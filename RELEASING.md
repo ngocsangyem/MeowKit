@@ -43,7 +43,7 @@ independent.
 Bump each **only** for its own change:
 
 - Kit content changed (`.claude/`, rules, skills, agents) → bump the **root** version.
-- CLI code changed (`packages/mewkit/src/`) → bump the **CLI** version. (When the CLI change also touches the authored Codex bundle, re-run `run-codex-port.ts` — see step 1e.)
+- CLI code changed (`packages/mewkit/src/`) → bump the **CLI** version. (When the CLI change also touches the authored Codex bundle, hand-author the affected surfaces — see step 1e.)
 - Both changed → bump both, independently, in the same release. Not to the same number.
 
 A version-field change is a release decision. Never edit one to make the other
@@ -133,16 +133,32 @@ Check `packages/mewkit/portable-manifest.json` whenever a release moves source f
 - Do not copy `portable-manifest.json` into `.claude/`. It is an npm package artifact shipped with `packages/mewkit`, not part of the project kit that `npx mewkit init` scaffolds.
 - If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `tasks/`, `CLAUDE.md`, and `release-manifest.json`.
 
-#### 1e. Sync the authored Codex bundle (when `.claude/` content changes)
+#### 1e. Update the authored Codex bundle + Cursor export (when `.claude/` content changes)
 
-The Codex migration target is a HAND-AUTHORED bundle at
-`packages/mewkit/src/migrate/modules/codex/`, ported from `.claude/` into Codex-native
-shapes. It is NOT a runtime transform — `mewkit migrate codex` copies this bundle
-verbatim. When a release adds or changes any **skill, agent, rule, command, or hook**
-in `.claude/`, re-port so the Codex bundle stays consistent with the Codex Harness.
+The Codex and Cursor migration targets are maintained very differently — know which
+one you are touching:
+
+- **Codex — HAND-AUTHORED bundle** at `packages/mewkit/src/migrate/modules/codex/`.
+  There is **no porter** (the `run-codex-port.ts` transform was removed in CLI 2.1.0
+  once every surface was authored). `mewkit migrate codex` / `init --target codex` copy
+  this bundle verbatim through the reconciler. When a release adds or changes any
+  **skill, agent, rule, command, or hook** in `.claude/`, author the matching
+  Codex-native file(s) **by hand** so the bundle stays consistent.
+- **Cursor — RUNTIME converter** (no bundle). `mewkit migrate cursor` converts `.claude/`
+  on the fly, so a new `.claude/` skill / agent / rule reaches Cursor **automatically**
+  with no manual step (see the Cursor note at the end of this section).
+
+**Codex bundle layout** (author under `root/`, then wire the two catalogs):
+
+| Path | What it is | When you touch it |
+| --- | --- | --- |
+| `modules/codex/root/` | The Codex-native tree copied verbatim: `.codex/agents/*.toml`, `.agents/skills/<name>/SKILL.md`, `.codex/hooks.json` + `.codex/hooks/*`, `.codex/rules/`, `AGENTS.md`, `.codex/config.toml` | Author the new/changed file(s) here by hand |
+| `modules/codex/manifest.json` | One `active` entry per **top-level surface** (agents dir, skills dir, hooks.json, config.toml, AGENTS.md, rules, …) | Only when adding a NEW top-level surface — a new skill/agent does NOT need an entry (the dir is one entry) |
+| `modules/codex/catalog/skill-packs.json` | Pack membership for the 7 packs (`core` is `defaultPack`) | Add the new skill's name to the right pack's `skills[]`; keep `core` under `budgetChars` |
+| `modules/codex/compliance/*.json` | Evidence (surface matrix, version matrix, cutover gates) | Update if a surface's support/version claim changed |
 
 **Always check the official Codex docs FIRST** — the formats change, so verify each
-surface against the source of truth before porting:
+surface against the source of truth before authoring:
 
 - Subagents (agents): https://learn.chatgpt.com/docs/agent-configuration/subagents
 - Rules: https://learn.chatgpt.com/docs/agent-configuration/rules
@@ -153,45 +169,55 @@ surface against the source of truth before porting:
 - Hooks: https://learn.chatgpt.com/docs/hooks
 - Skills: https://learn.chatgpt.com/docs/build-skills
 
-**Surface mapping (current, per the docs above):**
+**Surface mapping (authoring reference — hand-write these shapes, per the docs above):**
 
-| `.claude/` surface | Codex shape | Notes |
+| `.claude/` surface | Codex shape (author by hand) | Notes |
 | --- | --- | --- |
-| `agents/*.md` | `.codex/agents/<name>.toml` | `name` + `description` + `developer_instructions`; `model_reasoning_effort` is DERIVED from the agent's `model:` tier (opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` omits it) — do NOT hand-edit it, the porter regenerates it. Codex auto-loads them — NO `config.toml` `config_file` wiring |
-| `skills/<name>/` | `.agents/skills/<name>/SKILL.md` | Codex uses the SAME `SKILL.md` (name + description frontmatter); references/scripts copied |
-| `commands/**` | `.agents/skills/command-<name>/` | Codex has no command surface → represented as skills |
-| `rules/*`, `rules-conditional/*` | `.agents/skills/rule-<name>/` | Codex native `.rules` are Starlark command policies, NOT markdown guidance → guidance rules become skills |
+| `agents/*.md` | `.codex/agents/<name>.toml` | `name` + `description` + `developer_instructions`. Set `model_reasoning_effort` to match the source agent's `model:` tier (opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` omits it). Codex auto-loads agents — NO `config.toml` `config_file` wiring |
+| `skills/<name>/` | `.agents/skills/<name>/SKILL.md` | Same `SKILL.md` (name + description frontmatter); copy references/scripts; then add the skill name to a pack in `catalog/skill-packs.json` |
+| `commands/**` | `.agents/skills/command-<name>/` | Codex has no command surface → author as a skill |
+| `rules/*`, `rules-conditional/*` | `.agents/skills/rule-<name>/` | Codex native `.rules` are Starlark command policies, NOT markdown guidance → guidance rules become skills (native `.codex/rules/` holds only prefix_rule() policies) |
 | `modes/*` | `.agents/skills/mode-<name>/` | guidance → skills |
-| `settings.json` hooks | `.codex/hooks.json` | same JSON schema; resolve the project root via `$(git rev-parse --show-toplevel)` — Codex exposes no `CLAUDE_PROJECT_DIR` |
+| `settings.json` hooks | `.codex/hooks.json` (+ `.codex/hooks/*`) | same JSON schema; resolve the project root via `$(git rev-parse --show-toplevel)` — Codex exposes no `CLAUDE_PROJECT_DIR` |
 
 Index files (`agents/AGENTS_INDEX.md` / `SKILLS_INDEX.md`, no `name:` frontmatter) are
-NOT agents; the porter skips them.
+NOT agents; do not author agent TOMLs for them.
 
-**Re-port + verify:**
+**Neutralize Claude-isms by hand** (there is no porter to do it): the authored bundle
+must carry zero product/Claude self-references — memory paths use `.meowkit/`, `CLAUDE.md`
+→ `AGENTS.md`, `CLAUDE_PROJECT_DIR` → `$(git rev-parse --show-toplevel)`,
+`CLAUDE_PLUGIN_ROOT/DATA` → Codex's `PLUGIN_ROOT/DATA`, product wording → "the toolkit" /
+"the harness", tool/invocation tokens in Codex-native form.
+
+**Verify (Node 24, from the repo ROOT):**
 
 ```bash
-# Regenerate agents/ + skills/ from .claude/ into the bundle. Authored AGENTS.md,
-# config.toml, hooks.json, hooks/, and manifest.json are preserved.
-npx tsx packages/mewkit/scripts/run-codex-port.ts
+export PATH="/opt/homebrew/opt/node@24/bin:$PATH"   # tests need node:sqlite (Node 24)
 
-# Consistency gate: the bundle must contain ZERO `claude` references.
-grep -rli claude packages/mewkit/src/migrate/modules/codex   # expect: no output
+# dist parity: copy-codex-bundle stages the bundle into dist (also runs in `npm run build`)
+node packages/mewkit/scripts/copy-codex-bundle.cjs
 
-# Structural gate: the copied bundle must pass the Codex target validator.
-npx vitest run --config vitest.config.ts "src/migrate/modules/"
+# Codex bundle structural + pack + parity gates:
+npx vitest run $(grep -rl codex packages/mewkit/src --include='*.test.ts')
+
+# Pack-catalog coherence (every catalog skill resolves, budget respected):
+npx mewkit validate --packs
 ```
 
-The porter neutralizes Claude-isms (memory → `.meowkit/`, `CLAUDE.md` → `AGENTS.md`,
-`CLAUDE_PROJECT_DIR` → `$(git rev-parse …)`, `CLAUDE_PLUGIN_ROOT/DATA` → Codex's
-`PLUGIN_ROOT/DATA`, product wording → Codex, tool/invocation tokens via the adapter
-rules). If a NEW Claude-specific token appears, extend `neutralize()` in
-`packages/mewkit/src/migrate/modules/porter/port-claude-to-codex.ts` and re-run — do
-NOT hand-patch generated files.
+The brand-prose lint runs in CI in **diff-mode (blocking)** — any authored file you change
+must be brand-clean. There is no longer a `grep -rli claude` porter-output gate; the
+`codex-output-brand-free` test covers brand-freedom of the authored surface.
 
-**Bundle phasing (author-first, delete-converters-last):** each
-`modules/codex/manifest.json` entry carries an `active` flag. While draft
-(`active: false`) the migrate overlay is inert and the legacy converters still
-generate Codex output; flip surfaces live per batch, then retire the converters.
+**Cursor (runtime converter — usually no work):** `mewkit migrate cursor` converts `.claude/`
+at runtime — `agents/*.md` → `.cursor/rules/*.mdc` (fm-to-fm), `rules` + config → `.mdc`
+(md-to-mdc), `skills/` direct-copied; Cursor has **no command or hook surface**. A new
+`.claude/` skill / agent / rule is exported to Cursor automatically. Only touch the
+converters (`src/migrate/converters/{fm-to-fm,md-to-mdc,direct-copy}.ts`) if a NEW source
+shape needs a conversion rule.
+
+> **MCP servers → Codex:** `mewkit migrate codex --include-mcp` still merges a project's
+> `.mcp.json` into `.codex/config.toml [mcp_servers]` (opt-in). This is the only codex
+> converter kept after the cutover — it converts the user's own config, not toolkit content.
 
 #### 1f. Update when the derived index or wiki schema changes
 
@@ -505,7 +531,7 @@ Copy this checklist for each release:
 
 - [ ] `prepare-release-assets.cjs` ran successfully
 - [ ] `dist/meowkit-release.zip` exists with expected size
-- [ ] Codex bundle synced when `.claude/` changed (step 1e): `npx tsx packages/mewkit/scripts/run-codex-port.ts` re-run; `grep -rli claude packages/mewkit/src/migrate/modules/codex` → no output; `npx vitest run --config vitest.config.ts "src/migrate/modules/"` green
+- [ ] Codex bundle hand-authored when `.claude/` changed (step 1e): new/changed surfaces authored under `modules/codex/root/`; new skill added to a pack in `catalog/skill-packs.json`; codex suite + `mewkit validate --packs` green; `copy-codex-bundle.cjs` staged to dist. (Cursor export is automatic — no manual step.)
 - [ ] Committed and tagged
 - [ ] Pushed to GitHub (commits + tag)
 - [ ] GitHub Release created with zip asset
@@ -558,7 +584,7 @@ For CLI changes inside `packages/mewkit/src/`:
 | `scripts/sync-package-versions.cjs`     | Sync version across both npm packages                                           |
 | `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files                                |
 | `scripts/prepare-release-assets.cjs`    | Build the release manifest + dist/meowkit-release.zip                            |
-| `packages/mewkit/scripts/run-codex-port.ts` | Re-port `.claude/` → the authored Codex bundle (`modules/codex/`) — see step 1e |
+| `packages/mewkit/scripts/copy-codex-bundle.cjs` | Stage the authored Codex bundle (`modules/codex/`) into `dist/` — runs in `npm run build`; see step 1e |
 | `scripts/release.sh`                    | Automated release: bump → build → assets → commit → tag → push → GitHub Release |
 
 ## Release History
@@ -681,8 +707,8 @@ gh release upload v<version> dist/meowkit-release.zip --clobber
 
 No `feat:` or `fix:` commits since last release. Add a commit with the right prefix, or use `--force` on the workflow dispatch.
 
-### `mewkit migrate codex` produces stale output after editing `.claude/`
+### `mewkit migrate codex` is missing a skill/agent/rule after editing `.claude/`
 
-**Cause:** the authored Codex bundle (`packages/mewkit/src/migrate/modules/codex/`) was not re-ported after the `.claude/` change.
+**Cause:** the authored Codex bundle (`packages/mewkit/src/migrate/modules/codex/`) is hand-maintained — a new `.claude/` surface does not appear in the bundle until it is authored there. (There is no porter; `run-codex-port.ts` was removed in CLI 2.1.0.)
 
-**Fix:** re-run `npx tsx packages/mewkit/scripts/run-codex-port.ts`, then verify `grep -rli claude packages/mewkit/src/migrate/modules/codex` returns nothing — see step 1e.
+**Fix:** author the Codex-native file(s) under `modules/codex/root/`, add a new skill to a pack in `catalog/skill-packs.json`, then re-run the codex suite + `mewkit validate --packs` — see step 1e. Cursor export is automatic and needs no such step.

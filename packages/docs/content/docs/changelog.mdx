@@ -11,6 +11,20 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## CLI 2.1.0 (2026-07-24) — Codex Cutover Complete
+
+Kit unchanged at **2.14.6**; this is a **`mewkit` CLI 2.1.0** release (minor). Completes the Codex-native migration: the toolkit's Codex bundle is now fully hand-authored, so the semantic porter and the generic Codex converter pipeline are retired.
+
+### CLI
+
+- `mewkit migrate codex` now copies only the hand-authored Codex bundle — it no longer converts a project's own custom `.claude/agents`, `.claude/commands`, or `.claude/hooks` (toolkit agents ship in the bundle), and prints a one-line notice pointing to manual porting when such custom content is detected.
+- `mewkit migrate codex --include-mcp` is unchanged — it still merges a project's `.mcp.json` into `.codex/config.toml [mcp_servers]`.
+- `mewkit migrate cursor` is unchanged — Cursor export stays an automatic runtime conversion of `.claude/`.
+
+### Removals
+
+- Retired the internal Codex porter and converter pipeline — the Codex bundle is now authored directly. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) step 1e for the new hand-authored maintenance workflow.
+
 ## 2.14.6 (2026-07-23) — Runtime-Neutral State Root & Codex-First Migration
 
 Ships as kit **2.14.6** and **`mewkit` CLI 2.0.1** (major — breaking CLI changes below). The kit change is the plan-completion lifecycle wiring — agents now archive a finished plan via `npx mewkit plan archive`; the bulk of the release is CLI-side.
