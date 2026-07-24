@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Git Worktree Manager for MeowKit
+ * Git Worktree Manager for the toolkit
  *
  * Usage: node worktree.cjs <command> [options]
  * Commands:
@@ -86,7 +86,7 @@ const noPrefixIndex = args.indexOf('--no-prefix');
 const noPrefix = noPrefixIndex > -1;
 if (noPrefixIndex > -1) args.splice(noPrefixIndex, 1);
 
-// --orchestrated: parallel agent worktree mode (MeowKit-specific)
+// --orchestrated: parallel agent worktree mode (toolkit-specific)
 const orchestratedIndex = args.indexOf('--orchestrated');
 const orchestrated = orchestratedIndex > -1;
 if (orchestratedIndex > -1) args.splice(orchestratedIndex, 1);
@@ -708,7 +708,7 @@ function cmdPrune() {
 }
 
 function showHelp() {
-  console.log(`Git Worktree Manager for MeowKit
+  console.log(`Git Worktree Manager for the toolkit
 
 Usage: node worktree.cjs <command> [options]
 

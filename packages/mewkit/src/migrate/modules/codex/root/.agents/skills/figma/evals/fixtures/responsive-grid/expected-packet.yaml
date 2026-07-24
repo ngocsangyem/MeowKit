@@ -1,5 +1,5 @@
 # Expected Figma Evidence Packet — responsive-grid fixture.
-# Schema oracle. Paths use MeowKit convention (tasks/plans, tasks/reports).
+# Schema oracle. Paths use the toolkit convention (tasks/plans, tasks/reports).
 schema_version: figma-evidence-packet/v1
 source:
   figma_url: "https://www.figma.com/design/FIX0GRID/meowkit-fixtures?node-id=20-2"

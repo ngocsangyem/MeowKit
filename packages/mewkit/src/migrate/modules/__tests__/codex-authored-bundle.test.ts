@@ -98,24 +98,25 @@ describe("authored codex bundle", () => {
 		expect(existsSync(agentPath("confluence-page"))).toBe(true);
 	});
 
-	it("the copied bundle passes the Codex validator's structural checks", async () => {
+	it("the copied bundle passes the Codex validator's structural checks (incl. every installed skill)", async () => {
 		copyAuthoredCodexBundle(moduleDir, target);
 		const results = await codexTargetProfile.check(target);
-		// The authored structural surfaces (AGENTS.md, config, hooks, agents, legacy
-		// surfaces) must pass. Per-skill token cleanliness across the 189 ported skills
-		// is a follow-up hand-refinement pass, so skill-level findings are tolerated here.
-		const fails = results.filter((r) => r.status === "fail" && !/skill/i.test(r.name));
-		expect(fails, `unexpected non-skill failures: ${fails.map((f) => `${f.name} — ${f.detail}`).join("; ")}`).toEqual([]);
+		// The full authored surface must pass with NO exemption — the per-skill token-cleanliness
+		// hand-refinement is complete (all installed skills parse + carry zero denied tool tokens),
+		// so skill-level findings are no longer tolerated.
+		const fails = results.filter((r) => r.status === "fail");
+		expect(fails, `unexpected failures: ${fails.map((f) => `${f.name} — ${f.detail}`).join("; ")}`).toEqual([]);
 	});
 
-	it("the migrate overlay writes only the active surfaces (hooks + agents); draft surfaces stay converter-owned", async () => {
-		// Phase-9 flips 1+2: the hooks and agents surfaces are active, so the overlay writes exactly
-		// those five entries (hooks.json + three wrappers + the agents/ tree) and leaves every
-		// still-draft surface (AGENTS.md, config, skills) to the converter path during the transition.
+	it("the migrate overlay writes the active surfaces (hooks + agents + skills); draft surfaces stay converter-owned", async () => {
+		// Phase-9 flips 1-3: hooks, agents, and the skills tree are active, so the overlay writes
+		// exactly those six entries and leaves the still-draft surfaces (AGENTS.md, config) to the
+		// converter path during the transition.
 		const overlay = await applyActiveCodexOverlay(target, { moduleDir });
 		const written = overlay.entries.map((e) => e.targetPath).sort();
 		expect(written).toEqual(
 			[
+				".agents/skills",
 				".codex/agents",
 				".codex/hooks.json",
 				".codex/hooks/capture.cjs",
@@ -123,9 +124,10 @@ describe("authored codex bundle", () => {
 				".codex/hooks/privacy-block.cjs",
 			].sort(),
 		);
-		expect(overlay.writes).toBe(5);
+		expect(overlay.writes).toBe(6);
 		expect(existsSync(join(target, ".codex", "hooks.json"))).toBe(true);
 		expect(existsSync(join(target, ".codex", "agents", "planner.toml"))).toBe(true); // authored agent
+		expect(existsSync(join(target, ".agents", "skills", "fix", "SKILL.md"))).toBe(true); // authored skill
 		expect(existsSync(join(target, "AGENTS.md"))).toBe(false); // inactive surface stays draft
 	});
 });

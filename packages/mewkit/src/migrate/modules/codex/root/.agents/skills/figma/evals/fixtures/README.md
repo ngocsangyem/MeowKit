@@ -26,7 +26,7 @@ Each fixture directory contains:
 
 ## Path convention
 
-All artifact paths use the MeowKit `tasks/` convention:
+All artifact paths use the toolkit `tasks/` convention:
 
 - active plan → `tasks/plans/<active-plan>/research/`
 - standalone → `tasks/reports/`

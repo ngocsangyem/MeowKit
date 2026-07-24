@@ -1,7 +1,7 @@
 # Expected Figma Evidence Packet — spec-conflict fixture.
 # Schema oracle. Prototype flow is EXTRACTED but CONFLICTS with route + spec.
 # mk:figma records evidence + ledger data; it does NOT adjudicate or set blocked_on.
-# Paths use MeowKit convention (tasks/plans, tasks/reports).
+# Paths use the toolkit convention (tasks/plans, tasks/reports).
 schema_version: figma-evidence-packet/v1
 source:
   figma_url: "https://www.figma.com/design/FIX0CONFLICT/meowkit-fixtures?node-id=40-2"

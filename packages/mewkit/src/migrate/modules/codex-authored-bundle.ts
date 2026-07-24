@@ -76,6 +76,13 @@ export function copyAuthoredCodexBundle(
 	return copied;
 }
 
+/** Build artifacts that must never be copied into a target: untracked, regenerated on run,
+ *  and (for `.pyc`) binary blobs whose embedded string constants would pollute the project. */
+export function isBundleBuildArtifact(p: string): boolean {
+	const norm = p.split("\\").join("/");
+	return /(?:^|\/)__pycache__(?:\/|$)/.test(norm) || norm.endsWith(".pyc");
+}
+
 export function copyOne(moduleDir: string, targetDir: string, entry: ArtifactManifestEntry): void {
 	const src = join(moduleDir, entry.sourcePath);
 	if (!existsSync(src)) throw new Error(`authored codex artifact missing: ${entry.sourcePath}`);
@@ -84,7 +91,7 @@ export function copyOne(moduleDir: string, targetDir: string, entry: ArtifactMan
 	// the entry `mode` applies only to single-file artifacts (hooks/scripts).
 	if (statSync(src).isDirectory()) {
 		mkdirSync(dest, { recursive: true });
-		cpSync(src, dest, { recursive: true });
+		cpSync(src, dest, { recursive: true, filter: (s) => !isBundleBuildArtifact(s) });
 		return;
 	}
 	mkdirSync(dirname(dest), { recursive: true });

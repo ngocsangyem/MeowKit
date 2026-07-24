@@ -1,6 +1,6 @@
 # Expected Figma Evidence Packet — interaction-modal fixture.
 # Schema oracle. Exercises prototype_flow_summary + linked flow artifacts.
-# Paths use MeowKit convention (tasks/plans, tasks/reports).
+# Paths use the toolkit convention (tasks/plans, tasks/reports).
 schema_version: figma-evidence-packet/v1
 source:
   figma_url: "https://www.figma.com/design/FIX0MODAL/meowkit-fixtures?node-id=30-2"

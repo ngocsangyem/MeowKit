@@ -2,7 +2,7 @@
   "name": "mk-stitch-scripts",
   "version": "1.0.0",
   "type": "module",
-  "description": "MeowKit mk:stitch skill SDK wrapper scripts",
+  "description": "the toolkit mk:stitch skill SDK wrapper scripts",
   "scripts": {
     "api-call": "tsx stitch-api-call.ts",
     "write-output": "tsx stitch-write-output.ts",

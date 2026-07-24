@@ -314,8 +314,8 @@ test('validateRemote requires a remote name', () => {
 });
 
 test('parseRemoteGitHub parses https and ssh forms, rejects non-github', () => {
-  const https = reviewPr.parseRemoteGitHub('https://github.com/ngocsangyem/MeowKit.git');
-  assert(https && https.owner === 'ngocsangyem' && https.repo === 'MeowKit', `https parse failed: ${JSON.stringify(https)}`);
+  const https = reviewPr.parseRemoteGitHub('https://github.com/ngocsangyem/mewkit.git');
+  assert(https && https.owner === 'ngocsangyem' && https.repo === 'mewkit', `https parse failed: ${JSON.stringify(https)}`);
   const ssh = reviewPr.parseRemoteGitHub('git@github.com:acme/repo.git');
   assert(ssh && ssh.owner === 'acme' && ssh.repo === 'repo', `ssh parse failed: ${JSON.stringify(ssh)}`);
   assert(reviewPr.parseRemoteGitHub('https://gitlab.com/a/b.git') === null, 'non-github should be null');

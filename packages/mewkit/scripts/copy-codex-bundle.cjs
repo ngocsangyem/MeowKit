@@ -17,5 +17,11 @@ if (!existsSync(src)) {
 	console.error(`[copy-codex-bundle] source missing: ${src}`);
 	process.exit(1);
 }
-cpSync(src, dest, { recursive: true });
+// Exclude Python build artifacts (untracked, regenerated on run; binary `.pyc` blobs would
+// otherwise ship into the published package). Mirrors isBundleBuildArtifact in codex-authored-bundle.ts.
+const isBuildArtifact = (p) => {
+	const norm = p.split("\\").join("/");
+	return /(?:^|\/)__pycache__(?:\/|$)/.test(norm) || norm.endsWith(".pyc");
+};
+cpSync(src, dest, { recursive: true, filter: (s) => !isBuildArtifact(s) });
 console.log(`[copy-codex-bundle] copied Codex bundle → dist/migrate/modules/codex`);

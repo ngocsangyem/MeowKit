@@ -1,6 +1,6 @@
 # Expected Figma Evidence Packet — static-card fixture.
 # Schema oracle: the packet mk:figma emits must match THIS field set (values may vary in
-# wording; keys and shape must match). Paths use MeowKit convention (tasks/plans, tasks/reports).
+# wording; keys and shape must match). Paths use the toolkit convention (tasks/plans, tasks/reports).
 schema_version: figma-evidence-packet/v1
 source:
   figma_url: "https://www.figma.com/design/FIX0STATIC/meowkit-fixtures?node-id=10-2"
