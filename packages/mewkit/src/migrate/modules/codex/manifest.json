@@ -89,7 +89,7 @@
       "scopeTags": [
         "managed-runtime"
       ],
-      "active": false
+      "active": true
     },
     {
       "sourcePath": "root/.agents/skills",

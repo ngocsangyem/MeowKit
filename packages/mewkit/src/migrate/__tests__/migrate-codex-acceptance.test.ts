@@ -88,7 +88,11 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 	});
 
 	it("rewrites migrated skill refs while preserving genuinely out-of-set refs", () => {
-		const agentToml = readFileSync(join(env.projectDir, ".codex", "agents", "planner.toml"), "utf-8");
+		// Asserted against a NON-roster user agent (custom-helper.md → custom_helper.toml): the
+		// authored-bundle overlay overwrites toolkit agents (planner.toml) but never a user-custom
+		// agent, so the converter's ref-rewriting stays observable end-to-end post-cutover (also
+		// unit-covered in the ref-rewrite suites).
+		const agentToml = readFileSync(join(env.projectDir, ".codex", "agents", "custom_helper.toml"), "utf-8");
 		expect(agentToml).toContain("python3 .agents/skills/demo-skill/scripts/run.py");
 		expect(agentToml).not.toContain(".claude/skills/demo-skill");
 		expect(agentToml).toContain("node .claude/scripts/validate-docs.cjs");
@@ -109,11 +113,12 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 		expect(configToml).not.toContain("JIRA_API_TOKEN");
 
 		// No modelRouting override mechanism: a known source tier has no target model
-		// id (deployment-specific), so the converter discloses it as a commented hint
-		// and the target inherits its own configured default.
-		const plannerToml = readFileSync(join(env.projectDir, ".codex", "agents", "planner.toml"), "utf-8");
-		expect(plannerToml).toContain('# model = "opus"');
-		expect(plannerToml).not.toContain('model_reasoning_effort');
+		// id (deployment-specific), so the converter discloses it as a commented hint and the
+		// target inherits its own configured default. Asserted on the non-roster custom_helper
+		// agent — the overlay overwrites the toolkit planner.toml with authored content.
+		const customToml = readFileSync(join(env.projectDir, ".codex", "agents", "custom_helper.toml"), "utf-8");
+		expect(customToml).toContain('# model = "opus"');
+		expect(customToml).not.toContain('model_reasoning_effort');
 		expect(readReport().header.secretKeysOmitted).toBe(1);
 	});
 

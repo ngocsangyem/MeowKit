@@ -108,23 +108,24 @@ describe("authored codex bundle", () => {
 		expect(fails, `unexpected non-skill failures: ${fails.map((f) => `${f.name} — ${f.detail}`).join("; ")}`).toEqual([]);
 	});
 
-	it("the migrate overlay writes only the active hooks surface; draft surfaces stay converter-owned", async () => {
-		// Phase-9 flip-1: the hooks surface is active, so the overlay writes exactly its four
-		// entries (hooks.json + the three wrappers) and leaves every still-draft surface
-		// (AGENTS.md, config, agents, skills) to the converter path during the phased transition.
+	it("the migrate overlay writes only the active surfaces (hooks + agents); draft surfaces stay converter-owned", async () => {
+		// Phase-9 flips 1+2: the hooks and agents surfaces are active, so the overlay writes exactly
+		// those five entries (hooks.json + three wrappers + the agents/ tree) and leaves every
+		// still-draft surface (AGENTS.md, config, skills) to the converter path during the transition.
 		const overlay = await applyActiveCodexOverlay(target, { moduleDir });
 		const written = overlay.entries.map((e) => e.targetPath).sort();
 		expect(written).toEqual(
 			[
+				".codex/agents",
 				".codex/hooks.json",
 				".codex/hooks/capture.cjs",
 				".codex/hooks/gate-enforcement.cjs",
 				".codex/hooks/privacy-block.cjs",
 			].sort(),
 		);
-		expect(overlay.writes).toBe(4);
+		expect(overlay.writes).toBe(5);
 		expect(existsSync(join(target, ".codex", "hooks.json"))).toBe(true);
-		expect(existsSync(join(target, ".codex", "hooks", "gate-enforcement.cjs"))).toBe(true);
+		expect(existsSync(join(target, ".codex", "agents", "planner.toml"))).toBe(true); // authored agent
 		expect(existsSync(join(target, "AGENTS.md"))).toBe(false); // inactive surface stays draft
 	});
 });

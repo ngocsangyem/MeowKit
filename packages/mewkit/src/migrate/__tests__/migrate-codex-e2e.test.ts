@@ -87,7 +87,10 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 	});
 
 	it("rewrites the agent TOML fenced ref to a migrated skill script, preserving only out-of-set refs", () => {
-		const agentToml = readFileSync(join(env.projectDir, ".codex", "agents", "planner.toml"), "utf-8");
+		// Non-roster user agent (custom-helper): the authored overlay overwrites toolkit agents
+		// (planner.toml) but not user-custom ones, so the converter's fenced-ref rewriting stays
+		// observable end-to-end after the agents surface is flipped authored.
+		const agentToml = readFileSync(join(env.projectDir, ".codex", "agents", "custom_helper.toml"), "utf-8");
 		// demo-skill IS in the migration set → the fenced script ref is rewritten to
 		// the provider target (previously blanket-preserved because migratedRefs was dropped).
 		expect(agentToml).toContain("python3 .agents/skills/demo-skill/scripts/run.py");
@@ -110,21 +113,18 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 		);
 		expect(generated.length).toBeGreaterThan(0);
 		for (const file of generated) {
-			// The bounded bootstrap intentionally names documented CLI invocations (allowed as
-			// literal CLI tokens per skill-authoring Rule 7). Strip those exact trusted operations
-			// before asserting no narrative/toolkit branding remains.
-			const content = readFileSync(file, "utf-8")
-				.replace(/npx mewkit capabilities resolve --intent/g, "")
-				.replace(/npx mewkit orient/g, "");
-			if (file.includes("/.codex/hooks/")) {
-				// Authored hook wrappers are provider-neutral CODE that MUST invoke the `mewkit`
-				// CLI and reference the `.meowkit/` state dir — allowed as CLI tokens/namespace
-				// (skill-authoring Rule 7). Forbid only the capitalized marketing brand here; the
-				// nuanced narrative-brand policy is enforced by the brand-prose lint.
-				expect(content, file).not.toMatch(/MeowKit/);
-			} else {
-				expect(content, file).not.toMatch(/MeowKit|mewkit|meowkit/);
-			}
+			// Forbid the capitalized PRODUCT brand `MeowKit` — the marketing form that only appears
+			// in narrative prose and would pollute the user's project. The lowercase functional
+			// tokens are all legitimate per skill-authoring Rule 7 and intentionally allowed here:
+			// the `mewkit` CLI (hooks invoke it), the `.meowkit/` state-dir namespace (agents read
+			// its memory store; hook path-guards match it), and `MEOWKIT_*` env vars.
+			//
+			// NOTE ON COVERAGE: a lowercase narrative "meowkit" prose leak in an AUTHORED codex file
+			// (.codex/agents/*.toml, hooks, AGENTS.md) is NOT caught by any automated check today —
+			// the repo brand lint scans `.claude/` (capitalized-only, *.md), not this authored tree —
+			// so authored content is kept brand-clean by manual review. Converter-PATH lowercase
+			// stripping (of user source content) stays unit-covered by codex-output-brand-free.test.ts.
+			expect(readFileSync(file, "utf-8"), file).not.toMatch(/MeowKit/);
 		}
 		expect(existsSync(join(env.projectDir, ".mewkit"))).toBe(false);
 	});
