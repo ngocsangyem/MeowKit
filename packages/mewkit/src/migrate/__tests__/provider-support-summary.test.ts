@@ -70,9 +70,7 @@ describe("provider support summary", () => {
 			config: { ...cursorManifest.config, supportLevel: "deprecated", supportReason: "test override" },
 		};
 
-		expect(findProviderSupportInfo("cursor", collectProviderSupportMatrix([disabledManifest]))?.role).toBe(
-			"disabled",
-		);
+		expect(findProviderSupportInfo("cursor", collectProviderSupportMatrix([disabledManifest]))?.role).toBe("disabled");
 		expect(findProviderSupportInfo("cursor", collectProviderSupportMatrix([deprecatedManifest]))?.role).toBe(
 			"deprecated",
 		);

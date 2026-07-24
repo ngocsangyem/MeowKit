@@ -12,21 +12,14 @@ const preflightDir = resolve(here, ".."); // src/migrate/memory-preflight
 
 // Entry points that define the memory-import path (NOT commands/migrate.ts, whose migrate
 // orchestrator legitimately touches the porter — the guard is scoped to the import logic).
-const ENTRY_POINTS = [
-	join(preflightDir, "memory-preflight.ts"),
-	join(preflightDir, "memory-migration-transaction.ts"),
-];
+const ENTRY_POINTS = [join(preflightDir, "memory-preflight.ts"), join(preflightDir, "memory-migration-transaction.ts")];
 
 const IMPORT_RE = /(?:import|export)\s+(?:[^"']*?\sfrom\s+)?["'](\.[^"']+)["']/g;
 
 /** Resolve a relative import specifier (with a `.js` runtime extension) to its `.ts` source. */
 function resolveSource(fromFile: string, spec: string): string | null {
 	const base = resolve(dirname(fromFile), spec);
-	const candidates = [
-		base.replace(/\.js$/, ".ts"),
-		base.endsWith(".ts") ? base : `${base}.ts`,
-		join(base, "index.ts"),
-	];
+	const candidates = [base.replace(/\.js$/, ".ts"), base.endsWith(".ts") ? base : `${base}.ts`, join(base, "index.ts")];
 	return candidates.find((c) => existsSync(c)) ?? null;
 }
 

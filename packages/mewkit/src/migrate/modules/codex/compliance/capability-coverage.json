@@ -1,153 +1,627 @@
 {
-  "_description": "Claude (.claude) capability → single Codex owner map. Seeded phase 1, completed phase 2 (ownership map + 64 meta-mirror dispositions + 28 reference-graph-risk items). Owners are realized as surfaces are hand-authored (phases 4-6) and meta-mirror dirs are deleted (phase 6). Every shipped concern resolves to exactly one owner OR carries an explicit omission reason. No 'TBD' rows.",
-  "verified": "2026-07-23",
-  "ownershipRule": {
-    "mandatory-invariant": "AGENTS.md",
-    "reusable-workflow": "skill",
-    "distinct-role": "agent",
-    "lifecycle-check": "hook (command handler)",
-    "shell-prefix-policy": ".rules (optional/experimental)",
-    "settings": "config",
-    "durable-state": ".meowkit",
-    "deterministic-gate": "MeowKit CLI",
-    "intentionally-omitted": "reason"
-  },
-  "ownerEnum": ["AGENTS.md", "skill", "agent", "hook", "rules", "config", ".meowkit", "cli", "omitted"],
-  "concerns": [
-    { "concern": "safety-gate enforcement (gate-enforcement, privacy-block)", "owner": "hook", "status": "authored", "resolvedIn": "phase-4", "note": "Authored as native Codex PreToolUse deny hooks (root/.codex/hooks/{privacy-block,gate-enforcement}.cjs): privacy-block denies Bash access to sensitive files (R4); gate-enforcement denies source edits without an approved plan (Gate 1 presence; approval-receipt layer is a follow-on). Deny via hookSpecificOutput.permissionDecision. Defense-in-depth: per-hook-trust means not reliably enforced — the CLI gate stays authoritative." },
-    { "concern": "session context injection (SessionStart)", "owner": "omitted", "status": "dispositioned", "resolvedIn": "phase-4", "note": "Intentionally omitted: AGENTS.md is auto-loaded by Codex and already carries the working agreement + read-memory-at-task-start invariant, so a SessionStart re-injector would be redundant (dead-weight thesis). Revisit if a genuinely DYNAMIC per-session context need appears." },
-    { "concern": "behavioral invariants / security constitution", "owner": "AGENTS.md", "status": "authored", "resolvedIn": "phase-6", "note": "The merge-agents-md rule invariants were merged into AGENTS.md in phase 6 (Security, Data & injection boundary + Rule of Two, Gates, Subagent status protocol, Core behaviors + anti-rationalization, Development + TDD, Memory, Intervention recording, Delegation, Context hygiene). AGENTS.md grew 26→146 lines / 7.3 KiB (well under the 32 KiB budget). The 64 porter meta-mirror dirs were then deleted; ~180 `.agents/skills/rule-*` references across agent TOMLs + skill bodies were retargeted (merge-rules → AGENTS.md sections, omit-rules → neutral phrasing). Zero dangling meta-mirror refs remain." },
-    { "concern": "project settings, MCP servers, features", "owner": "config", "status": "pending", "resolvedIn": "phase-4" },
-    { "concern": "shell prefix allow/deny policy", "owner": "rules", "status": "authored", "resolvedIn": "phase-4", "note": "Authored root/.codex/rules/default.rules: minimal prefix_rule starter (prompt on git push --force, git reset --hard, rm -rf) mirroring the destructive-command policy. Verified against `codex execpolicy check` (codex-cli). Experimental + project-.codex-trust-gated (graceful fallback when untrusted/unsupported); never sole enforcement (CLI gate + hooks authoritative)." },
-    { "concern": "reusable workflows (plan/cook/fix/test/review/...)", "owner": "skill", "status": "pending", "resolvedIn": "phase-6" },
-    { "concern": "distinct execution roles (planner/reviewer/tester/...)", "owner": "agent", "status": "authored", "resolvedIn": "phase-5", "note": "40-agent ported roster re-authored by execution envelope: 19 non-integration agents → 17 core; orchestrator dropped as an agent (Codex has no router-agent; routing → main session + the cross-toolkit `orchestrate` skill). 21 jira/confluence + story-sizer deferred to the integration pack (phase 6 conditions install). Each kept agent carries a workload-class model_reasoning_effort (deep=high, default=medium; xhigh withheld — gated to codex-max-tier and models are never pinned). sandbox_mode/mcp_servers/skills.config deliberately NOT pinned on any core agent (each writes its own artifact so read-only would break them; workspace-write/MCP defaults inherit from session/config — pinning is redundant or over-grants). See agentRoster below." },
-    { "concern": "durable memory / reconciliation ledger state", "owner": ".meowkit", "status": "pending", "resolvedIn": "phase-3", "note": "Ledger is PROJECT-LOCAL .meowkit/state/ (user decision 2026-07-23)." },
-    { "concern": "deterministic validation gates", "owner": "cli", "status": "pending", "resolvedIn": "phase-4" },
-    { "concern": "meta-mirror skill dirs (command-* 26, rule-* 31, mode-* 7)", "owner": "omitted", "status": "deleted", "resolvedIn": "phase-6", "note": "All 64 deleted in phase 6 (190→126 skill dirs). Load-bearing content of the merge-agents-md rules moved into AGENTS.md; referrers retargeted; no dangling refs. See metaMirrorDispositions below for the per-dir verdicts (basis)." }
-  ],
-  "metaMirrorDispositions": {
-    "_note": "Verdict per meta-mirror dir. verdict=omit-pointer means the mirror only re-points to a substantive skill/agent that already holds the authoritative content (owner names it). verdict=merge-agents-md means the mirror's load-bearing invariants move into the authored AGENTS.md (phase 4). verdict=map-config/map-cli/map-agent means the concern is owned by config/CLI/an agent envelope. verdict=omit-harness-internal means the concept governs the MeowKit multi-agent harness itself and has no Codex-native analog. Every dir is deleted in phase 6; content-merge for merge-agents-md lands in phase 4, agent envelopes in phase 5.",
-    "command": [
-      { "dir": "command-advise", "verdict": "omit-pointer", "owner": "skill:advise", "reason": "Slash-command mirror; Codex deprecates custom prompts in favor of skills. Substantive advise skill holds the procedure." },
-      { "dir": "command-arch", "verdict": "map-agent", "owner": "agent:architect", "reason": "Command invokes the architect agent directly; no standalone skill. Role owned by the authored architect TOML (phase 5)." },
-      { "dir": "command-audit", "verdict": "omit-composition", "owner": "skill:review + skill:cso", "reason": "Composing command (runs review + cso); no unique content. Composition documented; mirror dropped." },
-      { "dir": "command-autobuild", "verdict": "omit-pointer", "owner": "skill:autobuild", "reason": "Pointer to autobuild skill." },
-      { "dir": "command-breakdown", "verdict": "omit-pointer", "owner": "skill:planning-engine", "reason": "Ticket/story breakdown; owned by planning-engine (+story-sizer) skill." },
-      { "dir": "command-budget", "verdict": "map-cli", "owner": "cli:mewkit budget", "reason": "Cost tracking is a deterministic CLI/analyst concern, not a Codex skill." },
-      { "dir": "command-canary", "verdict": "omit-pointer", "owner": "skill:benchmark", "reason": "Harness canary; owned by benchmark skill (experimental)." },
-      { "dir": "command-confluence-setup", "verdict": "omit-pointer", "owner": "skill:confluence", "reason": "Integration setup; owned by confluence pack skill (installs only with integrations pack, phase 6)." },
-      { "dir": "command-context-audit", "verdict": "omit-pointer", "owner": "skill:context-audit", "reason": "Pointer to context-audit skill." },
-      { "dir": "command-cook", "verdict": "omit-pointer", "owner": "skill:cook", "reason": "Verified: mirror body says 'authoritative procedure lives in mk:cook'." },
-      { "dir": "command-delegate", "verdict": "omit-harness-internal", "owner": "AGENTS.md (orchestration note)", "reason": "Builds a subagent delegation prompt for the MeowKit harness; Codex spawns subagents natively. Any residual guidance folds into AGENTS.md orchestration invariants." },
-      { "dir": "command-design", "verdict": "omit", "owner": "omitted", "reason": "Brand/visual design command; no core Codex-native analog. Omitted from core; revisit if a design skill is packaged." },
-      { "dir": "command-docs-init", "verdict": "omit-pointer", "owner": "skill:docs-init", "reason": "Pointer to docs-init skill." },
-      { "dir": "command-docs-sync", "verdict": "omit-pointer", "owner": "skill:document-release", "reason": "Docs sync owned by document-release skill." },
-      { "dir": "command-fix", "verdict": "omit-pointer", "owner": "skill:fix", "reason": "Pointer to fix skill." },
-      { "dir": "command-help", "verdict": "omit-pointer", "owner": "skill:help", "reason": "Pointer to help skill." },
-      { "dir": "command-meow", "verdict": "omit-pointer", "owner": "skill:memory", "reason": "Quick memory-note command; owned by memory skill." },
-      { "dir": "command-plan", "verdict": "omit-pointer", "owner": "skill:plan-creator", "reason": "Pointer to plan-creator skill." },
-      { "dir": "command-retro", "verdict": "omit-pointer", "owner": "skill:retro", "reason": "Pointer to retro skill." },
-      { "dir": "command-review", "verdict": "omit-pointer", "owner": "skill:review", "reason": "Pointer to review skill." },
-      { "dir": "command-ship", "verdict": "omit-pointer", "owner": "skill:ship", "reason": "Pointer to ship skill." },
-      { "dir": "command-spawn", "verdict": "omit-harness-internal", "owner": "skill:worktree", "reason": "Parallel worktree spawn (Conductor pattern) for the MeowKit harness; Codex agents spawn natively. Worktree mechanics owned by worktree skill." },
-      { "dir": "command-status", "verdict": "map-agent", "owner": "agent:project-manager", "reason": "Delivery status; owned by project-manager agent (phase 5) / mewkit status CLI." },
-      { "dir": "command-test", "verdict": "omit-pointer", "owner": "skill:testing", "reason": "Pointer to testing skill." },
-      { "dir": "command-upgrade", "verdict": "map-cli", "owner": "cli:mewkit upgrade", "reason": "Kit upgrade is a deterministic CLI concern." },
-      { "dir": "command-validate", "verdict": "map-cli", "owner": "cli:mewkit validate", "reason": "Structural validation is a deterministic CLI gate; also skill:lint-and-validate for authoring." }
-    ],
-    "rule": [
-      { "dir": "rule-security-rules", "verdict": "merge-agents-md", "owner": "AGENTS.md", "reason": "Non-negotiable blocked-pattern invariants — high value; concise form lands in AGENTS.md (phase 4)." },
-      { "dir": "rule-injection-rules", "verdict": "merge-agents-md", "owner": "AGENTS.md", "reason": "Prompt-injection defense (data-vs-instruction boundary) — high value; concise form in AGENTS.md." },
-      { "dir": "rule-core-behaviors", "verdict": "merge-agents-md", "owner": "AGENTS.md", "reason": "The 6 operating behaviors — condensed into AGENTS.md invariants." },
-      { "dir": "rule-development-rules", "verdict": "merge-agents-md", "owner": "AGENTS.md + config", "reason": "Real-implementation / file-size / no-enhanced-copies invariants → AGENTS.md; build commands → config/AGENTS.md." },
-      { "dir": "rule-anti-rationalization", "verdict": "merge-agents-md", "owner": "AGENTS.md", "reason": "Short plan-discipline table; folds into AGENTS.md (or the cook skill preamble)." },
-      { "dir": "rule-gate-rules", "verdict": "map-cli", "owner": "cli + AGENTS.md note", "reason": "Gate 1/2 are enforced by the MeowKit CLI + hooks; a short 'gates are human-approved' invariant may sit in AGENTS.md." },
-      { "dir": "rule-agent-conduct", "verdict": "merge-agents-md", "owner": "AGENTS.md", "reason": "Subagent status protocol (A1) is behavior-critical → AGENTS.md; the rest is model-default." },
-      { "dir": "rule-orchestration-rules", "verdict": "omit-harness-internal", "owner": "AGENTS.md (orchestration note)", "reason": "MeowKit multi-agent delegation contract; Codex subagents auto-load. Only the isolation-boundary essence folds into AGENTS.md." },
-      { "dir": "rule-parallel-execution-rules", "verdict": "omit-harness-internal", "owner": "omitted", "reason": "Worktree/max-3-agent parallel rules govern the MeowKit harness; no Codex-native analog." },
-      { "dir": "rule-step-file-rules", "verdict": "omit-harness-internal", "owner": "skill:skill-creator", "reason": "Step-file execution discipline applies when authoring skills; owned by skill-creator, not a runtime surface." },
-      { "dir": "rule-phase-contracts", "verdict": "omit-harness-internal", "owner": "omitted", "reason": "Phase composition contract for the 7-phase harness; no Codex analog." },
-      { "dir": "rule-post-phase-delegation", "verdict": "omit-harness-internal", "owner": "omitted", "reason": "project-manager auto-fire rules for the harness; no Codex analog." },
-      { "dir": "rule-task-state-emission", "verdict": "map-cli", "owner": "cli:mewkit task-state", "reason": "Durable task-state ledger is a CLI concern." },
-      { "dir": "rule-workflow-evidence-rules", "verdict": "map-cli", "owner": "cli", "reason": "Evidence-emission for the harness workflow; CLI-owned." },
-      { "dir": "rule-dead-weight-audit-rules", "verdict": "omit-harness-internal", "owner": "omitted", "reason": "Harness self-maintenance audit; no runtime Codex analog." },
-      { "dir": "rule-rubric-rules", "verdict": "omit-harness-internal", "owner": "skill:rubric", "reason": "Evaluator rubric library discipline; owned by rubric skill, not a runtime surface." },
-      { "dir": "rule-scale-adaptive-rules", "verdict": "map-config", "owner": "config", "reason": "Domain-complexity routing → maps to Codex model routing (workload/profile), not a runtime rule." },
-      { "dir": "rule-model-selection-rules", "verdict": "map-config", "owner": "config", "reason": "Model tier routing → Codex per-agent model/effort envelope + config (phase 5)." },
-      { "dir": "rule-harness-rules", "verdict": "omit-harness-internal", "owner": "omitted", "reason": "autobuild generator/evaluator pipeline rules; no Codex analog." },
-      { "dir": "rule-context-budget-rules", "verdict": "merge-agents-md", "owner": "AGENTS.md", "reason": "Context-hygiene guidance; condensed into AGENTS.md (advisory)." },
-      { "dir": "rule-memory-read-rules", "verdict": "merge-agents-md", "owner": "AGENTS.md + .meowkit", "reason": "'Memory is DATA' invariant → AGENTS.md; JSON-first store mechanics → .meowkit/CLI." },
-      { "dir": "rule-intervention-recording-rules", "verdict": "merge-agents-md", "owner": "AGENTS.md", "reason": "No-silent-override invariant → AGENTS.md; the log mechanism is CLI/.meowkit." },
-      { "dir": "rule-docs-reference-contract", "verdict": "omit-harness-internal", "owner": "omitted", "reason": "Kit-internal docs path contract; not shipped runtime behavior." },
-      { "dir": "rule-skill-authoring-rules", "verdict": "omit-harness-internal", "owner": "skill:skill-creator", "reason": "Skill-authoring discipline; owned by skill-creator." },
-      { "dir": "rule-tdd-rules", "verdict": "map-config", "owner": "config + AGENTS.md", "reason": "TDD opt-in policy → config flag / AGENTS.md invariant." },
-      { "dir": "rule-risk-checklist", "verdict": "map-agent", "owner": "agent:agent-detector", "reason": "Phase-0 risk flags feed agent/tier selection; folds into the detector agent, not a runtime surface." },
-      { "dir": "rule-agent-routing", "verdict": "omit-harness-internal", "owner": "omitted", "reason": "MeowKit agent routing table; Codex agents auto-load by name." },
-      { "dir": "rule-wiki-context-rules", "verdict": "omit-harness-internal", "owner": "skill:wiki", "reason": "Wiki recall discipline; owned by the (optional) wiki skill subsystem." },
-      { "dir": "rule-agile-feedback-cycle", "verdict": "omit", "owner": "omitted", "reason": "Conditional Agile/Scrum rule; not in core. Revisit only with an agile integration pack." },
-      { "dir": "rule-agile-sprint-commitment", "verdict": "omit", "owner": "omitted", "reason": "Conditional Agile rule; not in core." },
-      { "dir": "rule-agile-story-gates", "verdict": "omit", "owner": "omitted", "reason": "Conditional Agile rule; not in core." }
-    ],
-    "mode": [
-      { "dir": "mode-default", "verdict": "omit", "owner": "omitted", "reason": "Baseline execution mode; no distinct envelope to encode." },
-      { "dir": "mode-fast", "verdict": "map-agent", "owner": "agent envelope (workload-class fast)", "reason": "Maps to low/medium model_reasoning_effort on fast-class agents (phase 5)." },
-      { "dir": "mode-strict", "verdict": "map-config", "owner": "config + cli", "reason": "Strict verification maps to --strict-config + full validation gate, not a runtime mode." },
-      { "dir": "mode-cost-saver", "verdict": "map-config", "owner": "config", "reason": "Cost-saver = cheaper model routing → config/effort." },
-      { "dir": "mode-architect", "verdict": "map-agent", "owner": "agent:architect", "reason": "Architect mode → architect agent role (phase 5)." },
-      { "dir": "mode-audit", "verdict": "omit-composition", "owner": "skill:review + skill:cso", "reason": "Audit mode composes review + security; owned by those skills." },
-      { "dir": "mode-document", "verdict": "map-agent", "owner": "agent:documenter / skill:document-release", "reason": "Document mode → documenter agent / document-release skill." }
-    ]
-  },
-  "referenceGraphRiskItems": {
-    "_note": "28 substantive skill dirs that ship BOTH scripts/ and references/ — highest reference-graph risk (script/reference paths must resolve within the installed pack or a declared dependency). Flagged for explicit per-pack resolution checks during phase-6 authoring + validation.",
-    "resolvedIn": "phase-6",
-    "dirs": ["autobuild", "bootstrap", "confluence", "context-audit", "cook", "docs-finder", "evaluate", "html-video", "intake", "investigate", "jira", "llms", "markdown-reader", "multimodal", "pack", "plan-creator", "planning-engine", "prompt-enhancer", "qa-manual", "rubric", "sequential-thinking", "skill-creator", "sprint-contract", "stitch", "story-sizer", "tech-graph", "web-to-markdown", "worktree"]
-  },
-  "ledgerDecision": {
-    "decision": "PROJECT-LOCAL reconciliation ledger",
-    "path": ".meowkit/state/codex-ledger.json",
-    "basis": "User decision, validation interview 2026-07-23. Reuses the reconciler matrix + PortableInstallationV3 entry shape (same logic), but storage is per-project rather than the home registry — no parallel engine.",
-    "homeRegistryInteraction": "Home-scoped ~/.mewkit/portable-registry.json remains for other providers; existing codex rows whose recorded path resolves inside a project are adopted into that project's ledger on first post-phase-3 run (home rows left in place for rollback).",
-    "resolvedIn": "phase-3"
-  },
-  "agentRoster": {
-    "_note": "Phase-5 disposition of the 40 ported agent TOMLs. verified 2026-07-23; roster finalized per user decision 2026-07-23 (keep brainstormer/git-manager/analyst standalone; orchestrator → cross-toolkit `orchestrate` skill, not an agent). keep=hand-authored core agent with a distinct execution dimension; drop=no Codex-native agent analog, responsibility moved to the named owner (TOML deleted); integration=jira/confluence leaf, deferred to the integration pack (TOML retained, phase 6 conditions its install). effort assigned by workload class; no agent pins a model or sandbox_mode.",
-    "workloadClasses": {
-      "deep": { "effort": "high", "work": "architecture, security, complex review/planning, advisory, trade-off exploration" },
-      "default": { "effort": "medium", "work": "implementation, testing, docs, research, status, ship, git, cost analysis" },
-      "fast": { "effort": "low", "work": "narrow discovery/indexing — no core agent currently qualifies" }
-    },
-    "keep": [
-      { "agent": "planner", "effort": "high", "distinctDimension": "product+engineering plan file, Gate 1 owner" },
-      { "agent": "architect", "effort": "high", "distinctDimension": "architectural tradeoff evaluation + ADR authoring (docs/architecture ownership)" },
-      { "agent": "brainstormer", "effort": "high", "distinctDimension": "pre-plan approach exploration + trade-off debate; read-only, no artifact — feeds planner's Technical Approach" },
-      { "agent": "researcher", "effort": "medium", "distinctDimension": "external research, read-mostly, context isolation (research pollutes impl context)" },
-      { "agent": "developer", "effort": "medium", "distinctDimension": "production source ownership (src/, lib/, app/)" },
-      { "agent": "tester", "effort": "medium", "distinctDimension": "test-file ownership; red/green phases" },
-      { "agent": "reviewer", "effort": "high", "distinctDimension": "static structural 5-dimension audit, Gate 2 owner" },
-      { "agent": "evaluator", "effort": "high", "distinctDimension": "dynamic runtime verification — drives the running build (execution envelope differs from static reviewers)" },
-      { "agent": "security", "effort": "high", "distinctDimension": "threat-model lens, BLOCK authority" },
-      { "agent": "documenter", "effort": "medium", "distinctDimension": "living project docs ownership (docs/)" },
-      { "agent": "journal-writer", "effort": "medium", "distinctDimension": "failure/incident retrospective ownership (docs/journal/)" },
-      { "agent": "analyst", "effort": "medium", "distinctDimension": "cost/token analysis + session pattern extraction, Phase-6 reflect (reads budget/memory surfaces)" },
-      { "agent": "project-manager", "effort": "medium", "distinctDimension": "cross-workflow delivery-status aggregation, read-only, backward-looking" },
-      { "agent": "git-manager", "effort": "medium", "distinctDimension": "standalone conventional commit/push (no PR/CI) — the light git path distinct from shipper's full release" },
-      { "agent": "shipper", "effort": "medium", "distinctDimension": "full ship pipeline (pre-ship checks + PR + CI + rollback)" },
-      { "agent": "ui-ux-designer", "effort": "medium", "distinctDimension": "UI/UX design decisions, design-spec ownership" },
-      { "agent": "advisor", "effort": "high", "distinctDimension": "isolated advisory executor; invoked only by the advise skill, never a lifecycle phase owner" }
-    ],
-    "merge": [],
-    "drop": [
-      { "agent": "orchestrator", "responsibilityMovedTo": "skill:orchestrate (cross-toolkit) + main session", "reason": "Codex has no router-agent concept — the main session spawns agents by name natively, and cross-runtime/parallel orchestration is authored as the provider-agnostic `orchestrate` skill (user decision 2026-07-23). An 'invoke orchestrator at task start' agent is dead weight (rule-agent-routing already omitted for the same reason)." }
-    ],
-    "integrationDeferred": {
-      "reason": "Jira/Confluence leaf agents + the jira-adjacent story-sizer install only with the integration pack; phase 6 authors the pack catalog that conditions their install. Retained in the tree now (manifest entries stay active:false until phase 9); not part of the core roster.",
-      "jira": ["jira-issue", "jira-search", "jira-lifecycle", "jira-collaborate", "jira-relationships", "jira-time", "jira-agile", "jira-fields", "jira-bulk", "jira-jsm", "jira-admin", "jira-dev", "jira-ops", "jira-evaluator", "jira-estimator", "jira-analyst"],
-      "confluence": ["confluence-page", "confluence-search", "confluence-spec-analyst", "confluence-bulk", "confluence-collaborate"],
-      "other": ["story-sizer"]
-    }
-  },
-  "intentionalOmissions": [
-    { "omission": ".claude/memeory typo-path import", "reason": "Verified absent in code; YAGNI — not implemented unless a real-world occurrence is shown (phase-7 decision)." }
-  ]
+	"_description": "Claude (.claude) capability → single Codex owner map. Seeded phase 1, completed phase 2 (ownership map + 64 meta-mirror dispositions + 28 reference-graph-risk items). Owners are realized as surfaces are hand-authored (phases 4-6) and meta-mirror dirs are deleted (phase 6). Every shipped concern resolves to exactly one owner OR carries an explicit omission reason. No 'TBD' rows.",
+	"verified": "2026-07-23",
+	"ownershipRule": {
+		"mandatory-invariant": "AGENTS.md",
+		"reusable-workflow": "skill",
+		"distinct-role": "agent",
+		"lifecycle-check": "hook (command handler)",
+		"shell-prefix-policy": ".rules (optional/experimental)",
+		"settings": "config",
+		"durable-state": ".meowkit",
+		"deterministic-gate": "MeowKit CLI",
+		"intentionally-omitted": "reason"
+	},
+	"ownerEnum": ["AGENTS.md", "skill", "agent", "hook", "rules", "config", ".meowkit", "cli", "omitted"],
+	"concerns": [
+		{
+			"concern": "safety-gate enforcement (gate-enforcement, privacy-block)",
+			"owner": "hook",
+			"status": "authored",
+			"resolvedIn": "phase-4",
+			"note": "Authored as native Codex PreToolUse deny hooks (root/.codex/hooks/{privacy-block,gate-enforcement}.cjs): privacy-block denies Bash access to sensitive files (R4); gate-enforcement denies source edits without an approved plan (Gate 1 presence; approval-receipt layer is a follow-on). Deny via hookSpecificOutput.permissionDecision. Defense-in-depth: per-hook-trust means not reliably enforced — the CLI gate stays authoritative."
+		},
+		{
+			"concern": "session context injection (SessionStart)",
+			"owner": "omitted",
+			"status": "dispositioned",
+			"resolvedIn": "phase-4",
+			"note": "Intentionally omitted: AGENTS.md is auto-loaded by Codex and already carries the working agreement + read-memory-at-task-start invariant, so a SessionStart re-injector would be redundant (dead-weight thesis). Revisit if a genuinely DYNAMIC per-session context need appears."
+		},
+		{
+			"concern": "behavioral invariants / security constitution",
+			"owner": "AGENTS.md",
+			"status": "authored",
+			"resolvedIn": "phase-6",
+			"note": "The merge-agents-md rule invariants were merged into AGENTS.md in phase 6 (Security, Data & injection boundary + Rule of Two, Gates, Subagent status protocol, Core behaviors + anti-rationalization, Development + TDD, Memory, Intervention recording, Delegation, Context hygiene). AGENTS.md grew 26→146 lines / 7.3 KiB (well under the 32 KiB budget). The 64 porter meta-mirror dirs were then deleted; ~180 `.agents/skills/rule-*` references across agent TOMLs + skill bodies were retargeted (merge-rules → AGENTS.md sections, omit-rules → neutral phrasing). Zero dangling meta-mirror refs remain."
+		},
+		{
+			"concern": "project settings, MCP servers, features",
+			"owner": "config",
+			"status": "pending",
+			"resolvedIn": "phase-4"
+		},
+		{
+			"concern": "shell prefix allow/deny policy",
+			"owner": "rules",
+			"status": "authored",
+			"resolvedIn": "phase-4",
+			"note": "Authored root/.codex/rules/default.rules: minimal prefix_rule starter (prompt on git push --force, git reset --hard, rm -rf) mirroring the destructive-command policy. Verified against `codex execpolicy check` (codex-cli). Experimental + project-.codex-trust-gated (graceful fallback when untrusted/unsupported); never sole enforcement (CLI gate + hooks authoritative)."
+		},
+		{
+			"concern": "reusable workflows (plan/cook/fix/test/review/...)",
+			"owner": "skill",
+			"status": "pending",
+			"resolvedIn": "phase-6"
+		},
+		{
+			"concern": "distinct execution roles (planner/reviewer/tester/...)",
+			"owner": "agent",
+			"status": "authored",
+			"resolvedIn": "phase-5",
+			"note": "40-agent ported roster re-authored by execution envelope: 19 non-integration agents → 17 core; orchestrator dropped as an agent (Codex has no router-agent; routing → main session + the cross-toolkit `orchestrate` skill). 21 jira/confluence + story-sizer deferred to the integration pack (phase 6 conditions install). Each kept agent carries a workload-class model_reasoning_effort (deep=high, default=medium; xhigh withheld — gated to codex-max-tier and models are never pinned). sandbox_mode/mcp_servers/skills.config deliberately NOT pinned on any core agent (each writes its own artifact so read-only would break them; workspace-write/MCP defaults inherit from session/config — pinning is redundant or over-grants). See agentRoster below."
+		},
+		{
+			"concern": "durable memory / reconciliation ledger state",
+			"owner": ".meowkit",
+			"status": "pending",
+			"resolvedIn": "phase-3",
+			"note": "Ledger is PROJECT-LOCAL .meowkit/state/ (user decision 2026-07-23)."
+		},
+		{ "concern": "deterministic validation gates", "owner": "cli", "status": "pending", "resolvedIn": "phase-4" },
+		{
+			"concern": "meta-mirror skill dirs (command-* 26, rule-* 31, mode-* 7)",
+			"owner": "omitted",
+			"status": "deleted",
+			"resolvedIn": "phase-6",
+			"note": "All 64 deleted in phase 6 (190→126 skill dirs). Load-bearing content of the merge-agents-md rules moved into AGENTS.md; referrers retargeted; no dangling refs. See metaMirrorDispositions below for the per-dir verdicts (basis)."
+		}
+	],
+	"metaMirrorDispositions": {
+		"_note": "Verdict per meta-mirror dir. verdict=omit-pointer means the mirror only re-points to a substantive skill/agent that already holds the authoritative content (owner names it). verdict=merge-agents-md means the mirror's load-bearing invariants move into the authored AGENTS.md (phase 4). verdict=map-config/map-cli/map-agent means the concern is owned by config/CLI/an agent envelope. verdict=omit-harness-internal means the concept governs the MeowKit multi-agent harness itself and has no Codex-native analog. Every dir is deleted in phase 6; content-merge for merge-agents-md lands in phase 4, agent envelopes in phase 5.",
+		"command": [
+			{
+				"dir": "command-advise",
+				"verdict": "omit-pointer",
+				"owner": "skill:advise",
+				"reason": "Slash-command mirror; Codex deprecates custom prompts in favor of skills. Substantive advise skill holds the procedure."
+			},
+			{
+				"dir": "command-arch",
+				"verdict": "map-agent",
+				"owner": "agent:architect",
+				"reason": "Command invokes the architect agent directly; no standalone skill. Role owned by the authored architect TOML (phase 5)."
+			},
+			{
+				"dir": "command-audit",
+				"verdict": "omit-composition",
+				"owner": "skill:review + skill:cso",
+				"reason": "Composing command (runs review + cso); no unique content. Composition documented; mirror dropped."
+			},
+			{
+				"dir": "command-autobuild",
+				"verdict": "omit-pointer",
+				"owner": "skill:autobuild",
+				"reason": "Pointer to autobuild skill."
+			},
+			{
+				"dir": "command-breakdown",
+				"verdict": "omit-pointer",
+				"owner": "skill:planning-engine",
+				"reason": "Ticket/story breakdown; owned by planning-engine (+story-sizer) skill."
+			},
+			{
+				"dir": "command-budget",
+				"verdict": "map-cli",
+				"owner": "cli:mewkit budget",
+				"reason": "Cost tracking is a deterministic CLI/analyst concern, not a Codex skill."
+			},
+			{
+				"dir": "command-canary",
+				"verdict": "omit-pointer",
+				"owner": "skill:benchmark",
+				"reason": "Harness canary; owned by benchmark skill (experimental)."
+			},
+			{
+				"dir": "command-confluence-setup",
+				"verdict": "omit-pointer",
+				"owner": "skill:confluence",
+				"reason": "Integration setup; owned by confluence pack skill (installs only with integrations pack, phase 6)."
+			},
+			{
+				"dir": "command-context-audit",
+				"verdict": "omit-pointer",
+				"owner": "skill:context-audit",
+				"reason": "Pointer to context-audit skill."
+			},
+			{
+				"dir": "command-cook",
+				"verdict": "omit-pointer",
+				"owner": "skill:cook",
+				"reason": "Verified: mirror body says 'authoritative procedure lives in mk:cook'."
+			},
+			{
+				"dir": "command-delegate",
+				"verdict": "omit-harness-internal",
+				"owner": "AGENTS.md (orchestration note)",
+				"reason": "Builds a subagent delegation prompt for the MeowKit harness; Codex spawns subagents natively. Any residual guidance folds into AGENTS.md orchestration invariants."
+			},
+			{
+				"dir": "command-design",
+				"verdict": "omit",
+				"owner": "omitted",
+				"reason": "Brand/visual design command; no core Codex-native analog. Omitted from core; revisit if a design skill is packaged."
+			},
+			{
+				"dir": "command-docs-init",
+				"verdict": "omit-pointer",
+				"owner": "skill:docs-init",
+				"reason": "Pointer to docs-init skill."
+			},
+			{
+				"dir": "command-docs-sync",
+				"verdict": "omit-pointer",
+				"owner": "skill:document-release",
+				"reason": "Docs sync owned by document-release skill."
+			},
+			{ "dir": "command-fix", "verdict": "omit-pointer", "owner": "skill:fix", "reason": "Pointer to fix skill." },
+			{ "dir": "command-help", "verdict": "omit-pointer", "owner": "skill:help", "reason": "Pointer to help skill." },
+			{
+				"dir": "command-meow",
+				"verdict": "omit-pointer",
+				"owner": "skill:memory",
+				"reason": "Quick memory-note command; owned by memory skill."
+			},
+			{
+				"dir": "command-plan",
+				"verdict": "omit-pointer",
+				"owner": "skill:plan-creator",
+				"reason": "Pointer to plan-creator skill."
+			},
+			{
+				"dir": "command-retro",
+				"verdict": "omit-pointer",
+				"owner": "skill:retro",
+				"reason": "Pointer to retro skill."
+			},
+			{
+				"dir": "command-review",
+				"verdict": "omit-pointer",
+				"owner": "skill:review",
+				"reason": "Pointer to review skill."
+			},
+			{ "dir": "command-ship", "verdict": "omit-pointer", "owner": "skill:ship", "reason": "Pointer to ship skill." },
+			{
+				"dir": "command-spawn",
+				"verdict": "omit-harness-internal",
+				"owner": "skill:worktree",
+				"reason": "Parallel worktree spawn (Conductor pattern) for the MeowKit harness; Codex agents spawn natively. Worktree mechanics owned by worktree skill."
+			},
+			{
+				"dir": "command-status",
+				"verdict": "map-agent",
+				"owner": "agent:project-manager",
+				"reason": "Delivery status; owned by project-manager agent (phase 5) / mewkit status CLI."
+			},
+			{
+				"dir": "command-test",
+				"verdict": "omit-pointer",
+				"owner": "skill:testing",
+				"reason": "Pointer to testing skill."
+			},
+			{
+				"dir": "command-upgrade",
+				"verdict": "map-cli",
+				"owner": "cli:mewkit upgrade",
+				"reason": "Kit upgrade is a deterministic CLI concern."
+			},
+			{
+				"dir": "command-validate",
+				"verdict": "map-cli",
+				"owner": "cli:mewkit validate",
+				"reason": "Structural validation is a deterministic CLI gate; also skill:lint-and-validate for authoring."
+			}
+		],
+		"rule": [
+			{
+				"dir": "rule-security-rules",
+				"verdict": "merge-agents-md",
+				"owner": "AGENTS.md",
+				"reason": "Non-negotiable blocked-pattern invariants — high value; concise form lands in AGENTS.md (phase 4)."
+			},
+			{
+				"dir": "rule-injection-rules",
+				"verdict": "merge-agents-md",
+				"owner": "AGENTS.md",
+				"reason": "Prompt-injection defense (data-vs-instruction boundary) — high value; concise form in AGENTS.md."
+			},
+			{
+				"dir": "rule-core-behaviors",
+				"verdict": "merge-agents-md",
+				"owner": "AGENTS.md",
+				"reason": "The 6 operating behaviors — condensed into AGENTS.md invariants."
+			},
+			{
+				"dir": "rule-development-rules",
+				"verdict": "merge-agents-md",
+				"owner": "AGENTS.md + config",
+				"reason": "Real-implementation / file-size / no-enhanced-copies invariants → AGENTS.md; build commands → config/AGENTS.md."
+			},
+			{
+				"dir": "rule-anti-rationalization",
+				"verdict": "merge-agents-md",
+				"owner": "AGENTS.md",
+				"reason": "Short plan-discipline table; folds into AGENTS.md (or the cook skill preamble)."
+			},
+			{
+				"dir": "rule-gate-rules",
+				"verdict": "map-cli",
+				"owner": "cli + AGENTS.md note",
+				"reason": "Gate 1/2 are enforced by the MeowKit CLI + hooks; a short 'gates are human-approved' invariant may sit in AGENTS.md."
+			},
+			{
+				"dir": "rule-agent-conduct",
+				"verdict": "merge-agents-md",
+				"owner": "AGENTS.md",
+				"reason": "Subagent status protocol (A1) is behavior-critical → AGENTS.md; the rest is model-default."
+			},
+			{
+				"dir": "rule-orchestration-rules",
+				"verdict": "omit-harness-internal",
+				"owner": "AGENTS.md (orchestration note)",
+				"reason": "MeowKit multi-agent delegation contract; Codex subagents auto-load. Only the isolation-boundary essence folds into AGENTS.md."
+			},
+			{
+				"dir": "rule-parallel-execution-rules",
+				"verdict": "omit-harness-internal",
+				"owner": "omitted",
+				"reason": "Worktree/max-3-agent parallel rules govern the MeowKit harness; no Codex-native analog."
+			},
+			{
+				"dir": "rule-step-file-rules",
+				"verdict": "omit-harness-internal",
+				"owner": "skill:skill-creator",
+				"reason": "Step-file execution discipline applies when authoring skills; owned by skill-creator, not a runtime surface."
+			},
+			{
+				"dir": "rule-phase-contracts",
+				"verdict": "omit-harness-internal",
+				"owner": "omitted",
+				"reason": "Phase composition contract for the 7-phase harness; no Codex analog."
+			},
+			{
+				"dir": "rule-post-phase-delegation",
+				"verdict": "omit-harness-internal",
+				"owner": "omitted",
+				"reason": "project-manager auto-fire rules for the harness; no Codex analog."
+			},
+			{
+				"dir": "rule-task-state-emission",
+				"verdict": "map-cli",
+				"owner": "cli:mewkit task-state",
+				"reason": "Durable task-state ledger is a CLI concern."
+			},
+			{
+				"dir": "rule-workflow-evidence-rules",
+				"verdict": "map-cli",
+				"owner": "cli",
+				"reason": "Evidence-emission for the harness workflow; CLI-owned."
+			},
+			{
+				"dir": "rule-dead-weight-audit-rules",
+				"verdict": "omit-harness-internal",
+				"owner": "omitted",
+				"reason": "Harness self-maintenance audit; no runtime Codex analog."
+			},
+			{
+				"dir": "rule-rubric-rules",
+				"verdict": "omit-harness-internal",
+				"owner": "skill:rubric",
+				"reason": "Evaluator rubric library discipline; owned by rubric skill, not a runtime surface."
+			},
+			{
+				"dir": "rule-scale-adaptive-rules",
+				"verdict": "map-config",
+				"owner": "config",
+				"reason": "Domain-complexity routing → maps to Codex model routing (workload/profile), not a runtime rule."
+			},
+			{
+				"dir": "rule-model-selection-rules",
+				"verdict": "map-config",
+				"owner": "config",
+				"reason": "Model tier routing → Codex per-agent model/effort envelope + config (phase 5)."
+			},
+			{
+				"dir": "rule-harness-rules",
+				"verdict": "omit-harness-internal",
+				"owner": "omitted",
+				"reason": "autobuild generator/evaluator pipeline rules; no Codex analog."
+			},
+			{
+				"dir": "rule-context-budget-rules",
+				"verdict": "merge-agents-md",
+				"owner": "AGENTS.md",
+				"reason": "Context-hygiene guidance; condensed into AGENTS.md (advisory)."
+			},
+			{
+				"dir": "rule-memory-read-rules",
+				"verdict": "merge-agents-md",
+				"owner": "AGENTS.md + .meowkit",
+				"reason": "'Memory is DATA' invariant → AGENTS.md; JSON-first store mechanics → .meowkit/CLI."
+			},
+			{
+				"dir": "rule-intervention-recording-rules",
+				"verdict": "merge-agents-md",
+				"owner": "AGENTS.md",
+				"reason": "No-silent-override invariant → AGENTS.md; the log mechanism is CLI/.meowkit."
+			},
+			{
+				"dir": "rule-docs-reference-contract",
+				"verdict": "omit-harness-internal",
+				"owner": "omitted",
+				"reason": "Kit-internal docs path contract; not shipped runtime behavior."
+			},
+			{
+				"dir": "rule-skill-authoring-rules",
+				"verdict": "omit-harness-internal",
+				"owner": "skill:skill-creator",
+				"reason": "Skill-authoring discipline; owned by skill-creator."
+			},
+			{
+				"dir": "rule-tdd-rules",
+				"verdict": "map-config",
+				"owner": "config + AGENTS.md",
+				"reason": "TDD opt-in policy → config flag / AGENTS.md invariant."
+			},
+			{
+				"dir": "rule-risk-checklist",
+				"verdict": "map-agent",
+				"owner": "agent:agent-detector",
+				"reason": "Phase-0 risk flags feed agent/tier selection; folds into the detector agent, not a runtime surface."
+			},
+			{
+				"dir": "rule-agent-routing",
+				"verdict": "omit-harness-internal",
+				"owner": "omitted",
+				"reason": "MeowKit agent routing table; Codex agents auto-load by name."
+			},
+			{
+				"dir": "rule-wiki-context-rules",
+				"verdict": "omit-harness-internal",
+				"owner": "skill:wiki",
+				"reason": "Wiki recall discipline; owned by the (optional) wiki skill subsystem."
+			},
+			{
+				"dir": "rule-agile-feedback-cycle",
+				"verdict": "omit",
+				"owner": "omitted",
+				"reason": "Conditional Agile/Scrum rule; not in core. Revisit only with an agile integration pack."
+			},
+			{
+				"dir": "rule-agile-sprint-commitment",
+				"verdict": "omit",
+				"owner": "omitted",
+				"reason": "Conditional Agile rule; not in core."
+			},
+			{
+				"dir": "rule-agile-story-gates",
+				"verdict": "omit",
+				"owner": "omitted",
+				"reason": "Conditional Agile rule; not in core."
+			}
+		],
+		"mode": [
+			{
+				"dir": "mode-default",
+				"verdict": "omit",
+				"owner": "omitted",
+				"reason": "Baseline execution mode; no distinct envelope to encode."
+			},
+			{
+				"dir": "mode-fast",
+				"verdict": "map-agent",
+				"owner": "agent envelope (workload-class fast)",
+				"reason": "Maps to low/medium model_reasoning_effort on fast-class agents (phase 5)."
+			},
+			{
+				"dir": "mode-strict",
+				"verdict": "map-config",
+				"owner": "config + cli",
+				"reason": "Strict verification maps to --strict-config + full validation gate, not a runtime mode."
+			},
+			{
+				"dir": "mode-cost-saver",
+				"verdict": "map-config",
+				"owner": "config",
+				"reason": "Cost-saver = cheaper model routing → config/effort."
+			},
+			{
+				"dir": "mode-architect",
+				"verdict": "map-agent",
+				"owner": "agent:architect",
+				"reason": "Architect mode → architect agent role (phase 5)."
+			},
+			{
+				"dir": "mode-audit",
+				"verdict": "omit-composition",
+				"owner": "skill:review + skill:cso",
+				"reason": "Audit mode composes review + security; owned by those skills."
+			},
+			{
+				"dir": "mode-document",
+				"verdict": "map-agent",
+				"owner": "agent:documenter / skill:document-release",
+				"reason": "Document mode → documenter agent / document-release skill."
+			}
+		]
+	},
+	"referenceGraphRiskItems": {
+		"_note": "28 substantive skill dirs that ship BOTH scripts/ and references/ — highest reference-graph risk (script/reference paths must resolve within the installed pack or a declared dependency). Flagged for explicit per-pack resolution checks during phase-6 authoring + validation.",
+		"resolvedIn": "phase-6",
+		"dirs": [
+			"autobuild",
+			"bootstrap",
+			"confluence",
+			"context-audit",
+			"cook",
+			"docs-finder",
+			"evaluate",
+			"html-video",
+			"intake",
+			"investigate",
+			"jira",
+			"llms",
+			"markdown-reader",
+			"multimodal",
+			"pack",
+			"plan-creator",
+			"planning-engine",
+			"prompt-enhancer",
+			"qa-manual",
+			"rubric",
+			"sequential-thinking",
+			"skill-creator",
+			"sprint-contract",
+			"stitch",
+			"story-sizer",
+			"tech-graph",
+			"web-to-markdown",
+			"worktree"
+		]
+	},
+	"ledgerDecision": {
+		"decision": "PROJECT-LOCAL reconciliation ledger",
+		"path": ".meowkit/state/codex-ledger.json",
+		"basis": "User decision, validation interview 2026-07-23. Reuses the reconciler matrix + PortableInstallationV3 entry shape (same logic), but storage is per-project rather than the home registry — no parallel engine.",
+		"homeRegistryInteraction": "Home-scoped ~/.mewkit/portable-registry.json remains for other providers; existing codex rows whose recorded path resolves inside a project are adopted into that project's ledger on first post-phase-3 run (home rows left in place for rollback).",
+		"resolvedIn": "phase-3"
+	},
+	"agentRoster": {
+		"_note": "Phase-5 disposition of the 40 ported agent TOMLs. verified 2026-07-23; roster finalized per user decision 2026-07-23 (keep brainstormer/git-manager/analyst standalone; orchestrator → cross-toolkit `orchestrate` skill, not an agent). keep=hand-authored core agent with a distinct execution dimension; drop=no Codex-native agent analog, responsibility moved to the named owner (TOML deleted); integration=jira/confluence leaf, deferred to the integration pack (TOML retained, phase 6 conditions its install). effort assigned by workload class; no agent pins a model or sandbox_mode.",
+		"workloadClasses": {
+			"deep": {
+				"effort": "high",
+				"work": "architecture, security, complex review/planning, advisory, trade-off exploration"
+			},
+			"default": {
+				"effort": "medium",
+				"work": "implementation, testing, docs, research, status, ship, git, cost analysis"
+			},
+			"fast": { "effort": "low", "work": "narrow discovery/indexing — no core agent currently qualifies" }
+		},
+		"keep": [
+			{ "agent": "planner", "effort": "high", "distinctDimension": "product+engineering plan file, Gate 1 owner" },
+			{
+				"agent": "architect",
+				"effort": "high",
+				"distinctDimension": "architectural tradeoff evaluation + ADR authoring (docs/architecture ownership)"
+			},
+			{
+				"agent": "brainstormer",
+				"effort": "high",
+				"distinctDimension": "pre-plan approach exploration + trade-off debate; read-only, no artifact — feeds planner's Technical Approach"
+			},
+			{
+				"agent": "researcher",
+				"effort": "medium",
+				"distinctDimension": "external research, read-mostly, context isolation (research pollutes impl context)"
+			},
+			{
+				"agent": "developer",
+				"effort": "medium",
+				"distinctDimension": "production source ownership (src/, lib/, app/)"
+			},
+			{ "agent": "tester", "effort": "medium", "distinctDimension": "test-file ownership; red/green phases" },
+			{
+				"agent": "reviewer",
+				"effort": "high",
+				"distinctDimension": "static structural 5-dimension audit, Gate 2 owner"
+			},
+			{
+				"agent": "evaluator",
+				"effort": "high",
+				"distinctDimension": "dynamic runtime verification — drives the running build (execution envelope differs from static reviewers)"
+			},
+			{ "agent": "security", "effort": "high", "distinctDimension": "threat-model lens, BLOCK authority" },
+			{ "agent": "documenter", "effort": "medium", "distinctDimension": "living project docs ownership (docs/)" },
+			{
+				"agent": "journal-writer",
+				"effort": "medium",
+				"distinctDimension": "failure/incident retrospective ownership (docs/journal/)"
+			},
+			{
+				"agent": "analyst",
+				"effort": "medium",
+				"distinctDimension": "cost/token analysis + session pattern extraction, Phase-6 reflect (reads budget/memory surfaces)"
+			},
+			{
+				"agent": "project-manager",
+				"effort": "medium",
+				"distinctDimension": "cross-workflow delivery-status aggregation, read-only, backward-looking"
+			},
+			{
+				"agent": "git-manager",
+				"effort": "medium",
+				"distinctDimension": "standalone conventional commit/push (no PR/CI) — the light git path distinct from shipper's full release"
+			},
+			{
+				"agent": "shipper",
+				"effort": "medium",
+				"distinctDimension": "full ship pipeline (pre-ship checks + PR + CI + rollback)"
+			},
+			{
+				"agent": "ui-ux-designer",
+				"effort": "medium",
+				"distinctDimension": "UI/UX design decisions, design-spec ownership"
+			},
+			{
+				"agent": "advisor",
+				"effort": "high",
+				"distinctDimension": "isolated advisory executor; invoked only by the advise skill, never a lifecycle phase owner"
+			}
+		],
+		"merge": [],
+		"drop": [
+			{
+				"agent": "orchestrator",
+				"responsibilityMovedTo": "skill:orchestrate (cross-toolkit) + main session",
+				"reason": "Codex has no router-agent concept — the main session spawns agents by name natively, and cross-runtime/parallel orchestration is authored as the provider-agnostic `orchestrate` skill (user decision 2026-07-23). An 'invoke orchestrator at task start' agent is dead weight (rule-agent-routing already omitted for the same reason)."
+			}
+		],
+		"integrationDeferred": {
+			"reason": "Jira/Confluence leaf agents + the jira-adjacent story-sizer install only with the integration pack; phase 6 authors the pack catalog that conditions their install. Retained in the tree now (manifest entries stay active:false until phase 9); not part of the core roster.",
+			"jira": [
+				"jira-issue",
+				"jira-search",
+				"jira-lifecycle",
+				"jira-collaborate",
+				"jira-relationships",
+				"jira-time",
+				"jira-agile",
+				"jira-fields",
+				"jira-bulk",
+				"jira-jsm",
+				"jira-admin",
+				"jira-dev",
+				"jira-ops",
+				"jira-evaluator",
+				"jira-estimator",
+				"jira-analyst"
+			],
+			"confluence": [
+				"confluence-page",
+				"confluence-search",
+				"confluence-spec-analyst",
+				"confluence-bulk",
+				"confluence-collaborate"
+			],
+			"other": ["story-sizer"]
+		}
+	},
+	"intentionalOmissions": [
+		{
+			"omission": ".claude/memeory typo-path import",
+			"reason": "Verified absent in code; YAGNI — not implemented unless a real-world occurrence is shown (phase-7 decision)."
+		}
+	]
 }

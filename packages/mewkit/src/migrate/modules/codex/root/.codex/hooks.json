@@ -1,43 +1,43 @@
 {
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/capture.cjs\"",
-            "commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/capture.cjs')\"",
-            "timeout": 10,
-            "statusMessage": "Capturing memory prefixes"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/privacy-block.cjs\"",
-            "commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/privacy-block.cjs')\"",
-            "timeout": 10,
-            "statusMessage": "Privacy guard (sensitive files)"
-          }
-        ]
-      },
-      {
-        "matcher": "apply_patch|Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/gate-enforcement.cjs\"",
-            "commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/gate-enforcement.cjs')\"",
-            "timeout": 10,
-            "statusMessage": "Gate 1 (approved plan required)"
-          }
-        ]
-      }
-    ]
-  }
+	"hooks": {
+		"UserPromptSubmit": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/capture.cjs\"",
+						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/capture.cjs')\"",
+						"timeout": 10,
+						"statusMessage": "Capturing memory prefixes"
+					}
+				]
+			}
+		],
+		"PreToolUse": [
+			{
+				"matcher": "Bash",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/privacy-block.cjs\"",
+						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/privacy-block.cjs')\"",
+						"timeout": 10,
+						"statusMessage": "Privacy guard (sensitive files)"
+					}
+				]
+			},
+			{
+				"matcher": "apply_patch|Edit|Write",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/gate-enforcement.cjs\"",
+						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/gate-enforcement.cjs')\"",
+						"timeout": 10,
+						"statusMessage": "Gate 1 (approved plan required)"
+					}
+				]
+			}
+		]
+	}
 }

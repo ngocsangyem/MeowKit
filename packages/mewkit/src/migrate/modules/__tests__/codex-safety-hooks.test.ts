@@ -42,7 +42,10 @@ describe("codex privacy-block hook (PreToolUse/Bash)", () => {
 		expect(r.denied).toBe(false);
 	});
 	it("allows on invalid stdin (fail-open — CLI gate is authoritative)", () => {
-		const res = spawnSync(process.execPath, [join(hooksDir, "privacy-block.cjs")], { input: "not json", encoding: "utf-8" });
+		const res = spawnSync(process.execPath, [join(hooksDir, "privacy-block.cjs")], {
+			input: "not json",
+			encoding: "utf-8",
+		});
 		expect(res.status).toBe(0);
 	});
 });
@@ -56,28 +59,48 @@ describe("codex gate-enforcement hook (PreToolUse/apply_patch)", () => {
 	afterEach(() => rmSync(project, { recursive: true, force: true }));
 
 	it("denies a source edit when no approved plan exists", () => {
-		const r = runHook("gate-enforcement.cjs", { tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } }, project);
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } },
+			project,
+		);
 		expect(r.status).toBe(0);
 		expect(r.denied).toBe(true);
 	});
 	it("allows a source edit once a plan exists under tasks/plans/", () => {
 		mkdirSync(join(project, "tasks", "plans", "260101-x"), { recursive: true });
 		writeFileSync(join(project, "tasks", "plans", "260101-x", "plan.md"), "# plan\n");
-		const r = runHook("gate-enforcement.cjs", { tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } }, project);
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } },
+			project,
+		);
 		expect(r.denied).toBe(false);
 	});
 	it("always allows test files, docs, and plan files (no plan needed)", () => {
 		for (const p of ["src/x.test.ts", "docs/readme.md", "tasks/plans/p/plan.md"]) {
-			const r = runHook("gate-enforcement.cjs", { tool_name: "apply_patch", tool_input: { command: patch(p) } }, project);
+			const r = runHook(
+				"gate-enforcement.cjs",
+				{ tool_name: "apply_patch", tool_input: { command: patch(p) } },
+				project,
+			);
 			expect(r.denied, `${p} should be allowed`).toBe(false);
 		}
 	});
 	it("rejects a backup/legacy path", () => {
-		const r = runHook("gate-enforcement.cjs", { tool_name: "apply_patch", tool_input: { command: patch("src/x.bak/y.ts") } }, project);
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: patch("src/x.bak/y.ts") } },
+			project,
+		);
 		expect(r.denied).toBe(true);
 	});
 	it("allows when no target path is determinable (fail-open)", () => {
-		const r = runHook("gate-enforcement.cjs", { tool_name: "apply_patch", tool_input: { command: "no file markers here" } }, project);
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: "no file markers here" } },
+			project,
+		);
 		expect(r.denied).toBe(false);
 	});
 });

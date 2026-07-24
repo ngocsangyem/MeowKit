@@ -74,7 +74,11 @@ export function renderPreflightReport(result: PreflightResult): string {
 	const flagged = result.inventory.filter((e) => (e.secretFindings?.length ?? 0) > 0);
 	if (flagged.length > 0) {
 		lines.push("");
-		lines.push(pc.yellow(`⚠ ${flagged.length} file(s) contain secret-like content — quarantined to memory/legacy/ (not published, not deleted). Review and remove the secret, then re-run:`));
+		lines.push(
+			pc.yellow(
+				`⚠ ${flagged.length} file(s) contain secret-like content — quarantined to memory/legacy/ (not published, not deleted). Review and remove the secret, then re-run:`,
+			),
+		);
 		for (const e of flagged) {
 			const types = [...new Set((e.secretFindings ?? []).map((f) => f.type))].join(", ");
 			lines.push(pc.yellow(`    ${e.relPath} (${types})`));

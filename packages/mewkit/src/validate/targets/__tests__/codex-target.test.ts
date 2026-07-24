@@ -187,7 +187,10 @@ describe("codex target validation", () => {
 	it("a .rules file with an invalid prefix_rule decision → FAIL exec-policy rules valid", async () => {
 		const d = makeTarget();
 		mkdirSync(join(d, ".codex", "rules"), { recursive: true });
-		writeFileSync(join(d, ".codex", "rules", "default.rules"), 'prefix_rule(pattern = ["rm", "-rf"], decision = "reject")\n');
+		writeFileSync(
+			join(d, ".codex", "rules", "default.rules"),
+			'prefix_rule(pattern = ["rm", "-rf"], decision = "reject")\n',
+		);
 		const rs = await codexTargetProfile.check(d);
 		expect(status(rs, "Codex exec-policy rules valid")).toBe("fail");
 	});
@@ -195,7 +198,10 @@ describe("codex target validation", () => {
 	it("a .rules file with valid decisions passes", async () => {
 		const d = makeTarget();
 		mkdirSync(join(d, ".codex", "rules"), { recursive: true });
-		writeFileSync(join(d, ".codex", "rules", "default.rules"), 'prefix_rule(pattern = ["rm", "-rf"], decision = "prompt")\n');
+		writeFileSync(
+			join(d, ".codex", "rules", "default.rules"),
+			'prefix_rule(pattern = ["rm", "-rf"], decision = "prompt")\n',
+		);
 		const rs = await codexTargetProfile.check(d);
 		expect(status(rs, "Codex exec-policy rules valid")).toBe("pass");
 		expect(anyFail(rs)).toBe(false);

@@ -63,7 +63,11 @@ export function detectLegacyDrift(projectRoot: string, opts: { meowkitRoot?: str
 		if (names.length === 0 && dir !== legacyRoot) {
 			// An empty directory is a managed-code artifact (e.g. self-update recreating
 			// the legacy tree), never user content.
-			drifted.push({ relPath: toPosix(relative(legacyRoot, dir)), kind: "managed", note: "empty directory recreated at legacy path" });
+			drifted.push({
+				relPath: toPosix(relative(legacyRoot, dir)),
+				kind: "managed",
+				note: "empty directory recreated at legacy path",
+			});
 			return;
 		}
 		for (const name of names) {

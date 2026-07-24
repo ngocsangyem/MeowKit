@@ -90,7 +90,11 @@ describe("migrate idempotency and conflict handling", () => {
 		const before = readFileSync(agentsPath, "utf-8");
 		expect(before).toContain("## Rule: tool-rules"); // sanity: a source rule merged in
 		expect(before).toContain("Authored Codex instruction surface"); // authored base present
-		await writeFile(agentsPath, before.replace("## Rule: tool-rules", "## Rule: tool-rules\n<!-- user hand-edit -->"), "utf-8");
+		await writeFile(
+			agentsPath,
+			before.replace("## Rule: tool-rules", "## Rule: tool-rules\n<!-- user hand-edit -->"),
+			"utf-8",
+		);
 
 		// Every remaining codex-installed surface is managed/authored post-cutover:
 		// the overlay force-rewrites its base and the source rules re-merge onto it every run, so a

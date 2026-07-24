@@ -5,8 +5,8 @@
  * Priority: process.env > skill/.env > skills/.env > .codex/.env
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 /**
  * Parse .env file content into key-value pairs
@@ -14,27 +14,26 @@ const path = require('path');
  * @returns {Object} Parsed environment variables
  */
 function parseEnvFile(content) {
-  const env = {};
-  const lines = content.split('\n');
+	const env = {};
+	const lines = content.split("\n");
 
-  for (const line of lines) {
-    if (!line || line.trim().startsWith('#')) continue;
+	for (const line of lines) {
+		if (!line || line.trim().startsWith("#")) continue;
 
-    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
-    if (match) {
-      const key = match[1];
-      let value = match[2].trim();
+		const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+		if (match) {
+			const key = match[1];
+			let value = match[2].trim();
 
-      if ((value.startsWith('"') && value.endsWith('"')) ||
-          (value.startsWith("'") && value.endsWith("'"))) {
-        value = value.slice(1, -1);
-      }
+			if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+				value = value.slice(1, -1);
+			}
 
-      env[key] = value;
-    }
-  }
+			env[key] = value;
+		}
+	}
 
-  return env;
+	return env;
 }
 
 /**
@@ -42,33 +41,29 @@ function parseEnvFile(content) {
  * @returns {Object} Merged environment variables
  */
 function loadEnv() {
-  const skillDir = path.resolve(__dirname, '../..');
-  const skillsDir = path.resolve(skillDir, '..');
-  const codexDir = path.resolve(skillsDir, '..');
+	const skillDir = path.resolve(__dirname, "../..");
+	const skillsDir = path.resolve(skillDir, "..");
+	const codexDir = path.resolve(skillsDir, "..");
 
-  const envPaths = [
-    path.join(codexDir, '.env'),
-    path.join(skillsDir, '.env'),
-    path.join(skillDir, '.env'),
-  ];
+	const envPaths = [path.join(codexDir, ".env"), path.join(skillsDir, ".env"), path.join(skillDir, ".env")];
 
-  let mergedEnv = {};
+	let mergedEnv = {};
 
-  for (const envPath of envPaths) {
-    if (fs.existsSync(envPath)) {
-      try {
-        const content = fs.readFileSync(envPath, 'utf8');
-        const parsed = parseEnvFile(content);
-        mergedEnv = { ...mergedEnv, ...parsed };
-      } catch (error) {
-        // Silently skip unreadable files
-      }
-    }
-  }
+	for (const envPath of envPaths) {
+		if (fs.existsSync(envPath)) {
+			try {
+				const content = fs.readFileSync(envPath, "utf8");
+				const parsed = parseEnvFile(content);
+				mergedEnv = { ...mergedEnv, ...parsed };
+			} catch (error) {
+				// Silently skip unreadable files
+			}
+		}
+	}
 
-  mergedEnv = { ...mergedEnv, ...process.env };
+	mergedEnv = { ...mergedEnv, ...process.env };
 
-  return mergedEnv;
+	return mergedEnv;
 }
 
 /**
@@ -77,13 +72,13 @@ function loadEnv() {
  * @param {string} defaultValue
  * @returns {string}
  */
-function getEnv(key, defaultValue = '') {
-  const env = loadEnv();
-  return env[key] || defaultValue;
+function getEnv(key, defaultValue = "") {
+	const env = loadEnv();
+	return env[key] || defaultValue;
 }
 
 module.exports = {
-  loadEnv,
-  getEnv,
-  parseEnvFile,
+	loadEnv,
+	getEnv,
+	parseEnvFile,
 };

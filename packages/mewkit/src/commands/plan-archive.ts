@@ -112,9 +112,14 @@ function printReport(report: ArchiveReport, projectRoot: string, dryRun: boolean
 	console.log(pc.bold(dryRun ? "Plan archive (dry-run)" : "Plan archived"));
 	console.log(`  ${pc.dim("plan:")}    ${rel(report.planDir)}`);
 	console.log(`  ${pc.dim("→ dest:")}  ${rel(report.dest)}`);
-	console.log(`  ${pc.dim("plan.md:")} ${report.planMdUpdated ? pc.green("status → completed") : pc.dim("no status field")}`);
-	console.log(`  ${pc.dim("phases:")}  ${pc.green(`${report.phasesUpdated}`)}/${report.phaseFilesTotal} set to completed`);
-	if (report.planStateUpdated) console.log(`  ${pc.dim(".plan-state.json:")} phase statuses → completed (visual block preserved)`);
+	console.log(
+		`  ${pc.dim("plan.md:")} ${report.planMdUpdated ? pc.green("status → completed") : pc.dim("no status field")}`,
+	);
+	console.log(
+		`  ${pc.dim("phases:")}  ${pc.green(`${report.phasesUpdated}`)}/${report.phaseFilesTotal} set to completed`,
+	);
+	if (report.planStateUpdated)
+		console.log(`  ${pc.dim(".plan-state.json:")} phase statuses → completed (visual block preserved)`);
 	if (report.pointerCleared) console.log(`  ${pc.dim("active pointer:")} cleared`);
 	if (dryRun) console.log(pc.dim("\n  (dry-run — no files written or moved)"));
 }
@@ -171,7 +176,15 @@ export async function planArchive(args: PlanArchiveArgs): Promise<void> {
 	}
 
 	printReport(
-		{ planDir, dest, planMdUpdated, phasesUpdated, phaseFilesTotal: phaseFiles.length, planStateUpdated, pointerCleared },
+		{
+			planDir,
+			dest,
+			planMdUpdated,
+			phasesUpdated,
+			phaseFilesTotal: phaseFiles.length,
+			planStateUpdated,
+			pointerCleared,
+		},
 		projectRoot,
 		dryRun,
 	);

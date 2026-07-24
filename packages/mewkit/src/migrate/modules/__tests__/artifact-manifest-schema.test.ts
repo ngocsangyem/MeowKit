@@ -47,7 +47,9 @@ describe("ArtifactManifestEntrySchema — fail-closed ownership", () => {
 	});
 
 	it("only accepts the three trimmed providers", () => {
-		expect(ArtifactManifestEntrySchema.safeParse({ ...baseEntry, provider: "windsurf", scopeTags: [] }).success).toBe(false);
+		expect(ArtifactManifestEntrySchema.safeParse({ ...baseEntry, provider: "windsurf", scopeTags: [] }).success).toBe(
+			false,
+		);
 	});
 });
 
@@ -57,8 +59,24 @@ describe("ArtifactManifest — parse + deterministic serialize", () => {
 		provider: "codex",
 		generatedFrom: "modules/",
 		entries: [
-			{ ...baseEntry, provider: "codex", targetPath: ".codex/hooks.json", mode: "0755", ownership: "managed-replace", mergeBehavior: "replace", scopeTags: ["managed-runtime"] },
-			{ ...baseEntry, provider: "codex", targetPath: ".codex/AGENTS.md", mode: "0644", ownership: "managed-replace", mergeBehavior: "replace", scopeTags: ["managed-runtime"] },
+			{
+				...baseEntry,
+				provider: "codex",
+				targetPath: ".codex/hooks.json",
+				mode: "0755",
+				ownership: "managed-replace",
+				mergeBehavior: "replace",
+				scopeTags: ["managed-runtime"],
+			},
+			{
+				...baseEntry,
+				provider: "codex",
+				targetPath: ".codex/AGENTS.md",
+				mode: "0644",
+				ownership: "managed-replace",
+				mergeBehavior: "replace",
+				scopeTags: ["managed-runtime"],
+			},
 		],
 	};
 

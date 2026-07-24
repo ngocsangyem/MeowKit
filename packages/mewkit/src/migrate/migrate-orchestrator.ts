@@ -373,7 +373,11 @@ async function runMigrateUnderLock(
 				} catch (err) {
 					const message = err instanceof Error ? err.message : String(err);
 					executed.results.push({ action, success: false, error: message });
-					recordOutcome(sink.outcomes, action.type, action.item, { outcome: "failed", error: message, internalError: true });
+					recordOutcome(sink.outcomes, action.type, action.item, {
+						outcome: "failed",
+						error: message,
+						internalError: true,
+					});
 				}
 			}
 		}
@@ -580,7 +584,11 @@ async function executePlan(
 		// skip/conflict handlers — so EVERY non-delete one defers to the post-overlay pass (the
 		// overlay force-overwrites AGENTS.md each run, so a "skip" must still re-merge to stay
 		// idempotent). Delete actions fall through to normal handling.
-		if (action.provider === "codex" && (action.type === "config" || action.type === "rules") && action.action !== "delete") {
+		if (
+			action.provider === "codex" &&
+			(action.type === "config" || action.type === "rules") &&
+			action.action !== "delete"
+		) {
 			codexAgentsMdActions.push(action);
 			continue;
 		}
@@ -644,10 +652,15 @@ async function executePlan(
 	const hookProviders = targets.filter((target) => providers[target].hooks);
 	if (ctx.allItems.hooks.length > 0 && hookProviders.length > 0) {
 		for (const target of hookProviders) {
-			const result = await mergeHooksSettings(target, ctx.allItems.hooks, hookTargetPathsByProvider.get(target) ?? new Map(), {
-				global: isGlobal,
-				sourceSettingsPath,
-			});
+			const result = await mergeHooksSettings(
+				target,
+				ctx.allItems.hooks,
+				hookTargetPathsByProvider.get(target) ?? new Map(),
+				{
+					global: isGlobal,
+					sourceSettingsPath,
+				},
+			);
 			results.push({
 				action: codexBulkActionShim("hooks", target, isGlobal, result.hooksWritten),
 				success: result.success,

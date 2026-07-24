@@ -13,12 +13,7 @@ import { dirname, join } from "node:path";
 import { acquireMigrationLock, releaseMigrationLock } from "../reconcile/process-lock.js";
 import { meowkitStatePaths } from "../../state/meowkit-state-paths.js";
 import { sha256File } from "./memory-inventory.js";
-import {
-	readManifest,
-	writeManifest,
-	type ManifestEntry,
-	type MigrationManifest,
-} from "./migration-manifest.js";
+import { readManifest, writeManifest, type ManifestEntry, type MigrationManifest } from "./migration-manifest.js";
 import type { InventoryEntry, PreflightResult } from "./preflight-types.js";
 
 export interface MigrationHooks {
@@ -51,7 +46,10 @@ export interface MigrationTransactionResult {
 
 function makeRunId(now: string): string {
 	const compact = now.replace(/[^0-9]/g, "").slice(0, 14);
-	const suffix = createHash("sha1").update(now + String(process.hrtime.bigint())).digest("hex").slice(0, 6);
+	const suffix = createHash("sha1")
+		.update(now + String(process.hrtime.bigint()))
+		.digest("hex")
+		.slice(0, 6);
 	return `${compact}-${suffix}`;
 }
 
@@ -123,7 +121,12 @@ async function stageAll(plan: PreflightResult, paths: RunPaths, manifest: Migrat
 }
 
 /** Publish phase: atomically publish every staged entry; manifest re-written each time. */
-async function publishAll(paths: RunPaths, meowkitRoot: string, manifest: MigrationManifest, hooks?: MigrationHooks): Promise<void> {
+async function publishAll(
+	paths: RunPaths,
+	meowkitRoot: string,
+	manifest: MigrationManifest,
+	hooks?: MigrationHooks,
+): Promise<void> {
 	for (let i = 0; i < manifest.entries.length; i++) {
 		const me = manifest.entries[i];
 		if (me.outcome !== "staged") continue;
@@ -170,7 +173,11 @@ export async function pruneRunDirs(meowkitRoot: string, keep = 3): Promise<void>
 	}
 }
 
-async function finalize(paths: RunPaths, manifest: MigrationManifest, meowkitRoot: string): Promise<MigrationTransactionResult> {
+async function finalize(
+	paths: RunPaths,
+	manifest: MigrationManifest,
+	meowkitRoot: string,
+): Promise<MigrationTransactionResult> {
 	manifest.status = "complete";
 	await writeManifest(paths.manifestPath, manifest);
 	await pruneRunDirs(meowkitRoot);
@@ -192,12 +199,28 @@ export async function runMemoryMigrationTransaction(
 ): Promise<MigrationTransactionResult> {
 	if (plan.noop) return { status: "noop", runId: null, published: 0, quarantined: 0, fenced: [], conflicts: [] };
 	if (plan.conflicts.length > 0)
-		return { status: "aborted", reason: "conflicts", runId: null, published: 0, quarantined: 0, fenced: [], conflicts: plan.conflicts };
+		return {
+			status: "aborted",
+			reason: "conflicts",
+			runId: null,
+			published: 0,
+			quarantined: 0,
+			fenced: [],
+			conflicts: plan.conflicts,
+		};
 
 	const projectRoot = opts.projectRoot ?? dirname(plan.meowkitRoot);
 	const lock = await acquireMigrationLock({ scope: "project", projectRoot });
 	if (!lock.acquired)
-		return { status: "blocked", runId: null, published: 0, quarantined: 0, fenced: [], conflicts: [], heldBy: lock.heldBy };
+		return {
+			status: "blocked",
+			runId: null,
+			published: 0,
+			quarantined: 0,
+			fenced: [],
+			conflicts: [],
+			heldBy: lock.heldBy,
+		};
 
 	try {
 		const now = opts.now ?? new Date().toISOString();
@@ -231,7 +254,8 @@ export async function recoverMemoryMigration(
 	opts: { projectRoot?: string; hooks?: MigrationHooks } = {},
 ): Promise<MigrationTransactionResult> {
 	const migrations = meowkitStatePaths(meowkitRoot).migrations;
-	if (!existsSync(migrations)) return { status: "noop", runId: null, published: 0, quarantined: 0, fenced: [], conflicts: [] };
+	if (!existsSync(migrations))
+		return { status: "noop", runId: null, published: 0, quarantined: 0, fenced: [], conflicts: [] };
 
 	const runDirs = (await fsp.readdir(migrations, { withFileTypes: true }))
 		.filter((d) => d.isDirectory())
@@ -245,7 +269,15 @@ export async function recoverMemoryMigration(
 		const manifest = await readManifest(paths.manifestPath);
 		if (!manifest) {
 			// Torn/unparsable manifest — fail closed. Legacy remains authoritative.
-			return { status: "aborted", reason: "corrupt-manifest", runId, published: 0, quarantined: 0, fenced: [], conflicts: [] };
+			return {
+				status: "aborted",
+				reason: "corrupt-manifest",
+				runId,
+				published: 0,
+				quarantined: 0,
+				fenced: [],
+				conflicts: [],
+			};
 		}
 		if (manifest.status !== "in-progress") continue;
 

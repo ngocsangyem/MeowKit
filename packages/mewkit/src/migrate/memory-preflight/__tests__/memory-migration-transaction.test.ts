@@ -1,4 +1,13 @@
-import { mkdtempSync, mkdirSync, existsSync, readFileSync, writeFileSync, rmSync, readdirSync, realpathSync } from "node:fs";
+import {
+	mkdtempSync,
+	mkdirSync,
+	existsSync,
+	readFileSync,
+	writeFileSync,
+	rmSync,
+	readdirSync,
+	realpathSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -93,7 +102,11 @@ describe("transaction — interruption + recovery", () => {
 			runMemoryMigrationTransaction(plan, {
 				projectRoot: root,
 				runId: "run-1",
-				hooks: { afterStageAll: () => { throw new Error("crash-after-stage"); } },
+				hooks: {
+					afterStageAll: () => {
+						throw new Error("crash-after-stage");
+					},
+				},
 			}),
 		).rejects.toThrow("crash-after-stage");
 
@@ -116,7 +129,11 @@ describe("transaction — interruption + recovery", () => {
 			runMemoryMigrationTransaction(plan, {
 				projectRoot: root,
 				runId: "run-1",
-				hooks: { afterPublish: () => { if (++published >= 3) throw new Error("crash-mid-publish"); } },
+				hooks: {
+					afterPublish: () => {
+						if (++published >= 3) throw new Error("crash-mid-publish");
+					},
+				},
 			}),
 		).rejects.toThrow("crash-mid-publish");
 
@@ -238,7 +255,17 @@ describe("migration-manifest", () => {
 			legacyRoot: "/l",
 			meowkitRoot: "/m",
 			status: "in-progress",
-			entries: [{ relPath: "a", sourcePath: "/l/a", targetClass: "memory", targetRelPath: "memory/a", checksum: "abc", action: "stage", outcome: "staged" }],
+			entries: [
+				{
+					relPath: "a",
+					sourcePath: "/l/a",
+					targetClass: "memory",
+					targetRelPath: "memory/a",
+					checksum: "abc",
+					action: "stage",
+					outcome: "staged",
+				},
+			],
 		};
 		await writeManifest(p, manifest);
 		expect(await readManifest(p)).toEqual(manifest);

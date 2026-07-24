@@ -36,7 +36,10 @@ export const ArtifactManifestEntrySchema = z
 		 *  hand-authored bundles, whose checksum is computed from the file at copy time. */
 		checksum: z.string().min(1).optional(),
 		/** POSIX file mode for the installed artifact (e.g. "0644", "0755" for hooks). */
-		mode: z.string().regex(/^0[0-7]{3}$/).default("0644"),
+		mode: z
+			.string()
+			.regex(/^0[0-7]{3}$/)
+			.default("0644"),
 		ownership: ArtifactOwnership,
 		mergeBehavior: ArtifactMergeBehavior.default("replace"),
 		scopeTags: z.array(ArtifactScopeTag).default([]),

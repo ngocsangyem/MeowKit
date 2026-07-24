@@ -1,35 +1,39 @@
 {
-  "_description": "Phase-7 verification + hardening of the legacy `.claude/memory/` -> `.meowkit/` import for Codex-target flows. The import already existed (migrate.ts -> runMemoryPreflight -> runMemoryMigrationTransaction) with dry-run, quarantine, conflict hard-abort (exit 2), symlink safety, and an atomic staged/fenced transaction. This file records the dispositions decided while closing the remaining contract gaps (loss-aware, secret-scrubbed, rollback-capable, porter-independent).",
-  "verified": "2026-07-24",
-  "phase": 7,
-  "dispositions": [
-    {
-      "gap": "secret-bearing entries",
-      "status": "implemented",
-      "decision": "Added a conservative text secret scan (memory-preflight/secret-scan.ts) run in buildEntry for text-classified files (binary cache class skipped). A hit QUARANTINES the file to memory/legacy/ (preserved, not published as a canonical store) and reports a count + types via the preflight report; the file is NEVER deleted or redacted. High-confidence provider patterns + one conservative credential-assignment rule keep false positives low; per the plan risk note, a false positive quarantines (no data loss) and the user resolves.",
-      "surfaces": ["memory-preflight/secret-scan.ts", "memory-preflight/memory-inventory.ts", "memory-preflight/memory-preflight-report.ts"]
-    },
-    {
-      "gap": "rollback / failure pre-state",
-      "status": "verified",
-      "decision": "The transaction is roll-forward (resume), not roll-back, and pre-state is preserved by construction: legacy sources stay live until a fence-verified archive move; conflicts abort BEFORE any publish; a torn manifest fails closed (legacy authoritative). Covered by memory-migration-transaction.test.ts (crash-after-stage, crash-mid-publish, conflict-abort, torn-manifest). Added an explicit assertion that a conflict-abort leaves the legacy source live (pre-state intact)."
-    },
-    {
-      "gap": "init --target codex with legacy .claude/memory/ present",
-      "status": "decided",
-      "decision": "init --target codex (and the multi-provider addCodexBundle path) copy the authored bundle only; they do NOT auto-run the legacy-memory import. Rather than silently skip, both now surface a hint pointing at `mewkit migrate codex` (loss-aware, conflict-safe). Import stays an explicit opt-in transaction so a codex-only install never silently mutates user memory.",
-      "surfaces": ["src/commands/init.ts"]
-    },
-    {
-      "gap": "typo path `.claude/memeory/`",
-      "status": "omitted",
-      "decision": "Intentionally NOT implemented (YAGNI). The discovery walker reads the real `.claude/memory/` root; a misspelled sibling directory has never been observed in a real project. Revisit only if a real-world occurrence is shown."
-    },
-    {
-      "gap": "porter independence (survives phase-9 porter deletion)",
-      "status": "implemented",
-      "decision": "The memory-import path (memory-preflight/*, migrate.ts memory step) has zero static imports from modules/porter/**. Guarded by a regression test that walks the import closure from the preflight entry points and asserts no resolved module lives under modules/porter/.",
-      "surfaces": ["memory-preflight/__tests__/porter-independence.test.ts"]
-    }
-  ]
+	"_description": "Phase-7 verification + hardening of the legacy `.claude/memory/` -> `.meowkit/` import for Codex-target flows. The import already existed (migrate.ts -> runMemoryPreflight -> runMemoryMigrationTransaction) with dry-run, quarantine, conflict hard-abort (exit 2), symlink safety, and an atomic staged/fenced transaction. This file records the dispositions decided while closing the remaining contract gaps (loss-aware, secret-scrubbed, rollback-capable, porter-independent).",
+	"verified": "2026-07-24",
+	"phase": 7,
+	"dispositions": [
+		{
+			"gap": "secret-bearing entries",
+			"status": "implemented",
+			"decision": "Added a conservative text secret scan (memory-preflight/secret-scan.ts) run in buildEntry for text-classified files (binary cache class skipped). A hit QUARANTINES the file to memory/legacy/ (preserved, not published as a canonical store) and reports a count + types via the preflight report; the file is NEVER deleted or redacted. High-confidence provider patterns + one conservative credential-assignment rule keep false positives low; per the plan risk note, a false positive quarantines (no data loss) and the user resolves.",
+			"surfaces": [
+				"memory-preflight/secret-scan.ts",
+				"memory-preflight/memory-inventory.ts",
+				"memory-preflight/memory-preflight-report.ts"
+			]
+		},
+		{
+			"gap": "rollback / failure pre-state",
+			"status": "verified",
+			"decision": "The transaction is roll-forward (resume), not roll-back, and pre-state is preserved by construction: legacy sources stay live until a fence-verified archive move; conflicts abort BEFORE any publish; a torn manifest fails closed (legacy authoritative). Covered by memory-migration-transaction.test.ts (crash-after-stage, crash-mid-publish, conflict-abort, torn-manifest). Added an explicit assertion that a conflict-abort leaves the legacy source live (pre-state intact)."
+		},
+		{
+			"gap": "init --target codex with legacy .claude/memory/ present",
+			"status": "decided",
+			"decision": "init --target codex (and the multi-provider addCodexBundle path) copy the authored bundle only; they do NOT auto-run the legacy-memory import. Rather than silently skip, both now surface a hint pointing at `mewkit migrate codex` (loss-aware, conflict-safe). Import stays an explicit opt-in transaction so a codex-only install never silently mutates user memory.",
+			"surfaces": ["src/commands/init.ts"]
+		},
+		{
+			"gap": "typo path `.claude/memeory/`",
+			"status": "omitted",
+			"decision": "Intentionally NOT implemented (YAGNI). The discovery walker reads the real `.claude/memory/` root; a misspelled sibling directory has never been observed in a real project. Revisit only if a real-world occurrence is shown."
+		},
+		{
+			"gap": "porter independence (survives phase-9 porter deletion)",
+			"status": "implemented",
+			"decision": "The memory-import path (memory-preflight/*, migrate.ts memory step) has zero static imports from modules/porter/**. Guarded by a regression test that walks the import closure from the preflight entry points and asserts no resolved module lives under modules/porter/.",
+			"surfaces": ["memory-preflight/__tests__/porter-independence.test.ts"]
+		}
+	]
 }

@@ -63,9 +63,12 @@ export interface InitArgs {
 function parseSkillPacks(raw?: string): PackSelection {
 	if (raw === undefined) return [];
 	const v = raw.trim();
-	if (v === "" ) return [];
+	if (v === "") return [];
 	if (v.toLowerCase() === "all") return "all";
-	return v.split(",").map((s) => s.trim()).filter(Boolean);
+	return v
+		.split(",")
+		.map((s) => s.trim())
+		.filter(Boolean);
 }
 
 /** Profile picker options (stable names; resolution validates against the release manifest). */
@@ -304,7 +307,9 @@ async function initCodexTarget(
 		});
 		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
 		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
-		p.log.info(`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .codex/, .agents/skills/.`);
+		p.log.info(
+			`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .codex/, .agents/skills/.`,
+		);
 		p.outro(pc.green("Dry-run complete — no files written."));
 		return;
 	}
@@ -315,10 +320,14 @@ async function initCodexTarget(
 		);
 		for (const c of result.conflicts) p.log.message(pc.dim(`  ${c.targetPath}`));
 	}
-	p.log.success(`Codex toolkit ready (${result.writes} written): AGENTS.md, .codex/{config.toml,agents,hooks.json,hooks}, .agents/skills/.`);
+	p.log.success(
+		`Codex toolkit ready (${result.writes} written): AGENTS.md, .codex/{config.toml,agents,hooks.json,hooks}, .agents/skills/.`,
+	);
 	const budgetWarn = packSelectionBudgetWarning(moduleDir, packs);
 	if (budgetWarn) p.log.warn(budgetWarn);
-	p.log.info("Skill packs are additive: re-run with more `--skill-packs` to add; removing an installed pack is manual (delete its .agents/skills/<name> dirs).");
+	p.log.info(
+		"Skill packs are additive: re-run with more `--skill-packs` to add; removing an installed pack is manual (delete its .agents/skills/<name> dirs).",
+	);
 	await warnBelowMinCodex();
 	hintLegacyMemoryForCodex(targetDir);
 	p.outro(pc.green("Codex toolkit installed!"));
@@ -365,7 +374,11 @@ async function promptProviders(): Promise<ProviderType[]> {
 	const choice = await p.multiselect({
 		message: "Select the toolkits to set up",
 		options: [
-			{ value: "claude-code" as const, label: providers["claude-code"].displayName, hint: "installs .claude/ (default)" },
+			{
+				value: "claude-code" as const,
+				label: providers["claude-code"].displayName,
+				hint: "installs .claude/ (default)",
+			},
 			{ value: "codex" as const, label: providers.codex.displayName, hint: "copies the authored Codex bundle" },
 			{ value: "cursor" as const, label: providers.cursor.displayName, hint: "exports .claude/ to .cursor/" },
 		],

@@ -1,4 +1,13 @@
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync, readdirSync, realpathSync } from "node:fs";
+import {
+	mkdtempSync,
+	mkdirSync,
+	writeFileSync,
+	readFileSync,
+	rmSync,
+	existsSync,
+	readdirSync,
+	realpathSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

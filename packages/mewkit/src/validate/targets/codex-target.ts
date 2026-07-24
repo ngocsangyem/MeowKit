@@ -379,7 +379,10 @@ function checkLegacySurfaces(dir: string): CheckResult[] {
 	const promptsDir = path.join(dir, ".codex", "prompts");
 	out.push(
 		fs.existsSync(promptsDir)
-			? fail("Codex no legacy prompts surface", "`.codex/prompts` present — deprecated custom prompts must be Agent Skills")
+			? fail(
+					"Codex no legacy prompts surface",
+					"`.codex/prompts` present — deprecated custom prompts must be Agent Skills",
+				)
 			: pass("Codex no legacy prompts surface", "no deprecated `.codex/prompts` surface"),
 	);
 	return out;

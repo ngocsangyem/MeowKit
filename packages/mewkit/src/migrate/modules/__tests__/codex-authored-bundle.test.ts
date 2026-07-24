@@ -2,11 +2,7 @@ import { mkdtempSync, readFileSync, rmSync, statSync, existsSync } from "node:fs
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import {
-	resolveCodexModuleDir,
-	loadCodexBundleManifest,
-	copyAuthoredCodexBundle,
-} from "../codex-authored-bundle.js";
+import { resolveCodexModuleDir, loadCodexBundleManifest, copyAuthoredCodexBundle } from "../codex-authored-bundle.js";
 import { applyActiveCodexOverlay } from "../codex-reconcile-apply.js";
 import { codexTargetProfile } from "../../../validate/targets/codex-target.js";
 

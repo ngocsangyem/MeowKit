@@ -98,9 +98,15 @@ describe("plan archive", () => {
 
 	it("leaves visual-plan/plan.json untouched (review status is not lifecycle)", async () => {
 		makePlan("260101-1400-visual", { visual: true });
-		const before = readFileSync(join(projectRoot, "tasks", "plans", "260101-1400-visual", "visual-plan", "plan.json"), "utf-8");
+		const before = readFileSync(
+			join(projectRoot, "tasks", "plans", "260101-1400-visual", "visual-plan", "plan.json"),
+			"utf-8",
+		);
 		await planArchive({ target: join(projectRoot, "tasks", "plans", "260101-1400-visual") });
-		const after = readFileSync(join(projectRoot, "tasks", "plans", "archive", "260101-1400-visual", "visual-plan", "plan.json"), "utf-8");
+		const after = readFileSync(
+			join(projectRoot, "tasks", "plans", "archive", "260101-1400-visual", "visual-plan", "plan.json"),
+			"utf-8",
+		);
 		expect(after).toBe(before);
 	});
 

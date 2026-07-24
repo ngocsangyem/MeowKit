@@ -28,7 +28,9 @@ const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
 async function reMigrateInstalledProviders(projectDir: string): Promise<void> {
 	const installed = PROPAGATABLE_PROVIDERS.filter((p) => existsSync(join(projectDir, p.dir)));
 	if (installed.length === 0) return;
-	console.log(`\n${pc.bold("Propagating upgrade to installed provider toolkits:")} ${installed.map((p) => p.tool).join(", ")}`);
+	console.log(
+		`\n${pc.bold("Propagating upgrade to installed provider toolkits:")} ${installed.map((p) => p.tool).join(", ")}`,
+	);
 	for (const { tool } of installed) {
 		try {
 			await runMigrate(
@@ -56,10 +58,14 @@ async function upgradeCodexToolkit(projectDir: string): Promise<void> {
 	const result = await reconcileApplyCodexBundle(moduleDir, projectDir, { projectRoot: projectDir });
 	const preserved = result.entries.filter((e) => e.action === "skip" && e.reasonCode === "user-edits-preserved").length;
 	console.log(
-		pc.green(`Codex toolkit refreshed — ${result.writes} updated${preserved > 0 ? `, ${preserved} preserving your edits` : ""}.`),
+		pc.green(
+			`Codex toolkit refreshed — ${result.writes} updated${preserved > 0 ? `, ${preserved} preserving your edits` : ""}.`,
+		),
 	);
 	if (result.conflicts.length > 0) {
-		console.log(pc.yellow(`  ${result.conflicts.length} conflict(s) — both you and mewkit changed these; left untouched:`));
+		console.log(
+			pc.yellow(`  ${result.conflicts.length} conflict(s) — both you and mewkit changed these; left untouched:`),
+		);
 		for (const c of result.conflicts) console.log(pc.dim(`    ${c.targetPath}`));
 	}
 }

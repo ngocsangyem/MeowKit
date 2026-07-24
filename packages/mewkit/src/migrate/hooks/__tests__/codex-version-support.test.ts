@@ -2,7 +2,11 @@
 // (0.142.0) the merger emits a hard WARN naming affected safety hooks.
 
 import { describe, expect, it } from "vitest";
-import { CODEX_MIN_SUPPORTED_VERSION, detectCodexVersion, isCodexVersionSupported } from "../../providers/codex/capabilities.js";
+import {
+	CODEX_MIN_SUPPORTED_VERSION,
+	detectCodexVersion,
+	isCodexVersionSupported,
+} from "../../providers/codex/capabilities.js";
 
 describe("isCodexVersionSupported", () => {
 	it("targets 0.142.0 as the minimum supported hook tier", () => {

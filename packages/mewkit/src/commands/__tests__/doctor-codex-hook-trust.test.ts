@@ -47,7 +47,11 @@ describe("checkCodexHookTrust", () => {
 	it("resolves the hook label from commandWindows when command is absent", () => {
 		const d = makeTarget(
 			JSON.stringify({
-				hooks: { PreToolUse: [{ matcher: "Bash", hooks: [{ commandWindows: "node -e require('...codex/hooks/privacy-block.cjs')" }] }] },
+				hooks: {
+					PreToolUse: [
+						{ matcher: "Bash", hooks: [{ commandWindows: "node -e require('...codex/hooks/privacy-block.cjs')" }] },
+					],
+				},
 			}),
 		);
 		const rs = checkCodexHookTrust(d);

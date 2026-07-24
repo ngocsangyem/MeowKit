@@ -25,52 +25,138 @@ function row(source: string, target: string): PortableInstallationV3 {
 
 describe("decideCodexEntryAction", () => {
 	it("installs a brand-new artifact (no ledger row, no target)", () => {
-		const d = decideCodexEntryAction({ ownership: MANAGED, force: false, srcChecksum: "a", targetExists: false, currentTargetChecksum: undefined, row: undefined });
+		const d = decideCodexEntryAction({
+			ownership: MANAGED,
+			force: false,
+			srcChecksum: "a",
+			targetExists: false,
+			currentTargetChecksum: undefined,
+			row: undefined,
+		});
 		expect(d).toMatchObject({ action: "install", reasonCode: "new-item", write: true, recordLedger: true });
 	});
 
 	it("adopts an unregistered target that already matches the source (no write, records baseline)", () => {
-		const d = decideCodexEntryAction({ ownership: MANAGED, force: false, srcChecksum: "a", targetExists: true, currentTargetChecksum: "a", row: undefined });
-		expect(d).toMatchObject({ action: "skip", reasonCode: "target-up-to-date-backfill", write: false, recordLedger: true });
+		const d = decideCodexEntryAction({
+			ownership: MANAGED,
+			force: false,
+			srcChecksum: "a",
+			targetExists: true,
+			currentTargetChecksum: "a",
+			row: undefined,
+		});
+		expect(d).toMatchObject({
+			action: "skip",
+			reasonCode: "target-up-to-date-backfill",
+			write: false,
+			recordLedger: true,
+		});
 	});
 
 	it("conflicts (never blind-installs) on an unregistered target that differs from the source", () => {
-		const d = decideCodexEntryAction({ ownership: MANAGED, force: false, srcChecksum: "a", targetExists: true, currentTargetChecksum: "b", row: undefined });
+		const d = decideCodexEntryAction({
+			ownership: MANAGED,
+			force: false,
+			srcChecksum: "a",
+			targetExists: true,
+			currentTargetChecksum: "b",
+			row: undefined,
+		});
 		expect(d).toMatchObject({ action: "conflict", reasonCode: "both-changed", write: false, recordLedger: false });
 	});
 
 	it("force overwrites an unregistered differing target (overlay/--force)", () => {
-		const d = decideCodexEntryAction({ ownership: MANAGED, force: true, srcChecksum: "a", targetExists: true, currentTargetChecksum: "b", row: undefined });
+		const d = decideCodexEntryAction({
+			ownership: MANAGED,
+			force: true,
+			srcChecksum: "a",
+			targetExists: true,
+			currentTargetChecksum: "b",
+			row: undefined,
+		});
 		expect(d).toMatchObject({ action: "install", reasonCode: "force-overwrite", write: true });
 	});
 
 	it("skips when nothing changed (idempotent)", () => {
-		const d = decideCodexEntryAction({ ownership: MANAGED, force: false, srcChecksum: "a", targetExists: true, currentTargetChecksum: "a", row: row("a", "a") });
+		const d = decideCodexEntryAction({
+			ownership: MANAGED,
+			force: false,
+			srcChecksum: "a",
+			targetExists: true,
+			currentTargetChecksum: "a",
+			row: row("a", "a"),
+		});
 		expect(d).toMatchObject({ action: "skip", reasonCode: "no-changes", write: false });
 	});
 
 	it("updates when source changed but the user did not edit the target", () => {
-		const d = decideCodexEntryAction({ ownership: MANAGED, force: false, srcChecksum: "b", targetExists: true, currentTargetChecksum: "a", row: row("a", "a") });
+		const d = decideCodexEntryAction({
+			ownership: MANAGED,
+			force: false,
+			srcChecksum: "b",
+			targetExists: true,
+			currentTargetChecksum: "a",
+			row: row("a", "a"),
+		});
 		expect(d).toMatchObject({ action: "update", reasonCode: "source-changed", write: true });
 	});
 
 	it("preserves a user edit when the source is unchanged", () => {
-		const d = decideCodexEntryAction({ ownership: MANAGED, force: false, srcChecksum: "a", targetExists: true, currentTargetChecksum: "z", row: row("a", "a") });
+		const d = decideCodexEntryAction({
+			ownership: MANAGED,
+			force: false,
+			srcChecksum: "a",
+			targetExists: true,
+			currentTargetChecksum: "z",
+			row: row("a", "a"),
+		});
 		expect(d).toMatchObject({ action: "skip", reasonCode: "user-edits-preserved", write: false });
 	});
 
 	it("conflicts when both the source and the user's target changed", () => {
-		const d = decideCodexEntryAction({ ownership: MANAGED, force: false, srcChecksum: "b", targetExists: true, currentTargetChecksum: "z", row: row("a", "a") });
+		const d = decideCodexEntryAction({
+			ownership: MANAGED,
+			force: false,
+			srcChecksum: "b",
+			targetExists: true,
+			currentTargetChecksum: "z",
+			row: row("a", "a"),
+		});
 		expect(d).toMatchObject({ action: "conflict", reasonCode: "both-changed", write: false });
 	});
 
 	it("reinstalls a deleted target when the source changed; respects the deletion otherwise", () => {
-		expect(decideCodexEntryAction({ ownership: MANAGED, force: false, srcChecksum: "b", targetExists: false, currentTargetChecksum: undefined, row: row("a", "a") })).toMatchObject({ action: "install", reasonCode: "target-deleted-source-changed" });
-		expect(decideCodexEntryAction({ ownership: MANAGED, force: false, srcChecksum: "a", targetExists: false, currentTargetChecksum: undefined, row: row("a", "a") })).toMatchObject({ action: "skip", reasonCode: "user-deleted-respected" });
+		expect(
+			decideCodexEntryAction({
+				ownership: MANAGED,
+				force: false,
+				srcChecksum: "b",
+				targetExists: false,
+				currentTargetChecksum: undefined,
+				row: row("a", "a"),
+			}),
+		).toMatchObject({ action: "install", reasonCode: "target-deleted-source-changed" });
+		expect(
+			decideCodexEntryAction({
+				ownership: MANAGED,
+				force: false,
+				srcChecksum: "a",
+				targetExists: false,
+				currentTargetChecksum: undefined,
+				row: row("a", "a"),
+			}),
+		).toMatchObject({ action: "skip", reasonCode: "user-deleted-respected" });
 	});
 
 	it("never touches a user-owned artifact", () => {
-		const d = decideCodexEntryAction({ ownership: "user-owned-never-touch", force: true, srcChecksum: "a", targetExists: true, currentTargetChecksum: "b", row: undefined });
+		const d = decideCodexEntryAction({
+			ownership: "user-owned-never-touch",
+			force: true,
+			srcChecksum: "a",
+			targetExists: true,
+			currentTargetChecksum: "b",
+			row: undefined,
+		});
 		expect(d).toMatchObject({ action: "skip", write: false, recordLedger: false });
 	});
 });
@@ -86,8 +172,24 @@ function makeModule(dir: string): void {
 		provider: "codex",
 		generatedFrom: "test",
 		entries: [
-			{ sourcePath: "root/AGENTS.md", targetPath: "AGENTS.md", provider: "codex", mode: "0644", ownership: "managed-replace", scopeTags: ["managed-runtime"], active: false },
-			{ sourcePath: "root/.codex/config.toml", targetPath: ".codex/config.toml", provider: "codex", mode: "0644", ownership: "managed-replace", scopeTags: ["managed-runtime"], active: false },
+			{
+				sourcePath: "root/AGENTS.md",
+				targetPath: "AGENTS.md",
+				provider: "codex",
+				mode: "0644",
+				ownership: "managed-replace",
+				scopeTags: ["managed-runtime"],
+				active: false,
+			},
+			{
+				sourcePath: "root/.codex/config.toml",
+				targetPath: ".codex/config.toml",
+				provider: "codex",
+				mode: "0644",
+				ownership: "managed-replace",
+				scopeTags: ["managed-runtime"],
+				active: false,
+			},
 		],
 	};
 	writeFileSync(join(dir, "manifest.json"), JSON.stringify(manifest, null, 2));
@@ -198,7 +300,15 @@ function makeDirModule(dir: string): void {
 		provider: "codex",
 		generatedFrom: "test",
 		entries: [
-			{ sourcePath: "root/.agents/skills", targetPath: ".agents/skills", provider: "codex", mode: "0644", ownership: "managed-replace", scopeTags: ["managed-runtime"], active: false },
+			{
+				sourcePath: "root/.agents/skills",
+				targetPath: ".agents/skills",
+				provider: "codex",
+				mode: "0644",
+				ownership: "managed-replace",
+				scopeTags: ["managed-runtime"],
+				active: false,
+			},
 		],
 	};
 	writeFileSync(join(dir, "manifest.json"), JSON.stringify(manifest, null, 2));
@@ -236,7 +346,9 @@ describe("reconcileApplyCodexBundle — directory (tree-hashed) entries", () => 
 
 		const rerun = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
 		expect(rerun.entries[0]).toMatchObject({ action: "skip", reasonCode: "user-edits-preserved" });
-		expect(readFileSync(join(target, ".agents", "skills", "fix", "SKILL.md"), "utf-8")).toBe("# MY EDIT inside the tree\n");
+		expect(readFileSync(join(target, ".agents", "skills", "fix", "SKILL.md"), "utf-8")).toBe(
+			"# MY EDIT inside the tree\n",
+		);
 
 		const forced = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target, force: true });
 		expect(forced.entries[0]?.wrote).toBe(true);

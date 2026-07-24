@@ -11,7 +11,11 @@
 import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ArtifactManifestSchema, type ArtifactManifest, type ArtifactManifestEntry } from "./artifact-manifest-schema.js";
+import {
+	ArtifactManifestSchema,
+	type ArtifactManifest,
+	type ArtifactManifestEntry,
+} from "./artifact-manifest-schema.js";
 import {
 	expandSkillsEntry,
 	isSkillsTreeEntry,
@@ -30,7 +34,9 @@ export function loadCodexBundleManifest(moduleDir: string): ArtifactManifest {
 	const manifestPath = join(moduleDir, "manifest.json");
 	const parsed = ArtifactManifestSchema.safeParse(JSON.parse(readFileSync(manifestPath, "utf-8")));
 	if (!parsed.success) {
-		throw new Error(`invalid codex bundle manifest: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`);
+		throw new Error(
+			`invalid codex bundle manifest: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`,
+		);
 	}
 	return parsed.data;
 }

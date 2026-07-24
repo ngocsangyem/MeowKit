@@ -1,89 +1,89 @@
 {
-  "_description": "Phase-9 cutover-gate evidence record. All 11 gates verified GREEN (or dispositioned SKIP with a no-auth substitute proof) against the fully authored Codex bundle (9/9 manifest surfaces active:true) BEFORE porter/converter deletion. Each gate cites a passing test or a compliance artifact. Deletion of the porter/converter subsystem is gated on this record.",
-  "verified": "2026-07-24",
-  "environment": {
-    "node": "24.16.0",
-    "codexCli": "0.144.6 (latest verified)",
-    "invocation": "vitest run from meowkit workspace root (cwd = real .claude harness)"
-  },
-  "baseline": {
-    "codexSuite": "76 codex-named test files / 562 tests GREEN",
-    "preExistingUnrelatedFailures": [
-      "check-packs live-harness: root mk: skill 'orchestrate' assigned to no pack/base (root-harness manifest gap; phase 9 never touched root packs; user confirmed OUT of scope)",
-      "memory-cli findMemoryDir (2): macOS /var->/private/var realpath symlink mismatch (environmental)",
-      "3 codex-bundle .cjs skill self-tests collected by vitest default-include from root (their source copies pass in CI via node; collection artifact, not a real failure)"
-    ]
-  },
-  "gates": [
-    {
-      "id": 1,
-      "requirement": "No Codex semantic output depends on .claude",
-      "status": "PASS",
-      "evidence": "Authored bundle = 1104 static files under modules/codex/root/. Zero .md semantic .claude dependencies; the single .claude reference is a functional path-guard comment in .codex/hooks/gate-enforcement.cjs listing protected trees. Native apply path (overlay + reconciler + injectors) reads source .claude only for user-custom merge content (config/rules, MCP, custom agents), never for toolkit output. Proven by codex-output-brand-free.test.ts + codex-authored-bundle.test.ts."
-    },
-    {
-      "id": 2,
-      "requirement": "Skill-failure exemption removed from codex-authored-bundle.test.ts; suite green without it",
-      "status": "PASS",
-      "evidence": "codex-authored-bundle.test.ts: 'the copied bundle passes the Codex validator structural checks (incl. every installed skill)' with NO exemption filter (comment: per-skill token-cleanliness hand-refinement complete). Removed in PR-9d. Green."
-    },
-    {
-      "id": 3,
-      "requirement": "100% installed skills parse + pass native tool-vocabulary checks (zero denied-token hits)",
-      "status": "PASS",
-      "evidence": "190/190 skills parse, 0 host-bound tool/invocation tokens (blast-radius measurement + codexTargetProfile.check). codex-pack-cleanliness.test.ts + codex-target.test.ts green."
-    },
-    {
-      "id": 4,
-      "requirement": "100% internal references resolve for every installable pack combination",
-      "status": "PASS",
-      "evidence": "codex-pack-cleanliness.test.ts iterates COMPLETED_PACKS (core, development, review, product, operations, integrations, media), resolvePackSelection per pack, walks all skill files. codex-skill-packs.test.ts covers empty/named/'all' selection + budget. Green."
-    },
-    {
-      "id": 5,
-      "requirement": "Hook contract tests pass on min + latest Codex",
-      "status": "PASS",
-      "evidence": "Latest (0.144.6) GREEN via compat lane (codex-version-support.test.ts, compat-lane-dispositions.json). Min-candidate 0.124.0 structural-only; operational floor held at 0.142.0 (conservative, documented in minimum-version-matrix.json — lowering needs 0.124.0 install lane unavailable in env)."
-    },
-    {
-      "id": 6,
-      "requirement": "codex --strict-config passes for generated config where supported",
-      "status": "SKIP-DISPOSITIONED",
-      "evidence": "codex --strict-config requires an authenticated session (compat-lane-dispositions.json, verified 2026-07-24 codex-cli 0.144.6). Substituted no-auth proofs: STRUCTURAL lane pass (CI-blocking) + execpolicy load pass (default.rules loads; git push --force resolves to prompt). Recorded SKIP, not omitted."
-    },
-    {
-      "id": 7,
-      "requirement": "Every mandatory behavior has one primary owner (capability-coverage.json complete, zero TBD)",
-      "status": "PASS",
-      "evidence": "capability-coverage.json: 0 null/empty/TBD owner assignments (the single 'TBD' string is descriptive prose in _description). ownershipRule + ownerEnum + 64 meta-mirror dispositions + 28 reference-graph-risk items resolved. verified 2026-07-23."
-    },
-    {
-      "id": 8,
-      "requirement": "init/migrate/upgrade converge through the reconciler; second run zero drift",
-      "status": "PASS",
-      "evidence": "codex-reconcile-apply.test.ts (idempotent/converge assertions), init-target-codex.test.ts, upgrade-codex-toolkit.test.ts all green. Project-local ledger .meowkit/state/codex-ledger.json; second-run byte-identical (verified in PR-9a..AGENTS.md flip: 201/201 idempotent)."
-    },
-    {
-      "id": 9,
-      "requirement": "Dry-run accurate; user edits preserved or explicit conflict",
-      "status": "PASS",
-      "evidence": "codex-full-surface-cli-dry-run.test.ts green; reconciler conflict path (codex-reconcile-apply.test.ts) preserves user-edited managed files or reports explicit conflict (never silent overwrite)."
-    },
-    {
-      "id": 10,
-      "requirement": "Packed tarball contains every catalog/skill/agent/hook/compliance artifact (dist-parity green)",
-      "status": "PASS",
-      "evidence": "packaged-bundle-parity.test.ts green (phase-8). copy-codex-bundle.cjs ships full authored tree; isBundleBuildArtifact filter excludes __pycache__/.pyc."
-    },
-    {
-      "id": 11,
-      "requirement": "Structural canary and model-in-loop canary recorded separately; structural green",
-      "status": "PASS",
-      "evidence": "minimum-version-matrix.json + compat-lane-dispositions.json record two independent lanes that never mask each other: deterministic STRUCTURAL (CI-blocking, GREEN) vs best-effort LIVE Codex lane + MANUAL model-in-loop canary (scripts/codex-model-canary, never CI). Structural GREEN on 0.144.6."
-    }
-  ],
-  "verdict": "ALL GATES PASS (gate 6 SKIP-dispositioned with substitute proofs). Cleared for porter/converter deletion.",
-  "unresolvedQuestions": [
-    "Section E.1 (product decision, NOT a gate): codex providers/config.ts agents/commands/hooks surface formats — null them vs route to explicit 'unsupported, use native bundle' message. Blocks the orchestrator config.ts edit in Half B."
-  ]
+	"_description": "Phase-9 cutover-gate evidence record. All 11 gates verified GREEN (or dispositioned SKIP with a no-auth substitute proof) against the fully authored Codex bundle (9/9 manifest surfaces active:true) BEFORE porter/converter deletion. Each gate cites a passing test or a compliance artifact. Deletion of the porter/converter subsystem is gated on this record.",
+	"verified": "2026-07-24",
+	"environment": {
+		"node": "24.16.0",
+		"codexCli": "0.144.6 (latest verified)",
+		"invocation": "vitest run from meowkit workspace root (cwd = real .claude harness)"
+	},
+	"baseline": {
+		"codexSuite": "76 codex-named test files / 562 tests GREEN",
+		"preExistingUnrelatedFailures": [
+			"check-packs live-harness: root mk: skill 'orchestrate' assigned to no pack/base (root-harness manifest gap; phase 9 never touched root packs; user confirmed OUT of scope)",
+			"memory-cli findMemoryDir (2): macOS /var->/private/var realpath symlink mismatch (environmental)",
+			"3 codex-bundle .cjs skill self-tests collected by vitest default-include from root (their source copies pass in CI via node; collection artifact, not a real failure)"
+		]
+	},
+	"gates": [
+		{
+			"id": 1,
+			"requirement": "No Codex semantic output depends on .claude",
+			"status": "PASS",
+			"evidence": "Authored bundle = 1104 static files under modules/codex/root/. Zero .md semantic .claude dependencies; the single .claude reference is a functional path-guard comment in .codex/hooks/gate-enforcement.cjs listing protected trees. Native apply path (overlay + reconciler + injectors) reads source .claude only for user-custom merge content (config/rules, MCP, custom agents), never for toolkit output. Proven by codex-output-brand-free.test.ts + codex-authored-bundle.test.ts."
+		},
+		{
+			"id": 2,
+			"requirement": "Skill-failure exemption removed from codex-authored-bundle.test.ts; suite green without it",
+			"status": "PASS",
+			"evidence": "codex-authored-bundle.test.ts: 'the copied bundle passes the Codex validator structural checks (incl. every installed skill)' with NO exemption filter (comment: per-skill token-cleanliness hand-refinement complete). Removed in PR-9d. Green."
+		},
+		{
+			"id": 3,
+			"requirement": "100% installed skills parse + pass native tool-vocabulary checks (zero denied-token hits)",
+			"status": "PASS",
+			"evidence": "190/190 skills parse, 0 host-bound tool/invocation tokens (blast-radius measurement + codexTargetProfile.check). codex-pack-cleanliness.test.ts + codex-target.test.ts green."
+		},
+		{
+			"id": 4,
+			"requirement": "100% internal references resolve for every installable pack combination",
+			"status": "PASS",
+			"evidence": "codex-pack-cleanliness.test.ts iterates COMPLETED_PACKS (core, development, review, product, operations, integrations, media), resolvePackSelection per pack, walks all skill files. codex-skill-packs.test.ts covers empty/named/'all' selection + budget. Green."
+		},
+		{
+			"id": 5,
+			"requirement": "Hook contract tests pass on min + latest Codex",
+			"status": "PASS",
+			"evidence": "Latest (0.144.6) GREEN via compat lane (codex-version-support.test.ts, compat-lane-dispositions.json). Min-candidate 0.124.0 structural-only; operational floor held at 0.142.0 (conservative, documented in minimum-version-matrix.json — lowering needs 0.124.0 install lane unavailable in env)."
+		},
+		{
+			"id": 6,
+			"requirement": "codex --strict-config passes for generated config where supported",
+			"status": "SKIP-DISPOSITIONED",
+			"evidence": "codex --strict-config requires an authenticated session (compat-lane-dispositions.json, verified 2026-07-24 codex-cli 0.144.6). Substituted no-auth proofs: STRUCTURAL lane pass (CI-blocking) + execpolicy load pass (default.rules loads; git push --force resolves to prompt). Recorded SKIP, not omitted."
+		},
+		{
+			"id": 7,
+			"requirement": "Every mandatory behavior has one primary owner (capability-coverage.json complete, zero TBD)",
+			"status": "PASS",
+			"evidence": "capability-coverage.json: 0 null/empty/TBD owner assignments (the single 'TBD' string is descriptive prose in _description). ownershipRule + ownerEnum + 64 meta-mirror dispositions + 28 reference-graph-risk items resolved. verified 2026-07-23."
+		},
+		{
+			"id": 8,
+			"requirement": "init/migrate/upgrade converge through the reconciler; second run zero drift",
+			"status": "PASS",
+			"evidence": "codex-reconcile-apply.test.ts (idempotent/converge assertions), init-target-codex.test.ts, upgrade-codex-toolkit.test.ts all green. Project-local ledger .meowkit/state/codex-ledger.json; second-run byte-identical (verified in PR-9a..AGENTS.md flip: 201/201 idempotent)."
+		},
+		{
+			"id": 9,
+			"requirement": "Dry-run accurate; user edits preserved or explicit conflict",
+			"status": "PASS",
+			"evidence": "codex-full-surface-cli-dry-run.test.ts green; reconciler conflict path (codex-reconcile-apply.test.ts) preserves user-edited managed files or reports explicit conflict (never silent overwrite)."
+		},
+		{
+			"id": 10,
+			"requirement": "Packed tarball contains every catalog/skill/agent/hook/compliance artifact (dist-parity green)",
+			"status": "PASS",
+			"evidence": "packaged-bundle-parity.test.ts green (phase-8). copy-codex-bundle.cjs ships full authored tree; isBundleBuildArtifact filter excludes __pycache__/.pyc."
+		},
+		{
+			"id": 11,
+			"requirement": "Structural canary and model-in-loop canary recorded separately; structural green",
+			"status": "PASS",
+			"evidence": "minimum-version-matrix.json + compat-lane-dispositions.json record two independent lanes that never mask each other: deterministic STRUCTURAL (CI-blocking, GREEN) vs best-effort LIVE Codex lane + MANUAL model-in-loop canary (scripts/codex-model-canary, never CI). Structural GREEN on 0.144.6."
+		}
+	],
+	"verdict": "ALL GATES PASS (gate 6 SKIP-dispositioned with substitute proofs). Cleared for porter/converter deletion.",
+	"unresolvedQuestions": [
+		"Section E.1 (product decision, NOT a gate): codex providers/config.ts agents/commands/hooks surface formats — null them vs route to explicit 'unsupported, use native bundle' message. Blocks the orchestrator config.ts edit in Half B."
+	]
 }

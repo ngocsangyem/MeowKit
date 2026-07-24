@@ -34,7 +34,9 @@ describe("captureFromPrompt", () => {
 	});
 
 	it("routes ##note: to a scrubbed quick-notes.md append", async () => {
-		const res = await captureFromPrompt("##note: token is sk-ant-aaaaaaaaaaaaaaaaaaaaaaaa keep private", { startDir: root });
+		const res = await captureFromPrompt("##note: token is sk-ant-aaaaaaaaaaaaaaaaaaaaaaaa keep private", {
+			startDir: root,
+		});
 		expect(res).toMatchObject({ captured: true, store: "quick-notes.md" });
 		const md = readFileSync(store("quick-notes.md"), "utf-8");
 		expect(md).toContain("[REDACTED-ANTHROPIC-KEY]");
@@ -42,7 +44,9 @@ describe("captureFromPrompt", () => {
 	});
 
 	it("is a no-op for a non-prefixed prompt (fast path)", async () => {
-		expect(await captureFromPrompt("just a normal question about the code", { startDir: root })).toEqual({ captured: false });
+		expect(await captureFromPrompt("just a normal question about the code", { startDir: root })).toEqual({
+			captured: false,
+		});
 		expect(existsSync(join(root, ".meowkit"))).toBe(false);
 	});
 
@@ -58,7 +62,10 @@ describe("captureFromPrompt", () => {
 	});
 
 	it("scrubs secrets in a curated-store capture", async () => {
-		await captureFromPrompt("##pattern: api key sk-ant-bbbbbbbbbbbbbbbbbbbbbbbb must rotate", { startDir: root, id: "p2" });
+		await captureFromPrompt("##pattern: api key sk-ant-bbbbbbbbbbbbbbbbbbbbbbbb must rotate", {
+			startDir: root,
+			id: "p2",
+		});
 		const raw = readFileSync(store("review-patterns.json"), "utf-8");
 		expect(raw).not.toContain("sk-ant-bbbbbbbbbbbbbbbbbbbbbbbb");
 		expect(raw).toContain("[REDACTED-ANTHROPIC-KEY]");

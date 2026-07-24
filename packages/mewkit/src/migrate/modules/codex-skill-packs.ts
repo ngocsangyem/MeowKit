@@ -81,7 +81,10 @@ export function resolvePackSelection(
  * install skill dir, preserving ownership/mode/scope/active. The reconciler then
  * treats each skill dir as its own reconciled item (targetPath `.agents/skills/<name>`).
  */
-export function expandSkillsEntry(skillsEntry: ArtifactManifestEntry, installSkills: string[]): ArtifactManifestEntry[] {
+export function expandSkillsEntry(
+	skillsEntry: ArtifactManifestEntry,
+	installSkills: string[],
+): ArtifactManifestEntry[] {
 	return installSkills.map((name) => ({
 		...skillsEntry,
 		sourcePath: `${skillsEntry.sourcePath}/${name}`,
@@ -115,7 +118,11 @@ export function skillNameDescChars(skillDir: string): number {
 	const t = readFileSync(md, "utf-8");
 	const name = (t.match(/^name:\s*["']?([^"'\n]+?)["']?\s*$/m)?.[1] ?? "").trim();
 	// description may be quoted and can wrap; capture up to the closing quote or next top-level key.
-	const desc = (t.match(/^description:\s*"([\s\S]*?)"\s*$/m)?.[1] ?? t.match(/^description:\s*([^\n]+)$/m)?.[1] ?? "").trim();
+	const desc = (
+		t.match(/^description:\s*"([\s\S]*?)"\s*$/m)?.[1] ??
+		t.match(/^description:\s*([^\n]+)$/m)?.[1] ??
+		""
+	).trim();
 	return name.length + desc.length;
 }
 
@@ -155,9 +162,12 @@ function isMetaMirror(name: string): boolean {
  */
 export function validateSkillPackCatalog(moduleDir: string): CatalogCheck[] {
 	const catalog = loadSkillPackCatalog(moduleDir); // throws on invalid JSON/schema
-	if (!catalog) return [{ level: "warn", name: "Codex skill-pack catalog", detail: "no skill-packs.json (whole-tree install)" }];
+	if (!catalog)
+		return [{ level: "warn", name: "Codex skill-pack catalog", detail: "no skill-packs.json (whole-tree install)" }];
 
-	const out: CatalogCheck[] = [{ level: "pass", name: "Codex skill-pack catalog parses", detail: `${Object.keys(catalog.packs).length} packs` }];
+	const out: CatalogCheck[] = [
+		{ level: "pass", name: "Codex skill-pack catalog parses", detail: `${Object.keys(catalog.packs).length} packs` },
+	];
 	const skillsRoot = join(moduleDir, "root", ".agents", "skills");
 	const onDisk = new Set(listSkillDirs(skillsRoot));
 
@@ -181,13 +191,18 @@ export function validateSkillPackCatalog(moduleDir: string): CatalogCheck[] {
 	out.push(
 		missing.length === 0
 			? { level: "pass", name: "Codex pack skills exist", detail: "every listed skill dir is present" }
-			: { level: "fail", name: "Codex pack skills exist", detail: `catalog lists absent dir(s): ${missing.join(", ")}` },
+			: {
+					level: "fail",
+					name: "Codex pack skills exist",
+					detail: `catalog lists absent dir(s): ${missing.join(", ")}`,
+				},
 	);
 
 	// dependsOn references a known pack.
 	const known = new Set(Object.keys(catalog.packs));
 	const badDeps: string[] = [];
-	for (const [pk, pv] of Object.entries(catalog.packs)) for (const d of pv.dependsOn) if (!known.has(d)) badDeps.push(`${pk} → ${d}`);
+	for (const [pk, pv] of Object.entries(catalog.packs))
+		for (const d of pv.dependsOn) if (!known.has(d)) badDeps.push(`${pk} → ${d}`);
 	out.push(
 		badDeps.length === 0
 			? { level: "pass", name: "Codex pack dependsOn resolve", detail: "all dependencies known" }
@@ -199,7 +214,11 @@ export function validateSkillPackCatalog(moduleDir: string): CatalogCheck[] {
 	out.push(
 		orphans.length === 0
 			? { level: "pass", name: "Codex pack coverage", detail: "every shipped skill maps to a pack" }
-			: { level: "warn", name: "Codex pack coverage", detail: `unpackaged skill(s) (won't install): ${orphans.join(", ")}` },
+			: {
+					level: "warn",
+					name: "Codex pack coverage",
+					detail: `unpackaged skill(s) (won't install): ${orphans.join(", ")}`,
+				},
 	);
 
 	// Discovery budget: the resolved install for each pack (pack + its dependsOn) must fit
@@ -215,7 +234,11 @@ export function validateSkillPackCatalog(moduleDir: string): CatalogCheck[] {
 				detail: `${chars} > ${catalog.budgetChars} name+desc chars — shrink descriptions before cutover`,
 			});
 		} else if (isDefault) {
-			out.push({ level: "pass", name: `Codex pack budget: ${pk} (default)`, detail: `${chars} ≤ ${catalog.budgetChars}` });
+			out.push({
+				level: "pass",
+				name: `Codex pack budget: ${pk} (default)`,
+				detail: `${chars} ≤ ${catalog.budgetChars}`,
+			});
 		}
 	}
 	return out;

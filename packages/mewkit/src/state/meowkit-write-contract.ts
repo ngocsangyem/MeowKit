@@ -22,8 +22,7 @@ export interface WriteStoreOptions extends StoreLockOptions {
 }
 
 export type WriteStoreResult =
-	| { ok: true; deduped: boolean; entryId: string }
-	| { ok: false; reason: "schema" | "injection"; detail: string };
+	{ ok: true; deduped: boolean; entryId: string } | { ok: false; reason: "schema" | "injection"; detail: string };
 
 type StoreEntry = Record<string, unknown>;
 type StoreFile = { version: string; scope: string; consumer: string; metadata?: Record<string, unknown> } & Record<
@@ -33,12 +32,19 @@ type StoreFile = { version: string; scope: string; consumer: string; metadata?: 
 
 function specFor(store: string): StoreSpec {
 	const spec = CURATED_STORES.find((s) => s.scope === store);
-	if (!spec) throw new Error(`unknown memory store: ${store} (known: ${CURATED_STORES.map((s) => s.scope).join(", ")})`);
+	if (!spec)
+		throw new Error(`unknown memory store: ${store} (known: ${CURATED_STORES.map((s) => s.scope).join(", ")})`);
 	return spec;
 }
 
 function emptySkeleton(spec: StoreSpec, now: string): StoreFile {
-	return { version: "2.0.0", scope: spec.scope, consumer: "meowkit", [spec.itemsKey]: [], metadata: { created: now, last_updated: now } };
+	return {
+		version: "2.0.0",
+		scope: spec.scope,
+		consumer: "meowkit",
+		[spec.itemsKey]: [],
+		metadata: { created: now, last_updated: now },
+	};
 }
 
 /** Scrub secrets in every configured text field (mutates a shallow copy). */
@@ -117,7 +123,11 @@ export async function writeStoreEntry(
 			}
 
 			items.push(scrubbed);
-			const candidate: StoreFile = { ...file, [spec.itemsKey]: items, metadata: { ...file.metadata, last_updated: now } };
+			const candidate: StoreFile = {
+				...file,
+				[spec.itemsKey]: items,
+				metadata: { ...file.metadata, last_updated: now },
+			};
 
 			const parsed = spec.schema.safeParse(candidate);
 			if (!parsed.success) {

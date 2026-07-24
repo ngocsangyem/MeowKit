@@ -50,7 +50,12 @@ export async function captureFromPrompt(prompt: string, opts: CaptureOptions = {
 	if (!scan.valid) throw new Error(`capture rejected (injection: ${scan.match ?? scan.pattern})`);
 
 	const now = opts.now ?? new Date().toISOString();
-	const id = opts.id ?? `capture-${createHash("sha1").update(now + content).digest("hex").slice(0, 10)}`;
+	const id =
+		opts.id ??
+		`capture-${createHash("sha1")
+			.update(now + content)
+			.digest("hex")
+			.slice(0, 10)}`;
 
 	if (route.store === "quick-notes") {
 		const meowkitRoot = resolveMeowkitRoot(opts.startDir ?? process.cwd());
