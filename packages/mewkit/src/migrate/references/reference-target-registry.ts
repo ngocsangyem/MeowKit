@@ -5,7 +5,6 @@
 
 import { homedir } from "node:os";
 import { providers } from "../provider-registry.js";
-import { codexCommandSkillRelativePath } from "./codex-command-skill-path.js";
 import type { ProviderType } from "../types.js";
 
 /** Portable-type keys that have a per-provider target path */
@@ -86,10 +85,6 @@ export function buildReferenceRewriteTable(
 			sourcePrefix: sourcePrefixForType(type),
 			target: getReferenceTarget(provider, type, scope),
 		};
-		// Commands that install as Agent Skills live in one directory per command.
-		if (type === "commands" && provider && providers[provider].commands?.format === "command-to-codex-skill") {
-			rule.resolveSuffix = (suffix) => codexCommandSkillRelativePath(suffix);
-		}
 		return rule;
 	});
 }

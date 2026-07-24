@@ -59,22 +59,25 @@ describe("codex full-surface characterization: markdown stripping", () => {
 
 	it("preserves fenced unmapped runtime references and surfaces them as warned occurrences", () => {
 		const result = convertItem(config, "md-strip", "codex");
-		// No provider equivalent exists for these — preserved verbatim, never fabricated.
+		// No provider equivalent exists for this generic script path — preserved
+		// verbatim, never fabricated.
 		expect(result.content).toContain("node .claude/scripts/validate-docs.cjs");
-		expect(result.content).toContain("node .claude/hooks/validate-docs.cjs --check");
 		const warned = (result.occurrences ?? []).filter((o) => o.decision === "preserve-warn");
-		expect(warned.length).toBeGreaterThanOrEqual(2);
+		expect(warned.length).toBeGreaterThanOrEqual(1);
 		expect(result.warnings.some((w) => w.includes(".claude/scripts/validate-docs.cjs"))).toBe(true);
 	});
 
-	it("keeps fenced refs to merged/non-directory targets preserved even with migration proof", () => {
-		// Codex hooks are a merged surface (bare .codex/hooks target) — rewriting a
-		// runnable path there would drop the filename, so it stays preserved + warned.
+	it("drops fenced hook references as noise — Codex has no hooks surface (nulled)", () => {
+		// Codex hooks conversion is nulled: `.claude/hooks/...` reference lines are
+		// dropped as noise (matching the existing "provider has no hooks surface"
+		// behavior every provider without a hooks surface has always had — e.g.
+		// cursor), never preserved+warned nor fabricated into a target path — even
+		// with migration-set proof, since there is no target surface at all.
 		const migratedRefs = createReferenceIntegrityIndex([".claude/hooks/validate-docs.cjs"]);
 		const result = convertItem(config, "md-strip", "codex", { migratedRefs });
-		expect(result.content).toContain("node .claude/hooks/validate-docs.cjs --check");
+		expect(result.content).not.toContain(".claude/hooks/validate-docs.cjs");
+		expect(result.content).not.toContain(".codex/hooks");
 		expect(result.content).toContain("node .claude/scripts/validate-docs.cjs");
-		expect(result.content).not.toContain("node .codex/hooks --check");
 	});
 
 	it("rewrites the CLAUDE.md token in prose to the provider config path", () => {
@@ -139,10 +142,18 @@ describe("codex full-surface characterization: direct-copy", () => {
 });
 
 describe("codex full-surface characterization: codex-only surfaces", () => {
-	it("migrates codex commands as Agent Skills", () => {
-		expect(providers.codex.commands).not.toBeNull();
-		expect(providers.codex.commands?.format).toBe("command-to-codex-skill");
-		expect(providers.codex.commands?.projectPath).toBe(".agents/skills");
+	it("nulls agents/commands/hooks conversion — toolkit ships those via the native authored bundle", () => {
+		// A project's own custom .claude/agents|commands|hooks are no longer
+		// auto-ported to Codex; toolkit agents/commands/hooks ship via the authored
+		// bundle + reconciler instead (see migrate-orchestrator's advisory banner).
+		expect(providers.codex.agents).toBeNull();
+		expect(providers.codex.commands).toBeNull();
+		expect(providers.codex.hooks).toBeNull();
+	});
+
+	it("keeps skills as direct-copy — the surviving codex-only per-file surface", () => {
+		expect(providers.codex.skills?.format).toBe("direct-copy");
+		expect(providers.codex.skills?.projectPath).toBe(".agents/skills");
 	});
 
 	it("converts markdown rules through md-strip so they merge into AGENTS.md", () => {
@@ -155,9 +166,11 @@ describe("codex full-surface characterization: codex-only surfaces", () => {
 		expect(result.content).toContain("Never commit secrets");
 	});
 
-	it("pins codex agent TOML conversion (fenced .claude refs survive inside developer_instructions)", () => {
-		const result = convertItem(agent, "fm-to-codex-toml", "codex");
-		expect(result.content).toMatchSnapshot("fm-to-codex-toml-planner");
+	it("converts config through md-strip so it merges into AGENTS.md too", () => {
+		expect(providers.codex.config?.format).toBe("md-strip");
+		expect(providers.codex.config?.projectPath).toBe("AGENTS.md");
+		const result = convertItem(config, "md-strip", "codex");
+		expect(result.error).toBeUndefined();
 	});
 
 	it("merged AGENTS.md carries no provenance branding", () => {

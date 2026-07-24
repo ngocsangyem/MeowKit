@@ -8,23 +8,15 @@ export const codexConfig: ProviderConfig = {
 	supportLevel: "experimental",
 	supportReason: "Public runtime docs do not yet fully document every filesystem surface used by this adapter.",
 	subagents: "full",
-	agents: {
-		projectPath: ".codex/agents",
-		globalPath: join(home, ".codex/agents"),
-		format: "fm-to-codex-toml",
-		writeStrategy: "codex-toml",
-		fileExtension: ".toml",
-	},
-	// Codex has no command-template surface (custom prompts gave way to Agent
-	// Skills), so command templates migrate as skills under .agents/skills/.
-	commands: {
-		projectPath: ".agents/skills",
-		globalPath: join(home, ".agents/skills"),
-		format: "command-to-codex-skill",
-		writeStrategy: "per-file",
-		fileExtension: ".md",
-		nestedCommands: true,
-	},
+	// Toolkit agents/commands/hooks now ship via the authored bundle (native path:
+	// modules/codex/**, modules/codex-authored-bundle.ts) plus the reconciler —
+	// converting a downstream project's OWN .claude/agents|commands|hooks is no
+	// longer needed for the toolkit surface, so these three portable types are
+	// nulled. A custom (non-toolkit) agent/command/hook a user authored under
+	// .claude/ is NOT auto-ported to Codex; the orchestrator emits a one-line
+	// advisory pointing the user at manual porting instead.
+	agents: null,
+	commands: null,
 	skills: {
 		projectPath: ".agents/skills",
 		globalPath: join(home, ".agents/skills"),
@@ -58,13 +50,7 @@ export const codexConfig: ProviderConfig = {
 		fileExtension: ".md",
 		totalCharLimit: 32768,
 	},
-	hooks: {
-		projectPath: ".codex/hooks",
-		globalPath: join(home, ".codex/hooks"),
-		format: "direct-copy",
-		writeStrategy: "codex-hooks",
-		fileExtension: "",
-	},
+	hooks: null,
 	settingsJsonPath: {
 		projectPath: ".codex/hooks.json",
 		globalPath: join(home, ".codex/hooks.json"),

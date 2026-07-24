@@ -28,7 +28,7 @@ beforeAll(async () => {
 	// This fixture covers the documented 0.142 hook surface. The fallback tier
 	// intentionally omits newer events when no Codex binary is available.
 	env = await setupKitInstallMigrateE2e("target-codex-acceptance", "optimistic");
-	exitCode = await env.run({ includeMcp: true });
+	exitCode = await env.run({});
 }, 60_000);
 
 afterAll(async () => {
@@ -78,24 +78,27 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 			expect(existsSync(join(env.projectDir, ".codex", "hooks", `${name}.cjs`)), name).toBe(true);
 		}
 
-		// The migration report still accounts for every source hook — none silently dropped —
-		// and the safety hooks are recorded migrated.
+		// The migration report still accounts for every source hook — none silently
+		// dropped. Codex hooks conversion is nulled (the 3 native hooks above ship via
+		// the authored bundle, not this reporting path), so every source .claude hook
+		// is now uniformly recorded "skipped" rather than converted/"migrated" —
+		// including the safety-critical ones, which the native bundle installs
+		// directly instead.
 		const hookRecords = readReport().artifacts.filter((a) => a.type === "hooks");
 		const migratedOrSkipped = hookRecords.filter((a) => a.status === "migrated" || a.status === "skipped");
 		expect(migratedOrSkipped.length).toBe(22);
-		expect(hookRecords.find((a) => a.sourcePath === "gate-enforcement.sh")?.status).toBe("migrated");
-		expect(hookRecords.find((a) => a.sourcePath === "privacy-block.sh")?.status).toBe("migrated");
+		expect(hookRecords.find((a) => a.sourcePath === "gate-enforcement.sh")?.status).toBe("skipped");
+		expect(hookRecords.find((a) => a.sourcePath === "privacy-block.sh")?.status).toBe("skipped");
 	});
 
-	it("rewrites migrated skill refs while preserving genuinely out-of-set refs", () => {
-		// Asserted against a NON-roster user agent (custom-helper.md → custom_helper.toml): the
-		// authored-bundle overlay overwrites toolkit agents (planner.toml) but never a user-custom
-		// agent, so the converter's ref-rewriting stays observable end-to-end post-cutover (also
-		// unit-covered in the ref-rewrite suites).
-		const agentToml = readFileSync(join(env.projectDir, ".codex", "agents", "custom_helper.toml"), "utf-8");
-		expect(agentToml).toContain("python3 .agents/skills/demo-skill/scripts/run.py");
-		expect(agentToml).not.toContain(".claude/skills/demo-skill");
-		expect(agentToml).toContain("node .claude/scripts/validate-docs.cjs");
+	it("does not auto-port a non-roster user agent (custom-helper) — agents conversion is nulled", () => {
+		// Agents conversion is nulled for Codex: the toolkit's own agents ship via the
+		// authored bundle overlay (planner.toml, still written), but a project's own
+		// custom agent (custom-helper.md) is no longer converted at all — no
+		// custom_helper.toml is written. Ref-rewriting itself stays covered by the
+		// reference-target-registry and skill-directory-installer suites.
+		expect(existsSync(join(env.projectDir, ".codex", "agents", "custom_helper.toml"))).toBe(false);
+		expect(existsSync(join(env.projectDir, ".codex", "agents", "planner.toml"))).toBe(true);
 	});
 
 	it("installs previously audit-sensitive skill content with annotated env rewrites", () => {
@@ -105,20 +108,14 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 	});
 
 	it("emits config completeness surfaces without leaking source env secrets", () => {
+		// MCP conversion (--include-mcp) is removed along with the rest of the
+		// generic runtime converter pipeline; only the native shell-env-policy
+		// scaffold survives as a config completeness surface for Codex.
 		const configToml = readFileSync(join(env.projectDir, ".codex", "config.toml"), "utf-8");
-		expect(configToml).toContain("[mcp_servers.context7]");
 		expect(configToml).toContain("[shell_environment_policy]");
 		expect(configToml).toContain("MY_REGION");
 		expect(configToml).not.toContain("sk-do-not-leak-phase7");
 		expect(configToml).not.toContain("JIRA_API_TOKEN");
-
-		// No modelRouting override mechanism: a known source tier has no target model
-		// id (deployment-specific), so the converter discloses it as a commented hint and the
-		// target inherits its own configured default. Asserted on the non-roster custom_helper
-		// agent — the overlay overwrites the toolkit planner.toml with authored content.
-		const customToml = readFileSync(join(env.projectDir, ".codex", "agents", "custom_helper.toml"), "utf-8");
-		expect(customToml).toContain('# model = "opus"');
-		expect(customToml).not.toContain('model_reasoning_effort');
 		expect(readReport().header.secretKeysOmitted).toBe(1);
 	});
 
@@ -142,7 +139,7 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 	});
 
 	it("is idempotent on a second run over the generated output", async () => {
-		expect(await env.run({ includeMcp: true })).toBe(0);
+		expect(await env.run({})).toBe(0);
 		const report = readReport();
 		const { counts } = report.header;
 		expect(counts.migrated + counts.skipped + counts.failed + counts.narrowed).toBe(counts.total);

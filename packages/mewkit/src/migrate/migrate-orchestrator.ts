@@ -41,10 +41,9 @@ import { emitShellEnvPolicyScaffold } from "./providers/codex/shell-env-policy-e
 import { homedir } from "node:os";
 import { getCodexRoot } from "./hooks/codex-path-safety.js";
 import { applyActiveCodexOverlay } from "./modules/codex-reconcile-apply.js";
-import { formatMcpIncludeRerunCommand } from "./migrate-ui-summary.js";
+import { installCodexShellEnvPolicy } from "./hooks/codex-shell-env-installer.js";
 import { convertMcpJsonToCodexToml } from "./converters/mcp-json-to-codex-toml.js";
 import { installCodexMcpServers } from "./hooks/codex-mcp-installer.js";
-import { installCodexShellEnvPolicy } from "./hooks/codex-shell-env-installer.js";
 import { CODEX_MIN_SUPPORTED_VERSION } from "./providers/codex/capabilities.js";
 import {
 	createReferenceIntegrityIndex,
@@ -54,9 +53,15 @@ import { codexBulkActionShim, providerKey, skillActionShim } from "./migrate-act
 import { executeDeleteAction, executeInstallAction } from "./portable-installer.js";
 import { installSkillDirectory } from "./skill-directory-installer.js";
 import { buildInstalledBackRef, type InstalledBackRef } from "../core/install-metadata-backref.js";
-import { installCodexAgents, mergeHooksSettings } from "./hooks/index.js";
+import { mergeHooksSettings } from "./hooks/index.js";
 import { installCodexCapabilityProjection } from "./capability-bootstrap-projection.js";
-import { printActionDetails, printFinalSummary, printPreflight, printReportPath } from "./migrate-ui-summary.js";
+import {
+	formatMcpIncludeRerunCommand,
+	printActionDetails,
+	printFinalSummary,
+	printPreflight,
+	printReportPath,
+} from "./migrate-ui-summary.js";
 import {
 	collectProviderContractDiagnostics,
 	summarizeProviderContractDiagnostics,
@@ -181,18 +186,33 @@ async function runMigrateUnderLock(
 		}
 	}
 
+	// Codex advisory banners: surfaced in the preflight banner list, not tied to any
+	// single injector. Today this covers (1) the one-line notice that custom
+	// .claude agents/commands/hooks are not auto-ported (toolkit agents ship in the
+	// native bundle; the reconciler owns them) and (2) shell-env scaffold warnings.
+	const codexAdvisoryBanners: string[] = [];
+	if (
+		targets.includes("codex") &&
+		(discovered.agents.length > 0 || discovered.commands.length > 0 || discovered.hooks.length > 0)
+	) {
+		codexAdvisoryBanners.push(
+			"Custom .claude agents/commands/hooks are not auto-ported to Codex — toolkit agents ship in the native bundle; port custom ones manually.",
+		);
+	}
+
+	// Opt-in .mcp.json → .codex/config.toml [mcp_servers] merge (--include-mcp). This
+	// converts the user's OWN MCP server config (not toolkit content), independent of the
+	// authored bundle. When .mcp.json exists but --include-mcp is off, surface the exact
+	// re-run command so the user can opt in.
 	const mcpSourcePath = join(process.cwd(), ".mcp.json");
 	const mcpApplicable = targets.includes("codex") && existsSync(mcpSourcePath);
-	const mcpBanners: string[] = [];
 	if (mcpApplicable) {
-		mcpBanners.push(
+		codexAdvisoryBanners.push(
 			options.includeMcp
 				? ".mcp.json will be merged into .codex/config.toml [mcp_servers] (--include-mcp)"
 				: ".mcp.json detected but not migrated — opt in with --include-mcp",
 		);
 	}
-	// When .mcp.json exists but --include-mcp is off, surface the exact re-run command
-	// (Phase 5 field on PreflightContext); undefined otherwise.
 	const mcpIncludeAdvisory =
 		mcpApplicable && !options.includeMcp
 			? { rerunCommand: formatMcpIncludeRerunCommand(["mewkit", ...ctx.argv]) }
@@ -208,7 +228,7 @@ async function runMigrateUnderLock(
 		const scaffold = emitShellEnvPolicyScaffold(envKeys);
 		secretKeysOmitted = scaffold.omittedSecretCount;
 		shellEnvScaffold = scaffold.content;
-		for (const warning of scaffold.warnings) mcpBanners.push(warning);
+		for (const warning of scaffold.warnings) codexAdvisoryBanners.push(warning);
 	}
 
 	const collisions = detectProviderPathCollisions(targets, { global: isGlobal });
@@ -239,7 +259,7 @@ async function runMigrateUnderLock(
 		bannerExtras: [
 			...collisionBanners,
 			...manifestBanners,
-			...mcpBanners,
+			...codexAdvisoryBanners,
 			...portabilityFiltered.skipMessages,
 			...portableSkills.skipMessages,
 			...providerDiagnosticMessages,
@@ -543,12 +563,10 @@ async function executePlan(
 	const results = sink.results;
 	const outcomes = sink.outcomes;
 	const phaseRecords = sink.phaseRecords;
-	const codexAgentActions = new Set<string>();
-	const codexHookActions = new Set<string>();
 	const codexAgentsMdActions: ReconcileAction[] = [];
 	const hookTargetPathsByProvider = new Map<ProviderType, Map<string, string>>();
 	for (const target of targets) {
-		if (target === "codex" || !providers[target].hooks) continue;
+		if (!providers[target].hooks) continue;
 		const providerMap = new Map<string, string>();
 		for (const hook of ctx.allItems.hooks) {
 			const targetPath = getPortableInstallPath(hook.name, target, "hooks", { global: isGlobal });
@@ -587,19 +605,6 @@ async function executePlan(
 			});
 			continue;
 		}
-		if (action.provider === "codex" && action.type === "agent") {
-			if (action.action !== "delete") {
-				codexAgentActions.add(action.item);
-				continue;
-			}
-		}
-		if (action.provider === "codex" && action.type === "hooks") {
-			if (action.action !== "delete") {
-				codexHookActions.add(action.item);
-				continue;
-			}
-		}
-
 		try {
 			if (action.action === "delete") {
 				results.push(await executeDeleteAction(action));
@@ -636,38 +641,10 @@ async function executePlan(
 		}
 	}
 
-	if (targets.includes("codex") && codexAgentActions.size > 0) {
-		const agentsToWrite = ctx.allItems.agent.filter((agent) => codexAgentActions.has(agent.name));
-		const result = await installCodexAgents(agentsToWrite, {
-			global: isGlobal,
-			configAgents: agentsToWrite,
-			migratedRefs: ctx.migratedRefs,
-		});
-		results.push({
-			action: codexBulkActionShim("agent", "codex", isGlobal, result.written),
-			success: result.success,
-			error: result.error,
-		});
-		// The bulk install is all-or-nothing; record each batched agent's outcome so the
-		// per-artifact report is not left blank for the 24 codex agents.
-		for (const agent of agentsToWrite) {
-			recordOutcome(
-				outcomes,
-				"agent",
-				agent.name,
-				result.success ? { outcome: "migrated" } : { outcome: "failed", error: result.error },
-			);
-		}
-	}
-
 	const hookProviders = targets.filter((target) => providers[target].hooks);
 	if (ctx.allItems.hooks.length > 0 && hookProviders.length > 0) {
 		for (const target of hookProviders) {
-			if (target === "codex" && codexHookActions.size === 0) continue;
-			const hookItems =
-				target === "codex" ? ctx.allItems.hooks.filter((hook) => codexHookActions.has(hook.name)) : ctx.allItems.hooks;
-			if (hookItems.length === 0) continue;
-			const result = await mergeHooksSettings(target, hookItems, hookTargetPathsByProvider.get(target) ?? new Map(), {
+			const result = await mergeHooksSettings(target, ctx.allItems.hooks, hookTargetPathsByProvider.get(target) ?? new Map(), {
 				global: isGlobal,
 				sourceSettingsPath,
 			});
@@ -676,10 +653,10 @@ async function executePlan(
 				success: result.success,
 				error: result.error,
 			});
-			// Thread the Phase 2 per-hook decision records (codex today) into the ledger,
-			// and record a baseline migrated/failed outcome per hook item in the batch.
+			// Thread per-hook decision records into the ledger, and record a baseline
+			// migrated/failed outcome per hook item in the batch.
 			phaseRecords.push(...(result.records ?? []));
-			for (const hook of hookItems) {
+			for (const hook of ctx.allItems.hooks) {
 				recordOutcome(
 					outcomes,
 					"hooks",

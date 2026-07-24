@@ -14,17 +14,19 @@ describe("provider support summary", () => {
 			verified: 2,
 			experimental: 1,
 			deprecated: 0,
-			enabledSurfaces: 14,
+			enabledSurfaces: 11,
 		});
 	});
 
-	it("classifies Codex as a hard-gate CANDIDATE, not a full harness (migrates every surface but cannot prove a gate)", () => {
+	it("classifies Codex as a procedure provider — agents/commands/hooks conversion is nulled, only skills/config/rules remain", () => {
+		// Toolkit agents/commands/hooks ship via the native authored bundle + reconciler,
+		// not the generic migrate converter, so those 3 surfaces are disabled here.
 		const codex = findProviderSupportInfo("codex");
 
 		expect(codex?.supportLevel).toBe("experimental");
-		expect(codex?.role).toBe("hard-gate-candidate"); // NOT full-harness — no proven enforcement
+		expect(codex?.role).toBe("procedure"); // no hooks surface enabled → not a hard-gate candidate
 		expect(codex?.capabilityStatus).toBe("partial"); // adapter truth, mirrored into the summary
-		expect(codex?.effectiveSurfaces).toEqual(["agents", "commands", "skills", "config", "rules", "hooks"]);
+		expect(codex?.effectiveSurfaces).toEqual(["skills", "config", "rules"]);
 		expect(codex?.enforcement).toEqual({
 			gate1: "advisory",
 			gate2: "advisory",

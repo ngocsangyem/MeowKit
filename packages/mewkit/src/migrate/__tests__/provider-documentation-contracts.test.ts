@@ -24,8 +24,12 @@ describe("provider documentation contracts", () => {
 	});
 
 	it("preserves documented surfaces for strongly documented runtimes", () => {
-		expect(getProviderSurfaceContract("codex", "agent").status).toBe("documented");
-		expect(getProviderSurfaceContract("codex", "hooks").status).toBe("documented");
+		// Codex agent/hooks migration surfaces are `partial`, not `documented` — Codex
+		// itself documents subagents/hooks, but the toolkit's migrate converter no
+		// longer auto-ports a project's own .claude/agents|hooks (toolkit agents/hooks
+		// ship via the native authored bundle instead).
+		expect(getProviderSurfaceContract("codex", "agent").status).toBe("partial");
+		expect(getProviderSurfaceContract("codex", "hooks").status).toBe("partial");
 		expect(getProviderSurfaceContract("claude-code", "command").status).toBe("documented");
 		expect(getProviderSurfaceContract("claude-code", "skill").status).toBe("documented");
 		expect(getProviderSurfaceContract("cursor", "rules").status).toBe("documented");

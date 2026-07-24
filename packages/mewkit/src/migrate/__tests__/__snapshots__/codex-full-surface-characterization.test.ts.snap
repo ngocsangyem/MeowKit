@@ -1,49 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`codex full-surface characterization: codex-only surfaces > pins codex agent TOML conversion (fenced .claude refs survive inside developer_instructions) > fm-to-codex-toml-planner 1`] = `
-"name = "planner"
-description = "Planning agent for implementation plans"
-# model = "opus"
-sandbox_mode = "read-only"
-
-developer_instructions = """
-# Planner
-
-<!-- ref: inline-mapped-asset -->
-Read the rules in AGENTS.md before planning.
-
-<!-- ref: inline-unmapped-runtime -->
-Cost data lives in project runtime data/memory/cost-log.json.
-
-<!-- ref: inline-code-span -->
-Store plans following the \`.codex/agents\` conventions.
-
-<!-- ref: fenced-runtime-command -->
-\`\`\`bash
-node .claude/scripts/validate-docs.cjs --strict
-python3 .claude/skills/demo-skill/scripts/run.py
-\`\`\`
-
-<!-- ref: fenced-illustrative-example -->
-\`\`\`text
-project/
-└── .claude/
-    └── agents/planner.md
-\`\`\`
-
-<!-- ref: citation -->
-> Source: anthropics/claude-code — .claude/agents/planner.md
-
-<!-- ref: claude-md-token-prose -->
-Keep AGENTS.md up to date after each milestone.
-
-<!-- ref: claude-md-token-command -->
-\`\`\`bash
-cat CLAUDE.md
-\`\`\`
-""""
-`;
-
 exports[`codex full-surface characterization: direct-copy > never fabricates provider paths: fenced refs without migration proof are preserved + warned > direct-copy-skill-md-codex 1`] = `
 "---
 name: demo-skill
@@ -226,7 +182,7 @@ Read the rules in AGENTS.md before planning.
 Cost data lives in project runtime data/memory/cost-log.json.
 
 <!-- ref: inline-code-span -->
-Store plans following the \`.codex/agents\` conventions.
+Store plans following the \`project subagents directory/planner.md\` conventions.
 
 <!-- ref: fenced-runtime-command -->
 \`\`\`bash

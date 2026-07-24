@@ -1,5 +1,4 @@
-// Per-action installer. Handles the 3 main write strategies (per-file, single-file,
-// merge-single). codex-toml + codex-hooks delegated to Phase 8 mergers.
+// Per-action installer. Handles the 3 write strategies (per-file, single-file, merge-single).
 // Path-safety helpers extracted to portable-installer-path-safety.ts.
 
 import { existsSync } from "node:fs";
@@ -61,15 +60,6 @@ export async function executeInstallAction(action: ReconcileAction, ctx: Install
 	}
 
 	const ws = pathConfig.writeStrategy;
-
-	// Codex special paths (delegated to Phase 8 hook/toml installers)
-	if (ws === "codex-hooks" || ws === "codex-toml") {
-		return {
-			action,
-			success: true,
-			error: `[deferred] ${ws} install pipeline lives in Phase 8 hook/toml installer`,
-		};
-	}
 
 	const conversion = convertItem(sourceItem, pathConfig.format, provider, { migratedRefs: ctx.migratedRefs });
 	if (conversion.error) return { action, success: false, error: conversion.error };

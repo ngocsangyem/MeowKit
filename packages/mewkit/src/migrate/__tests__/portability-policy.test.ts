@@ -91,15 +91,18 @@ describe("portability policy", () => {
 	});
 
 	it("keeps generic commands portable", () => {
+		// claude-code's own command surface is the officially-documented one (codex
+		// commands conversion is nulled — toolkit commands ship via the native
+		// authored bundle, not the generic runtime converter).
 		const command = makeItem("command", "docs/init", "Initialize the docs workspace and summarize the README.");
 		const plan = makePlan([
 			{
 				action: "install",
 				item: "docs/init",
 				type: "command",
-				provider: "codex",
+				provider: "claude-code",
 				global: false,
-				targetPath: ".agents/skills/source-command-docs-init/SKILL.md",
+				targetPath: ".claude/commands/docs-init.md",
 				reason: "new-item",
 			},
 		]);
@@ -158,7 +161,7 @@ describe("portability policy", () => {
 		);
 	});
 
-	it("keeps codex command actions now that commands migrate as Agent Skills", () => {
+	it("drops codex command actions — toolkit commands ship as native Agent Skills, custom ones are not auto-ported", () => {
 		const command = makeItem("command", "mk/design", "Design the change and summarize the tradeoffs.");
 		const plan = makePlan([
 			{
@@ -181,8 +184,10 @@ describe("portability policy", () => {
 			hooks: [],
 		});
 
-		expect(filtered.plan.actions).toHaveLength(1);
-		expect(filtered.skipMessages).toEqual([]);
+		expect(filtered.plan.actions).toHaveLength(0);
+		expect(filtered.skipMessages).toContain(
+			"Skipped 1 command for Codex: unsupported by Codex official docs for command migration",
+		);
 	});
 
 	it("skips orchestration-only rules for non-Claude targets", () => {

@@ -18,13 +18,19 @@ describe("provider registry", () => {
 	});
 
 	it("only advertises officially documented hook surfaces", () => {
+		// Codex hooks conversion is nulled — the toolkit's own hooks ship via the
+		// native authored bundle + reconciler, not the generic runtime converter.
 		const hookProviders = getProvidersSupporting("hooks").sort();
-		expect(hookProviders).toEqual(["claude-code", "codex"]);
+		expect(hookProviders).toEqual(["claude-code"]);
 	});
 
-	it("advertises Codex commands as Agent Skills", () => {
-		expect(providers.codex.commands?.format).toBe("command-to-codex-skill");
-		expect(providers.codex.commands?.projectPath).toBe(".agents/skills");
+	it("nulls the Codex agents/commands/hooks conversion surfaces", () => {
+		// Toolkit agents/commands/hooks ship via the authored bundle + reconciler;
+		// a downstream project's own .claude/agents|commands|hooks are no longer
+		// auto-converted for Codex (advisory surfaced in the migrate summary instead).
+		expect(providers.codex.agents).toBeNull();
+		expect(providers.codex.commands).toBeNull();
+		expect(providers.codex.hooks).toBeNull();
 	});
 
 	it("stops advertising the legacy shared .agents/skills path across targets", () => {
@@ -45,13 +51,13 @@ describe("provider registry", () => {
 describe("provider overrides", () => {
 	it("Codex is marked experimental", () => {
 		expect(providers.codex.supportLevel).toBe("experimental");
-		expect(providers.codex.agents?.projectPath).toBe(".codex/agents");
+		expect(providers.codex.agents).toBeNull();
 		expect(providers.codex.skills?.projectPath).toBe(".agents/skills");
 		expect(providers.codex.config?.projectPath).toBe("AGENTS.md");
 		expect(providers.codex.rules?.projectPath).toBe("AGENTS.md");
 		expect(providers.codex.rules?.format).toBe("md-strip");
 		expect(providers.codex.rules?.fileExtension).toBe(".md");
-		expect(providers.codex.hooks?.projectPath).toBe(".codex/hooks");
-		expect(providers.codex.commands?.projectPath).toBe(".agents/skills");
+		expect(providers.codex.hooks).toBeNull();
+		expect(providers.codex.commands).toBeNull();
 	});
 });

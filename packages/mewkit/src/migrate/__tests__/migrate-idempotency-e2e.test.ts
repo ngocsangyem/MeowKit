@@ -72,17 +72,18 @@ describe("migrate idempotency and conflict handling", () => {
 		expect(JSON.stringify(second.artifacts)).toBe(JSON.stringify(first.artifacts));
 	});
 
-	it("keeps a user-edited target by default and overwrites it with --force", async () => {
-		const skillPath = join(env.projectDir, ".agents", "skills", "source-command-mk-fix", "SKILL.md");
-		const userEdit = `${readFileSync(skillPath, "utf-8")}\n<!-- user customization -->\n`;
-		await writeFile(skillPath, userEdit, "utf-8");
-
-		expect(await env.run({})).toBe(0);
-		expect(readFileSync(skillPath, "utf-8")).toBe(userEdit);
-
-		expect(await env.run({ force: true })).toBe(0);
-		expect(readFileSync(skillPath, "utf-8")).not.toContain("user customization");
-	});
+	// NOTE: the "keeps a user-edited target by default, overwrites with --force"
+	// scenario previously exercised a converted-command skill file
+	// (.agents/skills/source-command-mk-fix/SKILL.md) — the ONLY codex artifact
+	// that went through the standard reconcile keep/conflict system. Commands
+	// conversion is now nulled for Codex (toolkit commands ship as native Agent
+	// Skills; custom commands are not auto-ported). The remaining codex surfaces
+	// have no keep-by-default artifact to exercise this against: skills always
+	// force-reinstall every run (skill-directory-installer.ts `cp(..., {force:
+	// true})`, bypassing reconcile conflict entirely — see the skill directory
+	// installer's own test suite), and config/rules merge-single into the
+	// managed AGENTS.md surface below (always re-applied). There is no longer a
+	// per-file "keep unless --force" codex artifact to test.
 
 	it("AGENTS.md is a managed authored surface — a hand-edited rule section is re-applied from source on re-migrate (no --force)", async () => {
 		const agentsPath = join(env.projectDir, "AGENTS.md");
@@ -91,7 +92,7 @@ describe("migrate idempotency and conflict handling", () => {
 		expect(before).toContain("Authored Codex instruction surface"); // authored base present
 		await writeFile(agentsPath, before.replace("## Rule: tool-rules", "## Rule: tool-rules\n<!-- user hand-edit -->"), "utf-8");
 
-		// Unlike a per-file skill (kept by default), AGENTS.md is an AUTHORED/managed surface post-cutover:
+		// Every remaining codex-installed surface is managed/authored post-cutover:
 		// the overlay force-rewrites its base and the source rules re-merge onto it every run, so a
 		// direct hand-edit is NOT preserved — consistent with config.toml and every other flipped surface.
 		// Users customize AGENTS.md by editing their source `.claude/rules/`, not AGENTS.md itself.

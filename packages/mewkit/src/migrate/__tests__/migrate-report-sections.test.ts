@@ -67,9 +67,6 @@ describe("conversion report over the fixture corpus", () => {
 		expect(report.warnedReferences.every((line) => /:\d+ — /.test(line))).toBe(true);
 		expect(report.warnedReferences.some((line) => line.includes(".claude/scripts/validate-docs.cjs"))).toBe(true);
 
-		// Unsupported concepts (dynamic command syntax) are reported, not dropped.
-		expect(report.conversionWarnings.some((w) => w.includes("manual adaptation needed"))).toBe(true);
-
 		// The merged instruction file budget is projected for codex.
 		expect(report.budgetLines.some((line) => line.includes("32768"))).toBe(true);
 	});

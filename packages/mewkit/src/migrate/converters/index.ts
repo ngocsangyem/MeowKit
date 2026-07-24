@@ -1,9 +1,7 @@
 // Vendored from claudekit-cli (MIT). Source: src/commands/portable/converters/index.ts
 import type { ReferenceIntegrityIndex } from "../references/fence-aware-reference-rewriter.js";
 import type { ConversionFormat, ConversionResult, PortableItem, ProviderType } from "../types.js";
-import { convertCommandToCodexSkill } from "./command-to-codex-skill.js";
 import { convertDirectCopy } from "./direct-copy.js";
-import { convertFmToCodexToml } from "./fm-to-codex-toml.js";
 import { convertFmToFm } from "./fm-to-fm.js";
 import { convertMdStrip } from "./md-strip.js";
 import { convertMdToMdc } from "./md-to-mdc.js";
@@ -29,10 +27,6 @@ export function convertItem(
 				return convertMdStrip(item, provider, context);
 			case "md-to-mdc":
 				return convertMdToMdc(item, provider);
-			case "fm-to-codex-toml":
-				return convertFmToCodexToml(item, context);
-			case "command-to-codex-skill":
-				return convertCommandToCodexSkill(item, context);
 			default: {
 				const _exhaustive: never = format;
 				return {
@@ -53,16 +47,6 @@ export function convertItem(
 	}
 }
 
-// Re-exports for direct converter access (used by hook mergers in Phase 8)
-export { convertClaudeHooksToCodex, rewriteCommandPath } from "./claude-to-codex-hooks.js";
-export type { HooksSection, HookGroup, HookEntry, PathRewriteMap } from "./claude-to-codex-hooks.js";
+// Re-exports for direct converter access
 export { stripClaudeRefs, truncateAtCleanBoundary } from "./md-strip.js";
 export { buildMergedAgentsMd } from "./fm-strip.js";
-export { toCodexSlug, buildCodexConfigEntry, type CodexAgentToml, type CodexConfigEntry } from "./fm-to-codex-toml.js";
-export { escapeTomlMultiline } from "./md-to-toml.js";
-export {
-	codexCommandSkillDirName,
-	codexCommandSkillRelativePath,
-	convertCommandToCodexSkill,
-	detectDynamicCommandSyntax,
-} from "./command-to-codex-skill.js";
