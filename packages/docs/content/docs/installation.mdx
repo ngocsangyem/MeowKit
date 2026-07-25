@@ -50,24 +50,32 @@ Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that 
 ## What gets generated
 
 ```
-.claude/
+.claude/              What Claude Code reads
 ├── agents/          Specialist agents for each phase
 ├── skills/          Domain skills with mk: namespace
 ├── hooks/           Lifecycle hooks
 ├── rules/           Enforcement rules
 ├── scripts/         Python validators
 │   └── bin/         Shell utilities
-├── memory/          Cost log, trace log, derived wiki index
+├── modes/           Behavioral modes
 ├── settings.json    Hook registrations
-├── meowkit.config.json  Project configuration
-├── .env             Optional API keys (Gemini)
-└── modes/           Behavioral modes
+└── .env             Optional API keys (Gemini)
+
+.meowkit/             Your project's own state
+├── config.json      Project configuration — commit this
+├── memory/          Fix patterns, review patterns, architecture decisions
+├── telemetry/       Cost log, trace log
+├── state/           Session markers
+└── cache/           Derived wiki index — rebuildable
 
 CLAUDE.md             Entry point for Claude Code
 .mcp.json.example     Optional MCP server config
 ```
 
-Curated memory (fix patterns, review patterns, architecture decisions) lives outside the provider directory, at `.meowkit/memory/`.
+The split follows ownership: `.claude/` holds what Claude Code itself reads, so
+`settings.json` and `.mcp.json` stay there. Everything MeowKit owns lives in `.meowkit/`.
+Only `config.json` is meant to be committed; the four state directories are machine-written
+and belong in `.gitignore` (`mewkit setup` appends them for you).
 
 ## Verify installation
 

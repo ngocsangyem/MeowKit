@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import minimist from "minimist";
 import pc from "picocolors";
@@ -34,6 +34,7 @@ import { reviewCoverage } from "./commands/review/coverage.js";
 import { reviewCompose } from "./commands/review/compose.js";
 import { reviewSubmit } from "./commands/review/submit.js";
 import { reviewCleanup } from "./commands/review/cleanup.js";
+import { resolveConfigPath } from "./state/resolve-config-path.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -139,16 +140,16 @@ async function printStatus(): Promise<void> {
 	console.log(`${pc.bold(pc.cyan("mewkit"))} ${pc.dim(`v${VERSION}`)} ${pc.dim(`(${channel})`)}`);
 	console.log();
 
-	const configPath = ".claude/meowkit.config.json";
+	const configPath = resolveConfigPath(process.cwd());
 	try {
 		const content = fs.readFileSync(configPath, "utf-8");
 		const config: Record<string, unknown> = JSON.parse(content) as Record<string, unknown>;
-		console.log(`${pc.bold("Config:")} ${configPath}`);
+		console.log(`${pc.bold("Config:")} ${relative(process.cwd(), configPath) || configPath}`);
 		for (const [key, value] of Object.entries(config)) {
 			console.log(`  ${pc.dim(key)}: ${String(value)}`);
 		}
 	} catch {
-		console.log(`${pc.dim("No .claude/meowkit.config.json found.")}`);
+		console.log(`${pc.dim("No .meowkit/config.json found.")}`);
 	}
 }
 

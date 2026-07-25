@@ -31,6 +31,7 @@ import { readInstallMetadata, CorruptInstallMetadataError } from "../core/instal
 import { readPortableRegistry } from "../migrate/reconcile/portable-registry.js";
 import { getConsolidationLedger, type ConsolidationStatus } from "../core/consolidation-ledger.js";
 import { TARGET_PROFILES } from "../validate/targets/target-profile.js";
+import { resolveConfigPath } from "../state/resolve-config-path.js";
 
 function statusIcon(status: Status): string {
 	switch (status) {
@@ -55,7 +56,7 @@ function providerSeverityToStatus(severity: ProviderDiagnosticSeverity): Status 
 function findProjectRoot(): string | null {
 	const cwd = process.cwd();
 	const hasDotClaude = fs.existsSync(path.join(cwd, ".claude"));
-	const hasConfig = fs.existsSync(path.join(cwd, ".claude", "meowkit.config.json"));
+	const hasConfig = fs.existsSync(resolveConfigPath(cwd));
 	const hasManifest = fs.existsSync(path.join(cwd, ".claude", "meowkit.manifest.json"));
 	const hasClaude = fs.existsSync(path.join(cwd, "CLAUDE.md"));
 	if (hasDotClaude || hasConfig || hasManifest || hasClaude) {

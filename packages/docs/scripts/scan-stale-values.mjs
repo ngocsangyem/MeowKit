@@ -80,9 +80,11 @@ const RULES = [
   },
   {
     id: "wrong-config-path",
+    // Both the root dotfile and the pre-move provider-dir location. Readers fall back to the
+    // latter so old installs keep working, but no page should still teach it.
     severity: "error",
-    re: /(?<![\w/.])\.meowkit\.config\.json/g,
-    why: "the generated config is `.claude/meowkit.config.json`",
+    re: /(?<![\w/.])\.meowkit\.config\.json|\.claude\/meowkit\.config\.json/g,
+    why: "the project config is `.meowkit/config.json`",
   },
   {
     id: "unprefixed-gemini-key",

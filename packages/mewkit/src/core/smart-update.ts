@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from "node:fs";
-import { join, relative, isAbsolute } from "node:path";
+import { join, relative, isAbsolute, dirname } from "node:path";
 import * as log from "./core-logger.js";
 import { processTemplate } from "./substitute-placeholders.js";
 import type { UserConfig } from "./substitute-placeholders.js";
@@ -21,6 +21,7 @@ import {
 } from "./install-metadata.js";
 import { writeInstallMetadata } from "./install-metadata-writer.js";
 import { writeRuntimeDescriptor, resolveInProjectExecutable } from "./hook-runtime.js";
+import { configWritePath } from "../state/resolve-config-path.js";
 
 export interface UpdateStats {
 	updated: number;
@@ -238,11 +239,13 @@ export async function smartUpdate(
 		stats.added++;
 	}
 
-	// meowkit.config.json template (generated, not from release)
-	const configDest = join(claudeDir, "meowkit.config.json");
-	if (!existsSync(configDest)) {
+	// config.json template (generated, not from release). Written to the `.meowkit/` state
+	// root; an install still holding the pre-move `.claude/meowkit.config.json` keeps working
+	// through the read fallback until this writes the canonical file.
+	const configDest = configWritePath(dirname(claudeDir));
+	if (!existsSync(configDest) && !existsSync(join(claudeDir, "meowkit.config.json"))) {
 		if (!dryRun) {
-			mkdirSync(claudeDir, { recursive: true });
+			mkdirSync(dirname(configDest), { recursive: true });
 			const configContent = JSON.stringify(
 				{
 					$schema: "https://meowkit.dev/schema/config.json",
@@ -303,9 +306,11 @@ export async function smartUpdate(
 		}
 	}
 
-	// Ensure memory + logs dirs exist
+	// Ensure the provider log dir exists. The memory tree is deliberately NOT created here:
+	// state lives under `.meowkit/` now, its writers create their own class dir on first
+	// write, and re-creating `.claude/memory/` would make `doctor --state` report drift that
+	// the installer itself caused.
 	if (!dryRun) {
-		mkdirSync(join(targetDir, ".claude", "memory"), { recursive: true });
 		mkdirSync(join(targetDir, ".claude", "logs"), { recursive: true });
 	}
 
