@@ -36,11 +36,21 @@ const files = walk(DOCS_ROOT);
 const pages = new Set(files.map(urlFor));
 
 // Routes the app serves that are not MDX pages under content/docs.
-const NON_MDX_ROUTES = new Set(["/", "/llms.txt", "/llms-full.txt", "/sitemap.xml", "/robots.txt"]);
+const NON_MDX_ROUTES = new Set(["/", "/llms.txt", "/llms-full.txt", "/sitemap.xml", "/robots.txt", "/api/search"]);
+// Per-page markdown exports are generated for every page, so match by prefix.
+const NON_MDX_PREFIXES = ["/llms.mdx/"];
 
-// Links inside fenced code are examples, not navigation.
-function stripFences(text) {
-  return text.replace(/```[\s\S]*?```/g, (block) => block.replace(/[^\n]/g, " "));
+// Anchors are intentionally not validated: Fumadocs serves the page regardless of an unknown
+// fragment, so a wrong anchor degrades to landing at the top rather than a dead link. Checking
+// them means parsing every heading and its slugifier, which is a bigger surface than the bug.
+
+// Links inside code are examples, not navigation — blank both fenced blocks and inline spans
+// so a sentence explaining markdown link syntax is not read as a link to a missing page.
+// Newlines are preserved so reported line numbers stay accurate.
+function stripCode(text) {
+  return text
+    .replace(/```[\s\S]*?```/g, (block) => block.replace(/[^\n]/g, " "))
+    .replace(/`[^`\n]*`/g, (span) => " ".repeat(span.length));
 }
 
 const LINK_RE = /\]\((\/[^)\s"']*)\)|href="(\/[^"]*)"/g;
@@ -48,13 +58,14 @@ const LINK_RE = /\]\((\/[^)\s"']*)\)|href="(\/[^"]*)"/g;
 const broken = [];
 for (const abs of files) {
   const rel = relative(REPO_ROOT, abs);
-  const lines = stripFences(readFileSync(abs, "utf-8")).split("\n");
+  const lines = stripCode(readFileSync(abs, "utf-8")).split("\n");
   lines.forEach((line, i) => {
     for (const m of line.matchAll(LINK_RE)) {
       const raw = m[1] ?? m[2];
       if (!raw) continue;
       const target = raw.split("#")[0].replace(/\/$/, "") || "/";
       if (NON_MDX_ROUTES.has(target)) continue;
+      if (NON_MDX_PREFIXES.some((p) => target.startsWith(p))) continue;
       if (pages.has(target)) continue;
       broken.push({ file: rel, line: i + 1, target: raw });
     }

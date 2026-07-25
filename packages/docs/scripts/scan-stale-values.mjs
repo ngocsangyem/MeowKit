@@ -11,8 +11,15 @@
 // the rewrite pass can retire it, and does not block.
 //
 // The token list lives here, not in prose, so it cannot drift from the check that enforces it.
-// Where a source of truth exists in the repo, the rule derives from it rather than restating
-// it — see the model-id rule.
+//
+// Deliberately NOT checked: model ids. classifyModel() in model-detector.cjs ends in a keyword
+// fallback — any string containing "opus", "sonnet", or "haiku" classifies — so there is no
+// such thing as an id the detector rejects, and a rule claiming to catch one would assert a
+// guarantee the runtime does not make. What can genuinely go wrong there (a model with no
+// MODEL_TIERS entry silently taking fallback density) is a runtime gap, not a docs error.
+//
+// Scanning is line-by-line, so a token split across a line break is not matched. MDX
+// formatting keeps inline code on one line, so this has no practical reach today.
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,26 +30,6 @@ const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..", ".."
 // The changelog is a historical record: past releases legitimately describe paths and flags
 // that no longer exist. Scanning it would demand rewriting history to satisfy a linter.
 const EXEMPT_FILES = new Set(["changelog.mdx"]);
-
-/** Model ids the runtime detector actually classifies — the allowed set is derived, not listed,
- *  so adding a model to the harness does not require editing this script. */
-function recognizedModelIds() {
-  const detector = join(REPO_ROOT, ".claude", "hooks", "handlers", "model-detector.cjs");
-  const matrix = join(REPO_ROOT, ".claude", "skills", "autobuild", "references", "adaptive-density-matrix.md");
-  const ids = new Set();
-  for (const path of [detector, matrix]) {
-    let text;
-    try {
-      text = readFileSync(path, "utf-8");
-    } catch {
-      continue; // a missing source narrows the allowed set; it never invents one
-    }
-    for (const m of text.matchAll(/\b(opus|sonnet|haiku)-\d+-\d+\b/g)) ids.add(m[0]);
-  }
-  return ids;
-}
-
-const MODEL_IDS = recognizedModelIds();
 
 /** Count artifacts on disk so a stale number in prose can be reported next to the real one. */
 function actualCount(kind) {
@@ -73,8 +60,10 @@ const RULES = [
     id: "legacy-hook-profile-env",
     severity: "error",
     re: /\bMEOW_HOOK_PROFILE\b/g,
-    // The configuration reference documents the alias once, on purpose.
-    allow: (line) => /legacy alias/i.test(line),
+    // The alias is documented on purpose, but only where the line also names the current
+    // variable. Keying the exemption to the phrase alone would let a line that inverts the
+    // precedence ("the legacy alias takes priority") pass simply for saying "legacy alias".
+    allow: (line) => /legacy alias/i.test(line) && /\bMEOWKIT_HOOK_PROFILE\b/.test(line),
     why: "`MEOWKIT_HOOK_PROFILE` is the current name; the alias is documented once in the config reference",
   },
   {
@@ -99,17 +88,11 @@ const RULES = [
     id: "unprefixed-gemini-key",
     severity: "error",
     re: /(?<!MEOWKIT_)\bGEMINI_API_KEY\b/g,
-    // The env helper really does fall back to the bare name, so a line that documents the
-    // fallback as a fallback is correct — only lines presenting it as the variable to set fail.
-    allow: (line) => /fall(s)? ?back|legacy/i.test(line),
+    // The env helper really does fall back to the bare name, so a line may mention it — but
+    // only when that same line names the canonical variable. Exempting on the word "legacy"
+    // alone would pass "set the legacy GEMINI_API_KEY directly", which is the opposite advice.
+    allow: (line) => /\bMEOWKIT_GEMINI_API_KEY\b/.test(line),
     why: "`MEOWKIT_GEMINI_API_KEY` is canonical; the bare name is only a fallback in the env helper",
-  },
-  {
-    id: "unknown-model-id",
-    severity: "error",
-    re: /\b(?:opus|sonnet|haiku)-\d+-\d+\b/g,
-    allow: (_line, match) => MODEL_IDS.has(match),
-    why: "the model detector does not classify this id — it will fall through to the default tier",
   },
   {
     id: "hard-coded-count",
@@ -168,9 +151,6 @@ for (const f of [...errors, ...warns]) {
   console.log(`${tag} ${f.file}:${f.line}  [${f.rule}] ${f.match}${extra}\n        ${f.why}`);
 }
 
-console.log(
-  `\nscanned ${files.length} pages — ${errors.length} error(s), ${warns.length} warning(s)` +
-    (MODEL_IDS.size ? `; model ids recognized: ${[...MODEL_IDS].sort().join(", ")}` : ""),
-);
+console.log(`\nscanned ${files.length} pages — ${errors.length} error(s), ${warns.length} warning(s)`);
 
 process.exit(errors.length > 0 ? 1 : 0);
