@@ -124,7 +124,7 @@ Most session-state files are wiped by `project-context-loader.sh` on session-id 
 | "Which model tier is this session running on?" | `session-state/detected-model.json` |
 | "Has the working directory drifted since last checkpoint?" | `session-state/checkpoints/checkpoint-latest.json` (git hash compare) |
 | "What rules and skills apply to this project?" | `CLAUDE.md`, `.claude/rules/`, `.claude/skills/` (loaded by `--resume`) |
-| "What was the durable lesson from the last bug fix?" | `.claude/memory/fixes.md` (loaded on demand by `mk:fix`) |
+| "What was the durable lesson from the last bug fix?" | `.meowkit/memory/fixes.md` (loaded on demand by `mk:fix`) |
 
 ## Honest caveats
 
@@ -138,7 +138,7 @@ These are micro-redundancies inside a layer that is genuinely complementary — 
 
 ## Related
 
-- [Memory System](/guide/memory-system) — `.claude/memory/` topic files (durable, human-curated learnings) — distinct from session-state
+- [Memory System](/guide/memory-system) — `.meowkit/memory/` topic files (durable, human-curated learnings) — distinct from session-state
 - [Workflow Phases (0-6)](/guide/workflow-phases) — where each phase reads/writes session-state
 - [Adaptive Density](/guide/adaptive-density) — how `detected-model.json` drives the harness
 - [Changelog v2.7.2](/changelog#_2-7-2-2026-05-01-checkpoint-subsystem-cleanup) — the single-file checkpoint collapse
