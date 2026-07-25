@@ -7,6 +7,8 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { DocsReferenceEntry } from "./docs-reference-manifest.js";
 import { renderReferenceFacts, spliceReferenceFacts } from "./render-reference-facts.js";
+import { buildHooksInventory } from "./build-hooks-inventory.js";
+import { renderArtifactIndex, renderHooksIndex, spliceIndex } from "./render-reference-indexes.js";
 
 export interface SpliceResult {
 	/** Pages whose generated block differs from what the manifest would produce. */
@@ -46,6 +48,49 @@ export function spliceReferencePages(
 
 		const body = readFileSync(abs, "utf-8");
 		const next = spliceReferenceFacts(body, renderReferenceFacts(entry));
+		if (next === body) continue;
+
+		if (opts.write) {
+			writeFileSync(abs, next, "utf-8");
+			result.written.push(rel);
+		} else {
+			result.stale.push(rel);
+		}
+	}
+
+	return result;
+}
+
+/**
+ * The generated sections on the index pages: a complete list per kind, and the hook registry.
+ *
+ * Separate from the per-artifact splice because these pages have no artifact behind them — they
+ * describe the set. Same marker contract, same all-or-nothing containment.
+ */
+export function spliceReferenceIndexes(
+	referenceDir: string,
+	claudeDir: string,
+	entries: DocsReferenceEntry[],
+	opts: { write: boolean },
+): SpliceResult {
+	const result: SpliceResult = { stale: [], missing: [], written: [], checked: 0 };
+
+	const targets: [string, string][] = [
+		[join("skills", "index.mdx"), renderArtifactIndex(entries, "skill")],
+		[join("agents", "index.mdx"), renderArtifactIndex(entries, "agent")],
+		["hooks.mdx", renderHooksIndex(buildHooksInventory(claudeDir))],
+	];
+
+	for (const [rel, block] of targets) {
+		const abs = join(referenceDir, rel);
+		if (!existsSync(abs)) {
+			result.missing.push(rel);
+			continue;
+		}
+		result.checked++;
+
+		const body = readFileSync(abs, "utf-8");
+		const next = spliceIndex(body, block);
 		if (next === body) continue;
 
 		if (opts.write) {

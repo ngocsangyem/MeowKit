@@ -9,19 +9,15 @@
 // Markers are MDX expression comments. HTML comments fail the MDX build outright, so this
 // deliberately does not reuse the capability view's `<!-- -->` syntax.
 import type { DocsReferenceEntry } from "./docs-reference-manifest.js";
+import { tableCell as cell, codeCell } from "./mdx-table-cell.js";
 
 export const FACTS_START = "{/* GENERATED:reference-facts START */}";
 export const FACTS_END = "{/* GENERATED:reference-facts END */}";
 
 const SOURCE_BASE = "https://github.com/ngocsangyem/MeowKit/blob/main/.claude/";
 
-/** A literal `|` would end the Markdown table cell it sits in. */
-function cell(text: string): string {
-	return text.replace(/\|/g, "\\|");
-}
-
 function list(values: string[]): string | null {
-	return values.length === 0 ? null : values.map((v) => `\`${cell(v)}\``).join(", ");
+	return values.length === 0 ? null : values.map((v) => codeCell(v)).join(", ");
 }
 
 /**
@@ -31,11 +27,11 @@ function list(values: string[]): string | null {
  */
 export function renderReferenceFacts(entry: DocsReferenceEntry): string {
 	const rows: [string, string | null][] = [
-		["Source", `[\`.claude/${entry.sourcePath}\`](${SOURCE_BASE}${entry.sourcePath})`],
-		["Owner", entry.owner ? `\`${cell(entry.owner)}\`` : null],
-		["Runtime", entry.runtime ? `\`${cell(entry.runtime)}\`` : null],
+		["Source", `[${codeCell(".claude/" + entry.sourcePath)}](${SOURCE_BASE}${entry.sourcePath})`],
+		["Owner", entry.owner ? codeCell(entry.owner) : null],
+		["Runtime", entry.runtime ? codeCell(entry.runtime) : null],
 		["Risk", entry.risk ? cell(entry.risk) : null],
-		["Phase", entry.phase ? `\`${cell(entry.phase)}\`` : null],
+		["Phase", entry.phase ? codeCell(entry.phase) : null],
 		["Depends on", list(entry.dependencies)],
 		["Writes", list(entry.output)],
 		["Last verified", entry.lastVerified ? cell(entry.lastVerified) : null],

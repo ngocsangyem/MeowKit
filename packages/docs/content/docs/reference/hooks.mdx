@@ -236,3 +236,41 @@ node dispatch.cjs <EventName> [Matcher]
 | `MEOWKIT_AUTOBUILD_MODE=LEAN`      | PreCompletion falls back to soft nudge; BuildVerify still runs        |
 | `MEOWKIT_AUTOBUILD_MODE=MINIMAL`   | Skip BuildVerify + PreCompletion entirely                             |
 | `MEOWKIT_HOOK_PROFILE=fast`         | Skip `pre-ship`, `post-session`, `learning-observer` (speed)          |
+
+{/* GENERATED:reference-index START */}
+
+## Registered hooks
+
+_Generated from `.claude/settings.json`, so a registered hook cannot be missing here._
+
+**Blocking** means the hook can stop the action. Advisory means it observes and reports.
+Script paths, timeouts, and matcher chains are intentionally not listed; read
+`.claude/settings.json` for the wiring.
+
+| Event | Purpose | Can it block? |
+|---|---|---|
+| `PostToolUse` | Dispatch | Advisory |
+| `PostToolUse` | Learning observer | Advisory |
+| `PostToolUse` | Security scanning written file | **Blocking** |
+| `PostToolUseFailure` | Posttoolfailure probe | Advisory |
+| `PreCompact` | Precompact probe | Advisory |
+| `PreToolUse` | Checking file access permissions | **Blocking** |
+| `PreToolUse` | Checking Gate 1 approval | **Blocking** |
+| `PreToolUse` | Checking web fetch targets | **Blocking** |
+| `PreToolUse` | Pre task check | Advisory |
+| `PreToolUse` | Running pre-ship validation | **Blocking** |
+| `SessionStart` | Dispatch | Advisory |
+| `SessionStart` | Ensuring Python skills venv | Advisory |
+| `SessionStart` | Loading capability resolution | Advisory |
+| `SessionStart` | Loading project context | Advisory |
+| `SessionStart` | Validating Jira env | Advisory |
+| `Stop` | Control probe | Advisory |
+| `Stop` | Dispatch | Advisory |
+| `Stop` | Post session | Advisory |
+| `Stop` | Pre completion check | **Blocking** |
+| `UserPromptSubmit` | Detecting --tdd flag | Advisory |
+| `UserPromptSubmit` | Dispatch | Advisory |
+
+Registered with no hooks today: `SubagentStart`, `SubagentStop`.
+
+{/* GENERATED:reference-index END */}

@@ -6,21 +6,17 @@
 import { CLI_CATALOGUE } from "./command-catalogue.js";
 import type { FlagSpec } from "./catalogue-types.js";
 import { summaryFor } from "./flag-summary.js";
+import { tableCell } from "../core/mdx-table-cell.js";
 
 // MDX rejects HTML comments — `<!--` is parsed as a tag and fails the build. The marker has to
 // be an MDX expression comment, which is why this does not reuse the capability view's syntax.
 export const SYNOPSIS_START = "{/* GENERATED:cli-flags START */}";
 export const SYNOPSIS_END = "{/* GENERATED:cli-flags END */}";
 
-/** A literal `|` ends a Markdown table cell, so any in a summary must be escaped. */
-function escapePipes(text: string): string {
-	return text.replace(/\|/g, "\\|");
-}
-
 function cell(flag: FlagSpec, command: string): string {
 	const value = flag.type === "string" ? " `<value>`" : "";
 	const repeat = flag.repeatable ? ", repeatable" : "";
-	return `| \`--${flag.name}\`${value} | ${escapePipes(summaryFor(flag, command))}${repeat} |`;
+	return `| \`--${flag.name}\`${value} | ${tableCell(summaryFor(flag, command))}${repeat} |`;
 }
 
 /** The full flag reference, one section per command, in catalogue order. */

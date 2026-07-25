@@ -8,7 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
 import { buildDocsReferenceManifest, serializeDocsReferenceManifest } from "../core/docs-reference-manifest.js";
-import { spliceReferencePages } from "../core/splice-reference-pages.js";
+import { spliceReferencePages, spliceReferenceIndexes } from "../core/splice-reference-pages.js";
 
 export interface DocsManifestArgs {
 	/** Compare against the committed file and exit non-zero on any difference. */
@@ -48,6 +48,8 @@ export function docsManifest(args: DocsManifestArgs = {}): void {
 			const splice = spliceReferencePages(referenceDir, manifest.entries, { write: true });
 			console.log(`${pc.green("✓")} spliced ${splice.written.length} of ${splice.checked} reference page(s)`);
 			for (const rel of splice.missing) console.log(pc.yellow(`  no page for ${rel}`));
+			const indexes = spliceReferenceIndexes(referenceDir, claudeDir, manifest.entries, { write: true });
+			console.log(`${pc.green("✓")} spliced ${indexes.written.length} of ${indexes.checked} index page(s)`);
 		}
 		return;
 	}
@@ -67,6 +69,12 @@ export function docsManifest(args: DocsManifestArgs = {}): void {
 		// The pages are half the contract: a manifest can be current while the pages restating it
 		// are not, which is the exact state this phase exists to make impossible.
 		if (fs.existsSync(referenceDir)) {
+			const indexes = spliceReferenceIndexes(referenceDir, claudeDir, manifest.entries, { write: false });
+			if (indexes.stale.length > 0) {
+				console.error(pc.red(`${indexes.stale.length} index page(s) carry a stale generated section:`));
+				for (const rel of indexes.stale) console.error(`  ${rel}`);
+				failed = true;
+			}
 			const splice = spliceReferencePages(referenceDir, manifest.entries, { write: false });
 			if (splice.stale.length > 0) {
 				console.error(pc.red(`${splice.stale.length} reference page(s) carry a stale generated block:`));
