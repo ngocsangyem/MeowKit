@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { resolveInventoryPath } from "../state/resolve-inventory-path.js";
 import pc from "picocolors";
 import { checkDocsReferences } from "../core/check-docs-references.js";
 import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
@@ -484,7 +485,7 @@ function isTableSeparatorRow(line: string): boolean {
 
 /** Parse the inventory artifacts map once (criticality lookup); empty map on any error. */
 function loadInventoryArtifacts(meowkitDir: string): Record<string, { criticality?: string }> {
-	const inventoryPath = path.join(meowkitDir, "harness-inventory.json");
+	const inventoryPath = resolveInventoryPath(path.dirname(meowkitDir));
 	if (!fs.existsSync(inventoryPath)) return {};
 	try {
 		const inv = JSON.parse(fs.readFileSync(inventoryPath, "utf-8")) as {

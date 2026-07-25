@@ -1,10 +1,10 @@
 // Pack-manifest data model + pure manifest operations (no filesystem walking of
-// artifacts). The manifest (`.claude/pack-manifest.json`) maps install profiles
+// artifacts). The manifest (`.meowkit/pack-manifest.json`) maps install profiles
 // onto the Phase-2 `owner` governance metadata plus an explicit `base` essentials
 // set. This module loads/shape-validates the manifest and flattens a profile to
 // its concrete pack list; pack-resolver.ts turns that into actual file paths.
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 export const PACK_MANIFEST_FILENAME = "pack-manifest.json";
 
@@ -42,9 +42,20 @@ export class PackManifestError extends Error {
 	}
 }
 
-/** Path to the manifest under a `.claude/` dir (present or absent). */
+/**
+ * Path to the manifest for the tree containing `claudeDir` (present or absent).
+ *
+ * Canonical is `<root>/.meowkit/pack-manifest.json`; a pre-move install or release still
+ * resolves to `<root>/.claude/pack-manifest.json`. The fallback matters more here than
+ * elsewhere: `check-packs` reads absence as "pack modularization not installed; run upgrade",
+ * so without it a healthy pre-move project would be told to upgrade for no reason.
+ */
 export function packManifestPath(claudeDir: string): string {
-	return join(claudeDir, PACK_MANIFEST_FILENAME);
+	const canonical = join(dirname(claudeDir), ".meowkit", PACK_MANIFEST_FILENAME);
+	if (existsSync(canonical)) return canonical;
+	const legacy = join(claudeDir, PACK_MANIFEST_FILENAME);
+	if (existsSync(legacy)) return legacy;
+	return canonical; // absent either way — report against the path we would create
 }
 
 /** True when the manifest file exists — used by infra-absent guards (pack/upgrade). */

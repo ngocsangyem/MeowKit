@@ -62,7 +62,7 @@ describe("explainProvenance (honesty on non-trusted sources)", () => {
 		mkdirSync(join(root, ".claude", "rules"), { recursive: true });
 		writeFileSync(join(root, ".claude", "rules", "a.md"), "shipped\n");
 		await writeInstallMetadata(
-			join(root, ".claude"),
+			root,
 			buildInstallMetadata(join(root, ".claude"), { version: "2.9.13" }),
 		);
 		const out = capture();

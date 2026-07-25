@@ -2,7 +2,7 @@
 // hook-reference extraction (so remove never breaks an append-only invocation),
 // release selection, and crash-safe metadata rebuild.
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import {
 	availablePacks,
 	BASE_PACK,
@@ -83,7 +83,7 @@ export async function rebuildMetadata(
 		profile: prior?.profile,
 		packs: nextPacks,
 	});
-	await writeInstallMetadata(claudeDir, meta);
+	await writeInstallMetadata(dirname(claudeDir), meta);
 }
 
 export interface RemovalPlan {

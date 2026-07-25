@@ -512,7 +512,7 @@ export async function smartUpdate(
 		// exactly the provenance divergence this flow must never produce. The atomic
 		// writer leaves the prior metadata.json intact on failure, so re-running the
 		// install/upgrade rebuilds correct metadata from disk — the recovery path.
-		await writeInstallMetadata(claudeDir, meta);
+		await writeInstallMetadata(dirname(claudeDir), meta);
 		// One-release rollback dual-write of the legacy manifest. Only after the
 		// canonical write succeeds — if the canonical write fails above we never reach
 		// here, so the previous legacy manifest stays on disk for the next run.

@@ -90,27 +90,27 @@ describe("checkStaleIndex", () => {
 		expect(results.some((r) => r.status === "fail" && r.detail.includes("declared 9, found 1"))).toBe(true);
 	});
 
-	it("FAILS when a docs content count drifts from the inventory", async () => {
+	// The docs site states capabilities without counting them: a count in evergreen prose is a
+	// fact with an expiry date, banned by the writing standard and flagged by the docs
+	// stale-scanner. Drift-checking a claim that was withdrawn on purpose would report the
+	// withdrawal as drift on every run, forever — so those pages are not specified here at all.
+	it("does not count-check the docs site, whose pages make no numeric claims", async () => {
 		const root = await makeRepo(README_OK, SKILLS_OK, AGENTS_OK, HOOKS_OK);
 		await writeFile(
 			join(root, "packages", "docs", "content", "docs", "core-concepts", "how-it-works.mdx"),
 			"9 skills\n",
 		);
-		expect(
-			compareCounts(root).some(
-				(d) => d.source.includes("core-concepts/how-it-works") && d.declared === 9 && d.actual === 1,
-			),
-		).toBe(true);
-	});
-
-	it("FAILS when a workflow page count drifts from the inventory", async () => {
-		const root = await makeRepo(README_OK, SKILLS_OK, AGENTS_OK, HOOKS_OK);
 		await writeFile(
 			join(root, "packages", "docs", "content", "docs", "workflows", "new-project.mdx"),
 			"1 agents, 9 skills\n",
 		);
+		expect(compareCounts(root).some((d) => d.source.includes("packages/docs"))).toBe(false);
+	});
+
+	it("still count-checks README, which does carry counts", async () => {
+		const root = await makeRepo("9 skills\n", SKILLS_OK, AGENTS_OK, HOOKS_OK);
 		expect(
-			compareCounts(root).some((d) => d.source.includes("workflows/new-project") && d.declared === 9 && d.actual === 1),
+			compareCounts(root).some((d) => d.source === "README.md" && d.declared === 9 && d.actual === 1),
 		).toBe(true);
 	});
 

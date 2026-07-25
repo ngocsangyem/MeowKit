@@ -53,7 +53,15 @@ function read(repoRoot: string, rel: string): string {
 	return fs.existsSync(p) ? fs.readFileSync(p, "utf-8") : "";
 }
 
-/** Build the list of count specifications anchored to each doc's real format. */
+/**
+ * Build the list of count specifications anchored to each doc's real format.
+ *
+ * The docs site is deliberately absent from this list. Its pages state capabilities without
+ * counting them, because a count in evergreen prose is a fact with an expiry date — the
+ * stop-slop standard bans them and the docs stale-scanner flags them. A drift check against a
+ * claim that was withdrawn on purpose reports the withdrawal as drift, forever. README and the
+ * generated `.claude/` indexes stay: those genuinely carry counts.
+ */
 export function countSpecs(repoRoot: string): CountSpec[] {
 	const claudeDir = path.join(repoRoot, ".claude");
 	const a = actualCounts(claudeDir);
@@ -63,36 +71,6 @@ export function countSpecs(repoRoot: string): CountSpec[] {
 		{ source: "README.md", label: "commands", pattern: /(\d+)\s+(?:slash\s+)?commands/g, actual: a.commands.length },
 		{ source: "README.md", label: "rules", pattern: /(\d+)\s+(?:enforcement\s+)?rules/g, actual: a.rules.length },
 		{ source: "README.md", label: "hook scripts", pattern: /(\d+)\s+hook scripts/g, actual: a.hooks.length },
-		{
-			source: "packages/docs/content/docs/workflows/new-project.mdx",
-			label: "new-project skills",
-			pattern: /(\d+)\s+skills/g,
-			actual: a.skills.length,
-		},
-		{
-			source: "packages/docs/content/docs/workflows/new-project.mdx",
-			label: "new-project agents",
-			pattern: /(\d+)\s+agents/g,
-			actual: a.agents.length,
-		},
-		{
-			source: "packages/docs/content/docs/reference/rules-index.mdx",
-			label: "rules index agents",
-			pattern: /all\s+(\d+)\s+agents/g,
-			actual: a.agents.length,
-		},
-		{
-			source: "packages/docs/content/docs/reference/skills/lazy-agent-loader.mdx",
-			label: "lazy loader agents",
-			pattern: /all\s+(\d+)\s+agents/g,
-			actual: a.agents.length,
-		},
-		{
-			source: "packages/docs/content/docs/core-concepts/how-it-works.mdx",
-			label: "how-it-works skills",
-			pattern: /(\d+)\+?\s+skills/g,
-			actual: a.skills.length,
-		},
 		{
 			source: ".claude/agents/SKILLS_INDEX.md",
 			label: "skills total",

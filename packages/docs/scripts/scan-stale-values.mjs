@@ -140,6 +140,16 @@ const RULES = [
     why: "the project dotenv is `.meowkit/.env`, shared by every provider",
   },
   {
+    id: "retired-state-path",
+    severity: "error",
+    // The kit's own bookkeeping moved into the state root. Readers still fall back to these
+    // paths so existing installs keep working, which is exactly why prose must not teach them:
+    // a fallback that gets documented stops being a fallback and becomes a second answer.
+    re: /`?\.claude\/(metadata\.json|pack-manifest\.json|harness-inventory\.json)`?/g,
+    allow: (line) => /pre-move|fall(s|back)|legacy/i.test(line),
+    why: "these live under `.meowkit/` now; the `.claude/` path is a read fallback, not a location to document",
+  },
+  {
     id: "hard-coded-count",
     severity: "warn",
     re: /\b\d{2,3} (?:specialist )?(skills|agents|rule files|hooks)\b/g,

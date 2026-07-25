@@ -4,10 +4,11 @@
 // that labels per-file ownership (meowkit / user / meowkit-modified) against the
 // prior installed state. The locked atomic writer lives in install-metadata-writer.ts.
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { z } from "zod";
 import { collectFiles, hashFile, classifyLayer, readManifest } from "./compute-checksums.js";
 import type { Manifest } from "./compute-checksums.js";
+import { resolveMetadataPath } from "../state/resolve-metadata-path.js";
 
 export const INSTALL_METADATA_FILENAME = "metadata.json";
 
@@ -50,7 +51,7 @@ export interface ReadInstallMetadataResult {
 /** Thrown when a canonical metadata.json carries `schemaVersion` but fails validation. */
 export class CorruptInstallMetadataError extends Error {
 	constructor(public readonly detail: string) {
-		super(`Corrupt .claude/metadata.json: ${detail}`);
+		super(`Corrupt install metadata.json: ${detail}`);
 		this.name = "CorruptInstallMetadataError";
 	}
 }
@@ -68,9 +69,14 @@ export function indexByPath(entries: InstallFileEntry[]): Record<string, Install
  * The legacy-manifest branch never trusts `Manifest.version` (hardcoded upstream);
  * it sources the version from a sibling version-only metadata.json when present.
  * Throws CorruptInstallMetadataError when a schemaVersion-bearing file fails Zod.
+ *
+ * Still takes the provider directory, because the legacy-manifest recovery branch reads
+ * `.claude/` and callers may point it at a migration source rather than the live project. The
+ * canonical metadata resolves from that directory's parent, so a pre-move install keeps its
+ * baseline and a migrated one stops reading the old file.
  */
 export function readInstallMetadata(claudeDir: string): ReadInstallMetadataResult {
-	const metadataPath = join(claudeDir, INSTALL_METADATA_FILENAME);
+	const metadataPath = resolveMetadataPath(dirname(claudeDir));
 	let legacyMetadataVersion: string | null = null;
 
 	if (existsSync(metadataPath)) {
