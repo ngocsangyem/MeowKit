@@ -16,16 +16,16 @@ echo "PROACTIVE: $_PROACTIVE"
 source <(workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
-_LAKE_SEEN=$([ -f .meowkit/memory/.completeness-intro-seen ] && echo "yes" || echo "no")
+_LAKE_SEEN=$([ -f .meowkit/state/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
 _TEL=$(workflow-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f .meowkit/memory/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL_PROMPTED=$([ -f .meowkit/state/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p .meowkit/memory
-echo '{"skill":"investigate","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/memory/skill-usage.jsonl 2>/dev/null || true
+mkdir -p .meowkit/telemetry
+echo '{"skill":"investigate","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
 STATE_DIR="${PLUGIN_DATA:-$HOME/.cache/meowkit}/investigate"
 mkdir -p "$STATE_DIR"
 for _PF in $(find .meowkit/memory -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && break; done
@@ -37,6 +37,6 @@ If `PROACTIVE` is `"false"`, do not proactively suggest skills — only invoke t
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: follow the inline upgrade flow. If `JUST_UPGRADED <from> <to>`: tell user "Updated to v{to} — continuing." and continue.
 
-If `LAKE_INTRO` is `no`: Introduce the Completeness Principle. Tell the user about the Boil the Lake principle, then offer to open the essay. Mark as seen with `touch .meowkit/memory/.completeness-intro-seen`.
+If `LAKE_INTRO` is `no`: Introduce the Completeness Principle. Tell the user about the Boil the Lake principle, then offer to open the essay. Mark as seen with `touch .meowkit/state/.completeness-intro-seen`.
 
-If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: Ask the user about telemetry via stop and ask the user in chat (community vs anonymous vs off). Mark with `touch .meowkit/memory/.telemetry-prompted`.
+If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: Ask the user about telemetry via stop and ask the user in chat (community vs anonymous vs off). Mark with `touch .meowkit/state/.telemetry-prompted`.

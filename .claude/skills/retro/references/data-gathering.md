@@ -81,7 +81,7 @@ git log origin/<default> --since="<window>" --format="AUTHOR:%aN" --name-only
 git shortlog origin/<default> --since="<window>" -sn --no-merges
 
 # 8. Review history (if available)
-cat .meowkit/memory/reviews.jsonl 2>/dev/null || true
+cat .meowkit/telemetry/reviews.jsonl 2>/dev/null || true
 
 # 9. TODOS.md backlog (if available)
 cat TODOS.md 2>/dev/null || true

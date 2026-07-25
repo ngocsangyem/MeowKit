@@ -99,7 +99,7 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 - **Reuses, does not duplicate:** `packages/mewkit/src/token-estimator/index.ts`
   is the canonical chars/4 source. Shell scripts inline the same heuristic with
   a citation comment, avoiding a Node bridge that would require `dist/`.
-- **Reads, does not write:** `.meowkit/memory/cost-log.json`,
+- **Reads, does not write:** `.meowkit/telemetry/cost-log.json`,
   `.codex/`, `.mcp.json`. No file writes anywhere.
 - **No env vars introduced.** Window size is hard-coded 200K; override deferred
   until a real 1M-context use case appears.

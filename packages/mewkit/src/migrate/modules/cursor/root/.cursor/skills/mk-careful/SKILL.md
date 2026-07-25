@@ -10,8 +10,8 @@ patterns before running. If a destructive command is detected, you'll be warned
 and can choose to proceed or cancel.
 
 ```bash
-mkdir -p .meowkit/memory
-echo '{"skill":"careful","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/memory/skill-usage.jsonl 2>/dev/null || true
+mkdir -p .meowkit/telemetry
+echo '{"skill":"careful","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
 ```
 
 ## What's protected

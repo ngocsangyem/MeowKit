@@ -144,7 +144,7 @@ When `trace-log.jsonl` exceeds **50MB**, `append-trace.sh` rotates it:
 
 ```
 .meowkit/telemetry/trace-log.jsonl              ← active log (reset to empty after rotation)
-.meowkit/memory/trace-log.{YYMMDD-HHMMSS}.jsonl.gz  ← compressed archive
+.meowkit/telemetry/trace-log.{YYMMDD-HHMMSS}.jsonl.gz  ← compressed archive
 ```
 
 Rotation is triggered on every append that finds the file over the size limit. No cron required.

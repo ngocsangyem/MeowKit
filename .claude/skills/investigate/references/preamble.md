@@ -16,10 +16,10 @@ echo "PROACTIVE: $_PROACTIVE"
 source <(.claude/scripts/bin/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
-_LAKE_SEEN=$([ -f .meowkit/memory/.completeness-intro-seen ] && echo "yes" || echo "no")
+_LAKE_SEEN=$([ -f .meowkit/state/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
 _TEL=$(.claude/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f .meowkit/memory/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL_PROMPTED=$([ -f .meowkit/state/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
@@ -37,6 +37,6 @@ If `PROACTIVE` is `"false"`, do not proactively suggest skills — only invoke t
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: follow the inline upgrade flow. If `JUST_UPGRADED <from> <to>`: tell user "Updated to v{to} — continuing." and continue.
 
-If `LAKE_INTRO` is `no`: Introduce the Completeness Principle. Tell the user about the Boil the Lake principle, then offer to open the essay. Mark as seen with `touch .meowkit/memory/.completeness-intro-seen`.
+If `LAKE_INTRO` is `no`: Introduce the Completeness Principle. Tell the user about the Boil the Lake principle, then offer to open the essay. Mark as seen with `touch .meowkit/state/.completeness-intro-seen`.
 
-If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: Ask the user about telemetry via AskUserQuestion (community vs anonymous vs off). Mark with `touch .meowkit/memory/.telemetry-prompted`.
+If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: Ask the user about telemetry via AskUserQuestion (community vs anonymous vs off). Mark with `touch .meowkit/state/.telemetry-prompted`.

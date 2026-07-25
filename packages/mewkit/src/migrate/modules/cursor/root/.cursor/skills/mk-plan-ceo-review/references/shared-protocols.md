@@ -81,7 +81,7 @@ Before building infrastructure, unfamiliar patterns, or anything the runtime mig
 
 Log eureka moments:
 ```bash
-jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> .meowkit/memory/eureka.jsonl 2>/dev/null || true
+jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> .meowkit/telemetry/eureka.jsonl 2>/dev/null || true
 ```
 Replace SKILL_NAME and ONE_LINE_SUMMARY. Runs inline — don't stop the workflow.
 
@@ -166,7 +166,7 @@ Run this bash:
 ```bash
 _TEL_END=$(date +%s)
 _TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f .meowkit/memory/.pending-"$_SESSION_ID" 2>/dev/null || true
+rm -f .meowkit/state/.pending-"$_SESSION_ID" 2>/dev/null || true
 # telemetry removed — telemetry disabled; analyst agent not invoked \
   --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
   --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &

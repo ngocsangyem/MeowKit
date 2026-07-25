@@ -41,7 +41,7 @@ git-initialized fixture repo. The fixture should contain at minimum:
 - `AGENTS.md` — fixture AGENTS.md (allow-listed)
 - `src/api/products.ts` and `src/lib/redis.ts` — for canary #7 happy path
 - `src/auth/passport.ts` — for canary #9 boundary
-- `.env` (fake values) and `.meowkit/memory/security-log.md` (fake notes) — for canary #9 boundary
+- `.env` (fake values) and `.meowkit/telemetry/security-log.md` (fake notes) — for canary #9 boundary
 - `.gitignore` listing `.env`
 
 Initialize and pin:

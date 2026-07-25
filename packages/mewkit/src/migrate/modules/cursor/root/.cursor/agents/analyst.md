@@ -13,7 +13,7 @@ extracts durable patterns into the project's canonical memory stores.
 
 ## What it does
 
-1. **Tracks token usage** in `.meowkit/memory/cost-log.json` — task, model, tokens,
+1. **Tracks token usage** in `.meowkit/telemetry/cost-log.json` — task, model, tokens,
    estimated cost, timestamp.
 2. **Generates cost reports** on request: spend by task, by agent, by model tier, over
    time. For cross-run aggregates (cost-by-model, events-by-type, friction-by-

@@ -27,12 +27,17 @@ function base(relPath: string): string {
 }
 
 function isLog(name: string): boolean {
-	// cost/trace/skill-usage/review/eval logs + any `*-log.(md|json|jsonl)`.
+	// cost/trace/skill-usage/review/eval logs, the append-only JSONL streams the harness
+	// writes during a run, and any `*-log.(md|json|jsonl)` or bare `*.log`.
 	return (
 		name === "cost-log.json" ||
 		name === "trace-log.jsonl" ||
 		name === "security-log.md" ||
+		name === "reviews.jsonl" ||
+		name === "eureka.jsonl" ||
+		name === "spec-review.jsonl" ||
 		/-log\.(md|json|jsonl)$/.test(name) ||
+		/\.log$/.test(name) ||
 		/^(skill-usage|eval|review-log)/.test(name)
 	);
 }
@@ -42,8 +47,16 @@ function isCache(name: string): boolean {
 }
 
 function isStateMarker(name: string): boolean {
-	// Session markers, feature flags, model metadata, preferences.
-	return name === "last-model-id.txt" || /\.flag$/.test(name) || /^session|preferences|model-id/.test(name);
+	// Session markers, feature flags, model metadata, preferences. The dot-prefixed
+	// "already prompted / already seen" markers are one-shot flags in all but extension:
+	// bucketing them as memory would silently reset a user's prior choice on migrate.
+	return (
+		name === "last-model-id.txt" ||
+		name === "no-test-bootstrap" ||
+		/^\.(telemetry-prompted|completeness-intro-seen|pending-)/.test(name) ||
+		/\.flag$/.test(name) ||
+		/^session|preferences|model-id/.test(name)
+	);
 }
 
 function target(cls: TargetClass, relPath: string): string {

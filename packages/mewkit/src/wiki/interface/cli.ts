@@ -40,14 +40,14 @@ function findClaudeDir(): string | null {
 	}
 }
 
-function buildService(claudeDir: string): WikiService {
+function buildService(projectRoot: string): WikiService {
 	return new WikiService({
-		repo: new MarkdownWikiRepository(path.dirname(claudeDir)),
+		repo: new MarkdownWikiRepository(projectRoot),
 		scanner: new ScannerAdapter(),
-		index: new SqliteWikiIndex(dbPath(claudeDir)),
-		tracer: new TraceAdapter(path.dirname(claudeDir)),
+		index: new SqliteWikiIndex(dbPath(projectRoot)),
+		tracer: new TraceAdapter(projectRoot),
 		fetcher: new FetcherAdapter(),
-		verifier: () => verifyWiki(path.dirname(claudeDir)),
+		verifier: () => verifyWiki(projectRoot),
 	});
 }
 
@@ -134,7 +134,7 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 	}
 	const projectRoot = path.dirname(claudeDir);
 	const { subcommand, rest, flags } = opts;
-	const svc = buildService(claudeDir);
+	const svc = buildService(projectRoot);
 
 	switch (subcommand) {
 		case "init": {
@@ -144,7 +144,7 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 			return;
 		}
 		case "search": {
-			const hits = searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), rest.join(" "));
+			const hits = searchWiki(new SqliteWikiIndex(dbPath(projectRoot)), rest.join(" "));
 			if (flags["json"]) return void console.log(JSON.stringify(hits, null, 2));
 			for (const h of hits)
 				console.log(`${h.title} [${h.slug}] ${h.path ?? h.pageId} ~${h.tokenEstimate}tok\n  ${h.snippet}`);
@@ -154,7 +154,7 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 		case "hint": {
 			// Context-discipline surface: title + score + path ONLY, never content. `path` is the
 			// project-root-readable file target; pageId/pagePath are kept for callers that need them.
-			const hits = searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), rest.join(" "), 5);
+			const hits = searchWiki(new SqliteWikiIndex(dbPath(projectRoot)), rest.join(" "), 5);
 			const hints = hits.map((h) => ({
 				title: h.title,
 				score: h.tokenEstimate,
@@ -182,12 +182,12 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 			return;
 		}
 		case "reindex": {
-			const r = svc.reindexWiki(path.dirname(claudeDir));
+			const r = svc.reindexWiki(projectRoot);
 			console.log(`reindexed: ${r.wiki.pages} page(s)`);
 			return;
 		}
 		case "verify": {
-			const report = verifyWiki(path.dirname(claudeDir));
+			const report = verifyWiki(projectRoot);
 			if (flags["json"]) {
 				console.log(JSON.stringify(report, null, 2));
 			} else if (report.fresh) {
@@ -313,7 +313,7 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 			// Route through the shared probe so index-missing/empty/query-failed
 			// discrimination + intent sanitization live in one place. UX unchanged:
 			// any non-`ready` outcome renders as "(no wiki context)".
-			const probe = probeWiki(dbPath(claudeDir), query, {
+			const probe = probeWiki(dbPath(projectRoot), query, {
 				maxPages: max,
 				includeContent,
 				// Inject a canonical-page counter so `context` surfaces a one-line staleness warning.

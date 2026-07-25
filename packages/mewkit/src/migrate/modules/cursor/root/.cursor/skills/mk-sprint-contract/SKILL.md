@@ -117,7 +117,7 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 
 - The contract negotiation is **skipped entirely** (per Phase 5 adaptive density policy for the complex/capable tier — capable models self-derive criteria from the product spec)
 - `gate-enforcement.sh` honors the env var and allows source edits without contract verification
-- LEAN bypasses are logged to `.meowkit/memory/lean-bypass.log` for audit
+- LEAN bypasses are logged to `.meowkit/telemetry/lean-bypass.log` for audit
 - LEAN mode is a PROJECT-level setting, not per-file override
 
 ## Gotchas

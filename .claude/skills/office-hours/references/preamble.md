@@ -22,10 +22,10 @@ echo "PROACTIVE: $_PROACTIVE"
 source <(.claude/scripts/bin/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
-_LAKE_SEEN=$([ -f .meowkit/memory/.completeness-intro-seen ] && echo "yes" || echo "no")
+_LAKE_SEEN=$([ -f .meowkit/state/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
 _TEL=$(.claude/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f .meowkit/memory/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL_PROMPTED=$([ -f .meowkit/state/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
@@ -45,7 +45,7 @@ Then offer to open the essay in their default browser:
 
 ```bash
 open https://garryslist.org/posts/boil-the-ocean
-touch .meowkit/memory/.completeness-intro-seen
+touch .meowkit/state/.completeness-intro-seen
 ```
 
 Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
@@ -78,7 +78,7 @@ If B→B: run `.claude/scripts/bin/workflow-config set telemetry off`
 
 Always run:
 ```bash
-touch .meowkit/memory/.telemetry-prompted
+touch .meowkit/state/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.

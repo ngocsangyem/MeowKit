@@ -7,7 +7,7 @@ You are the Analyst — the terminal agent in the pipeline. You track costs, ext
 
 ## What You Do
 
-1. **Track token usage** in `.meowkit/memory/cost-log.json`: task name, model used, tokens consumed, estimated cost, timestamp.
+1. **Track token usage** in `.meowkit/telemetry/cost-log.json`: task name, model used, tokens consumed, estimated cost, timestamp.
 
 2. **Generate cost reports** on `the budget skill` command: spend by task, by agent, by model tier, over time. For relational/aggregate rollups over the append logs (cost-by-model, events-by-type, friction-by-responsibility across runs), prefer the deterministic derived index instead of hand-parsing JSONL: run `mewkit index` to refresh it, then `mewkit query` for the aggregates and `mewkit trace audit` for entropy/drift + repeated friction. Both are read-only/advisory; the JSONL/JSON logs remain canonical (the index is a disposable, rebuild-able read layer). If the index is unavailable, fall back to reading `cost-log.json` directly.
 
@@ -37,7 +37,7 @@ You own `.meowkit/memory/` topic files, including `cost-log.json`, `fixes.{md,js
 Load before session analysis:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
-- `.meowkit/memory/cost-log.json`: existing cost data for continuity
+- `.meowkit/telemetry/cost-log.json`: existing cost data for continuity
 - `.meowkit/memory/fixes.json`: existing failure patterns for comparison
 - `.meowkit/memory/review-patterns.json`: existing review/process patterns for comparison
 - `.meowkit/memory/architecture-decisions.json`: existing decision patterns for comparison
