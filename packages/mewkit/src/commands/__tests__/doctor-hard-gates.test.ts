@@ -8,8 +8,9 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { checkHardGates } from "../doctor-hard-gates.js";
+import { requireLiveHarnessRoot } from "../../core/__tests__/support/live-harness.js";
 
-const REPO_ROOT = path.resolve(process.cwd());
+const REPO_ROOT = requireLiveHarnessRoot();
 
 let fixtureDir: string | null = null;
 afterEach(() => {

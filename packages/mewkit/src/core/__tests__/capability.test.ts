@@ -10,6 +10,7 @@ import { validateCapabilities, validateCapabilityEntries } from "../validate-cap
 import { CapabilityEntrySchema, type CapabilityEntry } from "../capability.js";
 import { renderCapabilityView } from "../generate-capability-view.js";
 import { enumerateArtifacts, type InventoryEntry } from "../build-inventory.js";
+import { requireLiveHarness } from "./support/live-harness.js";
 import { AUTHORED_CONTEXT_REQUIREMENTS } from "../capability-authored.js";
 
 const dirs: string[] = [];
@@ -161,7 +162,7 @@ describe("validateCapabilities", () => {
 	});
 
 	it("builds and validates the LIVE harness with zero ERROR-level issues", () => {
-		const live = join(process.cwd(), ".claude");
+		const live = requireLiveHarness();
 		const caps = buildCapabilities(live);
 		// Guard against a false-green: buildCapabilities always returns the authored
 		// constants even with no .claude/, so assert disk enumeration actually ran.
@@ -173,7 +174,7 @@ describe("validateCapabilities", () => {
 	});
 
 	it("every repo-context overlay key resolves to a real live capability (rename guard)", () => {
-		const caps = buildCapabilities(join(process.cwd(), ".claude"));
+		const caps = buildCapabilities(requireLiveHarness());
 		const ids = new Set(caps.map((c) => c.id));
 		for (const key of Object.keys(AUTHORED_CONTEXT_REQUIREMENTS)) expect(ids.has(key), key).toBe(true);
 		// And those flagship flows actually carry the requirement on the live harness.

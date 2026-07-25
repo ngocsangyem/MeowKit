@@ -1,12 +1,12 @@
 // Phase 2 slice 2: deterministic resolver. Flagship intents resolve to the right
 // capability with a reason; ambiguity and no-match are explicit; nothing is marked
 // runtime-invocable (that is Phase 3's host snapshot).
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { resolveCapabilities } from "../resolve-capabilities.js";
 import { buildCapabilities } from "../build-capabilities.js";
 import { AUTHORED_INTENTS } from "../capability-authored.js";
 import type { CapabilityEntry } from "../capability.js";
+import { requireLiveHarness } from "./support/live-harness.js";
 
 function cap(
 	id: string,
@@ -108,7 +108,7 @@ describe("resolveCapabilities", () => {
 	});
 
 	it("describe-only tool entries (jira/browser) carry no intents and do not win user intents", () => {
-		const caps = buildCapabilities(join(process.cwd(), ".claude"));
+		const caps = buildCapabilities(requireLiveHarness());
 		const jira = caps.find((c) => c.id === "jira" && c.kind === "tool");
 		expect(jira?.intents).toEqual([]);
 		// A jira user intent must not resolve to the non-invocable tool entry as top-1.
@@ -117,7 +117,7 @@ describe("resolveCapabilities", () => {
 	});
 
 	it("resolves EVERY authored flagship phrase to its owner as top-1 on the LIVE harness", () => {
-		const caps = buildCapabilities(join(process.cwd(), ".claude"));
+		const caps = buildCapabilities(requireLiveHarness());
 		// Guard: overlay actually applied (real .claude present, not an empty subdir).
 		expect(caps.find((c) => c.id === "mk:cook")?.provenance.intents).toBe("authored");
 		// The C1 regression guard: every curated phrase must resolve to its owning capability

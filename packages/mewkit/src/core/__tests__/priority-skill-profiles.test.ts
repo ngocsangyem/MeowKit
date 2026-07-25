@@ -1,12 +1,14 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { requireLiveHarness } from "./support/live-harness.js";
 
-const skill = (name: string) => readFileSync(join(process.cwd(), ".claude", "skills", name, "SKILL.md"), "utf8");
+const HARNESS = requireLiveHarness();
+const skill = (name: string) => readFileSync(join(HARNESS, "skills", name, "SKILL.md"), "utf8");
 const reference = (skillName: string, fileName: string) =>
-	readFileSync(join(process.cwd(), ".claude", "skills", skillName, "references", fileName), "utf8");
+	readFileSync(join(HARNESS, "skills", skillName, "references", fileName), "utf8");
 const asset = (skillName: string, fileName: string) =>
-	readFileSync(join(process.cwd(), ".claude", "skills", skillName, "assets", fileName), "utf8");
+	readFileSync(join(HARNESS, "skills", skillName, "assets", fileName), "utf8");
 
 describe("priority skill profile contracts", () => {
 	it("keeps brainstorming quick output inline and side-effect free", () => {

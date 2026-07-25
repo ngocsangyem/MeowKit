@@ -12,11 +12,12 @@ import {
 	type PackManifest,
 } from "../pack-manifest.js";
 import { resolvePacks, resolveProfile, resolveProfileDetailed } from "../pack-resolver.js";
+import { requireLiveHarness } from "./support/live-harness.js";
 // Single canonical safety list — also asserted by `validate --packs` (check-packs).
 import { SAFETY_PATHS } from "../check-packs.js";
 
 // Resolve against the LIVE harness tree (vitest cwd = repo root).
-const LIVE = join(process.cwd(), ".claude");
+const LIVE = requireLiveHarness();
 const manifest = loadPackManifest(LIVE);
 
 describe("pack manifest (live)", () => {

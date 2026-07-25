@@ -12,7 +12,7 @@
 		"cursorSuite": "~295 cursor-named tests GREEN across 13 files (lint, pack-cleanliness, authored-bundle, reconcile-apply, packaged-parity, target, init-target, upgrade-toolkit, mcp-profiles, safety-hooks, hook-version-support, doctor-cursor, provider-invocation)",
 		"skills": "126 skills across 7 packs (core default; development/review/product/operations/integrations/media opt-in); 0 denied-token hits",
 		"preExistingUnrelatedFailures": [
-			"20 tests across 8 files fail on the branch base independent of any cursor change (doctor-hard-gates, capability, check-packs, context-budget, hook-runner, pack-resolver, priority-skill-profiles, resolve-capabilities) — verified identical with the cursor work stashed out; NOT introduced by this plan and out of its scope"
+			"NONE — corrected 2026-07-25. The previously recorded '20 tests across 8 files fail on the branch base' (doctor-hard-gates, capability, check-packs, context-budget, hook-runner, pack-resolver, priority-skill-profiles, resolve-capabilities) was a wrong-cwd measurement, not a real defect: these 'live harness' suites read the source bundle at process.cwd()/.claude, which is populated only at the meowkit repo root (the canonical `npm test`/CI cwd) and empty in a package subdir. Run correctly they pass 75/75. A shared cwd guard (packages/mewkit/src/core/__tests__/support/live-harness.ts) now fails a wrong-cwd run with an actionable 'run from the meowkit repo root' message instead of a cryptic ENOENT."
 		]
 	},
 	"gates": [
