@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "check:links": "node scripts/check-internal-links.mjs",
     "check:stale": "node scripts/scan-stale-values.mjs",
-    "check": "npm run typecheck && npm run check:links && npm run check:stale"
+    "check:coverage": "node scripts/check-reference-coverage.mjs",
+    "check": "npm run typecheck && npm run check:links && npm run check:stale && npm run check:coverage"
   },
   "dependencies": {
     "fumadocs-core": "16.11.5",

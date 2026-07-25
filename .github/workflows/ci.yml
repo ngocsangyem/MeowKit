@@ -261,6 +261,9 @@ jobs:
       - name: No stale runtime values in docs
         run: npm run check:stale -w packages/docs
 
+      - name: Every skill and agent has a reference page
+        run: npm run check:coverage -w packages/docs
+
       - name: Build docs site
         run: npm run build -w packages/docs
 
