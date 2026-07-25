@@ -1,7 +1,7 @@
 ---
 name: confluence-search
 description: Use for finding Confluence pages via the confluence-as CLI wrapper — CQL queries, saved filters, exporting results. Not for single-page CRUD or bulk write ops.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

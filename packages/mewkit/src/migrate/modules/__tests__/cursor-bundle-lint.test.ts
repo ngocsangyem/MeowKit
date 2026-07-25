@@ -20,10 +20,9 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { scanDeniedTokens } from "../../denied-token-scan.js";
 import { loadSkillPackCatalog, packBudgetChars, resolvePackSelection } from "../codex-skill-packs.js";
 import { resolveCursorModuleDir } from "../cursor-authored-bundle.js";
-import { scanCursorExtraDenied } from "../cursor-extra-denied-tokens.js";
+import { scanCursorDenied } from "../cursor-extra-denied-tokens.js";
 import { reconcileApplyCursorBundle } from "../cursor-reconcile-apply.js";
 
 const moduleDir = resolveCursorModuleDir();
@@ -34,16 +33,13 @@ const skillsDir = join(rootDir, ".agents", "skills");
 
 const DESCRIPTION_CAP = 200;
 
-// Legacy-token denylist: the shared denied-token-scan set (which already covers .claude/
-// paths, CLAUDE.md, AskUserQuestion, Task(, CLAUDE_*/ANTHROPIC_* env vars, mk/meow slash
-// commands — invalid for any non-Claude-Code provider) PLUS the Cursor-only additions in
-// cursor-extra-denied-tokens.ts (single source of truth shared with cursor-pack-cleanliness
-// so the two suites can never drift): search-tool names + call-form, model tiers, `.codex/`
-// paths, the Task-management tool family, the Read tool's offset=/limit= signature, hook
-// lifecycle event names, settings.json hook registration, and the Anthropic no-reply email.
-function scanAllDenied(content: string): string[] {
-	return [...scanDeniedTokens(content).map((m) => m.label), ...scanCursorExtraDenied(content)];
-}
+// Legacy-token denylist: `scanCursorDenied` (cursor-extra-denied-tokens.ts) is the single
+// source of truth — the shared cross-provider set (.claude/ paths, CLAUDE.md, AskUserQuestion,
+// Task(, CLAUDE_*/ANTHROPIC_* env vars, mk/meow slash commands) plus the Cursor-only additions
+// (search-tool names + call-form, model tiers, `.codex/` paths, the Task-management tool family,
+// the Read tool's offset=/limit= signature, hook lifecycle event names, settings.json hook
+// registration, the Anthropic no-reply email), with the agent `model:` field exempted. Shared
+// with cursor-pack-cleanliness + cursor-output-brand-free so the suites can never drift.
 
 function walkFiles(dir: string, acc: string[] = []): string[] {
 	if (!existsSync(dir)) return acc;
@@ -121,7 +117,7 @@ describe("cursor bundle: legacy-token denylist (agents/skills/rules + AGENTS.md,
 		const leaks: string[] = [];
 		for (const f of denylistScope) {
 			const content = readFileSync(f, "utf-8");
-			const hits = scanAllDenied(content);
+			const hits = scanCursorDenied(content);
 			if (hits.length > 0) leaks.push(`${f.slice(rootDir.length + 1)} [${hits.join(", ")}]`);
 		}
 		expect(leaks, `denied tokens found: ${leaks.join("; ")}`).toEqual([]);
@@ -130,6 +126,15 @@ describe("cursor bundle: legacy-token denylist (agents/skills/rules + AGENTS.md,
 
 describe("cursor bundle: agent frontmatter schema (exactly the 5 verified fields)", () => {
 	const ALLOWED = ["name", "description", "model", "readonly", "is_background"].sort();
+	// Valid `model:` values: `inherit` or a concrete Cursor model id from the approved tier
+	// mapping. Keeps typos / stale suffix-form slugs (e.g. `claude-opus-4-8-thinking-high`) out.
+	const APPROVED_AGENT_MODELS = new Set([
+		"inherit",
+		"claude-fable-5",
+		"claude-opus-5[effort=high]",
+		"claude-sonnet-5",
+		"composer-2.5[fast=true]",
+	]);
 
 	for (const file of agentFiles) {
 		const rel = file.slice(agentsDir.length + 1);
@@ -143,8 +148,10 @@ describe("cursor bundle: agent frontmatter schema (exactly the 5 verified fields
 			expect(unquote(raw.name ?? "")).toBe(rel.replace(/\.md$/, ""));
 		});
 
-		it(`${rel}: model is "inherit" (locked decision — current model IDs only in explicit opt-in profiles)`, () => {
-			expect(unquote(raw.model ?? "")).toBe("inherit");
+		it(`${rel}: model is inherit or an approved Cursor model id`, () => {
+			// Agents pin concrete Cursor models per the approved tier mapping (user decision
+			// 2026-07-25, reversing the earlier inherit-default). `inherit` stays valid.
+			expect(APPROVED_AGENT_MODELS.has(unquote(raw.model ?? ""))).toBe(true);
 		});
 
 		it(`${rel}: readonly is a boolean; core-pack agents are advisory-only (readonly:true)`, () => {

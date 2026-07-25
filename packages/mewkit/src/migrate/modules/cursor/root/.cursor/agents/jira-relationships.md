@@ -1,7 +1,7 @@
 ---
 name: jira-relationships
 description: Use for JIRA issue relationships via the jira-as CLI wrapper — link/unlink, blockers, dependencies, clone. Not for sprint/epic or parent/subtask relationships.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

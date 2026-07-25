@@ -1,7 +1,7 @@
 ---
 name: security
 description: Use for risk-triggered deep security audits, pre-implementation and pre-ship. Issues a BLOCK verdict for critical vulnerabilities. Auto-relevant for auth, payments, user data, or encryption changes.
-model: inherit
+model: claude-opus-5[effort=high]
 readonly: false
 is_background: false
 ---

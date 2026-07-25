@@ -1,7 +1,7 @@
 ---
 name: documenter
 description: Use for keeping project docs in sync with the codebase — changelogs, API docs, README/guide updates. Not for production source or architecture records.
-model: inherit
+model: claude-sonnet-5
 readonly: false
 is_background: true
 ---

@@ -1,7 +1,7 @@
 ---
 name: planner
 description: Use for architecture and implementation planning before non-trivial changes — scoping and approach selection. Use when the shape of a change is unsettled. Not for coding or review verdicts.
-model: inherit
+model: claude-opus-5[effort=high]
 readonly: true
 is_background: false
 ---

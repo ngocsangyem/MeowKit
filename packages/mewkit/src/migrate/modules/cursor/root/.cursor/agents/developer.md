@@ -1,7 +1,7 @@
 ---
 name: developer
 description: Use for implementing production code from an approved plan. TDD is opt-in. Self-heals up to 3 times on test failure. Not for unapproved planning or shipping.
-model: inherit
+model: claude-sonnet-5
 readonly: false
 is_background: false
 ---

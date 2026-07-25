@@ -1,7 +1,7 @@
 ---
 name: tester
 description: Use for writing tests that protect production behavior — red-green in TDD mode, on-request otherwise. Anti-rationalization rules (no minimization, no mock substitution) apply in both modes.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

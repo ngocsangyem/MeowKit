@@ -8,17 +8,14 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { resolveCursorModuleDir } from "../cursor-authored-bundle.js";
 import { loadSkillPackCatalog, resolvePackSelection } from "../codex-skill-packs.js";
-import { scanDeniedTokens } from "../../denied-token-scan.js";
-import { scanCursorExtraDenied } from "../cursor-extra-denied-tokens.js";
+import { scanCursorDenied } from "../cursor-extra-denied-tokens.js";
 
 const DESCRIPTION_CAP = 200;
 
-// Shared with cursor-bundle-lint.test.ts via cursor-extra-denied-tokens.ts (single source of
-// truth for the Cursor-only additions on top of the shared denied-token-scan set) — see that
-// module's header comment for the full token list and the Grep/Glob + Stop scoping rationale.
-function scanAllDenied(content: string): string[] {
-	return [...scanDeniedTokens(content).map((m) => m.label), ...scanCursorExtraDenied(content)];
-}
+// `scanCursorDenied` (cursor-extra-denied-tokens.ts) is the single source of truth for the
+// full Cursor denylist (shared set + Cursor-only additions, agent `model:` field exempted) —
+// shared with cursor-bundle-lint + cursor-output-brand-free so the suites can never drift. See
+// that module's header comment for the full token list and the Grep/Glob + Stop scoping rationale.
 
 const moduleDir = resolveCursorModuleDir();
 const skillsRoot = join(moduleDir, "root", ".agents", "skills");
@@ -82,7 +79,7 @@ describe("cursor pack cleanliness", () => {
 				const dir = join(skillsRoot, s);
 				if (!existsSync(dir) || !statSync(dir).isDirectory()) continue;
 				for (const f of walkFiles(dir, [])) {
-					const hits = scanAllDenied(readFileSync(f, "utf-8"));
+					const hits = scanCursorDenied(readFileSync(f, "utf-8"));
 					if (hits.length > 0) leaks.push(`${s}/${f.slice(dir.length + 1)} [${hits.join(", ")}]`);
 				}
 			}

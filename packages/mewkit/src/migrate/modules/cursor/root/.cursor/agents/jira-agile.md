@@ -1,7 +1,7 @@
 ---
 name: jira-agile
 description: Use for JIRA agile surfaces via the jira-as CLI wrapper — epics, sprints, backlog, ranking, story points, velocity. Not for issue CRUD, links, or time tracking.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

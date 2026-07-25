@@ -1,7 +1,7 @@
 ---
 name: journal-writer
 description: Use when something goes wrong — repeated test failures, production bugs, failed refactors, or a security vulnerability. Documents the raw reality of what happened and what was learned.
-model: inherit
+model: claude-sonnet-5
 readonly: false
 is_background: true
 ---

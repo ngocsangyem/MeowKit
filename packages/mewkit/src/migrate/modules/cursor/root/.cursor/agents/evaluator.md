@@ -1,7 +1,7 @@
 ---
 name: evaluator
 description: Use for active verification of a running build against rubric criteria with real evidence, and for critiquing a sprint contract before code is written. Not for structural review verdicts.
-model: inherit
+model: claude-opus-5[effort=high]
 readonly: true
 is_background: false
 ---

@@ -1,7 +1,7 @@
 ---
 name: jira-fields
 description: Use for discovering and configuring JIRA custom fields via the jira-as CLI wrapper — list fields, field ids, agile field mappings. Not for per-issue field values or project admin.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

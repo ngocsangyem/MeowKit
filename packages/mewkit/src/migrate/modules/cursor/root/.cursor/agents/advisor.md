@@ -1,7 +1,7 @@
 ---
 name: advisor
 description: Use for an isolated advisory interview — one question at a time, confirms the real problem, then one honest recommendation packet. Invoked only via the advisory workflow, never directly.
-model: inherit
+model: claude-fable-5
 readonly: false
 is_background: false
 ---

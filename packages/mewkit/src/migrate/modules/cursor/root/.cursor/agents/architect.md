@@ -1,7 +1,7 @@
 ---
 name: architect
 description: Use for system-design tradeoff evaluation and ADRs — schema changes, new service boundaries, auth, API contracts, infrastructure. Not for implementation or routine planning.
-model: inherit
+model: claude-opus-5[effort=high]
 readonly: false
 is_background: false
 ---

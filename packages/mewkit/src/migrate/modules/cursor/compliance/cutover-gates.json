@@ -20,7 +20,7 @@
 			"id": 1,
 			"requirement": "No Cursor semantic output depends on .claude / .codex (authored bundle is self-contained)",
 			"status": "PASS",
-			"evidence": "cursor-bundle-lint + cursor-pack-cleanliness enforce a cursor-scoped denylist (.claude/, .codex/, Claude tool names, model tiers, CLAUDE_*, Task* tool-call forms, Claude hook event names, settings.json, anthropic email) across AGENTS.md + .cursor/** + all 126 .agents/skills/**; green. Independent grep confirms zero .codex/ or .claude/ residue."
+			"evidence": "cursor-bundle-lint + cursor-pack-cleanliness enforce a cursor-scoped denylist (.claude/, .codex/, Claude tool names, model tiers, CLAUDE_*, Task* tool-call forms, Claude hook event names, settings.json, anthropic email) across AGENTS.md + .cursor/** + all 126 .agents/skills/**; green. Independent grep confirms zero .codex/ or .claude/ residue. Note (2026-07-25): the model-tier denylist exempts `claude-<tier>` Cursor model IDs in the agent `model:` frontmatter field only (agents now pin concrete Cursor models by user decision); bare tier words in prose/body remain banned."
 		},
 		{
 			"id": 2,

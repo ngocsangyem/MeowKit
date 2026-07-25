@@ -1,7 +1,7 @@
 ---
 name: reviewer
 description: Use proactively after implementation to review a diff for correctness, security, and scope before it ships. Not for writing or fixing code, and not for the pre-implementation planning pass.
-model: inherit
+model: claude-opus-5[effort=high]
 readonly: true
 is_background: false
 ---

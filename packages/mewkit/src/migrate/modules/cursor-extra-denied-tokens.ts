@@ -24,6 +24,8 @@
 //     precision gain. The five other event names below are unique compound identifiers with
 //     no legitimate English-prose use, so they stay safely banned; `SubagentStop` also covers
 //     the "Stop as a hook name" case when it appears in its real (compound) form.
+import { scanDeniedTokens } from "../denied-token-scan.js";
+
 export interface CursorDeniedToken {
 	label: string;
 	pattern: RegExp;
@@ -32,6 +34,11 @@ export interface CursorDeniedToken {
 export const CURSOR_EXTRA_DENIED_TOKENS: readonly CursorDeniedToken[] = [
 	{ label: "Grep tool", pattern: /\bGrep\b/ },
 	{ label: "Glob tool", pattern: /\bGlob\b/ },
+	// Bare Claude-Code model-tier words leak model-specific framing into the model-agnostic
+	// bundle. Agent `model:` frontmatter legitimately holds a Cursor model id that may contain
+	// a tier word (`claude-opus-5`, `claude-4-5-haiku`); that one line is stripped before the
+	// scan (see `stripAgentModelField`), so a bare `opus`/`sonnet`/`haiku`/`fable` anywhere in
+	// prose or body is still flagged.
 	{ label: "Claude Code model tier name", pattern: /\b(opus|sonnet|haiku|fable)\b/i },
 	{ label: ".codex/ path (codex-only, no cursor equivalent)", pattern: /\.codex\// },
 	{
@@ -53,4 +60,26 @@ export function scanCursorExtraDenied(content: string): string[] {
 	const hits: string[] = [];
 	for (const t of CURSOR_EXTRA_DENIED_TOKENS) if (t.pattern.test(content)) hits.push(t.label);
 	return hits;
+}
+
+/**
+ * Remove the agent-frontmatter `model:` line before a denied-token scan. That field
+ * legitimately holds a Cursor model id whose tier word (`claude-opus-5`, `claude-4-5-haiku`)
+ * would otherwise trip the tier-name denylist. Only a leading `model:` line is removed;
+ * everything else — including tier words in prose or body — is left for the scan. The model
+ * value itself is separately whitelisted by the agent-frontmatter schema test.
+ */
+export function stripAgentModelField(content: string): string {
+	return content.replace(/^model:.*$/m, "");
+}
+
+/**
+ * Full Cursor denied-token scan: the shared cross-provider set plus the Cursor-only set,
+ * with the agent `model:` field exempted (it holds a valid Cursor model id, tier word and
+ * all). Single source of truth for every cursor lint suite (cursor-bundle-lint,
+ * cursor-pack-cleanliness, cursor-output-brand-free) so the scan can never drift between them.
+ */
+export function scanCursorDenied(content: string): string[] {
+	const scoped = stripAgentModelField(content);
+	return [...scanDeniedTokens(scoped).map((m) => m.label), ...scanCursorExtraDenied(scoped)];
 }

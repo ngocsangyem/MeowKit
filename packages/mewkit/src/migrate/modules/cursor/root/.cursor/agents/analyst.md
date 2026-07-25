@@ -1,7 +1,7 @@
 ---
 name: analyst
 description: Use for session-end cost tracking, pattern extraction, and memory upkeep. Invoked at workflow end or on demand for a budget report. Not for implementation or review verdicts.
-model: inherit
+model: claude-sonnet-5
 readonly: false
 is_background: true
 ---

@@ -1,7 +1,7 @@
 ---
 name: shipper
 description: Use for the full ship sequence — pre-ship checks, conventional commit, feature branch + PR, CI verification, rollback docs. Never commits to main. Not for implementation or review approval.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

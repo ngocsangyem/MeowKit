@@ -1,7 +1,7 @@
 ---
 name: jira-dev
 description: Use for generating developer artifacts from JIRA tickets — branch names, PR descriptions, parsed commits, commit/PR links. Not for running git/gh directly or issue CRUD.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

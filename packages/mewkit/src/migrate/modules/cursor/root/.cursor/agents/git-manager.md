@@ -1,7 +1,7 @@
 ---
 name: git-manager
 description: Use for staging, committing, and pushing code with conventional commits — when the user says "commit" or "push". Does not create PRs or run CI.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

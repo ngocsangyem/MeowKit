@@ -1,7 +1,7 @@
 ---
 name: jira-time
 description: Use for JIRA time tracking via the jira-as CLI wrapper — log work, edit/delete worklogs, estimates, time reports. Not for sprint capacity.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

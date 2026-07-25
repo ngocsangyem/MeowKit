@@ -1,7 +1,7 @@
 ---
 name: brainstormer
 description: Use to brainstorm software solutions or debate a technical decision before implementation. Use proactively when a task has multiple viable approaches. Not for implementation or final decisions.
-model: inherit
+model: claude-fable-5
 readonly: true
 is_background: false
 ---

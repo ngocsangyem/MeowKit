@@ -16,15 +16,10 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { resolveCursorModuleDir } from "../modules/cursor-authored-bundle.js";
-import { scanCursorExtraDenied } from "../modules/cursor-extra-denied-tokens.js";
-import { scanDeniedTokens } from "../denied-token-scan.js";
+import { scanCursorDenied } from "../modules/cursor-extra-denied-tokens.js";
 
 const moduleDir = resolveCursorModuleDir();
 const rootDir = join(moduleDir, "root");
-
-function scanAllDenied(content: string): string[] {
-	return [...scanDeniedTokens(content).map((m) => m.label), ...scanCursorExtraDenied(content)];
-}
 
 function walkFiles(dir: string, acc: string[] = []): string[] {
 	if (!existsSync(dir)) return acc;
@@ -39,13 +34,13 @@ function walkFiles(dir: string, acc: string[] = []): string[] {
 describe("cursor output is brand-free", () => {
 	it("AGENTS.md carries no Claude/Anthropic/codex brand or tool tokens", () => {
 		const content = readFileSync(join(rootDir, "AGENTS.md"), "utf-8");
-		expect(scanAllDenied(content)).toEqual([]);
+		expect(scanCursorDenied(content)).toEqual([]);
 	});
 
 	it("every .agents/skills/** file is free of denied tokens", () => {
 		const leaks: string[] = [];
 		for (const file of walkFiles(join(rootDir, ".agents", "skills"))) {
-			const hits = scanAllDenied(readFileSync(file, "utf-8"));
+			const hits = scanCursorDenied(readFileSync(file, "utf-8"));
 			if (hits.length > 0) leaks.push(`${file.slice(rootDir.length + 1)} [${hits.join(", ")}]`);
 		}
 		expect(leaks, `denied tokens found: ${leaks.join("; ")}`).toEqual([]);
@@ -54,7 +49,7 @@ describe("cursor output is brand-free", () => {
 	it("every .cursor/** file (agents, rules, hooks, hooks.json) is free of denied tokens", () => {
 		const leaks: string[] = [];
 		for (const file of walkFiles(join(rootDir, ".cursor"))) {
-			const hits = scanAllDenied(readFileSync(file, "utf-8"));
+			const hits = scanCursorDenied(readFileSync(file, "utf-8"));
 			if (hits.length > 0) leaks.push(`${file.slice(rootDir.length + 1)} [${hits.join(", ")}]`);
 		}
 		expect(leaks, `denied tokens found: ${leaks.join("; ")}`).toEqual([]);

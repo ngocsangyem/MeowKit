@@ -1,7 +1,7 @@
 ---
 name: jira-search
 description: Use for finding JIRA issues via the jira-as CLI wrapper — JQL queries, saved filters, exporting results. Not for single-issue CRUD or bulk write ops.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

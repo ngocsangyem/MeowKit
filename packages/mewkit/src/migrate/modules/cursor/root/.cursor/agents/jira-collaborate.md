@@ -1,7 +1,7 @@
 ---
 name: jira-collaborate
 description: Use for JIRA comments, attachments, watchers, and notifications via the jira-as CLI wrapper. Not for issue CRUD, issue links, or transitions.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

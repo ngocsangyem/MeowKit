@@ -1,7 +1,7 @@
 ---
 name: researcher
 description: Use to research technical topics, evaluate libraries, or find documentation before a decision. Use proactively before implementing an unfamiliar tool or pattern. Not for implementation or verdicts.
-model: inherit
+model: claude-sonnet-5
 readonly: true
 is_background: true
 ---

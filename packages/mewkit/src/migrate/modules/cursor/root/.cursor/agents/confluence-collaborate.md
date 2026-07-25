@@ -1,7 +1,7 @@
 ---
 name: confluence-collaborate
 description: Use for Confluence comments, attachments, labels, and watchers via the confluence-as CLI wrapper. Not for page CRUD or bulk ops.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

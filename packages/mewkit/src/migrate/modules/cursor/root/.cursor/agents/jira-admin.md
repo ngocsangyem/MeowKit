@@ -1,7 +1,7 @@
 ---
 name: jira-admin
 description: Use for JIRA project, user, group, scheme, and automation administration via the jira-as CLI wrapper. Requires Jira admin role. Not for per-issue ops or JSM admin.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

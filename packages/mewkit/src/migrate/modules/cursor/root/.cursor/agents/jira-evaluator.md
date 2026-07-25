@@ -1,7 +1,7 @@
 ---
 name: jira-evaluator
 description: Use for analyzing a single Jira ticket's complexity and inconsistencies via the jira-as CLI wrapper. Read-only. Not for story-point estimation or full root-cause analysis.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: true
 is_background: true
 ---

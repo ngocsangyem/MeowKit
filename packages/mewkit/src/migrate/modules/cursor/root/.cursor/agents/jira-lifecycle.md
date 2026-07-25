@@ -1,7 +1,7 @@
 ---
 name: jira-lifecycle
 description: Use for JIRA workflow lifecycle via the jira-as CLI wrapper — transitions, assign/unassign, resolve/reopen, versions. Not for issue CRUD, comments, or bulk transitions.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

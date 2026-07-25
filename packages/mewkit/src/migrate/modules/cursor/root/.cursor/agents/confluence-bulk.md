@@ -1,7 +1,7 @@
 ---
 name: confluence-bulk
 description: Use for bulk Confluence operations on 10+ pages via the confluence-as CLI wrapper — bulk-label, bulk-move, bulk-delete. Dry-run is mandatory first. Not for single-page ops or comments/attachments.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

@@ -1,7 +1,7 @@
 ---
 name: jira-bulk
 description: Use for bulk JIRA ops on 10+ issues via the jira-as CLI wrapper — transition, assign, set-priority, clone, delete. Dry-run is mandatory first. Not for single-issue ops.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

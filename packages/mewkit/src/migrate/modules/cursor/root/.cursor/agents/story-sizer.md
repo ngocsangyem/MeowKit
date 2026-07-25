@@ -1,7 +1,7 @@
 ---
 name: story-sizer
 description: Use for heuristic Fibonacci sizing of a pasted batch of user stories. Read-only against Jira; writes a Story Sizing Report locally. Auto-create mode delegates ticket creation to peer Jira agents.
-model: inherit
+model: claude-sonnet-5
 readonly: false
 is_background: true
 ---

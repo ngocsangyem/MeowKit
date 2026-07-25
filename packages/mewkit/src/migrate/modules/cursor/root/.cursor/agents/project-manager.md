@@ -1,7 +1,7 @@
 ---
 name: project-manager
 description: Use to aggregate plan, review, and cost state into an evidence-based delivery status report. Use proactively after phase completions or when asked "what's done/blocked/status". Backward-looking only.
-model: inherit
+model: claude-sonnet-5
 readonly: false
 is_background: true
 ---

@@ -1,7 +1,7 @@
 ---
 name: confluence-page
 description: Use for Confluence page CRUD, hierarchy, and version ops via the confluence-as CLI wrapper — "create page in SPACE", "show page 12345". Not for bulk ops, spec analysis, or comments.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

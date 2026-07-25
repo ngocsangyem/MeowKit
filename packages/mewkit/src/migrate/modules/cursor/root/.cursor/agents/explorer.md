@@ -1,7 +1,7 @@
 ---
 name: explorer
 description: Use when locating code, tracing how a feature works, or building fast repo orientation. Use proactively before unfamiliar work. Not for planning or producing a review verdict.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: true
 is_background: false
 ---

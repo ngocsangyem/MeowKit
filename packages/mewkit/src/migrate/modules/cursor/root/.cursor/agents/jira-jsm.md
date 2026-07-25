@@ -1,7 +1,7 @@
 ---
 name: jira-jsm
 description: Use for JIRA Service Management via the jira-as CLI wrapper — service desks, requests, customers, queues, SLAs, approvals. Requires a JSM tenant + agent/admin role. Not for core issue ops.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

@@ -1,7 +1,7 @@
 ---
 name: jira-ops
 description: Use for inspecting the jira-as wrapper's local cache and running project-context discovery. Diagnostic surface only. Not for issue CRUD or project admin.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

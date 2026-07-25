@@ -1,7 +1,7 @@
 ---
 name: jira-issue
 description: Use for JIRA issue CRUD via the jira-as CLI wrapper — "create bug/task/story", "show me PROJ-123", "update/delete issue". Not for transitions, comments, bulk ops, or sprint work.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: false
 ---

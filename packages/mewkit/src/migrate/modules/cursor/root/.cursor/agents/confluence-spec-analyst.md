@@ -1,7 +1,7 @@
 ---
 name: confluence-spec-analyst
 description: Use for reading a full Confluence spec page and children into a structured Spec Research Report — requirements, gaps, ambiguities. Read-only. Not for page CRUD or complexity scoring.
-model: inherit
+model: composer-2.5[fast=true]
 readonly: false
 is_background: true
 ---
