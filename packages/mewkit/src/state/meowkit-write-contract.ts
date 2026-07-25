@@ -6,9 +6,10 @@
 // Skills/hooks/adapters never construct provider paths or hand-roll this pipeline.
 import { existsSync } from "node:fs";
 import * as fsp from "node:fs/promises";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { CURATED_STORES, type StoreSpec } from "../memory/schemas.js";
 import { resolveMeowkitRoot } from "./meowkit-root-resolver.js";
+import { resolveStateDir } from "./resolve-state-dir.js";
 import { scrubSecrets, validateContent, normalizeForScan } from "./injection-scanner.js";
 import { withStoreLock, type StoreLockOptions } from "./store-lock.js";
 
@@ -95,6 +96,9 @@ export async function writeStoreEntry(
 	const spec = specFor(store);
 	const meowkitRoot = opts.meowkitRoot ?? resolveMeowkitRoot(opts.startDir ?? process.cwd());
 	if (!meowkitRoot) throw new Error("cannot resolve a project root for the .meowkit/ state directory");
+	// A pre-migration project still keeps its curated stores in the legacy tree; resolve
+	// through the shared fallback so a capture never starts a second history.
+	const memoryRoot = resolveStateDir(dirname(meowkitRoot), "memory");
 	const now = opts.now ?? new Date().toISOString();
 
 	// Scan the RAW entry first (reject) — secret scrub runs on the accepted entry.
@@ -102,8 +106,7 @@ export async function writeStoreEntry(
 	if (injection) return { ok: false, reason: "injection", detail: injection };
 	const scrubbed = scrubEntry(entry, spec);
 
-	const memoryDir = join(meowkitRoot, "memory");
-	const targetPath = join(memoryDir, spec.file);
+	const targetPath = join(memoryRoot, spec.file);
 
 	return withStoreLock(
 		meowkitRoot,
@@ -135,7 +138,7 @@ export async function writeStoreEntry(
 				return { ok: false, reason: "schema", detail };
 			}
 
-			await fsp.mkdir(memoryDir, { recursive: true });
+			await fsp.mkdir(memoryRoot, { recursive: true });
 			await atomicReplace(targetPath, `${JSON.stringify(candidate, null, 2)}\n`);
 			return { ok: true, deduped: false, entryId };
 		},
