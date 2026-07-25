@@ -37,18 +37,9 @@ The Atlassian-MCP-coupled implementation has been removed. Jira execution now li
 
 ## Setup
 
-One-time:
+Install, authentication, safety rules, and troubleshooting live on [Jira Integration](/guides/jira-integration). The variable list is in [Configuration](/reference/configuration#jira).
 
-```bash
-npx mewkit setup           # auto-installs jira-as into .claude/skills/.venv
-cp .meowkit/.env.example .meowkit/.env
-# edit MEOW_JIRA_API_TOKEN, MEOW_JIRA_EMAIL, MEOW_JIRA_SITE_URL
-```
-
-The SessionStart hook `jira-env-loader.sh` validates `.meowkit/.env` and emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing`. The wrapper `scripts/jira-as.sh` translates `MEOW_JIRA_*` → native `JIRA_*` env per call.
-
-See [Environment Variables — Jira](/reference/configuration#jira) for the full list.
-
+Mechanically: the SessionStart hook `jira-env-loader.sh` validates `.meowkit/.env` and emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing`; the wrapper `scripts/jira-as.sh` translates `MEOW_JIRA_*` -> native `JIRA_*` env per call.
 ## Architecture
 
 ```

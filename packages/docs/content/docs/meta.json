@@ -23,6 +23,8 @@
     "guides/review-code",
     "guides/ship-safely",
     "guides/autonomous-build",
+    "guides/jira-integration",
+    "guides/confluence-integration",
     "---Advanced---",
     "guide/harness-architecture",
     "guide/adaptive-density",

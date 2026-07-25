@@ -35,19 +35,11 @@ Confluence execution lives in 5 thin leaf skills (each forks a dedicated agent i
 - **Comments / attachments / watchers:** always `mk:confluence-collaborate`, even if scoped to a single page.
 - Truly ambiguous → ask one clarifying question.
 
-## Setup
+## Setu## Setup
 
-One-time:
+Install, authentication, the Cloud-only boundary, and troubleshooting live on [Confluence Integration](/guides/confluence-integration).
 
-```bash
-npx mewkit setup           # auto-installs confluence-as into .claude/skills/.venv
-cp .meowkit/.env.example .meowkit/.env
-# edit MEOW_CONFLUENCE_API_TOKEN, MEOW_CONFLUENCE_EMAIL, MEOW_CONFLUENCE_SITE_URL
-```
-
-Cloud-only — the wrapper exits 3 on non-`*.atlassian.net` URLs. For Server / Data Center, use the Atlassian MCP escape hatch documented in `references/install-and-auth.md`. The hub does NOT auto-fallback.
-
-## Architecture
+Mechanically: the wrapper exits 3 on non-`*.atlassian.net` URLs, and the hub does NOT auto-fallback to the Atlassian MCP transport - the leaf is invoked with it explicitly.chitecture
 
 ```
 mk:confluence (router, ≤80 lines)              ← recommends a leaf, never executes
