@@ -21,8 +21,9 @@ The table above governs the **session** model by task complexity. **Subagents** 
 |---|---|---|
 | Claude Code | `.claude/agents/<name>.md` frontmatter | `model:` — `opus` / `sonnet` / `haiku` / `fable` / `inherit` |
 | Codex | `.codex/agents/<name>.toml` | `model_reasoning_effort`, derived from the agent's Claude `model:` tier: opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` omits it and inherits Codex's default |
+| Cursor | `.cursor/agents/<name>.md` frontmatter | `model:` — a concrete Cursor model id (e.g. `claude-opus-5[effort=high]`, `composer-2.5[fast=true]`) or `inherit`. See [Cursor Agent Models](/guide/cursor-agent-models) for the full per-agent table. |
 
-The Codex value is derived from `model:` at migration time (`.claude/agents/*.md` is the single source), so the two providers stay in sync. Codex model **ids** are deployment-specific and are never hardcoded — only the portable reasoning-effort ladder is written.
+The Codex value is derived from `model:` at migration time (`.claude/agents/*.md` is the single source), so the two providers stay in sync. Codex model **ids** are deployment-specific and are never hardcoded — only the portable reasoning-effort ladder is written. The Cursor native bundle instead pins concrete Cursor model ids per agent — see [Cursor Agent Models](/guide/cursor-agent-models).
 
 ## Escalation rules
 
