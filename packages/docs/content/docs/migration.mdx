@@ -45,7 +45,7 @@ Markdown content is rewritten with a fence-aware classifier instead of blanket s
 | Reference | Inline prose / frontmatter | Fenced code (runnable) | Citation |
 |-----------|---------------------------|------------------------|----------|
 | Mapped asset (`.claude/skills/x/...`) | rewritten to the provider path | rewritten **only if** the asset migrates in the same run, else preserved + warned | preserved |
-| Unmapped runtime (`.claude/scripts/`, `.claude/memory/`) | neutralized to provider-agnostic phrasing | preserved + warned | preserved |
+| Unmapped runtime (`.claude/scripts/`, `.meowkit/memory/`) | neutralized to provider-agnostic phrasing | preserved + warned | preserved |
 | `CLAUDE.md` token | rewritten to the provider config name | preserved (command examples stay runnable) | preserved |
 
 Every preserved reference appears in the preflight/dry-run report with `file:line` and a reason — nothing is silently dropped, and no path is ever fabricated. A post-conversion scanner verifies the invariant: any surviving source reference must be explained by a classifier decision, otherwise the run aborts before writing. Codex runs also persist the outcome to `.codex/migration-report.json` and `.codex/migration-report.md`, with one row per migrated, skipped, failed, or narrowed artifact.
@@ -248,5 +248,5 @@ npx mewkit upgrade --check   # show available without installing
 ## See also
 
 - [CLI Commands Reference](/cli/commands#migrate) — every flag with examples
-- [Memory System](/guide/memory-system#legacy-migration-from-claudememory) — every `mewkit migrate` run also migrates legacy `.claude/memory/` into `.meowkit/`
+- [Memory System](/guide/memory-system#legacy-migration-from-claudememory) — every `mewkit migrate` run also migrates legacy `.meowkit/memory/` into `.meowkit/`
 - [TDD Optional Migration](/migration/tdd-optional) — older migration guide for the v2.x TDD-optional change

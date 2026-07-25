@@ -10,7 +10,7 @@ Every harness component encodes an assumption. Assumptions age. The meta-loop is
 ```mermaid
 flowchart TD
     A[Harness runs] --> B[Hooks emit trace records\nappend-trace.sh]
-    B --> C[.claude/memory/trace-log.jsonl]
+    B --> C[.meowkit/telemetry/trace-log.jsonl]
     C --> D[/mk:trace-analyze\nScatter-gather 3 researchers]
     D --> E{HITL gate\nAskUserQuestion}
     E -- Approved --> F[Apply harness changes]
@@ -25,7 +25,7 @@ The loop is intentionally slow and human-gated. Trace content is DATA (per `inje
 
 ## Trace Log Format
 
-**Location:** `.claude/memory/trace-log.jsonl`
+**Location:** `.meowkit/telemetry/trace-log.jsonl`
 
 Append-only JSONL. Every record has the same top-level envelope:
 
@@ -143,8 +143,8 @@ Full playbook: `docs/dead-weight-audit.md`.
 When `trace-log.jsonl` exceeds **50MB**, `append-trace.sh` rotates it:
 
 ```
-.claude/memory/trace-log.jsonl              ← active log (reset to empty after rotation)
-.claude/memory/trace-log.{YYMMDD-HHMMSS}.jsonl.gz  ← compressed archive
+.meowkit/telemetry/trace-log.jsonl              ← active log (reset to empty after rotation)
+.meowkit/memory/trace-log.{YYMMDD-HHMMSS}.jsonl.gz  ← compressed archive
 ```
 
 Rotation is triggered on every append that finds the file over the size limit. No cron required.
@@ -157,7 +157,7 @@ This is a hard requirement — trace records are often read by `mk:trace-analyze
 
 ## Canonical Sources
 
-- `.claude/memory/trace-log.jsonl` — append-only trace store
+- `.meowkit/telemetry/trace-log.jsonl` — append-only trace store
 - `.claude/hooks/append-trace.sh` — trace writer (flock + scrub + rotation)
 - `docs/dead-weight-audit.md` — full 6-step audit playbook + assumption registry
 - `.claude/skills/trace-analyze/SKILL.md` — scatter-gather workflow spec

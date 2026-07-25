@@ -109,7 +109,7 @@ For each session-state file, here is what it does and why `--resume` cannot repl
 <details>
 <summary>Lifecycle</summary>
 
-Most session-state files are wiped by `project-context-loader.sh` on session-id change (when `last-session-id` differs from the current session). Inside a single session, they accumulate. The `checkpoints/` directory holds the *current* checkpoint; `cost-log.json` (durable, in `.claude/memory/`) holds the *historical* per-session aggregate.
+Most session-state files are wiped by `project-context-loader.sh` on session-id change (when `last-session-id` differs from the current session). Inside a single session, they accumulate. The `checkpoints/` directory holds the *current* checkpoint; `cost-log.json` (durable, in `.meowkit/memory/`) holds the *historical* per-session aggregate.
 
 </details>
 
@@ -120,7 +120,7 @@ Most session-state files are wiped by `project-context-loader.sh` on session-id 
 | "What was said in the last conversation?" | `--resume` (transcript) |
 | "What was the agent doing when the session ended?" | `session-state/checkpoints/` (resume context) |
 | "Has the agent been editing the same file too many times?" | `session-state/edit-counts.json` (loop guard) |
-| "Did this session go over budget?" | `session-state/budget-state.json` (live) + `.claude/memory/cost-log.json` (historical) |
+| "Did this session go over budget?" | `session-state/budget-state.json` (live) + `.meowkit/telemetry/cost-log.json` (historical) |
 | "Which model tier is this session running on?" | `session-state/detected-model.json` |
 | "Has the working directory drifted since last checkpoint?" | `session-state/checkpoints/checkpoint-latest.json` (git hash compare) |
 | "What rules and skills apply to this project?" | `CLAUDE.md`, `.claude/rules/`, `.claude/skills/` (loaded by `--resume`) |

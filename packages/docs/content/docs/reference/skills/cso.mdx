@@ -74,7 +74,7 @@ Scope flags are **mutually exclusive**. If multiple scope flags are passed, the 
 | 11 | Data Classification | PII/credentials in logs, data at rest, data in transit |
 | 12 | False Positive Filtering | 22 hard-exclusion rules + confidence gate + active verification + variant analysis |
 | 13 | Report + Remediation | Findings with exploit scenarios, trend tracking, incident response playbooks, remediation roadmap |
-| 14 | Save Report | JSON schema to `.claude/memory/security-reports/` |
+| 14 | Save Report | JSON schema to `.meowkit/memory/security-reports/` |
 
 Phases 0, 1, 12, 13, 14 ALWAYS run regardless of scope flag.
 
@@ -149,7 +149,7 @@ For the top 5 findings, presents via AskUserQuestion with options: Fix now (spec
 5. **Assessment** -- OWASP Top 10 + STRIDE + data classification (Phases 9-11)
 6. **Filtering** -- false positive elimination, confidence gate, active verification, variant analysis (Phase 12)
 7. **Report** -- findings with exploit scenarios, trend tracking, remediation roadmap, disclaimer (Phase 13)
-8. **Save** -- JSON report to `.claude/memory/security-reports/` (Phase 14)
+8. **Save** -- JSON report to `.meowkit/memory/security-reports/` (Phase 14)
 
 ## Usage
 

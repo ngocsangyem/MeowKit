@@ -27,7 +27,7 @@ Performs systematic root cause debugging with a strict methodology: investigate 
 - **Blast radius check:** If >5 files touched, prompts user before proceeding
 - **Specialized technique dispatch:** Routes to deep stack trace analysis, system investigation, log analysis, or performance diagnostics based on bug type
 - **Pattern library:** Recognizes common failure patterns (race conditions, nil propagation, state corruption, integration failures, configuration drift, stale cache)
-- **Memory integration:** Reads `.claude/memory/fixes.md` and `.claude/memory/architecture-decisions.md`; writes diagnosis records
+- **Memory integration:** Reads `.meowkit/memory/fixes.md` and `.meowkit/memory/architecture-decisions.md`; writes diagnosis records
 - **Protocol compliance:** Follows shared protocols for AskUserQuestion format, completeness principle, telemetry, completion status
 
 ## Workflow
@@ -93,6 +93,6 @@ The skill collects the error trace, reads the search controller code, checks rec
 - **Check `TODOS.md` and prior fixes** -- many bugs are recurrences of previous issues
 - **Use `mk:freeze` for complex modules** -- scope-lock prevents accidentally touching unrelated files
 - **3 strikes and escalate** -- if you've tested 3 wrong hypotheses, your mental model is wrong; get fresh perspective
-- **The skill writes to `.claude/memory/fixes.md`** -- these diagnosis records build institutional knowledge over time
+- **The skill writes to `.meowkit/memory/fixes.md`** -- these diagnosis records build institutional knowledge over time
 
 > **Canonical source:** `.claude/skills/investigate/SKILL.md`

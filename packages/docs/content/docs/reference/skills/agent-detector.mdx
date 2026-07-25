@@ -88,7 +88,7 @@ Complexity fallback: TRIVIAL -> Essential, STANDARD -> Moderate, COMPLEX -> Deta
 
 3. **Step 1: Extract Keywords** — Extract action keywords ("fix", "implement", "design"), component names, platform mentions, and issue descriptions from the user message.
 
-4. **Step 2: Check Project Context** — Read `.claude/memory/fixes.md`, `review-patterns.md`, `architecture-decisions.md`. If insufficient, run `mk:scout` or read `package.json`/`tsconfig.json` directly.
+4. **Step 2: Check Project Context** — Read `.meowkit/memory/fixes.md`, `review-patterns.md`, `architecture-decisions.md`. If insufficient, run `mk:scout` or read `package.json`/`tsconfig.json` directly.
 
 5. **Step 3: Score All Agents** — Combine task scores and repo scores across all 5 layers. Each agent gets a weighted total.
 
@@ -96,7 +96,7 @@ Complexity fallback: TRIVIAL -> Essential, STANDARD -> Moderate, COMPLEX -> Deta
 
 7. **Step 5: Show Banner** — Display detection result banner at start of response. Single-agent or multi-agent format depending on collaboration needs.
 
-8. **After Detection** — Load agent instructions from `.claude/agents/[agent-name].md`. Invoke the appropriate skill (mk:cook, mk:fix, mk:investigate, mk:review, mk:cso). Context loaded on demand from `.claude/memory/` topic files.
+8. **After Detection** — Load agent instructions from `.claude/agents/[agent-name].md`. Invoke the appropriate skill (mk:cook, mk:fix, mk:investigate, mk:review, mk:cso). Context loaded on demand from `.meowkit/memory/` topic files.
 
 ## Example Prompt
 

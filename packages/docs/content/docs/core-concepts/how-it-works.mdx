@@ -109,14 +109,14 @@ Write paths: immediate capture via `##pattern:` / `##decision:` / `##note:` pref
 
 ### Wiki: gated long-term knowledge
 
-Curated memory above is short-lived, schema-validated JSON for engineering learnings. For long-term, provenance-bearing project knowledge there is a separate layer — the **`mewkit wiki`** subsystem (`mk:wiki` / `mk:wiki-research` / `mk:wiki-render`). Canonical pages live under `tasks/wikis/<slug>/`; a derived, rebuildable FTS index lives in `.claude/memory/wiki-index.db`.
+Curated memory above is short-lived, schema-validated JSON for engineering learnings. For long-term, provenance-bearing project knowledge there is a separate layer — the **`mewkit wiki`** subsystem (`mk:wiki` / `mk:wiki-research` / `mk:wiki-render`). Canonical pages live under `tasks/wikis/<slug>/`; a derived, rebuildable FTS index lives in `.meowkit/cache/wiki-index.db`.
 
 Its defining property is an **anti-self-poisoning write model**: external content and agent output are DATA, so an agent may only *propose* a `WikiCandidate`. A canonical page is written **only** through a human `mewkit wiki approve`, which always re-runs the secret-scrub + multi-pass injection scanner — there is no path from assistant output to a canonical page. This mirrors the same security stance the hooks enforce elsewhere: untrusted input never becomes a trusted instruction.
 
 | | Curated memory (`fixes`, `review-patterns`, …) | Wiki (`mewkit wiki`) |
 |---|---|---|
 | Lifetime | Short-term engineering learnings | Long-term project knowledge |
-| Store | Schema-validated JSON in `.claude/memory/` | Canonical files in `tasks/wikis/<slug>/` + derived FTS index |
+| Store | Schema-validated JSON in `.meowkit/memory/` | Canonical files in `tasks/wikis/<slug>/` + derived FTS index |
 | Write path | Agent/hook capture by prefix | Agent proposes; **human approves** (re-scans) |
 | Read | Skill loads its topic file at task start | `mewkit wiki search` / `hint` (FTS, provenance-bearing) |
 

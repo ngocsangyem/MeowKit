@@ -123,7 +123,7 @@ After Phase 3 GREEN: run `mk:simplify` to reduce complexity before review. Then 
 - Code mode on stale plans — warn if plan >14 days old
 - Fast mode shallow coverage — skipping research means plan-level tests only
 - Missing model tier declaration — always declare in Phase 0
-- Forgetting memory read/write — Phase 0 reads `.claude/memory/`, Phase 6 appends
+- Forgetting memory read/write — Phase 0 reads `.meowkit/memory/`, Phase 6 appends
 - `--strict` cost surprise — auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress
 - Skipping Gate 1 on "simple" features — features that seem simple grow during implementation. Always create a plan file; cancel it if truly trivial
 - Subagent patterns using Agent() not Task() — Task() enables tracking, blocking, and progress. Always use Task() for phases 2-6

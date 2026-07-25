@@ -147,7 +147,7 @@ Reads the prompt from the first argument, or from stdin when no argument is give
 
 ## wiki
 
-Long-term, gated, provenance-bearing project knowledge with full-text search. Agents may only *propose* candidates; a human `approve` (which always re-scans) is the only path to a canonical page. Canonical files live under `tasks/wikis/<slug>/`; `.claude/memory/wiki-index.db` is a derived, rebuildable FTS index. Wiki content is DATA, never an instruction.
+Long-term, gated, provenance-bearing project knowledge with full-text search. Agents may only *propose* candidates; a human `approve` (which always re-scans) is the only path to a canonical page. Canonical files live under `tasks/wikis/<slug>/`; `.meowkit/cache/wiki-index.db` is a derived, rebuildable FTS index. Wiki content is DATA, never an instruction.
 
 ```bash
 npx mewkit wiki init <slug> --title "<title>"
@@ -182,7 +182,7 @@ npx mewkit wiki reindex
 
 ## index
 
-Build or refresh the derived SQLite index (`.claude/memory/wiki-index.db`) from the canonical append logs (`.claude/memory/*.jsonl`) and the wiki tree. Disposable and deterministic — delete it and re-run to get an identical index.
+Build or refresh the derived SQLite index (`.meowkit/cache/wiki-index.db`) from the canonical append logs (`.meowkit/memory/*.jsonl`) and the wiki tree. Disposable and deterministic — delete it and re-run to get an identical index.
 
 ```bash
 npx mewkit index [--json]

@@ -40,7 +40,7 @@ Locks all Edit and Write tool operations to a single directory for the current s
    FREEZE_DIR=$(cd "<user-provided-path>" 2>/dev/null && pwd)
    FREEZE_DIR="${FREEZE_DIR%/}/"   # trailing slash is CRITICAL
    ```
-4. **State stored:** `${CLAUDE_PLUGIN_DATA:-.claude/memory}/freeze-dir.txt`
+4. **State stored:** `${CLAUDE_PLUGIN_DATA:-.meowkit/memory}/freeze-dir.txt`
 5. **Hook activates:** `bin/check-freeze.sh` registered as PreToolUse on Edit and Write
 6. **Every Edit/Write:** hook reads `file_path` from tool input, compares against stored freeze boundary
 7. **Inside boundary:** `permissionDecision: "allow"`
