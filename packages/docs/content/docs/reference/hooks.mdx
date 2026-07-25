@@ -67,7 +67,7 @@ These hooks are telemetry-only — they log event fires to verify Claude Code su
 
 ## Hook runtime profiling
 
-The `MEOW_HOOK_PROFILE` environment variable controls which hooks are active. Set it in your `.env` file or shell before starting a Claude Code session.
+The `MEOWKIT_HOOK_PROFILE` environment variable controls which hooks are active. Set it in your `.env` file or shell before starting a Claude Code session.
 
 | Profile    | Hooks Active                                                                | Use When                              |
 | ---------- | --------------------------------------------------------------------------- | ------------------------------------- |
@@ -77,7 +77,7 @@ The `MEOW_HOOK_PROFILE` environment variable controls which hooks are active. Se
 
 ```bash
 # Set in .env or shell
-MEOW_HOOK_PROFILE=fast
+MEOWKIT_HOOK_PROFILE=fast
 ```
 
 ### Per-hook profile classification
@@ -233,4 +233,4 @@ node dispatch.cjs <EventName> [Matcher]
 | `MEOWKIT_PRECOMPLETION=off`      | Skip `pre-completion-check.sh`                                        |
 | `MEOWKIT_AUTOBUILD_MODE=LEAN`      | PreCompletion falls back to soft nudge; BuildVerify still runs        |
 | `MEOWKIT_AUTOBUILD_MODE=MINIMAL`   | Skip BuildVerify + PreCompletion entirely                             |
-| `MEOW_HOOK_PROFILE=fast`         | Skip `pre-ship`, `post-session`, `learning-observer` (speed)          |
+| `MEOWKIT_HOOK_PROFILE=fast`         | Skip `pre-ship`, `post-session`, `learning-observer` (speed)          |

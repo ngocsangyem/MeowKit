@@ -38,7 +38,7 @@ fi
 
 # Hook profile gating — CF7 fix: run by default, opt-OUT only on fast profile
 # Memory capture, cost tracking, and trace records require this hook to run.
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 case "$MEOW_PROFILE" in
   fast) exit 0 ;;
 esac

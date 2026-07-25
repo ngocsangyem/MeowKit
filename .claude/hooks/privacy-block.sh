@@ -22,7 +22,7 @@
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
 # Hook profile gating — safety-critical: NEVER skip regardless of profile
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 
 # Phase 7 (260408): source JSON-on-stdin parser; prefer HOOK_* env vars, fall back to $1.
 if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then

@@ -19,7 +19,7 @@
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
 # Hook profile gating — safety-critical: NEVER skip regardless of profile
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 
 # Phase 7 migration: hooks now source the JSON-on-stdin parser shim and prefer
 # $HOOK_FILE_PATH from stdin. Falls back to $1 positional if stdin empty (back-compat).

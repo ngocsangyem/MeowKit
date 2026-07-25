@@ -166,7 +166,7 @@ All `MEOWKIT_*` env vars. Set in your shell profile (`~/.zshrc`, `~/.bashrc`) or
 |----------|---------|---------|-------------|
 | `MEOWKIT_TDD` | `off` | Enable strict TDD enforcement (RED-phase gate). Values: `1`, `true`, `on`, `enabled` | Production-quality code, payment/auth features. Opt-in — most users leave this off. |
 | `MEOWKIT_MODEL_HINT` | *(none)* | Fallback model ID for tier detection when SessionStart stdin lacks `model` field | Only if `model-detector.cjs` shows "not detected". Most users don't need this — stdin auto-detection is primary since v2.3.0. |
-| `MEOW_HOOK_PROFILE` | `standard` | Hook execution profile. `standard` = normal, `fast` = skip non-critical hooks (post-session, learning-observer, pre-ship), `strict` = all hooks enabled | `fast` for rapid iteration/spike work. `strict` for production sessions needing full memory capture. |
+| `MEOWKIT_HOOK_PROFILE` | `standard` | Hook execution profile. `standard` = normal, `fast` = skip non-critical hooks (post-session, learning-observer, pre-ship), `strict` = all hooks enabled. Legacy alias `MEOW_HOOK_PROFILE` still works; the new name wins when both are set | `fast` for rapid iteration/spike work. `strict` for production sessions needing full memory capture. |
 | `CLAUDE_CODE_FORK_SUBAGENT` | `1` (set in `settings.json` `env` block by default since v2.8.3) | Enables Claude Code's `context: fork` semantics so the 16 `mk:jira-*` thin skills fork into their matching agents. | Leave default. Unset only when explicitly debugging fork-mode behavior. |
 
 ### Jira
@@ -221,12 +221,12 @@ Memory is loaded on-demand by consumer skills via `Read` calls — there is no p
 **Production session with TDD and strict hooks:**
 ```bash
 export MEOWKIT_TDD=1
-export MEOW_HOOK_PROFILE=strict
+export MEOWKIT_HOOK_PROFILE=strict
 ```
 
 **Quick prototyping session:**
 ```bash
-export MEOW_HOOK_PROFILE=fast
+export MEOWKIT_HOOK_PROFILE=fast
 export MEOWKIT_BUILD_VERIFY=off
 ```
 

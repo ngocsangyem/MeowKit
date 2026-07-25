@@ -26,7 +26,7 @@ if [ ! -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/dispatch.cjs" ]; then
 fi
 
 # Hook profile gating — context loading always needed: NEVER skip regardless of profile
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 
 CONTEXT_FILE="docs/project-context.md"
 VENV_PYTHON=".claude/skills/.venv/bin/python3"

@@ -57,7 +57,7 @@ else
 fi
 
 # Hook profile gating — skip pre-deploy checks in fast profile
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 case "$MEOW_PROFILE" in
   fast) exit 0 ;;
 esac

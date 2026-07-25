@@ -14,7 +14,7 @@
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
 # Hook profile gating — skip context check in fast profile for speed
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 case "$MEOW_PROFILE" in
   fast) exit 0 ;;
 esac
