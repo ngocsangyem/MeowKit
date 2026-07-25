@@ -1,0 +1,230 @@
+<!-- Authored independently. Inspired by external preview template patterns. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mermaid Flowchart Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface2: #e9edf2;
+  --border: #c3cad3;
+  --text: #131820;
+  --text-dim: #4a5563;
+  --accent: #0f5b8a;
+  --accent2: #b54708;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1217;
+    --surface: #161c24;
+    --surface2: #1f2730;
+    --border: #2c3543;
+    --text: #e8edf2;
+    --text-dim: #99a3b1;
+    --accent: #6db4dc;
+    --accent2: #f1995c;
+  }
+}
+[data-theme="dark"] {
+  --bg: #0e1217;
+  --surface: #161c24;
+  --surface2: #1f2730;
+  --border: #2c3543;
+  --text: #e8edf2;
+  --text-dim: #99a3b1;
+  --accent: #6db4dc;
+  --accent2: #f1995c;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 300;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.theme-toggle:hover { background: var(--surface2); color: var(--text); }
+.page { max-width: 1200px; margin: 0 auto; padding: 56px 32px 80px; }
+.hero { padding-bottom: 24px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+.hero h1 { font-size: 32px; margin: 0 0 6px; letter-spacing: -0.01em; }
+.hero p { color: var(--text-dim); margin: 0; }
+.diagram-stage {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  min-height: 540px;
+  cursor: grab;
+}
+.diagram-stage.dragging { cursor: grabbing; }
+.diagram-canvas {
+  transform-origin: 0 0;
+  transition: transform 0.05s linear;
+  padding: 28px;
+  display: inline-block;
+}
+.diagram-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+.diagram-controls button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "IBM Plex Mono", monospace;
+}
+.diagram-controls button:hover { background: var(--surface); }
+.legend {
+  margin-top: 20px;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .dot { width: 10px; height: 10px; border-radius: 2px; }
+.help {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-family: "IBM Plex Mono", monospace;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle light/dark theme"></button>
+
+<main class="page">
+  <header class="hero">
+    <h1>{TOPIC_TITLE}</h1>
+    <p>{TOPIC_SUMMARY}</p>
+  </header>
+
+  <div class="diagram-stage">
+    <div class="diagram-controls">
+      <button data-zoom-out title="Zoom out">−</button>
+      <button data-zoom-reset title="Reset">○</button>
+      <button data-zoom-in title="Zoom in">+</button>
+    </div>
+    <div class="diagram-canvas">
+      <pre class="mermaid">
+flowchart TD
+  Start([Start]) --> Decide{Branch?}
+  Decide -->|yes| Path1[Path 1]
+  Decide -->|no| Path2[Path 2]
+  Path1 --> End([End])
+  Path2 --> End
+  classDef edge fill:#dbeafe,stroke:#1e40af,color:#1e3a8a
+  classDef leaf fill:#fef3c7,stroke:#92400e,color:#92400e
+  class Start,End edge
+  class Path1,Path2 leaf
+      </pre>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot" style="background:#dbeafe;border:1px solid #1e40af;"></span> entry / exit</span>
+    <span><span class="dot" style="background:#fef3c7;border:1px solid #92400e;"></span> branch path</span>
+  </div>
+
+  <p class="help">scroll to zoom · drag to pan · keys: + − 0</p>
+</main>
+
+<script>
+(function () {
+  var toggle = document.getElementById('themeToggle');
+  var saved = localStorage.getItem('theme');
+  var initial = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  if (saved) document.documentElement.setAttribute('data-theme', initial);
+  toggle.textContent = initial === 'dark' ? '☀' : '☾';
+  toggle.addEventListener('click', function () {
+    var current = document.documentElement.getAttribute('data-theme')
+      || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    toggle.textContent = next === 'dark' ? '☀' : '☾';
+  });
+})();
+</script>
+
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";
+mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose", flowchart: { curve: "basis" } });
+</script>
+
+<script>
+(function () {
+  var stages = document.querySelectorAll('.diagram-stage');
+  stages.forEach(function (stage) {
+    var canvas = stage.querySelector('.diagram-canvas');
+    var scale = 1, x = 0, y = 0;
+    var dragging = false, sx = 0, sy = 0;
+    function apply() { canvas.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + scale + ')'; }
+    function reset() { scale = 1; x = 0; y = 0; apply(); }
+    stage.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      var rect = stage.getBoundingClientRect();
+      var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      var delta = e.deltaY < 0 ? 1.1 : 0.9;
+      var newScale = Math.max(0.3, Math.min(4, scale * delta));
+      x = mx - (mx - x) * (newScale / scale);
+      y = my - (my - y) * (newScale / scale);
+      scale = newScale;
+      apply();
+    }, { passive: false });
+    stage.addEventListener('mousedown', function (e) {
+      dragging = true; sx = e.clientX - x; sy = e.clientY - y;
+      stage.classList.add('dragging');
+    });
+    window.addEventListener('mouseup', function () { dragging = false; stage.classList.remove('dragging'); });
+    window.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      x = e.clientX - sx; y = e.clientY - sy;
+      apply();
+    });
+    var rb = stage.querySelector('[data-zoom-reset]'); if (rb) rb.addEventListener('click', reset);
+    var zi = stage.querySelector('[data-zoom-in]'); if (zi) zi.addEventListener('click', function () { scale = Math.min(4, scale * 1.2); apply(); });
+    var zo = stage.querySelector('[data-zoom-out]'); if (zo) zo.addEventListener('click', function () { scale = Math.max(0.3, scale * 0.83); apply(); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === '+' || e.key === '=') document.querySelector('[data-zoom-in]')?.click();
+    if (e.key === '-') document.querySelector('[data-zoom-out]')?.click();
+    if (e.key === '0') document.querySelector('[data-zoom-reset]')?.click();
+  });
+})();
+</script>
+</body>
+</html>

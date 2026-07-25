@@ -33,6 +33,122 @@
 				"mk-verify",
 				"mk-workflow-orchestrator"
 			]
+		},
+		"development": {
+			"description": "Coding-domain helpers (languages, frameworks, architecture, merge conflicts, skill authoring) layered on top of the core lifecycle.",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-angular",
+				"mk-api-design",
+				"mk-autobuild",
+				"mk-bootstrap",
+				"mk-build-fix",
+				"mk-chom",
+				"mk-clean-code",
+				"mk-database",
+				"mk-improve-codebase-architecture",
+				"mk-planning-engine",
+				"mk-react-patterns",
+				"mk-resolving-merge-conflicts",
+				"mk-skill-creator",
+				"mk-skill-template-secure",
+				"mk-sprint-contract",
+				"mk-typescript",
+				"mk-vue",
+				"mk-vue-best-practices",
+				"mk-vue-testing-best-practices"
+			]
+		},
+		"review": {
+			"description": "Quality, security, and evaluation skills (audits, rubrics, coverage, PR review) beyond the core review step.",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-benchmark",
+				"mk-context-audit",
+				"mk-context-engineering",
+				"mk-cso",
+				"mk-evaluate",
+				"mk-nyquist",
+				"mk-qa",
+				"mk-qa-manual",
+				"mk-respond-pr",
+				"mk-review-pr",
+				"mk-rubric",
+				"mk-trace-analyze",
+				"mk-vulnerability-scanner"
+			]
+		},
+		"product": {
+			"description": "Product/planning/PM skills: ticket intake, estimation, retros, plan critique, and decision interviews.",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-advise",
+				"mk-ask-me",
+				"mk-decision-framework",
+				"mk-elicit",
+				"mk-ghpm",
+				"mk-grill",
+				"mk-intake",
+				"mk-office-hours",
+				"mk-plan-ceo-review",
+				"mk-problem-solving",
+				"mk-retro",
+				"mk-story-sizer",
+				"mk-visual-plan"
+			]
+		},
+		"operations": {
+			"description": "Ops, docs-site, wiki, session-scoped guardrails, parallel-agent, and browser-automation helpers.",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-agent-browser",
+				"mk-careful",
+				"mk-chrome-profile",
+				"mk-docs-finder",
+				"mk-freeze",
+				"mk-lazy-agent-loader",
+				"mk-llms",
+				"mk-loop",
+				"mk-markdown-reader",
+				"mk-orchestrate",
+				"mk-pack",
+				"mk-party",
+				"mk-playwright-cli",
+				"mk-prompt-enhancer",
+				"mk-scale-routing",
+				"mk-session-continuation",
+				"mk-task-queue",
+				"mk-team-config",
+				"mk-web-to-markdown",
+				"mk-wiki",
+				"mk-wiki-render",
+				"mk-wiki-research",
+				"mk-worktree"
+			]
+		},
+		"media": {
+			"description": "Media, visual, and UI-generation skills: diagrams, video, multimodal, design systems, previews.",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-frontend-design",
+				"mk-html-video",
+				"mk-mermaidjs-v11",
+				"mk-multimodal",
+				"mk-preview",
+				"mk-showcase",
+				"mk-tech-graph",
+				"mk-ui-design-system"
+			]
 		}
 	},
 	"budgetReport": {

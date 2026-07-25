@@ -1,0 +1,296 @@
+<!-- Standalone skeleton for mk:visual-plan's prototype-flow explorer. Self-contained:
+     inline CSS/JS, no external assets, no CDN. The agent replaces ONLY the JSON inside
+     <script id="flow-data" type="application/json"> with the real prototype-flow.json body,
+     then runs the self-check (sentinel class vp-flow-explorer; no injected <script / on*=).
+     All node/edge labels render via textContent — untrusted JSON strings can never become
+     markup. Template-fill only; never freehand the graph. Shares the --wf-* theme tokens. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype Flow Explorer</title>
+<style>
+:root {
+  --wf-paper: #fbf7f0; --wf-card: #ffffff; --wf-ink: #1c1a16; --wf-muted: #5a5447;
+  --wf-line: #d8cfbe; --wf-accent: #b45309; --wf-accent-fg: #ffffff;
+  --wf-accent-soft: #f3e4cf; --wf-warn: #b91c1c; --wf-ok: #047857; --wf-radius: 10px;
+  --wf-inferred: #7c6f00; --wf-blocked: #b45309; --wf-needs: #b91c1c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wf-paper: #14110d; --wf-card: #1c1812; --wf-ink: #f3ecdf; --wf-muted: #a39880;
+    --wf-line: #3a3328; --wf-accent: #f59e0b; --wf-accent-fg: #14110d;
+    --wf-accent-soft: #2a241b; --wf-warn: #f87171; --wf-ok: #34d399;
+    --wf-inferred: #d4c65a; --wf-blocked: #f59e0b; --wf-needs: #f87171;
+  }
+}
+[data-theme="dark"] {
+  --wf-paper: #14110d; --wf-card: #1c1812; --wf-ink: #f3ecdf; --wf-muted: #a39880;
+  --wf-line: #3a3328; --wf-accent: #f59e0b; --wf-accent-fg: #14110d;
+  --wf-accent-soft: #2a241b; --wf-warn: #f87171; --wf-ok: #34d399;
+  --wf-inferred: #d4c65a; --wf-blocked: #f59e0b; --wf-needs: #f87171;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--wf-paper); color: var(--wf-ink);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 15px; line-height: 1.5;
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+.vp-page { max-width: 1160px; margin: 0 auto; padding: 40px 24px 80px; }
+h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; }
+.sub { color: var(--wf-muted); margin: 0 0 20px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+.filter-btn {
+  border: 1px solid var(--wf-line); background: var(--wf-card); color: var(--wf-muted);
+  border-radius: 8px; padding: 5px 12px; cursor: pointer; font-size: 13px;
+}
+.filter-btn[aria-pressed="true"] { background: var(--wf-accent); color: var(--wf-accent-fg); border-color: var(--wf-accent); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; margin-left: auto; font-size: 12px; color: var(--wf-muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend i { width: 22px; height: 0; border-top: 2px solid var(--wf-ink); display: inline-block; }
+.legend i.inferred { border-top-style: dashed; border-top-color: var(--wf-inferred); }
+.legend i.confirmed { border-top-color: var(--wf-ok); }
+.legend i.blocked { border-top-color: var(--wf-needs); border-top-width: 3px; }
+.graph-wrap { overflow-x: auto; border: 1px solid var(--wf-line); border-radius: var(--wf-radius); background: var(--wf-card); }
+svg.flow { display: block; min-width: 720px; }
+.lane-label { fill: var(--wf-muted); font-size: 12px; font-weight: 600; }
+.lane-sep { stroke: var(--wf-line); stroke-width: 1; }
+.node rect { fill: var(--wf-card); stroke: var(--wf-line); stroke-width: 1.5; rx: 8; cursor: pointer; }
+.node text { fill: var(--wf-ink); font-size: 12px; }
+.node.selected rect { stroke: var(--wf-accent); stroke-width: 2.5; }
+.node.dim { opacity: 0.25; }
+.edge { fill: none; stroke: var(--wf-ink); stroke-width: 2; }
+.edge.inferred { stroke: var(--wf-inferred); stroke-dasharray: 6 5; }
+.edge.confirmed { stroke: var(--wf-ok); }
+.edge.blocked, .edge.needs-answer { stroke: var(--wf-needs); stroke-width: 3; }
+.edge.hidden { display: none; }
+.edge.dim { opacity: 0.12; }
+.edge.hot { stroke-width: 3.5; }
+.badge { fill: var(--wf-ok); font-size: 10px; font-weight: 700; }
+.detail { margin-top: 16px; padding: 14px 16px; border: 1px solid var(--wf-line); border-radius: var(--wf-radius); background: var(--wf-card); font-size: 13px; }
+.detail h3 { margin: 0 0 8px; font-size: 14px; }
+.detail table { border-collapse: collapse; width: 100%; }
+.detail td { padding: 3px 8px; border-bottom: 1px solid var(--wf-line); vertical-align: top; }
+.detail td:first-child { color: var(--wf-muted); white-space: nowrap; width: 130px; }
+.empty { color: var(--wf-muted); }
+</style>
+</head>
+<body>
+<main class="vp-page vp-flow-explorer">
+  <h1 id="flow-title">Prototype Flow Explorer</h1>
+  <p class="sub" id="flow-sub"></p>
+
+  <div class="toolbar">
+    <button class="filter-btn" data-filter="all" aria-pressed="true">All</button>
+    <button class="filter-btn" data-filter="extracted" aria-pressed="false">Extracted</button>
+    <button class="filter-btn" data-filter="inferred" aria-pressed="false">Inferred</button>
+    <button class="filter-btn" data-filter="blocked" aria-pressed="false">Blocked</button>
+    <span class="legend">
+      <span><i></i>extracted</span>
+      <span><i class="inferred"></i>inferred</span>
+      <span><i class="confirmed"></i>confirmed</span>
+      <span><i class="blocked"></i>blocked / needs-answer</span>
+    </span>
+  </div>
+
+  <div class="graph-wrap"><svg class="flow" id="flow-svg" role="img" aria-label="Prototype flow graph"></svg></div>
+  <div class="detail" id="detail"><span class="empty">Click a node to trace its cross-layer path.</span></div>
+</main>
+
+<!-- The agent replaces the JSON body below with the real prototype-flow.json (schema:
+     prototype-flow/v1). It is DATA — parsed with JSON.parse, never executed. -->
+<script id="flow-data" type="application/json">
+{
+  "schema_version": "prototype-flow/v1",
+  "availability": "partial",
+  "nodes": [
+    { "id": "d1", "kind": "frame", "label": "Members screen", "figma_node_id": "30:2" },
+    { "id": "d2", "kind": "frame", "label": "InviteModal", "figma_node_id": "30:20" },
+    { "id": "u1", "kind": "component", "label": "Invite button", "figma_node_id": "30:10" },
+    { "id": "u2", "kind": "component", "label": "Submit", "figma_node_id": "30:23" },
+    { "id": "r1", "kind": "route", "label": "POST /invites", "figma_node_id": null },
+    { "id": "a1", "kind": "action", "label": "member added", "figma_node_id": null }
+  ],
+  "edges": [
+    { "from": "u1", "to": "d2", "kind": "extracted", "risk": "low", "status": "extracted", "evidence_sources": ["figma_prototype"], "note": "Invite opens modal" },
+    { "from": "u2", "to": "r1", "kind": "inferred", "risk": "high", "status": "needs-answer", "evidence_sources": ["figma_prototype"], "note": "submit outcome not wired in prototype" },
+    { "from": "r1", "to": "a1", "kind": "inferred", "risk": "medium", "status": "inferred", "evidence_sources": ["existing_route"], "note": "assumed server mutation" }
+  ]
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var LANES = [
+    { kind: "frame", label: "Design" },
+    { kind: "component", label: "UI" },
+    { kind: "route", label: "Code" },
+    { kind: "action", label: "Data / Event" }
+  ];
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var data;
+  try { data = JSON.parse(document.getElementById("flow-data").textContent); }
+  catch (e) { data = { nodes: [], edges: [] }; }
+  var nodes = Array.isArray(data.nodes) ? data.nodes : [];
+  var edges = Array.isArray(data.edges) ? data.edges : [];
+
+  // Title / subtitle (textContent = safe)
+  document.getElementById("flow-sub").textContent =
+    "availability: " + (data.availability || "unknown") +
+    "  ·  " + nodes.length + " nodes, " + edges.length + " edges";
+
+  // Layout: one lane row per LANE kind; nodes ordered within lane by appearance.
+  var laneIndex = {}; LANES.forEach(function (l, i) { laneIndex[l.kind] = i; });
+  var laneY = function (i) { return 54 + i * 120; };
+  var COLW = 190, NODEW = 150, NODEH = 46, X0 = 150;
+  var perLaneCount = {};
+  var pos = {};
+  nodes.forEach(function (n) {
+    var li = laneIndex[n.kind]; if (li === undefined) li = LANES.length - 1;
+    var c = (perLaneCount[li] || 0); perLaneCount[li] = c + 1;
+    pos[n.id] = { x: X0 + c * COLW, y: laneY(li) + (li % 2 ? 18 : 0), lane: li };
+  });
+  var maxCols = Math.max.apply(null, [1].concat(Object.keys(perLaneCount).map(function (k) { return perLaneCount[k]; })));
+  var W = X0 + maxCols * COLW + 40, H = laneY(LANES.length - 1) + 120;
+
+  var svg = document.getElementById("flow-svg");
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
+
+  function el(name, attrs) {
+    var e = document.createElementNS(SVGNS, name);
+    for (var k in attrs) { e.setAttribute(k, attrs[k]); }
+    return e;
+  }
+
+  // Lane separators + labels
+  LANES.forEach(function (lane, i) {
+    var y = laneY(i) - 20;
+    svg.appendChild(el("line", { class: "lane-sep", x1: 0, y1: y, x2: W, y2: y }));
+    var t = el("text", { class: "lane-label", x: 10, y: y + 16 });
+    t.textContent = lane.label; // safe
+    svg.appendChild(t);
+  });
+
+  // Edges (drawn under nodes)
+  var edgeEls = [];
+  edges.forEach(function (e, idx) {
+    var a = pos[e.from], b = pos[e.to];
+    if (!a || !b) { return; }
+    var ax = a.x + NODEW / 2, ay = a.y + NODEH, bx = b.x + NODEW / 2, by = b.y;
+    var midY = (ay + by) / 2;
+    var d = "M" + ax + "," + ay + " C" + ax + "," + midY + " " + bx + "," + midY + " " + bx + "," + by;
+    var kind = String(e.kind || "extracted");
+    var status = String(e.status || kind);
+    var cls = "edge " + kind + (status === "blocked" || status === "needs-answer" ? " " + status : "");
+    var p = el("path", { class: cls, d: d });
+    p.__edge = e;
+    svg.appendChild(p);
+    edgeEls.push(p);
+  });
+
+  // Nodes
+  var nodeEls = {};
+  nodes.forEach(function (n) {
+    var p = pos[n.id]; if (!p) { return; }
+    var g = el("g", { class: "node", "data-id": n.id, tabindex: "0" });
+    g.appendChild(el("rect", { x: p.x, y: p.y, width: NODEW, height: NODEH }));
+    var label = el("text", { x: p.x + 12, y: p.y + 20 });
+    label.textContent = String(n.label == null ? n.id : n.label); // untrusted → textContent
+    g.appendChild(label);
+    var sub = el("text", { x: p.x + 12, y: p.y + 36, class: "lane-label" });
+    sub.textContent = String(n.kind || "");
+    g.appendChild(sub);
+    g.addEventListener("click", function () { select(n.id); });
+    g.addEventListener("keypress", function (ev) { if (ev.key === "Enter") { select(n.id); } });
+    svg.appendChild(g);
+    nodeEls[n.id] = g;
+  });
+
+  // Filters
+  var current = "all";
+  function applyFilter() {
+    edgeEls.forEach(function (p) {
+      var e = p.__edge, show = true;
+      if (current === "extracted") { show = e.kind === "extracted"; }
+      else if (current === "inferred") { show = e.kind === "inferred"; }
+      else if (current === "blocked") { show = e.status === "blocked" || e.status === "needs-answer"; }
+      p.classList.toggle("hidden", !show);
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".filter-btn"), function (btn) {
+    btn.addEventListener("click", function () {
+      current = btn.getAttribute("data-filter");
+      Array.prototype.forEach.call(document.querySelectorAll(".filter-btn"), function (b) {
+        b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+      });
+      clearSelection(); applyFilter();
+    });
+  });
+
+  // Selection: highlight cross-layer path (edges touching the node + their endpoints)
+  var detail = document.getElementById("detail");
+  function clearSelection() {
+    Object.keys(nodeEls).forEach(function (id) { nodeEls[id].classList.remove("selected", "dim"); });
+    edgeEls.forEach(function (p) { p.classList.remove("hot", "dim"); });
+    detail.innerHTML = ""; // static string only below; never JSON
+    var span = document.createElement("span");
+    span.className = "empty";
+    span.textContent = "Click a node to trace its cross-layer path.";
+    detail.appendChild(span);
+  }
+  function select(id) {
+    var connected = {}; connected[id] = true;
+    var rows = [];
+    edgeEls.forEach(function (p) {
+      var e = p.__edge, touch = (e.from === id || e.to === id);
+      p.classList.toggle("hot", touch);
+      p.classList.toggle("dim", !touch);
+      if (touch) { connected[e.from] = true; connected[e.to] = true; rows.push(e); }
+    });
+    Object.keys(nodeEls).forEach(function (nid) {
+      nodeEls[nid].classList.toggle("selected", nid === id);
+      nodeEls[nid].classList.toggle("dim", !connected[nid]);
+    });
+    renderDetail(id, rows);
+  }
+  function renderDetail(id, rows) {
+    detail.innerHTML = "";
+    var node = nodes.filter(function (n) { return n.id === id; })[0] || { label: id };
+    var h = document.createElement("h3");
+    h.textContent = String(node.label == null ? id : node.label); // safe
+    detail.appendChild(h);
+    if (!rows.length) {
+      var e = document.createElement("span"); e.className = "empty";
+      e.textContent = "No connected flows."; detail.appendChild(e); return;
+    }
+    var table = document.createElement("table");
+    rows.forEach(function (e) {
+      var from = labelOf(e.from), to = labelOf(e.to);
+      addRow(table, "path", from + " → " + to);
+      addRow(table, "kind / status", String(e.kind || "") + " / " + String(e.status || ""));
+      addRow(table, "risk", String(e.risk || ""));
+      addRow(table, "evidence", (e.evidence_sources || []).join(", "));
+      if (e.note) { addRow(table, "note", String(e.note)); }
+    });
+    detail.appendChild(table);
+  }
+  function labelOf(nid) {
+    var n = nodes.filter(function (x) { return x.id === nid; })[0];
+    return n ? String(n.label == null ? nid : n.label) : String(nid);
+  }
+  function addRow(table, k, v) {
+    var tr = document.createElement("tr");
+    var td1 = document.createElement("td"); td1.textContent = k;
+    var td2 = document.createElement("td"); td2.textContent = v; // untrusted → textContent
+    tr.appendChild(td1); tr.appendChild(td2); table.appendChild(tr);
+  }
+
+  applyFilter();
+})();
+</script>
+</body>
+</html>
