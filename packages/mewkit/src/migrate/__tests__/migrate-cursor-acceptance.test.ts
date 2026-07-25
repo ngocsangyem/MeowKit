@@ -43,7 +43,7 @@ describe("migrate cursor acceptance — full-bundle install completeness", () =>
 		expect(existsSync(join(projectDir, ".cursor", "rules"))).toBe(true);
 		expect(existsSync(join(projectDir, ".cursor", "hooks.json"))).toBe(true);
 		expect(existsSync(join(projectDir, ".cursor", "hooks"))).toBe(true);
-		expect(existsSync(join(projectDir, ".agents", "skills"))).toBe(true);
+		expect(existsSync(join(projectDir, ".cursor", "skills"))).toBe(true);
 
 		// Cursor-only: no Claude Code kit is created alongside the native bundle.
 		expect(existsSync(join(projectDir, ".claude"))).toBe(false);
@@ -59,7 +59,7 @@ describe("migrate cursor acceptance — full-bundle install completeness", () =>
 		const agentFiles = readdirSync(join(projectDir, ".cursor", "agents")).filter((f) => f.endsWith(".md"));
 		expect(agentFiles.length).toBe(40);
 
-		const skillDirs = readdirSync(join(projectDir, ".agents", "skills"), { withFileTypes: true }).filter((d) =>
+		const skillDirs = readdirSync(join(projectDir, ".cursor", "skills"), { withFileTypes: true }).filter((d) =>
 			d.isDirectory(),
 		);
 		expect(skillDirs.length).toBe(126);
@@ -96,6 +96,8 @@ describe("migrate cursor acceptance — full-bundle install completeness", () =>
 
 		// No leftover top-level entries beyond the bundle's own managed surfaces.
 		const topLevel = (await readdir(projectDir)).sort();
-		expect(topLevel).toEqual([".agents", ".cursor", ".meowkit", "AGENTS.md"].sort());
+		// Skills live under `.cursor/skills` (not the cross-vendor `.agents/skills`) so a
+		// co-installed Codex bundle owning `.agents/` can never collide with this tree.
+		expect(topLevel).toEqual([".cursor", ".meowkit", "AGENTS.md"].sort());
 	});
 });

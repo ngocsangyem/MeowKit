@@ -36,17 +36,18 @@ export default defineConfig({
 		// `*.test.cjs` under `.claude/` are node-native `assert` tests (run via `node`/`node --test`
 		// in CI), NOT vitest suites — Vitest would collect them and report "No test suite found".
 		// Exclude the whole class here rather than one file at a time.
-		// The authored Codex bundle under migrate/modules/codex/root is COPIED
-		// `.claude/` skill data (its own scripts/tests come along verbatim); those are
-		// data, not this package's suites, so exclude them from collection. (The bundle
-		// was restructured to the `root/` mirror layout — `.agents/skills`, `.codex/…` —
-		// so the exclude keys off `modules/codex/root/**`, not the old `.../skills/**`.)
+		// The authored Codex and Cursor bundles under migrate/modules/<provider>/root are
+		// COPIED `.claude/` skill data (their own scripts/tests come along verbatim); those
+		// are data, not this package's suites, so exclude them from collection. (Each bundle
+		// uses the `root/` mirror layout — codex `.agents/skills`, cursor `.cursor/skills` —
+		// so the exclude keys off `modules/<provider>/root/**`, not any `.../skills/**` path.)
 		exclude: [
 			"**/node_modules/**",
 			"**/dist/**",
 			".claude/**/*.test.cjs",
 			"plugin/**",
 			"**/migrate/modules/codex/root/**",
+			"**/migrate/modules/cursor/root/**",
 		],
 		environmentMatchGlobs: [
 			["packages/mewkit/src/**/__tests__/**/*.test.tsx", "jsdom"],

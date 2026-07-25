@@ -63,11 +63,11 @@ const DISABLE_MODEL_INVOCATION = new Set([
 ]);
 
 describe("cursor bundle: manifest + catalog resolve the 24-skill core pack", () => {
-	it("the manifest has a schema-valid .agents/skills entry with the source dir present", () => {
+	it("the manifest has a schema-valid .cursor/skills entry with the source dir present", () => {
 		const manifest = loadCursorBundleManifest(moduleDir);
 		expect(manifest.provider).toBe("cursor");
-		const skillsEntry = manifest.entries.find((e) => e.targetPath === ".agents/skills");
-		expect(skillsEntry, "no .agents/skills manifest entry").toBeDefined();
+		const skillsEntry = manifest.entries.find((e) => e.targetPath === ".cursor/skills");
+		expect(skillsEntry, "no .cursor/skills manifest entry").toBeDefined();
 		expect(skillsEntry?.active).toBe(true);
 		expect(existsSync(join(moduleDir, skillsEntry!.sourcePath))).toBe(true);
 	});
@@ -80,14 +80,14 @@ describe("cursor bundle: manifest + catalog resolve the 24-skill core pack", () 
 	});
 
 	it("every core skill dir exists on disk with a SKILL.md", () => {
-		const skillsRoot = join(moduleDir, "root", ".agents", "skills");
+		const skillsRoot = join(moduleDir, "root", ".cursor", "skills");
 		for (const name of CORE_SKILLS) {
 			expect(existsSync(join(skillsRoot, name, "SKILL.md")), `${name} missing SKILL.md`).toBe(true);
 		}
 	});
 
 	it("exactly the designated command-like skills carry disable-model-invocation: true", () => {
-		const skillsRoot = join(moduleDir, "root", ".agents", "skills");
+		const skillsRoot = join(moduleDir, "root", ".cursor", "skills");
 		const flagged: string[] = [];
 		for (const name of CORE_SKILLS) {
 			const body = readFileSync(join(skillsRoot, name, "SKILL.md"), "utf-8");
@@ -112,7 +112,7 @@ describe("cursor bundle: pack-expansion installs each skill as an independent re
 		});
 		expect(result.conflicts).toEqual([]);
 		for (const name of CORE_SKILLS) {
-			expect(existsSync(join(target, ".agents", "skills", name, "SKILL.md")), `${name} not installed`).toBe(true);
+			expect(existsSync(join(target, ".cursor", "skills", name, "SKILL.md")), `${name} not installed`).toBe(true);
 		}
 		// Non-skill surfaces from the manifest still install alongside the expanded skills.
 		expect(existsSync(join(target, "AGENTS.md"))).toBe(true);
@@ -135,7 +135,7 @@ describe("cursor bundle: pack-expansion installs each skill as an independent re
 		const result = await reconcileApplyCursorBundle(moduleDir, target, { adoptHomeRegistry: false, projectRoot: target });
 		expect(result.conflicts).toEqual([]);
 		for (const name of CORE_SKILLS) {
-			expect(existsSync(join(target, ".agents", "skills", name, "SKILL.md"))).toBe(true);
+			expect(existsSync(join(target, ".cursor", "skills", name, "SKILL.md"))).toBe(true);
 		}
 	});
 });
@@ -148,14 +148,14 @@ describe("cursor bundle: pack-selection budget warning", () => {
 	// The shipped `core` pack fits comfortably under budget by design, so there is no real
 	// oversized combination to select today (extended packs are empty). To prove the warning
 	// path actually fires — not just that it stays silent — this builds a throwaway module
-	// dir with the SAME generic catalog shape (catalog/skill-packs.json + root/.agents/skills)
+	// dir with the SAME generic catalog shape (catalog/skill-packs.json + root/.cursor/skills)
 	// but a deliberately tiny budgetChars, reusing the real `packSelectionBudgetWarning`
 	// function unmodified against synthetic content sized to exceed it.
 	describe("synthetic oversized selection", () => {
 		let synthModuleDir: string;
 		beforeEach(() => {
 			synthModuleDir = mkdtempSync(join(tmpdir(), "cursor-budget-synth-"));
-			const skillsRoot = join(synthModuleDir, "root", ".agents", "skills");
+			const skillsRoot = join(synthModuleDir, "root", ".cursor", "skills");
 			for (const name of ["mk-a", "mk-b"]) {
 				const dir = join(skillsRoot, name);
 				mkdirSync(dir, { recursive: true });

@@ -2,7 +2,7 @@
 // tokens — mirrors codex-output-brand-free.test.ts's intent, adapted to Cursor's
 // hand-authored bundle: there is no converter output to scan (Cursor is not produced by
 // the generic md-strip/direct-copy pipeline), so this scans the real authored artifacts
-// that install into a user's project — AGENTS.md, .cursor/**, .agents/skills/** — using
+// that install into a user's project — AGENTS.md, .cursor/**, .cursor/skills/** — using
 // the existing denylist helpers (scanDeniedTokens + scanCursorExtraDenied) instead of a
 // new regex, per the phase's "reuse the existing denylist helpers" instruction. This
 // overlaps cursor-bundle-lint.test.ts's denylist coverage by design (see task context) —
@@ -37,9 +37,9 @@ describe("cursor output is brand-free", () => {
 		expect(scanCursorDenied(content)).toEqual([]);
 	});
 
-	it("every .agents/skills/** file is free of denied tokens", () => {
+	it("every .cursor/skills/** file is free of denied tokens", () => {
 		const leaks: string[] = [];
-		for (const file of walkFiles(join(rootDir, ".agents", "skills"))) {
+		for (const file of walkFiles(join(rootDir, ".cursor", "skills"))) {
 			const hits = scanCursorDenied(readFileSync(file, "utf-8"));
 			if (hits.length > 0) leaks.push(`${file.slice(rootDir.length + 1)} [${hits.join(", ")}]`);
 		}

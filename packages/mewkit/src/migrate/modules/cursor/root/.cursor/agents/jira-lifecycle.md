@@ -27,7 +27,7 @@ context — 2 of the 3 risk factors under the Rule of Two, the compliant combina
 All invocations go through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh <args>
 ```
 
 ## Procedure references

@@ -29,7 +29,7 @@ below regardless.
 ## Pre-flight
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/confluence-as.sh <args>
 ```
 
 ## Procedure references
@@ -43,7 +43,7 @@ unfamiliar flags; do not invent CLI options.
 If the bulk CQL incorporates user-derived terms, sanitize first:
 
 ```bash
-SANITIZED=$(bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/cql-sanitize.sh '<term>')
+SANITIZED=$(bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/cql-sanitize.sh '<term>')
 ```
 
 Then build the CQL with the sanitized output. CQL injection at bulk scale is a
@@ -91,7 +91,7 @@ permission on a subset), the wrapper reports the partial-progress count (X of N
 completed). Surface this to the user; remediation is a re-run on the remaining set:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh bulk delete \
+bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/confluence-as.sh bulk delete \
   --cql "<original-CQL> AND id NOT IN (<already-completed-ids>)" \
   --dry-run --max-pages 100
 ```

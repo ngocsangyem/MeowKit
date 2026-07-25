@@ -32,7 +32,7 @@ escalate to the user — do NOT prompt for a token yourself.
 All `jira-as` invocations MUST go through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh <args>
 ```
 
 Never call the underlying binary directly. The wrapper handles env translation and a

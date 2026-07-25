@@ -9,7 +9,9 @@
 			"provider": "cursor",
 			"mode": "0644",
 			"ownership": "managed-replace",
-			"scopeTags": ["managed-runtime"],
+			"scopeTags": [
+				"managed-runtime"
+			],
 			"active": true
 		},
 		{
@@ -18,7 +20,9 @@
 			"provider": "cursor",
 			"mode": "0644",
 			"ownership": "managed-replace",
-			"scopeTags": ["managed-runtime"],
+			"scopeTags": [
+				"managed-runtime"
+			],
 			"active": true
 		},
 		{
@@ -27,7 +31,9 @@
 			"provider": "cursor",
 			"mode": "0644",
 			"ownership": "managed-replace",
-			"scopeTags": ["managed-runtime"],
+			"scopeTags": [
+				"managed-runtime"
+			],
 			"active": true
 		},
 		{
@@ -36,16 +42,20 @@
 			"provider": "cursor",
 			"mode": "0644",
 			"ownership": "managed-replace",
-			"scopeTags": ["managed-runtime"],
+			"scopeTags": [
+				"managed-runtime"
+			],
 			"active": true
 		},
 		{
-			"sourcePath": "root/.agents/skills",
-			"targetPath": ".agents/skills",
+			"sourcePath": "root/.cursor/skills",
+			"targetPath": ".cursor/skills",
 			"provider": "cursor",
 			"mode": "0644",
 			"ownership": "managed-replace",
-			"scopeTags": ["managed-runtime"],
+			"scopeTags": [
+				"managed-runtime"
+			],
 			"active": true
 		},
 		{
@@ -54,7 +64,9 @@
 			"provider": "cursor",
 			"mode": "0644",
 			"ownership": "managed-replace",
-			"scopeTags": ["managed-runtime"],
+			"scopeTags": [
+				"managed-runtime"
+			],
 			"active": true
 		},
 		{
@@ -63,7 +75,9 @@
 			"provider": "cursor",
 			"mode": "0755",
 			"ownership": "managed-replace",
-			"scopeTags": ["managed-runtime"],
+			"scopeTags": [
+				"managed-runtime"
+			],
 			"active": true
 		}
 	]

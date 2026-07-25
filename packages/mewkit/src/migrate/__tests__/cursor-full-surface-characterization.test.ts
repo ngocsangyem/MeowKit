@@ -28,7 +28,7 @@ describe("cursor full-surface characterization: manifest inventory", () => {
 				".meowkit/README.md",
 				".cursor/agents",
 				".cursor/rules",
-				".agents/skills",
+				".cursor/skills",
 				".cursor/hooks.json",
 				".cursor/hooks",
 			].sort(),
@@ -45,7 +45,7 @@ describe("cursor full-surface characterization: skill catalog inventory", () => 
 		const { skills } = resolvePackSelection(catalog!, "all");
 		expect(skills.length).toBe(126);
 
-		const onDisk = readdirSync(join(rootDir, ".agents", "skills"), { withFileTypes: true }).filter((d) =>
+		const onDisk = readdirSync(join(rootDir, ".cursor", "skills"), { withFileTypes: true }).filter((d) =>
 			d.isDirectory(),
 		);
 		expect(onDisk.length).toBe(126);

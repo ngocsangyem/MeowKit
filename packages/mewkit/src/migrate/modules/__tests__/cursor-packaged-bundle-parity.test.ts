@@ -60,7 +60,7 @@ describe("cursor bundle: source -> packaged parity", () => {
 	});
 
 	it("every core skill's SKILL.md is present and byte-identical in the packaged copy", () => {
-		const skillsRoot = "root/.agents/skills";
+		const skillsRoot = "root/.cursor/skills";
 		const names = readdirSync(join(moduleDir, skillsRoot), { withFileTypes: true })
 			.filter((d) => d.isDirectory())
 			.map((d) => d.name);

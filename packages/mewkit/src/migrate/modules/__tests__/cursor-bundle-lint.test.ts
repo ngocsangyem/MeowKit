@@ -29,7 +29,7 @@ const moduleDir = resolveCursorModuleDir();
 const rootDir = join(moduleDir, "root");
 const agentsDir = join(rootDir, ".cursor", "agents");
 const rulesDir = join(rootDir, ".cursor", "rules");
-const skillsDir = join(rootDir, ".agents", "skills");
+const skillsDir = join(rootDir, ".cursor", "skills");
 
 const DESCRIPTION_CAP = 200;
 
@@ -87,7 +87,7 @@ const isCoreAgent = (file: string): boolean =>
 
 // Denylist scope: the agent-facing / model-read surfaces (AGENTS.md router, agents, rules,
 // and skills once landed) — i.e. exactly "agents/skills/rules" plus the root router, which is
-// what Phase 3 authors and what a future skill-authoring pass will add under `.agents/skills/`.
+// what Phase 3 authors and what a future skill-authoring pass will add under `.cursor/skills/`.
 // Deliberately EXCLUDES `.meowkit/README.md`: that file is Phase-2-owned (not part of this
 // phase's File Ownership) and legitimately documents the real `.claude/memory/` ->
 // `.meowkit/memory/` cross-provider import source path (plan.md goal 7) — a factual interop

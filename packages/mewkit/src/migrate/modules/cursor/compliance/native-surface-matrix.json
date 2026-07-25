@@ -103,7 +103,7 @@
 		{
 			"surface": "skills",
 			"maturity": "stable",
-			"meowkitPolicy": "primary (core skill pack authored as a follow-up task, not in this Phase-3 part-A batch) — mk- namespace preserved; .agents/skills/ portable location; disable-model-invocation for command-like pipeline skills",
+			"meowkitPolicy": "primary — mk- namespace preserved (folder name == frontmatter name, per Cursor's rule); installs to the Cursor-native .cursor/skills/ rather than the shared .agents/skills/ so a co-installed Codex bundle can never collide with or shadow it; disable-model-invocation for command-like pipeline skills",
 			"claims": [
 				{
 					"claim": "SKILL.md frontmatter: name (required, must match the parent folder name), description (required, drives relevance matching), paths (optional glob, supersedes legacy globs), disable-model-invocation (optional bool — true means explicit-invocation only), metadata (optional freeform key-value).",
@@ -117,7 +117,7 @@
 					}
 				},
 				{
-					"claim": "Portable location .agents/skills/ (project) and ~/.agents/skills/ (user) is shared across Cursor, Codex CLI, Gemini CLI, and VS Code Copilot per the docs page; legacy .cursor/skills/ and ~/.cursor/skills/ also accepted.",
+					"claim": "Cursor loads skills from .agents/skills/ (project), ~/.agents/skills/ (user), .cursor/skills/ (project) and ~/.cursor/skills/ (user). Per the docs page all four are supported at parity — neither location is deprecated. The .agents/ pair is the cross-vendor convention shared with Codex CLI, Gemini CLI, and VS Code Copilot.",
 					"source": "https://cursor.com/docs/context/skills",
 					"verified": "2026-07-24",
 					"environments": {
@@ -128,7 +128,7 @@
 					}
 				},
 				{
-					"claim": "A community forum bug report (not official docs) claims the Cursor CLI does not load user-level ~/.agents/skills/ (the GUI does). This is the exact question the Phase 2/3 entry-gate live discovery smoke exists to close before any install path relies on it.",
+					"claim": "A community forum bug report (not official docs) claims the Cursor CLI does not load user-level ~/.agents/skills/ (the GUI does). The bundle installs project-level .cursor/skills/, so this user-level .agents/ gap no longer gates the install path; the live discovery smoke still records CLI loading of .cursor/skills/.",
 					"source": "plans/reports/researcher-260724-2125-cursor-official-docs-verification.md",
 					"verified": "2026-07-24",
 					"environments": {

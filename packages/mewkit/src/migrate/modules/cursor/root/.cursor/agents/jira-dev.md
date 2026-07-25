@@ -26,7 +26,7 @@ combination.
 ## Pre-flight
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh <args>
 ```
 
 ## Procedure references

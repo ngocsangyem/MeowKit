@@ -25,7 +25,7 @@ under the Rule of Two, the compliant combination.
 ## Pre-flight
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/confluence-as.sh <args>
 ```
 
 ## Procedure references
@@ -64,7 +64,7 @@ too.
 If a watcher/label op is scoped to the results of a CQL filter, sanitize:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/cql-sanitize.sh '<term>'
+bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/cql-sanitize.sh '<term>'
 ```
 
 (Most collaborate ops are page-id-scoped, not CQL-scoped — sanitization is only

@@ -18,7 +18,7 @@ const DESCRIPTION_CAP = 200;
 // that module's header comment for the full token list and the Grep/Glob + Stop scoping rationale.
 
 const moduleDir = resolveCursorModuleDir();
-const skillsRoot = join(moduleDir, "root", ".agents", "skills");
+const skillsRoot = join(moduleDir, "root", ".cursor", "skills");
 const catalog = loadSkillPackCatalog(moduleDir);
 
 function walkFiles(dir: string, acc: string[]): string[] {
@@ -96,7 +96,7 @@ describe("cursor pack cleanliness", () => {
 		});
 	}
 
-	it("no shipped skill dir is orphaned (unpackaged) — every dir under .agents/skills belongs to a pack", () => {
+	it("no shipped skill dir is orphaned (unpackaged) — every dir under .cursor/skills belongs to a pack", () => {
 		if (!catalog) return;
 		const onDisk = existsSync(skillsRoot)
 			? readdirSync(skillsRoot, { withFileTypes: true })

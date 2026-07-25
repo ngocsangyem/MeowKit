@@ -29,7 +29,7 @@ Trust that the project's configured environment validation already ran. All
 invocations go through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh <args>
 ```
 
 ## Procedure references
@@ -44,7 +44,7 @@ Before embedding ANY user-supplied term into a JQL query (issue summary, comment
 text, label name, component name), pass it through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jql-sanitize.sh '<user-term>'
+bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jql-sanitize.sh '<user-term>'
 ```
 
 The sanitizer strips JQL operators, functions, and special characters and

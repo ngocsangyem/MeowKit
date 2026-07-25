@@ -4,7 +4,7 @@ Cursor-native instruction surface for the toolkit. Hand-authored directly for Cu
 not converted from another tool's project configuration, and installed verbatim at the
 project root, where both the Cursor IDE and the Cursor CLI auto-load it every session.
 Keep this file compact — anything that grows into a multi-step procedure belongs in a
-skill under `.agents/skills/`, not here.
+skill under `.cursor/skills/`, not here.
 
 ## Working agreement
 
@@ -25,7 +25,7 @@ the surface that owns it:
 | Locate code, trace how something works, fast repo orientation | `explorer` agent | Auto-routed from its description, or `/explorer` |
 | Scope an approach before writing code; architecture/implementation planning | `planner` agent | Auto-routed from its description, or `/planner` |
 | Review a finished change before it ships | `reviewer` agent | Auto-routed ("use proactively after implementation"), or `/reviewer` |
-| Reusable multi-step procedure (a "how-to" with scripts/references) | a skill under `.agents/skills/mk-*` | Auto-surfaced by description/path match, or `/mk-<name>` |
+| Reusable multi-step procedure (a "how-to" with scripts/references) | a skill under `.cursor/skills/mk-*` | Auto-surfaced by description/path match, or `/mk-<name>` |
 | Command-like, explicit-only procedure (no implicit trigger) | an `mk-*` skill with `disable-model-invocation: true` | Only via explicit `/mk-<name>` |
 | Standing project-wide invariant | an Always-Apply rule (`.cursor/rules/runtime-invariants.mdc`) | Always in context |
 | Situational guidance (planning, security, testing, ...) | an Agent-Requested or Auto-Attached rule under `.cursor/rules/domain-*.mdc` | Model-matched by description, or auto-attached by file path |

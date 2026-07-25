@@ -33,7 +33,7 @@ key, escalate to the user — do NOT prompt for a token yourself.
 All `confluence-as` invocations MUST go through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/confluence-as.sh <args>
 ```
 
 Never call the underlying binary directly. The wrapper handles env translation,
@@ -53,7 +53,7 @@ before retrying a failed POST, list pages with the same title in the target spac
 first:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh search --cql 'space = ENG AND title = "..."' --max-results 5
+bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/confluence-as.sh search --cql 'space = ENG AND title = "..."' --max-results 5
 ```
 
 If an `--idempotency-key=auto` flag is available, prefer it on `page create`. Confirm

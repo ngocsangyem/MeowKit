@@ -62,9 +62,10 @@ export interface InitArgs {
 	 */
 	profile?: string;
 	/**
-	 * Codex skill-pack selection (only meaningful with a Codex target). Comma-separated
-	 * pack names (e.g. `core,integrations`) or `all`. Omitted = the catalog default
-	 * (`core`). Named `--skill-packs` to avoid the existing boolean `--packs` validate flag.
+	 * Skill-pack selection for the Codex and Cursor bundles. Comma-separated pack names
+	 * (e.g. `core,integrations`) or `all`. Omitted = the FULL catalog; pass an explicit
+	 * list to narrow the install. Named `--skill-packs` to avoid the existing boolean
+	 * `--packs` validate flag.
 	 */
 	skillPacks?: string;
 	/**
@@ -85,9 +86,13 @@ export interface InitArgs {
 	allowCloudMcp?: boolean;
 }
 
-/** Parse the `--skill-packs` value into a PackSelection (default `core` when absent). */
+/** Parse the `--skill-packs` value into a PackSelection (full catalog when absent). */
 function parseSkillPacks(raw?: string): PackSelection {
-	if (raw === undefined) return [];
+	// Omitted flag installs the FULL catalog. The bundle ships every skill, so a default
+	// that silently installed only the `core` pack left users comparing their install
+	// against the source tree and concluding skills were missing. An explicit
+	// `--skill-packs core` (or any named list) still narrows the install.
+	if (raw === undefined) return "all";
 	const v = raw.trim();
 	if (v === "") return [];
 	if (v.toLowerCase() === "all") return "all";
@@ -520,6 +525,7 @@ async function initCursorTarget(
 	force: boolean,
 	mcpProfiles?: string,
 	allowCloudMcp?: boolean,
+	packs: PackSelection = "all",
 ): Promise<void> {
 	p.intro(pc.bgCyan(pc.black(" meowkit init --target cursor ")));
 	const moduleDir = resolveCursorModuleDir();
@@ -530,7 +536,12 @@ async function initCursorTarget(
 	// No fail-closed guard: the reconciler preserves user edits (or surfaces a conflict)
 	// instead of clobbering an existing layout, and makes a re-run idempotent.
 	if (dryRun) {
-		const plan = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, dryRun: true, projectRoot: targetDir });
+		const plan = await reconcileApplyCursorBundle(moduleDir, targetDir, {
+			force,
+			dryRun: true,
+			projectRoot: targetDir,
+			packs,
+		});
 		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
 		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
 		p.log.info(`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .meowkit/README.md.`);
@@ -538,7 +549,7 @@ async function initCursorTarget(
 		p.outro(pc.green("Dry-run complete — no files written."));
 		return;
 	}
-	const result = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, projectRoot: targetDir });
+	const result = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
 	if (result.conflicts.length > 0) {
 		p.log.warn(
 			`${result.conflicts.length} existing file(s) differ from the bundle and were left untouched (re-run with --force to overwrite):`,
@@ -641,13 +652,14 @@ async function addCursorBundle(
 	force: boolean,
 	mcpProfiles?: string,
 	allowCloudMcp?: boolean,
+	packs: PackSelection = "all",
 ): Promise<void> {
 	const moduleDir = resolveCursorModuleDir();
 	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
 		p.log.warn("Cursor bundle not found in this install — skipping the Cursor toolkit.");
 		return;
 	}
-	const result = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, projectRoot: targetDir });
+	const result = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
 	if (result.conflicts.length > 0) {
 		p.log.warn(
 			`${result.conflicts.length} existing Cursor file(s) left untouched (re-run with --force to overwrite).`,
@@ -670,7 +682,14 @@ export async function init(args: InitArgs): Promise<void> {
 		return initCodexTarget(targetDir, args.dryRun ?? false, args.force ?? false, parseSkillPacks(args.skillPacks));
 	}
 	if (args.target === "cursor") {
-		return initCursorTarget(targetDir, args.dryRun ?? false, args.force ?? false, args.mcpProfiles, args.allowCloudMcp);
+		return initCursorTarget(
+			targetDir,
+			args.dryRun ?? false,
+			args.force ?? false,
+			args.mcpProfiles,
+			args.allowCloudMcp,
+			parseSkillPacks(args.skillPacks),
+		);
 	}
 
 	const mode = detectMode(targetDir);
@@ -703,7 +722,7 @@ export async function init(args: InitArgs): Promise<void> {
 	}
 	if (picked?.includes("cursor")) {
 		if (dryRun) p.log.info("Dry-run: would copy the authored Cursor bundle (AGENTS.md, .meowkit/README.md).");
-		else await addCursorBundle(targetDir, force, args.mcpProfiles, args.allowCloudMcp);
+		else await addCursorBundle(targetDir, force, args.mcpProfiles, args.allowCloudMcp, parseSkillPacks(args.skillPacks));
 	}
 
 	// Legacy explicit paths: `--target <provider>` / `--migrate` (never active with the picker).

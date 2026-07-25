@@ -47,7 +47,7 @@ describe("authored codex bundle", () => {
 		expect(planner).not.toContain(".claude/memory"); // memory rewritten to .meowkit/
 		expect(readFileSync(join(target, ".codex", "config.toml"), "utf-8")).not.toContain("config_file");
 		// Skills dir copied to .agents/skills with SKILL.md files.
-		expect(existsSync(join(target, ".agents", "skills", "fix", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".agents", "skills", "mk-fix", "SKILL.md"))).toBe(true);
 		// Hooks resolve the project root via git (Codex exposes no CODEX_PROJECT_DIR); wrapper executable.
 		expect(readFileSync(join(target, ".codex", "hooks.json"), "utf-8")).toContain("git rev-parse --show-toplevel");
 		expect(statSync(join(target, ".codex", "hooks", "capture.cjs")).mode & 0o777).toBe(0o755);
@@ -127,6 +127,6 @@ describe("authored codex bundle", () => {
 		expect(overlay.writes).toBe(9);
 		expect(existsSync(join(target, "AGENTS.md"))).toBe(true); // authored AGENTS.md base
 		expect(existsSync(join(target, ".codex", "config.toml"))).toBe(true); // authored config base
-		expect(existsSync(join(target, ".agents", "skills", "fix", "SKILL.md"))).toBe(true); // authored skill
+		expect(existsSync(join(target, ".agents", "skills", "mk-fix", "SKILL.md"))).toBe(true); // authored skill
 	});
 });

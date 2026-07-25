@@ -29,7 +29,7 @@ Trust that the project's configured environment validation already ran. All
 invocations go through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/confluence-as.sh <args>
 ```
 
 ## Procedure references
@@ -45,7 +45,7 @@ user-supplied term into a CQL query (page title, label, space-key fragment, free
 term), pass it through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/cql-sanitize.sh '<user-term>'
+bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/cql-sanitize.sh '<user-term>'
 ```
 
 The sanitizer rejects shell metacharacters and CQL statement separators, then escapes
