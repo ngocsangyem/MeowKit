@@ -258,6 +258,9 @@ jobs:
       - name: Internal links resolve to real pages
         run: npm run check:links -w packages/docs
 
+      - name: Every page is in the sidebar or redirected
+        run: npm run check:nav -w packages/docs
+
       - name: No stale runtime values in docs
         run: npm run check:stale -w packages/docs
 

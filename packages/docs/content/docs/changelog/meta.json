@@ -1,4 +1,7 @@
 {
   "title": "Changelog",
-  "pages": ["index"]
+  "pages": [
+    "index",
+    "archive"
+  ]
 }

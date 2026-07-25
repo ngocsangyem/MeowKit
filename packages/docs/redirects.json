@@ -8,6 +8,9 @@
     { "from": "/workflows/fix-bug", "to": "/guides/fix-a-bug" },
     { "from": "/workflows/code-review", "to": "/guides/review-code" },
     { "from": "/workflows/ship-code", "to": "/guides/ship-safely" },
-    { "from": "/workflows/autonomous-build", "to": "/guides/autonomous-build" }
+    { "from": "/workflows/autonomous-build", "to": "/guides/autonomous-build" },
+    { "from": "/guide/understanding-the-harness", "to": "/core-concepts/how-it-works" },
+    { "from": "/guide/audience-definition", "to": "/introduction" },
+    { "from": "/guide/infrastructure-audit", "to": "/design" }
   ]
 }

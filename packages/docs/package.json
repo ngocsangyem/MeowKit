@@ -11,7 +11,8 @@
     "check:links": "node scripts/check-internal-links.mjs",
     "check:stale": "node scripts/scan-stale-values.mjs",
     "check:coverage": "node scripts/check-reference-coverage.mjs",
-    "check": "npm run typecheck && npm run check:links && npm run check:stale && npm run check:coverage"
+    "check": "npm run typecheck && npm run check:links && npm run check:nav && npm run check:stale && npm run check:coverage",
+    "check:nav": "node scripts/check-nav-coverage.mjs"
   },
   "dependencies": {
     "fumadocs-core": "16.11.5",
