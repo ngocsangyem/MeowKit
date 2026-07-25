@@ -149,6 +149,40 @@
 				"mk-tech-graph",
 				"mk-ui-design-system"
 			]
+		},
+		"integrations": {
+			"description": "External-service integrations: Jira, Confluence, Figma, Stitch, and agent-surface conversion (henshin).",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-confluence",
+				"mk-confluence-bulk",
+				"mk-confluence-collaborate",
+				"mk-confluence-page",
+				"mk-confluence-search",
+				"mk-confluence-spec-analyst",
+				"mk-figma",
+				"mk-henshin",
+				"mk-jira",
+				"mk-jira-admin",
+				"mk-jira-agile",
+				"mk-jira-analyst",
+				"mk-jira-bulk",
+				"mk-jira-collaborate",
+				"mk-jira-dev",
+				"mk-jira-estimator",
+				"mk-jira-evaluator",
+				"mk-jira-fields",
+				"mk-jira-issue",
+				"mk-jira-jsm",
+				"mk-jira-lifecycle",
+				"mk-jira-ops",
+				"mk-jira-relationships",
+				"mk-jira-search",
+				"mk-jira-time",
+				"mk-stitch"
+			]
 		}
 	},
 	"budgetReport": {

@@ -1,0 +1,36 @@
+---
+name: "mk-jira-search"
+description: "JIRA search + filter management via jira-as; JQL injection-safe. NOT single-issue CRUD (mk:jira-issue) or bulk writes (mk:jira-bulk)."
+---
+
+# mk:jira-search
+
+Forks to the `jira-search` agent. JQL is positional on `search query` and `search validate`; flags everywhere else. The agent enforces JQL sanitization for any user-derived term via `../jira/scripts/jql-sanitize.sh`.
+
+## Triggers
+
+- "search jira for ..."
+- "find issues where assignee = me and sprint is open"
+- "build a jql for ..."
+- "export the search to /tmp/out.csv"
+- "list / create / update / delete a saved filter"
+
+## Examples
+
+- "find unresolved bugs in PROJ created in the last 7 days, top 20"
+- "validate this jql: project = PROJ AND status = 'In Progress'"
+- "save a filter named 'My open bugs' with this jql: ..."
+
+## See also
+
+- Agent: `../../agents/jira-search.md`
+- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Domain refs:
+  - `references/jql-patterns.md` — canonical JQL templates (curated)
+  - `references/jql-reference.md` — full JQL operator + function reference
+  - `references/search-examples.md` — practical query examples per scenario
+- Peer leaves: `mk:jira-bulk` (write-side bulk by JQL — same dry-run discipline), `mk:jira-time` (time-related JQL → see `mk:jira-time/references/jql-snippets.md`)
+
+## Gotchas
+
+- (none yet — grow from observed failures)

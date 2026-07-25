@@ -1,0 +1,44 @@
+---
+name: "mk-jira-jsm"
+description: "JIRA Service Management via jira-as: service desks, requests, customers, orgs, queues, SLAs, approvals. Requires JSM tenant + agent role. NOT core issue ops (mk:jira-issue) or admin (mk:jira-admin)."
+---
+
+# mk:jira-jsm
+
+Forks to the `jira-jsm` agent. Service Management (JSM) operations — service desks, requests, SLAs, customers, organizations, queues, approvals, request types.
+
+## Triggers
+
+- "create JSM request in service desk 'IT Support'"
+- "list service desks"
+- "SLA status for KEY-123"
+- "approve request KEY-123"
+- "list queue 'Tier 1 Support'"
+- "add comment to JSM request KEY-123" (agent will confirm internal vs public)
+
+## Examples
+
+- Get service desk status: "show me the queues for service desk 'IT Support'"
+- Customer-facing comment: "add public comment to KEY-123: '<message>'" → agent confirms internal-vs-public per safety-framework.
+
+## Required Permissions
+
+JSM-licensed tenant + agent or admin role. Insufficient permission → exit code 3.
+
+## Limitations
+
+- 8 sub-domains, ~45 verbs total — see `jira-as jsm <sub-domain> --help` for the authoritative flag list.
+- Internal-vs-public comments are a privacy concern; the agent enforces explicit confirmation before posting customer-facing content.
+
+## See also
+
+- Agent: `../../agents/jira-jsm.md`
+- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Domain refs:
+  - `references/decision-tree.md` — when to use `mk:jira-jsm` vs `mk:jira-{issue,lifecycle,collaborate}` etc.
+  - `references/itil-workflows.md` — ITIL 4 process implementations (incident / service-request / problem / change management)
+- Peer leaves: `mk:jira-collaborate` (internal-vs-public discipline applies on JSM tickets too), `mk:jira-lifecycle` (`patterns/jsm-request-workflow.md`), `mk:jira-admin` (request-type / queue config)
+
+## Gotchas
+
+- (none yet)
