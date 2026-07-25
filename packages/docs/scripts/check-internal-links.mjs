@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DOCS_ROOT = join(HERE, "..", "content", "docs");
 const REPO_ROOT = join(HERE, "..", "..", "..");
+const REDIRECTS_FILE = join(HERE, "..", "redirects.json");
 
 function walk(dir) {
   const out = [];
@@ -34,6 +35,25 @@ function urlFor(abs) {
 
 const files = walk(DOCS_ROOT);
 const pages = new Set(files.map(urlFor));
+
+// Retired URLs. A redirect resolves, so plain link checking stays green while the docs bounce
+// readers through pages that were merged away — which is the failure this half of the check
+// exists to catch. The map is also validated in its own right: an entry pointing at a page that
+// does not exist, or at another redirect, sends the reader somewhere worse than the old page.
+const { redirects } = JSON.parse(readFileSync(REDIRECTS_FILE, "utf-8"));
+const retired = new Map(redirects.map(({ from, to }) => [from, to]));
+
+const mapErrors = [];
+const seenSources = new Set();
+for (const { from, to } of redirects) {
+  if (seenSources.has(from)) mapErrors.push(`${from} — listed twice; the second entry is dead`);
+  seenSources.add(from);
+  if (from === to) mapErrors.push(`${from} — redirects to itself`);
+}
+for (const { from, to } of redirects) {
+  if (retired.has(to)) mapErrors.push(`${from} → ${to} — target is itself retired; point at the final page`);
+  else if (!pages.has(to)) mapErrors.push(`${from} → ${to} — no page serves the target`);
+}
 
 // Routes the app serves that are not MDX pages under content/docs.
 const NON_MDX_ROUTES = new Set(["/", "/llms.txt", "/llms-full.txt", "/sitemap.xml", "/robots.txt", "/api/search"]);
@@ -66,14 +86,24 @@ for (const abs of files) {
       const target = raw.split("#")[0].replace(/\/$/, "") || "/";
       if (NON_MDX_ROUTES.has(target)) continue;
       if (NON_MDX_PREFIXES.some((p) => target.startsWith(p))) continue;
+      if (retired.has(target)) {
+        broken.push({ file: rel, line: i + 1, target: raw, why: `retired — link ${retired.get(target)} instead` });
+        continue;
+      }
       if (pages.has(target)) continue;
-      broken.push({ file: rel, line: i + 1, target: raw });
+      broken.push({ file: rel, line: i + 1, target: raw, why: "no page serves this path" });
     }
   });
 }
 
-for (const b of broken) {
-  console.log(`ERROR ${b.file}:${b.line}  ${b.target} — no page serves this path`);
+for (const e of mapErrors) {
+  console.log(`ERROR redirects.json  ${e}`);
 }
-console.log(`\nchecked ${files.length} pages — ${broken.length} broken internal link(s)`);
-process.exit(broken.length > 0 ? 1 : 0);
+for (const b of broken) {
+  console.log(`ERROR ${b.file}:${b.line}  ${b.target} — ${b.why}`);
+}
+const failures = mapErrors.length + broken.length;
+console.log(
+  `\nchecked ${files.length} pages and ${redirects.length} redirect(s) — ${broken.length} bad internal link(s), ${mapErrors.length} redirect map error(s)`,
+);
+process.exit(failures > 0 ? 1 : 0);
