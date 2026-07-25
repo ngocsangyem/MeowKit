@@ -15,6 +15,8 @@ npx mewkit doctor [--report]
 
 **Checks:** Node.js 20+, Python 3.9+, Git, `.claude/` structure, hooks executable, scripts present, memory writable, MCP config, Python venv, config validity.
 
+The Node check passes at 20 and up, while the `mewkit` package itself requires Node 24 or later. Install on 24+; a passing `doctor` on Node 20 does not mean the CLI is supported there.
+
 **Auto-fixes:** Hook file permissions (`chmod +x`).
 
 | Flag              | Description                                                                                            |

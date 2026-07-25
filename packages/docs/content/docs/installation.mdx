@@ -5,8 +5,8 @@ description: "Install MeowKit and get it running in your project."
 
 ## Prerequisites
 
-- **Node.js** 20 or later
-- **Python** 3.9 or later (for validation scripts — stdlib only, no pip installs)
+- **Node.js** 24 or later
+- **Python** 3.9 or later — `mewkit setup` creates a virtualenv at `.claude/skills/.venv` and pip-installs `google-genai`, `pillow`, and `python-dotenv`, plus any per-skill `requirements.txt`
 - **Git** installed and configured
 - **Claude Code** installed ([claude.ai/code](https://claude.ai/code))
 
@@ -55,15 +55,17 @@ Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that 
 ├── rules/           Enforcement rules
 ├── scripts/         Python validators
 │   └── bin/         Shell utilities
-├── memory/          Cross-session persistence
+├── memory/          Cost log, trace log, derived wiki index
 ├── settings.json    Hook registrations
+├── meowkit.config.json  Project configuration
+├── .env             Optional API keys (Gemini)
 └── modes/           Behavioral modes
 
 CLAUDE.md             Entry point for Claude Code
-.meowkit.config.json  Project configuration
 .mcp.json.example     Optional MCP server config
-.env.example          Optional API keys (Gemini)
 ```
+
+Curated memory (fix patterns, review patterns, architecture decisions) lives outside the provider directory, at `.meowkit/memory/`.
 
 ## Verify installation
 
@@ -90,8 +92,8 @@ Available MCP servers: Context7 (docs), Playwright (QA), Sequential Thinking.
 For `mk:multimodal` (image/video/audio analysis):
 
 ```bash
-# Add to .env
-echo "GEMINI_API_KEY=your-key" >> .env
+# Add to .claude/.env — gitignored, secrets stay local
+echo "MEOWKIT_GEMINI_API_KEY=your-key" >> .claude/.env
 ```
 
 Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
