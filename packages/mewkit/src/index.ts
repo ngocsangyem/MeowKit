@@ -4,6 +4,8 @@ import fs from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import minimist from "minimist";
+import { renderHelp } from "./cli/render-help.js";
+import { minimistOptions } from "./cli/minimist-options.js";
 import pc from "picocolors";
 import { init } from "./commands/init.js";
 import { upgrade } from "./commands/upgrade.js";
@@ -41,98 +43,7 @@ const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json")
 const VERSION = pkgJson.version;
 
 function printHelp(): void {
-	console.log(`
-${pc.bold(pc.cyan("mewkit"))} ${pc.dim(`v${VERSION}`)} — MeowKit runtime CLI
-
-${pc.bold("Usage:")}
-  mewkit <command> [options]
-
-${pc.bold("Commands:")}
-  ${pc.green("init")}       Scaffold or update MeowKit in the current project
-  ${pc.green("upgrade")}    Upgrade MeowKit to the latest version
-  ${pc.green("validate")}   Validate .claude/ project structure (--mode authoring|flat-copy; auto-detected)
-  ${pc.green("capabilities")} Inspect/resolve the capability manifest ('capabilities list|explain <id>|resolve --intent "…"|view|bootstrap|projections' [--json])
-  ${pc.green("budget")}     View token usage and cost log ('budget context' for per-profile size)
-  ${pc.green("memory")}     Manage agent memory (lessons & patterns)
-  ${pc.green("setup")}      Guided post-scaffold configuration
-  ${pc.green("doctor")}     Diagnose common environment issues ('doctor provenance --explain' for a read-only provenance report)
-  ${pc.green("status")}     Print version and config summary
-  ${pc.green("task-state")} Durable task record ('task-state show [--json]' | 'task-state update <id> --status --step --next --plan')
-  ${pc.green("orient")}     Safe resume orientation from durable task state ('orient [--json]') — reads records only, no plan/wiki scan
-  ${pc.green("context")}    Repo-context evidence ('context resolve <path> [--root]' | 'context check <envelope.json>' | 'context record --task <id> <envelope.json>')
-  ${pc.green("task")}       Create and list task files (new, list)
-  ${pc.green("migrate")}    Export MeowKit to external coding-agent tools (cursor, codex, ...)
-  ${pc.green("providers")}  Show effective provider support matrix and enforcement levels ('providers [<p>] --lifecycle' for the capability-adapter + lifecycle matrix)
-  ${pc.green("visual-plan")} Visual plan contracts: validate|status|approve --revision <n>|rehash|export --format html|prepare-feedback --ops <f>|apply-feedback --batch <id> [--check|--receipt <f>]|patch --op <f>|edit|view <plan-dir> [--json]
-  ${pc.green("review")}     High-assurance PR review ('review prepare <pr>' → session; 'review read --session <id> --as <role> <path>' → observed read; 'review coverage --session <id>' → gap gate)
-  ${pc.green("inventory")}  List harness artifacts with governance metadata
-  ${pc.green("plan")}       Plan lifecycle: status <plan-dir> | check <phase-file> (read-only); approve <plan-dir> | archive <plan-dir> (mutating; archive marks completed + moves to tasks/plans/archive/)
-  ${pc.green("trace")}      On-demand trace recall: score | audit | propose | --friction
-  ${pc.green("wiki")}       Long-term project knowledge ('wiki context "<keywords>" [--max-pages N] [--include-content] [--json]' | init|propose|approve|search|reindex)
-  ${pc.green("index")}      Build/refresh the opt-in derived SQLite index over the append logs
-  ${pc.green("query")}      Read-only aggregate queries over the derived index
-  ${pc.green("pack")}       Manage install packs (list, add, remove)
-
-${pc.bold("Options:")}
-  --help, -h       Show help
-  --version, -v    Show version
-  --session [id]   Budget: filter to current session or a specific session id
-  --day [date]     Budget: filter to today or a specific YYYY-MM-DD
-  --providers      Doctor/migrate: include provider contract diagnostics
-  --state          Doctor: include state taxonomy diagnostics
-  --hard-gates     Doctor: live-probe the hard gates (plan/privacy/injection block)
-  --consolidation  Doctor: show the Phase-7 consolidation/deprecation ledger (status ≠ runtime availability)
-  --portable       Validate: include portable provider contract checks
-  --strict         Validate: treat WARN as failure (exit 1); off by default
-  --workflow       Validate: run only the workflow.yaml drift-check (CI scope)
-  --gates          Validate: run only the gate-authority contract check (CI scope)
-  --ownership      Validate: run only the artifact ownership-completeness check
-  --agents         Validate: run only declared agent-contract conformance checks
-  --packs          Validate: run only the pack-manifest coherence + safety check
-  --rules          Validate: run only the routing-table-breadth WARN check
-  --fail-over <N>  Budget context: exit non-zero when a profile exceeds N tokens
-  --json           Providers/inventory: emit machine-readable JSON
-  --stale          Inventory: show only deprecated/experimental artifacts
-  --critical       Inventory: show only criticality=critical artifacts
-  --portable-missing  Inventory: show artifacts whose runtime is not portable
-  --check          Inventory: fail if README/index counts drift from reality
-  --emit-counts    Inventory: rewrite README/index count numbers to match reality
-  --substrate      Inventory: print the responsibility×coverage substrate matrix (--emit writes the view)
-                   Validate: run only the responsibility-substrate drift/untagged check
-
-${pc.bold("Migrate flags:")}
-  --dry-run                  Print the migration plan and reference report without writing
-  --only <types>             Limit to item types (agents,commands,skills,config,rules,hooks)
-  --force                    Overwrite user-edited targets on conflict
-  --all-rules                Merge ALL rules into the provider instruction file (skip portability filter)
-  --include-mcp              Also convert .mcp.json servers into the provider MCP config (Codex)
-  --include-unportable       Install runtime: claude-code skills for a non-Claude provider without
-                             an adapter (EXPERIMENTAL; overrides Codex default-deny, not safety)
-
-${pc.bold("Init flags:")}
-  --profile <name>           Install a subset: core|developer|product|atlassian|security|research|full
-                             (default full). In update mode, trims an install down to the profile.
-
-${pc.bold("Init flags (a bare fresh 'init' shows a Claude Code / Codex / Cursor picker):")}
-  --target <provider>        Skip the picker; create one toolkit: 'codex' copies the authored Codex
-                             bundle (codex-only, no .claude/); 'cursor' unpacks .claude/ then exports
-  --migrate                  Skip the picker; after unpack, prompt for export targets (interactive)
-  --migrate-global           Use global install paths (~/.cursor/, etc.) instead of project-local
-  --mcp-profiles <names>     Cursor only: comma-separated MCP profile name(s) or 'all' to merge into
-                             .cursor/mcp.json (default: none — fresh install ships ZERO MCP config;
-                             omitted flag prompts interactively, still defaulting to none selected)
-  --allow-cloud-mcp          Cursor only: second explicit opt-in required to apply an MCP profile to
-                             a project with a git remote (may run as a Cursor Cloud Agent, where
-                             beforeMCPExecution has no local enforcement equivalent)
-
-${pc.bold("visual-plan flags:")}
-  --port <number>            Bind to fixed port (default: random)
-  --open / --no-open         Auto-launch browser (default: --open)
-  --revision <n>             approve: pin to the exact reviewed revision
-  --batch <id>               apply-feedback: target feedback batch
-  --check / --receipt <f>    apply-feedback: pre-apply gate / record outcomes
-  --op <f> / --ops <f>       patch / prepare-feedback operations file
-`);
+	console.log(renderHelp(VERSION));
 }
 
 async function printStatus(): Promise<void> {
@@ -154,112 +65,7 @@ async function printStatus(): Promise<void> {
 }
 
 async function main(): Promise<void> {
-	const args = minimist(process.argv.slice(2), {
-		boolean: [
-			"help",
-			"version",
-			"activate",
-			"record",
-			"presets",
-			"check",
-			"strict",
-			"beta",
-			"list",
-			"monthly",
-			"clear",
-			"show",
-			"stats",
-			"report",
-			"providers",
-			"state",
-			"hard-gates",
-			"consolidation",
-			"portable",
-			"all",
-			"dry-run",
-			"force",
-			"system-deps",
-			"yes",
-			"global",
-			"skip-config",
-			"skip-rules",
-			"skip-hooks",
-			"install",
-			"reconcile",
-			"reinstall-empty-dirs",
-			"respect-deletions",
-			"all-rules",
-			"include-mcp",
-			"include-unportable",
-			"no-cleanup",
-			"migrate",
-			"migrate-global",
-			"open",
-			"no-open",
-			"no-color",
-			"allow-cloud-mcp",
-			"verbose",
-			"workflow",
-			"gates",
-			"ownership",
-			"agents",
-			"json",
-			"stale",
-			"critical",
-			"portable-missing",
-			"emit-counts",
-			"packs",
-			"rules",
-			"substrate",
-			"capabilities",
-			"emit",
-			"commit",
-			"explain",
-			"write",
-			"record",
-			"reply",
-		],
-		string: [
-			"mode",
-			"intent",
-			"provider",
-			"step",
-			"next",
-			"plan",
-			"by",
-			"target",
-			"root",
-			"only",
-			"type",
-			"priority",
-			"status",
-			"source",
-			"source-version",
-			"port",
-			"session",
-			"day",
-			"workspace",
-			"log",
-			"profile",
-			"skill-packs",
-			"mcp-profiles",
-			"fail-over",
-			"friction",
-			"id",
-			"responsibility",
-			"revision",
-			"format",
-			"ops",
-			"batch",
-			"receipt",
-			"op",
-			"remote",
-			"as",
-			"tier",
-			"confirm",
-		],
-		alias: { h: "help", v: "version", y: "yes" },
-	});
+	const args = minimist(process.argv.slice(2), minimistOptions());
 
 	if (args.version) {
 		console.log(VERSION);
