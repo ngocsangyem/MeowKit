@@ -85,7 +85,7 @@ describe('conversation-summary subsystem fully removed', () => {
   it('no settings.json registration, env default, or env-example var remains', () => {
     expect(read('.claude/settings.json')).not.toContain('conversation-summary-cache.sh');
     expect(read('.claude/settings.json')).not.toContain('MEOWKIT_SUMMARY');
-    expect(read('.claude/.env.example')).not.toContain('MEOWKIT_SUMMARY');
+    expect(read('.meowkit/.env.example')).not.toContain('MEOWKIT_SUMMARY');
   });
 
   it('Stop + UserPromptSubmit still dispatch via dispatch.cjs (other hooks intact)', () => {

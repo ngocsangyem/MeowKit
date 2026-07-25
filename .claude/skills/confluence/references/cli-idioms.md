@@ -65,7 +65,7 @@ The sanitizer escapes backslash + double-quote in the payload; the caller is res
 
 Wrapper sets `CONFLUENCE_OUTPUT=json` by default. Output is the raw upstream API response — there is no envelope. Skills must parse with `python3 -c 'import json,sys; ...'` or `jq`.
 
-If the upstream `print_success` line appears as a trailing non-JSON line, set `MEOW_CONFLUENCE_STDOUT_FILTER=trim-tail` in `.claude/.env`. See `references/install-and-auth.md` for the channel-detection smoke test.
+If the upstream `print_success` line appears as a trailing non-JSON line, set `MEOW_CONFLUENCE_STDOUT_FILTER=trim-tail` in `.meowkit/.env`. See `references/install-and-auth.md` for the channel-detection smoke test.
 
 ## Error envelope + exit codes
 

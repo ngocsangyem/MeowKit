@@ -100,27 +100,27 @@ The following entries were added in v2.3.0 to route events to `dispatch.cjs`. Th
 
 See [Environment Variables](#environment-variables) below for the complete reference.
 
-## .claude/.env File [#dotenv]
+## .meowkit/.env File [#dotenv]
 
-MeowKit loads `.claude/.env` automatically at session start. This is the recommended way to set project-level env vars (API keys, config overrides) without polluting your shell profile.
+MeowKit loads `.meowkit/.env` automatically at session start. This is the recommended way to set project-level env vars (API keys, config overrides) without polluting your shell profile.
 
 **How it works:**
 
-1. `project-context-loader.sh` (SessionStart) sources `.claude/.env` into the shell environment → all shell hooks inherit it
-2. `dispatch.cjs` parses `.claude/.env` into `process.env` → all Node.js handlers inherit it
+1. `project-context-loader.sh` (SessionStart) sources `.meowkit/.env` into the shell environment → all shell hooks inherit it
+2. `dispatch.cjs` parses `.meowkit/.env` into `process.env` → all Node.js handlers inherit it
 3. `mk:multimodal` Python scripts have their own `.env` loading (predates centralized loader)
 
 **Precedence:** Shell exports (`export VAR=x`) **always win**. `.env` vars only apply when the var is not already set. This means you can override `.env` per-session with `export`.
 
 **Setup:**
 ```bash
-cp .claude/.env.example .claude/.env
-# Edit .claude/.env with your values
+cp .meowkit/.env.example .meowkit/.env
+# Edit .meowkit/.env with your values
 ```
 
 **Security:** `.env` is gitignored by default. Never commit API keys. The `privacy-block.sh` hook blocks Claude from reading `.env` files directly — the dotenv loader is the only authorized reader.
 
-**Template:** See `.claude/.env.example` for all supported variables with descriptions.
+**Template:** See `.meowkit/.env.example` for all supported variables with descriptions.
 
 ## Rules
 
@@ -173,25 +173,25 @@ All `MEOWKIT_*` env vars. Set in your shell profile (`~/.zshrc`, `~/.bashrc`) or
 
 ### Jira
 
-The `mk:jira-*` family (router + 16 leaves added in v2.8.3) is driven by three `MEOW_JIRA_*` env vars in `.claude/.env` (gitignored). The wrapper script `scripts/jira-as.sh` translates them to `jira-as`'s native `JIRA_*` names per call.
+The `mk:jira-*` family (router + 16 leaves added in v2.8.3) is driven by three `MEOW_JIRA_*` env vars in `.meowkit/.env` (gitignored). The wrapper script `scripts/jira-as.sh` translates them to `jira-as`'s native `JIRA_*` names per call.
 
 > **Naming exception**: these vars use the legacy `MEOW_*` prefix (one-off exception to the modern `MEOWKIT_*` convention) per migration directive. The upstream `JIRA-Assistant-Skills` README also mentions `JIRA_PROFILE` — that is a plugin-layer concern, NOT consumed by `jira-as` or `mk:jira`.
 
 | Variable | Default | Purpose | Where to set |
 |----------|---------|---------|--------------|
-| `MEOW_JIRA_API_TOKEN` | *(required)* | Atlassian Cloud API token. Get from [https://id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens). | `.claude/.env` |
-| `MEOW_JIRA_EMAIL` | *(required)* | Atlassian account email. | `.claude/.env` |
-| `MEOW_JIRA_SITE_URL` | *(required)* | e.g. `https://your-company.atlassian.net`. | `.claude/.env` |
+| `MEOW_JIRA_API_TOKEN` | *(required)* | Atlassian Cloud API token. Get from [https://id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens). | `.meowkit/.env` |
+| `MEOW_JIRA_EMAIL` | *(required)* | Atlassian account email. | `.meowkit/.env` |
+| `MEOW_JIRA_SITE_URL` | *(required)* | e.g. `https://your-company.atlassian.net`. | `.meowkit/.env` |
 | `JIRA_OUTPUT` | `json` (set by wrapper) | Default output format for `jira-as`. | Override per-call: `JIRA_OUTPUT=text bash scripts/jira-as.sh ...` |
 | `JIRA_MOCK_MODE` | *(unset)* | When set to `true`, agents surface `**[MOCK MODE]**` in output headers; intelligence agents avoid live writes. | Sandbox / CI testing. |
 
-The SessionStart hook `jira-env-loader.sh` validates `.claude/.env` presence + the 3 required keys. It emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing` to the status line.
+The SessionStart hook `jira-env-loader.sh` validates `.meowkit/.env` presence + the 3 required keys. It emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing` to the status line.
 
 **Setup (one-time):**
 
 ```bash
 npx mewkit setup           # auto-installs jira-as into .claude/skills/.venv
-cp .claude/.env.example .claude/.env
+cp .meowkit/.env.example .meowkit/.env
 # edit MEOW_JIRA_API_TOKEN, MEOW_JIRA_EMAIL, MEOW_JIRA_SITE_URL
 ```
 

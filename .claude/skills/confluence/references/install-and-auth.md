@@ -4,7 +4,7 @@ One-time setup for the Confluence skill family. Cloud only.
 
 ## Required env vars
 
-Add three lines to `.claude/.env` (chmod 0600 recommended):
+Add three lines to `.meowkit/.env` (chmod 0600 recommended):
 
 ```
 MEOW_CONFLUENCE_SITE_URL=https://your-tenant.atlassian.net
@@ -41,7 +41,7 @@ The wrapper exits 3 if `MEOW_CONFLUENCE_SITE_URL` does not end in `.atlassian.ne
 | ---- | ------- |
 | 0    | Success |
 | 1    | Sanitizer rejection (CQL) |
-| 2    | Plaintext credential fallback detected — move to `.claude/.env` |
+| 2    | Plaintext credential fallback detected — move to `.meowkit/.env` |
 | 3    | Non-Cloud URL — Server/DC not supported |
 | 127  | `confluence-as` binary not installed — run `.claude/scripts/bin/setup-workflow` |
 | 4-7  | confluence-as runtime errors (network, auth, validation, server) |

@@ -69,7 +69,7 @@ This skill is a **pure routing layer**. Its sole purpose: identify the right `mk
 
 ## Setup
 
-See `references/install-and-auth.md` for one-time setup (`.claude/scripts/bin/setup-workflow` installs `confluence-assistant-skills` into `.claude/skills/.venv` per `scripts/requirements.txt`; populate `.claude/.env` with the 3 `MEOW_CONFLUENCE_*` vars).
+See `references/install-and-auth.md` for one-time setup (`.claude/scripts/bin/setup-workflow` installs `confluence-assistant-skills` into `.claude/skills/.venv` per `scripts/requirements.txt`; populate `.meowkit/.env` with the 3 `MEOW_CONFLUENCE_*` vars).
 
 ## Shared Resources (used by leaves)
 

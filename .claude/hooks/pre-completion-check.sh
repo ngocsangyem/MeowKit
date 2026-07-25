@@ -7,7 +7,7 @@
 # Behavior:
 #   - Check for test run evidence, evaluator verdict, or contract sign-off in the current session
 #
-# Load .claude/.env (each hook is a separate subprocess)
+# Load .meowkit/.env (each hook is a separate subprocess)
 . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 #   - If missing AND attempts < 3 AND density != LEAN: emit JSON block decision
 #   - If missing AND attempts >= 3: soft nudge (avoid infinite loop)

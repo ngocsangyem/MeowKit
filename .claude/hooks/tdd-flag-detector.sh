@@ -7,7 +7,7 @@
 # accordingly. This converts the otherwise-behavioral sentinel mechanism into
 # a mechanical preventive control.
 #
-# Load .claude/.env (each hook is a separate subprocess)
+# Load .meowkit/.env (each hook is a separate subprocess)
 . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 #
 # Detection rules:

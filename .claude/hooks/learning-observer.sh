@@ -6,7 +6,7 @@
 # Signals detected:
 #   churn   — same file edited 3+ times this session
 #
-# Load .claude/.env (each hook is a separate subprocess)
+# Load .meowkit/.env (each hook is a separate subprocess)
 . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 # State: session-state/learning-observer.jsonl — per-file edit ledger, self-read to
 # compute edit_count for the canonical `file_edited` trace. No external reader

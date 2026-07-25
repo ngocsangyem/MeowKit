@@ -261,8 +261,11 @@ export async function smartUpdate(
 		stats.added++;
 	}
 
-	// Write .env with API keys (single read-modify-write cycle)
-	const envPath = join(claudeDir, ".env");
+	// Write .env with API keys (single read-modify-write cycle). Target `.meowkit/.env`, but
+	// keep editing a pre-move `.claude/.env` when that is the file the project already has —
+	// writing a second one would split the user's keys across two files.
+	const legacyEnvPath = join(claudeDir, ".env");
+	const envPath = existsSync(legacyEnvPath) ? legacyEnvPath : join(dirname(claudeDir), ".meowkit", ".env");
 	const hasNewKeys = config.geminiApiKey || config.externalProviderKeys;
 	if (hasNewKeys) {
 		let envContent = existsSync(envPath)
@@ -291,6 +294,7 @@ export async function smartUpdate(
 			}
 		}
 		if (!dryRun) {
+			mkdirSync(dirname(envPath), { recursive: true });
 			writeFileSync(envPath, envContent, "utf-8");
 		}
 		stats.added++;
@@ -299,8 +303,8 @@ export async function smartUpdate(
 		const gitignorePath = join(targetDir, ".gitignore");
 		if (!dryRun) {
 			let gitignoreContent = existsSync(gitignorePath) ? readFileSync(gitignorePath, "utf-8") : "";
-			if (!gitignoreContent.includes(".claude/.env")) {
-				gitignoreContent += "\n# MeowKit secrets\n.claude/.env\n";
+			if (!gitignoreContent.includes(".meowkit/.env")) {
+				gitignoreContent += "\n# MeowKit secrets\n.meowkit/.env\n.claude/.env\n";
 				writeFileSync(gitignorePath, gitignoreContent, "utf-8");
 			}
 		}

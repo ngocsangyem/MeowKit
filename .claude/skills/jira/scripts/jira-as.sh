@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Wraps the venv-local jira-as binary. Sources .claude/.env, translates
+# Wraps the venv-local jira-as binary. Sources .meowkit/.env (and the pre-move .claude/.env), translates
 # MEOW_JIRA_* → JIRA_* env, sets JIRA_OUTPUT=json default, then exec's.
 # Resolves to venv-local binary (NOT PATH) since `.claude/scripts/bin/setup-workflow` installs
 # jira-as into .claude/skills/.venv per skills-dependencies.ts.
@@ -7,7 +7,9 @@ set -euo pipefail
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 JIRA_AS="$ROOT/.claude/skills/.venv/bin/jira-as"
-ENV_FILE="$ROOT/.claude/.env"
+# Legacy first, canonical second: with `set -a` a later assignment wins, so
+# `.meowkit/.env` stays authoritative when a project still has both files.
+ENV_FILES="$ROOT/.claude/.env $ROOT/.meowkit/.env"
 
 if [ ! -x "$JIRA_AS" ]; then
   echo "[mk:jira] jira-as not installed at $JIRA_AS" >&2
@@ -15,14 +17,16 @@ if [ ! -x "$JIRA_AS" ]; then
   exit 127
 fi
 
-if [ -f "$ENV_FILE" ]; then
-  set -a
-  # shellcheck disable=SC1090
-  source "$ENV_FILE"
-  set +a
-fi
+for ENV_FILE in $ENV_FILES; do
+  if [ -f "$ENV_FILE" ]; then
+    set -a
+    # shellcheck disable=SC1090
+    source "$ENV_FILE"
+    set +a
+  fi
+done
 
-: "${MEOW_JIRA_API_TOKEN:?MEOW_JIRA_API_TOKEN missing — see .claude/.env.example}"
+: "${MEOW_JIRA_API_TOKEN:?MEOW_JIRA_API_TOKEN missing — see .meowkit/.env.example}"
 : "${MEOW_JIRA_EMAIL:?MEOW_JIRA_EMAIL missing}"
 : "${MEOW_JIRA_SITE_URL:?MEOW_JIRA_SITE_URL missing}"
 

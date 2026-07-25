@@ -26,7 +26,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 
 ## Pre-flight
 
-The parent SessionStart hook (`jira-env-loader.sh`) already validated `.claude/.env` presence + the 3 `MEOW_JIRA_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
+The parent SessionStart hook (`jira-env-loader.sh`) already validated `.meowkit/.env` presence + the 3 `MEOW_JIRA_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
 
 All `jira-as` invocations MUST go through:
 
@@ -61,7 +61,7 @@ End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.
 ```toon
 [7]{exit,action}
 1|Validation — re-read your `--help`, fix the flag, retry
-2|Auth — escalate; user updates `.claude/.env`
+2|Auth — escalate; user updates `.meowkit/.env`
 3|Permission — report; user lacks Jira permission
 4|Not found — confirm the issue/project key exists
 5|Rate limit — backoff + retry once

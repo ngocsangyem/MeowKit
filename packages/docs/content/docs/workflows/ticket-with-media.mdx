@@ -39,7 +39,7 @@ npx mewkit setup
 
 This installs `jira-as` into `.claude/skills/.venv/bin/jira-as`. No global install needed.
 
-Then populate `.claude/.env` (gitignored) with three vars:
+Then populate `.meowkit/.env` (gitignored) with three vars:
 
 | Var | Purpose |
 |---|---|
@@ -67,7 +67,7 @@ The router does NOT auto-fallback — you invoke the leaf with the MCP transport
 | Tool | What it enables | Install |
 |------|----------------|---------|
 | Figma MCP | Exact design data (colors, spacing, tokens) | `claude mcp add figma` |
-| Gemini API key | Better image/video analysis | Set `MEOWKIT_GEMINI_API_KEY` in `.claude/.env` |
+| Gemini API key | Better image/video analysis | Set `MEOWKIT_GEMINI_API_KEY` in `.meowkit/.env` |
 | FFmpeg | Video frame extraction, image optimization | `brew install ffmpeg` or `npx mewkit setup --system-deps` |
 | ImageMagick | Image resize/conversion | `brew install imagemagick` or `npx mewkit setup --system-deps` |
 

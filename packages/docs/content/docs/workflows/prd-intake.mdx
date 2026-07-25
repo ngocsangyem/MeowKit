@@ -31,7 +31,7 @@ npx mewkit setup
 
 This installs `jira-as` into `.claude/skills/.venv/bin/jira-as`. No global install needed.
 
-Then populate `.claude/.env` (gitignored) with three vars:
+Then populate `.meowkit/.env` (gitignored) with three vars:
 
 | Var | Purpose |
 |---|---|
@@ -307,7 +307,7 @@ Be honest about boundaries:
 
 ## Gotchas
 
-- **No `MEOW_JIRA_*` env = no Jira I/O**: The analysis skills work standalone (you can paste ticket text), but automated read/write requires the three env vars in `.claude/.env`.
+- **No `MEOW_JIRA_*` env = no Jira I/O**: The analysis skills work standalone (you can paste ticket text), but automated read/write requires the three env vars in `.meowkit/.env`.
 - **Product areas YAML must be maintained**: Stale domain mappings = wrong classification. Update when team structure changes.
 - **RCA only for bugs**: Feature PRDs get completeness scoring + breakdown, not root cause analysis.
 - **PIC suggestion ≠ assignment**: MeowKit suggests based on domain + load. Human confirms. Never auto-assign without review unless your team explicitly opts in.

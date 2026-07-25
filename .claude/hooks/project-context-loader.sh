@@ -9,7 +9,7 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
-# Load .claude/.env — shared dotenv lib (each hook is a separate subprocess,
+# Load .meowkit/.env — shared dotenv lib (each hook is a separate subprocess,
 # so every hook that reads MEOWKIT_* vars must source this independently).
 # Note: as of the native `env` field fix, most control vars now come from
 # settings.json `env` block. .env loading remains for API keys + overrides.
@@ -134,7 +134,7 @@ if [ -n "${HOOK_SESSION_ID:-}" ] && [ "$HOOK_SESSION_ID" != "${LAST_SESSION:-}" 
   [ "${MEOWKIT_LOOP_DETECT:-on}" = "off" ] && echo "- Loop detection: **disabled**" || echo "- Loop detection: on (default)"
   [ -n "${MEOWKIT_AUTOBUILD_MODE:-}" ] && echo "- Harness density: **${MEOWKIT_AUTOBUILD_MODE}** (overridden)" || echo "- Harness density: auto-detect"
   echo ""
-  echo "_Config sources: settings.json \`env\` (defaults) → .claude/.env (overrides) → shell export (highest). Agent sees this block at session start only._"
+  echo "_Config sources: settings.json \`env\` (defaults) → .meowkit/.env (overrides) → shell export (highest). Agent sees this block at session start only._"
 fi
 
 echo ""

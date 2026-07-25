@@ -11,7 +11,9 @@ set -euo pipefail
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 CONFLUENCE_AS="$ROOT/.claude/skills/.venv/bin/confluence-as"
-ENV_FILE="$ROOT/.claude/.env"
+# Legacy first, canonical second: with `set -a` a later assignment wins, so
+# `.meowkit/.env` stays authoritative when a project still has both files.
+ENV_FILES="$ROOT/.claude/.env $ROOT/.meowkit/.env"
 LOCAL_SETTINGS="$ROOT/.claude/settings.local.json"
 
 if [ ! -x "$CONFLUENCE_AS" ]; then
@@ -27,14 +29,16 @@ if [ -f "$LOCAL_SETTINGS" ] && grep -q "CONFLUENCE_API_TOKEN" "$LOCAL_SETTINGS" 
   exit 2
 fi
 
-if [ -f "$ENV_FILE" ]; then
-  set -a
-  # shellcheck disable=SC1090
-  source "$ENV_FILE"
-  set +a
-fi
+for ENV_FILE in $ENV_FILES; do
+  if [ -f "$ENV_FILE" ]; then
+    set -a
+    # shellcheck disable=SC1090
+    source "$ENV_FILE"
+    set +a
+  fi
+done
 
-: "${MEOW_CONFLUENCE_API_TOKEN:?MEOW_CONFLUENCE_API_TOKEN missing — see .claude/.env.example}"
+: "${MEOW_CONFLUENCE_API_TOKEN:?MEOW_CONFLUENCE_API_TOKEN missing — see .meowkit/.env.example}"
 : "${MEOW_CONFLUENCE_EMAIL:?MEOW_CONFLUENCE_EMAIL missing}"
 : "${MEOW_CONFLUENCE_SITE_URL:?MEOW_CONFLUENCE_SITE_URL missing}"
 

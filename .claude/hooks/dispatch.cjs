@@ -17,11 +17,14 @@ const path = require('path');
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const HOOKS_DIR = path.join(ROOT, '.claude', 'hooks');
 
-// Load .claude/.env for Node.js handlers — no external dependency.
-// Does NOT override existing env vars (shell export takes precedence).
-const dotenvPath = path.join(ROOT, '.claude', '.env');
+// Load the project dotenv for Node.js handlers — no external dependency.
+// Canonical `.meowkit/.env` first, then the pre-move `.claude/.env` so an existing install
+// keeps working. Never overrides an existing var, so the first file to define a key wins
+// and a shell export beats both.
+const dotenvPaths = [path.join(ROOT, '.meowkit', '.env'), path.join(ROOT, '.claude', '.env')];
 try {
-  if (fs.existsSync(dotenvPath)) {
+  for (const dotenvPath of dotenvPaths) {
+    if (!fs.existsSync(dotenvPath)) continue;
     const lines = fs.readFileSync(dotenvPath, 'utf8').split('\n');
     for (const line of lines) {
       const trimmed = line.trim();

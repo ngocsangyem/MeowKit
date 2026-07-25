@@ -17,12 +17,26 @@ def _env(name: str) -> Optional[str]:
     return None
 
 
-def load_env_files():
-    """Load .env files. Priority: shell exports > skill .env > .agents/.env.
+def _find_meowkit_dir(start: Path) -> Optional[Path]:
+    """Walk up for the project's `.meowkit/` state dir. Bounded so a script run from
+    outside a project cannot climb to the filesystem root."""
+    for candidate in [start, *start.parents][:12]:
+        meowkit = candidate / '.meowkit'
+        if meowkit.is_dir():
+            return meowkit
+    return None
 
-    Uses override=False so shell exports always win.
-    Loads skill-specific FIRST (higher priority), then central (lower priority).
-    First file to set a var wins (since override=False).
+
+def load_env_files():
+    """Load .env files. Priority: shell exports > skill .env > .meowkit/.env > the bundle's own .env.
+
+    Uses override=False so shell exports always win and the first file to set a var wins.
+
+    `.meowkit/.env` is the project-wide file shared by every provider. No coding agent reads
+    a dotenv natively — Codex documents only `[shell_environment_policy]` for passing env to
+    subprocesses — so these scripts do their own loading, which is exactly why one shared
+    location works across Claude Code, Codex, and Cursor. The provider-local `.env` stays as
+    a fallback for installs that predate the move.
     """
     try:
         from dotenv import load_dotenv
@@ -31,7 +45,11 @@ def load_env_files():
     script_dir = Path(__file__).parent
     skill_dir = script_dir.parent
     agents_dir = skill_dir.parent.parent
-    # Skill .env first (higher priority), then central .env (defaults)
-    for env_path in [skill_dir / '.env', agents_dir / '.env']:
+    meowkit_dir = _find_meowkit_dir(script_dir)
+    candidates = [skill_dir / '.env']
+    if meowkit_dir is not None:
+        candidates.append(meowkit_dir / '.env')
+    candidates.append(agents_dir / '.env')
+    for env_path in candidates:
         if env_path.exists():
             load_dotenv(env_path, override=False)

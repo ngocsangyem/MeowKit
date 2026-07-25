@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync, copyFileSync, appendFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import pc from "picocolors";
 import { ensureVenv, installPipPackages, verifyPackages } from "../core/dependency-installer.js";
 import { getRequirementsSource, formatPackageList } from "../core/skills-dependencies.js";
@@ -47,14 +47,18 @@ MEOWKIT_GEMINI_API_KEY=
 # MEOWKIT_OPENROUTER_FALLBACK_ENABLED=true
 \n`;
 
+// Mirrors `.meowkit/gitignore.meowkit`; used only when that template is absent.
+// `.meowkit/config.json` is deliberately NOT ignored — it is project config meant to be committed.
 const DEFAULT_GITIGNORE = `# MeowKit
 .env
 .env.local
-.claude/.env
-.claude/memory/
-.claude/logs/
-.meowkit/state/
+.meowkit/.env
+.meowkit/memory/
 .meowkit/telemetry/
+.meowkit/state/
+.meowkit/cache/
+.claude/.env
+.claude/logs/
 \n`;
 
 /** Setup Python virtual environment for MeowKit skill scripts */
@@ -78,7 +82,11 @@ function setupMcp(projectDir: string): StepResult {
 	}
 
 	// Copy from example if available, otherwise create with defaults
-	const mcpExample = join(projectDir, ".claude", "mcp.json.example");
+	// Template moved into `.meowkit/`; an install made before the move still has the old copy.
+	const canonicalMcpExample = join(projectDir, ".meowkit", "mcp.json.example");
+	const mcpExample = existsSync(canonicalMcpExample)
+		? canonicalMcpExample
+		: join(projectDir, ".claude", "mcp.json.example");
 	if (existsSync(mcpExample)) {
 		copyFileSync(mcpExample, mcpTarget);
 	} else {
@@ -87,20 +95,22 @@ function setupMcp(projectDir: string): StepResult {
 	return { name: "mcp", status: "pass", message: "Created .mcp.json — edit API keys inside." };
 }
 
-/** Setup .env in .claude/ directory */
+/** Setup `.meowkit/.env`. A pre-move `.claude/.env` still counts as configured — the loaders
+ *  read both — so this never overwrites or duplicates an existing setup. */
 function setupEnv(projectDir: string): StepResult {
-	const envTarget = join(projectDir, ".claude", ".env");
+	const envTarget = join(projectDir, ".meowkit", ".env");
+	const legacyEnv = join(projectDir, ".claude", ".env");
 
-	if (existsSync(envTarget)) {
-		const content = readFileSync(envTarget, "utf-8").trim();
-		if (content.length > 0) {
-			return { name: "env", status: "skip", message: ".claude/.env already exists" };
+	for (const existing of [envTarget, legacyEnv]) {
+		if (!existsSync(existing)) continue;
+		if (readFileSync(existing, "utf-8").trim().length > 0) {
+			return { name: "env", status: "skip", message: `${relative(projectDir, existing)} already exists` };
 		}
 	}
 
-	mkdirSync(join(projectDir, ".claude"), { recursive: true });
+	mkdirSync(join(projectDir, ".meowkit"), { recursive: true });
 	writeFileSync(envTarget, DEFAULT_ENV, "utf-8");
-	return { name: "env", status: "pass", message: "Created .claude/.env — add your API keys." };
+	return { name: "env", status: "pass", message: "Created .meowkit/.env — add your API keys." };
 }
 
 /** Setup .gitignore with MeowKit entries */
@@ -110,13 +120,13 @@ function setupGitignore(projectDir: string): StepResult {
 	// Check if already has MeowKit entries
 	if (existsSync(gitignore)) {
 		const content = readFileSync(gitignore, "utf-8");
-		if (content.includes(".claude/memory/")) {
+		if (content.includes(".meowkit/memory/")) {
 			return { name: "gitignore", status: "skip", message: "MeowKit entries already in .gitignore" };
 		}
 	}
 
 	// Read from .gitignore.meowkit if exists, otherwise use defaults
-	const meowkitIgnore = join(projectDir, ".claude", "gitignore.meowkit");
+	const meowkitIgnore = join(projectDir, ".meowkit", "gitignore.meowkit");
 	const additions = existsSync(meowkitIgnore) ? readFileSync(meowkitIgnore, "utf-8") : DEFAULT_GITIGNORE;
 	appendFileSync(gitignore, `\n${additions}`, "utf-8");
 	return { name: "gitignore", status: "pass", message: "Appended MeowKit entries to .gitignore" };

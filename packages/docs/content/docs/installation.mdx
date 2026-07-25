@@ -58,11 +58,11 @@ Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that 
 ├── scripts/         Python validators
 │   └── bin/         Shell utilities
 ├── modes/           Behavioral modes
-├── settings.json    Hook registrations
-└── .env             Optional API keys (Gemini)
+└── settings.json    Hook registrations
 
 .meowkit/             Your project's own state
 ├── config.json      Project configuration — commit this
+├── .env             API keys — gitignored, shared by every provider
 ├── memory/          Fix patterns, review patterns, architecture decisions
 ├── telemetry/       Cost log, trace log
 ├── state/           Session markers
@@ -102,8 +102,8 @@ Available MCP servers: Context7 (docs), Playwright (QA), Sequential Thinking.
 For `mk:multimodal` (image/video/audio analysis):
 
 ```bash
-# Add to .claude/.env — gitignored, secrets stay local
-echo "MEOWKIT_GEMINI_API_KEY=your-key" >> .claude/.env
+# Add to .meowkit/.env — gitignored, secrets stay local
+echo "MEOWKIT_GEMINI_API_KEY=your-key" >> .meowkit/.env
 ```
 
 Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).

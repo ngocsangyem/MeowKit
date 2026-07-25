@@ -97,6 +97,15 @@ const RULES = [
     why: "`MEOWKIT_GEMINI_API_KEY` is canonical; the bare name is only a fallback in the env helper",
   },
   {
+    id: "legacy-env-path",
+    severity: "error",
+    re: /`?\.claude\/\.env(\.example)?`?/g,
+    // The loaders still read the old path as a fallback, so a line documenting that is fine;
+    // requiring the canonical path on the same line keeps the exemption from being a hole.
+    allow: (line) => /\.meowkit\/\.env/.test(line),
+    why: "the project dotenv is `.meowkit/.env`, shared by every provider",
+  },
+  {
     id: "hard-coded-count",
     severity: "warn",
     re: /\b\d{2,3} (?:specialist )?(skills|agents|rule files|hooks)\b/g,

@@ -56,7 +56,7 @@ Use only for a novel, text-prompt design. Existing design sources belong to `mk:
 
 ## Setup and guard
 
-Set `STITCH_API_KEY` in `.claude/.env`, then install the scripts once:
+Set `STITCH_API_KEY` in the project env file, then install the scripts once:
 
 ```bash
 cd .claude/skills/stitch/scripts && npm install
@@ -71,7 +71,7 @@ Before any script runs, verify both prerequisites:
 
 ```bash
 # Key gate
-[ -z "$STITCH_API_KEY" ] && { echo "[X] STITCH_API_KEY not set — add to .claude/.env"; exit 1; }
+[ -z "$STITCH_API_KEY" ] && { echo "[X] STITCH_API_KEY not set — add it to the project env file"; exit 1; }
 
 # tsx gate
 npx tsx --version 2>/dev/null || { echo "[X] tsx not found — run: cd .claude/skills/stitch/scripts && npm install"; exit 1; }
@@ -127,7 +127,7 @@ and the handoff contract are in [references/stitch-operations.md](references/sti
 
 ## Gotchas
 
-- `STITCH_API_KEY` must be in `.claude/.env` — the skill fails closed (exit 1) if unset; no network call is attempted
+- `STITCH_API_KEY` must be set in the project env file — the skill fails closed (exit 1) if unset; no network call is attempted
 - `tsx` must be installed (`npm install` in `scripts/`) — scripts will not run without it; install once per machine
 - Local quota can drift from real Stitch usage (e.g., designs made via the Stitch web UI); if you hit `RATE_LIMITED` despite the tracker showing credits, run `stitch-quota.ts reset`
 - Quota limits and paid-tier availability are volatile; load [quota-management.md](references/quota-management.md) before making a quota-based decision.

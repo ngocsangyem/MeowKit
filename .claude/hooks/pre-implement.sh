@@ -11,7 +11,7 @@
 # When TDD is enabled, blocks the calling tool unless a failing test exists.
 set -e
 
-# Load .claude/.env — this script is invoked manually by the developer agent
+# Load .meowkit/.env — this script is invoked manually by the developer agent
 # (not wired to a system event), so CLAUDE_PROJECT_DIR may or may not be set.
 # Fall back to script-relative resolution.
 # [M-1 GUARD] Skip .env load if project root doesn't contain .claude/ (catches
