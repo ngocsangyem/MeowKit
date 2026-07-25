@@ -116,6 +116,8 @@ Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 | Hooks not executable | Run `chmod +x .claude/hooks/*.sh` |
 | Python scripts fail | Ensure Python 3.9+ is in PATH |
 | Claude Code doesn't load CLAUDE.md | Restart Claude Code session |
+| The agent refuses to edit any file | Gate 1 is unapproved, which is the gate working. See [When a gate blocks you](/core-concepts/gates#when-a-gate-blocks-you) |
+| `doctor` reports hooks not executable after a fresh clone | `npx mewkit doctor` fixes this itself; permissions do not survive some archive formats |
 
 ## Next steps
 

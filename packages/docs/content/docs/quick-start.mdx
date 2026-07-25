@@ -23,10 +23,10 @@ npx mewkit doctor
 ## Step 2: Create your first task
 
 ```bash
-npx mewkit task new --type feature "My first feature"
+npx mewkit task new --type feature "Add user authentication with JWT"
 ```
 
-This creates a task file under `tasks/plans/` using the feature template. Fill in the acceptance criteria before proceeding.
+This writes a task file to `tasks/active/` from the feature template. Open it and fill in the acceptance criteria; they are what the plan and the review are both measured against, so vague criteria produce a vague plan.
 
 ## Step 3: Start a Claude Code session
 
@@ -40,7 +40,7 @@ Claude automatically reads `CLAUDE.md` and loads MeowKit's agents, skills, and r
 
 ## Step 4: Run your first command
 
-Try the simplest workflow, planning a feature:
+Plan the task you just created:
 
 ```
 /mk:plan add user authentication with JWT

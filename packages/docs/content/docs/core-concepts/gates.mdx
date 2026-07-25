@@ -49,6 +49,20 @@ Most MeowKit skills enforce a plan-first gate before significant work:
 
 Skills that skip planning have documented reasons: `mk:investigate` and `mk:office-hours` produce planning input, so they run before a plan exists by design. `mk:retro` is data-driven with no implementation output.
 
+## When a gate blocks you
+
+A gate doing its job looks like a tool that stopped working. These are the four ways it usually shows up.
+
+**The agent says it cannot edit a file, and you did not ask it to plan anything.** Gate 1 is unapproved. `gate-enforcement.sh` refuses every source write until a plan exists and you have approved it. Run `/mk:plan <what you want>`, read what it produces, and approve it. If the change genuinely is a one-liner, `/mk:fix` on a simple bug skips the gate by design; the fix is the plan.
+
+**You approved a plan and it is still blocked.** The approval is bound to the plan as it was when you approved it. Editing the plan afterwards invalidates that binding on purpose, so changed scope cannot inherit an old approval. Approve again with `npx mewkit plan approve <plan-dir>`.
+
+**Ship refuses although the review passed.** Gate 2 needs the verdict to belong to the active plan, and it fails closed when it cannot tell: no verdict, no active-plan pointer, or more than one verdict that could match. It will not pick the most recent one, because an unrelated review must never authorize this ship. Check that `session-state/active-plan.json` points at the plan you are shipping.
+
+**A verdict has a WARN and you want to proceed.** WARNs do not block, but every one has to be seen and accepted. FAIL does block, and nothing overrides it.
+
+If you want the gate off for a run, there is no flag. That is the design, not an oversight: a gate that a flag can clear measures nothing.
+
 ## Security model: four layers
 
 ### Layer 1: Behavioral rules
