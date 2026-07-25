@@ -17,7 +17,7 @@ Primary entry point for building features. Given a description or plan path, orc
 
 ## Core Capabilities
 
-- **7-phase pipeline:** Orient → Plan → Test → Build → Simplify → Verify → Review → Ship → Reflect
+- **Full pipeline:** drives all seven phases, including the mandatory Simplify and Verify stages inside Build — see [Workflow Phases](/core-concepts/workflow)
 - **TDD mode:** Opt-in via `--tdd` — writes failing tests before implementation, enforces RED-GREEN-REFACTOR
 - **Smart intent detection:** Auto-routes to the correct mode based on input patterns (plan path, "fast", "parallel", "auto")
 - **Workflow modes:** interactive (default), auto, fast, parallel, no-test, code — with modifier flags `--verify`, `--strict`, `--no-strict`

@@ -1,0 +1,42 @@
+---
+title: "Glossary"
+description: "The MeowKit vocabulary, defined once — workflow, phase, stage, gate, mode, skill, agent, hook, canonical source, hub, and leaf."
+---
+
+Every term below means one specific thing in MeowKit. Where a term also has a general meaning in software, the definition here is the narrower one.
+
+## The pipeline
+
+**Workflow** — the whole path a task takes from description to shipped code. There is one workflow; it has seven phases.
+
+**Phase** — one of the seven numbered steps of that path: Orient, Plan, Test, Build, Review, Ship, Reflect. Every task passes through all of them. Full detail on [Workflow Phases](/core-concepts/workflow).
+
+**Stage** — a step *inside* a phase. Simplify and Verify are stages of Build. A stage carries no gate and produces no approval; the distinction matters because a stage cannot be the thing a human signs off on.
+
+**Gate** — a hard stop that requires a human to approve before work continues. There are exactly two: Gate 1 on the plan, Gate 2 on the review verdict. No flag skips them and no agent can approve its own. See [Gates](/core-concepts/gates).
+
+**Exception** — a documented case where a phase is skipped, such as a one-line fix that needs no separate plan. Exceptions exist for Gate 1. Gate 2 has none.
+
+**Mode** — how the phases execute: sequential by default, parallel across isolated worktrees, or party for architecture deliberation. A mode changes the shape of the work and never the gates.
+
+## The pieces
+
+**Agent** — a specialist with its own context, prompt, and file ownership, spawned to do one job: planner, developer, reviewer, shipper. Agents do not share a context window, which is why the reviewer cannot be talked round by the developer.
+
+**Skill** — a packaged procedure the agent loads when the task needs it, addressed as `mk:name`. Skills are instructions; agents are who follows them. A skill is loaded on demand rather than always resident, which is what keeps the context budget survivable.
+
+**Hook** — a script the harness runs at a lifecycle event, registered in `.claude/settings.json`. A hook is the difference between a rule that asks and a rule that blocks: `gate-enforcement.sh` does not advise against writing code before Gate 1, it refuses the write.
+
+## How things are organised
+
+**Canonical source** — the one place a fact is allowed to live. Everything else links to it. When two pages state the same fact, one of them is already wrong or shortly will be, so MeowKit's docs name an owner per fact rather than keeping copies in sync.
+
+**Hub** — a skill that routes rather than acts. `mk:jira` decides which Jira operation you want and forwards to the skill that performs it.
+
+**Leaf** — the skill a hub forwards to, which does one operation. Leaves carry the operation detail; the hub carries the routing and the safety rules.
+
+## Next steps
+
+- [Workflow Phases](/core-concepts/workflow) — the seven phases in full
+- [Gates](/core-concepts/gates) — what each gate checks and why neither can be bypassed
+- [Skills and agents](/guide/agent-skill-architecture) — how the two fit together

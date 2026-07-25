@@ -11,6 +11,18 @@ Phase 0: Orient → Phase 1: Plan → [GATE 1] → Phase 2: Test
 → Phase 5: Ship → Phase 6: Reflect
 ```
 
+## The words this page uses
+
+Five terms do most of the work, and they are not interchangeable:
+
+| Term | What it means |
+|---|---|
+| **Phase** | One of the seven numbered steps above. Every task passes through all of them. |
+| **Stage** | A step *inside* a phase — Simplify and Verify inside Build. No gate, no approval. |
+| **Gate** | A hard stop needing a human. There are exactly two: the plan, and the review verdict. |
+| **Mode** | How the phases execute — sequential, parallel, or party. Modes change the shape of the work, never the gates. |
+| **Exception** | A documented case where a phase is skipped. Exceptions exist for Gate 1; there are none for Gate 2. |
+
 ## Why phases exist
 
 Without structure, AI agents skip testing, self-approve their work, and ship directly to main. Each phase is a deliberate checkpoint that prevents a specific failure mode:
@@ -67,9 +79,18 @@ With `--tdd` or `MEOWKIT_TDD=1`, failing tests must exist before implementation 
 ## Phase 3 — Build
 
 **Agent:** developer
-**Produces:** a passing implementation
+**Produces:** a passing, simplified, verified implementation
 
 The developer implements against the approved plan. On test failure it self-heals up to three times, each attempt taking a different approach, then escalates to you. `post-write.sh` security-scans every file write. Bead-decomposed tasks commit after each bead and resume from the last uncommitted one. Autonomous runs at FULL density require a signed sprint contract before any source write.
+
+Two stages then run inside this phase before Review can start. Both are mandatory:
+
+| Stage | Skill | Why it is not optional |
+|---|---|---|
+| 3.5 Simplify | `mk:simplify` | The reviewer should read the code you intend to keep, not the first version that passed |
+| 3.6 Verify | `mk:verify` | Build, lint, types, tests, and coverage in one pass — review starting from a broken signal is review of nothing |
+
+They are stages rather than phases because they carry no gate and produce no approval; they are the last two things Build does.
 
 ## Phase 4 — Review
 

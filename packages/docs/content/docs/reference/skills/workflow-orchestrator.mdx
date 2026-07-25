@@ -5,7 +5,7 @@ description: "Auto-invoked 7-phase workflow coordinator for complex features —
 
 ## What This Skill Does
 
-The central workflow coordinator. Auto-invoked when a session starts with complex-feature intent. Routes through the 7-phase pipeline (Orient → Plan → Test → Build → Simplify → Review → Ship → Reflect), managing gate enforcement, token budgets, agent team composition, and state persistence. Defers to `mk:cook` for single-task invocations.
+The central workflow coordinator. Auto-invoked when a session starts with complex-feature intent. Routes through [the seven phases](/core-concepts/workflow), managing gate enforcement, token budgets, agent team composition, and state persistence. Defers to `mk:cook` for single-task invocations.
 
 ## When to Use
 
@@ -15,7 +15,7 @@ The central workflow coordinator. Auto-invoked when a session starts with comple
 
 ## Core Capabilities
 
-- **7-phase routing:** Orient (agent-detector, scale-routing) → Plan (plan-creator) → Test (testing, TDD opt-in) → Build (developer) → Simplify (simplify — mandatory) → Review (review) → Ship (ship) → Reflect (memory)
+- **Phase routing:** each phase dispatched to its owning skill — agent-detector and scale-routing at Orient, plan-creator at Plan, testing at Test, developer plus the mandatory simplify and verify stages at Build, review, ship, and memory after. The phase sequence itself is on [Workflow Phases](/core-concepts/workflow).
 - **Gate enforcement:** Gate 1 after Phase 1 (plan approval), Gate 2 after Phase 4 (review verdict)
 - **Token budget:** warns at 75%, handoff at 85%, forces context reset at 90%. Target ≤30K per workflow.
 - **State persistence:** `workflow:handoff` / `workflow:resume` / `workflow:status` commands for cross-session continuity

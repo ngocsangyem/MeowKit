@@ -21,7 +21,7 @@ The harness isolates different kinds of reasoning into discrete layers, so no si
 |-------|-------|-------------|
 | L1: Builder | Human | Approve plans (Gate 1), approve reviews (Gate 2) |
 | L2: Planner | `mk:plan-creator` | Decompose requests into product-level specs — user stories, not file names |
-| L3: Cook | `/mk:cook` workflow | 7-phase pipeline: Orient → Plan → Test → Build → Review → Ship → Reflect |
+| L3: Cook | `/mk:cook` workflow | Drives the task through [the seven phases](/core-concepts/workflow) and their two gates |
 | L4: Native Tasks | `dispatch.cjs` + handlers | Build-verify, budget tracking, checkpoints, immediate capture |
 | L5: Teams | `/mk:scout`, `/mk:party` | Parallel agents with worktree isolation and a context firewall |
 | L6: Skills | 126 skills | JIT activation — loaded only when the task domain matches |

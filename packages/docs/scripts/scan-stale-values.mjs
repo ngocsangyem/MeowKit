@@ -56,7 +56,34 @@ function actualCount(kind) {
   }
 }
 
+// The phase sequence, read from the rule file that defines it rather than retyped here. Every
+// page that copied this list had drifted: one called nine steps "7-phase", another dropped
+// Verify, and none agreed on where Simplify sits. A copy is the bug — so the check is not
+// "does this copy match" but "is there a copy at all".
+const PHASE_SEQUENCE = (() => {
+  const src = join(REPO_ROOT, ".claude", "rules", "phase-contracts.md");
+  const m = /<!--\s*Workflow phase sequence:\s*(.+?)\s*-->/.exec(readFileSync(src, "utf-8"));
+  if (!m) throw new Error(`no phase-sequence fingerprint in ${src}`);
+  return m[1].split(">").map((p) => p.split(":")[1].trim());
+})();
+
+const PHASE_ALT = PHASE_SEQUENCE.join("|");
+const PHASE_CHAIN = new RegExp(
+  `(?:${PHASE_ALT})(?:\\s*(?:→|->)\\s*(?:\\[[^\\]]*\\]\\s*(?:→|->)\\s*)?(?:Phase\\s*[\\d.]+[:.]?\\s*)?(?:${PHASE_ALT})){3,}`,
+  "g",
+);
+
+// One page owns the pipeline. The changelog is history and is exempt by directory already.
+const PHASE_LIST_OWNER = join("packages", "docs", "content", "docs", "core-concepts", "workflow.mdx");
+
 const RULES = [
+  {
+    id: "copied-phase-list",
+    severity: "error",
+    re: PHASE_CHAIN,
+    skipFile: (rel) => rel === PHASE_LIST_OWNER,
+    why: "the phase list lives on /core-concepts/workflow — link it instead of restating it",
+  },
   {
     id: "legacy-memory-path",
     severity: "error",
@@ -142,6 +169,7 @@ function scanFile(abs) {
   const lines = readFileSync(abs, "utf-8").split("\n");
   lines.forEach((line, i) => {
     for (const rule of RULES) {
+      if (rule.skipFile?.(rel)) continue;
       for (const m of line.matchAll(rule.re)) {
         if (rule.allow?.(line, m[0])) continue;
         findings.push({
