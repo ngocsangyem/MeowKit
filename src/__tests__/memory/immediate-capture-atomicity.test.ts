@@ -3,8 +3,11 @@
 //   A2: unified per-file lock (dual-prefix writes to same file share lock)
 //   A3: secret scrub before persist
 //   A4: fresh-install MEMORY_DIR auto-creation (ENOENT guard)
+// Curated stores resolve through .claude/hooks/lib/meowkit-paths.cjs: a fresh project
+// uses the `.meowkit/` taxonomy, a project whose memory already lives in the legacy
+// tree keeps writing there so a user's history is never split across two directories.
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, existsSync, readFileSync, rmSync, mkdirSync } from 'fs';
+import { mkdtempSync, existsSync, readFileSync, writeFileSync, rmSync, mkdirSync } from 'fs';
 import { join, resolve } from 'path';
 import { tmpdir } from 'os';
 
@@ -31,14 +34,27 @@ describe('immediate-capture atomicity & safety (post-red-team fixes)', () => {
     rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  // A4 — fresh install: no .claude/memory/ dir yet, capture must auto-create it.
+  // A4 — fresh install: no store dir yet, capture must auto-create it.
   it('auto-creates MEMORY_DIR on fresh install (ENOENT guard)', () => {
     const handler = loadHandler(tmpDir);
     const result = handler({ prompt: '##note: first capture ever' });
-    const memDir = join(tmpDir, '.claude', 'memory');
+    const memDir = join(tmpDir, '.meowkit', 'memory');
     expect(existsSync(memDir)).toBe(true);
     expect(existsSync(join(memDir, 'quick-notes.md'))).toBe(true);
     expect(result).toContain('Captured');
+  });
+
+  // A pre-migration project must keep appending to the tree that already holds its
+  // history — writing to the taxonomy instead would strand every earlier entry.
+  it('keeps writing to an existing legacy store instead of starting a second one', () => {
+    mkdirSync(join(tmpDir, '.claude', 'memory'), { recursive: true });
+    writeFileSync(join(tmpDir, '.claude', 'memory', 'quick-notes.md'), '## earlier\n\nprior entry\n');
+    const handler = loadHandler(tmpDir);
+    handler({ prompt: '##note: captured after the legacy tree already exists' });
+    const legacyNotes = join(tmpDir, '.claude', 'memory', 'quick-notes.md');
+    expect(readFileSync(legacyNotes, 'utf8')).toContain('captured after the legacy tree');
+    // and no parallel store appeared
+    expect(existsSync(join(tmpDir, '.meowkit', 'memory', 'quick-notes.md'))).toBe(false);
   });
 
   // A3 — secret scrub: captured payload must have known key patterns redacted.
@@ -46,7 +62,7 @@ describe('immediate-capture atomicity & safety (post-red-team fixes)', () => {
     const handler = loadHandler(tmpDir);
     const payload = '##decision: use stripe key sk_live_abc123def456ghi789 and aws key AKIAIOSFODNN7EXAMPLE';
     handler({ prompt: payload });
-    const file = join(tmpDir, '.claude', 'memory', 'architecture-decisions.json');
+    const file = join(tmpDir, '.meowkit', 'memory', 'architecture-decisions.json');
     const data = JSON.parse(readFileSync(file, 'utf8'));
     const body = data.patterns[0].pattern;
     expect(body).not.toContain('sk_live_abc123');
@@ -59,7 +75,7 @@ describe('immediate-capture atomicity & safety (post-red-team fixes)', () => {
   it('appendToPatterns writes atomically (no orphan .tmp file)', () => {
     const handler = loadHandler(tmpDir);
     handler({ prompt: '##pattern:bug-class always quote $VAR in bash' });
-    const memDir = join(tmpDir, '.claude', 'memory');
+    const memDir = join(tmpDir, '.meowkit', 'memory');
     const fixesPath = join(memDir, 'fixes.json');
     expect(existsSync(fixesPath)).toBe(true);
     // valid JSON (not partial / 0-byte)
@@ -79,7 +95,7 @@ describe('immediate-capture atomicity & safety (post-red-team fixes)', () => {
     const handler = loadHandler(tmpDir);
     handler({ prompt: '##decision: chose Zustand over Redux for client state' });
     handler({ prompt: '##pattern:decision picked Postgres over MySQL for strong ACID guarantees' });
-    const file = join(tmpDir, '.claude', 'memory', 'architecture-decisions.json');
+    const file = join(tmpDir, '.meowkit', 'memory', 'architecture-decisions.json');
     const data = JSON.parse(readFileSync(file, 'utf8'));
     // Both entries persisted — neither overwrote the other.
     expect(data.patterns.length).toBe(2);

@@ -237,7 +237,10 @@ const COMMAND_DRIFT_PATTERNS: { name: string; re: RegExp; expected: string }[] =
 	},
 	{
 		name: "memory-write instruction",
-		re: /\b(Edit|write|append|update)\b[^.\n]{0,40}\.claude\/memory\//gi,
+		// Matches the curated store in either tree: the `.meowkit/` taxonomy and the
+		// pre-migration `.claude/memory` layout. Binding this to one path silently
+		// disables the check the moment the other one is in use.
+		re: /\b(Edit|write|append|update)\b[^.\n]{0,40}\.(claude|meowkit)\/memory\//gi,
 		expected: "memory writes belong to the skill's capture step, not the command",
 	},
 	{

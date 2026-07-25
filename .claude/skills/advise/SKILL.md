@@ -165,7 +165,7 @@ The packet **must not** contain, and this skill must never produce:
 - An ADR — that is the architect's artifact
 - A diff, patch, or source change
 - A review verdict — Gate 2 belongs to `mk:review` and the human
-- Any mutation of `.meowkit/memory/` decisions
+- Any mutation of the curated memory stores
 
 Advise **never auto-runs** `mk:plan-creator` or `mk:cook`. It ends with the
 packet. If the user wants a plan next, they ask for one — an advisor that starts

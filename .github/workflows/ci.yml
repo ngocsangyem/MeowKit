@@ -13,11 +13,16 @@ jobs:
           # Full history so diff-mode lints can resolve a base ref (merge-base).
           fetch-depth: 0
 
+      # pnpm before setup-node so the pnpm store cache can resolve. Version comes
+      # from the root package.json packageManager field.
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: pnpm
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - name: Build packages
         run: npm run build
@@ -240,11 +245,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # pnpm before setup-node so the pnpm store cache can resolve. Version comes
+      # from the root package.json packageManager field.
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: pnpm
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - name: Build packages
         run: npm run build
