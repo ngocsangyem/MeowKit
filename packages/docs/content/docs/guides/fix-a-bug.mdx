@@ -53,6 +53,17 @@ Pauses for your approval at each step. Use when:
 - You want to validate the diagnosis before the fix
 - The fix has regulatory implications
 
+## What runs without you asking
+
+| Concern | What handles it | What it buys you |
+|---------|-----------|-------------|
+| Root cause before fix | `mk:investigate` | You cannot patch the symptom by accident |
+| Scope control | `mk:freeze` | Unrelated code stays untouched |
+| Regression test | tester | Proof the bug existed *and* that the fix closes it |
+| Security scan | `post-write.sh` | Every edited file is checked for new holes |
+| Minimal diff | developer | The root cause fixed in the fewest lines |
+| Evidence over assertion | reviewer | Verified with test output, not "should work" |
+
 ## After the fix
 
 Every fix writes to `.meowkit/memory/fixes.md` and `fixes.json`. Next time a similar bug appears, Step 0.5 finds the pattern and fast-tracks diagnosis. After 3+ occurrences of the same bug class, the pattern is promoted to a `CLAUDE.md` rule.

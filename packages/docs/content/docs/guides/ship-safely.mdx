@@ -33,6 +33,16 @@ Phase 4 review approved (Gate 2)
 /mk:ship --dry-run    # Preview without pushing or creating PR
 ```
 
+## Official versus beta
+
+Where you are shipping changes what runs. A beta ship trades the adversarial review and the docs update for speed; an official ship does not.
+
+| Mode | Target | Adversarial review | Version format | Docs update |
+|------|--------|-------------------|---------------|-------------|
+| `official` | main/master | Full, auto-scaled | `1.2.3` | Yes |
+| `beta` | dev/beta | Skipped | `1.2.3-beta.1` | Skipped |
+| `--dry-run` | nothing — preview only | Shows the plan | Shows the prediction | Shows what would change |
+
 ## Commit format
 
 Every ship produces a conventional commit:
@@ -72,6 +82,15 @@ Before shipping, capture non-obvious decisions and corrections:
 ```
 
 These persist to `.meowkit/memory/` for future sessions.
+
+## When it goes wrong
+
+| What you see | Why | What to do |
+|-------|-------|-----|
+| Pre-ship checks fail | Tests, lint, or types are broken | Fix them first — the ship is correctly refusing |
+| Merge conflicts | The base branch moved | Resolve manually, then re-run |
+| CI fails on the PR but passed locally | Something differs in the CI environment | Read the CI logs; the difference is the bug |
+| `gh` not found | GitHub CLI is not installed | Install `gh`, or push and open the PR in the browser |
 
 ## Don't use /mk:ship for
 

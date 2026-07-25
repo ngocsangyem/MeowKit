@@ -4,6 +4,10 @@
     { "from": "/why-meowkit", "to": "/core-concepts/what-is-meowkit" },
     { "from": "/guide/philosophy", "to": "/core-concepts/what-is-meowkit" },
     { "from": "/guide/workflow-phases", "to": "/core-concepts/workflow" },
-    { "from": "/workflows/add-feature", "to": "/guides/build-a-feature" }
+    { "from": "/workflows/add-feature", "to": "/guides/build-a-feature" },
+    { "from": "/workflows/fix-bug", "to": "/guides/fix-a-bug" },
+    { "from": "/workflows/code-review", "to": "/guides/review-code" },
+    { "from": "/workflows/ship-code", "to": "/guides/ship-safely" },
+    { "from": "/workflows/autonomous-build", "to": "/guides/autonomous-build" }
   ]
 }
