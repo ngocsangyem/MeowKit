@@ -29,7 +29,9 @@ const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..", ".."
 
 // The changelog is a historical record: past releases legitimately describe paths and flags
 // that no longer exist. Scanning it would demand rewriting history to satisfy a linter.
-const EXEMPT_FILES = new Set(["changelog.mdx"]);
+// Exempted by directory rather than filename so splitting it into current + archive pages
+// cannot silently re-enrol history in the scan.
+const EXEMPT_DIRS = new Set(["changelog"]);
 
 /** Count artifacts on disk so a stale number in prose can be reported next to the real one. */
 function actualCount(kind) {
@@ -127,8 +129,9 @@ function walk(dir) {
   const out = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const abs = join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...walk(abs));
-    else if (entry.name.endsWith(".mdx") && !EXEMPT_FILES.has(entry.name)) out.push(abs);
+    if (entry.isDirectory()) {
+      if (!EXEMPT_DIRS.has(entry.name)) out.push(...walk(abs));
+    } else if (entry.name.endsWith(".mdx")) out.push(abs);
   }
   return out;
 }
