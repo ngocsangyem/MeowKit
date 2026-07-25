@@ -235,6 +235,35 @@ jobs:
           path: ${{ runner.temp }}/skill-eval-results.md
           if-no-files-found: error
 
+  # The docs site has its own gate. Both checks resolve against the live `.claude/` tree
+  # in the same checkout, so a runtime change that invalidates a documented path, env var,
+  # or model id fails here instead of reaching a reader.
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck docs
+        run: npm run typecheck -w packages/docs
+
+      - name: Internal links resolve to real pages
+        run: npm run check:links -w packages/docs
+
+      - name: No stale runtime values in docs
+        run: npm run check:stale -w packages/docs
+
+      - name: Build docs site
+        run: npm run build -w packages/docs
+
   # Windows is a supported Codex target (user decision). This job proves the authored
   # bundle installs and structurally validates on windows-latest — the authored hook
   # commands carry a `commandWindows` variant, so the install must not assume a POSIX
