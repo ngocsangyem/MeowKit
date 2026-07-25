@@ -27,7 +27,9 @@ On a fresh install the CLI prompts, in order:
 | Toolkits — multiselect (Claude Code / Codex / Cursor) | Claude Code preselected |
 | Install profile | `full` |
 | Project description (optional) | skipped |
-| Gemini API key (optional) | skipped |
+| Install Python skill dependencies into `.claude/skills/.venv` | no |
+| Gemini API key (optional) | no |
+| Fallback API keys for external providers (optional) | no |
 
 All other settings use fixed defaults: cost tracking enabled, memory enabled, mode set to `balanced`. Stack detection is not performed. In **update mode** (an existing `.claude/`), the toolkit picker is skipped and init just refreshes `.claude/`.
 
