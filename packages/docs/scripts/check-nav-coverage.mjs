@@ -87,8 +87,47 @@ const orphans = allPages(DOCS_ROOT)
   .map((abs) => ({ url: urlFor(abs), file: relative(REPO_ROOT, abs) }))
   .filter((p) => !covered.has(p.url) && !retired.has(p.url));
 
+// A `root: true` folder is its own sidebar tree, and this check used to treat that as proof it
+// was reachable. It is not: a tree with no tab pointing into it is invisible, and CLI, Reference,
+// and Workflows sat that way — every page inside them "covered", none of them findable. Coverage
+// answers "is this page in a tree"; only this answers "can anyone get to that tree".
+const rootTrees = [];
+function collectRootTrees(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const abs = join(dir, entry.name);
+    const metaPath = join(abs, "meta.json");
+    if (existsSync(metaPath) && JSON.parse(readFileSync(metaPath, "utf-8")).root === true) {
+      rootTrees.push("/" + relative(DOCS_ROOT, abs).split("\\").join("/"));
+    }
+    collectRootTrees(abs);
+  }
+}
+collectRootTrees(DOCS_ROOT);
+
+const layoutPath = join(HERE, "..", "app", "[...slug]", "layout.tsx");
+const tabUrls = existsSync(layoutPath)
+  ? [...readFileSync(layoutPath, "utf-8").matchAll(/url:\s*['"]([^'"]+)['"]/g)].map((m) => m[1])
+  : [];
+
+const unreachable = rootTrees.filter((tree) => !tabUrls.some((u) => u === tree || u.startsWith(tree + "/")));
+const servedUrls = new Set(allPages(DOCS_ROOT).map(urlFor));
+const deadTabs = tabUrls.filter((u) => !servedUrls.has(u.replace(/\/$/, "")) && !retired.has(u));
+
+for (const t of unreachable) {
+  console.log(`ERROR ${t} — a root:true tree with no tab pointing into it; nothing in the sidebar reaches it`);
+}
+for (const u of deadTabs) {
+  console.log(`ERROR layout.tsx tab "${u}" — no page serves this path`);
+}
+
 for (const o of orphans) {
   console.log(`ERROR ${o.file}  ${o.url} — served but in no meta.json and not retired in redirects.json`);
 }
-console.log(`\nchecked ${covered.size} navigable page(s) and ${retired.size} retired URL(s) — ${orphans.length} orphan(s)`);
-process.exit(orphans.length > 0 ? 1 : 0);
+
+const failures = orphans.length + unreachable.length + deadTabs.length;
+console.log(
+  `\nchecked ${covered.size} navigable page(s), ${retired.size} retired URL(s), ` +
+    `${rootTrees.length} root tree(s) against ${tabUrls.length} tab(s) — ${failures} problem(s)`,
+);
+process.exit(failures > 0 ? 1 : 0);
