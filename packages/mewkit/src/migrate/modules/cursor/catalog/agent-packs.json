@@ -1,12 +1,64 @@
 {
-	"_description": "Cursor bundle agent-pack catalog. `core` is the default install (Phase 3 part A) — explorer, planner, reviewer. Everything else stays an inactive/empty pack placeholder until the full catalog (codex parity) lands in a later phase, per the plan's 'small default install, packs opt-in' decision.",
-	"verified": "2026-07-24",
+	"_description": "Cursor bundle agent-pack catalog. `core` is the default install — explorer, planner, reviewer. Extended packs mirror the codex agent roster, grouped by domain, matching the skill-pack domains where sensible. Extended agents ship physically alongside core under .cursor/agents/ (there is no per-agent install-time filtering yet, unlike skills) — this catalog is the organizational/documentation grouping for future selection tooling.",
+	"verified": "2026-07-25",
 	"defaultPack": "core",
 	"packs": {
 		"core": {
 			"description": "Default install: fast read-only repo orientation (explorer), architecture/implementation planning (planner), evidence-ranked post-implementation review (reviewer). Kept small per Cursor's own guidance against many vague-description agents degrading auto-routing quality.",
 			"dependsOn": [],
 			"agents": ["explorer", "planner", "reviewer"]
+		},
+		"development": {
+			"description": "Implementation and architecture roles layered on top of the core lifecycle: production coding, system design, research, and test authoring.",
+			"dependsOn": ["core"],
+			"agents": ["developer", "architect", "researcher", "tester"]
+		},
+		"review": {
+			"description": "Behavioral active-verification and security-audit roles, distinct from the core reviewer's structural review.",
+			"dependsOn": ["core"],
+			"agents": ["evaluator", "security"]
+		},
+		"product": {
+			"description": "Product/planning roles: solution brainstorming, ticket sizing, delivery-status tracking, and interview-driven advisory.",
+			"dependsOn": ["core"],
+			"agents": ["brainstormer", "story-sizer", "project-manager", "advisor"]
+		},
+		"operations": {
+			"description": "Delivery-pipeline and knowledge-capture roles: shipping, git operations, failure journaling, living docs, and cost/pattern analysis.",
+			"dependsOn": ["core"],
+			"agents": ["shipper", "git-manager", "journal-writer", "documenter", "analyst"]
+		},
+		"media": {
+			"description": "UI/UX design roles: component design, design systems, wireframes, accessibility audits.",
+			"dependsOn": ["core"],
+			"agents": ["ui-ux-designer"]
+		},
+		"integrations": {
+			"description": "External-service integration roles: Jira issue/agile/admin/JSM operations and Confluence page/search/collaboration operations, each scoped to a single CLI-wrapper domain.",
+			"dependsOn": ["core"],
+			"agents": [
+				"confluence-bulk",
+				"confluence-collaborate",
+				"confluence-page",
+				"confluence-search",
+				"confluence-spec-analyst",
+				"jira-admin",
+				"jira-agile",
+				"jira-analyst",
+				"jira-bulk",
+				"jira-collaborate",
+				"jira-dev",
+				"jira-estimator",
+				"jira-evaluator",
+				"jira-fields",
+				"jira-issue",
+				"jira-jsm",
+				"jira-lifecycle",
+				"jira-ops",
+				"jira-relationships",
+				"jira-search",
+				"jira-time"
+			]
 		}
 	}
 }

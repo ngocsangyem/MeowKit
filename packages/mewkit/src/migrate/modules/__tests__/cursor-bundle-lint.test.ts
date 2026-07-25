@@ -76,6 +76,19 @@ function unquote(v: string): string {
 const agentFiles = walkFiles(agentsDir).filter((f) => f.endsWith(".md"));
 const ruleFiles = walkFiles(rulesDir).filter((f) => f.endsWith(".mdc"));
 
+// The DEFAULT-install agent set is the `core` pack (agent-packs.json); extended packs are
+// opt-in and may ship write-capable agents (readonly:false). Core-only invariants
+// (advisory-readonly, default-install budget) scope to this set — mirroring how the skill
+// checks scope via resolvePackSelection — while schema/name/model/denylist checks apply to
+// every authored agent.
+const coreAgentNames: string[] = (() => {
+	const p = join(moduleDir, "catalog", "agent-packs.json");
+	if (!existsSync(p)) return [];
+	return JSON.parse(readFileSync(p, "utf-8")).packs?.core?.agents ?? [];
+})();
+const isCoreAgent = (file: string): boolean =>
+	coreAgentNames.includes(file.slice(agentsDir.length + 1).replace(/\.md$/, ""));
+
 // Denylist scope: the agent-facing / model-read surfaces (AGENTS.md router, agents, rules,
 // and skills once landed) — i.e. exactly "agents/skills/rules" plus the root router, which is
 // what Phase 3 authors and what a future skill-authoring pass will add under `.agents/skills/`.
@@ -86,12 +99,14 @@ const ruleFiles = walkFiles(rulesDir).filter((f) => f.endsWith(".mdc"));
 const denylistScope = [join(rootDir, "AGENTS.md"), ...walkFiles(agentsDir), ...walkFiles(rulesDir), ...walkFiles(skillsDir)];
 
 describe("cursor bundle: authored content exists (Phase 3 part A)", () => {
-	it("ships the core 3 agents", () => {
-		expect(agentFiles.map((f) => f.slice(agentsDir.length + 1)).sort()).toEqual([
-			"explorer.md",
-			"planner.md",
-			"reviewer.md",
-		]);
+	it("ships the core agent pack (explorer, planner, reviewer); extended agents may coexist", () => {
+		expect(coreAgentNames.slice().sort()).toEqual(["explorer", "planner", "reviewer"]);
+		for (const name of coreAgentNames) {
+			expect(
+				agentFiles.some((f) => f.slice(agentsDir.length + 1) === `${name}.md`),
+				`core agent ${name}.md is present`,
+			).toBe(true);
+		}
 	});
 
 	it("ships at least the runtime-invariants rule plus domain rules", () => {
@@ -132,8 +147,9 @@ describe("cursor bundle: agent frontmatter schema (exactly the 5 verified fields
 			expect(unquote(raw.model ?? "")).toBe("inherit");
 		});
 
-		it(`${rel}: readonly is true (core pack is advisory-only, no writes)`, () => {
-			expect(raw.readonly).toBe("true");
+		it(`${rel}: readonly is a boolean; core-pack agents are advisory-only (readonly:true)`, () => {
+			expect(["true", "false"]).toContain(raw.readonly);
+			if (isCoreAgent(file)) expect(raw.readonly, `core agent ${rel} must be readonly`).toBe("true");
 		});
 
 		it(`${rel}: description reads as a routing trigger (states "Use when" / "use proactively")`, () => {
@@ -222,7 +238,7 @@ describe("cursor bundle: description budget", () => {
 		const catalog = loadSkillPackCatalog(moduleDir); // catalog/skill-packs.json — shared schema, cursor moduleDir
 		const budgetChars = catalog?.budgetChars ?? 8000;
 
-		const coreAgentChars = agentFiles.reduce((sum, f) => sum + agentNameDescChars(f), 0);
+		const coreAgentChars = agentFiles.filter(isCoreAgent).reduce((sum, f) => sum + agentNameDescChars(f), 0);
 
 		let coreSkillChars = 0;
 		if (catalog && Object.keys(catalog.packs).length > 0) {
