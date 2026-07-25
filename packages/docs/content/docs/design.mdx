@@ -18,7 +18,7 @@ The site runs on [Fumadocs](https://fumadocs.dev) on the Next.js App Router. Lay
 | MDX components available inside pages | `components/mdx.tsx`, `components/mdx/` |
 | Navigation order and section labels | `content/docs/**/meta.json` |
 
-`app/global.css` is the source of truth for the palette. This page deliberately does not restate the values — a second copy of a colour ramp is a copy that goes stale, and the CSS is readable on its own.
+`app/global.css` is the source of truth for the palette. This page deliberately does not restate the values, because a second copy of a colour ramp is a copy that goes stale and the CSS is readable on its own.
 
 ## The system in one paragraph
 
@@ -39,8 +39,8 @@ These are decisions, not defaults. Changing one is fine; changing one by acciden
 
 Two layers, and the boundary between them is the useful part:
 
-1. **Primitives** — the `--mk-*` variables. This is the palette. Change one and it moves everywhere.
-2. **Slot mappings** — the `--color-fd-*` variables Fumadocs actually reads, set once for light and again under `.dark`. Change one and it moves one role.
+1. **Primitives**, the `--mk-*` variables. This is the palette. Change one and it moves everywhere.
+2. **Slot mappings**, the `--color-fd-*` variables Fumadocs actually reads, set once for light and again under `.dark`. Change one and it moves one role.
 
 Retheme by editing primitives. Re-map by editing slots. Reaching past both to style a component directly is how a design system stops being one.
 

@@ -6,7 +6,7 @@ description: "Install MeowKit and get it running in your project."
 ## Prerequisites
 
 - **Node.js** 24 or later
-- **Python** 3.9 or later — `mewkit setup` creates a virtualenv at `.claude/skills/.venv` and pip-installs `google-genai`, `pillow`, and `python-dotenv`, plus any per-skill `requirements.txt`
+- **Python** 3.9 or later. `mewkit setup` creates a virtualenv at `.claude/skills/.venv` and pip-installs `google-genai`, `pillow`, and `python-dotenv`, plus any per-skill `requirements.txt`
 - **Git** installed and configured
 - **Claude Code** installed ([claude.ai/code](https://claude.ai/code))
 
@@ -16,7 +16,7 @@ description: "Install MeowKit and get it running in your project."
 npx mewkit init
 ```
 
-On a fresh install, `mewkit init` first asks which toolkits to set up — a multiselect of **Claude Code** (preselected), **Codex**, and **Cursor** — then provisions each: Claude Code generates the `.claude/` directory, Codex copies the authored Codex bundle, Cursor installs `.claude/` and exports it to `.cursor/`. Selecting only Codex yields a codex-only project.
+On a fresh install, `mewkit init` first asks which toolkits to set up, a multiselect of **Claude Code** (preselected), **Codex**, and **Cursor**, then provisions each: Claude Code generates the `.claude/` directory, Codex copies the authored Codex bundle, Cursor installs `.claude/` and exports it to `.cursor/`. Selecting only Codex yields a codex-only project.
 
 ### Interactive setup
 
@@ -24,7 +24,7 @@ On a fresh install the CLI prompts, in order:
 
 | Prompt | Default |
 |--------|---------|
-| Toolkits — multiselect (Claude Code / Codex / Cursor) | Claude Code preselected |
+| Toolkits, a multiselect of Claude Code / Codex / Cursor | Claude Code preselected |
 | Install profile | `full` |
 | Project description (optional) | skipped |
 | Install Python skill dependencies into `.claude/skills/.venv` | no |
@@ -38,8 +38,8 @@ All other settings use fixed defaults: cost tracking enabled, memory enabled, mo
 Skip the interactive prompts with flags:
 
 ```bash
-npx mewkit init --target codex     # Skip the picker — Codex-only toolkit
-npx mewkit init --target cursor    # Skip the picker — .claude/ + export to Cursor
+npx mewkit init --target codex     # Skip the picker, Codex-only toolkit
+npx mewkit init --target cursor    # Skip the picker, .claude/ plus export to Cursor
 npx mewkit init --force            # Overwrite existing .claude/
 npx mewkit init --dry-run          # Preview without writing
 npx mewkit init --profile core     # Install a right-sized profile subset
@@ -61,12 +61,12 @@ Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that 
 └── settings.json    Hook registrations
 
 .meowkit/             Your project's own state
-├── config.json      Project configuration — commit this
-├── .env             API keys — gitignored, shared by every provider
+├── config.json      Project configuration, commit this
+├── .env             API keys, gitignored, shared by every provider
 ├── memory/          Fix patterns, review patterns, architecture decisions
 ├── telemetry/       Cost log, trace log
 ├── state/           Session markers
-└── cache/           Derived wiki index — rebuildable
+└── cache/           Derived wiki index, rebuildable
 
 CLAUDE.md             Entry point for Claude Code
 .mcp.json.example     Optional MCP server config
@@ -102,7 +102,7 @@ Available MCP servers: Context7 (docs), Playwright (QA), Sequential Thinking.
 For `mk:multimodal` (image/video/audio analysis):
 
 ```bash
-# Add to .meowkit/.env — gitignored, secrets stay local
+# Add to .meowkit/.env, gitignored, secrets stay local
 echo "MEOWKIT_GEMINI_API_KEY=your-key" >> .meowkit/.env
 ```
 
@@ -126,5 +126,5 @@ npx mewkit setup    # Post-scaffold configuration (venv, MCP, env, gitignore)
 npx mewkit doctor   # Verify installation
 ```
 
-- [Quick Start](/quick-start) — your first task with MeowKit
-- [Configuration](/reference/configuration) — customize MeowKit for your project
+- [Quick Start](/quick-start): your first task with MeowKit
+- [Configuration](/reference/configuration): customize MeowKit for your project

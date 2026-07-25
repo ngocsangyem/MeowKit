@@ -264,6 +264,9 @@ jobs:
       - name: No stale runtime values in docs
         run: npm run check:stale -w packages/docs
 
+      - name: Learning-path prose passes the stop-slop hard tier
+        run: npm run check:slop -w packages/docs
+
       - name: Every skill and agent has a reference page
         run: npm run check:coverage -w packages/docs
 

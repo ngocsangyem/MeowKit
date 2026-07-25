@@ -1,6 +1,6 @@
 ---
 title: "Review Code"
-description: "Multi-pass adversarial code review with /mk:review — 5 dimensions, parallel reviewers, and structured verdicts."
+description: "Multi-pass adversarial code review with /mk:review: five dimensions, parallel reviewers, and structured verdicts."
 ---
 
 `/mk:review` runs a multi-pass adversarial code review. Three parallel reviewers examine your code independently, then findings are triaged into a single verdict. It's both a Phase 4 pipeline step and a standalone command.
@@ -32,9 +32,9 @@ description: "Multi-pass adversarial code review with /mk:review — 5 dimension
 
 Three reviewers run simultaneously to prevent anchoring bias:
 
-1. **Blind Hunter** — zero context review. Sees only the diff, not the plan or codebase.
-2. **Edge Case Hunter** — boundary conditions. What happens on empty input, max values, null?
-3. **Criteria Auditor** — acceptance criteria. Does the code satisfy every criterion in the plan?
+1. **Blind Hunter.** Zero context review. Sees only the diff, not the plan or codebase.
+2. **Edge Case Hunter.** Boundary conditions. What happens on empty input, max values, null?
+3. **Criteria Auditor.** Acceptance criteria. Does the code satisfy every criterion in the plan?
 
 Findings from all three are triaged into a single verdict.
 
@@ -58,7 +58,7 @@ A FAIL on any single dimension blocks shipping (Gate 2). There is no averaging.
 /mk:cook "feature" --strict
 ```
 
-`--verify` checks that pages load and have no console errors. `--strict` runs the full evaluator — it clicks through the app, grades against rubrics, and produces a scored verdict. Use `--strict` for security-critical or payment-related features.
+`--verify` checks that pages load and have no console errors. `--strict` runs the full evaluator: it clicks through the app, grades against rubrics, and produces a scored verdict. Use `--strict` for security-critical or payment-related features.
 
 ## Optional: post-verdict elicitation
 
@@ -76,6 +76,6 @@ After the verdict, `/mk:elicit` pushes deeper on WARN dimensions using 8 structu
 
 ## Next steps
 
-- [Ship safely](/guides/ship-safely) — the deployment pipeline
-- [Build a feature](/guides/build-a-feature) — the full workflow with review
-- [Gates & security](/core-concepts/gates) — how Gate 2 enforces review
+- [Ship safely](/guides/ship-safely): the deployment pipeline
+- [Build a feature](/guides/build-a-feature): the full workflow with review
+- [Gates & security](/core-concepts/gates): how Gate 2 enforces review

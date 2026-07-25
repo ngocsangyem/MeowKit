@@ -8,7 +8,7 @@ MeowKit ships one CLI package, `mewkit`:
 | Command | Purpose |
 |---------|---------|
 | `npx mewkit init` | Scaffold or update the `.claude/` system |
-| `npx mewkit COMMAND` | Runtime tools — see the groups below |
+| `npx mewkit COMMAND` | Runtime tools, see the groups below |
 
 ### Command groups
 
@@ -43,6 +43,6 @@ npx mewkit task new --type feature "Add user authentication"
 
 `npx mewkit init` is a **scaffold + update** tool:
 - **First run:** opens a toolkit picker (Claude Code / Codex / Cursor, Claude Code preselected), then copies the full MeowKit system (agents, skills, hooks, rules, commands, modes, scripts) into `.claude/` for each selected provider. `--target <provider>` skips the picker.
-- **Subsequent runs:** smart update — overwrites unchanged core files, skips user-modified files, adds new files (no picker)
+- **Subsequent runs:** smart update. Overwrites unchanged core files, skips user-modified files, adds new files, no picker
 
-`mewkit` is a **runtime toolbox** for daily use — diagnostics, setup, task management, and cost tracking with session/day filtering in `budget`.
+`mewkit` is a **runtime toolbox** for daily use: diagnostics, setup, task management, and cost tracking with session and day filtering in `budget`.
