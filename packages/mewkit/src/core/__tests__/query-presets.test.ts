@@ -47,11 +47,11 @@ const LINES = [
 function makeIndex(): string {
 	const root = mkdtempSync(join(tmpdir(), "mewkit-presets-"));
 	roots.push(root);
-	const mem = join(root, ".claude", "memory");
+	const mem = join(root, ".meowkit", "telemetry");
 	mkdirSync(mem, { recursive: true });
 	writeFileSync(join(mem, "trace-log.jsonl"), LINES.map((l) => JSON.stringify(l)).join("\n") + "\n");
-	buildIndex(join(root, ".claude"));
-	return join(root, ".claude");
+	buildIndex(root);
+	return root;
 }
 
 describe("queryPresets", () => {

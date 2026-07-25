@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { resolveStateDir } from "../state/resolve-state-dir.js";
 import pc from "picocolors";
 import {
 	parseTraceLog,
@@ -9,7 +10,7 @@ import {
 	proposeImprovements,
 	type TraceRecord,
 } from "../core/trace-analysis.js";
-import { appendTraceRecordSync } from "../core/trace-append.js";
+import { appendTraceRecordSync, traceLogPath } from "../core/trace-append.js";
 
 // On-demand trace recall: score trace quality, audit entropy/drift, propose advisory
 // improvements, and record friction — all over the existing append log, with NO inner-harness
@@ -45,8 +46,8 @@ function redact(msg: string): string {
 		.replace(/((?:api[_-]?key|token|secret|password)\s*[=:]\s*)\S+/gi, "$1[redacted]");
 }
 
-function readLog(claudeDir: string): TraceRecord[] {
-	const logPath = path.join(claudeDir, "memory", "trace-log.jsonl");
+function readLog(projectRoot: string): TraceRecord[] {
+	const logPath = traceLogPath(projectRoot);
 	if (!fs.existsSync(logPath)) return [];
 	return parseTraceLog(fs.readFileSync(logPath, "utf-8"));
 }
@@ -56,7 +57,7 @@ function recordFriction(claudeDir: string, opts: TraceOptions): void {
 	const data: Record<string, unknown> = { message };
 	if (opts.responsibility) data["responsibility"] = opts.responsibility;
 	// Route through the ONE shared append primitive (lock + scrub + rotation) — no local append.
-	appendTraceRecordSync(claudeDir, { event: "friction", runId: opts.id ?? "", data });
+	appendTraceRecordSync(path.dirname(claudeDir), { event: "friction", runId: opts.id ?? "", data });
 	console.log(
 		`${pc.green("Recorded friction.")} ${pc.dim(opts.responsibility ? `[${opts.responsibility}] ` : "")}${message}`,
 	);
@@ -120,7 +121,7 @@ function runPropose(claudeDir: string, records: TraceRecord[], opts: TraceOption
 	if (items.length === 0) console.log(pc.dim("  Nothing to propose — no repeated friction or drift."));
 
 	if (opts.commit && items.length > 0) {
-		const backlog = path.join(claudeDir, "memory", "improvement-backlog.md");
+		const backlog = path.join(resolveStateDir(path.dirname(claudeDir), "memory"), "improvement-backlog.md");
 		fs.mkdirSync(path.dirname(backlog), { recursive: true });
 		const stamp = new Date().toISOString().slice(0, 10);
 		const lines = [`\n## ${stamp} — advisory proposals (trace propose)`];
@@ -148,7 +149,7 @@ export function trace(opts: TraceOptions = {}): void {
 		return;
 	}
 
-	const records = readLog(claudeDir);
+	const records = readLog(path.dirname(claudeDir));
 	switch (opts.subcommand) {
 		case "score":
 			runScore(records, opts);

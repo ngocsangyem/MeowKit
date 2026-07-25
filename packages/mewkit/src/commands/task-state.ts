@@ -192,7 +192,7 @@ export async function taskState(args: TaskStateOptions = {}): Promise<void> {
 			// Emit the transition trace ONLY after a successful state write. Advisory: a failed
 			// append warns but never fails the command (the durable state is already committed).
 			try {
-				await appendTraceRecord(path.join(projectRoot, ".claude"), {
+				await appendTraceRecord(projectRoot, {
 					event: "task_transition",
 					taskId: updated.taskId,
 					planPath: updated.planPath,

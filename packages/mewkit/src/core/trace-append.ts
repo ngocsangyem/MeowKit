@@ -8,11 +8,17 @@ import { appendFileSync, mkdirSync, renameSync, statSync, readFileSync, writeFil
 import { gzipSync } from "node:zlib";
 import path from "node:path";
 import { withFileLock, withFileLockSync } from "./file-lock.js";
+import { resolveStateDir } from "../state/resolve-state-dir.js";
 import { scrubSecrets } from "../wiki/infrastructure/scan-patterns.js";
 
 export const TRACE_SCHEMA_VERSION = "1.0";
-export const TRACE_LOG_REL = path.join("memory", "trace-log.jsonl");
-export const TRACE_LOCK_REL = path.join("memory", ".trace-log.lock");
+/** Append logs are telemetry in the `.meowkit/` taxonomy. */
+export const TRACE_LOG_NAME = "trace-log.jsonl";
+export const TRACE_LOCK_NAME = ".trace-log.lock";
+export const traceLogPath = (projectRoot: string): string =>
+	path.join(resolveStateDir(projectRoot, "telemetry"), TRACE_LOG_NAME);
+export const traceLockPath = (projectRoot: string): string =>
+	path.join(resolveStateDir(projectRoot, "telemetry"), TRACE_LOCK_NAME);
 export const TRACE_MAX_BYTES = 50 * 1024 * 1024;
 
 /** Shared rotation predicate — bash and TS agree on the 50MB threshold. */
@@ -90,8 +96,8 @@ function rotate(logPath: string, now: Date): void {
 }
 
 /** Append the serialized line and rotate if the log is now oversized (caller holds the lock). */
-function writeAndRotate(claudeDir: string, line: string, now: Date): void {
-	const logPath = path.join(claudeDir, TRACE_LOG_REL);
+function writeAndRotate(projectRoot: string, line: string, now: Date): void {
+	const logPath = traceLogPath(projectRoot);
 	mkdirSync(path.dirname(logPath), { recursive: true });
 	appendFileSync(logPath, line + "\n", "utf-8");
 	try {
@@ -102,19 +108,19 @@ function writeAndRotate(claudeDir: string, line: string, now: Date): void {
 }
 
 /** Append one trace record under the shared sidecar lock. Async writer (task-state, CLI). */
-export async function appendTraceRecord(claudeDir: string, input: TraceAppendInput): Promise<void> {
+export async function appendTraceRecord(projectRoot: string, input: TraceAppendInput): Promise<void> {
 	const now = input.now ?? new Date();
 	const line = JSON.stringify(buildRecord(input, now));
-	const lockPath = path.join(claudeDir, TRACE_LOCK_REL);
+	const lockPath = traceLockPath(projectRoot);
 	mkdirSync(path.dirname(lockPath), { recursive: true });
-	await withFileLock(lockPath, async () => writeAndRotate(claudeDir, line, now));
+	await withFileLock(lockPath, async () => writeAndRotate(projectRoot, line, now));
 }
 
 /** Synchronous sibling for sync callers (the wiki trace adapter) — same lock, same record shape. */
-export function appendTraceRecordSync(claudeDir: string, input: TraceAppendInput): void {
+export function appendTraceRecordSync(projectRoot: string, input: TraceAppendInput): void {
 	const now = input.now ?? new Date();
 	const line = JSON.stringify(buildRecord(input, now));
-	const lockPath = path.join(claudeDir, TRACE_LOCK_REL);
+	const lockPath = traceLockPath(projectRoot);
 	mkdirSync(path.dirname(lockPath), { recursive: true });
-	withFileLockSync(lockPath, () => writeAndRotate(claudeDir, line, now));
+	withFileLockSync(lockPath, () => writeAndRotate(projectRoot, line, now));
 }

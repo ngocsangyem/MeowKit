@@ -65,7 +65,7 @@ async function activatePlan(planFile: string, cliVersion: string | undefined): P
 		console.log(pc.green(`✓ Activated task ${pc.bold(taskId)} → tasks/active/${taskId}.json (+ active pointer).`));
 		// Transition trace is advisory: a failed append never fails an already-durable activation.
 		try {
-			await appendTraceRecord(path.join(projectRoot, ".claude"), {
+			await appendTraceRecord(projectRoot, {
 				event: "task_transition",
 				taskId,
 				planPath,

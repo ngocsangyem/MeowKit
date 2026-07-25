@@ -80,7 +80,7 @@ describe("task-state update — transition metadata", () => {
 			plan: "plans/260711-x/plan.md",
 			cliVersion: "1.18.2",
 		});
-		const logPath = join(root, ".claude", "memory", "trace-log.jsonl");
+		const logPath = join(root, ".meowkit", "telemetry", "trace-log.jsonl");
 		expect(existsSync(logPath)).toBe(true);
 		const records = parseTraceLog(readFileSync(logPath, "utf-8"));
 		const t = records.find((r) => r.event === "task_transition");

@@ -4,18 +4,19 @@ import { DatabaseSync } from "node:sqlite";
 import { parseTraceLog } from "./trace-analysis.js";
 import { WIKI_MIGRATION_SQL, WIKI_V3_MIGRATION_SQL } from "../wiki/infrastructure/wiki-schema.js";
 import { ingestWiki, type WikiIngestCounts } from "../wiki/infrastructure/wiki-ingest.js";
+import { resolveStateDir } from "../state/resolve-state-dir.js";
 
 // The consolidated DERIVED, disposable SQLite index. Canonical data stays in the append
-// logs (.claude/memory/*) and the wiki tree (tasks/wikis/<slug>/); this DB is a rebuild-able
+// logs (the telemetry tree) and the wiki tree (tasks/wikis/<slug>/); this DB is a rebuild-able
 // read index (delete → reindex → identical). Opt-in: nothing builds it automatically and no
 // hook writes to it. All inserts are parameterized (prepared statements); queries are static
 // aggregates with no user-supplied SQL — no injection surface. v2 folds in the wiki tables +
 // FTS5 (was a separate index.db, now unified as wiki-index.db per the consolidation decision).
 
 export const SCHEMA_VERSION = 4;
-const DB_REL = path.join("memory", "wiki-index.db");
+const DB_NAME = "wiki-index.db";
 /** The pre-consolidation DB, removed once on the first unified build. */
-const LEGACY_DB_REL = path.join("memory", "index.db");
+const LEGACY_DB_NAME = "index.db";
 
 /** Forward migrations, applied in order when the DB's PRAGMA user_version is behind. */
 const MIGRATIONS: { version: number; sql: string }[] = [
@@ -46,8 +47,8 @@ const MIGRATIONS: { version: number; sql: string }[] = [
 	},
 ];
 
-export function dbPath(claudeDir: string): string {
-	return path.join(claudeDir, DB_REL);
+export function dbPath(projectRoot: string): string {
+	return path.join(resolveStateDir(projectRoot, "cache"), DB_NAME);
 }
 
 function userVersion(db: DatabaseSync): number {
@@ -82,8 +83,8 @@ function asNumber(v: unknown): number | null {
 }
 
 /** Ingest the trace log (full replace — deterministic rebuild). */
-function ingestTrace(db: DatabaseSync, claudeDir: string): number {
-	const logPath = path.join(claudeDir, "memory", "trace-log.jsonl");
+function ingestTrace(db: DatabaseSync, projectRoot: string): number {
+	const logPath = path.join(resolveStateDir(projectRoot, "telemetry"), "trace-log.jsonl");
 	if (!fs.existsSync(logPath)) return 0;
 	const records = parseTraceLog(fs.readFileSync(logPath, "utf-8"));
 	const stmt = db.prepare(
@@ -112,8 +113,8 @@ function ingestTrace(db: DatabaseSync, claudeDir: string): number {
 }
 
 /** Ingest the cost log defensively (the CostEntry union varies; keep common columns + raw JSON). */
-function ingestCost(db: DatabaseSync, claudeDir: string): number {
-	const logPath = path.join(claudeDir, "memory", "cost-log.json");
+function ingestCost(db: DatabaseSync, projectRoot: string): number {
+	const logPath = path.join(resolveStateDir(projectRoot, "telemetry"), "cost-log.json");
 	if (!fs.existsSync(logPath)) return 0;
 	let arr: unknown;
 	try {
@@ -150,8 +151,8 @@ export interface IndexResult {
 
 /** Remove the pre-consolidation index.db (and its WAL/SHM sidecars) once. The new
  *  unified wiki-index.db supersedes it; the logs remain canonical so nothing is lost. */
-function removeLegacyDb(claudeDir: string): void {
-	const legacy = path.join(claudeDir, LEGACY_DB_REL);
+function removeLegacyDb(projectRoot: string): void {
+	const legacy = path.join(resolveStateDir(projectRoot, "cache"), LEGACY_DB_NAME);
 	let removed = false;
 	for (const suffix of ["", "-wal", "-shm"]) {
 		const f = legacy + suffix;
@@ -161,16 +162,15 @@ function removeLegacyDb(claudeDir: string): void {
 		}
 	}
 	if (removed) {
-		console.error(`[mewkit] removed legacy ${LEGACY_DB_REL} — superseded by ${DB_REL}`);
+		console.error(`[mewkit] removed legacy ${LEGACY_DB_NAME} — superseded by ${DB_NAME}`);
 	}
 }
 
 /** Build/refresh the derived index from the canonical logs + wiki tree. Full re-ingest =
  *  deterministic and rebuild-able. Creates the DB (WAL) if absent. Never mutates the sources. */
-export function buildIndex(claudeDir: string): IndexResult {
-	removeLegacyDb(claudeDir);
-	const target = dbPath(claudeDir);
-	const projectRoot = path.dirname(claudeDir);
+export function buildIndex(projectRoot: string): IndexResult {
+	removeLegacyDb(projectRoot);
+	const target = dbPath(projectRoot);
 	fs.mkdirSync(path.dirname(target), { recursive: true });
 	const db = new DatabaseSync(target);
 	try {
@@ -178,8 +178,8 @@ export function buildIndex(claudeDir: string): IndexResult {
 		ensureIndexSchema(db);
 		db.exec("DELETE FROM trace_events");
 		db.exec("DELETE FROM cost_entries");
-		const traceRows = ingestTrace(db, claudeDir);
-		const costRows = ingestCost(db, claudeDir);
+		const traceRows = ingestTrace(db, projectRoot);
+		const costRows = ingestCost(db, projectRoot);
 		const wiki = ingestWiki(db, projectRoot);
 		return { dbPath: target, schemaVersion: userVersion(db), traceRows, costRows, wiki };
 	} finally {
@@ -196,8 +196,8 @@ export interface QueryResult {
 }
 
 /** Read-only aggregate/join queries. Opens the DB read-only; only static SELECTs run. */
-export function queryIndex(claudeDir: string): QueryResult {
-	const target = dbPath(claudeDir);
+export function queryIndex(projectRoot: string): QueryResult {
+	const target = dbPath(projectRoot);
 	if (!fs.existsSync(target)) throw new Error("no index — run `mewkit index` first");
 	const db = new DatabaseSync(target, { readOnly: true });
 	try {
@@ -243,8 +243,8 @@ export interface PresetResult {
  * user-supplied SQL). Answers: recovery-outcome distribution, stale-warning frequency, transitions
  * missing task context, and verification re-run counts.
  */
-export function queryPresets(claudeDir: string): PresetResult {
-	const target = dbPath(claudeDir);
+export function queryPresets(projectRoot: string): PresetResult {
+	const target = dbPath(projectRoot);
 	if (!fs.existsSync(target)) throw new Error("no index — run `mewkit index` first");
 	const db = new DatabaseSync(target, { readOnly: true });
 	try {
@@ -293,8 +293,8 @@ export interface TaskQueryResult {
  * plus the distinct plan paths those events reference. Parameterized (no SQL injection surface).
  * Returns an empty event list for an unknown task id — never throws for a missing task.
  */
-export function queryByTask(claudeDir: string, taskId: string): TaskQueryResult {
-	const target = dbPath(claudeDir);
+export function queryByTask(projectRoot: string, taskId: string): TaskQueryResult {
+	const target = dbPath(projectRoot);
 	if (!fs.existsSync(target)) throw new Error("no index — run `mewkit index` first");
 	const db = new DatabaseSync(target, { readOnly: true });
 	try {

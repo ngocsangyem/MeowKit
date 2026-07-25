@@ -66,7 +66,10 @@ function escapeMemoryContent(text) {
 }
 
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-const MEMORY_DIR = path.join(ROOT, '.claude', 'memory');
+// Curated stores live in the `.meowkit/` taxonomy, the same tree `mewkit memory`
+// reads. Resolved through the shared helper so a pre-migration project keeps
+// writing to its existing `.claude/memory` tree instead of splitting history.
+const MEMORY_DIR = require('../lib/meowkit-paths.cjs').memoryDir(ROOT);
 
 // ##decision: routes to architecture-decisions.json (structured JSON entry).
 // ##pattern: is category-routed — resolved at runtime in appendToPatterns() — to

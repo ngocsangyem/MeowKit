@@ -36,28 +36,27 @@ const COST = [
 	{ date: "2026-06-20", command: "review", tier: "complex", model: "opus", tokens: 800, task: "y" },
 ];
 
-async function makeLogs(): Promise<{ claudeDir: string; tracePath: string; costPath: string }> {
+async function makeLogs(): Promise<{ root: string; tracePath: string; costPath: string }> {
 	const root = await mkdtemp(join(tmpdir(), "mewkit-idx-"));
 	tempDirs.push(root);
-	const claudeDir = join(root, ".claude");
-	const mem = join(claudeDir, "memory");
+	const mem = join(root, ".meowkit", "telemetry");
 	await mkdir(mem, { recursive: true });
 	const tracePath = join(mem, "trace-log.jsonl");
 	const costPath = join(mem, "cost-log.json");
 	await writeFile(tracePath, TRACE_LINES.map((r) => JSON.stringify(r)).join("\n") + "\n");
 	await writeFile(costPath, JSON.stringify(COST));
-	return { claudeDir, tracePath, costPath };
+	return { root, tracePath, costPath };
 }
 
 describe("buildIndex / queryIndex", () => {
 	it("builds from logs and answers aggregate queries", async () => {
-		const { claudeDir } = await makeLogs();
-		const res = buildIndex(claudeDir);
+		const { root } = await makeLogs();
+		const res = buildIndex(root);
 		expect(res.traceRows).toBe(5);
 		expect(res.costRows).toBe(2);
 		expect(res.schemaVersion).toBe(SCHEMA_VERSION);
 
-		const q = queryIndex(claudeDir);
+		const q = queryIndex(root);
 		expect(q.eventsByType.find((e) => e.event === "friction")!.n).toBe(2);
 		expect(q.frictionByResponsibility.find((r) => r.responsibility === "verification")!.n).toBe(2);
 		expect(q.runsByTier.find((r) => r.run_id === "r1")!.events).toBe(3);
@@ -65,32 +64,32 @@ describe("buildIndex / queryIndex", () => {
 	});
 
 	it("is rebuild-able: delete the DB → reindex → identical aggregates", async () => {
-		const { claudeDir } = await makeLogs();
-		buildIndex(claudeDir);
-		const before = queryIndex(claudeDir);
+		const { root } = await makeLogs();
+		buildIndex(root);
+		const before = queryIndex(root);
 
-		rmSync(dbPath(claudeDir)); // throw away the disposable index
-		expect(existsSync(dbPath(claudeDir))).toBe(false);
+		rmSync(dbPath(root)); // throw away the disposable index
+		expect(existsSync(dbPath(root))).toBe(false);
 
-		buildIndex(claudeDir); // rebuild from the canonical logs
-		const after = queryIndex(claudeDir);
+		buildIndex(root); // rebuild from the canonical logs
+		const after = queryIndex(root);
 		expect(after).toEqual(before);
 	});
 
 	it("never mutates the canonical source logs", async () => {
-		const { claudeDir, tracePath, costPath } = await makeLogs();
+		const { root, tracePath, costPath } = await makeLogs();
 		const t0 = await readFile(tracePath, "utf-8");
 		const c0 = await readFile(costPath, "utf-8");
-		buildIndex(claudeDir);
-		queryIndex(claudeDir);
+		buildIndex(root);
+		queryIndex(root);
 		expect(await readFile(tracePath, "utf-8")).toBe(t0);
 		expect(await readFile(costPath, "utf-8")).toBe(c0);
 	});
 
 	it("enables WAL and stamps the schema version on the DB", async () => {
-		const { claudeDir } = await makeLogs();
-		buildIndex(claudeDir);
-		const db = new DatabaseSync(dbPath(claudeDir), { readOnly: true });
+		const { root } = await makeLogs();
+		buildIndex(root);
+		const db = new DatabaseSync(dbPath(root), { readOnly: true });
 		try {
 			expect((db.prepare("PRAGMA journal_mode").get() as { journal_mode: string }).journal_mode.toLowerCase()).toBe(
 				"wal",
@@ -102,8 +101,8 @@ describe("buildIndex / queryIndex", () => {
 	});
 
 	it("queryIndex throws before any index is built (query is opt-in)", async () => {
-		const { claudeDir } = await makeLogs();
-		expect(() => queryIndex(claudeDir)).toThrow(/no index/);
+		const { root } = await makeLogs();
+		expect(() => queryIndex(root)).toThrow(/no index/);
 	});
 
 	it("handles empty/absent logs without error (zero rows)", async () => {
@@ -118,26 +117,26 @@ describe("buildIndex / queryIndex", () => {
 	});
 
 	it("stamps the consolidated schema version", async () => {
-		const { claudeDir } = await makeLogs();
-		expect(buildIndex(claudeDir).schemaVersion).toBe(SCHEMA_VERSION);
+		const { root } = await makeLogs();
+		expect(buildIndex(root).schemaVersion).toBe(SCHEMA_VERSION);
 	});
 
 	it("removes a stale legacy index.db on the first unified build", async () => {
-		const { claudeDir } = await makeLogs();
-		const legacy = join(claudeDir, "memory", "index.db");
+		const { root } = await makeLogs();
+		const legacy = join(root, ".meowkit", "cache", "index.db");
+		await mkdir(join(root, ".meowkit", "cache"), { recursive: true });
 		await writeFile(legacy, "stale");
 		expect(existsSync(legacy)).toBe(true);
-		buildIndex(claudeDir);
+		buildIndex(root);
 		expect(existsSync(legacy)).toBe(false);
-		expect(existsSync(dbPath(claudeDir))).toBe(true); // new unified DB
+		expect(existsSync(dbPath(root))).toBe(true); // new unified DB
 	});
 });
 
-async function makeWiki(): Promise<{ claudeDir: string; root: string }> {
+async function makeWiki(): Promise<{ root: string }> {
 	const root = await mkdtemp(join(tmpdir(), "mewkit-wiki-"));
 	tempDirs.push(root);
-	const claudeDir = join(root, ".claude");
-	await mkdir(join(claudeDir, "memory"), { recursive: true });
+	await mkdir(join(root, ".meowkit", "telemetry"), { recursive: true });
 	const pagesDir = join(root, "tasks", "wikis", "demo", "pages");
 	await mkdir(pagesDir, { recursive: true });
 	await writeFile(
@@ -164,13 +163,13 @@ async function makeWiki(): Promise<{ claudeDir: string; root: string }> {
 			salience: { total: 9, components: { explicit_user_intent: 3 } },
 		}) + "\n",
 	);
-	return { claudeDir, root };
+	return { root };
 }
 
 describe("wiki ingest + FTS", () => {
 	it("ingests the canonical wiki tree into the index", async () => {
-		const { claudeDir } = await makeWiki();
-		const res = buildIndex(claudeDir);
+		const { root } = await makeWiki();
+		const res = buildIndex(root);
 		expect(res.wiki.wikis).toBe(1);
 		expect(res.wiki.pages).toBe(2);
 		expect(res.wiki.candidates).toBe(1);
@@ -178,9 +177,9 @@ describe("wiki ingest + FTS", () => {
 	});
 
 	it("returns FTS matches with provenance + a token estimate", async () => {
-		const { claudeDir } = await makeWiki();
-		buildIndex(claudeDir);
-		const hits = searchWiki(dbPath(claudeDir), "salience");
+		const { root } = await makeWiki();
+		buildIndex(root);
+		const hits = searchWiki(dbPath(root), "salience");
 		expect(hits.length).toBe(1);
 		expect(hits[0]!.slug).toBe("demo");
 		expect(hits[0]!.pageId).toBe("demo/intro");
@@ -188,44 +187,43 @@ describe("wiki ingest + FTS", () => {
 	});
 
 	it("treats a SQL-ish match string as search text, not SQL", async () => {
-		const { claudeDir } = await makeWiki();
-		buildIndex(claudeDir);
-		expect(searchWiki(dbPath(claudeDir), "nonexistentterm")).toEqual([]);
-		expect(listWikiPages(dbPath(claudeDir), "demo").length).toBe(2);
+		const { root } = await makeWiki();
+		buildIndex(root);
+		expect(searchWiki(dbPath(root), "nonexistentterm")).toEqual([]);
+		expect(listWikiPages(dbPath(root), "demo").length).toBe(2);
 	});
 
 	it("is rebuild-able: wiki tables + FTS reindex identically", async () => {
-		const { claudeDir } = await makeWiki();
-		buildIndex(claudeDir);
-		const before = searchWiki(dbPath(claudeDir), "rubric");
-		rmSync(dbPath(claudeDir));
-		buildIndex(claudeDir);
-		const after = searchWiki(dbPath(claudeDir), "rubric");
+		const { root } = await makeWiki();
+		buildIndex(root);
+		const before = searchWiki(dbPath(root), "rubric");
+		rmSync(dbPath(root));
+		buildIndex(root);
+		const after = searchWiki(dbPath(root), "rubric");
 		expect(after).toEqual(before);
 	});
 
 	it("re-ingest does not duplicate FTS rows (triggers stay in sync)", async () => {
-		const { claudeDir } = await makeWiki();
-		buildIndex(claudeDir);
-		buildIndex(claudeDir); // second build over the same DB
-		expect(searchWiki(dbPath(claudeDir), "salience").length).toBe(1);
-		expect(listWikiPages(dbPath(claudeDir)).length).toBe(2);
+		const { root } = await makeWiki();
+		buildIndex(root);
+		buildIndex(root); // second build over the same DB
+		expect(searchWiki(dbPath(root), "salience").length).toBe(1);
+		expect(listWikiPages(dbPath(root)).length).toBe(2);
 	});
 
 	it("does not crash on duplicate page ids; first file wins with no FTS duplication", async () => {
 		const root = await mkdtemp(join(tmpdir(), "mewkit-wiki-dup-"));
 		tempDirs.push(root);
-		const claudeDir = join(root, ".claude");
-		await mkdir(join(claudeDir, "memory"), { recursive: true });
+		await mkdir(join(root, ".meowkit", "telemetry"), { recursive: true });
 		const pagesDir = join(root, "tasks", "wikis", "demo", "pages");
 		await mkdir(pagesDir, { recursive: true });
 		const frontmatter = (title: string, body: string) =>
 			"---\nid: demo/dup\nslug: demo\ntitle: " + title + "\nstate: committed\norigin: human\n---\n" + body + "\n";
 		await writeFile(join(pagesDir, "a.md"), frontmatter("First", "alpha salience text"));
 		await writeFile(join(pagesDir, "b.md"), frontmatter("Second", "beta salience text"));
-		const res = buildIndex(claudeDir); // must not throw on the duplicate id
+		const res = buildIndex(root); // must not throw on the duplicate id
 		expect(res.wiki.pages).toBe(1);
-		const hits = searchWiki(dbPath(claudeDir), "salience");
+		const hits = searchWiki(dbPath(root), "salience");
 		expect(hits.length).toBe(1);
 		expect(hits[0]!.pageId).toBe("demo/dup");
 	});

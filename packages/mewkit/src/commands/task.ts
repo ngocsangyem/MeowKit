@@ -152,7 +152,7 @@ async function taskNew(args: TaskNewArgs): Promise<void> {
 			});
 			console.log(`  ${pc.green("✓")} Activated task ${pc.bold(taskId)} (no-plan) → tasks/active/${taskId}.json\n`);
 			try {
-				await appendTraceRecord(path.join(projectRoot, ".claude"), {
+				await appendTraceRecord(projectRoot, {
 					event: "task_transition",
 					taskId,
 					data: { status: "active", trigger: "task-new" },

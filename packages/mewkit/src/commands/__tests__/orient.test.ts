@@ -105,7 +105,7 @@ describe("mewkit orient", () => {
 
 describe("mewkit orient — measurement emission", () => {
 	function traceEvents(root: string): ReturnType<typeof parseTraceLog> {
-		const logPath = join(root, ".claude", "memory", "trace-log.jsonl");
+		const logPath = join(root, ".meowkit", "telemetry", "trace-log.jsonl");
 		return existsSync(logPath) ? parseTraceLog(readFileSync(logPath, "utf-8")) : [];
 	}
 
@@ -140,8 +140,8 @@ describe("mewkit orient — measurement emission", () => {
 
 	it("a failed trace append never fails orientation (advisory)", async () => {
 		const root = makeRoot();
-		// Make .claude a FILE so the trace-append mkdir fails; orient must still print its JSON.
-		writeFileSync(join(root, ".claude"), "not a dir");
+		// Make .meowkit a FILE so the trace-append mkdir fails; orient must still print its JSON.
+		writeFileSync(join(root, ".meowkit"), "not a dir");
 		process.chdir(root);
 		orient({ json: true });
 		expect(parseJson().outcome).toBe("none"); // orientation still produced despite emit failure

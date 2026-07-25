@@ -45,37 +45,37 @@ const LINES = [
 function makeIndex(): string {
 	const root = mkdtempSync(join(tmpdir(), "mewkit-taskq-"));
 	roots.push(root);
-	const mem = join(root, ".claude", "memory");
+	const mem = join(root, ".meowkit", "telemetry");
 	mkdirSync(mem, { recursive: true });
 	writeFileSync(join(mem, "trace-log.jsonl"), LINES.map((l) => JSON.stringify(l)).join("\n") + "\n");
-	buildIndex(join(root, ".claude"));
-	return join(root, ".claude");
+	buildIndex(root);
+	return root;
 }
 
 describe("queryByTask", () => {
 	it("returns only the named task's events, oldest first, with plan linkage", () => {
-		const claudeDir = makeIndex();
-		const res = queryByTask(claudeDir, "feat-x");
+		const root = makeIndex();
+		const res = queryByTask(root, "feat-x");
 		expect(res.events.map((e) => e.event)).toEqual(["task_transition", "task_transition"]);
 		expect(res.plans).toEqual(["plans/260711-x/plan.md"]);
 	});
 
 	it("resolves task identity carried inside the data payload (transitional logs)", () => {
-		const claudeDir = makeIndex();
-		const res = queryByTask(claudeDir, "feat-y");
+		const root = makeIndex();
+		const res = queryByTask(root, "feat-y");
 		expect(res.events).toHaveLength(1);
 		expect(res.plans).toEqual(["plans/260711-y/plan.md"]);
 	});
 
 	it("returns an empty result for an unknown task (never throws)", () => {
-		const claudeDir = makeIndex();
-		expect(queryByTask(claudeDir, "nope").events).toEqual([]);
+		const root = makeIndex();
+		expect(queryByTask(root, "nope").events).toEqual([]);
 	});
 
 	it("ingests the legacy no-task event but never matches it under --task", () => {
-		const claudeDir = makeIndex();
+		const root = makeIndex();
 		// The legacy 'file_edited' row is present in the index but carries no task id.
-		expect(queryByTask(claudeDir, "feat-x").events.some((e) => e.event === "file_edited")).toBe(false);
+		expect(queryByTask(root, "feat-x").events.some((e) => e.event === "file_edited")).toBe(false);
 	});
 
 	it("throws only when no index has been built", () => {

@@ -32,7 +32,8 @@ export function indexCommand(opts: IndexOptions = {}): void {
 		console.error(pc.red("Could not find .claude/ directory."));
 		process.exit(0);
 	}
-	const result = buildIndex(claudeDir);
+	const projectRoot = path.dirname(claudeDir);
+	const result = buildIndex(projectRoot);
 	if (opts.json) {
 		console.log(JSON.stringify(result, null, 2));
 		return;
@@ -56,7 +57,7 @@ export function queryCommand(opts: IndexOptions = {}): void {
 	if (opts.task) {
 		let taskResult;
 		try {
-			taskResult = queryByTask(claudeDir, opts.task);
+			taskResult = queryByTask(path.dirname(claudeDir), opts.task);
 		} catch {
 			console.log(pc.dim("No derived index yet — run `mewkit index` first (opt-in)."));
 			return;
@@ -83,7 +84,7 @@ export function queryCommand(opts: IndexOptions = {}): void {
 	if (opts.presets) {
 		let presets;
 		try {
-			presets = queryPresets(claudeDir);
+			presets = queryPresets(path.dirname(claudeDir));
 		} catch {
 			console.log(pc.dim("No derived index yet — run `mewkit index` first (opt-in)."));
 			return;
@@ -111,7 +112,7 @@ export function queryCommand(opts: IndexOptions = {}): void {
 
 	let result;
 	try {
-		result = queryIndex(claudeDir);
+		result = queryIndex(path.dirname(claudeDir));
 	} catch {
 		console.log(pc.dim("No derived index yet — run `mewkit index` first (opt-in)."));
 		return; // advisory: missing index is not an error

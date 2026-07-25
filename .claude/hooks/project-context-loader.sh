@@ -187,7 +187,9 @@ fi
 # ═══════════════════════════════════════════════════════════════════
 # Personal preferences injection
 # ═══════════════════════════════════════════════════════════════════
-PREFS_FILE=".claude/memory/preferences.md"
+# Preferences are a session/state marker, not a curated store.
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/meowkit-paths.sh"
+PREFS_FILE="$(meowkit_state_dir state)/preferences.md"
 if [ -f "$PREFS_FILE" ]; then
   echo ""
   echo "## Personal Preferences"
@@ -248,7 +250,7 @@ fi
 
 # Memory dir audit — report .md topic files exceeding 500 lines.
 # Display-only (no mutation); pairs with the auto-prune block in post-session.sh.
-MEM_DIR=".claude/memory"
+MEM_DIR="$(meowkit_state_dir memory)"
 if [ -d "$MEM_DIR" ]; then
   echo ""
   echo "## Memory files"

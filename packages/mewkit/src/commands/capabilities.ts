@@ -272,7 +272,7 @@ function resolve(
 	// Opt-in telemetry only: default runs stay write-free.
 	if (record && result.knowledgeRecall) {
 		const { event, data } = recallDecisionEvent(result.knowledgeRecall);
-		new TraceAdapter(claudeDir).recordWikiTrace(event, data);
+		new TraceAdapter(path.dirname(claudeDir)).recordWikiTrace(event, data);
 	}
 	if (json) {
 		console.log(JSON.stringify(result, null, 2));

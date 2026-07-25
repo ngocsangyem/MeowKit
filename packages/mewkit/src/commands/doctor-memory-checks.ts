@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { resolveStateDir } from "../state/resolve-state-dir.js";
 import { validateMemory } from "../memory/validate.js";
 import { detectLegacyDrift } from "../migrate/memory-preflight/legacy-drift-detector.js";
 import type { DiagResult } from "./doctor-checks.js";
@@ -33,9 +34,9 @@ export function checkMemoryHealth(root: string | null): DiagResult[] {
 		return [{ status: "warn", name: "Memory schema", detail: "Project root not found; skipped memory-schema checks." }];
 	}
 	const drift = checkMemoryDrift(root);
-	const memoryDir = path.join(root, ".claude", "memory");
+	const memoryDir = resolveStateDir(root, "memory");
 	if (!fs.existsSync(memoryDir)) {
-		return [{ status: "warn", name: "Memory schema", detail: ".claude/memory/ not found." }, ...drift];
+		return [{ status: "warn", name: "Memory schema", detail: "memory store not found." }, ...drift];
 	}
 
 	const report = validateMemory(memoryDir);

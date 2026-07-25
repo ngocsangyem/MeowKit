@@ -47,7 +47,14 @@ esac
 MAX_CAPTURE_SECONDS=300
 MAX_MARKERS=5
 
-MEMORY_DIR=".claude/memory"
+# `.meowkit/` taxonomy: curated stores, append logs, and session markers each
+# have their own home. A pre-migration project resolves all three to the legacy
+# `.claude/memory` tree, preserving current behavior until `mewkit migrate` runs.
+# shellcheck source=lib/meowkit-paths.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/meowkit-paths.sh"
+MEMORY_DIR="$(meowkit_state_dir memory)"
+TELEMETRY_DIR="$(meowkit_state_dir telemetry)"
+STATE_DIR="$(meowkit_state_dir state)"
 
 # Skip if memory disabled in config
 if [ -f .claude/meowkit.config.json ]; then
@@ -58,10 +65,11 @@ if [ -f .claude/meowkit.config.json ]; then
   fi
 fi
 
-# Ensure memory directory exists
-if [ ! -d "$MEMORY_DIR" ]; then
-  mkdir -p "$MEMORY_DIR"
-fi
+# Ensure the state directories this hook writes to exist
+for _d in "$MEMORY_DIR" "$TELEMETRY_DIR" "$STATE_DIR"; do
+  [ -d "$_d" ] || mkdir -p "$_d"
+done
+unset _d
 
 # Get current timestamp
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M")
@@ -114,8 +122,8 @@ else
 fi
 
 # Initialize cost-log.json if missing
-if [ ! -f "$MEMORY_DIR/cost-log.json" ]; then
-  echo "[]" > "$MEMORY_DIR/cost-log.json"
+if [ ! -f "$TELEMETRY_DIR/cost-log.json" ]; then
+  echo "[]" > "$TELEMETRY_DIR/cost-log.json"
 fi
 
 # Append cost entry from budget-state (values passed via env vars to avoid shell-to-Python injection)
@@ -131,7 +139,7 @@ if [ -f "$BUDGET_STATE_FILE" ] && command -v python3 >/dev/null 2>&1; then
   # Include session_id + model + cache-token fields per cost-tracking.md spec.
   # Atomic write: temp file + os.replace rename — safe under concurrent invocations.
   _CLEAN_BUDGET="$CLEAN_BUDGET" \
-  _COST_LOG="$MEMORY_DIR/cost-log.json" \
+  _COST_LOG="$TELEMETRY_DIR/cost-log.json" \
   _TIMESTAMP="$TIMESTAMP" \
   _SESSION_ID="$PERSISTED_SESSION_ID" \
   _MODEL_HINT="$RESOLVED_MODEL" \
@@ -170,10 +178,10 @@ fi
 # Emits a dead_weight_audit_flagged trace record (telemetry, not curated memory).
 # Note: the acquire_lock function defined above is dead code after v2.4.1
 # (retroactive capture was removed). The model-change branch below is the
-# sole remaining consumer of MEMORY_DIR; two concurrent Stop invocations
+# sole remaining consumer of STATE_DIR; two concurrent Stop invocations
 # can race on this branch. Mitigation is atomic write of last-model-id.txt
 # (temp + mv) so the file is never partially observable.
-LAST_MODEL_FILE="$MEMORY_DIR/last-model-id.txt"
+LAST_MODEL_FILE="$STATE_DIR/last-model-id.txt"
 CURRENT_MODEL="$RESOLVED_MODEL"
 
 # One-shot migration: legacy installs have last-model-id.txt = "unknown"
@@ -257,7 +265,7 @@ fi
 # Failure modes handled:
 #   - empty TODAY (date(1) failure)        → [ -n "$TODAY" ] guard skips cleanly
 #   - Python error (exit != 0)             → LAST_PRUNE_FILE NOT advanced; retries tomorrow
-#   - prune-log location                   → session-state/, NOT .claude/memory/.
+#   - prune-log location                   → session-state/, NOT the memory tree.
 #     Loaders never scan session-state/, which breaks the injection-rules.md Rule 11
 #     carrier chain (memory files are both untrusted input AND sensitive data).
 MEOWKIT_MEMORY_PRUNE="${MEOWKIT_MEMORY_PRUNE:-on}"
@@ -271,7 +279,7 @@ LAST_PRUNE=$(cat "$LAST_PRUNE_FILE" 2>/dev/null || echo "")
 if [ "$MEOWKIT_MEMORY_PRUNE" != "off" ] && [ -n "$TODAY" ] && [ "$TODAY" != "$LAST_PRUNE" ]; then
   VENV_PY="${CLAUDE_PROJECT_DIR:-.}/.claude/skills/.venv/bin/python3"
   PRUNE_SCRIPT="${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/memory-prune.py"
-  MEM_DIR="${CLAUDE_PROJECT_DIR:-.}/.claude/memory"
+  MEM_DIR="$MEMORY_DIR"
   PRUNE_LOG="session-state/prune-log.md"  # NOT inside .claude/memory/
   mkdir -p session-state 2>/dev/null
   if [ -x "$VENV_PY" ] && [ -f "$PRUNE_SCRIPT" ]; then
@@ -286,7 +294,7 @@ if [ "$MEOWKIT_MEMORY_PRUNE" != "off" ] && [ -n "$TODAY" ] && [ "$TODAY" != "$LA
   fi
 fi
 
-echo "Session data captured to .claude/memory/"
+echo "Session data captured to $MEMORY_DIR"
 
 # Gated runtime-truth sentinel: success-path completion marker.
 # Uses sentinel on success path (NOT trap EXIT — that fires on subshell exits

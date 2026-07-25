@@ -1,6 +1,7 @@
 import { execSync } from "node:child_process";
 import fs, { chmodSync } from "node:fs";
 import path from "node:path";
+import { resolveStateDir } from "../state/resolve-state-dir.js";
 import { commandExists } from "./setup.js";
 import { getRequirementsSource } from "../core/skills-dependencies.js";
 import { verifyPackages } from "../core/dependency-installer.js";
@@ -147,7 +148,7 @@ export function checkScripts(root: string | null): DiagResult {
 export function checkMemory(root: string | null): DiagResult {
 	if (!root) return { name: "Memory", status: "warn", detail: "Skipped — no project" };
 
-	const memDir = path.join(root, ".claude", "memory");
+	const memDir = resolveStateDir(root, "memory");
 	if (!fs.existsSync(memDir)) {
 		return { name: "Memory", status: "warn", detail: "memory/ not found — will be created on first session" };
 	}

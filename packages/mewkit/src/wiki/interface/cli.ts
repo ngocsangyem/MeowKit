@@ -45,9 +45,9 @@ function buildService(claudeDir: string): WikiService {
 		repo: new MarkdownWikiRepository(path.dirname(claudeDir)),
 		scanner: new ScannerAdapter(),
 		index: new SqliteWikiIndex(dbPath(claudeDir)),
-		tracer: new TraceAdapter(claudeDir),
+		tracer: new TraceAdapter(path.dirname(claudeDir)),
 		fetcher: new FetcherAdapter(),
-		verifier: () => verifyWiki(claudeDir),
+		verifier: () => verifyWiki(path.dirname(claudeDir)),
 	});
 }
 
@@ -182,12 +182,12 @@ export async function wikiCommand(opts: WikiCliOptions): Promise<void> {
 			return;
 		}
 		case "reindex": {
-			const r = svc.reindexWiki(claudeDir);
+			const r = svc.reindexWiki(path.dirname(claudeDir));
 			console.log(`reindexed: ${r.wiki.pages} page(s)`);
 			return;
 		}
 		case "verify": {
-			const report = verifyWiki(claudeDir);
+			const report = verifyWiki(path.dirname(claudeDir));
 			if (flags["json"]) {
 				console.log(JSON.stringify(report, null, 2));
 			} else if (report.fresh) {

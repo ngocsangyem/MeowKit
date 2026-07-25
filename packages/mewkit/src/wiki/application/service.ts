@@ -136,8 +136,8 @@ export class WikiService {
 		this.deps.tracer.recordWikiTrace("wiki_seed", { slug, query: seed.query });
 	}
 
-	reindexWiki(claudeDir: string): IndexResult {
-		const result = buildIndex(claudeDir);
+	reindexWiki(projectRoot: string): IndexResult {
+		const result = buildIndex(projectRoot);
 		this.deps.tracer.recordWikiTrace("wiki_reindex", { pages: result.wiki.pages });
 		return result;
 	}

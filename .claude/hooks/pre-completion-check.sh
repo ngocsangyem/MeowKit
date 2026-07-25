@@ -151,8 +151,10 @@ if [ "$HAS_VERIFICATION" -eq 0 ]; then
 fi
 
 # 3. Trace log shows test evidence (P13 — capped scan)
-if [ "$HAS_VERIFICATION" -eq 0 ] && [ -f ".claude/memory/trace-log.jsonl" ]; then
-  if tail -n 500 .claude/memory/trace-log.jsonl 2>/dev/null | grep -qE '"test_result":[[:space:]]*"pass"|"exit_code":[[:space:]]*0.*"test"'; then
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/meowkit-paths.sh"
+_TRACE_LOG="$(meowkit_state_dir telemetry)/trace-log.jsonl"
+if [ "$HAS_VERIFICATION" -eq 0 ] && [ -f "$_TRACE_LOG" ]; then
+  if tail -n 500 "$_TRACE_LOG" 2>/dev/null | grep -qE '"test_result":[[:space:]]*"pass"|"exit_code":[[:space:]]*0.*"test"'; then
     HAS_VERIFICATION=1
   fi
 fi

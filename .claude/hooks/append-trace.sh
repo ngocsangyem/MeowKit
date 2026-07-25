@@ -29,7 +29,11 @@ PAYLOAD="${2:-}"
 # Resolve project root
 [ -n "${CLAUDE_PROJECT_DIR:-}" ] && cd "$CLAUDE_PROJECT_DIR"
 
-LOG_DIR=".claude/memory"
+# Append logs are telemetry in the `.meowkit/` taxonomy. The TypeScript writer
+# resolves the same directory, so both contend on one lock file.
+# shellcheck source=lib/meowkit-paths.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/meowkit-paths.sh"
+LOG_DIR="$(meowkit_state_dir telemetry)"
 LOG_FILE="$LOG_DIR/trace-log.jsonl"
 LOCK_FILE="$LOG_DIR/.trace-log.lock"
 MAX_BYTES=$((50 * 1024 * 1024))  # 50MB
