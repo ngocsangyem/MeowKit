@@ -36,7 +36,6 @@ What each tool can receive from your `.claude/` kit:
 - **`.mcp.json`** converts to `config.toml [mcp_servers]` entries with the opt-in `--include-mcp` flag (Codex only; project-scoped MCP config loads only in trusted projects). When `.mcp.json` exists and the flag is off, the preflight tells you the exact re-run command.
 - **`.claude/.env`** converts to a Codex `[shell_environment_policy]` scaffold from key names only. Values are never copied; secret-like key names are omitted and counted only as an aggregate warning.
 - **Hooks** reach Codex through the bundle only. Cursor has no documented hooks surface, so mewkit skips hooks for it with a warning. Codex events are version-gated: recent Codex (0.142+) supports 10 events with hooks enabled by default; older versions fall back to the conservative 6-event table.
-- **Codex shell hooks** (`.sh`) run through generated `.cjs` wrappers that execute the copied script inside `.codex/hooks/`. Unsupported shell-family handlers such as `.ps1`, `.bat`, `.cmd`, and `.py` are reported as skipped with a reason.
 - **Codex agent bundle** — `mewkit migrate codex` copies a hand-authored, Codex-native bundle: agents as `.codex/agents/*.toml` (name/description/developer_instructions), skills/commands/rules/modes as `.agents/skills/*/SKILL.md`, and hooks as `.codex/hooks.json`.
 
 ## Reference rewriting
