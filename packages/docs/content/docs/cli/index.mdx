@@ -1,28 +1,22 @@
 ---
 title: "CLI Reference"
-description: "MeowKit command-line tools overview."
+description: "The mewkit command line, grouped by what you are trying to do."
 ---
 
-MeowKit ships one CLI package, `mewkit`:
+MeowKit ships one CLI package, `mewkit`. Run it from your project root; there is nothing to install globally.
 
-| Command | Purpose |
-|---------|---------|
-| `npx mewkit init` | Scaffold or update the `.claude/` system |
-| `npx mewkit COMMAND` | Runtime tools, see the groups below |
+## Find a command
 
-### Command groups
+| You want to | Page |
+|---|---|
+| Create a project, configure it, check it is healthy, upgrade it | [Project Setup](/cli/project-setup) |
+| Write a plan, create a task, see where a task stands | [Planning and Tasks](/cli/planning) |
+| Review a pull request across several sittings | [Review](/cli/review) |
+| Read or write memory, check the context budget, use the wiki | [Memory and Knowledge](/cli/knowledge) |
+| Export the kit to Codex or Cursor, or see what they support | [Portability](/cli/portability) |
+| See what a session cost, what it did, what the kit contains | [Cost and Telemetry](/cli/telemetry) |
 
-| Group | Commands |
-| --- | --- |
-| Project lifecycle | `init`, `upgrade`, `setup`, `doctor`, `status`, `task`, `migrate` |
-| Knowledge & memory | `wiki`, `memory`, `index`, `query` |
-| Harness introspection | `validate`, `inventory`, `trace`, `budget` (incl. `budget context`), `verdict-gate`, `capabilities`, `context` |
-| Cost & visualization | `budget`, `visual-plan` |
-| Release & providers | `pack`, `providers` / `explain-support` |
-
-See [Commands](/cli/commands) for the full reference and [Task Commands](/cli/task-commands) for `task` details.
-
-## Quick Start
+## Get started
 
 ```bash
 # 1. Scaffold MeowKit into your project
@@ -39,10 +33,8 @@ npx mewkit doctor
 npx mewkit task new --type feature "Add user authentication"
 ```
 
-## How it works
+## Two things worth knowing up front
 
-`npx mewkit init` is a **scaffold + update** tool:
-- **First run:** opens a toolkit picker (Claude Code / Codex / Cursor, Claude Code preselected), then copies the full MeowKit system (agents, skills, hooks, rules, commands, modes, scripts) into `.claude/` for each selected provider. `--target <provider>` skips the picker.
-- **Subsequent runs:** smart update. Overwrites unchanged core files, skips user-modified files, adds new files, no picker
+`npx mewkit init` both scaffolds and updates. The first run opens a toolkit picker (Claude Code, Codex, Cursor, with Claude Code preselected) and copies the full system into `.claude/` for each provider you choose; `--target <provider>` skips the picker. Later runs are a smart update: unchanged core files are overwritten, files you edited are left alone, new files are added, and there is no picker.
 
-`mewkit` is a **runtime toolbox** for daily use: diagnostics, setup, task management, and cost tracking with session and day filtering in `budget`.
+Everything else is a runtime toolbox for daily use. None of it is required to run MeowKit, and none of it changes your project unless the command says it does.

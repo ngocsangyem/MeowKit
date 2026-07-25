@@ -3,7 +3,11 @@
   "title": "CLI",
   "pages": [
     "index",
-    "commands",
-    "task-commands"
+    "project-setup",
+    "planning",
+    "review",
+    "knowledge",
+    "portability",
+    "telemetry"
   ]
 }

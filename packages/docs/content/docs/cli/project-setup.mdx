@@ -1,0 +1,154 @@
+---
+title: "Project Setup"
+description: "Start a project, keep it healthy, and upgrade it."
+---
+
+Everything that touches the shape of the project itself: creating it, configuring it, checking it is sound, and moving it forward a version.
+
+## init — provider selection & one-shot export
+
+On a **fresh install** with no provider flag, `mewkit init` opens a provider multiselect —
+**Claude Code** (checked by default), **Codex**, **Cursor** — and provisions each picked
+toolkit. Any explicit provider intent (`--target <provider>` or `--migrate`) skips the picker
+and keeps its own flow.
+
+```bash
+# Fresh install → provider multiselect (Claude Code preselected)
+npx mewkit init
+
+# Skip the picker — Codex-only toolkit (copies the authored Codex bundle, no .claude/)
+npx mewkit init --target codex
+
+# Skip the picker — Cursor toolkit (unpacks .claude/ then exports to Cursor)
+npx mewkit init --target cursor
+
+# Global install scope
+npx mewkit init --target cursor --migrate-global
+```
+
+| Flag                  | Description                                                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--target <provider>` | Skip the picker and create one provider toolkit. `codex` copies the authored Codex bundle (codex-only, no `.claude/`); any other provider (e.g. `cursor`) unpacks `.claude/` then exports to it |
+| `--migrate`           | After unpack, prompt for export targets via the standalone migrate multiselect (TTY required)                                                     |
+| `--migrate-global`    | Use global install paths (`~/.cursor/`, etc.) instead of project-local                                                                            |
+
+**Provider multiselect** (fresh install, no `--target`):
+
+- **Claude Code** → installs the `.claude/` kit from the latest release (today's behavior).
+- **Codex** → copies the authored Codex bundle (`AGENTS.md`, `.codex/`, `.agents/skills/`); non-fatal if it can't (warns and continues).
+- **Cursor** → installs `.claude/` (needed as the export source) then exports to `.cursor/`.
+- Selecting **only Codex** yields a codex-only project — no release download, no `.claude/`.
+- The picker is shown for **new installs only** and only when no provider flag is passed. In update mode (existing `.claude/`), init refreshes `.claude/` without prompting; use `mewkit upgrade` to propagate to installed provider toolkits.
+
+**Behavior:**
+
+- `--target codex` is offline: it copies the Codex bundle shipped in the package — no release download, no `.claude/`, no conversion. It fails closed if `AGENTS.md` already exists (re-run with `--force`).
+- For non-codex targets, export runs after the kit unpacks; failures don't roll back the kit install — re-run `mewkit migrate` to retry.
+- Init uses the same orchestrator, registry, and reconciler as the standalone `migrate` command. Idempotent re-runs work the same way.
+- `--target` implies `--yes` (non-interactive) for the export step, so it's safe in CI scripts.
+
+## setup
+
+Guided post-scaffold configuration. Each step is idempotent.
+
+```bash
+npx mewkit setup [--only=<step>]
+```
+
+| Step        | What it does                                                    |
+| ----------- | --------------------------------------------------------------- |
+| `venv`      | Creates Python venv for skill scripts at `.claude/skills/.venv` |
+| `mcp`       | Copies `mcp.json.example` → `.mcp.json`                         |
+| `env`       | Copies `env.example` → `.env`                                   |
+| `gitignore` | Appends MeowKit entries to `.gitignore`                         |
+
+```bash
+npx mewkit setup              # Run all steps
+npx mewkit setup --only=venv  # Run single step
+```
+
+## doctor
+
+Diagnose environment issues with auto-fix for permissions.
+
+```bash
+npx mewkit doctor [--report]
+```
+
+**Checks:** Node.js 20+, Python 3.9+, Git, `.claude/` structure, hooks executable, scripts present, memory writable, MCP config, Python venv, config validity.
+
+The Node check passes at 20 and up, while the `mewkit` package itself requires Node 24 or later. Install on 24+; a passing `doctor` on Node 20 does not mean the CLI is supported there.
+
+**Auto-fixes:** Hook file permissions (`chmod +x`).
+
+| Flag              | Description                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| `--report`        | Print shareable diagnostic report                                                                      |
+| `--consolidation` | Show the consolidation/deprecation ledger — each candidate's status (canonical / keep-legacy / authoring-only / experimental / deprecated). Status is a classification, **not** a runtime-availability claim. |
+
+## upgrade
+
+Update mewkit to the latest version.
+
+```bash
+npx mewkit upgrade [--check] [--beta] [--list]
+```
+
+| Flag      | Description                                        |
+| --------- | -------------------------------------------------- |
+| `--check` | Show available update (shows both stable and beta) |
+| `--beta`  | Install beta channel                               |
+| `--list`  | List all available versions with channel info      |
+
+**Examples:**
+
+```bash
+npx mewkit upgrade              # Upgrade to latest stable
+npx mewkit upgrade --beta       # Upgrade to latest beta
+npx mewkit upgrade --check      # Check without installing
+npx mewkit upgrade --list       # Show all versions
+```
+
+**Output of `--list`:**
+
+```
+Channels:
+  stable:  1.2.0
+  beta:    1.3.0-beta.2
+
+Recent versions:
+  1.2.0 (installed)
+  1.1.1
+  1.1.0
+  1.0.0
+```
+
+## validate
+
+Verify `.claude/` structure integrity.
+
+```bash
+npx mewkit validate
+```
+
+**Checks:** Agents (10+), skills (30+), commands dir, modes (5+), rules (10+), hooks executable, scripts present, settings.json, CLAUDE.md, config file. In the MeowKit authoring checkout, the full sweep also reports provider-specific vocabulary found in generic skill bodies as advisory portability WARNs; `--strict` promotes WARNs to errors. Run a focused suite with any of the flags below (no flag = the full sweep).
+
+| Flag | Description |
+| --- | --- |
+| `--packs` | Pack-manifest coherence + the exact-path safety invariant. |
+| `--workflow` | Workflow drift-check (CLAUDE.md / phase docs vs `workflow.yaml`). |
+| `--ownership` | Artifact ownership coverage. |
+| `--substrate` | Substrate-view freshness + responsibility coverage. |
+| `--rules` | Routing-table breadth. |
+| `--portable` | Portable-migration manifest checks. |
+| `--strict` | Promote recommended-field WARNs to errors. |
+
+## status
+
+Print version, channel, and current config.
+
+```bash
+npx mewkit status
+```
+
+Shows: MeowKit version with channel indicator (stable/beta), project config from `.meowkit/config.json`.

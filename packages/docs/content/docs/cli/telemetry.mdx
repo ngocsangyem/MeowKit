@@ -1,0 +1,109 @@
+---
+title: "Cost and Telemetry"
+description: "See what a session cost, what it did, and what the kit contains."
+---
+
+Read-only reporting over logs the harness already writes. Nothing here changes project state.
+
+## budget
+
+View token usage and cost tracking.
+
+```bash
+npx mewkit budget [--monthly] [--session [id]] [--day [YYYY-MM-DD]]
+```
+
+| Flag | Description |
+| --- | --- |
+| `--monthly` | Aggregate by month instead of showing the last 10 entries |
+| `--session` | Filter to the current Claude Code session id |
+| `--session <id>` | Filter to a specific session id from `cost-log.json` |
+| `--day` | Filter to today using `YYYY-MM-DD` |
+| `--day <date>` | Filter to a specific day in `YYYY-MM-DD` format |
+
+**Behavior:**
+- Without filters, `budget` shows the latest 10 rows and the all-time token total.
+- `--session` resolves the current session from `HOOK_SESSION_ID` first, then `session-state/last-session-id`.
+- `--day` without a value uses today.
+- Filters compose, so `--session --day` reports the intersection.
+
+**Examples:**
+
+```bash
+npx mewkit budget
+npx mewkit budget --monthly
+npx mewkit budget --session
+npx mewkit budget --session 9adf6a6b-9fbf-45ca-b36b-b0dd55356ac1
+npx mewkit budget --day
+npx mewkit budget --day 2026-05-01
+npx mewkit budget --session --day 2026-05-01
+```
+
+### budget context
+
+Estimate the loadable `.claude/` context size for a profile (the context-budget guardrail; also wired into CI).
+
+```bash
+npx mewkit budget context --profile <core|developer|full> [--fail-over N] [--json]
+```
+
+`--fail-over N` exits non-zero when the estimated loadable context exceeds `N` tokens.
+
+## trace
+
+Inspect the append-only trace log for entropy and recurring friction, and record friction inline so future sessions can recall it. Advisory — always exits 0.
+
+```bash
+npx mewkit trace audit            # orphaned / stale / unverified / repeated-friction signals
+npx mewkit trace propose          # group repeated friction (≥2) into advisory backlog items
+npx mewkit trace score            # entropy score
+npx mewkit trace --friction "<note>" [--responsibility <r>] [--commit]
+```
+
+## index
+
+Build or refresh the derived SQLite index (`.meowkit/cache/wiki-index.db`) from the canonical append logs (`.meowkit/memory/*.jsonl`) and the wiki tree. Disposable and deterministic — delete it and re-run to get an identical index.
+
+```bash
+npx mewkit index [--json]
+```
+
+## query
+
+Run read-only aggregate queries over the derived index (events by type, runs, friction by responsibility, cost by model). Requires a prior `mewkit index`.
+
+```bash
+npx mewkit query [--json]
+```
+
+## inventory
+
+Report harness-artifact coverage. With `--substrate`, map artifacts onto the responsibility taxonomy (covered / partial / missing); `--emit` rewrites the generated `harness-substrate.md` view.
+
+```bash
+npx mewkit inventory [--json]
+npx mewkit inventory --substrate [--emit]
+npx mewkit inventory --stale | --critical | --portable-missing | --check | --emit-counts
+```
+
+## capabilities
+
+Inspect and resolve the capability manifest — the semantic map of installed skills/agents/commands/hooks plus authored tool and context/state services. The manifest is a resolution surface; it is **never** injected into a model session. The CLI reads the live `.claude/` install when present; a Codex-migrated project without it falls back to the validated `.codex/capabilities.json` projection written by `mewkit migrate codex`.
+
+```bash
+npx mewkit capabilities list [--json]
+npx mewkit capabilities explain <id> [--json]
+npx mewkit capabilities resolve --intent "implement this feature" [--provider <id>] [--json]
+npx mewkit capabilities view          # render the trigger-registry table from the manifest
+npx mewkit capabilities bootstrap [--provider <id>]   # the always-visible discovery bootstrap
+npx mewkit capabilities projections [--json]          # per-provider discovery + 4 support levels
+```
+
+| Subcommand    | Purpose                                                                                                                             |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `list`        | All capabilities with kind, owner, install state, and intents.                                                                      |
+| `explain <id>`| One capability's requirements, support levels, verification, and provenance.                                                        |
+| `resolve`     | Rank capabilities for an `--intent` and, with `--provider`, report host availability, the safe invocation, any repo-context requirement + how that provider acquires it, and the adapter + evidence behind the claim. In a Codex-only project, resolve uses the validated migration snapshot. |
+| `view`        | Render the capabilities table (the generated portion of the trigger registry).                                                      |
+| `bootstrap`   | Print the bounded, brand-neutral discovery bootstrap for a provider (`--write` regenerates the committed file).                     |
+| `projections` | Per-provider discovery projection + the four support levels (`discoverable`/`selectable`/`invocable`/`enforceable`).                |

@@ -1,0 +1,177 @@
+---
+title: "Planning and Tasks"
+description: "Create plans and task records, and see where a task stands."
+---
+
+The commands behind Gate 1 and the durable task record. If you are asking "what am I supposed to be doing", `orient` answers it.
+
+## plan
+
+Plan lifecycle. `status` / `check` are read-only (the plan Markdown stays the sole authority); `approve` / `archive` are the two mutating subcommands and live in their own modules so the read-only path imports no write API.
+
+```bash
+npx mewkit plan status <plan-dir>       # checkbox progress across plan.md + phase files
+npx mewkit plan check <phase-file>      # required-section + checklist report for one phase
+npx mewkit plan approve <plan-dir>      # stamp the Gate 1 approval receipt (after a human approves)
+npx mewkit plan archive <plan-dir>      # mark completed + move to tasks/plans/archive/
+npx mewkit plan archive <plan-dir> --dry-run
+```
+
+`plan archive` finishes a plan in one step:
+
+- Stamps `status: completed` in `plan.md` frontmatter, every `phase-*.md` frontmatter, and every `phases[*].status` in `.plan-state.json` (the plan-creator checkpoint).
+- Preserves the CLI-managed `.plan-state.json` `visual` block and leaves `visual-plan/plan.json` untouched — both are lifecycle-agnostic and travel with the directory.
+- Clears a dangling active-task pointer that still points at the plan.
+- Moves the whole directory into `tasks/plans/archive/<name>/` — fail-closed if the destination exists, no-op if already archived.
+
+Agents run it automatically at the end of a completed plan (cook Phase 6). `--dry-run` previews with zero writes.
+
+## task new
+
+Create a new task file from a template.
+
+```bash
+npx mewkit task new --type <type> "description"
+```
+
+**Arguments:**
+
+| Argument | Description |
+|----------|-------------|
+| description | Short description (used in filename and title) |
+
+**Flags:**
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--type` | Template type: `feature`, `bug-fix`, `refactor`, `security` | `feature` |
+| `--priority` | Priority: `critical`, `high`, `medium`, `low` | `medium` |
+
+**Examples:**
+
+```bash
+npx mewkit task new --type feature "Add user authentication"
+# Creates: tasks/active/260327-add-user-authentication.feature.md
+
+npx mewkit task new --type bug-fix --priority high "Fix login timeout"
+# Creates: tasks/active/260327-fix-login-timeout.bug-fix.md
+```
+## task list
+
+List task files with status.
+
+```bash
+npx mewkit task list [--all] [--status <status>]
+```
+
+**Flags:**
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--all` | Include completed and backlog tasks | `false` |
+| `--status` | Filter by status: `draft`, `in-progress`, `blocked`, `review`, `done` | all |
+
+**Examples:**
+
+```bash
+npx mewkit task list
+# Lists active tasks only
+
+npx mewkit task list --all
+# Lists all tasks (active + completed + backlog)
+
+npx mewkit task list --status blocked
+# Lists only blocked tasks
+```
+
+## task-state show
+
+Reconstruct durable resume state from the task records under `tasks/active/` — files only, no network. Marks the record whose plan matches the active-plan pointer as current, and surfaces any incompatible/corrupt record as an issue rather than crashing.
+
+```bash
+npx mewkit task-state show [--json]
+```
+## task-state update
+
+Atomically update a durable task record (created for planned / long-running work). Used by orchestration workflows to record status, the last completed step, the next action, and capability decisions so a fresh session can resume. Advisory — a failed write is surfaced but never blocks the workflow.
+
+```bash
+npx mewkit task-state update <id> [--status <active|blocked|done>] [--step "<what just finished>"] [--next "<next action>"] [--plan <path>] [--json]
+```
+
+**Flags:**
+
+| Flag       | Description                                             | Default  |
+| ---------- | ------------------------------------------------------- | -------- |
+| `--status` | Task status: `active`, `blocked`, `done`                | `active` |
+| `--step`   | What just finished (the last completed step)            | —        |
+| `--next`   | The next action to take on resume                       | —        |
+| `--plan`   | Path to the plan this record joins                      | —        |
+
+**Examples:**
+
+```bash
+npx mewkit task-state show
+# Lists active task records + the current-plan marker
+
+npx mewkit task-state update feat-auth --status active --step "wired login route" --next "add refresh-token test"
+```
+
+## visual-plan
+
+Structured visual review for UI-bearing plans. The canonical artifact
+`visual-plan/plan.json` (schema `visual-plan/v1`) is a coverage ledger + canvas
+(lanes, surface-locked artboards, semantic-HTML wireframes, connectors,
+annotations). Deterministic subcommands validate and gate it; `edit`/`view`
+serve a transient 127.0.0.1 React studio that renders and edits it.
+
+```bash
+npx mewkit visual-plan <subcommand> <plan-dir> [flags]
+```
+
+### Subcommands
+
+| Subcommand                          | Description                                                                 |
+| ----------------------------------- | -------------------------------------------------------------------------- |
+| `validate`                          | Schema + coverage closure + ref resolution + safe-HTML + source-hash freshness (exact JSON-path errors) |
+| `status`                            | Coverage summary (resolved/planned/omitted/unresolved) + review status     |
+| `approve --revision <n>`            | Single writer of `review.status`; the Gate-1 transition (pins the reviewed revision) |
+| `rehash`                            | Refresh pinned source hashes after an intentional Markdown edit (clears approval) |
+| `export --format html`             | Self-contained `plan.html` from the approved artifact                       |
+| `view` / `edit`                     | Transient studio — read-only / editable (single-editor lock)               |
+| `prepare-feedback --ops <f>`        | Freeze accumulated semantic ops into an immutable `visual-feedback/v1` batch + Copy Command |
+| `apply-feedback --batch <id>`       | `--check` (pre-apply stale gate) / `--receipt <f>` (record per-op outcomes) |
+| `patch --op <f>`                    | Apply one typed visual op (lane/order/annotation/connector-label/field)     |
+
+### Flags
+
+| Flag                   | Description                                              |
+| ---------------------- | ------------------------------------------------------- |
+| `--port <number>`      | `edit`/`view`: bind to fixed port (`0` = random)        |
+| `--open` / `--no-open` | `edit`/`view`: auto-launch browser (default: `--open`)  |
+| `--force`              | `edit`: override another session's single-editor lock   |
+| `--json`              | Machine-readable output for the deterministic subcommands |
+
+### Security
+
+- The studio server binds `127.0.0.1` only; Host-header guarded against DNS rebinding.
+- Strict CSP (`script-src 'self'`); path traversal blocked on the static server.
+- Wireframe HTML is DOMPurify-sanitized at BOTH save and render time via one shared allowlist.
+- Writes use optimistic concurrency: `PATCH` requires `If-Match`; a stale ETag returns 409.
+- Feedback batch ids are charset-validated before any path join; batches + receipts are write-once.
+
+### Notes
+
+- If the studio bundle is missing at `dist/visual-plan-web/`, run `npm run build:web` in the `mewkit` package to produce it.
+- The deterministic contract commands (`validate`/`status`/`approve`/`rehash`/`prepare-feedback`/`apply-feedback`/`patch`) run with no browser and no network.
+
+## orient
+
+Print where the current task sits in the workflow, and what the next action is.
+
+```bash
+npx mewkit orient [--json] [--no-record]
+```
+
+Reads plans, reviews, tests, and git state rather than asking you. `--no-record` skips writing
+the result to the task record, which is what you want when you are only looking.

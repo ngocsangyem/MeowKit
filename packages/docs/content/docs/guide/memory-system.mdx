@@ -56,7 +56,7 @@ The **human user** types messages with a `##` prefix. Codex's `UserPromptSubmit`
 | `##pattern: DESCRIPTION` | `review-patterns.json` |
 | `##note: TEXT` | `quick-notes.md` |
 
-A non-prefixed prompt is a fast no-op (exit 0). See [`memory capture`](/cli/commands#memory-capture) for direct CLI usage.
+A non-prefixed prompt is a fast no-op (exit 0). See [`memory capture`](/cli/knowledge#memory-capture) for direct CLI usage.
 
 **The hook does NOT fire on agent or tool output.** It is bound to `UserPromptSubmit` semantics. Agents that need to capture use Path 2 below.
 
