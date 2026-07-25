@@ -37,7 +37,12 @@ function actualCount(kind) {
   const dirs = {
     // A skill is a directory holding a SKILL.md — `.venv` and loose files are not skills.
     skills: [skillsDir, (e) => e.isDirectory() && existsSync(join(skillsDir, e.name, "SKILL.md"))],
-    agents: [join(REPO_ROOT, ".claude", "agents"), (e) => e.isFile() && e.name.endsWith(".md")],
+    // The agents directory also holds generated indexes; counting those reported 43 against
+    // pages that correctly said 41, which would have pushed the rewrite pass the wrong way.
+    agents: [
+      join(REPO_ROOT, ".claude", "agents"),
+      (e) => e.isFile() && e.name.endsWith(".md") && !/^(AGENTS|SKILLS)_INDEX\.md$/.test(e.name),
+    ],
     "rule files": [join(REPO_ROOT, ".claude", "rules"), (e) => e.isFile() && e.name.endsWith(".md")],
   };
   const spec = dirs[kind];
