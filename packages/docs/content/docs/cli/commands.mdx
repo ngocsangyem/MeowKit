@@ -449,14 +449,16 @@ What each tool emits at runtime. ✓ migrated · — not migrated.
 
 The matrix reflects what `mewkit migrate` actually writes per provider. Each provider's contract (`providers/{id}/contract.ts`) declares which surfaces are first-party documented; surfaces not in that contract are nulled by the runtime disable loop, even if `config.ts` declares a path for them. See "Known limitations" below for documented-upstream surfaces that the runtime currently skips.
 
-| Tool                     |   Agents   | Commands | Skills | Config | Rules | Hooks |
-| ------------------------ | :--------: | :------: | :----: | :----: | :---: | :---: |
-| Cursor                   |     —      |    —     |   —    |   ✓    |   ✓   |   —   |
-| Codex                    |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   ✓   |
+| Tool                     |   Agents   | Commands | Skills | Config | Rules | Hooks  |
+| ------------------------ | :--------: | :------: | :----: | :----: | :---: | :----: |
+| Cursor                   |     —      |    —     |   —    |   ✓    |   ✓   |   —    |
+| Codex                    |   bundle   |  bundle  |   ✓    |   ✓    |   ✓   | bundle |
+
+✓ converted from your `.claude/` kit · bundle = shipped by the authored Codex bundle · — not supported by tool
 
 **Notes:**
 
-- Codex command migration is disabled until OpenAI documents a custom command directory. Codex's documented slash/app commands remain built in to Codex itself.
+- Codex does not convert your own agents, commands, or hooks. Toolkit versions of all three ship in the hand-authored Codex bundle; port your custom ones manually. The converter prints a one-line notice when it finds them.
 - Codex rules in OpenAI's docs are exec-policy `.rules` files. MeowKit behavioral rules migrate into `AGENTS.md`; they are not converted into sandbox exec-policy rules.
 - Hooks: only Codex migrates hooks. Cursor has no documented hooks surface.
 - Shell hooks (`.sh`/`.ps1`/`.bat`) are filtered at discovery — only node-runnable hooks (`.cjs`/`.mjs`/`.js`) migrate.
