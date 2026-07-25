@@ -149,11 +149,11 @@ Selected agents (architecture row): `architect + developer + planner`.
 - Party mode is discussion-only — if an agent suggests code changes during party, redirect to the normal pipeline after the decision
 - Decision write is NOT optional — see "Memory Write" below
 - "decide" keyword ends the discussion immediately — don't use it in the topic itself (e.g., avoid "decide between REST and GraphQL")
-- `allowed-tools` is intentionally broad: `Bash` for `mkdir -p .claude/memory`, `Grep`/`Glob` for topic-keyword grounding against the codebase, `Read` for `prompts/*.md` references, `AskUserQuestion` for the "decide" gate. Do not trim without measuring loss.
+- `allowed-tools` is intentionally broad: `Bash` for `mkdir -p .meowkit/memory`, `Grep`/`Glob` for topic-keyword grounding against the codebase, `Read` for `prompts/*.md` references, `AskUserQuestion` for the "decide" gate. Do not trim without measuring loss.
 
 ## Decision Record Template (canonical)
 
-This template is the single source of truth for both the in-discussion synthesis output and the persistent record written to `.claude/memory/decisions.md`. Do NOT introduce alternative shapes elsewhere in the skill.
+This template is the single source of truth for both the in-discussion synthesis output and the persistent record written to `.meowkit/memory/decisions.md`. Do NOT introduce alternative shapes elsewhere in the skill.
 
 ```markdown
 ## {ISO-date} — {decision-title}
@@ -174,7 +174,7 @@ This template is the single source of truth for both the in-discussion synthesis
 
 ## Memory Write (required, not optional)
 
-After synthesis concludes, append the populated Decision Record (using the template above) to `.claude/memory/decisions.md`. Run `mkdir -p .claude/memory` first to create the directory if it does not exist.
+After synthesis concludes, append the populated Decision Record (using the template above) to `.meowkit/memory/decisions.md`. Run `mkdir -p .meowkit/memory` first to create the directory if it does not exist.
 
 This step is NOT optional. Decisions lost to session end cannot be recovered.
 

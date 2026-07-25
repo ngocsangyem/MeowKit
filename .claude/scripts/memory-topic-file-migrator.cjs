@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-const MEMORY_DIR = path.join(ROOT, '.claude', 'memory');
+const MEMORY_DIR = require('../hooks/lib/meowkit-paths.cjs').memoryDir(ROOT);
 const DRY_RUN = process.argv.includes('--dry-run');
 
 // ---------------------------------------------------------------------------

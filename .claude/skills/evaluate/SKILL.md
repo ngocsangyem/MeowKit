@@ -74,13 +74,13 @@ Step 5: Generator Feedback → produce one-line fix guidance per FAIL/WARN; emit
 
 ## Memory Write
 
-After each completed evaluation, update the canonical `.claude/memory/review-patterns.json` store and regenerate Markdown views. Do not write the generated `review-patterns.md` view directly.
+After each completed evaluation, update the canonical `.meowkit/memory/review-patterns.json` store and regenerate Markdown views. Do not write the generated `review-patterns.md` view directly.
 
 ```
 | {date} | {artifact-id} | {verdict: PASS/WARN/FAIL} | {top-criterion} | {score} |
 ```
 
-Use `mkdir -p .claude/memory` before the append to avoid silent failure on missing directory. This persists evaluation patterns across sessions for `mk:elicit` and `mk:review` to reference.
+Use `mkdir -p .meowkit/memory` before the append to avoid silent failure on missing directory. This persists evaluation patterns across sessions for `mk:elicit` and `mk:review` to reference.
 
 ## Verdict Schema
 

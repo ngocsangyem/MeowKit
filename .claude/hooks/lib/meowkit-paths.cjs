@@ -8,7 +8,7 @@
 //   state/      session markers, flags, model metadata
 //   cache/      derived, rebuildable artifacts (wiki-index.db)
 //
-// Pre-migration fallback: a project whose memory still lives at `.claude/memory`
+// Pre-migration fallback: a project whose memory still lives at `.meowkit/memory`
 // keeps using it until `mewkit migrate` moves it. Writing to the new taxonomy
 // while old content sits in the legacy tree would split a user's history across
 // two directories, so the legacy path wins whenever it is the only one present.

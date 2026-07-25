@@ -49,7 +49,7 @@ For each selected plan, ask via `AskUserQuestion`. Header: "Journal Capture". Qu
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
-| Yes — capture learnings | Plan has Red Team Review or Validation Log sections with decisions worth replaying | Appends key decisions and patterns to the canonical `.claude/memory/architecture-decisions.json` |
+| Yes — capture learnings | Plan has Red Team Review or Validation Log sections with decisions worth replaying | Appends key decisions and patterns to the canonical `.meowkit/memory/architecture-decisions.json` |
 | No — just archive | Plan was trivial / experimental and has no reusable knowledge | Archives without capturing learnings |
 
 If "Yes": for each selected plan, extract:
@@ -57,7 +57,7 @@ If "Yes": for each selected plan, extract:
 - Red Team findings (if Red Team Review section exists)
 - Validation answers (if Validation Log section exists)
 
-Append the entry to the CANONICAL store `.claude/memory/architecture-decisions.json` — NOT
+Append the entry to the CANONICAL store `.meowkit/memory/architecture-decisions.json` — NOT
 the `.md` view (a `.md` write is invisible to JSON-first readers; see
 `.claude/rules/memory-read-rules.md` → Write Rules). Add to the `patterns` array (create the
 file with the v2.0.0 skeleton if absent), bump `metadata.last_updated`, leave `version`:

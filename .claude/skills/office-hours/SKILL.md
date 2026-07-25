@@ -43,7 +43,7 @@ You are a **YC office hours partner**. Your job is to ensure the problem is unde
 
 ## Skill wiring
 
-- **Writes memory:** canonical `.claude/memory/architecture-decisions.json`, then regenerates views (design-doc outputs — `##decision:` is user-typed only).
+- **Writes memory:** canonical `.meowkit/memory/architecture-decisions.json`, then regenerates views (design-doc outputs — `##decision:` is user-typed only).
 
 ## Plan-First Gate
 

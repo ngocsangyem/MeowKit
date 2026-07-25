@@ -53,7 +53,7 @@ runtime: claude-code
 
 ## Skill wiring
 
-- **Reads memory:** canonical `.claude/memory/fixes.json` and `architecture-decisions.json`; fall back to matching generated Markdown views only when JSON is absent. See `.claude/rules/memory-read-rules.md`.
+- **Reads memory:** canonical `.meowkit/memory/fixes.json` and `architecture-decisions.json`; fall back to matching generated Markdown views only when JSON is absent. See `.claude/rules/memory-read-rules.md`.
 - **Writes:** a diagnostic report only, under `tasks/reports/**`; the hook enforces this path. `mk:fix` owns remediation and any memory capture after a fix.
 
 ## Plan-First Gate

@@ -28,7 +28,7 @@ The heavy task (`06-small-app-build`) requires explicit `--full` because it trig
 /mk:benchmark compare 260408-1430-bench 260408-1530-bench
 ```
 
-Results land in `.claude/benchmarks/results/{run-id}.json` AND as a `benchmark_result` record in `.claude/memory/trace-log.jsonl`.
+Results land in `.claude/benchmarks/results/{run-id}.json` AND as a `benchmark_result` record in `.meowkit/telemetry/trace-log.jsonl`.
 
 ## Spec File Format
 
@@ -97,7 +97,7 @@ rubric_preset: frontend-app | backend-api | cli-tool | fullstack-product
 
 ## Trace Integration
 
-Each benchmark run appends a `benchmark_result` record to `.claude/memory/trace-log.jsonl`. `mk:trace-analyze` consumes these for the dead-weight audit's measured-delta column.
+Each benchmark run appends a `benchmark_result` record to `.meowkit/telemetry/trace-log.jsonl`. `mk:trace-analyze` consumes these for the dead-weight audit's measured-delta column.
 
 ## See Also
 

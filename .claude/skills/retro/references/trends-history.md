@@ -40,7 +40,7 @@ Count backward from today — how many consecutive days have at least one commit
 Before saving the new snapshot, check for prior retro history:
 
 ```bash
-ls -t .claude/memory/retros/*.json 2>/dev/null
+ls -t .meowkit/memory/retros/*.json 2>/dev/null
 ```
 
 **If prior retros exist:** Load the most recent one using the Read tool. Calculate deltas for key metrics and include a **Trends vs Last Retro** section:
@@ -62,7 +62,7 @@ Deep sessions:      3      ->    5           ^2
 After computing all metrics (including streak) and loading any prior history for comparison, save a JSON snapshot:
 
 ```bash
-mkdir -p .claude/memory/retros
+mkdir -p .meowkit/memory/retros
 ```
 
 Determine the next sequence number for today (substitute the actual date for `$(date +%Y-%m-%d)`):
@@ -70,9 +70,9 @@ Determine the next sequence number for today (substitute the actual date for `$(
 ```bash
 # Count existing retros for today to get next sequence number
 today=$(date +%Y-%m-%d)
-existing=$(ls .claude/memory/retros/${today}-*.json 2>/dev/null | wc -l | tr -d ' ')
+existing=$(ls .meowkit/memory/retros/${today}-*.json 2>/dev/null | wc -l | tr -d ' ')
 next=$((existing + 1))
-# Save as .claude/memory/retros/${today}-${next}.json
+# Save as .meowkit/memory/retros/${today}-${next}.json
 ```
 
 Use the Write tool to save the JSON file with this schema:
@@ -121,7 +121,7 @@ Use the Write tool to save the JSON file with this schema:
 }
 ```
 
-**Note:** Only include the `reviews` field if `.claude/memory/reviews.jsonl` exists and has entries within the time window. Only include the `backlog` field if `TODOS.md` exists. Only include the `test_health` field if test files were found (command 10 returns > 0). If any has no data, omit the field entirely.
+**Note:** Only include the `reviews` field if `.meowkit/memory/reviews.jsonl` exists and has entries within the time window. Only include the `backlog` field if `TODOS.md` exists. Only include the `test_health` field if test files were found (command 10 returns > 0). If any has no data, omit the field entirely.
 
 Include test health data in the JSON when test files exist:
 

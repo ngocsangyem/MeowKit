@@ -4,7 +4,7 @@
 #
 # Stream positioning:
 #   - .claude/hooks/.logs/hook-log.jsonl is INTERNAL hook-fire telemetry (gitignored)
-#   - .claude/memory/trace-log.jsonl (append-trace.sh) is SHARED memory (may be committed)
+#   - .meowkit/telemetry/trace-log.jsonl (append-trace.sh) is SHARED memory (may be committed)
 #
 # Rotation: adapted from append-trace.sh:97-107. 50MB threshold, mv-rename.
 # Differs by intent: hook-log is read frequently for telemetry — DO NOT gzip rotated files.

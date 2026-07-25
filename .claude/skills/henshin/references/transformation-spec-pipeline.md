@@ -119,7 +119,7 @@ WHY, never implementation code:
 ```
 
 Write the approved architectural decision to
-`.claude/memory/architecture-decisions.json`, regenerate its Markdown views, create
+`.meowkit/memory/architecture-decisions.json`, regenerate its Markdown views, create
 the directory first when absent, and scrub secrets before writing. `##decision:` is
 user-typed only; agent output does not trigger it. Include the dated henshin slug,
 decision, selected surfaces, rationale, dissent, and `live-captured` status in the

@@ -20,7 +20,7 @@ set -u
 if [ "${MEOWKIT_AUTOBUILD_MODE:-}" = "LEAN" ] || [ "${MEOWKIT_AUTOBUILD_MODE:-}" = "MINIMAL" ]; then
   # Log the bypass for audit (per security considerations) but don't block
   if [ -d ".claude" ]; then
-    log_file=".claude/memory/lean-bypass.log"
+    log_file=".meowkit/telemetry/lean-bypass.log"
     mkdir -p "$(dirname "$log_file")" 2>/dev/null || true
     echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) MEOWKIT_AUTOBUILD_MODE=LEAN bypassed contract gate" >> "$log_file" 2>/dev/null || true
   fi

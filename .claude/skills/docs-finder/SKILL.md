@@ -132,7 +132,7 @@ Scripts handle URL construction, source routing, fallback chains, and error hand
 4. **Analyze results** — pipe through `analyze-results.js` for budget check
 5. **Format output** — fill the output template (see `references/errors.md` for template)
 
-**Budget rule:** ≤3000 tokens inline. Overflow → write to `.claude/memory/docs-cache/`.
+**Budget rule:** ≤3000 tokens inline. Overflow → write to `.meowkit/memory/docs-cache/`.
 
 ## Setup
 
@@ -205,7 +205,7 @@ mk:docs-finder/
 
 ## Gotchas
 
-- **Cache growth**: `.claude/memory/docs-cache/` is NOT pruned automatically by `mk:memory --prune`. Run `rm -rf .claude/memory/docs-cache/` to clear manually, or add a periodic prune step if the directory exceeds 50MB.
+- **Cache growth**: `.meowkit/memory/docs-cache/` is NOT pruned automatically by `mk:memory --prune`. Run `rm -rf .meowkit/memory/docs-cache/` to clear manually, or add a periodic prune step if the directory exceeds 50MB.
 - **Python venv required**: if you get `python3: command not found` or import errors, run `.claude/scripts/bin/setup-workflow` once from the project root.
 - **Silent tier-by-tier fallback produces stale or off-target docs with no warning** — if Context7 returns a 404 and chub returns no results, the skill falls through to WebSearch without telling the user which tier succeeded; the agent may present a 2-year-old blog post as "documentation" without attribution; always check the `source` field in the JSON response from each script to know which tier actually won.
 - **Context7 library ID is not the same as the npm package name** — `fetch-context7.js "react-query"` may fail because the Context7 repo path is `tanstack/query`, not `react-query`; run `detect-source.js` first to resolve the canonical Context7 repo path from the library alias map, rather than guessing the package name directly.

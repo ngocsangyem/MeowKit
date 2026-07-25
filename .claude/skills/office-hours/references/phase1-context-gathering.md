@@ -11,7 +11,7 @@ eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
 3. Use Grep/Glob to map the codebase areas most relevant to the user's request.
 4. **List existing design docs for this project:**
    ```bash
-   ls -t .claude/memory/projects/*-design-*.md 2>/dev/null
+   ls -t .meowkit/memory/projects/*-design-*.md 2>/dev/null
    ```
    If design docs exist, list them: "Prior designs for this project: [titles + dates]"
 

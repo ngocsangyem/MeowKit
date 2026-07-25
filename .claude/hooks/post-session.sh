@@ -49,7 +49,7 @@ MAX_MARKERS=5
 
 # `.meowkit/` taxonomy: curated stores, append logs, and session markers each
 # have their own home. A pre-migration project resolves all three to the legacy
-# `.claude/memory` tree, preserving current behavior until `mewkit migrate` runs.
+# `.meowkit/memory` tree, preserving current behavior until `mewkit migrate` runs.
 # shellcheck source=lib/meowkit-paths.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/meowkit-paths.sh"
 MEMORY_DIR="$(meowkit_state_dir memory)"
@@ -280,7 +280,7 @@ if [ "$MEOWKIT_MEMORY_PRUNE" != "off" ] && [ -n "$TODAY" ] && [ "$TODAY" != "$LA
   VENV_PY="${CLAUDE_PROJECT_DIR:-.}/.claude/skills/.venv/bin/python3"
   PRUNE_SCRIPT="${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/memory-prune.py"
   MEM_DIR="$MEMORY_DIR"
-  PRUNE_LOG="session-state/prune-log.md"  # NOT inside .claude/memory/
+  PRUNE_LOG="session-state/prune-log.md"  # NOT inside .meowkit/memory/
   mkdir -p session-state 2>/dev/null
   if [ -x "$VENV_PY" ] && [ -f "$PRUNE_SCRIPT" ]; then
     PRUNE_RESULT=$("$VENV_PY" "$PRUNE_SCRIPT" "$MEM_DIR" "$PRUNE_AGE" "$PRUNE_LOG" 2>/dev/null)

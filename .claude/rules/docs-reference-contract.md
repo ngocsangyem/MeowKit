@@ -1,6 +1,6 @@
 # Docs Reference Contract
 
-How `docs/*` paths inside `.claude/agents`, `.claude/skills`, `.claude/commands`, `.claude/memory`, `.claude/hooks`, `.claude/scripts`, `.claude/rules`, `.claude/rules-conditional`, and `.claude/modes` are resolved at runtime, and which paths are allowed to appear.
+How `docs/*` paths inside `.claude/agents`, `.claude/skills`, `.claude/commands`, `.meowkit/memory`, `.claude/hooks`, `.claude/scripts`, `.claude/rules`, `.claude/rules-conditional`, and `.claude/modes` are resolved at runtime, and which paths are allowed to appear.
 
 ## Two-Tier Resolution
 

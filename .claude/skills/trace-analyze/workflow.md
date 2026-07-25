@@ -13,7 +13,7 @@
 
 ## Steps
 
-1. `step-01-ingest.md` — Read last N records from `.claude/memory/trace-log.jsonl` via venv python; filter by `schema_version`
+1. `step-01-ingest.md` — Read last N records from `.meowkit/telemetry/trace-log.jsonl` via venv python; filter by `schema_version`
 2. `step-02-partition.md` — Group records by `run_id`; split into ≤3 batches
 3. `step-03-scatter-analysis.md` — Spawn 3 researcher subagents in parallel; each gets one batch + the error-taxonomy reference
 4. `step-04-gather-synthesis.md` — Main agent reads all 3 batch reports; computes cross-batch frequency counts; identifies recurring patterns
@@ -40,7 +40,7 @@
 /mk:trace-analyze [--runs N] [--pattern <name>]
     ↓
 Step 1: Ingest
-    ├── Read .claude/memory/trace-log.jsonl
+    ├── Read .meowkit/telemetry/trace-log.jsonl
     ├── Parse via venv python (filter schema_version=1.0)
     ├── Take last N records (default 20 runs worth)
     └── Create plans/{date}-{slug}/ analysis dir

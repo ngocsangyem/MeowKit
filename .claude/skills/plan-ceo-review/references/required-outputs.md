@@ -149,6 +149,6 @@ Verdict logic:
 **Pre-screen:** {PASS / N gaps noted}
 ```
 
-All modes (including HOLD and REDUCTION) write this block. EXPANSION/SELECTIVE additionally write the CEO plan doc to `.claude/memory/projects/ceo-plans/`.
+All modes (including HOLD and REDUCTION) write this block. EXPANSION/SELECTIVE additionally write the CEO plan doc to `.meowkit/memory/projects/ceo-plans/`.
 
 Accepted TODOs from the review are auto-written to TODOS.md with source tag `ceo-review`.

@@ -17,7 +17,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-COST_LOG = Path(".claude/memory/cost-log.json")
+COST_LOG = Path(".meowkit/telemetry/cost-log.json")
 
 
 def load_cost_log() -> list[dict]:

@@ -67,10 +67,10 @@ Write to the appropriate topic file based on category:
 
 | Category | Canonical JSON file |
 |----------|---------------------|
-| Bug fix / failure / shell/code pattern | `.claude/memory/fixes.json` |
-| Review pattern / architecture insight | `.claude/memory/review-patterns.json` |
-| Architectural decision | `.claude/memory/architecture-decisions.json` |
-| Security finding | `.claude/memory/security-findings.json` |
+| Bug fix / failure / shell/code pattern | `.meowkit/memory/fixes.json` |
+| Review pattern / architecture insight | `.meowkit/memory/review-patterns.json` |
+| Architectural decision | `.meowkit/memory/architecture-decisions.json` |
+| Security finding | `.meowkit/memory/security-findings.json` |
 
 **Do NOT write to `lessons.md` or generated Markdown views.** JSON stores are the active write targets; run `mewkit memory render-views` after capture.
 

@@ -73,7 +73,7 @@ A file is read **only** if it survives the forbid-list AND matches the allow-lis
 Forbid-list is checked first.
 
 ```
-.claude/memory/*
+.meowkit/memory/*
 .env
 .env.*
 tasks/
@@ -209,7 +209,7 @@ codebase mapper (that is `mk:scout`'s own job).
 When the output is saved, the saver runs a final scan:
 
 1. Search the saved file for any path matching the forbid-list.
-2. Search the saved file for `.claude/memory/`, `.env`, secrets, credentials.
+2. Search the saved file for `.meowkit/memory/`, `.env`, secrets, credentials.
 3. If any match → write `SCOUT_BOUNDARY_VIOLATION` and refuse to save. Emit:
    "Refusing to save — scout output contains forbid-list reference."
 
@@ -219,6 +219,6 @@ and file an incident.
 
 The audit is also part of the canary suite (canary #9, deep-mode boundary test):
 
-- Saved output grep: zero matches for `.env`, `.claude/memory/*`.
+- Saved output grep: zero matches for `.env`, `.meowkit/memory/*`.
 - Transcript audit: zero `Read` tool calls against forbidden paths.
 - Both must pass for the boundary canary to PASS.

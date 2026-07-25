@@ -18,7 +18,7 @@
 #   - Atomic write: .tmp + os.replace prevents partial writes on crash.
 #   - <prune_log_path> MUST be outside <memory_dir>. The log records ONLY
 #     "{file} | {date} | {N} entries pruned" — NO entry content, NO header text.
-#     Keeping the log outside .claude/memory/ breaks the injection-rules.md
+#     Keeping the log outside .meowkit/memory/ breaks the injection-rules.md
 #     Rule 11 carrier chain (memory loaders never scan session-state/).
 #   - Exits 0 on success, 1 on any per-file error so the caller can gate
 #     its rate-limit advance on success.

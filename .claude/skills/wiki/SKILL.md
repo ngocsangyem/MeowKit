@@ -25,7 +25,7 @@ dependency_edges:
 
 # mk:wiki
 
-Long-term, gated, queryable project knowledge. Canonical pages live under `tasks/wikis/<slug>/`; a derived rebuildable FTS index lives in `.claude/memory/wiki-index.db`.
+Long-term, gated, queryable project knowledge. Canonical pages live under `tasks/wikis/<slug>/`; a derived rebuildable FTS index lives in `.meowkit/cache/wiki-index.db`.
 
 ## Core rule
 

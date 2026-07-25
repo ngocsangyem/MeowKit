@@ -157,6 +157,6 @@ or I'll proceed with these.`
 ## Related Skills
 
 - `mk:context-audit` — use instead for structural `.claude/` overhead (tokens/% statically loaded).
-- `mk:memory` — use instead to actually read/write canonical `.claude/memory/` JSON stores; this skill only decides a write is warranted.
+- `mk:memory` — use instead to actually read/write canonical `.meowkit/memory/` JSON stores; this skill only decides a write is warranted.
 - `mk:scout` — use instead to discover *where* code lives; this skill decides *how much* to read.
 - `mk:agent-detector` — use the canonical agent inventory for routing and on-demand instruction loading.

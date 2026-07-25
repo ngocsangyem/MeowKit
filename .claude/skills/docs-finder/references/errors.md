@@ -84,6 +84,6 @@
 ## Context Budget Overflow
 
 When retrieved docs exceed 3000 tokens (inline budget):
-1. Write full docs to `.claude/memory/docs-cache/{library}-{topic}.md`
+1. Write full docs to `.meowkit/memory/docs-cache/{library}-{topic}.md`
 2. Return 500-token summary inline
 3. Include file path for the agent to read sections as needed

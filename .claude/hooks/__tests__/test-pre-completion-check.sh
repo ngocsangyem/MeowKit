@@ -23,10 +23,10 @@ bad() { echo "  ✗ $1"; FAIL=$((FAIL + 1)); }
 
 reset_env() {
   rm -rf session-state 2>/dev/null || true
-  mkdir -p session-state tasks/plans tasks/reviews tasks/contracts .claude/memory
+  mkdir -p session-state tasks/plans tasks/reviews tasks/contracts .meowkit/memory
   find tasks/reviews -mindepth 1 ! -name '.gitkeep' -exec rm -rf {} + 2>/dev/null || true
   find tasks/contracts -mindepth 1 ! -name '.gitkeep' -exec rm -rf {} + 2>/dev/null || true
-  find .claude/memory -mindepth 1 ! -name '.gitkeep' -exec rm -rf {} + 2>/dev/null || true
+  find .meowkit/memory -mindepth 1 ! -name '.gitkeep' -exec rm -rf {} + 2>/dev/null || true
 }
 
 run_hook() {

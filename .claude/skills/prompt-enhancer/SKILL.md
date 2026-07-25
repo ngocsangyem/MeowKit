@@ -128,7 +128,7 @@ Default mode (always):
 `--deep` mode (additional):
 
 9. **Allow-list only.** Read only `docs/project-context.md`, `CLAUDE.md`, repo file-tree
-   paths, public docstrings. Default-deny everything else (especially `.claude/memory/*`,
+   paths, public docstrings. Default-deny everything else (especially `.meowkit/memory/*`,
    `.env*`, `tasks/`, secrets).
 10. **Suggest, never substitute.** Scout outputs go in `[FILL-IN: <desc> (suggested: <path>)]`
     brackets. The user is the source of truth.
@@ -199,7 +199,7 @@ Detection precedence: explicit user signal > destructive verbs > default to MEDI
 - "Compare A and B" must not become "evaluate A". Verbatim core ask.
 - Auto-suggested Freedom level can be wrong on first read. Show the level + reason in OUTPUT FORMAT so the user can flip it without re-running.
 - Verbosity is task-type dependent: terse for implementation, structured for review/analysis, confirmation for Q&A. Default = terse.
-- `--deep` does NOT read `.claude/memory/*`, `.env*`, `tasks/`, secrets.
+- `--deep` does NOT read `.meowkit/memory/*`, `.env*`, `tasks/`, secrets.
 - `--deep` suggestions live in `[FILL-IN]` brackets. Never auto-substitute.
 - `--deep` aborts with `SCOUT_BUDGET_EXCEEDED` if caps hit; falls back to default.
 - `MEOWKIT_AUTOBUILD_MODE=MINIMAL` downgrades `--deep` to default with a one-line note.

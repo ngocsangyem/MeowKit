@@ -83,7 +83,7 @@ Five boundary types govern what context crosses between layers. Each row defines
 | Session → Subagent | Prompt-only | Task desc + file paths + acceptance criteria + plan ref | Session history, prior conversation, CLAUDE.md contents |
 | Orchestrator → Worker | Slim brief | Specific subtask + relevant files + output format | Full plan, other workers' outputs, orchestrator's reasoning chain |
 | Plan → Phase | Phase file | Path to `phase-XX-*.md` | Full `plan.md` + all other phase files |
-| Memory → Subagent | Named files | Specific topic file paths needed for task | Entire `.claude/memory/` directory |
+| Memory → Subagent | Named files | Specific topic file paths needed for task | Entire `.meowkit/memory/` directory |
 | Workflow → Step | Step file | Current step content only (JIT) | Prior step files, `workflow.md`, `SKILL.md` preamble |
 
 Boundary violations show up as: subagent does the wrong thing despite a "clear" prompt, then re-reads your conversation to "understand what you really meant." Re-reading is the symptom — the prompt was too thin OR too thick at the boundary.
@@ -114,7 +114,7 @@ Patterns deliberately NOT implemented in the toolkit, with the reason each was r
 | `PreToolUse:Task` hook validating subagent prompts | Violates outer-harness principle. Could break legitimate Task calls. Make-correct-path-easy beats block-incorrect-path. |
 | Per-task memory namespaces | Over-engineering. The 5 boundary types above (Isolation Boundaries) already cover the leakage paths; namespacing memory adds complexity without measured benefit. |
 | AI OS / agent runtime abstraction layer | The toolkit is the outer harness, not a runtime replacement. An abstraction layer would silently break inner-harness diversity — the harness contract is whatever the host runtime exposes, not a wrapper. |
-| Vector embedding / external memory store | YAGNI. `.claude/memory/` topic files already cover the toolkit's recall needs. |
+| Vector embedding / external memory store | YAGNI. `.meowkit/memory/` topic files already cover the toolkit's recall needs. |
 
 Documented here so future contributors recognize these as decided trade-offs, not gaps awaiting implementation.
 

@@ -57,7 +57,7 @@ node scripts/fetch-chub.js "<library name>"
 
 After all docs are gathered:
 - Total ≤ 3000 tokens → inline in output template
-- Total > 3000 tokens → write to `.claude/memory/docs-cache/` and return summary
+- Total > 3000 tokens → write to `.meowkit/memory/docs-cache/` and return summary
 
 ## Fallback
 

@@ -1,13 +1,13 @@
 # Step 1: Ingest Trace Records
 
-Read the last N records from `.claude/memory/trace-log.jsonl` via venv python. Filter by schema_version. Create the analysis directory.
+Read the last N records from `.meowkit/telemetry/trace-log.jsonl` via venv python. Filter by schema_version. Create the analysis directory.
 
 ## Instructions
 
 ### 1a. Verify trace log exists
 
 ```bash
-TRACE_LOG=".claude/memory/trace-log.jsonl"
+TRACE_LOG=".meowkit/telemetry/trace-log.jsonl"
 if [ ! -f "$TRACE_LOG" ]; then
   echo "BLOCKED: trace log not found at $TRACE_LOG. Run some harness sessions first to populate it." >&2
   exit 1

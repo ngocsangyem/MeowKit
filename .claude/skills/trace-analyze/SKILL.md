@@ -32,7 +32,7 @@ adapted_for: claude-code
 
 # mk:trace-analyze — Scatter-Gather Trace Analysis
 
-Step-file workflow that ingests `.claude/memory/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel `researcher` subagents, gathers cross-batch patterns, and gates suggestions through human review before any harness change is applied.
+Step-file workflow that ingests `.meowkit/telemetry/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel `researcher` subagents, gathers cross-batch patterns, and gates suggestions through human review before any harness change is applied.
 
 ## Deterministic CLI companion
 
@@ -50,7 +50,7 @@ Use the CLI for fast deterministic recall; use this skill's scatter-gather when 
 
 Activate when:
 - User runs `/mk:trace-analyze [--runs N]` (default N=20)
-- `dead-weight-audit-needed` flag in `.claude/memory/fixes.json` (set by `post-session.sh` on model version change)
+- `dead-weight-audit-needed` flag in `.meowkit/memory/fixes.json` (set by `post-session.sh` on model version change)
 - After 3+ consecutive harness failures on the same task
 - Quarterly schedule for the dead-weight audit
 

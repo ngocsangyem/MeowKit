@@ -56,7 +56,7 @@ For each comment, classify and handle:
 **VALID & ACTIONABLE:** Use AskUserQuestion:
 - Show the comment with file:line reference
 - Options: A) Fix now, B) Acknowledge and ship anyway, C) Dismiss as false positive
-- If fixed: commit with `git commit -m "fix: address review comment — <brief>"`, log to `.claude/memory/reviews.jsonl`
+- If fixed: commit with `git commit -m "fix: address review comment — <brief>"`, log to `.meowkit/memory/reviews.jsonl`
 
 **ALREADY ADDRESSED:** Note what was done and the commit SHA. No user action needed.
 

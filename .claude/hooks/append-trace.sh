@@ -1,5 +1,5 @@
 #!/bin/bash
-# append-trace.sh — Append a single JSONL trace record to .claude/memory/trace-log.jsonl.
+# append-trace.sh — Append a single JSONL trace record to .meowkit/telemetry/trace-log.jsonl.
 # Phase 8: shared trace writer for hooks + harness steps.
 #
 # Usage:

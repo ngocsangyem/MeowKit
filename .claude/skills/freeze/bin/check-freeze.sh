@@ -8,7 +8,7 @@ set -euo pipefail
 INPUT=$(cat)
 
 # Locate the freeze directory state file — respect CLAUDE_PLUGIN_DATA if set
-FREEZE_FILE="${CLAUDE_PLUGIN_DATA:-.claude/memory}/freeze-dir.txt"
+FREEZE_FILE="${CLAUDE_PLUGIN_DATA:-.meowkit/memory}/freeze-dir.txt"
 
 # If no freeze file exists, allow everything (not yet configured)
 if [ ! -f "$FREEZE_FILE" ]; then

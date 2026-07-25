@@ -34,7 +34,7 @@ All modes share these phases with mode-specific variations.
    - Auth/payments/security → always COMPLEX
    - Feature <5 files → STANDARD
    - Rename/typo/format → TRIVIAL
-3. **Read memory** (if exists): `.claude/memory/fixes.json` only for bug-class warnings; `.claude/memory/architecture-decisions.json` first for prior architectural decisions — note relevant prior learnings (see `.claude/rules/memory-read-rules.md`)
+3. **Read memory** (if exists): `.meowkit/memory/fixes.json` only for bug-class warnings; `.meowkit/memory/architecture-decisions.json` first for prior architectural decisions — note relevant prior learnings (see `.claude/rules/memory-read-rules.md`)
 4. If mode=code: load plan path, parse phases
 5. **Autonomy Boundaries (advisory):** if the loaded plan.md has an `## Autonomy Boundaries` block (long-horizon plans only), read it once for the whole run and comply **mode-aware**:
    - Interactive / `code` mode: an "Ask first" item → raise an immediate `AskUserQuestion` when that decision arises; "Always" items proceed without asking.
@@ -336,7 +336,7 @@ Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using t
 3. **Memory capture (MUST spawn):**
 
    ```
-   Task(subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .claude/memory/fixes.json (canonical); write architectural decisions to .claude/memory/architecture-decisions.json (canonical); write review patterns to .claude/memory/review-patterns.json (canonical). After all writes, regenerate the matching .md views via 'mewkit memory render-views' — do NOT hand-write the .md files (see .claude/rules/memory-read-rules.md).", description="Session memory capture")
+   Task(subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .meowkit/memory/fixes.json (canonical); write architectural decisions to .meowkit/memory/architecture-decisions.json (canonical); write review patterns to .meowkit/memory/review-patterns.json (canonical). After all writes, regenerate the matching .md views via 'mewkit memory render-views' — do NOT hand-write the .md files (see .claude/rules/memory-read-rules.md).", description="Session memory capture")
    ```
 
 4. `TaskUpdate` → mark all session tasks complete after sync-back

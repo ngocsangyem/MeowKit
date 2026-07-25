@@ -1,6 +1,6 @@
 # Trace Log Schema
 
-Reference for `.claude/memory/trace-log.jsonl` records. Append-only JSONL written by `append-trace.sh`.
+Reference for `.meowkit/telemetry/trace-log.jsonl` records. Append-only JSONL written by `append-trace.sh`.
 
 ## Top-Level Fields
 
@@ -70,7 +70,7 @@ When `trace-log.jsonl` exceeds 50MB, `append-trace.sh` rotates it:
 2. gzip in place → `trace-log.{YYMMDD-HHMMSS}.jsonl.gz`
 3. Truncate the original
 
-Rotated logs remain in `.claude/memory/` for historical analysis. They are NOT deleted automatically.
+Rotated logs remain in `.meowkit/memory/` for historical analysis. They are NOT deleted automatically.
 
 ## Reading Records
 
@@ -78,7 +78,7 @@ Always parse via `.claude/skills/.venv/bin/python3` (per kit rules — no `jq` d
 
 ```python
 import json
-with open('.claude/memory/trace-log.jsonl') as f:
+with open('.meowkit/telemetry/trace-log.jsonl') as f:
     for line in f:
         if not line.strip():
             continue

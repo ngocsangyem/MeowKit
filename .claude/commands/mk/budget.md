@@ -10,13 +10,13 @@
 
 ## Behavior
 
-Tracks and reports AI model usage costs. Reads from `.claude/memory/cost-log.json`.
+Tracks and reports AI model usage costs. Reads from `.meowkit/telemetry/cost-log.json`.
 
 ### Execution Steps
 
 #### Default (no flags)
 
-1. Read `.claude/memory/cost-log.json`.
+1. Read `.meowkit/telemetry/cost-log.json`.
 2. Show the last 10 tasks with: task name, complexity tier, model used, estimated token count, estimated cost.
 3. Print as a table:
    ```
@@ -33,7 +33,7 @@ Tracks and reports AI model usage costs. Reads from `.claude/memory/cost-log.jso
 
 #### --monthly
 
-1. Read `.claude/memory/cost-log.json`.
+1. Read `.meowkit/telemetry/cost-log.json`.
 2. Aggregate entries by month.
 3. Print monthly totals:
    ```
@@ -49,12 +49,12 @@ Tracks and reports AI model usage costs. Reads from `.claude/memory/cost-log.jso
 #### --reset
 
 1. Confirm with human: "This will clear all cost tracking history. Type 'yes' to confirm."
-2. If confirmed: clear `.claude/memory/cost-log.json` (reset to empty array).
+2. If confirmed: clear `.meowkit/telemetry/cost-log.json` (reset to empty array).
 3. If not confirmed: abort.
 
 ### Output
 
-Formatted table of cost data from `.claude/memory/cost-log.json`. No files are modified (except `--reset`).
+Formatted table of cost data from `.meowkit/telemetry/cost-log.json`. No files are modified (except `--reset`).
 
 ### Related
 
