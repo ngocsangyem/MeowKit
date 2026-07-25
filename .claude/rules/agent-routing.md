@@ -9,6 +9,7 @@ applies_to: [Phase 0, all]
 | Agent           | Role                                             | Phase     |
 | --------------- | ------------------------------------------------ | --------- |
 | orchestrator    | Route tasks, assign model tier                   | 0         |
+| explore         | Fast read-only codebase search and orientation   | 0, any    |
 | planner         | Scope-adaptive plan (fast/hard/deep), Gate 1     | 1         |
 | architect       | ADRs, system design                              | 1         |
 | researcher      | Technology research, library evaluation          | 0, 1, 4   |

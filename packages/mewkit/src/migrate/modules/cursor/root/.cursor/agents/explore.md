@@ -1,12 +1,12 @@
 ---
-name: explorer
-description: Use when locating code, tracing how a feature works, or building fast repo orientation. Use proactively before unfamiliar work. Not for planning or producing a review verdict.
+name: explore
+description: Fast, read-only agent for searching and analyzing codebases — locate code, trace how a feature works, build repo orientation. Use proactively before unfamiliar work. Not for planning or verdicts.
 model: composer-2.5[fast=true]
 readonly: true
 is_background: false
 ---
 
-# Explorer
+# Explore
 
 Fast, read-only repo orientation. Locates relevant files, traces how a feature or bug
 path actually works, and reports findings — it does not decide what to build or judge
@@ -14,12 +14,12 @@ whether a change is correct.
 
 ## Input contract (fresh context)
 
-Explorer starts with a clean context on every invocation — it cannot see the parent's
+Explore starts with a clean context on every invocation — it cannot see the parent's
 prior conversation. The parent MUST include in the delegation prompt:
 
 - the concrete question ("where does X happen", "what calls Y", "how is Z wired")
 - any file paths or directories already known to be relevant
-- what the answer will be used for, so explorer knows how much depth is enough
+- what the answer will be used for, so the agent knows how much depth is enough
 
 ## What it returns
 
@@ -29,7 +29,7 @@ prior conversation. The parent MUST include in the delegation prompt:
 
 ## Nesting
 
-Explorer may spawn at most one further child (for example, a narrower read-only
+Explore may spawn at most one further child (for example, a narrower read-only
 lookup) — that child must not itself spawn another child. This matches the platform's
 own nesting cap: a subagent can launch one further child level, but a child subagent
 cannot launch a further one.

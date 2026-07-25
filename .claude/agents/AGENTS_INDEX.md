@@ -3,13 +3,14 @@
 ## Active Agents
 
 <!-- GENERATED:agent-views START -->
-**Agent registry views (generated):** 17 core/support direct-only; 21 domain hub-only; 1 intelligence direct-only; 1 internal harness.
+**Agent registry views (generated):** 18 core/support direct-only; 21 domain hub-only; 1 intelligence direct-only; 1 internal harness.
 <!-- GENERATED:agent-views END -->
 
 <!-- GENERATED:agent-table-cardinality (`mewkit inventory --emit-counts`; validated by `mewkit validate --agents`) -->
 ```toon
-[40]{agent_file,type,role,source,workflow_phases,auto_activate,ce_version,last_improved}
+[41]{agent_file,type,role,source,workflow_phases,auto_activate,ce_version,last_improved}
 `orchestrator.md`|Core|Task router, complexity classification, model tier assignment|original|Phase 0 (Orient)|Yes — every task|260326|260326
+`explore.md`|Support|Fast read-only codebase search and orientation: locates code, traces call/data paths, reports `path:line` evidence|original|Phase 0 (Orient), any|Routed by orchestrator or explicit|260725|260725
 `planner.md`|Core|Two-lens planning (product + engineering) + product-level mode for green-field builds, Gate 1 enforcement|original|Phase 1 (Plan)|Routed by orchestrator|260326|260408
 `brainstormer.md`|Support|Solution brainstorming, architecture evaluation, trade-off analysis|Credit: Duy Nguyen|Phase 1 (Plan)|Routed by orchestrator or explicit|260326|260326
 `advisor.md`|Support|Reframe-then-recommend advisory executor: interviews one question per turn, confirms the real problem, emits ONE verdict packet|original|on-demand|Invoked ONLY by mk:advise — never orchestrator-routed|260715|260715

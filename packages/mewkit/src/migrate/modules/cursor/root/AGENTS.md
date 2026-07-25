@@ -22,7 +22,7 @@ the surface that owns it:
 
 | Intent | Surface | How it activates |
 | --- | --- | --- |
-| Locate code, trace how something works, fast repo orientation | `explorer` agent | Auto-routed from its description, or `/explorer` |
+| Locate code, trace how something works, fast repo orientation | `explore` agent | Auto-routed from its description, or `/explore` |
 | Scope an approach before writing code; architecture/implementation planning | `planner` agent | Auto-routed from its description, or `/planner` |
 | Review a finished change before it ships | `reviewer` agent | Auto-routed ("use proactively after implementation"), or `/reviewer` |
 | Reusable multi-step procedure (a "how-to" with scripts/references) | a skill under `.cursor/skills/mk-*` | Auto-surfaced by description/path match, or `/mk-<name>` |
@@ -37,7 +37,7 @@ wired.
 
 ## Discovery
 
-- Explicit agent invocation: `/agent-name` (e.g. `/explorer`, `/planner`, `/reviewer`),
+- Explicit agent invocation: `/agent-name` (e.g. `/explore`, `/planner`, `/reviewer`),
   or mention it by name in a request.
 - Explicit skill invocation: `/mk-<skill-name>` once skills are installed.
 - Explicit rule invocation: `@rule-name` in chat for a rule that is not always-on or

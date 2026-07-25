@@ -83,11 +83,11 @@ describe("cursor full-surface characterization: agent catalog inventory", () => 
 		expect([...unionOfPacks].map((n) => `${n}.md`).sort()).toEqual(onDisk.sort());
 	});
 
-	it("the core agent pack is exactly {explorer, planner, reviewer} — every core agent ships on disk", () => {
+	it("the core agent pack is exactly {explore, planner, reviewer} — every core agent ships on disk", () => {
 		const catalog = JSON.parse(
 			readFileSync(join(moduleDir, "catalog", "agent-packs.json"), "utf-8"),
 		) as AgentPackCatalog;
-		expect(catalog.packs.core.agents.slice().sort()).toEqual(["explorer", "planner", "reviewer"]);
+		expect(catalog.packs.core.agents.slice().sort()).toEqual(["explore", "planner", "reviewer"]);
 		for (const name of catalog.packs.core.agents) {
 			expect(existsSync(join(rootDir, ".cursor", "agents", `${name}.md`))).toBe(true);
 		}

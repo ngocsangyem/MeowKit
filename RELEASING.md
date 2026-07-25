@@ -633,7 +633,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
-| v2.14.7 | 2026-07-25 | Per-Agent Claude Model Routing                   |
+| v2.14.7 | 2026-07-25 | Per-Agent Model Routing & Explore Agent          |
 | v2.14.4 | 2026-07-19 | The Orientation & Transition Spine               |
 | v2.14.3 | 2026-07-19 | Jira & Confluence Agents on Haiku                |
 | v2.14.2 | 2026-07-18 | Composed Capability Recall                       |

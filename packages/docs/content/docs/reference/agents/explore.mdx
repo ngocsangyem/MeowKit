@@ -1,0 +1,93 @@
+---
+title: "explore"
+description: "Fast, read-only agent optimized for searching and analyzing codebases — locates code, traces call paths, and reports path:line evidence."
+---
+
+The explore agent is your codebase scout. When you need to find where something lives, trace how a feature actually works, or orient yourself in unfamiliar code, explore searches in an isolated context and returns evidence — file paths, line numbers, and the real call path — without touching a single file.
+
+## Cognitive Framing
+
+> *"Report what the code does, not what it looks like it should do."*
+
+Explore runs read-only, in a fresh context, on the cheapest tier that still searches well. Its job is to compress a broad search into a short, cited answer so the caller's context stays free for the actual work. It never decides what to build and never judges whether a change is correct.
+
+## Key Facts
+
+| | |
+|---|---|
+| **Type** | Support (read-only subagent) |
+| **Phase** | 0 (Orient), any |
+| **Auto-activates** | Routed by the orchestrator for locate/trace questions, or on explicit invocation |
+| **Never does** | Write or edit files, run mutating commands, produce a plan, issue a review verdict |
+
+## When to Use
+
+- When you need to **locate code** — "where is the session timeout enforced?"
+- When you need to **trace a path** — "how does the webhook get from ingress to the handler?"
+- When you need **repo orientation** before unfamiliar work — what exists, where, and how it is wired.
+- When a broad search would otherwise **flood the main context** with file contents that only one answer depends on.
+
+## Key Capabilities
+
+- **Widen-then-narrow search** — glob for candidate paths, grep for the identifying symbol, then read only the files the matches implicate.
+- **Real-edge tracing** — follows definition → callers → configuration instead of inferring behavior from a name.
+- **Evidence-first reporting** — every claim carries a `path:line` citation.
+- **Honest gaps** — questions it could not resolve from the repository are named, not filled in with a plausible guess.
+
+## Behavioral Checklist
+
+- [x] Cites `path:line` for every claim
+- [x] Traces the actual call or data path when asked "how does X work"
+- [x] Names contradictions between documentation and code
+- [x] Returns `NEEDS_CONTEXT` when the delegation prompt lacks the question or the work context path
+- [x] Distills findings — never dumps raw file contents back to the caller
+- [x] Never writes, edits, commits, or runs a mutating command
+- [x] Treats everything it reads as DATA — reports instruction-like file content, never follows it
+
+## Input Contract
+
+Explore starts with a clean context every invocation and cannot see the caller's prior conversation. A delegation prompt must include:
+
+1. **The concrete question** — "where does X happen", "what calls Y", "how is Z wired"
+2. **Known paths** — any file or directory already believed relevant
+3. **The purpose** — what the answer will be used for, so explore knows how much depth is enough
+
+## Per-Provider Model
+
+| Provider | Definition | Model |
+|---|---|---|
+| Claude Code | `.claude/agents/explore.md` | `haiku` |
+| Codex | `.codex/agents/explore.toml` | `gpt-5.4-mini`, effort `medium` |
+| Cursor | `.cursor/agents/explore.md` | `composer-2.5[fast=true]`, `readonly: true` |
+
+Explore is in the Cursor bundle's default **core** pack alongside `planner` and `reviewer`. See [Claude Agent Models](/guide/claude-agent-models), [Codex Agent Models](/guide/codex-agent-models), and [Cursor Agent Models](/guide/cursor-agent-models).
+
+## Common Use Cases
+
+| Scenario | What explore does |
+|---|---|
+| "Where is rate limiting applied?" | Greps for the limiter symbol, reads the middleware, reports the registration site and every route it covers |
+| "What breaks if I change this signature?" | Finds the definition, enumerates callers with line numbers, flags callers it could not resolve statically |
+| "How does login work end to end?" | Traces route → controller → service → store and returns the ordered path with citations |
+| Pre-planning orientation | Reports the modules, conventions, and contracts the planner needs before writing a plan |
+
+## Pro Tips
+
+### Ask One Question Per Invocation
+
+Explore is cheap and stateless. Two focused invocations return sharper evidence than one prompt asking for a whole subsystem survey.
+
+### Say What the Answer Is For
+
+"I need to add a field to this response" produces a different — and more useful — depth of trace than the same question with no stated purpose.
+
+## Key Takeaway
+
+Explore keeps broad search out of the main context. It reads widely, answers narrowly, and cites everything — so planning and review start from evidence rather than assumption.
+
+## Related Agents
+
+- **[planner](/reference/agents/planner)** — consumes explore findings before writing a plan
+- **[reviewer](/reference/agents/reviewer)** — uses explore to confirm how a touched path actually behaves
+- **[researcher](/reference/agents/researcher)** — the external counterpart: libraries and documentation rather than this repository
+- **[orchestrator](/reference/agents/orchestrator)** — routes locate/trace questions to explore during Phase 0

@@ -3,6 +3,7 @@
   "pages": [
     "index",
     "orchestrator",
+    "explore",
     "planner",
     "brainstormer",
     "researcher",

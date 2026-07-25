@@ -36,7 +36,7 @@ surfaces the gap rather than guessing silently.
 
 ## Nesting
 
-Planner may delegate to at most one child (for example, an `explorer` pass to confirm
+Planner may delegate to at most one child (for example, an `explore` pass to confirm
 an assumption about the existing code) — that child must not itself spawn a further
 child. Planner never spawns another planner.
 

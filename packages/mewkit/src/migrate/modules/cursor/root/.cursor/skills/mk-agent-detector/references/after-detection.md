@@ -20,7 +20,7 @@ This bundle ships exactly **3 agents** at `.cursor/agents/` — there is no larg
 
 | Agent | Role |
 |---|---|
-| `explorer` | Fast, read-only repo orientation |
+| `explore` | Fast, read-only repo orientation |
 | `planner` | Architecture / implementation planning before non-trivial changes |
 | `reviewer` | Evidence-ranked review after implementation |
 

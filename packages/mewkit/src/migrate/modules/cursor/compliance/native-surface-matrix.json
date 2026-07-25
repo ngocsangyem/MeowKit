@@ -12,7 +12,7 @@
 		{
 			"surface": "agents",
 			"maturity": "stable",
-			"meowkitPolicy": "primary — core install ships explorer, planner, reviewer only; readonly: true; description written as a routing trigger. Model: agents pin concrete Cursor models by tier (user decision 2026-07-25, reversing the earlier inherit-default) — fable-5 advisory / opus-5[effort=high] deep / sonnet-5 standard / composer-2.5[fast=true] mechanical + jira/confluence integration.",
+			"meowkitPolicy": "primary — core install ships explore, planner, reviewer only; readonly: true; description written as a routing trigger. Model: agents pin concrete Cursor models by tier (user decision 2026-07-25, reversing the earlier inherit-default) — fable-5 advisory / opus-5[effort=high] deep / sonnet-5 standard / composer-2.5[fast=true] mechanical + jira/confluence integration.",
 			"claims": [
 				{
 					"claim": "Frontmatter is exactly 5 fields: name, description, model (default inherit), readonly (default false), is_background (default false); no additional fields documented.",

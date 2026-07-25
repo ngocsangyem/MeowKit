@@ -95,8 +95,8 @@ const isCoreAgent = (file: string): boolean =>
 const denylistScope = [join(rootDir, "AGENTS.md"), ...walkFiles(agentsDir), ...walkFiles(rulesDir), ...walkFiles(skillsDir)];
 
 describe("cursor bundle: authored content exists (Phase 3 part A)", () => {
-	it("ships the core agent pack (explorer, planner, reviewer); extended agents may coexist", () => {
-		expect(coreAgentNames.slice().sort()).toEqual(["explorer", "planner", "reviewer"]);
+	it("ships the core agent pack (explore, planner, reviewer); extended agents may coexist", () => {
+		expect(coreAgentNames.slice().sort()).toEqual(["explore", "planner", "reviewer"]);
 		for (const name of coreAgentNames) {
 			expect(
 				agentFiles.some((f) => f.slice(agentsDir.length + 1) === `${name}.md`),
@@ -270,7 +270,7 @@ describe("cursor bundle: reconcile-install smoke (real authored bundle -> throwa
 			});
 			expect(first.conflicts).toEqual([]);
 			expect(existsSync(join(target, "AGENTS.md"))).toBe(true);
-			expect(existsSync(join(target, ".cursor", "agents", "explorer.md"))).toBe(true);
+			expect(existsSync(join(target, ".cursor", "agents", "explore.md"))).toBe(true);
 			expect(existsSync(join(target, ".cursor", "agents", "planner.md"))).toBe(true);
 			expect(existsSync(join(target, ".cursor", "agents", "reviewer.md"))).toBe(true);
 			expect(existsSync(join(target, ".cursor", "rules", "runtime-invariants.mdc"))).toBe(true);

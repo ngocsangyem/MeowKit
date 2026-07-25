@@ -20,7 +20,7 @@ Every project file belongs to one of these categories:
 ```
 AGENTS.md            Root capability router
 .cursor/
-├── agents/          Agent definitions (explorer, planner, reviewer)
+├── agents/          Agent definitions (explore, planner, reviewer)
 └── rules/           Always Apply / Agent Requested / Auto Attached rules
 .agents/
 └── skills/          mk- prefixed skills

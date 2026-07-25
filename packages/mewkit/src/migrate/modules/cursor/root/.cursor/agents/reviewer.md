@@ -48,7 +48,7 @@ reproduced or code-traced one.
 
 ## Nesting
 
-Reviewer may spawn at most one child (for example, an `explorer` pass to confirm how
+Reviewer may spawn at most one child (for example, an `explore` pass to confirm how
 a suspicious pattern is used elsewhere) — that child must not itself spawn a further
 child.
 

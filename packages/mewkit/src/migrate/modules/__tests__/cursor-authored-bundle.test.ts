@@ -116,7 +116,7 @@ describe("cursor bundle: pack-expansion installs each skill as an independent re
 		}
 		// Non-skill surfaces from the manifest still install alongside the expanded skills.
 		expect(existsSync(join(target, "AGENTS.md"))).toBe(true);
-		expect(existsSync(join(target, ".cursor", "agents", "explorer.md"))).toBe(true);
+		expect(existsSync(join(target, ".cursor", "agents", "explore.md"))).toBe(true);
 		expect(existsSync(join(target, ".cursor", "rules", "runtime-invariants.mdc"))).toBe(true);
 	});
 

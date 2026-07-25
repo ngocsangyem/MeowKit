@@ -42,7 +42,7 @@ problem, and any constraint already known (existing ADRs, project conventions).
 
 ## Nesting
 
-Brainstormer may delegate to at most one child (for example, an `explorer` pass to
+Brainstormer may delegate to at most one child (for example, an `explore` pass to
 confirm what the codebase already does) — that child must not itself spawn a further
 child.
 

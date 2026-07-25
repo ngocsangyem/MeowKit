@@ -1,12 +1,12 @@
 {
-	"_description": "Cursor bundle agent-pack catalog. `core` is the default install — explorer, planner, reviewer. Extended packs mirror the codex agent roster, grouped by domain, matching the skill-pack domains where sensible. Extended agents ship physically alongside core under .cursor/agents/ (there is no per-agent install-time filtering yet, unlike skills) — this catalog is the organizational/documentation grouping for future selection tooling.",
+	"_description": "Cursor bundle agent-pack catalog. `core` is the default install — explore, planner, reviewer. Extended packs mirror the codex agent roster, grouped by domain, matching the skill-pack domains where sensible. Extended agents ship physically alongside core under .cursor/agents/ (there is no per-agent install-time filtering yet, unlike skills) — this catalog is the organizational/documentation grouping for future selection tooling.",
 	"verified": "2026-07-25",
 	"defaultPack": "core",
 	"packs": {
 		"core": {
-			"description": "Default install: fast read-only repo orientation (explorer), architecture/implementation planning (planner), evidence-ranked post-implementation review (reviewer). Kept small per Cursor's own guidance against many vague-description agents degrading auto-routing quality.",
+			"description": "Default install: fast read-only repo orientation (explore), architecture/implementation planning (planner), evidence-ranked post-implementation review (reviewer). Kept small per Cursor's own guidance against many vague-description agents degrading auto-routing quality.",
 			"dependsOn": [],
-			"agents": ["explorer", "planner", "reviewer"]
+			"agents": ["explore", "planner", "reviewer"]
 		},
 		"development": {
 			"description": "Implementation and architecture roles layered on top of the core lifecycle: production coding, system design, research, and test authoring.",
