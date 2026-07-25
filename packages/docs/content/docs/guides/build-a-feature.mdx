@@ -84,6 +84,15 @@ Spawns up to 3 agents in isolated git worktrees for independent subtasks. Use wh
 - **Gate 2 is never auto-approved.** The `--auto` flag fixes issues but still requires your review approval.
 - **Long sessions lose context.** The plan's Agent State section auto-updates — read it if you resume mid-build.
 
+## When it goes wrong
+
+| What you see | Why | What to do |
+|-------|-------|-----|
+| The plan is far broader than you meant | The description left the scope open | Narrow it — "cart for the product page", not "cart" |
+| Tests only cover the happy path | The tester read the acceptance criteria literally | Ask for the edge cases you care about: zero quantity, maximum quantity |
+| The developer self-heals three times, then escalates | The tests expect a different approach than the implementation took | Decide which is wrong — the plan or the tests — and fix that one, not the symptom |
+| Review FAILs on security | Hardcoded values or an unsafe pattern | Fix the findings; the review re-runs automatically |
+
 ## Next steps
 
 - [Fix a bug](/guides/fix-a-bug) — structured debugging with `/mk:fix`

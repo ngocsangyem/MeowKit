@@ -10,7 +10,6 @@
     "core-concepts/how-it-works",
     "core-concepts/workflow",
     "core-concepts/gates",
-    "guide/workflow-phases",
     "core-concepts/plan-creator-modes-and-flags",
     "guide/model-routing",
     "guide/claude-agent-models",
