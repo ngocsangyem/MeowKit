@@ -12,9 +12,10 @@ import { baseOptions } from '@/lib/layout.shared';
 // became unreachable from the sidebar with nothing reporting it. An explicit list cannot fail
 // that way, and `check-nav-coverage.mjs` now asserts every root tree has a tab here.
 //
-// `tabMode="top"` renders them as real links across the top. The default, "auto", renders a
-// dropdown whose items only exist once it is opened — which is how three whole sections can be
-// present in the config and still not be findable by someone looking at the page.
+// tabMode is left at its default. "top" is NOT usable with this layout: it renders LayoutTabs
+// into `[grid-area:main]`, the same grid area as the page content container, with an opaque
+// background and z-10 — two items in one grid area overlap, so it covers the whole article.
+// The header links in layout.shared.tsx are what actually make these sections visible.
 const tabs = [
   { title: 'Documentation', url: '/introduction' },
   { title: 'Workflows', url: '/workflows' },
@@ -24,7 +25,7 @@ const tabs = [
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <DocsLayout tree={source.getPageTree()} tabs={tabs} tabMode="top" {...baseOptions()}>
+    <DocsLayout tree={source.getPageTree()} tabs={tabs} {...baseOptions()}>
       {children}
     </DocsLayout>
   );

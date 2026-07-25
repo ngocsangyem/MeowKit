@@ -105,10 +105,25 @@ function collectRootTrees(dir) {
 }
 collectRootTrees(DOCS_ROOT);
 
-const layoutPath = join(HERE, "..", "app", "[...slug]", "layout.tsx");
-const tabUrls = existsSync(layoutPath)
-  ? [...readFileSync(layoutPath, "utf-8").matchAll(/url:\s*['"]([^'"]+)['"]/g)].map((m) => m[1])
-  : [];
+// Both files that can carry a link into a root tree: the sidebar tabs and the header nav.
+const navSources = [
+  join(HERE, "..", "app", "[...slug]", "layout.tsx"),
+  join(HERE, "..", "lib", "layout.shared.tsx"),
+].filter((p) => existsSync(p));
+const tabUrls = navSources.flatMap((p) =>
+  [...readFileSync(p, "utf-8").matchAll(/url:\s*['"](\/[^'"]*)['"]/g)].map((m) => m[1]),
+);
+
+// `tabMode="top"` renders LayoutTabs into `[grid-area:main]` — the same grid area as the page
+// content container — with an opaque background and z-10. Two items in one grid area overlap, so
+// it covers the entire article. It looks like the obvious way to make the tabs visible, which is
+// why it needs a guard rather than a comment.
+// Comments are stripped first: both of these files explain in prose why tabMode="top" is wrong,
+// and a guard that fires on its own explanation is a guard nobody can satisfy.
+function stripComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/[^\n]*/g, "$1");
+}
+const topTabMode = navSources.filter((p) => /tabMode\s*=\s*["'{]?\s*["']top["']/.test(stripComments(readFileSync(p, "utf-8"))));
 
 const unreachable = rootTrees.filter((tree) => !tabUrls.some((u) => u === tree || u.startsWith(tree + "/")));
 const servedUrls = new Set(allPages(DOCS_ROOT).map(urlFor));
@@ -118,14 +133,17 @@ for (const t of unreachable) {
   console.log(`ERROR ${t} — a root:true tree with no tab pointing into it; nothing in the sidebar reaches it`);
 }
 for (const u of deadTabs) {
-  console.log(`ERROR layout.tsx tab "${u}" — no page serves this path`);
+  console.log(`ERROR nav link "${u}" — no page serves this path`);
+}
+for (const p of topTabMode) {
+  console.log(`ERROR ${relative(REPO_ROOT, p)} sets tabMode="top" — LayoutTabs then shares [grid-area:main] with the page content and covers the whole article`);
 }
 
 for (const o of orphans) {
   console.log(`ERROR ${o.file}  ${o.url} — served but in no meta.json and not retired in redirects.json`);
 }
 
-const failures = orphans.length + unreachable.length + deadTabs.length;
+const failures = orphans.length + unreachable.length + deadTabs.length + topTabMode.length;
 console.log(
   `\nchecked ${covered.size} navigable page(s), ${retired.size} retired URL(s), ` +
     `${rootTrees.length} root tree(s) against ${tabUrls.length} tab(s) — ${failures} problem(s)`,
