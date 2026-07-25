@@ -1,0 +1,4 @@
+# Deliberately invalid JSON: hook tests feed this file in to assert the hooks
+# fail closed on unparseable input. Prettier cannot parse it, and formatting it
+# would destroy what it tests.
+packages/mewkit/src/migrate/hooks/__tests__/cursor-hook-fixtures/malformed.json

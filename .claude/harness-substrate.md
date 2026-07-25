@@ -21,4 +21,4 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 | Gate enforcement *(kit)* | ✅ covered | 12 | 12 | gate-rules, harness-rules, agile-story-gates |
 
 **Coverage:** 12/12 responsibilities have active artifacts.
-**Untagged:** 0 registry + 163 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).
+**Untagged:** 0 registry + 164 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).
