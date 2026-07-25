@@ -37,7 +37,13 @@ interface RuntimeEnvironmentMatrix {
  *  whole row `warn` (surface the gap, never silently `pass`); all-`not-applicable` is `na`;
  *  otherwise `pass`. Never "a single support flag" — the row's detail always names the parts. */
 function rowStatus(row: EnvironmentRow): "pass" | "warn" | "na" {
-	const parts = [row.hookEventsActive, row.skillsDiscoveryPaths, row.agentsDiscoveryPaths, row.rulesDiscoveryPaths, row.mcpTransportsSupported];
+	const parts = [
+		row.hookEventsActive,
+		row.skillsDiscoveryPaths,
+		row.agentsDiscoveryPaths,
+		row.rulesDiscoveryPaths,
+		row.mcpTransportsSupported,
+	];
 	if (parts.some((p) => p.status === "undocumented")) return "warn";
 	if (parts.every((p) => p.status === "not-applicable")) return "na";
 	return "pass";
@@ -66,7 +72,9 @@ function checkEnvironmentMatrix(moduleDir: string): DiagResult[] {
 	try {
 		matrix = JSON.parse(fs.readFileSync(matrixPath, "utf-8"));
 	} catch (e) {
-		return [{ status: "fail", name: "Cursor runtime-environment matrix", detail: `invalid JSON: ${(e as Error).message}` }];
+		return [
+			{ status: "fail", name: "Cursor runtime-environment matrix", detail: `invalid JSON: ${(e as Error).message}` },
+		];
 	}
 	return matrix.environments.map(renderEnvironmentRow);
 }
@@ -80,7 +88,9 @@ function checkEnvironmentMatrix(moduleDir: string): DiagResult[] {
 async function checkMcpProfileHealth(dir: string, moduleDir: string): Promise<DiagResult[]> {
 	const mcpJsonPath = path.join(dir, ".cursor", "mcp.json");
 	if (!fs.existsSync(mcpJsonPath)) {
-		return [{ status: "pass", name: "Cursor MCP profile(s)", detail: "no .cursor/mcp.json — opt-in MCP surface untouched." }];
+		return [
+			{ status: "pass", name: "Cursor MCP profile(s)", detail: "no .cursor/mcp.json — opt-in MCP surface untouched." },
+		];
 	}
 
 	const ledgerPath = meowkitStatePaths(path.join(dir, ".meowkit")).cursorLedger;
@@ -93,7 +103,8 @@ async function checkMcpProfileHealth(dir: string, moduleDir: string): Promise<Di
 		results.push({
 			status: "pass",
 			name: "Cursor MCP profile(s)",
-			detail: ".cursor/mcp.json exists but no server in it is mewkit-owned (user-authored, or ledger not yet recorded).",
+			detail:
+				".cursor/mcp.json exists but no server in it is mewkit-owned (user-authored, or ledger not yet recorded).",
 		});
 		return results;
 	}
@@ -107,7 +118,11 @@ async function checkMcpProfileHealth(dir: string, moduleDir: string): Promise<Di
 	const unresolved = await collectUnresolvedEnvRefs(mcpJsonPath, ownedServers);
 	results.push(
 		unresolved.length === 0
-			? { status: "pass", name: "Cursor MCP env references", detail: "every ${env:NAME} reference in owned servers resolves." }
+			? {
+					status: "pass",
+					name: "Cursor MCP env references",
+					detail: "every ${env:NAME} reference in owned servers resolves.",
+				}
 			: {
 					status: "warn",
 					name: "Cursor MCP env references",

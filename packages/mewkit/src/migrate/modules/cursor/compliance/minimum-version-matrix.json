@@ -18,21 +18,83 @@
 		"status": "unverified-hook-support"
 	},
 	"hookEvents": [
-		{ "event": "sessionStart", "cloudSupported": false, "failClosed": false, "note": "Never blocking; no session boundary in cloud agents." },
-		{ "event": "beforeReadFile", "cloudSupported": true, "failClosed": true, "note": "Security-critical: secret/private-path read gate." },
-		{ "event": "beforeShellExecution", "cloudSupported": true, "failClosed": true, "note": "Security-critical: destructive-command + path-scope gate." },
-		{ "event": "beforeMCPExecution", "cloudSupported": false, "failClosed": true, "note": "Security-critical: server/tool allowlist gate; cloud-unsupported (deferred)." },
-		{ "event": "preToolUse", "cloudSupported": true, "failClosed": "per-matcher", "note": "Matcher-enumerated: file-mutation(true), read-only-query(false), unclassified-other(true, decides ask)." },
+		{
+			"event": "sessionStart",
+			"cloudSupported": false,
+			"failClosed": false,
+			"note": "Never blocking; no session boundary in cloud agents."
+		},
+		{
+			"event": "beforeReadFile",
+			"cloudSupported": true,
+			"failClosed": true,
+			"note": "Security-critical: secret/private-path read gate."
+		},
+		{
+			"event": "beforeShellExecution",
+			"cloudSupported": true,
+			"failClosed": true,
+			"note": "Security-critical: destructive-command + path-scope gate."
+		},
+		{
+			"event": "beforeMCPExecution",
+			"cloudSupported": false,
+			"failClosed": true,
+			"note": "Security-critical: server/tool allowlist gate; cloud-unsupported (deferred)."
+		},
+		{
+			"event": "preToolUse",
+			"cloudSupported": true,
+			"failClosed": "per-matcher",
+			"note": "Matcher-enumerated: file-mutation(true), read-only-query(false), unclassified-other(true, decides ask)."
+		},
 		{ "event": "postToolUse", "cloudSupported": true, "failClosed": false, "note": "Telemetry observe only." },
 		{ "event": "postToolUseFailure", "cloudSupported": true, "failClosed": false, "note": "Telemetry observe only." },
 		{ "event": "afterFileEdit", "cloudSupported": true, "failClosed": false, "note": "Telemetry observe only." },
 		{ "event": "afterShellExecution", "cloudSupported": true, "failClosed": false, "note": "Telemetry observe only." },
-		{ "event": "afterMCPExecution", "cloudSupported": false, "failClosed": false, "note": "Telemetry observe only; cloud-unsupported (MCP deferred)." },
-		{ "event": "beforeSubmitPrompt", "cloudSupported": true, "failClosed": false, "note": "Capture side-effect only; block-only contract, never exercised to block; noncritical." },
-		{ "event": "subagentStart", "cloudSupported": true, "failClosed": false, "note": "Validates + allows; noncritical." },
-		{ "event": "subagentStop", "cloudSupported": true, "failClosed": false, "note": "Bounded status persisted to telemetry; noncritical." },
-		{ "event": "preCompact", "cloudSupported": true, "failClosed": false, "note": "Best-effort telemetry only; memory commits never depend on it." },
-		{ "event": "stop", "cloudSupported": true, "failClosed": false, "note": "Bounded followup_message; finite loop_limit set in hooks.json." }
+		{
+			"event": "afterMCPExecution",
+			"cloudSupported": false,
+			"failClosed": false,
+			"note": "Telemetry observe only; cloud-unsupported (MCP deferred)."
+		},
+		{
+			"event": "beforeSubmitPrompt",
+			"cloudSupported": true,
+			"failClosed": false,
+			"note": "Capture side-effect only; block-only contract, never exercised to block; noncritical."
+		},
+		{
+			"event": "subagentStart",
+			"cloudSupported": true,
+			"failClosed": false,
+			"note": "Validates + allows; noncritical."
+		},
+		{
+			"event": "subagentStop",
+			"cloudSupported": true,
+			"failClosed": false,
+			"note": "Bounded status persisted to telemetry; noncritical."
+		},
+		{
+			"event": "preCompact",
+			"cloudSupported": true,
+			"failClosed": false,
+			"note": "Best-effort telemetry only; memory commits never depend on it."
+		},
+		{
+			"event": "stop",
+			"cloudSupported": true,
+			"failClosed": false,
+			"note": "Bounded followup_message; finite loop_limit set in hooks.json."
+		}
 	],
-	"deferredV1": ["beforeTabFileRead", "afterTabFileEdit", "workspaceOpen", "afterAgentResponse", "afterAgentThought", "sessionEnd"]
+	"deferredV1": [
+		"beforeTabFileRead",
+		"afterTabFileEdit",
+		"workspaceOpen",
+		"afterAgentResponse",
+		"afterAgentThought",
+		"sessionEnd"
+	]
 }

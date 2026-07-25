@@ -21,8 +21,16 @@ const VALID_HOOKS_JSON = {
 		beforeShellExecution: [{ command: "node .cursor/hooks/shell-gate.cjs", failClosed: true }],
 		beforeMCPExecution: [{ command: "node .cursor/hooks/mcp-gate.cjs", failClosed: true }],
 		preToolUse: [
-			{ matcher: "^(?:write|edit|create|delete|remove|apply_patch|str_replace|update)", command: "node .cursor/hooks/tool-gate.cjs", failClosed: true },
-			{ matcher: "^(?:read|search|grep|glob|list|find|view)", command: "node .cursor/hooks/tool-gate.cjs", failClosed: false },
+			{
+				matcher: "^(?:write|edit|create|delete|remove|apply_patch|str_replace|update)",
+				command: "node .cursor/hooks/tool-gate.cjs",
+				failClosed: true,
+			},
+			{
+				matcher: "^(?:read|search|grep|glob|list|find|view)",
+				command: "node .cursor/hooks/tool-gate.cjs",
+				failClosed: false,
+			},
 			{ matcher: ".*", command: "node .cursor/hooks/tool-gate.cjs", failClosed: true },
 		],
 	},
@@ -147,7 +155,10 @@ describe("checkCursor: bundle checksum re-verification", () => {
 		mkdirSync(join(m, "root", ".cursor", "hooks"), { recursive: true });
 		writeFileSync(join(m, "root", ".cursor", "hooks", "shell-gate.cjs"), "console.log('NEW shipped content');\n");
 		mkdirSync(join(d, ".cursor", "hooks"), { recursive: true });
-		writeFileSync(join(d, ".cursor", "hooks", "shell-gate.cjs"), "console.log('OLD installed content — tampered or stale');\n");
+		writeFileSync(
+			join(d, ".cursor", "hooks", "shell-gate.cjs"),
+			"console.log('OLD installed content — tampered or stale');\n",
+		);
 		writeLedger(d, [
 			{
 				item: "shell-gate.cjs",

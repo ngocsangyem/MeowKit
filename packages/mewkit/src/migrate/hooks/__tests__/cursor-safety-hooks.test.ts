@@ -110,14 +110,20 @@ describe("shell-gate.cjs (beforeShellExecution, security-critical)", () => {
 describe("mcp-gate.cjs (beforeMCPExecution, security-critical, cloud-unsupported)", () => {
 	it("allows a server present in .cursor/mcp.json", () => {
 		mkdirSync(join(dir, ".cursor"), { recursive: true });
-		writeFileSync(join(dir, ".cursor", "mcp.json"), JSON.stringify({ mcpServers: { context7: { url: "https://example.com" } } }));
+		writeFileSync(
+			join(dir, ".cursor", "mcp.json"),
+			JSON.stringify({ mcpServers: { context7: { url: "https://example.com" } } }),
+		);
 		const r = runHook("mcp-gate.cjs", fixture("before-mcp-execution-allow"), dir);
 		expect(r.json).toEqual({ permission: "allow" });
 	});
 
 	it("denies a server not in the allowlist", () => {
 		mkdirSync(join(dir, ".cursor"), { recursive: true });
-		writeFileSync(join(dir, ".cursor", "mcp.json"), JSON.stringify({ mcpServers: { context7: { url: "https://example.com" } } }));
+		writeFileSync(
+			join(dir, ".cursor", "mcp.json"),
+			JSON.stringify({ mcpServers: { context7: { url: "https://example.com" } } }),
+		);
 		const r = runHook("mcp-gate.cjs", fixture("before-mcp-execution-deny"), dir);
 		expect(r.json?.permission).toBe("deny");
 	});
@@ -242,7 +248,9 @@ describe("subagent-lifecycle.cjs (subagentStart/subagentStop, noncritical)", () 
 	it("emits a bounded followup_message on subagentStop error status", () => {
 		const r = runHook("subagent-lifecycle.cjs", fixture("subagent-stop-error"), dir);
 		expect(typeof r.json?.followup_message).toBe("string");
-		const record = JSON.parse(readFileSync(join(dir, ".meowkit", "telemetry", "subagent-lifecycle.jsonl"), "utf-8").trim());
+		const record = JSON.parse(
+			readFileSync(join(dir, ".meowkit", "telemetry", "subagent-lifecycle.jsonl"), "utf-8").trim(),
+		);
 		expect(record.agent_transcript_path).toBeUndefined();
 		expect(record.user_email).toMatch(/^sha256:/);
 	});

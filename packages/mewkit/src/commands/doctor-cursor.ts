@@ -5,7 +5,11 @@ import { computeFileChecksum } from "../migrate/reconcile/checksum-utils.js";
 import { readCursorLedger } from "../migrate/reconcile/cursor-ledger.js";
 import { meowkitStatePaths } from "../state/meowkit-state-paths.js";
 import { resolveCursorModuleDir } from "../migrate/modules/cursor-authored-bundle.js";
-import { CURSOR_MIN_SUPPORTED_VERSION, detectCursorVersion, isCursorVersionSupported } from "../migrate/providers/cursor/capabilities.js";
+import {
+	CURSOR_MIN_SUPPORTED_VERSION,
+	detectCursorVersion,
+	isCursorVersionSupported,
+} from "../migrate/providers/cursor/capabilities.js";
 import { checkCursorEnvironment } from "./doctor-cursor-environment.js";
 
 // Single-file Cursor doctor (env checks join it in Phase 5). Validates the
@@ -21,7 +25,12 @@ const KILL_SWITCH_FLAG_RELATIVE = ".meowkit/state/cursor-hooks-kill-switch";
 
 // Events this bundle declares security-critical — every configured entry for
 // these MUST carry `failClosed: true` (per-matcher for preToolUse).
-const SECURITY_CRITICAL_EVENTS = new Set(["beforeReadFile", "beforeShellExecution", "beforeMCPExecution", "preToolUse"]);
+const SECURITY_CRITICAL_EVENTS = new Set([
+	"beforeReadFile",
+	"beforeShellExecution",
+	"beforeMCPExecution",
+	"preToolUse",
+]);
 // The one deliberately fail-open preToolUse matcher (read-only tools).
 const OPEN_PRE_TOOL_USE_MATCHER = "^(?:read|search|grep|glob|list|find|view)";
 
@@ -53,7 +62,11 @@ function checkHooksJsonShape(hooksJsonPath: string): { ok: boolean; results: Dia
 	const results: DiagResult[] = [
 		parsed.version === 1
 			? { status: "pass", name: "Cursor hooks.json schema version", detail: "version: 1" }
-			: { status: "fail", name: "Cursor hooks.json schema version", detail: `expected version 1, got ${String(parsed.version)}` },
+			: {
+					status: "fail",
+					name: "Cursor hooks.json schema version",
+					detail: `expected version 1, got ${String(parsed.version)}`,
+				},
 	];
 
 	const seen = new Set<string>();
@@ -61,7 +74,11 @@ function checkHooksJsonShape(hooksJsonPath: string): { ok: boolean; results: Dia
 		for (const entry of entries) {
 			const key = `${event}::${entry.matcher ?? ""}`;
 			if (seen.has(key)) {
-				results.push({ status: "fail", name: `Cursor hook dedupe: ${event}`, detail: `duplicate (event, matcher) entry: ${key}` });
+				results.push({
+					status: "fail",
+					name: `Cursor hook dedupe: ${event}`,
+					detail: `duplicate (event, matcher) entry: ${key}`,
+				});
 			}
 			seen.add(key);
 
@@ -89,7 +106,11 @@ function checkHooksJsonShape(hooksJsonPath: string): { ok: boolean; results: Dia
 async function checkVersionGate(): Promise<DiagResult> {
 	const detected = await detectCursorVersion();
 	if (!detected) {
-		return { status: "pass", name: "Cursor IDE version", detail: "undetectable (cursor CLI shim not on PATH) — skipped, not treated as below minimum." };
+		return {
+			status: "pass",
+			name: "Cursor IDE version",
+			detail: "undetectable (cursor CLI shim not on PATH) — skipped, not treated as below minimum.",
+		};
 	}
 	const ok = isCursorVersionSupported(detected);
 	return {
@@ -114,21 +135,38 @@ async function checkBundleChecksums(dir: string, moduleDir: string): Promise<Dia
 	try {
 		ledger = await readCursorLedger(ledgerPath);
 	} catch (e) {
-		return [{ status: "fail", name: "Cursor reconciliation ledger", detail: `unreadable/corrupt: ${(e as Error).message}` }];
+		return [
+			{ status: "fail", name: "Cursor reconciliation ledger", detail: `unreadable/corrupt: ${(e as Error).message}` },
+		];
 	}
-	const rows = ledger.installations.filter((r) => r.provider === "cursor" && (r.type === "hooks" || r.type === "agent"));
+	const rows = ledger.installations.filter(
+		(r) => r.provider === "cursor" && (r.type === "hooks" || r.type === "agent"),
+	);
 	if (rows.length === 0) {
-		return [{ status: "pass", name: "Cursor bundle checksum re-verification", detail: "no hooks/agent rows installed yet — nothing to re-verify." }];
+		return [
+			{
+				status: "pass",
+				name: "Cursor bundle checksum re-verification",
+				detail: "no hooks/agent rows installed yet — nothing to re-verify.",
+			},
+		];
 	}
 
 	const results: DiagResult[] = [];
 	for (const row of rows) {
 		const shippedPath = path.join(moduleDir, row.sourcePath);
 		if (!fs.existsSync(row.path) || !fs.existsSync(shippedPath)) {
-			results.push({ status: "warn", name: `Cursor checksum: ${row.item}`, detail: `missing live (${row.path}) or shipped (${shippedPath}) file — cannot re-verify.` });
+			results.push({
+				status: "warn",
+				name: `Cursor checksum: ${row.item}`,
+				detail: `missing live (${row.path}) or shipped (${shippedPath}) file — cannot re-verify.`,
+			});
 			continue;
 		}
-		const [liveChecksum, shippedChecksum] = await Promise.all([computeFileChecksum(row.path), computeFileChecksum(shippedPath)]);
+		const [liveChecksum, shippedChecksum] = await Promise.all([
+			computeFileChecksum(row.path),
+			computeFileChecksum(shippedPath),
+		]);
 		const diverged = liveChecksum !== shippedChecksum;
 		const ledgerClaimsNoDrift = row.sourceChecksum === row.targetChecksum;
 		results.push({

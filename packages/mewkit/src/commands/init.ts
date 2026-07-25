@@ -661,9 +661,7 @@ async function addCursorBundle(
 	}
 	const result = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
 	if (result.conflicts.length > 0) {
-		p.log.warn(
-			`${result.conflicts.length} existing Cursor file(s) left untouched (re-run with --force to overwrite).`,
-		);
+		p.log.warn(`${result.conflicts.length} existing Cursor file(s) left untouched (re-run with --force to overwrite).`);
 	}
 	p.log.success(`Cursor toolkit created (${result.writes} written): AGENTS.md, .meowkit/README.md.`);
 	await warnBelowMinCursor();
@@ -722,7 +720,8 @@ export async function init(args: InitArgs): Promise<void> {
 	}
 	if (picked?.includes("cursor")) {
 		if (dryRun) p.log.info("Dry-run: would copy the authored Cursor bundle (AGENTS.md, .meowkit/README.md).");
-		else await addCursorBundle(targetDir, force, args.mcpProfiles, args.allowCloudMcp, parseSkillPacks(args.skillPacks));
+		else
+			await addCursorBundle(targetDir, force, args.mcpProfiles, args.allowCloudMcp, parseSkillPacks(args.skillPacks));
 	}
 
 	// Legacy explicit paths: `--target <provider>` / `--migrate` (never active with the picker).

@@ -65,8 +65,12 @@ interface VersionMatrix {
 }
 
 describe("minimum-version-matrix.json consistency", () => {
-	const matrix: VersionMatrix = JSON.parse(readFileSync(join(CURSOR_MODULE_DIR, "compliance", "minimum-version-matrix.json"), "utf-8"));
-	const hooksJson: HooksJson = JSON.parse(readFileSync(join(CURSOR_MODULE_DIR, "root", ".cursor", "hooks.json"), "utf-8"));
+	const matrix: VersionMatrix = JSON.parse(
+		readFileSync(join(CURSOR_MODULE_DIR, "compliance", "minimum-version-matrix.json"), "utf-8"),
+	);
+	const hooksJson: HooksJson = JSON.parse(
+		readFileSync(join(CURSOR_MODULE_DIR, "root", ".cursor", "hooks.json"), "utf-8"),
+	);
 
 	it("matrix.ide.operationalFloor matches CURSOR_MIN_SUPPORTED_VERSION", () => {
 		expect(matrix.ide.operationalFloor).toBe(CURSOR_MIN_SUPPORTED_VERSION);
@@ -83,7 +87,9 @@ describe("minimum-version-matrix.json consistency", () => {
 	it("every matrix hookEvent row is actually configured in hooks.json", () => {
 		const configuredEvents = new Set(Object.keys(hooksJson.hooks ?? {}));
 		for (const row of matrix.hookEvents) {
-			expect(configuredEvents.has(row.event), `matrix row '${row.event}' has no corresponding hooks.json entry`).toBe(true);
+			expect(configuredEvents.has(row.event), `matrix row '${row.event}' has no corresponding hooks.json entry`).toBe(
+				true,
+			);
 		}
 	});
 

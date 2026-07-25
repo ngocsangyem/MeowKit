@@ -36,9 +36,7 @@
 		},
 		"development": {
 			"description": "Coding-domain helpers (languages, frameworks, architecture, merge conflicts, skill authoring) layered on top of the core lifecycle.",
-			"dependsOn": [
-				"core"
-			],
+			"dependsOn": ["core"],
 			"skills": [
 				"mk-angular",
 				"mk-api-design",
@@ -63,9 +61,7 @@
 		},
 		"review": {
 			"description": "Quality, security, and evaluation skills (audits, rubrics, coverage, PR review) beyond the core review step.",
-			"dependsOn": [
-				"core"
-			],
+			"dependsOn": ["core"],
 			"skills": [
 				"mk-benchmark",
 				"mk-context-audit",
@@ -84,9 +80,7 @@
 		},
 		"product": {
 			"description": "Product/planning/PM skills: ticket intake, estimation, retros, plan critique, and decision interviews.",
-			"dependsOn": [
-				"core"
-			],
+			"dependsOn": ["core"],
 			"skills": [
 				"mk-advise",
 				"mk-ask-me",
@@ -105,9 +99,7 @@
 		},
 		"operations": {
 			"description": "Ops, docs-site, wiki, session-scoped guardrails, parallel-agent, and browser-automation helpers.",
-			"dependsOn": [
-				"core"
-			],
+			"dependsOn": ["core"],
 			"skills": [
 				"mk-agent-browser",
 				"mk-careful",
@@ -136,9 +128,7 @@
 		},
 		"integrations": {
 			"description": "External-service integrations: Jira, Confluence, Figma, Stitch, and agent-surface conversion (henshin).",
-			"dependsOn": [
-				"core"
-			],
+			"dependsOn": ["core"],
 			"skills": [
 				"mk-confluence",
 				"mk-confluence-bulk",
@@ -170,9 +160,7 @@
 		},
 		"media": {
 			"description": "Media, visual, and UI-generation skills: diagrams, video, multimodal, design systems, previews.",
-			"dependsOn": [
-				"core"
-			],
+			"dependsOn": ["core"],
 			"skills": [
 				"mk-frontend-design",
 				"mk-html-video",

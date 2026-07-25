@@ -16,11 +16,27 @@
 			"hookEventsActive": {
 				"status": "documented",
 				"events": [
-					"sessionStart", "sessionEnd", "preToolUse", "postToolUse", "postToolUseFailure",
-					"subagentStart", "subagentStop", "beforeShellExecution", "afterShellExecution",
-					"beforeMCPExecution", "afterMCPExecution", "beforeReadFile", "afterFileEdit",
-					"beforeSubmitPrompt", "preCompact", "stop", "afterAgentResponse", "afterAgentThought",
-					"beforeTabFileRead", "afterTabFileEdit", "workspaceOpen"
+					"sessionStart",
+					"sessionEnd",
+					"preToolUse",
+					"postToolUse",
+					"postToolUseFailure",
+					"subagentStart",
+					"subagentStop",
+					"beforeShellExecution",
+					"afterShellExecution",
+					"beforeMCPExecution",
+					"afterMCPExecution",
+					"beforeReadFile",
+					"afterFileEdit",
+					"beforeSubmitPrompt",
+					"preCompact",
+					"stop",
+					"afterAgentResponse",
+					"afterAgentThought",
+					"beforeTabFileRead",
+					"afterTabFileEdit",
+					"workspaceOpen"
 				]
 			},
 			"skillsDiscoveryPaths": {
@@ -28,7 +44,10 @@
 				"paths": [".agents/skills/", "~/.agents/skills/", ".cursor/skills/", "~/.cursor/skills/"]
 			},
 			"agentsDiscoveryPaths": { "status": "documented", "paths": [".cursor/agents/", "~/.cursor/agents/"] },
-			"rulesDiscoveryPaths": { "status": "documented", "paths": [".cursor/rules/*.mdc", "AGENTS.md (nested, deeper wins)"] },
+			"rulesDiscoveryPaths": {
+				"status": "documented",
+				"paths": [".cursor/rules/*.mdc", "AGENTS.md (nested, deeper wins)"]
+			},
 			"mcpTransportsSupported": { "status": "documented", "transports": ["stdio", "sse", "streamable-http"] },
 			"sandboxRunModeGuidance": "https://cursor.com/docs/agent/hooks",
 			"cloudCompatibilitySummary": "n/a — this IS the local IDE environment."
@@ -38,10 +57,24 @@
 			"hookEventsActive": {
 				"status": "documented",
 				"events": [
-					"sessionStart", "sessionEnd", "preToolUse", "postToolUse", "postToolUseFailure",
-					"subagentStart", "subagentStop", "beforeShellExecution", "afterShellExecution",
-					"beforeMCPExecution", "afterMCPExecution", "beforeReadFile", "afterFileEdit",
-					"beforeSubmitPrompt", "preCompact", "stop", "afterAgentResponse", "afterAgentThought"
+					"sessionStart",
+					"sessionEnd",
+					"preToolUse",
+					"postToolUse",
+					"postToolUseFailure",
+					"subagentStart",
+					"subagentStop",
+					"beforeShellExecution",
+					"afterShellExecution",
+					"beforeMCPExecution",
+					"afterMCPExecution",
+					"beforeReadFile",
+					"afterFileEdit",
+					"beforeSubmitPrompt",
+					"preCompact",
+					"stop",
+					"afterAgentResponse",
+					"afterAgentThought"
 				]
 			},
 			"skillsDiscoveryPaths": {
@@ -60,15 +93,31 @@
 			"hookEventsActive": {
 				"status": "documented",
 				"events": [
-					"beforeShellExecution", "afterShellExecution", "beforeReadFile", "afterFileEdit",
-					"preToolUse", "postToolUse", "postToolUseFailure", "subagentStart", "subagentStop",
-					"beforeSubmitPrompt", "preCompact", "afterAgentResponse", "afterAgentThought", "stop"
+					"beforeShellExecution",
+					"afterShellExecution",
+					"beforeReadFile",
+					"afterFileEdit",
+					"preToolUse",
+					"postToolUse",
+					"postToolUseFailure",
+					"subagentStart",
+					"subagentStop",
+					"beforeSubmitPrompt",
+					"preCompact",
+					"afterAgentResponse",
+					"afterAgentThought",
+					"stop"
 				],
 				"unsupportedEvents": {
 					"status": "documented",
 					"events": [
-						"sessionStart", "sessionEnd", "beforeMCPExecution", "afterMCPExecution",
-						"beforeTabFileRead", "afterTabFileEdit", "workspaceOpen"
+						"sessionStart",
+						"sessionEnd",
+						"beforeMCPExecution",
+						"afterMCPExecution",
+						"beforeTabFileRead",
+						"afterTabFileEdit",
+						"workspaceOpen"
 					],
 					"note": "beforeMCPExecution/afterMCPExecution are the enforcement gap this phase's --allow-cloud-mcp gate and doctor hard-FAIL exist to cover — an MCP tool call in a Cloud Agent has NO local hook enforcement equivalent. User-level ~/.cursor/hooks.json is also NOT loaded in cloud (project/team/enterprise hook config is)."
 				}

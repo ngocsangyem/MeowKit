@@ -27,7 +27,11 @@ import { lintMcpProfileForSecrets } from "./cursor-mcp-profile-lint.js";
 
 export type { McpProfile, McpProfileSelection } from "./cursor-mcp-profile-catalog.js";
 export { loadMcpProfileCatalog, resolveMcpProfiles } from "./cursor-mcp-profile-catalog.js";
-export { lintMcpProfileForSecrets, unresolvedEnvRefs, DOCUMENTED_STATIC_INTERPOLATION_VARS } from "./cursor-mcp-profile-lint.js";
+export {
+	lintMcpProfileForSecrets,
+	unresolvedEnvRefs,
+	DOCUMENTED_STATIC_INTERPOLATION_VARS,
+} from "./cursor-mcp-profile-lint.js";
 
 /** A project "may run as a Cloud Agent" when it has at least one git remote configured —
  *  Cursor Cloud Agents operate against a remote-hosted repo, so a remoteless local-only

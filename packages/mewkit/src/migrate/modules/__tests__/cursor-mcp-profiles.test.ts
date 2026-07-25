@@ -67,7 +67,9 @@ describe("lintMcpProfileForSecrets (secret-emission guard)", () => {
 			transport: "remote",
 			mcpServers: { bad: { url: "https://example.invalid/${command:someUndocumentedThing}" } },
 		};
-		expect(lintMcpProfileForSecrets("bad-profile", profile).some((i) => i.includes("undocumented interpolation"))).toBe(true);
+		expect(lintMcpProfileForSecrets("bad-profile", profile).some((i) => i.includes("undocumented interpolation"))).toBe(
+			true,
+		);
 	});
 
 	it("passes a clean profile using only documented interpolation vars", () => {
@@ -176,7 +178,9 @@ describe("applyMcpProfiles", () => {
 		const [serverName] = Object.keys(profile.mcpServers);
 
 		mkdirSync(join(target, ".cursor"), { recursive: true });
-		const userOwned = { mcpServers: { [serverName]: { command: "my-own-server-binary" }, "my-other-server": { command: "echo" } } };
+		const userOwned = {
+			mcpServers: { [serverName]: { command: "my-own-server-binary" }, "my-other-server": { command: "echo" } },
+		};
 		writeFileSync(join(target, ".cursor", "mcp.json"), JSON.stringify(userOwned, null, 2));
 
 		const result = await applyMcpProfiles(moduleDir, target, [profileName], { projectRoot: target });
@@ -224,7 +228,10 @@ describe("applyMcpProfiles — cloud enforcement gate", () => {
 	});
 
 	it("applies once allowCloudMcp is explicitly true", async () => {
-		const result = await applyMcpProfiles(moduleDir, target, [profileName], { allowCloudMcp: true, projectRoot: target });
+		const result = await applyMcpProfiles(moduleDir, target, [profileName], {
+			allowCloudMcp: true,
+			projectRoot: target,
+		});
 		expect(result.applied).toBe(true);
 		expect(result.blockedByCloudGate).toBe(false);
 		expect(existsSync(join(target, ".cursor", "mcp.json"))).toBe(true);

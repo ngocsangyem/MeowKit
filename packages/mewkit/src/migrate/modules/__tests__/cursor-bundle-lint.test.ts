@@ -92,7 +92,12 @@ const isCoreAgent = (file: string): boolean =>
 // phase's File Ownership) and legitimately documents the real `.claude/memory/` ->
 // `.meowkit/memory/` cross-provider import source path (plan.md goal 7) — a factual interop
 // reference, not a leaked Claude-Code-bound instruction, so it is not subject to this denylist.
-const denylistScope = [join(rootDir, "AGENTS.md"), ...walkFiles(agentsDir), ...walkFiles(rulesDir), ...walkFiles(skillsDir)];
+const denylistScope = [
+	join(rootDir, "AGENTS.md"),
+	...walkFiles(agentsDir),
+	...walkFiles(rulesDir),
+	...walkFiles(skillsDir),
+];
 
 describe("cursor bundle: authored content exists (Phase 3 part A)", () => {
 	it("ships the core agent pack (explore, planner, reviewer); extended agents may coexist", () => {
@@ -197,7 +202,9 @@ describe("cursor bundle: rule-classification completeness (no unclassified .mdc)
 	}
 
 	it("exactly one rule is Always Apply (runtime-invariants.mdc) — everything else is situational", () => {
-		const alwaysApplyRules = ruleFiles.filter((f) => parseFrontmatter(readFileSync(f, "utf-8")).raw.alwaysApply === "true");
+		const alwaysApplyRules = ruleFiles.filter(
+			(f) => parseFrontmatter(readFileSync(f, "utf-8")).raw.alwaysApply === "true",
+		);
 		expect(alwaysApplyRules.map((f) => f.slice(rulesDir.length + 1))).toEqual(["runtime-invariants.mdc"]);
 	});
 });

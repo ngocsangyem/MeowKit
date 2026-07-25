@@ -121,7 +121,11 @@ describe("cursor bundle: pack-expansion installs each skill as an independent re
 	});
 
 	it("a second run with the same pack selection is a no-op (idempotent per-skill)", async () => {
-		await reconcileApplyCursorBundle(moduleDir, target, { packs: ["core"], adoptHomeRegistry: false, projectRoot: target });
+		await reconcileApplyCursorBundle(moduleDir, target, {
+			packs: ["core"],
+			adoptHomeRegistry: false,
+			projectRoot: target,
+		});
 		const second = await reconcileApplyCursorBundle(moduleDir, target, {
 			packs: ["core"],
 			adoptHomeRegistry: false,
@@ -132,7 +136,10 @@ describe("cursor bundle: pack-expansion installs each skill as an independent re
 	});
 
 	it("undefined pack selection copies the whole skills tree (backward compatible, pre-pack behavior)", async () => {
-		const result = await reconcileApplyCursorBundle(moduleDir, target, { adoptHomeRegistry: false, projectRoot: target });
+		const result = await reconcileApplyCursorBundle(moduleDir, target, {
+			adoptHomeRegistry: false,
+			projectRoot: target,
+		});
 		expect(result.conflicts).toEqual([]);
 		for (const name of CORE_SKILLS) {
 			expect(existsSync(join(target, ".cursor", "skills", name, "SKILL.md"))).toBe(true);

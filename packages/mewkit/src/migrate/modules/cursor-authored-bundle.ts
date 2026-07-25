@@ -9,7 +9,11 @@
 import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { parseArtifactManifest, type ArtifactManifest, type ArtifactManifestEntry } from "./artifact-manifest-schema.js";
+import {
+	parseArtifactManifest,
+	type ArtifactManifest,
+	type ArtifactManifestEntry,
+} from "./artifact-manifest-schema.js";
 
 /** Resolve the authored `modules/cursor/` directory (source of truth, in the kit). */
 export function resolveCursorModuleDir(): string {
