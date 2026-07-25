@@ -3,6 +3,17 @@ title: "mk:verify"
 description: "Unified verification: build -> lint -> test -> type-check -> coverage. Use for 'is everything green', 'run all checks', 'verify build'. Auto-called by mk:cook."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/verify/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/verify/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | high |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Runs a unified verification loop across five steps -- build, lint, type-check, tests, and coverage -- in sequence with fail-fast behavior. Auto-detects the project type (JS/TS, Python, Go, Ruby, Rust) from marker files and selects the correct commands for each step. Produces a single PASS/FAIL verdict with per-step timing and results. Serves as the quality gate between Phase 3 (Build) and Phase 4 (Review) and is auto-called by `mk:cook`.

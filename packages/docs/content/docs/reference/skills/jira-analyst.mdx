@@ -3,6 +3,18 @@ title: "mk:jira-analyst"
 description: "Read-only full ticket context analysis including media. Persists structured RCA report."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/jira-analyst/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/jira-analyst/SKILL.md) |
+| **Owner** | `jira` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Forks the `jira-analyst` agent to read the full ticket context — description, comments, attachments, linked issues, **including media (images / PDFs / screenshots)** — and produce a structured analysis suitable for posting back as a Jira comment. Read-only — never mutates Jira. The user reviews the output before posting.

@@ -3,6 +3,18 @@ title: "evaluator"
 description: "Behavioral verification agent — drives the running build against rubric criteria with real evidence. Skeptic by default."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/evaluator.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/evaluator.md) |
+| **Owner** | `testing` |
+| **Runtime** | `claude-code` |
+| **Risk** | high |
+| **Writes** | `tasks/reviews/`, `tasks/reviews/*-evalverdict-evidence/`, `tasks/reviews/*-evalverdict.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The evaluator is your skeptical quality inspector. Unlike the reviewer (which audits code structure), the evaluator tests whether the built product **actually works** by driving it through a browser, API calls, or CLI commands. It grades against rubric criteria with concrete evidence — no passing without proof.
 
 ## Cognitive Framing

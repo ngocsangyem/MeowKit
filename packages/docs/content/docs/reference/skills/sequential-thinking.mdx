@@ -3,6 +3,17 @@ title: "mk:sequential-thinking"
 description: "Structured step-by-step reasoning before acting. Prevents jumping to conclusions or guessing root causes without evidence. Used by mk:fix diagnosis phase."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/sequential-thinking/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/sequential-thinking/SKILL.md) |
+| **Owner** | `research` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Provides a structured reasoning framework for problems requiring step-by-step analysis before action. Generates multiple hypotheses from evidence (not guessing), tests each with concrete falsifiable criteria, eliminates refuted hypotheses, and concludes with a confidence-rated root cause and fix scope. Supports explicit revision when new evidence contradicts earlier conclusions, and branching when multiple viable approaches exist. Used internally by `mk:fix` during the diagnosis phase, but can also be invoked directly for complex reasoning tasks.

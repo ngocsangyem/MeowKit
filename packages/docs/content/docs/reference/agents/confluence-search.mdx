@@ -3,6 +3,18 @@ title: "confluence-search"
 description: "Confluence search agent — runs CQL queries, validates CQL, lists spaces, manages saved filters, and exports results via the confluence-as CLI wrapper."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/confluence-search.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/confluence-search.md) |
+| **Owner** | `confluence` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Writes** | `docs/project-context.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The confluence-search agent finds Confluence pages by criteria. It runs CQL queries, validates CQL syntax, builds queries from natural language, lists spaces, manages saved filters, and exports results — every user-derived term flowing through the `cql-sanitize.sh` injection guard before reaching the wrapper.
 
 ## Cognitive Framing

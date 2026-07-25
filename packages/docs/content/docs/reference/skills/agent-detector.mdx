@@ -3,6 +3,17 @@ title: "mk:agent-detector"
 description: "mk:agent-detector"
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/agent-detector/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/agent-detector/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 `mk:agent-detector` is the highest-priority MeowKit skill that runs first on every user message. It analyzes task content, technology mentions, user intent, project context, and file patterns through a 5-layer scoring system to auto-detect which agent should handle the task, at what complexity level, with which model, and whether team mode is warranted. The output is a detection banner shown at the start of every response.

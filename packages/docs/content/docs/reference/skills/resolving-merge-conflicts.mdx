@@ -3,6 +3,17 @@ title: "mk:resolving-merge-conflicts"
 description: "Resolve an in-progress git merge or rebase conflict end to end — read state, recover each side's intent, resolve hunks, run checks, finish the merge/rebase."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/resolving-merge-conflicts/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/resolving-merge-conflicts/SKILL.md) |
+| **Owner** | `git` |
+| **Runtime** | `claude-code` |
+| **Risk** | high |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Drives an **in-progress** git merge or rebase to a clean finish. It reads the conflict state, recovers the original intent behind each side from history and PRs, resolves every hunk (preserving both intents where compatible), runs the project's checks, and completes the merge or rebase with a commit. Two iron laws govern it: **always resolve — never `--abort`**, and **never invent new behavior**.

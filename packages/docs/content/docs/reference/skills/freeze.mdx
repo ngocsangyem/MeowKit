@@ -3,6 +3,17 @@ title: "mk:freeze"
 description: "Session-scoped edit restriction — blocks Edit and Write tools outside an allowed directory. Gate for preventing accidental scope creep during debugging or focused work."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/freeze/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/freeze/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Locks all Edit and Write tool operations to a single directory for the current session. Any attempt to edit or write a file outside the allowed path is **denied** (not just warned). The freeze enforces intent boundaries — it prevents accidentally fixing unrelated code while working on a specific module. Bash commands (`sed`, `awk`, `cp`, `mv`) are NOT restricted.

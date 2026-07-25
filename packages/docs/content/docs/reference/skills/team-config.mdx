@@ -3,6 +3,17 @@ title: "mk:team-config"
 description: "Set up parallel agent team for COMPLEX tasks — creates worktree structure, generates ownership map, initializes task queue."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/team-config/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/team-config/SKILL.md) |
+| **Owner** | `git` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Sets up the infrastructure for parallel agent execution. Called by the orchestrator when a COMPLEX task is decomposed into independent subtasks. Creates isolated git worktrees, assigns file ownership globs per agent, and initializes the task queue.

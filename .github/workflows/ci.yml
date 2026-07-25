@@ -255,6 +255,14 @@ jobs:
       - name: Typecheck docs
         run: npm run typecheck -w packages/docs
 
+      # Honest drift detection needs the manifest re-derived against the live `.claude/` tree,
+      # so this job builds the generator rather than trusting the committed JSON.
+      - name: Build the CLI (the docs manifest generator)
+        run: npm run build -w packages/mewkit
+
+      - name: Docs reference manifest and pages match the runtime
+        run: node packages/mewkit/dist/index.js docs-manifest --check
+
       - name: Internal links resolve to real pages
         run: npm run check:links -w packages/docs
 

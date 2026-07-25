@@ -3,6 +3,18 @@ title: "mk:scale-routing"
 description: "mk:scale-routing"
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/scale-routing/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/scale-routing/SKILL.md) |
+| **Owner** | `portability` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `0` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 `mk:scale-routing` is an internal sub-skill of Phase 0 (Orient) that replaces subjective orchestrator judgment with deterministic, auditable domain-based routing. It scans task descriptions against `data/domain-complexity.csv` and runs additional detection layers to classify task type, complexity level, workflow intensity, provider-neutral execution tier, and suggested skill. A fintech auth change auto-classifies as high complexity without human intervention; the active provider adapter selects any model policy.

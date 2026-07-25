@@ -3,6 +3,17 @@ title: "mk:document-release"
 description: "Post-ship documentation sync — updates all project docs to match shipped code, polishes changelog, cleans up TODOs."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/document-release/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/document-release/SKILL.md) |
+| **Owner** | `docs` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Post-ship workflow that ensures every documentation file in the project is accurate, up to date, and written in a friendly, user-forward voice. Runs after `/mk:ship` (Step 8.5) but before the PR merges. Mostly automated — makes obvious factual updates directly, stops only for risky or subjective decisions.

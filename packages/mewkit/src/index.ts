@@ -313,6 +313,15 @@ async function main(): Promise<void> {
 				promptArgs: args._.slice(2).map(String),
 			});
 			break;
+		case "docs-manifest": {
+			const { docsManifest } = await import("./commands/docs-manifest.js");
+			docsManifest({
+				check: args.check as boolean | undefined,
+				write: args.write as boolean | undefined,
+				json: args.json as boolean | undefined,
+			});
+			break;
+		}
 		case "verdict-gate":
 			verdictGate({ slug: args._[1] as string | undefined });
 			break;

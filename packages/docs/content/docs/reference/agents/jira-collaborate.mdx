@@ -3,6 +3,18 @@ title: "jira-collaborate"
 description: "Jira collaboration agent — manages comments, attachments, watchers, and notifications with internal-vs-public safety enforcement."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/jira-collaborate.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/jira-collaborate.md) |
+| **Owner** | `jira` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Writes** | `docs/project-context.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The jira-collaborate agent manages the collaboration layer on Jira issues — comments, attachments, watchers, and notifications. Its most critical safety feature is the internal-vs-public comment distinction: before posting any potentially customer-facing comment, it confirms visibility with the user to prevent accidental information leaks.
 
 ## Cognitive Framing

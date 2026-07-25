@@ -52,6 +52,7 @@ const COMMANDS = [
 	{ name: "query", summary: "Read-only aggregate queries over the derived index" },
 	{ name: "pack", summary: "Manage install packs", subcommands: ["list", "add", "remove"] },
 	{ name: "verdict-gate", summary: "Check a review verdict against the active plan" },
+	{ name: "docs-manifest", summary: "Generate or drift-check the docs reference manifest" },
 ];
 
 /** `b`/`s` keep the table readable; the type is the thing most likely to be wrong. */
@@ -74,7 +75,7 @@ const s = (name: string, commands: string[], summary: string, extra: Extra = {})
 const FLAGS: FlagSpec[] = [
 	b("help", [], "Show help"),
 	b("version", [], "Print the CLI version"),
-	b("json", ["review", "capabilities", "pack", "explain-support", "providers", "plan", "inventory", "trace", "index", "query", "orient", "budget", "task-state", "context", "visual-plan"], "Emit machine-readable JSON"),
+	b("json", ["review", "capabilities", "pack", "explain-support", "providers", "plan", "inventory", "trace", "index", "query", "orient", "budget", "task-state", "context", "visual-plan", "docs-manifest"], "Emit machine-readable JSON"),
 	b("yes", ["upgrade", "pack", "migrate"], "Answer prompts affirmatively"),
 	b("beta", ["init", "upgrade", "pack"], "Use the beta release channel"),
 	b("dry-run", ["init", "plan", "migrate"], "Print what would happen without writing"),
@@ -96,10 +97,11 @@ const FLAGS: FlagSpec[] = [
 	b("allow-cloud-mcp", ["init"], "Cursor only: second opt-in for applying an MCP profile to a repo with a git remote"),
 
 	// upgrade
-	b("check", ["upgrade", "inventory", "visual-plan"], "Report without changing anything", {
+	b("check", ["upgrade", "inventory", "visual-plan", "docs-manifest"], "Report without changing anything", {
 		perCommand: {
 			inventory: "Fail if README or index counts drift from reality",
 			"visual-plan": "Pre-apply gate for apply-feedback",
+			"docs-manifest": "Fail when the committed manifest no longer matches the live `.claude/` tree",
 		},
 	}),
 	b("list", ["upgrade"], "List available versions"),
@@ -132,7 +134,9 @@ const FLAGS: FlagSpec[] = [
 	// capabilities
 	s("intent", ["capabilities"], "Resolve this intent to the capability that owns it"),
 	s("provider", ["capabilities"], "Scope the projection to one provider"),
-	b("write", ["capabilities"], "Write the generated view rather than printing it"),
+	b("write", ["capabilities", "docs-manifest"], "Write the generated view rather than printing it", {
+		perCommand: { "docs-manifest": "Regenerate the committed manifest" },
+	}),
 	b("record", ["capabilities", "orient"], "Record the result to the task record; `--no-record` skips it"),
 
 	// plan

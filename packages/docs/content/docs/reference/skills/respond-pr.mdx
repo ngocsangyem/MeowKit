@@ -3,6 +3,17 @@ title: "mk:respond-pr"
 description: "Triage reviewer comments on a GitHub PR with receiving-review discipline — verify each against the codebase, then accept/push-back/clarify, and optionally reply in-thread."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/respond-pr/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/respond-pr/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 Fetches reviewer comments on a PR and triages EACH one with receiving-code-review discipline: verify against the codebase, then ACCEPT / PUSH BACK / CLARIFY, and (opt-in) reply in the comment thread. Never edits code — accepted fixes hand off to `mk:fix` / `mk:cook`. Does NOT give a review verdict on a PR (use `mk:review-pr`).
 
 ## What This Skill Does

@@ -3,6 +3,18 @@ title: "jira-fields"
 description: "Jira custom field discovery agent — finds field IDs, lists custom fields, checks project field configurations, and configures agile fields."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/jira-fields.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/jira-fields.md) |
+| **Owner** | `jira` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Writes** | `docs/project-context.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The jira-fields agent discovers and manages Jira custom fields. Custom field IDs vary per Jira instance — a field called "Story Points" might be `customfield_10016` in one instance and `customfield_10031` in another. The jira-fields agent finds these mappings and caches them so other agents can reference fields correctly.
 
 ## Cognitive Framing

@@ -3,6 +3,17 @@ title: "mk:pack"
 description: "Pack an EXTERNAL repository into a single AI-friendly file (markdown/xml/json). Use for third-party library analysis, security audits, or handoff to external LLMs."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/pack/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/pack/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Pack snapshots an external repository into a single AI-friendly file via `repomix`. The output is a portable, shareable document for pasting into external LLMs (ChatGPT, Gemini, claude.ai web), distributing to reviewers, or archiving. It includes a secret scan by default and supports Tree-sitter-based `--compress` mode that extracts only class/function/interface signatures.

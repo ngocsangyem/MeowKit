@@ -3,6 +3,17 @@ title: "mk:review-pr"
 description: "Review a GitHub PR with a single shallow correctness/security/breaking/AI-slop checklist and emit a verdict; optionally post it via gh pr review."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/review-pr/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/review-pr/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 Reviews a GitHub PR with ONE shallow checklist pass and emits a Summary / Risk / Findings / Verdict. Default prints to chat; `--reply` posts the verdict via `gh pr review`. Read-only on code. This is the shallow lane — for a deep multi-pass adversarial audit of your own diff, use `mk:review` (Phase 4 Gate-2 review). Does NOT respond to received reviewer comments (use `mk:respond-pr`).
 
 ## What This Skill Does

@@ -3,6 +3,18 @@ title: "security"
 description: "Security audit specialist — runs checks at Phase 2 and Phase 4, issues BLOCK verdicts that halt the pipeline for critical vulnerabilities."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/security.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/security.md) |
+| **Owner** | `security` |
+| **Runtime** | `claude-code` |
+| **Risk** | critical |
+| **Writes** | `.claude/rules/security-rules.md`, `tasks/reviews/*-security-verdict.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The security agent is your last line of defense against shipping vulnerabilities. It audits both the plan (before code is written) and the implementation (before code ships), with the authority to halt the entire pipeline when it finds critical issues. No other agent can override a security BLOCK.
 
 ## Cognitive Framing

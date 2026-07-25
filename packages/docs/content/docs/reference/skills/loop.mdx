@@ -3,6 +3,18 @@ title: "mk:loop"
 description: "Bounded, git-tracked optimization loop. Improve one scalar metric (coverage, bundle size, lint count, latency) by iterating: modify one scoped change, verify, keep or revert. Boundary-gated autonomy."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/loop/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/loop/SKILL.md) |
+| **Owner** | `memory` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Improves ONE scalar metric through bounded autonomous iterations: pick one atomic change -> commit -> verify -> keep if the number improved, otherwise `git revert`. Git history is the loop's memory; a TSV log, a summary, and a handoff JSON are the artifacts. Autonomy is **boundary-gated** -- one human approval before the loop starts, then hands-off iteration up to a hard cap, with hard re-gates on cap-reached, stuck/plateau, and scope-expansion. It never plans, never grades behavior, and never ships.

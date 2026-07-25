@@ -3,6 +3,17 @@ title: "mk:review"
 description: "Multi-pass structural code review with adversarial analysis, scope-aware dispatch, adversarial persona passes, and forced-finding protocol. Supports branch diff, PR number, commit hash, and pending changes."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/review/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/review/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | high |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Performs a multi-pass adversarial code review using a step-file architecture. Three parallel base reviewers examine the code independently from different angles (blind code smells, edge-case tracing, criteria mapping). For non-trivial diffs, adversarial persona passes challenge findings deeper -- security adversary, failure mode analyst, assumption destroyer, and scope critic. A forced-finding protocol prevents rubber-stamp approvals. Produces a 5-dimension verdict (Correctness, Maintainability, Performance, Security, Coverage) that gates Phase 5 (Ship).

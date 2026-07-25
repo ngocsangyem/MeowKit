@@ -3,6 +3,18 @@ title: "mk:orchestrate"
 description: "Coordinates staged or parallel jobs across live-verified coding-agent runtimes and in-session subagents — capability/risk routing, worktree isolation, redacted capture, resume, arbiter review."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/orchestrate/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/orchestrate/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Splits one piece of work into jobs and runs them across the coding-agent CLIs already installed on your machine, across in-session subagents, or across both. It routes each job by how much capability it needs and how much damage it could do, isolates parallel writers in git worktrees, captures redacted output, resumes an interrupted run, and blocks its own final report until an independent arbiter has checked the results against the evidence.

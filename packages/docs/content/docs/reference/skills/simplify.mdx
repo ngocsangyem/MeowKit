@@ -3,6 +3,17 @@ title: "mk:simplify"
 description: "Post-implementation simplification pass — reduces complexity without changing behavior. Runs after Phase 3 GREEN, before Phase 4 Review."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/simplify/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/simplify/SKILL.md) |
+| **Owner** | `docs` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 Runs after implementation, before review. Behavior-preserving simplification: reduces complexity while passing the exact same tests. Scoped to the current diff only.
 
 > For ad-hoc code quality review outside the current implementation diff, use `mk:clean-code`. `mk:simplify` is behavior-preserving and scoped to the current diff only.

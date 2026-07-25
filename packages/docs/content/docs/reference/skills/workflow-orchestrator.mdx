@@ -3,6 +3,17 @@ title: "mk:workflow-orchestrator"
 description: "Auto-invoked 7-phase workflow coordinator for complex features — phase routing, token budget management, gate enforcement, fast-track mode."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/workflow-orchestrator/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/workflow-orchestrator/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | high |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 The central workflow coordinator. Auto-invoked when a session starts with complex-feature intent. Routes through [the seven phases](/core-concepts/workflow), managing gate enforcement, token budgets, agent team composition, and state persistence. Defers to `mk:cook` for single-task invocations.

@@ -3,6 +3,17 @@ title: "mk:lazy-agent-loader"
 description: "mk:lazy-agent-loader"
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/lazy-agent-loader/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/lazy-agent-loader/SKILL.md) |
+| **Owner** | `research` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 `mk:lazy-agent-loader` manages agent context budget in multi-agent workflows by loading only agent summaries initially (~50 tokens each) and deferring full agent definitions until an agent is selected. This avoids loading all agent files at session start, which would consume ~26,000 tokens.

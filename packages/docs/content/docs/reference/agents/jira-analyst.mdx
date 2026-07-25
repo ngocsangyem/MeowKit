@@ -3,6 +3,18 @@ title: "jira-analyst"
 description: "Jira ticket analyst — performs full context analysis including attached media (images, PDFs, screenshots) and linked issues for root cause investigation."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/jira-analyst.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/jira-analyst.md) |
+| **Owner** | `jira` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Writes** | `docs/project-context.md`, `tasks/reports/jira-analyze-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The jira-analyst agent performs the deepest level of Jira ticket analysis. Unlike the evaluator and estimator, the analyst processes attached media — screenshots, PDFs, images — and follows linked issue chains to build a complete picture. Its findings are structured for posting back to Jira as a comment, making analysis results accessible to the entire team.
 
 ## Cognitive Framing

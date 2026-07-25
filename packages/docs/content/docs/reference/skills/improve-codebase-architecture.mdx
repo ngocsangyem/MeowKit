@@ -3,6 +3,18 @@ title: "mk:improve-codebase-architecture"
 description: "Review a codebase for deepening opportunities (shallow modules → deep), emit structured candidates for mk:preview to render, then grill a pick into a precise, type-safe patch. Analysis and patch emission only — no embedded rendering."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/improve-codebase-architecture/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/improve-codebase-architecture/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Surfaces architectural friction and proposes **deepening opportunities** — refactors that turn shallow modules into deep ones (small interface, large hidden implementation) for testability and AI-navigability. It owns three things only: **structural analysis**, **dependency mapping**, and **type-safe patch emission**. Every visual artifact — before/after diagrams, the candidate report, HTML — is delegated to `mk:preview`. The skill emits structured findings; `mk:preview` draws them.

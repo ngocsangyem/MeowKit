@@ -3,6 +3,18 @@ title: "mk:planning-engine"
 description: "Analyzes ticket complexity and maps dependencies against existing codebase before sprint planning — capacity estimation, dependency graphing, tech review."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/planning-engine/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/planning-engine/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `1` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Pre-sprint analysis engine. Takes a set of tickets and produces three reports: technical review (complexity, risks, unknowns per ticket), capacity estimate (story points with bin-packing), and dependency graph (execution order, cycles, critical path). Delegates deep analysis to subagents (`tech-analyzer`, `planning-reporter`).

@@ -3,6 +3,18 @@ title: "reviewer"
 description: "5-dimension structural code review — enforces Gate 2 with written verdicts. Adversarial review with parallel reviewers."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/reviewer.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/reviewer.md) |
+| **Owner** | `testing` |
+| **Runtime** | `claude-code` |
+| **Risk** | high |
+| **Writes** | `tasks/reviews/*-verdict.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The reviewer is your quality gatekeeper for code. It performs thorough structural reviews across five dimensions and enforces Gate 2 — the hard stop that prevents code from shipping without a passing review verdict. Every finding must be actionable, every WARN must be justified, and rubber-stamping is mechanically prevented.
 
 ## Cognitive Framing

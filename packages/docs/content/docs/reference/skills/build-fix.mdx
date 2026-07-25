@@ -3,6 +3,17 @@ title: "mk:build-fix"
 description: "Universal build error resolver — detects language, loads fix patterns, classifies by fixability, auto-retries up to 3 attempts. Chains into mk:verify."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/build-fix/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/build-fix/SKILL.md) |
+| **Owner** | `testing` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Automatically triages and fixes build errors across multiple languages. Detects language from error output, loads the appropriate error reference, classifies each error by fixability (auto-fixable / suggest-with-confidence / report-only), applies minimal fixes, verifies the build passes, and iterates up to 3 times before escalating.

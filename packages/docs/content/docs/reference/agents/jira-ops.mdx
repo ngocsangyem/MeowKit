@@ -3,6 +3,18 @@ title: "jira-ops"
 description: "Jira operations agent — manages jira-as cache, validates connectivity, and discovers project context. Diagnostic-only, no Atlassian state changes."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/jira-ops.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/jira-ops.md) |
+| **Owner** | `jira` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Writes** | `docs/project-context.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The jira-ops agent handles the operational layer of the Jira integration — cache management, connectivity validation, and project context discovery. It is diagnostic-only: it inspects and maintains the `jira-as` CLI wrapper's local state but never modifies anything in the Jira instance itself.
 
 ## Cognitive Framing

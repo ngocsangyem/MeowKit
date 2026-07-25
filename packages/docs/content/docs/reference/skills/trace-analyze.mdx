@@ -3,6 +3,17 @@ title: "mk:trace-analyze"
 description: "Scatter-gather trace log analysis — partitions run records, scatters to parallel researchers, surfaces recurring patterns with mandatory human gate."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/trace-analyze/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/trace-analyze/SKILL.md) |
+| **Owner** | `observability` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Step-file workflow that ingests `.meowkit/telemetry/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel researcher subagents, gathers cross-batch patterns, and gates suggestions through mandatory human review before any harness change is applied.

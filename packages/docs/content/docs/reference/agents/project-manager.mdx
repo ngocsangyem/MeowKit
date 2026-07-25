@@ -3,6 +3,18 @@ title: "project-manager"
 description: "Delivery tracker agent — produces on-demand status reports by scanning plans, verdicts, contracts, cost logs, and git history."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/project-manager.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/project-manager.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Writes** | `tasks/plans/*/`, `{plan-dir}/status-reports/*-status.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The project-manager is your delivery tracker. When you need to know where a task stands — what is done, what is in progress, what is blocked, and what has not started — the project-manager scans all available artifacts and produces a structured status report. It reads everything but writes only status reports.
 
 ## Cognitive Framing
