@@ -15,6 +15,18 @@ This workflow is for **planning new work into a sprint**. If you have an existin
 
 </Callout>
 
+## Quick path
+
+```bash
+/mk:jira-evaluator AUTH-201                # per ticket: ready?
+/mk:jira-estimator AUTH-201                # per ticket: how big?
+/mk:planning-engine review AUTH-201 --scout   # check the estimate against the real codebase
+/mk:planning-engine plan --tickets AUTH-201,AUTH-202 --capacity 40
+```
+
+**You end up with** a sprint plan backed by codebase evidence rather than by estimates alone.
+**The machinery** is Jira reads plus a codebase scout; see [Jira Integration](/guides/jira-integration).
+
 ## Prerequisites
 
 Jira access needs the `jira-as` CLI and three variables in `.meowkit/.env`. [Jira Integration](/guides/jira-integration) covers the install, the token, what the skills will and will not do on their own, and what to check when authentication fails.

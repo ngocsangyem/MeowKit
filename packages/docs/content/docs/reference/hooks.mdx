@@ -94,9 +94,11 @@ MEOWKIT_HOOK_PROFILE=fast
 | `post-session.sh`           |   ✅   |    ❌    |  ❌  |
 | `learning-observer.sh`      |   ✅   |    ✅    |  ❌  |
 
-:::warning Safety-critical hooks never skip
+<Callout title="Safety-critical hooks never skip" type="warn">
+
 `gate-enforcement.sh` and `privacy-block.sh` are active in **all** profiles, including `fast`. These enforce the two hard gates and sensitive file protection — they cannot be disabled by profile selection.
-:::
+
+</Callout>
 
 ## Hook configuration
 

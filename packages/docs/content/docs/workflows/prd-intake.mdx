@@ -9,6 +9,18 @@ description: "Analyze incoming PRDs/tickets with MeowKit as the AI engine, power
 **Time estimate:** ~2 min per ticket (automated)
 **Skills used:** [mk:intake](/reference/skills/intake), [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-lifecycle](/reference/skills/jira-lifecycle), [mk:jira-relationships](/reference/skills/jira-relationships), [mk:jira-collaborate](/reference/skills/jira-collaborate), [mk:scale-routing](/reference/skills/scale-routing), [mk:scout](/reference/skills/scout), [mk:investigate](/reference/skills/investigate), [mk:decision-framework](/reference/skills/decision-framework)
 
+## Quick path
+
+```bash
+/mk:intake PRD-123          # classify area, score completeness, run RCA if it is a bug
+/mk:jira-evaluator PRD-123  # readiness
+/mk:jira-lifecycle transition PRD-123 "In Analysis"
+```
+
+**You end up with** a structured analysis posted back to the ticket as a comment.
+**Worth knowing** the analysis skills work on pasted text too, so you can try this before
+setting up Jira access at all.
+
 ## Overview
 
 When a new PRD or ticket lands in Jira, MeowKit can analyze it automatically: classify the product area, score description completeness, run root cause analysis (for bugs), scan the codebase for technical context, and post structured results back as a Jira comment.
@@ -69,12 +81,11 @@ Jira Automation Rule:
 
 MeowKit v2.0 introduced `mk:intake` which orchestrates the entire intake workflow automatically. Instead of chaining skills manually, just run:
 
-</Callout>
 ```bash
 /mk:intake
 ```
 The steps below describe what mk:intake does internally.
-:::
+</Callout>
 
 ### Step 1: Fetch the ticket
 
@@ -223,13 +234,12 @@ If configured, MeowKit can:
 
 After reviewing intake analysis, run the suggested Jira actions directly:
 
-</Callout>
 ```bash
 /mk:jira-lifecycle transition PRD-123 "In Analysis"
 /mk:jira-relationships link PRD-123 blocks BUG-045
 /mk:jira-lifecycle assign PRD-123 alice
 ```
-:::
+</Callout>
 
 ## Skill Graph
 

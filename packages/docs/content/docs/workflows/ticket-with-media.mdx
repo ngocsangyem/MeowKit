@@ -9,6 +9,20 @@ description: "How MeowKit handles tickets containing screenshots, videos, Figma 
 **Time estimate:** Varies by media type (images ~30s, video 1–2 min, Figma ~1 min)
 **Skills used:** [mk:intake](/reference/skills/intake), [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-collaborate](/reference/skills/jira-collaborate), [mk:figma](/reference/skills/figma), [mk:multimodal](/reference/skills/multimodal), [mk:investigate](/reference/skills/investigate)
 
+## Quick path
+
+```bash
+/mk:intake BUG-789          # pulls the ticket, its screenshots, video, Figma links
+                            # then describes what it found
+/mk:investigate             # use those findings as evidence
+/mk:jira-collaborate add-comment BUG-789 --body "<what you learned>"
+```
+
+**You end up with** the media turned into text you can reason about, and a comment on the
+ticket recording it.
+**Worth knowing** the fallback chain degrades rather than fails: a missing tool means a
+lower-fidelity read, not an error.
+
 ## Overview
 
 Tickets often include more than text. Bug reports have screen recordings. Feature PRDs have Figma links. Specs have PDF attachments. MeowKit processes all of these through a fallback chain — it tries the best tool first, then degrades gracefully if that tool isn't available.

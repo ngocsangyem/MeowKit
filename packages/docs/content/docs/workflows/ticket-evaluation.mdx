@@ -9,6 +9,18 @@ description: "Assess ticket complexity, detect issues, and estimate story points
 **Time estimate:** ~30s per ticket
 **Skills used:** [mk:intake](/reference/skills/intake), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-estimator](/reference/skills/jira-estimator), [mk:jira-analyst](/reference/skills/jira-analyst), [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-relationships](/reference/skills/jira-relationships)
 
+## Quick path
+
+```bash
+/mk:intake PROJ-123         # fetch
+/mk:jira-evaluator PROJ-123 # complexity, missing acceptance criteria, contradictions
+/mk:jira-estimator PROJ-123 # Fibonacci story points, with reasoning
+```
+
+**You end up with** an assessment you can act on. Nothing is written to Jira; every suggested
+change waits for you.
+**The machinery** is three read-only intelligence leaves, listed on [Jira Integration](/guides/jira-integration).
+
 ## Overview
 
 MeowKit can assess individual Jira tickets for complexity, detect missing acceptance criteria or vague requirements, and suggest Fibonacci-scale story points — all without modifying any Jira data. The three intelligence leaves (`mk:jira-evaluator`, `mk:jira-estimator`, `mk:jira-analyst`) are read-only; suggested actions require your review before execution.

@@ -9,6 +9,19 @@ description: "Developer workflow from receiving a Jira ticket through understand
 **Time estimate:** Varies by ticket complexity
 **Skills used:** [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-analyst](/reference/skills/jira-analyst), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-estimator](/reference/skills/jira-estimator), [mk:jira-lifecycle](/reference/skills/jira-lifecycle), [mk:jira-collaborate](/reference/skills/jira-collaborate), [mk:jira-relationships](/reference/skills/jira-relationships), [mk:planning-engine](/reference/skills/planning-engine), [mk:scout](/reference/skills/scout), [mk:plan-creator](/reference/skills/plan-creator), [mk:cook](/reference/skills/cook), [mk:review](/reference/skills/review), [mk:ship](/reference/skills/ship)
 
+## Quick path
+
+```bash
+/mk:jira-analyst AUTH-201                       # read the ticket and its attachments
+/mk:jira-evaluator AUTH-201                     # is it ready to work on?
+/mk:jira-lifecycle transition AUTH-201 "In Progress"
+/mk:cook AUTH-201                               # plan, build, review
+/mk:ship                                        # commit, PR, CI
+```
+
+**You end up with** a merged-ready PR and the ticket moved to its next status.
+**The machinery** is the seven-phase pipeline, explained once on [Workflow Phases](/core-concepts/workflow).
+
 ## Prerequisites
 
 Jira access needs the `jira-as` CLI and three variables in `.meowkit/.env`. [Jira Integration](/guides/jira-integration) covers the install, the token, what the skills will and will not do on their own, and what to check when authentication fails.

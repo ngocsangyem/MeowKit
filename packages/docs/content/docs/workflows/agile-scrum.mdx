@@ -10,6 +10,19 @@ description: "Sprint goal, DoR/DoD, retro→action loop, and spike governance vi
 **Skills used:** [mk:plan-creator](/reference/skills/plan-creator), [mk:sprint-contract](/reference/skills/sprint-contract), [mk:retro](/reference/skills/retro), [mk:jira-agile](/reference/skills/jira-agile), [mk:ship](/reference/skills/ship), [mk:agent-detector](/reference/skills/agent-detector)
 **Rules:** `agile-story-gates.md`, `agile-sprint-commitment.md`, `agile-feedback-cycle.md` (in `.claude/rules-conditional/`)
 
+## Quick path
+
+```bash
+/mk:sprint-contract sprint-goal set "<goal>" --sprint 42   # at sprint start
+/mk:jira-agile sprint add PROJ-125 --sprint 42             # during
+/mk:jira-agile sprint close --sprint 42                    # at sprint end
+/mk:retro                                                  # after
+```
+
+**You end up with** sprint governance that loads only when an Agile context is detected;
+non-Agile sessions pay nothing for it.
+**The machinery** is three conditional rule files, not a skill you invoke.
+
 ## Overview
 
 The toolkit ships a thin Agile governance layer covering:
