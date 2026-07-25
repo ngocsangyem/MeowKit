@@ -11,9 +11,10 @@
     "check:links": "node scripts/check-internal-links.mjs",
     "check:stale": "node scripts/scan-stale-values.mjs",
     "check:coverage": "node scripts/check-reference-coverage.mjs",
-    "check": "npm run typecheck && npm run check:links && npm run check:nav && npm run check:stale && npm run check:slop && npm run check:coverage",
+    "check": "npm run typecheck && npm run check:links && npm run check:nav && npm run check:frontmatter && npm run check:stale && npm run check:slop && npm run check:coverage",
     "check:nav": "node scripts/check-nav-coverage.mjs",
-    "check:slop": "node scripts/lint-prose-slop.mjs"
+    "check:slop": "node scripts/lint-prose-slop.mjs",
+    "check:frontmatter": "node scripts/check-frontmatter-contract.mjs"
   },
   "dependencies": {
     "fumadocs-core": "16.11.5",
@@ -23,7 +24,8 @@
     "next": "^16.0.0",
     "next-themes": "^0.4.6",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",
