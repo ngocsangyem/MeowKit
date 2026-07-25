@@ -58,6 +58,14 @@ const NAMED_PROFILES: Record<string, ModelProfile> = {
 		supportedProviders: ["claude-code"],
 		evidence: "claude-api skill model table (cached 2026-06-24) + its shared/models.md — exact id, no date suffix",
 	},
+	// Written as the exact id rather than the `opus` tier because the deep-reasoning
+	// agents pin one specific model, not "whatever the heavy tier resolves to today".
+	// The tier ladder cannot express that distinction, which is what a profile is for.
+	"claude-opus-5": {
+		identifier: "claude-opus-5",
+		supportedProviders: ["claude-code"],
+		evidence: "claude-api skill model table (cached 2026-06-24) — exact id, no date suffix",
+	},
 };
 
 /**

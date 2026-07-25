@@ -2,7 +2,7 @@
 name: evaluator
 description: 'Behavioral active-verification agent. Phase 3 (active verifier: drives the running build against rubric criteria with browser/curl/CLI evidence) + Phase 4 (contract reviewer: critiques sprint contracts for testability before code is written). Distinct from reviewer (which audits code structure) — evaluator runs the actual built artifact. Skeptic by default — assumes bugs exist and refuses static-only PASS verdicts. Not for structural review verdicts.'
 tools: Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion
-model: inherit
+model: claude-opus-5
 memory: project
 owner: testing
 criticality: high

@@ -3,7 +3,7 @@ name: ui-ux-designer
 subagent_type: advisory
 description: Use when frontend work requires UI/UX design decisions — component design, design systems, wireframes, visual review, accessibility audits, or responsive layout. Activated by mk:cook and mk:bootstrap when frontend is detected. Not for production source implementation.
 tools: Read, Grep, Glob, Edit, Write, AskUserQuestion, WebSearch, Task
-model: inherit
+model: claude-opus-5
 source: local
 owner: docs
 criticality: medium

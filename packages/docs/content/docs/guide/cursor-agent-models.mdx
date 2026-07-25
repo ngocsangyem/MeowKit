@@ -5,12 +5,12 @@ description: "Which Cursor model each agent in the Cursor native bundle is pinne
 
 When you install the Cursor target (`mewkit init --target cursor`), every bundled
 agent ships with a **concrete Cursor model** pinned in its frontmatter — not a
-provider-neutral tier. This is different from the Claude Code adapter (which picks
-a session model by task complexity — see [Model Routing](/docs/guide/model-routing))
-and from Codex (which writes a portable reasoning-effort ladder). See
-[Model Routing](/guide/model-routing) for the Claude Code and Codex adapters.
-Cursor exposes a real model picker per agent, so the bundle assigns each agent the
-model that fits its role.
+provider-neutral tier. Every target pins per agent in its own vocabulary: Claude Code
+in agent frontmatter (see [Claude Agent Models](/guide/claude-agent-models)) and Codex
+as a model plus reasoning effort (see [Codex Agent Models](/guide/codex-agent-models)).
+Session-level tier routing by task complexity is separate — see
+[Model Routing](/guide/model-routing). Cursor exposes a real model picker per agent, so
+the bundle assigns each agent the model that fits its role.
 
 ## How the mapping works
 

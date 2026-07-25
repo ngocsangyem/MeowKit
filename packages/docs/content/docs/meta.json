@@ -12,6 +12,7 @@
     "guide/workflow-phases",
     "core-concepts/plan-creator-modes-and-flags",
     "guide/model-routing",
+    "guide/claude-agent-models",
     "guide/cursor-agent-models",
     "guide/codex-agent-models",
     "guide/memory-system",

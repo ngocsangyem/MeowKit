@@ -2,7 +2,7 @@
 name: tester
 description: Test-writing agent. In TDD mode (--tdd / MEOWKIT_TDD=1), writes failing tests before implementation (red phase) and verifies they pass after (green phase). In default mode (TDD off), writes tests when invoked but does not block the developer. Use in Phase 2 and after implementation. Anti-rationalization rules (no test minimization, no mock substitution) apply in BOTH modes.
 tools: Read, Grep, Glob, Bash, Edit, Write
-model: inherit
+model: sonnet
 memory: project
 owner: testing
 criticality: high

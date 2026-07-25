@@ -13,6 +13,12 @@ describe("resolveModel — named profiles", () => {
 		expect(result.warning).toBeUndefined();
 	});
 
+	it("resolves the exact Opus id pinned by the deep-reasoning agents", () => {
+		const result = resolveModel("claude-opus-5", "claude-code");
+		expect(result.resolved).toEqual({ model: "claude-opus-5" });
+		expect(result.warning).toBeUndefined();
+	});
+
 	it("discloses inherit-default for a profile the provider does not support natively", () => {
 		const result = resolveModel("fable", "codex");
 		expect(result.resolved).toBeNull();

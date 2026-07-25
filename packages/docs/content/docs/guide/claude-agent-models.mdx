@@ -1,0 +1,145 @@
+---
+title: "Claude Agent Models"
+description: "Which Claude model each agent in the Claude Code toolkit is pinned to, why, and how to change it."
+---
+
+When you install the Claude Code target (`mewkit init`), every bundled agent ships with a
+**model pinned in its frontmatter**. This is the per-agent counterpart to the session-level
+tier routing in [Model Routing](/guide/model-routing): the session model follows task
+complexity, while a subagent always runs on the model its own role needs.
+
+The Codex and Cursor bundles do the same thing in their own vocabulary — see
+[Codex Agent Models](/guide/codex-agent-models) and
+[Cursor Agent Models](/guide/cursor-agent-models).
+
+## How the mapping works
+
+Each agent file at `.claude/agents/<name>.md` carries a `model:` field:
+
+```md title=".claude/agents/planner.md"
+---
+name: planner
+description: Product and engineering planning agent...
+tools: Read, Grep, Glob, Bash, Edit, Write
+model: claude-opus-5
+---
+```
+
+Agents are grouped into four tiers by what the work actually demands:
+
+| Tier | `model:` value | Use for |
+|---|---|---|
+| Advisory | `fable` (resolves to `claude-fable-5`) | Open-ended reframing where the strongest model earns its cost. |
+| Deep | `claude-opus-5` | High-value coding, design judgement, adversarial review, and load-bearing knowledge work. |
+| Standard | `sonnet` | Multi-step reasoning and operational judgement inside an explicit workflow guard. |
+| Bounded | `haiku` | Procedural, template-led, wrapper-driven, or evidence-aggregation work. |
+
+The deep tier pins an **exact model id** rather than the `opus` tier alias: those agents
+depend on one specific model's capability, which a tier alias — "whatever the heavy tier
+resolves to today" — cannot express. The other tiers use aliases, so they track the model
+the account is currently entitled to.
+
+<Callout type="warn">
+  Lowering a tier never lowers a gate. Confirmation prompts, dry-run requirements, scope
+  checks, and wrapper validation are independent of model selection.
+</Callout>
+
+## Core and delivery agents
+
+| Agent | Model | Why |
+|---|---|---|
+| `advisor` | `fable` | Reframing and one consequential recommendation are deep knowledge work. |
+| `planner` | `claude-opus-5` | Planning shapes every subsequent phase. |
+| `developer` | `claude-opus-5` | Production coding, integration, and self-healing need strong coding ability. |
+| `architect` | `claude-opus-5` | ADR, schema, auth, API, and infrastructure trade-offs are load-bearing. |
+| `reviewer` | `claude-opus-5` | Gate 2 review needs adversarial reasoning and regression detection. |
+| `security` | `claude-opus-5` | Threat modelling and BLOCK verdicts make a false negative expensive. |
+| `evaluator` | `claude-opus-5` | Runtime evidence, rubric judgement, and design-quality assessment. |
+| `brainstormer` | `claude-opus-5` | Evaluates alternatives and second-order architectural effects. |
+| `ui-ux-designer` | `claude-opus-5` | Design, accessibility, responsive behaviour, and visual judgement. |
+| `orchestrator` | `sonnet` | Routes every task and reads complexity, but does not implement. |
+| `tester` | `sonnet` | Test design and failure diagnosis inside a clear workflow. |
+| `researcher` | `sonnet` | Source comparison and trade-off synthesis. |
+| `analyst` | `sonnet` | Session and cost trends need real data analysis. |
+| `journal-writer` | `sonnet` | Evidence-led root cause and prevention narrative. |
+| `project-manager` | `haiku` | Schema-led evidence aggregation and status reporting. |
+| `documenter` | `haiku` | Bounded synchronization of docs, changelogs, and API descriptions. |
+| `shipper` | `haiku` | Check, branch, PR, and CI work is tool-verifiable and procedural. |
+| `git-manager` | `haiku` | Narrow Git operations governed by a safety checklist. |
+| `story-sizer` | `haiku` | Deterministic Fibonacci heuristic and a fixed report template. |
+
+## Jira and Confluence agents
+
+Integration agents run behind a validated CLI wrapper, so most are bounded enough for the
+`haiku` tier. The exceptions synthesize evidence, interpret partial failures, or can damage
+a source-of-truth system.
+
+| Agent | Model | Why |
+|---|---|---|
+| `jira-analyst` | `claude-opus-5` | Full ticket, comment, link, and media synthesis; may produce an RCA. |
+| `jira-evaluator` | `claude-opus-5` | Complexity, contradiction, and dependency analysis is judgement-heavy. |
+| `jira-estimator` | `claude-opus-5` | Qualitative estimation needs precedent comparison and calibrated escalation. |
+| `confluence-spec-analyst` | `claude-opus-5` | Multi-page, image-backed spec synthesis: gaps, ACs, and stories. |
+| `jira-admin` | `sonnet` | Broad administration needs policy-consistent judgement; confirmation contains blast radius. |
+| `jira-bulk` | `sonnet` | JQL, dry-run, and partial-failure interpretation across many issues. |
+| `jira-jsm` | `sonnet` | Public/internal boundary, customer data, SLAs, and approvals. |
+| `jira-lifecycle` | `sonnet` | Dynamic workflow, required fields, and resolution checks. |
+| `jira-collaborate` | `sonnet` | Public vs internal comment and notification judgement. |
+| `jira-dev` | `sonnet` | Branch and PR artifacts need correct technical synthesis. |
+| `confluence-bulk` | `sonnet` | Dry-run interpretation and large-scope operation reporting. |
+| `confluence-page` | `sonnet` | Semantic updates, version restoration, and macro-loss warnings. |
+| `jira-agile` | `haiku` | Wrapper-led agile CRUD with confirmation when closing sprints. |
+| `jira-search` | `haiku` | Structured JQL, search, filter, and export with mandatory sanitization. |
+| `jira-issue` | `haiku` | Single-issue CRUD inside a bounded wrapper protocol. |
+| `jira-relationships` | `haiku` | Formatted link, unlink, and clone operations with verification. |
+| `jira-fields` | `haiku` | Field discovery and ID verification are procedural. |
+| `jira-ops` | `haiku` | Read-heavy cache and project-context diagnostics. |
+| `jira-time` | `haiku` | Read-confirm-write worklog operations. |
+| `confluence-collaborate` | `haiku` | Bounded comments, attachments, labels, and watchers. |
+| `confluence-search` | `haiku` | Deterministic CQL search, pagination, and export. |
+
+## Accepted `model:` values
+
+| Value | Meaning |
+|---|---|
+| `inherit` | Run on whatever model the session is using. |
+| `opus` / `sonnet` / `haiku` | Tier aliases — resolve to the account's current model for that tier. |
+| `fable`, `claude-opus-5` | Named profiles — an exact model id, registered in the toolkit's model taxonomy. |
+
+A value outside this set fails `mewkit validate --agents` with
+`model "<value>" is not in the taxonomy`. To pin a different exact id, register it as a
+named profile in `packages/mewkit/src/migrate/model-taxonomy.ts` first — that table is the
+single place a model rename has to be edited.
+
+## Account-tier caveat
+
+`claude-opus-5` and `claude-fable-5` require an account entitled to those models. If a plan
+cannot run one, the agent fails at spawn time — change the affected agents to a tier alias
+(`sonnet`) or to `inherit`.
+
+## Operating policy
+
+1. Verify account entitlement before relying on a pinned exact id.
+2. Judge a tier by outcome, not token cost: missed architectural or security issues and
+   review recall for the deep tier; correct workflow selection and confirmation compliance
+   for standard; tool-call correctness and schema compliance for bounded.
+3. **Promote** a bounded agent when it misroutes an action, mishandles an ambiguous query,
+   or needs repeated remediation.
+4. Run a representative evaluation per tier before treating a re-tiering as settled.
+
+## Changing an agent's model
+
+Edit the `model:` field in the agent file:
+
+```md title=".claude/agents/jira-issue.md"
+---
+name: jira-issue
+model: haiku   # inherit | opus | sonnet | haiku | a registered named profile
+---
+```
+
+## See also
+
+- [Model Routing](/guide/model-routing) — session-level tier routing by task complexity
+- [Codex Agent Models](/guide/codex-agent-models) — the same per-agent pinning for Codex
+- [Cursor Agent Models](/guide/cursor-agent-models) — the same per-agent pinning for Cursor

@@ -2,7 +2,7 @@
 name: analyst
 description: Cost and learning analysis agent that tracks token usage, generates cost reports, extracts patterns from sessions, and maintains institutional memory. Invoked on session end only by its owning workflow, or on demand via /mk:budget. Not for implementation, planning, or review decisions.
 tools: Read, Grep, Glob, Bash, Edit, Write
-model: haiku
+model: sonnet
 memory: project
 owner: docs
 criticality: medium

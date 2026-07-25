@@ -19,11 +19,11 @@ The table above governs the **session** model by task complexity. **Subagents** 
 
 | Provider | Where | How |
 |---|---|---|
-| Claude Code | `.claude/agents/<name>.md` frontmatter | `model:` — `opus` / `sonnet` / `haiku` / `fable` / `inherit` |
+| Claude Code | `.claude/agents/<name>.md` frontmatter | `model:` — a tier alias (`opus` / `sonnet` / `haiku`), a named profile pinning an exact id (`fable`, `claude-opus-5`), or `inherit`. See [Claude Agent Models](/guide/claude-agent-models) for the full per-agent table. |
 | Codex | `.codex/agents/<name>.toml` | `model` + `model_reasoning_effort` — a concrete Codex model id (e.g. `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.4-mini`) with its own effort (`low`/`medium`/`high`). See [Codex Agent Models](/guide/codex-agent-models) for the full per-agent table. |
 | Cursor | `.cursor/agents/<name>.md` frontmatter | `model:` — a concrete Cursor model id (e.g. `claude-opus-5[effort=high]`, `composer-2.5[fast=true]`) or `inherit`. See [Cursor Agent Models](/guide/cursor-agent-models) for the full per-agent table. |
 
-Both native bundles pin a concrete model per agent rather than deriving one from the Claude tier: each agent gets the model its role actually needs, so bounded wrapper work does not run at top-tier cost. See [Codex Agent Models](/guide/codex-agent-models) and [Cursor Agent Models](/guide/cursor-agent-models) for the per-agent tables and for how to override a pin.
+All three targets pin a model per agent rather than deriving one from the session tier: each agent gets the model its role actually needs, so bounded wrapper work does not run at top-tier cost. See [Claude Agent Models](/guide/claude-agent-models), [Codex Agent Models](/guide/codex-agent-models), and [Cursor Agent Models](/guide/cursor-agent-models) for the per-agent tables and for how to override a pin.
 
 ## Escalation rules
 
@@ -60,5 +60,6 @@ For Claude Code harness builds, density auto-adjusts per model tier: Haiku → M
 
 ## See also
 
+- [Claude Agent Models](/guide/claude-agent-models) — per-agent pins in the Claude Code toolkit
 - [Adaptive Density](/guide/adaptive-density) — scaffolding by model capability
 - [Orchestrator agent](/reference/agents/orchestrator) — the routing agent

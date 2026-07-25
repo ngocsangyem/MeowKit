@@ -94,6 +94,7 @@ Check and update these pages if the release affects them:
 | `guide/workflow-phases.md`          | Phase behavior changes (new steps, hook changes) |
 | `guide/agent-skill-architecture.md` | New skills, agents, or Mermaid diagram changes   |
 | `guide/model-routing.md`            | Model tier or routing changes                    |
+| `guide/{claude,codex,cursor}-agent-models.md` | An agent's pinned model changes, or an agent is added/removed |
 | `reference/agents/*.md`             | Agent capability changes                         |
 | `reference/skills/*.md`             | Skill behavior or schema changes                 |
 
@@ -183,6 +184,12 @@ not cosmetic. Add the same `mk-<name>` to the right pack in each bundle's catalo
 
 **Model assignment when adding an agent:**
 
+- **Claude Code** — set `model:` in the agent's frontmatter by class: advisory → `fable`;
+  deep (planning, review, security, architecture, design, evidence synthesis) →
+  `claude-opus-5`; standard judgement → `sonnet`; bounded/wrapper work → `haiku`. An exact
+  model id must be registered as a named profile in
+  `packages/mewkit/src/migrate/model-taxonomy.ts`, or `mewkit validate --agents` rejects it
+  as not in the taxonomy. Per-agent table: `packages/docs/content/docs/guide/claude-agent-models.mdx`.
 - **Codex** — set `model_reasoning_effort` by the agent's *class*, matching what ships
   today: deep/advisory roles (planning, review, security, architecture, advisory) → `high`;
   everything else → `medium`. `xhigh` is NOT used — `high` is the deep-class ceiling until a
@@ -626,6 +633,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.14.7 | 2026-07-25 | Per-Agent Claude Model Routing                   |
 | v2.14.4 | 2026-07-19 | The Orientation & Transition Spine               |
 | v2.14.3 | 2026-07-19 | Jira & Confluence Agents on Haiku                |
 | v2.14.2 | 2026-07-18 | Composed Capability Recall                       |

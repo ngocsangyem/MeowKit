@@ -11,6 +11,32 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.14.7 (2026-07-25) — Per-Agent Claude Model Routing
+
+Ships as kit **2.14.7** and **`mewkit` CLI 2.2.3** (patch). Every Claude Code agent now declares the model its role actually needs instead of inheriting the session model or defaulting to the cheapest tier.
+
+### Highlights
+
+Each of the 40 bundled Claude Code agents is pinned to one of four tiers — advisory, deep, standard, or bounded — so planning, review, security, and design work runs on a deep-reasoning model while wrapper-driven integration work stays on a bounded one. This brings Claude Code in line with the Codex and Cursor bundles, which already pin a model per agent.
+
+### Improvements
+
+- Deep-reasoning agents (`planner`, `developer`, `architect`, `reviewer`, `security`, `evaluator`, `brainstormer`, `ui-ux-designer`, `jira-analyst`, `jira-evaluator`, `jira-estimator`, `confluence-spec-analyst`) now pin the exact `claude-opus-5` id rather than inheriting the session model or running on the cheapest tier.
+- Judgement-bearing agents (`orchestrator`, `tester`, `researcher`, `analyst`, `journal-writer`, and the Jira/Confluence agents that interpret partial failures or customer-facing boundaries) run on `sonnet`.
+- Procedural agents (`project-manager`, `documenter`, `shipper`, `git-manager`, `story-sizer`, and the bounded Jira/Confluence wrappers) stay on `haiku`.
+- `advisor` keeps `fable`, matching the advisory tier the Cursor bundle pins.
+- New guide: [Claude Agent Models](/guide/claude-agent-models) — the per-agent table, the accepted `model:` values, and how to change a pin.
+
+### CLI
+
+- The model taxonomy accepts `claude-opus-5` as a named profile, so `mewkit validate --agents` resolves an exact-id pin instead of rejecting it as unknown.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the new per-agent pins. `claude-opus-5` requires an account entitled to that model; if yours is not, change the affected agents to `sonnet` or `inherit`.
+
+---
+
 ## CLI 2.1.0 (2026-07-24) — Codex Cutover Complete
 
 Kit unchanged at **2.14.6**; this is a **`mewkit` CLI 2.1.0** release (minor). Completes the Codex-native migration: the toolkit's Codex bundle is now fully hand-authored, so the semantic porter and the generic Codex converter pipeline are retired.

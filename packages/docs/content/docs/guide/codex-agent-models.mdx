@@ -5,9 +5,10 @@ description: "Which Codex model and reasoning effort each agent in the Codex nat
 
 When you install the Codex target (`mewkit init --target codex`), every bundled agent
 ships with a **concrete Codex model and reasoning effort** pinned in its TOML. This mirrors
-how the Cursor bundle pins a model per agent (see
-[Cursor Agent Models](/guide/cursor-agent-models)) and differs from the Claude Code adapter,
-which picks a session model by task complexity (see [Model Routing](/guide/model-routing)).
+how the Cursor and Claude Code toolkits pin a model per agent (see
+[Cursor Agent Models](/guide/cursor-agent-models) and
+[Claude Agent Models](/guide/claude-agent-models)); session-level tier routing by task
+complexity is a separate layer (see [Model Routing](/guide/model-routing)).
 
 Codex lets a custom agent set `model` and `model_reasoning_effort` directly, and those
 override any inherited default — so the bundle assigns each agent the tier that fits its
