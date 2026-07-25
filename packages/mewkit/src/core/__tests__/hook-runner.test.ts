@@ -5,8 +5,9 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseHookCommands } from "../hook-runner.js";
+import { requireLiveHarness } from "./support/live-harness.js";
 
-const SETTINGS = JSON.parse(readFileSync(resolve(process.cwd(), ".claude/settings.json"), "utf8"));
+const SETTINGS = JSON.parse(readFileSync(resolve(requireLiveHarness(), "settings.json"), "utf8"));
 
 describe("parseHookCommands", () => {
 	it("returns gate-enforcement + privacy-block for a PreToolUse Write", () => {

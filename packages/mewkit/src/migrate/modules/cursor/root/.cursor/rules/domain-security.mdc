@@ -1,0 +1,28 @@
+---
+description: Security guidance — read before touching authentication, authorization, secrets, external-system integrations, or a destructive data operation such as a schema change or bulk delete.
+alwaysApply: false
+---
+
+<!-- Agent Requested: security guidance should surface specifically when a task actually
+touches a sensitive surface, not on every turn — the description above is the trigger.
+Auto Attached (globs) would require pre-guessing which file paths are "security-
+sensitive" across every project, which is unreliable; description-based matching lets
+the model reason about the task itself instead of the file path. -->
+
+# Security guidance
+
+Do not write any of the following without an explicit, recorded human decision to
+override it:
+
+- Hardcoded secrets (API keys, passwords, tokens) in source.
+- SQL built by string interpolation — use parameterized queries instead.
+- Disabled certificate/host validation, or an auth token stored somewhere a script on
+  the page can read it.
+- A destructive migration (cascade delete, irreversible schema change) without an
+  approved plan naming it explicitly.
+- A newly exposed endpoint or handler with no auth/authorization check, unless the task
+  explicitly documents it as intentionally public.
+
+When reviewing existing code that already has one of these patterns, flag it — do not
+silently rewrite it, and do not silently accept it either. This guidance is advisory;
+the actual enforcement boundary is hooks and sandbox permissions, not this text.

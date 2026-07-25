@@ -133,92 +133,126 @@ Check `packages/mewkit/portable-manifest.json` whenever a release moves source f
 - Do not copy `portable-manifest.json` into `.claude/`. It is an npm package artifact shipped with `packages/mewkit`, not part of the project kit that `npx mewkit init` scaffolds.
 - If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `tasks/`, `CLAUDE.md`, and `release-manifest.json`.
 
-#### 1e. Update the authored Codex bundle + Cursor export (when `.claude/` content changes)
+#### 1e. Author the Codex AND Cursor native bundles (when `.claude/` content changes)
 
-The Codex and Cursor migration targets are maintained very differently — know which
-one you are touching:
+**Both Codex and Cursor ship HAND-AUTHORED native bundles. There is no porter for
+either.** A new `.claude/` skill / agent / rule / command / hook does NOT reach them
+automatically. When a release adds or changes any of those, author the matching native
+file(s) **by hand in both bundles**, or the two targets silently drift from `.claude/`.
 
-- **Codex — HAND-AUTHORED bundle** at `packages/mewkit/src/migrate/modules/codex/`.
-  There is **no porter** (the `run-codex-port.ts` transform was removed in CLI 2.1.0
-  once every surface was authored). `mewkit migrate codex` / `init --target codex` copy
-  this bundle verbatim through the reconciler. When a release adds or changes any
-  **skill, agent, rule, command, or hook** in `.claude/`, author the matching
-  Codex-native file(s) **by hand** so the bundle stays consistent.
-- **Cursor — RUNTIME converter** (no bundle). `mewkit migrate cursor` converts `.claude/`
-  on the fly, so a new `.claude/` skill / agent / rule reaches Cursor **automatically**
-  with no manual step (see the Cursor note at the end of this section).
+> A legacy `.claude/`→`.cursor/` converter still exists behind `mewkit migrate cursor`, but
+> `init --target cursor` no longer uses it and its removal is gated on the cursor
+> cutover-gates record. **Never rely on it to carry new content.**
 
-**Codex bundle layout** (author under `root/`, then wire the two catalogs):
+**Bundle roots and their managed surfaces** (one manifest entry per top-level surface):
 
-| Path | What it is | When you touch it |
+| Provider | Module dir | Top-level surfaces |
 | --- | --- | --- |
-| `modules/codex/root/` | The Codex-native tree copied verbatim: `.codex/agents/*.toml`, `.agents/skills/<name>/SKILL.md`, `.codex/hooks.json` + `.codex/hooks/*`, `.codex/rules/`, `AGENTS.md`, `.codex/config.toml` | Author the new/changed file(s) here by hand |
-| `modules/codex/manifest.json` | One `active` entry per **top-level surface** (agents dir, skills dir, hooks.json, config.toml, AGENTS.md, rules, …) | Only when adding a NEW top-level surface — a new skill/agent does NOT need an entry (the dir is one entry) |
-| `modules/codex/catalog/skill-packs.json` | Pack membership for the 7 packs (`core` is `defaultPack`) | Add the new skill's name to the right pack's `skills[]`; keep `core` under `budgetChars` |
-| `modules/codex/compliance/*.json` | Evidence (surface matrix, version matrix, cutover gates) | Update if a surface's support/version claim changed |
+| Codex | `packages/mewkit/src/migrate/modules/codex/` | `AGENTS.md`, `.codex/config.toml`, `.codex/agents`, `.codex/rules/default.rules`, `.codex/hooks.json`, `.codex/hooks/*.cjs`, `.agents/skills` |
+| Cursor | `packages/mewkit/src/migrate/modules/cursor/` | `AGENTS.md`, `.meowkit/README.md`, `.cursor/agents`, `.cursor/rules`, `.cursor/skills`, `.cursor/hooks.json`, `.cursor/hooks` |
 
-**Always check the official Codex docs FIRST** — the formats change, so verify each
-surface against the source of truth before authoring:
+Author under `<module>/root/`; the tree is copied verbatim through the reconciler.
 
-- Subagents (agents): https://learn.chatgpt.com/docs/agent-configuration/subagents
-- Rules: https://learn.chatgpt.com/docs/agent-configuration/rules
-- Environment variables: https://learn.chatgpt.com/docs/config-file/environment-variables
-- AGENTS.md: https://learn.chatgpt.com/docs/agent-configuration/agents-md
-- Config (advanced): https://learn.chatgpt.com/docs/config-file/config-advanced
-- Config (basic): https://learn.chatgpt.com/docs/config-file/config-basic
-- Hooks: https://learn.chatgpt.com/docs/hooks
-- Skills: https://learn.chatgpt.com/docs/build-skills
+**The skills directories differ ON PURPOSE.** Codex installs `.agents/skills/`, Cursor
+installs `.cursor/skills/` — both are documented load paths for their own runtime. Do NOT
+"unify" them: when the two bundles shared `.agents/skills/`, the manifest's single
+directory-level entry made whichever provider installed second treat the whole tree as one
+conflicting directory and **silently skip every skill**. Separate trees also let each
+bundle keep its own provider-specific content (Cursor-only frontmatter fields, different
+TDD sentinel paths, different hook scripts).
 
-**Surface mapping (authoring reference — hand-write these shapes, per the docs above):**
+**Surface mapping — author these shapes by hand:**
 
-| `.claude/` surface | Codex shape (author by hand) | Notes |
+| `.claude/` surface | Codex native | Cursor native |
 | --- | --- | --- |
-| `agents/*.md` | `.codex/agents/<name>.toml` | `name` + `description` + `developer_instructions`. Set `model_reasoning_effort` to match the source agent's `model:` tier (opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` omits it). Codex auto-loads agents — NO `config.toml` `config_file` wiring |
-| `skills/<name>/` | `.agents/skills/<name>/SKILL.md` | Same `SKILL.md` (name + description frontmatter); copy references/scripts; then add the skill name to a pack in `catalog/skill-packs.json` |
-| `commands/**` | `.agents/skills/command-<name>/` | Codex has no command surface → author as a skill |
-| `rules/*`, `rules-conditional/*` | `.agents/skills/rule-<name>/` | Codex native `.rules` are Starlark command policies, NOT markdown guidance → guidance rules become skills (native `.codex/rules/` holds only prefix_rule() policies) |
-| `modes/*` | `.agents/skills/mode-<name>/` | guidance → skills |
-| `settings.json` hooks | `.codex/hooks.json` (+ `.codex/hooks/*`) | same JSON schema; resolve the project root via `$(git rev-parse --show-toplevel)` — Codex exposes no `CLAUDE_PROJECT_DIR` |
+| `skills/<name>/` | `.agents/skills/mk-<name>/SKILL.md` | `.cursor/skills/mk-<name>/SKILL.md` |
+| `agents/<name>.md` | `.codex/agents/<name>.toml` — `name`, `description`, `developer_instructions`, `model_reasoning_effort` | `.cursor/agents/<name>.md` — frontmatter is exactly `name`, `description`, `model`, `readonly`, `is_background` |
+| `commands/**` | author as a skill (Codex has no command surface) | author as a skill with `disable-model-invocation: true` (explicit `/mk-<name>` invocation only) |
+| `rules/*`, `rules-conditional/*` | guidance goes in `AGENTS.md` or a skill — native `.codex/rules/*.rules` are Starlark **command policies**, not markdown guidance | `.cursor/rules/<name>.mdc` — frontmatter is exactly `description`, `globs`, `alwaysApply`; every rule declares one activation class (`alwaysApply: true` is reserved for `runtime-invariants.mdc`) |
+| `modes/*` | author as a skill | author as a skill |
+| `settings.json` hooks | `.codex/hooks.json` + `.codex/hooks/*.cjs` | `.cursor/hooks.json` + `.cursor/hooks/*.cjs` |
+| memory | `.meowkit/memory/` (provider-neutral — never `.claude/memory/`) | `.meowkit/memory/` |
 
-Index files (`agents/AGENTS_INDEX.md` / `SKILLS_INDEX.md`, no `name:` frontmatter) are
-NOT agents; do not author agent TOMLs for them.
+Index files (`agents/AGENTS_INDEX.md`, `SKILLS_INDEX.md`) are NOT agents — do not author
+agent files for them.
 
-**Neutralize Claude-isms by hand** (there is no porter to do it): the authored bundle
-must carry zero product/Claude self-references — memory paths use `.meowkit/`, `CLAUDE.md`
-→ `AGENTS.md`, `CLAUDE_PROJECT_DIR` → `$(git rev-parse --show-toplevel)`,
-`CLAUDE_PLUGIN_ROOT/DATA` → Codex's `PLUGIN_ROOT/DATA`, product wording → "the toolkit" /
-"the harness", tool/invocation tokens in Codex-native form.
+**Skill naming contract (BOTH bundles, non-negotiable):** the skill directory MUST be
+`mk-<name>` **and** the `name:` in its `SKILL.md` MUST equal that directory name. Cursor
+documents this ("`name` must match the parent folder name"); a mismatch is a real defect,
+not cosmetic. Add the same `mk-<name>` to the right pack in each bundle's catalog.
+
+**Model assignment when adding an agent:**
+
+- **Codex** — set `model_reasoning_effort` by the agent's *class*, matching what ships
+  today: deep/advisory roles (planning, review, security, architecture, advisory) → `high`;
+  everything else → `medium`. `xhigh` is NOT used — `high` is the deep-class ceiling until a
+  shipped default model is confirmed codex-max-tier (see `compliance/minimum-version-matrix.json`).
+  Codex auto-loads agents; no `config.toml` wiring needed. Model **ids** are never hardcoded.
+- **Cursor** — set a concrete Cursor model id per the shipped tier mapping:
+  `claude-fable-5` (advisory), `claude-opus-5[effort=high]` (deep: planning/review/security),
+  `claude-sonnet-5` (standard), `composer-2.5[fast=true]` (mechanical + jira/confluence).
+  Valid values are `inherit` or `id[option=value]`; the suffix form (`-thinking-high`) is
+  NOT valid. The lint whitelists the approved ids — add there first if you introduce one.
+
+**Catalog wiring (a new skill/agent is invisible until it is in a pack):**
+
+| File | When |
+| --- | --- |
+| `modules/codex/catalog/skill-packs.json` | new skill → add `mk-<name>` to a pack; keep `core` under `budgetChars` |
+| `modules/cursor/catalog/skill-packs.json` | same, for the Cursor bundle |
+| `modules/cursor/catalog/agent-packs.json` | new agent → add to a pack (`core` = explorer, planner, reviewer) |
+| `modules/<provider>/manifest.json` | ONLY when adding a NEW top-level surface — a new skill/agent needs no entry (the directory is one entry) |
+| `modules/<provider>/compliance/*.json` | when a surface's support or version claim changed |
+
+**Always check the official docs FIRST** — these formats change:
+
+- Codex: [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents) · [rules](https://learn.chatgpt.com/docs/agent-configuration/rules) · [AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md) · [hooks](https://learn.chatgpt.com/docs/hooks) · [skills](https://learn.chatgpt.com/docs/build-skills) · [config](https://learn.chatgpt.com/docs/config-file/config-basic)
+- Cursor: [subagents](https://cursor.com/docs/agent/subagents) · [rules](https://cursor.com/docs/context/rules) · [skills](https://cursor.com/docs/context/skills) · [models](https://cursor.com/docs/models-and-pricing)
+
+**Neutralize host-isms by hand** (no porter does it): zero Claude/product self-references —
+`CLAUDE.md` → `AGENTS.md`, `CLAUDE_PROJECT_DIR` → `$(git rev-parse --show-toplevel)` (Codex)
+or the Cursor equivalent, `.claude/memory/` → `.meowkit/memory/`, Claude tool names and hook
+event names → the target's own vocabulary, product wording → "the toolkit" / "the harness".
+The Cursor denylist additionally bans `.codex/` paths, bare model-tier words outside the
+agent `model:` field, and `settings.json`.
 
 **Verify (Node 24, from the repo ROOT):**
 
 ```bash
 export PATH="/opt/homebrew/opt/node@24/bin:$PATH"   # tests need node:sqlite (Node 24)
 
-# dist parity: copy-codex-bundle stages the bundle into dist (also runs in `npm run build`)
-node packages/mewkit/scripts/copy-codex-bundle.cjs
+# stage both authored bundles into dist (also runs in `npm run build`)
+node packages/mewkit/scripts/copy-provider-bundles.cjs
 
-# Codex bundle structural + pack + parity gates:
-npx vitest run $(grep -rl codex packages/mewkit/src --include='*.test.ts')
+# both providers' structural + pack + parity + lint gates
+npx vitest run $(grep -rl "cursor\|codex" packages/mewkit/src --include='*.test.ts')
 
-# Pack-catalog coherence (every catalog skill resolves, budget respected):
+# pack-catalog coherence (every catalog skill resolves, budget respected)
 npx mewkit validate --packs
 ```
 
-The brand-prose lint runs in CI in **diff-mode (blocking)** — any authored file you change
-must be brand-clean. There is no longer a `grep -rli claude` porter-output gate; the
-`codex-output-brand-free` test covers brand-freedom of the authored surface.
+Brand-prose lint runs in CI in **diff-mode (blocking)** — any authored file you touch must be
+brand-clean. `codex-output-brand-free` / `cursor-output-brand-free` cover brand-freedom of
+the authored surfaces.
 
-**Cursor (runtime converter — usually no work):** `mewkit migrate cursor` converts `.claude/`
-at runtime — `agents/*.md` → `.cursor/rules/*.mdc` (fm-to-fm), `rules` + config → `.mdc`
-(md-to-mdc), `skills/` direct-copied; Cursor has **no command or hook surface**. A new
-`.claude/` skill / agent / rule is exported to Cursor automatically. Only touch the
-converters (`src/migrate/converters/{fm-to-fm,md-to-mdc,direct-copy}.ts`) if a NEW source
-shape needs a conversion rule.
+**End-to-end smoke — a multi-provider install must not drop content:**
+
+```bash
+S=$(mktemp -d) && cd "$S"
+node <repo>/packages/mewkit/dist/index.js init --target codex
+node <repo>/packages/mewkit/dist/index.js init --target cursor
+ls .agents/skills | wc -l   # codex skills
+ls .cursor/skills | wc -l   # cursor skills — BOTH must be the full catalog count
+```
+
+Run it in **both orders**. An omitted `--skill-packs` installs the full catalog for both
+providers; `--skill-packs core` narrows it. A second run must report `0 written`.
 
 > **MCP servers → Codex:** `mewkit migrate codex --include-mcp` still merges a project's
 > `.mcp.json` into `.codex/config.toml [mcp_servers]` (opt-in). This is the only codex
 > converter kept after the cutover — it converts the user's own config, not toolkit content.
-
+> Cursor MCP is opt-in via `modules/cursor/catalog/mcp-profiles.json` and never written by a
+> fresh install on its own.
 #### 1f. Update when the derived index or wiki schema changes
 
 `mewkit`'s SQLite index (`.claude/memory/wiki-index.db`) is DERIVED and disposable — canonical data lives in the append logs (`.claude/memory/*.jsonl`) and the wiki tree (`tasks/wikis/<slug>/`). The DB is rebuilt by `mewkit index` (whole index) and `mewkit wiki reindex` (wiki tables); delete → reindex → identical. A schema change therefore needs code + test + doc updates, but NOT a user-data migration.
@@ -531,7 +565,8 @@ Copy this checklist for each release:
 
 - [ ] `prepare-release-assets.cjs` ran successfully
 - [ ] `dist/meowkit-release.zip` exists with expected size
-- [ ] Codex bundle hand-authored when `.claude/` changed (step 1e): new/changed surfaces authored under `modules/codex/root/`; new skill added to a pack in `catalog/skill-packs.json`; codex suite + `mewkit validate --packs` green; `copy-codex-bundle.cjs` staged to dist. (Cursor export is automatic — no manual step.)
+- [ ] **BOTH** native bundles hand-authored when `.claude/` changed (step 1e): new/changed surfaces authored under `modules/codex/root/` **and** `modules/cursor/root/`; new skill added as `mk-<name>` (dir name == `SKILL.md` name) to a pack in each bundle's `catalog/skill-packs.json`; new agent added to `modules/cursor/catalog/agent-packs.json` with its model set per provider; codex + cursor suites and `mewkit validate --packs` green; `copy-provider-bundles.cjs` staged to dist
+- [ ] Multi-provider install smoke (step 1e): `init --target codex` then `init --target cursor` in one scratch project — **both** `.agents/skills` and `.cursor/skills` hold the full catalog, in either install order; re-run reports `0 written`
 - [ ] Committed and tagged
 - [ ] Pushed to GitHub (commits + tag)
 - [ ] GitHub Release created with zip asset
@@ -584,7 +619,7 @@ For CLI changes inside `packages/mewkit/src/`:
 | `scripts/sync-package-versions.cjs`     | Sync version across both npm packages                                           |
 | `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files                                |
 | `scripts/prepare-release-assets.cjs`    | Build the release manifest + dist/meowkit-release.zip                            |
-| `packages/mewkit/scripts/copy-codex-bundle.cjs` | Stage the authored Codex bundle (`modules/codex/`) into `dist/` — runs in `npm run build`; see step 1e |
+| `packages/mewkit/scripts/copy-provider-bundles.cjs` | Stage the authored provider bundles (`modules/codex/`, `modules/cursor/`) into `dist/` — runs in `npm run build`; see step 1e |
 | `scripts/release.sh`                    | Automated release: bump → build → assets → commit → tag → push → GitHub Release |
 
 ## Release History
@@ -707,8 +742,14 @@ gh release upload v<version> dist/meowkit-release.zip --clobber
 
 No `feat:` or `fix:` commits since last release. Add a commit with the right prefix, or use `--force` on the workflow dispatch.
 
-### `mewkit migrate codex` is missing a skill/agent/rule after editing `.claude/`
+### A Codex or Cursor install is missing a skill/agent/rule after editing `.claude/`
 
-**Cause:** the authored Codex bundle (`packages/mewkit/src/migrate/modules/codex/`) is hand-maintained — a new `.claude/` surface does not appear in the bundle until it is authored there. (There is no porter; `run-codex-port.ts` was removed in CLI 2.1.0.)
+**Cause:** both authored bundles (`modules/codex/`, `modules/cursor/`) are hand-maintained — a new `.claude/` surface does not appear in either until it is authored there. There is no porter for either provider (`run-codex-port.ts` was removed in CLI 2.1.0).
 
-**Fix:** author the Codex-native file(s) under `modules/codex/root/`, add a new skill to a pack in `catalog/skill-packs.json`, then re-run the codex suite + `mewkit validate --packs` — see step 1e. Cursor export is automatic and needs no such step.
+**Fix:** author the native file(s) under `modules/codex/root/` **and** `modules/cursor/root/`, add the skill as `mk-<name>` to a pack in each bundle's `catalog/skill-packs.json` (agents also go in `modules/cursor/catalog/agent-packs.json`), then re-run both suites + `mewkit validate --packs` — see step 1e.
+
+### Cursor installed no skills at all in a multi-provider project
+
+**Cause:** the manifest tracks each skills tree as ONE directory-level entry. If both bundles are pointed at the same directory, whichever provider installs second sees the tree as a single conflicting directory and skips every skill (`existing file(s) differ from the bundle and were left untouched`).
+
+**Fix:** keep the trees separate — Codex owns `.agents/skills/`, Cursor owns `.cursor/skills/`. Both are documented load paths for their runtime; do not "unify" them. Re-run the multi-provider smoke in step 1e, in both install orders.

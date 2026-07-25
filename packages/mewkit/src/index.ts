@@ -117,6 +117,12 @@ ${pc.bold("Init flags (a bare fresh 'init' shows a Claude Code / Codex / Cursor 
                              bundle (codex-only, no .claude/); 'cursor' unpacks .claude/ then exports
   --migrate                  Skip the picker; after unpack, prompt for export targets (interactive)
   --migrate-global           Use global install paths (~/.cursor/, etc.) instead of project-local
+  --mcp-profiles <names>     Cursor only: comma-separated MCP profile name(s) or 'all' to merge into
+                             .cursor/mcp.json (default: none — fresh install ships ZERO MCP config;
+                             omitted flag prompts interactively, still defaulting to none selected)
+  --allow-cloud-mcp          Cursor only: second explicit opt-in required to apply an MCP profile to
+                             a project with a git remote (may run as a Cursor Cloud Agent, where
+                             beforeMCPExecution has no local enforcement equivalent)
 
 ${pc.bold("visual-plan flags:")}
   --port <number>            Bind to fixed port (default: random)
@@ -190,6 +196,7 @@ async function main(): Promise<void> {
 			"open",
 			"no-open",
 			"no-color",
+			"allow-cloud-mcp",
 			"verbose",
 			"workflow",
 			"gates",
@@ -234,6 +241,7 @@ async function main(): Promise<void> {
 			"log",
 			"profile",
 			"skill-packs",
+			"mcp-profiles",
 			"fail-over",
 			"friction",
 			"id",
@@ -275,6 +283,8 @@ async function main(): Promise<void> {
 				migrateGlobal: args["migrate-global"] as boolean | undefined,
 				profile: args.profile as string | undefined,
 				skillPacks: args["skill-packs"] as string | undefined,
+				mcpProfiles: args["mcp-profiles"] as string | undefined,
+				allowCloudMcp: args["allow-cloud-mcp"] as boolean | undefined,
 			});
 			break;
 		case "upgrade":

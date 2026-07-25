@@ -9,10 +9,12 @@ describe("provider support summary", () => {
 	it("summarizes the effective provider registry after contract filtering", () => {
 		const matrix = collectProviderSupportMatrix();
 
+		// claude-code is the only verified native harness; codex and the legacy cursor
+		// converter are honestly "experimental" (cursor's native bundle is not yet installed).
 		expect(matrix.counts).toEqual({
 			total: 3,
-			verified: 2,
-			experimental: 1,
+			verified: 1,
+			experimental: 2,
 			deprecated: 0,
 			enabledSurfaces: 11,
 		});

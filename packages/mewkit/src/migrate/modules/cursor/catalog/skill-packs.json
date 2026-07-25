@@ -1,0 +1,191 @@
+{
+	"_description": "Cursor bundle skill-pack catalog. Each shipped skill maps to exactly one pack. `core` installs by default; other packs are explicit (--packs) or --all. Budget: default-install (core skills + the 3 core agents) name+description <= budgetChars. Extended packs are intentionally empty for now (Phase 3 ships core only); a later phase adds development/review/product/operations/integrations/media skills adapted from the codex bundle.",
+	"verified": "2026-07-25",
+	"budgetChars": 8000,
+	"defaultPack": "core",
+	"packs": {
+		"core": {
+			"description": "Always-on lifecycle kernel: orient, plan, implement, test, verify, review, ship, and session/orchestration helpers installed by default.",
+			"dependsOn": [],
+			"skills": [
+				"mk-agent-detector",
+				"mk-brainstorming",
+				"mk-cook",
+				"mk-development",
+				"mk-docs-init",
+				"mk-document-release",
+				"mk-fix",
+				"mk-help",
+				"mk-investigate",
+				"mk-lint-and-validate",
+				"mk-memory",
+				"mk-plan-creator",
+				"mk-project-context",
+				"mk-project-organization",
+				"mk-research",
+				"mk-review",
+				"mk-scout",
+				"mk-sequential-thinking",
+				"mk-ship",
+				"mk-simplify",
+				"mk-testing",
+				"mk-validate-plan",
+				"mk-verify",
+				"mk-workflow-orchestrator"
+			]
+		},
+		"development": {
+			"description": "Coding-domain helpers (languages, frameworks, architecture, merge conflicts, skill authoring) layered on top of the core lifecycle.",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-angular",
+				"mk-api-design",
+				"mk-autobuild",
+				"mk-bootstrap",
+				"mk-build-fix",
+				"mk-chom",
+				"mk-clean-code",
+				"mk-database",
+				"mk-improve-codebase-architecture",
+				"mk-planning-engine",
+				"mk-react-patterns",
+				"mk-resolving-merge-conflicts",
+				"mk-skill-creator",
+				"mk-skill-template-secure",
+				"mk-sprint-contract",
+				"mk-typescript",
+				"mk-vue",
+				"mk-vue-best-practices",
+				"mk-vue-testing-best-practices"
+			]
+		},
+		"review": {
+			"description": "Quality, security, and evaluation skills (audits, rubrics, coverage, PR review) beyond the core review step.",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-benchmark",
+				"mk-context-audit",
+				"mk-context-engineering",
+				"mk-cso",
+				"mk-evaluate",
+				"mk-nyquist",
+				"mk-qa",
+				"mk-qa-manual",
+				"mk-respond-pr",
+				"mk-review-pr",
+				"mk-rubric",
+				"mk-trace-analyze",
+				"mk-vulnerability-scanner"
+			]
+		},
+		"product": {
+			"description": "Product/planning/PM skills: ticket intake, estimation, retros, plan critique, and decision interviews.",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-advise",
+				"mk-ask-me",
+				"mk-decision-framework",
+				"mk-elicit",
+				"mk-ghpm",
+				"mk-grill",
+				"mk-intake",
+				"mk-office-hours",
+				"mk-plan-ceo-review",
+				"mk-problem-solving",
+				"mk-retro",
+				"mk-story-sizer",
+				"mk-visual-plan"
+			]
+		},
+		"operations": {
+			"description": "Ops, docs-site, wiki, session-scoped guardrails, parallel-agent, and browser-automation helpers.",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-agent-browser",
+				"mk-careful",
+				"mk-chrome-profile",
+				"mk-docs-finder",
+				"mk-freeze",
+				"mk-lazy-agent-loader",
+				"mk-llms",
+				"mk-loop",
+				"mk-markdown-reader",
+				"mk-orchestrate",
+				"mk-pack",
+				"mk-party",
+				"mk-playwright-cli",
+				"mk-prompt-enhancer",
+				"mk-scale-routing",
+				"mk-session-continuation",
+				"mk-task-queue",
+				"mk-team-config",
+				"mk-web-to-markdown",
+				"mk-wiki",
+				"mk-wiki-render",
+				"mk-wiki-research",
+				"mk-worktree"
+			]
+		},
+		"media": {
+			"description": "Media, visual, and UI-generation skills: diagrams, video, multimodal, design systems, previews.",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-frontend-design",
+				"mk-html-video",
+				"mk-mermaidjs-v11",
+				"mk-multimodal",
+				"mk-preview",
+				"mk-showcase",
+				"mk-tech-graph",
+				"mk-ui-design-system"
+			]
+		},
+		"integrations": {
+			"description": "External-service integrations: Jira, Confluence, Figma, Stitch, and agent-surface conversion (henshin).",
+			"dependsOn": [
+				"core"
+			],
+			"skills": [
+				"mk-confluence",
+				"mk-confluence-bulk",
+				"mk-confluence-collaborate",
+				"mk-confluence-page",
+				"mk-confluence-search",
+				"mk-confluence-spec-analyst",
+				"mk-figma",
+				"mk-henshin",
+				"mk-jira",
+				"mk-jira-admin",
+				"mk-jira-agile",
+				"mk-jira-analyst",
+				"mk-jira-bulk",
+				"mk-jira-collaborate",
+				"mk-jira-dev",
+				"mk-jira-estimator",
+				"mk-jira-evaluator",
+				"mk-jira-fields",
+				"mk-jira-issue",
+				"mk-jira-jsm",
+				"mk-jira-lifecycle",
+				"mk-jira-ops",
+				"mk-jira-relationships",
+				"mk-jira-search",
+				"mk-jira-time",
+				"mk-stitch"
+			]
+		}
+	},
+	"budgetReport": {
+		"core": 4534
+	}
+}

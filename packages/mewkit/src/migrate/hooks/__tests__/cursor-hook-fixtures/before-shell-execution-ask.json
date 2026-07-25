@@ -1,0 +1,6 @@
+{
+	"hook_event_name": "beforeShellExecution",
+	"conversation_id": "conv-abc123",
+	"command": "sudo systemctl restart nginx",
+	"cwd": "/Users/example/project"
+}

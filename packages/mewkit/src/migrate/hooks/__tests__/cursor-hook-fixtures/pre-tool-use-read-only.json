@@ -1,0 +1,8 @@
+{
+	"hook_event_name": "preToolUse",
+	"conversation_id": "conv-abc123",
+	"tool_name": "search_files",
+	"tool_input": { "query": "TODO" },
+	"tool_use_id": "call-3",
+	"cwd": "/Users/example/project"
+}

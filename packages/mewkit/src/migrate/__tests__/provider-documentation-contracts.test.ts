@@ -38,6 +38,10 @@ describe("provider documentation contracts", () => {
 	it("exposes capability-level documentation contracts beyond surface allowlists", () => {
 		expect(getProviderCapabilityContract("codex", "commands").status).toBe("documented");
 		expect(getProviderCapabilityContract("codex", "rules").status).toBe("documented");
-		expect(getProviderCapabilityContract("cursor", "agents").status).toBe("partial");
+		// Cursor natively supports custom agents (.cursor/agents/*.md), verified against
+		// official docs 2026-07-24 — a documented platform capability. (The legacy migrate
+		// converter still only projects delegation into rules, tracked as the `agent`
+		// surface = partial above; capability ≠ converter surface.)
+		expect(getProviderCapabilityContract("cursor", "agents").status).toBe("documented");
 	});
 });

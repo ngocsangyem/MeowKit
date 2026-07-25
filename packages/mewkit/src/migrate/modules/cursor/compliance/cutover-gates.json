@@ -1,0 +1,98 @@
+{
+	"_description": "Cursor cutover-gate evidence record (plan phase 7). Mirrors the codex gate set adapted to cursor. Deletion of the legacy .claude->.cursor converter path is gated on this record reaching a GREEN verdict with ZERO SKIP-dispositioned gates (plan hard constraint: unlike codex gate 6, no cursor gate may pass via SKIP). Offline-verifiable gates are PASS with a cited cursor test. Gates that require a live Cursor IDE/CLI on the validation machine are PENDING until the user runs the live smoke matrix and records evidence here — they are NOT SKIP-passed. The verdict therefore stays BLOCKED and the converter is NOT retired until every PENDING gate is closed.",
+	"verified": "2026-07-25",
+	"environment": {
+		"node": "24.16.0",
+		"cursorIdeInstalled": "3.13.10 (Cursor.app; semver — above the 3.11 operational floor)",
+		"cursorCliInstalled": "cursor-agent 2026.07.23 (calendar versioning — a DIFFERENT scheme from the IDE; gated independently)",
+		"account": "basic tier (validation V3) — cloud-agent / Max Mode / team-marketplace rows stay compatibility-gated, never falsely verified",
+		"invocation": "vitest run from meowkit/packages/mewkit (Node 24)"
+	},
+	"baseline": {
+		"cursorSuite": "~295 cursor-named tests GREEN across 13 files (lint, pack-cleanliness, authored-bundle, reconcile-apply, packaged-parity, target, init-target, upgrade-toolkit, mcp-profiles, safety-hooks, hook-version-support, doctor-cursor, provider-invocation)",
+		"skills": "126 skills across 7 packs (core default; development/review/product/operations/integrations/media opt-in); 0 denied-token hits",
+		"preExistingUnrelatedFailures": [
+			"NONE — corrected 2026-07-25. The previously recorded '20 tests across 8 files fail on the branch base' (doctor-hard-gates, capability, check-packs, context-budget, hook-runner, pack-resolver, priority-skill-profiles, resolve-capabilities) was a wrong-cwd measurement, not a real defect: these 'live harness' suites read the source bundle at process.cwd()/.claude, which is populated only at the meowkit repo root (the canonical `npm test`/CI cwd) and empty in a package subdir. Run correctly they pass 75/75. A shared cwd guard (packages/mewkit/src/core/__tests__/support/live-harness.ts) now fails a wrong-cwd run with an actionable 'run from the meowkit repo root' message instead of a cryptic ENOENT."
+		]
+	},
+	"gates": [
+		{
+			"id": 1,
+			"requirement": "No Cursor semantic output depends on .claude / .codex (authored bundle is self-contained)",
+			"status": "PASS",
+			"evidence": "cursor-bundle-lint + cursor-pack-cleanliness enforce a cursor-scoped denylist (.claude/, .codex/, Claude tool names, model tiers, CLAUDE_*, Task* tool-call forms, Claude hook event names, settings.json, anthropic email) across AGENTS.md + .cursor/** + all 126 .cursor/skills/**; green. Independent grep confirms zero .codex/ or .claude/ residue. Note (2026-07-25): the model-tier denylist exempts `claude-<tier>` Cursor model IDs in the agent `model:` frontmatter field only (agents now pin concrete Cursor models by user decision); bare tier words in prose/body remain banned."
+		},
+		{
+			"id": 2,
+			"requirement": "100% installed skills parse + pass native tool-vocabulary checks (zero denied-token hits) for every installable pack combination",
+			"status": "PASS",
+			"evidence": "cursor-pack-cleanliness.test.ts walks every pack (core + 6 extended) via resolvePackSelection; 126/126 skills, name==dir, mk- prefix, per-description budget, 0 denied tokens. cursor-authored-bundle.test.ts covers pack-expansion + dependsOn resolution."
+		},
+		{
+			"id": 3,
+			"requirement": "init/upgrade converge through the reconciler; second run zero drift; crash-interrupted install self-heals",
+			"status": "PASS",
+			"evidence": "cursor-reconcile-apply.test.ts (atomic temp+rename staging + per-entry ledger flush; crash-recovery re-run cases), init-target-cursor.test.ts (idempotent re-run no-op), cursor-authored-bundle.test.ts (second run writes:0). Project-local ledger .meowkit/state/cursor-ledger.json."
+		},
+		{
+			"id": 4,
+			"requirement": "Dry-run accurate; user edits preserved or explicit conflict (never silent overwrite)",
+			"status": "PASS",
+			"evidence": "init-target-cursor.test.ts (--dry-run writes nothing; existing user AGENTS.md preserved as conflict, not clobbered); cursor-reconcile-apply.test.ts conflict path."
+		},
+		{
+			"id": 5,
+			"requirement": "Legacy-vs-authored disambiguation; mixed .claude/+authored .cursor/ project upgrade never re-runs the legacy exporter (no-clobber)",
+			"status": "PASS",
+			"evidence": "upgrade-cursor-toolkit.test.ts mixed-project case: ledger-presence gate (not .cursor/ dir presence) prevents runMigrate({tool:'cursor',force:true}) over authored files; TARGET_PROFILES.cursor.detect keys on the ledger file."
+		},
+		{
+			"id": 6,
+			"requirement": "Picker and --target cursor produce identical authored installs (no divergence)",
+			"status": "PASS",
+			"evidence": "init-provider-multiselect.test.ts byte-identical parity test between the interactive picker path and --target cursor."
+		},
+		{
+			"id": 7,
+			"requirement": "Packed bundle contains every catalog/skill/rule/agent/hook/compliance artifact (dist parity green)",
+			"status": "PASS",
+			"evidence": "cursor-packaged-bundle-parity.test.ts: every manifest-listed source path exists byte-identical in the packaged copy; copy-provider-bundles.cjs ships both codex and cursor trees; __pycache__/.pyc excluded."
+		},
+		{
+			"id": 8,
+			"requirement": "Security hooks fail closed on crash/timeout/malformed/unknown-critical schema; kill-switch behavior; forged-ledger detection by doctor",
+			"status": "PASS",
+			"evidence": "cursor-safety-hooks.test.ts (allow/deny/malformed/exit-2/fail-open-noncritical/fail-closed-critical + kill-switch + .meowkit/state protected from tool-driven writes + PII/secret scrub); doctor-cursor.test.ts re-verifies security-critical entries against SHIPPED-BUNDLE checksums (not the forgeable ledger) and warns when the kill-switch is active. NOTE: this is the OFFLINE fixture-and-checksum proof; the LIVE per-event blocking/allowing semantics against a real Cursor binary is gate 12 (PENDING)."
+		},
+		{
+			"id": 9,
+			"requirement": "MCP is opt-in only (zero default authority); cloud enforcement gap is a control; secret-safe",
+			"status": "PASS",
+			"evidence": "cursor-mcp-profiles.test.ts: deny-by-default (fresh install writes no .cursor/mcp.json), user-keys-win merge with conflict report, secret-emission guard (${env:} only), missing-env diagnostic, --allow-cloud-mcp gate + doctor hard-FAIL on owned MCP in a cloud-exposed project. NOTE: manual smoke against a real stdio MCP server is part of gate 12 (PENDING)."
+		},
+		{
+			"id": 10,
+			"requirement": "Per-environment support reporting (never a single 'verified' flag); undocumented behaviors labeled, not inferred",
+			"status": "PASS",
+			"evidence": "native-surface-matrix.json + runtime-environment-matrix.json carry per-environment rows (ide-local/cli-headless/cloud/tab), doc-URL-backed; undocumented cells render as warn via doctor-cursor-environment; minimum-version-matrix.json tracks IDE-semver and CLI-calendar independently."
+		},
+		{
+			"id": 11,
+			"requirement": "Live IDE + CLI discovery smoke: agents listed, /mk-* skills discovered, rules attach per activation mode, on both floor-3.11 and current stable",
+			"status": "PENDING",
+			"evidence": "INSTALL HALF CLI-PROVEN (2026-07-25): `node dist/index.js init --target cursor` into a clean scratch project wrote 7 managed surfaces and landed 40 agents (.cursor/agents), 126 skills (.cursor/skills), 4 rules (.cursor/rules), hooks.json (15 events), AGENTS.md; re-run = 0 written (idempotent); no .claude/ created (native, not the legacy converter); ledger at .meowkit/state/cursor-ledger.json. LIVE-LOAD HALF still REQUIRES a live Cursor IDE + CLI (user-owned): open the scratch project in Cursor 3.13.10 and confirm the agents appear in the picker, /mk-* skills are discovered from .cursor/skills/, and each rule attaches per its activation class; run `cursor-agent -p` to confirm CLI discovery (closes the forum-only user-level ~/.agents/skills/ question). Smoke-kit command + checklist in plans/reports/handoff-260725-cursor-native-bundle.md. Record live pass/fail before retirement."
+		},
+		{
+			"id": 12,
+			"requirement": "Full release smoke matrix executed (not skipped) on floor-3.11 + current stable Cursor: installer, ownership, agents (auto+explicit routing hit-rate), models, skills, rules, hooks (live per-event semantics + kill-switch), memory, local/CLI, cloud, security, drift",
+			"status": "PENDING",
+			"evidence": "REQUIRES live Cursor binaries (user-owned). The scripted routing test set (plan phase 3 success criterion) must run against live Cursor and meet the agreed auto-routing hit-rate + 100% explicit invocation; live hook gates must block/allow as designed; basic-tier-untestable rows (cloud agents / Max Mode / team marketplace) stay 'not claimed', never falsely verified. Record evidence here per matrix row."
+		}
+	],
+	"verdict": "BLOCKED — 10/12 gates PASS (offline). Gates 11 and 12 are PENDING live-Cursor evidence on the validation machine and MUST NOT be SKIP-passed (plan hard constraint). The legacy .claude->.cursor converter path is NOT retired until both PENDING gates are closed GREEN with recorded evidence.",
+	"remainingUserOwnedWork": [
+		"Run the live discovery smoke (gate 11) — steps in plan phase-02 'Discovery-smoke handoff'.",
+		"Run the full release smoke matrix + scripted routing set (gate 12) on Cursor 3.13.10 IDE + cursor-agent CLI; record per-row evidence.",
+		"Once both are GREEN, flip the small mechanical retirement changes (init.ts legacy cursor dispatch, upgrade.ts legacy re-export list, providers/cursor/config.ts demotion note) and re-run the mixed-project no-clobber suite (gate 5) to confirm legacy projects still upgrade via adoption, not deletion."
+	]
+}

@@ -1,0 +1,23 @@
+<!-- block: phase-timeline (sentinel .vp-phase-timeline). Core block.
+     Binds to: ## Phases list + each phase frontmatter (status/priority/dependencies/effort) + ## Overview.
+     Fill one .vp-phase-card per phase, in plan order. Tokens/classes only — no hex. -->
+<section class="vp-section">
+  <h2>Phases</h2>
+  <div class="vp-phase-timeline">
+
+    <article class="wf-card vp-phase-card">
+      <span class="vp-phase-no">Phase {N}</span>
+      <h3>{PHASE_TITLE}</h3>
+      <div class="vp-phase-tags">
+        <span class="wf-pill accent">{STATUS}</span>
+        <span class="wf-pill">priority {PRIORITY}</span>
+        <span class="wf-pill">{EFFORT}</span>
+        <span class="wf-pill">deps: {DEPENDENCIES}</span>
+      </div>
+      <p class="wf-muted">{ONE_LINE_OBJECTIVE_FROM_OVERVIEW}</p>
+    </article>
+
+    <!-- repeat .vp-phase-card for each remaining phase -->
+
+  </div>
+</section>

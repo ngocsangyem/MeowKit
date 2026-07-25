@@ -1,0 +1,117 @@
+---
+title: "Cursor Agent Models"
+description: "Which Cursor model each agent in the Cursor native bundle is pinned to, why, and how to change it."
+---
+
+When you install the Cursor target (`mewkit init --target cursor`), every bundled
+agent ships with a **concrete Cursor model** pinned in its frontmatter — not a
+provider-neutral tier. This is different from the Claude Code adapter (which picks
+a session model by task complexity — see [Model Routing](/docs/guide/model-routing))
+and from Codex (which writes a portable reasoning-effort ladder). See
+[Model Routing](/guide/model-routing) for the Claude Code and Codex adapters.
+Cursor exposes a real model picker per agent, so the bundle assigns each agent the
+model that fits its role.
+
+## How the mapping works
+
+Each agent file at `.cursor/agents/<name>.md` carries a `model:` field. Agents are
+grouped into four tiers by what they do:
+
+| Tier | Model | Why |
+|---|---|---|
+| Advisory | `claude-fable-5` | Open-ended reasoning and reframing — the strongest model earns its cost here. |
+| Deep | `claude-opus-5[effort=high]` | Planning, review, and security need maximum reasoning with high effort. |
+| Standard | `claude-sonnet-5` | Everyday build, research, and documentation work. |
+| Mechanical + integration | `composer-2.5[fast=true]` | Fast, high-volume, low-ambiguity work — Cursor's fast model is enough. |
+
+## Per-agent assignments
+
+<Callout type="info">
+  The bundle installs a small **core** pack by default (`explorer`, `planner`,
+  `reviewer`); the other agents ship in opt-in packs. The model each agent uses is
+  the same whether it is in the default install or an opt-in pack.
+</Callout>
+
+### `claude-fable-5` — advisory
+
+- `advisor`
+- `brainstormer`
+
+### `claude-opus-5[effort=high]` — deep reasoning
+
+- `architect`
+- `evaluator`
+- `planner`
+- `reviewer`
+- `security`
+
+### `claude-sonnet-5` — standard
+
+- `analyst`
+- `developer`
+- `documenter`
+- `journal-writer`
+- `project-manager`
+- `researcher`
+- `story-sizer`
+- `ui-ux-designer`
+
+### `composer-2.5[fast=true]` — mechanical and integration
+
+Mechanical roles:
+
+- `explorer`
+- `git-manager`
+- `tester`
+- `shipper`
+
+Jira and Confluence integration agents (fast is enough — these are high-volume,
+tool-driven roles):
+
+- `jira-admin`, `jira-agile`, `jira-analyst`, `jira-bulk`, `jira-collaborate`,
+  `jira-dev`, `jira-estimator`, `jira-evaluator`, `jira-fields`, `jira-issue`,
+  `jira-jsm`, `jira-lifecycle`, `jira-ops`, `jira-relationships`, `jira-search`,
+  `jira-time`
+- `confluence-bulk`, `confluence-collaborate`, `confluence-page`,
+  `confluence-search`, `confluence-spec-analyst`
+
+## Model-id format
+
+Cursor accepts either `inherit` (use the parent/session model) or a model id with
+optional bracketed options:
+
+```text
+claude-opus-5[effort=high]        # reasoning effort
+composer-2.5[fast=true]           # fast variant
+claude-opus-5[effort=high,context=300k]   # combine options
+claude-sonnet-5                   # base id, no options
+```
+
+Options are `id=value` pairs separated by commas, and which options apply depends
+on the model. See the official [Cursor models](https://cursor.com/docs/models-and-pricing)
+and [subagents](https://cursor.com/docs/agent/subagents) docs for the current list.
+
+## Account-tier caveat
+
+Some pinned models (`claude-opus-5`, `claude-fable-5`) require a paid Cursor plan.
+On a **basic-tier** account those agents may be unavailable and Cursor will error
+or fall back. If you are on basic tier, change the affected agents to a model your
+account can run (for example `composer-2.5` or `claude-sonnet-5`), or set them to
+`inherit`.
+
+## Changing an agent's model
+
+Edit the `model:` field in the agent file:
+
+```md title=".cursor/agents/planner.md"
+---
+name: planner
+description: ...
+model: claude-opus-5[effort=high]   # change to any valid Cursor model id, or `inherit`
+readonly: true
+is_background: false
+---
+```
+
+Use any id from the Cursor models list. `inherit` makes the agent follow whatever
+model the session is using.

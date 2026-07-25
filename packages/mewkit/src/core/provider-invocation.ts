@@ -96,10 +96,47 @@ const CODEX_INVOCATION: InvocationShapeMap = {
 	none: { operation: "(not directly invocable)", support: "unsupported", note: "describe-only / hook capability" },
 };
 
+// Cursor exposes typed native primitives (verified against Cursor docs 2026-07-24):
+// custom agents (.cursor/agents/*.md, /agent-name or description-routed), Agent Skills
+// (.agents/skills/), and lifecycle hooks (.cursor/hooks.json) — closer to Claude Code than
+// to Codex's prompt-projection. So skill/agent/hook are `supported`. Commands are advisory:
+// the legacy .cursor/commands/ surface is not targeted — commands map onto skills with
+// `disable-model-invocation`. As with every provider, these operation strings are
+// DESCRIPTIVE (what the host does), never runnable commands.
+const CURSOR_INVOCATION: InvocationShapeMap = {
+	"invoke-skill": {
+		operation: "Agent Skill (from .agents/skills/)",
+		support: "supported",
+		note: "native skill invocation; `disable-model-invocation` makes a skill explicit-invoke only",
+	},
+	"invoke-agent": {
+		operation: "custom agent (/agent-name or description-routed)",
+		support: "supported",
+		note: "native .cursor/agents/*.md; `is_background` for non-blocking roles; a child agent cannot re-spawn",
+	},
+	"invoke-command": {
+		operation: "skill with `disable-model-invocation` (legacy .cursor/commands not targeted)",
+		support: "advisory",
+		note: "no separate command primitive installed — commands project onto explicit-invoke skills",
+	},
+	"invoke-workflow": {
+		operation: "entry skill/agent composition",
+		support: "advisory",
+		note: "no distinct workflow primitive — runs as its entry skill/agent",
+	},
+	"lifecycle-hook": {
+		operation: "hook registered in .cursor/hooks.json (version 1)",
+		support: "supported",
+		note: "host fires the hook on the mapped event; `failClosed` for security gates",
+	},
+	none: { operation: "(not directly invocable)", support: "unsupported", note: "describe-only / hook capability" },
+};
+
 const INVOCATION_BY_PROVIDER: Record<string, InvocationShapeMap> = {
 	"claude-code": CLAUDE_CODE_INVOCATION,
 	"claude-plugin": CLAUDE_PLUGIN_INVOCATION,
 	codex: CODEX_INVOCATION,
+	cursor: CURSOR_INVOCATION,
 };
 
 /** An all-`unknown` invocation map for a provider with no tested projection (claims nothing). */

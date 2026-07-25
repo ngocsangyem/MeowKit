@@ -1,10 +1,10 @@
 # MeowKit Memory System
 
-> Per-project, machine-local memory for MeowKit skills. Topic files live at `.claude/memory/` and are read on demand — no auto-injection pipeline. Separate from the host runtime's platform auto-memory.
+> Per-project, machine-local memory for MeowKit skills. Topic files live at `.meowkit/memory/` and are read on demand — no auto-injection pipeline. Separate from the host runtime's platform auto-memory.
 
 ## 1. Overview
 
-MeowKit maintains a per-project memory system at `.claude/memory/`. It is a **MeowKit convention** — a directory owned by MeowKit skills and hooks, scoped to a single project, and explicitly read/written by the skills that need it.
+MeowKit maintains a per-project memory system at `.meowkit/memory/`. It is a **MeowKit convention** — a directory owned by MeowKit skills and hooks, scoped to a single project, and explicitly read/written by the skills that need it.
 
 ### Separate from Claude Code auto-memory
 
@@ -13,13 +13,13 @@ Claude Code ships its own auto-memory system. It is **not** the same as MeowKit'
 | System | Path | Scope | Auto-load | Written by |
 |---|---|---|---|---|
 | Claude Code auto-memory | `~/.claude/projects/<project>/memory/` (directory) | Per-git-repo, machine-local | `MEMORY.md` auto-loads at SessionStart (capped at **200 lines or 25 KB**, whichever comes first). Topic files in the same directory load on demand. | Claude via its standard Write/Edit tools |
-| MeowKit memory | `<repo>/.claude/memory/` | Per-repo, machine-local (gitignored from v2.4.1+) | Never auto-loaded. Consumer skills `Read` the relevant topic file at task start. | MeowKit hooks (`immediate-capture-handler`, `post-session.sh`) and skills (`mk:memory`, `mk:fix`, etc.) |
+| MeowKit memory | `<repo>/.meowkit/memory/` | Per-repo, machine-local (gitignored from v2.4.1+) | Never auto-loaded. Consumer skills `Read` the relevant topic file at task start. | MeowKit hooks (`immediate-capture-handler`, `post-session.sh`) and skills (`mk:memory`, `mk:fix`, etc.) |
 
-The two systems are complementary: Claude Code's auto-memory captures the user's personal, cross-project habits; MeowKit's `.claude/memory/` captures project-specific engineering artifacts (fix patterns, review findings, architecture decisions, cost telemetry) needed by MeowKit's 7-phase workflow.
+The two systems are complementary: Claude Code's auto-memory captures the user's personal, cross-project habits; MeowKit's `.meowkit/memory/` captures project-specific engineering artifacts (fix patterns, review findings, architecture decisions, cost telemetry) needed by MeowKit's 7-phase workflow.
 
 ### Machine-local by default (v2.4.1+)
 
-`.claude/memory/*` is gitignored. Only `.gitkeep` is tracked, so the directory survives clones but its contents do not. Fresh installs via `npx mewkit setup` start with an empty memory directory.
+`.meowkit/memory/*` is gitignored. Only `.gitkeep` is tracked, so the directory survives clones but its contents do not. Fresh installs via `npx mewkit setup` start with an empty memory directory.
 
 **Why:** memory content is developer-specific working state. Committing it would mix personal session history, secrets, and transient captures into shared git history — and would ship the MeowKit dev team's own memory to every downstream install.
 
@@ -35,7 +35,7 @@ The prior auto-inject pipeline (`memory-loader`, `memory-parser`, `memory-filter
 ## 2. File Layout
 
 ```
-.claude/memory/
+.meowkit/memory/
   fixes.md                    # Bug-class session learnings (mk:fix)
   fixes.json                  # Structured fix patterns — schema v2.0.0
   review-patterns.md          # Review / architecture patterns (mk:review, mk:plan-creator)
@@ -111,7 +111,7 @@ Memory loads **on demand**, never automatically:
 2. The agent uses the standard `Read` tool to load those files when the task starts.
 3. Nothing is injected on subsequent turns; re-reads happen only if the skill explicitly requires them.
 
-The files in `.claude/memory/` are plain Markdown and JSON. Claude Code's platform does not treat this path specially; it reads these files the same way it reads any project file.
+The files in `.meowkit/memory/` are plain Markdown and JSON. Claude Code's platform does not treat this path specially; it reads these files the same way it reads any project file.
 
 ### 4.1 Source-of-truth rule (JSON-first)
 
@@ -145,7 +145,7 @@ Run `/mk:memory --prune` to archive stale entries from topic files.
 **Mechanics** (grep-based, no parser dependency):
 1. For each topic file, find `## ` headings with date pattern `(YYYY-MM-DD, severity: <level>)`.
 2. Compute age; identify entries older than the threshold.
-3. Move matching blocks into `.claude/memory/lessons-archive.md`.
+3. Move matching blocks into `.meowkit/memory/lessons-archive.md`.
 4. Rewrite the topic file without those blocks.
 
 **Exempt from pruning:** entries marked `severity: critical` or `severity: security`; entries with no parseable date.
@@ -182,7 +182,7 @@ These pieces of Claude Code's own memory system are **separate** from MeowKit's 
 - **Auto-memory** (`~/.claude/projects/<project>/memory/`) — Claude writes its own learnings here. `MEMORY.md` auto-loads at SessionStart, capped at **200 lines or 25 KB**, whichever comes first. Topic files in the same directory load on demand when Claude uses `Read`.
 - **Subagent memory** — each subagent has its own memory directory at `~/.claude/agent-memory/<agent-name>/`. Subagents do **not** inherit the parent session's `MEMORY.md`.
 - **`/memory` slash command** — opens Claude Code's built-in browser for the auto-memory directory. Disjoint from MeowKit's `##prefix:` capture system.
-- **`autoMemoryEnabled` setting** (and env var `CLAUDE_CODE_DISABLE_AUTO_MEMORY`) — toggles platform auto-memory off without affecting MeowKit's `.claude/memory/`.
+- **`autoMemoryEnabled` setting** (and env var `CLAUDE_CODE_DISABLE_AUTO_MEMORY`) — toggles platform auto-memory off without affecting MeowKit's `.meowkit/memory/`.
 - **`/compact` and compaction** — in-session only; does not write to any memory file.
 
 ## 8. Tombstone — components removed in v2.4.1
@@ -196,7 +196,7 @@ These pieces of Claude Code's own memory system are **separate** from MeowKit's 
 | `NEEDS_CAPTURE` marker system | Eliminated; retroactive capture replaced by direct writes and Phase 6 `mk:memory session-capture` |
 | `lessons.md` as active store | Archived stub; content migrated to topic files via `memory-topic-file-migrator.cjs` |
 | `patterns.json` monolith | Deprecated stub; replaced by `fixes.json` + `review-patterns.json` + `architecture-decisions.json` |
-| `.claude/memory/*` committed to git | Gitignored — machine-local by default |
+| `.meowkit/memory/*` committed to git | Gitignored — machine-local by default |
 | `##pattern:` / `##decision:` / `##note:` as agent-output API | Agent-authored entries via direct `Edit` (path 3d). `##prefix:` remains a user-typed keyboard shortcut only — the handler does NOT fire on agent or tool output. See `.claude/skills/memory/references/capture-architecture.md`. |
 | `patterns.json` / `lessons.md` as active write targets | Split topic files since v2.4.1 (`fixes.{json,md}`, `review-patterns.{json,md}`, `architecture-decisions.{json,md}`). Any agent or skill writing to the old monolith files is spec drift; the legacy files remain on disk as gravestone markers. |
 
@@ -220,7 +220,7 @@ After migration, your team's topic files exist but remain **machine-local**. If 
 
 | | Memory | Cache |
 |---|---|---|
-| Location | `.claude/memory/` | `.claude/cache/` |
+| Location | `.meowkit/memory/` | `.claude/cache/` |
 | Purpose | Durable, human-curated learnings | Skill-generated, regeneratable output |
 | Examples | Fix patterns, architecture decisions, cost log | Web-fetched docs, pack snapshots, per-call outputs |
 | Gitignored | Yes (v2.4.1+) | Yes |

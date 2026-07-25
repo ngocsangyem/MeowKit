@@ -3,8 +3,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { checkPacks } from "../check-packs.js";
+import { requireLiveHarness } from "./support/live-harness.js";
 
-const LIVE = join(process.cwd(), ".claude");
+const LIVE = requireLiveHarness();
 
 const tempDirs: string[] = [];
 afterEach(async () => {

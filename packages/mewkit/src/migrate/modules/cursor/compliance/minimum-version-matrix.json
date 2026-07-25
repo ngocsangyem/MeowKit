@@ -1,0 +1,38 @@
+{
+	"_description": "Cursor IDE + CLI version support matrix for the MeowKit cursor bundle's native hooks. IDE and CLI use INDEPENDENT, incompatible version schemes (verified 2026-07-24): the IDE reports semver (e.g. 3.13.10); the CLI (cursor-agent) reports calendar versioning (e.g. 2026.07.23). This matrix never collapses the two into one scalar gate — doctor-cursor.ts reads the `ide` row for its version-gate check and does not attempt to compare the CLI row against it.",
+	"ide": {
+		"scheme": "semver",
+		"operationalFloor": "3.11.0",
+		"operationalFloorNote": "Matches CURSOR_MIN_SUPPORTED_VERSION in src/migrate/providers/cursor/capabilities.ts. Every hook event this bundle targets is documented on the CURRENT (undated, 3.11-era) hooks reference page, so the floor is evidence-of-presence at 3.11, not a per-event intro-version claim.",
+		"latestVerified": "3.11.0",
+		"latestVerifiedReleased": "2026-07-10",
+		"verifiedAgainstIde": "3.13.10 (this machine's installed IDE, Phase 2 live probe)",
+		"verified": "2026-07-24",
+		"sources": ["https://cursor.com/changelog", "https://cursor.com/docs/agent/hooks"],
+		"perEventIntroVersionNote": "UNRESOLVED for sessionStart/sessionEnd, beforeReadFile, beforeShellExecution/afterShellExecution, beforeMCPExecution/afterMCPExecution, afterFileEdit, subagentStop, preCompact, Tab hooks, workspaceOpen — the docs page does not annotate per-hook intro versions and a full changelog crawl (15+ entries) was out of scope for the Phase-4 docs pass. `stop`, `beforeSubmitPrompt`, `preToolUse`/`postToolUse` are confirmed introduced at v2.4 (2026-01-22); cloud-agent support for `beforeSubmitPrompt`/`afterAgentResponse`/`afterAgentThought`/`stop`/`subagentStart` confirmed at v3.11 (2026-07-10). Below the 3.11 floor, gate evidence is 'the event exists on the current docs page', not a verified per-version introduction date."
+	},
+	"cli": {
+		"scheme": "calendar",
+		"note": "cursor-agent uses calendar versioning (e.g. 2026.07.23), NOT comparable to the IDE's semver floor. No CLI-specific hook-support floor is set in this phase — the bundle targets IDE/Agent-window hook execution; CLI hook parity is unverified (docs-report gap: IDE-vs-CLI behavioral differences beyond output format and Tab-hooks-are-IDE-only are not enumerated). Do not gate on this row until CLI hook support is independently confirmed.",
+		"verifiedAgainstCli": "2026.07.23-e383d2b (this machine's installed CLI, Phase 2 live probe)",
+		"status": "unverified-hook-support"
+	},
+	"hookEvents": [
+		{ "event": "sessionStart", "cloudSupported": false, "failClosed": false, "note": "Never blocking; no session boundary in cloud agents." },
+		{ "event": "beforeReadFile", "cloudSupported": true, "failClosed": true, "note": "Security-critical: secret/private-path read gate." },
+		{ "event": "beforeShellExecution", "cloudSupported": true, "failClosed": true, "note": "Security-critical: destructive-command + path-scope gate." },
+		{ "event": "beforeMCPExecution", "cloudSupported": false, "failClosed": true, "note": "Security-critical: server/tool allowlist gate; cloud-unsupported (deferred)." },
+		{ "event": "preToolUse", "cloudSupported": true, "failClosed": "per-matcher", "note": "Matcher-enumerated: file-mutation(true), read-only-query(false), unclassified-other(true, decides ask)." },
+		{ "event": "postToolUse", "cloudSupported": true, "failClosed": false, "note": "Telemetry observe only." },
+		{ "event": "postToolUseFailure", "cloudSupported": true, "failClosed": false, "note": "Telemetry observe only." },
+		{ "event": "afterFileEdit", "cloudSupported": true, "failClosed": false, "note": "Telemetry observe only." },
+		{ "event": "afterShellExecution", "cloudSupported": true, "failClosed": false, "note": "Telemetry observe only." },
+		{ "event": "afterMCPExecution", "cloudSupported": false, "failClosed": false, "note": "Telemetry observe only; cloud-unsupported (MCP deferred)." },
+		{ "event": "beforeSubmitPrompt", "cloudSupported": true, "failClosed": false, "note": "Capture side-effect only; block-only contract, never exercised to block; noncritical." },
+		{ "event": "subagentStart", "cloudSupported": true, "failClosed": false, "note": "Validates + allows; noncritical." },
+		{ "event": "subagentStop", "cloudSupported": true, "failClosed": false, "note": "Bounded status persisted to telemetry; noncritical." },
+		{ "event": "preCompact", "cloudSupported": true, "failClosed": false, "note": "Best-effort telemetry only; memory commits never depend on it." },
+		{ "event": "stop", "cloudSupported": true, "failClosed": false, "note": "Bounded followup_message; finite loop_limit set in hooks.json." }
+	],
+	"deferredV1": ["beforeTabFileRead", "afterTabFileEdit", "workspaceOpen", "afterAgentResponse", "afterAgentThought", "sessionEnd"]
+}

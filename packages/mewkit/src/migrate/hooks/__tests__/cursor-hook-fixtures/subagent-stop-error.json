@@ -1,0 +1,14 @@
+{
+	"hook_event_name": "subagentStop",
+	"conversation_id": "conv-abc123",
+	"subagent_type": "fullstack-developer",
+	"status": "error",
+	"task": "Implement phase 4",
+	"duration_ms": 45000,
+	"message_count": 12,
+	"tool_call_count": 30,
+	"loop_count": 1,
+	"modified_files": ["src/commands/doctor-cursor.ts"],
+	"agent_transcript_path": "/Users/example/.cursor/transcripts/sub-1.json",
+	"user_email": "dev@example.com"
+}

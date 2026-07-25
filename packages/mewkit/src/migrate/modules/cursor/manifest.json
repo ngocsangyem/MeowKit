@@ -1,0 +1,84 @@
+{
+	"version": "1.0",
+	"provider": "cursor",
+	"generatedFrom": "hand-authored (native Cursor bundle)",
+	"entries": [
+		{
+			"sourcePath": "root/AGENTS.md",
+			"targetPath": "AGENTS.md",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": [
+				"managed-runtime"
+			],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.meowkit/README.md",
+			"targetPath": ".meowkit/README.md",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": [
+				"managed-runtime"
+			],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.cursor/agents",
+			"targetPath": ".cursor/agents",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": [
+				"managed-runtime"
+			],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.cursor/rules",
+			"targetPath": ".cursor/rules",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": [
+				"managed-runtime"
+			],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.cursor/skills",
+			"targetPath": ".cursor/skills",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": [
+				"managed-runtime"
+			],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.cursor/hooks.json",
+			"targetPath": ".cursor/hooks.json",
+			"provider": "cursor",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": [
+				"managed-runtime"
+			],
+			"active": true
+		},
+		{
+			"sourcePath": "root/.cursor/hooks",
+			"targetPath": ".cursor/hooks",
+			"provider": "cursor",
+			"mode": "0755",
+			"ownership": "managed-replace",
+			"scopeTags": [
+				"managed-runtime"
+			],
+			"active": true
+		}
+	]
+}

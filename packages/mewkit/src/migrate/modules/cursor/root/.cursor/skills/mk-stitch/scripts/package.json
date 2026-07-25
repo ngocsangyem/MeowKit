@@ -1,0 +1,17 @@
+{
+	"name": "mk-stitch-scripts",
+	"version": "1.0.0",
+	"type": "module",
+	"description": "the toolkit mk:stitch skill SDK wrapper scripts",
+	"scripts": {
+		"api-call": "tsx stitch-api-call.ts",
+		"write-output": "tsx stitch-write-output.ts",
+		"quota": "tsx stitch-quota.ts"
+	},
+	"dependencies": {
+		"@google/stitch-sdk": ">=0.0.3 <1.0.0"
+	},
+	"devDependencies": {
+		"tsx": "^4.0.0"
+	}
+}

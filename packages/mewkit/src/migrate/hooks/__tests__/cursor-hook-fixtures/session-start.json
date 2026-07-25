@@ -1,0 +1,11 @@
+{
+	"hook_event_name": "sessionStart",
+	"conversation_id": "conv-abc123",
+	"generation_id": "gen-1",
+	"model": "composer-2",
+	"model_id": "composer-2",
+	"cursor_version": "3.13.10",
+	"workspace_roots": ["/Users/example/project"],
+	"user_email": "dev@example.com",
+	"transcript_path": "/Users/example/.cursor/transcripts/conv-abc123.json"
+}

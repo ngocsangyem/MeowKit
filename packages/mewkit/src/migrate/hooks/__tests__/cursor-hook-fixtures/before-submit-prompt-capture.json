@@ -1,0 +1,6 @@
+{
+	"hook_event_name": "beforeSubmitPrompt",
+	"conversation_id": "conv-abc123",
+	"prompt": "##note: remember to check the retry budget before shipping",
+	"attachments": []
+}

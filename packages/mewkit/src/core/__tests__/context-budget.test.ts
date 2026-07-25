@@ -1,10 +1,10 @@
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadPackManifest } from "../pack-manifest.js";
 import { resolveProfile } from "../pack-resolver.js";
 import { classifyTier, computeContextBudget } from "../context-budget.js";
+import { requireLiveHarness } from "./support/live-harness.js";
 
-const LIVE = join(process.cwd(), ".claude");
+const LIVE = requireLiveHarness();
 
 describe("classifyTier", () => {
 	it("classifies CLAUDE.md and rules/*.md as always-on", () => {

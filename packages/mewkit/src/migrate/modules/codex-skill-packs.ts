@@ -92,9 +92,26 @@ export function expandSkillsEntry(
 	}));
 }
 
-/** True when a manifest entry is the aggregate skills-tree entry that packs expand. */
+/**
+ * The bundle's on-disk skills tree. Codex authors the cross-vendor `root/.agents/skills`;
+ * Cursor authors `root/.cursor/skills` (both are documented Cursor load paths) so the two
+ * providers never share one directory. Probes the Cursor path first and falls back to the
+ * `.agents` default, keeping this helper usable by either bundle.
+ */
+export function resolveBundleSkillsRoot(moduleDir: string): string {
+	const cursorRoot = join(moduleDir, "root", ".cursor", "skills");
+	return existsSync(cursorRoot) ? cursorRoot : join(moduleDir, "root", ".agents", "skills");
+}
+
+/**
+ * True when a manifest entry is the aggregate skills-tree entry that packs expand.
+ * Codex installs the cross-vendor `.agents/skills`; Cursor installs its own
+ * `.cursor/skills` (both are documented Cursor load paths) so the two providers never
+ * share a directory — a shared tree made whichever provider installed second see the
+ * whole surface as one conflicting directory and skip every skill.
+ */
 export function isSkillsTreeEntry(entry: ArtifactManifestEntry): boolean {
-	return entry.targetPath === ".agents/skills";
+	return entry.targetPath === ".agents/skills" || entry.targetPath === ".cursor/skills";
 }
 
 /**
@@ -106,7 +123,7 @@ export function packSelectionBudgetWarning(moduleDir: string, selection: PackSel
 	const catalog = loadSkillPackCatalog(moduleDir);
 	if (!catalog) return null;
 	const { packs, skills } = resolvePackSelection(catalog, selection);
-	const chars = packBudgetChars(join(moduleDir, "root", ".agents", "skills"), skills);
+	const chars = packBudgetChars(resolveBundleSkillsRoot(moduleDir), skills);
 	if (chars <= catalog.budgetChars) return null;
 	return `selected pack(s) [${packs.join(", ")}] total ${chars} skill name+description chars, over Codex's ${catalog.budgetChars}-char discovery budget — Codex may silently truncate the skill list. Install fewer packs, or rely on implicit (description-matched) skill selection.`;
 }

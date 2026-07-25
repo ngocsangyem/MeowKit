@@ -91,20 +91,20 @@ describe("pack-filtered install", () => {
 
 	it("core-only install excludes a non-core (integrations) skill", () => {
 		copyAuthoredCodexBundle(moduleDir, target, { packs: ["core"] });
-		expect(existsSync(join(target, ".agents", "skills", "cook", "SKILL.md"))).toBe(true); // core
-		expect(existsSync(join(target, ".agents", "skills", "jira-issue"))).toBe(false); // integrations
+		expect(existsSync(join(target, ".agents", "skills", "mk-cook", "SKILL.md"))).toBe(true); // core
+		expect(existsSync(join(target, ".agents", "skills", "mk-jira-issue"))).toBe(false); // integrations
 		expect(existsSync(join(target, "AGENTS.md"))).toBe(true); // non-skill surfaces still install
 	});
 
 	it("selecting integrations pulls in its core dependency too", () => {
 		copyAuthoredCodexBundle(moduleDir, target, { packs: ["integrations"] });
-		expect(existsSync(join(target, ".agents", "skills", "jira-issue", "SKILL.md"))).toBe(true);
-		expect(existsSync(join(target, ".agents", "skills", "cook", "SKILL.md"))).toBe(true); // via dependsOn core
+		expect(existsSync(join(target, ".agents", "skills", "mk-jira-issue", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".agents", "skills", "mk-cook", "SKILL.md"))).toBe(true); // via dependsOn core
 	});
 
 	it("undefined selection copies the whole tree (backward compatible)", () => {
 		copyAuthoredCodexBundle(moduleDir, target); // no packs
-		expect(existsSync(join(target, ".agents", "skills", "jira-issue", "SKILL.md"))).toBe(true);
-		expect(existsSync(join(target, ".agents", "skills", "cook", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".agents", "skills", "mk-jira-issue", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".agents", "skills", "mk-cook", "SKILL.md"))).toBe(true);
 	});
 });

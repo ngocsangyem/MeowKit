@@ -1,0 +1,8 @@
+{
+	"hook_event_name": "beforeReadFile",
+	"conversation_id": "conv-abc123",
+	"file_path": ".env.production",
+	"content": "DATABASE_URL=postgres://user:pass@host/db\n",
+	"attachments": [],
+	"cwd": "/Users/example/project"
+}

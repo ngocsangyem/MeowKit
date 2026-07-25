@@ -1,0 +1,19 @@
+---
+globs: ["**/*.test.*", "**/*.spec.*", "tests/**", "test/**", "__tests__/**"]
+alwaysApply: false
+---
+
+<!-- Auto Attached: testing conventions only matter while a test file is actually in
+context, so glob-scoping surfaces this exactly then, at zero cost the rest of the time.
+An Agent Requested description would need the model to first decide "this is a testing
+task" — the file path already tells us that for free. -->
+
+# Testing guidance
+
+- New or changed logic needs a test for the happy path and at least one realistic
+  failure case — not just the case that was easiest to make pass.
+- Never fake data, mock away the behavior under test, or weaken an assertion just to
+  make a test pass. If a test is wrong, fix the test; if the code is wrong, fix the code.
+- Re-run the full affected test file after every change, not just the new test — a
+  passing new test next to a broken old one is a regression, not a success.
+- A flaky test earns a more reliable reproduction, not a longer timeout and a shrug.

@@ -24,13 +24,23 @@ describe("getInvocationShapes", () => {
 		expect(m.none.support).toBe("unsupported");
 	});
 
+	it("cursor: native typed skill/agent/hook ops (not unknown-fallback); command/workflow advisory", () => {
+		const m = getInvocationShapes("cursor");
+		expect(m["invoke-skill"].support).toBe("supported");
+		expect(m["invoke-agent"].support).toBe("supported");
+		expect(m["lifecycle-hook"].support).toBe("supported");
+		expect(m["invoke-command"].support).toBe("advisory"); // legacy .cursor/commands not targeted
+		expect(m["invoke-workflow"].support).toBe("advisory"); // no distinct workflow primitive
+		expect(m.none.support).toBe("unsupported");
+	});
+
 	it("unknown provider: every invocation id unknown (claims nothing)", () => {
 		const m = getInvocationShapes("some-future-runtime");
 		for (const id of KNOWN_INVOCATION_IDS) expect(m[id].support, id).toBe("unknown");
 	});
 
 	it("every provider map covers EXACTLY the known logical invocation ids (no gaps, no extras)", () => {
-		for (const provider of ["claude-code", "claude-plugin", "codex", "some-future-runtime"]) {
+		for (const provider of ["claude-code", "claude-plugin", "codex", "cursor", "some-future-runtime"]) {
 			expect(new Set(Object.keys(getInvocationShapes(provider)))).toEqual(new Set(KNOWN_INVOCATION_IDS));
 		}
 	});

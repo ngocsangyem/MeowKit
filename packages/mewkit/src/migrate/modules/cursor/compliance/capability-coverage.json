@@ -1,0 +1,17 @@
+{
+	"_description": "Claude (.claude) capability -> single Cursor owner map, mirroring the Codex bundle's capability-coverage.json shape. Skeleton only: `concerns` populates as each capability's native Cursor owner (AGENTS.md, skill, agent, hook, rules, config, .meowkit, cli, or an explicit omission reason) is authored. native-surface-matrix, minimum-version-matrix, and runtime-environment-matrix are intentionally NOT created here — each lands alongside the content it describes.",
+	"verified": "2026-07-24",
+	"ownershipRule": {
+		"mandatory-invariant": "AGENTS.md",
+		"reusable-workflow": "skill",
+		"distinct-role": "agent",
+		"lifecycle-check": "hook",
+		"instruction-scoping": "rules (.mdc)",
+		"settings": "config",
+		"durable-state": ".meowkit",
+		"deterministic-gate": "MeowKit CLI",
+		"intentionally-omitted": "reason"
+	},
+	"ownerEnum": ["AGENTS.md", "skill", "agent", "hook", "rules", "config", ".meowkit", "cli", "omitted"],
+	"concerns": []
+}

@@ -5,8 +5,17 @@ import { home, cwd, hasAnyInstallSignal, hasBinaryInPath } from "../detection-he
 export const cursorConfig: ProviderConfig = {
 	name: "cursor",
 	displayName: "Cursor",
-	supportLevel: "verified",
-	subagents: "full",
+	// Legacy .claude→.cursor converter. It projects delegation into rules
+	// (.cursor/rules/*.mdc), not native custom agents (.cursor/agents/*.md), and
+	// emits no hooks — so it is an honest "experimental" export, not a verified
+	// native harness. The authored native Cursor bundle (native agents/hooks/skills)
+	// lands in later phases; this label lifts to reflect it only once that ships.
+	supportLevel: "experimental",
+	supportReason:
+		"Legacy exporter converts .claude/ to Cursor rules; native agents/hooks are authored in the native bundle, not yet installed here.",
+	// Converter emits rules-as-agents (delegation preserved in .mdc rules), not the
+	// native .cursor/agents/*.md custom-agent contract — partial, not full.
+	subagents: "partial",
 	agents: {
 		projectPath: ".cursor/rules",
 		globalPath: join(home, ".cursor/rules"),
@@ -36,9 +45,11 @@ export const cursorConfig: ProviderConfig = {
 		writeStrategy: "per-file",
 		fileExtension: ".mdc",
 	},
+	// Converter emits no hooks. Cursor DOES support native hooks via
+	// .cursor/hooks.json (version: 1, failClosed) — that is the authored-bundle
+	// target for a later phase, not something this legacy converter installs.
 	hooks: null,
 	settingsJsonPath: null,
-	// Cursor v2.2+ moves toward .cursor/rules/<name>/RULE.md folder format. Per-file .mdc still works as of 2026-04. Track via drift detection.
 	detect: async () =>
 		hasBinaryInPath("cursor") ||
 		hasAnyInstallSignal([join(cwd, ".cursor/rules"), join(home, ".cursor/rules"), join(home, ".cursor/skills")]),

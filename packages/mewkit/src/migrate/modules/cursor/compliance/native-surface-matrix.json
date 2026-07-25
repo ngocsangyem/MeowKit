@@ -1,0 +1,200 @@
+{
+	"_description": "Cursor native surface × per-environment support map, authored alongside the Phase-3 agents/rules content it describes. Never a single 'verified' flag: every claim carries an `environments` object across ide-local / cli-headless / cloud / tab, per plan.md Goal 2. `documented` means the official doc source states this for that environment; `live-verified` means it was additionally confirmed against an installed Cursor binary on the validation machine (plan.md V3); `undocumented` means the docs are silent and no live test has closed the gap; `not-claimed` means this environment does not apply or was intentionally left untested (never asserted as passing).",
+	"_sources": [
+		"https://cursor.com/docs/agent/subagents",
+		"https://cursor.com/docs/context/rules",
+		"https://cursor.com/docs/context/skills",
+		"plans/reports/researcher-260724-2125-cursor-official-docs-verification.md",
+		"plans/reports/researcher-260724-2143-cursor-routing-discovery.md"
+	],
+	"_liveVerification": "No live Cursor binary was exercised while authoring this Phase-3 batch (part A is offline authoring only). Rows below stay at `documented` (doc-only) until the Phase 2/3 live discovery smoke (validation V1/V3) and the Success Criteria routing-test-set run promote the relevant cells to `live-verified` — do not hand-edit a cell to `live-verified` without a recorded test run.",
+	"surfaces": [
+		{
+			"surface": "agents",
+			"maturity": "stable",
+			"meowkitPolicy": "primary — core install ships explorer, planner, reviewer only; readonly: true; description written as a routing trigger. Model: agents pin concrete Cursor models by tier (user decision 2026-07-25, reversing the earlier inherit-default) — fable-5 advisory / opus-5[effort=high] deep / sonnet-5 standard / composer-2.5[fast=true] mechanical + jira/confluence integration.",
+			"claims": [
+				{
+					"claim": "Frontmatter is exactly 5 fields: name, description, model (default inherit), readonly (default false), is_background (default false); no additional fields documented.",
+					"source": "https://cursor.com/docs/agent/subagents",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "Nesting cap: a subagent may spawn at most one further child level (since Cursor 2.5); a child subagent cannot itself spawn a further child.",
+					"source": "https://cursor.com/docs/agent/subagents",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "undocumented",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "Auto-delegation signal is model judgment over task complexity/scope plus subagent description text plus current context/tools; no published scoring algorithm. Description phrasing like 'use proactively' / 'always use for' measurably nudges routing per the docs' own framing.",
+					"source": "plans/reports/researcher-260724-2143-cursor-routing-discovery.md",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "undocumented",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "Project .cursor/agents/ takes precedence over .claude/agents/ or .codex/agents/ on a name conflict within the same project; user-level ~/.cursor/agents/ also supported. Exact tie-break mechanics beyond 'takes precedence' (merge vs full shadow) are not detailed.",
+					"source": "https://cursor.com/docs/agent/subagents",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "undocumented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				}
+			]
+		},
+		{
+			"surface": "rules",
+			"maturity": "stable",
+			"meowkitPolicy": "primary — every `.mdc` carries a deliberate activation class; alwaysApply reserved for runtime-invariants.mdc only",
+			"claims": [
+				{
+					"claim": "Exactly 3 frontmatter fields: description, globs, alwaysApply. Four activation modes: Always Apply (alwaysApply: true), Agent Requested (description only), Auto Attached (globs only), Apply Manually (neither field, @-mention required).",
+					"source": "https://cursor.com/docs/context/rules",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "undocumented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "Nested AGENTS.md / rules: a deeper directory's file takes precedence over a shallower one on conflict; all applicable levels are combined, not switch-replaced.",
+					"source": "https://cursor.com/docs/context/rules",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "undocumented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "Rule-source precedence generally: Team Rules -> Project Rules -> User Rules (earlier wins on conflict). Explicit precedence between AGENTS.md and .cursor/rules/*.mdc specifically is undocumented; docs position them as coexisting, complementary surfaces rather than one strictly overriding the other.",
+					"source": "https://cursor.com/docs/context/rules",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "undocumented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				}
+			]
+		},
+		{
+			"surface": "skills",
+			"maturity": "stable",
+			"meowkitPolicy": "primary — mk- namespace preserved (folder name == frontmatter name, per Cursor's rule); installs to the Cursor-native .cursor/skills/ rather than the shared .agents/skills/ so a co-installed Codex bundle can never collide with or shadow it; disable-model-invocation for command-like pipeline skills",
+			"claims": [
+				{
+					"claim": "SKILL.md frontmatter: name (required, must match the parent folder name), description (required, drives relevance matching), paths (optional glob, supersedes legacy globs), disable-model-invocation (optional bool — true means explicit-invocation only), metadata (optional freeform key-value).",
+					"source": "https://cursor.com/docs/context/skills",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "undocumented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "Cursor loads skills from .agents/skills/ (project), ~/.agents/skills/ (user), .cursor/skills/ (project) and ~/.cursor/skills/ (user). Per the docs page all four are supported at parity — neither location is deprecated. The .agents/ pair is the cross-vendor convention shared with Codex CLI, Gemini CLI, and VS Code Copilot.",
+					"source": "https://cursor.com/docs/context/skills",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "undocumented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "A community forum bug report (not official docs) claims the Cursor CLI does not load user-level ~/.agents/skills/ (the GUI does). The bundle installs project-level .cursor/skills/, so this user-level .agents/ gap no longer gates the install path; the live discovery smoke still records CLI loading of .cursor/skills/.",
+					"source": "plans/reports/researcher-260724-2125-cursor-official-docs-verification.md",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "not-claimed",
+						"cli-headless": "undocumented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "No documented numeric discovery-budget (character or token cap) for the skill/rule description index. MeowKit adopts a conservative internal budgetChars (8000, catalog/skill-packs.json) as a self-imposed cap, not a Cursor-documented limit — revisit if Cursor documents a real one.",
+					"source": "plans/reports/researcher-260724-2143-cursor-routing-discovery.md",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "not-claimed",
+						"cli-headless": "not-claimed",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				}
+			]
+		},
+		{
+			"surface": "hooks",
+			"maturity": "stable",
+			"meowkitPolicy": "primary enforcement layer — security-critical gates (beforeReadFile, beforeShellExecution, beforeMCPExecution, file-mutation preToolUse) declare failClosed:true; observational events fail open; state/telemetry under .meowkit/, PII scrubbed; kill-switch downgrades gates to warn-and-allow",
+			"claims": [
+				{
+					"claim": "hooks.json schema version 1: lifecycle events invoke `node` command hooks; security gates return { permission: allow|deny|ask }; exit 0 + JSON stdout, exit 2 blocks. Events used: sessionStart, beforeReadFile, beforeShellExecution, beforeMCPExecution, preToolUse, postToolUse, postToolUseFailure, afterFileEdit, afterShellExecution, afterMCPExecution, beforeSubmitPrompt, subagentStart, subagentStop, preCompact, stop.",
+					"source": "https://cursor.com/docs/agent/hooks",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "undocumented",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "beforeMCPExecution is not enforced in the Cloud Agent environment (docs report §5): applying an MCP profile to a cloud-exposed project has no local hook enforcement, so it is gated behind an explicit --allow-cloud-mcp opt-in (Phase 5) and doctor FAILs when an active profile lacks a cloud enforcement equivalent — a control, not a label.",
+					"source": "plans/reports/researcher-260724-2125-cursor-official-docs-verification.md",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "Fail-closed semantics are MeowKit-authored, not a Cursor guarantee: security-critical gates deny on crash / timeout / invalid-JSON / unknown-critical schema; a documented kill-switch (env MEWKIT_CURSOR_HOOKS_KILL_SWITCH or flag file .meowkit/state/cursor-hooks-kill-switch) downgrades gates to warn-and-allow to recover from schema-drift brick. Per-event intro versions are moot below the 3.11 floor (validation V2); doctor-cursor gates on the installed binary, IDE semver and CLI calendar tracked independently (minimum-version-matrix.json).",
+					"source": "https://cursor.com/docs/agent/hooks",
+					"verified": "2026-07-24",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				}
+			]
+		}
+	],
+	"openQuestions": [
+		"Whether the Phase 2 live CLI/IDE discovery smoke (validation V1/V3, this Mac, basic-tier account) has actually run and closed the `.agents/skills/` CLI-loading question — plan.md's phase table still shows Phase 2 as 'discovery-smoke pending' as of this authoring pass, so every `cli-headless` cell above stays `documented`/`undocumented`, never `live-verified`, until that run is recorded.",
+		"Explicit precedence across AGENTS.md, .cursor/rules/*.mdc, .cursor/agents/*.md, and Skills as one unified resolution stack — no single doc page unifies all four; would need a live Cursor test, not just docs, to confirm behavior when multiple mechanisms compete for the same intent.",
+		"Cloud Agent support for custom agents/subagents, skills, and rules specifically (as opposed to hooks/MCP, which are confirmed) — not directly confirmed in the research pass this matrix draws from."
+	]
+}

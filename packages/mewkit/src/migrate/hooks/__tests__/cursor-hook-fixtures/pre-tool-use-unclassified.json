@@ -1,0 +1,8 @@
+{
+	"hook_event_name": "preToolUse",
+	"conversation_id": "conv-abc123",
+	"tool_name": "run_background_task",
+	"tool_input": {},
+	"tool_use_id": "call-4",
+	"cwd": "/Users/example/project"
+}

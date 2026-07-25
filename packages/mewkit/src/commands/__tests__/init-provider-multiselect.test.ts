@@ -1,11 +1,13 @@
-import { mkdtempSync, existsSync, mkdirSync, rmSync } from "node:fs";
+import { mkdtempSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // `npx mewkit init` (no provider flag, fresh dir) shows a provider multiselect.
 // These tests drive the picker by mocking @clack/prompts and verify:
-//  - codex-only selection provisions the authored bundle offline (no .claude/, no network);
+//  - codex-only / cursor-only selection provisions the authored bundle offline
+//    (no .claude/, no network), and the picker route produces the SAME tree as
+//    the equivalent `--target` flag (picker/flag parity — red team: divergence);
 //  - the picker is SUPPRESSED whenever an explicit provider intent is given
 //    (update mode, or --target, or --migrate) — the gate that keeps those flows intact.
 
@@ -86,5 +88,46 @@ describe("init provider multiselect", () => {
 		const { init } = await import("../init.js");
 		await init({ migrate: true }).catch(() => undefined);
 		expect(multiselectSpy).not.toHaveBeenCalled();
+	});
+
+	it("cursor-only selection copies the authored bundle and never creates .claude/", async () => {
+		multiselectResult.value = ["cursor"];
+		const { init } = await import("../init.js");
+		await init({});
+		expect(existsSync(join(dir, "AGENTS.md"))).toBe(true);
+		expect(existsSync(join(dir, ".meowkit", "README.md"))).toBe(true);
+		expect(existsSync(join(dir, ".claude"))).toBe(false);
+	});
+
+	it("cursor-only --dry-run writes nothing", async () => {
+		multiselectResult.value = ["cursor"];
+		const { init } = await import("../init.js");
+		await init({ dryRun: true });
+		expect(existsSync(join(dir, "AGENTS.md"))).toBe(false);
+		expect(existsSync(join(dir, ".meowkit"))).toBe(false);
+	});
+
+	it("picker (cursor-only) and `--target cursor` produce byte-identical authored trees", async () => {
+		multiselectResult.value = ["cursor"];
+		const { init } = await import("../init.js");
+		await init({});
+		const pickerTree = {
+			agents: readFileSync(join(dir, "AGENTS.md"), "utf-8"),
+			readme: readFileSync(join(dir, ".meowkit", "README.md"), "utf-8"),
+		};
+
+		const flagDir = mkdtempSync(join(tmpdir(), "init-picker-flag-"));
+		const prevDir = process.cwd();
+		process.chdir(flagDir);
+		try {
+			vi.resetModules();
+			const { init: initFlag } = await import("../init.js");
+			await initFlag({ target: "cursor" });
+			expect(readFileSync(join(flagDir, "AGENTS.md"), "utf-8")).toBe(pickerTree.agents);
+			expect(readFileSync(join(flagDir, ".meowkit", "README.md"), "utf-8")).toBe(pickerTree.readme);
+		} finally {
+			process.chdir(prevDir);
+			rmSync(flagDir, { recursive: true, force: true });
+		}
 	});
 });
