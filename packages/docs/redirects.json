@@ -1,4 +1,7 @@
 {
   "$comment": "Retired doc URLs and where they now live. One entry per URL that used to serve a page and must keep working for inbound links. `from` is the old path, `to` is the canonical page that answers the same reader question. Every entry becomes a 308 in next.config.mjs, is excluded from llms.txt/llms-full.txt/sitemap.xml, and is rejected as an internal link target by check-internal-links.mjs. This file is the single record of what has been retired — adding an entry is the whole retirement, there is no second place to update.",
-  "redirects": []
+  "redirects": [
+    { "from": "/why-meowkit", "to": "/core-concepts/what-is-meowkit" },
+    { "from": "/guide/philosophy", "to": "/core-concepts/what-is-meowkit" }
+  ]
 }

@@ -21,7 +21,7 @@ It installs a `.claude/` directory that Claude Code reads automatically. No exec
 
 With the same model, the same task, and the same compute budget — just by changing the environment design — performance increases by 64% ([SWE-agent, NeurIPS 2024](https://arxiv.org/abs/2405.15793)). The model is not the bottleneck. The environment is.
 
-MeowKit adds a discipline layer on top of Claude Code: structured workflows, quality gates, memory, multi-agent coordination, and hook-based automation. Claude Code handles the mechanics (tools, context, subagents). MeowKit handles the strategy (what to build, when to stop, how to verify).
+Claude Code is already a harness — it manages context, tools, and sessions. MeowKit is a second harness on top of it: structured workflows, quality gates, memory, multi-agent coordination, and hook-based automation. Claude Code handles the mechanics. MeowKit handles the strategy — what to build, when to stop, how to verify.
 
 ## How it differs from raw Claude Code
 
@@ -88,12 +88,38 @@ Topic files in `.meowkit/memory/` — `fixes.md` for bug patterns, `review-patte
 
 Skills activate by task domain, not all at once. Each skill's SKILL.md is a compact router, with detailed procedures loaded on demand. The hook system routes events to only matching handlers. This progressive disclosure saves ~70% context per invocation.
 
+## Trade-offs we accept
+
+Each of these is a decision that costs something. They are listed because the cost is real, not because it is negligible.
+
+| We chose | Over | Because |
+|----------|------|---------|
+| Human gates (slower) | Auto-approve (faster) | Agent self-approval drifts lenient |
+| Opt-in TDD | Mandatory TDD | Strict TDD costs more than it returns on spikes and prototypes |
+| Independent security hooks | One dispatcher for everything | If the dispatcher crashes, security still fires — worth the duplication |
+| Exclusive file ownership per agent | Agents editing wherever they need to | Two agents on one file lose each other's work |
+| Behavioral output limits | Hook-based truncation | Hooks append to tool output, they cannot replace it |
+| Session budget warnings | No budget tracking | A runaway session costs more than a false alarm |
+
 ## What MeowKit does NOT do
 
 - **No proprietary formats** — standard Markdown and JSON
 - **No telemetry** — all data stays project-local
 - **No external services** — zero third-party API dependencies for core workflow
 - **No model lock-in** — adaptive density works across Haiku, Sonnet, and Opus tiers
+- **No experimental surface** — nothing ships to the toolkit that is not ready to use
+
+## Where MeowKit came from
+
+MeowKit builds on ideas from earlier toolkits, and it is worth naming them:
+
+- **[ClaudeKit](https://claudekit.cc/)** — the original structured skill system for Claude Code. Its orchestration protocols, development rules, and cook workflow are what MeowKit's phase-gated pipeline descends from.
+- **[Gstack](https://github.com/garrytan/gstack)** — a broad skill collection covering headless browser automation and QA testing, and the source of the "search before building" habit MeowKit inherits.
+- **[Aura-frog](https://github.com/nguyenthienthanh/aura-frog)** — an autonomous agent framework whose multi-agent coordination and self-healing patterns shaped MeowKit's agent architecture and escalation protocols.
+
+What MeowKit adds is enforcement: gates that block rather than advise. The question it exists to answer is what happens when best practice stops being a suggestion.
+
+MeowKit is MIT-licensed and community-driven. Skills, fixes, documentation, and unreasonable ideas for new agent workflows are all welcome — open a PR.
 
 ## Next steps
 

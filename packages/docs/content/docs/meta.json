@@ -3,7 +3,6 @@
   "pages": [
     "---Getting Started---",
     "introduction",
-    "why-meowkit",
     "installation",
     "quick-start",
     "---Core Concepts---",
@@ -11,7 +10,6 @@
     "core-concepts/how-it-works",
     "core-concepts/workflow",
     "core-concepts/gates",
-    "guide/philosophy",
     "guide/workflow-phases",
     "core-concepts/plan-creator-modes-and-flags",
     "guide/model-routing",
