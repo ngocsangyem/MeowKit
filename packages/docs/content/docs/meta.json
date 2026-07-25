@@ -13,6 +13,7 @@
     "core-concepts/plan-creator-modes-and-flags",
     "guide/model-routing",
     "guide/cursor-agent-models",
+    "guide/codex-agent-models",
     "guide/memory-system",
     "guide/session-state-vs-resume",
     "guide/agent-skill-architecture",

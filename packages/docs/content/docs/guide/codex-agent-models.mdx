@@ -1,0 +1,125 @@
+---
+title: "Codex Agent Models"
+description: "Which Codex model and reasoning effort each agent in the Codex native bundle is pinned to, why, and how to change it."
+---
+
+When you install the Codex target (`mewkit init --target codex`), every bundled agent
+ships with a **concrete Codex model and reasoning effort** pinned in its TOML. This mirrors
+how the Cursor bundle pins a model per agent (see
+[Cursor Agent Models](/guide/cursor-agent-models)) and differs from the Claude Code adapter,
+which picks a session model by task complexity (see [Model Routing](/guide/model-routing)).
+
+Codex lets a custom agent set `model` and `model_reasoning_effort` directly, and those
+override any inherited default — so the bundle assigns each agent the tier that fits its
+role rather than paying top-tier cost for bounded, wrapper-driven work.
+
+## How the mapping works
+
+Each agent file at `.codex/agents/<name>.toml` carries both keys:
+
+```toml
+name = "planner"
+model = "gpt-5.6"
+model_reasoning_effort = "high"
+description = "..."
+developer_instructions = """..."""
+```
+
+Agents are grouped into three model tiers by what the work actually demands:
+
+| Model | Use for | Why |
+|---|---|---|
+| `gpt-5.6` | Complex reasoning, high blast radius | Quality-first model. A false pass or a bad write here is expensive. |
+| `gpt-5.6-terra` | Balanced work that still needs judgement | Balances intelligence and cost for synthesis and evidence-led reporting. |
+| `gpt-5.4-mini` | Bounded, transactional wrapper operations | Strong mini model for subagents and tool use, with a 400K context at lower cost. |
+
+`model_reasoning_effort` is tuned independently (`low` / `medium` / `high`) — a bounded agent
+can still need `high` effort, and a capable model can run at `medium` for routine work.
+
+<Callout type="warn">
+  Do not move every agent to `gpt-5.4-mini`. It has less context than GPT-5.6 and is a poor
+  default when a task needs multi-source judgement, conflict resolution, or protection
+  against a costly mistaken write.
+</Callout>
+
+## Core and delivery agents
+
+| Agent | Model | Effort |
+|---|---|---|
+| `architect` | `gpt-5.6` | high |
+| `planner` | `gpt-5.6` | high |
+| `reviewer` | `gpt-5.6` | high |
+| `security` | `gpt-5.6` | high |
+| `evaluator` | `gpt-5.6` | high |
+| `advisor` | `gpt-5.6` | high |
+| `brainstormer` | `gpt-5.6` | high |
+| `ui-ux-designer` | `gpt-5.6` | high |
+| `developer` | `gpt-5.6` | medium |
+| `tester` | `gpt-5.6-terra` | medium |
+| `researcher` | `gpt-5.6-terra` | medium |
+| `shipper` | `gpt-5.6-terra` | medium |
+| `analyst` | `gpt-5.6-terra` | medium |
+| `project-manager` | `gpt-5.6-terra` | medium |
+| `documenter` | `gpt-5.6-terra` | medium |
+| `journal-writer` | `gpt-5.6-terra` | medium |
+| `git-manager` | `gpt-5.6-terra` | medium |
+| `story-sizer` | `gpt-5.6-terra` | medium |
+
+## Jira and Confluence agents
+
+Integration agents run behind a validated CLI wrapper, so most are bounded enough for the
+mini tier. The exceptions are the ones that synthesize evidence or can damage a
+source-of-truth system.
+
+| Agent | Model | Effort |
+|---|---|---|
+| `jira-admin` | `gpt-5.6` | high |
+| `jira-bulk` | `gpt-5.6` | high |
+| `confluence-bulk` | `gpt-5.6` | high |
+| `confluence-spec-analyst` | `gpt-5.6` | high |
+| `jira-analyst` | `gpt-5.6-terra` | high |
+| `jira-jsm` | `gpt-5.6-terra` | high |
+| `jira-lifecycle` | `gpt-5.6-terra` | high |
+| `jira-evaluator` | `gpt-5.6-terra` | high |
+| `confluence-page` | `gpt-5.6-terra` | high |
+| `jira-estimator` | `gpt-5.4-mini` | high |
+| `jira-agile` | `gpt-5.4-mini` | medium |
+| `jira-search` | `gpt-5.4-mini` | medium |
+| `jira-issue` | `gpt-5.4-mini` | medium |
+| `jira-fields` | `gpt-5.4-mini` | medium |
+| `jira-collaborate` | `gpt-5.4-mini` | medium |
+| `jira-time` | `gpt-5.4-mini` | medium |
+| `confluence-collaborate` | `gpt-5.4-mini` | medium |
+| `confluence-search` | `gpt-5.4-mini` | medium |
+| `jira-dev` | `gpt-5.4-mini` | low |
+| `jira-relationships` | `gpt-5.4-mini` | low |
+| `jira-ops` | `gpt-5.4-mini` | low |
+
+## Operating policy
+
+1. Verify the model is exposed to your Codex account before relying on a pinned tier — a
+   model your plan cannot run will fail at spawn time.
+2. Measure success by correct tool action, confirmation compliance, user correction rate,
+   and escalation rate — not token cost alone.
+3. **Promote** a mini agent to `gpt-5.6-terra` when it misroutes an action, mishandles an
+   ambiguous query, or needs repeated remediation.
+4. Destructive-action confirmation and wrapper validation are independent of model
+   selection — lowering a tier never lowers a safety gate.
+
+## Changing an agent's model
+
+Edit the two keys in the agent's TOML:
+
+```toml title=".codex/agents/jira-issue.toml"
+name = "jira-issue"
+model = "gpt-5.4-mini"            # any model your Codex account exposes
+model_reasoning_effort = "medium" # low | medium | high
+```
+
+Omitting both keys makes the agent inherit the Codex session default. The bundle pins them
+so behaviour is predictable across machines and accounts.
+
+<Callout type="info">
+  `xhigh` is deliberately unused. `high` is the deep-class ceiling in this bundle until a
+  shipped default model is confirmed to be a Codex max tier.
+</Callout>

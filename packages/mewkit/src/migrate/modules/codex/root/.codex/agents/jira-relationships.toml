@@ -1,6 +1,7 @@
 name = "jira-relationships"
 description = "Manage JIRA issue relationships via the jira-as CLI wrapper: link / unlink, blockers, dependencies, clone, bulk-link. Routed by mk:jira-relationships skill. NOT for sprint/epic relationships (jira-agile); NOT for parent/subtask (jira-agile)."
-model_reasoning_effort = "medium"
+model = "gpt-5.4-mini"
+model_reasoning_effort = "low"
 developer_instructions = """
 # JIRA Relationships Agent
 
