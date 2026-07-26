@@ -578,6 +578,13 @@
 				"agent": "advisor",
 				"effort": "high",
 				"distinctDimension": "isolated advisory executor; invoked only by the advise skill, never a lifecycle phase owner"
+			},
+			{
+				"agent": "athena",
+				"effort": "high",
+				"distinctDimension": "one-shot workflow-decision supervisor; invoked only at --advice checkpoints of a wrapped skill, never a lifecycle phase owner and never a gate authority",
+				"mutationBan": "behavioral-only on Codex — agent definitions carry no per-agent tool or permission field, so the no-write rule is enforced by developer_instructions, not by the runtime. Structural enforcement exists on the other two planes (tool omission / readonly flag). Live mutation-refusal probe pending.",
+				"delegation": "natural-language; canonical trigger sentence 'Delegate this advice checkpoint to the athena agent.' Unverified against a live Codex session as of 2026-07-26."
 			}
 		],
 		"merge": [],
