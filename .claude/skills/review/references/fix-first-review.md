@@ -62,8 +62,8 @@ Before producing the final review output:
 
 If the PR has review comments from GitHub reviewers or CI bots:
 
-1. **VALID & ACTIONABLE comments:** Include in your findings — follow Fix-First flow (auto-fix if mechanical, batch into ASK if not). Log resolution to `.claude/memory/reviews.jsonl`.
+1. **VALID & ACTIONABLE comments:** Include in your findings — follow Fix-First flow (auto-fix if mechanical, batch into ASK if not). Log resolution to `.meowkit/telemetry/reviews.jsonl`.
 
 2. **FALSE POSITIVE comments:** Present each via AskUserQuestion with evidence for why it's incorrect. Options: A) Dismiss with explanation, B) Fix anyway, C) Ignore.
 
-3. **ALREADY ADDRESSED comments:** Note what was done and the fixing commit SHA. Log to `.claude/memory/reviews.jsonl`.
+3. **ALREADY ADDRESSED comments:** Note what was done and the fixing commit SHA. Log to `.meowkit/telemetry/reviews.jsonl`.

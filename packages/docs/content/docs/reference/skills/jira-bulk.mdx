@@ -3,6 +3,18 @@ title: "mk:jira-bulk"
 description: "Bulk JIRA operations on 10+ issues. Dry-run is mandatory. Reads workflow cache."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/jira-bulk/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/jira-bulk/SKILL.md) |
+| **Owner** | `jira` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Forks the `jira-bulk` agent to execute bulk operations across many issues — transition, assign, set-priority, clone, delete. **Every bulk command MUST be invoked with `--dry-run` first**; the user reviews the `would_*` JSON keys before re-invoking without `--dry-run`.

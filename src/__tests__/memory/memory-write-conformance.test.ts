@@ -10,6 +10,8 @@
 // canonical `.md`, and skips only lines that NEGATE the write or describe view/legacy/seed
 // semantics — not any line that merely contains "canonical" (a real offender may too).
 // Scans both `.claude/` (source) and `plugin/` (generated mirror) so drift can't hide one.
+// The path prefix is optional and accepts either tree — pinning it to one silently
+// disables the guard as soon as content moves to the other.
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -24,7 +26,7 @@ const CANONICAL = "fixes|review-patterns|architecture-decisions|security-finding
 
 // A write instruction aimed at a canonical store's .md view. `edit` included — Path 2's own tool.
 const WRITE_TO_VIEW = new RegExp(
-	`(append(ing)?\\s+(to|the)|writ(e|ing)\\s+to|edit(ing)?|>>\\s*\`?[.\\/]*)\\s*\`?[.\\/]*(\\.claude/)?memory/(${CANONICAL})\\.md`,
+	`(append(ing)?\\s+(to|the)|writ(e|ing)\\s+to|edit(ing)?|>>\\s*\`?[.\\/]*)\\s*\`?[.\\/]*(\\.(claude|meowkit)/)?memory/(${CANONICAL})\\.md`,
 	"i",
 );
 // Excluded ONLY when the line negates the write or describes view/legacy/seed/fallback semantics.
@@ -61,6 +63,9 @@ describe("memory single-write conformance (MK-P1-04)", () => {
 		const caught = (s: string) => WRITE_TO_VIEW.test(s) && !IS_DESCRIPTIVE.test(s);
 		// Real offenders — must be caught:
 		expect(caught("Append to `.claude/memory/architecture-decisions.md`:")).toBe(true);
+		// the same instruction in the `.meowkit/` taxonomy must trip the same rule
+		expect(caught("Append to `.meowkit/memory/architecture-decisions.md`:")).toBe(true);
+		expect(caught("Edit .meowkit/memory/fixes.md to add the pattern")).toBe(true);
 		expect(caught("Edit .claude/memory/fixes.md to add the pattern")).toBe(true);
 		expect(caught("Append to `.claude/memory/security-notes.md` (the canonical security log)")).toBe(true);
 		expect(caught(">> .claude/memory/review-patterns.md")).toBe(true);

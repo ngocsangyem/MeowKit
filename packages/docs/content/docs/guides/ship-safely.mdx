@@ -1,9 +1,9 @@
 ---
 title: "Ship Safely"
-description: "Deploy with /mk:ship — conventional commits, PR creation, CI verification, and rollback documentation."
+description: "Deploy with /mk:ship: conventional commits, PR creation, CI verification, and rollback documentation."
 ---
 
-`/mk:ship` handles deployment. It runs tests, creates conventional commits, opens a PR, and verifies CI — never pushes directly to main. It also documents rollback steps.
+`/mk:ship` handles deployment. It runs tests, creates conventional commits, opens a PR, and verifies CI. It never pushes directly to main. It also documents rollback steps.
 
 ## Quick start
 
@@ -32,6 +32,16 @@ Phase 4 review approved (Gate 2)
 /mk:ship --canary     # Staged deployment with monitoring
 /mk:ship --dry-run    # Preview without pushing or creating PR
 ```
+
+## Official versus beta
+
+Where you are shipping changes what runs. A beta ship trades the adversarial review and the docs update for speed; an official ship does not.
+
+| Mode | Target | Adversarial review | Version format | Docs update |
+|------|--------|-------------------|---------------|-------------|
+| `official` | main/master | Full, auto-scaled | `1.2.3` | Yes |
+| `beta` | dev/beta | Skipped | `1.2.3-beta.1` | Skipped |
+| `--dry-run` | nothing, preview only | Shows the plan | Shows the prediction | Shows what would change |
 
 ## Commit format
 
@@ -67,20 +77,29 @@ Hotfixes still require Gate 2 approval but may skip non-critical checks. Documen
 Before shipping, capture non-obvious decisions and corrections:
 
 ```
-##decision: Used connection pool over per-request connection — load testing showed 3x throughput
-##pattern:bug-class Race condition in payment retry — fixed with idempotency key
+##decision: Used connection pool over per-request connection, load testing showed 3x throughput
+##pattern:bug-class Race condition in payment retry, fixed with idempotency key
 ```
 
-These persist to `.claude/memory/` for future sessions.
+These persist to `.meowkit/memory/` for future sessions.
+
+## When it goes wrong
+
+| What you see | Why | What to do |
+|-------|-------|-----|
+| Pre-ship checks fail | Tests, lint, or types are broken | Fix them first; the ship is correctly refusing |
+| Merge conflicts | The base branch moved | Resolve manually, then re-run |
+| CI fails on the PR but passed locally | Something differs in the CI environment | Read the CI logs; the difference is the bug |
+| `gh` not found | GitHub CLI is not installed | Install `gh`, or push and open the PR in the browser |
 
 ## Don't use /mk:ship for
 
-- **Features still in development** — complete the review pipeline first
-- **Experimental code** — ship only reviewed, tested code
-- **Force pushes** — MeowKit never force-pushes
+- **Features still in development.** Complete the review pipeline first
+- **Experimental code.** Ship only reviewed, tested code
+- **Force pushes.** MeowKit never force-pushes
 
 ## Next steps
 
-- [Build a feature](/guides/build-a-feature) — the full pipeline ending with ship
-- [Review code](/guides/review-code) — the review phase before shipping
-- [Gates & security](/core-concepts/gates) — how Gate 2 protects shipping
+- [Build a feature](/guides/build-a-feature): the full pipeline ending with ship
+- [Review code](/guides/review-code): the review phase before shipping
+- [Gates & security](/core-concepts/gates): how Gate 2 protects shipping

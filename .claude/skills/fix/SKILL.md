@@ -89,13 +89,13 @@ Without a mode flag, use the standard profile. Use quick only when its boundary 
 
 ## Step 0.5 — Check Fix Memory (standard/deep only)
 
-Read `.claude/memory/fixes.json` — it is the canonical, schema-validated store of prior fix patterns. See the source-of-truth rule in `.claude/rules/memory-read-rules.md`.
+Read `.meowkit/memory/fixes.json` — it is the canonical, schema-validated store of prior fix patterns. See the source-of-truth rule in `.claude/rules/memory-read-rules.md`.
 
 - Search for similar symptoms, error messages, or affected modules
 - If a matching fix pattern exists → use it as starting hypothesis in Step 2
 - If a matching success pattern exists → apply the known fix approach directly
 
-This turns repeated bugs into instant fixes. Skip for quick, or if `.claude/memory/` does not exist.
+This turns repeated bugs into instant fixes. Skip for quick, or if `.meowkit/memory/` does not exist.
 
 ## Step 1 — Scout (MANDATORY — never skip)
 
@@ -177,8 +177,8 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 1. Report: confidence, root cause, changes, files, prevention measures.
 
-2. **Write to memory only for recurrence or durable salience** — read `.claude/memory/fixes.json` first, then add/update the canonical JSON store only when the pattern is likely to help a future run. Quick runs never write memory.
-   - **`.claude/memory/fixes.json`** — under `patterns`, add or update:
+2. **Write to memory only for recurrence or durable salience** — read `.meowkit/memory/fixes.json` first, then add/update the canonical JSON store only when the pattern is likely to help a future run. Quick runs never write memory.
+   - **`.meowkit/memory/fixes.json`** — under `patterns`, add or update:
 
      ```json
      {
@@ -233,7 +233,7 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index reco
 
 **Validate before approval:** run `node .claude/scripts/validate-workflow-evidence.cjs <path> --phase fix` before the user-approval prompt (Step 6 item 5). Surface any `EVIDENCE_BLOCKED:<reasons>` and fill the missing fields — do not present for approval on a blocked index. A high-risk flag (`risk.requiresHumanApproval`) forces explicit human approval before finalize regardless of mode.
 
-**Evidence ≠ memory:** the evidence file is one-run proof; `.claude/memory/fixes.json` is the durable pattern store. Keep them separate — standalone `/mk:fix` owns its evidence write; inside `/mk:cook` the pipeline (Phase 6) owns the evidence write, so do NOT double-write. Scrub secrets / tokens / PII and store pointers/summaries only — never raw command logs.
+**Evidence ≠ memory:** the evidence file is one-run proof; `.meowkit/memory/fixes.json` is the durable pattern store. Keep them separate — standalone `/mk:fix` owns its evidence write; inside `/mk:cook` the pipeline (Phase 6) owns the evidence write, so do NOT double-write. Scrub secrets / tokens / PII and store pointers/summaries only — never raw command logs.
 
 ## Skill Activation
 

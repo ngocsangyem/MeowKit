@@ -3,6 +3,17 @@ title: "mk:benchmark"
 description: "Harness canary suite — measures harness performance against ground-truth tasks. Backs the dead-weight audit with measured deltas."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/benchmark/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/benchmark/SKILL.md) |
+| **Owner** | `testing` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (`docs/dead-weight-audit.md`) consumes to make load-bearing decisions about each harness component.
@@ -23,7 +34,7 @@ Activate before applying a harness change (baseline) and after (verify delta). A
 
 - **Run canary suite:** Executes spec files from `.claude/benchmarks/canary/quick/` (and `full/` with `--full`) via `mk:autobuild`, recording per-task verdicts, scores, duration, and cost.
 - **Compare runs:** Reads two prior run JSONs from `.claude/benchmarks/results/` and emits a markdown delta table showing per-task score and cost changes.
-- **Persist baselines:** After each completed run, appends a cost baseline to `.claude/memory/cost-log.json` and emits a `benchmark_result` event to `.claude/memory/trace-log.jsonl`.
+- **Persist baselines:** After each completed run, appends a cost baseline to `.meowkit/telemetry/cost-log.json` and emits a `benchmark_result` event to `.meowkit/telemetry/trace-log.jsonl`.
 - **Git index audit:** `scripts/git-index-audit.sh` records a reproducible git tracked-state fingerprint as a JSON artifact in `.claude/benchmarks/audits/` (a sibling of `results/`, with a `type: audit` discriminator). Single-repo mode snapshots tracked-file/directory counts plus tracked-path and tracked-index SHA-256; two-arg mode adds local/remote-only counts and a recursive diff status.
 
 ## Example Prompt

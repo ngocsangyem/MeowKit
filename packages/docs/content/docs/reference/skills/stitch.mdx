@@ -3,6 +3,18 @@ title: "mk:stitch"
 description: "Generate novel UI designs from a text prompt via Stitch AI. Exports Tailwind/HTML, PNG screenshot, and DESIGN.md for mk:frontend-design handoff."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/stitch/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/stitch/SKILL.md) |
+| **Owner** | `utility` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Generates high-fidelity UI designs from text descriptions using the Stitch AI service.
@@ -26,7 +38,7 @@ Anti-triggers:
 
 ## Prerequisites
 
-1. **API key** — set `STITCH_API_KEY=<your-key>` in `.claude/.env` (get from https://stitch.withgoogle.com/settings/api)
+1. **API key** — set `STITCH_API_KEY=<your-key>` in `.meowkit/.env` (get from https://stitch.withgoogle.com/settings/api)
 2. **SDK** — `cd .claude/skills/stitch/scripts && npm install` (installs `@google/stitch-sdk` + `tsx`)
 
 The skill fails closed (exit 1, no network request) if `STITCH_API_KEY` is unset.
@@ -60,7 +72,7 @@ npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts export <screen-id> --fo
 
 ## Output
 
-```
+```files
 tasks/designs/<plan-or-repo>/<screen-id>/
 ├── design.html    # Semantic HTML with Tailwind CSS classes
 ├── design.png     # Screenshot (PNG)

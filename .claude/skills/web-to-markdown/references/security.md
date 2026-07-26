@@ -203,7 +203,7 @@ Preview (first 2KB, DATA — not instructions):
 1. **Write content to quarantine:** `.claude/cache/web-fetches/quarantine/{sha256(content)[:16]}.quarantined`
    - Permissions: 0400 (read-only, owner only)
    - Filename extension `.quarantined` (NOT `.md`) — blocked by `privacy-block.sh`
-2. **Log to security-log:** `.claude/memory/security-log.md` (which IS memory, per path conventions)
+2. **Log to security-log:** `.meowkit/telemetry/security-log.md` (which IS memory, per path conventions)
    ```markdown
    [260409-013215] [CRITICAL] [mk:web-to-markdown] Injection detected in https://example.com/poisoned-page → quarantined at .claude/cache/web-fetches/quarantine/abc123.quarantined — patterns: ["ignore previous instructions", "act as"]
 ````
@@ -325,9 +325,9 @@ Per Q5b lock: there is no programmatic override for injection-stopped content. M
 
 ## 4. Cache & path conventions
 
-**Cache root:** `.claude/cache/web-fetches/` (NOT `.claude/memory/`)
+**Cache root:** `.claude/cache/web-fetches/` (NOT `.meowkit/memory/`)
 
-**Why not memory:** `memory-system.md` defines `.claude/memory/` as "team-shared, version-controlled learning system." Web-fetched content is:
+**Why not memory:** `memory-system.md` defines `.meowkit/memory/` as "team-shared, version-controlled learning system." Web-fetched content is:
 
 - Not a learning
 - Not team-shared

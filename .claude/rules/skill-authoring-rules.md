@@ -33,7 +33,7 @@ When a skill needs to persist data across sessions (append-only logs, JSON state
 
 WHY: Skill directories can be wiped on plugin upgrade; `${CLAUDE_PLUGIN_DATA}` is stable.
 
-EXCEPTION: framework-internal infrastructure (`.claude/memory/`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
+EXCEPTION: framework-internal infrastructure (`.meowkit/memory/`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
 
 **Good example: Stable plugin-data path**:
 

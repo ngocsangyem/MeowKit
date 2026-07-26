@@ -3,6 +3,18 @@ title: "mk:docs-finder"
 description: "Script-first documentation discovery — retrieves up-to-date library, framework, and API docs via Context7 (llms.txt), Context Hub (chub), WebSearch, and web-to-markdown with intelligent 4-tier fallback."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/docs-finder/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/docs-finder/SKILL.md) |
+| **Owner** | `docs` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Retrieves current, accurate documentation for any library, framework, API, SDK, or internal project spec. Uses a **script-first architecture**: five Node.js scripts form a pipeline (detect source -> fetch -> analyze -> output). Supports topic-specific searches (10-15s), general library searches (30-60s), and internal project doc searches (5-15s). Always prefers this over raw WebSearch — it returns structured, context-efficient results.

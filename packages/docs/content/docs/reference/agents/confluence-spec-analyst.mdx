@@ -3,6 +3,18 @@ title: "confluence-spec-analyst"
 description: "Confluence spec analyst — reads a page and its children, runs gap-detection heuristics, and produces a structured Spec Research Report. Read-only at Confluence side; persists report locally."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/confluence-spec-analyst.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/confluence-spec-analyst.md) |
+| **Owner** | `confluence` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Writes** | `/`, `docs/project-context.md`, `research/`, `tasks/reports/` |
+
+{/* GENERATED:reference-facts END */}
+
 The confluence-spec-analyst agent reads a Confluence spec page (plus children up to a depth cap), runs gap-detection heuristics, and emits a **structured Spec Research Report** for human review. The fetch path uses `--representation atlas_doc_format` (ADF) piped through the macro-aware walker so panels, decisions, task lists, mentions, expand sections, and Smart Link / Figma embeds survive the fetch as explicit markdown labels — first-class signals for downstream gap detection.
 
 ## Cognitive Framing

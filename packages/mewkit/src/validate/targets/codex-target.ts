@@ -23,8 +23,17 @@ function warn(name: string, detail: string): CheckResult {
 	return { name, status: "warn", detail, section: SECTION };
 }
 
-/** `X_OK` bit set for owner/group/other. */
+/**
+ * `X_OK` bit set for owner/group/other.
+ *
+ * Windows has no POSIX execute bit — `fs.stat` there reports only the read-only attribute, so
+ * `mode & 0o111` is always 0 and this check would fail every wrapper on a Windows checkout. The
+ * bit is also not what makes a wrapper runnable: `hooks.json` invokes each one as `node <path>`,
+ * which needs read access, not the execute bit. So on Windows the assertion is not meaningful and
+ * existence (already checked by the caller) is the real contract.
+ */
 function isExecutable(file: string): boolean {
+	if (process.platform === "win32") return fs.existsSync(file);
 	try {
 		return (fs.statSync(file).mode & 0o111) !== 0;
 	} catch {

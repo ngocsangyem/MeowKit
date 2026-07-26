@@ -6,7 +6,7 @@
 # Usage: pre-task-check.sh <task-description>
 # Exit codes: 0 = PASS, 1 = BLOCK
 #
-# Load .claude/.env (each hook is a separate subprocess)
+# Load .meowkit/.env (each hook is a separate subprocess)
 . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 # POSIX-compatible (macOS + Linux). No bash-isms.
 
@@ -14,7 +14,7 @@
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
 # Hook profile gating — skip context check in fast profile for speed
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 case "$MEOW_PROFILE" in
   fast) exit 0 ;;
 esac

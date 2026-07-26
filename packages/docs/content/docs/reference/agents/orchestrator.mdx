@@ -3,6 +3,18 @@ title: "orchestrator"
 description: "Task router — classifies complexity, assigns model tier, detects TDD mode, and routes every request to the right specialist agent."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/orchestrator.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/orchestrator.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | critical |
+| **Writes** | `.claude/session-state/tdd-mode`, `/`, `rules/scale-adaptive-rules.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The orchestrator is the front door of every MeowKit workflow. Before any code is written, any plan is drafted, or any review is conducted, the orchestrator steps in to understand what you are asking for and decides who should handle it. Think of it as a project intake coordinator — it reads the room, sizes up the task, and assigns the right team.
 
 ## Cognitive Framing

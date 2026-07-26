@@ -35,7 +35,7 @@ The `--prune` subcommand uses a **grep-based approach** — no parser dependency
 **Mechanism:**
 1. For each topic file (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`): grep for `## ` headings with date pattern `(YYYY-MM-DD, severity: standard)`
 2. Compute age from today's date; identify entries older than threshold (default: 90 days)
-3. Append stale entry blocks to `.claude/memory/lessons-archive.md`
+3. Append stale entry blocks to `.meowkit/memory/lessons-archive.md`
 4. Rewrite topic file without the stale blocks
 5. Report: "Archived N entries across M files"
 

@@ -56,7 +56,7 @@ The **human user** types messages with a `##` prefix. Codex's `UserPromptSubmit`
 | `##pattern: DESCRIPTION` | `review-patterns.json` |
 | `##note: TEXT` | `quick-notes.md` |
 
-A non-prefixed prompt is a fast no-op (exit 0). See [`memory capture`](/cli/commands#memory-capture) for direct CLI usage.
+A non-prefixed prompt is a fast no-op (exit 0). See [`memory capture`](/cli/knowledge#memory-capture) for direct CLI usage.
 
 **The hook does NOT fire on agent or tool output.** It is bound to `UserPromptSubmit` semantics. Agents that need to capture use Path 2 below.
 
@@ -69,23 +69,6 @@ The `mk:fix` skill's Step 6 is the canonical example: read the live JSON schema 
 ### Session-end capture
 
 The Stop hook auto-appends cost entries to `cost-log.json` and resolves the active model id from `session-state/detected-model.json` via `resolve-model.sh`. Phase 6 (Reflect) runs **prose-driven** session capture via direct `Edit`. There is no `mewkit memory session-capture` CLI subcommand; content extraction needs LLM analysis.
-
-## Legacy migration from `.claude/memory/`
-
-Pre-migration projects have their memory under the legacy `.claude/memory/` path. `mewkit memory` (and any command that resolves the memory dir) detects this and refuses to read/write the wrong location — it prompts to run `mewkit migrate` instead of silently ignoring existing content.
-
-`mewkit migrate` runs a memory-migration step before the provider export:
-
-1. **Preflight** (read-only) — discovers `.claude/memory/`, classifies every file into the `.meowkit/` taxonomy, and builds a reconciliation plan. Nothing is written.
-2. **Migration transaction** — locked, staged, atomic move of the classified content into `.meowkit/`. Unknown files are preserved losslessly under `memory/legacy/` rather than dropped. A conflicting destination aborts the transaction instead of silently overwriting or merging.
-3. **Recovery** — a recoverable legacy archive is kept; `--dry-run` makes zero mutations so you can preview the plan first.
-
-```bash
-npx mewkit migrate --dry-run   # preview the memory migration plan, no writes
-npx mewkit migrate cursor      # migrates memory, then exports to the target provider
-```
-
-After a successful migration, `mewkit doctor --state` reports **legacy-path drift** if any writer (managed code or a user edit) reintroduces a file under `.claude/memory/` — it is reported, never silently re-migrated.
 
 ## How to read
 

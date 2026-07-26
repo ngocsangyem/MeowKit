@@ -20,7 +20,7 @@ async function makeSourceWithInstall(): Promise<string> {
 	await mkdir(join(claudeDir, "skills", "demo"), { recursive: true });
 	await writeFile(join(claudeDir, "skills", "demo", "SKILL.md"), "skill\n", "utf-8");
 	const meta = buildInstallMetadata(claudeDir, { version: "2.9.20" });
-	await writeInstallMetadata(claudeDir, meta);
+	await writeInstallMetadata(root, meta);
 	return root;
 }
 

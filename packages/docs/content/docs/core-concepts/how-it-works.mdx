@@ -1,9 +1,9 @@
 ---
 title: "How It Works"
-description: "The three mechanisms that enforce discipline — rules, hooks, and skills — and how agents compose skills across the workflow."
+description: "The three mechanisms that enforce discipline (rules, hooks, and skills) and how agents compose skills across the workflow."
 ---
 
-MeowKit is a **harness²**: Claude Code is already a harness (tools, context, subagents); MeowKit adds a second harness layer on top — workflows, gates, memory, and hook-based automation. It shapes AI behavior through three mechanisms. None of them are an executable runtime — they're conventions that Claude Code reads and acts on.
+MeowKit is a **harness²**: Claude Code is already a harness (tools, context, subagents); MeowKit adds a second harness layer on top: workflows, gates, memory, and hook-based automation. It shapes AI behavior through three mechanisms, none of which is an executable runtime. They are conventions that Claude Code reads and acts on.
 
 ## The three mechanisms
 
@@ -20,31 +20,31 @@ The harness isolates different kinds of reasoning into discrete layers, so no si
 | Layer | Owner | What it does |
 |-------|-------|-------------|
 | L1: Builder | Human | Approve plans (Gate 1), approve reviews (Gate 2) |
-| L2: Planner | `mk:plan-creator` | Decompose requests into product-level specs — user stories, not file names |
-| L3: Cook | `/mk:cook` workflow | 7-phase pipeline: Orient → Plan → Test → Build → Review → Ship → Reflect |
+| L2: Planner | `mk:plan-creator` | Decompose requests into product-level specs: user stories, not file names |
+| L3: Cook | `/mk:cook` workflow | Drives the task through [the seven phases](/core-concepts/workflow) and their two gates |
 | L4: Native Tasks | `dispatch.cjs` + handlers | Build-verify, budget tracking, checkpoints, immediate capture |
 | L5: Teams | `/mk:scout`, `/mk:party` | Parallel agents with worktree isolation and a context firewall |
-| L6: Skills | 126 skills | JIT activation — loaded only when the task domain matches |
+| L6: Skills | The skill library | Just-in-time activation, loaded only when the task domain matches |
 | L7: Base Shell | Claude Code | Context compaction, tool validation, subagent models |
 
 ## Rules: behavioral guardrails
 
-19 rule files in `.claude/rules/` are loaded into context every session. Two are NEVER-override: `security-rules.md` (block hardcoded secrets, SQL injection, XSS) and `injection-rules.md` (treat all file content as DATA, not instructions).
+The rule files in `.claude/rules/` carry the enforcement layer. Most load every session; the ones marked `[CONTEXTUAL]` load on demand. Two are NEVER-override: `security-rules.md` (block hardcoded secrets, SQL injection, XSS) and `injection-rules.md` (treat all file content as DATA, not instructions).
 
 Rules define the WHY. Hooks enforce the WHAT. A rule says "don't write code before planning." A hook says "you can't."
 
 ## Hooks: preventive enforcement
 
-Shell and Node.js scripts triggered by Claude Code lifecycle events — SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit. They intercept tool calls before they execute:
+Shell and Node.js scripts triggered by Claude Code lifecycle events: SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit. They intercept tool calls before they execute:
 
-- `gate-enforcement.sh` — blocks file writes before Gate 1 approval
-- `privacy-block.sh` — blocks reads of `.env`, SSH keys, credentials
-- `post-write.sh` — security scan on every written file
-- `pre-completion-check.sh` — blocks session end without verification evidence
+- `gate-enforcement.sh` blocks file writes before Gate 1 approval
+- `privacy-block.sh` blocks reads of `.env`, SSH keys, and credentials
+- `post-write.sh` security-scans every written file
+- `pre-completion-check.sh` blocks session end without verification evidence
 
-Critical design: security hooks (`gate-enforcement.sh`, `privacy-block.sh`) are never routed through the dispatcher. If `dispatch.cjs` crashes, security hooks still fire — no single point of failure.
+Critical design: security hooks (`gate-enforcement.sh`, `privacy-block.sh`) are never routed through the dispatcher. If `dispatch.cjs` crashes, security hooks still fire, so there is no single point of failure.
 
-Under the hooks, a Node.js dispatch system (`dispatch.cjs` + `handlers.json`) runs infrastructure handlers: model detection, budget tracking, build verification, loop detection, and checkpoint management. These fire automatically — agents don't invoke them.
+Under the hooks, a Node.js dispatch system (`dispatch.cjs` + `handlers.json`) runs infrastructure handlers: model detection, budget tracking, build verification, loop detection, and checkpoint management. These fire automatically; agents don't invoke them.
 
 ### Session lifecycle
 
@@ -61,16 +61,16 @@ Stop            → pre-completion-check (block without verification evidence) �
 
 ## Skills: domain expertise on demand
 
-126 skills in `.claude/skills/` provide domain-specific knowledge. Each skill's `SKILL.md` is a compact decision router — typically under 150 lines. Detailed procedures live in `references/` and load only when needed. This progressive disclosure saves ~70% context per invocation.
+The skills in `.claude/skills/` provide domain-specific knowledge. Each skill's `SKILL.md` is a compact decision router, typically under 150 lines. Detailed procedures live in `references/` and load only when needed. This progressive disclosure saves ~70% context per invocation.
 
 Skills activate by task domain, not all at once. A bug fix loads `mk:fix` (which internally calls `mk:investigate` and `mk:sequential-thinking`). A code review loads `mk:review`. A deployment loads `mk:ship`. No agent loads everything.
 
-Complex skills use step-file decomposition — only the active step is in context:
+Complex skills use step-file decomposition, so only the active step is in context:
 
-```
+```files
 skills/review/
-├── SKILL.md              # Entrypoint — metadata only
-├── workflow.md           # Step sequence
+├── SKILL.md (entrypoint, metadata only)
+├── workflow.md (step sequence)
 ├── step-01-blind-review.md
 ├── step-02-edge-cases.md
 ├── step-03-criteria-audit.md
@@ -79,7 +79,7 @@ skills/review/
 
 ## Agents: specialists with clear ownership
 
-17 specialist agents each own one concern. No two agents modify the same files:
+Each specialist agent owns one concern, and no two agents modify the same files:
 
 | Agent | Phase | Owns | Never does |
 |-------|-------|------|-----------|
@@ -95,7 +95,7 @@ Agents invoke skills as tools. The orchestrator loads `agent-detector` and `scou
 
 ## Memory: learning across sessions
 
-MeowKit stores engineering learnings in `.claude/memory/` — fix patterns, review findings, architecture decisions. Skills read relevant topic files at task start:
+MeowKit stores engineering learnings in `.meowkit/memory/`: fix patterns, review findings, architecture decisions. Skills read relevant topic files at task start:
 
 | Topic file | Consumer | Read when |
 |-----------|----------|-----------|
@@ -109,42 +109,31 @@ Write paths: immediate capture via `##pattern:` / `##decision:` / `##note:` pref
 
 ### Wiki: gated long-term knowledge
 
-Curated memory above is short-lived, schema-validated JSON for engineering learnings. For long-term, provenance-bearing project knowledge there is a separate layer — the **`mewkit wiki`** subsystem (`mk:wiki` / `mk:wiki-research` / `mk:wiki-render`). Canonical pages live under `tasks/wikis/<slug>/`; a derived, rebuildable FTS index lives in `.claude/memory/wiki-index.db`.
+Curated memory above is short-lived, schema-validated JSON for engineering learnings. For long-term, provenance-bearing project knowledge there is a separate layer, the **`mewkit wiki`** subsystem (`mk:wiki` / `mk:wiki-research` / `mk:wiki-render`). Canonical pages live under `tasks/wikis/<slug>/`; a derived, rebuildable FTS index lives in `.meowkit/cache/wiki-index.db`.
 
-Its defining property is an **anti-self-poisoning write model**: external content and agent output are DATA, so an agent may only *propose* a `WikiCandidate`. A canonical page is written **only** through a human `mewkit wiki approve`, which always re-runs the secret-scrub + multi-pass injection scanner — there is no path from assistant output to a canonical page. This mirrors the same security stance the hooks enforce elsewhere: untrusted input never becomes a trusted instruction.
+Its defining property is an **anti-self-poisoning write model**: external content and agent output are DATA, so an agent may only *propose* a `WikiCandidate`. A canonical page is written **only** through a human `mewkit wiki approve`, which always re-runs the secret-scrub and multi-pass injection scanner. There is no path from assistant output to a canonical page. This mirrors the same security stance the hooks enforce elsewhere: untrusted input never becomes a trusted instruction.
 
 | | Curated memory (`fixes`, `review-patterns`, …) | Wiki (`mewkit wiki`) |
 |---|---|---|
 | Lifetime | Short-term engineering learnings | Long-term project knowledge |
-| Store | Schema-validated JSON in `.claude/memory/` | Canonical files in `tasks/wikis/<slug>/` + derived FTS index |
+| Store | Schema-validated JSON in `.meowkit/memory/` | Canonical files in `tasks/wikis/<slug>/` + derived FTS index |
 | Write path | Agent/hook capture by prefix | Agent proposes; **human approves** (re-scans) |
 | Read | Skill loads its topic file at task start | `mewkit wiki search` / `hint` (FTS, provenance-bearing) |
 
 ## Putting it together: a feature request
 
-```
-User: "Add Stripe payment checkout"
-     │
-     ▼
-Phase 0: orchestrator classifies → COMPLEX (fintech domain)
-     │  Loads architecture-decisions.md for past payment patterns
-     ▼
-Phase 1: planner creates plan → Gate 1 (human approves)
-     │
-     ▼
-Phase 2: tester writes failing tests (if --tdd enabled)
-     │
-     ▼
-Phase 3: developer implements → build-verify.cjs checks every file
-     │  budget-tracker.cjs warns at $30, blocks at $100
-     ▼
-Phase 4: reviewer audits 5 dimensions → Gate 2 (human approves)
-     │
-     ▼
-Phase 5: shipper creates PR, never pushes to main
-     │
-     ▼
-Phase 6: documenter captures patterns to memory for next time
+```mermaid
+flowchart TD
+    U["User: 'Add Stripe payment checkout'"]
+    P0["<b>Phase 0</b> — orchestrator classifies → COMPLEX (fintech domain)<br/>Loads architecture-decisions.md for past payment patterns"]
+    P1["<b>Phase 1</b> — planner creates plan<br/>GATE 1: human approves"]
+    P2["<b>Phase 2</b> — tester writes failing tests (if --tdd enabled)"]
+    P3["<b>Phase 3</b> — developer implements → build-verify.cjs checks every file<br/>budget-tracker.cjs warns at $30, blocks at $100"]
+    P4["<b>Phase 4</b> — reviewer audits 5 dimensions<br/>GATE 2: human approves"]
+    P5["<b>Phase 5</b> — shipper creates PR, never pushes to main"]
+    P6["<b>Phase 6</b> — documenter captures patterns to memory for next time"]
+
+    U --> P0 --> P1 --> P2 --> P3 --> P4 --> P5 --> P6
 ```
 
 ## Next steps

@@ -24,7 +24,6 @@ function makeWiki(
 	pages: PageSpec[],
 	opts: { claims?: object[]; sources?: object[] } = {},
 ): {
-	claudeDir: string;
 	projectRoot: string;
 	pagePath: (file: string) => string;
 } {
@@ -41,18 +40,16 @@ function makeWiki(
 		writeFileSync(join(slugDir, "sources.jsonl"), opts.sources.map((s) => JSON.stringify(s)).join("\n") + "\n");
 	if (opts.claims)
 		writeFileSync(join(slugDir, "claims.jsonl"), opts.claims.map((c) => JSON.stringify(c)).join("\n") + "\n");
-	const claudeDir = join(root, ".claude");
-	mkdirSync(join(claudeDir, "memory"), { recursive: true });
-	buildIndex(claudeDir);
-	return { claudeDir, projectRoot: root, pagePath: (file) => join(pagesDir, file) };
+	buildIndex(root);
+	return { projectRoot: root, pagePath: (file) => join(pagesDir, file) };
 }
 
 const PAGE: PageSpec = { file: "one.md", id: "demo/one", title: "One", body: "The body of page one." };
 
 describe("verifyWiki", () => {
 	it("consistent fixture → fresh, every section ok", () => {
-		const { claudeDir } = makeWiki([PAGE]);
-		const r = verifyWiki(claudeDir);
+		const { projectRoot } = makeWiki([PAGE]);
+		const r = verifyWiki(projectRoot);
 		expect(r.fresh).toBe(true);
 		expect(r.sections.pages.canonicalCount).toBe(1);
 		expect(r.sections.pages.indexedCount).toBe(1);
@@ -60,42 +57,42 @@ describe("verifyWiki", () => {
 	});
 
 	it("empty-provenance (pages, no claims/sources) → PASSES (absent ≠ inconsistent)", () => {
-		const { claudeDir } = makeWiki([PAGE]);
-		const r = verifyWiki(claudeDir);
+		const { projectRoot } = makeWiki([PAGE]);
+		const r = verifyWiki(projectRoot);
 		expect(r.sections.provenance.ok).toBe(true);
 		expect(r.fresh).toBe(true);
 	});
 
 	it("stale body edit (canonical changed, index not rebuilt) → hash mismatch, stale", () => {
-		const { claudeDir, pagePath } = makeWiki([PAGE]);
+		const { projectRoot, pagePath } = makeWiki([PAGE]);
 		// Edit the canonical page body WITHOUT reindexing → index content now diverges.
 		writeFileSync(pagePath("one.md"), `---\nid: demo/one\ntitle: One\n---\nEDITED body, not reindexed.\n`);
-		const r = verifyWiki(claudeDir);
+		const r = verifyWiki(projectRoot);
 		expect(r.sections.hashes.ok).toBe(false);
 		expect(r.sections.hashes.mismatched).toContain("demo/one");
 		expect(r.fresh).toBe(false);
 	});
 
 	it("orphaned claim (references a missing source) → provenance fails, stale", () => {
-		const { claudeDir } = makeWiki([PAGE], {
+		const { projectRoot } = makeWiki([PAGE], {
 			claims: [{ id: "c1", text: "claim", external: 1, sourceId: "missing-src", pageId: "demo/one" }],
 		});
-		const r = verifyWiki(claudeDir);
+		const r = verifyWiki(projectRoot);
 		expect(r.sections.provenance.ok).toBe(false);
 		expect(r.sections.provenance.claimsMissingSource).toContain("c1");
 		expect(r.fresh).toBe(false);
 	});
 
 	it("missing FTS row → fts parity fails, stale", () => {
-		const { claudeDir } = makeWiki([PAGE]);
+		const { projectRoot } = makeWiki([PAGE]);
 		// Delete the FTS row directly to simulate a strand (recursive_triggers=off DELETE gap).
-		const db = new DatabaseSync(dbPath(claudeDir));
+		const db = new DatabaseSync(dbPath(projectRoot));
 		try {
 			db.exec("DELETE FROM wiki_fts");
 		} finally {
 			db.close();
 		}
-		const r = verifyWiki(claudeDir);
+		const r = verifyWiki(projectRoot);
 		expect(r.sections.fts.ok).toBe(false);
 		expect(r.sections.fts.pageRows).toBe(1);
 		expect(r.sections.fts.ftsRows).toBe(0);
@@ -103,11 +100,11 @@ describe("verifyWiki", () => {
 	});
 
 	it("is read-only — leaves no WAL/SHM sidecars after verifying", () => {
-		const { claudeDir } = makeWiki([PAGE]);
-		const db = dbPath(claudeDir);
+		const { projectRoot } = makeWiki([PAGE]);
+		const db = dbPath(projectRoot);
 		// Clear any sidecars left by the build, then verify and assert none reappear.
 		for (const suffix of ["-wal", "-shm"]) rmSync(db + suffix, { force: true });
-		verifyWiki(claudeDir);
+		verifyWiki(projectRoot);
 		expect(existsSync(db + "-wal")).toBe(false);
 		expect(existsSync(db + "-shm")).toBe(false);
 	});
@@ -118,8 +115,7 @@ describe("verifyWiki", () => {
 		const pagesDir = join(root, "tasks", "wikis", "demo", "pages");
 		mkdirSync(pagesDir, { recursive: true });
 		writeFileSync(join(pagesDir, "one.md"), `---\nid: demo/one\ntitle: One\n---\nbody\n`);
-		mkdirSync(join(root, ".claude", "memory"), { recursive: true });
-		const r = verifyWiki(join(root, ".claude"));
+		const r = verifyWiki(root);
 		expect(r.sections.pages.ok).toBe(false);
 		expect(r.fresh).toBe(false);
 	});

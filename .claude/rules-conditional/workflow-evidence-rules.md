@@ -72,7 +72,7 @@ the compact `fixDiagnosis` form; simple fixes may skip evidence entirely.
 ## 5 — Evidence ≠ Memory
 
 Evidence is **one-run proof** (this run's pointers); memory JSON
-(`.claude/memory/*.json`) is **durable cross-run patterns**. They never mix:
+(`.meowkit/memory/*.json`) is **durable cross-run patterns**. They never mix:
 the run's evidence file is not a memory store, and the JSON stores stay
 JSON-first per `memory-read-rules.md`. Write both separately.
 

@@ -20,7 +20,7 @@ step "Build (CLI needs dist)"
 npm run build >/dev/null 2>&1 && ok "build" || bad "build"
 
 # step "Unit tests (npm test)"
-# npm test >/dev/null 2>&1 && ok "npm test" || bad "npm test"
+npm test >/dev/null 2>&1 && ok "npm test" || bad "npm test"
 
 step "Lint"
 npm run lint >/dev/null 2>&1 && ok "lint" || bad "lint"

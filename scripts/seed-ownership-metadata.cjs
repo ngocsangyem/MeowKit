@@ -56,9 +56,9 @@ function deriveOwner(name) {
   if (/^jira/.test(name))              return "jira";
   if (/^confluence/.test(name))        return "confluence";
   if (/^(gate-enforcement|privacy-block|secret-scrub|control-probe)/.test(name)) return "security";
-  if (/^(memory|mk-loop)/.test(name))  return "memory";
+  if (/^(memory|loop)/.test(name))  return "memory";
   if (/^(cook|plan-creator|plan-ceo-review|planning-engine|workflow-orchestrator|ship|review|autobuild|validate-plan|agent-detector|bootstrap|pack|freeze)/.test(name)) return "lifecycle";
-  if (/^(scout|investigate|sequential-thinking|brainstorming|decision-framework|elicit|problem-solving|office-hours|party|careful|intake|help|nyquist|henshin|chom|mk-loop|lazy-agent-loader)/.test(name)) return "research";
+  if (/^(scout|investigate|sequential-thinking|brainstorming|decision-framework|elicit|problem-solving|office-hours|party|careful|intake|help|nyquist|henshin|chom|loop|lazy-agent-loader)/.test(name)) return "research";
   if (/^(testing|benchmark|qa|qa-manual|playwright-cli|verify|lint-and-validate|build-fix|rubric|evaluate)/.test(name)) return "testing";
   if (/^(docs-finder|docs-init|document-release|project-context|project-organization|llms|web-to-markdown|retro|preview|session-continuation|fix|simplify|context-audit|prompt-enhancer)/.test(name)) return "docs";
   if (/^(git-manager|worktree|ship|task-queue|team-config)/.test(name) && !/^ship/.test(name)) return "git";

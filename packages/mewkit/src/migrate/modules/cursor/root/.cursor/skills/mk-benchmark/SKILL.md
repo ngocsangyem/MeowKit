@@ -188,7 +188,7 @@ For compare: `scripts/compare-runs.sh <run-id-a> <run-id-b>`.
 
 ## Memory Write
 
-After each completed benchmark run, append the baseline to `.meowkit/memory/cost-log.json` (top-level array). Create the file with `[]` if it does not exist.
+After each completed benchmark run, append the baseline to `.meowkit/telemetry/cost-log.json` (top-level array). Create the file with `[]` if it does not exist.
 
 ```json
 {"run_id": "{id}", "date": "{ISO-date}", "tier": "quick|full", "pass_rate": N, "avg_score": N, "total_cost_usd": N}

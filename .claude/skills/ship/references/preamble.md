@@ -20,15 +20,15 @@
 
 ## Memory — At task start
 
-Read `.claude/memory/architecture-decisions.json` for release context; fall back to the generated Markdown view only when JSON is absent. If neither exists, proceed without memory.
+Read `.meowkit/memory/architecture-decisions.json` for release context; fall back to the generated Markdown view only when JSON is absent. If neither exists, proceed without memory.
 
 ## Preamble (run first)
 
 ```bash
-mkdir -p .claude/memory/sessions
-touch .claude/memory/sessions/"$PPID"
-_SESSIONS=$(find .claude/memory/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find .claude/memory/sessions -mmin +120 -type f -delete 2>/dev/null || true
+mkdir -p .meowkit/state/sessions
+touch .meowkit/state/sessions/"$PPID"
+_SESSIONS=$(find .meowkit/state/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
+find .meowkit/state/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _CONTRIB=$(.claude/scripts/bin/workflow-config get contributor 2>/dev/null || true)
 _PROACTIVE=$(.claude/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
@@ -37,16 +37,16 @@ echo "PROACTIVE: $_PROACTIVE"
 source <(.claude/scripts/bin/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
-_LAKE_SEEN=$([ -f .claude/memory/.completeness-intro-seen ] && echo "yes" || echo "no")
+_LAKE_SEEN=$([ -f .meowkit/state/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
 _TEL=$(.claude/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f .claude/memory/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL_PROMPTED=$([ -f .meowkit/state/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p .claude/memory
-echo '{"skill":"ship","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .claude/memory/skill-usage.jsonl 2>/dev/null || true
+mkdir -p .meowkit/telemetry
+echo '{"skill":"ship","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest skills — only invoke
@@ -59,7 +59,7 @@ Then offer to open the essay in their default browser:
 
 ```bash
 open https://garryslist.org/posts/boil-the-ocean
-touch .claude/memory/.completeness-intro-seen
+touch .meowkit/state/.completeness-intro-seen
 ```
 
 Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
@@ -92,7 +92,7 @@ If B→B: run `.claude/scripts/bin/workflow-config set telemetry off`
 
 Always run:
 ```bash
-touch .claude/memory/.telemetry-prompted
+touch .meowkit/state/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
@@ -161,7 +161,7 @@ Before building infrastructure, unfamiliar patterns, or anything the runtime mig
 
 Log eureka moments:
 ```bash
-jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> .claude/memory/eureka.jsonl 2>/dev/null || true
+jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> .meowkit/telemetry/eureka.jsonl 2>/dev/null || true
 ```
 Replace SKILL_NAME and ONE_LINE_SUMMARY. Runs inline — don't stop the workflow.
 
@@ -177,7 +177,7 @@ If `_CONTRIB` is `true`: you are in **contributor mode**. You're a toolkit user 
 
 **NOT worth filing:** user's app bugs, network errors to user's URL, auth failures on user's site, user's own JS logic bugs.
 
-**To file:** write `.claude/memory/contributor-logs/{slug}.md` with **all sections below** (do not truncate — include every section through the Date/Version footer):
+**To file:** write `.meowkit/memory/contributor-logs/{slug}.md` with **all sections below** (do not truncate — include every section through the Date/Version footer):
 
 ```
 # {Title}

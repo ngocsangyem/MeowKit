@@ -1,6 +1,6 @@
 import { mkdtemp, mkdir, rm, writeFile, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
 	buildInstallMetadata,
@@ -43,7 +43,7 @@ describe("readInstallMetadata precedence", () => {
 		const claudeDir = await makeClaudeDir();
 		await writeFileAt(claudeDir, "rules/a.md", "shipped\n");
 		const meta = buildInstallMetadata(claudeDir, { version: "2.9.13" });
-		await writeInstallMetadata(claudeDir, meta);
+		await writeInstallMetadata(dirname(claudeDir), meta);
 
 		const result = readInstallMetadata(claudeDir);
 		expect(result.source).toBe("new");
@@ -255,7 +255,7 @@ describe("writeInstallMetadata round-trip", () => {
 		await writeFileAt(claudeDir, "rules/a.md", "shipped\n");
 		await writeFileAt(claudeDir, "skills/x/SKILL.md", "skill\n");
 		const meta = buildInstallMetadata(claudeDir, { version: "2.9.13" });
-		await writeInstallMetadata(claudeDir, meta);
+		await writeInstallMetadata(dirname(claudeDir), meta);
 
 		const result = readInstallMetadata(claudeDir);
 		expect(result.source).toBe("new");

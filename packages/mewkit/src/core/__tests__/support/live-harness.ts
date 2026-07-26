@@ -15,8 +15,10 @@ export const REPO_ROOT = process.cwd();
 export const LIVE_HARNESS = join(REPO_ROOT, ".claude");
 
 // `pack-manifest.json` is the harness marker: present at the repo-root bundle, never in
-// an empty package-subdir `.claude/`.
+// an empty package-subdir `.claude/`. It now lives in the state root, with the pre-move
+// location still accepted so the guard works against either shape of checkout.
 function assertHarnessPresent(): void {
+	if (existsSync(join(REPO_ROOT, ".meowkit", "pack-manifest.json"))) return;
 	if (existsSync(join(LIVE_HARNESS, "pack-manifest.json"))) return;
 	throw new Error(
 		`Live-harness tests need the MeowKit bundle at "${LIVE_HARNESS}", but it is absent. ` +

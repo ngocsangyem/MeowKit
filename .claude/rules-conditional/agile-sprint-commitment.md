@@ -17,7 +17,7 @@ trust_level: HIGH
 2. `mk:agent-detector` Step 0b reads newest active sprint-state, surfaces `sprint_goal:` in orient banner
 3. `mk:plan-creator` Phase 1 advisory: "Does this plan serve sprint goal '{goal}'?"
 
-**NEVER persist sprint goal in `.claude/memory/`** (memory churns). **INSTEAD:** file-based contract; survives sessions; auditable in git.
+**NEVER persist sprint goal in `.meowkit/memory/`** (memory churns). **INSTEAD:** file-based contract; survives sessions; auditable in git.
 
 ## 2 — Commitment immutability + amendment ceremony
 

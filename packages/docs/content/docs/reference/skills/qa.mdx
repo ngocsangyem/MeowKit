@@ -3,6 +3,17 @@ title: "mk:qa"
 description: "Systematically QA test a web application and fix bugs found. Runs QA testing, then iteratively fixes bugs in source code, committing each fix atomically and re-verifying."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/qa/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/qa/SKILL.md) |
+| **Owner** | `testing` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 A combined QA engineer and bug-fix engineer that tests web applications like a real user -- clicking every element, filling every form, checking every state. When bugs are found, it fixes them in source code with atomic commits and re-verifies. Produces a structured report with before/after health scores, fix evidence, and a ship-readiness summary.
@@ -52,7 +63,7 @@ The skill follows an 11-phase pipeline:
 7. **Triage** -- Sort by severity, filter by tier, mark unfixable issues as deferred
 8. **Fix Loop** -- For each fixable issue: locate source (Grep/Glob), apply minimal fix, atomic commit, re-test with evidence, classify (verified/best-effort/reverted), generate regression test
 9. **Final QA** -- Re-run QA on all affected pages, compute final health score, warn if regressed
-10. **Report** -- Write structured report to `.claude/memory/qa-reports/` with health score delta, fix status per issue, PR summary
+10. **Report** -- Write structured report to `.meowkit/memory/qa-reports/` with health score delta, fix status per issue, PR summary
 11. **TODOS.md Update** -- Add deferred bugs, annotate fixed bugs
 
 ## Usage
@@ -84,7 +95,7 @@ The skill enters diff-aware mode: analyzes the branch diff to find affected page
 - **Always commit or stash first** -- the skill requires a clean working tree so each fix gets its own atomic commit
 - **Use diff-aware mode** on feature branches -- it automatically scopes testing to what changed, much faster than full mode
 - **Run before `mk:review`** -- QA finds runtime bugs that static review misses; the two complement each other
-- **Check `.claude/memory/qa-reports/`** for historical reports and baselines for regression comparisons
+- **Check `.meowkit/memory/qa-reports/`** for historical reports and baselines for regression comparisons
 - **The health score weights functional (20%) highest** -- prioritize functional bugs during triage
 - **Set up test framework first** -- if the project has no tests, the skill offers to bootstrap one before generating regression tests
 

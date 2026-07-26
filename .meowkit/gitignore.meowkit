@@ -1,0 +1,14 @@
+# MeowKit — append to your .gitignore
+.env
+.env.local
+
+# `.meowkit/` holds project state. These classes are machine-written and either
+# disposable or private. `.meowkit/config.json` is your project's config and
+# SHOULD be committed, so the ignores are per-class rather than the whole dir.
+.meowkit/memory/
+.meowkit/telemetry/
+.meowkit/state/
+.meowkit/cache/
+
+.claude/logs/
+.claude/skills/.venv/

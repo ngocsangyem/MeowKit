@@ -58,13 +58,13 @@ tasks/
 
 Every plan uses a directory with reports subfolder:
 
-```
+```files
 tasks/plans/260328-add-auth/
-├── plan.md                    # Main plan (under 80 lines)
-├── reports/                   # Scout + research reports
+├── plan.md (main plan, under 80 lines)
+├── reports/ (scout + research reports)
 │   ├── scout-report.md
 │   └── researcher-01-oauth.md
-├── phase-01-setup.md          # Per-phase details
+├── phase-01-setup.md (per-phase details)
 └── phase-02-implement.md
 ```
 
@@ -95,4 +95,4 @@ Agents update this section after each significant action. On resumption, the age
 | Security Audit | Security review | security agent |
 | Guideline | Team standards document | documenter |
 
-Create tasks with `npx mewkit task new --type TYPE "description"`. See [Task Commands](/cli/task-commands) for details.
+Create tasks with `npx mewkit task new --type TYPE "description"`. See [Planning and Tasks](/cli/planning) for details.

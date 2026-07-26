@@ -1,6 +1,8 @@
 ---
 title: "Hooks"
 description: "MeowKit's lifecycle hooks — what they enforce, when they run."
+sourceOfTruth: ".claude/settings.json"
+lastVerified: "2026-07-26"
 ---
 
 MeowKit uses lifecycle hooks to enforce discipline at the tool level. Some hooks are registered in `.claude/settings.json` (automatic), others are invoked by skills.
@@ -13,7 +15,7 @@ These run automatically via Claude Code's hook system:
 | ---------------------- | ----------- | ----------- | ----------------------------------------------------------------------------------------- | ------------ |
 | `post-write.sh`        | PostToolUse | Edit, Write | Security scan: secrets, `any` type, SQL injection, XSS, destructive patterns              | Yes (exit 2) |
 | `learning-observer.sh` | PostToolUse | Edit, Write | Detect churn patterns (file edited 3+ times); feeds into post-session retroactive capture | No           |
-| `post-session.sh`      | Stop        | Session end | Capture session data to `.claude/memory/`                                                 | No           |
+| `post-session.sh`      | Stop        | Session end | Capture session data to `.meowkit/memory/`                                                 | No           |
 | `ensure-skills-venv.sh` | SessionStart | Session start | Idempotent bootstrap — creates `.claude/skills/.venv` if absent                         | No           |
 | `tdd-flag-detector.sh`  | UserPromptSubmit | Prompt submit | Detects `--tdd` flag in user prompts, writes sentinel to `session-state/tdd-mode`      | No           |
 | `gate-enforcement.sh`   | PreToolUse     | Edit, Write  | Blocks code writes before Gate 1 (plan approval) and sprint contract sign; validates contract file edits against schema | Yes (exit 1) |
@@ -38,7 +40,7 @@ These run when specific skills call them:
 | `pre-task-check.sh` | Any       | Prompt injection pattern detection | Yes (BLOCK on injection) |
 | `pre-implement.sh`  | Phase 2-3 | TDD gate — opt-in (see note below) | Only when TDD enabled    |
 | `pre-ship.sh`       | Phase 5   | Test + lint + typecheck            | Yes                      |
-| `append-trace.sh`   | Any       | Append JSONL trace record to `.claude/memory/trace-log.jsonl` (secret-scrubbed, atomic, auto-rotates at 50MB) | No                       |
+| `append-trace.sh`   | Any       | Append JSONL trace record to `.meowkit/telemetry/trace-log.jsonl` (secret-scrubbed, atomic, auto-rotates at 50MB) | No                       |
 
 ### `pre-implement.sh` invocation model
 
@@ -67,7 +69,7 @@ These hooks are telemetry-only — they log event fires to verify Claude Code su
 
 ## Hook runtime profiling
 
-The `MEOW_HOOK_PROFILE` environment variable controls which hooks are active. Set it in your `.env` file or shell before starting a Claude Code session.
+The `MEOWKIT_HOOK_PROFILE` environment variable controls which hooks are active. Set it in your `.env` file or shell before starting a Claude Code session.
 
 | Profile    | Hooks Active                                                                | Use When                              |
 | ---------- | --------------------------------------------------------------------------- | ------------------------------------- |
@@ -77,7 +79,7 @@ The `MEOW_HOOK_PROFILE` environment variable controls which hooks are active. Se
 
 ```bash
 # Set in .env or shell
-MEOW_HOOK_PROFILE=fast
+MEOWKIT_HOOK_PROFILE=fast
 ```
 
 ### Per-hook profile classification
@@ -94,9 +96,11 @@ MEOW_HOOK_PROFILE=fast
 | `post-session.sh`           |   ✅   |    ❌    |  ❌  |
 | `learning-observer.sh`      |   ✅   |    ✅    |  ❌  |
 
-:::warning Safety-critical hooks never skip
+<Callout title="Safety-critical hooks never skip" type="warn">
+
 `gate-enforcement.sh` and `privacy-block.sh` are active in **all** profiles, including `fast`. These enforce the two hard gates and sensitive file protection — they cannot be disabled by profile selection.
-:::
+
+</Callout>
 
 ## Hook configuration
 
@@ -233,4 +237,42 @@ node dispatch.cjs <EventName> [Matcher]
 | `MEOWKIT_PRECOMPLETION=off`      | Skip `pre-completion-check.sh`                                        |
 | `MEOWKIT_AUTOBUILD_MODE=LEAN`      | PreCompletion falls back to soft nudge; BuildVerify still runs        |
 | `MEOWKIT_AUTOBUILD_MODE=MINIMAL`   | Skip BuildVerify + PreCompletion entirely                             |
-| `MEOW_HOOK_PROFILE=fast`         | Skip `pre-ship`, `post-session`, `learning-observer` (speed)          |
+| `MEOWKIT_HOOK_PROFILE=fast`         | Skip `pre-ship`, `post-session`, `learning-observer` (speed)          |
+
+{/* GENERATED:reference-index START */}
+
+## Registered hooks
+
+_Generated from `.claude/settings.json`, so a registered hook cannot be missing here._
+
+**Blocking** means the hook can stop the action. Advisory means it observes and reports.
+Script paths, timeouts, and matcher chains are intentionally not listed; read
+`.claude/settings.json` for the wiring.
+
+| Event | Purpose | Can it block? |
+|---|---|---|
+| `PostToolUse` | Dispatch | Advisory |
+| `PostToolUse` | Learning observer | Advisory |
+| `PostToolUse` | Security scanning written file | **Blocking** |
+| `PostToolUseFailure` | Posttoolfailure probe | Advisory |
+| `PreCompact` | Precompact probe | Advisory |
+| `PreToolUse` | Checking file access permissions | **Blocking** |
+| `PreToolUse` | Checking Gate 1 approval | **Blocking** |
+| `PreToolUse` | Checking web fetch targets | **Blocking** |
+| `PreToolUse` | Pre task check | Advisory |
+| `PreToolUse` | Running pre-ship validation | **Blocking** |
+| `SessionStart` | Dispatch | Advisory |
+| `SessionStart` | Ensuring Python skills venv | Advisory |
+| `SessionStart` | Loading capability resolution | Advisory |
+| `SessionStart` | Loading project context | Advisory |
+| `SessionStart` | Validating Jira env | Advisory |
+| `Stop` | Control probe | Advisory |
+| `Stop` | Dispatch | Advisory |
+| `Stop` | Post session | Advisory |
+| `Stop` | Pre completion check | **Blocking** |
+| `UserPromptSubmit` | Detecting --tdd flag | Advisory |
+| `UserPromptSubmit` | Dispatch | Advisory |
+
+Registered with no hooks today: `SubagentStart`, `SubagentStop`.
+
+{/* GENERATED:reference-index END */}

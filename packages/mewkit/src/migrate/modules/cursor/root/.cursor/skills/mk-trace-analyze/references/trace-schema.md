@@ -1,6 +1,6 @@
 # Trace Log Schema
 
-Reference for `.meowkit/memory/trace-log.jsonl` records. Append-only JSONL written by `append-trace.sh`.
+Reference for `.meowkit/telemetry/trace-log.jsonl` records. Append-only JSONL written by `append-trace.sh`.
 
 ## Top-Level Fields
 
@@ -78,7 +78,7 @@ Always parse via `.cursor/skills/.venv/bin/python3` (per kit rules — no `jq` d
 
 ```python
 import json
-with open('.meowkit/memory/trace-log.jsonl') as f:
+with open('.meowkit/telemetry/trace-log.jsonl') as f:
     for line in f:
         if not line.strip():
             continue

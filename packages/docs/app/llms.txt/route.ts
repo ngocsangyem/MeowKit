@@ -1,10 +1,10 @@
-import { source } from '@/lib/source';
+import { getPublishedPages } from '@/lib/get-published-pages';
 
 export const revalidate = false;
 
 // llms.txt index — one line per page, grouped nowhere (flat), for AI agents.
 export function GET() {
-  const lines = source.getPages().map((page) => {
+  const lines = getPublishedPages().map((page) => {
     const title = page.data.title ?? page.url;
     const desc = page.data.description ? `: ${page.data.description}` : '';
     return `- [${title}](${page.url})${desc}`;

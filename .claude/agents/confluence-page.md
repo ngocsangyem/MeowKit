@@ -26,7 +26,7 @@ This agent is **A (untrusted page content) + C (Confluence state change via wrap
 
 ## Pre-flight
 
-The parent SessionStart hook validated `.claude/.env` presence + the 3 `MEOW_CONFLUENCE_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
+The parent SessionStart hook validated `.meowkit/.env` presence + the 3 `MEOW_CONFLUENCE_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
 
 All `confluence-as` invocations MUST go through:
 
@@ -71,7 +71,7 @@ End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.
 ```toon
 [5]{exit,action}
 1|Validation — re-read your `--help`, fix the flag, retry
-2|Auth or settings.local.json fallback — wrapper rejected; user moves credentials to `.claude/.env`
+2|Auth or settings.local.json fallback — wrapper rejected; user moves credentials to `.meowkit/.env`
 3|Cloud-only gate — site URL is non-Cloud; user uses MCP escape hatch per install-and-auth.md
 4|Network / DNS — retry once; check VPN
 5|Permission (401/403) — token may be rotated; user re-runs `/mk:confluence-setup`

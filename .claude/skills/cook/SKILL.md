@@ -268,7 +268,7 @@ Operational gotchas live here; pre-build failure modes and rationalizations live
 - **Code mode on stale plans**: Running old plan against changed codebase. Warn if plan.md is >14 days old
 - **Fast mode shallow test coverage**: Skipping research means tests capture plan-level intent, not edge cases. Document: "fast mode = TDD-flavored, coverage may be lower"
 - **Missing model tier declaration**: Expensive models on trivial tasks, cheap models on security-critical work. Always declare tier in Phase 0
-- **Forgetting memory read/write**: Prior session learnings lost. Phase 0 reads canonical `.claude/memory/*.json` stores only for fix memory; Phase 6 writes canonical JSON stores and regenerates generated views when needed
+- **Forgetting memory read/write**: Prior session learnings lost. Phase 0 reads canonical `.meowkit/memory/*.json` stores only for fix memory; Phase 6 writes canonical JSON stores and regenerates generated views when needed
 - **Subagent patterns using Agent() not Task()**: Task() enables tracking, blocking, and progress. Always use Task() for phases 2-6
 - **--strict cost surprise**: `--strict` spawns the full evaluator (`mk:evaluate`) — a [HEAVY] pass. Auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress, or `--verify` for the [LIGHT] check
 - **--strict vs --verify confusion**: `--verify` = light browser check (advisory). `--strict` = full evaluator with rubrics (FAIL blocks ship). `--strict` supersedes `--verify`

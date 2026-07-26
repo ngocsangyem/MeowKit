@@ -3,6 +3,17 @@ title: "mk:investigate"
 description: "Systematic debugging with root cause investigation. Four phases: investigate, analyze, hypothesize, implement. Iron Law: no fixes without root cause."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/investigate/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/investigate/SKILL.md) |
+| **Owner** | `research` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Performs systematic root cause debugging with a strict methodology: investigate symptoms, analyze patterns, form and test hypotheses, and only then implement a fix. Enforces the **Iron Law** -- no fixes without confirmed root cause. Hooks prevent edits until investigation is complete. Produces a structured DEBUG REPORT with symptom, root cause, fix scope, and evidence. Hands off to `mk:fix` for implementation if a fix is needed.
@@ -27,7 +38,7 @@ Performs systematic root cause debugging with a strict methodology: investigate 
 - **Blast radius check:** If >5 files touched, prompts user before proceeding
 - **Specialized technique dispatch:** Routes to deep stack trace analysis, system investigation, log analysis, or performance diagnostics based on bug type
 - **Pattern library:** Recognizes common failure patterns (race conditions, nil propagation, state corruption, integration failures, configuration drift, stale cache)
-- **Memory integration:** Reads `.claude/memory/fixes.md` and `.claude/memory/architecture-decisions.md`; writes diagnosis records
+- **Memory integration:** Reads `.meowkit/memory/fixes.md` and `.meowkit/memory/architecture-decisions.md`; writes diagnosis records
 - **Protocol compliance:** Follows shared protocols for AskUserQuestion format, completeness principle, telemetry, completion status
 
 ## Workflow
@@ -93,6 +104,6 @@ The skill collects the error trace, reads the search controller code, checks rec
 - **Check `TODOS.md` and prior fixes** -- many bugs are recurrences of previous issues
 - **Use `mk:freeze` for complex modules** -- scope-lock prevents accidentally touching unrelated files
 - **3 strikes and escalate** -- if you've tested 3 wrong hypotheses, your mental model is wrong; get fresh perspective
-- **The skill writes to `.claude/memory/fixes.md`** -- these diagnosis records build institutional knowledge over time
+- **The skill writes to `.meowkit/memory/fixes.md`** -- these diagnosis records build institutional knowledge over time
 
 > **Canonical source:** `.claude/skills/investigate/SKILL.md`

@@ -3,6 +3,17 @@ title: "mk:evaluate"
 description: "Behavioral active verification — drives running build via browser/curl/CLI and grades against rubric criteria with concrete evidence. Owned by the evaluator agent (Phase 3+)."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/evaluate/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/evaluate/SKILL.md) |
+| **Owner** | `testing` |
+| **Runtime** | `claude-code` |
+| **Risk** | high |
+
+{/* GENERATED:reference-facts END */}
+
 Step-file workflow that drives a running build, probes each rubric criterion via active verification, and produces a graded verdict with runtime evidence. Owned by the `evaluator` agent (Phase 3+). NOT for structural code audit of a diff/PR (use `mk:review`); NOT for static linting (use `mk:lint-and-validate`).
 
 ## What This Skill Does
@@ -194,7 +205,7 @@ Loaded at session start and re-anchored before each criterion. The persona:
 
 ### Memory Write
 
-After each completed evaluation, appends a summary line to `.claude/memory/review-patterns.md`:
+After each completed evaluation, appends a summary line to `.meowkit/memory/review-patterns.md`:
 
 ```
 | {date} | {artifact-id} | {verdict: PASS/WARN/FAIL} | {top-criterion} | {score} |

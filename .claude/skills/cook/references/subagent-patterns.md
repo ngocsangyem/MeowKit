@@ -159,10 +159,10 @@ Task(subagent_type="documenter", prompt="Evaluate docs impact for changes: [file
 
 **Memory capture:**
 ```
-Task(subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .claude/memory/fixes.json (canonical); write architectural decisions to .claude/memory/architecture-decisions.json (canonical); write review patterns to .claude/memory/review-patterns.json (canonical).", description="Session memory capture")
+Task(subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .meowkit/memory/fixes.json (canonical); write architectural decisions to .meowkit/memory/architecture-decisions.json (canonical); write review patterns to .meowkit/memory/review-patterns.json (canonical).", description="Session memory capture")
 ```
 
-**Scope (analyst memory):** pass plan-file path, reviewer findings, decisions log, `.claude/memory/*.json` canonical store paths. Do NOT pass full conversation transcript (the analyst infers learnings from artifacts, not chat).
+**Scope (analyst memory):** pass plan-file path, reviewer findings, decisions log, `.meowkit/memory/*.json` canonical store paths. Do NOT pass full conversation transcript (the analyst infers learnings from artifacts, not chat).
 
 ## UI Work (Conditional)
 

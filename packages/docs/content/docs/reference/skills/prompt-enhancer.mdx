@@ -3,6 +3,18 @@ title: "mk:prompt-enhancer"
 description: "Refine a draft user prompt — default returns only the rewritten prompt. Pass --analyze to surface decomposition, 10-item weakness detection, and improvement notes. Pass --score (with --analyze) for a deterministic 1–10 quality score. Rewrite uses the universal kernel (plain markdown, no XML, no vendor tokens). Auto-suggests freedom level and verbosity. Optional --deep flag scouts allow-listed sources for [FILL-IN] placeholder candidates."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/prompt-enhancer/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/prompt-enhancer/SKILL.md) |
+| **Owner** | `docs` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Takes a draft user prompt and emits a **mode-aware** markdown output:
@@ -87,7 +99,7 @@ The skill **does not accept a `--model` flag.** Per the synthesis report (see so
 1. **Mode-Select** — honor `--deep` only when a git repo is available and `MEOWKIT_AUTOBUILD_MODE` is not `MINIMAL`. Otherwise downgrade to default with a one-line note.
 2. **Decompose** — read-only on the input; label each of the 5 components.
 3. **Detect** — score the 10-item binary checklist; cite the exact text fragment for every FOUND issue.
-4. **Scout** *(when `--deep`)* — invoke `mk:scout` with allow-list filter; ≤8 files / ≤100 lines/file / ≤30s wall clock; default-deny against `.claude/memory/*`, `.env*`, `tasks/`, secrets.
+4. **Scout** *(when `--deep`)* — invoke `mk:scout` with allow-list filter; ≤8 files / ≤100 lines/file / ≤30s wall clock; default-deny against `.meowkit/memory/*`, `.env*`, `tasks/`, secrets.
 5. **Map** — pick exactly one fix per FOUND issue from the playbook; preserve user intent verbatim; emit `[FILL-IN: <description>]` placeholders for unknown values.
 6. **Rewrite** — populate the universal kernel; auto-suggest freedom level and verbosity; never apply model overlays.
 
@@ -156,7 +168,7 @@ Bounded codebase scout. Surfaces `[FILL-IN]` candidates from allow-listed source
 | Aspect | Value |
 |---|---|
 | Allow-list | `docs/project-context.md`, `docs/*.md`, `CLAUDE.md`, `AGENTS.md`, nested `CLAUDE.md` / `AGENTS.md` / `README.md`, top-level metadata (`package.json`, `pyproject.toml`, etc.), source files in `**/*.{ts,tsx,js,jsx,py,go,rs,java,rb,kt,swift,vue}` |
-| Forbid-list (default-deny) | `.claude/memory/*`, `.env*`, `tasks/`, `~/.ssh/`, `*.pem`, `*.key`, `*credentials*`, `*secret*`, anything matched by `.gitignore` |
+| Forbid-list (default-deny) | `.meowkit/memory/*`, `.env*`, `tasks/`, `~/.ssh/`, `*.pem`, `*.key`, `*credentials*`, `*secret*`, anything matched by `.gitignore` |
 | Hard caps | ≤8 files, ≤100 lines per file, ≤30 s wall clock |
 | Output | Path + top-level symbol names + 1-line public docstring summary. **Never** the file body. |
 | Substitution | Suggestions live inside `[FILL-IN: <desc> (suggested: <path>)]` brackets. Never auto-substituted — the user is the source of truth. |

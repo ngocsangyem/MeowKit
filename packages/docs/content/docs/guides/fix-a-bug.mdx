@@ -1,6 +1,6 @@
 ---
 title: "Fix a Bug"
-description: "Structured bug investigation with /mk:fix — root cause analysis, regression tests, and memory capture."
+description: "Structured bug investigation with /mk:fix: root cause analysis, regression tests, and memory capture."
 ---
 
 `/mk:fix` is MeowKit's debugging pipeline. Instead of immediately editing code, it forces structured investigation: find the root cause, write a regression test, apply the minimal fix. The approach adapts to bug complexity automatically.
@@ -53,9 +53,20 @@ Pauses for your approval at each step. Use when:
 - You want to validate the diagnosis before the fix
 - The fix has regulatory implications
 
+## What runs without you asking
+
+| Concern | What handles it | What it buys you |
+|---------|-----------|-------------|
+| Root cause before fix | `mk:investigate` | You cannot patch the symptom by accident |
+| Scope control | `mk:freeze` | Unrelated code stays untouched |
+| Regression test | tester | Proof the bug existed *and* that the fix closes it |
+| Security scan | `post-write.sh` | Every edited file is checked for new holes |
+| Minimal diff | developer | The root cause fixed in the fewest lines |
+| Evidence over assertion | reviewer | Verified with test output, not "should work" |
+
 ## After the fix
 
-Every fix writes to `.claude/memory/fixes.md` and `fixes.json`. Next time a similar bug appears, Step 0.5 finds the pattern and fast-tracks diagnosis. After 3+ occurrences of the same bug class, the pattern is promoted to a `CLAUDE.md` rule.
+Every fix writes to `.meowkit/memory/fixes.md` and `fixes.json`. Next time a similar bug appears, Step 0.5 finds the pattern and fast-tracks diagnosis. After 3+ occurrences of the same bug class, the pattern is promoted to a `CLAUDE.md` rule.
 
 ## Don't use /mk:fix for
 
@@ -65,6 +76,6 @@ Every fix writes to `.claude/memory/fixes.md` and `fixes.json`. Next time a simi
 
 ## Next steps
 
-- [Debug effectively](/guides/debug-effectively) — when to use fix vs investigate vs sequential-thinking
-- [Build a feature](/guides/build-a-feature) — the full feature pipeline
+- [Debug effectively](/guides/debug-effectively): when to use fix vs investigate vs sequential-thinking
+- [Build a feature](/guides/build-a-feature): the full feature pipeline
 - [Understand the workflow](/core-concepts/workflow)

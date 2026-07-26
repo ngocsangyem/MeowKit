@@ -16,12 +16,15 @@ const REPO_CLAUDE = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..",
 
 const roots: string[] = [];
 afterEach(() => roots.splice(0).forEach((d) => rmSync(d, { recursive: true, force: true })));
-function makeClaudeDir(): { root: string; claudeDir: string; logPath: string } {
+function makeProjectRoot(): { root: string; claudeDir: string; telemetryDir: string; logPath: string } {
 	const root = mkdtempSync(join(tmpdir(), "mewkit-trace-"));
 	roots.push(root);
 	const claudeDir = join(root, ".claude");
-	mkdirSync(join(claudeDir, "memory"), { recursive: true });
-	return { root, claudeDir, logPath: join(claudeDir, "memory", "trace-log.jsonl") };
+	mkdirSync(claudeDir, { recursive: true });
+	// Append logs live under the `.meowkit/` telemetry class; the writer creates it.
+	const telemetryDir = join(root, ".meowkit", "telemetry");
+	mkdirSync(telemetryDir, { recursive: true });
+	return { root, claudeDir, telemetryDir, logPath: join(telemetryDir, "trace-log.jsonl") };
 }
 function readLines(logPath: string): string[] {
 	return readFileSync(logPath, "utf-8").split("\n").filter(Boolean);
@@ -29,8 +32,8 @@ function readLines(logPath: string): string[] {
 
 describe("appendTraceRecord — record shape", () => {
 	it("writes canonical task identity at top level and scrubs secret-shaped data", async () => {
-		const { claudeDir, logPath } = makeClaudeDir();
-		await appendTraceRecord(claudeDir, {
+		const { root, logPath } = makeProjectRoot();
+		await appendTraceRecord(root, {
 			event: "task_transition",
 			taskId: "feat-x",
 			planPath: "plans/260711-x/plan.md",
@@ -46,8 +49,8 @@ describe("appendTraceRecord — record shape", () => {
 	});
 
 	it("omits task_id/plan_path when not supplied (legacy-shaped line)", async () => {
-		const { claudeDir, logPath } = makeClaudeDir();
-		await appendTraceRecord(claudeDir, { event: "friction", data: {} });
+		const { root, logPath } = makeProjectRoot();
+		await appendTraceRecord(root, { event: "friction", data: {} });
 		const rec = JSON.parse(readLines(logPath)[0]);
 		expect(rec).not.toHaveProperty("task_id");
 		expect(rec).not.toHaveProperty("plan_path");
@@ -56,13 +59,13 @@ describe("appendTraceRecord — record shape", () => {
 
 describe("appendTraceRecord — rotation", () => {
 	it("rotates a >50MB log to a .gz and starts a fresh log", async () => {
-		const { claudeDir, logPath } = makeClaudeDir();
+		const { root, logPath } = makeProjectRoot();
 		// Pre-fill above the threshold with valid JSONL, then one more append triggers rotation.
 		const bigLine = JSON.stringify({ schema_version: "1.0", event: "pad", data: { x: "y".repeat(200) } }) + "\n";
 		const repeats = Math.ceil((TRACE_MAX_BYTES + 1024) / bigLine.length);
 		writeFileSync(logPath, bigLine.repeat(repeats));
-		await appendTraceRecord(claudeDir, { event: "post_rotate", data: {}, now: new Date("2026-07-12T00:00:00Z") });
-		const gz = readdirSync(join(claudeDir, "memory")).filter((f) => f.endsWith(".jsonl.gz"));
+		await appendTraceRecord(root, { event: "post_rotate", data: {}, now: new Date("2026-07-12T00:00:00Z") });
+		const gz = readdirSync(join(root, ".meowkit", "telemetry")).filter((f) => f.endsWith(".jsonl.gz"));
 		expect(gz.length).toBe(1);
 		// Fresh log holds only lines appended after rotation, all valid JSON.
 		const lines = readLines(logPath);
@@ -73,24 +76,22 @@ describe("appendTraceRecord — rotation", () => {
 
 describe("appendTraceRecord — concurrency (no interleaving/corruption)", () => {
 	it("keeps every line valid under many concurrent async appends", async () => {
-		const { claudeDir, logPath } = makeClaudeDir();
+		const { root, logPath } = makeProjectRoot();
 		const N = 30;
 		// Async-only: the async lock releases run on the event loop, so N concurrent appends
 		// serialize cleanly. (Mixing SYNC appends into the same process is not a real usage — the
 		// sync writer is the wiki adapter and the async writer is task-state; they run in separate
 		// CLI processes. Cross-process contention is covered by the shell+TS parity test below.)
-		await Promise.all(
-			Array.from({ length: N }, (_, i) => appendTraceRecord(claudeDir, { event: "async_ev", data: { i } })),
-		);
+		await Promise.all(Array.from({ length: N }, (_, i) => appendTraceRecord(root, { event: "async_ev", data: { i } })));
 		const lines = readLines(logPath);
 		expect(lines.length).toBe(N);
 		for (const l of lines) expect(() => JSON.parse(l)).not.toThrow();
 	});
 
 	it("appends valid lines through the sync writer (sequential)", () => {
-		const { claudeDir, logPath } = makeClaudeDir();
+		const { root, logPath } = makeProjectRoot();
 		const N = 10;
-		for (let i = 0; i < N; i++) appendTraceRecordSync(claudeDir, { event: "sync_ev", data: { i } });
+		for (let i = 0; i < N; i++) appendTraceRecordSync(root, { event: "sync_ev", data: { i } });
 		const lines = readLines(logPath);
 		expect(lines.length).toBe(N);
 		for (const l of lines) expect(JSON.parse(l).event).toBe("sync_ev");
@@ -107,7 +108,7 @@ describe("shell + TS parity (shared sidecar lock across languages)", () => {
 		if (!python3Available()) return; // the shell writer builds its record via python3
 		const scriptPath = join(REPO_CLAUDE, "hooks", "append-trace.sh");
 		if (!existsSync(scriptPath)) return;
-		const { root, claudeDir, logPath } = makeClaudeDir();
+		const { root, claudeDir, logPath } = makeProjectRoot();
 		const N = 6;
 		const shell = Array.from(
 			{ length: N },
@@ -121,7 +122,7 @@ describe("shell + TS parity (shared sidecar lock across languages)", () => {
 					p.on("error", () => res());
 				}),
 		);
-		const ts = Array.from({ length: N }, (_, i) => appendTraceRecord(claudeDir, { event: "ts_ev", data: { i } }));
+		const ts = Array.from({ length: N }, (_, i) => appendTraceRecord(root, { event: "ts_ev", data: { i } }));
 		const tsResults = await Promise.allSettled(ts);
 		await Promise.all(shell);
 		const tsLanded = tsResults.filter((r) => r.status === "fulfilled").length;

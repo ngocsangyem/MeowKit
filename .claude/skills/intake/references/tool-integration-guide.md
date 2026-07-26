@@ -22,8 +22,8 @@ Setup:
 # Install jira-as into the workflow venv (auto-handled by .claude/scripts/bin/setup-workflow)
 .claude/scripts/bin/setup-workflow
 
-# Populate .claude/.env with the three MEOW_JIRA_* vars
-cp .claude/.env.example .claude/.env
+# Populate .meowkit/.env with the three MEOW_JIRA_* vars
+cp .meowkit/.env.example .meowkit/.env
 # Edit MEOW_JIRA_API_TOKEN, MEOW_JIRA_EMAIL, MEOW_JIRA_SITE_URL
 ```
 

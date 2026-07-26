@@ -9,7 +9,7 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
-# Load .claude/.env — shared dotenv lib (each hook is a separate subprocess,
+# Load .meowkit/.env — shared dotenv lib (each hook is a separate subprocess,
 # so every hook that reads MEOWKIT_* vars must source this independently).
 # Note: as of the native `env` field fix, most control vars now come from
 # settings.json `env` block. .env loading remains for API keys + overrides.
@@ -26,7 +26,7 @@ if [ ! -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/dispatch.cjs" ]; then
 fi
 
 # Hook profile gating — context loading always needed: NEVER skip regardless of profile
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 
 CONTEXT_FILE="docs/project-context.md"
 VENV_PYTHON=".claude/skills/.venv/bin/python3"
@@ -134,7 +134,7 @@ if [ -n "${HOOK_SESSION_ID:-}" ] && [ "$HOOK_SESSION_ID" != "${LAST_SESSION:-}" 
   [ "${MEOWKIT_LOOP_DETECT:-on}" = "off" ] && echo "- Loop detection: **disabled**" || echo "- Loop detection: on (default)"
   [ -n "${MEOWKIT_AUTOBUILD_MODE:-}" ] && echo "- Harness density: **${MEOWKIT_AUTOBUILD_MODE}** (overridden)" || echo "- Harness density: auto-detect"
   echo ""
-  echo "_Config sources: settings.json \`env\` (defaults) → .claude/.env (overrides) → shell export (highest). Agent sees this block at session start only._"
+  echo "_Config sources: settings.json \`env\` (defaults) → .meowkit/.env (overrides) → shell export (highest). Agent sees this block at session start only._"
 fi
 
 echo ""
@@ -187,7 +187,9 @@ fi
 # ═══════════════════════════════════════════════════════════════════
 # Personal preferences injection
 # ═══════════════════════════════════════════════════════════════════
-PREFS_FILE=".claude/memory/preferences.md"
+# Preferences are a session/state marker, not a curated store.
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/meowkit-paths.sh"
+PREFS_FILE="$(meowkit_state_dir state)/preferences.md"
 if [ -f "$PREFS_FILE" ]; then
   echo ""
   echo "## Personal Preferences"
@@ -248,7 +250,7 @@ fi
 
 # Memory dir audit — report .md topic files exceeding 500 lines.
 # Display-only (no mutation); pairs with the auto-prune block in post-session.sh.
-MEM_DIR=".claude/memory"
+MEM_DIR="$(meowkit_state_dir memory)"
 if [ -d "$MEM_DIR" ]; then
   echo ""
   echo "## Memory files"

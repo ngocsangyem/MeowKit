@@ -52,7 +52,7 @@ WHY: Loading project context first prevents conflicting convention guesses.
 When Layer 3 reasoning reveals a genuine insight — something that contradicts the conventional approach with evidence:
 
 - Name it: "EUREKA: Everyone does X because they assume [assumption]. But [evidence] suggests that's wrong here."
-- Log it in the relevant `.claude/memory/` topic file for future sessions
+- Log it in the relevant `.meowkit/memory/` topic file for future sessions
 - This is the highest-value output of the search process
 
 WHY: Documented insights survive context reset.

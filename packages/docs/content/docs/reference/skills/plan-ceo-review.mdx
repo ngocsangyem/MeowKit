@@ -3,6 +3,17 @@ title: "mk:plan-ceo-review"
 description: "mk:plan-ceo-review"
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/plan-ceo-review/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/plan-ceo-review/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 A rigorous, multi-section plan review from a CEO/founder perspective. Challenges premises, maps failure modes across 11 sections, traces error paths with severity tiers (BLOCKER/HIGH-LEVERAGE/POLISH), and ensures the plan is extraordinary -- not just adequate. Operates in four user-controlled modes: SCOPE EXPANSION (cathedral thinking), SELECTIVE EXPANSION (hold scope + cherry-pick), HOLD SCOPE (maximum rigor), and SCOPE REDUCTION (strip to essentials).
 
@@ -75,7 +86,7 @@ The skill will: pre-screen the plan for unfinished sections, run the full system
 - Every section requires at least one finding -- "no issues found" is valid only with documented evidence proving why the section is clean
 - The outside voice subagent has independent fresh context and catches blind spots the primary reviewer is structurally blind to
 - The review appends to plan.md -- it never overwrites. Both the original plan and the CEO review coexist
-- For EXPANSION/SELECTIVE modes, the CEO plan is persisted to `.claude/memory/projects/ceo-plans/` and can be promoted to `docs/designs/`
+- For EXPANSION/SELECTIVE modes, the CEO plan is persisted to `.meowkit/memory/projects/ceo-plans/` and can be promoted to `docs/designs/`
 - The GATE 1 HARD STOP at the end means the agent does NOT chain into implementation automatically -- the human decides
 
 ### Notes

@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from "node:fs";
-import { join, relative, isAbsolute } from "node:path";
+import { join, relative, isAbsolute, dirname } from "node:path";
 import * as log from "./core-logger.js";
 import { processTemplate } from "./substitute-placeholders.js";
 import type { UserConfig } from "./substitute-placeholders.js";
@@ -21,6 +21,7 @@ import {
 } from "./install-metadata.js";
 import { writeInstallMetadata } from "./install-metadata-writer.js";
 import { writeRuntimeDescriptor, resolveInProjectExecutable } from "./hook-runtime.js";
+import { configWritePath } from "../state/resolve-config-path.js";
 
 export interface UpdateStats {
 	updated: number;
@@ -238,11 +239,13 @@ export async function smartUpdate(
 		stats.added++;
 	}
 
-	// meowkit.config.json template (generated, not from release)
-	const configDest = join(claudeDir, "meowkit.config.json");
-	if (!existsSync(configDest)) {
+	// config.json template (generated, not from release). Written to the `.meowkit/` state
+	// root; an install still holding the pre-move `.claude/meowkit.config.json` keeps working
+	// through the read fallback until this writes the canonical file.
+	const configDest = configWritePath(dirname(claudeDir));
+	if (!existsSync(configDest) && !existsSync(join(claudeDir, "meowkit.config.json"))) {
 		if (!dryRun) {
-			mkdirSync(claudeDir, { recursive: true });
+			mkdirSync(dirname(configDest), { recursive: true });
 			const configContent = JSON.stringify(
 				{
 					$schema: "https://meowkit.dev/schema/config.json",
@@ -258,8 +261,11 @@ export async function smartUpdate(
 		stats.added++;
 	}
 
-	// Write .env with API keys (single read-modify-write cycle)
-	const envPath = join(claudeDir, ".env");
+	// Write .env with API keys (single read-modify-write cycle). Target `.meowkit/.env`, but
+	// keep editing a pre-move `.claude/.env` when that is the file the project already has —
+	// writing a second one would split the user's keys across two files.
+	const legacyEnvPath = join(claudeDir, ".env");
+	const envPath = existsSync(legacyEnvPath) ? legacyEnvPath : join(dirname(claudeDir), ".meowkit", ".env");
 	const hasNewKeys = config.geminiApiKey || config.externalProviderKeys;
 	if (hasNewKeys) {
 		let envContent = existsSync(envPath)
@@ -288,6 +294,7 @@ export async function smartUpdate(
 			}
 		}
 		if (!dryRun) {
+			mkdirSync(dirname(envPath), { recursive: true });
 			writeFileSync(envPath, envContent, "utf-8");
 		}
 		stats.added++;
@@ -296,16 +303,18 @@ export async function smartUpdate(
 		const gitignorePath = join(targetDir, ".gitignore");
 		if (!dryRun) {
 			let gitignoreContent = existsSync(gitignorePath) ? readFileSync(gitignorePath, "utf-8") : "";
-			if (!gitignoreContent.includes(".claude/.env")) {
-				gitignoreContent += "\n# MeowKit secrets\n.claude/.env\n";
+			if (!gitignoreContent.includes(".meowkit/.env")) {
+				gitignoreContent += "\n# MeowKit secrets\n.meowkit/.env\n.claude/.env\n";
 				writeFileSync(gitignorePath, gitignoreContent, "utf-8");
 			}
 		}
 	}
 
-	// Ensure memory + logs dirs exist
+	// Ensure the provider log dir exists. The memory tree is deliberately NOT created here:
+	// state lives under `.meowkit/` now, its writers create their own class dir on first
+	// write, and re-creating `.claude/memory/` would make `doctor --state` report drift that
+	// the installer itself caused.
 	if (!dryRun) {
-		mkdirSync(join(targetDir, ".claude", "memory"), { recursive: true });
 		mkdirSync(join(targetDir, ".claude", "logs"), { recursive: true });
 	}
 
@@ -503,7 +512,7 @@ export async function smartUpdate(
 		// exactly the provenance divergence this flow must never produce. The atomic
 		// writer leaves the prior metadata.json intact on failure, so re-running the
 		// install/upgrade rebuilds correct metadata from disk — the recovery path.
-		await writeInstallMetadata(claudeDir, meta);
+		await writeInstallMetadata(dirname(claudeDir), meta);
 		// One-release rollback dual-write of the legacy manifest. Only after the
 		// canonical write succeeds — if the canonical write fails above we never reach
 		// here, so the previous legacy manifest stays on disk for the next run.

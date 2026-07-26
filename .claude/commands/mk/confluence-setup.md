@@ -10,11 +10,11 @@ Walk the user through Confluence Cloud credential setup for the `mk:confluence-*
 
 1. Verify `.claude/scripts/bin/setup-workflow` ran and `confluence-as` binary exists at `.claude/skills/.venv/bin/confluence-as`. If not, instruct: `.claude/scripts/bin/setup-workflow`.
 
-2. Ensure `.claude/.env` exists. If absent: create empty file, then `chmod 0600 .claude/.env`.
+2. Ensure `.meowkit/.env` exists. If absent: create empty file, then `chmod 0600 .meowkit/.env`.
 
 3. Check whether `MEOW_CONFLUENCE_*` vars are already populated:
    ```bash
-   grep -c '^MEOW_CONFLUENCE_' .claude/.env || true
+   grep -c '^MEOW_CONFLUENCE_' .meowkit/.env || true
    ```
    If present (count >= 3): ask user whether to overwrite. If overwriting, comment out the old lines (do not delete; user may want to recover).
 
@@ -23,14 +23,14 @@ Walk the user through Confluence Cloud credential setup for the `mk:confluence-*
    - **Email** — Atlassian account email.
    - **API token** — instruction text: "Generate one at https://id.atlassian.com/manage-profile/security/api-tokens then paste here. The token will not be displayed in chat."
 
-5. Append to `.claude/.env` via `>>` Bash redirection (do NOT echo back — keeps token out of transcript):
+5. Append to `.meowkit/.env` via `>>` Bash redirection (do NOT echo back — keeps token out of transcript):
    ```
    MEOW_CONFLUENCE_SITE_URL=...
    MEOW_CONFLUENCE_EMAIL=...
    MEOW_CONFLUENCE_API_TOKEN=...
    ```
 
-6. Re-run `chmod 0600 .claude/.env`.
+6. Re-run `chmod 0600 .meowkit/.env`.
 
 7. Validate by running:
    ```bash

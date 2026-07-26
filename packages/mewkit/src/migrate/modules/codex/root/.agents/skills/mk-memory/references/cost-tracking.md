@@ -41,7 +41,7 @@ Task tier: [standard] | Model: [codex-opus-4-6]
 
 ## After Task: Log Usage
 
-Append an entry to `.meowkit/memory/cost-log.json` (create if it does not exist).
+Append an entry to `.meowkit/telemetry/cost-log.json` (create if it does not exist).
 
 **Schema:**
 ```json
@@ -69,7 +69,7 @@ Append an entry to `.meowkit/memory/cost-log.json` (create if it does not exist)
 
 > Note: `the budget skill` is a subcommand handled by `mk:memory`, not a standalone skill. Invoke it while `mk:memory` is active: `the budget skill [--report|--alert N]`.
 
-When the user invokes `the budget skill`, read `.meowkit/memory/cost-log.json` and display:
+When the user invokes `the budget skill`, read `.meowkit/telemetry/cost-log.json` and display:
 
 ### Last N Entries (default: 10)
 

@@ -112,10 +112,7 @@ describe("smartUpdate forward-upgrade provenance", () => {
 
 		// Prior install: v1 on disk, canonical metadata recording base=v1.
 		await writeText(target, ".claude/rules/core-behaviors.md", "v1\n");
-		await writeInstallMetadata(
-			join(target, ".claude"),
-			buildInstallMetadata(join(target, ".claude"), { version: "2.9.13" }),
-		);
+		await writeInstallMetadata(target, buildInstallMetadata(join(target, ".claude"), { version: "2.9.13" }));
 
 		// New release ships a CHANGED payload for the same file, with a release manifest.
 		await writeText(source, ".claude/rules/core-behaviors.md", "v2 changed\n");
@@ -140,7 +137,7 @@ describe("smartUpdate forward-upgrade provenance", () => {
 		await writeText(target, ".claude/rules/core-behaviors.md", "old\n");
 		// A directory where metadata.json belongs makes the atomic rename fail — the
 		// content is copied, but the metadata write cannot complete. Must not be swallowed.
-		await mkdir(join(target, ".claude/metadata.json"), { recursive: true });
+		await mkdir(join(target, ".meowkit/metadata.json"), { recursive: true });
 
 		await expect(smartUpdate(config, source, target, false, false, { cleanup: false })).rejects.toThrow();
 	});

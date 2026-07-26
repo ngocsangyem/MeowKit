@@ -1,11 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
+import { resolveStateDir } from "../state/resolve-state-dir.js";
 import type { CostEntry, LiveBudgetState } from "./budget-types.js";
 
 export function findCostLog(): string | null {
 	let current = process.cwd();
 	while (true) {
-		const candidate = path.join(current, ".claude", "memory", "cost-log.json");
+		const candidate = path.join(resolveStateDir(current, "telemetry"), "cost-log.json");
 		if (fs.existsSync(candidate)) {
 			return candidate;
 		}

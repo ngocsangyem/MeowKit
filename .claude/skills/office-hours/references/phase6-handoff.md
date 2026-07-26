@@ -74,4 +74,4 @@ After the plea, suggest the next step:
 - **`/mk:plan-ceo-review`** for well-scoped implementation planning — lock in architecture, tests, edge cases
 - **`/plan-design-review`** for visual/UX design review
 
-The design doc at `.claude/memory/projects/` is automatically discoverable by downstream skills — they will read it during their pre-review system audit.
+The design doc at `.meowkit/memory/projects/` is automatically discoverable by downstream skills — they will read it during their pre-review system audit.

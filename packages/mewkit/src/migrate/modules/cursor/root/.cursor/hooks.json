@@ -9,6 +9,14 @@
 				"failClosed": false
 			}
 		],
+		"sessionEnd": [
+			{
+				"command": "node .cursor/hooks/telemetry-observers.cjs",
+				"type": "command",
+				"timeout": 10,
+				"failClosed": false
+			}
+		],
 		"beforeReadFile": [
 			{
 				"command": "node .cursor/hooks/privacy-read-gate.cjs",

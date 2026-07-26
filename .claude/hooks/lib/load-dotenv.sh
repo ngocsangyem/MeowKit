@@ -1,7 +1,8 @@
 #!/bin/sh
 # load-dotenv.sh — Shared dotenv loader for MeowKit hooks.
 # Source this at the top of any hook that reads MEOWKIT_* env vars.
-# Loads .claude/.env if present. Does NOT override existing env vars.
+# Loads .meowkit/.env, then .claude/.env. Does NOT override existing env vars, so the
+# first file to define a key wins and a shell export beats both.
 #
 # Usage: . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh"
 #
@@ -11,7 +12,8 @@
 # Parsing: handles inline comments on unquoted values, trims key whitespace,
 # preserves quoted values containing `#` (e.g., API keys with literal hash).
 
-_MEOWKIT_DOTENV="${CLAUDE_PROJECT_DIR:-.}/.claude/.env"
+# Canonical first, then the pre-move provider location so an existing install keeps working.
+for _MEOWKIT_DOTENV in "${CLAUDE_PROJECT_DIR:-.}/.meowkit/.env" "${CLAUDE_PROJECT_DIR:-.}/.claude/.env"; do
 if [ -f "$_MEOWKIT_DOTENV" ]; then
   while IFS= read -r _line || [ -n "$_line" ]; do
     case "$_line" in \#*|"") continue ;; esac
@@ -57,4 +59,5 @@ if [ -f "$_MEOWKIT_DOTENV" ]; then
     fi
   done < "$_MEOWKIT_DOTENV"
 fi
+done
 unset _MEOWKIT_DOTENV _line _key _val _quoted

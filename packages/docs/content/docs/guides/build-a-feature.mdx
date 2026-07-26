@@ -1,9 +1,9 @@
 ---
 title: "Build a Feature"
-description: "Step-by-step guide to building features with /mk:cook — from plan to ship."
+description: "Step-by-step guide to building features with /mk:cook, from plan to ship."
 ---
 
-`/mk:cook` is the primary workflow for building features. It runs the full 7-phase pipeline — you describe what you want, and MeowKit handles planning, testing, building, reviewing, and shipping.
+`/mk:cook` is the primary workflow for building features. It runs the full 7-phase pipeline: you describe what you want, and MeowKit handles planning, testing, building, reviewing, and shipping.
 
 ## Quick start
 
@@ -59,13 +59,13 @@ Spawns up to 3 agents in isolated git worktrees for independent subtasks. Use wh
 
 | Phase | What you see | What you do |
 |-------|-------------|------------|
-| 0 — Orient | Task classified, model tier declared | Nothing — automatic |
-| 1 — Plan | Plan created with acceptance criteria | **Approve the plan** (Gate 1) |
-| 2 — Test | Tests written from acceptance criteria | Review test coverage |
-| 3 — Build | Implementation proceeds | Watch for self-healing attempts |
-| 4 — Review | 5-dimension audit with verdict | **Approve the review** (Gate 2) |
-| 5 — Ship | PR created, CI triggered | Merge when CI passes |
-| 6 — Reflect | Patterns captured to memory | Nothing — automatic |
+| 0. Orient | Task classified, model tier declared | Nothing, it is automatic |
+| 1. Plan | Plan created with acceptance criteria | **Approve the plan** (Gate 1) |
+| 2. Test | Tests written from acceptance criteria | Review test coverage |
+| 3. Build | Implementation proceeds | Watch for self-healing attempts |
+| 4. Review | 5-dimension audit with verdict | **Approve the review** (Gate 2) |
+| 5. Ship | PR created, CI triggered | Merge when CI passes |
+| 6. Reflect | Patterns captured to memory | Nothing, it is automatic |
 
 ## Choosing the right mode
 
@@ -80,12 +80,21 @@ Spawns up to 3 agents in isolated git worktrees for independent subtasks. Use wh
 
 ## Gotchas
 
-- **Simple features grow.** Always let MeowKit create a plan — a "simple" feature that touches 3 files needs planning.
+- **Simple features grow.** Always let MeowKit create a plan. A "simple" feature that touches three files needs one.
 - **Gate 2 is never auto-approved.** The `--auto` flag fixes issues but still requires your review approval.
-- **Long sessions lose context.** The plan's Agent State section auto-updates — read it if you resume mid-build.
+- **Long sessions lose context.** The plan's Agent State section auto-updates, so read it if you resume mid-build.
+
+## When it goes wrong
+
+| What you see | Why | What to do |
+|-------|-------|-----|
+| The plan is far broader than you meant | The description left the scope open | Narrow it: "cart for the product page", not "cart" |
+| Tests only cover the happy path | The tester read the acceptance criteria literally | Ask for the edge cases you care about: zero quantity, maximum quantity |
+| The developer self-heals three times, then escalates | The tests expect a different approach than the implementation took | Decide which is wrong, the plan or the tests, and fix that one rather than the symptom |
+| Review FAILs on security | Hardcoded values or an unsafe pattern | Fix the findings; the review re-runs automatically |
 
 ## Next steps
 
-- [Fix a bug](/guides/fix-a-bug) — structured debugging with `/mk:fix`
-- [Autonomous builds](/guides/autonomous-build) — green-field products with `/mk:autobuild`
-- [Understand the workflow](/core-concepts/workflow) — the 7-phase pipeline in detail
+- [Fix a bug](/guides/fix-a-bug): structured debugging with `/mk:fix`
+- [Autonomous builds](/guides/autonomous-build): green-field products with `/mk:autobuild`
+- [Understand the workflow](/core-concepts/workflow): the 7-phase pipeline in detail

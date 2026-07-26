@@ -5,7 +5,7 @@ description: "Analyzes harness trace logs to surface recurring failure patterns 
 
 # mk:trace-analyze — Scatter-Gather Trace Analysis
 
-Step-file workflow that ingests `.meowkit/memory/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel `researcher` sub-task, gathers cross-batch patterns, and gates suggestions through human review before any harness change is applied.
+Step-file workflow that ingests `.meowkit/telemetry/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel `researcher` sub-task, gathers cross-batch patterns, and gates suggestions through human review before any harness change is applied.
 
 ## Deterministic CLI companion
 

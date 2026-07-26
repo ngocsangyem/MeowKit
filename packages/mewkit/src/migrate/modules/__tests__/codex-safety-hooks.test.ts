@@ -104,3 +104,75 @@ describe("codex gate-enforcement hook (PreToolUse/apply_patch)", () => {
 		expect(r.denied).toBe(false);
 	});
 });
+
+// Codex documents that a session may start in a subdirectory and sets no project-root
+// environment variable, so the hook resolves the root itself. These cases pin that:
+// with the payload cwd pointing below the root, the gate must still find the plan and
+// still classify targets against root-relative patterns.
+describe("codex gate-enforcement hook (session started in a subdirectory)", () => {
+	let project: string;
+	let subdir: string;
+	const patch = (path: string) => `*** Begin Patch\n*** Update File: ${path}\n+x\n*** End Patch`;
+
+	beforeEach(() => {
+		project = mkdtempSync(join(tmpdir(), "codex-gate-sub-"));
+		subdir = join(project, "packages", "web");
+		mkdirSync(subdir, { recursive: true });
+	});
+	afterEach(() => rmSync(project, { recursive: true, force: true }));
+
+	it("finds the root plan via the marker walk when the session cwd is a subdirectory", () => {
+		mkdirSync(join(project, "tasks", "plans", "260101-x"), { recursive: true });
+		writeFileSync(join(project, "tasks", "plans", "260101-x", "plan.md"), "# plan\n");
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } },
+			subdir,
+		);
+		expect(r.denied).toBe(false);
+	});
+
+	it("finds the root plan via the git top level when the session cwd is a subdirectory", () => {
+		spawnSync("git", ["init", "-q"], { cwd: project });
+		mkdirSync(join(project, "tasks", "plans"), { recursive: true });
+		writeFileSync(join(project, "tasks", "plans", "flat.md"), "# plan\n");
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } },
+			subdir,
+		);
+		expect(r.denied).toBe(false);
+	});
+
+	it("still denies a source edit from a subdirectory when the project has no plan", () => {
+		mkdirSync(join(project, ".codex"), { recursive: true });
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } },
+			subdir,
+		);
+		expect(r.denied).toBe(true);
+	});
+
+	it("classifies an always-allowed target relative to the root, not the session cwd", () => {
+		mkdirSync(join(project, ".codex"), { recursive: true });
+		for (const p of ["src/x.test.ts", "docs/readme.md"]) {
+			const r = runHook(
+				"gate-enforcement.cjs",
+				{ tool_name: "apply_patch", tool_input: { command: patch(p) } },
+				subdir,
+			);
+			expect(r.denied, `${p} should be allowed from a subdirectory`).toBe(false);
+		}
+	});
+
+	it("resolves an absolute target against the root", () => {
+		mkdirSync(join(project, ".codex"), { recursive: true });
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: patch(join(project, "docs", "readme.md")) } },
+			subdir,
+		);
+		expect(r.denied).toBe(false);
+	});
+});

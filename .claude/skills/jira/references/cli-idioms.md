@@ -26,7 +26,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <args>
 The wrapper:
 
 - Resolves to venv-local `.claude/skills/.venv/bin/jira-as`
-- Sources `.claude/.env` and translates `MEOW_JIRA_*` → `JIRA_*`
+- Sources `.meowkit/.env` and translates `MEOW_JIRA_*` → `JIRA_*`
 - Exports `JIRA_OUTPUT=json` as default (drop `--output json` flag noise from per-call examples)
 
 ## Verified Quick Examples

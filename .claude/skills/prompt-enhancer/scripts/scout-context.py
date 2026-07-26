@@ -74,8 +74,8 @@ SOURCE_EXTENSIONS = {
 
 # Forbid-list. Checked FIRST (default-deny).
 FORBID_LIST = [
-    ".claude/memory/*",
-    ".claude/memory/**",
+    ".meowkit/memory/*",
+    ".meowkit/memory/**",
     ".env",
     ".env.*",
     "tasks/*",
@@ -304,7 +304,7 @@ def _extract_summary(rel_path: str, lines: list[str]) -> str:
 def _scan_for_violations(hits: list[dict[str, Any]]) -> bool:
     """Failsafe: scan output for forbid-list references."""
     forbidden_substrings = [
-        ".claude/memory/",
+        ".meowkit/memory/",
         ".env",
         "id_rsa",
         "id_ed25519",

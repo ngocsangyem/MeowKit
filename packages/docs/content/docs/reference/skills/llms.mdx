@@ -3,6 +3,17 @@ title: "mk:llms"
 description: "Generate llms.txt and llms-full.txt files from project documentation following the llmstxt.org spec — LLM-friendly markdown indexes that make projects discoverable by AI assistants."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/llms/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/llms/SKILL.md) |
+| **Owner** | `docs` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Scans project documentation directories, extracts metadata (titles, descriptions), categorizes files by type, and generates standards-compliant `llms.txt` (index with links) and optionally `llms-full.txt` (index with inline content) files. Uses a Python script for deterministic work (scanning, extracting, categorizing) with Claude reviewing and improving the output.

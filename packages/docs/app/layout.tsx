@@ -1,5 +1,5 @@
 import { RootProvider } from 'fumadocs-ui/provider/next';
-import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
+import { Inter, Space_Grotesk } from 'next/font/google';
 import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { siteUrl, siteName, siteDescription } from '@/lib/site';
@@ -17,11 +17,9 @@ const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-jetbrains-mono',
-});
+// No webfont for code on purpose — see the --font-mono note in global.css. Code blocks use
+// the platform monospace, which ships box-drawing and geometric glyphs in the same face as
+// its letters, so preformatted text keeps a single advance width.
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -73,7 +71,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+      className={`${inter.variable} ${spaceGrotesk.variable}`}
     >
       <body className="flex min-h-screen flex-col">
         <SoftwareApplicationJsonLd />

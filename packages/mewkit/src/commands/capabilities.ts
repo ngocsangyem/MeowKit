@@ -268,11 +268,13 @@ function resolve(
 	};
 	const claudeDir = path.join(projectRoot, ".claude");
 	// Compose bounded recall (only for `selected`; read-only, never creates the index DB).
-	const result = attachRecall(resolveWithHost(entries, intent, ctx), intent, { dbFile: dbPath(claudeDir) });
+	const result = attachRecall(resolveWithHost(entries, intent, ctx), intent, {
+		dbFile: dbPath(path.dirname(claudeDir)),
+	});
 	// Opt-in telemetry only: default runs stay write-free.
 	if (record && result.knowledgeRecall) {
 		const { event, data } = recallDecisionEvent(result.knowledgeRecall);
-		new TraceAdapter(claudeDir).recordWikiTrace(event, data);
+		new TraceAdapter(path.dirname(claudeDir)).recordWikiTrace(event, data);
 	}
 	if (json) {
 		console.log(JSON.stringify(result, null, 2));

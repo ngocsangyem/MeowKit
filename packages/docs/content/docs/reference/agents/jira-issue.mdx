@@ -3,6 +3,18 @@ title: "jira-issue"
 description: "Jira issue CRUD agent — creates, reads, updates, and deletes individual Jira issues via the jira-as CLI wrapper."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/jira-issue.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/jira-issue.md) |
+| **Owner** | `jira` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Writes** | `.meowkit/.env`, `docs/project-context.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The jira-issue agent handles single-issue operations in Jira. It creates bugs, tasks, and stories, retrieves issue details, updates fields, and deletes issues — all through the `jira-as` CLI wrapper with built-in safety tiers that escalate confirmation requirements based on operation risk.
 
 ## Cognitive Framing

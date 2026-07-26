@@ -3,6 +3,18 @@ title: "mk:henshin"
 description: "Transform existing code into agent-consumable surfaces — CLI (npm-publishable), MCP server, and companion skill."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/henshin/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/henshin/SKILL.md) |
+| **Owner** | `research` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Henshin analyzes existing code and produces a **Transformation Spec** -- a planning document that defines which capabilities to expose as agent tools, what shape each CLI command and MCP tool should take, and how the three surfaces (CLI + MCP + companion skill) share a common core. Henshin is a planning skill, not a builder -- the actual scaffold, wrap, test, docs, and publish steps happen downstream in `mk:plan-creator` and `mk:cook`.

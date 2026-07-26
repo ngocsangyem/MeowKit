@@ -4,10 +4,10 @@
 ## Preamble (run first)
 
 ```bash
-mkdir -p .claude/memory/sessions
-touch .claude/memory/sessions/"$PPID"
-_SESSIONS=$(find .claude/memory/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find .claude/memory/sessions -mmin +120 -type f -delete 2>/dev/null || true
+mkdir -p .meowkit/state/sessions
+touch .meowkit/state/sessions/"$PPID"
+_SESSIONS=$(find .meowkit/state/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
+find .meowkit/state/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _CONTRIB=$(.claude/scripts/bin/workflow-config get contributor 2>/dev/null || true)
 _PROACTIVE=$(.claude/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
@@ -16,27 +16,27 @@ echo "PROACTIVE: $_PROACTIVE"
 source <(.claude/scripts/bin/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
-_LAKE_SEEN=$([ -f .claude/memory/.completeness-intro-seen ] && echo "yes" || echo "no")
+_LAKE_SEEN=$([ -f .meowkit/state/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
 _TEL=$(.claude/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f .claude/memory/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL_PROMPTED=$([ -f .meowkit/state/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p .claude/memory
-echo '{"skill":"investigate","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .claude/memory/skill-usage.jsonl 2>/dev/null || true
+mkdir -p .meowkit/telemetry
+echo '{"skill":"investigate","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
 STATE_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/data}/investigate"
 mkdir -p "$STATE_DIR"
-for _PF in $(find .claude/memory -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && break; done
+for _PF in $(find .meowkit/memory -maxdepth 1 -name '.pending-*' 2>/dev/null); do [ -f "$_PF" ] && break; done
 ```
 
-**Memory load:** At task start, read `.claude/memory/fixes.json` for relevant diagnosis patterns; fall back to the generated Markdown view only if JSON is absent. Do not write memory during investigation. Save the diagnostic report under `tasks/reports/**`; `mk:fix` owns remediation and post-fix memory capture.
+**Memory load:** At task start, read `.meowkit/memory/fixes.json` for relevant diagnosis patterns; fall back to the generated Markdown view only if JSON is absent. Do not write memory during investigation. Save the diagnostic report under `tasks/reports/**`; `mk:fix` owns remediation and post-fix memory capture.
 
 If `PROACTIVE` is `"false"`, do not proactively suggest skills — only invoke them when the user explicitly asks.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: follow the inline upgrade flow. If `JUST_UPGRADED <from> <to>`: tell user "Updated to v{to} — continuing." and continue.
 
-If `LAKE_INTRO` is `no`: Introduce the Completeness Principle. Tell the user about the Boil the Lake principle, then offer to open the essay. Mark as seen with `touch .claude/memory/.completeness-intro-seen`.
+If `LAKE_INTRO` is `no`: Introduce the Completeness Principle. Tell the user about the Boil the Lake principle, then offer to open the essay. Mark as seen with `touch .meowkit/state/.completeness-intro-seen`.
 
-If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: Ask the user about telemetry via AskUserQuestion (community vs anonymous vs off). Mark with `touch .claude/memory/.telemetry-prompted`.
+If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: Ask the user about telemetry via AskUserQuestion (community vs anonymous vs off). Mark with `touch .meowkit/state/.telemetry-prompted`.

@@ -1,0 +1,32 @@
+---
+title: "Step 2 — Send open questions back to the PM"
+description: "Footer comments carry the spec's ambiguities back to Confluence. The workflow deliberately pauses here, before any ticket exists."
+---
+
+## Prompt
+
+```bash
+/mk:confluence-collaborate add-comment 12345 \
+  "Three open questions from spec analysis: (1) Google scopes? (2) Session expiry style — sliding or hard? (3) Can OAuth users add a password later?" \
+  --footer
+```
+
+## What happens behind the scenes
+
+| Layer            | Action                                                                                                     |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| Inline vs footer | Skill enforces `--footer` for open-question batches (inline comments are reserved for line-level feedback) |
+| API call         | `confluence-as add-comment --page 12345 --type footer --body "..."`                                        |
+| Notification     | PM gets a Confluence notification email; their reply lands as a comment thread                             |
+| Workflow         | **You stop here.** Tickets do not yet exist.                                                               |
+
+## Why the workflow pauses
+
+Resolving ambiguity **before** ticket creation prevents two failure modes:
+
+1. Tickets with vague ACs that estimator gives a falsely confident number on
+2. Code that ships matching one valid interpretation of an ambiguous spec, requiring rework when the other interpretation surfaces
+
+---
+
+Previous: [Step 1 — Pull the spec out of Confluence](/workflows/spec-to-pr-walkthrough/step-01-pull-the-spec) · Next: [Step 3 — Tech feasibility breakdown](/workflows/spec-to-pr-walkthrough/step-03-tech-feasibility) · [All steps](/workflows/spec-to-pr-walkthrough)

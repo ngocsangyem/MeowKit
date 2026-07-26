@@ -33,6 +33,7 @@ describe("authored codex bundle", () => {
 				".codex/hooks.json",
 				".codex/hooks/capture.cjs",
 				".codex/hooks/gate-enforcement.cjs",
+				".codex/hooks/lib",
 				".codex/hooks/privacy-block.cjs",
 				".codex/rules/default.rules",
 				"AGENTS.md",
@@ -104,8 +105,8 @@ describe("authored codex bundle", () => {
 		expect(fails, `unexpected failures: ${fails.map((f) => `${f.name} — ${f.detail}`).join("; ")}`).toEqual([]);
 	});
 
-	it("the migrate overlay writes EVERY authored surface (cutover complete — all 9 entries active)", async () => {
-		// Phase-9 cutover complete: all nine manifest entries are active, so the overlay writes the
+	it("the migrate overlay writes EVERY authored surface (cutover complete — all 10 entries active)", async () => {
+		// Phase-9 cutover complete: all ten manifest entries are active, so the overlay writes the
 		// full authored tree. For AGENTS.md the overlay writes the authored BASE; the source-rules
 		// merge-single (config/rules) then merges onto it in the full migrate flow (not exercised by
 		// this direct-overlay test), and the capability-bootstrap injector adds its block.
@@ -120,11 +121,12 @@ describe("authored codex bundle", () => {
 				".codex/hooks.json",
 				".codex/hooks/capture.cjs",
 				".codex/hooks/gate-enforcement.cjs",
+				".codex/hooks/lib",
 				".codex/hooks/privacy-block.cjs",
 				".codex/rules/default.rules",
 			].sort(),
 		);
-		expect(overlay.writes).toBe(9);
+		expect(overlay.writes).toBe(10);
 		expect(existsSync(join(target, "AGENTS.md"))).toBe(true); // authored AGENTS.md base
 		expect(existsSync(join(target, ".codex", "config.toml"))).toBe(true); // authored config base
 		expect(existsSync(join(target, ".agents", "skills", "mk-fix", "SKILL.md"))).toBe(true); // authored skill

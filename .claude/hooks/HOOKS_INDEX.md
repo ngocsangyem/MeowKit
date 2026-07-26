@@ -33,7 +33,7 @@ Every hook must be registered in `.claude/settings.json` — unregistered hooks 
 | `dispatch.cjs` | PostToolUse, Stop, SessionStart, UserPromptSubmit | varies | Central Node.js dispatcher. Loads `handlers.json`, dispatches to registered `.cjs` handler modules. | 10-40s | Full stdin JSON |
 | `pre-completion-check.sh` | Stop | — | **Phase 7 NEW.** Block session stop if no verification evidence exists. Hard cap 3 re-entries. LEAN mode soft nudge. | 5s | (none — reads plan/contract/trace) |
 | `post-session.sh` | Stop | — | Capture session lessons + model-change detection + cost log initialization | 5s | (none — reads memory) |
-| `jira-env-loader.sh` | SessionStart | — | Validate presence of `.claude/.env` and 3 `MEOW_JIRA_*` vars (token, email, site URL). Emits "[mk:jira] env OK" or "[mk:jira] {key} missing". Does NOT export — wrapper `scripts/jira-as.sh` handles per-call export per "each hook is a separate subprocess" constraint. | 5s | JSON stdin via `lib/read-hook-input.sh` |
+| `jira-env-loader.sh` | SessionStart | — | Validate presence of `.meowkit/.env` and 3 `MEOW_JIRA_*` vars (token, email, site URL). Emits "[mk:jira] env OK" or "[mk:jira] {key} missing". Does NOT export — wrapper `scripts/jira-as.sh` handles per-call export per "each hook is a separate subprocess" constraint. | 5s | JSON stdin via `lib/read-hook-input.sh` |
 | `control-probe.sh` | Stop | — | Telemetry control signal — fires on every Stop to disambiguate "event unsupported" from "logger broken" when comparing PreCompact/PostToolUseFailure probe counts. Never blocks. | 5s | Full stdin JSON |
 | `posttoolfailure-probe.sh` | PostToolUseFailure | — | Log PostToolUseFailure hook fires to verify the host runtime supports the event. Telemetry-only; never blocks. | 5s | Full stdin JSON |
 | `precompact-probe.sh` | PreCompact | — | Telemetry + safety-baseline re-arm: logs the fire, then appends a `precompact_rearm` marker so the next turn re-reads the safety baseline that compaction dropped from context. No-op without a session id; never blocks. | 5s | Full stdin JSON |
@@ -82,17 +82,17 @@ Hooks that maintain state write to `session-state/` (cleared per session by `pro
 | `.claude/session-state/tdd-deprecation-warned` | tdd-detect.sh | (same) | Legacy profile deprecation one-shot flag (cleared on new session) |
 | `session-state/session-sentinels.jsonl` | post-session.sh (Stop, verification line), precompact-probe.sh (PreCompact, re-arm line) | handlers/safety-sentinel-inject.cjs (UserPromptSubmit) | Single append-only log, two line shapes per session: verification `{session_id, safety, phase_zero, ts}` (Stop) and re-arm `{session_id, event:"precompact_rearm", ts}` (PreCompact). Reader emits the cached-skip marker only when the latest verification is MORE RECENT (later file position) than the latest re-arm — so compaction forces a fresh safety-baseline re-read on the next turn. The Stop hook's unconditional verification write needs no change: a re-arm post-dates it, and the post-re-read verification then post-dates the re-arm. Matching verification → mk:agent-detector step-0/0b skip their 5-file Read loops on turns 2..N. Truncated by project-context-loader.sh on session change. |
 | `session-state/last-prune-date` | post-session.sh (Stop) | (same) | Daily rate-limit token for memory auto-prune. Holds YYYY-MM-DD of last successful prune; advanced only on Python exit 0. |
-| `session-state/prune-log.md` | lib/memory-prune.py (via post-session.sh Stop) | observability only | Append-only count log of pruned entries (`{file} \| {date} \| {N} entries pruned`). NO entry content is ever logged — breaks the injection-rules.md Rule 11 carrier chain. Lives OUTSIDE `.claude/memory/` deliberately. |
+| `session-state/prune-log.md` | lib/memory-prune.py (via post-session.sh Stop) | observability only | Append-only count log of pruned entries (`{file} \| {date} \| {N} entries pruned`). NO entry content is ever logged — breaks the injection-rules.md Rule 11 carrier chain. Lives OUTSIDE `.meowkit/memory/` deliberately. |
 
 ## Telemetry / Canonical Event Stream
 
 | Stream | Writer | Reader | Status |
 |---|---|---|---|
-| `.claude/memory/trace-log.jsonl` | `append-trace.sh` (called by `post-session.sh`, `learning-observer.sh`) | `mk:trace-analyze`, `pre-completion-check.sh` | **Canonical structured event stream.** One typed JSONL record per event. Lock `.claude/memory/.trace-log.lock`; rotates at 50 MB. Never injected into prompt context. |
+| `.meowkit/telemetry/trace-log.jsonl` | `append-trace.sh` (called by `post-session.sh`, `learning-observer.sh`) | `mk:trace-analyze`, `pre-completion-check.sh` | **Canonical structured event stream.** One typed JSONL record per event. Lock `.meowkit/telemetry/.trace-log.lock`; rotates at 50 MB. Never injected into prompt context. |
 | `.claude/hooks/.logs/hook-log.jsonl` | `lib/hook-logger.sh` | `scripts/telemetry-decisions.py` (dead-weight-audit gate) | Hook-fire telemetry. Has a reader — keep writing; not debug-gated. |
 | `session-state/learning-observer.jsonl` | `learning-observer.sh` | self (edit-frequency state → `file_edited` trace) | Reader-less churn record is debug-gated (`MEOWKIT_HOOK_DEBUG=1`); edit ledger feeds the canonical trace. |
 
-`trace-log.jsonl` is the single canonical event stream — do not spawn parallel JSONL control planes (`skill-usage.jsonl`, `eureka.jsonl`, `reviews.jsonl`). Durable workflow evidence lives under `tasks/`; reusable knowledge under `.claude/memory/*.json`.
+`trace-log.jsonl` is the single canonical event stream — do not spawn parallel JSONL control planes (`skill-usage.jsonl`, `eureka.jsonl`, `reviews.jsonl`). Durable workflow evidence lives under `tasks/`; reusable knowledge under `.meowkit/memory/*.json`.
 
 ## Hook Order Independence (Phase 7 P22)
 

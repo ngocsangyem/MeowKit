@@ -52,7 +52,7 @@ is_tdd_enabled() {
   fi
 
   # 3. Legacy profile alias (deprecated — to be removed in next major)
-  case "${MEOW_HOOK_PROFILE:-${MEOW_PROFILE:-standard}}" in
+  case "${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-${MEOW_PROFILE:-standard}}}" in
     fast)
       _tdd_mode=off
       _tdd_src=profile

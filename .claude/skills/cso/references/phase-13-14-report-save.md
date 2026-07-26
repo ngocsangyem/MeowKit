@@ -44,7 +44,7 @@ For each finding:
 5. **Audit exposure window** — when committed? When removed? Was repo public?
 6. **Check for abuse** — review provider's audit logs
 
-**Trend Tracking:** If prior reports exist in `.claude/memory/security-reports/`:
+**Trend Tracking:** If prior reports exist in `.meowkit/memory/security-reports/`:
 ```
 SECURITY POSTURE TREND
 ══════════════════════
@@ -72,10 +72,10 @@ Match findings across reports using the `fingerprint` field (sha256 of category 
 # Phase 14: Save Report
 
 ```bash
-mkdir -p .claude/memory/security-reports
+mkdir -p .meowkit/memory/security-reports
 ```
 
-Write findings to `.claude/memory/security-reports/{date}-{HHMMSS}.json` using this schema:
+Write findings to `.meowkit/memory/security-reports/{date}-{HHMMSS}.json` using this schema:
 
 ```json
 {
@@ -128,7 +128,7 @@ Write findings to `.claude/memory/security-reports/{date}-{HHMMSS}.json` using t
 }
 ```
 
-If `.claude/memory/` is not in `.gitignore`, note it in findings — security reports should stay local.
+If `.meowkit/memory/` is not in `.gitignore`, note it in findings — security reports should stay local.
 
 ## Important Rules
 

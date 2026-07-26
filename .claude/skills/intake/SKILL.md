@@ -52,10 +52,10 @@ Route based on ticket source:
 
 | Source | Adapter |
 |---|---|
-| Jira | `mk:jira-issue` (via `jira-as` wrapper, requires `MEOW_JIRA_*` in `.claude/.env`) |
+| Jira | `mk:jira-issue` (via `jira-as` wrapper, requires `MEOW_JIRA_*` in `.meowkit/.env`) |
 | Linear | Linear MCP (`claude mcp add linear`) |
 | GitHub | `gh` CLI (`gh issue view <n>`) |
-| Confluence | `confluence-as` wrapper directly (requires `MEOW_CONFLUENCE_*` in `.claude/.env`); recognizes `*.atlassian.net/wiki/spaces/{KEY}/pages/{ID}/...` URLs and raw page IDs with explicit "from confluence" phrase. See `references/confluence-handoff-protocol.md`. |
+| Confluence | `confluence-as` wrapper directly (requires `MEOW_CONFLUENCE_*` in `.meowkit/.env`); recognizes `*.atlassian.net/wiki/spaces/{KEY}/pages/{ID}/...` URLs and raw page IDs with explicit "from confluence" phrase. See `references/confluence-handoff-protocol.md`. |
 | None of the above | Prompt user to paste content |
 
 Source adapters may retrieve only the resource explicitly selected by the user.
@@ -135,7 +135,7 @@ Identify affected files, test coverage gaps, and implementation complexity.
 
 ### Step 8b: Jira enrichment
 
-If the `mk:jira-*` family is available (jira-as installed via `.claude/scripts/bin/setup-workflow` + `.claude/.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
+If the `mk:jira-*` family is available (jira-as installed via `.claude/scripts/bin/setup-workflow` + `.meowkit/.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
 Suggest `mk:jira-*` actions per `references/jira-handoff-protocol.md`.
 
 ### Step 9: Generate output

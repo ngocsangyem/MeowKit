@@ -3,6 +3,18 @@ title: "mk:story-sizer"
 description: "Pre-ticket Fibonacci sizing for a paste-mode batch of user stories. Default writes an advisory Story Sizing Report. Opt-in --auto-create delegates ticket creation behind a single confirmation gate."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/story-sizer/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/story-sizer/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Sizes a batch of suggested user stories **before** Jira tickets exist. v1 ships paste-mode only — the user pastes a markdown block of stories, the skill applies deterministic heuristics, and a Story Sizing Report is written to `tasks/reports/`. Default mode is advisory only. Opt-in `--auto-create` delegates ticket creation to `mk:jira-issue` + `mk:jira-collaborate` behind a single batch-level confirmation gate.
@@ -112,4 +124,4 @@ Override path via `MEOWKIT_STORY_SIZER_COMMENT_TEMPLATE` env var (must contain t
 - Agent: [story-sizer](/reference/agents/story-sizer)
 - Peer execution: [`mk:jira-issue`](/reference/skills/jira-issue), [`mk:jira-collaborate`](/reference/skills/jira-collaborate)
 - Peer intelligence: [`mk:jira-evaluator`](/reference/skills/jira-evaluator), [`mk:jira-estimator`](/reference/skills/jira-estimator), [`mk:planning-engine`](/reference/skills/planning-engine)
-- Workflow: [Spec → PR walkthrough](/workflows/spec-to-pr-walkthrough) — Step 3.5
+- Workflow: [Spec → PR walkthrough, Step 3.5](/workflows/spec-to-pr-walkthrough/step-03-5-story-sizing)

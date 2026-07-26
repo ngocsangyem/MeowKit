@@ -44,8 +44,8 @@ Lock file edits to a specific directory. Any Edit or Write operation targeting
 a file outside the allowed path will be **blocked** (not just warned).
 
 ```bash
-mkdir -p .claude/memory
-echo '{"skill":"freeze","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .claude/memory/skill-usage.jsonl 2>/dev/null || true
+mkdir -p .meowkit/telemetry
+echo '{"skill":"freeze","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
 ```
 
 ## Setup
@@ -68,7 +68,7 @@ echo "$FREEZE_DIR"
 
 ```bash
 FREEZE_DIR="${FREEZE_DIR%/}/"
-STATE_DIR="${CLAUDE_PLUGIN_DATA:-.claude/memory}"
+STATE_DIR="${CLAUDE_PLUGIN_DATA:-.meowkit/memory}"
 mkdir -p "$STATE_DIR"
 echo "$FREEZE_DIR" > "$STATE_DIR/freeze-dir.txt"
 echo "Freeze boundary set: $FREEZE_DIR"

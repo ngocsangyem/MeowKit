@@ -1,0 +1,382 @@
+---
+title: "Changelog"
+description: "MeowKit release history and changes."
+---
+
+## Upgrade
+
+```bash
+npx mewkit upgrade
+```
+
+Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
+
+## 2.14.8 (2026-07-26) — Runtime-Neutral State & the Documentation Rebuild
+
+Ships as kit **2.14.8** and **`mewkit` CLI 2.2.4** (patch). Project state and configuration finish their move out of the provider directory into `.meowkit/`, the documentation site is rebuilt around one page per task, and the Codex hook bundle stops denying edits when a session starts below the repository root.
+
+### Highlights
+
+Everything the toolkit writes for itself now resolves through the runtime-neutral `.meowkit/` root — memory, telemetry, session state, and cache each get their own class, and the project config, dotenv example, and manifests move there too. Installs created before the move keep working: the legacy locations are still read, so no project has to relocate anything by hand.
+
+### CLI
+
+- Memory, telemetry, session state, and cache each resolve to their own class under `.meowkit/`, and the wiki index and append logs land in the class they belong to.
+- The project config is read from `.meowkit/config.json` — an install still holding `.claude/meowkit.config.json` keeps working.
+- The dotenv example, gitignore block, MCP example, harness inventory, and pack manifest moved out of `.claude/` into `.meowkit/`.
+- The command surface is declared once and checked against the implementation, so a documented command that no longer exists fails the build instead of the user's shell.
+- The Codex bundle resolves the project root from the git top level, falling back to a marker directory, instead of trusting the hook payload's working directory.
+- The Cursor bundle registers the documented `sessionEnd` event.
+
+### Improvements
+
+- Hooks honor `MEOWKIT_HOOK_PROFILE`; the older `MEOW_HOOK_PROFILE` spelling is still accepted.
+- The documentation site is reorganized around what the reader is holding — one page per command family, per integration, and per workflow, instead of the same setup block repeated six times.
+- Reference indexes and the hook registry are generated from source, so a registered hook or shipped skill cannot be missing from the docs.
+- Docs CI gates on stale runtime values, broken internal links, navigation coverage, frontmatter, and reference coverage.
+- Release history moved to its own archive page and out of the learning path.
+- The `mk-loop` skill directory is renamed to `loop`, matching every other skill directory, which carries its namespace in frontmatter rather than the directory name.
+
+### Bug Fixes
+
+- Codex hooks treated the session working directory as the project root — starting Codex in a subdirectory made Gate 1 look for `tasks/plans` in the wrong place and deny every source edit. The hooks now resolve the root themselves, matching the Codex documentation's own guidance that a session may start below the root.
+- Curated-memory capture through the CLI ignored the legacy-tree fallback, so a project whose memory still lived in `.claude/memory/` had new entries written to a second location.
+- Documentation nav tabs covered page content, and the CLI, Reference, and Workflows sections were unreachable.
+- Corrected the stated license to MIT, the install requirements, the opt-in status of TDD, and the Codex migration rule, each of which contradicted the shipped behavior.
+- The portability, commands, and migration pages claimed Cursor has no documented hooks surface, contradicting both Cursor's documentation and the `.cursor/hooks.json` the Cursor bundle has been shipping.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the new layout. No manual file moves are required — legacy config and memory locations are still read.
+
+---
+
+## 2.14.7 (2026-07-25) — Per-Agent Model Routing
+
+Ships as kit **2.14.7** and **`mewkit` CLI 2.2.3** (patch). Every Claude Code agent now declares the model its role actually needs instead of inheriting the session model or defaulting to the cheapest tier, and a new read-only `explore` agent ships for all three providers.
+
+### Highlights
+
+Each of the bundled Claude Code agents is pinned to one of four tiers — advisory, deep, standard, or bounded — so planning, review, security, and design work runs on a deep-reasoning model while wrapper-driven integration work stays on a bounded one. This brings Claude Code in line with the Codex and Cursor bundles, which already pin a model per agent.
+
+### New Agents
+
+- `explore` — fast, read-only agent optimized for searching and analyzing codebases: locates code, traces call and data paths, and reports `path:line` evidence without writing anything. Ships for all three providers on a bounded tier (`haiku` on Claude Code, `gpt-5.4-mini` at medium effort on Codex, `composer-2.5[fast=true]` on Cursor) and stays in the Cursor default core pack.
+
+### Improvements
+
+- Deep-reasoning agents (`planner`, `developer`, `architect`, `reviewer`, `security`, `evaluator`, `brainstormer`, `ui-ux-designer`, `jira-analyst`, `jira-evaluator`, `jira-estimator`, `confluence-spec-analyst`) now pin the exact `claude-opus-5` id rather than inheriting the session model or running on the cheapest tier.
+- Judgement-bearing agents (`orchestrator`, `tester`, `researcher`, `analyst`, `journal-writer`, and the Jira/Confluence agents that interpret partial failures or customer-facing boundaries) run on `sonnet`.
+- Procedural agents (`project-manager`, `documenter`, `shipper`, `git-manager`, `story-sizer`, and the bounded Jira/Confluence wrappers) stay on `haiku`.
+- `advisor` keeps `fable`, matching the advisory tier the Cursor bundle pins.
+- New guide: [Claude Agent Models](/guide/claude-agent-models) — the per-agent table, the accepted `model:` values, and how to change a pin.
+
+### Removals
+
+- The Cursor bundle's `explorer` agent is renamed to `explore` for one name across providers. A project installed before this release keeps the old `.cursor/agents/explorer.md` — delete it after `npx mewkit upgrade` so the two do not compete for auto-routing.
+
+### CLI
+
+- The model taxonomy accepts `claude-opus-5` as a named profile, so `mewkit validate --agents` resolves an exact-id pin instead of rejecting it as unknown.
+- The shipped Codex and Cursor bundles carry the new `explore` agent.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the new per-agent pins. `claude-opus-5` requires an account entitled to that model; if yours is not, change the affected agents to `sonnet` or `inherit`.
+
+---
+
+## CLI 2.1.0 (2026-07-24) — Codex Cutover Complete
+
+Kit unchanged at **2.14.6**; this is a **`mewkit` CLI 2.1.0** release (minor). Completes the Codex-native migration: the toolkit's Codex bundle is now fully hand-authored, so the semantic porter and the generic Codex converter pipeline are retired.
+
+### CLI
+
+- `mewkit migrate codex` now copies only the hand-authored Codex bundle — it no longer converts a project's own custom `.claude/agents`, `.claude/commands`, or `.claude/hooks` (toolkit agents ship in the bundle), and prints a one-line notice pointing to manual porting when such custom content is detected.
+- `mewkit migrate codex --include-mcp` is unchanged — it still merges a project's `.mcp.json` into `.codex/config.toml [mcp_servers]`.
+- `mewkit migrate cursor` is unchanged — Cursor export stays an automatic runtime conversion of `.claude/`.
+
+### Removals
+
+- Retired the internal Codex porter and converter pipeline — the Codex bundle is now authored directly. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) step 1e for the new hand-authored maintenance workflow.
+
+## 2.14.6 (2026-07-23) — Runtime-Neutral State Root & Codex-First Migration
+
+Ships as kit **2.14.6** and **`mewkit` CLI 2.0.1** (major — breaking CLI changes below). The kit change is the plan-completion lifecycle wiring — agents now archive a finished plan via `npx mewkit plan archive`; the bulk of the release is CLI-side.
+
+Project state moves out of the provider directory into a runtime-neutral `.meowkit/` root, `mewkit migrate` safely relocates any legacy `.claude/memory/` content, and the migration surface is trimmed to the actively-maintained targets (Codex, Cursor).
+
+### Features
+
+- **Runtime-neutral `.meowkit/` state root** — `memory/`, `telemetry/`, `state/`, `cache/`, `migrations/`. Every structured memory write goes through one validated contract (schema → secret scrub → injection scan → per-store lock → atomic replace). `mewkit memory` now reads/writes `.meowkit/memory`.
+- **Safe legacy-memory migration** — `mewkit migrate` runs a read-only preflight, then a locked, staged, atomic transaction that relocates `.claude/memory/` into `.meowkit/` (unknown files preserved under `memory/legacy/`). Conflicts abort; nothing is overwritten or merged silently; a recoverable archive is kept; `--dry-run` makes zero changes. `mewkit doctor --state` reports post-migration legacy-path drift.
+- **Authored Codex bundle** — `mewkit migrate codex` copies a hand-authored, Codex-native bundle (agents as `.codex/agents/*.toml`; skills/commands/rules/modes as `.agents/skills/*/SKILL.md`; hooks as `.codex/hooks.json`) instead of a runtime transform.
+- **Per-agent Codex model routing** — every authored `.codex/agents/*.toml` now carries `model_reasoning_effort` derived from the source Claude tier (opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` agents omit it and inherit Codex's default), mirroring how each `.claude/agents/*.md` declares its `model:`. `model` is left unset (Codex model ids are deployment-specific).
+
+### CLI
+
+- Added `mewkit plan archive <plan-dir>` — finishes a plan: stamps `status: completed` across `plan.md` + every phase file and `.plan-state.json` (preserving its `visual` block; `visual-plan/plan.json` untouched), clears a dangling active-task pointer, then moves the directory into `tasks/plans/archive/`. Fail-closed on collision, `--dry-run` supported. Agents call it at the end of a completed plan (cook Phase 6). A mutating sibling to `plan approve`; read-only `plan status`/`check` are unchanged.
+- Added `mewkit memory capture` — routes a `##pattern` / `##decision` / `##note` prompt into the right `.meowkit/memory` store through the write contract.
+- Added `mewkit init --target <provider>` — `--target codex` creates a Codex-only project by copying the authored Codex bundle shipped in the package (no `.claude/`, no conversion); other providers unpack `.claude/` then export. Replaces the old `--migrate-to`.
+- **`mewkit init` provider multiselect** — a fresh install without `--target` now opens a picker (**Claude Code** preselected, **Codex**, **Cursor**) and provisions each selected toolkit: Claude Code → `.claude/`, Codex → authored bundle, Cursor → `.claude/` + export. Codex-only selection yields a codex-only project (no release download). Shown on new installs only; `--target` bypasses it.
+- `mewkit upgrade` now propagates to installed provider toolkits (`.cursor/`, `.codex/`) after refreshing `.claude/`, and refreshes the authored bundle in a codex-only project.
+- Removed `mewkit build-plugin`, `mewkit validate --plugin` / `--parity`, and `init --migrate-to`.
+
+### Removals
+
+- **Migration targets reduced from 16 to 3** — only `codex` and `cursor` remain as targets (`claude-code` is the source format). Removed: amp, antigravity, cline, droid, gemini-cli, github-copilot, goose, kilo, kiro, openhands, opencode, roo, windsurf.
+- **Native plugin distribution retired** — `plugin/`, the Claude/Codex marketplaces, and `mewkit build-plugin` are gone. Install via `npx mewkit init` (or `npx mewkit upgrade`); there is no marketplace / plugin-install path.
+- **`modelRouting` config removed** — the unused root-config block and the migrate per-provider model-override mechanism (`.meowkit.config.json` → `modelRouting.providers.<tool>.tiers`) are gone. Model routing is now per agent: Claude Code via each agent's `model:` frontmatter, Codex via each agent TOML's baked `model_reasoning_effort`. The authored bundle is the single source; edit an agent TOML or use a Codex config profile to pin a model.
+
+## 2.14.5 (2026-07-20) — High-Assurance PR Review
+
+The `mewkit` CLI ships alongside this kit as **1.19.1** (see `CLI` below).
+
+### Highlights
+
+A new evidence-gated PR-review path. `mk:review-pr --assured` runs a deterministic `ReviewSession`: an isolated, SHA-bound, detached review worktree (the user's checkout is provably untouched), one immutable hash-pinned diff, a diff-scoped impact map with targeted scout escalation, a scope-driven reviewer roster, session-observed coverage, and a mechanical verdict gate that cannot emit a PASS/Approve without complete, hook-corroborated coverage. GitHub writes happen only through `--reply` plus an immediate user confirmation bound to the reviewed revision.
+
+### New Commands
+
+- `mewkit review prepare <pr-url | owner/repo#n | n> [--remote <name>]` — provision an isolated SHA-bound worktree from a PR (fork-safe: `pull/N/head` fetched from the base-repo remote), capture one immutable hash-pinned diff + PR metadata/CI as untrusted DATA, and write a deterministic impact map + reviewer roster/briefs under `tasks/reviews/<session>/`.
+- `mewkit review read --session <id> --as <role> <path>` — path-confined, evidence-recording read wrapper (assigned reviewer reads flow through it so coverage is observable).
+- `mewkit review coverage --session <id>` — roster ∩ evidence gap gate; reports `evidenceLevel` (`session-observed` vs `attested`) and exits non-zero on any gap.
+- `mewkit review compose --session <id>` — the mechanical gate: verify the diff hash, re-run coverage, apply the deterministic verdict cap table, resolve inline anchors by snippet, and emit a `verdict-gate`-compatible proof bundle + `SubmitPayload`.
+- `mewkit review submit --session <id> --reply --confirm <payload-hash>` — the sole GitHub write path; re-checks the PR head SHA (aborts without posting if it changed) and is idempotent.
+- `mewkit review cleanup --session <id>` — remove the ephemeral review worktree (manifest-nonce-owned); the session audit trail is kept.
+- `mk:worktree review-pr` / `review-pr-cleanup` — detached, nonce-owned review worktrees; cleanup refuses anything but a matching manifest.
+
+### Features
+
+- `mk:review-pr` gains an opt-in `--assured` lane (full ReviewSession pipeline) and keeps its fast, read-only default lane unchanged.
+- Scope-driven review topology (small / medium / large tiers) with whole-diff roles a per-chunk territory reviewer cannot own, plus heavy-file invariant slices.
+
+### Improvements
+
+- `mk:review` PR mode consumes the prepared session; step-03 runs the coverage gate before verdict composition, and step-04 composes the verdict through `mewkit review compose`.
+- Gate 2 (`gate2-check.sh`) gains a narrow review-session extension that validates a review verdict's embedded coverage block (hash-clean, no gaps, `session-observed` required for PASS); inert for non-review verdicts.
+
+### Security
+
+- All git/gh invocations in the review pipeline use array-argv `execFileSync` (no shell). Untrusted PR content is quarantined under `untrusted/` and never treated as instructions; the read wrapper is realpath-confined against symlink exfiltration.
+- Honest capability limit: subagent tool calls do not reach the parent PostToolUse hook, so `session-observed` is anti-accidental corroboration (not unforgeable) and proves session-level — not individual-reviewer — access; subagent-driven reviews are `attested` and cannot earn Approve.
+
+### CLI
+
+- The `mewkit` CLI is bumped to **1.19.1** for the `review` command group (`prepare` / `read` / `coverage` / `compose` / `submit` / `cleanup`).
+
+## 2.14.4 (2026-07-19) — The Orientation & Transition Spine
+
+The `mewkit` CLI ships alongside this kit as **1.19.0** (see `CLI` below).
+
+### Highlights
+
+A fresh session can now recover what it was doing from durable task state alone — no plan or wiki scanning. Explicit activation records one active task plus a canonical pointer, `mewkit orient` returns a bounded, honest resume envelope (active / none / ambiguous / corrupt-only), and the resume hook injects it through a trust-gated installed runtime with a labeled checkpoint fallback. Trace logging is now one shared append primitive across the shell and CLI, task work is queryable by id, and wiki recall verifies its own index before research trusts it.
+
+### CLI
+
+- `mewkit orient [--json]` — safe resume orientation built only from durable task state; reports active, none, ambiguous, or corrupt-only, and never scans plans or the wiki.
+- `mewkit plan approve` now durably activates the plan by default (one active record + canonical task pointer); `--no-activate` opts out, and a failed activation exits non-zero rather than claiming success.
+- `mewkit task new --activate` — durably activate no-plan work.
+- `mewkit task-state update` gained `--blocker`, `--verification`, `--evidence-ref`, and `--capability-decision`, and emits a task-transition trace after a successful write.
+- `mewkit query --task <id>` — task-joined evidence and plan linkage; `mewkit query --presets` — recovery-measurement metrics (outcome distribution, stale-warning frequency, transitions missing task context, verification re-runs).
+- `mewkit wiki verify [--json]` — canonical-vs-index consistency check (page set, per-page body hash, provenance, FTS parity); research refuses to run against an inconsistent index, and `wiki context` warns when the index looks stale.
+
+### Improvements
+
+- One shared trace-append primitive now backs every writer — the shell hook and the CLI contend on the same sidecar lock, so concurrent appends can no longer interleave or corrupt a line.
+- The resume/clear/compact orientation hook runs through a trust-gated installed runtime (absolute, in-project, symlink-resolved executable) and falls back to a clearly labeled checkpoint summary when no runtime is available; fresh-session startup stays disabled pending its release gate.
+- Providers surface an explicit, report-only Qwen entry (no support claimed), and the session-orientation instruction is documented in the capability bootstrap.
+
+### Migration Notes
+
+- The derived index schema is now v4 (adds `task_id` / `plan_path` columns for task-joined queries). Additive — it auto-applies on the next `mewkit index` / `mewkit wiki reindex`; no user action required.
+
+## 2.14.3 (2026-07-19) — Jira & Confluence Agents on Haiku
+
+The `mewkit` CLI is unchanged at **1.18.2** — this release ships kit content only.
+
+### Improvements
+
+- The 16 Jira and 5 Confluence domain agents now pin to the Haiku model tier instead of inheriting the session model, so their CLI-wrapper operations (issue and page CRUD, search, bulk, lifecycle) run on the cheapest tier.
+
+## 2.14.2 (2026-07-18) — Composed Capability Recall
+
+The `mewkit` CLI ships alongside this kit as **1.18.2** (see `CLI` below).
+
+### Highlights
+
+When `capabilities resolve` selects a knowledge-sensitive capability, it now composes a bounded, read-only recall of prior project knowledge directly into the result — the agent reads one `knowledgeRecall` envelope instead of running a separate wiki lookup. The same activation policy reaches both Claude Code and Codex.
+
+### CLI
+
+- `capabilities resolve` now attaches a `knowledgeRecall` envelope to a selected capability — a `required`-class capability gets exactly one bounded wiki recall (≤3 snippets, no page bodies); `conditional`, `none`, and every non-selected outcome perform zero automatic wiki access.
+- Missing, empty, and errored wiki indexes are now reported distinctly and always fail open — recall never blocks a resolution.
+- `capabilities resolve --record` — opt-in flag that logs one recall decision (counts and status only, never recalled content) through the trace log; default runs stay write-free.
+- A capability provided by the running `mewkit` CLI (invoked via `npx` or a workspace bin) now resolves as available with "current CLI process" evidence instead of a false "not on PATH".
+- `mewkit --help` now lists the `wiki` command.
+
+### Improvements
+
+- `wiki context` routes through a shared read-only probe that sanitizes free-text queries into valid full-text-search terms and reads the index without creating `-wal`/`-shm` sidecar files.
+
+## 2.14.1 (2026-07-18) — Harness Integrity & Provider Parity
+
+The `mewkit` CLI ships alongside this kit as **1.18.1** (see `CLI` below).
+
+### Highlights
+
+This release closes the 2.14.0 harness audit. Gates now prove authority rather than paperwork, the evaluator rejects forged verdicts, provider support is stated from one honest source, Codex migration is default-deny with a measured parity score and a post-migration validator, and the release now gates on its own quality checks.
+
+### CLI
+
+- `mewkit validate --target codex <dir>` — a read-only post-migration gate for a generated Codex project that checks the config/hook wiring, that hook wrappers exist, are executable, and carry the deny contract, that agent TOMLs parse, and that installed skills declare a supported runtime and carry no host-bound tool tokens.
+- `mewkit providers codex` and `--lifecycle` now render from a single provider-truth source, and both the migration output and README report a `skill parity: N%` score.
+- `mewkit migrate codex` is default-deny — a portable skill installs, a host-bound skill installs only through a tested adapter or is skipped with a report reason; `mewkit migrate codex --include-unportable` overrides the policy with an EXPERIMENTAL marker.
+- The cross-harness journey (J10) runs a deterministic layer in CI — migration, target validation, then route/artifact/denied-token/side-effect oracles — with no model calls, reporting structural (not semantic) parity.
+- The benchmark path now enforces its cost cap: a run halts when cumulative cost reaches the effective cap (`--budget` or `MEOWKIT_BUDGET_CAP` override the tier cap).
+- `mewkit inventory --emit-counts` regenerates documentation count tokens from the inventory; `npm run release:check` aggregates the release-readiness gates for contributors.
+
+### Improvements
+
+- Gate 1 now requires a fresh approval receipt bound to the plan revision — plan-presence alone no longer opens it, and editing the plan after approval re-arms the gate.
+- Every pre-ship blocked path exits with a structured deny (`exit 2`), and a missing gate checker fails closed for ship commands.
+- The evaluator recomputes its weighted score from the rubric preset and verifies evidence provenance, so a verdict whose score does not follow from its rubrics is rejected.
+- Curated memory has a single JSON write path — a write to a non-canonical view is corrected, and a failed capture surfaces a notice instead of skipping silently.
+- The release gates on its own checks (tests, lint, typecheck, format, portable validation, inventory, version sync, and plugin-payload drift), versions sync from the root as the single source, and documentation counts generate from the inventory.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the hardened gates and provider changes — a plan now needs `npx mewkit plan approve <plan-dir>` after human approval (or `MEOWKIT_GATE1_PRESENCE_ONLY=1` to opt out).
+
+---
+
+## 2.14.0 (2026-07-17) — Provider Conformance, Contract Safety & Evals
+
+The `mewkit` CLI ships alongside this kit as **1.18.0** (see `CLI` below).
+
+### Highlights
+
+This release hardens skill contracts and provider portability. Generic skill bodies are cleaned of provider-specific tool names and model IDs so they stay honest per harness, `mewkit validate` now reports operation-level conformance, and the `cook` workflow stops after reporting — shipping and reflection are explicit, user-invoked steps rather than automatic.
+
+### CLI
+
+- `mewkit validate` now reports operation-level conformance — it flags a logical operation an installed skill relies on (via its declared tools) that an advertised provider cannot honor, so a cross-harness payload never silently advertises an unsupported capability.
+- Skill metadata now carries typed dependency edges, surfaced through the generated inventory.
+
+### Improvements
+
+- `cook` stops after reporting — shipping and reflection are explicit, user-invoked steps, so a run makes no unrequested commit or push.
+- Canonical workflow definitions and stricter execution gates across skills, with contract repairs that remove duplicated or conflicting phase ownership.
+- Generic skill bodies no longer carry provider tool names, model IDs, or brand tokens; skills genuinely tied to one harness are annotated honestly instead of claiming portability.
+- The quick workflow is formalized with a tighter context budget for low-complexity tasks.
+- `plan-creator` is slimmed — visual rendering and lifecycle tasks moved into dedicated skills.
+- `scale-routing` gains a bilingual English + Vietnamese routing eval covering the common task clusters.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the new skill contracts and the CLI — a `cook` run that previously auto-shipped now stops after reporting, so invoke shipping explicitly.
+
+
+## Older releases
+
+Everything before this line lives in the [changelog archive](/changelog/archive), in full and in the same format:
+
+- [2.13.7 (2026-07-15) — Gate Contract Safety, Portability, DX](/changelog/archive#2-13-7-2026-07-15-gate-contract-safety-portability-dx)
+- [2.13.6 (2026-07-13) — Local Visual Plan Review](/changelog/archive#2-13-6-2026-07-13-local-visual-plan-review)
+- [2.13.5 (2026-07-12) — Capability Discovery + Durable Task State](/changelog/archive#2-13-5-2026-07-12-capability-discovery-durable-task-state)
+- [2.13.4 (2026-07-05) — Figma Gateway + Agent-Browser Hardening](/changelog/archive#2-13-4-2026-07-05-figma-gateway-agent-browser-hardening)
+- [2.13.3 (2026-07-04) — Context-Engineering + Prompt-Enhancer Hardening](/changelog/archive#2-13-3-2026-07-04-context-engineering-prompt-enhancer-hardening)
+- [2.13.2 (2026-07-03) — Deep Research Skill + Full-Surface Codex Migration](/changelog/archive#2-13-2-2026-07-03-deep-research-skill-full-surface-codex-migration)
+- [2.13.1 (2026-06-29) — Wiki Handoff + Context Recall](/changelog/archive#2-13-1-2026-06-29-wiki-handoff-context-recall)
+- [2.13.0 (2026-06-29) — The Wiki Knowledge Subsystem](/changelog/archive#2-13-0-2026-06-29-the-wiki-knowledge-subsystem)
+- [2.12.3 (2026-06-28) — Visual + HTML Workflow](/changelog/archive#2-12-3-2026-06-28-visual-html-workflow)
+- [2.12.2 (2026-06-28) — Visual Plan Rendering](/changelog/archive#2-12-2-2026-06-28-visual-plan-rendering)
+- [2.12.1 (2026-06-27) — Native Plugin Distribution](/changelog/archive#2-12-1-2026-06-27-native-plugin-distribution)
+- [2.12.0 (2026-06-27) — Legible Context + Queryable Substrate](/changelog/archive#2-12-0-2026-06-27-legible-context-queryable-substrate)
+- [2.11.7 (2026-06-20) — Brainstorming Solution Decompression](/changelog/archive#2-11-7-2026-06-20-brainstorming-solution-decompression)
+- [2.11.6 (2026-06-19) — Merge Conflict + Codebase Architecture Skills](/changelog/archive#2-11-6-2026-06-19-merge-conflict-codebase-architecture-skills)
+- [2.11.5 (2026-06-18) — Long-Horizon Run Hardening](/changelog/archive#2-11-5-2026-06-18-long-horizon-run-hardening)
+- [2.11.4 (2026-06-18) — Post-Compaction Safety Re-Arm](/changelog/archive#2-11-4-2026-06-18-post-compaction-safety-re-arm)
+- [2.11.3 (2026-06-14) — Vue 3 Skill Suite](/changelog/archive#2-11-3-2026-06-14-vue-3-skill-suite)
+- [2.11.2 (2026-06-13) — Grill Plan-Interrogation Skill](/changelog/archive#2-11-2-2026-06-13-grill-plan-interrogation-skill)
+- [2.11.1 (2026-06-11) — Ask-Me Project Q&A Skill](/changelog/archive#2-11-1-2026-06-11-ask-me-project-q-a-skill)
+- [2.11.0 (2026-06-11) — Context Tiers + Harness Guardrails](/changelog/archive#2-11-0-2026-06-11-context-tiers-harness-guardrails)
+- [2.10.3 (2026-06-10) — Memory + Plan Completion Cleanup](/changelog/archive#2-10-3-2026-06-10-memory-plan-completion-cleanup)
+- [2.10.2 (2026-06-02) — PR Review + Response Skills](/changelog/archive#2-10-2-2026-06-02-pr-review-response-skills)
+- [2.10.1 (2026-06-02) — Brainstorming Rigor + Prompt Recipes](/changelog/archive#2-10-1-2026-06-02-brainstorming-rigor-prompt-recipes)
+- [2.9.14 (2026-05-30) — Autobuild Rename + mk:loop](/changelog/archive#2-9-14-2026-05-30-autobuild-rename-mk-loop)
+- [2.9.13 (2026-05-30) — Fix Gate Parity & Workflow Evidence Index](/changelog/archive#2-9-13-2026-05-30-fix-gate-parity-workflow-evidence-index)
+- [2.9.12 (2026-05-30) — JSON-first memory + observability cleanup](/changelog/archive#2-9-12-2026-05-30-json-first-memory-observability-cleanup)
+- [2.9.11 (2026-05-24) — Plan-creator mode clarity](/changelog/archive#2-9-11-2026-05-24-plan-creator-mode-clarity)
+- [2.9.10 (2026-05-23) — Skill portability + cook context-engineering + provider diagnostics](/changelog/archive#2-9-10-2026-05-23-skill-portability-cook-context-engineering-provider-diagnostics)
+- [2.9.9 (2026-05-23) — Plan-creator determinism + handoff](/changelog/archive#2-9-9-2026-05-23-plan-creator-determinism-handoff)
+- [2.9.8 (2026-05-23) — Memory system deep fix](/changelog/archive#2-9-8-2026-05-23-memory-system-deep-fix)
+- [2.9.7 (2026-05-16) — Docs reference contract + validator](/changelog/archive#2-9-7-2026-05-16-docs-reference-contract-validator)
+- [2.9.6 (2026-05-16) — Context isolation: SessionStart budgeting, agent-detector sentinel, memory auto-prune](/changelog/archive#2-9-6-2026-05-16-context-isolation-sessionstart-budgeting-agent-detector-sentinel-memory-auto-prune)
+- [2.9.5 (2026-05-14) — mk:worktree script backing and new commands](/changelog/archive#2-9-5-2026-05-14-mk-worktree-script-backing-and-new-commands)
+- [2.9.4 (2026-05-11) — Agent rules and TOON agent docs](/changelog/archive#2-9-4-2026-05-11-agent-rules-and-toon-agent-docs)
+- [2.9.3 (2026-05-11) — Optimize rules](/changelog/archive#2-9-3-2026-05-11-optimize-rules)
+- [2.9.2 (2026-05-11) — Spec-to-tech-breakdown orchestrator](/changelog/archive#2-9-2-2026-05-11-spec-to-tech-breakdown-orchestrator)
+- [2.9.1 (2026-05-11) — Brand-prose neutralization for migrate targets](/changelog/archive#2-9-1-2026-05-11-brand-prose-neutralization-for-migrate-targets)
+- [2.9.0 (2026-05-11) — Pre-ticket story sizing](/changelog/archive#2-9-0-2026-05-11-pre-ticket-story-sizing)
+- [2.8.7 (2026-05-11) — Agile/Scrum Rule Layer](/changelog/archive#2-8-7-2026-05-11-agile-scrum-rule-layer)
+- [2.8.6 (2026-05-10) — Align rules](/changelog/archive#2-8-6-2026-05-10-align-rules)
+- [2.8.5 (2026-05-10) — Rules Folder Reconsolidation + mk:preview](/changelog/archive#2-8-5-2026-05-10-rules-folder-reconsolidation-mk-preview)
+- [2.8.4 (2026-05-10) — Confluence Ecosystem + Macro-Aware Spec Analysis](/changelog/archive#2-8-4-2026-05-10-confluence-ecosystem-macro-aware-spec-analysis)
+- [2.8.3 (2026-05-10) — Jira Family + Workflow Discovery](/changelog/archive#2-8-3-2026-05-10-jira-family-workflow-discovery)
+- [2.8.2 (2026-05-09) — Prompt Enhancer Output Modes](/changelog/archive#2-8-2-2026-05-09-prompt-enhancer-output-modes)
+- [2.8.1 (2026-05-09) — The Prompt Enhancer Release](/changelog/archive#2-8-1-2026-05-09-the-prompt-enhancer-release)
+- [2.8.0 (2026-05-09) — The Cleanup & Audit Release](/changelog/archive#2-8-0-2026-05-09-the-cleanup-audit-release)
+- [2.7.6 (2026-05-09) — Phase 0 risk checklist](/changelog/archive#2-7-6-2026-05-09-phase-0-risk-checklist)
+- [2.7.5 (2026-05-09) — CLAUDE.md trim + reference cleanup](/changelog/archive#2-7-5-2026-05-09-claude-md-trim-reference-cleanup)
+- [2.7.4 (2026-05-02) — Browser skill consolidation](/changelog/archive#2-7-4-2026-05-02-browser-skill-consolidation)
+- [2.7.3 (2026-05-01) — `npx mewkit` resolution fix](/changelog/archive#2-7-3-2026-05-01-npx-mewkit-resolution-fix)
+- [2.7.2 (2026-05-01) — Checkpoint subsystem cleanup](/changelog/archive#2-7-2-2026-05-01-checkpoint-subsystem-cleanup)
+- [2.7.1 (2026-04-30) — Phase Frontmatter Contract](/changelog/archive#2-7-1-2026-04-30-phase-frontmatter-contract)
+- [2.7.0 (2026-04-30) — The Namespace Rename Release](/changelog/archive#2-7-0-2026-04-30-the-namespace-rename-release)
+- [2.6.2 (2026-04-29) — The Telemetry & Validator Release](/changelog/archive#2-6-2-2026-04-29-the-telemetry-validator-release)
+- [2.6.1 (2026-04-22) — The project-manager Release](/changelog/archive#2-6-1-2026-04-22-the-project-manager-release)
+- [2.6.0 (2026-04-22) — The Skills Compliance Release](/changelog/archive#2-6-0-2026-04-22-the-skills-compliance-release)
+- [2.5.1 (2026-04-20) — mk:henshin](/changelog/archive#2-5-1-2026-04-20-mk-henshin)
+- [2.5.0 (2026-04-19) — The Native Fit Release](/changelog/archive#2-5-0-2026-04-19-the-native-fit-release)
+- [2.4.6 (2026-04-19) — mk:ship Cleanup + Design Review Checklist](/changelog/archive#2-4-6-2026-04-19-mk-ship-cleanup-design-review-checklist)
+- [2.4.5 (2026-04-19) — The Thinking Skills Release](/changelog/archive#2-4-5-2026-04-19-the-thinking-skills-release)
+- [2.4.4 (2026-04-19) — Deprecated Skill Cleanup + Brand Refresh](/changelog/archive#2-4-4-2026-04-19-deprecated-skill-cleanup-brand-refresh)
+- [2.4.3 (2026-04-18) — Brainstorming v2: Discovery, Scope, Anti-Bias Pivot](/changelog/archive#2-4-3-2026-04-18-brainstorming-v2-discovery-scope-anti-bias-pivot)
+- [2.4.2 (2026-04-18) — Memory Fix](/changelog/archive#2-4-2-2026-04-18-memory-fix)
+- [2.4.1 (2026-04-18) — Memory Simplification + Red-Team Hardening](/changelog/archive#2-4-1-2026-04-18-memory-simplification-red-team-hardening)
+- [2.4.0 (2026-04-18) — The Agent Constitution Release](/changelog/archive#2-4-0-2026-04-18-the-agent-constitution-release)
+- [2.3.12 (2026-04-17) — External Codebase Packing + chom v2 Rigor](/changelog/archive#2-3-12-2026-04-17-external-codebase-packing-chom-v2-rigor)
+- [2.3.11 (2026-04-14) — Env Var Handling Hardening](/changelog/archive#2-3-11-2026-04-14-env-var-handling-hardening)
+- [2.3.10 (2026-04-13) — Jira Ticket Intelligence + Confluence & Sprint Planning](/changelog/archive#2-3-10-2026-04-13-jira-ticket-intelligence-confluence-sprint-planning)
+- [2.3.9 (2026-04-12) — Memory System Hardening](/changelog/archive#2-3-9-2026-04-12-memory-system-hardening)
+- [2.3.8 (2026-04-12) — Multimodal Resilience, MiniMax & Provider Fallback](/changelog/archive#2-3-8-2026-04-12-multimodal-resilience-minimax-provider-fallback)
+- [2.3.7 (2026-04-12) — The Copy-Cat Release](/changelog/archive#2-3-7-2026-04-12-the-copy-cat-release)
+- [2.3.6 (2026-04-11)](/changelog/archive#2-3-6-2026-04-11)
+- [2.3.5 (2026-04-11) — CEO Review Layered Verification](/changelog/archive#2-3-5-2026-04-11-ceo-review-layered-verification)
+- [2.3.4 (2026-04-11) — Centralized Dotenv Loading](/changelog/archive#2-3-4-2026-04-11-centralized-dotenv-loading)
+- [2.3.3 (2026-04-11) — The Wiring Integrity Release](/changelog/archive#2-3-3-2026-04-11-the-wiring-integrity-release)
+- [2.3.2 (2026-04-11) — The Agent-Skills Integration Release](/changelog/archive#2-3-2-2026-04-11-the-agent-skills-integration-release)
+- [2.3.1 (2026-04-11) — The Plan Creator Intelligence Release](/changelog/archive#2-3-1-2026-04-11-the-plan-creator-intelligence-release)
+- [2.3.0 (2026-04-11) — The Hook Dispatch Release](/changelog/archive#2-3-0-2026-04-11-the-hook-dispatch-release)
+- [2.2.2 (2026-04-10) — Homoglyph Detection Refinement](/changelog/archive#2-2-2-2026-04-10-homoglyph-detection-refinement)
+- [2.2.1 (2026-04-10) — Bug Fix](/changelog/archive#2-2-1-2026-04-10-bug-fix)
+- [2.2.0 (2026-04-08) — Generator/Evaluator Harness](/changelog/archive#2-2-0-2026-04-08-generator-evaluator-harness)
+- [2.1.0 (2026-04-04)](/changelog/archive#2-1-0-2026-04-04)
+- [2.0.0 (2026-04-04) — The Leverage Release](/changelog/archive#2-0-0-2026-04-04-the-leverage-release)
+- [1.4.0 (2026-04-03) — The Plan Intelligence Release](/changelog/archive#1-4-0-2026-04-03-the-plan-intelligence-release)
+- [1.3.4 (2026-04-02) — Hook path resolution fix](/changelog/archive#1-3-4-2026-04-02-hook-path-resolution-fix)
+- [1.3.3 (2026-04-02) — The Hook Safety Release](/changelog/archive#1-3-3-2026-04-02-the-hook-safety-release)
+- [1.3.2 (2026-04-01) — The Plan Quality Release](/changelog/archive#1-3-2-2026-04-01-the-plan-quality-release)
+- [1.3.1 (2026-03-31) — The Red Team Depth Release](/changelog/archive#1-3-1-2026-03-31-the-red-team-depth-release)
+- [1.3.0 (2026-03-31) — The Integration Integrity Release](/changelog/archive#1-3-0-2026-03-31-the-integration-integrity-release)
+- [1.2.1 (2026-03-31)](/changelog/archive#1-2-1-2026-03-31)
+- [1.2.0 (2026-03-31) — The Memory Activation Release](/changelog/archive#1-2-0-2026-03-31-the-memory-activation-release)
+- [1.1.0 (2026-03-30) — The Reasoning Depth Release](/changelog/archive#1-1-0-2026-03-30-the-reasoning-depth-release)
+- [1.0.0 (2026-03-30) — The Disciplined Velocity Release](/changelog/archive#1-0-0-2026-03-30-the-disciplined-velocity-release)
+- [0.1.2 (2026-03-29)](/changelog/archive#0-1-2-2026-03-29)
+- [0.1.1 (2026-03-29)](/changelog/archive#0-1-1-2026-03-29)
+- [0.1.0 (2026-03-29)](/changelog/archive#0-1-0-2026-03-29)
+
+If you followed a version anchor and landed at the top of this page, that release is in the archive — the list above links straight to it.

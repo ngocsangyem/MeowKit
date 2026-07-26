@@ -212,10 +212,10 @@ For compare: `scripts/compare-runs.sh <run-id-a> <run-id-b>`.
 
 ## Memory Write
 
-After each completed benchmark run, append the baseline to `.claude/memory/cost-log.json` (top-level array). Create the file with `[]` if it does not exist.
+After each completed benchmark run, append the baseline to `.meowkit/telemetry/cost-log.json` (top-level array). Create the file with `[]` if it does not exist.
 
 ```json
 {"run_id": "{id}", "date": "{ISO-date}", "tier": "quick|full", "pass_rate": N, "avg_score": N, "total_cost_usd": N}
 ```
 
-Use `mkdir -p .claude/memory` before the append. This persists baselines for `compare-runs.sh` and the dead-weight audit.
+Use `mkdir -p .meowkit/telemetry` before the append. This persists baselines for `compare-runs.sh` and the dead-weight audit.

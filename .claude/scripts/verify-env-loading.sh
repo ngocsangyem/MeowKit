@@ -30,7 +30,7 @@ echo ""
 # Test 1: Inline comment stripped from unquoted value
 echo "Test 1: Inline comment stripped (unquoted)"
 TMPDIR=$(make_tmp)
-echo 'MEOWKIT_BUILD_VERIFY=off # disable in CI' > "$TMPDIR/.claude/.env"
+echo 'MEOWKIT_BUILD_VERIFY=off # disable in CI' > "$TMPDIR/.meowkit/.env"
 RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.sh" && echo "${MEOWKIT_BUILD_VERIFY}"')
 [ "$RESULT" = "off" ] && pass "inline comment stripped" || fail "inline comment stripped" "got [$RESULT], expected [off]"
 rm -rf "$TMPDIR"
@@ -38,7 +38,7 @@ rm -rf "$TMPDIR"
 # Test 2: Quoted value preserves # literally (H-4 regression)
 echo "Test 2: Quoted # preserved (API key with hash)"
 TMPDIR=$(make_tmp)
-echo 'MEOWKIT_API_KEY="abc#123"' > "$TMPDIR/.claude/.env"
+echo 'MEOWKIT_API_KEY="abc#123"' > "$TMPDIR/.meowkit/.env"
 RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.sh" && echo "${MEOWKIT_API_KEY}"')
 [ "$RESULT" = "abc#123" ] && pass "quoted # preserved" || fail "quoted # preserved" "got [$RESULT]"
 rm -rf "$TMPDIR"
@@ -46,7 +46,7 @@ rm -rf "$TMPDIR"
 # Test 3: Indented key whitespace trimmed
 echo "Test 3: Indented key whitespace trimmed"
 TMPDIR=$(make_tmp)
-printf '  MEOWKIT_TDD=1\n' > "$TMPDIR/.claude/.env"
+printf '  MEOWKIT_TDD=1\n' > "$TMPDIR/.meowkit/.env"
 RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.sh" && echo "${MEOWKIT_TDD}"')
 [ "$RESULT" = "1" ] && pass "indented key trimmed" || fail "indented key trimmed" "got [$RESULT]"
 rm -rf "$TMPDIR"
@@ -54,7 +54,7 @@ rm -rf "$TMPDIR"
 # Test 4: Dangerous key PATH blocked
 echo "Test 4: PATH not hijacked by .env"
 TMPDIR=$(make_tmp)
-echo 'PATH=/evil/bin' > "$TMPDIR/.claude/.env"
+echo 'PATH=/evil/bin' > "$TMPDIR/.meowkit/.env"
 ORIGINAL_PATH="$PATH"
 RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.sh" && echo "$PATH"')
 [ "$RESULT" = "$ORIGINAL_PATH" ] && pass "PATH not hijacked" || fail "PATH not hijacked" "PATH changed to $RESULT"
@@ -63,7 +63,7 @@ rm -rf "$TMPDIR"
 # Test 5: Invalid key (starts with digit) skipped, valid key still loaded
 echo "Test 5: Invalid key name skipped"
 TMPDIR=$(make_tmp)
-cat > "$TMPDIR/.claude/.env" <<'EOF'
+cat > "$TMPDIR/.meowkit/.env" <<'EOF'
 1INVALID=value
 MEOWKIT_VALID=works
 KEY WITH SPACE=value

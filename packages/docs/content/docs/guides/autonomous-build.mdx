@@ -1,9 +1,9 @@
 ---
 title: "Autonomous Build"
-description: "Green-field product builds with /mk:autobuild — planner, sprint contract, generator/evaluator loop with adaptive density."
+description: "Green-field product builds with /mk:autobuild: planner, sprint contract, and a generator/evaluator loop with adaptive density."
 ---
 
-`/mk:autobuild` builds entire products from a description. It's for "build me a kanban app" scope — not single features (use `/mk:cook` for those). It runs a planner → contract → generator ⇄ evaluator loop with minimal handholding.
+`/mk:autobuild` builds entire products from a description. It is for "build me a kanban app" scope, not single features (use `/mk:cook` for those). It runs a planner → contract → generator ⇄ evaluator loop with minimal handholding.
 
 ## Quick start
 
@@ -11,7 +11,7 @@ description: "Green-field product builds with /mk:autobuild — planner, sprint 
 /mk:autobuild build a kanban board with drag-and-drop
 ```
 
-MeowKit detects your model tier, selects the right scaffolding density, and drives the full build. You approve at Gate 1 (plan) and Gate 2 (review). The evaluator grades the running app against rubrics. If it fails, the harness loops back to the generator — up to 3 rounds.
+MeowKit detects your model tier, selects the right scaffolding density, and drives the full build. You approve at Gate 1 (plan) and Gate 2 (review). The evaluator grades the running app against rubrics. If it fails, the harness loops back to the generator, up to three rounds.
 
 ## When to use
 
@@ -20,6 +20,13 @@ MeowKit detects your model tier, selects the right scaffolding density, and driv
 | Green-field product from scratch | `/mk:autobuild` |
 | Single feature on existing codebase | `/mk:cook` |
 | Bug fix | `/mk:fix` |
+
+## Before you start
+
+- Opus 4.5 or better is the comfortable floor. Sonnet works at FULL density; Haiku short-circuits to `/mk:cook`.
+- Density is detected automatically when your host sends a model at session start. `MEOWKIT_MODEL_HINT` is a fallback, or a way to force a tier. See [Adaptive Density](/guide/adaptive-density).
+- Long runs deserve a budget: `--budget 50`, or `export MEOWKIT_BUDGET_CAP=50`.
+- Run `npx mewkit doctor` to confirm your install is healthy before a multi-hour build.
 
 ## Scaffolding density
 
@@ -64,7 +71,7 @@ Override with `--tier` or `MEOWKIT_AUTOBUILD_MODE`:
 /mk:autobuild --resume 260501-1450-build-kanban
 ```
 
-Picks up at the last completed step. Run reports are append-only — no work is lost.
+Picks up at the last completed step. Run reports are append-only, so no work is lost.
 
 ## Exit statuses
 
@@ -76,14 +83,75 @@ Picks up at the last completed step. Run reports are append-only — no work is 
 | ESCALATED | Human intervention required |
 | TIMED_OUT | Budget cap reached |
 
+## What a run looks like
+
+Take `/mk:autobuild "build a kanban app with drag/drop cards and user auth"`.
+
+**Density is chosen first.** The harness classifies the detected model and prints what it picked, so you know what you are getting before it spends anything:
+
+```
+mk:autobuild: model = opus-4-6 → tier = COMPLEX → density = LEAN
+Scaffolding: single-session, contract optional, 0–1 evaluator iterations
+Run ID: harness-260408-1423-kanban
+```
+
+**The plan is product-level, not technical.** The planner emits user stories and design language: no file paths, no class names. That is deliberate: naming the files up front narrows what the generator is allowed to find.
+
+```
+Plan: Kanban App
+  - As a user, I can create boards and add named lists to them
+  - As a user, I can drag cards between lists to update status
+  - As a user, I can sign in with email/password to save my boards
+  Design language: clean utility-first UI, dark mode, smooth drag feedback
+```
+
+Gate 1 fires here. You approve the product spec.
+
+**At FULL density a sprint contract is signed next**, turning those stories into acceptance criteria bound to evaluator rubrics: AC-1 board CRUD, AC-2 drag and drop, AC-3 auth flow, AC-4 UI quality. LEAN skips it when there are fewer than five criteria.
+
+**The generator builds.** It works in subphases (project setup, data model, UI, auth) and it cannot see evaluator results. Its context is fresh by design, because a generator that reads its own grades starts writing for the grader.
+
+**The evaluator starts cold and drives the running app.** Not the source, the app:
+
+```
+→ open http://localhost:5173
+→ click "Create board" → board appears ✓
+→ drag card from "Todo" to "In Progress" → card moves ✓
+→ sign up → session persists on reload ✓
+→ screenshots written to evidence/kanban-260408/
+
+product-depth 0.82 · functionality 0.91 · design-quality 0.74 · originality 0.68
+Weighted overall: 0.81 → PASS
+```
+
+The skeptic persona is re-anchored before each rubric, because grading gets more generous the longer it runs.
+
+**Then it ships or loops.** A PASS proceeds. A FAIL re-runs the generator, up to three rounds by default, and after three consecutive failures the harness stops and asks you what to do.
+
+## Reading the verdict
+
+The verdict lands at `tasks/reviews/*-evalverdict.md` and holds per-rubric scores, an overall weighted score, and a pointer to the evidence directory with the screenshots and command output behind each grade.
+
+Two things to know before you read it. A rubric passes at 0.70, and any single rubric failing sets the overall verdict to FAIL no matter how good the weighted average looks. A strong average is exactly how an unshippable dimension hides. Both thresholds are configurable per rubric in `.claude/rubrics/`.
+
+## When it goes wrong
+
+**Density came out FULL but you are on Opus 4.6.** Detection reads the `model` field your host sends at session start. If your build does not send it, detection reports "not detected" and falls back to the hint. Set `export MEOWKIT_MODEL_HINT=opus-4-6`, then restart.
+
+**Budget breach partway through.** Lower the cap with `--budget 30`, or cut the product spec down; total work follows the planner's product-level output more than anything else. On an existing scaffold, `--no-boot` skips the setup cost.
+
+**The evaluator says FAIL and the build looks fine to you.** Open the evidence directory: there is a screenshot or command output behind every graded criterion. `/mk:elicit` re-examines a single rubric in more depth. If the anchors are simply wrong for your project, they are yours to recalibrate in `.claude/rubrics/`.
+
+**The run was interrupted.** State is checkpointed to `tasks/autobuild-runs/{run-id}/run.md`. Resume with `/mk:autobuild --resume {run-id}`.
+
 ## Don't use /mk:autobuild for
 
-- **Single features or bug fixes** — use `/mk:cook` or `/mk:fix`
-- **Doc updates or code reviews** — use targeted skills
-- **Analysis or explanation** — harness is for building, not research
+- **Single features or bug fixes.** Use `/mk:cook` or `/mk:fix`
+- **Doc updates or code reviews.** Use targeted skills
+- **Analysis or explanation.** The harness builds; it does not research
 
 ## Next steps
 
-- [Build a feature](/guides/build-a-feature) — the single-feature pipeline
-- [Adaptive density](/guide/adaptive-density) — the dead-weight thesis in detail
-- [Trace & benchmark](/guide/trace-and-benchmark) — measuring harness performance
+- [Build a feature](/guides/build-a-feature): the single-feature pipeline
+- [Adaptive density](/guide/adaptive-density): the dead-weight thesis in detail
+- [Trace & benchmark](/guide/trace-and-benchmark): measuring harness performance

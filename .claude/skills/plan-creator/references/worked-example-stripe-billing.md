@@ -81,7 +81,7 @@ A complete plan showing the expected detail level for a 7-phase implementation i
 **Agent:** orchestrator  
 **Time budget:** 15 minutes
 
-- Read `.claude/memory/architecture-decisions.md` (and `architecture-decisions.json`) for prior billing decisions
+- Read `.meowkit/memory/architecture-decisions.md` (and `architecture-decisions.json`) for prior billing decisions
 - Run `mk:scout` on `src/billing/` — confirm directory doesn't exist yet
 - Run `mk:scale-routing` — confirm domain=fintech, level=high, model=COMPLEX
 - Declare: `Task complexity: COMPLEX → Opus`
@@ -181,7 +181,7 @@ Review dimensions: Correctness, Maintainability, Performance, Security, Coverage
 - Update `docs/project-context.md`: add billing domain, Stripe SDK version, webhook event list
 - Update `docs/architecture/system-architecture.md`: add subscription state machine diagram
 - `mk:memory` session-capture: log any Stripe API surprises, webhook ordering issues
-- (User keyboard shortcut example) the user can type `##pattern:bug-class Stripe webhook events arrive out of order — always check current_period_end before updating status` to route via `immediate-capture-handler.cjs` to `.claude/memory/fixes.json`. Agents in this skill instead call `Edit` directly on `fixes.md` + `fixes.json` (see `.claude/skills/memory/references/capture-architecture.md`).
+- (User keyboard shortcut example) the user can type `##pattern:bug-class Stripe webhook events arrive out of order — always check current_period_end before updating status` to route via `immediate-capture-handler.cjs` to `.meowkit/memory/fixes.json`. Agents in this skill instead call `Edit` directly on `fixes.md` + `fixes.json` (see `.claude/skills/memory/references/capture-architecture.md`).
 - Docs impact: major
 
 ---

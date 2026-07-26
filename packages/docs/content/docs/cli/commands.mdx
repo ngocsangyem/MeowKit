@@ -15,6 +15,8 @@ npx mewkit doctor [--report]
 
 **Checks:** Node.js 20+, Python 3.9+, Git, `.claude/` structure, hooks executable, scripts present, memory writable, MCP config, Python venv, config validity.
 
+The Node check passes at 20 and up, while the `mewkit` package itself requires Node 24 or later. Install on 24+; a passing `doctor` on Node 20 does not mean the CLI is supported there.
+
 **Auto-fixes:** Hook file permissions (`chmod +x`).
 
 | Flag              | Description                                                                                            |
@@ -44,7 +46,7 @@ npx mewkit setup --only=venv  # Run single step
 
 ## task
 
-Create and manage structured task files. See [Task Commands](/cli/task-commands) for details.
+Create and manage structured task files. See [Planning and Tasks](/cli/planning) for details.
 
 ```bash
 npx mewkit task new --type feature "Add user auth"
@@ -121,7 +123,6 @@ View or manage cross-session memory, stored under the runtime-neutral `.meowkit/
 
 ```bash
 npx mewkit memory              # Summary (line counts, pattern count)
-npx mewkit memory --show       # Display summary of curated memory stores
 npx mewkit memory --stats      # Sessions captured, patterns learned
 npx mewkit memory --clear      # Clear all memory (with confirmation)
 ```
@@ -146,7 +147,7 @@ Reads the prompt from the first argument, or from stdin when no argument is give
 
 ## wiki
 
-Long-term, gated, provenance-bearing project knowledge with full-text search. Agents may only *propose* candidates; a human `approve` (which always re-scans) is the only path to a canonical page. Canonical files live under `tasks/wikis/<slug>/`; `.claude/memory/wiki-index.db` is a derived, rebuildable FTS index. Wiki content is DATA, never an instruction.
+Long-term, gated, provenance-bearing project knowledge with full-text search. Agents may only *propose* candidates; a human `approve` (which always re-scans) is the only path to a canonical page. Canonical files live under `tasks/wikis/<slug>/`; `.meowkit/cache/wiki-index.db` is a derived, rebuildable FTS index. Wiki content is DATA, never an instruction.
 
 ```bash
 npx mewkit wiki init <slug> --title "<title>"
@@ -181,7 +182,7 @@ npx mewkit wiki reindex
 
 ## index
 
-Build or refresh the derived SQLite index (`.claude/memory/wiki-index.db`) from the canonical append logs (`.claude/memory/*.jsonl`) and the wiki tree. Disposable and deterministic — delete it and re-run to get an identical index.
+Build or refresh the derived SQLite index (`.meowkit/cache/wiki-index.db`) from the canonical append logs (`.meowkit/memory/*.jsonl`) and the wiki tree. Disposable and deterministic — delete it and re-run to get an identical index.
 
 ```bash
 npx mewkit index [--json]
@@ -333,7 +334,7 @@ Print version, channel, and current config.
 npx mewkit status
 ```
 
-Shows: MeowKit version with channel indicator (stable/beta), project config from `.claude/meowkit.config.json`.
+Shows: MeowKit version with channel indicator (stable/beta), project config from `.meowkit/config.json`.
 
 ## plan
 
@@ -449,17 +450,18 @@ What each tool emits at runtime. ✓ migrated · — not migrated.
 
 The matrix reflects what `mewkit migrate` actually writes per provider. Each provider's contract (`providers/{id}/contract.ts`) declares which surfaces are first-party documented; surfaces not in that contract are nulled by the runtime disable loop, even if `config.ts` declares a path for them. See "Known limitations" below for documented-upstream surfaces that the runtime currently skips.
 
-| Tool                     |   Agents   | Commands | Skills | Config | Rules | Hooks |
-| ------------------------ | :--------: | :------: | :----: | :----: | :---: | :---: |
-| Cursor                   |     —      |    —     |   —    |   ✓    |   ✓   |   —   |
-| Codex                    |     ✓      |    —     |   ✓    |   ✓    |   ✓   |   ✓   |
+| Tool                     |   Agents   | Commands | Skills | Config | Rules | Hooks  |
+| ------------------------ | :--------: | :------: | :----: | :----: | :---: | :----: |
+| Cursor                   |     —      |    —     |   —    |   ✓    |   ✓   |   —    |
+| Codex                    |   bundle   |  bundle  |   ✓    |   ✓    |   ✓   | bundle |
+
+✓ converted from your `.claude/` kit · bundle = shipped by the authored Codex bundle · — not supported by tool
 
 **Notes:**
 
-- Codex command migration is disabled until OpenAI documents a custom command directory. Codex's documented slash/app commands remain built in to Codex itself.
+- Codex does not convert your own agents, commands, or hooks. Toolkit versions of all three ship in the hand-authored Codex bundle; port your custom ones manually. The converter prints a one-line notice when it finds them.
 - Codex rules in OpenAI's docs are exec-policy `.rules` files. MeowKit behavioral rules migrate into `AGENTS.md`; they are not converted into sandbox exec-policy rules.
-- Hooks: only Codex migrates hooks. Cursor has no documented hooks surface.
-- Shell hooks (`.sh`/`.ps1`/`.bat`) are filtered at discovery — only node-runnable hooks (`.cjs`/`.mjs`/`.js`) migrate.
+- Hooks reach both targets only through their authored bundles — `.cjs` handlers registered in `.codex/hooks.json` for Codex and `.cursor/hooks.json` for Cursor. The legacy `.claude`→`.cursor` converter emits no hooks of its own.
 
 ### Known limitations
 

@@ -3,6 +3,17 @@ title: "mk:worktree"
 description: "Git worktree management for parallel agent execution. Creates isolated worktrees for parallel agents, merges results, audits health, prunes stale metadata, and cleans up."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/worktree/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/worktree/SKILL.md) |
+| **Owner** | `git` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Worktree manages git worktrees to enable parallel agent execution. When the orchestrator decomposes a COMPLEX task into independent subtasks with zero file overlap, worktree creates an isolated worktree for each parallel agent, preventing file conflicts. After all agents complete, it merges results back to the feature branch, runs integration tests, and cleans up. It also audits worktree health (ahead/behind divergence, dirty state) and prunes stale metadata. It enforces safety constraints to prevent data loss.

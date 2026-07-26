@@ -26,7 +26,7 @@ This agent is **A (untrusted ticket content) + C (local-FS write of evaluation r
 
 ## Pre-flight
 
-The parent SessionStart hook validated `.claude/.env`. All `jira-as` invocations go through:
+The parent SessionStart hook validated `.meowkit/.env`. All `jira-as` invocations go through:
 
 ```bash
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <args>

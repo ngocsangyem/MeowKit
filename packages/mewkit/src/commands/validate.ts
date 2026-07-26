@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { resolveInventoryPath } from "../state/resolve-inventory-path.js";
 import pc from "picocolors";
 import { checkDocsReferences } from "../core/check-docs-references.js";
 import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
@@ -28,6 +29,7 @@ import { discoverSkills } from "../migrate/discovery/index.js";
 import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js";
 import { getTargetProfile, targetProfileNames } from "../validate/targets/target-profile.js";
 import type { Status } from "./doctor-checks.js";
+import { resolveConfigPath } from "../state/resolve-config-path.js";
 
 // validate reports STRUCTURE & WIRING only — that gate files exist and are wired, not that
 // they actually block. Behavioral proof is `doctor --hard-gates`. Statuses are honest:
@@ -199,7 +201,8 @@ export function checkHooksExecutable(meowkitDir: string): CheckResult[] {
 }
 
 function checkConfigJson(meowkitDir: string): CheckResult {
-	const configPath = path.join(meowkitDir, "meowkit.config.json");
+	// `meowkitDir` is the provider install dir; the config now lives beside it under `.meowkit/`.
+	const configPath = resolveConfigPath(path.dirname(meowkitDir));
 	if (!fs.existsSync(configPath)) {
 		return { name: "Config JSON valid", status: "fail", detail: `Missing: ${configPath}`, section: "Structure" };
 	}
@@ -482,7 +485,7 @@ function isTableSeparatorRow(line: string): boolean {
 
 /** Parse the inventory artifacts map once (criticality lookup); empty map on any error. */
 function loadInventoryArtifacts(meowkitDir: string): Record<string, { criticality?: string }> {
-	const inventoryPath = path.join(meowkitDir, "harness-inventory.json");
+	const inventoryPath = resolveInventoryPath(path.dirname(meowkitDir));
 	if (!fs.existsSync(inventoryPath)) return {};
 	try {
 		const inv = JSON.parse(fs.readFileSync(inventoryPath, "utf-8")) as {

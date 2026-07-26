@@ -3,9 +3,20 @@ title: "mk:party"
 description: "Multi-agent deliberation for architecture decisions and trade-off analysis — 2-4 agent perspectives with mandatory decision writing."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/party/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/party/SKILL.md) |
+| **Owner** | `research` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
-Brings 2-4 specialized agents together for structured deliberation on architecture decisions, trade-offs, and design choices. Agents are explicitly prompted to challenge and counter each other (anti-sycophancy). Discussions are discussion-only — no code is written. Every session MUST produce a decision record in `.claude/memory/decisions.md`.
+Brings 2-4 specialized agents together for structured deliberation on architecture decisions, trade-offs, and design choices. Agents are explicitly prompted to challenge and counter each other (anti-sycophancy). Discussions are discussion-only — no code is written. Every session MUST produce a decision record in `.meowkit/memory/decisions.md`.
 
 ## When to Use
 
@@ -20,7 +31,7 @@ Brings 2-4 specialized agents together for structured deliberation on architectu
 - **Agent selection:** maps domain signals (database, security, frontend, API, performance, infra, auth, data-modeling) to relevant agent perspectives
 - **Anti-sycophancy:** agents are explicitly prompted to critique, counter, and challenge — not agree
 - **Structured rounds:** Round 1 (independent positions) → Round 2 (critique and build on others) → Round 3 (final recommendation)
-- **Mandatory output:** decision written to `.claude/memory/decisions.md` in specified format
+- **Mandatory output:** decision written to `.meowkit/memory/decisions.md` in specified format
 - **Token budget:** max 4 agents, max 3 rounds, ~8K token ceiling per session
 
 ## Arguments
@@ -38,7 +49,7 @@ Brings 2-4 specialized agents together for structured deliberation on architectu
 4. **Round 2** — agents respond to others' positions — critique, build on, or counter (max 100 tokens each)
 5. **Round 3** — each agent delivers a final recommendation
 6. **Synthesize** — produce a decision summary with areas of agreement, disagreement, and the recommended path
-7. **Write** — persist decision to `.claude/memory/decisions.md`
+7. **Write** — persist decision to `.meowkit/memory/decisions.md`
 
 ## Usage
 
@@ -65,6 +76,6 @@ We're building a real-time notification system. Should we use WebSockets, Server
 
 - **Phrase the question as a forced choice.** "Should we do X or Y?" produces better deliberation than "How should we do this?"
 - **Party is discussion-only.** Do not chain it with `/mk:cook` in the same command — the decision must be written and reviewed first.
-- **Read the decision later.** `.claude/memory/decisions.md` persists across sessions so future tasks can reference past architecture choices.
+- **Read the decision later.** `.meowkit/memory/decisions.md` persists across sessions so future tasks can reference past architecture choices.
 
 > **Canonical source:** `.claude/skills/party/SKILL.md`

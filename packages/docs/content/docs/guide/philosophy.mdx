@@ -73,7 +73,7 @@ Why optional: strict TDD added friction for spike work, tooling, and prototypes.
 
 ### 8. Learn from Every Session
 
-The memory system captures patterns, mistakes, and costs across sessions. Topic files in `.claude/memory/` — `fixes.md`/`fixes.json` for bug-class patterns, `review-patterns.md`/`review-patterns.json` for recurring observations, `architecture-decisions.md`/`architecture-decisions.json` for design choices — are read on-demand by consumer skills at task start. There is no auto-injection pipeline; each skill loads only the topic files relevant to its domain.
+The memory system captures patterns, mistakes, and costs across sessions. Topic files in `.meowkit/memory/` — `fixes.md`/`fixes.json` for bug-class patterns, `review-patterns.md`/`review-patterns.json` for recurring observations, `architecture-decisions.md`/`architecture-decisions.json` for design choices — are read on-demand by consumer skills at task start. There is no auto-injection pipeline; each skill loads only the topic files relevant to its domain.
 
 ### 9. Load Only What's Needed
 
@@ -84,7 +84,7 @@ The same principle applies to the hook system: `handlers.json` routes events to 
 ## What MeowKit Does NOT Do
 
 - **No proprietary formats** — standard Markdown and JSON, readable by any tool
-- **No telemetry** — all data stays project-local in `.claude/memory/` and `session-state/`
+- **No telemetry** — all data stays project-local under `.meowkit/` and `session-state/`
 - **No experimental features** — everything shipped is production-ready
 - **No external services** — zero dependencies on third-party APIs for core workflow
 - **No model lock-in** — adaptive density works across Haiku, Sonnet, and Opus tiers
@@ -104,4 +104,4 @@ The same principle applies to the hook system: `handlers.json` routes events to 
 - [How MeowKit Works](/core-concepts/how-it-works) — the "how" (layers, lifecycle, mechanisms)
 - [Harness Architecture](/guide/harness-architecture) — the `/mk:autobuild` autonomous pipeline
 - [Adaptive Density](/guide/adaptive-density) — scaffolding by model capability
-- [Workflow Phases](/guide/workflow-phases) — the 7-phase pipeline in detail
+- [Workflow Phases](/core-concepts/workflow) — the 7-phase pipeline in detail

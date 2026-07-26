@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { resolveInventoryPath } from "../../state/resolve-inventory-path.js";
 import type { InventoryRegistrar } from "../application/ports.js";
 
 // Registers wiki harness artifacts into .claude/harness-inventory.json under an existing
@@ -19,7 +20,7 @@ export class InventoryAdapter implements InventoryRegistrar {
 	constructor(private readonly claudeDir: string) {}
 
 	private file(): string {
-		return path.join(this.claudeDir, "harness-inventory.json");
+		return resolveInventoryPath(path.dirname(this.claudeDir));
 	}
 
 	register(artifactPath: string, meta: { criticality?: string; status?: string } = {}): void {

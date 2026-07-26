@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { resolveInventoryPath } from "../state/resolve-inventory-path.js";
 import yaml from "js-yaml";
 import type { CheckResult } from "../commands/validate.js";
 import type { Status } from "../commands/doctor-checks.js";
@@ -206,7 +207,7 @@ interface RegistryShape {
 
 /** Read the central registry for rules/commands/hooks. */
 export function readRegistry(claudeDir: string): Record<string, Record<string, unknown>> {
-	const regPath = path.join(claudeDir, "harness-inventory.json");
+	const regPath = resolveInventoryPath(path.dirname(claudeDir));
 	if (!fs.existsSync(regPath)) return {};
 	try {
 		const parsed = JSON.parse(fs.readFileSync(regPath, "utf-8")) as RegistryShape;

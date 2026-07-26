@@ -3,6 +3,17 @@ title: "mk:web-to-markdown"
 description: "Fetch arbitrary URLs and return clean markdown with 8-layer injection defense. For external pages (blogs, RFCs, GitHub issues, vendor docs) not covered by curated indexes. Static-only by default with opt-in JS rendering."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/web-to-markdown/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/web-to-markdown/SKILL.md) |
+| **Owner** | `docs` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Fetches arbitrary web pages and returns clean markdown wrapped in a DATA boundary fence. Built with an 8-layer security architecture: SSRF guard, URL validation, size cap, DATA wrapping, 6-pass injection scanner, HARD_STOP on injection, secret scrubbing, and post-write audit. Static HTTP fetch by default; opt-in Playwright/Chromium rendering for JS-heavy pages.

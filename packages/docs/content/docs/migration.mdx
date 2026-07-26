@@ -23,18 +23,19 @@ What each tool can receive from your `.claude/` kit:
 |------|:------:|:--------:|:------:|:------:|:-----:|:-----:|
 | Claude Code (source) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Cursor | — | — | — | ✓ | ✓ | — |
-| Codex | ✓ | — | ✓ | ✓ | ✓ | ✓ |
+| Codex | bundle | bundle | ✓ | ✓ | ✓ | bundle |
 
-✓ supported · — not supported by tool
+✓ converted from your `.claude/` kit · bundle = shipped by the authored Codex bundle, your own files are not converted · — not supported by tool
+
+**Codex does not convert your own agents, commands, or hooks.** The converter leaves those three surfaces alone and prints a one-line notice when it finds them. Toolkit agents, commands, rules, modes, and hooks reach Codex through a hand-authored Codex-native bundle instead. Port your custom ones by hand.
 
 **Special cases:**
-- **Codex commands** migrate as Agent Skills (`.agents/skills/source-command-<name>/SKILL.md`) — Codex custom prompts gave way to skills. Dynamic template syntax (`$ARGUMENTS`, `$1`, <code v-pre>{`{...}`}</code>, `` !`cmd` ``, `@file`) has no skill equivalent; the template migrates verbatim with a manual-adaptation warning.
+- **Toolkit commands** ship as Agent Skills in the bundle (`.agents/skills/*/SKILL.md`) — Codex custom prompts gave way to skills. Your own `.claude/commands/` files are not converted; dynamic template syntax (`$ARGUMENTS`, `$1`, <code v-pre>{`{...}`}</code>, `` !`cmd` ``, `@file`) has no skill equivalent, so port those manually.
 - **Capability resolution** adds one generated, bounded instruction block to `AGENTS.md` and writes `.codex/capabilities.json`. The block tells the agent to use `npx mewkit capabilities resolve --intent "..." --provider codex`; the JSON is data-only resolver input, never always-on model context. Re-running migration replaces the managed block without touching user-authored `AGENTS.md` content.
 - **Codex rules** merge into `AGENTS.md` as `## Rule:` sections (native `.rules` files only accept `prefix_rule()` command policies). Orchestration/runtime-only rules are skipped by default; pass `--all-rules` to merge everything. The merged file is checked against Codex's 32 KiB `project_doc_max_bytes` budget — over-budget merges warn with the exact config line to add to `~/.codex/config.toml`, but mewkit never truncates the file or writes to your home config.
 - **`.mcp.json`** converts to `config.toml [mcp_servers]` entries with the opt-in `--include-mcp` flag (Codex only; project-scoped MCP config loads only in trusted projects). When `.mcp.json` exists and the flag is off, the preflight tells you the exact re-run command.
-- **`.claude/.env`** converts to a Codex `[shell_environment_policy]` scaffold from key names only. Values are never copied; secret-like key names are omitted and counted only as an aggregate warning.
-- **Hooks** only migrate to Codex. Cursor has no documented hooks surface, so mewkit skips hooks for it with a warning. Codex events are version-gated: recent Codex (0.142+) supports 10 events with hooks enabled by default; older versions fall back to the conservative 6-event table.
-- **Codex shell hooks** (`.sh`) migrate through generated `.cjs` wrappers that execute the copied script inside `.codex/hooks/`. Unsupported shell-family handlers such as `.ps1`, `.bat`, `.cmd`, and `.py` are reported as skipped with a reason.
+- **`.meowkit/.env`** converts to a Codex `[shell_environment_policy]` scaffold from key names only. Values are never copied; secret-like key names are omitted and counted only as an aggregate warning.
+- **Hooks** reach Codex and Cursor through their authored bundles only; the legacy `.claude`→`.cursor` converter emits none, so `mewkit migrate cursor` skips hooks with a warning. Codex events are version-gated: recent Codex (0.142+) supports 10 events with hooks enabled by default; older versions fall back to the conservative 6-event table. Cursor's own lifecycle events are documented and shipped in the Cursor bundle's `.cursor/hooks.json`.
 - **Codex agent bundle** — `mewkit migrate codex` copies a hand-authored, Codex-native bundle: agents as `.codex/agents/*.toml` (name/description/developer_instructions), skills/commands/rules/modes as `.agents/skills/*/SKILL.md`, and hooks as `.codex/hooks.json`.
 
 ## Reference rewriting
@@ -44,7 +45,7 @@ Markdown content is rewritten with a fence-aware classifier instead of blanket s
 | Reference | Inline prose / frontmatter | Fenced code (runnable) | Citation |
 |-----------|---------------------------|------------------------|----------|
 | Mapped asset (`.claude/skills/x/...`) | rewritten to the provider path | rewritten **only if** the asset migrates in the same run, else preserved + warned | preserved |
-| Unmapped runtime (`.claude/scripts/`, `.claude/memory/`) | neutralized to provider-agnostic phrasing | preserved + warned | preserved |
+| Unmapped runtime (`.claude/scripts/`, `.meowkit/memory/`) | neutralized to provider-agnostic phrasing | preserved + warned | preserved |
 | `CLAUDE.md` token | rewritten to the provider config name | preserved (command examples stay runnable) | preserved |
 
 Every preserved reference appears in the preflight/dry-run report with `file:line` and a reason — nothing is silently dropped, and no path is ever fabricated. A post-conversion scanner verifies the invariant: any surviving source reference must be explained by a classifier decision, otherwise the run aborts before writing. Codex runs also persist the outcome to `.codex/migration-report.json` and `.codex/migration-report.md`, with one row per migrated, skipped, failed, or narrowed artifact.
@@ -246,6 +247,6 @@ npx mewkit upgrade --check   # show available without installing
 
 ## See also
 
-- [CLI Commands Reference](/cli/commands#migrate) — every flag with examples
-- [Memory System](/guide/memory-system#legacy-migration-from-claudememory) — every `mewkit migrate` run also migrates legacy `.claude/memory/` into `.meowkit/`
+- [Portability commands](/cli/portability#migrate) — every flag with examples
+- [Memory System](/guide/memory-system#legacy-migration-from-claudememory) — every `mewkit migrate` run also migrates legacy `.meowkit/memory/` into `.meowkit/`
 - [TDD Optional Migration](/migration/tdd-optional) — older migration guide for the v2.x TDD-optional change

@@ -90,7 +90,7 @@ This skill is a **pure routing layer**. Its sole purpose: identify the right `mk
 
 ## Setup
 
-See `references/install-and-auth.md` for one-time setup (`.claude/scripts/bin/setup-workflow` installs `jira-as` into `.claude/skills/.venv`; populate `.claude/.env` with the 3 `MEOW_JIRA_*` vars).
+See `references/install-and-auth.md` for one-time setup (`.claude/scripts/bin/setup-workflow` installs `jira-as` into `.claude/skills/.venv`; populate `.meowkit/.env` with the 3 `MEOW_JIRA_*` vars).
 
 ## Shared Resources (used by leaves)
 

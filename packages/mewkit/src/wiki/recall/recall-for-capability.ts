@@ -10,7 +10,7 @@ import { DEFAULT_RECALL_MAX_PAGES, type KnowledgeRecall, type RecallHit, type Re
 // are enforced here, not trusted from callers.
 
 export interface RecallDeps extends WikiProbeDeps {
-	/** Path to the derived wiki-index DB (e.g. dbPath(claudeDir)). */
+	/** Path to the derived wiki-index DB (e.g. dbPath(projectRoot)). */
 	dbFile: string;
 }
 

@@ -166,7 +166,7 @@ Create a task file for any change affecting > 2 files OR > 30 minutes.
 
 ## Harness Env Vars
 
-Source of truth: `.claude/.env.example`. Most defaults live in `.claude/settings.json` `env` block (team-shared, git-committed); override here per-project / per-user. Uncommented values in `.claude/.env` win over `settings.json`; shell exports win over both.
+Source of truth: `.meowkit/.env.example`. Most defaults live in `.claude/settings.json` `env` block (team-shared, git-committed); override here per-project / per-user. Uncommented values in `.meowkit/.env` win over `settings.json`; shell exports win over both.
 
 ### Density + budget
 
@@ -207,7 +207,7 @@ Set to `off` to disable an individual hook; default `on`.
 ### Precedence reminder
 
 ```
-shell export  >  .claude/.env  >  .claude/settings.json "env" block
+shell export  >  .meowkit/.env  >  .claude/settings.json "env" block
 ```
 
 Unquoted values strip inline comments after `#`. Quote values that contain a literal `#` (e.g. API keys): `VAR="abc#123"`.

@@ -2,6 +2,7 @@ import { existsSync, readdirSync, statSync, accessSync, constants } from "node:f
 import { join } from "node:path";
 import pc from "picocolors";
 import { isHookScript } from "./is-hook-script.js";
+import { resolveConfigPath } from "../state/resolve-config-path.js";
 
 export interface ValidationResult {
 	valid: boolean;
@@ -53,7 +54,7 @@ export function validate(targetDir: string): ValidationResult {
 	// Core structure
 	check(".claude/ directory exists", existsSync(claude), issues);
 	check("CLAUDE.md exists", existsSync(join(targetDir, "CLAUDE.md")), issues);
-	check("meowkit.config.json exists", existsSync(join(claude, "meowkit.config.json")), issues);
+	check("config.json exists", existsSync(resolveConfigPath(targetDir)), issues);
 
 	// Agents (expect 10+ from real system)
 	const agentCount = countMdFiles(join(claude, "agents"));

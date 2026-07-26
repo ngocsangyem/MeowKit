@@ -2,7 +2,7 @@
 
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { join, relative, dirname } from "node:path";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { applyMewkitOverrides } from "./provider-overrides.js";
@@ -224,7 +224,12 @@ async function runMigrateUnderLock(
 	let secretKeysOmitted = 0;
 	let shellEnvScaffold = "";
 	if (targets.includes("codex")) {
-		const envKeys = await discoverEnvKeys(join(discovered.source.root, ".env"));
+		// Key names for the Codex scaffold come from whichever dotenv the project actually
+		// uses: `.meowkit/.env` is canonical, `.claude/.env` is the pre-move location.
+		const projectRoot = dirname(discovered.source.root);
+		const canonicalEnv = join(projectRoot, ".meowkit", ".env");
+		const envSource = existsSync(canonicalEnv) ? canonicalEnv : join(discovered.source.root, ".env");
+		const envKeys = await discoverEnvKeys(envSource);
 		const scaffold = emitShellEnvPolicyScaffold(envKeys);
 		secretKeysOmitted = scaffold.omittedSecretCount;
 		shellEnvScaffold = scaffold.content;

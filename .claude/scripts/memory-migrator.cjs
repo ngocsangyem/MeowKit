@@ -2,15 +2,15 @@
 // memory-migrator.cjs — Convert freeform lessons.md to structured YAML frontmatter format.
 // Run: node .claude/scripts/memory-migrator.cjs [--dry-run]
 //
-// Input:  .claude/memory/lessons.md (freeform ## headers with status markers)
-// Output: .claude/memory/lessons.md (structured entries with YAML frontmatter)
-// Backup: .claude/memory/lessons.md.bak
+// Input:  .meowkit/memory/lessons.md (freeform ## headers with status markers)
+// Output: .meowkit/memory/lessons.md (structured entries with YAML frontmatter)
+// Backup: .meowkit/memory/lessons.md.bak
 
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-const LESSONS_FILE = path.join(ROOT, '.claude', 'memory', 'lessons.md');
+const LESSONS_FILE = path.join(require('../hooks/lib/meowkit-paths.cjs').memoryDir(ROOT), 'lessons.md');
 const BACKUP_FILE = LESSONS_FILE + '.bak';
 const DRY_RUN = process.argv.includes('--dry-run');
 

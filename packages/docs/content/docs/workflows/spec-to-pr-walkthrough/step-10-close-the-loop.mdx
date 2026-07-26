@@ -1,0 +1,18 @@
+---
+title: "Step 10 — After merge: close the loop"
+description: "Transition the ticket, comment the outcome, and write a footer comment back to the source spec page — the only place the workflow writes back to Confluence."
+---
+
+When the PR merges:
+
+```bash
+/mk:jira-lifecycle transition AUTH-201 "Done" --resolution Fixed
+/mk:jira-collaborate add-comment AUTH-201 "Shipped in PR #142. Spec §R1, AC1-AC3 satisfied. AC2 dashboard target = /app/dashboard (confirmed with PM)."
+/mk:confluence-collaborate add-comment 12345 --footer "AUTH-201 (Google OAuth) shipped in PR #142."
+```
+
+This is the only place the workflow writes **back** to Confluence — a footer comment on the source spec page so future readers know which ticket/PR realised which requirement.
+
+---
+
+Previous: [Step 9 — Implement with /mk:cook](/workflows/spec-to-pr-walkthrough/step-09-implement-with-cook) · [All steps](/workflows/spec-to-pr-walkthrough)

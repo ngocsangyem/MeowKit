@@ -3,6 +3,17 @@ title: "mk:team-config"
 description: "Set up parallel agent team for COMPLEX tasks — creates worktree structure, generates ownership map, initializes task queue."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/team-config/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/team-config/SKILL.md) |
+| **Owner** | `git` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Sets up the infrastructure for parallel agent execution. Called by the orchestrator when a COMPLEX task is decomposed into independent subtasks. Creates isolated git worktrees, assigns file ownership globs per agent, and initializes the task queue.
@@ -24,19 +35,19 @@ Sets up the infrastructure for parallel agent execution. Called by the orchestra
 
 ## Workflow
 
-```
-Plan approved (Gate 1)
-    ↓
-Orchestrator identifies parallel opportunity
-    ↓
-mk:team-config
-    ├── 1. Parse plan for independent subtasks
-    ├── 2. Generate ownership map
-    ├── 3. Validate zero overlap between ownerships
-    ├── 4. Create git worktrees via mk:worktree
-    └── 5. Create task-queue.json via mk:task-queue
-    ↓
-Parallel agents start claiming tasks
+```mermaid
+flowchart TD
+    A["Plan approved (Gate 1)"]
+    B["Orchestrator identifies parallel opportunity"]
+    C["<b>mk:team-config</b>"]
+    C1["1. Parse plan for independent subtasks"]
+    C2["2. Generate ownership map"]
+    C3["3. Validate zero overlap between ownerships"]
+    C4["4. Create git worktrees via mk:worktree"]
+    C5["5. Create task-queue.json via mk:task-queue"]
+    D["Parallel agents start claiming tasks"]
+
+    A --> B --> C --> C1 --> C2 --> C3 --> C4 --> C5 --> D
 ```
 
 ## Usage

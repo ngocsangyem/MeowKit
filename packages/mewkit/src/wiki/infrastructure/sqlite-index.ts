@@ -1,3 +1,5 @@
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import type { WikiPage } from "../domain/index.js";
 import type { WikiIndex, WikiSearchHit } from "../application/ports.js";
@@ -14,6 +16,10 @@ export class SqliteWikiIndex implements WikiIndex {
 	constructor(private readonly dbFile: string) {}
 
 	upsertPage(page: WikiPage): void {
+		// The index lives in the `.meowkit/` cache class, which need not exist yet on a fresh
+		// project. DatabaseSync creates the file but never the directory, so ensure it here —
+		// otherwise the first `approve` fails with "unable to open database file".
+		mkdirSync(dirname(this.dbFile), { recursive: true });
 		const db = new DatabaseSync(this.dbFile);
 		try {
 			db.exec("PRAGMA journal_mode = WAL");

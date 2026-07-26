@@ -10,23 +10,23 @@
 // (which Codex would surface to the model), so no captured content or secret leaks.
 "use strict";
 const { spawnSync } = require("node:child_process");
-const { readFileSync } = require("node:fs");
+const { readPayload, sessionCwd, projectRoot } = require("./lib/codex-hook-runtime.cjs");
 
-let input;
-try {
-	input = JSON.parse(readFileSync(0, "utf-8"));
-} catch {
-	process.exit(0); // no/invalid stdin → nothing to capture
-}
+const input = readPayload();
+if (!input) process.exit(0); // no/invalid stdin → nothing to capture
 
 const prompt = typeof input.prompt === "string" ? input.prompt : "";
-const cwd = typeof input.cwd === "string" && input.cwd ? input.cwd : process.cwd();
 
 // Fast no-op unless the prompt opens with a capture prefix (matches memory-capture.ts).
 if (!/^\s*##(pattern|decision|note):/i.test(prompt)) process.exit(0);
 
-// Pipe the prompt to the CLI capture path (single write authority). Run in the
-// project's cwd so the CLI resolves the correct .meowkit/ root.
-const res = spawnSync("mewkit", ["memory", "capture"], { input: prompt, cwd, encoding: "utf-8" });
+// Pipe the prompt to the CLI capture path (single write authority). Run from the
+// resolved project root — not the payload `cwd`, which Codex may set to a
+// subdirectory — so the CLI writes to the project's own .meowkit/ tree.
+const res = spawnSync("mewkit", ["memory", "capture"], {
+	input: prompt,
+	cwd: projectRoot(sessionCwd(input)),
+	encoding: "utf-8",
+});
 if (res.status !== 0 && res.stderr) process.stderr.write(`memory capture: ${res.stderr.trim()}\n`);
 process.exit(0); // never block the turn on a capture failure

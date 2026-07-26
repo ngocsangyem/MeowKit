@@ -116,14 +116,14 @@ Not every task needs the full 7-phase pipeline. Mention these when relevant:
 |-----------|-----------|-----------------|
 | Simple bug fix, typo, rename, config tweak | `the fix skill` | Gate 1 (plan approval) — scope is the plan |
 | Task flagged as `one-shot` by scale-routing | Auto Gate 1 bypass | Gate 1 — zero blast radius confirmed |
-| Rapid iteration / spike work | `MEOW_HOOK_PROFILE=fast` | post-write scan, pre-ship, pre-task-check, TDD check |
+| Rapid iteration / spike work | `MEOWKIT_HOOK_PROFILE=fast` | post-write scan, pre-ship, pre-task-check, TDD check |
 
 **Quick fix?** Use `the fix skill` — bypasses Gate 1 for simple changes.
 
 **Small config change?** Scale-routing may auto-bypass Gate 1 when blast radius is zero.
 
-**Hook profiles:** Set `MEOW_HOOK_PROFILE=fast` for rapid iteration (skips non-critical hooks).
-Set `MEOW_HOOK_PROFILE=strict` to enable ALL hooks including post-session capture.
+**Hook profiles:** Set `MEOWKIT_HOOK_PROFILE=fast` for rapid iteration (skips non-critical hooks).
+Set `MEOWKIT_HOOK_PROFILE=strict` to enable ALL hooks including post-session capture.
 
 ## Gotchas
 

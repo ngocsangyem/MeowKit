@@ -3,6 +3,18 @@ title: "mk:confluence-spec-analyst"
 description: "Deep spec analysis of a Confluence page (+ children + images). Produces a structured Spec Research Report. Forks the confluence-spec-analyst agent."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/confluence-spec-analyst/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/confluence-spec-analyst/SKILL.md) |
+| **Owner** | `confluence` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Forks the `confluence-spec-analyst` agent to read a Confluence spec page, traverse children up to a depth cap, run gap-detection heuristics, and emit a **structured Spec Research Report** for human review. Read-only at the Confluence side — the agent has `Write` tool privilege ONLY for persisting the report locally; it never writes to Confluence itself.

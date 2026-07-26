@@ -6,7 +6,7 @@ Determine the outcome from the workflow result (success if completed normally, e
 if it failed, abort if the user interrupted).
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-`.claude/memory/` (user config directory, not project files). The skill
+`.meowkit/memory/` (user config directory, not project files). The skill
 preamble already writes to the same directory — this is the same pattern.
 Skipping this command loses session duration and outcome data.
 
@@ -15,7 +15,7 @@ Run this bash:
 ```bash
 _TEL_END=$(date +%s)
 _TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f .claude/memory/.pending-"$_SESSION_ID" 2>/dev/null || true
+rm -f .meowkit/state/.pending-"$_SESSION_ID" 2>/dev/null || true
 # telemetry removed — telemetry disabled; analyst agent not invoked \
   --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
   --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &

@@ -10,7 +10,7 @@
 # Gate 1 bypass: /mk:fix --simple OR scale-routing one-shot
 # Contract gate bypass: MEOWKIT_AUTOBUILD_MODE=LEAN env var (adaptive density for COMPLEX/Opus 4.6)
 #
-# Load .claude/.env (each hook is a separate subprocess)
+# Load .meowkit/.env (each hook is a separate subprocess)
 . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 # Phase 4 extension (260408): also validates contract files on edit so hand-edits cannot
 # break the schema. Triggered when $1 matches tasks/contracts/*.md.
@@ -19,7 +19,7 @@
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
 # Hook profile gating — safety-critical: NEVER skip regardless of profile
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 
 # Phase 7 migration: hooks now source the JSON-on-stdin parser shim and prefer
 # $HOOK_FILE_PATH from stdin. Falls back to $1 positional if stdin empty (back-compat).

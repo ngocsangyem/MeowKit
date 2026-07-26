@@ -30,7 +30,7 @@ Common failure patterns when fixing bugs. Update this file when Claude produces 
 
 ### Ignoring Memory
 **Symptom:** Same bug class fixed repeatedly.
-**Fix:** Check `.claude/memory/fixes.json` only. Write new fix patterns by calling `Edit` directly on `.claude/memory/fixes.json` only (see SKILL.md Step 6 for the live schema). Do NOT use `##pattern:bug-class` — that is a user-typed keyboard shortcut; the handler only fires on `UserPromptSubmit` and agent output is invisible to it. See `.claude/skills/memory/references/capture-architecture.md`.
+**Fix:** Check `.meowkit/memory/fixes.json` only. Write new fix patterns by calling `Edit` directly on `.meowkit/memory/fixes.json` only (see SKILL.md Step 6 for the live schema). Do NOT use `##pattern:bug-class` — that is a user-typed keyboard shortcut; the handler only fires on `UserPromptSubmit` and agent output is invisible to it. See `.claude/skills/memory/references/capture-architecture.md`.
 
 ### Fixing Without Evidence
 **Symptom:** "I think I know what's wrong" → fix deployed → bug persists.

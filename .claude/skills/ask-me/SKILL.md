@@ -88,7 +88,7 @@ Depth budgets and output/failure contracts: [references/answer-contract.md](refe
 
 ### Forbidden Paths (never read)
 
-`.env*`, secrets/keys/credentials/tokens of any kind, `.claude/memory/`,
+`.env*`, secrets/keys/credentials/tokens of any kind, `.meowkit/memory/`,
 `session-state/`, dependency dirs (`node_modules/`, `.venv/`), build outputs,
 browser profiles. No WebSearch — current-docs lookup belongs to `mk:docs-finder`.
 

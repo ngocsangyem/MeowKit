@@ -94,7 +94,7 @@ Load before writing a journal entry:
 - The failure event details (error output, failing tests, escalation context)
 - Git log of recent changes related to the failure
 - Existing journal entries in `docs/journal/`: avoid duplicating known issues
-- `.claude/memory/fixes.json` and `.claude/memory/review-patterns.json`: check if this is a recurring pattern
+- `.meowkit/memory/fixes.json` and `.meowkit/memory/review-patterns.json`: check if this is a recurring pattern
 
 ## Constraints
 

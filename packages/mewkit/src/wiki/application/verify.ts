@@ -10,6 +10,7 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { openReadOnlyImmutable } from "../infrastructure/wiki-query.js";
+import { resolveStateDir } from "../../state/resolve-state-dir.js";
 import { readCanonicalPages } from "../infrastructure/wiki-ingest.js";
 
 const sha256 = (text: string): string => createHash("sha256").update(text, "utf-8").digest("hex");
@@ -25,8 +26,8 @@ export interface WikiVerifyReport {
 	remediation: "wiki reindex";
 }
 
-function dbFileFor(claudeDir: string): string {
-	return path.join(claudeDir, "memory", "wiki-index.db");
+function dbFileFor(projectRoot: string): string {
+	return path.join(resolveStateDir(projectRoot, "cache"), "wiki-index.db");
 }
 
 function schemaPresent(db: DatabaseSync): boolean {
@@ -46,8 +47,7 @@ function setDiff(canonical: Set<string>, indexed: Set<string>): string[] {
  * rows: consistent only when there are also zero canonical pages (otherwise the index is stale
  * and needs a rebuild). Callers use `fresh` for the advisory exit code (0 fresh / 1 stale).
  */
-export function verifyWiki(claudeDir: string): WikiVerifyReport {
-	const projectRoot = path.dirname(claudeDir);
+export function verifyWiki(projectRoot: string): WikiVerifyReport {
 	const canonical = readCanonicalPages(projectRoot);
 	const canonicalById = new Map(canonical.map((p) => [p.id, p]));
 
@@ -56,7 +56,7 @@ export function verifyWiki(claudeDir: string): WikiVerifyReport {
 	const sourceIds = new Set<string>();
 	let claims: { id: string; source_id: string | null; page_id: string | null }[] = [];
 
-	const dbFile = dbFileFor(claudeDir);
+	const dbFile = dbFileFor(projectRoot);
 	if (existsSync(dbFile)) {
 		const db = openReadOnlyImmutable(dbFile);
 		try {

@@ -66,7 +66,7 @@ On a non-trivial task, route to `mk:plan-creator`; proceed only after Gate 1. Fa
 ## Pre-Execution Checklist
 
 1. **agent-detector** → Select lead agent (MANDATORY)
-2. **Load context** → Read canonical `.claude/memory/fixes.json` + `.claude/memory/architecture-decisions.json` (Phase 0 Orient; fall back to matching `.md` views only when JSON is absent)
+2. **Load context** → Read canonical `.meowkit/memory/fixes.json` + `.meowkit/memory/architecture-decisions.json` (Phase 0 Orient; fall back to matching `.md` views only when JSON is absent)
 3. **Show agent banner** at start of response
 4. **Verify task complexity** — if simple, suggest lighter approach
 5. **Challenge requirements** → Ask clarifying questions before Phase 1

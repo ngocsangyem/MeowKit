@@ -125,10 +125,9 @@ describe("SqliteWikiIndex", () => {
 describe("TraceAdapter", () => {
 	it("appends a fixed-shape JSONL line with secrets scrubbed", async () => {
 		const root = await tempRoot("mk-trace-");
-		const claudeDir = join(root, ".claude");
-		await mkdir(join(claudeDir, "memory"), { recursive: true });
-		new TraceAdapter(claudeDir).recordWikiTrace("wiki_write", { note: "uses AKIA1234567890ABCDEF here" });
-		const raw = await readFile(join(claudeDir, "memory", "trace-log.jsonl"), "utf-8");
+		await mkdir(join(root, ".meowkit", "telemetry"), { recursive: true });
+		new TraceAdapter(root).recordWikiTrace("wiki_write", { note: "uses AKIA1234567890ABCDEF here" });
+		const raw = await readFile(join(root, ".meowkit", "telemetry", "trace-log.jsonl"), "utf-8");
 		const line = JSON.parse(raw.trim());
 		expect(line.schema_version).toBe("1.0");
 		expect(line.event).toBe("wiki_write");

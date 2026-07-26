@@ -17,7 +17,7 @@ trust_level: MED
 2. ≥1 item → per-item AskUserQuestion. 0 items → freeform: "List action items, one per line. Empty = no action."
 3. Per-item options: `Create Jira story now` | `Add to plan TODO` | `No-action` | `Defer`
 4. `Create Jira story now` → `mk:jira-issue create` body pre-filled — REQUIRES user review
-5. `No-action` → append to `.claude/memory/retros/{date}-decisions.md` (distinct from existing retro pattern files)
+5. `No-action` → append to `.meowkit/memory/retros/{date}-decisions.md` (distinct from existing retro pattern files)
 6. Retro is not "complete" until every action has a disposition
 
 **NEVER auto-create Jira stories. INSTEAD:** surface, propose, human edits and submits. Preserves reports-not-automation.

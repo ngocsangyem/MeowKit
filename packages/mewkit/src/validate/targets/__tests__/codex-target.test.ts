@@ -79,11 +79,21 @@ describe("codex target validation", () => {
 		expect(status(rs, "Codex config.toml secret-free")).toBe("fail");
 	});
 
-	it("a non-executable hook wrapper → FAIL executable", async () => {
+	// POSIX-only: Windows has no execute bit, so `chmod 0o644` there does not make a file
+	// non-executable and the wrapper check deliberately falls back to existence.
+	it.skipIf(process.platform === "win32")("a non-executable hook wrapper → FAIL executable", async () => {
 		const d = makeTarget();
 		chmodSync(join(d, ".codex", "hooks", "w.cjs"), 0o644);
 		const rs = await codexTargetProfile.check(d);
 		expect(status(rs, "Codex hook wrappers")).toBe("fail");
+	});
+
+	it("an existing wrapper passes the executable check on Windows, where there is no execute bit", async () => {
+		const d = makeTarget();
+		chmodSync(join(d, ".codex", "hooks", "w.cjs"), 0o644);
+		const rs = await codexTargetProfile.check(d);
+		// On Windows this is the real contract (existence); elsewhere the bit still governs.
+		expect(status(rs, "Codex hook wrappers")).toBe(process.platform === "win32" ? "pass" : "fail");
 	});
 
 	it("a wrapper whose SCRUB_RULES gates no permission event → WARN deny contract (not a tautology)", async () => {

@@ -3,6 +3,18 @@ title: "jira-search"
 description: "Jira search and filter agent — runs JQL queries, validates syntax, builds queries from natural language, and manages saved filters."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/jira-search.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/jira-search.md) |
+| **Owner** | `jira` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Writes** | `docs/project-context.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The jira-search agent finds Jira issues using JQL queries. It validates query syntax, builds JQL from plain-language descriptions, manages saved filters, and exports results — all with mandatory JQL sanitization that prevents injection vulnerabilities when handling user-supplied search terms.
 
 ## Cognitive Framing

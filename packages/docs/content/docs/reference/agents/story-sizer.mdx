@@ -3,6 +3,18 @@ title: "story-sizer"
 description: "Pre-ticket Fibonacci sizing agent for paste-mode batches of user stories. Read-only at Jira; auto-create delegates ticket creation to peer skills."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/story-sizer.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/story-sizer.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Writes** | `.claude/rules-conditional/agile-story-gates.md`, `.claude/rules/agent-conduct.md`, `.claude/rules/injection-rules.md`, `.claude/skills/story-sizer/assets/sizing-report-template.md`, `.claude/skills/story-sizer/references/auto-create-execution.md`, `.claude/skills/story-sizer/references/auto-create-gating.md`, `.claude/skills/story-sizer/references/input-adapter.md`, `.claude/skills/story-sizer/references/report-writer.md`, `.claude/skills/story-sizer/references/sizing-heuristics.md`, `/mk:scout`, `docs/project-context.md`, `tasks/reports/story-sizing-*.md`, `tasks/reports/story-sizing-&#123;YYMMDD&#125;-&#123;slug&#125;.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The story-sizer agent applies deterministic heuristics to a batch of suggested user stories and emits a Story Sizing Report with Fibonacci point estimates, complexity verdicts, inconsistency flags, and optional split proposals. It never mutates Jira directly — auto-create mode delegates to `mk:jira-issue` and `mk:jira-collaborate`.
 
 ## Cognitive Framing
@@ -70,4 +82,4 @@ Same `StoryRecord` produces the same `points` / `drivers_score` / `complexity` e
 - Skill: [mk:story-sizer](/reference/skills/story-sizer)
 - Peer execution: [`jira-issue`](/reference/agents/jira-issue), [`jira-collaborate`](/reference/agents/jira-collaborate)
 - Peer intelligence: [`jira-evaluator`](/reference/agents/jira-evaluator), [`jira-estimator`](/reference/agents/jira-estimator), [`jira-analyst`](/reference/agents/jira-analyst)
-- Workflow: [Spec → PR walkthrough](/workflows/spec-to-pr-walkthrough) — Step 3.5
+- Workflow: [Spec → PR walkthrough, Step 3.5](/workflows/spec-to-pr-walkthrough/step-03-5-story-sizing)

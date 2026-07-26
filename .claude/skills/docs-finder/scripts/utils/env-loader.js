@@ -2,7 +2,7 @@
 
 /**
  * Environment variable loader for mk:docs-finder skill
- * Priority: process.env > skill/.env > skills/.env > .claude/.env
+ * Priority: process.env > skill/.env > skills/.env > .meowkit/.env > .claude/.env
  */
 
 const fs = require('fs');
@@ -46,8 +46,12 @@ function loadEnv() {
   const skillsDir = path.resolve(skillDir, '..');
   const claudeDir = path.resolve(skillsDir, '..');
 
+  // Ascending priority — a later file overrides an earlier one. The pre-move provider
+  // dotenv sits lowest, then the project-wide `.meowkit/.env` every provider shares, then
+  // the more specific skill-level files.
   const envPaths = [
     path.join(claudeDir, '.env'),
+    path.join(path.resolve(claudeDir, '..'), '.meowkit', '.env'),
     path.join(skillsDir, '.env'),
     path.join(skillDir, '.env'),
   ];

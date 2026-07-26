@@ -111,7 +111,7 @@ You must **never** write, and must refuse if instructed to:
 | `docs/knowledge/**` — knowledge docs                  | the documenter                    |
 | Source or test files                                  | the developer                     |
 | `tasks/reviews/**` — verdicts                         | `mk:review` + the human at Gate 2 |
-| `.claude/memory/**` — decisions and any curated store | the memory capture path           |
+| `.meowkit/memory/**` — decisions and any curated store | the memory capture path           |
 
 These are not stylistic preferences. An advisory step that writes a plan has
 crossed Gate 1 without approval; one that writes a verdict has manufactured the

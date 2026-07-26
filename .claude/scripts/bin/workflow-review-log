@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# workflow-review-log — log a review result to .claude/memory/
+# workflow-review-log — append a review result to the telemetry log
 # Adapted from gstack-review-log. Uses project-local memory, not ~/.gstack/.
 # Usage: workflow-review-log '{"skill":"...","timestamp":"...","status":"..."}'
 set -euo pipefail
-MEMORY_DIR=".claude/memory"
+MEMORY_DIR=".meowkit/telemetry"
 mkdir -p "$MEMORY_DIR"
 echo "$1" >> "$MEMORY_DIR/reviews.jsonl"

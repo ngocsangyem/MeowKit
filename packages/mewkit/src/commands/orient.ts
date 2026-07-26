@@ -55,7 +55,7 @@ export function orient(opts: OrientOptions = {}): void {
 	// fails orient), read-only for task state. `--no-record` opts out for strictly pure calls.
 	if (!opts.noRecord) {
 		try {
-			appendTraceRecordSync(path.join(projectRoot, ".claude"), {
+			appendTraceRecordSync(projectRoot, {
 				event: "orient_run",
 				// taskId only for an unambiguous active outcome (never for none/ambiguous/corrupt-only).
 				...(envelope.outcome === "active" && envelope.activeTask ? { taskId: envelope.activeTask.taskId } : {}),

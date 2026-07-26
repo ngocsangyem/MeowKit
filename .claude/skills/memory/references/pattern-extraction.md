@@ -30,9 +30,9 @@ Invoke after approximately 10 sessions have been captured (check combined entry 
 Read all three split JSON files and collect pattern entries:
 
 ```bash
-cat .claude/memory/fixes.json | python3 -m json.tool
-cat .claude/memory/review-patterns.json | python3 -m json.tool
-cat .claude/memory/architecture-decisions.json | python3 -m json.tool
+cat .meowkit/memory/fixes.json | python3 -m json.tool
+cat .meowkit/memory/review-patterns.json | python3 -m json.tool
+cat .meowkit/memory/architecture-decisions.json | python3 -m json.tool
 ```
 
 **Do NOT read `patterns.json`** — it is a deprecated stub. The authoritative data is in the three split files above.

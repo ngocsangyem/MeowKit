@@ -7,7 +7,7 @@
 #
 # Matches: Read, Edit, Write, Bash tool calls
 #
-# Load .claude/.env (each hook is a separate subprocess)
+# Load .meowkit/.env (each hook is a separate subprocess)
 . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/load-dotenv.sh" 2>/dev/null || true
 # Blocks:
 #   - .env*, *.key, *.pem, *credentials*, *secret*, *.keystore, ~/.ssh/*  (R4 sensitive files)
@@ -22,7 +22,7 @@
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
 # Hook profile gating — safety-critical: NEVER skip regardless of profile
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 
 # Phase 7 (260408): source JSON-on-stdin parser; prefer HOOK_* env vars, fall back to $1.
 if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then

@@ -5,8 +5,8 @@ description: "Install MeowKit and get it running in your project."
 
 ## Prerequisites
 
-- **Node.js** 20 or later
-- **Python** 3.9 or later (for validation scripts — stdlib only, no pip installs)
+- **Node.js** 24 or later
+- **Python** 3.9 or later. `mewkit setup` creates a virtualenv at `.claude/skills/.venv` and pip-installs `google-genai`, `pillow`, and `python-dotenv`, plus any per-skill `requirements.txt`
 - **Git** installed and configured
 - **Claude Code** installed ([claude.ai/code](https://claude.ai/code))
 
@@ -16,7 +16,7 @@ description: "Install MeowKit and get it running in your project."
 npx mewkit init
 ```
 
-On a fresh install, `mewkit init` first asks which toolkits to set up — a multiselect of **Claude Code** (preselected), **Codex**, and **Cursor** — then provisions each: Claude Code generates the `.claude/` directory, Codex copies the authored Codex bundle, Cursor installs `.claude/` and exports it to `.cursor/`. Selecting only Codex yields a codex-only project.
+On a fresh install, `mewkit init` first asks which toolkits to set up, a multiselect of **Claude Code** (preselected), **Codex**, and **Cursor**, then provisions each: Claude Code generates the `.claude/` directory, Codex copies the authored Codex bundle, Cursor installs `.claude/` and exports it to `.cursor/`. Selecting only Codex yields a codex-only project.
 
 ### Interactive setup
 
@@ -24,10 +24,12 @@ On a fresh install the CLI prompts, in order:
 
 | Prompt | Default |
 |--------|---------|
-| Toolkits — multiselect (Claude Code / Codex / Cursor) | Claude Code preselected |
+| Toolkits, a multiselect of Claude Code / Codex / Cursor | Claude Code preselected |
 | Install profile | `full` |
 | Project description (optional) | skipped |
-| Gemini API key (optional) | skipped |
+| Install Python skill dependencies into `.claude/skills/.venv` | no |
+| Gemini API key (optional) | no |
+| Fallback API keys for external providers (optional) | no |
 
 All other settings use fixed defaults: cost tracking enabled, memory enabled, mode set to `balanced`. Stack detection is not performed. In **update mode** (an existing `.claude/`), the toolkit picker is skipped and init just refreshes `.claude/`.
 
@@ -36,8 +38,8 @@ All other settings use fixed defaults: cost tracking enabled, memory enabled, mo
 Skip the interactive prompts with flags:
 
 ```bash
-npx mewkit init --target codex     # Skip the picker — Codex-only toolkit
-npx mewkit init --target cursor    # Skip the picker — .claude/ + export to Cursor
+npx mewkit init --target codex     # Skip the picker, Codex-only toolkit
+npx mewkit init --target cursor    # Skip the picker, .claude/ plus export to Cursor
 npx mewkit init --force            # Overwrite existing .claude/
 npx mewkit init --dry-run          # Preview without writing
 npx mewkit init --profile core     # Install a right-sized profile subset
@@ -48,22 +50,43 @@ Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that 
 ## What gets generated
 
 ```
-.claude/
+.claude/              What Claude Code reads
 ├── agents/          Specialist agents for each phase
 ├── skills/          Domain skills with mk: namespace
 ├── hooks/           Lifecycle hooks
 ├── rules/           Enforcement rules
 ├── scripts/         Python validators
 │   └── bin/         Shell utilities
-├── memory/          Cross-session persistence
-├── settings.json    Hook registrations
-└── modes/           Behavioral modes
+├── modes/           Behavioral modes
+└── settings.json    Hook registrations
+
+.meowkit/             Your project's own state
+├── config.json      Project configuration, commit this
+├── .env             API keys, gitignored, shared by every provider
+├── metadata.json    What this install put on disk, and what you have edited since
+├── pack-manifest.json  Which packs this release ships
+├── harness-inventory.json  Generated registry of .claude/ artifacts
+├── memory/          Fix patterns, review patterns, architecture decisions
+├── telemetry/       Cost log, trace log
+├── state/           Session markers
+└── cache/           Derived wiki index, rebuildable
 
 CLAUDE.md             Entry point for Claude Code
-.meowkit.config.json  Project configuration
 .mcp.json.example     Optional MCP server config
-.env.example          Optional API keys (Gemini)
 ```
+
+The split follows ownership: `.claude/` holds what Claude Code itself reads, so
+`settings.json` and `.mcp.json` stay there. Everything MeowKit owns lives in `.meowkit/`.
+Only `config.json` is meant to be committed; the state directories are machine-written
+and belong in `.gitignore` (`mewkit setup` appends them for you).
+
+`metadata.json` is worth knowing about even though you never edit it. It records what the
+install wrote and what its contents were, which is how `mewkit upgrade` can tell a file you
+edited from one it shipped. Delete it and the next upgrade has no baseline, so it treats every
+file as untouched.
+
+An install created before these files moved keeps working: readers fall back to the old
+`.claude/` locations, and the next `upgrade` migrates each one forward.
 
 ## Verify installation
 
@@ -90,8 +113,8 @@ Available MCP servers: Context7 (docs), Playwright (QA), Sequential Thinking.
 For `mk:multimodal` (image/video/audio analysis):
 
 ```bash
-# Add to .env
-echo "GEMINI_API_KEY=your-key" >> .env
+# Add to .meowkit/.env, gitignored, secrets stay local
+echo "MEOWKIT_GEMINI_API_KEY=your-key" >> .meowkit/.env
 ```
 
 Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
@@ -104,6 +127,8 @@ Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 | Hooks not executable | Run `chmod +x .claude/hooks/*.sh` |
 | Python scripts fail | Ensure Python 3.9+ is in PATH |
 | Claude Code doesn't load CLAUDE.md | Restart Claude Code session |
+| The agent refuses to edit any file | Gate 1 is unapproved, which is the gate working. See [When a gate blocks you](/core-concepts/gates#when-a-gate-blocks-you) |
+| `doctor` reports hooks not executable after a fresh clone | `npx mewkit doctor` fixes this itself; permissions do not survive some archive formats |
 
 ## Next steps
 
@@ -114,5 +139,5 @@ npx mewkit setup    # Post-scaffold configuration (venv, MCP, env, gitignore)
 npx mewkit doctor   # Verify installation
 ```
 
-- [Quick Start](/quick-start) — your first task with MeowKit
-- [Configuration](/reference/configuration) — customize MeowKit for your project
+- [Quick Start](/quick-start): your first task with MeowKit
+- [Configuration](/reference/configuration): customize MeowKit for your project

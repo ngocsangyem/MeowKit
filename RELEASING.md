@@ -82,7 +82,7 @@ The script automates steps 3-9 below: bump version → build/lint/typecheck/test
 
 Update the changelog and any affected guide/reference pages BEFORE tagging.
 
-**Patch releases:** Only update `packages/docs/content/docs/changelog.mdx` (step 2). Skip the doc update step below unless a guide page documents behavior that changed.
+**Patch releases:** Only update `packages/docs/content/docs/changelog/index.mdx` (step 2). Skip the doc update step below unless a guide page documents behavior that changed.
 
 #### 1a. Update affected guide pages
 
@@ -306,9 +306,9 @@ grep -rinE 'meowkit' .claude/skills .claude/agents .claude/commands .claude/rule
 
 A broader `grep -ri meowkit .claude tasks` also surfaces functional hits — config identity (`metadata.json` `"name": "meowkit"`), filenames (`gitignore.meowkit`), hook log prefixes (`[meowkit]`), generated views (`harness-substrate.md`), and the kit's own `memory/` dev log. Those are expected; only **new prose** that names the product as a subject needs neutralizing.
 
-### 2. Update CHANGELOG (`packages/docs/content/docs/changelog.mdx`)
+### 2. Update CHANGELOG (`packages/docs/content/docs/changelog/index.mdx`)
 
-> **Note:** The ONLY changelog file you edit is `packages/docs/content/docs/changelog.mdx` — the Fumadocs source that renders to https://docs.meowkit.dev/changelog. Root `CHANGELOG.md` is a permanent stub that just refers readers to that published page; never add release notes to it.
+> **Note:** The ONLY changelog file you edit is `packages/docs/content/docs/changelog/index.mdx` — the Fumadocs source that renders to https://docs.meowkit.dev/changelog. Root `CHANGELOG.md` is a permanent stub that just refers readers to that published page; never add release notes to it. Older releases live in the sibling `changelog/archive.mdx`; a release moves there only when the index page needs trimming, never as part of adding a new section.
 
 Add a new version section at the **top** (just below the `## Upgrade` block). Use the schema below — only include sections that have content. Empty sections are dropped, not stubbed.
 
@@ -544,7 +544,7 @@ Copy this checklist for each release:
 
 ### Changelog
 
-- [ ] Added v<version> section to `packages/docs/content/docs/changelog.mdx` (NOT root `CHANGELOG.md` — it is a stub, leave it untouched)
+- [ ] Added v<version> section to `packages/docs/content/docs/changelog/index.mdx` (NOT root `CHANGELOG.md` — it is a stub, leave it untouched)
 
 ### Version
 
@@ -597,7 +597,7 @@ Push to `main` or `dev` triggers `.github/workflows/release.yml`:
 5. `@semantic-release/exec` publishes both packages to npm
 6. `@semantic-release/git` commits version files back to repo
 
-**Note:** Automated releases do NOT update `packages/docs/content/docs/changelog.mdx` or affected guide/reference pages. Those must be done manually before the release commit. Root `CHANGELOG.md` is a stub and is never updated per-release.
+**Note:** Automated releases do NOT update `packages/docs/content/docs/changelog/index.mdx` or affected guide/reference pages. Those must be done manually before the release commit. Root `CHANGELOG.md` is a stub and is never updated per-release.
 
 ### Conventional commits → version bumps
 
@@ -633,6 +633,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.14.8 | 2026-07-26 | Runtime-Neutral State & the Documentation Rebuild |
 | v2.14.7 | 2026-07-25 | Per-Agent Model Routing & Explore Agent          |
 | v2.14.4 | 2026-07-19 | The Orientation & Transition Spine               |
 | v2.14.3 | 2026-07-19 | Jira & Confluence Agents on Haiku                |

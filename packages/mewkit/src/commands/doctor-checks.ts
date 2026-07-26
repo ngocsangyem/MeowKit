@@ -1,6 +1,8 @@
 import { execSync } from "node:child_process";
 import fs, { chmodSync } from "node:fs";
 import path from "node:path";
+import { resolveStateDir } from "../state/resolve-state-dir.js";
+import { resolveConfigPath } from "../state/resolve-config-path.js";
 import { commandExists } from "./setup.js";
 import { getRequirementsSource } from "../core/skills-dependencies.js";
 import { verifyPackages } from "../core/dependency-installer.js";
@@ -147,7 +149,7 @@ export function checkScripts(root: string | null): DiagResult {
 export function checkMemory(root: string | null): DiagResult {
 	if (!root) return { name: "Memory", status: "warn", detail: "Skipped — no project" };
 
-	const memDir = path.join(root, ".claude", "memory");
+	const memDir = resolveStateDir(root, "memory");
 	if (!fs.existsSync(memDir)) {
 		return { name: "Memory", status: "warn", detail: "memory/ not found — will be created on first session" };
 	}
@@ -214,16 +216,17 @@ export function checkPipPackages(root: string | null): DiagResult {
 export function checkConfig(root: string | null): DiagResult {
 	if (!root) return { name: "Config", status: "warn", detail: "Skipped — no project" };
 
-	const configPath = path.join(root, ".claude", "meowkit.config.json");
+	const configPath = resolveConfigPath(root);
+	const shown = path.relative(root, configPath) || configPath;
 	if (!fs.existsSync(configPath)) {
-		return { name: "Config", status: "warn", detail: ".claude/meowkit.config.json not found" };
+		return { name: "Config", status: "warn", detail: `${shown} not found` };
 	}
 
 	try {
 		JSON.parse(fs.readFileSync(configPath, "utf-8"));
-		return { name: "Config", status: "pass", detail: ".claude/meowkit.config.json valid" };
+		return { name: "Config", status: "pass", detail: `${shown} valid` };
 	} catch {
-		return { name: "Config", status: "fail", detail: ".claude/meowkit.config.json is invalid JSON" };
+		return { name: "Config", status: "fail", detail: `${shown} is invalid JSON` };
 	}
 }
 

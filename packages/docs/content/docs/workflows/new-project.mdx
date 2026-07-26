@@ -15,7 +15,7 @@ This workflow gets you from an empty project to a fully configured MeowKit envir
 
 ## Prerequisites
 
-- Node.js 20+, Python 3.9+, Git installed
+- Node.js 24+, Python 3.9+, Git installed
 - Claude Code installed ([claude.ai/code](https://claude.ai/code))
 - A project directory (new or existing)
 
@@ -29,7 +29,7 @@ npx mewkit init
 
 The CLI auto-detects your tech stack and asks configuration questions (project name, stack, team size, mode, memory, optional Gemini API key). Takes ~30 seconds.
 
-**What gets created:** A `.claude/` directory with 41 agents, 126 skills, lifecycle hooks, security rules, and a memory system. Plus `CLAUDE.md` (the entry point Claude reads at session start).
+**What gets created:** A `.claude/` directory holding the agents, skills, lifecycle hooks, security rules, and memory system. Plus `CLAUDE.md` (the entry point Claude reads at session start).
 
 ### Step 2: Verify installation
 
@@ -45,7 +45,7 @@ Checks: Node.js version, Python available, Git configured, hooks executable, scr
 claude
 ```
 
-Claude reads `CLAUDE.md` automatically. The **orchestrator** agent activates and reads `memory/cost-log.json` for cost history. Topic files in `.claude/memory/` (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`) are loaded on-demand by consumer skills at task start — they are empty on first run.
+Claude reads `CLAUDE.md` automatically. The **orchestrator** agent activates and reads `memory/cost-log.json` for cost history. Topic files in `.meowkit/memory/` (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`) are loaded on-demand by consumer skills at task start — they are empty on first run.
 
 ### Step 4: Plan your first feature
 
@@ -93,4 +93,4 @@ This executes Phases 2-6 automatically:
 
 ## Next workflow
 
-→ [Adding a Feature](/workflows/add-feature) — how to add features after initial setup
+→ [Build a Feature](/guides/build-a-feature) — how to add features after initial setup

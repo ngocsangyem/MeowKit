@@ -4,4 +4,4 @@ The canonical Decision Record Template and synthesis rules live in `SKILL.md` "D
 
 This file exists for filesystem-layout consistency with sibling skills (`plan-creator`, `evaluate`, `review`). Do not duplicate the template or rules here — keep SKILL.md as the single source of truth.
 
-Persist synthesis output to `.claude/memory/decisions.md` per SKILL.md "Memory Write".
+Persist synthesis output to `.meowkit/memory/decisions.md` per SKILL.md "Memory Write".

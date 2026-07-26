@@ -3,6 +3,17 @@ title: "mk:retro"
 description: "Weekly-cadence engineering retrospective — analyzes commit history, work patterns, and code quality metrics with persistent history, trend tracking, and team-aware breakdowns. Supports compare mode and cross-project global mode."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/retro/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/retro/SKILL.md) |
+| **Owner** | `docs` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 Weekly engineering retrospective (v2). Analyzes commit history, work patterns, and code quality metrics with persistent history and trend tracking. Team-aware: identifies the user running the command, then analyzes every contributor with per-person praise and growth opportunities. Designed for a senior IC/CTO-level builder using Claude Code as a force multiplier.
 
 ## What This Skill Does
@@ -51,11 +62,11 @@ Runs 12 parallel git commands:
 5. PR number extraction from commit messages
 6. Per-author file hotspots
 7. Per-author commit counts (shortlog)
-8. Review history from `.claude/memory/reviews.jsonl`
+8. Review history from `.meowkit/telemetry/reviews.jsonl`
 9. TODOS.md backlog
 10. Total test file count
 11. Regression test commits in window
-12. Skill usage telemetry from `.claude/memory/skill-usage.jsonl`
+12. Skill usage telemetry from `.meowkit/telemetry/skill-usage.jsonl`
 
 **Midnight-aligned windows:** Uses explicit `T00:00:00` suffix for git queries to ensure consistent day boundaries.
 
@@ -129,7 +140,7 @@ When `global` argument is given:
 6. Per-tool productivity patterns (Claude Code, Codex, Gemini sessions per repo)
 7. Generate shareable personal card + full global retro narrative
 8. Load history and compare against prior global retros with same window
-9. Save snapshot to `.claude/memory/retros/global-{date}-{seq}.json`
+9. Save snapshot to `.meowkit/memory/retros/global-{date}-{seq}.json`
 
 **Does NOT require being inside a git repo.** Works from any directory.
 
@@ -137,7 +148,7 @@ When `global` argument is given:
 
 - Loads most recent prior retro JSON for delta comparison
 - Week-over-week trend breakdowns (if window >= 14d)
-- Saves JSON snapshot to `.claude/memory/retros/` with sequence numbering
+- Saves JSON snapshot to `.meowkit/memory/retros/` with sequence numbering
 
 ### Tone and Rules
 
@@ -169,7 +180,7 @@ When `global` argument is given:
 1. **Initialize** -- run preamble, parse arguments (time window, mode)
 2. **Gather + compute** -- fetch origin, run 12 parallel git commands, compute metrics (summary, leaderboard, backlog, skills, eureka)
 3. **Analyze** -- per-person breakdown (praise + growth), time patterns, trends, streaks
-4. **Output** -- narrative with tweetable summary, save JSON snapshot to `.claude/memory/retros/`
+4. **Output** -- narrative with tweetable summary, save JSON snapshot to `.meowkit/memory/retros/`
 
 ## Usage
 
@@ -245,7 +256,7 @@ After the narrative is written:
 |--------|--------|
 | Create Jira story now | `mk:jira-issue create` body pre-filled — REQUIRES user review before submit |
 | Add to plan TODO | Append to active plan as TODO |
-| Document as no-action | Append to `.claude/memory/retros/{date}-decisions.md` with reason |
+| Document as no-action | Append to `.meowkit/memory/retros/{date}-decisions.md` with reason |
 | Defer to next retro | Carry forward |
 
 The retro is not "complete" until every surfaced action has a disposition. NEVER auto-creates Jira stories — preserves the reports-not-automation principle. Skipped silently in non-Agile sessions (rule not loaded).

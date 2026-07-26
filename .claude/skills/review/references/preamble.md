@@ -22,10 +22,10 @@
 ## Preamble (run first)
 
 ```bash
-mkdir -p .claude/memory/sessions
-touch .claude/memory/sessions/"$PPID"
-_SESSIONS=$(find .claude/memory/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find .claude/memory/sessions -mmin +120 -type f -delete 2>/dev/null || true
+mkdir -p .meowkit/state/sessions
+touch .meowkit/state/sessions/"$PPID"
+_SESSIONS=$(find .meowkit/state/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
+find .meowkit/state/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _CONTRIB=$(.claude/scripts/bin/workflow-config get contributor 2>/dev/null || true)
 _PROACTIVE=$(.claude/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
@@ -34,16 +34,16 @@ echo "PROACTIVE: $_PROACTIVE"
 source <(.claude/scripts/bin/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
-_LAKE_SEEN=$([ -f .claude/memory/.completeness-intro-seen ] && echo "yes" || echo "no")
+_LAKE_SEEN=$([ -f .meowkit/state/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
 _TEL=$(.claude/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f .claude/memory/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL_PROMPTED=$([ -f .meowkit/state/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p .claude/memory
-echo '{"skill":"review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .claude/memory/skill-usage.jsonl 2>/dev/null || true
+mkdir -p .meowkit/telemetry
+echo '{"skill":"review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
 # zsh-compatible: use find instead of glob to avoid NOMATCH error
 ```
 
@@ -57,7 +57,7 @@ Then offer to open the essay in their default browser:
 
 ```bash
 open https://garryslist.org/posts/boil-the-ocean
-touch .claude/memory/.completeness-intro-seen
+touch .meowkit/state/.completeness-intro-seen
 ```
 
 Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
@@ -90,15 +90,15 @@ If B→B: run `.claude/scripts/bin/workflow-config set telemetry off`
 
 Always run:
 ```bash
-touch .claude/memory/.telemetry-prompted
+touch .meowkit/state/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 
 ## Memory
 
-- **Reads memory:** at task start, read canonical `.claude/memory/review-patterns.json` and `.claude/memory/security-findings.json`; use a matching Markdown view only if its JSON store is absent.
-- **Writes memory:** at task end, append newly-observed patterns to canonical `.claude/memory/review-patterns.json`, validate it, then regenerate views. Do not write `review-patterns.md`; it is non-authoritative. Scrub secrets before writing.
+- **Reads memory:** at task start, read canonical `.meowkit/memory/review-patterns.json` and `.meowkit/memory/security-findings.json`; use a matching Markdown view only if its JSON store is absent.
+- **Writes memory:** at task end, append newly-observed patterns to canonical `.meowkit/memory/review-patterns.json`, validate it, then regenerate views. Do not write `review-patterns.md`; it is non-authoritative. Scrub secrets before writing.
 
 ## AskUserQuestion Format
 
@@ -164,7 +164,7 @@ Before building infrastructure, unfamiliar patterns, or anything the runtime mig
 
 Log eureka moments:
 ```bash
-jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> .claude/memory/eureka.jsonl 2>/dev/null || true
+jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> .meowkit/telemetry/eureka.jsonl 2>/dev/null || true
 ```
 Replace SKILL_NAME and ONE_LINE_SUMMARY. Runs inline — don't stop the workflow.
 
@@ -180,7 +180,7 @@ If `_CONTRIB` is `true`: you are in **contributor mode**. You're a toolkit user 
 
 **NOT worth filing:** user's app bugs, network errors to user's URL, auth failures on user's site, user's own JS logic bugs.
 
-**To file:** write `.claude/memory/contributor-logs/{slug}.md` with **all sections below** (do not truncate — include every section through the Date/Version footer):
+**To file:** write `.meowkit/memory/contributor-logs/{slug}.md` with **all sections below** (do not truncate — include every section through the Date/Version footer):
 
 ```
 # {Title}
@@ -240,7 +240,7 @@ Determine the outcome from the workflow result (success if completed normally, e
 if it failed, abort if the user interrupted).
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-`.claude/memory/` (user config directory, not project files). The skill
+`.meowkit/memory/` (user config directory, not project files). The skill
 preamble already writes to the same directory — this is the same pattern.
 Skipping this command loses session duration and outcome data.
 
@@ -249,7 +249,7 @@ Run this bash:
 ```bash
 _TEL_END=$(date +%s)
 _TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f .claude/memory/.pending-"$_SESSION_ID" 2>/dev/null || true
+rm -f .meowkit/state/.pending-"$_SESSION_ID" 2>/dev/null || true
 # telemetry removed — telemetry disabled; analyst agent not invoked \
   --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
   --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &

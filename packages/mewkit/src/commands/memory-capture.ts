@@ -10,7 +10,8 @@ import { appendFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { writeStoreEntry } from "../state/meowkit-write-contract.js";
-import { resolveMeowkitRoot } from "../state/meowkit-root-resolver.js";
+import { resolveProjectRoot } from "../state/meowkit-root-resolver.js";
+import { resolveStateDir } from "../state/resolve-state-dir.js";
 import { scrubSecrets, validateContent, normalizeForScan } from "../state/injection-scanner.js";
 
 interface PrefixRoute {
@@ -58,9 +59,11 @@ export async function captureFromPrompt(prompt: string, opts: CaptureOptions = {
 			.slice(0, 10)}`;
 
 	if (route.store === "quick-notes") {
-		const meowkitRoot = resolveMeowkitRoot(opts.startDir ?? process.cwd());
-		if (!meowkitRoot) throw new Error("cannot resolve a project root for .meowkit/memory");
-		const memoryDir = join(meowkitRoot, "memory");
+		// Same store resolution as every other writer, so a pre-migration project keeps
+		// appending to its existing tree instead of starting a second one.
+		const projectRoot = resolveProjectRoot(opts.startDir ?? process.cwd());
+		if (!projectRoot) throw new Error("cannot resolve a project root for the memory store");
+		const memoryDir = resolveStateDir(projectRoot, "memory");
 		mkdirSync(memoryDir, { recursive: true });
 		appendFileSync(join(memoryDir, "quick-notes.md"), `\n## ${now}\n\n${scrubSecrets(content)}\n`, "utf-8");
 		return { captured: true, store: "quick-notes.md", entryId: id };

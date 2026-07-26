@@ -1,0 +1,55 @@
+---
+title: "Confluence Integration"
+description: "Install and authenticate Confluence access, understand the Cloud-only boundary and the write rules, and find the right skill for a task."
+---
+
+MeowKit reads and writes Confluence through the `confluence-as` CLI. If you have already set up [Jira](/guides/jira-integration), most of this is done, because the same Atlassian API token works for both.
+
+## Set it up
+
+The same command installs both wrappers:
+
+```bash
+npx mewkit setup
+```
+
+Then add three values to `.meowkit/.env`:
+
+| Variable | What it is |
+|---|---|
+| `MEOW_CONFLUENCE_API_TOKEN` | An Atlassian Cloud API token. The same one you use for Jira is fine |
+| `MEOW_CONFLUENCE_EMAIL` | The Atlassian account that token belongs to |
+| `MEOW_CONFLUENCE_SITE_URL` | Your site, for example `https://your-company.atlassian.net` |
+
+## What it will and will not do on its own
+
+- **Cloud only, and it is enforced rather than documented.** The wrapper exits with status 3 on any URL that is not `*.atlassian.net`. Server and Data Center do not work through `confluence-as`; use the Atlassian MCP transport instead, invoked explicitly. The hub does not fall back on its own.
+- **Bulk operations require a dry run.** Ten or more pages means you see the plan before anything changes.
+- **The implementation pipeline never writes back.** `mk:cook` reads Confluence specs; it does not update Confluence pages when it ships. Write paths are deliberately outside the pipeline, so a build cannot quietly edit your documentation.
+- **Spec analysis is read-only at the Confluence side.** `mk:confluence-spec-analyst` produces a report in your repo, not a comment on the page.
+
+## Find the right skill
+
+| What you want to do | Skill |
+|---|---|
+| Get, create, update, delete, copy, move, or version a page | [`mk:confluence-page`](/reference/skills/confluence-page) |
+| Search with CQL, list spaces, export results | [`mk:confluence-search`](/reference/skills/confluence-search) |
+| Pull requirements, gaps, and suggested stories out of a spec | [`mk:confluence-spec-analyst`](/reference/skills/confluence-spec-analyst) |
+| Label, move, or delete ten or more pages | [`mk:confluence-bulk`](/reference/skills/confluence-bulk) |
+| Comments, attachments, labels, watchers | [`mk:confluence-collaborate`](/reference/skills/confluence-collaborate) |
+
+Two routing rules are worth knowing because they are not guessable. Labels belong to `mk:confluence-collaborate`, not to `mk:confluence-page`, because "label this page" is a collaboration operation. So are comments, attachments, and watchers, even when scoped to a single page.
+
+## When it goes wrong
+
+**The wrapper exits with status 3.** Your site URL is not an `*.atlassian.net` address. This is the Cloud-only check, not a misconfiguration. Server and Data Center need the MCP transport.
+
+**A page fetch returns something that does not look like the page.** Confluence stores content as ADF, and MeowKit converts it to Markdown through a macro-aware walker. Unusual macros can convert imperfectly. The page ID and the raw fetch are both available if you need to check what the source actually contains.
+
+**`mk:planning-engine` will not accept your spec.** It takes `--spec <report-path>` pointing at a spec-analyst report, not at a Confluence URL. Run `mk:confluence-spec-analyst` first, then pass the path it gives you.
+
+## Next steps
+
+- [Jira Integration](/guides/jira-integration): same token, same setup command
+- [Spec to Sprint](/workflows/spec-to-sprint): a Confluence spec through to planned work
+- [`mk:confluence` reference](/reference/skills/confluence): the router's architecture and handoff points

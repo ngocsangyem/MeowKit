@@ -1,28 +1,22 @@
 ---
 title: "CLI Reference"
-description: "MeowKit command-line tools overview."
+description: "The mewkit command line, grouped by what you are trying to do."
 ---
 
-MeowKit provides two CLI packages:
+MeowKit ships one CLI package, `mewkit`. Run it from your project root; there is nothing to install globally.
 
-| Package | Command | Purpose |
-|---------|---------|---------|
-| `mewkit` | `npx mewkit init` | Scaffold or update the `.claude/` system |
-| `mewkit` | `npx mewkit COMMAND` | Runtime tools — see the groups below |
+## Find a command
 
-### Command groups
+| You want to | Page |
+|---|---|
+| Create a project, configure it, check it is healthy, upgrade it | [Project Setup](/cli/project-setup) |
+| Write a plan, create a task, see where a task stands | [Planning and Tasks](/cli/planning) |
+| Review a pull request across several sittings | [Review](/cli/review) |
+| Read or write memory, check the context budget, use the wiki | [Memory and Knowledge](/cli/knowledge) |
+| Export the kit to Codex or Cursor, or see what they support | [Portability](/cli/portability) |
+| See what a session cost, what it did, what the kit contains | [Cost and Telemetry](/cli/telemetry) |
 
-| Group | Commands |
-| --- | --- |
-| Project lifecycle | `init`, `upgrade`, `setup`, `doctor`, `status`, `task`, `migrate` |
-| Knowledge & memory | `wiki`, `memory`, `index`, `query` |
-| Harness introspection | `validate`, `inventory`, `trace`, `budget` (incl. `budget context`), `verdict-gate`, `capabilities`, `context` |
-| Cost & visualization | `budget`, `visual-plan` |
-| Release & providers | `pack`, `providers` / `explain-support` |
-
-See [Commands](/cli/commands) for the full reference and [Task Commands](/cli/task-commands) for `task` details.
-
-## Quick Start
+## Get started
 
 ```bash
 # 1. Scaffold MeowKit into your project
@@ -39,10 +33,369 @@ npx mewkit doctor
 npx mewkit task new --type feature "Add user authentication"
 ```
 
-## How it works
+## Two things worth knowing up front
 
-`npx mewkit init` is a **scaffold + update** tool:
-- **First run:** opens a toolkit picker (Claude Code / Codex / Cursor, Claude Code preselected), then copies the full MeowKit system (agents, skills, hooks, rules, commands, modes, scripts) into `.claude/` for each selected provider. `--target <provider>` skips the picker.
-- **Subsequent runs:** smart update — overwrites unchanged core files, skips user-modified files, adds new files (no picker)
+`npx mewkit init` both scaffolds and updates. The first run opens a toolkit picker (Claude Code, Codex, Cursor, with Claude Code preselected) and copies the full system into `.claude/` for each provider you choose; `--target <provider>` skips the picker. Later runs are a smart update: unchanged core files are overwritten, files you edited are left alone, new files are added, and there is no picker.
 
-`mewkit` is a **runtime toolbox** for daily use — diagnostics, setup, task management, and cost tracking with session/day filtering in `budget`.
+Everything else is a runtime toolbox for daily use. None of it is required to run MeowKit, and none of it changes your project unless the command says it does.
+
+## Every flag
+
+The table below is generated from the same catalogue that configures the parser and prints `--help`, so it cannot drift from what the CLI actually accepts. The family pages above carry the worked examples and the failure recovery; this is the lookup.
+
+{/* GENERATED:cli-flags START */}
+
+_Generated from the CLI catalogue. Edit `packages/mewkit/src/cli/command-catalogue.ts`, not this table._
+
+### Every command
+
+| Flag | What it does |
+|---|---|
+| `--help` | Show help |
+| `--version` | Print the CLI version |
+
+### `mewkit init`
+
+Scaffold or update MeowKit in the current project.
+
+| Flag | What it does |
+|---|---|
+| `--beta` | Use the beta release channel |
+| `--dry-run` | Print what would happen without writing |
+| `--force` | Overwrite an existing `.claude/` |
+| `--target` `<value>` | Skip the toolkit picker and create one toolkit |
+| `--profile` `<value>` | Install a subset: core, developer, product, atlassian, security, research, full |
+| `--migrate` | After unpack, prompt for export targets |
+| `--migrate-global` | Use global install paths instead of project-local |
+| `--skill-packs` `<value>` | Comma-separated skill packs to install |
+| `--mcp-profiles` `<value>` | Cursor only: MCP profile names, or 'all', to merge into .cursor/mcp.json |
+| `--allow-cloud-mcp` | Cursor only: second opt-in for applying an MCP profile to a repo with a git remote |
+
+### `mewkit upgrade`
+
+Upgrade MeowKit to the latest version.
+
+| Flag | What it does |
+|---|---|
+| `--yes` | Answer prompts affirmatively |
+| `--beta` | Use the beta release channel |
+| `--check` | Report without changing anything |
+| `--list` | List available versions |
+| `--no-cleanup` | Keep the downloaded release directory |
+
+### `mewkit validate`
+
+Validate .claude/ project structure.
+
+| Flag | What it does |
+|---|---|
+| `--target` `<value>` | Validate a generated provider target instead of a `.claude/` project |
+| `--mode` `<value>` | Force authoring or flat-copy mode instead of auto-detecting |
+| `--portable` | Include portable provider contract checks |
+| `--strict` | Treat WARN as failure (exit 1) |
+| `--workflow` | Run only the workflow.yaml drift check |
+| `--gates` | Run only the gate-authority contract check |
+| `--ownership` | Run only the artifact ownership-completeness check |
+| `--agents` | Run only declared agent-contract conformance checks |
+| `--packs` | Run only the pack-manifest coherence and safety check |
+| `--rules` | Run only the routing-table-breadth check |
+| `--capabilities` | Run only the capability manifest checks |
+| `--substrate` | Run only the responsibility-substrate drift and untagged check |
+
+### `mewkit capabilities`
+
+Inspect or resolve the capability manifest.
+
+Subcommands: `list`, `explain`, `resolve`, `view`, `bootstrap`, `projections`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--intent` `<value>` | Resolve this intent to the capability that owns it |
+| `--provider` `<value>` | Scope the projection to one provider |
+| `--write` | Write the generated view rather than printing it |
+| `--record` | Record the result to the task record; `--no-record` skips it |
+
+### `mewkit budget`
+
+View token usage and cost log.
+
+Subcommands: `context`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--profile` `<value>` | Estimate one context profile instead of all of them |
+| `--session` `<value>` | Filter to the current session, or to a specific session id |
+| `--monthly` | Aggregate by month instead of the last ten entries |
+| `--day` `<value>` | Filter to today, or to a specific YYYY-MM-DD |
+| `--fail-over` `<value>` | Exit non-zero when a profile exceeds N tokens |
+
+### `mewkit memory`
+
+Manage agent memory (lessons and patterns).
+
+Subcommands: `capture`, `render-views`, `seed-from-md`.
+
+| Flag | What it does |
+|---|---|
+| `--strict` | Treat WARN as failure (exit 1) |
+| `--clear` | Clear all memory, with confirmation |
+| `--stats` | Show sessions captured and patterns learned |
+
+### `mewkit setup`
+
+Guided post-scaffold configuration.
+
+| Flag | What it does |
+|---|---|
+| `--only` `<value>` | Run a single setup step |
+| `--system-deps` | Install system-level dependencies |
+
+### `mewkit doctor`
+
+Diagnose common environment issues.
+
+Subcommands: `provenance`.
+
+| Flag | What it does |
+|---|---|
+| `--report` | Print a shareable diagnostic report |
+| `--providers` | Include provider contract diagnostics |
+| `--state` | Include state taxonomy diagnostics |
+| `--explain` | Explain the provenance result rather than summarizing it |
+| `--consolidation` | Show the consolidation ledger; status is not a runtime-availability claim |
+| `--hard-gates` | Live-probe the hard gates (plan, privacy, injection block) |
+
+### `mewkit status`
+
+Print version and config summary.
+
+### `mewkit task-state`
+
+Durable task record.
+
+Subcommands: `show`, `update`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--status` `<value>` | Task status: active, blocked, done |
+| `--step` `<value>` | What just finished |
+| `--next` `<value>` | The next action |
+| `--plan` `<value>` | Path to the plan this record joins |
+| `--blocker` `<value>` | Record a blocker, repeatable |
+| `--verification` `<value>` | Record a verification as ref=result, repeatable |
+| `--evidence-ref` `<value>` | Record an evidence reference, repeatable |
+| `--capability-decision` `<value>` | Record a capability decision as capId\|decision\|reason, repeatable |
+
+### `mewkit orient`
+
+Resume orientation from durable task state; reads records only.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--record` | Record the result to the task record; `--no-record` skips it |
+
+### `mewkit context`
+
+Repo-context evidence.
+
+Subcommands: `resolve`, `check`, `record`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--task` `<value>` | Task id to record the evidence envelope against |
+| `--root` `<value>` | Project root to resolve the path against |
+
+### `mewkit task`
+
+Create and list task files.
+
+Subcommands: `new`, `list`.
+
+| Flag | What it does |
+|---|---|
+| `--activate` | Activate the task on creation; --no-activate opts out |
+| `--status` `<value>` | Filter the list by status: draft, in-progress, blocked, review, done |
+| `--type` `<value>` | Task type: feature, bug-fix, refactor, security |
+| `--priority` `<value>` | Task priority |
+| `--all` | Include completed and backlog tasks |
+
+### `mewkit migrate`
+
+Export MeowKit to external coding-agent tools.
+
+| Flag | What it does |
+|---|---|
+| `--yes` | Answer prompts affirmatively |
+| `--dry-run` | Print what would happen without writing |
+| `--force` | Overwrite user-edited targets on conflict |
+| `--only` `<value>` | Limit to item types: agents, commands, skills, config, rules, hooks |
+| `--providers` | Include provider contract diagnostics |
+| `--all` | Export every item type rather than the default subset |
+| `--global` | Use global install paths instead of project-local |
+| `--source` `<value>` | Migration source root |
+| `--source-version` `<value>` | Version to record for the migration source |
+| `--install` | Install the runtime for the target provider |
+| `--reconcile` | Reconcile an existing export instead of writing fresh |
+| `--skip-config` | Do not convert configuration |
+| `--skip-rules` | Do not convert rules |
+| `--skip-hooks` | Do not convert hooks |
+| `--reinstall-empty-dirs` | Recreate directories that were emptied by a prior run |
+| `--respect-deletions` | Honor deletions.json rather than reinstating removed files |
+| `--all-rules` | Merge every rule into the provider instruction file |
+| `--include-mcp` | Also convert .mcp.json servers into the provider MCP config |
+| `--include-unportable` | Install Claude Code skills for a provider with no adapter (experimental) |
+
+### `mewkit providers`
+
+Show the effective provider support matrix and enforcement levels.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--lifecycle` | Show the capability-adapter and lifecycle matrix |
+
+### `mewkit explain-support`
+
+Alias of `providers`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--lifecycle` | Show the capability-adapter and lifecycle matrix |
+
+### `mewkit visual-plan`
+
+Visual plan contracts.
+
+Subcommands: `validate`, `status`, `approve`, `rehash`, `export`, `prepare-feedback`, `apply-feedback`, `patch`, `edit`, `view`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--force` | Overwrite user-edited targets on conflict |
+| `--check` | Pre-apply gate for apply-feedback |
+| `--port` `<value>` | Bind to a fixed port instead of a random one |
+| `--open` | Auto-launch the browser |
+| `--no-open` | Do not launch the browser |
+| `--revision` `<value>` | Pin approve to the exact reviewed revision |
+| `--format` `<value>` | Export format |
+| `--ops` `<value>` | Operations file for prepare-feedback |
+| `--op` `<value>` | Operations file for patch |
+| `--batch` `<value>` | Feedback batch id for apply-feedback |
+| `--receipt` `<value>` | Record apply-feedback outcomes to this file |
+
+### `mewkit review`
+
+High-assurance PR review, resumable across sittings via a session id.
+
+Subcommands: `prepare`, `read`, `coverage`, `compose`, `submit`, `cleanup`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--remote` `<value>` | Git remote to fetch the pull request from |
+| `--session` `<value>` | Review session id from `review prepare` |
+| `--as` `<value>` | Read the diff as one named persona |
+| `--reply` | Post the composed review back to the pull request |
+| `--confirm` `<value>` | Confirmation token required for the irreversible submit step |
+
+### `mewkit inventory`
+
+List harness artifacts with governance metadata.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--check` | Fail if README or index counts drift from reality |
+| `--substrate` | Print the responsibility-by-coverage substrate matrix |
+| `--stale` | Show only deprecated or experimental artifacts |
+| `--critical` | Show only criticality=critical artifacts |
+| `--portable-missing` | Show artifacts whose runtime is not portable |
+| `--emit` | Write the substrate view rather than printing it |
+| `--emit-counts` | Rewrite README and index count numbers to match reality |
+
+### `mewkit plan`
+
+Plan lifecycle.
+
+Subcommands: `status`, `check`, `approve`, `archive`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--dry-run` | Print what would happen without writing |
+| `--by` `<value>` | Approver name recorded on the approval receipt |
+| `--activate` | Activate the task on creation; --no-activate opts out |
+
+### `mewkit trace`
+
+On-demand trace recall.
+
+Subcommands: `score`, `audit`, `propose`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--id` `<value>` | Trace record id |
+| `--friction` `<value>` | Record a friction note against the current task |
+| `--responsibility` `<value>` | Scope to one substrate responsibility |
+| `--commit` | Persist the proposal rather than previewing it |
+
+### `mewkit wiki`
+
+Long-term project knowledge.
+
+Subcommands: `context`, `init`, `propose`, `approve`, `search`, `reindex`, `handoff`.
+
+This command reads its own flags, which are owned by its subsystem rather than by the CLI catalogue.
+
+### `mewkit index`
+
+Build or refresh the derived SQLite index over the append logs.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+
+### `mewkit query`
+
+Read-only aggregate queries over the derived index.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--task` `<value>` | Task id to scope the query to |
+| `--presets` | List the built-in query presets |
+
+### `mewkit pack`
+
+Manage install packs.
+
+Subcommands: `list`, `add`, `remove`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--yes` | Answer prompts affirmatively |
+| `--beta` | Use the beta release channel |
+
+### `mewkit verdict-gate`
+
+Check a review verdict against the active plan.
+
+### `mewkit docs-manifest`
+
+Generate or drift-check the docs reference manifest.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--check` | Fail when the committed manifest no longer matches the live `.claude/` tree |
+| `--write` | Regenerate the committed manifest |
+
+{/* GENERATED:cli-flags END */}

@@ -3,6 +3,17 @@ title: "mk:wiki-research"
 description: "Fetch external sources (web / arXiv / GitHub) and turn them into scanner-gated wiki candidates — never canonical pages."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/wiki-research/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/wiki-research/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `portable` |
+| **Risk** | high |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Runs the wiki research loop: a seed queue + a fetcher (web / arXiv / GitHub). Fetched content is the **largest injection surface** in the subsystem, so it is the most tightly gated. Every fetched byte is **DATA** — url-guarded, size-capped, redirect-re-validated, injection-scanned, and secret-scrubbed before a candidate is even created.

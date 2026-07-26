@@ -19,17 +19,13 @@ Skills activate by task domain, not all at once. An orchestrator loads routing s
 
 `docs/project-context.md` is the agent **constitution** — tech stack, conventions, anti-patterns, and testing approach. All agents load it at session start, before any task-specific context.
 
-```
-Session Start
-     │
-     ▼
-Load docs/project-context.md   ← Always first
-     │
-     ▼
-Load task-specific context
-     │
-     ▼
-Route to agent
+```mermaid
+flowchart TD
+    A["Session start"]
+    B["Load docs/project-context.md<br/><i>always first</i>"]
+    C["Load task-specific context"]
+    D["Route to agent"]
+    A --> B --> C --> D
 ```
 
 Without `project-context.md`, agents infer project conventions independently and make conflicting assumptions. With it, every agent shares the same ground truth.
@@ -43,30 +39,18 @@ Create or update it with:
 
 ## Task Flow
 
-```
-Task Received
-     │
-     ▼
-Phase 0: Orient ──→ agent-detector scores all agents
-     │                lazy-agent-loader loads winner
-     ▼
-Phase 1: Plan ────→ planner loads: plan-creator, office-hours
-     │
-     ▼
-Phase 2: Test ────→ tester loads: testing, lint-and-validate (RED if --tdd, optional otherwise)
-     │
-     ▼
-Phase 3: Build ───→ developer loads: development, typescript/vue, clean-code
-     │
-     ▼
-Phase 4: Review ──→ reviewer loads: review, cso, vulnerability-scanner
-     │
-     ▼
-Phase 5: Ship ────→ shipper loads: ship, careful, document-release
-     │
-     ▼
-Phase 6: Reflect ─→ documenter loads: documentation, memory
-                    analyst loads: memory
+```mermaid
+flowchart TD
+    T["Task received"]
+    P0["<b>Phase 0: Orient</b><br/>agent-detector scores all agents<br/>lazy-agent-loader loads winner"]
+    P1["<b>Phase 1: Plan</b><br/>planner loads: plan-creator, office-hours"]
+    P2["<b>Phase 2: Test</b><br/>tester loads: testing, lint-and-validate<br/>(RED if --tdd, optional otherwise)"]
+    P3["<b>Phase 3: Build</b><br/>developer loads: development, typescript/vue, clean-code"]
+    P4["<b>Phase 4: Review</b><br/>reviewer loads: review, cso, vulnerability-scanner"]
+    P5["<b>Phase 5: Ship</b><br/>shipper loads: ship, careful, document-release"]
+    P6["<b>Phase 6: Reflect</b><br/>documenter loads: documentation, memory<br/>analyst loads: memory"]
+
+    T --> P0 --> P1 --> P2 --> P3 --> P4 --> P5 --> P6
 ```
 
 ## Agent → Skills Mapping
@@ -134,16 +118,13 @@ flowchart TD
 
 Most skills enforce a plan-first gate: before doing significant work they check that an approved plan exists.
 
-```
-Task arrives
-     │
-     ▼
-Plan exists? ──No──→ Create plan ──→ ✋ Gate 1 (human approval)
-     │                                       │
-    Yes ◄──────────────────────────── Approved
-     │
-     ▼
-Proceed with implementation
+```mermaid
+flowchart TD
+    A["Task arrives"] --> B{"Plan exists?"}
+    B -->|No| C["Create plan"]
+    C --> D["GATE 1 — human approval"]
+    D -->|Approved| E["Proceed with implementation"]
+    B -->|Yes| E
 ```
 
 Skills that enforce this gate:
@@ -184,7 +165,7 @@ SKILL.md frontmatter supports advisory fields for humans and downstream tooling.
 
 | Field            | Values                                         | Meaning                                                                                                                                                                                          |
 | ---------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `preamble-tier`  | `1 \| 2 \| 3`                                  | Context-injection priority. 3 = injected before other context. Used by 21 skills (benchmark, elicit, evaluate, harness, plan-creator, rubric, sprint-contract, trace-analyze, validate-plan, …). |
+| `preamble-tier`  | `1 \| 2 \| 3`                                  | Context-injection priority. 3 = injected before other context. Set by the skills whose preambles must load first: benchmark, elicit, evaluate, harness, plan-creator, rubric, sprint-contract, trace-analyze, validate-plan, and others. |
 | `user-invocable` | `true` (default) / `false`                     | `false` = internal sub-skill, orchestrator-invoked only. Currently set on `mk:scale-routing`.                                                                                                    |
 | `phase`          | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6 \| on-demand` | Workflow phase anchor. `on-demand` = invoked by need, not by phase.                                                                                                                              |
 | `trust_level`    | `kit-authored \| third-party`                  | Provenance marker. Third-party skills treat external input as DATA per `injection-rules.md`.                                                                                                     |
@@ -194,10 +175,10 @@ SKILL.md frontmatter supports advisory fields for humans and downstream tooling.
 
 Complex skills decompose into JIT-loaded step files instead of one monolithic SKILL.md:
 
-```
+```files
 skills/mk:review/
-├── SKILL.md           # Entrypoint — metadata only, no workflow
-├── workflow.md        # Step sequence definition
+├── SKILL.md (entrypoint — metadata only, no workflow)
+├── workflow.md (step sequence definition)
 ├── step-01-blind-review.md
 ├── step-02-edge-cases.md
 ├── step-03-criteria-audit.md

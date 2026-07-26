@@ -5,7 +5,7 @@ description: "Capture, gate, and query long-term project knowledge via the gated
 
 # mk:wiki
 
-Long-term, gated, queryable project knowledge. Canonical pages live under `tasks/wikis/<slug>/`; a derived rebuildable FTS index lives in `.meowkit/memory/wiki-index.db`.
+Long-term, gated, queryable project knowledge. Canonical pages live under `tasks/wikis/<slug>/`; a derived rebuildable FTS index lives in `.meowkit/cache/wiki-index.db`.
 
 ## Core rule
 

@@ -1,10 +1,10 @@
 # Capture Architecture
 
-> Canonical contract for how memory entries reach `.claude/memory/` topic files. Read this BEFORE adding any `##pattern:` / `##decision:` / `##note:` instruction to an agent or skill.
+> Canonical contract for how memory entries reach `.meowkit/memory/` topic files. Read this BEFORE adding any `##pattern:` / `##decision:` / `##note:` instruction to an agent or skill.
 
 ## Two Paths — One Source of Truth
 
-There are exactly **two** mechanisms that write to `.claude/memory/`. They are not interchangeable. Picking the wrong one means the entry is silently lost.
+There are exactly **two** mechanisms that write to `.meowkit/memory/`. They are not interchangeable. Picking the wrong one means the entry is silently lost.
 
 ### Path 1 — Human-typed `##prefix:` (the keyboard shortcut)
 

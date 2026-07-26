@@ -1,0 +1,75 @@
+---
+title: "Step 3 — Tech feasibility breakdown (pre-ticket)"
+description: "A read-only scan with mk:scout and mk:docs-finder that catches 'this needs a refactor first' or 'we already shipped this' before anything gets filed and estimated."
+---
+
+Before tickets exist, do a **read-only feasibility pass** against the codebase. The goal is to catch "this can't be built without a refactor first" or "we already shipped this" _before_ tickets get filed and estimated.
+
+<Callout title="What MeowKit actually supports here" type="warn">
+
+Two skills run **before** any Jira ticket exists: `mk:scout` (codebase fingerprint) and `mk:docs-finder` (external API/library docs). That's it.
+
+`mk:planning-engine` — the deeper tech-review skill — **requires Jira ticket keys** (`review TICKET-KEY` or `plan --tickets KEY,KEY,...`). So MeowKit's auto-mapping of spec requirements to specific files happens in **Step 7**, _after_ tickets exist. Step 3 is the pre-ticket scan that fits between "what the PM wants" and "what we'll commit to build."
+
+Anything more automated than `mk:scout` + human cross-read at this stage would be speculative — there's no MeowKit skill that ingests a Spec Research Report and emits per-file impact without ticket keys.
+
+</Callout>
+
+## Prompt
+
+```bash
+/mk:scout authentication oauth session
+# Cross-read the Spec Research Report against scout output. Then:
+/mk:docs-finder "Google OAuth 2.0 — current scopes + PKCE requirements"
+```
+
+## What happens behind the scenes
+
+| Layer                | Action                                                                                                                                                                                                                                                                                                                              | Skill            |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| Codebase fingerprint | Spawns parallel Explore subagents per directory segment; consolidates into a file map with architecture sketch, complexity estimates, and routing suggestions. Cached for downstream skills.                                                                                                                                        | `mk:scout`       |
+| External docs check  | For any third-party API/library named in the spec (OAuth providers, SDKs, etc.), pulls current docs via Context7 / Context Hub. Avoids planning against outdated training data.                                                                                                                                                     | `mk:docs-finder` |
+| Spec cross-read      | **You** read the Spec Research Report's `## Suggested User Stories` section next to the scout output, then decide whether the scope is feasible as-is, needs splitting, or hits an unblockable gap (e.g. "we don't have a session middleware yet"). | Human — no skill |
+
+## Sample output (scout, abridged)
+
+```
+Architecture sketch
+  Stack: NestJS + Vue 3 + Postgres
+  Auth surface: src/auth/ — already has GitHubOAuthService (plugin pattern)
+  Session middleware: src/auth/session.middleware.ts — currently fixed 24h
+  Test runner: vitest
+
+Files relevant to spec keywords
+  src/auth/oauth.controller.ts          (provider plugin pattern entry)
+  src/auth/github-oauth.service.ts      (reference impl)
+  src/auth/session.middleware.ts        (fixed expiry — needs change)
+  src/users/users.module.ts             (no OAuth fields yet)
+
+Gaps detected
+  No PKCE helper exists in the codebase (would be new code for Google's 2026 req)
+```
+
+## Feasibility decisions you make here
+
+After cross-reading the Spec Research Report against the scout output:
+
+| Spec story                           | Feasibility                                                           | Decision                                                    |
+| ------------------------------------ | --------------------------------------------------------------------- | ----------------------------------------------------------- |
+| "Sign in with Google"                | HIGH — OAuth plugin pattern exists; just add a provider               | Create ticket as-is                                         |
+| "Sliding 24h session"                | MEDIUM — middleware exists but uses fixed expiry; needs refactor      | Create ticket; flag dependency before "Sign in with Google" |
+| "OAuth users can add password later" | LOW — users table has no OAuth-provider column; separate model change | Defer to a follow-up sprint; flag with PM                   |
+
+<Callout title="Why this step exists separately from Step 7" type="info">
+
+Step 7's `mk:planning-engine review` produces a per-ticket Tech Review Report — but it needs a ticket key. If a requirement is infeasible against the current codebase, you want to know **before** it becomes a ticket that the team gets pressured to commit to. This Step 3 scan is the only chance.
+
+</Callout>
+
+## What you carry forward
+
+A short, hand-written set of notes (kept in the Spec Research Report or a follow-up Confluence comment) that says, per suggested story: _feasibility level + any structural prerequisite_. These notes inform Step 4 (ticket creation) and resurface in Step 7 (per-ticket review) for confirmation.
+
+---
+
+Previous: [Step 2 — Send open questions back to the PM](/workflows/spec-to-pr-walkthrough/step-02-open-questions) · Next: [Step 3.5 — Story sizing](/workflows/spec-to-pr-walkthrough/step-03-5-story-sizing) · [All steps](/workflows/spec-to-pr-walkthrough)

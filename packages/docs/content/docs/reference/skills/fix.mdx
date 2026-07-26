@@ -3,6 +3,17 @@ title: "mk:fix"
 description: "Structured bug investigation — auto-complexity detection, root cause analysis, mandatory regression tests."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/fix/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/fix/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | high |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Structured debugging pipeline. Instead of immediately editing code, it forces structured investigation: assess complexity, find root cause, write a regression test, apply the minimal fix. Auto-detects complexity — a typo gets a quick fix, a race condition gets full investigation.
@@ -19,7 +30,7 @@ Structured debugging pipeline. Instead of immediately editing code, it forces st
 - **Mandatory scout + diagnose:** Never fixes before understanding the codebase and confirming root cause with evidence
 - **Complexity auto-detection:** Classifies as Simple (single file), Moderate (multi-file), Complex (system-wide), or Parallel (2+ independent issues)
 - **Regression test enforcement:** Every fix must include a test that fails without the fix and passes with it
-- **Fix memory:** Reads `.claude/memory/fixes.md` and `fixes.json` for prior patterns — repeated bugs become instant fixes
+- **Fix memory:** Reads `.meowkit/memory/fixes.md` and `fixes.json` for prior patterns — repeated bugs become instant fixes
 - **Defense-in-depth:** After fixing, applies prevention measures: entry validation, business logic guards, error handling, type safety
 - **Workflow evidence index:** for standalone standard/complex fixes, writes `.claude/session-state/evidence/<slug>/workflow-evidence.json` indexing risk flags (from `risk-checklist.md`), the six root-cause fields, verification commands, and approvals. Traceability only — it **never approves**, carries no score, and is distinct from the durable `fixes.json` memory store. Validated before the approval prompt
 - **Mode selection:** `--auto` (default, auto-fixes then stops at *ready for user approval* — never self-approves), `--review` (human-in-the-loop), `--quick` (fast cycle), `--parallel` (per-issue agents), `--tdd` (regression test before fix)
@@ -67,7 +78,7 @@ If no mode flag: `AskUserQuestion` (Autonomous / Human-in-the-loop / Quick). Aut
 
 ## Step 0.5 — Check fix memory
 
-Read `.claude/memory/fixes.md` and `fixes.json` for prior patterns. Search for similar symptoms, error messages, or affected modules. If a matching fix pattern exists → use as starting hypothesis. If a matching success pattern exists → apply known fix approach directly. This turns repeated bugs into instant fixes.
+Read `.meowkit/memory/fixes.md` and `fixes.json` for prior patterns. Search for similar symptoms, error messages, or affected modules. If a matching fix pattern exists → use as starting hypothesis. If a matching success pattern exists → apply known fix approach directly. This turns repeated bugs into instant fixes.
 
 ## Step 1 — Scout (MANDATORY)
 

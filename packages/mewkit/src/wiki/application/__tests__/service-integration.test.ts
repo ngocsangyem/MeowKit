@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, rm, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { WikiService } from "../service.js";
 import { searchWiki } from "../queries.js";
@@ -38,16 +38,14 @@ describe("WikiService end-to-end (real adapters)", () => {
 	it("creates → proposes → approves into a canonical page + FTS row", async () => {
 		const root = await mkdtemp(join(tmpdir(), "wiki-e2e-"));
 		tempDirs.push(root);
-		const claudeDir = join(root, ".claude");
-		await mkdir(join(claudeDir, "memory"), { recursive: true });
-		buildIndex(claudeDir); // create the index schema
+		buildIndex(root); // create the index schema
 
 		const slug = makeWikiSlug("demo");
 		const svc = new WikiService({
 			repo: new MarkdownWikiRepository(root),
 			scanner: new ScannerAdapter(),
-			index: new SqliteWikiIndex(dbPath(claudeDir)),
-			tracer: new TraceAdapter(claudeDir),
+			index: new SqliteWikiIndex(dbPath(root)),
+			tracer: new TraceAdapter(root),
 		});
 
 		svc.createWiki(slug, "Demo Wiki");
@@ -75,7 +73,7 @@ describe("WikiService end-to-end (real adapters)", () => {
 		expect(md).toContain("approvedBy: alice");
 
 		// Indexed + searchable.
-		const hits = searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), "salience");
+		const hits = searchWiki(new SqliteWikiIndex(dbPath(root)), "salience");
 		expect(hits.length).toBe(1);
 		expect(hits[0]!.slug).toBe("demo");
 	});
@@ -86,15 +84,13 @@ describe("WikiService end-to-end (real adapters)", () => {
 		// migrating → `Fatal: no such table: wiki_page`. NO buildIndex() here on purpose.
 		const root = await mkdtemp(join(tmpdir(), "wiki-e2e-"));
 		tempDirs.push(root);
-		const claudeDir = join(root, ".claude");
-		await mkdir(join(claudeDir, "memory"), { recursive: true });
 
 		const slug = makeWikiSlug("demo");
 		const svc = new WikiService({
 			repo: new MarkdownWikiRepository(root),
 			scanner: new ScannerAdapter(),
-			index: new SqliteWikiIndex(dbPath(claudeDir)),
-			tracer: new TraceAdapter(claudeDir),
+			index: new SqliteWikiIndex(dbPath(root)),
+			tracer: new TraceAdapter(root),
 		});
 
 		svc.createWiki(slug, "Demo Wiki");
@@ -113,7 +109,7 @@ describe("WikiService end-to-end (real adapters)", () => {
 		expect(() => svc.approveCandidate(slug, candidate!.id, "alice")).not.toThrow();
 		expect(existsSync(join(root, "tasks", "wikis", "demo", "pages", "salience-rubric.md"))).toBe(true);
 
-		const hits = searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), "salience");
+		const hits = searchWiki(new SqliteWikiIndex(dbPath(root)), "salience");
 		expect(hits.length).toBe(1);
 	});
 
@@ -122,27 +118,26 @@ describe("WikiService end-to-end (real adapters)", () => {
 		// search/list open it read-only and cannot migrate, so they must degrade to [] not throw.
 		const root = await mkdtemp(join(tmpdir(), "wiki-e2e-"));
 		tempDirs.push(root);
-		const claudeDir = join(root, ".claude");
-		await mkdir(join(claudeDir, "memory"), { recursive: true });
-		// Create an empty (schema-less) but valid DB file, mimicking the stale-DB state.
-		new DatabaseSync(dbPath(claudeDir)).close();
 
-		expect(() => searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), "anything")).not.toThrow();
-		expect(searchWiki(new SqliteWikiIndex(dbPath(claudeDir)), "anything")).toEqual([]);
+		// Create an empty (schema-less) but valid DB file, mimicking the stale-DB state.
+		await mkdir(dirname(dbPath(root)), { recursive: true });
+		new DatabaseSync(dbPath(root)).close();
+
+		expect(() => searchWiki(new SqliteWikiIndex(dbPath(root)), "anything")).not.toThrow();
+		expect(searchWiki(new SqliteWikiIndex(dbPath(root)), "anything")).toEqual([]);
 	});
 
 	it("a secret in the proposed content is scrubbed out of the canonical page", async () => {
 		const root = await mkdtemp(join(tmpdir(), "wiki-e2e-"));
 		tempDirs.push(root);
-		const claudeDir = join(root, ".claude");
-		await mkdir(join(claudeDir, "memory"), { recursive: true });
-		buildIndex(claudeDir);
+
+		buildIndex(root);
 		const slug = makeWikiSlug("demo");
 		const svc = new WikiService({
 			repo: new MarkdownWikiRepository(root),
 			scanner: new ScannerAdapter(),
-			index: new SqliteWikiIndex(dbPath(claudeDir)),
-			tracer: new TraceAdapter(claudeDir),
+			index: new SqliteWikiIndex(dbPath(root)),
+			tracer: new TraceAdapter(root),
 		});
 		svc.createWiki(slug, "Demo");
 		const { candidate } = svc.proposeCandidate({

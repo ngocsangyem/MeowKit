@@ -47,8 +47,8 @@ branch name wherever the instructions say "the base branch."
 |-----------|---------|-----------------:|
 | Target URL | (auto-detect or required) | `https://myapp.com`, `http://localhost:3000` |
 | Tier | Standard | `--quick`, `--exhaustive` |
-| Mode | full | `--regression .claude/memory/qa-reports/baseline.json` |
-| Output dir | `.claude/memory/qa-reports/` | `Output to /tmp/qa` |
+| Mode | full | `--regression .meowkit/memory/qa-reports/baseline.json` |
+| Output dir | `.meowkit/memory/qa-reports/` | `Output to /tmp/qa` |
 | Scope | Full app (or diff-scoped) | `Focus on the billing page` |
 | Auth | None | `Sign in to user@example.com`, `Import cookies from cookies.json` |
 
@@ -114,7 +114,7 @@ If `NEEDS_SETUP`:
 ls jest.config.* vitest.config.* playwright.config.* .rspec pytest.ini pyproject.toml phpunit.xml 2>/dev/null
 ls -d test/ tests/ spec/ __tests__/ cypress/ e2e/ 2>/dev/null
 # Check opt-out marker
-[ -f .claude/memory/no-test-bootstrap ] && echo "BOOTSTRAP_DECLINED"
+[ -f .meowkit/state/no-test-bootstrap ] && echo "BOOTSTRAP_DECLINED"
 ```
 
 **If test framework detected** (config files or test directories found):
@@ -127,7 +127,7 @@ Store conventions as prose context for use in Phase 8e.5 or Step 3.4. **Skip the
 **If NO runtime detected** (no config files found): Use AskUserQuestion:
 "I couldn't detect your project's language. What runtime are you using?"
 Options: A) Node.js/TypeScript B) Ruby/Rails C) Python D) Go E) Rust F) PHP G) Elixir H) This project doesn't need tests.
-If user picks H → write `.claude/memory/no-test-bootstrap` and continue without tests.
+If user picks H → write `.meowkit/state/no-test-bootstrap` and continue without tests.
 
 **If runtime detected but no test framework — bootstrap:**
 
@@ -159,7 +159,7 @@ B) [Alternative] — [rationale]. Includes: [packages]
 C) Skip — don't set up testing right now
 RECOMMENDATION: Choose A because [reason based on project context]"
 
-If user picks C → write `.claude/memory/no-test-bootstrap`. Tell user: "If you change your mind later, delete `.claude/memory/no-test-bootstrap` and re-run." Continue without tests.
+If user picks C → write `.meowkit/state/no-test-bootstrap`. Tell user: "If you change your mind later, delete `.meowkit/state/no-test-bootstrap` and re-run." Continue without tests.
 
 If multiple runtimes detected (monorepo) → ask which runtime to set up first, with option to do both sequentially.
 
@@ -250,17 +250,17 @@ Only commit if there are changes. Stage all bootstrap files (config, test direct
 ## Create Output Directories
 
 ```bash
-mkdir -p .claude/memory/qa-reports/screenshots
+mkdir -p .meowkit/memory/qa-reports/screenshots
 ```
 
 ## Test Plan Context
 
 Before falling back to git diff heuristics, check for richer test plan sources:
 
-1. **Project-scoped test plans:** Check `.claude/memory/projects/` for recent `*-test-plan-*.md` files for this repo
+1. **Project-scoped test plans:** Check `.meowkit/memory/projects/` for recent `*-test-plan-*.md` files for this repo
    ```bash
    eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
-   ls -t .claude/memory/projects/*-test-plan-*.md 2>/dev/null | head -1
+   ls -t .meowkit/memory/projects/*-test-plan-*.md 2>/dev/null | head -1
    ```
 2. **Conversation context:** Check if a prior `/mk:plan-ceo-review` or `/mk:plan-ceo-review` produced test plan output in this conversation
 3. **Use whichever source is richer.** Fall back to git diff analysis only if neither is available.

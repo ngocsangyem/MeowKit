@@ -7,7 +7,7 @@
 # Ensure CWD is project root for relative paths
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then cd "$CLAUDE_PROJECT_DIR" || exit 0; fi
 
-# Load .claude/.env (each hook is a separate subprocess).
+# Load .meowkit/.env (each hook is a separate subprocess).
 # The `[ -f ]` guard is load-bearing: `.` is a POSIX special builtin, so sourcing
 # a MISSING file aborts the whole script — `2>/dev/null || true` does not catch
 # it. That would kill this hook before the Gate 2 check below ever runs, and an
@@ -57,7 +57,7 @@ else
 fi
 
 # Hook profile gating — skip pre-deploy checks in fast profile
-MEOW_PROFILE="${MEOW_HOOK_PROFILE:-standard}"
+MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 case "$MEOW_PROFILE" in
   fast) exit 0 ;;
 esac

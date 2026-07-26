@@ -11,7 +11,7 @@ MeowKit didn't emerge from a vacuum. It was inspired by and builds upon ideas fr
 - **[Gstack](https://github.com/garrytan/gstack)** — a comprehensive skill collection featuring headless browser automation, QA testing, and the ethos of "search before building" that shaped MeowKit's research-first approach.
 - **[Aura-frog](https://github.com/nguyenthienthanh/aura-frog)** — an autonomous agent framework whose multi-agent coordination patterns and self-healing concepts influenced MeowKit's agent architecture and escalation protocols.
 
-MeowKit takes these foundations and adds **enforced discipline** — hard gates that block, TDD that's mandatory not optional, and security scanning baked into every workflow. The goal isn't to replace these projects but to push the idea further: what happens when best practices aren't suggestions but requirements?
+MeowKit takes these foundations and adds **enforced discipline** — hard gates that block, opt-in strict TDD, and security scanning baked into every workflow. The goal isn't to replace these projects but to push the idea further: what happens when best practices aren't suggestions but requirements?
 
 ## The problem with unstructured AI coding
 
@@ -27,7 +27,7 @@ This works for toy projects. For production code, it creates a whack-a-mole cycl
 
 ## MeowKit's thesis
 
-> AI agents need enforced discipline — hard gates, TDD, security scanning, and human approval — to ship production-quality code.
+> AI agents need enforced discipline — hard gates, security scanning, and human approval — to ship production-quality code. Strict red-first TDD is opt-in: turn it on with `--tdd` or `MEOWKIT_TDD=1`. High-risk work passes the planning, review, and security gates either way.
 
 The key word is **enforced**. Not "recommended." Not "best practice." Enforced through hooks that block, gates that require approval, and rules that cannot be overridden.
 
@@ -89,11 +89,11 @@ Every step is visible. Every claim is verified. The fix is tested, reviewed, and
 
 ## A note on usage
 
-MeowKit is an open-source, community-driven project — **not intended for commercial use**. It exists to push the boundaries of what disciplined AI coding agents can do, and to share those learnings freely.
+MeowKit is an open-source, community-driven project released under the MIT license. It exists to push the boundaries of what disciplined AI coding agents can do, and to share those learnings freely.
 
 All contributions are welcome. Whether it's a new skill, a bug fix, a documentation improvement, or a wild idea for a new agent workflow — open a PR and let's build together.
 
 ## Next steps
 
 - [Installation](/installation) — get started in 2 minutes
-- [Philosophy](/guide/philosophy) — deeper dive into MeowKit's principles
+- [What Is MeowKit](/core-concepts/what-is-meowkit) — deeper dive into MeowKit's principles

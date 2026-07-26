@@ -48,16 +48,22 @@ try {
     fs.unlinkSync(archivePath);
   }
 
-  const archiveTargets = [".claude", "tasks", "CLAUDE.md", "release-manifest.json"].filter((t) =>
-    fs.existsSync(path.join(projectRoot, t)),
-  );
+  // `.meowkit/pack-manifest.json` is named as a single file, never as a directory: the rest
+  // of `.meowkit/` is per-project state including `.env`, and must never reach an archive.
+  const archiveTargets = [
+    ".claude",
+    "tasks",
+    "CLAUDE.md",
+    "release-manifest.json",
+    path.join(".meowkit", "pack-manifest.json"),
+  ].filter((t) => fs.existsSync(path.join(projectRoot, t)));
 
   if (archiveTargets.length === 0) {
     throw new Error("No release assets found");
   }
 
   // Validate critical assets
-  for (const critical of [".claude", "release-manifest.json"]) {
+  for (const critical of [".claude", "release-manifest.json", path.join(".meowkit", "pack-manifest.json")]) {
     if (!fs.existsSync(path.join(projectRoot, critical))) {
       throw new Error(`Critical asset missing: ${critical}`);
     }
@@ -76,6 +82,13 @@ try {
     // metadata.json, but a local install might leave one behind).
     "-x", ".claude/metadata.json",
     "-x", ".claude/.env",
+    // Belt and braces around naming a path inside the state root: nothing else in
+    // `.meowkit/` may enter the archive even if a target is later widened.
+    "-x", ".meowkit/.env",
+    "-x", ".meowkit/memory/*",
+    "-x", ".meowkit/cache/*",
+    "-x", ".meowkit/telemetry/*",
+    "-x", ".meowkit/metadata.json",
     "-x", "*.pyc",
     "-x", "__pycache__/*",
   ];

@@ -33,7 +33,7 @@ Use `/mk:autobuild` when you want to build a new product or substantial green-fi
 ## Prerequisites
 
 - Opus 4.5+ recommended (Sonnet works with FULL density, Haiku short-circuits to `mk:cook`)
-- If on Opus 4.6+, set `export MEOWKIT_MODEL_HINT=opus-4-6` before starting Claude Code — enables LEAN auto-detect
+- Density detection is automatic when the host sends a model at SessionStart. Set `MEOWKIT_MODEL_HINT` only as a fallback or to force a tier — see [Adaptive Density](/guide/adaptive-density)
 - Budget awareness: use `--budget 50` or `export MEOWKIT_BUDGET_CAP=50` for long runs
 - MeowKit v2.2.0+ installed (`npx mewkit doctor` to verify)
 
@@ -43,7 +43,7 @@ Use `/mk:autobuild` when you want to build a new product or substantial green-fi
 /mk:autobuild "build a kanban app"
 ```
 
-That's it. The harness reads `MEOWKIT_MODEL_HINT`, selects density, and runs the full pipeline.
+That's it. The harness detects your model, selects density, and runs the full pipeline.
 
 ## Worked Example: Kanban App
 
@@ -55,10 +55,10 @@ This walks through what actually happens when you run:
 
 ### Step 0 — Density Auto-Select
 
-The harness reads `MEOWKIT_MODEL_HINT` and the model tier:
+The harness classifies the detected model into a tier:
 
 ```
-mk:autobuild: model hint = opus-4-6 → tier = COMPLEX → density = LEAN
+mk:autobuild: model = opus-4-6 → tier = COMPLEX → density = LEAN
 Scaffolding: single-session, contract optional, 0–1 evaluator iterations
 Run ID: harness-260408-1423-kanban
 ```
@@ -167,7 +167,7 @@ A score ≥ 0.70 per rubric is PASS. Hard-fail threshold is configurable per rub
 ## Troubleshooting
 
 **"Density auto-detected as FULL but I'm on Opus 4.6"**  
-Claude Code does not export model env vars to hooks. Set `export MEOWKIT_MODEL_HINT=opus-4-6` in your shell before running `claude`. Then restart Claude Code. Without the hint, Opus 4.6 silently gets FULL density.
+Detection reads the `model` field from SessionStart stdin. If your Claude Code build does not send that field, `model-detector.cjs` reports "not detected" and falls back to `MEOWKIT_MODEL_HINT`. Set `export MEOWKIT_MODEL_HINT=opus-4-6` in your shell, restart Claude Code, and the tier resolves from the hint.
 
 **"Budget breach at iteration 2"**  
 Pass a lower cap: `/mk:autobuild "..." --budget 30`. Or re-scope the product spec to fewer features — the planner's product-level output drives total work. `/mk:autobuild --no-boot` on an existing scaffold also reduces Phase 3 cost.

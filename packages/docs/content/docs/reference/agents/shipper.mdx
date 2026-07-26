@@ -3,6 +3,18 @@ title: "shipper"
 description: "Deployment pipeline agent — executes the full ship sequence from pre-checks through PR creation, CI verification, and rollback documentation."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/shipper.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/shipper.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | high |
+| **Writes** | `docs/project-context.md`, `tasks/reviews/YYMMDD-name-verdict.md` |
+
+{/* GENERATED:reference-facts END */}
+
 The shipper is your deployment specialist. Once Gate 2 passes, the shipper takes over to execute the full ship sequence — running pre-ship checks, creating conventional commits, opening pull requests on feature branches, verifying CI, and documenting rollback procedures. It never commits directly to main.
 
 ## Cognitive Framing

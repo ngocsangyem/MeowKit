@@ -3,6 +3,17 @@ title: "mk:cook"
 description: "End-to-end feature pipeline — plan, test, build, review, ship. TDD is opt-in via --tdd."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/cook/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/cook/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | critical |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Primary entry point for building features. Given a description or plan path, orchestrates the full 7-phase pipeline. TDD is opt-in via `--tdd`. For green-field product builds, use `mk:autobuild` instead.
@@ -17,7 +28,7 @@ Primary entry point for building features. Given a description or plan path, orc
 
 ## Core Capabilities
 
-- **7-phase pipeline:** Orient → Plan → Test → Build → Simplify → Verify → Review → Ship → Reflect
+- **Full pipeline:** drives all seven phases, including the mandatory Simplify and Verify stages inside Build — see [Workflow Phases](/core-concepts/workflow)
 - **TDD mode:** Opt-in via `--tdd` — writes failing tests before implementation, enforces RED-GREEN-REFACTOR
 - **Smart intent detection:** Auto-routes to the correct mode based on input patterns (plan path, "fast", "parallel", "auto")
 - **Workflow modes:** interactive (default), auto, fast, parallel, no-test, code — with modifier flags `--verify`, `--strict`, `--no-strict`
@@ -123,7 +134,7 @@ After Phase 3 GREEN: run `mk:simplify` to reduce complexity before review. Then 
 - Code mode on stale plans — warn if plan >14 days old
 - Fast mode shallow coverage — skipping research means plan-level tests only
 - Missing model tier declaration — always declare in Phase 0
-- Forgetting memory read/write — Phase 0 reads `.claude/memory/`, Phase 6 appends
+- Forgetting memory read/write — Phase 0 reads `.meowkit/memory/`, Phase 6 appends
 - `--strict` cost surprise — auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress
 - Skipping Gate 1 on "simple" features — features that seem simple grow during implementation. Always create a plan file; cancel it if truly trivial
 - Subagent patterns using Agent() not Task() — Task() enables tracking, blocking, and progress. Always use Task() for phases 2-6

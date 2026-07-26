@@ -3,6 +3,17 @@ title: "mk:cso"
 description: "Chief Security Officer — infrastructure-first security audit. Two modes: daily (zero-noise, 8/10 confidence gate) and comprehensive (monthly deep scan, 2/10 bar). Covers secrets archaeology, dependency supply chain, CI/CD pipeline, LLM/AI security, OWASP Top 10, STRIDE threat modeling, and active verification."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/cso/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/cso/SKILL.md) |
+| **Owner** | `security` |
+| **Runtime** | `claude-code` |
+| **Risk** | high |
+
+{/* GENERATED:reference-facts END */}
+
 Chief Security Officer mode (v2). Infrastructure-first security audit that thinks like an attacker but reports like a defender. Produces a Security Posture Report with concrete findings, severity ratings, exploit scenarios, and remediation plans. Does NOT make code changes.
 
 ## What This Skill Does
@@ -74,7 +85,7 @@ Scope flags are **mutually exclusive**. If multiple scope flags are passed, the 
 | 11 | Data Classification | PII/credentials in logs, data at rest, data in transit |
 | 12 | False Positive Filtering | 22 hard-exclusion rules + confidence gate + active verification + variant analysis |
 | 13 | Report + Remediation | Findings with exploit scenarios, trend tracking, incident response playbooks, remediation roadmap |
-| 14 | Save Report | JSON schema to `.claude/memory/security-reports/` |
+| 14 | Save Report | JSON schema to `.meowkit/memory/security-reports/` |
 
 Phases 0, 1, 12, 13, 14 ALWAYS run regardless of scope flag.
 
@@ -149,7 +160,7 @@ For the top 5 findings, presents via AskUserQuestion with options: Fix now (spec
 5. **Assessment** -- OWASP Top 10 + STRIDE + data classification (Phases 9-11)
 6. **Filtering** -- false positive elimination, confidence gate, active verification, variant analysis (Phase 12)
 7. **Report** -- findings with exploit scenarios, trend tracking, remediation roadmap, disclaimer (Phase 13)
-8. **Save** -- JSON report to `.claude/memory/security-reports/` (Phase 14)
+8. **Save** -- JSON report to `.meowkit/memory/security-reports/` (Phase 14)
 
 ## Usage
 

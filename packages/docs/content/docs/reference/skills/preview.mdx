@@ -3,6 +3,18 @@ title: "mk:preview"
 description: "Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, and git diffs. Display only; not for plan rendering or plan critique."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/preview/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/preview/SKILL.md) |
+| **Owner** | `docs` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+| **Phase** | `on-demand` |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Generates visual artifacts — markdown and self-contained HTML files — for explaining code, drawing diagrams, building slide decks, and visualizing git diffs. Rendering a plan as HTML belongs to `mk:visual-plan`. No live server, no Python, no D3. Pure markdown + HTML + bash file ops. Output writes to `tasks/plans/{active-plan}/visuals/` when an active plan exists, otherwise falls back to `tasks/visuals/`.

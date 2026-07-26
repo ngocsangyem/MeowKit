@@ -1,0 +1,40 @@
+---
+title: "Review"
+description: "Run a resumable multi-pass review, and check a verdict."
+---
+
+Review is a sequence of steps with a session id rather than one long command, so a review of a large change can be picked up where it stopped.
+
+## review
+
+Drive a multi-pass pull-request review as a sequence of resumable steps, so a long review
+survives a lost session.
+
+```bash
+npx mewkit review prepare <target> [--remote <name>] [--json]
+npx mewkit review read <target> --session <id> --as <persona>
+npx mewkit review coverage --session <id> [--json]
+npx mewkit review compose --session <id> [--json]
+npx mewkit review submit --session <id> [--reply] [--confirm <value>] [--json]
+npx mewkit review cleanup --session <id> [--json]
+```
+
+| Subcommand | What it does |
+| --- | --- |
+| `prepare` | Fetch the target and open a review session |
+| `read` | Read the diff as one named persona |
+| `coverage` | Report which files and personas have been covered so far |
+| `compose` | Assemble the collected findings into a single review |
+| `submit` | Post the review; `--confirm` guards the irreversible step |
+| `cleanup` | Close the session and remove its working state |
+
+Every subcommand after `prepare` takes the `--session` id that `prepare` returned. That id is
+the whole point: reviewing a large PR across several sittings does not restart from nothing.
+
+## verdict-gate
+
+Gate 2 proof-bundle check. Reads a machine-readable review verdict and exits `0` (PASS / PASS_WITH_RISK or a tolerated legacy markdown-only verdict), `1` (BLOCKED / invalid / missing), or `2` (usage error).
+
+```bash
+npx mewkit verdict-gate <slug | path-to-verdict.json>
+```

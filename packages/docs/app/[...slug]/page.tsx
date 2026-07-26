@@ -3,6 +3,7 @@ import {
   DocsDescription,
   DocsPage,
   DocsTitle,
+  MarkdownCopyButton,
   ViewOptionsPopover,
 } from 'fumadocs-ui/layouts/docs/page';
 import { notFound } from 'next/navigation';
@@ -23,13 +24,19 @@ export default async function Page(props: PageParams) {
 
   const MDX = page.data.body;
 
+  // Both page actions read the same source: `/:path*.md` is rewritten in next.config.mjs to the
+  // per-page llms route, so the copied Markdown is byte-identical to what the "Open" targets and
+  // to what agents fetch. One URL, no second rendering path to drift.
+  const markdownUrl = `${page.url}.md`;
+
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <BreadcrumbJsonLd slug={params.slug} />
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <div className="flex flex-row items-center gap-2 border-b border-fd-border pb-4">
-        <ViewOptionsPopover markdownUrl={`${page.url}.md`} />
+        <MarkdownCopyButton markdownUrl={markdownUrl} />
+        <ViewOptionsPopover markdownUrl={markdownUrl} />
       </div>
       <DocsBody>
         <MDX components={getMDXComponents({ a: createRelativeLink(source, page) })} />

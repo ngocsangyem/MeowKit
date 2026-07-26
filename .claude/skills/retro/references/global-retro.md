@@ -242,7 +242,7 @@ Considering the full cross-project picture.
 ## Global Step 8: Load history & compare
 
 ```bash
-ls -t .claude/memory/retros/global-*.json 2>/dev/null | head -5
+ls -t .meowkit/memory/retros/global-*.json 2>/dev/null | head -5
 ```
 
 **Only compare against a prior retro with the same `window` value** (e.g., 7d vs 7d). If the most recent prior retro has a different window, skip comparison and note: "Prior global retro used a different window — skipping comparison."
@@ -254,17 +254,17 @@ If no prior global retros exist, append: "First global retro recorded — run ag
 ## Global Step 9: Save snapshot
 
 ```bash
-mkdir -p .claude/memory/retros
+mkdir -p .meowkit/memory/retros
 ```
 
 Determine the next sequence number for today:
 ```bash
 today=$(date +%Y-%m-%d)
-existing=$(ls .claude/memory/retros/global-${today}-*.json 2>/dev/null | wc -l | tr -d ' ')
+existing=$(ls .meowkit/memory/retros/global-${today}-*.json 2>/dev/null | wc -l | tr -d ' ')
 next=$((existing + 1))
 ```
 
-Use the Write tool to save JSON to `.claude/memory/retros/global-${today}-${next}.json`:
+Use the Write tool to save JSON to `.meowkit/memory/retros/global-${today}-${next}.json`:
 
 ```json
 {

@@ -60,7 +60,7 @@ export function checkPacks(claudeDir: string, opts: { missingInfraSeverity?: Sta
 				detail:
 					status === "warn"
 						? "No pack-manifest.json — pack modularization not installed; run `mewkit upgrade`"
-						: "Missing .claude/pack-manifest.json",
+						: "Missing pack-manifest.json (.meowkit/, or .claude/ on a pre-move install)",
 				section: "Packs",
 			},
 		];

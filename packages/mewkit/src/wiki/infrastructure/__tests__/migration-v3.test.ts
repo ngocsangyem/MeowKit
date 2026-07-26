@@ -1,7 +1,7 @@
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildIndex, dbPath, ensureIndexSchema, queryIndex, SCHEMA_VERSION } from "../../../core/derived-index.js";
@@ -31,8 +31,7 @@ function page(id: string, title: string, body: string): string {
 async function makeV3Wiki(): Promise<string> {
 	const root = await mkdtemp(join(tmpdir(), "mewkit-v3-"));
 	tempDirs.push(root);
-	const claudeDir = join(root, ".claude");
-	await mkdir(join(claudeDir, "memory"), { recursive: true });
+	await mkdir(join(root, ".meowkit", "telemetry"), { recursive: true });
 	const dir = join(root, "tasks", "wikis", "demo");
 	await mkdir(join(dir, "pages"), { recursive: true });
 	await writeFile(join(dir, "wiki.json"), JSON.stringify({ slug: "demo", title: "Demo" }));
@@ -86,15 +85,14 @@ async function makeV3Wiki(): Promise<string> {
 			createdAt: "2026-06-29T00:00:00.000Z",
 		}) + "\n",
 	);
-	return claudeDir;
+	return root;
 }
 
 /** Aspire-shaped fixture: pages + candidate with EMPTY sourceIds, no sources, no handoffs. */
 async function makeAspireShapedWiki(): Promise<string> {
 	const root = await mkdtemp(join(tmpdir(), "mewkit-aspire-"));
 	tempDirs.push(root);
-	const claudeDir = join(root, ".claude");
-	await mkdir(join(claudeDir, "memory"), { recursive: true });
+	await mkdir(join(root, ".meowkit", "telemetry"), { recursive: true });
 	const dir = join(root, "tasks", "wikis", "aspire-cf");
 	await mkdir(join(dir, "pages"), { recursive: true });
 	await writeFile(join(dir, "wiki.json"), JSON.stringify({ slug: "aspire-cf", title: "Aspire CF" }));
@@ -115,7 +113,7 @@ async function makeAspireShapedWiki(): Promise<string> {
 			salience: { total: 10, components: {} },
 		}) + "\n",
 	);
-	return claudeDir;
+	return root;
 }
 
 function tableNames(file: string, names: string[]): string[] {
@@ -134,20 +132,20 @@ function tableNames(file: string, names: string[]): string[] {
 
 describe("migration v3 — fresh build", () => {
 	it("creates wiki_handoff + wiki_candidate_source exactly once, no duplicate-DDL error", async () => {
-		const claudeDir = await makeV3Wiki();
-		const res = buildIndex(claudeDir);
+		const root = await makeV3Wiki();
+		const res = buildIndex(root);
 		expect(res.schemaVersion).toBe(SCHEMA_VERSION);
-		expect(tableNames(dbPath(claudeDir), ["wiki_handoff", "wiki_candidate_source"])).toEqual([
+		expect(tableNames(dbPath(root), ["wiki_handoff", "wiki_candidate_source"])).toEqual([
 			"wiki_candidate_source",
 			"wiki_handoff",
 		]);
 	});
 
 	it("ingests handoffs.jsonl with salience flattened to total + json", async () => {
-		const claudeDir = await makeV3Wiki();
-		const res = buildIndex(claudeDir);
+		const root = await makeV3Wiki();
+		const res = buildIndex(root);
 		expect(res.wiki.handoffs).toBe(1);
-		const db = new DatabaseSync(dbPath(claudeDir), { readOnly: true });
+		const db = new DatabaseSync(dbPath(root), { readOnly: true });
 		try {
 			const row = db
 				.prepare(
@@ -171,10 +169,10 @@ describe("migration v3 — fresh build", () => {
 	});
 
 	it("backfills wiki_candidate_source from candidate sourceIds", async () => {
-		const claudeDir = await makeV3Wiki();
-		const res = buildIndex(claudeDir);
+		const root = await makeV3Wiki();
+		const res = buildIndex(root);
 		expect(res.wiki.candidateSources).toBe(2);
-		const db = new DatabaseSync(dbPath(claudeDir), { readOnly: true });
+		const db = new DatabaseSync(dbPath(root), { readOnly: true });
 		try {
 			const n = (
 				db.prepare("SELECT COUNT(*) AS n FROM wiki_candidate_source WHERE candidate_id = ?").get("demo/c1") as {
@@ -188,9 +186,9 @@ describe("migration v3 — fresh build", () => {
 	});
 
 	it("is deterministic: a second reindex yields identical handoff + relation counts", async () => {
-		const claudeDir = await makeV3Wiki();
-		const first = buildIndex(claudeDir);
-		const second = buildIndex(claudeDir);
+		const root = await makeV3Wiki();
+		const first = buildIndex(root);
+		const second = buildIndex(root);
 		expect(second.wiki.handoffs).toBe(first.wiki.handoffs);
 		expect(second.wiki.candidateSources).toBe(first.wiki.candidateSources);
 		expect(second.wiki.candidateSources).toBe(2);
@@ -199,23 +197,22 @@ describe("migration v3 — fresh build", () => {
 
 describe("migration v3 — Aspire-shaped v2 data", () => {
 	it("ingests pages/candidates with empty sourceIds and no sources, yielding zero relation rows", async () => {
-		const claudeDir = await makeAspireShapedWiki();
-		const res = buildIndex(claudeDir);
+		const root = await makeAspireShapedWiki();
+		const res = buildIndex(root);
 		expect(res.wiki.pages).toBe(1);
 		expect(res.wiki.candidates).toBe(1);
 		expect(res.wiki.sources).toBe(0);
 		expect(res.wiki.handoffs).toBe(0);
 		expect(res.wiki.candidateSources).toBe(0);
-		expect(searchWiki(dbPath(claudeDir), "backend").length).toBe(1);
+		expect(searchWiki(dbPath(root), "backend").length).toBe(1);
 	});
 
 	it("upgrades an existing user_version=2 DB to 3 additively, preserving pages + search", async () => {
 		const root = await mkdtemp(join(tmpdir(), "mewkit-upgrade-"));
 		tempDirs.push(root);
-		const claudeDir = join(root, ".claude");
-		await mkdir(join(claudeDir, "memory"), { recursive: true });
-		const file = dbPath(claudeDir);
-		await mkdir(join(claudeDir, "memory"), { recursive: true });
+		await mkdir(join(root, ".meowkit", "telemetry"), { recursive: true });
+		const file = dbPath(root);
+		await mkdir(dirname(file), { recursive: true });
 
 		// Simulate a live v2 install: a real DB reaches v2 by applying v1 (trace/cost tables)
 		// THEN v2 (wiki), so seed both before stamping v2 — otherwise a later additive migration
@@ -280,10 +277,9 @@ describe("migration v3 — query contract intact", () => {
 	it("mewkit query still answers aggregates after the bump", async () => {
 		const root = await mkdtemp(join(tmpdir(), "mewkit-v3-query-"));
 		tempDirs.push(root);
-		const claudeDir = join(root, ".claude");
-		await mkdir(join(claudeDir, "memory"), { recursive: true });
+		await mkdir(join(root, ".meowkit", "telemetry"), { recursive: true });
 		await writeFile(
-			join(claudeDir, "memory", "trace-log.jsonl"),
+			join(root, ".meowkit", "telemetry", "trace-log.jsonl"),
 			JSON.stringify({
 				schema_version: "1.0",
 				ts: "2026-06-29T10:00:00Z",
@@ -292,8 +288,8 @@ describe("migration v3 — query contract intact", () => {
 				data: { responsibility: "verification" },
 			}) + "\n",
 		);
-		buildIndex(claudeDir);
-		const q = queryIndex(claudeDir);
+		buildIndex(root);
+		const q = queryIndex(root);
 		expect(q.schemaVersion).toBe(SCHEMA_VERSION);
 		expect(q.eventsByType.find((e) => e.event === "friction")!.n).toBe(1);
 	});

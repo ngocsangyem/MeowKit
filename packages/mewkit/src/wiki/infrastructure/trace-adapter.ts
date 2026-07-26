@@ -6,9 +6,9 @@ import { appendTraceRecordSync } from "../../core/trace-append.js";
 // adapter no longer re-implements any of that — it only names the event and passes the data.
 
 export class TraceAdapter implements Tracer {
-	constructor(private readonly claudeDir: string) {}
+	constructor(private readonly projectRoot: string) {}
 
 	recordWikiTrace(event: string, data: Record<string, unknown>): void {
-		appendTraceRecordSync(this.claudeDir, { event, data });
+		appendTraceRecordSync(this.projectRoot, { event, data });
 	}
 }

@@ -1,0 +1,148 @@
+---
+title: "Step 9 — Implement with /mk:cook"
+description: "The 7-phase pipeline phase by phase — orient, plan, test, build, review, ship, reflect — with Gate 2 at Phase 4 and every phase observable."
+---
+
+You've chosen AUTH-201 for this sprint. Time to build.
+
+## Prompt
+
+```bash
+# AUTH-201 has a plan from Step 8 — call cook in "code mode" with the plan path.
+# cook skips its own Phase 1 (plan-creator) because the plan is already approved.
+/mk:cook tasks/plans/260511-auth-201-google-oauth/plan.md
+
+# AUTH-203 (TRIVIAL — skipped Step 8) — pass a natural-language task.
+# cook runs the full pipeline including Phase 1 inline.
+/mk:cook implement AUTH-203
+```
+
+Optional flags: `--tdd` (failing test first), `--fast` (skip Phase 1 research). For this walkthrough we run the default pipeline for AUTH-201.
+
+<Callout title="Phase 1 behavior" type="info">
+
+- **Plan-path entry (AUTH-201, AUTH-202):** Phase 1 is SKIPPED. Cook reads the approved plan from Step 8 and goes straight to Phase 2 / Phase 3.
+- **Natural-language entry (AUTH-203):** Phase 1 runs inline — `mk:plan-creator` produces the plan and Gate 1 fires inside the cook invocation.
+</Callout>
+
+## What happens behind the scenes — the 7 phases
+
+This is where the most happens per command. Each phase is observable.
+
+### Phase 0 — Orient
+
+```
+mk:agent-detector reads:
+  - AUTH-201 description + ACs (via mk:jira-issue)
+  - The Tech Review Report from Step 7 (if present in tasks/reports/)
+mk:scale-routing scans for vertical-domain CSV match
+  → "OAuth" matches auth domain → level=high → tier override: COMPLEX
+mk:risk-checklist flags:
+  → AUTH (login/session keywords) → matched_flags: ["AUTH"]
+```
+
+<Callout title="AUTH flag is a hard escalator" type="error">
+
+Per `model-selection-rules.md` Rule 2, any `matched_flags` ∈ `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` forces COMPLEX tier — **regardless** of how simple the task looks. This is non-negotiable.
+
+</Callout>
+
+Output:
+
+```
+Task complexity: COMPLEX → using Opus
+matched_flags: ["AUTH"]
+Routed to: planner → developer → security → reviewer → shipper
+```
+
+### Phase 1 — Plan
+
+```
+Plan-path entry (AUTH-201): SKIPPED
+  cook detects an existing plan.md → enters code mode
+  → no plan-creator invocation, no re-research
+
+Natural-language entry (AUTH-203, TRIVIAL):
+  mk:plan-creator runs inline in --fast mode
+  Writes a one-paragraph plan; phases collapsed
+```
+
+<Callout title="GATE 1 — Where it fires" type="error">
+
+- **For tickets that went through Step 8** (AUTH-201, AUTH-202): Gate 1 already fired at Step 8 standalone. Cook treats the existing plan as approved (sources approval from the plan file's approval line).
+- **For tickets that skipped Step 8** (TRIVIAL — AUTH-203): Gate 1 fires here, inside cook's Phase 1. `gate-enforcement.sh` still blocks Phase 3 if no approval line exists.
+
+Gate 1 is non-bypassable in both paths.
+
+</Callout>
+
+### Phase 2 — Test (only if `--tdd`)
+
+In default mode, this phase is a no-op. With `--tdd`, the `tester` agent writes failing tests targeting each AC **before** any implementation runs. The `pre-implement.sh` hook then verifies the RED state.
+
+### Phase 3 — Build
+
+```
+developer agent reads phase-01-service-skeleton.md
+Edits:
+  - src/auth/oauth-google.service.ts (new, ~110 LOC)
+  - src/auth/oauth.controller.ts     (+route, +10 LOC)
+  - src/auth/auth.module.ts          (register service)
+Commits incrementally with conventional-commit messages.
+mk:verify runs after each commit:
+  - npm run build  → 0 errors
+  - npm run lint   → 0 warnings
+  - npm test       → 18 passed
+```
+
+### Phase 4 — Review
+
+```
+mk:review forks the reviewer agent in fresh context.
+Reads:
+  - the diff
+  - tasks/plans/.../plan.md (to check scope discipline)
+  - .meowkit/memory/review-patterns.md (past learnings)
+Grades 5 dimensions:
+  Functionality: PASS — all 3 ACs met
+  Security:      PASS — uses httpOnly cookie, no token in localStorage
+  Code quality:  PASS
+  Tests:         WARN — no integration test for token refresh path
+  Docs:          PASS — README updated
+Writes: tasks/reviews/260511-auth-201-verdict.md
+```
+
+<Callout title="GATE 2 — Human approval required" type="error">
+
+Verdict has 1 WARN. You decide: ship with the WARN documented, or add the missing test first. **Any FAIL** blocks Phase 5 unconditionally.
+
+</Callout>
+
+### Phase 5 — Ship
+
+```
+mk:jira-dev branch-name AUTH-201
+  → "feat/auth-201-google-oauth"
+mk:jira-dev pr-description AUTH-201
+  → PR body with "Closes AUTH-201", AC checklist, screenshot placeholder
+git checkout -b feat/auth-201-google-oauth
+git push -u origin HEAD
+gh pr create --title "feat(auth): Sign in with Google" --body "..."
+mk:jira-lifecycle transition AUTH-201 "In Review"
+```
+
+### Phase 6 — Reflect
+
+```
+mk:memory appends to:
+  - .meowkit/memory/architecture-decisions.md
+      ##decision: OAuth provider plugins follow GitHubOAuthService pattern.
+      Token refresh remains out of scope until AUTH-87 lands.
+  - .meowkit/memory/review-patterns.md
+      ##pattern: Reviewer caught missing token-refresh test on first OAuth provider.
+      Add to OAuth provider checklist.
+```
+
+---
+
+Previous: [Step 8 — Plan per ticket](/workflows/spec-to-pr-walkthrough/step-08-plan-per-ticket) · Next: [Step 10 — After merge: close the loop](/workflows/spec-to-pr-walkthrough/step-10-close-the-loop) · [All steps](/workflows/spec-to-pr-walkthrough)

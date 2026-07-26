@@ -1,0 +1,57 @@
+---
+title: "Step 4 — Create the Jira tickets (your decision)"
+description: "One verb, one issue — no bulk creation. The Confluence URL carried in the description is the only sync mechanism between the spec and the tickets."
+---
+
+PM has replied. You now know: Google scopes = `email + profile`; expiry = sliding 24h; OAuth users can add a password later (separate ticket). The Step 3.5 Story Sizing Report has rough estimates per story — pick the size from the report and pass via `--story-points`. Alternatively, run `/mk:story-sizer --paste --auto-create --project AUTH` to delegate ticket creation behind the single confirmation gate.
+
+## Prompt
+
+```bash
+/mk:jira-issue create --project AUTH --type Story \
+  --summary "Sign in with Google OAuth" \
+  --story-points 3 \
+  --description "Per spec page 12345 §R1. Scopes: email, profile.
+
+  AC:
+  - AC1. 'Sign in with Google' button redirects to Google consent
+  - AC2. After consent, user lands on /dashboard with session cookie
+  - AC3. Session uses sliding 24h expiry
+
+  Spec: https://acme.atlassian.net/wiki/spaces/ENG/pages/12345"
+
+/mk:jira-issue create --project AUTH --type Story \
+  --summary "Sliding 24h session expiry"
+  # ...
+
+/mk:jira-issue create --project AUTH --type Task \
+  --summary "Preserve email/password login flow (no-op test)"
+  # ...
+```
+
+## What happens behind the scenes
+
+| Layer            | Action                                                                                                            |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Field resolution | `mk:jira-fields` is auto-invoked if the project has custom required fields. Skill prompts you to fill them.       |
+| Issue creation   | `jira-as create` posts to `/rest/api/3/issue`                                                                     |
+| Audit            | Each created issue prints its key + URL. No bulk creation — one verb, one issue.                                  |
+| Spec link        | Description carries the Confluence URL verbatim. **This is the only sync mechanism** between Confluence and Jira. |
+
+<Callout title="Why no bulk creation from the spec report" type="info">
+
+The Spec Research Report supports `--with-commands` to emit suggested `mk:jira-issue create` blocks. Even then, you copy them by hand. The friction is intentional — it forces a human read-through before each ticket lands in someone's backlog.
+
+</Callout>
+
+## What you have now
+
+```
+AUTH-201  Story  "Sign in with Google OAuth"            (To Do)
+AUTH-202  Story  "Sliding 24h session expiry"            (To Do)
+AUTH-203  Task   "Preserve email/password login flow"    (To Do)
+```
+
+---
+
+Previous: [Step 3.5 — Story sizing](/workflows/spec-to-pr-walkthrough/step-03-5-story-sizing) · Next: [Step 5 — Group into an epic and rank](/workflows/spec-to-pr-walkthrough/step-05-epic-and-rank) · [All steps](/workflows/spec-to-pr-walkthrough)

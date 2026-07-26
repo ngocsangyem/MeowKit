@@ -81,10 +81,10 @@ On completion, scout outputs:
 
 After completing a scout:
 
-- **Read first:** If `.claude/memory/codebase-map.md` exists, read it before scouting — previous scouts can accelerate re-scouting by identifying unchanged areas
+- **Read first:** If `.meowkit/memory/codebase-map.md` exists, read it before scouting — previous scouts can accelerate re-scouting by identifying unchanged areas
 - **Do NOT write by default** — scout reports are ephemeral task context that becomes stale quickly
 - **Write only on explicit request** — user says "save this scout" or "remember this structure"
-- **Path:** `.claude/memory/codebase-map.md`
+- **Path:** `.meowkit/memory/codebase-map.md`
 - **What to save:** Architecture Fingerprint + Key Directories only (not the full task-specific file map — that's ephemeral)
 
 **WHY:** Codebase structure changes frequently. A stale codebase map is worse than no map because it gives false confidence. Fresh scouts are cheap (30-60 seconds). Memory is best reserved for insights that don't change with code (e.g., "this project uses a non-standard auth pattern because of [reason]").

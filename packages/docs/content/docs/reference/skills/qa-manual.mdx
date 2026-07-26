@@ -3,6 +3,17 @@ title: "mk:qa-manual"
 description: "Spec-driven manual QA testing and Playwright E2E code generation. Orchestrates browser skills to navigate apps like a human tester, producing structured test reports or production-ready .spec.ts files."
 ---
 
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/qa-manual/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/qa-manual/SKILL.md) |
+| **Owner** | `testing` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
 ## What This Skill Does
 
 Orchestrates browser skills (`mk:agent-browser`, `mk:playwright-cli`) to act like a human QA tester: navigate applications, interact with elements, verify outcomes, and produce structured reports. Supports two primary use cases: manual QA testing from a spec or URL (producing pass/fail reports), and E2E code generation (producing production-ready Playwright `.spec.ts` files with role-based locators). Always prompts the user for credentials -- never guesses or stores auth.
@@ -60,14 +71,14 @@ If no flag is provided, the skill auto-detects the use case from spec content.
 2. **Record interactions** -- Capture Playwright TypeScript code from each playwright-cli action
 3. **Detect test ID convention** -- Check source for `data-testid` vs `data-cy` vs `data-test`
 4. **Generate feature folder:**
-   ```
+   ```files
    tests/e2e/{feature-name}/
    ├── common/
-   │   ├── {featureName}Selectors.ts    # All locators
-   │   ├── {featureName}Assertions.ts   # Reusable assertions
-   │   ├── {featureName}Intercepts.ts   # API route mocks
-   │   └── {featureName}Helpers.ts      # Shared setup (optional)
-   └── {feature-name}.spec.ts           # One test.describe only
+   │   ├── {featureName}Selectors.ts (all locators)
+   │   ├── {featureName}Assertions.ts (reusable assertions)
+   │   ├── {featureName}Intercepts.ts (API route mocks)
+   │   └── {featureName}Helpers.ts (shared setup, optional)
+   └── {feature-name}.spec.ts (one test.describe only)
    ```
 5. **Verify selectors** -- Grep source for each `getByTestId('xxx')`; if missing, add warning + fallback
 6. **Validate** -- Run generated `.spec.ts` via `scripts/run-playwright.sh`

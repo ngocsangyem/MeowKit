@@ -11,7 +11,7 @@ This guide gets you from zero to your first MeowKit-managed task in 5 minutes.
 npx mewkit init
 ```
 
-The CLI asks two optional questions: a project description and a Gemini API key. Press Enter to skip both. All other settings (cost tracking, memory, mode) default automatically. Takes ~30 seconds.
+The CLI walks you through a short set of prompts, and every one after the toolkit picker is skippable. See [Installation](/installation) for the full list and the flags that skip them. Takes ~30 seconds.
 
 After scaffolding completes, run setup and verify:
 
@@ -23,10 +23,10 @@ npx mewkit doctor
 ## Step 2: Create your first task
 
 ```bash
-npx mewkit task new --type feature "My first feature"
+npx mewkit task new --type feature "Add user authentication with JWT"
 ```
 
-This creates a task file under `tasks/plans/` using the feature template. Fill in the acceptance criteria before proceeding.
+This writes a task file to `tasks/active/` from the feature template. Open it and fill in the acceptance criteria; they are what the plan and the review are both measured against, so vague criteria produce a vague plan.
 
 ## Step 3: Start a Claude Code session
 
@@ -40,7 +40,7 @@ Claude automatically reads `CLAUDE.md` and loads MeowKit's agents, skills, and r
 
 ## Step 4: Run your first command
 
-Try the simplest workflow — planning a feature:
+Plan the task you just created:
 
 ```
 /mk:plan add user authentication with JWT
@@ -60,7 +60,7 @@ Once you approve the plan, try the full cook pipeline:
 /mk:cook
 ```
 
-This runs the complete workflow: Plan → Test → Build → Review → Ship. Each phase activates the appropriate agent, and you'll see the two hard gates in action.
+This runs the complete workflow. Each phase activates the appropriate agent, and you will meet both hard gates along the way. See [Workflow Phases](/core-concepts/workflow) for what each one does.
 
 ## Step 6: Explore more commands
 
@@ -84,7 +84,8 @@ No code was written until you approved. That's MeowKit's discipline.
 
 ## Next steps
 
-- [Cheatsheet](/cheatsheet) — quick reference for all commands
-- [Workflow Phases](/guide/workflow-phases) — understand Phase 0-6
-- [Build a Feature](/guide/agent-skill-architecture) — how agents and skills work together
-- [Fix a Bug](/guides/debug-effectively) — structured debugging guide
+- [Cheatsheet](/cheatsheet): quick reference for all commands
+- [Workflow Phases](/core-concepts/workflow): understand Phase 0-6
+- [Build a Feature](/guides/build-a-feature): the feature workflow end to end
+- [Fix a Bug](/guides/fix-a-bug): the bug workflow end to end
+- [Debug Effectively](/guides/debug-effectively): structured debugging guide

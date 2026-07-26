@@ -59,7 +59,7 @@ pending feedback batch. Surface these in the 7a self-check. Full list:
   precondition failed ⇒ do NOT proceed to step-08; print the failed preconditions and
   return to Modify. When `html_mode == false`, skip this call.
 - **Memory capture** (lightweight, no subagent): append the decision to the CANONICAL
-  store `.claude/memory/architecture-decisions.json` — NOT the `.md` view (a `.md` write is
+  store `.meowkit/memory/architecture-decisions.json` — NOT the `.md` view (a `.md` write is
   invisible to JSON-first readers; see `.claude/rules/memory-read-rules.md` → Write Rules).
   Add an entry to the `patterns` array (create the file with the v2.0.0 skeleton if absent),
   bump `metadata.last_updated`, and never touch `version`. The entry body:
