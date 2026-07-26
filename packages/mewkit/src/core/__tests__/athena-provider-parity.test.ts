@@ -316,14 +316,111 @@ describe("athena provider parity: the codex contract projection installs", () =>
 	});
 });
 
-describe("athena provider parity: neither bundle turns the flag on yet", () => {
-	// Slice A authors the adapter; wrapper wiring is a separate change. Until then the
-	// honest state is the documented fallback line, not a half-wired checkpoint.
+describe("athena provider parity: each bundle contract reports its own wiring honestly", () => {
 	for (const plane of PLANES.slice(1)) {
-		it(`${plane.name}: the contract states no wrapper is wired and names the fallback line`, () => {
+		it(`${plane.name}: the contract names every wrapped skill and keeps the fallback line`, () => {
 			const body = read(plane.contract);
-			expect(body).toMatch(/No skill on this runtime is wired yet/);
+			for (const canonical of Object.keys(SKILL_HARD_CAPS)) {
+				expect(body, `${plane.name} contract omits ${canonical}`).toContain(plane.skillId(canonical));
+			}
 			expect(body).toContain("advice checkpoint unavailable in this runtime");
+		});
+
+		it(`${plane.name}: the contract claims authored wiring, not live-verified delegation`, () => {
+			// Locked decision 6: an unsmoked capability reports unverified. The contract may
+			// say the wiring exists; it may not say delegation is known to work.
+			const body = read(plane.contract);
+			expect(body).toMatch(/authored but not yet live-verified/);
+			expect(body).not.toMatch(/No skill on this runtime is wired yet/);
+		});
+	}
+});
+
+describe("athena provider parity: every supervised skill declares the flag on both bundles", () => {
+	// The cap table IS the registry of supervised skills — `isSupervisedSkill` answers from
+	// it, and `mewkit advice begin` refuses anything absent. Driving the list from
+	// SKILL_HARD_CAPS means wrapping a seventh skill without wiring both bundles fails here.
+	const WRAPPERS = Object.keys(SKILL_HARD_CAPS).map((k) => k.replace(":", "-"));
+
+	const BUNDLES = [
+		{
+			name: "codex",
+			skillsRoot: join(modulesDir, "codex", "root", ".agents", "skills"),
+			contractRef: ".agents/skills/rule-advice-supervision/SKILL.md",
+		},
+		{
+			name: "cursor",
+			skillsRoot: join(modulesDir, "cursor", "root", ".cursor", "skills"),
+			contractRef: ".cursor/rules/domain-advice-supervision.mdc",
+		},
+	];
+
+	for (const bundle of BUNDLES) {
+		for (const wrapper of WRAPPERS) {
+			const dir = join(bundle.skillsRoot, wrapper);
+			// mk-fix keeps its checkpoints inside its workflow files, matching how that skill
+			// was already structured on both planes; the other five carry a dedicated reference.
+			const checkpointFiles =
+				wrapper === "mk-fix"
+					? [join(dir, "references", "workflow-standard.md"), join(dir, "references", "workflow-deep.md")]
+					: [join(dir, "references", "advice-checkpoints.md")];
+
+			it(`${bundle.name}/${wrapper}: SKILL.md declares --advice and cites this plane's contract`, () => {
+				const skill = read(join(dir, "SKILL.md"));
+				expect(skill, `${wrapper} does not declare --advice`).toContain("--advice");
+				expect(skill, `${wrapper} does not cite ${bundle.contractRef}`).toContain(bundle.contractRef);
+			});
+
+			it(`${bundle.name}/${wrapper}: no longer claims the adapter is unauthored`, () => {
+				for (const f of [join(dir, "SKILL.md"), ...checkpointFiles]) {
+					expect(read(f), `${f} still says the bundle has no adapter`).not.toMatch(
+						/Not available in this bundle yet|adapter not authored for this bundle/,
+					);
+				}
+			});
+
+			it(`${bundle.name}/${wrapper}: names all four stages and keeps the fallback line`, () => {
+				for (const f of checkpointFiles) {
+					const body = read(f);
+					const missing = SUPERVISION_STAGES.filter((s) => !body.includes(s));
+					expect(missing, `${f} is missing stages: ${missing.join(", ")}`).toEqual([]);
+					expect(body, `${f} drops the fallback line`).toContain(
+						"advice checkpoint unavailable in this runtime",
+					);
+					// The one thing a wrapper must never permit when delegation is unavailable.
+					expect(body, `${f} does not forbid inline self-advice`).toMatch(
+						/Never write a packet inline|never improvise|Never improvise/i,
+					);
+				}
+			});
+		}
+
+		it(`${bundle.name}: the orchestrator exposes no flag and carries only the run id`, () => {
+			const body = read(join(bundle.skillsRoot, "mk-workflow-orchestrator", "SKILL.md"));
+			expect(body).toMatch(/exposes \*\*no `--advice` flag\*\*|no `--advice` flag/);
+			expect(body).toContain("supervisionRunId");
+			expect(body).toMatch(/opaque value/);
+		});
+
+		it(`${bundle.name}: every wrapper is denied-token clean`, () => {
+			const scan = bundle.name === "cursor" ? scanCursorDenied : (c: string) =>
+				scanDeniedTokens(c).map((h) => h.label);
+			const leaks: string[] = [];
+			for (const wrapper of WRAPPERS) {
+				for (const f of [
+					join(bundle.skillsRoot, wrapper, "SKILL.md"),
+					...(wrapper === "mk-fix"
+						? [
+								join(bundle.skillsRoot, wrapper, "references", "workflow-standard.md"),
+								join(bundle.skillsRoot, wrapper, "references", "workflow-deep.md"),
+							]
+						: [join(bundle.skillsRoot, wrapper, "references", "advice-checkpoints.md")]),
+				]) {
+					const hits = scan(read(f));
+					if (hits.length > 0) leaks.push(`${f}: ${hits.join(", ")}`);
+				}
+			}
+			expect(leaks, leaks.join("; ")).toEqual([]);
 		});
 	}
 });

@@ -22,10 +22,10 @@
 		"capabilities": [
 			{
 				"capability": "embedded-supervision",
-				"state": "unavailable",
+				"state": "unverified",
 				"evidence": "structural",
-				"detail": "The adapter carries the full GUIDE/RESCUE/REVIEW/RECHECK contract and the contract rule is authored, but no wrapper on this plane declares --advice yet. Every wrapper prints its documented unavailable-checkpoint line and the run continues unsupervised.",
-				"blockedBy": "wrapper wiring on this plane"
+				"detail": "The adapter, the contract rule, and all six wrappers (brainstorming, plan-creator, cook, fix, autobuild, ship) are authored and declare their checkpoints. No live session has exercised delegation from a wrapper on this plane, so the wiring is unverified rather than supported; a runtime that cannot reach the agent prints the documented fallback line and continues unsupervised.",
+				"blockedBy": "live provider smoke"
 			},
 			{
 				"capability": "direct-consult",

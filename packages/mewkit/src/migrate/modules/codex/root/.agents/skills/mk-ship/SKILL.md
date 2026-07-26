@@ -112,6 +112,26 @@ After pipeline completes, output this summary:
 - Version, changelog, issue creation, or publication → require `publish` and a current explicit user request.
 - Pre-existing test failures → report them and ask whether to proceed; never silently treat them as acceptable.
 
+## `--advice` (composable, off by default)
+
+Opt-in strategic supervision for one run. At named checkpoints — GUIDE after the scope is
+resolved and pre-flight has run, RESCUE on an exceptional blocker, REVIEW after CI reaches
+a terminal green state, RECHECK after a correction — the `athena` agent assesses the
+situation and recommends an operational path inside the locked scope. Hard cap **4 calls
+per release stage**: `prepare`, `release` and `publish` each carry their own budget.
+
+**Counsel is not authorization.** A directive never creates the authority to push, open a
+PR, merge, version, publish, or deploy. Those come only from an explicit `release` or
+`publish` scope plus the existing explicit confirmations, both unchanged by this flag. Red
+or pending CI keeps its existing repair-or-stop route. Gate 2 stays with the review skill
+and the human. Posting an assessment to a PR or issue is an external effect needing the
+same explicit authority as any other — the default is a local receipt only.
+
+Without the flag there are zero calls and no state is written.
+
+Checkpoints: `references/advice-checkpoints.md`. Contract: `.agents/skills/rule-advice-supervision/SKILL.md` (load only when the
+flag is present).
+
 ## References
 
 - `references/preamble.md` — Session init, stop and ask the user in chat format, Completeness Principle, Repo Ownership, Search Before Building, Contributor Mode, Completion Status Protocol, Plan Status Footer
@@ -129,6 +149,7 @@ After pipeline completes, output this summary:
 - `references/rollback-protocol.md` — Rollback steps and procedures (migrated from mk:shipping)
 - `references/ship-pipeline.md` — Full ship pipeline stages and gate definitions (migrated from mk:shipping)
 - `references/canary-deploy.md` — Canary deployment strategy and traffic splitting (migrated from mk:shipping)
+- `references/advice-checkpoints.md` — `--advice` checkpoint boundaries, caps, and what supervision may not touch
 
 ## Hooks
 

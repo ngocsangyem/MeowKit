@@ -344,16 +344,87 @@ none.
 declared in `.codex/agents/athena.toml` for this runtime. No model name or id belongs in
 this contract or in any skill body.
 
+## The call protocol
+
+Identical at every checkpoint of every wrapped skill, so it lives here once. A wrapper
+declares only WHERE its checkpoints fire and WHAT question each asks.
+
+**1. Open the checkpoint.** This is what enforces the cap, stage legality and idempotency,
+and writes the pending marker that makes a crash resumable:
+
+```
+mewkit advice begin --run <supervisionRunId> --skill mk-<skill> \
+  --stage GUIDE|RESCUE|REVIEW|RECHECK --checkpoint <checkpointId>
+```
+
+`mk-ship` additionally passes `--release-stage prepare|release|publish`; every other skill
+is refused if it passes one. A refusal is final for that checkpoint: continue unsupervised,
+or escalate when the refusal says to. Re-running the same `--checkpoint` returns the
+recorded result and spends no slot.
+
+**2. Validate the packet, then delegate.** The caps, pointer budget, provenance requirement
+and secret scan are enforced by the command, not by writing the packet carefully:
+
+```
+mewkit advice validate-packet --evidence <packet.json> --packet-kind input
+```
+
+Then delegate to the `athena` agent by name, with the packet inline — a fresh subagent
+inherits no conversation. Validate the returned packet the same way with
+`--packet-kind output` before acting on it or summarizing it into a receipt.
+
+**3. Commit the result.** Render the returned packet to the user, then:
+
+```
+mewkit advice commit --run <runId> --checkpoint <checkpointId> \
+  --disposition <returned disposition> --outcome adopted|rejected|deferred \
+  --reason "<one line, required even when adopted>" \
+  --directive "<summary>" --next "<next safe action>" \
+  [--correction "<change>" ...] [--evidence-pointer <path> ...]
+```
+
+`commit` writes the receipt, records the call against the cap, and refuses a disposition
+that is illegal for the stage. `disposition` is Athena's routing signal; `--outcome` is
+what the wrapper decided to do with it — a rejected directive is a legitimate, recordable
+outcome.
+
+**4. Route on the disposition.**
+
+- `CONTINUE_WITH_DIRECTIVE` — proceed; the directive is input, not instruction.
+- `READY_FOR_EXISTING_GATE` — run the skill's normal next gate or review. It is NOT cleared.
+- `RETURN_TO_EXECUTOR` — apply the corrections, then supersede the stale evidence:
+  `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence <workflow-evidence.json> --correction-kind source|scope`.
+  Re-run the skill's verification before its review. `scope` also returns Gate 1 to
+  `required`.
+- `ESCALATE_TO_HUMAN` — stop at the existing human touchpoint.
+- `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
+
+If an active durable task record exists, point at the receipt with
+`mewkit task-state update <id> --evidence-ref <receipt path>`. With no active record, keep
+the file and skip this step — never invent a record.
+
 ## Wiring status on this runtime
 
 The adapter is authored: `.codex/agents/athena.toml` carries the full supervisor contract.
 
-**No skill on this runtime is wired yet.** Wrapper wiring — the named checkpoints, the
-`begin`/`commit` calls, the dossier and the receipt — lands per skill in a later change.
-Until a wrapper declares support, `--advice` on this runtime prints the fallback line in
-§10 and the run continues unsupervised. Never improvise a checkpoint: writing a packet
-inline and presenting it as the agent's output is not an independent check, and a receipt
-produced that way records supervision that never happened.
+Six wrappers declare the flag and name their checkpoints: `mk-brainstorming` (deep
+workflow only), `mk-plan-creator`, `mk-cook`, `mk-fix`, `mk-autobuild` and `mk-ship`. Each
+fires at the stage boundaries in §2 and drives `mewkit advice begin|commit`, which is where
+the caps, stage legality, idempotency, dossier and receipt are actually enforced.
+
+`mk-workflow-orchestrator` exposes **no** flag and is not an entry point. When an
+explicitly enabled run hands off, it carries `supervisionRunId` forward as an opaque value
+at macro boundaries and nothing else.
+
+Every other surface is excluded, and the exclusion is enforced in code rather than by
+convention: `mewkit advice begin` refuses a skill absent from the cap table.
+
+**Delegation on this runtime is authored but not yet live-verified.** No session has
+exercised reaching the agent from a wrapper here. If the runtime cannot discover or
+delegate to `athena`, print the fallback line in §10 and continue unsupervised. Never
+improvise a checkpoint: writing a packet inline and presenting it as the agent's output is
+not an independent check, and a receipt produced that way records supervision that never
+happened.
 
 ### Parent-side commands
 

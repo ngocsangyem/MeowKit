@@ -209,6 +209,21 @@ After a Gate 2 verdict PASS, delegate to `project-manager` (background — inclu
 
 When this run drives an **active durable task** (a `tasks/active/<id>.json` exists), emit status/step at phase transitions and record each acted-on `mewkit capabilities resolve` outcome (`selected|skipped|unavailable|unsupported`) via `mewkit task-state update`. Advisory + best-effort: a failed or unavailable command is surfaced but never blocks the pipeline, and one-off work with no record emits nothing.
 
+## `--advice` (composable, off by default)
+
+Opt-in strategic supervision for one run. At named checkpoints — GUIDE after Gate 1,
+RESCUE on a stall or contradiction, REVIEW after Verify and before the reviewer, RECHECK
+after a correction; hard cap 5 — the `athena` agent assesses the situation, recommends an
+operational path inside the locked scope, and may return the work for correction.
+
+It never approves: Gate 1 and Gate 2 remain human, the reviewer keeps its verdict, and
+supervision counts as no verification.
+
+Without the flag there are zero calls and no state is written.
+
+Checkpoints: `references/advice-checkpoints.md`. Contract: `.agents/skills/rule-advice-supervision/SKILL.md` (load only when the
+flag is present).
+
 ## Related Rules
 
 - AGENTS.md (Gates) — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions this skill enforces across all modes
