@@ -76,6 +76,30 @@ const PATTERNS: { name: string; re: RegExp; expected: string }[] = [
 		re: /\bskips?\s+gate\s*[12]\b[^.\n]{0,30}(prompt|user)/gi,
 		expected: "present the gate; a passing pre-check is evidence, not approval",
 	},
+	{
+		name: "supervision disposition advancing a gate",
+		// The `--advice` supervision lane adds vocabulary that reads like authority.
+		// `READY_FOR_EXISTING_GATE` names the NEXT STEP; it never clears the gate.
+		//
+		// Requires an ASSERTIVE verb plus an explicit gate digit. Merely NAMING the
+		// anti-pattern must stay clean, because the contract and its gotcha lists
+		// have to be able to describe the thing they forbid.
+		re: /(?:READY_FOR_EXISTING_GATE|RETURN_TO_EXECUTOR|supervision|counsel|directive)[^.\n]{0,40}\b(?:approves?|clears?|advances?|unblocks?)\s+(?:the\s+)?gates?\s*[12]\b/gi,
+		expected: "a supervision disposition routes work; a human approves the gate",
+	},
+	{
+		name: "supervision counted as verification",
+		// Verification comes from tests, review verdicts and validators. A directive
+		// naming what to prove is not the proof.
+		//
+		// "counts as verification" needs NO subject: after clause splitting the subject
+		// is often a pronoun ("...but it counts as verification"), and nothing in this
+		// codebase says that phrase except to forbid it — where the negation disarms it.
+		// The "is verification" form keeps a subject requirement, since that wording
+		// appears in legitimate prose far more often.
+		re: /\bcounts\s+as\s+verification\b|\b(?:supervision|counsel|directive|advice|athena)\b[^.\n]{0,25}\bis\s+verification\b/gi,
+		expected: "verification comes from tests and verdicts; a directive is evidence, not proof",
+	},
 ];
 
 /**
@@ -112,6 +136,25 @@ function isStandaloneMarker(line: string): boolean {
 	return /^\s*<!--\s*lint-allow-gate-authority\s*-->\s*$/.test(line);
 }
 
+/**
+ * Split a line into independent clauses before matching.
+ *
+ * A negation governs its OWN clause. Without this split, one wide match can span a
+ * contrastive boundary — "supervision is not verification, but it counts as
+ * verification for Gate 2" — and `isNegated` then finds the first clause's "not"
+ * inside the match text and disarms a violation that lives entirely in the second
+ * clause. Sentence boundaries matter for the same reason: the lookbehind window
+ * would otherwise reach back across a period into an unrelated prior sentence.
+ *
+ * Splitting on `.` costs nothing for matching, because every pattern already refuses
+ * to cross `[^.\n]`; it exists purely to stop a negation leaking across sentences.
+ */
+function splitClauses(line: string): string[] {
+	return line
+		.split(/\.\s|[.;]|,\s*(?:but|yet|however|though|although|whereas|while)\b/i)
+		.filter((clause) => clause.trim().length > 0);
+}
+
 /** Scan one file's prose for statements granting automated gate authority. */
 export function scanForGateAuthority(root: string, relPath: string): GateAuthorityViolation[] {
 	const abs = path.join(root, relPath);
@@ -130,15 +173,18 @@ export function scanForGateAuthority(root: string, relPath: string): GateAuthori
 		if (text.includes(ALLOW_MARKER)) return;
 		if (idx > 0 && isStandaloneMarker(lines[idx - 1])) return;
 
-		// Negation is evaluated per MATCH, and EVERY match is examined — not just
-		// the first. A line may state the contract and then carve an exception out
-		// of it ("Gate 2 is never auto-approved, but fast mode auto-approves Gate 2
-		// when tests pass"): the negated first clause must not excuse the second.
+		// Negation is evaluated per MATCH within a single CLAUSE, and EVERY match is
+		// examined — not just the first. A line may state the contract and then carve
+		// an exception out of it ("Gate 2 is never auto-approved, but fast mode
+		// auto-approves Gate 2 when tests pass"): the negated first clause must not
+		// excuse the second, and a match may not span the boundary between them.
 		for (const { re, expected } of PATTERNS) {
-			for (const m of text.matchAll(re)) {
-				if (isNegated(text, m.index, m[0])) continue;
-				violations.push({ file: relPath, line: idx + 1, found: text.trim(), expected });
-				return; // one finding per line is enough to locate and fix it
+			for (const clause of splitClauses(text)) {
+				for (const m of clause.matchAll(re)) {
+					if (isNegated(clause, m.index, m[0])) continue;
+					violations.push({ file: relPath, line: idx + 1, found: text.trim(), expected });
+					return; // one finding per line is enough to locate and fix it
+				}
 			}
 		}
 	});

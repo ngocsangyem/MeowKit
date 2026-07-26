@@ -27,6 +27,58 @@ async function projectWith(files: Record<string, string>): Promise<string> {
 	return root;
 }
 
+describe("scanForGateAuthority — supervision vocabulary", () => {
+	// The `--advice` lane introduced words that read like authority. These must
+	// fire, or the patterns are dead weight in a safety lint.
+	it.each([
+		["disposition clearing a gate", "A READY_FOR_EXISTING_GATE disposition clears Gate 2 for the shipper."],
+		["disposition advancing a gate", "RETURN_TO_EXECUTOR advances Gate 1 once the corrections land."],
+		["supervision approving a gate", "Supervision approves Gate 2 when the evidence is complete."],
+		["counsel unblocking a gate", "Counsel unblocks Gate 1 for a run that stalled."],
+		["supervision as verification", "Athena's supervision counts as verification for the ship preflight."],
+		["directive as verification", "The directive is verification enough for Gate 2."],
+	])("flags %s", async (_label, line) => {
+		const root = await projectWith({ ".claude/rules-conditional/x.md": line });
+		const found = scanForGateAuthority(root, ".claude/rules-conditional/x.md");
+		expect(found).toHaveLength(1);
+	});
+
+	// A negation governs its OWN clause. A contract sentence that states the rule and
+	// then carves an exception out of it must still be caught — the whole point of a
+	// safety lint is that it does not get talked out of a finding.
+	it.each([
+		[
+			"contrastive clause after a negation",
+			"Athena's supervision is not verification, but it counts as verification for Gate 2.",
+		],
+		[
+			"exception carved out with yet",
+			"The directive is never approval, yet the directive approves gate 2 once tests pass.",
+		],
+		[
+			"violation in a later sentence",
+			"READY_FOR_EXISTING_GATE is not authority. In fast mode READY_FOR_EXISTING_GATE clears Gate 2 automatically.",
+		],
+	])("still flags a real violation despite an adjacent negation — %s", async (_label, line) => {
+		const root = await projectWith({ ".claude/rules-conditional/x.md": line });
+		expect(scanForGateAuthority(root, ".claude/rules-conditional/x.md")).toHaveLength(1);
+	});
+
+	// The contract itself must be able to STATE these prohibitions, and its gotcha
+	// lists must be able to name the anti-pattern, without tripping the lint.
+	it.each([
+		["negated clearance", "`READY_FOR_EXISTING_GATE` never means the gate is cleared."],
+		["next-step framing", "`READY_FOR_EXISTING_GATE` means the normal reviewer is the correct next step."],
+		["named anti-pattern", "Treating `READY_FOR_EXISTING_GATE` as clearing the gate — it names the next step."],
+		["negated verification", "Your supervision is also not verification."],
+		["routing framing", "A supervision disposition routes work back to its executor."],
+		["prohibition prose", "Athena cannot approve Gate 1, Gate 2, a security review, CI, a merge, or a deploy."],
+	])("stays clean on %s", async (_label, line) => {
+		const root = await projectWith({ ".claude/rules-conditional/x.md": line });
+		expect(scanForGateAuthority(root, ".claude/rules-conditional/x.md")).toEqual([]);
+	});
+});
+
 describe("scanForGateAuthority — statements that grant automated approval", () => {
 	// Both word orders, because a fixed pattern set that only knows one is a
 	// pattern set that a rewrite walks straight through.
