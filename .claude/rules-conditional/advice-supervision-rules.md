@@ -1,162 +1,255 @@
 ---
 source: original
 applies_to: [mk:fix]
+governs: [mk:brainstorming, mk:plan-creator, mk:cook, mk:fix, mk:autobuild, mk:ship]
 loaded_by: consuming skills on demand when --advice is present (NOT always-on)
 trust_level: HIGH
 ---
 
 # Advice Supervision (`--advice`)
 
-**Core rule:** when — and only when — the user passes `--advice`, a supporting
-skill may call the `athena` agent at a small set of **declared checkpoints** to
-get one-shot counsel. Counsel is **evidence the human reads**. It is never an
-approval, never a gate, never a substitute for verification.
+**Core rule:** when — and only when — the user passes `--advice`, a supporting skill
+may call the `athena` agent at a small set of **named checkpoints** to get
+strategic supervision over one delivery run. Athena assesses the situation, makes
+an evidence-backed operational recommendation, guides before work, rescues a
+blocked run, reviews finished work, and may return work for correction.
 
-Athena's classification is `internal / harness / non-public` (the same shape as
-`advisor`): it is not routed to by the orchestrator, not scored by
-`mk:agent-detector`, and it owns no lifecycle phase. Invocation is a **one-shot
-subagent fork with isolated context** — it returns a packet and ends.
+Supervision is **evidence the human reads**. It is never an approval, never a gate,
+never a substitute for verification.
+
+Athena is a workflow-level strategic intelligence agent with stronger reasoning and
+cross-phase visibility — and **no mutation authority**. The parent owns execution,
+the dossier, receipts and routing. Existing specialists keep their verdicts. Athena
+is public for an explicit stateless direct strategy consult where the provider exposes
+one, and is also reachable through the `--advice` harness; it is never
+orchestrator-routed and owns no lifecycle phase.
+
+The mechanical half of this contract is enforced in code — stage/disposition
+legality, caps, packet caps and content checks, dossier fields. Where prose and
+those checks disagree, the checks are authoritative and the prose is the bug.
 
 ## 1 — Activation
 
 - Fires ONLY on an explicit `--advice` flag on a skill that documents support.
 - NEVER from SessionStart / Stop / any hook. Hooks may not invoke agents
   (`.claude/rules/post-phase-delegation.md` Rule 7).
-- NEVER auto-enabled by a mode, a tier, a risk flag, a score, or a failure count.
-- Orchestrated child jobs never self-supervise: a supervised parent does not
-  hand `--advice` to the children it spawns.
+- NEVER auto-enabled by a mode, tier, risk flag, score, or failure count.
+- Orchestrated child jobs never self-supervise: a supervised parent does not hand
+  `--advice` to the children it spawns.
 
-Without the flag, the checkpoint blocks below are inert and cost nothing: the
-skill does not load this file.
+Without the flag the checkpoint blocks are inert and cost nothing: the skill does
+not load this file, makes zero calls, and writes no state or receipt.
 
-## 2 — Checkpoint triggers (`mk:fix` slice)
+## 2 — Cadence
 
-Exactly three, each firing **at most once per run**:
+```text
+GUIDE → (executor works) → RESCUE* → REVIEW → RECHECK*
+```
 
-| # | Trigger | Fires when |
-|---|---|---|
-| a | Stuck run | Root cause is evidenced AND two distinct fix approaches have failed |
-| b | Irreversible step | Before a security-sensitive, public-contract, or data-loss-capable action |
-| c | Residual risk | Verification passed but the remaining risk is unclear |
+Checkpoints are **macro boundaries**, never per tool call, per file, or per loop
+iteration.
 
-Never per tool call. Never per loop iteration. Never per file. Triggers MAY
-co-fire in one run, so the worst case is three calls total.
+| Stage | Purpose | Max per run |
+|---|---|---:|
+| GUIDE | Direction before work starts | 1 |
+| RESCUE | Unblock a stalled or contradicted run | 2 (one per rework round) |
+| REVIEW | Independent read of finished work, against evidence | 1 |
+| RECHECK | Re-examine returned work | 1 |
 
-**Trigger (a) complements the human STOP, it does not replace or delay it.**
-`mk:fix`'s existing rule — 3+ failed attempts ⇒ STOP and question the
-architecture with the user — still fires on its own schedule whether or not
-counsel was taken at two failures.
+Per-skill total ceiling:
+
+| Skill | Cap |
+|---|---:|
+| `mk:brainstorming` | 4 |
+| `mk:plan-creator` | 4 |
+| `mk:cook` | 5 |
+| `mk:fix` | 5 |
+| `mk:autobuild` | 5 |
+| `mk:ship` | 4 per release stage — **not yet enforced as stated**: the current counter is a flat 4 per run, which under-permits rather than over-permits. Stage-partitioned accounting is authored with the ship wrapper. |
+
+Rules that keep the cadence bounded:
+
+- A duplicate `checkpointId` is **idempotent** — it returns the prior result and
+  does not consume a cap slot. This is what makes crash-and-resume safe.
+- `RECHECK` requires a prior `RETURN_TO_EXECUTOR`.
+- A **second unresolved return escalates to a human.** There is no third opinion.
+- Reaching a cap escalates; it never loops.
+
+**Rescue complements human STOPs; it never delays them.** `mk:fix`'s rule — 3+
+failed attempts ⇒ STOP and question the architecture with the user — fires on its
+own schedule whether or not counsel was taken at two failures. The same holds for
+the Gate 1 question, the Gate 2 question, and any explicit business decision.
 
 ## 3 — Input packet (the parent supplies)
 
-The calling skill assembles all five fields inline in the delegation prompt. A
-fork inherits no conversation, so an omitted field is simply missing.
+A fork inherits no conversation, so the packet is the supervisor's entire world.
+Fields: `runId`, `skill`, `stage`, `checkpointId`, `mission`, `lockedDecisions`,
+`currentState`, `workerSummary`, `evidenceRefs`, `priorDirective`, `question`,
+`riskAndReversibility`.
 
-1. **Task and exact question** — the outcome being pursued, and the one decision
-   counsel is wanted on.
-2. **Constraints and user decisions** — including decisions that must not be
-   silently reversed (`.claude/rules/core-behaviors.md`).
-3. **Evidence** — file paths, commands run, summarized observations.
-4. **Attempts** — what was tried, what happened, why it failed.
-5. **Options and risk** — candidate paths, risk class, and whether the step is
-   reversible.
+- Serialized cap **12 KiB UTF-8** — fail visibly BEFORE delegation, never truncate.
+  A truncated packet asks a different question than the one intended.
+- At most **5 evidence pointers**, each carrying `path`, `relevance`, `provenance`
+  and a short `summary`. Provenance is mandatory: an unattributed path cannot be
+  weighed, and a fresh fork cannot reconstruct it.
+- **Never** a raw transcript, full diff or log, memory dump, secret/PII, or
+  unrelated project history. Pass a pointer, not the payload.
+- Start with the map; Athena reads only the detail it selects.
+- Locked decisions and the exact current question appear at both start and end as
+  attention anchors.
 
 ## 4 — Output packet (Athena returns)
 
-1. **Disposition advice** — proceed / pause / escalate to the human.
-2. **Next falsifiable check** — the cheapest observation that would disconfirm
-   the current hypothesis.
-3. **Critical risks + rollback note.**
-4. **Alternatives rejected, and why.**
-5. **Assumptions, missing evidence, and a stated confidence level.**
+Fields: `disposition`, `strategicAssessment`, `decisionRecommendation`,
+`strategicDirective`, `requiredCorrections`,
+`nextFalsifiableCheck`, `risksAndRollback`, `rejectedAlternatives`, `assumptions`,
+`confidence`, `evidenceRead`.
 
-## 5 — Prohibitions
+Dispositions are **stage-specific**, and an illegal one is rejected before routing:
+
+| Stage | Legal dispositions |
+|---|---|
+| GUIDE, RESCUE | `CONTINUE_WITH_DIRECTIVE`, `ESCALATE_TO_HUMAN`, `BLOCKED_MISSING_EVIDENCE` |
+| REVIEW, RECHECK | `READY_FOR_EXISTING_GATE`, `RETURN_TO_EXECUTOR`, `ESCALATE_TO_HUMAN`, `BLOCKED_MISSING_EVIDENCE` |
+
+`READY_FOR_EXISTING_GATE` means "the normal reviewer/gate is the correct next
+step". It **never** means the gate is cleared.
+
+- Output cap **600 words**. Volume is not rigor.
+- `requiredCorrections`: max 5, ordered, each independently verifiable and each
+  naming its `proofRequired`. `RETURN_TO_EXECUTOR` requires at least one.
+- `decisionRecommendation` selects one operational path within the packet's locked
+  scope and says why. It MUST escalate rather than override a locked business,
+  security, compliance or gate decision.
+- No `approve`, `clear`, `merge`, `deploy` or equivalent authority language, in any
+  wording. Say "the evidence supports X".
+
+### Transport status vs disposition
+
+The A1 status block is **transport status only**: `DONE` means a valid packet
+arrived; `BLOCKED` means no usable directive exists. The `disposition` field is the
+sole workflow-routing signal. A `BLOCKED` transport may not carry a usable
+directive, and a delivered packet must state a disposition — either mismatch is
+refused rather than guessed at.
+
+## 5 — Continuity dossier
+
+One parent-owned file per run at the deterministic path
+`tasks/reports/{supervisionRunId}-athena-supervision.md`.
+
+Athena is a long-lived **lead**, never a long-lived **session**: every call is a
+fresh isolated fork. Continuity therefore comes from this compact record, NOT from
+a transcript, auto-memory, or a new supervisor store.
+
+- Frontmatter + active summary stay under **2 KiB**, holding only run identity,
+  current stage, locked-decision pointers, latest directive, correction count,
+  receipt pointers, and next safe action.
+- Historical receipts may sit below the active summary but are **never
+  auto-loaded**. Never append full model output.
+- The dossier **cannot** carry progress, verification, gate, approval, verdict or
+  status fields. A candidate that does is refused, not stripped — silently dropping
+  a field the caller believed it stored is worse than refusing.
+- Two-step checkpoint marker: `pending` written BEFORE the call, `committed` after
+  the result lands. A pending marker lets a resuming parent recognize an
+  already-attempted checkpoint instead of spending another slot.
+- Pointer placement: an active durable task gets an `evidenceRef`; a plan/run
+  artifact gets a pointer; a one-off run keeps only the local dossier and has no
+  automatic cross-session resume guarantee. **Never invent an active task**
+  (`.claude/rules/task-state-emission.md` Rule 1).
+
+A state or write failure disables supervision for that run, emits the exact
+degraded notice, and lets the ordinary unsupervised workflow continue — but no
+later Athena call may run until durable state is recovered.
+
+## 6 — Correction cycle
+
+`RETURN_TO_EXECUTOR` routes work back to its **current owner** — planner, developer,
+tester, whoever owns it — never to Athena.
+
+1. The executor addresses each correction or records why it is rejected.
+2. Source changes advance `evidenceRevision` and mark stale verification/review
+   evidence **superseded**; normal checks re-run.
+3. Plan or scope changes additionally invalidate Gate 1 and require a new human
+   approval. In-scope source corrections keep Gate 1 but invalidate downstream
+   evidence.
+4. Athena rechecks once by default. A second unresolved return escalates.
+
+Superseded evidence must never read as current at a later gate or ship preflight.
+
+## 7 — Prohibitions
 
 Athena MUST NOT:
 
-- Interview the user, or reframe the problem through questions. That is
-  `advisor`'s job, behind `mk:advise`, and is unchanged by this rule.
-- Mutate anything: no file writes, no edits, no test or fixture changes, no
-  command that alters the working tree.
-- Own a plan, report, transcript, or task record.
-- Change the executor's model, profile, or effort. `--advice` supervises the
-  workflow, not the model running it.
+- Mutate anything: no source, test, fixture, plan, verdict, PM report, or memory
+  write, and no command that alters the working tree. Only the parent writes the
+  dossier/receipt.
+- Interview the user. That is `advisor`, behind `mk:advise`, unchanged by this rule.
+- Emit a verdict, score, grade, or security clearance. `reviewer`, `evaluator` and
+  `security` own those.
 - Approve, clear, unblock, or advance Gate 1, Gate 2, a security review, CI, a
   merge, a deploy, or any user business decision.
-- Spawn another Athena, or any lifecycle agent.
+- Change the executor's model, profile, or effort. `--advice` supervises the
+  workflow, not the model running it.
+- Spawn another Athena or any lifecycle agent.
 
-**Gate Authority Invariant** (`.claude/rules/gate-rules.md`): automation
-executes BETWEEN gates and never supplies the authority OF a gate. An Athena
-recommendation is in exactly the same class as an evaluator verdict or a green
-test suite — evidence presented to a human at the gate, never the approval
-itself. Prose that lets counsel advance a gate, in any wording, is a violation.
+**Gate Authority Invariant** (`.claude/rules/gate-rules.md`): automation executes
+BETWEEN gates and never supplies the authority OF a gate. An Athena directive is in
+exactly the same class as an evaluator verdict or a green test suite — evidence
+presented to a human at the gate, never the approval itself. Prose that lets
+supervision advance a gate, in any wording, is a violation.
 
-A recommendation is also **not verification**. Verification comes from tests,
-review verdicts, and validators. Counsel never counts toward it.
+A directive is also **not verification**. Verification comes from tests, review
+verdicts and validators. Supervision never counts toward it.
 
-## 6 — Disposition and receipt
+## 8 — Receipt
 
 After each checkpoint the **parent** (never Athena) writes a receipt to
-`tasks/reports/{YYMMDD}-{slug}-advice-{n}.md`, where `{n}` is the checkpoint
-number within the run:
+`tasks/reports/{YYMMDD}-{slug}-advice-{n}.md`:
 
 ```markdown
 ---
 kind: advice-receipt
-disposition: adopted | rejected | deferred
-reason: <one line>
+runId: <supervisionRunId>
+stage: GUIDE | RESCUE | REVIEW | RECHECK
+disposition: <the returned disposition, verbatim>
+outcome: adopted | rejected | deferred
+reason: <one line — required even when adopted>
 taskId: <active task id, or "none">
 provider: <runtime>
-skill: <skill and workflow, e.g. mk:fix / standard>
-checkpoint: <trigger a | b | c, named>
+skill: <skill and workflow>
+checkpointId: <named checkpoint>
 ---
 
-This is a record of counsel, NEVER verification evidence.
+This is a record of supervision, NEVER verification and never a gate approval.
 
 **Question asked:** …
-**Recommendation:** … (summary, not the full packet)
+**Directive:** … (summary, not the full packet)
+**Required corrections:** … (or "none")
 **Evidence pointers:** …
 **Next safe action:** …
 ```
 
-The header line is verbatim, and the reason is required even when the counsel
-was adopted — "why" is the part a later session cannot reconstruct.
+`disposition` is Athena's returned routing signal; `outcome` is what the parent did
+with it. They are separate fields because a parent may rightly reject a directive,
+and collapsing them would hide that. The reason is required even when adopted —
+"why" is what a later session cannot reconstruct.
 
-### Where the pointer goes
-
-| Situation | Action |
-|---|---|
-| An active durable task record exists | `mewkit task-state update <id> --evidence-ref <receipt path>` — the receipt joins `evidenceRefs`, and `mewkit task-state` lists it on resume |
-| No active durable task (a one-off run) | Keep the receipt file, skip the pointer. Never invent a record (`.claude/rules/task-state-emission.md` Rule 1) |
-
-A failed receipt write surfaces a one-line notice and the workflow continues. It
-never blocks, and it is never skipped silently
+A failed receipt write surfaces a one-line notice and never fails silently
 (`.claude/rules/memory-read-rules.md`, no-silent-skip).
 
-### Trace
+Old-format receipts using the retired `proceed | pause | escalate` vocabulary stay
+readable, but MUST NOT be reinterpreted as correction authority.
 
-Optional, and only for trigger (a): a checkpoint reached because the run was
-genuinely stuck is friction, and recording it lets `mewkit trace propose` group
-repeated stalls at the same place.
+## 9 — Propagation
 
-```
-mewkit trace --friction "advice checkpoint: <one line>" --responsibility failure-attribution
-```
+Only `supervisionRunId` crosses an approved top-level lifecycle handoff between
+skills that both document `--advice`. Spawned workers receive a task-specific
+directive — never the flag, never the dossier, never routing ability.
 
-Triggers (b) and (c) are not friction — do not log them there. The trace record
-is telemetry; the receipt file is the durable record, and neither is verification.
+## 10 — Fallback
 
-## 7 — Propagation
-
-The flag follows only an **explicit lifecycle handoff** between skills that both
-document `--advice` support. It is not inherited by spawned agents, background
-jobs, or nested skill calls. In the current slice no handoff target exists, so
-in practice the flag ends with the run that received it.
-
-## 8 — Fallback when the runtime cannot delegate
-
-If the running provider cannot discover the agent or cannot execute a one-shot
-foreground delegation, the skill prints exactly:
+If the runtime cannot discover the agent or execute a foreground delegation, the
+skill prints exactly:
 
 ```
 advice checkpoint unavailable in this runtime: <reason>
@@ -164,22 +257,36 @@ advice checkpoint unavailable in this runtime: <reason>
 
 then continues unsupervised.
 
-**Inline self-advice impersonating Athena is forbidden.** The main thread must
-not write a counsel packet and present it as if a supervisor produced it: a
-recommendation from the agent that is stuck is not an independent check, and
-labelling it as one corrupts the receipt.
+**Inline self-advice impersonating Athena is forbidden.** A recommendation written
+by the agent that is stuck is not an independent check, and labelling it as one
+corrupts the receipt.
 
-## 9 — Model policy
+## 11 — Direct consult vs embedded supervision
+
+Where a runtime exposes direct mention of the agent, that is a **stateless strategy
+consult**: Athena may assess a difficult situation, compare alternatives and make a
+recommended operational decision, but creates no run receipt, correction routing or
+cap accounting. It is NOT lifecycle supervision and must label itself accordingly.
+It escalates rather than changing a locked business, security, compliance or gate
+decision. Embedded supervision requires a valid `supervisionRunId`.
+
+## 12 — Model policy
 
 `--advice` never changes the executor's model. Athena maps to the strongest
-advisory tier declared in the **provider adapter file** for the runtime in use
-(the agent definition on each plane). No model name or id belongs in this
-contract or in any skill body — see `.claude/rules/skill-authoring-rules.md`
-Rule 7.
+advisory tier declared in the **provider adapter file** for the runtime in use. No
+model name or id belongs in this contract or in any skill body
+(`.claude/rules/skill-authoring-rules.md` Rule 7).
 
-## Integrations
+## Wiring status
 
-- `mk:fix` standard and deep workflows — the three triggers above.
-- Any future skill wrapped under `--advice` loads this file the same way, JIT,
-  and declares its own trigger table. Wrapping a new skill requires a registry
-  row in the same change (`.claude/rules/dead-weight-audit-rules.md` Rule 6).
+This file is the canonical contract. Wrapper wiring lands per skill, and a skill
+that has not been wired yet exposes no flag:
+
+- `mk:fix` — wrapper still describes the retired one-shot three-trigger cadence and
+  is rewritten in the core-cohort step. Until then its prose is superseded by this
+  file, not authoritative.
+- `mk:brainstorming`, `mk:plan-creator`, `mk:cook` — core cohort, not yet wired.
+- `mk:autobuild`, `mk:ship` — extended cohort, not yet wired.
+
+Wrapping a new skill requires a registry row in the same change
+(`.claude/rules/dead-weight-audit-rules.md` Rule 6).

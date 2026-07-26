@@ -53,7 +53,7 @@ not reach the relevant surface pays zero context cost.
 | Rule | Purpose | Loaded by |
 | ---- | ------- | --------- |
 | `workflow-evidence-rules.md` | One-run evidence index: pointers + normalized summaries of plan/diagnosis/verify/verdict/approvals. Records gate results; never approves | `mk:fix`, `mk:cook`, `mk:review`, `mk:ship` on demand |
-| `advice-supervision-rules.md` | `--advice` supervisory lane: activation, the three bounded checkpoint triggers, input/output packets, prohibitions, receipt + disposition. Counsel is evidence, never gate authority and never verification | Skills run with `--advice` (currently `mk:fix`), at the first checkpoint |
+| `advice-supervision-rules.md` | `--advice` supervision lane: activation, the `GUIDE → RESCUE* → REVIEW → RECHECK*` cadence with per-stage and per-skill caps, input/output packets and their caps, stage-legal dispositions, continuity dossier, correction cycle, prohibitions, receipt. Supervision is evidence, never gate authority and never verification | Skills run with `--advice`, at their first named checkpoint |
 
 ## Loading Priority
 

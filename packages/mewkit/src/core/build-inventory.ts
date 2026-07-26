@@ -55,7 +55,7 @@ export interface InventoryEntry {
 	/** Generated agent-contract classification; never a hand-maintained roster. */
 	agentClass?: "core-support" | "domain" | "intelligence" | "internal";
 	/** Generated entry route used by the agent-contract inventory views. */
-	routing?: "direct-only" | "hub-only" | "harness";
+	routing?: "direct-only" | "hub-only" | "harness" | "direct-and-harness";
 	/** Whether the agent can be invoked outside its internal executor path. */
 	public?: boolean;
 	/** Agent-only owned paths/patterns parsed from its ownership declaration. */
@@ -258,9 +258,10 @@ function dependencyEdges(
 }
 
 function agentContractFields(id: string): Pick<InventoryEntry, "agentClass" | "routing" | "public"> {
-	// Executors reached only through their own skill/flag, never orchestrator-routed:
-	// `advisor` behind mk:advise, `athena` behind --advice checkpoints.
-	if (id === "advisor" || id === "athena") return { agentClass: "internal", routing: "harness", public: false };
+	// `advisor` is reached only through mk:advise. Athena has both a bounded
+	// --advice harness route and an explicitly requested, stateless strategy consult.
+	if (id === "advisor") return { agentClass: "internal", routing: "harness", public: false };
+	if (id === "athena") return { agentClass: "intelligence", routing: "direct-and-harness", public: true };
 	if (id === "story-sizer") return { agentClass: "intelligence", routing: "direct-only", public: true };
 	if (id.startsWith("jira-") || id.startsWith("confluence-")) {
 		return { agentClass: "domain", routing: "hub-only", public: true };

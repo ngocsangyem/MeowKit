@@ -86,7 +86,7 @@ export function renderAgentViewCounts(claudeDir: string): string {
 	const agents = buildInventory(claudeDir).entries.filter((entry) => entry.type === "agent");
 	const count = (agentClass: string, routing: string) =>
 		agents.filter((entry) => entry.agentClass === agentClass && entry.routing === routing).length;
-	return `${VIEW_START}\n**Agent registry views (generated):** ${count("core-support", "direct-only")} core/support direct-only; ${count("domain", "hub-only")} domain hub-only; ${count("intelligence", "direct-only")} intelligence direct-only; ${count("internal", "harness")} internal harness.\n${VIEW_END}`;
+	return `${VIEW_START}\n**Agent registry views (generated):** ${count("core-support", "direct-only")} core/support direct-only; ${count("domain", "hub-only")} domain hub-only; ${count("intelligence", "direct-only")} intelligence direct-only; ${count("intelligence", "direct-and-harness")} intelligence direct-and-harness; ${count("internal", "harness")} internal harness.\n${VIEW_END}`;
 }
 
 /**

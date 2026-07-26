@@ -90,13 +90,10 @@ export const AUTHORED_CAPABILITIES: CapabilityEntry[] = [
 		id: "advice-supervision",
 		kind: "agent",
 		description:
-			"Bounded advisory supervision at declared --advice checkpoints, via the athena agent. Counsel is evidence, never gate approval and never verification.",
-		// Describe-only: a user does not invoke this directly — it fires from inside a wrapped
-		// skill's checkpoint. Listing it keeps the lane discoverable and lets each provider's
-		// support be reported honestly instead of assumed.
-		intents: [],
+			"Athena provides bounded strategic supervision at declared --advice checkpoints and a stateless direct strategy consult where a provider exposes it. Recommendations are evidence, never gate approval or verification.",
+		intents: ["strategic judgement", "decision recommendation", "delivery supervision"],
 		whenToUse:
-			"Reached automatically by a skill run with --advice when it is stuck after two failed approaches, faces an irreversible step, or carries unclear residual risk.",
+			"Use --advice for a bounded delivery run, or explicitly consult Athena for a stateless strategy brief when the situation needs trade-off analysis, judgement, or a recommended next decision.",
 		// `support` stays EMPTY: delegation has not been proven against a live session on any
 		// provider yet, and absence reads as unknown rather than as a claim. Populate a provider
 		// only from a recorded smoke run — never from the fact that the files exist.
