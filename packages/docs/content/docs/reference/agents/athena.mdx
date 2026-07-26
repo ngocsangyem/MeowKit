@@ -145,6 +145,40 @@ It never interviews the user, never grades or scores, owns no plan or report, re
 memory only when a packet explicitly points at it, never writes memory, and never
 spawns another supervisor.
 
+## Provider Support
+
+Athena is authored on three planes, each in its own runtime's dialect rather than as a
+copy: Claude Code, Codex (`.codex/agents/athena.toml` plus a
+`rule-advice-supervision` skill projection, because Codex has no conditional-rule
+surface) and Cursor (`.cursor/agents/athena.md` plus an Agent-Requested `.mdc`). All six
+wrapped skills declare the flag on all three.
+
+**Authored is not proven.** Two capabilities are tracked separately, because a runtime can
+expose one and not the other:
+
+| Capability | What it is |
+|---|---|
+| `embedded-supervision` | the `--advice` harness — checkpoints, caps, dossier, receipts |
+| `direct-consult` | a stateless strategy brief, where the runtime exposes direct delegation |
+
+Check the current state for a runtime:
+
+```bash
+mewkit providers <provider>
+```
+
+Every capability on every provider is `unverified` today: the wiring exists, no live
+session has exercised delegation. A state leaves `unverified` only from a recorded run with
+artifact hashes and a workspace diff — never from the fact that the files exist. Codex
+additionally reports its mutation ban as `degraded (behavioral)`, since it has no per-agent
+tool field to enforce one.
+
+If a runtime cannot reach the agent, the wrapper prints
+`advice checkpoint unavailable in this runtime: <reason>` and the run continues
+unsupervised. A packet written inline and presented as Athena's output is forbidden: a
+recommendation from the agent that is stuck is not an independent check, and a receipt
+recording it as one corrupts the audit trail.
+
 ## Related Reference
 
 - **[advisor](/reference/agents/advisor)** — the interview-driven alternative; it
