@@ -19,9 +19,9 @@
 			"agents": ["evaluator", "security"]
 		},
 		"product": {
-			"description": "Product/planning roles: solution brainstorming, ticket sizing, delivery-status tracking, and interview-driven advisory.",
+			"description": "Product/planning roles: solution brainstorming, ticket sizing, delivery-status tracking, interview-driven advisory, and one-shot advice-checkpoint supervision.",
 			"dependsOn": ["core"],
-			"agents": ["brainstormer", "story-sizer", "project-manager", "advisor"]
+			"agents": ["brainstormer", "story-sizer", "project-manager", "advisor", "athena"]
 		},
 		"operations": {
 			"description": "Delivery-pipeline and knowledge-capture roles: shipping, git operations, failure journaling, living docs, and cost/pattern analysis.",

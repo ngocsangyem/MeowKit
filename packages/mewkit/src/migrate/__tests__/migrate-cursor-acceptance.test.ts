@@ -49,7 +49,7 @@ describe("migrate cursor acceptance — full-bundle install completeness", () =>
 		expect(existsSync(join(projectDir, ".claude"))).toBe(false);
 	});
 
-	it("installs all 40 agents and all 126 skills with the 'all' pack selection", async () => {
+	it("installs all 41 agents and all 126 skills with the 'all' pack selection", async () => {
 		await reconcileApplyCursorBundle(moduleDir, projectDir, {
 			packs: "all",
 			adoptHomeRegistry: false,
@@ -57,7 +57,7 @@ describe("migrate cursor acceptance — full-bundle install completeness", () =>
 		});
 
 		const agentFiles = readdirSync(join(projectDir, ".cursor", "agents")).filter((f) => f.endsWith(".md"));
-		expect(agentFiles.length).toBe(40);
+		expect(agentFiles.length).toBe(41);
 
 		const skillDirs = readdirSync(join(projectDir, ".cursor", "skills"), { withFileTypes: true }).filter((d) =>
 			d.isDirectory(),

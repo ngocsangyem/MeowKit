@@ -57,6 +57,28 @@
 						"cloud": "not-claimed",
 						"tab": "not-claimed"
 					}
+				},
+				{
+					"claim": "athena (advice-checkpoint supervisor) is discovered from .cursor/agents/athena.md and dispatched in the foreground, blocking until it returns one counsel packet. NOT yet exercised against a live Cursor binary: foreground delegate-and-wait has open reliability reports skewed toward the cursor-agent CLI (Task-tool availability history, stuck prompts, premature main-thread end). Wherever this is unconfirmed, the wrapped fix skill prints its documented unavailable-checkpoint line and continues unsupervised.",
+					"source": "https://cursor.com/docs/agent/subagents",
+					"verified": "2026-07-26",
+					"environments": {
+						"ide-local": "undocumented",
+						"cli-headless": "undocumented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "athena's no-mutation rule is enforced structurally by readonly: true on this surface, unlike the Codex plane where the equivalent ban is behavioral-only. The flag's runtime effect has not been live-verified for this agent.",
+					"source": "https://cursor.com/docs/agent/subagents",
+					"verified": "2026-07-26",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
 				}
 			]
 		},

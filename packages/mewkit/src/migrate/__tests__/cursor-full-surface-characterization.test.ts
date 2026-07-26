@@ -71,15 +71,15 @@ describe("cursor full-surface characterization: skill catalog inventory", () => 
 });
 
 describe("cursor full-surface characterization: agent catalog inventory", () => {
-	it("ships exactly 40 agent files, matching the union of every agent pack", () => {
+	it("ships exactly 41 agent files, matching the union of every agent pack", () => {
 		const onDisk = readdirSync(join(rootDir, ".cursor", "agents")).filter((f) => f.endsWith(".md"));
-		expect(onDisk.length).toBe(40);
+		expect(onDisk.length).toBe(41);
 
 		const catalog = JSON.parse(
 			readFileSync(join(moduleDir, "catalog", "agent-packs.json"), "utf-8"),
 		) as AgentPackCatalog;
 		const unionOfPacks = new Set(Object.values(catalog.packs).flatMap((p) => p.agents));
-		expect(unionOfPacks.size).toBe(40);
+		expect(unionOfPacks.size).toBe(41);
 		expect([...unionOfPacks].map((n) => `${n}.md`).sort()).toEqual(onDisk.sort());
 	});
 
