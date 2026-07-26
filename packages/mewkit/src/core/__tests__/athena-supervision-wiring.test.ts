@@ -27,7 +27,7 @@ import {
 	markCurrent,
 	supersessionProblems,
 } from "../workflow-evidence-revision.js";
-import { AdviceRefusal, runAdvice } from "../../commands/advice.js";
+import { AdviceRefusal, EVIDENCE_INDEX_FILENAME, runAdvice } from "../../commands/advice.js";
 
 // Resolve the repo from this file, not `process.cwd()`: cwd passes from the repo root
 // and fails from `packages/mewkit`, and the newer tests here already moved off it.
@@ -492,7 +492,15 @@ describe("advice command", () => {
 	it("refuses an --evidence path that escapes the project", async () => {
 		// `--evidence` reaches a WRITE, so a traversal here would let a supervision
 		// event mutate a file outside the repository (`injection-rules.md` Rule 6).
+		//
+		// The escaping target must EXIST for this to test the boundary. Pointing at a
+		// path that is both outside and absent gets refused as absent, which is safe but
+		// proves nothing about traversal — the check under test never runs.
 		const root = tempRoot();
+		const outsideDir = mkdtempSync(join(tmpdir(), "athena-escape-"));
+		const outside = join(outsideDir, EVIDENCE_INDEX_FILENAME);
+		writeFileSync(outside, JSON.stringify({ evidenceRevision: 1 }), "utf-8");
+
 		await begin(root, { stage: "REVIEW", checkpoint: "cook-review" });
 		await expect(
 			runAdvice(root, {
@@ -502,10 +510,13 @@ describe("advice command", () => {
 				disposition: "RETURN_TO_EXECUTOR",
 				reason: "r",
 				correction: ["c"],
-				evidence: "../../escape.json",
+				evidence: outside,
 				correctionKind: "source",
 			}),
 		).rejects.toThrow(/must stay inside the project/);
+
+		// Untouched: a refused correction writes nothing anywhere.
+		expect(JSON.parse(readFileSync(outside, "utf-8"))).toEqual({ evidenceRevision: 1 });
 	});
 
 	it("does not let a fresh run id walk around an escalation", async () => {

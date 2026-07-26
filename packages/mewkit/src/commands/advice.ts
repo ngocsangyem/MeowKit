@@ -11,7 +11,7 @@
 // Nothing here approves anything. `begin` may refuse a call and `commit` may refuse
 // a disposition, but no path advances a gate, and `disposition` is recorded verbatim
 // alongside the parent's own `outcome`.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, realpathSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
 import {
@@ -71,6 +71,15 @@ export interface AdviceOptions {
 	releaseStage?: string;
 	json?: boolean;
 }
+
+/**
+ * The only file a returned correction may write.
+ *
+ * The workflow evidence index is written under several roots — `.claude/`, `.codex/`,
+ * `.meowkit/state/`, `tasks/plans/<plan>/reports/evidence/` — but always under this
+ * name, so the name is what identifies it rather than any one path.
+ */
+export const EVIDENCE_INDEX_FILENAME = "workflow-evidence.json";
 
 const toArray = (v: string | string[] | undefined): string[] =>
 	v === undefined ? [] : (Array.isArray(v) ? v : [v]).map((s) => String(s).trim()).filter(Boolean);
@@ -368,19 +377,63 @@ function applyEvidenceCorrection(projectRoot: string, args: AdviceOptions): void
 		return;
 	}
 
-	// Stay inside the project (`injection-rules.md` Rule 6). `--evidence` reaches a
-	// WRITE, and the value is supplied by whatever assembled the checkpoint call, so
-	// `../` here would let a supervision event mutate a file outside the repository.
+	// Resolve symlinks BEFORE deciding anything about the path.
+	//
+	// `path.resolve` normalizes text; it does not follow links. Checking the literal
+	// argument therefore answers a question about the caller's string, not about the file
+	// that will actually be opened — and `readFileSync` follows links at the OS level. A
+	// symlink named `workflow-evidence.json` placed anywhere in the repo and pointing
+	// outside it satisfied every textual check, and its contents were merged into the
+	// correction and written back inside the repo. That is `injection-rules.md` Rule 6
+	// (project boundary) defeated by one indirection, and it turns this path into the
+	// 3-of-3 shape Rule 11 exists to reject: caller-supplied pointer, sensitive read,
+	// state change. Every check below runs on the real path.
 	const abs = path.resolve(projectRoot, args.evidence);
-	const rel = path.relative(projectRoot, abs);
-	if (rel.startsWith("..") || path.isAbsolute(rel))
-		fail(`Refused: --evidence must stay inside the project (${args.evidence} resolves outside ${projectRoot}).`);
+	let real: string;
+	try {
+		real = realpathSync(abs);
+	} catch {
+		// `--evidence` must name an index that already exists — a correction supersedes
+		// recorded evidence and never creates it — so an unresolvable path is simply absent.
+		return fail(`Cannot apply correction: evidence file not found: ${args.evidence}`);
+	}
 
-	const loaded = readJsonFile(abs);
+	// Stay inside the project (`injection-rules.md` Rule 6). `--evidence` reaches a WRITE,
+	// and the value is supplied by whatever assembled the checkpoint call.
+	//
+	// The ROOT is resolved too, or the comparison is between a real path and a textual
+	// one. On macOS `/var` is itself a symlink to `/private/var`, so a project under
+	// `/var/...` would compute as outside itself and every correction would be refused.
+	let realRoot: string;
+	try {
+		realRoot = realpathSync(projectRoot);
+	} catch {
+		realRoot = projectRoot;
+	}
+	const rel = path.relative(realRoot, real);
+	if (rel.startsWith("..") || path.isAbsolute(rel))
+		fail(`Refused: --evidence must stay inside the project (${args.evidence} resolves to ${real}, outside ${realRoot}).`);
+
+	// Inside the project is not narrow enough. `applyCorrection` spreads whatever JSON
+	// object it reads and writes it back, so any JSON file in the repo was a legal write
+	// target. Pointed at a Gate-1-approved `visual-plan/plan.json` — which carries its own
+	// top-level `review.status` — a correction flipped that status to "superseded",
+	// injected four foreign fields, and broke the artifact against its own pinned hash.
+	// That is a supervision event silently mutating the HTML pipeline's artifact, which
+	// the two flags being orthogonal is supposed to make impossible.
+	//
+	// The index has one name everywhere it is written, so the name is the check.
+	if (path.basename(real) !== EVIDENCE_INDEX_FILENAME)
+		fail(
+			`Refused: --evidence must name a ${EVIDENCE_INDEX_FILENAME} (got ${path.basename(real)}).\n` +
+				"  A correction supersedes workflow evidence; it does not write any other artifact.",
+		);
+
+	const loaded = readJsonFile(real);
 	if (!loaded.ok) fail(`Cannot apply correction: ${loaded.reason}`);
 
 	const updated = applyCorrection(loaded.data, kind);
-	writeJsonAtomic(abs, updated);
+	writeJsonAtomic(real, updated);
 	console.log(
 		pc.green(
 			`  evidence revision → ${updated.evidenceRevision}; verification and review marked superseded${

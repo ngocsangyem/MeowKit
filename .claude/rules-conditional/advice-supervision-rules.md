@@ -188,6 +188,42 @@ tester, whoever owns it — never to Athena.
 
 Superseded evidence must never read as current at a later gate or ship preflight.
 
+**A correction's only write target is an existing `workflow-evidence.json` inside the
+project.** The index lives under several roots but always under that name, so the name is
+the check; the CLI refuses any other path. Without that bound, `--evidence` accepted any
+JSON object in the project and the correction spread it and wrote it back — pointed at a
+Gate-1-approved `visual-plan/plan.json`, which carries its own top-level `review.status`,
+it flipped that status to `superseded`, injected fields the visual schema does not define,
+and broke the artifact against its own pinned hash. Supervision does not write another
+owner's artifact.
+
+Both the boundary check and the name check run on the **resolved** path. A textual check
+answers a question about the caller's string, not about the file that will be opened, and
+reads follow symlinks: a link named `workflow-evidence.json` inside the project and
+pointing outside it otherwise satisfied every check, and its contents were merged into the
+correction and written back inside the repository. A path that does not resolve is absent,
+and a correction supersedes recorded evidence rather than creating it, so it is refused.
+
+## 6a — Composing with `--html`
+
+`--advice` and `--html` are orthogonal. Neither implies the other, each is parsed
+independently, and combining them changes no activation, approval, validation, export or
+ownership. A run with both produces the same visual artifact, at the same path, validated
+by the same validator, approved by the same human at the same gate, and exported by the
+same owner as `--html` alone would for the same final Markdown.
+
+They meet only in the correction loop, because a supervised correction edits Markdown and
+the visual artifact pins hashes of it. The Markdown plan stays the source of truth;
+REVIEW fires before the gate step where the visual preconditions are checked; and a
+returned correction invalidates the artifact's pinned hashes exactly like any other
+Markdown edit — rehash (which clears the prior visual approval), re-validate, re-review,
+re-approve, then present the ordinary Gate 1. A stale artifact never reaches the gate
+beside a corrected plan.
+
+Athena approves no visual, edits no HTML, changes no filename or path, opens no browser,
+and turns no dossier or receipt into a rendered artifact. This is structural: the adapter
+grants read-only tools, so no such action is available to it.
+
 ## 7 — Prohibitions
 
 Athena MUST NOT:

@@ -43,6 +43,37 @@ If the correction changes scope rather than wording, the plan body changes, so a
 previously stamped approval goes stale and re-approval is required — that is the
 existing receipt mechanism working, not a new rule.
 
+## Composing with `--html`
+
+The two flags are orthogonal: `--advice` never turns the visual pipeline on, `--html`
+never turns supervision on, and combining them changes no activation, approval,
+validation, export or ownership. `step-00` parses each independently, and neither alters
+`planning_mode`.
+
+Where they meet is the correction loop, because a supervised correction edits Markdown
+and the visual artifact pins hashes of that Markdown:
+
+1. The **Markdown plan stays the source of truth.** Athena reviews plan semantics and
+   evidence; it never reviews the rendered artifact.
+2. REVIEW fires before `step-07-gate`, which is where the visual Gate-1 preconditions are
+   checked and `mewkit visual-plan approve` runs. Supervision therefore lands *before*
+   the visual approval, never between it and the gate.
+3. A `RETURN_TO_EXECUTOR` that edits the plan invalidates the artifact's pinned source
+   hashes exactly like any other Steps 5/6 edit. Follow the existing route in
+   `references/visual-plan-integration.md` §6: `mewkit visual-plan rehash {plan_dir}` —
+   which **clears the prior visual approval** — then re-validate, re-review, and
+   `approve` the new revision before presenting Gate 1. A stale artifact must never reach
+   the gate alongside a corrected plan.
+4. Nothing about step-08b changes. The export still runs only on a Gate-1-approved
+   artifact, still writes exactly `{plan_dir}/plan.html`, and is still fail-open.
+
+**Athena touches none of it.** It cannot approve the visual, edit the HTML, change its
+filename or path, open a browser, or turn its dossier or receipt into the visual
+artifact. That is structural rather than promised: the adapter grants `Read, Grep, Glob`
+and nothing else, so there is no tool with which to do any of it. The supervision
+dossier and receipts live under `tasks/reports/`; a correction may supersede a
+`workflow-evidence.json` and nothing else — the CLI refuses any other write target.
+
 ## Call
 
 ```
