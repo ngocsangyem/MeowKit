@@ -47,25 +47,29 @@ Confluence execution lives in 5 thin leaf skills (each forks a dedicated agent i
 - **Comments / attachments / watchers:** always `mk:confluence-collaborate`, even if scoped to a single page.
 - Truly ambiguous → ask one clarifying question.
 
-## Setu## Setup
+## Setup
 
 Install, authentication, the Cloud-only boundary, and troubleshooting live on [Confluence Integration](/guides/confluence-integration).
 
-Mechanically: the wrapper exits 3 on non-`*.atlassian.net` URLs, and the hub does NOT auto-fallback to the Atlassian MCP transport - the leaf is invoked with it explicitly.chitecture
+Mechanically: the wrapper exits 3 on non-`*.atlassian.net` URLs, and the hub does NOT auto-fallback to the Atlassian MCP transport - the leaf is invoked with it explicitly.
+
+## Architecture
+
+The router recommends a leaf and never executes; each leaf runs `context: fork` against its matching agent in `.claude/agents/`.
 
 ```
-mk:confluence (router, ≤80 lines)              ← recommends a leaf, never executes
+mk:confluence (router, ≤80 lines)
 ├── shared resources (used by all 5 leaves):
 │   ├── scripts/{confluence-as.sh, cql-sanitize.sh}
-│   ├── scripts/{adf-to-md.sh, adf_to_md.py}    ← macro-aware ADF→Markdown walker
-│   ├── scripts/requirements.txt                 ← pip deps installed by mewkit setup
+│   ├── scripts/{adf-to-md.sh, adf_to_md.py}     macro-aware ADF→Markdown walker
+│   ├── scripts/requirements.txt                 pip deps installed by mewkit setup
 │   └── references/{install-and-auth, cli-idioms, safety-framework}.md
-└── 5 leaf skills (each: context: fork → matching agent in .claude/agents/)
-    ├── confluence-page          — single-page CRUD + hierarchy + version
-    ├── confluence-search        — CQL search + space list + saved filters + export
-    ├── confluence-spec-analyst  — deep spec analysis (read-only at Confluence side)
-    ├── confluence-bulk          — bulk ops on 10+ pages with mandatory dry-run
-    └── confluence-collaborate   — comments / attachments / labels / watchers
+└── 5 leaf skills
+    ├── confluence-page          single-page CRUD + hierarchy + version
+    ├── confluence-search        CQL search + space list + saved filters + export
+    ├── confluence-spec-analyst  deep spec analysis (read-only at Confluence side)
+    ├── confluence-bulk          bulk ops on 10+ pages with mandatory dry-run
+    └── confluence-collaborate   comments / attachments / labels / watchers
 ```
 
 ## Handoff

@@ -61,13 +61,13 @@ The [mk:qa-manual](/reference/skills/qa-manual) skill:
 3. Detects test ID convention (`data-testid` or `data-cy`)
 4. Generates feature folder structure:
 
-```
+```files
 tests/e2e/checkout-flow/
 ├── common/
-│   ├── checkoutSelectors.ts      # All locators centralized
-│   ├── checkoutAssertions.ts     # Reusable assertions
-│   └── checkoutIntercepts.ts     # API mocks
-└── checkout-flow.spec.ts         # One describe block
+│   ├── checkoutSelectors.ts (all locators centralized)
+│   ├── checkoutAssertions.ts (reusable assertions)
+│   └── checkoutIntercepts.ts (API mocks)
+└── checkout-flow.spec.ts (one describe block)
 ```
 
 ### Step 2: Verify selectors exist

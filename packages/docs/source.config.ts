@@ -1,5 +1,5 @@
 import { defineDocs, defineConfig, frontmatterSchema } from 'fumadocs-mdx/config';
-import { remarkMdxMermaid } from 'fumadocs-core/mdx-plugins';
+import { remarkMdxMermaid, remarkMdxFiles } from 'fumadocs-core/mdx-plugins';
 import { z } from 'zod';
 
 // The frontmatter contract: which runtime file owns a page's facts, and when a human last
@@ -35,6 +35,10 @@ export const docs = defineDocs({
 
 export default defineConfig({
   mdxOptions: {
-    remarkPlugins: [remarkMdxMermaid],
+    // `remarkMdxFiles` claims ```files fences and rewrites them to <Files>/<Folder>/<File>.
+    // Directory trees drawn by hand in box-drawing characters cannot survive a webfont whose
+    // subset omits U+2500-257F — the glyphs fall back to a font with a different advance
+    // width and the columns shear apart. A real tree component has no column to shear.
+    remarkPlugins: [remarkMdxMermaid, remarkMdxFiles],
   },
 });

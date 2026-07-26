@@ -54,21 +54,27 @@ Install, authentication, safety rules, and troubleshooting live on [Jira Integra
 Mechanically: the SessionStart hook `jira-env-loader.sh` validates `.meowkit/.env` and emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing`; the wrapper `scripts/jira-as.sh` translates `MEOW_JIRA_*` -> native `JIRA_*` env per call.
 ## Architecture
 
+The router recommends a leaf and never executes; each of the 16 leaves runs `context: fork` against its matching agent in `.claude/agents/`.
+
 ```
-mk:jira (router, ≤80 lines)              ← recommends a leaf, never executes
+mk:jira (router, ≤80 lines)
 ├── shared resources (used by all 16 leaves):
 │   ├── scripts/{jira-as.sh, jql-sanitize.sh, fetch-workflow.sh}
-│   ├── scripts/requirements.txt          ← pip deps installed by mewkit setup
+│   ├── scripts/requirements.txt          pip deps installed by mewkit setup
 │   └── references/{install-and-auth, cli-idioms, safety-framework}.md
-└── 16 thin leaf skills (each: context: fork → matching agent in .claude/agents/)
-    ├── 13 domain leaves (issue, search, lifecycle, collaborate, relationships, time,
-    │                     agile, fields, bulk, jsm, admin, dev, ops)
+└── 16 thin leaf skills
+    ├── 13 domain leaves (issue, search, lifecycle, collaborate, relationships,
+    │                     time, agile, fields, bulk, jsm, admin, dev, ops)
     └── 3 intelligence leaves (evaluator, estimator, analyst)
+```
 
-tasks/jira-workflows/              ← discovered Jira workflow cache (NEW in 2.8.3)
+The discovered Jira workflow cache (new in 2.8.3) lands separately:
+
+```files
+tasks/jira-workflows/
 ├── README.md
-├── _schemes/<PROJECT_KEY>.md      ← project → workflow-name mapping
-└── <workflow-slug>.md             ← full statuses + transitions per workflow
+├── _schemes/<PROJECT_KEY>.md — project → workflow-name mapping
+└── <workflow-slug>.md — full statuses + transitions per workflow
 ```
 
 ## Handoff

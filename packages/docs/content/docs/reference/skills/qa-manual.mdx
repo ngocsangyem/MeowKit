@@ -71,14 +71,14 @@ If no flag is provided, the skill auto-detects the use case from spec content.
 2. **Record interactions** -- Capture Playwright TypeScript code from each playwright-cli action
 3. **Detect test ID convention** -- Check source for `data-testid` vs `data-cy` vs `data-test`
 4. **Generate feature folder:**
-   ```
+   ```files
    tests/e2e/{feature-name}/
    ├── common/
-   │   ├── {featureName}Selectors.ts    # All locators
-   │   ├── {featureName}Assertions.ts   # Reusable assertions
-   │   ├── {featureName}Intercepts.ts   # API route mocks
-   │   └── {featureName}Helpers.ts      # Shared setup (optional)
-   └── {feature-name}.spec.ts           # One test.describe only
+   │   ├── {featureName}Selectors.ts (all locators)
+   │   ├── {featureName}Assertions.ts (reusable assertions)
+   │   ├── {featureName}Intercepts.ts (API route mocks)
+   │   └── {featureName}Helpers.ts (shared setup, optional)
+   └── {feature-name}.spec.ts (one test.describe only)
    ```
 5. **Verify selectors** -- Grep source for each `getByTestId('xxx')`; if missing, add warning + fallback
 6. **Validate** -- Run generated `.spec.ts` via `scripts/run-playwright.sh`

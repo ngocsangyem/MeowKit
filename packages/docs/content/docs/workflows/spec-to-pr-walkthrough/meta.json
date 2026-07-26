@@ -1,0 +1,18 @@
+{
+  "title": "Spec → PR: Behind the Scenes",
+  "pages": [
+    "index",
+    "---The ten steps---",
+    "step-01-pull-the-spec",
+    "step-02-open-questions",
+    "step-03-tech-feasibility",
+    "step-03-5-story-sizing",
+    "step-04-create-tickets",
+    "step-05-epic-and-rank",
+    "step-06-refine-and-estimate",
+    "step-07-tech-review",
+    "step-08-plan-per-ticket",
+    "step-09-implement-with-cook",
+    "step-10-close-the-loop"
+  ]
+}

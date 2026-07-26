@@ -27,14 +27,14 @@ lower-fidelity read, not an error.
 
 Tickets often include more than text. Bug reports have screen recordings. Feature PRDs have Figma links. Specs have PDF attachments. MeowKit processes all of these through a fallback chain — it tries the best tool first, then degrades gracefully if that tool isn't available.
 
-```
-Ticket arrives (Jira/Linear/GitHub/manual)
-  │
-  ├─ Text content → mk:intake analyzes directly
-  ├─ Images (.png/.jpg) → Claude Read or Gemini
-  ├─ Videos (.mp4/.mov) → FFmpeg key frames → Claude Read or Gemini
-  ├─ Figma links → Figma MCP or PNG export → Claude Read or Gemini
-  └─ PDFs → Claude Read (native, up to 20 pages)
+```mermaid
+flowchart LR
+    T["Ticket arrives<br/>(Jira / Linear / GitHub / manual)"]
+    T --> A["Text content"] --> A1["mk:intake analyzes directly"]
+    T --> B["Images (.png/.jpg)"] --> B1["Claude Read or Gemini"]
+    T --> C["Videos (.mp4/.mov)"] --> C1["FFmpeg key frames"] --> C2["Claude Read or Gemini"]
+    T --> D["Figma links"] --> D1["Figma MCP or PNG export"] --> D2["Claude Read or Gemini"]
+    T --> E["PDFs"] --> E1["Claude Read<br/>(native, up to 20 pages)"]
 ```
 
 ## Prerequisites
@@ -120,35 +120,30 @@ mk:intake finds `.mp4` in attachments.
 
 ### Step 2: Video processing — FFmpeg required
 
-```
-FFmpeg installed?
-├─ YES:
-│   Extract key frames (scene changes only):
-│   ffmpeg -i bug-reproduction.mp4 -vf "select='gt(scene,0.3)'" -vsync vfq frame_%03d.jpg
-│
-│   Result: 8-15 key frames from 2-minute video
-│   (3600 raw frames → 12 key frames = 99.7% reduction)
-│
-└─ NO:
-    ⚠ Cannot analyze video
-    Output: "Video attached but FFmpeg not installed.
-    Install: brew install ffmpeg or npx mewkit setup --system-deps
-    Workaround: manually screenshot key moments and attach as images"
+```mermaid
+flowchart TD
+    Q{"FFmpeg installed?"}
+    Y["Extract key frames (scene changes only)<br/><code>ffmpeg -i bug-reproduction.mp4 -vf select='gt(scene,0.3)' -vsync vfq frame_%03d.jpg</code>"]
+    Y2["Result: 8-15 key frames from a 2-minute video<br/>3600 raw frames → 12 key frames = 99.7% reduction"]
+    N["Cannot analyze video"]
+    N2["'Video attached but FFmpeg not installed.<br/>Install: brew install ffmpeg — or — npx mewkit setup --system-deps<br/>Workaround: manually screenshot key moments and attach as images'"]
+
+    Q -->|yes| Y --> Y2
+    Q -->|no| N --> N2
 ```
 
 ### Step 3: Analyze extracted frames
 
-```
-Gemini available?
-├─ YES: Batch analyze all frames
-│   frame_001: "Login page, empty form"
-│   frame_003: "Email entered, password typed"
-│   frame_005: "Submit clicked, loading spinner"
-│   frame_008: "Error toast: 'Session expired'"
-│   frame_012: "Redirected back to login page"
-│
-└─ NO: Claude Read on each frame
-    Similar descriptions, less precise on small text
+```mermaid
+flowchart TD
+    Q{"Gemini available?"}
+    Y["Batch analyze all frames"]
+    Y2["frame_001: 'Login page, empty form'<br/>frame_003: 'Email entered, password typed'<br/>frame_005: 'Submit clicked, loading spinner'<br/>frame_008: 'Error toast: Session expired'<br/>frame_012: 'Redirected back to login page'"]
+    N["Claude Read on each frame"]
+    N2["Similar descriptions,<br/>less precise on small text"]
+
+    Q -->|yes| Y --> Y2
+    Q -->|no| N --> N2
 ```
 
 ### Step 4: Timeline synthesis
@@ -213,26 +208,19 @@ mk:intake regex matches: `figma.com/(design|file|proto)/`
 
 ### Step 2: Figma analysis — fallback chain
 
-```
-Figma MCP available?
-├─ YES (best):
-│   mk:figma ANALYZE mode:
-│   → get_design_context: component tree, styles, layout, constraints
-│   → get_screenshot: visual reference
-│   → Extract: exact colors (#1A73E8), exact spacing (24px), fonts (Inter 14px/20px)
-│   → Components: LoginCard, EmailInput, PasswordInput, SubmitButton, SocialLoginGroup
-│
-├─ NO, but user can export PNG:
-│   mk:intake asks: "Export Figma frames as PNG"
-│   User drops login-screen.png
-│   → Claude Read or Gemini analyzes the image
-│   → Gets: approximate colors (~#1a73e8), estimated spacing (~24px), visual layout
-│
-└─ NO MCP, no export:
-    ⚠ Cannot analyze design
-    Output: "Figma link detected but cannot access.
-    Install Figma MCP: claude mcp add figma
-    Or export frames as PNG and attach to ticket"
+```mermaid
+flowchart TD
+    Q{"Figma MCP available?"}
+    A["<b>Best</b> — mk:figma ANALYZE mode"]
+    A2["get_design_context: component tree, styles, layout, constraints<br/>get_screenshot: visual reference<br/>Extract: exact colors (#1A73E8), exact spacing (24px), fonts (Inter 14px/20px)<br/>Components: LoginCard, EmailInput, PasswordInput, SubmitButton, SocialLoginGroup"]
+    B["<b>Fallback</b> — user exports PNG"]
+    B2["mk:intake asks: 'Export Figma frames as PNG'<br/>User drops login-screen.png<br/>Claude Read or Gemini analyzes the image<br/>Gets: approximate colors (~#1a73e8), estimated spacing (~24px), visual layout"]
+    C["<b>Blocked</b> — cannot analyze design"]
+    C2["'Figma link detected but cannot access.<br/>Install Figma MCP: claude mcp add figma<br/>Or export frames as PNG and attach to ticket'"]
+
+    Q -->|yes| A --> A2
+    Q -->|"no, but PNG export possible"| B --> B2
+    Q -->|"no MCP, no export"| C --> C2
 ```
 
 ### Step 3: Design context in output

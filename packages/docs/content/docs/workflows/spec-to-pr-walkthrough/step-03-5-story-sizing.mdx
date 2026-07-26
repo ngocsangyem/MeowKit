@@ -1,0 +1,31 @@
+---
+title: "Step 3.5 — Story sizing"
+description: "mk:story-sizer gives each suggested story a Fibonacci size before any ticket exists — advisory by default, with opt-in batch creation behind one confirmation gate."
+---
+
+Spec analyst output gives you a list of suggested user stories. Tech feasibility (Step 3) tells you they are buildable. What you still don't know: **how big is each one?** Jira sizing skills require a ticket key, so they can't help yet. `mk:story-sizer` fills the gap — v1 paste-only, advisory by default, with opt-in `--auto-create` behind a single confirmation gate.
+
+## Prompt
+
+`/mk:story-sizer --paste [--scout]` (advisory) or `/mk:story-sizer --paste --auto-create --project AUTH --epic AUTH-100` (delegated). Paste template requires `story:` + `ac:` per block, separated by bare `---`. Optional `description:`. Full schema: [reference](/reference/skills/story-sizer).
+
+## What happens behind the scenes
+
+| Layer       | Action                                                                                                                                                                                                                                                                                                                                 |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Adapter     | Validates template, emits `StoryRecord` list with SHA-256 source-hash; surfaces `[NO_ACS]` / `[MALFORMED_INPUT]`                                                                                                                                                                                                                       |
+| Scoring     | 5 deterministic dimensions → Fibonacci 1/2/3/5/8/13 + uncertainty + complexity; plus inconsistency / split / DoR (Agile) / codebase signals (`--scout`)                                                                                                                                                                                |
+| Writer      | Renders `tasks/reports/story-sizing-{YYMMDD}-{slug}.md` with per-story sections, summary table, and suggested `mk:jira-issue create` block (v1 field whitelist)                                                                                                                                                                        |
+| Auto-create | 5 pre-flight checks (NO_ACS, Rule-1 injection, length cap, duplicate via `mk:jira-search`, source-hash); single batch `AskUserQuestion`; no skip-confirm. Per story: `mk:jira-issue create --story-points N` + `mk:jira-collaborate add-comment --internal`. Call A failure stops + cleanup hint; Call B failure logs WARN + continues |
+
+<Callout title="Advisory by default" type="warn">
+
+Default mode never calls Jira; suggested create blocks are text you copy in Step 4. `--auto-create` is the only mutating path; see [reference](/reference/skills/story-sizer) for full schema, gating rules, and `MEOWKIT_STORY_SIZER_COMMENT_TEMPLATE`.
+
+</Callout>
+
+Step 3.5 informs Step 4: create tickets with `--story-points <N>` chosen, or run `--auto-create` for delegated batch creation.
+
+---
+
+Previous: [Step 3 — Tech feasibility breakdown](/workflows/spec-to-pr-walkthrough/step-03-tech-feasibility) · Next: [Step 4 — Create the Jira tickets](/workflows/spec-to-pr-walkthrough/step-04-create-tickets) · [All steps](/workflows/spec-to-pr-walkthrough)

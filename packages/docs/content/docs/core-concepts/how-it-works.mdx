@@ -67,10 +67,10 @@ Skills activate by task domain, not all at once. A bug fix loads `mk:fix` (which
 
 Complex skills use step-file decomposition, so only the active step is in context:
 
-```
+```files
 skills/review/
-├── SKILL.md              # Entrypoint, metadata only
-├── workflow.md           # Step sequence
+├── SKILL.md (entrypoint, metadata only)
+├── workflow.md (step sequence)
 ├── step-01-blind-review.md
 ├── step-02-edge-cases.md
 ├── step-03-criteria-audit.md
@@ -122,29 +122,18 @@ Its defining property is an **anti-self-poisoning write model**: external conten
 
 ## Putting it together: a feature request
 
-```
-User: "Add Stripe payment checkout"
-     │
-     ▼
-Phase 0: orchestrator classifies → COMPLEX (fintech domain)
-     │  Loads architecture-decisions.md for past payment patterns
-     ▼
-Phase 1: planner creates plan → Gate 1 (human approves)
-     │
-     ▼
-Phase 2: tester writes failing tests (if --tdd enabled)
-     │
-     ▼
-Phase 3: developer implements → build-verify.cjs checks every file
-     │  budget-tracker.cjs warns at $30, blocks at $100
-     ▼
-Phase 4: reviewer audits 5 dimensions → Gate 2 (human approves)
-     │
-     ▼
-Phase 5: shipper creates PR, never pushes to main
-     │
-     ▼
-Phase 6: documenter captures patterns to memory for next time
+```mermaid
+flowchart TD
+    U["User: 'Add Stripe payment checkout'"]
+    P0["<b>Phase 0</b> — orchestrator classifies → COMPLEX (fintech domain)<br/>Loads architecture-decisions.md for past payment patterns"]
+    P1["<b>Phase 1</b> — planner creates plan<br/>GATE 1: human approves"]
+    P2["<b>Phase 2</b> — tester writes failing tests (if --tdd enabled)"]
+    P3["<b>Phase 3</b> — developer implements → build-verify.cjs checks every file<br/>budget-tracker.cjs warns at $30, blocks at $100"]
+    P4["<b>Phase 4</b> — reviewer audits 5 dimensions<br/>GATE 2: human approves"]
+    P5["<b>Phase 5</b> — shipper creates PR, never pushes to main"]
+    P6["<b>Phase 6</b> — documenter captures patterns to memory for next time"]
+
+    U --> P0 --> P1 --> P2 --> P3 --> P4 --> P5 --> P6
 ```
 
 ## Next steps

@@ -1,0 +1,54 @@
+---
+title: "Step 6 — Refine and estimate"
+description: "mk:jira-evaluator grades ACs, complexity and contradictions; mk:jira-estimator chains off it to suggest story points with an uncertainty annotation. Both are read-only."
+---
+
+## Prompt
+
+```bash
+/mk:jira-evaluator AUTH-201
+/mk:jira-estimator AUTH-201
+```
+
+## What happens behind the scenes
+
+`mk:jira-evaluator` (read-only):
+
+| Check                 | Output                                                  |
+| --------------------- | ------------------------------------------------------- |
+| AC presence           | `present` / `missing` / `vague` per AC                  |
+| Complexity dimensions | Code volume, integration count, novelty, risk           |
+| Inconsistencies       | Description ↔ AC contradictions, AC ↔ AC contradictions |
+| Verdict               | `simple` / `standard` / `complex`                       |
+
+`mk:jira-estimator` (read-only, chains off evaluator):
+
+| Input                                  | Output                                                                                                                                        |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Evaluator complexity + inconsistencies | Suggested story points (1, 2, 3, 5, 8, 13)                                                                                                    |
+| Uncertainty annotation                 | If evaluator flagged inconsistencies, estimator says e.g. "**5 ± 3** — AC2 wording is ambiguous; estimate halves if redirect target is fixed" |
+
+<Callout title="Estimates are signals, not commitments" type="warn">
+
+Both skills emit suggestions only. The **team** still does planning poker. The AI provides numbers + reasoning; the humans negotiate.
+
+</Callout>
+
+## Sample output
+
+```
+AUTH-201 evaluator
+  ACs: 3 present, 0 missing, 1 vague (AC2 "lands on /dashboard" — which dashboard?)
+  Complexity: standard
+  Inconsistencies: none
+  Verdict: simple
+
+AUTH-201 estimator
+  Suggested: 3 points
+  Uncertainty: ±1 (AC2 wording)
+  Drivers: 1 new OAuth provider, 1 callback route, session middleware untouched
+```
+
+---
+
+Previous: [Step 5 — Group into an epic and rank](/workflows/spec-to-pr-walkthrough/step-05-epic-and-rank) · Next: [Step 7 — Tech review against your codebase](/workflows/spec-to-pr-walkthrough/step-07-tech-review) · [All steps](/workflows/spec-to-pr-walkthrough)

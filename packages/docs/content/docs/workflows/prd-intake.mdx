@@ -243,17 +243,18 @@ After reviewing intake analysis, run the suggested Jira actions directly:
 
 ## Skill Graph
 
-```
-mk:intake (orchestrator)
-  ├─ mk:jira-issue          → fetch ticket
-  ├─ mk:scale-routing       → product-area classification
-  ├─ mk:plan-creator        → completeness scoring (scope challenge)
-  ├─ mk:scout               → codebase context
-  ├─ mk:investigate         → RCA (bug tickets)
-  ├─ mk:decision-framework  → triage rules
-  ├─ mk:jira-collaborate    → post analysis comment
-  ├─ mk:jira-lifecycle      → transition + assign (Step 7)
-  └─ mk:jira-relationships  → link related tickets (Step 7)
+```mermaid
+flowchart LR
+    I["<b>mk:intake</b><br/>orchestrator"]
+    I --> A["mk:jira-issue — fetch ticket"]
+    I --> B["mk:scale-routing — product-area classification"]
+    I --> C["mk:plan-creator — completeness scoring (scope challenge)"]
+    I --> D["mk:scout — codebase context"]
+    I --> E["mk:investigate — RCA (bug tickets)"]
+    I --> F["mk:decision-framework — triage rules"]
+    I --> G["mk:jira-collaborate — post analysis comment"]
+    I --> H["mk:jira-lifecycle — transition + assign (Step 7)"]
+    I --> J["mk:jira-relationships — link related tickets (Step 7)"]
 ```
 
 ## MeowKit Skills Used

@@ -49,7 +49,7 @@ Two paths depending on where the spec lives:
 
 1. `/mk:confluence-spec-analyst analyze <PAGE-ID>` — produces a Spec Research Report with requirements, ACs, gaps, and suggested user stories (read-only — no tickets created)
 2. Resolve `[MISSING]` / `[VAGUE]` / `[AMBIGUOUS]` flags with the PM via `/mk:confluence-collaborate add-comment <PAGE-ID> ... --footer`
-3. Optional pre-ticket feasibility scan with `/mk:scout` + `/mk:docs-finder` (see the [Spec → PR walkthrough](/workflows/spec-to-pr-walkthrough#step-3-tech-feasibility-breakdown-pre-ticket) for the full pattern)
+3. Optional pre-ticket feasibility scan with `/mk:scout` + `/mk:docs-finder` (see the [Spec → PR walkthrough](/workflows/spec-to-pr-walkthrough/step-03-tech-feasibility) for the full pattern)
 4. Create tickets manually (Step 2 below) — never auto-creation
 5. At Step 5, pass the report path back in: `/mk:planning-engine plan --tickets ... --spec <report-path>` brings the spec context into the Planning Report
 

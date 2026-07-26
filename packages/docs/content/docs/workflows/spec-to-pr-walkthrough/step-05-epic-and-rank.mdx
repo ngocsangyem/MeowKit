@@ -1,0 +1,32 @@
+---
+title: "Step 5 — Group into an epic and rank"
+description: "Epic-add, backlog ranking, and blocks links. Every ordering decision here is dev-declared — the skill never reorders on its own judgment."
+---
+
+## Prompt
+
+```bash
+/mk:jira-agile epic-add AUTH-200 AUTH-201 AUTH-202 AUTH-203
+/mk:jira-agile rank AUTH-202 --before AUTH-201   # session expiry blocks the redirect
+/mk:jira-relationships link AUTH-201 blocks AUTH-203
+```
+
+## What happens behind the scenes
+
+| Skill                   | Verb       | Effect                                                  |
+| ----------------------- | ---------- | ------------------------------------------------------- |
+| `mk:jira-agile`         | `epic-add` | Sets the epic-link custom field on each child issue     |
+| `mk:jira-agile`         | `rank`     | Calls `/rest/agile/1.0/issue/rank` to reorder backlog   |
+| `mk:jira-relationships` | `link`     | Creates a "blocks" issue link (visible on both tickets) |
+
+## Decision point
+
+<Callout title="Ranking is dev-declared, not inferred" type="warn">
+
+The agent did not read "blocks" from the spec — you told it. The spec analyst can suggest dependencies in its report, but the actual ranking is always your call. The skill never reorders based on its own judgment.
+
+</Callout>
+
+---
+
+Previous: [Step 4 — Create the Jira tickets](/workflows/spec-to-pr-walkthrough/step-04-create-tickets) · Next: [Step 6 — Refine and estimate](/workflows/spec-to-pr-walkthrough/step-06-refine-and-estimate) · [All steps](/workflows/spec-to-pr-walkthrough)

@@ -70,9 +70,16 @@
 }
 
 @theme inline {
-  /* Space Grotesk display · Inter body · JetBrains Mono code */
+  /* Space Grotesk display · Inter body · platform mono for code */
   --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  /* The code font must cover box-drawing (U+2500-257F) and geometric shapes (U+25A0-25FF)
+     in the SAME face as its letters. A Google webfont loaded with `subsets: ['latin']`
+     does not: those glyphs resolve through per-character fallback to a face with a
+     different advance width, so a 66-character line of ASCII art renders anywhere from
+     521px to 735px and every column shears. Platform monos ship the full block, so any
+     preformatted diagram that is still literal text stays aligned. */
+  --font-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   --font-display: var(--font-space-grotesk), var(--font-inter), sans-serif;
 }
 
