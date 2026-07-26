@@ -45,6 +45,16 @@ Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sp
 | `agile-sprint-commitment.md` | Sprint goal persistence, mid-sprint amendment ceremony, sprint close hygiene | `mk:agent-detector` Step 0b (Agile context) |
 | `agile-feedback-cycle.md` | Retro action-item ceremony, spike governance (timebox + findings doc) | `mk:agent-detector` Step 0b (Agile context) |
 
+### Workflow Conditional Rules (`.claude/rules-conditional/`)
+
+Not Agile-gated. Each is loaded on demand by the consuming skill, so a session that does
+not reach the relevant surface pays zero context cost.
+
+| Rule | Purpose | Loaded by |
+| ---- | ------- | --------- |
+| `workflow-evidence-rules.md` | One-run evidence index: pointers + normalized summaries of plan/diagnosis/verify/verdict/approvals. Records gate results; never approves | `mk:fix`, `mk:cook`, `mk:review`, `mk:ship` on demand |
+| `advice-supervision-rules.md` | `--advice` supervisory lane: activation, the three bounded checkpoint triggers, input/output packets, prohibitions, receipt + disposition. Counsel is evidence, never gate authority and never verification | Skills run with `--advice` (currently `mk:fix`), at the first checkpoint |
+
 ## Loading Priority
 
 Rules are applied in this priority (higher = stronger override):
@@ -75,6 +85,10 @@ Rules are applied in this priority (higher = stronger override):
 - `rules-conditional/agile-story-gates.md`
 - `rules-conditional/agile-sprint-commitment.md`
 - `rules-conditional/agile-feedback-cycle.md`
+
+**Workflow conditional** (live in `rules-conditional/`, loaded on demand by the consuming skill, not Agile-gated):
+- `rules-conditional/workflow-evidence-rules.md`
+- `rules-conditional/advice-supervision-rules.md`
 
 ## Hook Enforcement
 

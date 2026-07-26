@@ -1,0 +1,101 @@
+---
+title: "athena"
+description: "One-shot advisory supervisor behind the --advice checkpoints."
+---
+
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/athena.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/athena.md) |
+| **Owner** | `research` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
+Athena is the one-shot supervisor behind the opt-in `--advice` flag. It is not a
+lifecycle agent and not a direct user route: pass `--advice` to a skill that
+supports it, currently **[mk:fix](/reference/skills/fix)**, rather than invoking
+the agent yourself.
+
+<Callout type="warn">
+Delegation to this agent has not yet been confirmed against a live session on any
+runtime. Structural discovery passes — the agent is registered, classified, and
+conformance-checked — but a wrapped skill that cannot reach it prints
+`advice checkpoint unavailable in this runtime: <reason>` and continues
+unsupervised. Treat the lane as experimental until a runtime is verified.
+</Callout>
+
+## Role
+
+A workflow reaches a hard point and asks something that is not the agent that got
+stuck. Athena reads the evidence already gathered and answers once.
+
+The failure mode it exists to avoid is agreeing with the caller. The caller has
+spent its context on a hypothesis and often wants permission to continue, so the
+value is in the parts it did not want to hear: the skipped check, the discounted
+risk, the alternative dropped too early.
+
+## When It Fires
+
+Only when the user passed `--advice`, and only at a declared checkpoint. Each
+trigger fires at most once per run, so three calls is the worst case. It never
+fires per tool call, per loop iteration, or per file.
+
+| Trigger | Condition |
+|---|---|
+| Stuck run | Root cause is evidenced and two distinct approaches have failed |
+| Irreversible step | Before a security-sensitive, public-contract, or data-loss-capable action |
+| Residual risk | Verification passed but the remaining risk is unclear |
+
+Without the flag there are zero invocations and the checkpoint prose is never
+loaded, so the lane costs nothing when unused.
+
+## Packets
+
+The parent supplies five fields inline, because the fork inherits no
+conversation: the task and exact question; constraints and user decisions that
+must not be silently reversed; evidence paths and observations; attempts and why
+each failed; options, risk class, and reversibility.
+
+Athena returns five parts and nothing else: a disposition (proceed, pause, or
+escalate); the next falsifiable check; critical risks with a rollback note;
+alternatives rejected and why; assumptions, missing evidence, and confidence.
+
+## No Gate Authority
+
+A recommendation is evidence a human reads at a gate — the same class as a
+passing test suite or an evaluator verdict — never the approval itself. Athena
+cannot clear or advance Gate 1, Gate 2, a security review, CI, a merge, a deploy,
+or any business decision.
+
+Counsel is also not verification. Verification stays with tests, review verdicts,
+and validators, and a receipt recording counsel is never proof that anything
+works.
+
+It does not delay a human escalation either: `mk:fix` stops for the user after
+three failed attempts on its own schedule, whatever was advised at two.
+
+## Artifacts and Boundaries
+
+Athena writes nothing. The mutation ban is structural on Claude Code (no write
+tools granted) and on Cursor (`readonly: true`); on Codex, agent definitions carry
+no per-agent permission field, so the ban there is behavioral — enforced by the
+agent's own instructions and evidenced by a live refusal probe.
+
+The **parent** workflow, never Athena, records each checkpoint as a receipt at
+`tasks/reports/{YYMMDD}-{slug}-advice-{n}.md` carrying the disposition
+(`adopted` / `rejected` / `deferred`) and a one-line reason. When a durable task
+record is active, the receipt path joins its `evidenceRefs` and appears in
+`mewkit task-state` on resume.
+
+It never interviews the user, never grades or scores, owns no plan or report, and
+never spawns another supervisor.
+
+## Related Reference
+
+- **[mk:fix](/reference/skills/fix)** — the only skill wrapped so far.
+- **[advisor](/reference/agents/advisor)** — the interview-driven alternative; it
+  reframes a problem with the user, where Athena answers one bounded question and ends.
+- **[reviewer](/reference/agents/reviewer)** — owns review verdicts, which Athena must not pre-empt.
