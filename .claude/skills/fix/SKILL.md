@@ -3,7 +3,7 @@ name: mk:fix
 description: Diagnoses and fixes bugs, type errors, lint failures, CI/CD issues, and runtime errors via root-cause-first investigation. Use for defect remediation. NOT for investigation without a fix (see mk:investigate); NOT for build-only compilation errors (see mk:build-fix).
 source: local
 version: 0.1.0
-argument-hint: "[issue|diagnostic-report-path] --auto|--review|--quick|--parallel|--tdd"
+argument-hint: "[issue|diagnostic-report-path] --auto|--review|--quick|--parallel|--tdd|--advice"
 keywords:
   - fix
   - bug-fix
@@ -72,6 +72,7 @@ If 3+ fix attempts fail, STOP and question the architecture — discuss with use
 - `--quick` — Quick profile for a known cause and ≤2 files.
 - `--parallel` — Parallel `developer` agents per independent issue.
 - `--tdd` — Force regression test BEFORE the fix (writes the `.claude/session-state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
+- `--advice` — Opt-in advisory supervision. At three declared checkpoints (two failed approaches, an irreversible step, unclear residual risk) the workflow asks the `athena` agent for one counsel packet, records the disposition, and continues. Standard and deep profiles only. Counsel is evidence, never approval: it clears no gate and counts as no verification, and the three-failed-attempt human STOP below still fires on its own schedule. Without the flag, zero advisory calls happen. Contract: `.claude/rules-conditional/advice-supervision-rules.md` (load it only when the flag is present).
 
 ## Plan-First Gate
 

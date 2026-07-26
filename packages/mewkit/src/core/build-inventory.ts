@@ -258,7 +258,9 @@ function dependencyEdges(
 }
 
 function agentContractFields(id: string): Pick<InventoryEntry, "agentClass" | "routing" | "public"> {
-	if (id === "advisor") return { agentClass: "internal", routing: "harness", public: false };
+	// Executors reached only through their own skill/flag, never orchestrator-routed:
+	// `advisor` behind mk:advise, `athena` behind --advice checkpoints.
+	if (id === "advisor" || id === "athena") return { agentClass: "internal", routing: "harness", public: false };
 	if (id === "story-sizer") return { agentClass: "intelligence", routing: "direct-only", public: true };
 	if (id.startsWith("jira-") || id.startsWith("confluence-")) {
 		return { agentClass: "domain", routing: "hub-only", public: true };
