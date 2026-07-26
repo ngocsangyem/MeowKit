@@ -11,6 +11,46 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.14.8 (2026-07-26) — Runtime-Neutral State & the Documentation Rebuild
+
+Ships as kit **2.14.8** and **`mewkit` CLI 2.2.4** (patch). Project state and configuration finish their move out of the provider directory into `.meowkit/`, the documentation site is rebuilt around one page per task, and the Codex hook bundle stops denying edits when a session starts below the repository root.
+
+### Highlights
+
+Everything the toolkit writes for itself now resolves through the runtime-neutral `.meowkit/` root — memory, telemetry, session state, and cache each get their own class, and the project config, dotenv example, and manifests move there too. Installs created before the move keep working: the legacy locations are still read, so no project has to relocate anything by hand.
+
+### CLI
+
+- Memory, telemetry, session state, and cache each resolve to their own class under `.meowkit/`, and the wiki index and append logs land in the class they belong to.
+- The project config is read from `.meowkit/config.json` — an install still holding `.claude/meowkit.config.json` keeps working.
+- The dotenv example, gitignore block, MCP example, harness inventory, and pack manifest moved out of `.claude/` into `.meowkit/`.
+- The command surface is declared once and checked against the implementation, so a documented command that no longer exists fails the build instead of the user's shell.
+- The Codex bundle resolves the project root from the git top level, falling back to a marker directory, instead of trusting the hook payload's working directory.
+- The Cursor bundle registers the documented `sessionEnd` event.
+
+### Improvements
+
+- Hooks honor `MEOWKIT_HOOK_PROFILE`; the older `MEOW_HOOK_PROFILE` spelling is still accepted.
+- The documentation site is reorganized around what the reader is holding — one page per command family, per integration, and per workflow, instead of the same setup block repeated six times.
+- Reference indexes and the hook registry are generated from source, so a registered hook or shipped skill cannot be missing from the docs.
+- Docs CI gates on stale runtime values, broken internal links, navigation coverage, frontmatter, and reference coverage.
+- Release history moved to its own archive page and out of the learning path.
+- The `mk-loop` skill directory is renamed to `loop`, matching every other skill directory, which carries its namespace in frontmatter rather than the directory name.
+
+### Bug Fixes
+
+- Codex hooks treated the session working directory as the project root — starting Codex in a subdirectory made Gate 1 look for `tasks/plans` in the wrong place and deny every source edit. The hooks now resolve the root themselves, matching the Codex documentation's own guidance that a session may start below the root.
+- Curated-memory capture through the CLI ignored the legacy-tree fallback, so a project whose memory still lived in `.claude/memory/` had new entries written to a second location.
+- Documentation nav tabs covered page content, and the CLI, Reference, and Workflows sections were unreachable.
+- Corrected the stated license to MIT, the install requirements, the opt-in status of TDD, and the Codex migration rule, each of which contradicted the shipped behavior.
+- The portability, commands, and migration pages claimed Cursor has no documented hooks surface, contradicting both Cursor's documentation and the `.cursor/hooks.json` the Cursor bundle has been shipping.
+
+### Migration Notes
+
+- `npx mewkit upgrade` to pick up the new layout. No manual file moves are required — legacy config and memory locations are still read.
+
+---
+
 ## 2.14.7 (2026-07-25) — Per-Agent Model Routing
 
 Ships as kit **2.14.7** and **`mewkit` CLI 2.2.3** (patch). Every Claude Code agent now declares the model its role actually needs instead of inheriting the session model or defaulting to the cheapest tier, and a new read-only `explore` agent ships for all three providers.

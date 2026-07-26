@@ -18,7 +18,11 @@ const COMMANDS = [
 		subcommands: ["list", "explain", "resolve", "view", "bootstrap", "projections"],
 	},
 	{ name: "budget", summary: "View token usage and cost log", subcommands: ["context"] },
-	{ name: "memory", summary: "Manage agent memory (lessons and patterns)", subcommands: ["capture", "render-views", "seed-from-md"] },
+	{
+		name: "memory",
+		summary: "Manage agent memory (lessons and patterns)",
+		subcommands: ["capture", "render-views", "seed-from-md"],
+	},
 	{ name: "setup", summary: "Guided post-scaffold configuration" },
 	{ name: "doctor", summary: "Diagnose common environment issues", subcommands: ["provenance"] },
 	{ name: "status", summary: "Print version and config summary" },
@@ -32,7 +36,18 @@ const COMMANDS = [
 	{
 		name: "visual-plan",
 		summary: "Visual plan contracts",
-		subcommands: ["validate", "status", "approve", "rehash", "export", "prepare-feedback", "apply-feedback", "patch", "edit", "view"],
+		subcommands: [
+			"validate",
+			"status",
+			"approve",
+			"rehash",
+			"export",
+			"prepare-feedback",
+			"apply-feedback",
+			"patch",
+			"edit",
+			"view",
+		],
 	},
 	{
 		name: "review",
@@ -75,7 +90,28 @@ const s = (name: string, commands: string[], summary: string, extra: Extra = {})
 const FLAGS: FlagSpec[] = [
 	b("help", [], "Show help"),
 	b("version", [], "Print the CLI version"),
-	b("json", ["review", "capabilities", "pack", "explain-support", "providers", "plan", "inventory", "trace", "index", "query", "orient", "budget", "task-state", "context", "visual-plan", "docs-manifest"], "Emit machine-readable JSON"),
+	b(
+		"json",
+		[
+			"review",
+			"capabilities",
+			"pack",
+			"explain-support",
+			"providers",
+			"plan",
+			"inventory",
+			"trace",
+			"index",
+			"query",
+			"orient",
+			"budget",
+			"task-state",
+			"context",
+			"visual-plan",
+			"docs-manifest",
+		],
+		"Emit machine-readable JSON",
+	),
 	b("yes", ["upgrade", "pack", "migrate"], "Answer prompts affirmatively"),
 	b("beta", ["init", "upgrade", "pack"], "Use the beta release channel"),
 	b("dry-run", ["init", "plan", "migrate"], "Print what would happen without writing"),
@@ -195,7 +231,9 @@ const FLAGS: FlagSpec[] = [
 	s("blocker", ["task-state"], "Record a blocker", { repeatable: true }),
 	s("verification", ["task-state"], "Record a verification as ref=result", { repeatable: true }),
 	s("evidence-ref", ["task-state"], "Record an evidence reference", { repeatable: true }),
-	s("capability-decision", ["task-state"], "Record a capability decision as capId|decision|reason", { repeatable: true }),
+	s("capability-decision", ["task-state"], "Record a capability decision as capId|decision|reason", {
+		repeatable: true,
+	}),
 
 	// context
 	s("root", ["context"], "Project root to resolve the path against"),

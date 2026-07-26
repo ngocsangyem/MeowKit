@@ -93,7 +93,9 @@ export function docsManifest(args: DocsManifestArgs = {}): void {
 			console.error(`\nRegenerate with \`mewkit docs-manifest --write\` and commit the result.`);
 			process.exit(1);
 		}
-		console.log(`${pc.green("✓")} manifest and ${manifest.entries.length} reference page(s) match the live .claude/ tree`);
+		console.log(
+			`${pc.green("✓")} manifest and ${manifest.entries.length} reference page(s) match the live .claude/ tree`,
+		);
 		return;
 	}
 

@@ -109,9 +109,7 @@ describe("checkStaleIndex", () => {
 
 	it("still count-checks README, which does carry counts", async () => {
 		const root = await makeRepo("9 skills\n", SKILLS_OK, AGENTS_OK, HOOKS_OK);
-		expect(
-			compareCounts(root).some((d) => d.source === "README.md" && d.declared === 9 && d.actual === 1),
-		).toBe(true);
+		expect(compareCounts(root).some((d) => d.source === "README.md" && d.declared === 9 && d.actual === 1)).toBe(true);
 	});
 
 	it("FAILS on completeness (an agent id is missing from AGENTS_INDEX)", async () => {

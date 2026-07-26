@@ -61,10 +61,7 @@ describe("explainProvenance (honesty on non-trusted sources)", () => {
 		const root = makeRoot();
 		mkdirSync(join(root, ".claude", "rules"), { recursive: true });
 		writeFileSync(join(root, ".claude", "rules", "a.md"), "shipped\n");
-		await writeInstallMetadata(
-			root,
-			buildInstallMetadata(join(root, ".claude"), { version: "2.9.13" }),
-		);
+		await writeInstallMetadata(root, buildInstallMetadata(join(root, ".claude"), { version: "2.9.13" }));
 		const out = capture();
 		explainProvenance(root, true);
 		expect(out()).toContain("provable provenance");

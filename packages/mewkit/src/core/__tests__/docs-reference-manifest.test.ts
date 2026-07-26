@@ -40,7 +40,10 @@ describe("docs reference manifest", () => {
 	it("changes the source hash when the source file changes", () => {
 		const { claudeDir, referenceDir } = makeProject('name: demo\ndescription: "before"');
 		const before = buildDocsReferenceManifest(claudeDir, referenceDir).entries[0];
-		writeFileSync(join(claudeDir, "skills", "demo", "SKILL.md"), `---\nname: demo\ndescription: "after"\n---\n\nbody\n`);
+		writeFileSync(
+			join(claudeDir, "skills", "demo", "SKILL.md"),
+			`---\nname: demo\ndescription: "after"\n---\n\nbody\n`,
+		);
 		const after = buildDocsReferenceManifest(claudeDir, referenceDir).entries[0];
 		expect(after.sourceHash).not.toBe(before.sourceHash);
 		expect(after.description).toBe("after");

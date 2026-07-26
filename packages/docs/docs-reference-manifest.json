@@ -1498,7 +1498,7 @@
       "title": "mk:help",
       "description": "Workflow navigation assistant. Scans project state (plans, reviews, tests, git) and recommends the next step in the 7-phase pipeline. Use when asked \"what should I do next?\", \"where am I?\", \"help\", or at session start. NOT for domain complexity routing (see mk:scale-routing); NOT for skill discovery (descriptions handle that automatically).",
       "sourcePath": "skills/help/SKILL.md",
-      "sourceHash": "98b963254a3cb95aa7734c1c8ccab90a392ff77f55607e5d2d13a7d04b38b42b",
+      "sourceHash": "8925da708fae1d4ff9539446ffdeed5c52dd2a21c9d90ab7922e4bdc6205f551",
       "aliases": [],
       "owner": "research",
       "phase": null,

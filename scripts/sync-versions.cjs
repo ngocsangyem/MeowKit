@@ -3,7 +3,7 @@
  * Single-source version sync for the KIT (harness) version.
  *
  * Source of truth: root `package.json` `version`. This script stamps that version into the kit's
- * tracked identity file `.claude/meowkit.config.json` and into `release-manifest.json`, and
+ * tracked identity file `.meowkit/config.json` and into `release-manifest.json`, and
  * records the CLI package version (`packages/mewkit/package.json`, a SEPARATE semver track) into
  * the manifest as `cliVersion` (recorded, never overwritten to match the kit).
  *
@@ -20,7 +20,13 @@ const path = require("path");
 const root = path.join(__dirname, "..");
 const ROOT_PKG = path.join(root, "package.json");
 const CLI_PKG = path.join(root, "packages", "mewkit", "package.json");
-const CLAUDE_CONFIG = path.join(root, ".claude", "meowkit.config.json");
+// The kit config is canonically `.meowkit/config.json`. A checkout created before that move
+// still carries `.claude/meowkit.config.json`, and stamping the canonical path while the legacy
+// file is the one actually read would leave the real config on a stale version — so mirror the
+// reader in packages/mewkit/src/state/resolve-config-path.ts: canonical when present, else legacy.
+const CANONICAL_CONFIG = path.join(root, ".meowkit", "config.json");
+const LEGACY_CONFIG = path.join(root, ".claude", "meowkit.config.json");
+const KIT_CONFIG = fs.existsSync(CANONICAL_CONFIG) ? CANONICAL_CONFIG : LEGACY_CONFIG;
 const RELEASE_MANIFEST = path.join(root, "release-manifest.json");
 
 const write = process.argv.includes("--write");
@@ -40,7 +46,7 @@ const cliVersion = readJson(CLI_PKG).version;
 // that may be absent on a fresh clone — absent is N/A, not a mismatch (it is regenerated at
 // release by generate-release-manifest.cjs).
 const targets = [
-	{ file: CLAUDE_CONFIG, field: "version", expected: kitVersion, stamp: true, optional: false },
+	{ file: KIT_CONFIG, field: "version", expected: kitVersion, stamp: true, optional: false },
 	{ file: RELEASE_MANIFEST, field: "version", expected: kitVersion, stamp: true, optional: true },
 	{ file: RELEASE_MANIFEST, field: "cliVersion", expected: cliVersion, stamp: true, optional: true },
 ];

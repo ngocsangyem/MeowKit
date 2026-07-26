@@ -50,7 +50,9 @@ function isBlocking(hooksDir: string, command: string): boolean {
 	const abs = join(hooksDir, name);
 	if (!existsSync(abs)) return false;
 	const body = readFileSync(abs, "utf-8");
-	return /\bexit 2\b/.test(body) || /"decision"\s*:\s*"block"/.test(body) || /"permissionDecision"\s*:\s*"deny"/.test(body);
+	return (
+		/\bexit 2\b/.test(body) || /"decision"\s*:\s*"block"/.test(body) || /"permissionDecision"\s*:\s*"deny"/.test(body)
+	);
 }
 
 /** Turn `ensure-skills-venv.sh` into a readable phrase when no statusMessage is declared. */

@@ -10,7 +10,17 @@ import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveStateDir, usingLegacyMemoryTree } from "../resolve-state-dir.js";
 
-const HOOK_LIB = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..", "..", ".claude", "hooks", "lib");
+const HOOK_LIB = resolve(
+	dirname(fileURLToPath(import.meta.url)),
+	"..",
+	"..",
+	"..",
+	"..",
+	"..",
+	".claude",
+	"hooks",
+	"lib",
+);
 
 const roots: string[] = [];
 afterEach(() => roots.splice(0).forEach((d) => rmSync(d, { recursive: true, force: true })));
@@ -85,17 +95,19 @@ describe("the three resolvers agree", () => {
 	const classes = ["memory", "telemetry", "state", "cache"] as const;
 
 	function shellResolve(root: string, cls: string): string {
-		return execFileSync(
-			"bash",
-			["-c", `. "${join(HOOK_LIB, "meowkit-paths.sh")}"; meowkit_state_dir ${cls}`],
-			{ env: { ...process.env, CLAUDE_PROJECT_DIR: root }, encoding: "utf-8" },
-		).trim();
+		return execFileSync("bash", ["-c", `. "${join(HOOK_LIB, "meowkit-paths.sh")}"; meowkit_state_dir ${cls}`], {
+			env: { ...process.env, CLAUDE_PROJECT_DIR: root },
+			encoding: "utf-8",
+		}).trim();
 	}
 
 	function cjsResolve(root: string, cls: string): string {
 		return execFileSync(
 			"node",
-			["-e", `process.stdout.write(require(${JSON.stringify(join(HOOK_LIB, "meowkit-paths.cjs"))}).stateDir(${JSON.stringify(cls)}, ${JSON.stringify(root)}))`],
+			[
+				"-e",
+				`process.stdout.write(require(${JSON.stringify(join(HOOK_LIB, "meowkit-paths.cjs"))}).stateDir(${JSON.stringify(cls)}, ${JSON.stringify(root)}))`,
+			],
 			{ encoding: "utf-8" },
 		).trim();
 	}

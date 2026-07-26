@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "fumadocs-mdx && tsc --noEmit",
     "check:links": "node scripts/check-internal-links.mjs",
     "check:stale": "node scripts/scan-stale-values.mjs",
     "check:coverage": "node scripts/check-reference-coverage.mjs",

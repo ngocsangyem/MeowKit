@@ -85,7 +85,6 @@ describe("WikiService end-to-end (real adapters)", () => {
 		const root = await mkdtemp(join(tmpdir(), "wiki-e2e-"));
 		tempDirs.push(root);
 
-
 		const slug = makeWikiSlug("demo");
 		const svc = new WikiService({
 			repo: new MarkdownWikiRepository(root),

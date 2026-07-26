@@ -82,9 +82,7 @@ describe("appendTraceRecord — concurrency (no interleaving/corruption)", () =>
 		// serialize cleanly. (Mixing SYNC appends into the same process is not a real usage — the
 		// sync writer is the wiki adapter and the async writer is task-state; they run in separate
 		// CLI processes. Cross-process contention is covered by the shell+TS parity test below.)
-		await Promise.all(
-			Array.from({ length: N }, (_, i) => appendTraceRecord(root, { event: "async_ev", data: { i } })),
-		);
+		await Promise.all(Array.from({ length: N }, (_, i) => appendTraceRecord(root, { event: "async_ev", data: { i } })));
 		const lines = readLines(logPath);
 		expect(lines.length).toBe(N);
 		for (const l of lines) expect(() => JSON.parse(l)).not.toThrow();

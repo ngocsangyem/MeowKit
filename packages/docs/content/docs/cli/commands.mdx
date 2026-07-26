@@ -461,7 +461,7 @@ The matrix reflects what `mewkit migrate` actually writes per provider. Each pro
 
 - Codex does not convert your own agents, commands, or hooks. Toolkit versions of all three ship in the hand-authored Codex bundle; port your custom ones manually. The converter prints a one-line notice when it finds them.
 - Codex rules in OpenAI's docs are exec-policy `.rules` files. MeowKit behavioral rules migrate into `AGENTS.md`; they are not converted into sandbox exec-policy rules.
-- Hooks reach Codex only through the bundle, which ships `.cjs` handlers registered in `.codex/hooks.json`. Cursor has no documented hooks surface at all.
+- Hooks reach both targets only through their authored bundles — `.cjs` handlers registered in `.codex/hooks.json` for Codex and `.cursor/hooks.json` for Cursor. The legacy `.claude`→`.cursor` converter emits no hooks of its own.
 
 ### Known limitations
 

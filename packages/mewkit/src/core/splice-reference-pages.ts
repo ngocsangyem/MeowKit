@@ -24,9 +24,7 @@ export interface SpliceResult {
 function pageRelFor(entry: DocsReferenceEntry): string {
 	const parts = entry.sourcePath.split(/[\\/]/);
 	const slug =
-		entry.kind === "skill"
-			? (parts[parts.length - 2] ?? "")
-			: (parts[parts.length - 1] ?? "").replace(/\.md$/, "");
+		entry.kind === "skill" ? (parts[parts.length - 2] ?? "") : (parts[parts.length - 1] ?? "").replace(/\.md$/, "");
 	return join(`${entry.kind}s`, `${slug}.mdx`);
 }
 

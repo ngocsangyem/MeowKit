@@ -124,7 +124,11 @@ describe("codex gate-enforcement hook (session started in a subdirectory)", () =
 	it("finds the root plan via the marker walk when the session cwd is a subdirectory", () => {
 		mkdirSync(join(project, "tasks", "plans", "260101-x"), { recursive: true });
 		writeFileSync(join(project, "tasks", "plans", "260101-x", "plan.md"), "# plan\n");
-		const r = runHook("gate-enforcement.cjs", { tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } }, subdir);
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } },
+			subdir,
+		);
 		expect(r.denied).toBe(false);
 	});
 
@@ -132,20 +136,32 @@ describe("codex gate-enforcement hook (session started in a subdirectory)", () =
 		spawnSync("git", ["init", "-q"], { cwd: project });
 		mkdirSync(join(project, "tasks", "plans"), { recursive: true });
 		writeFileSync(join(project, "tasks", "plans", "flat.md"), "# plan\n");
-		const r = runHook("gate-enforcement.cjs", { tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } }, subdir);
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } },
+			subdir,
+		);
 		expect(r.denied).toBe(false);
 	});
 
 	it("still denies a source edit from a subdirectory when the project has no plan", () => {
 		mkdirSync(join(project, ".codex"), { recursive: true });
-		const r = runHook("gate-enforcement.cjs", { tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } }, subdir);
+		const r = runHook(
+			"gate-enforcement.cjs",
+			{ tool_name: "apply_patch", tool_input: { command: patch("src/x.ts") } },
+			subdir,
+		);
 		expect(r.denied).toBe(true);
 	});
 
 	it("classifies an always-allowed target relative to the root, not the session cwd", () => {
 		mkdirSync(join(project, ".codex"), { recursive: true });
 		for (const p of ["src/x.test.ts", "docs/readme.md"]) {
-			const r = runHook("gate-enforcement.cjs", { tool_name: "apply_patch", tool_input: { command: patch(p) } }, subdir);
+			const r = runHook(
+				"gate-enforcement.cjs",
+				{ tool_name: "apply_patch", tool_input: { command: patch(p) } },
+				subdir,
+			);
 			expect(r.denied, `${p} should be allowed from a subdirectory`).toBe(false);
 		}
 	});

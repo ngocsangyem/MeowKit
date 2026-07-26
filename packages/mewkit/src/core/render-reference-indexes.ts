@@ -72,10 +72,7 @@ export function renderHooksIndex(inventory: HooksInventory): string {
 	];
 
 	if (inventory.emptyEvents.length > 0) {
-		lines.push(
-			"",
-			`Registered with no hooks today: ${inventory.emptyEvents.map((e) => `\`${e}\``).join(", ")}.`,
-		);
+		lines.push("", `Registered with no hooks today: ${inventory.emptyEvents.map((e) => `\`${e}\``).join(", ")}.`);
 	}
 
 	return wrap(lines);
