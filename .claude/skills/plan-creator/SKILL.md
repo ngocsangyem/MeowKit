@@ -58,6 +58,10 @@ dependency_edges:
     type: peer
   - id: mk:scout
     type: peer
+  - id: mk:validate-plan
+    type: peer
+  - id: mk:visual-plan
+    type: peer
 ---
 
 # Plan Creator
