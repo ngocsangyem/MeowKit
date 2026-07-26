@@ -56,6 +56,7 @@ If `next_step` is unset, the agent follows the default linear progression (step-
 | `budget_spent` | running tally | step-06 | USD |
 | `final_status` | step-05 | step-06 | `PASS`, `WARN`, `FAIL`, `ESCALATED`, `TIMED_OUT` |
 | `next_step` | step-03/04/05 | JIT loader | filename of next step file to read; persisted to run.md frontmatter so it survives subagent context resets |
+| `supervisionRunId` | invoker (`--advice` only) | step-02, step-05 | Opaque run id for `--advice` checkpoints; persisted to run.md frontmatter for the same reason as `next_step` — a resumed run that loses it would start a fresh supervision budget. Unset when the flag is absent, and never passed to a spawned subagent |
 
 ## Flow
 

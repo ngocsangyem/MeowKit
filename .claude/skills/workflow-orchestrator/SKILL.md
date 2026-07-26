@@ -99,6 +99,13 @@ Only the canonical gates authorize transition. Shipping and reflection require e
 - **Token budget:** Target ≤30K for full workflow. Warn at 75%, handoff at 90%.
 - **State:** `workflow:handoff` saves, `workflow:resume <id>` continues
 - **ALWAYS show what's next** after each phase
+- **No `--advice` flag.** This orchestrator is not a supervision entry point and never
+  enables `--advice`. When a phase skill was *already* invoked with the flag by the user,
+  carry its `supervisionRunId` forward as an **opaque value** across macro phase
+  boundaries so a resumed run keeps one budget instead of minting a fresh one. Carry
+  nothing else: no flag, no dossier, no directive history, and no routing ability.
+  Spawned subagents receive a task-specific directive only, so an orchestrated child can
+  never supervise itself (`.claude/rules-conditional/advice-supervision-rules.md` §1, §9).
 
 ## Related Rules
 

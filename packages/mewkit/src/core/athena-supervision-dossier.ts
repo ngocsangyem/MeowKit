@@ -52,6 +52,12 @@ export const CheckpointMarkerSchema = z.object({
 	stage: z.enum(["GUIDE", "RESCUE", "REVIEW", "RECHECK"]),
 	/** `pending` is written BEFORE the call, `committed` after its result lands. */
 	state: z.enum(["pending", "committed"]),
+	/**
+	 * Which budget this call is charged to, for a skill whose cap is per-partition.
+	 * Carried on the marker so `commit` inherits it from `begin` — asking the caller
+	 * to repeat it would let a call open against one budget and commit against another.
+	 */
+	partition: z.string().min(1).optional(),
 });
 export type CheckpointMarker = z.infer<typeof CheckpointMarkerSchema>;
 
@@ -67,6 +73,12 @@ export const CheckpointHistorySchema = z.object({
 	checkpointId: z.string().min(1),
 	stage: z.enum(SUPERVISION_STAGES),
 	disposition: z.enum(DISPOSITIONS),
+	/**
+	 * The budget this call was charged to. Optional so a history written before
+	 * partitioning still parses — an entry with no partition belongs to a per-run
+	 * budget, which is exactly what those runs had.
+	 */
+	partition: z.string().min(1).optional(),
 });
 
 export const DossierSchema = z
@@ -183,7 +195,7 @@ stage: ${yamlScalar(dossier.stage)}
 lockedDecisionPointers: ${yamlList(dossier.lockedDecisionPointers)}
 correctionCount: ${dossier.correctionCount}
 receiptPointers: ${yamlList(dossier.receiptPointers)}
-checkpoint: ${cp ? `{ checkpointId: ${yamlScalar(cp.checkpointId)}, stage: ${yamlScalar(cp.stage)}, state: ${yamlScalar(cp.state)} }` : "null"}
+checkpoint: ${cp ? `{ checkpointId: ${yamlScalar(cp.checkpointId)}, stage: ${yamlScalar(cp.stage)}, state: ${yamlScalar(cp.state)}${cp.partition ? `, partition: ${yamlScalar(cp.partition)}` : ""} }` : "null"}
 history: ${JSON.stringify(dossier.history)}
 escalatedToHuman: ${dossier.escalatedToHuman}
 ---
@@ -250,9 +262,18 @@ export function parseDossier(text: string): DossierRead {
 	let checkpoint: unknown = null;
 	const rawCheckpoint = frontmatterValue(fm, "checkpoint");
 	if (rawCheckpoint && rawCheckpoint !== "null") {
-		// `{ key: "value", … }` — the inline form render emits. Read the three known keys.
+		// `{ key: "value", … }` — the inline form render emits. Read the known keys.
 		const read = (k: string): string | undefined => unquote(new RegExp(`${k}:\\s*("(?:[^"\\\\]|\\\\.)*")`).exec(rawCheckpoint)?.[1]);
-		checkpoint = { checkpointId: read("checkpointId"), stage: read("stage"), state: read("state") };
+		const partition = read("partition");
+		checkpoint = {
+			checkpointId: read("checkpointId"),
+			stage: read("stage"),
+			state: read("state"),
+			// Omit the key entirely when absent. `partition: undefined` would round-trip
+			// through the optional schema, but an explicitly-present-yet-empty key reads
+			// as "this run has no budget partition" rather than "this render had none".
+			...(partition === undefined ? {} : { partition }),
+		};
 	}
 
 	let pointers: unknown = [];
@@ -455,7 +476,16 @@ export function commitCheckpoint(
 	},
 ): Dossier {
 	const cp = dossier.checkpoint;
-	const entry = cp ? { checkpointId: cp.checkpointId, stage: cp.stage, disposition: result.disposition } : null;
+	// The partition comes from the marker, never from the commit call: the budget a
+	// call spends is decided when the slot is claimed, so a commit cannot move it.
+	const entry = cp
+		? {
+				checkpointId: cp.checkpointId,
+				stage: cp.stage,
+				disposition: result.disposition,
+				...(cp.partition === undefined ? {} : { partition: cp.partition }),
+			}
+		: null;
 	const history = entry
 		? [...dossier.history.filter((h) => h.checkpointId !== entry.checkpointId), entry]
 		: dossier.history;

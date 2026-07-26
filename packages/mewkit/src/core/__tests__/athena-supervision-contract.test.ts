@@ -177,12 +177,14 @@ describe("cadence, caps and idempotency", () => {
 		if (!d.allowed) expect(d.escalate).toBe(true);
 	});
 
+	// `mk:cook`, not `mk:ship`: ship's cap is per release stage, so it is not an example
+	// of the flat per-run cap this case is about.
 	it("enforces the per-skill hard cap", () => {
-		const cap = SKILL_HARD_CAPS["mk:ship"];
+		const cap = SKILL_HARD_CAPS["mk:cook"];
 		const history = Array.from({ length: cap }, (_, i) =>
 			committed({ checkpointId: `c${i}`, stage: "RESCUE", disposition: "ESCALATE_TO_HUMAN" }),
 		);
-		const d = evaluateStageRequest({ skill: "mk:ship", stage: "REVIEW", checkpointId: "new", history });
+		const d = evaluateStageRequest({ skill: "mk:cook", stage: "REVIEW", checkpointId: "new", history });
 		expect(d.allowed).toBe(false);
 		if (!d.allowed) expect(d.escalate).toBe(true);
 	});

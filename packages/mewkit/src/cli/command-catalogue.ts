@@ -263,6 +263,7 @@ const FLAGS: FlagSpec[] = [
 	s("evidence", ["advice"], "Path to the workflow evidence index a correction supersedes, or the packet/brief to validate"),
 	s("correction-kind", ["advice"], "source (keeps Gate 1) or scope (invalidates it)"),
 	s("packet-kind", ["advice"], "validate-packet shape: input, output, or brief (direct consult)"),
+	s("release-stage", ["advice"], "Ship scope the call is budgeted against: prepare, release, publish"),
 
 	// context
 	s("root", ["context"], "Project root to resolve the path against"),

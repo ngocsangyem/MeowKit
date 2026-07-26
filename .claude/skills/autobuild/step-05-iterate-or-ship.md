@@ -67,6 +67,14 @@ Authority Invariant), Gate 2 is human-only and has no exceptions — so a verdic
 Gate 2 *presentation*, it does not clear Gate 2. There is no env var or density mode that
 skips this prompt.
 
+**`--advice` runs only:** fire the REVIEW checkpoint here, **before** the question below,
+per `references/advice-checkpoints.md`. It reads the terminal verdict and its evidence
+and may return the work for correction — in which case re-enter step-03 and re-evaluate,
+because the verdict presented at Gate 2 must describe the code that exists. A
+`READY_FOR_EXISTING_GATE` disposition means only that presenting Gate 2 is the correct
+next step. Athena's read is a second piece of evidence beside the evaluator's verdict;
+it is not a second approval, and it is not the approval.
+
 **First, present Gate 2 via AskUserQuestion. Do NOT dispatch the shipper until the human approves.**
 
 Surface the verdict and its evidence so the human decides on what the evaluator actually
@@ -145,9 +153,21 @@ echo "$verdict verdict on iteration $iteration. Re-entering step-03 with feedbac
 
 The next session reads `step-03-generate.md` again. step-03 reads the iteration counter from the run report frontmatter (set at 5b) and the feedback packet to inform the next generator pass.
 
+**`--advice` runs only:** the RESCUE checkpoint is available on this path, but it is not
+a per-iteration call. Fire it only on a plateau — two consecutive verdicts failing the
+**same** criteria with no measurable change in the evidence — or on drift outside the
+signed contract's scope. A first FAIL with concrete, actionable feedback is the loop
+working; consulting there spends a slot on a round that was going to converge anyway.
+See `references/advice-checkpoints.md`. A rescue directive does not buy another round:
+the correction re-enters step-03 and consumes an `--max-iter` round like any other loop.
+
 ### 5e. Action: escalate (verdict was FAIL at iteration cap)
 
 When `next_action == escalate`, first surface current delivery state to the user (foreground), then present a 3-option choice via AskUserQuestion.
+
+This escalation fires on its own schedule. A `--advice` rescue earlier in the loop
+neither delays it nor substitutes for it, and Athena is not consulted here — the
+decision below is the human's.
 
 **PM foreground invocation (per `.claude/rules/post-phase-delegation.md` Rule 5 — the only foreground PM call):**
 
@@ -184,6 +204,7 @@ If user picks "Abort and triage": set `final_status=ESCALATED`, proceed to step-
 - Verdict in: {PASS | WARN | FAIL}
 - Action: {ship | ship_with_warnings | loop | escalate | timeout}
 - Gate 2: {approved by human | rejected by human | N/A — no ship attempted}
+- Advice checkpoints (`--advice` runs only): {stage/checkpointId + disposition per call, or "none"}
 - Final status: {PASS | WARN | FAIL | ESCALATED | TIMED_OUT}
 - Iterations completed: {N}
 - WARNs acknowledged (if ship_with_warnings): {path to warns-iter-{N}.md}

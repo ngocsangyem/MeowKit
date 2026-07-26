@@ -39,6 +39,12 @@ export const ReceiptSchema = z
 		provider: z.string().default("unknown"),
 		skill: z.string().min(1),
 		checkpointId: z.string().min(1),
+		/**
+		 * Which release stage's budget this call was charged to, for a skill whose cap
+		 * is per-partition. Without it a reader of three ship receipts cannot tell
+		 * whether they were one over-supervised stage or three ordinary ones.
+		 */
+		releaseStage: z.string().min(1).optional(),
 		question: z.string().default(""),
 		directive: z.string().default(""),
 		requiredCorrections: z.array(z.string()).default([]),
@@ -114,7 +120,7 @@ reason: ${yamlScalar(line(receipt.reason))}
 taskId: ${yamlScalar(receipt.taskId)}
 provider: ${yamlScalar(receipt.provider)}
 skill: ${yamlScalar(receipt.skill)}
-checkpointId: ${yamlScalar(receipt.checkpointId)}
+checkpointId: ${yamlScalar(receipt.checkpointId)}${receipt.releaseStage ? `\nreleaseStage: ${yamlScalar(receipt.releaseStage)}` : ""}
 ---
 
 This is a record of supervision, NEVER verification and never a gate approval.

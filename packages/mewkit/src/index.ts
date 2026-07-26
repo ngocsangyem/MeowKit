@@ -381,6 +381,7 @@ async function main(): Promise<void> {
 				evidence: args.evidence as string | undefined,
 				correctionKind: args["correction-kind"] as string | undefined,
 				packetKind: args["packet-kind"] as string | undefined,
+				releaseStage: args["release-stage"] as string | undefined,
 				json: args.json as boolean | undefined,
 			});
 			break;

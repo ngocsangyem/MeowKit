@@ -109,8 +109,6 @@ describe("the canonical rule agrees with the wiring", () => {
 		for (const s of ["mk:fix", "mk:cook", "mk:brainstorming", "mk:plan-creator"]) {
 			expect(wiredSentence, s).toContain(s);
 		}
-		expect(wiredSentence).not.toContain("mk:autobuild");
-		expect(rule).toMatch(/`mk:autobuild`, `mk:ship` — extended cohort, not yet wired/);
 	});
 
 	it("documents the brief as a separate shape that cannot carry a disposition", () => {

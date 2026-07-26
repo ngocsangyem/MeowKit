@@ -27,10 +27,12 @@ import {
 import { classifySupervisionCall } from "../core/athena-supervision-mode.js";
 import {
 	SKILL_HARD_CAPS,
+	chargesToPartition,
 	evaluateStageRequest,
 	isDispositionLegal,
 	isSupervisedSkill,
 	legalDispositions,
+	partitionValuesFor,
 	type Disposition,
 	type SupervisionStage,
 } from "../core/athena-supervision-protocol.js";
@@ -66,6 +68,7 @@ export interface AdviceOptions {
 	evidence?: string;
 	correctionKind?: string;
 	packetKind?: string;
+	releaseStage?: string;
 	json?: boolean;
 }
 
@@ -181,11 +184,13 @@ async function begin(projectRoot: string, args: AdviceOptions): Promise<void> {
 	if (preview?.escalatedToHuman)
 		fail(`Refused: run "${runId}" escalated to a human and is unresolved — that decision is theirs, not a retry.`, true);
 
+	const partition = args.releaseStage?.trim() || undefined;
 	const verdict = evaluateStageRequest({
 		skill,
 		stage: stage as SupervisionStage,
 		checkpointId,
 		history: preview?.history ?? [],
+		partition,
 	});
 	if (!verdict.allowed) {
 		if (verdict.escalate) await escalate(projectRoot, runId, verdict.reason);
@@ -199,6 +204,13 @@ async function begin(projectRoot: string, args: AdviceOptions): Promise<void> {
 		const prior = preview?.history.find((h) => h.checkpointId === checkpointId);
 		if (prior && prior.stage !== stage)
 			fail(`Refused: checkpointId "${checkpointId}" already ran at ${prior.stage} — use a distinct id per checkpoint.`);
+		// Same reasoning one axis over: a reused id under a DIFFERENT release stage is a
+		// naming collision, not a retry. Accepting it would return the recorded result of
+		// another stage's checkpoint and silently skip this one — while spending nothing.
+		if (prior && prior.partition !== partition)
+			fail(
+				`Refused: checkpointId "${checkpointId}" already ran in ${prior.partition ?? "(no release stage)"} — use a distinct id per release stage.`,
+			);
 		console.log(pc.yellow(`Checkpoint "${checkpointId}" already ran — returning the recorded result, no slot spent.`));
 		console.log(`  latest directive: ${preview?.latestDirective || "(none)"}`);
 		console.log(`  next safe action: ${preview?.nextSafeAction || "(none)"}`);
@@ -219,12 +231,18 @@ async function begin(projectRoot: string, args: AdviceOptions): Promise<void> {
 			history: [],
 			escalatedToHuman: false,
 		};
-		return beginCheckpoint(base, { checkpointId, stage: stage as SupervisionStage });
+		return beginCheckpoint(base, {
+			checkpointId,
+			stage: stage as SupervisionStage,
+			...(partition === undefined ? {} : { partition }),
+		});
 	});
 
-	console.log(
-		pc.green(`Checkpoint ${stage}/${checkpointId} opened (${written.history.length + 1} of ${SKILL_HARD_CAPS[skill]} for ${skill}).`),
-	);
+	// Report usage against the budget this call actually spends, not the run total —
+	// on a partitioned skill those differ, and the run total would misstate what is left.
+	const spent = written.history.filter((h) => chargesToPartition(skill, h, partition)).length;
+	const scope = partition === undefined ? skill : `${skill} / ${partition}`;
+	console.log(pc.green(`Checkpoint ${stage}/${checkpointId} opened (${spent + 1} of ${SKILL_HARD_CAPS[skill]} for ${scope}).`));
 	console.log(pc.dim(`  dossier: ${path.relative(projectRoot, dossierPath(projectRoot, runId))}`));
 	console.log(pc.dim(`  legal dispositions: ${legalDispositions(stage as SupervisionStage).join(", ")}`));
 	console.log(pc.dim("  supervision is evidence — it clears no gate and counts as no verification."));
@@ -250,6 +268,15 @@ async function commit(projectRoot: string, args: AdviceOptions): Promise<void> {
 		);
 	}
 
+	// The budget is fixed when the slot is claimed. A `--release-stage` on commit may
+	// only confirm it: letting it differ would charge the call to one budget and record
+	// it against another, which is how a spent slot comes back.
+	const claimed = args.releaseStage?.trim() || undefined;
+	if (claimed !== undefined && claimed !== marker.partition)
+		fail(
+			`Refused: checkpoint "${checkpointId}" opened in ${marker.partition ?? "(no release stage)"}, not ${claimed} — the release stage is fixed at \`begin\`.`,
+		);
+
 	const corrections = toArray(args.correction);
 	const receipt: Receipt = {
 		runId,
@@ -261,6 +288,7 @@ async function commit(projectRoot: string, args: AdviceOptions): Promise<void> {
 		provider: args.provider ?? "unknown",
 		skill: dossier.skill,
 		checkpointId,
+		...(marker.partition === undefined ? {} : { releaseStage: marker.partition }),
 		question: args.question ?? "",
 		directive: args.directive ?? "",
 		requiredCorrections: corrections,
@@ -300,8 +328,13 @@ async function commit(projectRoot: string, args: AdviceOptions): Promise<void> {
 			...(receiptWritten ? { receiptPointer: relReceipt } : {}),
 		});
 		// A second unresolved return is the human's call, so record it where a later
-		// call — including one under a fresh run id — will see it.
-		const returns = committed.history.filter((h) => h.disposition === "RETURN_TO_EXECUTOR").length;
+		// call — including one under a fresh run id — will see it. Returns are counted
+		// within the budget that spent them (mirroring `evaluateStageRequest`), but the
+		// escalation flag itself stays run-wide: once a human has been asked, the whole
+		// run waits for them, not just the stage that asked.
+		const returns = committed.history.filter(
+			(h) => h.disposition === "RETURN_TO_EXECUTOR" && chargesToPartition(current.skill, h, marker.partition),
+		).length;
 		return { ...committed, escalatedToHuman: committed.escalatedToHuman || returns >= 2 };
 	});
 
@@ -420,9 +453,25 @@ function status(projectRoot: string, args: AdviceOptions): void {
 		console.log(JSON.stringify(dossier, null, 2));
 		return;
 	}
-	const cap = SKILL_HARD_CAPS[dossier.skill] ?? 0;
+	// `hasOwnProperty`, not a bare lookup: a hand-edited `skill: "__proto__"` returns a
+	// truthy prototype object, which `?? 0` does not catch, and the run then reports a
+	// garbled cap.
+	const cap = Object.prototype.hasOwnProperty.call(SKILL_HARD_CAPS, dossier.skill) ? SKILL_HARD_CAPS[dossier.skill] : 0;
+	const partitions = partitionValuesFor(dossier.skill);
 	console.log(pc.bold(pc.cyan(`Supervision run ${dossier.runId}`)));
-	console.log(`  skill: ${dossier.skill}   calls: ${dossier.history.length}/${cap}   corrections: ${dossier.correctionCount}`);
+	if (partitions) {
+		// A resuming parent needs the budget it is about to spend from. One run total
+		// against a per-partition cap would read as over-budget while every stage still
+		// has room — or worse, as room remaining in a stage that has none. Unattributable
+		// entries count everywhere, so the displayed totals may exceed the history length;
+		// that is the accounting the caps actually use.
+		const used = partitions
+			.map((p) => `${p} ${dossier.history.filter((h) => chargesToPartition(dossier.skill, h, p)).length}/${cap}`)
+			.join("   ");
+		console.log(`  skill: ${dossier.skill}   calls per release stage: ${used}   corrections: ${dossier.correctionCount}`);
+	} else {
+		console.log(`  skill: ${dossier.skill}   calls: ${dossier.history.length}/${cap}   corrections: ${dossier.correctionCount}`);
+	}
 	console.log(`  stage: ${dossier.stage}   open checkpoint: ${dossier.checkpoint?.state === "pending" ? dossier.checkpoint.checkpointId : "(none)"}`);
 	console.log(`  latest directive: ${dossier.latestDirective || pc.dim("(none)")}`);
 	console.log(`  next safe action: ${dossier.nextSafeAction || pc.dim("(none)")}`);

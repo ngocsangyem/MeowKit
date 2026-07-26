@@ -65,15 +65,27 @@ Per-skill total ceiling:
 | `mk:cook` | 5 |
 | `mk:fix` | 5 |
 | `mk:autobuild` | 5 |
-| `mk:ship` | 4 per release stage — **not yet enforced as stated**: the current counter is a flat 4 per run, which under-permits rather than over-permits. Stage-partitioned accounting is authored with the ship wrapper. |
+| `mk:ship` | 4 **per release stage** — `prepare`, `release` and `publish` each carry their own budget, charged by `--release-stage`. The flag is required for ship and refused for every other skill; it is fixed at `begin` and inherited by `commit`. |
 
 Rules that keep the cadence bounded:
 
 - A duplicate `checkpointId` is **idempotent** — it returns the prior result and
-  does not consume a cap slot. This is what makes crash-and-resume safe.
+  does not consume a cap slot. This is what makes crash-and-resume safe. Ids are unique
+  per RUN, not per partition: reusing one under a different stage or release stage is a
+  naming collision and is refused, because returning another checkpoint's recorded
+  result would silently skip the one the workflow believes it ran.
 - `RECHECK` requires a prior `RETURN_TO_EXECUTOR`.
 - A **second unresolved return escalates to a human.** There is no third opinion.
+  Returns are counted within the budget that spent them, so on a partitioned skill a
+  resolved return in one release stage and an unrelated one in another are two
+  episodes, not one unresolved loop. The escalation flag itself stays run-wide: once a
+  human has been asked, the whole run waits for them.
 - Reaching a cap escalates; it never loops.
+- A recorded call that names no partition, or names one the skill does not declare,
+  counts against **every** partition. Skipping it would turn history written before the
+  skill was partitioned — or a hand-edited value — into a free slot in each budget, so a
+  run that had already spent its cap would acquire a full fresh one per stage. Counting
+  it everywhere can only under-permit, which is the direction this contract errs in.
 
 **Rescue complements human STOPs; it never delays them.** `mk:fix`'s rule — 3+
 failed attempts ⇒ STOP and question the architecture with the user — fires on its
@@ -318,21 +330,33 @@ model name or id belongs in this contract or in any skill body
 This file is the canonical contract. Wrapper wiring lands per skill, and a skill
 that has not been wired yet exposes no flag:
 
-- `mk:fix`, `mk:cook`, `mk:brainstorming` (deep only), `mk:plan-creator` — wired. Each
+- `mk:fix`, `mk:cook`, `mk:brainstorming` (deep only), `mk:plan-creator`, `mk:autobuild`, `mk:ship` — wired. Each
   declares the flag, fires checkpoints at the stage boundaries above, and drives
   `mewkit advice begin|commit`, which is where the caps, stage legality, idempotency,
   dossier and receipt are actually enforced.
-- `mk:autobuild`, `mk:ship` — extended cohort, not yet wired.
 
 `mk:brainstorming` wires its **deep** workflow only. Its quick profile answers inline
 in three steps and creates no scout, report, plan or memory entry; supervising that is
 noise rather than safety (`skill-authoring-rules.md` Rule 6 — match control to risk).
 
+`mk:workflow-orchestrator` exposes **no flag** and is not an entry point. When an
+explicitly enabled run hands off, it carries `supervisionRunId` forward as an opaque
+value at macro boundaries and nothing else, so a resumed workflow keeps one budget
+rather than minting a fresh one.
+
+Every other surface is excluded, and the exclusion is enforced in code rather than by
+convention — `isSupervisedSkill` answers `false` for anything absent from the cap table,
+so `mewkit advice begin` refuses the call. `mk:review` and `mk:evaluate`, and the
+`security` and `project-manager` agents, own verdicts, scores and status that
+supervision must not duplicate; `mk:advise` is the user-facing interview Athena is
+forbidden from running; `mk:party`, `mk:loop` and `mk:investigate` run no delivery
+lifecycle for a run id to bound.
+
 ### Parent-side commands
 
 | Command | Enforces |
 |---|---|
-| `mewkit advice begin` | route contract, supervised-skill check, per-stage + per-skill caps, idempotent `checkpointId`, pending marker |
+| `mewkit advice begin` | route contract, supervised-skill check, per-stage + per-skill caps, partition legality (`--release-stage`), idempotent `checkpointId`, pending marker |
 | `mewkit advice commit` | stage/disposition legality, receipt validation (authority language, credentials, empty return), dossier commit, correction supersession |
 | `mewkit advice status` | resume view: current stage, calls used, latest directive, next safe action |
 | `mewkit advice validate-packet` | input packet, output packet, or direct-consult brief — `--packet-kind input\|output\|brief` |

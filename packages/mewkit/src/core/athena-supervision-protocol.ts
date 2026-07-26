@@ -73,13 +73,11 @@ export const PER_STAGE_MAX: Record<SupervisionStage, number> = {
 };
 
 /**
- * Total-call ceiling per wrapped skill, keyed by skill id.
+ * Call ceiling per wrapped skill, keyed by skill id.
  *
- * Every entry is a FLAT per-run total: `evaluateStageRequest` compares the whole
- * run's history length against it. `mk:ship` is designed to budget 4 calls per
- * RELEASE STAGE, which this flat counter cannot express — a stage-partitioned
- * counter is required when the ship wrapper is authored. Until then the flat value
- * is the stricter reading, so it under-permits rather than over-permits.
+ * For most skills this is a flat per-RUN total. For a skill listed in
+ * `PARTITIONED_SKILL_CAPS` it is the ceiling per PARTITION instead — see there for
+ * why one ship run needs more than one budget.
  */
 export const SKILL_HARD_CAPS: Record<string, number> = {
 	"mk:brainstorming": 4,
@@ -89,6 +87,35 @@ export const SKILL_HARD_CAPS: Record<string, number> = {
 	"mk:autobuild": 5,
 	"mk:ship": 4,
 };
+
+/** Ship's scopes. One ship run may pass through all three in sequence. */
+export const RELEASE_STAGES = ["prepare", "release", "publish"] as const;
+export type ReleaseStage = (typeof RELEASE_STAGES)[number];
+
+/**
+ * Skills whose cap is spent per PARTITION rather than per run, with the partition
+ * values each one accepts.
+ *
+ * `mk:ship` is the reason this exists. Its three scopes are three separate decisions
+ * — stage a local commit, push and open a PR, cut a version — and a run that walks
+ * all three under one flat budget would arrive at `publish` with its supervision
+ * already spent on `prepare`. Per-partition accounting matches how the skill is
+ * actually used; the previous flat counter under-permitted rather than over-permitted,
+ * which was safe but wrong.
+ *
+ * A partitioned skill REQUIRES a partition and an unpartitioned one REFUSES it, both
+ * in `evaluateStageRequest`. Neither is defaulted: silently assuming `prepare` would
+ * charge a publish-time call to the wrong budget, and silently ignoring a partition on
+ * an unpartitioned skill would let a caller believe it bought a budget it did not.
+ */
+export const PARTITIONED_SKILL_CAPS: Record<string, readonly string[]> = {
+	"mk:ship": RELEASE_STAGES,
+};
+
+/** The partition values a skill accepts, or `null` when its cap is per-run. */
+export function partitionValuesFor(skill: string): readonly string[] | null {
+	return Object.prototype.hasOwnProperty.call(PARTITIONED_SKILL_CAPS, skill) ? PARTITIONED_SKILL_CAPS[skill] : null;
+}
 
 /** Skills that expose `--advice`. Anything else is not a supervision entry point. */
 export function isSupervisedSkill(skill: string): boolean {
@@ -100,6 +127,8 @@ export interface CheckpointRecord {
 	checkpointId: string;
 	stage: SupervisionStage;
 	disposition: Disposition;
+	/** Which budget this call was charged to. Absent on an unpartitioned skill. */
+	partition?: string;
 }
 
 /** Why a proposed call is refused. `escalate` means hand off to a human, not retry. */
@@ -115,20 +144,52 @@ const countStage = (history: readonly CheckpointRecord[], stage: SupervisionStag
 	history.filter((h) => h.stage === stage).length;
 
 /**
+ * Whether `record` is charged to `partition`'s budget for `skill`.
+ *
+ * On an unpartitioned skill everything counts — there is one budget.
+ *
+ * On a partitioned skill, a record that names no partition, or names one the skill does
+ * not declare, is UNATTRIBUTABLE and counts against EVERY partition. Two ways to hold
+ * one: history written before the skill was partitioned (those entries have no partition
+ * field at all), or a hand-edited dossier whose value does not match a declared stage.
+ *
+ * The tempting reading — "it belongs to no partition, so skip it" — silently turns every
+ * such entry into a free slot in all three budgets, which is how a run that already
+ * exhausted a flat cap acquires 4×3 fresh calls, and how a run holding two unresolved
+ * returns loses its escalation. Counting an unattributable record everywhere can only
+ * under-permit, which is the direction this module errs in on purpose. It is also why an
+ * in-flight run needs no migration story: across the change it becomes more restricted,
+ * never less.
+ *
+ * Shared with the CLI so cap accounting at `begin` and return accounting at `commit`
+ * cannot drift apart — two copies of this rule is one copy too many.
+ */
+export function chargesToPartition(skill: string, record: CheckpointRecord, partition: string | undefined): boolean {
+	const legal = partitionValuesFor(skill);
+	if (!legal) return true;
+	const attributable = record.partition !== undefined && legal.includes(record.partition);
+	return record.partition === partition || !attributable;
+}
+
+/**
  * Whether a proposed checkpoint call may run.
  *
- * Ordering matters. Idempotency is checked FIRST: a retried checkpoint (same
- * `checkpointId`) must be a no-op rather than consume a cap slot, otherwise a
- * crash-and-resume between the pending marker and the committed result silently
- * spends the run's budget. Everything after that is a real new call.
+ * Ordering matters. Idempotency is checked FIRST, against the WHOLE run history: a
+ * retried checkpoint (same `checkpointId`) must be a no-op rather than consume a cap
+ * slot, otherwise a crash-and-resume between the pending marker and the committed
+ * result silently spends the run's budget. A `checkpointId` is unique per run, not per
+ * partition, so this check deliberately ignores partitioning. Everything after it is a
+ * real new call and is counted within the active budget.
  */
 export function evaluateStageRequest(input: {
 	skill: string;
 	stage: SupervisionStage;
 	checkpointId: string;
 	history: readonly CheckpointRecord[];
+	/** Required for a partitioned skill, refused for any other. */
+	partition?: string;
 }): StageDecision {
-	const { skill, stage, checkpointId, history } = input;
+	const { skill, stage, checkpointId, history, partition } = input;
 
 	const duplicate = history.find((h) => h.checkpointId === checkpointId);
 	if (duplicate) return { allowed: true, duplicateOf: duplicate.checkpointId };
@@ -136,30 +197,59 @@ export function evaluateStageRequest(input: {
 	if (!isSupervisedSkill(skill))
 		return { allowed: false, reason: `${skill} does not expose --advice`, escalate: false };
 
+	const legalPartitions = partitionValuesFor(skill);
+	if (legalPartitions) {
+		if (partition === undefined)
+			return {
+				allowed: false,
+				reason: `${skill} budgets supervision per release stage — name one of ${legalPartitions.join(", ")}`,
+				escalate: false,
+			};
+		if (!legalPartitions.includes(partition))
+			return {
+				allowed: false,
+				reason: `"${partition}" is not a release stage for ${skill} — expected ${legalPartitions.join(", ")}`,
+				escalate: false,
+			};
+	} else if (partition !== undefined) {
+		return {
+			allowed: false,
+			reason: `${skill} has a per-run cap and takes no release stage`,
+			escalate: false,
+		};
+	}
+
+	// The active budget. For a partitioned skill each partition carries its own
+	// per-stage maxima, return counter and cap — that is what "per release stage" means.
+	const scoped = history.filter((h) => chargesToPartition(skill, h, partition));
+	const within = legalPartitions ? `in ${partition}` : "in this run";
+
 	// A second unresolved return is a human's decision, not a third supervisor opinion.
-	const returns = history.filter((h) => h.disposition === "RETURN_TO_EXECUTOR").length;
+	// Counted within the budget: a resolved return while preparing and an unrelated one
+	// while releasing are two episodes, not one unresolved loop.
+	const returns = scoped.filter((h) => h.disposition === "RETURN_TO_EXECUTOR").length;
 	if (returns >= 2)
 		return {
 			allowed: false,
-			reason: "work was returned twice without resolution — escalate to a human",
+			reason: `work was returned twice without resolution ${within} — escalate to a human`,
 			escalate: true,
 		};
 
-	if (countStage(history, stage) >= PER_STAGE_MAX[stage])
+	if (countStage(scoped, stage) >= PER_STAGE_MAX[stage])
 		return {
 			allowed: false,
-			reason: `${stage} already ran ${PER_STAGE_MAX[stage]}× in this run`,
+			reason: `${stage} already ran ${PER_STAGE_MAX[stage]}× ${within}`,
 			escalate: stage === "RECHECK",
 		};
 
 	// RECHECK exists only to re-examine returned work; without a return it would be
 	// a second free review of unchanged evidence.
 	if (stage === "RECHECK" && returns === 0)
-		return { allowed: false, reason: "RECHECK requires a prior RETURN_TO_EXECUTOR", escalate: false };
+		return { allowed: false, reason: `RECHECK requires a prior RETURN_TO_EXECUTOR ${within}`, escalate: false };
 
 	const cap = SKILL_HARD_CAPS[skill];
-	if (history.length >= cap)
-		return { allowed: false, reason: `${skill} reached its ${cap}-call supervision cap`, escalate: true };
+	if (scoped.length >= cap)
+		return { allowed: false, reason: `${skill} reached its ${cap}-call supervision cap ${within}`, escalate: true };
 
 	return { allowed: true };
 }
