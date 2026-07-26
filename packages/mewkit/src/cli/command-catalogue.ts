@@ -253,7 +253,7 @@ const FLAGS: FlagSpec[] = [
 	s("checkpoint", ["advice"], "Named checkpoint id; repeating one is idempotent"),
 	s("disposition", ["advice"], "The returned disposition, recorded verbatim"),
 	s("outcome", ["advice"], "What the parent did with it: adopted, rejected, deferred"),
-	s("reason", ["advice"], "Why — required even when the directive was adopted"),
+	s("reason", ["advice"], "Why the outcome was chosen; required even when the directive was adopted"),
 	s("question", ["advice"], "The exact question the checkpoint asked"),
 	s("directive", ["advice"], "The returned directive, summarized"),
 	s("correction", ["advice"], "A required correction", { repeatable: true }),

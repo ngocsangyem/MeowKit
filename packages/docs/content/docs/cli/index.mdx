@@ -10,7 +10,7 @@ MeowKit ships one CLI package, `mewkit`. Run it from your project root; there is
 | You want to | Page |
 |---|---|
 | Create a project, configure it, check it is healthy, upgrade it | [Project Setup](/cli/project-setup) |
-| Write a plan, create a task, see where a task stands | [Planning and Tasks](/cli/planning) |
+| Write a plan, create a task, see where a task stands, record a supervised run | [Planning and Tasks](/cli/planning) |
 | Review a pull request across several sittings | [Review](/cli/review) |
 | Read or write memory, check the context budget, use the wiki | [Memory and Knowledge](/cli/knowledge) |
 | Export the kit to Codex or Cursor, or see what they support | [Portability](/cli/portability) |
@@ -206,7 +206,7 @@ Subcommands: `begin`, `commit`, `status`, `validate-packet`.
 | `--checkpoint` `<value>` | Named checkpoint id; repeating one is idempotent |
 | `--disposition` `<value>` | The returned disposition, recorded verbatim |
 | `--outcome` `<value>` | What the parent did with it: adopted, rejected, deferred |
-| `--reason` `<value>` | Why — required even when the directive was adopted |
+| `--reason` `<value>` | Why the outcome was chosen; required even when the directive was adopted |
 | `--question` `<value>` | The exact question the checkpoint asked |
 | `--directive` `<value>` | The returned directive, summarized |
 | `--correction` `<value>` | A required correction, repeatable |
