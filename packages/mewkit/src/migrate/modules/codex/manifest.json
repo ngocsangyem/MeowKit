@@ -40,6 +40,15 @@
 			"active": true
 		},
 		{
+			"sourcePath": "root/.codex/hooks/lib",
+			"targetPath": ".codex/hooks/lib",
+			"provider": "codex",
+			"mode": "0755",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
 			"sourcePath": "root/.codex/hooks/capture.cjs",
 			"targetPath": ".codex/hooks/capture.cjs",
 			"provider": "codex",

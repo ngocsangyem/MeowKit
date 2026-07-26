@@ -60,6 +60,24 @@
 					"status": "partial",
 					"source": "github.com/openai/codex/issues/19385",
 					"verified": "2026-07-23"
+				},
+				{
+					"claim": "Codex sets NO project-root environment variable for hook processes. The only documented hook env vars are PLUGIN_ROOT and PLUGIN_DATA (plus the CLAUDE_PLUGIN_ROOT / CLAUDE_PLUGIN_DATA compatibility aliases), and those describe a plugin bundle, not the user's repository. There is no CODEX_PROJECT_DIR counterpart to CLAUDE_PROJECT_DIR / CURSOR_PROJECT_DIR.",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/hooks",
+					"verified": "2026-07-26"
+				},
+				{
+					"claim": "Hook commands run with the session cwd as their working directory, and the session may be started from a subdirectory — the docs explicitly recommend resolving repo-local hook paths from the git root rather than a relative path for exactly this reason. Consequence for this bundle: the payload `cwd` is NOT the project root, so any root-relative lookup (Gate 1's tasks/plans, .meowkit/ writes, path classification) must resolve the root itself. lib/codex-hook-runtime.cjs does this via git top level → root-marker walk-up → cwd.",
+					"status": "verified",
+					"source": "https://learn.chatgpt.com/docs/hooks",
+					"verified": "2026-07-26"
+				},
+				{
+					"claim": "The docs do not state whether hook `command` strings are executed through a shell or spawned directly as argv; the documented examples rely on $(git rev-parse --show-toplevel) command substitution, which implies shell execution but is not guaranteed. This bundle's hooks.json follows the documented example form, and each hook script also re-derives the root internally so it stays correct if the command-string substitution ever fails.",
+					"status": "partial",
+					"source": "https://learn.chatgpt.com/docs/hooks",
+					"verified": "2026-07-26"
 				}
 			]
 		},
@@ -236,6 +254,7 @@
 	],
 	"openQuestions": [
 		"Per-feature maturity table on the feature-maturity page could not be extracted via automated fetch (tool summarized away the table body); maturity labels above are inferred from individual feature pages + changelog, not a single authoritative table row.",
-		"Exact hook-event surface present at 0.124.0 vs 0.145.0 not separately verified; the live capability table treats any supported version as the full verified surface."
+		"Exact hook-event surface present at 0.124.0 vs 0.145.0 not separately verified; the live capability table treats any supported version as the full verified surface.",
+		"Shell-vs-argv execution of hook command strings is undocumented; the bundle is correct either way because each hook re-derives the project root internally, but a definitive answer would let hooks.json drop the command-substitution form."
 	]
 }

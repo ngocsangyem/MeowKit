@@ -8,36 +8,26 @@
 // approval-RECEIPT layer (a plan file must also carry a fresh receipt) is NOT ported yet —
 // tracked as a follow-on; presence is the foundational condition.
 //
-// Codex hook contract (developers.openai.com/codex/hooks, verified 2026-07-23):
+// Codex hook contract (learn.chatgpt.com/docs/hooks, verified 2026-07-26):
 //   stdin = JSON { hook_event_name, tool_name, tool_input: { command }, cwd, ... }.
 //   For apply_patch/Edit/Write, tool_input.command carries the patch / edit spec; target
 //   paths are read from apply_patch `*** {Add,Update,Delete,Move} File:` markers (falling
 //   back to explicit path fields). deny = stdout JSON permissionDecision:"deny", exit 0.
+//
+// The payload `cwd` is the SESSION directory, which Codex documents may be a subdirectory
+// of the repository. Plan lookup and path classification are both project-root-relative,
+// so the root is resolved separately (see lib/codex-hook-runtime.cjs) — using `cwd` for
+// either would deny every source edit whenever Codex is started below the root.
 "use strict";
-const { readFileSync, existsSync, readdirSync } = require("node:fs");
-const { join, isAbsolute, relative } = require("node:path");
+const { existsSync, readdirSync } = require("node:fs");
+const { join, isAbsolute, relative, resolve } = require("node:path");
+const { readPayload, sessionCwd, projectRoot, realpathSafePartial, deny } = require("./lib/codex-hook-runtime.cjs");
 
-function deny(reason) {
-	process.stdout.write(
-		JSON.stringify({
-			hookSpecificOutput: {
-				hookEventName: "PreToolUse",
-				permissionDecision: "deny",
-				permissionDecisionReason: reason,
-			},
-		}),
-	);
-	process.exit(0);
-}
+const input = readPayload();
+if (!input) process.exit(0); // fail-open on parse; the CLI gate is authoritative
 
-let input;
-try {
-	input = JSON.parse(readFileSync(0, "utf-8"));
-} catch {
-	process.exit(0); // fail-open on parse; the CLI gate is authoritative
-}
-
-const cwd = typeof input.cwd === "string" && input.cwd ? input.cwd : process.cwd();
+const cwd = sessionCwd(input);
+const root = projectRoot(cwd);
 const toolInput = input && typeof input.tool_input === "object" && input.tool_input ? input.tool_input : {};
 const command = typeof toolInput.command === "string" ? toolInput.command : "";
 
@@ -53,11 +43,12 @@ function targetPaths() {
 	return [...paths];
 }
 
-/** Normalize to a cwd-relative, forward-slash path. */
+/** Normalize to a project-root-relative, forward-slash path. A relative target is
+ *  resolved against the session cwd first (that is what it is relative to), then
+ *  re-expressed against the root the ALLOWED patterns are written in terms of. */
 function normalize(p) {
-	let rel = isAbsolute(p) ? relative(cwd, p) : p.replace(/^\.\//, "");
-	rel = rel.replace(/\\/g, "/");
-	return rel;
+	const absolute = isAbsolute(p) ? realpathSafePartial(p) : resolve(cwd, p.replace(/^\.\//, ""));
+	return relative(root, absolute).replace(/\\/g, "/");
 }
 
 const ALLOWED = [
@@ -71,7 +62,7 @@ const BACKUP = /(?:^|\/)[^/]*\.(?:bak|tmp|backup)\/|(?:^|\/)[^/]*_(?:legacy|old)
 
 /** True when a plan file is present under tasks/plans/ (nested or flat layout). */
 function planExists() {
-	const plansDir = join(cwd, "tasks", "plans");
+	const plansDir = join(root, "tasks", "plans");
 	if (!existsSync(plansDir)) return false;
 	let entries;
 	try {

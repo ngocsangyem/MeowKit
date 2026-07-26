@@ -109,6 +109,7 @@ describe("cursor full-surface characterization: rules + hooks inventory", () => 
 		expect(events).toEqual(
 			[
 				"sessionStart",
+				"sessionEnd",
 				"beforeReadFile",
 				"beforeShellExecution",
 				"beforeMCPExecution",
