@@ -43,7 +43,10 @@ Autonomous build pipeline for green-field products. Runs planner → contract �
 /mk:autobuild build a markdown editor --budget 25 --max-iter 2
 /mk:autobuild --resume 260501-1450-build-kanban          # Resume interrupted run
 /mk:autobuild "build payment system" --tdd               # TDD enforcement
+/mk:autobuild build a kanban board --advice               # Strategic supervision
 ```
+
+`--advice` is opt-in strategic supervision for one run by the [athena](/reference/agents/athena) agent: direction at the plan/contract boundary, rescue on a plateau or scope drift, and an independent read of the terminal evaluator verdict before the Gate 2 question — up to 5 calls. Checkpoints are macro boundaries, so a five-round build makes no more calls than a one-round build. It approves nothing: Gate 2 stays human, and the evaluator keeps its verdict and its active-verification hard gate.
 
 ## Example Prompt
 

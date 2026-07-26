@@ -11,6 +11,50 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## 2.15.0 (2026-07-27) — Opt-In Strategic Supervision
+
+Ships as kit **2.15.0** and **`mewkit` CLI 2.3.0** (minor — the CLI gains a new command surface). A new advisory agent can supervise a single delivery run when you ask for it, and it holds no authority over any gate.
+
+### Highlights
+
+Pass `--advice` to a supported skill and the `athena` agent supervises that one run: it sets direction before work starts, unblocks a stalled run, and reads finished work against its own evidence before the normal reviewer sees it — and it can send the work back for correction. It approves nothing. Every directive is evidence a human reads at a gate, never the approval itself, and supervision never counts as verification. Without the flag there are zero calls and no state is written.
+
+### New Agents
+
+- `athena` — strategic supervision at named checkpoints, and a stateless strategy consult where a runtime exposes direct delegation. Read-only, and it never interviews the user.
+
+### New Commands
+
+- `mewkit advice begin` — opens a checkpoint, enforcing the caps, stage legality and idempotency before anything is delegated.
+- `mewkit advice commit` — records the result, writes the receipt, and refuses a disposition that is illegal for the stage.
+- `mewkit advice status` — the resume view: current stage, calls used, latest directive, next safe action.
+- `mewkit advice validate-packet` — validates an input packet, an output packet, or a direct-consult brief.
+
+### Features
+
+- `--advice` on `mk:brainstorming` (deep workflow only), `mk:plan-creator`, `mk:cook`, `mk:fix`, `mk:autobuild` and `mk:ship`, composable with every existing flag.
+- Supervision runs a fixed cadence — direction, rescue, review, recheck — capped per skill, with `mk:ship` carrying a separate budget for each of `prepare`, `release` and `publish`.
+- Returned work goes back to its current owner with corrections that each name the proof that closes them; a second unresolved return escalates to a human rather than looping.
+- Continuity comes from a compact per-run record rather than a transcript, so a crashed run resumes without re-spending a checkpoint.
+- `mewkit providers <provider>` reports supervision support per runtime, tracking the harness and the direct consult as separate capabilities.
+- `mewkit task-state` lists the evidence paths a record tracks.
+
+### Improvements
+
+- `--advice` and `--html` are orthogonal: combining them changes no activation, approval, validation, export or ownership of the visual pipeline.
+- `mk:workflow-orchestrator` is not a supervision entry point — it carries only an opaque run id across phase boundaries, so an orchestrated child can never supervise itself.
+
+### Bug Fixes
+
+- A supervision correction could overwrite an approved visual plan artifact — a correction now writes only an existing workflow evidence index, checked on the resolved path so a symlink cannot redirect it.
+- The harness inventory no longer reports read-only agents as writing the files they merely cite.
+
+### Beta
+
+- Supervision is authored for Claude Code, Codex and Cursor, but no runtime has been verified end to end yet: every capability reports `unverified`, and a runtime that cannot reach the agent prints an unavailable notice and continues unsupervised. Run `mewkit providers <provider>` to see the current state.
+
+---
+
 ## 2.14.8 (2026-07-26) — Runtime-Neutral State & the Documentation Rebuild
 
 Ships as kit **2.14.8** and **`mewkit` CLI 2.2.4** (patch). Project state and configuration finish their move out of the provider directory into `.meowkit/`, the documentation site is rebuilt around one page per task, and the Codex hook bundle stops denying edits when a session starts below the repository root.
