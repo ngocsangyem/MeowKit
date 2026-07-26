@@ -31,7 +31,8 @@
 				"mk-testing",
 				"mk-validate-plan",
 				"mk-verify",
-				"mk-workflow-orchestrator"
+				"mk-workflow-orchestrator",
+				"rule-advice-supervision"
 			]
 		},
 		"development": {

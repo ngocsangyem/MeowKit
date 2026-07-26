@@ -159,6 +159,12 @@
 					"status": "verified",
 					"source": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
 					"verified": "2026-07-23"
+				},
+				{
+					"claim": "athena (the --advice supervisor) is delegated in natural language by name, either at a wrapper's declared checkpoint or — with no packet — as a stateless strategy consult. These are two separate capabilities with separate states (see capability-coverage.json → adviceSupervision); neither has been exercised against a live Codex session. Because a subagent definition carries no per-agent tool or permission field, athena's no-mutation rule is behavioral plus sandbox here, never structural — the adapter discloses that rather than claiming parity with the other planes.",
+					"status": "partial",
+					"source": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+					"verified": "2026-07-27"
 				}
 			]
 		},

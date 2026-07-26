@@ -582,9 +582,9 @@
 			{
 				"agent": "athena",
 				"effort": "high",
-				"distinctDimension": "strategic supervisor for one delivery run; invoked only at declared --advice checkpoints of a wrapped skill, never a lifecycle phase owner and never a gate authority",
-				"mutationBan": "behavioral-only on Codex — agent definitions carry no per-agent tool or permission field, so the no-write rule is enforced by developer_instructions, not by the runtime. Structural enforcement exists on the other two planes (tool omission / readonly flag). Live mutation-refusal probe pending.",
-				"delegation": "natural-language; canonical trigger sentence 'Delegate this advice checkpoint to the athena agent.' Unverified against a live Codex session as of 2026-07-26."
+				"distinctDimension": "strategic supervisor for one delivery run across GUIDE/RESCUE/REVIEW/RECHECK, plus a stateless direct strategy consult; never a lifecycle phase owner and never a gate authority",
+				"mutationBan": "behavioral-only on Codex — agent definitions carry no per-agent tool or permission field, so the no-write rule is enforced by developer_instructions, not by the runtime. Structural enforcement exists on the other two planes (tool omission / readonly flag). Live mutation-refusal probe pending. See adviceSupervision.mutationBan for the declared state.",
+				"delegation": "natural-language delegation to the agent by name, for both a declared checkpoint and a direct consult. Unverified against a live Codex session; see adviceSupervision.capabilities for the per-capability state."
 			}
 		],
 		"merge": [],
@@ -623,6 +623,34 @@
 				"confluence-collaborate"
 			],
 			"other": ["story-sizer"]
+		}
+	},
+	"adviceSupervision": {
+		"_description": "Per-surface support state for the two --advice capabilities on this plane. Structural presence is NEVER a support claim: a state leaves `unverified` only from a recorded live smoke run. Direct consult and embedded supervision are separate capabilities and neither may be reported through the other's state.",
+		"stateEnum": ["supported", "degraded", "unverified", "unavailable"],
+		"adapter": "root/.codex/agents/athena.toml",
+		"contract": "root/.agents/skills/rule-advice-supervision/SKILL.md",
+		"capabilities": [
+			{
+				"capability": "embedded-supervision",
+				"state": "unavailable",
+				"evidence": "structural",
+				"detail": "The adapter carries the full GUIDE/RESCUE/REVIEW/RECHECK contract and the contract skill is authored, but no wrapper on this plane declares --advice yet. Every wrapper prints its documented unavailable-checkpoint line and the run continues unsupervised.",
+				"blockedBy": "wrapper wiring on this plane"
+			},
+			{
+				"capability": "direct-consult",
+				"state": "unverified",
+				"evidence": "structural",
+				"detail": "The adapter declares the stateless strategy-brief contract and Codex delegates to a named agent in natural language, but no live session has exercised it. Unverified is not degraded: nothing here is known to work partially.",
+				"blockedBy": "live provider smoke"
+			}
+		],
+		"mutationBan": {
+			"enforcement": "behavioral",
+			"state": "degraded",
+			"detail": "A Codex agent definition carries no per-agent tool or permission field, so the no-write rule is enforced by developer_instructions and the sandbox, never by a per-agent capability. The other two planes enforce it structurally (tool omission, readonly flag). Degraded is the honest state: the ban is real and disclosed, but weaker here than elsewhere, and it must not be reported as structural.",
+			"blockedBy": "runtime gains a per-agent tool or permission field"
 		}
 	},
 	"intentionalOmissions": [

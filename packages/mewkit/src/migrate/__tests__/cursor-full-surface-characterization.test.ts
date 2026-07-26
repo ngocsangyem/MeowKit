@@ -95,10 +95,14 @@ describe("cursor full-surface characterization: agent catalog inventory", () => 
 });
 
 describe("cursor full-surface characterization: rules + hooks inventory", () => {
-	it("ships exactly 4 rules, with runtime-invariants.mdc as the sole Always Apply rule", () => {
+	it("ships exactly 5 rules, with runtime-invariants.mdc as the sole Always Apply rule", () => {
+		// 4 originals plus domain-advice-supervision.mdc, the Agent-Requested projection of
+		// the --advice supervision contract. Cursor has no other on-demand rule surface, and
+		// the contract must not ride in AGENTS.md where every unsupervised run would load it.
 		const names = readdirSync(join(rootDir, ".cursor", "rules")).filter((f) => f.endsWith(".mdc"));
-		expect(names.length).toBe(4);
+		expect(names.length).toBe(5);
 		expect(names).toContain("runtime-invariants.mdc");
+		expect(names).toContain("domain-advice-supervision.mdc");
 	});
 
 	it("hooks.json declares the full lifecycle-event set backed by real .cjs handlers", () => {
