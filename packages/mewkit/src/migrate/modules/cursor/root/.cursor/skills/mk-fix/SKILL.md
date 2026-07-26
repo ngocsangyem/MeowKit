@@ -40,7 +40,7 @@ If 3+ fix attempts fail, STOP and question the architecture — discuss with use
 - `--quick` — Quick profile for a known cause and ≤2 files.
 - `--parallel` — Parallel `developer` agents per independent issue.
 - `--tdd` — Force regression test BEFORE the fix (writes the `.meowkit/state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
-- `--advice` — Opt-in advisory supervision. At three declared checkpoints (two failed approaches, an irreversible step, unclear residual risk) the workflow dispatches the `athena` subagent in the foreground for one counsel packet, records the disposition, and continues. Standard and deep profiles only. Counsel is evidence, never approval: it clears no gate and counts as no verification, and the three-failed-attempt human STOP below still fires on its own schedule. Without the flag, zero advisory calls happen. See the Advice Checkpoints section in `references/workflow-standard.md` / `references/workflow-deep.md`.
+- `--advice` — **Not available in this bundle yet.** The supervisor contract is enforced by `mewkit advice begin|commit`, and the adapter that reaches it from this runtime has not been authored or smoke-tested here. Passing the flag prints `advice checkpoint unavailable in this runtime: adapter not authored for this bundle` and the run continues unsupervised. Never improvise a checkpoint inline. See the Advice Checkpoints section in `references/workflow-standard.md` / `references/workflow-deep.md`.
 
 ## Plan-First Gate
 

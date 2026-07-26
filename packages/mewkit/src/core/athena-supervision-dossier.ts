@@ -14,11 +14,12 @@
 //     progress and verification; this file is refused if it carries any of them.
 //     Without that guard, "the dossier says verified" eventually outranks the
 //     tests, which is how an advisory surface silently acquires authority.
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { rename, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
 import { RUN_ID_RE, isValidRunId } from "./athena-supervision-mode.js";
+import { DISPOSITIONS, SUPERVISION_STAGES, type CheckpointRecord } from "./athena-supervision-protocol.js";
 import { withFileLock } from "./file-lock.js";
 
 /** Frontmatter + active summary ceiling. History below it does not count. */
@@ -54,6 +55,20 @@ export const CheckpointMarkerSchema = z.object({
 });
 export type CheckpointMarker = z.infer<typeof CheckpointMarkerSchema>;
 
+/**
+ * One committed call, persisted so cap accounting survives a process boundary.
+ *
+ * Every checkpoint runs as a separate CLI invocation, so in-memory history does not
+ * exist by the time the next call is evaluated. Without this list a run would
+ * re-derive an empty history each time and every cap would silently reset to zero —
+ * a supervision budget that resets is not a budget.
+ */
+export const CheckpointHistorySchema = z.object({
+	checkpointId: z.string().min(1),
+	stage: z.enum(SUPERVISION_STAGES),
+	disposition: z.enum(DISPOSITIONS),
+});
+
 export const DossierSchema = z
 	.object({
 		runId: z.string().regex(RUN_ID_RE),
@@ -66,6 +81,21 @@ export const DossierSchema = z
 		receiptPointers: z.array(z.string()).default([]),
 		nextSafeAction: z.string().default(""),
 		checkpoint: CheckpointMarkerSchema.nullable().default(null),
+		history: z.array(CheckpointHistorySchema).default([]),
+		/**
+		 * Set when supervision stopped and handed the decision to a human — a cap was
+		 * reached, or work was returned twice unresolved.
+		 *
+		 * It exists because caps are per RUN and the run id comes from the caller: an
+		 * agent told "escalate, do not retry" could otherwise mint a fresh run id and
+		 * keep going, which defeats the escalation rather than the budget. A sibling run
+		 * for the same skill is refused while this is set, so the way forward is the
+		 * human the refusal asked for.
+		 *
+		 * This records that supervision STOPPED. It is not a verdict, status or approval
+		 * — those remain forbidden fields.
+		 */
+		escalatedToHuman: z.boolean().default(false),
 	})
 	.strict();
 export type Dossier = z.infer<typeof DossierSchema>;
@@ -121,9 +151,21 @@ const yamlList = (items: readonly string[]): string =>
 	items.length === 0 ? "[]" : `[${items.map(yamlScalar).join(", ")}]`;
 
 /**
+ * Collapse to one line. The directive and next action round-trip through
+ * single-line body markers, so an embedded newline would truncate on read — and a
+ * silently truncated directive is worse than a reformatted one. The 2 KiB cap
+ * already implies a short summary, so nothing legitimate is lost.
+ */
+const singleLine = (v: string): string => v.replace(/\s+/g, " ").trim();
+
+/**
  * Render the active portion: frontmatter plus a short human-readable summary. The
  * explicit not-verification line is part of the artifact, not decoration — a later
  * reader must not be able to mistake a directive for proof.
+ *
+ * `history` is emitted as inline JSON: JSON is valid YAML, so the frontmatter stays
+ * well-formed for any reader, and this module can parse its own output exactly
+ * without taking on a YAML dependency.
  */
 export function renderDossier(dossier: Dossier): string {
 	const cp = dossier.checkpoint;
@@ -136,16 +178,125 @@ lockedDecisionPointers: ${yamlList(dossier.lockedDecisionPointers)}
 correctionCount: ${dossier.correctionCount}
 receiptPointers: ${yamlList(dossier.receiptPointers)}
 checkpoint: ${cp ? `{ checkpointId: ${yamlScalar(cp.checkpointId)}, stage: ${yamlScalar(cp.stage)}, state: ${yamlScalar(cp.state)} }` : "null"}
+history: ${JSON.stringify(dossier.history)}
+escalatedToHuman: ${dossier.escalatedToHuman}
 ---
 
 # Supervision run ${dossier.runId}
 
 This is supervision continuity, NEVER verification and never a gate approval.
 
-**Latest directive:** ${dossier.latestDirective || "(none yet)"}
-**Next safe action:** ${dossier.nextSafeAction || "(none recorded)"}
+**Latest directive:** ${singleLine(dossier.latestDirective) || "(none yet)"}
+**Next safe action:** ${singleLine(dossier.nextSafeAction) || "(none recorded)"}
 `;
 }
+
+/** Outcome of reading a dossier back. A corrupt record is a refusal, never an empty run. */
+export type DossierRead =
+	| { found: true; dossier: Dossier }
+	| { found: false; corrupt: false }
+	| { found: false; corrupt: true; reason: string };
+
+/** Pull one frontmatter scalar line's raw value (everything after the first colon). */
+function frontmatterValue(frontmatter: string, key: string): string | undefined {
+	const line = frontmatter.split("\n").find((l) => l.startsWith(`${key}:`));
+	return line === undefined ? undefined : line.slice(key.length + 1).trim();
+}
+
+/** Undo `yamlScalar` — a quoted scalar is valid JSON, so JSON.parse is the exact inverse. */
+function unquote(raw: string | undefined): string | undefined {
+	if (raw === undefined) return undefined;
+	if (!raw.startsWith('"')) return raw;
+	try {
+		const v: unknown = JSON.parse(raw);
+		return typeof v === "string" ? v : undefined;
+	} catch {
+		return undefined;
+	}
+}
+
+/**
+ * Parse a dossier this module rendered.
+ *
+ * Deliberately narrow: it reads only the keys `renderDossier` writes rather than
+ * accepting arbitrary YAML. A general parser would be a larger surface for a file
+ * whose only writer is this module, and the round-trip test is the contract.
+ *
+ * Fails closed. A record that cannot be parsed is reported as CORRUPT, never as an
+ * absent run — treating a damaged dossier as "no history" would reset every cap and
+ * hand the run an unbounded supervision budget.
+ */
+export function parseDossier(text: string): DossierRead {
+	const match = /^---\n([\s\S]*?)\n---\n/.exec(text);
+	if (!match) return { found: false, corrupt: true, reason: "no frontmatter block" };
+	const fm = match[1];
+
+	let history: unknown = [];
+	const rawHistory = frontmatterValue(fm, "history");
+	if (rawHistory !== undefined && rawHistory !== "") {
+		try {
+			history = JSON.parse(rawHistory);
+		} catch {
+			return { found: false, corrupt: true, reason: "history is not valid JSON" };
+		}
+	}
+
+	let checkpoint: unknown = null;
+	const rawCheckpoint = frontmatterValue(fm, "checkpoint");
+	if (rawCheckpoint && rawCheckpoint !== "null") {
+		// `{ key: "value", … }` — the inline form render emits. Read the three known keys.
+		const read = (k: string): string | undefined => unquote(new RegExp(`${k}:\\s*("(?:[^"\\\\]|\\\\.)*")`).exec(rawCheckpoint)?.[1]);
+		checkpoint = { checkpointId: read("checkpointId"), stage: read("stage"), state: read("state") };
+	}
+
+	let pointers: unknown = [];
+	const rawPointers = frontmatterValue(fm, "lockedDecisionPointers");
+	let receipts: unknown = [];
+	const rawReceipts = frontmatterValue(fm, "receiptPointers");
+	try {
+		if (rawPointers) pointers = JSON.parse(rawPointers);
+		if (rawReceipts) receipts = JSON.parse(rawReceipts);
+	} catch {
+		return { found: false, corrupt: true, reason: "pointer list is not valid JSON" };
+	}
+
+	const body = text.slice(match[0].length);
+	const bodyField = (label: string): string => {
+		const line = new RegExp(`^\\*\\*${label}:\\*\\* (.*)$`, "m").exec(body)?.[1] ?? "";
+		return line === "(none yet)" || line === "(none recorded)" ? "" : line;
+	};
+
+	const candidate = {
+		runId: unquote(frontmatterValue(fm, "runId")),
+		skill: unquote(frontmatterValue(fm, "skill")),
+		stage: unquote(frontmatterValue(fm, "stage")),
+		lockedDecisionPointers: pointers,
+		latestDirective: bodyField("Latest directive"),
+		correctionCount: Number(frontmatterValue(fm, "correctionCount") ?? 0),
+		receiptPointers: receipts,
+		nextSafeAction: bodyField("Next safe action"),
+		checkpoint,
+		history,
+		escalatedToHuman: frontmatterValue(fm, "escalatedToHuman") === "true",
+	};
+
+	const parsed = DossierSchema.safeParse(candidate);
+	if (!parsed.success) {
+		const detail = parsed.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`).join("; ");
+		return { found: false, corrupt: true, reason: detail };
+	}
+	return { found: true, dossier: parsed.data };
+}
+
+/** Read a run's dossier from its deterministic path. Absent ≠ corrupt; see `parseDossier`. */
+export function readDossier(projectRoot: string, runId: string): DossierRead {
+	const target = dossierPath(projectRoot, runId);
+	if (!existsSync(target)) return { found: false, corrupt: false };
+	return parseDossier(readFileSync(target, "utf-8"));
+}
+
+/** Separator for never-auto-loaded history kept below the active summary. */
+const HISTORY_MARKER = "\n<!-- supervision-history (never auto-loaded) -->\n";
 
 /** Atomic temp+rename write; caller holds the lock. */
 async function atomicWriteText(target: string, body: string): Promise<void> {
@@ -175,7 +326,6 @@ export async function writeDossier(projectRoot: string, dossier: Dossier): Promi
 	const target = dossierPath(projectRoot, dossier.runId);
 	mkdirSync(join(projectRoot, "tasks", "reports"), { recursive: true });
 
-	const HISTORY_MARKER = "\n<!-- supervision-history (never auto-loaded) -->\n";
 	const lockPath = join(projectRoot, "tasks", "reports", `.${dossier.runId}-supervision.lock`);
 
 	// The history read happens INSIDE the lock with the write. Reading first would let a
@@ -195,6 +345,81 @@ export async function writeDossier(projectRoot: string, dossier: Dossier): Promi
 }
 
 /**
+ * Read → mutate → write for one run, all inside the same lock.
+ *
+ * `readDossier` followed by `writeDossier` is NOT equivalent: the lock in
+ * `writeDossier` covers only its own history-preserving rename, so two processes
+ * that each read, mutate and write lose one of the two updates — and the update
+ * being lost is a committed checkpoint, i.e. a spent cap slot that comes back. This
+ * mirrors `updateTaskRecord`, which solved the same problem for the task record.
+ *
+ * The mutator receives `null` when no run exists yet, so creation and update take
+ * the same guarded path.
+ */
+export async function updateDossier(
+	projectRoot: string,
+	runId: string,
+	mutate: (existing: Dossier | null) => Dossier,
+): Promise<Dossier> {
+	const target = dossierPath(projectRoot, runId);
+	mkdirSync(join(projectRoot, "tasks", "reports"), { recursive: true });
+	const lockPath = join(projectRoot, "tasks", "reports", `.${runId}-supervision.lock`);
+
+	let written!: Dossier;
+	await withFileLock(lockPath, async () => {
+		let existing: Dossier | null = null;
+		let history = "";
+		if (existsSync(target)) {
+			const raw = readFileSync(target, "utf-8");
+			const read = parseDossier(raw);
+			// Fail closed inside the lock too: a damaged record must not be silently
+			// replaced by a fresh one, which would hand the run a brand-new budget.
+			if (!read.found) throw new CorruptDossierError(runId, read.corrupt ? read.reason : "unreadable");
+			existing = read.dossier;
+			const idx = raw.indexOf(HISTORY_MARKER);
+			if (idx !== -1) history = raw.slice(idx);
+		}
+
+		const next = mutate(existing);
+		const check = validateDossier(next);
+		if (!check.ok) throw new Error(`invalid supervision dossier: ${check.errors.join("; ")}`);
+		await atomicWriteText(target, renderDossier(next) + history);
+		written = next;
+	});
+	return written;
+}
+
+/** A dossier exists but cannot be read. Distinct from "no such run" on purpose. */
+export class CorruptDossierError extends Error {
+	constructor(
+		readonly runId: string,
+		readonly detail: string,
+	) {
+		super(`supervision state for run "${runId}" is unreadable (${detail})`);
+		this.name = "CorruptDossierError";
+	}
+}
+
+/**
+ * Every supervision run recorded in the project, by deterministic filename.
+ *
+ * Used to answer "is another run for this skill already escalated" — the check that
+ * stops a fresh run id from being used to walk around an escalation. Corrupt records
+ * are returned rather than skipped: silently ignoring one would restore the very
+ * bypass this is here to close.
+ */
+export function listSupervisionRuns(projectRoot: string): { runId: string; read: DossierRead }[] {
+	const dir = join(projectRoot, "tasks", "reports");
+	if (!existsSync(dir)) return [];
+	return readdirSync(dir)
+		.filter((f) => f.endsWith("-athena-supervision.md"))
+		.map((f) => ({
+			runId: f.slice(0, -"-athena-supervision.md".length),
+			read: parseDossier(readFileSync(join(dir, f), "utf-8")),
+		}));
+}
+
+/**
  * Mark a checkpoint `pending` before delegating. If the process dies mid-call, the
  * pending marker is what lets a resuming parent recognize the checkpoint as
  * already-attempted instead of spending another slot on it.
@@ -203,11 +428,32 @@ export function beginCheckpoint(dossier: Dossier, marker: Omit<CheckpointMarker,
 	return { ...dossier, stage: marker.stage, checkpoint: { ...marker, state: "pending" } };
 }
 
-/** Commit a delivered result, advancing the directive and correction count. */
+/**
+ * Commit a delivered result, advancing the directive and correction count and
+ * appending the call to `history`.
+ *
+ * The history entry is what a later call counts against the caps, so it is written
+ * here — at the same moment the checkpoint becomes `committed` — rather than left to
+ * the caller. A committed call that never reached the history would be a free slot.
+ * Re-committing the same `checkpointId` replaces its entry instead of appending a
+ * second one, so a retry cannot inflate the count it is supposed to be exempt from.
+ */
 export function commitCheckpoint(
 	dossier: Dossier,
-	result: { latestDirective: string; nextSafeAction: string; receiptPointer?: string; corrections?: number },
+	result: {
+		latestDirective: string;
+		nextSafeAction: string;
+		disposition: CheckpointRecord["disposition"];
+		receiptPointer?: string;
+		corrections?: number;
+	},
 ): Dossier {
+	const cp = dossier.checkpoint;
+	const entry = cp ? { checkpointId: cp.checkpointId, stage: cp.stage, disposition: result.disposition } : null;
+	const history = entry
+		? [...dossier.history.filter((h) => h.checkpointId !== entry.checkpointId), entry]
+		: dossier.history;
+
 	return {
 		...dossier,
 		latestDirective: result.latestDirective,
@@ -216,6 +462,7 @@ export function commitCheckpoint(
 		receiptPointers: result.receiptPointer
 			? [...new Set([...dossier.receiptPointers, result.receiptPointer])]
 			: dossier.receiptPointers,
-		checkpoint: dossier.checkpoint ? { ...dossier.checkpoint, state: "committed" } : null,
+		checkpoint: cp ? { ...cp, state: "committed" } : null,
+		history,
 	};
 }

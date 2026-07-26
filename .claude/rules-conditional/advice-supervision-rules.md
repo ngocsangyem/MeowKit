@@ -271,9 +271,10 @@ It escalates rather than changing a locked business, security, compliance or gat
 decision. Embedded supervision requires a valid `supervisionRunId`.
 
 The two routes are distinct capabilities, and neither may impersonate the other. The
-route classifier refuses both impersonation directions, and the checkpoint call sites
-that consult it land with the wrapper wiring — so today this is enforced wherever a
-call is classified, not yet at a write path:
+route classifier refuses both impersonation directions, and `mewkit advice begin` is
+the call site that consults it: a call claiming `embedded` is refused before any
+dossier or receipt can be written, so the classification now sits in front of the
+write path rather than beside it.
 
 | Route | Requires | Forbidden |
 |---|---|---|
@@ -301,11 +302,22 @@ model name or id belongs in this contract or in any skill body
 This file is the canonical contract. Wrapper wiring lands per skill, and a skill
 that has not been wired yet exposes no flag:
 
-- `mk:fix` — wrapper still describes the retired one-shot three-trigger cadence and
-  is rewritten in the core-cohort step. Until then its prose is superseded by this
-  file, not authoritative.
-- `mk:brainstorming`, `mk:plan-creator`, `mk:cook` — core cohort, not yet wired.
+- `mk:fix`, `mk:cook` — wired. Both declare the flag, fire checkpoints at the stage
+  boundaries above, and drive `mewkit advice begin|commit`, which is where the caps,
+  stage legality, idempotency, dossier and receipt are actually enforced.
+- `mk:brainstorming`, `mk:plan-creator` — core cohort, not yet wired.
 - `mk:autobuild`, `mk:ship` — extended cohort, not yet wired.
+
+### Parent-side commands
+
+| Command | Enforces |
+|---|---|
+| `mewkit advice begin` | route contract, supervised-skill check, per-stage + per-skill caps, idempotent `checkpointId`, pending marker |
+| `mewkit advice commit` | stage/disposition legality, receipt validation (authority language, credentials, empty return), dossier commit, correction supersession |
+| `mewkit advice status` | resume view: current stage, calls used, latest directive, next safe action |
+
+A corrupt dossier is refused, never read as a fresh run — otherwise breaking the
+file that counts the calls would be the cheapest way to buy unlimited ones.
 
 Wrapping a new skill requires a registry row in the same change
 (`.claude/rules/dead-weight-audit-rules.md` Rule 6).

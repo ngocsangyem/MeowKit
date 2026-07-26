@@ -3,7 +3,7 @@ name: mk:cook
 description: 'Orchestrates single-task implementation pipeline: plan → test → build → review. Shipping is an explicit follow-up. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see mk:autobuild); NOT for auto-invoked workflow orchestration (see mk:workflow-orchestrator).'
 source: local
 version: 1.0.0
-argument-hint: '[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict]'
+argument-hint: '[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict|--advice]'
 keywords:
   - cook
   - implement-pipeline
@@ -64,6 +64,16 @@ Quick runs do not create a plan, wiki candidate, memory entry, or ship action by
 Concrete cost depends on the inner harness, model tier, and target surface; treat `[LIGHT]` vs `[HEAVY]` as relative ordering only.
 
 **`--verify` is advisory** (does not block ship). **`--strict` is a hard gate** (FAIL blocks ship and routes back to Phase 3).
+
+**`--advice`** (composable, off by default) — opt-in strategic supervision for one
+run. At named checkpoints (GUIDE after Gate 1, RESCUE on a stall or contradiction,
+REVIEW after Verify and before the reviewer, RECHECK after a correction; hard cap 5)
+the `athena` agent assesses the situation, recommends an operational path inside the
+locked scope, and may return the work for correction. It never approves: Gate 1 and
+Gate 2 remain human, the reviewer keeps its verdict, and supervision counts as no
+verification. Without the flag there are zero calls and no state is written.
+Checkpoints: `references/workflow-steps.md` → Advice Checkpoints. Contract:
+`.claude/rules-conditional/advice-supervision-rules.md` (load only when the flag is present).
 
 ## TDD mode (`--tdd` flag)
 

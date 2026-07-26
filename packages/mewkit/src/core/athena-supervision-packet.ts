@@ -218,6 +218,21 @@ const AUTHORITY_PATTERNS: { name: string; re: RegExp }[] = [
 ];
 
 /**
+ * Authority-language scan over arbitrary supervision prose.
+ *
+ * Exported so the receipt writer reuses THIS list rather than growing its own. Two
+ * detectors for one rule drift, and the weaker one becomes the de-facto contract —
+ * the same reason the gate-authority checker was extended instead of duplicated.
+ */
+export function scanAuthorityLanguage(text: string): string[] {
+	const found: string[] = [];
+	for (const { name, re } of AUTHORITY_PATTERNS) {
+		if (re.test(text)) found.push(`${name} in counsel — say "the evidence supports X", never approve or clear`);
+	}
+	return found;
+}
+
+/**
  * Validate a returned packet: shape, word cap, correction budget, and absence of
  * authority language. `RETURN_TO_EXECUTOR` additionally requires at least one
  * correction — returning work with nothing to change is not actionable.
@@ -245,9 +260,7 @@ export function validateOutputPacket(candidate: unknown): PacketValidation {
 	if (words > OUTPUT_PACKET_MAX_WORDS)
 		errors.push(`output is ${words} words, over the ${OUTPUT_PACKET_MAX_WORDS}-word cap`);
 
-	for (const { name, re } of AUTHORITY_PATTERNS) {
-		if (re.test(prose)) errors.push(`${name} in counsel — say "the evidence supports X", never approve or clear`);
-	}
+	errors.push(...scanAuthorityLanguage(prose));
 
 	// The supervisor OPENS the files it was pointed at, so its own prose can quote their
 	// contents back. Without this the return trip is laxer than the outbound one, and a

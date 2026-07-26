@@ -189,6 +189,33 @@ Subcommands: `show`, `update`.
 | `--evidence-ref` `<value>` | Record an evidence reference, repeatable |
 | `--capability-decision` `<value>` | Record a capability decision as capId\|decision\|reason, repeatable |
 
+### `mewkit advice`
+
+Bounded supervision checkpoints for --advice; records evidence, approves nothing.
+
+Subcommands: `begin`, `commit`, `status`, `validate-packet`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--provider` `<value>` | Runtime recorded on the receipt |
+| `--next` `<value>` | The next safe action recorded on the dossier and receipt |
+| `--run` `<value>` | Supervision run id (embedded supervision requires one) |
+| `--skill` `<value>` | The skill running the checkpoint, e.g. mk:fix |
+| `--stage` `<value>` | Checkpoint stage: GUIDE, RESCUE, REVIEW, RECHECK |
+| `--checkpoint` `<value>` | Named checkpoint id; repeating one is idempotent |
+| `--disposition` `<value>` | The returned disposition, recorded verbatim |
+| `--outcome` `<value>` | What the parent did with it: adopted, rejected, deferred |
+| `--reason` `<value>` | Why — required even when the directive was adopted |
+| `--question` `<value>` | The exact question the checkpoint asked |
+| `--directive` `<value>` | The returned directive, summarized |
+| `--correction` `<value>` | A required correction, repeatable |
+| `--evidence-pointer` `<value>` | An evidence pointer, repeatable |
+| `--slug` `<value>` | Slug used in the receipt filename; defaults to the run id |
+| `--task-id` `<value>` | Active durable task id, or omit for none |
+| `--evidence` `<value>` | Path to the workflow evidence index a correction supersedes, or the packet to validate |
+| `--correction-kind` `<value>` | source (keeps Gate 1) or scope (invalidates it); input\|output for validate-packet |
+
 ### `mewkit orient`
 
 Resume orientation from durable task state; reads records only.

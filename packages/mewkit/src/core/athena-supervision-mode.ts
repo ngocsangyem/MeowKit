@@ -124,5 +124,6 @@ export function classifySupervisionCall(claim: SupervisionCallClaim): ModeDecisi
 // Durable-artifact permission is deliberately NOT a helper here. Only an embedded run
 // has a run id, and a dossier path cannot be built without one, so "direct writes no
 // artifacts" is already structural rather than a predicate a caller must remember to
-// check. The checkpoint call sites that gate receipts land in the core-cohort phase and
-// will own that decision where it is actually made.
+// check. `mewkit advice begin` is the call site that classifies: it claims `embedded`
+// and is refused outright when the triple is incomplete, so an unbounded, unresumable
+// call cannot reach the dossier or receipt writers at all.

@@ -21,6 +21,8 @@ All modes share these phases with mode-specific variations.
   - [--strict [HEAVY]: Full Evaluator (mk:evaluate)](#strict-heavy-full-evaluator-meowevaluate)
 - [Phase 5: Ship (explicit request only)](#phase-5-ship-explicit-request-only)
 - [Phase 6: Reflect (on explicit close request)](#phase-6-reflect-on-explicit-close-request)
+- [Advice Checkpoints (`--advice` only)](#advice-checkpoints---advice-only)
+- [Workflow Evidence Index (traceability — no new gate)](#workflow-evidence-index-traceability--no-new-gate)
 - [Mode Flow Summary](#mode-flow-summary)
 - [Validation](#validation)
 
@@ -369,6 +371,92 @@ Idempotent: re-running this checkpoint on an unchanged phase produces zero diff 
 
 **Output:** `Phase 6: Reflect — sync-back done, docs [impact], memory updated, wiki handoff [proposed|skipped]`
 
+## Advice Checkpoints (`--advice` only)
+
+Skip this whole section unless the run was invoked with `--advice`. Without the flag
+there are zero supervision calls, no dossier, no receipt, and behavior is unchanged.
+
+On the first checkpoint of a run, read
+`.claude/rules-conditional/advice-supervision-rules.md` — it is the contract this
+section implements.
+
+| Stage | Fires at | Condition | Max |
+|---|---|---|---:|
+| GUIDE | after Gate 1, before Phase 3 Build | always, when the flag is on | 1 |
+| RESCUE | Phase 3 | repeated failure, a `BLOCKED` subagent, or a high-risk / irreversible decision | 2 |
+| REVIEW | after Phase 3.5 Simplify + 3.6 Verify, **before** the Phase 4 reviewer | always, when the flag is on | 1 |
+| RECHECK | after corrections from a `RETURN_TO_EXECUTOR` | only after a return | 1 |
+
+Hard cap **5 calls per run**. Checkpoints are macro boundaries — never per tool call,
+per file, or per build-test-fix loop iteration. GUIDE fires AFTER Gate 1 on purpose:
+supervision reads an approved plan, it does not help produce the approval.
+
+### Call
+
+```
+mewkit advice begin --run <supervisionRunId> --skill mk:cook \
+  --stage GUIDE|RESCUE|REVIEW|RECHECK --checkpoint <checkpointId>
+```
+
+This enforces the cap, stage legality and idempotency, and writes the pending marker
+that makes a crash resumable. A refusal is final for that checkpoint: continue
+unsupervised, or escalate when the refusal says to. Re-running the same
+`--checkpoint` returns the recorded result and spends no slot.
+
+Then delegate with the packet inline (a fork inherits no conversation):
+
+```
+Agent(subagent_type="athena",
+      description="advice: <checkpoint name>",
+      prompt="<packet: runId, skill, stage, checkpointId, mission, lockedDecisions,
+               currentState, workerSummary, evidenceRefs (≤5, with provenance),
+               priorDirective, question, riskAndReversibility>")
+```
+
+Serialized cap 12 KiB — pass pointers, never payloads. Spawned workers receive a
+task-specific directive only: never the flag, never the dossier, never the run id.
+
+Validate the packet before sending it — the caps, pointer budget, provenance
+requirement and secret scan are enforced by this command, not by writing the packet
+carefully:
+
+```
+mewkit advice validate-packet --evidence <packet.json> --correction-kind input
+```
+
+Validate the returned packet the same way with `--correction-kind output` before
+acting on it or summarizing it into a receipt.
+
+### After the call
+
+```
+mewkit advice commit --run <runId> --checkpoint <checkpointId> \
+  --disposition <returned disposition> --outcome adopted|rejected|deferred \
+  --reason "<one line, required even when adopted>" \
+  --directive "<summary>" --next "<next safe action>" \
+  [--correction "<change>" ...] [--evidence-pointer <path> ...]
+```
+
+Route on the disposition:
+
+- `CONTINUE_WITH_DIRECTIVE` — proceed into Build; the directive is input, not instruction.
+- `READY_FOR_EXISTING_GATE` — run the Phase 4 reviewer. Gate 2 is **not** cleared.
+- `RETURN_TO_EXECUTOR` — route corrections to the current owner, then supersede the
+  stale evidence:
+  `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence tasks/plans/<plan>/reports/evidence/workflow-evidence.json --correction-kind source|scope`.
+  Re-run Phase 3.6 Verify before Phase 4 — the previous Verify output describes code
+  that no longer exists. A `scope` correction also returns Gate 1 to `required`,
+  because a plan change needs a fresh human approval that Athena cannot give.
+- `ESCALATE_TO_HUMAN` — stop at the existing human touchpoint.
+- `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
+
+A second unresolved return escalates to a human; there is no third opinion.
+
+If the runtime cannot delegate to `athena`, print exactly
+`advice checkpoint unavailable in this runtime: <reason>` and continue unsupervised.
+**Never write a packet inline and present it as Athena's** — a recommendation written
+by the agent that is stuck is not an independent check.
+
 ## Workflow Evidence Index (traceability — no new gate)
 
 Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist across Phases 0-6 — no extra agent work, no extra user step, no behavior change. The index records pointers + summaries; it **never approves** (Gate 1 / Gate 2 stay human authority) and carries **no score**. The gate scripts (`validate-gate-1.sh`, `validate-gate-2.sh`) remain the structural authority; evidence MIRRORS their result.
@@ -388,6 +476,16 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. Cook populates
 | 6 Reflect | `memory.*` capture status |
 
 `cookContract` is populated from the Phase 1 five exact requirements; **skip it only when the input was an existing `plan.md` / `phase-*.md` path** (the contract already lives in the plan — pass `--plan-input` to the validator). Evidence completeness must pass before presenting Gate 2 (see Phase 4 GATE 2). Scrub secrets/PII; store pointers + summaries, not raw logs.
+
+**Evidence revision (supersession).** `evidenceRevision` binds Verify and review
+output to the source state it observed; `scopeRevision` records when the plan or
+scope last changed. A returned correction advances the revision and marks both
+`verification` and `review` superseded — `mewkit advice commit … --evidence <path>`
+does this, and the validator then refuses a Gate 2 approval resting on superseded
+proof, a stale record still marked `valid`, or a Gate 1 approval older than the last
+scope change. Re-run the normal checks and record the fresh output at the current
+revision. Absent revision fields mean revision 1 with nothing superseded, so an index
+written before this mechanism still validates.
 
 ## Mode Flow Summary
 

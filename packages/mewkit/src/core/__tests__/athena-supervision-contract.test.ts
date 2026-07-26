@@ -95,6 +95,8 @@ const baseDossier = (over: Partial<Dossier> = {}): Dossier => ({
 	receiptPointers: [],
 	nextSafeAction: "implement packet schema",
 	checkpoint: null,
+	history: [],
+	escalatedToHuman: false,
 	...over,
 });
 
@@ -586,12 +588,16 @@ describe("continuity dossier", () => {
 		const done = commitCheckpoint(pending, {
 			latestDirective: "return work: missing regression test",
 			nextSafeAction: "add the test",
+			disposition: "RETURN_TO_EXECUTOR",
 			receiptPointer: "tasks/reports/run-1-advice-1.md",
 			corrections: 2,
 		});
 		expect(done.checkpoint?.state).toBe("committed");
 		expect(done.correctionCount).toBe(2);
 		expect(done.receiptPointers).toEqual(["tasks/reports/run-1-advice-1.md"]);
+		// The committed call joins the history the caps are counted against — a committed
+		// checkpoint missing from it would be a free slot.
+		expect(done.history).toEqual([{ checkpointId: "c1", stage: "REVIEW", disposition: "RETURN_TO_EXECUTOR" }]);
 	});
 
 	it("writes atomically and preserves never-auto-loaded history across writes", async () => {

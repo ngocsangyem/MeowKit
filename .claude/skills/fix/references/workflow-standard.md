@@ -62,56 +62,96 @@ On the first checkpoint of a run, read
 `.claude/rules-conditional/advice-supervision-rules.md` — it is the contract this
 section implements.
 
-### Triggers
+### Checkpoints
 
-| Trigger | Fires at | Condition |
-|---|---|---|
-| a — stuck run | Step 3 | Root cause is evidenced AND two distinct fix approaches have failed |
-| b — irreversible step | Step 3, before the edit | The fix touches a security boundary, a public contract, or anything that can lose data |
-| c — residual risk | Step 5 | Tests and review passed but the remaining risk is unclear |
+| Stage | Fires at | Condition | Max |
+|---|---|---|---:|
+| GUIDE | Step 3, before the first edit | Root cause is confirmed, or a diagnostic report was handed off | 1 |
+| RESCUE | Step 3 | Two distinct fix approaches have failed, OR the evidence contradicts itself, OR the step is irreversible (security boundary, public contract, possible data loss) | 2 |
+| REVIEW | Step 4→5 boundary, after Verify and before the normal review | always, when the flag is on | 1 |
+| RECHECK | after corrections from a `RETURN_TO_EXECUTOR` | only after a return | 1 |
 
-Each trigger fires **at most once per run** — worst case three calls. Never per
-tool call, never per loop iteration, never per file.
+Hard cap **5 calls per run**. Checkpoints are macro boundaries — never per tool
+call, per loop iteration, or per file.
 
-Trigger (a) does not replace or postpone the three-failed-attempt human STOP in
-`SKILL.md`. That stop fires on its own schedule whether or not counsel was taken.
+The RESCUE trigger does not replace or postpone the three-failed-attempt human
+STOP in `SKILL.md`. That stop fires on its own schedule whether or not supervision
+was taken at two failures.
 
 ### Call
+
+Open the checkpoint first — this is what enforces the cap, the stage legality and
+idempotency, and writes the pending marker that makes a crash resumable:
+
+```
+mewkit advice begin --run <supervisionRunId> --skill mk:fix \
+  --stage GUIDE|RESCUE|REVIEW|RECHECK --checkpoint <checkpointId>
+```
+
+A refusal is final for that checkpoint: continue unsupervised, or escalate when the
+refusal says to. Re-running the same `--checkpoint` returns the recorded result and
+spends no slot.
+
+Then delegate, with the packet inline (a fork inherits no conversation):
 
 ```
 Agent(subagent_type="athena",
       description="advice: <checkpoint name>",
-      prompt="<the five fields below, inline>")
+      prompt="<the packet below, inline>")
 ```
 
-The fork inherits no conversation, so all five fields go in the prompt text:
+Packet fields — `runId`, `skill`, `stage`, `checkpointId`, `mission`,
+`lockedDecisions`, `currentState`, `workerSummary`, `evidenceRefs` (≤5 pointers,
+each with provenance), `priorDirective`, `question`, `riskAndReversibility`.
+Serialized cap 12 KiB; pass pointers, never payloads. Locked decisions and the exact
+question appear at both the start and the end.
 
-1. Task and the exact question being asked.
-2. Constraints, plus any user decision that must not be silently reversed.
-3. Evidence — file paths, commands run, observations so far.
-4. Attempts — what was tried, what happened, why each failed.
-5. Options under consideration, risk class, and whether the step is reversible.
+Validate the packet before sending it — the caps, pointer budget, provenance
+requirement and secret scan are enforced by this command, not by writing the packet
+carefully:
+
+```
+mewkit advice validate-packet --evidence <packet.json> --correction-kind input
+```
+
+Validate the returned packet the same way with `--correction-kind output` before
+acting on it or summarizing it into a receipt.
 
 ### After the call
 
-Render the returned packet to the user, then:
+Render the returned packet to the user, then commit it:
 
-1. Write a receipt to `tasks/reports/{YYMMDD}-{slug}-advice-{n}.md` — frontmatter
-   `kind: advice-receipt`, `disposition: adopted|rejected|deferred`, `reason`,
-   `taskId`, `provider`, `skill`, `checkpoint`; body carries the verbatim line
-   "This is a record of counsel, NEVER verification evidence.", the question, a
-   recommendation summary, evidence pointers, and the next safe action.
-2. If an active durable task record exists, point at it:
-   `mewkit task-state update <id> --evidence-ref <receipt path>`. With no active
-   record, keep the file and skip this step — never invent a record.
-3. For trigger (a) only, optionally record the stall as friction:
-   `mewkit trace --friction "advice checkpoint: <one line>" --responsibility failure-attribution`.
+```
+mewkit advice commit --run <runId> --checkpoint <checkpointId> \
+  --disposition <returned disposition> --outcome adopted|rejected|deferred \
+  --reason "<one line, required even when adopted>" \
+  --directive "<summary>" --next "<next safe action>" \
+  [--correction "<change>" ...] [--evidence-pointer <path> ...]
+```
+
+`commit` writes the receipt to `tasks/reports/{YYMMDD}-{slug}-advice-{n}.md`, records
+the call against the cap, and refuses a disposition that is illegal for the stage.
+`disposition` is Athena's routing signal; `--outcome` is what this pipeline decided
+to do with it — a rejected directive is a legitimate, recordable outcome.
+
+Route on the disposition:
+
+- `CONTINUE_WITH_DIRECTIVE` — proceed; the directive is input, not instruction.
+- `READY_FOR_EXISTING_GATE` — run the normal Step 5 review. The gate is NOT cleared.
+- `RETURN_TO_EXECUTOR` — apply the corrections, then supersede the stale evidence:
+  `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence <workflow-evidence.json> --correction-kind source|scope`.
+  Re-run Step 4 before the review. `scope` also returns Gate 1 to `required`.
+- `ESCALATE_TO_HUMAN` — stop at the existing human touchpoint.
+- `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
+
+If an active durable task record exists, point at the receipt:
+`mewkit task-state update <id> --evidence-ref <receipt path>`. With no active record,
+keep the file and skip this step — never invent a record.
 
 A failed receipt write prints a one-line notice and the run continues; it never
-blocks and is never skipped silently. Then continue — the workflow decision stays
-with this pipeline.
+blocks and is never skipped silently.
 
-**Counsel is evidence, not authority.** It cannot pass, clear, or unblock any
+**Supervision is evidence, not authority.** It cannot pass, clear, or unblock any
 gate, and it is never counted as verification. Verification stays with Step 4
 tests and the Step 5 review verdict.
 
