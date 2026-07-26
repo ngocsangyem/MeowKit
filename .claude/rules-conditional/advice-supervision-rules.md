@@ -270,6 +270,22 @@ cap accounting. It is NOT lifecycle supervision and must label itself accordingl
 It escalates rather than changing a locked business, security, compliance or gate
 decision. Embedded supervision requires a valid `supervisionRunId`.
 
+A direct consult returns a **strategy brief**, which is a different shape from a
+checkpoint packet and deliberately cannot carry a `disposition`:
+
+| Field | Required |
+|---|---|
+| `situation`, `decisionRecommendation`, `nextFalsifiableCheck`, `escalationPoint`, `confidence` | yes |
+| `rejectedAlternatives`, `risksAndRollback`, `assumptions`, `evidenceRead` | no |
+
+`disposition`, `requiredCorrections`, `strategicDirective`, `runId`, `stage`,
+`checkpointId` and any receipt/dossier/correction field are **refused, not stripped**
+(`mewkit advice validate-packet --packet-kind brief`). A disposition is a routing
+signal for a run; emitted without one it reads as a governed decision that no run ever
+governed, and a later reader cannot tell the difference. That is the impersonation
+this section exists to prevent, so the refusal lives in a schema rather than in a
+reviewer's memory.
+
 The two routes are distinct capabilities, and neither may impersonate the other. The
 route classifier refuses both impersonation directions, and `mewkit advice begin` is
 the call site that consults it: a call claiming `embedded` is refused before any
@@ -302,11 +318,15 @@ model name or id belongs in this contract or in any skill body
 This file is the canonical contract. Wrapper wiring lands per skill, and a skill
 that has not been wired yet exposes no flag:
 
-- `mk:fix`, `mk:cook` — wired. Both declare the flag, fire checkpoints at the stage
-  boundaries above, and drive `mewkit advice begin|commit`, which is where the caps,
-  stage legality, idempotency, dossier and receipt are actually enforced.
-- `mk:brainstorming`, `mk:plan-creator` — core cohort, not yet wired.
+- `mk:fix`, `mk:cook`, `mk:brainstorming` (deep only), `mk:plan-creator` — wired. Each
+  declares the flag, fires checkpoints at the stage boundaries above, and drives
+  `mewkit advice begin|commit`, which is where the caps, stage legality, idempotency,
+  dossier and receipt are actually enforced.
 - `mk:autobuild`, `mk:ship` — extended cohort, not yet wired.
+
+`mk:brainstorming` wires its **deep** workflow only. Its quick profile answers inline
+in three steps and creates no scout, report, plan or memory entry; supervising that is
+noise rather than safety (`skill-authoring-rules.md` Rule 6 — match control to risk).
 
 ### Parent-side commands
 
@@ -315,6 +335,7 @@ that has not been wired yet exposes no flag:
 | `mewkit advice begin` | route contract, supervised-skill check, per-stage + per-skill caps, idempotent `checkpointId`, pending marker |
 | `mewkit advice commit` | stage/disposition legality, receipt validation (authority language, credentials, empty return), dossier commit, correction supersession |
 | `mewkit advice status` | resume view: current stage, calls used, latest directive, next safe action |
+| `mewkit advice validate-packet` | input packet, output packet, or direct-consult brief — `--packet-kind input\|output\|brief` |
 
 A corrupt dossier is refused, never read as a fresh run — otherwise breaking the
 file that counts the calls would be the cheapest way to buy unlimited ones.

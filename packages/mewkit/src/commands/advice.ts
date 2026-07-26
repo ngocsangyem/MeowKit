@@ -41,6 +41,7 @@ import {
 	type Receipt,
 	type ReceiptOutcome,
 } from "../core/athena-supervision-receipt.js";
+import { validateStrategyBrief } from "../core/athena-strategy-brief.js";
 import { validateInputPacket, validateOutputPacket } from "../core/athena-supervision-packet.js";
 import { applyCorrection, type CorrectionKind } from "../core/workflow-evidence-revision.js";
 import { readJsonFile, writeJsonAtomic } from "./advice-evidence-io.js";
@@ -64,6 +65,7 @@ export interface AdviceOptions {
 	provider?: string;
 	evidence?: string;
 	correctionKind?: string;
+	packetKind?: string;
 	json?: boolean;
 }
 
@@ -357,36 +359,53 @@ function applyEvidenceCorrection(projectRoot: string, args: AdviceOptions): void
 }
 
 /**
- * `advice validate-packet` — check a packet against the contract before it is sent
- * or acted on.
+ * `advice validate-packet` — check a packet or brief against its contract.
  *
- * Both packets are assembled as prose and handed to (or returned by) an agent, so
- * neither passes through this CLI on its own. Without this command the packet caps,
- * pointer budget, provenance requirement and secret/authority scans were code that
- * nothing could reach — real functions, but not an enforcement any workflow could
- * actually invoke. This is the reachable surface; the skill bodies call it at the
- * checkpoint boundaries.
+ * All three shapes are assembled as prose and handed to (or returned by) an agent,
+ * so none passes through this CLI on its own. Without this command the caps, pointer
+ * budget, provenance requirement, secret and authority scans, and the direct/embedded
+ * separation were code nothing could reach — real functions, but not an enforcement
+ * any workflow could invoke. This is the reachable surface; the skill bodies and the
+ * agent adapter call it at their boundaries.
+ *
+ * `brief` is the direct-consult shape. It is validated by a DIFFERENT schema on
+ * purpose: a brief that carries a disposition is refused, which is what stops a
+ * stateless consult from being recorded as a governed checkpoint.
  */
 function validatePacket(projectRoot: string, args: AdviceOptions): void {
 	const file = args.evidence ?? fail("`advice validate-packet` requires --evidence <path-to-packet.json>.");
-	const direction = args.correctionKind ?? "input";
-	if (direction !== "input" && direction !== "output")
-		fail(`--correction-kind must be input|output for validate-packet, got ${direction}.`);
+	// `--correction-kind` used to select the packet shape here and now means
+	// source|scope on `commit`. Silently ignoring it would route the caller to the
+	// DEFAULT validator — a brief checked against the input-packet schema fails with a
+	// confusing shape error instead of saying which flag moved.
+	if (args.correctionKind !== undefined)
+		fail("`validate-packet` uses --packet-kind (input|output|brief); --correction-kind is for `commit` (source|scope).");
+
+	const kind = args.packetKind ?? "input";
+	if (kind !== "input" && kind !== "output" && kind !== "brief")
+		fail(`--packet-kind must be input|output|brief, got ${kind}.`);
 
 	const abs = path.resolve(projectRoot, file);
 	const rel = path.relative(projectRoot, abs);
-	if (rel.startsWith("..") || path.isAbsolute(rel)) fail(`Refused: --evidence must stay inside the project.`);
+	if (rel.startsWith("..") || path.isAbsolute(rel)) fail("Refused: --evidence must stay inside the project.");
 
 	const loaded = readJsonFile(abs);
 	if (!loaded.ok) fail(`Cannot read packet: ${loaded.reason}`);
 
-	const result = direction === "input" ? validateInputPacket(loaded.data) : validateOutputPacket(loaded.data);
+	const result =
+		kind === "input"
+			? validateInputPacket(loaded.data)
+			: kind === "output"
+				? validateOutputPacket(loaded.data)
+				: validateStrategyBrief(loaded.data);
 	if (!result.ok) {
 		// Refused BEFORE delegation, never truncated to fit: a trimmed packet asks a
 		// different question than the one the workflow intended.
-		fail(`Packet refused (${direction}):\n${result.errors.map((e) => `  - ${e}`).join("\n")}`);
+		fail(`Packet refused (${kind}):\n${result.errors.map((e) => `  - ${e}`).join("\n")}`);
 	}
-	console.log(pc.green(`Packet OK (${direction}).`));
+	console.log(pc.green(`${kind === "brief" ? "Strategy brief" : "Packet"} OK (${kind}).`));
+	if (kind === "brief")
+		console.log(pc.dim("  a consult governs no run — it writes no dossier, no receipt, and spends no cap."));
 }
 
 /** `advice status` — what a resuming parent needs, without loading any history. */

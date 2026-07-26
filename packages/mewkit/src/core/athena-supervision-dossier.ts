@@ -125,7 +125,13 @@ export function validateDossier(candidate: unknown): DossierValidation {
 	const errors: string[] = [];
 
 	if (candidate && typeof candidate === "object") {
-		const keys = Object.keys(candidate as Record<string, unknown>);
+		// `Object.getOwnPropertyNames`, not `Object.keys`: a non-enumerable property is
+		// still a property, and zod's `.strict()` shares the same blind spot. Today the
+		// only caller round-trips through `JSON.parse` (which cannot produce one), so
+		// this is closing the gap before a future in-memory caller opens it — the claim
+		// above says "refused", and a claim that holds only for JSON inputs is a
+		// narrower claim than the one written.
+		const keys = Object.getOwnPropertyNames(candidate as Record<string, unknown>);
 		for (const forbidden of FORBIDDEN_DOSSIER_FIELDS) {
 			if (keys.includes(forbidden))
 				errors.push(`"${forbidden}" belongs to the task record — the dossier carries no progress, verification, or gate state`);

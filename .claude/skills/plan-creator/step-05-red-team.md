@@ -255,6 +255,13 @@ rehash clears prior approval). Detail: `references/visual-plan-integration.md` Â
 - plan.md frontmatter `consistency_sweeps.red_team` updated
 - `red_team_findings` variable set: `"{N} findings, {accepted} accepted, {C} cross-persona promoted"`
 
+## Advice (`--advice` runs only)
+
+If the red team left a contradiction the plan does not resolve, or research produced
+two incompatible directions, fire the RESCUE checkpoint per
+`references/advice-checkpoints.md`. Findings that the plan already resolves are not a
+trigger. Without the flag, skip this section.
+
 ## Next
 
 Read and follow `step-06-validation-interview.md`

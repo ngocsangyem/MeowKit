@@ -421,10 +421,10 @@ requirement and secret scan are enforced by this command, not by writing the pac
 carefully:
 
 ```
-mewkit advice validate-packet --evidence <packet.json> --correction-kind input
+mewkit advice validate-packet --evidence <packet.json> --packet-kind input
 ```
 
-Validate the returned packet the same way with `--correction-kind output` before
+Validate the returned packet the same way with `--packet-kind output` before
 acting on it or summarizing it into a receipt.
 
 ### After the call

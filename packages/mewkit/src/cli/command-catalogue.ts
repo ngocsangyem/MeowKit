@@ -260,8 +260,9 @@ const FLAGS: FlagSpec[] = [
 	s("evidence-pointer", ["advice"], "An evidence pointer", { repeatable: true }),
 	s("slug", ["advice"], "Slug used in the receipt filename; defaults to the run id"),
 	s("task-id", ["advice"], "Active durable task id, or omit for none"),
-	s("evidence", ["advice"], "Path to the workflow evidence index a correction supersedes, or the packet to validate"),
-	s("correction-kind", ["advice"], "source (keeps Gate 1) or scope (invalidates it); input|output for validate-packet"),
+	s("evidence", ["advice"], "Path to the workflow evidence index a correction supersedes, or the packet/brief to validate"),
+	s("correction-kind", ["advice"], "source (keeps Gate 1) or scope (invalidates it)"),
+	s("packet-kind", ["advice"], "validate-packet shape: input, output, or brief (direct consult)"),
 
 	// context
 	s("root", ["context"], "Project root to resolve the path against"),

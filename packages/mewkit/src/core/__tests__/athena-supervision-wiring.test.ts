@@ -602,13 +602,13 @@ describe("advice command", () => {
 			"utf-8",
 		);
 		await expect(
-			runAdvice(root, { subcommand: "validate-packet", evidence: "packet.json", correctionKind: "input" }),
+			runAdvice(root, { subcommand: "validate-packet", evidence: "packet.json", packetKind: "input" }),
 		).resolves.toBeUndefined();
 
 		const bad = join(root, "bad.json");
 		writeFileSync(bad, JSON.stringify({ runId: "run-1", skill: "mk:cook" }), "utf-8");
 		await expect(
-			runAdvice(root, { subcommand: "validate-packet", evidence: "bad.json", correctionKind: "input" }),
+			runAdvice(root, { subcommand: "validate-packet", evidence: "bad.json", packetKind: "input" }),
 		).rejects.toThrow(/Packet refused/);
 	});
 

@@ -213,8 +213,9 @@ Subcommands: `begin`, `commit`, `status`, `validate-packet`.
 | `--evidence-pointer` `<value>` | An evidence pointer, repeatable |
 | `--slug` `<value>` | Slug used in the receipt filename; defaults to the run id |
 | `--task-id` `<value>` | Active durable task id, or omit for none |
-| `--evidence` `<value>` | Path to the workflow evidence index a correction supersedes, or the packet to validate |
-| `--correction-kind` `<value>` | source (keeps Gate 1) or scope (invalidates it); input\|output for validate-packet |
+| `--evidence` `<value>` | Path to the workflow evidence index a correction supersedes, or the packet/brief to validate |
+| `--correction-kind` `<value>` | source (keeps Gate 1) or scope (invalidates it) |
+| `--packet-kind` `<value>` | validate-packet shape: input, output, or brief (direct consult) |
 
 ### `mewkit orient`
 

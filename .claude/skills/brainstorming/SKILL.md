@@ -56,6 +56,12 @@ Use at least two alternatives. Quick returns 2-4; deep generates 3-8 and never m
 
 ## Deep Workflow
 
+**`--advice` (optional, deep only):** when the flag is present, GUIDE fires after
+step 1's frame and REVIEW after step 4's challenge pass, capped at 4 calls per run.
+Athena supplies decision criteria and reads the chosen direction; it never generates
+the option set, chooses for the user, or adds a gate. Without the flag there are zero
+calls and no state. See `references/advice-checkpoints.md`.
+
 1. Confirm the decision, binding constraint, success criterion, and excluded scope. Ask at most three focused questions when needed.
 2. If 3+ independently shippable concerns are bundled, ask to choose one. Use a compact scout summary only when current codebase touchpoints change the decision.
 3. Load one technique from `references/techniques/`; generate 3-8 technical approaches without scoring while generating.
@@ -68,3 +74,4 @@ Use at least two alternatives. Quick returns 2-4; deep generates 3-8 and never m
 - `references/techniques/` — choose one technique for a deep run
 - `references/challenge-pass.md` and `references/scoring-criteria.md` — deep convergence only
 - `references/editorial-html.md` — HTML only for a requested report
+- `references/advice-checkpoints.md` — deep `--advice` checkpoints; load only when the flag is present

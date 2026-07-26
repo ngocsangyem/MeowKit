@@ -216,6 +216,10 @@ Default: `html_mode = false`.
 
 ## Next
 
+**`--advice` GUIDE checkpoint:** when the run carries `--advice`, fire the GUIDE
+checkpoint HERE — scope has stopped moving and research has not started. Follow
+`references/advice-checkpoints.md`. Without the flag, skip this paragraph entirely.
+
 If trivial → STOP (recommend /mk:fix).
 Otherwise, FIRST read and follow `step-00-5-intake-packet.md` (conditional — activates only when ≥2 external artifact paths are in the invocation; 0–1 sources skip cleanly). It then routes by mode:
 If fast → skip to `step-03-draft-plan.md`.
