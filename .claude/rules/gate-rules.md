@@ -166,8 +166,9 @@ Gate 2 approval receipt; designed, not yet enforced).
 gate approval. It is a **floor, not the contract**: it matches a fixed pattern set, and
 any paraphrase walks straight through it.
 
-So at Gate 2, whenever a change touches `.claude/rules/`, `.claude/modes/`,
-`.claude/skills/cook/`, or `.claude/skills/autobuild/`, the reviewer MUST answer:
+So at Gate 2, whenever a change touches `.claude/rules/`, `.claude/rules-conditional/`,
+`.claude/modes/`, `.claude/agents/`, `.claude/skills/cook/`, `.claude/skills/fix/`, or
+`.claude/skills/autobuild/`, the reviewer MUST answer:
 
 > **Does any prose in this change grant approval authority to something that is not a
 > human — in any wording?**

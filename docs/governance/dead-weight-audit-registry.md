@@ -28,6 +28,7 @@ Delta convention: `measured_delta = baseline_avg − disabled_avg` on the calibr
 | `validate/targets/` (`target-profile.ts` + `codex-target.ts`) | A generated Codex project has no post-migration quality gate — a broken/leaky target ships undetected | N/A (correctness — provider-target validation; provider-keyed so new providers add a profile, not a command) | Opus 4.8 | 2026-07-18 | KEEP |
 | `journey-validation/` (`deterministic-runner.ts` + `oracles.ts` + `side-effect-observer.ts`) | Cross-harness parity (J10) is claimed but never machine-checked — a payload could silently diverge | N/A (correctness — deterministic structural-parity oracles run in CI, no model calls; reuses migration + target validation as libraries) | Opus 4.8 | 2026-07-18 | KEEP |
 | `journey-validation/cost-ledger.ts` (+ `run-canary.sh check-cap`) | A benchmark / live run overspends because the `cost_cap_usd` is recorded but never enforced | N/A (correctness — Rule 6 cap enforcement; proven against a mock backend so deferred live backends inherit it) | Opus 4.8 | 2026-07-18 | KEEP |
+| `athena` agent + `--advice` wrapper (`rules-conditional/advice-supervision-rules.md`, `mk:fix` checkpoints) | Executor models benefit from bounded elevated-reasoning supervision at declared workflow checkpoints (stuck run, irreversible step, unclear residual risk) | Not yet measured — initial entry; supervised-vs-control sample runs are the gating measurement before any expansion beyond the `mk:fix` slice | Opus 5 | 2026-07-26 | WATCH |
 
 ## Notes
 
