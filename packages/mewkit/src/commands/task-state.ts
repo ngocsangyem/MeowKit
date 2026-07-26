@@ -118,6 +118,10 @@ export async function taskState(args: TaskStateOptions = {}): Promise<void> {
 			if (r.repos.length)
 				console.log(`    repos: ${r.repos.map((x) => `${x.identity}@${x.revision ?? "(no-rev)"}`).join(", ")}`);
 			if (r.blockers.length) console.log(`    ${pc.yellow(`blockers: ${r.blockers.join("; ")}`)}`);
+			// Evidence paths are pointers a resuming session can open — the record deliberately
+			// stores no content, so listing them is the only way they are discoverable without
+			// reading the JSON by hand. They are POINTERS, never a verification result.
+			if (r.evidenceRefs.length) console.log(`    evidence: ${r.evidenceRefs.join(", ")}`);
 			if (r.capabilityDecisions.length) {
 				console.log(`    decisions: ${r.capabilityDecisions.map((d) => `${d.capabilityId}=${d.decision}`).join(", ")}`);
 			}
