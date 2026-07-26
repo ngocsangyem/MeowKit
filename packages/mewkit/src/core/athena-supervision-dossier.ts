@@ -18,13 +18,11 @@ import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { rename, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
+import { RUN_ID_RE, isValidRunId } from "./athena-supervision-mode.js";
 import { withFileLock } from "./file-lock.js";
 
 /** Frontmatter + active summary ceiling. History below it does not count. */
 export const ACTIVE_SUMMARY_MAX_BYTES = 2 * 1024;
-
-/** Valid supervision run id — filename-safe, since it becomes part of a path. */
-const RUN_ID_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
 
 /**
  * Fields that would turn continuity into authority. Rejected outright rather than
@@ -72,9 +70,13 @@ export const DossierSchema = z
 	.strict();
 export type Dossier = z.infer<typeof DossierSchema>;
 
-/** Deterministic path so a fresh parent can find the run without an index. */
+/**
+ * Deterministic path so a fresh parent can find the run without an index. Only an
+ * embedded run has an id, so this path cannot exist for a direct consult — that is
+ * the structural reason a stateless brief leaves no dossier behind.
+ */
 export function dossierPath(projectRoot: string, runId: string): string {
-	if (!RUN_ID_RE.test(runId)) throw new Error(`invalid supervision run id: ${JSON.stringify(runId)}`);
+	if (!isValidRunId(runId)) throw new Error(`invalid supervision run id: ${JSON.stringify(runId)}`);
 	return join(projectRoot, "tasks", "reports", `${runId}-athena-supervision.md`);
 }
 

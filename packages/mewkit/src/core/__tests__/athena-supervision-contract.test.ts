@@ -26,6 +26,13 @@ import {
 	validateOutputPacket,
 } from "../athena-supervision-packet.js";
 import {
+	SUPERVISION_MODES,
+	classifySupervisionCall,
+	isValidMode,
+	isValidRunId,
+	isValidStage,
+} from "../athena-supervision-mode.js";
+import {
 	ACTIVE_SUMMARY_MAX_BYTES,
 	FORBIDDEN_DOSSIER_FIELDS,
 	beginCheckpoint,
@@ -391,6 +398,150 @@ describe("output packet validation", () => {
 	it("rejects a credential in the evidence-read list", () => {
 		const r = validateOutputPacket(validOutput({ evidenceRead: ["AKIAIOSFODNN7EXAMPLE"] }));
 		expect(r.ok).toBe(false);
+	});
+});
+
+describe("strategic output fields", () => {
+	// The role is assessment + recommendation + directive, not one blended blob. Each
+	// field must independently carry the same authority and secrecy constraints.
+	const STRATEGIC_FIELDS = ["strategicAssessment", "decisionRecommendation", "strategicDirective"] as const;
+
+	// Documents the actual contract rather than asserting the fixture's own literals:
+	// the three fields are separately declared and optional, so a packet may legally
+	// leave any of them empty. The per-field tests below are what prove they are real —
+	// each is independently reachable by the scanners.
+	it("treats the three fields as separately declared and optional", () => {
+		const only = validateOutputPacket(
+			validOutput({ strategicAssessment: "", decisionRecommendation: "", strategicDirective: "only this one" }),
+		);
+		expect(only.ok).toBe(true);
+	});
+
+	// The recommendation is the field most likely to drift into authority: it names a
+	// chosen path, which is one short step from claiming that path is approved.
+	it.each(STRATEGIC_FIELDS)("refuses authority language smuggled through %s", (field) => {
+		for (const phrase of ["This is approved, proceed to ship.", "Merge is approved.", "You are cleared to proceed."]) {
+			const r = validateOutputPacket(validOutput({ [field]: phrase }));
+			expect(r.ok, `${field}: ${phrase}`).toBe(false);
+		}
+	});
+
+	it.each(STRATEGIC_FIELDS)("refuses a credential smuggled through %s", (field) => {
+		const r = validateOutputPacket(validOutput({ [field]: 'token = "abcdefghijklmno1234"' }));
+		expect(r.ok).toBe(false);
+		expect(r.errors.join(" ")).toMatch(/never carry credentials/);
+	});
+
+	// The 600-word cap is a budget across the whole packet, so no single field can be
+	// bounded on its own while the others absorb the overflow.
+	it.each(STRATEGIC_FIELDS)("counts %s toward the shared word cap", (field) => {
+		const r = validateOutputPacket(validOutput({ [field]: "word ".repeat(OUTPUT_PACKET_MAX_WORDS + 5) }));
+		expect(r.ok).toBe(false);
+		expect(r.errors.join(" ")).toMatch(/over the \d+-word cap/);
+	});
+
+	it("keeps a recommendation that frames evidence rather than authority", () => {
+		const r = validateOutputPacket({
+			...validOutput(),
+			decisionRecommendation: "The evidence supports constraining the boundary first; the alternative defers the risk.",
+		});
+		expect(r.ok).toBe(true);
+	});
+});
+
+describe("direct consult vs embedded supervision", () => {
+	it("declares exactly two routes", () => {
+		expect([...SUPERVISION_MODES]).toEqual(["direct", "embedded"]);
+	});
+
+	it("accepts an embedded call carrying the full run triple", () => {
+		expect(
+			classifySupervisionCall({ claimedMode: "embedded", runId: "run-1", stage: "GUIDE", checkpointId: "c1" }),
+		).toEqual({ valid: true, mode: "embedded", stateful: true });
+	});
+
+	// The load-bearing rule: a stateless consult must not be able to become supervision.
+	it("refuses embedded supervision without a valid run id", () => {
+		for (const runId of [undefined, null, "", "Run_1", "../escape", "x".repeat(80)]) {
+			const d = classifySupervisionCall({ claimedMode: "embedded", runId, stage: "GUIDE", checkpointId: "c1" });
+			expect(d.valid, String(runId)).toBe(false);
+			if (!d.valid) expect(d.reason).toMatch(/valid supervisionRunId/);
+		}
+	});
+
+	it("refuses embedded supervision missing a stage or checkpoint", () => {
+		expect(classifySupervisionCall({ claimedMode: "embedded", runId: "run-1", checkpointId: "c1" }).valid).toBe(false);
+		expect(classifySupervisionCall({ claimedMode: "embedded", runId: "run-1", stage: "GUIDE" }).valid).toBe(false);
+	});
+
+	it("accepts a stateless direct consult", () => {
+		expect(classifySupervisionCall({ claimedMode: "direct" })).toEqual({
+			valid: true,
+			mode: "direct",
+			stateful: false,
+		});
+	});
+
+	// The other direction: run state would launder a consult into the audit trail.
+	it.each([
+		["runId", { runId: "run-1" }],
+		["stage", { stage: "GUIDE" as const }],
+		["checkpointId", { checkpointId: "c1" }],
+	])("refuses a direct consult carrying %s", (field, extra) => {
+		const d = classifySupervisionCall({ claimedMode: "direct", ...extra });
+		expect(d.valid).toBe(false);
+		if (!d.valid) expect(d.reason).toContain(field);
+	});
+
+	// Truthiness is not validity: a truthy-but-unknown stage would previously classify as
+	// valid embedded supervision and then crash the cadence checks that index by stage.
+	it("refuses a truthy but unknown stage", () => {
+		for (const stage of ["bogus", "   ", "guide", "GUIDE " ] as unknown as SupervisionStage[]) {
+			const d = classifySupervisionCall({ claimedMode: "embedded", runId: "run-1", stage, checkpointId: "c1" });
+			expect(d.valid, String(stage)).toBe(false);
+			if (!d.valid) expect(d.reason).toMatch(/known stage/);
+		}
+	});
+
+	it("refuses a blank checkpoint id", () => {
+		const d = classifySupervisionCall({ claimedMode: "embedded", runId: "run-1", stage: "GUIDE", checkpointId: "   " });
+		expect(d.valid).toBe(false);
+	});
+
+	// A misspelled mode must not fall through to the permissive branch — that would let a
+	// caller opt out of the embedded requirements by inventing a route name.
+	it("refuses an unknown claimed mode instead of defaulting to direct", () => {
+		const d = classifySupervisionCall({ claimedMode: "supervision" as never, runId: null });
+		expect(d.valid).toBe(false);
+		if (!d.valid) expect(d.reason).toMatch(/unknown mode/);
+	});
+
+	it("validates stage and mode vocabularies", () => {
+		expect(isValidStage("GUIDE")).toBe(true);
+		expect(isValidStage("bogus")).toBe(false);
+		expect(isValidMode("direct")).toBe(true);
+		expect(isValidMode("embedded")).toBe(true);
+		expect(isValidMode("supervision")).toBe(false);
+	});
+
+	// A rejected stage must not become a crash at the routing boundary.
+	it("answers legality for an unknown stage without throwing", () => {
+		expect(isDispositionLegal("bogus" as unknown as SupervisionStage, "ESCALATE_TO_HUMAN")).toBe(false);
+		expect(legalDispositions("bogus" as unknown as SupervisionStage)).toEqual([]);
+	});
+
+	it("validates run ids consistently with the dossier path", () => {
+		expect(isValidRunId("run-1")).toBe(true);
+		expect(isValidRunId("../escape")).toBe(false);
+		// One regex governs both surfaces, so an id the mode contract rejects cannot
+		// still produce a dossier path.
+		expect(() => dossierPath("/tmp/p", "../escape")).toThrow(/invalid supervision run id/);
+	});
+
+	it("gives a direct consult no dossier to write", () => {
+		// A dossier is keyed by run id, and a direct consult has none — the absence of a
+		// path is the structural reason a consult leaves no trace.
+		expect(() => dossierPath("/tmp/p", "")).toThrow(/invalid supervision run id/);
 	});
 });
 

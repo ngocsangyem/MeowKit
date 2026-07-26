@@ -270,6 +270,25 @@ cap accounting. It is NOT lifecycle supervision and must label itself accordingl
 It escalates rather than changing a locked business, security, compliance or gate
 decision. Embedded supervision requires a valid `supervisionRunId`.
 
+The two routes are distinct capabilities, and neither may impersonate the other. The
+route classifier refuses both impersonation directions, and the checkpoint call sites
+that consult it land with the wrapper wiring — so today this is enforced wherever a
+call is classified, not yet at a write path:
+
+| Route | Requires | Forbidden |
+|---|---|---|
+| `direct` | nothing — it is stateless | any `runId`, `stage` or `checkpointId`; any dossier, receipt or cap accounting |
+| `embedded` | a valid `runId` **and** `stage` **and** `checkpointId` | — |
+
+A call claiming `embedded` without a valid run id is refused rather than downgraded:
+supervision with nothing to resume from and no cap to bound it is not supervision. A
+`direct` consult that arrives carrying run state is refused rather than stripped,
+because once that state is written down the consult is indistinguishable from a
+governed checkpoint — a directive would enter the audit trail that no run ever
+governed. Only `embedded` may produce durable supervision artifacts — structurally, not
+by convention: a dossier path cannot be built without a run id, and a direct consult has
+none. A caller that needs an auditable directive must run a supervised checkpoint.
+
 ## 12 — Model policy
 
 `--advice` never changes the executor's model. Athena maps to the strongest

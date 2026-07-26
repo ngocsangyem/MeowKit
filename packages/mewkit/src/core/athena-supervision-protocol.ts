@@ -40,14 +40,20 @@ const STAGE_DISPOSITIONS: Record<SupervisionStage, readonly Disposition[]> = {
 	RECHECK: ["READY_FOR_EXISTING_GATE", "RETURN_TO_EXECUTOR", "ESCALATE_TO_HUMAN", "BLOCKED_MISSING_EVIDENCE"],
 };
 
-/** True when `disposition` is legal for `stage`. */
+/**
+ * True when `disposition` is legal for `stage`.
+ *
+ * An unknown stage yields `false` rather than throwing: this is a legality question, and
+ * "no disposition is legal for a stage that does not exist" is the safe answer. Throwing
+ * would turn a rejected input into a crash at the routing boundary.
+ */
 export function isDispositionLegal(stage: SupervisionStage, disposition: Disposition): boolean {
-	return STAGE_DISPOSITIONS[stage].includes(disposition);
+	return STAGE_DISPOSITIONS[stage]?.includes(disposition) ?? false;
 }
 
 /** The legal dispositions for a stage (readonly view, for error messages and tests). */
 export function legalDispositions(stage: SupervisionStage): readonly Disposition[] {
-	return STAGE_DISPOSITIONS[stage];
+	return STAGE_DISPOSITIONS[stage] ?? [];
 }
 
 /**
