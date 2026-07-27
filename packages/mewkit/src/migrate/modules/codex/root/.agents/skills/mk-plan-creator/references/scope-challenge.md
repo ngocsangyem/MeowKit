@@ -27,7 +27,10 @@ During scope challenge, if the task domain matches, suggest the relevant skill:
 | Domain Signal | Suggested Skill |
 |---------------|----------------|
 | Operations, triage, case management, billing ops, support workflows, "how should we handle X cases" | `mk:decision-framework` — structures expert judgment into repeatable decision systems |
-| API design, endpoint planning, REST/GraphQL, "how should I structure this API" | `mk:api-design` — REST and GraphQL patterns, naming, status codes, pagination |
+| API contract design or review — interface shape, error semantics, compatibility, pagination | `mk:api-design-principles` — durable REST, GraphQL, RPC, or event contracts |
+| Backend change end to end — handler, service, integration, webhook, job | `mk:backend-development` — coordinates contract, data, and auth owners |
+| Schema, migration, query, index, or ORM data-access boundary | `mk:database` — data invariants, safe evolution, query evidence |
+| Infrastructure, containers, CI/CD, deployment safety, rollback | `mk:devops` — infrastructure change safety and delivery |
 
 Surface the suggestion as: "This looks like an [ops/API design] task — consider activating `mk:[skill]` before planning."
 

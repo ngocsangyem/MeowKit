@@ -31,6 +31,7 @@ import {
 } from "../migrate/providers/codex/capabilities.js";
 import { resolveCursorModuleDir } from "../migrate/modules/cursor-authored-bundle.js";
 import { reconcileApplyCursorBundle } from "../migrate/modules/cursor-reconcile-apply.js";
+import { describeRetiredSkills } from "../migrate/modules/retired-skill-cleanup.js";
 import {
 	CURSOR_MIN_SUPPORTED_VERSION,
 	detectCursorVersion,
@@ -457,6 +458,7 @@ async function initCodexTarget(
 		p.log.info(
 			`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .codex/, .agents/skills/.`,
 		);
+		for (const line of describeRetiredSkills(plan.retired, true)) p.log.info(`Dry-run: ${line}`);
 		p.outro(pc.green("Dry-run complete — no files written."));
 		return;
 	}
@@ -467,6 +469,7 @@ async function initCodexTarget(
 		);
 		for (const c of result.conflicts) p.log.message(pc.dim(`  ${c.targetPath}`));
 	}
+	for (const line of describeRetiredSkills(result.retired)) p.log.info(line);
 	p.log.success(
 		`Codex toolkit ready (${result.writes} written): AGENTS.md, .codex/{config.toml,agents,hooks.json,hooks}, .agents/skills/.`,
 	);
@@ -545,6 +548,7 @@ async function initCursorTarget(
 		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
 		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
 		p.log.info(`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .meowkit/README.md.`);
+		for (const line of describeRetiredSkills(plan.retired, true)) p.log.info(`Dry-run: ${line}`);
 		p.log.info("Dry-run: MCP profiles are never applied or prompted for during a dry-run.");
 		p.outro(pc.green("Dry-run complete — no files written."));
 		return;
@@ -556,6 +560,7 @@ async function initCursorTarget(
 		);
 		for (const c of result.conflicts) p.log.message(pc.dim(`  ${c.targetPath}`));
 	}
+	for (const line of describeRetiredSkills(result.retired)) p.log.info(line);
 	p.log.success(`Cursor toolkit ready (${result.writes} written): AGENTS.md, .meowkit/README.md.`);
 	await warnBelowMinCursor();
 	hintLegacyMemoryForCursor(targetDir);
@@ -635,6 +640,7 @@ async function addCodexBundle(targetDir: string, force: boolean, packs: PackSele
 	if (result.conflicts.length > 0) {
 		p.log.warn(`${result.conflicts.length} existing Codex file(s) left untouched (re-run with --force to overwrite).`);
 	}
+	for (const line of describeRetiredSkills(result.retired)) p.log.info(line);
 	p.log.success(`Codex toolkit created (${result.writes} written): AGENTS.md, .codex/, .agents/skills/.`);
 	const budgetWarn = packSelectionBudgetWarning(moduleDir, packs);
 	if (budgetWarn) p.log.warn(budgetWarn);
@@ -663,6 +669,7 @@ async function addCursorBundle(
 	if (result.conflicts.length > 0) {
 		p.log.warn(`${result.conflicts.length} existing Cursor file(s) left untouched (re-run with --force to overwrite).`);
 	}
+	for (const line of describeRetiredSkills(result.retired)) p.log.info(line);
 	p.log.success(`Cursor toolkit created (${result.writes} written): AGENTS.md, .meowkit/README.md.`);
 	await warnBelowMinCursor();
 	hintLegacyMemoryForCursor(targetDir);

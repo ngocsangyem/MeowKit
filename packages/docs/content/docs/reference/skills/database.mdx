@@ -8,89 +8,76 @@ description: "Database patterns — schema design, safe migrations, query optimi
 | | |
 |---|---|
 | **Source** | [`.claude/skills/database/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/database/SKILL.md) |
-| **Owner** | `utility` |
-| **Runtime** | `claude-code` |
-| **Risk** | medium |
+| **Owner** | `portability` |
+| **Runtime** | `portable` |
+| **Risk** | high |
 
 {/* GENERATED:reference-facts END */}
 
 ## What This Skill Does
 
-Provides reference-backed guidance for the full database development lifecycle: schema design with naming conventions and normalization, zero-downtime migrations with rollback paths, and query optimization with indexing and N+1 prevention. PostgreSQL is the primary target; most patterns apply to MySQL and SQLite with minor syntax differences.
+Owns the data layer end to end: invariants, schema, safe evolution, and query/index evidence,
+plus the ORM data-access boundary. It discovers the engine, migration tool, and ORM the
+repository already runs before proposing any syntax — there is no default engine, and an
+answer written for the wrong one is wasted.
 
 ## When to Use
 
-- Designing a new schema or adding tables/columns
-- Writing migration files (up + down with rollback)
-- Optimizing slow queries or adding indexes
-- **Triggers:** "database schema", "migration", "query optimization", "indexing", "SQL", "N+1"
+- Designing a data model, or changing a schema
+- Writing or reviewing a migration, backfill, or recovery path
+- Diagnosing a slow query or choosing an index from evidence
+- Shaping the ORM data-access boundary, or selecting a datastore on greenfield work
+- **NOT for:** API contracts (`mk:api-design-principles`), service or handler code
+  (`mk:backend-development`), infrastructure and deployment (`mk:devops`), or the security verdict
+
+## Ownership Boundary
+
+| Owner | Owns |
+|---|---|
+| `mk:database` | Data invariants, schema, migration and recovery, query/index evidence, ORM boundary |
+| `mk:api-design-principles` | The API contract — a table is not an API type |
+| `mk:backend-development` | The service change that consumes the data |
+| `mk:devops` | Provisioning, backups, replicas, and any production effect |
 
 ## Arguments
 
-`[schema|migration|query|optimize] [description]`
+`[model|migration|query|index|orm|store] [description]`
 
-Example: `mk:database schema user profiles with avatar support`
+## Workflow
 
-## Example Prompt
+1. **Discover the source of truth** — dependency manifest, schema, migration tool, ORM
+   config, query call sites, data tests, active plan. No engine stated means ask.
+2. **Classify** — model/schema, migration, query/index, or store and ORM selection
+3. **State invariants before syntax** — entity and lifecycle, identity and uniqueness,
+   tenancy and authorization boundary, retention and personal data, consistency need, known
+   access patterns, performance baseline; unknowns marked unknown
+4. **Design proportional to the evidence** — normalize or denormalize only with a stated
+   rationale; index from filter/join/order evidence weighed against write cost
+5. **Evolve safely** — compatibility with running code, locking behavior at this size,
+   backfill approach, verification signal, and a reverse migration *or* forward recovery
+6. **Validate and hand off** — on a disposable database with synthetic, non-personal fixtures
 
-```
-Design a schema for a multi-tenant blogging platform with users, posts, comments, and tags. Create migration files with up and down rollbacks for adding a `published_at` timestamp column. Optimize the post listing query — it currently runs an N+1 on the comments count.
-```
+## References
 
-## Core Capabilities
-
-### Schema Design (`references/schema-design.md`)
-
-**Naming:** Tables: snake_case, plural (`users`, `order_items`). Columns: snake_case (`created_at`, `user_id`). Join tables: singular, alphabetical (`user_role`). Indexes: `idx_{table}_{columns}`. Foreign keys: `fk_{table}_{referenced_table}`.
-
-**Primary keys:** UUID (`gen_random_uuid()`) for distributed systems, cross-service refs, public IDs. BIGSERIAL for single-node, high-insert, internal tables. Never composite PKs as main PK.
-
-**Standard columns on every table:** `created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`, `updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`. Optionally: `created_by`, `updated_by` (audit), `deleted_at` (soft delete).
-
-**Foreign keys:** Always declared explicitly with cascade behavior (`ON DELETE CASCADE / SET NULL / RESTRICT / NO ACTION`). `RESTRICT` is safest default.
-
-**Normalization:** Default 3NF. Only denormalize with measured performance problem and documented query analysis. Never denormalize speculatively (YAGNI).
-
-**Schema checklist:**
-- [ ] All tables use snake_case plural naming
-- [ ] Primary key declared (UUID or BIGSERIAL)
-- [ ] Foreign keys with explicit ON DELETE/ON UPDATE rules
-- [ ] `created_at` and `updated_at` timestamps present
-- [ ] No EAV (entity-attribute-value) anti-pattern
-
-### Safe Migrations (`references/migration-patterns.md`)
-
-Every migration must have **up + down** (apply + rollback). If destructive, document with WARNING.
-
-**Safe operations (no table lock):** `ADD COLUMN` nullable, `CREATE INDEX CONCURRENTLY`, `ADD CONSTRAINT` on new column, `DROP INDEX CONCURRENTLY`.
-
-**Unsafe (requires 2-phase):** `DROP COLUMN` (stop reading in app, deploy, then drop), `RENAME COLUMN` (add new + backfill + stop reading old + drop old), `ADD COLUMN NOT NULL` (add nullable, backfill batches, then SET NOT NULL).
-
-**Critical rule:** Never mix schema and data migrations in one file. Schema runs at deploy; data may need batching and retry.
-
-**Migration checklist:**
-- [ ] Both up (apply) and down (rollback) provided
-- [ ] No table-locking operations in production migration
-- [ ] Data migrations separated from schema migrations
-- [ ] Filename is timestamp-based
-
-### Query Optimization (`references/query-optimization.md`)
-
-**Always measure first:** Run `EXPLAIN (ANALYZE, BUFFERS)` before and after optimization.
-
-**Indexing:** B-tree for equality/range/sort/prefix. Composite for multi-column (equality first, range/sort last). Partial for subsets (`WHERE deleted_at IS NULL`). GIN for arrays/JSONB/full-text. Don't index: low-cardinality columns, write-heavy tables, unused columns.
-
-**N+1 prevention:** Never query inside a loop. Use JOINs, subqueries, or batch loading.
-
-**Pagination:** Cursor-based for tables >10k rows. Offset pagination scans all skipped rows.
-
-**Query checklist:**
-- [ ] No N+1 (no queries inside loops)
-- [ ] EXPLAIN ANALYZE recommended for complex queries
-- [ ] Indexes proposed where needed
-- [ ] No `SELECT *` in production queries
-- [ ] `LIMIT` present on unbounded queries
+| File | Load when |
+|---|---|
+| `references/schema-design.md` | Entities, keys, relationships, tenancy, constraints |
+| `references/migration-patterns.md` | Changing a table that holds data; backfills; recovery |
+| `references/query-optimization.md` | A slow query, or an index decision needing evidence |
 
 ## Security Constraint
 
-**NEVER write SQL with string interpolation or template literals. Parameterized queries only.**
+**Never build a query by string interpolation or template concatenation.** Use the parameter
+mechanism the driver or ORM provides. Never log, print, or copy personal data while
+investigating — a row that reproduces a bug can be described by its shape.
+
+## Pro Tips
+
+- **There is no default engine.** Every locking, index-type, and DDL claim below is
+  conditional on the one the repository actually runs.
+- **The analysing form of `EXPLAIN` executes the statement.** Never run it on a mutating
+  statement outside a transaction you will roll back.
+- **A reverse migration that silently discards data is worse than declaring the change
+  irreversible.** Say recovery is forward-only and name the corrective change.
+- **Pool exhaustion looks like a slow query, not a pool error.** Check for connections held
+  past their work before optimizing.

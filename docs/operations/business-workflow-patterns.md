@@ -124,9 +124,11 @@ Agent Browser preference, POM, flaky quarantine, success metrics.
 | ----------------------- | --------------------------------- | -------------------- |
 | mk:decision-framework | Operational decision architecture | 1 (Plan)             |
 | mk:verify             | Unified verification loop         | 3→4 transition       |
-| mk:api-design         | REST/GraphQL patterns             | 1 (Plan)             |
+| mk:api-design-principles | Durable API contracts          | 1 (Plan)             |
 | mk:build-fix          | Build error triage                | 3 (Build)            |
 | mk:database           | Schema, migrations, queries       | 1 (Plan) / 3 (Build) |
+| mk:backend-development | End-to-end backend changes       | 3 (Build)            |
+| mk:devops             | Infrastructure, CI/CD, rollback   | 3 (Build)            |
 
 ## Origin
 

@@ -32,6 +32,14 @@ import {
 	resolvePackSelection,
 	type PackSelection,
 } from "./codex-skill-packs.js";
+import { reconcileRetiredSkills, type RetiredSkillOutcome } from "./retired-skill-cleanup.js";
+
+/** Where the Codex bundle's skills live, in source and in the installed target. */
+const CODEX_RETIRED_SKILL_CONFIG = {
+	provider: "codex",
+	sourceSkillsPrefix: "root/.agents/skills",
+	targetSkillsRoot: ".agents/skills",
+} as const;
 
 /**
  * Expand the aggregate `.agents/skills` entry into one per-skill entry for the selected
@@ -67,6 +75,9 @@ export interface ApplyBundleResult {
 	adopted: number;
 	dryRun: boolean;
 	ledgerPath: string;
+	/** Skill directories this bundle no longer ships: removed when provably pristine,
+	 *  preserved and reported otherwise. Empty when the install carries none. */
+	retired: RetiredSkillOutcome[];
 }
 
 export interface ReconcileApplyOptions {
@@ -272,6 +283,17 @@ export async function reconcileApplyCodexBundle(
 		});
 	}
 
+	// Retired-skill cleanup runs AFTER normal reconciliation: the replacement must already be
+	// installed before the directory it replaces is removed, so no window exposes neither.
+	const retired = await reconcileRetiredSkills({
+		ledger,
+		moduleDir,
+		targetDir,
+		config: CODEX_RETIRED_SKILL_CONFIG,
+		dryRun: opts.dryRun,
+	});
+	if (retired.some((r) => r.ledgerRowRemoved)) ledgerDirty = true;
+
 	if (ledgerDirty && !opts.dryRun) await writeCodexLedger(ledgerPath, ledger);
 
 	return {
@@ -281,6 +303,7 @@ export async function reconcileApplyCodexBundle(
 		adopted,
 		dryRun: !!opts.dryRun,
 		ledgerPath,
+		retired,
 	};
 }
 
@@ -292,7 +315,7 @@ export async function applyActiveCodexOverlay(
 ): Promise<ApplyBundleResult> {
 	const moduleDir = opts.moduleDir ?? resolveCodexModuleDir();
 	if (!existsSync(join(moduleDir, "manifest.json"))) {
-		return { entries: [], writes: 0, conflicts: [], adopted: 0, dryRun: false, ledgerPath: "" };
+		return { entries: [], writes: 0, conflicts: [], adopted: 0, dryRun: false, ledgerPath: "", retired: [] };
 	}
 	// Overlay overwrites machine-generated converter output (not user edits), so force.
 	return reconcileApplyCodexBundle(moduleDir, targetDir, {

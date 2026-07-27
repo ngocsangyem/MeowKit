@@ -245,3 +245,113 @@ describe("reconcileApplyCursorBundle — crash-recovery re-run (atomic write + p
 		expect(second.conflicts).toHaveLength(0);
 	});
 });
+
+/**
+ * A pack-enabled Cursor module whose skills tree contains exactly `skills`. Pack expansion
+ * gives each installed skill its own ledger row — the provenance the retired-skill cleanup
+ * reasons over. Cursor-specific here: the `.cursor/skills` root and the per-row ledger flush.
+ */
+function makeCursorPackModule(dir: string, skills: string[]): void {
+	rmSync(join(dir, "root", ".cursor", "skills"), { recursive: true, force: true });
+	for (const s of skills) {
+		mkdirSync(join(dir, "root", ".cursor", "skills", s), { recursive: true });
+		writeFileSync(join(dir, "root", ".cursor", "skills", s, "SKILL.md"), `# ${s}\n`);
+	}
+	mkdirSync(join(dir, "catalog"), { recursive: true });
+	writeFileSync(
+		join(dir, "catalog", "skill-packs.json"),
+		JSON.stringify({
+			budgetChars: 8000,
+			defaultPack: "development",
+			packs: { development: { description: "dev", dependsOn: [], skills } },
+		}),
+	);
+	writeFileSync(
+		join(dir, "manifest.json"),
+		JSON.stringify({
+			version: "1.0",
+			provider: "cursor",
+			generatedFrom: "test",
+			entries: [
+				{
+					sourcePath: "root/.cursor/skills",
+					targetPath: ".cursor/skills",
+					provider: "cursor",
+					mode: "0644",
+					ownership: "managed-replace",
+					scopeTags: ["managed-runtime"],
+					active: true,
+				},
+			],
+		}),
+	);
+}
+
+describe("reconcileApplyCursorBundle — retired skill cleanup on upgrade", () => {
+	let moduleDir: string;
+	let target: string;
+	const opts = { adoptHomeRegistry: false as const, packs: ["development"] };
+
+	beforeEach(() => {
+		moduleDir = mkdtempSync(join(tmpdir(), "cursor-rmod-"));
+		target = mkdtempSync(join(tmpdir(), "cursor-rtgt-"));
+		makeCursorPackModule(moduleDir, ["mk-api-design", "mk-database"]);
+	});
+	afterEach(() => {
+		rmSync(moduleDir, { recursive: true, force: true });
+		rmSync(target, { recursive: true, force: true });
+	});
+
+	it("upgrading past the rename installs the replacement, removes the old dir, and flushes the ledger", async () => {
+		await reconcileApplyCursorBundle(moduleDir, target, { ...opts, projectRoot: target });
+		makeCursorPackModule(moduleDir, ["mk-api-design-principles", "mk-backend-development", "mk-database", "mk-devops"]);
+
+		const upgrade = await reconcileApplyCursorBundle(moduleDir, target, { ...opts, projectRoot: target });
+
+		expect(existsSync(join(target, ".cursor", "skills", "mk-api-design-principles", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".cursor", "skills", "mk-devops", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".cursor", "skills", "mk-api-design"))).toBe(false);
+		expect(upgrade.retired).toEqual([
+			expect.objectContaining({ skill: "mk-api-design", action: "delete", removed: true }),
+		]);
+
+		// The row is gone from the ledger ON DISK, not just in memory — a crash right after
+		// this run must not resurrect the directory on the next one.
+		const ledgerPath = meowkitStatePaths(join(target, ".meowkit")).cursorLedger;
+		const onDisk = JSON.parse(readFileSync(ledgerPath, "utf-8")) as { installations: { item: string }[] };
+		expect(onDisk.installations.map((i) => i.item)).not.toContain(".cursor/skills/mk-api-design");
+
+		const rerun = await reconcileApplyCursorBundle(moduleDir, target, { ...opts, projectRoot: target });
+		expect(rerun.retired).toEqual([]);
+		expect(rerun.writes).toBe(0);
+	});
+
+	it("a user-modified old dir survives the upgrade and is reported, even with --force", async () => {
+		await reconcileApplyCursorBundle(moduleDir, target, { ...opts, projectRoot: target });
+		const edited = join(target, ".cursor", "skills", "mk-api-design", "SKILL.md");
+		writeFileSync(edited, "# my own copy\n");
+
+		makeCursorPackModule(moduleDir, ["mk-api-design-principles", "mk-database"]);
+		const upgrade = await reconcileApplyCursorBundle(moduleDir, target, { ...opts, projectRoot: target, force: true });
+
+		expect(readFileSync(edited, "utf-8")).toBe("# my own copy\n");
+		expect(upgrade.retired).toEqual([
+			expect.objectContaining({ skill: "mk-api-design", action: "skip", removed: false }),
+		]);
+	});
+
+	it("a dry-run upgrade writes neither the target nor the ledger", async () => {
+		await reconcileApplyCursorBundle(moduleDir, target, { ...opts, projectRoot: target });
+		const ledgerPath = meowkitStatePaths(join(target, ".meowkit")).cursorLedger;
+		const before = readFileSync(ledgerPath, "utf-8");
+		makeCursorPackModule(moduleDir, ["mk-api-design-principles", "mk-database"]);
+
+		const plan = await reconcileApplyCursorBundle(moduleDir, target, { ...opts, projectRoot: target, dryRun: true });
+
+		expect(plan.retired).toEqual([
+			expect.objectContaining({ skill: "mk-api-design", action: "delete", removed: false }),
+		]);
+		expect(existsSync(join(target, ".cursor", "skills", "mk-api-design", "SKILL.md"))).toBe(true);
+		expect(readFileSync(ledgerPath, "utf-8")).toBe(before);
+	});
+});

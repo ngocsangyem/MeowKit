@@ -1,165 +1,128 @@
-# Migration Patterns Reference
+# Migration Patterns
 
-Safe migration practices for production databases. PostgreSQL primary; principles apply broadly.
+Changing a table that already holds data, and getting back when it goes wrong. Confirm the
+engine and the migration tool first — `SKILL.md` step 1.
+
+Nothing here is executed against a live database. Prepare the migration and hand execution to
+`mk:ship` or a human.
 
 ## Contents
 
-- [File Naming](#file-naming)
-- [Structure: Always Up + Down](#structure-always-up-down)
-- [Safe vs Unsafe Operations](#safe-vs-unsafe-operations)
-  - [Safe (no table lock, online):](#safe-no-table-lock-online)
-  - [Unsafe (locks table — requires maintenance window or 2-phase approach):](#unsafe-locks-table-requires-maintenance-window-or-2-phase-approach)
-- [Zero-Downtime Patterns](#zero-downtime-patterns)
-  - [Add column (safe in PostgreSQL 11+)](#add-column-safe-in-postgresql-11)
-  - [Drop column (2-phase approach)](#drop-column-2-phase-approach)
-  - [Rename column (3-phase approach)](#rename-column-3-phase-approach)
-  - [Add non-null column](#add-non-null-column)
-  - [Create index without locking](#create-index-without-locking)
-- [Data Migrations](#data-migrations)
-  - [Batched data migration pattern](#batched-data-migration-pattern)
-- [Testing Migrations](#testing-migrations)
-- [Anti-Patterns](#anti-patterns)
+- [Use the repository's migration tool](#use-the-repositorys-migration-tool)
+- [Compatibility with the running code](#compatibility-with-the-running-code)
+- [Expand, migrate, contract](#expand-migrate-contract)
+- [Recovery: reverse or forward](#recovery-reverse-or-forward)
+- [Locking and runtime](#locking-and-runtime)
+- [Backfills](#backfills)
+- [Validation before handoff](#validation-before-handoff)
+- [Risky operations](#risky-operations)
 
+## Use the repository's migration tool
 
-## File Naming
+Read the migration directory and the tool that owns it before writing anything. Match its
+file naming, its ordering scheme, its up/down convention, and whether it wraps each migration
+in a transaction. Never renumber or reorder an existing migration — ordering is history that
+other environments have already applied.
 
-ALWAYS use timestamp-based names. NEVER reorder or renumber migrations after creation.
+Where an ORM generates migrations, generate through it rather than hand-writing a file it
+will not recognise.
 
-```
-20240115_143000_add_users_table.sql
-20240116_091500_add_email_index_to_users.sql
-```
+## Compatibility with the running code
 
-Framework conventions:
-- Sequelize: `YYYYMMDDHHMMSS-description.js`
-- Flyway: `V20240115143000__description.sql`
-- Alembic: `{revision_id}_description.py`
-- Prisma: auto-generated timestamp
+The code currently deployed keeps running during and after the migration. State, for the
+change, which of these holds:
 
-## Structure: Always Up + Down
+- **Backward compatible** — old code still works against the new schema. Additive changes
+  usually are.
+- **Requires a deploy first** — the code must stop using something before the schema drops
+  it.
+- **Requires a schema change first** — the code needs a column that must already exist.
 
-EVERY migration must have a rollback path.
+That ordering is the plan. Write it down; it is the part that breaks in production, not the
+SQL.
 
-```sql
--- up.sql
-ALTER TABLE users ADD COLUMN phone VARCHAR(20);
+## Expand, migrate, contract
 
--- down.sql
-ALTER TABLE users DROP COLUMN phone;
-```
+For a rename, a type change, a split, or any change that cannot be applied in one step
+without breaking a running caller:
 
-If a rollback is genuinely destructive (data loss), document it explicitly:
-```sql
--- down.sql
--- WARNING: This rollback drops the phone column and all data in it.
--- Ensure data is backed up before rolling back.
-ALTER TABLE users DROP COLUMN phone;
-```
+1. **Expand.** Add the new shape alongside the old. Nothing reads it yet.
+2. **Migrate.** Write to both, then backfill the existing rows in batches. Verify the two
+   agree.
+3. **Switch reads.** Deploy code reading the new shape. Keep the old one intact.
+4. **Contract.** Once nothing reads or writes the old shape and the change has proven itself,
+   remove it — as a separate, later change.
 
-## Safe vs Unsafe Operations
+Each step ships and is reversible on its own. A single-step rename on a live table is the
+version that needs a maintenance window.
 
-### Safe (no table lock, online):
-- `ADD COLUMN` with nullable or default value
-- `CREATE INDEX CONCURRENTLY` (PostgreSQL)
-- `ADD CONSTRAINT` (check constraint on new column)
-- `DROP INDEX CONCURRENTLY`
+Say explicitly when a change is simple enough not to need this — it is not required for a new
+nullable column on a table nothing else is touching.
 
-### Unsafe (locks table — requires maintenance window or 2-phase approach):
-- `DROP COLUMN`
-- `ALTER COLUMN` type change
-- `ADD COLUMN NOT NULL` without default (locks in older PostgreSQL < 11)
-- `ADD CONSTRAINT FOREIGN KEY` (without `NOT VALID` trick)
-- `RENAME TABLE` or `RENAME COLUMN`
+## Recovery: reverse or forward
 
-## Zero-Downtime Patterns
+Every migration needs a recovery path. Choose deliberately:
 
-### Add column (safe in PostgreSQL 11+)
-```sql
--- Single migration, no lock
-ALTER TABLE users ADD COLUMN phone VARCHAR(20) DEFAULT NULL;
-```
+- **Reverse migration** — restores the previous schema. Valid when the change is genuinely
+  reversible and no data was destroyed.
+- **Forward recovery** — a corrective migration. The honest answer whenever the change
+  dropped a column, rewrote values, or otherwise destroyed information.
 
-### Drop column (2-phase approach)
-**Phase 1:** Stop reading/writing the column in application code. Deploy.
-**Phase 2 (separate migration):** Drop the column.
-```sql
--- Phase 2 migration (after code is deployed and verified)
-ALTER TABLE users DROP COLUMN phone;
-```
+A reverse step that silently discards data is worse than declaring the change irreversible.
+Do not write one just to satisfy a template: state that recovery is forward-only, and what
+the corrective change would be.
 
-### Rename column (3-phase approach)
-**Phase 1:** Add new column, backfill, write to both.
-**Phase 2:** Stop reading old column. Deploy.
-**Phase 3:** Drop old column.
+Where the data itself must survive a mistake, the backup or point-in-time-recovery capability
+is `mk:devops`'s to confirm — name the dependency rather than assuming it exists.
 
-### Add non-null column
-```sql
--- Step 1: Add nullable
-ALTER TABLE users ADD COLUMN status VARCHAR(20);
--- Step 2: Backfill in batches (see batching below)
-UPDATE users SET status = 'active' WHERE status IS NULL;
--- Step 3: Add NOT NULL constraint (after backfill complete)
-ALTER TABLE users ALTER COLUMN status SET NOT NULL;
-```
+## Locking and runtime
 
-### Create index without locking
-```sql
--- PostgreSQL: CONCURRENTLY avoids full table lock
-CREATE INDEX CONCURRENTLY idx_users_email ON users(email);
--- Note: cannot run inside a transaction block
-```
+What a schema change locks, and for how long, depends on the engine, its version, and the
+table's size. Confirm all three, then estimate. Engine-conditional facts worth checking:
 
-## Data Migrations
+- **Adding a column with `NOT NULL` and no default** can rewrite the entire table under an
+  exclusive lock. On PostgreSQL before 12 it does; from 12 the two-step form (add nullable →
+  backfill → validate the constraint) avoids the rewrite. Other engines vary.
+- **Index creation blocks writes** in the default form on PostgreSQL; the concurrent form
+  avoids it but cannot run inside a transaction block and can leave an invalid index behind
+  if it fails, which must then be dropped. MySQL's online behavior depends on the algorithm
+  the change can use. SQLite rewrites the table for most `ALTER` operations.
+- **Adding a foreign key validates existing rows** and can hold a lock for the scan. Engines
+  that support adding the constraint unvalidated and validating separately turn one long lock
+  into two short ones.
+- **Changing a column type** may rewrite the table, or may be metadata-only, depending on the
+  engine and the specific conversion.
 
-NEVER mix data migrations with schema migrations in the same file.
-WHY: Schema migrations run at deploy time; data migrations may need to run on large tables with
-batching, progress tracking, and retry logic.
+When the lock behavior cannot be established, that is the finding — say so rather than
+asserting a change is online.
 
-```sql
--- BAD: schema + data in one migration
-ALTER TABLE orders ADD COLUMN total_cents INTEGER;
-UPDATE orders SET total_cents = total * 100;  -- full table scan, lock risk
+## Backfills
 
--- GOOD: separate files
--- 20240115_add_total_cents_to_orders.sql  <- schema only
--- 20240116_backfill_total_cents.sql       <- data only, with batching
-```
+- Keep the backfill out of the schema migration. A schema change runs at deploy time; a
+  backfill over a large table needs batching, progress, and the ability to stop.
+- Batch it, bound each batch, and make it resumable — it will be interrupted.
+- Make it idempotent: re-running a completed batch must be harmless.
+- Give it a progress signal and a completion check. "It finished" needs evidence, usually a
+  count of rows still unconverted.
+- Never write an unbounded update over a whole table as a migration step.
 
-### Batched data migration pattern
-```sql
--- Process 1000 rows at a time to avoid long locks
-DO $$
-DECLARE
-  batch_size INT := 1000;
-  processed  INT := 0;
-BEGIN
-  LOOP
-    UPDATE orders
-    SET total_cents = total * 100
-    WHERE total_cents IS NULL
-    LIMIT batch_size;
+## Validation before handoff
 
-    GET DIAGNOSTICS processed = ROW_COUNT;
-    EXIT WHEN processed = 0;
-    PERFORM pg_sleep(0.01);  -- brief pause between batches
-  END LOOP;
-END $$;
-```
+- Apply the migration to a disposable database seeded with synthetic, non-personal fixtures.
+  Copying production data elsewhere is a data-protection decision for the user, never a
+  default testing technique.
+- Reproduce a realistic row count when the concern is duration or locking; a change that is
+  instant on an empty table proves nothing about a large one.
+- Apply the recovery path and confirm the result matches expectation.
+- Re-run the migration to confirm re-application behaves as the tool expects.
+- State the measured duration, or state that it is unmeasured.
 
-## Testing Migrations
+## Risky operations
 
-Before deploying to production:
-1. Run migration on a production-sized dataset (staging with prod data snapshot)
-2. Measure duration — anything over 1 second on large tables needs zero-downtime approach
-3. Verify rollback works: run down migration, verify schema matches pre-migration state
-4. Check `EXPLAIN ANALYZE` on queries that touch the migrated table
-
-## Anti-Patterns
-
-| Anti-Pattern | Risk | Fix |
-|-------------|------|-----|
-| `DROP TABLE` without backup | Permanent data loss | Backup first, soft-delete pattern, or explicit human approval |
-| `UPDATE` without `WHERE` | Full table modification | Always add `WHERE` or document intentional full-table update |
-| Schema + data in one migration | Lock risk on large tables | Separate files, batch data migration |
-| Reordering migration files | Breaks migration history | Timestamp names, never reorder |
-| Migration in a transaction with DDL | PostgreSQL DDL is transactional — OK, but `CONCURRENTLY` cannot be in a txn | Use `CONCURRENTLY` outside transactions |
+| Operation | Risk | Handling |
+|---|---|---|
+| Dropping a table or column | Irreversible data loss | Contract step only, after nothing reads it; explicit human approval |
+| Unbounded update or delete | Whole-table modification, long lock | Bound it, batch it, or state that the whole table is the intent |
+| Schema and data change in one file | The lock and the backfill share a window | Separate files |
+| Cascading delete introduced or triggered | Silent bulk removal of child rows | Audit the graph before, treat as a data-loss review |
+| Running any of these against a live database | Unrecoverable in the wrong environment | Not done here — hand to `mk:ship` or a human |

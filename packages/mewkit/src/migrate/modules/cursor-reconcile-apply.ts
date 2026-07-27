@@ -39,6 +39,14 @@ import {
 	resolvePackSelection,
 	type PackSelection,
 } from "./codex-skill-packs.js";
+import { reconcileRetiredSkills, type RetiredSkillOutcome } from "./retired-skill-cleanup.js";
+
+/** Where the Cursor bundle's skills live, in source and in the installed target. */
+const CURSOR_RETIRED_SKILL_CONFIG = {
+	provider: "cursor",
+	sourceSkillsPrefix: "root/.cursor/skills",
+	targetSkillsRoot: ".cursor/skills",
+} as const;
 
 /**
  * Expand the aggregate `.agents/skills` entry into one per-skill entry for the selected
@@ -77,6 +85,9 @@ export interface ApplyBundleResult {
 	adopted: number;
 	dryRun: boolean;
 	ledgerPath: string;
+	/** Skill directories this bundle no longer ships: removed when provably pristine,
+	 *  preserved and reported otherwise. Empty when the install carries none. */
+	retired: RetiredSkillOutcome[];
 }
 
 export interface ReconcileApplyOptions {
@@ -208,6 +219,19 @@ export async function reconcileApplyCursorBundle(
 		});
 	}
 
+	// Retired-skill cleanup runs AFTER normal reconciliation: the replacement must already be
+	// installed before the directory it replaces is removed. The ledger is flushed per dropped
+	// row, matching this provider's per-entry durability contract — a crash mid-cleanup leaves
+	// the ledger consistent with everything already removed.
+	const retired = await reconcileRetiredSkills({
+		ledger,
+		moduleDir,
+		targetDir,
+		config: CURSOR_RETIRED_SKILL_CONFIG,
+		dryRun: opts.dryRun,
+		onLedgerRowRemoved: opts.dryRun ? undefined : () => writeCursorLedger(ledgerPath, ledger),
+	});
+
 	return {
 		entries: results,
 		writes: results.filter((r) => r.wrote).length,
@@ -215,5 +239,6 @@ export async function reconcileApplyCursorBundle(
 		adopted,
 		dryRun: !!opts.dryRun,
 		ledgerPath,
+		retired,
 	};
 }

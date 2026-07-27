@@ -1,0 +1,79 @@
+---
+title: "mk:backend-development"
+description: "End-to-end backend changes — handlers, services, integrations, webhooks, and jobs — coordinating the contract, data, and auth owners without absorbing them."
+---
+
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/backend-development/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/backend-development/SKILL.md) |
+| **Owner** | `portability` |
+| **Runtime** | `portable` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
+## What This Skill Does
+
+Drives a backend change from discovery to validation, and routes each specialist part to its
+owner. It classifies what the change actually touches — contract, service logic, data, auth,
+async work, operability — then composes the result. It is a router with a workflow, not a
+framework catalogue.
+
+## When to Use
+
+- Adding or changing a handler, service, integration, webhook consumer, or background job
+- A backend change that spans contract, data, and auth and needs coordinating
+- Backend architecture questions about where a change belongs
+- **NOT for:** contract-only design or review (`mk:api-design-principles`), schema, query, or
+  migration work (`mk:database`), infrastructure and deployment (`mk:devops`), or the
+  security verdict
+
+## Ownership Boundary
+
+| Owner | Owns |
+|---|---|
+| `mk:backend-development` | The end-to-end change: discovery, classification, service and integration work, wiring the specialists together |
+| `mk:api-design-principles` | Contract authorship — loaded only for a new, public, or breaking contract |
+| `mk:database` | Schema, migrations, queries, indexes, ORM boundary — never written here |
+| `mk:devops` | Infrastructure, delivery, deployment safety |
+
+An internal change that alters no contract must not open a contract discussion.
+
+## Arguments
+
+`[backend change]`
+
+## Workflow
+
+1. **Discover** — active plan, affected module, callers, covering tests, local conventions;
+   name what was not found rather than assuming it
+2. **Classify** — contract-only, service logic, data, auth, async/event, or production
+   readiness; most tasks are two or three of these
+3. **Design the boundary** — which existing boundary this lives in and why it is not a new
+   one; failure semantics for every call that leaves the process
+4. **Implement** — in the owning flow, reusing local error types, validation, and test helpers
+5. **Validate proportional to risk** — narrowest covering test first, widening when a shared
+   contract, public boundary, or auth path was touched
+
+## References
+
+| File | Load when |
+|---|---|
+| `references/backend-readiness.md` | The change is public-facing, auth-sensitive, or otherwise high-risk |
+
+## Output
+
+No new report artifact. The existing workflow artifact gains the affected boundary, the
+contract delta (or "none"), the auth and data decisions, the failure semantics, the
+validation evidence, and the handoffs made.
+
+## Pro Tips
+
+- **Name no infrastructure the repository does not already run.** A queue, cache, broker, or
+  orchestrator is a proposal with an operational cost, not a default.
+- **Invent no number.** "Make it fast" means find the stated target, or ask what fast means
+  and what is slow now.
+- **A consumer retried at least once will be delivered twice.** Make the handler tolerate the
+  repeat, or say plainly that the guarantee is unknown.
