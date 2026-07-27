@@ -27,6 +27,11 @@ const COMMANDS = [
 	{ name: "doctor", summary: "Diagnose common environment issues", subcommands: ["provenance"] },
 	{ name: "status", summary: "Print version and config summary" },
 	{ name: "task-state", summary: "Durable task record", subcommands: ["show", "update"] },
+	{
+		name: "advice",
+		summary: "Bounded supervision checkpoints for --advice; records evidence, approves nothing",
+		subcommands: ["begin", "commit", "status", "validate-packet"],
+	},
 	{ name: "orient", summary: "Resume orientation from durable task state; reads records only" },
 	{ name: "context", summary: "Repo-context evidence", subcommands: ["resolve", "check", "record"] },
 	{ name: "task", summary: "Create and list task files", subcommands: ["new", "list"] },
@@ -106,6 +111,7 @@ const FLAGS: FlagSpec[] = [
 			"orient",
 			"budget",
 			"task-state",
+			"advice",
 			"context",
 			"visual-plan",
 			"docs-manifest",
@@ -169,7 +175,9 @@ const FLAGS: FlagSpec[] = [
 
 	// capabilities
 	s("intent", ["capabilities"], "Resolve this intent to the capability that owns it"),
-	s("provider", ["capabilities"], "Scope the projection to one provider"),
+	s("provider", ["capabilities", "advice"], "Scope the projection to one provider", {
+		perCommand: { advice: "Runtime recorded on the receipt" },
+	}),
 	b("write", ["capabilities", "docs-manifest"], "Write the generated view rather than printing it", {
 		perCommand: { "docs-manifest": "Regenerate the committed manifest" },
 	}),
@@ -226,7 +234,9 @@ const FLAGS: FlagSpec[] = [
 		perCommand: { task: "Filter the list by status: draft, in-progress, blocked, review, done" },
 	}),
 	s("step", ["task-state"], "What just finished"),
-	s("next", ["task-state"], "The next action"),
+	s("next", ["task-state", "advice"], "The next action", {
+		perCommand: { advice: "The next safe action recorded on the dossier and receipt" },
+	}),
 	s("plan", ["task-state"], "Path to the plan this record joins"),
 	s("blocker", ["task-state"], "Record a blocker", { repeatable: true }),
 	s("verification", ["task-state"], "Record a verification as ref=result", { repeatable: true }),
@@ -234,6 +244,30 @@ const FLAGS: FlagSpec[] = [
 	s("capability-decision", ["task-state"], "Record a capability decision as capId|decision|reason", {
 		repeatable: true,
 	}),
+
+	// advice — the supervision checkpoint surface. Every flag here records evidence;
+	// none of them approves, clears, or advances anything.
+	s("run", ["advice"], "Supervision run id (embedded supervision requires one)"),
+	s("skill", ["advice"], "The skill running the checkpoint, e.g. mk:fix"),
+	s("stage", ["advice"], "Checkpoint stage: GUIDE, RESCUE, REVIEW, RECHECK"),
+	s("checkpoint", ["advice"], "Named checkpoint id; repeating one is idempotent"),
+	s("disposition", ["advice"], "The returned disposition, recorded verbatim"),
+	s("outcome", ["advice"], "What the parent did with it: adopted, rejected, deferred"),
+	s("reason", ["advice"], "Why the outcome was chosen; required even when the directive was adopted"),
+	s("question", ["advice"], "The exact question the checkpoint asked"),
+	s("directive", ["advice"], "The returned directive, summarized"),
+	s("correction", ["advice"], "A required correction", { repeatable: true }),
+	s("evidence-pointer", ["advice"], "An evidence pointer", { repeatable: true }),
+	s("slug", ["advice"], "Slug used in the receipt filename; defaults to the run id"),
+	s("task-id", ["advice"], "Active durable task id, or omit for none"),
+	s(
+		"evidence",
+		["advice"],
+		"Path to the workflow evidence index a correction supersedes, or the packet/brief to validate",
+	),
+	s("correction-kind", ["advice"], "source (keeps Gate 1) or scope (invalidates it)"),
+	s("packet-kind", ["advice"], "validate-packet shape: input, output, or brief (direct consult)"),
+	s("release-stage", ["advice"], "Ship scope the call is budgeted against: prepare, release, publish"),
 
 	// context
 	s("root", ["context"], "Project root to resolve the path against"),

@@ -135,6 +135,18 @@ npx mewkit providers <provider> --lifecycle   # one provider: levels, acquisitio
 | `--lifecycle` | Capability-adapter view: support levels + acquisition + lifecycle-event support. A `gate` is claimed only where a runtime hook can deny/block (never for version-gated or observe-only events). |
 | `--json`      | Machine-readable output.                                                                                      |
 
+Per-provider output also reports `--advice` supervision support. The harness and the direct
+strategy consult are tracked as **separate capabilities** — a runtime can expose one and not
+the other, so one proving out says nothing about the other. Each carries a state
+(`supported`, `degraded`, `unverified`, `unavailable`), what the state rests on, and what
+would move it up a rung.
+
+Structural evidence never produces a `supported` claim: the files existing is not the same
+as a runtime having done the thing. A capability leaves `unverified` only from a recorded
+live run. Codex additionally reports its mutation ban as `degraded (behavioral)`, because a
+Codex agent definition carries no per-agent tool field to enforce one — Claude Code and
+Cursor enforce theirs structurally.
+
 ## explain-support
 
 An alias of `providers`, kept because "which providers does this support" and "explain the

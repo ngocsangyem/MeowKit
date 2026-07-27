@@ -55,7 +55,7 @@ export interface InventoryEntry {
 	/** Generated agent-contract classification; never a hand-maintained roster. */
 	agentClass?: "core-support" | "domain" | "intelligence" | "internal";
 	/** Generated entry route used by the agent-contract inventory views. */
-	routing?: "direct-only" | "hub-only" | "harness";
+	routing?: "direct-only" | "hub-only" | "harness" | "direct-and-harness";
 	/** Whether the agent can be invoked outside its internal executor path. */
 	public?: boolean;
 	/** Agent-only owned paths/patterns parsed from its ownership declaration. */
@@ -258,7 +258,10 @@ function dependencyEdges(
 }
 
 function agentContractFields(id: string): Pick<InventoryEntry, "agentClass" | "routing" | "public"> {
+	// `advisor` is reached only through mk:advise. Athena has both a bounded
+	// --advice harness route and an explicitly requested, stateless strategy consult.
 	if (id === "advisor") return { agentClass: "internal", routing: "harness", public: false };
+	if (id === "athena") return { agentClass: "intelligence", routing: "direct-and-harness", public: true };
 	if (id === "story-sizer") return { agentClass: "intelligence", routing: "direct-only", public: true };
 	if (id.startsWith("jira-") || id.startsWith("confluence-")) {
 		return { agentClass: "domain", routing: "hub-only", public: true };
@@ -336,7 +339,13 @@ export function buildInventory(claudeDir: string): Inventory {
 				.map((tool) => tool.trim())
 				.filter(Boolean);
 			Object.assign(entry, agentContractFields(ref.id));
-			entry.ownedArtifacts = agentDeclaredArtifacts(body);
+			// Owned artifacts are WRITE targets, so an agent with no write tool owns none.
+			// Without this gate, an agent that merely CITES rule paths in its prose is reported
+			// as writing them — the body scan cannot tell a citation from an ownership claim
+			// when the agent declares no ownership section. Read-only agents were being
+			// published as writers of the very governance files they only reference.
+			const canWrite = entry.tools.includes("Write") || entry.tools.includes("Edit");
+			entry.ownedArtifacts = canWrite ? agentDeclaredArtifacts(body) : [];
 			entry.triggerOwner =
 				/\b(?:use|runs?|activated|auto-activates|invoked|routed)\b/i.test(str(meta.description)) &&
 				/\b(?:not|never|does not)\b/i.test(str(meta.description));

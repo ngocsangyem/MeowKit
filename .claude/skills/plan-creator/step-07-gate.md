@@ -2,6 +2,11 @@
 
 Self-check and Gate 1 presentation for human approval.
 
+**`--advice` runs:** the REVIEW checkpoint fires BEFORE this step, never inside it
+(`references/advice-checkpoints.md`). Athena does not approve Gate 1 and its
+directive is not part of the approval — `READY_FOR_EXISTING_GATE` means only that
+presenting Gate 1 is the correct next step. The human approval below is unchanged.
+
 ## Instructions
 
 ### 7a. Self-Check Before Presenting

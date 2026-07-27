@@ -12,6 +12,7 @@ import { upgrade } from "./commands/upgrade.js";
 import { validate } from "./commands/validate.js";
 import { capabilities } from "./commands/capabilities.js";
 import { taskState } from "./commands/task-state.js";
+import { advice } from "./commands/advice.js";
 import { context } from "./commands/context.js";
 import { budget, contextBudget } from "./commands/budget.js";
 import { memory } from "./commands/memory.js";
@@ -357,6 +358,31 @@ async function main(): Promise<void> {
 				capabilityDecision: args["capability-decision"] as string | string[] | undefined,
 				json: args.json as boolean | undefined,
 				cliVersion: VERSION,
+			});
+			break;
+		case "advice":
+			await advice({
+				subcommand: args._[1] as string | undefined,
+				run: args.run as string | undefined,
+				skill: args.skill as string | undefined,
+				stage: args.stage as string | undefined,
+				checkpoint: args.checkpoint as string | undefined,
+				disposition: args.disposition as string | undefined,
+				outcome: args.outcome as string | undefined,
+				reason: args.reason as string | undefined,
+				question: args.question as string | undefined,
+				directive: args.directive as string | undefined,
+				correction: args.correction as string | string[] | undefined,
+				evidencePointer: args["evidence-pointer"] as string | string[] | undefined,
+				next: args.next as string | undefined,
+				slug: args.slug as string | undefined,
+				taskId: args["task-id"] as string | undefined,
+				provider: args.provider as string | undefined,
+				evidence: args.evidence as string | undefined,
+				correctionKind: args["correction-kind"] as string | undefined,
+				packetKind: args["packet-kind"] as string | undefined,
+				releaseStage: args["release-stage"] as string | undefined,
+				json: args.json as boolean | undefined,
 			});
 			break;
 		case "context":

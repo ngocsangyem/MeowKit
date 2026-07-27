@@ -6,7 +6,7 @@ description: |
   Ship workflow with explicit scopes: prepare stages and commits locally; release pushes and creates a PR; publish manages issues and versioning. Use when asked to "ship", "deploy", "push to main", "create a PR", or "merge and push".
   Proactively suggest when the user says code is ready or asks about deploying.
   Supports official (→ main) and beta (→ dev/develop) ship modes with auto-detection.
-argument-hint: '[prepare|release|publish] [official|beta] [--skip-tests] [--dry-run]'
+argument-hint: '[prepare|release|publish] [official|beta] [--skip-tests] [--dry-run] [--advice]'
 allowed-tools:
   - Bash
   - Read
@@ -72,6 +72,28 @@ After the verdict file is read at the start of the workflow:
 | `official` / `beta` | Select the target release branch when `release` or `publish` is requested. |
 | `--skip-tests` | Skip the test step only when the user confirms that current-session evidence is sufficient. |
 | `--dry-run` | Show the scoped actions without executing them. |
+| `--advice` | Composable, off by default. Opt-in strategic supervision for this run — see below. |
+
+## `--advice` (composable, off by default)
+
+At named checkpoints — GUIDE after the scope is resolved and pre-flight has run,
+RESCUE on an exceptional blocker, REVIEW after CI reaches a terminal green state,
+RECHECK after a correction — the `athena` agent assesses the situation and recommends
+an operational path inside the locked scope. Hard cap **4 calls per release stage**:
+`prepare`, `release` and `publish` each carry their own budget.
+
+**Counsel is not authorization.** A directive never creates the authority to push, open
+a PR, merge, version, publish, or deploy. Those come only from an explicit `release` or
+`publish` scope plus the confirmations in *Explicit Confirmations* below, both unchanged
+by this flag. Red or pending CI keeps its existing repair-or-stop route; Athena cannot
+clear it, wave it through, or shorten the wait. Gate 2 stays with `mk:review` and the
+human. Posting an Athena assessment to a PR or issue is an external effect needing the
+same explicit authority as any other — the default is a local receipt only.
+
+Without the flag there are zero calls and no state is written.
+
+Checkpoints: `references/advice-checkpoints.md`. Contract:
+`.claude/rules-conditional/advice-supervision-rules.md` (load only when the flag is present).
 
 ## When to Use
 
@@ -154,6 +176,7 @@ After pipeline completes, output this summary:
 - `references/pre-landing-review.md` — Pre-landing review (Step 3.5), design review, PR comment resolution (Step 3.75)
 - `references/version-changelog-todos.md` — Version bump (Step 4), CHANGELOG (Step 5), TODOS.md (Step 5.5)
 - `references/commit-push-pr.md` — Issue linking, commit (Step 6), verification gate (Step 6.5), push (Step 7), PR creation/edit (Step 8), document-release (Step 8.5), ship metrics (Step 8.75)
+- `references/advice-checkpoints.md` — `--advice` checkpoint boundaries, the per-release-stage cap, and the counsel-is-not-authorization boundary
 - `references/rules.md` — Important rules and constraints
 - `references/rollback-protocol.md` — Rollback steps and procedures (migrated from mk:shipping)
 - `references/ship-pipeline.md` — Full ship pipeline stages and gate definitions (migrated from mk:shipping)

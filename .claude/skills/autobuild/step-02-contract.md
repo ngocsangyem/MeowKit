@@ -103,10 +103,21 @@ Must exit 0. If exit 1, the autobuild workflow halts — escalate to user.
 
 Increment `budget_spent`. Run `budget-tracker.sh`.
 
+### 2z. GUIDE checkpoint (`--advice` runs only)
+
+Skip entirely unless the run was invoked with `--advice`.
+
+This is the run's single GUIDE checkpoint: the plan and the contract decision are both
+settled, and no source has been generated yet. Fire it here — after the skip-or-run
+decision above, before `step-03-generate.md` — and follow
+`references/advice-checkpoints.md`. A directive is input to the generator's brief; it
+does not amend the signed contract, and it grants no permission the contract withholds.
+
 ## Output
 
 - `contract_path` (absolute path or `null`) set
 - Run report updated with Step 02 section
+- GUIDE checkpoint recorded (`--advice` runs only)
 
 Print: `"Contract: {signed | skipped}. Proceeding to step-03 (generate)."`
 

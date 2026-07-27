@@ -1,6 +1,6 @@
 ---
 title: "Planning and Tasks"
-description: "Create plans and task records, and see where a task stands."
+description: "Create plans and task records, see where a task stands, and record the checkpoints of a supervised run."
 ---
 
 The commands behind Gate 1 and the durable task record. If you are asking "what am I supposed to be doing", `orient` answers it.
@@ -116,6 +116,64 @@ npx mewkit task-state show
 
 npx mewkit task-state update feat-auth --status active --step "wired login route" --next "add refresh-token test"
 ```
+
+## advice
+
+Records the checkpoints of an opt-in supervised run — the `--advice` flag on `mk:fix`, `mk:cook`, `mk:brainstorming`, `mk:plan-creator`, `mk:autobuild` and `mk:ship`. The workflow drives these commands; you rarely type them yourself. They exist as a CLI because the caps, the stage rules and the receipt have to be enforced somewhere the model cannot talk its way past.
+
+**Supervision is evidence, not authority.** Nothing here clears a gate, and a recorded directive never counts as verification.
+
+```bash
+npx mewkit advice begin --run <id> --skill <skill> --stage <stage> --checkpoint <id>
+npx mewkit advice commit --run <id> --checkpoint <id> --disposition <value> --outcome <value> --reason "<one line>"
+npx mewkit advice status --run <id>
+npx mewkit advice validate-packet --evidence <file.json> --packet-kind input|output|brief
+```
+
+**Subcommands:**
+
+| Subcommand        | What it enforces                                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `begin`           | Per-stage and per-skill caps, stage legality, idempotent `--checkpoint`, and the pending marker that makes a crash resumable |
+| `commit`          | Stage/disposition legality, receipt validation, the dossier write, and evidence supersession after a correction      |
+| `status`          | The resume view: current stage, calls used, latest directive, next safe action                                        |
+| `validate-packet` | An input packet, an output packet, or a direct-consult brief                                                          |
+
+**Two flags worth understanding:**
+
+`--release-stage` is required by `mk:ship` and refused by every other skill. Ship's budget is 4 calls **per release stage**, so a run walking `prepare` → `release` → `publish` is three separate budgets. The stage is fixed when the slot is claimed and inherited by `commit`.
+
+`--correction-kind` decides what a returned correction invalidates: `source` marks downstream verification and review evidence superseded but keeps Gate 1, while `scope` also returns Gate 1 to `required` — a plan whose scope moved needs a new human approval.
+
+**Examples:**
+
+```bash
+# Open a checkpoint. Repeating the same --checkpoint returns the recorded
+# result and spends no slot, which is what makes resume safe.
+npx mewkit advice begin --run fix-260727-auth --skill mk:fix --stage GUIDE --checkpoint guide-1
+
+# Record what came back, and what you decided to do with it. --reason is
+# required even when you adopted the directive.
+npx mewkit advice commit --run fix-260727-auth --checkpoint guide-1 \
+  --disposition CONTINUE_WITH_DIRECTIVE --outcome adopted \
+  --reason "matches the evidence in the root-cause proof" \
+  --directive "fix the guard, not the caller" --next "write the regression test"
+
+# Send work back, and supersede the evidence it invalidated.
+npx mewkit advice commit --run fix-260727-auth --checkpoint review-1 \
+  --disposition RETURN_TO_EXECUTOR --outcome adopted --reason "coverage gap" \
+  --correction "cover the expired-token path" \
+  --evidence tasks/plans/260727-auth/reports/evidence/workflow-evidence.json \
+  --correction-kind source
+
+# Ship charges each release stage its own budget.
+npx mewkit advice begin --run ship-260727 --skill mk:ship --stage GUIDE \
+  --checkpoint publish-guide --release-stage publish
+
+npx mewkit advice status --run fix-260727-auth
+```
+
+**When it refuses:** a call past the cap, an illegal stage/disposition pair, a `--checkpoint` reused under a different stage, a corrupt dossier, or `--evidence` pointing anywhere but an existing `workflow-evidence.json` inside the project. A refusal is final for that checkpoint — continue unsupervised, or escalate when the refusal says to.
 
 ## visual-plan
 

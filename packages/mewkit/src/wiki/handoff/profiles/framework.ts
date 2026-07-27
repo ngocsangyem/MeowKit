@@ -35,7 +35,16 @@ export const frameworkProfiles: SkillHandoffProfile[] = [
 				novelty_vs_existing_wiki: 1,
 			},
 		},
-		["mk:api-design", "mk:database", "mk:frontend-design", "mk:stitch", "mk:tech-graph", "mk:ui-design-system"],
+		[
+			"mk:api-design-principles",
+			"mk:backend-development",
+			"mk:database",
+			"mk:devops",
+			"mk:frontend-design",
+			"mk:stitch",
+			"mk:tech-graph",
+			"mk:ui-design-system",
+		],
 	),
 	// Repo-specific conventions and reusable strategies.
 	...defineGroup(

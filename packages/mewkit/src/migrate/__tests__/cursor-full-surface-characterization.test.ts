@@ -39,20 +39,20 @@ describe("cursor full-surface characterization: manifest inventory", () => {
 });
 
 describe("cursor full-surface characterization: skill catalog inventory", () => {
-	it("resolves exactly 126 skills across all packs, matching the on-disk skill dir count", () => {
+	it("resolves exactly 128 skills across all packs, matching the on-disk skill dir count", () => {
 		const catalog = loadSkillPackCatalog(moduleDir);
 		expect(catalog).not.toBeNull();
 		const { skills } = resolvePackSelection(catalog!, "all");
-		expect(skills.length).toBe(126);
+		expect(skills.length).toBe(128);
 
 		const onDisk = readdirSync(join(rootDir, ".cursor", "skills"), { withFileTypes: true }).filter((d) =>
 			d.isDirectory(),
 		);
-		expect(onDisk.length).toBe(126);
+		expect(onDisk.length).toBe(128);
 		expect([...skills].sort()).toEqual(onDisk.map((d) => d.name).sort());
 	});
 
-	it("the core pack (default install) is a strict 24-skill subset of the full 126", () => {
+	it("the core pack (default install) is a strict 24-skill subset of the full 128", () => {
 		const catalog = loadSkillPackCatalog(moduleDir);
 		const { skills: core } = resolvePackSelection(catalog!, []); // [] = catalog default (core)
 		const { skills: all } = resolvePackSelection(catalog!, "all");
@@ -71,15 +71,15 @@ describe("cursor full-surface characterization: skill catalog inventory", () => 
 });
 
 describe("cursor full-surface characterization: agent catalog inventory", () => {
-	it("ships exactly 40 agent files, matching the union of every agent pack", () => {
+	it("ships exactly 41 agent files, matching the union of every agent pack", () => {
 		const onDisk = readdirSync(join(rootDir, ".cursor", "agents")).filter((f) => f.endsWith(".md"));
-		expect(onDisk.length).toBe(40);
+		expect(onDisk.length).toBe(41);
 
 		const catalog = JSON.parse(
 			readFileSync(join(moduleDir, "catalog", "agent-packs.json"), "utf-8"),
 		) as AgentPackCatalog;
 		const unionOfPacks = new Set(Object.values(catalog.packs).flatMap((p) => p.agents));
-		expect(unionOfPacks.size).toBe(40);
+		expect(unionOfPacks.size).toBe(41);
 		expect([...unionOfPacks].map((n) => `${n}.md`).sort()).toEqual(onDisk.sort());
 	});
 
@@ -95,10 +95,14 @@ describe("cursor full-surface characterization: agent catalog inventory", () => 
 });
 
 describe("cursor full-surface characterization: rules + hooks inventory", () => {
-	it("ships exactly 4 rules, with runtime-invariants.mdc as the sole Always Apply rule", () => {
+	it("ships exactly 5 rules, with runtime-invariants.mdc as the sole Always Apply rule", () => {
+		// 4 originals plus domain-advice-supervision.mdc, the Agent-Requested projection of
+		// the --advice supervision contract. Cursor has no other on-demand rule surface, and
+		// the contract must not ride in AGENTS.md where every unsupervised run would load it.
 		const names = readdirSync(join(rootDir, ".cursor", "rules")).filter((f) => f.endsWith(".mdc"));
-		expect(names.length).toBe(4);
+		expect(names.length).toBe(5);
 		expect(names).toContain("runtime-invariants.mdc");
+		expect(names).toContain("domain-advice-supervision.mdc");
 	});
 
 	it("hooks.json declares the full lifecycle-event set backed by real .cjs handlers", () => {

@@ -67,7 +67,9 @@ Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 `mk:verify`|developer|development|monolithic
 `mk:loop`|developer|development|monolithic (references; bounded git-tracked metric-optimization loop, boundary-gated, leaf executor — calls no orchestration skill)
 `mk:build-fix`|developer|development|monolithic
-`mk:api-design`|architect|development|monolithic
+`mk:api-design-principles`|architect|development|monolithic
+`mk:backend-development`|developer|development|monolithic
+`mk:devops`|developer|development|monolithic
 `mk:database`|developer|development|monolithic
 `mk:decision-framework`|planner|development|monolithic
 `mk:figma`|ui-ux-designer|development|monolithic
@@ -246,7 +248,7 @@ Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
 Knowledge/Wiki|3
-**Total**|**126**
+**Total**|**128**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

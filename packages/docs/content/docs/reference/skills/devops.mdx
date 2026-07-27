@@ -1,0 +1,87 @@
+---
+title: "mk:devops"
+description: "Infrastructure, containers, CI/CD, deployment safety, observability, and rollback — with a hard secret boundary and no deployment authority."
+---
+
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/devops/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/devops/SKILL.md) |
+| **Owner** | `portability` |
+| **Runtime** | `portable` |
+| **Risk** | high |
+
+{/* GENERATED:reference-facts END */}
+
+## What This Skill Does
+
+Plans and implements infrastructure, container, pipeline, runtime-configuration, and
+observability changes, and designs the safety around them: blast radius, stateful resources,
+rollback, approval point, and the read-only evidence that proves the change is right.
+
+It never performs the production effect and never reads a secret. Both are structural, not
+stylistic.
+
+## When to Use
+
+- Container definitions, local runtime composition, or pipeline changes
+- Infrastructure-as-code and cloud runtime changes
+- Deployment safety design, rollback planning, runtime configuration
+- Operational diagnosis of a live failure
+- **NOT for:** approving or executing a release (`mk:ship` or a human), reading secrets, code
+  root-cause analysis (`mk:investigate`), schema semantics (`mk:database`), or the security
+  verdict
+
+## Secret Boundary
+
+Unconditional, stated in the skill body rather than a reference so it is always loaded:
+
+- Never read, grep, print, or open a `.env`/`.env.*` file at any depth, a keystore, a
+  credential file, or a generated config carrying credentials
+- Never ask for a secret value in conversation, and never echo output containing one
+- Read only committed templates, configuration, and infrastructure definitions
+- When availability cannot be proven from a tracked file, stop at a readiness report naming
+  the missing capability — absence from the tree proves nothing about the runtime
+
+## Ownership Boundary
+
+| Owner | Owns |
+|---|---|
+| `mk:devops` | Infrastructure-as-code, containers, CI, runtime config, deployment safety design, rollback planning, incident diagnosis |
+| `mk:ship` / a human | Deploy approval and execution |
+| `mk:investigate` | Code root cause behind an operational symptom |
+| `mk:database` | Schema semantics inside a data resource |
+
+## Arguments
+
+`[platform or infrastructure change]`
+
+## Workflow
+
+1. **Discover the platform** from tracked container, IaC, pipeline, and deployment files —
+   when it is not discoverable, ask; never pick a cloud as a default
+2. **Classify** — local container, CI, infrastructure, runtime config, observability,
+   release/rollback, or incident diagnosis
+3. **Safety design** — blast radius, stateful resources, environment contract (names only),
+   rollback or forward recovery, approval point, validation command
+4. **Implement inside an approved plan** — produce and read the plan or diff evidence; never
+   run the apply, deploy, or destroy step and never emit one ready to run
+5. **Hand off** the production effect with the evidence, blast radius, rollback path, and
+   post-change validation
+
+## References
+
+| File | Load when |
+|---|---|
+| `references/container-and-ci.md` | Container images, local composition, or pipelines |
+| `references/infrastructure-change-safety.md` | Infrastructure-as-code, deployment, rollback, or incident diagnosis |
+
+## Pro Tips
+
+- **A plan or diff nobody read is not evidence.** Quote the resources it would replace, not
+  just update.
+- **"Replace" on a stateful resource is data loss** until a restore is proven, not merely
+  configured.
+- **A rollback that needs the failing system healthy is not a rollback.** Check the recovery
+  path against the failure it is meant to survive.

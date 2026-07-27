@@ -126,7 +126,10 @@ For skill suggestions based on task type, see `mk:agent-detector` (its `../agent
 |-----------|-------|----------------|
 | Operations, triage, case management, escalation protocols, billing workflows | `/mk:decision-framework` | User asks "how should we handle X cases" or is designing any case-routing system |
 | "Is everything green?", pre-review check, post-implementation validation | `/mk:verify` | After implementation completes, before review, or when user wants a quick health check |
-| API design, endpoint structure, REST/GraphQL conventions | `/mk:api-design` | User is planning backend endpoints or asking about API conventions |
+| API contract design or review — interface shape, error semantics, compatibility, pagination | `/mk:api-design-principles` | User is authoring or reviewing what an API promises, not how it runs |
+| Backend change end to end — handler, service, integration, webhook, job | `/mk:backend-development` | User is changing backend behavior and needs contract, data, and auth owners coordinated |
+| Schema, migration, query, index, or ORM data-access boundary | `/mk:database` | User is modelling, evolving, or querying data |
+| Infrastructure, containers, CI/CD, deployment safety, rollback | `/mk:devops` | User is changing how the system is built, configured, or delivered |
 
 ## Fast Paths (surface these prominently)
 

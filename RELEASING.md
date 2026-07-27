@@ -633,6 +633,7 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Version | Date       | Title                                            |
 | ------- | ---------- | ------------------------------------------------ |
+| v2.15.0 | 2026-07-27 | Strategic Supervision & the Portable Backend Surface |
 | v2.14.8 | 2026-07-26 | Runtime-Neutral State & the Documentation Rebuild |
 | v2.14.7 | 2026-07-25 | Per-Agent Model Routing & Explore Agent          |
 | v2.14.4 | 2026-07-19 | The Orientation & Transition Spine               |

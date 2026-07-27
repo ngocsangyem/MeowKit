@@ -1,6 +1,7 @@
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildInventory, checkOwnership, enumerateArtifacts } from "../build-inventory.js";
 
@@ -202,5 +203,45 @@ describe("checkOwnership", () => {
 		const results = checkOwnership(c, { missingInfraSeverity: "warn" });
 		expect(results.some((r) => r.status === "fail")).toBe(false);
 		expect(results.some((r) => r.status === "warn")).toBe(true);
+	});
+});
+
+describe("the live repo's agent-contract classification", () => {
+	// Resolve the repo `.claude` relative to THIS test file (cwd-independent) — a
+	// process.cwd()-relative path passes from the repo root but fails when vitest runs
+	// from packages/mewkit, which has its own test script.
+	const REPO_CLAUDE = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..", "..", ".claude");
+	const liveAgents = () => buildInventory(REPO_CLAUDE).entries.filter((entry) => entry.type === "agent");
+
+	// Athena is reachable two ways — an explicitly requested stateless strategy
+	// consult and the bounded --advice harness route — so a single-route
+	// classification would misdescribe one of them.
+	it("models athena as publicly consultable strategic intelligence on both routes", () => {
+		const athena = liveAgents().find((entry) => entry.id === "athena");
+		expect(athena).toBeDefined();
+		expect(athena).toMatchObject({
+			agentClass: "intelligence",
+			routing: "direct-and-harness",
+			public: true,
+		});
+	});
+
+	// advisor stays internal: it is reached ONLY through its own skill, so widening
+	// athena must not widen it by association.
+	it("keeps advisor internal and harness-only", () => {
+		expect(liveAgents().find((entry) => entry.id === "advisor")).toMatchObject({
+			agentClass: "internal",
+			routing: "harness",
+			public: false,
+		});
+	});
+
+	// A read-only agent owns no write artifacts; citing a governance path in prose is
+	// not an ownership claim.
+	it("gives read-only athena no owned write artifacts", () => {
+		const athena = liveAgents().find((entry) => entry.id === "athena")!;
+		expect(athena.tools ?? []).not.toContain("Write");
+		expect(athena.tools ?? []).not.toContain("Edit");
+		expect(athena.ownedArtifacts ?? []).toEqual([]);
 	});
 });

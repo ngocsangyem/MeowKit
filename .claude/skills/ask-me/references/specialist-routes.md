@@ -8,7 +8,10 @@
 | Product idea validation | `mk:office-hours` |
 | Existing-plan review | `mk:plan-ceo-review` |
 | Re-examine an output or verdict | `mk:elicit` |
-| API or database design | `mk:api-design` or `mk:database` |
+| API contract design or review — interface shape, error semantics, compatibility, pagination | `mk:api-design-principles` |
+| Backend change end to end — handler, service, integration, webhook, job | `mk:backend-development` |
+| Schema, migration, query, index, or ORM data-access boundary | `mk:database` |
+| Infrastructure, containers, CI/CD, deployment safety, rollback | `mk:devops` |
 | Bug or root cause | `mk:investigate` |
 | Diff or PR review | `mk:review` |
 | Grade a running build | `mk:evaluate` |

@@ -47,6 +47,15 @@ See the phase-contract conventions for input/output expectations per phase. (Loa
 
 Only the canonical gates authorize transition. Shipping and reflection require explicit user direction; they do not auto-run after review.
 
+## Supervision (`--advice`) is not an entry point here
+
+This orchestrator exposes **no `--advice` flag** and never enables it. When a phase skill
+was *already* invoked with the flag by the user, carry its `supervisionRunId` forward as an
+**opaque value** across macro phase boundaries so a resumed run keeps one budget instead of
+minting a fresh one. Carry nothing else: no flag, no dossier, no directive history, and no
+routing ability. Spawned subagents receive a task-specific directive only, so an
+orchestrated child can never supervise itself.
+
 ## References
 
 | Reference                                                         | When to load                                     | Content                                                                     |

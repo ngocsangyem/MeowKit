@@ -805,12 +805,12 @@
           "criticality": "medium"
         },
         {
-          "id": "api-design",
-          "label": "mk:api-design",
+          "id": "api-design-principles",
+          "label": "mk:api-design-principles",
           "kind": "skill",
           "edge": "calls",
-          "detail": "REST/GraphQL API design: resource naming, HTTP methods, status codes, pagination, versioning, error formats.",
-          "sourceRef": "plugin/skills/api-design/SKILL.md",
+          "detail": "Durable REST, GraphQL, RPC, or event API contracts: shape, compatibility, pagination, error semantics.",
+          "sourceRef": "plugin/skills/api-design-principles/SKILL.md",
           "group": "portability",
           "criticality": "medium"
         },

@@ -13,5 +13,33 @@
 		"intentionally-omitted": "reason"
 	},
 	"ownerEnum": ["AGENTS.md", "skill", "agent", "hook", "rules", "config", ".meowkit", "cli", "omitted"],
-	"concerns": []
+	"concerns": [],
+	"adviceSupervision": {
+		"_description": "Per-surface support state for the two --advice capabilities on this plane. Structural presence is NEVER a support claim: a state leaves `unverified` only from a recorded live smoke run. Direct consult and embedded supervision are separate capabilities and neither may be reported through the other's state.",
+		"stateEnum": ["supported", "degraded", "unverified", "unavailable"],
+		"adapter": "root/.cursor/agents/athena.md",
+		"contract": "root/.cursor/rules/domain-advice-supervision.mdc",
+		"capabilities": [
+			{
+				"capability": "embedded-supervision",
+				"state": "unverified",
+				"evidence": "structural",
+				"detail": "The adapter, the contract rule, and all six wrappers (brainstorming, plan-creator, cook, fix, autobuild, ship) are authored and declare their checkpoints. No live session has exercised delegation from a wrapper on this plane, so the wiring is unverified rather than supported; a runtime that cannot reach the agent prints the documented fallback line and continues unsupervised.",
+				"blockedBy": "live provider smoke"
+			},
+			{
+				"capability": "direct-consult",
+				"state": "unverified",
+				"evidence": "structural",
+				"detail": "The adapter declares the stateless strategy-brief contract and the runtime documents delegating to a named agent, but no live session has exercised it. Unverified is not degraded: nothing here is known to work partially.",
+				"blockedBy": "live provider smoke"
+			}
+		],
+		"mutationBan": {
+			"enforcement": "structural",
+			"state": "unverified",
+			"detail": "readonly: true in the agent frontmatter is the structural half of the no-mutation rule, and the adapter carries the behavioral half. The flag's runtime effect has not been live-verified for this agent, so the enforcement is declared structural while its state stays unverified.",
+			"blockedBy": "live mutation-refusal probe"
+		}
+	}
 }

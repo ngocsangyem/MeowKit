@@ -22,7 +22,9 @@ const RULES = [
     canonical: '$30/$100 budget thresholds',
     wrong: [/\$10\b/g, /\$25\b/g],
     note: 'Budget thresholds are $30 (warn) / $100 (block), not $10/$25',
-    ignoreFiles: ['changelog.mdx'], // historical accuracy
+    // archive.mdx is the release history split out of changelog.mdx; both record
+    // superseded values verbatim, so both are exempt for historical accuracy.
+    ignoreFiles: ['changelog.mdx', 'archive.mdx'],
   },
   // Inventory-derived counts are checked by \`mewkit inventory --check\`; this
   // terminology-only linter must not carry a second volatile count source.
@@ -31,7 +33,8 @@ const RULES = [
     canonical: 'on-demand memory (no loader)',
     wrong: [/memory-loader/g],
     note: 'memory-loader was deleted in v2.4.1. Memory is on-demand, no auto-loader.',
-    ignoreFiles: ['changelog.mdx', 'hooks.mdx'], // historical accuracy
+    // archive.mdx documents the release that deleted memory-loader; naming it is the point.
+    ignoreFiles: ['changelog.mdx', 'archive.mdx', 'hooks.mdx'], // historical accuracy
   },
 ];
 

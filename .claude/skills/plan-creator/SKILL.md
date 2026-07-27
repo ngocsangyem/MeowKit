@@ -3,7 +3,7 @@ name: mk:plan-creator
 version: 1.6.3
 preamble-tier: 3
 description: 'Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1. Activated by /mk:plan or /mk:cook. NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine); NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review).'
-argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] [--html] OR [archive | red-team {path} | validate {path}]'
+argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] [--html] [--advice] OR [archive | red-team {path} | validate {path}]'
 allowed-tools:
   - Bash
   - Read
@@ -58,6 +58,10 @@ dependency_edges:
     type: peer
   - id: mk:scout
     type: peer
+  - id: mk:validate-plan
+    type: peer
+  - id: mk:visual-plan
+    type: peer
 ---
 
 # Plan Creator
@@ -108,6 +112,7 @@ Skip when:
 **Composable flags:**
 
 - `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
+- `--advice` — opt-in strategic supervision for one planning run, capped at 4 calls: GUIDE after the scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before Gate 1, RECHECK after a correction. Athena reads the plan and can return it to the planner; it never writes the plan and never approves Gate 1. Without the flag there are zero calls and no state. See `references/advice-checkpoints.md`.
 - Visual work belongs to `mk:visual-plan`. Plan-creator emits only the handoff metadata needed for that skill; Markdown plan files remain source of truth.
 
 ## Requirements Capture Contract

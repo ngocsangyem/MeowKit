@@ -1,0 +1,186 @@
+---
+title: "athena"
+description: "Strategic intelligence through direct consults and opt-in --advice supervision."
+---
+
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/agents/athena.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/agents/athena.md) |
+| **Owner** | `research` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
+Athena is a strategic intelligence agent. Use an explicit direct consult where a
+runtime exposes it for a stateless strategy brief, or pass `--advice` to a
+supporting skill for bounded lifecycle supervision of one delivery run.
+
+<Callout type="warn">
+Delegation to this agent has not yet been confirmed against a live session on any
+runtime. Structural discovery passes — the agent is registered, classified, and
+conformance-checked — but a wrapped skill that cannot reach it prints
+`advice checkpoint unavailable in this runtime: <reason>` and continues
+unsupervised. Treat the lane as experimental until a runtime is verified.
+</Callout>
+
+<Callout type="info">
+Wrapper wiring lands per skill. A skill that has not been wired exposes no flag.
+The canonical contract is
+[`advice-supervision-rules.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/rules-conditional/advice-supervision-rules.md);
+this page describes the agent, not the per-skill rollout state.
+</Callout>
+
+## Role
+
+Athena evaluates difficult situations, weighs trade-offs, and recommends one
+operational decision within locked scope. In supervised mode, it guides a run before
+work starts, unblocks it when it stalls, and reads finished work against evidence
+before the normal reviewer sees it. It can send work back to the executor. It cannot
+approve anything.
+
+Its contribution is stronger reasoning and cross-phase visibility — never authority.
+The failure mode it exists to avoid is agreeing with the caller: the caller has
+spent its context on a hypothesis and often wants permission to continue, so the
+value is in the parts it did not want to hear — the skipped check, the discounted
+risk, the acceptance criterion the evidence does not actually cover.
+
+At review this cuts both ways. Returning work that is genuinely done is as much a
+failure as waving through work that is not, because a supervisor that always finds
+something becomes noise the run learns to route around.
+
+## Stages
+
+Supervision follows `GUIDE → RESCUE* → REVIEW → RECHECK*` at named macro
+checkpoints — never per tool call, per file, or per loop iteration.
+
+| Stage | Job | Max per run |
+|---|---|---:|
+| GUIDE | Direction before work starts | 1 |
+| RESCUE | Unblock a stalled or contradicted run | 2 |
+| REVIEW | Independent read of finished work against evidence | 1 |
+| RECHECK | Judge whether corrections were addressed and proven | 1 |
+
+Each wrapped skill also carries a total call cap. A duplicate checkpoint id is
+idempotent and spends no slot, `RECHECK` requires a prior return, and a second
+unresolved return escalates to a human rather than looping.
+
+Without the flag there are zero invocations and the checkpoint prose is never
+loaded, so the lane costs nothing when unused.
+
+## Packets
+
+Every call is a fresh isolated fork that inherits no conversation, so the packet is
+the supervisor's entire world. The parent supplies `runId`, `skill`, `stage`,
+`checkpointId`, `mission`, `lockedDecisions`, `currentState`, `workerSummary`,
+`evidenceRefs`, `priorDirective`, `question` and `riskAndReversibility`, capped at
+12 KiB with at most five evidence pointers — each carrying its provenance. A
+transcript, full diff, memory dump or credential in a packet is rejected before
+delegation rather than truncated.
+
+Athena returns a `disposition`, strategic assessment, decision recommendation,
+strategic directive, required corrections, next falsifiable check, risks and
+rollback, rejected alternatives, assumptions, confidence, and which evidence it
+actually read — 600 words at most.
+
+Dispositions are stage-specific:
+
+| Stage | Legal dispositions |
+|---|---|
+| GUIDE, RESCUE | `CONTINUE_WITH_DIRECTIVE`, `ESCALATE_TO_HUMAN`, `BLOCKED_MISSING_EVIDENCE` |
+| REVIEW, RECHECK | `READY_FOR_EXISTING_GATE`, `RETURN_TO_EXECUTOR`, `ESCALATE_TO_HUMAN`, `BLOCKED_MISSING_EVIDENCE` |
+
+`READY_FOR_EXISTING_GATE` names the next step — the normal reviewer or gate. It
+never means the gate is cleared.
+
+## Continuity
+
+Athena is a long-lived lead, never a long-lived session. Continuity comes from one
+compact parent-owned dossier at
+`tasks/reports/{supervisionRunId}-athena-supervision.md`, not from a transcript,
+auto-memory, or a supervisor database. Its active summary stays under 2 KiB and
+carries only run identity, stage, locked-decision pointers, the latest directive,
+correction count, receipt pointers and the next safe action. Historical receipts may
+sit below it but are never auto-loaded.
+
+The dossier cannot carry progress, verification, gate, approval, verdict or status
+fields — a candidate that does is refused, so continuity can never become a second
+task truth.
+
+## No Gate Authority
+
+A directive is evidence a human reads at a gate — the same class as a passing test
+suite or an evaluator verdict — never the approval itself. Athena cannot clear or
+advance Gate 1, Gate 2, a security review, CI, a merge, a deploy, or any business
+decision.
+
+Supervision is also not verification. Verification stays with tests, review verdicts
+and validators, and a receipt recording a directive is never proof that anything
+works.
+
+It does not delay a human stop either: `mk:fix` stops for the user after three
+failed attempts on its own schedule, whatever was advised at two, and the Gate 1 and
+Gate 2 questions fire on theirs.
+
+## Artifacts and Boundaries
+
+Athena writes nothing. The mutation ban is structural on Claude Code (only `Read`,
+`Grep` and `Glob` are granted) and on Cursor (`readonly: true`); on Codex, agent
+definitions carry no per-agent permission field, so the ban there is behavioral —
+enforced by the agent's own instructions and evidenced by a live refusal probe.
+
+The **parent** workflow, never Athena, records each checkpoint as a receipt at
+`tasks/reports/{YYMMDD}-{slug}-advice-{n}.md` carrying the returned `disposition`,
+the parent's own `outcome` (`adopted` / `rejected` / `deferred`) and a one-line
+reason. The two are separate fields because a parent may rightly reject a directive.
+When a durable task record is active, the receipt path joins its `evidenceRefs` and
+appears in `mewkit task-state` on resume.
+
+Returned work goes to its current owner — planner, developer, tester — never to
+Athena, and every correction names the proof that closes it.
+
+It never interviews the user, never grades or scores, owns no plan or report, reads
+memory only when a packet explicitly points at it, never writes memory, and never
+spawns another supervisor.
+
+## Provider Support
+
+Athena is authored on three planes, each in its own runtime's dialect rather than as a
+copy: Claude Code, Codex (`.codex/agents/athena.toml` plus a
+`rule-advice-supervision` skill projection, because Codex has no conditional-rule
+surface) and Cursor (`.cursor/agents/athena.md` plus an Agent-Requested `.mdc`). All six
+wrapped skills declare the flag on all three.
+
+**Authored is not proven.** Two capabilities are tracked separately, because a runtime can
+expose one and not the other:
+
+| Capability | What it is |
+|---|---|
+| `embedded-supervision` | the `--advice` harness — checkpoints, caps, dossier, receipts |
+| `direct-consult` | a stateless strategy brief, where the runtime exposes direct delegation |
+
+Check the current state for a runtime:
+
+```bash
+mewkit providers <provider>
+```
+
+Every capability on every provider is `unverified` today: the wiring exists, no live
+session has exercised delegation. A state leaves `unverified` only from a recorded run with
+artifact hashes and a workspace diff — never from the fact that the files exist. Codex
+additionally reports its mutation ban as `degraded (behavioral)`, since it has no per-agent
+tool field to enforce one.
+
+If a runtime cannot reach the agent, the wrapper prints
+`advice checkpoint unavailable in this runtime: <reason>` and the run continues
+unsupervised. A packet written inline and presented as Athena's output is forbidden: a
+recommendation from the agent that is stuck is not an independent check, and a receipt
+recording it as one corrupts the audit trail.
+
+## Related Reference
+
+- **[advisor](/reference/agents/advisor)** — the interview-driven alternative; it
+  reframes a problem with the user, where Athena supervises a run without asking questions.
+- **[reviewer](/reference/agents/reviewer)** — owns review verdicts, which Athena must not pre-empt.

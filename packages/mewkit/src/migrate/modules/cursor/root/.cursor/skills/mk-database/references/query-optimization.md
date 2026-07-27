@@ -1,163 +1,139 @@
-# Query Optimization Reference
+# Query Optimization
 
-Patterns for writing efficient queries and diagnosing slow ones. PostgreSQL primary.
+Diagnosing a slow query and choosing an index from evidence. Confirm the engine first —
+`SKILL.md` step 1. Plan output, index types, and syntax all differ by engine.
 
 ## Contents
 
-- [First: Measure Before Optimizing](#first-measure-before-optimizing)
-- [Indexing Strategy](#indexing-strategy)
-  - [B-tree (default) — use for:](#b-tree-default-use-for)
-  - [Composite index — use for frequent multi-column queries:](#composite-index-use-for-frequent-multi-column-queries)
-  - [Partial index — use when querying a subset:](#partial-index-use-when-querying-a-subset)
-  - [GIN index — use for arrays, JSONB, full-text search:](#gin-index-use-for-arrays-jsonb-full-text-search)
-  - [When NOT to index:](#when-not-to-index)
-- [N+1 Prevention](#n1-prevention)
-- [Pagination](#pagination)
-  - [Offset pagination (simple, but slow on large tables):](#offset-pagination-simple-but-slow-on-large-tables)
-  - [Cursor-based pagination (preferred for large tables):](#cursor-based-pagination-preferred-for-large-tables)
-- [Common Query Mistakes](#common-query-mistakes)
-- [Connection Pooling](#connection-pooling)
-- [Statistics and Cache](#statistics-and-cache)
+- [Measure before changing anything](#measure-before-changing-anything)
+- [Reading a plan safely](#reading-a-plan-safely)
+- [What the plan is telling you](#what-the-plan-is-telling-you)
+- [Choosing an index from evidence](#choosing-an-index-from-evidence)
+- [When not to add an index](#when-not-to-add-an-index)
+- [Query shapes that defeat an index](#query-shapes-that-defeat-an-index)
+- [Repeated queries in a loop](#repeated-queries-in-a-loop)
+- [Pagination cost](#pagination-cost)
+- [Connections and pooling](#connections-and-pooling)
+- [Statistics](#statistics)
 
+## Measure before changing anything
 
-## First: Measure Before Optimizing
+Establish, in order:
 
-ALWAYS run `EXPLAIN ANALYZE` before and after any optimization.
-Never assume a query is slow — measure it.
+1. **Which query.** The exact statement the application sends, with its real parameters —
+   not a simplified version.
+2. **How slow, and against what.** Current timing, current row counts, and the target. If no
+   target exists, ask for one; "fast" is not a measurement and neither is a number you chose.
+3. **How often.** A query taking a second once an hour and one taking a second per request
+   are different problems.
+4. **What changed.** A query that got slower has a cause — data volume, a plan flip, a lost
+   index, stale statistics.
 
-```sql
-EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)
-SELECT u.*, o.total
-FROM users u
-JOIN orders o ON o.user_id = u.id
-WHERE u.created_at > NOW() - INTERVAL '30 days';
-```
+An optimization with no before-and-after measurement is a guess that also changed the code.
 
-Key metrics to read:
-- `Seq Scan` on large tables → missing index
-- `cost=X..Y` — estimated cost; `actual time=X..Y` — real time
-- `rows=X` estimate vs `actual rows=Y` — large gap means stale statistics (`ANALYZE` the table)
-- `Buffers: hit=X read=Y` — high `read` means disk I/O (cold cache or missing index)
+## Reading a plan safely
 
-## Indexing Strategy
+Every engine exposes an execution plan; most also expose an analysing form that reports
+actual timings.
 
-### B-tree (default) — use for:
-- Equality: `WHERE id = $1`
-- Range: `WHERE created_at BETWEEN $1 AND $2`
-- Sorting: `ORDER BY created_at DESC`
-- Prefix matching: `WHERE name LIKE 'prefix%'` (not `'%suffix'`)
+**The analysing form runs the statement.** On an `INSERT`, `UPDATE`, or `DELETE` that means
+the rows change. Use the non-executing form for a mutating statement, or run the analysing
+form inside a transaction you will roll back — and never against a production database at
+all. Preparing the command and handing it over is this skill's job; running it against live
+data is not.
 
-```sql
-CREATE INDEX CONCURRENTLY idx_orders_user_id ON orders(user_id);
-CREATE INDEX CONCURRENTLY idx_orders_created_at ON orders(created_at DESC);
-```
+## What the plan is telling you
 
-### Composite index — use for frequent multi-column queries:
-```sql
--- Query: WHERE user_id = $1 AND status = $2 ORDER BY created_at DESC
-CREATE INDEX CONCURRENTLY idx_orders_user_status_created
-  ON orders(user_id, status, created_at DESC);
--- Column order matters: equality columns first, range/sort columns last
-```
+Vocabulary differs by engine; the questions do not:
 
-### Partial index — use when querying a subset:
-```sql
--- Only index active users (deleted_at IS NULL)
-CREATE INDEX CONCURRENTLY idx_users_email_active
-  ON users(email)
-  WHERE deleted_at IS NULL;
-```
+- **Is it scanning the whole table where it should be seeking?** On a large table that is
+  usually a missing or unusable index.
+- **Do the estimated and actual row counts diverge?** A large gap means the planner is
+  working from stale or insufficient statistics, and every choice downstream is suspect.
+- **Where is the time actually spent?** The slow node, not the alarming-looking one. Sorting,
+  hashing, and spilling to disk often cost more than the scan being blamed.
+- **How much data is being read versus found in cache?** High physical reads point at volume,
+  a cold cache, or an index that is not being used.
+- **Is the row count itself the problem?** A query returning far more rows than the caller
+  needs is a query-shape problem, not an index problem.
 
-### GIN index — use for arrays, JSONB, full-text search:
-```sql
--- JSONB containment queries
-CREATE INDEX CONCURRENTLY idx_products_metadata ON products USING GIN(metadata);
+## Choosing an index from evidence
 
--- Full-text search
-CREATE INDEX CONCURRENTLY idx_posts_search ON posts USING GIN(to_tsvector('english', body));
-```
+Build the index from the query, never from the schema:
 
-### When NOT to index:
-- Low-cardinality columns (boolean, small enums) — table scan is often faster
-- Write-heavy tables — indexes slow down INSERT/UPDATE/DELETE
-- Columns never used in WHERE, JOIN, or ORDER BY
+- **Equality columns first, then range or ordering columns.** A composite index serves a
+  prefix of its columns; ordering determines what it can serve.
+- **One index can serve several queries** that share a prefix. Prefer widening an existing
+  index over adding a near-duplicate.
+- **A partial or filtered index** — where the engine supports one — is smaller and cheaper
+  when queries always constrain the same subset.
+- **Specialised index types** exist for containment, text search, geometry, and similar. They
+  are engine-specific; confirm what this engine offers before naming one.
+- **Covering the query** so the engine answers from the index alone helps a hot read path and
+  costs more write and more space.
 
-## N+1 Prevention
+State the expected effect before creating it, then measure whether it happened. An index that
+did not change the plan should be removed.
 
-N+1 is querying in a loop — the most common performance killer.
+## When not to add an index
 
-```typescript
-// BAD: N+1 — 1 query for users + N queries for orders
-const users = await db.query('SELECT * FROM users');
-for (const user of users) {
-  user.orders = await db.query('SELECT * FROM orders WHERE user_id = $1', [user.id]);
-}
+- The column has very few distinct values and the query matches most rows.
+- The table is write-heavy and the read is rare — every index is paid on every write.
+- No query filters, joins, or orders by the column.
+- The query is slow for a different reason: returning too much data, running too often, or
+  doing work the database should not be doing.
+- An existing index already covers the access pattern and is not being used — find out why
+  before adding another.
 
-// GOOD: JOIN in one query
-const result = await db.query(`
-  SELECT u.*, json_agg(o.*) AS orders
-  FROM users u
-  LEFT JOIN orders o ON o.user_id = u.id
-  GROUP BY u.id
-`);
-```
+## Query shapes that defeat an index
 
-Or use subquery:
-```sql
-SELECT u.*,
-  (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS order_count
-FROM users u;
-```
+| Shape | Why it hurts | Usually better |
+|---|---|---|
+| A function applied to the indexed column in the predicate | The stored value no longer matches the expression | An expression index, or store the derived form |
+| A type mismatch between the column and the parameter | Forces a conversion that discards the index | Match the parameter type to the column |
+| A leading wildcard in a text match | Nothing to seek on | A text-search index, or restructure the match |
+| `OR` across unrelated columns | Cannot use one composite index | Two indexed queries combined |
+| A negated subquery membership test | Slow, and surprising with nulls | An anti-join, or an existence test |
+| Selecting every column when few are needed | Extra reads, and a covering index cannot help | Select what the caller uses — where the repository's conventions allow it |
+| No bound on a list query | Unbounded result and unbounded cost | Bound it, or document why the whole set is required |
 
-## Pagination
+## Repeated queries in a loop
 
-### Offset pagination (simple, but slow on large tables):
-```sql
--- Scans all skipped rows — O(offset) cost
-SELECT * FROM orders ORDER BY created_at DESC LIMIT 20 OFFSET 10000;
-```
+One query per item in a result set is the most common cause of a slow request path, and it
+rarely shows up as a slow query — each individual statement is fast.
 
-### Cursor-based pagination (preferred for large tables):
-```sql
--- Only reads rows after the cursor — O(1) regardless of page depth
-SELECT * FROM orders
-WHERE created_at < $1  -- cursor: last seen created_at
-ORDER BY created_at DESC
-LIMIT 20;
-```
+Fix it at the access layer: fetch the related rows in one statement, or batch the lookups for
+the whole set. Which mechanism is right depends on the ORM and the engine; the invariant is
+that the number of round trips must not grow with the number of rows.
 
-Use cursor pagination for any table expected to grow beyond ~10k rows.
+`mk:backend-development` owns the call site; this skill owns whether the resulting access
+path is sound.
 
-## Common Query Mistakes
+## Pagination cost
 
-| Mistake | Problem | Fix |
-|---------|---------|-----|
-| `SELECT *` | Fetches unused columns, breaks column-order assumptions | Select only needed columns |
-| No `LIMIT` on list queries | Full table scan with unbounded result | Add `LIMIT` and document if intentional |
-| Function on indexed column | `WHERE LOWER(email) = $1` bypasses index | Use functional index or store lowercase |
-| `OR` across different columns | Cannot use composite index efficiently | Consider `UNION ALL` of two indexed queries |
-| `NOT IN (subquery)` | Slow and NULL-unsafe | Use `NOT EXISTS` or `LEFT JOIN ... WHERE IS NULL` |
-| Implicit type cast | `WHERE id = '123'` when id is INT | Match types exactly to use index |
+Skipping rows by offset costs more as the offset grows — the engine still traverses what it
+skips. Seeking from the last-seen ordered value stays flat regardless of depth, and stays
+correct while rows are inserted.
 
-## Connection Pooling
+Use offset where the collection is small and bounded, or where page numbers are part of the
+product. Use a seek where the collection grows. Note that changing an existing endpoint's
+pagination shape is a contract change owned by `mk:api-design-principles`.
 
-ALWAYS use a connection pool. Never open a new connection per request.
+A total count over a large filtered set is its own query cost. Confirm it is affordable
+before it is promised in a contract.
 
-- **Application-level:** PgBouncer (transaction mode for serverless, session mode for stateful)
-- **Library-level:** `pg-pool` (Node.js), SQLAlchemy pool (Python), database/sql (Go)
-- **Pool sizing rule of thumb:** `pool_size = (num_cores * 2) + effective_spindle_count`
+## Connections and pooling
 
-Signs of pool exhaustion: `too many clients`, `connection refused`, long queue wait times.
+Every engine has a finite connection budget, and exhausting it presents as slow queries
+rather than as a pool error: callers wait for a slot until a timeout fires.
 
-## Statistics and Cache
+Check for connections held open past their work — a transaction left open across an external
+call holds its slot for the whole call. Confirm the pool releases on every path, including
+error paths. Sizing the pool is an operational decision that depends on the deployment shape;
+`mk:devops` owns the runtime side of it.
 
-```sql
--- Update planner statistics (run if EXPLAIN estimates are far off)
-ANALYZE users;
-ANALYZE orders;
+## Statistics
 
--- Check table/index cache hit rate (should be >99% for hot tables)
-SELECT relname, heap_blks_hit::float / NULLIF(heap_blks_hit + heap_blks_read, 0) AS cache_ratio
-FROM pg_statio_user_tables
-ORDER BY heap_blks_read DESC;
-```
+When estimated and actual row counts disagree badly, refresh the planner's statistics for the
+affected tables using the engine's mechanism before concluding anything about indexes. A
+plan built on stale statistics will mislead every step that follows.

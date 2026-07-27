@@ -109,6 +109,24 @@ ended: 2026-04-08T15:18:00Z
 - **Run reports are append-only.** Don't edit prior steps' entries — the report is the audit trail.
 - **Resumable.** If the autobuild workflow is killed mid-run, `the autobuild skill --resume {run-id}` picks up at the last completed step.
 
+## `--advice` (composable, off by default)
+
+Opt-in strategic supervision for one run. At named macro checkpoints — GUIDE at the
+Plan/Contract boundary, RESCUE on a plateau or scope drift, REVIEW after the terminal
+evaluator verdict and before the Gate 2 question, RECHECK after a correction; hard cap
+5 — the `athena` agent assesses the situation, recommends an operational path inside the
+locked scope, and may return the work for correction.
+
+It never approves. Gate 2 stays human, the evaluator keeps its verdict and its
+active-verification hard gate, and the iteration cap and budget thresholds keep their own
+schedules. Checkpoints are macro boundaries — never per generated artifact and never per
+evaluator iteration, so a five-round build makes no more calls than a one-round build.
+
+Without the flag there are zero calls and no state is written.
+
+Checkpoints: `references/advice-checkpoints.md`. Contract: `.cursor/rules/domain-advice-supervision.mdc` (load only when the
+flag is present).
+
 ## References
 
 | File | Purpose |
@@ -130,6 +148,7 @@ ended: 2026-04-08T15:18:00Z
 | `../rubric/` | Rubric stage (Step 2/4) — rubric library |
 | `../evaluate/` | Evaluator stage (Step 4) — behavioral evaluator |
 | `../scale-routing/` | Tier + density emission |
+| `references/advice-checkpoints.md` | `--advice` checkpoint boundaries, caps, and what supervision may not touch |
 
 ## Start
 

@@ -1,0 +1,86 @@
+---
+title: "mk:api-design-principles"
+description: "Durable REST, GraphQL, RPC, and event API contracts — interface shape, error and authorization semantics, compatibility, deprecation, and pagination."
+---
+
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/api-design-principles/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/api-design-principles/SKILL.md) |
+| **Owner** | `portability` |
+| **Runtime** | `portable` |
+| **Risk** | high |
+
+{/* GENERATED:reference-facts END */}
+
+## What This Skill Does
+
+Authors and reviews the contract an API promises: interface shape, error and authorization
+semantics, compatibility, deprecation, and pagination. It discovers the existing consumers
+and conventions before recommending anything, so an extension matches the API it extends
+instead of the convention the author happens to prefer.
+
+It owns the contract only. Implementation, persistence, the security verdict, and release
+each belong to a different owner.
+
+## When to Use
+
+- Designing a new public or shared API contract
+- Reviewing an existing contract for consistency, compatibility, or error semantics
+- Deciding whether a change is additive or breaking, and how to deprecate
+- Choosing an interface style on greenfield work, from evidence rather than habit
+- **NOT for:** implementing the handler (`mk:backend-development`), schema or query work
+  (`mk:database`), infrastructure and release (`mk:devops`), or the security verdict
+
+## Ownership Boundary
+
+| Owner | Owns |
+|---|---|
+| `mk:api-design-principles` | Interface contract, error/authorization requirements, compatibility, consumer discovery |
+| `mk:backend-development` | The end-to-end backend change that implements it |
+| `mk:database` | Data invariants, schema, migrations, query and index evidence |
+| `mk:devops` | Infrastructure, delivery, deployment safety, rollback |
+
+A contract-only question stays here even in the middle of a backend task. A backend task
+loads this skill only when a new, public, or breaking contract is in scope.
+
+## Arguments
+
+`[contract or review] [--rest|--graphql|--rpc|--event]`
+
+## Workflow
+
+1. **Discover** — existing consumers, contract surface, versioning scheme, error envelope,
+   pagination shape, and contract tests
+2. **Classify the interface** — preserve the discovered style; on greenfield, justify the
+   choice from client shape, query flexibility, streaming need, and consumer ownership
+3. **Model the contract** — shape, authorization requirement, validation and error
+   semantics, and only the idempotency, concurrency, or pagination the use case needs
+4. **Review with examples** — success, invalid, forbidden, conflict/not-found, and evolution
+5. **Hand off** — implementation, persistence, security verdict, release
+
+## References
+
+| File | Load when |
+|---|---|
+| `references/rest-principles.md` | The contract is HTTP-shaped |
+| `references/graphql-principles.md` | The contract is a GraphQL schema |
+
+An RPC, event, or webhook contract loads neither — the same discipline applies in message
+terms, described in the skill body.
+
+## Output
+
+A compact contract decision record: discovered evidence, consumer set and stability class,
+style rationale, contract delta, error/authorization/compatibility semantics, validation
+proof, and handoffs.
+
+## Pro Tips
+
+- **Consistency with the shipped contract beats any convention.** A "correct" endpoint that
+  disagrees with its neighbours is the defect.
+- **Breaking is anything a current consumer can observe** — including a tightened validation
+  rule or a changed status code, not just a removed field.
+- **Do not invent a page size, rate limit, or sunset window.** Read it from the repository,
+  or ask.

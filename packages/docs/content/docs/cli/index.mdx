@@ -10,7 +10,7 @@ MeowKit ships one CLI package, `mewkit`. Run it from your project root; there is
 | You want to | Page |
 |---|---|
 | Create a project, configure it, check it is healthy, upgrade it | [Project Setup](/cli/project-setup) |
-| Write a plan, create a task, see where a task stands | [Planning and Tasks](/cli/planning) |
+| Write a plan, create a task, see where a task stands, record a supervised run | [Planning and Tasks](/cli/planning) |
 | Review a pull request across several sittings | [Review](/cli/review) |
 | Read or write memory, check the context budget, use the wiki | [Memory and Knowledge](/cli/knowledge) |
 | Export the kit to Codex or Cursor, or see what they support | [Portability](/cli/portability) |
@@ -188,6 +188,35 @@ Subcommands: `show`, `update`.
 | `--verification` `<value>` | Record a verification as ref=result, repeatable |
 | `--evidence-ref` `<value>` | Record an evidence reference, repeatable |
 | `--capability-decision` `<value>` | Record a capability decision as capId\|decision\|reason, repeatable |
+
+### `mewkit advice`
+
+Bounded supervision checkpoints for --advice; records evidence, approves nothing.
+
+Subcommands: `begin`, `commit`, `status`, `validate-packet`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--provider` `<value>` | Runtime recorded on the receipt |
+| `--next` `<value>` | The next safe action recorded on the dossier and receipt |
+| `--run` `<value>` | Supervision run id (embedded supervision requires one) |
+| `--skill` `<value>` | The skill running the checkpoint, e.g. mk:fix |
+| `--stage` `<value>` | Checkpoint stage: GUIDE, RESCUE, REVIEW, RECHECK |
+| `--checkpoint` `<value>` | Named checkpoint id; repeating one is idempotent |
+| `--disposition` `<value>` | The returned disposition, recorded verbatim |
+| `--outcome` `<value>` | What the parent did with it: adopted, rejected, deferred |
+| `--reason` `<value>` | Why the outcome was chosen; required even when the directive was adopted |
+| `--question` `<value>` | The exact question the checkpoint asked |
+| `--directive` `<value>` | The returned directive, summarized |
+| `--correction` `<value>` | A required correction, repeatable |
+| `--evidence-pointer` `<value>` | An evidence pointer, repeatable |
+| `--slug` `<value>` | Slug used in the receipt filename; defaults to the run id |
+| `--task-id` `<value>` | Active durable task id, or omit for none |
+| `--evidence` `<value>` | Path to the workflow evidence index a correction supersedes, or the packet/brief to validate |
+| `--correction-kind` `<value>` | source (keeps Gate 1) or scope (invalidates it) |
+| `--packet-kind` `<value>` | validate-packet shape: input, output, or brief (direct consult) |
+| `--release-stage` `<value>` | Ship scope the call is budgeted against: prepare, release, publish |
 
 ### `mewkit orient`
 

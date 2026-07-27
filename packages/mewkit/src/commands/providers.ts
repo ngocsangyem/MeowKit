@@ -7,6 +7,7 @@ import {
 } from "../migrate/provider-support-summary.js";
 import { describeProvider, ADAPTED_PROVIDERS, type ProviderAdapterView } from "../core/provider-adapter.js";
 import { LIFECYCLE_EVENTS } from "../core/provider-lifecycle.js";
+import { readAdviceSupport, type AdviceSupportState } from "../core/advice-support-report.js";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { discoverSkills } from "../migrate/discovery/index.js";
@@ -145,11 +146,46 @@ function printProviderDetail(provider: ProviderSupportInfo): void {
 			console.log(`  ${" ".repeat(24)}${pc.dim(surface.note)}`);
 		}
 	}
+	printAdviceSupport(provider.id);
 	if (provider.docs.length > 0) {
 		console.log();
 		console.log(pc.bold("Docs"));
 		for (const doc of provider.docs) console.log(`  ${doc}`);
 	}
+}
+
+/** Per-provider `--advice` support. Embedded supervision and a direct consult are separate
+ *  capabilities and are always printed separately — collapsing them would let one runtime's
+ *  proven consult imply supervision it has never run. */
+function printAdviceSupport(providerId: string): void {
+	const report = readAdviceSupport(providerId);
+	if (report === null) return;
+	console.log();
+	console.log(pc.bold("Advice supervision (`--advice`)"));
+	for (const cap of report.capabilities) {
+		console.log(`  ${pad(cap.capability, 24)} ${formatAdviceState(cap.state)} ${pc.dim(`(${cap.evidence} evidence)`)}`);
+		if (cap.blockedBy !== undefined) console.log(`  ${" ".repeat(24)}${pc.dim(`blocked by: ${cap.blockedBy}`)}`);
+	}
+	if (report.mutationBan !== null) {
+		const mb = report.mutationBan;
+		console.log(`  ${pad("mutation ban", 24)} ${formatAdviceState(mb.state)} ${pc.dim(`(${mb.enforcement})`)}`);
+	}
+	if (report.adapter !== null) console.log(`  ${pc.dim("Adapter:")} ${report.adapter}`);
+	if (report.contract !== null) console.log(`  ${pc.dim("Contract:")} ${report.contract}`);
+	console.log(
+		pc.dim(
+			report.source === "authored-bundle"
+				? "  Declared by the authored bundle. Structural evidence never claims support — only a recorded live run does."
+				: "  Derived from the capability registry: no recorded live run for this provider.",
+		),
+	);
+}
+
+function formatAdviceState(state: AdviceSupportState): string {
+	if (state === "supported") return pc.green(state);
+	if (state === "degraded") return pc.yellow(state);
+	if (state === "unavailable") return pc.dim(state);
+	return pc.yellow(state);
 }
 
 function printProviderNames(matrix: ProviderSupportMatrix): void {

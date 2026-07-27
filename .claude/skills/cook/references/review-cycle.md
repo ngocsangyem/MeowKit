@@ -60,6 +60,24 @@ LOOP:
 
 Before presenting Gate 2 (either cycle), the workflow evidence index must be complete: run `validate-gate-2.sh` (authoritative structural guard) AND `node .claude/scripts/validate-workflow-evidence.cjs <path> --phase cook` (completeness mirror). Surface both; neither approves — they gate on structure/completeness only. See `workflow-steps.md` → Workflow Evidence Index.
 
+## Returned Work (`--advice` runs only)
+
+A `RETURN_TO_EXECUTOR` from the REVIEW checkpoint is **not** a review verdict and
+does not enter this cycle as one. It fires BEFORE the reviewer is spawned:
+
+1. Route each required correction to its current owner — planner, developer, tester,
+   whoever owns that artifact. Never to Athena, which cannot edit anything.
+2. The owner addresses each correction or records why it is rejected.
+3. Supersede the stale evidence and re-run the normal checks
+   (`workflow-steps.md` → Advice Checkpoints). Phase 3.6 Verify runs again before the
+   reviewer, because its previous output describes code that no longer exists.
+4. RECHECK once. A second unresolved return escalates to a human — there is no third
+   opinion, and the reviewer's own verdict is still the Gate 2 input either way.
+
+Athena never emits PASS/WARN/FAIL and never records a security clearance. It may
+detect that the evidence contradicts itself and route the work back; the verdict
+stays with `reviewer`, `evaluator` and `security`.
+
 ## Regression Recovery Options
 
 When the reviewer surfaces a regression, side effect, or broken workflow (verdict includes `Side Effects Detected: Yes` OR a FAIL dimension citing existing-behavior break):

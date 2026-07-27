@@ -355,3 +355,128 @@ describe("reconcileApplyCodexBundle — directory (tree-hashed) entries", () => 
 		expect(readFileSync(join(target, ".agents", "skills", "fix", "SKILL.md"), "utf-8")).toBe("# fix\n");
 	});
 });
+
+/**
+ * Build a pack-enabled module whose skills tree contains exactly `skills`. Pack expansion is
+ * what gives each installed skill its own ledger row, which is the provenance the retired-skill
+ * cleanup reasons over — an aggregate whole-tree entry produces no per-skill row and no candidate.
+ */
+function makePackModule(dir: string, skills: string[]): void {
+	rmSync(join(dir, "root", ".agents", "skills"), { recursive: true, force: true });
+	for (const s of skills) {
+		mkdirSync(join(dir, "root", ".agents", "skills", s), { recursive: true });
+		writeFileSync(join(dir, "root", ".agents", "skills", s, "SKILL.md"), `# ${s}\n`);
+	}
+	mkdirSync(join(dir, "catalog"), { recursive: true });
+	writeFileSync(
+		join(dir, "catalog", "skill-packs.json"),
+		JSON.stringify({
+			budgetChars: 8000,
+			defaultPack: "development",
+			packs: { development: { description: "dev", dependsOn: [], skills } },
+		}),
+	);
+	writeFileSync(
+		join(dir, "manifest.json"),
+		JSON.stringify({
+			version: "1.0",
+			provider: "codex",
+			generatedFrom: "test",
+			entries: [
+				{
+					sourcePath: "root/.agents/skills",
+					targetPath: ".agents/skills",
+					provider: "codex",
+					mode: "0644",
+					ownership: "managed-replace",
+					scopeTags: ["managed-runtime"],
+					active: false,
+				},
+			],
+		}),
+	);
+}
+
+describe("reconcileApplyCodexBundle — retired skill cleanup on upgrade", () => {
+	let moduleDir: string;
+	let target: string;
+	const opts = { adoptHomeRegistry: false as const, packs: ["development"] };
+
+	beforeEach(() => {
+		moduleDir = mkdtempSync(join(tmpdir(), "codex-rmod-"));
+		target = mkdtempSync(join(tmpdir(), "codex-rtgt-"));
+		makePackModule(moduleDir, ["mk-api-design", "mk-database"]);
+	});
+	afterEach(() => {
+		rmSync(moduleDir, { recursive: true, force: true });
+		rmSync(target, { recursive: true, force: true });
+	});
+
+	it("upgrading past the rename installs the replacement and removes the pristine old dir", async () => {
+		await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+		expect(existsSync(join(target, ".agents", "skills", "mk-api-design", "SKILL.md"))).toBe(true);
+
+		// The next release renames the entry point and adds the two new skills.
+		makePackModule(moduleDir, ["mk-api-design-principles", "mk-backend-development", "mk-database", "mk-devops"]);
+		const upgrade = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+
+		expect(existsSync(join(target, ".agents", "skills", "mk-api-design-principles", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".agents", "skills", "mk-backend-development", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".agents", "skills", "mk-devops", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".agents", "skills", "mk-api-design"))).toBe(false);
+		expect(upgrade.retired).toEqual([
+			expect.objectContaining({ skill: "mk-api-design", action: "delete", removed: true }),
+		]);
+
+		const rerun = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+		expect(rerun.retired).toEqual([]);
+		expect(rerun.writes).toBe(0);
+	});
+
+	it("a user-modified old dir survives the upgrade and is reported, even with --force", async () => {
+		await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+		const edited = join(target, ".agents", "skills", "mk-api-design", "SKILL.md");
+		writeFileSync(edited, "# my own copy\n");
+
+		makePackModule(moduleDir, ["mk-api-design-principles", "mk-database"]);
+		const upgrade = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target, force: true });
+
+		expect(readFileSync(edited, "utf-8")).toBe("# my own copy\n");
+		expect(upgrade.retired).toEqual([
+			expect.objectContaining({ skill: "mk-api-design", action: "skip", removed: false }),
+		]);
+	});
+
+	it("a dry-run upgrade plans the removal but changes nothing on disk", async () => {
+		await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+		makePackModule(moduleDir, ["mk-api-design-principles", "mk-database"]);
+
+		const plan = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target, dryRun: true });
+
+		expect(plan.retired).toEqual([
+			expect.objectContaining({ skill: "mk-api-design", action: "delete", removed: false }),
+		]);
+		expect(existsSync(join(target, ".agents", "skills", "mk-api-design", "SKILL.md"))).toBe(true);
+		expect(existsSync(join(target, ".agents", "skills", "mk-api-design-principles"))).toBe(false);
+	});
+
+	it("installing a narrower pack never reads as retirement of the skills left out", async () => {
+		await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+
+		// Same bundle, but only one pack member selected. mk-database is still authored.
+		writeFileSync(
+			join(moduleDir, "catalog", "skill-packs.json"),
+			JSON.stringify({
+				budgetChars: 8000,
+				defaultPack: "development",
+				packs: {
+					development: { description: "dev", dependsOn: [], skills: ["mk-api-design"] },
+				},
+			}),
+		);
+		const narrowed = await reconcileApplyCodexBundle(moduleDir, target, { ...opts, projectRoot: target });
+
+		expect(narrowed.retired).toEqual([]);
+		expect(existsSync(join(target, ".agents", "skills", "mk-database", "SKILL.md"))).toBe(true);
+	});
+});

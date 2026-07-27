@@ -35,6 +35,67 @@ function nonEmptyArray(v) {
   return Array.isArray(v) && v.length > 0 && v.every((x) => nonEmptyString(x));
 }
 
+// --- Evidence revision / supersession ---------------------------------------
+// Mirrors packages/mewkit/src/core/workflow-evidence-revision.ts. That module is the
+// semantic owner (it also APPLIES corrections); this is the shipped checker for
+// projects with no TypeScript build. A parity test runs both over shared fixtures,
+// because two implementations of one rule drift and the looser one quietly wins.
+//
+// Absent fields mean revision 1 and nothing superseded, so an index written before
+// this mechanism existed still validates. The feature is additive by construction.
+
+function currentRevision(ev) {
+  return Number.isInteger(ev.evidenceRevision) ? ev.evidenceRevision : 1;
+}
+
+function scopeRevision(ev) {
+  return Number.isInteger(ev.scopeRevision) ? ev.scopeRevision : 0;
+}
+
+function isSuperseded(rec, current) {
+  if (!rec) return false;
+  const at = Number.isInteger(rec.evidenceRevision) ? rec.evidenceRevision : current;
+  return at < current || rec.status === 'superseded';
+}
+
+// Returns reason strings for revision/supersession violations.
+function supersessionReasons(ev) {
+  const reasons = [];
+  const current = currentRevision(ev);
+  if (!Number.isInteger(current) || current < 1) return ['invalid-evidenceRevision'];
+  if (scopeRevision(ev) > current) reasons.push('scopeRevision-ahead-of-evidenceRevision');
+
+  for (const field of ['verification', 'review']) {
+    const rec = ev[field];
+    if (!rec) continue;
+    const at = rec.evidenceRevision;
+    if (at !== undefined && (!Number.isInteger(at) || at < 1 || at > current)) {
+      reasons.push(`${field}-revision-out-of-range`);
+      continue;
+    }
+    // A stored `valid` over stale evidence is refused, not corrected: whoever wrote it
+    // is exactly the caller a later reader would have trusted.
+    const staleByRevision = (Number.isInteger(at) ? at : current) < current;
+    if (rec.status === 'valid' && staleByRevision) reasons.push(`stale-${field}-marked-valid`);
+  }
+
+  const approvals = ev.approvals || {};
+  if (approvals.gate2 === 'approved' && isSuperseded(ev.review, current)) {
+    reasons.push('gate2-approved-on-superseded-review');
+  }
+  if (approvals.gate2 === 'approved' && isSuperseded(ev.verification, current)) {
+    reasons.push('gate2-approved-on-superseded-verification');
+  }
+  // Gate 1 covers a SCOPE. Once scope moves past the approval, that approval
+  // describes a plan that is no longer the one being built.
+  if (approvals.gate1 === 'approved') {
+    const approvedAt = Number.isInteger(approvals.gate1Revision) ? approvals.gate1Revision : 0;
+    if (scopeRevision(ev) > approvedAt) reasons.push('gate1-approved-before-scope-change');
+  }
+
+  return [...new Set(reasons)];
+}
+
 // Returns an array of reason strings; empty array means the evidence is OK.
 function validate(ev, opts) {
   const reasons = [];
@@ -55,6 +116,11 @@ function validate(ev, opts) {
   // verification.commands must be non-empty by the time review/approval runs.
   const verification = ev.verification || {};
   if (!nonEmptyArray(verification.commands)) reasons.push('empty-verification-commands');
+
+  // Revision / supersession invariants. A returned correction advances the revision
+  // and marks Verify + review stale; these keep that stale proof from reading as
+  // current at a later gate or at ship preflight.
+  reasons.push(...supersessionReasons(ev));
 
   // Gate 2 cannot be marked approved without a verdict pointer.
   const approvals = ev.approvals || {};
@@ -164,8 +230,37 @@ function selfTest() {
   const brokenCook = JSON.parse(JSON.stringify(validCook));
   brokenCook.cookContract.scopeBoundary = [];
 
+  // Supersession samples: a correction advanced the source revision, so the Verify
+  // and review evidence recorded at the earlier revision no longer describes the code.
+  const supersededReview = JSON.parse(JSON.stringify(validFix));
+  supersededReview.evidenceRevision = 2;
+  supersededReview.verification.evidenceRevision = 2;
+  supersededReview.review.evidenceRevision = 1;
+  supersededReview.approvals.gate2 = 'approved';
+
+  const staleMarkedValid = JSON.parse(JSON.stringify(validFix));
+  staleMarkedValid.evidenceRevision = 3;
+  staleMarkedValid.verification.evidenceRevision = 1;
+  staleMarkedValid.verification.status = 'valid';
+
+  const scopeChanged = JSON.parse(JSON.stringify(validCook));
+  scopeChanged.evidenceRevision = 2;
+  scopeChanged.scopeRevision = 2;
+  scopeChanged.approvals.gate1 = 'approved'; // approved before the scope moved
+
+  const correctedThenRerun = JSON.parse(JSON.stringify(validFix));
+  correctedThenRerun.evidenceRevision = 2;
+  correctedThenRerun.verification.evidenceRevision = 2;
+  correctedThenRerun.verification.status = 'valid';
+  correctedThenRerun.review.evidenceRevision = 2;
+  correctedThenRerun.review.status = 'valid';
+
   const cases = [
     ['valid-fix', validFix, { phase: 'fix' }, true],
+    ['superseded-review-under-gate2', supersededReview, { phase: 'fix' }, false],
+    ['stale-verification-marked-valid', staleMarkedValid, { phase: 'fix' }, false],
+    ['gate1-approved-before-scope-change', scopeChanged, { phase: 'cook' }, false],
+    ['corrected-then-rerun-is-current', correctedThenRerun, { phase: 'fix' }, true],
     ['broken-fix', brokenFix, { phase: 'fix' }, false],
     ['broken-gate', brokenGate, { phase: 'fix' }, false],
     ['valid-cook', validCook, { phase: 'cook' }, true],

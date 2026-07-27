@@ -86,6 +86,19 @@ export const AUTHORED_CAPABILITIES: CapabilityEntry[] = [
 		// Provided by the `mewkit trace` subcommand — availability = CLI present.
 		requirements: [{ type: "external_binary", id: "mewkit", provenance: "authored" }],
 	}),
+	authored({
+		id: "advice-supervision",
+		kind: "agent",
+		description:
+			"Athena provides bounded strategic supervision at declared --advice checkpoints and a stateless direct strategy consult where a provider exposes it. Recommendations are evidence, never gate approval or verification.",
+		intents: ["strategic judgement", "decision recommendation", "delivery supervision"],
+		whenToUse:
+			"Use --advice for a bounded delivery run, or explicitly consult Athena for a stateless strategy brief when the situation needs trade-off analysis, judgement, or a recommended next decision.",
+		// `support` stays EMPTY: delegation has not been proven against a live session on any
+		// provider yet, and absence reads as unknown rather than as a claim. Populate a provider
+		// only from a recorded smoke run — never from the fact that the files exist.
+		requirements: [{ type: "file_or_config", id: ".claude/agents/athena.md", provenance: "authored" }],
+	}),
 ];
 
 /**

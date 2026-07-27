@@ -1,11 +1,13 @@
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { copyAuthoredCodexBundle, resolveCodexModuleDir } from "../codex-authored-bundle.js";
 import {
 	expandSkillsEntry,
+	loadSkillPackCatalog,
 	packSelectionBudgetWarning,
+	resolveBundleSkillsRoot,
 	resolvePackSelection,
 	validateSkillPackCatalog,
 	type SkillPackCatalog,
@@ -79,6 +81,33 @@ describe("validateSkillPackCatalog (shipped catalog)", () => {
 		expect(packSelectionBudgetWarning(moduleDir, [])).toBeNull(); // core
 		const warn = packSelectionBudgetWarning(moduleDir, ["integrations"]); // core + integrations
 		expect(warn).toMatch(/over Codex's \d+-char discovery budget/);
+	});
+});
+
+// Codex is counted explicitly here, not inferred from Cursor's characterization. The two
+// bundles do not start from the same number — Codex ships one skill Cursor does not — so a
+// Cursor-only count assertion lets the two roots drift apart unnoticed.
+describe("codex shipped surface (explicit counts)", () => {
+	const catalog = loadSkillPackCatalog(moduleDir);
+
+	it("resolves exactly 129 skills across all packs, matching the on-disk skill dir count", () => {
+		expect(catalog).not.toBeNull();
+		const { skills } = resolvePackSelection(catalog!, "all");
+		expect(skills.length).toBe(129);
+
+		const onDisk = readdirSync(resolveBundleSkillsRoot(moduleDir), { withFileTypes: true })
+			.filter((d) => d.isDirectory())
+			.map((d) => d.name);
+		expect(onDisk.length).toBe(129);
+		expect([...skills].sort()).toEqual([...onDisk].sort());
+	});
+
+	it("the development pack carries the four backend-domain skills and not the retired API id", () => {
+		const { skills } = resolvePackSelection(catalog!, ["development"]);
+		for (const id of ["mk-api-design-principles", "mk-backend-development", "mk-database", "mk-devops"]) {
+			expect(skills.filter((s) => s === id)).toEqual([id]);
+		}
+		expect(skills).not.toContain("mk-api-design");
 	});
 });
 

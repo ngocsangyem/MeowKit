@@ -16,9 +16,11 @@ Advisory only — does not change agent-detector scoring or output format.
 | Stress-test / interrogate my OWN plan or design ("grill me", "get grilled on my design") until every branch is resolved | Plan | mk:grill (one question at a time; checkpoints to `docs/knowledge/<slug>.md`; NOT proposing options — see mk:brainstorming; NOT "should we build this" — see mk:office-hours; NOT Codex answering repo questions — see mk:ask-me) |
 | UI/frontend work | Build | mk:frontend-design, mk:cook |
 | Review my Vue feature code / "Vue best practices" / ordered Vue authoring workflow | Build | mk:vue-best-practices (deep review + workflow; NOT everyday authoring — see mk:vue; NOT test code — see mk:vue-testing-best-practices) |
-| API/backend work | Build | mk:api-design, mk:cook |
+| API contract design or review — interface shape, error semantics, compatibility, pagination | Plan | mk:api-design-principles |
+| Backend change end to end — handler, service, integration, webhook, job | Build | mk:backend-development, mk:cook |
+| Infrastructure, containers, CI/CD, deployment safety, rollback | Build | mk:devops |
 | Need library/API docs | Build | mk:docs-finder |
-| Database work | Build | mk:database, mk:cook |
+| Schema, migration, query, index, or ORM data-access boundary | Build | mk:database, mk:cook |
 | Writing or running tests | Verify | mk:testing, mk:qa |
 | Design or review Vue test code; choose Vue test tooling ("review my Vue tests", "how should I test this component/composable/store") | Verify | mk:vue-testing-best-practices (advisory test-design + review; NOT running tests — see mk:testing; NOT feature code — see mk:vue-best-practices) |
 | Something broke, debugging | Verify | mk:investigate, mk:fix |

@@ -42,7 +42,10 @@ Fully automated ship workflow. Non-interactive — runs straight through and out
 /mk:ship beta             # Ship to dev/beta (prerelease suffix)
 /mk:ship --skip-tests     # Skip tests (already passed this session)
 /mk:ship --dry-run        # Preview without executing
+/mk:ship release --advice  # Strategic supervision for this stage
 ```
+
+`--advice` is opt-in strategic supervision by the [athena](/reference/agents/athena) agent: direction once the scope is resolved and pre-flight has run, rescue on an exceptional blocker, and a read of the outcome after CI reaches a terminal green state. The budget is **4 calls per release stage** — `prepare`, `release` and `publish` each carry their own. Counsel is never authorization: it creates no authority to push, open a PR, merge, version, publish, or deploy, and red or pending CI keeps its existing repair-or-stop route.
 
 ## Example Prompt
 

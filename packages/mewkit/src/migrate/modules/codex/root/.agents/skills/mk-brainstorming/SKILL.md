@@ -41,9 +41,24 @@ Use at least two alternatives. Quick returns 2-4; deep generates 3-8 and never m
 4. Run one anti-bias pivot, then the challenge pass in `references/challenge-pass.md` before recommending.
 5. Load scoring only for deep scoring. Write a report, HTML output, or handoff only when requested or needed by an active plan. For a requested report, an optional `mewkit wiki handoff suggest` follows `.agents/skills/wiki/references/terminal-handoff-advisory.md`; it is fail-open and never runs for quick.
 
+## `--advice` (composable, off by default)
+
+Opt-in strategic supervision for one run, **deep workflow only**. GUIDE fires after the
+frame and before generation, REVIEW after the challenge pass and before the
+recommendation reaches the user; hard cap 4.
+
+Athena supplies decision criteria and reads the chosen direction. It never generates the
+option set, scores it, chooses for the user, or adds a gate.
+
+Without the flag there are zero calls and no state is written.
+
+Checkpoints: `references/advice-checkpoints.md`. Contract: `.agents/skills/rule-advice-supervision/SKILL.md` (load only when the
+flag is present).
+
 ## References
 
 - `references/context-budget.md` — deep clarification, count, pivot, and challenge limits
 - `references/techniques/` — choose one technique for a deep run
 - `references/challenge-pass.md` and `references/scoring-criteria.md` — deep convergence only
 - `references/editorial-html.md` — HTML only for a requested report
+- `references/advice-checkpoints.md` — `--advice` checkpoint boundaries, caps, and what supervision may not touch

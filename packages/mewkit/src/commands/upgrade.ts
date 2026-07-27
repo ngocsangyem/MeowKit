@@ -17,6 +17,7 @@ import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.
 import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
 import { resolveCursorModuleDir } from "../migrate/modules/cursor-authored-bundle.js";
 import { reconcileApplyCursorBundle } from "../migrate/modules/cursor-reconcile-apply.js";
+import { describeRetiredSkills } from "../migrate/modules/retired-skill-cleanup.js";
 import { meowkitStatePaths } from "../state/meowkit-state-paths.js";
 
 /** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
@@ -55,6 +56,7 @@ async function refreshCursorBundle(projectDir: string): Promise<void> {
 		);
 		for (const c of result.conflicts) console.log(pc.dim(`    ${c.targetPath}`));
 	}
+	for (const line of describeRetiredSkills(result.retired)) console.log(pc.dim(`  ${line}`));
 }
 
 /** After a `.claude/` upgrade, re-export to any installed downstream provider toolkit
@@ -115,6 +117,7 @@ async function upgradeCodexToolkit(projectDir: string): Promise<void> {
 		);
 		for (const c of result.conflicts) console.log(pc.dim(`    ${c.targetPath}`));
 	}
+	for (const line of describeRetiredSkills(result.retired)) console.log(pc.dim(`  ${line}`));
 }
 
 /** A cursor-only project (from `init --target cursor`) has no `.claude/`; upgrade it by

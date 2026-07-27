@@ -190,6 +190,13 @@
       "runtime": "claude-code",
       "responsibility": "project-memory"
     },
+    "rules-conditional/advice-supervision-rules.md": {
+      "owner": "research",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "failure-attribution"
+    },
     "rules-conditional/agile-feedback-cycle.md": {
       "owner": "utility",
       "criticality": "medium",

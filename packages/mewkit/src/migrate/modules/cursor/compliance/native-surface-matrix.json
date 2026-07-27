@@ -57,6 +57,28 @@
 						"cloud": "not-claimed",
 						"tab": "not-claimed"
 					}
+				},
+				{
+					"claim": "athena (the --advice supervisor) is discovered from .cursor/agents/athena.md and dispatched in the foreground, blocking until it returns one checkpoint packet or — when delegated directly with no packet — one strategy brief. These are two separate capabilities with separate states (see capability-coverage.json → adviceSupervision); neither is exercised against a live Cursor binary yet, and foreground delegate-and-wait has open reliability reports skewed toward the cursor-agent CLI (subagent availability history, stuck prompts, premature main-thread end). Until a wrapper on this plane declares --advice, every wrapper prints its documented unavailable-checkpoint line and continues unsupervised.",
+					"source": "https://cursor.com/docs/agent/subagents",
+					"verified": "2026-07-26",
+					"environments": {
+						"ide-local": "undocumented",
+						"cli-headless": "undocumented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
+				},
+				{
+					"claim": "athena's no-mutation rule is enforced structurally by readonly: true on this surface, unlike the Codex plane where the equivalent ban is behavioral-only. The flag's runtime effect has not been live-verified for this agent, so the declared state stays unverified (capability-coverage.json → adviceSupervision.mutationBan) — structural enforcement is a property of the declaration, not a proof that it holds at runtime.",
+					"source": "https://cursor.com/docs/agent/subagents",
+					"verified": "2026-07-26",
+					"environments": {
+						"ide-local": "documented",
+						"cli-headless": "documented",
+						"cloud": "not-claimed",
+						"tab": "not-claimed"
+					}
 				}
 			]
 		},

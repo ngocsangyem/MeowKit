@@ -23,8 +23,20 @@ cd "$ROOT" || { echo "Cannot cd to $ROOT" >&2; exit 1; }
 # File types swept: .md, .sh, .cjs, .json, .py, .yaml, .toml under .claude/, plus
 # top-level CLAUDE.md and docs/. Also packages/ to catch references in mewkit
 # source code (e.g., smart-update-utils.ts exclusion list).
+#
+# `.mdx` is swept because the published docs are authored in it; omitting it left
+# every reference in packages/docs/content unchecked.
+#
+# Test trees, release history and generated build output are pruned instead. Tests
+# assert scanner behavior on deliberately absent paths, so a fixture literal is not
+# a reference a reader could follow; build output is a rendered copy of sources
+# already swept, and being untracked it makes the result depend on whether someone
+# ran a build. Release notes record rule files as they were when a release removed
+# or consolidated them — those paths are meant to be unresolvable, and rewriting
+# them to satisfy this check would falsify the history.
 SWEEP_GLOBS=(
   --include='*.md'
+  --include='*.mdx'
   --include='*.sh'
   --include='*.cjs'
   --include='*.js'
@@ -34,6 +46,14 @@ SWEEP_GLOBS=(
   --include='*.yaml'
   --include='*.yml'
   --include='*.toml'
+  --exclude-dir='__tests__'
+  --exclude-dir='__fixtures__'
+  --exclude-dir='changelog'
+  --exclude-dir='node_modules'
+  --exclude-dir='dist'
+  --exclude-dir='.next'
+  --exclude-dir='.nuxt'
+  --exclude-dir='.output'
 )
 
 SWEEP_PATHS=(.claude CLAUDE.md docs packages tasks)

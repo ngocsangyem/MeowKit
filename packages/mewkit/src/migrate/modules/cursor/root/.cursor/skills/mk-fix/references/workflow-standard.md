@@ -52,3 +52,53 @@ Use reviewer agent. See `references/review-cycle.md`.
 - Update docs if needed via documenter agent
 
 **Output:** `Step 6: Complete — [action]`
+
+## Advice Checkpoints (`--advice` only)
+
+Skip this whole section unless the run was invoked with `--advice`. Without the flag
+there are zero supervision calls and nothing here loads.
+
+On the first checkpoint of a run, read `.cursor/rules/domain-advice-supervision.mdc` — it is the contract this section
+implements, and it holds the call protocol every checkpoint follows.
+
+### Checkpoints
+
+| Stage | Fires at | Condition | Max |
+|---|---|---|---:|
+| GUIDE | Step 3, before the first edit | Root cause is confirmed, or a diagnostic report was handed off | 1 |
+| RESCUE | Step 3 | Two distinct fix approaches have failed, OR the evidence contradicts itself, OR the step is irreversible (security boundary, public contract, possible data loss) | 2 |
+| REVIEW | Step 4→5 boundary, after Verify and before the normal review | always, when the flag is on | 1 |
+| RECHECK | after corrections from a `RETURN_TO_EXECUTOR` | only after a return | 1 |
+
+Hard cap **5 calls per run**, charged as `--skill mk-fix`. Checkpoints are macro
+boundaries — never per tool call, per loop iteration, or per file.
+
+The RESCUE trigger does not replace or postpone the three-failed-attempt human STOP in
+`SKILL.md`. That stop fires on its own schedule whether or not supervision was taken at
+two failures.
+
+### What each checkpoint asks
+
+- **GUIDE** — given this root cause, which fix path carries the least risk, and what
+  proof would show it worked?
+- **RESCUE** — two approaches failed on this evidence; what does the evidence actually
+  support, and what would disconfirm the current hypothesis?
+- **REVIEW** — does the evidence cover the reported bug and its regression, or does this
+  go back?
+- **RECHECK** — were the corrections addressed and proven?
+
+### Boundaries
+
+**Supervision is evidence, not authority.** It cannot pass, clear, or unblock any gate,
+and it is never counted as verification. Verification stays with the Verify step's tests
+and the review verdict.
+
+If the runtime cannot delegate to `athena`, print exactly
+
+```
+advice checkpoint unavailable in this runtime: <reason>
+```
+
+and continue unsupervised. Never write a packet inline and present it as the agent's —
+that is not an independent check, and a receipt produced that way records supervision
+that never happened.

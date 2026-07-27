@@ -32,6 +32,7 @@ A bare “brainstorm” request is ambiguous. The skill asks whether the user ne
 
 - `--depth quick` (default): restates the decision, gives 2-4 technical options and a recommendation inline, then stops. It creates no report, plan, wiki candidate, memory entry, or handoff.
 - `--depth deep`: generates 3-8 approaches, runs one anti-bias pivot and challenge pass, and can score or report findings when requested or needed by an active plan.
+- `--advice` (deep only): opt-in strategic supervision by the [athena](/reference/agents/athena) agent — it supplies the decision criteria before generation and reads the chosen direction after the challenge pass, up to 4 calls. It never generates the option set, scores it, chooses for the user, or adds a gate. The quick profile creates no artifact to supervise, so the flag does not apply there.
 
 ## Usage
 

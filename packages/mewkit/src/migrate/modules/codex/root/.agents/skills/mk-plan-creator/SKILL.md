@@ -124,6 +124,20 @@ tasks/plans/YYMMDD-name/
 - **Post-hydration integrity-check failure is a hard stop**: cycle / count-mismatch / missing-metadata failures print an explicit diff and STOP — do NOT auto-recover or silently continue. Human resolution required before step-09. See `references/task-management.md` "Post-Hydration Integrity Checks".
 - **Re-analyzing a design source that already has a packet duplicates interpretation**: when a design evidence packet path is present, cite the packet — do NOT call the design source's tools or re-parse its raw JSON. See `references/design-evidence-consumption.md`.
 
+## `--advice` (composable, off by default)
+
+Opt-in strategic supervision for one planning run, capped at 4 calls: GUIDE after the
+scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before the gate
+step, RECHECK after a correction.
+
+Athena reads the plan and can return it to the planner. It never writes the plan and never
+approves Gate 1.
+
+Without the flag there are zero calls and no state is written.
+
+Checkpoints: `references/advice-checkpoints.md`. Contract: `.agents/skills/rule-advice-supervision/SKILL.md` (load only when the
+flag is present).
+
 ## References
 
 | File                                               | Purpose                                                                                                                                                                                                              |
@@ -173,6 +187,7 @@ tasks/plans/YYMMDD-name/
 | `references/workflow-models/bugfix-model.md`       | Workflow template for bug fix tasks (loaded JIT by step-00)                                                                                                                                                          |
 | `references/workflow-models/refactor-model.md`     | Workflow template for refactor tasks (loaded JIT by step-00)                                                                                                                                                         |
 | `references/workflow-models/security-model.md`     | Workflow template for security tasks (loaded JIT by step-00)                                                                                                                                                         |
+| `references/advice-checkpoints.md` | `--advice` checkpoint boundaries, caps, and what supervision may not touch |
 
 ## Known Exceptions
 

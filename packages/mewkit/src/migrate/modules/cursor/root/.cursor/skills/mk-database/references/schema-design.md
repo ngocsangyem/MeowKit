@@ -1,133 +1,144 @@
-# Schema Design Reference
+# Schema Design
 
-Patterns for designing relational database schemas. PostgreSQL primary; most rules apply to MySQL and SQLite.
+Modelling entities, keys, relationships, tenancy, and constraints. Confirm the engine first —
+`SKILL.md` step 1. Everything below is a decision with a rationale, not a house style.
 
 ## Contents
 
-- [Naming Conventions](#naming-conventions)
-- [Primary Keys](#primary-keys)
-- [Standard Columns (Include on Every Table)](#standard-columns-include-on-every-table)
-- [Foreign Keys](#foreign-keys)
+- [Follow the repository's conventions](#follow-the-repositorys-conventions)
+- [Identity and keys](#identity-and-keys)
+- [Attributes and timestamps](#attributes-and-timestamps)
+- [Relationships](#relationships)
 - [Normalization](#normalization)
-- [Common Patterns](#common-patterns)
-  - [Polymorphic Relationships (with discriminator)](#polymorphic-relationships-with-discriminator)
-  - [Enum Columns](#enum-columns)
-  - [Tags / Many-to-Many](#tags-many-to-many)
-- [Anti-Patterns](#anti-patterns)
+- [Tenancy and authorization boundary](#tenancy-and-authorization-boundary)
+- [Personal data and retention](#personal-data-and-retention)
+- [Constraints belong in the database](#constraints-belong-in-the-database)
+- [Engine-conditional notes](#engine-conditional-notes)
+- [Shapes that usually cost more than they save](#shapes-that-usually-cost-more-than-they-save)
 
+## Follow the repository's conventions
 
-## Naming Conventions
+Read the existing schema before naming anything. Table casing, pluralization, key naming,
+index naming, and timestamp columns are already decided in any repository that has tables. A
+new table that disagrees with its neighbours is the defect, even when it matches a
+convention you would otherwise prefer.
 
-| Element | Convention | Example |
-|---------|-----------|---------|
-| Table names | snake_case, plural | `users`, `order_items`, `audit_logs` |
-| Column names | snake_case | `created_at`, `user_id`, `first_name` |
-| Join/pivot tables | singular, alphabetical order | `user_role`, `product_tag` |
-| Indexes | `idx_{table}_{columns}` | `idx_users_email`, `idx_orders_created_at` |
-| Foreign keys | `fk_{table}_{referenced_table}` | `fk_orders_users` |
-| Primary keys | always `id` | `id UUID` or `id BIGSERIAL` |
+Where no convention exists, propose one, apply it consistently, and say it is a proposal.
 
-## Primary Keys
+## Identity and keys
 
-**UUID (preferred for distributed systems):**
-```sql
-id UUID PRIMARY KEY DEFAULT gen_random_uuid()
-```
+State what makes a row the same row before choosing a key type.
 
-**BIGSERIAL (preferred for single-node, high-insert tables):**
-```sql
-id BIGSERIAL PRIMARY KEY
-```
+- **Natural key** — the domain already has a unique, immutable identifier. Use it when it is
+  genuinely both.
+- **Sequential surrogate** — compact, ordered, good for locality and joins, and it leaks
+  volume when exposed publicly.
+- **Random or time-sortable identifier** — safe to expose, generatable before insert, works
+  across systems; costs more space and, for fully random values, insert locality.
 
-**When to use UUID:** Cross-service references, public-facing IDs, sharded databases.
-**When to use BIGSERIAL:** Internal tables, high-insert workloads, when join performance is critical.
-**Never use:** Composite primary keys as the main PK (use a surrogate `id` + unique constraint on the natural key).
+Whichever is chosen, add a unique constraint on the natural key when one exists — a surrogate
+key does not make duplicates impossible, it just hides them.
 
-## Standard Columns (Include on Every Table)
+A composite key is correct for a pure join table. Elsewhere it makes every referencing table
+carry the whole key; weigh that before choosing it.
 
-```sql
-created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-```
+## Attributes and timestamps
 
-For audit trails (who made the change):
-```sql
-created_by  UUID REFERENCES users(id),
-updated_by  UUID REFERENCES users(id)
-```
+Model an attribute as a column when it is queried, constrained, or required. A document or
+JSON column suits genuinely open-ended attributes — accept that querying and constraining it
+is weaker, and that engines differ in what they can index inside it.
 
-For soft delete (never physically remove rows):
-```sql
-deleted_at  TIMESTAMPTZ  -- NULL = active, NOT NULL = deleted
-```
+Creation and update timestamps are useful on most tables and mandatory on none. Add them
+where something reads them. When they exist, decide whether the database or the application
+maintains them, and hold that decision consistently — mixed ownership produces rows the
+application updated without touching the timestamp.
 
-## Foreign Keys
+Soft deletion is a lifecycle decision, not a default. It keeps history and makes every query,
+unique constraint, and retention rule conditional on it. Choose it when history is required;
+say so when it is not.
 
-ALWAYS declare foreign keys explicitly. NEVER rely on application-level enforcement alone.
+## Relationships
 
-```sql
--- Declare with explicit cascade behavior
-user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-category_id UUID REFERENCES categories(id) ON DELETE SET NULL
-```
+Declare foreign keys in the database where the engine supports them. Application-level
+enforcement alone permits orphans under concurrency.
 
-**Cascade rules:**
-- `ON DELETE CASCADE` — delete child when parent deleted (use carefully — requires plan approval per security-rules.md)
-- `ON DELETE SET NULL` — set FK to NULL (column must be nullable)
-- `ON DELETE RESTRICT` — block parent delete if children exist (safest default)
-- `ON DELETE NO ACTION` — same as RESTRICT, checked at end of transaction
+Choose the referential action deliberately per relationship:
+
+- **Restrict** — block the parent delete. The safest default when nothing says otherwise.
+- **Set null** — the child survives without its parent; the column must be nullable and the
+  domain must make sense without it.
+- **Cascade** — the child has no meaning without the parent. It deletes rows silently and in
+  bulk; treat adding one as a data-loss review, not a schema detail.
+
+Index a foreign key when it is used to look up children, or when the engine needs it to check
+the parent delete efficiently. Do not index every foreign key reflexively — each index is
+write cost paid on every insert and update.
 
 ## Normalization
 
-**Default: 3NF (Third Normal Form)**
-- Every non-key column depends on the whole primary key, nothing else
-- No repeating groups, no transitive dependencies
+Normalize by default because it makes invariants enforceable in one place. Denormalize with a
+stated reason: a measured read cost, a consistency requirement that the normalized shape
+cannot express, or an evolution constraint.
 
-**When to denormalize:**
-- Measured performance problem with documented query analysis
-- Read-heavy reporting tables (materialized views preferred over denorm)
-- Cache tables explicitly labeled as `*_cache` or `*_snapshot`
+Both directions need the rationale. "Denormalized for performance" without a measurement is
+speculation; so is "fully normalized" applied to a shape nobody queries that way.
 
-NEVER denormalize speculatively (YAGNI).
+When a derived value is stored, state what keeps it correct and what happens when that fails.
 
-## Common Patterns
+## Tenancy and authorization boundary
 
-### Polymorphic Relationships (with discriminator)
-```sql
--- Table for multiple resource types
-CREATE TABLE comments (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  body        TEXT NOT NULL,
-  resource_type VARCHAR(50) NOT NULL,  -- 'post', 'video', 'product'
-  resource_id   UUID NOT NULL,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-CREATE INDEX idx_comments_resource ON comments(resource_type, resource_id);
-```
+For multi-tenant data, decide and write down:
 
-### Enum Columns
-```sql
--- PostgreSQL enum type
-CREATE TYPE order_status AS ENUM ('pending', 'processing', 'shipped', 'delivered', 'cancelled');
--- Or use VARCHAR with CHECK constraint (easier to alter)
-status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled'))
-```
+- Where the tenant identifier lives on each table, and whether every query path carries it.
+- What is unique **per tenant** versus globally — a uniqueness constraint that forgets the
+  tenant column is a cross-tenant collision or a cross-tenant leak.
+- Where isolation is enforced: in the query layer, in a database-level policy, or by
+  separate schemas or databases. Each has a different failure mode when a caller forgets.
+- What a query that omits the tenant filter returns. If the answer is "everything", that is
+  the finding.
 
-### Tags / Many-to-Many
-```sql
-CREATE TABLE product_tag (
-  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-  tag_id     UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
-  PRIMARY KEY (product_id, tag_id)
-);
-```
+The requirement is stated here; the verdict on whether it is enforced correctly belongs to
+the security workflow.
 
-## Anti-Patterns
+## Personal data and retention
 
-| Anti-Pattern | Problem | Alternative |
-|-------------|---------|-------------|
-| EAV (entity-attribute-value) | Impossible to query efficiently, no type safety | Proper columns or JSONB for truly dynamic attributes |
-| Polymorphic FK without discriminator | Cannot enforce FK constraints | Add `resource_type` column + partial indexes |
-| Storing CSV in a column | Cannot query individual values | Normalize to a junction table |
-| `NOT NULL DEFAULT ''` on strings | Empty string is not NULL — causes subtle bugs | Use `NULL` for absence of value |
-| `updated_at` managed in application | Inconsistent when bulk updates happen | Use DB trigger or `DEFAULT NOW()` + trigger |
+Mark which columns hold personal data. State the retention rule and how deletion or
+anonymization is executed — a retention policy with no mechanism is not a policy.
+
+Remember that copies propagate: backups, replicas, exports, caches, and search indexes. Note
+which ones exist; `mk:devops` owns them.
+
+## Constraints belong in the database
+
+Uniqueness, non-null, check constraints, and foreign keys are the invariants the application
+cannot forget. Express them in the schema wherever the engine can enforce them, even when
+the application also validates.
+
+Where the engine cannot (a cross-row rule, a conditional uniqueness the engine lacks), say
+explicitly where it is enforced instead and what happens under concurrency.
+
+## Engine-conditional notes
+
+Confirm the engine, then apply only the relevant note:
+
+- **Enumerated values** — a dedicated enum type gives stronger checking but altering it is a
+  schema change with engine-specific limits; a constrained text column is easier to evolve.
+  Pick per how often the set changes.
+- **Empty string is not null.** Where absence is meaningful, allow null and mean it; a
+  not-null default of empty string produces two representations of "nothing".
+- **Engines differ in what a schema change locks.** SQLite rewrites the table for most
+  `ALTER` operations. MySQL's online capability depends on the algorithm the change can use.
+  PostgreSQL is online for many operations but not all. Never assume a change is free; a
+  change to a table that already holds data is a migration question, not a modelling one.
+- **Case sensitivity, collation, and text comparison differ by engine and configuration** and
+  silently change what "unique" means. Confirm them before relying on a unique constraint over
+  text.
+
+## Shapes that usually cost more than they save
+
+| Shape | Cost | Usually better |
+|---|---|---|
+| Entity-attribute-value | No type safety, no useful constraint, every query becomes a self-join | Real columns; a document column for genuinely open attributes |
+| Polymorphic reference with no type discriminator | No enforceable foreign key; orphans are invisible | Store the type alongside the identifier, or use one table per relationship |
+| Delimited list inside one column | Individual values are not queryable or constrainable | A junction table |
+| A derived value with nothing maintaining it | Drifts silently from its source | Compute it, or state and test what keeps it correct |

@@ -13,7 +13,7 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 | Project memory | ✅ covered | 7 | 7 | mk:wiki, mk:wiki-render, mk:wiki-research |
 | Task state | ✅ covered | 9 | 9 | agent-conduct, orchestration-rules, parallel-execution-rules |
 | Observability | ✅ covered | 12 | 12 | post-phase-delegation, workflow-evidence-rules, budget |
-| Failure attribution | ✅ covered | 2 | 2 | fix, posttoolfailure-probe |
+| Failure attribution | ✅ covered | 3 | 3 | advice-supervision-rules, fix, posttoolfailure-probe |
 | Verification | ✅ covered | 7 | 7 | development-rules, rubric-rules, tdd-rules |
 | Permissions | ✅ covered | 5 | 5 | docs-reference-contract, injection-rules, security-rules |
 | Entropy auditing | ✅ covered | 1 | 1 | dead-weight-audit-rules |
@@ -21,4 +21,4 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 | Gate enforcement *(kit)* | ✅ covered | 12 | 12 | gate-rules, harness-rules, agile-story-gates |
 
 **Coverage:** 12/12 responsibilities have active artifacts.
-**Untagged:** 0 registry + 164 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).
+**Untagged:** 0 registry + 167 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).
