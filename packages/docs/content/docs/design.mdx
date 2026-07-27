@@ -22,7 +22,7 @@ The site runs on [Fumadocs](https://fumadocs.dev) on the Next.js App Router. Lay
 
 ## The system in one paragraph
 
-Cool paper, one electric-blue signal accent, and a three-family type stack: Space Grotesk for display, Inter for body, JetBrains Mono for code. Neutrals are blue-tinted slate rather than true grey, which is what keeps the light theme from reading as clinical white and the dark theme from reading as flat black.
+Cool paper, one blue signal accent, and a display/body/code type stack: Space Grotesk for display, Inter for body, the platform mono for code. Colour is the Fumadocs `ocean` preset. Neutrals are blue-tinted slate rather than true grey, which is what keeps the light theme from reading as clinical white and the dark theme from reading as flat black. The accent is navy in light and pale blue in dark.
 
 ## Rules worth keeping
 
@@ -37,11 +37,11 @@ These are decisions, not defaults. Changing one is fine; changing one by acciden
 
 ## Changing it
 
-Two layers, and the boundary between them is the useful part:
+Colour arrives as a whole palette, not as a list of values:
 
-1. **Primitives**, the `--mk-*` variables. This is the palette. Change one and it moves everywhere.
-2. **Slot mappings**, the `--color-fd-*` variables Fumadocs actually reads, set once for light and again under `.dark`. Change one and it moves one role.
+1. **Retheme** by swapping the preset import in `app/global.css`, currently `@import 'fumadocs-ui/css/ocean.css'`. Fumadocs ships eleven of these; each sets every `--color-fd-*` slot for light and dark at once. One line moves the entire site.
+2. **Re-map one role** by declaring that single `--color-fd-*` slot below the import. It wins on cascade order, so an override is deliberate and visible rather than a whole second palette shadowing the first.
 
-Retheme by editing primitives. Re-map by editing slots. Reaching past both to style a component directly is how a design system stops being one.
+Overriding every slot is how you end up with a preset that loads and does nothing. Reaching past both to style a component directly is how a design system stops being one.
 
 Run `npm run dev` in `packages/docs` to see changes. `npm run build` is what CI runs.

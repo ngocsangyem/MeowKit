@@ -62,7 +62,9 @@ export const metadata: Metadata = {
     images: '/og-image.png',
   },
   other: {
-    'theme-color': '#1a1a2e',
+    /* Matches the ocean preset's dark background, hsl(220 60% 8%), so the
+       mobile browser chrome does not band against the page. */
+    'theme-color': '#081021',
   },
 };
 
