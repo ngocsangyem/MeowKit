@@ -154,7 +154,8 @@ export function scanBulkContent(text: string): string[] {
 	const found: string[] = [];
 	for (const { name, re } of BULK_CONTENT_PATTERNS) {
 		const hits = countMatches(text, re);
-		if (re.global ? hits > TRANSCRIPT_TOLERANCE : hits > 0) found.push(`${name} detected — pass a pointer, not the payload`);
+		if (re.global ? hits > TRANSCRIPT_TOLERANCE : hits > 0)
+			found.push(`${name} detected — pass a pointer, not the payload`);
 	}
 	return found;
 }

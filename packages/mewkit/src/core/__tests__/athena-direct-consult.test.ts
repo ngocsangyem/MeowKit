@@ -18,7 +18,8 @@ const tempRoot = (): string => mkdtempSync(join(tmpdir(), "athena-direct-"));
 
 const brief = (over: Partial<StrategyBrief> = {}): StrategyBrief => ({
 	situation: "two services write the same row and the later write silently wins",
-	decisionRecommendation: "serialize on an advisory lock in the owning service; the evidence supports it over a retry loop",
+	decisionRecommendation:
+		"serialize on an advisory lock in the owning service; the evidence supports it over a retry loop",
 	rejectedAlternatives: "optimistic retry — it hides the conflict rather than ordering it",
 	nextFalsifiableCheck: "run the concurrent reassign test; a lost update proves this wrong",
 	risksAndRollback: "lock contention under load; drop the lock and the old behavior returns",

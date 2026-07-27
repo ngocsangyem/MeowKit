@@ -92,9 +92,7 @@ describe("athena provider parity: every plane ships an adapter and a contract", 
 			const body = read(plane.adapter);
 			expect(body, `${plane.name} adapter does not cite ${plane.contractRef}`).toContain(plane.contractRef);
 			for (const other of PLANES.filter((p) => p.name !== plane.name)) {
-				expect(body, `${plane.name} adapter cites ${other.name}'s contract path`).not.toContain(
-					other.contractRef,
-				);
+				expect(body, `${plane.name} adapter cites ${other.name}'s contract path`).not.toContain(other.contractRef);
 			}
 		});
 	}
@@ -119,7 +117,9 @@ describe("athena provider parity: the four stages and their legal dispositions",
 		it(`${plane.name}: says READY_FOR_EXISTING_GATE does not clear the gate`, () => {
 			// The single most load-bearing sentence in the contract: the one disposition that
 			// sounds like an approval, explicitly denied as one.
-			expect(body).toMatch(/READY_FOR_EXISTING_GATE[\s\S]{0,400}?(does \*\*not\*\* mean|never\*\* means|not mean the gate is cleared)/);
+			expect(body).toMatch(
+				/READY_FOR_EXISTING_GATE[\s\S]{0,400}?(does \*\*not\*\* mean|never\*\* means|not mean the gate is cleared)/,
+			);
 		});
 	}
 });
@@ -384,9 +384,7 @@ describe("athena provider parity: every supervised skill declares the flag on bo
 					const body = read(f);
 					const missing = SUPERVISION_STAGES.filter((s) => !body.includes(s));
 					expect(missing, `${f} is missing stages: ${missing.join(", ")}`).toEqual([]);
-					expect(body, `${f} drops the fallback line`).toContain(
-						"advice checkpoint unavailable in this runtime",
-					);
+					expect(body, `${f} drops the fallback line`).toContain("advice checkpoint unavailable in this runtime");
 					// The one thing a wrapper must never permit when delegation is unavailable.
 					expect(body, `${f} does not forbid inline self-advice`).toMatch(
 						/Never write a packet inline|never improvise|Never improvise/i,
@@ -403,8 +401,7 @@ describe("athena provider parity: every supervised skill declares the flag on bo
 		});
 
 		it(`${bundle.name}: every wrapper is denied-token clean`, () => {
-			const scan = bundle.name === "cursor" ? scanCursorDenied : (c: string) =>
-				scanDeniedTokens(c).map((h) => h.label);
+			const scan = bundle.name === "cursor" ? scanCursorDenied : (c: string) => scanDeniedTokens(c).map((h) => h.label);
 			const leaks: string[] = [];
 			for (const wrapper of WRAPPERS) {
 				for (const f of [

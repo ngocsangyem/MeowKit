@@ -123,20 +123,36 @@ describe("ship budgets supervision per release stage", () => {
 		// The regression this whole partition exists to prevent: a full `prepare` must
 		// not leave `release` with nothing to spend.
 		expect(
-			evaluateStageRequest({ skill: "mk:ship", stage: "GUIDE", checkpointId: "r1", history, partition: "release" }).allowed,
+			evaluateStageRequest({ skill: "mk:ship", stage: "GUIDE", checkpointId: "r1", history, partition: "release" })
+				.allowed,
 		).toBe(true);
 		expect(
-			evaluateStageRequest({ skill: "mk:ship", stage: "GUIDE", checkpointId: "u1", history, partition: "publish" }).allowed,
+			evaluateStageRequest({ skill: "mk:ship", stage: "GUIDE", checkpointId: "u1", history, partition: "publish" })
+				.allowed,
 		).toBe(true);
 	});
 
 	it("applies the per-stage maximum within a release stage, not across the run", () => {
-		const history = [committed({ checkpointId: "g-prep", stage: "GUIDE", disposition: "CONTINUE_WITH_DIRECTIVE", partition: "prepare" })];
+		const history = [
+			committed({
+				checkpointId: "g-prep",
+				stage: "GUIDE",
+				disposition: "CONTINUE_WITH_DIRECTIVE",
+				partition: "prepare",
+			}),
+		];
 		expect(
-			evaluateStageRequest({ skill: "mk:ship", stage: "GUIDE", checkpointId: "g-prep-2", history, partition: "prepare" }).allowed,
+			evaluateStageRequest({
+				skill: "mk:ship",
+				stage: "GUIDE",
+				checkpointId: "g-prep-2",
+				history,
+				partition: "prepare",
+			}).allowed,
 		).toBe(false);
 		expect(
-			evaluateStageRequest({ skill: "mk:ship", stage: "GUIDE", checkpointId: "g-rel", history, partition: "release" }).allowed,
+			evaluateStageRequest({ skill: "mk:ship", stage: "GUIDE", checkpointId: "g-rel", history, partition: "release" })
+				.allowed,
 		).toBe(true);
 	});
 
@@ -158,19 +174,24 @@ describe("ship budgets supervision per release stage", () => {
 		if (!samePartition.allowed) expect(samePartition.escalate).toBe(true);
 
 		expect(
-			evaluateStageRequest({ skill: "mk:ship", stage: "REVIEW", checkpointId: "rev-r", history, partition: "release" }).allowed,
+			evaluateStageRequest({ skill: "mk:ship", stage: "REVIEW", checkpointId: "rev-r", history, partition: "release" })
+				.allowed,
 		).toBe(true);
 	});
 
 	it("requires a return in the SAME release stage before RECHECK", () => {
-		const history = [committed({ checkpointId: "rev-p", stage: "REVIEW", disposition: "RETURN_TO_EXECUTOR", partition: "prepare" })];
+		const history = [
+			committed({ checkpointId: "rev-p", stage: "REVIEW", disposition: "RETURN_TO_EXECUTOR", partition: "prepare" }),
+		];
 		expect(
-			evaluateStageRequest({ skill: "mk:ship", stage: "RECHECK", checkpointId: "rc-p", history, partition: "prepare" }).allowed,
+			evaluateStageRequest({ skill: "mk:ship", stage: "RECHECK", checkpointId: "rc-p", history, partition: "prepare" })
+				.allowed,
 		).toBe(true);
 		// A return during `prepare` is not returned work in `release` — rechecking there
 		// would re-examine evidence nothing returned.
 		expect(
-			evaluateStageRequest({ skill: "mk:ship", stage: "RECHECK", checkpointId: "rc-r", history, partition: "release" }).allowed,
+			evaluateStageRequest({ skill: "mk:ship", stage: "RECHECK", checkpointId: "rc-r", history, partition: "release" })
+				.allowed,
 		).toBe(false);
 	});
 
@@ -205,8 +226,13 @@ describe("ship budgets supervision per release stage", () => {
 			committed({ checkpointId: `x${i}`, stage: "RESCUE", disposition: "ESCALATE_TO_HUMAN", partition: "Prepare" }),
 		);
 		expect(
-			evaluateStageRequest({ skill: "mk:ship", stage: "GUIDE", checkpointId: "n", history: orphaned, partition: "prepare" })
-				.allowed,
+			evaluateStageRequest({
+				skill: "mk:ship",
+				stage: "GUIDE",
+				checkpointId: "n",
+				history: orphaned,
+				partition: "prepare",
+			}).allowed,
 		).toBe(false);
 	});
 
@@ -230,8 +256,16 @@ describe("ship budgets supervision per release stage", () => {
 	});
 
 	it("keeps idempotency run-wide, so a retry never spends a slot in any stage", () => {
-		const history = [committed({ checkpointId: "g1", stage: "GUIDE", disposition: "CONTINUE_WITH_DIRECTIVE", partition: "prepare" })];
-		const d = evaluateStageRequest({ skill: "mk:ship", stage: "GUIDE", checkpointId: "g1", history, partition: "prepare" });
+		const history = [
+			committed({ checkpointId: "g1", stage: "GUIDE", disposition: "CONTINUE_WITH_DIRECTIVE", partition: "prepare" }),
+		];
+		const d = evaluateStageRequest({
+			skill: "mk:ship",
+			stage: "GUIDE",
+			checkpointId: "g1",
+			history,
+			partition: "prepare",
+		});
 		expect(d.allowed).toBe(true);
 		if (d.allowed) expect(d.duplicateOf).toBe("g1");
 	});
@@ -241,7 +275,13 @@ describe("the CLI charges calls to the right budget", () => {
 	it("refuses `begin` for ship with no --release-stage", async () => {
 		const root = tempRoot();
 		await expect(
-			runAdvice(root, { subcommand: "begin", run: "260726-1200-ship", skill: "mk:ship", stage: "GUIDE", checkpoint: "g1" }),
+			runAdvice(root, {
+				subcommand: "begin",
+				run: "260726-1200-ship",
+				skill: "mk:ship",
+				stage: "GUIDE",
+				checkpoint: "g1",
+			}),
 		).rejects.toThrow(/per release stage/);
 	});
 
@@ -477,8 +517,18 @@ describe("skills that must never become supervision entry points", () => {
 
 describe("the extended cohort is wired", () => {
 	const WIRED = [
-		{ skill: "mk:autobuild", cap: 5, main: ".claude/skills/autobuild/SKILL.md", checkpoints: ".claude/skills/autobuild/references/advice-checkpoints.md" },
-		{ skill: "mk:ship", cap: 4, main: ".claude/skills/ship/SKILL.md", checkpoints: ".claude/skills/ship/references/advice-checkpoints.md" },
+		{
+			skill: "mk:autobuild",
+			cap: 5,
+			main: ".claude/skills/autobuild/SKILL.md",
+			checkpoints: ".claude/skills/autobuild/references/advice-checkpoints.md",
+		},
+		{
+			skill: "mk:ship",
+			cap: 4,
+			main: ".claude/skills/ship/SKILL.md",
+			checkpoints: ".claude/skills/ship/references/advice-checkpoints.md",
+		},
 	] as const;
 
 	it.each(WIRED)("$skill declares the flag and its checkpoint reference exists", ({ main, checkpoints }) => {

@@ -84,9 +84,7 @@ describe("role boundaries the wiring must not erode", () => {
 	});
 
 	it("plan-creator fires REVIEW before the gate step, and the gate step says so", () => {
-		expect(flat(".claude/skills/plan-creator/references/advice-checkpoints.md")).toMatch(
-			/before.{0,40}`step-07-gate`/,
-		);
+		expect(flat(".claude/skills/plan-creator/references/advice-checkpoints.md")).toMatch(/before.{0,40}`step-07-gate`/);
 		const gateStep = flat(".claude/skills/plan-creator/step-07-gate.md");
 		expect(gateStep).toMatch(/REVIEW checkpoint fires BEFORE this step/);
 		expect(gateStep).toMatch(/does not approve Gate 1/);

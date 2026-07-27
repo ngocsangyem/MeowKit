@@ -69,9 +69,7 @@ export interface SupervisionCallClaim {
 	checkpointId?: string | null;
 }
 
-export type ModeDecision =
-	| { valid: true; mode: SupervisionMode; stateful: boolean }
-	| { valid: false; reason: string };
+export type ModeDecision = { valid: true; mode: SupervisionMode; stateful: boolean } | { valid: false; reason: string };
 
 /**
  * Decide whether a call may run as the mode it claims.

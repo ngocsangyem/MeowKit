@@ -263,9 +263,7 @@ export const TRANSPORT_STATUSES = ["DONE", "DONE_WITH_CONCERNS", "BLOCKED"] as c
 export type TransportStatus = (typeof TRANSPORT_STATUSES)[number];
 
 /** Result of reconciling transport status against disposition. */
-export type PrecedenceResult =
-	| { valid: true; route: Disposition }
-	| { valid: false; reason: string };
+export type PrecedenceResult = { valid: true; route: Disposition } | { valid: false; reason: string };
 
 /**
  * Reconcile transport status with disposition before routing.

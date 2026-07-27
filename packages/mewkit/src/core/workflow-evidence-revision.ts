@@ -131,7 +131,8 @@ export function supersessionProblems(index: RevisionBearingIndex): string[] {
 	// status field was never updated, the stored status catches one whose revisions
 	// were rewritten. Requiring both to agree would let either omission through.
 	const staleBy = (rec: { evidenceRevision?: number; status?: string } | undefined): boolean =>
-		rec !== undefined && (evidenceStatusOf(rec.evidenceRevision, current) === "superseded" || rec.status === "superseded");
+		rec !== undefined &&
+		(evidenceStatusOf(rec.evidenceRevision, current) === "superseded" || rec.status === "superseded");
 
 	const approvals = index.approvals ?? {};
 	if (approvals.gate2 === "approved" && staleBy(index.review)) problems.push("gate2-approved-on-superseded-review");

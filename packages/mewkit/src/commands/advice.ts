@@ -146,7 +146,8 @@ function refuseIfSkillAlreadyEscalated(projectRoot: string, runId: string, skill
 		// A damaged sibling is refused too: skipping it would restore the bypass by
 		// simply corrupting the record that says "escalate".
 		if (!read.found) {
-			if (read.corrupt) fail(`Refused: supervision record "${otherId}" is unreadable (${read.reason}) — repair or remove it first.`);
+			if (read.corrupt)
+				fail(`Refused: supervision record "${otherId}" is unreadable (${read.reason}) — repair or remove it first.`);
 			continue;
 		}
 		if (read.dossier.skill === skill && read.dossier.escalatedToHuman) {
@@ -191,7 +192,10 @@ async function begin(projectRoot: string, args: AdviceOptions): Promise<void> {
 	if (preview && preview.skill !== skill) fail(`Refused: run "${runId}" belongs to ${preview.skill}, not ${skill}.`);
 	if (!preview) refuseIfSkillAlreadyEscalated(projectRoot, runId, skill);
 	if (preview?.escalatedToHuman)
-		fail(`Refused: run "${runId}" escalated to a human and is unresolved — that decision is theirs, not a retry.`, true);
+		fail(
+			`Refused: run "${runId}" escalated to a human and is unresolved — that decision is theirs, not a retry.`,
+			true,
+		);
 
 	const partition = args.releaseStage?.trim() || undefined;
 	const verdict = evaluateStageRequest({
@@ -251,7 +255,9 @@ async function begin(projectRoot: string, args: AdviceOptions): Promise<void> {
 	// on a partitioned skill those differ, and the run total would misstate what is left.
 	const spent = written.history.filter((h) => chargesToPartition(skill, h, partition)).length;
 	const scope = partition === undefined ? skill : `${skill} / ${partition}`;
-	console.log(pc.green(`Checkpoint ${stage}/${checkpointId} opened (${spent + 1} of ${SKILL_HARD_CAPS[skill]} for ${scope}).`));
+	console.log(
+		pc.green(`Checkpoint ${stage}/${checkpointId} opened (${spent + 1} of ${SKILL_HARD_CAPS[skill]} for ${scope}).`),
+	);
 	console.log(pc.dim(`  dossier: ${path.relative(projectRoot, dossierPath(projectRoot, runId))}`));
 	console.log(pc.dim(`  legal dispositions: ${legalDispositions(stage as SupervisionStage).join(", ")}`));
 	console.log(pc.dim("  supervision is evidence — it clears no gate and counts as no verification."));
@@ -412,7 +418,9 @@ function applyEvidenceCorrection(projectRoot: string, args: AdviceOptions): void
 	}
 	const rel = path.relative(realRoot, real);
 	if (rel.startsWith("..") || path.isAbsolute(rel))
-		fail(`Refused: --evidence must stay inside the project (${args.evidence} resolves to ${real}, outside ${realRoot}).`);
+		fail(
+			`Refused: --evidence must stay inside the project (${args.evidence} resolves to ${real}, outside ${realRoot}).`,
+		);
 
 	// Inside the project is not narrow enough. `applyCorrection` spreads whatever JSON
 	// object it reads and writes it back, so any JSON file in the repo was a legal write
@@ -465,7 +473,9 @@ function validatePacket(projectRoot: string, args: AdviceOptions): void {
 	// DEFAULT validator — a brief checked against the input-packet schema fails with a
 	// confusing shape error instead of saying which flag moved.
 	if (args.correctionKind !== undefined)
-		fail("`validate-packet` uses --packet-kind (input|output|brief); --correction-kind is for `commit` (source|scope).");
+		fail(
+			"`validate-packet` uses --packet-kind (input|output|brief); --correction-kind is for `commit` (source|scope).",
+		);
 
 	const kind = args.packetKind ?? "input";
 	if (kind !== "input" && kind !== "output" && kind !== "brief")
@@ -521,11 +531,17 @@ function status(projectRoot: string, args: AdviceOptions): void {
 		const used = partitions
 			.map((p) => `${p} ${dossier.history.filter((h) => chargesToPartition(dossier.skill, h, p)).length}/${cap}`)
 			.join("   ");
-		console.log(`  skill: ${dossier.skill}   calls per release stage: ${used}   corrections: ${dossier.correctionCount}`);
+		console.log(
+			`  skill: ${dossier.skill}   calls per release stage: ${used}   corrections: ${dossier.correctionCount}`,
+		);
 	} else {
-		console.log(`  skill: ${dossier.skill}   calls: ${dossier.history.length}/${cap}   corrections: ${dossier.correctionCount}`);
+		console.log(
+			`  skill: ${dossier.skill}   calls: ${dossier.history.length}/${cap}   corrections: ${dossier.correctionCount}`,
+		);
 	}
-	console.log(`  stage: ${dossier.stage}   open checkpoint: ${dossier.checkpoint?.state === "pending" ? dossier.checkpoint.checkpointId : "(none)"}`);
+	console.log(
+		`  stage: ${dossier.stage}   open checkpoint: ${dossier.checkpoint?.state === "pending" ? dossier.checkpoint.checkpointId : "(none)"}`,
+	);
 	console.log(`  latest directive: ${dossier.latestDirective || pc.dim("(none)")}`);
 	console.log(`  next safe action: ${dossier.nextSafeAction || pc.dim("(none)")}`);
 	if (dossier.receiptPointers.length) console.log(`  receipts: ${dossier.receiptPointers.join(", ")}`);
@@ -555,7 +571,9 @@ export async function advice(args: AdviceOptions = {}): Promise<void> {
 		// A damaged record surfaces as a refusal, not a stack trace: the operator needs
 		// the repair instruction, and supervision must stop rather than start fresh.
 		if (err instanceof CorruptDossierError) {
-			console.error(pc.red(`${err.message}\nSupervision is disabled for this run until that file is repaired or removed.`));
+			console.error(
+				pc.red(`${err.message}\nSupervision is disabled for this run until that file is repaired or removed.`),
+			);
 			console.error(pc.dim("The ordinary workflow continues unsupervised — it is not blocked by this."));
 			process.exit(1);
 		}

@@ -63,7 +63,9 @@ const validInput = (over: Record<string, unknown> = {}) => ({
 	lockedDecisions: ["explicit flag only"],
 	currentState: "Gate 1 approved; build not started",
 	workerSummary: "plan approved, no source edits yet",
-	evidenceRefs: [{ path: "tasks/plans/x/plan.md", relevance: "approved scope", provenance: "planner", summary: "7 phases" }],
+	evidenceRefs: [
+		{ path: "tasks/plans/x/plan.md", relevance: "approved scope", provenance: "planner", summary: "7 phases" },
+	],
 	priorDirective: null,
 	question: "Which risk should the build address first?",
 	riskAndReversibility: "reversible; no public contract touched",
@@ -353,9 +355,11 @@ describe("output packet validation", () => {
 	});
 
 	it("permits evidence-framed wording", () => {
-		expect(validateOutputPacket(validOutput({ decisionRecommendation: "The evidence supports landing the validator first." })).ok).toBe(
-			true,
-		);
+		expect(
+			validateOutputPacket(
+				validOutput({ decisionRecommendation: "The evidence supports landing the validator first." }),
+			).ok,
+		).toBe(true);
 	});
 
 	it("rejects RETURN_TO_EXECUTOR with no corrections", () => {
@@ -369,14 +373,17 @@ describe("output packet validation", () => {
 			change: `c${i}`,
 			proofRequired: "test",
 		}));
-		expect(validateOutputPacket(validOutput({ disposition: "RETURN_TO_EXECUTOR", requiredCorrections: corrections })).ok).toBe(
-			false,
-		);
+		expect(
+			validateOutputPacket(validOutput({ disposition: "RETURN_TO_EXECUTOR", requiredCorrections: corrections })).ok,
+		).toBe(false);
 	});
 
 	it("requires proof for every correction", () => {
 		const r = validateOutputPacket(
-			validOutput({ disposition: "RETURN_TO_EXECUTOR", requiredCorrections: [{ change: "fix it", proofRequired: "" }] }),
+			validOutput({
+				disposition: "RETURN_TO_EXECUTOR",
+				requiredCorrections: [{ change: "fix it", proofRequired: "" }],
+			}),
 		);
 		expect(r.ok).toBe(false);
 	});
@@ -500,7 +507,7 @@ describe("direct consult vs embedded supervision", () => {
 	// Truthiness is not validity: a truthy-but-unknown stage would previously classify as
 	// valid embedded supervision and then crash the cadence checks that index by stage.
 	it("refuses a truthy but unknown stage", () => {
-		for (const stage of ["bogus", "   ", "guide", "GUIDE " ] as unknown as SupervisionStage[]) {
+		for (const stage of ["bogus", "   ", "guide", "GUIDE "] as unknown as SupervisionStage[]) {
 			const d = classifySupervisionCall({ claimedMode: "embedded", runId: "run-1", stage, checkpointId: "c1" });
 			expect(d.valid, String(stage)).toBe(false);
 			if (!d.valid) expect(d.reason).toMatch(/known stage/);
@@ -632,7 +639,11 @@ describe("continuity dossier", () => {
 		const root = await tempRoot();
 		await writeDossier(
 			root,
-			baseDossier({ latestDirective: "add the regression test", nextSafeAction: "run focused tests", correctionCount: 1 }),
+			baseDossier({
+				latestDirective: "add the regression test",
+				nextSafeAction: "run focused tests",
+				correctionCount: 1,
+			}),
 		);
 		const body = await readFile(dossierPath(root, "run-1"), "utf-8");
 		expect(body).toMatch(/add the regression test/);

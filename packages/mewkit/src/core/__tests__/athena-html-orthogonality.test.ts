@@ -159,7 +159,9 @@ describe("the flags are parsed independently", () => {
 		// If either ever starts changing planning_mode, "orthogonal" stops being true and
 		// the combined run diverges from the single-flag run before any visual work.
 		expect(step00).toMatch(/set `tdd_mode = true`\. This flag is composable with any planning mode/);
-		expect(step00).toMatch(/set `html_mode = true`\. This flag is composable with any planning mode and does NOT change the planning mode/);
+		expect(step00).toMatch(
+			/set `html_mode = true`\. This flag is composable with any planning mode and does NOT change the planning mode/,
+		);
 	});
 
 	it("keeps --html the single switch for the visual pipeline", () => {

@@ -21,7 +21,12 @@ import { existsSync, lstatSync, readdirSync, realpathSync, rmSync, statSync } fr
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { computeTreeChecksum } from "../reconcile/checksum-utils.js";
 import type { PortableInstallationV3, PortableRegistryV3 } from "../reconcile/portable-registry.js";
-import { getReasonCopy, isUnknownChecksum, type ReconcileActionType, type ReconcileReason } from "../reconcile/reconcile-types.js";
+import {
+	getReasonCopy,
+	isUnknownChecksum,
+	type ReconcileActionType,
+	type ReconcileReason,
+} from "../reconcile/reconcile-types.js";
 
 /** The two provider-specific facts this cleanup needs. Everything else is shared. */
 export interface RetiredSkillProvider {

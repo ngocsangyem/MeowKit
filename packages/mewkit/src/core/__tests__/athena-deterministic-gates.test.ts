@@ -16,11 +16,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import {
-	ADVICE_CAPABILITY_ID,
-	ADVICE_SUPPORT_STATES,
-	readAdviceSupport,
-} from "../advice-support-report.js";
+import { ADVICE_CAPABILITY_ID, ADVICE_SUPPORT_STATES, readAdviceSupport } from "../advice-support-report.js";
 import { AUTHORED_CAPABILITIES } from "../capability-authored.js";
 
 const testsDir = dirname(fileURLToPath(import.meta.url));
@@ -40,9 +36,7 @@ describe("advice support report: every provider states both capabilities", () =>
 			for (const cap of (report as NonNullable<typeof report>).capabilities) {
 				expect(ADVICE_SUPPORT_STATES, `${cap.capability} state`).toContain(cap.state);
 				if (cap.evidence === "structural") {
-					expect(cap.state, `${provider}/${cap.capability} claims support without a live run`).not.toBe(
-						"supported",
-					);
+					expect(cap.state, `${provider}/${cap.capability} claims support without a live run`).not.toBe("supported");
 				}
 			}
 		});

@@ -21,12 +21,7 @@ import {
 } from "../athena-supervision-dossier.js";
 import { evaluateStageRequest } from "../athena-supervision-protocol.js";
 import { receiptPath, renderReceipt, validateReceipt, type Receipt } from "../athena-supervision-receipt.js";
-import {
-	applyCorrection,
-	evidenceStatusOf,
-	markCurrent,
-	supersessionProblems,
-} from "../workflow-evidence-revision.js";
+import { applyCorrection, evidenceStatusOf, markCurrent, supersessionProblems } from "../workflow-evidence-revision.js";
 import { AdviceRefusal, EVIDENCE_INDEX_FILENAME, runAdvice } from "../../commands/advice.js";
 
 // Resolve the repo from this file, not `process.cwd()`: cwd passes from the repo root
@@ -80,7 +75,7 @@ describe("dossier round-trip", () => {
 		// This is the property that matters: "absent" would restart cap accounting at
 		// zero, making a broken file the cheapest route to unlimited supervision calls.
 		expect(parseDossier("no frontmatter here")).toMatchObject({ found: false, corrupt: true });
-		expect(parseDossier("---\nrunId: \"x\"\n---\n")).toMatchObject({ found: false, corrupt: true });
+		expect(parseDossier('---\nrunId: "x"\n---\n')).toMatchObject({ found: false, corrupt: true });
 
 		const root = tempRoot();
 		expect(readDossier(root, "never-written")).toEqual({ found: false, corrupt: false });
@@ -88,7 +83,10 @@ describe("dossier round-trip", () => {
 
 	it("survives a write/read cycle on disk", async () => {
 		const root = tempRoot();
-		await writeDossier(root, baseDossier({ history: [{ checkpointId: "g", stage: "GUIDE", disposition: "ESCALATE_TO_HUMAN" }] }));
+		await writeDossier(
+			root,
+			baseDossier({ history: [{ checkpointId: "g", stage: "GUIDE", disposition: "ESCALATE_TO_HUMAN" }] }),
+		);
 		const read = readDossier(root, "run-cook-1");
 		expect(read.found).toBe(true);
 		if (read.found) expect(read.dossier.history).toHaveLength(1);
@@ -168,19 +166,28 @@ describe("caps survive the process boundary", () => {
 	});
 
 	it("does not spend a slot on a repeated checkpointId", () => {
-		const history = [{ checkpointId: "cook-guide", stage: "GUIDE" as const, disposition: "CONTINUE_WITH_DIRECTIVE" as const }];
+		const history = [
+			{ checkpointId: "cook-guide", stage: "GUIDE" as const, disposition: "CONTINUE_WITH_DIRECTIVE" as const },
+		];
 		const retry = evaluateStageRequest({ skill: "mk:cook", stage: "GUIDE", checkpointId: "cook-guide", history });
 		expect(retry).toEqual({ allowed: true, duplicateOf: "cook-guide" });
 	});
 
 	it("replaces rather than appends when the same checkpoint commits twice", () => {
 		const pending = beginCheckpoint(baseDossier(), { checkpointId: "c1", stage: "GUIDE" });
-		const once = commitCheckpoint(pending, { latestDirective: "a", nextSafeAction: "b", disposition: "CONTINUE_WITH_DIRECTIVE" });
-		const twice = commitCheckpoint({ ...once, checkpoint: { checkpointId: "c1", stage: "GUIDE", state: "pending" } }, {
-			latestDirective: "a2",
-			nextSafeAction: "b2",
-			disposition: "ESCALATE_TO_HUMAN",
+		const once = commitCheckpoint(pending, {
+			latestDirective: "a",
+			nextSafeAction: "b",
+			disposition: "CONTINUE_WITH_DIRECTIVE",
 		});
+		const twice = commitCheckpoint(
+			{ ...once, checkpoint: { checkpointId: "c1", stage: "GUIDE", state: "pending" } },
+			{
+				latestDirective: "a2",
+				nextSafeAction: "b2",
+				disposition: "ESCALATE_TO_HUMAN",
+			},
+		);
 		expect(twice.history).toEqual([{ checkpointId: "c1", stage: "GUIDE", disposition: "ESCALATE_TO_HUMAN" }]);
 	});
 });
@@ -218,9 +225,7 @@ describe("receipt", () => {
 
 	it("refuses credentials anywhere in its prose or pointers", () => {
 		expect(validateReceipt(base({ reason: "use api_key: sk-live-abcdefghijklmnop" })).ok).toBe(false);
-		expect(
-			validateReceipt(base({ evidencePointers: ["-----BEGIN PRIVATE KEY-----"] })).ok,
-		).toBe(false);
+		expect(validateReceipt(base({ evidencePointers: ["-----BEGIN PRIVATE KEY-----"] })).ok).toBe(false);
 	});
 
 	it("refuses a returned-work receipt that names nothing to change", () => {
@@ -277,18 +282,28 @@ describe("evidence revision and supersession", () => {
 	});
 
 	it("refuses a Gate 2 approval resting on superseded proof", () => {
-		const stale = { ...applyCorrection(evidence(), "source"), approvals: { gate1: "approved", gate2: "approved", gate1Revision: 1 } };
+		const stale = {
+			...applyCorrection(evidence(), "source"),
+			approvals: { gate1: "approved", gate2: "approved", gate1Revision: 1 },
+		};
 		expect(supersessionProblems(stale)).toContain("gate2-approved-on-superseded-review");
 		expect(supersessionProblems(stale)).toContain("gate2-approved-on-superseded-verification");
 	});
 
 	it("refuses a stale record that claims to be valid", () => {
-		const lying = evidence({ evidenceRevision: 3, verification: { commands: ["x"], evidenceRevision: 1, status: "valid" } });
+		const lying = evidence({
+			evidenceRevision: 3,
+			verification: { commands: ["x"], evidenceRevision: 1, status: "valid" },
+		});
 		expect(supersessionProblems(lying)).toContain("stale-verification-marked-valid");
 	});
 
 	it("refuses a Gate 1 approval older than the last scope change", () => {
-		const moved = evidence({ evidenceRevision: 2, scopeRevision: 2, approvals: { gate1: "approved", gate1Revision: 1 } });
+		const moved = evidence({
+			evidenceRevision: 2,
+			scopeRevision: 2,
+			approvals: { gate1: "approved", gate1Revision: 1 },
+		});
 		expect(supersessionProblems(moved)).toContain("gate1-approved-before-scope-change");
 	});
 
@@ -304,13 +319,28 @@ describe("validator parity (TypeScript core vs shipped .cjs)", () => {
 	// contract. These fixtures are the shared truth both must agree on.
 	const fixtures: { name: string; index: Record<string, unknown> }[] = [
 		{ name: "no revision fields", index: {} },
-		{ name: "current", index: { evidenceRevision: 2, verification: { evidenceRevision: 2 }, review: { evidenceRevision: 2 } } },
-		{ name: "stale review under gate2", index: { evidenceRevision: 2, review: { evidenceRevision: 1 }, approvals: { gate2: "approved" } } },
-		{ name: "stale verification marked valid", index: { evidenceRevision: 2, verification: { evidenceRevision: 1, status: "valid" } } },
-		{ name: "scope moved past gate1", index: { evidenceRevision: 2, scopeRevision: 2, approvals: { gate1: "approved", gate1Revision: 1 } } },
+		{
+			name: "current",
+			index: { evidenceRevision: 2, verification: { evidenceRevision: 2 }, review: { evidenceRevision: 2 } },
+		},
+		{
+			name: "stale review under gate2",
+			index: { evidenceRevision: 2, review: { evidenceRevision: 1 }, approvals: { gate2: "approved" } },
+		},
+		{
+			name: "stale verification marked valid",
+			index: { evidenceRevision: 2, verification: { evidenceRevision: 1, status: "valid" } },
+		},
+		{
+			name: "scope moved past gate1",
+			index: { evidenceRevision: 2, scopeRevision: 2, approvals: { gate1: "approved", gate1Revision: 1 } },
+		},
 		{ name: "revision out of range", index: { evidenceRevision: 1, review: { evidenceRevision: 9 } } },
 		{ name: "scope ahead of revision", index: { evidenceRevision: 1, scopeRevision: 5 } },
-		{ name: "status superseded under gate2", index: { review: { status: "superseded" }, approvals: { gate2: "approved" } } },
+		{
+			name: "status superseded under gate2",
+			index: { review: { status: "superseded" }, approvals: { gate2: "approved" } },
+		},
 	];
 
 	it.each(fixtures)("agrees on $name", ({ index }) => {
@@ -440,7 +470,13 @@ describe("advice command", () => {
 		const root = tempRoot();
 		await begin(root);
 		await expect(
-			runAdvice(root, { subcommand: "commit", run: "run-1", checkpoint: "other", disposition: "CONTINUE_WITH_DIRECTIVE", reason: "r" }),
+			runAdvice(root, {
+				subcommand: "commit",
+				run: "run-1",
+				checkpoint: "other",
+				disposition: "CONTINUE_WITH_DIRECTIVE",
+				reason: "r",
+			}),
 		).rejects.toThrow(/no open checkpoint/);
 	});
 
@@ -555,7 +591,9 @@ describe("advice command", () => {
 			/escalated to a human/,
 		);
 		// A different skill is unaffected — the escalation is scoped, not global.
-		await expect(begin(root, { run: "run-c", skill: "mk:fix", stage: "GUIDE", checkpoint: "g3" })).resolves.toBeUndefined();
+		await expect(
+			begin(root, { run: "run-c", skill: "mk:fix", stage: "GUIDE", checkpoint: "g3" }),
+		).resolves.toBeUndefined();
 	});
 
 	it("records the escalation when a cap refusal fires", async () => {
@@ -588,7 +626,9 @@ describe("advice command", () => {
 		});
 		// Treating this as an idempotent retry would silently skip the REVIEW the
 		// workflow believes it ran.
-		await expect(begin(root, { stage: "REVIEW", checkpoint: "shared-id" })).rejects.toThrow(/distinct id per checkpoint/);
+		await expect(begin(root, { stage: "REVIEW", checkpoint: "shared-id" })).rejects.toThrow(
+			/distinct id per checkpoint/,
+		);
 	});
 
 	it("validates a packet through a reachable command, not just an unreferenced function", async () => {
@@ -605,7 +645,9 @@ describe("advice command", () => {
 				lockedDecisions: ["advisory only"],
 				currentState: "gate 1 approved",
 				workerSummary: "plan approved, no code yet",
-				evidenceRefs: [{ path: "plan.md", relevance: "the approved scope", provenance: "planner", summary: "7 phases" }],
+				evidenceRefs: [
+					{ path: "plan.md", relevance: "the approved scope", provenance: "planner", summary: "7 phases" },
+				],
 				priorDirective: "",
 				question: "what should build start with?",
 				riskAndReversibility: "reversible",

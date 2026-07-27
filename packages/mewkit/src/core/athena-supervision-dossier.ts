@@ -146,7 +146,9 @@ export function validateDossier(candidate: unknown): DossierValidation {
 		const keys = Object.getOwnPropertyNames(candidate as Record<string, unknown>);
 		for (const forbidden of FORBIDDEN_DOSSIER_FIELDS) {
 			if (keys.includes(forbidden))
-				errors.push(`"${forbidden}" belongs to the task record — the dossier carries no progress, verification, or gate state`);
+				errors.push(
+					`"${forbidden}" belongs to the task record — the dossier carries no progress, verification, or gate state`,
+				);
 		}
 	}
 
@@ -263,7 +265,8 @@ export function parseDossier(text: string): DossierRead {
 	const rawCheckpoint = frontmatterValue(fm, "checkpoint");
 	if (rawCheckpoint && rawCheckpoint !== "null") {
 		// `{ key: "value", … }` — the inline form render emits. Read the known keys.
-		const read = (k: string): string | undefined => unquote(new RegExp(`${k}:\\s*("(?:[^"\\\\]|\\\\.)*")`).exec(rawCheckpoint)?.[1]);
+		const read = (k: string): string | undefined =>
+			unquote(new RegExp(`${k}:\\s*("(?:[^"\\\\]|\\\\.)*")`).exec(rawCheckpoint)?.[1]);
 		const partition = read("partition");
 		checkpoint = {
 			checkpointId: read("checkpointId"),
