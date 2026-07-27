@@ -11,13 +11,22 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
-## 2.15.0 (2026-07-27) — Opt-In Strategic Supervision
+## 2.15.0 (2026-07-27) — Strategic Supervision & the Portable Backend Surface
 
-Ships as kit **2.15.0** and **`mewkit` CLI 2.3.0** (minor — the CLI gains a new command surface). A new advisory agent can supervise a single delivery run when you ask for it, and it holds no authority over any gate.
+Ships as kit **2.15.0** and **`mewkit` CLI 2.3.1** (patch — the CLI gains a new command surface and a safer upgrade path without changing an existing flag or subcommand). A new advisory agent can supervise a single delivery run when you ask for it, and the backend skill surface becomes portable across every supported runtime.
 
 ### Highlights
 
 Pass `--advice` to a supported skill and the `athena` agent supervises that one run: it sets direction before work starts, unblocks a stalled run, and reads finished work against its own evidence before the normal reviewer sees it — and it can send the work back for correction. It approves nothing. Every directive is evidence a human reads at a gate, never the approval itself, and supervision never counts as verification. Without the flag there are zero calls and no state is written.
+
+The backend surface is also rebuilt around discovery instead of defaults. `mk:backend-development` and `mk:devops` join a redesigned `mk:database`, and `mk:api-design` becomes `mk:api-design-principles`. The four now read the engine, platform, and contract a project already has before proposing anything — no assumed database, no assumed cloud, no invented latency target — and each states plainly what it does not own.
+
+### New Skills
+
+| Skill                      | Purpose                                                                                                     |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `mk:backend-development`   | Drives a backend change end to end and routes the contract, data, and auth parts to their owners.           |
+| `mk:devops`                | Infrastructure, containers, CI/CD, deployment safety and rollback — reads no secrets and approves no release. |
 
 ### New Agents
 
@@ -29,6 +38,12 @@ Pass `--advice` to a supported skill and the `athena` agent supervises that one 
 - `mewkit advice commit` — records the result, writes the receipt, and refuses a disposition that is illegal for the stage.
 - `mewkit advice status` — the resume view: current stage, calls used, latest directive, next safe action.
 - `mewkit advice validate-packet` — validates an input packet, an output packet, or a direct-consult brief.
+
+### CLI
+
+- Upgrading a Codex or Cursor project now removes a skill directory the bundle no longer ships, but only when its installed contents still match what the toolkit recorded at install time.
+- A skill directory you edited is preserved byte for byte and reported by name, and `--force` does not widen this — it can overwrite a currently managed skill, never an unproven retired one.
+- A dry run reports the planned removal and writes neither the directory nor the ledger.
 
 ### Features
 
@@ -43,6 +58,14 @@ Pass `--advice` to a supported skill and the `athena` agent supervises that one 
 
 - `--advice` and `--html` are orthogonal: combining them changes no activation, approval, validation, export or ownership of the visual pipeline.
 - `mk:workflow-orchestrator` is not a supervision entry point — it carries only an opaque run id across phase boundaries, so an orchestrated child can never supervise itself.
+- `mk:database` is now portable and engine-neutral — it discovers the engine, migration tool and ORM a project already runs instead of assuming PostgreSQL, and asks when the repository does not say.
+- Database guidance leads with data invariants rather than syntax, requires a recovery path for any change to a table that already holds data, and never runs a migration or backfill against a live database.
+- The accurate PostgreSQL specifics are kept, each restated as conditional on the engine actually in use rather than as a universal rule.
+- Help, ask-me, the agent detector and the plan creator now share one API / backend / database / DevOps decision matrix, so the four adjacent skills route the same way from every entry point.
+
+### Removals
+
+- `mk:api-design` is replaced by `mk:api-design-principles` with no alias — invoke the new id, which covers RPC and event contracts alongside REST and GraphQL. The old documentation URL redirects to the new page.
 
 ### Bug Fixes
 
@@ -52,6 +75,11 @@ Pass `--advice` to a supported skill and the `athena` agent supervises that one 
 ### Beta
 
 - Supervision is authored for Claude Code, Codex and Cursor, but no runtime has been verified end to end yet: every capability reports `unverified`, and a runtime that cannot reach the agent prints an unavailable notice and continues unsupervised. Run `mewkit providers <provider>` to see the current state.
+
+### Migration Notes
+
+- Run `npx mewkit upgrade` to pick up the new skills. An untouched `api-design` skill directory is removed as part of the upgrade; an edited one is kept and named in the output so you can merge it yourself.
+- Replace `mk:api-design` with `mk:api-design-principles` anywhere you invoke it by name — there is no alias, so the old id resolves to nothing.
 
 ---
 

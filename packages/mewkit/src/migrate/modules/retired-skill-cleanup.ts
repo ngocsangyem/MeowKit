@@ -196,6 +196,12 @@ export async function reconcileRetiredSkills(input: RetiredSkillCleanupInput): P
 			continue;
 		}
 
+		// Caveat on "pristine": the tree checksum walks only regular files and directories,
+		// so a symlink nested INSIDE the candidate is not part of the hash and cannot make
+		// the comparison fail. That is not a deletion hazard — the recursive remove unlinks a
+		// nested symlink rather than following it, so nothing outside the tree is reachable —
+		// but the match proves the tracked file content is unchanged, not that the directory
+		// is byte-for-byte as installed.
 		if (currentChecksum !== row.targetChecksum) {
 			// User work. Preserve it byte-for-byte and surface it; the conflict report IS the
 			// intended handoff, not a cleanup failure.

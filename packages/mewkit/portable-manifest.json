@@ -1,7 +1,14 @@
 {
 	"version": "1.0",
-	"mewkitVersion": "1.14.0",
-	"renames": [],
+	"mewkitVersion": "2.3.1",
+	"renames": [
+		{
+			"from": "skills/api-design",
+			"to": "skills/api-design-principles",
+			"type": "skill",
+			"since": "2.3.1"
+		}
+	],
 	"providerPathMigrations": [
 		{
 			"provider": "codex",

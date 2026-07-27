@@ -80,7 +80,6 @@ describe("portable evolution manifest", () => {
 		const manifest = await loadPortableEvolutionManifest(dirname(SHIPPED_MANIFEST_PATH), {});
 
 		expect(manifest).not.toBeNull();
-		expect(manifest?.mewkitVersion).toBe("1.14.0");
 
 		const codexRulesMigration = manifest?.providerPathMigrations.find(
 			(entry) => entry.provider === "codex" && entry.type === "rules",
@@ -92,8 +91,36 @@ describe("portable evolution manifest", () => {
 			to: "AGENTS.md",
 			since: "1.14.0",
 		});
-		// The entry's `since` must be applicable at the manifest's own version.
-		expect(manifest?.mewkitVersion).toBe(codexRulesMigration?.since);
+	});
+
+	it("ships the api-design skill rename so an upgrade cleans up the retired directory", async () => {
+		const manifest = await loadPortableEvolutionManifest(dirname(SHIPPED_MANIFEST_PATH), {});
+
+		expect(manifest?.renames).toContainEqual({
+			from: "skills/api-design",
+			to: "skills/api-design-principles",
+			type: "skill",
+			since: "2.3.1",
+		});
+	});
+
+	it("every shipped entry is applicable at the manifest's own version", async () => {
+		// The real invariant behind `isEntryApplicable`: an entry whose `since` is AHEAD of
+		// the manifest version is filtered out and silently never applied. Checking every
+		// entry catches that, where pinning one entry's `since` to the manifest version only
+		// ever described the manifest at the moment it had a single entry.
+		const manifest = await loadPortableEvolutionManifest(dirname(SHIPPED_MANIFEST_PATH), {});
+		const entries = [
+			...(manifest?.renames ?? []),
+			...(manifest?.providerPathMigrations ?? []),
+			...(manifest?.sectionRenames ?? []),
+		];
+		expect(entries.length).toBeGreaterThan(0);
+
+		const applicable = filterApplicableManifestEntries(manifest!, {});
+		const applicableCount =
+			applicable.renames.length + applicable.providerPathMigrations.length + applicable.sectionRenames.length;
+		expect(applicableCount).toBe(entries.length);
 	});
 
 	it("filters entries already applied by registry version", () => {
