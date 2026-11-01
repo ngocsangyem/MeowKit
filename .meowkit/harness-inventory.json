@@ -92,13 +92,6 @@
       "runtime": "claude-code",
       "responsibility": "intervention-recording"
     },
-    "rules/memory-read-rules.md": {
-      "owner": "memory",
-      "criticality": "high",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "project-memory"
-    },
     "rules/model-selection-rules.md": {
       "owner": "lifecycle",
       "criticality": "high",
@@ -182,13 +175,6 @@
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "verification"
-    },
-    "rules/wiki-context-rules.md": {
-      "owner": "memory",
-      "criticality": "medium",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "project-memory"
     },
     "rules-conditional/advice-supervision-rules.md": {
       "owner": "research",

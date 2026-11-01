@@ -4,17 +4,15 @@
 ## Contents
 
 - [Preamble (run first)](#preamble-run-first)
-- [Memory](#memory)
 - [SETUP (run this check BEFORE any browse command)](#setup-run-this-check-before-any-browse-command)
 
 ## Preamble (run first)
 
 ```bash
-mkdir -p .meowkit/memory/sessions
-touch .meowkit/memory/sessions/"$PPID"
-_SESSIONS=$(find .meowkit/memory/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find .meowkit/memory/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(.codex/scripts/bin/workflow-config get contributor 2>/dev/null || true)
+mkdir -p .meowkit/state/sessions
+touch .meowkit/state/sessions/"$PPID"
+_SESSIONS=$(find .meowkit/state/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
+find .meowkit/state/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _PROACTIVE=$(.codex/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
@@ -82,10 +80,6 @@ touch .meowkit/state/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
-
-## Memory
-
-- **Writes memory:** when the session produces a design-doc decision, append the structured record to canonical `.meowkit/memory/architecture-decisions.json`, validate it, then regenerate the Markdown view. Do not write `architecture-decisions.md`; it is non-authoritative. Scrub secrets before writing.
 
 ## SETUP (run this check BEFORE any browser command)
 

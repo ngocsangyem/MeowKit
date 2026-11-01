@@ -52,7 +52,7 @@ When neither chub nor MCP has the internal docs:
 
 Internal docs are often long specifications:
 - ≤ 3000 tokens → inline
-- \> 3000 tokens → save to `.meowkit/memory/docs-cache/project-{topic}.md`, return summary
+- \> 3000 tokens → save to `.meowkit/cache/docs/project-{topic}.md`, return summary
 
 ## Fallback
 

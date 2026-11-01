@@ -166,6 +166,7 @@ def write_security_log(findings: list[Finding], log_path: Path, command: str = "
 
     timestamp = datetime.now().strftime("%y%m%d-%H%M%S")
     try:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
         with open(log_path, "a", encoding="utf-8") as f:
             for finding in critical:
                 f.write(f"[{timestamp}] [{finding.level}] [{command}] {finding.description} — {finding.file}\n")
@@ -203,7 +204,12 @@ def main() -> int:
         print("HALT: Review findings above. Do NOT proceed without human review.")
 
         # Write to security log
-        log_path = directory / ".claude" / "memory" / "security-log.md"
+        # Canonical destination named by `.claude/rules/intervention-recording-rules.md`:
+        # the telemetry class, NOT `.meowkit/memory/`. A finding's description quotes the
+        # attacker payload, and the memory store is committed and grep-read back as DATA by
+        # the read-set skills — logging there would turn the audit trail into a delivery
+        # channel for the payload it recorded. Telemetry is gitignored and never recall-read.
+        log_path = directory / ".meowkit" / "telemetry" / "security-log.md"
         write_security_log(critical, log_path, command)
         print(f"Findings logged to: {log_path}")
 

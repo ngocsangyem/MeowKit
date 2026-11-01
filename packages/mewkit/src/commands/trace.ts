@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import { resolveStateDir } from "../state/resolve-state-dir.js";
 import pc from "picocolors";
 import {
 	parseTraceLog,
@@ -121,7 +120,12 @@ function runPropose(claudeDir: string, records: TraceRecord[], opts: TraceOption
 	if (items.length === 0) console.log(pc.dim("  Nothing to propose — no repeated friction or drift."));
 
 	if (opts.commit && items.length > 0) {
-		const backlog = path.join(resolveStateDir(path.dirname(claudeDir), "memory"), "improvement-backlog.md");
+		// The advisory backlog is NOT memory. It used to land in the memory store, which is now
+		// committed and read by `grep -ril … .meowkit/memory/` — so trace-derived friction text
+		// became grep-readable "team knowledge" and was linted as such (arbitrary friction text
+		// can trip the injection patterns and wedge the blocking lint). Backlog items belong
+		// beside the other task artifacts.
+		const backlog = path.join(path.dirname(claudeDir), "tasks", "backlog", "improvement-backlog.md");
 		fs.mkdirSync(path.dirname(backlog), { recursive: true });
 		const stamp = new Date().toISOString().slice(0, 10);
 		const lines = [`\n## ${stamp} — advisory proposals (trace propose)`];

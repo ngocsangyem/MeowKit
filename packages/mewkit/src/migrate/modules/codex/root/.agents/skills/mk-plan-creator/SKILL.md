@@ -5,7 +5,7 @@ description: "Structured multi-file implementation plans before build; scope-awa
 
 # Plan Creator
 
-Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, visual rendering, archive, and durable-memory capture stay with their existing owners.
+Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, visual rendering, archive, and durable-memory writes stay with their existing owners.
 
 ## When to Use
 

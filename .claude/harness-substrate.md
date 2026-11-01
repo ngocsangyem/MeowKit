@@ -10,7 +10,7 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 | Task specification | ✅ covered | 13 | 13 | agent-routing, anti-rationalization, core-behaviors |
 | Context selection | ✅ covered | 5 | 5 | context-budget-rules, step-file-rules, context-audit |
 | Tool access | ✅ covered | 5 | 5 | skill-authoring-rules, confluence-setup, upgrade |
-| Project memory | ✅ covered | 7 | 7 | mk:wiki, mk:wiki-render, mk:wiki-research |
+| Project memory | ✅ covered | 2 | 2 | retro, learning-observer |
 | Task state | ✅ covered | 9 | 9 | agent-conduct, orchestration-rules, parallel-execution-rules |
 | Observability | ✅ covered | 12 | 12 | post-phase-delegation, workflow-evidence-rules, budget |
 | Failure attribution | ✅ covered | 3 | 3 | advice-supervision-rules, fix, posttoolfailure-probe |

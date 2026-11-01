@@ -1,3 +1,21 @@
 {
-  "deletions": []
+  "deletions": [
+    "hooks/handlers/immediate-capture-handler.cjs",
+    "hooks/lib/memory-prune.py",
+    "rules/memory-read-rules.md",
+    "rules/wiki-context-rules.md",
+    "scripts/memory-migrator.cjs",
+    "scripts/memory-topic-file-migrator.cjs",
+    "skills/document-release/references/contributor-mode.md",
+    "skills/memory/references/capture-architecture.md",
+    "skills/memory/references/consolidation.md",
+    "skills/memory/references/cost-tracking.md",
+    "skills/memory/references/pattern-extraction.md",
+    "skills/memory/references/session-capture.md",
+    "skills/retro/references/contributor-mode.md",
+    "skills/wiki-render/SKILL.md",
+    "skills/wiki-research/SKILL.md",
+    "skills/wiki/SKILL.md",
+    "skills/wiki/references/terminal-handoff-advisory.md"
+  ]
 }

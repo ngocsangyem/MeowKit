@@ -19,6 +19,7 @@ import { resolveCursorModuleDir } from "../migrate/modules/cursor-authored-bundl
 import { reconcileApplyCursorBundle } from "../migrate/modules/cursor-reconcile-apply.js";
 import { describeRetiredSkills } from "../migrate/modules/retired-skill-cleanup.js";
 import { meowkitStatePaths } from "../state/meowkit-state-paths.js";
+import { reportOrphanedV2Stores } from "../core/report-orphaned-stores.js";
 
 /** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
 const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
@@ -311,10 +312,15 @@ async function performUpgrade(
 			console.log(`  ${pc.red("removed")} ${stats.orphansDeleted.length}  ${pc.dim("(release no longer ships)")}`);
 		}
 		if (stats.orphansSkipped.length > 0) {
+			// NAME them. A count alone is unactionable: a leftover rule file still auto-loads
+			// and can outrank the current release's guidance, and the user cannot judge the risk
+			// — or delete the file by hand — from the number alone.
 			console.log(
-				pc.yellow(`\n  ${stats.orphansSkipped.length} orphan file(s) detected but not deleted (use --yes to confirm).`),
+				pc.yellow(`\n  ${stats.orphansSkipped.length} orphan file(s) detected but not deleted (use --yes to confirm):`),
 			);
+			for (const relPath of stats.orphansSkipped) console.log(pc.yellow(`    .claude/${relPath}`));
 		}
+		reportOrphanedV2Stores(process.cwd());
 
 		if (stats.userModified.length > 0) {
 			console.log(

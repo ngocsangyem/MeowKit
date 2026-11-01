@@ -91,7 +91,8 @@ No two agents modify the same file type. Conflicts escalate to human.
 | `tasks/plans/` | planner |
 | `tasks/reviews/` | reviewer |
 | `docs/` | documenter |
-| `.meowkit/memory/` (curated stores), `.meowkit/telemetry/` (cost log, trace log) | analyst, documenter |
+| `.meowkit/memory/` (team store, written via `mewkit note`) | write-set skills and agents |
+| `.meowkit/telemetry/` (cost log, trace log) | analyst, documenter |
 
 ## See also
 
@@ -109,7 +110,7 @@ _Generated from `.claude/`. Every agent on disk appears here; the sections above
 | Agent | What it does |
 |---|---|
 | [`advisor`](/reference/agents/advisor) | Isolated advisory executor for mk:advise. Interviews one question at a time, confirms a reframing of the user's problem, then delivers a single honest recommendation packet. Invoked ONLY by mk:advise — never routed to directly by the orchestrator, and never as a lifecycle phase owner. Examples: "What should I do about our slow build?", "Advise me on splitting this service.", "Am I approaching this migration right?" |
-| [`analyst`](/reference/agents/analyst) | Cost and learning analysis agent that tracks token usage, generates cost reports, extracts patterns from sessions, and maintains institutional memory. Invoked on session end only by its owning workflow, or on demand via /mk:budget. Not for implementation, planning, or review decisions. |
+| [`analyst`](/reference/agents/analyst) | Cost and learning analysis agent that tracks token usage, generates cost reports, and extracts patterns from sessions. Invoked on session end only by its owning workflow, or on demand via /mk:budget. Not for implementation, planning, or review decisions. |
 | [`architect`](/reference/agents/architect) | System design specialist for architectural tradeoff evaluation and ADR generation. Use when tasks touch database schema, new service boundaries, auth systems, API contracts, or infrastructure. Also use for any task classified as complex by the orchestrator. Not for implementation or routine planning. |
 | [`athena`](/reference/agents/athena) | Strategic intelligence and lifecycle supervision. At --advice checkpoints, Athena supervises ONE delivery run across GUIDE, RESCUE, REVIEW and RECHECK. Where a runtime exposes it, direct Athena is a stateless strategy consult for trade-offs, judgement and a recommended operational decision. It returns evidence-backed assessment, recommendation and directive, may return work to its executor for correction, but holds no gate authority, writes nothing, and never interviews the user. Examples: "which architecture trade-off should we choose within this approved scope?", "two fix approaches failed on an evidenced root cause — what next?", "verification passed; does the evidence actually cover the acceptance criteria?" |
 | [`brainstormer`](/reference/agents/brainstormer) | Use this agent when you need to brainstorm software solutions, evaluate architectural approaches, or debate technical decisions before implementation. Examples: "Should I use WebSockets or SSE for real-time?", "What's the best approach for file uploads?", "Evaluate REST vs GraphQL for our API." Use proactively during Phase 1 (Plan) when the task involves significant technical decisions or multiple viable approaches. Not for implementation or final decisions. |

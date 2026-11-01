@@ -60,22 +60,6 @@ npx mewkit trace score            # entropy score
 npx mewkit trace --friction "<note>" [--responsibility <r>] [--commit]
 ```
 
-## index
-
-Build or refresh the derived SQLite index (`.meowkit/cache/wiki-index.db`) from the canonical append logs (`.meowkit/memory/*.jsonl`) and the wiki tree. Disposable and deterministic — delete it and re-run to get an identical index.
-
-```bash
-npx mewkit index [--json]
-```
-
-## query
-
-Run read-only aggregate queries over the derived index (events by type, runs, friction by responsibility, cost by model). Requires a prior `mewkit index`.
-
-```bash
-npx mewkit query [--json]
-```
-
 ## inventory
 
 Report harness-artifact coverage. With `--substrate`, map artifacts onto the responsibility taxonomy (covered / partial / missing); `--emit` rewrites the generated `harness-substrate.md` view.

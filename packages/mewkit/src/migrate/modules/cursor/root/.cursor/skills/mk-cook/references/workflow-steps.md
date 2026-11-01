@@ -34,9 +34,8 @@ All modes share these phases with mode-specific variations.
    - Auth/payments/security → always COMPLEX
    - Feature <5 files → STANDARD
    - Rename/typo/format → TRIVIAL
-3. **Read memory** (if exists): `.meowkit/memory/fixes.json` only for bug-class warnings; `.meowkit/memory/architecture-decisions.json` first for prior architectural decisions — note relevant prior learnings (see AGENTS.md (Memory))
-4. If mode=code: load plan path, parse phases
-5. **Autonomy Boundaries (advisory):** if the loaded plan.md has an `## Autonomy Boundaries` block (long-horizon plans only), read it once for the whole run and comply **mode-aware**:
+3. If mode=code: load plan path, parse phases
+4. **Autonomy Boundaries (advisory):** if the loaded plan.md has an `## Autonomy Boundaries` block (long-horizon plans only), read it once for the whole run and comply **mode-aware**:
    - Interactive / `code` mode: an "Ask first" item → raise an immediate `stop and ask the user in chat` when that decision arises; "Always" items proceed without asking.
    - Autonomous (`auto` / autobuild): an "Ask first" item → **defer** — skip the action, log the deferred decision to the plan.md Agent State, proceed with the safe default; deferred decisions surface at the next existing touchpoint (Gate 2 / autobuild run-report). NEVER raise an ad-hoc blocking prompt mid-autonomous-run.
    - Block **absent** (short plans — the common case): default to "proceed on reversible in-scope changes; built-in gates still apply." Do NOT error, do NOT over-ask.
@@ -327,23 +326,7 @@ delegate a sub-task (subagent_type="planner", prompt="Run full sync-back for [pl
    delegate a sub-task (subagent_type="documenter", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
    ```
 
-3. **Memory capture (MUST spawn):**
-
-   ```
-   delegate a sub-task (subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .meowkit/memory/fixes.json (canonical); write architectural decisions to .meowkit/memory/architecture-decisions.json (canonical); write review patterns to .meowkit/memory/review-patterns.json (canonical). After all writes, regenerate the matching .md views via 'mewkit memory render-views' — do NOT hand-write the .md files (see AGENTS.md Memory section).", description="Session memory capture")
-   ```
-
-4. Mark all session tasks complete after sync-back
-
-5. **Terminal wiki handoff (advisory, fail-open):** after sync-back, docs, and memory writes complete, optionally hand the implemented plan off to the wiki per `.cursor/skills/wiki/references/terminal-handoff-advisory.md`. Use the status report at `{plan-dir}/status-reports/<YYMMDD>-status.md` if present, else the synced `plan.md`. Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip + print the command). Advisory only — never blocks, never approves; do not add `wiki reindex`:
-
-   ```bash
-   npx mewkit wiki handoff propose \
-     --skill mk:cook \
-     --from {plan-dir}/plan.md \
-     --slug <resolved-wiki-slug> \
-     --verified-outcome
-   ```
+3. Mark all session tasks complete after sync-back
 
 ### Per-Phase Checkpoint (MANDATORY — fires after EACH completed plan phase, before the next-phase transition)
 
@@ -361,7 +344,7 @@ Idempotent: re-running this checkpoint on an unchanged phase produces zero diff 
 **Auto mode:** After an explicit close request, check if more plan phases remain → loop to Phase 2 for next phase.
 **Others:** Ask user before continuing to next phase.
 
-**Output:** `Phase 6: Reflect — sync-back done, docs [impact], memory updated, wiki handoff [proposed|skipped]`
+**Output:** `Phase 6: Reflect — sync-back done, docs [impact]`
 
 ## Workflow Evidence Index (traceability — no new gate)
 
@@ -371,7 +354,7 @@ Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist acro
 
 | Phase | Existing output → evidence fields |
 |---|---|
-| 0 Orient | `mode`, tier, `risk.matchedFlags` (from `risk-checklist.md` / `mk:agent-detector`), memory-loaded flag |
+| 0 Orient | `mode`, tier, `risk.matchedFlags` (from `risk-checklist.md` / `mk:agent-detector`) |
 | 1 Plan | `planPath`, `cookContract` (the 5 exact requirements), `approvals.gate1` (mirrors `validate-gate-1.sh`) |
 | 3 Build | changed-files summary |
 | 3.5 Simplify | simplify status |
@@ -379,7 +362,7 @@ Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist acro
 | 4 Review | `review.verdictPath`, `review.status`, `review.sideEffectsDetected`, `approvals.gate2` (mirrors `validate-gate-2.sh`) |
 | 4.5 Verify | `--verify`/`--strict` run state only — RECORD result; does NOT change advisory vs hard-gate semantics |
 | 5 Ship | ship pre-flight status → `approvals.ship` |
-| 6 Reflect | `memory.*` capture status |
+| 6 Reflect | sync-back + docs-impact status |
 
 `cookContract` is populated from the Phase 1 five exact requirements; **skip it only when the input was an existing `plan.md` / `phase-*.md` path** (the contract already lives in the plan — pass `--plan-input` to the validator). Evidence completeness must pass before presenting Gate 2 (see Phase 4 GATE 2). Scrub secrets/PII; store pointers + summaries, not raw logs.
 

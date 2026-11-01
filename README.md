@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  128 skills &middot; 42 agents &middot; 27 commands &middot; 7 modes &middot; 27 rules &middot; 5 conditional rules &middot; 18 hook scripts &middot; 4-layer+ security
+  125 skills &middot; 42 agents &middot; 27 commands &middot; 7 modes &middot; 25 rules &middot; 5 conditional rules &middot; 18 hook scripts &middot; 4-layer+ security
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
 
 ## What is MeowKit
 
-MeowKit installs a `.claude/` directory that Claude Code reads at session start. It enforces a structured 7-phase workflow with hard gates, TDD, security scanning, and scoped topic-file memory (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`). Zero external dependencies for core workflow.
+MeowKit installs a `.claude/` directory that Claude Code reads at session start. It enforces a structured 7-phase workflow with hard gates, TDD, security scanning, and a two-file team memory store (`.meowkit/memory/decisions.md`, `gotchas.md`) read by grep. Zero external dependencies for core workflow.
 
 **Homepage:** [meowkit.dev](https://meowkit.dev) &nbsp;·&nbsp; **Docs:** [docs.meowkit.dev](https://docs.meowkit.dev/)
 
@@ -100,15 +100,15 @@ npx mewkit doctor     # Verify environment
 meowkit/
 ├── .claude/                  Source of truth — agents, skills, rules, hooks
 │   ├── agents/               42 specialist agents
-│   ├── skills/               128 skills (mk: namespace)
-│   ├── rules/                27 enforcement rules
+│   ├── skills/               125 skills (mk: namespace)
+│   ├── rules/                25 enforcement rules
 │   ├── hooks/                18 hook scripts — lifecycle hooks + handlers + libraries
 │   ├── commands/             27 slash commands
 │   ├── modes/                7 behavioral modes
-│   ├── memory/               Machine-local topic files (gitignored; scaffolded by `mewkit setup`)
 │   ├── scripts/              Python validators + shell utilities
 │   └── settings.json
 ├── tasks/                    Task templates
+├── .meowkit/memory/          Team store: decisions.md + gotchas.md (committed)
 ├── packages/
 │   ├── mewkit/               CLI (npm as mewkit)
 │   └── landing/              Landing page (meowkit.dev, Nuxt + Tailwind v4)

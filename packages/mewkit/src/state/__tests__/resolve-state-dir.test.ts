@@ -25,12 +25,21 @@ const HOOK_LIB = resolve(
 const roots: string[] = [];
 afterEach(() => roots.splice(0).forEach((d) => rmSync(d, { recursive: true, force: true })));
 
-function makeRoot(shape: "fresh" | "legacy" | "migrated" | "legacy-gitkeep" | "meowkit-no-memory"): string {
+type Shape = "fresh" | "legacy" | "migrated" | "legacy-gitkeep" | "legacy-stray-file" | "meowkit-no-memory";
+
+function makeRoot(shape: Shape): string {
 	const root = mkdtempSync(join(tmpdir(), "mewkit-stateroot-"));
 	roots.push(root);
 	if (shape === "legacy" || shape === "migrated") {
+		// A RECOGNISED store file is what makes the legacy tree a memory store.
 		mkdirSync(join(root, ".claude", "memory"), { recursive: true });
-		writeFileSync(join(root, ".claude", "memory", "fixes.json"), "{}");
+		writeFileSync(join(root, ".claude", "memory", "gotchas.md"), "# Gotchas\n");
+	}
+	if (shape === "legacy-stray-file") {
+		// A log, a cache file, a botched redirect — several writers mkdir -p this path. One
+		// stray entry must NOT relocate (and thereby un-commit) the whole store.
+		mkdirSync(join(root, ".claude", "memory"), { recursive: true });
+		writeFileSync(join(root, ".claude", "memory", "docs-cache.json"), "{}");
 	}
 	if (shape === "legacy-gitkeep") {
 		mkdirSync(join(root, ".claude", "memory"), { recursive: true });
@@ -52,13 +61,26 @@ describe("resolveStateDir — project shapes", () => {
 		expect(resolveStateDir(root, "cache")).toBe(join(root, ".meowkit", "cache"));
 	});
 
-	it("a pre-migration project keeps writing to its existing tree, so history is never split", () => {
+	it("a pre-migration project keeps writing its MEMORY to the existing tree, so history is never split", () => {
 		const root = makeRoot("legacy");
 		expect(usingLegacyMemoryTree(root)).toBe(true);
-		// Every class collapses to the flat legacy dir — the pre-migration layout.
-		for (const cls of ["memory", "telemetry", "state", "cache"] as const) {
-			expect(resolveStateDir(root, cls)).toBe(join(root, ".claude", "memory"));
+		expect(resolveStateDir(root, "memory")).toBe(join(root, ".claude", "memory"));
+	});
+
+	it("the legacy fallback is scoped to memory — telemetry, state and cache never follow it", () => {
+		// The fallback used to apply to all four classes, which put the trace log and the
+		// security log INSIDE the grep-read memory directory, and resolved the committed store
+		// into a gitignored path. Only `memory` has legacy history to preserve.
+		const root = makeRoot("legacy");
+		for (const cls of ["telemetry", "state", "cache"] as const) {
+			expect(resolveStateDir(root, cls)).toBe(join(root, ".meowkit", cls));
 		}
+	});
+
+	it("one stray non-store file in the legacy dir does not flip the fallback", () => {
+		const root = makeRoot("legacy-stray-file");
+		expect(usingLegacyMemoryTree(root)).toBe(false);
+		expect(resolveStateDir(root, "memory")).toBe(join(root, ".meowkit", "memory"));
 	});
 
 	it("a migrated project ignores leftover legacy content", () => {
@@ -84,14 +106,16 @@ describe("resolveStateDir — project shapes", () => {
 	it("a ledger-only .meowkit/ alongside real legacy content still defers to the legacy tree", () => {
 		const root = makeRoot("meowkit-no-memory");
 		mkdirSync(join(root, ".claude", "memory"), { recursive: true });
-		writeFileSync(join(root, ".claude", "memory", "fixes.json"), "{}");
+		writeFileSync(join(root, ".claude", "memory", "decisions.md"), "# Decisions\n");
 		expect(usingLegacyMemoryTree(root)).toBe(true);
 		expect(resolveStateDir(root, "memory")).toBe(join(root, ".claude", "memory"));
 	});
 });
 
 describe("the three resolvers agree", () => {
-	const shapes = ["fresh", "legacy", "migrated", "legacy-gitkeep", "meowkit-no-memory"] as const;
+	// `legacy` is excluded from the all-class sweep: only `memory` follows the legacy tree,
+	// covered by the dedicated tests below.
+	const shapes = ["fresh", "migrated", "legacy-gitkeep", "meowkit-no-memory"] as const;
 	const classes = ["memory", "telemetry", "state", "cache"] as const;
 
 	function shellResolve(root: string, cls: string): string {
@@ -122,4 +146,27 @@ describe("the three resolvers agree", () => {
 			}
 		});
 	}
+
+	it("all three still agree on MEMORY for a legacy project", () => {
+		const root = makeRoot("legacy");
+		const ts = resolveStateDir(root, "memory");
+		expect(ts).toBe(join(root, ".claude", "memory"));
+		expect(shellResolve(root, "memory")).toBe(ts);
+		expect(cjsResolve(root, "memory")).toBe(ts);
+	});
+
+	it("all three agree that telemetry/state/cache never fall back, and a stray file does not flip memory", () => {
+		const legacy = makeRoot("legacy");
+		for (const cls of ["telemetry", "state", "cache"] as const) {
+			const ts = resolveStateDir(legacy, cls);
+			expect(ts).toBe(join(legacy, ".meowkit", cls));
+			expect(shellResolve(legacy, cls)).toBe(ts);
+			expect(cjsResolve(legacy, cls)).toBe(ts);
+		}
+		const stray = makeRoot("legacy-stray-file");
+		const ts = resolveStateDir(stray, "memory");
+		expect(ts).toBe(join(stray, ".meowkit", "memory"));
+		expect(shellResolve(stray, "memory")).toBe(ts);
+		expect(cjsResolve(stray, "memory")).toBe(ts);
+	});
 });

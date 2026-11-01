@@ -33,7 +33,7 @@ When a skill needs to persist data across sessions (append-only logs, JSON state
 
 WHY: Skill directories can be wiped on plugin upgrade; `${CLAUDE_PLUGIN_DATA}` is stable.
 
-EXCEPTION: framework-internal infrastructure (`.meowkit/memory/`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
+EXCEPTION: framework-internal infrastructure (the team memory store `.meowkit/memory/{decisions,gotchas}.md`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
 
 **Good example: Stable plugin-data path**:
 
@@ -166,7 +166,7 @@ Use exact, low-freedom instructions and deterministic gates only for fragile,
 destructive, security-sensitive, or otherwise deterministic steps. For judgment
 tasks, define the outcome and leave the method proportionate to the risk.
 
-Do not require finding quotas, reports, memory writes, wiki updates, or a fixed
+Do not require finding quotas, reports, memory writes, or a fixed
 number of ideas for trivial runs. Those requirements create ceremony without
 making the result safer or more reliable.
 

@@ -24,4 +24,4 @@ What each phase expects and produces. Breaking upstream contracts cascades downs
 | 3.6 Verify   | mk:verify                      | Simplified code                      | Clean build+lint+type+test+coverage result               | Review starts with broken signal       |
 | 4 Review     | mk:review                      | Committed code with passing tests    | Verdict (PASS/WARN/FAIL per dimension)                   | Can't assess correctness without tests |
 | 5 Ship       | mk:ship                        | PASS/WARN verdict (Gate 2)           | PR + branch push                                         | Ships unreviewed code                  |
-| 6 Reflect    | analyst + documenter + mk:memory | Completed work with decisions      | Memory entries, docs sync                                | Knowledge lost (non-blocking)          |
+| 6 Reflect    | analyst + documenter + mk:memory | Completed work with decisions      | Append gotcha/decision if non-derivable, docs sync       | Knowledge lost (non-blocking)          |

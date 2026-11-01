@@ -70,7 +70,7 @@ const CLAUDE_CODE_LIFECYCLE: LifecycleMap = {
 		status: "supported",
 		gate: false,
 		evidence:
-			"UserPromptSubmit block is a documented host capability, but no shipped hook blocks there (handlers are inject/capture only) — no in-repo proof",
+			"UserPromptSubmit block is a documented host capability, but no shipped hook blocks there (handlers are inject-only) — no in-repo proof",
 	},
 	stop: {
 		status: "supported",

@@ -100,7 +100,7 @@ export function deniedTokenCleanliness(targetChecks: readonly CheckResult[]): Jo
 }
 
 /**
- * Side-effect denial: the run produced no unrequested durable write (commit / tag / push / wiki /
+ * Side-effect denial: the run produced no unrequested durable write (commit / tag / push /
  * memory). Consumes a durable-surface diff (see side-effect-observer). An empty diff passes.
  */
 export function sideEffectDenial(violations: readonly SideEffectViolation[]): JourneyOracleResult {

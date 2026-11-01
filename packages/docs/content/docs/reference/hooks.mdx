@@ -15,7 +15,7 @@ These run automatically via Claude Code's hook system:
 | ---------------------- | ----------- | ----------- | ----------------------------------------------------------------------------------------- | ------------ |
 | `post-write.sh`        | PostToolUse | Edit, Write | Security scan: secrets, `any` type, SQL injection, XSS, destructive patterns              | Yes (exit 2) |
 | `learning-observer.sh` | PostToolUse | Edit, Write | Detect churn patterns (file edited 3+ times); feeds into post-session retroactive capture | No           |
-| `post-session.sh`      | Stop        | Session end | Capture session data to `.meowkit/memory/`                                                 | No           |
+| `post-session.sh`      | Stop        | Session end | Record session data to `.meowkit/telemetry/`                                                 | No           |
 | `ensure-skills-venv.sh` | SessionStart | Session start | Idempotent bootstrap — creates `.claude/skills/.venv` if absent                         | No           |
 | `tdd-flag-detector.sh`  | UserPromptSubmit | Prompt submit | Detects `--tdd` flag in user prompts, writes sentinel to `session-state/tdd-mode`      | No           |
 | `gate-enforcement.sh`   | PreToolUse     | Edit, Write  | Blocks code writes before Gate 1 (plan approval) and sprint contract sign; validates contract file edits against schema | Yes (exit 1) |
@@ -205,9 +205,9 @@ node dispatch.cjs <EventName> [Matcher]
 | budget-tracker | `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | `tool_input`, `tool_response` | Estimates cost; warns $30, blocks $100 |
 | auto-checkpoint | `handlers/auto-checkpoint.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Checkpoint every 20 calls |
 | checkpoint-writer | `handlers/checkpoint-writer.cjs` | Stop | — | — | Sequenced checkpoint with git state |
-| immediate-capture | `handlers/immediate-capture-handler.cjs` | UserPromptSubmit | — | `prompt` | Detects ##decision:, ##pattern:, ##note: prefixes; routes to memory files |
+| safety-sentinel-inject | `handlers/safety-sentinel-inject.cjs` | UserPromptSubmit | — | `prompt` | Emits the cached-skip marker, or forces a safety-baseline re-read after compaction |
 
-> **Note:** The `memory-loader.cjs` handler was removed in v2.4.1. Memory is now loaded on-demand by consumer skills — there is no per-turn auto-injection.
+> **Note:** The memory auto-inject handlers and the prompt-prefix capture handler are all removed. Memory is read on demand by the read-set skills (one grep) and written by the write-set skills — there is no per-turn auto-injection and no hook capture.
 
 ### Shared Libraries
 

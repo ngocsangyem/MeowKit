@@ -36,9 +36,6 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Wiki-research security corpus
-        run: npx vitest run packages/mewkit/src/wiki/infrastructure/__tests__/fetcher-adapter.test.ts packages/mewkit/src/wiki/infrastructure/__tests__/scanner-adapter.test.ts packages/mewkit/src/wiki/application/__tests__/research-quarantine.test.ts
-
       - name: Validate visual-plan eval fixtures
         run: node scripts/validate-visual-plan-evals.cjs
 
@@ -81,10 +78,24 @@ jobs:
       - name: mk:help skill contract test
         run: bash tests/help-skill-contract.test.sh
 
-      - name: Smoke-test memory CLI
+      - name: Lint the committed team-memory store
+        # Bounded: the lint reads user-pasted content, so a pathological line must fail the
+        # step rather than burn toward the 6-hour job ceiling.
+        timeout-minutes: 5
         run: |
-          node packages/mewkit/dist/index.js memory validate
-          node packages/mewkit/dist/index.js memory render-views
+          set -euo pipefail
+          # This repo's own store (may be absent — that is a legitimate PASS).
+          node packages/mewkit/dist/index.js validate --memory
+          # A store with REAL entries, so the step is not vacuous. Copied to a temp project
+          # root (and git-init'd, since the root resolver keys off the VCS root) because the
+          # fixture lives inside this repo and would otherwise resolve to the repo root.
+          fixture_root="$(mktemp -d)"
+          cp -R tests/fixtures/memory-store/. "$fixture_root/"
+          git -C "$fixture_root" init -q .
+          ( cd "$fixture_root" && node "$GITHUB_WORKSPACE/packages/mewkit/dist/index.js" validate --memory )
+
+      - name: Zero-residue check (memory/wiki)
+        run: node scripts/check-memory-wiki-residue.cjs
 
       - name: Setup Python venv
         run: |

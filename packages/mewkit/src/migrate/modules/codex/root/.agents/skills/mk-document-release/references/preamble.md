@@ -1,11 +1,10 @@
 # Preamble (run first)
 
 ```bash
-mkdir -p .meowkit/memory/sessions
-touch .meowkit/memory/sessions/"$PPID"
-_SESSIONS=$(find .meowkit/memory/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find .meowkit/memory/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(.codex/scripts/bin/workflow-config get contributor 2>/dev/null || true)
+mkdir -p .meowkit/state/sessions
+touch .meowkit/state/sessions/"$PPID"
+_SESSIONS=$(find .meowkit/state/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
+find .meowkit/state/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _PROACTIVE=$(.codex/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"

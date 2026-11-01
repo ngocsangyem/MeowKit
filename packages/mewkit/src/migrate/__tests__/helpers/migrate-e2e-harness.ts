@@ -124,7 +124,6 @@ function buildKitInstallHookRegistrations(): HookRegistration[] {
 	return [
 		hook("SessionStart", "session-startup.cjs", "startup"),
 		hook("SessionStart", "session-resume.sh", "resume"),
-		hook("UserPromptSubmit", "prompt-capture.cjs"),
 		hook("UserPromptSubmit", "prompt-audit.sh"),
 		hook("PreToolUse", "pretooluse-bash-a.cjs", "Bash"),
 		hook("PreToolUse", "pretooluse-bash-b.sh", "Bash"),

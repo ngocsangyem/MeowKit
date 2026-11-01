@@ -1,6 +1,6 @@
 // producer-consumer-characterization.test.ts
-// Audit-lock characterization: pins the verified writer→reader wiring of the memory,
-// session-state, and telemetry planes so an accidental break (e.g. during retirement)
+// Audit-lock characterization: pins the verified writer→reader wiring of the
+// session-state and telemetry planes so an accidental break (e.g. during retirement)
 // is caught. These assertions encode the frozen baseline — if one fails, either the
 // wiring genuinely moved (update the baseline + this test together) or a regression
 // slipped in. No behavior is exercised; these are static-wiring guards.
@@ -10,27 +10,6 @@ import { resolve } from 'path';
 
 const root = process.cwd();
 const read = (rel: string): string => readFileSync(resolve(root, rel), 'utf8');
-
-describe('Audit-lock: curated-memory writers', () => {
-  it('immediate-capture-handler routes the three JSON stores', () => {
-    const h = read('.claude/hooks/handlers/immediate-capture-handler.cjs');
-    expect(h).toContain('fixes.json');
-    expect(h).toContain('architecture-decisions.json');
-    expect(h).toContain('review-patterns.json');
-  });
-
-  it('post-session.sh emits the model-change flag as a trace event, not a fixes.md write', () => {
-    const p = read('.claude/hooks/post-session.sh');
-    expect(p).toContain('dead_weight_audit_needed');
-    // The model-change flag no longer appends to the curated fixes store.
-    expect(p).not.toMatch(/cat >> "\$MEMORY_DIR\/fixes\.md"/);
-  });
-
-  // NOTE: the seed-from-md → architecture-decisions.json population is covered by
-  // seed-from-md.test.ts with tmp fixtures. It is NOT asserted here because
-  // `.claude/memory/*` is gitignored (machine-local), so the live store is absent in
-  // a fresh checkout / CI. Characterization here pins committed wiring only.
-});
 
 describe('Audit-lock: trace-log canonical stream', () => {
   it('append-trace.sh is the trace writer; callers are post-session + learning-observer', () => {

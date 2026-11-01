@@ -56,6 +56,51 @@ else
   esac
 fi
 
+# ---------------------------------------------------------------------------
+# Team memory store lint — fail closed on a poisoned store at a ship boundary.
+# ---------------------------------------------------------------------------
+# Also ABOVE the fast-profile early-exit, for the same reason as Gate 2: every
+# entry in `.meowkit/memory/` is read back as DATA by the read-set skills, and
+# the store is committed, so an injection phrase or a secret-shaped token in it
+# is a security finding. security-rules.md has no fast-mode exception.
+#
+# Exits 2, not 1: exit 1 is ADVISORY under this repo's hook contract — it would
+# print "BLOCKED" and let the commit through, which is the one outcome a write
+# guard must not produce.
+#
+# CLI resolution deliberately uses only already-resolvable executables. A bare
+# `npx mewkit` would fetch from the registry at a commit boundary, and — worse —
+# would exit non-zero when the package is simply absent, which this check would
+# then read as "poisoned store" and block on. An unavailable CLI is a SKIP with
+# a named line (the same degradation as a missing test script below), never a
+# silent pass and never a false block.
+case "$COMMAND" in
+  *"git commit"*|*"git push"*|*"git merge"*)
+    MEMORY_CLI=""
+    if [ -n "${MEOWKIT_CLI:-}" ] && [ -x "${MEOWKIT_CLI:-}" ]; then
+      MEMORY_CLI="$MEOWKIT_CLI"
+    elif [ -x "./node_modules/.bin/mewkit" ]; then
+      MEMORY_CLI="./node_modules/.bin/mewkit"
+    elif command -v mewkit > /dev/null 2>&1; then
+      MEMORY_CLI="mewkit"
+    fi
+
+    if [ -z "$MEMORY_CLI" ]; then
+      echo "SKIP: mewkit CLI not found — team memory store not linted"
+    elif ! MEMORY_LINT_OUT="$("$MEMORY_CLI" validate --memory 2>&1)"; then
+      {
+        echo "@@GATE_BLOCK@@"
+        echo "PRE-SHIP BLOCKED: team memory store lint failed."
+        echo "$MEMORY_LINT_OUT"
+        echo "A store entry carrying an injection phrase, a secret-shaped token,"
+        echo "or an unscannable file is read back as DATA by every read-set skill"
+        echo "and ships in this commit. Fix or remove the entry, then retry."
+      } >&2
+      exit 2
+    fi
+    ;;
+esac
+
 # Hook profile gating — skip pre-deploy checks in fast profile
 MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 case "$MEOW_PROFILE" in

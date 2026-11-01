@@ -21,7 +21,7 @@ the review is complete and the context is no longer needed.
 
 ```bash
 eval "$(workflow-slug 2>/dev/null)"
-rm -f .meowkit/memory/projects/*-$BRANCH-ceo-handoff-*.md 2>/dev/null || true
+rm -f tasks/plans/*/*-$BRANCH-ceo-handoff-*.md 2>/dev/null || true
 ```
 
 ## Review Log
@@ -29,8 +29,8 @@ rm -f .meowkit/memory/projects/*-$BRANCH-ceo-handoff-*.md 2>/dev/null || true
 After producing the Completion Summary above, persist the review result.
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes review metadata to
-`.meowkit/memory/` (user config directory, not project files). The skill preamble
-already writes to `.meowkit/memory/sessions/` and `.meowkit/memory/` — this is
+`.meowkit/telemetry/` (not project files). The skill preamble
+already writes to `.meowkit/state/sessions/` and `.meowkit/telemetry/` — this is
 the same pattern. The review dashboard depends on this data. Skipping this
 command breaks the review readiness dashboard in /ship.
 
@@ -181,7 +181,7 @@ At the end of the review, if the vision produced a compelling feature direction,
 
 "The vision from this review produced {N} accepted scope expansions. Want to promote it to a design doc in the repo?"
 - **A)** Promote to `docs/designs/{FEATURE}.md` (committed to repo, visible to the team)
-- **B)** Keep in `.meowkit/memory/projects/` only (local, personal reference)
+- **B)** Keep in `tasks/plans/<slug>/` only (local, personal reference)
 - **C)** Skip
 
 If promoted, copy the CEO plan content to `docs/designs/{FEATURE}.md` (create the directory if needed) and update the `status` field in the original CEO plan from `ACTIVE` to `PROMOTED`.

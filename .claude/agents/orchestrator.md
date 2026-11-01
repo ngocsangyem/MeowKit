@@ -47,7 +47,7 @@ high|COMPLEX (Opus)|Required
    - `blocked` or a `stale` warning (changed repo revision) — surface the blocker/warning explicitly and route to planner or one targeted question. Do NOT auto-resume.
    - `ambiguous` — surface every candidate task id and ask which to resume (or route to planner). Do NOT pick one silently.
    - `corrupt-only` — surface that durable state is unreadable and route to planner. Do NOT fabricate a task.
-   - `none`, or no orientation block present — proceed with normal new-work routing (steps 1–6). Only then read scoped memory and check in-progress plans.
+   - `none`, or no orientation block present — proceed with normal new-work routing (steps 1–6). Only then read budget context and check in-progress plans.
 
 1. **Classify complexity.** Every task gets one tier:
    - **Trivial**: single-file, no architectural impact (rename, typo, format, version bump)
@@ -67,11 +67,9 @@ high|COMPLEX (Opus)|Required
    - Deep security audit is inserted at Phases 2 and 4 for auth, payments, user data, API endpoints, encryption, or other flagged risk surfaces. The deterministic post-write scan runs on every write in all modes.
    - **Green-field product builds** (signals: "build me a kanban app", "make a retro game maker", "build a SaaS dashboard", "autonomous build", or any prompt asking for a multi-hour autonomous green-field build): route to `mk:autobuild` instead of the standard pipeline. The harness owns its own planner → contract → generator ⇄ evaluator loop with adaptive density. See `mk:autobuild/SKILL.md` and CLAUDE.md preference note.
 
-4. **Read scoped memory.** At session start, read only the topic files relevant to routing (see `.claude/rules/memory-read-rules.md` for precedence rule):
-   - `.meowkit/memory/fixes.json` first; fall back to `fixes.md` only if the `.json` is absent
-   - `.meowkit/memory/review-patterns.json` first; fall back to `review-patterns.md` only if the `.json` is absent
-   - `.meowkit/memory/architecture-decisions.json` first; fall back to `architecture-decisions.md` only if the `.json` is absent
-   - `.meowkit/telemetry/cost-log.json` for budget context
+4. **Read budget context.** At session start, read `.meowkit/telemetry/cost-log.json` for model-tier
+   decisions. Do not read the team memory store here — the read-set skills (`mk:fix`,
+   `mk:investigate`, `mk:review`, `mk:plan-creator`, `mk:cso`) grep it when their task needs it.
 
 5. **Enforce gates.** Never skip planner for standard/complex tasks (Gate 1). Never skip reviewer for code changes (Gate 2).
 
@@ -82,9 +80,6 @@ high|COMPLEX (Opus)|Required
 Load before starting any routing decision:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
-- `.meowkit/memory/fixes.json` (canonical); fall back to `fixes.md` if absent — recurring failure classes that affect routing (see `.claude/rules/memory-read-rules.md`)
-- `.meowkit/memory/review-patterns.json` (canonical); fall back to `review-patterns.md` if absent — repeated review outcomes that affect routing
-- `.meowkit/memory/architecture-decisions.json` (canonical); fall back to `architecture-decisions.md` if absent — active architectural constraints
 - `.meowkit/telemetry/cost-log.json`: budget context for model tier decisions
 - `CLAUDE.md` → Agent Roster table: current agent capabilities and ownership
 - `tasks/plans/`: check for in-progress plans (pipeline state) ONLY when the orientation outcome is `none`/absent (new-work routing). When orientation resolved an `active`/`blocked`/`ambiguous`/`corrupt-only` task, act on that injected block instead of scanning — no unconditional plan scan, no all-memory read.

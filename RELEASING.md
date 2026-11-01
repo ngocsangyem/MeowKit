@@ -260,28 +260,18 @@ providers; `--skill-packs core` narrows it. A second run must report `0 written`
 > converter kept after the cutover — it converts the user's own config, not toolkit content.
 > Cursor MCP is opt-in via `modules/cursor/catalog/mcp-profiles.json` and never written by a
 > fresh install on its own.
-#### 1f. Update when the derived index or wiki schema changes
+#### 1f. Update when the memory contract changes
 
-`mewkit`'s SQLite index (`.claude/memory/wiki-index.db`) is DERIVED and disposable — canonical data lives in the append logs (`.claude/memory/*.jsonl`) and the wiki tree (`tasks/wikis/<slug>/`). The DB is rebuilt by `mewkit index` (whole index) and `mewkit wiki reindex` (wiki tables); delete → reindex → identical. A schema change therefore needs code + test + doc updates, but NOT a user-data migration.
+The team store is two committed files, `.meowkit/memory/decisions.md` and `gotchas.md`. A change to
+the entry format, the read or write sets, `npx mewkit note`, or the `validate --memory` lint must
+update, in the same PR:
 
-When you change the index/wiki schema — a new table, a new column, a new FTS shape, or a `SCHEMA_VERSION` bump — update every touchpoint below:
+- `docs/core/memory-system.md` and `packages/docs/content/docs/guide/memory-system.mdx`
+- the `CLAUDE.md` Memory section, and the `mk:memory` skill
+- `docs/governance/dead-weight-audit-registry.md`, when a harness component is added or removed
 
-| Touchpoint                                                                   | What to do                                                                                                                                                                                       |
-| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `packages/mewkit/src/core/derived-index.ts` — `SCHEMA_VERSION`               | Bump the constant to the new version number.                                                                                                                                                     |
-| `packages/mewkit/src/core/derived-index.ts` — `MIGRATIONS[]`                 | APPEND a new `{ version: N, sql }` entry. Migrations are forward-only, applied when the DB's `PRAGMA user_version` is behind. NEVER edit an existing migration's SQL — installs that already ran it will not re-run it. |
-| `packages/mewkit/src/wiki/infrastructure/wiki-schema.ts` — `WIKI_DDL_STATEMENTS` / `WIKI_MIGRATION_SQL` | Wiki table + FTS DDL lives here. The v2 migration references this constant; a new wiki-table change is a NEW migration version, not an edit to v2.                            |
-| `packages/mewkit/src/wiki/infrastructure/wiki-ingest.ts`                     | Keep the JSONL → table ingest in sync with any column add/rename, or rebuilt rows silently drop the new field.                                                                                    |
-| `packages/mewkit/src/wiki/domain/types.ts`                                   | If the domain shape changed, update the types the schema mirrors.                                                                                                                                |
-| `packages/mewkit/src/core/__tests__/derived-index.test.ts`                   | This test pins `SCHEMA_VERSION` — update the expected value and add a migration test for the new version.                                                                                         |
-| `docs/architecture/system-architecture.md`                                   | Update the `SCHEMA_VERSION N` line in the Wiki Subsystem section.                                                                                                                                 |
-
-**Additive vs destructive:**
-
-- **Additive** (a new `CREATE TABLE` / `CREATE INDEX` / new column via a forward migration) auto-applies on the next `mewkit index` / `mewkit wiki reindex` — existing installs upgrade transparently, no user action.
-- **Destructive** (drop/rename a column, change an FTS table's shape) cannot be expressed as a forward `CREATE`. Either write a migration that rebuilds the affected table, or — since the DB is disposable — tell users to delete `.claude/memory/wiki-index.db` and re-run `mewkit index`. State the exact step in the CHANGELOG `Migration Notes`.
-
-Every file above lives under `packages/mewkit/src/`, so a schema change ALWAYS triggers a CLI version bump (step 3) and an npm publish (step 10).
+A format change affects existing stores, so record it in the CHANGELOG `Migration Notes` with the
+exact new entry format or command.
 
 #### 1g. No product-brand leakage in shipped content
 
@@ -289,7 +279,7 @@ Every file above lives under `packages/mewkit/src/`, so a schema change ALWAYS t
 
 **Allowed (functional — keep):**
 
-- The `mewkit` CLI binary — `npx mewkit ...`, `mewkit validate`, `mewkit wiki`, etc. (it's the installed command, not brand prose).
+- The `mewkit` CLI binary — `npx mewkit ...`, `mewkit validate`, `mewkit note`, etc. (it's the installed command, not brand prose).
 - `MEOWKIT_*` environment variables (e.g. `MEOWKIT_TDD`, `MEOWKIT_AUTOBUILD_MODE`).
 - The `ngocsangyem/MeowKit` repo URL inside plugin-install commands.
 - Attribution / provenance metadata (e.g. `SKILLS_ATTRIBUTION.md`, skill `attribution:` frontmatter) — legitimate credit.
@@ -304,7 +294,7 @@ grep -rinE 'meowkit' .claude/skills .claude/agents .claude/commands .claude/rule
   | grep -vE 'MEOWKIT_|ngocsangyem/MeowKit|attribution|MeowKit-native|meowkit_tier|author: meowkit|~/\.meowkit|meowkit-default|:meowkit:'
 ```
 
-A broader `grep -ri meowkit .claude tasks` also surfaces functional hits — config identity (`metadata.json` `"name": "meowkit"`), filenames (`gitignore.meowkit`), hook log prefixes (`[meowkit]`), generated views (`harness-substrate.md`), and the kit's own `memory/` dev log. Those are expected; only **new prose** that names the product as a subject needs neutralizing.
+A broader `grep -ri meowkit .claude tasks` also surfaces functional hits — config identity (`metadata.json` `"name": "meowkit"`), filenames (`gitignore.meowkit`), hook log prefixes (`[meowkit]`), generated views (`harness-substrate.md`). Those are expected; only **new prose** that names the product as a subject needs neutralizing.
 
 ### 2. Update CHANGELOG (`packages/docs/content/docs/changelog/index.mdx`)
 
@@ -552,14 +542,12 @@ Copy this checklist for each release:
 - [ ] If `packages/mewkit/src/` changed: chose patch / minor / major bump per the SemVer table in step 3
 - [ ] Ran `npm -w packages/mewkit version <version>` (or skipped because src untouched)
 
-### Schema (only if the index/wiki schema changed — step 1f)
+### Memory contract (only if the store format, read/write sets or lint changed — step 1f)
 
-- [ ] Bumped `SCHEMA_VERSION` in `derived-index.ts` and APPENDED a new `MIGRATIONS[]` entry (never edited an existing one)
-- [ ] Updated `wiki-schema.ts` DDL and kept `wiki-ingest.ts` in sync (if wiki tables changed)
-- [ ] Updated the `SCHEMA_VERSION` assertion + added a migration test in `derived-index.test.ts`
-- [ ] Updated the `SCHEMA_VERSION` line in `docs/architecture/system-architecture.md`
-- [ ] CHANGELOG `Migration Notes`: additive = auto-applies on next `mewkit index`; destructive = users delete `wiki-index.db` and reindex
-- [ ] Confirmed this is a `packages/mewkit/src/` change → CLI bump (step 3) + npm publish (step 10)
+- [ ] Updated `docs/core/memory-system.md`, the docs-site memory guide, and the `CLAUDE.md` Memory section
+- [ ] Confirmed `npx mewkit validate --memory` and `npx mewkit note` still match the documented entry format
+- [ ] CHANGELOG `Migration Notes` records any format change that affects existing stores
+- [ ] If `packages/mewkit/src/` changed → CLI bump (step 3) + npm publish (step 10)
 
 ### Build
 

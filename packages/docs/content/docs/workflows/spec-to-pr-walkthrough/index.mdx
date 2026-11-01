@@ -56,7 +56,7 @@ flowchart TD
     P -->|Step 9: /mk:cook &lt;plan-path&gt;<br/>code mode — Phase 1 skipped| J["7-phase pipeline<br/>Phase 0 orient → 3 build → 4 review<br/><b>GATE 2 at Phase 4</b>"]
     H -.->|TRIVIAL fast-path:<br/>/mk:cook 'implement TICKET'<br/>Phase 1 runs inline, GATE 1 fires inside cook| J
     J -->|Step 9 P5: mk:ship + mk:jira-dev + mk:jira-lifecycle| K[PR opened<br/>ticket → In Review]
-    J -->|Step 9 P6: mk:memory| L[".meowkit/memory/<br/>fixes / decisions"]
+    J -->|Step 9 P6: mk:memory| L[".meowkit/memory/<br/>gotchas / decisions"]
     K --> M["Step 10: post-merge close-loop<br/>jira-lifecycle → Done<br/>+ Confluence footer comment<br/>linking back to spec page"]
 ```
 
@@ -131,7 +131,7 @@ Three systems, three artifacts crossing each seam. No more, no less.
 | Step 9 P3 | `mk:cook` inner build                                                           | write code                          | Incremental commits                                                         |
 | Step 9 P4 | `mk:review`                                                                     | write verdict                       | Gate 2 enforced                                                             |
 | Step 9 P5 | `mk:ship` + `mk:jira-dev` + `mk:jira-lifecycle`                                 | write git + Jira                    | Branch, PR, transition                                                      |
-| Step 9 P6 | `mk:memory`                                                                     | write `.meowkit/memory/`             | Cross-session continuity                                                    |
+| Step 9 P6 | `mk:memory`                                                                     | write via `mewkit note` to `.meowkit/memory/`             | Cross-session continuity                                                    |
 | Step 10   | `mk:jira-lifecycle` + `mk:jira-collaborate` + `mk:confluence-collaborate`       | write Jira + Confluence             | Close the loop                                                              |
 
 ## Human gates summary

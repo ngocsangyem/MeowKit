@@ -13,7 +13,7 @@ Standard Task() invocation patterns for cook workflow phases.
   - [Test Failure — Debugger](#test-failure-debugger)
 - [Phase 4: Review — Code Review](#phase-4-review-code-review)
   - [Phase 5 Ship — Shipper](#phase-5-ship--shipper)
-- [Phase 6: Reflect — Sync-back + Docs + Memory](#phase-6-reflect-sync-back-docs-memory)
+- [Phase 6: Reflect — Sync-back + Docs](#phase-6-reflect-sync-back-docs)
 - [UI Work (Conditional)](#ui-work-conditional)
 
 
@@ -138,7 +138,7 @@ Task(subagent_type="shipper", prompt="Run full pre-ship pipeline: pre-ship.sh (t
 
 **Scope (shipper):** pass branch name, base branch, plan-file path (for PR body), changed-file list. Do NOT pass plan internals, session conversation. Shipper invokes `git-manager` internally for raw git ops.
 
-## Phase 6: Reflect — Sync-back + Docs + Memory
+## Phase 6: Reflect — Sync-back + Docs
 
 **Orchestrator** (detailed sync-back):
 
@@ -156,13 +156,6 @@ Task(subagent_type="documenter", prompt="Evaluate docs impact for changes: [file
 ```
 
 **Scope (documenter):** pass changed-file list, docs/ root, target-project doc allowlist (per `docs-reference-contract.md`). Do NOT pass plan internals, session conversation, code diffs.
-
-**Memory capture:**
-```
-Task(subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .meowkit/memory/fixes.json (canonical); write architectural decisions to .meowkit/memory/architecture-decisions.json (canonical); write review patterns to .meowkit/memory/review-patterns.json (canonical).", description="Session memory capture")
-```
-
-**Scope (analyst memory):** pass plan-file path, reviewer findings, decisions log, `.meowkit/memory/*.json` canonical store paths. Do NOT pass full conversation transcript (the analyst infers learnings from artifacts, not chat).
 
 ## UI Work (Conditional)
 

@@ -102,7 +102,7 @@ mk:review forks the reviewer agent in fresh context.
 Reads:
   - the diff
   - tasks/plans/.../plan.md (to check scope discipline)
-  - .meowkit/memory/review-patterns.md (past learnings)
+  - .meowkit/memory/gotchas.md (past learnings)
 Grades 5 dimensions:
   Functionality: PASS — all 3 ACs met
   Security:      PASS — uses httpOnly cookie, no token in localStorage
@@ -133,14 +133,18 @@ mk:jira-lifecycle transition AUTH-201 "In Review"
 
 ### Phase 6 — Reflect
 
-```
-mk:memory appends to:
-  - .meowkit/memory/architecture-decisions.md
-      ##decision: OAuth provider plugins follow GitHubOAuthService pattern.
-      Token refresh remains out of scope until AUTH-87 lands.
-  - .meowkit/memory/review-patterns.md
-      ##pattern: Reviewer caught missing token-refresh test on first OAuth provider.
-      Add to OAuth provider checklist.
+```md
+# .meowkit/memory/decisions.md
+## OAuth provider plugins follow the GitHubOAuthService shape   <!-- 2026-11-01 -->
+Why: a second provider needed the same token lifecycle; diverging shapes duplicated refresh logic
+Apply when: adding a third OAuth provider
+Source: PR #402
+
+# .meowkit/memory/gotchas.md
+## First OAuth provider shipped without a token-refresh test   <!-- 2026-11-01 -->
+Why: the reviewer caught it at Gate 2; the happy path passed without it
+Apply when: adding any OAuth provider
+Source: tasks/reviews/261101-auth-201-verdict.md
 ```
 
 ---

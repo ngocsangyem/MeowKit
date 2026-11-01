@@ -282,8 +282,7 @@ with it. They are separate fields because a parent may rightly reject a directiv
 and collapsing them would hide that. The reason is required even when adopted —
 "why" is what a later session cannot reconstruct.
 
-A failed receipt write surfaces a one-line notice and never fails silently
-(`.claude/rules/memory-read-rules.md`, no-silent-skip).
+A failed receipt write surfaces a one-line notice and never fails silently.
 
 Old-format receipts using the retired `proceed | pause | escalate` vocabulary stay
 readable, but MUST NOT be reinterpreted as correction authority.

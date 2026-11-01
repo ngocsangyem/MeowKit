@@ -8,7 +8,7 @@
 // age > STALE_LOCK_MS) are a cross-language contract: the shell trace writer
 // (hooks/append-trace.sh) contends on the SAME sidecar lock path with the SAME
 // protocol, so a bash writer and a TypeScript writer mutually exclude. The sync
-// variant below exists so a synchronous caller (the wiki trace adapter) shares
+// variant below exists so a synchronous caller (the trace append path) shares
 // that one primitive instead of forking a second locking scheme.
 import {
 	existsSync,
@@ -39,17 +39,44 @@ function pidIsDead(pid: number): boolean {
 	}
 }
 
-/** A lock is reclaimable when its owner PID is dead OR its timestamp is stale. */
+/** A lock is reclaimable when its owner PID is dead OR its timestamp is stale.
+ *
+ *  An UNPARSEABLE lock is treated as HELD, not as reclaimable. A half-written lock file
+ *  (any writer that creates then writes, including the shell hook) is readable as `""` for a
+ *  moment; `parseInt("")` is NaN, and reading NaN as "dead pid" made a waiter reclaim a LIVE
+ *  lock, which is exactly the mutual-exclusion failure the lock exists to prevent. A genuinely
+ *  abandoned lock is still reclaimed on a later pass once its content is readable, or by the
+ *  stale-timestamp rule below. Fail closed: a lock we cannot read is a lock someone holds. */
 function lockIsReclaimable(content: string): boolean {
 	const [pidStr, tsStr] = content.split("\n");
 	const pid = Number.parseInt(pidStr, 10);
 	const ts = Number.parseInt(tsStr, 10);
-	return pidIsDead(pid) || (Number.isFinite(ts) && Date.now() - ts > STALE_LOCK_MS);
+	if (!Number.isFinite(pid) || !Number.isFinite(ts)) return false;
+	return pidIsDead(pid) || Date.now() - ts > STALE_LOCK_MS;
+}
+
+/** Publish a lock file ATOMICALLY: write the full content to a private name, then `link` it
+ *  into place. `link` fails with EEXIST when the lock is already held, so the lock file is
+ *  never observable in a partially-written state — unlike `open(wx)` + `write`, which leaves
+ *  a readable empty file between the two calls. Returns false when another writer holds it.
+ *
+ *  The published file keeps the cross-language shape `<pid>\n<ms-epoch>\n`, so the shell
+ *  writer in hooks/append-trace.sh contends on the same object with the same protocol. */
+function lockContent(): string {
+	return `${process.pid}\n${Date.now()}\n`;
 }
 
 /** A per-process reclaim scratch name — the target of the atomic rename that claims a stale lock. */
 function reclaimName(lockPath: string): string {
 	return `${lockPath}.${process.pid}.${Date.now()}.reclaim`;
+}
+
+/** A per-attempt scratch name for the atomic publish. Includes a counter so two attempts from
+ *  the same process in the same millisecond cannot collide on it. */
+let publishCounter = 0;
+function publishName(lockPath: string): string {
+	publishCounter += 1;
+	return `${lockPath}.${process.pid}.${publishCounter}.pub`;
 }
 
 // LIMITATION (crash-recovery only): reclaim can theoretically strand a lock in a microsecond
@@ -126,33 +153,46 @@ async function acquireFileLock(lockPath: string): Promise<void> {
 	const lockDir = dirname(lockPath);
 	if (!existsSync(lockDir)) await mkdir(lockDir, { recursive: true });
 
-	const myPid = process.pid;
 	const startTime = Date.now();
 
 	while (true) {
+		// Atomic publish: full content first, then link it into place. `link` is the only step
+		// that can win the lock, and it never exposes an empty lock file to a waiter.
+		const scratch = publishName(lockPath);
+		let published = false;
 		try {
-			const handle = await open(lockPath, "wx");
-			await handle.writeFile(`${myPid}\n${Date.now()}\n`, "utf-8");
+			const handle = await open(scratch, "wx");
+			await handle.writeFile(lockContent(), "utf-8");
 			await handle.close();
-			return;
-		} catch (err) {
-			if (!isErrnoCode(err, "EEXIST")) throw err;
+			try {
+				await link(scratch, lockPath);
+				published = true;
+			} catch (err) {
+				if (!isErrnoCode(err, "EEXIST")) throw err;
+			}
+		} finally {
+			await unlink(scratch).catch(() => undefined);
 		}
+		if (published) return;
 
+		let reclaimed = false;
 		try {
 			const content = await readFile(lockPath, "utf-8");
 			if (lockIsReclaimable(content)) {
 				await reclaimStale(lockPath, content);
-				continue;
+				reclaimed = true;
 			}
 		} catch {
-			// Lock disappeared or unreadable between create and read — retry.
+			// Lock disappeared or unreadable between link and read — retry.
 		}
 
+		// The timeout is checked on EVERY pass, including a reclaim pass. Skipping it on the
+		// reclaim branch (the old `continue`) let a waiter hot-spin without bound.
 		if (Date.now() - startTime > ACQUIRE_TIMEOUT_MS) {
 			throw new Error(`Could not acquire lock ${lockPath} within ${ACQUIRE_TIMEOUT_MS / 1000}s`);
 		}
-		await new Promise((r) => setTimeout(r, RETRY_INTERVAL_MS));
+		// A reclaim retries immediately (the lock is free right now); a held lock backs off.
+		if (!reclaimed) await new Promise((r) => setTimeout(r, RETRY_INTERVAL_MS));
 	}
 }
 
@@ -184,27 +224,42 @@ function acquireFileLockSync(lockPath: string): void {
 	if (!existsSync(lockDir)) mkdirSync(lockDir, { recursive: true });
 	const startTime = Date.now();
 	for (;;) {
+		// Same atomic publish as the async path: write to a scratch name, then link it in.
+		const scratch = publishName(lockPath);
+		let published = false;
 		try {
-			const fd = openSync(lockPath, "wx");
-			writeSync(fd, `${process.pid}\n${Date.now()}\n`);
+			const fd = openSync(scratch, "wx");
+			writeSync(fd, lockContent());
 			closeSync(fd);
-			return;
-		} catch (err) {
-			if (!isErrnoCode(err, "EEXIST")) throw err;
+			try {
+				linkSync(scratch, lockPath);
+				published = true;
+			} catch (err) {
+				if (!isErrnoCode(err, "EEXIST")) throw err;
+			}
+		} finally {
+			try {
+				unlinkSync(scratch);
+			} catch {
+				/* already gone */
+			}
 		}
+		if (published) return;
+
+		let reclaimed = false;
 		try {
 			const content = readFileSync(lockPath, "utf-8");
 			if (lockIsReclaimable(content)) {
 				reclaimStaleSync(lockPath, content);
-				continue;
+				reclaimed = true;
 			}
 		} catch {
-			// Lock vanished between create and read — retry.
+			// Lock vanished between link and read — retry.
 		}
 		if (Date.now() - startTime > ACQUIRE_TIMEOUT_MS) {
 			throw new Error(`Could not acquire lock ${lockPath} within ${ACQUIRE_TIMEOUT_MS / 1000}s`);
 		}
-		sleepSync(RETRY_INTERVAL_MS);
+		if (!reclaimed) sleepSync(RETRY_INTERVAL_MS);
 	}
 }
 

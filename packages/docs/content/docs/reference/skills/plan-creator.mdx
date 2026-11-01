@@ -111,7 +111,7 @@ If the plan frontmatter has non-empty `jira_tickets:`, `mk:plan-creator` runs th
 | 04 | Semantic checks | Validation report, two-approach selection (if applicable), Verification Roles dispatch (sub-step 4d — Light/Standard/Full tier by phase count) writes `## Verification Log` per phase file |
 | 05 | Red-team | 4-persona adversarial analysis, red-team-findings.md (7-field findings); Gate W1 Whole-Plan Consistency Sweep at exit |
 | 06 | Validation interview | 5-category questions with propagated answers; Gate W2 Whole-Plan Consistency Sweep at exit |
-| 07 | Gate 1 | Self-check (Completed/Skipped/Uncertain), AskUserQuestion, memory capture |
+| 07 | Gate 1 | Self-check (Completed/Skipped/Uncertain), AskUserQuestion; archive writes `decisions.md` |
 | 08 | Hydrate | TaskCreate with dependency chains, critical-step sub-tasks, `.plan-state.json` (v1.2) |
 | 09 | Post-plan handoff | Mode-pruned AskUserQuestion (cook / validate / red-team / autobuild / end), writes `handoff: { next, decided_at }` to plan.md frontmatter, prints command, STOPs |
 

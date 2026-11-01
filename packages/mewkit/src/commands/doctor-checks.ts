@@ -151,7 +151,7 @@ export function checkMemory(root: string | null): DiagResult {
 
 	const memDir = resolveStateDir(root, "memory");
 	if (!fs.existsSync(memDir)) {
-		return { name: "Memory", status: "warn", detail: "memory/ not found — will be created on first session" };
+		return { name: "Memory", status: "warn", detail: "memory/ not found — created on the first memory write" };
 	}
 
 	try {

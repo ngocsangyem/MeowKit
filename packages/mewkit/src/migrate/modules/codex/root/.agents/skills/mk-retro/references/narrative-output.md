@@ -71,7 +71,7 @@ Check review JSONL logs for plan completion data from the ship skill runs this p
 
 ```bash
 eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)"
-cat .meowkit/memory/projects/*-reviews.jsonl 2>/dev/null | grep '"skill":"ship"' | grep '"plan_items_total"' || echo "NO_PLAN_DATA"
+cat .meowkit/telemetry/*-reviews.jsonl 2>/dev/null | grep '"skill":"ship"' | grep '"plan_items_total"' || echo "NO_PLAN_DATA"
 ```
 
 If plan completion data exists within the retro time window:

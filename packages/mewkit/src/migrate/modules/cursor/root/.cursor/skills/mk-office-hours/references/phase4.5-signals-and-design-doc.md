@@ -59,18 +59,18 @@ Count the signals. You'll use this count in Phase 6 to determine which tier of c
 Write the design document to the project directory.
 
 ```bash
-eval "$(workflow-slug 2>/dev/null)" && mkdir -p .meowkit/memory/projects
+eval "$(.cursor/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p "tasks/plans/$SLUG"
 USER=$(whoami)
 DATETIME=$(date +%Y%m%d-%H%M%S)
 ```
 
 **Design lineage:** Before writing, check for existing design docs on this branch:
 ```bash
-PRIOR=$(ls -t .meowkit/memory/projects/*-$BRANCH-design-*.md 2>/dev/null | head -1)
+PRIOR=$(ls -t tasks/plans/*/*-$BRANCH-design-*.md 2>/dev/null | head -1)
 ```
 If `$PRIOR` exists, the new doc gets a `Supersedes:` field referencing it. This creates a revision chain — you can trace how a design evolved across office hours sessions.
 
-Write to `.meowkit/memory/projects/{slug}/{user}-{branch}-design-{datetime}.md`:
+Write to `tasks/plans/{slug}/{user}-{branch}-design-{datetime}.md`:
 
 ## Startup mode design doc template:
 

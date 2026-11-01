@@ -47,8 +47,8 @@ branch name wherever the instructions say "the base branch."
 |-----------|---------|-----------------:|
 | Target URL | (auto-detect or required) | `https://myapp.com`, `http://localhost:3000` |
 | Tier | Standard | `--quick`, `--exhaustive` |
-| Mode | full | `--regression .meowkit/memory/qa-reports/baseline.json` |
-| Output dir | `.meowkit/memory/qa-reports/` | `Output to /tmp/qa` |
+| Mode | full | `--regression tasks/reports/qa/baseline.json` |
+| Output dir | `tasks/reports/qa/` | `Output to /tmp/qa` |
 | Scope | Full app (or diff-scoped) | `Focus on the billing page` |
 | Auth | None | `Sign in to user@example.com`, `Import cookies from cookies.json` |
 
@@ -250,17 +250,17 @@ Only commit if there are changes. Stage all bootstrap files (config, test direct
 ## Create Output Directories
 
 ```bash
-mkdir -p .meowkit/memory/qa-reports/screenshots
+mkdir -p tasks/reports/qa/screenshots
 ```
 
 ## Test Plan Context
 
 Before falling back to git diff heuristics, check for richer test plan sources:
 
-1. **Project-scoped test plans:** Check `.meowkit/memory/projects/` for recent `*-test-plan-*.md` files for this repo
+1. **Project-scoped test plans:** Check `.meowkit/telemetry/` for recent `*-test-plan-*.md` files for this repo
    ```bash
    eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
-   ls -t .meowkit/memory/projects/*-test-plan-*.md 2>/dev/null | head -1
+   ls -t .meowkit/telemetry/*/*-test-plan-*.md 2>/dev/null | head -1
    ```
 2. **Conversation context:** Check if a prior `/mk:plan-ceo-review` or `/mk:plan-ceo-review` produced test plan output in this conversation
 3. **Use whichever source is richer.** Fall back to git diff analysis only if neither is available.

@@ -30,9 +30,9 @@ Structured debugging pipeline. Instead of immediately editing code, it forces st
 - **Mandatory scout + diagnose:** Never fixes before understanding the codebase and confirming root cause with evidence
 - **Complexity auto-detection:** Classifies as Simple (single file), Moderate (multi-file), Complex (system-wide), or Parallel (2+ independent issues)
 - **Regression test enforcement:** Every fix must include a test that fails without the fix and passes with it
-- **Fix memory:** Reads `.meowkit/memory/fixes.md` and `fixes.json` for prior patterns — repeated bugs become instant fixes
+- **Fix memory:** greps `.meowkit/memory/` for prior gotchas — repeated bugs become instant fixes
 - **Defense-in-depth:** After fixing, applies prevention measures: entry validation, business logic guards, error handling, type safety
-- **Workflow evidence index:** for standalone standard/complex fixes, writes `.claude/session-state/evidence/<slug>/workflow-evidence.json` indexing risk flags (from `risk-checklist.md`), the six root-cause fields, verification commands, and approvals. Traceability only — it **never approves**, carries no score, and is distinct from the durable `fixes.json` memory store. Validated before the approval prompt
+- **Workflow evidence index:** for standalone standard/complex fixes, writes `.claude/session-state/evidence/<slug>/workflow-evidence.json` indexing risk flags (from `risk-checklist.md`), the six root-cause fields, verification commands, and approvals. Traceability only — it **never approves**, carries no score, and is distinct from the durable team memory store. Validated before the approval prompt
 - **Mode selection:** `--auto` (default, auto-fixes then stops at *ready for user approval* — never self-approves), `--review` (human-in-the-loop), `--quick` (fast cycle), `--parallel` (per-issue agents), `--tdd` (regression test before fix)
 
 ## Usage
@@ -79,7 +79,7 @@ If no mode flag: `AskUserQuestion` (Autonomous / Human-in-the-loop / Quick). Aut
 
 ## Step 0.5 — Check fix memory
 
-Read `.meowkit/memory/fixes.md` and `fixes.json` for prior patterns. Search for similar symptoms, error messages, or affected modules. If a matching fix pattern exists → use as starting hypothesis. If a matching success pattern exists → apply known fix approach directly. This turns repeated bugs into instant fixes.
+Run `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` with the symptom keywords, and open only the matching entries. Search for similar symptoms, error messages, or affected modules. If a matching fix pattern exists → use as starting hypothesis. If a matching success pattern exists → apply known fix approach directly. This turns repeated bugs into instant fixes.
 
 ## Step 1 — Scout (MANDATORY)
 
@@ -116,7 +116,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 ## Step 6 — Finalize + Learn
 
 1. Report: confidence, root cause, changes, files, prevention measures
-2. Write to memory: append to `fixes.md` (symptom → root cause → fix → prevention), update `fixes.json`
+2. Write to memory: when the lesson is non-derivable, append one entry with `npx mewkit note gotchas` (one-line lesson, Why, Apply when, Source)
 3. Delegate to `project-manager` (Moderate/Complex only, background)
 4. `documenter` agent → update docs
 

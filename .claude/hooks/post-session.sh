@@ -1,5 +1,5 @@
 #!/bin/bash
-# post-session.sh — Capture session data to memory after session ends.
+# post-session.sh — Record cost + trace data after a session ends.
 # Usage: post-session.sh
 
 # Ensure CWD is project root for relative paths
@@ -37,36 +37,31 @@ if [ "${MEOWKIT_HOOK_DEBUG:-0}" = "1" ]; then
 fi
 
 # Hook profile gating — CF7 fix: run by default, opt-OUT only on fast profile
-# Memory capture, cost tracking, and trace records require this hook to run.
+# Cost tracking and trace records require this hook to run.
 MEOW_PROFILE="${MEOWKIT_HOOK_PROFILE:-${MEOW_HOOK_PROFILE:-standard}}"
 case "$MEOW_PROFILE" in
   fast) exit 0 ;;
 esac
 
-# Retroactive capture budget (MeowKit v2.0: extended from 2min/3 markers)
-MAX_CAPTURE_SECONDS=300
-MAX_MARKERS=5
-
-# `.meowkit/` taxonomy: curated stores, append logs, and session markers each
-# have their own home. A pre-migration project resolves all three to the legacy
-# `.meowkit/memory` tree, preserving current behavior until `mewkit migrate` runs.
+# `.meowkit/` taxonomy: append logs and session markers each have their own
+# home. A pre-migration project resolves both to the legacy tree, preserving
+# current behavior until `mewkit migrate` runs.
 # shellcheck source=lib/meowkit-paths.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/meowkit-paths.sh"
-MEMORY_DIR="$(meowkit_state_dir memory)"
 TELEMETRY_DIR="$(meowkit_state_dir telemetry)"
 STATE_DIR="$(meowkit_state_dir state)"
 
-# Skip if memory disabled in config
+# Skip if session recording disabled in config
 if [ -f .claude/meowkit.config.json ]; then
   if command -v .claude/scripts/bin/meowkit-config >/dev/null 2>&1; then
-    .claude/scripts/bin/meowkit-config has features.memory 2>/dev/null || { echo "Memory disabled in config — skipping"; exit 0; }
+    .claude/scripts/bin/meowkit-config has features.memory 2>/dev/null || { echo "Session recording disabled in config — skipping"; exit 0; }
   elif ! command -v python3 >/dev/null 2>&1; then
-    echo "Warning: python3 not found — meowkit-config unavailable; proceeding with memory capture" >&2
+    echo "Warning: python3 not found — meowkit-config unavailable; proceeding" >&2
   fi
 fi
 
 # Ensure the state directories this hook writes to exist
-for _d in "$MEMORY_DIR" "$TELEMETRY_DIR" "$STATE_DIR"; do
+for _d in "$TELEMETRY_DIR" "$STATE_DIR"; do
   [ -d "$_d" ] || mkdir -p "$_d"
 done
 unset _d
@@ -80,36 +75,6 @@ fi
 
 # Count files in recent commits (captures actual work done)
 RECENT_FILES=$(git log --oneline -5 --name-only 2>/dev/null | grep -v '^[a-f0-9]' | sort -u | wc -l | tr -d ' ')
-
-# mkdir-based atomic lock (POSIX portable — flock does not exist on macOS)
-LOCKDIR="$MEMORY_DIR/.lessons.lock"
-acquire_lock() {
-  local _timeout=5
-  while [ "$_timeout" -gt 0 ]; do
-    if mkdir "$LOCKDIR" 2>/dev/null; then
-      trap 'rmdir "$LOCKDIR" 2>/dev/null' EXIT
-      return 0
-    fi
-    # Stale lock detection (>60 seconds old)
-    # If stat fails (network FS, race), treat the lock as live — using echo 0 would
-    # set _lock_age to ~unix-epoch and cause spurious stale-eviction.
-    if [ -d "$LOCKDIR" ]; then
-      local _lock_mtime _lock_age
-      _lock_mtime=$(stat -f %m "$LOCKDIR" 2>/dev/null || stat -c %Y "$LOCKDIR" 2>/dev/null)
-      if [ -z "$_lock_mtime" ]; then
-        sleep 1; _timeout=$((_timeout - 1)); continue  # stat failed — treat as live lock, retry
-      fi
-      _lock_age=$(( $(date +%s) - _lock_mtime ))
-      if [ "$_lock_age" -gt 60 ]; then rmdir "$LOCKDIR" 2>/dev/null; continue; fi
-    fi
-    sleep 1
-    _timeout=$((_timeout - 1))
-  done
-  return 1
-}
-
-# The retroactive NEEDS_CAPTURE heredoc has been removed. lessons.md is archived.
-# The model-change flag below is emitted to the canonical trace stream.
 
 # Resolve active model id once, via the canonical SessionStart artifact.
 # Claude Code does not export model env vars to Stop hooks — see
@@ -136,7 +101,9 @@ if [ -f "$BUDGET_STATE_FILE" ] && command -v python3 >/dev/null 2>&1; then
   else
     CLEAN_BUDGET=$(cat "$BUDGET_STATE_FILE" 2>/dev/null || echo '{}')
   fi
-  # Include session_id + model + cache-token fields per cost-tracking.md spec.
+  # Entry shape is the cost-log.json v2 schema documented by its owner,
+  # .claude/agents/analyst.md ("cost-log.json schema (v2)") — session_id + model
+  # + cache-token fields included.
   # Atomic write: temp file + os.replace rename — safe under concurrent invocations.
   _CLEAN_BUDGET="$CLEAN_BUDGET" \
   _COST_LOG="$TELEMETRY_DIR/cost-log.json" \
@@ -175,12 +142,10 @@ except Exception:
 fi
 
 # Detect model-version change → flag dead-weight audit needed.
-# Emits a dead_weight_audit_flagged trace record (telemetry, not curated memory).
-# Note: the acquire_lock function defined above is dead code after v2.4.1
-# (retroactive capture was removed). The model-change branch below is the
-# sole remaining consumer of STATE_DIR; two concurrent Stop invocations
-# can race on this branch. Mitigation is atomic write of last-model-id.txt
-# (temp + mv) so the file is never partially observable.
+# Emits a dead_weight_audit_flagged trace record (telemetry only).
+# The model-change branch below is the sole consumer of STATE_DIR; two
+# concurrent Stop invocations can race on it. Mitigation is atomic write of
+# last-model-id.txt (temp + mv) so the file is never partially observable.
 LAST_MODEL_FILE="$STATE_DIR/last-model-id.txt"
 CURRENT_MODEL="$RESOLVED_MODEL"
 
@@ -211,8 +176,8 @@ elif [ "$CURRENT_MODEL" != "unknown" ]; then
   LAST_MODEL=$(cat "$LAST_MODEL_FILE" 2>/dev/null | tr -d '[:space:]' || echo "unknown")
   if [ "$CURRENT_MODEL" != "$LAST_MODEL" ] && [ "$LAST_MODEL" != "unknown" ]; then
     # Emit the dead-weight-audit signal to the canonical trace stream (the
-    # `dead_weight_audit_needed` event already defined in trace-schema.md, consumed
-    # by mk:trace-analyze) instead of the curated fixes store — it is telemetry, not a fix.
+    # `dead_weight_audit_needed` event defined in trace-schema.md, consumed
+    # by mk:trace-analyze) — it is telemetry, not a lesson.
     if [ -x "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" ]; then
       bash "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/append-trace.sh" "dead_weight_audit_needed" \
         "{\"old_model\":\"$LAST_MODEL\",\"new_model\":\"$CURRENT_MODEL\"}" 2>/dev/null || true
@@ -226,12 +191,6 @@ elif [ "$CURRENT_MODEL" != "unknown" ]; then
     || rm -f "$_TMP_LMF" 2>/dev/null
   unset _TMP_LMF
 fi
-
-# M9 partial fix: threshold hint — sum lines across all topic files
-TOTAL=$(wc -l "$MEMORY_DIR"/fixes.md "$MEMORY_DIR"/review-patterns.md \
-  "$MEMORY_DIR"/architecture-decisions.md "$MEMORY_DIR"/security-notes.md \
-  2>/dev/null | tail -1 | awk '{print $1}')
-[ "${TOTAL:-0}" -gt 500 ] && echo "HINT: topic files total $TOTAL lines — consider /mk:memory --prune" >&2
 
 # Phase 8 (260408): emit session_end trace record (canonical per trace-schema.md).
 # Non-blocking; trace failures don't break the hook chain.
@@ -261,40 +220,7 @@ if [ "${MEOWKIT_SKIP_SAFETY_SENTINEL:-on}" != "off" ] && [ -n "$PERSISTED_SESSIO
   esac
 fi
 
-# Memory auto-prune (gated by MEOWKIT_MEMORY_PRUNE and daily rate-limit).
-# Failure modes handled:
-#   - empty TODAY (date(1) failure)        → [ -n "$TODAY" ] guard skips cleanly
-#   - Python error (exit != 0)             → LAST_PRUNE_FILE NOT advanced; retries tomorrow
-#   - prune-log location                   → session-state/, NOT the memory tree.
-#     Loaders never scan session-state/, which breaks the injection-rules.md Rule 11
-#     carrier chain (memory files are both untrusted input AND sensitive data).
-MEOWKIT_MEMORY_PRUNE="${MEOWKIT_MEMORY_PRUNE:-on}"
-PRUNE_AGE="${MEOWKIT_MEMORY_PRUNE_AGE_DAYS:-90}"
-# Validate PRUNE_AGE is integer to prevent shell→python arg injection.
-case "$PRUNE_AGE" in ''|*[!0-9]*) PRUNE_AGE=90 ;; esac
-LAST_PRUNE_FILE="session-state/last-prune-date"
-TODAY=$(date +%Y-%m-%d 2>/dev/null)
-LAST_PRUNE=$(cat "$LAST_PRUNE_FILE" 2>/dev/null || echo "")
-
-if [ "$MEOWKIT_MEMORY_PRUNE" != "off" ] && [ -n "$TODAY" ] && [ "$TODAY" != "$LAST_PRUNE" ]; then
-  VENV_PY="${CLAUDE_PROJECT_DIR:-.}/.claude/skills/.venv/bin/python3"
-  PRUNE_SCRIPT="${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/memory-prune.py"
-  MEM_DIR="$MEMORY_DIR"
-  PRUNE_LOG="session-state/prune-log.md"  # NOT inside .meowkit/memory/
-  mkdir -p session-state 2>/dev/null
-  if [ -x "$VENV_PY" ] && [ -f "$PRUNE_SCRIPT" ]; then
-    PRUNE_RESULT=$("$VENV_PY" "$PRUNE_SCRIPT" "$MEM_DIR" "$PRUNE_AGE" "$PRUNE_LOG" 2>/dev/null)
-    PRUNE_EXIT=$?
-    [ -n "$PRUNE_RESULT" ] && echo "Memory prune: $PRUNE_RESULT"
-    if [ "$PRUNE_EXIT" -eq 0 ]; then
-      echo "$TODAY" > "$LAST_PRUNE_FILE"
-    else
-      echo "Memory prune failed (exit $PRUNE_EXIT) — will retry tomorrow" >&2
-    fi
-  fi
-fi
-
-echo "Session data captured to $MEMORY_DIR"
+echo "Session cost + trace recorded to $TELEMETRY_DIR"
 
 # Gated runtime-truth sentinel: success-path completion marker.
 # Uses sentinel on success path (NOT trap EXIT — that fires on subshell exits

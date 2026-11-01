@@ -10,7 +10,7 @@ The experimental `mewkit orchviz` visualizer (and its `src/orchviz/` module) was
 removed in v2.13.6. Its loopback-server safety model survived as the reusable
 primitives under `packages/mewkit/src/local-web/`, now consumed by the
 `mewkit visual-plan` studio (`packages/mewkit/src/visual-plan/`, layered
-domain → application → infrastructure → interface/server like the wiki subsystem).
+domain → application → infrastructure → interface/server).
 
 ### Shared Loopback Primitives (`src/local-web/`)
 
@@ -101,19 +101,32 @@ converter is the opt-in `--include-mcp` `.mcp.json` → `config.toml [mcp_server
 The shared converters (`converters/{md-strip,fm-to-fm,md-to-mdc,direct-copy}.ts`) + the
 reference-rewriter family still serve Cursor and the surviving Codex config/rules path.
 
-## Wiki Subsystem (`mewkit wiki`)
+## Team memory store
 
-Long-term, gated, FTS-searchable project knowledge, built on clean layering under `packages/mewkit/src/wiki/`. The dependency direction is strictly inward: **interface → application → infrastructure → domain**.
+Non-derivable project knowledge lives in two committed, plain-markdown files:
+`.meowkit/memory/decisions.md` (why a non-obvious choice was made) and
+`.meowkit/memory/gotchas.md` (what a real failure taught). There is no index, no JSON
+store, and no generated view.
 
-- **domain/** — pure types + invariants (no IO): branded `WikiSlug`/`WikiPageId`, the salience rubric (`scoreSalience`, 9 components), `decideWrite` thresholds, and the state machine where *unscanned→approved* and *agent-origin→committed* are structurally impossible.
-- **application/** — `WikiService` orchestrates the write order (scrub → scan → candidate-or-approve → atomic write → index upsert → trace). `commitWrite` is the SOLE caller of `repo.writePage`; `approveCandidate` is the SOLE canonical-page mint. `queries.ts` is read-only (CQS via `Pick<>` port slices). `research.ts` turns fetched DATA into candidates only.
-- **handoff/** — a vertical slice that lets a knowledge-producing skill hand its terminal artifact to the wiki. `domain.ts` defines `WikiHandoffPacket`/`WikiHandoffRecord` (a superset of `ProposeInput`) + the `toProposeInput` mapper; `profile-factory.ts` + `profiles/*.ts` hold a per-skill registry (class **required/conditional/none** + salience defaults, one row per skill — adding a skill is a registry row, never a switch edit); `service.ts`'s `HandoffService` reads the artifact, **path-gates it** (rejects out-of-root + sensitive `.env`/`*.pem`/`*.key`/`*secret*`/`*credentials*`/`*.keystore` paths before any read), scans it, and proposes a candidate ONLY when salience clears the existing `decideWrite` gate and the scan is clean. `suggest` is read-only; there is no page-write path (no `writePage`/`approveCandidate` dependency).
-- **infrastructure/** — `MarkdownWikiRepository` (atomic temp+rename canonical writes under `tasks/wikis/<slug>/`; `writePage` accepts only a scanner-issued `ApprovedWrite` token; `appendHandoff` writes `handoffs.jsonl`), `ScannerAdapter` (url-guard → size cap → multi-pass injection scan → secret scrub; TS port of `validate-content.cjs`/`secret-scrub.cjs` so it ships in `dist/`), `SqliteWikiIndex` (FTS over the consolidated `wiki-index.db`), `FetcherAdapter` (web/arXiv/GitHub; per-hop redirect re-validation), `TraceAdapter`, `InventoryAdapter`.
-- **interface/** — `cli.ts` (`mewkit wiki <sub>`) is the only layer that constructs concrete adapters and injects them into the service; `render.ts` emits a self-contained (no-CDN, HTML-escaped) snapshot. Subcommands include `handoff suggest|propose|profiles`, the disciplined recall surface `context` (snippets only unless `--include-content`; returns a project-root-readable `path`), and full provenance flags on `propose` (`--origin`, `--source-id`, `--reuse-scope`, `--salience-json`, …).
+- **Read** — five skills (`mk:fix`, `mk:investigate`, `mk:review`, `mk:plan-creator`,
+  `mk:cso`) run one `grep -rilE "<kw1|kw2|kw3>" .meowkit/memory/` at task start and open
+  only the matching entries. No always-on rule, no auto-injection.
+- **Write** — `mk:fix`, `mk:review`, `mk:retro`, `mk:memory`, and the `architect` agent;
+  `mk:party` and `mk:plan-creator archive` write `decisions.md` only. Each
+  appends one entry when the lesson is non-derivable. There is no hook capture; a human asks
+  for something to be remembered and the agent writes it. A failed write prints one line.
+- **Boundary** — content is DATA (`rules/injection-rules.md` Rule 3): it never overrides a
+  rule, grants a permission, or bypasses a gate. Security findings and secrets never enter
+  the store; they stay in `mk:cso` reports and Gate 2 verdicts.
+- **Governance** — the store ships in the PR diff, so git review replaces a scanner gate.
+  `mewkit validate --memory` lints size (≤300 lines per file), the injection patterns in
+  `.claude/hooks/lib/validate-content.cjs`, and secret patterns. `mk:memory --prune`
+  proposes removals; every removal is human-approved.
 
-**Anti-self-poisoning core:** external content and agent output are DATA. An agent can only propose a `WikiCandidate` — whether via `propose`, `research`, or `handoff` — never write a canonical page; canonical pages are written only via human `approve`, which always re-runs the scanner. The chokepoint is type-enforced (`ApprovedWrite` private constructor, minted only on a clean multi-pass verdict bound to scrubbed content). Recall (`context`) is read-only and DATA-bounded by `rules/wiki-context-rules.md`: wiki content never overrides rules or instructions, and the probe fails open when no index exists.
-
-**Persistence:** canonical files in `tasks/wikis/<slug>/` (wiki.json, pages/*.md, sources/claims/candidates/interventions/seeds/**handoffs** JSONL) are the source of truth; `.claude/memory/wiki-index.db` (SCHEMA_VERSION 4 — trace + cost + wiki tables + FTS5, the additive v3 `wiki_handoff` + `wiki_candidate_source` relation, and the additive v4 `trace_events.task_id` + `plan_path` columns for task-joined queries) is derived and fully rebuildable via `mewkit wiki reindex` / `mewkit index`.
+The earlier wiki subsystem (gated pages under `tasks/wikis/`, SQLite FTS index,
+propose/approve chokepoint, handoff-class registry, recall envelope) was removed in v3: it
+had zero recorded use, and `grep` over two committed files covers the same need. The code
+remains in git history.
 
 ## High-assurance PR review pipeline (`src/review/`, `src/commands/review/`)
 

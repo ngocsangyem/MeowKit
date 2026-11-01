@@ -59,12 +59,6 @@
 			"note": "Telemetry observe only; cloud-unsupported (MCP deferred)."
 		},
 		{
-			"event": "beforeSubmitPrompt",
-			"cloudSupported": true,
-			"failClosed": false,
-			"note": "Capture side-effect only; block-only contract, never exercised to block; noncritical."
-		},
-		{
 			"event": "subagentStart",
 			"cloudSupported": true,
 			"failClosed": false,

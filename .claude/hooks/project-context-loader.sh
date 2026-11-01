@@ -90,25 +90,30 @@ fi
 if [ -f ".claude/hooks/lib/read-hook-input.sh" ]; then
   . ".claude/hooks/lib/read-hook-input.sh"
 fi
-LAST_SESSION_FILE="session-state/last-session-id"
-mkdir -p session-state 2>/dev/null
+# Anchor to the project root. A bare relative `session-state` would be created
+# wherever the host runtime happened to set cwd for this hook, scattering the dir
+# (and the absolute edited-file paths inside it) into unrelated trees. The cd at
+# the top of this file only fires when CLAUDE_PROJECT_DIR is set.
+SESSION_STATE_DIR="${CLAUDE_PROJECT_DIR:-.}/session-state"
+LAST_SESSION_FILE="$SESSION_STATE_DIR/last-session-id"
+mkdir -p "$SESSION_STATE_DIR" 2>/dev/null
 if [ -n "${HOOK_SESSION_ID:-}" ]; then
   LAST_SESSION=""
   [ -f "$LAST_SESSION_FILE" ] && LAST_SESSION=$(cat "$LAST_SESSION_FILE" 2>/dev/null)
   if [ "$HOOK_SESSION_ID" != "$LAST_SESSION" ]; then
     # New session — reset per-session counters
-    echo '{}' > session-state/edit-counts.json 2>/dev/null || true
+    echo '{}' > "$SESSION_STATE_DIR"/edit-counts.json 2>/dev/null || true
     # Note: precompletion-attempts.json is NOT reset here. pre-completion-check.sh
     # owns its own lifecycle — it clears the counter when verification passes
     # (line ~110) or when the 3-attempt soft-nudge cap is hit (line ~152).
     # Resetting here breaks the cap because the host runtime assigns a new session ID
     # for every blocked-Stop cycle, which would otherwise wipe the counter mid-loop.
-    echo '{}' > session-state/build-verify-cache.json 2>/dev/null || true
+    echo '{}' > "$SESSION_STATE_DIR"/build-verify-cache.json 2>/dev/null || true
     # Truncate the safety/phase-zero sentinel log from prior sessions. The log
     # is keyed by session_id, so leaving stale entries in place could falsely
     # match if a session_id were ever recycled. Single-file overwrite (no
     # per-session-ID glob).
-    : > session-state/session-sentinels.jsonl 2>/dev/null || true
+    : > "$SESSION_STATE_DIR"/session-sentinels.jsonl 2>/dev/null || true
     # CF1 fix: clear TDD sentinel + deprecation flag (written to .claude/session-state/)
     rm -f "${CLAUDE_PROJECT_DIR:-.}/.claude/session-state/tdd-mode" 2>/dev/null || true
     rm -f "${CLAUDE_PROJECT_DIR:-.}/.claude/session-state/tdd-deprecation-warned" 2>/dev/null || true
@@ -248,25 +253,23 @@ if [ -n "$READY_MISSING" ]; then
   echo "Missing:${READY_MISSING}"
 fi
 
-# Memory dir audit — report .md topic files exceeding 500 lines.
-# Display-only (no mutation); pairs with the auto-prune block in post-session.sh.
+# Memory store audit — warn only when a store file exceeds the 300-line cap.
+# Display-only (no mutation); silent when the store is within budget.
 MEM_DIR="$(meowkit_state_dir memory)"
 if [ -d "$MEM_DIR" ]; then
-  echo ""
-  echo "## Memory files"
   BLOATED=""
   for f in "$MEM_DIR"/*.md; do
     [ -f "$f" ] || continue
     LINES=$(wc -l < "$f" 2>/dev/null | tr -d ' ')
     LINES="${LINES:-0}"
-    if [ "$LINES" -gt 500 ]; then
+    if [ "$LINES" -gt 300 ]; then
       BLOATED="${BLOATED} $(basename "$f"):${LINES}lines"
     fi
   done
   if [ -n "$BLOATED" ]; then
-    echo "⚠ Memory files >500 lines:${BLOATED}"
-    echo "  Run \`/mk:memory --prune\` to trim entries >90 days."
-  else
-    echo "OK (all memory topic .md files ≤500 lines)"
+    echo ""
+    echo "## Memory files"
+    echo "⚠ Memory files >300 lines:${BLOATED}"
+    echo "  Run \`/mk:memory --prune\` to propose removals."
   fi
 fi

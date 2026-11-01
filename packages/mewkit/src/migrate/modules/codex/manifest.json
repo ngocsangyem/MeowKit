@@ -49,15 +49,6 @@
 			"active": true
 		},
 		{
-			"sourcePath": "root/.codex/hooks/capture.cjs",
-			"targetPath": ".codex/hooks/capture.cjs",
-			"provider": "codex",
-			"mode": "0755",
-			"ownership": "managed-replace",
-			"scopeTags": ["managed-runtime"],
-			"active": true
-		},
-		{
 			"sourcePath": "root/.codex/hooks/privacy-block.cjs",
 			"targetPath": ".codex/hooks/privacy-block.cjs",
 			"provider": "codex",

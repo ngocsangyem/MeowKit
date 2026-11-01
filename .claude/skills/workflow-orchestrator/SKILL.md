@@ -66,16 +66,15 @@ On a non-trivial task, route to `mk:plan-creator`; proceed only after Gate 1. Fa
 ## Pre-Execution Checklist
 
 1. **agent-detector** → Select lead agent (MANDATORY)
-2. **Load context** → Read canonical `.meowkit/memory/fixes.json` + `.meowkit/memory/architecture-decisions.json` (Phase 0 Orient; fall back to matching `.md` views only when JSON is absent)
-3. **Show agent banner** at start of response
-4. **Verify task complexity** — if simple, suggest lighter approach
-5. **Challenge requirements** → Ask clarifying questions before Phase 1
+2. **Show agent banner** at start of response
+3. **Verify task complexity** — if simple, suggest lighter approach
+4. **Challenge requirements** → Ask clarifying questions before Phase 1
 
 ## Process
 
 See `.claude/rules/phase-contracts.md` for input/output expectations per phase. (Loaded by `mk:agent-detector` Step 0b at session start.)
 
-1. **Run pre-execution checklist** — select lead agent, load memory, show agent banner, verify complexity, challenge requirements.
+1. **Run pre-execution checklist** — select lead agent, show agent banner, verify complexity, challenge requirements.
 
 2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 7-phase flow.
 

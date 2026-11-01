@@ -32,7 +32,7 @@ Primary entry point for building features. Given a description or plan path, orc
 - **TDD mode:** Opt-in via `--tdd` — writes failing tests before implementation, enforces RED-GREEN-REFACTOR
 - **Smart intent detection:** Auto-routes to the correct mode based on input patterns (plan path, "fast", "parallel", "auto")
 - **Workflow modes:** interactive (default), auto, fast, parallel, no-test, code — with modifier flags `--verify`, `--strict`, `--no-strict`
-- **Required subagents:** Scout (Phase 0), plan-creator + researcher (Phase 1), tester (Phase 2, TDD only), developer (Phase 3), mk:simplify + mk:verify (post-build), reviewer (Phase 4), shipper via mk:ship (Phase 5 — shipper invokes git-manager internally), documenter + memory capture (Phase 6)
+- **Required subagents:** Scout (Phase 0), plan-creator + researcher (Phase 1), tester (Phase 2, TDD only), developer (Phase 3), mk:simplify + mk:verify (post-build), reviewer (Phase 4), shipper via mk:ship (Phase 5 — shipper invokes git-manager internally), documenter (Phase 6); a memory entry only if the lesson is non-derivable
 - **Scout-First Contract (Phase 0):** before any clarifying question or plan generation, a 3–6 bullet codebase-context summary is surfaced to the user (project type/language/framework, relevant modules, current patterns, in-flight plans, public APIs/schemas). Skipped on `plan.md` / `phase-*.md` input.
 - **Exact-Requirements Contract (Phase 1):** `mk:plan-creator` MUST answer 5 dimensions in concrete sentences — expected output, acceptance criteria, scope boundary, non-negotiable constraints, touchpoints — before returning a plan. Clarifying-question options MUST cite scout findings (file paths). Skipped on plan-path input.
 - **Regression Recovery Options (Gate 2):** when the reviewer surfaces a regression in EXISTING behavior (verdict includes `Side Effects Detected: Yes`), cook STOPs the iteration loop and presents 2–4 typed options to the user (revert / keep + update dependents / compatibility shim / accept the regression). User selection recorded as a `## User Decision Addendum` block on the verdict file. `validate-gate-2.sh` blocks Gate 2 until the addendum is present.
@@ -111,7 +111,7 @@ Gate 2: human approval mandatory in all modes — see `.claude/rules/gate-rules.
 | 4 Review | `reviewer` via `mk:review` | MUST spawn — Gate 2 |
 | 4.5 Verify | `agent-browser` or `evaluator` via `mk:evaluate` | Only with `--verify` or `--strict` |
 | 5 Ship | `git-manager` via `mk:ship` | MUST spawn |
-| 6 Reflect | `documenter`, `mk:memory session-capture` | MUST spawn |
+| 6 Reflect | `documenter`; `mk:memory` only if a lesson is non-derivable | MUST spawn |
 
 ## Simplify + Verify (mandatory after Build)
 
@@ -135,7 +135,7 @@ After Phase 3 GREEN: run `mk:simplify` to reduce complexity before review. Then 
 - Code mode on stale plans — warn if plan >14 days old
 - Fast mode shallow coverage — skipping research means plan-level tests only
 - Missing model tier declaration — always declare in Phase 0
-- Forgetting memory read/write — Phase 0 reads `.meowkit/memory/`, Phase 6 appends
+- Forgetting to record a non-derivable lesson at Phase 6
 - `--strict` cost surprise — auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress
 - Skipping Gate 1 on "simple" features — features that seem simple grow during implementation. Always create a plan file; cancel it if truly trivial
 - Subagent patterns using Agent() not Task() — Task() enables tracking, blocking, and progress. Always use Task() for phases 2-6

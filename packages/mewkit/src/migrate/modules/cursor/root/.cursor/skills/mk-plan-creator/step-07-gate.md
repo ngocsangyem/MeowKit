@@ -29,7 +29,7 @@ Present the plan for approval via `stop and ask the user in chat`. Header: "Gate
 >
 > All checks passed. Ready to proceed?
 
-For long-horizon plans that carry an `## Autonomy Boundaries` block, note in the question that the user may adjust the Always / Ask-first latitude before approving; capture any adjustment into plan.md (and the Agent State / memory capture in 7c) on Approve/Modify. Omit the line entirely for fast / trivial / single-phase plans that have no block.
+For long-horizon plans that carry an `## Autonomy Boundaries` block, note in the question that the user may adjust the Always / Ask-first latitude before approving; capture any adjustment into plan.md (and the Agent State in 7c) on Approve/Modify. Omit the line entirely for fast / trivial / single-phase plans that have no block.
 
 Single-select.
 
@@ -58,21 +58,6 @@ pending feedback batch. Surface these in the 7a self-check. Full list:
   revision). The CLI is the single writer of `review.status`. Non-zero exit ⇒ a
   precondition failed ⇒ do NOT proceed to step-08; print the failed preconditions and
   return to Modify. When `html_mode == false`, skip this call.
-- **Memory capture** (lightweight, no sub-task): append the decision to the CANONICAL
-  store `.meowkit/memory/architecture-decisions.json` — NOT the `.md` view (a `.md` write is
-  invisible to JSON-first readers; see AGENTS.md (Memory) → Write Rules).
-  Add an entry to the `patterns` array (create the file with the v2.0.0 skeleton if absent),
-  bump `metadata.last_updated`, and never touch `version`. The entry body:
-  ```
-  id: {plan-dir-name}
-  type: decision
-  pattern: {1-2 sentence summary of the architectural / scope choices}
-  context: mode={planning_mode}, scope={scope_mode}, model={workflow_model}, tdd={tdd_mode}; red-team accepted {N}
-  date: {YYYY-MM-DD}
-  ```
-  (Match the canonical entry shape `immediate-capture-handler.cjs` writes: `type` + `pattern` + `context` — the recompute/render layers scan `pattern`/`context`, not a `decision` key.)
-  If the write fails, print a one-line notice (`⚠ memory capture skipped: <reason>`) — do
-  NOT skip silently (Write Rules: no silent skip).
 - Print Context Reminder block (from `references/gate-1-approval.md`) with absolute path to plan.md
 - Proceed to step-08
 

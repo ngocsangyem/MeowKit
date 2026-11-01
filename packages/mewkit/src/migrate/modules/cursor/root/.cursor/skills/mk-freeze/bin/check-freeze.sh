@@ -9,7 +9,7 @@ set -euo pipefail
 INPUT=$(cat)
 
 # Locate the freeze directory state file — respect PLUGIN_DATA if set
-FREEZE_FILE="${PLUGIN_DATA:-.meowkit/memory}/freeze-dir.txt"
+FREEZE_FILE="${PLUGIN_DATA:-.meowkit/state}/freeze-dir.txt"
 
 # If no freeze file exists, allow everything (not yet configured)
 if [ ! -f "$FREEZE_FILE" ]; then

@@ -15,7 +15,6 @@ Before (or instead of) the LLM scatter-gather, the deterministic `mewkit trace` 
 - `mewkit trace audit` — entropy + orphaned / stale / unverified-run / repeated-friction counts.
 - `mewkit trace propose [--commit]` — group repeated friction (≥2) + drift into advisory backlog items (dry-run by default).
 - `mewkit trace --friction "<note>" [--responsibility <r>]` — record friction on demand (the portable write path; the `##friction:` hook prefix is an optional enhancement).
-- `mewkit index` then `mewkit query` — opt-in: build a disposable SQLite index over the same logs and run read-only relational aggregates (events-by-type, friction-by-responsibility, cost-by-model). Use only when a cross-run aggregate is awkward over raw JSONL; logs stay canonical.
 
 Use the CLI for fast deterministic recall; use this skill's scatter-gather when patterns need cross-run LLM synthesis. Both are advisory — neither gates.
 
@@ -23,7 +22,6 @@ Use the CLI for fast deterministic recall; use this skill's scatter-gather when 
 
 Activate when:
 - User runs `the trace-analyze skill [--runs N]` (default N=20)
-- `dead-weight-audit-needed` flag in `.meowkit/memory/fixes.json` (set by `post-session.sh` on model version change)
 - After 3+ consecutive harness failures on the same task
 - Quarterly schedule for the dead-weight audit
 

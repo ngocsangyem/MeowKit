@@ -48,6 +48,41 @@ describe("appendTraceRecord — record shape", () => {
 		expect(JSON.stringify(rec.data)).not.toContain("sk-abcdef0123456789");
 	});
 
+	// The scrub used to be applied to `record.data` ONLY, so a credential reached the log
+	// verbatim whenever it arrived in any other position. `run_id` is user-supplied via
+	// `trace --id` / MEOWKIT_RUN_ID, and a map keyed by user-supplied text puts the secret in
+	// the KEY position, where scrubbing a value does nothing.
+	it("scrubs top-level string fields, not only data values", async () => {
+		const { root, logPath } = makeProjectRoot();
+		const fake = "sk-ant-AAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+		await appendTraceRecord(root, {
+			event: "friction",
+			runId: fake,
+			model: `opus via ${fake}`,
+			taskId: `task-${fake}`,
+			planPath: `plans/${fake}/plan.md`,
+			data: {},
+		});
+		const line = readLines(logPath)[0];
+		expect(line).not.toContain(fake);
+		const rec = JSON.parse(line);
+		expect(rec.run_id).toBe("[REDACTED-ANTHROPIC-KEY]");
+		expect(rec.task_id).toContain("[REDACTED-ANTHROPIC-KEY]");
+		expect(rec.plan_path).toContain("[REDACTED-ANTHROPIC-KEY]");
+	});
+
+	it("scrubs object KEYS inside data, not only their values", async () => {
+		const { root, logPath } = makeProjectRoot();
+		const fake = "AKIA1234567890ABCDEF";
+		await appendTraceRecord(root, {
+			event: "friction",
+			data: { [fake]: "value", nested: { [`env.${fake}`]: { deep: fake } } },
+		});
+		const line = readLines(logPath)[0];
+		expect(line).not.toContain(fake);
+		expect(line).toContain("[REDACTED-AWS-KEY]");
+	});
+
 	it("omits task_id/plan_path when not supplied (legacy-shaped line)", async () => {
 		const { root, logPath } = makeProjectRoot();
 		await appendTraceRecord(root, { event: "friction", data: {} });
@@ -80,7 +115,7 @@ describe("appendTraceRecord — concurrency (no interleaving/corruption)", () =>
 		const N = 30;
 		// Async-only: the async lock releases run on the event loop, so N concurrent appends
 		// serialize cleanly. (Mixing SYNC appends into the same process is not a real usage — the
-		// sync writer is the wiki adapter and the async writer is task-state; they run in separate
+		// sync writers are orient and CLI friction, the async writer is task-state; they run in separate
 		// CLI processes. Cross-process contention is covered by the shell+TS parity test below.)
 		await Promise.all(Array.from({ length: N }, (_, i) => appendTraceRecord(root, { event: "async_ev", data: { i } })));
 		const lines = readLines(logPath);

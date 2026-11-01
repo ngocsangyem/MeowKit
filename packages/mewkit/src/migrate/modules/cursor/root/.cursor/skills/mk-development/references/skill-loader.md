@@ -58,7 +58,6 @@ Analyze the files being touched in the current task. Use the following rules to 
 ## Always-Loaded References
 
 These are loaded for EVERY task regardless of domain:
-- `.cursor/skills/memory/references/session-capture.md` (captures learnings)
 - `.cursor/skills/development/references/tdd-enforcement.md` (enforces test-first)
 
 ## Steps to Execute

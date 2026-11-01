@@ -1,11 +1,6 @@
 // The CLI surface, declared once. minimist options, `--help`, and the docs synopsis are all
 // derived from this file, and a contract test fails if the dispatcher reads a flag that is not
 // here. Add a flag here first; nothing else needs editing.
-//
-// Known boundary: `wiki` receives the whole parsed args object as a pass-through bag and reads
-// its own flags from it (`--max-pages`, `--include-content`, and ~20 more). Those are not
-// dispatcher reads, so they are deliberately absent rather than half-covered. Declaring them
-// here without routing them through minimist would claim a contract that does not hold.
 import type { Catalogue, FlagSpec } from "./catalogue-types.js";
 
 const COMMANDS = [
@@ -18,11 +13,6 @@ const COMMANDS = [
 		subcommands: ["list", "explain", "resolve", "view", "bootstrap", "projections"],
 	},
 	{ name: "budget", summary: "View token usage and cost log", subcommands: ["context"] },
-	{
-		name: "memory",
-		summary: "Manage agent memory (lessons and patterns)",
-		subcommands: ["capture", "render-views", "seed-from-md"],
-	},
 	{ name: "setup", summary: "Guided post-scaffold configuration" },
 	{ name: "doctor", summary: "Diagnose common environment issues", subcommands: ["provenance"] },
 	{ name: "status", summary: "Print version and config summary" },
@@ -62,16 +52,13 @@ const COMMANDS = [
 	{ name: "inventory", summary: "List harness artifacts with governance metadata" },
 	{ name: "plan", summary: "Plan lifecycle", subcommands: ["status", "check", "approve", "archive"] },
 	{ name: "trace", summary: "On-demand trace recall", subcommands: ["score", "audit", "propose"] },
-	{
-		name: "wiki",
-		summary: "Long-term project knowledge",
-		subcommands: ["context", "init", "propose", "approve", "search", "reindex", "handoff"],
-		passThrough: true,
-	},
-	{ name: "index", summary: "Build or refresh the derived SQLite index over the append logs" },
-	{ name: "query", summary: "Read-only aggregate queries over the derived index" },
 	{ name: "pack", summary: "Manage install packs", subcommands: ["list", "add", "remove"] },
 	{ name: "verdict-gate", summary: "Check a review verdict against the active plan" },
+	{
+		name: "note",
+		summary: "Append a lint-checked entry to the committed team-memory store (entry on stdin)",
+		usage: "note <decisions|gotchas>",
+	},
 	{ name: "docs-manifest", summary: "Generate or drift-check the docs reference manifest" },
 ];
 
@@ -106,8 +93,6 @@ const FLAGS: FlagSpec[] = [
 			"plan",
 			"inventory",
 			"trace",
-			"index",
-			"query",
 			"orient",
 			"budget",
 			"task-state",
@@ -152,7 +137,7 @@ const FLAGS: FlagSpec[] = [
 	// validate
 	s("mode", ["validate"], "Force authoring or flat-copy mode instead of auto-detecting"),
 	b("portable", ["validate"], "Include portable provider contract checks"),
-	b("strict", ["validate", "memory"], "Treat WARN as failure (exit 1)"),
+	b("strict", ["validate"], "Treat WARN as failure (exit 1)"),
 	b("workflow", ["validate"], "Run only the workflow.yaml drift check"),
 	b("gates", ["validate"], "Run only the gate-authority contract check"),
 	b("ownership", ["validate"], "Run only the artifact ownership-completeness check"),
@@ -160,6 +145,7 @@ const FLAGS: FlagSpec[] = [
 	b("packs", ["validate"], "Run only the pack-manifest coherence and safety check"),
 	b("rules", ["validate"], "Run only the routing-table-breadth check"),
 	b("capabilities", ["validate"], "Run only the capability manifest checks"),
+	b("memory", ["validate"], "Run only the committed team-memory store lint"),
 	b("substrate", ["validate", "inventory"], "Run only the responsibility-substrate drift and untagged check", {
 		perCommand: { inventory: "Print the responsibility-by-coverage substrate matrix" },
 	}),
@@ -181,7 +167,7 @@ const FLAGS: FlagSpec[] = [
 	b("write", ["capabilities", "docs-manifest"], "Write the generated view rather than printing it", {
 		perCommand: { "docs-manifest": "Regenerate the committed manifest" },
 	}),
-	b("record", ["capabilities", "orient"], "Record the result to the task record; `--no-record` skips it"),
+	b("record", ["orient"], "Record the result to the task record; `--no-record` skips it"),
 
 	// plan
 	s("by", ["plan"], "Approver name recorded on the approval receipt"),
@@ -200,20 +186,12 @@ const FLAGS: FlagSpec[] = [
 	s("responsibility", ["trace"], "Scope to one substrate responsibility"),
 	b("commit", ["trace"], "Persist the proposal rather than previewing it"),
 
-	// query
-	s("task", ["query", "context"], "Task id to scope the query to", {
-		perCommand: { context: "Task id to record the evidence envelope against" },
-	}),
-	b("presets", ["query"], "List the built-in query presets"),
+	s("task", ["context"], "Task id to record the evidence envelope against"),
 
 	// budget
 	b("monthly", ["budget"], "Aggregate by month instead of the last ten entries"),
 	s("day", ["budget"], "Filter to today, or to a specific YYYY-MM-DD"),
 	s("fail-over", ["budget"], "Exit non-zero when a profile exceeds N tokens"),
-
-	// memory
-	b("clear", ["memory"], "Clear all memory, with confirmation"),
-	b("stats", ["memory"], "Show sessions captured and patterns learned"),
 
 	// setup
 	s("only", ["setup", "migrate"], "Run a single setup step", {
@@ -226,7 +204,6 @@ const FLAGS: FlagSpec[] = [
 	b("providers", ["doctor", "migrate"], "Include provider contract diagnostics"),
 	b("state", ["doctor"], "Include state taxonomy diagnostics"),
 	b("explain", ["doctor"], "Explain the provenance result rather than summarizing it"),
-	b("consolidation", ["doctor"], "Show the consolidation ledger; status is not a runtime-availability claim"),
 	b("hard-gates", ["doctor"], "Live-probe the hard gates (plan, privacy, injection block)"),
 
 	// task-state

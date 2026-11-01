@@ -89,6 +89,11 @@ try {
     "-x", ".meowkit/cache/*",
     "-x", ".meowkit/telemetry/*",
     "-x", ".meowkit/metadata.json",
+    // `tasks` is archived whole for its templates. Run output under it is not a
+    // release asset, and `tasks/reports/` specifically holds Security Posture
+    // Reports — unpatched vulnerability detail that must never reach a public
+    // GitHub Release zip.
+    "-x", "tasks/reports/*",
     "-x", "*.pyc",
     "-x", "__pycache__/*",
   ];

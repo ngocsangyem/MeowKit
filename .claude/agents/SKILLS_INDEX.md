@@ -198,15 +198,6 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:showcase`|developer|utility|script-backed (self-contained HTML generator; optional Puppeteer screenshots --no-screenshots; publish fail-closed; state in CLAUDE_PLUGIN_DATA/showcase/)
 ```
 
-### Knowledge / Wiki (Any Phase)
-
-```toon
-[3]{skill,owner,type,architecture}
-`mk:wiki`|any agent|knowledge|monolithic (gated long-term knowledge subsystem over `mewkit wiki`; init/propose/approve/reject/search/hint/list/reindex. Agents PROPOSE candidates only; canonical pages are written via human `approve`, which always re-runs the scanner.)
-`mk:wiki-research`|any agent|knowledge|monolithic (gated external fetch → candidate; web/arXiv/GitHub fetched as DATA, url-guarded + size-capped + redirect-re-validated; produces candidates only.)
-`mk:wiki-render`|any agent|knowledge|monolithic (self-contained, no-CDN HTML snapshot of a wiki.)
-```
-
 ### Cross-Cutting (Any Phase)
 
 ```toon
@@ -248,7 +239,7 @@ Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
 Knowledge/Wiki|3
-**Total**|**128**
+**Total**|**125**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

@@ -74,14 +74,16 @@ Hotfixes still require Gate 2 approval but may skip non-critical checks. Documen
 
 ## Memory capture
 
-Before shipping, capture non-obvious decisions and corrections:
+Before shipping, ask for the non-derivable decisions and corrections to be written down. Each becomes one entry in `.meowkit/memory/`:
 
-```
-##decision: Used connection pool over per-request connection, load testing showed 3x throughput
-##pattern:bug-class Race condition in payment retry, fixed with idempotency key
+```md
+## Connection pool, not per-request connection   <!-- 2026-11-01 -->
+Why: load testing showed 3x throughput; per-request exhausted the pool under burst
+Apply when: adding any new DB-backed endpoint to this service
+Source: PR #318
 ```
 
-These persist to `.meowkit/memory/` for future sessions.
+The store is committed, so the entry ships in the same PR and is reviewed with the code.
 
 ## When it goes wrong
 

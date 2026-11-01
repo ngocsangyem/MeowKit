@@ -73,13 +73,13 @@ Why optional: strict TDD added friction for spike work, tooling, and prototypes.
 
 ### 8. Learn from Every Session
 
-The memory system captures patterns, mistakes, and costs across sessions. Topic files in `.meowkit/memory/` — `fixes.md`/`fixes.json` for bug-class patterns, `review-patterns.md`/`review-patterns.json` for recurring observations, `architecture-decisions.md`/`architecture-decisions.json` for design choices — are read on-demand by consumer skills at task start. There is no auto-injection pipeline; each skill loads only the topic files relevant to its domain.
+The memory store keeps the part of a session a future model could not derive: `.meowkit/memory/decisions.md` for why a non-obvious choice was made, `gotchas.md` for what a real failure taught. It is two committed markdown files, read with one grep by the skills whose task needs it. There is no auto-injection pipeline and no capture hook — a human asks for something to be remembered, and the agent writes it.
 
 ### 9. Load Only What's Needed
 
 Skills activate by task domain, not all at once. Each skill's SKILL.md is a compact decision router, with detailed procedures in `references/` loaded on demand. This progressive disclosure pattern saves ~70% context per invocation.
 
-The same principle applies to the hook system: `handlers.json` routes events to only the matching handlers. A UserPromptSubmit event triggers the summary cache and immediate-capture handler — not build-verify or checkpoint logic.
+The same principle applies to the hook system: `handlers.json` routes events to only the matching handlers. A UserPromptSubmit event triggers the safety-sentinel handler — not build-verify or checkpoint logic.
 
 ## What MeowKit Does NOT Do
 

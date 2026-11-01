@@ -24,7 +24,7 @@ For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
 | 3.6   | Verify                  | mk:verify            | Clean build, lint, typecheck, test, and coverage       | Auto             |
 | 4     | Review                  | reviewer + security  | Quality/security audit, verdict                       | **GATE 2**       |
 | 5     | Ship                    | shipper + git-manager| Commit, PR, deploy                                    | Auto             |
-| 6     | Reflect                 | analyst + documenter + mk:memory | Memory capture, docs sync               | Auto             |
+| 6     | Reflect                 | analyst + documenter + mk:memory | Cost/pattern analysis, docs sync, gotcha/decision if non-derivable | Auto             |
 
 ## Phase Transition Rules
 

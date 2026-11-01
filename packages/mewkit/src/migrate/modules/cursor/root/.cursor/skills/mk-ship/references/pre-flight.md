@@ -141,7 +141,7 @@ If the Eng Review is NOT "CLEAR":
 
    ```bash
    eval "$(workflow-slug 2>/dev/null)"
-   grep '"skill":"ship-review-override"' .meowkit/memory/projects/$BRANCH-reviews.jsonl 2>/dev/null || echo "NO_OVERRIDE"
+   grep '"skill":"ship-review-override"' .meowkit/telemetry/$BRANCH-reviews.jsonl 2>/dev/null || echo "NO_OVERRIDE"
    ```
 
    If an override exists, display the dashboard and note "Review gate previously accepted — continuing." Do NOT ask again.
@@ -156,6 +156,6 @@ If the Eng Review is NOT "CLEAR":
 3. **If the user chooses A or C,** persist the decision so future `the ship skill` runs on this branch skip the gate:
    ```bash
    eval "$(workflow-slug 2>/dev/null)"
-   echo '{"skill":"ship-review-override","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","decision":"USER_CHOICE"}' >> .meowkit/memory/projects/$BRANCH-reviews.jsonl
+   echo '{"skill":"ship-review-override","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","decision":"USER_CHOICE"}' >> .meowkit/telemetry/$BRANCH-reviews.jsonl
    ```
    Substitute USER_CHOICE with "ship_anyway" or "not_relevant".

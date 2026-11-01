@@ -122,7 +122,7 @@ Which one costs more depends on your harness, model tier, and target surface; tr
 **Agents:** documenter, analyst
 **Produces:** updated memory and documentation
 
-Learnings are extracted as patterns, decisions, or failures and written to the canonical `.meowkit/memory/*.json` stores, affected docs are synced, and the task is closed.
+Non-derivable lessons are appended to `.meowkit/memory/decisions.md` or `gotchas.md` with `npx mewkit note`, affected docs are synced, and the task is closed.
 
 Two things happen on a fixed schedule rather than at your request. After each completed plan phase, the phase-file checkboxes and the plan's Agent State are updated before any transition, so a fresh session resumes at the right phase. And once every non-abandoned phase todo is checked the plan auto-completes and archives, without waiting for a ship.
 

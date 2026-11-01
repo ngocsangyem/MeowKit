@@ -7,10 +7,6 @@ import pc from "picocolors";
 import { buildCapabilities } from "../core/build-capabilities.js";
 import { validateCapabilities } from "../core/validate-capabilities.js";
 import { resolveWithHost } from "../core/resolve-capabilities.js";
-import { dbPath } from "../core/derived-index.js";
-import { attachRecall, recallDecisionEvent } from "../wiki/recall/compose.js";
-import type { KnowledgeRecall } from "../wiki/recall/contract.js";
-import { TraceAdapter } from "../wiki/infrastructure/trace-adapter.js";
 import { renderCapabilityView } from "../core/generate-capability-view.js";
 import { renderBootstrap, BOOTSTRAP_FILENAME, type BootstrapProvider } from "../core/bootstrap.js";
 import { PROVIDER_PROJECTIONS, isProjectedProvider } from "../core/provider-projection.js";
@@ -31,8 +27,6 @@ interface CapabilitiesOptions {
 	intent?: string;
 	provider?: string;
 	write?: boolean;
-	/** Opt-in telemetry: record one recall decision through the trace log. Default off. */
-	record?: boolean;
 }
 
 export async function capabilities(args: CapabilitiesOptions = {}): Promise<void> {
@@ -95,7 +89,6 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 			args.provider ?? null,
 			process.cwd(),
 			args.json ?? false,
-			args.record ?? false,
 		);
 		return;
 	}
@@ -255,7 +248,6 @@ function resolve(
 	provider: string | null,
 	projectRoot: string,
 	json: boolean,
-	record: boolean,
 ): void {
 	if (!intent) {
 		console.error(pc.red('`capabilities resolve` requires an intent (--intent "…" or a positional phrase).'));
@@ -266,16 +258,7 @@ function resolve(
 		checkedAt: new Date().toISOString(),
 		probes: hostProbes(projectRoot),
 	};
-	const claudeDir = path.join(projectRoot, ".claude");
-	// Compose bounded recall (only for `selected`; read-only, never creates the index DB).
-	const result = attachRecall(resolveWithHost(entries, intent, ctx), intent, {
-		dbFile: dbPath(path.dirname(claudeDir)),
-	});
-	// Opt-in telemetry only: default runs stay write-free.
-	if (record && result.knowledgeRecall) {
-		const { event, data } = recallDecisionEvent(result.knowledgeRecall);
-		new TraceAdapter(path.dirname(claudeDir)).recordWikiTrace(event, data);
-	}
+	const result = resolveWithHost(entries, intent, ctx);
 	if (json) {
 		console.log(JSON.stringify(result, null, 2));
 		return;
@@ -317,23 +300,4 @@ function resolve(
 	console.log(
 		pc.dim(`  can gate on: ${cite.gatingEvents.length ? cite.gatingEvents.join(", ") : "no events (advisory host)"}`),
 	);
-	if (result.knowledgeRecall) renderRecall(result.knowledgeRecall);
-}
-
-/** Compact recall section: policy + status + hit provenance (paths, token estimates).
- * Never prints page bodies — snippets and counts only. */
-function renderRecall(recall: KnowledgeRecall): void {
-	const { status, policy, hits, metadata } = recall;
-	console.log(pc.bold(`  knowledge recall: ${policy} → ${status}`));
-	if (status === "conditional" && metadata.conditionalHint) {
-		console.log(pc.dim(`      ${metadata.conditionalHint}`));
-	}
-	if (status === "empty") {
-		const n = metadata.wikiPageCount ?? 0;
-		console.log(pc.dim(n === 0 ? "      wiki is empty (0 pages)" : `      no match (${n} pages searched)`));
-	}
-	for (const h of hits) {
-		console.log(pc.dim(`      • ${h.title} — ${h.path} ~${h.tokenEstimate}tok`));
-		if (h.snippet) console.log(pc.dim(`        ${h.snippet}`));
-	}
 }

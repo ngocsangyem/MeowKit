@@ -19,7 +19,6 @@
     "./handlers/orientation-ritual.cjs"
   ],
   "UserPromptSubmit": [
-    "./handlers/safety-sentinel-inject.cjs",
-    "./handlers/immediate-capture-handler.cjs"
+    "./handlers/safety-sentinel-inject.cjs"
   ]
 }

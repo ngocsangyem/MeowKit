@@ -15,8 +15,8 @@ import { taskState } from "./commands/task-state.js";
 import { advice } from "./commands/advice.js";
 import { context } from "./commands/context.js";
 import { budget, contextBudget } from "./commands/budget.js";
-import { memory } from "./commands/memory.js";
 import { verdictGate } from "./commands/verdict-gate.js";
+import { note } from "./commands/note.js";
 import { doctor } from "./commands/doctor.js";
 import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
@@ -26,8 +26,6 @@ import { plan } from "./commands/plan.js";
 import { planApprove } from "./commands/plan-approve.js";
 import { planArchive } from "./commands/plan-archive.js";
 import { trace } from "./commands/trace.js";
-// NOTE: index-command is imported lazily inside its case — it pulls in `node:sqlite`
-// (experimental), so a static import would load SQLite + emit its warning on EVERY command.
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
 import { visualPlan } from "./commands/visual-plan.js";
@@ -125,6 +123,7 @@ async function main(): Promise<void> {
 				packs: args.packs as boolean | undefined,
 				rules: args.rules as boolean | undefined,
 				capabilities: args.capabilities as boolean | undefined,
+				memory: args.memory as boolean | undefined,
 			});
 			break;
 		}
@@ -180,7 +179,6 @@ async function main(): Promise<void> {
 				intent: args.intent as string | undefined,
 				provider: args.provider as string | undefined,
 				write: args.write as boolean | undefined,
-				record: args.record as boolean | undefined,
 			});
 			break;
 		case "pack":
@@ -248,33 +246,10 @@ async function main(): Promise<void> {
 				json: args.json as boolean | undefined,
 			});
 			break;
-		case "index": {
-			const { indexCommand } = await import("./commands/index-command.js");
-			indexCommand({ json: args.json as boolean | undefined });
-			break;
-		}
-		case "query": {
-			const { queryCommand } = await import("./commands/index-command.js");
-			queryCommand({
-				json: args.json as boolean | undefined,
-				task: args.task as string | undefined,
-				presets: args.presets as boolean | undefined,
-			});
-			break;
-		}
 		case "orient": {
 			const { orient } = await import("./commands/orient.js");
 			// minimist maps `--no-record` to `record === false`.
 			orient({ json: args.json as boolean | undefined, noRecord: args.record === false });
-			break;
-		}
-		case "wiki": {
-			const { wikiCommand } = await import("./wiki/interface/cli.js");
-			await wikiCommand({
-				subcommand: args._[1] as string | undefined,
-				rest: args._.slice(2).map(String),
-				flags: args as Record<string, unknown>,
-			});
 			break;
 		}
 		case "budget": {
@@ -304,16 +279,6 @@ async function main(): Promise<void> {
 			});
 			break;
 		}
-		case "memory":
-			await memory({
-				subcommand: args._[1] as string | undefined,
-				clear: args.clear as boolean | undefined,
-				stats: args.stats as boolean | undefined,
-				strict: args.strict as boolean | undefined,
-				check: args.check as boolean | undefined,
-				promptArgs: args._.slice(2).map(String),
-			});
-			break;
 		case "docs-manifest": {
 			const { docsManifest } = await import("./commands/docs-manifest.js");
 			docsManifest({
@@ -325,6 +290,11 @@ async function main(): Promise<void> {
 		}
 		case "verdict-gate":
 			verdictGate({ slug: args._[1] as string | undefined });
+			break;
+		case "note":
+			// Entry text comes from stdin, not a flag — the write path is a pipe, so a
+			// multi-line entry never has to survive shell quoting.
+			await note({ file: args._[1] as string | undefined });
 			break;
 		case "setup":
 			await setup({ only: args.only as string | undefined, systemDeps: args["system-deps"] as boolean | undefined });
@@ -338,7 +308,6 @@ async function main(): Promise<void> {
 				// `doctor provenance [--explain]`: read-only provenance report.
 				provenance: args._[1] === "provenance" || undefined,
 				explain: args.explain as boolean | undefined,
-				consolidation: args.consolidation as boolean | undefined,
 			});
 			break;
 		case "status":
@@ -466,11 +435,15 @@ async function main(): Promise<void> {
 			break;
 		}
 		default:
+			// A bare `mewkit` prints help and succeeds; an unrecognized VERB is a usage
+			// error, so it must exit non-zero — otherwise a retired command (or a typo)
+			// looks like a successful no-op to any script that checks the exit code.
 			if (command) {
 				console.error(pc.red(`Unknown command: ${command}`));
 				console.log();
 			}
 			printHelp();
+			if (command) process.exit(2);
 			break;
 	}
 }

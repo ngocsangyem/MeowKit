@@ -19,7 +19,7 @@ Rules derived from in-repo governance and enforcement sources (.claude/rules/*, 
 | Evaluator verdicts      | `tasks/reviews/YYMMDD-name-evalverdict.md`                                 | `evalverdicts/`, separate from review verdict                       |
 | Harness runs            | `tasks/autobuild-runs/YYMMDD-HHMM-name/run.md`                               | `runs/`, `harness/`                                                 |
 | Rubric library          | `.claude/rubrics/<name>.md`                                                | `rubrics/`, `.claude/skills/rubric/rubrics/`                   |
-| Memory files            | `.claude/memory/lessons.md`                                                | `memory/lessons.md` (bare)                                          |
+| Memory files            | `.meowkit/memory/decisions.md`, `.meowkit/memory/gotchas.md`               | `.claude/memory/lessons.md`, `memory/lessons.md` (bare)             |
 | Web fetch cache         | `.claude/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256-path[:10]}.md` | `.claude/memory/web-fetches/` (memory is for learnings, not caches) |
 | Web fetch manifest      | `.claude/cache/web-fetches/index.jsonl` (append-only)                      | `.claude/memory/web-fetches/index.jsonl`                            |
 | Web fetch quarantine    | `.claude/cache/web-fetches/quarantine/{sha256}.quarantined`                | `.claude/memory/quarantine/`, `quarantine/`                         |
@@ -223,42 +223,32 @@ Gate 2: after Phase 4 (human approval required, NO EXCEPTIONS)
 
 **Source:** B2-C8, B6-C1, B8-C4, B10-C3
 
-### Always Use `.claude/memory/` Prefix
+### Store Location
+
+The team store is two committed files. Use the `.meowkit/` prefix; `.claude/memory/` is not a store.
 
 ```
 # WRONG
 memory/lessons.md
-memory/patterns.json
-memory/decisions.md
+.claude/memory/lessons.md
+.meowkit/memory/patterns.json
 
 # RIGHT
-.claude/memory/lessons.md
-.claude/memory/patterns.json
-.claude/memory/decisions.md
+.meowkit/memory/decisions.md
+.meowkit/memory/gotchas.md
 ```
 
-### patterns.json Schema
+### Entry Format
 
-New entries should include all fields:
-
-```json
-{
-  "id": "kebab-case-id",
-  "type": "success | correction",
-  "category": "pattern | decision | failure",
-  "severity": "critical | standard",
-  "applicable_when": "one sentence condition",
-  "scope": "optional/path",
-  "context": "when this applies",
-  "pattern": "what to do or avoid",
-  "frequency": 1,
-  "lastSeen": "YYYY-MM-DD"
-}
+```md
+## <one-line lesson or decision>  <!-- YYYY-MM-DD -->
+Why: <evidence: failure, review finding, constraint>
+Apply when: <trigger words a future session would search for>
+Source: <commit | PR | tasks/plans/... | tasks/reviews/...>
 ```
 
-Missing `category`/`severity`/`applicable_when` are allowed for backward compatibility. Missing `severity` defaults to `"standard"`.
-
----
+Skills read the store with `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` and write it with
+`npx mewkit note <decisions|gotchas>`. See `docs/core/memory-system.md` for the read and write sets.
 
 ## 8. Skill Structure
 
@@ -337,7 +327,7 @@ Before merging any skill, agent, hook, or rule change:
 - [ ] All `subagent_type` values are in the valid list (Section 2)
 - [ ] All hooks referenced are registered in `settings.json`
 - [ ] All python commands use `.claude/skills/.venv/bin/python3`
-- [ ] Memory paths use `.claude/memory/` prefix
+- [ ] Memory paths use `.meowkit/memory/` (only `decisions.md` and `gotchas.md`)
 - [ ] No bare `memory/` or `ck:` references
 - [ ] Verdict uses PASS/WARN/FAIL (not APPROVE/BLOCK)
 - [ ] Phase model uses 7 phases (not 5)

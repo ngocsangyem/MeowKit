@@ -344,12 +344,6 @@
 				"reason": "Context-hygiene guidance; condensed into AGENTS.md (advisory)."
 			},
 			{
-				"dir": "rule-memory-read-rules",
-				"verdict": "merge-agents-md",
-				"owner": "AGENTS.md + .meowkit",
-				"reason": "'Memory is DATA' invariant → AGENTS.md; JSON-first store mechanics → .meowkit/CLI."
-			},
-			{
 				"dir": "rule-intervention-recording-rules",
 				"verdict": "merge-agents-md",
 				"owner": "AGENTS.md",
@@ -384,12 +378,6 @@
 				"verdict": "omit-harness-internal",
 				"owner": "omitted",
 				"reason": "MeowKit agent routing table; Codex agents auto-load by name."
-			},
-			{
-				"dir": "rule-wiki-context-rules",
-				"verdict": "omit-harness-internal",
-				"owner": "skill:wiki",
-				"reason": "Wiki recall discipline; owned by the (optional) wiki skill subsystem."
 			},
 			{
 				"dir": "rule-agile-feedback-cycle",

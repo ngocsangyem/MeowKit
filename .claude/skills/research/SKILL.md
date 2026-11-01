@@ -12,7 +12,7 @@ description: |
   fetch (see mk:web-to-markdown); NOT for internal codebase discovery (see
   mk:scout); NOT for project-only Q&A (see mk:ask-me); NOT for comparing
   solution designs (see mk:brainstorming); NOT for root-cause debugging (see
-  mk:investigate); NOT for wiki ingestion of sources (see mk:wiki-research).
+  mk:investigate).
 allowed-tools:
   - Read
   - Grep

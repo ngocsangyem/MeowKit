@@ -39,7 +39,7 @@ never an approval predicate.
 | `verification` | object | `{ commands[], overall }` — pointers/summary, NOT raw logs |
 | `review` | object | `{ verdictPath, status, sideEffectsDetected, userDecisionAddendum? }` |
 | `approvals` | object | `{ gate1, gate2, ship }` — each `not_applicable` \| `required` \| `approved` |
-| `memory` | object | `{ fixPatternWritten, reviewPatternWritten }` — capture status, NOT the patterns |
+| `memory` | object | `{ gotchaWritten, decisionWritten }` — whether an entry was appended, NOT the entry text |
 
 ## 3 — Validation Rules (enforced by the `.cjs`)
 
@@ -71,10 +71,10 @@ the compact `fixDiagnosis` form; simple fixes may skip evidence entirely.
 
 ## 5 — Evidence ≠ Memory
 
-Evidence is **one-run proof** (this run's pointers); memory JSON
-(`.meowkit/memory/*.json`) is **durable cross-run patterns**. They never mix:
-the run's evidence file is not a memory store, and the JSON stores stay
-JSON-first per `memory-read-rules.md`. Write both separately.
+Evidence is **one-run proof** (this run's pointers); the team memory store
+(`.meowkit/memory/{decisions,gotchas}.md`) holds **durable, non-derivable
+lessons**. They never mix: the run's evidence file is not a memory store, and a
+memory entry is not run evidence. Write both separately.
 
 ## 6 — Scrub Rule
 

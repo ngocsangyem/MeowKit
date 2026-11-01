@@ -203,16 +203,6 @@ Loaded at session start and re-anchored before each criterion. The persona:
 - `tasks/reviews/YYMMDD-{slug}-evalverdict-evidence/` -- directory of screenshots, HTTP captures, CLI transcripts
 - Returned to caller: `PASS | WARN | FAIL` + path to verdict file + generator feedback summary
 
-### Memory Write
-
-After each completed evaluation, appends a summary line to `.meowkit/memory/review-patterns.md`:
-
-```
-| {date} | {artifact-id} | {verdict: PASS/WARN/FAIL} | {top-criterion} | {score} |
-```
-
-This persists evaluation patterns across sessions for `mk:elicit` and `mk:review` to reference.
-
 ## Common Use Cases
 
 - Grading a generator-built frontend against the product spec before shipping

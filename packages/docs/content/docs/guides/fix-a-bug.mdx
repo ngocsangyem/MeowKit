@@ -1,6 +1,6 @@
 ---
 title: "Fix a Bug"
-description: "Structured bug investigation with /mk:fix: root cause analysis, regression tests, and memory capture."
+description: "Structured bug investigation with /mk:fix: root cause analysis, regression tests, and a memory entry."
 ---
 
 `/mk:fix` is MeowKit's debugging pipeline. Instead of immediately editing code, it forces structured investigation: find the root cause, write a regression test, apply the minimal fix. The approach adapts to bug complexity automatically.
@@ -66,7 +66,7 @@ Pauses for your approval at each step. Use when:
 
 ## After the fix
 
-Every fix writes to `.meowkit/memory/fixes.md` and `fixes.json`. Next time a similar bug appears, Step 0.5 finds the pattern and fast-tracks diagnosis. After 3+ occurrences of the same bug class, the pattern is promoted to a `CLAUDE.md` rule.
+When a fix teaches something a future session could not derive, it appends one entry to `.meowkit/memory/gotchas.md`. Next time a similar bug appears, Step 0.5's grep finds the entry and fast-tracks diagnosis. After 3+ occurrences of the same bug class, promote the lesson to a `CLAUDE.md` rule.
 
 ## Don't use /mk:fix for
 

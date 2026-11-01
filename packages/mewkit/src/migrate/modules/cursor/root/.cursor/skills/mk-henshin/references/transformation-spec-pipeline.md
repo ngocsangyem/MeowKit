@@ -118,12 +118,9 @@ WHY, never implementation code:
 ## 8. Out of Scope
 ```
 
-Write the approved architectural decision to
-`.meowkit/memory/architecture-decisions.json`, regenerate its Markdown views, create
-the directory first when absent, and scrub secrets before writing. `##decision:` is
-user-typed only; agent output does not trigger it. Include the dated henshin slug,
-decision, selected surfaces, rationale, dissent, and `live-captured` status in the
-record.
+The approved architectural decision stays in the spec document: include the dated
+henshin slug, decision, selected surfaces, rationale, dissent, and `live-captured`
+status there, and scrub secrets before writing.
 
 ## Handoff and boundaries
 

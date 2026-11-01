@@ -1,16 +1,16 @@
 ---
 title: "Using MeowKit Productively"
-description: "Hand off pieces of the loop — verification, stop conditions, triggers — and keep memory and wiki fresh so every session starts smarter."
+description: "Hand off pieces of the loop — verification, stop conditions, triggers — and keep the memory store fresh so every session starts smarter."
 ---
 
-MeowKit's 7-phase workflow is a loop: gather context, act, verify, repeat. Productivity is not about typing prompts faster — it is about **handing off pieces of that loop** so you stop being the bottleneck. This guide shows which piece to hand off, which MeowKit primitive to reach for, and how to keep the memory and wiki subsystems fresh so every future session starts smarter than the last.
+MeowKit's 7-phase workflow is a loop: gather context, act, verify, repeat. Productivity is not about typing prompts faster — it is about **handing off pieces of that loop** so you stop being the bottleneck. This guide shows which piece to hand off, which MeowKit primitive to reach for, and how to keep the memory store fresh so every future session starts smarter than the last.
 
 | You hand off | Use it when | Reach for |
 |--------------|-------------|-----------|
 | The check | You're exploring or deciding | `mk:verify`, `mk:evaluate`, `mk:review` |
 | The stop condition | You know what done looks like | `/goal` + `mk:verify`, `/mk:loop` |
 | The trigger | Work happens outside your session on its own schedule | `/loop`, `/schedule` (host runtime) |
-| The knowledge | A learning should outlive the session | `##` capture, `mewkit wiki`, `mewkit trace` |
+| The knowledge | A learning should outlive the session | `.meowkit/memory/`, `mewkit trace` |
 
 <Callout title="Host runtime primitives" type="info">
 
@@ -57,11 +57,10 @@ Several MeowKit maintenance jobs are documented as "quarterly" or "calendar remi
 
 | Job | Command | Cadence |
 |-----|---------|---------|
-| Memory prune (archive entries >90 days) | `/mk:memory --prune` | Monthly |
+| Memory prune (propose stale-entry removals) | `/mk:memory --prune` | Monthly |
 | Friction backlog review | `mewkit trace propose` | Weekly |
 | SKILL.md length audit (>500 lines) | check from skill-authoring rules | Quarterly |
 | Dead-weight audit | `/mk:benchmark run --full` + compare | Quarterly, and on every model upgrade |
-| Wiki candidate review | `mewkit wiki list` → `approve`/`reject` | Weekly |
 
 <Callout title="Cloud environments" type="warn">
 
@@ -69,55 +68,39 @@ Scheduled routines run in a cloud environment that does not inherit your local s
 
 </Callout>
 
-## Keep memory fresh — capture while you work
+## Keep memory fresh — write the non-derivable lesson while you work
 
-Memory only compounds if entries actually land. MeowKit has two write paths ([full architecture](/guide/memory-system)); the productive habit is using the **keyboard shortcut path** the moment a learning appears, not at session end:
+The store is two committed files, `.meowkit/memory/decisions.md` and `gotchas.md`
+([full architecture](/guide/memory-system)). There is no capture hook and no prefix syntax: when a
+learning appears, say so, and the running skill appends the entry.
 
+```md
+## Advisory lock, not row lock, for team reassignment   <!-- 2026-11-01 -->
+Why: the row lock deadlocked under two concurrent reassigns (seen in CI, 3 runs)
+Apply when: adding any concurrent write path to team membership
+Source: PR #412
 ```
-##decision: chose advisory lock over row lock — row lock deadlocked under concurrent reassign
-##pattern: bug-class N+1 in team roster query — always eager-load memberships
-##note: staging DB resets every Monday 03:00 UTC
-```
 
-These route to the canonical `.json` stores via the capture hook, with injection validation and secret scrubbing built in. Phase 6 (Reflect) also captures at session end, but it can only capture what the session still remembers — mid-work capture beats end-of-session recall.
+Three rules keep the store useful:
 
-Two rules keep the stores healthy:
+- **Only non-derivable lessons.** If the next session could get the same answer from the code, the
+  git log, the plan or the ADR, do not write it. A store of derivable facts is noise.
+- **No secrets, no vulnerability detail.** The store is committed and read back as DATA. Security
+  findings stay in `mk:cso` reports and Gate 2 verdicts. `mewkit validate --memory` enforces this
+  mechanically, alongside a 300-line cap per file.
+- **Prune on a schedule.** `/mk:memory --prune` proposes removing entries whose `Source` no longer
+  exists and entries older than 180 days with no recent hit. You approve each removal. A store full
+  of stale entries is worse than an empty one — agents read it as current truth.
 
-- **JSON is canonical.** The `.md` files are generated views. Never hand-edit them; regenerate with `mewkit memory render-views` after JSON changes.
-- **Prune on a schedule.** `/mk:memory --prune` archives entries older than 90 days to `lessons-archive.md` (nothing is deleted). A store full of stale patterns is worse than an empty one — agents read it as current truth.
-
-## Keep the wiki current — a weekly gate, not a someday task
-
-The wiki is MeowKit's long-term, provenance-bearing knowledge store. Its safety model is also why it goes stale: **agents can only propose; only a human `approve` writes a canonical page.** If you never review candidates, knowledge accumulates in the proposal queue and the wiki stops reflecting reality.
-
-The maintenance loop that keeps it current:
-
-**1. Agents propose during work.** Decision-heavy flows end by handing off their terminal artifact as a scanned candidate:
+Reading is one grep, run only by the skills that need it (`mk:fix`, `mk:investigate`, `mk:review`,
+`mk:plan-creator`, `mk:cso`):
 
 ```bash
-npx mewkit wiki propose            # propose a candidate (scanner-gated)
-npx mewkit wiki handoff propose    # hand off a skill's terminal artifact
+grep -rilE "payment|retry|idempotency" .meowkit/memory/
 ```
 
-**2. External knowledge enters as candidates too.** Use `mk:wiki-research` (`mewkit wiki enqueue` / `research`) to fetch external sources — every fetched byte is scanned, size-capped, and secret-scrubbed before it can even become a candidate. Nothing external writes directly to canonical pages.
-
-**3. You review weekly.** This is the step to protect with a recurring slot (or a `/schedule` reminder):
-
-```bash
-npx mewkit wiki list               # see pending candidates
-npx mewkit wiki approve <id>       # re-runs the scanner, writes canonical page
-npx mewkit wiki reject <id>
-```
-
-A weekly 10-minute review keeps the queue near zero. Approving in batches months later means re-verifying stale claims — the cost grows with the delay.
-
-**4. Recall closes the loop.** Approved knowledge pays off at Phase 0, when agents probe the wiki before non-trivial work:
-
-```bash
-npx mewkit wiki context "payment retry idempotency" --max-pages 3 --json
-```
-
-If the probe keeps returning nothing for topics you know were decided, that is your signal the approval queue is backed up.
+If that keeps returning nothing for topics you know were decided, nobody is writing entries — the
+fix is the habit, not more tooling.
 
 ## Turn friction into system improvements
 
@@ -133,13 +116,13 @@ npx mewkit trace --friction "evaluator passed a build with broken auth flow"
 
 | When | Do | Why |
 |------|----|-----|
-| During every task | `##decision:` / `##pattern:` the moment you learn something | Mid-work capture beats end-of-session recall |
+| During every task | Ask for the non-derivable lesson to be written down the moment you learn it | Mid-work capture beats end-of-session recall |
 | After every intervention | `mewkit trace --friction "<note>"` | Repeated friction becomes a backlog item automatically |
-| Weekly | Review wiki candidates; run `mewkit trace propose` | Keeps the wiki canonical and the harness improving |
+| Weekly | Run `mewkit trace propose` | Repeated friction becomes a backlog item, and the harness improves |
 | Monthly | `/mk:memory --prune` | Stale memory misleads agents |
 | Quarterly / model upgrade | Dead-weight audit via `/mk:benchmark` | Scaffolding that helped last model may slow this one |
 
-None of these steps is large. The point is that each one feeds the next session: captured decisions become recalled context, recorded friction becomes harness fixes, approved candidates become Phase 0 answers. That is what "productive" means with an agent toolkit — not faster typing, but a system that gets smarter every week you use it.
+None of these steps is large. The point is that each one feeds the next session: a written-down decision becomes recalled context, and recorded friction becomes a harness fix. That is what "productive" means with an agent toolkit — not faster typing, but a system that gets smarter every week you use it.
 
 ## Related
 

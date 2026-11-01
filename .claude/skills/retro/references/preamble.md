@@ -5,7 +5,6 @@ mkdir -p .meowkit/state/sessions
 touch .meowkit/state/sessions/"$PPID"
 _SESSIONS=$(find .meowkit/state/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
 find .meowkit/state/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(.claude/scripts/bin/workflow-config get contributor 2>/dev/null || true)
 _PROACTIVE=$(.claude/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
@@ -76,5 +75,4 @@ This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 
 ## Memory
 
-- **Reads memory:** at task start, read canonical `.meowkit/memory/review-patterns.json` and `.meowkit/memory/architecture-decisions.json`; use a matching Markdown view only if its JSON store is absent.
-- **Writes memory:** at task end, append patterns to canonical `review-patterns.json` and decisions to canonical `architecture-decisions.json`, validate them, then regenerate views. Do not write generated Markdown views. Scrub secrets before writing.
+- **Writes memory:** at task end append ONE entry to `.meowkit/memory/gotchas.md` (or `decisions.md` for a decision) via `npx mewkit note gotchas` (entry on stdin, lint-checked and locked by the CLI — never a bare `Edit`), in the format defined by `mk:memory`, and only when the lesson is non-derivable from the code, the diff, or `git log`. Never write secrets or vulnerability detail. A failed write is not silent: print `⚠ memory write skipped: <reason>` and continue.

@@ -25,8 +25,8 @@ function makeRepo(): string {
 	git(dir, ["init", "-q"]);
 	git(dir, ["config", "user.email", "t@t.dev"]);
 	git(dir, ["config", "user.name", "t"]);
-	mkdirSync(join(dir, ".claude", "memory"), { recursive: true });
-	writeFileSync(join(dir, ".claude", "memory", "fixes.json"), '{"patterns":[]}');
+	mkdirSync(join(dir, ".meowkit", "memory"), { recursive: true });
+	writeFileSync(join(dir, ".meowkit", "memory", "gotchas.md"), "# Gotchas\n");
 	writeFileSync(join(dir, "f.txt"), "1");
 	git(dir, ["add", "-A"]);
 	git(dir, ["commit", "-qm", "init"]);
@@ -60,12 +60,12 @@ describe("durable-write observer detection", () => {
 		expect(violations.map((v) => v.surface)).toContain("tags (unrequested tag)");
 	});
 
-	it("catches an unrequested curated-memory write", () => {
+	it("catches an unrequested team-memory write", () => {
 		const d = makeRepo();
 		const before = snapshotDurableSurfaces(d);
-		writeFileSync(join(d, ".claude", "memory", "fixes.json"), '{"patterns":[{"id":"x"}]}');
+		writeFileSync(join(d, ".meowkit", "memory", "gotchas.md"), "# Gotchas\n\n## lesson\n");
 		const violations = diffDurableSurfaces(before, snapshotDurableSurfaces(d));
-		expect(violations.map((v) => v.surface)).toContain("curated memory (unrequested memory write)");
+		expect(violations.map((v) => v.surface)).toContain("team memory (unrequested memory write)");
 	});
 
 	it("catches a dirty worktree (uncommitted change)", () => {

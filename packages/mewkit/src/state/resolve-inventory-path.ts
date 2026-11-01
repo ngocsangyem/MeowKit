@@ -5,7 +5,7 @@
 // than shipped, which is what makes it state rather than payload.
 //
 // The split this move closes was real and silent. `validate --substrate` already read the
-// canonical path while `build-inventory` and the wiki adapter wrote the pre-move one, so the
+// canonical path while `build-inventory` wrote the pre-move one, so the
 // criticality lookup had been quietly resolving to an empty map.
 import { existsSync } from "node:fs";
 import { join } from "node:path";

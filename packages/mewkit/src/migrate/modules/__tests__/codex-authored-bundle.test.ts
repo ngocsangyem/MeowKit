@@ -31,7 +31,6 @@ describe("authored codex bundle", () => {
 				".codex/agents",
 				".codex/config.toml",
 				".codex/hooks.json",
-				".codex/hooks/capture.cjs",
 				".codex/hooks/gate-enforcement.cjs",
 				".codex/hooks/lib",
 				".codex/hooks/privacy-block.cjs",
@@ -51,7 +50,7 @@ describe("authored codex bundle", () => {
 		expect(existsSync(join(target, ".agents", "skills", "mk-fix", "SKILL.md"))).toBe(true);
 		// Hooks resolve the project root via git (Codex exposes no CODEX_PROJECT_DIR); wrapper executable.
 		expect(readFileSync(join(target, ".codex", "hooks.json"), "utf-8")).toContain("git rev-parse --show-toplevel");
-		expect(statSync(join(target, ".codex", "hooks", "capture.cjs")).mode & 0o777).toBe(0o755);
+		expect(statSync(join(target, ".codex", "hooks", "gate-enforcement.cjs")).mode & 0o777).toBe(0o755);
 	});
 
 	it("the agent roster is re-authored by execution envelope (orchestrator dropped, effort assigned)", () => {
@@ -105,7 +104,7 @@ describe("authored codex bundle", () => {
 		expect(fails, `unexpected failures: ${fails.map((f) => `${f.name} — ${f.detail}`).join("; ")}`).toEqual([]);
 	});
 
-	it("the migrate overlay writes EVERY authored surface (cutover complete — all 10 entries active)", async () => {
+	it("the migrate overlay writes EVERY authored surface (cutover complete — all 9 entries active)", async () => {
 		// Phase-9 cutover complete: all ten manifest entries are active, so the overlay writes the
 		// full authored tree. For AGENTS.md the overlay writes the authored BASE; the source-rules
 		// merge-single (config/rules) then merges onto it in the full migrate flow (not exercised by
@@ -119,14 +118,13 @@ describe("authored codex bundle", () => {
 				".codex/agents",
 				".codex/config.toml",
 				".codex/hooks.json",
-				".codex/hooks/capture.cjs",
 				".codex/hooks/gate-enforcement.cjs",
 				".codex/hooks/lib",
 				".codex/hooks/privacy-block.cjs",
 				".codex/rules/default.rules",
 			].sort(),
 		);
-		expect(overlay.writes).toBe(10);
+		expect(overlay.writes).toBe(9);
 		expect(existsSync(join(target, "AGENTS.md"))).toBe(true); // authored AGENTS.md base
 		expect(existsSync(join(target, ".codex", "config.toml"))).toBe(true); // authored config base
 		expect(existsSync(join(target, ".agents", "skills", "mk-fix", "SKILL.md"))).toBe(true); // authored skill

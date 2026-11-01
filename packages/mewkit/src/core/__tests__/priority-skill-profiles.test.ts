@@ -13,13 +13,12 @@ const asset = (skillName: string, fileName: string) =>
 describe("priority skill profile contracts", () => {
 	it("keeps brainstorming quick output inline and side-effect free", () => {
 		const body = skill("brainstorming");
-		expect(body).toContain("Do not create a report, plan, wiki candidate, or memory entry.");
+		expect(body).toContain("Do not create a report or plan.");
 		expect(body).toContain("give 2-4 technically distinct options and one recommendation");
 		expect(body).toContain(
-			"Do not load techniques, scout, scoring, challenge, reports, plans, wiki candidates, memory, or handoff.",
+			"Do not load techniques, scout, scoring, challenge, reports, plans, or handoff.",
 		);
 		expect(body).not.toContain("## HTML Output");
-		expect(body).not.toContain("npx mewkit wiki handoff propose");
 	});
 
 	it("keeps deep brainstorming bounded and resolves product-routing ambiguity", () => {
@@ -29,8 +28,7 @@ describe("priority skill profile contracts", () => {
 		expect(brainstorming).toContain("one anti-bias pivot, then the challenge pass");
 		expect(brainstorming).toContain("split only 3+ independently shippable concerns");
 		expect(brainstorming).toContain("A bare “brainstorm” request is ambiguous");
-		expect(brainstorming).toContain("mewkit wiki handoff suggest");
-		expect(brainstorming).toContain("terminal-handoff-advisory");
+		expect(brainstorming).toContain("A report, HTML output, or handoff is optional");
 		expect(officeHours).toContain("new product, feature, or side-project concept");
 		expect(officeHours).toContain(
 			"For multiple technical approaches to a validated requirement, use `mk:brainstorming`.",
@@ -49,7 +47,7 @@ describe("priority skill profile contracts", () => {
 		expect(body).toContain("quick: confirm the known cause directly");
 		expect(body).toContain("Do not delegate to `mk:investigate`");
 		expect(body).toContain("it never bypasses Scout, Diagnose, root-cause evidence, Verify + Prevent");
-		expect(body).toContain("No default plan, report, wiki, memory, commit prompt, or subagent fan-out.");
+		expect(body).toContain("No default plan, report, memory entry, commit prompt, or subagent fan-out.");
 	});
 
 	it("accepts bounded probabilistic evidence for intermittent root causes", () => {
@@ -65,7 +63,7 @@ describe("priority skill profile contracts", () => {
 		const quickWorkflow = reference("fix", "workflow-quick.md");
 		expect(quickWorkflow).toContain("Confirm the supplied cause");
 		expect(quickWorkflow).toContain(
-			"Do not create a plan, report, wiki candidate, memory entry, reviewer task, or commit prompt.",
+			"Do not create a plan, report, memory entry, reviewer task, or commit prompt.",
 		);
 		expect(quickWorkflow).not.toContain("Activate `mk:investigate`");
 	});

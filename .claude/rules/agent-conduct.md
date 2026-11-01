@@ -47,12 +47,16 @@ WHY: Loading project context first prevents conflicting convention guesses.
 
 ### A3. Document Eureka Moments
 
-> Source: `search-before-building-rules.md` Rule 4 — verbatim.
+> Source: `search-before-building-rules.md` Rule 4 — verbatim, except the append path, which now
+> names the locked, lint-checked `mewkit note` write command.
 
 When Layer 3 reasoning reveals a genuine insight — something that contradicts the conventional approach with evidence:
 
 - Name it: "EUREKA: Everyone does X because they assume [assumption]. But [evidence] suggests that's wrong here."
-- Log it in the relevant `.meowkit/memory/` topic file for future sessions
+- Append it as one entry to `.meowkit/memory/gotchas.md` for future sessions, through
+  `npx mewkit note gotchas` (entry on stdin) — never with a bare `Edit`, which is neither
+  lint-checked nor serialized against a concurrent agent. A failed write prints one line —
+  `⚠ memory write skipped: <reason>` — and the workflow continues.
 - This is the highest-value output of the search process
 
 WHY: Documented insights survive context reset.

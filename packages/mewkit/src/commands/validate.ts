@@ -20,6 +20,7 @@ import { checkOwnership } from "../core/build-inventory.js";
 import { checkAgentConformance } from "../core/check-agent-conformance.js";
 import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
+import { checkMemoryStore } from "../core/check-memory-store.js";
 import { checkPluginNamespace } from "../core/namespace-purity.js";
 import { validateCapabilities } from "../core/validate-capabilities.js";
 import { buildCapabilities } from "../core/build-capabilities.js";
@@ -30,6 +31,7 @@ import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js"
 import { getTargetProfile, targetProfileNames } from "../validate/targets/target-profile.js";
 import type { Status } from "./doctor-checks.js";
 import { resolveConfigPath } from "../state/resolve-config-path.js";
+import { resolveProjectRoot } from "../state/meowkit-root-resolver.js";
 
 // validate reports STRUCTURE & WIRING only — that gate files exist and are wired, not that
 // they actually block. Behavioral proof is `doctor --hard-gates`. Statuses are honest:
@@ -50,6 +52,7 @@ export type Section =
 	| "Gates"
 	| "Capabilities"
 	| "Agents"
+	| "Memory"
 	| "Target";
 
 export interface CheckResult {
@@ -95,6 +98,8 @@ interface ValidateOptions {
 	capabilities?: boolean;
 	/** Scope the run to the declared agent-contract conformance check. */
 	agents?: boolean;
+	/** Scope the run to the committed team-memory store lint (used by CI). */
+	memory?: boolean;
 	/** Validate a GENERATED provider target instead of a `.claude/` project: the provider key
 	 * (e.g. "codex"). Requires `targetDir`. Mutually exclusive with `--portable`. */
 	target?: string;
@@ -693,6 +698,9 @@ export async function buildDefaultChecks(
 		// Namespace purity is cheap and consumer-relevant (a leaked double-prefix would
 		// misbehave in the consumer too), so it runs in both modes.
 		...checkPluginNamespace(meowkitDir),
+		// The team-memory store is consumer-owned content: a consumer's store can carry
+		// instruction-like text or a secret just as easily as the source checkout's can.
+		...checkMemoryStore(projectRoot),
 	];
 
 	if (mode === "authoring") {
@@ -752,6 +760,21 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		}
 		const targetResults = await profile.check(dir);
 		renderResultsAndExit(targetResults, args.strict ?? false);
+		return;
+	}
+
+	// `--memory` lints CONSUMER content (`.meowkit/memory/`), which exists on every runtime —
+	// the Codex bundle installs `.agents/`, the Cursor bundle `.cursor/`, and both instruct the
+	// user to run this lint. Gating it behind the `.claude/` lookup made the only automated
+	// guard unreachable on exactly those targets, and the error named `.claude/` rather than
+	// memory, so the user read "not a Claude project" and dropped the step. It runs FIRST, and
+	// independently of any provider directory.
+	if (args.memory) {
+		const memoryRoot = resolveProjectRoot(process.cwd()) ?? process.cwd();
+		console.log(pc.bold(pc.cyan("Linting the committed team-memory store...")));
+		console.log(`${pc.dim("Project root:")} ${memoryRoot}`);
+		console.log();
+		renderResultsAndExit(checkMemoryStore(memoryRoot), args.strict ?? false);
 		return;
 	}
 
@@ -830,6 +853,7 @@ function renderResultsAndExit(results: CheckResult[], strict: boolean): void {
 		Rules: true,
 		Capabilities: true,
 		Agents: true,
+		Memory: true,
 		Target: true,
 	};
 	const sections = Object.keys(SECTION_ORDER) as Section[];

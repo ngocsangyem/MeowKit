@@ -55,7 +55,13 @@ PROJECT_ROOT = _find_project_root()
 CACHE_ROOT = PROJECT_ROOT / ".codex" / "cache" / "web-fetches"
 QUARANTINE_DIR = CACHE_ROOT / "quarantine"
 MANIFEST_PATH = CACHE_ROOT / "index.jsonl"
-SECURITY_LOG = PROJECT_ROOT / ".codex" / "memory" / "security-log.md"
+# Canonical destination for intervention records: the telemetry class, NOT
+# `.meowkit/memory/`. `_log_security` appends the finding description — a description of the
+# attacker payload — plus the quarantine path. The memory store is committed and grep-read
+# back as DATA by the read-set skills, so logging a quarantine there would re-deliver the
+# content the quarantine exists to hold. Telemetry is gitignored, excluded from the release
+# archive, and never recall-read.
+SECURITY_LOG = PROJECT_ROOT / ".meowkit" / "telemetry" / "security-log.md"
 
 
 # ---------------------------------------------------------------------------

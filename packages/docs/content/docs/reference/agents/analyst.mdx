@@ -11,7 +11,7 @@ description: "Cost tracking and pattern analysis agent — tracks token usage, e
 | **Owner** | `docs` |
 | **Runtime** | `claude-code` |
 | **Risk** | medium |
-| **Writes** | `.meowkit/memory/` |
+| **Writes** | `.claude/hooks/post-session.sh`, `.claude/rules/model-selection-rules.md`, `.meowkit/telemetry/cost-log.json` |
 
 {/* GENERATED:reference-facts END */}
 
@@ -30,7 +30,7 @@ The analyst operates at Phase 0 (session start — loads context) and Phase 6 (R
 | **Type** | Core |
 | **Phase** | 0 (Orient), 6 (Reflect) |
 | **Auto-activates** | Session start and session end |
-| **Owns** | `.meowkit/memory/` (cost-log.json, patterns.json, lessons.md) |
+| **Owns** | `.meowkit/telemetry/cost-log.json` |
 | **Never does** | Write code, auto-apply configuration changes |
 
 ## When to Use
@@ -43,9 +43,9 @@ The analyst operates at Phase 0 (session start — loads context) and Phase 6 (R
 ## Key Capabilities
 
 - **Token usage tracking** — records task name, model used, tokens consumed, estimated cost, and timestamp in `.meowkit/telemetry/cost-log.json` for every session.
-- **Cost reporting** — generates cost reports via `/mk:budget` showing spend breakdowns by task, agent, model tier, and time period. For cross-run aggregates it prefers the derived index — `mewkit index` then `mewkit query` and `mewkit trace audit` — over hand-parsing the JSONL logs, falling back to `cost-log.json` when the index is absent.
-- **Pattern extraction** — identifies recurring issues, common solutions, and frequently needed refactors from session data and records them in `.meowkit/memory/patterns.json`.
-- **Lessons learned** — maintains actionable lessons in `.meowkit/memory/lessons.md` documenting what worked, what did not, and what to do differently.
+- **Cost reporting** — generates cost reports via `/mk:budget` showing spend breakdowns by task, agent, model tier, and time period. For cross-run aggregates it reads `cost-log.json` directly and uses `mewkit trace score|audit|propose` over the JSONL logs.
+- **Pattern extraction** — identifies recurring issues, common solutions, and frequently needed refactors from session data and reports them. It does not write the team store; durable lessons go through the write-set skills.
+- **Lessons learned** — proposes actionable lessons documenting what worked, what did not, and what to do differently. A write-set skill records an accepted lesson.
 - **Configuration recommendations** — proposes `CLAUDE.md` updates every 10 sessions based on accumulated patterns. These are always proposals for human review, never auto-applied.
 - **Cost optimization** — identifies tasks consistently over-classified to expensive model tiers and recommends routing adjustments.
 
@@ -78,7 +78,7 @@ If your cost reports show that a large percentage of tasks are classified as Com
 
 ### Review Lessons Learned Periodically
 
-The lessons in `.meowkit/memory/lessons.md` accumulate over time and become increasingly valuable. Periodically reviewing them helps identify systemic issues — patterns that a single session might miss but that become obvious when viewed across many sessions.
+The lessons recorded in `.meowkit/memory/gotchas.md` accumulate over time and become increasingly valuable. Periodically reviewing them helps identify systemic issues — patterns that a single session might miss but that become obvious when viewed across many sessions.
 
 ## Key Takeaway
 

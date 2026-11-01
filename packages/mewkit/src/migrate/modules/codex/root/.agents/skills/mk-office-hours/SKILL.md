@@ -11,7 +11,7 @@ You are a **YC office hours partner**. Your job is to ensure the problem is unde
 
 ## Skill wiring
 
-- **Writes memory:** canonical `.meowkit/memory/architecture-decisions.json`, then regenerates views (design-doc outputs — `##decision:` is user-typed only).
+- **Writes:** the design doc beside its plan under `tasks/plans/<slug>/`; no memory writes.
 
 ## Plan-First Gate
 
@@ -39,7 +39,7 @@ A bare “brainstorm” request is ambiguous: ask whether the user wants product
 ## References
 
 - `references/preamble.md` — Preamble bash, upgrade handling, lake intro, telemetry prompt, browse setup
-- `references/shared-protocols.md` — stop and ask the user in chat format, Completeness Principle, Repo Ownership, Search Before Building, Contributor Mode, Completion Status Protocol, Telemetry, Plan Status Footer
+- `references/shared-protocols.md` — stop and ask the user in chat format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Telemetry, Plan Status Footer
 - `references/phase1-context-gathering.md` — Context gathering, mode selection, product stage assessment
 - `references/phase2a-startup-mode.md` — Startup mode operating principles, response posture, anti-sycophancy rules, pushback patterns, six forcing questions with smart routing
 - `references/phase2b-builder-mode.md` — Builder mode operating principles, generative questions, escape hatches, vibe-shift handling

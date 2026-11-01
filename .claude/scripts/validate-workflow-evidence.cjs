@@ -202,7 +202,7 @@ function selfTest() {
     verification: { commands: ['npm test -- auth'], overall: 'pass' },
     review: { verdictPath: 'tasks/reviews/x-verdict.md', status: 'PASS', sideEffectsDetected: false },
     approvals: { gate1: 'not_applicable', gate2: 'required', ship: 'required' },
-    memory: { fixPatternWritten: true, reviewPatternWritten: false },
+    memory: { gotchaWritten: true, decisionWritten: false },
   };
   const brokenFix = JSON.parse(JSON.stringify(validFix));
   brokenFix.task = '';

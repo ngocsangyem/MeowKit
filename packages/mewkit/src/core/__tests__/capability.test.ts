@@ -137,7 +137,7 @@ describe("contextRequirement overlay (Phase 5 slice 2)", () => {
 
 	it("authored tool/service entries never carry a contextRequirement", () => {
 		const caps = buildCapabilities(makeFlagshipDir());
-		for (const id of ["jira", "browser", "project-context", "task-record", "trace-log", "wiki-recall"]) {
+		for (const id of ["jira", "browser", "project-context", "task-record", "trace-log"]) {
 			expect(caps.find((c) => c.id === id)?.contextRequirement, id).toBeNull();
 		}
 	});

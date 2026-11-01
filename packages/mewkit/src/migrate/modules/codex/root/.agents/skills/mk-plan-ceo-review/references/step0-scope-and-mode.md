@@ -98,17 +98,17 @@ Rules:
 After the opt-in/cherry-pick ceremony, write the plan to disk so the vision and decisions survive beyond this conversation. Only run this step for EXPANSION and SELECTIVE EXPANSION modes.
 
 ```bash
-eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/memory/projects/ceo-plans
+eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p tasks/plans/ceo-plans
 ```
 
 Before writing, check for existing CEO plans in the ceo-plans/ directory. If any are >30 days old or their branch has been merged/deleted, offer to archive them:
 
 ```bash
-mkdir -p .meowkit/memory/projects/ceo-plans/archive
-# For each stale plan: mv .meowkit/memory/projects/ceo-plans/{old-plan}.md .meowkit/memory/projects/ceo-plans/archive/
+mkdir -p tasks/plans/ceo-plans/archive
+# For each stale plan: mv tasks/plans/ceo-plans/{old-plan}.md tasks/plans/ceo-plans/archive/
 ```
 
-Write to `.meowkit/memory/projects/ceo-plans/{date}-{feature-slug}.md` using this format:
+Write to `tasks/plans/ceo-plans/{date}-{feature-slug}.md` using this format:
 
 ```markdown
 ---

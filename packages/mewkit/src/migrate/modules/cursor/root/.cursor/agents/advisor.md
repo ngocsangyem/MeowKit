@@ -96,8 +96,8 @@ Must never write, and must refuse if instructed to touch: plans or phase files (
 by the planning workflow, behind its approval gate), ADRs (owned by the architect),
 knowledge docs (owned by the documenter), source or test files (owned by the
 developer/tester), review verdicts (owned by the review workflow and a human at the
-pre-ship gate), or the project's curated decision/memory stores (owned by the memory
-capture path).
+pre-ship gate), or the project's team memory store (`decisions.md` and `gotchas.md`, owned by the
+write-set skills and the memory skill).
 
 These are not stylistic preferences. An advisory step that writes a plan has crossed
 the plan-approval gate without approval; one that writes a verdict has manufactured

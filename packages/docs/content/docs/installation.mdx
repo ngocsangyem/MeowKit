@@ -66,10 +66,10 @@ Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that 
 ├── metadata.json    What this install put on disk, and what you have edited since
 ├── pack-manifest.json  Which packs this release ships
 ├── harness-inventory.json  Generated registry of .claude/ artifacts
-├── memory/          Fix patterns, review patterns, architecture decisions
+├── memory/          decisions.md + gotchas.md, committed
 ├── telemetry/       Cost log, trace log
 ├── state/           Session markers
-└── cache/           Derived wiki index, rebuildable
+└── cache/           Derived caches, rebuildable
 
 CLAUDE.md             Entry point for Claude Code
 .mcp.json.example     Optional MCP server config
@@ -77,8 +77,8 @@ CLAUDE.md             Entry point for Claude Code
 
 The split follows ownership: `.claude/` holds what Claude Code itself reads, so
 `settings.json` and `.mcp.json` stay there. Everything MeowKit owns lives in `.meowkit/`.
-Only `config.json` is meant to be committed; the state directories are machine-written
-and belong in `.gitignore` (`mewkit setup` appends them for you).
+`config.json` and `memory/*.md` are meant to be committed; the other state directories are
+machine-written and belong in `.gitignore` (`mewkit setup` appends them for you).
 
 `metadata.json` is worth knowing about even though you never edit it. It records what the
 install wrote and what its contents were, which is how `mewkit upgrade` can tell a file you

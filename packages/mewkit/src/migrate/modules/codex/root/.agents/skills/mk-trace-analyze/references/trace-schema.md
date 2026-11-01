@@ -70,7 +70,7 @@ When `trace-log.jsonl` exceeds 50MB, `append-trace.sh` rotates it:
 2. gzip in place → `trace-log.{YYMMDD-HHMMSS}.jsonl.gz`
 3. Truncate the original
 
-Rotated logs remain in `.meowkit/memory/` for historical analysis. They are NOT deleted automatically.
+Rotated logs remain in `.meowkit/telemetry/` for historical analysis. They are NOT deleted automatically.
 
 ## Reading Records
 

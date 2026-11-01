@@ -256,7 +256,7 @@ if [ -n "$WARN" ]; then
   # Audit trail — append the warning event to security-log.md.
   # Each warn is logged as an "override-request" entry; the user's decision
   # (approve/deny) happens at this project's configured approval-prompt level.
-  LOG_DIR="${PLUGIN_DATA:-.meowkit/memory}"
+  LOG_DIR="${PLUGIN_DATA:-.meowkit/telemetry}"
   LOG_FILE="$LOG_DIR/security-log.md"
   mkdir -p "$LOG_DIR" 2>/dev/null || true
   if [ ! -f "$LOG_FILE" ]; then

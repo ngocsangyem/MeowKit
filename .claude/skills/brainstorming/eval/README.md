@@ -7,7 +7,7 @@ Canary scenarios for routing, convergence, and handoff behavior. Add fixture fil
 | Scenario | Input shape | Expected behavior |
 |---|---|---|
 | Activation routing | "compare technical approaches for X" | Uses `mk:brainstorming` for one validated decision. |
-| Quick no-artifact | "brainstorm 3 options, no file" | Returns 2-4 inline options and recommendation; creates no report, plan, wiki, memory, or handoff. |
+| Quick no-artifact | "brainstorm 3 options, no file" | Returns 2-4 inline options and recommendation; creates no report, plan, or handoff. |
 | Bare brainstorm ambiguity | "brainstorm X" | Asks whether product validation or technical approaches are wanted; does not route from the word alone. |
 | Product-validation redirect | "is this worth building?" | Routes to `mk:office-hours`; no technical solution list. |
 | Plan-exists redirect | "review this existing plan" | Routes to `mk:plan-ceo-review` or `mk:elicit`. |

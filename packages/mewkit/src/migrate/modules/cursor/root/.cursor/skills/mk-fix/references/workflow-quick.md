@@ -18,7 +18,7 @@ Implement the smallest root-cause fix following local patterns. Run the exact fo
 **Output:** `Step 2: Fixed — [N] files, focused before/after result`
 
 ### Step 3: Complete
-Return the root cause, changed files, and verification result inline. Do not create a plan, report, wiki candidate, memory entry, reviewer task, or commit prompt.
+Return the root cause, changed files, and verification result inline. Do not create a plan, report, memory entry, reviewer task, or commit prompt.
 
 **Output:** `Step 3: Complete — [summary]`
 

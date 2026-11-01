@@ -48,12 +48,11 @@ MEOWKIT_GEMINI_API_KEY=
 \n`;
 
 // Mirrors `.meowkit/gitignore.meowkit`; used only when that template is absent.
-// `.meowkit/config.json` is deliberately NOT ignored — it is project config meant to be committed.
+// `.meowkit/config.json` and `.meowkit/memory/` are deliberately NOT ignored — both are meant to be committed.
 const DEFAULT_GITIGNORE = `# MeowKit
 .env
 .env.local
 .meowkit/.env
-.meowkit/memory/
 .meowkit/telemetry/
 .meowkit/state/
 .meowkit/cache/
@@ -113,15 +112,48 @@ function setupEnv(projectDir: string): StepResult {
 	return { name: "env", status: "pass", message: "Created .meowkit/.env — add your API keys." };
 }
 
+/**
+ * Strip a stale `.meowkit/memory/` ignore line.
+ *
+ * In v2 the whole memory directory was gitignored. In v3 the store is COMMITTED and reviewed
+ * in the PR diff — that is the entire replacement for the deleted approve gate. A project set
+ * up by the previous version carries the old ignore line, and since it also carries the new
+ * `.meowkit/telemetry/` line, the "already present" probe below returns `skip` and the stale
+ * line survives forever. The premise then silently does not hold on exactly the installs that
+ * have history worth reviewing.
+ *
+ * Only the memory line is touched, and only when it is an exact MeowKit-shaped ignore; an
+ * explicit user negation (`!`) is left alone.
+ */
+export function stripStaleMemoryIgnore(content: string): { content: string; stripped: boolean } {
+	const stale = /^\s*\.?\/?\.meowkit\/memory\/?\*{0,2}\s*$/;
+	const lines = content.split("\n");
+	const kept = lines.filter((line) => !stale.test(line));
+	if (kept.length === lines.length) return { content, stripped: false };
+	return { content: kept.join("\n"), stripped: true };
+}
+
 /** Setup .gitignore with MeowKit entries */
 function setupGitignore(projectDir: string): StepResult {
 	const gitignore = join(projectDir, ".gitignore");
 
 	// Check if already has MeowKit entries
 	if (existsSync(gitignore)) {
-		const content = readFileSync(gitignore, "utf-8");
-		if (content.includes(".meowkit/memory/")) {
-			return { name: "gitignore", status: "skip", message: "MeowKit entries already in .gitignore" };
+		let content = readFileSync(gitignore, "utf-8");
+		// BEFORE the skip: a stale memory ignore has to go even when everything else is present.
+		const stripped = stripStaleMemoryIgnore(content);
+		if (stripped.stripped) {
+			writeFileSync(gitignore, stripped.content, "utf-8");
+			content = stripped.content;
+		}
+		if (content.includes(".meowkit/telemetry/")) {
+			return {
+				name: "gitignore",
+				status: stripped.stripped ? "pass" : "skip",
+				message: stripped.stripped
+					? "Removed the stale .meowkit/memory/ ignore — the v3 team store is committed"
+					: "MeowKit entries already in .gitignore",
+			};
 		}
 	}
 

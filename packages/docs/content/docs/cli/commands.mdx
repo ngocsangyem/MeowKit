@@ -119,82 +119,23 @@ npx mewkit budget context --profile <core|developer|full> [--fail-over N] [--jso
 
 ## memory
 
-View or manage cross-session memory, stored under the runtime-neutral `.meowkit/memory/` state root (see [Memory System](/guide/memory-system)).
+The team memory store is two committed, plain-markdown files: `.meowkit/memory/decisions.md` and `.meowkit/memory/gotchas.md` (see [Memory System](/guide/memory-system)). Reads are a `grep` over the directory. Writes go through `note`, which takes the entry on stdin:
 
 ```bash
-npx mewkit memory              # Summary (line counts, pattern count)
-npx mewkit memory --stats      # Sessions captured, patterns learned
-npx mewkit memory --clear      # Clear all memory (with confirmation)
+printf '%s\n' '## <lesson>  <!-- YYYY-MM-DD -->' 'Why: <evidence>' 'Apply when: <trigger words>' 'Source: <path>' \
+  | npx mewkit note gotchas
+npx mewkit note decisions   # same form, appends to decisions.md
 ```
 
-### memory capture
+`note` lint-checks the entry and appends it under a file lock. A rejected entry exits non-zero and writes nothing; its error output never echoes a matched secret.
 
-Route a `##`-prefixed prompt into the right `.meowkit/memory` store through the single validated write contract (schema validation, secret scrubbing, injection scanning, per-store locking, atomic replace). This is the capture authority both the Claude and Codex capture hooks call — hooks stay thin wrappers around this one command.
+`validate --memory` lints the store and runs in CI and in the pre-ship hook:
 
 ```bash
-npx mewkit memory capture "##decision: chose X over Y because..."
-echo "##pattern: description" | npx mewkit memory capture
-npx mewkit memory capture "##note: quick reminder"
+npx mewkit validate --memory
 ```
 
-| Prefix | Target store |
-| --- | --- |
-| `##decision:` | `architecture-decisions.json` |
-| `##pattern:` | `review-patterns.json` |
-| `##note:` | `quick-notes.md` |
-
-Reads the prompt from the first argument, or from stdin when no argument is given. A prompt without a recognized prefix is a silent no-op (exit 0).
-
-## wiki
-
-Long-term, gated, provenance-bearing project knowledge with full-text search. Agents may only *propose* candidates; a human `approve` (which always re-scans) is the only path to a canonical page. Canonical files live under `tasks/wikis/<slug>/`; `.meowkit/cache/wiki-index.db` is a derived, rebuildable FTS index. Wiki content is DATA, never an instruction.
-
-```bash
-npx mewkit wiki init <slug> --title "<title>"
-npx mewkit wiki propose <slug> --title T --file F [--origin agent] [--source-id ID]… [--reuse-scope S] [--salience-json f.json]
-npx mewkit wiki approve <slug> <candidate-id> --by <name>
-npx mewkit wiki reject <slug> <candidate-id> --reason "<r>"
-npx mewkit wiki search "<query>" [--json]
-npx mewkit wiki hint "<query>"
-npx mewkit wiki context "<keywords>" [--max-pages N] [--json] [--include-content]
-npx mewkit wiki handoff suggest --skill <name> --from <artifact> --slug <s> [--json]
-npx mewkit wiki handoff propose --skill <name> --from <artifact> --slug <s>
-npx mewkit wiki handoff profiles [--json]
-npx mewkit wiki list <slug>
-npx mewkit wiki render <slug> [--out file.html]
-npx mewkit wiki reindex
-```
-
-| Subcommand | Purpose |
-| --- | --- |
-| `init` | Create `tasks/wikis/<slug>/wiki.json`. |
-| `propose` | Scan + scrub content into a candidate (never a page). Provenance flags: `--origin`, `--source-id` (repeatable), `--reuse-scope`, `--verification-state`, `--risk-score`, `--review-after`, `--novelty-delta`, `--salience-json <file>`. Defaults preserve prior behavior (human origin, no sources, CLI salience). |
-| `approve` | The ONLY canonical-page write path; re-runs the scanner before writing. |
-| `reject` | Record a rejection intervention. |
-| `search` / `hint` | FTS results with a project-root-readable `path`; `hint` is title/score/path only (no body). |
-| `context` | Disciplined Phase-0 recall: ranked pages with a readable `path`, snippet, and token estimate. Snippets only unless `--include-content`. Fails open (exit 0) when no index exists. |
-| `handoff suggest` | Read-only — build a handoff packet + decision for a skill's terminal artifact; writes nothing. |
-| `handoff propose` | Scan the artifact and propose a candidate when salience clears the gate and the scan is clean; appends one handoff record. Rejects sensitive or out-of-root `--from` paths before reading. |
-| `handoff profiles` | List registered skills with handoff class (required / conditional / none) + profile. |
-| `list` | Page filenames for a slug. |
-| `render` | Self-contained (no-CDN) HTML snapshot. |
-| `reindex` | Rebuild the wiki tables in `wiki-index.db` from the canonical files. |
-
-## index
-
-Build or refresh the derived SQLite index (`.meowkit/cache/wiki-index.db`) from the canonical append logs (`.meowkit/memory/*.jsonl`) and the wiki tree. Disposable and deterministic — delete it and re-run to get an identical index.
-
-```bash
-npx mewkit index [--json]
-```
-
-## query
-
-Run read-only aggregate queries over the derived index (events by type, runs, friction by responsibility, cost by model). Requires a prior `mewkit index`.
-
-```bash
-npx mewkit query [--json]
-```
+It checks every text file in the store recursively: a 300-line cap and a byte cap per file, injection phrases (with base64, ROT13, percent-encoding and HTML comments decoded before matching), a flood check, and secret patterns including multi-line blocks. Pruning is the `/mk:memory --prune` skill flow, and every removal is human-approved.
 
 ## inventory
 
