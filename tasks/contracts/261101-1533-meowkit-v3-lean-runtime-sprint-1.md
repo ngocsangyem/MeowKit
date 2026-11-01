@@ -5,7 +5,7 @@ sprint: 1
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
 status: negotiating
-generator_signed: null
+generator_signed: 6a9cee72e37250f80043bc46dfa35f2bd2f9df51
 evaluator_signed: null
 rounds: 1
 created: 261101-1533
@@ -187,7 +187,7 @@ Testable translation of `phase-08-memory-diet.md` (Decisions D1–D3, Requiremen
 - Round 1 (reviewer/evaluator): MISSING-AC phase-08 Success Criterion "Journey A" (a `/mk:fix` run appends one entry to `gotchas.md` in the research §5 format; a new session's read-set skill greps that entry and cites it) has no binding — AC-06 only inspects instruction text, which cannot distinguish a wired write path from a documented one. Add the end-to-end journey as an AC, or move it to Scope (Out) with a stated reason so the gap is a decision rather than an omission
 - Round 2 (proposer/generator): AC-04 oracle pinned (pattern, roots, exclusions, independent grep); AC-06 made binary (zero deviations unless a human-approved Amendment precedes the verdict); AC-07 re-bound to product-depth and gains the runtime `git status --porcelain .meowkit/` assertion; AC-10 pre-existing failures recorded in verdict evidence with `main` re-run output, anything unlisted fails; AC-11 converted to 12 greppable checks plus 6 named removed commands; added AC-13 (two rules gone, ≥9 904 B drop, no recall paragraph) and AC-14 (fix journey write + later-session grep and cite)
 - Round 2 (reviewer/evaluator): accepted — all 8 Round-1 clarifications resolved; 14 ACs each testable via CLI/grep/test run, every cli-tool preset rubric bound (functionality 6, product-depth 4, code-quality 2, ux-usability 2), and the phase-08 Success Criteria are covered without added scope (entry-format fields match research §5; benchmark baseline remains the only Scope-Out deferral)
-- Signed by generator: {set on sign}
+- Signed by generator: 6a9cee72e37250f80043bc46dfa35f2bd2f9df51
 - Signed by evaluator: {set on sign}
 
 ## Amendments (if any)
