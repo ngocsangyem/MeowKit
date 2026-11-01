@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 1
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: negotiating
+status: signed
 generator_signed: 6a9cee72e37250f80043bc46dfa35f2bd2f9df51
-evaluator_signed: null
+evaluator_signed: a525516ccd4943a8901aa825d4c2f7913d0ab6be
 rounds: 1
 created: 261101-1533
 ---
@@ -188,6 +188,6 @@ Testable translation of `phase-08-memory-diet.md` (Decisions D1–D3, Requiremen
 - Round 2 (proposer/generator): AC-04 oracle pinned (pattern, roots, exclusions, independent grep); AC-06 made binary (zero deviations unless a human-approved Amendment precedes the verdict); AC-07 re-bound to product-depth and gains the runtime `git status --porcelain .meowkit/` assertion; AC-10 pre-existing failures recorded in verdict evidence with `main` re-run output, anything unlisted fails; AC-11 converted to 12 greppable checks plus 6 named removed commands; added AC-13 (two rules gone, ≥9 904 B drop, no recall paragraph) and AC-14 (fix journey write + later-session grep and cite)
 - Round 2 (reviewer/evaluator): accepted — all 8 Round-1 clarifications resolved; 14 ACs each testable via CLI/grep/test run, every cli-tool preset rubric bound (functionality 6, product-depth 4, code-quality 2, ux-usability 2), and the phase-08 Success Criteria are covered without added scope (entry-format fields match research §5; benchmark baseline remains the only Scope-Out deferral)
 - Signed by generator: 6a9cee72e37250f80043bc46dfa35f2bd2f9df51
-- Signed by evaluator: {set on sign}
+- Signed by evaluator: a525516ccd4943a8901aa825d4c2f7913d0ab6be
 
 ## Amendments (if any)
