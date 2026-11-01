@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 1
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: signed
-generator_signed: 6a9cee72e37250f80043bc46dfa35f2bd2f9df51
-evaluator_signed: a525516ccd4943a8901aa825d4c2f7913d0ab6be
+status: amended
+generator_signed: null
+evaluator_signed: null
 rounds: 1
 created: 261101-1533
 ---
@@ -191,3 +191,24 @@ Testable translation of `phase-08-memory-diet.md` (Decisions D1–D3, Requiremen
 - Signed by evaluator: a525516ccd4943a8901aa825d4c2f7913d0ab6be
 
 ## Amendments (if any)
+
+### Amendment 1 — 261101-1730
+
+**Trigger:** the AC-07 runtime check failed after the AC-14 sessions. `git status --porcelain --ignored .meowkit/`
+showed `.meowkit/memory/` as ignored, because the shipped `.meowkit/gitignore.meowkit` template and the
+`DEFAULT_GITIGNORE` fallback in `packages/mewkit/src/commands/setup-steps.ts` both ignore the committed memory
+directory. v3 memory is committed, so the entries contradict Scope (In) item 1. No `config.yaml` writer exists
+yet (Phase 03), so `config.yaml` cannot appear.
+
+**Scope added (human-approved 261101: "Fix gitignore now"):**
+- Remove `.meowkit/memory/` from `.meowkit/gitignore.meowkit` and from `DEFAULT_GITIGNORE`.
+- The setup step's "entries already present" check stops keying on `.meowkit/memory/` (it keys on `.meowkit/telemetry/`).
+- Unchanged: `scripts/prepare-release-assets.cjs` still excludes `.meowkit/memory/*` from the release archive (a
+  project's memory never ships in the kit).
+- Out: rewriting the `.gitignore` of projects that already installed v2 (no v2→v3 migration layer, per Scope (Out)).
+
+**AC-07 runtime assertion, revised** (overrides the original Verification step (2); the static step (1) is unchanged):
+in a scratch project whose `.gitignore` is generated from the amended template, after the AC-14 journey sessions,
+`git status --porcelain .meowkit/` lists only `memory/*.md` (and `config.yaml` only once Phase 03 ships a writer),
+and `git status --porcelain --ignored .meowkit/` shows `state/`, `telemetry/` and `cache/` as ignored with
+`memory/` not ignored. Any other listed path fails.
