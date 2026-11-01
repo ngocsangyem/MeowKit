@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 1
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: signed
-generator_signed: 8680487fad3881b225238a78a56769124f2b9fc2
-evaluator_signed: d6f803260b2e7010021f2564af1633dfadc035a3
+status: amended
+generator_signed: null
+evaluator_signed: null
 rounds: 1
 created: 261101-1533
 ---
@@ -229,3 +229,46 @@ review, retro, the architect agent, the memory skill, `mk:party` (decisions.md) 
 
 **AC-11 follow-through:** item (4) names the revised write set, so the memory skill and the memory-system docs page
 list `mk:party` and `mk:plan-creator archive` as `decisions.md` writers.
+
+### Amendment 3 — 261101-2130
+
+**Trigger:** the Phase 4 review (`tasks/reviews/261101-meowkit-v3-lean-runtime-verdict.md`) returned FAIL
+(Correctness, Performance, Security, Coverage) with 19 required changes and security BLOCKs S1–S3.
+
+**Decisions (human-approved 261101):**
+- Fix scope: "All 19 required changes" from the verdict's Required Changes list.
+- Security: "Restore into the lint": the obfuscation decode passes, a byte cap and the flood heuristic
+  (`injection-rules.md` Rules 8–9) return inside `validate --memory`, which runs fail-closed in `pre-ship.sh`.
+- `CLAUDE.md`: "Yes, rewrite it": the Memory section and the line-25 JSON-store instruction only.
+- AC-06: "Amendment 3, keep both": the `/mk:retro` command read and the `agent-conduct.md` A3 EUREKA append stand.
+- Write path: a locked append command `mewkit note <decisions|gotchas>` (entry on stdin; lint-checked before
+  append; `withFileLock`; exits non-zero without echoing a secret). The `memory|wiki|index|query` verbs stay retired.
+
+**Scope added** (overrides Scope (Out) where they conflict): the `mewkit note` command; the restored lint
+defenses and pre-ship enforcement; the `file-lock.ts` atomic-publish fix; upgrade-time *reporting* (not migration)
+of orphaned v2 stores and a stale `.meowkit/memory/` ignore line; one canonical security-log path outside
+`.meowkit/memory/`; top-level trace field and key scrubbing; Codex/Cursor bundles regenerated from the kit; the
+docs sweep; dead-weight registry rows; a committed lint fixture store. A v2→v3 data migration stays out.
+
+**AC-06, revised again** (overrides Amendment 2's read clause; write clause extended): reads are also allowed in
+the `/mk:retro` command; appends are also allowed by any agent under `agent-conduct.md` A3 (one EUREKA entry to
+`gotchas.md`). Write-set skills append through `mewkit note`.
+
+**AC-10, revised:** the three `withFileLock` concurrency tests (file-lock, trace-append concurrency,
+athena-supervision-wiring race) are no longer pre-existing exceptions; they must pass.
+
+**New criteria:**
+- **AC-15** Given a memory store holding (a) a non-`.md` file with an injection phrase, (b) a nested `.md` with
+  one, (c) a base64-encoded injection inside an HTML comment, (d) a multi-line PEM private key, (e) a file over the
+  byte cap, when `mewkit validate --memory` runs, then it exits non-zero naming each file and echoes no secret.
+  Verification: CLI against a temp fixture; assert exit code, five file names, 0 secret echoes.
+- **AC-16** Given an entry on stdin, when `mewkit note gotchas` runs twice concurrently, then both entries land
+  intact; an entry carrying an injection phrase or secret exits non-zero and writes nothing. Verification: vitest
+  plus a CLI run.
+- **AC-17** Given a poisoned store, when the pre-ship hook evaluates a ship-boundary command, then it blocks with
+  exit 2. Verification: hook test.
+- **AC-18** Given the regenerated bundles, then neither registers a capture hook, no file references
+  `mewkit memory capture` or `.meowkit/memory/sessions`, and no security log resolves under `.meowkit/memory/`.
+  Verification: grep both bundle roots → 0; migrate vitest pass.
+- **AC-19** Given the finished change, when the review is re-run, then the verdict names no FAIL dimension and no
+  BLOCK. Verification: the re-run verdict file.
