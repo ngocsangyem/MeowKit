@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 1
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: signed
-generator_signed: 7ea097ff09fd1a7f0d7717ab1a6206a054d9c128
-evaluator_signed: d6bf89d7b38bc914155b97ece5c258b66364c935
+status: amended
+generator_signed: null
+evaluator_signed: null
 rounds: 1
 created: 261101-1533
 ---
@@ -212,3 +212,20 @@ in a scratch project whose `.gitignore` is generated from the amended template, 
 `git status --porcelain .meowkit/` lists only `memory/*.md` (and `config.yaml` only once Phase 03 ships a writer),
 and `git status --porcelain --ignored .meowkit/` shows `state/`, `telemetry/` and `cache/` as ignored with
 `memory/` not ignored. Any other listed path fails.
+
+### Amendment 2 — 261101-1900
+
+**Trigger:** the AC-06 tabulation found two writers outside the decided write set, both appending to
+`.meowkit/memory/decisions.md`: `mk:party` (a Decision Record after a deliberation reaches a decision) and
+`mk:plan-creator archive` (one decision entry when an archived plan carries a Red Team Review or Validation Log).
+
+**Decision (human-approved 261101: "Amend to allow both"):** both writers are kept and added to the decided
+write set. Each writes `decisions.md` only, one entry per run, in the standard entry format, under the same
+non-derivable rule. Neither gains a read of `.meowkit/memory/`; `plan-creator` stays in the read set as before.
+
+**AC-06, revised** (overrides the write-set clause; the read-set clause is unchanged): appends appear only in fix,
+review, retro, the architect agent, the memory skill, `mk:party` (decisions.md) and `mk:plan-creator` archive
+(decisions.md). Any other writer fails.
+
+**AC-11 follow-through:** item (4) names the revised write set, so the memory skill and the memory-system docs page
+list `mk:party` and `mk:plan-creator archive` as `decisions.md` writers.
