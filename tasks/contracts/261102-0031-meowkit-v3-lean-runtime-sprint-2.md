@@ -5,7 +5,7 @@ sprint: 2
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
 status: negotiating
-generator_signed: null
+generator_signed: b4d9ffbd5f9fc87c5c93d94f72c7fee9fdfb050d
 evaluator_signed: null
 rounds: 2
 created: 261102-0031
