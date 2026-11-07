@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 4
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: signed
-generator_signed: f9a05de067232d5d5544906b8f5aee894dabd96e
-evaluator_signed: f4fcc0102e4fc55aa73623ad34a3e34fc13b6f25
+status: amended
+generator_signed: null
+evaluator_signed: null
 rounds: 2
 created: 261108-0321
 ---
@@ -483,4 +483,38 @@ rather than a traceback
 
 ## Amendments (if any)
 
-None.
+### Amendment 1 — 261108-1200
+
+Trigger: the build ran in five batches and hit three places where signed criteria could not all hold as written, plus
+two pre-existing defects found by the pinned verbs and one drift that blocks AC-10. Decided under the user's standing directive (follow recommended options).
+No criterion is weakened; each item names what it changes.
+
+- **`skill env` eligibility (AC-04 vs AC-06 vs AC-13).** `jira` installs a binary from its own pins and ships no `.py`,
+  so AC-13 needs `skill env jira`, AC-06 forbids declaring `requires_runtime` on it, and AC-04 rejects a skill without
+  it. Ruling: a skill is eligible when it declares `requires_runtime` **or** pins packages in its own
+  `requirements.txt`. `requires_runtime` still means "runs Python" and stays on exactly the 12 Definitions skills; a
+  skill with neither still exits non-zero (verified with `cook`).
+- **Flags, not verbs (Scope Out).** Added `setup --skills=<a,b>` (AC-03's one-skill verification needs it),
+  `validate --frontmatter` and `validate --docs-refs` (the ported validators, D5). No new verb beyond `skill env` and
+  `plan check --structural`. `setup`'s `venv` and `deps` steps are repointed as one `skill-envs` step, so
+  `--only=venv|deps` no longer exist; nothing in the tree referenced them.
+- **Projections ship the resolver (AC-05, AC-11).** The codex and cursor manifests carry `scripts/skill-python.cjs`, so
+  the remediation message holds in both projections. 15 bundle sites still call `validate.py` / `security-scan.py`
+  directly: no skill owns them (D6, Scope Out), so a per-skill resolver cannot resolve them.
+- **Inventory and ownership drift (AC-10 scope addition).** At BASE `build-inventory.ts` counted only top-level `.sh`
+  hooks and `.meowkit/harness-inventory.json` listed the 18 deleted `.sh` names, so `validate --ownership` and
+  `inventory --check` — two of AC-10's 23 verbs — failed before this sprint started. In scope now: count the node
+  hook entrypoints, regenerate the inventory and ownership records with their own generators, and correct the README
+  and HOOKS_INDEX counts.
+- **Characterization tests restated, not weakened.** `codex-authored-bundle.test.ts` (9→10 targets) and
+  `cursor-full-surface-characterization.test.ts` (7→8 surfaces) follow the resolver manifest entry;
+  `doctor-hard-gates.test.ts` follows a diagnostic rename.
+- **AC-14 reading.** "Grows past 200 lines" means crosses 200 because of this sprint. Files already over 200 at BASE
+  that grew are listed by name in the evidence.
+- **Two BASE defects fixed because pinned verbs exposed them.** `plan approve` spawned its receipt helper through
+  `sh` after the helper became `.cjs`, so no Gate 1 receipt could be stamped since the hook port; it now runs on
+  `process.execPath`. `plan check --structural` failed with `EISDIR` when given a plan directory; it now resolves the
+  directory to its `plan.md`, with a test.
+- **AC-15.** Gate 1 "blocked on its own terms" satisfies the criterion; the orchestrator recorded the journey. Because
+  `mewkit init` fetches the published release, which does not contain this change, the fixture project is the
+  working-tree kit laid down the way `init` lays it down, and the evidence says so.
