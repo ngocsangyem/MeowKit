@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 3
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: signed
-generator_signed: 5e8d57c61f4b0ee9daf3b6799c301b1fb3e86dbc
-evaluator_signed: 207e198c05298173a6d81b31691b35570fadbd24
+status: amended
+generator_signed: null
+evaluator_signed: null
 rounds: 2
 created: 261107-2251
 ---
@@ -381,3 +381,20 @@ repository. The LEAN-for-MINIMAL log line reproduces at BASE (`check-contract-si
 logs the `LEAN` literal), so recording it as parity carry-over is right. No item changes what a gate decides. Carried to
 the Gate 2 verdict as follow-ups, not blockers: the 429-line safety test's split, and the `selfPath` normalizer as a
 standing audit item whenever a fixture is added.
+
+### Amendment 3 — 261108-0700
+
+Trigger: the Gate 2 review asked whether the enabled skill guards actually enforce. The Claude Code hooks reference
+states that a PreToolUse decision is read from a `hookSpecificOutput` object (`permissionDecision`,
+`permissionDecisionReason`) and that top-level decision fields are deprecated for this event. At BASE the guards printed
+a top-level `permissionDecision` with a `message` field, which the host does not read, so even once registered they
+would report no decision. Enabling them (Amendment 1, D5) requires the documented envelope.
+
+- **Guard envelope (AC-03, AC-08).** `careful`, `freeze` and `investigate` emit
+  `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask|deny","permissionDecisionReason":"..."}}`.
+  Each guard's decision (`ask`/`deny`/allow), its reason text and its exit code are unchanged from BASE (`investigate`
+  keeps exit 2 and also writes the reason to stderr). The fixtures in groups `guard-careful`, `guard-freeze` and
+  `guard-investigate` are compared by exit code, decision and reason rather than by literal stdout; every other fixture
+  keeps its existing comparison.
+- **Provider bundles.** The codex and cursor bundles ship self-contained node guards in place of their shell guards, each
+  emitting its own host's decision shape (codex `hookSpecificOutput`, cursor `permission`/`user_message`).
