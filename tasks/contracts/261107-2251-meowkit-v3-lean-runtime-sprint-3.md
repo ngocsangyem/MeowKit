@@ -398,3 +398,30 @@ would report no decision. Enabling them (Amendment 1, D5) requires the documente
   keeps its existing comparison.
 - **Provider bundles.** The codex and cursor bundles ship self-contained node guards in place of their shell guards, each
   emitting its own host's decision shape (codex `hookSpecificOutput`, cursor `permission`/`user_message`).
+
+Evaluator: accepted — append-only (frontmatter plus this block; Amendments 1 and 2 and every AC byte-identical), and the
+W2 defect is real and worse than "unverified", as the evidence says. At BASE all three guards printed a **top-level**
+`permissionDecision` with a `message` field: `check-careful.sh:280,282` (`block` in production, else `ask`),
+`check-freeze.sh:64` (`deny`), `check-report-path.sh:15,22,41` (`deny`); `message` is not a recognised field for any
+event, so combined with the `${CLAUDE_SKILL_DIR}` registration defect from Amendment 1 the guards were broken twice
+over. The ports emit the documented envelope — `careful/bin/check-careful.cjs:35`, `freeze/bin/check-freeze.cjs:52-55`,
+`investigate/bin/check-report-path.cjs:24` — and exits are preserved exactly (`careful` 0, `freeze` 0,
+`investigate` 2 at `:27`, which also writes the reason to stderr at `:26`). Keeping `careful` on `ask` rather than
+collapsing it to exit 2 is the right call and the one that protects Scope (Out): exit 2 cannot express a confirmable
+prompt, so the fallback would have turned "warn and let the user decide" into a block — a decision change. The
+comparison is correctly scoped: `golden-replay.test.ts:81` lists exactly `guard-careful`, `guard-freeze`,
+`guard-investigate`, and `assertParity:126-133` relaxes only inside that branch while every other fixture still
+compares stdout and stderr whole. `guardDecision()` (`:89-104`) reads a decision out of either envelope with **no value
+mapping** — `permissionDecision` is compared literally, so a `block`→`deny` rewrite would fail rather than pass, which
+is what makes "the decision is unchanged" an assertion instead of a claim; exit, marker and side effects stay asserted,
+and `-t 'guard'` replays 8 passed. Bundles verified: six `.cjs` guards, no `check-*.sh` left under any bundle `bin/`,
+cursor emitting `{permission, user_message}` (`mk-freeze/bin/check-freeze.cjs:30,85`) and codex `hookSpecificOutput`
+(`:85-87`). Two things recorded for the Gate 2 verdict rather than treated as blockers. (1) The enumeration "compared by
+exit code, decision and reason" is exhaustive, so **stderr is no longer compared for these three groups** — necessarily,
+since `investigate`'s new stderr write is a deliberate addition against an empty BASE recording. That is safe here only
+because all eight guard fixtures recorded empty stderr, and it is narrower than it sounds, but AC-03's "stderr matches
+exactly … and no other normalization is applied" now has three groups outside it: guard stderr is unasserted, and a
+later guard change could print anything there unnoticed. (2) `migrate/modules/cursor/.../mk-freeze/bin/check-freeze.cjs`
+carries a garbled duplicated comment at `:12-14` (`// a failure.// This host reads a decision as …`, repeated at `:23`)
+— cosmetic, in a file this amendment adds, outside the amendment's own claims. Also noted: no fixture covers `careful`'s
+production `block` path, so that branch is untested in either implementation.
