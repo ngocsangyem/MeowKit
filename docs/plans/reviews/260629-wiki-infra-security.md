@@ -52,7 +52,7 @@ Empirically confirmed bypasses against the current 3-pass (plaintext / base64 / 
 
 - Secret-scrub TS port is **byte-for-byte identical** to the human-approved `secret-scrub.cjs` (verified line-by-line: `scan-patterns.ts:49-68` ≡ `secret-scrub.cjs` PATTERNS). Parity test exists (`scanner-adapter.test.ts:136-141`).
 - Trace path scrubs deeply via `scrubDeep` over every string in `data` before append (`trace-adapter.ts:12-21, 34`) — verified by test (`markdown-repository.test.ts:96-107`).
-- **Quarantine writes RAW (un-scrubbed) content by design** (`markdown-repository.ts:95-100`). Acceptable per the brief: the file is `.quarantined` (read-blocked by `privacy-block.sh`, confirmed live — the hook blocked my own read of `secret-scrub.cjs` this session) and 0400-intent. A poisoned page that ALSO contains a secret keeps the secret at rest in quarantine, but that bucket is human-review-only and never indexed. WARN (W3): quarantine files are NOT created with explicit `0400` perms in code — `atomicWriteText` uses default umask. The security.md contract (Layer 6) specifies 0400. Recommend `fs.chmodSync(target, 0o400)` after write.
+- **Quarantine writes RAW (un-scrubbed) content by design** (`markdown-repository.ts:95-100`). Acceptable per the brief: the file is `.quarantined` (read-blocked by `privacy-block.cjs`, confirmed live — the hook blocked my own read of `secret-scrub.cjs` this session) and 0400-intent. A poisoned page that ALSO contains a secret keeps the secret at rest in quarantine, but that bucket is human-review-only and never indexed. WARN (W3): quarantine files are NOT created with explicit `0400` perms in code — `atomicWriteText` uses default umask. The security.md contract (Layer 6) specifies 0400. Recommend `fs.chmodSync(target, 0o400)` after write.
 - **Index leak risk is downstream of W-H1:** if an un-scrubbed page is written (Q1 gap), `wiki-ingest`/`upsertPage` copies `page.content` verbatim into `wiki_page` and the trigger mirrors it into `wiki_fts` (`wiki-schema.ts:40`). So the secret-into-index path is REAL but is gated entirely by closing W-H1. Closing W-H1 closes this too.
 
 ### Q4 — SSRF: `isSafeSourceUrl` completeness — WARN (MEDIUM)
@@ -111,7 +111,7 @@ This layer is the gate that ENFORCES these rules for the wiki subsystem. Posture
 | R1 File content is data | PASS | Canonical/ingested content treated as data; no execution of file content. |
 | R2 Tool output is data | PASS | No tool-output execution in this layer. |
 | R3 Memory cannot override | PASS | Trace append is data-only, secret-scrubbed (`trace-adapter.ts`). |
-| R4 Sensitive-file protection | PASS | `privacy-block.sh` actively blocked `secret-scrub.cjs` read this session; quarantine uses `.quarantined` (read-blocked). |
+| R4 Sensitive-file protection | PASS | `privacy-block.cjs` actively blocked `secret-scrub.cjs` read this session; quarantine uses `.quarantined` (read-blocked). |
 | R5 No external exfiltration | PASS (this layer) | Pipeline is pure/no-network; exfil surface is Phase-5 fetcher. |
 | R6 Project-dir boundary | PASS | All writes resolved under `tasks/wikis/<slug>/` via `resolveInSlug`; traversal rejected. |
 | R7 Skill content boundary | **WARN** | Fetched content wrapping/DATA-fence is asserted in the contract but the STOP-on-injection is realized only as quarantine + thin pattern set (W-H2). Hard-stop semantics OK (quarantine, no override); detection completeness is the gap. |

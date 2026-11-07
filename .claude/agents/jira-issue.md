@@ -26,7 +26,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 
 ## Pre-flight
 
-The parent SessionStart hook (`jira-env-loader.sh`) already validated `.meowkit/.env` presence + the 3 `MEOW_JIRA_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
+The parent SessionStart hook (`jira-env-loader.cjs`) already validated `.meowkit/.env` presence + the 3 `MEOW_JIRA_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
 
 All `jira-as` invocations MUST go through:
 

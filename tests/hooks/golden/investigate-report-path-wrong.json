@@ -1,0 +1,23 @@
+{
+  "name": "investigate-report-path-wrong",
+  "group": "guard-investigate",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/skills/investigate/bin/check-report-path.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"src/findings.md\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "investigate-report-path-wrong",
+  "setupDescription": "a Write outside tasks/reports/",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": null,
+    "stdout": "{\"permissionDecision\":\"deny\",\"message\":\"[investigate] Only diagnostic reports under tasks/reports/** may be written.\"}\n",
+    "stderr": ""
+  }
+}

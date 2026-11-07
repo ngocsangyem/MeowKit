@@ -183,8 +183,8 @@ After pipeline completes, output this summary:
 
 ## Hooks
 
-- **pre-ship.sh**: Runs lint + test + typecheck before any commit (always-on via settings.json)
-- **post-write.sh**: Security scan on every file write (always-on)
+- **pre-ship.cjs**: Runs lint + test + typecheck before any commit (always-on via settings.json)
+- **post-write.cjs**: Security scan on every file write (always-on)
 - These are NOT session-scoped — they run on every ship regardless of skill activation
 
 ## Related Rules

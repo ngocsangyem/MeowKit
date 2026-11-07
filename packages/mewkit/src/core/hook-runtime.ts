@@ -4,7 +4,7 @@
 // resolved at install time); the hook reads + re-validates it and falls back to the checkpoint
 // cache when it is missing or fails validation. The WRITE side lives here and is tested; the
 // SessionStart hook mirrors the READ validation in .cjs (it ships without the TS build), exactly
-// as append-trace.sh mirrors the file-lock protocol.
+// as append-trace.cjs mirrors the file-lock protocol.
 import { existsSync, statSync, readFileSync, realpathSync } from "node:fs";
 import { rename, writeFile, unlink, mkdir } from "node:fs/promises";
 import path from "node:path";

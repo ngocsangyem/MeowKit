@@ -51,7 +51,7 @@ Skip: Daily mode (`--daily`) — scope is automatic.
 
 ## Hooks
 
-- **post-write.sh**: Security scan runs on every file write (always-on via settings.json)
+- **post-write.cjs**: Security scan runs on every file write (always-on via settings.json)
 - CSO mode additionally performs manual checks: dependency audit, CI config review, secrets archaeology
 - These manual checks are NOT hooks — they are workflow steps in the audit process
 

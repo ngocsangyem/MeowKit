@@ -19,8 +19,8 @@ This is the failure mode the middleware layer was built to interrupt. Without ex
 |------|-------|---------|
 | `post-write-build-verify.sh` | PostToolUse (Edit\|Write) | Compile/lint on source writes; hash-cached to skip unchanged files. Never blocks — feedback only. |
 | `post-write-loop-detection.sh` | PostToolUse (Edit\|Write) | Warns at 4 edits to same file, escalates at 8. Cleared per session. |
-| `pre-completion-check.sh` | Stop | Blocks session end without verification evidence. 3-attempt guard. LEAN: soft nudge only. MINIMAL: skipped. |
-| `project-context-loader.sh` | SessionStart | Injects directory tree, tool availability, package scripts. Resets per-session state. |
+| `pre-completion-check.cjs` | Stop | Blocks session end without verification evidence. 3-attempt guard. LEAN: soft nudge only. MINIMAL: skipped. |
+| `project-context-loader.cjs` | SessionStart | Injects directory tree, tool availability, package scripts. Resets per-session state. |
 
 ## Key properties
 

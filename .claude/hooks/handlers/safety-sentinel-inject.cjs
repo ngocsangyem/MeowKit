@@ -14,7 +14,7 @@
 // Reader finds, for the current session, the latest verification line and the
 // latest re-arm line, then emits a flag's cached marker ONLY when that
 // verification is more recent than the last re-arm. The file is truncated by
-// project-context-loader.sh on new-session detection (HOOK_SESSION_ID change),
+// project-context-loader.cjs on new-session detection (HOOK_SESSION_ID change),
 // so it never accumulates state from prior sessions.
 //
 // Why the recency compare: compaction drops the safety-baseline rule TEXT from
@@ -28,9 +28,9 @@
 //
 // Architectural notes:
 //  - The skill is `allowed-tools: [Read]`. Filesystem ops live in hook
-//    context (here / post-session.sh), not in the skill.
+//    context (here / post-session.cjs), not in the skill.
 //  - HOOK_SESSION_ID arrives via ctx.session_id (parsed by dispatch.cjs).
-//  - Sentinel WRITE happens in post-session.sh (Stop event), not here.
+//  - Sentinel WRITE happens in post-session.cjs (Stop event), not here.
 //  - This hook only READS the JSONL and emits markers. No state mutation.
 //
 // Bypass: MEOWKIT_SKIP_SAFETY_SENTINEL=off disables marker injection.

@@ -1,0 +1,26 @@
+{
+  "name": "precompletion-security-verdict-block",
+  "group": "pre-completion-check",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-completion-check.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"Stop\"}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "precompletion-security-verdict-block",
+  "setupDescription": "verification-required + active-plan pointer + a FAIL security verdict for the slug",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "{\"decision\":\"block\",\"reason\":\"Security verdict 'tasks/reviews/261101-corpus-demo-security-verdict.md' blocks active plan 'tasks/plans/261101-corpus-demo'. Resolve the finding and obtain a new PASS security verdict before stopping.\"}\n",
+    "stderr": ""
+  },
+  "sideEffects": {
+    "session-state/precompletion-attempts.json": null
+  }
+}

@@ -27,7 +27,7 @@ the entire session — the user does not need to re-specify the path on each inv
 
 ## Hook Enforcement
 
-The `check-freeze.sh` script runs as a pre-write guard on both edit and write operations,
+The `check-freeze.cjs` script runs as a pre-write guard on both edit and write operations,
 invoked by this project's configured hooks when present.
 
 On each invocation:

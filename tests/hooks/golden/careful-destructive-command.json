@@ -1,0 +1,27 @@
+{
+  "name": "careful-destructive-command",
+  "group": "guard-careful",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/skills/careful/bin/check-careful.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"rm -rf /var/data/customers\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "careful-destructive-command",
+  "setupDescription": "BASE guard tree only",
+  "normalizers": [
+    "tmpdir",
+    "isoTimestamp"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "{\"permissionDecision\":\"ask\",\"message\":\"[careful] Destructive: recursive delete (rm -r). This permanently removes files.\"}\n",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/security-log.md": "# Security Override Log\n\n| Timestamp | Pattern | Severity | Action | Command |\n|-----------|---------|----------|--------|---------|\n| {{TS}} | rm_recursive | CRITICAL | override-request | rm -rf /var/data/customers |\n"
+  }
+}

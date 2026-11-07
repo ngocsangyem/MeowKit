@@ -42,7 +42,7 @@ The DoD prompts are gated by `verdict.jira_tickets:` non-empty — but `mk:ship`
 
 ### Sprint-state contract introduces a NEW file class in `tasks/contracts/`
 
-Path discipline: leading `sprint-state-` prefix prevents glob collision with the existing `check-contract-signed.sh` glob (`tasks/contracts/*-{slug}-sprint-*.md`). Verified safe — sprint-state files have no slug between leading `*` and `-sprint-`.
+Path discipline: leading `sprint-state-` prefix prevents glob collision with the existing `check-contract-signed.cjs` glob (`tasks/contracts/*-{slug}-sprint-*.md`). Verified safe — sprint-state files have no slug between leading `*` and `-sprint-`.
 
 ### Concurrent-write safety requires `flock`
 

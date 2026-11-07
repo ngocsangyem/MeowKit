@@ -139,9 +139,6 @@ jobs:
       - name: Validate hook registration
         run: bash scripts/check-hook-registration.sh
 
-      - name: Validate hook shell consistency
-        run: bash scripts/check-hook-shell-consistency.sh
-
       - name: Validate workflow spec drift
         run: node packages/mewkit/dist/index.js validate --workflow
 
@@ -331,3 +328,36 @@ jobs:
 
       - name: Codex bundle parity + version-support unit tests
         run: npx vitest run packages/mewkit/src/migrate/modules/codex/__tests__/packaged-bundle-parity.test.ts packages/mewkit/src/migrate/hooks/__tests__/codex-version-support.test.ts
+
+  # The hook runtime is node-only, which is only worth anything if it runs where
+  # there is no POSIX shell. This job proves that on the one host that can: the
+  # hook suites, the node-native hook tests, and doctor with its hard-gate probes
+  # actually executing rather than skipping. Every step is node, no bash.
+  hooks-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Hook suites (golden replay, crash paths, dispatcher, isolation, env allowlist)
+        run: npx vitest run tests/hooks
+
+      - name: Node-native hook tests
+        run: node --test .claude/hooks/__tests__/*.test.cjs
+
+      # The hard-gate probes used to be skipped on this platform because the hooks
+      # were POSIX shell. They are node now, so a skip here would mean the only
+      # thing this port exists for is never verified.
+      - name: Doctor hard gates
+        run: node packages/mewkit/dist/index.js doctor --hard-gates

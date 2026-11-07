@@ -60,8 +60,8 @@ const MANIFEST = {
 const SAFETY = [
 	"settings.json",
 	"statusline.cjs",
-	"hooks/gate-enforcement.sh",
-	"hooks/lib/read-hook-input.sh",
+	"hooks/gate-enforcement.cjs",
+	"hooks/lib/parse-stdin.cjs",
 	"hooks/dispatch.cjs",
 	"rules/security-rules.md",
 	"rules/injection-rules.md",
@@ -88,8 +88,8 @@ async function makeSource(): Promise<string> {
 	await w("rules/security-rules.md", "# security\n");
 	await w("rules/injection-rules.md", "# injection\n");
 	await w("rules/gate-rules.md", "# gate\n");
-	await w("hooks/gate-enforcement.sh", "#!/bin/sh\n");
-	await w("hooks/lib/read-hook-input.sh", "#!/bin/sh\n");
+	await w("hooks/gate-enforcement.cjs", "#!/bin/sh\n");
+	await w("hooks/lib/parse-stdin.cjs", "#!/bin/sh\n");
 	await w("hooks/dispatch.cjs", "// dispatch\n");
 	// essential commands
 	await w("commands/mk/plan.md", "# plan\n");
@@ -118,7 +118,7 @@ async function makeSource(): Promise<string> {
 			"rules/gate-rules.md": { owner: "lifecycle", criticality: "critical", status: "active", runtime: "claude-code" },
 			"commands/mk/plan.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
 			"commands/mk/validate.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
-			"hooks/gate-enforcement.sh": {
+			"hooks/gate-enforcement.cjs": {
 				owner: "security",
 				criticality: "critical",
 				status: "active",

@@ -12,7 +12,7 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 **Agent:** orchestrator, analyst
 **Deliverable:** Model tier assignment, execution mode, context loaded, scout summary presented
 
-- Read `docs/project-context.md` (agent constitution — auto-injected by `project-context-loader.sh`)
+- Read `docs/project-context.md` (agent constitution — auto-injected by `project-context-loader.cjs`)
 - Read relevant topic files on-demand (consumer skills handle this at task start)
 - Run `mk:scale-routing` for domain-based complexity classification
 - Load stack-relevant skills only (lazy loading)
@@ -33,14 +33,14 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 - For COMPLEX tasks (5+ files): bead decomposition — atomic, independently committable work units
 - **Exact-requirements contract (v2.9.10+):** in `mk:cook`, plan-creator MUST answer 5 dimensions in concrete sentences before returning a plan — expected output, acceptance criteria, scope boundary, non-negotiable constraints, touchpoints (files from scout). Clarifying-question options MUST cite scout findings (file paths); abstract options are a failure mode. Skipped on plan-path input.
 
-**Gate 1:** Human approval required. `gate-enforcement.sh` blocks all file writes until plan is approved. In non-auto modes `validate-gate-1.sh` runs as an advisory preflight (surfaces structural-check failures to the user; user retains override). In `--auto` mode it remains blocking.
+**Gate 1:** Human approval required. `gate-enforcement.cjs` blocks all file writes until plan is approved. In non-auto modes `validate-gate-1.sh` runs as an advisory preflight (surfaces structural-check failures to the user; user retains override). In `--auto` mode it remains blocking.
 
 ## Phase 2 — Test
 
 **Agent:** tester
 **Deliverable:** Tests (failing in TDD mode; optional otherwise)
 
-- **TDD mode** (`--tdd` / `MEOWKIT_TDD=1`): failing tests first. `pre-implement.sh` blocks if no failing test exists. `--tdd` is a flag, not a planning mode; it composes with the selected plan-creator mode.
+- **TDD mode** (`--tdd` / `MEOWKIT_TDD=1`): failing tests first. `pre-implement.cjs` blocks if no failing test exists. `--tdd` is a flag, not a planning mode; it composes with the selected plan-creator mode.
 - **Default mode:** Phase 2 is optional. Tester invoked on-request.
 - `mk:nyquist` verifies test-to-requirement coverage at end of phase.
 - Security pre-check always runs.
@@ -51,7 +51,7 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 **Deliverable:** Passing implementation
 
 - Implement until tests pass
-- `post-write.sh` hook: security scan on every file write
+- `post-write.cjs` hook: security scan on every file write
 - Self-heal: auto-fix up to 3 attempts, each using a different approach
 - For COMPLEX tasks: bead processing — commit after each bead, resume from last uncommitted bead
 - For harness runs in FULL density: signed sprint contract required before source writes
@@ -67,9 +67,9 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 
 **Gate 2:** Human approval required in all modes — see `.claude/rules/gate-rules.md`. FAIL blocks Phase 5.
 
-**Regression-recovery pattern (v2.9.10+):** when the reviewer surfaces a regression in EXISTING behavior (verdict appends `Side Effects Detected: Yes` plus bullet effects), cook STOPs the iteration loop and presents 2–4 typed options to the user — revert + re-plan / keep + update dependents / compatibility shim / accept the regression. User selection is recorded as a `## User Decision Addendum` block on the verdict file. `validate-gate-2.sh` blocks Gate 2 until the addendum is present (positive-presence-only — absence of the field is never a block).
+**Regression-recovery pattern (v2.9.10+):** when the reviewer surfaces a regression in EXISTING behavior (verdict appends `Side Effects Detected: Yes` plus bullet effects), cook STOPs the iteration loop and presents 2–4 typed options to the user — revert + re-plan / keep + update dependents / compatibility shim / accept the regression. User selection is recorded as a `## User Decision Addendum` block on the verdict file. `validate-gate-2.cjs` blocks Gate 2 until the addendum is present (positive-presence-only — absence of the field is never a block).
 
-**Workflow evidence index (v2.9.13+):** `mk:cook` and `mk:fix` populate one `workflow-evidence.json` per run — a traceable index of task, risk flags, diagnosis/contract, verification, verdict path, and approvals. It mirrors `validate-gate-1.sh` / `validate-gate-2.sh` (the gate scripts stay authoritative) and **never approves anything**; the validator `validate-workflow-evidence.cjs` checks completeness before Gate 2 is presented, and the contract loads on demand from `.claude/rules-conditional/workflow-evidence-rules.md`. `mk:fix --auto` no longer self-approves from a review score — it stops at *ready for user approval*.
+**Workflow evidence index (v2.9.13+):** `mk:cook` and `mk:fix` populate one `workflow-evidence.json` per run — a traceable index of task, risk flags, diagnosis/contract, verification, verdict path, and approvals. It mirrors `validate-gate-1.sh` / `validate-gate-2.cjs` (the gate scripts stay authoritative) and **never approves anything**; the validator `validate-workflow-evidence.cjs` checks completeness before Gate 2 is presented, and the contract loads on demand from `.claude/rules-conditional/workflow-evidence-rules.md`. `mk:fix --auto` no longer self-approves from a review score — it stops at *ready for user approval*.
 
 **Optional flags** (cook only):
 - `--verify` `[LIGHT]`: light browser/artifact check, **advisory** (no back-edge to Phase 3 — FAIL is reported but does not block ship)
@@ -82,7 +82,7 @@ Concrete cost of `[LIGHT]` vs `[HEAVY]` depends on the inner harness, model tier
 **Agent:** shipper
 **Deliverable:** PR URL + rollback documentation
 
-- `pre-ship.sh`: full test + lint + typecheck
+- `pre-ship.cjs`: full test + lint + typecheck
 - Pre-flight reads the workflow evidence index when present (after `mk:verify`, which keeps abort authority) — augments proof, never overrides a verify FAIL (v2.9.13+)
 - Conventional commit (auto-generated)
 - PR — never push to main directly

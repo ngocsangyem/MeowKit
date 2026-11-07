@@ -231,14 +231,14 @@ Hook chain verified against `settings.json` (2026-04-18). All 7 events listed.
 
 | Event                     | Hooks (in order)                                                                                                              | Source line             |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `SessionStart`            | project-context-loader.sh → dispatch.cjs (model-detector.cjs, orientation-ritual.cjs)                                         | `settings.json:18-33`   |
-| `PreToolUse Edit\|Write`  | gate-enforcement.sh → privacy-block.sh                                                                                        | `settings.json:36-52`   |
-| `PreToolUse Read`         | privacy-block.sh                                                                                                              | `settings.json:53-63`   |
-| `PreToolUse Bash`         | pre-task-check.sh → pre-ship.sh → privacy-block.sh                                                                            | `settings.json:64-85`   |
-| `PostToolUse Edit\|Write` | post-write.sh → learning-observer.sh → dispatch.cjs (build-verify, loop-detection, budget-tracker, auto-checkpoint)           | `settings.json:87-108`  |
+| `SessionStart`            | project-context-loader.cjs → dispatch.cjs (model-detector.cjs, orientation-ritual.cjs)                                         | `settings.json:18-33`   |
+| `PreToolUse Edit\|Write`  | gate-enforcement.cjs → privacy-block.cjs                                                                                        | `settings.json:36-52`   |
+| `PreToolUse Read`         | privacy-block.cjs                                                                                                              | `settings.json:53-63`   |
+| `PreToolUse Bash`         | pre-task-check.cjs → pre-ship.cjs → privacy-block.cjs                                                                            | `settings.json:64-85`   |
+| `PostToolUse Edit\|Write` | post-write.cjs → learning-observer.cjs → dispatch.cjs (build-verify, loop-detection, budget-tracker, auto-checkpoint)           | `settings.json:87-108`  |
 | `PostToolUse Bash`        | cost-meter.sh → dispatch.cjs (budget-tracker)                                                                                 | `settings.json:109-123` |
-| `UserPromptSubmit`        | tdd-flag-detector.sh → dispatch.cjs (safety-sentinel-inject)                                                                  | `settings.json:152-173` |
-| `Stop`                    | pre-completion-check.sh → post-session.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer)                                 | `settings.json:125-151` |
+| `UserPromptSubmit`        | tdd-flag-detector.cjs → dispatch.cjs (safety-sentinel-inject)                                                                  | `settings.json:152-173` |
+| `Stop`                    | pre-completion-check.cjs → post-session.cjs → dispatch.cjs (auto-checkpoint, checkpoint-writer)                                 | `settings.json:125-151` |
 
 **Phase routing** (source: `.claude/skills/cook/references/phase-contracts.md`):
 `Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test → Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect`
@@ -250,15 +250,15 @@ infinite-loop inside subagents (`HOOKS_INDEX.md:39` footer).
 
 ## 5. Gate Enforcement
 
-Source: `.claude/rules/gate-rules.md`, `settings.json:41` (gate-enforcement.sh
+Source: `.claude/rules/gate-rules.md`, `settings.json:41` (gate-enforcement.cjs
 registration), `RULES_INDEX.md` Enforcement Mechanism Matrix.
 
 | Gate                | Trigger                              | Mechanism                                                                         | Bypass                                                                        |
 | ------------------- | ------------------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Gate 1              | After Phase 1, before any code write | **Hook-preventive**: `gate-enforcement.sh` on PreToolUse Edit\|Write; timeout 10s | `/mk:fix` simple; scale-routing one-shot (`scale-adaptive-rules.md` Rule 4) |
+| Gate 1              | After Phase 1, before any code write | **Hook-preventive**: `gate-enforcement.cjs` on PreToolUse Edit\|Write; timeout 10s | `/mk:fix` simple; scale-routing one-shot (`scale-adaptive-rules.md` Rule 4) |
 | Gate 2              | After Phase 4, before Phase 5        | **Behavioral**: reviewer verdict at `tasks/reviews/` required                     | None — zero exceptions (`gate-rules.md` Gate 2 section)                       |
 | Active Verification | Phase 4 evaluator PASS               | **Script**: `validate-verdict.sh` rejects PASS with empty `evidence/` dir         | None — hard gate (`harness-rules.md` Rule 8)                                  |
-| Sprint Contract     | FULL density harness Phase 3         | **Hook**: `gate-enforcement.sh` contract gate                                     | `MEOWKIT_AUTOBUILD_MODE=LEAN` or `MINIMAL`                                      |
+| Sprint Contract     | FULL density harness Phase 3         | **Hook**: `gate-enforcement.cjs` contract gate                                     | `MEOWKIT_AUTOBUILD_MODE=LEAN` or `MINIMAL`                                      |
 
 **Known issue — gate-owning agents don't reference gate-rules.md:**
 planner (`planner.md` Required Context, CF-M3), reviewer (`reviewer.md:132`, CF-M5),
@@ -318,13 +318,13 @@ Source: `.claude/rules/meowkit-core.md` Memory section; `HOOKS_INDEX.md` State F
 | ----------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------- |
 | `memory/gotchas.md`                                         | Grep on demand (mk:fix, mk:investigate, mk:review, mk:plan-creator, planner agent, mk:cso, `/mk:retro`) | mk:fix, mk:review, mk:retro, architect agent, mk:memory (via `mewkit note`) |
 | `memory/decisions.md`                                       | Grep on demand (same read set)                               | architect agent, mk:memory, mk:party, mk:plan-creator archive (via `mewkit note`) |
-| `telemetry/cost-log.json`                                   | Phase 0/6                                                    | post-session.sh (atomic temp-rename)           |
+| `telemetry/cost-log.json`                                   | Phase 0/6                                                    | post-session.cjs (atomic temp-rename)           |
 | `telemetry/security-log`                                    | On-demand (security agent)                                   | injection-audit.py, quarantine writers         |
-| `telemetry/trace-log.jsonl`                                 | On-demand                                                    | append-trace.sh                                |
+| `telemetry/trace-log.jsonl`                                 | On-demand                                                    | append-trace.cjs                                |
 
 **Per-turn context budget** (~0KB auto-inject, source: `HOOKS_INDEX.md` handler rows):
 No per-turn memory injection — the auto-inject handlers are deleted. SessionStart also loads
-`docs/project-context.md` via project-context-loader.sh — **CF-C5 OPEN**: file
+`docs/project-context.md` via project-context-loader.cjs — **CF-C5 OPEN**: file
 does not exist; loads nothing.
 
 ---
@@ -391,7 +391,7 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | CF-C2 | `mk:shipping/SKILL.md:1-4`                   | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
 | CF-C3 | `mk:documentation/SKILL.md:1-4`              | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
 | CF-C4 | `mk:multimodal/SKILL.md:45`                  | `.claude/skills/.venv/bin/python3` ABSENT — all Python scripts fail; blocks mk:llms, mk:web-to-markdown, mk:plan-creator | OPEN (re-verified 2026-04-29; loader warns; covered by `mewkit setup venv`) |
-| CF-C5 | `plan-creator/step-02-codebase-analysis.md:21` | `docs/project-context.md` missing; project-context-loader.sh nudges agent but no setup-time auto-prompt                        | PARTIAL → CLOSED 2026-04-29 (mewkit setup `project-context` step added; warns user to invoke `/mk:project-context` on first session) |
+| CF-C5 | `plan-creator/step-02-codebase-analysis.md:21` | `docs/project-context.md` missing; project-context-loader.cjs nudges agent but no setup-time auto-prompt                        | PARTIAL → CLOSED 2026-04-29 (mewkit setup `project-context` step added; warns user to invoke `/mk:project-context` on first session) |
 | CF-C6 | `mk:cook/SKILL.md:159`                       | Audit cited bare `memory/lessons.md` path. Re-verification 2026-04-29: line 159 is `## Gotchas`, line 170 has correct `.claude/memory/fixes.md` prefix | CLOSED 2026-04-29 (re-verified — already correct in current tree) |
 
 ### High-Impact High Findings (re-verified 2026-04-29)

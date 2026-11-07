@@ -1,0 +1,23 @@
+{
+  "name": "preship-commit-fail-verdict",
+  "group": "gate2-preship",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-ship.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git commit -m \\\"feat: add thing\\\"\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "preship-commit-fail-verdict",
+  "setupDescription": "verdict naming HEAD but carrying a FAIL dimension",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@GATE_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nGate 2 structural check FAILED — ship blocked.\n\nVerdict tasks/reviews/261101-corpus-demo-verdict.md does not satisfy Gate 2's structural conditions:\n  GATE_2_BLOCKED: has-FAIL-dimensions(1) — review verdict, score: 9/10\nHuman approval required to override.\nFix: resolve the FAIL/critical/security items, re-review, then re-present Gate 2.\n\nGate 2 is human-approved and has no exceptions (.claude/rules/gate-rules.md).\nThis check proves only that the paperwork exists and is self-consistent;\nit does not and cannot prove a human approved anything.\n"
+  }
+}

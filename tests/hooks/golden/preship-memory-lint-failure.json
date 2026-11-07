@@ -1,0 +1,24 @@
+{
+  "name": "preship-memory-lint-failure",
+  "group": "gate2-preship",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-ship.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git commit -m \\\"docs: update\\\"\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}",
+    "MEOWKIT_CLI": "{{TMP}}/bin/fake-mewkit"
+  },
+  "setup": "preship-memory-lint-failure",
+  "setupDescription": "docs-only staged (Gate 2 N/A) + MEOWKIT_CLI resolving to a failing stub (pre-ship.sh:99 path)",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@GATE_BLOCK@@",
+    "stdout": "Gate 2: N/A — no-ship change (documentation, reports, and markdown only). Not skipped, not applicable.\n",
+    "stderr": "@@GATE_BLOCK@@\nPRE-SHIP BLOCKED: team memory store lint failed.\nFAIL: .meowkit/memory/gotchas.md:3 entry carries an instruction-like phrase\nA store entry carrying an injection phrase, a secret-shaped token,\nor an unscannable file is read back as DATA by every read-set skill\nand ships in this commit. Fix or remove the entry, then retry.\n"
+  }
+}

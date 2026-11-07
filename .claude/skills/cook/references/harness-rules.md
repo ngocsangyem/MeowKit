@@ -26,7 +26,7 @@ Flow: generator → handoff → evaluator fresh context → graded verdict with 
 Per the adaptive density policy (`.claude/skills/autobuild/references/adaptive-density-matrix.md`):
 
 - `MINIMAL` (Haiku) — contract skipped (harness short-circuits to `mk:cook`)
-- `FULL` (Sonnet, Opus 4.5) — contract REQUIRED before any source-code edit; enforced by `gate-enforcement.sh`
+- `FULL` (Sonnet, Opus 4.5) — contract REQUIRED before any source-code edit; enforced by `gate-enforcement.cjs`
 - `LEAN` (Opus 4.6+) — contract OPTIONAL; skip if estimated ACs < 5
 
 **WHY:** Contracts prevent silent substitution on intermediate tiers but add dead weight on trivial/capable tiers.
@@ -61,7 +61,7 @@ Every harness component encodes an assumption about what the model CANNOT do. Wh
 
 **WHY:** Model upgrades can turn useful scaffolding into dead weight.
 
-**Detection:** `post-session.sh` attempts to flag this via `MEOWKIT_MODEL_HINT` env var, but on Claude Code, `CLAUDE_MODEL` is NOT exported to hooks (verified 260408). Auto-detection only works if the user sets `export MEOWKIT_MODEL_HINT=opus-4-7` at session start. Otherwise the audit must be triggered manually on a calendar reminder OR by reading session metadata from `~/.claude/projects/`.
+**Detection:** `post-session.cjs` attempts to flag this via `MEOWKIT_MODEL_HINT` env var, but on Claude Code, `CLAUDE_MODEL` is NOT exported to hooks (verified 260408). Auto-detection only works if the user sets `export MEOWKIT_MODEL_HINT=opus-4-7` at session start. Otherwise the audit must be triggered manually on a calendar reminder OR by reading session metadata from `~/.claude/projects/`.
 
 Use the audit playbook with measured baselines after model upgrades.
 

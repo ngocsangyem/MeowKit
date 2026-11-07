@@ -19,7 +19,7 @@ fail() { FAIL=$((FAIL + 1)); echo "  FAIL: $1 — $2"; }
 make_tmp() {
   TMPDIR=$(mktemp -d)
   mkdir -p "$TMPDIR/.claude/hooks/lib"
-  cp "$MEOWKIT_ROOT/.claude/hooks/lib/load-dotenv.sh" "$TMPDIR/.claude/hooks/lib/"
+  cp "$MEOWKIT_ROOT/.claude/hooks/lib/load-dotenv.cjs" "$TMPDIR/.claude/hooks/lib/"
   echo "$TMPDIR"
 }
 
@@ -31,7 +31,7 @@ echo ""
 echo "Test 1: Inline comment stripped (unquoted)"
 TMPDIR=$(make_tmp)
 echo 'MEOWKIT_BUILD_VERIFY=off # disable in CI' > "$TMPDIR/.meowkit/.env"
-RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.sh" && echo "${MEOWKIT_BUILD_VERIFY}"')
+RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.cjs" && echo "${MEOWKIT_BUILD_VERIFY}"')
 [ "$RESULT" = "off" ] && pass "inline comment stripped" || fail "inline comment stripped" "got [$RESULT], expected [off]"
 rm -rf "$TMPDIR"
 
@@ -39,7 +39,7 @@ rm -rf "$TMPDIR"
 echo "Test 2: Quoted # preserved (API key with hash)"
 TMPDIR=$(make_tmp)
 echo 'MEOWKIT_API_KEY="abc#123"' > "$TMPDIR/.meowkit/.env"
-RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.sh" && echo "${MEOWKIT_API_KEY}"')
+RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.cjs" && echo "${MEOWKIT_API_KEY}"')
 [ "$RESULT" = "abc#123" ] && pass "quoted # preserved" || fail "quoted # preserved" "got [$RESULT]"
 rm -rf "$TMPDIR"
 
@@ -47,7 +47,7 @@ rm -rf "$TMPDIR"
 echo "Test 3: Indented key whitespace trimmed"
 TMPDIR=$(make_tmp)
 printf '  MEOWKIT_TDD=1\n' > "$TMPDIR/.meowkit/.env"
-RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.sh" && echo "${MEOWKIT_TDD}"')
+RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.cjs" && echo "${MEOWKIT_TDD}"')
 [ "$RESULT" = "1" ] && pass "indented key trimmed" || fail "indented key trimmed" "got [$RESULT]"
 rm -rf "$TMPDIR"
 
@@ -56,7 +56,7 @@ echo "Test 4: PATH not hijacked by .env"
 TMPDIR=$(make_tmp)
 echo 'PATH=/evil/bin' > "$TMPDIR/.meowkit/.env"
 ORIGINAL_PATH="$PATH"
-RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.sh" && echo "$PATH"')
+RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.cjs" && echo "$PATH"')
 [ "$RESULT" = "$ORIGINAL_PATH" ] && pass "PATH not hijacked" || fail "PATH not hijacked" "PATH changed to $RESULT"
 rm -rf "$TMPDIR"
 
@@ -70,7 +70,7 @@ KEY WITH SPACE=value
 MEOWKIT_AFTER=after
 EOF
 # Just verify the valid keys loaded (invalid ones are silently skipped)
-RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.sh" && echo "${MEOWKIT_VALID:-missing}|${MEOWKIT_AFTER:-missing}"')
+RESULT=$(CLAUDE_PROJECT_DIR="$TMPDIR" sh -c '. "$CLAUDE_PROJECT_DIR/.claude/hooks/lib/load-dotenv.cjs" && echo "${MEOWKIT_VALID:-missing}|${MEOWKIT_AFTER:-missing}"')
 [ "$RESULT" = "works|after" ] && pass "valid keys loaded, invalid keys skipped without error" || fail "invalid key handling" "got [$RESULT]"
 rm -rf "$TMPDIR"
 
@@ -89,7 +89,7 @@ rm -f session-state/last-session-id-test 2>/dev/null
 OUTPUT=$(echo '{"session_id":"verify-test-'"$$"'","hook_event_name":"SessionStart"}' | \
   CLAUDE_PROJECT_DIR="$MEOWKIT_ROOT" \
   MEOWKIT_TDD=1 \
-  sh "$MEOWKIT_ROOT/.claude/hooks/project-context-loader.sh" 2>&1)
+  sh "$MEOWKIT_ROOT/.claude/hooks/handlers/project-context-loader.cjs" 2>&1)
 echo "$OUTPUT" | grep -q "## MeowKit Config" && pass "config block emitted" || fail "config block" "not found in stdout"
 
 # Test 8: Config block NOT duplicated on session resume
@@ -97,7 +97,7 @@ echo "Test 8: Config block gated on resume (same session id)"
 # Previous test wrote the session id — second call with same id should skip the block
 OUTPUT2=$(echo '{"session_id":"verify-test-'"$$"'","hook_event_name":"SessionStart"}' | \
   CLAUDE_PROJECT_DIR="$MEOWKIT_ROOT" \
-  sh "$MEOWKIT_ROOT/.claude/hooks/project-context-loader.sh" 2>&1)
+  sh "$MEOWKIT_ROOT/.claude/hooks/handlers/project-context-loader.cjs" 2>&1)
 echo "$OUTPUT2" | grep -q "## MeowKit Config" && fail "resume gating" "block duplicated on resume" || pass "config block gated on resume"
 
 echo ""

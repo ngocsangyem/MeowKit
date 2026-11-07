@@ -6,7 +6,7 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 // Exercises the Gate 2 narrow extension script (.claude/scripts/validate-review-coverage.cjs)
-// that gate2-check.sh calls on a review-session verdict's embedded coverage block.
+// that gate2-check.cjs calls on a review-session verdict's embedded coverage block.
 const REPO = execFileSync("git", ["rev-parse", "--show-toplevel"], {
 	cwd: path.dirname(new URL(import.meta.url).pathname),
 	encoding: "utf-8",

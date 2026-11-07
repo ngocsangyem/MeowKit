@@ -5,7 +5,7 @@
 // State: session-state/edit-counts.json keyed by {session_id}:{filepath}
 // Env: MEOWKIT_LOOP_DETECT=off — skip entirely
 //
-// NOTE: Trace emission (append-trace.sh) intentionally omitted from Node.js port.
+// NOTE: Trace emission (append-trace.cjs) intentionally omitted from Node.js port.
 // Shell version's trace records are not consumed by any downstream system currently.
 
 const path = require('path');

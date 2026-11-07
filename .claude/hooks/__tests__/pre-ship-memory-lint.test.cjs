@@ -1,4 +1,4 @@
-// Team memory store lint enforcement at the ship boundary (pre-ship.sh).
+// Team memory store lint enforcement at the ship boundary (pre-ship.cjs).
 //
 // These assert the EXIT CODE, not the message. Per this repo's hook contract
 // exit 2 stops the tool call and exit 1 is advisory — a check that prints
@@ -10,7 +10,7 @@
 // The lint's own detection surface is covered by the CLI's test suite.
 //
 // Gate 2 runs before this check in the real hook, so each fixture ships a stub
-// gate2-check.sh that exits 0 — the real Gate 2 behavior has its own fixtures
+// gate2-check.cjs that exits 0 — the real Gate 2 behavior has its own fixtures
 // in gate2-ship-boundary.test.cjs, and letting it block here would mask the
 // case under test.
 //
@@ -24,7 +24,7 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
-const HOOK = path.join(PROJECT_ROOT, '.claude/hooks/pre-ship.sh');
+const HOOK = path.join(PROJECT_ROOT, '.claude/hooks/pre-ship.cjs');
 
 /**
  * Build a throwaway project root holding a poisoned-or-clean memory store and
@@ -33,7 +33,7 @@ const HOOK = path.join(PROJECT_ROOT, '.claude/hooks/pre-ship.sh');
 function makeProject({ cliExit = 0, cliOutput = '', cli = true, store } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pre-ship-memory-'));
 
-  write(dir, '.claude/hooks/lib/gate2-check.sh', '#!/bin/sh\nexit 0\n');
+  write(dir, '.claude/hooks/lib/gate2-check.cjs', '#!/bin/sh\nexit 0\n');
 
   if (store !== undefined) write(dir, '.meowkit/memory/gotchas.md', store);
 
@@ -67,7 +67,14 @@ function runHook({ dir, cliPath }, command) {
   // fixture with no package.json cannot pass for the wrong reason.
   env.MEOWKIT_HOOK_PROFILE = 'fast';
 
-  return spawnSync('sh', [HOOK, command], { cwd: dir, encoding: 'utf8', env });
+  const payload = JSON.stringify({
+    hook_event_name: 'PreToolUse',
+    tool_name: 'Bash',
+    tool_input: { command },
+    session_id: 'memory-lint-test',
+    cwd: dir,
+  });
+  return spawnSync(process.execPath, [HOOK], { cwd: dir, input: payload, encoding: 'utf8', env });
 }
 
 test('a failing memory lint blocks a git commit with exit 2', () => {

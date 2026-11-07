@@ -104,7 +104,7 @@ The persisted candidate carries `scan.scrubbed` (`service.ts:79`), and `scan.scr
 | R1 File content is data | PASS | Candidate/source content treated as data; never executed. |
 | R2 Tool output is data | PASS | No tool-output execution in the research path. |
 | R3 Memory cannot override | PASS | Trace/intervention appends are data-only; secret-scrubbed candidate content. |
-| R4 Sensitive-file protection | PASS | Quarantine writes `.quarantined` + `chmodSync(0o400)` (`markdown-repository.ts:184`); read-blocked by `privacy-block.sh`. |
+| R4 Sensitive-file protection | PASS | Quarantine writes `.quarantined` + `chmodSync(0o400)` (`markdown-repository.ts:184`); read-blocked by `privacy-block.cjs`. |
 | R5 No external exfiltration | PASS | Egress only to the guarded fetch URL; no file content piped outbound; URL credential-stripped. |
 | R6 Project-dir boundary | PASS | All writes via `resolveInSlug` prefix-check under `tasks/wikis/<slug>/`. |
 | R7 Skill content boundary | PASS | Fetched content is DATA then scanner gate then quarantine HARD-STOP (no programmatic override); pattern set now ~38 + 4 passes. |

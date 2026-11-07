@@ -34,7 +34,7 @@ When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.
 mkdir -p .codex/session-state && echo on > .codex/session-state/tdd-mode
 ```
 
-This sentinel file is read by `pre-implement.sh`, `tdd-detect.sh`, and downstream agents to detect TDD mode. Without `--tdd`, the sentinel is absent and the workflow runs in default mode (Phase 2 optional, no RED-phase gate).
+This sentinel file is read by `pre-implement.cjs`, `tdd-detect.sh`, and downstream agents to detect TDD mode. Without `--tdd`, the sentinel is absent and the workflow runs in default mode (Phase 2 optional, no RED-phase gate).
 
 `MEOWKIT_TDD=1` env var (set in CI / shell rc) is the highest-precedence opt-in and overrides the sentinel.
 

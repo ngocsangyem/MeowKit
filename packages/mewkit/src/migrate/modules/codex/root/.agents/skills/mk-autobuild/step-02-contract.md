@@ -50,7 +50,7 @@ delegate a sub-task (
     Draft 5–15 ACs in Given/When/Then form. Each must have a Verification line and a Rubric tie-in.
 
     Save to tasks/contracts/{date-time}-{slug}-sprint-1.md.
-    Run validate-contract.sh to confirm schema clean.
+    Run validate-contract.cjs to confirm schema clean.
 
     Work context: $(pwd)
   "
@@ -81,8 +81,7 @@ contract_path=$(ls -t tasks/contracts/*-${slug}-sprint-1.md | head -1)
 
 ### 2c. Verify both signatures present
 
-```bash
-.agents/skills/sprint-contract/scripts/check-contract-signed.sh
+```node .agents/skills/sprint-contract/scripts/check-contract-signed.cjs
 ```
 
 Must exit 0. If exit 1, the autobuild workflow halts — escalate to user.

@@ -109,9 +109,9 @@ MeowKit uses shell hooks to upgrade behavioral rules to preventive enforcement:
 
 | Hook                              | Event        | Purpose                                                        |
 | --------------------------------- | ------------ | -------------------------------------------------------------- |
-| `hooks/privacy-block.sh`          | PreToolUse   | Block sensitive file reads before they happen (Rule 4 upgrade) |
-| `hooks/gate-enforcement.sh`       | PreToolUse   | Block source code writes before Gate 1 approval                |
-| `hooks/project-context-loader.sh` | SessionStart | Auto-load project-context.md into agent context                |
+| `hooks/privacy-block.cjs`          | PreToolUse   | Block sensitive file reads before they happen (Rule 4 upgrade) |
+| `hooks/gate-enforcement.cjs`       | PreToolUse   | Block source code writes before Gate 1 approval                |
+| `hooks/project-context-loader.cjs` | SessionStart | Auto-load project-context.md into agent context                |
 
 Hooks supplement rules — they do not replace them. Rules define the WHY; hooks enforce the WHAT.
 
@@ -123,7 +123,7 @@ Hooks supplement rules — they do not replace them. Rules define the WHY; hooks
 | --- | --- | --- | --- |
 | `security-rules.md` | Behavioral | NEVER | Human override only, documented |
 | `injection-rules.md` | Behavioral | NEVER | Human override only, documented |
-| `gate-rules.md` | Hook (`gate-enforcement.sh`) | NEVER | `/mk:fix` simple bypasses Gate 1; scale-routing one-shot |
+| `gate-rules.md` | Hook (`gate-enforcement.cjs`) | NEVER | `/mk:fix` simple bypasses Gate 1; scale-routing one-shot |
 | `core-behaviors.md` | Behavioral | No | — |
 | `meowkit-core.md` | Behavioral + Script (`check-always-on-budget.cjs`) | No | — |
 | `agent-conduct.md` | Behavioral | No | A1/A3 preserve rationale verbatim; B2 compressed |
@@ -133,9 +133,9 @@ Hooks supplement rules — they do not replace them. Rules define the WHY; hooks
 
 | Rule | Mechanism | Override? | Exception |
 | --- | --- | --- | --- |
-| `harness-rules.md` | Behavioral + Hook (`gate-enforcement.sh` contract gate, `validate-verdict.sh` active-verification HARD GATE) | NEVER override gates | Density modes adjust scaffolding, not gate semantics |
+| `harness-rules.md` | Behavioral + Hook (`gate-enforcement.cjs` contract gate, `validate-verdict.sh` active-verification HARD GATE) | NEVER override gates | Density modes adjust scaffolding, not gate semantics |
 | `rubric-rules.md` | Behavioral + Script (`validate-rubric.sh`, `check-product-spec.sh`) | NEVER override hard-fail propagation | Custom rubrics can be added; existing rubric semantics are fixed |
-| `tdd-rules.md` | Behavioral + Manual Script (`pre-implement.sh` — invoked by the developer agent, not wired to system events) | Yes | Default OFF. Opt in via `--tdd` / `MEOWKIT_TDD=1` |
+| `tdd-rules.md` | Behavioral + Manual Script (`pre-implement.cjs` — invoked by the developer agent, not wired to system events) | Yes | Default OFF. Opt in via `--tdd` / `MEOWKIT_TDD=1` |
 | `orchestration-rules.md` | Behavioral | N/A | Contextual — only in multi-agent workflows |
 | `model-selection-rules.md` | Behavioral | No | Domain override via scale-routing CSV |
 | `scale-adaptive-rules.md` | Behavioral + CSV data | No | CSV extensible by users |

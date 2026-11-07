@@ -98,7 +98,7 @@ Just-in-time rules apply when their owning skill loads them, and only there. `ha
 | `meowkit-core.md` | Behavioral + Script (always-on byte budget) | No | — |
 | `agent-conduct.md` | Behavioral | No | A1/A3 preserve rationale; B2 compressed |
 | `development-rules.md` | Behavioral | No | — |
-| `harness-rules.md` | Behavioral + Hook (`gate-enforcement.sh`, `validate-verdict.sh`) | NEVER override gates | Density modes adjust scaffolding, not gate semantics |
+| `harness-rules.md` | Behavioral + Hook (`gate-enforcement.cjs`, `validate-verdict.sh`) | NEVER override gates | Density modes adjust scaffolding, not gate semantics |
 | `rubric-rules.md` | Behavioral + Script (`validate-rubric.sh`) | NEVER override hard-fail propagation | Custom rubrics addable; semantics fixed |
 | `tdd-rules.md` | Behavioral | Yes | Default OFF; opt in via `--tdd` / `MEOWKIT_TDD=1` |
 | `context-budget-rules.md` | Behavioral | N/A | Advisory read-budget; never a gate |
@@ -120,9 +120,9 @@ Just-in-time rules apply when their owning skill loads them, and only there. `ha
 
 | Hook | Event | Purpose |
 |------|-------|---------|
-| `privacy-block.sh` | PreToolUse | Block reads of `.env`, `*.key`, credentials |
-| `gate-enforcement.sh` | PreToolUse | Block source code writes before Gate 1 |
-| `project-context-loader.sh` | SessionStart | Auto-load `project-context.md` |
+| `privacy-block.cjs` | PreToolUse | Block reads of `.env`, `*.key`, credentials |
+| `gate-enforcement.cjs` | PreToolUse | Block source code writes before Gate 1 |
+| `project-context-loader.cjs` | SessionStart | Auto-load `project-context.md` |
 
 Rules define _why_. Hooks enforce _what_.
 

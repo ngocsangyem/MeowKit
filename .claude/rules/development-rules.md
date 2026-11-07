@@ -22,11 +22,11 @@ NEVER finish a session with failing tests. Fix all failures before completing; e
 
 NEVER ignore failing tests, delete tests, weaken assertions, or introduce fake data solely to pass CI. Address the root cause, then re-run the relevant checks.
 
-Those two rules apply whenever tests exist. Tests are optional in default mode and required in strict mode (`MEOWKIT_TDD=1` / `--tdd`, where `pre-implement.sh` enforces failing-test-first); a zero-test repo is permitted and the reviewer may WARN at Gate 2. Policy: `.claude/skills/cook/references/tdd-rules.md`.
+Those two rules apply whenever tests exist. Tests are optional in default mode and required in strict mode (`MEOWKIT_TDD=1` / `--tdd`, where `pre-implement.cjs` enforces failing-test-first); a zero-test repo is permitted and the reviewer may WARN at Gate 2. Policy: `.claude/skills/cook/references/tdd-rules.md`.
 
 ## Pre-Commit Rules
 
-Before every commit: run linting (zero errors); run tests — all pass IF tests exist (`pre-ship.sh` skips that check when `package.json` has no `"test"` script); stage no confidential file (`.env`, credentials, API keys).
+Before every commit: run linting (zero errors); run tests — all pass IF tests exist (`pre-ship.cjs` skips that check when `package.json` has no `"test"` script); stage no confidential file (`.env`, credentials, API keys).
 
 ALWAYS use conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 NEVER include AI references in commit messages.

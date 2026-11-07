@@ -16,7 +16,7 @@ description: "Session-scoped safety guardrails for destructive commands with env
 
 ## What This Skill Does
 
-Intercepts every Bash command via a PreToolUse hook (`bin/check-careful.sh`) and checks it against a comprehensive catalog of destructive patterns. In development contexts, destructive commands trigger a warning the user can override. In production/staging contexts, CRITICAL patterns are **blocked with no override**. All overrides are logged to `.meowkit/telemetry/security-log.md` for audit trail.
+Intercepts every Bash command via a PreToolUse hook (`bin/check-careful.cjs`) and checks it against a comprehensive catalog of destructive patterns. In development contexts, destructive commands trigger a warning the user can override. In production/staging contexts, CRITICAL patterns are **blocked with no override**. All overrides are logged to `.meowkit/telemetry/security-log.md` for audit trail.
 
 ## When to Use
 
@@ -62,7 +62,7 @@ When any of `NODE_ENV`, `APP_ENV`, or `ENVIRONMENT` contains `production`/`prod`
 ## Workflow
 
 1. **Invoke** — user runs `/mk:careful` or triggers it contextually
-2. **Hook activates** — `bin/check-careful.sh` registers as PreToolUse on all Bash calls
+2. **Hook activates** — `bin/check-careful.cjs` registers as PreToolUse on all Bash calls
 3. **Pattern matching** — every bash command string is checked against ~30 destructive patterns
 4. **Decision** — allow (no match or safe exception), ask (match in dev), or block (CRITICAL match in prod)
 5. **Audit** — all overrides logged with timestamp and command to `.meowkit/telemetry/security-log.md`
@@ -93,6 +93,6 @@ Container housekeeping: `docker rm $(docker ps -aq)` (stopped containers only), 
 
 ### Notes
 
-- Hook script: `.claude/skills/careful/bin/check-careful.sh`
+- Hook script: `.claude/skills/careful/bin/check-careful.cjs`
 - Pattern reference: `.claude/skills/careful/references/destructive-patterns.md` (200+ lines)
 - Source: gstack

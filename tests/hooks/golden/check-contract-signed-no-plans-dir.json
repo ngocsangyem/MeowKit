@@ -1,0 +1,23 @@
+{
+  "name": "check-contract-signed-no-plans-dir",
+  "group": "gate-helper-check-contract-signed",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/skills/sprint-contract/scripts/check-contract-signed.sh",
+  "args": [],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "check-contract-signed-no-plans-dir",
+  "setupDescription": "no tasks/plans/ at all — defers to Gate 1",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  }
+}

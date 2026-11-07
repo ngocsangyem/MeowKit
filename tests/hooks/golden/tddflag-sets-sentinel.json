@@ -1,0 +1,26 @@
+{
+  "name": "tddflag-sets-sentinel",
+  "group": "observer-tdd-flag-detector",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/tdd-flag-detector.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"UserPromptSubmit\",\"prompt\":\"/mk:cook --tdd add the parser\"}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "tddflag-sets-sentinel",
+  "setupDescription": "BASE hook tree only; no existing sentinel",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": "[tdd] sentinel written by --tdd flag (mechanical detection)\n"
+  },
+  "sideEffects": {
+    ".claude/session-state/tdd-mode": "on\n"
+  }
+}

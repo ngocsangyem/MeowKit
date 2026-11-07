@@ -1,0 +1,23 @@
+{
+  "name": "gate1-approved-plan-unsigned-contract",
+  "group": "gate1",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/gate-enforcement.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"src/app.ts\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "gate1-approved-plan-unsigned-contract",
+  "setupDescription": "stamped plan + a draft (unsigned) contract",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@CONTRACT_GATE_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@CONTRACT_GATE_BLOCK@@\nNo signed sprint contract found for task 'corpus-demo'.\nActive plan: tasks/plans/261101-corpus-demo/plan.md\n\nPhase 4 sprint contract gate requires a signed contract before source edits.\n\nTo proceed, do ONE of:\n  1. Run: /mk:sprint-contract propose corpus-demo\n     Then: /mk:sprint-contract sign (after evaluator review)\n  2. Set: export MEOWKIT_AUTOBUILD_MODE=LEAN  (Opus 4.6 LEAN mode bypass)\n"
+  }
+}

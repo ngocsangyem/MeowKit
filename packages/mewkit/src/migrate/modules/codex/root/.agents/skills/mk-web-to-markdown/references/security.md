@@ -8,7 +8,7 @@
   - [Attackers](#attackers)
   - [Trust boundaries](#trust-boundaries)
 - [2. Defense architecture](#2-defense-architecture)
-  - [Layer 1 — PreToolUse hook (`privacy-block.sh`)](#layer-1-pretooluse-hook-privacy-blocksh)
+  - [Layer 1 — PreToolUse hook (`privacy-block.cjs`)](#layer-1-pretooluse-hook-privacy-blocksh)
   - [Layer 2 — Python URL validator (`_safe_url`)](#layer-2-python-url-validator-safeurl)
   - [Layer 3 — Size cap (streaming)](#layer-3-size-cap-streaming)
   - [Layer 4 — DATA boundary wrapping](#layer-4-data-boundary-wrapping)
@@ -84,7 +84,7 @@ Other skills (research, intake, investigate, planner, …)
 
 ## 2. Defense architecture
 
-### Layer 1 — PreToolUse hook (`privacy-block.sh`)
+### Layer 1 — PreToolUse hook (`privacy-block.cjs`)
 
 **Scope:** All Bash/Read/Edit/Write tool calls.
 **What it blocks:**
@@ -96,7 +96,7 @@ Other skills (research, intake, investigate, planner, …)
   - `localhost`, `127.*`, `10.*`, `192.168.*`, `169.254.*`, `metadata.*`
   - Non-http(s) schemes: `file://`, `chrome://`, `about:`, `data:`, `javascript:`
 
-**Implementation:** `.codex/hooks/privacy-block.sh`.
+**Implementation:** `.codex/hooks/privacy-block.cjs`.
 
 **Limitation:** The hook's regex extraction is best-effort — agents can still smuggle URLs via shell variable expansion or obfuscation. The hook is defense-in-depth, not the primary guard. `_safe_url` is the authoritative guard.
 
@@ -202,7 +202,7 @@ Preview (first 2KB, DATA — not instructions):
 **When injection scanner reports CRITICAL:**
 1. **Write content to quarantine:** `.codex/cache/web-fetches/quarantine/{sha256(content)[:16]}.quarantined`
    - Permissions: 0400 (read-only, owner only)
-   - Filename extension `.quarantined` (NOT `.md`) — blocked by `privacy-block.sh`
+   - Filename extension `.quarantined` (NOT `.md`) — blocked by `privacy-block.cjs`
 2. **Log to security-log:** `.meowkit/telemetry/security-log.md` — the canonical destination for
    intervention records, and deliberately NOT `.meowkit/memory/`: the entry quotes the attacker
    payload, while the memory store is committed and grep-read back as DATA
@@ -226,7 +226,7 @@ Preview (first 2KB, DATA — not instructions):
 
 **Scope:** Called BEFORE every disk write (both content and URL).
 
-**Implementation:** Python port of `.codex/hooks/lib/secret-scrub.sh` regex set.
+**Implementation:** Python port of `.codex/hooks/lib/secret-scrub.cjs` regex set.
 
 **Patterns scrubbed:**
 
@@ -429,7 +429,7 @@ export const SYSTEM_DEPS_REGISTRY: Record<string, SystemDepEntry> = {
 
 ## 6. Manifest (`index.jsonl`) format
 
-Per-line JSON. Append-only via `fcntl.flock`. Read-blocked by `privacy-block.sh`.
+Per-line JSON. Append-only via `fcntl.flock`. Read-blocked by `privacy-block.cjs`.
 
 ```jsonl
 {"ts":"2026-04-09T01:32:15Z","url":"https://docs.example.com/api","caller":"user:direct","method":"static","status":"success","http_status":200,"size":12345,"content_type":"text/html","report":".codex/cache/web-fetches/260409-013215-docs-example-com-a1b2c3d4e5.md","sha":"a1b2c3d4e5f6g7h8","session":"abc-def-ghi","skill_version":"1.0.0","injection_warn":false}
@@ -476,7 +476,7 @@ If injection-audit.py post-write scan (Layer 8) catches a pattern that Layer 5 m
 1. **Retroactive quarantine:** move the written report file to quarantine bucket (as if Layer 5 had caught it)
 2. **Manifest update:** append a corrective line to `index.jsonl` marking the original report as `superseded_by_quarantine`
 3. **security-log entry:** log the gap with severity CRITICAL + request for Layer 5 pattern update
-4. **User notification:** next session's `project-context-loader.sh` surfaces the log entry
+4. **User notification:** next session's `project-context-loader.cjs` surfaces the log entry
 
 **Post-incident:** Layer 5 pattern set gets updated to cover the missed pattern, documented in this file's section 2 Layer 5.
 

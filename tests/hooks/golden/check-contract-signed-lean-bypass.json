@@ -1,0 +1,28 @@
+{
+  "name": "check-contract-signed-lean-bypass",
+  "group": "gate-helper-check-contract-signed",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/skills/sprint-contract/scripts/check-contract-signed.sh",
+  "args": [],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}",
+    "MEOWKIT_AUTOBUILD_MODE": "LEAN"
+  },
+  "setup": "check-contract-signed-lean-bypass",
+  "setupDescription": "a plan dir with a draft contract, with MEOWKIT_AUTOBUILD_MODE=LEAN set",
+  "normalizers": [
+    "tmpdir",
+    "isoTimestamp"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/lean-bypass.log": "{{TS}} MEOWKIT_AUTOBUILD_MODE=LEAN bypassed contract gate\n"
+  }
+}

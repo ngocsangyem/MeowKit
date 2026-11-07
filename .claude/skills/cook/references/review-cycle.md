@@ -9,7 +9,7 @@ cycle = 0
 LOOP:
   1. Spawn reviewer subagent → score, critical_count, warnings, suggestions
 
-  2. Run .claude/skills/cook/scripts/validate-gate-2.sh (if available)
+  2. Run .claude/skills/cook/scripts/validate-gate-2.cjs (if available)
 
   3. DISPLAY FINDINGS:
      Review: [score]/10
@@ -58,7 +58,7 @@ LOOP:
   Auto mode only automates the fix loop, not the approval.
 ```
 
-Before presenting Gate 2 (either cycle), the workflow evidence index must be complete: run `validate-gate-2.sh` (authoritative structural guard) AND `node .claude/scripts/validate-workflow-evidence.cjs <path> --phase cook` (completeness mirror). Surface both; neither approves — they gate on structure/completeness only. See `workflow-steps.md` → Workflow Evidence Index.
+Before presenting Gate 2 (either cycle), the workflow evidence index must be complete: run `validate-gate-2.cjs` (authoritative structural guard) AND `node .claude/scripts/validate-workflow-evidence.cjs <path> --phase cook` (completeness mirror). Surface both; neither approves — they gate on structure/completeness only. See `workflow-steps.md` → Workflow Evidence Index.
 
 ## Returned Work (`--advice` runs only)
 
@@ -89,7 +89,7 @@ When the reviewer surfaces a regression, side effect, or broken workflow (verdic
    - Keep the implementation and update `<dependents>` to match the new contract
    - Add a compatibility shim at `<boundary>` so old callers keep working
    - Accept the regression — old behavior was unintended/buggy
-4. **Record the user's selection** in the verdict file as a `## User Decision Addendum` block including `User selected:` and `Resumption point:` lines. The `validate-gate-2.sh` script blocks the verdict until this addendum is present (positive-presence-only signal; absence of the original side-effect line is never a block).
+4. **Record the user's selection** in the verdict file as a `## User Decision Addendum` block including `User selected:` and `Resumption point:` lines. The `validate-gate-2.cjs` script blocks the verdict until this addendum is present (positive-presence-only signal; absence of the original side-effect line is never a block).
 5. **Resume** based on the user's choice: revert → return to Phase 1; keep + update dependents → Phase 3 with broader scope; compat shim → Phase 3 with shim added; accept → Gate 2 PASS with the trade-off documented in the addendum.
 
 This pattern preserves the user's decision-making authority on cross-cutting changes and prevents silent scope expansion.

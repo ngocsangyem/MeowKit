@@ -1,0 +1,23 @@
+{
+  "name": "postwrite-blocked-pattern",
+  "group": "post-write",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/post-write.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"{{TMP}}/src/app.ts\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "postwrite-blocked-pattern",
+  "setupDescription": "a written .ts file containing `: any` and `as any`",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": "BLOCK — Usage of 'any' type at line 1 in app.ts\nBLOCK — Usage of 'any' type at line 2 in app.ts\n"
+  }
+}

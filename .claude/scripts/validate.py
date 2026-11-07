@@ -21,7 +21,7 @@ class Finding(NamedTuple):
 
 
 # ---------------------------------------------------------------------------
-# Security checks (same as post-write.sh, applied comprehensively)
+# Security checks (same as post-write.cjs, applied comprehensively)
 # ---------------------------------------------------------------------------
 
 def check_ts_js(filepath: Path, content: str) -> list[Finding]:

@@ -1,6 +1,6 @@
 // Trace-append primitive: record shape (task identity top-level, scrubbed data), rotation, and
 // the concurrency guarantees that matter for a shared JSONL log — the TS writer alone, and the
-// shell writer + TS writer contending on the same sidecar lock, must never interleave or corrupt
+// node writer + TS writer contending on the same sidecar lock, must never interleave or corrupt
 // a line.
 import { mkdtempSync, rmSync, mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { spawn, spawnSync } from "node:child_process";
@@ -11,7 +11,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { appendTraceRecord, appendTraceRecordSync, TRACE_MAX_BYTES } from "../trace-append.js";
 
 // Repo `.claude` relative to THIS file (cwd-independent) — under the canonical root run a
-// process.cwd()-relative path would miss the shell writer and silently skip the parity test.
+// process.cwd()-relative path would miss the node writer and silently skip the parity test.
 const REPO_CLAUDE = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..", "..", ".claude");
 
 const roots: string[] = [];
@@ -116,7 +116,7 @@ describe("appendTraceRecord — concurrency (no interleaving/corruption)", () =>
 		// Async-only: the async lock releases run on the event loop, so N concurrent appends
 		// serialize cleanly. (Mixing SYNC appends into the same process is not a real usage — the
 		// sync writers are orient and CLI friction, the async writer is task-state; they run in separate
-		// CLI processes. Cross-process contention is covered by the shell+TS parity test below.)
+		// CLI processes. Cross-process contention is covered by the node+TS parity test below.)
 		await Promise.all(Array.from({ length: N }, (_, i) => appendTraceRecord(root, { event: "async_ev", data: { i } })));
 		const lines = readLines(logPath);
 		expect(lines.length).toBe(N);
@@ -138,10 +138,10 @@ function python3Available(): boolean {
 	return spawnSync("python3", ["--version"], { stdio: "ignore" }).status === 0;
 }
 
-describe("shell + TS parity (shared sidecar lock across languages)", () => {
+describe("node + TS parity (shared sidecar lock across writers)", () => {
 	it("neither writer interleaves or corrupts a line under concurrent append", async () => {
-		if (!python3Available()) return; // the shell writer builds its record via python3
-		const scriptPath = join(REPO_CLAUDE, "hooks", "append-trace.sh");
+		
+		const scriptPath = join(REPO_CLAUDE, "hooks", "append-trace.cjs");
 		if (!existsSync(scriptPath)) return;
 		const { root, claudeDir, logPath } = makeProjectRoot();
 		const N = 6;
@@ -149,7 +149,7 @@ describe("shell + TS parity (shared sidecar lock across languages)", () => {
 			{ length: N },
 			(_, i) =>
 				new Promise<void>((res) => {
-					const p = spawn("bash", [scriptPath, "shell_ev", JSON.stringify({ i })], {
+					const p = spawn(process.execPath, [scriptPath, "shell_ev", JSON.stringify({ i })], {
 						env: { ...process.env, CLAUDE_PROJECT_DIR: root },
 						stdio: "ignore",
 					});

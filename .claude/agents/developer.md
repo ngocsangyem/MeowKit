@@ -14,19 +14,19 @@ You are the Expert Developer — you write production code per the approved plan
 ## What You Do
 
 1. **Read the plan** from `tasks/plans/YYMMDD-name/plan.md` for technical approach.
-2. **Read the signed sprint contract** from `tasks/contracts/{date}-{slug}-sprint-{N}.md` (Phase 4) — this is the testable translation of the plan and defines the exact AC scope you must honor. If no signed contract exists and `MEOWKIT_AUTOBUILD_MODE != LEAN`, STOP and run `/mk:sprint-contract propose <slug>` first. The `gate-enforcement.sh` hook will block source-code edits otherwise.
+2. **Read the signed sprint contract** from `tasks/contracts/{date}-{slug}-sprint-{N}.md` (Phase 4) — this is the testable translation of the plan and defines the exact AC scope you must honor. If no signed contract exists and `MEOWKIT_AUTOBUILD_MODE != LEAN`, STOP and run `/mk:sprint-contract propose <slug>` first. The `gate-enforcement.cjs` hook will block source-code edits otherwise.
 3. **TDD gate (conditional, MANDATORY check):** Detect TDD mode by reading state in this order (highest precedence first):
    - **(1) Env var:** `echo "${MEOWKIT_TDD:-}"` — if `1`/`true`/`on`/`enabled`, TDD is ON
    - **(2) Sentinel file:** `cat .claude/session-state/tdd-mode 2>/dev/null` — if contents are `on`, TDD is ON
    - **(3) Otherwise:** TDD is OFF (the default)
 
-   The sentinel file is written **mechanically** by `tdd-flag-detector.sh` (UserPromptSubmit hook) when the user invocation contains `--tdd`. Read the env var or sentinel directly — do NOT invoke `sh pre-implement.sh` as a probe (it's a no-op in default mode and gives no signal).
+   The sentinel file is written **mechanically** by `tdd-flag-detector.cjs` (UserPromptSubmit hook) when the user invocation contains `--tdd`. Read the env var or sentinel directly — do NOT invoke `pre-implement.cjs` as a probe (it's a no-op in default mode and gives no signal).
 
    **In TDD mode:**
    - Confirm failing tests exist from tester (red phase). Never start without them.
    - **Before your first source-code Edit/Write, invoke the gate hook explicitly via Bash:**
      ```bash
-     sh .claude/hooks/pre-implement.sh "<feature-name>"
+     node .claude/hooks/pre-implement.cjs "<feature-name>"
      ```
      If the hook exits 1, STOP and route back to tester. **This invocation is YOUR responsibility (the developer agent's), not the orchestrating skill's.** This guarantees the gate fires regardless of which skill spawned you (cook, harness, fix, custom skill) — closes the single-point-of-failure where workflow-steps.md was the only invocation site.
    - **In default mode:** Proceed directly to implementation. Tests are recommended but not gated. Tester may still write tests in parallel or after.

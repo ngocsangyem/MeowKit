@@ -60,7 +60,7 @@ Pauses for your approval at each step. Use when:
 | Root cause before fix | `mk:investigate` | You cannot patch the symptom by accident |
 | Scope control | `mk:freeze` | Unrelated code stays untouched |
 | Regression test | tester | Proof the bug existed *and* that the fix closes it |
-| Security scan | `post-write.sh` | Every edited file is checked for new holes |
+| Security scan | `post-write.cjs` | Every edited file is checked for new holes |
 | Minimal diff | developer | The root cause fixed in the fewest lines |
 | Evidence over assertion | reviewer | Verified with test output, not "should work" |
 

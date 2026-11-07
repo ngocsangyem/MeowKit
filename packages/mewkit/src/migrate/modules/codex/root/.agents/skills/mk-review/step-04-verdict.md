@@ -43,7 +43,7 @@ applies the deterministic cap table, resolves anchors by snippet, and writes the
 verdict proof bundle (`<id>-verdict.json`, embedding the coverage block + hash) plus a
 `SubmitPayload`. A `PASS` decision is emitted ONLY with complete, `session-observed`
 coverage; attested sessions cap at `PASS_WITH_RISK`. The composed decision is
-Gate-2-eligible only at `session-observed` — `gate2-check.sh` re-validates the embedded
+Gate-2-eligible only at `session-observed` — `gate2-check.cjs` re-validates the embedded
 coverage block for review-session verdicts.
 
 ## Verdict Rules
@@ -138,11 +138,11 @@ Side Effects Detected: Yes
 
 **Authoring rules:**
 - Emit ONLY when an existing-behavior break is the cause. New-code bugs go in the dimension table as normal CRITICAL/MAJOR findings.
-- Plaintext line only — NOT a markdown header (`## Side Effects Detected: Yes` will not be recognized by `validate-gate-2.sh`).
+- Plaintext line only — NOT a markdown header (`## Side Effects Detected: Yes` will not be recognized by `validate-gate-2.cjs`).
 - Each bullet names the affected behavior or caller (e.g., `- POST /api/users no longer accepts trailing slashes — breaks 3 existing callers`).
 - Absence of the line = no signal. Backward-compatible.
 
-When this signal is present, the cook orchestrator MUST follow the "Regression Recovery Options" pattern in `.agents/skills/cook/references/review-cycle.md` (presents 2–4 options to the user; user selection recorded as a `## User Decision Addendum` block on the verdict file). `validate-gate-2.sh` blocks Gate 2 until the addendum is present.
+When this signal is present, the cook orchestrator MUST follow the "Regression Recovery Options" pattern in `.agents/skills/cook/references/review-cycle.md` (presents 2–4 options to the user; user selection recorded as a `## User Decision Addendum` block on the verdict file). `validate-gate-2.cjs` blocks Gate 2 until the addendum is present.
 
 ## Proof Bundle (machine-readable verdict)
 

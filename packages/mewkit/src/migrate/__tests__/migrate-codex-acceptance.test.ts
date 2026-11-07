@@ -87,8 +87,8 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 		const hookRecords = readReport().artifacts.filter((a) => a.type === "hooks");
 		const migratedOrSkipped = hookRecords.filter((a) => a.status === "migrated" || a.status === "skipped");
 		expect(migratedOrSkipped.length).toBe(21);
-		expect(hookRecords.find((a) => a.sourcePath === "gate-enforcement.sh")?.status).toBe("skipped");
-		expect(hookRecords.find((a) => a.sourcePath === "privacy-block.sh")?.status).toBe("skipped");
+		expect(hookRecords.find((a) => a.sourcePath === "gate-enforcement.cjs")?.status).toBe("skipped");
+		expect(hookRecords.find((a) => a.sourcePath === "privacy-block.cjs")?.status).toBe("skipped");
 	});
 
 	it("does not auto-port a non-roster user agent (custom-helper) — agents conversion is nulled", () => {

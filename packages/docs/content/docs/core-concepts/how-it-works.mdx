@@ -37,12 +37,12 @@ Rules define the WHY. Hooks enforce the WHAT. A rule says "don't write code befo
 
 Shell and Node.js scripts triggered by Claude Code lifecycle events: SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit. They intercept tool calls before they execute:
 
-- `gate-enforcement.sh` blocks file writes before Gate 1 approval
-- `privacy-block.sh` blocks reads of `.env`, SSH keys, and credentials
-- `post-write.sh` security-scans every written file
-- `pre-completion-check.sh` blocks session end without verification evidence
+- `gate-enforcement.cjs` blocks file writes before Gate 1 approval
+- `privacy-block.cjs` blocks reads of `.env`, SSH keys, and credentials
+- `post-write.cjs` security-scans every written file
+- `pre-completion-check.cjs` blocks session end without verification evidence
 
-Critical design: security hooks (`gate-enforcement.sh`, `privacy-block.sh`) are never routed through the dispatcher. If `dispatch.cjs` crashes, security hooks still fire, so there is no single point of failure.
+Critical design: security hooks (`gate-enforcement.cjs`, `privacy-block.cjs`) are never routed through the dispatcher. If `dispatch.cjs` crashes, security hooks still fire, so there is no single point of failure.
 
 Under the hooks, a Node.js dispatch system (`dispatch.cjs` + `handlers.json`) runs infrastructure handlers: model detection, budget tracking, build verification, loop detection, and checkpoint management. These fire automatically; agents don't invoke them.
 

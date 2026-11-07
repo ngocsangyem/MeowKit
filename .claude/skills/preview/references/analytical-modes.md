@@ -103,7 +103,7 @@ Stick to these meanings everywhere. Do not invent new color codes.
 **MANDATORY:** when running `gh pr diff`, pipe through the secret-scrubber:
 
 ```bash
-gh pr diff $PR_NUMBER | bash .claude/hooks/lib/secret-scrub.sh > /tmp/diff-scrubbed.patch
+gh pr diff $PR_NUMBER | node .claude/hooks/lib/secret-scrub.cjs > /tmp/diff-scrubbed.patch
 ```
 
 The scrubber masks credential lines, env-key references, and internal hostnames. PR diffs frequently contain redacted-but-leaked credentials; without this step we'd interpolate them into the rendered HTML.

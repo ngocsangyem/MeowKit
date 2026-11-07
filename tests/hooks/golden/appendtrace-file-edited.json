@@ -1,0 +1,30 @@
+{
+  "name": "appendtrace-file-edited",
+  "group": "cli-append-trace",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/append-trace.sh",
+  "args": [
+    "file_edited",
+    "{\"file\":\"src/app.ts\",\"edit_count\":3}"
+  ],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "appendtrace-file-edited",
+  "setupDescription": "BASE hook tree only; no prior trace log",
+  "normalizers": [
+    "tmpdir",
+    "isoTimestamp"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/trace-log.jsonl": "{\"schema_version\":\"1.0\",\"ts\":\"{{TS}}\",\"event\":\"file_edited\",\"run_id\":\"\",\"harness_version\":\"3.0.0\",\"model\":\"\",\"density\":\"\",\"data\":{\"file\":\"src/app.ts\",\"edit_count\":3}}\n"
+  }
+}

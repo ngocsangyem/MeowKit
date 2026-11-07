@@ -12,26 +12,26 @@ const root = process.cwd();
 const read = (rel: string): string => readFileSync(resolve(root, rel), 'utf8');
 
 describe('Audit-lock: trace-log canonical stream', () => {
-  it('append-trace.sh is the trace writer; callers are post-session + learning-observer', () => {
-    expect(existsSync(resolve(root, '.claude/hooks/append-trace.sh'))).toBe(true);
-    expect(read('.claude/hooks/post-session.sh')).toContain('append-trace');
-    expect(read('.claude/hooks/learning-observer.sh')).toContain('append-trace');
+  it('append-trace.cjs is the trace writer; callers are post-session + learning-observer', () => {
+    expect(existsSync(resolve(root, '.claude/hooks/append-trace.cjs'))).toBe(true);
+    expect(read('.claude/hooks/handlers/post-session.cjs')).toContain('appendTrace');
+    expect(read('.claude/hooks/handlers/learning-observer.cjs')).toContain('appendTrace');
   });
 });
 
 describe('Audit-lock: telemetry classification', () => {
   it('hook-log.jsonl HAS a code reader (telemetry-decisions.py) and is NOT debug-gated', () => {
     expect(read('scripts/telemetry-decisions.py')).toContain('hook-log.jsonl');
-    // hook-logger.sh must keep writing unconditionally (its reader needs the data).
-    expect(read('.claude/hooks/lib/hook-logger.sh')).not.toContain('MEOWKIT_HOOK_DEBUG');
+    // hook-logger.cjs must keep writing unconditionally (its reader needs the data).
+    expect(read('.claude/hooks/lib/hook-logger.cjs')).not.toContain('MEOWKIT_HOOK_DEBUG');
   });
 
   it('learning-observer churn record is debug-gated; file_edited trace stays unconditional', () => {
-    const obs = read('.claude/hooks/learning-observer.sh');
+    const obs = read('.claude/hooks/handlers/learning-observer.cjs');
     // The churn printf is guarded by MEOWKIT_HOOK_DEBUG.
     expect(obs).toMatch(/MEOWKIT_HOOK_DEBUG[\s\S]*"type":"churn"/);
     // The canonical file_edited trace emission is NOT behind the debug gate.
-    expect(obs).toContain('append-trace.sh');
+    expect(obs).toContain('trace-log.cjs');
     expect(obs).toContain('file_edited');
   });
 
@@ -49,7 +49,7 @@ describe('inert cost-meter retired; budget-tracker is the live writer', () => {
   });
 
   it('the live per-Bash cost path (dispatch.cjs Bash -> budget-tracker.cjs) is intact', () => {
-    expect(read('.claude/settings.json')).toMatch(/dispatch\.cjs\\" PostToolUse Bash/);
+    expect(read('.claude/settings.json')).toMatch(/dispatch\.cjs",\s*"PostToolUse",\s*"Bash"/);
     expect(existsSync(resolve(root, '.claude/hooks/handlers/budget-tracker.cjs'))).toBe(true);
   });
 });
@@ -70,19 +70,19 @@ describe('conversation-summary subsystem fully removed', () => {
   it('Stop + UserPromptSubmit still dispatch via dispatch.cjs (other hooks intact)', () => {
     const settings = read('.claude/settings.json');
     // settings.json escapes the inner quote, so match dispatch.cjs + the event name.
-    expect(settings).toMatch(/dispatch\.cjs\\" Stop/);
-    expect(settings).toMatch(/dispatch\.cjs\\" UserPromptSubmit/);
+    expect(settings).toMatch(/dispatch\.cjs",\s*"Stop"/);
+    expect(settings).toMatch(/dispatch\.cjs",\s*"UserPromptSubmit"/);
   });
 
   it('harness Rule 11 is gone and project-context-loader no longer clears a summary cache', () => {
     expect(read('.claude/skills/cook/references/harness-rules.md')).not.toContain('## Rule 11');
-    expect(read('.claude/hooks/project-context-loader.sh')).not.toContain('conversation-summary');
+    expect(read('.claude/hooks/handlers/project-context-loader.cjs')).not.toContain('conversation-summary');
   });
 });
 
 describe('session-state retirement outcomes', () => {
   it('the dead active-skill reader has been removed from pre-completion-check', () => {
-    expect(read('.claude/hooks/pre-completion-check.sh')).not.toContain('active-skill');
+    expect(read('.claude/hooks/handlers/pre-completion-check.cjs')).not.toContain('active-skill');
   });
 
   it('build-progress.json is kept (live harness-resume feature in the developer agent)', () => {

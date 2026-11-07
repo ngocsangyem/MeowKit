@@ -1,4 +1,4 @@
-// cost-log-atomicity.test.ts — Verifies concurrent post-session.sh writes don't
+// cost-log-atomicity.test.ts — Verifies concurrent post-session.cjs writes don't
 // corrupt cost-log.json (M7 closed). Spawns 5 parallel invocations against a
 // shared temp MEMORY_DIR and asserts all entries are valid JSON afterward.
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -7,7 +7,7 @@ import { join, resolve } from 'path';
 import { tmpdir } from 'os';
 import { spawnSync } from 'child_process';
 
-const POST_SESSION_SH = resolve(process.cwd(), '.claude/hooks/post-session.sh');
+const POST_SESSION_SH = resolve(process.cwd(), '.claude/hooks/handlers/post-session.cjs');
 
 describe('cost-log atomic write (M7 closed)', () => {
   let tmpDir: string;
@@ -23,7 +23,7 @@ describe('cost-log atomic write (M7 closed)', () => {
 
   afterEach(() => rmSync(tmpDir, { recursive: true, force: true }));
 
-  it('5 concurrent post-session.sh invocations all write valid JSON entries', () => {
+  it('5 concurrent post-session.cjs invocations all write valid JSON entries', () => {
     // Create budget-state files for each worker
     const budgetFiles: string[] = [];
     for (let i = 0; i < 5; i++) {
@@ -38,7 +38,7 @@ describe('cost-log atomic write (M7 closed)', () => {
 
     // Spawn 5 parallel sh invocations using the same MEMORY_DIR
     const workers = Array.from({ length: 5 }, (_, i) => {
-      return spawnSync('bash', [POST_SESSION_SH], {
+      return spawnSync(process.execPath, [POST_SESSION_SH], {
         encoding: 'utf8',
         timeout: 15000,
         env: {

@@ -29,11 +29,11 @@ When an agent makes an error, don't pray for better behavior next time. Build a 
 
 Gate 1 (plan approved) and Gate 2 (review approved) require explicit human sign-off. No `--skip-gates` flag exists by design. No agent can self-approve. No mode bypasses them.
 
-`gate-enforcement.sh` is a PreToolUse hook that **blocks file writes** before Gate 1 passes. This is preventive enforcement — the agent literally cannot edit source files until a plan is approved. Behavioral rules say "don't write code before planning." Hooks say "you can't."
+`gate-enforcement.cjs` is a PreToolUse hook that **blocks file writes** before Gate 1 passes. This is preventive enforcement — the agent literally cannot edit source files until a plan is approved. Behavioral rules say "don't write code before planning." Hooks say "you can't."
 
 ### 3. Security Is Architecture, Not Afterthought
 
-Security operates in three layers: behavioral rules (`security-rules.md`, `injection-rules.md`), preventive hooks (`gate-enforcement.sh`, `privacy-block.sh`), and observational hooks (`post-write.sh`, `build-verify.cjs`).
+Security operates in three layers: behavioral rules (`security-rules.md`, `injection-rules.md`), preventive hooks (`gate-enforcement.cjs`, `privacy-block.cjs`), and observational hooks (`post-write.cjs`, `build-verify.cjs`).
 
 **Critical design decision:** Security hooks are **never** routed through the dispatcher. They remain independent bash entries in `settings.json`. If `dispatch.cjs` crashes, security hooks still fire. SPOF protection is non-negotiable.
 
@@ -67,7 +67,7 @@ This principle applies at different scales:
 
 ### 7. TDD Is Opt-In
 
-TDD enforcement moved from default-on to opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. When enabled, failing tests must exist before implementation — the `pre-implement.sh` hook blocks code without corresponding failing tests. In default mode, tests are recommended but not gated.
+TDD enforcement moved from default-on to opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. When enabled, failing tests must exist before implementation — the `pre-implement.cjs` hook blocks code without corresponding failing tests. In default mode, tests are recommended but not gated.
 
 Why optional: strict TDD added friction for spike work, tooling, and prototypes. Production-quality work should still enable `--tdd`.
 

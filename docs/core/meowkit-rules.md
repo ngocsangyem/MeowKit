@@ -106,20 +106,20 @@ Every hook in `.claude/hooks/` MUST be registered in `.claude/settings.json`. An
 
 **Canonical convention (per `code.claude.com/docs/en/hooks`):** Claude Code passes hook input as a **JSON object on stdin**, not as positional args. Phase 7 of the harness plan migrated all meowkit hooks to consume stdin via a shared parser shim.
 
-**Canonical parser:** `.claude/hooks/lib/read-hook-input.sh`. Every hook sources this at the top and consumes exported env vars:
+**Canonical parser:** `.claude/hooks/lib/parse-stdin.cjs`. Every hook sources this at the top and consumes exported env vars:
 
 ```bash
 #!/bin/bash
 # Source the parser shim (sets HOOK_* env vars from stdin JSON)
-if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
-  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/parse-stdin.cjs" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/parse-stdin.cjs"
 fi
 
 # Prefer the stdin-parsed value; fall back to $1 positional for back-compat
 FILE_PATH="${HOOK_FILE_PATH:-$1}"
 ```
 
-**Exported env vars (from `lib/read-hook-input.sh`):**
+**Exported env vars (from `lib/parse-stdin.cjs`):**
 
 | Var                    | Source in JSON         | When set                   |
 | ---------------------- | ---------------------- | -------------------------- |
@@ -141,7 +141,7 @@ FILE_PATH="${HOOK_FILE_PATH:-$1}"
 Never register expensive hooks (test suites, builds) on broad matchers like `Bash`. Gate them by inspecting the input early and exiting 0 for non-matching cases:
 
 ```bash
-. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/parse-stdin.cjs"
 COMMAND="${HOOK_COMMAND:-$1}"
 
 # Only run on git commit/push commands
@@ -169,7 +169,7 @@ python3 .claude/skills/multimodal/scripts/check_setup.py
 .claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/check_setup.py
 ```
 
-The venv is created by `npx mewkit setup`. If it doesn't exist, the `project-context-loader.sh` SessionStart hook warns the user.
+The venv is created by `npx mewkit setup`. If it doesn't exist, the `project-context-loader.cjs` SessionStart hook warns the user.
 
 ---
 
@@ -313,7 +313,7 @@ The toolkit has a thin Agile governance layer. Three rules live in `.claude/rule
 - `MEOW_JIRA_BASE_URL` env var set
 - Last user message matches `[A-Z]{2,10}-\d+`
 
-**Sprint-state contracts:** sprint-LEVEL state lives at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Template: `mk:sprint-contract/assets/sprint-state-template.md`. Concurrent writes require `flock`; YAML append is non-atomic across shells. The existing `validate-contract.sh` does NOT validate sprint-state files (different schema by design).
+**Sprint-state contracts:** sprint-LEVEL state lives at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Template: `mk:sprint-contract/assets/sprint-state-template.md`. Concurrent writes require `flock`; YAML append is non-atomic across shells. The existing `validate-contract.cjs` does NOT validate sprint-state files (different schema by design).
 
 **Spike governance:** `mk:plan-creator --spike --timebox <duration>` produces a two-phase investigation plan from `mk:plan-creator/assets/spike-plan-template.md`. INCOMPATIBLE with `mk:autobuild` FULL density (harness gate breaks). Run via `mk:cook` or `mk:plan-creator --fast`.
 

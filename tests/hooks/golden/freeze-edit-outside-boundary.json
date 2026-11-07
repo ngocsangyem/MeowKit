@@ -1,0 +1,23 @@
+{
+  "name": "freeze-edit-outside-boundary",
+  "group": "guard-freeze",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/skills/freeze/bin/check-freeze.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"{{TMP}}/lib/other.ts\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "freeze-edit-outside-boundary",
+  "setupDescription": "freeze boundary set to {{TMP}}/src; the edit targets {{TMP}}/lib",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "{\"permissionDecision\":\"deny\",\"message\":\"[freeze] Blocked: {{TMP}}/lib/other.ts is outside the freeze boundary ({{TMP}}/src). Only edits within the frozen directory are allowed.\"}\n",
+    "stderr": ""
+  }
+}

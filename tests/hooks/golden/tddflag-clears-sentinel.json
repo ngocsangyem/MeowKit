@@ -1,0 +1,26 @@
+{
+  "name": "tddflag-clears-sentinel",
+  "group": "observer-tdd-flag-detector",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/tdd-flag-detector.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"UserPromptSubmit\",\"prompt\":\"/mk:cook --no-tdd add the parser\"}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "tddflag-clears-sentinel",
+  "setupDescription": "an existing tdd-mode sentinel containing `on`",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": "[tdd] sentinel cleared by --no-tdd / --tdd=off\n"
+  },
+  "sideEffects": {
+    ".claude/session-state/tdd-mode": null
+  }
+}

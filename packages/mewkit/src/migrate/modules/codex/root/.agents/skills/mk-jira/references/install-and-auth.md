@@ -38,7 +38,7 @@ The legacy `MEOW_*` prefix (vs. modern `MEOWKIT_*`) is a deliberate exception pe
 
 ## Hook validation
 
-A `SessionStart` hook (`.codex/hooks/jira-env-loader.sh`) validates `.codex/.env` presence and the 3 keys. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper handles per-call sourcing/export.
+A `SessionStart` hook (`.codex/hooks/handlers/jira-env-loader.cjs`) validates `.codex/.env` presence and the 3 keys. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper handles per-call sourcing/export.
 
 Status messages:
 - `[mk:jira] env OK` — all 3 keys present

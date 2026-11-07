@@ -85,10 +85,10 @@ This executes Phases 2-6 automatically:
 |-------|-------|-----------|-------------|
 | 0 | orchestrator | — | Reads memory, classifies complexity, assigns model tier |
 | 1 | planner | **Gate 1** | Creates plan, waits for human approval |
-| 2 | tester | `pre-implement.sh` (skill-invoked, TDD-mode only) | TDD mode: writes failing tests, blocks implementation. Default mode: optional/on-request. |
-| 3 | developer | `post-write.sh` | Implements code, security scan on every file write |
+| 2 | tester | `pre-implement.cjs` (skill-invoked, TDD-mode only) | TDD mode: writes failing tests, blocks implementation. Default mode: optional/on-request. |
+| 3 | developer | `post-write.cjs` | Implements code, security scan on every file write |
 | 4 | reviewer + security | **Gate 2** | 5-dimension audit + security audit, waits for approval |
-| 5 | shipper | `pre-ship.sh` | Test + lint + typecheck, then commit → PR |
+| 5 | shipper | `pre-ship.cjs` | Test + lint + typecheck, then commit → PR |
 | 6 | documenter + analyst | — | Update docs, capture patterns to memory |
 
 ## Next workflow

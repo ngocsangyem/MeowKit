@@ -61,8 +61,8 @@ Already covered by the allowlist in `docs/maintainer/docs-reference-contract.md`
 
 ## Type 4 — False Positives (do not patch)
 
-- `.claude/hooks/gate-enforcement.sh:88` — `docs/*|*/docs/*)` glob path-match in a case statement, not a doc reference
-- `.claude/hooks/project-context-loader.sh` — reads `docs/project-context.md` from the USER project root (it IS the producer/consumer for the Type-1 contract)
+- `.claude/hooks/gate-enforcement.cjs:88` — `docs/*|*/docs/*)` glob path-match in a case statement, not a doc reference
+- `.claude/hooks/handlers/project-context-loader.cjs` — reads `docs/project-context.md` from the USER project root (it IS the producer/consumer for the Type-1 contract)
 - `.claude/skills/scale-routing/SKILL.md:35` — `bug_fix/feature/refactor/security/devops/docs/review/intake` is a slash-separated task-type category list, not a path
 - `.claude/skills/agent-browser/references/video-recording.md:71` — `./docs/how-to-login.webm` is example user-project data in a CLI invocation example
 - `.claude/skills/jira-issue/references/issue-templates.md:177` — `jira-issue/docs/templates/` is part of an attribution-prose phrase about upstream JIRA-Assistant-Skills layout, not a load

@@ -1,0 +1,27 @@
+{
+  "name": "posttoolfailureprobe-fired",
+  "group": "observer-posttoolfailure-probe",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/posttoolfailure-probe.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PostToolUseFailure\",\"tool_name\":\"Bash\"}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "posttoolfailureprobe-fired",
+  "setupDescription": "BASE hook tree only",
+  "normalizers": [
+    "tmpdir",
+    "isoTimestamp"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".claude/hooks/.logs/hook-log.jsonl": "{\"ts\":\"{{TS}}\",\"hook\":\"posttoolfailure-probe\",\"event\":\"fired\",\"session\":\"corpus-session\",\"detail\":null}\n"
+  }
+}

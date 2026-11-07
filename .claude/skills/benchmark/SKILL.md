@@ -175,7 +175,7 @@ carries a top-level `"type": "audit"` discriminator. Override the output dir wit
 **Artifact schema:** `type`, `run_id`, `ts`, `repo`, `tracked_file_count`,
 `directory_count_excl_git`, `tracked_path_sha256`, `tracked_index_sha256`, `comparison`
 (null in single-repo mode), `working_tree_clean`. A best-effort `audit_result` trace event
-is appended via `append-trace.sh`.
+is appended via `append-trace.cjs`.
 
 **Index-hash definition (toolkit canonical):** `tracked_index_sha256 = sha256(sort(git
 ls-files -s))`. The `-s` flag includes mode + blob hash + stage, so the index hash captures

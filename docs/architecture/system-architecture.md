@@ -161,4 +161,4 @@ deterministic, evidence-gated PR review as a `ReviewSession` under
   anti-accidental, not unforgeable, and proves session-level (not individual-reviewer)
   access; subagent-driven reviews are `attested` and cannot earn Approve. The Gate 2
   narrow extension (`.claude/scripts/validate-review-coverage.cjs`, called from
-  `gate2-check.sh`) validates a review verdict's embedded coverage block.
+  `gate2-check.cjs`) validates a review verdict's embedded coverage block.

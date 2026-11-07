@@ -82,7 +82,7 @@ All under `plans/{date}-trace-analysis/` (created by step-01):
 | `references/trace-schema.md` | JSONL record schema spec |
 | `references/error-taxonomy.md` | Catalog of known failure patterns |
 | `../../../memory/trace-log.jsonl` | Append-only trace store |
-| `../../hooks/append-trace.sh` | Trace writer |
+| `../../hooks/append-trace.cjs` | Trace writer |
 
 ## Start
 

@@ -16,7 +16,8 @@ hooks:
     - matcher: Bash
       hooks:
         - type: command
-          command: bash ${CLAUDE_SKILL_DIR}/bin/check-careful.sh
+          command: node
+          args: ["${CLAUDE_PROJECT_DIR}/.claude/skills/careful/bin/check-careful.cjs"]
           statusMessage: Checking for destructive commands...
 source: gstack
 keywords:

@@ -98,14 +98,14 @@ description: "Dense quick reference for all MeowKit commands, agents, skills, an
 
 | Hook | Type | What it does | Blocks? |
 |------|------|-------------|---------|
-| post-write.sh | PostToolUse | Security scan on Edit/Write | Yes |
-| post-session.sh | Stop | Capture session to memory | No |
-| pre-task-check.sh | Skill-invoked | Injection pattern detection | Yes |
-| pre-implement.sh | Skill-invoked | TDD gate — opt-in via `--tdd` / `MEOWKIT_TDD=1`; no-op otherwise | Only when TDD enabled |
-| pre-ship.sh | Skill-invoked | Test + lint + typecheck | Yes |
-| privacy-block.sh | PreToolUse | Block .env / *.key / credential reads | Yes |
-| gate-enforcement.sh | PreToolUse | Block source writes before Gate 1 approval | Yes |
-| project-context-loader.sh | SessionStart | Auto-load project-context.md into context | No |
+| post-write.cjs | PostToolUse | Security scan on Edit/Write | Yes |
+| post-session.cjs | Stop | Capture session to memory | No |
+| pre-task-check.cjs | Skill-invoked | Injection pattern detection | Yes |
+| pre-implement.cjs | Skill-invoked | TDD gate — opt-in via `--tdd` / `MEOWKIT_TDD=1`; no-op otherwise | Only when TDD enabled |
+| pre-ship.cjs | Skill-invoked | Test + lint + typecheck | Yes |
+| privacy-block.cjs | PreToolUse | Block .env / *.key / credential reads | Yes |
+| gate-enforcement.cjs | PreToolUse | Block source writes before Gate 1 approval | Yes |
+| project-context-loader.cjs | SessionStart | Auto-load project-context.md into context | No |
 
 ## Key Skills
 
@@ -182,7 +182,7 @@ Source of truth: `.meowkit/.env.example`. Most defaults live in `.claude/setting
 
 | Variable | Values | Effect |
 |----------|--------|--------|
-| `MEOWKIT_TDD` | `0` \| `1` | `1` = strict red-green-refactor (`pre-implement.sh` enforces failing-test-first); `0` = optional (default) |
+| `MEOWKIT_TDD` | `0` \| `1` | `1` = strict red-green-refactor (`pre-implement.cjs` enforces failing-test-first); `0` = optional (default) |
 | `MEOWKIT_HOOK_PROFILE` | `standard` \| `fast` \| `strict` | Hook profile selector. Legacy alias `MEOW_HOOK_PROFILE` still accepted; new name wins if both set |
 
 ### Memory loader

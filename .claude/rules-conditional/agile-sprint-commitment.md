@@ -49,4 +49,4 @@ Log transparently, then proceed.
 
 ## Validator scope
 
-`validate-contract.sh` validates per-story sprint-CONTRACT files only. Sprint-STATE files have no validator — YAML parsed inline. Do not invoke `validate-contract.sh` on a sprint-state path; it FAILS.
+`validate-contract.cjs` validates per-story sprint-CONTRACT files only. Sprint-STATE files have no validator — YAML parsed inline. Do not invoke `validate-contract.cjs` on a sprint-state path; it FAILS.

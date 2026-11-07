@@ -151,9 +151,9 @@ echo ""
 # store has at least one record per benchmark invocation, even if the orchestrator
 # never finishes filling in per-task results. Links back to the manifest path so
 # mk:trace-analyze can correlate.
-if [ -x ".codex/hooks/append-trace.sh" ]; then
+if [ -x ".codex/hooks/append-trace.cjs" ]; then
   RUN_MODEL="${MEOWKIT_MODEL_HINT:-the project environment:-unknown}}"
-  bash .codex/hooks/append-trace.sh "benchmark_result" \
+  node .codex/hooks/append-trace.cjs "benchmark_result" \
     "{\"run_id\":\"$RUN_ID\",\"tier\":\"$TIER\",\"model\":\"$RUN_MODEL\",\"manifest_path\":\"$RESULT_FILE\"}" 2>/dev/null || true
 fi
 
@@ -172,7 +172,7 @@ echo "         bash .agents/skills/benchmark/scripts/run-canary.sh check-cap $LE
 echo "       (exit 2 = cap reached — STOP the run; do not start further tasks)"
 echo "  2. After all tasks complete, set status='complete', compute summary"
 echo "  3. Append a benchmark_result trace record:"
-echo "     bash .codex/hooks/append-trace.sh benchmark_result \"\$(cat $RESULT_FILE)\""
+echo "     node .codex/hooks/append-trace.cjs benchmark_result \"\$(cat $RESULT_FILE)\""
 echo "═══════════════════════════════════════════════════════════════"
 
 echo "RUN_ID=$RUN_ID"

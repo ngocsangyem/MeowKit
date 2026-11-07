@@ -98,7 +98,7 @@ The following entries were added in v2.3.0 to route events to `dispatch.cjs`. Th
 }
 ```
 
-`PostToolUse Edit|Write` has both `post-write.sh` (shell, security scan) and `dispatch.cjs` entries. Both fire independently on every file write.
+`PostToolUse Edit|Write` has both `post-write.cjs` (shell, security scan) and `dispatch.cjs` entries. Both fire independently on every file write.
 
 ### Environment variables (v2.3.0+)
 
@@ -110,7 +110,7 @@ MeowKit loads `.meowkit/.env` automatically at session start. This is the recomm
 
 **How it works:**
 
-1. `project-context-loader.sh` (SessionStart) sources `.meowkit/.env` into the shell environment → all shell hooks inherit it
+1. `project-context-loader.cjs` (SessionStart) sources `.meowkit/.env` into the shell environment → all shell hooks inherit it
 2. `dispatch.cjs` parses `.meowkit/.env` into `process.env` → all Node.js handlers inherit it
 3. `mk:multimodal` Python scripts have their own `.env` loading (predates centralized loader)
 
@@ -122,7 +122,7 @@ cp .meowkit/.env.example .meowkit/.env
 # Edit .meowkit/.env with your values
 ```
 
-**Security:** `.env` is gitignored by default. Never commit API keys. The `privacy-block.sh` hook blocks Claude from reading `.env` files directly — the dotenv loader is the only authorized reader.
+**Security:** `.env` is gitignored by default. Never commit API keys. The `privacy-block.cjs` hook blocks Claude from reading `.env` files directly — the dotenv loader is the only authorized reader.
 
 **Template:** See `.meowkit/.env.example` for all supported variables with descriptions.
 
@@ -189,7 +189,7 @@ The `mk:jira-*` family (router + 16 leaves added in v2.8.3) is driven by three `
 | `JIRA_OUTPUT` | `json` (set by wrapper) | Default output format for `jira-as`. | Override per-call: `JIRA_OUTPUT=text bash scripts/jira-as.sh ...` |
 | `JIRA_MOCK_MODE` | *(unset)* | When set to `true`, agents surface `**[MOCK MODE]**` in output headers; intelligence agents avoid live writes. | Sandbox / CI testing. |
 
-The SessionStart hook `jira-env-loader.sh` validates `.meowkit/.env` presence + the 3 required keys. It emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing` to the status line.
+The SessionStart hook `jira-env-loader.cjs` validates `.meowkit/.env` presence + the 3 required keys. It emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing` to the status line.
 
 **Setup (one-time):**
 

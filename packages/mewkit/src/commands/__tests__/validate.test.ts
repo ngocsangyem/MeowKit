@@ -32,10 +32,10 @@ function writeHook(name: string, mode = 0o755): void {
 
 describe("checkHooksExecutable honesty", () => {
 	it("reports a real .sh hook but NOT the lib/ or __tests__/ subdirectories", () => {
-		writeHook("gate-enforcement.sh");
+		writeHook("gate-enforcement.cjs");
 		const results = checkHooksExecutable(claudeDir);
 		const names = results.map((r) => r.name);
-		expect(names).toContain("Hook executable: gate-enforcement.sh");
+		expect(names).toContain("Hook executable: gate-enforcement.cjs");
 		expect(names).not.toContain("Hook executable: lib");
 		expect(names).not.toContain("Hook executable: __tests__");
 	});

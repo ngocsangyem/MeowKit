@@ -31,7 +31,7 @@ Creates and negotiates a sprint contract — a signed agreement between the gene
 - **BDD translation:** 6 rules for converting user stories into Given/When/Then acceptance criteria with anti-pattern detection
 - **Git signing:** two-commit-per-agent protocol — each party commits their signature separately, SHA capture for non-repudiation
 - **Amendment protocol:** nullifies existing signatures on amend, append-only changes, re-signing required
-- **Validation:** `validate-contract.sh` checks 7 categories (frontmatter, status enum, rubric_preset, AC count, GWT form, injection patterns, required sections)
+- **Validation:** `validate-contract.cjs` checks 7 categories (frontmatter, status enum, rubric_preset, AC count, GWT form, injection patterns, required sections)
 - **Hard constraints:** max 2 negotiation rounds, max 15 ACs, LEAN mode bypass via `MEOWKIT_AUTOBUILD_MODE=LEAN`
 
 ## Arguments
@@ -42,7 +42,7 @@ Creates and negotiates a sprint contract — a signed agreement between the gene
 | `--review` | Review a proposed contract (evaluator role) |
 | `--amend` | Amend an existing contract (appends to negotiation log, nullifies signatures) |
 | `--sign` | Sign the contract (generator or evaluator) |
-| `--validate` | Run `validate-contract.sh` checks |
+| `--validate` | Run `validate-contract.cjs` checks |
 | `sprint-goal set/show/align` | Sprint-LEVEL goal management (Agile mode — gated by `agile-sprint-commitment.md` Section 1) |
 
 ### sprint-goal subcommand (Agile mode)
@@ -55,7 +55,7 @@ Sprint-LEVEL goal contract — distinct from per-story sprint-CONTRACT files. Wr
 | `show` | `mk:sprint-contract sprint-goal show --sprint N` | Prints current `sprint_goal:` |
 | `align` | `mk:sprint-contract sprint-goal align --plan <path>` | Renders alignment between plan goal and sprint goal. Advisory only |
 
-**Validator scope note:** the existing `validate-contract.sh` validates per-story sprint-CONTRACT files only. Sprint-STATE files have NO validator — YAML is parsed inline by consuming skills.
+**Validator scope note:** the existing `validate-contract.cjs` validates per-story sprint-CONTRACT files only. Sprint-STATE files have NO validator — YAML is parsed inline by consuming skills.
 
 ## Workflow
 
@@ -63,8 +63,8 @@ Sprint-LEVEL goal contract — distinct from per-story sprint-CONTRACT files. Wr
 2. **Review** — evaluator reviews, may request changes (max 2 rounds)
 3. **Negotiate** — amendments appended to negotiation log (append-only)
 4. **Sign** — generator signs (commit 1), evaluator signs (commit 2). Both SHAs recorded.
-5. **Validate** — `validate-contract.sh` runs. Gate enforcement checks `check-contract-signed.sh`.
-6. **Build** — developer reads signed contract before writing code (enforced by `gate-enforcement.sh`)
+5. **Validate** — `validate-contract.cjs` runs. Gate enforcement checks `check-contract-signed.cjs`.
+6. **Build** — developer reads signed contract before writing code (enforced by `gate-enforcement.cjs`)
 
 ## Usage
 

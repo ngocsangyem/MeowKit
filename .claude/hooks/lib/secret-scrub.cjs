@@ -1,4 +1,4 @@
-// secret-scrub.cjs — JS port of secret-scrub.sh regex set.
+// secret-scrub.cjs — JS port of secret-scrub.cjs regex set.
 // Mirrors the shell version pattern-for-pattern to keep parity across capture
 // paths that prefer in-process scrubbing (lower latency, consistent on all OSes).
 // Conservative: false positives accepted, missed secrets are not.

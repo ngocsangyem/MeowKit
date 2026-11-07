@@ -112,18 +112,12 @@ describe("resolveStateDir — project shapes", () => {
 	});
 });
 
-describe("the three resolvers agree", () => {
+describe("both resolvers agree", () => {
 	// `legacy` is excluded from the all-class sweep: only `memory` follows the legacy tree,
 	// covered by the dedicated tests below.
 	const shapes = ["fresh", "migrated", "legacy-gitkeep", "meowkit-no-memory"] as const;
 	const classes = ["memory", "telemetry", "state", "cache"] as const;
 
-	function shellResolve(root: string, cls: string): string {
-		return execFileSync("bash", ["-c", `. "${join(HOOK_LIB, "meowkit-paths.sh")}"; meowkit_state_dir ${cls}`], {
-			env: { ...process.env, CLAUDE_PROJECT_DIR: root },
-			encoding: "utf-8",
-		}).trim();
-	}
 
 	function cjsResolve(root: string, cls: string): string {
 		return execFileSync(
@@ -137,36 +131,32 @@ describe("the three resolvers agree", () => {
 	}
 
 	for (const shape of shapes) {
-		it(`TypeScript, shell, and cjs resolve identically for a ${shape} project`, () => {
+		it(`TypeScript and cjs resolve identically for a ${shape} project`, () => {
 			const root = makeRoot(shape);
 			for (const cls of classes) {
 				const ts = resolveStateDir(root, cls);
-				expect(shellResolve(root, cls), `shell disagrees on ${cls}`).toBe(ts);
 				expect(cjsResolve(root, cls), `cjs disagrees on ${cls}`).toBe(ts);
 			}
 		});
 	}
 
-	it("all three still agree on MEMORY for a legacy project", () => {
+	it("both still agree on MEMORY for a legacy project", () => {
 		const root = makeRoot("legacy");
 		const ts = resolveStateDir(root, "memory");
 		expect(ts).toBe(join(root, ".claude", "memory"));
-		expect(shellResolve(root, "memory")).toBe(ts);
 		expect(cjsResolve(root, "memory")).toBe(ts);
 	});
 
-	it("all three agree that telemetry/state/cache never fall back, and a stray file does not flip memory", () => {
+	it("both agree that telemetry/state/cache never fall back, and a stray file does not flip memory", () => {
 		const legacy = makeRoot("legacy");
 		for (const cls of ["telemetry", "state", "cache"] as const) {
 			const ts = resolveStateDir(legacy, cls);
 			expect(ts).toBe(join(legacy, ".meowkit", cls));
-			expect(shellResolve(legacy, cls)).toBe(ts);
 			expect(cjsResolve(legacy, cls)).toBe(ts);
 		}
 		const stray = makeRoot("legacy-stray-file");
 		const ts = resolveStateDir(stray, "memory");
 		expect(ts).toBe(join(stray, ".meowkit", "memory"));
-		expect(shellResolve(stray, "memory")).toBe(ts);
 		expect(cjsResolve(stray, "memory")).toBe(ts);
 	});
 });

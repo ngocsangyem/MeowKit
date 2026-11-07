@@ -31,7 +31,7 @@ beforeEach(() => {
 	// A real flat copy carries the always-on rule set; no root CLAUDE.md ships.
 	for (const rule of ALWAYS_ON_RULES) fs.writeFileSync(path.join(meowkitDir, "rules", rule), `# ${rule}\n`);
 	fs.writeFileSync(path.join(meowkitDir, "meowkit.config.json"), JSON.stringify({ description: "" }));
-	const hook = path.join(meowkitDir, "hooks", "gate-enforcement.sh");
+	const hook = path.join(meowkitDir, "hooks", "gate-enforcement.cjs");
 	fs.writeFileSync(hook, "#!/bin/bash\nexit 0\n");
 	fs.chmodSync(hook, 0o755);
 });

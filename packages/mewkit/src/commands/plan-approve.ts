@@ -15,7 +15,7 @@ import { readInstallMetadata } from "../core/install-metadata.js";
 // separate, explicitly-named command.
 //
 // The hash + frontmatter surgery live in the pure-sh helper
-// `.claude/hooks/lib/approval-receipt.sh` — the SAME file the shell Gate 1 hook
+// `.claude/hooks/lib/approval-receipt.cjs` — the SAME file the shell Gate 1 hook
 // uses to VERIFY. Shelling out to it (rather than reimplementing the hash in TS)
 // is what guarantees the writer and the verifier can never drift. Anti-accidental
 // per ADR 260715: this records "an approval was stamped against this plan
@@ -123,7 +123,7 @@ export async function planApprove(args: PlanApproveArgs): Promise<void> {
 
 	// The receipt helper is shipped under .claude/hooks/lib/. It is resolved relative
 	// to the project root (cwd), matching where the Gate 1 hook reads it from.
-	const helper = path.resolve(".claude/hooks/lib/approval-receipt.sh");
+	const helper = path.resolve(".claude/hooks/lib/approval-receipt.cjs");
 	if (!fs.existsSync(helper)) {
 		console.log(pc.red(`plan approve: approval-receipt helper not found at ${helper}`));
 		console.log(pc.dim("This project may predate the receipt mechanism — reinstall .claude/ hooks."));

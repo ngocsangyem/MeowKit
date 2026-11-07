@@ -52,7 +52,7 @@ never an approval predicate.
 - `verification.commands` non-empty before review/finalize.
 - `approvals.gate2 === "approved"` requires a non-empty `review.verdictPath`.
 - `review.sideEffectsDetected === true` requires a non-empty `review.userDecisionAddendum`
-  — mirrors `cook/scripts/validate-gate-2.sh` (mirror status; does NOT replace that script).
+  — mirrors `cook/scripts/validate-gate-2.cjs` (mirror status; does NOT replace that script).
 - **No score validation anywhere.**
 
 Run before presenting for approval:

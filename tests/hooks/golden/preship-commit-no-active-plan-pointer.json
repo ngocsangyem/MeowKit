@@ -1,0 +1,23 @@
+{
+  "name": "preship-commit-no-active-plan-pointer",
+  "group": "gate2-preship",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-ship.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git commit -m \\\"feat: add thing\\\"\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "preship-commit-no-active-plan-pointer",
+  "setupDescription": "staged source file, no session-state/active-plan.json",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@GATE_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nGate 2 structural check FAILED — ship blocked.\n\nShip-capable change (e.g. src/app.ts) with no active-plan pointer.\nCannot tell WHICH review verdict is supposed to authorize this ship, and\nguessing the newest verdict would let an unrelated review authorize it.\nFix: set session-state/active-plan.json {\"path\": \"tasks/plans/<plan-dir>\"}.\n\nGate 2 is human-approved and has no exceptions (.claude/rules/gate-rules.md).\nThis check proves only that the paperwork exists and is self-consistent;\nit does not and cannot prove a human approved anything.\n"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "validate-gate-2-file-missing",
+  "group": "gate-helper-validate-gate-2",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/skills/cook/scripts/validate-gate-2.sh",
+  "args": [
+    "tasks/reviews/does-not-exist-verdict.md"
+  ],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "validate-gate-2-file-missing",
+  "setupDescription": "a verdict path that does not exist",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "marker": null,
+    "stdout": "GATE_2_BLOCKED: File not found: tasks/reviews/does-not-exist-verdict.md\n",
+    "stderr": ""
+  }
+}

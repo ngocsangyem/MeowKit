@@ -153,8 +153,8 @@ flag is present).
 
 ## Hooks
 
-- **pre-ship.sh**: Runs lint + test + typecheck before any commit (always-on via this project's configured hooks, when present)
-- **post-write.sh**: Security scan on every file write (always-on)
+- **pre-ship.cjs**: Runs lint + test + typecheck before any commit (always-on via this project's configured hooks, when present)
+- **post-write.cjs**: Security scan on every file write (always-on)
 - These are NOT session-scoped — they run on every ship regardless of skill activation
 
 ## Related Rules

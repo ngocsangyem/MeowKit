@@ -16,12 +16,14 @@ hooks:
     - matcher: Edit
       hooks:
         - type: command
-          command: bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh
+          command: node
+          args: ["${CLAUDE_PROJECT_DIR}/.claude/skills/freeze/bin/check-freeze.cjs"]
           statusMessage: Checking freeze boundary...
     - matcher: Write
       hooks:
         - type: command
-          command: bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh
+          command: node
+          args: ["${CLAUDE_PROJECT_DIR}/.claude/skills/freeze/bin/check-freeze.cjs"]
           statusMessage: Checking freeze boundary...
 source: gstack
 keywords:

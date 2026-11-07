@@ -26,9 +26,11 @@ describe("doctor --hard-gates", () => {
 		// Sanity: the key gate probes are actually present and PASS.
 		const byName = (n: string) => results.find((r) => r.name.startsWith(n));
 		expect(byName("Gate 1: blocks source write with no plan")?.status).toBe("pass");
-		expect(byName("Gate 1: allows source write once the plan is approved")?.status).toBe("pass");
+		expect(byName("Gate 1 + contract: allows source write")?.status).toBe("pass");
 		expect(byName("Privacy: blocks .env read")?.status).toBe("pass");
-		expect(byName("Runtime: every configured shell hook")?.status).toBe("pass");
+		expect(byName("Gate 2: blocks a commit with no verdict")?.status).toBe("pass");
+		expect(byName("Runtime: no leftover shell hooks")?.status).toBe("pass");
+		expect(byName("Runtime: every configured hook")?.status).toBe("pass");
 		// This probe scaffolds a throwaway project and spawns many real hooks (now incl. an
 		// approval-receipt stamp), so it legitimately exceeds the 5s default on cold runs.
 	}, 30000);
@@ -49,7 +51,7 @@ describe("doctor --hard-gates", () => {
 		);
 
 		const results = await checkHardGates(fixtureDir);
-		const runtime = results.find((r) => r.name.startsWith("Runtime: every configured shell hook"));
+		const runtime = results.find((r) => r.name.startsWith("Runtime: every configured hook"));
 		expect(runtime?.status).toBe("fail");
 		expect(runtime?.detail).toContain("bad.sh");
 	}, 30000);

@@ -24,7 +24,8 @@ hooks:
     - matcher: Write
       hooks:
         - type: command
-          command: bash ${CLAUDE_SKILL_DIR}/bin/check-report-path.sh
+          command: node
+          args: ["${CLAUDE_PROJECT_DIR}/.claude/skills/investigate/bin/check-report-path.cjs"]
           statusMessage: Checking diagnostic report path...
 source: gstack
 keywords:

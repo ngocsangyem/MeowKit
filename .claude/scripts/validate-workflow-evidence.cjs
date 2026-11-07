@@ -13,7 +13,7 @@
 // Exit 0 = EVIDENCE_OK
 // Exit 1 = EVIDENCE_BLOCKED:<comma-separated reasons>
 //
-// Message shape mirrors cook/scripts/validate-gate-2.sh (PREFIX:reasons).
+// Message shape mirrors cook/scripts/validate-gate-2.cjs (PREFIX:reasons).
 
 const fs = require('fs');
 

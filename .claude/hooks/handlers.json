@@ -1,24 +1,35 @@
 {
-  "PostToolUse": {
-    "Edit|Write": [
-      "./handlers/build-verify.cjs",
-      "./handlers/loop-detection.cjs",
-      "./handlers/budget-tracker.cjs",
-      "./handlers/auto-checkpoint.cjs"
-    ],
-    "Bash": [
-      "./handlers/budget-tracker.cjs",
-      "./handlers/review-evidence-tag.cjs"
-    ]
-  },
-  "Stop": [
-    "./handlers/checkpoint-writer.cjs"
-  ],
-  "SessionStart": [
-    "./handlers/model-detector.cjs",
-    "./handlers/orientation-ritual.cjs"
-  ],
-  "UserPromptSubmit": [
-    "./handlers/safety-sentinel-inject.cjs"
+  "schema": 2,
+  "comment": "One entry per observer. `matcher` is present only for tool-scoped events, because the others have nothing to match on. `toggleKey` is declared here now and read from project configuration later; nothing switches off yet. The write guards are deliberately absent: they are registered directly and must never run through a fail-open dispatcher.",
+  "handlers": [
+    { "event": "PreToolUse", "matcher": "Bash", "handler": "./handlers/pre-task-check.cjs", "toggleKey": "preTaskCheck" },
+
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/build-verify.cjs", "toggleKey": "buildVerify" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/loop-detection.cjs", "toggleKey": "loopDetection" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/budget-tracker.cjs", "toggleKey": "budgetTracker" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/auto-checkpoint.cjs", "toggleKey": "autoCheckpoint" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/learning-observer.cjs", "toggleKey": "learningObserver" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/post-write.cjs", "toggleKey": "postWrite" },
+
+    { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/budget-tracker.cjs", "toggleKey": "budgetTracker" },
+    { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/review-evidence-tag.cjs", "toggleKey": "reviewEvidenceTag" },
+
+    { "event": "Stop", "handler": "./handlers/checkpoint-writer.cjs", "toggleKey": "checkpointWriter" },
+    { "event": "Stop", "handler": "./handlers/post-session.cjs", "toggleKey": "postSession" },
+    { "event": "Stop", "handler": "./handlers/control-probe.cjs", "toggleKey": "controlProbe" },
+    { "event": "Stop", "handler": "./handlers/pre-completion-check.cjs", "toggleKey": "preCompletionCheck" },
+
+    { "event": "SessionStart", "handler": "./handlers/model-detector.cjs", "toggleKey": "modelDetector" },
+    { "event": "SessionStart", "handler": "./handlers/orientation-ritual.cjs", "toggleKey": "orientationRitual" },
+    { "event": "SessionStart", "handler": "./handlers/project-context-loader.cjs", "toggleKey": "projectContextLoader" },
+    { "event": "SessionStart", "handler": "./handlers/jira-env-loader.cjs", "toggleKey": "jiraEnvLoader" },
+    { "event": "SessionStart", "handler": "./handlers/capability-bootstrap.cjs", "toggleKey": "capabilityBootstrap" },
+
+    { "event": "UserPromptSubmit", "handler": "./handlers/safety-sentinel-inject.cjs", "toggleKey": "safetySentinelInject" },
+    { "event": "UserPromptSubmit", "handler": "./handlers/tdd-flag-detector.cjs", "toggleKey": "tddFlagDetector" },
+
+    { "event": "PreCompact", "handler": "./handlers/precompact-probe.cjs", "toggleKey": "precompactProbe" },
+
+    { "event": "PostToolUseFailure", "handler": "./handlers/posttoolfailure-probe.cjs", "toggleKey": "posttoolfailureProbe" }
   ]
 }

@@ -1,0 +1,28 @@
+{
+  "name": "learningobserver-first-edit",
+  "group": "observer-learning-observer",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/learning-observer.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"src/app.ts\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "learningobserver-first-edit",
+  "setupDescription": "BASE hook tree only; no prior edit ledger",
+  "normalizers": [
+    "tmpdir",
+    "isoTimestamp"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    "session-state/learning-observer.jsonl": "{\"type\":\"edit\",\"file\":\"src/app.ts\",\"count\":1,\"ts\":\"{{TS}}\"}\n",
+    ".meowkit/telemetry/trace-log.jsonl": "{\"schema_version\":\"1.0\",\"ts\":\"{{TS}}\",\"event\":\"file_edited\",\"run_id\":\"\",\"harness_version\":\"3.0.0\",\"model\":\"\",\"density\":\"\",\"data\":{\"file\":\"src/app.ts\",\"edit_count\":1}}\n"
+  }
+}

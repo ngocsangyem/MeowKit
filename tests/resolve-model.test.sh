@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# resolve-model.test.sh — unit test for hooks/lib/resolve-model.sh
+# resolve-model.test.sh — unit test for hooks/lib/resolve-model.cjs
 #
-# Verifies the 5 resolution paths declared in resolve-model.sh:
+# Verifies the 5 resolution paths declared in resolve-model.cjs:
 #   1. happy_path     — detected-model.json with real model_id → returns id
 #   2. missing_file   — file absent → falls back to env (MEOWKIT_MODEL_HINT)
 #   3. malformed_json — bad JSON → grep fallback OR env fallback OR "unknown"
@@ -12,7 +12,7 @@
 
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-HELPER="$ROOT/.claude/hooks/lib/resolve-model.sh"
+HELPER="$ROOT/.claude/hooks/lib/resolve-model.cjs"
 
 PASS=0
 FAIL=0

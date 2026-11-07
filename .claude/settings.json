@@ -12,7 +12,10 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "node \"$CLAUDE_PROJECT_DIR/.claude/statusline.cjs\""
+    "command": "node",
+    "args": [
+      "${CLAUDE_PROJECT_DIR}/.claude/statusline.cjs"
+    ]
   },
   "hooks": {
     "SessionStart": [
@@ -26,26 +29,12 @@
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/project-context-loader.sh\"",
-            "timeout": 5,
-            "statusMessage": "Loading project context..."
-          },
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" SessionStart",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/jira-env-loader.sh\"",
-            "timeout": 5,
-            "statusMessage": "Validating Jira env..."
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/capability-bootstrap.sh\"",
-            "timeout": 5,
-            "statusMessage": "Loading capability resolution..."
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs",
+              "SessionStart"
+            ],
+            "timeout": 15
           }
         ]
       }
@@ -56,13 +45,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/gate-enforcement.sh\"",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/gate-enforcement.cjs"
+            ],
             "timeout": 10,
             "statusMessage": "Checking Gate 1 approval..."
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/privacy-block.cjs"
+            ],
             "timeout": 5,
             "statusMessage": "Checking file access permissions..."
           }
@@ -73,7 +68,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/privacy-block.cjs"
+            ],
             "timeout": 5,
             "statusMessage": "Checking file access permissions..."
           }
@@ -84,20 +82,31 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-task-check.sh\"",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-ship.sh\"",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-ship.cjs"
+            ],
             "timeout": 30,
             "statusMessage": "Running pre-ship validation..."
           },
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/privacy-block.sh\"",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/privacy-block.cjs"
+            ],
             "timeout": 5,
             "statusMessage": "Checking web fetch targets..."
+          },
+          {
+            "type": "command",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs",
+              "PreToolUse",
+              "Bash"
+            ],
+            "timeout": 10
           }
         ]
       }
@@ -108,18 +117,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-write.sh\"",
-            "timeout": 10,
-            "statusMessage": "Security scanning written file..."
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/learning-observer.sh\"",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" PostToolUse \"Edit|Write\"",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs",
+              "PostToolUse",
+              "Edit|Write"
+            ],
             "timeout": 40
           }
         ]
@@ -129,7 +132,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" PostToolUse Bash",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs",
+              "PostToolUse",
+              "Bash"
+            ],
             "timeout": 15
           }
         ]
@@ -140,23 +148,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-completion-check.sh\"",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-session.sh\"",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" Stop",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/control-probe.sh\"",
-            "timeout": 3
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs",
+              "Stop"
+            ],
+            "timeout": 15
           }
         ]
       }
@@ -166,13 +163,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/tdd-flag-detector.sh\"",
-            "timeout": 3,
-            "statusMessage": "Detecting --tdd flag..."
-          },
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.cjs\" UserPromptSubmit",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs",
+              "UserPromptSubmit"
+            ],
             "timeout": 10
           }
         ]
@@ -185,8 +180,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/precompact-probe.sh\"",
-            "timeout": 3
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs",
+              "PreCompact"
+            ],
+            "timeout": 5
           }
         ]
       }
@@ -196,8 +195,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/posttoolfailure-probe.sh\"",
-            "timeout": 3
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs",
+              "PostToolUseFailure"
+            ],
+            "timeout": 5
           }
         ]
       }
@@ -209,7 +212,6 @@
       "Bash(npm run lint)",
       "Bash(npx tsc --noEmit)",
       "Bash(python .claude/scripts/*)",
-      "Bash(sh .claude/hooks/*)",
       "Bash(node .claude/hooks/*)",
       "Bash(git *)",
       "Bash(gh *)",

@@ -23,7 +23,7 @@ Step-file workflow that ingests `.meowkit/telemetry/trace-log.jsonl`, partitions
 Activate when:
 - `/mk:trace-analyze [--runs N]` (default N=20 runs worth of records)
 - `/mk:trace-analyze --pattern `NAME` (focus on a specific pattern from the error taxonomy)
-- `dead-weight-audit-needed` flag set by `post-session.sh` on model version change
+- `dead-weight-audit-needed` flag set by `post-session.cjs` on model version change
 - After 3+ consecutive harness failures on the same task
 - Quarterly dead-weight audit schedule
 

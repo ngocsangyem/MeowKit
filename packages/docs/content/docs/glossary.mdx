@@ -25,7 +25,7 @@ Every term below means one specific thing in MeowKit. Where a term also has a ge
 
 **Skill**: a packaged procedure the agent loads when the task needs it, addressed as `mk:name`. Skills are instructions; agents are who follows them. A skill is loaded on demand rather than always resident, which is what keeps the context budget survivable.
 
-**Hook**: a script the harness runs at a lifecycle event, registered in `.claude/settings.json`. A hook is the difference between a rule that asks and a rule that blocks: `gate-enforcement.sh` does not advise against writing code before Gate 1, it refuses the write.
+**Hook**: a script the harness runs at a lifecycle event, registered in `.claude/settings.json`. A hook is the difference between a rule that asks and a rule that blocks: `gate-enforcement.cjs` does not advise against writing code before Gate 1, it refuses the write.
 
 ## How things are organised
 

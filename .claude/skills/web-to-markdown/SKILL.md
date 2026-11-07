@@ -94,7 +94,7 @@ See `references/security.md` for the full threat model, attack surface, and defe
 4. Injection scanner: 50+ patterns + encoding detection (base64/ROT13/Unicode/zero-width) + context-flood WARN
 5. **HARD_STOP on injection hit** — content quarantined, no programmatic override, manual user inspection required
 6. Secret scrub on content AND URL BEFORE any disk write
-7. `privacy-block.sh` hook-layer enforcement of SSRF + cache/manifest read blocks
+7. `privacy-block.cjs` hook-layer enforcement of SSRF + cache/manifest read blocks
 8. `injection-audit.py` post-write library scan (called from `persist_fetch.persist` via `scan_file` import, not CLI)
 
 ## Gotchas

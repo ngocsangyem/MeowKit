@@ -1,0 +1,23 @@
+{
+  "name": "stdin-empty-gate-enforcement",
+  "group": "stdin-unreadable",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/gate-enforcement.sh",
+  "args": [],
+  "stdin": "",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "stdin-empty-gate-enforcement",
+  "setupDescription": "BASE hook tree only; stdin is an empty pipe",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  }
+}

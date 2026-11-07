@@ -30,7 +30,7 @@ any read-modify-write cycle. YAML frontmatter append is non-atomic across
 shells; flock is the only mitigation.
 
 Validator: this file class has NO validator. Do not invoke
-`validate-contract.sh` on this path — that script validates per-story
+`validate-contract.cjs` on this path — that script validates per-story
 sprint-CONTRACT files only and will fail (no contract_schema_version,
 no [AC-N] entries here by design).
 -->

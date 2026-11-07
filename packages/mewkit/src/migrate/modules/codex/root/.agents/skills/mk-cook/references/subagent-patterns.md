@@ -133,7 +133,7 @@ Suggestions (1): ["Consider extracting helper for date formatting"]
 ### Phase 5 Ship — Shipper
 
 ```
-delegate a sub-task (subagent_type="shipper", prompt="Run full pre-ship pipeline: pre-ship.sh (test+lint+typecheck), conventional commit (via git-manager), create PR if on feature branch, verify CI, document rollback. Use mk:ship.", description="Ship + PR")
+delegate a sub-task (subagent_type="shipper", prompt="Run full pre-ship pipeline: pre-ship.cjs (test+lint+typecheck), conventional commit (via git-manager), create PR if on feature branch, verify CI, document rollback. Use mk:ship.", description="Ship + PR")
 ```
 
 **Scope (shipper):** pass branch name, base branch, plan-file path (for PR body), changed-file list. Do NOT pass plan internals, session conversation. Shipper invokes `git-manager` internally for raw git ops.

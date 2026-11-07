@@ -49,7 +49,7 @@ Five handlers cross-read each other's state:
 - `auto-checkpoint.cjs` reads both `budget-state.json` and `detected-model.json` to stamp the checkpoint
 - `checkpoint-writer.cjs` reads `active-plan` and `budget-state.json` at Stop
 - `loop-detection.cjs` writes counters that other observers read
-- `pre-completion-check.sh` reads `precompletion-attempts.json` to enforce the 3-attempt re-entry cap
+- `pre-completion-check.cjs` reads `precompletion-attempts.json` to enforce the 3-attempt re-entry cap
 
 This is an **integration bus**, not a log. No transcript carries this coordination — handlers are isolated subprocesses with no shared memory; the filesystem IS the coordination layer.
 
@@ -97,19 +97,19 @@ For each session-state file, here is what it does and why `--resume` cannot repl
 
 | File | Writer | Reader | Why session-state, not `--resume` |
 |---|---|---|---|
-| `budget-state.json` | `budget-tracker.cjs` (PostToolUse) | Same handler + `auto-checkpoint`, `checkpoint-writer`, `post-session.sh` | Live token/cost counter. Each write IS an enforcement action — `budget-tracker` returns `@@BUDGET_BLOCK@@` over cap. |
+| `budget-state.json` | `budget-tracker.cjs` (PostToolUse) | Same handler + `auto-checkpoint`, `checkpoint-writer`, `post-session.cjs` | Live token/cost counter. Each write IS an enforcement action — `budget-tracker` returns `@@BUDGET_BLOCK@@` over cap. |
 | `detected-model.json` | `model-detector.cjs` (SessionStart) | `budget-tracker`, `auto-checkpoint`, `checkpoint-writer` | Model tier drives hook density. Set from SessionStart `model` field. |
 | `edit-counts.json` | `loop-detection.cjs` (PostToolUse Edit/Write) | Same handler | Doom-loop guard. Keyed by `{session_id}:{realpath}`. |
-| `precompletion-attempts.json` | `pre-completion-check.sh` (Stop) | Same hook | 3-attempt re-entry cap on Stop verification gate. |
+| `precompletion-attempts.json` | `pre-completion-check.cjs` (Stop) | Same hook | 3-attempt re-entry cap on Stop verification gate. |
 | `build-verify-cache.json` | `build-verify.cjs` (PostToolUse) | Same handler | Hash-based skip cache for compile/lint. |
-| `learning-observer.jsonl` | `learning-observer.sh` (PostToolUse) | `post-session.sh` (Stop) | Append-log for churn detection input. |
-| `last-session-id` | `project-context-loader.sh` (SessionStart) | Same hook (new-session detection) | Detects when the session_id has changed (Claude Code starts a fresh session vs resumes the same one). |
+| `learning-observer.jsonl` | `learning-observer.cjs` (PostToolUse) | `post-session.cjs` (Stop) | Append-log for churn detection input. |
+| `last-session-id` | `project-context-loader.cjs` (SessionStart) | Same hook (new-session detection) | Detects when the session_id has changed (Claude Code starts a fresh session vs resumes the same one). |
 | `checkpoints/checkpoint-latest.json` | `checkpoint-writer.cjs` (Stop) + `auto-checkpoint.cjs` (phase transitions) | `orientation-ritual.cjs` (SessionStart resume) | Single-file resume context: model tier, density, plan path, git state, budget. v2.7.2 collapsed this from the prior pointer-and-numbered-file scheme. |
 
 <details>
 <summary>Lifecycle</summary>
 
-Most session-state files are wiped by `project-context-loader.sh` on session-id change (when `last-session-id` differs from the current session). Inside a single session, they accumulate. The `checkpoints/` directory holds the *current* checkpoint; `cost-log.json` (durable, in `.meowkit/telemetry/`) holds the *historical* per-session aggregate.
+Most session-state files are wiped by `project-context-loader.cjs` on session-id change (when `last-session-id` differs from the current session). Inside a single session, they accumulate. The `checkpoints/` directory holds the *current* checkpoint; `cost-log.json` (durable, in `.meowkit/telemetry/`) holds the *historical* per-session aggregate.
 
 </details>
 
@@ -132,7 +132,7 @@ The layer is not perfect. A 2026-05-01 council audit flagged three file-level co
 
 - **`last-session-id`** may overlap with the SessionStart `source` field (`startup` vs `resume` vs `clear`). The two signals are genuinely different (`source` = trigger; `last-session-id` = whether the ID changed), but the overlap is worth a code-level audit before the next refactor.
 - **`detected-model.json`** is read from disk by every PostToolUse handler. If `dispatch.cjs` ever evolves to pass shared state through its call chain, the file could be eliminated as an IPC crutch.
-- **`learning-observer.jsonl`** has one writer (`learning-observer.sh`) and one reader (`post-session.sh` at Stop). If neither is doing something useful with the data, the log is dead instrumentation.
+- **`learning-observer.jsonl`** has one writer (`learning-observer.cjs`) and one reader (`post-session.cjs` at Stop). If neither is doing something useful with the data, the log is dead instrumentation.
 
 These are micro-redundancies inside a layer that is genuinely complementary — not reasons to remove the layer.
 

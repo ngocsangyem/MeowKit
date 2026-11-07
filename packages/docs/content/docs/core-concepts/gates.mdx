@@ -11,7 +11,7 @@ MeowKit has two hard stops that no agent, mode, or flag can bypass. Both require
 
 | Gate | When | What it blocks | Mechanism |
 |------|------|---------------|-----------|
-| **Gate 1** | After Phase 1 (Plan) | Any source code writes | `gate-enforcement.sh` hook on PreToolUse (Edit\|Write) |
+| **Gate 1** | After Phase 1 (Plan) | Any source code writes | `gate-enforcement.cjs` hook on PreToolUse (Edit\|Write) |
 | **Gate 2** | After Phase 4 (Review) | Shipping / deployment | Behavioral: reviewer verdict required at `tasks/reviews/` |
 
 ### Gate 1: Plan before code
@@ -20,7 +20,7 @@ Gate 1 ensures the agent cannot start implementing until a human approves the pl
 
 1. Planner produces a plan at `tasks/plans/YYMMDD-name/plan.md`
 2. Plan is presented to the human for review
-3. Only after approval does `gate-enforcement.sh` allow file writes to `src/`, `lib/`, `app/`
+3. Only after approval does `gate-enforcement.cjs` allow file writes to `src/`, `lib/`, `app/`
 
 **Bypass conditions (documented, intentional):**
 - `/mk:fix --quick` for trivial fixes affecting ≤ 2 files
@@ -55,7 +55,7 @@ Skills that skip planning have documented reasons: `mk:investigate` and `mk:offi
 
 A gate doing its job looks like a tool that stopped working. These are the four ways it usually shows up.
 
-**The agent says it cannot edit a file, and you did not ask it to plan anything.** Gate 1 is unapproved. `gate-enforcement.sh` refuses every source write until a plan exists and you have approved it. Run `/mk:plan <what you want>`, read what it produces, and approve it. If the change genuinely is a one-liner, `/mk:fix` on a simple bug skips the gate by design; the fix is the plan.
+**The agent says it cannot edit a file, and you did not ask it to plan anything.** Gate 1 is unapproved. `gate-enforcement.cjs` refuses every source write until a plan exists and you have approved it. Run `/mk:plan <what you want>`, read what it produces, and approve it. If the change genuinely is a one-liner, `/mk:fix` on a simple bug skips the gate by design; the fix is the plan.
 
 **You approved a plan and it is still blocked.** The approval is bound to the plan as it was when you approved it. Editing the plan afterwards invalidates that binding on purpose, so changed scope cannot inherit an old approval. Approve again with `npx mewkit plan approve <plan-dir>`.
 
@@ -81,9 +81,9 @@ If you want the gate off for a run, there is no flag. That is the design, not an
 
 | Hook | Event | What it blocks |
 |------|-------|---------------|
-| `gate-enforcement.sh` | PreToolUse (Edit\|Write) | Writes before Gate 1 |
-| `privacy-block.sh` | PreToolUse (Read) | Reads of `.env`, `*.key`, SSH keys, credentials |
-| `privacy-block.sh` | PreToolUse (Bash) | SSRF attempts |
+| `gate-enforcement.cjs` | PreToolUse (Edit\|Write) | Writes before Gate 1 |
+| `privacy-block.cjs` | PreToolUse (Read) | Reads of `.env`, `*.key`, SSH keys, credentials |
+| `privacy-block.cjs` | PreToolUse (Bash) | SSRF attempts |
 
 These hooks intercept the tool call before it executes. The agent never sees the blocked content.
 
@@ -91,7 +91,7 @@ These hooks intercept the tool call before it executes. The agent never sees the
 
 | Hook | Event | What it checks |
 |------|-------|---------------|
-| `post-write.sh` | PostToolUse (Edit\|Write) | Security scan on every written file |
+| `post-write.cjs` | PostToolUse (Edit\|Write) | Security scan on every written file |
 | `build-verify.cjs` | PostToolUse (Edit\|Write) | Compile/lint on every source change |
 
 These run after the tool call. They provide feedback but don't block: the hook exits 0 and injects warnings into context.

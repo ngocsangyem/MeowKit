@@ -51,7 +51,7 @@ The Atlassian-MCP-coupled implementation has been removed. Jira execution now li
 
 Install, authentication, safety rules, and troubleshooting live on [Jira Integration](/guides/jira-integration). The variable list is in [Configuration](/reference/configuration#jira).
 
-Mechanically: the SessionStart hook `jira-env-loader.sh` validates `.meowkit/.env` and emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing`; the wrapper `scripts/jira-as.sh` translates `MEOW_JIRA_*` -> native `JIRA_*` env per call.
+Mechanically: the SessionStart hook `jira-env-loader.cjs` validates `.meowkit/.env` and emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing`; the wrapper `scripts/jira-as.sh` translates `MEOW_JIRA_*` -> native `JIRA_*` env per call.
 ## Architecture
 
 The router recommends a leaf and never executes; each of the 16 leaves runs `context: fork` against its matching agent in `.claude/agents/`.

@@ -26,10 +26,10 @@ MeowKit controls what context is **injected** at session boundaries. It cannot c
 
 | Source                      | Content                             | Token estimate | Cap                   |
 | --------------------------- | ----------------------------------- | -------------- | --------------------- |
-| `project-context-loader.sh` | `docs/project-context.md`           | ~500–3000t     | 12KB warn, 24KB error |
-| `project-context-loader.sh` | `.claude/memory/preferences.md`     | ≤1000t         | 4096B hard cap        |
-| `project-context-loader.sh` | Directory tree (depth 2)            | ~80t           | 30 lines              |
-| `project-context-loader.sh` | Tool availability + package scripts | ~100t          | 10 scripts            |
+| `project-context-loader.cjs` | `docs/project-context.md`           | ~500–3000t     | 12KB warn, 24KB error |
+| `project-context-loader.cjs` | `.claude/memory/preferences.md`     | ≤1000t         | 4096B hard cap        |
+| `project-context-loader.cjs` | Directory tree (depth 2)            | ~80t           | 30 lines              |
+| `project-context-loader.cjs` | Tool availability + package scripts | ~100t          | 10 scripts            |
 | `orientation-ritual.cjs`    | Checkpoint context (resume only)    | ~100t          | Fixed schema          |
 
 ### 2. UserPromptSubmit (every user message)
@@ -70,7 +70,7 @@ Skills load step files JIT (one step at a time). Memory topic files load per-ski
 **Moderate:**
 
 - Orchestration prompt template: documented delegation checklist with named anti-patterns.
-- `gate-enforcement.sh` + `privacy-block.sh`: block access to sensitive files/dirs before they enter context.
+- `gate-enforcement.cjs` + `privacy-block.cjs`: block access to sensitive files/dirs before they enter context.
 - Build-verify cache: file-hash cache skips re-running build on unchanged files.
 
 ## Subagent Delegation Protocol
@@ -121,7 +121,7 @@ These approaches were explicitly evaluated and rejected:
 
 Memory topic files in `.claude/memory/` have a 90-day automated pruning policy:
 
-- `post-session.sh` runs pruning on Stop (daily rate-limit via `session-state/last-prune-date`)
+- `post-session.cjs` runs pruning on Stop (daily rate-limit via `session-state/last-prune-date`)
 - Only entries with ISO 8601 date markers in headers are pruned
 - Entries without date markers are preserved (require manual review)
 - Pruned entries logged to `.claude/memory/pruned-log.md`

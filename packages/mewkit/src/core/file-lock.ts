@@ -6,7 +6,7 @@
 //
 // The lock-file SHAPE (`<pid>\n<ms-epoch>\n`) and the reclaim rule (dead PID OR
 // age > STALE_LOCK_MS) are a cross-language contract: the shell trace writer
-// (hooks/append-trace.sh) contends on the SAME sidecar lock path with the SAME
+// (hooks/append-trace.cjs) contends on the SAME sidecar lock path with the SAME
 // protocol, so a bash writer and a TypeScript writer mutually exclude. The sync
 // variant below exists so a synchronous caller (the trace append path) shares
 // that one primitive instead of forking a second locking scheme.
@@ -61,7 +61,7 @@ function lockIsReclaimable(content: string): boolean {
  *  a readable empty file between the two calls. Returns false when another writer holds it.
  *
  *  The published file keeps the cross-language shape `<pid>\n<ms-epoch>\n`, so the shell
- *  writer in hooks/append-trace.sh contends on the same object with the same protocol. */
+ *  writer in hooks/append-trace.cjs contends on the same object with the same protocol. */
 function lockContent(): string {
 	return `${process.pid}\n${Date.now()}\n`;
 }

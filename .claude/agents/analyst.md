@@ -31,7 +31,7 @@ You own `.meowkit/telemetry/cost-log.json`.
 ### `cost-log.json` schema (v2)
 
 A top-level JSON **array**, append-only, truncated to the most recent 1 000 entries. One entry
-per session, written by `.claude/hooks/post-session.sh`:
+per session, written by `.claude/hooks/handlers/post-session.cjs`:
 
 | Field | Meaning |
 |---|---|

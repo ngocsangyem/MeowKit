@@ -1,0 +1,23 @@
+{
+  "name": "pretaskcheck-no-task-description",
+  "group": "observer-pre-task-check",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-task-check.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "pretaskcheck-no-task-description",
+  "setupDescription": "a payload carrying no command",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "PASS — no task description provided, skipping injection check.\n",
+    "stderr": ""
+  }
+}

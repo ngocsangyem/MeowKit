@@ -76,7 +76,7 @@ const CLAUDE_CODE_LIFECYCLE: LifecycleMap = {
 		status: "supported",
 		gate: true,
 		evidence: "Stop hook can block the stop (pre-completion-check security-BLOCK, exit 2)",
-		proof: ".claude/hooks/__tests__/test-pre-completion-check.sh",
+		proof: "tests/hooks/completion-gate.test.ts",
 	},
 	pre_compaction: { status: "supported", gate: false, evidence: "PreCompact hook in shipped settings.json (observe)" },
 	subagent_start: {

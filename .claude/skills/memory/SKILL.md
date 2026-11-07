@@ -92,7 +92,7 @@ Rules:
   checklist asks whether the memory diff adds instruction-like text or secrets.
 - **Linted at three points.** `mewkit note` lints the entry before it appends, so a finding never
   reaches the file. `npx mewkit validate --memory` lints the whole store and is run fail-closed by
-  the `pre-ship.sh` hook on `git commit` / `push` / `merge` (exit 2 blocks the ship; if no `mewkit` CLI resolves it prints a visible SKIP instead) and by this
+  the `pre-ship.cjs` hook on `git commit` / `push` / `merge` (exit 2 blocks the ship; if no `mewkit` CLI resolves it prints a visible SKIP instead) and by this
   kit's own CI. Both fail on injection phrases, secret-shaped tokens, an unscannable file, or a
   file over 300 lines, without echoing the matched secret. Run it yourself before you commit if
   you edited the store by hand. `mewkit note` refuses an append that would push a file over the

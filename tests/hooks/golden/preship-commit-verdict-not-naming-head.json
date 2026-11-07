@@ -1,0 +1,23 @@
+{
+  "name": "preship-commit-verdict-not-naming-head",
+  "group": "gate2-preship",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-ship.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git commit -m \\\"feat: add thing\\\"\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "preship-commit-verdict-not-naming-head",
+  "setupDescription": "one passing verdict that records no revision",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@GATE_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nGate 2 structural check FAILED — ship blocked.\n\nVerdict tasks/reviews/261101-corpus-demo-verdict.md does not name the revision under review (b5c9dd3).\nA verdict with no matching revision cannot be tied to this code — a stale\nverdict from an earlier state would look identical to a current one.\nFix: record the reviewed revision in the verdict (e.g. a 'Revision: b5c9dd3'\nline), or re-review at the current HEAD and record its SHA.\n\nGate 2 is human-approved and has no exceptions (.claude/rules/gate-rules.md).\nThis check proves only that the paperwork exists and is self-consistent;\nit does not and cannot prove a human approved anything.\n"
+  }
+}

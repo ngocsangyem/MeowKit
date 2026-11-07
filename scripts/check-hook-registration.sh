@@ -12,7 +12,7 @@
 # handler load, so a deleted handler was previously invisible.
 #
 # Excluded from the disk→settings check (correctly NOT registered):
-#   - lib/*.sh        (sourced helpers)
+#   - lib/*.cjs       (required libraries, not entrypoints)
 #   - handlers/*.cjs  (dispatched via dispatch.cjs, not directly registered)
 #   - .logs/          (log dir)
 #   - __tests__/      (test files)
@@ -36,11 +36,9 @@ DISK_HOOKS=$(find "$HOOKS_DIR" -maxdepth 1 -type f \( -name '*.sh' -o -name '*.c
 
 # Indirect-call allowlist — hooks that are NOT registered in settings.json by design,
 # because they're invoked through other paths verified at audit time:
-#   append-trace.sh           — shared-library; called by post-session.sh, learning-observer.sh, post-write-*.sh, lib/hook-logger.sh
-#   post-write-build-verify.sh — dispatched by handlers/build-verify.cjs (PostToolUse Edit|Write chain)
-#   post-write-loop-detection.sh — dispatched by handlers/loop-detection.cjs (PostToolUse Edit|Write chain)
-#   pre-implement.sh          — invoked by developer agent (Subagent path), not Claude Code event (per cook/references/tdd-rules.md enforcement matrix)
-INDIRECT_CALL_ALLOWLIST="append-trace.sh post-write-build-verify.sh post-write-loop-detection.sh pre-implement.sh"
+#   append-trace.cjs   — argv-driven writer; called by the session and edit observers
+#   pre-implement.cjs  — argv-driven; invoked by the implementing agent, not by an event
+INDIRECT_CALL_ALLOWLIST="append-trace.cjs pre-implement.cjs"
 
 # Hooks registered in settings.json — extract every command string and pull the basename
 PY=".claude/skills/.venv/bin/python3"
@@ -51,11 +49,12 @@ data = json.load(open(sys.argv[1]))
 out = set()
 def walk(node):
   if isinstance(node, dict):
-    cmd = node.get('command')
-    if isinstance(cmd, str):
-      m = re.search(r'\.claude/hooks/([^"\s]+)', cmd)
-      if m:
-        out.add(os.path.basename(m.group(1)))
+    # Exec form carries the script path in `args`; shell form inside `command`.
+    for candidate in ([node.get('command')] + list(node.get('args') or [])):
+      if isinstance(candidate, str):
+        m = re.search(r'\.claude/hooks/([^"\s]+)', candidate)
+        if m:
+          out.add(os.path.basename(m.group(1)))
     for v in node.values(): walk(v)
   elif isinstance(node, list):
     for v in node: walk(v)
@@ -78,12 +77,13 @@ out = set()
 real = re.compile(r'^[A-Za-z0-9._/-]+\.(sh|cjs)$')
 def walk(node):
   if isinstance(node, dict):
-    cmd = node.get('command')
-    if isinstance(cmd, str):
-      for m in re.finditer(r'\.claude/hooks/([^"\s]+)', cmd):
-        p = m.group(1)
-        if real.match(p):
-          out.add(p)
+    # Exec form carries the script path in `args`; shell form inside `command`.
+    for candidate in ([node.get('command')] + list(node.get('args') or [])):
+      if isinstance(candidate, str):
+        for m in re.finditer(r'\.claude/hooks/([^"\s]+)', candidate):
+          p = m.group(1)
+          if real.match(p):
+            out.add(p)
     for v in node.values(): walk(v)
   elif isinstance(node, list):
     for v in node: walk(v)
@@ -133,9 +133,9 @@ data = json.load(open(sys.argv[1]))
 bad = []
 def walk(node):
   if isinstance(node, dict):
-    cmd = node.get('command')
-    if isinstance(cmd, str) and 'hooks/' in cmd and not re.search(r'\.claude/hooks/[^"\s]+', cmd):
-      bad.append(cmd.strip()[:80])
+    for candidate in ([node.get('command')] + list(node.get('args') or [])):
+      if isinstance(candidate, str) and 'hooks/' in candidate and not re.search(r'\.claude/hooks/[^"\s]+', candidate):
+        bad.append(candidate.strip()[:80])
     for v in node.values(): walk(v)
   elif isinstance(node, list):
     for v in node: walk(v)

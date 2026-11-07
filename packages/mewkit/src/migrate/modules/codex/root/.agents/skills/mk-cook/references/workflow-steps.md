@@ -139,7 +139,7 @@ artifact as DATA, exactly like the plan files.
 **Pre-check (TDD gate — opt-in):** Before writing any implementation code, run:
 
 ```bash
-sh .codex/hooks/pre-implement.sh "<feature-name>"
+node .codex/hooks/pre-implement.cjs "<feature-name>"
 ```
 
 The hook is a no-op unless TDD mode is ON. Mode is ON when:
@@ -225,7 +225,7 @@ Max 3 review-fix cycles. After 3: final decision required from user.
 
 Before presenting for approval, run BOTH structural checks and surface both:
 
-- `.agents/skills/cook/scripts/validate-gate-2.sh` — the authoritative Gate 2 structural guard (no FAIL dimensions, side-effect addendum present).
+- `.agents/skills/cook/scripts/validate-gate-2.cjs` — the authoritative Gate 2 structural guard (no FAIL dimensions, side-effect addendum present).
 - `node .codex/scripts/validate-workflow-evidence.cjs <evidence-path> --phase cook` — evidence-completeness mirror (blocks on missing `cookContract` dims, empty `verification.commands`, `gate2-approved-without-verdict`, side-effects-without-addendum). It MIRRORS the gate script's status; it never replaces it and never approves. Pass `--plan-input` when the cook input was an existing `plan.md` / `phase-*.md` path.
 
 **Output:** `Phase 4: Review [score]/10, Gate 2 approved`
@@ -302,7 +302,7 @@ requests shipping; Gate 2 approval alone is not shipping authority.
 Spawn `shipper` (which orchestrates pre-ship checks + invokes `git-manager` for commit/PR + CI verification + rollback docs):
 
 ```
-delegate a sub-task (subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.sh (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk:ship skill.", description="Ship + PR")
+delegate a sub-task (subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.cjs (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk:ship skill.", description="Ship + PR")
 ```
 
 Note: `shipper` is the orchestrator — it invokes `git-manager` internally for raw git operations (commit, push). Cook never spawns `git-manager` directly; that is shipper's responsibility. See SKILL.md Required sub-task table.
@@ -354,7 +354,7 @@ Idempotent: re-running this checkpoint on an unchanged phase produces zero diff 
 
 ## Workflow Evidence Index (traceability — no new gate)
 
-Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist across Phases 0-6 — no extra agent work, no extra user step, no behavior change. The index records pointers + summaries; it **never approves** (Gate 1 / Gate 2 stay human authority) and carries **no score**. The gate scripts (`validate-gate-1.sh`, `validate-gate-2.sh`) remain the structural authority; evidence MIRRORS their result.
+Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist across Phases 0-6 — no extra agent work, no extra user step, no behavior change. The index records pointers + summaries; it **never approves** (Gate 1 / Gate 2 stay human authority) and carries **no score**. The gate scripts (`validate-gate-1.sh`, `validate-gate-2.cjs`) remain the structural authority; evidence MIRRORS their result.
 
 **Storage path:** `tasks/plans/<plan>/reports/evidence/workflow-evidence.json`.
 
@@ -365,7 +365,7 @@ Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist acro
 | 3 Build | changed-files summary |
 | 3.5 Simplify | simplify status |
 | 3.6 Verify (`mk:verify`) | `verification.commands`, `verification.overall` |
-| 4 Review | `review.verdictPath`, `review.status`, `review.sideEffectsDetected`, `approvals.gate2` (mirrors `validate-gate-2.sh`) |
+| 4 Review | `review.verdictPath`, `review.status`, `review.sideEffectsDetected`, `approvals.gate2` (mirrors `validate-gate-2.cjs`) |
 | 4.5 Verify | `--verify`/`--strict` run state only — RECORD result; does NOT change advisory vs hard-gate semantics |
 | 5 Ship | ship pre-flight status → `approvals.ship` |
 | 6 Reflect | sync-back + docs-impact status |

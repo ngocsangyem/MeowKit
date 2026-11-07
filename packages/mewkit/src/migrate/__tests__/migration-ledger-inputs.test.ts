@@ -41,7 +41,7 @@ describe("migration-ledger-inputs", () => {
 			agents: [item("planner")],
 			rules: [{ ...item("security-rules"), type: "rules" }],
 			skills: [skill("demo")],
-			skippedShellHooks: ["gate-enforcement.sh", "privacy-block.sh"],
+			skippedShellHooks: ["gate-enforcement.cjs", "privacy-block.cjs"],
 		});
 		expect(enumerateDiscoveredArtifacts(d)).toHaveLength(5);
 
@@ -66,7 +66,7 @@ describe("migration-ledger-inputs", () => {
 	});
 
 	it("marks shell hooks with no outcome as skipped (not failed)", () => {
-		const d = discovered({ skippedShellHooks: ["gate-enforcement.sh"] });
+		const d = discovered({ skippedShellHooks: ["gate-enforcement.cjs"] });
 		const records = buildRunRecords({
 			discovered: d,
 			provider: "codex",

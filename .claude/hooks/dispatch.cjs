@@ -1,153 +1,115 @@
 #!/usr/bin/env node
-// dispatch.cjs — Central event dispatcher for MeowKit Node.js hooks.
-// Parses stdin JSON once, loads handler registry from handlers.json,
-// dispatches to matching handlers sequentially.
+'use strict';
+// dispatch.cjs — run the observers registered for one event.
 //
-// Usage: node dispatch.cjs <EventName> [Matcher]
-//   e.g. node dispatch.cjs PostToolUse "Edit|Write"
-//        node dispatch.cjs Stop
+//   node dispatch.cjs <EventName> [Matcher]
 //
-// Security: gate-enforcement.sh and privacy-block.sh stay independent
-// in settings.json — they are NOT routed through this dispatcher.
+// Observers are fail-OPEN by contract. One that throws, fails to load, or has a
+// syntax error is reported on stderr and the rest still run, because an
+// observer's job is to watch: a broken watcher must not stop the work it was
+// watching. That is exactly why the write guards are NOT routed through here —
+// they need the opposite behavior and are registered on their own.
+//
+// Two observers are an exception to "output is advisory", and both have their
+// output passed through rather than swallowed: the write scanner reports a
+// finding and fails the tool result, and the completion check answers with a
+// block decision. Both are emitted only AFTER every other observer has run, so
+// a block never costs the rest of the chain its turn.
+//
+// Each handler is required lazily inside the try block. Loading them up front
+// would let one unparseable file take down the whole event.
 
-const fs = require('fs');
-const path = require('path');
+const path = require('node:path');
 
-// Must point to meowkit root (not parent repo) for .claude/.env resolution
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const HOOKS_DIR = path.join(ROOT, '.claude', 'hooks');
 
-// Load the project dotenv for Node.js handlers — no external dependency.
-// Canonical `.meowkit/.env` first, then the pre-move `.claude/.env` so an existing install
-// keeps working. Never overrides an existing var, so the first file to define a key wins
-// and a shell export beats both.
-const dotenvPaths = [path.join(ROOT, '.meowkit', '.env'), path.join(ROOT, '.claude', '.env')];
-try {
-  for (const dotenvPath of dotenvPaths) {
-    if (!fs.existsSync(dotenvPath)) continue;
-    const lines = fs.readFileSync(dotenvPath, 'utf8').split('\n');
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-      const eqIdx = trimmed.indexOf('=');
-      if (eqIdx < 1) continue;
-      const key = trimmed.slice(0, eqIdx).trim();
-      // Validate key is a legal env var name (skip rogue keys silently)
-      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) continue;
-      // Block dangerous keys (env injection defense)
-      if (['PATH', 'LD_PRELOAD', 'LD_LIBRARY_PATH', 'DYLD_INSERT_LIBRARIES', 'DYLD_FRAMEWORK_PATH', 'IFS', 'BASH_ENV', 'ENV'].includes(key)) continue;
+const report = (message) => process.stderr.write(`dispatch: ${message}\n`);
 
-      let val = trimmed.slice(eqIdx + 1).trim();
-      // Detect quoted values BEFORE stripping comments — API keys like
-      // "abc#123" must preserve the `#` literally.
-      const isQuoted = (val.startsWith('"') && val.endsWith('"')) ||
-                       (val.startsWith("'") && val.endsWith("'"));
-      // Strip inline comments only for unquoted values (" # " pattern)
-      if (!isQuoted) {
-        const commentIdx = val.search(/\s+#/);
-        if (commentIdx > 0) val = val.slice(0, commentIdx).trimEnd();
-      } else {
-        // Strip surrounding quotes
-        val = val.slice(1, -1);
-      }
-      // Don't override existing env vars (shell export / settings.json env wins)
-      if (!(key in process.env)) {
-        process.env[key] = val;
-      }
-    }
-  }
-} catch (_) { /* graceful — dotenv is optional */ }
+/**
+ * Normalise what a handler returned. A plain string is stdout; an object may
+ * also carry stderr and an exit code. Anything else is treated as "nothing to
+ * say", so a handler that returns undefined is normal rather than an error.
+ */
+function normalizeResult(value) {
+  if (!value) return null;
+  if (typeof value === 'string') return { stdout: value, stderr: '', exitCode: 0, feedback: false };
+  if (typeof value !== 'object') return null;
+  return {
+    stdout: typeof value.stdout === 'string' ? value.stdout : '',
+    stderr: typeof value.stderr === 'string' ? value.stderr : '',
+    exitCode: Number.isInteger(value.exitCode) ? value.exitCode : 0,
+    feedback: value.feedback === true,
+  };
+}
+
+async function callHandler(entry, ctx, state) {
+  const absPath = path.resolve(HOOKS_DIR, entry.handler);
+  const handler = require(absPath);
+  const run = typeof handler === 'function' ? handler : handler.run;
+  if (typeof run !== 'function') throw new Error('exports no callable handler');
+  return normalizeResult(await run(ctx, state));
+}
 
 async function main() {
   const event = process.argv[2] || '';
   const matcher = process.argv[3] || '';
 
-  // Load handler registry
-  const registryPath = path.join(HOOKS_DIR, 'handlers.json');
-  let registry;
+  const { loadRegistry, selectHandlers } = require(path.join(HOOKS_DIR, 'lib', 'handler-registry.cjs'));
+
+  let selected;
   try {
-    registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+    selected = selectHandlers(loadRegistry(ROOT), event, matcher);
   } catch (err) {
-    process.stderr.write(`dispatch: failed to load handlers.json: ${err.message}\n`);
-    process.exit(0); // graceful degradation — don't block Claude Code
-  }
-
-  // Find handlers for this event + matcher
-  const eventHandlers = registry[event];
-  if (!eventHandlers) {
+    // No registry means no observers to run. Report it and stand aside: the
+    // guards are registered independently and are unaffected.
+    report(err.message);
     process.exit(0);
   }
+  if (selected.length === 0) process.exit(0);
 
-  let handlerPaths;
-  if (Array.isArray(eventHandlers)) {
-    // Events without matchers (Stop, SessionStart, UserPromptSubmit)
-    handlerPaths = eventHandlers;
-  } else {
-    // Events with matchers (PostToolUse, PreToolUse)
-    handlerPaths = eventHandlers[matcher] || [];
-  }
-
-  if (handlerPaths.length === 0) {
-    process.exit(0);
-  }
-
-  // Read and parse stdin once
-  const { parseStdin } = require(path.join(HOOKS_DIR, 'lib', 'parse-stdin.cjs'));
-  const ctx = await parseStdin();
-
-  // Load shared state module
+  const { readHookInput, normalizeFilePath } = require(path.join(HOOKS_DIR, 'lib', 'parse-stdin.cjs'));
+  const input = await readHookInput();
   const state = require(path.join(HOOKS_DIR, 'lib', 'shared-state.cjs'));
 
-  // Dispatch to each handler sequentially, collect stdout output
-  let output = '';
-  for (const handlerPath of handlerPaths) {
+  // Handlers receive the parsed payload plus the resolved root, so none of them
+  // has to re-derive either. Unreadable input is passed through as an empty
+  // payload: an observer with nothing to look at simply has nothing to do.
+  //
+  // Two spellings of the target path are exposed because handlers need
+  // different ones. `tool_input.file_path` is resolved against the session cwd,
+  // which is what the state-keeping handlers key on. `hookInput.filePath` is the
+  // path exactly as the payload spelled it, which the handlers that print it or
+  // match it against repo-relative rules must use — resolving it there would
+  // change both the message and the rule outcome.
+  const ctx = { ...input.data, root: ROOT, hookInput: input, event, matcher };
+  if (ctx.tool_input && typeof ctx.tool_input === 'object') {
+    ctx.tool_input = { ...ctx.tool_input, file_path: normalizeFilePath(ctx.tool_input.file_path, input.cwd) };
+  }
+
+  const advisory = [];
+  const feedback = [];
+
+  for (const entry of selected) {
     try {
-      const absPath = path.resolve(HOOKS_DIR, handlerPath);
-      const handler = require(absPath);
-      if (typeof handler === 'function') {
-        const result = await handler(ctx, state);
-        if (result) output += result;
-      } else if (typeof handler.run === 'function') {
-        const result = await handler.run(ctx, state);
-        if (result) output += result;
-      }
+      const result = await callHandler(entry, ctx, state);
+      if (result) (result.feedback ? feedback : advisory).push(result);
     } catch (err) {
-      process.stderr.write(`dispatch: handler ${handlerPath} error: ${err.message}\n`);
-      // Continue to next handler — don't let one handler crash others
+      report(`handler ${entry.handler} error: ${err.message}`);
     }
   }
 
-  if (output) {
-    process.stdout.write(output);
+  let exitCode = 0;
+  for (const result of [...advisory, ...feedback]) {
+    if (result.stdout) process.stdout.write(result.stdout);
+    if (result.stderr) process.stderr.write(result.stderr);
+    if (result.exitCode > exitCode) exitCode = result.exitCode;
   }
-
-  // Gated runtime-truth sentinel: confirms dispatch.cjs Stop handler chain
-  // ran to completion. Off by default; opt in: MEOWKIT_HOOK_DEBUG=1.
-  // Reaches the same file post-session.sh writes (stop-env-<TIMESTAMP>.txt),
-  // distinguished by the dispatch_stop_completed line.
-  if (process.env.MEOWKIT_HOOK_DEBUG === '1' && event === 'Stop') {
-    try {
-      const dbgDir = path.join(ROOT, 'session-state', '.debug');
-      fs.mkdirSync(dbgDir, { recursive: true });
-      // Use a generic sentinel file (Stop event ordering means post-session.sh's
-      // timestamped file may not be deterministically locatable from here).
-      const sentinelPath = path.join(dbgDir, `dispatch-stop-${Date.now()}.txt`);
-      const lines = [
-        'hook=dispatch.cjs',
-        `event=${event}`,
-        `CLAUDE_PROJECT_DIR=${process.env.CLAUDE_PROJECT_DIR || 'UNSET'}`,
-        `ROOT=${ROOT}`,
-        `cwd=${process.cwd()}`,
-        `handlers_count=${handlerPaths.length}`,
-        `dispatch_stop_completed=1`,
-        `ts=${new Date().toISOString()}`,
-      ].join('\n') + '\n';
-      fs.writeFileSync(sentinelPath, lines);
-    } catch (_) { /* graceful — debug never breaks the hook */ }
-  }
+  process.exit(exitCode);
 }
 
 main().catch((err) => {
-  process.stderr.write(`dispatch: fatal: ${err.message}\n`);
-  process.exit(0); // graceful degradation
+  // A dispatcher fault is still fail-open: the event is lost, the work is not.
+  report(`fatal: ${err.message}`);
+  process.exit(0);
 });

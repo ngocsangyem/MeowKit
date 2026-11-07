@@ -181,7 +181,7 @@ At spike completion: "Convert findings to delivery story? [Yes — extract AC | 
 - **Reports-not-automation** preserved — every action surfaces a prompt; no silent ticket creation
 - **Sprint-state contracts** at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Leading `sprint-state-` prefix prevents glob collision with the existing contract validator
 - **Concurrent-write safety** — writers acquire `flock` before any read-modify-write cycle on sprint-state files; YAML frontmatter append is non-atomic across shells
-- **Validator scope** — `validate-contract.sh` validates per-story sprint-CONTRACT files only; sprint-STATE files have NO validator (YAML parsed inline by consuming skills)
+- **Validator scope** — `validate-contract.cjs` validates per-story sprint-CONTRACT files only; sprint-STATE files have NO validator (YAML parsed inline by consuming skills)
 
 ## Out of Scope
 

@@ -1,0 +1,27 @@
+{
+  "name": "controlprobe-fired",
+  "group": "observer-control-probe",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/control-probe.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"Stop\"}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "controlprobe-fired",
+  "setupDescription": "BASE hook tree only",
+  "normalizers": [
+    "tmpdir",
+    "isoTimestamp"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".claude/hooks/.logs/hook-log.jsonl": "{\"ts\":\"{{TS}}\",\"hook\":\"control-probe\",\"event\":\"fired\",\"session\":\"corpus-session\",\"detail\":null}\n"
+  }
+}

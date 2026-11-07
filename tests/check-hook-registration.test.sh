@@ -31,7 +31,7 @@ assert() {
   fi
 }
 
-# Build a base tree with one registered .sh hook + a handlers.json using the REAL
+# Build a base tree with one registered hook + a handlers.json using the REAL
 # ./handlers/ relative path form (anchored at .claude/hooks/, as dispatch.cjs expects).
 make_tree() {
   local dir="$1"
@@ -40,13 +40,12 @@ make_tree() {
 {
   "hooks": {
     "SessionStart": [
-      { "hooks": [ { "type": "command", "command": "bash .claude/hooks/session-start.sh" } ] }
+      { "hooks": [ { "type": "command", "command": "node", "args": [".claude/hooks/session-start.cjs"] } ] }
     ]
   }
 }
 JSON
-  printf '#!/bin/bash\nexit 0\n' > "$dir/.claude/hooks/session-start.sh"
-  chmod +x "$dir/.claude/hooks/session-start.sh"
+  printf 'process.exit(0);\n' > "$dir/.claude/hooks/session-start.cjs"
   printf '#!/usr/bin/env node\n' > "$dir/.claude/hooks/dispatch.cjs"
   printf 'module.exports={};\n' > "$dir/.claude/hooks/handlers/build-verify.cjs"
   cat > "$dir/.claude/hooks/handlers.json" <<'JSON'
@@ -59,7 +58,7 @@ JSON
 {
   "hooks": {
     "SessionStart": [
-      { "hooks": [ { "type": "command", "command": "bash .claude/hooks/session-start.sh" } ] }
+      { "hooks": [ { "type": "command", "command": "node", "args": [".claude/hooks/session-start.cjs"] } ] }
     ],
     "PostToolUse": [
       { "hooks": [ { "type": "command", "command": "node .claude/hooks/dispatch.cjs" } ] }
@@ -81,14 +80,14 @@ rm -rf "$D"
 
 # ---- Case 2: unregistered disk hook ----
 D="$(mktemp -d)"; make_tree "$D"
-printf '#!/bin/bash\nexit 0\n' > "$D/.claude/hooks/rogue.sh"; chmod +x "$D/.claude/hooks/rogue.sh"
+printf 'process.exit(0);\n' > "$D/.claude/hooks/rogue.cjs"
 OUT="$(run_out "$D")"; RC=$?
 { [ "$RC" != "0" ] && echo "$OUT" | grep -q "UNREGISTERED:"; } && assert "unregistered disk hook → UNREGISTERED exit 1" 1 || assert "unregistered disk hook → UNREGISTERED exit 1" 0
 rm -rf "$D"
 
 # ---- Case 3: registered hook missing on disk ----
 D="$(mktemp -d)"; make_tree "$D"
-rm "$D/.claude/hooks/session-start.sh"
+rm "$D/.claude/hooks/session-start.cjs"
 OUT="$(run_out "$D")"; RC=$?
 { [ "$RC" != "0" ] && echo "$OUT" | grep -q "MISSING-ON-DISK:"; } && assert "registered hook missing on disk → MISSING-ON-DISK exit 1" 1 || assert "registered hook missing on disk → MISSING-ON-DISK exit 1" 0
 rm -rf "$D"
@@ -102,8 +101,8 @@ rm -rf "$D"
 
 # ---- Case 5: allowlisted indirect hook on disk only ----
 D="$(mktemp -d)"; make_tree "$D"
-printf '#!/bin/bash\nexit 0\n' > "$D/.claude/hooks/append-trace.sh"; chmod +x "$D/.claude/hooks/append-trace.sh"
-[ "$(run "$D")" = "0" ] && assert "allowlisted indirect hook (append-trace.sh) ignored → exit 0" 1 || assert "allowlisted indirect hook (append-trace.sh) ignored → exit 0" 0
+printf 'process.exit(0);\n' > "$D/.claude/hooks/append-trace.cjs"
+[ "$(run "$D")" = "0" ] && assert "allowlisted indirect hook (append-trace.cjs) ignored → exit 0" 1 || assert "allowlisted indirect hook (append-trace.cjs) ignored → exit 0" 0
 rm -rf "$D"
 
 echo

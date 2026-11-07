@@ -10,7 +10,7 @@
 # or gate label than declared here. CI fails on contradiction.
 #
 # Required-output path patterns below are the exact glob tokens used by
-# gate-enforcement.sh and pre-completion-check.sh — keep them in sync.
+# gate-enforcement.cjs and pre-completion-check.cjs — keep them in sync.
 version: 1
 
 phases:
@@ -92,8 +92,8 @@ gates:
     # In TDD mode blocks Phase 2 entry; in default mode (Phase 2 skipped) blocks
     # Phase 3 entry. The enforcement point is the same hook regardless of mode.
     blocks_phase: 3
-    enforced_by: hook        # gate-enforcement.sh (do not modify hook logic here)
-    # Glob used by gate-enforcement.sh — must match exactly:
+    enforced_by: hook        # gate-enforcement.cjs (do not modify hook logic here)
+    # Glob used by gate-enforcement.cjs — must match exactly:
     required_output: "tasks/plans/*/plan.md"
 
   - id: gate_2
@@ -103,15 +103,15 @@ gates:
     # See gate-rules.md for the full contract. Do not weaken the "NO EXCEPTIONS"
     # requirement — behavioral enforcement is real; hook enforcement is a follow-up.
     enforced_by: behavioral
-    # Glob used by pre-completion-check.sh verdict check:
+    # Glob used by pre-completion-check.cjs verdict check:
     required_output: "tasks/reviews/*-verdict.md"
 
 # autobuild sprint-contract substep (autobuild-only; not part of the 7 lifecycle phases).
 # This is an internal stage of the autobuild pipeline, not a lifecycle phase.
 contract_substep:
-  # Glob used by pre-completion-check.sh contract check:
+  # Glob used by pre-completion-check.cjs contract check:
   required_output: "tasks/contracts/*-{slug}-sprint-*.md"
-  enforced_by: hook          # gate-enforcement.sh contract validation branch
+  enforced_by: hook          # gate-enforcement.cjs contract validation branch
 
 # Prose lifecycle files that the drift-check will scan.
 # Paths are relative to the MeowKit project root (the parent of .claude/),

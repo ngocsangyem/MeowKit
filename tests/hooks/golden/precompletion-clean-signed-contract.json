@@ -1,0 +1,26 @@
+{
+  "name": "precompletion-clean-signed-contract",
+  "group": "pre-completion-check",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-completion-check.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"Stop\"}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "precompletion-clean-signed-contract",
+  "setupDescription": "verification-required + active-plan pointer + a signed sprint contract, no security verdict",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    "session-state/precompletion-attempts.json": "{}"
+  }
+}

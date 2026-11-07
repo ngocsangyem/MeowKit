@@ -1,0 +1,25 @@
+{
+  "name": "validate-contract-invalid",
+  "group": "gate-helper-validate-contract",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/skills/sprint-contract/scripts/validate-contract.sh",
+  "args": [
+    "tasks/contracts/261101-corpus-demo-sprint-9.md"
+  ],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "validate-contract-invalid",
+  "setupDescription": "a contract missing frontmatter fields, sections and ACs",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": "FAIL: missing required frontmatter field: contract_schema_version\nFAIL: missing required frontmatter field: sprint\nFAIL: missing required frontmatter field: plan_ref\nFAIL: missing required frontmatter field: rubric_preset\nFAIL: missing required frontmatter field: status\nFAIL: missing required frontmatter field: rounds\nFAIL: missing required frontmatter field: created\nFAIL: only 0 AC entries (minimum 5)\nFAIL: missing required section: ## Scope (In)\nFAIL: missing required section: ## Scope (Out)\nFAIL: missing required section: ## Acceptance Criteria\nFAIL: missing required section: ## Rubric Bindings\nFAIL: missing required section: ## Negotiation Log\n\nVALIDATION_FAILED: tasks/contracts/261101-corpus-demo-sprint-9.md\n"
+  }
+}

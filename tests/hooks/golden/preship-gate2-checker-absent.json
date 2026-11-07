@@ -1,0 +1,23 @@
+{
+  "name": "preship-gate2-checker-absent",
+  "group": "gate2-preship",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-ship.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git commit -m \\\"feat: add thing\\\"\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "preship-gate2-checker-absent",
+  "setupDescription": "lib/gate2-check.sh deleted from the tree (pre-ship.sh:54 path)",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@GATE_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nGate 2 checker {{TMP}}/.claude/hooks/lib/gate2-check.sh not found — Gate 2 cannot be enforced.\nA ship with no enforceable Gate 2 is blocked, not waved through.\nFix: reinstall or restore the hook library, then retry.\n"
+  }
+}

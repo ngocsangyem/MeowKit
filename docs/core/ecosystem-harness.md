@@ -26,7 +26,7 @@ Key characteristics:
 ### 2) Hook orchestration config
 
 - `.claude/settings.json` provides the hook registration + tool execution allowlist.
-- Hook wiring is driven by `.claude/hooks/` + handler dispatch (`.claude/hooks/dispatch.cjs`) and the hook input contract from `.claude/hooks/lib/read-hook-input.sh`.
+- Hook wiring is driven by `.claude/hooks/` + handler dispatch (`.claude/hooks/dispatch.cjs`) and the hook input contract from `.claude/hooks/lib/parse-stdin.cjs`.
 
 ### 3) Core rule set
 

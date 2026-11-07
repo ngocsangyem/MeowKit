@@ -118,9 +118,9 @@ print(json.dumps(artifact, separators=(",", ":")))
 PY
 
 # Best-effort trace event — never fail the audit if the trace writer is absent/errors.
-if [ -x ".meowkit/hooks/append-trace.sh" ]; then
+if [ -x ".meowkit/hooks/append-trace.cjs" ]; then
   TRACE_JSON="$(RUN_ID="$RUN_ID" REPO="$LOCAL" FILE_COUNT="$FILE_COUNT" OUT_FILE="$OUT_FILE" "$PY" -c 'import json,os; print(json.dumps({"run_id":os.environ["RUN_ID"],"repo":os.environ["REPO"],"tracked_file_count":int(os.environ["FILE_COUNT"]),"artifact":os.environ["OUT_FILE"]}))' 2>/dev/null || echo '{}')"
-  bash .meowkit/hooks/append-trace.sh audit_result "$TRACE_JSON" 2>/dev/null || true
+  node .meowkit/hooks/append-trace.cjs audit_result "$TRACE_JSON" 2>/dev/null || true
 fi
 
 echo "Audit artifact: $OUT_FILE" >&2

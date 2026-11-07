@@ -62,7 +62,7 @@ GUARD: Production-facing code ALWAYS requires TDD regardless of size. When in do
 
 - Tests are good practice; the tester agent writes them when invoked but does NOT block the developer
 - No RED-phase gate; the developer may implement directly per the approved plan
-- The `pre-implement.sh` hook is a no-op (exits 0 silently)
+- The `pre-implement.cjs` hook is a no-op (exits 0 silently)
 - All other quality rules STILL APPLY: `security-rules.md`, `injection-rules.md`, Gate 1, Gate 2, naming, code quality, review verdict
 - "Tests must pass before commit" from `development-rules.md` STILL APPLIES **IF tests exist** — you just don't have to write them first
 - Reviewer may flag missing tests as a WARN at Gate 2; user decides whether to address before ship
