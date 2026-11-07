@@ -317,3 +317,20 @@ BASE. Both were put to the user, who decided (261108):
   fixture rule/docs tree) that asserts the same output fields BASE produces, and the test file says so.
 - **AC-13 replay on Windows.** The `preship-memory-lint-failure` fixture's `MEOWKIT_CLI` stub is a shebang script; the
   replay harness builds a platform-appropriate stub from the fixture's `setup` id instead of reusing the recorded path.
+
+Evaluator: accepted — append-only (no AC text touched; only frontmatter status/signature), and both BASE claims hold on
+inspection: `privacy-block.sh:35`'s sensitive-path grep sits inside `if [ -n "$FILE_PATH" ]` while Check 2 matches only
+`fetch_as_markdown.py`/`web-to-markdown` commands, so a `Bash` payload carrying `cat .env` reaches no check and exits 0,
+and all three guards register `command: bash ${CLAUDE_SKILL_DIR}/bin/...` in shell form (`careful/SKILL.md:19`,
+`freeze/SKILL.md:19,24`, `investigate/SKILL.md:27`). Every override is testable: D4 is already pinned by the recorded
+`privacy-bash-reads-dotenv` fixture (`expect.exit 0`, empty stdout/stderr, with the finding in its `setupDescription`);
+D5 is satisfiable because `ac-01-exec-form.md` probe 1 shows `${CLAUDE_PROJECT_DIR}` **does** substitute into an `args`
+element of a `SKILL.md` `hooks:` block while `${CLAUDE_SKILL_DIR}` survives as a literal and is absent from the hook
+environment — backed by docs and a live Claude Code v2.1.316 probe, so "the guards now fire" is checkable rather than
+hopeful; the AC-07 method override matches `index.json`'s `notRecorded` reasons for exactly `post-session` and
+`project-context-loader`; and the AC-13 stub fix is consistent with AC-13's own no-`bash`/`sh`/`.sh` rule. Corpus
+cross-checks: `index.json` records `base` = BASE, `fixtureCount` 82 and 22 groups spanning every AC-02 family. Two
+consequences are accepted as user decisions, not defects, and belong in the Gate 2 verdict: D5 turns three inert
+registrations live (notably `freeze` on `Edit`/`Write`), and D4 leaves a `Bash`-mediated `.env` read allowed, so the
+privacy gate's file-path-only coverage is now a documented BASE limitation rather than an implied guarantee — a
+follow-up phase item, out of scope here.
