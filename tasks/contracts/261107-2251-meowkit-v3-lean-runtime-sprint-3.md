@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 3
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: signed
-generator_signed: cd3d1305f92d16c545604187cefd7a747a4fc5ad
-evaluator_signed: 4765838e2b803773f41f6e8fcf180f6df001071b
+status: amended
+generator_signed: null
+evaluator_signed: null
 rounds: 2
 created: 261107-2251
 ---
@@ -293,3 +293,27 @@ decisions recorded 261107.
 - Round 2 (reviewer/evaluator): accepted — sign-time fixes verified
 
 ## Amendments (if any)
+
+### Amendment 1 — 261108-0010
+
+Trigger: Batch A recorded the AC-02 corpus from BASE (82 fixtures, byte-reproducible; evidence in
+`tasks/reviews/evidence/261107-meowkit-v3-lean-runtime-sprint-3/`) and found two places where the contract misdescribed
+BASE. Both were put to the user, who decided (261108):
+
+- **D4 — Bash reading `.env` stays allowed (BASE parity).** At BASE `privacy-block.sh:35` checks the sensitive-path
+  pattern only against `tool_input.file_path`, which a `Bash` payload lacks, so `cat .env` exits 0. Override for AC-02:
+  the privacy bullet "a Bash command reading `.env` → block" reads "a Bash command reading `.env` → allow (BASE)", and
+  that fixture (`privacy-bash-reads-dotenv`) is part of AC-03's parity set. Hardening Bash `.env` reads is out of scope.
+- **D5 — the skill guards are enabled.** At BASE the `careful`, `freeze` and `investigate` SKILL.md `hooks:` blocks run
+  `bash ${CLAUDE_SKILL_DIR}/bin/...` in shell form; `${CLAUDE_SKILL_DIR}` is not substituted in `hooks:` (cited docs plus
+  a live probe, `ac-01-exec-form.md`), so the path is empty and the guards never fire. Override for AC-01 and AC-08: the
+  guard registrations use exec form with `${CLAUDE_PROJECT_DIR}/.claude/skills/<skill>/bin/<guard>.cjs`, and the guards
+  now fire. This is a deliberate behavior change added to the Scope (Out) exceptions (with D2 and the AC-04 crash-path
+  hardening); the Out-of-Scope Clarifications "beyond D2" bullet is read with the same exceptions. AC-08's fixtures
+  test the guard scripts directly, so they are unchanged. AC-09's count stays over `settings.json` only (5 → ≤3).
+- **AC-07 method for two observers.** `post-session` (derives fields from a live transcript) and
+  `project-context-loader` (emits files this sprint changes) have no deterministic BASE recording (`index.json`
+  `notRecorded`). Override for AC-07: each is verified by a unit test over a pinned input (a fixture transcript; a
+  fixture rule/docs tree) that asserts the same output fields BASE produces, and the test file says so.
+- **AC-13 replay on Windows.** The `preship-memory-lint-failure` fixture's `MEOWKIT_CLI` stub is a shebang script; the
+  replay harness builds a platform-appropriate stub from the fixture's `setup` id instead of reusing the recorded path.
