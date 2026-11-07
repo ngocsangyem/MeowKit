@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 3
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: signed
-generator_signed: 73d7ad89dbd97965d837c98e6d068baf78c51448
-evaluator_signed: 6a4ef33e04454a63611496f41e77f6773048c79d
+status: amended
+generator_signed: null
+evaluator_signed: null
 rounds: 2
 created: 261107-2251
 ---
@@ -334,3 +334,29 @@ consequences are accepted as user decisions, not defects, and belong in the Gate
 registrations live (notably `freeze` on `Edit`/`Write`), and D4 leaves a `Bash`-mediated `.env` read allowed, so the
 privacy gate's file-path-only coverage is now a documented BASE limitation rather than an implied guarantee — a
 follow-up phase item, out of scope here.
+
+### Amendment 2 — 261108-0500
+
+Trigger: Batches B–D ported the tree and replayed all 82 fixtures. Five places where two signed criteria could not both
+hold, or where the cutover changed fixture setup, are recorded here. None changes what a gate decides.
+
+- **`selfPath` normalizer (AC-03).** Five recorded stderr lines quote the implementation file they belong to; the port
+  renames that file, and AC-11 forbids printing a deleted `.sh` path. AC-03 allows one further named normalizer,
+  `selfPath` (`(\.claude/[\w./-]+)\.cjs` → `$1.sh`), applied only to: `gate1-contract-edit-invalid`,
+  `preship-gate2-checker-absent`, `validate-contract-usage-error`, `preimplement-no-feature-argument`,
+  `preimplement-strict-tdd-helper-missing`. It may only rewrite a kit module's own path; every other fixture is compared
+  with `tmpdir` alone.
+- **Advisory exit through the dispatcher (AC-06 vs AC-07).** `pre-task-check`'s injection finding exited 1 at BASE, a
+  documented advisory exit that never blocked. Through the dispatcher it exits 0 (AC-06 fail-open wins); the finding text
+  is still compared whole. Applies to `pretaskcheck-injection-blocked`, `injection-block.integration.test.ts` and the
+  doctor injection probes, which assert the finding text instead of the exit code.
+- **`PostToolUseFailure` has no matcher (AC-06).** It is registered without one at BASE; the registry requires `matcher`
+  for `PreToolUse` and `PostToolUse` only.
+- **Contract step inside the probe sandbox (AC-10).** The contract validator now lives in the hook library the doctor and
+  fixture sandboxes copy, so those sandboxes supply a signed contract to reach "allow". BASE reported this step as not
+  verified; the node tree verifies it.
+- **AC-15 exception.** `.claude/hooks/__tests__/gate2-ship-boundary.test.cjs` was 420 lines at BASE and is 429 after
+  retargeting; its split is a recorded follow-up rather than a change to a safety test inside this sprint.
+- **AC-12 method.** The codex and cursor layouts are generated in a scratch dir by calling the bundle reconcile functions
+  from the built package (no `init` against this repository), then validated with `validate --target`.
+- Known parity carry-over, not a defect: the LEAN bypass log names `LEAN` for a `MINIMAL` bypass, as at BASE.
