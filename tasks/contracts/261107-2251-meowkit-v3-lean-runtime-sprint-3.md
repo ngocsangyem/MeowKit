@@ -5,7 +5,7 @@ sprint: 3
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
 status: amended
-generator_signed: null
+generator_signed: 671a5f3aa416e5552dedc5d5c339d4b26b0c9793
 evaluator_signed: null
 rounds: 2
 created: 261107-2251
