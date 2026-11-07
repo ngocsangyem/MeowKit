@@ -5,7 +5,7 @@ sprint: 3
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
 status: amended
-generator_signed: a79fabe9f62e4ef3687a191032eef0661d6be297
+generator_signed: null
 evaluator_signed: null
 rounds: 2
 created: 261107-2251
@@ -340,12 +340,13 @@ follow-up phase item, out of scope here.
 Trigger: Batches B–D ported the tree and replayed all 82 fixtures. Five places where two signed criteria could not both
 hold, or where the cutover changed fixture setup, are recorded here. None changes what a gate decides.
 
-- **`selfPath` normalizer (AC-03).** Five recorded stderr lines quote the implementation file they belong to; the port
+- **`selfPath` normalizer (AC-03).** Five recorded lines quote the implementation file they belong to; the port
   renames that file, and AC-11 forbids printing a deleted `.sh` path. AC-03 allows one further named normalizer,
-  `selfPath` (`(\.claude/[\w./-]+)\.cjs` → `$1.sh`), applied only to: `gate1-contract-edit-invalid`,
+  `selfPath` (`/([\w./-]+)\.cjs\b/g` → `$1.sh`), applied only to: `gate1-contract-edit-invalid`,
   `preship-gate2-checker-absent`, `validate-contract-usage-error`, `preimplement-no-feature-argument`,
-  `preimplement-strict-tdd-helper-missing`. It may only rewrite a kit module's own path; every other fixture is compared
-  with `tmpdir` alone.
+  `preimplement-strict-tdd-helper-missing`. The pattern is unanchored because two of those fixtures quote a bare
+  basename (`pre-implement.cjs`, `tdd-detect.cjs`) rather than a `.claude/`-prefixed path; within these five fixtures
+  every token it rewrites is a kit module's own path. Every other fixture is compared with `tmpdir` alone.
 - **Advisory exit through the dispatcher (AC-06 vs AC-07).** `pre-task-check`'s injection finding exited 1 at BASE, a
   documented advisory exit that never blocked. Through the dispatcher it exits 0 (AC-06 fail-open wins); the finding text
   is still compared whole. Applies to `pretaskcheck-injection-blocked`, `injection-block.integration.test.ts` and the
