@@ -361,3 +361,23 @@ hold, or where the cutover changed fixture setup, are recorded here. None change
 - **AC-12 method.** The codex and cursor layouts are generated in a scratch dir by calling the bundle reconcile functions
   from the built package (no `init` against this repository), then validated with `validate --target`.
 - Known parity carry-over, not a defect: the LEAN bypass log names `LEAN` for a `MINIMAL` bypass, as at BASE.
+
+Evaluator: accepted — append-only (only frontmatter and, in the correction commit, the `selfPath` bullet), and every item
+now matches the working tree. `selfPath` reads `/([\w./-]+)\.cjs\b/g` → `$1.sh`, identical to
+`tests/hooks/lib/replay-harness.ts:129`, and the unanchored form is necessary rather than convenient: two of the five
+fixtures quote a bare basename, `pre-implement.cjs` (`pre-implement.cjs:89`) and `tdd-detect.cjs` (`:32`), which a
+`.claude/`-anchored pattern cannot reach — the first draft's pattern would have failed those two. Scoping is exact
+(`golden-replay.test.ts:64-70` names those five and `assertParity:85-87` applies the normalizer only to them; every `.sh`
+token in their recorded output — 10 across the five — is a kit module's own path, so nothing broader is laundered);
+`-t 'preimplement'` replays 5 passed. The other items verify too: `pretaskcheck-injection-blocked` is the only entry in
+`ADVISORY_EXIT_FIXTURES` and BASE's exit 1 was already non-blocking by `pre-task-check`'s own advisory contract, so
+fail-open changes no block decision, with `doctor-hard-gates.ts:153-167` asserting the finding text and probe 7 still
+asserting exit 0; BASE `settings.json` registers `PostToolUseFailure` with no `matcher` key, matching
+`handler-registry.cjs:35-38`, which requires one for `PreToolUse`/`PostToolUse` only; Probe 3 (`doctor-hard-gates.ts:107-130`)
+supplies receipt **and** signed contract, which makes doctor stricter rather than moving a decision; the test file is 420
+lines at BASE and 429 now, exactly the +9 claimed; and AC-12's method is `reconcileApplyCursorBundle` called directly over
+the authored bundle into a scratch target (`cursor-full-surface-cli-dry-run.test.ts:5-28`), no `init` against this
+repository. The LEAN-for-MINIMAL log line reproduces at BASE (`check-contract-signed.sh:20-25` fires on either mode but
+logs the `LEAN` literal), so recording it as parity carry-over is right. No item changes what a gate decides. Carried to
+the Gate 2 verdict as follow-ups, not blockers: the 429-line safety test's split, and the `selfPath` normalizer as a
+standing audit item whenever a fixture is added.
