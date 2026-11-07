@@ -29,7 +29,7 @@ Task(subagent_type="[type]", prompt="[task description]", description="[brief]")
 
 ## Standard Delegation Skeleton
 
-Every template below SHOULD expand into this 9-field skeleton at runtime (per `.claude/rules/orchestration-rules.md` Delegation Prompt Template). The compact `Task()` examples are runtime shorthand; omitting fields produces under-specified prompts.
+Every template below SHOULD expand into this 9-field skeleton at runtime (per `.claude/skills/cook/references/orchestration-rules.md` Delegation Prompt Template). The compact `Task()` examples are runtime shorthand; omitting fields produces under-specified prompts.
 
 ```
 Task: <specific task>
@@ -43,7 +43,7 @@ Acceptance criteria: <binary pass/fail checks>
 Constraints: <what must NOT change>
 ```
 
-Each per-phase section below adds a one-line **Scope** annotation defining what to pass and explicitly what NOT to pass (isolation boundary, per `orchestration-rules.md` "Isolation Boundaries"). Adds ~10–15 tokens per template, paid only when this file is loaded (JIT).
+Each per-phase section below adds a one-line **Scope** annotation defining what to pass and explicitly what NOT to pass (isolation boundary, per `.claude/skills/cook/references/orchestration-rules.md` "Isolation Boundaries"). Adds ~10–15 tokens per template, paid only when this file is loaded (JIT).
 
 ## Phase 0: Orient — Scout
 
@@ -155,7 +155,7 @@ Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using t
 Task(subagent_type="documenter", prompt="Evaluate docs impact for changes: [file-list]. Update docs/ directory if needed. State explicitly: Docs impact: [none|minor|major]", description="Update docs")
 ```
 
-**Scope (documenter):** pass changed-file list, docs/ root, target-project doc allowlist (per `docs-reference-contract.md`). Do NOT pass plan internals, session conversation, code diffs.
+**Scope (documenter):** pass changed-file list, docs/ root, target-project doc allowlist (per the kit's docs-reference contract, maintained in the source repo and not shipped). Do NOT pass plan internals, session conversation, code diffs.
 
 ## UI Work (Conditional)
 

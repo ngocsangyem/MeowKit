@@ -142,7 +142,7 @@ fi
 # (an explicit, logged opt-out). The former opt-in MEOWKIT_GATE1_REQUIRE_APPROVED
 # is now the default and needs no flag.
 if [ "${MEOWKIT_GATE1_PRESENCE_ONLY:-0}" = "1" ]; then
-  # No Silent Override (intervention-recording-rules.md Rule 1): announce the downgrade
+  # No Silent Override (gate-rules.md, Recording Human Interventions): announce the downgrade
   # on stderr so the bypass is never invisible.
   echo "Gate 1: downgraded to presence-only via MEOWKIT_GATE1_PRESENCE_ONLY=1 (approval receipt NOT verified)." >&2
 fi

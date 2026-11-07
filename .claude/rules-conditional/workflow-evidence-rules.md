@@ -33,7 +33,7 @@ never an approval predicate.
 | `task` | string | required, non-empty |
 | `planPath` | string | pointer to `tasks/plans/<plan>/plan.md` when planned |
 | `phase` | string | current workflow phase label |
-| `risk` | object | `{ matchedFlags[], requiresHumanApproval, reason }` — flags ⊆ the 9 IDs in `risk-checklist.md` |
+| `risk` | object | `{ matchedFlags[], requiresHumanApproval, reason }` — flags ⊆ the 9 IDs in `.claude/skills/agent-detector/references/risk-checklist.md` |
 | `fixDiagnosis` | object | `{ exactSymptom, reproduction, expectedActual, rootCause, whyNow, blastRadius[] }` — `mk:fix` only (six fields) |
 | `cookContract` | object | `{ expectedOutput, acceptanceCriteria[], scopeBoundary[], constraints[], touchpoints[] }` — `mk:cook` only (five dimensions) |
 | `verification` | object | `{ commands[], overall }` — pointers/summary, NOT raw logs |
@@ -44,7 +44,7 @@ never an approval predicate.
 ## 3 — Validation Rules (enforced by the `.cjs`)
 
 - `skill` ∈ {`mk:fix`, `mk:cook`}; `task` non-empty.
-- `risk.matchedFlags` ⊆ the 9 IDs in `.claude/rules/risk-checklist.md`
+- `risk.matchedFlags` ⊆ the 9 IDs in `.claude/skills/agent-detector/references/risk-checklist.md`
   (`AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF`).
 - `mk:fix` → all six `fixDiagnosis` fields populated before implementation.
 - `mk:cook` → all five `cookContract` dimensions populated before Gate 1, **unless**
@@ -66,7 +66,7 @@ Run before presenting for approval:
 | Standalone `mk:fix` standard/complex | `.claude/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` |
 
 `session-state/` is framework-internal state — the `${CLAUDE_PLUGIN_DATA}` rule
-(`skill-authoring-rules.md` Rule 2) explicitly exempts it. `--quick` fixes write
+(`.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 2) explicitly exempts it. `--quick` fixes write
 the compact `fixDiagnosis` form; simple fixes may skip evidence entirely.
 
 ## 5 — Evidence ≠ Memory

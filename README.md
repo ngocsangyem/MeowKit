@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  125 skills &middot; 42 agents &middot; 27 commands &middot; 7 modes &middot; 25 rules &middot; 5 conditional rules &middot; 18 hook scripts &middot; 4-layer+ security
+  125 skills &middot; 42 agents &middot; 27 commands &middot; 7 modes &middot; 7 rules &middot; 5 conditional rules &middot; 18 hook scripts &middot; 4-layer+ security
 </p>
 
 <p align="center">
@@ -101,7 +101,7 @@ meowkit/
 ├── .claude/                  Source of truth — agents, skills, rules, hooks
 │   ├── agents/               42 specialist agents
 │   ├── skills/               125 skills (mk: namespace)
-│   ├── rules/                25 enforcement rules
+│   ├── rules/                7 enforcement rules (always-on)
 │   ├── hooks/                18 hook scripts — lifecycle hooks + handlers + libraries
 │   ├── commands/             27 slash commands
 │   ├── modes/                7 behavioral modes
@@ -114,7 +114,7 @@ meowkit/
 │   └── landing/              Landing page (meowkit.dev, Nuxt + Tailwind v4)
 ├── scripts/                  Release automation
 ├── packages/docs/            Fumadocs documentation
-├── CLAUDE.md                 Entry point for Claude Code
+├── CLAUDE.md                 Maintainer guide for this repo (not shipped to projects)
 ├── .releaserc.cjs            Semantic release config
 └── .github/workflows/        CI/CD (release, beta, PR validation)
 ```

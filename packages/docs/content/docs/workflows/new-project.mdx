@@ -29,7 +29,7 @@ npx mewkit init
 
 The CLI auto-detects your tech stack and asks configuration questions (project name, stack, team size, mode, memory, optional Gemini API key). Takes ~30 seconds.
 
-**What gets created:** A `.claude/` directory holding the agents, skills, lifecycle hooks, security rules, and memory system. Plus `CLAUDE.md` (the entry point Claude reads at session start).
+**What gets created:** A `.claude/` directory holding the agents, skills, lifecycle hooks and the 7 always-on rules, plus the `.meowkit/` store (config, team memory, telemetry). No root `CLAUDE.md` is installed — the always-on guidance is `.claude/rules/*.md`.
 
 ### Step 2: Verify installation
 
@@ -45,7 +45,7 @@ Checks: Node.js version, Python available, Git configured, hooks executable, scr
 claude
 ```
 
-Claude reads `CLAUDE.md` automatically. The **orchestrator** agent activates and reads `.meowkit/telemetry/cost-log.json` for cost history. The team store `.meowkit/memory/` (`decisions.md`, `gotchas.md`) is grepped on demand by the read-set skills at task start. It is created when the first lesson is recorded.
+Claude Code auto-loads `.claude/rules/` automatically. The **orchestrator** agent activates and reads `.meowkit/telemetry/cost-log.json` for cost history. The team store `.meowkit/memory/` (`decisions.md`, `gotchas.md`) is grepped on demand by the read-set skills at task start. It is created when the first lesson is recorded.
 
 ### Step 4: Plan your first feature
 

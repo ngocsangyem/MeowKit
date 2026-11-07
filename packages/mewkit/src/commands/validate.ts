@@ -2,7 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { resolveInventoryPath } from "../state/resolve-inventory-path.js";
 import pc from "picocolors";
+import { ALWAYS_ON_RULE_PATHS } from "../core/always-on-rules.js";
 import { checkDocsReferences } from "../core/check-docs-references.js";
+import { resolveContractPath } from "../core/docs-reference-contract-paths.js";
 import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
 import { isHookScript } from "../core/is-hook-script.js";
 import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
@@ -69,7 +71,7 @@ export interface CheckResult {
  *   coherence, routing-table breadth) alongside consumer checks.
  * - `flat-copy`: a project that installed `.claude/` by copy. Gets only
  *   consumer-actionable checks; authoring-coherence checks are suppressed because a
- *   consumer legitimately customizes `CLAUDE.md`/`rules` (tripping workflow-drift and
+ *   consumer legitimately customizes `rules` (tripping workflow-drift and
  *   routing-breadth), so those checks would surface as false failures in a healthy
  *   consumer install.
  * Provider projections are validated by adapter-specific paths (e.g. `--portable`),
@@ -221,14 +223,21 @@ function checkConfigJson(meowkitDir: string): CheckResult {
 }
 
 function checkDocsRefsContract(meowkitDir: string): CheckResult[] {
-	const contractPath = path.join(meowkitDir, "rules", "docs-reference-contract.md");
-	if (!fs.existsSync(contractPath)) {
-		return [
-			{ name: "Docs-reference contract present", status: "fail", detail: `Missing: ${contractPath}`, section: "Docs" },
-		];
-	}
 	try {
-		const { scannedFiles, findings, errorCount, warnCount } = checkDocsReferences(meowkitDir);
+		const { scannedFiles, findings, errorCount, warnCount, notApplicable } = checkDocsReferences(meowkitDir);
+		// The contract is a source-repo-only maintainer document. A consumer project ships
+		// `.claude/` without it, so its absence is N/A — there is no allowlist to check
+		// against, and failing here would fail every consumer install.
+		if (notApplicable) {
+			return [
+				{
+					name: "Docs references on Type-1 allowlist",
+					status: "pass",
+					detail: `N/A — maintainer contract absent (${resolveContractPath(meowkitDir)})`,
+					section: "Docs",
+				},
+			];
+		}
 		const summary = `Scanned ${scannedFiles} files — ${errorCount} error(s), ${warnCount} warning(s)`;
 		const status: Status = errorCount > 0 ? "fail" : warnCount > 0 ? "warn" : "pass";
 		const detail =
@@ -676,7 +685,7 @@ export function checkCapabilityViewDrift(meowkitDir: string, projectRoot: string
 /**
  * Assemble the default-run checks for a given mode. Consumer-actionable checks run in
  * both modes; authoring-coherence checks run only in `authoring` mode — in a flat-copy
- * consumer they would be false failures (consumer customization of CLAUDE.md/rules trips
+ * consumer they would be false failures (consumer customization of rules/ trips
  * drift + routing-breadth). Pure and side-effect-free so it can be tested directly
  * against a fixture.
  */
@@ -691,7 +700,10 @@ export async function buildDefaultChecks(
 	const results: CheckResult[] = [
 		checkDirExists(meowkitDir, "agents"),
 		checkDirExists(meowkitDir, "hooks"),
-		checkFileExists(projectRoot, "CLAUDE.md", "Structure"),
+		// The always-on rule set replaces the former root-`CLAUDE.md` presence check: these
+		// files are what the host auto-loads every session, so a missing one silently drops
+		// enforcement. Consumer-actionable in both modes.
+		...ALWAYS_ON_RULE_PATHS.map((rel) => checkFileExists(meowkitDir, rel, "Structure")),
 		checkConfigJson(meowkitDir),
 		...checkHooksExecutable(meowkitDir),
 		...checkDocsRefsContract(meowkitDir),

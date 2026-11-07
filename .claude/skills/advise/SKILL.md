@@ -176,7 +176,7 @@ building has stopped advising, and the user never approved the build.
 Default: the isolated `advisor` agent (see `.claude/agents/advisor.md`), which
 runs on the Fable 5 advisory profile.
 
-The harness has **no subagent pause/resume** (`orchestration-rules.md` → Rejected
+The harness has **no subagent pause/resume** (`.claude/skills/cook/references/orchestration-rules.md` → Rejected
 Patterns), so an interview cannot be one long-lived subagent. Each turn is a
 **fresh advisor spawn** given the checkpoint at
 `session-state/<advise-run>/transcript.json` plus the new answer. The

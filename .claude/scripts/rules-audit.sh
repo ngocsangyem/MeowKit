@@ -15,9 +15,9 @@
 #   bash .claude/scripts/rules-audit.sh status                  # show which rules are currently disabled
 #
 # Safety:
-#   - Refuses to disable any rule in the safety baseline (security, injection,
-#     gate, core-behaviors, development) regardless of coverage. These are
-#     EXEMPT per Phase 3 step 2.
+#   - Refuses to disable any rule in the safety baseline — which is now the
+#     WHOLE always-on set (core, security, injection, gate, core-behaviors,
+#     development, agent-conduct) regardless of coverage. These are EXEMPT.
 #   - Refuses to disable a rule whose `coverage_count < 3` per the canary
 #     coverage matrix.
 #   - Idempotent: disable on already-disabled is a no-op; restore on already-
@@ -28,13 +28,23 @@ ROOT="${PROJECT_ROOT:-$(pwd)}"
 cd "$ROOT" || { echo "Cannot cd to $ROOT" >&2; exit 1; }
 
 RULES_DIR=".claude/rules"
-SAFETY_BASELINE=("security-rules" "injection-rules" "gate-rules" "core-behaviors" "development-rules")
-# Rules with coverage_count >= 3 per canary-coverage-matrix.md (Phase 0 V3 deliverable).
-# Update this list when a new audit cycle re-runs the coverage matrix.
-# agent-routing ablation now covers the narrowed file (agent table + domain-agent
-# exclusions only); the intent->skill dispatch table lives in the agent-detector
-# skill reference and is no longer part of this always-loaded rule.
-ELIGIBLE_RULES=("agent-routing" "naming-rules" "phase-contracts")
+# The 7 always-on rules. After the context diet every file left in .claude/rules/ is
+# always-on and safety-baseline, so this list IS the directory listing.
+SAFETY_BASELINE=(
+	"meowkit-core"
+	"security-rules"
+	"injection-rules"
+	"gate-rules"
+	"core-behaviors"
+	"development-rules"
+	"agent-conduct"
+)
+# Empty by design. Ablation only ever measured always-on rules, and the context diet moved
+# every ablatable rule out of .claude/rules/ into the skill that consumes it — a rule that
+# loads just in time is already measured by not loading. Nothing in .claude/rules/ is
+# eligible: all 7 remaining files are the safety baseline above. Re-populate this list only
+# if a future rule is added to the always-on set AND its canary coverage_count reaches 3.
+ELIGIBLE_RULES=()
 
 is_safety() {
 	local r="$1"
@@ -46,7 +56,9 @@ is_safety() {
 
 is_eligible() {
 	local r="$1"
-	for e in "${ELIGIBLE_RULES[@]}"; do
+	# `${arr[@]}` on an empty array is unset under `set -u`; the `+` expansion is the
+	# portable guard that keeps an empty ELIGIBLE_RULES from aborting the script.
+	for e in ${ELIGIBLE_RULES[@]+"${ELIGIBLE_RULES[@]}"}; do
 		[ "$r" = "$e" ] && return 0
 	done
 	return 1
@@ -63,7 +75,11 @@ cmd_disable() {
 	fi
 	if ! is_eligible "$rule"; then
 		echo "REFUSED: $rule has coverage_count < 3 (KEEP-by-default; not eligible for ablation)." >&2
-		echo "Eligible rules: ${ELIGIBLE_RULES[*]}" >&2
+		if [ "${#ELIGIBLE_RULES[@]}" -eq 0 ]; then
+			echo "Eligible rules: (none — every rule left in ${RULES_DIR} is always-on safety baseline)" >&2
+		else
+			echo "Eligible rules: ${ELIGIBLE_RULES[*]}" >&2
+		fi
 		exit 2
 	fi
 	if [ ! -f "$src" ]; then
@@ -105,9 +121,14 @@ cmd_restore() {
 
 cmd_list_eligible() {
 	echo "Eligible for ablation (coverage_count >= 3):"
-	for e in "${ELIGIBLE_RULES[@]}"; do
-		echo "  - $e"
-	done
+	if [ "${#ELIGIBLE_RULES[@]}" -eq 0 ]; then
+		echo "  (none — every rule left in ${RULES_DIR} is always-on safety baseline;"
+		echo "   just-in-time rules live with the skill that loads them)"
+	else
+		for e in ${ELIGIBLE_RULES[@]+"${ELIGIBLE_RULES[@]}"}; do
+			echo "  - $e"
+		done
+	fi
 	echo
 	echo "Safety baseline (EXEMPT):"
 	for s in "${SAFETY_BASELINE[@]}"; do

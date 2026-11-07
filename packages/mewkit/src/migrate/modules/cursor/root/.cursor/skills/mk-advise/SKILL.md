@@ -128,7 +128,7 @@ building has stopped advising, and the user never approved the build.
 Default: the isolated `advisor` custom agent, which
 runs on the strongest-available-model advisory profile.
 
-The harness has **no sub-task pause/resume** (`orchestration-rules.md` → Rejected
+The harness has **no sub-task pause/resume** (the orchestration rules → Rejected
 Patterns), so an interview cannot be one long-lived sub-task. Each turn is a
 **fresh advisor spawn** given the checkpoint at
 `session-state/<advise-run>/transcript.json` plus the new answer. The

@@ -34,7 +34,7 @@ For backward compatibility, `--red-only` still forces the RED-phase write-failin
    - Report results: total, passed, failed, skipped.
    - If any fail: print failure details with file, line, expected vs actual.
 
-3. **TDD Rules Enforcement** (only when `--tdd` / `MEOWKIT_TDD=1` — see `rules/tdd-rules.md`):
+3. **TDD Rules Enforcement** (only when `--tdd` / `MEOWKIT_TDD=1` — see `.claude/skills/cook/references/tdd-rules.md`):
    - No implementation code before a failing test exists.
    - After implementation, ALL existing tests must pass (not just new ones).
    - If tests fail after implementation: self-heal up to 3 attempts.
@@ -51,7 +51,7 @@ For backward compatibility, `--red-only` still forces the RED-phase write-failin
 | `--coverage` | Run tests with coverage report. Show: line coverage %, branch coverage %, uncovered files/lines. |
 | `--watch` | Continuous test mode. Re-run affected tests on every file save. |
 | `--red-only` | Write failing tests but do NOT implement. Used by `/mk:cook --tdd` in Phase 2 to generate the RED test suite before Phase 3 implementation. |
-| `--tdd` | Enforce TDD discipline for this invocation. Equivalent to writing the `.claude/session-state/tdd-mode` sentinel. RED-phase rules in `tdd-rules.md` apply. |
+| `--tdd` | Enforce TDD discipline for this invocation. Equivalent to writing the `.claude/session-state/tdd-mode` sentinel. RED-phase rules in `.claude/skills/cook/references/tdd-rules.md` apply. |
 
 ### Output
 

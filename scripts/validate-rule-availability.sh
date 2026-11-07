@@ -2,9 +2,8 @@
 # validate-rule-availability.sh
 #
 # Scans repo for `.claude/rules/<name>.md` references and verifies each resolves
-# to a file on disk. Backs the rule-existence guarantee that CLAUDE.md prose
-# alone cannot provide (Anthropic best-practices.md: hooks/scripts deterministic,
-# CLAUDE.md instructions advisory).
+# to a file on disk. Backs the rule-existence guarantee that prose alone cannot
+# provide: scripts are deterministic, prose instructions are advisory.
 #
 # Wire points:
 #   - pre-commit hook
@@ -21,8 +20,8 @@ cd "$ROOT" || { echo "Cannot cd to $ROOT" >&2; exit 1; }
 [ -d .claude ] || { echo "ERROR: no .claude/ dir at $ROOT" >&2; exit 1; }
 
 # File types swept: .md, .sh, .cjs, .json, .py, .yaml, .toml under .claude/, plus
-# top-level CLAUDE.md and docs/. Also packages/ to catch references in mewkit
-# source code (e.g., smart-update-utils.ts exclusion list).
+# docs/ and a root CLAUDE.md when the repo has one. Also packages/ to catch
+# references in mewkit source code (e.g., smart-update-utils.ts exclusion list).
 #
 # `.mdx` is swept because the published docs are authored in it; omitting it left
 # every reference in packages/docs/content unchecked.
@@ -33,7 +32,17 @@ cd "$ROOT" || { echo "Cannot cd to $ROOT" >&2; exit 1; }
 # already swept, and being untracked it makes the result depend on whether someone
 # ran a build. Release notes record rule files as they were when a release removed
 # or consolidated them — those paths are meant to be unresolvable, and rewriting
-# them to satisfy this check would falsify the history.
+# them to satisfy this check would falsify the history. `tasks/` is pruned for the
+# same reason: plans, reports and status snapshots record the rule paths that were
+# live when they were written, and editing a closed plan to keep this check green
+# would rewrite the record rather than fix a reference a reader would follow.
+#
+# Two further prunes, same principle — the path is the record, not a reference:
+#   - `rule-destination-table.md` IS the old-path → new-path mapping for the context
+#     diet. Its first column names pre-diet paths on purpose; resolving them would
+#     delete the mapping.
+#   - `.claude/worktrees/` holds sibling session checkouts. Those are separate working
+#     trees at their own revisions, so their references are not this tree's to fix.
 SWEEP_GLOBS=(
   --include='*.md'
   --include='*.mdx'
@@ -49,6 +58,8 @@ SWEEP_GLOBS=(
   --exclude-dir='__tests__'
   --exclude-dir='__fixtures__'
   --exclude-dir='changelog'
+  --exclude-dir='worktrees'
+  --exclude='rule-destination-table.md'
   --exclude-dir='node_modules'
   --exclude-dir='dist'
   --exclude-dir='.next'
@@ -56,7 +67,7 @@ SWEEP_GLOBS=(
   --exclude-dir='.output'
 )
 
-SWEEP_PATHS=(.claude CLAUDE.md docs packages tasks)
+SWEEP_PATHS=(.claude CLAUDE.md docs packages)
 EXISTING_PATHS=()
 for p in "${SWEEP_PATHS[@]}"; do
   [ -e "$p" ] && EXISTING_PATHS+=("$p")

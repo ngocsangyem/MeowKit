@@ -190,9 +190,9 @@ Before dispatch, confirm:
 - cwd and writable roots match the job;
 - approval and tool controls meet the assigned risk tier;
 - parallel writers are isolated in separate worktrees (via `mk:worktree`) and
-  own disjoint files, per `parallel-execution-rules.md`;
+  own disjoint files, per `.claude/skills/cook/references/parallel-execution-rules.md`;
 - destructive or external actions have explicit user approval and rollback,
-  recorded per `intervention-recording-rules.md` and gated by `gate-rules.md`;
+  recorded and gated per `.claude/rules/gate-rules.md` (Recording Human Interventions);
 - prompt and capture paths cannot expose secrets (`injection-rules.md` Rule 4
   and Rule 5);
 - a write pattern the toolkit blocks outright (`security-rules.md`) is never

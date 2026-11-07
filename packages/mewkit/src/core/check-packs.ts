@@ -3,6 +3,7 @@
 // depends_on), that every governed artifact belongs to ≥1 pack or base, and — the
 // non-negotiable safety invariant — that base carries the full gate/privacy/dispatch
 // chain at its exact verified paths. Mirrors checkOwnership's quad-state pattern.
+import { ALWAYS_ON_RULE_PATHS } from "./always-on-rules.js";
 import { buildInventory } from "./build-inventory.js";
 import {
 	availablePacks,
@@ -34,11 +35,7 @@ export const SAFETY_PATHS = [
 	"hooks/lib/parse-stdin.cjs",
 	"hooks/lib/shared-state.cjs",
 	"hooks/handlers.json",
-	"rules/security-rules.md",
-	"rules/injection-rules.md",
-	"rules/gate-rules.md",
-	"rules/core-behaviors.md",
-	"rules/development-rules.md",
+	...ALWAYS_ON_RULE_PATHS,
 	// essential cross-profile commands — a profile without these has no /mk:plan etc.
 	"commands/mk/plan.md",
 	"commands/mk/upgrade.md",

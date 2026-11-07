@@ -1,6 +1,6 @@
 ---
 name: mk:agent-detector
-description: Detects task agent and complexity tier at Phase 0 orient. Invoked first in every workflow. Provider adapters select any model/runtime policy. NOT for runtime agent routing inside a single skill (see orchestration-rules.md).
+description: Detects task agent and complexity tier at Phase 0 orient. Invoked first in every workflow. Provider adapters select any model/runtime policy. NOT for runtime agent routing inside a single skill (see the cook skill's orchestration reference).
 triggers:
   - every message
   - always first
@@ -41,18 +41,20 @@ default_enabled: true
    ```
 
    If the marker IS present (turns 2..N of the same session): emit
-   `Safety baseline: verified (cached)` and SKIP the 5-file Read loop below.
-   The 5 rules remain in context from the inner harness's CLAUDE.md auto-load;
+   `Safety baseline: verified (cached)` and SKIP the 7-file Read loop below.
+   The 7 rules remain in context from the inner harness's `.claude/rules/` auto-load;
    the sentinel only suppresses redundant re-reads.
 
    If the marker is ABSENT (turn 1 of a new session, OR
-   `MEOWKIT_SKIP_SAFETY_SENTINEL=off`): `Read` each of the 5 always-on
-   safety/baseline rules:
+   `MEOWKIT_SKIP_SAFETY_SENTINEL=off`): `Read` each of the 7 always-on
+   safety/baseline rules — exactly the files in `.claude/rules/`, no more:
+   - `.claude/rules/meowkit-core.md`
    - `.claude/rules/security-rules.md`
    - `.claude/rules/injection-rules.md`
    - `.claude/rules/gate-rules.md`
    - `.claude/rules/core-behaviors.md`
    - `.claude/rules/development-rules.md`
+   - `.claude/rules/agent-conduct.md`
 
    If any `Read` returns "file does not exist" or equivalent, **ABORT IMMEDIATELY** with the exact message:
 
@@ -61,7 +63,9 @@ default_enabled: true
    Refusing to route any task. Restore the rule (git checkout / the installer) before retrying.
    ```
 
-   Do NOT proceed to detection. Do NOT route to any agent. The 5 rules are the deterministic baseline; their absence indicates either repo corruption or a partial install. Replaces the unverified directory-auto-load assumption with a positive existence check.
+   Do NOT proceed to detection. Do NOT route to any agent. The 7 rules are the deterministic baseline; their absence indicates either repo corruption or a partial install. Replaces the unverified directory-auto-load assumption with a positive existence check.
+
+0a. **Project context first.** When `docs/project-context.md` exists, `Read` it BEFORE any task-specific context — it is the project constitution (stack, conventions, anti-patterns), and loading it first prevents conflicting convention guesses (agent-conduct A2, detailed in `.claude/skills/cook/references/agent-conduct-extended.md`). If it is absent, log `project-context: absent; proceeding without it` and continue — this is never an abort.
 
 0b. **Phase-zero rule load.** After the safety baseline is confirmed, scan context for the cached-sentinel marker:
 
@@ -69,17 +73,18 @@ default_enabled: true
    ## Phase-zero rules: verified (cached, session <id>)
    ```
 
-   If the marker IS present: emit `Phase-zero rules: verified (cached)` and SKIP the 6-file Read loop. If ABSENT (turn 1 or env-var override), `Read` each phase-zero file. These govern Phase 0 routing and are read once per agent-detector invocation:
-   - `.claude/rules/phase-contracts.md` — what each phase expects/produces
-   - `.claude/rules/agent-routing.md` — agent → role → phase table
-   - `.claude/rules/model-selection-rules.md` — task-type → model-tier mapping
-   - `.claude/rules/scale-adaptive-rules.md` — domain CSV → complexity routing
-   - `.claude/rules/risk-checklist.md` — 9 horizontal-risk flags
+   If the marker IS present: emit `Phase-zero rules: verified (cached)` and SKIP the 7-file Read loop. If ABSENT (turn 1 or env-var override), `Read` each phase-zero file. These moved out of the always-on set and are now loaded just in time, once per agent-detector invocation:
+   - `.claude/skills/cook/references/phase-contracts.md` — what each phase expects/produces
+   - `.claude/skills/agent-detector/references/agent-routing.md` — agent → role → phase table
+   - `.claude/skills/agent-detector/references/model-selection-rules.md` — task-type → model-tier mapping
+   - `.claude/skills/agent-detector/references/scale-adaptive-rules.md` — domain CSV → complexity routing
+   - `.claude/skills/agent-detector/references/risk-checklist.md` — 9 horizontal-risk flags
+   - `.claude/skills/agent-detector/references/context-budget-rules.md` — per-phase × per-tier read budget for the tier this step assigns
    - `.claude/skills/agent-detector/references/skill-domain-routing.md` — intent → skill dispatch table (used at hand-off, Step 5)
 
-   If any of the 5 rule `Read`s fails: ABORT with `PHASE-ZERO RULE MISSING: <name>` — same fail-fast semantics as Step 0. These rules drive the routing logic in steps 2–4; without them, detection silently degrades to keyword-only. The skill-domain-routing reference is advisory dispatch guidance (not a routing rule): if it is absent, log `skill-domain-routing reference absent; skill dispatch falls back to inline judgment` and continue — do NOT abort.
+   If any of the 6 rule `Read`s fails: ABORT with `PHASE-ZERO RULE MISSING: <name>` — same fail-fast semantics as Step 0. These rules drive the routing logic in steps 2–4; without them, detection silently degrades to keyword-only. The skill-domain-routing reference is advisory dispatch guidance (not a routing rule): if it is absent, log `skill-domain-routing reference absent; skill dispatch falls back to inline judgment` and continue — do NOT abort.
 
-   **Agile context detection (additive — Agile-only load).** After the 5 phase-zero `Read`s succeed:
+   **Agile context detection (additive — Agile-only load).** After the 6 phase-zero rule `Read`s succeed:
 
    1. **PRE-FLIGHT.** Check that `.claude/rules-conditional/` directory exists. If absent → log `agile rules: rules-conditional/ not deployed; skipping load` and skip steps 2–4. (Defensive: filesystem may lag pruning-plan status doc.)
    2. **Detect Agile context — OR-logic, any one match triggers load:**
@@ -99,7 +104,7 @@ default_enabled: true
 1. **Check cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
 2. **Score agents** -- analyze task content, extract keywords, check project context across all layers (0-4). See `references/multi-layer-detection.md`, `references/scoring-and-thresholds.md`
 3. **Select model + mode** -- map complexity to model tier, check team mode eligibility. See `references/model-selection.md`, `references/complexity-detection.md`, `references/team-mode.md`
-4. **Evaluate risk flags** -- read `.claude/rules/risk-checklist.md` (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per `rules/model-selection-rules.md` Rule 2 — regardless of `mk:scale-routing` outcome.
+4. **Evaluate risk flags** -- read `.claude/skills/agent-detector/references/risk-checklist.md` (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per `.claude/skills/agent-detector/references/model-selection-rules.md` Rule 2 — regardless of `mk:scale-routing` outcome.
 5. **Output + hand off** -- show detection banner (including `matched_flags` line if non-empty), load agent instructions, invoke skill. See `references/detection-process.md`, `references/after-detection.md`
 
 ## References

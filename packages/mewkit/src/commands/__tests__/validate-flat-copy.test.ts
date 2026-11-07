@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { ALWAYS_ON_RULES } from "../../core/always-on-rules.js";
 import { buildDefaultChecks, type Section } from "../validate.js";
 
 // Sections produced ONLY by authoring-coherence checks — no consumer check emits these.
@@ -27,7 +28,8 @@ beforeEach(() => {
 	fs.mkdirSync(path.join(meowkitDir, "agents"), { recursive: true });
 	fs.mkdirSync(path.join(meowkitDir, "hooks"), { recursive: true });
 	fs.mkdirSync(path.join(meowkitDir, "rules"), { recursive: true });
-	fs.writeFileSync(path.join(projectRoot, "CLAUDE.md"), "# consumer project\n");
+	// A real flat copy carries the always-on rule set; no root CLAUDE.md ships.
+	for (const rule of ALWAYS_ON_RULES) fs.writeFileSync(path.join(meowkitDir, "rules", rule), `# ${rule}\n`);
 	fs.writeFileSync(path.join(meowkitDir, "meowkit.config.json"), JSON.stringify({ description: "" }));
 	const hook = path.join(meowkitDir, "hooks", "gate-enforcement.sh");
 	fs.writeFileSync(hook, "#!/bin/bash\nexit 0\n");
@@ -55,5 +57,10 @@ describe("flat-copy consumer validation", () => {
 		// Structure/Hooks checks are present regardless of mode.
 		expect(results.some((r) => r.section === "Structure")).toBe(true);
 		expect(results.some((r) => r.section === "Hooks")).toBe(true);
+		// The always-on rule set is consumer-actionable and must pass on a real flat copy.
+		for (const rule of ALWAYS_ON_RULES) {
+			const check = results.find((r) => r.name === `File exists: rules/${rule}`);
+			expect(check?.status).toBe("pass");
+		}
 	});
 });

@@ -169,7 +169,7 @@ This escalation fires on its own schedule. A `--advice` rescue earlier in the lo
 neither delays it nor substitutes for it, and Athena is not consulted here — the
 decision below is the human's.
 
-**PM foreground invocation (per `.claude/rules/post-phase-delegation.md` Rule 5 — the only foreground PM call):**
+**PM foreground invocation (per `.claude/skills/cook/references/post-phase-delegation.md` Rule 5 — the only foreground PM call):**
 
 ```
 Delegate to the project-manager agent (foreground):

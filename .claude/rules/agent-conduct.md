@@ -1,14 +1,8 @@
 # Agent Conduct
 
-Two-tier conduct rules: Tier A preserves behavior-critical handoff rules; Tier B keeps hook-enforceable or model-default rules concise.
+Behavior-critical conduct rules. A2, B1 and B3–B6 (project context first, naming, context ordering, search before building, plan status on resumption, context hygiene) load just in time from `.claude/skills/cook/references/agent-conduct-extended.md`.
 
----
-
-## Tier A — Behavioral, orchestrator-consumed (rationale preserved)
-
-### A1. Subagent Status Protocol
-
-> Source: `output-format-rules.md` Rule 5 — preserved verbatim because the orchestrator depends on this exact schema.
+## A1. Subagent Status Protocol
 
 Every subagent MUST end its response with a structured status block:
 
@@ -18,16 +12,16 @@ Every subagent MUST end its response with a structured status block:
 **Concerns/Blockers:** [if applicable — omit if DONE with no concerns]
 ```
 
-#### Status Definitions
+### Status Definitions
 
-| Status                 | Meaning                        | Controller Action                                                                                      |
-| ---------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| **DONE**               | Task completed successfully    | Proceed to next step                                                                                   |
-| **DONE_WITH_CONCERNS** | Completed but flagged doubts   | If correctness concern → address before review. If tech debt → note, proceed.                          |
-| **BLOCKED**            | Cannot complete task           | Assess blocker → provide more context / break task down / escalate to user. NEVER retry same approach. |
-| **NEEDS_CONTEXT**      | Missing information to proceed | Provide missing context → re-dispatch                                                                  |
+| Status | Meaning | Controller Action |
+| --- | --- | --- |
+| **DONE** | Task completed successfully | Proceed to next step |
+| **DONE_WITH_CONCERNS** | Completed but flagged doubts | If correctness concern → address before review. If tech debt → note, proceed. |
+| **BLOCKED** | Cannot complete task | Assess blocker → provide more context / break task down / escalate to user. NEVER retry same approach. |
+| **NEEDS_CONTEXT** | Missing information to proceed | Provide missing context → re-dispatch |
 
-#### Handling Rules
+### Handling Rules
 
 - NEVER ignore BLOCKED or NEEDS_CONTEXT — something must change before retry
 - NEVER force same approach after BLOCKED — try: more context → simpler task → escalate
@@ -35,126 +29,17 @@ Every subagent MUST end its response with a structured status block:
 - DONE_WITH_CONCERNS about file growth or tech debt → note for future, proceed now
 - DONE_WITH_CONCERNS about correctness or security → address before review
 
-WHY: Vague "I'm done" handoffs force the controller to investigate completion state. Structured status codes eliminate ambiguity and enable automatic routing decisions.
+## A3. Document Eureka Moments
 
-### A2. Project Context First
+When reasoning reveals a genuine insight that contradicts the conventional approach with evidence: name it — "EUREKA: Everyone does X because they assume [assumption]. But [evidence] suggests that's wrong here." — and append it as one entry to `.meowkit/memory/gotchas.md` with `npx mewkit note gotchas` (entry on stdin), never a bare `Edit`, which is neither lint-checked nor serialized against a concurrent agent. A failed write prints one line (`⚠ memory write skipped: <reason>`) and the workflow continues.
 
-> Source: `context-ordering-rules.md` Rule 4 — verbatim.
-
-When `docs/project-context.md` exists, ALWAYS load it BEFORE task-specific context. This file is the agent "constitution" — tech stack, conventions, anti-patterns, testing approach.
-
-WHY: Loading project context first prevents conflicting convention guesses.
-
-### A3. Document Eureka Moments
-
-> Source: `search-before-building-rules.md` Rule 4 — verbatim, except the append path, which now
-> names the locked, lint-checked `mewkit note` write command.
-
-When Layer 3 reasoning reveals a genuine insight — something that contradicts the conventional approach with evidence:
-
-- Name it: "EUREKA: Everyone does X because they assume [assumption]. But [evidence] suggests that's wrong here."
-- Append it as one entry to `.meowkit/memory/gotchas.md` for future sessions, through
-  `npx mewkit note gotchas` (entry on stdin) — never with a bare `Edit`, which is neither
-  lint-checked nor serialized against a concurrent agent. A failed write prints one line —
-  `⚠ memory write skipped: <reason>` — and the workflow continues.
-- This is the highest-value output of the search process
-
-WHY: Documented insights survive context reset.
-
----
-
-## Tier B — Hook-enforceable / model-default (rationale compressed)
-
-### B1. File Naming (a.k.a. naming-rules)
-
-ALWAYS use kebab-case for file names with descriptive names.
-
-| Platform | Element | Convention | Example |
-|---|---|---|---|
-| TypeScript | vars/fns | camelCase | `getUserById` |
-| TypeScript | classes/types | PascalCase | `UserService` |
-| TypeScript | constants | UPPER_SNAKE_CASE | `MAX_RETRY` |
-| TypeScript | files | kebab-case | `user.service.ts` |
-| Vue | components | PascalCase | `UserAvatar` |
-| Vue | composables | camelCase + `use` prefix | `useAuth` |
-| Vue | files | kebab-case | `user-avatar.vue` |
-| Swift | vars/fns | camelCase | `fetchUser()` |
-| Swift | types/protocols | PascalCase | `UserRepository` |
-| Swift | enum cases | lowerCamelCase | `.authenticated` |
-| DB | tables | snake_case plural | `order_items` |
-| DB | columns | snake_case | `created_at` |
-
-Pattern files: NestJS `feature.service.ts` / `feature.controller.ts` / `feature.module.ts` / `action-name.dto.ts`; Vue `FeatureName.vue`; Swift view `FeatureNameView.swift`.
-
-WHY: Self-documenting names make Grep/Glob useful without opening files.
-
-### B2. Response Structure (after code changes)
+## B2. Response Structure (after code changes)
 
 Every response that ships code MUST include:
+
 1. **What changed** — 1-2 sentences
 2. **Why** — link to plan/bug/user request
 3. **File refs** — `path:line` for every modified file (e.g., `src/auth.ts:42`)
 4. **Open questions** — unresolved decisions
 
-Example:
-
-```
-Changed the session timeout from 5min to 24hr in the auth middleware.
-Why: Fixes #123 — users were getting logged out during normal work sessions.
-Files: src/middleware/auth.ts:15, src/config/session.ts:8
-Open: Should we add a "remember me" checkbox, or apply 24hr universally?
-```
-
-NEVER respond with only "I'm done" or "Task complete" — always include what changed and current state.
-
-Suggest next steps only when natural; don't invent them.
-
-WHY: Structured responses keep review fast.
-
-### B3. Context Ordering
-
-When constructing prompts/plans/handoffs:
-- **Long content first, query last** — background/code/refs at TOP, specific instruction at BOTTOM. This improves multi-document task quality.
-- **Context before constraint** — explain WHAT and WHY before stating a NEVER. Pair every NEVER with an INSTEAD.
-- **Self-contained documents** — every plan file / handoff readable cold by an agent with zero prior context. Required: WHAT (goal), WHERE (file paths), WHY (problem), STATUS (done/next).
-
-WHY: Plans must survive resets and handoffs.
-
-### B4. Search Before Building (3-layer framework)
-
-Identify which knowledge layer applies:
-- **Layer 1 — Tried and true.** Standard patterns. ALWAYS check if the runtime/framework/language already provides this.
-- **Layer 2 — New and popular.** Current best practices. Search and cross-reference; popularity is not correctness.
-- **Layer 3 — First principles.** Original observations. Document as EUREKAs (see A3).
-
-ALWAYS search before: introducing a new dependency · implementing an unfamiliar pattern · solving a novel problem · making an architectural decision. Search means: codebase Grep/Glob → official docs → community.
-
-NEVER skip search because "I know how to do this." For non-trivial research (library evaluation, architectural comparison), route to the **researcher** agent — research output pollutes the implementation context.
-
-WHY: Checking is cheap; rebuilding the wrong thing is not.
-
-### B5. Plan Status on Resumption
-
-When resuming work on an existing plan, ALWAYS start the response with:
-- Current plan status (which phases done / in-progress / blocked)
-- What you are about to work on next
-- Any blockers discovered
-
-WHY: Resumption context prevents duplicate work.
-
-### B6. Host-Runtime Context Hygiene
-
-Treat context as a limited resource:
-
-- Explore first, then plan, then code for non-trivial work.
-- Scope file reads and searches narrowly; use subagents for broad investigations.
-- Put long context before the specific request in plans and handoffs.
-- Keep always-loaded guidance concise; move domain-specific procedures into skills.
-- Prefer deterministic verification (tests, build output, screenshots, runtime checks) over plausibility.
-- After two repeated corrections on the same issue, refine the prompt/plan instead of accumulating more failed context.
-
-For the per-phase × per-tier read-set and token ceiling that operationalizes this hygiene,
-see `context-budget-rules.md` (the Context-selection budget). B3/B6 set the ordering and
-discipline; that rule sets how much to load per phase.
-
-WHY: JIT-loaded context keeps host-runtime performance usable.
+NEVER respond with only "I'm done" or "Task complete" — always include what changed and current state. Suggest next steps only when natural.

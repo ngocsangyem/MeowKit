@@ -100,7 +100,7 @@ AGENTS.md (Gates) — The Gate Authority Invariant).
 
 ## Phase 2: Test (skip if no-test mode; RED-phase enforcement only if `--tdd` / `MEOWKIT_TDD=1`)
 
-Write failing tests BEFORE implementation. TDD enforcement per `tdd-rules.md`. Phase 2 behavior by mode:
+Write failing tests BEFORE implementation. TDD enforcement per the TDD rules. Phase 2 behavior by mode:
 
 - `RED-strict` (interactive, auto, parallel, code) — when `--tdd` / `MEOWKIT_TDD=1` is active, failing tests gate Phase 3. When TDD is off, Phase 2 is optional.
 - `Plan-level` (fast) — tests reflect plan intent only; no RED gate.
@@ -360,7 +360,7 @@ Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist acro
 
 | Phase | Existing output → evidence fields |
 |---|---|
-| 0 Orient | `mode`, tier, `risk.matchedFlags` (from `risk-checklist.md` / `mk:agent-detector`) |
+| 0 Orient | `mode`, tier, `risk.matchedFlags` (from the risk checklist / `mk:agent-detector`) |
 | 1 Plan | `planPath`, `cookContract` (the 5 exact requirements), `approvals.gate1` (mirrors `validate-gate-1.sh`) |
 | 3 Build | changed-files summary |
 | 3.5 Simplify | simplify status |

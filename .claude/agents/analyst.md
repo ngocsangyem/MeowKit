@@ -44,7 +44,7 @@ per session, written by `.claude/hooks/post-session.sh`:
 
 Complexity tiers used when estimating before a task (`TRIVIAL` 1–5 K, `STANDARD` 5–20 K,
 `COMPLEX` 20–100 K, intensive full-codebase work 100 K+) map to the tiers in
-`.claude/rules/model-selection-rules.md`; this log records actuals, not estimates.
+`.claude/skills/agent-detector/references/model-selection-rules.md`; this log records actuals, not estimates.
 
 Rules: append, never overwrite; keep the array valid JSON after every write; never fabricate an
 entry — record a placeholder noting data was unavailable instead; never put a credential, a

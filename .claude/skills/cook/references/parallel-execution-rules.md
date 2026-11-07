@@ -55,7 +55,7 @@ After merging parallel worktrees, run the FULL test suite on the merged result.
 If tests fail, the parallel decomposition was wrong — fix before proceeding.
 
 After the integration test passes, delegate to `project-manager` per
-`.claude/rules/post-phase-delegation.md` Rule 1 to emit a merge report
+`.claude/skills/cook/references/post-phase-delegation.md` Rule 1 to emit a merge report
 summarizing what each parallel branch contributed.
 
 WHY: Integration tests catch cross-branch interaction bugs.
@@ -69,7 +69,7 @@ WHY: Parallelism only pays off when task size amortizes coordination cost.
 
 ## Rule 7: Team Coordination Is Opt-In
 
-Agent Team rules apply only when a team/worktree workflow is active. Standard single-session subagent workflows use `orchestration-rules.md`.
+Agent Team rules apply only when a team/worktree workflow is active. Standard single-session subagent workflows use `.claude/skills/cook/references/orchestration-rules.md`.
 
 The team-mode coordination details (ownership, no-force-push, worktree-branch commits, actionable completion messages, docs-impact ownership) are loaded on demand by `mk:team-config` from `.claude/skills/team-config/references/team-coordination.md` — they cost zero always-on context in standard sessions.
 

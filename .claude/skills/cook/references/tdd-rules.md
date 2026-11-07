@@ -30,7 +30,7 @@ These rules apply to all implementation work in strict mode. No exceptions unles
 - (b) Less than 30 lines AND
 - (c) Orchestrator explicitly classifies as MICRO-TASK
 
-This is distinct from TRIVIAL in model-selection-rules.md (which means cosmetic-only: rename, typo, format). MICRO-TASK covers non-production code that has logic but doesn't need test coverage.
+This is distinct from TRIVIAL in .claude/skills/agent-detector/references/model-selection-rules.md (which means cosmetic-only: rename, typo, format). MICRO-TASK covers non-production code that has logic but doesn't need test coverage.
 
 WHY: Tiny non-production changes rarely gain quality from strict RED-first testing.
 

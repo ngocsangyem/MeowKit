@@ -3,7 +3,7 @@
 //
 // A single-pass plaintext scan is trivially evaded: the same payload survives base64,
 // ROT13, percent-encoding, or an HTML comment that renders invisibly in markdown. Rule 8
-// names base64 and ROT13 explicitly, and `dead-weight-audit-rules.md` Rule 4 makes every
+// names base64 and ROT13 explicitly, and `benchmark/references/dead-weight-audit-rules.md` Rule 4 makes every
 // `injection-rules.md` defense never-prune — so these passes live in the shared state layer
 // where every content gate (`validate --memory`, `mewkit note`) reuses ONE copy.
 //

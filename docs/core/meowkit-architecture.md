@@ -13,7 +13,7 @@ workflows, quality gates, memory persistence, and 125 domain skills. It operates
 through three mechanisms:
 
 1. **Rules** (`.claude/rules/*.md`) — behavioral instructions loaded every session;
-   25 rule files, priority-ordered; 2 are NEVER-override (`security-rules.md`,
+   7 rule files, priority-ordered; 2 are NEVER-override (`security-rules.md`,
    `injection-rules.md`). Source: `RULES_INDEX.md` loading-priority table.
 2. **Hooks** (`.claude/hooks/*.sh`, `.cjs`) — shell/Node scripts triggered by
    Claude Code events before or after tool calls. Source: `settings.json` (7 hook
@@ -25,7 +25,7 @@ through three mechanisms:
 
 There is no executable runtime. MeowKit shapes LLM behavior through prompt
 engineering, preventive hooks, and structured file conventions.
-Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
+Source: `.claude/rules/meowkit-core.md` Role line; `settings.json` hook registrations.
 
 ## Ecosystem Harness (start here)
 
@@ -54,7 +54,7 @@ For the end-to-end integration story (rules + hooks + skills + artifacts), see:
 | Node handlers documented (HOOKS_INDEX) | 9 active | `HOOKS_INDEX.md` footer                    | The memory auto-inject handlers and the prompt-prefix capture handler are all deleted; memory loads on demand per skill |
 | Slash commands                         | 21       | `ls .claude/commands/meow/*.md`            | `status.md` added 260422 alongside project-manager agent                                                                         |
 | Rules files                            | 18       | `ls .claude/rules/*.md` excl. RULES_INDEX  | RULES_INDEX table lists 18 rows — matches disk (`risk-checklist.md` added at slot 13b for Phase 0 horizontal-risk evaluation)    |
-| Memory files                           | 2        | `CLAUDE.md` Memory section                 | `.meowkit/memory/decisions.md`, `.meowkit/memory/gotchas.md` — committed, read by grep. Logs/state/caches live in `.meowkit/{telemetry,state,cache}/` |
+| Memory files                           | 2        | `.claude/rules/meowkit-core.md` Memory     | `.meowkit/memory/decisions.md`, `.meowkit/memory/gotchas.md` — committed, read by grep. Logs/state/caches live in `.meowkit/{telemetry,state,cache}/` |
 
 **Skill type breakdown** (source: `inventory-summary.md`): workflow 33, verification 17,
 reference 11, business-process 7, scaffolding 5, cicd 3, library-api-reference 2 = **78**.
@@ -240,7 +240,7 @@ Hook chain verified against `settings.json` (2026-04-18). All 7 events listed.
 | `UserPromptSubmit`        | tdd-flag-detector.sh → dispatch.cjs (safety-sentinel-inject)                                                                  | `settings.json:152-173` |
 | `Stop`                    | pre-completion-check.sh → post-session.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer)                                 | `settings.json:125-151` |
 
-**Phase routing** (source: `.claude/rules/phase-contracts.md`):
+**Phase routing** (source: `.claude/skills/cook/references/phase-contracts.md`):
 `Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test → Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect`
 
 SubagentStart/SubagentStop: intentionally empty — hooks in these events would
@@ -309,10 +309,10 @@ Note: jira-evaluator, jira-estimator, jira-analyst moved to project-scoped (`.cl
 
 ## 7. Context & Memory System
 
-Source: `CLAUDE.md` Memory section; `HOOKS_INDEX.md` State Files table.
+Source: `.claude/rules/meowkit-core.md` Memory section; `HOOKS_INDEX.md` State Files table.
 
 Memory path: `.meowkit/memory/` (NOT bare `memory/` — see CF-C6).
-Source: `CLAUDE.md` Memory section; `HOOKS_INDEX.md` State Files table.
+Source: `.claude/rules/meowkit-core.md` Memory section; `HOOKS_INDEX.md` State Files table.
 
 | File                                                        | When read                                                    | Writer                                         |
 | ----------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------- |
@@ -399,13 +399,13 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | ID     | File:Line                            | Issue                                                                        | Status |
 | ------ | ------------------------------------ | ---------------------------------------------------------------------------- | ------ |
 | CF-H7  | `mk:lazy-agent-loader/SKILL.md:13` | Audit cited hardcoded agent count "15" | CLOSED 2026-04-29 — `grep -nE "[0-9]+ agent"` returns nothing; no hardcoded count exists in current tree |
-| CF-H11 | `commands/meow/meow.md:20`           | `/mk:command` routed but `mk:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `.claude/rules/skill-authoring-rules.md` (post-dated audit) |
+| CF-H11 | `commands/meow/meow.md:20`           | `/mk:command` routed but `mk:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `.claude/skills/skill-creator/references/skill-authoring-rules.md` (post-dated audit) |
 | CF-H12 | `commands/meow/meow.md:20,40`        | `mk:plan/arch/design/test` phantom routing targets | CLOSED 2026-04-29 — all 4 resolve via `commands/meow/<name>.md` |
 | CF-H13 | `commands/meow/plan.md`              | `mk:plan` phantom                                                          | CLOSED 2026-04-29 — `commands/meow/plan.md` exists |
 | CF-H14 | `commands/meow/validate.md`          | `mk:audit`, `mk:validate` phantom                                        | CLOSED 2026-04-29 — both resolve in `commands/meow/` |
 | CF-H15 | `commands/meow/summary.md`           | `mk:summary` phantom                                                       | CLOSED 2026-04-29 — `commands/meow/summary.md` exists |
 
-**Re-verification finding (CF-H11–H15):** the audit pre-dated `.claude/rules/skill-authoring-rules.md` (originally in `meowkit/CLAUDE.md`, relocated 2026-05-09), which formalizes that a command without a matching skill is NOT phantom (per audit-rubric RF-14). All 7 cited refs resolve to a command file. **A future cross-ref CI script will guard against regressions.**
+**Re-verification finding (CF-H11–H15):** the audit pre-dated `.claude/skills/skill-creator/references/skill-authoring-rules.md` (originally in `meowkit/CLAUDE.md`, relocated 2026-05-09), which formalizes that a command without a matching skill is NOT phantom (per audit-rubric RF-14). All 7 cited refs resolve to a command file. **A future cross-ref CI script will guard against regressions.**
 
 **Total post-re-verify (2026-04-29):** 1 CRITICAL OPEN (CF-C4), 0 HIGH OPEN (5 closed). Re-baseline of MEDIUM/LOW deferred to next audit pass.
 
@@ -439,4 +439,4 @@ Source: `audit-findings/simulation-traces.md` Scenario Verdict Summary table.
 - Regressed: 0
 
 **Next audit trigger:** mandatory on next model upgrade per `harness-rules.md` Rule 7
-(dead-weight audit playbook: `.claude/rules/dead-weight-audit-rules.md`).
+(dead-weight audit playbook: `.claude/skills/benchmark/references/dead-weight-audit-rules.md`).

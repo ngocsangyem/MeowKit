@@ -61,7 +61,7 @@ function actualCount(kind) {
 // Verify, and none agreed on where Simplify sits. A copy is the bug — so the check is not
 // "does this copy match" but "is there a copy at all".
 const PHASE_SEQUENCE = (() => {
-  const src = join(REPO_ROOT, ".claude", "rules", "phase-contracts.md");
+  const src = join(REPO_ROOT, ".claude", "skills", "cook", "references", "phase-contracts.md");
   const m = /<!--\s*Workflow phase sequence:\s*(.+?)\s*-->/.exec(readFileSync(src, "utf-8"));
   if (!m) throw new Error(`no phase-sequence fingerprint in ${src}`);
   return m[1].split(">").map((p) => p.split(":")[1].trim());

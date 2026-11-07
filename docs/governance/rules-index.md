@@ -2,38 +2,67 @@
 
 # MeowKit Rules Index
 
-Rules are loaded by the agent at session start.
-All rules are mandatory unless marked [CONTEXTUAL].
-Full background rationale lives in `docs/governance/rule-rationale.md`; read it before modifying rules.
+The always-on set is exactly 7 files under `.claude/rules/`. The host auto-loads that
+directory every session, so those 7 are the only rules that cost context unconditionally —
+the budget for the set is 25 600 bytes, enforced by `scripts/check-always-on-budget.cjs`.
+Every other rule moved next to the skill that loads it and reaches context just in time.
 
-| Rule                              | Purpose                                                                                                                                            | Source                                       | Applies to                                          |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------- |
-| `security-rules.md`               | Block hardcoded secrets, any types, SQL injection, XSS patterns                                                                                    | MeowKit original                             | All modes, all phases                               |
-| `injection-rules.md`              | Prompt injection defense: DATA vs INSTRUCTIONS boundary; Rule 11 = Skill Rule of Two                                                               | MeowKit original                             | All modes, all phases                               |
-| `gate-rules.md`                   | Gate 1 (plan approval) and Gate 2 (review approval) hard stops                                                                                     | MeowKit original                             | Phases 1, 4                                         |
-| `core-behaviors.md`               | 6 mandatory operating behaviors: Surface Assumptions, Manage Confusion, Push Back, Enforce Simplicity, Scope Discipline, Verify Don't Assume       | Adapted from agent-skills                    | All modes, all phases                               |
-| `tdd-rules.md`                    | TDD enforcement (opt-in via MEOWKIT_TDD=1 / --tdd). Includes MICRO-TASK exemption.                                                                 | MeowKit original                             | Phases 2, 3 **when TDD enabled** [CONTEXTUAL]       |
-| `agent-conduct.md`                | Two-tier merge: file naming (B1), response structure (B2), context ordering (B3), search-before-building (B4), plan-resumption (B5), Claude Code context hygiene (B6); subagent status protocol (A1), project-context-first (A2), eureka documentation (A3) | MeowKit original (merged from 4 sources + Claude Code best practices) | Implementation, review, all agent responses |
-| `development-rules.md`            | Skill activation, YAGNI/KISS/DRY, file management, code quality, MeowKit validation commands, pre-commit, git safety, docs impact                  | Adapted from user rules + MeowKit conventions | Implementation, commit                              |
-| `orchestration-rules.md`          | Subagent delegation, work/report/plan paths, file ownership, parallel vs sequential, completion-status handling                                     | Adapted from user rules + MeowKit conventions | Multi-agent workflows [CONTEXTUAL]                  |
-| `harness-rules.md`                | Generator/evaluator architecture: planner stance, contract discipline, evaluator skepticism, iteration limits, adaptive density, dead-weight audit | New (Anthropic + LangChain harness research) | Phase 3 (Build, harness pipeline), Phase 4 (Review) |
-| `rubric-rules.md`                 | Evaluator calibration discipline, rubric library governance, anchor balance enforcement, drift detection cadence, anti-slop anti-patterns          | New (Anthropic harness research)             | Phase 4 (Review, evaluator agent)                   |
-| `step-file-rules.md`              | JIT step loading, no skipping, state persistence for multi-step workflows                                                                          | New (BMAD-inspired)                          | Step-file skills                                    |
-| `parallel-execution-rules.md`     | Worktree isolation, file ownership, max 3 agents, integration test, opt-in team coordination                                                       | New (MeowKit team pattern)                   | Parallel execution [CONTEXTUAL]                     |
-| `skill-authoring-rules.md`        | Mandatory Gotchas section, persistent state in `${CLAUDE_PLUGIN_DATA}`, 500-line SKILL.md cap with decomposition + audit cadence, required `keywords`/`when_to_use`/`user-invocable` frontmatter (Rule 4) | New (Anthropic skill-authoring docs)         | Skill authoring, audits                             |
-| `post-phase-delegation.md`        | Fire points, skip conditions, and invocation form for delegating to project-manager after each phase transition                                    | MeowKit original                             | Orchestration skills [CONTEXTUAL]                   |
+No kit-owned root `CLAUDE.md` ships. A target project may keep its own `CLAUDE.md`; it is
+project-owned, never installed or refreshed by the kit.
 
-### Phase-Zero Conditional Rules (`.claude/rules/`)
+Full background rationale lives in `docs/governance/rule-rationale.md`; read it before
+modifying rules. The old-path → new-path mapping for the context diet, line by line, is
+`docs/maintainer/rule-destination-table.md`.
 
-Live alongside the always-on rules but are loaded explicitly by `mk:agent-detector` Step 0b — NOT auto-loaded by Claude Code's directory mechanism. Out of always-on tier; only reaches context when agent-detector runs (every user message).
+## Always-On Rules (7)
 
-| Rule | Purpose | Loaded by |
-| ---- | ------- | --------- |
-| `phase-contracts.md` | Phase I/O contracts table — what each phase expects/produces | `mk:agent-detector` Step 0b |
-| `agent-routing.md` | Agent → role → phase routing table; domain-agent exclusions; PM opt-out env var (intent → skill dispatch table relocated to `skills/agent-detector/references/skill-domain-routing.md`) | `mk:agent-detector` Step 0b |
-| `model-selection-rules.md` | Task type → model tier routing, security escalation | `mk:agent-detector` Step 0b |
-| `scale-adaptive-rules.md` | Domain-based complexity routing, CSV match override, Gate 1 one-shot bypass | `mk:agent-detector` Step 0b |
-| `risk-checklist.md` | Phase 0 horizontal-risk flag eval (9 flags); auto-escalation feeds `model-selection-rules.md` Rule 2 | `mk:agent-detector` Step 0b |
+| Rule | Purpose | Applies to |
+| --- | --- | --- |
+| `meowkit-core.md` | Role, the 7-phase workflow, the two gates in brief, the DATA/INSTRUCTIONS boundary, the memory contract, the compaction policy | All modes, all phases |
+| `security-rules.md` | Block hardcoded secrets, `any` types, SQL interpolation, XSS and the rest of the blocked-pattern table | All modes, all phases |
+| `injection-rules.md` | Prompt-injection defense: DATA vs INSTRUCTIONS boundary; Rule 11 = Skill Rule of Two | All modes, all phases |
+| `gate-rules.md` | Gate 1 (plan approval) and Gate 2 (review approval) hard stops, the Gate Authority Invariant, and Recording Human Interventions | Phases 1, 4 |
+| `core-behaviors.md` | 6 mandatory operating behaviors (Surface Assumptions, Manage Confusion, Push Back, Enforce Simplicity, Scope Discipline, Verify Don't Assume) plus the Anti-Rationalization table | All modes, all phases |
+| `development-rules.md` | YAGNI/KISS/DRY, file management, code quality, pre-commit, git safety, docs impact, tool-output limits | Implementation, commit |
+| `agent-conduct.md` | A1 subagent status protocol, A3 eureka documentation, B2 response structure | All agent responses |
+
+`mewkit validate` checks all 7 for presence: a missing file silently drops enforcement, so
+the presence check replaced the former root-`CLAUDE.md` check.
+
+## Moved Rules — Where They Live Now
+
+Each file below left `.claude/rules/` in the context diet and is loaded on demand by the
+skill that owns it. Nothing was dropped: the enforcement text moved intact.
+
+| Rule | New location | Loaded by |
+| --- | --- | --- |
+| `harness-rules.md` | `.claude/skills/cook/references/` | `mk:cook`, `mk:autobuild` |
+| `tdd-rules.md` | `.claude/skills/cook/references/` | `mk:cook` (Phases 2–3), `mk:fix` |
+| `phase-contracts.md` | `.claude/skills/cook/references/` | `mk:agent-detector` Step 0b |
+| `post-phase-delegation.md` | `.claude/skills/cook/references/` | orchestration skills |
+| `task-state-emission.md` | `.claude/skills/cook/references/` | `mk:cook`, `mk:autobuild` |
+| `parallel-execution-rules.md` | `.claude/skills/cook/references/` | `mk:worktree`, `mk:team-config`, parallel runs |
+| `orchestration-rules.md` | `.claude/skills/cook/references/` | multi-agent workflows |
+| `model-selection-rules.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector` Step 0b |
+| `scale-adaptive-rules.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector` Step 0b |
+| `risk-checklist.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector` Step 0b |
+| `agent-routing.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector` Step 0b |
+| `context-budget-rules.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector`, `mk:context-audit` |
+| `rubric-rules.md` | `.claude/skills/rubric/references/` | `mk:rubric`, evaluator agent |
+| `skill-authoring-rules.md` | `.claude/skills/skill-creator/references/` | `mk:skill-creator`, skill audits |
+| `dead-weight-audit-rules.md` | `.claude/skills/benchmark/references/` | `mk:benchmark` |
+| `docs-reference-contract.md` | `docs/maintainer/` (source repo only, not shipped) | maintainers, `check-docs-references.py` |
+| `step-file-rules.md` | inlined as `## Step-File Contract` in each step-filed skill's `workflow.md` | `mk:plan-creator`, `mk:review`, `mk:evaluate`, `mk:autobuild`, `mk:trace-analyze` |
+| `anti-rationalization.md` | merged into `.claude/rules/core-behaviors.md` | always-on |
+| `intervention-recording-rules.md` | merged into `.claude/rules/gate-rules.md` ("Recording Human Interventions") | always-on |
+
+The Tier-A/Tier-B sections of the pre-diet `agent-conduct.md` that are not A1/A3/B2 — A2
+(project context first), B1 (naming), B3 (context ordering), B4 (search before building),
+B5 (plan status on resumption), B6 (context hygiene) — live verbatim in
+`.claude/skills/cook/references/agent-conduct-extended.md`.
+
+`scripts/check-dangling-rule-refs.cjs` fails the build if any of these files is referenced
+at its old path, or if a destination has no load step naming it.
 
 ### Agile Conditional Rules (`.claude/rules-conditional/`)
 
@@ -57,38 +86,22 @@ not reach the relevant surface pays zero context cost.
 
 ## Loading Priority
 
-Rules are applied in this priority (higher = stronger override):
+A just-in-time rule never overrides an always-on one. Within the always-on set, higher =
+stronger override:
 
 1. `security-rules.md` — NEVER override
 2. `injection-rules.md` — NEVER override
 3. `gate-rules.md` — NEVER override (except `/mk:fix` simple bypasses Gate 1)
-4. `harness-rules.md` — NEVER override gates; density choice does not bypass any gate
-5. `rubric-rules.md` — NEVER override hard-fail propagation
-6. `core-behaviors.md` — always apply (6 behaviors + 10 failure modes)
-7. `tdd-rules.md` — applies only when `MEOWKIT_TDD=1` / `--tdd`; default OFF. Legacy `[fast]` profile bypass retained with deprecation warning.
-8. `agent-conduct.md` — always apply (file naming, response structure, context ordering, search-before-building, plan-resumption, context hygiene, subagent status protocol)
-9. `development-rules.md` — always apply
-10. `step-file-rules.md` — apply when executing step-file workflows
-11. `parallel-execution-rules.md` — apply during parallel agent execution [CONTEXTUAL]
-12. `orchestration-rules.md` — apply only in multi-agent workflows [CONTEXTUAL]
-13. `skill-authoring-rules.md` — apply during skill authoring, scaffolding, and quarterly/model-upgrade audits
-14. `post-phase-delegation.md` — apply during orchestration-skill execution only [CONTEXTUAL]
+4. `core-behaviors.md` — always apply (6 behaviors + anti-rationalization)
+5. `meowkit-core.md` — always apply (workflow, gates in brief, memory, compaction policy)
+6. `agent-conduct.md` — always apply (A1 status protocol, A3 eureka, B2 response structure)
+7. `development-rules.md` — always apply
 
-**Phase-zero conditional** (live in `rules/` but loaded by `mk:agent-detector` Step 0b only — NOT auto-loaded by directory mechanism):
-- `rules/phase-contracts.md`
-- `rules/agent-routing.md`
-- `rules/model-selection-rules.md`
-- `rules/scale-adaptive-rules.md`
-- `rules/risk-checklist.md`
-
-**Agile conditional** (live in `rules-conditional/`, loaded by `mk:agent-detector` Step 0b only when Agile context detected):
-- `rules-conditional/agile-story-gates.md`
-- `rules-conditional/agile-sprint-commitment.md`
-- `rules-conditional/agile-feedback-cycle.md`
-
-**Workflow conditional** (live in `rules-conditional/`, loaded on demand by the consuming skill, not Agile-gated):
-- `rules-conditional/workflow-evidence-rules.md`
-- `rules-conditional/advice-supervision-rules.md`
+Just-in-time rules apply when their owning skill loads them, and only there:
+`harness-rules.md` and `rubric-rules.md` never override a gate; `tdd-rules.md` applies only
+when `MEOWKIT_TDD=1` / `--tdd`; `parallel-execution-rules.md`, `orchestration-rules.md` and
+`post-phase-delegation.md` are contextual; `context-budget-rules.md` is advisory and never a
+gate.
 
 ## Hook Enforcement
 
@@ -102,28 +115,39 @@ MeowKit uses shell hooks to upgrade behavioral rules to preventive enforcement:
 
 Hooks supplement rules — they do not replace them. Rules define the WHY; hooks enforce the WHAT.
 
-## Enforcement Mechanism Matrix (v1.1.0)
+## Enforcement Mechanism Matrix
 
-| Rule                              | Mechanism                                                                                                | Override?                            | Exception                                                                                                                               |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `security-rules.md`               | Behavioral                                                                                               | NEVER                                | Human override only, documented                                                                                                         |
-| `injection-rules.md`              | Behavioral                                                                                               | NEVER                                | Human override only, documented                                                                                                         |
-| `gate-rules.md`                   | Hook (gate-enforcement.sh)                                                                               | NEVER                                | `/mk:fix` simple bypasses Gate 1; scale-routing one-shot                                                                              |
-| `harness-rules.md`                | Behavioral + Hook (gate-enforcement.sh contract gate, validate-verdict.sh active-verification HARD GATE) | NEVER override gates                 | Density modes adjust scaffolding, not gate semantics                                                                                    |
-| `rubric-rules.md`                 | Behavioral + Script (validate-rubric.sh, check-product-spec.sh)                                          | NEVER override hard-fail propagation | Custom rubrics can be added; existing rubric semantics are fixed                                                                        |
-| `tdd-rules.md`                    | Behavioral + Manual Script (`pre-implement.sh` — invoked by developer agent, not wired to system events)  | Yes                                  | Default OFF. Opt in via `--tdd` / `MEOWKIT_TDD=1`. Legacy `MEOW_PROFILE=fast` retained with deprecation warn. [CONTEXTUAL]              |
-| `agent-conduct.md`                | Behavioral                                                                                               | No                                   | Tier A (A1/A2/A3) preserves rationale verbatim; Tier B (B1–B6) compressed                                                              |
-| `development-rules.md`            | Behavioral                                                                                               | No                                   | —                                                                                                                                       |
-| `orchestration-rules.md`          | Behavioral                                                                                               | N/A                                  | [CONTEXTUAL] — only in multi-agent workflows                                                                                            |
-| `model-selection-rules.md`        | Behavioral                                                                                               | No                                   | Domain override via scale-routing CSV                                                                                                   |
-| `scale-adaptive-rules.md`         | Behavioral + CSV data                                                                                    | No                                   | CSV extensible by users                                                                                                                 |
-| `risk-checklist.md`               | Behavioral + DATA                                                                                        | No                                   | Flags advisory; escalation routed through `model-selection-rules.md` Rule 2                                                             |
-| `step-file-rules.md`              | Behavioral                                                                                               | N/A                                  | Only applies to step-file skills                                                                                                        |
-| `parallel-execution-rules.md`     | Behavioral + worktree                                                                                    | N/A                                  | [CONTEXTUAL] — only during parallel execution                                                                                           |
-| `skill-authoring-rules.md`        | Behavioral + Script (500-line audit `find` one-liner) + Hook (`scripts/validate-skill-frontmatter.py` via `ci.yml`)                                                    | No                                   | MeowKit-internal infra paths exempt from Rule 2; step-filed skills auto-pass Rule 3; Rule 4 fields validated mechanically (ERROR for schema violations, WARN for missing `when_to_use`)                                                     |
-| `post-phase-delegation.md`        | Behavioral                                                                                               | N/A                                  | [CONTEXTUAL] — only when an orchestration skill is active. `MEOWKIT_PM_AUTO=off` disables silent fires                                  |
-| `phase-contracts.md`              | Behavioral                                                                                               | No                                   | —                                                                                                                                       |
-| `agent-routing.md`                | Behavioral                                                                                               | No                                   | `MEOWKIT_PM_AUTO=off` disables silent project-manager fires                                                                             |
+### Always-on
+
+| Rule | Mechanism | Override? | Exception |
+| --- | --- | --- | --- |
+| `security-rules.md` | Behavioral | NEVER | Human override only, documented |
+| `injection-rules.md` | Behavioral | NEVER | Human override only, documented |
+| `gate-rules.md` | Hook (`gate-enforcement.sh`) | NEVER | `/mk:fix` simple bypasses Gate 1; scale-routing one-shot |
+| `core-behaviors.md` | Behavioral | No | — |
+| `meowkit-core.md` | Behavioral + Script (`check-always-on-budget.cjs`) | No | — |
+| `agent-conduct.md` | Behavioral | No | A1/A3 preserve rationale verbatim; B2 compressed |
+| `development-rules.md` | Behavioral | No | — |
+
+### Just-in-time
+
+| Rule | Mechanism | Override? | Exception |
+| --- | --- | --- | --- |
+| `harness-rules.md` | Behavioral + Hook (`gate-enforcement.sh` contract gate, `validate-verdict.sh` active-verification HARD GATE) | NEVER override gates | Density modes adjust scaffolding, not gate semantics |
+| `rubric-rules.md` | Behavioral + Script (`validate-rubric.sh`, `check-product-spec.sh`) | NEVER override hard-fail propagation | Custom rubrics can be added; existing rubric semantics are fixed |
+| `tdd-rules.md` | Behavioral + Manual Script (`pre-implement.sh` — invoked by the developer agent, not wired to system events) | Yes | Default OFF. Opt in via `--tdd` / `MEOWKIT_TDD=1` |
+| `orchestration-rules.md` | Behavioral | N/A | Contextual — only in multi-agent workflows |
+| `model-selection-rules.md` | Behavioral | No | Domain override via scale-routing CSV |
+| `scale-adaptive-rules.md` | Behavioral + CSV data | No | CSV extensible by users |
+| `risk-checklist.md` | Behavioral + DATA | No | Flags advisory; escalation routed through the model-selection rules Rule 2 |
+| `parallel-execution-rules.md` | Behavioral + worktree | N/A | Contextual — only during parallel execution |
+| `skill-authoring-rules.md` | Behavioral + Script (500-line audit `find` one-liner) + CI (`scripts/validate-skill-frontmatter.py` via `ci.yml`) | No | MeowKit-internal infra paths exempt from Rule 2; step-filed skills auto-pass Rule 3 |
+| `post-phase-delegation.md` | Behavioral | N/A | Contextual. `MEOWKIT_PM_AUTO=off` disables silent fires |
+| `phase-contracts.md` | Behavioral | No | — |
+| `agent-routing.md` | Behavioral | No | `MEOWKIT_PM_AUTO=off` disables silent project-manager fires |
+| `context-budget-rules.md` | Behavioral | N/A | Advisory read-budget; never a gate |
+| `dead-weight-audit-rules.md` | Behavioral + Benchmark data | No | Requires measured deltas, not subjective judgment |
+| `step-file-rules.md` | Behavioral (inlined in each step-filed `workflow.md`) | N/A | Step-file skills only |
 
 **Mechanism types:**
 
@@ -135,7 +159,6 @@ Hooks supplement rules — they do not replace them. Rules define the WHY; hooks
 
 Every rule file follows this structure:
 
-- **Frontmatter**: source, original_file, adapted, adaptation_notes
 - **Imperative language**: ALWAYS, NEVER, MUST (not "consider", "try to")
 - **WHY explanations**: every rule includes its rationale
 - **INSTEAD alternatives**: every NEVER is paired with what TO DO instead

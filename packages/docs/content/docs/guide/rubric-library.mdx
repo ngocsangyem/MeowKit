@@ -24,7 +24,7 @@ Every file in `.claude/rubrics/` follows `schema.md` and contains:
 | `## Anti-patterns` | Fixed list of auto-FAIL signatures (see below) |
 | `## Few-Shot Examples` | ≥1 PASS anchor + ≥1 FAIL anchor with reasoning |
 
-**Rule 1** (from `.claude/rules/rubric-rules.md`): every rubric must have at least one PASS and one FAIL anchor. A rubric with only PASS examples produces an evaluator that defaults to PASS. Balanced anchors force the model to discriminate.
+**Rule 1** (from `.claude/skills/rubric/references/rubric-rules.md`): every rubric must have at least one PASS and one FAIL anchor. A rubric with only PASS examples produces an evaluator that defaults to PASS. Balanced anchors force the model to discriminate.
 
 **Rule 5** — position bias: anchor examples alternate PASS/FAIL by number (Example 1 = PASS, Example 2 = FAIL, ...). Models attend more to recent context; alternating order eliminates the position-bias signal.
 
@@ -119,7 +119,7 @@ A poisoned rubric could otherwise inject prompt overrides into the evaluator's c
 - `.claude/rubrics/` — all rubric files and composition presets
 - `.claude/rubrics/RUBRICS_INDEX.md` — catalog with weights, hard-fail thresholds, applicability
 - `.claude/rubrics/schema.md` — canonical rubric format spec
-- `.claude/rules/rubric-rules.md` — the 10 rules governing rubric governance
+- `.claude/skills/rubric/references/rubric-rules.md` — the 10 rules governing rubric governance
 
 ## Related
 

@@ -12,7 +12,7 @@
 
 Generates a classified, evidence-based delivery status report for the active plan via the `project-manager` agent. Report is co-located inside the plan dir at `{plan-dir}/status-reports/{YYMMDD}-status.md`.
 
-This is the **foreground** entry point for the project-manager agent. Use it when the agent's background auto-invocation (via `post-phase-delegation.md` rule) is not applicable — e.g., when asking on demand or when disambiguation between multiple active plans is needed.
+This is the **foreground** entry point for the project-manager agent. Use it when the agent's background auto-invocation (via `.claude/skills/cook/references/post-phase-delegation.md` rule) is not applicable — e.g., when asking on demand or when disambiguation between multiple active plans is needed.
 
 **For "what should I do next" advice, use `/mk:help` instead.** PM is backward-looking ("what's done, what's blocked"); `mk:help` is forward-looking.
 
@@ -61,7 +61,7 @@ Example:
 
 ## Skip Conditions
 
-`/mk:status` runs regardless of `MEOWKIT_PM_AUTO` — the env var only gates silent background fires per `post-phase-delegation.md`. User-invoked requests are always honored.
+`/mk:status` runs regardless of `MEOWKIT_PM_AUTO` — the env var only gates silent background fires per `.claude/skills/cook/references/post-phase-delegation.md`. User-invoked requests are always honored.
 
 ## Notes
 
@@ -73,5 +73,5 @@ Example:
 
 - Agent: `.claude/agents/project-manager.md`
 - Template: `tasks/templates/pm-status-template.md`
-- Rule: `.claude/rules/post-phase-delegation.md` (background auto-fire policy)
+- Rule: `.claude/skills/cook/references/post-phase-delegation.md` (background auto-fire policy)
 - Alternative (forward-looking): `/mk:help`

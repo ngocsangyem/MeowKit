@@ -8,7 +8,7 @@
 - ALWAYS halt at the HITL gate (step-06) — no auto-apply
 - ALWAYS use venv python for JSON parsing (no `jq` dependency)
 - NEVER mutate trace records — append-only
-- Max 3 parallel researchers (per `parallel-execution-rules.md`)
+- Max 3 parallel researchers (per the parallel-execution rules)
 - Frequency threshold: a pattern needs ≥3 occurrences to become a suggestion
 
 ## Steps
@@ -47,7 +47,7 @@ Step 1: Ingest
          ↓
 Step 2: Partition
     ├── Group by run_id
-    ├── Split into max 3 batches (parallel-execution-rules.md cap)
+    ├── Split into max 3 batches (the parallel-execution rules cap)
     └── If <3 run_ids, use fewer batches
          ↓
 Step 3: Scatter

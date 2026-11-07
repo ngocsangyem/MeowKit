@@ -38,9 +38,9 @@ during the run — never from memory or a prior report.
   (`injection-rules.md`).
 - Destructive, deploy, release, delete, or credentialed jobs require explicit
   human approval for that exact scope, recorded per
-  `intervention-recording-rules.md`. `--internal` prompt-only isolation may never
+  `.claude/rules/gate-rules.md` (Recording Human Interventions). `--internal` prompt-only isolation may never
   carry destructive/credentialed work.
-- In-session parallel fan-out honors `parallel-execution-rules.md` (max 3
+- In-session parallel fan-out honors `.claude/skills/cook/references/parallel-execution-rules.md` (max 3
   concurrent agents, zero file-ownership overlap, worktree isolation for writers).
 - Gate 1 and Gate 2 are never self-approved by orchestration (`gate-rules.md`).
 - Prefer a direct single-agent workflow (`mk:cook`) when orchestration adds no

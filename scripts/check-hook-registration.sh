@@ -39,7 +39,7 @@ DISK_HOOKS=$(find "$HOOKS_DIR" -maxdepth 1 -type f \( -name '*.sh' -o -name '*.c
 #   append-trace.sh           — shared-library; called by post-session.sh, learning-observer.sh, post-write-*.sh, lib/hook-logger.sh
 #   post-write-build-verify.sh — dispatched by handlers/build-verify.cjs (PostToolUse Edit|Write chain)
 #   post-write-loop-detection.sh — dispatched by handlers/loop-detection.cjs (PostToolUse Edit|Write chain)
-#   pre-implement.sh          — invoked by developer agent (Subagent path), not Claude Code event (per tdd-rules.md enforcement matrix)
+#   pre-implement.sh          — invoked by developer agent (Subagent path), not Claude Code event (per cook/references/tdd-rules.md enforcement matrix)
 INDIRECT_CALL_ALLOWLIST="append-trace.sh post-write-build-verify.sh post-write-loop-detection.sh pre-implement.sh"
 
 # Hooks registered in settings.json — extract every command string and pull the basename

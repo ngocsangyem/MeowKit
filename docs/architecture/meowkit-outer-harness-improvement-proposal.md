@@ -189,7 +189,7 @@ The first implementation is successful only when all of the following are demons
 
 - Task scaffold: `packages/mewkit/src/commands/task.ts`
 - Durable state and resume: `packages/mewkit/src/core/task-record.ts`, `packages/mewkit/src/commands/task-state.ts`
-- Installed task-state emission rule: `/Users/sangnguyen/Documents/Aspire/.claude/rules/task-state-emission.md`
+- Installed task-state emission rule: `/Users/sangnguyen/Documents/Aspire/.claude/skills/cook/references/task-state-emission.md`
 - Installed orientation/checkpoint/budget handlers: `/Users/sangnguyen/Documents/Aspire/.claude/hooks/handlers/{orientation-ritual,checkpoint-writer,budget-tracker}.cjs`
 - Wiki write/research/recall: `packages/mewkit/src/wiki/application/{service,research}.ts`, `packages/mewkit/src/wiki/recall/*`
 - Provider lifecycle/projections: `packages/mewkit/src/core/{provider-lifecycle,provider-projection}.ts`

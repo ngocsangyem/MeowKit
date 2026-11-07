@@ -35,7 +35,7 @@ domain_agents[2]{family,count,list}:
   Confluence,5,confluence-page/confluence-search/confluence-spec-analyst/confluence-bulk/confluence-collaborate
 ```
 
-Total: 17 core + 21 domain = 38 agents. Core agents are routed by the orchestrator via the `agent-routing.md` table; domain agents are routed by their hub skill (`mk:jira` / `mk:confluence`) — the orchestrator does NOT score them directly.
+Total: 17 core + 21 domain = 38 agents. Core agents are routed by the orchestrator via the agent-routing table; domain agents are routed by their hub skill (`mk:jira` / `mk:confluence`) — the orchestrator does NOT score them directly.
 
 See the agent-routing conventions for the full agent table. Skill dispatch (intent → skill) lives separately in `.agents/skills/agent-detector/references/skill-domain-routing.md`.
 

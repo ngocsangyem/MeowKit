@@ -4,7 +4,7 @@
 // These cases are ported from the deleted `wiki/infrastructure/__tests__/scanner-adapter.test.ts`.
 // The wiki carried the only implementation of Rules 8 and 9, and when it was deleted the
 // defenses AND their tests went with it — so a base64 payload in an HTML comment passed the
-// replacement lint with exit 0. `dead-weight-audit-rules.md` Rule 4 makes everything in
+// replacement lint with exit 0. `benchmark/references/dead-weight-audit-rules.md` Rule 4 makes everything in
 // `injection-rules.md` never-prune, so the cases live here now, attached to the content gate
 // that every memory writer and the lint both call.
 import { describe, expect, it } from "vitest";

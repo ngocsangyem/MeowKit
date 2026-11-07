@@ -154,7 +154,7 @@
       "type": "array",
       "items": { "type": "string", "minLength": 1 },
       "uniqueItems": true,
-      "description": "Optional (advisory tool-contract). External services this skill needs (e.g. ['jira'], ['gemini','minimax']). Annotates external-service entrypoints for humans/tooling; not hook-enforced. See skill-authoring-rules.md → Tool Contract Rule."
+      "description": "Optional (advisory tool-contract). External services this skill needs (e.g. ['jira'], ['gemini','minimax']). Annotates external-service entrypoints for humans/tooling; not hook-enforced. See .claude/skills/skill-creator/references/skill-authoring-rules.md → Tool Contract Rule."
     },
     "default_enabled": {
       "type": "boolean",

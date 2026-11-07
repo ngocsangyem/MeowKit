@@ -32,7 +32,7 @@ those checks disagree, the checks are authoritative and the prose is the bug.
 
 - Fires ONLY on an explicit `--advice` flag on a skill that documents support.
 - NEVER from SessionStart / Stop / any hook. Hooks may not invoke agents
-  (`.claude/rules/post-phase-delegation.md` Rule 7).
+  (`.claude/skills/cook/references/post-phase-delegation.md` Rule 7).
 - NEVER auto-enabled by a mode, tier, risk flag, score, or failure count.
 - Orchestrated child jobs never self-supervise: a supervised parent does not hand
   `--advice` to the children it spawns.
@@ -167,7 +167,7 @@ a transcript, auto-memory, or a new supervisor store.
 - Pointer placement: an active durable task gets an `evidenceRef`; a plan/run
   artifact gets a pointer; a one-off run keeps only the local dossier and has no
   automatic cross-session resume guarantee. **Never invent an active task**
-  (`.claude/rules/task-state-emission.md` Rule 1).
+  (`.claude/skills/cook/references/task-state-emission.md` Rule 1).
 
 A state or write failure disables supervision for that run, emits the exact
 degraded notice, and lets the ordinary unsupervised workflow continue — but no
@@ -358,7 +358,7 @@ none. A caller that needs an auditable directive must run a supervised checkpoin
 `--advice` never changes the executor's model. Athena maps to the strongest
 advisory tier declared in the **provider adapter file** for the runtime in use. No
 model name or id belongs in this contract or in any skill body
-(`.claude/rules/skill-authoring-rules.md` Rule 7).
+(`.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 7).
 
 ## Wiring status
 
@@ -372,7 +372,7 @@ that has not been wired yet exposes no flag:
 
 `mk:brainstorming` wires its **deep** workflow only. Its quick profile answers inline
 in three steps and creates no scout, report, plan or memory entry; supervising that is
-noise rather than safety (`skill-authoring-rules.md` Rule 6 — match control to risk).
+noise rather than safety (`.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 6 — match control to risk).
 
 `mk:workflow-orchestrator` exposes **no flag** and is not an entry point. When an
 explicitly enabled run hands off, it carries `supervisionRunId` forward as an opaque
@@ -400,4 +400,4 @@ A corrupt dossier is refused, never read as a fresh run — otherwise breaking t
 file that counts the calls would be the cheapest way to buy unlimited ones.
 
 Wrapping a new skill requires a registry row in the same change
-(`.claude/rules/dead-weight-audit-rules.md` Rule 6).
+(`.claude/skills/benchmark/references/dead-weight-audit-rules.md` Rule 6).

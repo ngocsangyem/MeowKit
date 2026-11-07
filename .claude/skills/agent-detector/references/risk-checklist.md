@@ -19,7 +19,7 @@ Mark each flag whose triggers match the task description. The agent emits
 | AUDIT_SEC | Audit / security event | audit log, security event, sensitive PII, access log, compliance flag | Force COMPLEX + security agent; flag `injection-rules.md` review |
 | EXT_SYSTEM | External system | third-party API, payment provider, webhook ingress, external auth, SSO IdP, email, queue | Force COMPLEX + ADR; require `mk:docs-finder` against latest provider docs |
 | PUBLIC_CONTRACT | Public API/contract | OpenAPI change, public REST/GraphQL surface, SDK signature, response envelope, client-visible behavior | Force `mk:plan-creator --hard`; require coverage check |
-| CROSS_PLATFORM | Cross-platform impact | iOS+Android, web+mobile, server+client, desktop/mobile/browser split, native shell, deep links | Allow parallel-execution per `parallel-execution-rules.md` Rule 6 |
+| CROSS_PLATFORM | Cross-platform impact | iOS+Android, web+mobile, server+client, desktop/mobile/browser split, native shell, deep links | Allow parallel-execution per `.claude/skills/cook/references/parallel-execution-rules.md` Rule 6 |
 | EXISTING_BEHAVIOR | Touches existing behavior | refactor, edit of >2 production files, touches >5 callers, already test-covered behavior changes | Apply `core-behaviors.md` Rule 5 (Scope Discipline); require `mk:simplify` |
 | WEAK_PROOF | Weak proof | touches code with <50% test coverage OR no tests in path; unclear test coverage around affected area | Reviewer adds WARN at Gate 2; user opt-in for `--tdd` recommended |
 
@@ -27,7 +27,7 @@ Mark each flag whose triggers match the task description. The agent emits
 
 ## Hard-Gate Cross-Reference
 
-The following flag IDs auto-escalate to COMPLEX tier per `model-selection-rules.md` Rule 2 — regardless of CSV match:
+The following flag IDs auto-escalate to COMPLEX tier per `.claude/skills/agent-detector/references/model-selection-rules.md` Rule 2 — regardless of CSV match:
 
 - AUTH
 - AUTHZ
@@ -46,7 +46,7 @@ matched_flags: ["AUTH", "DATA_MODEL"]
 
 Empty array `[]` is the default when no flag matches. Downstream consumers
 (orchestrator, planner) treat the array as advisory metadata; the
-authoritative tier comes from `model-selection-rules.md` Rule 2 escalation.
+authoritative tier comes from `.claude/skills/agent-detector/references/model-selection-rules.md` Rule 2 escalation.
 
 ## Non-Overlap Statement
 

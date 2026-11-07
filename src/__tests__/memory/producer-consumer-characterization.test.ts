@@ -75,7 +75,7 @@ describe('conversation-summary subsystem fully removed', () => {
   });
 
   it('harness Rule 11 is gone and project-context-loader no longer clears a summary cache', () => {
-    expect(read('.claude/rules/harness-rules.md')).not.toContain('## Rule 11');
+    expect(read('.claude/skills/cook/references/harness-rules.md')).not.toContain('## Rule 11');
     expect(read('.claude/hooks/project-context-loader.sh')).not.toContain('conversation-summary');
   });
 });

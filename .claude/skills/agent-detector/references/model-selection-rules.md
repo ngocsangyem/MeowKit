@@ -25,7 +25,7 @@ The orchestrator agent MUST declare the tier before any task begins.
 
 Source: prompt-crafting-for-different-models.md — Model Selection Strategy table
 
-> Note: TRIVIAL (cosmetic: rename, typo, format) is distinct from MICRO-TASK (non-production logic <30 lines). MICRO-TASK is only relevant when TDD is enabled (`MEOWKIT_TDD=1` / `--tdd`) — it exempts non-production code from the RED-phase requirement. In default mode (TDD off), the exemption is moot since no RED gate exists. See tdd-rules.md.
+> Note: TRIVIAL (cosmetic: rename, typo, format) is distinct from MICRO-TASK (non-production logic <30 lines). MICRO-TASK is only relevant when TDD is enabled (`MEOWKIT_TDD=1` / `--tdd`) — it exempts non-production code from the RED-phase requirement. In default mode (TDD off), the exemption is moot since no RED gate exists. See .claude/skills/cook/references/tdd-rules.md.
 
 ## Rules
 
@@ -51,7 +51,7 @@ ALWAYS use COMPLEX tier for any task involving:
 
 WHY: Security-sensitive work needs maximum reasoning, including risks vertical CSV matching can miss.
 
-The `risk-checklist.md` rule emits a `matched_flags` array at Phase 0; any
+The `.claude/skills/agent-detector/references/risk-checklist.md` rule emits a `matched_flags` array at Phase 0; any
 flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` triggers this
 escalation regardless of CSV match.
 
@@ -66,7 +66,7 @@ WHY: Mid-task downgrades lose reasoning context and create phase inconsistency.
 
 When `mk:scale-routing` returns a domain match with `level=high`, the model tier MUST be COMPLEX (best available) regardless of any other signal — including manual classification.
 
-WHY: High-complexity domains carry risks where weaker-model savings are not worth failure cost. See `rules/scale-adaptive-rules.md` and `mk:scale-routing/data/domain-complexity.csv`.
+WHY: High-complexity domains carry risks where weaker-model savings are not worth failure cost. See `.claude/skills/agent-detector/references/scale-adaptive-rules.md` and `mk:scale-routing/data/domain-complexity.csv`.
 
 ### Rule 5: Harness Density Follows Tier
 
@@ -76,6 +76,6 @@ For `mk:autobuild` runs, the model tier auto-selects a scaffolding density (`MIN
 
 **Density override:** `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` env var overrides auto-detected density.
 
-**Single source of truth:** the full decision matrix and rationale live at `.claude/skills/autobuild/references/adaptive-density-matrix.md`. See also `scale-adaptive-rules.md` Rule 6.
+**Single source of truth:** the full decision matrix and rationale live at `.claude/skills/autobuild/references/adaptive-density-matrix.md`. See also `.claude/skills/agent-detector/references/scale-adaptive-rules.md` Rule 6.
 
 WHY: Dead-weight thesis — capable models need less scaffolding; forcing FULL can degrade output.

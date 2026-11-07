@@ -73,7 +73,7 @@ Skip when:
 4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
 5. **Run report mandatory** — every autobuild run produces `tasks/autobuild-runs/YYMMDD-{slug}/run.md` with full audit trail
 6. **Coexists with `mk:cook`** — does not replace it; both route through Gate 1 + Gate 2
-7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.claude/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `harness-rules.md`) is independent of TDD mode and always applies.
+7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.claude/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `.claude/skills/cook/references/harness-rules.md`) is independent of TDD mode and always applies.
 
 ## `--advice` (composable, off by default)
 
@@ -107,6 +107,17 @@ Step 4: Evaluate            → invoke mk:evaluate
 Step 5: Iterate or Ship     → PASS → shipper; FAIL → loop to step-3 (max --max-iter)
 Step 6: Run Report          → write the audit trail
 ```
+
+### Rule Loads (just in time)
+
+These rules left the always-on set; the harness owns them at the canonical cook path — there is no duplicate copy under this skill.
+
+| Load at | Rule |
+| --- | --- |
+| Step 0, before density selection | `.claude/skills/cook/references/harness-rules.md` — the 10 harness rules this pipeline enforces (density, generator ≠ evaluator, iteration cap, budget thresholds, active-verification HARD GATE) |
+| Step 0, alongside the harness rules | `.claude/skills/cook/references/phase-contracts.md` — what each of the 7 phases expects and produces |
+| Step 3, only when the generator stage is parallelized | `.claude/skills/cook/references/parallel-execution-rules.md` — zero file overlap, max 3 agents, worktree isolation, integration test after merge |
+| Steps 5 and 6, before the project-manager delegation | `.claude/skills/cook/references/post-phase-delegation.md` — fire points (Step 5 foreground pre-escalation, Step 6 background) and skip conditions |
 
 ## Density Modes
 

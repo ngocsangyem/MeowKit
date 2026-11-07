@@ -68,7 +68,7 @@ For tasks running >5 turns or >50KB of accumulated context.
 | **Sub-agent handoff** — delegate focused subtasks; receive 1–2KB distilled summaries | Lead-context lean; sub-agent's distilled return | Sub-agent's full exploration trace |
 
 The skill **documents** these as safeguards. **Triggering** belongs to the
-harness (`harness-rules.md` Rule 11 in the toolkit handles compaction-cache; the
+harness (the harness rules Rule 11 in the toolkit handles compaction-cache; the
 prompting framework does not auto-compact).
 
 When the input prompt mentions any of these mechanisms (or similar — "checkpoint", "resumable", "long task"), surface the relevant pattern as a recommendation in section 3 of the output.
@@ -122,13 +122,13 @@ Workflow:
 2. Write expected outputs for each case (gold standard).
 3. Run the draft prompt; diff actual vs expected.
 4. Adjust instruction text. Canaries stay pinned.
-5. After every model-tier change, replay canaries; flag drift >5% (rubric-rules.md Rule 6).
+5. After every model-tier change, replay canaries; flag drift >5% (the rubric rules Rule 6).
 
 When the input prompt is itself a skill / system prompt / agent instruction set
 (meta-prompting case), surface eval discipline as a CONSTRAINTS line: "Add 3+
 canary scenarios with expected outputs before broadening this prompt."
 
-**Source:** skill-authoring-guidelines (eval-driven authoring); rubric-rules.md Rule 6 (drift check on model upgrade); synthesis.
+**Source:** skill-authoring-guidelines (eval-driven authoring); the rubric rules Rule 6 (drift check on model upgrade); synthesis.
 
 ---
 

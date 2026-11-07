@@ -20,7 +20,7 @@ import { readInstallMetadata } from "../core/install-metadata.js";
 // is what guarantees the writer and the verifier can never drift. Anti-accidental
 // per ADR 260715: this records "an approval was stamped against this plan
 // revision", NOT a host-authenticated "a human approved" — the agent must only run
-// it after a real human approval (intervention-recording-rules.md Rule 3).
+// it after a real human approval (gate-rules.md, Recording Human Interventions).
 
 export interface PlanApproveArgs {
 	/** Plan directory or a plan.md path. */

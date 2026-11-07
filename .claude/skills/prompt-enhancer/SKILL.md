@@ -78,7 +78,7 @@ Step detail in `references/decomposition-checklist.md`, `references/playbook.md`
 The skill **does not accept a `--model` flag.** Per the synthesis report
 (`tasks/reports/synthesis-260509-2058-prompting-framework.md`), model
 detection violates the model-agnostic mandate; dispatch by model-tier lives
-in `harness-rules.md` Rule 5, not here.
+in `.claude/skills/cook/references/harness-rules.md` Rule 5, not here.
 
 ## Output
 

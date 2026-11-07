@@ -10,7 +10,7 @@ WHY: Versioned domain signals are more reliable than subjective tier guesses.
 
 ## Rule 2: No Match Falls Back Gracefully
 
-When `mk:scale-routing` returns "unknown" (no domain keywords matched), the orchestrator falls back to existing manual classification per `model-selection-rules.md`.
+When `mk:scale-routing` returns "unknown" (no domain keywords matched), the orchestrator falls back to existing manual classification per `.claude/skills/agent-detector/references/model-selection-rules.md`.
 
 WHY: Fallback prevents regression for unrecognized task types.
 

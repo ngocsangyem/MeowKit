@@ -107,7 +107,7 @@ After 3 failed attempts, **escalate to user** with:
 ## Attempt Counter
 
 Track attempts in the session. Reset counter when switching to a different error.
-Per `tdd-rules.md` Rule 4: max 3 self-healing attempts, then escalate.
+Per `.claude/skills/cook/references/tdd-rules.md` Rule 4: max 3 self-healing attempts, then escalate.
 
 ## Reference Files
 

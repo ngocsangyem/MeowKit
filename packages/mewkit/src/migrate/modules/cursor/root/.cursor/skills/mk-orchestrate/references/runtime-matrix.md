@@ -190,9 +190,9 @@ Before dispatch, confirm:
 - cwd and writable roots match the job;
 - approval and tool controls meet the assigned risk tier;
 - parallel writers are isolated in separate worktrees (via `mk:worktree`) and
-  own disjoint files, per `parallel-execution-rules.md`;
+  own disjoint files, per the parallel-execution rules;
 - destructive or external actions have explicit user approval and rollback,
-  recorded per `intervention-recording-rules.md` and gated by `gate-rules.md`;
+  recorded per the intervention-recording invariant in AGENTS.md and gated by `gate-rules.md`;
 - prompt and capture paths cannot expose secrets (`injection-rules.md` Rule 4
   and Rule 5);
 - a write pattern the toolkit blocks outright (`security-rules.md`) is never

@@ -1,6 +1,6 @@
 // Cost ledger + cap enforcement for the benchmark / live-journey path (MK-P1-01). A run appends
 // one JSONL receipt per model call and HALTS as soon as cumulative cost reaches the effective
-// cap. Thresholds follow `harness-rules.md` Rule 6 — warn at $30, hard block at $100, and a user
+// cap. Thresholds follow `skills/cook/references/harness-rules.md` Rule 6 — warn at $30, hard block at $100, and a user
 // cap (`MEOWKIT_BUDGET_CAP` / an explicit override) that can move the block point lower OR higher.
 // We reuse that one scheme rather than inventing a second. This module is the canonical
 // enforcement logic the (deferred) live RunnerBackends inherit; it is proven here against the

@@ -1,6 +1,6 @@
 # /mk:delegate — Context-Isolated Subagent Prompt Builder
 
-> Operationalizes the delegation template from `orchestration-rules.md`.
+> Operationalizes the delegation template from `.claude/skills/cook/references/orchestration-rules.md`.
 > Does NOT invoke the Task tool — outputs a ready-to-paste prompt for review.
 >
 > NOTE: `mk:spawn` is the parallel-agent launcher (Conductor pattern). This
@@ -81,9 +81,9 @@ Skip all `AskUserQuestion` prompts. Reads fields from a single structured argume
 
 ## Why This Command Exists
 
-The toolkit's subagent context isolation is currently prompt-protocol-only. `orchestration-rules.md` documents a template with anti-patterns, but no mechanism ensures orchestrators follow it. `mk:delegate` makes the correct path low-friction. The incorrect path (passing 50+ lines of conversation, vague "continue from where we left off") is documented in the `orchestration-rules.md` Rejected Patterns section.
+The toolkit's subagent context isolation is currently prompt-protocol-only. `.claude/skills/cook/references/orchestration-rules.md` documents a template with anti-patterns, but no mechanism ensures orchestrators follow it. `mk:delegate` makes the correct path low-friction. The incorrect path (passing 50+ lines of conversation, vague "continue from where we left off") is documented in the `.claude/skills/cook/references/orchestration-rules.md` Rejected Patterns section.
 
 ## See Also
 
-- `.claude/rules/orchestration-rules.md` — delegation rules, anti-patterns, isolation boundaries, inner-harness compatibility, and rejected patterns
+- `.claude/skills/cook/references/orchestration-rules.md` — delegation rules, anti-patterns, isolation boundaries, inner-harness compatibility, and rejected patterns
 - `.claude/commands/mk/spawn.md` — parallel-agent launcher (Conductor pattern). DIFFERENT command. Use `mk:spawn` for multi-agent parallel work in isolated worktrees; use `mk:delegate` to assemble a single context-isolated prompt for one subagent.

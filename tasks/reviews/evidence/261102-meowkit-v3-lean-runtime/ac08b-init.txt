@@ -1,0 +1,74 @@
+==============================================================
+AC-08(b) — fresh init creates no CLAUDE.md; .claude/rules has exactly 7 files
+==============================================================
+Date: 2026-11-02T04:44:09Z
+
+HOW THIS WAS RUN (and why not the `mewkit init` binary):
+  init.ts:682 sets targetDir = process.cwd(), then runClaudeKitInstall() does
+  fetchReleases() -> downloadRelease() -> smartUpdate(config, sourceDir, targetDir)
+  -> validate(targetDir). The binary would install a PUBLISHED GitHub release,
+  not the local branch kit, so it cannot test this change. Driving smartUpdate()
+  directly with sourceDir = the AC-08(a) archive extracted, targetDir = empty
+  scratch dir, reproduces the install byte-for-byte with no network.
+  Driver: /private/tmp/claude-501/-Users-sangnguyen-Desktop-MeowKit/40ecfd1c-e81f-4cbf-b0b5-dafbf0272d69/scratchpad/ac-evidence/drive-init.cjs (refuses any target outside the scratch path)
+  sourceDir: /private/tmp/claude-501/-Users-sangnguyen-Desktop-MeowKit/40ecfd1c-e81f-4cbf-b0b5-dafbf0272d69/scratchpad/ac-evidence/src-extract  (unzip of dist/meowkit-release.zip from AC-08(a))
+  targetDir: /private/tmp/claude-501/-Users-sangnguyen-Desktop-MeowKit/40ecfd1c-e81f-4cbf-b0b5-dafbf0272d69/scratchpad/ac-evidence/proj-fresh   (was empty)
+
+--- smartUpdate output
+--- stats ---
+added=1267 updated=1 skipped=0
+userModified (0): []
+orphansDeleted (0): []
+orphansSkipped (0): []
+deletionsDeleted (0): []
+deletionsSkipped (0): []
+deletionsAlreadyGone (36): ["hooks/handlers/immediate-capture-handler.cjs","hooks/lib/memory-prune.py","rules/agent-routing.md","rules/anti-rationalization.md","rules/context-budget-rules.md","rules/dead-weight-audit-rules.md","rules/docs-reference-contract.md","rules/harness-rules.md","rules/intervention-recording-rules.md","rules/memory-read-rules.md","rules/model-selection-rules.md","rules/orchestration-rules.md","rules/parallel-execution-rules.md","rules/phase-contracts.md","rules/post-phase-delegation.md","rules/risk-checklist.md","rules/rubric-rules.md","rules/scale-adaptive-rules.md","rules/skill-authoring-rules.md","rules/step-file-rules.md","rules/task-state-emission.md","rules/tdd-rules.md","rules/wiki-context-rules.md","scripts/memory-migrator.cjs","scripts/memory-topic-file-migrator.cjs","skills/document-release/references/contributor-mode.md","skills/memory/references/capture-architecture.md","skills/memory/references/consolidation.md","skills/memory/references/cost-tracking.md","skills/memory/references/pattern-extraction.md","skills/memory/references/session-capture.md","skills/retro/references/contributor-mode.md","skills/wiki-render/SKILL.md","skills/wiki-research/SKILL.md","skills/wiki/SKILL.md","skills/wiki/references/terminal-handoff-advisory.md"]
+profileTrimmed (0): []
+
+--- ASSERTION 1: no CLAUDE.md created anywhere in the project
+$ find . -iname 'CLAUDE.md'
+  root CLAUDE.md present: NO
+  count of any CLAUDE.md outside skills/ reference docs: 0
+
+--- ASSERTION 2: .claude/rules contains exactly 7 files
+$ ls -1 .claude/rules | wc -l ; ls -la .claude/rules
+7
+total 72
+drwxr-xr-x@  9 sangnguyen  wheel   288 Nov  2 11:43 .
+drwxr-xr-x@ 23 sangnguyen  wheel   736 Nov  2 11:43 ..
+-rw-r--r--@  1 sangnguyen  wheel  2559 Nov  2 11:43 agent-conduct.md
+-rw-rw-rw-@  1 sangnguyen  wheel  2222 Nov  2 11:43 core-behaviors.md
+-rw-rw-rw-@  1 sangnguyen  wheel  3768 Nov  2 11:43 development-rules.md
+-rw-rw-rw-@  1 sangnguyen  wheel  7719 Nov  2 11:43 gate-rules.md
+-rw-r--r--@  1 sangnguyen  wheel  4540 Nov  2 11:43 injection-rules.md
+-rw-r--r--@  1 sangnguyen  wheel  2761 Nov  2 11:43 meowkit-core.md
+-rw-rw-rw-@  1 sangnguyen  wheel  1953 Nov  2 11:43 security-rules.md
+
+--- ASSERTION 3: none of the 19 moved rules landed in .claude/rules
+  .claude/rules/harness-rules.md                 absent
+  .claude/rules/tdd-rules.md                     absent
+  .claude/rules/phase-contracts.md               absent
+  .claude/rules/post-phase-delegation.md         absent
+  .claude/rules/task-state-emission.md           absent
+  .claude/rules/parallel-execution-rules.md      absent
+  .claude/rules/orchestration-rules.md           absent
+  .claude/rules/model-selection-rules.md         absent
+  .claude/rules/scale-adaptive-rules.md          absent
+  .claude/rules/risk-checklist.md                absent
+  .claude/rules/agent-routing.md                 absent
+  .claude/rules/context-budget-rules.md          absent
+  .claude/rules/rubric-rules.md                  absent
+  .claude/rules/skill-authoring-rules.md         absent
+  .claude/rules/dead-weight-audit-rules.md       absent
+  .claude/rules/docs-reference-contract.md       absent
+  .claude/rules/step-file-rules.md               absent
+  .claude/rules/intervention-recording-rules.md  absent
+  .claude/rules/anti-rationalization.md          absent
+
+--- top-level project tree after init
+$ ls -a
+.
+..
+.claude
+.meowkit
+tasks

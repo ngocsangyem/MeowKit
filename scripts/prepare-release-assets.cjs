@@ -53,7 +53,6 @@ try {
   const archiveTargets = [
     ".claude",
     "tasks",
-    "CLAUDE.md",
     "release-manifest.json",
     path.join(".meowkit", "pack-manifest.json"),
   ].filter((t) => fs.existsSync(path.join(projectRoot, t)));
@@ -77,6 +76,8 @@ try {
     "-x", ".claude/memory/*",
     "-x", ".claude/logs/*",
     "-x", ".claude/skills/.venv/*",
+    // Sibling session checkouts (with their own node_modules) are never kit assets.
+    "-x", ".claude/worktrees/*",
     // Defensive guard: a stray installed metadata.json or .env on a dev machine
     // must never leak into a published archive (the pipeline no longer generates
     // metadata.json, but a local install might leave one behind).
@@ -94,6 +95,10 @@ try {
     // Reports — unpatched vulnerability detail that must never reach a public
     // GitHub Release zip.
     "-x", "tasks/reports/*",
+    // Review verdicts and their evidence are run output, not templates; the
+    // directory itself (its .gitkeep) still ships so verdicts have a home.
+    "-x", "tasks/reviews/*.md",
+    "-x", "tasks/reviews/evidence/*",
     "-x", "*.pyc",
     "-x", "__pycache__/*",
   ];

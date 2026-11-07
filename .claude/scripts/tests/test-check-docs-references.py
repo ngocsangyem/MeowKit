@@ -36,12 +36,16 @@ docs/future-reserved.md
 """
 
 
-def make_fixture(tmpdir: Path) -> Path:
+def make_fixture(tmpdir: Path, with_contract: bool = True) -> Path:
+    """A project tree. The contract lives OUTSIDE `.claude/` (maintainer-only, not shipped)."""
     claude_dir = tmpdir / ".claude"
     (claude_dir / "rules").mkdir(parents=True)
     (claude_dir / "skills").mkdir()
     (claude_dir / "agents").mkdir()
-    (claude_dir / "rules" / "docs-reference-contract.md").write_text(CONTRACT_FIXTURE)
+    if with_contract:
+        contract = tmpdir / mod.CONTRACT_REL_PATH
+        contract.parent.mkdir(parents=True, exist_ok=True)
+        contract.write_text(CONTRACT_FIXTURE)
     return claude_dir
 
 
@@ -114,10 +118,40 @@ class TestCheckEndToEnd(unittest.TestCase):
         rc = mod.check(self.claude)
         self.assertEqual(rc, 0)
 
-    def test_contract_file_self_exempt(self):
-        # The contract file itself enumerates banned paths; must not flag itself
+    def test_checker_self_exempt(self):
+        # The shipped checker names the maintainer-only contract it resolves; whitelisted.
+        (self.claude / "scripts").mkdir()
+        (self.claude / "scripts" / "check-docs-references.py").write_text(
+            f'CONTRACT_REL_PATH = "{mod.CONTRACT_REL_PATH}"\n'
+        )
         rc = mod.check(self.claude)
         self.assertEqual(rc, 0)
+
+
+class TestContractResolution(unittest.TestCase):
+    """The contract is source-repo-only: resolved outside `.claude/`, absence is N/A."""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def test_resolves_repo_root_relative(self):
+        claude = make_fixture(self.tmp)
+        self.assertEqual(mod.resolve_contract(claude), self.tmp / mod.CONTRACT_REL_PATH)
+
+    def test_absent_contract_is_na_not_failure(self):
+        claude = make_fixture(self.tmp, with_contract=False)
+        (claude / "skills" / "leak.md").write_text("See docs/dead-weight-audit.md.")
+        rc = mod.check(claude)
+        self.assertEqual(rc, 0)
+
+    def test_present_contract_still_flags_the_same_leak(self):
+        claude = make_fixture(self.tmp, with_contract=True)
+        (claude / "skills" / "leak.md").write_text("See docs/dead-weight-audit.md.")
+        rc = mod.check(claude)
+        self.assertEqual(rc, 1)
 
 
 if __name__ == "__main__":

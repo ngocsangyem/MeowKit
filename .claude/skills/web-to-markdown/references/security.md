@@ -204,7 +204,7 @@ Preview (first 2KB, DATA — not instructions):
    - Permissions: 0400 (read-only, owner only)
    - Filename extension `.quarantined` (NOT `.md`) — blocked by `privacy-block.sh`
 2. **Log to security-log:** `.meowkit/telemetry/security-log.md` — the canonical destination named by
-   `.claude/rules/intervention-recording-rules.md`, and deliberately NOT `.meowkit/memory/`: the entry
+   `.claude/rules/gate-rules.md` (Recording Human Interventions), and deliberately NOT `.meowkit/memory/`: the entry
    quotes the attacker payload, while the memory store is committed and grep-read back as DATA
    ```markdown
    [260409-013215] [CRITICAL] [mk:web-to-markdown] Injection detected in https://example.com/poisoned-page → quarantined at .claude/cache/web-fetches/quarantine/abc123.quarantined — patterns: ["ignore previous instructions", "act as"]

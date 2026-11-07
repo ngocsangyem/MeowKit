@@ -5,7 +5,7 @@ Complete guide to building, tagging, and publishing MeowKit releases.
 ## Architecture
 
 ```
-Source of truth (.claude/, tasks/, CLAUDE.md)
+Source of truth (.claude/, tasks/)
     ↓
 prepare-release-assets.cjs → dist/meowkit-release.zip   (flat-copy distribution)
     ↓
@@ -106,7 +106,7 @@ When a release adds a new agent or skill, update the routing surfaces so the orc
 | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `.claude/agents/SKILLS_INDEX.md`                                | New skill — add a row in the matching phase or "Cross-Cutting (Any Phase)" table                                            |
 | `.claude/agents/AGENTS_INDEX.md`                                | New agent — add a row to the active-agents table (Type, Role, Source, phases, auto-activate, CE version)                    |
-| `.claude/rules/agent-routing.md`                                | New core/support agent — add to the 17-row table; new domain agent → add to the hub-skill family row                        |
+| `.claude/skills/agent-detector/references/agent-routing.md`     | New core/support agent — add to the 17-row table; new domain agent → add to the hub-skill family row                        |
 | `.claude/skills/agent-detector/references/lifecycle-routing.md` | New skill that maps to a user signal — add a Discovery Tree row                                                             |
 | `.claude/skills/scale-routing/data/domain-complexity.csv`       | New domain match (fintech, healthcare, etc.) — add a row with signals + level + workflow                                    |
 | `packages/docs/content/docs/reference/meta.json`                                  | New skill or agent — add to the matching group in `packages/docs/content/docs/reference/meta.json`                   |
@@ -132,7 +132,7 @@ Check `packages/mewkit/portable-manifest.json` whenever a release moves source f
 - Do not add entries for new files, deleted files, provider capability changes, or invented history.
 - Keep release checksum manifests, provider manifests, and `portable-manifest.json` separate; they serve different purposes.
 - Do not copy `portable-manifest.json` into `.claude/`. It is an npm package artifact shipped with `packages/mewkit`, not part of the project kit that `npx mewkit init` scaffolds.
-- If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `tasks/`, `CLAUDE.md`, and `release-manifest.json`.
+- If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `tasks/`, `release-manifest.json`, and `.meowkit/pack-manifest.json` — no root `CLAUDE.md` ships.
 
 #### 1e. Author the Codex AND Cursor native bundles (when `.claude/` content changes)
 
@@ -267,7 +267,7 @@ the entry format, the read or write sets, `npx mewkit note`, or the `validate --
 update, in the same PR:
 
 - `docs/core/memory-system.md` and `packages/docs/content/docs/guide/memory-system.mdx`
-- the `CLAUDE.md` Memory section, and the `mk:memory` skill
+- the `.claude/rules/meowkit-core.md` Memory section, and the `mk:memory` skill
 - `docs/governance/dead-weight-audit-registry.md`, when a harness component is added or removed
 
 A format change affects existing stores, so record it in the CHANGELOG `Migration Notes` with the
@@ -275,7 +275,7 @@ exact new entry format or command.
 
 #### 1g. No product-brand leakage in shipped content
 
-`npx mewkit init` copies `.claude/` + `tasks/` + `CLAUDE.md` into the USER's project, where every loaded skill / agent / rule / command competes for the user's context window. Shipped content MUST NOT refer to the product by name as a self-referential subject — write **"the toolkit"**, **"the harness"**, or **"this workflow"** instead of "MeowKit" / "meowkit".
+`npx mewkit init` copies `.claude/` + `tasks/` into the USER's project, where every loaded skill / agent / rule / command competes for the user's context window. Shipped content MUST NOT refer to the product by name as a self-referential subject — write **"the toolkit"**, **"the harness"**, or **"this workflow"** instead of "MeowKit" / "meowkit".
 
 **Allowed (functional — keep):**
 
@@ -285,7 +285,7 @@ exact new entry format or command.
 - Attribution / provenance metadata (e.g. `SKILLS_ATTRIBUTION.md`, skill `attribution:` frontmatter) — legitimate credit.
 - Real path / string literals the code depends on (`~/.meowkit/...`, `"meowkit-default"`, `meowkit:` frontmatter keys).
 
-**Scope:** this rule applies ONLY to shipped surfaces — `.claude/`, `tasks/`, and the shipped `CLAUDE.md`. The source repo's `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
+**Scope:** this rule applies ONLY to shipped surfaces — `.claude/` and `tasks/`. The source repo's `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
 
 **Check before release.** Scope the grep to the context-loaded prose surfaces (skill / agent / command / rule `.md`) and exclude the functional refs above — expect **zero** hits:
 
@@ -386,7 +386,7 @@ would want it.
 
 #### When to bump
 
-Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, `tasks/`, `CLAUDE.md`, the docs site, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
+Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, `tasks/`, the docs site, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
 
 ```bash
 # Decide first — does this release touch CLI code?
@@ -433,7 +433,7 @@ node scripts/prepare-release-assets.cjs "<version>"
 This creates:
 
 - `release-manifest.json` — SHA-256 checksums for all files
-- `dist/meowkit-release.zip` — the flat-copy release package (`.claude/` + `tasks/` + `CLAUDE.md` + manifest)
+- `dist/meowkit-release.zip` — the flat-copy release package (`.claude/` + `tasks/` + manifests; no root `CLAUDE.md`)
 
 > **Note:** This script does NOT write `.claude/metadata.json` — the `mewkit` CLI writes it on install/upgrade, and `prepare-release-assets.cjs` explicitly excludes it from the zip. The shipped release version lives in `release-manifest.json`.
 
@@ -528,7 +528,7 @@ Copy this checklist for each release:
 ### Docs
 
 - [ ] Updated affected guide/reference pages (step 1a)
-- [ ] If a new agent or skill landed: updated routing surfaces (step 1b — `SKILLS_INDEX.md`, `AGENTS_INDEX.md`, `agent-routing.md`, `lifecycle-routing.md`, sidebar config, reference page)
+- [ ] If a new agent or skill landed: updated routing surfaces (step 1b — `SKILLS_INDEX.md`, `AGENTS_INDEX.md`, `agent-detector/references/agent-routing.md`, `lifecycle-routing.md`, sidebar config, reference page)
 - [ ] No product-brand leakage in shipped `.claude/` / `tasks/` (step 1g — brand grep shows only functional/attribution hits)
 - [ ] Docs build passes (`npm run build -w packages/docs`)
 
@@ -544,7 +544,7 @@ Copy this checklist for each release:
 
 ### Memory contract (only if the store format, read/write sets or lint changed — step 1f)
 
-- [ ] Updated `docs/core/memory-system.md`, the docs-site memory guide, and the `CLAUDE.md` Memory section
+- [ ] Updated `docs/core/memory-system.md`, the docs-site memory guide, and the `meowkit-core.md` Memory section
 - [ ] Confirmed `npx mewkit validate --memory` and `npx mewkit note` still match the documented entry format
 - [ ] CHANGELOG `Migration Notes` records any format change that affects existing stores
 - [ ] If `packages/mewkit/src/` changed → CLI bump (step 3) + npm publish (step 10)
@@ -589,7 +589,7 @@ Push to `main` or `dev` triggers `.github/workflows/release.yml`:
 
 ### Conventional commits → version bumps
 
-The CI mapping below applies to `.claude/`, `tasks/`, and `CLAUDE.md` content. The CLI follows the same SemVer fields, but it only bumps when `packages/mewkit/src/` changes — see step 3.
+The CI mapping below applies to `.claude/` and `tasks/` content. The CLI follows the same SemVer fields, but it only bumps when `packages/mewkit/src/` changes — see step 3.
 
 ```
 feat: new skill            → MINOR (1.0.0 → 1.1.0)

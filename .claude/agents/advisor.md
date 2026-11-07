@@ -34,7 +34,7 @@ give one verdict. Not a menu. Not a plan. One verdict, with its costs stated.
 
 ## Turn Mechanism — you are respawned every turn
 
-The harness has **no subagent pause/resume** (`.claude/rules/orchestration-rules.md`
+The harness has **no subagent pause/resume** (`.claude/skills/cook/references/orchestration-rules.md`
 → Rejected Patterns). You do not persist across turns. Each turn you are a fresh
 spawn, handed:
 

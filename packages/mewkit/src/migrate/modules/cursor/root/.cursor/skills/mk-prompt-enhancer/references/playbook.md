@@ -20,7 +20,7 @@
 ## Gotchas Growth Protocol
 
 The `## Gotchas` section in `SKILL.md` is the highest-signal content (per
-`skill-authoring-rules.md` Rule 1). After every observed failure during eval
+the skill-authoring rules Rule 1). After every observed failure during eval
 or post-rollout, append one bullet to the Gotchas list with format:
 
 ```
@@ -222,7 +222,7 @@ codex-prompting-best-practices universal-vs-Codex-specific filter.
 
 **Guard:** Do NOT add an overlay for ANY model. The universal kernel works on
 Codex, GPT/Codex, and Gemini without dispatch. Model-tier dispatch lives in
-`harness-rules.md` Rule 5, not in this skill.
+the harness rules Rule 5, not in this skill.
 
 **`--deep` boost:** Not applicable (this is a framing fix, not a content fix).
 

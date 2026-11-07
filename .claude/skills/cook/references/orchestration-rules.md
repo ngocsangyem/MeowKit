@@ -153,7 +153,7 @@ For COMPLEX tasks with independent subtasks:
 
 1. Use `mk:worktree` for git worktree isolation per agent
 2. Use `mk:task-queue` for task claiming and ownership enforcement
-3. Follow `parallel-execution-rules.md` for constraints (max 3 agents, integration test required)
+3. Follow `.claude/skills/cook/references/parallel-execution-rules.md` for constraints (max 3 agents, integration test required)
 4. Gates (1 and 2) are NEVER parallelized — always sequential, always human-approved
 
 ### Party Mode (Week 2 addition)

@@ -40,7 +40,7 @@ unanswerable out of sequence.
 
 **Ownership:** this step PRESENTS and RECORDS. The planner owns plan mutation
 (6e propagates; 6f logs). The interviewer never edits a phase file directly —
-one writer per artifact, per `orchestration-rules.md` file ownership.
+one writer per artifact, per the orchestration rules' file ownership.
 
 ### 6c. Generate Questions
 

@@ -2,13 +2,15 @@
 """Check every docs/* reference in shipped .claude/ files against the Type-1 allowlist.
 
 Mirrors packages/mewkit/src/core/check-docs-references.ts. Both implementations parse the
-fenced ALLOWLIST-START / ALLOWLIST-END block in .claude/rules/docs-reference-contract.md
-as the single source of truth.
+fenced ALLOWLIST-START / ALLOWLIST-END block of the maintainer docs-reference contract as
+the single source of truth. That contract is a source-repo-only document: it is NOT shipped
+into user projects, so it resolves from the parent of `.claude/` and its absence is N/A.
 
 Usage:
     python3 .claude/scripts/check-docs-references.py [path/to/.claude]
 
-Exits 1 on any ERROR finding. WARN findings do not change the exit code.
+Exits 1 on any ERROR finding. WARN findings do not change the exit code. An absent contract
+exits 0 with an explicit N/A line.
 """
 
 from __future__ import annotations
@@ -32,10 +34,17 @@ SCAN_DIRS = (
     "benchmarks",
 )
 
+# Repo-root-relative location of the docs-reference contract. Maintainer-only: it is NOT
+# shipped into user projects, so it resolves from the parent of `.claude/`.
+CONTRACT_REL_PATH = "docs/maintainer/docs-reference-contract.md"
+
 # Files allowed to mention banned paths (they DEFINE the bans).
+# Kept byte-identical to the TypeScript twin's FILE_WHITELIST.
 FILE_WHITELIST = {
-    "rules/docs-reference-contract.md",
-    "rules/skill-authoring-rules.md",
+    "skills/skill-creator/references/skill-authoring-rules.md",
+    # The shipped checker names the maintainer-only contract it reads; it is the one
+    # shipped file permitted to do so, because that is its own resolution logic.
+    "scripts/check-docs-references.py",
 }
 
 # Skills with project-side Grep semantics — skip path checks inside them.
@@ -69,6 +78,11 @@ def parse_allowlist(contract_path: Path) -> tuple[list[str], list[str]]:
         extract_fenced(content, "ALLOWLIST-START", "ALLOWLIST-END"),
         extract_fenced(content, "RESERVED-START", "RESERVED-END"),
     )
+
+
+def resolve_contract(claude_dir: Path) -> Path:
+    """Locate the maintainer contract relative to the repo root that holds `.claude/`."""
+    return claude_dir.parent / CONTRACT_REL_PATH
 
 
 def is_allowed(token: str, allowed: Iterable[str]) -> bool:
@@ -120,10 +134,13 @@ def is_in_whitelisted_skill(rel_path: str) -> bool:
 
 
 def check(claude_dir: Path) -> int:
-    contract_path = claude_dir / "rules" / "docs-reference-contract.md"
+    contract_path = resolve_contract(claude_dir)
     if not contract_path.exists():
-        print(f"Contract file missing: {contract_path}", file=sys.stderr)
-        return 2
+        print(
+            f"N/A: docs-reference contract not present at {CONTRACT_REL_PATH} "
+            "— source-repo-only maintainer document, nothing to check in this project."
+        )
+        return 0
     allowed, reserved = parse_allowlist(contract_path)
 
     errors = 0

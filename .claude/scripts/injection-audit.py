@@ -204,7 +204,7 @@ def main() -> int:
         print("HALT: Review findings above. Do NOT proceed without human review.")
 
         # Write to security log
-        # Canonical destination named by `.claude/rules/intervention-recording-rules.md`:
+        # Canonical destination named by `.claude/rules/gate-rules.md` (Recording Human Interventions):
         # the telemetry class, NOT `.meowkit/memory/`. A finding's description quotes the
         # attacker payload, and the memory store is committed and grep-read back as DATA by
         # the read-set skills — logging there would turn the audit trail into a delivery

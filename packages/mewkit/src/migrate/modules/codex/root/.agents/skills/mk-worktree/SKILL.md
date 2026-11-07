@@ -32,7 +32,7 @@ echo '.worktrees/' >> .gitignore
 ```
 
 The script places the worktree at `.worktrees/{agent-name}` on branch
-`parallel/{agent-name}-{timestamp}` per `parallel-execution-rules.md` Rule 3.
+`parallel/{agent-name}-{timestamp}` per the parallel-execution rules Rule 3.
 
 ### merge
 
@@ -45,7 +45,7 @@ git merge --no-ff {branch} -m "merge: parallel/{agent-name} into {feature-branch
 On conflict: list conflicting files, STOP, report to orchestrator. Do NOT auto-resolve —
 human or lead agent decides.
 
-On success: run the full test suite (parallel-execution-rules.md Rule 5). After integration
+On success: run the full test suite (the parallel-execution rules Rule 5). After integration
 test passes, delegate to `project-manager` (background):
 
 ```
@@ -139,7 +139,7 @@ node .agents/skills/worktree/scripts/worktree.cjs review-pr-cleanup --sweep --dr
   and report to orchestrator, never auto-resolve
 - `mk:task-queue` ownership must be released before worktree cleanup, or the next agent
   cannot claim that task
-- Max 3 active worktrees at any time (parallel-execution-rules.md Rule 2) — `status`
+- Max 3 active worktrees at any time (the parallel-execution rules Rule 2) — `status`
   command shows current count
 - On macOS, paths with `:` in skill names need quoting in shell commands
 

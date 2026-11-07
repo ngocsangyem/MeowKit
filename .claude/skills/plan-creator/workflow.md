@@ -3,11 +3,17 @@
 Step-file workflow for structured plan creation. Scope-aware with fast/hard modes.
 Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 
+## Step-File Contract
+
+- One step at a time — NEVER load multiple step files at once.
+- Read the ENTIRE step file before executing any instruction in it.
+- Complete the current step before reading the next — NEVER skip steps or optimize the sequence.
+- Follow the step's instructions exactly — do not improvise, add steps, or deviate.
+- Persist intermediate state the next step needs: frontmatter variables, or `session-state/{skill}-progress.json` when it must survive a context reset.
+- A step file that chains to `references/*.md` opens with a `## Contents` ToC, so a partial read lands on navigation.
+
 ## Rules
 
-- NEVER load multiple step files simultaneously
-- ALWAYS read entire step file before execution
-- NEVER skip steps or optimize the sequence
 - ALWAYS halt at Gate 1 and wait for human approval
 
 ## Steps

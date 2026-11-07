@@ -17,7 +17,7 @@
 
 const fs = require('fs');
 
-// Canonical risk-flag IDs. Source of truth: .claude/rules/risk-checklist.md
+// Canonical risk-flag IDs. Source of truth: .claude/skills/agent-detector/references/risk-checklist.md
 // (the 9-flag table). Kept in sync by Phase 7 parity check.
 const RISK_FLAGS = [
   'AUTH', 'AUTHZ', 'DATA_MODEL', 'AUDIT_SEC', 'EXT_SYSTEM',

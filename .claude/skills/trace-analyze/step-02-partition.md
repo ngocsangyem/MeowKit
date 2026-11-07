@@ -1,6 +1,6 @@
 # Step 2: Partition Records into Batches
 
-Group records by `run_id` and split into ≤3 batches for the scatter step. Honors the `parallel-execution-rules.md` Rule 2 max-3-agents cap.
+Group records by `run_id` and split into ≤3 batches for the scatter step. Honors the `.claude/skills/cook/references/parallel-execution-rules.md` Rule 2 max-3-agents cap.
 
 ## Instructions
 

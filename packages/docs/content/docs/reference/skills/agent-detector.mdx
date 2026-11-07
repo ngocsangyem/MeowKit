@@ -153,7 +153,7 @@ Steps 0 and 0b first scan the context window for a cached-sentinel marker emitte
 
 **State source:** `session-state/session-sentinels.jsonl` — one JSONL line per Stop with `{session_id, safety, phase_zero, ts}`. The file is truncated on new-session detection (HOOK_SESSION_ID change), so sentinels never cross session boundaries.
 
-**Safety guarantee preserved.** The rules remain in context from the host runtime's auto-load of `CLAUDE.md` + `.claude/rules/`. The sentinel only suppresses redundant re-reads; it does not weaken the existence check on turn 1 of any new session.
+**Safety guarantee preserved.** The rules remain in context from the host runtime's auto-load of `.claude/rules/`. The sentinel only suppresses redundant re-reads; it does not weaken the existence check on turn 1 of any new session.
 
 **Bypass.** `MEOWKIT_SKIP_SAFETY_SENTINEL=off` disables marker injection. The skill then runs the full 10-file Read loop every turn.
 

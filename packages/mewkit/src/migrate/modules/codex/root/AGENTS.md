@@ -145,3 +145,10 @@ Explore, then plan, then implement. Scope reads narrowly; use subagents for broa
 investigation so their reads don't accumulate. Put long context before the specific
 request. After two repeated corrections on the same issue, refine the prompt or plan
 instead of piling on more failed context.
+
+## Compaction policy
+
+When the session is compacted or summarized, ALWAYS preserve verbatim: every numbered
+injection-boundary rule above (especially the Rule of Two), the subagent status
+protocol, and the names of the always-on safety baselines — security, injection, gates,
+core behaviors, development. Summaries lose enforcement specifics; these must survive.

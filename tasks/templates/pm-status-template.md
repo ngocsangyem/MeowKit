@@ -60,4 +60,4 @@ Source: `.claude/memory/cost-log.json` (session_id filter: `{{session_id}}`)
 
 ---
 
-*Written by `project-manager` per `.claude/rules/post-phase-delegation.md`. Report lives alongside the plan; archive moves reports with the plan.*
+*Written by `project-manager` per `.claude/skills/cook/references/post-phase-delegation.md`. Report lives alongside the plan; archive moves reports with the plan.*

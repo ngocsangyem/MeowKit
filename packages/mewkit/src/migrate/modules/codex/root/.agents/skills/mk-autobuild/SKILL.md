@@ -31,7 +31,7 @@ Skip when:
 4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
 5. **Run report mandatory** — every autobuild run produces `tasks/autobuild-runs/YYMMDD-{slug}/run.md` with full audit trail
 6. **Coexists with `mk:cook`** — does not replace it; both route through Gate 1 + Gate 2
-7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.codex/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `harness-rules.md`) is independent of TDD mode and always applies.
+7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.codex/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of the harness rules) is independent of TDD mode and always applies.
 
 ## Workflow
 

@@ -75,7 +75,7 @@ A common over-claim is that the two layers are "fully orthogonal." That's too cl
 
 | Survives `--resume`? | What | Where |
 |---|---|---|
-| ✓ Yes | Behavioral rules (security, injection, gates) | `CLAUDE.md`, `.claude/rules/*.md` |
+| ✓ Yes | Behavioral rules (security, injection, gates) | `.claude/rules/*.md` |
 | ✓ Yes | Skill content | `.claude/skills/**/SKILL.md` |
 | ✓ Yes | Agent definitions | `.claude/agents/*.md` |
 | ✓ Yes | Project context | `docs/project-context.md` |
@@ -89,7 +89,7 @@ A common over-claim is that the two layers are "fully orthogonal." That's too cl
 
 The gap MeowKit fills is **specifically the runtime-policy state** — counters, caches, hashes, drift — that lives in files Claude Code does not load.
 
-The durable task record (`tasks/active/<id>.json`, v2.13.5+) is a different kind of survivor: it persists as a project file, but unlike `CLAUDE.md` it is **not** auto-injected — a fresh session reconstructs the active task (status, last step, next action, capability decisions) on demand via `mewkit task-state show`, so resume state survives without spending context until it's needed.
+The durable task record (`tasks/active/<id>.json`, v2.13.5+) is a different kind of survivor: it persists as a project file, but unlike `.claude/rules/*.md` it is **not** auto-injected — a fresh session reconstructs the active task (status, last step, next action, capability decisions) on demand via `mewkit task-state show`, so resume state survives without spending context until it's needed.
 
 ## File-by-file map
 
@@ -123,7 +123,7 @@ Most session-state files are wiped by `project-context-loader.sh` on session-id 
 | "Did this session go over budget?" | `session-state/budget-state.json` (live) + `.meowkit/telemetry/cost-log.json` (historical) |
 | "Which model tier is this session running on?" | `session-state/detected-model.json` |
 | "Has the working directory drifted since last checkpoint?" | `session-state/checkpoints/checkpoint-latest.json` (git hash compare) |
-| "What rules and skills apply to this project?" | `CLAUDE.md`, `.claude/rules/`, `.claude/skills/` (loaded by `--resume`) |
+| "What rules and skills apply to this project?" | `.claude/rules/`, `.claude/skills/` (loaded by `--resume`) |
 | "What was the durable lesson from the last bug fix?" | `.meowkit/memory/gotchas.md` (grepped on demand by `mk:fix`) |
 
 ## Honest caveats

@@ -46,6 +46,8 @@ export default defineConfig({
 			"**/dist/**",
 			".claude/**/*.test.cjs",
 			"plugin/**",
+			// Sibling session checkouts: separate revisions, not this tree's suites.
+			".claude/worktrees/**",
 			"**/migrate/modules/codex/root/**",
 			"**/migrate/modules/cursor/root/**",
 		],

@@ -170,7 +170,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 Contract: the workflow-evidence conventions. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
 
-**Storage path:** `.codex/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per `skill-authoring-rules.md` Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
+**Storage path:** `.codex/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per the skill-authoring rules Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
 
 **Write points (standard/deep only):** Step 2.5 (init: skill, mode, task, planPath, phase, risk, fixDiagnosis) → Step 5 (verification) → Step 6 finalize (`approvals.gate2`/`ship` as `required|not_applicable`, `memory.gotchaWritten` / `memory.decisionWritten`).
 
@@ -188,7 +188,7 @@ Contract: the workflow-evidence conventions. The index records pointers + summar
 - **Guessing root causes**: "I think it's X" without evidence → use mk:sequential-thinking to generate + test hypotheses from evidence
 - **Fixing symptoms**: test passes but underlying issue remains → always trace backward: symptom → cause → ROOT cause
 - **Skipping scout**: fixing without codebase context → mandatory scout maps what you're touching
-- **Missing required regression test**: bug resurfaces next sprint → follow `tdd-rules.md` and record any allowed omission rationale
+- **Missing required regression test**: bug resurfaces next sprint → follow the TDD rules and record any allowed omission rationale
 - **3+ failed attempts without stopping**: insanity loop → STOP, question architecture, discuss with user
 
 Full list: `references/gotchas.md` (update when Codex produces wrong fix patterns)

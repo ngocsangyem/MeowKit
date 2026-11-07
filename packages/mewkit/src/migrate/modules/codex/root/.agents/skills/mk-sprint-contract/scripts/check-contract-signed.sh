@@ -15,7 +15,7 @@
 #   4. Exit 0 if found, 1 otherwise
 set -u
 
-# 1. LEAN/MINIMAL mode bypass — per harness-rules.md Rule 3:
+# 1. LEAN/MINIMAL mode bypass — per the harness rules Rule 3:
 #    MINIMAL (Haiku) = contract skipped, LEAN (Opus 4.6+) = contract optional
 if [ "${MEOWKIT_AUTOBUILD_MODE:-}" = "LEAN" ] || [ "${MEOWKIT_AUTOBUILD_MODE:-}" = "MINIMAL" ]; then
   # Log the bypass for audit (per security considerations) but don't block

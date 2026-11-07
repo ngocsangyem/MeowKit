@@ -59,7 +59,7 @@ WHY: Skip paths avoid delivery tracking when there is no useful plan/report surf
 
 ## Rule 4: Orchestrator Disambiguation
 
-Per `.claude/rules/orchestration-rules.md`, `mk:cook` and `mk:workflow-orchestrator` are mutually exclusive per session. Refer to that rule for the full disambiguation logic.
+Per `.claude/skills/cook/references/orchestration-rules.md`, `mk:cook` and `mk:workflow-orchestrator` are mutually exclusive per session. Refer to that rule for the full disambiguation logic.
 
 WHY: Orchestrator mutual exclusion also prevents duplicate PM reports.
 

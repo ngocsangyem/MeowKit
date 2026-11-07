@@ -99,11 +99,11 @@ Do NOT write implementation code until a plan exists and Gate 1 is approved.
 In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): do NOT skip Test RED phase — write failing tests BEFORE implementation.
 In default mode: Phase 2 is optional; the developer may implement directly per the approved plan.
 Exception: `--fast` mode skips research but still requires plan + (in TDD mode) TDD-flavored tests.
-User override: Planning may be skipped only when the user explicitly says "just code it" or "skip planning" **and** Phase 0 found zero matched risk flags. Record the human override and rationale per `.claude/rules/intervention-recording-rules.md`; otherwise explain why Gate 1 still applies.
+User override: Planning may be skipped only when the user explicitly says "just code it" or "skip planning" **and** Phase 0 found zero matched risk flags. Record the human override and rationale per `.claude/rules/gate-rules.md` (Recording Human Interventions); otherwise explain why Gate 1 still applies.
 
 ## Anti-Rationalization
 
-Generic implementation-phase rationalizations live in `.claude/rules/anti-rationalization.md` — read before any non-trivial implementation step. Cook-specific addition (TDD mode):
+Generic implementation-phase rationalizations live in the Anti-Rationalization section of `.claude/rules/core-behaviors.md` — read before any non-trivial implementation step. Cook-specific addition (TDD mode):
 
 | Thought                | Reality                                                                                                                                  |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -252,18 +252,30 @@ If `mk:verify` FAILS after simplify: send back to developer to fix, then re-run 
 
 ## Status Report (Post-Gate 2)
 
-After a Gate 2 verdict PASS, delegate to `project-manager` per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Stop after reporting completion; invoke `mk:ship` only when the user explicitly requests shipping. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
+After a Gate 2 verdict PASS, delegate to `project-manager` per `.claude/skills/cook/references/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Stop after reporting completion; invoke `mk:ship` only when the user explicitly requests shipping. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
 
 ## Durable Task State (when an active task record exists)
 
-When this run drives an **active durable task** (a `tasks/active/<id>.json` exists), emit status/step at phase transitions and record each acted-on `mewkit capabilities resolve` outcome (`selected|skipped|unavailable|unsupported`) via `mewkit task-state update` — per `.claude/rules/task-state-emission.md`. Advisory + best-effort: a failed or unavailable command is surfaced but never blocks the pipeline, and one-off work with no record emits nothing.
+When this run drives an **active durable task** (a `tasks/active/<id>.json` exists), emit status/step at phase transitions and record each acted-on `mewkit capabilities resolve` outcome (`selected|skipped|unavailable|unsupported`) via `mewkit task-state update` — per `.claude/skills/cook/references/task-state-emission.md`. Advisory + best-effort: a failed or unavailable command is surfaced but never blocks the pipeline, and one-off work with no record emits nothing.
 
 ## Related Rules
 
 - `.claude/rules/gate-rules.md` — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions this skill enforces across all modes
-- `.claude/rules/post-phase-delegation.md` — PM delegation fire points and skip conditions
-- `.claude/rules/task-state-emission.md` — when/what/how to emit durable task-state events (advisory; active durable tasks only)
 - `.claude/rules-conditional/workflow-evidence-rules.md` — workflow evidence index (traceability over existing Phase 0-6 outputs; mirrors the gate scripts, never approves). See `references/workflow-steps.md` → Workflow Evidence Index
+
+## Rule Loads (just in time)
+
+These rules are no longer always-on: cook owns them and `Read`s each one at the phase that needs it. Load nothing else from this list — an unloaded rule is cheaper than an unread one.
+
+| Load at | Rule | Why |
+| --- | --- | --- |
+| Phase 0 Orient | `.claude/skills/cook/references/phase-contracts.md` | what each phase expects and produces, so a skipped input is caught before it cascades |
+| Phase 2 Test (TDD mode only) | `.claude/skills/cook/references/tdd-rules.md` | RED-phase definition, self-heal cap, escalation form |
+| Phase 3 Build, parallel mode only | `.claude/skills/cook/references/parallel-execution-rules.md` | zero-overlap ownership, max-3 agents, worktree isolation, integration test after merge |
+| Phase 3 Build, whenever a subagent is spawned | `.claude/skills/cook/references/orchestration-rules.md` | delegation template, isolation boundaries, file ownership, status handling |
+| Phase 4.5 `--strict` / generator ⇄ evaluator work | `.claude/skills/cook/references/harness-rules.md` | generator ≠ evaluator separation, active-verification HARD GATE, iteration cap |
+| After Gate 2 PASS | `.claude/skills/cook/references/post-phase-delegation.md` | PM delegation fire points and skip conditions |
+| Phase transitions, active durable task only | `.claude/skills/cook/references/task-state-emission.md` | when/what/how to emit durable task-state events (advisory) |
 
 ## Gotchas
 

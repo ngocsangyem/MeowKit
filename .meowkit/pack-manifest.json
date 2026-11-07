@@ -2,7 +2,6 @@
   "schemaVersion": "1.0",
   "base": {
     "files": [
-      "CLAUDE.md",
       "settings.json",
       "statusline.cjs",
       "workflow.yaml",
@@ -11,11 +10,13 @@
       "gitignore.meowkit",
       "mcp.json.example",
       ".env.example",
+      "rules/meowkit-core.md",
       "rules/security-rules.md",
       "rules/injection-rules.md",
       "rules/gate-rules.md",
       "rules/core-behaviors.md",
-      "rules/development-rules.md"
+      "rules/development-rules.md",
+      "rules/agent-conduct.md"
     ],
     "globs": [
       "hooks/**",

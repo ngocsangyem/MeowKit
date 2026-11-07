@@ -1,7 +1,6 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from "node:fs";
 import { join, relative, isAbsolute, dirname } from "node:path";
 import * as log from "./core-logger.js";
-import { processTemplate } from "./substitute-placeholders.js";
 import type { UserConfig } from "./substitute-placeholders.js";
 import { mergeSettingsFile } from "./merge-settings.js";
 import { writeManifest, hashFile, classifyLayer } from "./compute-checksums.js";
@@ -85,7 +84,7 @@ export interface SmartUpdateOptions {
  * Smart update from a downloaded release directory.
  *
  * @param config - User configuration (description, API keys, etc.)
- * @param sourceDir - Path to extracted release (contains .claude/, tasks/, CLAUDE.md)
+ * @param sourceDir - Path to extracted release (contains .claude/ and tasks/)
  * @param targetDir - User's project directory
  * @param dryRun - Preview only, no writes
  * @param force - Overwrite all files, ignore user modifications
@@ -231,13 +230,9 @@ export async function smartUpdate(
 
 	const claudeDir = join(targetDir, ".claude");
 
-	// CLAUDE.md at project root
-	const claudeMdSrc = join(sourceDir, "CLAUDE.md");
-	const claudeMdDest = join(targetDir, "CLAUDE.md");
-	if (existsSync(claudeMdSrc) && !existsSync(claudeMdDest)) {
-		processTemplate(claudeMdSrc, claudeMdDest, config, dryRun);
-		stats.added++;
-	}
+	// No kit-owned root CLAUDE.md is created or refreshed. The always-on guidance ships as
+	// `.claude/rules/*.md`, which the host auto-loads; a root CLAUDE.md in a target project
+	// is the user's own file and is never written, templated or deleted here.
 
 	// config.json template (generated, not from release). Written to the `.meowkit/` state
 	// root; an install still holding the pre-move `.claude/meowkit.config.json` keeps working

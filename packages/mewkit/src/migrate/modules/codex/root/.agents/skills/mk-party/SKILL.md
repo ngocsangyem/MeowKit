@@ -9,7 +9,7 @@ Bring multiple agent perspectives into one room. Agents debate, challenge, and b
 
 ## Required Agents
 
-This skill orchestrates discussion among existing agent definitions. The following must exist under `.codex/agents/` (per `agent-routing.md`):
+This skill orchestrates discussion among existing agent definitions. The following must exist under `.codex/agents/` (per the agent-routing table):
 
 `architect`, `developer`, `security`, `tester`, `reviewer`, `ui-ux-designer`, `analyst`, `planner`, `researcher`
 

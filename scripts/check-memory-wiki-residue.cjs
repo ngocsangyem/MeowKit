@@ -75,6 +75,8 @@ function walk(dir, out) {
 		const full = path.join(dir, entry.name);
 		if (entry.isDirectory()) {
 			if (entry.name === "node_modules" || entry.name === ".git") continue;
+			// Sibling session checkouts live at other revisions; they are not this tree.
+			if (entry.name === "worktrees" && path.basename(dir) === ".claude") continue;
 			walk(full, out);
 		} else if (entry.isFile()) {
 			if (SKIP_EXT.has(path.extname(entry.name).toLowerCase())) continue;

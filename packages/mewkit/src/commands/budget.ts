@@ -166,7 +166,7 @@ export function contextBudget(args: ContextBudgetArgs): void {
 		console.log(pc.bold(pc.cyan("Context budget")));
 		console.log(
 			pc.dim(
-				"Tiers: always-on (CLAUDE.md + rules) · conditional (rules-conditional) · on-demand (agents + commands + SKILL.md).",
+				"Tiers: always-on (rules) · conditional (rules-conditional) · on-demand (agents + commands + SKILL.md).",
 			),
 		);
 		console.log();

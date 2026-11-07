@@ -1,26 +1,27 @@
 ---
 title: "Configuration"
-description: "All MeowKit configuration options across CLAUDE.md, settings.json, and config files."
+description: "All MeowKit configuration options across the always-on rules, settings.json, and config files."
 sourceOfTruth: ".meowkit/.env.example"
 lastVerified: "2026-07-26"
 ---
 
 MeowKit is configured through several files:
 
-## CLAUDE.md
+## .claude/rules/
 
-The entry point Claude reads at session start. Contains:
-- Philosophy and core principles
-- Workflow phases (Phase 0-6)
-- Agent roster with ownership
-- Command index
-- Model routing table
-- Mode definitions
-- Memory system description
-- Security rules summary
+The 7 always-on rules Claude Code auto-loads at session start. `meowkit-core.md` carries the
+role, the 7-phase workflow, the two gates in brief, the DATA/INSTRUCTIONS boundary, the memory
+contract and the compaction policy; the other six are `security-rules.md`,
+`injection-rules.md`, `gate-rules.md`, `core-behaviors.md`, `development-rules.md` and
+`agent-conduct.md`. Everything else loads just in time from the owning skill's `references/`
+(see [Rules Index](/reference/rules-index)).
 
-**Customize:** Add project-specific conventions, adjust mode preferences.
-**Do not modify:** Security rules, gate definitions, agent roster structure.
+MeowKit installs no root `CLAUDE.md`. A project may keep its own; it is project-owned and
+never installed, refreshed or overwritten by the kit.
+
+**Customize:** project-specific conventions belong in your own `CLAUDE.md` or in
+`docs/project-context.md`, not in the kit's rule files — `mewkit upgrade` refreshes those.
+**Do not modify:** security rules, gate definitions, the injection boundary.
 
 ## .meowkit/config.json
 

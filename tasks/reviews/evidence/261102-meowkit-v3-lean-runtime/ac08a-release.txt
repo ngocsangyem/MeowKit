@@ -1,0 +1,79 @@
+==============================================================
+AC-08(a) — release archive + release manifest contain no root CLAUDE.md
+==============================================================
+Date: 2026-11-02T04:43:23Z
+Both scripts are cwd-rooted (projectRoot = process.cwd()) and have NO out-dir flag.
+=> run with cwd = scratch copy of the kit assets (.claude, tasks, scripts,
+   packages/mewkit/package.json, .meowkit/pack-manifest.json, deletions.json).
+   Excluded from the copy: .claude/worktrees (git-ignored dev worktree w/ node_modules)
+   and .claude/skills/.venv -- both are local dev artifacts the zip excludes/ignores anyway.
+cwd: /private/tmp/claude-501/-Users-sangnguyen-Desktop-MeowKit/40ecfd1c-e81f-4cbf-b0b5-dafbf0272d69/scratchpad/ac-evidence/kit2
+
+--- $ node scripts/prepare-release-assets.cjs 9.9.9   (zip 'adding:' lines elided)
+Generating release manifest v9.9.9...
+  .claude: 1237 files
+  tasks: 35 files
+Total files: 1272
+Generated: /private/tmp/claude-501/-Users-sangnguyen-Desktop-MeowKit/40ecfd1c-e81f-4cbf-b0b5-dafbf0272d69/scratchpad/ac-evidence/kit2/release-manifest.json (1271 entries)
+Validated release-manifest.json
+Prepared /private/tmp/claude-501/-Users-sangnguyen-Desktop-MeowKit/40ecfd1c-e81f-4cbf-b0b5-dafbf0272d69/scratchpad/ac-evidence/kit2/dist/meowkit-release.zip
+    [1639 'adding:' lines elided]
+
+--- ASSERTION 1: manifest has no root CLAUDE.md entry
+$ jq -r '.files[].path' release-manifest.json | grep -c CLAUDE
+total manifest entries : 1271
+paths matching /CLAUDE/i: 1 [ 'skills/tech-graph/references/style-6-claude-official.md' ]
+deletions[] entries    : 36
+deletions rules/* count: 21
+
+--- NOTE: manifest paths are .claude/-relative (the .claude/ prefix is stripped),
+--- so a root CLAUDE.md would appear as the literal path "CLAUDE.md". Checked above: 0.
+
+--- ASSERTION 2: zip archive has no root CLAUDE.md
+$ unzip -l dist/meowkit-release.zip | grep -iE 'CLAUDE.md'
+[exit 0 from grep; no output above = no match]
+
+$ unzip -Z1 dist/meowkit-release.zip | awk -F/ 'NF==1 || (NF==2 && $2=="")' | sort -u   # top-level entries
+.claude
+.meowkit
+release-manifest.json
+tasks
+
+--- ASSERTION 3: the 7 always-on rules ship; the 19 moved ones do not
+$ unzip -Z1 dist/meowkit-release.zip | grep '^.claude/rules/'
+.claude/rules/
+.claude/rules/agent-conduct.md
+.claude/rules/core-behaviors.md
+.claude/rules/development-rules.md
+.claude/rules/gate-rules.md
+.claude/rules/injection-rules.md
+.claude/rules/meowkit-core.md
+.claude/rules/security-rules.md
+
+--- the 19 moved rule basenames, searched across the WHOLE archive as rules/<name>:
+  rules/harness-rules.md                 in archive: 0
+  rules/tdd-rules.md                     in archive: 0
+  rules/phase-contracts.md               in archive: 0
+  rules/post-phase-delegation.md         in archive: 0
+  rules/task-state-emission.md           in archive: 0
+  rules/parallel-execution-rules.md      in archive: 0
+  rules/orchestration-rules.md           in archive: 0
+  rules/model-selection-rules.md         in archive: 0
+  rules/scale-adaptive-rules.md          in archive: 0
+  rules/risk-checklist.md                in archive: 0
+  rules/agent-routing.md                 in archive: 0
+  rules/context-budget-rules.md          in archive: 0
+  rules/rubric-rules.md                  in archive: 0
+  rules/skill-authoring-rules.md         in archive: 0
+  rules/dead-weight-audit-rules.md       in archive: 0
+  rules/docs-reference-contract.md       in archive: 0
+  rules/step-file-rules.md               in archive: 0
+  rules/intervention-recording-rules.md  in archive: 0
+  rules/anti-rationalization.md          in archive: 0
+
+--- ASSERTION 4: repo root CLAUDE.md is NOT a kit asset
+The maintainer repo DOES have a root CLAUDE.md (AC-13 keeps it as maintainer guidance).
+It is not in INCLUDE_DIRS ['.claude','tasks'] nor in archiveTargets, so it cannot ship.
+$ grep -n 'INCLUDE_DIRS\|archiveTargets' + root file presence:
+  repo root CLAUDE.md exists, size=8999
+  present in archive: 0

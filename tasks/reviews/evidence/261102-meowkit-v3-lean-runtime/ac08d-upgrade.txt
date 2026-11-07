@@ -1,0 +1,342 @@
+==============================================================
+AC-08(d) — v2-shaped project upgraded from the local kit:
+  pristine moved rules removed · user-modified one kept+reported · CLAUDE.md untouched
+==============================================================
+Date: 2026-11-02T04:48:26Z
+
+FIXTURE CONSTRUCTION
+  v2 source  = git archive b225a319 .claude tasks  -> /private/tmp/claude-501/-Users-sangnguyen-Desktop-MeowKit/40ecfd1c-e81f-4cbf-b0b5-dafbf0272d69/scratchpad/ac-evidence/src-v2
+               + release-manifest.json generated at version 2.9.9 with deletions=[]
+                 (a v2-era release predates this sprint's deletion list)
+  v3 source  = the AC-08(a) archive extracted      -> /private/tmp/claude-501/-Users-sangnguyen-Desktop-MeowKit/40ecfd1c-e81f-4cbf-b0b5-dafbf0272d69/scratchpad/ac-evidence/src-extract
+               (its release-manifest.json carries deletions[] = 36 entries, 21 under rules/)
+  Both installs drive smartUpdate() from packages/mewkit/dist with an explicit
+  scratch targetDir. Only the SOURCE is v2-shaped; the CLI is the current build,
+  which is what an upgrading user would actually run.
+  Path used: the existing update + deletion-list + orphan-cleanup path only.
+  No --force. cleanup default-on. assumeYes=true stands in for the [y/N] prompt.
+
+--- the 25 BASE rules (git ls-tree --name-only b225a319 .claude/rules/)
+     1	agent-conduct.md
+     2	agent-routing.md
+     3	anti-rationalization.md
+     4	context-budget-rules.md
+     5	core-behaviors.md
+     6	dead-weight-audit-rules.md
+     7	development-rules.md
+     8	docs-reference-contract.md
+     9	gate-rules.md
+    10	harness-rules.md
+    11	injection-rules.md
+    12	intervention-recording-rules.md
+    13	model-selection-rules.md
+    14	orchestration-rules.md
+    15	parallel-execution-rules.md
+    16	phase-contracts.md
+    17	post-phase-delegation.md
+    18	risk-checklist.md
+    19	rubric-rules.md
+    20	scale-adaptive-rules.md
+    21	security-rules.md
+    22	skill-authoring-rules.md
+    23	step-file-rules.md
+    24	task-state-emission.md
+    25	tdd-rules.md
+  = 6 survivors + 19 moved. (meowkit-core.md is new in v3, so v3 ships 7.)
+
+--- step 1: install the v2-shaped kit  => 25 rules, real metadata written
+$ ls -1 .claude/rules | wc -l  -> 25
+$ metadata entry for a moved rule (proves kit ownership, the deletion gate):
+    {"path":"rules/harness-rules.md","owner":"meowkit","layer":"core",
+     "checksum":"d0e5f5bf...9a375","installedVersion":"2.9.9"}
+
+--- step 2: user edits
+  (a) wrote a user-owned root CLAUDE.md (never kit-owned: the current CLI has no
+      CLAUDE.md copy step at all, so nothing in the kit claims this path)
+  (b) appended one HTML comment line to .claude/rules/harness-rules.md
+      -> exactly ONE moved rule is user-modified; the other 18 stay pristine
+
+--- PRE-UPGRADE shasum -a 256
+9a069f122be815b7fa9e8e018ddbfcccb1ec4417b919a2d5a6d28603c99653d2  CLAUDE.md
+a0c3e5062f9361390ce42d505f81e1b7d42e18729bc79899240096563c944f19  .claude/rules/harness-rules.md
+c4b196e75b858b4d04609b580c5cca53540fd3a79c294b4ce4e694da03da22be  .claude/rules/tdd-rules.md
+12dd6a2e4e48bb4ec0fc2c9d7dbdc75e7b5fbb35492b2cc472c2ec32dd1b0992  .claude/rules/phase-contracts.md
+
+--- step 3: $ upgrade from the local v3 kit
+Removed 18 file(s) marked for deletion by the release.
+Found 5 orphan file(s) — files on disk no longer in release:
+  - hooks/.logs/.gitignore
+  - hooks/.logs/hook-log.jsonl
+  - skills/docs-finder/.env.example
+  - skills/memory/SKILL.md
+  - skills/multimodal/.env.example
+Deleted 5 orphan file(s).
+--- stats ---
+added=33 updated=1184 skipped=35
+userModified (0): []
+orphansDeleted (5): ["hooks/.logs/.gitignore","hooks/.logs/hook-log.jsonl","skills/docs-finder/.env.example","skills/memory/SKILL.md","skills/multimodal/.env.example"]
+orphansSkipped (0): []
+deletionsDeleted (18): ["rules/agent-routing.md","rules/anti-rationalization.md","rules/context-budget-rules.md","rules/dead-weight-audit-rules.md","rules/docs-reference-contract.md","rules/intervention-recording-rules.md","rules/model-selection-rules.md","rules/orchestration-rules.md","rules/parallel-execution-rules.md","rules/phase-contracts.md","rules/post-phase-delegation.md","rules/risk-checklist.md","rules/rubric-rules.md","rules/scale-adaptive-rules.md","rules/skill-authoring-rules.md","rules/step-file-rules.md","rules/task-state-emission.md","rules/tdd-rules.md"]
+deletionsSkipped (1): ["rules/harness-rules.md"]
+deletionsAlreadyGone (17): ["hooks/handlers/immediate-capture-handler.cjs","hooks/lib/memory-prune.py","rules/memory-read-rules.md","rules/wiki-context-rules.md","scripts/memory-migrator.cjs","scripts/memory-topic-file-migrator.cjs","skills/document-release/references/contributor-mode.md","skills/memory/references/capture-architecture.md","skills/memory/references/consolidation.md","skills/memory/references/cost-tracking.md","skills/memory/references/pattern-extraction.md","skills/memory/references/session-capture.md","skills/retro/references/contributor-mode.md","skills/wiki-render/SKILL.md","skills/wiki-research/SKILL.md","skills/wiki/SKILL.md","skills/wiki/references/terminal-handoff-advisory.md"]
+profileTrimmed (0): []
+
+=============== ASSERTIONS ===============
+
+ASSERT 1: the unmodified moved rules were REMOVED  -> 18 deleted
+  deletionsDeleted contains 18 of the 19 moved rules (all but harness-rules.md).
+  Per-file on-disk check now:
+    rules/agent-routing.md             removed
+    rules/anti-rationalization.md      removed
+    rules/context-budget-rules.md      removed
+    rules/dead-weight-audit-rules.md   removed
+    rules/docs-reference-contract.md   removed
+    rules/intervention-recording-rules.md removed
+    rules/model-selection-rules.md     removed
+    rules/orchestration-rules.md       removed
+    rules/parallel-execution-rules.md  removed
+    rules/phase-contracts.md           removed
+    rules/post-phase-delegation.md     removed
+    rules/risk-checklist.md            removed
+    rules/rubric-rules.md              removed
+    rules/scale-adaptive-rules.md      removed
+    rules/skill-authoring-rules.md     removed
+    rules/step-file-rules.md           removed
+    rules/task-state-emission.md       removed
+    rules/tdd-rules.md                 removed
+
+ASSERT 2: the user-modified moved rule was KEPT and REPORTED
+  reported via stats.deletionsSkipped = ["rules/harness-rules.md"]  (see step 3 output)
+  and smart-update.ts:344-346 reaches that branch only on a checksum mismatch
+  ("user-modified — preserve").
+$ on disk:  PRESENT
+$ shasum -a 256 .claude/rules/harness-rules.md
+a0c3e5062f9361390ce42d505f81e1b7d42e18729bc79899240096563c944f19  .claude/rules/harness-rules.md
+  pre-upgrade was: a0c3e5062f9361390ce42d505f81e1b7d42e18729bc79899240096563c944f19
+$ tail -1 (the user's edit survived verbatim):
+<!-- LOCAL EDIT: our team keeps harness rules pinned, do not delete -->
+
+ASSERT 3: the user's root CLAUDE.md is BYTE-IDENTICAL
+$ shasum -a 256 CLAUDE.md
+9a069f122be815b7fa9e8e018ddbfcccb1ec4417b919a2d5a6d28603c99653d2  CLAUDE.md
+  pre-upgrade was: 9a069f122be815b7fa9e8e018ddbfcccb1ec4417b919a2d5a6d28603c99653d2
+$ cat CLAUDE.md
+# My Project
+
+Hand-written project guidance that MeowKit must never touch.
+Build: `make all`. Deploy: ask Dana first.
+
+ASSERT 4: resulting .claude/rules = the 7 always-on + the 1 preserved user-modified file
+$ ls -1 .claude/rules | wc -l -> 8
+agent-conduct.md
+core-behaviors.md
+development-rules.md
+gate-rules.md
+harness-rules.md
+injection-rules.md
+meowkit-core.md
+security-rules.md
+
+ASSERT 5: no new migration module in the sprint diff
+$ git -C repo diff --cached --name-only | grep -iE 'migrat|/v2|v2[-_]|port'
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-advise/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-agent-detector/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-agent-detector/references/after-detection.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-autobuild/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-benchmark/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-build-fix/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-context-audit/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-context-engineering/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-cook/references/loop-safety-protocol.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-cook/references/subagent-patterns.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-cook/references/workflow-steps.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-fix/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/references/harness-profiles.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/references/internal-routing.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/references/job-spec.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/references/model-routing.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/references/runtime-matrix.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-party/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-plan-creator/references/parallel-mode.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-plan-creator/step-06-validation-interview.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-preview/references/html-design-rules.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-prompt-enhancer/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-prompt-enhancer/references/context-safeguards.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-prompt-enhancer/references/deep-mode-scout.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-prompt-enhancer/references/playbook.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-scout/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-skill-creator/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-skill-creator/scripts/validate-skill.py
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-sprint-contract/scripts/check-contract-signed.sh
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-story-sizer/references/injection-patterns.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-team-config/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-trace-analyze/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-trace-analyze/step-02-partition.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-trace-analyze/workflow.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-worktree/SKILL.md
+packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-worktree/references/commands.md
+packages/mewkit/src/migrate/modules/codex/root/.codex/agents/jira-issue.toml
+packages/mewkit/src/migrate/modules/codex/root/AGENTS.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-advise/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-agent-detector/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-autobuild/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-benchmark/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-build-fix/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-context-audit/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-context-engineering/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-cook/references/loop-safety-protocol.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-cook/references/subagent-patterns.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-cook/references/workflow-steps.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-fix/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/references/harness-profiles.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/references/internal-routing.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/references/job-spec.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/references/model-routing.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/references/runtime-matrix.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-party/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-plan-creator/references/parallel-mode.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-plan-creator/step-06-validation-interview.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-preview/references/html-design-rules.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-prompt-enhancer/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-prompt-enhancer/references/context-safeguards.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-prompt-enhancer/references/deep-mode-scout.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-prompt-enhancer/references/playbook.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-scout/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-skill-creator/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-skill-creator/scripts/validate-skill.py
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-sprint-contract/scripts/check-contract-signed.sh
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-story-sizer/references/injection-patterns.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-team-config/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-trace-analyze/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-trace-analyze/step-02-partition.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-trace-analyze/workflow.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-worktree/SKILL.md
+packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-worktree/references/commands.md
+packages/mewkit/src/migrate/modules/cursor/root/AGENTS.md
+packages/mewkit/src/migrate/portable-installer.ts
+
+  all staged files whose name mentions migrate/v2/port, with status:
+M	.claude/skills/autobuild/step-06-run-report.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-advise/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-agent-detector/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-agent-detector/references/after-detection.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-autobuild/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-benchmark/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-build-fix/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-context-audit/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-context-engineering/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-cook/references/loop-safety-protocol.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-cook/references/subagent-patterns.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-cook/references/workflow-steps.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-fix/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/references/harness-profiles.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/references/internal-routing.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/references/job-spec.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/references/model-routing.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-orchestrate/references/runtime-matrix.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-party/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-plan-creator/references/parallel-mode.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-plan-creator/step-06-validation-interview.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-preview/references/html-design-rules.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-prompt-enhancer/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-prompt-enhancer/references/context-safeguards.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-prompt-enhancer/references/deep-mode-scout.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-prompt-enhancer/references/playbook.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-scout/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-skill-creator/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-skill-creator/scripts/validate-skill.py
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-sprint-contract/scripts/check-contract-signed.sh
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-story-sizer/references/injection-patterns.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-team-config/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-trace-analyze/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-trace-analyze/step-02-partition.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-trace-analyze/workflow.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-worktree/SKILL.md
+M	packages/mewkit/src/migrate/modules/codex/root/.agents/skills/mk-worktree/references/commands.md
+M	packages/mewkit/src/migrate/modules/codex/root/.codex/agents/jira-issue.toml
+M	packages/mewkit/src/migrate/modules/codex/root/AGENTS.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-advise/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-agent-detector/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-autobuild/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-benchmark/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-build-fix/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-context-audit/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-context-engineering/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-cook/references/loop-safety-protocol.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-cook/references/subagent-patterns.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-cook/references/workflow-steps.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-fix/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/references/harness-profiles.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/references/internal-routing.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/references/job-spec.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/references/model-routing.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-orchestrate/references/runtime-matrix.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-party/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-plan-creator/references/parallel-mode.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-plan-creator/step-06-validation-interview.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-preview/references/html-design-rules.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-prompt-enhancer/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-prompt-enhancer/references/context-safeguards.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-prompt-enhancer/references/deep-mode-scout.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-prompt-enhancer/references/playbook.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-scout/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-skill-creator/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-skill-creator/scripts/validate-skill.py
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-sprint-contract/scripts/check-contract-signed.sh
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-story-sizer/references/injection-patterns.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-team-config/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-trace-analyze/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-trace-analyze/step-02-partition.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-trace-analyze/workflow.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-worktree/SKILL.md
+M	packages/mewkit/src/migrate/modules/cursor/root/.cursor/skills/mk-worktree/references/commands.md
+M	packages/mewkit/src/migrate/modules/cursor/root/AGENTS.md
+M	packages/mewkit/src/migrate/portable-installer.ts
+
+  NOTE: the cleanup is done purely by data (deletions.json -> release-manifest
+  deletions[]) through the pre-existing deletions pass. No code module was added.
+  smart-update.ts diff in this sprint:
+ packages/mewkit/src/core/smart-update.ts | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
+
+--- ASSERT 5 (refined): the grep above is noisy because the pre-existing
+--- packages/mewkit/src/migrate/ tree is the PROVIDER EXPORT feature
+--- (Codex/Cursor bundles, AC-11) — not a v2->v3 data migration.
+--- The question is whether any file was ADDED. Added files only:
+$ git diff --cached --diff-filter=A --name-only | grep -iE 'migrat|v2|port'
+  (no match — ZERO added files mention migrate/v2/port)
+
+$ ALL added .ts/.cjs/.js source files in this sprint:
+packages/mewkit/src/core/__tests__/always-on-rule-set.test.ts
+packages/mewkit/src/core/__tests__/docs-reference-contract-resolution.test.ts
+packages/mewkit/src/core/always-on-rules.ts
+scripts/check-always-on-budget.cjs
+scripts/check-dangling-rule-refs.cjs
+scripts/check-rule-survival.cjs
+scripts/dangling-rule-refs-data.cjs
+scripts/rule-survival-oracle.cjs
+src/__tests__/rules/always-on-checks.test.ts
+src/__tests__/rules/dangling-rule-refs.test.ts
+
+$ ALL added files in this sprint (any type):
+    .claude/rules/meowkit-core.md
+    .claude/skills/cook/references/agent-conduct-extended.md
+    docs/maintainer/rule-destination-table.md
+    packages/mewkit/src/core/__tests__/always-on-rule-set.test.ts
+    packages/mewkit/src/core/__tests__/docs-reference-contract-resolution.test.ts
+    packages/mewkit/src/core/always-on-rules.ts
+    scripts/check-always-on-budget.cjs
+    scripts/check-dangling-rule-refs.cjs
+    scripts/check-rule-survival.cjs
+    scripts/dangling-rule-refs-data.cjs
+    scripts/rule-survival-oracle.cjs
+    src/__tests__/rules/always-on-checks.test.ts
+    src/__tests__/rules/dangling-rule-refs.test.ts
+
+=> no new migration module. The 19-rule cleanup is data-driven:
+   deletions.json -> release-manifest.json deletions[] -> the pre-existing
+   deletions pass in smart-update.ts (which this sprint only shrank, -9/+4).

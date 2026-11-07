@@ -147,4 +147,4 @@ The autobuild workflow reads `tasks/autobuild-runs/{run-id}/run.md` to find the 
 - `.claude/skills/autobuild/references/adaptive-density-matrix.md` — density decision matrix
 - `.claude/skills/autobuild/references/agent-teams-vs-subagents.md` — when to use `--teams`
 - `docs/dead-weight-audit.md` — playbook for keeping the autobuild workflow pruned
-- `.claude/rules/harness-rules.md` — discipline core
+- `.claude/skills/cook/references/harness-rules.md` — discipline core

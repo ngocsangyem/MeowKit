@@ -212,7 +212,7 @@ function collectMarkdown(root: string, dir: string, acc: string[] = []): string[
 // ─── Command-vs-skill drift ──────────────────────────────────────────────────
 //
 // A slash command and its same-named skill are two descriptions of one behavior,
-// and two descriptions drift. The rule (skill-authoring-rules.md → Commands vs
+// and two descriptions drift. The rule (skill-creator/references/skill-authoring-rules.md → Commands vs
 // Skills): the command is a DISPATCHER — usage, flags, dispatch, and a concise
 // safety note pointing at the authority. The skill owns the procedure.
 //
@@ -253,7 +253,7 @@ function pairedCommands(root: string): string[] {
 			.filter((f) => f.endsWith(".md"))
 			.filter((f) => GOVERNED_DISPATCHERS.has(f.replace(/\.md$/, "")))
 			// A command with no same-name skill has nowhere to delegate its procedure to,
-			// so the same prose there is correct (skill-authoring-rules.md: "not every
+			// so the same prose there is correct (skill-authoring-rules: "not every
 			// command has a matching SKILL.md, and that is intentional").
 			.filter((f) => fs.existsSync(path.join(skillsDir, f.replace(/\.md$/, ""), "SKILL.md")))
 			.map((f) => path.join(".claude", "commands", "mk", f))
@@ -335,7 +335,7 @@ export function scanCommandForDrift(root: string, relPath: string): CommandDrift
  *
  * Scoped to PAIRED commands only. A standalone command (no matching skill) has
  * nowhere to delegate its procedure to, so the same prose there is correct —
- * per skill-authoring-rules.md, "not every command has a matching SKILL.md, and
+ * per skill-creator/references/skill-authoring-rules.md, "not every command has a matching SKILL.md, and
  * that is intentional".
  */
 export function checkCommandDrift(root: string): CheckResult[] {

@@ -99,7 +99,7 @@ Activate `mk:scout` to map affected codebase BEFORE any diagnosis:
 - Affected files, dependencies, related tests, recent changes (`git log`)
 - Quick mode: minimal scout (affected file + direct deps only)
 - Standard/Deep: full scout (module boundaries, test coverage, call chains)
-- **Risk flags:** match the task against `.claude/rules/risk-checklist.md` (the 9 IDs only — do not invent flags) and hold `matchedFlags` for the evidence index. If any of AUTH / AUTHZ / DATA_MODEL / AUDIT_SEC / EXT_SYSTEM / PUBLIC_CONTRACT / WEAK_PROOF matches, set `risk.requiresHumanApproval = true` — auto mode cannot finalize silently (see `references/review-cycle.md`).
+- **Risk flags:** match the task against `.claude/skills/agent-detector/references/risk-checklist.md` (the 9 IDs only — do not invent flags) and hold `matchedFlags` for the evidence index. If any of AUTH / AUTHZ / DATA_MODEL / AUDIT_SEC / EXT_SYSTEM / PUBLIC_CONTRACT / WEAK_PROOF matches, set `risk.requiresHumanApproval = true` — auto mode cannot finalize silently (see `references/review-cycle.md`).
 
 **Why mandatory:** Without codebase context, diagnosis guesses instead of reasons from evidence.
 
@@ -160,7 +160,7 @@ Task orchestration (Moderate+): `references/task-orchestration.md`.
 ## Step 5 — Verify + Prevent (MANDATORY)
 
 1. **Iron-law verify:** Re-run exact pre-fix commands. Compare before/after.
-2. **Regression test:** Follow `.claude/rules/tdd-rules.md`; when required, the test fails WITHOUT the fix and passes WITH it.
+2. **Regression test:** Follow `.claude/skills/cook/references/tdd-rules.md`; when required, the test fails WITHOUT the fix and passes WITH it.
 3. **Defense-in-depth:** Load `references/prevention-gate.md` — consider entry validation, business logic guards, error handling, type safety.
 4. **BLOCK:** Missing a required regression test is incomplete; record the allowed omission rationale for lint/format/config-only changes.
 
@@ -191,7 +191,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
    - A failed write is never silent: print one line — `⚠ memory write skipped: <reason>` — and continue.
    - Quick runs never write memory. Skip when `/mk:fix --no-capture` was passed or the lesson is derivable from code/git.
 
-3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per `.claude/rules/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — Gate 1 bypass path means no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
+3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per `.claude/skills/cook/references/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — Gate 1 bypass path means no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
 
 4. `documenter` agent → update `./docs`.
 
@@ -203,7 +203,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
 
-**Storage path:** `.claude/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per `skill-authoring-rules.md` Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
+**Storage path:** `.claude/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
 
 **Write points (standard/deep only):** Step 2.5 (init: skill, mode, task, planPath, phase, risk, fixDiagnosis) → Step 5 (verification) → Step 6 finalize (`approvals.gate2`/`ship` as `required|not_applicable`, `memory.gotchaWritten` / `memory.decisionWritten`).
 
@@ -221,7 +221,7 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index reco
 - **Guessing root causes**: "I think it's X" without evidence → use mk:sequential-thinking to generate + test hypotheses from evidence
 - **Fixing symptoms**: test passes but underlying issue remains → always trace backward: symptom → cause → ROOT cause
 - **Skipping scout**: fixing without codebase context → mandatory scout maps what you're touching
-- **Missing required regression test**: bug resurfaces next sprint → follow `tdd-rules.md` and record any allowed omission rationale
+- **Missing required regression test**: bug resurfaces next sprint → follow `.claude/skills/cook/references/tdd-rules.md` and record any allowed omission rationale
 - **3+ failed attempts without stopping**: insanity loop → STOP, question architecture, discuss with user
 
 Full list: `references/gotchas.md` (update when Claude produces wrong fix patterns)

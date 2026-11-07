@@ -3,7 +3,7 @@
 #
 # Why this exists:
 #   Claude Code does NOT export CLAUDE_MODEL / MEOWKIT_MODEL_HINT / ANTHROPIC_MODEL
-#   to Stop-hook subprocesses (verified 260408, harness-rules.md Rule 7).
+#   to Stop-hook subprocesses (verified 260408, .claude/skills/cook/references/harness-rules.md Rule 7).
 #   The canonical source is session-state/detected-model.json written by
 #   handlers/model-detector.cjs at SessionStart. This helper reads that file
 #   with python3 (safe path), falls back to grep+sed if python is missing,
@@ -57,7 +57,7 @@ except Exception: pass
   model=$(printf '%s' "$model" | tr -cd 'a-zA-Z0-9._-')
 
   if [ "$model" = "unknown" ] && [ -n "$source" ]; then
-    echo "resolve-model: detected-model.json contains 'unknown' — model-detector.cjs at SessionStart failed to identify model. See harness-rules.md Rule 7." >&2
+    echo "resolve-model: detected-model.json contains 'unknown' — model-detector.cjs at SessionStart failed to identify model. See .claude/skills/cook/references/harness-rules.md Rule 7." >&2
     model=""
   fi
 

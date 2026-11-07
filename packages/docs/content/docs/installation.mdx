@@ -71,7 +71,6 @@ Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that 
 ├── state/           Session markers
 └── cache/           Derived caches, rebuildable
 
-CLAUDE.md             Entry point for Claude Code
 .mcp.json.example     Optional MCP server config
 ```
 
@@ -126,7 +125,7 @@ Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 | `.claude/` already exists | Use `--force` flag or delete manually |
 | Hooks not executable | Run `chmod +x .claude/hooks/*.sh` |
 | Python scripts fail | Ensure Python 3.9+ is in PATH |
-| Claude Code doesn't load CLAUDE.md | Restart Claude Code session |
+| Claude Code doesn't load `.claude/rules/` | Restart the Claude Code session; `npx mewkit validate` confirms all 7 always-on rules are present |
 | The agent refuses to edit any file | Gate 1 is unapproved, which is the gate working. See [When a gate blocks you](/core-concepts/gates#when-a-gate-blocks-you) |
 | `doctor` reports hooks not executable after a fresh clone | `npx mewkit doctor` fixes this itself; permissions do not survive some archive formats |
 

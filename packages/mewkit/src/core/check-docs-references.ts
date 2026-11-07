@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { CONTRACT_REL_PATH, FILE_WHITELIST, resolveContractPath } from "./docs-reference-contract-paths.js";
 
 export interface DocsRefFinding {
 	file: string;
@@ -14,6 +15,11 @@ export interface DocsRefResult {
 	findings: DocsRefFinding[];
 	errorCount: number;
 	warnCount: number;
+	/**
+	 * True when the maintainer contract is absent, so there was no allowlist to check
+	 * against. A user project ships `.claude/` without it, which is N/A, not a failure.
+	 */
+	notApplicable?: boolean;
 }
 
 // Subdirectories under .claude/ that ship in the release zip.
@@ -30,9 +36,6 @@ const SCAN_DIRS = [
 	"modes",
 	"benchmarks",
 ];
-
-// Files allowed to mention banned paths (because they DEFINE the bans).
-const FILE_WHITELIST = new Set(["rules/docs-reference-contract.md", "rules/skill-authoring-rules.md"]);
 
 // Skill dirs whose Grep-of-user-project semantics need an opt-out from path checks.
 const SKILL_DIR_WHITELIST = new Set(["skills/docs-finder"]);
@@ -133,9 +136,9 @@ function isInWhitelistedSkill(relPath: string): boolean {
 }
 
 export function checkDocsReferences(claudeDir: string): DocsRefResult {
-	const contractPath = path.join(claudeDir, "rules", "docs-reference-contract.md");
+	const contractPath = resolveContractPath(claudeDir);
 	if (!fs.existsSync(contractPath)) {
-		throw new Error(`Contract file missing: ${contractPath}`);
+		return { scannedFiles: 0, findings: [], errorCount: 0, warnCount: 0, notApplicable: true };
 	}
 	const { allowed, reserved } = parseAllowlist(contractPath);
 
@@ -185,6 +188,9 @@ export function checkDocsReferences(claudeDir: string): DocsRefResult {
 }
 
 export function formatReport(result: DocsRefResult): string {
+	if (result.notApplicable) {
+		return `N/A: docs-reference contract not present at ${CONTRACT_REL_PATH} — source-repo-only maintainer document, nothing to check in this project.`;
+	}
 	const lines: string[] = [];
 	for (const f of result.findings) {
 		lines.push(`${f.file}:${f.line}: ${f.level}: ${f.token} — ${f.reason}`);

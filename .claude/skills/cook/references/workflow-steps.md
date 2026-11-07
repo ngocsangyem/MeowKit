@@ -31,6 +31,7 @@ All modes share these phases with mode-specific variations.
 
 ## Phase 0: Orient
 
+0. **Load the phase contracts.** `Read` `.claude/skills/cook/references/phase-contracts.md` once per run — it is the expects/produces table for all 7 phases and is no longer always-on context.
 1. Parse input with `intent-detection.md` rules → detect mode
 2. **Model tier declaration** (MANDATORY): `Task complexity: [TRIVIAL|STANDARD|COMPLEX] → [model]`
    - Auth/payments/security → always COMPLEX
@@ -102,7 +103,7 @@ mode automates the path *to* Gate 1, never the approval *at* it (see
 
 ## Phase 2: Test (skip if no-test mode; RED-phase enforcement only if `--tdd` / `MEOWKIT_TDD=1`)
 
-Write failing tests BEFORE implementation. TDD enforcement per `tdd-rules.md`. Phase 2 behavior by mode:
+Write failing tests BEFORE implementation. TDD enforcement per `.claude/skills/cook/references/tdd-rules.md`. Phase 2 behavior by mode:
 
 - `RED-strict` (interactive, auto, parallel, code) — when `--tdd` / `MEOWKIT_TDD=1` is active, failing tests gate Phase 3. When TDD is off, Phase 2 is optional.
 - `Plan-level` (fast) — tests reflect plan intent only; no RED gate.
@@ -129,6 +130,8 @@ Present test list. Ask: "Proceed to implementation?" / "Adjust tests" / "Abort"
 ## Phase 3: Build GREEN
 
 Implement code until all tests pass. TDD: implement ONLY enough to make tests pass.
+
+**Rule loads for this phase.** Before spawning any subagent, `Read` `.claude/skills/cook/references/orchestration-rules.md` (delegation template, isolation boundaries, file ownership, status handling). In parallel mode ONLY, also `Read` `.claude/skills/cook/references/parallel-execution-rules.md` (zero file overlap, max 3 agents, worktree isolation, integration test after merge). Skip both in a single-agent sequential run.
 
 **Visual metadata (read-only for cook).** If `.plan-state.json` carries a `visual`
 block (schema 1.3), the plan has an APPROVED `visual-plan/plan.json`. Before a
@@ -270,6 +273,8 @@ Before presenting for approval, run BOTH structural checks and surface both:
 
 **Fires when:** `--strict` flag present OR `mk:scale-routing` returned `level=high` at Phase 0.
 **Supersedes:** `--verify` (strict includes active verification via mk:evaluate step-02/03).
+
+**Rule load for this path.** `Read` `.claude/skills/cook/references/harness-rules.md` before spawning the evaluator — it carries the generator ≠ evaluator separation, the active-verification HARD GATE, and the skeptic-persona reload rule the evaluator is graded against. Not loaded on the `--verify` path.
 
 1. **Log trigger reason:**
    - If explicit: `"--strict flag detected, invoking full evaluator"`
@@ -448,7 +453,7 @@ Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. Cook populates
 
 | Phase | Existing output → evidence fields |
 |---|---|
-| 0 Orient | `mode`, tier, `risk.matchedFlags` (from `risk-checklist.md` / `mk:agent-detector`) |
+| 0 Orient | `mode`, tier, `risk.matchedFlags` (from `.claude/skills/agent-detector/references/risk-checklist.md` / `mk:agent-detector`) |
 | 1 Plan | `planPath`, `cookContract` (the 5 exact requirements), `approvals.gate1` (mirrors `validate-gate-1.sh`) |
 | 3 Build | changed-files summary |
 | 3.5 Simplify | simplify status |

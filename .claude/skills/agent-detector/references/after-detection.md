@@ -35,9 +35,9 @@ domain_agents[2]{family,count,list}:
   Confluence,5,confluence-page/confluence-search/confluence-spec-analyst/confluence-bulk/confluence-collaborate
 ```
 
-Total: 18 core + 21 domain = 39 agents. Core agents are routed by the orchestrator via the `agent-routing.md` table; domain agents are routed by their hub skill (`mk:jira` / `mk:confluence`) — the orchestrator does NOT score them directly.
+Total: 18 core + 21 domain = 39 agents. Core agents are routed by the orchestrator via the `.claude/skills/agent-detector/references/agent-routing.md` table; domain agents are routed by their hub skill (`mk:jira` / `mk:confluence`) — the orchestrator does NOT score them directly.
 
-See `.claude/rules/agent-routing.md` for the full agent table. Skill dispatch (intent → skill) lives separately in `.claude/skills/agent-detector/references/skill-domain-routing.md`.
+See `.claude/skills/agent-detector/references/agent-routing.md` for the full agent table. Skill dispatch (intent → skill) lives separately in `.claude/skills/agent-detector/references/skill-domain-routing.md`.
 
 ---
 
@@ -53,6 +53,6 @@ User: "Use only tester for this task"
 
 ---
 
-**Agent routing:** `.claude/rules/agent-routing.md` (canonical agent table) and `.claude/agents/orchestrator.md` (orchestrator agent definition). **Skill dispatch:** `.claude/skills/agent-detector/references/skill-domain-routing.md`.
+**Agent routing:** `.claude/skills/agent-detector/references/agent-routing.md` (canonical agent table) and `.claude/agents/orchestrator.md` (orchestrator agent definition). **Skill dispatch:** `.claude/skills/agent-detector/references/skill-domain-routing.md`.
 
 **MANDATORY:** Always show agent banner at start of EVERY response.

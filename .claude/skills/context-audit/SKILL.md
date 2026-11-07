@@ -48,7 +48,7 @@ Complementary lens: `mewkit inventory --substrate` shows the same artifact set
 grouped by the responsibility each serves (covered / partial / missing), so a trim
 can be checked against responsibility coverage before removing an artifact. The
 per-phase read budget that bounds what an audit-driven session should load lives in
-`rules/context-budget-rules.md`.
+`.claude/skills/agent-detector/references/context-budget-rules.md`.
 
 ## When to Use
 
@@ -60,7 +60,7 @@ Three concrete triggers:
    over-compacted, audit to see if structural overhead has grown past 10%.
 3. **Periodic health audit** — quarterly or on model upgrades, confirm
    the always-on bundle still pays its keep (paired with the dead-weight audit
-   in `harness-rules.md` Rule 7).
+   in `.claude/skills/cook/references/harness-rules.md` Rule 7).
 
 ## Context vs Cost (Boundary)
 
@@ -147,7 +147,7 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 
 ## Related Rules
 
-- `.claude/rules/skill-authoring-rules.md` — discovery + Gotchas section requirements
+- `.claude/skills/skill-creator/references/skill-authoring-rules.md` — discovery + Gotchas section requirements
 - `.claude/rules/injection-rules.md` Rule 11 — Skill Rule of Two; this skill
   scores 2 of 3 (untrusted SCAN_ROOT input + filename inventory may surface
   sensitive paths) so paths are canonicalized via `realpath` and never executed.

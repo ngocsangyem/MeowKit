@@ -6,6 +6,9 @@ import { artifactPatternsOverlap, checkAgentConformance } from "../check-agent-c
 
 const tempDirs: string[] = [];
 
+const ROUTING_DIR = join("skills", "agent-detector", "references");
+const ROUTING_REL = join(ROUTING_DIR, "agent-routing.md");
+
 afterEach(async () => {
 	await Promise.all(tempDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
@@ -18,9 +21,10 @@ async function harness(files: Record<string, string>): Promise<string> {
 	tempDirs.push(root);
 	const claude = join(root, ".claude");
 	await mkdir(join(claude, "agents"), { recursive: true });
-	await mkdir(join(claude, "rules"), { recursive: true });
+	// The prose routing table is loaded just in time by the agent-detector skill.
+	await mkdir(join(claude, ROUTING_DIR), { recursive: true });
 	await writeFile(join(claude, "agents", "AGENTS_INDEX.md"), "# index\n[0]{agent_file}\n");
-	await writeFile(join(claude, "rules", "agent-routing.md"), "# routes\n");
+	await writeFile(join(claude, ROUTING_REL), "# routes\n");
 	for (const [name, body] of Object.entries(files)) await writeFile(join(claude, "agents", name), body);
 	return root;
 }
@@ -51,7 +55,7 @@ describe("agent conformance", () => {
 
 	it("reports missing routing and generated index files without throwing", async () => {
 		const root = await harness({});
-		await rm(join(root, ".claude", "rules", "agent-routing.md"));
+		await rm(join(root, ".claude", ROUTING_REL));
 		await rm(join(root, ".claude", "agents", "AGENTS_INDEX.md"));
 
 		const results = checkAgentConformance(root);

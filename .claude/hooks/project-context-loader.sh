@@ -213,10 +213,11 @@ READY_SCORE=0
 READY_MAX=5
 READY_MISSING=""
 
-if [ -f "CLAUDE.md" ] || [ -f ".claude/CLAUDE.md" ]; then
+# The kit ships no root CLAUDE.md; the always-on core rule is the install marker.
+if [ -f ".claude/rules/meowkit-core.md" ]; then
   READY_SCORE=$((READY_SCORE + 1))
 else
-  READY_MISSING="${READY_MISSING} CLAUDE.md"
+  READY_MISSING="${READY_MISSING} core-rules"
 fi
 
 if [ -f "docs/project-context.md" ]; then

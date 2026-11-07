@@ -77,7 +77,7 @@ The whole surface reduces to four moves. Name the one you need, then triage.
 
 Pointer-style — the rules below own the detail; do not restate them here.
 
-- **Read more** — only when a Retrieval Trigger in `context-budget-rules.md` matches (schema/contract change, security surface, cross-cutting refactor, failed verification, resume). No trigger → no read. (Rule file is present in a toolkit install; if absent downstream, fall back to: read only what a named acceptance criterion requires.)
+- **Read more** — only when a Retrieval Trigger in `.claude/skills/agent-detector/references/context-budget-rules.md` matches (schema/contract change, security surface, cross-cutting refactor, failed verification, resume). No trigger → no read. (Rule file is present in a toolkit install; if absent downstream, fall back to: read only what a named acceptance criterion requires.)
 - **Stop** — you have enough to act, OR two consecutive reads changed no decision, OR the phase/tier read ceiling is reached. "Seems right" without evidence is not stop — verify.
 - **Ask** — an ungreppable fact, a spec-vs-code conflict, or a business/irreversible decision (`core-behaviors.md` #2, if present). Scout first: if grep/read answers it, don't ask.
 - **Assume** — cheap-to-fix uncertainty. Emit an `ASSUMPTIONS I'M MAKING` block (format in Output Format below; matches `core-behaviors.md` #1 where present) and proceed; never silently guess.
@@ -97,7 +97,7 @@ when it is greppable — read it. An unverifiable fact is an **Ask** or an expli
 Context triage:
 - [ ] 1. Phase + tier — which of Orient/Plan/Test/Build/Review/Ship/Reflect, and low/standard/complex?
 - [ ] 2. Context risk — near ceiling? drifting? poisoned by a prior claim? key fact buried? (labeled heuristics, not measured)
-- [ ] 3. Minimal read-set — the smallest set for THIS step (see context-budget-rules.md phase×tier, if present)
+- [ ] 3. Minimal read-set — the smallest set for THIS step (see .claude/skills/agent-detector/references/context-budget-rules.md phase×tier, if present)
 - [ ] 4. Route — load exactly ONE section of references/pattern-index.md matching the intent
 - [ ] 5. Apply + emit the output contract (Context decision: …)
 ```

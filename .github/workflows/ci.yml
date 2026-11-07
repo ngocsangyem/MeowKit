@@ -176,11 +176,18 @@ jobs:
       - name: Validate plugin namespace + manifest contract
         run: node packages/mewkit/dist/index.js validate --plugin
 
-      # The core context-budget guardrail is not enforced in CI. Its cap (131000) was set
-      # against a measured ~104.7k core and the profile has since grown past it, so the gate
-      # blocked every run rather than catching new growth. Measure on demand with
-      # `mewkit budget context --profile core`; re-add a step here once a cap is re-baselined
-      # against the real profile size.
+      # One budget number: the always-on rule set a session loads on every turn. The old
+      # 131000-token core guardrail was never enforced (it blocked every run instead of
+      # catching growth) and is replaced by this hard byte budget. Measure the wider core
+      # profile on demand with `mewkit budget context --profile core`.
+      - name: Check always-on rule budget
+        run: node scripts/check-always-on-budget.cjs .
+
+      - name: Check always-on safety text survives compression
+        run: node scripts/check-rule-survival.cjs .
+
+      - name: Check for dangling references to relocated rules
+        run: node scripts/check-dangling-rule-refs.cjs .
 
       - name: Validate README, website, and index counts (stale-index)
         run: node packages/mewkit/dist/index.js inventory --check

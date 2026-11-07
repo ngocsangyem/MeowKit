@@ -20,7 +20,7 @@
 | 2 | .claude/skills/benchmark/SKILL.md | 151 | docs/dead-weight-audit.md | Hosted URL |
 | 3 | .claude/skills/autobuild/references/adaptive-density-matrix.md | 68 | docs/dead-weight-audit.md | Hosted URL |
 | 4 | .claude/skills/autobuild/references/adaptive-density-matrix.md | 83 | docs/dead-weight-audit.md | Drop the orphan bullet (stale Phase-6 TODO; Phase 8 shipped) |
-| 5 | .claude/rules/harness-rules.md | 57 | docs/dead-weight-audit.md | Hosted URL (rules file is always-loaded; cannot inline a multi-page playbook) |
+| 5 | .claude/skills/cook/references/harness-rules.md | 57 | docs/dead-weight-audit.md | Hosted URL (cannot inline a multi-page playbook into a rule file) |
 | 6 | .claude/agents/reviewer.md | 65 | docs/red-team-overview.md | Hosted URL `https://docs.meowkit.dev/red-team-overview` (file lives at docs/operations/red-team-overview.md, do NOT drop) |
 | 7 | .claude/commands/mk/summary.md | 56 | docs/operations/autobuild-runbook.md | Hosted URL `https://docs.meowkit.dev/autobuild-runbook` |
 | 8 | .claude/memory/architecture-decisions.md | 51 | docs/memory-system.md:28-31 | Inline 1–2 sentences capturing the rationale; preserve citation by title |
@@ -45,7 +45,7 @@
 
 ## Type 1 — Target-Project Allowlist (200+ refs across .claude/)
 
-Already covered by the allowlist in `.claude/rules/docs-reference-contract.md`. Highest-volume consumers:
+Already covered by the allowlist in `docs/maintainer/docs-reference-contract.md`. Highest-volume consumers:
 
 - `docs/project-context.md` — ~81 refs (agent "constitution" load per `agent-conduct.md` A2)
 - `docs/architecture/` and subpaths — ~18 refs (ADRs, system-architecture; owned by architect agent)

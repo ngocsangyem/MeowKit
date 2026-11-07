@@ -20,7 +20,7 @@ Before manual classification, run domain-based complexity routing:
 2. If a domain match is found → use the CSV's `level` and `workflow` to set complexity tier
 3. If no match → proceed to manual classification below
 
-CSV match OVERRIDES manual classification. See `rules/scale-adaptive-rules.md` for details.
+CSV match OVERRIDES manual classification. See `.claude/skills/agent-detector/references/scale-adaptive-rules.md` for details.
 
 ## TDD Mode Detection (Phase 0 — Required)
 
@@ -130,7 +130,7 @@ When a COMPLEX task can be decomposed into independent subtasks with zero file o
 4. After all complete: merge worktrees → run full test suite
 5. Resume sequential pipeline at review phase
 
-**Rules:** See `parallel-execution-rules.md`. Max 3 agents. Gates remain sequential.
+**Rules:** See `.claude/skills/cook/references/parallel-execution-rules.md`. Max 3 agents. Gates remain sequential.
 
 ## Planning Depth (from Mode Config)
 

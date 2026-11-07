@@ -1,7 +1,7 @@
 # Rule-1 Injection Patterns (mirror of `injection-rules.md` Rule 1)
 
 <!-- source: .claude/rules/injection-rules.md Rule 1 -->
-<!-- audit cadence: quarterly OR on every model-tier upgrade per skill-authoring-rules.md Rule 3 -->
+<!-- audit cadence: quarterly OR on every model-tier upgrade per .claude/skills/skill-creator/references/skill-authoring-rules.md Rule 3 -->
 
 This file is a working copy of the Rule-1 inventory from `.claude/rules/injection-rules.md`. The auto-create dry-run (`references/auto-create-gating.md` Check 2) scans every suggested summary and description for these substrings; ANY match ABORTS the batch with the offending pattern quoted in the abort message.
 

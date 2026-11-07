@@ -71,4 +71,4 @@ End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.
 
 ## Gotchas
 
-- (none yet — grow from observed failures per `skill-authoring-rules.md` Rule 1)
+- (none yet — grow from observed failures per `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 1)

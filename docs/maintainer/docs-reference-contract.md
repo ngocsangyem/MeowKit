@@ -1,5 +1,10 @@
 # Docs Reference Contract
 
+> Maintainer document. It lives in the kit's source repo at `docs/maintainer/docs-reference-contract.md`
+> and is NOT shipped into user projects. The only shipped file permitted to name this path is
+> `.claude/scripts/check-docs-references.py`, whose job is to resolve it; when the contract is absent
+> (every user project) that checker reports N/A and exits 0.
+
 How `docs/*` paths inside `.claude/agents`, `.claude/skills`, `.claude/commands`, `.claude/hooks`, `.claude/scripts`, `.claude/rules`, `.claude/rules-conditional`, and `.claude/modes` are resolved at runtime, and which paths are allowed to appear.
 
 ## Two-Tier Resolution
@@ -121,8 +126,8 @@ Two implementations consume this contract:
 - A TypeScript-native check exposed by the kit's `validate` command (runs without any external dependency).
 - A standalone Python script at `.claude/scripts/check-docs-references.py` (CI convenience and direct CLI use).
 
-Both parse the `<!-- ALLOWLIST-START -->` / `<!-- ALLOWLIST-END -->` block above as the single source of truth. They must produce identical output on identical input — a cross-implementation parity test in CI guards against drift.
+Both resolve this file at `docs/maintainer/docs-reference-contract.md`, relative to the repo root that holds `.claude/`, and parse the `<!-- ALLOWLIST-START -->` / `<!-- ALLOWLIST-END -->` block above as the single source of truth. When the file is absent, both report N/A and exit 0. They must produce identical output on identical input — a cross-implementation parity test in CI guards against drift.
 
 ## Cross-References
 
-- `.claude/rules/skill-authoring-rules.md` Rule 5 — mandates compliance with this contract for every new skill or agent
+- `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 5 — mandates compliance with this contract for every new skill or agent

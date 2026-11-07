@@ -110,7 +110,7 @@ If you cannot complete the evaluation:
 Load before starting an evaluation:
 
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
-- `.claude/rules/rubric-rules.md`: calibration discipline, anchor balance rules, hard-fail propagation
+- `.claude/skills/rubric/references/rubric-rules.md`: calibration discipline, anchor balance rules, hard-fail propagation
 - Sprint contract from `tasks/contracts/` (if exists) — defines what was promised
 - Spec from `tasks/plans/` — original product-level specification
 - Rubric composition from `mk:rubric compose <preset>` — your grading criteria

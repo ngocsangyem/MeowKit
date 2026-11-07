@@ -29,7 +29,9 @@ fi
 #     * my-feature    — example skill name in mk:skill-creator CLI usage docs
 #     * research      — illustrative skill name in mk:web-to-markdown composition examples
 #     * evil-skill    — fictional name in mk:web-to-markdown security warning examples
-ALLOWLIST="debug shipping documentation command my-feature research evil-skill figma-code-connect figma-library figma-write"
+#     * my-skill      — example dir tree in the skill-authoring rules (progressive disclosure)
+#     * my-workflow   — example dir tree in the skill-authoring rules (step-file decomposition)
+ALLOWLIST="debug shipping documentation command my-feature my-skill my-workflow research evil-skill figma-code-connect figma-library figma-write"
 
 PHANTOM=0
 while read -r ref; do

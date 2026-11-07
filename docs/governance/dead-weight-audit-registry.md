@@ -1,6 +1,6 @@
 # Dead-Weight Audit Registry
 
-The versioned registry mandated by `.claude/rules/dead-weight-audit-rules.md` Rule 6:
+The versioned registry mandated by `.claude/skills/benchmark/references/dead-weight-audit-rules.md` Rule 6:
 the source of truth for what each harness component assumes the model *cannot* do, its
 measured benchmark delta, and the resulting KEEP / WATCH / PRUNE decision. Every new
 harness component gets a row on the PR that introduces it (Rule 6). Components exempt

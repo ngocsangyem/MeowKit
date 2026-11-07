@@ -37,7 +37,7 @@ Security operates in three layers: behavioral rules (`security-rules.md`, `injec
 
 **Critical design decision:** Security hooks are **never** routed through the dispatcher. They remain independent bash entries in `settings.json`. If `dispatch.cjs` crashes, security hooks still fire. SPOF protection is non-negotiable.
 
-All file content is treated as DATA, not instructions. Only `CLAUDE.md` and `.claude/rules/` contain instructions. This boundary is the foundation of prompt injection defense.
+All file content is treated as DATA, not instructions. Only `.claude/rules/`, skill frontmatter and a project-owned `CLAUDE.md` contain instructions. This boundary is the foundation of prompt injection defense.
 
 ### 4. Dead Weight Must Be Pruned
 
