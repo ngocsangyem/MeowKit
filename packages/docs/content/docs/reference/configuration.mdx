@@ -201,43 +201,64 @@ cp .meowkit/.env.example .meowkit/.env
 
 ### Harness (Autonomous Build Pipeline)
 
-| Variable | Default | Purpose | When to use |
-|----------|---------|---------|-------------|
-| `MEOWKIT_AUTOBUILD_MODE` | *(auto-detected)* | Override scaffolding density: `MINIMAL` (Haiku), `FULL` (Sonnet/Opus 4.5), `LEAN` (Opus 4.6+) | When auto-detection picks wrong density. `LEAN` skips contract negotiation; `MINIMAL` short-circuits to `/cook`. Does NOT bypass gates. |
-| `MEOWKIT_BUDGET_WARN` | `30` | USD threshold for budget warning message | Lower for cost-conscious sessions, higher for long research runs. |
-| `MEOWKIT_BUDGET_BLOCK` | `100` | USD threshold for hard session block | Emergency brake. Session halts at this amount. |
-| `MEOWKIT_BUDGET_CAP` | *(none)* | User override for hard block — can be lower OR higher than `BUDGET_BLOCK` | Set `MEOWKIT_BUDGET_CAP=200` for intentional high-budget harness runs. Set `MEOWKIT_BUDGET_CAP=15` for tight budgets. |
-| `MEOWKIT_RUN_ID` | `current` | Harness run identifier for trace and budget tracking | Set automatically by `mk:autobuild` step-00. Don't set manually unless resuming. |
+These are keys in `.meowkit/config.yaml`, not environment variables.
+
+| Key | Default | Purpose | When to use |
+|-----|---------|---------|-------------|
+| `autobuild.mode` | *(auto-detected)* | Override scaffolding density: `MINIMAL` (Haiku), `FULL` (Sonnet/Opus 4.5), `LEAN` (Opus 4.6+) | When auto-detection picks wrong density. Does NOT bypass gates — a project config saying `LEAN` still faces the sprint-contract gate, and `mewkit doctor` says so. |
+| `budget.warn` | `30` | USD threshold for budget warning message | Lower for cost-conscious sessions, higher for long research runs. |
+| `budget.block` | `100` | USD threshold for hard session block | Emergency brake. Session halts at this amount. |
+| `budget.cap` | *(none)* | User override for hard block — can be lower OR higher than `budget.block` | `budget.cap: 200` for intentional high-budget harness runs, `15` for tight budgets. |
+
+`MEOWKIT_RUN_ID` stays in the environment: it is a per-invocation handoff set by
+`mk:autobuild` step-00, which a committed file cannot carry.
 
 ### Memory
 
-The team memory store is two committed markdown files at `.meowkit/memory/`. The read-set skills grep it when their task needs it; there is no per-turn auto-injection and no capture hook. `MEOWKIT_MEMORY_PRUNE*` are gone with the auto-prune hook — pruning is `/mk:memory --prune`, human-approved. See [Memory System](/guide/memory-system) for details.
+The team memory store is two committed markdown files at `.meowkit/memory/`. The read-set skills grep it when their task needs it; there is no per-turn auto-injection and no capture hook. Pruning is `/mk:memory --prune`, human-approved, with a fixed window and no setting. See [Memory System](/guide/memory-system) for details.
 
 ### Hook Controls
 
-| Variable | Default | Purpose | When to use |
-|----------|---------|---------|-------------|
-| `MEOWKIT_BUILD_VERIFY` | `on` | Set `off` to skip post-write compile/lint checks | Disable during bulk file generation where per-file verification is too slow. |
-| `MEOWKIT_LOOP_DETECT` | `on` | Set `off` to skip edit-count loop detection | Disable during intentional multi-pass refactoring. |
-| `MEOWKIT_PRECOMPLETION` | `on` | Set `off` to skip pre-completion verification check | Disable if the check blocks session exit incorrectly. |
-| `MEOWKIT_TDD_FLAG_DETECTOR` | `on` | Set `off` to disable `--tdd` flag detection in user prompts | Disable if `--tdd` in your prompt text triggers TDD unintentionally. |
+`hooks.<name>: false` in `.meowkit/config.yaml` disables one observer; the default is
+`true`. The name is the observer's own file base name.
+
+| Key | Purpose | When to use |
+|-----|---------|-------------|
+| `hooks.build-verify` | Skip post-write compile/lint checks | Bulk file generation where per-file verification is too slow. |
+| `hooks.loop-detection` | Skip edit-count loop detection | Intentional multi-pass refactoring. |
+| `hooks.pre-completion-check` | Skip the pre-completion verification check | The check blocks session exit incorrectly. |
+| `hooks.tdd-flag-detector` | Disable `--tdd` detection in user prompts | `--tdd` in your prompt text triggers TDD unintentionally. |
+| `buildVerify.timeoutMs` | Per-command timeout for build-verify, in milliseconds | A slow build needs longer than the per-language default. |
+
+The seven safety names — `gate-enforcement`, `privacy-block`, `pre-ship`,
+`gate2-check`, `check-careful`, `check-freeze`, `check-report-path` — are rejected from
+every config scope with a validation error, and the hook keeps blocking.
 
 ### Examples
 
 **Production session with TDD and strict hooks:**
+```yaml
+# .meowkit/config.yaml
+tdd: true
+```
 ```bash
-export MEOWKIT_TDD=1
 export MEOWKIT_HOOK_PROFILE=strict
 ```
 
 **Quick prototyping session:**
+```yaml
+# .meowkit/config.yaml
+hooks:
+  build-verify: false
+```
 ```bash
 export MEOWKIT_HOOK_PROFILE=fast
-export MEOWKIT_BUILD_VERIFY=off
 ```
 
 **High-budget harness run on Opus 4.6:**
-```bash
-export MEOWKIT_BUDGET_CAP=200
-# MEOWKIT_AUTOBUILD_MODE auto-detects LEAN for Opus 4.6
+```yaml
+# .meowkit/config.yaml
+budget:
+  cap: 200
+# autobuild.mode is left unset — it auto-detects LEAN for Opus 4.6
 ```

@@ -14,8 +14,13 @@ import {
 	flattenProfile,
 	availableProfiles,
 } from "../core/index.js";
-import type { ReleaseInfo, UserConfig } from "../core/index.js";
+import type { ReleaseInfo, UpdateStats, UserConfig } from "../core/index.js";
 import { promptAndInstallSystemDeps } from "./setup.js";
+import { createSnapshot } from "../core/snapshot.js";
+import { populateKitCache } from "../core/kit-cache.js";
+import { confirmationRequiredMessage, EXIT_NEEDS_CONFIRMATION, needsConfirmation } from "../core/destructive-guard.js";
+import { beginMachineOutput, ensureEnvelopeOnExit, envelopeEmitter, type MutationReport } from "../core/mutation-report.js";
+import { bundleReport, installMutationReport } from "./install-report.js";
 
 import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.js";
 import type { MigrateOptions, ProviderType } from "../migrate/types.js";
@@ -42,6 +47,10 @@ import { applyMcpProfiles, isCloudExposedProject } from "../migrate/modules/curs
 export interface InitArgs {
 	dryRun?: boolean;
 	force?: boolean;
+	/** Print the one mutation envelope on stdout; the narration goes to stderr. */
+	json?: boolean;
+	/** False in a non-TTY session; the destructive guard reads it. */
+	interactive?: boolean;
 	beta?: boolean;
 	/** When true, run interactive provider multiselect after init unpacks. */
 	migrate?: boolean;
@@ -84,6 +93,13 @@ export interface InitArgs {
 	 * cloud-exposed.
 	 */
 	allowCloudMcp?: boolean;
+	/**
+	 * Answer every prompt with its default: the newest stable release, the base
+	 * Claude Code kit, the full profile, no API keys and no optional system
+	 * dependencies. What this buys is not convenience but testability — an
+	 * install that can only be driven by a human is an install no test covers.
+	 */
+	yes?: boolean;
 }
 
 /** Parse the `--skill-packs` value into a PackSelection (full catalog when absent). */
@@ -434,7 +450,7 @@ async function initCodexTarget(
 	dryRun: boolean,
 	force: boolean,
 	packs: PackSelection = [],
-): Promise<void> {
+): Promise<MutationReport> {
 	p.intro(pc.bgCyan(pc.black(" meowkit init --target codex ")));
 	const moduleDir = resolveCodexModuleDir();
 	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
@@ -454,12 +470,12 @@ async function initCodexTarget(
 		});
 		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
 		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
-		p.log.info(
-			`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .codex/, .agents/skills/.`,
-		);
-		for (const line of describeRetiredSkills(plan.retired, true)) p.log.info(`Dry-run: ${line}`);
+		const headline = `Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .codex/, .agents/skills/.`;
+		p.log.info(headline);
+		const retiredNotes = describeRetiredSkills(plan.retired, true);
+		for (const line of retiredNotes) p.log.info(`Dry-run: ${line}`);
 		p.outro(pc.green("Dry-run complete — no files written."));
-		return;
+		return bundleReport("init", plan.entries, true, [headline, ...retiredNotes]);
 	}
 	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
 	if (result.conflicts.length > 0) {
@@ -480,6 +496,7 @@ async function initCodexTarget(
 	await warnBelowMinCodex();
 	hintLegacyMemoryForCodex(targetDir);
 	p.outro(pc.green("Codex toolkit installed!"));
+	return bundleReport("init", result.entries, false, [`Codex toolkit ready (${result.writes} written).`, ...(budgetWarn ? [budgetWarn] : [])]);
 }
 
 /**
@@ -528,7 +545,7 @@ async function initCursorTarget(
 	mcpProfiles?: string,
 	allowCloudMcp?: boolean,
 	packs: PackSelection = "all",
-): Promise<void> {
+): Promise<MutationReport> {
 	p.intro(pc.bgCyan(pc.black(" meowkit init --target cursor ")));
 	const moduleDir = resolveCursorModuleDir();
 	if (!fs.existsSync(join(moduleDir, "manifest.json"))) {
@@ -546,11 +563,13 @@ async function initCursorTarget(
 		});
 		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
 		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
-		p.log.info(`Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .meowkit/README.md.`);
-		for (const line of describeRetiredSkills(plan.retired, true)) p.log.info(`Dry-run: ${line}`);
+		const headline = `Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .meowkit/README.md.`;
+		p.log.info(headline);
+		const retiredNotes = describeRetiredSkills(plan.retired, true);
+		for (const line of retiredNotes) p.log.info(`Dry-run: ${line}`);
 		p.log.info("Dry-run: MCP profiles are never applied or prompted for during a dry-run.");
 		p.outro(pc.green("Dry-run complete — no files written."));
-		return;
+		return bundleReport("init", plan.entries, true, [headline, ...retiredNotes]);
 	}
 	const result = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
 	if (result.conflicts.length > 0) {
@@ -566,6 +585,7 @@ async function initCursorTarget(
 	// `--target cursor` is used by scripts/CI as well as humans — never prompt on its own.
 	await applySelectedMcpProfiles(targetDir, moduleDir, mcpProfiles, allowCloudMcp, dryRun, false);
 	p.outro(pc.green("Cursor toolkit installed!"));
+	return bundleReport("init", result.entries, false, [`Cursor toolkit ready (${result.writes} written).`]);
 }
 
 /**
@@ -679,14 +699,28 @@ async function addCursorBundle(
 
 export async function init(args: InitArgs): Promise<void> {
 	const targetDir = process.cwd();
+	const json = args.json === true;
+	// `--json`: the whole narration — including the prompt library's — goes to
+	// stderr, so stdout holds the envelope and nothing else. The install validates
+	// as it goes and exits from several places, so the exit guard makes sure a
+	// caller parsing stdout gets a document either way.
+	if (json) {
+		beginMachineOutput();
+		ensureEnvelopeOnExit("init");
+	}
+
+	/** One envelope per run, printed on the way out of whichever path ran. */
+	const emit = envelopeEmitter(json);
 
 	// `--target codex` / `--target cursor` are distinct, offline paths: reconcile the
 	// authored bundle, done. No `.claude/`, no release download, no legacy converter.
 	if (args.target === "codex") {
-		return initCodexTarget(targetDir, args.dryRun ?? false, args.force ?? false, parseSkillPacks(args.skillPacks));
+		const report = await initCodexTarget(targetDir, args.dryRun ?? false, args.force ?? false, parseSkillPacks(args.skillPacks));
+		emit(() => report);
+		return;
 	}
 	if (args.target === "cursor") {
-		return initCursorTarget(
+		const report = await initCursorTarget(
 			targetDir,
 			args.dryRun ?? false,
 			args.force ?? false,
@@ -694,11 +728,23 @@ export async function init(args: InitArgs): Promise<void> {
 			args.allowCloudMcp,
 			parseSkillPacks(args.skillPacks),
 		);
+		emit(() => report);
+		return;
 	}
 
 	const mode = detectMode(targetDir);
-	const dryRun = args.dryRun ?? false;
 	const force = args.force ?? false;
+
+	// `init --force` overwrites an existing `.claude/`, which is the one init
+	// invocation that can destroy work. With no terminal to confirm in it
+	// degrades to the dry run rather than overwriting an unseen tree. A plain
+	// `init` is left scriptable on purpose: it refuses to overwrite anyway.
+	const blind = force && needsConfirmation({ assumeYes: args.yes === true, interactive: args.interactive !== false });
+	const dryRun = (args.dryRun ?? false) || blind;
+	if (blind) {
+		console.log(pc.yellow(confirmationRequiredMessage("init --force")));
+		process.exitCode = EXIT_NEEDS_CONFIRMATION;
+	}
 
 	p.intro(pc.bgCyan(pc.black(" meowkit init ")));
 
@@ -708,15 +754,13 @@ export async function init(args: InitArgs): Promise<void> {
 	// The provider multiselect is the default ONLY for a bare fresh `init` — any explicit
 	// provider intent (`--target`, `--migrate`) bypasses it and keeps its own flow. Update
 	// mode keeps today's behavior (refresh .claude/); use `mewkit upgrade` to propagate.
-	const picked = !args.target && !args.migrate && mode === "new" ? await promptProviders() : null;
+	const picked = !args.target && !args.migrate && !args.yes && mode === "new" ? await promptProviders() : null;
 	// Codex and Cursor are both additive, offline authored-bundle installs — picking either
 	// (without also picking claude-code) never forces the base kit. No picker (update mode,
 	// `--target`, or `--migrate`) ⇒ base install as today.
 	const installClaudeKit = picked ? picked.includes("claude-code") : true;
 
-	if (installClaudeKit) {
-		await runClaudeKitInstall(args, targetDir, mode, dryRun, force);
-	}
+	const stats = installClaudeKit ? await runClaudeKitInstall(args, targetDir, mode, dryRun, force) : null;
 
 	// Codex and Cursor are both additive, offline authored-bundle copies when picked — neither
 	// depends on the base kit or the legacy converter.
@@ -736,6 +780,11 @@ export async function init(args: InitArgs): Promise<void> {
 	}
 
 	p.outro(pc.green(mode === "new" ? "MeowKit installed!" : "MeowKit updated!"));
+	emit(() =>
+		stats === null
+			? { ok: true, command: "init", dryRun, planned: [], applied: [], notes: ["the base kit was not selected — nothing was installed into .claude/"] }
+			: installMutationReport("init", stats, dryRun, [`mode: ${mode}`]),
+	);
 }
 
 /**
@@ -750,7 +799,7 @@ async function runClaudeKitInstall(
 	mode: "new" | "update",
 	dryRun: boolean,
 	force: boolean,
-): Promise<void> {
+): Promise<UpdateStats> {
 	// Step 1: Fetch releases
 	const releaseSpinner = p.spinner();
 	releaseSpinner.start("Fetching available releases...");
@@ -777,11 +826,14 @@ async function runClaudeKitInstall(
 	const options = buildReleaseOptions(releases, args.beta ?? false);
 	const latestStable = releases.find((r) => !r.isBeta);
 
-	const selected = await p.select({
-		message: "Select MeowKit version to install",
-		options,
-		initialValue: latestStable?.tag ?? releases[0].tag,
-	});
+	const defaultTag = latestStable?.tag ?? releases[0].tag;
+	const selected = args.yes
+		? defaultTag
+		: await p.select({
+				message: "Select MeowKit version to install",
+				options,
+				initialValue: defaultTag,
+			});
 
 	if (p.isCancel(selected)) {
 		p.cancel("Installation cancelled.");
@@ -819,7 +871,7 @@ async function runClaudeKitInstall(
 
 	// Step 3: Config prompts (new installs only)
 	let config: UserConfig & { installDeps: boolean; profile: string };
-	if (mode === "new") {
+	if (mode === "new" && !args.yes) {
 		config = await promptNewInstall();
 	} else {
 		config = {
@@ -853,6 +905,16 @@ async function runClaudeKitInstall(
 	downloadSpinner.stop(`Downloaded v${release.version}`);
 
 	try {
+		// Before the first write. A fresh install has nothing to lose, but an
+		// `init` in update mode overwrites a populated `.claude/`, and that is
+		// the same operation `upgrade` snapshots.
+		if (!dryRun) {
+			const snapshot = createSnapshot(targetDir, "init", [".claude"]);
+			if (snapshot !== null) {
+				p.log.info(`Snapshot ${snapshot.id} — ${snapshot.fileCount} file(s); restore with \`mewkit backups restore ${snapshot.id}\``);
+			}
+		}
+
 		// Step 5: Apply via smart update. Resolve the profile allow-set against the
 		// extracted release (full ⇒ undefined allow-set = byte-identical install).
 		const install = resolveInstall(sourceDir, profileName);
@@ -902,7 +964,8 @@ async function runClaudeKitInstall(
 		// Step 7: System dependencies (optional, skipped on dry-run)
 		// Flat list from registry — no per-skill ownership shown (locked decision #4).
 		// Each dep rendered as: [ ] Name (~NMB) — all unchecked by default.
-		if (!dryRun) {
+		// A `--json` run has no one to answer an installer prompt, so it does not ask.
+		if (!dryRun && !args.yes && args.json !== true) {
 			console.log(`\n${pc.bold("? Phase 2: System dependencies")} ${pc.dim("(optional)")}`);
 			await promptAndInstallSystemDeps(targetDir);
 		}
@@ -923,7 +986,18 @@ async function runClaudeKitInstall(
 
 		// Step 9: Summary
 		printSummary(stats, dryRun);
+		return stats;
 	} finally {
+		// The local kit copy, written while the release's own bytes still exist.
+		// Every later deletion decision is checked against them, so a dry run —
+		// which installed nothing — deliberately writes no cache either.
+		if (!dryRun) {
+			try {
+				populateKitCache(sourceDir, targetDir, release.version);
+			} catch (err: unknown) {
+				p.log.warn(`Could not write the local kit copy: ${err instanceof Error ? err.message : String(err)}`);
+			}
+		}
 		cleanupDownload(sourceDir);
 	}
 }

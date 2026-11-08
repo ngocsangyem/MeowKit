@@ -22,8 +22,13 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(HERE, '../../..');
 export const GOLDEN_DIR = path.join(REPO_ROOT, 'tests/ports/golden');
 
-/** The kit directories a port under test reaches into. */
-const TREE = ['.claude/scripts'];
+/**
+ * The kit directories a port under test reaches into. `.claude/hooks/lib` is
+ * here because the config reader lives there: the dependency-free YAML subset
+ * reader and the key rules are one implementation, and a second copy under
+ * `scripts/` would be a second answer to "what does this config say".
+ */
+const TREE = ['.claude/scripts', '.claude/hooks/lib', '.claude/hooks/handlers.json'];
 
 export type Invocation = { kind: 'scan-dir'; args: string[] } | { kind: 'scan-one'; target: string } | { kind: 'config'; args: string[] };
 
@@ -127,8 +132,14 @@ export interface Replayed {
 	sideEffects: Record<string, string | null>;
 }
 
-/** Build this fixture's tree, run the node port, and return normalized streams. */
-export function replay(fixture: Fixture): Replayed {
+/**
+ * Build this fixture's tree, run the node port, and return normalized streams.
+ *
+ * `extraPaths` reads files the recording does not name. A port that writes
+ * somewhere new has to be asserted somewhere, and a caller that can only read
+ * the recorded paths would have to take the new one on trust.
+ */
+export function replay(fixture: Fixture, extraPaths: readonly string[] = []): Replayed {
 	const caseRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'mk-portreplay-'));
 	const projectDir = path.join(caseRoot, 'project');
 	const home = path.join(projectDir, 'home');
@@ -136,6 +147,7 @@ export function replay(fixture: Fixture): Replayed {
 	fs.mkdirSync(home, { recursive: true });
 	fs.mkdirSync(emptyBin, { recursive: true });
 	for (const rel of TREE) {
+		fs.mkdirSync(path.dirname(path.join(projectDir, rel)), { recursive: true });
 		fs.cpSync(path.join(REPO_ROOT, rel), path.join(projectDir, rel), { recursive: true });
 	}
 
@@ -153,7 +165,7 @@ export function replay(fixture: Fixture): Replayed {
 
 	const norm = (v: string | null) => applyNormalizers(v ?? '', fixture.normalizers, ctx);
 	const sideEffects: Record<string, string | null> = {};
-	for (const rel of Object.keys(fixture.sideEffects)) {
+	for (const rel of [...Object.keys(fixture.sideEffects), ...extraPaths]) {
 		try {
 			sideEffects[rel] = norm(fs.readFileSync(path.join(projectDir, rel), 'utf8'));
 		} catch {

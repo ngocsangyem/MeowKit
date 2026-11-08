@@ -17,6 +17,9 @@ const TOOL_SCOPED_EVENTS = ['PreToolUse', 'PostToolUse', 'PostToolUseFailure'];
 
 const REGISTRY_REL = '.claude/hooks/handlers.json';
 
+/** A toggle key is lower-case words joined by single hyphens, and nothing else. */
+const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
 const isToolScoped = (event) => TOOL_SCOPED_EVENTS.includes(event);
 
 /** `{ entries, errors }` — a bad entry is reported, never silently dropped. */
@@ -31,7 +34,20 @@ function validate(handlers) {
     }
     if (typeof entry.event !== 'string' || !entry.event) errors.push(`${where}: missing event`);
     if (typeof entry.handler !== 'string' || !entry.handler) errors.push(`${where}: missing handler`);
-    if (typeof entry.toggleKey !== 'string' || !entry.toggleKey) errors.push(`${where}: missing toggleKey`);
+    if (typeof entry.toggleKey !== 'string' || !entry.toggleKey) {
+      errors.push(`${where}: missing toggleKey`);
+    } else if (!KEBAB.test(entry.toggleKey)) {
+      errors.push(`${where}: toggleKey '${entry.toggleKey}' is not kebab-case`);
+    } else if (typeof entry.handler === 'string' && entry.handler) {
+      // The toggle key IS the handler's file name, so there is no translation
+      // table between the registry and the config and nothing to fall out of
+      // step. A key naming a different file would silently switch off the wrong
+      // observer, or nothing at all.
+      const base = path.basename(entry.handler, path.extname(entry.handler));
+      if (base !== entry.toggleKey) {
+        errors.push(`${where}: toggleKey '${entry.toggleKey}' does not match handler file '${base}'`);
+      }
+    }
     // PostToolUseFailure is tool-scoped in principle but is registered without a
     // matcher, so a matcher is required only where the event can carry one.
     if (entry.event === 'PreToolUse' || entry.event === 'PostToolUse') {
@@ -63,9 +79,32 @@ function loadRegistry(root) {
  * Entries for one event, in registry order. An entry with no matcher applies to
  * every invocation of its event; an entry with one applies only to the matching
  * invocation.
+ *
+ * `hooks.<toggleKey>: false` in the project config removes the entry here, which
+ * is the only place a toggle needs to act: the observer is never loaded, so the
+ * switch works whether or not the handler itself knows about it, and a handler
+ * registered twice is switched off in both places by the one key.
+ *
+ * The config reader is required lazily and its failure is swallowed, because a
+ * broken config must not cost the whole event its observers.
  */
-function selectHandlers(entries, event, matcher) {
-  return entries.filter((e) => e.event === event && (!e.matcher || e.matcher === matcher));
+function selectHandlers(entries, event, matcher, options = {}) {
+  const forEvent = entries.filter((e) => e.event === event && (!e.matcher || e.matcher === matcher));
+  if (forEvent.length === 0) return forEvent;
+  let disabled;
+  try {
+    // eslint-disable-next-line global-require
+    const { resolveConfig } = require('./read-config.cjs');
+    const { values } = resolveConfig(options);
+    disabled = new Set(
+      Object.entries(values)
+        .filter(([key, value]) => key.startsWith('hooks.') && value === false)
+        .map(([key]) => key.slice('hooks.'.length)),
+    );
+  } catch {
+    return forEvent;
+  }
+  return forEvent.filter((e) => !disabled.has(e.toggleKey));
 }
 
-module.exports = { REGISTRY_REL, TOOL_SCOPED_EVENTS, isToolScoped, loadRegistry, selectHandlers, validate };
+module.exports = { KEBAB, REGISTRY_REL, TOOL_SCOPED_EVENTS, isToolScoped, loadRegistry, selectHandlers, validate };

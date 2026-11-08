@@ -34,7 +34,7 @@ Use `/mk:autobuild` when you want to build a new product or substantial green-fi
 
 - Opus 4.5+ recommended (Sonnet works with FULL density, Haiku short-circuits to `mk:cook`)
 - Density detection is automatic when the host sends a model at SessionStart. Set `MEOWKIT_MODEL_HINT` only as a fallback or to force a tier — see [Adaptive Density](/guide/adaptive-density)
-- Budget awareness: use `--budget 50` or `export MEOWKIT_BUDGET_CAP=50` for long runs
+- Budget awareness: use `--budget 50`, or set `budget.cap: 50` in `.meowkit/config.yaml`, for long runs
 - MeowKit v2.2.0+ installed (`npx mewkit doctor` to verify)
 
 ## Quick Start

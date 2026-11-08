@@ -125,6 +125,8 @@ export const MigrateOptionsSchema = z.object({
 	global: z.boolean().optional(),
 	yes: z.boolean().optional(),
 	dryRun: z.boolean().optional(),
+	/** Print the one mutation envelope on stdout; narration goes to stderr. */
+	json: z.boolean().optional(),
 	force: z.boolean().optional(),
 	source: z.string().optional(),
 	only: z.string().optional(),

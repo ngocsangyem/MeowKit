@@ -2,14 +2,17 @@
 // Ported from post-write-build-verify.sh. Same logic:
 //   classify file by extension → check cache → run compile/lint → emit errors.
 //
-// Env vars:
-//   MEOWKIT_BUILD_VERIFY=off       — skip entirely
-//   MEOWKIT_BUILD_VERIFY_TIMEOUT=N — override timeout (seconds)
+// Settings, from the project config and nowhere else:
+//   hooks.build-verify: false  — switch the observer off. The dispatcher drops
+//                                the registration, so this file is never loaded.
+//   buildVerify.timeoutMs      — override the per-command timeout.
 
 const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+
+const { configValue } = require('../lib/read-config.cjs');
 
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 
@@ -62,9 +65,9 @@ function whichSync(cmd) {
 }
 
 module.exports = function buildVerify(ctx, state) {
-  // Bypass checks
-  if (process.env.MEOWKIT_BUILD_VERIFY === 'off') return '';
-  if (process.env.MEOWKIT_AUTOBUILD_MODE === 'MINIMAL') return '';
+  // Switching this observer off is the dispatcher's job: `hooks.build-verify:
+  // false` removes the registration, so there is nothing to check here.
+  if (configValue('autobuild.mode', '', { root: ctx.root }).value === 'MINIMAL') return '';
 
   const filePath = ctx.tool_input?.file_path;
   if (!filePath || !fs.existsSync(filePath)) return '';
@@ -77,9 +80,9 @@ module.exports = function buildVerify(ctx, state) {
   const commands = COMMANDS_BY_EXT[ext];
   if (!commands) return '';
 
-  const envTimeout = Number(process.env.MEOWKIT_BUILD_VERIFY_TIMEOUT);
-  const timeoutMs = (Number.isFinite(envTimeout) && envTimeout > 0)
-    ? envTimeout * 1000
+  const configured = Number(configValue('buildVerify.timeoutMs', 0, { root: ctx.root }).value);
+  const timeoutMs = (Number.isFinite(configured) && configured > 0)
+    ? configured
     : (TIMEOUT_BY_EXT[ext] || DEFAULT_TIMEOUT);
 
   // Cache check

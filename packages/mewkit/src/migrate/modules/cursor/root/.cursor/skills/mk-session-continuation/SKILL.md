@@ -17,15 +17,11 @@ Manage workflow state across sessions with handoff and resume.
 - Session ending with incomplete workflow
 - Incomplete workflow from previous session
 
-## Plan State Variables
+## Plan State
 
-```toon
-state_vars[4]{var,purpose,persistence}:
-  MEOWKIT_ACTIVE_PLAN,Current active plan path,Session temp file
-  MEOWKIT_SUGGESTED_PLAN,Branch-matched plan hint,Inferred from git branch
-  MEOWKIT_COMPLEXITY,Auto-detected task complexity,Session memory
-  MEOWKIT_ACTIVE_AGENTS,Currently active agents,Session memory
-```
+Saved workflow state lives in `.cursor/logs/workflows/`; the active plan is resolved
+from `session-state/active-plan.json` or by scanning `tasks/plans/`. Nothing is carried
+between sessions in the environment.
 
 ## Process
 

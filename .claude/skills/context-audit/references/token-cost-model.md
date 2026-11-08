@@ -62,7 +62,7 @@ Three banners drive the formatter's headline status:
 | `≥ 25%`                   | Action recommended |
 
 These thresholds are the **canonical source of truth** for token-overhead
-banners. They are NOT linked to `MEOWKIT_BUDGET_*` env vars — those track
+banners. They are NOT linked to the `budget.*` config keys — those track
 USD cost, not window utilization.
 
 The 10 / 25% values are v1 defaults. Calibrate against real production data

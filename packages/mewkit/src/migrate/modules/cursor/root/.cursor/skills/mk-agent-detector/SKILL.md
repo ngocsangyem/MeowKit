@@ -64,7 +64,7 @@ description: "Detects the right agent and complexity tier at Phase 0 orient; run
    2. **Detect Agile context — OR-logic, any one match triggers load:**
       - glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
       - Active plan frontmatter has non-empty `jira_tickets:`
-      - `MEOW_JIRA_BASE_URL` env var is set
+      - `MEOW_JIRA_SITE_URL` env var is set
       - Last user message matches `[A-Z]{2,10}-\d+` (Jira-key pattern)
    3. **If Agile context detected, `Read` the 3 conditional rules:**
       - the agile story-gate conventions

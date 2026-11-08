@@ -51,7 +51,7 @@ The harness budget tracker (`mk:autobuild/scripts/budget-tracker.sh`) enforces t
 
 - **$30 warn** — print warning, continue
 - **$100 hard block** — halt the run, set `final_status=TIMED_OUT`
-- **User cap** (`MEOWKIT_BUDGET_CAP` env var or `--budget` flag) — overrides hard block, can be lower OR higher
+- **User cap** (`budget.cap` in `.meowkit/config.yaml`, or the `--budget` flag) — overrides hard block, can be lower OR higher
 
 **WHY:** Multi-hour runs can spend quickly; thresholds catch runaway and intentional high-budget runs.
 

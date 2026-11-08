@@ -1,0 +1,8 @@
+tdd: false
+budget:
+  cap: 100
+  warn: 30
+  block: 90
+workflow:
+  telemetry: off
+  proactive: true

@@ -25,7 +25,7 @@ MeowKit detects your model tier, selects the right scaffolding density, and driv
 
 - Opus 4.5 or better is the comfortable floor. Sonnet works at FULL density; Haiku short-circuits to `/mk:cook`.
 - Density is detected automatically when your host sends a model at session start. `MEOWKIT_MODEL_HINT` is a fallback, or a way to force a tier. See [Adaptive Density](/guide/adaptive-density).
-- Long runs deserve a budget: `--budget 50`, or `export MEOWKIT_BUDGET_CAP=50`.
+- Long runs deserve a budget: `--budget 50`, or `budget.cap: 50` in `.meowkit/config.yaml`.
 - Run `npx mewkit doctor` to confirm your install is healthy before a multi-hour build.
 
 ## Scaffolding density

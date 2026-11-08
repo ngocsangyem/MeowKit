@@ -1,0 +1,2 @@
+workflow:
+  telemetry: !!str off

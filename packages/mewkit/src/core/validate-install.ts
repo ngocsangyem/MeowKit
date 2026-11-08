@@ -3,7 +3,7 @@ import { join } from "node:path";
 import pc from "picocolors";
 import { ALWAYS_ON_RULES } from "./always-on-rules.js";
 import { isHookScript } from "./is-hook-script.js";
-import { resolveConfigPath } from "../state/resolve-config-path.js";
+import { configWritePath, migrationPending } from "../state/resolve-config-path.js";
 
 export interface ValidationResult {
 	valid: boolean;
@@ -54,7 +54,14 @@ export function validate(targetDir: string): ValidationResult {
 
 	// Core structure
 	check(".claude/ directory exists", existsSync(claude), issues);
-	check("config.json exists", existsSync(resolveConfigPath(targetDir)), issues);
+	// A project still carrying only the v2 descriptor is migration-pending, not
+	// broken: `upgrade` carries its values across. Failing it here would fail
+	// every install that has not upgraded yet, for a condition it can fix.
+	if (migrationPending(targetDir)) {
+		console.log(pc.yellow("  [!] .meowkit/config.yaml missing — migration pending, run `mewkit upgrade`"));
+	} else {
+		check("config.yaml exists", existsSync(configWritePath(targetDir)), issues);
+	}
 
 	// Agents (expect 10+ from real system)
 	const agentCount = countMdFiles(join(claude, "agents"));

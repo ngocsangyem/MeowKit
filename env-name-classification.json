@@ -1,0 +1,630 @@
+{
+  "schema": 1,
+  "comment": "One row per environment name the scan of scripts/scan-env-names.sh yields. `class` is the allowlist class a name keeps, `toggle` a name that becomes a config key, or `drop` a name with no reader anywhere. `key` is the config key for the toggle and behavior-override classes. `reader` is derived composition-aware: a name reached as os.getenv(f'MEOWKIT_{suffix}') is recorded as read, because a literal-name grep reports it as reader-less. This file is the allowlist the environment-read check loads; it lives at the repository root, outside every scanned tree, so a dropped name's own row cannot keep that name in the universe. The reader column is checked in both directions by scripts/check-env-reads.cjs: a live name must be read at the file named here, and a replaced name must be read nowhere.",
+  "classes": {
+    "credential": "a secret. Never a config key, because a committed file must not hold one.",
+    "host": "supplied by the host process (CLAUDE_*). Outside this prefix set.",
+    "safety-path": "read by a safety entrypoint. Never a config key: the committed file stays unreachable from those paths.",
+    "runtime-handoff": "a per-invocation value one process writes and the next reads. A committed file cannot carry it.",
+    "skill-option": "read only by one skill's own scripts, several of them Python, which must not need a YAML parser.",
+    "behavior-override": "has a config key and stays readable from the environment at the top of the precedence chain, because losing it silently would turn an enforcement mode off.",
+    "toggle": "a user preference with a code reader. Becomes the config key in `key`.",
+    "drop": "no reader anywhere. Deleted from docs, agents, skills and settings; a still-exported one is a doctor finding."
+  },
+  "compositionZones": [
+    {
+      "dir": ".claude/skills/multimodal/scripts",
+      "prefix": "MEOWKIT_",
+      "why": "env_utils.py composes the prefix with a suffix supplied by provider_router.py, so a literal-name scan sees none of these reads"
+    }
+  ],
+  "nonSuffixLiterals": {
+    "comment": "Upper-case literals inside a composition zone that are NOT environment-name suffixes. Listed by name so a newly composed suffix is a violation rather than silently tolerated.",
+    "MEDIA_RESOLUTION_HIGH": "a Gemini request parameter value",
+    "MEDIA_RESOLUTION_LOW": "a Gemini request parameter value",
+    "MEDIA_RESOLUTION_MEDIUM": "a Gemini request parameter value",
+    "RESOURCE_EXHAUSTED": "a Gemini error status compared against"
+  },
+  "readerUnverifiable": {
+    "comment": "A read no syntactic scan can see. The reader column is still required to name a file that exists, so a renamed or deleted reader is caught; what is waived is only the proof that the read is in it.",
+    "MEOWKIT_EVAL_SLUG": "read by a markdown skill step, not by code: the step exports it in one shell block and reads it back in another",
+    "MEOWKIT_GEMINI_API_KEY_2": "the suffix index is composed at the call site (an f-string loop), so the name is spelled nowhere",
+    "MEOWKIT_GEMINI_API_KEY_3": "the suffix index is composed at the call site (an f-string loop), so the name is spelled nowhere",
+    "MEOWKIT_GEMINI_API_KEY_4": "the suffix index is composed at the call site (an f-string loop), so the name is spelled nowhere"
+  },
+  "removalExempt": {
+    "comment": "A name whose class is `toggle` or `drop` is a removed environment variable: a shell still exporting it is told so by `mewkit doctor`, with the key that replaced it or the fact that nothing replaced it. These names are exempt from that finding, because exporting them is not a stale export.",
+    "MEOWKIT_PM_AUTO": "still honored — by agent prose rather than by code, so there is nothing stale about exporting it",
+    "MEOWKIT_TOKEN": "not an environment variable: a module-level compiled regex whose identifier matches the scan regex",
+    "MEOWKIT_INTERNAL_DIRS": "not an environment variable: an exported module constant whose identifier matches the scan regex",
+    "MEOWKIT_INTERNAL_FILES": "not an environment variable: an exported module constant whose identifier matches the scan regex",
+    "MEOWKIT_CONFIG": "never shipped as a setting; named only in the assertion that the workflow-config reader does not consult it",
+    "MEOWKIT_API_KEY": "never a shipped setting: a fixture name from a deleted dotenv-parser self-check, surviving only in an archived changelog"
+  },
+  "retainedDropOccurrences": {
+    "comment": "A name in the `drop` class is deleted from docs, agents, skills and settings. These are the occurrences that deliberately survive, each with the file substring it may appear in and why. Any OTHER occurrence of a dropped name fails the universe test, so the deletion is enforced rather than hoped for, and a retained one cannot quietly spread to a new file.",
+    "MEOWKIT_CONFIG": {
+      "in": [
+        "tests/ports/workflow-config-resolution.test.ts"
+      ],
+      "why": "named only in an assertion that the workflow-config reader does NOT consult it; deleting the mention would delete the proof"
+    },
+    "MEOWKIT_HARNESS_MODE": {
+      "in": [
+        "packages/docs/content/docs/changelog/archive.mdx"
+      ],
+      "why": "an archived changelog is a historical record — the same reason the scan places RELEASING.md out of scope; rewriting it would falsify what a past release shipped"
+    },
+    "MEOWKIT_INTERNAL_DIRS": {
+      "in": [
+        "packages/mewkit/src/migrate/discovery/"
+      ],
+      "why": "not an environment name — an exported module constant whose identifier happens to match the scan regex"
+    },
+    "MEOWKIT_INTERNAL_FILES": {
+      "in": [
+        "packages/mewkit/src/migrate/discovery/"
+      ],
+      "why": "not an environment name — an exported module constant whose identifier happens to match the scan regex"
+    },
+    "MEOWKIT_MEMORY_BUDGET": {
+      "in": [
+        "packages/docs/content/docs/changelog/archive.mdx"
+      ],
+      "why": "archived changelog (historical record)"
+    },
+    "MEOWKIT_MEMORY_PRUNE": {
+      "in": [
+        "packages/docs/content/docs/changelog/archive.mdx"
+      ],
+      "why": "archived changelog (historical record)"
+    },
+    "MEOWKIT_MEMORY_PRUNE_AGE_DAYS": {
+      "in": [
+        "packages/docs/content/docs/changelog/archive.mdx"
+      ],
+      "why": "archived changelog (historical record)"
+    },
+    "MEOWKIT_MEMORY_STALENESS_MONTHS": {
+      "in": [
+        "packages/docs/content/docs/changelog/archive.mdx"
+      ],
+      "why": "archived changelog (historical record)"
+    },
+    "MEOWKIT_PM_AUTO": {
+      "in": [
+        ".claude/",
+        "docs/governance/rules-index.md",
+        "packages/docs/content/docs/",
+        "packages/mewkit/src/migrate/modules/"
+      ],
+      "why": "the opt-out an agent reads for itself: no code reader and no schema key, documented prose-only, which is the standing decision for this name. Deleting it would remove a user opt-out with nothing replacing it. The provider projections mirror the same prose, so the name is as live there as it is under .claude/"
+    },
+    "MEOWKIT_SUMMARY_MODE": {
+      "in": [
+        "packages/docs/content/docs/changelog/archive.mdx"
+      ],
+      "why": "an archived changelog is a historical record"
+    },
+    "MEOWKIT_TOKEN": {
+      "in": [
+        ".claude/scripts/check-anthropic-context.py"
+      ],
+      "why": "not an environment name — a module-level compiled regex whose identifier happens to match the scan regex"
+    },
+    "MEOW_JIRA_BASE_URL": {
+      "in": [
+        "packages/docs/content/docs/changelog/archive.mdx"
+      ],
+      "why": "an archived changelog is a historical record; every live mention was repointed at MEOW_JIRA_SITE_URL, the name the Jira wrapper actually requires"
+    },
+    "MEOW_PROFILE": {
+      "in": [
+        ".claude/hooks/__tests__/advisory-boundary.test.cjs",
+        "tests/hooks/config-precedence.test.ts"
+      ],
+      "why": "named only in assertions that no hook reads it; deleting the mention would delete the proof the removal landed"
+    },
+    "MEOWKIT_API_KEY": {
+      "in": [
+        "packages/docs/content/docs/changelog/archive.mdx"
+      ],
+      "why": "a fixture name from a deleted dotenv-parser self-check; an archived changelog is a historical record, the same reason the scan places RELEASING.md out of scope"
+    }
+  },
+  "names": [
+    {
+      "name": "MEOWKIT_ACTIVE_AGENTS",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader; agent prose only"
+    },
+    {
+      "name": "MEOWKIT_ACTIVE_PLAN",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader; agent prose only"
+    },
+    {
+      "name": "MEOWKIT_API_KEY",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader; docs prose only"
+    },
+    {
+      "name": "MEOWKIT_AUDIT_OUT_DIR",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/benchmark/scripts/git-index-audit.sh"
+    },
+    {
+      "name": "MEOWKIT_AUTOBUILD_MODE",
+      "class": "safety-path",
+      "key": "autobuild.mode",
+      "reader": "hooks/lib/check-contract-signed.cjs (gate bypass, env only); density readers use the config key"
+    },
+    {
+      "name": "MEOWKIT_BUDGET_BLOCK",
+      "class": "toggle",
+      "key": "budget.block",
+      "reader": "no reader; budget.block is resolved instead — by hooks/handlers/budget-tracker.cjs, and by skills/autobuild/scripts/budget-tracker.sh through hooks/lib/config-get.cjs"
+    },
+    {
+      "name": "MEOWKIT_BUDGET_CAP",
+      "class": "toggle",
+      "key": "budget.cap",
+      "reader": "no reader; budget.cap is resolved instead — by hooks/handlers/budget-tracker.cjs, and by skills/autobuild/scripts/budget-tracker.sh and skills/benchmark/scripts/run-canary.sh through hooks/lib/config-get.cjs"
+    },
+    {
+      "name": "MEOWKIT_BUDGET_WARN",
+      "class": "toggle",
+      "key": "budget.warn",
+      "reader": "no reader; budget.warn is resolved instead — by hooks/handlers/budget-tracker.cjs, and by skills/autobuild/scripts/budget-tracker.sh through hooks/lib/config-get.cjs"
+    },
+    {
+      "name": "MEOWKIT_BUILD_VERIFY",
+      "class": "toggle",
+      "key": "hooks.build-verify",
+      "reader": "no reader; the off switch is hooks.build-verify, applied by hooks/lib/handler-registry.cjs before the handler is loaded"
+    },
+    {
+      "name": "MEOWKIT_BUILD_VERIFY_DEBUG",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOWKIT_BUILD_VERIFY_TIMEOUT",
+      "class": "toggle",
+      "key": "buildVerify.timeoutMs",
+      "reader": "no reader; hooks/handlers/build-verify.cjs resolves buildVerify.timeoutMs instead"
+    },
+    {
+      "name": "MEOWKIT_CLI",
+      "class": "safety-path",
+      "key": "",
+      "reader": "hooks/lib/memory-store-lint.cjs, hooks/lib/session-context-report.cjs"
+    },
+    {
+      "name": "MEOWKIT_COMMAND",
+      "class": "runtime-handoff",
+      "key": "",
+      "reader": "scripts/injection-audit.cjs"
+    },
+    {
+      "name": "MEOWKIT_COMPLEXITY",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader; agent prose only"
+    },
+    {
+      "name": "MEOWKIT_CONFIG",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOWKIT_CONTEXT_WINDOW",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/context-audit/scripts/estimate-tokens.sh"
+    },
+    {
+      "name": "MEOWKIT_COST_LOG",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/autobuild/scripts/budget-tracker.sh"
+    },
+    {
+      "name": "MEOWKIT_EVAL_SLUG",
+      "class": "runtime-handoff",
+      "key": "",
+      "reader": "skills/evaluate/step-01-load-rubrics.md exports it; skills/evaluate/step-04-grade-and-verdict.md reads it for the verdict path"
+    },
+    {
+      "name": "MEOWKIT_GATE1_PRESENCE_ONLY",
+      "class": "safety-path",
+      "key": "",
+      "reader": "hooks/lib/gate1-hatch.cjs, reached from hooks/gate-enforcement.cjs"
+    },
+    {
+      "name": "MEOWKIT_GEMINI_API_KEY",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_GEMINI_API_KEY_2",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_GEMINI_API_KEY_3",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_GEMINI_API_KEY_4",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_HARNESS_MODE",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader; docs prose only"
+    },
+    {
+      "name": "MEOWKIT_HARNESS_RESUME_STEP",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOWKIT_HARNESS_VERSION",
+      "class": "runtime-handoff",
+      "key": "",
+      "reader": "core/trace-append.ts"
+    },
+    {
+      "name": "MEOWKIT_HOOK_DEBUG",
+      "class": "runtime-handoff",
+      "key": "",
+      "reader": "hooks/handlers/learning-observer.cjs"
+    },
+    {
+      "name": "MEOWKIT_HOOK_PROFILE",
+      "class": "safety-path",
+      "key": "",
+      "reader": "hooks/pre-ship.cjs and three observers; no config key by design"
+    },
+    {
+      "name": "MEOWKIT_IMAGE_GEN_MODEL",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_IMAGE_PROVIDER_CHAIN",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_INTERNAL_DIRS",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOWKIT_INTERNAL_FILES",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOWKIT_LOOP_DETECT",
+      "class": "toggle",
+      "key": "hooks.loop-detection",
+      "reader": "no reader; the off switch is hooks.loop-detection, applied by hooks/lib/handler-registry.cjs before the handler is loaded"
+    },
+    {
+      "name": "MEOWKIT_MAX_PROJECT_CONTEXT_BYTES",
+      "class": "toggle",
+      "key": "projectContext.maxBytes",
+      "reader": "no reader; hooks/handlers/project-context-loader.cjs resolves projectContext.maxBytes instead"
+    },
+    {
+      "name": "MEOWKIT_MEMORY_BUDGET",
+      "class": "drop",
+      "key": "",
+      "reader": "declared in settings.json and read by nothing"
+    },
+    {
+      "name": "MEOWKIT_MEMORY_PRUNE",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOWKIT_MEMORY_PRUNE_AGE_DAYS",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOWKIT_MEMORY_STALENESS_MONTHS",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader; docs prose only"
+    },
+    {
+      "name": "MEOWKIT_MINIMAX_API_KEY",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/multimodal/scripts/minimax_api_client.py"
+    },
+    {
+      "name": "MEOWKIT_MINIMAX_IMAGE_MODEL",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_MINIMAX_MUSIC_MODEL",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_MINIMAX_SPEECH_MODEL",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_MINIMAX_SPEECH_VOICE",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_MINIMAX_VIDEO_MODEL",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_MODEL_HINT",
+      "class": "runtime-handoff",
+      "key": "",
+      "reader": "core/trace-append.ts, hooks/handlers/model-detector.cjs"
+    },
+    {
+      "name": "MEOWKIT_MUSIC_PROVIDER_CHAIN",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_OPENROUTER_API_KEY",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/multimodal/scripts/openrouter_fallback.py"
+    },
+    {
+      "name": "MEOWKIT_OPENROUTER_FALLBACK_ENABLED",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_OPENROUTER_IMAGE_MODEL",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_PM_AUTO",
+      "class": "drop",
+      "key": "",
+      "reader": "no code reader; the agent instruction stays prose-only and gains no schema key"
+    },
+    {
+      "name": "MEOWKIT_PRECOMPLETION",
+      "class": "toggle",
+      "key": "hooks.pre-completion-check",
+      "reader": "no reader; the off switch is hooks.pre-completion-check, applied by hooks/lib/handler-registry.cjs before the handler is loaded"
+    },
+    {
+      "name": "MEOWKIT_RELEASE_SOURCE",
+      "class": "skill-option",
+      "key": "",
+      "reader": "packages/mewkit/src/core/local-release-source.ts:27 (offline release fixture for the install tests)"
+    },
+    {
+      "name": "MEOWKIT_RUN_ID",
+      "class": "runtime-handoff",
+      "key": "",
+      "reader": "core/trace-append.ts, skills/autobuild/scripts/budget-tracker.sh"
+    },
+    {
+      "name": "MEOWKIT_RUN_SMOKE_TESTS",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/web-to-markdown/tests/test_smoke_real_urls.py"
+    },
+    {
+      "name": "MEOWKIT_SKIP_SAFETY_SENTINEL",
+      "class": "skill-option",
+      "key": "",
+      "reader": "hooks/handlers/safety-sentinel-inject.cjs, hooks/handlers/post-session.cjs, hooks/handlers/precompact-probe.cjs"
+    },
+    {
+      "name": "MEOWKIT_SPEECH_PROVIDER_CHAIN",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_STORY_SIZER_COMMENT_TEMPLATE",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/story-sizer/scripts/execute-auto-create.py:97 — a live read a single-line grep misses, because the call spans two lines"
+    },
+    {
+      "name": "MEOWKIT_SUGGESTED_PLAN",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOWKIT_SUMMARY_MODE",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOWKIT_TDD",
+      "class": "behavior-override",
+      "key": "tdd",
+      "reader": "hooks/lib/tdd-detect.cjs; stays a supported override at top precedence because it is one of only two sources that can turn strict mode on"
+    },
+    {
+      "name": "MEOWKIT_TDD_FLAG_DETECTOR",
+      "class": "drop",
+      "key": "",
+      "replacedBy": "hooks.tdd-flag-detector",
+      "reader": "declared in settings.json and read by nothing"
+    },
+    {
+      "name": "MEOWKIT_TOKEN",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOWKIT_VIDEO_GEN_MODEL",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_VIDEO_PROVIDER_CHAIN",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/multimodal/scripts/env_utils.py by prefix composition"
+    },
+    {
+      "name": "MEOWKIT_WEB_FETCH_JS",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/web-to-markdown/scripts/fetch_as_markdown.py"
+    },
+    {
+      "name": "MEOWKIT_WEB_FETCH_MAX_BYTES",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/web-to-markdown/scripts/http_fetch.py"
+    },
+    {
+      "name": "MEOWKIT_WEB_FETCH_PERSIST",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/web-to-markdown/scripts/fetch_as_markdown.py"
+    },
+    {
+      "name": "MEOWKIT_WEB_FETCH_RESPECT_ROBOTS",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/web-to-markdown/scripts/fetch_as_markdown.py, which passes it to the robots cache"
+    },
+    {
+      "name": "MEOWKIT_WEB_FETCH_ROBOTS_TTL_HOURS",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/web-to-markdown/scripts/robots_cache.py"
+    },
+    {
+      "name": "MEOWKIT_WEB_FETCH_THROTTLE_MS",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/web-to-markdown/scripts/rate_limit.py"
+    },
+    {
+      "name": "MEOWKIT_WRITE_SYNOPSIS",
+      "class": "skill-option",
+      "key": "",
+      "reader": "cli/__tests__/synopsis-drift.test.ts"
+    },
+    {
+      "name": "MEOW_CONFLUENCE_API_TOKEN",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/confluence/scripts/confluence-as.sh"
+    },
+    {
+      "name": "MEOW_CONFLUENCE_EMAIL",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/confluence/scripts/confluence-as.sh"
+    },
+    {
+      "name": "MEOW_CONFLUENCE_SITE_URL",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/confluence/scripts/confluence-as.sh"
+    },
+    {
+      "name": "MEOW_CONFLUENCE_STDOUT_FILTER",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/confluence/scripts/confluence-as.sh"
+    },
+    {
+      "name": "MEOW_HOOK_PROFILE",
+      "class": "safety-path",
+      "key": "",
+      "reader": "hooks/pre-ship.cjs and three observers; no config key by design"
+    },
+    {
+      "name": "MEOW_JIRA_API_TOKEN",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/jira/scripts/jira-as.sh"
+    },
+    {
+      "name": "MEOW_JIRA_BASE_URL",
+      "class": "drop",
+      "key": "",
+      "reader": "no reader"
+    },
+    {
+      "name": "MEOW_JIRA_EMAIL",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/jira/scripts/jira-as.sh"
+    },
+    {
+      "name": "MEOW_JIRA_SITE_URL",
+      "class": "credential",
+      "key": "",
+      "reader": "skills/jira/scripts/jira-as.sh"
+    },
+    {
+      "name": "MEOW_PROFILE",
+      "class": "drop",
+      "key": "",
+      "reader": "deprecated alias; its own notice announced removal in the next major, and this is it"
+    },
+    {
+      "name": "MK_SHOWCASE_PREFS_PATH",
+      "class": "skill-option",
+      "key": "",
+      "reader": "skills/showcase/scripts/preferences.js"
+    }
+  ]
+}

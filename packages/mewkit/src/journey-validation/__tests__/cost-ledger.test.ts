@@ -28,16 +28,17 @@ const tasks = (n: number) =>
 	}));
 
 describe("cost ledger cap resolution (Rule 6)", () => {
-	it("precedence: override > MEOWKIT_BUDGET_CAP > tier cap > $100 default", () => {
-		expect(resolveCapUsd({ env: {} })).toBe(DEFAULT_HARD_CAP_USD);
-		expect(resolveCapUsd({ tierCapUsd: 5, env: {} })).toBe(5);
-		expect(resolveCapUsd({ tierCapUsd: 5, env: { MEOWKIT_BUDGET_CAP: "42" } })).toBe(42);
-		expect(resolveCapUsd({ override: 7, tierCapUsd: 5, env: { MEOWKIT_BUDGET_CAP: "42" } })).toBe(7);
+	it("precedence: override > the config cap > tier cap > $100 default", () => {
+		expect(resolveCapUsd({})).toBe(DEFAULT_HARD_CAP_USD);
+		expect(resolveCapUsd({ tierCapUsd: 5 })).toBe(5);
+		expect(resolveCapUsd({ tierCapUsd: 5, configCapUsd: 42 })).toBe(42);
+		expect(resolveCapUsd({ override: 7, tierCapUsd: 5, configCapUsd: 42 })).toBe(7);
 	});
 
-	it("ignores a non-positive / non-numeric override or env cap", () => {
-		expect(resolveCapUsd({ override: 0, tierCapUsd: 5, env: {} })).toBe(5);
-		expect(resolveCapUsd({ tierCapUsd: 5, env: { MEOWKIT_BUDGET_CAP: "nope" } })).toBe(5);
+	it("ignores a non-positive override, and reads a cap of 0 as no cap at all", () => {
+		expect(resolveCapUsd({ override: 0, tierCapUsd: 5 })).toBe(5);
+		expect(resolveCapUsd({ tierCapUsd: 5, configCapUsd: 0 })).toBe(5);
+		expect(resolveCapUsd({ tierCapUsd: 5, configCapUsd: Number.NaN })).toBe(5);
 	});
 });
 

@@ -33,7 +33,9 @@ import { discoverSkills } from "../migrate/discovery/index.js";
 import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js";
 import { getTargetProfile, targetProfileNames } from "../validate/targets/target-profile.js";
 import type { Status } from "./doctor-checks.js";
-import { resolveConfigPath } from "../state/resolve-config-path.js";
+import { configWritePath, migrationPending } from "../state/resolve-config-path.js";
+import { loadConfigFile } from "../config/load-config.js";
+import { observerNames } from "../config/observer-names.js";
 import { resolveProjectRoot } from "../state/meowkit-root-resolver.js";
 
 // validate reports STRUCTURE & WIRING only — that gate files exist and are wired, not that
@@ -259,18 +261,21 @@ export function checkFrontmatterContract(projectRoot: string): CheckResult[] {
 }
 
 function checkConfigJson(meowkitDir: string): CheckResult {
-	// `meowkitDir` is the provider install dir; the config now lives beside it under `.meowkit/`.
-	const configPath = resolveConfigPath(path.dirname(meowkitDir));
+	// `meowkitDir` is the provider install dir; the config lives beside it under `.meowkit/`.
+	const name = "Project config valid";
+	const root = path.dirname(meowkitDir);
+	const configPath = configWritePath(root);
 	if (!fs.existsSync(configPath)) {
-		return { name: "Config JSON valid", status: "fail", detail: `Missing: ${configPath}`, section: "Structure" };
+		// Absent is not invalid. A project with no config runs on its defaults,
+		// and one that still has the v2 descriptor has an upgrade to run.
+		const detail = migrationPending(root)
+			? `${configPath} absent — the v2 descriptor is still in place; run \`mewkit upgrade\``
+			: `${configPath} absent — every setting is at its default`;
+		return { name, status: "warn", detail, section: "Structure" };
 	}
-	try {
-		JSON.parse(fs.readFileSync(configPath, "utf-8"));
-		return { name: "Config JSON valid", status: "pass", detail: configPath, section: "Structure" };
-	} catch (error: unknown) {
-		const message = error instanceof Error ? error.message : String(error);
-		return { name: "Config JSON valid", status: "fail", detail: `Invalid JSON: ${message}`, section: "Structure" };
-	}
+	const result = loadConfigFile(configPath, observerNames(root));
+	if (result.ok) return { name, status: "pass", detail: configPath, section: "Structure" };
+	return { name, status: "fail", detail: `${result.error.message} [${result.error.code}]`, section: "Structure" };
 }
 
 function checkDocsRefsContract(meowkitDir: string): CheckResult[] {

@@ -56,14 +56,14 @@ running conversation?" — orthogonal to both above.
 
 The 10% / 25% structural-overhead banners used by `/mk:context-audit` are the
 canonical source of truth for window-utilization thresholds. They are NOT
-linked to `MEOWKIT_BUDGET_*` env vars — those are USD amounts, not token
+linked to the `budget.*` config keys — those are USD amounts, not token
 percentages.
 
 ## Rules Layout
 
 Always-on rules: `.claude/rules/*.md` — auto-loaded by directory mechanism. Phase-zero conditional: same directory, but loaded explicitly by `mk:agent-detector` Step 0b only.
 
-Agile/Scrum: 3 conditional rules in `.claude/rules-conditional/agile-*.md` — loaded by `mk:agent-detector` Step 0b only when an Agile context is detected (sprint-state contract, `jira_tickets:` frontmatter, `MEOW_JIRA_BASE_URL` env, or Jira-key prompt match). Non-Agile sessions pay zero context cost.
+Agile/Scrum: 3 conditional rules in `.claude/rules-conditional/agile-*.md` — loaded by `mk:agent-detector` Step 0b only when an Agile context is detected (sprint-state contract, `jira_tickets:` frontmatter, `MEOW_JIRA_SITE_URL` env, or Jira-key prompt match). Non-Agile sessions pay zero context cost.
 
 ## Install Profiles & Packs (modular install)
 

@@ -117,6 +117,53 @@ function readinessBlock(root) {
   return lines;
 }
 
+/**
+ * Where a `mewkit` the hooks could call would be found, or null.
+ *
+ * Named for what it returns, because a second resolver in this directory returns
+ * a spawn target that is never null: swapping the two would make this one's
+ * caller stop emitting the hint and the other's hand `null` to `spawnSync` on a
+ * pre-ship path.
+ *
+ * Resolution only — nothing is spawned. A clone of a project whose `.claude/` is
+ * committed has the whole kit and none of the CLI: no `node_modules`, no global
+ * install, and no committed launcher. Checking the places it could be is cheap;
+ * spawning a process at session start to find out is not. `MEOWKIT_CLI` is first
+ * because the guard that honours it would run against a CLI this function had
+ * already reported absent.
+ */
+function locateCliOnPath(root, env) {
+  const candidates = [
+    ...(env.MEOWKIT_CLI ? [env.MEOWKIT_CLI] : []),
+    path.join(root, '.meowkit', 'bin', 'mewkit'),
+    path.join(root, 'node_modules', '.bin', 'mewkit'),
+    ...String(env.PATH || '').split(path.delimiter).filter(Boolean).map((dir) => path.join(dir, 'mewkit')),
+  ];
+  for (const candidate of candidates) {
+    try { if (fs.existsSync(candidate)) return candidate; } catch { /* unreadable PATH entry */ }
+  }
+  return null;
+}
+
+/**
+ * Say it once when the CLI is absent, and name the command that explains why.
+ *
+ * Without it the degradation is silent in exactly the situation where it matters:
+ * a fresh clone runs every gate and guard correctly — none of them needs the CLI
+ * — while the checks that DO call it skip, and nothing on screen connects the
+ * skipped line to the missing install. The hint is emitted from the session-start
+ * block, so it appears once per session rather than once per event.
+ */
+function installBlock(root, env = process.env) {
+  if (locateCliOnPath(root, env) !== null) return [];
+  return [
+    '## MeowKit CLI not available',
+    'This project carries `.claude/` but no `mewkit` CLI (no committed launcher, no node_modules, nothing on PATH).',
+    'Gates, guards and observers all still run — none of them needs it — but the checks that call it skip instead.',
+    'Run `mewkit doctor` (via `npx`, since nothing is installed here) to see what this clone is missing.',
+  ];
+}
+
 /** Warn when a memory file has outgrown the budget. Display only, never a mutation. */
 function memoryBlock(root) {
   const dir = memoryDir(root);
@@ -130,4 +177,4 @@ function memoryBlock(root) {
   return ['## Memory files', `⚠ Memory files >300 lines: ${bloated.join(' ')}`, '  Run `/mk:memory --prune` to propose removals.'];
 }
 
-module.exports = { directoryBlock, memoryBlock, preferencesBlock, readinessBlock, scriptBlock, toolBlock, detectCommands };
+module.exports = { directoryBlock, installBlock, locateCliOnPath, memoryBlock, preferencesBlock, readinessBlock, scriptBlock, toolBlock, detectCommands };

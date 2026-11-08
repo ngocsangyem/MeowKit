@@ -125,16 +125,14 @@ Memory topic files in `.claude/memory/` have a 90-day automated pruning policy:
 - Only entries with ISO 8601 date markers in headers are pruned
 - Entries without date markers are preserved (require manual review)
 - Pruned entries logged to `.claude/memory/pruned-log.md`
-- Override: `MEOWKIT_MEMORY_PRUNE=off` / `MEOWKIT_MEMORY_PRUNE_AGE_DAYS=N`
+- The 90-day window is fixed; there is no setting for it
 
-## Env Var Reference
+## Settings Reference
 
-| Variable                            | Default | Effect                                               |
-| ----------------------------------- | ------- | ---------------------------------------------------- |
-| `MEOWKIT_MAX_PROJECT_CONTEXT_BYTES` | `12288` | project-context.md size warn threshold; `0` disables |
-| `MEOWKIT_SKIP_SAFETY_SENTINEL`      | `on`    | Set `off` to always run agent-detector 9-file check  |
-| `MEOWKIT_MEMORY_PRUNE`              | `on`    | Set `off` to disable auto-pruning                    |
-| `MEOWKIT_MEMORY_PRUNE_AGE_DAYS`     | `90`    | Days before memory entries are pruned                |
+| Source | Key | Default | Effect |
+| ------ | --- | ------- | ------ |
+| `.meowkit/config.yaml` | `projectContext.maxBytes` | `12288` | project-context.md size warn threshold; `0` disables |
+| environment | `MEOWKIT_SKIP_SAFETY_SENTINEL` | `on` | Set `off` to always run the agent-detector 9-file check |
 
 ## See Also
 

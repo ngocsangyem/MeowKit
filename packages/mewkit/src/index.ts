@@ -35,7 +35,12 @@ import { reviewCoverage } from "./commands/review/coverage.js";
 import { reviewCompose } from "./commands/review/compose.js";
 import { reviewSubmit } from "./commands/review/submit.js";
 import { reviewCleanup } from "./commands/review/cleanup.js";
-import { resolveConfigPath } from "./state/resolve-config-path.js";
+import { configWritePath, migrationPending } from "./state/resolve-config-path.js";
+import { loadConfigFile } from "./config/load-config.js";
+import { backups } from "./commands/backups.js";
+import { uninstall } from "./commands/uninstall.js";
+import { resolveProjectRoot } from "./state/meowkit-root-resolver.js";
+import { observerNames } from "./config/observer-names.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -50,17 +55,30 @@ async function printStatus(): Promise<void> {
 	console.log(`${pc.bold(pc.cyan("mewkit"))} ${pc.dim(`v${VERSION}`)} ${pc.dim(`(${channel})`)}`);
 	console.log();
 
-	const configPath = resolveConfigPath(process.cwd());
-	try {
-		const content = fs.readFileSync(configPath, "utf-8");
-		const config: Record<string, unknown> = JSON.parse(content) as Record<string, unknown>;
-		console.log(`${pc.bold("Config:")} ${relative(process.cwd(), configPath) || configPath}`);
-		for (const [key, value] of Object.entries(config)) {
-			console.log(`  ${pc.dim(key)}: ${String(value)}`);
-		}
-	} catch {
-		console.log(`${pc.dim("No .meowkit/config.json found.")}`);
+	const root = process.cwd();
+	const configPath = configWritePath(root);
+	const shown = relative(root, configPath) || configPath;
+	if (migrationPending(root)) {
+		console.log(`${pc.bold("Config:")} ${pc.yellow("migration pending")} — run \`mewkit upgrade\` to produce ${shown}`);
+		return;
 	}
+	const result = loadConfigFile(configPath, observerNames(root));
+	if (!result.ok) {
+		console.log(`${pc.bold("Config:")} ${shown} ${pc.red("invalid")}`);
+		console.log(`  ${result.error.message}`);
+		console.log(`  ${pc.dim(result.error.fix)}`);
+		return;
+	}
+	if (!result.present) {
+		console.log(`${pc.dim(`No ${shown} — every setting is at its default.`)}`);
+		return;
+	}
+	// Only the keys someone uncommented are printed. The commented stubs are the
+	// surface, not the state, and listing them would read as settings in force.
+	const entries = Object.entries(result.values).filter(([key]) => key !== "$schema");
+	console.log(`${pc.bold("Config:")} ${shown}`);
+	if (entries.length === 0) console.log(`  ${pc.dim("no key set — every setting is at its default")}`);
+	for (const [key, value] of entries) console.log(`  ${pc.dim(key)}: ${String(value)}`);
 }
 
 async function main(): Promise<void> {
@@ -81,6 +99,7 @@ async function main(): Promise<void> {
 	switch (command) {
 		case "init":
 			await init({
+				json: args.json as boolean | undefined,
 				dryRun: args["dry-run"] as boolean | undefined,
 				force: args.force as boolean | undefined,
 				beta: args.beta as boolean | undefined,
@@ -91,15 +110,21 @@ async function main(): Promise<void> {
 				skillPacks: args["skill-packs"] as string | undefined,
 				mcpProfiles: args["mcp-profiles"] as string | undefined,
 				allowCloudMcp: args["allow-cloud-mcp"] as boolean | undefined,
+				yes: args.yes as boolean | undefined,
+				interactive: process.stdout.isTTY === true,
 			});
 			break;
 		case "upgrade":
 			await upgrade({
+				json: args.json as boolean | undefined,
 				check: args.check as boolean | undefined,
 				beta: args.beta as boolean | undefined,
 				list: args.list as boolean | undefined,
 				noCleanup: args["no-cleanup"] as boolean | undefined,
 				yes: args.yes as boolean | undefined,
+				force: args.force as boolean | undefined,
+				dryRun: args["dry-run"] as boolean | undefined,
+				interactive: process.stdout.isTTY === true,
 			});
 			break;
 		case "validate": {
@@ -190,6 +215,7 @@ async function main(): Promise<void> {
 				json: args.json as boolean | undefined,
 				yes: args.yes as boolean | undefined,
 				beta: args.beta as boolean | undefined,
+				dryRun: args["dry-run"] as boolean | undefined,
 			});
 			break;
 		case "providers":
@@ -294,6 +320,31 @@ async function main(): Promise<void> {
 		case "verdict-gate":
 			verdictGate({ slug: args._[1] as string | undefined });
 			break;
+		case "backups": {
+			// The snapshots live under the project root, so the verb needs one;
+			// without a root there is nothing to list and nothing to restore.
+			const root = resolveProjectRoot(process.cwd()) ?? process.cwd();
+			process.exitCode = backups(root, args._[1] as string | undefined, args._[2] as string | undefined, {
+				json: args.json as boolean | undefined,
+				dryRun: args["dry-run"] as boolean | undefined,
+				yes: args.yes as boolean | undefined,
+				interactive: process.stdout.isTTY === true,
+			});
+			break;
+		}
+		case "uninstall": {
+			// Ownership is project-relative, so the verb needs a root; without one
+			// there is no install to classify.
+			const root = resolveProjectRoot(process.cwd()) ?? process.cwd();
+			process.exitCode = uninstall(root, {
+				yes: args.yes as boolean | undefined,
+				force: args.force as boolean | undefined,
+				json: args.json as boolean | undefined,
+				dryRun: args["dry-run"] as boolean | undefined,
+				interactive: process.stdout.isTTY === true,
+			});
+			break;
+		}
 		case "note":
 			// Entry text comes from stdin, not a flag — the write path is a pipe, so a
 			// multi-line entry never has to survive shell quoting.
@@ -304,6 +355,8 @@ async function main(): Promise<void> {
 				only: args.only as string | undefined,
 				systemDeps: args["system-deps"] as boolean | undefined,
 				skills: args.skills as string | undefined,
+				dryRun: args["dry-run"] as boolean | undefined,
+				json: args.json as boolean | undefined,
 			});
 			break;
 		case "skill": {
@@ -322,6 +375,8 @@ async function main(): Promise<void> {
 				// `doctor provenance [--explain]`: read-only provenance report.
 				provenance: args._[1] === "provenance" || undefined,
 				explain: args.explain as boolean | undefined,
+				adopt: args.adopt as boolean | undefined,
+				json: args.json as boolean | undefined,
 			});
 			break;
 		case "status":
@@ -444,6 +499,7 @@ async function main(): Promise<void> {
 				"all-rules": args["all-rules"] as boolean | undefined,
 				"include-mcp": args["include-mcp"] as boolean | undefined,
 				"include-unportable": args["include-unportable"] as boolean | undefined,
+				json: args.json as boolean | undefined,
 			});
 			if (exitCode !== 0) process.exit(exitCode);
 			break;

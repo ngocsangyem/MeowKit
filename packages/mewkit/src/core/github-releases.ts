@@ -1,8 +1,10 @@
 import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { tmpdir } from "node:os";
 import AdmZip from "adm-zip";
 import * as log from "./core-logger.js";
+import { localReleaseDir, localReleaseVersion, materializeLocalRelease } from "./local-release-source.js";
 
 /** GitHub repository for MeowKit releases */
 const GITHUB_OWNER = "ngocsangyem";
@@ -34,6 +36,20 @@ export interface ReleaseInfo {
  * Returns stable and beta releases, sorted by newest first.
  */
 export async function fetchReleases(): Promise<ReleaseInfo[]> {
+	const local = localReleaseDir();
+	if (local !== null) {
+		const version = localReleaseVersion(local);
+		return [
+			{
+				tag: `v${version}`,
+				version,
+				isBeta: version.includes("-beta") || version.includes("-rc"),
+				downloadUrl: pathToFileURL(local).href,
+				publishedAt: new Date(0).toISOString(),
+			},
+		];
+	}
+
 	const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases`;
 	const response = await fetch(url, {
 		headers: {
@@ -85,6 +101,9 @@ export async function getLatestBeta(): Promise<ReleaseInfo | null> {
  * Returns the path to the extracted directory.
  */
 export async function downloadRelease(release: ReleaseInfo): Promise<string> {
+	const local = localReleaseDir();
+	if (local !== null) return materializeLocalRelease(local, release.version);
+
 	const tempDir = join(tmpdir(), `meowkit-release-${release.version}-${Date.now()}`);
 	mkdirSync(tempDir, { recursive: true });
 

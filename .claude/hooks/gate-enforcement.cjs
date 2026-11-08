@@ -37,6 +37,7 @@ const { validateContract } = require('./lib/validate-contract.cjs');
 const { verify, NO_RECEIPT, STALE } = require('./lib/approval-receipt.cjs');
 const { hasPlan, newestPlan } = require('./lib/plan-discovery.cjs');
 const rules = require('./lib/gate1-path-rules.cjs');
+const { resolveHatch } = require('./lib/gate1-hatch.cjs');
 
 /** The thin CLI a human runs for the same diagnostic the gate just applied. */
 const CONTRACT_VALIDATOR_CLI = '.claude/skills/sprint-contract/scripts/validate-contract.cjs';
@@ -123,11 +124,12 @@ function decide(root, filePath, env) {
 
   if (!hasPlan(root)) return blockNoPlan();
 
-  if (env.MEOWKIT_GATE1_PRESENCE_ONLY === '1') {
-    // An invisible bypass is worse than no bypass: announce the downgrade so it
-    // is always visible in the transcript.
-    process.stderr.write('Gate 1: downgraded to presence-only via MEOWKIT_GATE1_PRESENCE_ONLY=1 (approval receipt NOT verified).\n');
-  } else {
+  // An invisible bypass is worse than no bypass, so every outcome the hatch
+  // reaches — applied, or refused for one of its three reasons — is announced
+  // here and recorded in the security log by the reader itself.
+  const hatch = resolveHatch({ root, env });
+  for (const notice of hatch.notices) process.stderr.write(`${notice}\n`);
+  if (!hatch.downgrade) {
     const receiptExit = checkReceipt(root);
     if (receiptExit !== 0) return receiptExit;
   }

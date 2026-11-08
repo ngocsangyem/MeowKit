@@ -45,7 +45,7 @@ The 3 Agile rules load via `mk:agent-detector` Step 0b ONLY when an Agile contex
 |---------|-----------|
 | Sprint-state contract present | Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result |
 | Plan frontmatter | `jira_tickets:` non-empty in active plan |
-| Env var | `MEOW_JIRA_BASE_URL` set |
+| Env var | `MEOW_JIRA_SITE_URL` set |
 | User prompt | Last user message matches `[A-Z]{2,10}-\d+` |
 
 A pre-flight check verifies the `.claude/rules-conditional/` directory exists; if absent, the load is skipped silently.

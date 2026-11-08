@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 'use strict';
-// workflow-config — read/write workflow config with dot-notation
+// workflow-config — read a workflow setting, or record a per-project choice
 // Usage:
 //   workflow-config get <dotted.key> [default]
 //   workflow-config set <dotted.key> <value>
 //   workflow-config has <dotted.key>  → exit 0 if truthy, 1 if falsy/missing
 //
 // Runs on node so the skill preambles that call it work on a machine with no
-// interpreter installed. Argument handling is unchanged from the implementation
-// it replaces; the logic and the reasoning behind each answer live in
-// ../lib/workflow-config-core.cjs.
+// interpreter installed. `get` and `has` resolve session state, then the
+// project config, then the user config, then the caller's default; `set` writes
+// session state and never the committed config. The reasoning behind each
+// answer lives in ../lib/workflow-config-core.cjs.
 
 const C = require('../lib/workflow-config-core.cjs');
 
@@ -25,34 +26,46 @@ Examples:
 `;
 
 /** `get` — print the value, else the default, else an empty line. Always exits 0. */
-function get(file, key, fallback) {
-  const config = C.readConfig(file);
-  if (config === null) {
+function get(key, fallback) {
+  const { value, sourcePresent } = C.resolveKey(key);
+  if (value === undefined && !sourcePresent) {
+    // Nothing is configured at all. The caller's `|| echo "true"` default is
+    // what should answer, so printing an empty line would answer for it.
     if (fallback) process.stdout.write(`${fallback}\n`);
     return 0;
   }
-  const value = C.lookup(config, key);
   process.stdout.write(`${value === undefined ? fallback || '' : C.render(value)}\n`);
   return 0;
 }
 
 /** `has` — exit 0 only when the value reads as switched on. */
-function has(file, key) {
-  const config = C.readConfig(file);
-  if (config === null) return 1;
-  const rendered = C.render(C.lookup(config, key));
+function has(key) {
+  const rendered = C.render(C.resolveKey(key).value);
   return rendered === 'true' || rendered === '1' || rendered === 'yes' ? 0 : 1;
 }
 
-/** `set` — write into an existing config. Never creates one. */
-function set(file, key, raw) {
-  const config = C.readConfig(file);
-  if (config === null) {
-    process.stderr.write(`Config not found: ${C.displayPath(file)}\n`);
+/**
+ * `set` — record the choice in session state.
+ *
+ * The committed config is human-owned: an agent that rewrote it mid-run would
+ * put a settings change into the user's diff, which is also how a weakening
+ * reaches a pull request. So the write lands in state, and the message says
+ * where the same preference becomes durable — the behaviour change is visible
+ * at the moment it matters rather than discovered from a diff later.
+ */
+function set(key, raw) {
+  const file = C.statePath();
+  const state = C.readJson(file) || {};
+  C.assign(state, key, C.coerce(raw));
+  try {
+    C.writeState(file, state);
+  } catch (err) {
+    process.stderr.write(`Could not write ${C.displayPath(file)}: ${err.message}\n`);
+    process.stderr.write('Fix: check the permissions on .meowkit/state/, then run this again\n');
     return 1;
   }
-  C.assign(config, key, C.coerce(raw));
-  C.writeConfig(file, config);
+  process.stderr.write(`Set ${key} for this project in ${C.displayPath(file)} (session state).\n`);
+  process.stderr.write('To make it durable for everyone, set it in .meowkit/config.yaml instead — state is not committed.\n');
   return 0;
 }
 
@@ -69,14 +82,13 @@ function main(argv) {
     return 1;
   }
 
-  const file = C.resolveConfigPath();
-  if (subcommand === 'get') return get(file, key, third);
-  if (subcommand === 'has') return has(file, key);
+  if (subcommand === 'get') return get(key, third);
+  if (subcommand === 'has') return has(key);
   if (third === undefined) {
     process.stderr.write('Usage: workflow-config set <dotted.key> <value>\n');
     return 1;
   }
-  return set(file, key, third);
+  return set(key, third);
 }
 
 process.exit(main(process.argv.slice(2)));

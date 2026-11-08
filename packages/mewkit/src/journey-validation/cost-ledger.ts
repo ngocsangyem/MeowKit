@@ -1,7 +1,8 @@
 // Cost ledger + cap enforcement for the benchmark / live-journey path (MK-P1-01). A run appends
 // one JSONL receipt per model call and HALTS as soon as cumulative cost reaches the effective
 // cap. Thresholds follow `skills/cook/references/harness-rules.md` Rule 6 — warn at $30, hard block at $100, and a user
-// cap (`MEOWKIT_BUDGET_CAP` / an explicit override) that can move the block point lower OR higher.
+// cap (`budget.cap` in the project config, or an explicit override) that can move the block point
+// lower OR higher.
 // We reuse that one scheme rather than inventing a second. This module is the canonical
 // enforcement logic the (deferred) live RunnerBackends inherit; it is proven here against the
 // MockRunnerBackend so the live path cannot silently overspend.
@@ -24,16 +25,19 @@ export interface SpendEvaluation {
 }
 
 /**
- * Resolve the effective hard cap. Precedence: explicit override → `MEOWKIT_BUDGET_CAP` env →
- * tier cap (the canary tier's own budget) → the Rule 6 default of $100. A user cap can be lower
- * or higher than the tier cap — Rule 6 lets the operator move the block point either way.
+ * Resolve the effective hard cap. Precedence: explicit override → the project config's
+ * `budget.cap` → tier cap (the canary tier's own budget) → the Rule 6 default of $100. A user cap
+ * can be lower or higher than the tier cap — Rule 6 lets the operator move the block point either
+ * way.
+ *
+ * `configCapUsd` is passed in rather than read here: the config is resolved once, by the caller
+ * that knows the project root, so this function stays a pure precedence rule and the committed
+ * file has exactly one reader per process. A cap of 0 is the config's way of saying "no user cap".
  */
-export function resolveCapUsd(opts: { override?: number; tierCapUsd?: number; env?: NodeJS.ProcessEnv } = {}): number {
+export function resolveCapUsd(opts: { override?: number; configCapUsd?: number; tierCapUsd?: number } = {}): number {
 	if (typeof opts.override === "number" && Number.isFinite(opts.override) && opts.override > 0) return opts.override;
-	const envRaw = (opts.env ?? process.env).MEOWKIT_BUDGET_CAP;
-	if (envRaw !== undefined) {
-		const parsed = Number(envRaw);
-		if (Number.isFinite(parsed) && parsed > 0) return parsed;
+	if (typeof opts.configCapUsd === "number" && Number.isFinite(opts.configCapUsd) && opts.configCapUsd > 0) {
+		return opts.configCapUsd;
 	}
 	if (typeof opts.tierCapUsd === "number" && opts.tierCapUsd > 0) return opts.tierCapUsd;
 	return DEFAULT_HARD_CAP_USD;

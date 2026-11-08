@@ -9,6 +9,8 @@
 // Output: writes session-state/detected-model.json
 // Emits: human-readable model detection line to stdout (reaches model via SessionStart)
 
+const { configValue } = require('../lib/read-config.cjs');
+
 const MODEL_TIERS = {
   // Opus models → COMPLEX
   'claude-opus-4-6': { tier: 'COMPLEX', density: 'LEAN' },
@@ -90,10 +92,10 @@ module.exports = function modelDetector(ctx, state) {
     sourceId = 'unknown';
   }
 
-  // Allow density override via env var
-  const densityOverride = process.env.MEOWKIT_AUTOBUILD_MODE;
-  if (densityOverride && ['MINIMAL', 'FULL', 'LEAN'].includes(densityOverride)) {
-    result.density = densityOverride;
+  // A configured density preset overrides the detected one.
+  const configured = String(configValue('autobuild.mode', '', { root: ctx.root }).value);
+  if (['MINIMAL', 'FULL', 'LEAN'].includes(configured)) {
+    result.density = configured;
   }
 
   const detected = {

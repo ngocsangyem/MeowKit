@@ -193,6 +193,22 @@ jobs:
       - name: Check for dangling references to relocated rules
         run: node scripts/check-dangling-rule-refs.cjs .
 
+      # Every environment name the shipped kit reads is classified in
+      # env-name-classification.json, which the check loads as its allowlist
+      # rather than restating. Catches both a literal read and a name composed
+      # from a prefix and a suffix literal, which a literal scan cannot see.
+      - name: Check environment-name reads are classified
+        run: node scripts/check-env-reads.cjs
+
+      - name: Check the published config schema is not stale
+        run: node scripts/generate-config-schema.cjs --check
+
+      # A `mewkit <verb>` a skill tells an agent to run must exist. A renamed or
+      # never-shipped verb fails mid-session, inside a workflow the agent cannot
+      # finish; the catalogue is the source, so this cannot go stale.
+      - name: Check every mewkit verb the kit names resolves
+        run: node scripts/check-kit-verbs.cjs
+
       - name: Validate README, website, and index counts (stale-index)
         run: node packages/mewkit/dist/index.js inventory --check
 

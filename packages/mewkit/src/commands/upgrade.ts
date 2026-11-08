@@ -11,7 +11,9 @@ import {
 	loadPackManifest,
 	resolvePacks,
 } from "../core/index.js";
-import type { ReleaseInfo, UserConfig } from "../core/index.js";
+import type { ReleaseInfo, UpdateStats, UserConfig } from "../core/index.js";
+import { beginMachineOutput, envelopeEmitter, type MutationReport } from "../core/mutation-report.js";
+import { installMutationReport } from "./install-report.js";
 import { runMigrate } from "../migrate/migrate-orchestrator.js";
 import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
 import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
@@ -20,6 +22,11 @@ import { reconcileApplyCursorBundle } from "../migrate/modules/cursor-reconcile-
 import { describeRetiredSkills } from "../migrate/modules/retired-skill-cleanup.js";
 import { meowkitStatePaths } from "../state/meowkit-state-paths.js";
 import { reportOrphanedV2Stores } from "../core/report-orphaned-stores.js";
+import { createSnapshot } from "../core/snapshot.js";
+import { confirmationRequiredMessage, EXIT_NEEDS_CONFIRMATION, needsConfirmation } from "../core/destructive-guard.js";
+import { populateKitCache } from "../core/kit-cache.js";
+import { LEGACY_DESCRIPTOR_REL, legacyDescriptorPath } from "../state/resolve-config-path.js";
+import { migrateLegacyDescriptor } from "./migrate-config-descriptor.js";
 
 /** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
 const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
@@ -145,6 +152,14 @@ export interface UpgradeArgs {
 	list?: boolean;
 	noCleanup?: boolean;
 	yes?: boolean;
+	/** Overwrite files this project has edited. Destructive, so it is gated. */
+	force?: boolean;
+	/** Plan only: no snapshot, no write, no cache rewrite. */
+	dryRun?: boolean;
+	/** False in a non-TTY session; the destructive guard reads it. */
+	interactive?: boolean;
+	/** Print the one mutation envelope on stdout; the narration goes to stderr. */
+	json?: boolean;
 }
 
 /** Read installed version from canonical metadata (instant, no npx), with legacy fallback. */
@@ -230,7 +245,9 @@ async function performUpgrade(
 	useBeta: boolean,
 	cleanup: boolean,
 	assumeYes: boolean,
-): Promise<void> {
+	dryRun: boolean,
+	force: boolean,
+): Promise<UpdateStats | null> {
 	console.log(pc.dim("Fetching latest release from GitHub..."));
 
 	const releases = await fetchReleases();
@@ -245,7 +262,7 @@ async function performUpgrade(
 
 	if (localVersion === latest.version) {
 		console.log(pc.green(`Already up to date (v${latest.version}).`));
-		return;
+		return null;
 	}
 
 	console.log(`Upgrading: ${pc.dim(localVersion ?? "none")} → ${pc.cyan(latest.version)}`);
@@ -268,6 +285,19 @@ async function performUpgrade(
 			geminiApiKey: null,
 		};
 
+		// Before the first write of the run: a copy of everything the release
+		// could overwrite, plus the v2 descriptor the migration below replaces.
+		// A dry run takes none, because it writes nothing to recover from.
+		const snapshot = dryRun
+			? null
+			: createSnapshot(process.cwd(), "upgrade", [
+					".claude",
+					...(legacyDescriptorPath(process.cwd()) === null ? [] : [LEGACY_DESCRIPTOR_REL]),
+				]);
+		if (snapshot !== null) {
+			console.log(pc.dim(`Snapshot ${snapshot.id} — ${snapshot.fileCount} file(s); restore with \`mewkit backups restore ${snapshot.id}\``));
+		}
+
 		// Pack-aware upgrade: a partial install upgrades only its installed packs;
 		// removed packs stay removed. Corrupt/absent metadata (or a legacy/full
 		// install with `packs` undefined) falls through to a full upgrade — never
@@ -287,7 +317,7 @@ async function performUpgrade(
 				? resolvePacks(claudeSrc, loadPackManifest(claudeSrc), installedPacks)
 				: undefined;
 
-		const stats = await smartUpdate(config, sourceDir, process.cwd(), /* dryRun */ false, /* force */ false, {
+		const stats = await smartUpdate(config, sourceDir, process.cwd(), dryRun, force, {
 			cleanup,
 			assumeYes,
 			allowedPaths,
@@ -296,7 +326,7 @@ async function performUpgrade(
 		});
 
 		console.log();
-		console.log(pc.green(pc.bold("Upgrade complete!")));
+		console.log(pc.green(pc.bold(dryRun ? "Upgrade plan (nothing was written)" : "Upgrade complete!")));
 		console.log(`  ${pc.dim("Before:")} ${localVersion ?? "not installed"}`);
 		console.log(`  ${pc.dim("After:")}  ${latest.version}`);
 		console.log();
@@ -328,14 +358,42 @@ async function performUpgrade(
 			);
 		}
 
-		// Propagate the upgrade to any installed downstream provider toolkits.
-		await reMigrateInstalledProviders(process.cwd());
+		if (!dryRun) {
+			migrateLegacyDescriptor(process.cwd());
+
+			// Propagate the upgrade to any installed downstream provider toolkits.
+			await reMigrateInstalledProviders(process.cwd());
+		}
+		return stats;
 	} finally {
+		// The local kit copy is written BEFORE the download is removed: the
+		// temp directory is the only place the kit's own bytes exist, and every
+		// later deletion decision is checked against them. A dry run leaves the
+		// existing cache alone, because it installed nothing.
+		try {
+			if (!dryRun) populateKitCache(sourceDir, process.cwd(), latest.version);
+		} catch (err: unknown) {
+			console.log(pc.yellow(`  Could not write the local kit copy: ${err instanceof Error ? err.message : String(err)}`));
+			console.log(pc.dim("  `mewkit uninstall` will refuse to delete until `mewkit upgrade` succeeds in writing it."));
+		}
 		cleanupDownload(sourceDir);
 	}
 }
 
 export async function upgrade(args: UpgradeArgs): Promise<void> {
+	const json = args.json === true;
+	if (json) beginMachineOutput();
+	/** One envelope per run, whichever of this command's several ends is reached. */
+	const emit = envelopeEmitter(json);
+	const noChange = (note: string): MutationReport => ({
+		ok: true,
+		command: "upgrade",
+		dryRun: args.dryRun === true,
+		planned: [],
+		applied: [],
+		notes: [note],
+	});
+
 	// Provider-only project(s) (`init --target codex` / `init --target cursor`): no
 	// `.claude/` to update — refresh whichever authored bundle(s) are present instead of the
 	// release flow. A project can have more than one provider-only bundle installed with no
@@ -348,6 +406,7 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 		if (hasCodex || hasCursor) {
 			if (hasCodex) await upgradeCodexToolkit(cwd);
 			if (hasCursor) await upgradeCursorToolkit(cwd);
+			emit(() => noChange("refreshed the authored provider bundle(s); this project has no .claude/"));
 			return;
 		}
 	}
@@ -365,19 +424,43 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 	try {
 		if (args.list) {
 			await listReleases(localVersion);
+			emit(() => noChange("listed the available releases; nothing was changed"));
 			return;
 		}
 
 		if (args.check) {
 			await checkVersion(localVersion, useBeta);
+			emit(() => noChange("reported the installed version against the channel; nothing was changed"));
 			return;
 		}
 
-		await performUpgrade(
+		// `--force` overwrites files this project has edited, so it is one of the
+		// four destructive invocations: in a session with no terminal to confirm
+		// in it previews and stops rather than acting on an unseen plan.
+		if (args.force === true && needsConfirmation({ assumeYes: args.yes === true, interactive: args.interactive !== false })) {
+			console.log(pc.yellow(confirmationRequiredMessage("upgrade --force")));
+			const preview = await performUpgrade(localVersion, useBeta, args.noCleanup !== true, true, /* dryRun */ true, /* force */ true);
+			process.exitCode = EXIT_NEEDS_CONFIRMATION;
+			emit(() =>
+				preview === null
+					? noChange("already up to date; nothing was changed")
+					: installMutationReport("upgrade", preview, true, ["--force needs confirmation: this is the plan, nothing was written"]),
+			);
+			return;
+		}
+
+		const stats = await performUpgrade(
 			localVersion,
 			useBeta,
 			/* cleanup */ args.noCleanup !== true,
 			/* assumeYes */ args.yes === true,
+			/* dryRun */ args.dryRun === true,
+			/* force */ args.force === true,
+		);
+		emit(() =>
+			stats === null
+				? noChange("already up to date; nothing was changed")
+				: installMutationReport("upgrade", stats, args.dryRun === true, [`from ${localVersion ?? "not installed"}`]),
 		);
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err);

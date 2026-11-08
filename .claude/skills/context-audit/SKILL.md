@@ -127,7 +127,7 @@ Steps:
 
 The 10% / 25% thresholds are the canonical source of truth for token-overhead
 banners — see `references/token-cost-model.md`. They are NOT linked to
-`MEOWKIT_BUDGET_*` env vars (those are USD amounts, not token percentages).
+the `budget.*` config keys (those are USD amounts, not token percentages).
 
 ## Integration Points
 

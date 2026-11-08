@@ -128,13 +128,23 @@ export const NORMALIZERS: Record<string, (text: string, projectDir: string) => s
  */
 export const selfPath = (text: string) => text.replace(/([\w./-]+)\.cjs\b/g, '$1.sh');
 
-export function replay(fixture: Fixture): ReplayResult {
+/**
+ * `seed` runs after the fixture's own setup and before the hook is launched, so
+ * a caller can add a file the recording never had — a hostile project config,
+ * say — without a second copy of the recipe the recorder used.
+ */
+export interface ReplayOptions {
+  seed?: (projectDir: string, home: string) => void;
+}
+
+export function replay(fixture: Fixture, options: ReplayOptions = {}): ReplayResult {
   const testCase = caseFor(fixture.name);
   const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mk-hook-replay-'));
   copyTree(projectDir);
   const home = path.join(projectDir, 'home');
   fs.mkdirSync(home, { recursive: true });
   testCase.setup({ projectDir, home, ext: '.cjs' });
+  options.seed?.(projectDir, home);
 
   const env: Record<string, string> = {};
   for (const [k, v] of Object.entries(fixture.env)) {

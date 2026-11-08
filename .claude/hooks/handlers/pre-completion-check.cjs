@@ -21,6 +21,7 @@ const path = require('node:path');
 const { validateGate2 } = require('../lib/validate-gate-2.cjs');
 const V = require('../lib/gate2-verdict-lookup.cjs');
 const { telemetryDir } = require('../lib/meowkit-paths.cjs');
+const { configValue } = require('../lib/read-config.cjs');
 
 const ATTEMPTS_REL = 'session-state/precompletion-attempts.json';
 const REQUIRED_REL = 'session-state/verification-required.json';
@@ -90,9 +91,9 @@ const blockDecision = (reason) => ({ stdout: `${JSON.stringify({ decision: 'bloc
 
 module.exports = function preCompletionCheck(ctx) {
   const root = ctx.root;
-  if (process.env.MEOWKIT_PRECOMPLETION === 'off') return null;
-
-  const density = process.env.MEOWKIT_AUTOBUILD_MODE || '';
+  // Switching this observer off is the dispatcher's job:
+  // `hooks.pre-completion-check: false` removes the registration.
+  const density = String(configValue('autobuild.mode', '', { root }).value);
   if (density === 'MINIMAL') return null;
   if (density === 'LEAN') {
     return { stderr: 'Note: verification not enforced in LEAN mode. Ensure you ran tests / evaluator before stopping.\n' };

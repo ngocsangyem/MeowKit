@@ -3,7 +3,7 @@
 //   track per-file edit count, warn at 4, escalate at 8.
 //
 // State: session-state/edit-counts.json keyed by {session_id}:{filepath}
-// Env: MEOWKIT_LOOP_DETECT=off — skip entirely
+// Off switch: `hooks.loop-detection: false` in the project config.
 //
 // NOTE: Trace emission (append-trace.cjs) intentionally omitted from Node.js port.
 // Shell version's trace records are not consumed by any downstream system currently.
@@ -13,9 +13,9 @@ const path = require('path');
 const WARN_THRESHOLD = 4;
 const ESCALATE_THRESHOLD = 8;
 
+// Switching this observer off is the dispatcher's job: `hooks.loop-detection:
+// false` removes the registration before the handler is ever loaded.
 module.exports = function loopDetection(ctx, state) {
-  if (process.env.MEOWKIT_LOOP_DETECT === 'off') return '';
-
   const filePath = ctx.tool_input?.file_path;
   if (!filePath) return '';
 

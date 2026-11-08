@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import pc from "picocolors";
 import { MewkitMigrateError, runMigrate } from "../migrate/migrate-orchestrator.js";
+import { beginMachineOutput, endMachineOutput, jsonEmitted, printMutationJson } from "../core/mutation-report.js";
 import type { MigrateOptions } from "../migrate/types.js";
 export interface MigrateCliArgs {
 	_: string[];
@@ -26,6 +27,7 @@ export interface MigrateCliArgs {
 	"all-rules"?: boolean;
 	"include-mcp"?: boolean;
 	"include-unportable"?: boolean;
+	json?: boolean;
 }
 
 export async function migrate(args: MigrateCliArgs): Promise<number> {
@@ -33,6 +35,7 @@ export async function migrate(args: MigrateCliArgs): Promise<number> {
 
 	const options: MigrateOptions = {
 		tool,
+		json: args.json,
 		all: args.all,
 		global: args.global,
 		yes: args.yes,
@@ -57,15 +60,38 @@ export async function migrate(args: MigrateCliArgs): Promise<number> {
 	const __dirname = dirname(fileURLToPath(import.meta.url));
 	const bundledKitDir = join(__dirname, "..", "..", ".claude");
 
+	// `--json`: the plan narrates on stderr for the whole run so stdout carries
+	// the envelope alone. The run can also end before the plan exists — a refused
+	// tool, a cancelled confirm, a throw — so whichever return is reached, exactly
+	// one envelope is printed.
+	if (args.json === true) beginMachineOutput();
+	const finish = (exitCode: number, error?: string): number => {
+		if (args.json === true) {
+			if (!jsonEmitted()) {
+				printMutationJson({
+					ok: exitCode === 0,
+					command: "migrate",
+					dryRun: args["dry-run"] === true,
+					planned: [],
+					applied: [],
+					notes: [],
+					...(error === undefined ? {} : { error, fix: "Re-run `mewkit migrate <tool>` once the reason above is resolved." }),
+				});
+			}
+			endMachineOutput();
+		}
+		return exitCode;
+	};
+
 	try {
-		return await runMigrate(options, { bundledKitDir, argv: process.argv.slice(2) });
+		return finish(await runMigrate(options, { bundledKitDir, argv: process.argv.slice(2) }));
 	} catch (err) {
 		if (err instanceof MewkitMigrateError) {
 			console.error(pc.red(err.message));
-			return err.exitCode;
+			return finish(err.exitCode, err.message);
 		}
 		const msg = err instanceof Error ? err.message : String(err);
 		console.error(pc.red(`Migrate failed: ${msg}`));
-		return 1;
+		return finish(1, msg);
 	}
 }

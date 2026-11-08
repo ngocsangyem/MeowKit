@@ -8,17 +8,36 @@
 #
 # Exit:
 #   0  — under warn threshold
-#   1  — over warn threshold ($30 default)
-#   2  — over hard block threshold ($100 default)
-#   3  — over user-set --budget cap (read from MEOWKIT_BUDGET_CAP env var)
+#   1  — over warn threshold (budget.warn, $30 default)
+#   2  — over hard block threshold (budget.block, $100 default)
+#   3  — over the user cap (budget.cap; 0 means no cap)
 #
-# Reqs: Bash 3.2+, awk. No external deps.
+# All three thresholds are USD and come from .meowkit/config.yaml, which is the
+# one place they are written. A shell cannot parse YAML, so they are resolved
+# through the hook-side reader; without node the documented defaults apply.
+#
+# Reqs: Bash 3.2+, awk. node for the config read, optional.
 set -u
 
+# The reader ships beside this script, in the kit. Which PROJECT it answers for
+# is CLAUDE_PROJECT_DIR, or the working directory, and the reader resolves that
+# itself — so a kit invoked from outside its own tree still reads the right file.
+config_reader="$(dirname "$0")/../../../hooks/lib/config-get.cjs"
+
+# One resolved config value, or the fallback. A cost brake must not fail shut on
+# an unreadable config, so every failure path prints the default and carries on.
+config_get() {
+  if command -v node >/dev/null 2>&1 && [ -f "$config_reader" ]; then
+    node "$config_reader" "$1" "$2" 2>/dev/null || printf '%s\n' "$2"
+  else
+    printf '%s\n' "$2"
+  fi
+}
+
 cost_log="${MEOWKIT_COST_LOG:-.meowkit/telemetry/cost-log.json}"
-warn_threshold="${MEOWKIT_BUDGET_WARN:-30}"
-block_threshold="${MEOWKIT_BUDGET_BLOCK:-100}"
-user_cap="${MEOWKIT_BUDGET_CAP:-0}"  # 0 = no user cap
+warn_threshold=$(config_get budget.warn 30)
+block_threshold=$(config_get budget.block 100)
+user_cap=$(config_get budget.cap 0)  # 0 = no user cap
 run_id="${MEOWKIT_RUN_ID:-current}"
 
 # Ensure cost log exists
@@ -93,7 +112,7 @@ case "${1:-check}" in
     ;;
 
   -h|--help)
-    sed -n '2,17p' "$0"
+    sed -n '2,19p' "$0"
     exit 0
     ;;
 

@@ -1,0 +1,9 @@
+*
+!.gitignore
+!config.yaml
+!.env.example
+!mcp.json.example
+!bin/
+!bin/mewkit
+!memory/
+!memory/*.md

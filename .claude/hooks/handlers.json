@@ -1,35 +1,35 @@
 {
   "schema": 2,
-  "comment": "One entry per observer. `matcher` is present only for tool-scoped events, because the others have nothing to match on. `toggleKey` is declared here now and read from project configuration later; nothing switches off yet. The write guards are deliberately absent: they are registered directly and must never run through a fail-open dispatcher.",
+  "comment": "One entry per observer. `matcher` is present only for tool-scoped events, because the others have nothing to match on. `toggleKey` is the key that switches the entry off in the project config, and it is the handler file's base name so the registry entry IS the config key — nothing to translate and nothing to drift. One key covers every registration of the same handler. The write guards are deliberately absent: they are registered directly and must never run through a fail-open dispatcher.",
   "handlers": [
-    { "event": "PreToolUse", "matcher": "Bash", "handler": "./handlers/pre-task-check.cjs", "toggleKey": "preTaskCheck" },
+    { "event": "PreToolUse", "matcher": "Bash", "handler": "./handlers/pre-task-check.cjs", "toggleKey": "pre-task-check" },
 
-    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/build-verify.cjs", "toggleKey": "buildVerify" },
-    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/loop-detection.cjs", "toggleKey": "loopDetection" },
-    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/budget-tracker.cjs", "toggleKey": "budgetTracker" },
-    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/auto-checkpoint.cjs", "toggleKey": "autoCheckpoint" },
-    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/learning-observer.cjs", "toggleKey": "learningObserver" },
-    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/post-write.cjs", "toggleKey": "postWrite" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/build-verify.cjs", "toggleKey": "build-verify" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/loop-detection.cjs", "toggleKey": "loop-detection" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/budget-tracker.cjs", "toggleKey": "budget-tracker" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/auto-checkpoint.cjs", "toggleKey": "auto-checkpoint" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/learning-observer.cjs", "toggleKey": "learning-observer" },
+    { "event": "PostToolUse", "matcher": "Edit|Write", "handler": "./handlers/post-write.cjs", "toggleKey": "post-write" },
 
-    { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/budget-tracker.cjs", "toggleKey": "budgetTracker" },
-    { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/review-evidence-tag.cjs", "toggleKey": "reviewEvidenceTag" },
+    { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/budget-tracker.cjs", "toggleKey": "budget-tracker" },
+    { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/review-evidence-tag.cjs", "toggleKey": "review-evidence-tag" },
 
-    { "event": "Stop", "handler": "./handlers/checkpoint-writer.cjs", "toggleKey": "checkpointWriter" },
-    { "event": "Stop", "handler": "./handlers/post-session.cjs", "toggleKey": "postSession" },
-    { "event": "Stop", "handler": "./handlers/control-probe.cjs", "toggleKey": "controlProbe" },
-    { "event": "Stop", "handler": "./handlers/pre-completion-check.cjs", "toggleKey": "preCompletionCheck" },
+    { "event": "Stop", "handler": "./handlers/checkpoint-writer.cjs", "toggleKey": "checkpoint-writer" },
+    { "event": "Stop", "handler": "./handlers/post-session.cjs", "toggleKey": "post-session" },
+    { "event": "Stop", "handler": "./handlers/control-probe.cjs", "toggleKey": "control-probe" },
+    { "event": "Stop", "handler": "./handlers/pre-completion-check.cjs", "toggleKey": "pre-completion-check" },
 
-    { "event": "SessionStart", "handler": "./handlers/model-detector.cjs", "toggleKey": "modelDetector" },
-    { "event": "SessionStart", "handler": "./handlers/orientation-ritual.cjs", "toggleKey": "orientationRitual" },
-    { "event": "SessionStart", "handler": "./handlers/project-context-loader.cjs", "toggleKey": "projectContextLoader" },
-    { "event": "SessionStart", "handler": "./handlers/jira-env-loader.cjs", "toggleKey": "jiraEnvLoader" },
-    { "event": "SessionStart", "handler": "./handlers/capability-bootstrap.cjs", "toggleKey": "capabilityBootstrap" },
+    { "event": "SessionStart", "handler": "./handlers/model-detector.cjs", "toggleKey": "model-detector" },
+    { "event": "SessionStart", "handler": "./handlers/orientation-ritual.cjs", "toggleKey": "orientation-ritual" },
+    { "event": "SessionStart", "handler": "./handlers/project-context-loader.cjs", "toggleKey": "project-context-loader" },
+    { "event": "SessionStart", "handler": "./handlers/jira-env-loader.cjs", "toggleKey": "jira-env-loader" },
+    { "event": "SessionStart", "handler": "./handlers/capability-bootstrap.cjs", "toggleKey": "capability-bootstrap" },
 
-    { "event": "UserPromptSubmit", "handler": "./handlers/safety-sentinel-inject.cjs", "toggleKey": "safetySentinelInject" },
-    { "event": "UserPromptSubmit", "handler": "./handlers/tdd-flag-detector.cjs", "toggleKey": "tddFlagDetector" },
+    { "event": "UserPromptSubmit", "handler": "./handlers/safety-sentinel-inject.cjs", "toggleKey": "safety-sentinel-inject" },
+    { "event": "UserPromptSubmit", "handler": "./handlers/tdd-flag-detector.cjs", "toggleKey": "tdd-flag-detector" },
 
-    { "event": "PreCompact", "handler": "./handlers/precompact-probe.cjs", "toggleKey": "precompactProbe" },
+    { "event": "PreCompact", "handler": "./handlers/precompact-probe.cjs", "toggleKey": "precompact-probe" },
 
-    { "event": "PostToolUseFailure", "handler": "./handlers/posttoolfailure-probe.cjs", "toggleKey": "posttoolfailureProbe" }
+    { "event": "PostToolUseFailure", "handler": "./handlers/posttoolfailure-probe.cjs", "toggleKey": "posttoolfailure-probe" }
   ]
 }

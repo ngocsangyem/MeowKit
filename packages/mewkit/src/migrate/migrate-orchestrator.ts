@@ -59,6 +59,7 @@ import {
 	formatMcpIncludeRerunCommand,
 	printActionDetails,
 	printFinalSummary,
+	emitMigrateJson,
 	printPreflight,
 	printReportPath,
 } from "./migrate-ui-summary.js";
@@ -280,7 +281,9 @@ async function runMigrateUnderLock(
 		printActionDetails(portabilityFiltered.plan.actions);
 		console.log();
 		console.log(pc.dim("(dry run — no files written)"));
-		return conversionReport.validationErrors.length > 0 ? 1 : 0;
+		const ok = conversionReport.validationErrors.length > 0 ? 1 : 0;
+		if (options.json) emitMigrateJson(portabilityFiltered.plan.actions, [], { dryRun: true, ok: ok === 0, notes: conversionReport.validationErrors });
+		return ok;
 	}
 
 	if (conversionReport.validationErrors.length > 0) {
@@ -426,6 +429,9 @@ async function runMigrateUnderLock(
 		const hasFailures = executed.results.some((r) => !r.success);
 		if (!hasFailures && manifest) {
 			await updateAppliedManifestVersion(manifest.mewkitVersion);
+		}
+		if (options.json) {
+			emitMigrateJson(portabilityFiltered.plan.actions, executed.results, { dryRun: false, ok: !hasFailures && !mcpFailed });
 		}
 		return hasFailures || mcpFailed ? 1 : 0;
 	} finally {

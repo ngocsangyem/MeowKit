@@ -310,7 +310,7 @@ The toolkit has a thin Agile governance layer. Three rules live in `.claude/rule
 
 - Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
 - Active plan frontmatter has non-empty `jira_tickets:`
-- `MEOW_JIRA_BASE_URL` env var set
+- `MEOW_JIRA_SITE_URL` env var set
 - Last user message matches `[A-Z]{2,10}-\d+`
 
 **Sprint-state contracts:** sprint-LEVEL state lives at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Template: `mk:sprint-contract/assets/sprint-state-template.md`. Concurrent writes require `flock`; YAML append is non-atomic across shells. The existing `validate-contract.cjs` does NOT validate sprint-state files (different schema by design).

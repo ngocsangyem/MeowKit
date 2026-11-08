@@ -1,13 +1,5 @@
 {
   "env": {
-    "MEOWKIT_TDD": "0",
-    "MEOWKIT_BUILD_VERIFY": "on",
-    "MEOWKIT_LOOP_DETECT": "on",
-    "MEOWKIT_PRECOMPLETION": "on",
-    "MEOWKIT_TDD_FLAG_DETECTOR": "on",
-    "MEOWKIT_MEMORY_BUDGET": "4000",
-    "MEOWKIT_BUDGET_WARN": "30",
-    "MEOWKIT_BUDGET_BLOCK": "100",
     "CLAUDE_CODE_FORK_SUBAGENT": "1"
   },
   "statusLine": {

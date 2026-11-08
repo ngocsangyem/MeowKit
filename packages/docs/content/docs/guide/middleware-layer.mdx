@@ -31,13 +31,15 @@ This is the failure mode the middleware layer was built to interrupt. Without ex
 
 ## Opt-out matrix
 
-| Env var | Effect |
+Set in `.meowkit/config.yaml`, which is the one place these live:
+
+| Setting | Effect |
 |---------|--------|
-| `MEOWKIT_BUILD_VERIFY=off` | Skip build verify |
-| `MEOWKIT_LOOP_DETECT=off` | Skip loop detection |
-| `MEOWKIT_PRECOMPLETION=off` | Skip pre-completion check |
-| `MEOWKIT_AUTOBUILD_MODE=LEAN` | PreCompletion: soft nudge; BuildVerify: still runs |
-| `MEOWKIT_AUTOBUILD_MODE=MINIMAL` | Skip BuildVerify + PreCompletion |
+| `hooks.build-verify: false` | Skip build verify |
+| `hooks.loop-detection: false` | Skip loop detection |
+| `hooks.pre-completion-check: false` | Skip pre-completion check |
+| `autobuild.mode: LEAN` | PreCompletion: soft nudge; BuildVerify: still runs |
+| `autobuild.mode: MINIMAL` | Skip BuildVerify + PreCompletion |
 
 ## Next steps
 

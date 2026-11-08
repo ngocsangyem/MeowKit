@@ -66,7 +66,7 @@ at its old path, or if a destination has no load step naming it.
 
 ### Agile Conditional Rules (`.claude/rules-conditional/`)
 
-Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sprint-state contract present, `jira_tickets:` in plan frontmatter, `MEOW_JIRA_BASE_URL` env, or Jira-key pattern in user prompt). Non-Agile sessions pay zero context cost.
+Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sprint-state contract present, `jira_tickets:` in plan frontmatter, `MEOW_JIRA_SITE_URL` env, or Jira-key pattern in user prompt). Non-Agile sessions pay zero context cost.
 
 | Rule | Purpose | Loaded by |
 | ---- | ------- | --------- |

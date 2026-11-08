@@ -78,7 +78,7 @@ OR-logic: any one match → `mk:agent-detector` Step 0b loads the 3 Agile rules.
 |---|---|---|
 | Sprint-state contract present | Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result | `agile-*.md` |
 | Plan frontmatter `jira_tickets:` non-empty | YAML parse on active plan | `agile-*.md` |
-| `MEOW_JIRA_BASE_URL` env var set | shell env | `agile-*.md` |
+| `MEOW_JIRA_SITE_URL` env var set | shell env | `agile-*.md` |
 | Jira-key pattern in last user message | regex `[A-Z]{2,10}-\d+` | `agile-*.md` |
 
 | Skill subcommand | Triggered by | Effect |

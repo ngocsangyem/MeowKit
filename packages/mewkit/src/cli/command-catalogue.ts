@@ -61,6 +61,17 @@ const COMMANDS = [
 		usage: "note <decisions|gotchas>",
 	},
 	{ name: "docs-manifest", summary: "Generate or drift-check the docs reference manifest" },
+	{
+		name: "uninstall",
+		summary: "Remove the kit's own files; dry-run unless --yes, and never your data",
+		usage: "uninstall [--yes] [--force] [--json] [--dry-run]",
+	},
+	{
+		name: "backups",
+		summary: "List and restore the snapshots the mutating commands take",
+		subcommands: ["list", "restore"],
+		usage: "backups list | backups restore <id>",
+	},
 ];
 
 /** `b`/`s` keep the table readable; the type is the thing most likely to be wrong. */
@@ -101,14 +112,21 @@ const FLAGS: FlagSpec[] = [
 			"context",
 			"visual-plan",
 			"docs-manifest",
+			"backups",
+			"uninstall",
+			"doctor",
+			"init",
+			"setup",
+			"migrate",
+			"upgrade",
 		],
 		"Emit machine-readable JSON",
 	),
-	b("yes", ["upgrade", "pack", "migrate"], "Answer prompts affirmatively"),
+	b("yes", ["init", "upgrade", "pack", "migrate", "uninstall", "backups"], "Answer prompts affirmatively"),
 	b("beta", ["init", "upgrade", "pack"], "Use the beta release channel"),
-	b("dry-run", ["init", "plan", "migrate"], "Print what would happen without writing"),
-	b("force", ["init", "visual-plan", "migrate"], "Overwrite user-edited targets on conflict", {
-		perCommand: { init: "Overwrite an existing `.claude/`" },
+	b("dry-run", ["init", "plan", "migrate", "backups", "uninstall", "upgrade", "setup", "pack"], "Print what would happen without writing"),
+	b("force", ["init", "visual-plan", "migrate", "uninstall", "upgrade"], "Overwrite user-edited targets on conflict", {
+		perCommand: { init: "Overwrite an existing `.claude/`", uninstall: "Also remove kit paths this project has edited" },
 	}),
 
 	// init
@@ -213,6 +231,7 @@ const FLAGS: FlagSpec[] = [
 	b("state", ["doctor"], "Include state taxonomy diagnostics"),
 	b("explain", ["doctor"], "Explain the provenance result rather than summarizing it"),
 	b("hard-gates", ["doctor"], "Live-probe the hard gates (plan, privacy, injection block)"),
+	b("adopt", ["doctor"], "Rebuild the ownership baseline from the local kit cache, or refuse"),
 
 	// task-state
 	s("status", ["task-state", "task"], "Task status: active, blocked, done", {

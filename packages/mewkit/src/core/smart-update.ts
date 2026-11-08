@@ -20,7 +20,10 @@ import {
 } from "./install-metadata.js";
 import { writeInstallMetadata } from "./install-metadata-writer.js";
 import { writeRuntimeDescriptor, resolveInProjectExecutable } from "./hook-runtime.js";
-import { configWritePath } from "../state/resolve-config-path.js";
+import { configWritePath, legacyDescriptorPath } from "../state/resolve-config-path.js";
+import { observerNames } from "../config/observer-names.js";
+import { renderConfigStub } from "../config/write-stub.js";
+import { copyKitMeowkitFiles, writeKitDirGitignore } from "./install-meowkit-dir.js";
 
 export interface UpdateStats {
 	updated: number;
@@ -234,27 +237,27 @@ export async function smartUpdate(
 	// `.claude/rules/*.md`, which the host auto-loads; a root CLAUDE.md in a target project
 	// is the user's own file and is never written, templated or deleted here.
 
-	// config.json template (generated, not from release). Written to the `.meowkit/` state
-	// root; an install still holding the pre-move `.claude/meowkit.config.json` keeps working
-	// through the read fallback until this writes the canonical file.
-	const configDest = configWritePath(dirname(claudeDir));
-	if (!existsSync(configDest) && !existsSync(join(claudeDir, "meowkit.config.json"))) {
+	// The project config. A commented stub per key rather than a descriptor of
+	// values: the file is committed, so an uncommented line has to mean someone
+	// decided something. A project that still carries the v2 `config.json` is
+	// left alone here — `upgrade` migrates it, which is a different operation
+	// from scaffolding a fresh one, and it must snapshot first.
+	const projectRoot = dirname(claudeDir);
+	const configDest = configWritePath(projectRoot);
+	if (!existsSync(configDest) && legacyDescriptorPath(projectRoot) === null) {
 		if (!dryRun) {
 			mkdirSync(dirname(configDest), { recursive: true });
-			const configContent = JSON.stringify(
-				{
-					$schema: "https://meowkit.dev/schema/config.json",
-					version: "1.0.0",
-					project: { description: config.description || "" },
-					features: { costTracking: config.enableCostTracking, memory: config.enableMemory },
-				},
-				null,
-				2,
-			);
-			writeFileSync(configDest, configContent + "\n", "utf-8");
+			writeFileSync(configDest, renderConfigStub(observerNames(projectRoot)), "utf-8");
 		}
 		stats.added++;
 	}
+
+	// The shipped `.meowkit/` members and the deny-all ignore file. The ignore
+	// file is what keeps every machine-written class under `.meowkit/` — the
+	// local kit copy among them — out of a commit, so an install that skipped it
+	// left the one guarantee the deletion path relies on unenforced.
+	stats.added += copyKitMeowkitFiles(sourceDir, projectRoot, dryRun).length;
+	if (writeKitDirGitignore(projectRoot, dryRun)) stats.added++;
 
 	// Write .env with API keys (single read-modify-write cycle). Target `.meowkit/.env`, but
 	// keep editing a pre-move `.claude/.env` when that is the file the project already has —

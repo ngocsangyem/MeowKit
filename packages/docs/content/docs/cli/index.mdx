@@ -60,6 +60,8 @@ Scaffold or update MeowKit in the current project.
 
 | Flag | What it does |
 |---|---|
+| `--json` | Emit machine-readable JSON |
+| `--yes` | Answer prompts affirmatively |
 | `--beta` | Use the beta release channel |
 | `--dry-run` | Print what would happen without writing |
 | `--force` | Overwrite an existing `.claude/` |
@@ -77,8 +79,11 @@ Upgrade MeowKit to the latest version.
 
 | Flag | What it does |
 |---|---|
+| `--json` | Emit machine-readable JSON |
 | `--yes` | Answer prompts affirmatively |
 | `--beta` | Use the beta release channel |
+| `--dry-run` | Print what would happen without writing |
+| `--force` | Overwrite user-edited targets on conflict |
 | `--check` | Report without changing anything |
 | `--list` | List available versions |
 | `--no-cleanup` | Keep the downloaded release directory |
@@ -139,6 +144,8 @@ Guided post-scaffold configuration.
 
 | Flag | What it does |
 |---|---|
+| `--json` | Emit machine-readable JSON |
+| `--dry-run` | Print what would happen without writing |
 | `--skills` `<value>` | Comma-separated skills whose interpreter environment setup should create |
 | `--only` `<value>` | Run a single setup step |
 | `--system-deps` | Install system-level dependencies |
@@ -161,11 +168,13 @@ Subcommands: `provenance`.
 
 | Flag | What it does |
 |---|---|
+| `--json` | Emit machine-readable JSON |
 | `--report` | Print a shareable diagnostic report |
 | `--providers` | Include provider contract diagnostics |
 | `--state` | Include state taxonomy diagnostics |
 | `--explain` | Explain the provenance result rather than summarizing it |
 | `--hard-gates` | Live-probe the hard gates (plan, privacy, injection block) |
+| `--adopt` | Rebuild the ownership baseline from the local kit cache, or refuse |
 
 ### `mewkit status`
 
@@ -259,6 +268,7 @@ Export MeowKit to external coding-agent tools.
 
 | Flag | What it does |
 |---|---|
+| `--json` | Emit machine-readable JSON |
 | `--yes` | Answer prompts affirmatively |
 | `--dry-run` | Print what would happen without writing |
 | `--force` | Overwrite user-edited targets on conflict |
@@ -387,6 +397,7 @@ Subcommands: `list`, `add`, `remove`.
 | `--json` | Emit machine-readable JSON |
 | `--yes` | Answer prompts affirmatively |
 | `--beta` | Use the beta release channel |
+| `--dry-run` | Print what would happen without writing |
 
 ### `mewkit verdict-gate`
 
@@ -405,5 +416,28 @@ Generate or drift-check the docs reference manifest.
 | `--json` | Emit machine-readable JSON |
 | `--check` | Fail when the committed manifest no longer matches the live `.claude/` tree |
 | `--write` | Regenerate the committed manifest |
+
+### `mewkit uninstall`
+
+Remove the kit's own files; dry-run unless --yes, and never your data.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--yes` | Answer prompts affirmatively |
+| `--dry-run` | Print what would happen without writing |
+| `--force` | Also remove kit paths this project has edited |
+
+### `mewkit backups`
+
+List and restore the snapshots the mutating commands take.
+
+Subcommands: `list`, `restore`.
+
+| Flag | What it does |
+|---|---|
+| `--json` | Emit machine-readable JSON |
+| `--yes` | Answer prompts affirmatively |
+| `--dry-run` | Print what would happen without writing |
 
 {/* GENERATED:cli-flags END */}

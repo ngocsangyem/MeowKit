@@ -59,6 +59,39 @@ describe('safety entrypoints read a closed set of environment variables', () => 
     });
   }
 
+  it('reads no project config on any safety path', () => {
+    // The project config is committed, so it is editable by anyone who can open
+    // a pull request. Validating what a guard reads from it would still leave
+    // the guard reading it; the property worth having is that it cannot, and
+    // this is the same closed-set shape that already proves it for environment
+    // variables and dotenv files.
+    //
+    // The gate's own escape hatch is the one exception and is deliberately NOT
+    // the general loader: it has a dedicated single-key reader whose only
+    // vocabulary is `gate1PresenceOnly`, in the USER file outside the repo.
+    for (const entry of Object.keys(ALLOWED)) {
+      const { files } = requireGraph(entry);
+      for (const file of files) {
+        expect(file.source, `${file.rel} (reached from ${entry}) loads the project config`)
+          .not.toMatch(/read-config|config-rules|yaml-subset|js-yaml/);
+      }
+    }
+  });
+
+  it('reaches the committed config only through the single-key hatch reader', () => {
+    // `.meowkit/config.yaml` may be NAMED on a safety path exactly once — by the
+    // hatch reader, for the user-scope file. Any other mention would mean a
+    // second, unreviewed way in.
+    const mentions: string[] = [];
+    for (const entry of Object.keys(ALLOWED)) {
+      const { files } = requireGraph(entry);
+      for (const file of files) {
+        if (/config\.yaml|'config\.yaml'/.test(file.source)) mentions.push(file.rel);
+      }
+    }
+    expect([...new Set(mentions)].sort()).toEqual(['.claude/hooks/lib/gate1-hatch.cjs']);
+  });
+
   it('reads no dotenv file on any safety path', () => {
     for (const entry of Object.keys(ALLOWED)) {
       const { files } = requireGraph(entry);

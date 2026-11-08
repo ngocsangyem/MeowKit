@@ -1,9 +1,17 @@
-import { existsSync, readFileSync, writeFileSync, copyFileSync, appendFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import pc from "picocolors";
+import { changeRecorder, type ChangeRecorder } from "../core/change-recorder.js";
+import type { PlannedChange } from "../core/mutation-report.js";
 import { ensureEnv, findPython, installPipPackages, verifyPackages } from "../core/dependency-installer.js";
 import { formatPackageList } from "../core/skills-dependencies.js";
 import { envSkills, readSkillRequirements, skillEnvDir } from "../core/skill-env.js";
+// The ignore file and the shipped `.meowkit/` members are laid down by the
+// installer too, so they are owned there and re-exported here for the callers
+// that still reach for the constant.
+import { KIT_DIR_GITIGNORE, writeKitDirGitignore } from "../core/install-meowkit-dir.js";
+
+export { KIT_DIR_GITIGNORE };
 
 export type StepName = "skill-envs" | "mcp" | "env" | "gitignore" | "project-context";
 
@@ -11,12 +19,16 @@ export interface StepResult {
 	name: StepName;
 	status: "pass" | "skip" | "fail" | "warn";
 	message: string;
+	/** Every file the step wrote, or would have written under `dryRun`. */
+	changes?: PlannedChange[];
 }
 
-/** Options a step may read. Only the environment step uses any. */
+/** Options a step may read. */
 export interface StepOptions {
 	/** Skills the user named. Empty means create nothing — the default. */
 	skills?: string[];
+	/** Plan only: a step records what it would write and writes none of it. */
+	dryRun?: boolean;
 }
 
 // Default file contents — used when .example files don't exist (no scaffold yet)
@@ -55,24 +67,24 @@ MEOWKIT_GEMINI_API_KEY=
 \n`;
 
 // Mirrors `.meowkit/gitignore.meowkit`; used only when that template is absent.
-// `.meowkit/config.json` and `.meowkit/memory/` are deliberately NOT ignored — both are meant to be committed.
+// Nothing under `.meowkit/` appears here: `.meowkit/.gitignore` is authoritative
+// for that directory, and a second description of the same paths in a second
+// file is a second thing to keep in step.
 const DEFAULT_GITIGNORE = `# MeowKit
 .env
 .env.local
-.meowkit/.env
-.meowkit/telemetry/
-.meowkit/state/
-.meowkit/cache/
-.claude/.env
+session-state/
+tasks/reports/
 .claude/logs/
 \n`;
 
 /** Setup MCP configuration */
-function setupMcp(projectDir: string): StepResult {
+function setupMcp(projectDir: string, options: StepOptions = {}): StepResult {
 	const mcpTarget = join(projectDir, ".mcp.json");
+	const w = changeRecorder(projectDir, options.dryRun === true);
 
 	if (existsSync(mcpTarget)) {
-		return { name: "mcp", status: "skip", message: ".mcp.json already exists" };
+		return { name: "mcp", status: "skip", message: ".mcp.json already exists", changes: w.changes };
 	}
 
 	// Copy from example if available, otherwise create with defaults
@@ -81,30 +93,28 @@ function setupMcp(projectDir: string): StepResult {
 	const mcpExample = existsSync(canonicalMcpExample)
 		? canonicalMcpExample
 		: join(projectDir, ".claude", "mcp.json.example");
-	if (existsSync(mcpExample)) {
-		copyFileSync(mcpExample, mcpTarget);
-	} else {
-		writeFileSync(mcpTarget, DEFAULT_MCP, "utf-8");
-	}
-	return { name: "mcp", status: "pass", message: "Created .mcp.json — edit API keys inside." };
+	if (existsSync(mcpExample)) w.copy(mcpExample, mcpTarget);
+	else w.write(mcpTarget, DEFAULT_MCP);
+	return { name: "mcp", status: "pass", message: "Created .mcp.json — edit API keys inside.", changes: w.changes };
 }
 
 /** Setup `.meowkit/.env`. A pre-move `.claude/.env` still counts as configured — the loaders
  *  read both — so this never overwrites or duplicates an existing setup. */
-function setupEnv(projectDir: string): StepResult {
+function setupEnv(projectDir: string, options: StepOptions = {}): StepResult {
 	const envTarget = join(projectDir, ".meowkit", ".env");
 	const legacyEnv = join(projectDir, ".claude", ".env");
+	const w = changeRecorder(projectDir, options.dryRun === true);
 
 	for (const existing of [envTarget, legacyEnv]) {
 		if (!existsSync(existing)) continue;
 		if (readFileSync(existing, "utf-8").trim().length > 0) {
-			return { name: "env", status: "skip", message: `${relative(projectDir, existing)} already exists` };
+			return { name: "env", status: "skip", message: `${relative(projectDir, existing)} already exists`, changes: w.changes };
 		}
 	}
 
-	mkdirSync(join(projectDir, ".meowkit"), { recursive: true });
-	writeFileSync(envTarget, DEFAULT_ENV, "utf-8");
-	return { name: "env", status: "pass", message: "Created .meowkit/.env — add your API keys." };
+	w.mkdir(join(projectDir, ".meowkit"));
+	w.write(envTarget, DEFAULT_ENV);
+	return { name: "env", status: "pass", message: "Created .meowkit/.env — add your API keys.", changes: w.changes };
 }
 
 /**
@@ -128,35 +138,69 @@ export function stripStaleMemoryIgnore(content: string): { content: string; stri
 	return { content: kept.join("\n"), stripped: true };
 }
 
-/** Setup .gitignore with MeowKit entries */
-function setupGitignore(projectDir: string): StepResult {
-	const gitignore = join(projectDir, ".gitignore");
+/**
+ * Strip the per-class `.meowkit/*` ignores the deny-all file supersedes.
+ *
+ * Same shape and same reason as the memory-line strip above: a project set up by
+ * the previous version carries lines that now describe the same paths twice, and
+ * two descriptions of one path is one of them going stale. A line a user negated
+ * with `!` is left alone — that is a decision, not a leftover.
+ */
+export function stripSupersededMeowkitIgnores(content: string): { content: string; stripped: string[] } {
+	const superseded = /^\s*\.?\/?\.meowkit\/(?:telemetry|state|cache|envs|backups)\/?\*{0,2}\s*$|^\s*\.?\/?\.meowkit\/\.env\s*$/;
+	const lines = content.split("\n");
+	const stripped: string[] = [];
+	const kept = lines.filter((line) => {
+		if (line.trimStart().startsWith("!")) return true;
+		if (!superseded.test(line)) return true;
+		stripped.push(line.trim());
+		return false;
+	});
+	if (stripped.length === 0) return { content, stripped };
+	return { content: kept.join("\n"), stripped };
+}
 
-	// Check if already has MeowKit entries
+/** Setup both ignore files: the deny-all one for `.meowkit/`, and the root one. */
+function setupGitignore(projectDir: string, options: StepOptions = {}): StepResult {
+	const gitignore = join(projectDir, ".gitignore");
+	const w = changeRecorder(projectDir, options.dryRun === true);
+	const wroteInner = writeKitDirGitignore(projectDir, w.dryRun);
+	const notes: string[] = [];
+	if (wroteInner) {
+		w.record("create", join(projectDir, ".meowkit", ".gitignore"));
+		notes.push("Wrote .meowkit/.gitignore (deny-all + the shared allowlist)");
+	}
+
 	if (existsSync(gitignore)) {
 		let content = readFileSync(gitignore, "utf-8");
-		// BEFORE the skip: a stale memory ignore has to go even when everything else is present.
-		const stripped = stripStaleMemoryIgnore(content);
-		if (stripped.stripped) {
-			writeFileSync(gitignore, stripped.content, "utf-8");
-			content = stripped.content;
+		// BEFORE the skip: a stale or superseded line has to go even when everything else is present.
+		const memory = stripStaleMemoryIgnore(content);
+		if (memory.stripped) {
+			content = memory.content;
+			notes.push("Removed the stale .meowkit/memory/ ignore — the v3 team store is committed");
 		}
-		if (content.includes(".meowkit/telemetry/")) {
+		const superseded = stripSupersededMeowkitIgnores(content);
+		if (superseded.stripped.length) {
+			content = superseded.content;
+			notes.push(`Removed ${superseded.stripped.length} .meowkit/ line(s) now covered by .meowkit/.gitignore`);
+		}
+		if (memory.stripped || superseded.stripped.length) w.write(gitignore, content);
+		if (content.includes("session-state/")) {
 			return {
 				name: "gitignore",
-				status: stripped.stripped ? "pass" : "skip",
-				message: stripped.stripped
-					? "Removed the stale .meowkit/memory/ ignore — the v3 team store is committed"
-					: "MeowKit entries already in .gitignore",
+				status: notes.length ? "pass" : "skip",
+				message: notes.length ? notes.join("; ") : "MeowKit entries already in .gitignore",
+				changes: w.changes,
 			};
 		}
 	}
 
-	// Read from .gitignore.meowkit if exists, otherwise use defaults
+	// Read from the shipped template if it exists, otherwise use defaults.
 	const meowkitIgnore = join(projectDir, ".meowkit", "gitignore.meowkit");
 	const additions = existsSync(meowkitIgnore) ? readFileSync(meowkitIgnore, "utf-8") : DEFAULT_GITIGNORE;
-	appendFileSync(gitignore, `\n${additions}`, "utf-8");
-	return { name: "gitignore", status: "pass", message: "Appended MeowKit entries to .gitignore" };
+	w.append(gitignore, `\n${additions}`);
+	notes.push("Appended MeowKit entries to .gitignore");
+	return { name: "gitignore", status: "pass", message: notes.join("; "), changes: w.changes };
 }
 
 /**
@@ -204,6 +248,7 @@ async function setupSkillEnvs(projectDir: string, options: StepOptions = {}): Pr
 
 	const created: string[] = [];
 	const installed: string[] = [];
+	const w: ChangeRecorder = changeRecorder(projectDir, options.dryRun === true);
 	for (const skill of requested) {
 		const envDir = skillEnvDir(projectDir, skill);
 		const req = readSkillRequirements(projectDir, skill);
@@ -215,11 +260,28 @@ async function setupSkillEnvs(projectDir: string, options: StepOptions = {}): Pr
 			};
 		}
 
+		// A dry run reports the environment and the pins and creates neither: an
+		// interpreter environment is the largest thing setup writes.
+		if (w.dryRun) {
+			if (!existsSync(envDir)) {
+				w.record("create", envDir, "interpreter environment");
+				created.push(skill);
+			}
+			if (req.packages.length) {
+				w.record("install", envDir, `${req.packages.length} package(s) for ${skill}`);
+				installed.push(`${skill} (${req.packages.length})`);
+			}
+			continue;
+		}
+
 		try {
 			const { created: made, repaired } = ensureEnv(projectDir, envDir);
-			if (made || repaired) created.push(skill);
+			if (made || repaired) {
+				w.record("create", envDir, "interpreter environment");
+				created.push(skill);
+			}
 		} catch (err) {
-			return { name: "skill-envs", status: "fail", message: `${skill}: ${err instanceof Error ? err.message : String(err)}` };
+			return { name: "skill-envs", status: "fail", message: `${skill}: ${err instanceof Error ? err.message : String(err)}`, changes: w.changes };
 		}
 
 		if (!req.packages.length) continue;
@@ -231,16 +293,17 @@ async function setupSkillEnvs(projectDir: string, options: StepOptions = {}): Pr
 		const results = await installPipPackages(projectDir, envDir, missing);
 		const failed = results.filter((r) => !r.success);
 		if (failed.length) {
-			return { name: "skill-envs", status: "warn", message: `${skill}: ${failed.length} of ${results.length} package(s) failed` };
+			return { name: "skill-envs", status: "warn", message: `${skill}: ${failed.length} of ${results.length} package(s) failed`, changes: w.changes };
 		}
+		w.record("install", envDir, `${results.length} package(s) for ${skill}`);
 		installed.push(`${skill} (${results.length})`);
 	}
 
 	if (!created.length && !installed.length) {
-		return { name: "skill-envs", status: "skip", message: `Already configured: ${requested.join(", ")}` };
+		return { name: "skill-envs", status: "skip", message: `Already configured: ${requested.join(", ")}`, changes: w.changes };
 	}
 	const parts = [created.length ? `created ${created.join(", ")}` : "", installed.length ? `installed ${installed.join(", ")}` : ""].filter(Boolean);
-	return { name: "skill-envs", status: "pass", message: parts.join("; ") };
+	return { name: "skill-envs", status: "pass", message: parts.join("; "), changes: w.changes };
 }
 
 function setupProjectContext(projectDir: string): StepResult {

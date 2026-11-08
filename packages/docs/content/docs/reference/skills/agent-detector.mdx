@@ -171,7 +171,7 @@ After loading the 5 phase-zero rules, Step 0b checks for an Agile context and co
 |-----------|-----------|
 | Sprint-state contract present | Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result |
 | Active plan frontmatter | Non-empty `jira_tickets:` |
-| Env var | `MEOW_JIRA_BASE_URL` set |
+| Env var | `MEOW_JIRA_SITE_URL` set |
 | User prompt | Last user message matches `[A-Z]{2,10}-\d+` |
 
 **Load:** if Agile context detected, `Read` each of the 3 rules. Per-file Read failure → log and skip THAT rule; do NOT abort Step 0b.

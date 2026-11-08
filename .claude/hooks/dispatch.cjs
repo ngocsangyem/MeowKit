@@ -59,7 +59,7 @@ async function main() {
 
   let selected;
   try {
-    selected = selectHandlers(loadRegistry(ROOT), event, matcher);
+    selected = selectHandlers(loadRegistry(ROOT), event, matcher, { root: ROOT });
   } catch (err) {
     // No registry means no observers to run. Report it and stand aside: the
     // guards are registered independently and are unaffected.

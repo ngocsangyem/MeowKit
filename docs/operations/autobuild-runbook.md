@@ -32,7 +32,7 @@ The autobuild workflow picks the right scaffolding density based on your model t
 | `--budget USD` | `50` | Hard cap on total run cost (overrides default $100 hard block) |
 | `--no-boot` | (off) | Skip the boot-app step (target must be a running URL) |
 | `--teams` | (off) | Use Agent Teams for live generator↔evaluator coupling |
-| `--resume RUN_ID` * | — | Resume a killed run from the last completed step *(partial in v1.0 — may require `MEOWKIT_HARNESS_RESUME_STEP=N`; see Limitations)* |
+| `--resume RUN_ID` * | — | Resume a killed run from the last completed step *(partial in v1.0 — the step entry point is picked by hand; see Limitations)* |
 
 ## Density Modes
 
@@ -138,7 +138,7 @@ The autobuild workflow reads `tasks/autobuild-runs/{run-id}/run.md` to find the 
 - **Cannot judge audio** — no audio analysis in the rubric library yet
 - **Cannot judge highly subjective taste** without rubric anchors — if the project has unique aesthetic constraints, write a custom rubric
 - **Cannot execute closed-source binaries** — the active-verification gate needs source-runnable build
-- **`--resume` is partial in v1.0** — iteration counter resumes correctly, but step entry-point detection is manual; you may need to set `MEOWKIT_HARNESS_RESUME_STEP=N` to skip already-completed steps
+- **`--resume` is partial in v1.0** — the iteration counter resumes correctly, but step entry-point detection is manual: name the step to restart from when you re-invoke the run
 - **Spike plans (`--spike`) are INCOMPATIBLE with `mk:autobuild` FULL density mode.** Harness FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with a sprint-contract gate. Spikes skip Phase 2/Phase 5; the autobuild workflow flow breaks. Use `mk:cook` or `mk:plan-creator --fast` to run a spike. See `.claude/rules-conditional/agile-feedback-cycle.md` 2.
 
 ## See Also

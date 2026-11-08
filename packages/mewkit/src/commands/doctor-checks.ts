@@ -2,7 +2,6 @@ import { execSync } from "node:child_process";
 import fs, { chmodSync } from "node:fs";
 import path from "node:path";
 import { resolveStateDir } from "../state/resolve-state-dir.js";
-import { resolveConfigPath } from "../state/resolve-config-path.js";
 import { commandExists } from "./setup.js";
 import { verifyPackages } from "../core/dependency-installer.js";
 import { ENVS_REL, envSkills, envUsable, readSkillRequirements, skillEnvDir } from "../core/skill-env.js";
@@ -245,23 +244,6 @@ export function checkPipPackages(root: string | null): DiagResult {
 
 	if (!missing.length) return { name, status: "pass", detail: `${checked} pinned package(s) verified across ${provisioned.length} env(s)` };
 	return { name, status: "warn", detail: `Missing: ${missing.join(", ")}`, fix: `mewkit skill env ${missing[0]?.split(":")[0]}` };
-}
-
-export function checkConfig(root: string | null): DiagResult {
-	if (!root) return { name: "Config", status: "warn", detail: "Skipped — no project" };
-
-	const configPath = resolveConfigPath(root);
-	const shown = path.relative(root, configPath) || configPath;
-	if (!fs.existsSync(configPath)) {
-		return { name: "Config", status: "warn", detail: `${shown} not found` };
-	}
-
-	try {
-		JSON.parse(fs.readFileSync(configPath, "utf-8"));
-		return { name: "Config", status: "pass", detail: `${shown} valid` };
-	} catch {
-		return { name: "Config", status: "fail", detail: `${shown} is invalid JSON` };
-	}
 }
 
 /**

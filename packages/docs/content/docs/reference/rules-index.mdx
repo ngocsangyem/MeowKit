@@ -60,7 +60,7 @@ live verbatim in `.claude/skills/cook/references/agent-conduct-extended.md`.
 
 ## Agile Conditional Rules
 
-Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sprint-state contract present, `jira_tickets:` in plan frontmatter, `MEOW_JIRA_BASE_URL` env var set, or Jira-key pattern in user prompt). Non-Agile sessions pay zero context cost.
+Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sprint-state contract present, `jira_tickets:` in plan frontmatter, `MEOW_JIRA_SITE_URL` env var set, or Jira-key pattern in user prompt). Non-Agile sessions pay zero context cost.
 
 | Rule | Purpose | Loaded by |
 |------|---------|-----------|

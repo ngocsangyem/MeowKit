@@ -111,7 +111,7 @@ Use the template in `references/report-template.md`. Every requirement / AC / ga
 
 Resolve report path:
 
-1. If active plan present (read `MEOWKIT_ACTIVE_PLAN` env or scan `tasks/plans/` for current): write to `{plan_dir}/research/confluence-spec-{YYMMDD}-{HHMM}-{title-slug}.md`
+1. If active plan present (read `session-state/active-plan.json` or scan `tasks/plans/` for current): write to `{plan_dir}/research/confluence-spec-{YYMMDD}-{HHMM}-{title-slug}.md`
 2. Else: write to `tasks/reports/confluence-spec-{YYMMDD}-{HHMM}-{title-slug}.md`
 
 Compute `sha256` of the fetched root markdown (not the report). Append to the report's footer as `**Source page hash:** <hex>` for staleness detection on re-runs.

@@ -11,7 +11,7 @@ when_to_use: Use to test the external-service env-var detection path.
 
 # Test Env
 
-Set MEOW_JIRA_BASE_URL before invoking.
+Set MEOW_JIRA_SITE_URL before invoking.
 `;
 
 const JIRA_LEAF_NO_FIELD = `---
@@ -40,7 +40,7 @@ default_enabled: false
 
 # Test Annotated
 
-Set MEOW_JIRA_BASE_URL before invoking.
+Set MEOW_JIRA_SITE_URL before invoking.
 `;
 
 const REQUIRES_NO_DEFAULT = `---

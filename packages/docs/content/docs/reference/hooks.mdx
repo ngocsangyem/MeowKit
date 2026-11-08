@@ -50,9 +50,9 @@ The hook is a no-op unless TDD mode is ON via:
 
 - `MEOWKIT_TDD=1` env var (CI / shell rc, highest precedence)
 - `.claude/session-state/tdd-mode` sentinel file containing `on` (written by slash command `--tdd`)
-- (legacy) `MEOW_PROFILE=fast` still bypasses with a deprecation warning, removed in next major
+- `tdd: true` in `.meowkit/config.yaml`, or in `~/.meowkit/config.yaml` below it
 
-When TDD is OFF (the default), the hook exits 0 silently. When ON, it requires a failing test to exist for the feature being implemented and blocks otherwise. Bypass mechanisms: drop `--tdd`, unset `MEOWKIT_TDD`.
+When TDD is OFF (the default), the hook exits 0 silently. When ON, it requires a failing test to exist for the feature being implemented and blocks otherwise. Bypass mechanisms: drop `--tdd`, unset `MEOWKIT_TDD`, set `tdd: false`.
 
 ## Telemetry probes
 
@@ -159,16 +159,16 @@ Sourceable libraries in `.claude/hooks/lib/` — not hooks themselves:
 
 Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Classifies the written file by extension (`ts/tsx` → `tsc --noEmit\|eslint`; `js` → `eslint`; `py` → `ruff check\|mypy`; `go` → `go build ./...`; `rs` → `cargo check`; `rb` → `ruby -c\|rubocop`). Errors emitted to stdout as `@@BUILD_VERIFY_ERROR@@ … @@END_BUILD_VERIFY@@` blocks (fed back to agent). Results cached by file content hash — unchanged files are skipped. Skips `node_modules/`, `vendor/`, `dist/`, `tasks/`, `docs/`, `.claude/`, test files, and map/lock files.
 
-- **Opt-out:** `MEOWKIT_BUILD_VERIFY=off`
-- **Timeout override:** `MEOWKIT_BUILD_VERIFY_TIMEOUT=N` (default 30s for TS; 35s hook registration timeout)
-- **Density:** runs in LEAN; skipped in MINIMAL (`MEOWKIT_AUTOBUILD_MODE=MINIMAL`)
+- **Opt-out:** `hooks.build-verify: false`
+- **Timeout override:** `buildVerify.timeoutMs` (default 30s for TS; 35s hook registration timeout)
+- **Density:** runs in LEAN; skipped in MINIMAL (`autobuild.mode: MINIMAL`)
 - **Source:** `handlers/build-verify.cjs` (dispatched via `dispatch.cjs`)
 
 ### `loop-detection` (handler)
 
 Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits keyed `{session_id}:{realpath}` in `session-state/edit-counts.json`. Warns at N≥4 (`@@LOOP_DETECT_WARN@@`) and escalates at N≥8 (`@@LOOP_DETECT_ESCALATE@@`) — doom-loop prevention per LangChain harness research. Never blocks; messages are fed back via stdout.
 
-- **Opt-out:** `MEOWKIT_LOOP_DETECT=off`
+- **Opt-out:** `hooks.loop-detection: false`
 - **Timeout:** 3s
 - **Source:** `handlers/loop-detection.cjs` (dispatched via `dispatch.cjs`)
 
@@ -176,7 +176,7 @@ Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits ke
 
 Fires on the **Stop** event (not SubagentStop). Hard gate: if no verification evidence exists (no evaluator verdict file, no signed sprint contract, no test-pass markers in the trace log), emits `{"decision":"block","reason":"…"}` JSON to block session close. 3-attempt re-entry guard per active plan slug via `session-state/precompletion-attempts.json`; after 3 attempts soft-nudges and allows stop to prevent infinite loop. LEAN density mode: soft nudge only. MINIMAL: skipped entirely.
 
-- **Opt-out:** `MEOWKIT_PRECOMPLETION=off`
+- **Opt-out:** `hooks.pre-completion-check: false`
 - **Density:** `MEOWKIT_AUTOBUILD_MODE=LEAN` → soft nudge; `MEOWKIT_AUTOBUILD_MODE=MINIMAL` → skip
 - **Timeout:** 5s
 - **Source:** `.claude/hooks/handlers/pre-completion-check.cjs`
@@ -228,16 +228,21 @@ node dispatch.cjs <EventName> [Matcher]
 | `session-state/active-plan`                 | `mk:autobuild`, `mk:plan-creator`              | Currently active plan slug (read by `pre-completion-check.cjs`) |
 | `session-state/last-session-id`             | `project-context-loader.cjs`                      | Session change detection                                       |
 
-## Env Var Bypasses
+## Bypasses
 
-| Var                              | Effect                                                                |
-| -------------------------------- | --------------------------------------------------------------------- |
-| `MEOWKIT_BUILD_VERIFY=off`       | Skip `build-verify` handler                                            |
-| `MEOWKIT_LOOP_DETECT=off`        | Skip `loop-detection` handler                                          |
-| `MEOWKIT_PRECOMPLETION=off`      | Skip `pre-completion-check.cjs`                                        |
-| `MEOWKIT_AUTOBUILD_MODE=LEAN`      | PreCompletion falls back to soft nudge; BuildVerify still runs        |
-| `MEOWKIT_AUTOBUILD_MODE=MINIMAL`   | Skip BuildVerify + PreCompletion entirely                             |
+Observer switches live in `.meowkit/config.yaml`. The two environment names below
+stay environment-only on purpose: `pre-ship.cjs` is a safety entrypoint and reads
+no config file, and the density override is read by the contract gate.
+
+| Setting                             | Effect                                                                |
+| ----------------------------------- | --------------------------------------------------------------------- |
+| `hooks.build-verify: false`         | Skip `build-verify` handler                                            |
+| `hooks.loop-detection: false`       | Skip `loop-detection` handler                                          |
+| `hooks.pre-completion-check: false` | Skip `pre-completion-check.cjs`                                        |
+| `autobuild.mode: LEAN`              | PreCompletion falls back to soft nudge; BuildVerify still runs        |
+| `autobuild.mode: MINIMAL`           | Skip BuildVerify + PreCompletion entirely                             |
 | `MEOWKIT_HOOK_PROFILE=fast`         | Skip `pre-ship`, `post-session`, `learning-observer` (speed)          |
+| `MEOWKIT_AUTOBUILD_MODE=LEAN`       | Contract gate allows source edits without a signed contract (logged)  |
 
 {/* GENERATED:reference-index START */}
 

@@ -3,7 +3,6 @@ import path from "node:path";
 import pc from "picocolors";
 import {
 	checkClaudeDir,
-	checkConfig,
 	checkGit,
 	checkInstallMode,
 	checkHooks,
@@ -18,6 +17,9 @@ import {
 	type DiagResult,
 	type Status,
 } from "./doctor-checks.js";
+import { checkProjectConfig, checkRemovedEnvNames } from "./doctor-config-checks.js";
+import { ownershipChecks } from "./doctor-ownership-checks.js";
+import { doctorAdopt } from "./doctor-adopt.js";
 import { checkHardGates } from "./doctor-hard-gates.js";
 import { checkCodexHookTrust } from "./doctor-codex-hook-trust.js";
 import { checkCursor } from "./doctor-cursor.js";
@@ -29,7 +31,7 @@ import {
 import { readInstallMetadata, CorruptInstallMetadataError } from "../core/install-metadata.js";
 import { readPortableRegistry } from "../migrate/reconcile/portable-registry.js";
 import { TARGET_PROFILES } from "../validate/targets/target-profile.js";
-import { resolveConfigPath } from "../state/resolve-config-path.js";
+import { configWritePath } from "../state/resolve-config-path.js";
 
 function statusIcon(status: Status): string {
 	switch (status) {
@@ -54,7 +56,7 @@ function providerSeverityToStatus(severity: ProviderDiagnosticSeverity): Status 
 function findProjectRoot(): string | null {
 	const cwd = process.cwd();
 	const hasDotClaude = fs.existsSync(path.join(cwd, ".claude"));
-	const hasConfig = fs.existsSync(resolveConfigPath(cwd));
+	const hasConfig = fs.existsSync(configWritePath(cwd));
 	const hasManifest = fs.existsSync(path.join(cwd, ".claude", "meowkit.manifest.json"));
 	const hasClaude = fs.existsSync(path.join(cwd, "CLAUDE.md"));
 	if (hasDotClaude || hasConfig || hasManifest || hasClaude) {
@@ -70,7 +72,15 @@ export async function doctor(args?: {
 	hardGates?: boolean;
 	provenance?: boolean;
 	explain?: boolean;
+	adopt?: boolean;
+	json?: boolean;
 }): Promise<void> {
+	if (args?.adopt) {
+		// Adoption writes the ownership baseline, so it is its own operation
+		// rather than one row among the diagnostics.
+		process.exitCode = await doctorAdopt(findProjectRoot(), args.json ?? false);
+		return;
+	}
 	if (args?.provenance) {
 		explainProvenance(findProjectRoot(), args.explain ?? false);
 		return;
@@ -91,7 +101,9 @@ export async function doctor(args?: {
 		checkPython(),
 		checkGit(),
 		checkClaudeDir(root),
-		checkConfig(root),
+		checkProjectConfig(root),
+		...checkRemovedEnvNames(root),
+		...ownershipChecks(root),
 		checkInstallMode(root),
 		checkHooks(root),
 		checkScripts(root),
