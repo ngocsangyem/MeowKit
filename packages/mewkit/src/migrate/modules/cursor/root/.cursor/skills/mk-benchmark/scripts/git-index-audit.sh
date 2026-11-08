@@ -78,48 +78,17 @@ if [ -n "$REMOTE" ]; then
   if diff -qr --exclude=.git "$LOCAL" "$REMOTE" >/dev/null 2>&1; then DIFF_CLEAN=true; else DIFF_CLEAN=false; fi
 fi
 
-PY=".cursor/skills/.venv/bin/python3"
-[ -x "$PY" ] || PY="python3"
+AUDIT_ENV=(RUN_ID="$RUN_ID" TS="$TS" REPO="$LOCAL" OUT_FILE="$OUT_FILE"
+  FILE_COUNT="$FILE_COUNT" DIR_COUNT="$DIR_COUNT" PATH_SHA="$PATH_SHA" INDEX_SHA="$INDEX_SHA"
+  WT_CLEAN="$WT_CLEAN" CMP_REMOTE="$CMP_REMOTE" LOCAL_ONLY="$LOCAL_ONLY" REMOTE_ONLY="$REMOTE_ONLY"
+  DIFF_CLEAN="$DIFF_CLEAN")
+WRITER="$(dirname "$0")/lib/write-audit-artifact.cjs"
 
-RUN_ID="$RUN_ID" TS="$TS" REPO="$LOCAL" OUT_FILE="$OUT_FILE" \
-FILE_COUNT="$FILE_COUNT" DIR_COUNT="$DIR_COUNT" PATH_SHA="$PATH_SHA" INDEX_SHA="$INDEX_SHA" \
-WT_CLEAN="$WT_CLEAN" CMP_REMOTE="$CMP_REMOTE" LOCAL_ONLY="$LOCAL_ONLY" REMOTE_ONLY="$REMOTE_ONLY" \
-DIFF_CLEAN="$DIFF_CLEAN" "$PY" - <<'PY'
-import json, os
-
-def as_bool(s):
-    return s == "true"
-
-comparison = None
-if os.environ.get("CMP_REMOTE"):
-    comparison = {
-        "remote": os.environ["CMP_REMOTE"],
-        "local_only_count": int(os.environ["LOCAL_ONLY"]),
-        "remote_only_count": int(os.environ["REMOTE_ONLY"]),
-        "recursive_diff_clean": as_bool(os.environ["DIFF_CLEAN"]),
-    }
-
-artifact = {
-    "type": "audit",
-    "run_id": os.environ["RUN_ID"],
-    "ts": os.environ["TS"],
-    "repo": os.environ["REPO"],
-    "tracked_file_count": int(os.environ["FILE_COUNT"]),
-    "directory_count_excl_git": int(os.environ["DIR_COUNT"]),
-    "tracked_path_sha256": os.environ["PATH_SHA"],
-    "tracked_index_sha256": os.environ["INDEX_SHA"],
-    "comparison": comparison,
-    "working_tree_clean": as_bool(os.environ["WT_CLEAN"]),
-}
-
-with open(os.environ["OUT_FILE"], "w") as f:
-    json.dump(artifact, f, indent=2)
-print(json.dumps(artifact, separators=(",", ":")))
-PY
+env "${AUDIT_ENV[@]}" node "$WRITER"
 
 # Best-effort trace event — never fail the audit if the trace writer is absent/errors.
 if [ -x ".meowkit/hooks/append-trace.cjs" ]; then
-  TRACE_JSON="$(RUN_ID="$RUN_ID" REPO="$LOCAL" FILE_COUNT="$FILE_COUNT" OUT_FILE="$OUT_FILE" "$PY" -c 'import json,os; print(json.dumps({"run_id":os.environ["RUN_ID"],"repo":os.environ["REPO"],"tracked_file_count":int(os.environ["FILE_COUNT"]),"artifact":os.environ["OUT_FILE"]}))' 2>/dev/null || echo '{}')"
+  TRACE_JSON="$(env "${AUDIT_ENV[@]}" node "$WRITER" --trace 2>/dev/null || echo '{}')"
   node .meowkit/hooks/append-trace.cjs audit_result "$TRACE_JSON" 2>/dev/null || true
 fi
 

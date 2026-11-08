@@ -45,6 +45,48 @@ const DRY_RUN = process.argv.includes("--dry-run");
 const ROOT     = path.resolve(__dirname, "..");
 const CLAUDE   = path.join(ROOT, ".claude");
 
+// Hook script extensions. Matches core/is-hook-script.ts, which is the single
+// definition the validators share.
+const HOOK_EXTENSIONS = new Set([".cjs", ".mjs", ".js", ".sh"]);
+
+// Per-hook governance, derived here rather than hand-promoted in the registry.
+// A value a human pastes into generated output is a value the next regeneration
+// silently drops, which is how the registry came to describe a hook set that no
+// longer existed. `responsibility` is mandatory for every registry-sourced
+// artifact (validate --substrate treats a missing one as a hard gap), so it has
+// to come from the generator.
+const HOOK_GOVERNANCE = {
+  // Write guards — only exit 2 blocks a tool call, so a crash here reads as permission.
+  "gate-enforcement":      { criticality: "critical", responsibility: "gate-enforcement" },
+  "privacy-block":         { criticality: "critical", responsibility: "permissions" },
+  "pre-completion-check":  { criticality: "critical", responsibility: "gate-enforcement" },
+  "pre-ship":              { criticality: "high",     responsibility: "gate-enforcement" },
+  "pre-implement":         { criticality: "high",     responsibility: "gate-enforcement" },
+  "pre-task-check":        { criticality: "high",     responsibility: "gate-enforcement" },
+  // The dispatcher decides whether any observer runs at all.
+  dispatch:                { criticality: "high",     responsibility: "observability" },
+  "post-write":            { criticality: "high",     responsibility: "observability" },
+  "tdd-flag-detector":     { criticality: "high",     responsibility: "verification" },
+  "safety-sentinel-inject":{ criticality: "high",     responsibility: "context-selection" },
+  "build-verify":          { criticality: "medium",   responsibility: "verification" },
+  "review-evidence-tag":   { criticality: "medium",   responsibility: "verification" },
+  "append-trace":          { criticality: "medium",   responsibility: "observability" },
+  "control-probe":         { criticality: "medium",   responsibility: "observability" },
+  "post-session":          { criticality: "medium",   responsibility: "observability" },
+  "precompact-probe":      { criticality: "medium",   responsibility: "observability" },
+  "posttoolfailure-probe": { criticality: "medium",   responsibility: "failure-attribution" },
+  "loop-detection":        { criticality: "medium",   responsibility: "failure-attribution" },
+  "learning-observer":     { criticality: "medium",   responsibility: "project-memory" },
+  "capability-bootstrap":  { criticality: "medium",   responsibility: "context-selection" },
+  "project-context-loader":{ criticality: "medium",   responsibility: "context-selection" },
+  "orientation-ritual":    { criticality: "medium",   responsibility: "context-selection" },
+  "model-detector":        { criticality: "medium",   responsibility: "context-selection" },
+  "jira-env-loader":       { criticality: "medium",   responsibility: "tool-access" },
+  "budget-tracker":        { criticality: "medium",   responsibility: "entropy-auditing" },
+  "auto-checkpoint":       { criticality: "medium",   responsibility: "task-state" },
+  "checkpoint-writer":     { criticality: "medium",   responsibility: "task-state" },
+};
+
 // Known runtime-only dirs that should be skipped (no SKILL.md expected)
 const SKILLS_DENYLIST = new Set([".venv", "__pycache__", "node_modules", "SKILLS_ATTRIBUTION.md"]);
 
@@ -67,7 +109,7 @@ function deriveOwner(name) {
   if (/^(sprint-contract|story-sizer|breakdown)/.test(name)) return "lifecycle";
   if (/^(typescript|angular|vue|react-patterns|frontend-design|ui-design-system|figma|database|clean-code|development|multimodal|cso|vulnerability-scanner)/.test(name)) return "utility";
   // Hooks by pattern
-  if (/^(pre-implement|pre-ship|pre-completion-check|post-write|tdd-flag-detector|ensure-skills-venv|project-context-loader|jira-env-loader)/.test(name)) return "lifecycle";
+  if (/^(pre-implement|pre-ship|pre-completion-check|post-write|tdd-flag-detector|project-context-loader|jira-env-loader)/.test(name)) return "lifecycle";
   if (/^(append-trace|learning-observer|post-session|posttoolfailure-probe|precompact-probe|pre-task-check|control-probe)/.test(name)) return "observability";
   // Agents by role
   if (/^(orchestrator|planner|developer|architect|brainstormer|project-manager|story-sizer)/.test(name)) return "lifecycle";
@@ -210,18 +252,24 @@ function collectRegistryArtifacts(claudeRoot) {
     }
   }
 
-  // Hooks — only *.sh in hooks/ root (not subdirs)
-  const hooksDir = path.join(claudeRoot, "hooks");
-  if (fs.existsSync(hooksDir)) {
-    for (const f of fs.readdirSync(hooksDir)) {
-      if (f.endsWith(".sh") && fs.statSync(path.join(hooksDir, f)).isFile()) {
-        artifacts.push({ registryKey: `hooks/${f}`, name: f.replace(/\.sh$/, "") });
-      }
+  // Hooks — two tiers, because both are hooks: the entrypoints the host registers
+  // or an agent invokes (hooks/) and the observers the dispatcher runs
+  // (hooks/handlers/). lib/, __tests__/ and the .md/.json sidecars are not hooks.
+  for (const rel of ["hooks", "hooks/handlers"]) {
+    const dir = path.join(claudeRoot, ...rel.split("/"));
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir)) {
+      if (!HOOK_EXTENSIONS.has(path.extname(f))) continue;
+      if (!fs.statSync(path.join(dir, f)).isFile()) continue;
+      artifacts.push({ registryKey: `${rel}/${f}`, name: f.replace(/\.(cjs|mjs|js|sh)$/, "") });
     }
   }
 
   return artifacts;
 }
+
+/** Registry key prefixes this seeder OWNS — the only ones it may prune. */
+const REGISTRY_PREFIXES = ["rules/", "rules-conditional/", "commands/", "hooks/"];
 
 // ---------------------------------------------------------------------------
 // Main
@@ -229,7 +277,14 @@ function collectRegistryArtifacts(claudeRoot) {
 function main() {
   const skillsRoot  = path.join(CLAUDE, "skills");
   const agentsRoot  = path.join(CLAUDE, "agents");
-  const inventoryPath = path.join(CLAUDE, "harness-inventory.json");
+  // Canonical location is `.meowkit/harness-inventory.json`; the pre-move
+  // `.claude/` path is still read when it is the only one present. Writing the
+  // pre-move path while every reader resolved the canonical one is why a reseed
+  // used to have no effect on what `validate --ownership` saw.
+  const canonicalInventory = path.join(ROOT, ".meowkit", "harness-inventory.json");
+  const legacyInventory = path.join(CLAUDE, "harness-inventory.json");
+  const inventoryPath =
+    !fs.existsSync(canonicalInventory) && fs.existsSync(legacyInventory) ? legacyInventory : canonicalInventory;
 
   let skillsProcessed  = 0;
   let skillsModified   = 0;
@@ -312,23 +367,37 @@ function main() {
   }
 
   let registryAdded   = 0;
+  let registryPruned  = 0;
   for (const { registryKey, name } of registryArtifacts) {
     if (registryKey in inventory.artifacts) continue; // idempotent
+    const hookGov = registryKey.startsWith("hooks/") ? HOOK_GOVERNANCE[name] : undefined;
     inventory.artifacts[registryKey] = {
       owner:       deriveOwner(name),
-      criticality: "medium",
+      criticality: hookGov ? hookGov.criticality : "medium",
       status:      "active",
-      runtime:     "claude-code",
+      runtime:     deriveRuntime(),
+      ...(hookGov ? { responsibility: hookGov.responsibility } : {}),
     };
     registryAdded++;
     console.log(`  registry: added ${registryKey}`);
   }
 
-  if (registryAdded > 0 && !DRY_RUN) {
-    fs.writeFileSync(inventoryPath, JSON.stringify(inventory, null, 2) + "\n", "utf-8");
-  } else if (registryAdded === 0) {
-    // Still write if file didn't exist
-    if (!fs.existsSync(inventoryPath) && !DRY_RUN) {
+  // Prune entries this seeder owns whose artifact is gone. Additive-only merging
+  // let the registry keep describing files that had been renamed or deleted, and
+  // `validate --ownership` reports a stale entry as a failure — correctly, since
+  // governance metadata for a file nobody ships is governance of nothing.
+  const live = new Set(registryArtifacts.map((a) => a.registryKey));
+  for (const key of Object.keys(inventory.artifacts)) {
+    if (!REGISTRY_PREFIXES.some((prefix) => key.startsWith(prefix))) continue;
+    if (live.has(key)) continue;
+    delete inventory.artifacts[key];
+    registryPruned++;
+    console.log(`  registry: pruned ${key} (no artifact on disk)`);
+  }
+
+  if (registryAdded > 0 || registryPruned > 0 || !fs.existsSync(inventoryPath)) {
+    if (!DRY_RUN) {
+      fs.mkdirSync(path.dirname(inventoryPath), { recursive: true });
       fs.writeFileSync(inventoryPath, JSON.stringify(inventory, null, 2) + "\n", "utf-8");
     }
   }
@@ -338,7 +407,7 @@ function main() {
   console.log(`\nSummary${mode}:`);
   console.log(`  Skills:   ${skillsProcessed} scanned, ${skillsModified} modified`);
   console.log(`  Agents:   ${agentsProcessed} scanned, ${agentsModified} modified`);
-  console.log(`  Registry: ${Object.keys(inventory.artifacts).length} total entries (${registryAdded} added this run)`);
+  console.log(`  Registry: ${Object.keys(inventory.artifacts).length} total entries (${registryAdded} added, ${registryPruned} pruned this run)`);
   console.log(`\nNext: hand-promote criticality on safety/lifecycle artifacts.`);
 }
 

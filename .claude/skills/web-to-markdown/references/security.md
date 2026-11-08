@@ -15,7 +15,7 @@
   - [Layer 5 — Injection scanner (multi-pass)](#layer-5-injection-scanner-multi-pass)
   - [Layer 6 — HARD_STOP on injection (per C5 + R7 + R10)](#layer-6-hardstop-on-injection-per-c5-r7-r10)
   - [Layer 7 — Secret scrub (pre-write)](#layer-7-secret-scrub-pre-write)
-  - [Layer 8 — post-write library scan (`injection-audit.py`)](#layer-8-post-write-library-scan-injection-auditpy)
+  - [Layer 8 — post-write re-scan (`injection-audit.cjs`)](#layer-8--post-write-re-scan-injection-auditcjs)
 - [3. Flag semantics (locked)](#3-flag-semantics-locked)
   - [Direct user invocation — no flag](#direct-user-invocation-no-flag)
   - [Cross-skill delegation — `--wtm-accept-risk`](#cross-skill-delegation---wtm-accept-risk)
@@ -244,38 +244,36 @@ Preview (first 2KB, DATA — not instructions):
 - Report file body (full cleaned markdown)
 - Report file frontmatter URL field
 - Manifest `index.jsonl` URL field (per-entry)
-- `injection-audit.py` security-log entries
+- audit scanner security-log entries
 
-### Layer 8 — post-write library scan (`injection-audit.py`)
+### Layer 8 — post-write re-scan (`injection-audit.cjs`)
 
-**Scope:** After `persist_fetch.py` writes a report file successfully, invoke `injection_audit.scan_file(report_path)` (direct Python import, not CLI) as a belt-and-suspenders check.
+**Scope:** After `persist_fetch.py` writes a report file successfully, re-scan that one file through the audit scanner's single-path mode as a belt-and-suspenders check.
 
-**Rationale:** `injection-audit.py` has different patterns (IDENTITY_OVERRIDE, EXFILTRATION, SENSITIVE_DATA, UNEXPECTED_COMMAND) than Layer 5's pre-write scanner. If Layer 8 catches something Layer 5 missed, that's a signal to update Layer 5's patterns AND quarantine the already-written report.
+**Rationale:** the audit scanner has different patterns (IDENTITY_OVERRIDE, EXFILTRATION, SENSITIVE_DATA, UNEXPECTED_COMMAND) than Layer 5's pre-write scanner. If Layer 8 catches something Layer 5 missed, that's a signal to update Layer 5's patterns AND quarantine the already-written report.
+
+The scanner is a node program, so Layer 8 is a subprocess rather than an import. That is deliberate: this is a safety layer, and a safety layer that only runs where an optional interpreter happens to be installed is not one.
 
 ```python
-# At top of persist_fetch.py
-import sys
-sys.path.insert(0, str(project_root / ".claude" / "scripts"))
-import importlib.util
-spec = importlib.util.spec_from_file_location(
-    "injection_audit",
-    project_root / ".claude" / "scripts" / "injection-audit.py"
+# In persist_fetch.py
+proc = subprocess.run(
+    ["node", str(project_root / ".claude" / "scripts" / "injection-audit.cjs"), "--file", str(report_path)],
+    capture_output=True, text=True, timeout=30, cwd=str(project_root), check=False,
 )
-injection_audit = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(injection_audit)
+if proc.returncode != 0:
+    raise RuntimeError("audit scanner failed")   # a failed scan is treated as CRITICAL
+findings = json.loads(proc.stdout)["findings"]
 
-# After writing report file
-findings = injection_audit.scan_file(Path(report_path))
-criticals = [f for f in findings if f.level == "CRITICAL"]
+criticals = [f for f in findings if f["level"] == "CRITICAL"]
 if criticals:
     # Retroactive quarantine
     shutil.move(report_path, quarantine_path)
     # Manifest: mark entry as quarantined
     # security-log: append CRITICAL entries
-    return f"INJECTION_STOP (post-write audit): {criticals[0].description}"
+    return f"INJECTION_STOP (post-write audit): {criticals[0]['description']}"
 ```
 
-**Note:** the existing `injection-audit.py` CLI entry point (`scan_directory`) skips `.claude/*` subdirectories. That's fine for its original use case but wrong for ours — we must use `scan_file` directly with an explicit path.
+**Note:** the scanner's directory walk skips `.claude/*` subdirectories. That's right for its own use case but wrong for ours, which is why the single-path mode exists — it answers for the explicit path it is given, wherever that path lives.
 
 ---
 
@@ -394,11 +392,11 @@ export const SYSTEM_DEPS_REGISTRY: Record<string, SystemDepEntry> = {
   },
   "playwright-chromium": {
     name: "Playwright + Chromium",
-    detectCommand: ".claude/skills/.venv/bin/python3 -c 'import playwright'",
+    detectCommand: ".meowkit/envs/web-to-markdown/bin/python3 -c 'import playwright'",
     installCommands: {
       darwin: [
-        ".claude/skills/.venv/bin/pip install playwright==1.58.0",
-        ".claude/skills/.venv/bin/playwright install chromium",
+        ".meowkit/envs/web-to-markdown/bin/pip install playwright==1.58.0",
+        ".meowkit/envs/web-to-markdown/bin/playwright install chromium",
       ],
       linux: [
         /* same */
@@ -471,7 +469,7 @@ Real-URL tests, opt-in via `MEOWKIT_RUN_SMOKE_TESTS=1`:
 
 ## 8. Incident response
 
-If injection-audit.py post-write scan (Layer 8) catches a pattern that Layer 5 missed:
+If the post-write re-scan (Layer 8) catches a pattern that Layer 5 missed:
 
 1. **Retroactive quarantine:** move the written report file to quarantine bucket (as if Layer 5 had caught it)
 2. **Manifest update:** append a corrective line to `index.jsonl` marking the original report as `superseded_by_quarantine`

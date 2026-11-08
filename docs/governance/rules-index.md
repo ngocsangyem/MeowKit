@@ -51,7 +51,7 @@ skill that owns it. Nothing was dropped: the enforcement text moved intact.
 | `rubric-rules.md` | `.claude/skills/rubric/references/` | `mk:rubric`, evaluator agent |
 | `skill-authoring-rules.md` | `.claude/skills/skill-creator/references/` | `mk:skill-creator`, skill audits |
 | `dead-weight-audit-rules.md` | `.claude/skills/benchmark/references/` | `mk:benchmark` |
-| `docs-reference-contract.md` | `docs/maintainer/` (source repo only, not shipped) | maintainers, `check-docs-references.py` |
+| `docs-reference-contract.md` | `docs/maintainer/` (source repo only, not shipped) | maintainers, `npx mewkit validate` |
 | `step-file-rules.md` | inlined as `## Step-File Contract` in each step-filed skill's `workflow.md` | `mk:plan-creator`, `mk:review`, `mk:evaluate`, `mk:autobuild`, `mk:trace-analyze` |
 | `anti-rationalization.md` | merged into `.claude/rules/core-behaviors.md` | always-on |
 | `intervention-recording-rules.md` | merged into `.claude/rules/gate-rules.md` ("Recording Human Interventions") | always-on |
@@ -141,7 +141,7 @@ Hooks supplement rules — they do not replace them. Rules define the WHY; hooks
 | `scale-adaptive-rules.md` | Behavioral + CSV data | No | CSV extensible by users |
 | `risk-checklist.md` | Behavioral + DATA | No | Flags advisory; escalation routed through the model-selection rules Rule 2 |
 | `parallel-execution-rules.md` | Behavioral + worktree | N/A | Contextual — only during parallel execution |
-| `skill-authoring-rules.md` | Behavioral + Script (500-line audit `find` one-liner) + CI (`scripts/validate-skill-frontmatter.py` via `ci.yml`) | No | MeowKit-internal infra paths exempt from Rule 2; step-filed skills auto-pass Rule 3 |
+| `skill-authoring-rules.md` | Behavioral + Script (500-line audit `find` one-liner) + CI (`npx mewkit validate --frontmatter` via `ci.yml`) | No | MeowKit-internal infra paths exempt from Rule 2; step-filed skills auto-pass Rule 3 |
 | `post-phase-delegation.md` | Behavioral | N/A | Contextual. `MEOWKIT_PM_AUTO=off` disables silent fires |
 | `phase-contracts.md` | Behavioral | No | — |
 | `agent-routing.md` | Behavioral | No | `MEOWKIT_PM_AUTO=off` disables silent project-manager fires |

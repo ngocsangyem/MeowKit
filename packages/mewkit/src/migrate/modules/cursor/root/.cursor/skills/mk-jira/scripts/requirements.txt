@@ -1,5 +1,5 @@
-# Auto-installed into .cursor/skills/.venv by `setup-workflow` / the installer
-# (discovery: packages/cli/src/core/skills-dependencies.ts findRequirementsFiles)
+# Auto-installed into .meowkit/envs/jira by `setup-workflow` / the installer
+# Only this file is read; nothing outside it is installed.
 # Validated by SAFE_PKG_RE before install.
 jira-as
 jira-as[keyring]

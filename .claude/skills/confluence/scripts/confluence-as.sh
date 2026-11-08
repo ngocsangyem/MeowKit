@@ -10,7 +10,7 @@
 set -euo pipefail
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-CONFLUENCE_AS="$ROOT/.claude/skills/.venv/bin/confluence-as"
+CONFLUENCE_AS="$ROOT/.meowkit/envs/confluence/bin/confluence-as"
 # Legacy first, canonical second: with `set -a` a later assignment wins, so
 # `.meowkit/.env` stays authoritative when a project still has both files.
 ENV_FILES="$ROOT/.claude/.env $ROOT/.meowkit/.env"

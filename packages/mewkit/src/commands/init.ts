@@ -16,8 +16,7 @@ import {
 } from "../core/index.js";
 import type { ReleaseInfo, UserConfig } from "../core/index.js";
 import { promptAndInstallSystemDeps } from "./setup.js";
-import { getRequirementsSource, formatPackageList } from "../core/skills-dependencies.js";
-import { ensureVenv, installPipPackages } from "../core/dependency-installer.js";
+
 import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.js";
 import type { MigrateOptions, ProviderType } from "../migrate/types.js";
 import { providers } from "../migrate/provider-registry.js";
@@ -308,7 +307,7 @@ async function promptNewInstall(): Promise<UserConfig & { installDeps: boolean; 
 
 	// Skills dependencies prompt (before Gemini key — more common question first)
 	const installDeps = await p.confirm({
-		message: "Install Python skill dependencies? (into .claude/skills/.venv)",
+		message: "Show how to provision Python skill environments? (created per skill, on demand)",
 		initialValue: false,
 	});
 	const shouldInstallDeps = p.isCancel(installDeps) ? false : installDeps;
@@ -908,31 +907,18 @@ async function runClaudeKitInstall(
 			await promptAndInstallSystemDeps(targetDir);
 		}
 
-		// Step 8: Skills dependencies (if user opted in during config)
+		// Step 8: interpreter environments — deliberately NOT created here.
+		//
+		// Scaffolding a project says nothing about which skills it will use, and
+		// `init` used to answer that question by installing a merged set of every
+		// skill's dependencies into one shared environment. A project that never
+		// invokes a Python skill should not acquire an interpreter by being created,
+		// so the environment is provisioned on first real use instead, one skill at
+		// a time, by the command named here.
 		if (!dryRun && config.installDeps) {
 			console.log(`\n${pc.bold("? Phase 3: Skills dependencies")}`);
-			const { packages, source } = getRequirementsSource(targetDir);
-			console.log(pc.dim(`\n  Packages (from ${source}):\n`));
-			console.log(pc.dim(formatPackageList(packages)));
-			console.log();
-
-			try {
-				const { created } = ensureVenv(targetDir);
-				if (created) console.log(`  ${pc.green("✓")} Python venv created`);
-
-				const results = await installPipPackages(targetDir, packages);
-				const failed = results.filter((r) => !r.success);
-				if (failed.length === 0) {
-					console.log(`\n  ${pc.green("✓")} All ${results.length} packages installed`);
-				} else {
-					console.log(`\n  ${pc.yellow("!")} ${results.length - failed.length} installed, ${failed.length} failed`);
-					console.log(pc.dim(`  Re-run: npx mewkit setup --only=deps`));
-				}
-			} catch (err) {
-				const msg = err instanceof Error ? err.message : String(err);
-				console.log(`  ${pc.red("✗")} ${msg}`);
-				console.log(pc.dim(`  Install later: npx mewkit setup --only=deps`));
-			}
+			console.log(pc.dim("  Interpreter environments are created per skill, on demand."));
+			console.log(pc.dim("  Run `npx mewkit skill env --list` to see which skills need one."));
 		}
 
 		// Step 9: Summary

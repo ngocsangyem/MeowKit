@@ -1,0 +1,8 @@
+# mk:figma — Python dependencies
+# Installed into this skill's own environment by `mewkit skill env figma`.
+
+# YAML parsing — used by evals/validate-evidence-packets.py to load the
+# evidence-packet fixtures. Pinned here because it is this skill's dependency:
+# it used to arrive from a blanket install in CI, which meant the eval passed in
+# CI and failed anywhere else.
+PyYAML>=6.0.1

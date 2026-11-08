@@ -1,0 +1,23 @@
+{
+  "name": "audit-single-file-outside-project",
+  "group": "injection-audit",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "scan-one",
+    "target": "../outside/notes.md"
+  },
+  "setup": "audit-single-file-outside-project",
+  "setupDescription": "an explicit path that resolves outside the project root",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "stdout": "{\"path\":\"../outside/notes.md\",\"findings\":[{\"level\":\"CRITICAL\",\"category\":\"BOUNDARY_VIOLATION\",\"description\":\"File written outside project directory\",\"file\":\"../outside/notes.md\",\"line\":0}]}\n",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/security-log.md": null
+  }
+}

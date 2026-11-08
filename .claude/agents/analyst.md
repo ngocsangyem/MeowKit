@@ -87,7 +87,7 @@ via `--wtm-accept-risk`.
 - **With `--wtm-accept-risk`:** delegation proceeds through all security layers. The flag is
   a conscious trust-boundary crossing — the caller acknowledges the target URL may contain
   prompt injection and that the skill's defenses are best-effort.
-- Delegation example: `.claude/skills/.venv/bin/python3 .claude/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller analyst`
+- Delegation example: `node .claude/scripts/skill-python.cjs .claude/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller analyst`
 
 ## What You Do NOT Do
 

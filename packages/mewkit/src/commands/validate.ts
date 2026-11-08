@@ -4,6 +4,7 @@ import { resolveInventoryPath } from "../state/resolve-inventory-path.js";
 import pc from "picocolors";
 import { ALWAYS_ON_RULE_PATHS } from "../core/always-on-rules.js";
 import { checkDocsReferences } from "../core/check-docs-references.js";
+import { checkSkillFrontmatter } from "../core/check-skill-frontmatter.js";
 import { resolveContractPath } from "../core/docs-reference-contract-paths.js";
 import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
 import { isHookScript } from "../core/is-hook-script.js";
@@ -102,6 +103,10 @@ interface ValidateOptions {
 	agents?: boolean;
 	/** Scope the run to the committed team-memory store lint (used by CI). */
 	memory?: boolean;
+	/** Scope the run to the SKILL.md frontmatter schema + runtime contract check (used by CI). */
+	frontmatter?: boolean;
+	/** Scope the run to the `.claude` → `docs/*` reference allowlist check (used by CI). */
+	docsRefs?: boolean;
 	/** Validate a GENERATED provider target instead of a `.claude/` project: the provider key
 	 * (e.g. "codex"). Requires `targetDir`. Mutually exclusive with `--portable`. */
 	target?: string;
@@ -204,6 +209,52 @@ export function checkHooksExecutable(meowkitDir: string): CheckResult[] {
 		});
 	}
 
+	return results;
+}
+
+/**
+ * SKILL.md frontmatter against the schema, plus the runtime contract.
+ *
+ * Schema violations and runtime-contract breaks are FAIL; the advisory
+ * tool-contract and recommended-field gaps are WARN, so the calibration fields
+ * can be adopted gradually without blocking every unrelated change.
+ */
+export function checkFrontmatterContract(projectRoot: string): CheckResult[] {
+	const report = checkSkillFrontmatter(projectRoot);
+	if (report.fatal) {
+		return [{ name: "Skill frontmatter", status: "fail", detail: report.fatal, section: "Structure" }];
+	}
+	const results: CheckResult[] = [];
+	if (report.errors.length > 0) {
+		results.push({
+			name: "Skill frontmatter",
+			status: "fail",
+			detail: `${report.errors.length} error(s)\n         ${report.errors.slice(0, 10).join("\n         ")}`,
+			section: "Structure",
+		});
+	} else if (report.valid === 0) {
+		results.push({
+			name: "Skill frontmatter",
+			status: "fail",
+			detail: "Zero SKILL.md files found under .claude/skills/",
+			section: "Structure",
+		});
+	} else {
+		results.push({
+			name: "Skill frontmatter",
+			status: "pass",
+			detail: `${report.valid} skill(s) validated against skill-schema.json`,
+			section: "Structure",
+		});
+	}
+	if (report.warnings.length > 0) {
+		results.push({
+			name: "Skill frontmatter advisories",
+			status: "warn",
+			detail: `${report.warnings.length} warning(s)\n         ${report.warnings.slice(0, 10).join("\n         ")}`,
+			section: "Structure",
+		});
+	}
 	return results;
 }
 
@@ -826,6 +877,10 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkCapabilitiesSection(meowkitDir);
 	} else if (args.agents) {
 		results = checkAgentConformance(projectRoot);
+	} else if (args.frontmatter) {
+		results = checkFrontmatterContract(projectRoot);
+	} else if (args.docsRefs) {
+		results = checkDocsRefsContract(meowkitDir);
 	} else {
 		const mode = args.mode ?? detectValidateMode(projectRoot);
 		console.log(

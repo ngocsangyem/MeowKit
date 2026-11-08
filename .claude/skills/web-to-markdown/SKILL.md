@@ -14,6 +14,7 @@ owner: docs
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 <!--
@@ -95,7 +96,7 @@ See `references/security.md` for the full threat model, attack surface, and defe
 5. **HARD_STOP on injection hit** — content quarantined, no programmatic override, manual user inspection required
 6. Secret scrub on content AND URL BEFORE any disk write
 7. `privacy-block.cjs` hook-layer enforcement of SSRF + cache/manifest read blocks
-8. `injection-audit.py` post-write library scan (called from `persist_fetch.persist` via `scan_file` import, not CLI)
+8. Post-write re-scan through `injection-audit.cjs --file` (called from `persist_fetch.persist`, which treats a failed scan as CRITICAL)
 
 ## Gotchas
 
@@ -122,15 +123,15 @@ See `references/security.md` for the full threat model, attack surface, and defe
 **Static fetch (always):**
 
 ```bash
-.claude/skills/.venv/bin/pip install -r scripts/requirements.txt
+mewkit skill env web-to-markdown    # installs exactly scripts/requirements.txt
 # requests, readability-lxml, html2text, lxml, charset-normalizer
 ```
 
 **JS rendering (opt-in via `.claude/scripts/bin/setup-workflow --system-deps`):**
 
 ```bash
-.claude/skills/.venv/bin/pip install playwright==1.58.0
-.claude/skills/.venv/bin/playwright install chromium  # ~200MB one-time
+.meowkit/envs/web-to-markdown/bin/pip install playwright==1.58.0
+.meowkit/envs/web-to-markdown/bin/playwright install chromium  # ~200MB one-time
 ```
 
 To enable JS rendering at runtime, set `MEOWKIT_WEB_FETCH_JS=1` before invoking the skill. All three gates must be open: Playwright installed, `MEOWKIT_WEB_FETCH_JS=1`, and `js=True` per-call argument. See `references/security.md` for the three-layer JS gate spec.

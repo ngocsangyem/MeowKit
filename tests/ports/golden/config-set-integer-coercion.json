@@ -1,0 +1,27 @@
+{
+  "name": "config-set-integer-coercion",
+  "group": "workflow-config",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "config",
+    "args": [
+      "set",
+      "retries",
+      "7"
+    ]
+  },
+  "setup": "config-set-integer-coercion",
+  "setupDescription": "an integer written as a number, not a string",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".claude/meowkit.config.json": "{\n  \"proactive\": true,\n  \"telemetry\": false,\n  \"retries\": 7,\n  \"mode\": {\n    \"default\": \"strict\",\n    \"fallback\": \"\"\n  },\n  \"features\": {\n    \"costTracking\": true,\n    \"memory\": false\n  }\n}"
+  }
+}

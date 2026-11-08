@@ -9,24 +9,24 @@
 
 ```bash
 # 1. Single PDF extraction
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
   --files document.pdf \
   --task extract
 
 # 2. With custom extraction prompt
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
   --files report.pdf \
   --task extract \
   --prompt "Extract only the financial tables as markdown"
 
 # 3. Multiple documents
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
   --files doc1.pdf doc2.pdf doc3.pdf \
   --task extract \
   --json
 
 # 4. Large PDF (> 20MB) — auto uses File API
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
   --files large-report.pdf \
   --task extract \
   --verbose

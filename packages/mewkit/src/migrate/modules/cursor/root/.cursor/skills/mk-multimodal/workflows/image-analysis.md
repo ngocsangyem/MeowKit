@@ -9,22 +9,22 @@
 
 ```bash
 # 1. Verify setup
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/check_setup.py
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/check_setup.py
 
 # 2. Analyze image
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
   --files <image-path> \
   --task analyze \
   [--prompt "Focus on UI layout and color scheme"] \
   [--json]
 
 # 3. For OCR / text extraction
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
   --files <image-path> \
   --task extract
 
 # 4. For multi-image comparison
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
   --files before.png after.png \
   --task analyze \
   --prompt "Compare these two screenshots"

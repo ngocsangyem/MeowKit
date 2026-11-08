@@ -26,8 +26,12 @@ function skillDirs(srcRoot: string): string[] {
 	}
 }
 
-/** The bootstrap hook is the one deliberate shell exception; it owns its own replacement. */
-const SWEEP_EXCLUDE = ["ensure-skills-venv.sh"];
+/**
+ * Shell and interpreter scripts allowed to remain on a hook path. The list is
+ * empty, and that is the claim: every hook starts on node, so anything the
+ * sweep finds here is a leftover and gets reported rather than excused.
+ */
+const SWEEP_EXCLUDE: string[] = [];
 
 const RUNTIME_ERROR = /Syntax error|Bad substitution|unexpected|Cannot find module/i;
 
@@ -43,12 +47,18 @@ const SWEEP_EVENTS: Array<{ event: string; tool?: string; toolInput?: Record<str
 ];
 
 /**
- * A leftover shell hook under `.claude/hooks/` is a finding: the runtime is node
- * and a shell hook cannot run on a host without a shell, so it is a gate that
- * silently does nothing there. The bootstrap hook is the one exception and is
- * replaced together with its lazy resolver.
+ * A shell or interpreter script under a hook path is a finding: the runtime is
+ * node, and such a script cannot run on a host without that runtime installed,
+ * so it is a gate that silently does nothing there — and a gate that does
+ * nothing reads as permission.
+ *
+ * `.py` is swept alongside `.sh` because an optional interpreter is the weaker
+ * assumption of the two: a host without a shell is unusual, a host without
+ * Python is ordinary.
  */
-function checkNoLeftoverShellHooks(srcRoot: string): DiagResult {
+const SWEPT_SUFFIXES = [".sh", ".py"];
+
+function checkNoLeftoverInterpreterHooks(srcRoot: string): DiagResult {
 	const leftovers: string[] = [];
 	const walk = (dir: string) => {
 		let entries: fs.Dirent[];
@@ -60,7 +70,7 @@ function checkNoLeftoverShellHooks(srcRoot: string): DiagResult {
 		for (const entry of entries) {
 			const full = path.join(dir, entry.name);
 			if (entry.isDirectory()) walk(full);
-			else if (entry.name.endsWith(".sh") && !SWEEP_EXCLUDE.includes(entry.name)) {
+			else if (SWEPT_SUFFIXES.some((s) => entry.name.endsWith(s)) && !SWEEP_EXCLUDE.includes(entry.name)) {
 				leftovers.push(path.relative(srcRoot, full));
 			}
 		}
@@ -70,12 +80,16 @@ function checkNoLeftoverShellHooks(srcRoot: string): DiagResult {
 	walk(path.join(srcRoot, ".claude", "hooks"));
 	for (const skill of skillDirs(srcRoot)) walk(path.join(skill, "bin"));
 	return leftovers.length === 0
-		? { name: "Runtime: no leftover shell hooks", status: "pass", detail: `Only ${SWEEP_EXCLUDE.join(", ")} remains, by design.` }
+		? {
+				name: "Runtime: no leftover shell or interpreter hooks",
+				status: "pass",
+				detail: `No ${SWEPT_SUFFIXES.join("/")} file on any hook path.`,
+			}
 		: {
-				name: "Runtime: no leftover shell hooks",
+				name: "Runtime: no leftover shell or interpreter hooks",
 				status: "fail",
-				detail: `Shell hooks still present: ${leftovers.join(", ")}.`,
-				fix: "Port the hook or guard to a .cjs module and delete the .sh, or register it deliberately as a bootstrap exception.",
+				detail: `Still present: ${leftovers.join(", ")}.`,
+				fix: "Port the hook or guard to a .cjs module and delete the script.",
 			};
 }
 
@@ -106,7 +120,7 @@ export function checkHookRuntime(
 			? {
 					name: "Runtime: every configured hook executes cleanly",
 					status: "pass",
-					detail: `Excluded from sweep (bootstrap only): ${SWEEP_EXCLUDE.join(", ")}.`,
+					detail: "Every registration started and returned cleanly.",
 				}
 			: {
 					name: "Runtime: every configured hook executes cleanly",
@@ -114,5 +128,5 @@ export function checkHookRuntime(
 					detail: `Load or runtime error in: ${offenders.join("; ")}.`,
 					fix: "Fix the offending hook, or correct its registration in settings.json.",
 				};
-	return [sweep, checkNoLeftoverShellHooks(srcRoot)];
+	return [sweep, checkNoLeftoverInterpreterHooks(srcRoot)];
 }

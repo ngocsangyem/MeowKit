@@ -74,19 +74,18 @@ Rotated logs remain in `.meowkit/telemetry/` for historical analysis. They are N
 
 ## Reading Records
 
-Always parse via `.cursor/skills/.venv/bin/python3` (per kit rules — no `jq` dependency):
+Parse on node (no `jq` dependency, and no interpreter the project may not have):
 
-```python
-import json
-with open('.meowkit/telemetry/trace-log.jsonl') as f:
-    for line in f:
-        if not line.strip():
-            continue
-        record = json.loads(line)
-        # ... process record
+```js
+const fs = require("node:fs");
+for (const line of fs.readFileSync(".meowkit/telemetry/trace-log.jsonl", "utf8").split("\n")) {
+	if (!line.trim()) continue;
+	const record = JSON.parse(line);
+	// ... process record
+}
 ```
 
-`mk:trace-analyze` uses this pattern in `step-01-ingest.md`.
+`mk:trace-analyze` uses `scripts/trace-records.cjs` for this, driven from `step-01-ingest.md`.
 
 ## Append-Only Discipline
 

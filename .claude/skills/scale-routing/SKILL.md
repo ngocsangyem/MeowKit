@@ -19,6 +19,7 @@ owner: portability
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 # Scale-Adaptive Routing

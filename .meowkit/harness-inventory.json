@@ -274,126 +274,189 @@
       "runtime": "claude-code",
       "responsibility": "verification"
     },
-    "hooks/append-trace.sh": {
+    "hooks/append-trace.cjs": {
       "owner": "observability",
       "criticality": "medium",
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "observability"
     },
-    "hooks/control-probe.sh": {
-      "owner": "observability",
-      "criticality": "medium",
+    "hooks/dispatch.cjs": {
+      "owner": "utility",
+      "criticality": "high",
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "observability"
     },
-    "hooks/ensure-skills-venv.sh": {
-      "owner": "lifecycle",
-      "criticality": "medium",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "tool-access"
-    },
-    "hooks/gate-enforcement.sh": {
+    "hooks/gate-enforcement.cjs": {
       "owner": "security",
       "criticality": "critical",
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "gate-enforcement"
     },
-    "hooks/jira-env-loader.sh": {
-      "owner": "jira",
-      "criticality": "medium",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "tool-access"
-    },
-    "hooks/capability-bootstrap.sh": {
-      "owner": "lifecycle",
-      "criticality": "medium",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "context-selection"
-    },
-    "hooks/learning-observer.sh": {
-      "owner": "observability",
-      "criticality": "medium",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "project-memory"
-    },
-    "hooks/post-session.sh": {
-      "owner": "observability",
-      "criticality": "medium",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "observability"
-    },
-    "hooks/post-write.sh": {
-      "owner": "lifecycle",
-      "criticality": "high",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "observability"
-    },
-    "hooks/posttoolfailure-probe.sh": {
-      "owner": "observability",
-      "criticality": "medium",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "failure-attribution"
-    },
-    "hooks/pre-completion-check.sh": {
-      "owner": "security",
-      "criticality": "critical",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "gate-enforcement"
-    },
-    "hooks/pre-implement.sh": {
+    "hooks/pre-implement.cjs": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "gate-enforcement"
     },
-    "hooks/pre-ship.sh": {
+    "hooks/pre-ship.cjs": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "gate-enforcement"
     },
-    "hooks/pre-task-check.sh": {
-      "owner": "lifecycle",
-      "criticality": "high",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "gate-enforcement"
-    },
-    "hooks/precompact-probe.sh": {
-      "owner": "observability",
-      "criticality": "medium",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "observability"
-    },
-    "hooks/privacy-block.sh": {
+    "hooks/privacy-block.cjs": {
       "owner": "security",
       "criticality": "critical",
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "permissions"
     },
-    "hooks/project-context-loader.sh": {
+    "hooks/handlers/auto-checkpoint.cjs": {
+      "owner": "utility",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "task-state"
+    },
+    "hooks/handlers/budget-tracker.cjs": {
+      "owner": "utility",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "entropy-auditing"
+    },
+    "hooks/handlers/build-verify.cjs": {
+      "owner": "utility",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "verification"
+    },
+    "hooks/handlers/capability-bootstrap.cjs": {
+      "owner": "utility",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "context-selection"
+    },
+    "hooks/handlers/checkpoint-writer.cjs": {
+      "owner": "utility",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "task-state"
+    },
+    "hooks/handlers/control-probe.cjs": {
+      "owner": "security",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "observability"
+    },
+    "hooks/handlers/jira-env-loader.cjs": {
+      "owner": "jira",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "tool-access"
+    },
+    "hooks/handlers/learning-observer.cjs": {
+      "owner": "observability",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "project-memory"
+    },
+    "hooks/handlers/loop-detection.cjs": {
+      "owner": "memory",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "failure-attribution"
+    },
+    "hooks/handlers/model-detector.cjs": {
+      "owner": "utility",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "context-selection"
+    },
+    "hooks/handlers/orientation-ritual.cjs": {
+      "owner": "utility",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "context-selection"
+    },
+    "hooks/handlers/post-session.cjs": {
+      "owner": "observability",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "observability"
+    },
+    "hooks/handlers/post-write.cjs": {
+      "owner": "lifecycle",
+      "criticality": "high",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "observability"
+    },
+    "hooks/handlers/posttoolfailure-probe.cjs": {
+      "owner": "observability",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "failure-attribution"
+    },
+    "hooks/handlers/pre-completion-check.cjs": {
+      "owner": "lifecycle",
+      "criticality": "critical",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
+    },
+    "hooks/handlers/pre-task-check.cjs": {
+      "owner": "observability",
+      "criticality": "high",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "gate-enforcement"
+    },
+    "hooks/handlers/precompact-probe.cjs": {
+      "owner": "observability",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "observability"
+    },
+    "hooks/handlers/project-context-loader.cjs": {
       "owner": "docs",
       "criticality": "medium",
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "context-selection"
     },
-    "hooks/tdd-flag-detector.sh": {
+    "hooks/handlers/review-evidence-tag.cjs": {
+      "owner": "lifecycle",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "verification"
+    },
+    "hooks/handlers/safety-sentinel-inject.cjs": {
+      "owner": "utility",
+      "criticality": "high",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "context-selection"
+    },
+    "hooks/handlers/tdd-flag-detector.cjs": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",

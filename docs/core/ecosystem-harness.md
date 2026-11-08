@@ -106,7 +106,7 @@ Delegation prompts are expected to include:
 
 ## Contracts you can verify in CI
 
-- `.claude/scripts/check-docs-references.py` enforces the `.claude` → `docs/*` contract.
+- `npx mewkit validate` enforces the `.claude` → `docs/*` contract.
 
 ## How to extend the harness
 

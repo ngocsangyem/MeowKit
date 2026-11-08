@@ -27,6 +27,7 @@ owner: testing
 criticality: high
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 # mk:evaluate — Experimental Behavioral Verification

@@ -1,6 +1,7 @@
 ---
 name: "mk-llms"
 description: "Generate llms.txt files from project docs per the llmstxt.org spec, for AI-friendly documentation indexes and discoverability. Use to create or update llms.txt for AI assistants."
+requires_runtime: ["python>=3.9"]
 ---
 
 # llms.txt Generator
@@ -38,11 +39,11 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 
 ```bash
 # Generate llms.txt (script does the heavy lifting)
-.agents/skills/.venv/bin/python3 .agents/skills/llms/scripts/generate-llms-txt.py \
+node .codex/scripts/skill-python.cjs .agents/skills/llms/scripts/generate-llms-txt.py \
   --source ./docs [--output .] [--base-url https://example.com/docs] [--full]
 
 # Preview metadata first (Codex reviews before generating)
-.agents/skills/.venv/bin/python3 .agents/skills/llms/scripts/generate-llms-txt.py \
+node .codex/scripts/skill-python.cjs .agents/skills/llms/scripts/generate-llms-txt.py \
   --source ./docs --json
 ```
 

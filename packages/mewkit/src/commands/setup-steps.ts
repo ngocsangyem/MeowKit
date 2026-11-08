@@ -1,15 +1,22 @@
 import { existsSync, readFileSync, writeFileSync, copyFileSync, appendFileSync, mkdirSync } from "node:fs";
 import { join, relative } from "node:path";
 import pc from "picocolors";
-import { ensureVenv, installPipPackages, verifyPackages } from "../core/dependency-installer.js";
-import { getRequirementsSource, formatPackageList } from "../core/skills-dependencies.js";
+import { ensureEnv, findPython, installPipPackages, verifyPackages } from "../core/dependency-installer.js";
+import { formatPackageList } from "../core/skills-dependencies.js";
+import { envSkills, readSkillRequirements, skillEnvDir } from "../core/skill-env.js";
 
-export type StepName = "venv" | "deps" | "mcp" | "env" | "gitignore" | "project-context";
+export type StepName = "skill-envs" | "mcp" | "env" | "gitignore" | "project-context";
 
 export interface StepResult {
 	name: StepName;
 	status: "pass" | "skip" | "fail" | "warn";
 	message: string;
+}
+
+/** Options a step may read. Only the environment step uses any. */
+export interface StepOptions {
+	/** Skills the user named. Empty means create nothing — the default. */
+	skills?: string[];
 }
 
 // Default file contents — used when .example files don't exist (no scaffold yet)
@@ -59,18 +66,6 @@ const DEFAULT_GITIGNORE = `# MeowKit
 .claude/.env
 .claude/logs/
 \n`;
-
-/** Setup Python virtual environment for MeowKit skill scripts */
-function setupVenv(projectDir: string): StepResult {
-	try {
-		const { venvDir, created } = ensureVenv(projectDir);
-		if (created) return { name: "venv", status: "pass", message: `Created at ${venvDir}` };
-		return { name: "venv", status: "skip", message: "Python venv already exists" };
-	} catch (err) {
-		const msg = err instanceof Error ? err.message : String(err);
-		return { name: "venv", status: "fail", message: msg };
-	}
-}
 
 /** Setup MCP configuration */
 function setupMcp(projectDir: string): StepResult {
@@ -164,49 +159,90 @@ function setupGitignore(projectDir: string): StepResult {
 	return { name: "gitignore", status: "pass", message: "Appended MeowKit entries to .gitignore" };
 }
 
-/** Install pip packages into the skills venv */
-async function setupDeps(projectDir: string): Promise<StepResult> {
-	const venvDir = join(projectDir, ".claude", "skills", ".venv");
-	if (!existsSync(venvDir)) {
-		return { name: "deps", status: "fail", message: "No venv. Run setup --only=venv first." };
-	}
-
-	const { packages, source } = getRequirementsSource(projectDir);
-	console.log(pc.dim(`\n  Packages (from ${source}):`));
-	console.log(pc.dim(formatPackageList(packages)));
-	console.log();
-
-	const existing = verifyPackages(projectDir, packages);
-	const missing = packages.filter((_, i) => !existing[i]?.installed);
-
-	if (missing.length === 0) {
-		return { name: "deps", status: "skip", message: "All pip packages already installed" };
-	}
-
-	console.log(`  ${missing.length} package(s) to install, ${packages.length - missing.length} already present.\n`);
-
-	const results = await installPipPackages(projectDir, missing);
-	const failed = results.filter((r) => !r.success);
-
-	if (failed.length === 0) {
-		return { name: "deps", status: "pass", message: `Installed ${results.length} package(s)` };
-	}
-	if (failed.length < results.length) {
+/**
+ * Create the interpreter environment for each skill the user NAMED, and nothing
+ * else.
+ *
+ * Opt-in by default. Setup used to create one shared environment unconditionally
+ * and install a merged set of every skill's dependencies into it, which meant a
+ * project that used no Python skill still paid for Python, and a user who wanted
+ * one skill got all of them. With no `--skills`, this step reports that it did
+ * nothing and why.
+ *
+ * Each named skill gets exactly its own pins. There is no merged set and no
+ * built-in default list to fall back on.
+ */
+async function setupSkillEnvs(projectDir: string, options: StepOptions = {}): Promise<StepResult> {
+	const requested = options.skills ?? [];
+	if (!requested.length) {
 		return {
-			name: "deps",
-			status: "warn",
-			message: `${results.length - failed.length} installed, ${failed.length} failed`,
+			name: "skill-envs",
+			status: "skip",
+			message: "No skills selected — pass --skills=<a,b> or run `mewkit skill env <skill>`",
 		};
 	}
-	return { name: "deps", status: "fail", message: `All ${failed.length} package(s) failed` };
+
+	const declared = envSkills(projectDir);
+	const unknown = requested.filter((skill) => !declared.includes(skill));
+	if (unknown.length) {
+		return {
+			name: "skill-envs",
+			status: "fail",
+			message: `Not a skill that needs an environment: ${unknown.join(", ")}. Eligible: ${declared.join(", ") || "(none)"}`,
+		};
+	}
+
+	if (!findPython()) {
+		// Exits clean, creates nothing, and says why — an absent interpreter is a
+		// reason to skip, not a reason to fail a setup that configured everything else.
+		return {
+			name: "skill-envs",
+			status: "skip",
+			message: `No Python interpreter in PATH — skipped ${requested.join(", ")}; install Python, then re-run`,
+		};
+	}
+
+	const created: string[] = [];
+	const installed: string[] = [];
+	for (const skill of requested) {
+		const envDir = skillEnvDir(projectDir, skill);
+		const req = readSkillRequirements(projectDir, skill);
+		if (req.rejected.length) {
+			return {
+				name: "skill-envs",
+				status: "fail",
+				message: `${skill}: rejected requirement line(s): ${req.rejected.join(", ")} — nothing installed`,
+			};
+		}
+
+		try {
+			const { created: made, repaired } = ensureEnv(projectDir, envDir);
+			if (made || repaired) created.push(skill);
+		} catch (err) {
+			return { name: "skill-envs", status: "fail", message: `${skill}: ${err instanceof Error ? err.message : String(err)}` };
+		}
+
+		if (!req.packages.length) continue;
+		const present = verifyPackages(envDir, req.packages);
+		const missing = req.packages.filter((_, i) => !present[i]?.installed);
+		if (!missing.length) continue;
+		console.log(pc.dim(`\n  ${skill} — pins from ${relative(projectDir, req.source ?? "")}:`));
+		console.log(pc.dim(formatPackageList(missing)));
+		const results = await installPipPackages(projectDir, envDir, missing);
+		const failed = results.filter((r) => !r.success);
+		if (failed.length) {
+			return { name: "skill-envs", status: "warn", message: `${skill}: ${failed.length} of ${results.length} package(s) failed` };
+		}
+		installed.push(`${skill} (${results.length})`);
+	}
+
+	if (!created.length && !installed.length) {
+		return { name: "skill-envs", status: "skip", message: `Already configured: ${requested.join(", ")}` };
+	}
+	const parts = [created.length ? `created ${created.join(", ")}` : "", installed.length ? `installed ${installed.join(", ")}` : ""].filter(Boolean);
+	return { name: "skill-envs", status: "pass", message: parts.join("; ") };
 }
 
-/**
- * Notify if docs/project-context.md is missing. The actual generator lives in the
- * mk:project-context skill (invoked via /mk:project-context generate|init).
- * This step does not auto-invoke the skill — agents are not callable from this CLI —
- * but flags the absence so users know to run the skill on first session.
- */
 function setupProjectContext(projectDir: string): StepResult {
 	const target = join(projectDir, "docs", "project-context.md");
 	if (existsSync(target)) {
@@ -225,9 +261,8 @@ function setupProjectContext(projectDir: string): StepResult {
 	};
 }
 
-export const STEPS: Record<StepName, (dir: string) => StepResult | Promise<StepResult>> = {
-	venv: setupVenv,
-	deps: setupDeps,
+export const STEPS: Record<StepName, (dir: string, options?: StepOptions) => StepResult | Promise<StepResult>> = {
+	"skill-envs": setupSkillEnvs,
 	mcp: setupMcp,
 	env: setupEnv,
 	gitignore: setupGitignore,

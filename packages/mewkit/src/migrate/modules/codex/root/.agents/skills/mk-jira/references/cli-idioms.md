@@ -25,7 +25,7 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <ar
 
 The wrapper:
 
-- Resolves to venv-local `.agents/skills/.venv/bin/jira-as`
+- Resolves to venv-local `.meowkit/envs/jira/bin/jira-as`
 - Sources `.codex/.env` and translates `MEOW_JIRA_*` → `JIRA_*`
 - Exports `JIRA_OUTPUT=json` as default (drop `--output json` flag noise from per-call examples)
 

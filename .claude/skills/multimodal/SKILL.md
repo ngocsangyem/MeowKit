@@ -41,6 +41,7 @@ owner: utility
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 requires_external_service: ["gemini", "minimax"]
 default_enabled: false
 ---
@@ -71,7 +72,7 @@ verify preview IDs against the provider dashboard before relying on one.
 | Validate keys and dependencies | `scripts/check_setup.py` |
 
 ```bash
-.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/gemini_analyze.py \
+node .claude/scripts/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py \
   --files <path> --task <analyze|transcribe|extract> [--resolution low-res] [--json]
 ```
 

@@ -92,4 +92,4 @@ Record a durable entry whenever a human overrides a blocked pattern, a gate is b
 
 **Rule 3 — Human-authorized only.** Only a human authorizes an intervention. The agent records it; it never self-authorizes a bypass and logs it as approved.
 
-Records live in `.claude/scripts/injection-audit.py` (STOP events) and in the active plan plus `.meowkit/telemetry/security-log` (overrides, gate exceptions).
+Records live in `.claude/scripts/injection-audit.cjs` (STOP events) and in the active plan plus `.meowkit/telemetry/security-log` (overrides, gate exceptions).

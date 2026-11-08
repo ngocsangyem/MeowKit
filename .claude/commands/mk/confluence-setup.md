@@ -8,7 +8,7 @@ Walk the user through Confluence Cloud credential setup for the `mk:confluence-*
 
 ## Steps
 
-1. Verify `.claude/scripts/bin/setup-workflow` ran and `confluence-as` binary exists at `.claude/skills/.venv/bin/confluence-as`. If not, instruct: `.claude/scripts/bin/setup-workflow`.
+1. Verify the `confluence-as` binary exists at `.meowkit/envs/confluence/bin/confluence-as`. If not, instruct: `mewkit skill env confluence` (installs only what this skill pins).
 
 2. Ensure `.meowkit/.env` exists. If absent: create empty file, then `chmod 0600 .meowkit/.env`.
 

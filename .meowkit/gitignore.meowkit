@@ -18,4 +18,8 @@ session-state/
 tasks/reports/
 
 .claude/logs/
-.claude/skills/.venv/
+
+# Per-skill interpreter environments. Created on demand by `mewkit skill env`,
+# machine-local and reproducible from each skill's own pinned requirements, so
+# there is nothing here worth committing.
+.meowkit/envs/

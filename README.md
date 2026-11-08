@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  125 skills &middot; 42 agents &middot; 27 commands &middot; 7 modes &middot; 7 rules &middot; 5 conditional rules &middot; 18 hook scripts &middot; 4-layer+ security
+  125 skills &middot; 42 agents &middot; 27 commands &middot; 7 modes &middot; 7 rules &middot; 5 conditional rules &middot; 27 hook scripts &middot; 4-layer+ security
 </p>
 
 <p align="center">
@@ -102,7 +102,7 @@ meowkit/
 │   ├── agents/               42 specialist agents
 │   ├── skills/               125 skills (mk: namespace)
 │   ├── rules/                7 enforcement rules (always-on)
-│   ├── hooks/                18 hook scripts — lifecycle hooks + handlers + libraries
+│   ├── hooks/                27 hook scripts — lifecycle hooks + handlers + libraries
 │   ├── commands/             27 slash commands
 │   ├── modes/                7 behavioral modes
 │   ├── scripts/              Python validators + shell utilities

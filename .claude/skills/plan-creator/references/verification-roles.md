@@ -13,7 +13,7 @@
 
 ## Purpose
 
-`validate-plan.py` checks structure and frontmatter drift; it does NOT confirm that a cited file path, function name, or contract count actually exists in the codebase. Verification Roles layer on top of that structural check: each role dispatches as one read-only subagent that verifies claims against the live codebase and returns a uniform verdict list. Failed claims become interview topics in step-06, not auto-rejects — humans adjudicate.
+`npx mewkit plan check --structural` checks structure and frontmatter drift; it does NOT confirm that a cited file path, function name, or contract count actually exists in the codebase. Verification Roles layer on top of that structural check: each role dispatches as one read-only subagent that verifies claims against the live codebase and returns a uniform verdict list. Failed claims become interview topics in step-06, not auto-rejects — humans adjudicate.
 
 ## Where it runs
 
@@ -118,7 +118,7 @@ Aggregated block written by the orchestrator:
 
 ## Backward compatibility
 
-- `## Verification Log` is OPTIONAL. Legacy plans without it pass `validate-plan.py`.
+- `## Verification Log` is OPTIONAL. Legacy plans without it pass the structural check.
 - Section is machine-written. Humans should not hand-edit — orchestrator overwrites on next run.
 - Step-06 reads each phase's `## Verification Log` if present and generates clarifying questions from FAILED / UNVERIFIED entries.
 

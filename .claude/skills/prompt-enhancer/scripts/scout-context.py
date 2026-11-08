@@ -14,7 +14,7 @@ forbid-list AND match the allow-list to be read.
 
 Usage (stdin JSON):
   echo '{"keywords": ["auth"], "symbols": ["login"], "git_root": "/abs/path"}' \
-    | .claude/skills/.venv/bin/python3 scripts/scout-context.py
+    | node .claude/scripts/skill-python.cjs .claude/skills/prompt-enhancer/scripts/scout-context.py
 
 Output (stdout JSON):
   {

@@ -18,7 +18,7 @@ interface AgentPackCatalog {
 }
 
 describe("cursor full-surface characterization: manifest inventory", () => {
-	it("declares exactly the 7 top-level managed surfaces, all active", () => {
+	it("declares exactly the 8 top-level managed surfaces, all active", () => {
 		const manifest = loadCursorBundleManifest(moduleDir);
 		expect(manifest.provider).toBe("cursor");
 		const targetPaths = manifest.entries.map((e) => e.targetPath).sort();
@@ -31,6 +31,7 @@ describe("cursor full-surface characterization: manifest inventory", () => {
 				".cursor/skills",
 				".cursor/hooks.json",
 				".cursor/hooks",
+				".cursor/scripts/skill-python.cjs",
 			].sort(),
 		);
 		expect(manifest.entries.every((e) => e.active)).toBe(true);

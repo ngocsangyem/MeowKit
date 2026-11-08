@@ -9,7 +9,7 @@ Responsibilities:
   - Atomic .tmp → os.replace write
   - Manifest append under fcntl.flock (append-only index.jsonl)
   - Secret scrub on content + URL via secret_scrub module (Layer 7)
-  - Layer 8: post-write injection-audit.py scan via importlib direct import
+  - Layer 8: post-write re-scan of the written file through the audit scanner's single-path mode
 
 Exports:
   persist(url, content, method, status, http_status, size_bytes,
@@ -19,10 +19,10 @@ Exports:
 
 import fcntl
 import hashlib
-import importlib.util
 import json
 import os
 import shutil
+import subprocess
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -170,39 +170,65 @@ def _atomic_write(dest: Path, content_bytes: bytes) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Layer 8: post-write injection-audit.py scan
+# Layer 8: post-write re-scan through the audit scanner
 # ---------------------------------------------------------------------------
 
-def _load_injection_audit():
-    """Import injection_audit module via importlib (direct import, not CLI — see security.md Layer 8)."""
-    audit_path = PROJECT_ROOT / ".codex" / "scripts" / "injection-audit.py"
-    if not audit_path.exists():
+AUDIT_CLI = PROJECT_ROOT / ".cursor" / "scripts" / "injection-audit.cjs"
+
+
+class _Finding:
+    """One finding, as the audit scanner reports it."""
+
+    __slots__ = ("level", "category", "description", "file", "line")
+
+    def __init__(self, raw: dict):
+        self.level = raw.get("level", "")
+        self.category = raw.get("category", "")
+        self.description = raw.get("description", "")
+        self.file = raw.get("file", "")
+        self.line = raw.get("line", 0)
+
+
+def _scan_one_path(target: Path):
+    """
+    Scan one explicit path through the audit scanner's single-path mode.
+
+    A subprocess, not an import: the scanner is a node program, so the audit
+    layer stays available on a machine with no other interpreter. The
+    single-path mode exists for this caller — the scanner's directory walk
+    prunes `.cursor/*`, and the file just written may live under it.
+
+    Returns None when the scanner is absent, so the caller can tell "nothing to
+    report" from "no scanner ran". Any other failure raises: a failed scan is
+    treated as CRITICAL.
+    """
+    if not AUDIT_CLI.exists():
         return None
-    try:
-        spec = importlib.util.spec_from_file_location("injection_audit", audit_path)
-        if spec is None or spec.loader is None:
-            return None
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)  # type: ignore[union-attr]
-        return module
-    except Exception:
-        return None
+    proc = subprocess.run(
+        ["node", str(AUDIT_CLI), "--file", str(target)],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        cwd=str(PROJECT_ROOT),
+        check=False,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"audit scanner exited {proc.returncode}: {proc.stderr.strip()[:200]}")
+    payload = json.loads(proc.stdout)
+    return [_Finding(raw) for raw in payload.get("findings", [])]
 
 
 def _post_write_audit(report_path: Path, url: str, manifest_entry: dict) -> str | None:
     """
-    Layer 8: run injection_audit.scan_file after successful persist.
+    Layer 8: re-scan the written file after a successful persist.
     On CRITICAL findings → retroactive quarantine, corrective manifest entry, security-log.
     Returns INJECTION_STOP string if quarantined, None if clean.
     """
-    audit = _load_injection_audit()
-    if audit is None:
-        return None
     try:
-        findings = audit.scan_file(report_path)
+        findings = _scan_one_path(report_path)
     except Exception as exc:
-        # Fail-closed: a runtime scan_file exception is suspicious (corrupted pattern file,
-        # bad Path type, import error). Log as WARN and treat as CRITICAL to quarantine.
+        # Fail-closed: a failed scan is suspicious (scanner crashed, unparseable
+        # output, timeout). Log as WARN and treat as CRITICAL to quarantine.
         _log_security(f"[WARN] [mk:web-to-markdown] Layer 8 audit errored: {exc} — treating as CRITICAL (url={scrub_url(url)})")
         # Retroactive quarantine on audit failure
         content_sha = hashlib.sha256(report_path.read_bytes()).hexdigest()[:16] if report_path.exists() else "unknown"
@@ -223,6 +249,10 @@ def _post_write_audit(report_path: Path, url: str, manifest_entry: dict) -> str 
             f"Content quarantined at {q_path}\n"
             "Manual review required. No programmatic bypass."
         )
+
+    # None means no scanner was present, which is not the same as a clean scan.
+    if findings is None:
+        return None
 
     criticals = [f for f in findings if getattr(f, "level", "") == "CRITICAL"]
     if not criticals:

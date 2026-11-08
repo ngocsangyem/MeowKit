@@ -1,5 +1,5 @@
 # mk:web-to-markdown — Python dependencies
-# Install into skill venv: .claude/skills/.venv/bin/pip install -r requirements.txt
+# Installed into this skill's own environment by `mewkit skill env web-to-markdown`.
 # No Playwright here — installed separately via CLI (system-deps-registry)
 
 # Core HTTP client — used by _static_fetch, fetch_api_spec
@@ -20,3 +20,8 @@ charset-normalizer>=3.3.0
 # YAML parsing — used by injection_detect.py to load vendored
 # pyyaml is a soft dependency; injection_detect.py falls back to hardcoded patterns if unavailable
 PyYAML>=6.0.1
+
+# Test runner — the SSRF-guard and offline end-to-end suites are invoked as
+# `-m pytest`. Pinned here because nothing else pins it: it used to arrive from a
+# blanket install in CI, so the suites ran there and nowhere else.
+pytest>=8.0.0

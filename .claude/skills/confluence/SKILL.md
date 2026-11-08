@@ -16,6 +16,7 @@ owner: confluence
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 requires_external_service: ["confluence"]
 default_enabled: false
 dependency_edges:
@@ -69,7 +70,7 @@ This skill is a **pure routing layer**. Its sole purpose: identify the right `mk
 
 ## Setup
 
-See `references/install-and-auth.md` for one-time setup (`.claude/scripts/bin/setup-workflow` installs `confluence-assistant-skills` into `.claude/skills/.venv` per `scripts/requirements.txt`; populate `.meowkit/.env` with the 3 `MEOW_CONFLUENCE_*` vars).
+See `references/install-and-auth.md` for one-time setup (`mewkit skill env confluence` installs `confluence-assistant-skills` into `.meowkit/envs/confluence/` per `scripts/requirements.txt`; populate `.meowkit/.env` with the 3 `MEOW_CONFLUENCE_*` vars).
 
 ## Shared Resources (used by leaves)
 

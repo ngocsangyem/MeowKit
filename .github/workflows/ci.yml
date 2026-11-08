@@ -97,21 +97,24 @@ jobs:
       - name: Zero-residue check (memory/wiki)
         run: node scripts/check-memory-wiki-residue.cjs
 
-      - name: Setup Python venv
-        run: |
-          python3 -m venv .claude/skills/.venv
-          .claude/skills/.venv/bin/pip install --quiet pyyaml jsonschema pytest
-
+      # Each Python-owning skill gets its OWN environment from its OWN pinned
+      # requirements. No shared environment and no blanket install: a package one
+      # skill pins must not become every skill's dependency, and a step that
+      # passed only because another step installed something is a step that lies.
       - name: Multimodal mock tests
-        run: .claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/tests/run_tests.py
+        run: |
+          node packages/mewkit/dist/index.js skill env multimodal
+          node .claude/scripts/skill-python.cjs .claude/skills/multimodal/scripts/tests/run_tests.py
 
       - name: Validate Figma evidence packet fixtures
-        run: .claude/skills/.venv/bin/python3 .claude/skills/figma/evals/validate-evidence-packets.py
+        run: |
+          node packages/mewkit/dist/index.js skill env figma
+          node .claude/scripts/skill-python.cjs .claude/skills/figma/evals/validate-evidence-packets.py
 
       - name: Test web-to-markdown URL SSRF guard
         run: |
-          .claude/skills/.venv/bin/pip install --quiet -r .claude/skills/web-to-markdown/scripts/requirements.txt
-          .claude/skills/.venv/bin/python3 -m pytest \
+          node packages/mewkit/dist/index.js skill env web-to-markdown
+          node .claude/scripts/skill-python.cjs --skill web-to-markdown -m pytest \
             .claude/skills/web-to-markdown/tests/test_safe_url.py \
             .claude/skills/web-to-markdown/tests/test_e2e_offline.py -q
 
@@ -125,13 +128,17 @@ jobs:
         run: bash tests/story-sizer-all.test.sh
 
       - name: Routing eval (Track D, EN + VI)
-        run: .claude/skills/.venv/bin/python3 .claude/skills/scale-routing/eval/run-routing-eval.py
+        run: |
+          node packages/mewkit/dist/index.js skill env scale-routing
+          node .claude/scripts/skill-python.cjs .claude/skills/scale-routing/eval/run-routing-eval.py
 
       - name: Critical-skill contract coverage suites
         run: bash tests/skill-contract-coverage.test.sh
 
+      # Repo-development tooling: no skill owns it, so it runs on the runner's own
+      # interpreter and never inside a skill environment.
       - name: Real-world journey specs frozen + valid
-        run: .claude/skills/.venv/bin/python3 tests/journey-validation/check-journey-specs.py
+        run: python3 tests/journey-validation/check-journey-specs.py
 
       - name: Validate skill cross-refs
         run: bash scripts/check-skill-cross-refs.sh
@@ -199,16 +206,10 @@ jobs:
         run: node scripts/terminology-linter.cjs
 
       - name: Validate skill frontmatter
-        run: .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py
+        run: node packages/mewkit/dist/index.js validate --frontmatter
 
       - name: Validate docs references on Type-1 allowlist
-        run: python3 .claude/scripts/check-docs-references.py .claude
-
-      - name: Unit-test docs-references validator
-        run: python3 .claude/scripts/tests/test-check-docs-references.py
-
-      - name: Unit-test skill-frontmatter validator
-        run: .claude/skills/.venv/bin/python3 .claude/scripts/tests/test-validate-skill-frontmatter.py
+        run: node packages/mewkit/dist/index.js validate --docs-refs
 
       - name: Validate rule availability
         run: bash scripts/validate-rule-availability.sh

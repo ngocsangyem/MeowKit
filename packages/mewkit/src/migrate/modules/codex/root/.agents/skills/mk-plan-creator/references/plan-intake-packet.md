@@ -79,7 +79,7 @@ Six blocks, in this order. Target the whole packet at UNDER 120 lines.
 - The packet is a BRIEF, not a plan:
   - NO detailed implementation plan or step-by-step code instructions.
   - NO phase files — phase decomposition is step-03's job.
-  - NO validation changes — `validate-plan.py` does not know about packets.
+  - NO validation changes — the structural check does not know about packets.
   - NO brainstorming — if the approach is unsettled, route to `mk:brainstorming`
     BEFORE planning; the packet only records what sources already settled.
   - NO ticket complexity scoring — that is `mk:intake` / `mk:planning-engine`.
@@ -99,7 +99,7 @@ Six blocks, in this order. Target the whole packet at UNDER 120 lines.
 | Single ticket/PRD triage, completeness scoring, RCA | `mk:intake` |
 | Ticket complexity + dependency mapping against the codebase | `mk:planning-engine` |
 | Exploring solution approaches, trade-off analysis | `mk:brainstorming` |
-| Plan structural validation | `mk:plan validate` (validate-plan.py) |
+| Plan structural validation | `npx mewkit plan check --structural` |
 | Rendering plans to HTML | `mk:visual-plan` |
 
 If a request fits one of these rows, the packet does not absorb it — hand off.

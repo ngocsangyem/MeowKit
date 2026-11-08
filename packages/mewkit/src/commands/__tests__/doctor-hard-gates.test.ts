@@ -29,7 +29,7 @@ describe("doctor --hard-gates", () => {
 		expect(byName("Gate 1 + contract: allows source write")?.status).toBe("pass");
 		expect(byName("Privacy: blocks .env read")?.status).toBe("pass");
 		expect(byName("Gate 2: blocks a commit with no verdict")?.status).toBe("pass");
-		expect(byName("Runtime: no leftover shell hooks")?.status).toBe("pass");
+		expect(byName("Runtime: no leftover shell")?.status).toBe("pass");
 		expect(byName("Runtime: every configured hook")?.status).toBe("pass");
 		// This probe scaffolds a throwaway project and spawns many real hooks (now incl. an
 		// approval-receipt stamp), so it legitimately exceeds the 5s default on cold runs.

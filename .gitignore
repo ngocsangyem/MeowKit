@@ -38,7 +38,6 @@ __pycache__/
 *.pyc
 *.pyo
 .venv/
-.claude/skills/.venv/
 
 # Coverage
 coverage/
@@ -83,3 +82,8 @@ plugin/agent-memory/
 release-manifest.json
 
 tmp/
+
+# Per-skill interpreter environments. Created on demand by `mewkit skill env`,
+# machine-local and reproducible from each skill's own pinned requirements, so
+# there is nothing here worth committing.
+.meowkit/envs/

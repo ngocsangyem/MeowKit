@@ -50,7 +50,7 @@ enforcement text moved intact and is loaded on demand by the skill that owns it.
 | `rubric-rules.md` | `.claude/skills/rubric/references/` | `mk:rubric`, evaluator agent |
 | `skill-authoring-rules.md` | `.claude/skills/skill-creator/references/` | `mk:skill-creator`, skill audits |
 | `dead-weight-audit-rules.md` | `.claude/skills/benchmark/references/` | `mk:benchmark` |
-| `docs-reference-contract.md` | `docs/maintainer/` (source repo only, not shipped) | maintainers, `check-docs-references.py` |
+| `docs-reference-contract.md` | `docs/maintainer/` (source repo only, not shipped) | maintainers, `npx mewkit validate` |
 | `step-file-rules.md` | inlined as `## Step-File Contract` in each step-filed skill's `workflow.md` | `mk:plan-creator`, `mk:review`, `mk:evaluate`, `mk:autobuild`, `mk:trace-analyze` |
 | `anti-rationalization.md` | merged into `.claude/rules/core-behaviors.md` | always-on |
 | `intervention-recording-rules.md` | merged into `.claude/rules/gate-rules.md` | always-on |

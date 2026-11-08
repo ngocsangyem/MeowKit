@@ -1,0 +1,26 @@
+{
+  "name": "config-get-no-config-without-default",
+  "group": "workflow-config",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "config",
+    "args": [
+      "get",
+      "proactive"
+    ]
+  },
+  "setup": "config-get-no-config-without-default",
+  "setupDescription": "no config file and no default",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".claude/meowkit.config.json": null
+  }
+}

@@ -9,7 +9,7 @@ How to run:
 Requirements:
     - Network access to example.com, httpbin.org, rfc-editor.org
     - mk:web-to-markdown Python deps installed:
-        .cursor/skills/.venv/bin/pip install -r .cursor/skills/web-to-markdown/scripts/requirements.txt
+        .meowkit/envs/web-to-markdown/bin/pip install -r .cursor/skills/web-to-markdown/scripts/requirements.txt
     - Run from project root (so .meowkit/cache/ resolves correctly)
     - Set MEOWKIT_WEB_FETCH_PERSIST=off to avoid writing cache files during tests (optional)
 """

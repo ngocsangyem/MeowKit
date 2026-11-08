@@ -1,6 +1,7 @@
 ---
 name: "mk-scale-routing"
 description: "Domain-aware complexity routing: scans the task for domain keywords, matches domain-complexity.csv, and returns complexity level, workflow intensity, and execution tier. Extends Phase 0 orchestration."
+requires_runtime: ["python>=3.9"]
 ---
 
 # Scale-Adaptive Routing

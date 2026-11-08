@@ -2,7 +2,7 @@
 
 > Maintainer document. It lives in the kit's source repo at `docs/maintainer/docs-reference-contract.md`
 > and is NOT shipped into user projects. The only shipped file permitted to name this path is
-> `.claude/scripts/check-docs-references.py`, whose job is to resolve it; when the contract is absent
+> the kit's `validate` command, whose job is to resolve it; when the contract is absent
 > (every user project) that checker reports N/A and exits 0.
 
 How `docs/*` paths inside `.claude/agents`, `.claude/skills`, `.claude/commands`, `.claude/hooks`, `.claude/scripts`, `.claude/rules`, `.claude/rules-conditional`, and `.claude/modes` are resolved at runtime, and which paths are allowed to appear.
@@ -117,14 +117,13 @@ Before adding a `docs/*` reference to any file under `.claude/`:
 2. Is the target a kit-internal policy file? → Banned. Inline the policy or drop the link if context is enough.
 3. Is the target a research / attribution source? → Banned. Use plain prose ("Source: <Author> — <Title>").
 4. Is the target a template placeholder example? → Use an angle-bracket placeholder `<path-to-related-doc-in-your-project>`, not a literal path.
-5. Run the validator after editing: `.claude/scripts/check-docs-references.py` (Python CLI), or the equivalent native check exposed by the kit's `validate` command.
+5. Run the validator after editing: `npx mewkit validate` (the docs-reference check runs as part of it).
 
 ## Validator
 
 Two implementations consume this contract:
 
 - A TypeScript-native check exposed by the kit's `validate` command (runs without any external dependency).
-- A standalone Python script at `.claude/scripts/check-docs-references.py` (CI convenience and direct CLI use).
 
 Both resolve this file at `docs/maintainer/docs-reference-contract.md`, relative to the repo root that holds `.claude/`, and parse the `<!-- ALLOWLIST-START -->` / `<!-- ALLOWLIST-END -->` block above as the single source of truth. When the file is absent, both report N/A and exit 0. They must produce identical output on identical input — a cross-implementation parity test in CI guards against drift.
 

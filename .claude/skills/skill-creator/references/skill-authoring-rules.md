@@ -110,7 +110,7 @@ WHY: Standardized metadata keeps skill discovery predictable.
 
 ### Validation
 
-Enforced by `scripts/validate-skill-frontmatter.py` against `.claude/schemas/skill-schema.json`. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
+Enforced by `npx mewkit validate --frontmatter` against `.claude/schemas/skill-schema.json`. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
 
 ### Deprecated fields
 
@@ -124,7 +124,7 @@ The following frontmatter fields are advisory (not hook-enforced); they annotate
 - `phase: 0 | 1 | 2 | 3 | 4 | 5 | 6 | on-demand` — anchors the skill to a workflow phase. `on-demand` means the skill is invoked by need, not by phase.
 - `trust_level: kit-authored | third-party` — provenance marker. Third-party skills should treat external input as DATA per `injection-rules.md`.
 - `injection_risk: low | medium | high` — advisory risk level for prompt-injection exposure.
-- `requires_external_service: [<service>...]` — external services the skill needs (e.g. `["jira"]`, `["gemini", "minimax"]`). Annotate every external-service entrypoint. `validate-skill-frontmatter.py` emits a WARN (non-blocking) for an external-service entrypoint that lacks this field.
+- `requires_external_service: [<service>...]` — external services the skill needs (e.g. `["jira"]`, `["gemini", "minimax"]`). Annotate every external-service entrypoint. `npx mewkit validate --frontmatter` emits a WARN (non-blocking) for an external-service entrypoint that lacks this field.
 - `default_enabled: true | false` — whether the skill works without external configuration. External-service skills set `false` (fail-closed until the required env vars are present). A `true` value requires a verified external-service-free path. Declaring `requires_external_service` without `default_enabled` also WARNs.
 - `stable_output_contract: true | false` — `true` when the skill returns stable machine-readable IDs / output for created or bound runtime resources.
 
@@ -158,7 +158,7 @@ Kit-internal docs (any path under a `docs/` tree that lives only in the source k
 
 **WHY:** The kit installer ships `.claude/` + `tasks/` only. References to non-shipped `docs/` paths break at runtime in every downstream project. The contract codifies the two-tier resolution model so authors and the validator agree on what is allowed.
 
-**ENFORCEMENT:** Mechanically checked by the kit's `validate` command and by `.claude/scripts/check-docs-references.py` in CI. Both parse the allowlist from the `<!-- ALLOWLIST-START -->` block in the kit's docs-reference contract (source repo); when that contract is absent, as in a user project, the check reports N/A and exits 0.
+**ENFORCEMENT:** Mechanically checked by the kit's `validate` command in CI. It parses the allowlist from the `<!-- ALLOWLIST-START -->` block in the kit's docs-reference contract (source repo); when that contract is absent, as in a user project, the check reports N/A and exits 0.
 
 ## Rule 6: Match Control to Risk
 

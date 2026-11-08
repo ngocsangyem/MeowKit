@@ -1,0 +1,27 @@
+{
+  "name": "config-set-no-config",
+  "group": "workflow-config",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "config",
+    "args": [
+      "set",
+      "telemetry",
+      "true"
+    ]
+  },
+  "setup": "config-set-no-config",
+  "setupDescription": "no config file — a write must not create one",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "stdout": "",
+    "stderr": "Config not found: .claude/meowkit.config.json\n"
+  },
+  "sideEffects": {
+    ".claude/meowkit.config.json": null
+  }
+}

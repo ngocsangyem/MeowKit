@@ -23,12 +23,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-skills-venv.sh\"",
-            "timeout": 30,
-            "statusMessage": "Ensuring Python skills venv..."
-          },
-          {
-            "type": "command",
             "command": "node",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs",

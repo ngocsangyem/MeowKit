@@ -13,10 +13,4 @@ export function resolveContractPath(claudeDir: string): string {
 }
 
 // Files allowed to mention banned paths (because they DEFINE the bans).
-// Kept byte-identical to the Python twin's FILE_WHITELIST.
-export const FILE_WHITELIST = new Set([
-	"skills/skill-creator/references/skill-authoring-rules.md",
-	// The shipped checker names the maintainer-only contract it reads; it is the one
-	// shipped file permitted to do so, because that is its own resolution logic.
-	"scripts/check-docs-references.py",
-]);
+export const FILE_WHITELIST = new Set(["skills/skill-creator/references/skill-authoring-rules.md"]);

@@ -1,0 +1,25 @@
+{
+  "name": "audit-target-is-a-file",
+  "group": "injection-audit",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "scan-dir",
+    "args": [
+      "README.md"
+    ]
+  },
+  "setup": "audit-target-is-a-file",
+  "setupDescription": "the directory argument names a file",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "stdout": "Error: README.md is not a directory\n",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/security-log.md": null
+  }
+}

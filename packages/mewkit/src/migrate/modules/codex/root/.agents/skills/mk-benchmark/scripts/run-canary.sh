@@ -4,7 +4,7 @@
 # Usage:  run-canary.sh [--full] [--budget N]
 #         run-canary.sh check-cap <ledger.jsonl> [cap]   # enforce the cost cap between tasks
 # Exit:   0 all tasks completed / cap not reached; 1 infra failure; 2 cost cap reached (halt)
-# Reqs:   Bash 3.2+, .agents/skills/.venv/bin/python3
+# Reqs:   Bash 3.2+, node
 #
 # Quick tier (default): 5 tasks under .codex/benchmarks/canary/quick/, ≤$5
 # Full tier (--full): quick + 1 heavy task under .codex/benchmarks/canary/full/, ≤$30
@@ -22,24 +22,7 @@ if [ "${1:-}" = "check-cap" ]; then
   LEDGER="${2:-}"
   CAP="${MEOWKIT_BUDGET_CAP:-${3:-100}}"
   [ -f "$LEDGER" ] || { echo "ERROR: ledger not found: $LEDGER" >&2; exit 1; }
-  PY=".agents/skills/.venv/bin/python3"; [ -x "$PY" ] || PY="python3"
-  LEDGER="$LEDGER" CAP="$CAP" WARN_USD="$WARN_USD" "$PY" - <<'PYEOF'
-import json, os, sys
-cap = float(os.environ["CAP"]); warn = float(os.environ["WARN_USD"])
-total = 0.0
-for line in open(os.environ["LEDGER"], encoding="utf-8"):
-    line = line.strip()
-    if line:
-        try: total += float(json.loads(line).get("costUsd") or 0)
-        except Exception: pass
-if total >= cap:
-    print(f"HALT: cost cap reached: ${total:.2f} >= ${cap:.2f}"); sys.exit(2)
-if cap > warn and total >= warn:
-    print(f"WARN: ${total:.2f} >= ${warn:.0f} (cap ${cap:.2f})")
-else:
-    print(f"OK: ${total:.2f} of ${cap:.2f}")
-sys.exit(0)
-PYEOF
+  LEDGER="$LEDGER" CAP="$CAP" WARN_USD="$WARN_USD" node "$(dirname "$0")/lib/check-cost-cap.cjs"
   exit $?
 fi
 
@@ -64,10 +47,6 @@ done
 BENCH_DIR=".codex/benchmarks"
 RESULTS_DIR="$BENCH_DIR/results"
 mkdir -p "$RESULTS_DIR"
-
-PY=".agents/skills/.venv/bin/python3"
-[ -x "$PY" ] || PY="python3"
-command -v "$PY" >/dev/null 2>&1 || { echo "ERROR: python3 not found" >&2; exit 1; }
 
 # Collect spec files for the tier
 SPECS=()
@@ -116,7 +95,7 @@ done
 TASKS_JSON="${TASKS_JSON}]"
 
 # Write the initial manifest — pass dynamic values via env vars to avoid
-# shell→Python injection from spec filenames containing quotes
+# shell injection from spec filenames containing quotes
 TASKS_JSON="$TASKS_JSON" \
 RUN_ID="$RUN_ID" \
 TIER="$TIER" \
@@ -124,26 +103,7 @@ STARTED="$STARTED" \
 MODEL="${MEOWKIT_MODEL_HINT:-the project environment:-unknown}}" \
 COST_CAP="$COST_CAP" \
 RESULT_FILE="$RESULT_FILE" \
-"$PY" -c '
-import json, os
-manifest = {
-    "run_id": os.environ["RUN_ID"],
-    "tier": os.environ["TIER"],
-    "started": os.environ["STARTED"],
-    "ended": None,
-    "harness_version": "3.0.0",
-    "model": os.environ["MODEL"],
-    "cost_cap_usd": float(os.environ["COST_CAP"]),
-    "total_cost_usd": 0.0,
-    "total_duration_seconds": 0,
-    "tasks": json.loads(os.environ["TASKS_JSON"]),
-    "summary": {"passed": 0, "warned": 0, "failed": 0, "average_score": 0.0},
-    "status": "in_progress"
-}
-with open(os.environ["RESULT_FILE"], "w") as f:
-    json.dump(manifest, f, indent=2)
-print("Manifest: " + os.environ["RESULT_FILE"])
-'
+node "$(dirname "$0")/lib/write-run-manifest.cjs"
 
 echo ""
 

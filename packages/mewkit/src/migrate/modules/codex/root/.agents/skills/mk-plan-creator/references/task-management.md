@@ -133,7 +133,7 @@ if new_status != current_status:
 ### Anti-patterns
 
 - ❌ "Stamp at creation" — writing `status: completed` when scaffolding the phase file. Defeats Gate 1, breaks cook re-hydration (phases skip as "completed").
-- ❌ "Stamp completed without counting `[x]`" — drift between frontmatter and todo state. Validator (`scripts/validate-plan.py`) catches this with a hard error.
+- ❌ "Stamp completed without counting `[x]`" — drift between frontmatter and todo state. The structural check (`npx mewkit plan check --structural`) catches this with a hard error.
 
 ### Cross-Skill Notes
 

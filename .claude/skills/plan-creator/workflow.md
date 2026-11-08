@@ -24,7 +24,7 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 3. `step-02-codebase-analysis.md` — Scout + project docs reading (hard/deep/parallel/two only; deep: bounded scope map per `references/deep-mode.md`)
 4. `step-03-draft-plan.md` — Write plan.md overview + phase-XX files. Integrate research findings. Deep: phase map. TDD: inject regression-first sections.
    - **Branch:** if `planning_mode = product-level`, use `step-03a-product-spec.md` instead (writes plan.md only — user stories, features, design language; NO phase files).
-5. `step-04-semantic-checks.md` — Semantic checks + structural validation (validate-plan.py). Fast mode: skip validation, go to step-07.
+5. `step-04-semantic-checks.md` — Semantic checks + structural validation (`npx mewkit plan check --structural`). Fast mode: skip validation, go to step-07.
 6. `step-05-red-team.md` — Plan red team (hard/deep/parallel/two only): 4-persona scaling, red-team-findings.md, subagent dispatch, adjudication
 7. `step-06-validation-interview.md` — Validation interview (hard/deep/parallel/two only): 3-5 critical questions with detection keywords, section-mapped answer propagation
 8. `step-07-gate.md` — Self-check + Gate 1: AskUserQuestion (Approve | Modify | Reject)
@@ -109,7 +109,7 @@ Step 3: Draft Plan
          ↓
 Step 4: Semantic Checks
     ├── 4a. Semantic checks (goal=outcome, ACs=binary, constraints non-empty)
-    ├── 4b. Structural validation (validate-plan.py) — must output PLAN_COMPLETE
+    ├── 4b. Structural validation (`npx mewkit plan check --structural`) — must output PLAN_COMPLETE
     ├── 4c. Two-Approach Selection (planning_mode = two only)
     ├── 4d. Verification Roles (skipped in fast / product-level)
     │   ├── Tier: 1–2 = Light, 3–4 = Standard, 5+ = Full

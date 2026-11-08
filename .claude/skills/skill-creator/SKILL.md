@@ -17,6 +17,7 @@ owner: portability
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 # Skill Creator
@@ -43,10 +44,10 @@ Meta skill — not tied to a specific Phase. Invoked on-demand for skill develop
 
 ```bash
 # Scaffold a new skill (creates directory + template SKILL.md)
-.claude/skills/.venv/bin/python3 .claude/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .claude/skills
+node .claude/scripts/skill-python.cjs .claude/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .claude/skills
 
 # Validate an existing skill against compliance checklist
-.claude/skills/.venv/bin/python3 .claude/skills/skill-creator/scripts/validate-skill.py .claude/skills/my-feature
+node .claude/scripts/skill-python.cjs .claude/skills/skill-creator/scripts/validate-skill.py .claude/skills/my-feature
 ```
 
 ## Process

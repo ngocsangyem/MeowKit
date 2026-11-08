@@ -39,7 +39,7 @@ General validation script that checks code quality and correctness (if this proj
 
 **How to run:**
 ```bash
-.cursor/skills/.venv/bin/python3 <path-to-validate.py>
+.meowkit/envs/testing/bin/python3 <path-to-validate.py>
 ```
 
 **Exit codes:**
@@ -60,7 +60,7 @@ Security-focused validation (if this project provides one — path varies by pro
 
 **How to run:**
 ```bash
-.cursor/skills/.venv/bin/python3 <path-to-security-scan.py>
+.meowkit/envs/testing/bin/python3 <path-to-security-scan.py>
 ```
 
 **Exit codes:**

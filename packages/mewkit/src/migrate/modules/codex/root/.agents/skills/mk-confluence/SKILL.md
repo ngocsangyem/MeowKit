@@ -1,6 +1,7 @@
 ---
 name: "mk-confluence"
 description: "Routes Confluence Cloud tasks to the right mk:confluence-* leaf skill. Use for 'confluence', 'wiki page', 'spec page', or ambiguous intent. NOT an executor -- forks to a leaf skill."
+requires_runtime: ["python>=3.9"]
 ---
 
 # mk:confluence — Routing Skill
@@ -31,7 +32,7 @@ This skill is a **pure routing layer**. Its sole purpose: identify the right `mk
 
 ## Setup
 
-See `references/install-and-auth.md` for one-time setup (`.codex/scripts/bin/setup-workflow` installs `confluence-assistant-skills` into `.agents/skills/.venv` per `scripts/requirements.txt`; populate `.codex/.env` with the 3 `MEOW_CONFLUENCE_*` vars).
+See `references/install-and-auth.md` for one-time setup (`.codex/scripts/bin/setup-workflow` installs `confluence-assistant-skills` into `.meowkit/envs/confluence` per `scripts/requirements.txt`; populate `.codex/.env` with the 3 `MEOW_CONFLUENCE_*` vars).
 
 ## Shared Resources (used by leaves)
 

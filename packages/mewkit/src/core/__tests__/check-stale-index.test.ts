@@ -70,7 +70,7 @@ async function makeRepo(readme: string, skillsIndex: string, agentsIndex: string
 const README_OK = "1 skills · 1 agents · 1 commands · 1 rules · 1 hook scripts\n";
 const SKILLS_OK = "Skills.\n`mk:foo`|utility|x|monolithic\n**Total**|**1**\n";
 const AGENTS_OK = "[1]{agent_file,role}\n`dev.md`|core\n";
-const HOOKS_OK = "**Hook count:** 1 shell hook scripts.\n- `h1.sh` — does a thing.\n";
+const HOOKS_OK = "**Hook count:** 1 node hook scripts.\n- `h1.sh` — does a thing.\n";
 
 describe("checkStaleIndex", () => {
 	it("PASSES when README + indexes match the inventory", async () => {

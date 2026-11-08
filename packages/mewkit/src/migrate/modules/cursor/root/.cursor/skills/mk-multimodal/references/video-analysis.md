@@ -33,15 +33,15 @@ Formula: `duration_sec * tokens_per_sec / 1M * $0.30` (input price as of 2026-04
 
 ```bash
 # Standard analysis
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
   --files video.mp4 --task analyze --verbose
 
 # Cost-optimized (low-res)
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
   --files video.mp4 --task analyze --resolution low-res --verbose
 
 # Transcription (low-res sufficient — audio quality unchanged)
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
   --files video.mp4 --task transcribe --resolution low-res
 ```
 

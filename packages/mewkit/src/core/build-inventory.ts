@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { resolveInventoryPath } from "../state/resolve-inventory-path.js";
+import { isHookScript } from "./is-hook-script.js";
 import yaml from "js-yaml";
 import type { CheckResult } from "../commands/validate.js";
 import type { Status } from "../commands/doctor-checks.js";
@@ -174,14 +175,28 @@ export function enumerateArtifacts(claudeDir: string): { refs: ArtifactRef[]; is
 		});
 	}
 
-	// hooks — isHookScript-true files, registry-sourced
-	const hooksDir = path.join(claudeDir, "hooks");
-	if (fs.existsSync(hooksDir)) {
-		for (const f of fs.readdirSync(hooksDir)) {
-			const abs = path.join(hooksDir, f);
-			if (!fs.statSync(abs).isFile()) continue;
-			if (!f.endsWith(".sh")) continue; // top-level shell hooks are the counted set
-			refs.push({ type: "hook", rel: `hooks/${f}`, abs, id: f.replace(/\.sh$/, ""), metaSource: "registry" });
+	// hooks — isHookScript-true files, registry-sourced.
+	//
+	// Two tiers, because both are hooks: the entrypoints the host registers or an
+	// agent invokes live at `hooks/`, and the observers the dispatcher runs live at
+	// `hooks/handlers/`. Counting only the top level would silently shrink the set
+	// the moment the observers moved into their own directory — which is exactly
+	// what happened, and left every doc count claiming a number nothing produced.
+	// `lib/`, `__tests__/` and the `.md`/`.json` sidecars are not hooks:
+	// `isHookScript` is the single definition and decides that.
+	for (const rel of ["hooks", path.join("hooks", "handlers")]) {
+		const dir = path.join(claudeDir, rel);
+		if (!fs.existsSync(dir)) continue;
+		for (const f of fs.readdirSync(dir)) {
+			const abs = path.join(dir, f);
+			if (!isHookScript(abs)) continue;
+			refs.push({
+				type: "hook",
+				rel: `${rel.split(path.sep).join("/")}/${f}`,
+				abs,
+				id: f.replace(/\.(cjs|mjs|js|sh)$/, ""),
+				metaSource: "registry",
+			});
 		}
 	}
 

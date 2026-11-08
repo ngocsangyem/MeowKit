@@ -1,6 +1,7 @@
 ---
 name: "mk-skill-creator"
 description: "Creates new skills with proper structure, compliance checks, and registration. Enforces mk: prefix, sub-agents.md structure, and context-engineering principles. Use to scaffold a new skill."
+requires_runtime: ["python>=3.9"]
 ---
 
 # Skill Creator
@@ -27,10 +28,10 @@ Meta skill — not tied to a specific Phase. Invoked on-demand for skill develop
 
 ```bash
 # Scaffold a new skill (creates directory + template SKILL.md)
-.cursor/skills/.venv/bin/python3 .cursor/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .cursor/skills
+node .cursor/scripts/skill-python.cjs .cursor/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .cursor/skills
 
 # Validate an existing skill against compliance checklist
-.cursor/skills/.venv/bin/python3 .cursor/skills/skill-creator/scripts/validate-skill.py .cursor/skills/my-feature
+node .cursor/scripts/skill-python.cjs .cursor/skills/skill-creator/scripts/validate-skill.py .cursor/skills/my-feature
 ```
 
 ## Process

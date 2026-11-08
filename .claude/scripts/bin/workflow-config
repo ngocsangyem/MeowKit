@@ -1,71 +1,19 @@
-#!/usr/bin/env bash
-# workflow-config — read/write workflow config with dot-notation
-# Usage:
-#   workflow-config get <dotted.key> [default]
-#   workflow-config set <dotted.key> <value>
-#   workflow-config has <dotted.key>  → exit 0 if truthy, 1 if falsy/missing
-set -euo pipefail
+#!/usr/bin/env node
+'use strict';
+// workflow-config — read/write workflow config with dot-notation
+// Usage:
+//   workflow-config get <dotted.key> [default]
+//   workflow-config set <dotted.key> <value>
+//   workflow-config has <dotted.key>  → exit 0 if truthy, 1 if falsy/missing
+//
+// Runs on node so the skill preambles that call it work on a machine with no
+// interpreter installed. Argument handling is unchanged from the implementation
+// it replaces; the logic and the reasoning behind each answer live in
+// ../lib/workflow-config-core.cjs.
 
-CONFIG_FILE="${WORKFLOW_CONFIG:-.claude/meowkit.config.json}"
+const C = require('../lib/workflow-config-core.cjs');
 
-# Resolve nested key: "features.costTracking" → d["features"]["costTracking"]
-resolve_key() {
-  python3 -c "
-import json, sys
-try:
-    d = json.load(open('$CONFIG_FILE'))
-    v = d
-    for k in '$1'.split('.'):
-        v = v[k]
-    print(v if not isinstance(v, bool) else str(v).lower())
-except (KeyError, TypeError, FileNotFoundError):
-    if len(sys.argv) > 1:
-        print(sys.argv[1])
-    else:
-        sys.exit(1)
-" "${2:-}" 2>/dev/null
-}
-
-case "${1:-}" in
-  get)
-    KEY="${2:?Usage: workflow-config get <dotted.key> [default]}"
-    DEFAULT="${3:-}"
-    if [ -f "$CONFIG_FILE" ]; then
-      resolve_key "$KEY" "$DEFAULT"
-    elif [ -n "$DEFAULT" ]; then
-      echo "$DEFAULT"
-    fi
-    ;;
-  has)
-    KEY="${2:?Usage: workflow-config has <dotted.key>}"
-    if [ -f "$CONFIG_FILE" ]; then
-      VAL=$(resolve_key "$KEY" "false" 2>/dev/null || echo "false")
-      case "$VAL" in true|1|yes) exit 0 ;; *) exit 1 ;; esac
-    else
-      exit 1
-    fi
-    ;;
-  set)
-    KEY="${2:?Usage: workflow-config set <dotted.key> <value>}"
-    VALUE="${3:?Usage: workflow-config set <dotted.key> <value>}"
-    [ -f "$CONFIG_FILE" ] || { echo "Config not found: $CONFIG_FILE" >&2; exit 1; }
-    python3 -c "
-import json
-with open('$CONFIG_FILE') as f: d = json.load(f)
-keys = '$KEY'.split('.')
-obj = d
-for k in keys[:-1]:
-    obj = obj.setdefault(k, {})
-val = '$VALUE'
-if val.lower() in ('true','false'): val = val.lower() == 'true'
-elif val.isdigit(): val = int(val)
-obj[keys[-1]] = val
-with open('$CONFIG_FILE','w') as f: json.dump(d, f, indent=2)
-" 2>/dev/null
-    ;;
-  *)
-    cat << 'HELP'
-workflow-config — read/write workflow config
+const USAGE = `workflow-config — read/write workflow config
 Usage:
   workflow-config get <dotted.key> [default]
   workflow-config set <dotted.key> <value>
@@ -74,7 +22,61 @@ Examples:
   workflow-config get features.costTracking
   workflow-config has features.memory && echo enabled
   workflow-config set mode.default strict
-HELP
-    exit 1
-    ;;
-esac
+`;
+
+/** `get` — print the value, else the default, else an empty line. Always exits 0. */
+function get(file, key, fallback) {
+  const config = C.readConfig(file);
+  if (config === null) {
+    if (fallback) process.stdout.write(`${fallback}\n`);
+    return 0;
+  }
+  const value = C.lookup(config, key);
+  process.stdout.write(`${value === undefined ? fallback || '' : C.render(value)}\n`);
+  return 0;
+}
+
+/** `has` — exit 0 only when the value reads as switched on. */
+function has(file, key) {
+  const config = C.readConfig(file);
+  if (config === null) return 1;
+  const rendered = C.render(C.lookup(config, key));
+  return rendered === 'true' || rendered === '1' || rendered === 'yes' ? 0 : 1;
+}
+
+/** `set` — write into an existing config. Never creates one. */
+function set(file, key, raw) {
+  const config = C.readConfig(file);
+  if (config === null) {
+    process.stderr.write(`Config not found: ${C.displayPath(file)}\n`);
+    return 1;
+  }
+  C.assign(config, key, C.coerce(raw));
+  C.writeConfig(file, config);
+  return 0;
+}
+
+function usage() {
+  process.stdout.write(USAGE);
+  return 1;
+}
+
+function main(argv) {
+  const [subcommand, key, third] = argv;
+  if (subcommand !== 'get' && subcommand !== 'set' && subcommand !== 'has') return usage();
+  if (!key) {
+    process.stderr.write(`Usage: workflow-config ${subcommand} <dotted.key>${subcommand === 'set' ? ' <value>' : ''}\n`);
+    return 1;
+  }
+
+  const file = C.resolveConfigPath();
+  if (subcommand === 'get') return get(file, key, third);
+  if (subcommand === 'has') return has(file, key);
+  if (third === undefined) {
+    process.stderr.write('Usage: workflow-config set <dotted.key> <value>\n');
+    return 1;
+  }
+  return set(file, key, third);
+}
+
+process.exit(main(process.argv.slice(2)));

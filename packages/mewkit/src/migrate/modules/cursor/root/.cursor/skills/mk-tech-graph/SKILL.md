@@ -1,6 +1,7 @@
 ---
 name: "mk-tech-graph"
 description: "Generate publish-grade SVG+PNG technical diagrams (architecture, data flow, sequence, ER, state-machine, etc.) in 8 styles. Writes to tasks/visuals/. Needs rsvg-convert for PNG; else SVG-only."
+requires_runtime: ["python>=3.9"]
 ---
 
 # Tech Graph

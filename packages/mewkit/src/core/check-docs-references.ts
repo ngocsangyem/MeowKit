@@ -104,7 +104,6 @@ function walkMd(dir: string, out: string[] = []): string[] {
 			// fixture data, not a runtime reference. The contract exists because a
 			// reference to a non-shipped docs/ path breaks in a consumer project —
 			// a fixture string is never resolved, so it cannot break anything.
-			// Kept identical to .claude/scripts/check-docs-references.py (parity).
 			if (
 				entry.name === "node_modules" ||
 				entry.name === ".venv" ||

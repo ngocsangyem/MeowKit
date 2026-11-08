@@ -29,8 +29,8 @@ Located at `.codex/scripts/` — project-level scripts for deterministic validat
 
 | Script             | Purpose                   | Command                                       |
 | ------------------ | ------------------------- | --------------------------------------------- |
-| `validate.py`      | General code validation   | `.agents/skills/.venv/bin/python3 .codex/scripts/validate.py`          |
-| `security-scan.py` | Security pattern scanning | `.agents/skills/.venv/bin/python3 .codex/scripts/security-scan.py`     |
+| `validate.py`      | General code validation   | `.meowkit/envs/lint-and-validate/bin/python3 .codex/scripts/validate.py`          |
+| `security-scan.py` | Security pattern scanning | `.meowkit/envs/lint-and-validate/bin/python3 .codex/scripts/security-scan.py`     |
 
 Run these in addition to ecosystem linters — they check kit-wide patterns.
 
@@ -40,7 +40,7 @@ Run these in addition to ecosystem linters — they check kit-wide patterns.
 Write/Edit code
   → npm run lint && npx tsc --noEmit   (Node.js/TS)
   → ruff check . --fix && mypy .       (Python)
-  → .agents/skills/.venv/bin/python3 .codex/scripts/validate.py (all)
+  → .meowkit/envs/lint-and-validate/bin/python3 .codex/scripts/validate.py (all)
   → Fix errors → repeat until clean
 ```
 

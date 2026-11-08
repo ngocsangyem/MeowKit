@@ -29,8 +29,8 @@ Located at `.claude/scripts/` — project-level scripts for deterministic valida
 
 | Script             | Purpose                   | Command                                       |
 | ------------------ | ------------------------- | --------------------------------------------- |
-| `validate.py`      | General code validation   | `.claude/skills/.venv/bin/python3 .claude/scripts/validate.py`          |
-| `security-scan.py` | Security pattern scanning | `.claude/skills/.venv/bin/python3 .claude/scripts/security-scan.py`     |
+| `validate.py`      | General code validation   | `python3 .claude/scripts/validate.py`          |
+| `security-scan.py` | Security pattern scanning | `python3 .claude/scripts/security-scan.py`     |
 
 Run these in addition to ecosystem linters — they check kit-wide patterns.
 
@@ -40,7 +40,7 @@ Run these in addition to ecosystem linters — they check kit-wide patterns.
 Write/Edit code
   → npm run lint && npx tsc --noEmit   (Node.js/TS)
   → ruff check . --fix && mypy .       (Python)
-  → .claude/skills/.venv/bin/python3 .claude/scripts/validate.py (all)
+  → python3 .claude/scripts/validate.py (all)
   → Fix errors → repeat until clean
 ```
 

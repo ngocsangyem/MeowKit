@@ -1,0 +1,14 @@
+{
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "recorder": "scripts/record-port-golden-corpus.cjs",
+  "fixtureCount": 40,
+  "groups": {
+    "injection-audit": 17,
+    "workflow-config": 23
+  },
+  "subjects": {
+    "injection-audit": ".claude/scripts/injection-audit.py",
+    "workflow-config": ".claude/scripts/bin/workflow-config"
+  },
+  "pythonVersion": "3.15.2"
+}

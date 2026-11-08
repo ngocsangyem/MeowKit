@@ -134,7 +134,11 @@ export async function planApprove(args: PlanApproveArgs): Promise<void> {
 	const approver = typeof args.by === "string" && args.by.trim().length > 0 ? args.by.trim() : gitUserOrHuman();
 
 	try {
-		const out = execFileSync("sh", [helper, "stamp", planFile, approver], { encoding: "utf8" });
+		// The helper is a node module. It was a shell script once and this call site
+		// kept `sh` after the port, which made the receipt unstampable on every host:
+		// `sh` reads `'use strict';` as a command. Run it on the interpreter that is
+		// already running, which also means no shell is needed to stamp a gate.
+		const out = execFileSync(process.execPath, [helper, "stamp", planFile, approver], { encoding: "utf8" });
 		process.stdout.write(out);
 		console.log(pc.green("✓ Gate 1 approval receipt stamped."));
 		console.log(

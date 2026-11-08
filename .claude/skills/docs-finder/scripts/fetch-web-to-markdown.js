@@ -49,7 +49,7 @@ function buildDelegationCommand(url) {
   // https://x";rm -rf $HOME;echo " would otherwise escape the double-quote boundary.
   const safeUrl = shellEscapeSingleQuote(url);
   return (
-    `.claude/skills/.venv/bin/python3 ` +
+    `node .claude/scripts/skill-python.cjs ` +
     `.claude/skills/web-to-markdown/scripts/fetch_as_markdown.py ` +
     `${safeUrl} --wtm-accept-risk --caller mk:docs-finder`
   );

@@ -6,7 +6,7 @@ import { STEPS, type StepName, type StepResult } from "./setup-steps.js";
 export { commandExists, installSystemDeps, promptAndInstallSystemDeps } from "./setup-system-deps.js";
 
 /** Run setup steps. --only=<step> runs a single step. --system-deps installs system deps. */
-export async function setup(args: { only?: string; systemDeps?: boolean }): Promise<void> {
+export async function setup(args: { only?: string; systemDeps?: boolean; skills?: string }): Promise<void> {
 	// --system-deps: standalone system dep install flow, skips normal steps
 	if (args.systemDeps) {
 		console.log(pc.bold("\nMeowKit Setup — System Dependencies\n"));
@@ -16,6 +16,13 @@ export async function setup(args: { only?: string; systemDeps?: boolean }): Prom
 
 	// Always use cwd. No walk-up — avoids matching ~/.claude or parent projects.
 	const dir = process.cwd();
+
+	// Opt-in: with no --skills, the environment step creates nothing. Setup is
+	// safe to run (and re-run) on a project that never wants an interpreter.
+	const skills = (args.skills ?? "")
+		.split(",")
+		.map((s) => s.trim())
+		.filter(Boolean);
 
 	const stepsToRun: StepName[] = args.only ? [args.only as StepName] : (Object.keys(STEPS) as StepName[]);
 
@@ -30,7 +37,7 @@ export async function setup(args: { only?: string; systemDeps?: boolean }): Prom
 			process.exit(1);
 		}
 
-		const result = await fn(dir);
+		const result = await fn(dir, { skills });
 		results.push(result);
 
 		const icon =

@@ -1,0 +1,26 @@
+{
+  "name": "config-get-present-string",
+  "group": "workflow-config",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "config",
+    "args": [
+      "get",
+      "mode.default"
+    ]
+  },
+  "setup": "config-get-present-string",
+  "setupDescription": "a present nested string",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "stdout": "strict\n",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".claude/meowkit.config.json": "{\n  \"proactive\": true,\n  \"telemetry\": false,\n  \"retries\": 3,\n  \"mode\": {\n    \"default\": \"strict\",\n    \"fallback\": \"\"\n  },\n  \"features\": {\n    \"costTracking\": true,\n    \"memory\": false\n  }\n}\n"
+  }
+}

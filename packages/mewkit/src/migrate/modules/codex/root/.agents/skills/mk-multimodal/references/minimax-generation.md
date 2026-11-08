@@ -21,19 +21,19 @@
 
 ```bash
 # Image generation
-.agents/skills/.venv/bin/python3 .agents/skills/multimodal/scripts/minimax_generate.py \
+node .codex/scripts/skill-python.cjs .agents/skills/multimodal/scripts/minimax_generate.py \
   --task generate-image --prompt "A futuristic city" --verbose
 
 # Video generation (Hailuo — async, 60-180s)
-.agents/skills/.venv/bin/python3 .agents/skills/multimodal/scripts/minimax_generate.py \
+node .codex/scripts/skill-python.cjs .agents/skills/multimodal/scripts/minimax_generate.py \
   --task generate-video --prompt "A dancer in the rain" --verbose
 
 # Text-to-Speech
-.agents/skills/.venv/bin/python3 .agents/skills/multimodal/scripts/minimax_generate.py \
+node .codex/scripts/skill-python.cjs .agents/skills/multimodal/scripts/minimax_generate.py \
   --task generate-speech --text "Hello, welcome to the project" --voice-id Wise_Woman
 
 # Music generation
-.agents/skills/.venv/bin/python3 .agents/skills/multimodal/scripts/minimax_generate.py \
+node .codex/scripts/skill-python.cjs .agents/skills/multimodal/scripts/minimax_generate.py \
   --task generate-music --lyrics "Verse 1: Walking through the morning light..."
 ```
 

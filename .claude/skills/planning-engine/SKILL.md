@@ -22,6 +22,7 @@ owner: lifecycle
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 requires_external_service: ["jira"]
 default_enabled: false
 ---

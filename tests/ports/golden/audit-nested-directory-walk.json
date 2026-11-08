@@ -1,0 +1,26 @@
+{
+  "name": "audit-nested-directory-walk",
+  "group": "injection-audit",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "scan-dir",
+    "args": [
+      "."
+    ]
+  },
+  "setup": "audit-nested-directory-walk",
+  "setupDescription": "the payload sits several levels down, beside pruned directories",
+  "normalizers": [
+    "tmpdir",
+    "logStamp"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "stdout": "Injection audit scanning: .\n[CRITICAL] [IDENTITY_OVERRIDE] Agent identity may have been overridden: my new instructions are — a/b/c/deep.md (line 2)\n\n--- Audit Summary ---\nCRITICAL: 1\nSUSPICIOUS: 0\n\n==== CRITICAL — Possible successful prompt injection ====\nHALT: Review findings above. Do NOT proceed without human review.\nFindings logged to: .meowkit/telemetry/security-log.md\n",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/security-log.md": "[{{STAMP}}] [CRITICAL] [manual-audit] Agent identity may have been overridden: my new instructions are — a/b/c/deep.md\n"
+  }
+}

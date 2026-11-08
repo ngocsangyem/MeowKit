@@ -1,7 +1,6 @@
 // The docs-reference contract is a source-repo-only maintainer document that is NOT
 // shipped into user projects. These tests pin where it is resolved from and that its
 // absence is N/A (exit-0 semantics) rather than a failure — the Python twin
-// (.claude/scripts/check-docs-references.py) is asserted to the same contract.
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

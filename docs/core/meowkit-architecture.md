@@ -319,7 +319,7 @@ Source: `.claude/rules/meowkit-core.md` Memory section; `HOOKS_INDEX.md` State F
 | `memory/gotchas.md`                                         | Grep on demand (mk:fix, mk:investigate, mk:review, mk:plan-creator, planner agent, mk:cso, `/mk:retro`) | mk:fix, mk:review, mk:retro, architect agent, mk:memory (via `mewkit note`) |
 | `memory/decisions.md`                                       | Grep on demand (same read set)                               | architect agent, mk:memory, mk:party, mk:plan-creator archive (via `mewkit note`) |
 | `telemetry/cost-log.json`                                   | Phase 0/6                                                    | post-session.cjs (atomic temp-rename)           |
-| `telemetry/security-log`                                    | On-demand (security agent)                                   | injection-audit.py, quarantine writers         |
+| `telemetry/security-log`                                    | On-demand (security agent)                                   | injection-audit.cjs, quarantine writers         |
 | `telemetry/trace-log.jsonl`                                 | On-demand                                                    | append-trace.cjs                                |
 
 **Per-turn context budget** (~0KB auto-inject, source: `HOOKS_INDEX.md` handler rows):
@@ -390,7 +390,7 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | CF-C1 | `mk:debug/SKILL.md:1-4`                      | Deprecated skill missing `deprecated: true` + `superseded_by:` YAML — parsers miss it                                          | CLOSED (skill removed v2.4.4) |
 | CF-C2 | `mk:shipping/SKILL.md:1-4`                   | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
 | CF-C3 | `mk:documentation/SKILL.md:1-4`              | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
-| CF-C4 | `mk:multimodal/SKILL.md:45`                  | `.claude/skills/.venv/bin/python3` ABSENT — all Python scripts fail; blocks mk:llms, mk:web-to-markdown, mk:plan-creator | OPEN (re-verified 2026-04-29; loader warns; covered by `mewkit setup venv`) |
+| CF-C4 | `mk:multimodal/SKILL.md`                     | A skill's interpreter environment is absent — that skill's scripts fail; the core workflow is unaffected | RESOLVED: envs are per-skill and created on demand; the resolver names the skill and the command that provisions it |
 | CF-C5 | `plan-creator/step-02-codebase-analysis.md:21` | `docs/project-context.md` missing; project-context-loader.cjs nudges agent but no setup-time auto-prompt                        | PARTIAL → CLOSED 2026-04-29 (mewkit setup `project-context` step added; warns user to invoke `/mk:project-context` on first session) |
 | CF-C6 | `mk:cook/SKILL.md:159`                       | Audit cited bare `memory/lessons.md` path. Re-verification 2026-04-29: line 159 is `## Gotchas`, line 170 has correct `.claude/memory/fixes.md` prefix | CLOSED 2026-04-29 (re-verified — already correct in current tree) |
 
@@ -416,7 +416,7 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | S1 — Feature request routing   | PARTIAL | `commands/meow/meow.md:40` phantom routing (CF-H12)                |
 | S2 — `/mk:cook <plan>`       | PARTIAL | `mk:cook/SKILL.md:159` bare memory path (CF-C6)                  |
 | S3 — `/mk:autobuild "build X"` | PARTIAL | `evaluator.md` Required Context missing rubric-rules.md (CF-M4)    |
-| S4 — Python skill runtime      | BROKEN  | `.claude/skills/.venv/bin/python3` absent (CF-C4)                  |
+| S4 — Python skill runtime      | OK      | per-skill envs under `.meowkit/envs/`, created on demand (CF-C4)   |
 | S5 — Session reset mid-phase   | PARTIAL | `plan-creator/step-02:21` loads missing project-context.md (CF-C5) |
 | S6 — `/meow fix` dispatcher    | PARTIAL | `commands/meow/fix.md:58` phantom `/mk:plan` ref (CF-M29)        |
 

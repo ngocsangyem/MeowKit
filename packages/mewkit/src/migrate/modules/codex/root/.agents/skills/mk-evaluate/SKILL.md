@@ -1,6 +1,7 @@
 ---
 name: "mk-evaluate"
 description: "Experimental behavioral evaluator. Drives a running artifact via browser/curl/CLI and records rubric evidence; the runner is not yet a fully implemented automated evaluation system."
+requires_runtime: ["python>=3.9"]
 ---
 
 # mk:evaluate — Experimental Behavioral Verification

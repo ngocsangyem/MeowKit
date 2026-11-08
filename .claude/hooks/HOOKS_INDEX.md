@@ -6,9 +6,14 @@ Every hook this kit ships, with its registration and what it is for.
 
 The runtime is node. Every hook is a `.cjs` module registered in exec form — the
 executable in `command`, the script path as one `args` element — so no hook needs a
-shell to start and the kit runs on a host that has none. The one exception is
-`ensure-skills-venv.sh`, which bootstraps the Python environment and is replaced
-together with its lazy resolver.
+shell to start and the kit runs on a host that has none. There is no exception: no
+registration runs a shell, a `.sh` file or an interpreter, and `mewkit doctor` sweeps
+the hook paths for one.
+
+The kit ships 27 node hooks: the 6 entrypoints directly under `hooks/`, which the host
+registers or an agent invokes, and the 21 observers under `hooks/handlers/`, which
+`dispatch.cjs` runs. Shared modules under `lib/` are not hooks — nothing invokes them as
+one — and neither are the sidecars (`HOOKS_INDEX.md`, `handlers.json`) or `__tests__/`.
 
 Input arrives as JSON on stdin. A write guard reads it with the fail-closed reader
 (`lib/parse-stdin.cjs` `readHookInput`), which reports why input was unreadable so the
@@ -39,7 +44,6 @@ later; nothing is switchable yet.
 
 | Hook | Event | Matcher | Toggle key | Timeout | Purpose |
 |---|---|---|---|---|---|
-| `ensure-skills-venv.sh` | SessionStart | — | — | 30s | Bootstraps the Python environment the python-based skills need. Idempotent |
 | `dispatch.cjs` | SessionStart | — | — | 15s | Runs the observers registered for one event, fail-open |
 | `gate-enforcement.cjs` | PreToolUse | Edit\|Write | — | 10s | Blocks a source write before the plan is approved and before the sprint contract is signed |
 | `privacy-block.cjs` | PreToolUse | Edit\|Write | — | 5s | Refuses reads of credential-bearing files and web-fetch artifacts, and obviously unsafe fetch targets |

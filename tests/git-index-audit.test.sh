@@ -12,7 +12,7 @@
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPT="$ROOT/.claude/skills/benchmark/scripts/git-index-audit.sh"
-PY="$ROOT/.claude/skills/.venv/bin/python3"; [ -x "$PY" ] || PY="python3"
+PY="$ROOT/.meowkit/envs/benchmark/bin/python3"; [ -x "$PY" ] || PY="python3"
 
 PASS=0; FAIL=0; FAILED_NAMES=()
 assert() {

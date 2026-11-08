@@ -116,16 +116,11 @@ module.exports = function projectContextLoader(ctx, _state, env = process.env) {
     out.push("## NOTE: the toolkit's hooks not detected at project root", 'MEOWKIT_* config may not be loaded. Run from project root where .claude/ lives.', '');
   }
 
-  if (!fs.existsSync(path.join(root, '.claude/skills/.venv/bin/python3'))) {
-    out.push(
-      '## WARNING: Python venv not found',
-      '',
-      "the toolkit's scripts require `.claude/skills/.venv/bin/python3` but it doesn't exist.",
-      'Run `npx mewkit setup` to create the venv and install dependencies.',
-      'Until then, python-based skills (validate, security-scan, multimodal, llms) will fail.',
-      '',
-    );
-  }
+  // No interpreter check here. Session start is the wrong place to ask: nothing
+  // in the core workflow needs an interpreter, so a warning at every session
+  // start would be noise for most sessions and would train the reader to skip
+  // the block. A skill that does need one reports it at the moment it is
+  // invoked, naming itself and the command that provisions it.
 
   out.push(...contextBlock(root, env));
 

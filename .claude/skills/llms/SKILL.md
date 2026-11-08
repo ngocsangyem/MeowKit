@@ -17,6 +17,7 @@ owner: docs
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 # llms.txt Generator
@@ -54,11 +55,11 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 
 ```bash
 # Generate llms.txt (script does the heavy lifting)
-.claude/skills/.venv/bin/python3 .claude/skills/llms/scripts/generate-llms-txt.py \
+node .claude/scripts/skill-python.cjs .claude/skills/llms/scripts/generate-llms-txt.py \
   --source ./docs [--output .] [--base-url https://example.com/docs] [--full]
 
 # Preview metadata first (Claude reviews before generating)
-.claude/skills/.venv/bin/python3 .claude/skills/llms/scripts/generate-llms-txt.py \
+node .claude/scripts/skill-python.cjs .claude/skills/llms/scripts/generate-llms-txt.py \
   --source ./docs --json
 ```
 

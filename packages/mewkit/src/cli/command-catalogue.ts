@@ -14,6 +14,7 @@ const COMMANDS = [
 	},
 	{ name: "budget", summary: "View token usage and cost log", subcommands: ["context"] },
 	{ name: "setup", summary: "Guided post-scaffold configuration" },
+	{ name: "skill", summary: "Per-skill interpreter environments", subcommands: ["env"], usage: "skill env <skill>|--list" },
 	{ name: "doctor", summary: "Diagnose common environment issues", subcommands: ["provenance"] },
 	{ name: "status", summary: "Print version and config summary" },
 	{ name: "task-state", summary: "Durable task record", subcommands: ["show", "update"] },
@@ -146,9 +147,15 @@ const FLAGS: FlagSpec[] = [
 	b("rules", ["validate"], "Run only the routing-table-breadth check"),
 	b("capabilities", ["validate"], "Run only the capability manifest checks"),
 	b("memory", ["validate"], "Run only the committed team-memory store lint"),
+	b("frontmatter", ["validate"], "Run only the SKILL.md frontmatter schema and runtime-contract check"),
+	b("docs-refs", ["validate"], "Run only the `.claude` to `docs/*` reference allowlist check"),
 	b("substrate", ["validate", "inventory"], "Run only the responsibility-substrate drift and untagged check", {
 		perCommand: { inventory: "Print the responsibility-by-coverage substrate matrix" },
 	}),
+
+	// skill env
+	b("list", ["skill"], "List every skill that declares a runtime and the state of its environment"),
+	s("skills", ["setup"], "Comma-separated skills whose interpreter environment setup should create"),
 
 	// review
 	s("remote", ["review"], "Git remote to fetch the pull request from"),
@@ -171,6 +178,7 @@ const FLAGS: FlagSpec[] = [
 
 	// plan
 	s("by", ["plan"], "Approver name recorded on the approval receipt"),
+	b("structural", ["plan"], "`check`: validate plan.md + its phase files against the full template"),
 	b("activate", ["plan", "task"], "Activate the task on creation; --no-activate opts out"),
 
 	// inventory

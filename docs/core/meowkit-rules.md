@@ -165,8 +165,8 @@ python .claude/scripts/validate.py
 python3 .claude/skills/multimodal/scripts/check_setup.py
 
 # RIGHT
-.claude/skills/.venv/bin/python3 .claude/scripts/validate.py
-.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/check_setup.py
+python3 .claude/scripts/validate.py
+node .claude/scripts/skill-python.cjs .claude/skills/multimodal/scripts/check_setup.py
 ```
 
 The venv is created by `npx mewkit setup`. If it doesn't exist, the `project-context-loader.cjs` SessionStart hook warns the user.
@@ -326,7 +326,7 @@ Before merging any skill, agent, hook, or rule change:
 - [ ] All file paths referenced exist (grep every path)
 - [ ] All `subagent_type` values are in the valid list (Section 2)
 - [ ] All hooks referenced are registered in `settings.json`
-- [ ] All python commands use `.claude/skills/.venv/bin/python3`
+- [ ] All skill python commands go through `node .claude/scripts/skill-python.cjs`
 - [ ] Memory paths use `.meowkit/memory/` (only `decisions.md` and `gotchas.md`)
 - [ ] No bare `memory/` or `ck:` references
 - [ ] Verdict uses PASS/WARN/FAIL (not APPROVE/BLOCK)

@@ -124,6 +124,16 @@
       "enum": ["claude-code", "portable", "experimental"],
       "description": "Optional (governance). Execution environment required by this artifact."
     },
+    "requires_runtime": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(python|python3|node|ruby|php|perl|go|java|deno|bun)(>=|<=|==|~=|>|<)[0-9]+(\\.[0-9]+)*$"
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Optional. Language interpreters this skill's scripts need, as <interpreter><comparator><version> entries (e.g. ['python>=3.9']). Declares a dependency on an interpreter the project may not have — distinct from `runtime`, which names the agent execution environment. Each declaring skill gets its own environment under .meowkit/envs/<skill>/ via `mewkit skill env <skill>`."
+    },
     "context_cost": {
       "type": "string",
       "enum": ["low", "medium", "high"],

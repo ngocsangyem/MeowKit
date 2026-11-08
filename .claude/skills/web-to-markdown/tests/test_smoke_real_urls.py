@@ -9,7 +9,7 @@ How to run:
 Requirements:
     - Network access to example.com, httpbin.org, rfc-editor.org
     - mk:web-to-markdown Python deps installed:
-        .claude/skills/.venv/bin/pip install -r .claude/skills/web-to-markdown/scripts/requirements.txt
+        mewkit skill env web-to-markdown
     - Run from project root (so .claude/cache/ resolves correctly)
     - Set MEOWKIT_WEB_FETCH_PERSIST=off to avoid writing cache files during tests (optional)
 """

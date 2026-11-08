@@ -102,4 +102,4 @@ a remote log endpoint, a referenced issue URL), this skill delegates to
   (SSRF guard, injection scanner, DATA boundary, secret scrub). The flag is a conscious
   trust-boundary crossing — the caller acknowledges the target URL may contain prompt
   injection and that the skill's defenses are best-effort.
-- Delegation example: `.cursor/skills/.venv/bin/python3 .cursor/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller mk:investigate`
+- Delegation example: `node .cursor/scripts/skill-python.cjs .cursor/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller mk:investigate`

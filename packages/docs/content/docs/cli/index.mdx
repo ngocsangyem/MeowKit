@@ -101,6 +101,8 @@ Validate .claude/ project structure.
 | `--rules` | Run only the routing-table-breadth check |
 | `--capabilities` | Run only the capability manifest checks |
 | `--memory` | Run only the committed team-memory store lint |
+| `--frontmatter` | Run only the SKILL.md frontmatter schema and runtime-contract check |
+| `--docs-refs` | Run only the `.claude` to `docs/*` reference allowlist check |
 | `--substrate` | Run only the responsibility-substrate drift and untagged check |
 
 ### `mewkit capabilities`
@@ -137,8 +139,19 @@ Guided post-scaffold configuration.
 
 | Flag | What it does |
 |---|---|
+| `--skills` `<value>` | Comma-separated skills whose interpreter environment setup should create |
 | `--only` `<value>` | Run a single setup step |
 | `--system-deps` | Install system-level dependencies |
+
+### `mewkit skill`
+
+Per-skill interpreter environments.
+
+Subcommands: `env`.
+
+| Flag | What it does |
+|---|---|
+| `--list` | List every skill that declares a runtime and the state of its environment |
 
 ### `mewkit doctor`
 
@@ -346,6 +359,7 @@ Subcommands: `status`, `check`, `approve`, `archive`.
 | `--json` | Emit machine-readable JSON |
 | `--dry-run` | Print what would happen without writing |
 | `--by` `<value>` | Approver name recorded on the approval receipt |
+| `--structural` | `check`: validate plan.md + its phase files against the full template |
 | `--activate` | Activate the task on creation; --no-activate opts out |
 
 ### `mewkit trace`

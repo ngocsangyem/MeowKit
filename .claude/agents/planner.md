@@ -164,7 +164,7 @@ vendor API page, an external RFC) not available via `mk:docs-finder`, delegate t
 - **With `--wtm-accept-risk`:** delegation proceeds through all security layers. The flag is
   a conscious trust-boundary crossing — the caller acknowledges the target URL may contain
   prompt injection and that the skill's defenses are best-effort.
-- Delegation example: `.claude/skills/.venv/bin/python3 .claude/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller planner`
+- Delegation example: `node .claude/scripts/skill-python.cjs .claude/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller planner`
 
 ## What You Do NOT Do
 

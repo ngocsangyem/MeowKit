@@ -202,7 +202,7 @@ These sections are NOT added in default mode (12-section template remains unchan
 
 ## Optional Machine-Written Sections
 
-These sections are written by skill steps, not authored by humans. They are OPTIONAL — `validate-plan.py` does NOT require them. Legacy plans without them continue to validate.
+These sections are written by skill steps, not authored by humans. They are OPTIONAL — the structural check does NOT require them. Legacy plans without them continue to validate.
 
 ### `## Verification Log`
 

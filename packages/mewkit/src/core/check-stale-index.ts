@@ -85,8 +85,11 @@ export function countSpecs(repoRoot: string): CountSpec[] {
 		},
 		{
 			source: ".claude/hooks/HOOKS_INDEX.md",
-			label: "shell hooks",
-			pattern: /(\d+)\s+shell hook/g,
+			// "shell hooks" until the runtime became node, at which point the token
+			// stopped existing and the check reported "token not found" forever. The
+			// label has to describe the hooks that are actually shipped.
+			label: "node hooks",
+			pattern: /(\d+)\s+node hook/g,
 			actual: a.hooks.length,
 		},
 		// docs/core/meowkit-architecture.md — the UNDATED overview prose only. The dated

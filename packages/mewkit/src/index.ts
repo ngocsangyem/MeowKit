@@ -124,6 +124,8 @@ async function main(): Promise<void> {
 				rules: args.rules as boolean | undefined,
 				capabilities: args.capabilities as boolean | undefined,
 				memory: args.memory as boolean | undefined,
+				frontmatter: args.frontmatter as boolean | undefined,
+				docsRefs: args["docs-refs"] as boolean | undefined,
 			});
 			break;
 		}
@@ -220,6 +222,7 @@ async function main(): Promise<void> {
 					subcommand: planSub,
 					target: args._[2] as string | undefined,
 					json: args.json as boolean | undefined,
+					structural: args.structural as boolean | undefined,
 				});
 			}
 			break;
@@ -297,8 +300,19 @@ async function main(): Promise<void> {
 			await note({ file: args._[1] as string | undefined });
 			break;
 		case "setup":
-			await setup({ only: args.only as string | undefined, systemDeps: args["system-deps"] as boolean | undefined });
+			await setup({
+				only: args.only as string | undefined,
+				systemDeps: args["system-deps"] as boolean | undefined,
+				skills: args.skills as string | undefined,
+			});
 			break;
+		case "skill": {
+			const { skillCommand } = await import("./commands/skill-env.js");
+			const sub = args._.slice(1).map(String);
+			if (args.list) sub.push("--list");
+			process.exitCode = await skillCommand(sub);
+			break;
+		}
 		case "doctor":
 			await doctor({
 				report: args.report as boolean | undefined,

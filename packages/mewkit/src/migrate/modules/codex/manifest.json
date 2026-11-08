@@ -83,6 +83,15 @@
 			"ownership": "managed-replace",
 			"scopeTags": ["managed-runtime"],
 			"active": true
+		},
+		{
+			"sourcePath": "root/.codex/scripts/skill-python.cjs",
+			"targetPath": ".codex/scripts/skill-python.cjs",
+			"mode": "0755",
+			"active": true,
+			"provider": "codex",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"]
 		}
 	]
 }
