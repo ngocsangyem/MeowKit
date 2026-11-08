@@ -19,6 +19,7 @@ import { resolveCursorModuleDir } from "../migrate/modules/cursor-authored-bundl
 import { reconcileApplyCursorBundle } from "../migrate/modules/cursor-reconcile-apply.js";
 import { describeRetiredSkills } from "../migrate/modules/retired-skill-cleanup.js";
 import { meowkitStatePaths } from "../state/meowkit-state-paths.js";
+import { refuseKitSourceRepo } from "./kit-source-repo-guard.js";
 
 /** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
 const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
@@ -144,6 +145,7 @@ export interface UpgradeArgs {
 	list?: boolean;
 	noCleanup?: boolean;
 	yes?: boolean;
+	allowKitSource?: boolean;
 }
 
 /** Read installed version from canonical metadata (instant, no npx), with legacy fallback. */
@@ -336,6 +338,7 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 	// claude-code kit; refresh every one present rather than returning after the first match.
 	// (Skip for --check/--list, which are version queries.)
 	const cwd = process.cwd();
+	if (!args.check && !args.list) refuseKitSourceRepo(cwd, "upgrade", args.allowKitSource);
 	if (!args.check && !args.list && !existsSync(join(cwd, ".claude"))) {
 		const hasCodex = existsSync(join(cwd, ".codex"));
 		const hasCursor = hasCursorLedger(cwd);

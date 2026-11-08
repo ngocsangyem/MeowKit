@@ -80,3 +80,39 @@ export function renderHelp(version: string): string {
 	lines.push("");
 	return lines.join("\n");
 }
+
+/** `mewkit <command> --help`: the one command's summary, sub-verbs, and flags. */
+export function renderCommandHelp(version: string, name: string): string {
+	const cmd = CLI_CATALOGUE.commands.find((c) => c.name === name);
+	if (!cmd) return renderHelp(version);
+	const flagWidth = labelWidth();
+	const lines: string[] = [
+		"",
+		`${pc.bold(pc.cyan(`mewkit ${cmd.name}`))} ${pc.dim(`v${version}`)} — ${cmd.summary}`,
+		"",
+		`${pc.bold("Usage:")}`,
+		`  mewkit ${cmd.usage ?? `${cmd.name}${cmd.subcommands?.length ? " <subcommand>" : ""} [options]`}`,
+	];
+	if (cmd.subcommands?.length) {
+		lines.push("", `${pc.bold("Subcommands:")}`, `  ${cmd.subcommands.join(" · ")}`);
+	}
+	const flags = [...globalFlags(), ...(flagsByCommand().get(cmd.name) ?? [])];
+	lines.push("", `${pc.bold("Options:")}`);
+	for (const flag of flags) {
+		lines.push(`  ${pad(flagLabel(flag), flagWidth)}${flagSummary(flag, cmd.name)}`);
+	}
+	lines.push("");
+	return lines.join("\n");
+}
+
+/**
+ * The help text to print instead of dispatching, or null to dispatch normally.
+ *
+ * Checked before any command runs: `--help` must never fall through to a command, because
+ * several commands write on a bare invocation (`upgrade` downloads a release and overwrites
+ * `.claude/`). Subcommands do not parse their own `--help`, so the dispatcher owns it.
+ */
+export function helpRequest(help: unknown, command: string | undefined, version: string): string | null {
+	if (!help) return null;
+	return command ? renderCommandHelp(version, command) : renderHelp(version);
+}

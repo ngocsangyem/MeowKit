@@ -16,6 +16,7 @@ import {
 } from "../core/index.js";
 import type { ReleaseInfo, UserConfig } from "../core/index.js";
 import { promptAndInstallSystemDeps } from "./setup.js";
+import { refuseKitSourceRepo } from "./kit-source-repo-guard.js";
 import { getRequirementsSource, formatPackageList } from "../core/skills-dependencies.js";
 import { ensureVenv, installPipPackages } from "../core/dependency-installer.js";
 import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.js";
@@ -56,6 +57,8 @@ export interface InitArgs {
 	target?: string;
 	/** When true, scope the post-init migration globally (~/.cursor/, etc.) instead of per-project. */
 	migrateGlobal?: boolean;
+	/** Permit running in the MeowKit source repo, whose `.claude/` is the kit's authored source. */
+	allowKitSource?: boolean;
 	/**
 	 * Install profile (core/developer/product/atlassian/security/research/full).
 	 * Omitted = full (today's behavior). Works in update mode too, to TRIM an
@@ -680,6 +683,8 @@ async function addCursorBundle(
 
 export async function init(args: InitArgs): Promise<void> {
 	const targetDir = process.cwd();
+	// Every non-dry-run path writes into targetDir (update mode or a provider bundle).
+	if (!args.dryRun) refuseKitSourceRepo(targetDir, "init", args.allowKitSource);
 
 	// `--target codex` / `--target cursor` are distinct, offline paths: reconcile the
 	// authored bundle, done. No `.claude/`, no release download, no legacy converter.

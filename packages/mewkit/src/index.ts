@@ -4,7 +4,7 @@ import fs from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import minimist from "minimist";
-import { renderHelp } from "./cli/render-help.js";
+import { helpRequest, renderHelp } from "./cli/render-help.js";
 import { minimistOptions } from "./cli/minimist-options.js";
 import pc from "picocolors";
 import { init } from "./commands/init.js";
@@ -75,8 +75,10 @@ async function main(): Promise<void> {
 
 	const command = args._[0] as string | undefined;
 
-	if (args.help && !command) {
-		printHelp();
+	// Before the switch, for every command: a subcommand reached with `--help` would run for real.
+	const help = helpRequest(args.help, command, VERSION);
+	if (help !== null) {
+		console.log(help);
 		return;
 	}
 
@@ -93,6 +95,7 @@ async function main(): Promise<void> {
 				skillPacks: args["skill-packs"] as string | undefined,
 				mcpProfiles: args["mcp-profiles"] as string | undefined,
 				allowCloudMcp: args["allow-cloud-mcp"] as boolean | undefined,
+				allowKitSource: args["allow-kit-source"] as boolean | undefined,
 			});
 			break;
 		case "upgrade":
@@ -102,6 +105,7 @@ async function main(): Promise<void> {
 				list: args.list as boolean | undefined,
 				noCleanup: args["no-cleanup"] as boolean | undefined,
 				yes: args.yes as boolean | undefined,
+				allowKitSource: args["allow-kit-source"] as boolean | undefined,
 			});
 			break;
 		case "validate": {
