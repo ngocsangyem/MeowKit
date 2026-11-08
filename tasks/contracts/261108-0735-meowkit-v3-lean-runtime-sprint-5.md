@@ -1186,6 +1186,59 @@ the moment it matters; and no message in any of these paths prints a stack trace
   code-quality 1, ux-usability 1), each AC bound exactly once, BASE still
   `085cb5bd2ee855431f68d0481958da9114ab92e5`, `status: negotiating`, `rounds: 2`, both signature fields null.
 
+- Round 2b (reviewer/evaluator): accepted — the user decision of 2026-11-08 ("Local kit cache", my option (a)) is
+  applied faithfully and closes the single blocking item. Verified only the decision's application; the six items
+  accepted in round 2 were re-checked for regression, not reopened.
+  1. **Definitions name a source that exists.** *Trusted kit source* is now the local kit cache at
+     `.meowkit/cache/`, written by `init` and `upgrade`. It reuses an existing taxonomy class rather than
+     inventing one: `.claude/hooks/lib/meowkit-paths.cjs:8` already defines `cache/` as "derived, rebuildable
+     artifacts" and `:48` already exposes `cacheDir`. D12 states the narrowing explicitly — "no **tracked**
+     in-project file is trusted" — attributes it to the user decision, and records the property it rests on
+     (D11's deny-all keeps `cache/` untracked, so a pull request cannot introduce or alter it, which is the actual
+     threat model) rather than the out-of-project premise that round 2 could not supply.
+  2. **AC-10 and AC-11 state the cache as their source.** AC-10's `Given` carries a populated `.meowkit/cache/`
+     for the version `.meowkit/metadata.json` records, and the `--yes` cell says so in the clause that was
+     unsatisfiable before — "whose fixture has the populated cache, which is what makes a non-empty `clean` class
+     possible at all". AC-11's successful `--adopt` rebuilds metadata "**only** by comparing on-disk files against
+     `.meowkit/cache/` … and never against a tracked in-project file", with any non-matching file recorded
+     `orphan` or `user`, never `meowkit` — which closes the adopt-side half of the data-loss vector as well as the
+     uninstall-side half.
+  3. **Degraded cache refuses per path and points at `mewkit upgrade`.** All three degradations are probed as
+     separate invocations — cache absent, cache recording a version other than `metadata.json`'s, and a cache path
+     forced into tracking by `git add -f` — each deleting nothing and refusing **per affected path** with the
+     `mewkit upgrade` pointer; D12 adds *incomplete* to the same rule, and Scope (Out) forbids "a baseline-only
+     deletion fallback when the cache is absent or version-mismatched". Two details are better than what I asked
+     for: the version mismatch is detected from the version the cache **records** against the one `metadata.json`
+     reports, "not from content luck"; and the tracked-cache check is re-made with `git ls-files` **per run**
+     instead of trusting `.meowkit/.gitignore` to still be in place — which is what defeats a pull request that
+     allowlists `cache/` and then commits content into it.
+  4. **AC-08 shows `cache/` untracked, non-vacuously.** The assertion is made on a project where `init` has
+     already populated the cache, with `git check-ignore -v` naming the `.meowkit/.gitignore` `*` rule for a path
+     inside it and `git ls-files .meowkit/cache` **empty** — so it proves the ignore actually covers real content
+     rather than an empty directory.
+  5. **AC-09 excludes the cache from snapshots** and asserts it both ways: no snapshot manifest lists a
+     `.meowkit/cache/` path, and the cache is byte-identical before and after a restore. The rationale is sound —
+     the cache is re-derivable by `mewkit upgrade`, so snapshotting it would multiply every backup by the size of
+     a whole kit for no recovery value.
+  6. **The network wording is corrected, and now proved rather than asserted.** D12 states "the fetch happens at
+     `init`/`upgrade` only, and deletion needs none"; Scope (Out) forbids a network fetch on any path other than
+     those two; and AC-10 and AC-11 both **run with the network unreachable**, so the claim is a probe rather than
+     a sentence. D12 also records why round 2's source did not exist — `files: ["dist", "portable-manifest.json",
+     "NOTICE"]`, `github-releases.ts:87-88` fetching into a timestamped tmpdir, `upgrade.ts:334` deleting it via
+     `cleanupDownload` (`:127-133`) — and attributes it to `plan.md` Decision 4 rather than to an oversight.
+  7. **No regression.** 15 ACs, each bound exactly once, Rubric Bindings unchanged at functionality 10 /
+     product-depth 3 / code-quality 1 / ux-usability 1 against `cli-tool`'s 0.40/0.25/0.20/0.15. BASE still the
+     real SHA `085cb5bd`. All six round-2 resolutions intact: the committed scan's 84 names (73/10/1), the
+     `MEOWKIT_TDD` env > `--tdd` sentinel > project > user > default OFF precedence, `pm.auto` absent by name,
+     22 entries over 21 `toggleKey`s, AC-06's realpath/inode and fail-closed cells, and D15. No contradiction
+     between `cache/` sitting in the never-delete class and `upgrade` refreshing it: D12 scopes the protection to
+     `uninstall` and describes `upgrade` as the path that "re-fetches and rewrites the cache".
+  Residual risk, stated for the record rather than as an objection: the trust anchor is now a local untracked
+  directory, so an actor with filesystem write access to the project could alter it — but such an actor can
+  already modify the kit and the metadata directly, so this widens no practical exposure. The threat model the
+  sprint defends is the PR-editable committed file, and an untracked `cache/` plus the per-run `git ls-files`
+  re-check covers it. Evaluator accepts; proceeding to sign.
+
 ## Amendments (if any)
 
 None yet.
