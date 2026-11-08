@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 6
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: signed
-generator_signed: 79f9c7359f4665e2abd04ba933122fb2b6ec54ea
-evaluator_signed: 6f62a9e03f53f4d5b4e18e05d6d27732852ac12a
+status: amended
+generator_signed: null
+evaluator_signed: null
 rounds: 2
 created: 261108-2347
 ---
@@ -983,5 +983,25 @@ on, or the signing secret's value
 
 ## Amendments (if any)
 
-None. This contract is still `negotiating`; round-2 changes are in-place revisions of unsigned criteria, as
-the `amend` action defines. The Amendments section is for post-sign changes only.
+### Amendment 1 — 261109-0900
+
+Trigger: the build found two legs that cannot hold as written and two implementation choices the signed text
+did not anticipate. No criterion is weakened; AC-06 is unchanged and still required in full.
+
+- **AC-11 projection leg.** No committed entry point regenerates the codex/cursor projections, so "regenerate
+  and `git diff --exit-code`" names a command that does not exist. Replaced by: `scripts/codex-compat-check.mjs`
+  passes, and `mewkit validate --target codex|cursor` passes against targets produced by
+  `mewkit init --target codex|cursor` in throwaway `$TMPDIR` projects. Adding a regenerate verb stays out of scope.
+- **AC-12 changelog pages.** The two changelog pages record retired verbs as history; resolving them against
+  the live catalogue would require rewriting history. They are exempt from resolution and are instead asserted
+  unchanged by diff against BASE. The other ten pages are resolved as written.
+- **End-to-end legs.** Command-level probes (AC-04, 05, 06, 07, 08, 10, 11) run against throwaway `$TMPDIR`
+  projects through `MEOWKIT_RELEASE_SOURCE`, never against this repository. Because the committed keyring is
+  empty and no environment or flag may add a trusted key, the trusted-artifact install leg is proven at module
+  level with an injected test keyring; end to end, a present artifact must produce the `no-trusted-key`
+  refusal and a zip-only release must install.
+- **Archive member mode (AC-01).** Mode is derived from content (`0755` when the file starts with `#!`, else
+  `0644`) so a `chmod` perturbation cannot change the digest. Recorded so a lost execute bit on a non-script
+  file is not read as a defect.
+- **`base.exclude` (AC-01).** Optional in the pack-manifest schema, because an installed project publishes
+  nothing; both archive builders refuse to run without it.
