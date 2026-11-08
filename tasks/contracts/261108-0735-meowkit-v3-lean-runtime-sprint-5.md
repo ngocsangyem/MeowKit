@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 5
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: signed
-generator_signed: 8cac33b66674fd02c67c52b7e11a21d769b2eeec
-evaluator_signed: cc1cd520a462656cf5cad3873e96d6bbd1bf1107
+status: amended
+generator_signed: null
+evaluator_signed: null
 rounds: 2
 created: 261108-0735
 ---
@@ -1241,4 +1241,31 @@ the moment it matters; and no message in any of these paths prints a stack trace
 
 ## Amendments (if any)
 
-None yet.
+### Amendment 1 — 261108-1900
+
+Trigger: the build ran in one batch plus four passes and recorded 41 deviations in the sprint-5 evidence file. Decided
+under the user's standing directive (follow recommended options). No criterion is weakened; items that change how a
+signed criterion reads are listed here, the rest stay evidence-only.
+
+- **Locations (AC-01, AC-05).** The classification table is `env-name-classification.json` at the repository root;
+  the hook-side reader is `.claude/hooks/lib/read-config.cjs`. Two extra rejection identifiers
+  (`null-not-supported`, `float-not-supported`) and `state-only-key` join the AC-03/AC-15 identifier set.
+- **`$schema` (AC-02).** The stub's one uncommented line is `$schema`; both readers admit it, a test keeps it the
+  only live line.
+- **New names and behaviour (AC-01, AC-08, AC-09).** `MEOWKIT_RELEASE_SOURCE` enters the universe as `skill-option`
+  and drives the offline install harness; `init --yes` is new non-interactive behaviour; a snapshot records only
+  files that exist, so a fresh install snapshots nothing.
+- **`workflow-config` (D10, AC-02).** Writes go to session state; `config-set-no-config` exits 0; `telemetry` and
+  `proactive` alias `workflow.*`; `features.tdd` migrates to `tdd`.
+- **Ownership (AC-10, AC-11).** A metadata version of `unknown` cannot be checked and is not a match;
+  `.claude/worktrees/` and `.claude/logs/` are outside the ownership walk.
+- **Kit-verb validator (AC-13).** Scans the shipped kit (`.claude/**`) only; `docs/**` historical verbs are record.
+- **Flags (AC-13).** Implemented on all seven mutating commands with one envelope shape; `--json` moves narration to
+  stderr; `setup --dry-run --system-deps` refuses instead of planning; `pack add --dry-run` still fetches the release
+  to learn the pack's file list; `uninstall`/`backups` keep their superset payloads.
+- **AC-12.** `pre-ship` is driven twice (N/A with nothing staged, block with a source file staged); the offline
+  sandbox refuses DNS/connect in-process because the proxy approach is ignored by this Node's `fetch`. The journey
+  found a missing `mewkit doctor` hint, fixed in `session-context-report.cjs` without a new observer.
+- **AC-14.** `env-name-classification.json` (633 lines) is a named data-file exception: AC-07 requires one allowlist
+  file. Files already over 200 lines at BASE that grew are listed by name in the evidence.
+
