@@ -3,7 +3,7 @@
 persist_fetch.py — Cache persistence layer for mk:web-to-markdown.
 
 Responsibilities:
-  - Directory bootstrap (.claude/cache/web-fetches/ + quarantine/)
+  - Directory bootstrap (.meowkit/cache/web-fetches/ + quarantine/)
   - Slug generation (YYMMDD-HHMMSS-host-kebab-sha256path[:10].md)
   - Frontmatter + content assembly
   - Atomic .tmp → os.replace write
@@ -52,7 +52,10 @@ def _find_project_root() -> Path:
 
 
 PROJECT_ROOT = _find_project_root()
-CACHE_ROOT = PROJECT_ROOT / ".claude" / "cache" / "web-fetches"
+# The derived-artifact class of the runtime state tree, never the kit tree: a fetch
+# report is rebuildable output, and writing it under `.claude/` put untrusted page
+# content inside the directory the release archive is built from.
+CACHE_ROOT = PROJECT_ROOT / ".meowkit" / "cache" / "web-fetches"
 QUARANTINE_DIR = CACHE_ROOT / "quarantine"
 MANIFEST_PATH = CACHE_ROOT / "index.jsonl"
 # Canonical destination named by `.claude/rules/gate-rules.md` (Recording Human Interventions): the
@@ -173,7 +176,7 @@ def _atomic_write(dest: Path, content_bytes: bytes) -> None:
 # Layer 8: post-write re-scan through the audit scanner
 # ---------------------------------------------------------------------------
 
-AUDIT_CLI = PROJECT_ROOT / ".claude" / "scripts" / "injection-audit.cjs"
+AUDIT_CLI = PROJECT_ROOT / ".claude" / "hooks" / "lib" / "injection-audit.cjs"
 
 
 class _Finding:
@@ -304,7 +307,7 @@ def persist(
     caller: str = "user:direct",
 ) -> str:
     """
-    Write fetched markdown to .claude/cache/web-fetches/<slug>.md atomically.
+    Write fetched markdown to .meowkit/cache/web-fetches/<slug>.md atomically.
     Applies Layer 7 secret scrub before write.
     Appends manifest entry under fcntl.flock.
     Runs Layer 8 post-write audit; on CRITICAL → retroactive quarantine.

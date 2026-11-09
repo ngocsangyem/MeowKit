@@ -40,7 +40,7 @@ If the Read fails (file not found), say:
 
 After /mk:office-hours completes, re-run the design doc check:
 ```bash
-SLUG=$(.claude/scripts/bin/workflow-slug 2>/dev/null || basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
+SLUG=$(.claude/hooks/lib/workflow-slug 2>/dev/null || basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr '/' '-' || echo 'no-branch')
 DESIGN=$(ls -t tasks/plans/*/*-$BRANCH-design-*.md 2>/dev/null | head -1)
 [ -z "$DESIGN" ] && DESIGN=$(ls -t tasks/plans/*/*-design-*.md 2>/dev/null | head -1)

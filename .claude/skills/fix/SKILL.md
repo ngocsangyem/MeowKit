@@ -71,8 +71,8 @@ If 3+ fix attempts fail, STOP and question the architecture — discuss with use
 - `--review` — Human-in-the-loop. Pause at each step.
 - `--quick` — Quick profile for a known cause and ≤2 files.
 - `--parallel` — Parallel `developer` agents per independent issue.
-- `--tdd` — Force regression test BEFORE the fix (writes the `.claude/session-state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
-- `--advice` — Opt-in strategic supervision for one run. At named checkpoints (`GUIDE → RESCUE* → REVIEW → RECHECK*`, hard cap 5) the workflow asks the `athena` agent to assess the situation, recommend an operational path inside the locked scope, and — after the work — review it against the evidence, with the power to return it for correction. Standard and deep profiles only. Supervision is evidence, never approval: it clears no gate, counts as no verification, and the three-failed-attempt human STOP below still fires on its own schedule. Without the flag, zero calls happen and no state is written. Contract: `.claude/rules-conditional/advice-supervision-rules.md` (load it only when the flag is present).
+- `--tdd` — Force regression test BEFORE the fix (writes the `.meowkit/state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
+- `--advice` — Opt-in strategic supervision for one run. At named checkpoints (`GUIDE → RESCUE* → REVIEW → RECHECK*`, hard cap 5) the workflow asks the `athena` agent to assess the situation, recommend an operational path inside the locked scope, and — after the work — review it against the evidence, with the power to return it for correction. Standard and deep profiles only. Supervision is evidence, never approval: it clears no gate, counts as no verification, and the three-failed-attempt human STOP below still fires on its own schedule. Without the flag, zero calls happen and no state is written. Contract: `.claude/skills/advise/references/advice-supervision-rules.md` (load it only when the flag is present).
 
 ## Plan-First Gate
 
@@ -201,13 +201,13 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 ## Workflow Evidence Index
 
-Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
+Contract: `.claude/skills/advise/references/workflow-evidence-rules.md`. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
 
-**Storage path:** `.claude/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
+**Storage path:** `.meowkit/state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
 
 **Write points (standard/deep only):** Step 2.5 (init: skill, mode, task, planPath, phase, risk, fixDiagnosis) → Step 5 (verification) → Step 6 finalize (`approvals.gate2`/`ship` as `required|not_applicable`, `memory.gotchaWritten` / `memory.decisionWritten`).
 
-**Validate before approval:** run `node .claude/scripts/validate-workflow-evidence.cjs <path> --phase fix` before the user-approval prompt (Step 6 item 5). Surface any `EVIDENCE_BLOCKED:<reasons>` and fill the missing fields — do not present for approval on a blocked index. A high-risk flag (`risk.requiresHumanApproval`) forces explicit human approval before finalize regardless of mode.
+**Validate before approval:** run `node .claude/hooks/lib/validate-workflow-evidence.cjs <path> --phase fix` before the user-approval prompt (Step 6 item 5). Surface any `EVIDENCE_BLOCKED:<reasons>` and fill the missing fields — do not present for approval on a blocked index. A high-risk flag (`risk.requiresHumanApproval`) forces explicit human approval before finalize regardless of mode.
 
 **Evidence ≠ memory:** the evidence file is one-run proof; `.meowkit/memory/gotchas.md` is the durable lesson store. Keep them separate — standalone `/mk:fix` owns its evidence write; inside `/mk:cook` the pipeline (Phase 6) owns the evidence write, so do NOT double-write. Scrub secrets / tokens / PII and store pointers/summaries only — never raw command logs.
 

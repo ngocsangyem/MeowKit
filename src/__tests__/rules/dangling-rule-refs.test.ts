@@ -26,6 +26,12 @@ const DESTINATIONS = [
 	"skills/agent-detector/references/agent-routing.md",
 	"skills/agent-detector/references/context-budget-rules.md",
 	"skills/rubric/references/rubric-rules.md",
+	"skills/advise/references/advice-supervision-rules.md",
+	"skills/advise/references/workflow-evidence-rules.md",
+	"skills/agent-detector/references/agile-story-gates.md",
+	"skills/agent-detector/references/agile-sprint-commitment.md",
+	"skills/agent-detector/references/agile-feedback-cycle.md",
+	"hooks/references/capability-bootstrap.md",
 	"skills/skill-creator/references/skill-authoring-rules.md",
 	"skills/benchmark/references/dead-weight-audit-rules.md",
 ];

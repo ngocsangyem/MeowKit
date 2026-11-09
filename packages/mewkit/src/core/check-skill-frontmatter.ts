@@ -1,5 +1,5 @@
 /**
- * Validate every SKILL.md frontmatter against `.claude/schemas/skill-schema.json`.
+ * Validate every SKILL.md frontmatter against `skill-schema.json`.
  *
  * Two severities. An ERROR is a schema violation or a broken runtime contract and
  * fails the check. A WARN is a missing recommended or advisory field; it is
@@ -12,6 +12,7 @@
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { load as parseYaml } from "js-yaml";
 import { validateAgainstSchema, formatViolation } from "./json-schema-lite.js";
 import { RUNTIME_KEY } from "./skill-env.js";
@@ -34,6 +35,22 @@ const EXTERNAL_SERVICE_PATTERNS = [
 ];
 
 const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---/;
+
+/**
+ * The frontmatter schema, resolved inside this package rather than inside the
+ * project being validated.
+ *
+ * The schema is engine knowledge: it describes what this validator accepts, and
+ * it changes when the validator changes. Read from a project it would be a
+ * second copy that can disagree with the code reading it, and a project that
+ * never received one — or whose copy a user edited — made the check report a
+ * fatal instead of validating anything.
+ *
+ * `../../schemas/` resolves to the package root from both `src/core/` and the
+ * compiled `dist/core/`, so the source tree and a published install read the
+ * same file through the same path.
+ */
+const SCHEMA_PATH = fileURLToPath(new URL("../../schemas/skill-schema.json", import.meta.url));
 
 export interface FrontmatterReport {
 	errors: string[];
@@ -87,12 +104,13 @@ function skillNames(skillsRoot: string): string[] {
 
 /** Validate every `*​/SKILL.md` under `<root>/.claude/skills`. */
 export function checkSkillFrontmatter(root: string): FrontmatterReport {
-	const schemaPath = path.join(root, ".claude", "schemas", "skill-schema.json");
 	const skillsRoot = path.join(root, ".claude", "skills");
-	if (!existsSync(schemaPath)) return { errors: [], warnings: [], valid: 0, fatal: `No schema at ${schemaPath}` };
+	if (!existsSync(SCHEMA_PATH)) {
+		return { errors: [], warnings: [], valid: 0, fatal: `No schema at ${SCHEMA_PATH} — this CLI install is incomplete` };
+	}
 	if (!existsSync(skillsRoot)) return { errors: [], warnings: [], valid: 0, fatal: `No skills dir at ${skillsRoot}` };
 
-	const schema = JSON.parse(readFileSync(schemaPath, "utf-8")) as Record<string, unknown>;
+	const schema = JSON.parse(readFileSync(SCHEMA_PATH, "utf-8")) as Record<string, unknown>;
 	const report: FrontmatterReport = { errors: [], warnings: [], valid: 0 };
 
 	for (const name of skillNames(skillsRoot)) {

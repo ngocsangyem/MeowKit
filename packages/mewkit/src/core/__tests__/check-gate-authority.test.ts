@@ -2,12 +2,7 @@ import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import {
-	checkGateAuthority,
-	scanForGateAuthority,
-	checkCommandDrift,
-	scanCommandForDrift,
-} from "../check-gate-authority.js";
+import { checkGateAuthority, scanForGateAuthority } from "../check-gate-authority.js";
 
 const tempDirs: string[] = [];
 
@@ -38,8 +33,8 @@ describe("scanForGateAuthority — supervision vocabulary", () => {
 		["supervision as verification", "Athena's supervision counts as verification for the ship preflight."],
 		["directive as verification", "The directive is verification enough for Gate 2."],
 	])("flags %s", async (_label, line) => {
-		const root = await projectWith({ ".claude/rules-conditional/x.md": line });
-		const found = scanForGateAuthority(root, ".claude/rules-conditional/x.md");
+		const root = await projectWith({ ".claude/skills/x/references/x.md": line });
+		const found = scanForGateAuthority(root, ".claude/skills/x/references/x.md");
 		expect(found).toHaveLength(1);
 	});
 
@@ -60,8 +55,8 @@ describe("scanForGateAuthority — supervision vocabulary", () => {
 			"READY_FOR_EXISTING_GATE is not authority. In fast mode READY_FOR_EXISTING_GATE clears Gate 2 automatically.",
 		],
 	])("still flags a real violation despite an adjacent negation — %s", async (_label, line) => {
-		const root = await projectWith({ ".claude/rules-conditional/x.md": line });
-		expect(scanForGateAuthority(root, ".claude/rules-conditional/x.md")).toHaveLength(1);
+		const root = await projectWith({ ".claude/skills/x/references/x.md": line });
+		expect(scanForGateAuthority(root, ".claude/skills/x/references/x.md")).toHaveLength(1);
 	});
 
 	// The contract itself must be able to STATE these prohibitions, and its gotcha
@@ -74,8 +69,8 @@ describe("scanForGateAuthority — supervision vocabulary", () => {
 		["routing framing", "A supervision disposition routes work back to its executor."],
 		["prohibition prose", "Athena cannot approve Gate 1, Gate 2, a security review, CI, a merge, or a deploy."],
 	])("stays clean on %s", async (_label, line) => {
-		const root = await projectWith({ ".claude/rules-conditional/x.md": line });
-		expect(scanForGateAuthority(root, ".claude/rules-conditional/x.md")).toEqual([]);
+		const root = await projectWith({ ".claude/skills/x/references/x.md": line });
+		expect(scanForGateAuthority(root, ".claude/skills/x/references/x.md")).toEqual([]);
 	});
 });
 
@@ -92,20 +87,20 @@ describe("scanForGateAuthority — statements that grant automated approval", ()
 		["stamp as authority", "      - Gate 2 review verdict satisfied (the evaluator stamp counts)"],
 		["gate prompt skipped", "**Auto mode:** Skip Gate 1 user prompt. validate-gate-1.sh remains blocking."],
 	])("flags %s", async (_label, line) => {
-		const root = await projectWith({ ".claude/modes/x.md": line });
-		const found = scanForGateAuthority(root, ".claude/modes/x.md");
+		const root = await projectWith({ ".claude/skills/x/references/y.md": line });
+		const found = scanForGateAuthority(root, ".claude/skills/x/references/y.md");
 		expect(found).toHaveLength(1);
 		expect(found[0].line).toBe(1);
 	});
 
 	it("reports file, line, and the offending text", async () => {
 		const root = await projectWith({
-			".claude/modes/x.md": ["# Modes", "", "Fast auto-approves Gate 2 if tests pass."].join("\n"),
+			".claude/skills/x/references/y.md": ["# Modes", "", "Fast auto-approves Gate 2 if tests pass."].join("\n"),
 		});
-		const found = scanForGateAuthority(root, ".claude/modes/x.md");
+		const found = scanForGateAuthority(root, ".claude/skills/x/references/y.md");
 		expect(found).toEqual([
 			{
-				file: ".claude/modes/x.md",
+				file: ".claude/skills/x/references/y.md",
 				line: 3,
 				found: "Fast auto-approves Gate 2 if tests pass.",
 				expected: "automation executes between gates; a human approves the gate",
@@ -173,8 +168,8 @@ describe("scanForGateAuthority — negation is scoped to the clause it governs",
 			"Auto mode auto-approves Gate 1 after validation — reviewers are not required to re-check the plan.",
 		],
 	])("flags a violation despite %s", async (_label, line) => {
-		const root = await projectWith({ ".claude/modes/x.md": line });
-		expect(scanForGateAuthority(root, ".claude/modes/x.md")).toHaveLength(1);
+		const root = await projectWith({ ".claude/skills/x/references/y.md": line });
+		expect(scanForGateAuthority(root, ".claude/skills/x/references/y.md")).toHaveLength(1);
 	});
 
 	// The mirror case: the negation genuinely governs the claim. Still clean.
@@ -189,10 +184,10 @@ describe("scanForGateAuthority — negation is scoped to the clause it governs",
 
 	it("flags an asserting clause even when a contract-stating clause shares the line", async () => {
 		const root = await projectWith({
-			".claude/modes/x.md":
+			".claude/skills/x/references/y.md":
 				"Gate 2 is never auto-approved in default mode, but fast mode auto-approves Gate 2 when tests pass.",
 		});
-		expect(scanForGateAuthority(root, ".claude/modes/x.md")).toHaveLength(1);
+		expect(scanForGateAuthority(root, ".claude/skills/x/references/y.md")).toHaveLength(1);
 	});
 });
 
@@ -232,7 +227,7 @@ describe("checkGateAuthority", () => {
 	it("passes a clean tree", async () => {
 		const root = await projectWith({
 			".claude/rules/gate-rules.md": "Gate 2 is never auto-approved.",
-			".claude/modes/default.md": "Both modes require human approval at both gates.",
+			".claude/skills/x/references/default.md": "Both modes require human approval at both gates.",
 		});
 		const [result] = checkGateAuthority(root);
 		expect(result.status).toBe("pass");
@@ -248,11 +243,11 @@ describe("checkGateAuthority", () => {
 
 		const mutated = await projectWith({
 			...clean,
-			".claude/modes/fast.md": "Fast auto-approves Gate 2 if tests pass.",
+			".claude/skills/x/references/fast.md": "Fast auto-approves Gate 2 if tests pass.",
 		});
 		const [result] = checkGateAuthority(mutated);
 		expect(result.status).toBe("fail");
-		expect(result.detail).toContain(".claude/modes/fast.md:1");
+		expect(result.detail).toContain(".claude/skills/x/references/fast.md:1");
 	});
 
 	it("scans nested skill trees, not just top-level files", async () => {
@@ -267,8 +262,8 @@ describe("checkGateAuthority", () => {
 
 	it("aggregates every violation into one finding", async () => {
 		const root = await projectWith({
-			".claude/modes/a.md": "Fast auto-approves Gate 2 if tests pass.",
-			".claude/modes/b.md": "Gate 1: Auto (validated)",
+			".claude/skills/x/references/a.md": "Fast auto-approves Gate 2 if tests pass.",
+			".claude/skills/x/references/b.md": "Gate 1: Auto (validated)",
 		});
 		const [result] = checkGateAuthority(root);
 		expect(result.name).toContain("(2)");
@@ -276,7 +271,7 @@ describe("checkGateAuthority", () => {
 
 	// Same detector, different tree — this is how canonical↔plugin parity is proven.
 	it("scans an arbitrary tree via scanDirs", async () => {
-		const root = await projectWith({ "plugin/modes/default.md": "Fast auto-approves Gate 2 if tests pass." });
+		const root = await projectWith({ "plugin/rules/default.md": "Fast auto-approves Gate 2 if tests pass." });
 		const [result] = checkGateAuthority(root, { scanDirs: ["plugin"] });
 		expect(result.status).toBe("fail");
 	});
@@ -292,132 +287,5 @@ describe("checkGateAuthority", () => {
 		const root = await projectWith({ "README.md": "no claude tree here" });
 		const [result] = checkGateAuthority(root, { missingRootSeverity: "warn" });
 		expect(result.status).toBe("warn");
-	});
-});
-
-// ── Command-vs-skill drift ───────────────────────────────────────────────────
-
-/** A project root with a governed command/skill pair. */
-async function pairedProject(commandBody: string, name = "fix"): Promise<string> {
-	return projectWith({
-		[`.claude/commands/mk/${name}.md`]: commandBody,
-		[`.claude/skills/${name}/SKILL.md`]: "---\nname: mk:fix\n---\n\nThe skill owns the procedure.\n",
-	});
-}
-
-const THIN_DISPATCHER = [
-	"# /fix — Bug Fix",
-	"",
-	"## Usage",
-	"",
-	"```",
-	"/fix [bug description]",
-	"```",
-	"",
-	"## Purpose",
-	"",
-	"Diagnose and fix a defect root-cause-first. The authoritative procedure lives in `mk:fix`.",
-	"",
-	"## Dispatch",
-	"",
-	"Activate `mk:fix` with the user's bug description and any flags.",
-	"",
-	"## Flags",
-	"",
-	"- `--tdd` — Force a failing regression test before the fix.",
-	"",
-	"## Safety notes",
-	"",
-	"- Gate 1 and Gate 2 are human-approved per `.claude/rules/gate-rules.md`.",
-].join("\n");
-
-describe("command-vs-skill drift", () => {
-	it("a thin dispatcher is clean", async () => {
-		const root = await pairedProject(THIN_DISPATCHER);
-		expect(scanCommandForDrift(root, ".claude/commands/mk/fix.md")).toEqual([]);
-		expect(checkCommandDrift(root)[0].status).toBe("pass");
-	});
-
-	// The mutation test the criterion names: a seeded workflow sentence must fail.
-	// This is the exact `/mk:fix` defect — the command described a procedure that
-	// contradicted its own skill, and nothing caught the contradiction.
-	it("FAILS on a seeded workflow procedure", async () => {
-		const root = await pairedProject(
-			[
-				THIN_DISPATCHER,
-				"",
-				"### Execution by Complexity",
-				"",
-				"1. Identify the issue.",
-				"2. Apply the fix.",
-				"3. Run tests.",
-			].join("\n"),
-		);
-		const [result] = checkCommandDrift(root);
-		expect(result.status).toBe("fail");
-		expect(result.detail).toContain("commands/mk/fix.md");
-	});
-
-	it("FAILS on a seeded memory-write instruction", async () => {
-		const root = await pairedProject(
-			[THIN_DISPATCHER, "", "Edit `.claude/memory/fixes.json` and append the pattern."].join("\n"),
-		);
-		expect(checkCommandDrift(root)[0].status).toBe("fail");
-	});
-
-	it("FAILS on a seeded complexity-classification table", async () => {
-		const root = await pairedProject(
-			[THIN_DISPATCHER, "", "| Signal | Complexity |", "|---|---|", "| One file | Simple |"].join("\n"),
-		);
-		expect(checkCommandDrift(root)[0].status).toBe("fail");
-	});
-
-	it("does not flag a lone numbered line in a safety note", async () => {
-		// One "1." is a list, not a procedure. Flagging it would make the lint
-		// noise, and a noisy lint gets switched off.
-		const root = await pairedProject(
-			[THIN_DISPATCHER, "", "1. Gate 2 still applies to anything this ships."].join("\n"),
-		);
-		expect(checkCommandDrift(root)[0].status).toBe("pass");
-	});
-
-	it("ignores an unpaired command — it has nowhere to delegate to", async () => {
-		const root = await projectWith({
-			".claude/commands/mk/design.md": "# /design\n\n1. Sketch.\n2. Build.\n",
-			".claude/skills/other/SKILL.md": "---\nname: mk:other\n---\n\nx\n",
-		});
-		expect(checkCommandDrift(root)[0].status).toBe("pass");
-	});
-
-	it("ignores a paired command outside the governed dispatcher set", async () => {
-		// Six paired commands carry known pre-existing drift; the governed set is a
-		// deliberate floor, not a claim they are clean.
-		const root = await projectWith({
-			".claude/commands/mk/review.md": "# /review\n\n1. Scope.\n2. Audit.\n3. Verdict.\n",
-			".claude/skills/review/SKILL.md": "---\nname: mk:review\n---\n\nx\n",
-		});
-		expect(checkCommandDrift(root)[0].status).toBe("pass");
-	});
-
-	it("honors the suppression marker", async () => {
-		const root = await pairedProject(
-			[THIN_DISPATCHER, "", "2. Quoted anti-pattern <!-- lint-allow-gate-authority -->"].join("\n"),
-		);
-		expect(checkCommandDrift(root)[0].status).toBe("pass");
-	});
-
-	// The criterion: exactly ONE gate-phrase detector exists in the codebase.
-	it("does not re-implement gate detection — the gate blacklist is shared", async () => {
-		const root = await pairedProject([THIN_DISPATCHER, "", "Fast auto-approves Gate 2 if tests pass."].join("\n"));
-		// checkCommandDrift must NOT own gate semantics...
-		expect(checkCommandDrift(root)[0].status).toBe("pass");
-		// ...checkGateAuthority does, for the same file. Two blacklists would drift.
-		expect(checkGateAuthority(root)[0].status).toBe("fail");
-	});
-});
-
-describe("the live repo's governed dispatchers", () => {
-	it("are all thin", () => {
-		expect(checkCommandDrift(process.cwd())[0].status).toBe("pass");
 	});
 });

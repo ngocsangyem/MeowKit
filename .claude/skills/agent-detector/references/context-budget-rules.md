@@ -61,5 +61,5 @@ budget. Do not promote the whole task to a higher tier for one read.
 
 "Context selection" is one responsibility in the vendor-neutral substrate taxonomy
 (repo-harness synthesis, Runtime-Substrate-rooted). This rule is the toolkit's concrete
-read-budget for that responsibility; the substrate view (`inventory --substrate`) maps
+read-budget for that responsibility; the substrate view (`mewkit validate --substrate`) maps
 artifacts onto it.

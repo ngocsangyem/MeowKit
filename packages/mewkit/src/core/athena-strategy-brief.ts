@@ -1,6 +1,6 @@
 // Athena strategy brief — what a DIRECT `@athena` consult returns.
 //
-// Canonical contract: `.claude/rules-conditional/advice-supervision-rules.md` §11.
+// Canonical contract: `.claude/skills/advise/references/advice-supervision-rules.md` §11.
 //
 // Athena is reachable two ways, and they are different capabilities:
 //

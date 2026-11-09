@@ -175,7 +175,7 @@ decision below is the human's.
 Delegate to the project-manager agent (foreground):
 "Generate delivery status for plan at $plan_dir. Write report to
 $plan_dir/status-reports/$(date +%y%m%d)-status.md.
-Load template from tasks/templates/pm-status-template.md."
+Load template from .claude/skills/status/assets/pm-status-template.md."
 ```
 
 Wait for PM to return the report path, then include the headline in the escalation question so the user sees current state before deciding. Skip the PM call entirely when `MEOWKIT_PM_AUTO=off`.

@@ -15,6 +15,9 @@ tasks/jira-workflows/<workflow-slug>.md        # full statuses + transitions
 
 If the user lacks Jira admin, the script falls back to per-ticket `lifecycle transitions <KEY>` and writes `_partial-PROJ.md` (explicitly INCOMPLETE).
 
+The cache directory is created by the first discovery run — nothing scaffolds it. What it holds,
+and whether a team should commit it, is in `references/workflow-cache-layout.md`.
+
 ## Verified source primitives
 
 | jira-as command | Source line | Permission | Result |

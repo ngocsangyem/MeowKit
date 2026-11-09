@@ -93,7 +93,7 @@ Complexity fallback: TRIVIAL -> Essential, STANDARD -> Moderate, COMPLEX -> Deta
 
 ## Workflow
 
-1. **Pre-Step: Check Cache** — Check `.claude/cache/agent-detection-cache.json`. If same workflow and phase > 1, reuse cached result (saves ~500-1000 tokens). Invalidate on new workflow, phase reset, or user override.
+1. **Pre-Step: Check Cache** — Check `.meowkit/cache/agent-detection-cache.json`. If same workflow and phase > 1, reuse cached result (saves ~500-1000 tokens). Invalidate on new workflow, phase reset, or user override.
 
 2. **Step 0: Task Content Analysis** — Analyze the actual task, not just the repo. Classify task domain (frontend, backend, database, security, etc.) regardless of the repository's primary language.
 
@@ -151,7 +151,7 @@ Steps 0 and 0b first scan the context window for a cached-sentinel marker emitte
 | `## Safety baseline: verified (cached, session <id>)` | Step 0 skips the 5-file safety Read loop |
 | `## Phase-zero rules: verified (cached, session <id>)` | Step 0b skips the 5-file phase-zero Read loop |
 
-**State source:** `session-state/session-sentinels.jsonl` — one JSONL line per Stop with `{session_id, safety, phase_zero, ts}`. The file is truncated on new-session detection (HOOK_SESSION_ID change), so sentinels never cross session boundaries.
+**State source:** `.meowkit/state/session-sentinels.jsonl` — one JSONL line per Stop with `{session_id, safety, phase_zero, ts}`. The file is truncated on new-session detection (HOOK_SESSION_ID change), so sentinels never cross session boundaries.
 
 **Safety guarantee preserved.** The rules remain in context from the host runtime's auto-load of `.claude/rules/`. The sentinel only suppresses redundant re-reads; it does not weaken the existence check on turn 1 of any new session.
 
@@ -161,9 +161,9 @@ Steps 0 and 0b first scan the context window for a cached-sentinel marker emitte
 
 ## Step 0b — Agile context detection (additive)
 
-After loading the 5 phase-zero rules, Step 0b checks for an Agile context and conditionally loads 3 additional rules from `.claude/rules-conditional/agile-*.md`. Non-Agile sessions skip this load silently — zero context cost.
+After loading the 5 phase-zero rules, Step 0b checks for an Agile context and conditionally loads 3 additional rules from `.claude/skills/agent-detector/references/agile-*.md`. Non-Agile sessions skip this load silently — zero context cost.
 
-**Pre-flight:** verify `.claude/rules-conditional/` directory exists. If absent → log and skip steps 2–4 (defensive against drift between status doc and filesystem).
+**Pre-flight:** verify `references/agile-story-gates.md` exists beside the skill. If absent → log and skip steps 2–4 (defensive against a partial install).
 
 **Detection (OR-logic, any one match triggers load):**
 

@@ -27,8 +27,8 @@ describe('end-of-session recording', () => {
 
   it('writes one cost entry carrying the documented field set', () => {
     const root = project({
-      'session-state/budget-state.json': budget,
-      'session-state/detected-model.json': JSON.stringify({ model_id: 'claude-test-1' }),
+      '.meowkit/state/budget-state.json': budget,
+      '.meowkit/state/detected-model.json': JSON.stringify({ model_id: 'claude-test-1' }),
     });
     postSession({ root, session_id: 'sess-1' }, undefined, FROZEN);
 
@@ -42,7 +42,7 @@ describe('end-of-session recording', () => {
   });
 
   it('takes the model from the session artifact, not the environment', () => {
-    const root = project({ 'session-state/detected-model.json': JSON.stringify({ model_id: 'from-artifact' }) });
+    const root = project({ '.meowkit/state/detected-model.json': JSON.stringify({ model_id: 'from-artifact' }) });
     process.env.CLAUDE_MODEL = 'from-environment';
     try {
       postSession({ root, session_id: 'sess-2' }, undefined, FROZEN);
@@ -57,8 +57,8 @@ describe('end-of-session recording', () => {
     // literal for the write scanner to flag.
     const fake = `ghp_${'0123456789abcdefghijklmnopqrstuvwxyz'}AB`;
     const root = project({
-      'session-state/budget-state.json': JSON.stringify({ estimated_cost_usd: 1, note: `tok${'en'}=${fake}` }),
-      'session-state/detected-model.json': JSON.stringify({ model_id: 'claude-test-1' }),
+      '.meowkit/state/budget-state.json': JSON.stringify({ estimated_cost_usd: 1, note: `tok${'en'}=${fake}` }),
+      '.meowkit/state/detected-model.json': JSON.stringify({ model_id: 'claude-test-1' }),
     });
     postSession({ root, session_id: 'sess-3' }, undefined, FROZEN);
     const raw = fs.readFileSync(path.join(root, '.meowkit/telemetry/cost-log.json'), 'utf8');
@@ -67,7 +67,7 @@ describe('end-of-session recording', () => {
 
   it('flags a model change once and then records the new model', () => {
     const root = project({
-      'session-state/detected-model.json': JSON.stringify({ model_id: 'claude-new' }),
+      '.meowkit/state/detected-model.json': JSON.stringify({ model_id: 'claude-new' }),
       '.meowkit/state/last-model-id.txt': 'claude-old\n',
     });
     const first = postSession({ root, session_id: 'sess-4' }, undefined, FROZEN);
@@ -86,7 +86,7 @@ describe('end-of-session recording', () => {
   it('refuses to write a session marker whose id could break the record', () => {
     const root = project({});
     postSession({ root, session_id: 'bad"id\nwith-newline' }, undefined, FROZEN);
-    const marker = path.join(root, 'session-state/session-sentinels.jsonl');
+    const marker = path.join(root, '.meowkit/state/session-sentinels.jsonl');
     const content = fs.existsSync(marker) ? fs.readFileSync(marker, 'utf8') : '';
     expect(content).toBe('');
   });
@@ -94,7 +94,7 @@ describe('end-of-session recording', () => {
   it('writes a well-formed session marker for a safe id', () => {
     const root = project({});
     postSession({ root, session_id: 'sess-6' }, undefined, FROZEN);
-    const line = fs.readFileSync(path.join(root, 'session-state/session-sentinels.jsonl'), 'utf8').trim();
+    const line = fs.readFileSync(path.join(root, '.meowkit/state/session-sentinels.jsonl'), 'utf8').trim();
     expect(JSON.parse(line)).toMatchObject({ session_id: 'sess-6', safety: true, phase_zero: true });
   });
 });

@@ -1,17 +1,17 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { resolveInventoryPath } from "../state/resolve-inventory-path.js";
 import { isHookScript } from "./is-hook-script.js";
 import yaml from "js-yaml";
 import type { CheckResult } from "../commands/validate.js";
-import type { Status } from "../commands/doctor-checks.js";
 
-// The unified harness inventory. Every skill, agent, rule, command, and hook,
-// merged with its governance metadata from the hybrid store: frontmatter for
-// skills + agents, the central registry (.claude/harness-inventory.json) for
-// rules + commands + hooks. This is the single enumeration authority — the
-// stale-index check imports `enumerateArtifacts` from here and never re-derives
-// "what counts", so doc counts reconcile with reality by construction.
+// The unified harness inventory. Every skill, agent, rule and hook, merged with
+// its governance metadata from the hybrid store: frontmatter for skills + agents,
+// the central registry (.claude/harness-inventory.json) for rules + hooks. This
+// is the single enumeration authority — the stale-index check imports
+// `enumerateArtifacts` from here and never re-derives "what counts", so doc
+// counts reconcile with reality by construction.
 
 export type ArtifactType = "skill" | "agent" | "rule" | "command" | "hook";
 
@@ -101,8 +101,7 @@ function listMarkdown(dir: string): string[] {
 /**
  * The canonical "what counts" enumeration. Returns artifact references plus any
  * structural anomalies (e.g. a skill subdir with no SKILL.md that is not a known
- * runtime dir). Counting is presence-based; rules and rules-conditional are
- * deliberately NOT merged — callers label them as separate buckets.
+ * runtime dir). Counting is presence-based.
  */
 export function enumerateArtifacts(claudeDir: string): { refs: ArtifactRef[]; issues: InventoryIssue[] } {
 	const refs: ArtifactRef[] = [];
@@ -143,33 +142,12 @@ export function enumerateArtifacts(claudeDir: string): { refs: ArtifactRef[]; is
 		});
 	}
 
-	// rules + rules-conditional — separate buckets, registry-sourced
+	// rules — registry-sourced
 	for (const f of listMarkdown(path.join(claudeDir, "rules"))) {
 		refs.push({
 			type: "rule",
 			rel: `rules/${f}`,
 			abs: path.join(claudeDir, "rules", f),
-			id: f.replace(/\.md$/, ""),
-			metaSource: "registry",
-		});
-	}
-	for (const f of listMarkdown(path.join(claudeDir, "rules-conditional"))) {
-		refs.push({
-			type: "rule",
-			rel: `rules-conditional/${f}`,
-			abs: path.join(claudeDir, "rules-conditional", f),
-			id: f.replace(/\.md$/, ""),
-			metaSource: "registry",
-		});
-	}
-
-	// commands — commands/mk/*.md, registry-sourced
-	const cmdDir = path.join(claudeDir, "commands", "mk");
-	for (const f of listMarkdown(cmdDir)) {
-		refs.push({
-			type: "command",
-			rel: `commands/mk/${f}`,
-			abs: path.join(cmdDir, f),
 			id: f.replace(/\.md$/, ""),
 			metaSource: "registry",
 		});
@@ -220,7 +198,7 @@ interface RegistryShape {
 	artifacts?: Record<string, Record<string, unknown>>;
 }
 
-/** Read the central registry for rules/commands/hooks. */
+/** Read the central registry for rules and hooks. */
 export function readRegistry(claudeDir: string): Record<string, Record<string, unknown>> {
 	const regPath = resolveInventoryPath(path.dirname(claudeDir));
 	if (!fs.existsSync(regPath)) return {};
@@ -294,7 +272,7 @@ function agentDeclaredArtifacts(body: string): string[] {
 
 /**
  * Build the unified inventory. Each artifact's metadata comes from frontmatter
- * (skills/agents) or the registry (rules/commands/hooks). Missing records and
+ * (skills/agents) or the registry (rules/hooks). Missing records and
  * missing required fields are recorded as issues — never silently defaulted to
  * a passing value.
  */
@@ -384,6 +362,17 @@ export function buildInventory(claudeDir: string): Inventory {
 	return { entries, issues: allIssues };
 }
 
+/**
+ * The governance schema travels with the validator, not with the project.
+ *
+ * It describes the ENUMS this engine enforces, which makes it engine knowledge:
+ * a copy installed per project could disagree with the code reading it, and the
+ * published kit would carry a file only a maintainer tool opens. `../../schemas/`
+ * resolves to the package root from both `src/core/` and the compiled
+ * `dist/core/`, so the source tree and a published install read the same file.
+ */
+export const METADATA_SCHEMA_PATH = fileURLToPath(new URL("../../schemas/harness-metadata-schema.json", import.meta.url));
+
 interface SchemaEnums {
 	owner: Set<string>;
 	criticality: Set<string>;
@@ -392,11 +381,10 @@ interface SchemaEnums {
 }
 
 /** Load the allowed-enum sets from the governance schema (single source). */
-export function loadSchemaEnums(claudeDir: string): SchemaEnums | null {
-	const schemaPath = path.join(claudeDir, "schemas", "harness-metadata-schema.json");
-	if (!fs.existsSync(schemaPath)) return null;
+export function loadSchemaEnums(): SchemaEnums | null {
+	if (!fs.existsSync(METADATA_SCHEMA_PATH)) return null;
 	try {
-		const schema = JSON.parse(fs.readFileSync(schemaPath, "utf-8")) as {
+		const schema = JSON.parse(fs.readFileSync(METADATA_SCHEMA_PATH, "utf-8")) as {
 			properties?: Record<string, { enum?: string[] }>;
 		};
 		const props = schema.properties ?? {};
@@ -417,26 +405,17 @@ export function loadSchemaEnums(claudeDir: string): SchemaEnums | null {
  * a structural anomaly exists (unknown dir, stale registry entry). PASSES only
  * when every discovered artifact is 100% covered with valid values.
  */
-export function checkOwnership(claudeDir: string, opts: { missingInfraSeverity?: Status } = {}): CheckResult[] {
-	// The governance schema is the install signal: absent ⇒ the metadata layer
-	// is not installed. In a non-scoped run that downgrades to WARN (prompt the
-	// upgrade); the scoped `--ownership` CI check keeps it a hard FAIL.
-	const schemaPath = path.join(claudeDir, "schemas", "harness-metadata-schema.json");
-	if (!fs.existsSync(schemaPath)) {
-		const status: Status = opts.missingInfraSeverity ?? "fail";
-		const detail =
-			status === "warn"
-				? "Ownership metadata not installed (no harness-metadata-schema.json) — run `mewkit upgrade`"
-				: "Missing/unreadable .claude/schemas/harness-metadata-schema.json";
-		return [{ name: "Governance metadata installed", status, detail, section: "Ownership" }];
-	}
-	const enums = loadSchemaEnums(claudeDir);
+export function checkOwnership(claudeDir: string): CheckResult[] {
+	// The schema ships with this CLI, so its absence can only mean the CLI install
+	// itself is incomplete — a condition a project cannot create, and no longer a
+	// signal about whether the project installed anything.
+	const enums = loadSchemaEnums();
 	if (!enums) {
 		return [
 			{
 				name: "Governance schema loads",
 				status: "fail",
-				detail: "Unreadable .claude/schemas/harness-metadata-schema.json",
+				detail: `Missing or unreadable ${METADATA_SCHEMA_PATH} — this CLI install is incomplete`,
 				section: "Ownership",
 			},
 		];

@@ -3,18 +3,18 @@
 //
 // On Stop event:
 //   1. Check git status (clean/dirty)
-//   2. Read current budget + model state from session-state/
+//   2. Read current budget + model state from the session-marker state class
 //   3. Write checkpoint-latest.json (overwriting; sequence auto-incremented in writeCheckpoint)
 //
-// Checkpoint dir: session-state/checkpoints/
+// Checkpoint dir: the session-marker state class, under checkpoints/
 
 const fs = require('fs');
 const path = require('path');
-const { gitHead, gitBranch, gitStatus, writeCheckpoint } = require(
-  require('path').join(process.env.CLAUDE_PROJECT_DIR || process.cwd(), '.claude', 'hooks', 'lib', 'checkpoint-utils.cjs')
-);
+const LIB = path.join(process.env.CLAUDE_PROJECT_DIR || process.cwd(), '.claude', 'hooks', 'lib');
+const { gitHead, gitBranch, gitStatus, writeCheckpoint } = require(path.join(LIB, 'checkpoint-utils.cjs'));
+const { projectRoot, sessionStateFile } = require(path.join(LIB, 'meowkit-paths.cjs'));
 
-const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+const ROOT = projectRoot();
 const TASK_ID_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
 
 // READ-ONLY cache of the active durable task, for the checkpoint summary. The checkpoint never
@@ -22,7 +22,7 @@ const TASK_ID_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
 // as a summary. Best-effort: any absence/parse error yields null (no fabrication).
 function activeTaskSummary() {
   try {
-    const pointer = JSON.parse(fs.readFileSync(path.join(ROOT, 'session-state', 'active-plan.json'), 'utf8'));
+    const pointer = JSON.parse(fs.readFileSync(sessionStateFile('active-plan.json', ROOT), 'utf8'));
     const taskId = pointer && typeof pointer.taskId === 'string' ? pointer.taskId : null;
     if (!taskId || !TASK_ID_RE.test(taskId)) return null;
     const record = JSON.parse(fs.readFileSync(path.join(ROOT, 'tasks', 'active', taskId + '.json'), 'utf8'));

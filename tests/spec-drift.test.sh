@@ -39,8 +39,7 @@ assert_zero() {
 P4_HITS="$(
   grep -rn '##pattern\|##decision\|##note' \
     "$ROOT/.claude/agents/" \
-    "$ROOT/.claude/skills/" \
-    "$ROOT/.claude/commands/" 2>/dev/null \
+    "$ROOT/.claude/skills/" 2>/dev/null \
   | grep -v 'capture-architecture\.md' \
   | grep -v 'memory-system\.md' \
   | grep -v 'CLAUDE\.md' \
@@ -53,8 +52,7 @@ assert_zero "Phase 4 — no residual ##prefix agent-API instructions" "$P4_HITS"
 P5_HITS="$(
   grep -rn 'patterns\.json\|lessons\.md' \
     "$ROOT/.claude/agents/" \
-    "$ROOT/.claude/skills/" \
-    "$ROOT/.claude/commands/" 2>/dev/null \
+    "$ROOT/.claude/skills/" 2>/dev/null \
   | grep -iE 'write|append|update|edit' \
   | grep -v 'deprecated\|archived\|tombstone\|stub\|removed\|do not\|DO NOT\|not write\|NOT write' \
   | grep -v 'review-patterns\|fixes\.\|architecture-decisions' \

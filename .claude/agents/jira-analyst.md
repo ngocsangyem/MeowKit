@@ -74,7 +74,7 @@ Jira attachments are cloud-hosted. Workflow:
 **Enhanced analysis (optional):**
 
 ```bash
-node .claude/scripts/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py <path>
+node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py <path>
 ```
 (requires `MEOWKIT_GEMINI_API_KEY`)
 

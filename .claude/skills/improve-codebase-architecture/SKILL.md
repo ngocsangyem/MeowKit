@@ -195,6 +195,14 @@ Maintain `tasks/architecture-review/<run-id>-state.json` so an autonomous loop r
 
 Update it after each step. On resume, read it first and continue from the lowest incomplete step. Never block a long run on a clarification that the state file or codebase can already answer (scout-first; confidence ≥ 85% → act with a `path:line` citation).
 
+## Designing something that does not exist yet
+
+The workflow above needs code to analyze. When the subject is a system or feature that has no
+implementation yet, run the consultation in `references/system-design-consultation.md` instead:
+components and boundaries, an ASCII data flow, per-integration failure behavior, scalability
+concerns, and a recommendation against at least one real alternative. It emits documentation
+only and no patch, because there is no existing shape to deepen.
+
 ## Gotchas
 
 - **Vocabulary drift is the #1 failure** — reviewers slide into "component/service/API/boundary". Re-anchor to the glossary before writing each candidate; a non-glossary noun is a defect.

@@ -32,7 +32,6 @@ const SCAN_DIRS = [
 	"hooks",
 	"scripts",
 	"rules",
-	"rules-conditional",
 	"modes",
 	"benchmarks",
 ];

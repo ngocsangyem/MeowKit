@@ -9,6 +9,7 @@
   "files": [
     "dist",
     "!dist/maintainer",
+    "schemas",
     "portable-manifest.json",
     "NOTICE"
   ],

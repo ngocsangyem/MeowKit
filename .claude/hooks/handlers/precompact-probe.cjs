@@ -21,6 +21,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { logHookEvent } = require('../lib/hook-logger.cjs');
+const { sessionStateDir } = require('../lib/meowkit-paths.cjs');
 
 /** Host session identifiers are UUID-shaped; anything else could break the record. */
 const SAFE_SESSION_ID = /^[A-Za-z0-9_.-]+$/;
@@ -32,7 +33,7 @@ module.exports = function precompactProbe(ctx) {
   // With caching off the reader emits nothing regardless, so the re-arm is moot.
   if (!cachingDisabled && sessionId && SAFE_SESSION_ID.test(sessionId)) {
     try {
-      const dir = path.join(ctx.root, 'session-state');
+      const dir = sessionStateDir(ctx.root);
       fs.mkdirSync(dir, { recursive: true });
       const ts = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
       fs.appendFileSync(

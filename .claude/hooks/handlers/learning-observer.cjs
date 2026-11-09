@@ -10,8 +10,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { appendTrace } = require('../lib/trace-log.cjs');
+const { sessionStateDir } = require('../lib/meowkit-paths.cjs');
 
-const STATE_REL = 'session-state/learning-observer.jsonl';
+const LEDGER_BASENAME = 'learning-observer.jsonl';
 const CHURN_THRESHOLD = 3;
 
 /** How many times this ledger already names the file. */
@@ -32,7 +33,7 @@ module.exports = function learningObserver(ctx) {
   // The path as the payload spelled it, because the ledger is keyed on it and a
   // resolved spelling would start a second series for the same file.
   const filePath = (ctx.hookInput && ctx.hookInput.filePath) || 'unknown';
-  const stateFile = path.join(ctx.root, STATE_REL);
+  const stateFile = path.join(sessionStateDir(ctx.root), LEDGER_BASENAME);
   const ts = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
 
   try {

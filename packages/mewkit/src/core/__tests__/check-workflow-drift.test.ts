@@ -1,8 +1,8 @@
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { checkWorkflowDrift, loadWorkflowSpec, WorkflowSpecError } from "../check-workflow-drift.js";
+import { checkWorkflowDrift, loadWorkflowSpec, SPEC_REL, WorkflowSpecError } from "../check-workflow-drift.js";
 
 const tempDirs: string[] = [];
 
@@ -51,7 +51,7 @@ sources:
 // passes) and contains no contradictions.
 const CLEAN_PROSE = `# Lifecycle
 
-<!-- Canonical source: .claude/workflow.yaml -->
+<!-- Canonical source: workflow.yaml -->
 <!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 
 Phase 0 Orient → Phase 1 Plan → Phase 2 Test → Phase 3 Build →
@@ -66,8 +66,8 @@ Phase 6 Reflect leads: analyst + documenter + mk:memory.
 async function makeHarness(spec: string, prose: string, extraSources: Record<string, string> = {}): Promise<string> {
 	const root = await mkdtemp(join(tmpdir(), "mewkit-wfdrift-"));
 	tempDirs.push(root);
-	await mkdir(join(root, ".claude"), { recursive: true });
-	await writeFile(join(root, ".claude", "workflow.yaml"), spec);
+	await mkdir(dirname(join(root, SPEC_REL)), { recursive: true });
+	await writeFile(join(root, SPEC_REL), spec);
 	await writeFile(join(root, "lifecycle.md"), prose);
 	for (const [file, content] of Object.entries(extraSources)) await writeFile(join(root, file), content);
 	return root;
@@ -169,7 +169,7 @@ describe("checkWorkflowDrift", () => {
 	});
 
 	it("FAILS when a configured source lacks the canonical pointer", async () => {
-		const root = await makeHarness(SPEC, CLEAN_PROSE.replace("<!-- Canonical source: .claude/workflow.yaml -->\n", ""));
+		const root = await makeHarness(SPEC, CLEAN_PROSE.replace("<!-- Canonical source: workflow.yaml -->\n", ""));
 		expect(failDetail(checkWorkflowDrift(root))).toContain("missing canonical source pointer");
 	});
 

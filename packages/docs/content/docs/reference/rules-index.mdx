@@ -49,7 +49,7 @@ enforcement text moved intact and is loaded on demand by the skill that owns it.
 | `context-budget-rules.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector`, `mk:context-audit` |
 | `rubric-rules.md` | `.claude/skills/rubric/references/` | `mk:rubric`, evaluator agent |
 | `skill-authoring-rules.md` | `.claude/skills/skill-creator/references/` | `mk:skill-creator`, skill audits |
-| `dead-weight-audit-rules.md` | `.claude/skills/benchmark/references/` | `mk:benchmark` |
+| `dead-weight-audit-rules.md` | `.claude/skills/benchmark/references/` (maintainer-only — not in the shipped kit) | `mk:benchmark` |
 | `docs-reference-contract.md` | `docs/maintainer/` (source repo only, not shipped) | maintainers, `npx mewkit validate` |
 | `step-file-rules.md` | inlined as `## Step-File Contract` in each step-filed skill's `workflow.md` | `mk:plan-creator`, `mk:review`, `mk:evaluate`, `mk:autobuild`, `mk:trace-analyze` |
 | `anti-rationalization.md` | merged into `.claude/rules/core-behaviors.md` | always-on |
@@ -68,7 +68,7 @@ Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sp
 | `agile-sprint-commitment.md` | Sprint goal persistence, mid-sprint amendment ceremony, sprint close hygiene | `mk:agent-detector` Step 0b (Agile context) |
 | `agile-feedback-cycle.md` | Retro action-item ceremony, spike governance (timebox + findings doc) | `mk:agent-detector` Step 0b (Agile context) |
 
-These rules live at `.claude/rules-conditional/agile-*.md`. They wire into existing skills (`mk:plan-creator`, `mk:sprint-contract`, `mk:retro`, `mk:jira-agile`, `mk:ship`, `project-manager` agent) — no new agents, no new hooks, no new gates.
+These rules live at `.claude/skills/agent-detector/references/agile-*.md`. They wire into existing skills (`mk:plan-creator`, `mk:sprint-contract`, `mk:retro`, `mk:jira-agile`, `mk:ship`, `project-manager` agent) — no new agents, no new hooks, no new gates.
 
 ## Loading Priority
 
@@ -169,13 +169,13 @@ Model tier routing rules for Phase 0 task classification.
 
 Key updates in v2.3.0:
 
-> **Rule 5 update (v2.3.0):** Auto-detection now uses `model-detector.cjs` SessionStart handler as the primary source. It reads the `model` field from SessionStart stdin and writes tier + density to `session-state/detected-model.json`. `MEOWKIT_MODEL_HINT` is fallback only — no longer required for Opus 4.6+ users.
+> **Rule 5 update (v2.3.0):** Auto-detection now uses `model-detector.cjs` SessionStart handler as the primary source. It reads the `model` field from SessionStart stdin and writes tier + density to `.meowkit/state/detected-model.json`. `MEOWKIT_MODEL_HINT` is fallback only — no longer required for Opus 4.6+ users.
 
 Source: `.claude/skills/agent-detector/references/model-selection-rules.md`. Applies at Phase 0 (Orient).
 
 ## rubric-rules.md [#rubric-rules]
 
-Rules that keep the rubric library (`.claude/rubrics/`) calibrated and the evaluator grading honest.
+Rules that keep the rubric library (`.claude/skills/rubric/rubrics/`) calibrated and the evaluator grading honest.
 
 | # | Rule | Gloss |
 |---|------|-------|

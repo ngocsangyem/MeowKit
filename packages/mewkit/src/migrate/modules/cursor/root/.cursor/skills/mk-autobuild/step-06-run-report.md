@@ -12,7 +12,7 @@ Before finalizing the run report, delegate to `project-manager` (background):
 Delegate to the project-manager agent:
 "Generate delivery status for plan at $plan_dir. Write report to
 $plan_dir/status-reports/$(date +%y%m%d)-status.md.
-Load template from tasks/templates/pm-status-template.md.
+Load template from .cursor/skills/mk-autobuild/assets/pm-status-template.md.
 Run in the background — do not block step-06 finalization."
 ```
 

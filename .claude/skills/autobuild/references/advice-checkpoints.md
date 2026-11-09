@@ -4,7 +4,7 @@ Load this file only when the run was invoked with `--advice`. Without the flag t
 are zero supervision calls, no dossier, no receipt, and behavior is unchanged.
 
 The contract this implements is
-`.claude/rules-conditional/advice-supervision-rules.md`. Where the two disagree, the
+`.claude/skills/advise/references/advice-supervision-rules.md`. Where the two disagree, the
 contract wins.
 
 ## Checkpoints

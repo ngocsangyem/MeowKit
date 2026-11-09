@@ -18,7 +18,7 @@ const { execFileSync, spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-/** Paths the recorder needs out of BASE: the hook tree plus every script a hook calls. */
+/** Paths the recorder needs out of BASE: the hook tree plus every skill script a hook calls. */
 const BASE_PATHSPECS = [
   '.claude/hooks',
   '.claude/skills/careful',
@@ -26,7 +26,6 @@ const BASE_PATHSPECS = [
   '.claude/skills/investigate',
   '.claude/skills/sprint-contract',
   '.claude/skills/cook/scripts',
-  '.claude/scripts',
 ];
 
 /** PATH is pinned so `command -v` probes inside the BASE scripts resolve identically. */

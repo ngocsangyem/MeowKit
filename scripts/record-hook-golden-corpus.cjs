@@ -132,7 +132,14 @@ function main() {
   const workRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'mk-hook-corpus-'));
   const baseTree = extractBase(REPO_ROOT, base, path.join(workRoot, '_base'));
 
-  const cases = filter ? CASES.filter((c) => c.name.includes(filter)) : CASES;
+  const selected = filter ? CASES.filter((c) => c.name.includes(filter)) : CASES;
+  // A case the BASE tree cannot produce is not recorded from it. Its fixture is
+  // authored and committed, and the reason is published in the index, so a
+  // re-run never overwrites an authored expectation with a BASE run that was
+  // never capable of asserting it.
+  const authored = {};
+  for (const c of selected) if (c.authoredAfterBase) authored[c.name] = c.authoredAfterBase;
+  const cases = selected.filter((c) => !c.authoredAfterBase);
   const names = new Set();
   for (const c of cases) {
     if (names.has(c.name)) throw new Error(`duplicate case name: ${c.name}`);
@@ -160,6 +167,7 @@ function main() {
         groups,
         fixtures: written.map((f) => ({ name: f.name, group: f.group, entrypoint: f.entrypoint, exit: f.expect.exit, marker: f.expect.marker })),
         notRecorded: SKIPPED,
+        authoredAfterBase: authored,
       },
       null,
       2,

@@ -111,8 +111,8 @@ Tier-A/Tier-B sections that left the always-on file (A2, B1, B3, B4, B5, B6) ver
 | `.claude/rules/post-phase-delegation.md` | 11 | The following skills MUST delegate to `project-manager` at the fire points | `.claude/skills/cook/references/post-phase-delegation.md` | moved-whole |
 | `.claude/rules/post-phase-delegation.md` | 83 | User-invoked `/mk:status` is ALWAYS honored regardless of this env var. | `.claude/skills/cook/references/post-phase-delegation.md` | moved-whole |
 | `.claude/rules/post-phase-delegation.md` | 89 | PM MUST NOT be invoked from hook handlers. On Claude Code, hooks cannot call | `.claude/skills/cook/references/post-phase-delegation.md` | moved-whole |
-| `.claude/rules/rubric-rules.md` | 7 | Every file in `.claude/rubrics/*.md` MUST include at least one PASS example and at leas... | `.claude/skills/rubric/references/rubric-rules.md` | moved-whole |
-| `.claude/rules/rubric-rules.md` | 15 | Every preset file in `.claude/rubrics/composition-presets/*.md` MUST have rubric weight... | `.claude/skills/rubric/references/rubric-rules.md` | moved-whole |
+| `.claude/rules/rubric-rules.md` | 7 | Every file in `.claude/skills/rubric/rubrics/*.md` MUST include at least one PASS example and at leas... | `.claude/skills/rubric/references/rubric-rules.md` | moved-whole |
+| `.claude/rules/rubric-rules.md` | 15 | Every preset file in `.claude/skills/rubric/rubrics/composition-presets/*.md` MUST have rubric weight... | `.claude/skills/rubric/references/rubric-rules.md` | moved-whole |
 | `.claude/rules/rubric-rules.md` | 45 | When a new model tier ships (Sonnet 4.6, Opus 4.7, Haiku 5.x), the rubric calibration s... | `.claude/skills/rubric/references/rubric-rules.md` | moved-whole |
 | `.claude/rules/scale-adaptive-rules.md` | 19 | When CSV returns `level=high`, the model tier MUST be COMPLEX (best available) regardle... | `.claude/skills/agent-detector/references/scale-adaptive-rules.md` | moved-whole |
 | `.claude/rules/scale-adaptive-rules.md` | 51 | When `mk:scale-routing` returns `level=high` during a `/mk:cook` run, the cook workflow... | `.claude/skills/agent-detector/references/scale-adaptive-rules.md` | moved-whole |

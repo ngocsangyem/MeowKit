@@ -60,7 +60,7 @@ Several MeowKit maintenance jobs are documented as "quarterly" or "calendar remi
 | Memory prune (propose stale-entry removals) | `/mk:memory --prune` | Monthly |
 | Friction backlog review | `mewkit trace propose` | Weekly |
 | SKILL.md length audit (>500 lines) | check from skill-authoring rules | Quarterly |
-| Dead-weight audit | `/mk:benchmark run --full` + compare | Quarterly, and on every model upgrade |
+| Dead-weight audit (maintainers, from the source repo) | `/mk:benchmark run --full` + compare | Quarterly, and on every model upgrade |
 
 <Callout title="Cloud environments" type="warn">
 
@@ -120,7 +120,7 @@ npx mewkit trace --friction "evaluator passed a build with broken auth flow"
 | After every intervention | `mewkit trace --friction "<note>"` | Repeated friction becomes a backlog item automatically |
 | Weekly | Run `mewkit trace propose` | Repeated friction becomes a backlog item, and the harness improves |
 | Monthly | `/mk:memory --prune` | Stale memory misleads agents |
-| Quarterly / model upgrade | Dead-weight audit via `/mk:benchmark` | Scaffolding that helped last model may slow this one |
+| Quarterly / model upgrade | Dead-weight audit via `/mk:benchmark` (maintainers only) | Scaffolding that helped last model may slow this one |
 
 None of these steps is large. The point is that each one feeds the next session: a written-down decision becomes recalled context, and recorded friction becomes a harness fix. That is what "productive" means with an agent toolkit — not faster typing, but a system that gets smarter every week you use it.
 

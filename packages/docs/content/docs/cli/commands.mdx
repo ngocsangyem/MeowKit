@@ -34,7 +34,7 @@ mewkit setup [--only=<step>]
 
 | Step        | What it does                                                    |
 | ----------- | --------------------------------------------------------------- |
-| `venv`      | Creates Python venv for skill scripts at `.claude/skills/.venv` |
+| `skill-envs` | Prepares the per-skill Python environments under `.meowkit/envs/<skill>/` |
 | `mcp`       | Copies `mcp.json.example` → `.mcp.json`                         |
 | `env`       | Copies `env.example` → `.env`                                   |
 | `gitignore` | Appends MeowKit entries to `.gitignore`                         |
@@ -91,7 +91,7 @@ mewkit budget [--monthly] [--session [id]] [--day [YYYY-MM-DD]]
 
 **Behavior:**
 - Without filters, `budget` shows the latest 10 rows and the all-time token total.
-- `--session` resolves the current session from `HOOK_SESSION_ID` first, then `session-state/last-session-id`.
+- `--session` resolves the current session from `HOOK_SESSION_ID` first, then `.meowkit/state/last-session-id`.
 - `--day` without a value uses today.
 - Filters compose, so `--session --day` reports the intersection.
 
@@ -358,7 +358,6 @@ mewkit migrate                    # interactive multiselect
 | `--only CSV`                                    | Restrict to listed types: `agents,commands,skills,config,rules,hooks`          |
 | `--skip-config`, `--skip-rules`, `--skip-hooks` | Exclude one or more types                                                      |
 | `--respect-deletions`                           | Skip items whose target was deleted by the user (default re-installs)          |
-| `--reinstall-empty-dirs`                        | Re-install items even if the user emptied the target directory (default: true) |
 
 ### Model routing
 

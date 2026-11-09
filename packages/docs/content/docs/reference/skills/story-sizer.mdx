@@ -114,7 +114,7 @@ Override path via `MEOWKIT_STORY_SIZER_COMMENT_TEMPLATE` env var (must contain t
 
 - The `source_hash` is SHA-256 of the *exact* paste body. Editing the paste locally between sizing and `--auto-create` triggers a source-mismatch abort — re-paste and re-run `--paste`.
 - `--scout` does not auto-invoke `/mk:scout`. Run scout first when you want codebase signals.
-- DoR advisory only renders when `.claude/rules-conditional/agile-story-gates.md` is loaded for the session.
+- DoR advisory only renders when `.claude/skills/agent-detector/references/agile-story-gates.md` is loaded for the session.
 - No `--from-spec` / `--from-intake` adapter in v1. Use paste mode (copy the suggested-user-stories table out of `mk:confluence-spec-analyst` output and reformat to the paste template).
 - Blocks relationships are not propagated in v1. Link dependencies manually via `mk:jira-relationships` after creation.
 - Duplicate detection uses Jira's `~` token matching — false positives are possible. Prune or close the matching ticket, then re-run.

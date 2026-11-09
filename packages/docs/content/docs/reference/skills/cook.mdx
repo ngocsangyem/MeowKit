@@ -66,7 +66,7 @@ Build a JWT-based authentication system for the API — login, registration, tok
 
 ## TDD mode (`--tdd` flag)
 
-When `--tdd` is detected, the skill writes `on` to `.claude/session-state/tdd-mode` BEFORE any other workflow step. This sentinel is read by `pre-implement.cjs`, `tdd-detect.cjs`, and downstream agents. `MEOWKIT_TDD=1` env var is highest-precedence opt-in. Without `--tdd`, Phase 2 is optional — the developer may implement directly per the plan.
+When `--tdd` is detected, the skill writes `on` to `.meowkit/state/tdd-mode` BEFORE any other workflow step. This sentinel is read by `pre-implement.cjs`, `tdd-detect.cjs`, and downstream agents. `MEOWKIT_TDD=1` env var is highest-precedence opt-in. Without `--tdd`, Phase 2 is optional — the developer may implement directly per the plan.
 
 ## Workflow modes
 

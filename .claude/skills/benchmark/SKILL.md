@@ -29,6 +29,11 @@ runtime: claude-code
 
 # mk:benchmark — Experimental Harness Canary Suite
 
+> Runs from this repository only. The published kit withholds this skill and the
+> `.claude/benchmarks/` corpus it reads: the canary specs measure the harness itself, and a
+> benchmark that scored a user's own project would be measuring a different thing under the
+> same name. Nothing in an installed project invokes it.
+
 Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (per `.claude/skills/benchmark/references/dead-weight-audit-rules.md`) consumes to make load-bearing decisions about each harness component.
 
 ## When to Use

@@ -5,7 +5,7 @@ Complete guide to building, tagging, and publishing MeowKit releases.
 ## Architecture
 
 ```
-Source of truth (.claude/, tasks/)
+Source of truth (.claude/)
     ↓
 prepare-release-assets.cjs → dist/meowkit-release.zip   (flat-copy distribution)
     ↓
@@ -132,12 +132,12 @@ Check `packages/mewkit/portable-manifest.json` whenever a release moves source f
 - Do not add entries for new files, deleted files, provider capability changes, or invented history.
 - Keep release checksum manifests, provider manifests, and `portable-manifest.json` separate; they serve different purposes.
 - Do not copy `portable-manifest.json` into `.claude/`. It is an npm package artifact shipped with `packages/mewkit`, not part of the project kit that `npx mewkit init` scaffolds.
-- If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `tasks/`, `release-manifest.json`, and `.meowkit/pack-manifest.json` — no root `CLAUDE.md` ships.
+- If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `release-manifest.json`, `.meowkit/pack-manifest.json` and `.meowkit/harness-inventory.json` — no root `CLAUDE.md` and no `tasks/` scaffold ships.
 
 #### 1e. Author the Codex AND Cursor native bundles (when `.claude/` content changes)
 
 **Both Codex and Cursor ship HAND-AUTHORED native bundles. There is no porter for
-either.** A new `.claude/` skill / agent / rule / command / hook does NOT reach them
+either.** A new `.claude/` skill / agent / rule / hook does NOT reach them
 automatically. When a release adds or changes any of those, author the matching native
 file(s) **by hand in both bundles**, or the two targets silently drift from `.claude/`.
 
@@ -168,9 +168,7 @@ TDD sentinel paths, different hook scripts).
 | --- | --- | --- |
 | `skills/<name>/` | `.agents/skills/mk-<name>/SKILL.md` | `.cursor/skills/mk-<name>/SKILL.md` |
 | `agents/<name>.md` | `.codex/agents/<name>.toml` — `name`, `description`, `developer_instructions`, `model_reasoning_effort` | `.cursor/agents/<name>.md` — frontmatter is exactly `name`, `description`, `model`, `readonly`, `is_background` |
-| `commands/**` | author as a skill (Codex has no command surface) | author as a skill with `disable-model-invocation: true` (explicit `/mk-<name>` invocation only) |
-| `rules/*`, `rules-conditional/*` | guidance goes in `AGENTS.md` or a skill — native `.codex/rules/*.rules` are Starlark **command policies**, not markdown guidance | `.cursor/rules/<name>.mdc` — frontmatter is exactly `description`, `globs`, `alwaysApply`; every rule declares one activation class (`alwaysApply: true` is reserved for `runtime-invariants.mdc`) |
-| `modes/*` | author as a skill | author as a skill |
+| `rules/*` | guidance goes in `AGENTS.md` or a skill — native `.codex/rules/*.rules` are Starlark **command policies**, not markdown guidance | `.cursor/rules/<name>.mdc` — frontmatter is exactly `description`, `globs`, `alwaysApply`; every rule declares one activation class (`alwaysApply: true` is reserved for `runtime-invariants.mdc`) |
 | `settings.json` hooks | `.codex/hooks.json` + `.codex/hooks/*.cjs` | `.cursor/hooks.json` + `.cursor/hooks/*.cjs` |
 | memory | `.meowkit/memory/` (provider-neutral — never `.claude/memory/`) | `.meowkit/memory/` |
 
@@ -275,7 +273,7 @@ exact new entry format or command.
 
 #### 1g. No product-brand leakage in shipped content
 
-`npx mewkit init` copies `.claude/` + `tasks/` into the USER's project, where every loaded skill / agent / rule / command competes for the user's context window. Shipped content MUST NOT refer to the product by name as a self-referential subject — write **"the toolkit"**, **"the harness"**, or **"this workflow"** instead of "MeowKit" / "meowkit".
+`npx mewkit init` copies `.claude/` into the USER's project, where every loaded skill / agent / rule competes for the user's context window. Shipped content MUST NOT refer to the product by name as a self-referential subject — write **"the toolkit"**, **"the harness"**, or **"this workflow"** instead of "MeowKit" / "meowkit".
 
 **Allowed (functional — keep):**
 
@@ -285,16 +283,16 @@ exact new entry format or command.
 - Attribution / provenance metadata (e.g. `SKILLS_ATTRIBUTION.md`, skill `attribution:` frontmatter) — legitimate credit.
 - Real path / string literals the code depends on (`~/.meowkit/...`, `"meowkit-default"`, `meowkit:` frontmatter keys).
 
-**Scope:** this rule applies ONLY to shipped surfaces — `.claude/` and `tasks/`. The source repo's `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
+**Scope:** this rule applies ONLY to the shipped surface — `.claude/`. The source repo's `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
 
 **Check before release.** Scope the grep to the context-loaded prose surfaces (skill / agent / command / rule `.md`) and exclude the functional refs above — expect **zero** hits:
 
 ```bash
-grep -rinE 'meowkit' .claude/skills .claude/agents .claude/commands .claude/rules --include='*.md' \
+grep -rinE 'meowkit' .claude/skills .claude/agents .claude/rules --include='*.md' \
   | grep -vE 'MEOWKIT_|ngocsangyem/MeowKit|attribution|MeowKit-native|meowkit_tier|author: meowkit|~/\.meowkit|meowkit-default|:meowkit:'
 ```
 
-A broader `grep -ri meowkit .claude tasks` also surfaces functional hits — config identity (`metadata.json` `"name": "meowkit"`), filenames (`gitignore.meowkit`), hook log prefixes (`[meowkit]`), generated views (`harness-substrate.md`). Those are expected; only **new prose** that names the product as a subject needs neutralizing.
+A broader `grep -ri meowkit .claude` also surfaces functional hits — config identity (`metadata.json` `"name": "meowkit"`), filenames (`gitignore.meowkit`), hook log prefixes (`[meowkit]`), generated views (`harness-substrate.md`). Those are expected; only **new prose** that names the product as a subject needs neutralizing.
 
 ### 2. Update CHANGELOG (`packages/docs/content/docs/changelog/index.mdx`)
 
@@ -386,7 +384,7 @@ would want it.
 
 #### When to bump
 
-Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, `tasks/`, the docs site, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
+Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, the docs site, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
 
 ```bash
 # Decide first — does this release touch CLI code?
@@ -433,7 +431,7 @@ node scripts/prepare-release-assets.cjs "<version>"
 This creates:
 
 - `release-manifest.json` — SHA-256 checksums for all files
-- `dist/meowkit-release.zip` — the flat-copy release package (`.claude/` + `tasks/` + manifests; no root `CLAUDE.md`)
+- `dist/meowkit-release.zip` — the flat-copy release package (`.claude/` + manifests; no root `CLAUDE.md`, no `tasks/`)
 
 > **Note:** This script does NOT write `.claude/metadata.json` — the `mewkit` CLI writes it on install/upgrade, and `prepare-release-assets.cjs` explicitly excludes it from the zip. The shipped release version lives in `release-manifest.json`.
 
@@ -529,7 +527,7 @@ Copy this checklist for each release:
 
 - [ ] Updated affected guide/reference pages (step 1a)
 - [ ] If a new agent or skill landed: updated routing surfaces (step 1b — `SKILLS_INDEX.md`, `AGENTS_INDEX.md`, `agent-detector/references/agent-routing.md`, `lifecycle-routing.md`, sidebar config, reference page)
-- [ ] No product-brand leakage in shipped `.claude/` / `tasks/` (step 1g — brand grep shows only functional/attribution hits)
+- [ ] No product-brand leakage in shipped `.claude/` (step 1g — brand grep shows only functional/attribution hits)
 - [ ] Docs build passes (`npm run build -w packages/docs`)
 
 ### Changelog
@@ -589,7 +587,7 @@ Push to `main` or `dev` triggers `.github/workflows/release.yml`:
 
 ### Conventional commits → version bumps
 
-The CI mapping below applies to `.claude/` and `tasks/` content. The CLI follows the same SemVer fields, but it only bumps when `packages/mewkit/src/` changes — see step 3.
+The CI mapping below applies to `.claude/` content. The CLI follows the same SemVer fields, but it only bumps when `packages/mewkit/src/` changes — see step 3.
 
 ```
 feat: new skill            → MINOR (1.0.0 → 1.1.0)

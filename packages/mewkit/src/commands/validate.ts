@@ -9,7 +9,7 @@ import { resolveContractPath } from "../core/docs-reference-contract-paths.js";
 import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
 import { isHookScript } from "../core/is-hook-script.js";
 import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
-import { checkGateAuthority, checkCommandDrift } from "../core/check-gate-authority.js";
+import { checkGateAuthority } from "../core/check-gate-authority.js";
 import { assertOperationsNotInvocable } from "../core/provider-operations.js";
 import {
 	findOperationConformance,
@@ -780,7 +780,6 @@ export async function buildDefaultChecks(
 			// Gate-authority stays strict even in the default run: an un-synced
 			// install cannot explain a file that grants automated gate approval.
 			...checkGateAuthority(projectRoot),
-			...checkCommandDrift(projectRoot),
 			...checkOperationConformance(meowkitDir),
 			checkGenericCoreTokens(meowkitDir),
 			// Declared doc counts vs the real inventory. `scripts/harness-inventory.cjs --check`
@@ -788,7 +787,7 @@ export async function buildDefaultChecks(
 			// sees a stale README at validate time instead of at CI time. Counts are
 			// derived from buildInventory, so this can only drift when a doc lies.
 			...checkStaleIndex(projectRoot),
-			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
+			...checkOwnership(meowkitDir),
 			...checkAgentConformance(projectRoot),
 			...checkSubstrate(meowkitDir, { missingViewSeverity: "warn" }),
 			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
@@ -869,7 +868,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 	if (args.workflow) {
 		results = checkWorkflowDrift(projectRoot);
 	} else if (args.gates) {
-		results = [...checkGateAuthority(projectRoot), ...checkCommandDrift(projectRoot)];
+		results = checkGateAuthority(projectRoot);
 	} else if (args.ownership) {
 		results = checkOwnership(meowkitDir);
 	} else if (args.substrate) {

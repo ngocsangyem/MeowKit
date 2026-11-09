@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+'use strict';
+// workflow-slug — print the project slug and the sanitized branch name.
+//
+// Usage: eval "$(workflow-slug)"  → sets SLUG and BRANCH
+//
+// Runs on node, like every other executable the kit's core runtime reaches, so a
+// preamble that calls it works on a machine with no shell interpreter the caller
+// controls. Both values are reduced to the character set a directory name and a
+// git ref can both carry, and an unresolvable value answers `unknown` rather than
+// an empty string — a caller that interpolates the result into a path would
+// otherwise build a path with a missing segment and not notice.
+
+const { spawnSync } = require('node:child_process');
+
+/** A git invocation's trimmed stdout, or an empty string when git cannot answer. */
+function git(args) {
+  const result = spawnSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  return result.status === 0 && typeof result.stdout === 'string' ? result.stdout.trim() : '';
+}
+
+/**
+ * The `owner-repo` form of a remote URL.
+ *
+ * The two patterns are tried in order and the `.git` suffix first, so
+ * `git@host:owner/repo.git`, `https://host/owner/repo.git` and
+ * `https://host/owner/repo` all reduce to the same two trailing segments.
+ */
+function slugFromRemote(url) {
+  const withSuffix = /^.*[:/]([^/]*\/[^/]*)\.git$/.exec(url);
+  const bare = /^.*[:/]([^/]*\/[^/]*)$/.exec(url);
+  const match = withSuffix || bare;
+  return (match ? match[1] : url).replace(/\//g, '-');
+}
+
+/** Only the characters a directory name and a git ref can both carry. */
+function sanitize(value) {
+  return value.replace(/[^a-zA-Z0-9._-]/g, '');
+}
+
+const remote = git(['remote', 'get-url', 'origin']);
+const slug = sanitize(remote === '' ? '' : slugFromRemote(remote));
+const branch = sanitize(git(['rev-parse', '--abbrev-ref', 'HEAD']).replace(/\//g, '-'));
+
+process.stdout.write(`SLUG=${slug || 'unknown'}\n`);
+process.stdout.write(`BRANCH=${branch || 'unknown'}\n`);

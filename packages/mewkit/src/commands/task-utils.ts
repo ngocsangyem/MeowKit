@@ -112,7 +112,14 @@ export function typeSuffix(type: TaskType): string {
 	return map[type];
 }
 
-/** Read template content from .claude/tasks/templates/ relative to project root */
+/**
+ * Read a per-type task template a PROJECT authored, or null when it has none.
+ *
+ * The kit ships no file under any of these names, so null is the normal answer
+ * and the caller's inline frontmatter is the normal body. The lookup exists so a
+ * team that keeps its own task shape can drop a file in and have `task new` pick
+ * it up, without the kit having to scaffold a directory to hold one.
+ */
 export function readTemplate(type: TaskType, projectRoot: string): string | null {
 	const templateNames: Record<TaskType, string> = {
 		feature: "feature-implementation.md",
@@ -121,7 +128,6 @@ export function readTemplate(type: TaskType, projectRoot: string): string | null
 		security: "security-audit.md",
 	};
 
-	// Look in .claude/tasks/templates/ or tasks/templates/ under project root
 	const candidates = [
 		path.join(projectRoot, ".claude", "tasks", "templates", templateNames[type]),
 		path.join(projectRoot, "tasks", "templates", templateNames[type]),

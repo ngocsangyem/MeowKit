@@ -1,7 +1,8 @@
-// `.claude/scripts/` is kit-owned and was missing from the orphan scopes, so any script a
-// release stopped shipping stayed on disk forever. The retired MEMORY MIGRATORS are the case
-// that matters: a leftover migrator keeps offering to rebuild a store the current version no
-// longer has, and the kit's instruction-class files it references no longer exist.
+// A kit-owned script directory was missing from the orphan scopes, so any script a release
+// stopped shipping stayed on disk forever. Two cases make it matter: the retired MEMORY
+// MIGRATORS, where a leftover migrator keeps offering to rebuild a store the current version
+// no longer has; and a whole script directory the kit retires, whose files are left behind by
+// an upgrade unless the scope sweeps them.
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

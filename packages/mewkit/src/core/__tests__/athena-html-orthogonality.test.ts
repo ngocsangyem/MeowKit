@@ -228,7 +228,7 @@ describe("the combined run and the html-only run agree on the visual pipeline", 
 	});
 
 	it("records the orthogonality in the canonical contract too", () => {
-		const rule = flat(".claude/rules-conditional/advice-supervision-rules.md");
+		const rule = flat(".claude/skills/advise/references/advice-supervision-rules.md");
 		expect(rule).toMatch(/Composing with `--html`/);
 		expect(rule).toMatch(/Neither implies the other/);
 		expect(rule).toMatch(/only write target is an existing `workflow-evidence\.json`/);

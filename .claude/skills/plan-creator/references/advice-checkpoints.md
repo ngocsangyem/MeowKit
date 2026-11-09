@@ -5,7 +5,7 @@ are zero supervision calls, no dossier, no receipt, and the step sequence is
 byte-identical to an unsupervised run.
 
 The contract this implements is
-`.claude/rules-conditional/advice-supervision-rules.md`. Where the two disagree, the
+`.claude/skills/advise/references/advice-supervision-rules.md`. Where the two disagree, the
 contract wins.
 
 ## Checkpoints

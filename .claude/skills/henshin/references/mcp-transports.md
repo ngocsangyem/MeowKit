@@ -8,7 +8,7 @@ Wrapped server must support **stdio**, **SSE**, and **Streamable HTTP** from a s
 - [stdio — default for local agent processes](#stdio-default-for-local-agent-processes)
 - [SSE — legacy compatibility](#sse-legacy-compatibility)
 - [Streamable HTTP — preferred remote transport](#streamable-http-preferred-remote-transport)
-- [Session state](#session-state)
+- [Session state](#.meowkit/state)
 - [Auth](#auth)
 - [Tool registration](#tool-registration)
 - [Health and observability](#health-and-observability)

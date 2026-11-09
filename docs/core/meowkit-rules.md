@@ -18,20 +18,20 @@ Rules derived from in-repo governance and enforcement sources (.claude/rules/*, 
 | Sprint-state contracts  | `tasks/contracts/sprint-state-YYMMDD-sprint-N.md`                          | `tasks/contracts/state/`, missing `sprint-state-` prefix            |
 | Evaluator verdicts      | `tasks/reviews/YYMMDD-name-evalverdict.md`                                 | `evalverdicts/`, separate from review verdict                       |
 | Harness runs            | `tasks/autobuild-runs/YYMMDD-HHMM-name/run.md`                               | `runs/`, `harness/`                                                 |
-| Rubric library          | `.claude/rubrics/<name>.md`                                                | `rubrics/`, `.claude/skills/rubric/rubrics/`                   |
+| Rubric library          | `.claude/skills/rubric/rubrics/<name>.md`                                  | `rubrics/`, `.claude/rubrics/`                                      |
 | Memory files            | `.meowkit/memory/decisions.md`, `.meowkit/memory/gotchas.md`               | `.claude/memory/lessons.md`, `memory/lessons.md` (bare)             |
-| Web fetch cache         | `.claude/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256-path[:10]}.md` | `.claude/memory/web-fetches/` (memory is for learnings, not caches) |
-| Web fetch manifest      | `.claude/cache/web-fetches/index.jsonl` (append-only)                      | `.claude/memory/web-fetches/index.jsonl`                            |
-| Web fetch quarantine    | `.claude/cache/web-fetches/quarantine/{sha256}.quarantined`                | `.claude/memory/quarantine/`, `quarantine/`                         |
+| Web fetch cache         | `.meowkit/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256-path[:10]}.md` | `.claude/cache/web-fetches/`, `.meowkit/memory/web-fetches/` (memory is for learnings, not caches) |
+| Web fetch manifest      | `.meowkit/cache/web-fetches/index.jsonl` (append-only)                     | `.claude/cache/web-fetches/index.jsonl`, `.meowkit/memory/web-fetches/index.jsonl` |
+| Web fetch quarantine    | `.meowkit/cache/web-fetches/quarantine/{sha256}.quarantined`               | `.claude/cache/web-fetches/quarantine/`, `quarantine/`              |
 | ADR files               | `docs/architecture/adr/YYMMDD-title.md`                                    | `docs/architecture/NNNN-title.md`                                   |
-| Runtime session state   | `session-state/` (project root)                                            | `.claude/session-state/` for general runtime state                  |
-| Provider session exceptions | `.claude/session-state/` for TDD sentinels, workflow evidence, and plan intake | `session-state/` for those provider-scoped artifacts                |
+| Runtime session state   | `.meowkit/state/`                                                          | `session-state/` (project root), `.claude/session-state/`           |
+| Session markers         | `.meowkit/state/` for TDD sentinels, workflow evidence, and plan intake    | any provider-scoped `session-state/` directory for those artifacts  |
 | Skill references        | `.claude/skills/*/references/*.md`                                    | `domain/file.md` (short form)                                       |
 | Gate validation scripts | `.claude/skills/cook/scripts/validate-gate-*.sh`                      | `scripts/validate-gate-*.sh`                                        |
 
 **Rule:** When referencing any file in a skill or agent, use the FULL path from project root. Never use shortened or assumed paths. Before merging, grep for the path in all consuming files.
 
-**State taxonomy:** Project-root `session-state/` is the canonical ephemeral runtime root for active-plan, model, budget, checkpoint, task-queue, and hook-progress state. `.claude/session-state/` is a provider-scoped exception root: TDD sentinels, workflow evidence, and plan-creator intake packets live there. Durable workflow artifacts live under `tasks/` (`plans/`, `contracts/`, `reviews/`, `autobuild-runs/`); curated reusable memory lives under `.claude/memory/`. `tasks/completed/` is not a canonical active path until an archive writer owns it.
+**State taxonomy:** `.meowkit/state/` is the one canonical ephemeral runtime root — active-plan, model, budget, checkpoint, task-queue and hook-progress state, and the TDD sentinels, workflow evidence and plan-creator intake packets that used to sit in a second, provider-scoped root. Project-root `session-state/` and `.claude/session-state/` are read-only pre-move leftovers: they are still READ so a pre-move install keeps working, and nothing writes to them again. Durable workflow artifacts live under `tasks/` (`plans/`, `contracts/`, `reviews/`, `autobuild-runs/`), each created by its first writer rather than scaffolded; curated reusable memory lives under `.meowkit/memory/`. `tasks/completed/` is not a canonical active path until an archive writer owns it.
 
 ---
 
@@ -160,16 +160,18 @@ esac
 **Rule:** ALL python script invocations MUST use the venv interpreter:
 
 ```bash
-# WRONG
-python .claude/scripts/validate.py
+# WRONG — the system interpreter has none of the skill's packages
+python .claude/skills/lint-and-validate/scripts/validate.py
 python3 .claude/skills/multimodal/scripts/check_setup.py
 
 # RIGHT
-python3 .claude/scripts/validate.py
-node .claude/scripts/skill-python.cjs .claude/skills/multimodal/scripts/check_setup.py
+node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/validate.py
+node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/check_setup.py
 ```
 
-The venv is created by `npx mewkit setup`. If it doesn't exist, the `project-context-loader.cjs` SessionStart hook warns the user.
+`skill-python.cjs` resolves the environment for the skill that owns the script, under
+`.meowkit/envs/<skill>/`, and creates it on first use. `npx mewkit setup` can prepare them
+ahead of time; there is no single shared venv.
 
 ---
 
@@ -298,7 +300,7 @@ Skills read the store with `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` and write
 
 **Source:** plan `260510-2333-agile-scrum-rule-layer-design`
 
-The toolkit has a thin Agile governance layer. Three rules live in `.claude/rules-conditional/` and are loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected. Non-Agile sessions pay zero context cost.
+The toolkit has a thin Agile governance layer. Three rules live in `.claude/skills/agent-detector/references/` and are loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected. Non-Agile sessions pay zero context cost.
 
 | Rule | Source | Loaded by | Integration |
 |---|---|---|---|
@@ -326,7 +328,7 @@ Before merging any skill, agent, hook, or rule change:
 - [ ] All file paths referenced exist (grep every path)
 - [ ] All `subagent_type` values are in the valid list (Section 2)
 - [ ] All hooks referenced are registered in `settings.json`
-- [ ] All skill python commands go through `node .claude/scripts/skill-python.cjs`
+- [ ] All skill python commands go through `node .claude/hooks/lib/skill-python.cjs`
 - [ ] Memory paths use `.meowkit/memory/` (only `decisions.md` and `gotchas.md`)
 - [ ] No bare `memory/` or `ck:` references
 - [ ] Verdict uses PASS/WARN/FAIL (not APPROVE/BLOCK)

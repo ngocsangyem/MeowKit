@@ -44,10 +44,10 @@ Meta skill — not tied to a specific Phase. Invoked on-demand for skill develop
 
 ```bash
 # Scaffold a new skill (creates directory + template SKILL.md)
-node .claude/scripts/skill-python.cjs .claude/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .claude/skills
+node .claude/hooks/lib/skill-python.cjs .claude/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .claude/skills
 
 # Validate an existing skill against compliance checklist
-node .claude/scripts/skill-python.cjs .claude/skills/skill-creator/scripts/validate-skill.py .claude/skills/my-feature
+node .claude/hooks/lib/skill-python.cjs .claude/skills/skill-creator/scripts/validate-skill.py .claude/skills/my-feature
 ```
 
 ## Process
@@ -173,4 +173,4 @@ If FAIL: fix failing items before registering.
 - **Template must include `## Gotchas` header** — even as a placeholder. `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 1 is hard-enforced by `validate-skill.py`. Day-1 skills may use `(none yet — grow from observed failures)` but the header itself is mandatory.
 <!-- research-citation -->
 - **Line cap is 500, not 150** — the canonical threshold comes from `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 3 (Anthropic progressive-disclosure guidance). Step-file skills (with `workflow.md`) auto-pass regardless of line count.
-- **Persistent state goes to `${CLAUDE_PLUGIN_DATA}`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. framework-internal paths (`.meowkit/memory/`, `session-state/`) are exempt.
+- **Persistent state goes to `${CLAUDE_PLUGIN_DATA}`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. framework-internal paths (`.meowkit/memory/`, `.meowkit/state/`) are exempt.

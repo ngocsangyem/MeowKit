@@ -63,6 +63,10 @@ function resolvePlan(root, shipFile) {
         `Ship-capable change (e.g. ${shipFile}) with no active-plan pointer.`,
         'Cannot tell WHICH review verdict is supposed to authorize this ship, and',
         'guessing the newest verdict would let an unrelated review authorize it.',
+        // The advice names a pre-move location on purpose: this block message is
+        // pinned byte-for-byte by the recorded safety corpus, and the lookup
+        // accepts the pointer there as well as in the canonical state class, so
+        // the instruction still resolves. Canonical is `.meowkit/state/`.
         'Fix: set session-state/active-plan.json {"path": "tasks/plans/<plan-dir>"}.',
       ),
     };

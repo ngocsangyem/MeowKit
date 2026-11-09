@@ -104,17 +104,17 @@ jobs:
       - name: Multimodal mock tests
         run: |
           node packages/mewkit/dist/index.js skill env multimodal
-          node .claude/scripts/skill-python.cjs .claude/skills/multimodal/scripts/tests/run_tests.py
+          node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/tests/run_tests.py
 
       - name: Validate Figma evidence packet fixtures
         run: |
           node packages/mewkit/dist/index.js skill env figma
-          node .claude/scripts/skill-python.cjs .claude/skills/figma/evals/validate-evidence-packets.py
+          node .claude/hooks/lib/skill-python.cjs .claude/skills/figma/evals/validate-evidence-packets.py
 
       - name: Test web-to-markdown URL SSRF guard
         run: |
           node packages/mewkit/dist/index.js skill env web-to-markdown
-          node .claude/scripts/skill-python.cjs --skill web-to-markdown -m pytest \
+          node .claude/hooks/lib/skill-python.cjs --skill web-to-markdown -m pytest \
             .claude/skills/web-to-markdown/tests/test_safe_url.py \
             .claude/skills/web-to-markdown/tests/test_e2e_offline.py -q
 
@@ -130,7 +130,7 @@ jobs:
       - name: Routing eval (Track D, EN + VI)
         run: |
           node packages/mewkit/dist/index.js skill env scale-routing
-          node .claude/scripts/skill-python.cjs .claude/skills/scale-routing/eval/run-routing-eval.py
+          node .claude/hooks/lib/skill-python.cjs .claude/skills/scale-routing/eval/run-routing-eval.py
 
       - name: Critical-skill contract coverage suites
         run: bash tests/skill-contract-coverage.test.sh
@@ -236,6 +236,9 @@ jobs:
       - name: Validate rule availability
         run: bash scripts/validate-rule-availability.sh
 
+      - name: Check the shared executables need node only
+        run: node scripts/check-node-only-runtime.cjs .
+
       # Diff-mode brand-prose lint: violations in PR-changed files fail; pre-existing
       # legacy violations in untouched files are WARN-only. Needs a base ref — resolve
       # it from the PR base branch (guarded to PR events that set GITHUB_BASE_REF).
@@ -247,7 +250,7 @@ jobs:
           if [ -n "$BASE" ]; then echo "LINT_BASE_REF=$BASE" >> "$GITHUB_ENV"; fi
 
       - name: Lint brand prose in changed .claude markdown (diff mode)
-        run: LINT_MODE=diff bash .claude/scripts/lint-brand-prose.sh
+        run: LINT_MODE=diff bash scripts/lint-brand-prose.sh
 
       - name: "Reject residual meow: namespace"
         run: |
@@ -255,7 +258,7 @@ jobs:
             echo "ERROR: legacy 'meow:' frontmatter found — use 'mk:' instead." >&2
             exit 1
           fi
-          if grep -rEn '/meow:[a-z]' .claude/commands/ .claude/rules/ CLAUDE.md 2>/dev/null; then
+          if grep -rEn '/meow:[a-z]' .claude/skills/ .claude/rules/ CLAUDE.md 2>/dev/null; then
             echo "ERROR: legacy '/meow:' slash references found — use '/mk:' instead." >&2
             exit 1
           fi

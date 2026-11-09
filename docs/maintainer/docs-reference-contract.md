@@ -5,7 +5,7 @@
 > the kit's `validate` command, whose job is to resolve it; when the contract is absent
 > (every user project) that checker reports N/A and exits 0.
 
-How `docs/*` paths inside `.claude/agents`, `.claude/skills`, `.claude/commands`, `.claude/hooks`, `.claude/scripts`, `.claude/rules`, `.claude/rules-conditional`, and `.claude/modes` are resolved at runtime, and which paths are allowed to appear.
+How `docs/*` paths inside `.claude/agents`, `.claude/skills`, `.claude/hooks` and `.claude/rules` are resolved at runtime, and which paths are allowed to appear. Those four are the whole shipped surface.
 
 ## Two-Tier Resolution
 

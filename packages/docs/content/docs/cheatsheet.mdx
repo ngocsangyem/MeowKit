@@ -7,34 +7,34 @@ description: "Dense quick reference for all MeowKit commands, agents, skills, an
 
 | Command | Phase | What it does |
 |---------|-------|-------------|
-| `/mk:meow [task]` | 0 | Entry point — classifies and routes to right agent |
+| `/mk:agent-detector [task]` | 0 | Entry point — classifies and routes to right agent |
 | `/mk:breakdown <source>` | pre-1 | Spec/PRD → user stories + optional Jira tickets + tech breakdown — stops before plan |
-| `/mk:plan [feature]` | 1 | Premise challenge + two-lens plan + Gate 1 |
+| `/mk:plan-creator [feature]` | 1 | Premise challenge + two-lens plan + Gate 1 |
 | `/mk:cook [feature]` | 1→5 | Full pipeline: plan → test → build → review → ship |
 | `/mk:fix [bug]` | varies | Auto-detect complexity, route to fix strategy |
 | `/mk:review` | 4 | Multi-pass code review + adversarial analysis |
 | `/mk:ship` | 5 | Pre-ship → commit → PR → CI verify → rollback doc |
-| `/mk:test` | 2 | TDD enforcement — write or run tests |
-| `/mk:audit` | 4 | Full security scan across all platforms |
-| `/mk:validate` | any | Run deterministic Python validation scripts |
+| `/mk:testing` | 2 | TDD enforcement — write or run tests |
+| `/mk:cso` | 4 | Full security scan across all platforms |
+| `/mk:lint-and-validate` | any | Run deterministic Python validation scripts |
 | `/mk:arch [action]` | 1 | Generate, list, or analyze ADRs |
-| `/mk:design [system]` | 1 | System design consultation (docs only) |
+| `/mk:improve-codebase-architecture [system]` | 1 | System design consultation (docs only) |
 | `/mk:docs-init` | 6 | Initial codebase scan → doc skeleton |
-| `/mk:docs-sync` | 6 | Diff-aware doc updates after feature work |
-| `/mk:canary` | 5 | Staged deployment with monitoring |
+| `/mk:document-release` | 6 | Diff-aware doc updates after feature work |
+| `/mk:ship` | 5 | Staged deployment with monitoring |
 | `/mk:retro` | 6 | Sprint retrospective with trend tracking |
-| `/mk:budget` | any | Token cost tracking report |
+| `mewkit budget` | any | Token cost tracking report |
 | `/mk:party [topic]` | 1 | Multi-agent deliberation — 2-4 agents debate, forced synthesis |
-| `/mk:spawn [agent]` | any | Launch parallel agent session |
+| `/mk:team-config [agent]` | any | Launch parallel agent session |
 | `/mk:status` | any | Delivery status report via project-manager |
-| `/mk:upgrade` | any | Self-update MeowKit |
+| `mewkit upgrade` | any | Self-update MeowKit |
 | `/mk:help` | any | Scan project state, recommend next pipeline step |
 | `/mk:autobuild "build a X"` | 0→5 | Autonomous green-field build with generator/evaluator loop |
 | `/mk:evaluate` | 4 | Behavioral rubric grading with active verification |
 | `/mk:sprint-contract` | 3 | Draft contract before harness sprint |
 | `/mk:rubric` | 4 | Load/compose rubric preset |
 | `/mk:trace-analyze` | any | Scatter-gather analysis of trace log |
-| `/mk:benchmark` | any | Canary suite (quick tier default; `--full` for 6-task tier) |
+| `/mk:benchmark` | any | Canary suite (quick tier default; `--full` for 6-task tier) — maintainer-only, not in an installed kit |
 
 ## Agents Quick Reference
 
@@ -129,7 +129,7 @@ description: "Dense quick reference for all MeowKit commands, agents, skills, an
 | mk:sprint-contract | Harness FULL density | Acceptance criteria contract before sprint |
 | mk:rubric | Evaluator setup | Load/compose rubric preset |
 | mk:trace-analyze | Trace log available | Root cause analysis across trace spans |
-| mk:benchmark | Canary testing | Quick or full canary suite with scored output |
+| mk:benchmark | Canary testing (maintainer-only) | Quick or full canary suite with scored output |
 
 ## Planning (Phase 1)
 
@@ -144,7 +144,7 @@ All three review skills stop after printing — you control when to run `/mk:coo
 
 | Command | What it does |
 |---------|-------------|
-| `/mk:plan "feature"` | Create plan via mk:plan-creator |
+| `/mk:plan-creator "feature"` | Create plan via mk:plan-creator |
 | `npx mewkit task new --type feature "desc"` | Create task from template |
 | `npx mewkit task list` | List active tasks |
 

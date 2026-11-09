@@ -18,7 +18,7 @@ work, unblock it when it stalls, and read finished work against evidence before 
 normal reviewer sees it. You can send work back. You cannot approve anything.
 
 The full contract you serve is
-`.claude/rules-conditional/advice-supervision-rules.md`. This file is the
+`.claude/skills/advise/references/advice-supervision-rules.md`. This file is the
 Claude-plane adapter for it. Where the two disagree, the contract wins.
 
 ## Who Invokes You

@@ -86,16 +86,16 @@ default_enabled: true
 
    **Agile context detection (additive — Agile-only load).** After the 6 phase-zero rule `Read`s succeed:
 
-   1. **PRE-FLIGHT.** Check that `.claude/rules-conditional/` directory exists. If absent → log `agile rules: rules-conditional/ not deployed; skipping load` and skip steps 2–4. (Defensive: filesystem may lag pruning-plan status doc.)
+   1. **PRE-FLIGHT.** Check that `references/agile-story-gates.md` exists beside this skill. If absent → log `agile rules: not deployed; skipping load` and skip steps 2–4. (Defensive: a partial install may lag the skill.)
    2. **Detect Agile context — OR-logic, any one match triggers load:**
       - Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
       - Active plan frontmatter has non-empty `jira_tickets:`
       - `MEOW_JIRA_SITE_URL` env var is set
       - Last user message matches `[A-Z]{2,10}-\d+` (Jira-key pattern)
    3. **If Agile context detected, `Read` the 3 conditional rules:**
-      - `.claude/rules-conditional/agile-story-gates.md`
-      - `.claude/rules-conditional/agile-sprint-commitment.md`
-      - `.claude/rules-conditional/agile-feedback-cycle.md`
+      - `.claude/skills/agent-detector/references/agile-story-gates.md`
+      - `.claude/skills/agent-detector/references/agile-sprint-commitment.md`
+      - `.claude/skills/agent-detector/references/agile-feedback-cycle.md`
       Per-file Read failure (file absent inside the directory): log and skip THAT rule; do NOT abort Step 0b. The phase-zero baseline is already loaded.
    4. **Sprint-goal banner.** If a sprint-state contract exists, parse `sprint_goal:` from the newest active sprint-state file (status: active) and surface in the orient banner.
 

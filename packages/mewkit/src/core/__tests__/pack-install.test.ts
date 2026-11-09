@@ -42,8 +42,7 @@ const MANIFEST = {
 			"rules/injection-rules.md",
 			"rules/gate-rules.md",
 		],
-		globs: ["hooks/**"],
-		commands: ["plan", "validate"],
+		globs: ["hooks/**", "skills/entry/**"],
 	},
 	packs: {
 		"lifecycle-core": { owners: ["lifecycle"] },
@@ -66,8 +65,7 @@ const SAFETY = [
 	"rules/security-rules.md",
 	"rules/injection-rules.md",
 	"rules/gate-rules.md",
-	"commands/mk/plan.md",
-	"commands/mk/validate.md",
+	"skills/entry/SKILL.md",
 ];
 
 /** Build a realistic source release tree with a pack-manifest. */
@@ -91,9 +89,8 @@ async function makeSource(): Promise<string> {
 	await w("hooks/gate-enforcement.cjs", "#!/bin/sh\n");
 	await w("hooks/lib/parse-stdin.cjs", "#!/bin/sh\n");
 	await w("hooks/dispatch.cjs", "// dispatch\n");
-	// essential commands
-	await w("commands/mk/plan.md", "# plan\n");
-	await w("commands/mk/validate.md", "# validate\n");
+	// essential cross-profile entrypoint — base-declared, so every profile carries it
+	await w("skills/entry/SKILL.md", skillFm("mk:entry", "lifecycle"));
 	// lifecycle skill (in core) + two jira skills (atlassian only)
 	await w("skills/cooker/SKILL.md", skillFm("mk:cooker", "lifecycle"));
 	await w("skills/cooker/references/r.md", "# ref\n");
@@ -116,8 +113,6 @@ async function makeSource(): Promise<string> {
 				runtime: "claude-code",
 			},
 			"rules/gate-rules.md": { owner: "lifecycle", criticality: "critical", status: "active", runtime: "claude-code" },
-			"commands/mk/plan.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
-			"commands/mk/validate.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
 			"hooks/gate-enforcement.cjs": {
 				owner: "security",
 				criticality: "critical",

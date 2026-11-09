@@ -28,7 +28,7 @@ Persists and restores mid-session workflow progress across context resets. Captu
 2. **Resume:** Loads state from file, validates it (exists, valid JSON, compatible version, status is "paused"), restores context (project, agents, phase rules, key decisions), and continues from the saved phase
 3. **Auto-Save:** Silent background saves on phase completion, every 5 minutes, at host-reported context-warning milestones, and before external writes -- no user notification for routine saves
 4. **List:** `workflow:list` shows all saved workflows with their status
-5. **Plan state:** Saved workflow state lives in `.claude/logs/workflows/`; the active plan is resolved from `session-state/active-plan.json` or by scanning `tasks/plans/`
+5. **Plan state:** Saved workflow state lives in `.claude/logs/workflows/`; the active plan is resolved from `.meowkit/state/active-plan.json` or by scanning `tasks/plans/`
 6. **TOON format:** Token-efficient state representation (~160 tokens vs ~600 tokens JSON, 73% reduction)
 
 ## Arguments

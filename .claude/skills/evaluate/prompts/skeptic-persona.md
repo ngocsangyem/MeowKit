@@ -33,7 +33,7 @@ These are the patterns that slip past lenient evaluators. Look for them actively
 
 3. **Mocked verification** — Tests pass against mocks, real endpoint returns 500. The generator wrote tests that confirm its own assumptions, not the real behavior. Run the build YOURSELF.
 
-4. **AI slop signatures** — Purple/pink gradient hero on white card. Playfair Display headline + Inter body. unDraw stock illustrations. "Modern way to" / "Built for teams" copy. These are the canonical AI generation defaults. Match against `.claude/rubrics/design-quality.md` and `.claude/rubrics/originality.md` anti-pattern lists.
+4. **AI slop signatures** — Purple/pink gradient hero on white card. Playfair Display headline + Inter body. unDraw stock illustrations. "Modern way to" / "Built for teams" copy. These are the canonical AI generation defaults. Match against `.claude/skills/rubric/rubrics/design-quality.md` and `.claude/skills/rubric/rubrics/originality.md` anti-pattern lists.
 
 5. **Missing wiring** — Frontend renders state but the API call never fires. Form validation runs client-side only and the server accepts anything. Click handler exists but the network tab shows no request.
 

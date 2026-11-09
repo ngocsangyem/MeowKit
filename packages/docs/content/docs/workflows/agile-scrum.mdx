@@ -8,7 +8,7 @@ description: "Sprint goal, DoR/DoD, retro→action loop, and spike governance vi
 **Best for:** Teams running Jira-tracked sprints with the toolkit
 **Time estimate:** Per-sprint ceremonies; no setup beyond opt-in frontmatter
 **Skills used:** [mk:plan-creator](/reference/skills/plan-creator), [mk:sprint-contract](/reference/skills/sprint-contract), [mk:retro](/reference/skills/retro), [mk:jira-agile](/reference/skills/jira-agile), [mk:ship](/reference/skills/ship), [mk:agent-detector](/reference/skills/agent-detector)
-**Rules:** `agile-story-gates.md`, `agile-sprint-commitment.md`, `agile-feedback-cycle.md` (in `.claude/rules-conditional/`)
+**Rules:** `agile-story-gates.md`, `agile-sprint-commitment.md`, `agile-feedback-cycle.md` (in `.claude/skills/agent-detector/references/`)
 
 ## Quick path
 
@@ -48,7 +48,7 @@ The 3 Agile rules load via `mk:agent-detector` Step 0b ONLY when an Agile contex
 | Env var | `MEOW_JIRA_SITE_URL` set |
 | User prompt | Last user message matches `[A-Z]{2,10}-\d+` |
 
-A pre-flight check verifies the `.claude/rules-conditional/` directory exists; if absent, the load is skipped silently.
+A pre-flight check verifies `references/agile-story-gates.md` exists beside the skill; if absent, the load is skipped silently.
 
 ## Sprint Setup
 
@@ -87,7 +87,7 @@ Now `mk:plan-creator` will run the DoR advisory at Phase 1 entry, and `mk:ship` 
 
 ### Definition of Ready (Phase 1 entry)
 
-When you run `/mk:plan` on a plan that has `jira_tickets:`, the DoR advisory checks each ticket:
+When you run `/mk:plan-creator` on a plan that has `jira_tickets:`, the DoR advisory checks each ticket:
 
 1. AC text present
 2. Non-zero story-point estimate

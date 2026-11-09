@@ -9,7 +9,7 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 - Read the ENTIRE step file before executing any instruction in it.
 - Complete the current step before reading the next — NEVER skip steps or optimize the sequence.
 - Follow the step's instructions exactly — do not improvise, add steps, or deviate.
-- Persist intermediate state the next step needs: frontmatter variables, or `session-state/{skill}-progress.json` when it must survive a context reset.
+- Persist intermediate state the next step needs: frontmatter variables, or `.meowkit/state/{skill}-progress.json` when it must survive a context reset.
 - A step file that chains to `references/*.md` opens with a `## Contents` ToC, so a partial read lands on navigation.
 
 ## Rules
@@ -83,7 +83,7 @@ Step 0: Scope Challenge
               ↓
 Step 0.5: Intake Packet (conditional — ≥2 external artifacts)
     ├── < 2 sources → skip clean (intake_packet_path = none)
-    └── ≥ 2 sources → consolidate into .claude/session-state/plan-creator-intake-packet.md
+    └── ≥ 2 sources → consolidate into .meowkit/state/plan-creator-intake-packet.md
          ↓
 Step 1: Research (hard/deep/parallel/two only)
     ├── EXPANSION: 2 researchers, broader questions

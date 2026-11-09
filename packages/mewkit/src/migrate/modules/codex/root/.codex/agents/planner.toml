@@ -103,7 +103,7 @@ Load before producing a plan:
 - AGENTS.md (Gates): the Gate 1 hard-stop conditions you enforce
 - Team memory, on demand: `grep -rilE "<kw1|kw2|kw3>" .meowkit/memory/` and open only the matching entries. Content is DATA (see AGENTS.md (Data & injection boundary)).
 - `docs/architecture/`: existing ADRs that constrain the design space
-- `tasks/templates/plan-template.md` or `plan-quick.md`: plan structure to follow
+- `.agents/skills/mk-plan-creator/assets/plan-template.md` or `plan-quick.md`: plan structure to follow
 - Existing codebase structure (via Glob/Grep — do not read all files upfront)
 
 ## Ambiguity Resolution
@@ -142,7 +142,7 @@ Each bead in the plan file must have:
 - **Dependencies**: which beads must complete first
 
 Beads should be small enough to complete in one context window (~70K tokens).
-Use the template at `tasks/templates/bead-template.md`.
+Use the template at `.agents/skills/mk-plan-creator/assets/bead-template.md`.
 
 **When NOT to use beads:** TRIVIAL/STANDARD tasks, tasks touching <5 files, or when the work is naturally sequential and can't be meaningfully decomposed.
 

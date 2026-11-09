@@ -4,7 +4,6 @@
     "files": [
       "settings.json",
       "statusline.cjs",
-      "workflow.yaml",
       "harness-inventory.json",
       "pack-manifest.json",
       "gitignore.meowkit",
@@ -20,15 +19,11 @@
     ],
     "globs": [
       "hooks/**",
-      "scripts/**",
-      "schemas/**",
       "memory/**",
-      "agent-memory/**",
-      "modes/**",
-      "rubrics/**",
-      "rules-conditional/**"
+      "skills/help/**",
+      "skills/lint-and-validate/**",
+      "skills/plan-creator/**"
     ],
-    "commands": ["plan", "upgrade", "validate", "status", "cook", "fix"],
     "exclude": [
       ".claude/session-state/*",
       ".claude/memory/*",
@@ -42,21 +37,19 @@
       ".meowkit/cache/*",
       ".meowkit/telemetry/*",
       ".meowkit/metadata.json",
-      "tasks/reports/*",
-      "tasks/reviews/*.md",
-      "tasks/reviews/evidence/*",
-      "tasks/contracts/*.md",
-      "tasks/plans/*.md",
-      "tasks/plans/*/*",
       "*.pyc",
       "__pycache__/*",
       ".claude/settings.json.bak",
       ".claude/.brand-allowlist.txt",
-      ".claude/scripts/lint-brand-prose.sh",
-      ".claude/scripts/check-anthropic-context.py",
-      ".claude/benchmarks/results/*",
+      ".claude/agent-memory/*",
+      ".claude/benchmarks/*",
+      ".claude/skills/benchmark/*",
+      ".claude/harness-substrate.md",
+      ".claude/schemas/*",
       ".claude/eval/*",
       ".claude/skills/*/eval/*",
+      ".claude/hooks/.logs/*",
+      "*/.pytest_cache/*",
       "*/__tests__/*",
       "*/tests/*",
       "*.test.*"
@@ -67,7 +60,6 @@
       "owners": ["lifecycle"],
       "artifactsExclude": [
         "mk:autobuild",
-        "autobuild",
         "mk:planning-engine",
         "mk:plan-ceo-review",
         "mk:story-sizer",
@@ -88,7 +80,6 @@
     "product": {
       "artifactsAdd": [
         "mk:autobuild",
-        "autobuild",
         "mk:planning-engine",
         "mk:plan-ceo-review",
         "mk:story-sizer",

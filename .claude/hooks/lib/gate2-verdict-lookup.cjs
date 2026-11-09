@@ -13,6 +13,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+const { sessionStateFile } = require('./meowkit-paths.cjs');
+
 const DATE_PREFIX = /^[0-9]{6}(?:-[0-9]{4})?-(.+)$/;
 
 function readJson(file) {
@@ -26,10 +28,12 @@ function isFile(p) {
 /**
  * The pointer, as written. Both the JSON form and the bare-path file are read so
  * the completion check and the ship guard resolve the same plan from the same
- * place.
+ * place, and both are resolved through the state resolver, which also accepts a
+ * pre-move location — a project that wrote its pointer before session markers
+ * moved must not have this fail closed on it mid-session.
  */
 function activePlan(root) {
-  const jsonPath = path.join(root, 'session-state/active-plan.json');
+  const jsonPath = sessionStateFile('active-plan.json', root);
   if (isFile(jsonPath)) {
     const d = readJson(jsonPath);
     if (d) {
@@ -37,7 +41,7 @@ function activePlan(root) {
       if (value) return value;
     }
   }
-  const flat = path.join(root, 'session-state/active-plan');
+  const flat = sessionStateFile('active-plan', root);
   if (isFile(flat)) {
     try { return fs.readFileSync(flat, 'utf8').replace(/[\n\r]/g, ''); } catch { return ''; }
   }

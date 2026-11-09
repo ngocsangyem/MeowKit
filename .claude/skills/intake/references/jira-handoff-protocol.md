@@ -43,7 +43,7 @@ jira-as not installed (or .meowkit/.env not populated). Apply these changes manu
 - Assign to [username]
 - Set Fix Version to [version]
 
-Or run `.claude/scripts/bin/setup-workflow` then populate .meowkit/.env from .meowkit/.env.example to enable the mk:jira-* family.
+Or run `.claude/hooks/lib/setup-workflow` then populate .meowkit/.env from .meowkit/.env.example to enable the mk:jira-* family.
 ```
 
 ## Safety Gate

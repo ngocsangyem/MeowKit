@@ -605,5 +605,8 @@
   "notRecorded": {
     "post-session": "reads the live transcript path and writes duration/token fields derived from it; no fixture can supply a transcript whose derived numbers are stable across runs",
     "project-context-loader": "emits the repo-relative content of docs/ and .claude/rules/ at BASE, so its output is a copy of files this sprint is also changing; verified by a node unit test over a pinned fixture tree instead"
+  },
+  "authoredAfterBase": {
+    "privacy-read-webfetch-manifest-state-cache": "BASE matched only the pre-move cache root, so it cannot produce this block"
   }
 }

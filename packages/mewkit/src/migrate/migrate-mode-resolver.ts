@@ -20,9 +20,6 @@ export function validateFlags(options: MigrateOptions, argv: string[]): void {
 	if (options.install && options.reconcile) {
 		throw new MewkitMigrateError("--install and --reconcile are mutually exclusive", 2);
 	}
-	if (options.reinstallEmptyDirs && options.respectDeletions) {
-		throw new MewkitMigrateError("--reinstall-empty-dirs and --respect-deletions are mutually exclusive", 2);
-	}
 	if (options.sourceVersion) {
 		throw new MewkitMigrateError(
 			"--source-version is not used by mewkit migrate. Portable evolution is tracked by portable-manifest.json and the registry.",

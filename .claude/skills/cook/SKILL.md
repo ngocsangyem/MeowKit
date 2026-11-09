@@ -44,7 +44,7 @@ dependency_edges:
 
 # Cook — Full Implementation Pipeline
 
-Implementation entry adapter. `.claude/workflow.yaml` is the only lifecycle phase-sequence authority; this skill selects a profile, invokes the relevant owners, and presents the required gates. TDD is opt-in via `--tdd`.
+Implementation entry adapter. `.claude/skills/workflow-orchestrator/workflow.yaml` is the only lifecycle phase-sequence authority; this skill selects a profile, invokes the relevant owners, and presents the required gates. TDD is opt-in via `--tdd`.
 
 ## Usage
 
@@ -73,14 +73,14 @@ locked scope, and may return the work for correction. It never approves: Gate 1 
 Gate 2 remain human, the reviewer keeps its verdict, and supervision counts as no
 verification. Without the flag there are zero calls and no state is written.
 Checkpoints: `references/workflow-steps.md` → Advice Checkpoints. Contract:
-`.claude/rules-conditional/advice-supervision-rules.md` (load only when the flag is present).
+`.claude/skills/advise/references/advice-supervision-rules.md` (load only when the flag is present).
 
 ## TDD mode (`--tdd` flag)
 
-When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.claude/session-state/tdd-mode` via a Bash tool call BEFORE any other workflow step:
+When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.meowkit/state/tdd-mode` via a Bash tool call BEFORE any other workflow step:
 
 ```bash
-mkdir -p .claude/session-state && echo on > .claude/session-state/tdd-mode
+mkdir -p .meowkit/state && echo on > .meowkit/state/tdd-mode
 ```
 
 This sentinel file is read by `pre-implement.cjs`, `tdd-detect.cjs`, and downstream agents to detect TDD mode. Without `--tdd`, the sentinel is absent and the workflow runs in default mode (Phase 2 optional, no RED-phase gate).
@@ -131,7 +131,7 @@ See `references/intent-detection.md` for full detection logic.
 
 ## Lifecycle Adapter
 
-<!-- Canonical source: .claude/workflow.yaml — this diagram renders the same lifecycle; -->
+<!-- Canonical source: workflow.yaml — this diagram renders the same lifecycle; -->
 <!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 <!-- the YAML is the machine-readable authority; this Mermaid diagram is the human-facing render. -->
 
@@ -166,7 +166,7 @@ flowchart TD
     H --> I
 ```
 
-The YAML specification is authoritative. This diagram is a convenience rendering only; phase details and transitions live in `.claude/workflow.yaml` and `references/workflow-steps.md`.
+The YAML specification is authoritative. This diagram is a convenience rendering only; phase details and transitions live in `.claude/skills/workflow-orchestrator/workflow.yaml` and `references/workflow-steps.md`.
 
 ### Scout-First Contract (Phase 0)
 
@@ -261,7 +261,7 @@ When this run drives an **active durable task** (a `tasks/active/<id>.json` exis
 ## Related Rules
 
 - `.claude/rules/gate-rules.md` — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions this skill enforces across all modes
-- `.claude/rules-conditional/workflow-evidence-rules.md` — workflow evidence index (traceability over existing Phase 0-6 outputs; mirrors the gate scripts, never approves). See `references/workflow-steps.md` → Workflow Evidence Index
+- `.claude/skills/advise/references/workflow-evidence-rules.md` — workflow evidence index (traceability over existing Phase 0-6 outputs; mirrors the gate scripts, never approves). See `references/workflow-steps.md` → Workflow Evidence Index
 
 ## Rule Loads (just in time)
 

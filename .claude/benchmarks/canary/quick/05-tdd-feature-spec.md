@@ -14,7 +14,7 @@ requires_tdd_mode: true
 >
 > Manual reproduction (no automated runner exists yet):
 > ```bash
-> mkdir -p .claude/session-state && echo on > .claude/session-state/tdd-mode
+> mkdir -p .meowkit/state && echo on > .meowkit/state/tdd-mode
 > /mk:cook --tdd "build a slugify function per .claude/benchmarks/canary/quick/05-tdd-feature-spec.md"
 > ```
 

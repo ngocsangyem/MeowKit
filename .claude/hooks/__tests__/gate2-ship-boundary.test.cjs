@@ -38,15 +38,15 @@ function makeRepo({ files = {}, activePlan, verdicts = {}, committed = {}, unsta
   git('config', 'user.email', 'test@example.com');
   git('config', 'user.name', 'test');
 
-  // Mirror the real repo: session-state is transient and gitignored, so
+  // Mirror the real repo: runtime state is transient and gitignored, so
   // `git add .` never stages it. Without this the fixture's own scaffolding
   // reads as untracked ship-capable files and every case blocks.
-  write(dir, '.gitignore', 'session-state/\n');
+  write(dir, '.gitignore', '.meowkit/\n');
 
   // Real validators — the check delegates to them rather than re-parsing.
   // Committed as baseline because they are tracked files in a real install.
   copyIn(dir, '.claude/skills/cook/scripts/validate-gate-2.cjs');
-  copyIn(dir, '.claude/scripts/validate-workflow-evidence.cjs');
+  copyIn(dir, '.claude/hooks/lib/validate-workflow-evidence.cjs');
 
   // Baseline commit so HEAD exists and diffs have something to compare against.
   write(dir, 'README.md', '# baseline\n');
@@ -55,7 +55,7 @@ function makeRepo({ files = {}, activePlan, verdicts = {}, committed = {}, unsta
   git('commit', '-qm', 'baseline');
 
   if (activePlan !== undefined) {
-    write(dir, 'session-state/active-plan.json', JSON.stringify({ path: activePlan }));
+    write(dir, '.meowkit/state/active-plan.json', JSON.stringify({ path: activePlan }));
   }
   // The Gate 2 revision binding requires the verdict to name current HEAD. Bind it
   // here so a "passing" fixture actually reaches (and passes) that check; tests that

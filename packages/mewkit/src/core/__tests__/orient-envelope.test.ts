@@ -122,23 +122,23 @@ describe("active-task pointer round-trip (canonical + legacy read compatibility)
 	it("mirrors path/slug so the legacy checkpoint reader keeps working", async () => {
 		const root = makeRoot();
 		await writeActiveTaskPointer(root, { taskId: "feat-x", planPath: "plans/260711-x/plan.md", planSlug: "260711-x" });
-		const raw = JSON.parse(readFileSync(join(root, "session-state", "active-plan.json"), "utf-8"));
+		const raw = JSON.parse(readFileSync(join(root, ".meowkit", "state", "active-plan.json"), "utf-8"));
 		expect(raw.path).toBe("plans/260711-x/plan.md");
 		expect(raw.slug).toBe("260711-x");
 	});
 
 	it("reads a legacy path-only pointer as a legacy plan reference (no taskId)", () => {
 		const root = makeRoot();
-		mkdirSync(join(root, "session-state"), { recursive: true });
-		writeFileSync(join(root, "session-state", "active-plan.json"), JSON.stringify({ path: "plans/260711-x/plan.md" }));
+		mkdirSync(join(root, ".meowkit", "state"), { recursive: true });
+		writeFileSync(join(root, ".meowkit", "state", "active-plan.json"), JSON.stringify({ path: "plans/260711-x/plan.md" }));
 		const res = readActiveTaskPointer(root);
 		expect(res).toEqual({ kind: "legacy", planRef: "plans/260711-x/plan.md" });
 	});
 
 	it("reads a legacy plain-text pointer as a normalized legacy reference", () => {
 		const root = makeRoot();
-		mkdirSync(join(root, "session-state"), { recursive: true });
-		writeFileSync(join(root, "session-state", "active-plan"), "260711-x\n");
+		mkdirSync(join(root, ".meowkit", "state"), { recursive: true });
+		writeFileSync(join(root, ".meowkit", "state", "active-plan"), "260711-x\n");
 		expect(readActiveTaskPointer(root)).toEqual({ kind: "legacy", planRef: "260711-x" });
 	});
 
@@ -150,8 +150,8 @@ describe("active-task pointer round-trip (canonical + legacy read compatibility)
 		const root = makeRoot();
 		await writeActiveTaskPointer(root, { taskId: "feat-x" });
 		expect(await clearActiveTaskPointer(root, "other")).toBe(false);
-		expect(existsSync(join(root, "session-state", "active-plan.json"))).toBe(true);
+		expect(existsSync(join(root, ".meowkit", "state", "active-plan.json"))).toBe(true);
 		expect(await clearActiveTaskPointer(root, "feat-x")).toBe(true);
-		expect(existsSync(join(root, "session-state", "active-plan.json"))).toBe(false);
+		expect(existsSync(join(root, ".meowkit", "state", "active-plan.json"))).toBe(false);
 	});
 });

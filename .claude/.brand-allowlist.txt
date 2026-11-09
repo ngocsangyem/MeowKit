@@ -1,14 +1,13 @@
 # Full .claude/-rooted paths only. Every entry is a provider-specific citation,
 # attribution, or host-runtime instruction that cannot be made generic.
-.claude/commands/mk/orchestrate.md # Enumerates installed host CLIs by name to distinguish them from in-session routing
-.claude/rubrics/RUBRICS_INDEX.md # Calibration source title in generated index
-.claude/rubrics/composition-presets/frontend-app.md # Published research attribution for rubric weighting
-.claude/rubrics/craft.md # Published research attribution for rubric rationale
-.claude/rubrics/design-quality.md # Published research attribution for rubric rationale
-.claude/rubrics/functionality.md # Published research attribution for active verification rationale
-.claude/rubrics/originality.md # Published research attribution for rubric rationale
-.claude/rubrics/product-depth.md # Published research attribution for rubric rationale
-.claude/rubrics/ux-usability.md # Published research attribution for rubric rationale
+.claude/skills/rubric/rubrics/RUBRICS_INDEX.md # Calibration source title in generated index
+.claude/skills/rubric/rubrics/composition-presets/frontend-app.md # Published research attribution for rubric weighting
+.claude/skills/rubric/rubrics/craft.md # Published research attribution for rubric rationale
+.claude/skills/rubric/rubrics/design-quality.md # Published research attribution for rubric rationale
+.claude/skills/rubric/rubrics/functionality.md # Published research attribution for active verification rationale
+.claude/skills/rubric/rubrics/originality.md # Published research attribution for rubric rationale
+.claude/skills/rubric/rubrics/product-depth.md # Published research attribution for rubric rationale
+.claude/skills/rubric/rubrics/ux-usability.md # Published research attribution for rubric rationale
 .claude/rules/meowkit-core.md # Always-on file title plus the verbatim host-runtime compaction instruction
 .claude/skills/agent-detector/references/model-selection-rules.md # Host-runtime model-selection adapter; the runtime name is the adapter's subject
 .claude/skills/context-engineering/references/pattern-index.md # Research-source catalog preserves provider names

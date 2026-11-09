@@ -2,9 +2,11 @@
 // hook-logger.cjs — append-only record of hook fires.
 //
 // Two separate streams exist on purpose and must not be merged: this one is
-// internal fire telemetry (gitignored, read often, kept uncompressed so it stays
-// greppable), while the trace log is shared history that may be committed and is
-// gzipped when it rotates.
+// internal fire telemetry (read often, kept uncompressed so it stays greppable),
+// while the trace log is shared history that may be committed and is gzipped when
+// it rotates. Both live in the append-log class of the runtime state tree — a log
+// written inside the kit tree is local state in the directory the release archive
+// is built from, and it showed up as untracked residue in a fresh install.
 //
 // Every failure here is swallowed. Telemetry that can break a hook chain is
 // worse than no telemetry.
@@ -12,9 +14,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+const { telemetryDir } = require('./meowkit-paths.cjs');
+
 const MAX_BYTES = 50 * 1024 * 1024;
 
-const logDir = (root) => path.join(root, '.claude/hooks/.logs');
+const logDir = (root) => telemetryDir(root);
 
 /** `YYMMDD-HHMMSS` in local time, matching how rotated files have always been named. */
 function rotationStamp(now) {

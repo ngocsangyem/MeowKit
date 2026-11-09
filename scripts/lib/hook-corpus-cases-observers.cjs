@@ -100,8 +100,8 @@ const cases = [
     entrypoint: `${H}/capability-bootstrap.sh`,
     name: 'capabilitybootstrap-file-present',
     stdin: sessionStart(),
-    setupDescription: 'a capability-bootstrap.md sibling of the hooks dir',
-    setup: (ctx) => F.writeFile(ctx.projectDir, '.claude/capability-bootstrap.md', '# Capability resolution\n\nUse mk:docs-finder.\n'),
+    setupDescription: 'a capability-bootstrap.md in the hooks references dir',
+    setup: (ctx) => F.writeFile(ctx.projectDir, '.claude/hooks/references/capability-bootstrap.md', '# Capability resolution\n\nUse mk:docs-finder.\n'),
   },
   {
     group: 'observer-capability-bootstrap',
@@ -109,7 +109,9 @@ const cases = [
     name: 'capabilitybootstrap-file-absent',
     stdin: sessionStart(),
     setupDescription: 'no capability-bootstrap.md (partial install)',
-    setup: () => {},
+    // The guidance file now lives inside the hooks tree, which the replay copies
+    // wholesale, so "absent" has to be made true rather than assumed.
+    setup: (ctx) => F.removePath(ctx.projectDir, '.claude/hooks/references/capability-bootstrap.md'),
   },
   {
     group: 'observer-jira-env-loader',

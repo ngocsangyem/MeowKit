@@ -18,7 +18,7 @@ export const BOOTSTRAP_END = "<!-- GENERATED:capability-bootstrap END -->";
 /** `.claude/`-relative path of the committed, generated bootstrap file the SessionStart
  * hook emits. Regenerate with `mewkit capabilities bootstrap --write`; a drift test guards
  * it against the source constant. */
-export const BOOTSTRAP_FILENAME = "capability-bootstrap.md";
+export const BOOTSTRAP_FILENAME = "hooks/references/capability-bootstrap.md";
 
 /** Providers with an authored bootstrap projection. The bootstrap TEXT is identical across
  * them — the resolver invocation (`mewkit capabilities resolve`) is CLI-universal; only the

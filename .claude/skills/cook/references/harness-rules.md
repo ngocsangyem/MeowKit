@@ -1,6 +1,6 @@
 # Harness Rules
 
-<!-- Canonical lifecycle source: .claude/workflow.yaml -->
+<!-- Canonical lifecycle source: .claude/skills/workflow-orchestrator/workflow.yaml -->
 <!-- autobuild pipeline steps are Step 0–6 (not Phase N) to avoid clashing with the 7 lifecycle phases. -->
 
 These rules govern the autonomous multi-hour build pipeline (`mk:autobuild`) and the generator/evaluator architecture.
@@ -57,7 +57,7 @@ The harness budget tracker (`mk:autobuild/scripts/budget-tracker.sh`) enforces t
 
 ## Rule 7: Dead-Weight Audit Mandatory on Model Upgrade
 
-Every harness component encodes an assumption about what the model CANNOT do. When a new model tier ships (e.g., Sonnet 4.6, Opus 4.7), the dead-weight audit MUST be run to verify each component is still load-bearing. The audit's cadence, measurement procedure, decision thresholds, and never-prune list are in `.claude/skills/benchmark/references/dead-weight-audit-rules.md`.
+Every harness component encodes an assumption about what the model CANNOT do. When a new model tier ships (e.g., Sonnet 4.6, Opus 4.7), the dead-weight audit MUST be run to verify each component is still load-bearing. The audit's cadence, measurement procedure, decision thresholds, and never-prune list are in `.claude/skills/benchmark/references/dead-weight-audit-rules.md` (this repository only — an installed kit does not carry it, and the audit is a maintainer procedure).
 
 **WHY:** Model upgrades can turn useful scaffolding into dead weight.
 

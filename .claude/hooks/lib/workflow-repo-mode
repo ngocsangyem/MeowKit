@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+'use strict';
+// workflow-repo-mode — decide whether this repository is worked solo or with others.
+//
+// Usage: eval "$(workflow-repo-mode)" → sets REPO_MODE to solo, collaborative or unknown
+//
+// The answer comes from committer concentration over the last 90 days on the
+// default branch: one author holding 80 % or more of the non-merge commits reads
+// as solo. Too little history to tell is reported as `unknown` rather than
+// guessed, because the callers use the answer to decide how much review
+// ceremony to ask for and a wrong `solo` silently removes a review step.
+
+const { spawnSync } = require('node:child_process');
+
+const SOLO_SHARE_PERCENT = 80;
+const MINIMUM_COMMITS = 5;
+
+/** A git invocation's trimmed stdout, or an empty string when git cannot answer. */
+function git(args) {
+  const result = spawnSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  return result.status === 0 && typeof result.stdout === 'string' ? result.stdout.trim() : '';
+}
+
+/** Whether a revision resolves in this repository. */
+function resolves(rev) {
+  return spawnSync('git', ['rev-parse', '--verify', rev], { stdio: 'ignore' }).status === 0;
+}
+
+/** The branch the shortlog is counted over — the remote's default, else whatever HEAD is. */
+function defaultBranch() {
+  const symbolic = git(['symbolic-ref', 'refs/remotes/origin/HEAD']);
+  if (symbolic !== '') return symbolic.replace(/^refs\/remotes\//, '');
+  if (resolves('origin/main')) return 'origin/main';
+  if (resolves('origin/master')) return 'origin/master';
+  return 'HEAD';
+}
+
+function answer(mode) {
+  process.stdout.write(`REPO_MODE=${mode}\n`);
+}
+
+const shortlog = git(['shortlog', '-sn', '--since=90 days ago', '--no-merges', defaultBranch()]);
+if (shortlog === '') {
+  answer('unknown');
+  process.exit(0);
+}
+
+const counts = shortlog
+  .split('\n')
+  .map((line) => Number.parseInt(line.trim(), 10))
+  .filter((count) => Number.isFinite(count));
+const total = counts.reduce((sum, count) => sum + count, 0);
+
+if (counts.length === 0 || total < MINIMUM_COMMITS) {
+  answer('unknown');
+  process.exit(0);
+}
+
+answer(Math.floor((counts[0] * 100) / total) >= SOLO_SHARE_PERCENT ? 'solo' : 'collaborative');

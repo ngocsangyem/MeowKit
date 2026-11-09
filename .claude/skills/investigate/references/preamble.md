@@ -8,16 +8,16 @@ mkdir -p .meowkit/state/sessions
 touch .meowkit/state/sessions/"$PPID"
 _SESSIONS=$(find .meowkit/state/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
 find .meowkit/state/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_PROACTIVE=$(.claude/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
+_PROACTIVE=$(.claude/hooks/lib/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
 echo "PROACTIVE: $_PROACTIVE"
-source <(.claude/scripts/bin/workflow-repo-mode 2>/dev/null) || true
+source <(.claude/hooks/lib/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
 _LAKE_SEEN=$([ -f .meowkit/state/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(.claude/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
+_TEL=$(.claude/hooks/lib/workflow-config get telemetry 2>/dev/null || true)
 _TEL_PROMPTED=$([ -f .meowkit/state/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"

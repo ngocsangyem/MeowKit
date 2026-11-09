@@ -4,12 +4,11 @@
 # The ranked next-steps feature is skill prose (no scanner script), so behavior isn't
 # directly CI-testable — but the SKILL.md CONTRACT is. This guards the load-bearing
 # surface: the four scan-source paths, the BLOCKED verdict enum (never a top-level FAIL
-# decision), the absent-file skip behavior, and the /mk:help command wrapper.
+# decision) and the absent-file skip behavior.
 
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SKILL="$ROOT/.claude/skills/help/SKILL.md"
-WRAPPER="$ROOT/.claude/commands/mk/help.md"
 
 PASS=0; FAIL=0; FAILED_NAMES=()
 assert() {
@@ -43,9 +42,6 @@ if grep -qiE 'absent|skip silently|skip; ' "$SKILL"; then assert "documents abse
 
 # Read-only / forward-looking split documented (no /mk:status duplication).
 assert "documents forward-looking vs /mk:status split" "$(grep -qF '/mk:status' "$SKILL" && echo 1 || echo 0)"
-
-# /mk:help command wrapper exists and points to mk:help.
-if [ -f "$WRAPPER" ] && grep -qF 'mk:help' "$WRAPPER"; then assert "/mk:help wrapper exists and points to mk:help" 1; else assert "/mk:help wrapper exists and points to mk:help" 0; fi
 
 # SKILL.md stays under the 500-line cap (skill-authoring Rule 3).
 LINES=$(wc -l < "$SKILL" | tr -d ' ')

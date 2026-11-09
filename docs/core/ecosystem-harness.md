@@ -15,7 +15,7 @@ Describe how MeowKit’s ecosystem integrates Claude Code runtime artifacts (tra
 
 ### 1) Claude Code entry document
 
-- `.claude/rules/meowkit-core.md` (always-on) is the canonical workflow summary that shapes all agent behavior; `.claude/workflow.yaml` is the machine-readable phase authority. The kit ships no root `CLAUDE.md`; a project may keep its own.
+- `.claude/rules/meowkit-core.md` (always-on) is the canonical workflow summary that shapes all agent behavior; `.claude/skills/workflow-orchestrator/workflow.yaml` is the machine-readable phase authority. The kit ships no root `CLAUDE.md`; a project may keep its own.
 
 Key characteristics:
 

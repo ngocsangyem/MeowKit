@@ -51,9 +51,9 @@ Provides a complete testing reference suite for the `tester` agent, covering the
 
 Two scripts provide ground-truth validation independent of LLM judgment. Must pass (exit 0) before shipping.
 
-**`.claude/scripts/validate.py`** — checks: type errors, lint violations, test suite passes, build succeeds, no TODO/FIXME/HACK without linked issue, no debug statements (`console.log`, `print`, `debugger`).
+**`.claude/skills/lint-and-validate/scripts/validate.py`** — checks: type errors, lint violations, test suite passes, build succeeds, no TODO/FIXME/HACK without linked issue, no debug statements (`console.log`, `print`, `debugger`).
 
-**`.claude/scripts/security-scan.py`** — checks: no secrets in code, no raw SQL with string interpolation, no `eval()`, no known critical dependency vulnerabilities, safe env var access, auth guards on protected routes.
+**`.claude/skills/lint-and-validate/scripts/security-scan.py`** — checks: no secrets in code, no raw SQL with string interpolation, no `eval()`, no known critical dependency vulnerabilities, safe env var access, auth guards on protected routes.
 
 Run at two mandatory gates: Phase 4 (Review) and Pre-Ship.
 

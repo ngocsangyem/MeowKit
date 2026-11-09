@@ -2,6 +2,34 @@
 
 One-time setup for the Confluence skill family. Cloud only.
 
+## Guided setup
+
+Walk a user through credential setup in this order. Every step is a precondition for the next —
+a wizard that skips to the prompt leaves credentials in a tree with no binary to use them.
+
+1. Verify the binary at `.meowkit/envs/confluence/bin/confluence-as`. Absent → `mewkit skill env confluence`,
+   which installs only what this skill pins.
+2. Ensure `.meowkit/.env` exists; create it empty if not, then `chmod 0600 .meowkit/.env`.
+3. Check for existing values: `grep -c '^MEOW_CONFLUENCE_' .meowkit/.env || true`. At 3 or more,
+   ask before overwriting, and **comment the old lines out rather than deleting them** — a
+   credential the user still needed is not recoverable from a delete.
+4. Ask for the three values interactively: site URL (validate that it ends in `.atlassian.net`),
+   the account email, and an API token generated at
+   https://id.atlassian.com/manage-profile/security/api-tokens.
+5. Append them to `.meowkit/.env` with `>>` redirection — never echo the token back, so the
+   value never enters the transcript.
+6. Re-run `chmod 0600 .meowkit/.env`.
+7. Validate: `bash .claude/skills/confluence/scripts/confluence-as.sh space list 2>&1 | head -20`.
+   Expect non-error JSON. On exit 2, 3 or 127, surface the exit code's meaning from the table
+   below and offer a retry rather than a second credential prompt.
+8. Optional once per install: `bash .claude/skills/confluence/scripts/smoke-live.sh`, which tells
+   the user whether `MEOW_CONFLUENCE_STDOUT_FILTER=trim-tail` applies to their version.
+9. On success, name one concrete next step — a page read through `mk:confluence-page`, or a spec
+   analysis through `mk:confluence-spec-analyst`.
+
+Server and Data Center URLs are refused at step 4, not at step 7: the whole family is Cloud-only,
+so collecting a token that cannot work is wasted and misleading.
+
 ## Required env vars
 
 Add three lines to `.meowkit/.env` (chmod 0600 recommended):
@@ -18,7 +46,7 @@ The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load 
 
 ## Install
 
-`.claude/scripts/bin/setup-workflow` auto-installs from `.claude/skills/confluence/scripts/requirements.txt`:
+`.claude/hooks/lib/setup-workflow` auto-installs from `.claude/skills/confluence/scripts/requirements.txt`:
 
 - `confluence-assistant-skills==0.2.0` — distribution package; ships the `confluence-as` binary
 - `assistant-skills-lib==1.0.1` — transitive infra dep
@@ -43,7 +71,7 @@ The wrapper exits 3 if `MEOW_CONFLUENCE_SITE_URL` does not end in `.atlassian.ne
 | 1    | Sanitizer rejection (CQL) |
 | 2    | Plaintext credential fallback detected — move to `.meowkit/.env` |
 | 3    | Non-Cloud URL — Server/DC not supported |
-| 127  | `confluence-as` binary not installed — run `.claude/scripts/bin/setup-workflow` |
+| 127  | `confluence-as` binary not installed — run `.claude/hooks/lib/setup-workflow` |
 | 4-7  | confluence-as runtime errors (network, auth, validation, server) |
 | 130  | SIGINT |
 

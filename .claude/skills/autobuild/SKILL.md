@@ -45,7 +45,7 @@ runtime: claude-code
 context_cost: high
 ---
 
-<!-- Lifecycle canonical source: .claude/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
+<!-- Lifecycle canonical source: .claude/skills/workflow-orchestrator/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
 
 # mk:autobuild — Autonomous Multi-Hour Build Orchestration
 
@@ -73,7 +73,7 @@ Skip when:
 4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
 5. **Run report mandatory** — every autobuild run produces `tasks/autobuild-runs/YYMMDD-{slug}/run.md` with full audit trail
 6. **Coexists with `mk:cook`** — does not replace it; both route through Gate 1 + Gate 2
-7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.claude/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `.claude/skills/cook/references/harness-rules.md`) is independent of TDD mode and always applies.
+7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.meowkit/state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `.claude/skills/cook/references/harness-rules.md`) is independent of TDD mode and always applies.
 
 ## `--advice` (composable, off by default)
 
@@ -92,7 +92,7 @@ five-round build makes no more calls than a one-round build.
 Without the flag there are zero calls and no state is written.
 
 Checkpoints: `references/advice-checkpoints.md`. Contract:
-`.claude/rules-conditional/advice-supervision-rules.md` (load only when the flag is present).
+`.claude/skills/advise/references/advice-supervision-rules.md` (load only when the flag is present).
 
 ## Workflow
 

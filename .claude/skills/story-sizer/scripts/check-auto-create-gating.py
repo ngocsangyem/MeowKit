@@ -155,7 +155,7 @@ def _fire_injection_audit(project_root: Path, record: dict, field: str, pattern:
     an absent, slow or broken scanner must not crash a gate that has already
     decided to refuse.
     """
-    auditor = project_root / ".claude/scripts/injection-audit.cjs"
+    auditor = project_root / ".claude/hooks/lib/injection-audit.cjs"
     if not auditor.exists():
         return
 

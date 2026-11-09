@@ -110,7 +110,7 @@ When a new model tier is rolled out (Sonnet 4.6, Opus 4.7, etc.), re-run a calib
 3. Verify the model's verdict matches the anchor's stated verdict
 4. If the model disagrees on >1 anchor, update the anchors (or downgrade the rubric's hard-fail threshold)
 
-The Phase 8 benchmark suite (`mk:benchmark`) automates this — run after every model rollout.
+The Phase 8 benchmark suite (`mk:benchmark`) automates this — run after every model rollout. It lives in this repository only, so an installed project runs the replay by hand.
 
 ## Adding a New Rubric — Checklist
 

@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest';
 
 const require_ = createRequire(import.meta.url);
 
-const CORE_REL = '.claude/scripts/lib/workflow-config-core.cjs';
+const CORE_REL = '.claude/hooks/lib/workflow-config-core.cjs';
 const STATE_REL = '.meowkit/state/workflow-state.json';
 
 interface ConfigCore {

@@ -46,10 +46,10 @@ mis-reported state.
 
 | Concern                                   | Mechanism                                          | Unit             |
 | ----------------------------------------- | -------------------------------------------------- | ---------------- |
-| Cost                                      | `/mk:budget` + `harness/scripts/budget-tracker.sh`  | USD              |
+| Cost                                      | `mewkit budget` + `harness/scripts/budget-tracker.sh`  | USD              |
 | Window utilization & structural overhead  | `/mk:context-audit`                                 | tokens / %       |
 
-`/mk:budget` answers "how much have we spent?" (monetary). `/mk:context-audit`
+`mewkit budget` answers "how much have we spent?" (monetary). `/mk:context-audit`
 answers "how much of the context window is consumed by always-on `.claude/`
 content?" (window utilization). The transcript cache answers "how big is the
 running conversation?" — orthogonal to both above.
@@ -63,7 +63,7 @@ percentages.
 
 Always-on rules: `.claude/rules/*.md` — auto-loaded by directory mechanism. Phase-zero conditional: same directory, but loaded explicitly by `mk:agent-detector` Step 0b only.
 
-Agile/Scrum: 3 conditional rules in `.claude/rules-conditional/agile-*.md` — loaded by `mk:agent-detector` Step 0b only when an Agile context is detected (sprint-state contract, `jira_tickets:` frontmatter, `MEOW_JIRA_SITE_URL` env, or Jira-key prompt match). Non-Agile sessions pay zero context cost.
+Agile/Scrum: 3 conditional rules in `.claude/skills/agent-detector/references/agile-*.md` — loaded by `mk:agent-detector` Step 0b only when an Agile context is detected (sprint-state contract, `jira_tickets:` frontmatter, `MEOW_JIRA_SITE_URL` env, or Jira-key prompt match). Non-Agile sessions pay zero context cost.
 
 ## Install Profiles & Packs (modular install)
 
@@ -160,5 +160,5 @@ deterministic, evidence-gated PR review as a `ReviewSession` under
   dispatcher and carry no agent id, so `session-observed` (Bash-hook-corroborated) is
   anti-accidental, not unforgeable, and proves session-level (not individual-reviewer)
   access; subagent-driven reviews are `attested` and cannot earn Approve. The Gate 2
-  narrow extension (`.claude/scripts/validate-review-coverage.cjs`, called from
+  narrow extension (`.claude/hooks/lib/validate-review-coverage.cjs`, called from
   `gate2-check.cjs`) validates a review verdict's embedded coverage block.

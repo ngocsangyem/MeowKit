@@ -93,11 +93,9 @@ If you need a comment to explain a name, rename it.
 
 | Script | Purpose | Command |
 |---|---|---|
-| `validate.py` | General validation | `.claude/skills/.venv/bin/python3 .claude/scripts/validate.py` |
-| `security-scan.py` | Security scanning | `.claude/skills/.venv/bin/python3 .claude/scripts/security-scan.py` |
-| `injection-audit.py` | Injection detection | `.claude/skills/.venv/bin/python3 .claude/scripts/injection-audit.py` |
-| `validate-docs.py` | Doc consistency | `.claude/skills/.venv/bin/python3 .claude/scripts/validate-docs.py` |
-| `checklist.py` | Checklist automation | `.claude/skills/.venv/bin/python3 .claude/scripts/checklist.py` |
+| `validate.py` | General validation | `node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/validate.py` |
+| `security-scan.py` | Security scanning | `node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/security-scan.py` |
+| `injection-audit.cjs` | Injection detection | `node .claude/hooks/lib/injection-audit.cjs` |
 
 ## Gotchas
 

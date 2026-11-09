@@ -8,8 +8,8 @@
 #      Patterns): hooks fire inside subagents → infinite loop. Absent key and empty
 #      array both satisfy the invariant (jq `// []` null-safe semantics).
 #   2. The five truly-retired rule files never reappear in .claude/rules/.
-#   3. No team-coordination rule file appears in always-loaded .claude/rules/ (or
-#      rules-conditional/) — team coordination is skill-local (mk:team-config).
+#   3. No team-coordination rule file appears in always-loaded .claude/rules/ —
+#      team coordination is skill-local (mk:team-config).
 #
 # Usage: bash tests/surface-contract.test.sh [repo-root]   (default: $(pwd))
 
@@ -51,7 +51,6 @@ check_invariants() {
   local root="$1"
   local settings="$root/.claude/settings.json"
   local rules="$root/.claude/rules"
-  local rulescond="$root/.claude/rules-conditional"
   local fails=0
 
   # Invariant 1
@@ -79,7 +78,7 @@ check_invariants() {
 
   # Invariant 3
   local dir
-  for dir in "$rules" "$rulescond"; do
+  for dir in "$rules"; do
     if [ -d "$dir" ] && find "$dir" -maxdepth 1 -name 'team-coordination*' 2>/dev/null | grep -q .; then
       echo "FAIL: team-coordination* file in $dir — team rules must be skill-local (mk:team-config), not always-loaded." >&2
       fails=$((fails+1))
@@ -92,7 +91,7 @@ check_invariants() {
 # Build a minimal clean tree (empty Subagent arrays, empty rules dir) for self-checks.
 make_clean_tree() {
   local d="$1"
-  mkdir -p "$d/.claude/rules" "$d/.claude/rules-conditional"
+  mkdir -p "$d/.claude/rules"
   cat > "$d/.claude/settings.json" <<'JSON'
 { "hooks": { "SubagentStart": [], "SubagentStop": [] } }
 JSON

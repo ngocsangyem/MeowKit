@@ -70,9 +70,9 @@ Constraints: [what must NOT change]
 
 ### Use `mk:delegate` to Build the Prompt
 
-For non-trivial delegations, prefer `/mk:delegate` to assemble the prompt from the template above. The command wizards through the 7 required fields, runs an injection-pattern guard on each user-provided field, and emits a ≤200-token prompt block for review before you paste into the Task tool. Compatible with all inner harnesses via `--silent` mode.
+For non-trivial delegations, prefer `mk:delegate` to assemble the prompt from the template above. It asks for the 7 required fields, runs an injection-pattern guard on each user-provided field, and emits a ≤200-token prompt block for review before you paste into the Task tool. Compatible with all inner harnesses via `--silent` mode.
 
-Distinct from `mk:spawn` — that command launches parallel agents in isolated worktrees (Conductor pattern). Use `mk:delegate` to build ONE clean prompt; use `mk:spawn` to coordinate MANY agents on non-overlapping files.
+Distinct from `mk:team-config` — that one sets up parallel agents in isolated worktrees (Conductor pattern). Use `mk:delegate` to build ONE clean prompt; use `mk:team-config` to coordinate MANY agents on non-overlapping files.
 
 ## Isolation Boundaries
 

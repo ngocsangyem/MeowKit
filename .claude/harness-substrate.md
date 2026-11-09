@@ -7,18 +7,18 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 
 | Responsibility | Coverage | Tagged | Active | Examples |
 | -------------- | -------- | -----: | -----: | -------- |
-| Task specification | ✅ covered | 9 | 9 | core-behaviors, meowkit-core, advise |
-| Context selection | ✅ covered | 6 | 6 | context-audit, capability-bootstrap, model-detector |
-| Tool access | ✅ covered | 3 | 3 | confluence-setup, upgrade, jira-env-loader |
-| Project memory | ✅ covered | 2 | 2 | retro, learning-observer |
-| Task state | ✅ covered | 7 | 7 | agent-conduct, agile-feedback-cycle, agile-sprint-commitment |
-| Observability | ✅ covered | 12 | 12 | workflow-evidence-rules, budget, docs-init |
-| Failure attribution | ✅ covered | 4 | 4 | advice-supervision-rules, fix, loop-detection |
-| Verification | ✅ covered | 7 | 7 | development-rules, review, test |
-| Permissions | ✅ covered | 4 | 4 | injection-rules, security-rules, audit |
+| Task specification | ✅ covered | 2 | 2 | core-behaviors, meowkit-core |
+| Context selection | ✅ covered | 5 | 5 | capability-bootstrap, model-detector, orientation-ritual |
+| Tool access | ✅ covered | 1 | 1 | jira-env-loader |
+| Project memory | ✅ covered | 1 | 1 | learning-observer |
+| Task state | ✅ covered | 3 | 3 | agent-conduct, auto-checkpoint, checkpoint-writer |
+| Observability | ✅ covered | 6 | 6 | append-trace, dispatch, control-probe |
+| Failure attribution | ✅ covered | 2 | 2 | loop-detection, posttoolfailure-probe |
+| Verification | ✅ covered | 4 | 4 | development-rules, build-verify, review-evidence-tag |
+| Permissions | ✅ covered | 3 | 3 | injection-rules, security-rules, privacy-block |
 | Entropy auditing | ✅ covered | 1 | 1 | budget-tracker |
 | Intervention recording | ⬜ missing | 0 | 0 | — |
-| Gate enforcement *(kit)* | ✅ covered | 11 | 11 | gate-rules, agile-story-gates, autobuild |
+| Gate enforcement *(kit)* | ✅ covered | 6 | 6 | gate-rules, gate-enforcement, pre-implement |
 
 **Coverage:** 11/12 responsibilities have active artifacts. Missing: Intervention recording.
-**Untagged:** 0 registry + 167 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).
+**Untagged:** 0 registry + 171 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).

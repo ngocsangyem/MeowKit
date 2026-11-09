@@ -20,7 +20,6 @@ export interface MigrateCliArgs {
 	"skip-hooks"?: boolean;
 	install?: boolean;
 	reconcile?: boolean;
-	"reinstall-empty-dirs"?: boolean;
 	"respect-deletions"?: boolean;
 	"source-version"?: string;
 	providers?: boolean;
@@ -71,7 +70,6 @@ export async function migrate(args: MigrateCliArgs): Promise<number> {
 		skipHooks: args["skip-hooks"],
 		install: args.install,
 		reconcile: args.reconcile,
-		reinstallEmptyDirs: args["reinstall-empty-dirs"],
 		respectDeletions: args["respect-deletions"],
 		sourceVersion: args["source-version"],
 		providers: args.providers,

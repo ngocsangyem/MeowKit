@@ -39,9 +39,9 @@ Files under these paths are ALWAYS skipped regardless of extension:
 
 ## Cache
 
-The hook hashes each file's content and stores the hash in `session-state/build-verify-cache.json`. If a file is edited and its hash is unchanged from the last build-verify run, the hook skips re-running the command (cached PASS).
+The hook hashes each file's content and stores the hash in `.meowkit/state/build-verify-cache.json`. If a file is edited and its hash is unchanged from the last build-verify run, the hook skips re-running the command (cached PASS).
 
-**Cache invalidation:** the cache is per-session. `session-state/` is cleared on new sessions. To force re-run, delete `session-state/build-verify-cache.json`.
+**Cache invalidation:** the cache is per-session. `.meowkit/state/` is cleared on new sessions. To force re-run, delete `.meowkit/state/build-verify-cache.json`.
 
 ## Settings
 

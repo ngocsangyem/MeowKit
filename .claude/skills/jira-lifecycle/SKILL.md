@@ -49,6 +49,7 @@ Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key 
 - Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - **Authoritative source for THIS project's workflow** (discovered, not templated):
   - `references/workflow-discovery.md` — discovery + caching protocol (READ FIRST)
+  - `references/workflow-cache-layout.md` — what the cache directory holds, and whether to commit it
   - `tasks/jira-workflows/<workflow-slug>.md` — discovered workflow definitions
   - `tasks/jira-workflows/_schemes/<PROJECT_KEY>.md` — project → workflow mapping
   - Discovery script: `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ...` — wrapped by `fetch-workflow.sh`

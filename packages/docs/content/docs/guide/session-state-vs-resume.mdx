@@ -3,11 +3,13 @@ title: "Session State vs Claude Code --resume"
 description: "How MeowKit's session-state layer differs from Claude Code's built-in --resume mechanism. They share a trigger word but operate at different layers and solve different problems."
 ---
 
-MeowKit's `session-state/` directory and Claude Code's built-in `--resume` flag share a trigger word ("session") but operate at different layers and solve different problems. **They are complementary, not redundant.** This page exists because the question keeps coming up, and the right framing prevents wrong cleanup.
+The directory this page is named after now lives at `.meowkit/state/`; "session state" is the layer, `.meowkit/state/` is where it is written, and the pre-move `session-state/` and `.claude/session-state/` are read-only leftovers.
+
+MeowKit's `.meowkit/state/` directory and Claude Code's built-in `--resume` flag share a trigger word ("session") but operate at different layers and solve different problems. **They are complementary, not redundant.** This page exists because the question keeps coming up, and the right framing prevents wrong cleanup.
 
 ## TL;DR
 
-| | Claude Code `--resume` | MeowKit `session-state/` |
+| | Claude Code `--resume` | MeowKit `.meowkit/state/` |
 |---|---|---|
 | **What it restores** | Conversation transcript (messages + tool calls) | Hook-layer enforcement state |
 | **Operates at** | Protocol / dialogue layer | Hook / runtime-policy layer |
@@ -21,7 +23,7 @@ MeowKit's `session-state/` directory and Claude Code's built-in `--resume` flag 
 The natural framing is "redundant or complementary?" That framing is wrong. It assumes both systems answer the same question. They don't.
 
 - **Claude Code's `--resume`** is a *conversation replay* mechanism. It reconstructs *what was said*. It has no opinion about what state the filesystem is in, whether a doom-loop guard should fire, or how many edits happened. It is a transcript.
-- **MeowKit's `session-state/`** is a *workflow enforcement* layer. It tracks *what the process did* — not what was said, but what was *executed*: build attempts, budget consumed, loop counters, model identity, stop-gate re-entries. These are behavioral guardrails, not memory.
+- **MeowKit's `.meowkit/state/`** is a *workflow enforcement* layer. It tracks *what the process did* — not what was said, but what was *executed*: build attempts, budget consumed, loop counters, model identity, stop-gate re-entries. These are behavioral guardrails, not memory.
 
 Different nouns wearing the same word. Claude Code's "session" is a *dialogue*. MeowKit's "session" is a *unit of workflow execution*. The right axis is **convo-layer vs enforcement-layer**, not redundant vs complementary.
 
@@ -31,7 +33,7 @@ The real question isn't "is session-state redundant?" The real question is: **"I
 
 </Callout>
 
-## Four things `session-state/` enables that `--resume` cannot
+## Four things `.meowkit/state/` enables that `--resume` cannot
 
 These are the concrete capabilities that make session-state load-bearing — capabilities that pure transcript replay cannot reconstruct.
 
@@ -80,12 +82,12 @@ A common over-claim is that the two layers are "fully orthogonal." That's too cl
 | ✓ Yes | Agent definitions | `.claude/agents/*.md` |
 | ✓ Yes | Project context | `docs/project-context.md` |
 | ✓ Yes | Durable task record — resume state + capability decisions (v2.13.5+) | `tasks/active/<id>.json` |
-| ✗ No | Edit counters (doom-loop) | `session-state/edit-counts.json` |
-| ✗ No | Build-skip cache | `session-state/build-verify-cache.json` |
-| ✗ No | Stop-gate re-entry counter | `session-state/precompletion-attempts.json` |
-| ✗ No | Live budget accumulator | `session-state/budget-state.json` |
-| ✗ No | Model tier + density | `session-state/detected-model.json` |
-| ✗ No | Git drift (last commit hash) | `session-state/checkpoints/checkpoint-latest.json` |
+| ✗ No | Edit counters (doom-loop) | `.meowkit/state/edit-counts.json` |
+| ✗ No | Build-skip cache | `.meowkit/state/build-verify-cache.json` |
+| ✗ No | Stop-gate re-entry counter | `.meowkit/state/precompletion-attempts.json` |
+| ✗ No | Live budget accumulator | `.meowkit/state/budget-state.json` |
+| ✗ No | Model tier + density | `.meowkit/state/detected-model.json` |
+| ✗ No | Git drift (last commit hash) | `.meowkit/state/checkpoints/checkpoint-latest.json` |
 
 The gap MeowKit fills is **specifically the runtime-policy state** — counters, caches, hashes, drift — that lives in files Claude Code does not load.
 
@@ -118,11 +120,11 @@ Most session-state files are wiped by `project-context-loader.cjs` on session-id
 | Question you're asking | Layer to think about |
 |---|---|
 | "What was said in the last conversation?" | `--resume` (transcript) |
-| "What was the agent doing when the session ended?" | `session-state/checkpoints/` (resume context) |
-| "Has the agent been editing the same file too many times?" | `session-state/edit-counts.json` (loop guard) |
-| "Did this session go over budget?" | `session-state/budget-state.json` (live) + `.meowkit/telemetry/cost-log.json` (historical) |
-| "Which model tier is this session running on?" | `session-state/detected-model.json` |
-| "Has the working directory drifted since last checkpoint?" | `session-state/checkpoints/checkpoint-latest.json` (git hash compare) |
+| "What was the agent doing when the session ended?" | `.meowkit/state/checkpoints/` (resume context) |
+| "Has the agent been editing the same file too many times?" | `.meowkit/state/edit-counts.json` (loop guard) |
+| "Did this session go over budget?" | `.meowkit/state/budget-state.json` (live) + `.meowkit/telemetry/cost-log.json` (historical) |
+| "Which model tier is this session running on?" | `.meowkit/state/detected-model.json` |
+| "Has the working directory drifted since last checkpoint?" | `.meowkit/state/checkpoints/checkpoint-latest.json` (git hash compare) |
 | "What rules and skills apply to this project?" | `.claude/rules/`, `.claude/skills/` (loaded by `--resume`) |
 | "What was the durable lesson from the last bug fix?" | `.meowkit/memory/gotchas.md` (grepped on demand by `mk:fix`) |
 

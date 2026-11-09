@@ -312,7 +312,6 @@ Flags:
   --skip-config             Do not convert configuration
   --skip-rules              Do not convert rules
   --skip-hooks              Do not convert hooks
-  --reinstall-empty-dirs    Recreate directories that were emptied by a prior run
   --respect-deletions       Honor deletions.json rather than reinstating removed files
   --all-rules               Merge every rule into the provider instruction file
   --include-mcp             Also convert .mcp.json servers into the provider MCP config

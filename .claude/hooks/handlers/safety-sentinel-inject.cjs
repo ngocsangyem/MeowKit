@@ -5,8 +5,8 @@
 // is observed by `mk:agent-detector` step-0/step-0b inside the skill
 // (Read-only context) to skip the 10-file rule load on turns 2..N.
 //
-// State format: single append-only JSONL log at
-// `session-state/session-sentinels.jsonl`. Two line shapes for a session:
+// State format: single append-only JSONL log in the session-marker state class,
+// `session-sentinels.jsonl`. Two line shapes for a session:
 //
 //   verification (Stop):   {"session_id":"<id>","safety":true,"phase_zero":true,"ts":"<iso>"}
 //   re-arm (PreCompact):   {"session_id":"<id>","event":"precompact_rearm","ts":"<iso>"}
@@ -38,7 +38,8 @@
 
 'use strict';
 const fs = require('fs');
-const path = require('path');
+
+const { projectRoot, sessionStateFile } = require('../lib/meowkit-paths.cjs');
 
 const STATE_FILE = 'session-sentinels.jsonl';
 
@@ -50,8 +51,8 @@ module.exports = async function (ctx /*, state */) {
   const sessionId = (ctx && ctx.session_id) || process.env.HOOK_SESSION_ID || '';
   if (!sessionId) return '';
 
-  const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-  const stateFile = path.join(root, 'session-state', STATE_FILE);
+  const root = projectRoot();
+  const stateFile = sessionStateFile(STATE_FILE, root);
 
   let raw;
   try {

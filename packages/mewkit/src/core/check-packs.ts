@@ -24,6 +24,11 @@ import type { Status } from "../commands/doctor-checks.js";
  * `hooks/lib/...`); a missing one makes a profile shippable without enforcement,
  * so each absence is a hard FAIL.
  *
+ * The three entrypoint paths were command files until the kit stopped shipping a
+ * command surface; they were renamed to the skill and reference that absorbed each
+ * job rather than dropped, because the invariant is "every profile can reach these
+ * jobs", not "these three files exist".
+ *
  * Two entries were removed when the shell runtime went away, both because the
  * thing they named no longer exists rather than because enforcement shrank:
  * `hooks/lib/read-hook-input.sh` was replaced by `hooks/lib/parse-stdin.cjs`,
@@ -48,10 +53,13 @@ export const SAFETY_PATHS = [
 	"hooks/lib/check-contract-signed.cjs",
 	"hooks/lib/validate-gate-2.cjs",
 	...ALWAYS_ON_RULE_PATHS,
-	// essential cross-profile commands — a profile without these has no /mk:plan etc.
-	"commands/mk/plan.md",
-	"commands/mk/upgrade.md",
-	"commands/mk/validate.md",
+	// Essential cross-profile entrypoints. Each names the surface that now owns a job
+	// the kit used to expose as its own slash command: planning, the self-update path,
+	// and deterministic validation. A profile missing one of these has no way to reach
+	// that job at all, which is why they sit in the safety list rather than in a pack.
+	"skills/plan-creator/SKILL.md",
+	"skills/help/references/cli.md",
+	"skills/lint-and-validate/SKILL.md",
 ];
 
 const PASS = (name: string, detail: string): CheckResult => ({ name, status: "pass", detail, section: "Packs" });

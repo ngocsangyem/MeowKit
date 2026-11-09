@@ -27,7 +27,7 @@ CSV match OVERRIDES manual classification. See `.claude/skills/agent-detector/re
 After complexity routing, detect TDD mode:
 
 1. Read `MEOWKIT_TDD` env var (or check if user passed `--tdd` on the slash command)
-2. Read `.claude/session-state/tdd-mode` sentinel (written by slash command dispatch when `--tdd` is detected)
+2. Read `.meowkit/state/tdd-mode` sentinel (written by slash command dispatch when `--tdd` is detected)
 3. Print: `TDD mode: ON | OFF` to acknowledge the routing decision
 4. **If ON:** route per the strict TDD pipeline — invoke `tester` for Phase 2 RED before `developer` in Phase 3
 5. **If OFF (default):** Phase 2 is optional — skip `tester` invocation unless explicitly requested or unless the plan's acceptance criteria require test coverage. Route directly from `planner` → `developer` → `reviewer`

@@ -59,8 +59,8 @@ Build the question payload using the option set above. Each option has `label` a
     "header": "Next Step",
     "options": [
       { "label": "Cook (Recommended)", "description": "Run /mk:cook to implement the plan" },
-      { "label": "Validate", "description": "Run /mk:plan validate for a critical-questions interview" },
-      { "label": "Red-team", "description": "Run /mk:plan red-team for adversarial review" },
+      { "label": "Validate", "description": "Run /mk:plan-creator validate for a critical-questions interview" },
+      { "label": "Red-team", "description": "Run /mk:plan-creator red-team for adversarial review" },
       { "label": "End", "description": "Stop here — review plan before deciding" }
     ],
     "multiSelect": false
@@ -94,12 +94,12 @@ Print exactly one line matching the selection:
 | Cook (parallel + TDD) | `Run: /mk:cook --parallel {absolute-path-to-plan.md} --tdd` |
 | Cook (fast mode) | `Run: /mk:cook --auto {absolute-path-to-plan.md}` |
 | Cook (fast + TDD) | `Run: /mk:cook --auto {absolute-path-to-plan.md} --tdd` |
-| Validate | `Run: /mk:plan validate {absolute-path-to-plan.md}` |
-| Red-team | `Run: /mk:plan red-team {absolute-path-to-plan.md}` |
+| Validate | `Run: /mk:plan-creator validate {absolute-path-to-plan.md}` |
+| Red-team | `Run: /mk:plan-creator red-team {absolute-path-to-plan.md}` |
 | Hand off to mk:autobuild | `Run: /mk:autobuild {absolute-path-to-plan.md}` |
 | End | (no command line — print "Plan complete. No next command queued.") |
 
-If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.claude/session-state/tdd-mode` surviving a fresh session.
+If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.meowkit/state/tdd-mode` surviving a fresh session.
 
 After the command line, print the Context Reminder block from `references/gate-1-approval.md` with the absolute path substituted.
 

@@ -57,6 +57,19 @@ function isCliBrandMention(line: string, index: number, token: string, codeFence
 	);
 }
 
+/**
+ * `.meowkit/...` is a filesystem path, not brand prose.
+ *
+ * The rule exists to keep canonical skill bodies free of vendor and product
+ * NAMES. The runtime-state tree is a directory a skill has to name exactly to be
+ * followed, and the dot-prefixed, slash-terminated form cannot be anything else.
+ * Without this, relocating state into that tree would make a provider-neutral
+ * skill read as branded for naming the directory its own output lands in.
+ */
+function isStateTreePath(line: string, index: number, token: string): boolean {
+	return line[index - 1] === "." && line.slice(index + token.length).startsWith("/");
+}
+
 /** Finds provider-specific prose in canonical skill bodies. Initial callers report, not block. */
 export function findGenericCoreTokens(root: string, scanDir = "skills"): GenericCoreTokenFinding[] {
 	const findings: GenericCoreTokenFinding[] = [];
@@ -66,7 +79,12 @@ export function findGenericCoreTokens(root: string, scanDir = "skills"): Generic
 			for (const rule of TOKEN_RULES) {
 				rule.pattern.lastIndex = 0;
 				for (const match of line.text.matchAll(rule.pattern)) {
-					if (rule.category === "brand" && isCliBrandMention(line.text, match.index ?? 0, match[0], line.codeFence))
+					const index = match.index ?? 0;
+					if (
+						rule.category === "brand" &&
+						(isCliBrandMention(line.text, index, match[0], line.codeFence) ||
+							isStateTreePath(line.text, index, match[0]))
+					)
 						continue;
 					findings.push({ file, line: line.line, token: match[0], category: rule.category });
 				}

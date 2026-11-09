@@ -1,0 +1,42 @@
+---
+title: "mk:arch"
+description: "Architecture Decision Record lifecycle — create, list, review and impact-analyse ADRs under docs/architecture/adr/."
+---
+
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/arch/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/arch/SKILL.md) |
+| **Owner** | `docs` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
+## What This Skill Does
+
+Owns the ADR lifecycle: assigns the next sequential number, delegates the decision body to the `architect` agent, writes `docs/architecture/adr/YYMMDD-title.md`, lists every ADR with its status, reviews an existing one, and analyses the architectural impact of a proposed change against the decisions already taken.
+
+## When to Use
+
+- A non-obvious architectural choice needs a durable record
+- Asking which decisions are still valid, superseded, or deprecated
+- Checking a proposed change against the ADRs it would touch
+
+**NOT for:** codebase deepening and boundary refactors (`mk:improve-codebase-architecture`); trade-off debate between options (`mk:party`).
+
+## Modes
+
+| Mode | Output |
+|---|---|
+| `new [title]` | A Proposed ADR at `docs/architecture/adr/YYMMDD-title.md`, printed for review |
+| `list` | Table of every ADR with status and superseding links |
+| `review [number]` | The ADR updated in place with a dated review note and, when warranted, a new status |
+| `impact [change]` | Affected components, affected ADRs, risk level, recommendation |
+
+## Pro Tips
+
+- A `review` never rewrites the original Context or Decision text. An ADR records what was decided when it was decided; editing that history makes it describe a system it never approved.
+- An `impact` conflict is the finding. Report it as a conflict, not as "mostly aligned".
+- Recording a decision approves nothing — an ADR is documentation, never gate authority.

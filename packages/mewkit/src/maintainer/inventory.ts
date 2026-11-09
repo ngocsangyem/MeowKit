@@ -157,7 +157,7 @@ export async function inventory(opts: InventoryOptions = {}): Promise<void> {
 	console.log(pc.bold(pc.cyan("MeowKit harness inventory")));
 	console.log(
 		pc.dim(
-			`${entries.length} artifacts — ${byType("skill")} skills, ${byType("agent")} agents, ${byType("rule")} rules, ${byType("command")} commands, ${byType("hook")} hooks`,
+			`${entries.length} artifacts — ${byType("skill")} skills, ${byType("agent")} agents, ${byType("rule")} rules, ${byType("hook")} hooks`,
 		),
 	);
 	console.log();

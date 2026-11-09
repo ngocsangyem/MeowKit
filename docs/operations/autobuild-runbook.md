@@ -139,7 +139,7 @@ The autobuild workflow reads `tasks/autobuild-runs/{run-id}/run.md` to find the 
 - **Cannot judge highly subjective taste** without rubric anchors — if the project has unique aesthetic constraints, write a custom rubric
 - **Cannot execute closed-source binaries** — the active-verification gate needs source-runnable build
 - **`--resume` is partial in v1.0** — the iteration counter resumes correctly, but step entry-point detection is manual: name the step to restart from when you re-invoke the run
-- **Spike plans (`--spike`) are INCOMPATIBLE with `mk:autobuild` FULL density mode.** Harness FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with a sprint-contract gate. Spikes skip Phase 2/Phase 5; the autobuild workflow flow breaks. Use `mk:cook` or `mk:plan-creator --fast` to run a spike. See `.claude/rules-conditional/agile-feedback-cycle.md` 2.
+- **Spike plans (`--spike`) are INCOMPATIBLE with `mk:autobuild` FULL density mode.** Harness FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with a sprint-contract gate. Spikes skip Phase 2/Phase 5; the autobuild workflow flow breaks. Use `mk:cook` or `mk:plan-creator --fast` to run a spike. See `.claude/skills/agent-detector/references/agile-feedback-cycle.md` 2.
 
 ## See Also
 

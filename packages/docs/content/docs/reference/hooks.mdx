@@ -16,8 +16,7 @@ These run automatically via Claude Code's hook system:
 | `post-write.cjs`        | PostToolUse | Edit, Write | Security scan: secrets, `any` type, SQL injection, XSS, destructive patterns              | Yes (exit 2) |
 | `learning-observer.cjs` | PostToolUse | Edit, Write | Detect churn patterns (file edited 3+ times); feeds into post-session retroactive capture | No           |
 | `post-session.cjs`      | Stop        | Session end | Record session data to `.meowkit/telemetry/`                                                 | No           |
-| `ensure-skills-venv.sh` | SessionStart | Session start | Idempotent bootstrap — creates `.claude/skills/.venv` if absent                         | No           |
-| `tdd-flag-detector.cjs`  | UserPromptSubmit | Prompt submit | Detects `--tdd` flag in user prompts, writes sentinel to `session-state/tdd-mode`      | No           |
+| `tdd-flag-detector.cjs`  | UserPromptSubmit | Prompt submit | Detects `--tdd` flag in user prompts, writes sentinel to `.meowkit/state/tdd-mode`      | No           |
 | `gate-enforcement.cjs`   | PreToolUse     | Edit, Write  | Blocks code writes before Gate 1 (plan approval) and sprint contract sign; validates contract file edits against schema | Yes (exit 1) |
 | `privacy-block.cjs`      | PreToolUse     | Read, Edit, Write, Bash | Blocks reads/writes of sensitive files (.env, keys, credentials, SSH) and SSRF-vulnerable web fetches | Yes (exit 2) |
 | `project-context-loader.cjs` | SessionStart | Session start | Loads project context, directory listing, tool availability, package scripts, preferences, and agent readiness score | No           |
@@ -49,7 +48,7 @@ These run when specific skills call them:
 The hook is a no-op unless TDD mode is ON via:
 
 - `MEOWKIT_TDD=1` env var (CI / shell rc, highest precedence)
-- `.claude/session-state/tdd-mode` sentinel file containing `on` (written by slash command `--tdd`)
+- `.meowkit/state/tdd-mode` sentinel file containing `on` (written by slash command `--tdd`)
 - `tdd: true` in `.meowkit/config.yaml`, or in `~/.meowkit/config.yaml` below it
 
 When TDD is OFF (the default), the hook exits 0 silently. When ON, it requires a failing test to exist for the feature being implemented and blocks otherwise. Bypass mechanisms: drop `--tdd`, unset `MEOWKIT_TDD`, set `tdd: false`.
@@ -65,7 +64,7 @@ These hooks are telemetry-only — they log event fires to verify Claude Code su
 
 ### `precompact-probe.cjs` — safety-baseline re-arm
 
-`precompact-probe.cjs` (PreCompact) is no longer telemetry-only. It still logs the event fire, then appends a re-arm marker to `session-state/session-sentinels.jsonl` for the active session. Compaction drops the safety-baseline rule text from context but leaves the per-session "verified" marker intact, so the re-arm marker invalidates that cached verification and the next turn re-reads the safety baseline. The cached-skip resumes only once a genuine re-read writes a newer verification. The hook never blocks (exit 0 on all paths) and no-ops when no session id is present.
+`precompact-probe.cjs` (PreCompact) is no longer telemetry-only. It still logs the event fire, then appends a re-arm marker to `.meowkit/state/session-sentinels.jsonl` for the active session. Compaction drops the safety-baseline rule text from context but leaves the per-session "verified" marker intact, so the re-arm marker invalidates that cached verification and the next turn re-reads the safety baseline. The cached-skip resumes only once a genuine re-read writes a newer verification. The hook never blocks (exit 0 on all paths) and no-ops when no session id is present.
 
 ## Hook runtime profiling
 
@@ -166,7 +165,7 @@ Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Classifies the written f
 
 ### `loop-detection` (handler)
 
-Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits keyed `{session_id}:{realpath}` in `session-state/edit-counts.json`. Warns at N≥4 (`@@LOOP_DETECT_WARN@@`) and escalates at N≥8 (`@@LOOP_DETECT_ESCALATE@@`) — doom-loop prevention per LangChain harness research. Never blocks; messages are fed back via stdout.
+Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits keyed `{session_id}:{realpath}` in `.meowkit/state/edit-counts.json`. Warns at N≥4 (`@@LOOP_DETECT_WARN@@`) and escalates at N≥8 (`@@LOOP_DETECT_ESCALATE@@`) — doom-loop prevention per LangChain harness research. Never blocks; messages are fed back via stdout.
 
 - **Opt-out:** `hooks.loop-detection: false`
 - **Timeout:** 3s
@@ -174,7 +173,7 @@ Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits ke
 
 ### `pre-completion-check.cjs`
 
-Fires on the **Stop** event (not SubagentStop). Hard gate: if no verification evidence exists (no evaluator verdict file, no signed sprint contract, no test-pass markers in the trace log), emits `{"decision":"block","reason":"…"}` JSON to block session close. 3-attempt re-entry guard per active plan slug via `session-state/precompletion-attempts.json`; after 3 attempts soft-nudges and allows stop to prevent infinite loop. LEAN density mode: soft nudge only. MINIMAL: skipped entirely.
+Fires on the **Stop** event (not SubagentStop). Hard gate: if no verification evidence exists (no evaluator verdict file, no signed sprint contract, no test-pass markers in the trace log), emits `{"decision":"block","reason":"…"}` JSON to block session close. 3-attempt re-entry guard per active plan slug via `.meowkit/state/precompletion-attempts.json`; after 3 attempts soft-nudges and allows stop to prevent infinite loop. LEAN density mode: soft nudge only. MINIMAL: skipped entirely.
 
 - **Opt-out:** `hooks.pre-completion-check: false`
 - **Density:** `MEOWKIT_AUTOBUILD_MODE=LEAN` → soft nudge; `MEOWKIT_AUTOBUILD_MODE=MINIMAL` → skip
@@ -198,7 +197,7 @@ node dispatch.cjs <EventName> [Matcher]
 
 | Handler | File | Event | Matcher | Stdin Fields Used | Output |
 |---------|------|-------|---------|-------------------|--------|
-| model-detector | `handlers/model-detector.cjs` | SessionStart | — | `model` | Writes `session-state/detected-model.json`; stdout model tier line |
+| model-detector | `handlers/model-detector.cjs` | SessionStart | — | `model` | Writes `.meowkit/state/detected-model.json`; stdout model tier line |
 | orientation-ritual | `handlers/orientation-ritual.cjs` | SessionStart | — | — | Resumes from checkpoint if exists |
 | build-verify | `handlers/build-verify.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Runs compile/lint; cached by file hash |
 | loop-detection | `handlers/loop-detection.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Warns at 4 edits, escalates at 8 |
@@ -221,12 +220,12 @@ node dispatch.cjs <EventName> [Matcher]
 
 | File                                        | Writer                                           | Purpose                                                        |
 | ------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
-| `session-state/edit-counts.json`            | `handlers/loop-detection.cjs`                    | Per-file edit counter, keyed `{session_id}:{realpath}`         |
-| `session-state/precompletion-attempts.json` | `pre-completion-check.cjs`                        | Pre-completion re-entry guard per plan slug                    |
-| `session-state/build-verify-cache.json`     | `handlers/build-verify.cjs`                      | File-content-hash cache for skip-on-unchanged                  |
-| `session-state/learning-observer.jsonl`     | `learning-observer.cjs`                           | Churn pattern log                                              |
-| `session-state/active-plan`                 | `mk:autobuild`, `mk:plan-creator`              | Currently active plan slug (read by `pre-completion-check.cjs`) |
-| `session-state/last-session-id`             | `project-context-loader.cjs`                      | Session change detection                                       |
+| `.meowkit/state/edit-counts.json`            | `handlers/loop-detection.cjs`                    | Per-file edit counter, keyed `{session_id}:{realpath}`         |
+| `.meowkit/state/precompletion-attempts.json` | `pre-completion-check.cjs`                        | Pre-completion re-entry guard per plan slug                    |
+| `.meowkit/state/build-verify-cache.json`     | `handlers/build-verify.cjs`                      | File-content-hash cache for skip-on-unchanged                  |
+| `.meowkit/state/learning-observer.jsonl`     | `learning-observer.cjs`                           | Churn pattern log                                              |
+| `.meowkit/state/active-plan`                 | `mk:autobuild`, `mk:plan-creator`              | Currently active plan slug (read by `pre-completion-check.cjs`) |
+| `.meowkit/state/last-session-id`             | `project-context-loader.cjs`                      | Session change detection                                       |
 
 ## Bypasses
 

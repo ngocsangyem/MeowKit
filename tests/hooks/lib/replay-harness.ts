@@ -16,6 +16,7 @@ import path from 'node:path';
 
 import { REPO_ROOT, caseFor, loadPinnedEnv } from './corpus-cases';
 import { dispatchedHandler, nodeEntrypoint, prepareDispatch } from './dispatch-replay';
+import { migrateSeededState, sideEffectContent } from './state-relocation';
 
 export { REPO_ROOT, nodeEntrypoint };
 export const GOLDEN_DIR = path.join(REPO_ROOT, 'tests/hooks/golden');
@@ -47,7 +48,6 @@ export function loadFixtures(): Fixture[] {
 /** The kit directories a hook under test may reach into. */
 const TREE = [
   '.claude/hooks',
-  '.claude/scripts',
   '.claude/skills/careful',
   '.claude/skills/freeze',
   '.claude/skills/investigate',
@@ -145,6 +145,7 @@ export function replay(fixture: Fixture, options: ReplayOptions = {}): ReplayRes
   fs.mkdirSync(home, { recursive: true });
   testCase.setup({ projectDir, home, ext: '.cjs' });
   options.seed?.(projectDir, home);
+  migrateSeededState(projectDir);
 
   const env: Record<string, string> = {};
   for (const [k, v] of Object.entries(fixture.env)) {
@@ -177,8 +178,8 @@ export function replay(fixture: Fixture, options: ReplayOptions = {}): ReplayRes
 
   const sideEffects: Record<string, string | null> = {};
   for (const rel of Object.keys(fixture.sideEffects ?? {})) {
-    const abs = path.join(projectDir, rel);
-    sideEffects[rel] = fs.existsSync(abs) ? norm(fs.readFileSync(abs, 'utf8')) : null;
+    const content = sideEffectContent(projectDir, rel);
+    sideEffects[rel] = content === null ? null : norm(content);
   }
 
   const stdout = norm(r.stdout ?? '');

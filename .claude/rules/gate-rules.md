@@ -1,6 +1,6 @@
 # Phase Gate Rules — HARD STOPS
 
-<!-- Canonical source: .claude/workflow.yaml -->
+<!-- Canonical source: workflow.yaml -->
 
 These are hard stops. No automation may bypass them. No agent may self-approve.
 
@@ -60,13 +60,13 @@ None. Every change ships through Gate 2 — regardless of mode (fast mode still 
 
 A change that ships no code has nothing to review: that is **N/A**, declared out loud, never silently skipped. `.claude/hooks/lib/gate2-check.cjs` enforces Gate 2 at commit, push and merge. Only the no-ship set is enumerated — `docs/**`, `tasks/reports/**`, `*.md` outside `.claude/**`; every other path, known or unknown, is ship-capable and REQUIRES Gate 2 (structural proof or hard block, exit 2). One ship-capable file makes the whole change ship-capable.
 
-The verdict comes from the active-plan pointer (`session-state/active-plan.json`), then `tasks/reviews/<YYMMDD>-<slug>-verdict.md`. Missing pointer, unresolvable slug, zero verdicts, or **more than one** match on a ship-capable change all **fail closed**; "most recent verdict wins" is forbidden — an unrelated review must never authorize this ship.
+The verdict comes from the active-plan pointer (`.meowkit/state/active-plan.json`), then `tasks/reviews/<YYMMDD>-<slug>-verdict.md`. Missing pointer, unresolvable slug, zero verdicts, or **more than one** match on a ship-capable change all **fail closed**; "most recent verdict wins" is forbidden — an unrelated review must never authorize this ship.
 
 The check proves only that such a verdict exists, names no FAIL dimension and no security BLOCK, and is bound to the shipped revision (names current HEAD). It is anti-accidental, not unforgeable: every artifact it reads is writable by the acting session. **A pass means the paperwork is present, self-consistent, and bound to this revision — not that a human approved.** No hook output and no evidence field (e.g. `approvals.gate2`) is approval proof.
 
 ## Reviewer Checklist — Gate Authority (standing item)
 
-`mewkit validate --gates` rejects only the KNOWN wordings that grant automated gate approval — a **floor, not the contract**, since any paraphrase walks through its fixed pattern set. So at Gate 2, whenever a change touches `.claude/rules/`, `.claude/rules-conditional/`, `.claude/modes/`, `.claude/agents/`, `.claude/skills/cook/`, `.claude/skills/fix/`, or `.claude/skills/autobuild/`, the reviewer MUST answer:
+`mewkit validate --gates` rejects only the KNOWN wordings that grant automated gate approval — a **floor, not the contract**, since any paraphrase walks through its fixed pattern set. So at Gate 2, whenever a change touches `.claude/rules/`, `.claude/agents/`, or `.claude/skills/{advise,agent-detector,autobuild,cook,fix}/`, the reviewer MUST answer:
 
 > **Does any prose in this change grant approval authority to something that is not a human — in any wording?**
 
@@ -92,4 +92,4 @@ Record a durable entry whenever a human overrides a blocked pattern, a gate is b
 
 **Rule 3 — Human-authorized only.** Only a human authorizes an intervention. The agent records it; it never self-authorizes a bypass and logs it as approved.
 
-Records live in `.claude/scripts/injection-audit.cjs` (STOP events) and in the active plan plus `.meowkit/telemetry/security-log` (overrides, gate exceptions).
+`.claude/hooks/lib/injection-audit.cjs` records STOP events; the active plan and `.meowkit/telemetry/security-log` record overrides and gate exceptions.

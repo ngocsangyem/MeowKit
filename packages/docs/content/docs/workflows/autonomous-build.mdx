@@ -162,7 +162,7 @@ The verdict file (`tasks/reviews/*-evalverdict.md`) contains:
 - **Hard-fail propagation** — any single rubric FAIL sets overall verdict to FAIL regardless of score (harness-rules.md Rule 3)
 - **Evidence directory** — screenshots, curl output, CLI logs used for grading
 
-A score ≥ 0.70 per rubric is PASS. Hard-fail threshold is configurable per rubric in `.claude/rubrics/`.
+A score ≥ 0.70 per rubric is PASS. Hard-fail threshold is configurable per rubric in `.claude/skills/rubric/rubrics/`.
 
 ## Troubleshooting
 
@@ -173,7 +173,7 @@ Detection reads the `model` field from SessionStart stdin. If your Claude Code b
 Pass a lower cap: `/mk:autobuild "..." --budget 30`. Or re-scope the product spec to fewer features — the planner's product-level output drives total work. `/mk:autobuild --no-boot` on an existing scaffold also reduces Phase 3 cost.
 
 **"Evaluator returned FAIL but the build looks fine to me"**  
-Open the evidence directory — the evaluator writes screenshots and curl output for every graded AC. Use `/mk:elicit` to re-examine a specific rubric with deeper elicitation methods. If the rubric anchors are miscalibrated for your project, see `.claude/rubrics/calibration-guide.md`.
+Open the evidence directory — the evaluator writes screenshots and curl output for every graded AC. Use `/mk:elicit` to re-examine a specific rubric with deeper elicitation methods. If the rubric anchors are miscalibrated for your project, see `.claude/skills/rubric/rubrics/calibration-guide.md`.
 
 **"Run interrupted mid-build"**  
 Autobuild checkpoints state to `tasks/autobuild-runs/{run-id}/run.md`. Resume with: `/mk:autobuild --resume autobuild-260408-1423-kanban`.

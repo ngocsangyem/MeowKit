@@ -6,12 +6,12 @@ import type { Status } from "../commands/doctor-checks.js";
 
 // Workflow drift detector.
 //
-// `.claude/workflow.yaml` is the single source of truth for the lifecycle. This
-// module parses it, then line-scans each prose file listed under `sources:` for
-// tokens that CONTRADICT the spec: a phase id bound to the wrong name, a
-// required-output path typo (tasks/review/ vs tasks/reviews/), an output glob
-// bound to the wrong gate, an `applies_to` list that drops a phase, or a Reflect
-// lead list that disagrees.
+// `.claude/skills/workflow-orchestrator/workflow.yaml` is the single source of
+// truth for the lifecycle. This module parses it, then line-scans each prose
+// file listed under `sources:` for tokens that CONTRADICT the spec: a phase id
+// bound to the wrong name, a required-output path typo (tasks/review/ vs
+// tasks/reviews/), an output glob bound to the wrong gate, an `applies_to` list
+// that drops a phase, or a Reflect lead list that disagrees.
 //
 // Boundary (honest): this is a TOKEN/LINE detector, not a prose NLP parser. It
 // guarantees phase names, gate-to-output binding, and required-output path
@@ -25,6 +25,14 @@ export interface Violation {
 	found: string;
 	expected: string;
 }
+
+/** Basename of the canonical spec. Also the pointer every prose source must carry:
+ * short on purpose, because two of those sources are always-loaded rules with a
+ * byte budget and the basename is unique in the kit. */
+const SPEC_FILENAME = "workflow.yaml";
+
+/** Location of the canonical spec, inside the skill that owns the lifecycle. */
+export const SPEC_REL = path.join(".claude", "skills", "workflow-orchestrator", SPEC_FILENAME);
 
 /** The canonical lifecycle, distilled from workflow.yaml into checkable sets. */
 export interface CanonicalSpec {
@@ -91,12 +99,12 @@ function outputDirOf(glob: string): string | null {
 }
 
 /**
- * Parse `.claude/workflow.yaml` into a CanonicalSpec. Throws WorkflowSpecError
+ * Parse the canonical workflow spec into a CanonicalSpec. Throws WorkflowSpecError
  * if the file is missing or unparseable — NEVER returns a degenerate "empty"
  * spec that would let drift pass silently.
  */
 export function loadWorkflowSpec(projectRoot: string): CanonicalSpec {
-	const specPath = path.join(projectRoot, ".claude", "workflow.yaml");
+	const specPath = path.join(projectRoot, SPEC_REL);
 	if (!fs.existsSync(specPath)) {
 		throw new WorkflowSpecError(`Canonical workflow spec missing: ${specPath}`, "missing");
 	}
@@ -205,7 +213,7 @@ export function scanForViolations(
 	const violations: Violation[] = [];
 	const lines = fs.readFileSync(abs, "utf-8").split("\n");
 	const body = lines.join("\n");
-	const canonicalPointer = "Canonical source: .claude/workflow.yaml";
+	const canonicalPointer = `Canonical source: ${SPEC_FILENAME}`;
 	if (!body.includes(canonicalPointer)) {
 		violations.push({ file: relPath, line: 0, found: "missing canonical source pointer", expected: canonicalPointer });
 	}

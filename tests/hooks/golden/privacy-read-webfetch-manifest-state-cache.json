@@ -1,0 +1,23 @@
+{
+  "name": "privacy-read-webfetch-manifest-state-cache",
+  "group": "privacy",
+  "base": null,
+  "entrypoint": ".claude/hooks/privacy-block.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\".meowkit/cache/web-fetches/index.jsonl\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "privacy-read-webfetch-manifest-state-cache",
+  "setupDescription": "BASE hook tree only; the manifest at the canonical cache root",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@PRIVACY_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@PRIVACY_BLOCK@@\nFile '.meowkit/cache/web-fetches/index.jsonl' is a web-to-markdown cache artifact.\nThe manifest contains browsing history; quarantined files contain injection-stopped content.\nReading these files may disclose browsing history OR re-inject untrusted content into agent context.\nUse AskUserQuestion to get explicit user approval before accessing.\n"
+  }
+}

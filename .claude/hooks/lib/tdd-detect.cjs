@@ -25,7 +25,23 @@ const TRUTHY = ['1', 'true', 'True', 'TRUE', 'yes', 'Yes', 'YES', 'on', 'On', 'O
 // the user believed the top one had.
 const FALSY = ['0', 'false', 'False', 'FALSE', 'no', 'No', 'NO', 'off', 'Off', 'OFF', 'disable', 'Disable', 'disabled', 'Disabled'];
 
-const SENTINEL_REL = '.claude/session-state/tdd-mode';
+const { LEGACY_STATE_RELS, sessionStateDir, sessionStateFile } = require('./meowkit-paths.cjs');
+
+const SENTINEL_BASENAME = 'tdd-mode';
+
+/** Where the sentinel is written. One location, so two writers cannot disagree. */
+const sentinelWritePath = (root) => path.join(sessionStateDir(root), SENTINEL_BASENAME);
+
+/**
+ * Every location a sentinel may be found, canonical first. Turning the mode OFF
+ * has to reach all of them: a pre-move file left behind would keep enforcement
+ * on after the user switched it off, which is the silent-relax failure this
+ * detector exists to prevent.
+ */
+const sentinelPaths = (root) => [
+  sentinelWritePath(root),
+  ...LEGACY_STATE_RELS.map((rel) => path.join(root, rel, SENTINEL_BASENAME)),
+];
 
 /** The `tdd` key from the project then the user file, or `undefined`. */
 function configTier(root) {
@@ -53,7 +69,7 @@ function isTddEnabled({ root = process.cwd(), env = process.env, warn = (m) => p
   }
 
   try {
-    const first = fs.readFileSync(path.join(root, SENTINEL_REL), 'utf8').split('\n')[0].replace(/\s/g, '');
+    const first = fs.readFileSync(sessionStateFile(SENTINEL_BASENAME, root), 'utf8').split('\n')[0].replace(/\s/g, '');
     if (first === 'on') return { enabled: true, source: 'sentinel' };
   } catch {
     // No sentinel: fall through to the config tiers.
@@ -65,4 +81,4 @@ function isTddEnabled({ root = process.cwd(), env = process.env, warn = (m) => p
   return { enabled: false, source: 'default' };
 }
 
-module.exports = { isTddEnabled, SENTINEL_REL };
+module.exports = { isTddEnabled, sentinelPaths, sentinelWritePath };

@@ -44,7 +44,7 @@ Story-sizer NEVER auto-invokes `/mk:scout`. This preserves the trust boundary do
 
 ## Agile Detection
 
-`agile_loaded` is set to `true` only if `mk:agent-detector` reports that `.claude/rules-conditional/agile-story-gates.md` is loaded for the current session. The scorer then emits a `dor_status` block per record; when `false`, the field is omitted silently.
+`agile_loaded` is set to `true` only if `mk:agent-detector` reports that `.claude/skills/agent-detector/references/agile-story-gates.md` is loaded for the current session. The scorer then emits a `dor_status` block per record; when `false`, the field is omitted silently.
 
 ## Filtering with --story <id>
 

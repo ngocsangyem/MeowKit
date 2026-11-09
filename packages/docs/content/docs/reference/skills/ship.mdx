@@ -110,7 +110,7 @@ Shipping requires an approved plan or review verdict: check `tasks/plans/` for a
 
 - **Version bump conflicts in monorepo**: Multiple packages bump the same version file → use per-package VERSION files; bump only the package being shipped
 - **CI passing locally but failing remotely**: Local env has different Node version or env vars → always verify CI status after push; don't merge on local-only results
-- **Inline lite design check runs only on frontend diffs**: The pre-landing review block calls `meowkit-diff-scope`. If `SCOPE_FRONTEND=false` the design check skips silently. If true, it reads `mk:review/design-checklist.md` and applies the 6-category pattern scan.
+- **Inline lite design check runs only on frontend diffs**: The pre-landing review block calls `workflow-diff-scope`. If `SCOPE_FRONTEND=false` the design check skips silently. If true, it reads `mk:review/design-checklist.md` and applies the 6-category pattern scan.
 
 ## Skill wiring
 
@@ -118,7 +118,7 @@ Shipping requires an approved plan or review verdict: check `tasks/plans/` for a
 
 ## Definition of Done prompts (Agile mode — Gate 2 PASS)
 
-Governed by `.claude/rules-conditional/agile-story-gates.md` Section 2 (loaded only when Agile context active).
+Governed by `.claude/skills/agent-detector/references/agile-story-gates.md` Section 2 (loaded only when Agile context active).
 
 After the verdict file is read at the start of the workflow:
 

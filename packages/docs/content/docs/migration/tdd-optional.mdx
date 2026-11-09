@@ -30,10 +30,10 @@ Pass `--tdd` to any cook/test/fix invocation:
 ```bash
 /mk:cook --tdd "build payment processor"
 /mk:fix --tdd "checkout total calculation off by one"
-/mk:test --tdd
+/mk:testing --tdd
 ```
 
-The slash command writes a sentinel file `.claude/session-state/tdd-mode` that hooks and downstream agents read. The sentinel persists for the session and is cleared at the next session start.
+The slash command writes a sentinel file `.meowkit/state/tdd-mode` that hooks and downstream agents read. The sentinel persists for the session and is cleared at the next session start.
 
 ### Per-shell (recommended for CI / production projects)
 

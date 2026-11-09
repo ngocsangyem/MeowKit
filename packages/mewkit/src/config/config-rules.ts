@@ -85,7 +85,7 @@ export function applyRules(values: ConfigValues, observerNames: readonly string[
 				"state-only-key",
 				key,
 				`${key} is not a config key in the ${scope}: ${STATE_ONLY_KEYS[key]}`,
-				`remove the key and run .claude/scripts/bin/workflow-config set ${key} true, which records it in .meowkit/state/`,
+				`remove the key and run .claude/hooks/lib/workflow-config set ${key} true, which records it in .meowkit/state/`,
 			);
 		}
 

@@ -20,7 +20,7 @@ set -u
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 repo_root="$(cd "$script_dir/../../../.." && pwd)"
-rubrics_dir="$repo_root/.claude/rubrics"
+rubrics_dir="$repo_root/.claude/skills/rubric/rubrics"
 presets_dir="$rubrics_dir/composition-presets"
 
 if [ ! -d "$rubrics_dir" ]; then

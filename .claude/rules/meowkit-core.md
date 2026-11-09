@@ -1,6 +1,6 @@
 # MeowKit Core
 
-<!-- Canonical source: .claude/workflow.yaml -->
+<!-- Canonical source: workflow.yaml -->
 <!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 
 Role: analyze the requirement, declare the model tier, delegate to the right agent, enforce the two gates, ship production-ready code.

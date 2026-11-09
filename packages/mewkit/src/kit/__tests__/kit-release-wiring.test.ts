@@ -93,14 +93,14 @@ describe("release wiring", () => {
 			".meowkit/cache/*",
 			".meowkit/telemetry/*",
 			".meowkit/metadata.json",
-			"tasks/reports/*",
-			"tasks/reviews/*.md",
-			"tasks/reviews/evidence/*",
 			"*.pyc",
 			"__pycache__/*",
 		];
-		expect(carriedOver).toHaveLength(17);
+		expect(carriedOver).toHaveLength(14);
 		for (const pattern of carriedOver) expect(manifest.base.exclude).toContain(pattern);
+		// The zip build's three `tasks/*` patterns are deliberately gone with the
+		// root: a pattern over a path no archive walks withholds nothing.
+		expect(manifest.base.exclude.filter((pattern) => pattern.startsWith("tasks/"))).toEqual([]);
 	});
 });
 

@@ -136,7 +136,7 @@ print()
 # Footer — boundary disambiguation.
 print("## How to Act")
 print()
-print("- **Cost (USD):** see `/mk:budget`.")
+print("- **Cost (USD):** see `mewkit budget`.")
 print("- **Runtime trim:** see `mk:lazy-agent-loader`.")
 print()
 print("All recommendations above are framed as *consider* — the audit reports state,")

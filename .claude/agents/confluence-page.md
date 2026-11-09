@@ -74,7 +74,7 @@ End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.
 2|Auth or settings.local.json fallback — wrapper rejected; user moves credentials to `.meowkit/.env`
 3|Cloud-only gate — site URL is non-Cloud; user uses MCP escape hatch per install-and-auth.md
 4|Network / DNS — retry once; check VPN
-5|Permission (401/403) — token may be rotated; user re-runs `/mk:confluence-setup`
+5|Permission (401/403) — token may be rotated; user re-runs the guided setup in `mk:confluence`
 ```
 
 ## Gotchas

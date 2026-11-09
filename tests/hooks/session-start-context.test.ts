@@ -77,21 +77,21 @@ describe('session-start context injection', () => {
   it('clears per-session state on a new session and leaves the plan pointer alone', () => {
     const root = project({
       '.claude/hooks/dispatch.cjs': '',
-      'session-state/edit-counts.json': '{"a":3}',
-      'session-state/session-sentinels.jsonl': '{"session_id":"old"}\n',
-      'session-state/active-plan.json': '{"path":"tasks/plans/261101-keep-me"}',
-      'session-state/precompletion-attempts.json': '{"keep-me":2}',
-      '.claude/session-state/tdd-mode': 'on\n',
+      '.meowkit/state/edit-counts.json': '{"a":3}',
+      '.meowkit/state/session-sentinels.jsonl': '{"session_id":"old"}\n',
+      '.meowkit/state/active-plan.json': '{"path":"tasks/plans/261101-keep-me"}',
+      '.meowkit/state/precompletion-attempts.json': '{"keep-me":2}',
+      '.meowkit/state/tdd-mode': 'on\n',
     });
     loader({ root, session_id: 'fresh' }, undefined, env);
 
-    expect(fs.readFileSync(path.join(root, 'session-state/edit-counts.json'), 'utf8')).toBe('{}');
-    expect(fs.readFileSync(path.join(root, 'session-state/session-sentinels.jsonl'), 'utf8')).toBe('');
-    expect(fs.existsSync(path.join(root, '.claude/session-state/tdd-mode')), 'test-first sentinel cleared').toBe(false);
+    expect(fs.readFileSync(path.join(root, '.meowkit/state/edit-counts.json'), 'utf8')).toBe('{}');
+    expect(fs.readFileSync(path.join(root, '.meowkit/state/session-sentinels.jsonl'), 'utf8')).toBe('');
+    expect(fs.existsSync(path.join(root, '.meowkit/state/tdd-mode')), 'test-first sentinel cleared').toBe(false);
     // Cross-session coordination state and the attempt cap must survive, or the
     // next session loses its plan and the completion loop loses its bound.
-    expect(fs.readFileSync(path.join(root, 'session-state/active-plan.json'), 'utf8')).toContain('261101-keep-me');
-    expect(fs.readFileSync(path.join(root, 'session-state/precompletion-attempts.json'), 'utf8')).toBe('{"keep-me":2}');
+    expect(fs.readFileSync(path.join(root, '.meowkit/state/active-plan.json'), 'utf8')).toContain('261101-keep-me');
+    expect(fs.readFileSync(path.join(root, '.meowkit/state/precompletion-attempts.json'), 'utf8')).toBe('{"keep-me":2}');
   });
 
   // A clone of a project whose `.claude/` is committed has every hook and no CLI.
@@ -169,10 +169,10 @@ describe('session-start context injection', () => {
   it('leaves per-session state alone when the session has not changed', () => {
     const root = project({
       '.claude/hooks/dispatch.cjs': '',
-      'session-state/last-session-id': 'same',
-      'session-state/edit-counts.json': '{"a":3}',
+      '.meowkit/state/last-session-id': 'same',
+      '.meowkit/state/edit-counts.json': '{"a":3}',
     });
     loader({ root, session_id: 'same' }, undefined, env);
-    expect(fs.readFileSync(path.join(root, 'session-state/edit-counts.json'), 'utf8')).toBe('{"a":3}');
+    expect(fs.readFileSync(path.join(root, '.meowkit/state/edit-counts.json'), 'utf8')).toBe('{"a":3}');
   });
 });

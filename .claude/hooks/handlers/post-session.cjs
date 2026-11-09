@@ -13,7 +13,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { scrubSecrets } = require('../lib/secret-scrub.cjs');
-const { sessionStateDir, telemetryDir } = require('../lib/meowkit-paths.cjs');
+const { sessionStateDir, sessionStateFile, telemetryDir } = require('../lib/meowkit-paths.cjs');
 const { resolveModel, UNKNOWN } = require('../lib/resolve-model.cjs');
 const { appendTrace } = require('../lib/trace-log.cjs');
 
@@ -56,7 +56,7 @@ function recentFileCount(root) {
  * into a history that may be committed.
  */
 function appendCostEntry({ root, telemetry, timestamp, sessionId, model }) {
-  const budgetFile = path.join(root, 'session-state/budget-state.json');
+  const budgetFile = sessionStateFile('budget-state.json', root);
   const costLog = path.join(telemetry, 'cost-log.json');
   if (!fs.existsSync(costLog)) writeAtomic(costLog, '[]');
   if (!fs.existsSync(budgetFile)) return;
@@ -124,7 +124,7 @@ function writeSentinel(root, sessionId, now) {
   if (process.env.MEOWKIT_SKIP_SAFETY_SENTINEL === 'off') return;
   if (!sessionId || !SAFE_SESSION_ID.test(sessionId)) return;
   try {
-    const dir = path.join(root, 'session-state');
+    const dir = sessionStateDir(root);
     fs.mkdirSync(dir, { recursive: true });
     const ts = now.toISOString().replace(/\.\d{3}Z$/, 'Z');
     fs.appendFileSync(
@@ -149,7 +149,7 @@ module.exports = function postSession(ctx, _state, now = new Date()) {
 
   let sessionId = ctx.session_id || '';
   if (!sessionId) {
-    try { sessionId = fs.readFileSync(path.join(root, 'session-state/last-session-id'), 'utf8').trim(); } catch { sessionId = ''; }
+    try { sessionId = fs.readFileSync(sessionStateFile('last-session-id', root), 'utf8').trim(); } catch { sessionId = ''; }
   }
   const model = resolveModel({ root, warn: () => {} });
 

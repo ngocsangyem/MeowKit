@@ -1,13 +1,23 @@
-// Data for `check-dangling-rule-refs.cjs`: the 19 rule files that moved out of
-// `.claude/rules/` to keep the always-on set small, the roots that are scanned for references to them, and the
+// Data for `check-dangling-rule-refs.cjs`: every rule file that moved out of an
+// always-listed rules directory into the skill that owns it, the roots that are scanned for references to them, and the
 // exhaustive exemption list. Kept separate so the check itself stays short.
 
 /**
- * The 19 moved rules.
+ * The moved rules.
  *   `to`      — the file's new location, or null when it has no destination file.
  *   `inlined` — its text was merged into another file, so a bare-name mention is
  *               always stale (there is nothing left to point at).
- *   `shipped` — false for the source-repo-only maintainer contract.
+ *   `shipped` — false when the destination does not reach an installed project:
+ *               either it lives outside `.claude/` entirely, or it lives inside a
+ *               skill the published kit withholds. A reader that follows the `to`
+ *               path from an install finds nothing, and that is the documented
+ *               answer rather than a dangling reference someone has to rediscover.
+ *   `citedByName` — the rule is loaded for a session by a dispatcher and then cited
+ *               by bare name in prose ("per `x.md` 2"), so a bare mention is a rule
+ *               citation rather than a path a reader would follow. Rule (b) does not
+ *               apply; (a) and (c) still do — and (a) reaches a citedByName entry
+ *               only because its pattern covers the `rules-conditional/` prefix as
+ *               well as `rules/`, which is where these three lived.
  */
 const MOVED = [
 	{ name: "harness-rules", to: ".claude/skills/cook/references/harness-rules.md" },
@@ -24,11 +34,49 @@ const MOVED = [
 	{ name: "context-budget-rules", to: ".claude/skills/agent-detector/references/context-budget-rules.md" },
 	{ name: "rubric-rules", to: ".claude/skills/rubric/references/rubric-rules.md" },
 	{ name: "skill-authoring-rules", to: ".claude/skills/skill-creator/references/skill-authoring-rules.md" },
-	{ name: "dead-weight-audit-rules", to: ".claude/skills/benchmark/references/dead-weight-audit-rules.md" },
+	{
+		name: "dead-weight-audit-rules",
+		to: ".claude/skills/benchmark/references/dead-weight-audit-rules.md",
+		shipped: false,
+	},
+	{ name: "advice-supervision-rules", to: ".claude/skills/advise/references/advice-supervision-rules.md" },
+	{ name: "workflow-evidence-rules", to: ".claude/skills/advise/references/workflow-evidence-rules.md" },
+	{
+		name: "agile-story-gates",
+		to: ".claude/skills/agent-detector/references/agile-story-gates.md",
+		citedByName: true,
+	},
+	{
+		name: "agile-sprint-commitment",
+		to: ".claude/skills/agent-detector/references/agile-sprint-commitment.md",
+		citedByName: true,
+	},
+	{
+		name: "agile-feedback-cycle",
+		to: ".claude/skills/agent-detector/references/agile-feedback-cycle.md",
+		citedByName: true,
+	},
+	{ name: "capability-bootstrap", to: ".claude/hooks/references/capability-bootstrap.md" },
 	{ name: "docs-reference-contract", to: "docs/maintainer/docs-reference-contract.md", shipped: false },
 	{ name: "step-file-rules", to: null, inlined: true },
 	{ name: "anti-rationalization", to: null, inlined: true },
 	{ name: "intervention-recording-rules", to: null, inlined: true },
+];
+
+/**
+ * Tombstones for content that moved as a whole directory, or as a file that is not a
+ * rule `.md` — neither shape fits `MOVED`, which is keyed on a rule basename, so
+ * without these a stale reference to the old location matches no rule and the check
+ * reports pass while verifying nothing for them.
+ *   `path` — the retired location, matched as a literal.
+ *   `to`   — the current location. A line that names it as well is a mapping line
+ *            (a canonical-path table, a destination table, a "do not use" column),
+ *            which is a reference a reader can follow rather than a dangling one.
+ */
+const RETIRED_PATHS = [
+	{ path: ".claude/rubrics/", to: ".claude/skills/rubric/rubrics/" },
+	{ path: ".claude/workflow.yaml", to: ".claude/skills/workflow-orchestrator/workflow.yaml" },
+	{ path: ".claude/rules-conditional/", to: ".claude/skills/agent-detector/references/" },
 ];
 
 /**
@@ -79,6 +127,10 @@ const EXEMPT = [
 		why: "published rules index carries the moved-rules table",
 	},
 	{ match: "tasks/", why: "plans, contracts and reports record the paths that were live when written" },
+	{
+		match: "docs/architecture/adr/260511-agile-scrum-conditional-rule-layer.md",
+		why: "dated decision record — its header already says the paths below are the ones that existed then",
+	},
 ];
 
 /** The 5 step-filed skills whose workflow.md carries the inlined step-file contract. */
@@ -105,6 +157,7 @@ const TEXT_EXTENSIONS = [
 
 module.exports = {
 	MOVED,
+	RETIRED_PATHS,
 	ROOTS,
 	PRUNED_PREFIXES,
 	PRUNED_SEGMENTS,

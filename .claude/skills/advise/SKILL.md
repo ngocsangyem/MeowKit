@@ -179,7 +179,7 @@ runs on the Fable 5 advisory profile.
 The harness has **no subagent pause/resume** (`.claude/skills/cook/references/orchestration-rules.md` → Rejected
 Patterns), so an interview cannot be one long-lived subagent. Each turn is a
 **fresh advisor spawn** given the checkpoint at
-`session-state/<advise-run>/transcript.json` plus the new answer. The
+`.meowkit/state/<advise-run>/transcript.json` plus the new answer. The
 orchestrator relays the user's answer **verbatim** and relays the advisor's
 question back — it never answers on the user's behalf, and never reconstructs
 the advisor's reasoning from its own context.
@@ -216,7 +216,7 @@ The advisor uses the A1 status block from `.claude/rules/agent-conduct.md` as th
 
 Only when the user asks. One canonical report at
 `tasks/reports/advise-<YYMMDD-HHMM>-<slug>.md` containing the packet. Nothing
-else is written outside `session-state/<advise-run>/`.
+else is written outside `.meowkit/state/<advise-run>/`.
 
 ## Routing Canaries
 

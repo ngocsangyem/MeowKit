@@ -1,54 +1,40 @@
-// What the published kit carries, checked against the repository.
+// What the published kit WITHHOLDS, checked against the repository.
 //
-// Two separate claims. The artifact must not carry maintainer artifacts, and the
-// REPOSITORY must still have every one of them, because the exclusions are from
-// the published archive and CI runs those files from the checkout.
-import { execFileSync } from "node:child_process";
+// The converse claims — that the artifact still carries everything a shipped file
+// reads, and that nothing was deleted from the checkout — live in
+// `ship-set-completeness.test.ts`. Both halves read the same two views from
+// `helpers/ship-set-view.ts`, because an exclusion is only correct when both hold.
 import { readFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const REPO = join(HERE, "..", "..", "..", "..", "..");
-const require = createRequire(import.meta.url);
+import { REPO, shipSetView } from "./helpers/ship-set-view.js";
 
-interface ShipSet {
-	excludeMatcher: (patterns: string[]) => (rel: string) => boolean;
-	shipSetExclusions: (root: string) => string[];
-}
-
-const shipSet = require(join(REPO, "scripts", "kit-ship-set.cjs")) as ShipSet;
-
-/** Every path the repository tracks, as the archive would see it. */
-function trackedPaths(): string[] {
-	return execFileSync("git", ["ls-files"], { cwd: REPO, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 })
-		.split("\n")
-		.filter((line) => line !== "");
-}
-
-describe("ship set", () => {
-	const patterns = shipSet.shipSetExclusions(REPO);
-	const isExcluded = shipSet.excludeMatcher(patterns);
-	const tracked = trackedPaths();
-	/** What the archive would carry: tracked, under an archive root, not excluded. */
-	const shipped = tracked.filter(
-		(path) =>
-			(path.startsWith(".claude/") || path.startsWith("tasks/") || path === "release-manifest.json" || path === ".meowkit/pack-manifest.json") &&
-			!isExcluded(path),
-	);
+describe("ship set withholding", () => {
+	const { patterns, isExcluded, tracked, shipped } = shipSetView();
 
 	it("carries no maintainer artifact", () => {
 		for (const pattern of [
 			/^\.claude\/settings\.json\.bak$/,
 			/^\.claude\/\.brand-allowlist\.txt$/,
-			/^\.claude\/scripts\/lint-brand-prose\.sh$/,
-			/^\.claude\/scripts\/check-anthropic-context\.py$/,
-			/^\.claude\/benchmarks\/results\//,
+			/^\.claude\/scripts\//,
+			// Measurement of the harness itself, and the skill that reads it. Both
+			// run from this repository; neither has a job in a user's project.
+			/^\.claude\/benchmarks\//,
+			/^\.claude\/skills\/benchmark\//,
+			// The substrate map is maintainer input to this repository's own
+			// inventory tooling.
+			/^\.claude\/harness-substrate\.md$/,
+			/^\.claude\/schemas\//,
+			// This repository's own evaluator memory. It was reaching every install.
+			/^\.claude\/agent-memory\//,
 			/^\.claude\/eval\//,
 			/^\.claude\/skills\/[^/]+\/eval\//,
+			// Run output written by a hook and by pytest. Both appear only because
+			// something ran here, and neither is authored content.
+			/^\.claude\/hooks\/\.logs\//,
+			/\/\.pytest_cache\//,
 			/\/__tests__\//,
 			/\/tests\//,
 			/\.test\./,
@@ -57,73 +43,46 @@ describe("ship set", () => {
 		}
 	});
 
-	it("carries workflow.yaml, because shipped files read it", () => {
-		expect(shipped).toContain(".claude/workflow.yaml");
-		const readers = execFileSync("git", ["grep", "-l", "workflow.yaml", "--", ".claude"], {
-			cwd: REPO,
-			encoding: "utf8",
-		})
-			.split("\n")
-			.filter((line) => line !== "" && !line.startsWith(".claude/worktrees/"));
-		expect(readers.length).toBeGreaterThan(1);
+	it("ships every schema from the CLI, not from the project", () => {
+		// A schema describes what the validator accepts, so it travels with the
+		// validator. A project copy is a second answer the code reading it can
+		// disagree with, and a project that never received one made the check
+		// report a fatal, or advise an upgrade that could not deliver it, instead
+		// of validating anything.
+		for (const name of ["skill-schema.json", "harness-metadata-schema.json"]) {
+			expect(shipped).not.toContain(`.claude/schemas/${name}`);
+			expect(tracked.filter((path) => path.endsWith(`/${name}`))).toEqual([`packages/mewkit/schemas/${name}`]);
+		}
 	});
 
-	it("narrows the three exclusions whose readers ship, by name", () => {
-		// The benchmark corpus is a USER-INVOCABLE skill's input, not run output.
-		expect(shipped.some((path) => path.startsWith(".claude/benchmarks/canary/"))).toBe(true);
-		expect(shipped).toContain(".claude/benchmarks/README.md");
+	it("narrows the exclusions whose readers ship, by name", () => {
 		// The shared eval adapter and the two skill eval scripts that `require` it
 		// go together: excluding either side alone leaves a broken `require`.
 		expect(patterns).toContain(".claude/eval/*");
 		expect(patterns).toContain(".claude/skills/*/eval/*");
-		// The brand allowlist and both scripts that read it go together: excluding
-		// the data alone would ship a script that fails on a missing file.
-		for (const pattern of [
-			".claude/.brand-allowlist.txt",
-			".claude/scripts/lint-brand-prose.sh",
-			".claude/scripts/check-anthropic-context.py",
-		]) {
-			expect(patterns).toContain(pattern);
+		// The brand allowlist is excluded by pattern; both scripts that read it live
+		// outside every archive root, so no exclusion can leave one of them shipping
+		// against data the artifact does not carry.
+		expect(patterns).toContain(".claude/.brand-allowlist.txt");
+		for (const script of ["scripts/lint-brand-prose.sh", "scripts/check-anthropic-context.py"]) {
+			expect(tracked).toContain(script);
+			expect(shipped).not.toContain(script);
 		}
 	});
 
-	it("ships no run output from tasks/, only its templates and the homes they live in", () => {
-		// The converse of the exclusion assertions above. Excluding a pattern proves
-		// that pattern is handled; it does not prove the directory is clean, and
-		// `tasks/` is archived WHOLE for its templates — so anything new dropped
-		// under it ships by default. This project's own contracts and phase plans
-		// were reaching every installed project that way.
-		const shippedTasks = shipped.filter((path) => path.startsWith("tasks/"));
-		for (const runOutput of [
-			/^tasks\/reports\//,
-			/^tasks\/reviews\/[^/]+\.md$/,
-			/^tasks\/reviews\/evidence\//,
-			/^tasks\/contracts\/[^/]+\.md$/,
-			/^tasks\/plans\/.+\//,
+	it("withholds the local state the archive walk reaches but git does not track", () => {
+		// The archive is built by walking the filesystem, so a path git never
+		// tracked still ships. Three classes reached every install that way: this
+		// repository's evaluator memory, the hook log, and a pytest cache. None is
+		// visible to the tracked-paths view above, so they are asserted against the
+		// matcher directly — the only view that sees them.
+		for (const local of [
+			".claude/agent-memory/evaluator/MEMORY.md",
+			".claude/hooks/.logs/hook-log.jsonl",
+			".claude/skills/web-to-markdown/.pytest_cache/CACHEDIR.TAG",
 		]) {
-			expect(shippedTasks.filter((path) => runOutput.test(path))).toEqual([]);
+			expect(isExcluded(local)).toBe(true);
 		}
-		// The directories still ship, so run output written later has a home that
-		// is already in place rather than created by whatever writes first.
-		for (const home of ["tasks/contracts/.gitkeep", "tasks/plans/.gitkeep", "tasks/reviews/.gitkeep"]) {
-			expect(shippedTasks).toContain(home);
-		}
-		// And the templates — the reason `tasks/` is archived at all — are still there.
-		expect(shippedTasks.some((path) => path.startsWith("tasks/templates/"))).toBe(true);
-	});
-
-	it("removes nothing from the repository", () => {
-		// The exclusions are from the ARTIFACT. CI runs these from the checkout, so
-		// excluding them from the archive must not have deleted any of them.
-		for (const path of [
-			".claude/eval/track-m-adapter-core.cjs",
-			".claude/.brand-allowlist.txt",
-			".claude/scripts/lint-brand-prose.sh",
-			".claude/skills/prompt-enhancer/eval/run-canaries.cjs",
-		]) {
-			expect(tracked).toContain(path);
-		}
-		expect(tracked.filter((path) => path.includes("/__tests__/")).length).toBeGreaterThan(0);
 	});
 
 	it("leaves no shipped file referring to an excluded one", () => {

@@ -132,7 +132,7 @@ The skeptic persona is re-anchored before each rubric, because grading gets more
 
 The verdict lands at `tasks/reviews/*-evalverdict.md` and holds per-rubric scores, an overall weighted score, and a pointer to the evidence directory with the screenshots and command output behind each grade.
 
-Two things to know before you read it. A rubric passes at 0.70, and any single rubric failing sets the overall verdict to FAIL no matter how good the weighted average looks. A strong average is exactly how an unshippable dimension hides. Both thresholds are configurable per rubric in `.claude/rubrics/`.
+Two things to know before you read it. A rubric passes at 0.70, and any single rubric failing sets the overall verdict to FAIL no matter how good the weighted average looks. A strong average is exactly how an unshippable dimension hides. Both thresholds are configurable per rubric in `.claude/skills/rubric/rubrics/`.
 
 ## When it goes wrong
 
@@ -140,7 +140,7 @@ Two things to know before you read it. A rubric passes at 0.70, and any single r
 
 **Budget breach partway through.** Lower the cap with `--budget 30`, or cut the product spec down; total work follows the planner's product-level output more than anything else. On an existing scaffold, `--no-boot` skips the setup cost.
 
-**The evaluator says FAIL and the build looks fine to you.** Open the evidence directory: there is a screenshot or command output behind every graded criterion. `/mk:elicit` re-examines a single rubric in more depth. If the anchors are simply wrong for your project, they are yours to recalibrate in `.claude/rubrics/`.
+**The evaluator says FAIL and the build looks fine to you.** Open the evidence directory: there is a screenshot or command output behind every graded criterion. `/mk:elicit` re-examines a single rubric in more depth. If the anchors are simply wrong for your project, they are yours to recalibrate in `.claude/skills/rubric/rubrics/`.
 
 **The run was interrupted.** State is checkpointed to `tasks/autobuild-runs/{run-id}/run.md`. Resume with `/mk:autobuild --resume {run-id}`.
 

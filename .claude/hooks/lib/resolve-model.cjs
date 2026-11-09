@@ -11,15 +11,16 @@
 // text substitution downstream, so a crafted identifier must not survive.
 
 const fs = require('node:fs');
-const path = require('node:path');
 
-const ARTIFACT_REL = 'session-state/detected-model.json';
+const { sessionStateFile } = require('./meowkit-paths.cjs');
+
+const ARTIFACT_BASENAME = 'detected-model.json';
 const UNKNOWN = 'unknown';
 
 const sanitize = (value) => String(value || '').replace(/[^a-zA-Z0-9._-]/g, '');
 
 function fromArtifact(root) {
-  const file = path.join(root, ARTIFACT_REL);
+  const file = sessionStateFile(ARTIFACT_BASENAME, root);
   let content;
   try { content = fs.readFileSync(file, 'utf8'); } catch { return ''; }
   try {

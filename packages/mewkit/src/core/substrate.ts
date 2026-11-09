@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { buildInventory, type InventoryEntry } from "./build-inventory.js";
+import { METADATA_SCHEMA_PATH, buildInventory, type InventoryEntry } from "./build-inventory.js";
 import type { CheckResult } from "../commands/validate.js";
 import type { Status } from "../commands/doctor-checks.js";
 
@@ -53,10 +53,9 @@ export interface SubstrateAggregate {
 }
 
 /** Load the allowed responsibility values from the schema; fall back to the taxonomy. */
-export function loadResponsibilityEnum(claudeDir: string): Set<string> {
-	const schemaPath = path.join(claudeDir, "schemas", "harness-metadata-schema.json");
+export function loadResponsibilityEnum(): Set<string> {
 	try {
-		const schema = JSON.parse(fs.readFileSync(schemaPath, "utf-8")) as {
+		const schema = JSON.parse(fs.readFileSync(METADATA_SCHEMA_PATH, "utf-8")) as {
 			properties?: { responsibility?: { enum?: string[] } };
 		};
 		const en = schema.properties?.responsibility?.enum;
@@ -76,7 +75,7 @@ function coverageOf(count: number, active: number): Coverage {
 /** Build the responsibility×coverage aggregate from the live inventory. */
 export function aggregateSubstrate(claudeDir: string): SubstrateAggregate {
 	const { entries } = buildInventory(claudeDir);
-	const allowed = loadResponsibilityEnum(claudeDir);
+	const allowed = loadResponsibilityEnum();
 
 	const byResp = new Map<string, InventoryEntry[]>();
 	const invalid: { path: string; value: string }[] = [];

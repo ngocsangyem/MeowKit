@@ -1,6 +1,6 @@
 // `mewkit advice begin|commit|status` — the parent-side surface for `--advice`.
 //
-// Canonical contract: `.claude/rules-conditional/advice-supervision-rules.md`.
+// Canonical contract: `.claude/skills/advise/references/advice-supervision-rules.md`.
 //
 // Skills are prose, so they cannot call the supervision core directly; this command
 // is how a checkpoint reaches it. That is the point of the split: the SKILL decides

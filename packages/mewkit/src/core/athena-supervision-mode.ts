@@ -1,6 +1,6 @@
 // Athena route contract — direct strategy consult vs embedded lifecycle supervision.
 //
-// Canonical contract: `.claude/rules-conditional/advice-supervision-rules.md` §11.
+// Canonical contract: `.claude/skills/advise/references/advice-supervision-rules.md` §11.
 // Cadence lives in `athena-supervision-protocol.ts`, continuity in
 // `athena-supervision-dossier.ts`.
 //

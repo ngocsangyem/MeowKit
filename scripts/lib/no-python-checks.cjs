@@ -92,7 +92,7 @@ function buildAuditCheck(ctx) {
 	return {
 		name: "injection-audit records a planted critical finding in the security log",
 		run: () => {
-			const script = path.join(ctx.repoRoot, ".claude", "scripts", "injection-audit.cjs");
+			const script = path.join(ctx.repoRoot, ".claude", "hooks", "lib", "injection-audit.cjs");
 			ctx.run(process.execPath, [script, ctx.fixtureRoot], { cwd: ctx.fixtureRoot });
 			const log = path.join(ctx.fixtureRoot, ".meowkit", "telemetry", "security-log.md");
 			if (!fs.existsSync(log)) return `no entry written to ${path.relative(ctx.fixtureRoot, log)}`;

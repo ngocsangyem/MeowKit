@@ -19,6 +19,9 @@
 //               while the decision, exit code and every other line match. These
 //               are listed by name and get a second, named substitution. This is
 //               the only deviation from whole-stream parity in the suite.
+//               One further deviation applies to SIDE EFFECTS, not to streams:
+//               a recorded state path is read from the class that content lives
+//               in now (`lib/state-relocation.ts`), content still compared whole.
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { resolveStateDir } from "../state/resolve-state-dir.js";
+import { resolveSessionStateFile, resolveStateDir } from "../state/resolve-state-dir.js";
 import type { CostEntry, LiveBudgetState } from "./budget-types.js";
 
 /**
@@ -46,7 +46,7 @@ export function resolveCurrentSessionId(projectRoot: string): string | null {
 		return envSessionId;
 	}
 
-	const lastSessionFile = path.join(projectRoot, "session-state", "last-session-id");
+	const lastSessionFile = resolveSessionStateFile(projectRoot, "last-session-id");
 	if (!fs.existsSync(lastSessionFile)) {
 		return null;
 	}
@@ -56,7 +56,7 @@ export function resolveCurrentSessionId(projectRoot: string): string | null {
 }
 
 export function readLiveBudgetState(projectRoot: string): LiveBudgetState | null {
-	const budgetStateFile = path.join(projectRoot, "session-state", "budget-state.json");
+	const budgetStateFile = resolveSessionStateFile(projectRoot, "budget-state.json");
 	if (!fs.existsSync(budgetStateFile)) {
 		return null;
 	}

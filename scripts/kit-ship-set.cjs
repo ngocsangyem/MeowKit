@@ -32,10 +32,15 @@ const PACK_MANIFEST_REL = path.join(".meowkit", "pack-manifest.json");
  * because the only symptom is that an INSTALLED project fails its pack check
  * while the source tree passes. Naming it here is what makes the manifest's
  * declaration and the archive agree.
+ *
+ * `tasks/` is deliberately NOT a root. It is where a project writes its own
+ * plans, contracts and verdicts, so archiving it made the kit carry empty
+ * marker files and this repository's own working artifacts into every install.
+ * Every writer under it creates the directory it needs on first write, and a
+ * gate reads an absent directory as "no plan" — the same block, never an error.
  */
 const ARCHIVE_TARGETS = [
 	".claude",
-	"tasks",
 	"release-manifest.json",
 	path.join(".meowkit", "pack-manifest.json"),
 	path.join(".meowkit", "harness-inventory.json"),

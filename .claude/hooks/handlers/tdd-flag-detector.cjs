@@ -12,7 +12,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { SENTINEL_REL } = require('../lib/tdd-detect.cjs');
+const { sentinelPaths, sentinelWritePath } = require('../lib/tdd-detect.cjs');
 
 const TURN_OFF = /--no-tdd|--tdd=off|--tdd off/;
 const TURN_ON_WORD = /--tdd(\s|$)/;
@@ -25,12 +25,13 @@ module.exports = function tddFlagDetector(ctx) {
   const prompt = String(data.prompt || data.user_prompt || '');
   if (!prompt) return null;
 
-  const sentinel = path.join(ctx.root, SENTINEL_REL);
+  const sentinel = sentinelWritePath(ctx.root);
 
   if (TURN_OFF.test(prompt)) {
     try {
-      if (!fs.existsSync(sentinel)) return null;
-      fs.rmSync(sentinel, { force: true });
+      const present = sentinelPaths(ctx.root).filter((p) => fs.existsSync(p));
+      if (!present.length) return null;
+      for (const p of present) fs.rmSync(p, { force: true });
       return { stderr: '[tdd] sentinel cleared by --no-tdd / --tdd=off\n' };
     } catch {
       return null;

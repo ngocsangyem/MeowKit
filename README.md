@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  125 skills &middot; 42 agents &middot; 27 commands &middot; 7 modes &middot; 7 rules &middot; 5 conditional rules &middot; 27 hook scripts &middot; 4-layer+ security
+  129 skills &middot; 42 agents &middot; 7 rules &middot; 27 hook scripts &middot; 4-layer+ security
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@ same skills and agents twice (`mewkit doctor` warns when it detects both).
 npx mewkit init
 ```
 
-The CLI fetches the latest release from GitHub, prompts for config, and scaffolds `.claude/` into your project. Skills resolve as `/mk:*`, agents as `mk:*`.
+The CLI fetches the latest release from GitHub, prompts for config, and scaffolds `.claude/` and `.meowkit/` into your project — the only two directories it adds. Skills resolve as `/mk:*`, agents as `mk:*`.
 
 ### Native plugin (recommended on Claude Code; experimental on Codex)
 
@@ -55,7 +55,7 @@ npx mewkit init --target claude-code --delivery plugin
 ```
 
 The plugin shape is produced by the install itself, which is why there is nothing to build ahead of
-time: the same emitter writes the kit's skills, agents, commands and hooks for both deliveries, and
+time: the same emitter writes the kit's skills, agents and hooks for both deliveries, and
 `--delivery plugin` adds the `.claude-plugin/plugin.json` manifest the host reads. There is no
 `build-plugin` verb, no committed `plugin/` payload, and no marketplace publication — MeowKit is not
 published to a plugin marketplace, so `claude plugin marketplace add` and its Codex equivalent have
@@ -70,9 +70,11 @@ After installing MeowKit, run:
 npx mewkit setup
 ```
 
-This creates the Python venv at `.claude/skills/.venv`, installs pip packages
-(`google-genai`, `pillow`, `python-dotenv`), and interactively prompts for
-optional system deps (ImageMagick, FFmpeg, Playwright browsers).
+This writes `.mcp.json` and `.meowkit/.env`, extends `.gitignore`, seeds
+`docs/project-context.md`, and prepares the per-skill Python environments under
+`.meowkit/envs/<skill>/` — one environment per skill, created on demand rather
+than one shared venv. `--system-deps` interactively prompts for optional system
+deps (ImageMagick, FFmpeg, Playwright browsers).
 
 Run once per project. Idempotent — safe to re-run after upgrades.
 
@@ -91,7 +93,7 @@ npx mewkit doctor     # Verify environment
 ## Requirements
 
 - Node.js 24+
-- Python 3.9+ (stdlib only, for validation scripts)
+- Python 3.9+ (optional — only for the skills that run Python; the core workflow needs none)
 - Git
 
 ## Project Structure
@@ -100,14 +102,11 @@ npx mewkit doctor     # Verify environment
 meowkit/
 ├── .claude/                  Source of truth — agents, skills, rules, hooks
 │   ├── agents/               42 specialist agents
-│   ├── skills/               125 skills (mk: namespace)
+│   ├── skills/               129 skills (mk: namespace) — 128 ship; benchmark is maintainer-only
 │   ├── rules/                7 enforcement rules (always-on)
-│   ├── hooks/                27 hook scripts — lifecycle hooks + handlers + libraries
-│   ├── commands/             27 slash commands
-│   ├── modes/                7 behavioral modes
-│   ├── scripts/              Python validators + shell utilities
+│   ├── hooks/                27 hook scripts — lifecycle hooks + handlers — plus their libraries
+│   ├── statusline.cjs
 │   └── settings.json
-├── tasks/                    Task templates
 ├── .meowkit/memory/          Team store: decisions.md + gotchas.md (committed)
 ├── packages/
 │   ├── mewkit/               CLI (npm as mewkit)

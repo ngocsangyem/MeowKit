@@ -109,7 +109,7 @@
     },
     "MEOWKIT_TOKEN": {
       "in": [
-        ".claude/scripts/check-anthropic-context.py"
+        "scripts/check-anthropic-context.py"
       ],
       "why": "not an environment name — a module-level compiled regex whose identifier happens to match the scan regex"
     },
@@ -210,7 +210,7 @@
       "name": "MEOWKIT_COMMAND",
       "class": "runtime-handoff",
       "key": "",
-      "reader": "scripts/injection-audit.cjs"
+      "reader": "hooks/lib/injection-audit.cjs"
     },
     {
       "name": "MEOWKIT_COMPLEXITY",

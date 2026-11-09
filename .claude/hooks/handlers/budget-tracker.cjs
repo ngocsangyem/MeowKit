@@ -72,7 +72,7 @@ module.exports = function budgetTracker(ctx, state) {
   if (budget.estimated_cost_usd >= blockThreshold) {
     budget.warnings_emitted += 1;
     state.save('budget-state', budget);
-    return `@@BUDGET_BLOCK@@\nEstimated cost: $${budget.estimated_cost_usd} (cap: $${blockThreshold}). Session budget exceeded.\nReview session-state/budget-state.json for details. Consider wrapping up.\n@@END_BUDGET@@\n`;
+    return `@@BUDGET_BLOCK@@\nEstimated cost: $${budget.estimated_cost_usd} (cap: $${blockThreshold}). Session budget exceeded.\nReview .meowkit/state/budget-state.json for details. Consider wrapping up.\n@@END_BUDGET@@\n`;
   }
 
   if (budget.estimated_cost_usd >= warnThreshold && budget.warnings_emitted === 0) {

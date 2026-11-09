@@ -6,7 +6,7 @@ description: "Install MeowKit and get it running in your project."
 ## Prerequisites
 
 - **Node.js** 24 or later
-- **Python** 3.9 or later. `mewkit setup` creates a virtualenv at `.claude/skills/.venv` and pip-installs `google-genai`, `pillow`, and `python-dotenv`, plus any per-skill `requirements.txt`
+- **Python** 3.9 or later, and only for the skills that run Python — the core workflow needs none. `mewkit setup` prepares one environment per skill under `.meowkit/envs/<skill>/` and installs that skill's own `requirements.txt` into it
 - **Git** installed and configured
 - **Claude Code** installed ([claude.ai/code](https://claude.ai/code))
 
@@ -27,7 +27,7 @@ On a fresh install the CLI prompts, in order:
 | Toolkits, a multiselect of Claude Code / Codex / Cursor | Claude Code preselected |
 | Install profile | `full` |
 | Project description (optional) | skipped |
-| Install Python skill dependencies into `.claude/skills/.venv` | no |
+| Install Python skill dependencies into `.meowkit/envs/<skill>/` | no |
 | Gemini API key (optional) | no |
 | Fallback API keys for external providers (optional) | no |
 

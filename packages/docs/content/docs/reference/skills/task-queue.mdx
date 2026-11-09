@@ -16,7 +16,7 @@ description: "Task claiming and ownership tracking for parallel agent execution 
 
 ## What This Skill Does
 
-Manages task assignment and file ownership during parallel agent execution. Tracks tasks in `session-state/task-queue.json` with a claiming protocol that prevents file conflicts between agents.
+Manages task assignment and file ownership during parallel agent execution. Tracks tasks in `.meowkit/state/task-queue.json` with a claiming protocol that prevents file conflicts between agents.
 
 ## When to Use
 
@@ -34,7 +34,7 @@ Manages task assignment and file ownership during parallel agent execution. Trac
 
 ## Workflow
 
-1. Orchestrator creates `session-state/task-queue.json` with tasks and ownership globs
+1. Orchestrator creates `.meowkit/state/task-queue.json` with tasks and ownership globs
 2. Agent requests next available task from orchestrator
 3. Orchestrator checks for ownership conflicts with other in_progress tasks
 4. If no conflict: assigns task, sets status=in_progress, records owner
@@ -63,7 +63,7 @@ Set up parallel task queue: 3 tasks — API endpoints (src/api/*), UI components
 ## Pro Tips
 
 - **Ownership globs must not overlap.** `src/api/*` and `src/api/auth/*` overlap — the more specific glob must be in the same task.
-- **Queue is ephemeral.** Lives in `session-state/`, cleared on new session. For persistent task tracking, use the plan's task system instead.
+- **Queue is ephemeral.** Lives in `.meowkit/state/`, cleared on new session. For persistent task tracking, use the plan's task system instead.
 - **Agents never self-claim.** Always request through the orchestrator to prevent race conditions on parallel reads of `task-queue.json`.
 
 > **Canonical source:** `.claude/skills/task-queue/SKILL.md`

@@ -7,7 +7,8 @@
 // Loadable files split across three tiers by HOW the harness loads them:
 //   - always-on:  rules/*.md                        — auto-loaded every session
 //                                                      (no kit-owned root CLAUDE.md ships)
-//   - conditional: rules-conditional/*.md           — loaded by agent-detector only
+//   - conditional: rules-conditional/*.md           — retired from the kit; still
+//     classified so an installed project that has not upgraded yet is measured
 //                                                      when its trigger fires (e.g. Agile)
 //   - on-demand:  agents, commands, SKILL.md        — loaded when the artifact activates
 // All three count toward the budget total; the tier split makes the always-on

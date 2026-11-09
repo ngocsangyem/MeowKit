@@ -26,7 +26,7 @@ Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 ### Phase 1 — Plan
 
 ```toon
-[9]{skill,owner,type,architecture}
+[10]{skill,owner,type,architecture}
 `mk:plan-creator`|planner|planning|step-file (v1.5.0: scope challenge, multi-file output, plan red team, sync-back, **--product-level mode** for green-field app builds via step-03a; **--deep mode** for per-phase scouting; **--tdd flag** injects TDD sections into phase files; **standalone subcommands**: archive/red-team/validate; outputs `red-team-findings.md`; solution design checklist in each phase; memory capture at Gate 1)
 `mk:plan-ceo-review`|planner|planning|monolithic (v2.0: layered verification pipeline — pre-screen + two-lens eval + severity tiers + adversarial necessity + append-only verdict)
 `mk:validate-plan`|planner|planning|monolithic
@@ -36,6 +36,7 @@ Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 `mk:party`|orchestrator/brainstormer|planning|monolithic
 `mk:advise`|advisor|planning|monolithic (interview one question at a time → user confirms a reframing of their problem → ONE verdict packet; never a plan/ADR/verdict; isolated advisor by default, disclosed inline fallback)
 `mk:planning-engine`|planner|planning|monolithic
+`mk:breakdown`|planner|planning|monolithic (spec/PRD → sized stories → optional tickets → codebase-aware tech breakdown; stops before plan creation)
 ```
 
 ### Phase 2 — Test RED
@@ -136,12 +137,12 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ```toon
 [10]{skill,owner,type,architecture}
 `mk:review`|reviewer|review|**step-file** (4 steps)
-`mk:rubric`|evaluator|review|monolithic (v1.0.0: 7 rubrics + 4 composition presets at .claude/rubrics/, weighted graded grading with PASS/WARN/FAIL anchors and load/compose/validate scripts; frontend-app preset pruned to 4 distinctive rubrics in v2.0.0 per audit 260408)
+`mk:rubric`|evaluator|review|monolithic (v1.0.0: 7 rubrics + 4 composition presets at .claude/skills/rubric/rubrics/, weighted graded grading with PASS/WARN/FAIL anchors and load/compose/validate scripts; frontend-app preset pruned to 4 distinctive rubrics in v2.0.0 per audit 260408)
 `mk:evaluate`|evaluator|review|**step-file** (v1.0.0: 5 steps — load-rubrics → boot-app → probe-criteria → grade-and-verdict → feedback-to-generator. Active-verification HARD GATE: validate-verdict.sh rejects PASS verdicts with empty evidence/. Skeptic persona enforced on every criterion grading.)
 `mk:sprint-contract`|developer (propose/amend) + evaluator (review)|planning|monolithic (v1.0.0, 130 lines: propose/review/amend/sign actions inline. Phase 4 file-based contract negotiation between generator and evaluator before source edits. Enforced by gate-enforcement.cjs; bypassable via MEOWKIT_AUTOBUILD_MODE=LEAN.)
 `mk:autobuild`|orchestrator (planner/developer/evaluator/shipper agents dispatched per step)|orchestration|**step-file** (v1.0.0: 7 steps — tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report. Adaptive density MINIMAL/FULL/LEAN. Budget tracker with $30 warn / $100 block. 6h hard timeout. Resumable via --resume.)
 `mk:trace-analyze`|researcher (3 parallel) + main agent synthesis|analysis|**step-file** (v1.0.0: 6 steps — ingest → partition → scatter → gather → suggestions → HITL gate. Reads `.meowkit/telemetry/trace-log.jsonl`, finds patterns via error-taxonomy, mandatory HITL approval. Anti-overfit threshold ≥3 occurrences.)
-`mk:benchmark`|orchestrator (invokes mk:autobuild per spec)|measurement|monolithic (v1.0.0: run/compare subcommands. Quick tier 5 tasks ≤$5; full tier 6 tasks ≤$30. Records to `.claude/benchmarks/results/{run-id}.json` + trace-log.jsonl. Backs the dead-weight audit with measured deltas.)
+`mk:benchmark`|orchestrator (invokes mk:autobuild per spec)|measurement|monolithic (v1.0.0: run/compare subcommands. Quick tier 5 tasks ≤$5; full tier 6 tasks ≤$30. Records to `.claude/benchmarks/results/{run-id}.json` + trace-log.jsonl. Backs the dead-weight audit with measured deltas. Maintainer-only: runs from the MeowKit repository and is not part of an installed kit.)
 `mk:elicit`|reviewer|review|monolithic
 `mk:review-pr`|reviewer|review|monolithic (v0.1.0: single shallow correctness/security/breaking/AI-slop pass on a GitHub PR → Summary/Risk/Findings/Verdict. Default prints; --reply posts via gh pr review. Read-only on code. Shallow lane vs mk:review's deep Gate-2 engine.)
 `mk:respond-pr`|reviewer|review|monolithic (v0.1.0: triage reviewer comments with receiving-review discipline — verify each vs codebase, then accept/push-back/clarify. Default dry; --reply posts in-thread. Never edits code — accepted items hand off to mk:fix.)
@@ -166,13 +167,14 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Phase 6 — Reflect
 
 ```toon
-[6]{skill,owner,type,architecture}
+[7]{skill,owner,type,architecture}
 `mk:document-release`|shipper/documenter|documentation|monolithic
 `mk:docs-init`|documenter|documentation|monolithic
 `mk:llms`|documenter|documentation|monolithic
 `mk:retro`|analyst/documenter|memory|monolithic
 `mk:context-audit`|documenter|documentation|monolithic
 `mk:prompt-enhancer`|documenter|documentation|monolithic
+`mk:status`|project-manager|documentation|monolithic (backward-looking delivery status for the active plan; report lands in the plan dir)
 ```
 
 ### Diagram (Any Phase)
@@ -201,14 +203,14 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Cross-Cutting (Any Phase)
 
 ```toon
-[17]{skill,owner,trigger}
+[19]{skill,owner,trigger}
 `mk:ask-me`|any agent|Evidence-grounded project Q&A — "how does X work here", claim-checks, constraint summaries — answered with cited `file:line` sources. Read-only; redirects ideation/decisions/debugging/review to the owning specialist skill.
 `mk:research`|researcher (delegated)|Deep multi-source technical research producing one cited report — technology evaluation, ecosystem comparison, standards fact-finding, "how do others solve X". Delegates to researcher subagent(s) under primary-source discipline + a retrieval-call cap; optional editorial HTML via `--html`. NOT single-library docs (see mk:docs-finder); NOT project-only Q&A (see mk:ask-me).
 `mk:careful`|any agent|Before destructive commands
 `mk:freeze`|any agent|Debug session scoping
 `mk:docs-finder`|any agent (primary: researcher)|Library/API documentation lookup
 `mk:multimodal`|any agent|Visual content analysis
-`mk:web-to-markdown`|any agent|Fetch arbitrary URLs as clean markdown — use when URL is not covered by mk:docs-finder. Static-only by default; Playwright opt-in via `.claude/scripts/bin/setup-workflow --system-deps`.
+`mk:web-to-markdown`|any agent|Fetch arbitrary URLs as clean markdown — use when URL is not covered by mk:docs-finder. Static-only by default; Playwright opt-in via `.claude/hooks/lib/setup-workflow --system-deps`.
 `mk:henshin`|any agent|Planning front door for wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. Adapted from external agentization patterns.
 `mk:preview`|any agent|Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, and git diffs. Display only; NOT for rendering a plan as HTML (mk:visual-plan), plan critique (mk:plan-ceo-review), or media generation (mk:multimodal).
 `mk:visual-plan`|any agent|Visual review of a plan (plan.md + phase-*.md). Default: structured visual-plan/plan.json artifact + local studio (view/edit/export) via the mewkit visual-plan CLI; `--static` renders the legacy single-file plan.html. Canonical plan-as-visual-review owner; NOT generic code/diagram/diff visuals (mk:preview), NOT plan critique (mk:plan-ceo-review).
@@ -218,6 +220,8 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:resolving-merge-conflicts`|git-manager|Resolve an in-progress git merge/rebase conflict — read state, recover each side's intent, resolve hunks, run checks, finish the merge/rebase. Most often during ship; always resolves (never --abort); NOT the full ship pipeline (see mk:ship)
 `mk:improve-codebase-architecture`|architect / any agent|Review codebase for deepening opportunities (shallow→deep modules), emit structured candidates for mk:preview to render, then grill a pick into a type-safe patch. Analysis + patch emission only; rendering delegated; NOT trade-off debate (see mk:party); NOT plan critique (see mk:plan-ceo-review)
 `mk:context-engineering`|orchestrator / any agent|Runtime router for context decisions — read-more/stop/ask/assume/delegate, minimal read-set, compaction timing. Routes to one of 25 context patterns per decision via a lazy index. NOT structural .claude/ overhead audit (see mk:context-audit); NOT persistence itself (see mk:memory)
+`mk:arch`|architect|Architecture Decision Record lifecycle — new/list/review/impact over `docs/architecture/adr/`. NOT codebase deepening (see mk:improve-codebase-architecture); NOT trade-off debate (see mk:party)
+`mk:delegate`|orchestrator|Build one context-isolated subagent prompt for review — no session history, injection-guarded fields, emitted rather than invoked. NOT a parallel team launcher (see mk:team-config)
 `mk:orchestrate`|orchestrator|Coordinate staged or parallel jobs across live-verified coding-agent runtimes (Claude Code, Codex, Cursor, other CLIs) and in-session subagents — capability/risk routing, worktree-isolated parallel writers, resumable runs, arbiter verification before handoff. NOT single-agent work or the in-session 7-phase flow (see mk:cook / mk:workflow-orchestrator)
 ```
 
@@ -225,21 +229,21 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 
 ```toon
 [15]{category,count}
-Planning|6
+Planning|7
 Testing|7
 Development|31
 Review|8
 Security|3
 Deployment|2
-Documentation|4
+Documentation|5
 Memory|2
 Utility|12
-Cross-Cutting|9
+Cross-Cutting|11
 Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
 Knowledge/Wiki|3
-**Total**|**125**
+**Total**|**129**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

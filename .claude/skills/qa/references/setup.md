@@ -259,7 +259,7 @@ Before falling back to git diff heuristics, check for richer test plan sources:
 
 1. **Project-scoped test plans:** Check `.meowkit/telemetry/` for recent `*-test-plan-*.md` files for this repo
    ```bash
-   eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
+   eval "$(.claude/hooks/lib/workflow-slug 2>/dev/null)"
    ls -t .meowkit/telemetry/*/*-test-plan-*.md 2>/dev/null | head -1
    ```
 2. **Conversation context:** Check if a prior `/mk:plan-ceo-review` or `/mk:plan-ceo-review` produced test plan output in this conversation

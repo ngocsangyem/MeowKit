@@ -96,7 +96,7 @@ See `references/install-and-auth.md` for one-time setup (`mewkit skill env jira`
 
 - `scripts/jira-as.sh` — env-translating wrapper (`MEOW_JIRA_*` → `JIRA_*`, sets `JIRA_OUTPUT=json`)
 - `scripts/jql-sanitize.sh` — JQL escaping for user-derived terms
-- `scripts/requirements.txt` — pip dependency manifest auto-discovered by `.claude/scripts/bin/setup-workflow`
+- `scripts/requirements.txt` — pip dependency manifest auto-discovered by `.claude/hooks/lib/setup-workflow`
 - `references/install-and-auth.md` — setup, exit codes, DC/mTLS caveats
 - `references/cli-idioms.md` — verified jira-as syntax + `jq` projection rules
 - `references/safety-framework.md` — 4-tier safety model

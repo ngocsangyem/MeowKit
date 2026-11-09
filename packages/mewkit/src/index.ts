@@ -460,7 +460,6 @@ async function main(): Promise<void> {
 				"skip-hooks": args["skip-hooks"] as boolean | undefined,
 				install: args.install as boolean | undefined,
 				reconcile: args.reconcile as boolean | undefined,
-				"reinstall-empty-dirs": args["reinstall-empty-dirs"] as boolean | undefined,
 				"respect-deletions": args["respect-deletions"] as boolean | undefined,
 				"source-version": args["source-version"] as string | undefined,
 				providers: args.providers as boolean | undefined,

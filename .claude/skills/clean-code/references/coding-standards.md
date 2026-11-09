@@ -72,8 +72,6 @@ If the harness ships shared validation scripts, prefer them over per-skill copie
 | `validate`           | General code validation     |
 | `security-scan`      | Security pattern scanning   |
 | `injection-audit`    | Prompt injection detection  |
-| `validate-docs`      | Documentation consistency   |
-| `checklist`          | Review checklist automation |
 
 Run them through the harness's configured script runner (the host resolves the interpreter and path).
 

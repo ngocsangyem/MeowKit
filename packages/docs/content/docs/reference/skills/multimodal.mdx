@@ -60,7 +60,7 @@ Analyzes non-text media files (images, video, audio, PDFs) using Gemini API. Gen
 | `document_converter.py` | `--files doc.pdf --output ./docs/ [--json] [--verbose]` |
 | `check_setup.py` | (no args) — verify API keys and dependencies |
 
-**Important path convention:** All scripts run via `.claude/skills/.venv/bin/python3` from the project root. Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
+**Important path convention:** All scripts run via `node .claude/hooks/lib/skill-python.cjs <script>` from the project root, which resolves this skill's own environment under `.meowkit/envs/multimodal/`. Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
 
 ## Models & Limits
 

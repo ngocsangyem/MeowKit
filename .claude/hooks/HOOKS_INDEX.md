@@ -12,8 +12,16 @@ the hook paths for one.
 
 The kit ships 27 node hooks: the 6 entrypoints directly under `hooks/`, which the host
 registers or an agent invokes, and the 21 observers under `hooks/handlers/`, which
-`dispatch.cjs` runs. Shared modules under `lib/` are not hooks — nothing invokes them as
-one — and neither are the sidecars (`HOOKS_INDEX.md`, `handlers.json`) or `__tests__/`.
+`dispatch.cjs` runs. Nothing under `lib/` is a hook — the host registers none of it — and
+neither are the sidecars (`HOOKS_INDEX.md`, `handlers.json`) or `__tests__/`.
+
+`lib/` holds two kinds of file, and the difference matters when reading a registration:
+the shared modules a hook `require`s, and the kit's own command-line tools, which a skill
+or an agent runs by path and no event ever starts — `injection-audit.cjs`,
+`skill-python.cjs`, `validate-workflow-evidence.cjs`, `validate-review-coverage.cjs`,
+`workflow-config`, `workflow-slug`, `workflow-repo-mode`, `workflow-diff-scope`,
+`workflow-review-log` and `setup-workflow`. They live beside the libraries because they
+share them and because the whole tree carries one runtime rule: node, and nothing else.
 
 Input arrives as JSON on stdin. A write guard reads it with the fail-closed reader
 (`lib/parse-stdin.cjs` `readHookInput`), which reports why input was unreadable so the
@@ -96,9 +104,8 @@ later; nothing is switchable yet.
 
 `.meowkit/telemetry/trace-log.jsonl` is the single canonical event stream: one record per
 event, written through a shared sidecar lock so a writer in another language cannot
-interleave with it, and scrubbed before the write. `.claude/hooks/.logs/hook-log.jsonl` is
-separate and internal — hook-fire telemetry, gitignored, kept uncompressed so it stays
-greppable.
+interleave with it, and scrubbed before the write. `.meowkit/telemetry/hook-log.jsonl` is
+separate and internal — hook-fire telemetry, kept uncompressed so it stays greppable.
 
 ## Drift checks
 

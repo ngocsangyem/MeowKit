@@ -28,7 +28,7 @@ export const GOLDEN_DIR = path.join(REPO_ROOT, 'tests/ports/golden');
  * reader and the key rules are one implementation, and a second copy under
  * `scripts/` would be a second answer to "what does this config say".
  */
-const TREE = ['.claude/scripts', '.claude/hooks/lib', '.claude/hooks/handlers.json'];
+const TREE = ['.claude/hooks/lib', '.claude/hooks/handlers.json'];
 
 export type Invocation = { kind: 'scan-dir'; args: string[] } | { kind: 'scan-one'; target: string } | { kind: 'config'; args: string[] };
 
@@ -107,8 +107,8 @@ function replayEnv(home: string, emptyBin: string): Record<string, string> {
 
 /** Map an abstract invocation onto the node implementation. */
 function commandFor(projectDir: string, invocation: Invocation): string[] {
-	if (invocation.kind === 'config') return [path.join(projectDir, '.claude/scripts/bin/workflow-config'), ...invocation.args];
-	const auditor = path.join(projectDir, '.claude/scripts/injection-audit.cjs');
+	if (invocation.kind === 'config') return [path.join(projectDir, '.claude/hooks/lib/workflow-config'), ...invocation.args];
+	const auditor = path.join(projectDir, '.claude/hooks/lib/injection-audit.cjs');
 	if (invocation.kind === 'scan-dir') return [auditor, ...invocation.args];
 	return [auditor, '--file', invocation.target];
 }

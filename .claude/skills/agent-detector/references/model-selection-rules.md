@@ -72,7 +72,7 @@ WHY: High-complexity domains carry risks where weaker-model savings are not wort
 
 For `mk:autobuild` runs, the model tier auto-selects a scaffolding density (`MINIMAL | FULL | LEAN`).
 
-**Auto-detection:** `handlers/model-detector.cjs` reads the `model` field from SessionStart stdin and writes tier + density to `session-state/detected-model.json`. `MEOWKIT_MODEL_HINT` is now a fallback, not a requirement. Detection cascade: (1) stdin `model` field, (2) `MEOWKIT_MODEL_HINT` env var, (3) default STANDARD/FULL.
+**Auto-detection:** `handlers/model-detector.cjs` reads the `model` field from SessionStart stdin and writes tier + density to `.meowkit/state/detected-model.json`. `MEOWKIT_MODEL_HINT` is now a fallback, not a requirement. Detection cascade: (1) stdin `model` field, (2) `MEOWKIT_MODEL_HINT` env var, (3) default STANDARD/FULL.
 
 **Density override:** `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` env var overrides auto-detected density.
 

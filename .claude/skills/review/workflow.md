@@ -8,7 +8,7 @@ Scope-aware parallel review with adversarial persona passes, forced-finding, and
 - Read the ENTIRE step file before executing any instruction in it.
 - Complete the current step before reading the next — NEVER skip steps or optimize the sequence.
 - Follow the step's instructions exactly — do not improvise, add steps, or deviate.
-- Persist intermediate state the next step needs: frontmatter variables, or `session-state/{skill}-progress.json` when it must survive a context reset.
+- Persist intermediate state the next step needs: frontmatter variables, or `.meowkit/state/{skill}-progress.json` when it must survive a context reset.
 - A step file that chains to `references/*.md` opens with a `## Contents` ToC, so a partial read lands on navigation.
 
 ## Rules

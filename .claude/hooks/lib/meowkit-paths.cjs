@@ -16,6 +16,16 @@ const path = require('node:path');
 
 const LEGACY_REL = path.join('.claude', 'memory');
 
+/**
+ * Where session markers used to live, newest-first: the project root and then
+ * inside the kit tree. A reader still accepts both so a project installed before
+ * the taxonomy settled keeps resolving its in-flight pointers, and so the ship
+ * guard's advice ("set session-state/active-plan.json") stays true for it. NO
+ * writer uses these — a write always lands in `state/`, so the legacy locations
+ * drain instead of filling.
+ */
+const LEGACY_STATE_RELS = ['session-state', path.join('.claude', 'session-state')];
+
 function projectRoot() {
   return process.env.CLAUDE_PROJECT_DIR || process.cwd();
 }
@@ -47,6 +57,22 @@ const telemetryDir = (root) => stateDir('telemetry', root);
 const sessionStateDir = (root) => stateDir('state', root);
 const cacheDir = (root) => stateDir('cache', root);
 
+/**
+ * A session marker to READ: the canonical path when it exists, else a pre-move
+ * path that does, else the canonical one — so an absent marker is reported at
+ * the location a writer would use. `rel` is a path relative to the state class,
+ * e.g. `active-plan.json` or `checkpoints/checkpoint-latest.json`.
+ */
+function sessionStateFile(rel, root = projectRoot()) {
+  const canonical = path.join(sessionStateDir(root), rel);
+  if (fs.existsSync(canonical)) return canonical;
+  for (const legacy of LEGACY_STATE_RELS) {
+    const candidate = path.join(root, legacy, rel);
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return canonical;
+}
+
 module.exports = {
   projectRoot,
   usingLegacyTree,
@@ -54,5 +80,7 @@ module.exports = {
   memoryDir,
   telemetryDir,
   sessionStateDir,
+  sessionStateFile,
   cacheDir,
+  LEGACY_STATE_RELS,
 };

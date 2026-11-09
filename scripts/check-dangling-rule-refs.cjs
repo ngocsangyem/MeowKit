@@ -1,14 +1,20 @@
 #!/usr/bin/env node
-// Dangling-reference check: the 19 rules that moved out of `.claude/rules/`
-// must leave no reference behind, and every one that kept a destination file must still be
+// Dangling-reference check: every rule that moved out of an always-listed rules
+// directory must leave no reference behind, and every one that kept a destination file must still be
 // loaded from somewhere. Three rules (data in ./dangling-rule-refs-data.cjs):
 //
-//   (a) 0 matches of `rules/<moved>.md` anywhere in the scan roots
+//   (a) 0 matches of `rules/<moved>.md` or `rules-conditional/<moved>.md` anywhere
+//       in the scan roots
 //   (b) inside `.claude/` and the provider bundles, a bare `<moved>.md` mention is only
 //       allowed as part of a path to that file's new location; a bare mention of an
-//       inlined/merged rule or of the source-repo-only contract is always stale
+//       inlined/merged rule or of the source-repo-only contract is always stale. Rules
+//       flagged `citedByName` are exempt from (b): they are dispatched by name and then
+//       cited by name in prose, so a bare mention there is a citation, not a path.
 //   (c) every moved file with a destination is named by >=1 load step; the inlined
 //       step-file contract is proven by the marker in all 5 step-filed workflows
+//   (d) a retired directory or non-rule file (the tombstones) is named only on a
+//       line that also names its current location — a mapping line, which is a
+//       reference a reader can follow rather than a dangling one
 //
 // Usage: node scripts/check-dangling-rule-refs.cjs [repo-root]
 //   exit 0  no dangling reference, every destination loaded
@@ -20,7 +26,7 @@ const path = require("node:path");
 
 const data = require("./dangling-rule-refs-data.cjs");
 
-const PREFIXED_RE = new RegExp(`rules/(${data.MOVED.map((m) => m.name).join("|")})\\.md`);
+const PREFIXED_RE = new RegExp(`rules(?:-conditional)?/(${data.MOVED.map((m) => m.name).join("|")})\\.md`);
 const BUNDLE_PREFIX = "packages/mewkit/src/migrate/modules/";
 
 /** Repo-relative POSIX path of every readable text file under the scan roots. */
@@ -100,8 +106,14 @@ function scan(root, files) {
 			if (prefixed) {
 				violations.push({ rel, line: i + 1, detail: `(a) old rule path: ${prefixed[0]}` });
 			}
+			for (const retired of data.RETIRED_PATHS) {
+				if (line.includes(retired.path) && !line.includes(retired.to)) {
+					violations.push({ rel, line: i + 1, detail: `(d) retired location: ${retired.path}` });
+				}
+			}
 			if (!isShippedProse(rel)) continue;
 			for (const moved of data.MOVED) {
+				if (moved.citedByName) continue;
 				const needle = `${moved.name}.md`;
 				let at = line.indexOf(needle);
 				while (at !== -1) {
@@ -158,7 +170,10 @@ function main(argv) {
 		console.error(`FAIL: ${total} dangling-reference violation(s).`);
 		return 1;
 	}
-	console.log(`OK: no dangling references; all ${destinationHits.size} destinations are loaded.`);
+	console.log(
+		`OK: no dangling references; all ${destinationHits.size} destinations are loaded, ` +
+			`${data.RETIRED_PATHS.length} retired locations unreferenced.`,
+	);
 	return 0;
 }
 

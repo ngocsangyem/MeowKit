@@ -12,9 +12,7 @@ import type { CheckResult } from "../commands/validate.js";
 interface ActualCounts {
 	skills: InventoryEntry[];
 	agents: InventoryEntry[];
-	commands: InventoryEntry[];
 	rules: InventoryEntry[]; // rules/
-	rulesConditional: InventoryEntry[]; // rules-conditional/
 	hooks: InventoryEntry[];
 }
 
@@ -25,9 +23,7 @@ function actualCounts(claudeDir: string): ActualCounts {
 	return {
 		skills: byType("skill"),
 		agents: byType("agent"),
-		commands: byType("command"),
 		rules: rules.filter((e) => e.path.startsWith("rules/")),
-		rulesConditional: rules.filter((e) => e.path.startsWith("rules-conditional/")),
 		hooks: byType("hook"),
 	};
 }
@@ -68,7 +64,6 @@ export function countSpecs(repoRoot: string): CountSpec[] {
 	return [
 		{ source: "README.md", label: "skills", pattern: /(\d+)\s+skills/g, actual: a.skills.length },
 		{ source: "README.md", label: "agents", pattern: /(\d+)\s+(?:specialist\s+)?agents/g, actual: a.agents.length },
-		{ source: "README.md", label: "commands", pattern: /(\d+)\s+(?:slash\s+)?commands/g, actual: a.commands.length },
 		{ source: "README.md", label: "rules", pattern: /(\d+)\s+(?:enforcement\s+)?rules/g, actual: a.rules.length },
 		{ source: "README.md", label: "hook scripts", pattern: /(\d+)\s+hook scripts/g, actual: a.hooks.length },
 		{

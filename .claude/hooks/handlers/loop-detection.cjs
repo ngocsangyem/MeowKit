@@ -2,7 +2,7 @@
 // Ported from post-write-loop-detection.sh. Same logic:
 //   track per-file edit count, warn at 4, escalate at 8.
 //
-// State: session-state/edit-counts.json keyed by {session_id}:{filepath}
+// State: edit-counts.json in the session-marker state class, keyed by {session_id}:{filepath}
 // Off switch: `hooks.loop-detection: false` in the project config.
 //
 // NOTE: Trace emission (append-trace.cjs) intentionally omitted from Node.js port.

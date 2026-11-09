@@ -15,7 +15,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { scrubSecrets } = require('./secret-scrub.cjs');
-const { telemetryDir } = require('./meowkit-paths.cjs');
+const { sessionStateFile, telemetryDir } = require('./meowkit-paths.cjs');
 const { resolveModel, UNKNOWN } = require('./resolve-model.cjs');
 const { withLock } = require('./sidecar-lock.cjs');
 
@@ -29,7 +29,7 @@ const sanitizeId = (value) => String(value || '').replace(/[^a-zA-Z0-9._-]/g, ''
 function resolveRunId(root, env) {
   if (env.MEOWKIT_RUN_ID) return env.MEOWKIT_RUN_ID;
   try {
-    return sanitizeId(fs.readFileSync(path.join(root, 'session-state/last-session-id'), 'utf8').replace(/\s/g, ''));
+    return sanitizeId(fs.readFileSync(sessionStateFile('last-session-id', root), 'utf8').replace(/\s/g, ''));
   } catch {
     return '';
   }

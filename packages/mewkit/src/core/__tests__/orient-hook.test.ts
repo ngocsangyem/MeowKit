@@ -20,6 +20,9 @@ const HOOK = join(REPO_CLAUDE, "hooks", "handlers", "orientation-ritual.cjs");
 const CHECKPOINT_UTILS = join(REPO_CLAUDE, "hooks", "lib", "checkpoint-utils.cjs");
 // The handler also exposes the committed launcher on PATH, from this lib.
 const LAUNCHER_PATH_ENV = join(REPO_CLAUDE, "hooks", "lib", "launcher-path-env.cjs");
+// checkpoint-utils resolves its directory through the one state-path resolver, so the
+// scaffold has to carry it: a fixture missing it fails at load, not at the assertion.
+const STATE_PATHS_LIB = join(REPO_CLAUDE, "hooks", "lib", "meowkit-paths.cjs");
 
 const roots: string[] = [];
 let savedEnv: string | undefined;
@@ -42,6 +45,7 @@ function scaffold(): string {
 	mkdirSync(libDir, { recursive: true });
 	copyFileSync(CHECKPOINT_UTILS, join(libDir, "checkpoint-utils.cjs"));
 	copyFileSync(LAUNCHER_PATH_ENV, join(libDir, "launcher-path-env.cjs"));
+	copyFileSync(STATE_PATHS_LIB, join(libDir, "meowkit-paths.cjs"));
 	return root;
 }
 
@@ -68,7 +72,7 @@ function installFakeRuntime(root: string, output: string): string {
 }
 
 function writeCheckpoint(root: string): void {
-	const dir = join(root, "session-state", "checkpoints");
+	const dir = join(root, ".meowkit", "state", "checkpoints");
 	mkdirSync(dir, { recursive: true });
 	writeFileSync(
 		join(dir, "checkpoint-latest.json"),

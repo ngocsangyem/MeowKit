@@ -42,7 +42,7 @@ Anti-triggers:
 - **Zoom and pan** — diagrams support mouse wheel zoom (cursor-anchored), drag to pan, keyboard shortcuts (`+ − 0`)
 - **Slide engine** — `--html --slides` uses scroll-snap + IntersectionObserver + arrow-key nav + bottom progress dots
 - **Style rotation** — palette and typography vary per run via `${CLAUDE_PLUGIN_DATA}/preview/style-rotation.json`; deterministic-hash fallback when env var is unset
-- **Plan-aware output paths** — detects `session-state/active-plan` (handles both absolute path and slug formats); falls back loudly with stderr `warn:`
+- **Plan-aware output paths** — detects `.meowkit/state/active-plan` (handles both absolute path and slug formats); falls back loudly with stderr `warn:`
 - **Anti-slop guarantees** — no Inter font, no indigo/violet accent, no gradient text, no glow shadows, no emoji headers, no three-dot chrome
 - **Display, not critique** — `--html --diff` RENDERS; verdict stays with `mk:review` and `mk:plan-ceo-review`, and plan-as-HTML rendering stays with `mk:visual-plan`
 
@@ -97,7 +97,7 @@ Templates in `assets/` are out-of-band — read only when generating the matchin
 ## Output Path Lifecycle
 
 ```
-session-state/active-plan exists?
+.meowkit/state/active-plan exists?
   yes → value is absolute path?
           yes → {value}/visuals/
           no  → tasks/plans/{value}/visuals/   (treated as slug)
@@ -157,6 +157,6 @@ The 4 HTML templates in `assets/` are clean-room authored. Each carries the comm
 
 - **Mermaid `.node` class collision** — Mermaid uses `.node` internally; page-level `.node` CSS leaks into diagrams. Use `.ve-card` for cards.
 - **Mermaid theme is static at load** — switching the page theme does not re-skin Mermaid SVG internals.
-- **Output path falls back silently** — when `session-state/active-plan` is missing, output writes to `tasks/visuals/`. Logged on stderr.
+- **Output path falls back silently** — when `.meowkit/state/active-plan` is missing, output writes to `tasks/visuals/`. Logged on stderr.
 - **Slug truncation at 80 chars** — long topics produce truncated filenames; title placeholder uses the original input.
 - **Browser auto-open is conditional** — headless / SSH / WSL environments cannot open a browser; the shell snippet detects and prints the path instead.

@@ -144,9 +144,9 @@ export function checkHooks(root: string | null): DiagResult {
 export function checkScripts(root: string | null): DiagResult {
 	if (!root) return { name: "Scripts", status: "warn", detail: "Skipped — no project" };
 
-	const scriptsDir = path.join(root, ".claude", "scripts");
+	const scriptsDir = path.join(root, ".claude", "hooks", "lib");
 	if (!fs.existsSync(scriptsDir)) {
-		return { name: "Scripts", status: "warn", detail: "No scripts/ directory" };
+		return { name: "Scripts", status: "warn", detail: "No hooks/lib/ directory" };
 	}
 
 	// Only scripts the kit itself reaches are named here. A hard-coded list of

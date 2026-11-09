@@ -5,13 +5,14 @@
  * One-shot IDEMPOTENT seeder that applies governance metadata to every harness artifact:
  *   - Skills  (.claude/skills/{name}/SKILL.md):  injects owner/criticality/status/runtime into YAML frontmatter
  *   - Agents  (.claude/agents/{name}.md):        same
- *   - Rules, commands, hooks:                    writes entries into .claude/harness-inventory.json
+ *   - Rules and hooks:                            writes entries into .claude/harness-inventory.json
  *
  * Safe to re-run — already-present fields are not overwritten; registry entries are merged.
  * NOT wired to CI. Run once, then hand-promote critical/high values as needed.
  *
  * Governance owner is distinct from install-metadata.ts owner (install provenance).
- * See .claude/schemas/harness-metadata-schema.json for allowed enum values.
+ * See packages/mewkit/schemas/harness-metadata-schema.json for allowed enum values —
+ * the enums travel with the validator that enforces them.
  *
  * Usage (from meowkit/ root):
  *   node scripts/seed-ownership-metadata.cjs [--dry-run]
@@ -217,7 +218,7 @@ function collectAgents(agentsRoot) {
 }
 
 // ---------------------------------------------------------------------------
-// Rules, rules-conditional, commands, hooks enumeration
+// Rules and hooks enumeration
 // ---------------------------------------------------------------------------
 function collectRegistryArtifacts(claudeRoot) {
   const artifacts = [];
@@ -228,26 +229,6 @@ function collectRegistryArtifacts(claudeRoot) {
     for (const f of fs.readdirSync(rulesDir)) {
       if (f.endsWith(".md")) {
         artifacts.push({ registryKey: `rules/${f}`, name: f.replace(/\.md$/, "") });
-      }
-    }
-  }
-
-  // Rules-conditional
-  const rulesCondDir = path.join(claudeRoot, "rules-conditional");
-  if (fs.existsSync(rulesCondDir)) {
-    for (const f of fs.readdirSync(rulesCondDir)) {
-      if (f.endsWith(".md")) {
-        artifacts.push({ registryKey: `rules-conditional/${f}`, name: f.replace(/\.md$/, "") });
-      }
-    }
-  }
-
-  // Commands under commands/mk/
-  const commandsDir = path.join(claudeRoot, "commands", "mk");
-  if (fs.existsSync(commandsDir)) {
-    for (const f of fs.readdirSync(commandsDir)) {
-      if (f.endsWith(".md")) {
-        artifacts.push({ registryKey: `commands/mk/${f}`, name: f.replace(/\.md$/, "") });
       }
     }
   }
@@ -269,7 +250,7 @@ function collectRegistryArtifacts(claudeRoot) {
 }
 
 /** Registry key prefixes this seeder OWNS — the only ones it may prune. */
-const REGISTRY_PREFIXES = ["rules/", "rules-conditional/", "commands/", "hooks/"];
+const REGISTRY_PREFIXES = ["rules/", "hooks/"];
 
 // ---------------------------------------------------------------------------
 // Main
@@ -352,7 +333,7 @@ function main() {
     }
   }
 
-  // ---- Registry (rules + commands + hooks) ----
+  // ---- Registry (rules + hooks) ----
   const registryArtifacts = collectRegistryArtifacts(CLAUDE);
 
   // Load existing inventory if present (idempotent merge)

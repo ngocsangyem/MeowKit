@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 
 const require_ = createRequire(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const LOG_REL = 'session-state/session-sentinels.jsonl';
+const LOG_REL = '.meowkit/state/session-sentinels.jsonl';
 
 const SAFETY_MARKER = 'Safety baseline: verified';
 const PHASE_MARKER = 'Phase-zero rules: verified';
@@ -36,7 +36,7 @@ function loadInjector(): Injector {
 
 function project(): string {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mk-sentinel-'));
-  fs.mkdirSync(path.join(dir, 'session-state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.meowkit/state'), { recursive: true });
   fs.writeFileSync(path.join(dir, LOG_REL), '');
   fs.cpSync(path.join(REPO_ROOT, '.claude/hooks/handlers/precompact-probe.cjs'), path.join(dir, '.claude/hooks/handlers/precompact-probe.cjs'));
   fs.cpSync(path.join(REPO_ROOT, '.claude/hooks/lib'), path.join(dir, '.claude/hooks/lib'), { recursive: true });

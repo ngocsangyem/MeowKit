@@ -13,7 +13,7 @@ If any single rubric hits a hard-fail threshold, the entire sprint verdict is FA
 
 ## Anatomy of a Rubric
 
-Every file in `.claude/rubrics/` follows `schema.md` and contains:
+Every file in `.claude/skills/rubric/rubrics/` follows `schema.md` and contains:
 
 | Section | Purpose |
 |---|---|
@@ -44,7 +44,7 @@ Total weights sum to 1.00 when all 7 are loaded (Rule 2 — weights must sum to 
 
 ## Composition Presets
 
-Presets assemble rubric subsets appropriate for the project type. Files live at `.claude/rubrics/composition-presets/`.
+Presets assemble rubric subsets appropriate for the project type. Files live at `.claude/skills/rubric/rubrics/composition-presets/`.
 
 | Preset | Loads | Excludes | Use for |
 |---|---|---|---|
@@ -79,7 +79,7 @@ Rule 3: hard-fail propagates. Soft averages do not save weak dimensions.
 
 ## Calibration Set and Drift Check
 
-`.claude/rubrics/calibration-set/` contains gold-standard verdicts — carefully labeled examples used to verify that the evaluator still grades consistently after a model upgrade.
+`.claude/skills/rubric/rubrics/calibration-set/` contains gold-standard verdicts — carefully labeled examples used to verify that the evaluator still grades consistently after a model upgrade.
 
 **Rule 6:** when a new model tier ships (Sonnet 4.6, Opus 4.7, Haiku 5.x), replay the calibration set with the new model. Re-evaluator agreement with stored gold verdicts must stay within **5% per rubric**. If drift exceeds 5%, recalibrate the anchors or adjust the `hard_fail_threshold`.
 
@@ -101,7 +101,7 @@ These are the visual and textual signatures of AI slop — outputs that look lik
 
 ## Custom Rubrics
 
-Users can add their own rubric files to `.claude/rubrics/` (Rule 9). Requirements:
+Users can add their own rubric files to `.claude/skills/rubric/rubrics/` (Rule 9). Requirements:
 
 1. Conform to `schema.md`
 2. Run `validate-rubric.sh path/to/new-rubric.md` — enforces anchor balance, weight rules, and injection-safety checks
@@ -116,9 +116,9 @@ A poisoned rubric could otherwise inject prompt overrides into the evaluator's c
 
 ## Canonical Sources
 
-- `.claude/rubrics/` — all rubric files and composition presets
-- `.claude/rubrics/RUBRICS_INDEX.md` — catalog with weights, hard-fail thresholds, applicability
-- `.claude/rubrics/schema.md` — canonical rubric format spec
+- `.claude/skills/rubric/rubrics/` — all rubric files and composition presets
+- `.claude/skills/rubric/rubrics/RUBRICS_INDEX.md` — catalog with weights, hard-fail thresholds, applicability
+- `.claude/skills/rubric/rubrics/schema.md` — canonical rubric format spec
 - `.claude/skills/rubric/references/rubric-rules.md` — the 10 rules governing rubric governance
 
 ## Related

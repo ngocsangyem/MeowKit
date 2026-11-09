@@ -70,7 +70,7 @@ test passes, delegate to `project-manager` (background):
 ```
 "Generate delivery status for plan at {plan-dir}. Write report to
 {plan-dir}/status-reports/{YYMMDD}-status.md (create subdir if absent).
-Load template from tasks/templates/pm-status-template.md.
+Load template from .claude/skills/status/assets/pm-status-template.md.
 Run in the background — do not block the caller."
 ```
 

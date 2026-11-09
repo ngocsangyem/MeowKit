@@ -39,6 +39,30 @@ export function usingLegacyMemoryTree(projectRoot: string): boolean {
 	}
 }
 
+/**
+ * Where session markers used to live, newest-first: the project root, then inside
+ * the kit tree. A READER still accepts both, so a project that recorded a pointer
+ * before the taxonomy settled keeps resolving it. No writer uses them — a write
+ * always lands in `state/`, so these drain instead of filling. Mirrors
+ * `.claude/hooks/lib/meowkit-paths.cjs`, so the hooks and the CLI agree.
+ */
+export const LEGACY_SESSION_STATE_RELS = ["session-state", join(".claude", "session-state")] as const;
+
+/**
+ * A session marker to READ: the canonical path when it exists, else a pre-move
+ * path that does, else the canonical one — so an absent marker is reported at the
+ * location a writer would use.
+ */
+export function resolveSessionStateFile(projectRoot: string, rel: string): string {
+	const canonical = join(resolveStateDir(projectRoot, "state"), rel);
+	if (existsSync(canonical)) return canonical;
+	for (const legacy of LEGACY_SESSION_STATE_RELS) {
+		const candidate = join(projectRoot, legacy, rel);
+		if (existsSync(candidate)) return candidate;
+	}
+	return canonical;
+}
+
 /** Absolute directory for one taxonomy class under the given project root.
  *
  *  The legacy fallback is scoped to `memory` ONLY. Telemetry, state and cache were never in

@@ -21,6 +21,7 @@ const path = require('node:path');
 
 const R = require('../lib/session-context-report.cjs');
 const { configValue } = require('../lib/read-config.cjs');
+const { LEGACY_STATE_RELS, sessionStateDir, sessionStateFile } = require('../lib/meowkit-paths.cjs');
 const { isTddEnabled } = require('../lib/tdd-detect.cjs');
 
 const CONTEXT_FILE = 'docs/project-context.md';
@@ -68,12 +69,12 @@ function contextBlock(root) {
 
 /** State a new session must not inherit. */
 function resetSessionState(root, sessionId) {
-  const dir = path.join(root, 'session-state');
+  const dir = sessionStateDir(root);
   const lastFile = path.join(dir, 'last-session-id');
   try { fs.mkdirSync(dir, { recursive: true }); } catch { return null; }
 
   if (!sessionId) return null;
-  const previous = readText(lastFile);
+  const previous = readText(sessionStateFile('last-session-id', root));
   if (previous !== null && previous === sessionId) return previous;
 
   const write = (rel, content) => {
@@ -83,8 +84,12 @@ function resetSessionState(root, sessionId) {
   write('build-verify-cache.json', '{}');
   // Keyed by session id, so a recycled id could otherwise match a stale entry.
   write('session-sentinels.jsonl', '');
-  for (const rel of ['.claude/session-state/tdd-mode', '.claude/session-state/tdd-deprecation-warned']) {
-    try { fs.rmSync(path.join(root, rel), { force: true }); } catch { /* best effort */ }
+  // Cleared in every location a marker may sit, pre-move ones included: a stale
+  // test-first sentinel left behind would change how the new session behaves.
+  for (const marker of ['tdd-mode', 'tdd-deprecation-warned']) {
+    for (const base of [dir, ...LEGACY_STATE_RELS.map((rel) => path.join(root, rel))]) {
+      try { fs.rmSync(path.join(base, marker), { force: true }); } catch { /* best effort */ }
+    }
   }
   try { fs.writeFileSync(lastFile, sessionId); } catch { /* best effort */ }
   return previous;

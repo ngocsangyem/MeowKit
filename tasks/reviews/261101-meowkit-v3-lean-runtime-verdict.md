@@ -1,336 +1,342 @@
-# Review: MeowKit v3 lean runtime — CLI surface (sprint 7)
+# Review: MeowKit v3 lean runtime — kit shape and removals (sprint 8)
 
-- **Reviewed base:** `be3e990b` ("contract: evaluator signs sprint 7 …"), branch `feat/v3-lean-runtime`
-- **Reviewed change:** working tree vs `be3e990b` — `git diff HEAD` plus untracked files, excluding `tasks/plans/` (never committed)
-- **Spec graded against:** `tasks/contracts/261109-1021-meowkit-v3-lean-runtime-sprint-7.md` (signed, 13 acceptance criteria)
-- **Review round:** 2. Round 1 returned a blocking Correctness result on one reproduced defect plus five cheap items; all six are fixed. Round 1's verdict is archived verbatim at `tasks/reviews/evidence/261109-meowkit-v3-lean-runtime-sprint-7/review-round-1.md`.
+- **Reviewed base:** `d17cc03b` ("contract: evaluator signs sprint 8 …"), branch `feat/v3-lean-runtime`
+- **Reviewed change:** working tree vs `d17cc03b` — `git diff HEAD` plus untracked files, excluding `tasks/plans/` (never committed)
+- **Spec graded against:** `tasks/contracts/261109-1402-meowkit-v3-lean-runtime-sprint-8.md` (signed, 11 acceptance criteria). The metadata budget (D7), the integration rewrite and routing specs (D10, D11) and the SubagentStart spike (D13) are deferred to sprint 9 by D15 and are **not graded here**.
+- **Review round:** 2. Round 1 returned a blocking Correctness result on one reproduced defect plus six WARN items; R1, its follow-up guard, W1, W2, W3, W6(a) and W6(b) are closed, and W4/W5 are left as declared follow-ups. Round 1's verdict is archived verbatim at `tasks/reviews/evidence/261109-meowkit-v3-lean-runtime-sprint-8/review-round-1.md`; sprint 7's at `…/sprint-7/verdict-approved.md`.
 - **Mode:** default (TDD off) — coverage gaps are WARN
 - **Score:** 9.0/10
 
 ## Verdict: WARN
 
-Every round-1 item is fixed, and I reproduced the two that mattered rather than accepting the
-report: the file-URL decoding defect and the shell-quoting defect were each re-triggered on the
-old expression and then shown closed on the new one. The change now satisfies all 13 acceptance
-criteria on measurement. What remains is three carried-forward hardening suggestions the contract
-never asked for, one pre-existing dead-branch question, and three small items I found this round —
-one of which is a measurable miss against an AC-13 clause introduced by the fix itself. None
-blocks; all are named below for explicit acknowledgement.
+The blocking defect is closed, and I reproduced the fix rather than accepting the report: the
+corrected `--tdd` instruction now exits **0**, writes the sentinel, and creates no retired state root.
+More importantly the fix came with the guard round 1 asked for, and I proved the guard bites by
+planting the pre-fix line back into a faithful clone of the finished tree — it fails on the shipped
+file *and* on the blockquoted maintainer copy, which is the drift path that let the defect through in
+the first place.
+
+The W1 coverage hole is genuinely closed, not papered over. Round 1 caught 1 of 4 planted old-path
+references; I re-ran the same four probes against the finished checker and all **4 of 4** are now
+caught, while a legitimate mapping line that names both the retired and the current path stays legal —
+so rule (d) has teeth without being over-broad. The widened rule (a) is what finally makes the three
+`citedByName` entries protective. And the new rule found a **live** stale reference on its first run
+(`scripts/validate-rule-availability.sh:77`), which retires round 1's observation that the check "was
+green because it was not looking".
+
+What remains is two declared follow-ups the developer deliberately did not take (W4 projection sync,
+W5 a pre-existing fail-open), one accepted deviation, and three record-only items. None blocks; all
+are numbered below for explicit acknowledgement.
 
 | Dimension | Round 1 | Now |
 | --- | --- | --- |
 | Correctness | blocking | PASS |
-| Maintainability | WARN | WARN |
+| Maintainability | WARN | PASS |
 | Performance | PASS | PASS |
 | Security | WARN | WARN |
-| Coverage | WARN | PASS |
+| Coverage | WARN | WARN |
 
-Side Effects Detected: No
+Side Effects Detected: No — this review wrote only this verdict file and the two archive copies.
+
+## Gate-authority standing item (`gate-rules.md:67-73`)
+
+Re-asked for round 2, because the fix round again touched `.claude/rules/`-adjacent safety code and
+three skills in the trigger list.
+
+> **Does any prose in this change grant approval authority to something that is not a human — in any wording?**
+
+**No.** The fix round added prose in four places I read individually: the four-line comment in
+`.claude/hooks/lib/gate2-check.cjs`, the header comment of the new guard test, the widened
+`check-dangling-rule-refs.cjs` header, and the three "this repository only" qualifiers. None mentions
+approval, advancement, scoring or unattended operation; the gate2 comment documents why a message
+names a pre-move path, and explicitly leaves the decision with the recorded corpus rather than with
+any automation. `validate --gates` reports `[PASS] No automated gate-approval claims`, treated as a
+floor rather than as the answer. Round 1's two gate-adjacent findings (the reviewer path list's reach,
+and the `security-rules.md` Enforcement clause keeping its meaning) are unchanged by this round and
+remain satisfied.
 
 ## Fix verification — each reproduced, not accepted
 
-**F1 — `runningCliEntry` decoded a file URL with `new URL().pathname`. Fixed and reproduced.**
+**F1 — R1 closed. The shipped `--tdd` instruction no longer writes a retired state root.**
 
-`packages/mewkit/src/core/project-launcher.ts:140` now uses `fileURLToPath(moduleUrl)`; the
-`fileURLToPath` import is present at `:18` and the comment at `:131-138` states the invariant
-rather than citing the review. I ran the old and new expressions side by side on three real
-`dist/` layouts:
+`.claude/skills/cook/SKILL.md:83` and `.claude/benchmarks/canary/quick/05-tdd-feature-spec.md:17` both
+now read `mkdir -p .meowkit/state && echo on > .meowkit/state/tdd-mode`. Re-run in a project
+containing only `.meowkit/`:
 
 ```
-"dir with space"   old=ENOENT  new=ok:dir with space/dist/index.js
-"josé münchen"     old=ENOENT  new=ok:josé münchen/dist/index.js
-"plain"            old=ok      new=ok
+$ bash -c 'mkdir -p .meowkit/state && echo on > .meowkit/state/tdd-mode'; echo "EXIT=$?"
+EXIT=0
+$ find . -mindepth 1 | sort
+./.meowkit
+./.meowkit/state
+./.meowkit/state/tdd-mode
+$ cat .meowkit/state/tdd-mode   ->  on
+$ find . -name session-state | wc -l   ->  0
 ```
 
-Then end-to-end through the **real built artifact** copied under a path named `josé dir e2e`:
-`runningCliEntry` returned the correct absolute entry, and `writeLauncher` wrote
-`…/proj/.meowkit/bin/mewkit`, which then resolved and spawned the recorded entry. (My harness
-copied `dist` without `node_modules`, so the spawned CLI failed on its own `minimist` import —
-that is a property of my copy, not of the code, and it proves resolution reached the CLI.) The
-four new cases in `core/__tests__/project-launcher.test.ts` (6 → 10) include the space, the
-non-ASCII name, a plain control, and a module URL with no entry beside it. Confirmed the `dist/`
-I probed is current: `fileURLToPath` appears in `packages/mewkit/dist/core/project-launcher.js`.
+Exit **0** against round 1's exit 1; the sentinel exists, so `--tdd` arms strict mode on a fresh
+install; and no path named `session-state` is created, which is AC-08's clause as written. I also ran
+my **own** sweep for the same instruction shape across `.claude`, `docs`, `packages/docs/content`,
+`README.md`, `RELEASING.md` and `CLAUDE.md` (excluding the stale worktree and the changelog) rather
+than trusting the developer's: zero hits remain.
 
-**F8 — the env-file write was an unescaped double-quoted shell assignment. Fixed, and the
-vulnerability reproduced before and after.**
+**F2 — the guard round 1 required exists and bites.** New:
+`packages/mewkit/src/kit/__tests__/retired-state-write-instructions.test.ts`, 76 lines, no `any`.
 
-`.claude/hooks/lib/launcher-path-env.cjs:72-74` adds `singleQuote()` (the standard
-close-reopen form, `'` → `'\''`), `:99` refuses any value containing `\n`, `\r` or NUL, and
-`:102` writes `export PATH=<single-quoted>`. I built a project directory literally named
-``ev$(touch PWNED)il `touch PWNED2` "q" dir``, generated both the fixed line and the round-1
-line, sourced each in a real `/bin/sh`, and read back `$PATH`:
+I judged the design before testing it, and it is built the right way round: the detector is a pure
+function carrying **both** positive controls (the exact pre-fix line, the blockquoted form, a bare
+redirect, `touch`, a `tee` pipe) and **negative** controls that pin precisely the four survivors round
+1 dispositioned as legitimate — `LEGACY_STATE_RELS`, the `gate2-check.cjs:70` advice line,
+`bead-template.md:40`'s prose, and the corrected instruction itself. So it can neither pass by
+matching nothing nor pass by matching everything. The second test scans the shipped set **union** every
+tracked file under `.claude/`, and asserts the list exceeds 900 files — a phantom-pass guard against
+the empty-inventory pattern D4 condemns and that round 1's W1 found reintroduced. Covering the wider
+list is the right call: the two copies of that instruction drifted together, which is how R1 reached a
+shipped file.
 
-| code path | first `$PATH` entry equals launcher dir | command substitution executed |
+Proving it bites required planting the defect, and I would not write to the repository to do it. I
+built a faithful scratch clone — `git clone` of this repo, the uncommitted working tree rsynced over
+it, staged deletions applied, `git add -A` so `git ls-files` sees the finished tree, `node_modules`
+symlinked — confirmed the guard passes there as a baseline, then planted the pre-fix line into each
+file in turn:
+
+| Probe (in the clone) | Guard result |
+| --- | --- |
+| baseline, finished tree | 2 passed |
+| pre-fix line at `.claude/skills/cook/SKILL.md:83` (shipped) | 1 failed — `".claude/skills/cook/SKILL.md:83: mkdir -p .claude/session-state && echo on > .meowkit/state/tdd-mode"` |
+| pre-fix line at `…/canary/quick/05-tdd-feature-spec.md:17` (maintainer-only, blockquoted) | 1 failed — reported with its `> ` prefix intact |
+| both restored | 2 passed |
+
+The blockquoted case matters: a naive redirect matcher would read the Markdown `>` as a redirect and
+mis-handle that line, and the detector's shape deliberately requires a non-space character before a
+redirect so it does not. The real repository was never modified.
+
+**F3 — W1 closed. The move registry now protects all five of this sprint's moves.** Three changes, all
+inside the existing registry and its checker; no second registry (`scripts/dangling-rule-refs-data.cjs`
+remains the one list).
+
+1. Rule (a) widened at `scripts/check-dangling-rule-refs.cjs:29` to `` rules(?:-conditional)?/(<names>)\.md ``. This is the change that gives the three `citedByName` agile entries any protective value: they are exempt from rule (b) on purpose, and rule (a) previously could not match their `rules-conditional/` prefix, so their net worth was nil.
+2. A new `RETIRED_PATHS` export (3 entries) for the two shapes the `{name, to}` schema cannot express plus the directory form of the third: `.claude/rubrics/`, `.claude/workflow.yaml`, `.claude/rules-conditional/`, each with its current location.
+3. A new rule (d): a retired location may be named only on a line that also names its current location. I checked the implementation at `:109-113` and it sits **before** the `isShippedProse` filter, so it covers every scanned file rather than shipped prose only — broader than I would have asked for.
+
+I re-ran round 1's four probes myself, in a scratch copy, plus a fifth to test for over-breadth:
+
+| Planted reference | Round 1 | Now |
 | --- | --- | --- |
-| fixed (single-quoted) | yes, byte for byte | no |
-| round-1 (double-quoted) | no — entry mangled to `evil  q dir/…` | yes — both `PWNED` and `PWNED2` created |
+| `.claude/capability-bootstrap.md` | caught (b) | caught (b), exit 1 |
+| `.claude/rubrics/composition-presets/cli-tool.md` | missed | caught — `(d) retired location: .claude/rubrics/`, exit 1 |
+| `.claude/workflow.yaml` | missed | caught — `(d) retired location: .claude/workflow.yaml`, exit 1 |
+| `.claude/rules-conditional/agile-story-gates.md` | missed | caught **twice** — `(a) old rule path: rules-conditional/agile-story-gates.md` and `(d)`, exit 1 |
+| mapping line naming retired **and** current path | n/a | correctly **not** flagged, exit 0 |
 
-So the round-1 finding was real and is now closed. Also verified independently: a directory named
-`it's a dir` survives a real shell byte-for-byte; a `PATH` entry containing a newline returns the
-doctor hint and writes **nothing**; a literal `$HOME` inside an entry stays literal; and the
-pre-existing unrelated line in the env file is untouched in every case. The test file grew 11 → 14
-cases and now evaluates its assertions through `/bin/sh` rather than only pattern-matching the
-written text — a stronger property than the one it replaced.
+4 of 4, against 1 of 4. The fifth probe is the one that matters for judging rule (d): it is a
+mapping-line exemption by construction, not a file-level exemption, so a canonical-path table stays
+legal without blinding the check to the rest of that file. One file-level exemption was added — the
+dated ADR `docs/architecture/adr/260511-agile-scrum-conditional-rule-layer.md`, whose own header says
+its paths are the ones that existed then. Appropriate for a decision record.
 
-**F2 — flag aliases were folded into the verb set. Fixed and reproduced.**
-`scripts/check-kit-verbs.cjs` no longer adds `CLI_CATALOGUE.aliases`; the comment at `:102`
-records why. The printed count now matches reality — `PASS: 281 mewkit reference(s) … resolving
-against 24 commands`, against a catalogue of 24 commands and a generated manual of 24 entries. I
-confirmed the teeth myself in a scratch kit copy: `mewkit h`, `mewkit y` and `mewkit status` are
-each reported as unresolved commands and `mewkit plan capture` as an unresolved subcommand (exit
-1, 4 findings), while the flag-shaped control `mewkit trace --friction "x"` is correctly not
-reported.
+The live finding is the strongest evidence here. Rule (d) failed on its first run against
+`scripts/validate-rule-availability.sh:77`, whose comment claimed the conditional-rule tree "was
+merged into `.claude/rules/` in v2.8.4"; it now names `.claude/skills/agent-detector/references/`,
+where that content actually lives. `bash scripts/validate-rule-availability.sh` → `OK: 7 rule
+reference(s) all resolve to files on disk`. Round 1's note that the checker "was green because it was
+not looking" is retired on evidence.
 
-**F4 — dead `launcherPresent` removed.** `grep -rn launcherPresent` over `packages`, `scripts`,
-`tests` and `.claude` returns nothing, and the `statSync` import it was the only user of is gone
-from the import list at `project-launcher.ts:15`. Choosing removal over wiring it into `doctor`
-was the right half of the either/or: the alternative was new behaviour the contract does not ask
-for.
+**F4 — W2 closed, verified more widely than reported.** The three citations now carry the qualifier
+(`adaptive-density-matrix.md:68`, `advice-supervision-rules.md:403`, and the longer form at
+`harness-rules.md:60` — "this repository only — an installed kit does not carry it, and the audit is a
+maintainer procedure", which is right, because that was the load-bearing one that said the thresholds
+"are in" the path). Rather than check the three, I swept **every** shipped `.md`/`.mdx` in the ship set
+for any mention of `skills/benchmark/` or `mk:benchmark` lacking a maintainer qualifier. One hit came
+back, `adaptive-density-matrix.md:64`, and on reading it that line is qualified too — "available only
+in this repository", different wording my matcher did not anticipate. So: **zero** unqualified
+citations of a withheld surface anywhere in the shipped kit. Registry entry still `shipped: false`.
 
-**F6 — the changelog test now asserts immutability.** `tests/docs-cli-resolution.test.ts:153-168`
-byte-compares both changelog pages against `git show be3e990b:<path>` instead of calling
-`existsSync`, with a sibling case at `:143` proving the comparison would notice an appended line.
-5 → 6 cases.
+**F5 — the one shipped site naming a verb that does not exist.**
+`.claude/skills/agent-detector/references/context-budget-rules.md:64` now reads "the substrate view
+(`mewkit validate --substrate`)". Verified by running the built CLI, not by reading a catalogue:
+`mewkit inventory --substrate` → `Unknown command: inventory`; `mewkit validate --substrate` → 2
+passed, 1 warning, exit 0. I then grepped the whole tree: no **shipped** file names the phantom verb
+any more. The survivors are all unshipped and pre-existing — `CLAUDE.md:85`, the immutable changelog,
+`packages/docs/content/docs/cli/telemetry.mdx:63-65`, and a historical verdict under `docs/plans/`.
+(Round 1 cited `CLAUDE.md:102` for this; measured now it is `:85`.)
 
-**F7 — the exit-code-caller guard is widened and bounded.**
-`tests/cli-caller-exit-codes.test.ts:36-44` now covers the reversed JS order and both POSIX
-shapes alongside the originals, and the new case at `:64` asserts six offender strings all match
-**and** five legitimate strings (`!== 0`, `=== 0`, `-ne 0`, `toBe(2)`, `const retries = 1`) do
-not — so the widening cannot have been achieved by making the guard fire on a clean tree. The
-property still holds: zero offenders across the five committed trees.
+**F6 — the record is corrected.** The evidence header no longer claims "PRE-IMPLEMENTATION SIZING +
+BLOCKED"; it states that slices 1–6 ran and that source was edited, and it keeps §1's stop as an
+explicitly-labelled historical note rather than deleting it — the right choice, since the stop and the
+decision to proceed in slices are both part of the record. §4's eleven "NOT RUN" rows are replaced
+with a measured result plus an evidence pointer each, and §5's "Files changed: None" is corrected in
+place. `docs/operations/docs-references-inventory.md:56-57` now name `mk:document-release` and
+`mk:retro`, and `:4`'s grep no longer sweeps `commands`, `scripts` or `modes`, with the re-scope dated.
+`packages/docs/docs-reference-manifest.json` was regenerated for the one changed `sourceHash`, and
+`docs-manifest.cjs --check` confirms 171 reference pages match the live tree.
 
-**Control characters — confirmed clean.** I scanned all **96** changed and untracked files byte
-by byte: zero control characters other than TAB and LF, and no CR anywhere. The two literal `0x08`
-bytes the developer reported in `tests/cli-caller-exit-codes.test.ts` are gone. Their note is
-worth keeping as a lesson: the corrupted regex still compiled and the file still passed, so a
-green test was not evidence the bytes were what the author intended.
+**F7 — one safety library changed, and I inspected it rather than trusting the claim.**
+`.claude/hooks/lib/gate2-check.cjs` shows **+4 lines against BASE, all comment**; the advice string is
+byte-identical, so the recorded corpus stays green and the no-re-record rule holds. The comment states
+the invariant — the message names a pre-move location because the corpus pins it and the lookup accepts
+the pointer in both classes — without referencing a plan artifact, review round or finding code, which
+is the convention this contract requires. `.claude/hooks/lib/gate2-change-set.cjs` has **zero** diff,
+confirming W5 was left alone as declared.
 
-## Correctness
+**F8 — gates re-run by me, Node 24, on the finished tree.**
 
-Result — PASS
+| Gate | Result |
+| --- | --- |
+| `npm run build` | PASS |
+| `npm run lint` | PASS — **0 errors**, 3 warnings, all three pre-existing at BASE |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — **299 files / 3374 tests** (298 / 3372 in round 1; +1 file / +2 tests is exactly the new guard) |
+| `node --test .claude/hooks/__tests__/*.test.cjs` | PASS — 47/47 |
+| golden replay | PASS — 87/87, and `git diff` over `tests/hooks/golden/` is still one modified index plus one added case: **no fixture re-recorded** |
+| `check-dangling-rule-refs` | PASS — 22 destinations loaded, 3 retired locations unreferenced |
+| `check-always-on-budget` | PASS — **25 417 B** of 25 600, 183 B headroom, inside the ≤25 501 B pin |
+| `check-rule-survival` | PASS — every pinned safety item survives |
+| `validate --packs / --gates / --workflow / --frontmatter / --docs-refs / --memory` | PASS — 1 / 1 / 6 (no drift) / 1 / 1 / 1 |
+| `check-kit-verbs` · `check-env-reads` · `check-memory-wiki-residue` | PASS — 293 refs / 138 classified reads / 0 hits |
+| `check-no-python --allow-existing-envs` · `check-skill-cross-refs.sh` | PASS — 26 checks, no interpreter on PATH / all refs resolve |
+| `validate-rule-availability.sh` · `docs-manifest --check` · `generate-cli-manual --check` · `link-checker` | PASS — 7 refs / 171 pages / manual matches catalogue / 268 files |
+| `check-journey-specs.py` | PASS — 12 journeys frozen, unchanged |
 
-No critical or major defect remains. The blocking defect is fixed at the root with the API the
-rest of the package already uses, and the fix is covered by four tests including the exact path
-class that broke.
+Fix-round hygiene re-checked: no `any` or unsafe cast anywhere in the change, no new file over 200
+lines (the guard is 76; the two touched scripts are 184 and 168), and no plan-artifact token — phase,
+sprint, criterion, decision, round — in any added comment, test name or file name.
 
-- **F3 [MINOR, carried, accepted cost]** — in the `npx` case the pin records a path under
-  `~/.npm/_npx/<hash>/…`, which npm prunes on its own schedule, so the launcher's resolution is
-  only as durable as that cache. The degradation is the labelled doctor-hint branch D3 chose, and
-  it is fail-safe. Unchanged by the fixes and outside the contract; recorded so the expectation
-  stays accurate rather than optimistic.
+## Required Changes
 
-Re-verified after the fixes, by direct probe rather than from the evidence file: the exit-code
-invariant holds unchanged (`status`, `inventory`, `docs-manifest`, `context resolve`,
-`explain-support`, `h`, `y` → 2; `plan bogus` → 2 naming the valid subcommands; bare `plan` → 2
-"needs a subcommand"); the bare forms that must not change still do not (`backups`, `task-state`,
-`trace` → 0); per-subcommand help still exits 0 printing catalogue usage with a byte-empty working
-directory before and after the whole sweep; and `doctor --hard-gates` exits 0 in the repository
-with the retired `MEOWKIT_*` names unset (26 passed, 5 warnings).
+None. Round 1's blocking item is closed and independently reproduced.
 
-## Maintainability
+## WARN items — each needs explicit human acknowledgement
 
-Result — WARN
+Renumbered for this round. Each carries the three-part justification: what it means, why it is
+acceptable here, and what would make it blocking.
 
-Three of the four round-1 items are closed and the fourth is a question rather than a defect. Three
-new items, all minor, two of them introduced by the fix round.
+**1 — No committed test asserts the codex/cursor projections are in sync with the reduced `.claude/` surface, and the cursor target has no meaningful validator run.** (Round 1's W4, deliberately left.)
+*What it means:* AC-09 asks the projections to regenerate to a no-op. There is no generator — the
+bundles are hand-authored — and the passing bundle tests compare the authored bundle to its *packaged
+copy*, not to `.claude/`. From the repo root `validate --target codex` and `--target cursor` both
+report "not a … target" and exit 0: vacuous. Only codex has a CI lane
+(`packages/mewkit/scripts/codex-compat-check.mjs`, `ci.yml:171`); cursor has none. The same gap covers
+the bundles' ~57 files of `session-state` narration.
+*Why acceptable here:* measured directly, the bundles carry **no** `commands/`, `modes/`, `rubrics/`,
+`rules-conditional/` or `.claude/scripts/` directory; their stale-narration counts are *identical* to
+BASE, so this sprint introduced no projection drift; the narration is `.md`/`.toml` only with **zero**
+executable hits, and no bundle hook reads a state directory at all, so nothing computes a stale path at
+runtime. Pointing `validate --target codex` at the bundle root passes 16 checks. A declared sprint-9
+deferral, not a regression.
+*What makes it blocking:* an executable bundle file computing a retired path, or a projection carrying
+a removed directory.
 
-- **F13 [MINOR, new — a measurable AC-13 clause miss] `tests/hooks/launcher-path-env.test.ts` is
-  now 224 lines, over the 200-line limit.** AC-13 requires that no new file exceed 200 lines, with
-  only the generated manual exempt (`.claude/skills/help/references/cli.md`, 514). The file was 163
-  lines at round 1 and grew 61 lines from the three F8 cases. I measured every new file: this is
-  the only non-exempt one over the limit, and no *changed* file crossed 200 because of this sprint
-  (`scripts/check-kit-verbs.cjs` 114 → 182, `orientation-ritual.cjs` 113 → 152, and the seven files
-  already over 200 at the base grew only as previously recorded). The evidence's "Review fixes"
-  section does not re-measure line counts, which is how this got through. Not blocking, and the
-  project's own rule says the limit is a maintainability guard rather than a licence for mechanical
-  splitting — but the file does have a natural seam: it is already two `describe` blocks, the
-  library's six properties and the handler integration, and moving the second to its own file would
-  reduce it without inventing indirection. Dropping a shell-evaluated injection test to get under
-  the number would be strictly worse, so if the human prefers the overshoot, that is a reasonable
-  call to make explicitly rather than silently.
-- **F12 [MINOR, new] `core/__tests__/project-launcher.test.ts` writes into the developer's real
-  home directory.** `writeLauncher` calls `recordCliEntry`, which resolves
-  `path.join(homedir(), ".mewkit", "cli", …)` at `project-launcher.ts:30-31` with no injectable
-  seam, so the four `writeLauncher` calls in the test leave real files outside any temp directory.
-  Observed on this host: `~/.mewkit/cli/9.9.9-test.json`, whose `entry` names a `$TMPDIR` path that
-  no longer exists. Harm is low — the launcher's `usableFile` check rejects a stale entry, so it
-  degrades to the doctor hint — but the tests are not hermetic, which is a flake and
-  cross-contamination risk, and it sits against the spirit of D11 (journeys assert inside a
-  throwaway directory). Cheap fix: give `recordCliEntry` an optional store root, or read one from
-  the environment. The read side needs no change, since the generated launcher inlines its own
-  reader. I removed the one record my own verification wrote (`9.9.9-review.json`) and left the
-  others, since deleting another run's residue is not mine to do.
-- **F14 [MINOR, new] F6's fix pins a literal commit SHA.**
-  `tests/docs-cli-resolution.test.ts:33` hardcodes `REVIEWED_REVISION = "be3e990b"`. That is
-  correct today and is what makes the assertion meaningful, but it errors rather than fails
-  informatively once the commit becomes unreachable — a squash, rebase or amended history would do
-  it. Pinning to the merge-base against the default branch, or to the base branch tip, keeps the
-  same property without the expiry.
-- **F5 [MINOR, carried] six per-command unknown-subcommand branches are now unreachable** for the
-  case they were written for, because `classifyInvocation` intercepts first (`index.ts:194`,
-  `commands/capabilities.ts:102`, `commands/task-state.ts:237`, `commands/backups.ts:110`,
-  `commands/pack.ts:83`, `commands/advice.ts:563`). Still six, still pre-existing, still outside
-  the approved scope. One sentence saying whether they are defence-in-depth for programmatic
-  callers would stop the next reader re-deciding.
+**2 — Pre-existing: Gate 2 fails *open* when `git` cannot run.** (Round 1's W5, deliberately left.)
+*What it means:* `.claude/hooks/lib/gate2-change-set.cjs:23-27` returns `''` on any spawn error or
+non-zero status; an empty change set then means `changed.length === 0`, which takes the `allow()`
+branch in `gate2-check.cjs:46`. Driven in a throwaway project with a staged ship-capable file,
+`pre-ship.cjs` printed "PRE-SHIP PASS" and exited **0** both under a stripped PATH and with a corrupted
+`.git/index`. A check whose whole contract is to fail closed does the opposite in one error class.
+*Why acceptable here:* **not caused by this change** — I re-confirmed `gate2-change-set.cjs` has zero
+diff against BASE this round — and the blast radius is narrow, since the `git commit` being gated would
+itself fail under the same conditions. `security-rules.md`'s Enforcement clause is explicit that
+existing code is flagged and documented, never auto-fixed, because it may carry context I lack.
+*What makes it blocking:* a future sprint touching that file without fixing it, or any error class
+where the commit succeeds while the gate is bypassed. **Suggested fix:** treat a spawn error or
+non-zero status as unknown-and-therefore-blocked rather than returning `''`.
 
-Hygiene re-checked on the updated diff, excluding my own review prose from the scan: no `any`, no
-`as any`, no `as unknown as`, no `@ts-ignore`, no new TODO or FIXME, no commented-out code, and no
-code comment, test name, file name or script name referencing a plan artifact. Build, typecheck and
-lint all exit 0, with the same three pre-existing unused-symbol warnings in `commands/capabilities.ts`,
-`commands/orient.ts` and `commands/validate.ts:447` and zero errors.
+**3 — `release-manifest.json` still names 56 removed paths.** (Round 1's W6(c); accepted deviation 6.)
+*What it means:* a committed artifact describes a kit shape that no longer exists.
+*Why acceptable here:* verified in round 1 that it does **not** reach an installed project — the
+installer reads it from the release directory and does not copy it to the project root — and the
+release pipeline regenerates it. So no user sees the stale list.
+*What makes it blocking:* it being consumed by an installed project, or by `validate --packs` (neither
+is true today).
 
-## Performance
+**4 — The Gate 2 advice line and the gate rule disagree about where the active-plan pointer lives.**
+*What it means:* `gate2-check.cjs:70` advises `session-state/active-plan.json` while
+`.claude/rules/gate-rules.md` now names `.meowkit/state/active-plan.json`. A user following the hook's
+advice writes to the legacy location.
+*Why acceptable here:* the message is pinned byte-for-byte by the recorded corpus, and the no-re-record
+rule outranks message polish — re-recording a fixture to tidy prose is exactly what the contract
+forbids. The lookup accepts the pointer in both classes, so the advice still *works*, and this round
+added a comment stating that invariant in place, which is a real improvement on round 1 where the
+divergence was undocumented.
+*What makes it blocking:* the read fallback being removed while the message still names the legacy
+path, which would make the advice actively wrong.
 
-Result — PASS
+**5 — Pre-existing stale references outside the shipped kit.**
+`CLAUDE.md:85` and `packages/docs/content/docs/cli/telemetry.mdx:63-65` name the nonexistent
+`mewkit inventory --substrate`; `.claude/skills/plan-creator/assets/bead-template.md:40` narrates
+`session-state/build-progress.json` in prose; the brand linter is red at BASE and less red now.
+*What it means:* a reader of the root instructions or the docs site can be sent to a verb that does not
+exist.
+*Why acceptable here:* all were stale at BASE, none is in the shipped kit (the one shipped instance was
+fixed this round — F5), and `bead-template.md:40` is prose that the new guard's negative controls
+deliberately keep legal, since naming a retired path is not writing to one.
+*What makes it blocking:* nothing in this sprint; these belong in a docs pass. Worth folding into
+sprint 9 since it already touches descriptions.
 
-Nothing in the fixes touches a hot path. `singleQuote` adds one `split`/`join` over a string of
-PATH length and the control-character guard one regex test, both once per SessionStart.
-`fileURLToPath` is cheaper than constructing a `URL`. The widened exit-code regex and the
-byte-compare changelog assertion run only in tests. The two observations carried from round 1
-stand and remain immaterial: the orientation handler evaluates `containedLauncher(ROOT)` eagerly
-even when the descriptor already resolved (one extra realpath pair per session), and dispatch adds
-one `find` over 24 commands plus one `includes` over at most ten sub-verbs before the switch.
+**6 — The new guard's scope is bounded, by design.**
+*What it means:* `retired-state-write-instructions.test.ts` covers three retired roots
+(`session-state`, `.claude/cache/`, `.claude/hooks/.logs`) and shell write shapes (`mkdir`, `touch`,
+`tee`, `>`/`>>`). A write expressed another way — a Python `open(..., "w")` or an `fs.writeFileSync`
+inside prose — would not be caught, nor would a fourth retired root nobody adds to the list.
+*What it means in practice:* the guard closes the defect class that actually occurred and the shapes
+one rewrite away from it, which is the right scope for a regression guard; over-generalising it would
+cost false positives on the many legitimate mentions of these paths.
+*Why acceptable here:* the kit's instructions are shell, the three roots are the three the state move
+retired, and the detector's negative controls make the boundary explicit and reviewable.
+*What makes it blocking:* a retired-root write reaching a shipped file through an idiom the detector
+does not model — at which point the shape list grows rather than the approach changing.
 
-## Security
+## Items closed this round
 
-Result — WARN
+| Round 1 item | Status | How I confirmed |
+| --- | --- | --- |
+| R1 — `--tdd` instruction wrote a retired root | closed | corrected line run in a clean project: exit 0, sentinel present, no retired path; own tree-wide sweep clean |
+| R1-followup / W3 — no instruction-level guard | closed | new 76-line guard; pre-fix line planted in a faithful clone fails it on both the shipped and the maintainer copy |
+| W1 — registry gave 5 moves no coverage | closed | my four probes now 4/4; mapping-line control still legal; the new rule found a live stale reference |
+| W2 — three unqualified citations of a withheld path | closed | all three qualified; whole-ship-set sweep finds zero unqualified mentions |
+| W6(a) — evidence header contradicted its body | closed | header, §4 and §5 read correctly, with §1's stop kept as a labelled historical note |
+| W6(b) — stale emitters in the docs inventory | closed | `:4`, `:56`, `:57` current; `docs-manifest --check` green |
 
-The one real defect is closed, demonstrated above with a shell that executed the payload on the
-old code and treated it as data on the new. Blocked-pattern scan over the updated diff is clean:
-no hardcoded secret or key material, no `any` or unsafe cast, no `eval`, no `shell: true`, no
-string-interpolated SQL, no `localStorage`, no disabled certificate validation. Both process
-spawns still pass an argv array and never a shell string. What remains are the three
-trust-boundary items recorded in round 1, all unchanged and all still non-blocking.
+## Builder deviations
 
-- **F9 [informational, carried] the launcher is executed on sight, with no check of its bytes.**
-  `containedLauncher` applies the same realpath-both-sides containment rule as the descriptor gate
-  to a fixed project-relative path, so it grants no reach the descriptor path would not have, and
-  the symlink-escape case is tested. Confirmed still true: nothing in
-  `.claude/hooks/lib/launcher-path-env.cjs` or `.claude/hooks/handlers/orientation-ritual.cjs`
-  compares the launcher against `launcherSource(version)`. The delta from the base remains that a
-  committed `.meowkit/bin/mewkit` now suffices on its own, and that file is *expected* to be
-  committed, so it is a less conspicuous place for a hostile change to sit. The CLI generates that
-  text deterministically, so comparing it before execution is close to free.
-- **F10 [informational, carried] containment is one hop deep.** The gate validates the launcher;
-  the launcher then executes whatever absolute path `~/.mewkit/cli/<version>.json` names, outside
-  the project and outside the gate. In-contract per D3 and AC-05 (engine bytes are not kit content,
-  and a fresh clone must be able to resolve a CLI), and home-directory integrity is already a
-  precondition for trusting a dev machine. Recorded as a boundary fact. F12 above is the same
-  directory being written by the test suite, which is why the two are worth reading together.
-- **F11 [WARN, carried] decision D2(ii)(f) is prose with no test, and one path contradicts it
-  literally.** Re-confirmed: Gate 1 (`.claude/hooks/gate-enforcement.cjs`) spawns nothing, the
-  Gate 2 structural check spawns `process.execPath` with an explicit repo-relative validator path,
-  and the privacy and post-write scans spawn no CLI — so no gate decision depends on the PATH
-  entry. The exception is still `.claude/hooks/lib/memory-store-lint.cjs:45`, whose `resolveCli`
-  returns the bare string `'mewkit'` as its last resort. Pre-existing, and the direction of effect
-  is safe (a skipped lint becomes a real one, through the project's own pinned launcher), but an
-  invariant stated this firmly should be asserted rather than reasoned about.
+Round 1's eleven deviations stand as recorded there; none was revisited this round, and I re-confirmed
+the two that the fix round could have disturbed — `release-manifest.json` untouched (item 3 above) and
+`gate2-check.cjs`'s message byte-identical (F7). The fix round introduced no new deviation: every
+change in its F8 table is inside the contract's scope, and the one judgement call — covering tracked
+`.claude/` files as well as the ship set in the new guard — widens a check rather than narrowing one.
 
-## Coverage
+## Process disclosure (carried forward, per Rule 1 — No Silent Override)
 
-Result — PASS
+During slice 4 the developer ran `mewkit init --help` **once from the repository root**. The contract
+forbids this without qualification, including `--help` (sprint 7 D11, still binding). The orchestrator
+verified no residue — no `.meowkit/bin`, no `.claude/runtime.json`, no new untracked files — and I
+found nothing in the working tree inconsistent with that, this round included. **Recorded, not
+excused.** No dimension impact. No further occurrence in the fix round; my own verification of the
+install journey ran against a throwaway project, and the guard probes against a scratch clone, never
+against this repository.
 
-All 13 acceptance criteria are implemented and tested, and the round-1 coverage gaps that mattered
-are closed by tests rather than by argument: the path class F1 broke on now has four cases
-including a non-ASCII directory, the metacharacter case F8 needed now has three including a real
-shell evaluation, and the two guards that asserted less than their names promised (F6, F7) now
-assert the stated property with negative controls.
+## Suggestions (non-blocking)
 
-Full suite on Node 24: **294 files / 3375 tests passed, 0 skipped**, exit 0 — nine more tests than
-round 1's 3366, matching the nine cases the six fixes added. The `FAIL:` strings in the suite
-output are the intentional negative-control output of checks proving they have teeth, not
-failures. No test was skipped, deleted or weakened; the three retargeted assertions each assert
-the same or a stronger property.
+- Fold item 5's docs pass into sprint 9, which already opens the description surface.
+- When the corpus can next be legitimately re-recorded, reconcile the Gate 2 advice line with the rule text (item 4) so there is one answer rather than a documented two.
+- Consider whether `validate --agents`' count rule should accept the shipped count, so `README.md:9` can state the number a user actually receives rather than the repository number with a clarification elsewhere.
+- Item 2's fix is small and worth taking before it is inherited again.
 
-Every validator and committed check re-run here, all exit 0: `validate` with `--packs`,
-`--frontmatter`, `--docs-refs`, `--gates`, `--memory`, `--substrate`, `--plugin`, `--agents`,
-`--workflow`, `--ownership`, `--parity`; `check-kit-verbs`, `check-env-reads`,
-`check-dangling-rule-refs`, `check-memory-wiki-residue`, `check-always-on-budget`,
-`check-rule-survival`, `check-no-python --allow-existing-envs`, `terminology-linter`,
-`generate-cli-manual --check`, `docs-manifest.cjs --check`, `harness-inventory.cjs --check`,
-`codex-compat-check.mjs`, and `doctor --hard-gates` with the retired environment names unset.
-
-- **Coverage gap 3 [MINOR, carried]** — `exposeLauncherOnPath` still decides "already first" from
-  the *hook process's* own `PATH` (`.claude/hooks/lib/launcher-path-env.cjs:91-92`), which cannot
-  contain the directory the env-file line adds, because that line is applied to Bash tool commands
-  and not to the hook. So the guard only fires when the user added the directory by hand, and if
-  the host reuses one env file across sessions the file gains a line per session. Reading the env
-  file for an identical existing line would close it. A hardening suggestion, not an AC gap.
-- F12 and F14 above are test-hygiene items as much as maintainability ones.
-
-## Required changes
-
-None. Nothing in this round blocks.
-
-## Suggestions (non-blocking, in the order I would do them)
-
-- **F13** — split the handler-integration `describe` out of
-  `tests/hooks/launcher-path-env.test.ts` to bring it back under 200 lines, or record an explicit
-  decision to accept 224 for a test file.
-- **F12** — give `recordCliEntry` an injectable store root so the launcher tests stop writing into
-  the real `$HOME`.
-- **F14** — resolve `REVIEWED_REVISION` from the merge-base rather than hardcoding a SHA.
-- **F11** — assert that no gate hook resolves its executable by bare name.
-- **F9** — compare the launcher's bytes against `launcherSource(version)` before the SessionStart
-  handler executes it.
-- **Coverage gap 3** — detect an already-written PATH line by reading the env file.
-- **F5** — state once whether the per-command unknown-subcommand branches are retained
-  deliberately.
-- **F3 / F10** — no action proposed; recorded so the pin's durability and the one-hop containment
-  boundary are known rather than assumed.
-- Operational note, unchanged and not a defect: this repository has no `.meowkit/bin/mewkit` (an
-  install writes it, and D11 rightly forbids running `init` here), so sessions in *this* repo print
-  the doctor hint and the labelled checkpoint fallback. Distinct from the fresh-init behaviour
-  AC-06 governs.
-
-## WARN acknowledgements
-
-**Maintainability — WARN.** *What it means:* one new test file overshoots the 200-line limit AC-13
-sets (224), the launcher tests write into the real home directory, one new assertion pins a literal
-commit SHA that will expire, and six pre-existing unknown-subcommand branches are undocumented as
-to intent. *Why acceptable here:* none changes runtime behaviour or sits inside a trust boundary;
-the line overshoot is 12% in a test file and was caused by a security test this review asked for,
-where the project's own rule warns against mechanical splitting; the home-directory writes degrade
-safely because the launcher validates the entry it reads; and the SHA pin is correct today and is
-what gives the assertion its meaning. *What would make it a stop:* a line-limit miss in shipped
-source rather than a test, a non-hermetic test that can change another test's result, or an
-assertion that is already unreliable rather than merely perishable.
-
-**Security — WARN.** *What it means:* the launcher is executed on sight without a byte check (F9),
-the containment guarantee stops at the launcher rather than at what it runs (F10), and the "no
-safety hook resolves through this PATH entry" invariant is prose with one literal counter-example
-(F11). *Why acceptable here:* the injection channel found in round 1 is closed and demonstrated
-closed against a real shell; F9 grants no reach the previous descriptor path did not already grant;
-F10 is a decided, recorded consequence of D3 whose precondition (home-directory integrity) is
-already required to trust the machine; and F11's one contradicting path pre-dates this change and
-moves a check from skipped to performed, which is the safe direction. *What would make it a stop:*
-an injection channel reachable from repository content, tool output or network data; a gate or
-privacy hook whose *decision* depends on the PATH entry; or evidence that a hook process resolves
-`mewkit` through it in a way that could relax a block.
-
-## Post-review changes (orchestrator)
-
-- **F13 closed:** the PATH-line suite is split into `tests/hooks/launcher-path-env-library.test.ts` (157) and
-  `tests/hooks/launcher-path-env-handler.test.ts` (52) with shared builders in `tests/hooks/lib/launcher-path-fixtures.ts`;
-  14 cases before and after.
-- **F12 closed:** `recordCliEntry`/`writeLauncher` take an optional store home (production default unchanged);
-  the launcher tests use a temporary store, and a new case exercises the machine-record branch. The stray
-  `~/.mewkit/cli/9.9.9-test.json` was removed.
-- **F14 closed:** the changelog comparison base is resolved from the merge base with `main`, not a literal SHA.
-- Two files these fixes pushed past 200 lines were split at real seams (`project-launcher-module-url.test.ts`,
-  `docs-changelog-immutability.test.ts`). Orchestrator re-ran the six affected suites on Node 24: 33/33 pass;
-  developer full run 297 files / 3378 tests passed.
-
-## Gate 2 decision — CLI surface, project launcher and strict dispatch
+## Gate 2 decision — kit shape: one shipped tree, runtime state under .meowkit
 
 Human approval, typed by the owner in response to the Gate 2 prompt for this review:
 
 > "Approve, ack WARNs"
 
-- **Maintainability WARN** acknowledged: unreachable per-command unknown-subcommand branches (F5); the
-  npx-install launcher pin lasts only as long as npm's cache (F3); no verb prints effective config values
-  after `status` was removed. F12, F13, F14 closed before commit (see "Post-review changes").
-- **Security WARN** acknowledged: the committed launcher's bytes are not compared against the generated
-  source before a hook runs it (F9); containment is one hop deep (F10); `memory-store-lint.cjs` still
-  resolves bare `mewkit`, fail-safe and not gate-deciding (F11). F8 closed before commit.
-- `review --help` now prints help and exits 0 (previously ran the command and exited 1): accepted.
+- **WARN 1** acknowledged: no test asserts the Codex/Cursor projections are in sync with the reduced
+  surface, and Cursor has no CI lane; stale counts are identical to BASE and nothing executable is affected.
+- **WARN 2** acknowledged: pre-existing Gate 2 fail-open when `git` errors (`gate2-change-set.cjs:23-27`);
+  zero diff vs BASE, documented not auto-fixed; to be fixed in its own follow-up.
+- **WARN 3** acknowledged: `release-manifest.json` still names removed paths; the release pipeline regenerates it
+  and it never reaches an installed project.
+- **WARN 4** acknowledged: the Gate 2 advice line names the pre-move pointer location; kept byte-identical to its
+  recorded golden body, and the read fallback keeps it true.
+- **WARN 5** acknowledged: pre-existing stale references outside the shipped kit (`CLAUDE.md`, `telemetry.mdx`,
+  `bead-template.md:40` prose, brand linter).
+- **WARN 6** acknowledged: the retired-path write guard covers shell write shapes into three retired roots only.
+- Process disclosure (`mewkit init --help` run once from the repo root during the build, no residue) noted.

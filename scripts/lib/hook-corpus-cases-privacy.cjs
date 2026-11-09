@@ -26,6 +26,17 @@ const privacyCases = [
     setup: () => {},
   },
   {
+    name: 'privacy-read-webfetch-manifest-state-cache',
+    stdin: read('.meowkit/cache/web-fetches/index.jsonl'),
+    setupDescription: 'BASE hook tree only; the manifest at the canonical cache root',
+    // The BASE tree matched only the kit-tree cache root, so it cannot produce
+    // this block and this expectation is authored rather than recorded. The
+    // pre-move case beside it stays recorded and unchanged, which is what proves
+    // the widened pattern took nothing away.
+    authoredAfterBase: 'BASE matched only the pre-move cache root, so it cannot produce this block',
+    setup: () => {},
+  },
+  {
     name: 'privacy-read-ordinary-file',
     stdin: read('src/app.ts'),
     setupDescription: 'BASE hook tree only',

@@ -13,7 +13,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const BOOTSTRAP_FILE = path.join(__dirname, '../../capability-bootstrap.md');
+const BOOTSTRAP_FILE = path.join(__dirname, '../references/capability-bootstrap.md');
 
 module.exports = function capabilityBootstrap() {
   try {

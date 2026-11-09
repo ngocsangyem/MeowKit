@@ -84,7 +84,7 @@ For skill suggestions based on task type, see `mk:agent-detector` (its `../agent
 
 ## State-to-Recommendation Map
 
-> Alias: `the plan skill` routes to `mk:plan-creator` (slash-command wrapper at `.codex/commands/mk/plan.md`). Subcommands `red-team`, `validate`, `archive` are handled by the same skill.
+> `mk:plan-creator` is the planning entrypoint, and its `red-team`, `validate` and `archive` subcommands are handled by that same skill — there is no separate dispatcher to route through.
 
 | State | Pipeline Phase | Recommendation |
 |-------|---------------|----------------|

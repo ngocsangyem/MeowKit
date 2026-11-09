@@ -20,11 +20,11 @@ const path = require('node:path');
 
 const { validateGate2 } = require('../lib/validate-gate-2.cjs');
 const V = require('../lib/gate2-verdict-lookup.cjs');
-const { telemetryDir } = require('../lib/meowkit-paths.cjs');
+const { sessionStateDir, sessionStateFile, telemetryDir } = require('../lib/meowkit-paths.cjs');
 const { configValue } = require('../lib/read-config.cjs');
 
-const ATTEMPTS_REL = 'session-state/precompletion-attempts.json';
-const REQUIRED_REL = 'session-state/verification-required.json';
+const ATTEMPTS_BASENAME = 'precompletion-attempts.json';
+const REQUIRED_BASENAME = 'verification-required.json';
 const MAX_ATTEMPTS = 3;
 
 const readJson = (file, fallback) => {
@@ -32,8 +32,8 @@ const readJson = (file, fallback) => {
 };
 
 function writeAttempts(root, slug, value) {
-  const file = path.join(root, ATTEMPTS_REL);
-  const data = readJson(file, {});
+  const file = path.join(sessionStateDir(root), ATTEMPTS_BASENAME);
+  const data = readJson(sessionStateFile(ATTEMPTS_BASENAME, root), {});
   if (value === null) delete data[slug];
   else data[slug] = value;
   try {
@@ -53,7 +53,7 @@ const slugOf = (raw) => {
 function resolvePlan(root) {
   const activePlan = V.activePlan(root);
   if (activePlan) return { activePlan, slug: V.slugFromPointer(activePlan) };
-  const required = readJson(path.join(root, REQUIRED_REL), {});
+  const required = readJson(sessionStateFile(REQUIRED_BASENAME, root), {});
   const slug = slugOf(required.slug || required.plan_slug || '');
   return { activePlan: '', slug };
 }
@@ -100,7 +100,7 @@ module.exports = function preCompletionCheck(ctx) {
   }
 
   // Only the orchestrating skill decides that a session owes verification.
-  const required = readJson(path.join(root, REQUIRED_REL), null);
+  const required = readJson(sessionStateFile(REQUIRED_BASENAME, root), null);
   if (required === null) return null;
   if (required.required === false) return null;
 
@@ -125,7 +125,7 @@ module.exports = function preCompletionCheck(ctx) {
     return null;
   }
 
-  const attempts = Number(readJson(path.join(root, ATTEMPTS_REL), {})[slug] || 0);
+  const attempts = Number(readJson(sessionStateFile(ATTEMPTS_BASENAME, root), {})[slug] || 0);
   if (attempts < MAX_ATTEMPTS) {
     const next = attempts + 1;
     writeAttempts(root, slug, next);

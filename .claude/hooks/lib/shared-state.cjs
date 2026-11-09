@@ -1,16 +1,21 @@
 // shared-state.cjs — Persistent JSON state for cross-handler data sharing.
-// Files stored in session-state/*.json with atomic writes (tmp+rename).
+//
+// One JSON file per name in the session-marker class, written atomically
+// (tmp+rename). The directory comes from the one path resolver rather than being
+// joined here: a hand-joined project-root path is what used to drop these files
+// beside a user's source tree.
 
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-const DIR = path.join(ROOT, 'session-state');
+const { sessionStateDir, sessionStateFile } = require('./meowkit-paths.cjs');
+
+const DIR = sessionStateDir();
 
 module.exports = {
   load(name) {
     try {
-      return JSON.parse(fs.readFileSync(path.join(DIR, `${name}.json`), 'utf8'));
+      return JSON.parse(fs.readFileSync(sessionStateFile(`${name}.json`), 'utf8'));
     } catch {
       return null;
     }

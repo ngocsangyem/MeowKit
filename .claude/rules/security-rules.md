@@ -23,7 +23,7 @@ The agent MUST NOT write any of the following without explicit human override:
 
 ## Enforcement
 
-**Reviewing existing code** (`/mk:review`, `/mk:audit`): flag as **WARN**, document it in the verdict, do not auto-fix — existing code may carry context the agent lacks.
+**Reviewing existing code** (`/mk:review`, `/mk:cso`): flag as **WARN**, document it in the verdict, do not auto-fix — existing code may carry context the agent lacks.
 
 **Writing new code: BLOCK** — do not write the pattern. Ask the human for an explicit override; if approved, document the reason in the plan file and proceed. The override and its justification become part of the review record.
 

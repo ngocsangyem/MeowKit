@@ -52,8 +52,8 @@ function fixture(levels: Levels): { root: string; home: string } {
 		fs.writeFileSync(path.join(home, ".meowkit/config.yaml"), levels.user);
 	}
 	if (levels.sentinel !== undefined) {
-		fs.mkdirSync(path.join(root, ".claude/session-state"), { recursive: true });
-		fs.writeFileSync(path.join(root, ".claude/session-state/tdd-mode"), levels.sentinel);
+		fs.mkdirSync(path.join(root, ".meowkit/state"), { recursive: true });
+		fs.writeFileSync(path.join(root, ".meowkit/state/tdd-mode"), levels.sentinel);
 	}
 	return { root, home };
 }

@@ -11,15 +11,6 @@ afterEach(async () => {
 	await Promise.all(tempDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
 
-const SCHEMA = JSON.stringify({
-	properties: {
-		owner: { enum: ["lifecycle", "security", "utility"] },
-		criticality: { enum: ["critical", "high", "medium", "low"] },
-		status: { enum: ["active", "deprecated", "experimental"] },
-		runtime: { enum: ["claude-code", "portable", "experimental"] },
-	},
-});
-
 const FM = (over: Record<string, string> = {}): string => {
 	const base = {
 		owner: "utility",
@@ -42,8 +33,9 @@ async function makeHarness(
 	const root = await mkdtemp(join(tmpdir(), "mewkit-inv-"));
 	tempDirs.push(root);
 	const c = join(root, ".claude");
-	await mkdir(join(c, "schemas"), { recursive: true });
-	await writeFile(join(c, "schemas", "harness-metadata-schema.json"), SCHEMA);
+	await mkdir(c, { recursive: true });
+	// No schema is planted: the governance enums travel with the validator, so these
+	// fixtures are checked against the enum set that actually ships.
 
 	await mkdir(join(c, "skills", "mk-foo"), { recursive: true });
 	await writeFile(join(c, "skills", "mk-foo", "SKILL.md"), opts.skillFm ?? FM());
@@ -58,14 +50,11 @@ async function makeHarness(
 
 	await mkdir(join(c, "rules"), { recursive: true });
 	await writeFile(join(c, "rules", "r1.md"), "# rule body, no frontmatter");
-	await mkdir(join(c, "commands", "mk"), { recursive: true });
-	await writeFile(join(c, "commands", "mk", "c1.md"), "# command body");
 	await mkdir(join(c, "hooks"), { recursive: true });
 	await writeFile(join(c, "hooks", "h1.sh"), "#!/bin/sh\necho hi\n");
 
 	const registry = opts.registry ?? {
 		"rules/r1.md": REGISTRY_ENTRY,
-		"commands/mk/c1.md": REGISTRY_ENTRY,
 		"hooks/h1.sh": { ...REGISTRY_ENTRY, owner: "security", criticality: "critical" },
 	};
 	await writeFile(join(c, "harness-inventory.json"), JSON.stringify({ schema_version: 1, artifacts: registry }));
@@ -79,7 +68,6 @@ describe("enumerateArtifacts", () => {
 		expect(refs.filter((r) => r.type === "skill")).toHaveLength(1);
 		expect(refs.filter((r) => r.type === "agent")).toHaveLength(1); // AGENTS_INDEX excluded
 		expect(refs.filter((r) => r.type === "rule")).toHaveLength(1);
-		expect(refs.filter((r) => r.type === "command")).toHaveLength(1);
 		expect(refs.filter((r) => r.type === "hook")).toHaveLength(1);
 		expect(issues.some((i) => i.path === "skills/broken")).toBe(true);
 	});
@@ -89,7 +77,7 @@ describe("buildInventory", () => {
 	it("merges frontmatter + registry into the frozen InventoryEntry shape", async () => {
 		const c = await makeHarness();
 		const { entries } = buildInventory(c);
-		expect(entries).toHaveLength(5);
+		expect(entries).toHaveLength(4);
 		const skill = entries.find((e) => e.type === "skill")!;
 		expect(Object.keys(skill).sort()).toEqual(
 			["criticality", "id", "owner", "path", "runtime", "source", "status", "type"].sort(),
@@ -155,7 +143,7 @@ describe("checkOwnership", () => {
 	});
 
 	it("FAILS when a registry record is missing", async () => {
-		const c = await makeHarness({ registry: { "commands/mk/c1.md": REGISTRY_ENTRY, "hooks/h1.sh": REGISTRY_ENTRY } });
+		const c = await makeHarness({ registry: { "hooks/h1.sh": REGISTRY_ENTRY } });
 		const results = checkOwnership(c);
 		expect(results.some((r) => r.status === "fail" && r.name.includes("rules/r1.md"))).toBe(true);
 	});
@@ -190,19 +178,14 @@ describe("checkOwnership", () => {
 		expect(results.some((r) => r.status === "fail" && r.name.includes("skills/broken"))).toBe(true);
 	});
 
-	it("FAILS when the schema is absent by default (strict / scoped CI)", async () => {
+	it("needs no schema inside the project it checks", async () => {
+		// The enums describe what this engine enforces, so they ship with it. A project
+		// that carries no schema of its own is checked, not reported as un-installed —
+		// the pre-move behavior advised an upgrade that could never deliver the file.
 		const c = await makeHarness();
-		await rm(join(c, "schemas", "harness-metadata-schema.json"));
 		const results = checkOwnership(c);
-		expect(results.some((r) => r.status === "fail")).toBe(true);
-	});
-
-	it("WARNs (not FAILs) when the schema is absent and missingInfraSeverity=warn (un-synced install)", async () => {
-		const c = await makeHarness();
-		await rm(join(c, "schemas", "harness-metadata-schema.json"));
-		const results = checkOwnership(c, { missingInfraSeverity: "warn" });
-		expect(results.some((r) => r.status === "fail")).toBe(false);
-		expect(results.some((r) => r.status === "warn")).toBe(true);
+		expect(results.every((r) => !/schema/i.test(r.detail) || r.status === "pass")).toBe(true);
+		expect(results.some((r) => r.status === "pass")).toBe(true);
 	});
 });
 

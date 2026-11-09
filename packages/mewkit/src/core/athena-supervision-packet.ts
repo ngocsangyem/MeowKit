@@ -1,6 +1,6 @@
 // Athena supervision packets — what crosses the context boundary, both ways.
 //
-// Canonical contract: `.claude/rules-conditional/advice-supervision-rules.md`.
+// Canonical contract: `.claude/skills/advise/references/advice-supervision-rules.md`.
 // State machine: `athena-supervision-protocol.ts`.
 //
 // Every call is a fresh context fork, so the packet IS the supervisor's entire

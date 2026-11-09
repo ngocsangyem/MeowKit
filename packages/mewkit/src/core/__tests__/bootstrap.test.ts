@@ -47,7 +47,7 @@ describe("bootstrap content contract", () => {
 });
 
 describe("committed bootstrap file (SessionStart hook source) matches the constant", () => {
-	it("the live .claude/capability-bootstrap.md is in sync with renderBootstrap()", () => {
+	it("the live committed bootstrap file is in sync with renderBootstrap()", () => {
 		const file = join(repositoryClaudeDir, BOOTSTRAP_FILENAME);
 		// The hook emits this committed file; it must not drift from the source constant.
 		// Regenerate with `mewkit capabilities bootstrap --write` if this fails.

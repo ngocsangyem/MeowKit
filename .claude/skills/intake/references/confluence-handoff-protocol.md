@@ -12,7 +12,7 @@ Pattern-match against Atlassian Cloud URL grammar
     No match (raw input) → require "from confluence" phrase + numeric token
         ↓
 Pre-flight check: MEOW_CONFLUENCE_* env vars present?
-    NO  → "Confluence not configured. Run /mk:confluence-setup. Exiting."
+    NO  → "Confluence not configured. Run mk:confluence for setup. Exiting."
     YES → continue
         ↓
 Confirm with user: fetch page-id {N}? [Y/n]

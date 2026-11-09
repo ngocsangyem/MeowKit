@@ -9,7 +9,7 @@ and ship production-ready code following the 7-phase workflow.
 
 ## Workflow
 
-<!-- Canonical source: .claude/workflow.yaml -->
+<!-- Canonical source: workflow.yaml -->
 <!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 
 ```
@@ -58,7 +58,7 @@ Full rules incl. Skill Rule of Two: `.claude/rules/injection-rules.md` (Rule 11)
 
 ## Planning
 
-- Non-trivial task → `npx mewkit task new --type [feature|bug-fix|refactor|security] "desc"` (or copy from `tasks/templates/`)
+- Non-trivial task → `npx mewkit task new --type [feature|bug-fix|refactor|security] "desc"` — it creates `tasks/active/` on first write
 - **Plans live at `tasks/plans/YYMMDD-name/`** — overview `plan.md` (≤80 lines) + per-phase `phase-XX-*.md` files. See `.claude/skills/plan-creator/SKILL.md` for the structure.
 - Skill: `mk:plan-creator` auto-selects template
 - Modes: `--fast` | `--hard` | `--deep` | `--parallel` | `--two` | `--product-level`. Composable: `--tdd`. Subcommands: `archive`, `red-team {path}`, `validate {path}`.
@@ -125,7 +125,7 @@ WHY: Compaction summarizes; safety rules cannot be summarized without losing enf
 - **Phase contracts:** `.claude/skills/cook/references/phase-contracts.md` (loaded by `mk:agent-detector` Step 0b)
 - **Agent routing:** `.claude/skills/agent-detector/references/agent-routing.md` (agent table + domain-agent exclusions; loaded by `mk:agent-detector` Step 0b). Intent → skill dispatch moved to `.claude/skills/agent-detector/references/skill-domain-routing.md` (loaded on demand at Step 0b).
 - **Risk checklist:** `.claude/skills/agent-detector/references/risk-checklist.md` (Phase 0 horizontal-risk flags; loaded by `mk:agent-detector` Step 0b)
-- **Agile/Scrum rules:** `.claude/rules-conditional/agile-*.md` (loaded by `mk:agent-detector` Step 0b when Agile context detected)
+- **Agile/Scrum rules:** `.claude/skills/agent-detector/references/agile-*.md` (loaded by `mk:agent-detector` Step 0b when Agile context detected)
 - **Adaptive density:** `.claude/skills/autobuild/references/adaptive-density-matrix.md` (canonical) — governing rule: `.claude/skills/cook/references/harness-rules.md` Rule 5
 - **Orchestrator entry rule:** `.claude/skills/cook/references/orchestration-rules.md`
 - **Commands vs Skills:** `.claude/skills/skill-creator/references/skill-authoring-rules.md`

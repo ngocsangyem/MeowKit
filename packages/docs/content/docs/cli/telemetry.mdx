@@ -23,7 +23,7 @@ mewkit budget [--monthly] [--session [id]] [--day [YYYY-MM-DD]]
 
 **Behavior:**
 - Without filters, `budget` shows the latest 10 rows and the all-time token total.
-- `--session` resolves the current session from `HOOK_SESSION_ID` first, then `session-state/last-session-id`.
+- `--session` resolves the current session from `HOOK_SESSION_ID` first, then `.meowkit/state/last-session-id`.
 - `--day` without a value uses today.
 - Filters compose, so `--session --day` reports the intersection.
 

@@ -29,7 +29,7 @@ describe("archive member path safety", () => {
 		for (const bad of ["../escaped.md", "a/../../escaped.md", "/etc/passwd", "\\\\server\\share\\x", "C:/x"]) {
 			expect(memberPathIsUnsafe(bad)).toBe(true);
 		}
-		for (const good of [".claude/rules/a.md", "tasks/templates/x.md"]) {
+		for (const good of [".claude/rules/a.md", ".meowkit/pack-manifest.json"]) {
 			expect(memberPathIsUnsafe(good)).toBe(false);
 		}
 	});

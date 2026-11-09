@@ -19,6 +19,7 @@ owner: testing
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 # Lint and Validate Skill

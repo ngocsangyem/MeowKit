@@ -1,0 +1,39 @@
+#!/usr/bin/env node
+'use strict';
+// setup-workflow — run the installed setup command, whatever installed it.
+//
+// Usage: setup-workflow [args...]
+//
+// The project's committed launcher is resolved first and the bare name second,
+// so a project that has been installed into never depends on a package fetch to
+// run its own setup — and a project with no usable launcher still works through
+// whatever is on PATH rather than failing on a path that does not exist. The
+// launcher is reached through the same containment check the hooks use, so a
+// recorded path pointing outside the project is refused here too.
+
+const fs = require('node:fs');
+const { spawnSync } = require('node:child_process');
+
+const { containedLauncher } = require('./launcher-path-env.cjs');
+
+/** The launcher only when it is present, inside the project, and executable. */
+function runnableLauncher(root) {
+  const launcher = containedLauncher(root);
+  if (launcher === null) return null;
+  try {
+    fs.accessSync(launcher, fs.constants.X_OK);
+  } catch {
+    return null;
+  }
+  return launcher;
+}
+
+const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+const command = runnableLauncher(root) ?? 'mewkit';
+
+const result = spawnSync(command, ['setup', ...process.argv.slice(2)], { stdio: 'inherit' });
+if (result.error) {
+  process.stderr.write(`setup-workflow: could not run ${command}: ${result.error.message}\n`);
+  process.exit(127);
+}
+process.exit(result.status === null ? 1 : result.status);

@@ -1,6 +1,6 @@
 // Athena supervision protocol — the provider-neutral state machine.
 //
-// Canonical contract: `.claude/rules-conditional/advice-supervision-rules.md`.
+// Canonical contract: `.claude/skills/advise/references/advice-supervision-rules.md`.
 // This module is the mechanical half of it: which stages may run, which
 // dispositions each stage may return, how many calls a run may make, and how a
 // transport status combines with a disposition. Prose and this file must agree;

@@ -364,7 +364,6 @@ const FLAGS: FlagSpec[] = [
 	b("skip-config", ["migrate"], "Do not convert configuration"),
 	b("skip-rules", ["migrate"], "Do not convert rules"),
 	b("skip-hooks", ["migrate"], "Do not convert hooks"),
-	b("reinstall-empty-dirs", ["migrate"], "Recreate directories that were emptied by a prior run"),
 	b("respect-deletions", ["migrate"], "Honor deletions.json rather than reinstating removed files"),
 	b("all-rules", ["migrate"], "Merge every rule into the provider instruction file"),
 	b("include-mcp", ["migrate"], "Also convert .mcp.json servers into the provider MCP config"),

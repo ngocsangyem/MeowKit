@@ -40,8 +40,8 @@ const ALLOWED_COMMANDS = ['git', 'mewkit', 'npm', 'npx', 'swift', 'swiftlint', '
 
 /** The only scripts a guard may hand to `node`. */
 const ALLOWED_NODE_TARGETS = [
-  '.claude/scripts/validate-workflow-evidence.cjs',
-  '.claude/scripts/validate-review-coverage.cjs',
+  '.claude/hooks/lib/validate-workflow-evidence.cjs',
+  '.claude/hooks/lib/validate-review-coverage.cjs',
 ];
 
 /** Host credential surfaces no hook may touch. Exact tokens, so a rules handler named for security does not trip it. */
@@ -106,7 +106,7 @@ describe('every child process a safety entrypoint starts is accounted for', () =
     expect(nodeSites.length, 'the node-run validators are reachable').toBeGreaterThan(0);
     const named = uniqueFiles
       .flatMap((f) => commandLiterals(f.source))
-      .filter((lit) => lit.startsWith('.claude/scripts/'));
+      .filter((lit) => lit.startsWith('.claude/hooks/lib/'));
     for (const target of new Set(named)) {
       expect(ALLOWED_NODE_TARGETS, `node target ${target}`).toContain(target);
     }

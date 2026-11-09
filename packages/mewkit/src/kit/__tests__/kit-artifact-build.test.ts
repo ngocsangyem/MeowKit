@@ -41,16 +41,16 @@ function ephemeralKeyPem(): string {
 }
 
 /** A minimal source tree with the roots and the exclusion field a build needs. */
-function makeSourceRoot(exclude: string[] = ["tasks/reports/*"]): string {
+function makeSourceRoot(exclude: string[] = [".claude/logs/*"]): string {
 	const root = temp("mewkit-kit-src-");
 	mkdirSync(join(root, ".claude", "rules"), { recursive: true });
 	mkdirSync(join(root, ".claude", "scripts"), { recursive: true });
 	mkdirSync(join(root, ".meowkit"), { recursive: true });
-	mkdirSync(join(root, "tasks", "reports"), { recursive: true });
+	mkdirSync(join(root, ".claude", "logs"), { recursive: true });
 	writeFileSync(join(root, ".claude", "rules", "a.md"), "alpha\n");
 	writeFileSync(join(root, ".claude", "rules", "b.md"), "beta\n");
 	writeFileSync(join(root, ".claude", "scripts", "run.sh"), "#!/usr/bin/env bash\necho hi\n");
-	writeFileSync(join(root, "tasks", "reports", "secret.md"), "unpatched detail\n");
+	writeFileSync(join(root, ".claude", "logs", "secret.md"), "unpatched detail\n");
 	writeFileSync(join(root, "release-manifest.json"), JSON.stringify({ version: VERSION, files: [] }));
 	writeFileSync(
 		join(root, ".meowkit", "pack-manifest.json"),
@@ -141,10 +141,10 @@ describe("kit artifact build", () => {
 	it("takes its ship set from the pack manifest, so an added pattern drops the file", () => {
 		const withReport = temp("mewkit-kit-out-in-");
 		build(makeSourceRoot([]), withReport);
-		expect(readManifest(withReport).files.some((f) => f.path === "tasks/reports/secret.md")).toBe(true);
+		expect(readManifest(withReport).files.some((f) => f.path === ".claude/logs/secret.md")).toBe(true);
 
 		const withoutReport = temp("mewkit-kit-out-ex-");
-		build(makeSourceRoot(["tasks/reports/*"]), withoutReport);
-		expect(readManifest(withoutReport).files.some((f) => f.path === "tasks/reports/secret.md")).toBe(false);
+		build(makeSourceRoot([".claude/logs/*"]), withoutReport);
+		expect(readManifest(withoutReport).files.some((f) => f.path === ".claude/logs/secret.md")).toBe(false);
 	});
 });

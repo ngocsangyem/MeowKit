@@ -116,7 +116,7 @@ Priority order:
 ## Output Path Lifecycle
 
 ```
-session-state/active-plan exists?
+.meowkit/state/active-plan exists?
   yes → value is absolute path?
           yes → {value}/visuals/
           no  → tasks/plans/{value}/visuals/   (treated as slug)
@@ -168,7 +168,7 @@ Templates in `assets/` are out-of-band — they are not auto-Read; the agent rea
 - **Mermaid `.node` class collision** — Mermaid.js uses `.node` internally. Page-level `.node` CSS leaks into diagrams. Use `.ve-card` or any non-`.node` class on cards.
 - **Mandatory theme toggle** — every HTML artifact MUST include the light/dark toggle button as the first child of `<body>` per `references/html-design-rules.md`. Missing toggle = incomplete output.
 - **Mermaid theme is static at load** — switching the page theme does not re-skin Mermaid SVG internals; the diagram color palette is read once at init. Document this; do not pretend otherwise.
-- **Output path falls back silently** — when `session-state/active-plan` is missing or unreadable, output writes to `tasks/visuals/`. Log the fallback on stderr so users notice; do not raise.
+- **Output path falls back silently** — when `.meowkit/state/active-plan` is missing or unreadable, output writes to `tasks/visuals/`. Log the fallback on stderr so users notice; do not raise.
 - **Slug truncation at 80 chars** — topics get lowercased, hyphenated, stripped of non-alphanumerics, and truncated at word boundary. Title placeholder uses the original input in title case (not slug). Mismatch silently produces wrong filenames.
 - **Topic strings are HTML-untrusted** — interpolating `--explain "</title><script>alert(1)</script>"` MUST render as literal text. HTML-entity-encode `< > & " '` in element and attribute contexts. See `references/html-design-rules.md` for context-by-context encoding rules.
 - **Browser auto-open is conditional** — headless / SSH / WSL environments cannot open a browser. The shell snippet detects these cases and prints the path instead of invoking `open`/`xdg-open`.

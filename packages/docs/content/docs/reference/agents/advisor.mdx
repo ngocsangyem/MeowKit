@@ -28,7 +28,7 @@ a menu of options or an implementation plan.
 ## Turn Model
 
 The advisor is started fresh for each turn. It reads the prior interview and the
-user’s newest answer from `session-state/<advise-run>/transcript.json`, then
+user’s newest answer from `.meowkit/state/<advise-run>/transcript.json`, then
 updates that checkpoint before ending. This preserves a one-question-per-turn
 interview without treating the advisor as a persistent conversation.
 

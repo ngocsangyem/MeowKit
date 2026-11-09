@@ -65,7 +65,7 @@ Skills load step files JIT (one step at a time). Memory topic files load per-ski
 - `orientation-ritual.cjs`: ~100-token checkpoint recovery on resume (not full transcript re-injection).
 - Step-file JIT architecture: workflow steps load one at a time; never bulk-loaded.
 - Memory tombstone: auto-inject memory pipeline removed (v2.4.0); memory is on-demand per skill.
-- `session-state/` lifecycle: root-level runtime files are cleared on session ID change.
+- `.meowkit/state/` lifecycle: runtime markers are cleared on session ID change.
 
 **Moderate:**
 
@@ -75,10 +75,10 @@ Skills load step files JIT (one step at a time). Memory topic files load per-ski
 
 ## Subagent Delegation Protocol
 
-Use `mk:spawn` to assemble a context-isolated subagent prompt. The command enforces the isolation boundary by construction — it outputs a prompt that contains only what the subagent needs.
+Use `mk:team-config` to assemble a context-isolated subagent prompt. The skill enforces the isolation boundary by construction — it outputs a prompt that contains only what the subagent needs.
 
 ```
-/mk:spawn [task description]
+/mk:team-config [task description]
 ```
 
 **Anti-patterns (from orchestration-rules.md):**
@@ -119,12 +119,12 @@ These approaches were explicitly evaluated and rejected:
 
 ## Memory Lifecycle
 
-Memory topic files in `.claude/memory/` have a 90-day automated pruning policy:
+Memory topic files in `.meowkit/memory/` have a 90-day automated pruning policy:
 
-- `post-session.cjs` runs pruning on Stop (daily rate-limit via `session-state/last-prune-date`)
+- `post-session.cjs` runs pruning on Stop (daily rate-limit via `.meowkit/state/last-prune-date`)
 - Only entries with ISO 8601 date markers in headers are pruned
 - Entries without date markers are preserved (require manual review)
-- Pruned entries logged to `.claude/memory/pruned-log.md`
+- Pruned entries logged to `.meowkit/memory/pruned-log.md`
 - The 90-day window is fixed; there is no setting for it
 
 ## Settings Reference

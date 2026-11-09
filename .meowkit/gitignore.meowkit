@@ -7,7 +7,9 @@
 .env
 .env.local
 
-# Ephemeral per-session runtime state written by the SessionStart hooks.
+# Pre-move session markers. The hooks write under `.meowkit/state/` now, which
+# `.meowkit/.gitignore` already denies; this line keeps an older project's
+# leftover directory out of `git status` until it is deleted.
 session-state/
 
 # Security Posture Reports and other run output under tasks/reports/ carry

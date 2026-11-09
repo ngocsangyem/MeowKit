@@ -110,7 +110,7 @@ Splits are **advisory only**. The sized parent record stays in the report; the s
 
 ## DoR Advisory (conditional)
 
-If `agile_loaded == true` (i.e., `.claude/rules-conditional/agile-story-gates.md` was loaded by `mk:agent-detector`), emit a `DoRStatus`:
+If `agile_loaded == true` (i.e., `.claude/skills/agent-detector/references/agile-story-gates.md` was loaded by `mk:agent-detector`), emit a `DoRStatus`:
 
 ```text
 DoRStatus {
@@ -143,5 +143,5 @@ Inputs that refuse sizing (return `points: null`):
 
 - Fibonacci anchors: `.claude/skills/jira/references/estimation-guide.md`
 - Trust boundary: `.claude/rules/injection-rules.md` Rule 1 + Rule 11
-- Optional DoR rules: `.claude/rules-conditional/agile-story-gates.md`
+- Optional DoR rules: `.claude/skills/agent-detector/references/agile-story-gates.md`
 - Scout extraction (when `--scout` is passed): mirrors `mk:planning-engine` (see SKILL.md)

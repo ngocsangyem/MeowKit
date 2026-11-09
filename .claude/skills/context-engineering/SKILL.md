@@ -8,7 +8,7 @@ description: >-
   near budget, a long session is degrading, you must choose what to read for a task,
   or you are deciding /compact vs /clear vs a sub-agent. NOT for structural .claude/
   overhead audits (see mk:context-audit); NOT for owning persistence (see mk:memory);
-  NOT for USD cost (see mk:budget).
+  NOT for USD cost (see the `mewkit budget` verb).
 keywords:
   - context-engineering
   - context-budget
@@ -25,7 +25,7 @@ when_to_use: >-
   Use for runtime context decisions on the task at hand — how much to read, when to
   stop, when to ask vs assume, when to compact or delegate. NOT for structural
   .claude/ overhead audits (mk:context-audit); NOT for persistence itself (mk:memory);
-  NOT for USD cost (mk:budget).
+  NOT for USD cost (`mewkit budget`).
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored
@@ -61,7 +61,7 @@ structural `.claude/` setup or this session's runtime context? — then route.
 - Auditing `.claude/` token overhead → `mk:context-audit`.
 - Persisting a learning or reading memory topic files → `mk:memory`.
 - Finding *where* code lives → `mk:scout` (or `Read` for one known file).
-- USD run cost → `mk:budget`.
+- USD run cost → `mewkit budget`.
 - A trivial 1–2 file task — no routing needed; just do it.
 
 ## Four Operations

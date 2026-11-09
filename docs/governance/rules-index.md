@@ -50,7 +50,7 @@ skill that owns it. Nothing was dropped: the enforcement text moved intact.
 | `context-budget-rules.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector`, `mk:context-audit` |
 | `rubric-rules.md` | `.claude/skills/rubric/references/` | `mk:rubric`, evaluator agent |
 | `skill-authoring-rules.md` | `.claude/skills/skill-creator/references/` | `mk:skill-creator`, skill audits |
-| `dead-weight-audit-rules.md` | `.claude/skills/benchmark/references/` | `mk:benchmark` |
+| `dead-weight-audit-rules.md` | `.claude/skills/benchmark/references/` (maintainer-only — not in the shipped kit) | `mk:benchmark` |
 | `docs-reference-contract.md` | `docs/maintainer/` (source repo only, not shipped) | maintainers, `npx mewkit validate` |
 | `step-file-rules.md` | inlined as `## Step-File Contract` in each step-filed skill's `workflow.md` | `mk:plan-creator`, `mk:review`, `mk:evaluate`, `mk:autobuild`, `mk:trace-analyze` |
 | `anti-rationalization.md` | merged into `.claude/rules/core-behaviors.md` | always-on |
@@ -64,7 +64,7 @@ B5 (plan status on resumption), B6 (context hygiene) — live verbatim in
 `scripts/check-dangling-rule-refs.cjs` fails the build if any of these files is referenced
 at its old path, or if a destination has no load step naming it.
 
-### Agile Conditional Rules (`.claude/rules-conditional/`)
+### Agile Conditional Rules (`.claude/skills/agent-detector/references/`)
 
 Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sprint-state contract present, `jira_tickets:` in plan frontmatter, `MEOW_JIRA_SITE_URL` env, or Jira-key pattern in user prompt). Non-Agile sessions pay zero context cost.
 
@@ -74,7 +74,7 @@ Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sp
 | `agile-sprint-commitment.md` | Sprint goal persistence, mid-sprint amendment ceremony, sprint close hygiene | `mk:agent-detector` Step 0b (Agile context) |
 | `agile-feedback-cycle.md` | Retro action-item ceremony, spike governance (timebox + findings doc) | `mk:agent-detector` Step 0b (Agile context) |
 
-### Workflow Conditional Rules (`.claude/rules-conditional/`)
+### Workflow Conditional Rules (`.claude/skills/advise/references/`)
 
 Not Agile-gated. Each is loaded on demand by the consuming skill, so a session that does
 not reach the relevant surface pays zero context cost.

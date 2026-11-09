@@ -35,6 +35,23 @@ const securityRows = [
 	"`CASCADE DELETE` without explicit approval in plan",
 ].map((row) => ({ name: `security-rules blocked-pattern row "${row}"`, needle: row }));
 
+/**
+ * The Enforcement clause's disposition for code that already exists.
+ *
+ * Pinned separately from the blocked-pattern rows because it is the sentence that
+ * stops a reviewer from silently rewriting shipped code around a flagged pattern:
+ * existing code is WARNed and documented, never auto-fixed, because it may carry
+ * context the agent lacks. The needle deliberately excludes the entrypoint names
+ * beside it — those are routing surfaces and get renamed; the disposition must not
+ * disappear with a rename.
+ */
+const securityEnforcement = [
+	{
+		name: 'security-rules Enforcement clause (existing code: WARN, documented, never auto-fixed)',
+		needle: "flag as **WARN**, document it in the verdict, do not auto-fix",
+	},
+];
+
 const gateConditions = [
 	["Gate 1 condition 1", "**Plan file exists**"],
 	["Gate 1 condition 2", "**All required sections are populated:**"],
@@ -91,6 +108,7 @@ const developmentPhrases = [
 const ORACLE = [
 	...injectionHeadings,
 	...securityRows,
+	...securityEnforcement,
 	...gateConditions,
 	...a1Block,
 	...a1TableRows,

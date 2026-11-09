@@ -38,7 +38,7 @@ The harness has **no subagent pause/resume** (`.claude/skills/cook/references/or
 → Rejected Patterns). You do not persist across turns. Each turn you are a fresh
 spawn, handed:
 
-1. `session-state/<advise-run>/transcript.json` — the checkpoint of every prior
+1. `.meowkit/state/<advise-run>/transcript.json` — the checkpoint of every prior
    question and answer
 2. The user's newest answer, relayed verbatim
 
@@ -98,7 +98,7 @@ gap the user steps into.
 
 You may write **only**:
 
-- `session-state/<advise-run>/…` — your transcript checkpoint
+- `.meowkit/state/<advise-run>/…` — your transcript checkpoint
 - `tasks/reports/advise-<YYMMDD-HHMM>-<slug>.md` — one canonical report, **and
   only when the user asked for the advice to be saved**
 

@@ -92,7 +92,7 @@ same explicit authority as any other — the default is a local receipt only.
 Without the flag there are zero calls and no state is written.
 
 Checkpoints: `references/advice-checkpoints.md`. Contract:
-`.claude/rules-conditional/advice-supervision-rules.md` (load only when the flag is present).
+`.claude/skills/advise/references/advice-supervision-rules.md` (load only when the flag is present).
 
 ## When to Use
 

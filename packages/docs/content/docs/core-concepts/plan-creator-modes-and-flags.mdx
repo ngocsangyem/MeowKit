@@ -239,21 +239,21 @@ Pause for confirmation when the plan changes scope, when a risk gate finds unres
 | Work shape | Recommended command | Why |
 |---|---|---|
 | Fix a typo in one file | Use the lightweight fix path, not deep planning | Planning cost exceeds risk |
-| Add a small validation branch to a known module | `/mk:plan --fast "add validation for ..."` | Captures acceptance without research overhead |
-| Add a medium feature to known API and UI files | `/mk:plan "add saved filters to reports"` | Default routing is enough |
-| Implement a complex feature across API, storage, and UI | `/mk:plan --hard "add team invitations across API, email, and settings UI"` | Full planning without per-phase inventory |
-| Compare event-driven sync vs polling | `/mk:brainstorming --depth deep "choose sync strategy for ..."` then `/mk:plan ...` | Decide approach before planning |
-| Split a broad indexing module while preserving ranking | `/mk:plan --deep --tdd "refactor search indexing; preserve ranking behavior"` | Needs scope map and regression protection |
-| Run independent backend and UI phases in parallel | `/mk:plan --parallel "add export flow with separate API and UI work"` | Needs ownership matrix |
-| Build a new dashboard product from scratch | `/mk:plan --product-level "build a dashboard for ..."` | Product spec before implementation phases |
-| Investigate whether a migration is feasible | `/mk:plan --spike --timebox 1d "investigate migration path for ..."` | Findings before delivery plan |
+| Add a small validation branch to a known module | `/mk:plan-creator --fast "add validation for ..."` | Captures acceptance without research overhead |
+| Add a medium feature to known API and UI files | `/mk:plan-creator "add saved filters to reports"` | Default routing is enough |
+| Implement a complex feature across API, storage, and UI | `/mk:plan-creator --hard "add team invitations across API, email, and settings UI"` | Full planning without per-phase inventory |
+| Compare event-driven sync vs polling | `/mk:brainstorming --depth deep "choose sync strategy for ..."` then `/mk:plan-creator ...` | Decide approach before planning |
+| Split a broad indexing module while preserving ranking | `/mk:plan-creator --deep --tdd "refactor search indexing; preserve ranking behavior"` | Needs scope map and regression protection |
+| Run independent backend and UI phases in parallel | `/mk:plan-creator --parallel "add export flow with separate API and UI work"` | Needs ownership matrix |
+| Build a new dashboard product from scratch | `/mk:plan-creator --product-level "build a dashboard for ..."` | Product spec before implementation phases |
+| Investigate whether a migration is feasible | `/mk:plan-creator --spike --timebox 1d "investigate migration path for ..."` | Findings before delivery plan |
 
 ## Examples
 
 ### Small fix
 
 ```bash
-/mk:plan --fast "Update the empty-state copy in the reports page.
+/mk:plan-creator --fast "Update the empty-state copy in the reports page.
 Scope: one UI component.
 Acceptance: empty state shows the new text and existing tests still pass."
 ```
@@ -263,7 +263,7 @@ Use `--fast` because the scope is known and the risk is low.
 ### Medium feature
 
 ```bash
-/mk:plan "Add saved filters to reports.
+/mk:plan-creator "Add saved filters to reports.
 Expected output: users can save, rename, apply, and delete report filters.
 Scope: reports API, reports UI, existing user preferences storage.
 Out of scope: sharing filters across teams."
@@ -281,7 +281,7 @@ Constraints: keep existing API response, avoid new infrastructure unless needed.
 Then plan the chosen approach:
 
 ```bash
-/mk:plan --deep "Refactor report generation using the selected approach.
+/mk:plan-creator --deep "Refactor report generation using the selected approach.
 Touch: report API, background job entry point, storage adapter, admin observability.
 Preserve: current API response shape."
 ```
@@ -291,7 +291,7 @@ Use brainstorming first because the architecture is not yet decided. Use `--deep
 ### Behavior-preserving refactor
 
 ```bash
-/mk:plan --deep --tdd "Refactor search indexing without changing ranking behavior.
+/mk:plan-creator --deep --tdd "Refactor search indexing without changing ranking behavior.
 Preserve: ranking order, pagination cursor behavior, retry semantics.
 Tooling: use the project's existing unit and integration test commands."
 ```

@@ -33,7 +33,7 @@ When a skill needs to persist data across sessions (append-only logs, JSON state
 
 WHY: Skill directories can be wiped on plugin upgrade; `${CLAUDE_PLUGIN_DATA}` is stable.
 
-EXCEPTION: framework-internal infrastructure (the team memory store `.meowkit/memory/{decisions,gotchas}.md`, `tasks/`, `session-state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
+EXCEPTION: framework-internal infrastructure (the team memory store `.meowkit/memory/{decisions,gotchas}.md`, `tasks/`, `.meowkit/state/`) keeps its current paths — these are framework state, not skill-owned state. The rule applies to data the skill itself creates and consumes (e.g., `standup-post` history, `babysit-pr` retry logs).
 
 **Good example: Stable plugin-data path**:
 
@@ -110,7 +110,7 @@ WHY: Standardized metadata keeps skill discovery predictable.
 
 ### Validation
 
-Enforced by `mewkit validate --frontmatter` against `.claude/schemas/skill-schema.json`. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
+Enforced by `mewkit validate --frontmatter` against the `skill-schema.json` the CLI carries — the schema describes what the validator accepts, so it travels with the validator and a project holds no copy to edit or outgrow. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
 
 ### Deprecated fields
 
@@ -137,15 +137,33 @@ A skill that creates, binds, or selects external runtime resources MUST honor th
 3. **Default-disabled without config.** External services are `default_enabled: false` unless all required env vars are present; the skill degrades gracefully (soft gate) when they are absent.
 4. **Optional artifact schema validation.** A skill that emits a gate/verdict artifact MAY declare schema validation for it.
 
-## Commands vs Skills (they are not the same)
+## Commands vs Skills (the kit ships one surface)
 
-Slash commands live in `.claude/commands/mk/*.md`. They operate in one of 3 valid patterns — NOT every command has a matching SKILL.md, and that is intentional:
+**The kit authors skills and nothing else.** There is no `.claude/commands/` directory in the kit:
+a job the kit exposes to a user is a skill under `.claude/skills/<name>/SKILL.md`, invoked as
+`mk:<name>`. Every `mk:<name>` reference in kit prose therefore resolves against the skill
+inventory or it is a phantom — `scripts/check-skill-cross-refs.sh` is the enforcement, and it has
+no second inventory to fall back on.
 
-1. **Skill-composing** — command chains existing skills (e.g. `/audit` runs `mk:review` + `mk:cso`).
-2. **Agent-invoking** — command directly spawns an agent without a skill wrapper (e.g. `/arch` uses the `architect` agent).
-3. **Standalone** — command operates via inline behavior, no skill or agent spawn (e.g. `/design`).
+Why one surface: a slash command and a same-named skill are two descriptions of one behavior, and
+two descriptions drift — the command keeps a procedure its skill has since rewritten, and an agent
+reading the command follows stale steps it has no reason to distrust. One menu entry per job also
+means the user picks a job, not a spelling.
 
-**Do not flag a command as a "phantom skill" just because no `mk:<command>` SKILL.md exists.** A command is only phantom when BOTH no `mk:<name>` skill AND no `.claude/commands/mk/<name>.md` exist for a reference. See audit-rubric RF-14.
+A host runtime may still offer its own slash-command directory, and a **project** is free to author
+commands there for its own workflows. Those are project content: the kit neither ships, validates
+nor rewrites them, and the migration layer maps a project's command surface onto whichever surface
+a target provider supports.
+
+Three shapes a job can take, now all expressed as skills:
+
+1. **Skill-composing** — the skill chains other skills (e.g. `mk:cso` composes a security review).
+2. **Agent-invoking** — the skill resolves its inputs and hands the work to an agent (e.g.
+   `mk:status` resolves the plan, then the `project-manager` agent writes the report).
+3. **Standalone** — the skill carries the whole procedure itself.
+
+A skill whose body does nothing but delegate to one other skill is not a shape — it is a duplicate
+menu entry. Rewrite the references to the skill that owns the job instead.
 
 ## Rule 5: Docs References Follow the Two-Tier Contract
 

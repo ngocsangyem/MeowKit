@@ -9,6 +9,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync } from "
 import { rename, unlink, writeFile } from "node:fs/promises";
 import { join, relative, isAbsolute, sep } from "node:path";
 import { z } from "zod";
+import { resolveSessionStateFile, resolveStateDir } from "../state/resolve-state-dir.js";
 import { withFileLock } from "./file-lock.js";
 import { distinctRepos, type ContextEnvelope } from "./repo-context.js";
 
@@ -81,12 +82,12 @@ function activeDir(projectRoot: string): string {
 
 /**
  * The current active-plan pointer, mirroring the existing hook contract
- * (`session-state/active-plan.json` → `path` || `slug`, else legacy plain-text
- * `session-state/active-plan`). Null when absent. This is the CHECKPOINT JOIN: the task record
+ * (`active-plan.json` → `path` || `slug`, else the plain-text `active-plan`, both in
+ * the session-marker state class). Null when absent. This is the CHECKPOINT JOIN: the task record
  * whose `planPath` matches the pointer is the current task (resolves P4 open decision #3).
  */
 export function readActivePlanPointer(projectRoot: string): string | null {
-	const jsonPath = join(projectRoot, "session-state", "active-plan.json");
+	const jsonPath = pointerJsonReadPath(projectRoot);
 	if (existsSync(jsonPath)) {
 		try {
 			const d = JSON.parse(readFileSync(jsonPath, "utf-8")) as { path?: unknown; slug?: unknown };
@@ -96,7 +97,7 @@ export function readActivePlanPointer(projectRoot: string): string | null {
 			/* fall through to legacy */
 		}
 	}
-	const legacy = join(projectRoot, "session-state", "active-plan");
+	const legacy = pointerLegacyReadPath(projectRoot);
 	if (existsSync(legacy)) {
 		const txt = readFileSync(legacy, "utf-8").trim();
 		if (txt) return txt;
@@ -131,8 +132,12 @@ export type ActiveTaskPointer = z.infer<typeof ActiveTaskPointerSchema>;
 export type ActiveTaskPointerResult =
 	{ kind: "canonical"; pointer: ActiveTaskPointer } | { kind: "legacy"; planRef: string } | null;
 
-const pointerJsonPath = (projectRoot: string): string => join(projectRoot, "session-state", "active-plan.json");
-const pointerLegacyPath = (projectRoot: string): string => join(projectRoot, "session-state", "active-plan");
+/** Session-marker directory: the one write target for every pointer this CLI records. */
+const pointerDir = (projectRoot: string): string => resolveStateDir(projectRoot, "state");
+const pointerJsonPath = (projectRoot: string): string => join(pointerDir(projectRoot), "active-plan.json");
+/** The same two pointer files to READ, accepting a pre-move location (`resolve-state-dir.ts`). */
+const pointerJsonReadPath = (projectRoot: string): string => resolveSessionStateFile(projectRoot, "active-plan.json");
+const pointerLegacyReadPath = (projectRoot: string): string => resolveSessionStateFile(projectRoot, "active-plan");
 
 /**
  * Read the active-task pointer. JSON is parsed FIRST: a payload with a valid `taskId` is a
@@ -140,7 +145,7 @@ const pointerLegacyPath = (projectRoot: string): string => join(projectRoot, "se
  * plain-text file is the last fallback. Returns null when no readable pointer exists.
  */
 export function readActiveTaskPointer(projectRoot: string): ActiveTaskPointerResult {
-	const jsonPath = pointerJsonPath(projectRoot);
+	const jsonPath = pointerJsonReadPath(projectRoot);
 	if (existsSync(jsonPath)) {
 		try {
 			const raw = JSON.parse(readFileSync(jsonPath, "utf-8")) as {
@@ -161,7 +166,7 @@ export function readActiveTaskPointer(projectRoot: string): ActiveTaskPointerRes
 			/* fall through to the plain-text legacy file */
 		}
 	}
-	const legacy = pointerLegacyPath(projectRoot);
+	const legacy = pointerLegacyReadPath(projectRoot);
 	if (existsSync(legacy)) {
 		const planRef = readFileSync(legacy, "utf-8").trim();
 		if (planRef) return { kind: "legacy", planRef };
@@ -197,7 +202,7 @@ export async function writeActiveTaskPointer(
 	pointer: Omit<ActiveTaskPointer, "schemaVersion">,
 ): Promise<void> {
 	const validated = ActiveTaskPointerSchema.parse({ schemaVersion: ACTIVE_TASK_POINTER_SCHEMA_VERSION, ...pointer });
-	const dir = join(projectRoot, "session-state");
+	const dir = pointerDir(projectRoot);
 	mkdirSync(dir, { recursive: true });
 	const payload: Record<string, unknown> = {
 		schemaVersion: validated.schemaVersion,
@@ -218,13 +223,16 @@ export async function writeActiveTaskPointer(
  * Returns true when a pointer for `taskId` was removed.
  */
 export async function clearActiveTaskPointer(projectRoot: string, taskId: string): Promise<boolean> {
-	const dir = join(projectRoot, "session-state");
+	const dir = pointerDir(projectRoot);
 	const lockPath = join(dir, ".active-plan.lock");
-	if (!existsSync(pointerJsonPath(projectRoot))) return false;
+	// Cleared wherever the pointer actually is: a pre-move pointer left in place
+	// would keep naming a task that is finished.
+	const jsonPath = pointerJsonReadPath(projectRoot);
+	if (!existsSync(jsonPath)) return false;
 	return withFileLock(lockPath, async () => {
 		const current = readActiveTaskPointer(projectRoot);
 		if (current?.kind === "canonical" && current.pointer.taskId === taskId) {
-			await unlink(pointerJsonPath(projectRoot));
+			await unlink(jsonPath);
 			return true;
 		}
 		return false;

@@ -33,8 +33,6 @@ async function makeRepo(readme: string, skillsIndex: string, agentsIndex: string
 	await writeFile(join(c, "agents", "dev.md"), FM.replace("mk:foo", "dev"));
 	await mkdir(join(c, "rules"), { recursive: true });
 	await writeFile(join(c, "rules", "r1.md"), "# rule");
-	await mkdir(join(c, "commands", "mk"), { recursive: true });
-	await writeFile(join(c, "commands", "mk", "c1.md"), "# cmd");
 	await mkdir(join(c, "hooks"), { recursive: true });
 	await writeFile(join(c, "hooks", "h1.sh"), "#!/bin/sh\n");
 	await writeFile(
@@ -43,7 +41,6 @@ async function makeRepo(readme: string, skillsIndex: string, agentsIndex: string
 			schema_version: 1,
 			artifacts: {
 				"rules/r1.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
-				"commands/mk/c1.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
 				"hooks/h1.sh": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
 			},
 		}),
@@ -67,7 +64,7 @@ async function makeRepo(readme: string, skillsIndex: string, agentsIndex: string
 }
 
 // Accurate docs for the 1/1/1/1/1 harness.
-const README_OK = "1 skills · 1 agents · 1 commands · 1 rules · 1 hook scripts\n";
+const README_OK = "1 skills · 1 agents · 1 rules · 1 hook scripts\n";
 const SKILLS_OK = "Skills.\n`mk:foo`|utility|x|monolithic\n**Total**|**1**\n";
 const AGENTS_OK = "[1]{agent_file,role}\n`dev.md`|core\n";
 const HOOKS_OK = "**Hook count:** 1 node hook scripts.\n- `h1.sh` — does a thing.\n";
@@ -81,7 +78,7 @@ describe("checkStaleIndex", () => {
 
 	it("FAILS on a count drift (README claims wrong skill count)", async () => {
 		const root = await makeRepo(
-			"9 skills · 1 agents · 1 commands · 1 rules · 1 hook scripts\n",
+			"9 skills · 1 agents · 1 rules · 1 hook scripts\n",
 			SKILLS_OK,
 			AGENTS_OK,
 			HOOKS_OK,
@@ -128,7 +125,7 @@ describe("checkStaleIndex", () => {
 
 	it("emitCounts rewrites numbers but not curated prose", async () => {
 		const staleReadme =
-			"77 skills · 17 agents · 21 commands · 19 rules · 27 hook scripts\nKeep this curated sentence.\n";
+			"77 skills · 17 agents · 19 rules · 27 hook scripts\nKeep this curated sentence.\n";
 		const root = await makeRepo(
 			staleReadme,
 			"Curated intro.\n`mk:foo`|utility|x|monolithic\n**Total**|**76**\n",

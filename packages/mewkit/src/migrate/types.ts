@@ -135,7 +135,6 @@ export const MigrateOptionsSchema = z.object({
 	skipHooks: z.boolean().optional(),
 	install: z.boolean().optional(),
 	reconcile: z.boolean().optional(),
-	reinstallEmptyDirs: z.boolean().optional(),
 	respectDeletions: z.boolean().optional(),
 	sourceVersion: z.string().optional(),
 	providers: z.boolean().optional(),

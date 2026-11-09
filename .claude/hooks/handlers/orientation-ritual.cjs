@@ -15,7 +15,7 @@ const { execFileSync } = require('child_process');
 
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const CLAUDE_DIR = path.join(ROOT, '.claude');
-const { LATEST_FILE, gitHead } = require(
+const { LATEST_READ_FILE, gitHead } = require(
   path.join(CLAUDE_DIR, 'hooks', 'lib', 'checkpoint-utils.cjs')
 );
 const { exposeLauncherOnPath, containedLauncher } = require(
@@ -87,7 +87,7 @@ const UNREACHABLE_RUNTIME =
 function checkpointFallback() {
   let checkpoint;
   try {
-    checkpoint = JSON.parse(fs.readFileSync(LATEST_FILE, 'utf8'));
+    checkpoint = JSON.parse(fs.readFileSync(LATEST_READ_FILE, 'utf8'));
   } catch {
     return '';
   }

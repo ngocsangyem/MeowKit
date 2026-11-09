@@ -187,7 +187,7 @@ Side Effects Detected: Yes
 
 ### Evidence Index (recording only)
 
-When a workflow evidence index exists for the run (`mk:cook` or standalone `mk:fix`), the verdict file path is recorded as `review.verdictPath` (and `review.sideEffectsDetected` mirrors the signal above). This is a POINTER for traceability — the 5-dimension verdict and the side-effect signal are unchanged, and the evidence index never approves anything. Contract: `.claude/rules-conditional/workflow-evidence-rules.md`.
+When a workflow evidence index exists for the run (`mk:cook` or standalone `mk:fix`), the verdict file path is recorded as `review.verdictPath` (and `review.sideEffectsDetected` mirrors the signal above). This is a POINTER for traceability — the 5-dimension verdict and the side-effect signal are unchanged, and the evidence index never approves anything. Contract: `.claude/skills/advise/references/workflow-evidence-rules.md`.
 
 ## Pre-Review Scouting (Recommended)
 

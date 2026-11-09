@@ -17,4 +17,4 @@ If the user invokes this skill without any other guidance, ask them what they wa
 - **Type:** Inter 400/500 for headings + body, Fira Code 500 for code/prompts/taglines. Headings use weight 400 (not bold) with `letter-spacing: .02em`.
 - **Tokens:** all variables live in `colors_and_type.css` — source of truth is `design-tokens.json` mirrored from the upstream `packages/docs/app/global.css`.
 - **UI kits:** `ui_kits/website/` (docs-site design recreation), `ui_kits/cli/` (terminal sessions).
-- **Voice:** CLI-first, disciplined, playful-adjacent. Slash-commands (`/mk:plan`), Unicode glyphs (`✓ ✗ → ✋`), no illustrated mascot.
+- **Voice:** CLI-first, disciplined, playful-adjacent. Slash-commands (`/mk:plan-creator`), Unicode glyphs (`✓ ✗ → ✋`), no illustrated mascot.

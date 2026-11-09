@@ -74,8 +74,9 @@ for p in "${SWEEP_PATHS[@]}"; do
 done
 
 # Extract every `.claude/rules/<name>.md` reference (kebab-case +
-# RULES_INDEX-style ALLCAPS_UNDERSCORE). The legacy `.claude/rules-conditional/`
-# tree was merged into `.claude/rules/` in v2.8.4 — historical references in
+# RULES_INDEX-style ALLCAPS_UNDERSCORE). The conditional-rule tree that once sat
+# beside `.claude/rules/` now lives in `.claude/skills/agent-detector/references/`,
+# so it is outside this pattern by construction — historical references in
 # packages/docs/content/docs/changelog.mdx are excluded by the `EXISTING_PATHS` not including it.
 REFS=$(grep -rohE "${SWEEP_GLOBS[@]}" \
   '\.claude/rules/[A-Za-z0-9_-]+\.md' \

@@ -34,6 +34,7 @@ import { readInstallMetadata, CorruptInstallMetadataError } from "../core/instal
 import { readPortableRegistry } from "../migrate/reconcile/portable-registry.js";
 import { TARGET_PROFILES } from "../validate/targets/target-profile.js";
 import { configWritePath } from "../state/resolve-config-path.js";
+import { LEGACY_SESSION_STATE_RELS, resolveStateDir } from "../state/resolve-state-dir.js";
 
 function statusIcon(status: Status): string {
 	switch (status) {
@@ -406,19 +407,16 @@ function checkStateTaxonomy(root: string | null): DiagResult[] {
 	}
 	const results: DiagResult[] = [
 		{
-			status: fs.existsSync(path.join(root, "session-state")) ? "pass" : "warn",
+			status: fs.existsSync(resolveStateDir(root, "state")) ? "pass" : "warn",
 			name: "Runtime state directory",
-			detail: "Ephemeral runtime files use project-root session-state/.",
+			detail: "Ephemeral session markers use .meowkit/state/.",
 		},
 		{
-			status: fs.existsSync(path.join(root, ".claude", "session-state")) ? "warn" : "pass",
-			name: "Legacy Claude session state",
-			detail: ".claude/session-state/ is legacy; prefer project-root session-state/ for runtime state.",
-		},
-		{
-			status: fs.existsSync(path.join(root, "tasks", "autobuild-runs")) ? "pass" : "warn",
-			name: "Autobuild run ledger",
-			detail: "Autobuild audit events belong under tasks/autobuild-runs/.",
+			// Pre-move locations are still READ, so residue is not a failure — it is a
+			// directory that will never be written again and is safe to delete.
+			status: LEGACY_SESSION_STATE_RELS.some((rel) => fs.existsSync(path.join(root, rel))) ? "warn" : "pass",
+			name: "Pre-move session state",
+			detail: "session-state/ and .claude/session-state/ are read-only leftovers; move anything you need into .meowkit/state/ and delete them.",
 		},
 	];
 	return results;

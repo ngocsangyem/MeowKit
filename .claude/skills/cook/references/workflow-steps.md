@@ -150,7 +150,7 @@ node .claude/hooks/pre-implement.cjs "<feature-name>"
 The hook is a no-op unless TDD mode is ON. Mode is ON when:
 
 - `MEOWKIT_TDD=1` env var is set (CI / shell rc), OR
-- `.claude/session-state/tdd-mode` sentinel file contains `on` (written by slash command `--tdd`)
+- `.meowkit/state/tdd-mode` sentinel file contains `on` (written by slash command `--tdd`)
 
 When ON, the hook verifies failing tests exist. If tests pass (no red), implementation is BLOCKED — go back to Phase 2.
 When OFF (default), the hook exits 0 silently and the developer proceeds without the RED-phase gate.
@@ -231,7 +231,7 @@ Max 3 review-fix cycles. After 3: final decision required from user.
 Before presenting for approval, run BOTH structural checks and surface both:
 
 - `.claude/skills/cook/scripts/validate-gate-2.cjs` — the authoritative Gate 2 structural guard (no FAIL dimensions, side-effect addendum present).
-- `node .claude/scripts/validate-workflow-evidence.cjs <evidence-path> --phase cook` — evidence-completeness mirror (blocks on missing `cookContract` dims, empty `verification.commands`, `gate2-approved-without-verdict`, side-effects-without-addendum). It MIRRORS the gate script's status; it never replaces it and never approves. Pass `--plan-input` when the cook input was an existing `plan.md` / `phase-*.md` path.
+- `node .claude/hooks/lib/validate-workflow-evidence.cjs <evidence-path> --phase cook` — evidence-completeness mirror (blocks on missing `cookContract` dims, empty `verification.commands`, `gate2-approved-without-verdict`, side-effects-without-addendum). It MIRRORS the gate script's status; it never replaces it and never approves. Pass `--plan-input` when the cook input was an existing `plan.md` / `phase-*.md` path.
 
 **Output:** `Phase 4: Review [score]/10, Gate 2 approved`
 
@@ -365,7 +365,7 @@ Skip this whole section unless the run was invoked with `--advice`. Without the 
 there are zero supervision calls, no dossier, no receipt, and behavior is unchanged.
 
 On the first checkpoint of a run, read
-`.claude/rules-conditional/advice-supervision-rules.md` — it is the contract this
+`.claude/skills/advise/references/advice-supervision-rules.md` — it is the contract this
 section implements.
 
 | Stage | Fires at | Condition | Max |
@@ -447,7 +447,7 @@ by the agent that is stuck is not an independent check.
 
 ## Workflow Evidence Index (traceability — no new gate)
 
-Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist across Phases 0-6 — no extra agent work, no extra user step, no behavior change. The index records pointers + summaries; it **never approves** (Gate 1 / Gate 2 stay human authority) and carries **no score**. The gate scripts (`validate-gate-1.sh`, `validate-gate-2.cjs`) remain the structural authority; evidence MIRRORS their result.
+Contract: `.claude/skills/advise/references/workflow-evidence-rules.md`. Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist across Phases 0-6 — no extra agent work, no extra user step, no behavior change. The index records pointers + summaries; it **never approves** (Gate 1 / Gate 2 stay human authority) and carries **no score**. The gate scripts (`validate-gate-1.sh`, `validate-gate-2.cjs`) remain the structural authority; evidence MIRRORS their result.
 
 **Storage path:** `tasks/plans/<plan>/reports/evidence/workflow-evidence.json`.
 

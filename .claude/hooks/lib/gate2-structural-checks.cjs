@@ -12,11 +12,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
+const { LEGACY_STATE_RELS, sessionStateDir } = require('./meowkit-paths.cjs');
 const { validateGate2 } = require('./validate-gate-2.cjs');
 const { verdictJsonFor } = require('./gate2-verdict-lookup.cjs');
 
-const EVIDENCE_VALIDATOR = '.claude/scripts/validate-workflow-evidence.cjs';
-const REVIEW_COVERAGE_VALIDATOR = '.claude/scripts/validate-review-coverage.cjs';
+const EVIDENCE_VALIDATOR = '.claude/hooks/lib/validate-workflow-evidence.cjs';
+const REVIEW_COVERAGE_VALIDATOR = '.claude/hooks/lib/validate-review-coverage.cjs';
 
 /**
  * Every block says what it could not prove AND what it never claimed to prove.
@@ -53,15 +54,27 @@ function runValidator(root, validatorRel, args) {
   return { ok: !r.error && r.status === 0, out };
 }
 
+/**
+ * Every directory a standalone run's evidence index may sit under, lowest
+ * precedence first. The pre-move locations are still read: a project that
+ * recorded evidence before session markers moved must still be able to ship it.
+ */
+const evidenceRoots = (root) => [
+  ...LEGACY_STATE_RELS,
+  path.relative(root, sessionStateDir(root)),
+].map((rel) => path.posix.join(rel.split(path.sep).join('/'), 'evidence'));
+
 /** Candidate evidence index locations; the last one present wins. */
 function findEvidence(root, activePlan, slug) {
   const candidates = [path.posix.join('tasks/plans', path.basename(activePlan), 'reports/evidence/workflow-evidence.json')];
-  try {
-    for (const dir of fs.readdirSync(path.join(root, '.claude/session-state/evidence')).sort()) {
-      if (dir.includes(slug)) candidates.push(path.posix.join('.claude/session-state/evidence', dir, 'workflow-evidence.json'));
+  for (const evidenceRoot of evidenceRoots(root)) {
+    try {
+      for (const dir of fs.readdirSync(path.join(root, evidenceRoot)).sort()) {
+        if (dir.includes(slug)) candidates.push(path.posix.join(evidenceRoot, dir, 'workflow-evidence.json'));
+      }
+    } catch {
+      // No evidence tree under this root: the index is optional.
     }
-  } catch {
-    // No session evidence tree: the index is optional.
   }
   return candidates.filter((rel) => isFile(root, rel)).pop() || '';
 }

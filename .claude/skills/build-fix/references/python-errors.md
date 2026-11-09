@@ -41,7 +41,7 @@ open_list = [   # <- unclosed bracket across lines
 1. Install missing package: `pip install X` (or check venv is active)
 2. Check if it's a local module → verify `__init__.py` exists in the package dir
 3. Check PYTHONPATH if it's a custom path module
-4. For skills: run through `node .claude/scripts/skill-python.cjs <script.py>`, which resolves the skill's own environment
+4. For skills: run through `node .claude/hooks/lib/skill-python.cjs <script.py>`, which resolves the skill's own environment
 
 ### ImportError
 

@@ -1,0 +1,41 @@
+---
+title: "mk:status"
+description: "Backward-looking delivery status for the active plan — resolve the plan, then have the project-manager agent write a dated, evidence-based report into the plan directory."
+---
+
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/status/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/status/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
+## What This Skill Does
+
+Resolves which plan is meant — from an argument, a slug, or the set of active plans — then invokes the `project-manager` agent in the foreground to write `{plan-dir}/status-reports/{YYMMDD}-status.md` and prints the path plus the report's headline.
+
+## When to Use
+
+- "Where are we", "what is done", "what is blocked", or a stakeholder update
+- The background auto-fire policy does not apply, or more than one active plan needs disambiguating
+
+**NOT for:** "what should I do next" advice (`mk:help`, which is forward-looking); sprint capacity or ticket planning (`mk:planning-engine`).
+
+## Plan Resolution
+
+| Input | Behavior |
+|---|---|
+| A path | Used directly |
+| A slug | Resolved against `tasks/plans/*{slug}*` |
+| Nothing, 0 active plans | Prints that there is no active plan and writes no file |
+| Nothing, 1 active plan | Uses it |
+| Nothing, 2+ active plans | Asks which one — never picks the most recent silently |
+
+## Pro Tips
+
+- Same-day re-runs overwrite; multi-day history accumulates in the plan's `status-reports/` directory, and archiving a plan archives its reports.
+- Status is a report, never an approval. A green headline clears no gate.

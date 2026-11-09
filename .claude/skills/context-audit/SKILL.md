@@ -5,7 +5,7 @@ version: 1.0.0
 description: |
   Read-only audit of `.claude/` structural overhead. Reports prioritized
   "remove X save Y tokens" recommendations against the model context window.
-  NOT for monetary cost tracking — that's /mk:budget. NOT for transcript
+  NOT for monetary cost tracking — that's the `mewkit budget` verb. NOT for transcript
   size monitoring — long-session continuity defers to Claude Code native
   compaction. NOT for runtime context decisions (what to read, when to
   compact) — see mk:context-engineering. Use when planning to add context
@@ -26,7 +26,7 @@ keywords:
   - agents
   - mcp
   - structural
-when_to_use: Use to audit .claude/ structural overhead and surface 'remove X save Y tokens' recommendations against the model context window. NOT for USD cost tracking (see /mk:budget). NOT for transcript size. NOT for runtime context decisions (see mk:context-engineering).
+when_to_use: Use to audit .claude/ structural overhead and surface 'remove X save Y tokens' recommendations against the model context window. NOT for USD cost tracking (see the `mewkit budget` verb). NOT for transcript size. NOT for runtime context decisions (see mk:context-engineering).
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored
@@ -44,7 +44,7 @@ Read-only audit of `.claude/` structural overhead. Surfaces what is loaded into
 every host-runtime session and how much of the context window it consumes,
 then recommends the highest-leverage trims.
 
-Complementary lens: `scripts/harness-inventory.cjs --substrate` (maintainer script, MeowKit repo only) shows the same artifact set
+Complementary lens: `mewkit validate --substrate` shows the same artifact set
 grouped by the responsibility each serves (covered / partial / missing), so a trim
 can be checked against responsibility coverage before removing an artifact. The
 per-phase read budget that bounds what an audit-driven session should load lives in
@@ -66,7 +66,7 @@ Three concrete triggers:
 
 | Concern                         | Mechanism                                                | Unit          |
 | ------------------------------- | -------------------------------------------------------- | ------------- |
-| Monetary cost                   | `/mk:budget` + `../autobuild/scripts/budget-tracker.sh`  | USD           |
+| Monetary cost                   | `mewkit budget` + `../autobuild/scripts/budget-tracker.sh` | USD           |
 | Window utilization (this skill) | `/mk:context-audit` + `scripts/inventory-context.sh`      | tokens / %    |
 
 The three concerns are deliberately separate. This skill measures only what
@@ -121,7 +121,7 @@ Steps:
 ... (sorted by token impact, descending)
 
 ## How to Act
-- Cost: see `/mk:budget`
+- Cost: see `mewkit budget`
 - Runtime trim: see `mk:lazy-agent-loader`
 ```
 
@@ -139,7 +139,7 @@ the `budget.*` config keys (those are USD amounts, not token percentages).
 - **No env vars introduced.** Window size is hard-coded 200K; override deferred
   until a real 1M-context use case appears.
 - **Discovery:** via `keywords:` frontmatter and a cross-reference from
-  `/mk:budget`. There is no separate routing rule.
+  `mewkit budget`. There is no separate routing rule.
 
 ## Gotchas
 

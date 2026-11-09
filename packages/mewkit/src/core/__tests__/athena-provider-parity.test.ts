@@ -55,8 +55,8 @@ const PLANES: Plane[] = [
 	{
 		name: "claude",
 		adapter: join(repoRoot, ".claude", "agents", "athena.md"),
-		contract: join(repoRoot, ".claude", "rules-conditional", "advice-supervision-rules.md"),
-		contractRef: ".claude/rules-conditional/advice-supervision-rules.md",
+		contract: join(repoRoot, ".claude", "skills", "advise", "references", "advice-supervision-rules.md"),
+		contractRef: ".claude/skills/advise/references/advice-supervision-rules.md",
 		skillId: (c) => c,
 	},
 	{

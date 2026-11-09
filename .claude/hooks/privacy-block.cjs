@@ -43,7 +43,9 @@ const SENSITIVE_PATH = /\.env($|\.)|\.key$|\.pem$|credentials|secret|keystore|\.
  * file holds content a previous fetch stopped as untrusted — reading either
  * discloses history or re-injects that content into context.
  */
-const FETCH_ARTIFACT = /\.claude\/cache\/web-fetches\/index\.jsonl$|\.quarantined$/;
+// Both cache roots are matched: the canonical one and the pre-move one, so a stale
+// cache in a project installed earlier stays as protected as a new one.
+const FETCH_ARTIFACT = /(?:\.meowkit|\.claude)\/cache\/web-fetches\/index\.jsonl$|\.quarantined$/;
 
 /** Commands that invoke the fetch tooling, where a URL argument is worth inspecting. */
 const FETCH_COMMAND = /fetch_as_markdown\.py|web-to-markdown|mk:web-to-markdown/;

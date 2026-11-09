@@ -9,7 +9,7 @@
 ## 1. System Overview
 
 MeowKit is a prompt-engineering framework that extends Claude Code with structured
-workflows, quality gates, memory persistence, and 125 domain skills. It operates
+workflows, quality gates, memory persistence, and 129 domain skills. It operates
 through three mechanisms:
 
 1. **Rules** (`.claude/rules/*.md`) — behavioral instructions loaded every session;
@@ -339,7 +339,7 @@ architecture: separate agents, separate contexts; self-evaluation forbidden
 
 | Step | Action                                                                                                                                            | Rule      |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| 0    | Tier Detection — model-detector.cjs → session-state/detected-model.json → MINIMAL\|FULL\|LEAN                                                     | Rule 5    |
+| 0    | Tier Detection — model-detector.cjs → .meowkit/state/detected-model.json → MINIMAL\|FULL\|LEAN                                                     | Rule 5    |
 | 1    | Plan — mk:plan-creator --product-level; user stories NOT file paths → Gate 1                                                                    | Rule 1, 3 |
 | 2    | Contract — mk:sprint-contract (FULL: required; LEAN: optional; MINIMAL: skip)                                                                   | Rule 3    |
 | 3    | Generate — developer agent (isolated context)                                                                                                     | Rule 2    |
@@ -418,7 +418,7 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | S3 — `/mk:autobuild "build X"` | PARTIAL | `evaluator.md` Required Context missing rubric-rules.md (CF-M4)    |
 | S4 — Python skill runtime      | OK      | per-skill envs under `.meowkit/envs/`, created on demand (CF-C4)   |
 | S5 — Session reset mid-phase   | PARTIAL | `plan-creator/step-02:21` loads missing project-context.md (CF-C5) |
-| S6 — `/meow fix` dispatcher    | PARTIAL | `commands/meow/fix.md:58` phantom `/mk:plan` ref (CF-M29)        |
+| S6 — `/meow fix` dispatcher    | PARTIAL | `commands/meow/fix.md:58` phantom `/mk:plan-creator` ref (CF-M29)        |
 
 Source: `audit-findings/simulation-traces.md` Scenario Verdict Summary table.
 

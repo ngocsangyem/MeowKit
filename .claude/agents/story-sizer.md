@@ -52,7 +52,7 @@ The `Write` tool is allowlisted **only** for persisting the Story Sizing Report 
    - `inconsistencies[]`
    - `split_proposal` (when points ≥ 13 OR distinct concerns > 2)
    - `codebase_signals` (only when scout output supplied)
-   - `dor_status` (only when Agile rules loaded — see `.claude/rules-conditional/agile-story-gates.md`)
+   - `dor_status` (only when Agile rules loaded — see `.claude/skills/agent-detector/references/agile-story-gates.md`)
 4. Refuse to size stories flagged `[NO_ACS]` by the adapter.
 5. Render via the Story Sizing Report template (`.claude/skills/story-sizer/assets/sizing-report-template.md`).
 6. Write the report to `tasks/reports/story-sizing-{YYMMDD}-{slug}.md` using the resolver in `.claude/skills/story-sizer/references/report-writer.md`.
