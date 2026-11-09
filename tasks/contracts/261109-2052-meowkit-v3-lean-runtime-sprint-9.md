@@ -4,9 +4,9 @@ task: meowkit-v3-lean-runtime
 sprint: 9
 plan_ref: tasks/plans/261101-meowkit-v3-lean-runtime/plan.md
 rubric_preset: cli-tool
-status: signed
-generator_signed: 5417d93a31f8211e3abee7e35233989a22f71bdb
-evaluator_signed: e3d1187163429cda3b5751c538009a69cadd928b
+status: amended
+generator_signed: null
+evaluator_signed: null
 rounds: 2
 created: 261109-2052
 ---
@@ -1074,3 +1074,29 @@ Every rubric in the preset has at least one AC binding.
 
 None yet — round 2 is a pre-signature negotiation round, not an amendment. Format: append a new subsection
 per amendment; both sides re-sign.
+
+### Amendment 1 — 261109-2215
+
+**Why.** The build found two clauses that cannot be met as signed. Original criteria above stay as written;
+these overrides apply.
+
+1. **AC-06 / AC-07 ordering commit — no-ship paths only.** The Gate 2 pre-ship hook blocks any commit that
+   contains a ship-capable path until a verdict bound to that revision exists, and the journey specs
+   (`tests/journey-validation/*`) are ship-capable. A contract cannot require a gate bypass, and an
+   intermediate Gate 2 review would review a half-built sprint. So:
+   - The pre-rewrite commit contains only `tasks/reviews/evidence/<date>-meowkit-v3-lean-runtime-sprint-9/*.md`
+     (no-ship): `routing-live.md`, the driver, the metadata snapshot, one full prompt, and
+     `routing-specs-before.md` — the verbatim diff of the new specs and the validator as they stood before any
+     metadata edit.
+   - The spec and validator files themselves land in the sprint's code commit, after Gate 2.
+   - **Override of AC-06's and AC-07's ordering proof:** PASS when (a) the evidence commit and the sprint code
+     commit are two distinct SHAs, the evidence commit an ancestor of the code commit; (b) no commit between
+     them touches any skill or agent metadata; and (c) the spec lines and validator change in the code commit
+     are identical to `routing-specs-before.md`, except for edits the evidence names with a reason.
+     Verification: `git merge-base --is-ancestor <evidence> <code>`;
+     `git log <evidence>..<code>^ -- .claude/skills .claude/agents` is empty; diff the spec hunks.
+2. **AC-09 count.** Of the 57 files / 96 occurrences, 4 files hold exactly one occurrence each, and it is a
+   same-file markdown anchor (`#session-state-persistence`, `#session-state`) in the agent-browser and henshin
+   bundle copies. This is the same artifact the contract already exempts at
+   `.claude/skills/agent-browser/references/session-management.md:11`. **Override:** the target is
+   53 files / 92 path occurrences → 0, and the 4 anchors are exempt on the same grounds.
