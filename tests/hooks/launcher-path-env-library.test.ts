@@ -49,7 +49,7 @@ describe("exposing the launcher on PATH", () => {
 	it("prepends the launcher directory, so a project's pinned copy wins", () => {
 		const root = project();
 		const file = envFile(root);
-		exposeLauncherOnPath({ projectRoot: root, envFile: file, path: "/usr/bin:/global/bin" });
+		exposeLauncherOnPath({ projectRoot: root, envFile: file, path: ["/usr/bin", "/global/bin"].join(path.delimiter) });
 		const value = pathValue(file);
 		const entries = value.split(path.delimiter);
 		expect(entries[0]).toBe(path.dirname(fs.realpathSync(path.join(root, ".meowkit", "bin", "mewkit"))));
@@ -67,7 +67,7 @@ describe("exposing the launcher on PATH", () => {
 		const root = project();
 		const file = envFile(root);
 		const dir = path.dirname(containedLauncher(root) as string);
-		const note = exposeLauncherOnPath({ projectRoot: root, envFile: file, path: `${dir}:/usr/bin` });
+		const note = exposeLauncherOnPath({ projectRoot: root, envFile: file, path: [dir, "/usr/bin"].join(path.delimiter) });
 		expect(note).toBe("");
 		expect(fs.readFileSync(file, "utf-8")).toBe("");
 	});
@@ -92,7 +92,9 @@ describe("exposing the launcher on PATH", () => {
 		expect(fs.readFileSync(file, "utf-8")).toBe("");
 	});
 
-	it("writes shell metacharacters in a directory name literally, never as code", () => {
+	// Both shell-evaluation cases need a POSIX `/bin/sh`, and Windows also forbids `"` in a
+	// directory name, so they run where the env file is actually sourced by sh.
+	it.skipIf(process.platform === "win32")("writes shell metacharacters in a directory name literally, never as code", () => {
 		// A project directory name is attacker-influenced often enough (a clone named from a
 		// hostile URL, an archive unpacked into a crafted path) that it has to be treated as
 		// data. Inside double quotes a shell would run the `$(…)` and the backticks here.
@@ -122,7 +124,7 @@ describe("exposing the launcher on PATH", () => {
 		expect(fs.existsSync(path.join(root, "PWNED"))).toBe(false);
 	});
 
-	it("escapes a single quote in a directory name, the one byte single quotes cannot hold", () => {
+	it.skipIf(process.platform === "win32")("escapes a single quote in a directory name, the one byte single quotes cannot hold", () => {
 		const base = fs.mkdtempSync(path.join(tmpdir(), "mk-pathenv-quote-"));
 		const root = path.join(base, "it's a dir");
 		fs.mkdirSync(path.join(root, ".meowkit", "bin"), { recursive: true });

@@ -92,6 +92,12 @@ function platformStub(projectDir: string, value: string): string {
 
 const resolvePlaceholders = (value: string, projectDir: string) => value.split('{{TMP}}').join(projectDir);
 
+// Stdin is a JSON document, so the directory goes in as a JSON string body. A
+// Windows path dropped in raw (`D:\a\…`) is an invalid escape, the payload no
+// longer parses, and every hook replays as if it had no input at all.
+const jsonEscaped = (projectDir: string) => JSON.stringify(projectDir).slice(1, -1);
+const resolveStdin = (value: string, projectDir: string) => value.split('{{TMP}}').join(jsonEscaped(projectDir));
+
 export interface ReplayResult {
   exit: number;
   stdout: string;
@@ -109,7 +115,7 @@ const MARKERS = ['@@GATE_BLOCK@@', '@@CONTRACT_GATE_BLOCK@@', '@@PRIVACY_BLOCK@@
  * wall clock.
  */
 export const NORMALIZERS: Record<string, (text: string, projectDir: string) => string> = {
-  tmpdir: (text, projectDir) => text.split(projectDir).join('{{TMP}}'),
+  tmpdir: (text, projectDir) => text.split(jsonEscaped(projectDir)).join('{{TMP}}').split(projectDir).join('{{TMP}}'),
   isoTimestamp: (text) => text.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/g, '{{TS}}'),
   homedir: (text, projectDir) => text.split(path.join(projectDir, 'home')).join('{{HOME}}'),
   isoDate: (text) => text.replace(/\d{4}-\d{2}-\d{2}/g, '{{DATE}}'),
@@ -167,7 +173,7 @@ export function replay(fixture: Fixture, options: ReplayOptions = {}): ReplayRes
     ...fixture.args.map((a) => resolvePlaceholders(a, projectDir)),
   ], {
     cwd: projectDir,
-    input: fixture.stdin === null ? '' : resolvePlaceholders(fixture.stdin, projectDir),
+    input: fixture.stdin === null ? '' : resolveStdin(fixture.stdin, projectDir),
     env: { ...pinnedEnv(home), ...env },
     encoding: 'utf8',
     maxBuffer: 32 * 1024 * 1024,

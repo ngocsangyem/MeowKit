@@ -129,7 +129,9 @@ describe("the Gate 1 escape hatch", () => {
 		}
 	});
 
-	it("fails closed when the project directory itself is read-only", () => {
+	// Windows ignores POSIX mode bits on a directory, so there is no read-only
+	// project directory to build there.
+	it.skipIf(process.platform === "win32")("fails closed when the project directory itself is read-only", () => {
 		const { root, home } = layout();
 		writeConfig(home, "gate1PresenceOnly: true\n");
 		fs.chmodSync(root, 0o500);
