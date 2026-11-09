@@ -45,6 +45,22 @@ function resolveCli(root, env) {
   return 'mewkit';
 }
 
+/**
+ * Windows runs neither a shebang script nor, without a shell, a `.cmd` file, so
+ * a CLI that is a node script is handed to this node instead. Everywhere else
+ * the file is executed as it is, shebang and all.
+ */
+function launchArgs(cli, root, args) {
+  if (process.platform !== 'win32') return [cli, args];
+  try {
+    const head = fs.readFileSync(path.resolve(root, cli), 'utf8').slice(0, 128);
+    if (/^#!.*\bnode\b/.test(head)) return [process.execPath, [path.resolve(root, cli), ...args]];
+  } catch {
+    // A bare name or an unreadable file is launched as-is and reported below.
+  }
+  return [cli, args];
+}
+
 const SKIP = { exit: 0, stdout: ['SKIP: mewkit CLI not found — team memory store not linted'], stderr: [] };
 
 function blockLines(output) {
@@ -65,7 +81,8 @@ function blockLines(output) {
  */
 function lintMemoryStore({ root = process.cwd(), env = process.env } = {}) {
   const cli = resolveCli(root, env);
-  const r = spawnSync(cli, ['validate', '--memory'], { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+  const [command, args] = launchArgs(cli, root, ['validate', '--memory']);
+  const r = spawnSync(command, args, { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
   if (isMissingExecutable(r)) return SKIP;
   if (!r.error && r.status === 0) return { exit: 0, stdout: [], stderr: [] };
   // Streams are merged because the CLI reports findings on either one.

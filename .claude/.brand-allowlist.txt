@@ -18,3 +18,4 @@
 .claude/skills/tech-graph/references/icons.md # Provider design reference attribution
 .claude/skills/tech-graph/references/style-6-claude-official.md # Provider-branded design style name
 .claude/skills/tech-graph/references/style-diagram-matrix.md # Provider-branded design style name
+.claude/skills/help/references/cli.md # Generated CLI reference; reproduces the command help text, which names the product

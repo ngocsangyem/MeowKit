@@ -6,7 +6,7 @@
 **Agent registry views (generated):** 18 core/support direct-only; 21 domain hub-only; 1 intelligence direct-only; 1 intelligence direct-and-harness; 1 internal harness.
 <!-- GENERATED:agent-views END -->
 
-<!-- GENERATED:agent-table-cardinality (`scripts/harness-inventory.cjs --emit-counts` in the MeowKit repo; validated by `mewkit validate --agents`) -->
+<!-- GENERATED:agent-table-cardinality (`scripts/harness-inventory.cjs --emit-counts` in the kit source repo; validated by `mewkit validate --agents`) -->
 ```toon
 [42]{agent_file,type,role,source,workflow_phases,auto_activate,ce_version,last_improved}
 `orchestrator.md`|Core|Task router, complexity classification, model tier assignment|original|Phase 0 (Orient)|Yes — every task|260326|260326

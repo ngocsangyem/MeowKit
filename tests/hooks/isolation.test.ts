@@ -123,8 +123,9 @@ describe('every child process a safety entrypoint starts is accounted for', () =
         ".claude/hooks/lib/gate2-change-set.cjs spawnSync('git')",
         // Runs the two in-repo validators that own the evidence formats.
         '.claude/hooks/lib/gate2-structural-checks.cjs spawnSync(process.execPath)',
-        // Runs the resolved kit CLI to lint the team memory store.
-        '.claude/hooks/lib/memory-store-lint.cjs spawnSync(cli)',
+        // Runs the resolved kit CLI to lint the team memory store; on Windows a
+        // node-script CLI is run by this node, so the target is node or the CLI.
+        '.claude/hooks/lib/memory-store-lint.cjs spawnSync(command)',
         // Runs the project's own build, lint and test commands.
         '.claude/hooks/lib/preship-checks.cjs spawnSync(command)',
       ].sort(),

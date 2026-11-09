@@ -75,21 +75,6 @@ function copyTree(projectDir: string) {
   }
 }
 
-/**
- * A recorded stub path points at a shebang script. A shebang does not make a
- * file executable on Windows, so there the stub is re-emitted as a batch file
- * and the variable is pointed at that instead.
- */
-function platformStub(projectDir: string, value: string): string {
-  if (process.platform !== 'win32') return value;
-  const rel = path.relative(projectDir, value);
-  const source = fs.readFileSync(value, 'utf8').replace(/^#![^\n]*\n/, '');
-  const cmd = `${value}.cmd`;
-  fs.writeFileSync(path.join(projectDir, `${rel}.js`), source);
-  fs.writeFileSync(cmd, `@echo off\r\nnode "%~dp0${path.basename(rel)}.js" %*\r\n`);
-  return cmd;
-}
-
 const resolvePlaceholders = (value: string, projectDir: string) => value.split('{{TMP}}').join(projectDir);
 
 // Stdin is a JSON document, so the directory goes in as a JSON string body. A
@@ -162,7 +147,9 @@ export function replay(fixture: Fixture, options: ReplayOptions = {}): ReplayRes
   const env: Record<string, string> = {};
   for (const [k, v] of Object.entries(fixture.env)) {
     const resolved = resolvePlaceholders(v, projectDir);
-    env[k] = k === 'MEOWKIT_CLI' ? platformStub(projectDir, resolved) : resolved;
+    // A MEOWKIT_CLI stub stays a shebang script: the hook hands a node script
+    // to node itself on Windows, which is the path a real launcher takes.
+    env[k] = resolved;
   }
 
   // An observer is no longer a file the host launches, so it is replayed the

@@ -12,7 +12,7 @@ assert_match() {
 
 assert_match "iron law: no fixes without root cause" 'NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST' "$SKILL"
 assert_match "diagnostic-only constraint: never edit source" 'Diagnostic only.*never edit source' "$SKILL"
-assert_match "NOT for applying fixes without investigation (routes to mk:fix)" 'NOT for applying fixes without investigation \(see mk:fix\)' "$SKILL"
+assert_match "NOT for applying fixes without investigation (routes to mk:fix)" '^description:.*not an edit.*NOT for mk:fix' "$SKILL"
 assert_match "hands off confirmed defects to mk:fix, build failures to mk:build-fix" 'route confirmed defects to `mk:fix`, compile/build failures to `mk:build-fix`' "$SKILL"
 
 echo

@@ -7,6 +7,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SKILL="$ROOT/.claude/skills/fix/SKILL.md"
 TEST_WORKFLOW="$ROOT/.claude/skills/fix/references/workflow-test.md"
 REVIEW_CYCLE="$ROOT/.claude/skills/fix/references/review-cycle.md"
+INVESTIGATE="$ROOT/.claude/skills/investigate/SKILL.md"
+BUILD_FIX="$ROOT/.claude/skills/build-fix/SKILL.md"
 
 PASS=0
 FAIL=0
@@ -20,9 +22,12 @@ assert_match() {
   fi
 }
 
-assert_match "runtime bugs route to fix" 'Use when fixing a runtime bug' "$SKILL"
-assert_match "investigation-only work routes to investigate" 'NOT for investigation without a fix.*mk:investigate' "$SKILL"
-assert_match "compile errors route to build-fix" 'NOT for build/compile errors.*mk:build-fix' "$SKILL"
+# Routing lives in the description line the host lists, so each boundary is
+# checked there, on whichever side of the pair carries it.
+assert_match "runtime bugs route to fix" '^description:.*remediation of bugs' "$SKILL"
+assert_match "investigation-only work routes to investigate" '^description:.*NOT for mk:investigate' "$SKILL"
+assert_match "investigate hands fixes back to fix" '^description:.*not an edit.*NOT for mk:fix' "$INVESTIGATE"
+assert_match "compile errors route to build-fix" '^description:.*compile.*NOT for mk:fix' "$BUILD_FIX"
 assert_match "flaky failures require repeated verification" 'Run test 5x to confirm stability' "$TEST_WORKFLOW"
 assert_match "security-sensitive fixes can force regression-first TDD" '--tdd.*security-sensitive' "$SKILL"
 assert_match "high-risk fixes require human approval" 'risk\.requiresHumanApproval = true' "$SKILL"
