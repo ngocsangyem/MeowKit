@@ -62,6 +62,12 @@ npx mewkit init --target codex
 npx mewkit init --target cursor
 ```
 
+`--delivery` does not apply to these targets: each has one on-disk shape, so passing it is refused
+rather than ignored. `--target claude-code` is the one target with two shapes, and
+`npx mewkit init --target claude-code --delivery plugin` writes the plugin manifest beside the same
+content. Both paths verify the release's signed kit artifact before writing anything; see
+[Installation](/installation).
+
 ### Standalone after init
 
 ```bash

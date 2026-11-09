@@ -3,18 +3,15 @@ import { join, relative, isAbsolute, dirname } from "node:path";
 import * as log from "./core-logger.js";
 import type { UserConfig } from "./substitute-placeholders.js";
 import { mergeSettingsFile } from "./merge-settings.js";
-import { writeManifest, hashFile, classifyLayer } from "./compute-checksums.js";
-import type { Manifest } from "./compute-checksums.js";
+import { hashFile, classifyLayer } from "./compute-checksums.js";
 import { loadIgnorePatterns, walkDir, copyFile } from "./smart-update-utils.js";
 import { findOrphans } from "./find-orphans.js";
 import { readReleaseMetadata, toOrphanManifest, mapPathToLastModified, mapPathToChecksum } from "./release-metadata.js";
 import {
 	readInstallMetadata,
-	readLegacyManifestMetadata,
 	buildInstallMetadata,
 	indexByPath,
 	CorruptInstallMetadataError,
-	type InstallFileEntry,
 	type MetadataSource,
 	type ReadInstallMetadataResult,
 } from "./install-metadata.js";
@@ -391,8 +388,10 @@ export async function smartUpdate(
 	// from the SINGLE pre-write read at the top of smartUpdate so a later
 	// metadata write cannot flip it. A version-only `metadata.json`
 	// (`legacy-metadata`) does NOT count — it can come from the old pipeline on a
-	// non-checksum install — so only `new` and `legacy-manifest` enable cleanup.
-	const hasPriorMeowkitInstall = priorSource === "new" || priorSource === "legacy-manifest";
+	// non-checksum install — so only a canonical record enables cleanup. A project
+	// whose only baseline is the superseded checksum manifest is carried forward by
+	// the one-shot migration before this point, so it reaches here as `new`.
+	const hasPriorMeowkitInstall = priorSource === "new";
 	if (cleanup && hasPriorMeowkitInstall) {
 		const releaseManifest = release ? toOrphanManifest(release) : null;
 		if (!releaseManifest) {
@@ -504,6 +503,12 @@ export async function smartUpdate(
 			mergedSettings: settingsMerged ? ["settings.json"] : undefined,
 			profile: options.profile,
 			packs: options.packs,
+			// Carried forward, not re-derived. Provenance records what produced the
+			// install — the target, the delivery and the origin — and the updater
+			// knows none of those. Rebuilding the record without it would silently
+			// convert every upgraded project back to "unknown provenance", which is
+			// how a plugin-delivered project would look native again.
+			provenance: prior.meta?.provenance,
 		});
 		// Content has already been mutated on disk. A metadata write failure here is
 		// fatal, not a warning: silently leaving new content under stale metadata is
@@ -511,11 +516,6 @@ export async function smartUpdate(
 		// writer leaves the prior metadata.json intact on failure, so re-running the
 		// install/upgrade rebuilds correct metadata from disk — the recovery path.
 		await writeInstallMetadata(dirname(claudeDir), meta);
-		// One-release rollback dual-write of the legacy manifest. Only after the
-		// canonical write succeeds — if the canonical write fails above we never reach
-		// here, so the previous legacy manifest stays on disk for the next run.
-		// Derived from the entries just computed, avoiding a second scan+hash of .claude/.
-		writeManifest(claudeDir, legacyManifestFromInstallMeta(meta));
 
 		// Write the hook runtime descriptor when an in-project mewkit executable exists (so the
 		// SessionStart hook can run `orient` without npx / parent-node_modules scanning). This is
@@ -541,27 +541,6 @@ export async function smartUpdate(
 	return stats;
 }
 
-/**
- * Project canonical install metadata onto the legacy `Manifest` shape for the
- * one-release dual-write, reproducing `buildManifest`'s output without a second
- * directory walk (the hashes are already in `meta.files`).
- */
-function legacyManifestFromInstallMeta(meta: { installedAt: string; files: InstallFileEntry[] }): Manifest {
-	const checksums: Manifest["checksums"] = {};
-	for (const f of meta.files) {
-		checksums[f.path] = {
-			sha256: f.checksum,
-			layer: f.layer,
-			owner: f.layer === "user" ? "user" : "meowkit",
-			baseChecksum: f.checksum,
-			sourceChecksum: f.checksum,
-			targetChecksum: f.checksum,
-			installedAt: meta.installedAt,
-		};
-	}
-	return { version: "0.2.0", generatedAt: meta.installedAt, checksums };
-}
-
 function toManifestPath(relPath: string): string {
 	return relPath.replace(/\\/g, "/").replace(/^\.claude\//, "");
 }
@@ -574,18 +553,20 @@ function isWithinDir(dir: string, target: string): boolean {
 
 /**
  * Read the prior installed state for the user-edit baseline and orphan guard.
- * If the canonical metadata.json is present but corrupt, fall back to the legacy
- * manifest so user-edit protection still has a baseline, rather than treating
- * every file as unmodified.
+ *
+ * A corrupt canonical record is reported as "no baseline" rather than guessed
+ * at. There used to be a second file to fall back to; now there is one record,
+ * and the honest answer when it cannot be read is that nothing is known — which
+ * makes the run protective (every file looks user-authored) instead of
+ * destructive (every file looks removable).
  */
 function readPriorInstallState(claudeDir: string): ReadInstallMetadataResult {
 	try {
 		return readInstallMetadata(claudeDir);
 	} catch (err) {
 		if (err instanceof CorruptInstallMetadataError) {
-			log.warn(`Installed metadata is corrupt (${err.detail}); falling back to legacy manifest detection.`);
-			const legacy = readLegacyManifestMetadata(claudeDir);
-			return legacy ? { source: "legacy-manifest", meta: legacy } : { source: "none", meta: null };
+			log.warn(`Installed metadata is corrupt (${err.detail}); treating this project as having no recorded baseline.`);
+			return { source: "none", meta: null };
 		}
 		throw err;
 	}

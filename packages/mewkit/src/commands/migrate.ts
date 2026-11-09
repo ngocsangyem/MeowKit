@@ -30,8 +30,31 @@ export interface MigrateCliArgs {
 	json?: boolean;
 }
 
+/**
+ * Runtimes this command cannot export to, because they are not external to it.
+ *
+ * Named rather than left to the unknown-tool error. `mewkit migrate claude-code`
+ * is a reasonable thing to type and a wrong thing to run: this command exists to
+ * export the kit to OTHER tools, and Claude Code is the shape the kit is authored
+ * in. Reported as "not an external tool" rather than "unknown tool", because the
+ * second sends the user looking for a spelling mistake.
+ */
+const NOT_EXTERNAL_TOOLS: Record<string, string> = {
+	"claude-code": "mewkit init / mewkit upgrade",
+	"claude-plugin": "mewkit init --target claude-code --delivery plugin",
+};
+
 export async function migrate(args: MigrateCliArgs): Promise<number> {
 	const tool = args._[1];
+
+	const notExternal = tool === undefined ? undefined : NOT_EXTERNAL_TOOLS[tool];
+	if (notExternal !== undefined) {
+		console.error(
+			`\`mewkit migrate\` exports MeowKit to external coding-agent tools, and "${tool}" is not one of them — ` +
+				`it is the kit's own runtime, so there is nothing to export it to. Use \`${notExternal}\` instead. Nothing was written.`,
+		);
+		return 1;
+	}
 
 	const options: MigrateOptions = {
 		tool,

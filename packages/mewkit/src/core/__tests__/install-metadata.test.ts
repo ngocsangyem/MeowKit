@@ -9,7 +9,9 @@ import {
 	readInstallMetadata,
 } from "../install-metadata.js";
 import { writeInstallMetadata } from "../install-metadata-writer.js";
-import { buildManifest, hashFile, writeManifest } from "../compute-checksums.js";
+import { hashFile } from "../compute-checksums.js";
+import { carryLegacyBaseline } from "../legacy-manifest-migration.js";
+import { writeSupersededBaseline } from "../../../tests/helpers/superseded-baseline.js";
 
 const tempDirs: string[] = [];
 
@@ -51,30 +53,32 @@ describe("readInstallMetadata precedence", () => {
 		expect(result.meta?.files.length).toBe(1);
 	});
 
-	it("returns source=legacy-manifest and does NOT trust manifest.version", async () => {
+	it("reports no baseline when only the superseded checksum file is present", async () => {
 		const claudeDir = await makeClaudeDir();
 		await writeFileAt(claudeDir, "rules/a.md", "shipped\n");
-		writeManifest(claudeDir, buildManifest(claudeDir));
+		writeSupersededBaseline(claudeDir);
 
+		// The superseded file is no longer a metadata source. Reading it here would
+		// give a project two baselines, and which one wins would depend on read
+		// order — so one upgrade keeps a user edit and the next overwrites it.
 		const result = readInstallMetadata(claudeDir);
-		expect(result.source).toBe("legacy-manifest");
-		// manifest.version is the hardcoded "0.2.0" garbage — must not leak through.
-		expect(result.meta?.version).not.toBe("0.2.0");
-		expect(result.meta?.version).toBe("");
-		// sha256 maps to both checksum and baseChecksum.
-		const entry = result.meta?.files[0];
-		expect(entry?.checksum).toBe(entry?.baseChecksum);
+		expect(result.source).toBe("none");
+		expect(result.meta).toBeNull();
 	});
 
-	it("sources version from a sibling version-only metadata.json under legacy-manifest", async () => {
+	it("projects the superseded checksum file onto canonical entries for the carry-forward", async () => {
 		const claudeDir = await makeClaudeDir();
 		await writeFileAt(claudeDir, "rules/a.md", "shipped\n");
-		writeManifest(claudeDir, buildManifest(claudeDir));
-		await writeFile(join(claudeDir, "metadata.json"), JSON.stringify({ version: "2.8.0" }) + "\n", "utf-8");
+		writeSupersededBaseline(claudeDir);
 
-		const result = readInstallMetadata(claudeDir);
-		expect(result.source).toBe("legacy-manifest");
-		expect(result.meta?.version).toBe("2.8.0");
+		const carried = carryLegacyBaseline(claudeDir);
+		expect(carried?.uncarried).toEqual([]);
+		const entry = carried?.entries.find((e) => e.path === "rules/a.md");
+		// The old format recorded one hash per path. It becomes both the current and
+		// the as-shipped value, so a carried path does not compare as modified on
+		// the very next upgrade.
+		expect(entry?.checksum).toBe(entry?.baseChecksum);
+		expect(entry?.owner).toBe("meowkit");
 	});
 
 	it("returns source=legacy-metadata for a version-only metadata.json", async () => {

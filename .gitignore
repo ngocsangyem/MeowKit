@@ -71,7 +71,8 @@ tasks/plans/**/*.html
 !.claude/memory/.gitkeep
 
 # Agent scratch memory (subagent-written, machine-local — like .claude/memory).
-# Swept into plugin/agent-memory/ by build-plugin; never committed or shipped.
+# A plugin-delivery install can mirror it under plugin/agent-memory/ in a working
+# copy; neither location is ever committed or shipped.
 .claude/agent-memory/
 plugin/agent-memory/
 .claude/cache/

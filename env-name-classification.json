@@ -27,6 +27,7 @@
   },
   "readerUnverifiable": {
     "comment": "A read no syntactic scan can see. The reader column is still required to name a file that exists, so a renamed or deleted reader is caught; what is waived is only the proof that the read is in it.",
+    "MEOWKIT_KIT_SIGNING_KEY": "read by the release-pipeline build script under `scripts/`, which is outside the trees this scan walks; the key must never be readable from the installed kit, so the reader deliberately lives there",
     "MEOWKIT_EVAL_SLUG": "read by a markdown skill step, not by code: the step exports it in one shell block and reads it back in another",
     "MEOWKIT_GEMINI_API_KEY_2": "the suffix index is composed at the call site (an f-string loop), so the name is spelled nowhere",
     "MEOWKIT_GEMINI_API_KEY_3": "the suffix index is composed at the call site (an f-string loop), so the name is spelled nowhere",
@@ -438,6 +439,12 @@
       "class": "toggle",
       "key": "hooks.pre-completion-check",
       "reader": "no reader; the off switch is hooks.pre-completion-check, applied by hooks/lib/handler-registry.cjs before the handler is loaded"
+    },
+    {
+      "name": "MEOWKIT_KIT_SIGNING_KEY",
+      "class": "credential",
+      "key": "",
+      "reader": "scripts/kit-signing.cjs:28 (the release-pipeline key the kit manifest signature is made with; never a config key)"
     },
     {
       "name": "MEOWKIT_RELEASE_SOURCE",

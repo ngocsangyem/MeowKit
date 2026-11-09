@@ -9,6 +9,7 @@
 const fs = require("fs");
 const path = require("path");
 const { execSync, spawnSync } = require("child_process");
+const { ARCHIVE_TARGETS, CRITICAL_TARGETS, shipSetExclusions, zipExcludeArgs } = require("./kit-ship-set.cjs");
 
 const version = process.argv[2];
 if (!version) {
@@ -50,58 +51,24 @@ try {
 
   // `.meowkit/pack-manifest.json` is named as a single file, never as a directory: the rest
   // of `.meowkit/` is per-project state including `.env`, and must never reach an archive.
-  const archiveTargets = [
-    ".claude",
-    "tasks",
-    "release-manifest.json",
-    path.join(".meowkit", "pack-manifest.json"),
-  ].filter((t) => fs.existsSync(path.join(projectRoot, t)));
+  const archiveTargets = ARCHIVE_TARGETS.filter((t) => fs.existsSync(path.join(projectRoot, t)));
 
   if (archiveTargets.length === 0) {
     throw new Error("No release assets found");
   }
 
   // Validate critical assets
-  for (const critical of [".claude", "release-manifest.json", path.join(".meowkit", "pack-manifest.json")]) {
+  for (const critical of CRITICAL_TARGETS) {
     if (!fs.existsSync(path.join(projectRoot, critical))) {
       throw new Error(`Critical asset missing: ${critical}`);
     }
   }
 
-  // Exclude runtime dirs that shouldn't be in release.
-  // Patterns are passed as separate args (no shell) so glob expansion is done
-  // by zip's matcher, not by the shell — `*` then correctly crosses `/`.
-  const excludes = [
-    "-x", ".claude/session-state/*",
-    "-x", ".claude/memory/*",
-    "-x", ".claude/logs/*",
-    "-x", ".claude/skills/.venv/*",
-    // Sibling session checkouts (with their own node_modules) are never kit assets.
-    "-x", ".claude/worktrees/*",
-    // Defensive guard: a stray installed metadata.json or .env on a dev machine
-    // must never leak into a published archive (the pipeline no longer generates
-    // metadata.json, but a local install might leave one behind).
-    "-x", ".claude/metadata.json",
-    "-x", ".claude/.env",
-    // Belt and braces around naming a path inside the state root: nothing else in
-    // `.meowkit/` may enter the archive even if a target is later widened.
-    "-x", ".meowkit/.env",
-    "-x", ".meowkit/memory/*",
-    "-x", ".meowkit/cache/*",
-    "-x", ".meowkit/telemetry/*",
-    "-x", ".meowkit/metadata.json",
-    // `tasks` is archived whole for its templates. Run output under it is not a
-    // release asset, and `tasks/reports/` specifically holds Security Posture
-    // Reports — unpatched vulnerability detail that must never reach a public
-    // GitHub Release zip.
-    "-x", "tasks/reports/*",
-    // Review verdicts and their evidence are run output, not templates; the
-    // directory itself (its .gitkeep) still ships so verdicts have a home.
-    "-x", "tasks/reviews/*.md",
-    "-x", "tasks/reviews/evidence/*",
-    "-x", "*.pyc",
-    "-x", "__pycache__/*",
-  ];
+  // Exclusions come from the pack manifest's `base.exclude`, which the kit
+  // artifact build reads too. Patterns are passed as separate args (no shell) so
+  // glob expansion is done by zip's matcher, not by the shell — `*` then
+  // correctly crosses `/`, which is the semantics the shared matcher implements.
+  const excludes = zipExcludeArgs(shipSetExclusions(projectRoot));
   const zipResult = spawnSync(
     "zip",
     ["-r", archivePath, ...archiveTargets, ...excludes],

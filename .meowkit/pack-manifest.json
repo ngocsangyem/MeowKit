@@ -28,7 +28,39 @@
       "rubrics/**",
       "rules-conditional/**"
     ],
-    "commands": ["plan", "upgrade", "validate", "status", "cook", "fix"]
+    "commands": ["plan", "upgrade", "validate", "status", "cook", "fix"],
+    "exclude": [
+      ".claude/session-state/*",
+      ".claude/memory/*",
+      ".claude/logs/*",
+      ".claude/skills/.venv/*",
+      ".claude/worktrees/*",
+      ".claude/metadata.json",
+      ".claude/.env",
+      ".meowkit/.env",
+      ".meowkit/memory/*",
+      ".meowkit/cache/*",
+      ".meowkit/telemetry/*",
+      ".meowkit/metadata.json",
+      "tasks/reports/*",
+      "tasks/reviews/*.md",
+      "tasks/reviews/evidence/*",
+      "tasks/contracts/*.md",
+      "tasks/plans/*.md",
+      "tasks/plans/*/*",
+      "*.pyc",
+      "__pycache__/*",
+      ".claude/settings.json.bak",
+      ".claude/.brand-allowlist.txt",
+      ".claude/scripts/lint-brand-prose.sh",
+      ".claude/scripts/check-anthropic-context.py",
+      ".claude/benchmarks/results/*",
+      ".claude/eval/*",
+      ".claude/skills/*/eval/*",
+      "*/__tests__/*",
+      "*/tests/*",
+      "*.test.*"
+    ]
   },
   "packs": {
     "lifecycle-core": {

@@ -36,7 +36,7 @@ function withUserSkill(fx: Fixture): string {
 function dropBaseline(fx: Fixture): void {
 	rmSync(join(fx.root, META), { force: true });
 	rmSync(join(fx.root, ".claude", "metadata.json"), { force: true });
-	rmSync(join(fx.root, ".claude", "meowkit.manifest.json"), { force: true });
+
 }
 
 describe("doctor — validity, drift and adoption", () => {

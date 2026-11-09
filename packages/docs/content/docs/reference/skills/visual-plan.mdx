@@ -128,4 +128,4 @@ mewkit visual-plan apply-feedback <plan-dir> --batch <id>
 - **Mermaid palette is light (static route)** — the diagram uses `theme: "neutral"` read once at init; toggling dark does not re-skin the SVG.
 - **`.node` collision (static route)** — Mermaid uses `.node` internally; block sentinels use the `vp-*` prefix.
 - **Never hand-edit `plan.html`** — it is generated; edit the plan sources (or the artifact via the studio) and regenerate/export.
-- **Install via `npx mewkit init`/`upgrade`** — there is no plugin/marketplace build step; author the skill source directly under `.claude/skills/`.
+- **Install via `npx mewkit init`/`upgrade`** — author the skill source directly under `.claude/skills/`. A plugin-shaped install is a delivery of the same content (`--delivery plugin`), not a separate build of it, so there is no build step to run first; there is still no marketplace build step, because MeowKit is not published to a plugin marketplace.

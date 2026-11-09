@@ -24,7 +24,17 @@ npx mewkit init --target cursor
 
 # Global install scope
 npx mewkit init --target cursor --migrate-global
+
+# Claude Code, laid down as a plugin rather than as .claude/
+npx mewkit init --target claude-code --delivery plugin
+
+# Re-install from this project's cached artifact, reaching no network
+npx mewkit init --offline
 ```
+
+`--delivery` is meaningful for `--target claude-code` only; the other two targets have one shape
+each, so passing it with either is refused rather than ignored. An unrecognized `--target` is
+refused by name with the three valid values listed.
 
 | Flag                  | Description                                                                                                                                        |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -91,14 +101,18 @@ The Node check passes at 20 and up, while the `mewkit` package itself requires N
 Update mewkit to the latest version.
 
 ```bash
-npx mewkit upgrade [--check] [--beta] [--list]
+npx mewkit upgrade [--check] [--beta] [--list] [--offline]
 ```
 
-| Flag      | Description                                        |
-| --------- | -------------------------------------------------- |
-| `--check` | Show available update (shows both stable and beta) |
-| `--beta`  | Install beta channel                               |
-| `--list`  | List all available versions with channel info      |
+| Flag        | Description                                                            |
+| ----------- | ---------------------------------------------------------------------- |
+| `--check`   | Show available update (shows both stable and beta)                     |
+| `--beta`    | Install beta channel                                                   |
+| `--list`    | List all available versions with channel info                          |
+| `--offline` | Install from this project's cached artifact only, and reach no network |
+
+The release's signed kit artifact is verified before anything is extracted, and `--offline` re-runs
+the same checks on the cached copy in `.meowkit/cache/` rather than trusting it for being local.
 
 **Examples:**
 
@@ -152,3 +166,15 @@ npx mewkit status
 ```
 
 Shows: MeowKit version with channel indicator (stable/beta), project config from `.meowkit/config.json`.
+
+## versions
+
+Print what this project has installed, which `status` does not answer: the CLI and the kit carry
+independent versions.
+
+```bash
+npx mewkit versions
+```
+
+Shows the CLI version, the installed kit version, the target and delivery, and how the content
+arrived. Exits non-zero in a directory with no install.

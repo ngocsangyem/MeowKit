@@ -1,9 +1,10 @@
 import { mkdtempSync, readFileSync, rmSync, statSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { emitActiveOverlay } from "../../../emit/emit-active-overlay.js";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { resolveCodexModuleDir, loadCodexBundleManifest, copyAuthoredCodexBundle } from "../codex-authored-bundle.js";
-import { applyActiveCodexOverlay } from "../codex-reconcile-apply.js";
+
 import { codexTargetProfile } from "../../../validate/targets/codex-target.js";
 
 const moduleDir = resolveCodexModuleDir();
@@ -110,7 +111,7 @@ describe("authored codex bundle", () => {
 		// full authored tree. For AGENTS.md the overlay writes the authored BASE; the source-rules
 		// merge-single (config/rules) then merges onto it in the full migrate flow (not exercised by
 		// this direct-overlay test), and the capability-bootstrap injector adds its block.
-		const overlay = await applyActiveCodexOverlay(target, { moduleDir });
+		const overlay = await emitActiveOverlay("codex", target, false, moduleDir);
 		const written = overlay.entries.map((e) => e.targetPath).sort();
 		expect(written).toEqual(
 			[

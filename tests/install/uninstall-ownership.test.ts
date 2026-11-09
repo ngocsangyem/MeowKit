@@ -78,7 +78,7 @@ describe("uninstall — every invocation", () => {
 		// a legacy manifest left behind would still be a baseline.
 		rmSync(join(fx.root, ".meowkit", "metadata.json"), { force: true });
 		rmSync(join(fx.root, ".claude", "metadata.json"), { force: true });
-		rmSync(join(fx.root, ".claude", "meowkit.manifest.json"), { force: true });
+
 		const run = runMewkit(fx, ["uninstall", "--yes", "--force"]);
 		expect(run.status).toBe(1);
 		expect(run.all).toContain("mewkit doctor --adopt");

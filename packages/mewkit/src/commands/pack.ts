@@ -165,6 +165,16 @@ async function packAdd(
 		// stored list semantically "the optional domains installed".
 		const nextPacks = [...new Set([...installed, ...newPacks])].filter((n) => n !== BASE_PACK);
 		// cleanup:false ⇒ a focused add only WRITES new files; it never deletes.
+		//
+		// The updater is called directly here, and this is the one place outside the
+		// shared target projection that does. The projection exists so that `init`,
+		// `upgrade` and `migrate` cannot disagree about what a target's on-disk shape
+		// IS — they each lay the whole shape down, so a difference between them is a
+		// defect. This does something else: it adds a named SUBSET to a shape that is
+		// already on disk, bounded by `allowedPaths` and with deletion off. Routing it
+		// through the projection would make a partial write look like one of those
+		// three full ones, and the next reader would reasonably expect it to produce
+		// the same tree they do.
 		const stats = await smartUpdate(BLANK_CONFIG, sourceDir, process.cwd(), dryRun, false, {
 			cleanup: false,
 			allowedPaths: allowed,

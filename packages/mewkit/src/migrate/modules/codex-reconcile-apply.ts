@@ -24,7 +24,7 @@ import type { PortableInstallationV3 } from "../reconcile/portable-registry.js";
 import { getReasonCopy, type ReconcileActionType, type ReconcileReason } from "../reconcile/reconcile-types.js";
 import { meowkitStatePaths } from "../../state/meowkit-state-paths.js";
 import type { ArtifactManifestEntry } from "./artifact-manifest-schema.js";
-import { copyOne, loadCodexBundleManifest, resolveCodexModuleDir } from "./codex-authored-bundle.js";
+import { copyOne, loadCodexBundleManifest } from "./codex-authored-bundle.js";
 import {
 	expandSkillsEntry,
 	isSkillsTreeEntry,
@@ -307,21 +307,3 @@ export async function reconcileApplyCodexBundle(
 	};
 }
 
-/** Convenience: apply the installed bundle (migrate overlay — active entries only,
- *  overwrite converter output). Returns the reconcile result. */
-export async function applyActiveCodexOverlay(
-	targetDir: string,
-	opts: { global?: boolean; moduleDir?: string } = {},
-): Promise<ApplyBundleResult> {
-	const moduleDir = opts.moduleDir ?? resolveCodexModuleDir();
-	if (!existsSync(join(moduleDir, "manifest.json"))) {
-		return { entries: [], writes: 0, conflicts: [], adopted: 0, dryRun: false, ledgerPath: "", retired: [] };
-	}
-	// Overlay overwrites machine-generated converter output (not user edits), so force.
-	return reconcileApplyCodexBundle(moduleDir, targetDir, {
-		onlyActive: true,
-		force: true,
-		global: opts.global,
-		projectRoot: targetDir,
-	});
-}

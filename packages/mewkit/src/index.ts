@@ -7,7 +7,6 @@ import minimist from "minimist";
 import { renderHelp } from "./cli/render-help.js";
 import { minimistOptions } from "./cli/minimist-options.js";
 import pc from "picocolors";
-import { init } from "./commands/init.js";
 import { upgrade } from "./commands/upgrade.js";
 import { validate } from "./commands/validate.js";
 import { capabilities } from "./commands/capabilities.js";
@@ -41,6 +40,8 @@ import { backups } from "./commands/backups.js";
 import { uninstall } from "./commands/uninstall.js";
 import { resolveProjectRoot } from "./state/meowkit-root-resolver.js";
 import { observerNames } from "./config/observer-names.js";
+import { versions } from "./commands/versions.js";
+import { runInstall } from "./commands/run-install.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -98,7 +99,10 @@ async function main(): Promise<void> {
 
 	switch (command) {
 		case "init":
-			await init({
+			await runInstall({
+				cliVersion: VERSION,
+				delivery: args.delivery as string | undefined,
+				offline: args.offline as boolean | undefined,
 				json: args.json as boolean | undefined,
 				dryRun: args["dry-run"] as boolean | undefined,
 				force: args.force as boolean | undefined,
@@ -116,6 +120,8 @@ async function main(): Promise<void> {
 			break;
 		case "upgrade":
 			await upgrade({
+				cliVersion: VERSION,
+				offline: args.offline as boolean | undefined,
 				json: args.json as boolean | undefined,
 				check: args.check as boolean | undefined,
 				beta: args.beta as boolean | undefined,
@@ -381,6 +387,9 @@ async function main(): Promise<void> {
 			break;
 		case "status":
 			await printStatus();
+			break;
+		case "versions":
+			versions(VERSION, { json: args.json as boolean | undefined });
 			break;
 		case "task-state":
 			await taskState({

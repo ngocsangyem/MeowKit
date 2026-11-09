@@ -6,7 +6,6 @@ import {
 	fetchReleases,
 	downloadRelease,
 	cleanupDownload,
-	smartUpdate,
 	validate,
 	hasPackManifest,
 	loadPackManifest,
@@ -27,14 +26,15 @@ import type { MigrateOptions, ProviderType } from "../migrate/types.js";
 import { providers } from "../migrate/provider-registry.js";
 import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
 import { packSelectionBudgetWarning, type PackSelection } from "../migrate/modules/codex-skill-packs.js";
-import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
+import { emitCodexTarget, emitCursorTarget } from "../emit/emit-bundle-target.js";
+import { emitTarget } from "../emit/emit-target.js";
+import { orphanPrompt } from "./init-orphan-prompt.js";
 import {
 	CODEX_MIN_SUPPORTED_VERSION,
 	detectCodexVersion,
 	isCodexVersionSupported,
 } from "../migrate/providers/codex/capabilities.js";
 import { resolveCursorModuleDir } from "../migrate/modules/cursor-authored-bundle.js";
-import { reconcileApplyCursorBundle } from "../migrate/modules/cursor-reconcile-apply.js";
 import { describeRetiredSkills } from "../migrate/modules/retired-skill-cleanup.js";
 import {
 	CURSOR_MIN_SUPPORTED_VERSION,
@@ -77,6 +77,8 @@ export interface InitArgs {
 	 * `--packs` validate flag.
 	 */
 	skillPacks?: string;
+	/** On-disk shape for the Claude Code target: `native` or `plugin`. */
+	delivery?: string;
 	/**
 	 * Cursor MCP profile selection (only meaningful with a Cursor target). Comma-separated
 	 * profile names (e.g. `github-context`) or `all`. Omitted = an interactive multiselect
@@ -462,12 +464,7 @@ async function initCodexTarget(
 	// selects which skill packs install (default `core`); the whole `.codex/` surface
 	// always installs.
 	if (dryRun) {
-		const plan = await reconcileApplyCodexBundle(moduleDir, targetDir, {
-			force,
-			dryRun: true,
-			projectRoot: targetDir,
-			packs,
-		});
+		const plan = await emitCodexTarget("init", targetDir, moduleDir, { force, dryRun: true, packs });
 		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
 		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
 		const headline = `Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .codex/, .agents/skills/.`;
@@ -477,7 +474,7 @@ async function initCodexTarget(
 		p.outro(pc.green("Dry-run complete — no files written."));
 		return bundleReport("init", plan.entries, true, [headline, ...retiredNotes]);
 	}
-	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
+	const result = await emitCodexTarget("init", targetDir, moduleDir, { force, packs });
 	if (result.conflicts.length > 0) {
 		p.log.warn(
 			`${result.conflicts.length} existing file(s) differ from the bundle and were left untouched (re-run with --force to overwrite):`,
@@ -555,12 +552,7 @@ async function initCursorTarget(
 	// No fail-closed guard: the reconciler preserves user edits (or surfaces a conflict)
 	// instead of clobbering an existing layout, and makes a re-run idempotent.
 	if (dryRun) {
-		const plan = await reconcileApplyCursorBundle(moduleDir, targetDir, {
-			force,
-			dryRun: true,
-			projectRoot: targetDir,
-			packs,
-		});
+		const plan = await emitCursorTarget("init", targetDir, moduleDir, { force, dryRun: true, packs });
 		const toWrite = plan.entries.filter((e) => e.action === "install" || e.action === "update").length;
 		const conflictNote = plan.conflicts.length > 0 ? `, ${plan.conflicts.length} conflict(s)` : "";
 		const headline = `Dry-run: ${toWrite} artifact(s) would be written${conflictNote} — AGENTS.md, .meowkit/README.md.`;
@@ -571,7 +563,7 @@ async function initCursorTarget(
 		p.outro(pc.green("Dry-run complete — no files written."));
 		return bundleReport("init", plan.entries, true, [headline, ...retiredNotes]);
 	}
-	const result = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
+	const result = await emitCursorTarget("init", targetDir, moduleDir, { force, packs });
 	if (result.conflicts.length > 0) {
 		p.log.warn(
 			`${result.conflicts.length} existing file(s) differ from the bundle and were left untouched (re-run with --force to overwrite):`,
@@ -655,7 +647,7 @@ async function addCodexBundle(targetDir: string, force: boolean, packs: PackSele
 		p.log.warn("Codex bundle not found in this install — skipping the Codex toolkit.");
 		return;
 	}
-	const result = await reconcileApplyCodexBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
+	const result = await emitCodexTarget("init", targetDir, moduleDir, { force, packs });
 	if (result.conflicts.length > 0) {
 		p.log.warn(`${result.conflicts.length} existing Codex file(s) left untouched (re-run with --force to overwrite).`);
 	}
@@ -684,7 +676,7 @@ async function addCursorBundle(
 		p.log.warn("Cursor bundle not found in this install — skipping the Cursor toolkit.");
 		return;
 	}
-	const result = await reconcileApplyCursorBundle(moduleDir, targetDir, { force, projectRoot: targetDir, packs });
+	const result = await emitCursorTarget("init", targetDir, moduleDir, { force, packs });
 	if (result.conflicts.length > 0) {
 		p.log.warn(`${result.conflicts.length} existing Cursor file(s) left untouched (re-run with --force to overwrite).`);
 	}
@@ -920,27 +912,30 @@ async function runClaudeKitInstall(
 		const install = resolveInstall(sourceDir, profileName);
 		const updateSpinner = p.spinner();
 		updateSpinner.start("Applying files...");
-		const stats = await smartUpdate(config, sourceDir, targetDir, dryRun, force, {
-			allowedPaths: install.allowedPaths,
-			profile: install.profile,
-			packs: install.packs,
-			// A profile install owns the full→profile downgrade trim; full does not.
-			trimToProfile: install.allowedPaths !== undefined,
-			// Spinner overwrites inline `[y/N]` prompts → hand the prompt back to
-			// init so we can pause the spinner, ask via clack, then resume.
-			confirmOrphans: async (orphans) => {
-				updateSpinner.stop("Orphan files detected");
-				p.log.warn(`Found ${orphans.length} orphan file(s) — files on disk no longer in release:`);
-				for (const o of orphans) p.log.message(`  - ${pc.dim(o)}`);
-				const answer = await p.confirm({
-					message: `Delete ${orphans.length} orphan file(s)?`,
-					initialValue: false,
-				});
-				const ok = !p.isCancel(answer) && answer === true;
-				updateSpinner.start("Applying files...");
-				return ok;
-			},
+		// Through the one projection, like every other target: `init` writes no
+		// target's shape itself, so an install and the upgrade after it cannot
+		// disagree about what that shape is.
+		const emitted = await emitTarget({
+			target: "claude-code",
+			delivery: args.delivery === "plugin" ? "plugin" : "native",
+			entryPoint: "init",
+			projectRoot: targetDir,
+			dryRun,
+			force,
+			kitVersion: release.version,
+			release: { config, sourceDir, options: {
+					allowedPaths: install.allowedPaths,
+					profile: install.profile,
+					packs: install.packs,
+					// A profile install owns the full→profile downgrade trim; full does not.
+					trimToProfile: install.allowedPaths !== undefined,
+					confirmOrphans: orphanPrompt(updateSpinner, "Applying files..."),
+				} },
 		});
+		// A release-kit target always yields stats; the optionality belongs to the
+		// authored-bundle branch, which this call cannot reach.
+		if (emitted.stats === undefined) throw new Error("the projection applied no release content");
+		const stats = emitted.stats;
 		updateSpinner.stop(`Applied: ${stats.added} added, ${stats.updated} updated, ${stats.skipped} skipped`);
 
 		// Security confirmation for API keys

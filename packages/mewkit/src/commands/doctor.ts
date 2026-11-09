@@ -19,6 +19,8 @@ import {
 } from "./doctor-checks.js";
 import { checkProjectConfig, checkRemovedEnvNames } from "./doctor-config-checks.js";
 import { ownershipChecks } from "./doctor-ownership-checks.js";
+import { checkBaselineMigration, checkMixedDelivery, checkRefusedVersions } from "./doctor-kit-checks.js";
+import { hasLegacyManifest } from "../core/legacy-manifest-migration.js";
 import { doctorAdopt } from "./doctor-adopt.js";
 import { checkHardGates } from "./doctor-hard-gates.js";
 import { checkCodexHookTrust } from "./doctor-codex-hook-trust.js";
@@ -57,7 +59,7 @@ function findProjectRoot(): string | null {
 	const cwd = process.cwd();
 	const hasDotClaude = fs.existsSync(path.join(cwd, ".claude"));
 	const hasConfig = fs.existsSync(configWritePath(cwd));
-	const hasManifest = fs.existsSync(path.join(cwd, ".claude", "meowkit.manifest.json"));
+	const hasManifest = hasLegacyManifest(path.join(cwd, ".claude"));
 	const hasClaude = fs.existsSync(path.join(cwd, "CLAUDE.md"));
 	if (hasDotClaude || hasConfig || hasManifest || hasClaude) {
 		return cwd;
@@ -104,6 +106,9 @@ export async function doctor(args?: {
 		checkProjectConfig(root),
 		...checkRemovedEnvNames(root),
 		...ownershipChecks(root),
+		checkBaselineMigration(root),
+		checkRefusedVersions(root),
+		checkMixedDelivery(root),
 		checkInstallMode(root),
 		checkHooks(root),
 		checkScripts(root),

@@ -17,6 +17,7 @@ const COMMANDS = [
 	{ name: "skill", summary: "Per-skill interpreter environments", subcommands: ["env"], usage: "skill env <skill>|--list" },
 	{ name: "doctor", summary: "Diagnose common environment issues", subcommands: ["provenance"] },
 	{ name: "status", summary: "Print version and config summary" },
+	{ name: "versions", summary: "Print the installed CLI, kit, target and delivery of this project" },
 	{ name: "task-state", summary: "Durable task record", subcommands: ["show", "update"] },
 	{
 		name: "advice",
@@ -119,6 +120,7 @@ const FLAGS: FlagSpec[] = [
 			"setup",
 			"migrate",
 			"upgrade",
+			"versions",
 		],
 		"Emit machine-readable JSON",
 	),
@@ -139,6 +141,12 @@ const FLAGS: FlagSpec[] = [
 	b("migrate", ["init"], "After unpack, prompt for export targets"),
 	b("migrate-global", ["init"], "Use global install paths instead of project-local"),
 	s("skill-packs", ["init"], "Comma-separated skill packs to install"),
+	s("delivery", ["init"], "Claude Code only: native or plugin on-disk shape"),
+	b(
+		"offline",
+		["init", "upgrade"],
+		"Install from this project's cached kit artifact only, re-verifying it, and reach no network",
+	),
 	s("mcp-profiles", ["init"], "Cursor only: MCP profile names, or 'all', to merge into .cursor/mcp.json"),
 	b("allow-cloud-mcp", ["init"], "Cursor only: second opt-in for applying an MCP profile to a repo with a git remote"),
 

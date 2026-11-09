@@ -235,14 +235,15 @@ npx mewkit verdict-gate <slug | path-to-verdict.json>
 Update mewkit to the latest version.
 
 ```bash
-npx mewkit upgrade [--check] [--beta] [--list]
+npx mewkit upgrade [--check] [--beta] [--list] [--offline]
 ```
 
-| Flag      | Description                                        |
-| --------- | -------------------------------------------------- |
-| `--check` | Show available update (shows both stable and beta) |
-| `--beta`  | Install beta channel                               |
-| `--list`  | List all available versions with channel info      |
+| Flag        | Description                                                              |
+| ----------- | ------------------------------------------------------------------------ |
+| `--check`   | Show available update (shows both stable and beta)                       |
+| `--beta`    | Install beta channel                                                     |
+| `--list`    | List all available versions with channel info                            |
+| `--offline` | Install from this project's cached artifact only, and reach no network   |
 
 **Examples:**
 
@@ -251,7 +252,13 @@ npx mewkit upgrade              # Upgrade to latest stable
 npx mewkit upgrade --beta       # Upgrade to latest beta
 npx mewkit upgrade --check      # Check without installing
 npx mewkit upgrade --list       # Show all versions
+npx mewkit upgrade --offline    # Re-install from .meowkit/cache/, no network
 ```
+
+An upgrade verifies the release's signed kit artifact before extracting anything, and
+`--offline` re-runs the same checks on the cached copy rather than trusting it for being local.
+See [Installation](/installation) for what each check covers and what a refusal says. `--offline`
+needs a project that has installed at least once, because the cache is per project.
 
 **Output of `--list`:**
 
@@ -276,6 +283,23 @@ npx mewkit status
 ```
 
 Shows: MeowKit version with channel indicator (stable/beta), project config from `.meowkit/config.json`.
+
+## versions
+
+Print what is installed in this project, which is a different question from what the CLI is.
+
+```bash
+npx mewkit versions [--json]
+```
+
+Prints the CLI version, the installed kit version, the target and delivery the install was laid down
+for, and how the content arrived — a verified artifact, the older release zip, a local release
+directory, or the project cache. The CLI and the kit carry independent versions, so neither
+`--version` nor `status` answers this.
+
+Exits non-zero in a directory with no install, naming `mewkit init`, so a script can tell "nothing
+installed" from "installed with an unusual version". A project installed before these were recorded
+reports them as `unknown` rather than guessing a value.
 
 ## plan
 

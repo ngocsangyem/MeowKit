@@ -62,11 +62,18 @@ async function validateNoSymlinkComponents(targetPath: string, boundaryPath: str
 	return null;
 }
 
+/**
+ * `boundary` names the directory the target must stay inside, for callers whose
+ * destination is not the project root — extracting a release into a staging
+ * directory is the case. It exists so that path safety stays ONE implementation:
+ * a caller that cannot express its boundary here writes its own containment
+ * check instead, and two checks drift until the weaker one is the reachable one.
+ */
 export async function validateWritableTargetPath(
 	targetPath: string,
-	options: { global: boolean },
+	options: { global: boolean; boundary?: string },
 ): Promise<string | null> {
-	const boundary = options.global ? homedir() : process.cwd();
+	const boundary = options.boundary ?? (options.global ? homedir() : process.cwd());
 	return validateNoSymlinkComponents(targetPath, boundary);
 }
 

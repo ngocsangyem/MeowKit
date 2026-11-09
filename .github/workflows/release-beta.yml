@@ -4,6 +4,11 @@ on:
   push:
     branches: [dev]
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Kit version to build the artifact for; defaults to root package.json"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -44,6 +49,32 @@ jobs:
 
       - name: Test
         run: npm test
+
+      # The kit version comes from its single source (root package.json), never
+      # from the ref. A branch name is not a version, and this step is
+      # deliberately fail-closed, so deriving it from the ref failed every run
+      # before anything could publish.
+      - name: Resolve kit version
+        id: kit-version
+        # Assigned on its own line: a failing command substitution inside `echo`
+        # does not fail the step, so a resolution error would pass silently.
+        run: |
+          version="$(node scripts/kit-version.cjs)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build signed kit artifact
+        # No continue-on-error, no `|| true`, no `if:` condition and no `set +e`.
+        # A build that cannot sign must fail the job: publishing an unsigned
+        # artifact would make every later signature check advisory, and a release
+        # that carries no artifact at all still installs through the zip asset.
+        # Both triggers for this workflow are deliberate (a dispatch, or a push to
+        # the release branch), so a failure here blocks a publish and no merge.
+        run: node scripts/build-kit-artifact.cjs "${KIT_VERSION}" dist
+        env:
+          MEOWKIT_KIT_SIGNING_KEY: ${{ secrets.MEOWKIT_KIT_SIGNING_KEY }}
+          # The dispatch input overrides; absent, the kit's own version source
+          # answers. Both operands are values the build script accepts.
+          KIT_VERSION: ${{ inputs.version || steps.kit-version.outputs.version }}
 
       - name: Release
         run: npx semantic-release

@@ -50,6 +50,13 @@ export const KIT_MEOWKIT_FILES = [
 	"gitignore.meowkit",
 	"mcp.json.example",
 	"pack-manifest.json",
+	// The governance registry the pack checks read to learn which pack owns each
+	// artifact. The pack manifest declares it shipped content in its own
+	// `base.files`; without it in the install, an installed project's pack check
+	// reports every artifact as belonging to no pack, while the source tree it
+	// came from passes. Two declarations about the same file, and only one of
+	// them was being honored.
+	"harness-inventory.json",
 ] as const;
 
 /** Write the deny-all ignore file unless the project's copy already matches. */

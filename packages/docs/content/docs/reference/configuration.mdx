@@ -33,6 +33,15 @@ Commit this file, and commit `memory/*.md` — the team memory store is reviewed
 The other `.meowkit/` subdirectories (`telemetry/`, `state/`, `cache/`) are machine-written and
 belong in `.gitignore`.
 
+`.meowkit/cache/` is the project's ONE cache of kit bytes: the kit content the install laid down,
+and under it the verified release artifact with its manifest and signature, keyed by version. There
+is no second cache and nothing under `$HOME` — the cache's trust property is that it is untracked,
+so a pull request can neither introduce nor alter it, and `uninstall` and `doctor --adopt` depend on
+that. It is also what `npx mewkit init --offline` and `npx mewkit upgrade --offline` install from,
+after re-running the same signature and digest checks a download gets. Because it is per project,
+`--offline` works only where an install has already happened; a project with no network and no cache
+is served by `MEOWKIT_RELEASE_SOURCE` instead.
+
 ```json
 {
   "$schema": "https://meowkit.dev/schema/config.json",

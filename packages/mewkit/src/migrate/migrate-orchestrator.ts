@@ -40,7 +40,7 @@ import { discoverEnvKeys } from "./discovery/config-discovery.js";
 import { emitShellEnvPolicyScaffold } from "./providers/codex/shell-env-policy-emitter.js";
 import { homedir } from "node:os";
 import { getCodexRoot } from "./hooks/codex-path-safety.js";
-import { applyActiveCodexOverlay } from "./modules/codex-reconcile-apply.js";
+import { emitActiveOverlay } from "../emit/emit-active-overlay.js";
 import { installCodexShellEnvPolicy } from "./hooks/codex-shell-env-installer.js";
 import { convertMcpJsonToCodexToml } from "./converters/mcp-json-to-codex-toml.js";
 import { installCodexMcpServers } from "./hooks/codex-mcp-installer.js";
@@ -350,12 +350,20 @@ async function runMigrateUnderLock(
 		// the authored BASE, and the idempotent injectors then merge their per-project content
 		// onto it. Gated on converter success (the injectors run regardless — non-fatal, recorded).
 		// Inert while every entry is draft, so today's converter path is otherwise unchanged.
-		if (targets.includes("codex") && !executed.results.some((r) => !r.success)) {
-			// Overlay onto the SCOPE ROOT (project cwd / home), not the .codex dir — the manifest
-			// targetPaths are scope-root-relative (".codex/config.toml", "AGENTS.md").
+		// Both external targets overlay through the ONE projection `init` and
+		// `upgrade` use, so a target's authored shape is defined in a single place
+		// and `migrate` cannot lay down a variant of it.
+		if (!executed.results.some((r) => !r.success)) {
+			// Overlay onto the SCOPE ROOT (project cwd / home), not the provider dir — the
+			// manifest targetPaths are scope-root-relative (".codex/config.toml", "AGENTS.md").
 			const scopeRoot = isGlobal ? homedir() : process.cwd();
-			const overlay = await applyActiveCodexOverlay(scopeRoot, { global: isGlobal });
-			if (overlay.writes > 0) console.log(pc.green(`[+] Applied ${overlay.writes} authored Codex artifact(s)`));
+			for (const target of ["codex", "cursor"] as const) {
+				if (!targets.includes(target)) continue;
+				const overlay = await emitActiveOverlay(target, scopeRoot, isGlobal);
+				if (overlay !== null && overlay.writes > 0) {
+					console.log(pc.green(`[+] Applied ${overlay.writes} authored ${target} artifact(s)`));
+				}
+			}
 		}
 
 		// Codex config + rules merge-single (AGENTS.md), deferred from executePlan to run HERE —
