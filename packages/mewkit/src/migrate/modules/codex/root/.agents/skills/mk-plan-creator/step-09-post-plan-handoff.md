@@ -99,7 +99,7 @@ Print exactly one line matching the selection:
 | Hand off to mk:autobuild | `Run: the autobuild skill {absolute-path-to-plan.md}` |
 | End | (no command line — print "Plan complete. No next command queued.") |
 
-If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.codex/session-state/tdd-mode` surviving a fresh session.
+If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.meowkit/state/tdd-mode` surviving a fresh session.
 
 After the command line, print the Context Reminder block from `references/gate-1-approval.md` with the absolute path substituted.
 

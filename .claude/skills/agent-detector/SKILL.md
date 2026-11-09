@@ -1,6 +1,6 @@
 ---
 name: mk:agent-detector
-description: Detects task agent and complexity tier at Phase 0 orient. Invoked first in every workflow. Provider adapters select any model/runtime policy. NOT for runtime agent routing inside a single skill (see the cook skill's orchestration reference).
+description: Picks the task agent and complexity tier at orient time, before any other skill runs. NOT for mk:scale-routing.
 triggers:
   - every message
   - always first
@@ -13,7 +13,7 @@ keywords:
   - phase-0-orient
   - auto-detect
   - complexity-classification
-when_to_use: Auto-invoked at Phase 0 by orchestrator to assign agent + model tier. Not user-callable directly.
+when_to_use: Auto-invoked at the start of a workflow to assign agent plus model tier.
 user-invocable: false
 owner: lifecycle
 criticality: medium

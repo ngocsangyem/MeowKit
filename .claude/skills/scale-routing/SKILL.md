@@ -1,6 +1,6 @@
 ---
 name: mk:scale-routing
-description: Domain-aware complexity routing. Scans task description for domain keywords, matches against domain-complexity.csv, returns complexity level, workflow intensity, and execution tier. Extends Phase 0 orchestration.
+description: Matches task keywords against the domain-complexity table and returns complexity and execution tier. NOT for mk:agent-detector.
 triggers:
   - task classification
   - complexity routing
@@ -14,7 +14,7 @@ keywords:
   - complexity-routing
   - csv-routing
   - execution-tier
-when_to_use: Auto-invoked at Phase 0 — scans task description for domain keywords, returns complexity tier and execution tier. Not user-callable directly.
+when_to_use: Auto-invoked while tiering a task. Not user-callable.
 owner: portability
 criticality: medium
 status: active

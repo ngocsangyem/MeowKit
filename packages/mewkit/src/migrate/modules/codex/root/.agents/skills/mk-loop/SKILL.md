@@ -170,5 +170,5 @@ Schema details (TSV columns, statuses, resume state): [`references/result-schema
 
 Loop pattern (Modify → Verify → Keep/Discard with safety guardrails) adapted from
 autoresearch by Udit Goenka (MIT). Toolkit-native re-homing: boundary-gated autonomy,
-conventional `*(loop):` commit policy, `tasks/reports` + `session-state` artifacts, and the
+conventional `*(loop):` commit policy, `tasks/reports` + `.meowkit/state` artifacts, and the
 Skill Rule of Two posture. Not a verbatim copy.

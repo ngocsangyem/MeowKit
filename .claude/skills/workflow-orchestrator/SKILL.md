@@ -1,6 +1,6 @@
 ---
 name: mk:workflow-orchestrator
-description: Auto-invoked 7-phase workflow for complex-feature intent. Includes fasttrack mode for pre-approved specs. NOT for explicit user-invoked single tasks (see mk:cook); NOT for green-field autonomous builds (see mk:autobuild); NOT for simple bug fixes (see mk:fix).
+description: Auto-routes complex-feature intent through the 7-phase workflow, fasttracking signed specs. NOT for mk:cook.
 triggers:
   - implement feature
   - build feature
@@ -20,7 +20,7 @@ keywords:
   - intent-detection
   - fasttrack
   - complex-feature
-when_to_use: Auto-invoked on complex-feature intent — routes through 7-phase workflow. NOT for explicit user-invoked single tasks (see mk:cook). Not user-callable directly.
+when_to_use: Auto-invoked on complex feature intent. Not user-callable.
 user-invocable: false
 owner: lifecycle
 criticality: high

@@ -1,8 +1,8 @@
 ---
 name: mk:tech-graph
-description: Generate publish-grade SVG+PNG technical diagrams — architecture, data flow, flowchart, sequence, agent-memory, class, ER, state-machine, comparison, timeline, and more — across 8 visual styles. Writes output to tasks/visuals/ or an active plan's visuals/ directory. Requires rsvg-convert (librsvg) for PNG export; degrades gracefully to SVG-only when absent.
+description: 'Renders publish-grade SVG and PNG diagrams: architecture, flow, sequence, ER, state machine. NOT for mk:preview.'
 user-invocable: true
-when_to_use: Invoke when the user wants a publish-grade SVG or PNG diagram for a blog, doc, slide, or editorial use — architecture, data flow, flowchart, sequence, class, ER, state-machine, agent-memory, or any system layout they want illustrated. NOT for in-HTML interactive diagrams (mk:preview --html --diagram) or plan rendering (mk:visual-plan).
+when_to_use: A diagram is going into a blog, slide or doc and must look editorial.
 keywords:
   - diagrams
   - architecture

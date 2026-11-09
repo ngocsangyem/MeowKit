@@ -1,6 +1,6 @@
 ---
 name: story-sizer
-description: Heuristic pre-ticket Fibonacci sizing for a paste-mode batch of user stories. Read-only at Jira; writes Story Sizing Report locally. Auto-create mode delegates ticket creation to mk:jira-issue + mk:jira-collaborate; never reads Jira credentials directly. Forked from mk:story-sizer skill.
+description: 'mk:jira family executor for mk:story-sizer. Fibonacci sizing of pasted stories.'
 tools: Bash, Read, Grep, Glob, Write
 model: haiku
 permissionMode: default

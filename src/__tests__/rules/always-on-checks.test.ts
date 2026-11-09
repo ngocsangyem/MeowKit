@@ -18,11 +18,23 @@ afterEach(() => {
 	temp = null;
 });
 
-/** A project tree holding only the 7 always-on rule files copied from this repo. */
+/**
+ * A project tree holding only the 7 always-on rule files copied from this repo.
+ *
+ * The pack manifest is part of the shape because the budget check reads its measured file set
+ * from the ship set rather than globbing `.claude` — so the budget and the published kit cannot
+ * disagree about which blocks count. An empty `base.exclude` with no skills or agents present
+ * makes the metadata half zero, which keeps these cases about the rules ceiling alone.
+ */
 function makeAlwaysOnTree(): string {
 	temp = fs.mkdtempSync(path.join(os.tmpdir(), "always-on-"));
 	const rules = path.join(temp, ".claude", "rules");
 	fs.mkdirSync(rules, { recursive: true });
+	fs.mkdirSync(path.join(temp, ".meowkit"), { recursive: true });
+	fs.writeFileSync(
+		path.join(temp, ".meowkit", "pack-manifest.json"),
+		JSON.stringify({ base: { exclude: [] } }),
+	);
 	for (const name of ALWAYS_ON_RULES) {
 		fs.copyFileSync(path.join(REPO_ROOT, ".claude", "rules", name), path.join(rules, name));
 	}
@@ -48,7 +60,9 @@ describe("check-always-on-budget", () => {
 		);
 		const result = run(BUDGET, root);
 		expect(result.status).toBe(0);
-		expect(result.output).toContain(`measured total: ${expected} bytes`);
+		expect(result.output).toContain(`measured: rules ${expected} B (limit 25600)`);
+		// With no skills or agents in the tree, the two measured sets coincide.
+		expect(result.output).toContain(`always-listed ${expected} B (limit 70000)`);
 		expect(expected).toBeLessThanOrEqual(25600);
 	});
 
@@ -59,13 +73,24 @@ describe("check-always-on-budget", () => {
 		fs.appendFileSync(path.join(rules, "meowkit-core.md"), "x".repeat(25601 - current));
 		const result = run(BUDGET, root);
 		expect(result.status).toBe(1);
-		expect(result.output).toContain("measured total: 25601 bytes");
+		expect(result.output).toContain("measured: rules 25601 B (limit 25600)");
+		// The rules ceiling is its own enforced comparison: 25601 B is nowhere near the
+		// always-listed ceiling, so a tree that breaches only the rules must still fail.
+		expect(result.output).toContain("always-on rules are 1 bytes over the 25600-byte budget");
 	});
 
 	it("exits 2 when the rules directory is unreadable", () => {
 		const result = run(BUDGET, path.join(os.tmpdir(), "no-such-meowkit-root"));
 		expect(result.status).toBe(2);
 		expect(result.output).toContain("cannot read");
+	});
+
+	it("exits 2 when the ship set has no source, rather than measuring no metadata and passing", () => {
+		const root = makeAlwaysOnTree();
+		fs.rmSync(path.join(root, ".meowkit", "pack-manifest.json"));
+		const result = run(BUDGET, root);
+		expect(result.status).toBe(2);
+		expect(result.output).toContain("the ship set has no source");
 	});
 });
 

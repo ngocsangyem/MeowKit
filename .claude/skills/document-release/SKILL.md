@@ -2,12 +2,7 @@
 name: mk:document-release
 preamble-tier: 2
 version: 1.0.0
-description: |
-  Post-ship documentation update. Reads all project docs, cross-references the
-  diff, updates README/ARCHITECTURE/CONTRIBUTING/CLAUDE.md to match what shipped,
-  polishes CHANGELOG voice, cleans up TODOS, and optionally bumps VERSION. Use when
-  asked to "update the docs", "sync documentation", or "post-ship docs".
-  Proactively suggest after a PR is created and before it merges.
+description: Post-ship docs sync — README, architecture, contributing, CLAUDE.md, changelog voice, TODO cleanup. NOT for mk:docs-init.
 allowed-tools:
   - Bash
   - Read
@@ -23,7 +18,7 @@ keywords:
   - changelog
   - readme-update
   - sync-documentation
-when_to_use: Use after shipping work but before its PR merges — updates README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, CHANGELOG. NOT for initial doc creation (see mk:docs-init).
+when_to_use: Work has shipped and its pull request has not merged yet.
 user-invocable: true
 owner: docs
 criticality: medium

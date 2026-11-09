@@ -2,14 +2,7 @@
 name: mk:office-hours
 preamble-tier: 3
 version: 2.0.0
-description: |
-  YC Office Hours — product validation for a new product, feature, or side-project
-  concept. Startup mode tests demand; Builder mode develops an unvalidated product
-  idea. Use when the user asks whether something is worth building or has an idea
-  whose problem/value is not yet validated.
-  Proactively suggest when the user describes a new product idea or is exploring
-  whether something is worth building — before any code is written.
-  Use BEFORE a plan exists. For reviewing an existing plan, use /mk:plan-ceo-review.
+description: YC-style validation of whether a product or feature idea is worth building at all. NOT for mk:plan-ceo-review.
 allowed-tools:
   - Bash
   - Read
@@ -27,7 +20,7 @@ keywords:
   - forcing-questions
   - brainstorm-builder
   - design-doc
-when_to_use: Use when validating a new product, feature, or side-project concept. NOT for multiple technical approaches to a validated requirement (see mk:brainstorming).
+when_to_use: User floats a new idea whose problem and value are still unproven.
 user-invocable: true
 owner: research
 criticality: medium

@@ -2,14 +2,7 @@
 name: mk:review
 preamble-tier: 3
 version: 1.3.1
-description: |
-  Multi-pass structural code review with adversarial analysis, scope-aware dispatch, adversarial persona passes,
-  and forced-finding protocol. Supports input modes: branch diff (default),
-  PR number (#123), commit hash, pending changes (--pending). Use when asked to "review this PR",
-  "code review", "pre-landing review", "check my diff", or "review #123".
-  Proactively suggest when the user is about to merge or land code changes.
-  NOT for behavioral verification against a running build (see mk:evaluate);
-  NOT for post-implementation simplification (see mk:simplify).
+description: Multi-pass adversarial structural review of a diff, PR or commit; writes the Gate 2 verdict a human approves. NOT for mk:evaluate.
 argument-hint: '[#PR | COMMIT | --pending]'
 allowed-tools:
   - Bash
@@ -29,7 +22,7 @@ keywords:
   - verdict
   - gate-2
   - adversarial-review
-when_to_use: Use for structural code audit of a diff/PR — produces PASS/WARN/FAIL verdict per dimension. Phase 4 review skill. NOT for behavioral verification of running build (see mk:evaluate).
+when_to_use: Code is written and must be audited before it lands.
 user-invocable: true
 owner: lifecycle
 criticality: high

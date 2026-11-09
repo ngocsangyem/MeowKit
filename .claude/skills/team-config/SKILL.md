@@ -1,6 +1,6 @@
 ---
 name: mk:team-config
-description: Set up parallel agent team for COMPLEX tasks. Creates worktree structure, generates ownership map, and initializes task queue. Use when orchestrator decomposes a task into parallel subtasks, or when asked to "set up team", "parallel setup", or "configure worktrees".
+description: 'Sets up a parallel agent team: worktrees, ownership map, task queue. NOT for mk:worktree.'
 argument-hint: '"task description" --agents N'
 source: local
 allowed-tools:
@@ -14,7 +14,7 @@ keywords:
   - ownership-map
   - parallel-team-init
   - task-queue-init
-when_to_use: Auto-invoked when orchestrator decomposes a COMPLEX task into parallel subtasks — sets up worktrees, ownership map, task queue. Not user-callable directly.
+when_to_use: Auto-invoked when a complex task is split into parallel subtasks.
 user-invocable: false
 owner: git
 criticality: medium

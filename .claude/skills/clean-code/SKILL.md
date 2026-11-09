@@ -1,6 +1,6 @@
 ---
 name: mk:clean-code
-description: 'Enforces KISS/DRY/YAGNI during authoring and ad-hoc quality reviews. Pragmatic standards: concise, direct, no unnecessary comments. NOT for post-hoc diff/PR review (see mk:review); NOT for behavior-preserving simplification passes (see mk:simplify).'
+description: Apply KISS, DRY and YAGNI while code is being written, and in ad-hoc quality passes. NOT for mk:simplify.
 allowed-tools: Read, Write, Edit
 version: 2
 priority: CRITICAL
@@ -15,7 +15,7 @@ keywords:
   - yagni
   - authoring-quality
   - ad-hoc-review
-when_to_use: Use during authoring or ad-hoc quality reviews — KISS/DRY/YAGNI enforcement. NOT for post-hoc diff/PR review (see mk:review) or behavior-preserving simplification (see mk:simplify).
+when_to_use: Authoring new code that should stay concise, or an informal quality read.
 user-invocable: true
 owner: utility
 criticality: medium

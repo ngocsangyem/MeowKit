@@ -12,7 +12,7 @@ Sets up the infrastructure for parallel agent execution. Called by orchestrator 
 1. **Analyzes the task** — identifies independent subtasks from the plan
 2. **Generates ownership map** — assigns file ownership globs per subtask
 3. **Creates worktrees** — one git worktree per parallel agent
-4. **Initializes task queue** — `session-state/task-queue.json` with claiming protocol
+4. **Initializes task queue** — `.meowkit/state/task-queue.json` with claiming protocol
 5. **Validates no overlap** — checks ownership globs for conflicts before starting
 
 ## Setup Flow
@@ -62,4 +62,4 @@ See `templates/ownership-map-template.md` for the format agents use to declare f
 After all parallel agents complete and integration test passes:
 1. Merge all worktree branches to feature branch
 2. Remove worktrees via `mk:worktree cleanup`
-3. Archive `session-state/task-queue.json`
+3. Archive `.meowkit/state/task-queue.json`

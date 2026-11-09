@@ -1,13 +1,7 @@
 ---
 name: mk:sequential-thinking
 version: 1.0.0
-description: |
-  Use when a problem requires structured step-by-step reasoning before acting.
-  Prevents jumping to conclusions or guessing root causes without evidence.
-  Triggers on complex debugging, multi-step analysis, hypothesis verification,
-  or when mk:fix invokes diagnosis phase. NOT for being stuck on approach
-  (too many implementations, forced assumptions, innovation block) — use
-  mk:problem-solving instead.
+description: Forces explicit step-by-step hypothesis-and-evidence reasoning before acting. NOT for mk:problem-solving.
 allowed-tools:
   - Read
   - Grep
@@ -21,7 +15,7 @@ keywords:
   - evidence-based
   - incremental-analysis
   - chain-of-thought
-when_to_use: Use when applying step-by-step evidence-based reasoning. NOT for systematic debugging (see mk:investigate).
+when_to_use: Analysis runs several steps deep and a guessed conclusion would be costly.
 user-invocable: true
 owner: research
 criticality: medium

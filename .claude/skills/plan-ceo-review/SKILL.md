@@ -2,16 +2,7 @@
 name: mk:plan-ceo-review
 preamble-tier: 3
 version: 1.0.0
-description: |
-  CEO/founder-mode plan review. Rethink the problem, find the 10-star product,
-  challenge premises, expand scope when it creates a better product. Four modes:
-  SCOPE EXPANSION (dream big), SELECTIVE EXPANSION (hold scope + cherry-pick
-  expansions), HOLD SCOPE (maximum rigor), SCOPE REDUCTION (strip to essentials).
-  Use when asked to "think bigger", "expand scope", "strategy review", "rethink this",
-  or "is this ambitious enough".
-  Proactively suggest when the user is questioning scope or ambition of a plan,
-  or when the plan feels like it could be thinking bigger.
-  Use AFTER a plan exists. For validating the idea itself before planning, use /mk:office-hours first.
+description: 'Founder-mode critique of a written plan: premises, ambition, scope expansion or reduction. NOT for mk:validate-plan.'
 benefits-from:
   - office-hours
 allowed-tools:
@@ -28,7 +19,7 @@ keywords:
   - ambition-check
   - plan-evaluation
   - executive-review
-when_to_use: Use when reviewing existing plan for scope/ambition — CEO-level critique. NOT for ticket complexity analysis (see mk:planning-engine) or writing plans (see mk:plan-creator).
+when_to_use: User asks if the plan is ambitious enough or wants its scope rethought.
 user-invocable: true
 owner: lifecycle
 criticality: medium

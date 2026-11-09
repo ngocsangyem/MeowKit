@@ -1,6 +1,6 @@
 ---
 name: mk:jira-agile
-description: 'JIRA agile via the jira-as wrapper: epics, sprints, backlog, ranking, story points, subtasks, velocity. Triggers: ''create sprint'', ''add KEY to sprint'', ''set story points on KEY'', ''rank KEY before KEY'', ''velocity for board'', ''epic add''. Board ID ≠ project key. NOT for issue CRUD (mk:jira-issue); NOT for time tracking (mk:jira-time).'
+description: 'mk:jira leaf. Epics, sprints, backlog, ranking, story points, velocity. NOT for mk:jira-estimator.'
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - jira-backlog
   - story-points
   - velocity
-when_to_use: Use to manage epics, sprints, backlog, ranking, story-point estimates, subtasks, or velocity reports. NOT for individual issue CRUD.
+when_to_use: 'Move items between Jira sprints or backlog, or read sprint point totals.'
 user-invocable: true
 context: fork
 agent: jira-agile

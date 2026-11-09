@@ -1,6 +1,6 @@
 ---
 name: mk:confluence-collaborate
-description: 'Manage Confluence collaboration surface via the confluence-as wrapper: comments, attachments, labels, watchers. Triggers: ''add comment to page 12345'', ''upload attachment to page 12345'', ''label page 12345 as urgent'', ''watch page 12345''. Inline-vs-footer comment safety enforced. NOT for page CRUD (mk:confluence-page); NOT for bulk ops (mk:confluence-bulk).'
+description: 'mk:confluence leaf. Comments, attachments, label CRUD, watchers on one page. NOT for mk:confluence-page.'
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - page-watcher
   - footer-comment
   - inline-comment
-when_to_use: Use to add/list/update/delete comments, attachments, labels, or watchers on a single Confluence page. NOT for page field updates (use mk:confluence-page).
+when_to_use: 'Comment on, attach to, or label a single Confluence page.'
 user-invocable: true
 context: fork
 agent: confluence-collaborate

@@ -1,6 +1,6 @@
 ---
 name: jira-ops
-description: 'Inspect JIRA-side cache + project context discovery via the jira-as CLI wrapper. Diagnostic surface: cache-status, cache-clear, discover-project. Routed by mk:jira-ops skill. NOT for issue CRUD; NOT for project admin (jira-admin).'
+description: 'mk:jira executor for mk:jira-ops. Cache status, clear, project discovery.'
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default

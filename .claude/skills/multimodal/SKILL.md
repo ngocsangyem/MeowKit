@@ -1,6 +1,6 @@
 ---
 name: mk:multimodal
-description: Process images, video, audio, PDFs with Gemini API. Generate images (Nano Banana 2), videos (Veo 3), speech (MiniMax TTS), music (MiniMax). Convert documents to Markdown. Multi-provider fallback (Gemini → MiniMax → OpenRouter). Activate when task references media files, asks to analyze/describe/transcribe/extract/generate/convert, or involves non-text binary files.
+description: Analyse and generate images, video, audio and PDFs via Gemini or MiniMax with fallback. NOT for mk:html-video.
 version: 2.1.0
 argument-hint: '[file-path] [task]'
 phase: on-demand
@@ -30,7 +30,7 @@ keywords:
   - video
   - audio
   - minimax
-when_to_use: Use when processing images, video, audio, PDFs or generating media via Gemini/MiniMax/OpenRouter. Activate when task references media files.
+when_to_use: The task names a media file, or asks to transcribe, describe or generate one.
 user-invocable: true
 allowed-tools:
   - Bash

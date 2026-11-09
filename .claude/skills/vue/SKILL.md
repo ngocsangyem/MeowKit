@@ -1,12 +1,7 @@
 ---
 name: mk:vue
 version: 1.0.0
-description: |
-  Use when writing, reviewing, or refactoring Vue 3 code — components, composables,
-  reactivity, Pinia state, Pinia Colada data-fetching, file-based routing, and forms.
-  Targets Composition API + <script setup> + TypeScript. Auto-activates on .vue files.
-  For deep best-practices review/recommendations or the full ordered workflow (built-in
-  components, animations, performance pass), use mk:vue-best-practices.
+description: 'Everyday Vue 3 authoring: Composition API, composables, reactivity, Pinia, routing, forms. NOT for mk:vue-best-practices.'
 allowed-tools:
   - Read
   - Grep
@@ -24,7 +19,7 @@ keywords:
   - generic-components
   - vue-3-5
   - framework-specific
-when_to_use: Use when writing/reviewing/refactoring Vue 3 (components, composables, reactivity, Pinia, Pinia Colada, routing). Auto-activates on .vue files. NOT for deep best-practices review/recommendations or the ordered best-practices workflow (see mk:vue-best-practices), generic TypeScript (see mk:typescript), React (see mk:react-patterns), or Angular (see mk:angular).
+when_to_use: Editing .vue files or wiring Vue state and data fetching.
 user-invocable: true
 owner: utility
 criticality: medium

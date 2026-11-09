@@ -1,13 +1,7 @@
 ---
 name: mk:vue-best-practices
 version: 1.0.0
-description: >-
-  Use for deep Vue 3 best-practices review, recommendations, and the full ordered authoring
-  workflow — built-in components (Teleport, Suspense, KeepAlive, Transition, TransitionGroup),
-  animation techniques, slots, fallthrough attrs, custom directives, async components, render
-  functions, plugins, and the post-functionality performance pass. Complements mk:vue (the
-  everyday Composition API quick-reference). Invoke for "review my Vue", "Vue best practices",
-  "recommend improvements", or non-trivial feature work needing the ordered workflow.
+description: 'Deep Vue 3 review and the ordered workflow: built-ins, animation, slots, performance pass. NOT for mk:vue.'
 allowed-tools:
   - Read
   - Grep
@@ -23,11 +17,7 @@ keywords:
   - render-functions
   - slots
   - recommendations
-when_to_use: >-
-  Use when reviewing/recommending Vue 3 code against best practices, or following the full
-  ordered workflow for a non-trivial feature (built-in components, animations, optional
-  features, performance pass). NOT for everyday Vue authoring quick-reference (use mk:vue),
-  generic diff/PR structural review (use mk:review), or TypeScript/React/Angular.
+when_to_use: Asked to review Vue feature code or recommend improvements.
 user-invocable: true
 owner: utility
 criticality: medium

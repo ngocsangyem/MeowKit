@@ -1,342 +1,349 @@
-# Review: MeowKit v3 lean runtime — kit shape and removals (sprint 8)
+# Review: MeowKit v3 lean runtime — metadata budget, integration descriptions, SubagentStart answer (sprint 9)
 
-- **Reviewed base:** `d17cc03b` ("contract: evaluator signs sprint 8 …"), branch `feat/v3-lean-runtime`
-- **Reviewed change:** working tree vs `d17cc03b` — `git diff HEAD` plus untracked files, excluding `tasks/plans/` (never committed)
-- **Spec graded against:** `tasks/contracts/261109-1402-meowkit-v3-lean-runtime-sprint-8.md` (signed, 11 acceptance criteria). The metadata budget (D7), the integration rewrite and routing specs (D10, D11) and the SubagentStart spike (D13) are deferred to sprint 9 by D15 and are **not graded here**.
-- **Review round:** 2. Round 1 returned a blocking Correctness result on one reproduced defect plus six WARN items; R1, its follow-up guard, W1, W2, W3, W6(a) and W6(b) are closed, and W4/W5 are left as declared follow-ups. Round 1's verdict is archived verbatim at `tasks/reviews/evidence/261109-meowkit-v3-lean-runtime-sprint-8/review-round-1.md`; sprint 7's at `…/sprint-7/verdict-approved.md`.
+- **Revision: 3f85e7ff** — the revision under review, branch `feat/v3-lean-runtime` ("test: record pre-rewrite routing baseline for integration skills")
+- **Reviewed base:** `3f85e7ff`
+- **Reviewed change:** working tree vs `3f85e7ff` — `git diff HEAD` plus untracked files, excluding `tasks/plans/` (never committed). 218 tracked files changed, plus one untracked test file and two untracked evidence tables.
+- **Spec graded against:** `tasks/contracts/261109-2052-meowkit-v3-lean-runtime-sprint-9.md` (signed, 11 acceptance criteria) **including `### Amendment 1 — 261109-2215`**, which overrides AC-06/AC-07's ordering proof and AC-09's occurrence count.
+- **Builder evidence read:** `tasks/reviews/evidence/261109-meowkit-v3-lean-runtime-sprint-9/` — `evidence.md` (slices A/B/C), `slice-c1-table.md`, `slice-c2-table.md`, `routing-live.md`, `routing-specs-before.md`, `routing-metadata-{before,after}.md`, `routing-probe.md`, `routing-prompt-example.md`, `subagent-start-spike.md`. Every figure below was re-measured by this review, not accepted from the report.
+- **Review round:** 1. Sprint 8's approved verdict is archived verbatim at `tasks/reviews/evidence/261109-meowkit-v3-lean-runtime-sprint-8/verdict-approved.md` (md5 `088bf9276f866a8bcbeea8087819a5b1`, identical to the file this verdict replaced).
 - **Mode:** default (TDD off) — coverage gaps are WARN
-- **Score:** 9.0/10
+- **Score:** 8.8/10
 
 ## Verdict: WARN
 
-The blocking defect is closed, and I reproduced the fix rather than accepting the report: the
-corrected `--tdd` instruction now exits **0**, writes the sentinel, and creates no retired state root.
-More importantly the fix came with the guard round 1 asked for, and I proved the guard bites by
-planting the pre-fix line back into a faithful clone of the finished tree — it fails on the shipped
-file *and* on the blockquoted maintainer copy, which is the drift path that let the defect through in
-the first place.
+Nothing blocks. The sprint's central number holds under independent re-derivation: I re-implemented
+the extractor from the contract's definition (YAML-parse each ship-set file, `Buffer.byteLength` over
+the named scalars) and got **exactly** the committed check's figures — always-listed **59 401 B**
+against the 70 000 ceiling, rules **25 417 B** (equal to POST-8, not merely under 25 600), metadata
+half **33 984 B** against ≤44 583, a cut of **54 397 B** against the required ≥43 798. 128 skills and
+42 agents, **zero** missing `name`/`description`/`when_to_use`, `skills/benchmark/SKILL.md` absent
+from the ship set. No byte was bought by deleting a field or unshipping a block.
 
-The W1 coverage hole is genuinely closed, not papered over. Round 1 caught 1 of 4 planted old-path
-references; I re-ran the same four probes against the finished checker and all **4 of 4** are now
-caught, while a legitimate mapping line that names both the retired and the current path stays legal —
-so rule (d) has teeth without being over-broad. The widened rule (a) is what finally makes the three
-`citedByName` entries protective. And the new rule found a **live** stale reference on its first run
-(`scripts/validate-rule-availability.sh:77`), which retires round 1's observation that the check "was
-green because it was not looking".
+The claim I most expected to be decorative is the one that survived hardest. AC-02's probe — rules
+over their own 25 600 ceiling while the combined total is comfortably under 70 000 — exits **1** on a
+scratch tree and names the rules limit as the reason (`scripts/check-always-on-budget.cjs:177-180`),
+so shortening an always-on safety rule to buy metadata room still fails. The inflated-description
+probe exits **1** naming the file, its bytes and the overage; the removed-rules-directory probe still
+exits **2**. One script, one extractor, one CI invocation (`.github/workflows/ci.yml:188`).
 
-What remains is two declared follow-ups the developer deliberately did not take (W4 projection sync,
-W5 a pre-existing fail-open), one accepted deviation, and three record-only items. None blocks; all
-are numbered below for explicit acknowledgement.
+Amendment 1's clause (c) is proven, not asserted: the spec and validator hunks in the working tree
+are **byte-identical** to the diff recorded in `routing-specs-before.md` — I extracted both and
+`diff` returned empty at 9 466 B each, index lines included. Clauses (a) and (b) are post-commit
+obligations and are named in item 6 below.
 
-| Dimension | Round 1 | Now |
+What remains is a real routing cost that the builder disclosed for one pair and that I measured
+kit-wide (item 1), two compressed descriptions that edge toward automation-as-authority without
+crossing (item 2), and a coverage hole where this sprint's new invariants are enforced only by the
+aggregate byte ceiling (item 3). All are numbered for explicit acknowledgement.
+
+| Dimension | Result | One-line basis |
 | --- | --- | --- |
-| Correctness | blocking | PASS |
-| Maintainability | WARN | PASS |
-| Performance | PASS | PASS |
-| Security | WARN | WARN |
-| Coverage | WARN | WARN |
+| Correctness | PASS | 11/11 criteria re-measured; 9 fully met, AC-06/AC-07 content-met with Amendment 1's ordering proof pending the code commit, clause (c) proven byte-identical |
+| Maintainability | PASS | one script, one extractor, comments corrected to match what is measured; no `any`, no unsafe cast, lint 0 errors (3 pre-existing warnings), typecheck clean |
+| Performance | PASS | 54 397 B removed from the always-listed context; the integration routing surface shrank 13 103 B → 5 228 B (60.1 %) with 7/7 → 7/7 live leaf selection unchanged |
+| Security | PASS | no secret in any evidence artifact; injection STOP honoured with no bypass; `SubagentStart` registration still empty and no handler; `.claude/rules/` byte-unchanged; launcher, privacy and `settings.json` untouched |
+| Coverage | WARN | AC-02's ceilings are pinned by committed tests; AC-01/AC-04/AC-05's metadata invariants are not (item 3) |
 
-Side Effects Detected: No — this review wrote only this verdict file and the two archive copies.
+Side Effects Detected: No — this review wrote only this verdict file and the sprint 8 archive copy.
 
-## Gate-authority standing item (`gate-rules.md:67-73`)
+## Correctness
 
-Re-asked for round 2, because the fix round again touched `.claude/rules/`-adjacent safety code and
-three skills in the trigger list.
+Re-measured, not accepted. Commands re-run under `PATH=/opt/homebrew/opt/node@24/bin:$PATH`.
 
-> **Does any prose in this change grant approval authority to something that is not a human — in any wording?**
+- **AC-01 met.** `node scripts/check-always-on-budget.cjs .` exits 0; my independent extractor agrees
+  to the byte on all five figures. Per-field subtotals print (`scripts/check-always-on-budget.cjs:146-158`),
+  so the total is reproducible without guessing the extractor.
+- **AC-02 met.** Two enforced comparisons, both exiting non-zero on breach
+  (`scripts/check-always-on-budget.cjs:25-26`, `:177-187`). All three scratch probes reproduced
+  (rules-over-but-total-under → exit 1 naming rules; inflated description → exit 1 naming
+  `.claude/skills/verify/SKILL.md — mk:verify, 20069 B` with a 9 313 B overage; rules directory
+  removed → exit 2). No second budget script and no second extractor in the diff. See item 8 on the
+  contract's "disjoint sets" wording.
+- **AC-03 met.** `git diff f387e586 -- .claude/rules/` is **empty**; rules subtotal 25 417 B = POST-8;
+  all five always-on safety files present; `scripts/check-rule-survival.cjs` exit 0.
+- **AC-04 met.** 104/104 non-integration skills carry an exclusion clause; **zero** unresolved `mk:*`
+  ids inside any clause; **zero** duplicate `description` and **zero** duplicate `when_to_use` across
+  the 128 skills and 42 agents pooled; zero empty, whitespace-only or `name`-restating fields;
+  `validate --frontmatter` and `scripts/check-skill-cross-refs.sh` exit 0. Routing quality is graded
+  in items 1, 2, 4 and 5.
+- **AC-05 met.** 46 integration blocks measure **6 248 B** ≤ 6 900 and **5 592 B** net of `name`
+  ≤ 6 244. All 21 leaves name their hub by id and a verb set; both hub bodies still name every leaf
+  (16/16 and 5/5); `mk:story-sizer` opens `mk:jira family.`; `default_enabled`,
+  `requires_external_service`, `dependency_edges` and paths unchanged for all 46; `validate --packs`
+  exit 0. The omission table at `evidence.md:568-606` is honest about what the hubs carry — the two
+  hubs use `NOT an executor.` rather than a `NOT for <id>` clause, which is the one block type where
+  naming a single leaf would mislead, and the table prints the exact clause text for all 24.
+- **AC-06 met on content.** 7 specs `j13`–`j19` (≥6), each with all 12 required fields,
+  `oracle: model:routing`, `oracle_layers: ["live"]`, `status: active`; every `expected_route`
+  resolves to a shipped leaf. The three `12` literals and `REQUIRED_IDS` collapsed into one raised
+  constant (`tests/journey-validation/check-journey-specs.py:33`, `:36`, `:50`, `:99`) — stronger than
+  moving three literals in step, since there is now one number to move. Equality kept, not loosened.
+  `python3 tests/journey-validation/check-journey-specs.py` exits 0 and prints 19.
+- **AC-07 met on content, branch (a).** Exactly one artifact at the literal path; command, model id
+  (`claude-opus-5-5`), verbatim before and after output per spec, 7/7 → 7/7, zero route changes.
+  Scope of that evidence is item 4.
+- **AC-08 met.** Verdict `adopt` with a dated vendor citation and a recorded retrieval chain
+  (`subagent-start-spike.md:3-24`). All six assertion sites carry it:
+  `.claude/skills/cook/references/orchestration-rules.md:99`, `:113`,
+  `docs/architecture/context-isolation.md:21`, `:112`, `docs/core/meowkit-architecture.md:246-248`,
+  `docs/reference/sub-agents.md:527-531`. `.claude/settings.json:162` is still `[]`;
+  `git grep -l SubagentStart -- .claude/hooks` returns nothing; `scripts/check-hook-registration.sh`
+  exit 0. The claude provider record keeps `status`/`gate` and replaces its `evidence` string with the
+  dated host-documentation citation plus an explicit "this kit registers NO handler"
+  (`packages/mewkit/src/core/provider-lifecycle.ts:82-92`) — the empty-array-as-evidence defect the
+  criterion existed to catch is closed.
+- **AC-09 met under Amendment 1 §2.** `git grep -c session-state -- packages/mewkit/src/migrate/modules`
+  returns 4 files at 1 occurrence each, and all four are same-file markdown anchors
+  (`.../mk-agent-browser/references/session-management.md:11`, `.../mk-henshin/references/mcp-transports.md:11`
+  in both the codex and cursor copies) — exactly the artifact Amendment 1 §2 exempts. 121 files now
+  name `.meowkit/state`; **no** hunk in that tree touches a `description:` line; the three pinned
+  legacy readers and the anchor file are byte-identical to POST-8.
+- **AC-10 met.** `.claude/skills/plan-creator/assets/bead-template.md:40` names
+  `.meowkit/state/build-progress.json` with the sentence intact. The only `session-state` hits left
+  under `.claude` are the three pinned readers plus the anchor at
+  `.claude/skills/agent-browser/references/session-management.md:11`. `validate --docs-refs` and
+  `scripts/check-dangling-rule-refs.cjs` exit 0.
+- **AC-11 met on content.** `node scripts/docs-manifest.cjs --check` exit 0 with no drift; manifest
+  holds 171 entries / 129 skills / 42 agents with `mk:benchmark` present and recorded as correct
+  rather than reconciled; `generate-cli-manual.cjs --check` exit 0 as a no-op. Independent re-runs:
+  `npm run build` 0, `npm run lint` 0 errors / 3 pre-existing warnings, `npm run typecheck` 0,
+  `npm test` **300 files / 3 380 tests pass**, `node --test .claude/hooks/__tests__/*.test.cjs` 0 fail,
+  `validate --frontmatter|--packs|--gates|--docs-refs|--workflow|--memory` 0 each,
+  `check-rule-survival`, `check-dangling-rule-refs`, `check-kit-verbs`, `check-node-only-runtime`,
+  `harness-inventory --check`, `check-skill-cross-refs.sh`, `check-hook-registration.sh` all 0. My own
+  plan-artifact token sweep over added lines outside `tasks/` returns the same two pre-existing bundle
+  sample lines the builder disclosed and nothing new; the one new file name,
+  `tests/always-on-budget-ceilings.test.ts`, is domain-named.
 
-**No.** The fix round added prose in four places I read individually: the four-line comment in
-`.claude/hooks/lib/gate2-check.cjs`, the header comment of the new guard test, the widened
-`check-dangling-rule-refs.cjs` header, and the three "this repository only" qualifiers. None mentions
-approval, advancement, scoring or unattended operation; the gate2 comment documents why a message
-names a pre-move path, and explicitly leaves the decision with the recorded corpus rather than with
-any automation. `validate --gates` reports `[PASS] No automated gate-approval claims`, treated as a
-floor rather than as the answer. Round 1's two gate-adjacent findings (the reviewer path list's reach,
-and the `security-rules.md` Enforcement clause keeping its meaning) are unchanged by this round and
-remain satisfied.
+Implementation-vs-plan fit: the change matches the signed contract's shape — one check with two
+comparisons, descriptions cut to one job plus one exclusion, routing detail pushed into hub bodies,
+nothing moved or disabled. The two deliberate non-moves (20 non-integration agents left byte-identical,
+hub bodies left unedited) are recorded as decisions at `evidence.md:764-791` and `:607-617` and are
+consistent with the criteria as written.
 
-## Fix verification — each reproduced, not accepted
+## Maintainability
 
-**F1 — R1 closed. The shipped `--tdd` instruction no longer writes a retired state root.**
+The budget check is one file with one extractor and an explicit usage/exit contract
+(`scripts/check-always-on-budget.cjs:1-19`). The simplifier's correction to those comments is right:
+the header now says "those rules PLUS shipped skill/agent metadata" (`:5-6`) rather than claiming the
+two measured sets are disjoint, which they are not — the always-listed total contains the rules
+subtotal. See item 8. Reference per-item figures are printed and labelled "NOT enforced"
+(`:28-31`, `:160-165`), and the descending per-item list gives a maintainer a place to look.
 
-`.claude/skills/cook/SKILL.md:83` and `.claude/benchmarks/canary/quick/05-tdd-feature-spec.md:17` both
-now read `mkdir -p .meowkit/state && echo on > .meowkit/state/tdd-mode`. Re-run in a project
-containing only `.meowkit/`:
+No `any`, no `as any`, no `@ts-ignore`, no new `eslint-disable` in any changed TypeScript. The 3 lint
+warnings are pre-existing unused-symbol warnings, unchanged in count and location. Measured-set
+sourcing stays on `kit-ship-set.cjs` rather than a `.claude` glob, so the budget and the published kit
+cannot disagree, and `src/__tests__/rules/always-on-checks.test.ts:87-92` now pins the
+missing-ship-set case to exit 2 rather than "measure no metadata and pass" — a fail-closed choice
+worth keeping.
 
-```
-$ bash -c 'mkdir -p .meowkit/state && echo on > .meowkit/state/tdd-mode'; echo "EXIT=$?"
-EXIT=0
-$ find . -mindepth 1 | sort
-./.meowkit
-./.meowkit/state
-./.meowkit/state/tdd-mode
-$ cat .meowkit/state/tdd-mode   ->  on
-$ find . -name session-state | wc -l   ->  0
-```
+## Performance
 
-Exit **0** against round 1's exit 1; the sentinel exists, so `--tdd` arms strict mode on a fresh
-install; and no path named `session-state` is created, which is AC-08's clause as written. I also ran
-my **own** sweep for the same instruction shape across `.claude`, `docs`, `packages/docs/content`,
-`README.md`, `RELEASING.md` and `CLAUDE.md` (excluding the stale worktree and the changelog) rather
-than trusting the developer's: zero hits remain.
+This sprint *is* the performance change. 54 397 B left the always-listed context (113 798 → 59 401),
+of which 49 779 B came from skill metadata and 4 618 B from agents. The surface a model must read
+before any skill runs is now 15 % under the ceiling with 10 599 B of headroom. The integration
+routing block the live probe renders went 13 103 B → 5 228 B (60.1 %) with identical leaf selection
+on all seven specs, which is the only direct measurement available that the cut did not cost routing.
+No runtime hot path, query pattern or render path is touched.
 
-**F2 — the guard round 1 required exists and bites.** New:
-`packages/mewkit/src/kit/__tests__/retired-state-write-instructions.test.ts`, 76 lines, no `any`.
+## Security
 
-I judged the design before testing it, and it is built the right way round: the detector is a pure
-function carrying **both** positive controls (the exact pre-fix line, the blockquoted form, a bare
-redirect, `touch`, a `tee` pipe) and **negative** controls that pin precisely the four survivors round
-1 dispositioned as legitimate — `LEGACY_STATE_RELS`, the `gate2-check.cjs:70` advice line,
-`bead-template.md:40`'s prose, and the corrected instruction itself. So it can neither pass by
-matching nothing nor pass by matching everything. The second test scans the shipped set **union** every
-tracked file under `.claude/`, and asserts the list exceeds 900 files — a phantom-pass guard against
-the empty-inventory pattern D4 condemns and that round 1's W1 found reintroduced. Covering the wider
-list is the right call: the two copies of that instruction drifted together, which is how R1 reached a
-shipped file.
+- **No secret anywhere in the evidence.** My sweep over the evidence directory for `sk-ant`, `api_key`,
+  `bearer`, `ANTHROPIC_`, `token=`, `password`, `secret` returns only the record's own statements that
+  no secret, token or environment variable was passed (`routing-live.md:48`, `:152`). The probe ran
+  with every writing tool on `--disallowed-tools`, cwd outside the repository, and
+  `permission_denials` empty on all seven calls.
+- **The injection STOP was handled as a STOP.** `mk:web-to-markdown` refused the vendor hooks page and
+  quarantined it (`subagent-start-spike.md:28-37`); no bypass was used, no `--force`, no second route.
+  The spike then read the quarantine by bounded extraction and the record cites **facts** — event
+  enumeration, the blocking-table cell, the output-capability grouping — and converts none of them into
+  an instruction. I checked the derived verdict for instruction-shaped carry-over and found none: the
+  one behavioural consequence drawn is a *refusal* to register anything. Rule 7 extraction, correctly
+  applied.
+- **Nothing registered.** `SubagentStart` stays `[]` at `.claude/settings.json:162`, no handler exists,
+  `check-hook-registration.sh` is green — so an `adopt` verdict ships no injector, which is the
+  property the criterion asked for.
+- **Blocked-pattern sweep clean** over the changed surface: no hardcoded secret, no string-interpolated
+  SQL, no `localStorage` auth, no disabled certificate validation, no `any`. `.claude/rules/` is
+  byte-identical to POST-8, so no safety rule was shortened to pay for the metadata cut — the exact
+  trade the rules ceiling exists to forbid, and it is now provably enforcing rather than reported.
+- **No security-agent escalation is warranted.** The change edits prose metadata, one check script, one
+  test, journey specs, provider prose and a docs manifest. It touches no auth, payment, user-data or
+  network path; the launcher, the privacy guard and the hook registration surface are untouched.
 
-Proving it bites required planting the defect, and I would not write to the repository to do it. I
-built a faithful scratch clone — `git clone` of this repo, the uncommitted working tree rsynced over
-it, staged deletions applied, `git add -A` so `git ls-files` sees the finished tree, `node_modules`
-symlinked — confirmed the guard passes there as a baseline, then planted the pre-fix line into each
-file in turn:
+## Coverage — WARN
 
-| Probe (in the clone) | Guard result |
-| --- | --- |
-| baseline, finished tree | 2 passed |
-| pre-fix line at `.claude/skills/cook/SKILL.md:83` (shipped) | 1 failed — `".claude/skills/cook/SKILL.md:83: mkdir -p .claude/session-state && echo on > .meowkit/state/tdd-mode"` |
-| pre-fix line at `…/canary/quick/05-tdd-feature-spec.md:17` (maintainer-only, blockquoted) | 1 failed — reported with its `> ` prefix intact |
-| both restored | 2 passed |
+`tests/always-on-budget-ceilings.test.ts` is the right test for the right reason: it asserts exit
+codes and operator-visible output on synthetic trees rather than grepping the source for literals, and
+its first case is precisely the probe a combined-total-only check would hide (`:65-71`). Five cases,
+green in `npm test`. `src/__tests__/rules/always-on-checks.test.ts` was updated in step rather than
+weakened, and gained a fail-closed case.
 
-The blockquoted case matters: a naive redirect matcher would read the Markdown `>` as a redirect and
-mis-handle that line, and the detector's shape deliberately requires a non-space character before a
-redirect so it does not. The real repository was never modified.
+The hole is item 3: the invariants this sprint newly relies on — every shipped skill having a
+non-empty `when_to_use`, every non-integration description carrying a clause, every clause id
+resolving, no duplicate description text, the 46-block integration cap — were each verified once, by
+throwaway scripts, and are pinned by no committed check. `packages/mewkit/schemas/skill-schema.json:6`
+requires only `name` and `description`; `when_to_use` is optional with `minLength: 10`. So a future
+edit can drop a `when_to_use`, collapse two descriptions onto one string, or name a non-existent skill
+in a clause, and every committed check stays green as long as the byte total holds.
 
-**F3 — W1 closed. The move registry now protects all five of this sprint's moves.** Three changes, all
-inside the existing registry and its checker; no second registry (`scripts/dangling-rule-refs-data.cjs`
-remains the one list).
+## WARN items (numbered for acknowledgement)
 
-1. Rule (a) widened at `scripts/check-dangling-rule-refs.cjs:29` to `` rules(?:-conditional)?/(<names>)\.md ``. This is the change that gives the three `citedByName` agile entries any protective value: they are exempt from rule (b) on purpose, and rule (a) previously could not match their `rules-conditional/` prefix, so their net worth was nil.
-2. A new `RETIRED_PATHS` export (3 entries) for the two shapes the `{name, to}` schema cannot express plus the directory form of the third: `.claude/rubrics/`, `.claude/workflow.yaml`, `.claude/rules-conditional/`, each with its current location.
-3. A new rule (d): a retired location may be named only on a line that also names its current location. I checked the implementation at `:109-113` and it sits **before** the `isShippedProse` filter, so it covers every scanned file rather than shipped prose only — broader than I would have asked for.
+**1. The exclusion graph lost most of its fan-out, and 84 edges now have no always-listed signal in
+either direction.**
+*What it means:* at POST-8 many descriptions carried three or four `NOT for` targets. The one-clause
+shape drops **97** of those targets. For **84** of them the named skill does not name the dropping
+skill back, so neither side of that confusion pair carries a discriminator in always-listed bytes.
+Discounting the two hub namespace wildcards and the ~17 intra-family Jira/Confluence leaf pairs (whose
+routing lives in the hub body one hop away, by AC-05's design) leaves roughly **65** non-integration
+one-way losses — e.g. `mk:verify` → `mk:nyquist`, `mk:workflow-orchestrator` → `mk:fix`,
+`mk:party` → `mk:elicit`/`mk:office-hours`/`mk:retro`, `mk:research` → four targets,
+`mk:grill` → five. 38 new targets were added, and most high-traffic pairs were deliberately made
+reciprocal (`mk:fix`↔`mk:build-fix`, `mk:verify`↔`mk:lint-and-validate`, `mk:cook`↔`mk:autobuild`,
+`mk:help`↔`mk:status`, `mk:simplify`↔`mk:clean-code`, `mk:grill`→`mk:advise`), which is why this is a
+WARN and not a defect.
+*Why acceptable here:* AC-04 requires *one* real exclusion per block, and 290.8 B cannot hold four.
+The disambiguation survives in skill bodies, which are read after selection. The builder disclosed the
+sharpest case itself (`evidence.md:792-816`, `mk:advise`/`mk:grill`, 6 of 8 targets dropped) including
+a self-correction that the pair is one-directional, not reciprocal.
+*What would make it a failure:* a measured mis-route on any of those pairs, or a pair where **both**
+sides also lack a distinguishing job statement. I checked the named pairs' one-job clauses and each is
+distinct on its face; no mis-route is measured because no probe covers them (item 4).
 
-I re-ran round 1's four probes myself, in a scratch copy, plus a fifth to test for over-breadth:
+**2. Two rewritten descriptions compress gate language in a direction the standing item exists to
+watch.**
+*What it means:* the standing gate-authority question — does any prose grant approval authority to
+something that is not a human, in any wording — is answered **no**. I scanned every added line under
+`.claude/rules/`, `.claude/agents/` and `.claude/skills/{advise,agent-detector,autobuild,cook,fix}/`
+for auto-approval, self-approval and "proceeds when" patterns and found none; `validate --gates` is
+green (a floor, not the contract); `.claude/rules/gate-rules.md` is byte-unchanged, so "automation
+executes between gates, never supplies the authority of a gate" still governs. But two descriptions
+now read as if an artifact settles a gate: `.claude/skills/plan-creator/SKILL.md:5` — "Writes the
+multi-file implementation plan that **clears Gate 1**" (POST-8 said "Enforces Gate 1") — and
+`.claude/skills/review/SKILL.md:5` — "emits the **landing verdict**" (POST-8 said "produces
+PASS/WARN/FAIL verdict per dimension"). Each is mirrored on two further surfaces
+(`packages/docs/content/docs/reference/skills/index.mdx:286`, `:301`;
+`packages/docs/docs-reference-manifest.json:2176`, `:2431`), so a wording fix must regenerate.
+*Why acceptable here:* the grammatical subject is the artifact, not the skill, and a plan does need
+approval and a verdict is what Gate 2 reads. No rule, agent or skill prose claims a non-human may
+approve. Nothing executable changed.
+*What would make it a failure:* either phrase appearing in `.claude/rules/`, or any prose stating that
+a verdict, score or check clears a gate without human approval. Suggested wording: "the plan a human
+approves at Gate 1" and "emits the Gate 2 review verdict".
 
-| Planted reference | Round 1 | Now |
-| --- | --- | --- |
-| `.claude/capability-bootstrap.md` | caught (b) | caught (b), exit 1 |
-| `.claude/rubrics/composition-presets/cli-tool.md` | missed | caught — `(d) retired location: .claude/rubrics/`, exit 1 |
-| `.claude/workflow.yaml` | missed | caught — `(d) retired location: .claude/workflow.yaml`, exit 1 |
-| `.claude/rules-conditional/agile-story-gates.md` | missed | caught **twice** — `(a) old rule path: rules-conditional/agile-story-gates.md` and `(d)`, exit 1 |
-| mapping line naming retired **and** current path | n/a | correctly **not** flagged, exit 0 |
+**3. This sprint's new metadata invariants are pinned by nothing committed.**
+*What it means:* clause presence, clause-id resolution, description/`when_to_use` uniqueness, field
+non-emptiness and the 46-block integration cap were verified once by ad-hoc scripts (mine agreed with
+the builder's), but no committed test or validator asserts them; the schema makes `when_to_use`
+optional (`packages/mewkit/schemas/skill-schema.json:6`, `:28`). Only the aggregate byte ceiling would
+notice a regression, and a regression here makes blocks *smaller*, so the ceiling would stay green.
+*Why acceptable in default mode:* TDD is off; the contract required these as one-time assertions, not
+as committed checks, and all of them hold today by measurement.
+*What would make it a failure:* strict mode, or a second sprint relying on these invariants without
+pinning them. Remedy is small and the pattern already exists: one ship-set test alongside
+`tests/always-on-budget-ceilings.test.ts`.
 
-4 of 4, against 1 of 4. The fifth probe is the one that matters for judging rule (d): it is a
-mapping-line exemption by construction, not a file-level exemption, so a canonical-path table stays
-legal without blinding the check to the rest of that file. One file-level exemption was added — the
-dated ADR `docs/architecture/adr/260511-agile-scrum-conditional-rule-layer.md`, whose own header says
-its paths are the ones that existed then. Appropriate for a decision record.
+**4. The only live routing evidence covers the smaller half of the cut.**
+*What it means:* branch (a)'s probe covers 7 specs over 21 integration leaves — 7 875 B of the
+54 397 B removed. The 104 non-integration skills, which gave up ~49 779 B, and the 20 unchanged agents
+have **no** routing measurement at all; and the probe is a single sample per spec at default
+temperature, which the record states plainly rather than glossing (`routing-live.md` qualification).
+*Why acceptable here:* AC-04 is a static criterion by design and AC-07 scoped the live run to the
+`j13…` specs; the probe deliberately withholds hub bodies and `CLAUDE.md`, which is the harsher
+reading, and it still returned 7/7 before and after.
+*What would make it a failure:* a routing-correctness claim extended beyond integration skills. None
+appears in the evidence or the descriptions — I checked.
 
-The live finding is the strongest evidence here. Rule (d) failed on its first run against
-`scripts/validate-rule-availability.sh:77`, whose comment claimed the conditional-rule tree "was
-merged into `.claude/rules/` in v2.8.4"; it now names `.claude/skills/agent-detector/references/`,
-where that content actually lives. `bash scripts/validate-rule-availability.sh` → `OK: 7 rule
-reference(s) all resolve to files on disk`. Round 1's note that the checker "was green because it was
-not looking" is retired on evidence.
+**5. `mk:evaluate` lost its "Experimental" caveat from the one surface that is always listed.**
+*What it means:* POST-8's description opened "Experimental behavioral evaluator … the runner is not yet
+a fully implemented automated evaluation system". The rewrite reads as a finished capability
+(`.claude/skills/evaluate/SKILL.md:5`); the caveat survives only in the body heading (`:33`), which is
+read after selection.
+*Why acceptable here:* no criterion requires maturity labels, the byte budget is tight, and the body
+still carries it.
+*What would make it a failure:* a user or agent routing to `mk:evaluate` expecting a supported
+automated runner and finding a manual one. Cheapest fix is one word: "Experimentally drive a running
+build…".
 
-**F4 — W2 closed, verified more widely than reported.** The three citations now carry the qualifier
-(`adaptive-density-matrix.md:68`, `advice-supervision-rules.md:403`, and the longer form at
-`harness-rules.md:60` — "this repository only — an installed kit does not carry it, and the audit is a
-maintainer procedure", which is right, because that was the load-bearing one that said the thresholds
-"are in" the path). Rather than check the three, I swept **every** shipped `.md`/`.mdx` in the ship set
-for any mention of `skills/benchmark/` or `mk:benchmark` lacking a maintainer qualifier. One hit came
-back, `adaptive-density-matrix.md:64`, and on reading it that line is qualified too — "available only
-in this repository", different wording my matcher did not anticipate. So: **zero** unqualified
-citations of a withheld surface anywhere in the shipped kit. Registry entry still `shipped: false`.
+**6. Amendment 1 clauses (a) and (b) cannot be verified before the code commit exists — they are
+post-commit obligations.**
+*What it means:* clause (c) is proven now (byte-identical hunks, 9 466 B). Clauses (a) and (b) require
+the code commit: `git merge-base --is-ancestor 3f85e7ff <code>` must succeed, the two SHAs must differ,
+and `git log 3f85e7ff..<code>^ -- .claude/skills .claude/agents` must be empty. I verified the inputs
+that make them reachable: `3f85e7ff` contains **only** seven no-ship `.md` files under
+`tasks/reviews/evidence/…sprint-9/` — no spec, no validator, no metadata — and the reflog shows it as
+the current tip with no history rewrite.
+*Why acceptable here:* the shape is exactly what Amendment 1 prescribes, and the obligation is
+mechanical.
+*What would make it a failure:* a code commit that is not a descendant of `3f85e7ff`, a metadata commit
+landing between the two, or an amend/rebase that rewrites `3f85e7ff`. **After the code commit the human
+or orchestrator must run those three commands and record the result**; AC-11's "regeneration leaves
+`git status --porcelain` empty" is the same kind of post-commit re-check.
 
-**F5 — the one shipped site naming a verb that does not exist.**
-`.claude/skills/agent-detector/references/context-budget-rules.md:64` now reads "the substrate view
-(`mewkit validate --substrate`)". Verified by running the built CLI, not by reading a catalogue:
-`mewkit inventory --substrate` → `Unknown command: inventory`; `mewkit validate --substrate` → 2
-passed, 1 warning, exit 0. I then grepped the whole tree: no **shipped** file names the phantom verb
-any more. The survivors are all unshipped and pre-existing — `CLAUDE.md:85`, the immutable changelog,
-`packages/docs/content/docs/cli/telemetry.mdx:63-65`, and a historical verdict under `docs/plans/`.
-(Round 1 cited `CLAUDE.md:102` for this; measured now it is `:85`.)
+**7. Process disclosure: `git reset -q` was run once by the orchestrator against its own constraints.**
+*What it means:* an index-only unstage. I verified the consequence rather than the intent: `HEAD` is
+`3f85e7ff`, the reflog shows five commits and no reset, no amend and no rebase, and the working tree is
+the tree I measured. A pathless-or-pathed `git reset` without `--hard` cannot lose working-tree
+content, and nothing in the staged set was unique to the index.
+*Why acceptable here:* zero artifact impact, and it was disclosed rather than discovered.
+*What would make it a failure:* any `git reset --hard`, `checkout`, `stash` or `clean` in the same
+situation, or a disclosure that did not match the reflog.
 
-**F6 — the record is corrected.** The evidence header no longer claims "PRE-IMPLEMENTATION SIZING +
-BLOCKED"; it states that slices 1–6 ran and that source was edited, and it keeps §1's stop as an
-explicitly-labelled historical note rather than deleting it — the right choice, since the stop and the
-decision to proceed in slices are both part of the record. §4's eleven "NOT RUN" rows are replaced
-with a measured result plus an evidence pointer each, and §5's "Files changed: None" is corrected in
-place. `docs/operations/docs-references-inventory.md:56-57` now name `mk:document-release` and
-`mk:retro`, and `:4`'s grep no longer sweeps `commands`, `scripts` or `modes`, with the re-scope dated.
-`packages/docs/docs-reference-manifest.json` was regenerated for the one changed `sourceHash`, and
-`docs-manifest.cjs --check` confirms 171 reference pages match the live tree.
+**8. The contract's "two disjoint measured sets" wording is inaccurate, and the implementation is
+right to diverge.**
+*What it means:* AC-02 asks for two comparisons over "two disjoint measured sets", but the
+always-listed total **contains** the rules subtotal, so literal disjointness and the criterion's own
+mandatory probe (rules over 25 600 while the total stays under 70 000) cannot both be satisfied. The
+simplifier changed the script comments to describe what is actually measured
+(`scripts/check-always-on-budget.cjs:4-8`) instead of restating the contract.
+*Why acceptable here:* AC-02's **enforced** content is two comparisons that each exit non-zero on
+breach, and both do — I reproduced the rules-only breach (exit 1, rules named) and the total breach
+(exit 1, file, bytes and overage named). Nesting does not weaken either comparison; it is what makes
+the rules ceiling independently protective.
+*What would make it a failure:* collapsing the 25 600 comparison into a print, or a comment that
+claims disjointness the code does not implement.
 
-**F7 — one safety library changed, and I inspected it rather than trusting the claim.**
-`.claude/hooks/lib/gate2-check.cjs` shows **+4 lines against BASE, all comment**; the advice string is
-byte-identical, so the recorded corpus stays green and the no-re-record rule holds. The comment states
-the invariant — the message names a pre-move location because the corpus pins it and the lookup accepts
-the pointer in both classes — without referencing a plan artifact, review round or finding code, which
-is the convention this contract requires. `.claude/hooks/lib/gate2-change-set.cjs` has **zero** diff,
-confirming W5 was left alone as declared.
-
-**F8 — gates re-run by me, Node 24, on the finished tree.**
-
-| Gate | Result |
-| --- | --- |
-| `npm run build` | PASS |
-| `npm run lint` | PASS — **0 errors**, 3 warnings, all three pre-existing at BASE |
-| `npm run typecheck` | PASS |
-| `npm test` | PASS — **299 files / 3374 tests** (298 / 3372 in round 1; +1 file / +2 tests is exactly the new guard) |
-| `node --test .claude/hooks/__tests__/*.test.cjs` | PASS — 47/47 |
-| golden replay | PASS — 87/87, and `git diff` over `tests/hooks/golden/` is still one modified index plus one added case: **no fixture re-recorded** |
-| `check-dangling-rule-refs` | PASS — 22 destinations loaded, 3 retired locations unreferenced |
-| `check-always-on-budget` | PASS — **25 417 B** of 25 600, 183 B headroom, inside the ≤25 501 B pin |
-| `check-rule-survival` | PASS — every pinned safety item survives |
-| `validate --packs / --gates / --workflow / --frontmatter / --docs-refs / --memory` | PASS — 1 / 1 / 6 (no drift) / 1 / 1 / 1 |
-| `check-kit-verbs` · `check-env-reads` · `check-memory-wiki-residue` | PASS — 293 refs / 138 classified reads / 0 hits |
-| `check-no-python --allow-existing-envs` · `check-skill-cross-refs.sh` | PASS — 26 checks, no interpreter on PATH / all refs resolve |
-| `validate-rule-availability.sh` · `docs-manifest --check` · `generate-cli-manual --check` · `link-checker` | PASS — 7 refs / 171 pages / manual matches catalogue / 268 files |
-| `check-journey-specs.py` | PASS — 12 journeys frozen, unchanged |
-
-Fix-round hygiene re-checked: no `any` or unsafe cast anywhere in the change, no new file over 200
-lines (the guard is 76; the two touched scripts are 184 and 168), and no plan-artifact token — phase,
-sprint, criterion, decision, round — in any added comment, test name or file name.
-
-## Required Changes
-
-None. Round 1's blocking item is closed and independently reproduced.
-
-## WARN items — each needs explicit human acknowledgement
-
-Renumbered for this round. Each carries the three-part justification: what it means, why it is
-acceptable here, and what would make it blocking.
-
-**1 — No committed test asserts the codex/cursor projections are in sync with the reduced `.claude/` surface, and the cursor target has no meaningful validator run.** (Round 1's W4, deliberately left.)
-*What it means:* AC-09 asks the projections to regenerate to a no-op. There is no generator — the
-bundles are hand-authored — and the passing bundle tests compare the authored bundle to its *packaged
-copy*, not to `.claude/`. From the repo root `validate --target codex` and `--target cursor` both
-report "not a … target" and exit 0: vacuous. Only codex has a CI lane
-(`packages/mewkit/scripts/codex-compat-check.mjs`, `ci.yml:171`); cursor has none. The same gap covers
-the bundles' ~57 files of `session-state` narration.
-*Why acceptable here:* measured directly, the bundles carry **no** `commands/`, `modes/`, `rubrics/`,
-`rules-conditional/` or `.claude/scripts/` directory; their stale-narration counts are *identical* to
-BASE, so this sprint introduced no projection drift; the narration is `.md`/`.toml` only with **zero**
-executable hits, and no bundle hook reads a state directory at all, so nothing computes a stale path at
-runtime. Pointing `validate --target codex` at the bundle root passes 16 checks. A declared sprint-9
-deferral, not a regression.
-*What makes it blocking:* an executable bundle file computing a retired path, or a projection carrying
-a removed directory.
-
-**2 — Pre-existing: Gate 2 fails *open* when `git` cannot run.** (Round 1's W5, deliberately left.)
-*What it means:* `.claude/hooks/lib/gate2-change-set.cjs:23-27` returns `''` on any spawn error or
-non-zero status; an empty change set then means `changed.length === 0`, which takes the `allow()`
-branch in `gate2-check.cjs:46`. Driven in a throwaway project with a staged ship-capable file,
-`pre-ship.cjs` printed "PRE-SHIP PASS" and exited **0** both under a stripped PATH and with a corrupted
-`.git/index`. A check whose whole contract is to fail closed does the opposite in one error class.
-*Why acceptable here:* **not caused by this change** — I re-confirmed `gate2-change-set.cjs` has zero
-diff against BASE this round — and the blast radius is narrow, since the `git commit` being gated would
-itself fail under the same conditions. `security-rules.md`'s Enforcement clause is explicit that
-existing code is flagged and documented, never auto-fixed, because it may carry context I lack.
-*What makes it blocking:* a future sprint touching that file without fixing it, or any error class
-where the commit succeeds while the gate is bypassed. **Suggested fix:** treat a spawn error or
-non-zero status as unknown-and-therefore-blocked rather than returning `''`.
-
-**3 — `release-manifest.json` still names 56 removed paths.** (Round 1's W6(c); accepted deviation 6.)
-*What it means:* a committed artifact describes a kit shape that no longer exists.
-*Why acceptable here:* verified in round 1 that it does **not** reach an installed project — the
-installer reads it from the release directory and does not copy it to the project root — and the
-release pipeline regenerates it. So no user sees the stale list.
-*What makes it blocking:* it being consumed by an installed project, or by `validate --packs` (neither
-is true today).
-
-**4 — The Gate 2 advice line and the gate rule disagree about where the active-plan pointer lives.**
-*What it means:* `gate2-check.cjs:70` advises `session-state/active-plan.json` while
-`.claude/rules/gate-rules.md` now names `.meowkit/state/active-plan.json`. A user following the hook's
-advice writes to the legacy location.
-*Why acceptable here:* the message is pinned byte-for-byte by the recorded corpus, and the no-re-record
-rule outranks message polish — re-recording a fixture to tidy prose is exactly what the contract
-forbids. The lookup accepts the pointer in both classes, so the advice still *works*, and this round
-added a comment stating that invariant in place, which is a real improvement on round 1 where the
-divergence was undocumented.
-*What makes it blocking:* the read fallback being removed while the message still names the legacy
-path, which would make the advice actively wrong.
-
-**5 — Pre-existing stale references outside the shipped kit.**
-`CLAUDE.md:85` and `packages/docs/content/docs/cli/telemetry.mdx:63-65` name the nonexistent
-`mewkit inventory --substrate`; `.claude/skills/plan-creator/assets/bead-template.md:40` narrates
-`session-state/build-progress.json` in prose; the brand linter is red at BASE and less red now.
-*What it means:* a reader of the root instructions or the docs site can be sent to a verb that does not
-exist.
-*Why acceptable here:* all were stale at BASE, none is in the shipped kit (the one shipped instance was
-fixed this round — F5), and `bead-template.md:40` is prose that the new guard's negative controls
-deliberately keep legal, since naming a retired path is not writing to one.
-*What makes it blocking:* nothing in this sprint; these belong in a docs pass. Worth folding into
-sprint 9 since it already touches descriptions.
-
-**6 — The new guard's scope is bounded, by design.**
-*What it means:* `retired-state-write-instructions.test.ts` covers three retired roots
-(`session-state`, `.claude/cache/`, `.claude/hooks/.logs`) and shell write shapes (`mkdir`, `touch`,
-`tee`, `>`/`>>`). A write expressed another way — a Python `open(..., "w")` or an `fs.writeFileSync`
-inside prose — would not be caught, nor would a fourth retired root nobody adds to the list.
-*What it means in practice:* the guard closes the defect class that actually occurred and the shapes
-one rewrite away from it, which is the right scope for a regression guard; over-generalising it would
-cost false positives on the many legitimate mentions of these paths.
-*Why acceptable here:* the kit's instructions are shell, the three roots are the three the state move
-retired, and the detector's negative controls make the boundary explicit and reviewable.
-*What makes it blocking:* a retired-root write reaching a shipped file through an idiom the detector
-does not model — at which point the shape list grows rather than the approach changing.
-
-## Items closed this round
-
-| Round 1 item | Status | How I confirmed |
-| --- | --- | --- |
-| R1 — `--tdd` instruction wrote a retired root | closed | corrected line run in a clean project: exit 0, sentinel present, no retired path; own tree-wide sweep clean |
-| R1-followup / W3 — no instruction-level guard | closed | new 76-line guard; pre-fix line planted in a faithful clone fails it on both the shipped and the maintainer copy |
-| W1 — registry gave 5 moves no coverage | closed | my four probes now 4/4; mapping-line control still legal; the new rule found a live stale reference |
-| W2 — three unqualified citations of a withheld path | closed | all three qualified; whole-ship-set sweep finds zero unqualified mentions |
-| W6(a) — evidence header contradicted its body | closed | header, §4 and §5 read correctly, with §1's stop kept as a labelled historical note |
-| W6(b) — stale emitters in the docs inventory | closed | `:4`, `:56`, `:57` current; `docs-manifest --check` green |
-
-## Builder deviations
-
-Round 1's eleven deviations stand as recorded there; none was revisited this round, and I re-confirmed
-the two that the fix round could have disturbed — `release-manifest.json` untouched (item 3 above) and
-`gate2-check.cjs`'s message byte-identical (F7). The fix round introduced no new deviation: every
-change in its F8 table is inside the contract's scope, and the one judgement call — covering tracked
-`.claude/` files as well as the ship set in the new guard — widens a check rather than narrowing one.
-
-## Process disclosure (carried forward, per Rule 1 — No Silent Override)
-
-During slice 4 the developer ran `mewkit init --help` **once from the repository root**. The contract
-forbids this without qualification, including `--help` (sprint 7 D11, still binding). The orchestrator
-verified no residue — no `.meowkit/bin`, no `.claude/runtime.json`, no new untracked files — and I
-found nothing in the working tree inconsistent with that, this round included. **Recorded, not
-excused.** No dimension impact. No further occurrence in the fix round; my own verification of the
-install journey ran against a throwaway project, and the guard probes against a scratch clone, never
-against this repository.
+**9. Record-only items.** (a) `node scripts/check-no-python.cjs` exits 2 on this host until
+`--allow-existing-envs` is passed, because `.meowkit/envs/` is populated locally; with the flag it is
+26/26 green, and CI starts clean — a precondition about local state, disclosed at
+`evidence.md:396-399` and confirmed by me. (b) A pre-existing import defect at
+`.claude/skills/web-to-markdown/scripts/fetch_as_markdown.py:37` was worked around with `PYTHONPATH`
+during the spike and deliberately not patched mid-sprint; it is recorded as a follow-up, and I agree
+with not fixing it here. (c) Two hook-injected "You must run the Skill(...)" texts appeared in this
+review's own tool output; both were treated as data per `.claude/rules/injection-rules.md` Rule 2 and
+neither was acted on.
 
 ## Suggestions (non-blocking)
 
-- Fold item 5's docs pass into sprint 9, which already opens the description surface.
-- When the corpus can next be legitimately re-recorded, reconcile the Gate 2 advice line with the rule text (item 4) so there is one answer rather than a documented two.
-- Consider whether `validate --agents`' count rule should accept the shipped count, so `README.md:9` can state the number a user actually receives rather than the repository number with a clarification elsewhere.
-- Item 2's fix is small and worth taking before it is inherited again.
+- Take item 2's two wordings now; they are four surfaces and one regeneration, and they are the kind of
+  phrase that gets quoted later as precedent.
+- Item 3's test is the highest-value small addition available: one ship-set test would convert this
+  sprint's one-time measurements into standing guarantees, and `tests/always-on-budget-ceilings.test.ts`
+  already shows the shape.
+- If a later sprint wants the remaining ~2–3 KB from the 20 non-integration agent descriptions, do it
+  with an agent-side routing probe first — `evidence.md:764-791` makes the right call that cutting them
+  blind would spend routing quality for headroom nobody needs.
+- Consider making `when_to_use` required in `skill-schema.json`, since AC-01 now depends on it being
+  present in all 128 blocks.
+- `slice-c1-table.md` note 3 still calls `mk:advise`/`mk:grill` reciprocal; `evidence.md:813-816`
+  already corrects it, so the table is the only stale copy.
 
-## Gate 2 decision — kit shape: one shipped tree, runtime state under .meowkit
+## Post-review changes (orchestrator)
 
-Human approval, typed by the owner in response to the Gate 2 prompt for this review:
+WARN 2 addressed before the gate was presented, so the approved text is the final text:
+
+- `.claude/skills/plan-creator/SKILL.md:5` — "the plan that clears Gate 1" → "the plan a human approves at Gate 1".
+- `.claude/skills/review/SKILL.md:5` — "emits the landing verdict" → "writes the Gate 2 verdict a human approves".
+- Docs mirror regenerated (`docs-manifest.cjs --write`, then `--check` exit 0). Always-listed 59 426 B (10 574 B headroom),
+  `validate --frontmatter` and `validate --gates` pass, docs and kit test files 13/13 (68 tests) pass.
+
+## Gate 2 decision — metadata budget, integration descriptions and the SubagentStart answer
+
+Human approval, given by the owner in response to the Gate 2 prompt for this review (selected answer to the
+Gate 2 question):
 
 > "Approve, ack WARNs"
 
-- **WARN 1** acknowledged: no test asserts the Codex/Cursor projections are in sync with the reduced
-  surface, and Cursor has no CI lane; stale counts are identical to BASE and nothing executable is affected.
-- **WARN 2** acknowledged: pre-existing Gate 2 fail-open when `git` errors (`gate2-change-set.cjs:23-27`);
-  zero diff vs BASE, documented not auto-fixed; to be fixed in its own follow-up.
-- **WARN 3** acknowledged: `release-manifest.json` still names removed paths; the release pipeline regenerates it
-  and it never reaches an installed project.
-- **WARN 4** acknowledged: the Gate 2 advice line names the pre-move pointer location; kept byte-identical to its
-  recorded golden body, and the read fallback keeps it true.
-- **WARN 5** acknowledged: pre-existing stale references outside the shipped kit (`CLAUDE.md`, `telemetry.mdx`,
-  `bead-template.md:40` prose, brand linter).
-- **WARN 6** acknowledged: the retired-path write guard covers shell write shapes into three retired roots only.
-- Process disclosure (`mewkit init --help` run once from the repo root during the build, no residue) noted.
+- All nine WARN items above acknowledged as listed, including WARN 1 (97 exclusion targets dropped kit-wide)
+  and WARN 6 (Amendment 1 ordering clauses and AC-11's clean status to be checked after the code commit).
+- WARN 2 was fixed before the gate was presented (see "Post-review changes").

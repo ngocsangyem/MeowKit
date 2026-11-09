@@ -1,6 +1,6 @@
 ---
 name: jira-jsm
-description: 'Execute JIRA Service Management operations via the jira-as CLI wrapper: service desks, request types, requests, customers, organizations, queues, SLAs, approvals (8 sub-domains, ~45 verbs total). Routed by mk:jira-jsm skill. Requires JSM-licensed tenant + agent or admin role. NOT for core Jira issue ops (jira-issue); NOT for project admin (jira-admin).'
+description: 'mk:jira executor for mk:jira-jsm. Service desks, requests, queues, SLAs.'
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default

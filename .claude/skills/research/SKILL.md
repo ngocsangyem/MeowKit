@@ -3,16 +3,7 @@ name: mk:research
 preamble-tier: 2
 version: 1.0.0
 argument-hint: "[topic] [--deep] [--html]"
-description: |
-  Use when a decision needs deep multi-source technical research with cited
-  evidence — technology evaluation, ecosystem comparison, standards/spec
-  fact-finding, "how do others solve X". Triggers on "research X", "deep dive
-  on X", "evaluate X vs Y", "find best practices for X".
-  NOT for library/API doc lookup (see mk:docs-finder); NOT for one-shot URL
-  fetch (see mk:web-to-markdown); NOT for internal codebase discovery (see
-  mk:scout); NOT for project-only Q&A (see mk:ask-me); NOT for comparing
-  solution designs (see mk:brainstorming); NOT for root-cause debugging (see
-  mk:investigate).
+description: Multi-source technical research producing a cited report for a decision. NOT for mk:docs-finder.
 allowed-tools:
   - Read
   - Grep
@@ -31,7 +22,7 @@ keywords:
   - multi-source
   - evidence-gathering
   - best-practices
-when_to_use: Use for deep multi-source technical research producing a cited report before decisions or implementation. NOT for library/API docs (see mk:docs-finder), project-only Q&A (see mk:ask-me), or comparing solution designs (see mk:brainstorming).
+when_to_use: A choice between technologies needs outside evidence, not an API signature.
 user-invocable: true
 owner: research
 criticality: medium

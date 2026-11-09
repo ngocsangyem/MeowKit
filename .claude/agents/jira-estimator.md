@@ -1,6 +1,6 @@
 ---
 name: jira-estimator
-description: Heuristic story-point estimation for a single Jira ticket via the jira-as CLI wrapper. Read-only. Routed by mk:jira-estimator skill. NOT for complexity/inconsistency analysis (jira-evaluator); NOT for full RCA (jira-analyst).
+description: 'mk:jira executor for mk:jira-estimator. Heuristic story points, read-only.'
 tools: Bash, Read, Grep, Glob, Write
 model: claude-opus-5
 permissionMode: default

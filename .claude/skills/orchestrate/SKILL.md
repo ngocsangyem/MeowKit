@@ -1,6 +1,6 @@
 ---
 name: mk:orchestrate
-description: "Coordinates staged or parallel jobs across live-verified coding-agent runtimes (Claude Code, Codex, Cursor, and other installed CLIs) and in-session toolkit subagents. Routes each job by capability and risk tier, isolates parallel writers in git worktrees, captures redacted output, resumes interrupted runs, and blocks completion until an independent arbiter verifies the results. Use when work should be split across multiple runtimes or subagents, run as staged or parallel jobs, and reviewed before handoff. NOT for a single-agent task or the in-session 7-phase flow (use mk:cook / mk:workflow-orchestrator)."
+description: Splits a job across installed agent CLIs and subagents, isolates parallel writers in worktrees, arbiter-checks results. NOT for mk:cook.
 argument-hint: '<job-spec.yaml | task description | --resume <run-dir>> [--yes] [--internal]'
 source: local
 version: '1.0.0'
@@ -19,7 +19,7 @@ keywords:
   - resume
   - job-spec
   - cross-toolkit
-when_to_use: 'Invoke when a task benefits from splitting across multiple headless CLI runtimes or in-session subagents — staged dependencies, parallel isolated writers, runtime/model diversity, or independent arbiter review. NOT for single-agent work or the standard in-session pipeline (mk:cook).'
+when_to_use: Work needs several runtimes or parallel writers plus independent verification.
 owner: lifecycle
 criticality: medium
 status: active

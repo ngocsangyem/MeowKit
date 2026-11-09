@@ -1,6 +1,6 @@
 ---
 name: mk:jira-bulk
-description: 'Bulk JIRA operations on 10+ issues via the jira-as wrapper: bulk transition / assign / set-priority / clone / delete. Dry-run is MANDATORY first. Triggers: ''bulk update N issues'', ''mass transition'', ''transition 50+ issues to Done'', ''bulk-clone'', ''bulk-delete''. NOT for single-issue ops (mk:jira-issue / mk:jira-lifecycle).'
+description: 'mk:jira leaf. 10+ issues at once - transition, assign, label, clone, delete, dry-run first. NOT for mk:jira-issue.'
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - bulk-delete
   - bulk-clone
   - dry-run
-when_to_use: Use for any operation touching 10+ Jira issues at once. Dry-run is MANDATORY first. NOT for individual issue ops.
+when_to_use: 'A Jira change sweeping ten or more issues in one pass.'
 user-invocable: true
 context: fork
 agent: jira-bulk

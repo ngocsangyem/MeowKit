@@ -18,7 +18,7 @@ MeowKit is an **outer harness** — it sits on top of inner coding agents (Claud
 
 MeowKit controls what context is **injected** at session boundaries. It cannot control what the inner harness retains or compresses within its context window. All isolation mechanisms must respect this constraint.
 
-**Critical constraint:** MeowKit deliberately leaves `SubagentStart`/`SubagentStop` hooks empty — wiring them would cause infinite recursion inside subagents. All subagent isolation is prompt-protocol-based.
+**Critical constraint:** MeowKit deliberately leaves `SubagentStart`/`SubagentStop` hooks empty, and as of 2026-11-09 the reason is a choice rather than a platform limit (verdict `adopt`). The earlier "wiring them would cause infinite recursion inside subagents" claim is **superseded**: the Claude Code hooks reference (retrieved 2026-11-09) documents `SubagentStart` as firing once per subagent spawn or resume, unable to block subagent creation, and injecting context only. The open question is throttling on in-process agent teams, where it fires per teammate message. Until that is designed, all subagent isolation stays prompt-protocol-based and nothing is registered.
 
 ## Context Injection Points
 
@@ -109,7 +109,7 @@ These approaches were explicitly evaluated and rejected:
 
 | Pattern                                           | Reason                                                                    |
 | ------------------------------------------------- | ------------------------------------------------------------------------- |
-| SubagentStart hook for context injection          | Infinite-loop inside subagents — documented platform constraint           |
+| SubagentStart hook for context injection          | Deferred, not impossible (verdict `adopt`, 2026-11-09): the "infinite-loop / documented platform constraint" reason was wrong — the event fires once per spawn or resume, cannot block, injects context only. Open item is throttling on agent teams, where it fires per teammate message. Nothing registered. |
 | PreToolUse:Task hook to validate subagent prompts | Violates outer-harness principle; blocks legitimate Task calls            |
 | Per-task memory namespaces                        | Requires database infrastructure; plan directory already serves this role |
 | Vector embedding of conversation history          | Requires external infra; over-engineering for a workflow harness          |

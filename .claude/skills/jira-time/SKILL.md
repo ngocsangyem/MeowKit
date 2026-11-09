@@ -1,6 +1,6 @@
 ---
 name: mk:jira-time
-description: 'JIRA time tracking via the jira-as wrapper: log work, list/update/delete worklogs, set estimates, generate reports, bulk-log. Triggers: ''log 2h on KEY'', ''show worklog for KEY'', ''time report for sprint'', ''bulk-log 30m to JQL''. Worklog edit/delete loses data — agent confirms. NOT for sprint capacity (mk:jira-agile).'
+description: 'mk:jira leaf. Log work, list or edit worklogs, estimates, time reports. NOT for mk:jira-agile.'
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - jira-estimate
   - time-tracking
   - jira-report
-when_to_use: Use to log work / inspect worklogs / set estimates / pull time reports on Jira tickets. NOT for sprint capacity planning (mk:jira-agile).
+when_to_use: 'Log hours against a Jira ticket or pull a worklog time report.'
 user-invocable: true
 context: fork
 agent: jira-time

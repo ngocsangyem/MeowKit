@@ -2,7 +2,7 @@
 name: mk:brainstorming
 preamble-tier: 3
 version: 2.1.0
-description: Generate or compare multiple technical approaches for one validated decision. Do not use for product discovery or an existing plan.
+description: Generate and compare several technical approaches to one already-validated decision. NOT for mk:office-hours.
 allowed-tools:
   - Read
   - Grep
@@ -16,7 +16,7 @@ keywords:
   - compare-approaches
   - trade-off-analysis
   - alternatives
-when_to_use: Use for generating or comparing multiple technical approaches to one validated decision. NOT for product validation (mk:office-hours), debugging (mk:investigate), or critique of an existing plan (mk:plan-ceo-review or mk:elicit).
+when_to_use: The problem is settled and the options are open — what are my choices for X.
 user-invocable: true
 owner: research
 criticality: medium

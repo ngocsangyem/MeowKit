@@ -1,6 +1,6 @@
 ---
 name: mk:chom
-description: Use when copy-catting, replicating, or adapting features from external systems, repos, apps, or ideas into the current project. Triggers on 'copy this from', 'replicate', 'clone this feature', 'how does X do Y', 'chom', 'like how X does it', 'port from', 'build like', '1:1 copy'. NOT for packing the current project (see mk:pack); NOT for one-shot URL-to-markdown fetches (see mk:web-to-markdown).
+description: Replicate or port a feature from an external repo, app or product into this project. NOT for mk:web-to-markdown.
 argument-hint: <source-url|path|description> [feature] [--compare|--copy|--improve|--port] [--lean|--auto]
 phase: on-demand
 trust_level: kit-authored
@@ -13,7 +13,7 @@ keywords:
   - clone-feature
   - port-from
   - build-like
-when_to_use: Use when copy-catting or replicating features from external systems/repos into the current project. NOT for packing the current project (see mk:pack) or one-shot URL fetches (see mk:web-to-markdown).
+when_to_use: Asked to copy, clone or port a feature the way another product does it.
 user-invocable: true
 owner: research
 criticality: medium

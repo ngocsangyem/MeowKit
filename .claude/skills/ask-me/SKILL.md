@@ -1,7 +1,7 @@
 ---
 name: mk:ask-me
 version: 1.0.0
-description: Use when answering factual or explanatory questions about the current project — codebase, architecture, conventions, workflows, constraints — with minimal cited evidence. Triggers on "how does X work here", "what does X mean", "why is X structured this way", "is this claim true in the repo", "explain X with sources". NOT for brainstorming or comparing approaches (mk:brainstorming), trade-off decisions (mk:party), debugging/root cause (mk:investigate), code review (mk:review), plans (mk:plan-creator), security audits (mk:cso), visual explanations/diagrams (mk:preview --explain), test-coverage gaps (mk:nyquist), library docs (mk:docs-finder), or workflow navigation (mk:help).
+description: Answer factual questions about this project — code, architecture, conventions — with file:line citations. NOT for mk:investigate.
 argument-hint: '[question] [--depth quick|standard|deep] [--save-to <path>]'
 allowed-tools:
   - Read
@@ -16,7 +16,7 @@ keywords:
   - cited-answer
   - project-question
   - architecture-explanation
-when_to_use: Use for source-grounded project Q&A and concise technical explanation with file:line citations. NOT for ideation, decisions, plans, reviews, debugging, audits, diagrams, or workflow navigation — route those to specialist skills.
+when_to_use: Asked how something works here, or whether a claim holds in this repo.
 user-invocable: true
 owner: research
 criticality: medium

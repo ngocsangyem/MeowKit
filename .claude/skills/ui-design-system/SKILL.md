@@ -1,12 +1,7 @@
 ---
 name: mk:ui-design-system
 version: 2.0.0
-description: |
-  Use when designing UI components, creating design systems, reviewing visual design,
-  or checking accessibility compliance. Triggers on "design system", "UI review",
-  "color palette", "font pairing", "accessibility audit", "responsive design",
-  "WCAG check". Auto-activates when ui-ux-designer agent is working.
-  Data-driven: 160 palettes, 73 font pairings, 161 product types, 98 UX guidelines, 25 chart types.
+description: Designs UI components and design systems and audits WCAG accessibility. NOT for mk:frontend-design.
 allowed-tools:
   - Read
   - Grep
@@ -21,7 +16,7 @@ keywords:
   - wcag
   - accessibility-audit
   - responsive-design
-when_to_use: Use when designing UI components, creating design systems, or auditing accessibility (WCAG). Triggers on 'design system', 'UI review', 'color palette'.
+when_to_use: Choosing a palette or type pairing, or checking contrast and responsive rules.
 user-invocable: true
 owner: utility
 criticality: medium

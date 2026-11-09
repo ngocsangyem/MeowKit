@@ -1,13 +1,13 @@
 ---
 name: mk:testing
-description: Use when writing tests, running validation scripts, or (in TDD mode) enforcing red-green-refactor cycle. Activates during Phase 2 (Test) and Phase 3 (Build). NOT for coverage gap mapping (see mk:nyquist); NOT for sprint contract negotiation (see mk:sprint-contract).
+description: Writes and runs tests, enforcing red-green-refactor when TDD mode is on. NOT for mk:nyquist.
 keywords:
   - testing
   - unit-tests
   - tdd-red-green
   - validation-scripts
   - phase-2-test
-when_to_use: Use when writing tests, running validation scripts, or enforcing TDD red-green-refactor cycle. NOT for coverage gap mapping (see mk:nyquist) or sprint contract negotiation (see mk:sprint-contract).
+when_to_use: Tests must be authored, or the suite run, for a change in progress.
 user-invocable: true
 owner: testing
 criticality: medium

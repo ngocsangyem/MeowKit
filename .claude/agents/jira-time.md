@@ -1,6 +1,6 @@
 ---
 name: jira-time
-description: 'Manage JIRA time tracking via the jira-as CLI wrapper: log work, list/edit/delete worklogs, set estimates, generate time reports, bulk-log. Routed by mk:jira-time skill. NOT for sprint capacity (jira-agile).'
+description: 'mk:jira executor for mk:jira-time. Worklogs, estimates and time reports.'
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default

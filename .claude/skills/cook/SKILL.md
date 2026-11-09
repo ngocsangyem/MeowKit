@@ -1,6 +1,6 @@
 ---
 name: mk:cook
-description: 'Orchestrates single-task implementation pipeline: plan → test → build → review. Shipping is an explicit follow-up. Use for feature work, plan execution, or fixes scoped to a single task. NOT for green-field product builds (see mk:autobuild); NOT for auto-invoked workflow orchestration (see mk:workflow-orchestrator).'
+description: Single-task implementation pipeline — plan, test, build, review — with shipping left explicit. NOT for mk:autobuild.
 source: local
 version: 1.0.0
 argument-hint: '[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict|--advice]'
@@ -11,7 +11,7 @@ keywords:
   - feature-build
   - seven-phase
   - single-task
-when_to_use: Use when implementing a single task through review (plan→test→build→review); invoke shipping separately after explicit user direction. NOT for green-field product builds (see mk:autobuild) or auto-invoked workflow orchestration (see mk:workflow-orchestrator).
+when_to_use: One scoped feature, fix or approved plan to execute end to end.
 user-invocable: true
 owner: lifecycle
 criticality: critical

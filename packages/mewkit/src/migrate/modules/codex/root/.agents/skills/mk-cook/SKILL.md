@@ -28,10 +28,10 @@ Concrete cost depends on the inner harness, model tier, and target surface; trea
 
 ## TDD mode (`--tdd` flag)
 
-When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.codex/session-state/tdd-mode` via a Bash tool call BEFORE any other workflow step:
+When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.meowkit/state/tdd-mode` via a Bash tool call BEFORE any other workflow step:
 
 ```bash
-mkdir -p .codex/session-state && echo on > .codex/session-state/tdd-mode
+mkdir -p .meowkit/state && echo on > .meowkit/state/tdd-mode
 ```
 
 This sentinel file is read by `pre-implement.cjs`, `tdd-detect.sh`, and downstream agents to detect TDD mode. Without `--tdd`, the sentinel is absent and the workflow runs in default mode (Phase 2 optional, no RED-phase gate).

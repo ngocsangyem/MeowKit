@@ -1,15 +1,7 @@
 ---
 name: mk:improve-codebase-architecture
 version: 1.0.0
-description: |
-  Use when surfacing architectural friction and proposing deepening
-  refactors (shallow modules → deep modules) for testability and
-  AI-navigability. Triggers on "improve architecture", "find deepening
-  opportunities", "where is this codebase shallow", "architecture review".
-  Emits structured candidates + precise patches; delegates ALL rendering to
-  mk:preview. NOT for diagram/HTML rendering (see mk:preview); NOT for
-  trade-off deliberation (see mk:party); NOT for plan critique (see
-  mk:plan-ceo-review).
+description: Find shallow modules and propose deepening refactors as precise patches. NOT for mk:arch.
 allowed-tools:
   - Read
   - Grep
@@ -29,7 +21,7 @@ keywords:
   - refactor
   - patch-emission
   - testability
-when_to_use: Use when reviewing a codebase for deepening opportunities — shallow modules whose interface nearly matches their implementation — then grilling a chosen candidate into a precise, type-safe patch. Explicit invocation only; never auto-activates. NOT for visual rendering (mk:preview), NOT for architecture trade-off debate (mk:party).
+when_to_use: Asked where this codebase is shallow, or for deepening opportunities.
 user-invocable: true
 preamble-tier: 2
 phase: on-demand

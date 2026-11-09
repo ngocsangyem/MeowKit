@@ -1,6 +1,6 @@
 ---
 name: mk:review-pr
-description: Reviews a GitHub PR with a single shallow correctness/security/breaking/AI-slop checklist and emits a verdict; optionally posts it via gh pr review. Use to review an external or teammate PR. NOT for deep pre-landing audit of your own diff (see mk:review); NOT for responding to received review comments (see mk:respond-pr).
+description: Single-pass checklist review of someone else's GitHub PR, optionally posted via gh. NOT for mk:review.
 source: local
 version: 0.1.0
 argument-hint: '<#PR | URL> [--reply]'
@@ -11,7 +11,7 @@ keywords:
   - gh-pr
   - verdict
   - github-review
-when_to_use: Use to review a GitHub PR and emit a verdict (optionally post it). NOT for deep multi-pass audit of own diff (see mk:review) or responding to reviewer comments (see mk:respond-pr).
+when_to_use: Asked to review a teammate's or outside contributor's pull request.
 user-invocable: true
 owner: lifecycle
 criticality: medium

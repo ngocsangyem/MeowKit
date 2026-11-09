@@ -145,7 +145,7 @@ node .codex/hooks/pre-implement.cjs "<feature-name>"
 The hook is a no-op unless TDD mode is ON. Mode is ON when:
 
 - `MEOWKIT_TDD=1` env var is set (CI / shell rc), OR
-- `.codex/session-state/tdd-mode` sentinel file contains `on` (written by slash command `--tdd`)
+- `.meowkit/state/tdd-mode` sentinel file contains `on` (written by slash command `--tdd`)
 
 When ON, the hook verifies failing tests exist. If tests pass (no red), implementation is BLOCKED — go back to Phase 2.
 When OFF (default), the hook exits 0 silently and the developer proceeds without the RED-phase gate.

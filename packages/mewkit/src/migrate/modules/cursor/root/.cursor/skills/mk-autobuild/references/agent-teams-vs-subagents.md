@@ -44,7 +44,7 @@ For 95% of autobuild runs, sub-task are correct. Teams are appropriate when: (a)
 
 **How they work:**
 - Generator and evaluator run as long-lived agents in separate git worktrees, set up by `mk:team-config`
-- Coordination is file-based: an ownership map (who owns which files) plus `session-state/task-queue.json` as the claiming protocol — there is no live inter-agent messaging primitive
+- Coordination is file-based: an ownership map (who owns which files) plus `.meowkit/state/task-queue.json` as the claiming protocol — there is no live inter-agent messaging primitive
 - Each agent claims its next task from the queue rather than waiting for a fresh sub-task dispatch per step
 - File ownership matrix prevents concurrent edits to the same files
 

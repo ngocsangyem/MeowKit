@@ -2,7 +2,7 @@
 name: mk:plan-creator
 version: 1.6.3
 preamble-tier: 3
-description: 'Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1. Activated by /mk:plan-creator or /mk:cook. NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine); NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review).'
+description: Writes the multi-file implementation plan a human approves at Gate 1, scaled to task size. NOT for mk:planning-engine.
 argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] [--html] [--advice] OR [archive | red-team {path} | validate {path}]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - gate-1
   - scope-adaptive
   - design-evidence
-when_to_use: Use when creating a structured multi-file implementation plan before build, including plans that consume a design evidence packet (e.g. from mk:figma) without re-analyzing the design source. NOT for ticket analysis (see mk:planning-engine) or scope review (see mk:plan-ceo-review).
+when_to_use: A non-trivial build is requested and no approved plan directory exists.
 user-invocable: true
 meowkit:
   portability: provider-only

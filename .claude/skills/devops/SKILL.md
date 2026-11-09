@@ -1,6 +1,6 @@
 ---
 name: mk:devops
-description: "Plan and implement infrastructure, containers, CI/CD, deployment safety, observability, and rollback changes. Use for Docker, IaC, cloud runtime, Kubernetes, pipeline, deployment, or operational reliability work. Does not read dotenv files or approve/release deployments."
+description: Containers, IaC, CI/CD pipelines, runtime config, observability and rollback safety. NOT for mk:ship.
 version: 1.0.0
 argument-hint: '[platform or infrastructure change]'
 source: local
@@ -21,7 +21,7 @@ keywords:
   - observability
   - incident-diagnosis
   - blast-radius
-when_to_use: Use when changing infrastructure-as-code, containers, pipelines, runtime configuration, or observability, or when planning deployment safety, rollback, or operational diagnosis. NOT for approving or executing a release, reading secrets, code root-cause analysis (mk:investigate), schema semantics (mk:database), or the security verdict.
+when_to_use: Changing a Dockerfile, pipeline or cloud infra, or planning rollout safety.
 user-invocable: true
 owner: portability
 criticality: high

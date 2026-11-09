@@ -1,6 +1,6 @@
 ---
 name: confluence-search
-description: 'Find Confluence pages by criteria via the confluence-as CLI wrapper. Use for: ''search confluence'', ''find pages where X'', ''export search results'', CQL filter management, space list/get. Routed by mk:confluence-search skill. NOT for single-page CRUD (confluence-page); NOT for bulk write ops (confluence-bulk).'
+description: 'mk:confluence executor for mk:confluence-search. CQL search, spaces, export.'
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default

@@ -1,6 +1,6 @@
 ---
 name: mk:backend-development
-description: "Design and implement backend service changes: API contracts, service boundaries, auth integration, reliability and delivery checks. Use for backend/API handlers, services, webhooks, jobs, or backend architecture changes. Routes schema/migrations to mk:database; security review to the existing security workflow."
+description: Implement backend behaviour end to end — handlers, services, webhooks, jobs, authenticated access. NOT for mk:api-design-principles.
 version: 1.0.0
 argument-hint: '[backend change]'
 source: local
@@ -21,7 +21,7 @@ keywords:
   - failure-semantics
   - backend-architecture
   - auth-integration
-when_to_use: Use when adding or changing backend behavior end to end — an endpoint or handler, a service, an integration, a webhook consumer, a background job, or authenticated access to one — coordinating the contract, data, and auth owners. NOT for contract-only design or review (mk:api-design-principles), schema/query work (mk:database), infrastructure or deployment (mk:devops), or the security verdict.
+when_to_use: Adding or changing a server-side endpoint, service, integration or job.
 user-invocable: true
 owner: portability
 criticality: medium

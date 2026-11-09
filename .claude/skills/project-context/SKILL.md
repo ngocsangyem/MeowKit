@@ -1,6 +1,6 @@
 ---
 name: mk:project-context
-description: Generate or update docs/project-context.md — the single source of truth for project conventions, tech stack, and anti-patterns. Loaded by all agents as a "constitution" to ensure consistent behavior.
+description: Generates docs/project-context.md, the conventions and anti-patterns every agent loads. NOT for mk:docs-init.
 triggers:
   - generate context
   - project context
@@ -18,7 +18,7 @@ keywords:
   - conventions
   - anti-patterns
   - docs-init
-when_to_use: Use when generating or updating docs/project-context.md — single source of truth for project conventions, tech stack, anti-patterns.
+when_to_use: Stack or conventions moved and the agent constitution file is stale or missing.
 user-invocable: true
 owner: docs
 criticality: medium

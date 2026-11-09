@@ -36,7 +36,7 @@ record that step-07 wrote to `{plan_dir}/plan.md` frontmatter:
   `Skipping HTML render — plan is not Gate-1 approved.` and read and follow
   `step-09-post-plan-handoff.md`.
 
-Never resolve the plan from `session-state/active-plan`; always use the explicit
+Never resolve the plan from `.meowkit/state/active-plan`; always use the explicit
 absolute `plan_dir` passed from step-03.
 
 ### 8b-c. Export from the approved artifact

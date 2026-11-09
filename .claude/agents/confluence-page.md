@@ -1,6 +1,6 @@
 ---
 name: confluence-page
-description: 'Execute Confluence page CRUD + hierarchy + version ops via the confluence-as CLI wrapper. Use for: ''create page in SPACE'', ''show page 12345'', ''update page'', ''delete page'', ''children/ancestors of page''. Routed by mk:confluence-page skill. NOT for bulk ops (confluence-bulk); NOT for spec analysis (confluence-spec-analyst); NOT for comments/attachments/labels (confluence-collaborate).'
+description: 'mk:confluence executor for mk:confluence-page. Page CRUD, versions, hierarchy.'
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default

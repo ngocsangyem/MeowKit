@@ -2,15 +2,7 @@
 name: mk:investigate
 preamble-tier: 2
 version: 1.0.0
-description: |
-  Systematic debugging with root cause investigation. Produces a diagnostic report;
-  mk:fix owns remediation and mk:build-fix owns compile/build failures.
-  Use when asked to "debug this", "fix this bug", "why is this broken",
-  "investigate this error", or "root cause analysis".
-  Proactively suggest when the user reports errors, unexpected behavior, or
-  is troubleshooting why something stopped working.
-  NOT for applying fixes without investigation (see mk:fix); NOT for
-  step-by-step evidence-based reasoning (see mk:sequential-thinking).
+description: Systematic root-cause debugging that ends in a diagnostic report, not an edit. NOT for mk:fix.
 allowed-tools:
   - Bash
   - Read
@@ -35,7 +27,7 @@ keywords:
   - four-phase
   - iron-law
   - systematic-debugging
-when_to_use: Use when debugging with systematic root-cause investigation (four phases). NOT for applying fixes without investigation (see mk:fix).
+when_to_use: Asked why something is broken, or for a root-cause analysis.
 user-invocable: true
 owner: research
 criticality: medium

@@ -1,13 +1,7 @@
 ---
 name: mk:careful
 version: 0.1.0
-description: |
-  Session-scoped safety guardrails for destructive commands. Warns before rm -rf,
-  DROP TABLE, force-push, git reset --hard, kubectl delete, and similar destructive
-  operations. User can override each warning. Active for the current session only.
-  Use when touching prod, debugging live systems, or working in a shared environment.
-  Use when asked to "be careful", "safety mode", "prod mode", or "careful mode".
-  NOT for scoping edits to a specific directory (see mk:freeze).
+description: Session-scoped guardrails warning before destructive commands — rm -rf, DROP TABLE, force-push, reset --hard. NOT for mk:freeze.
 allowed-tools:
   - Bash
   - Read
@@ -26,7 +20,7 @@ keywords:
   - destructive-commands
   - prod-mode
   - guardrails
-when_to_use: Use when working in prod or with destructive commands — warns before rm -rf, DROP TABLE, force-push. NOT for scoping edits to a directory (see mk:freeze).
+when_to_use: Working against prod or a shared environment, or asked to be careful.
 user-invocable: true
 owner: research
 criticality: medium

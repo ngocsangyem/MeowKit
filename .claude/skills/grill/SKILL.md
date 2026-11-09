@@ -2,18 +2,7 @@
 name: mk:grill
 preamble-tier: 3
 version: 1.0.0
-description: |
-  Relentlessly interview the user about THEIR plan or design — one question at
-  a time — resolving each branch of a decision tree until shared understanding.
-  Claude is the interviewer; the user is the interviewee. Triggers on "grill me",
-  "stress-test this plan", "get grilled on my design", "interrogate my plan".
-  Checkpoints every answer to docs/knowledge/<slug>.md so progress survives a
-  context-window reset. Flags knowledge the user cannot answer as a gap to chase.
-  Do NOT use to PROPOSE solutions or compare approaches (→ mk:brainstorming).
-  Do NOT use to validate "is this worth building?" (→ mk:office-hours).
-  Do NOT use when Claude should ANSWER questions about the repo (→ mk:ask-me).
-  Do NOT use for a one-shot review of an existing plan (→ mk:plan-ceo-review).
-  Do NOT use to apply named reasoning lenses to findings (→ mk:elicit).
+description: Interrogate the user about THEIR plan one question at a time until every branch resolves, checkpointing answers. NOT for mk:advise.
 allowed-tools:
   - Read
   - Grep
@@ -31,7 +20,7 @@ keywords:
   - plan-interrogation
   - tacit-knowledge
   - shared-understanding
-when_to_use: Use when the user wants to be relentlessly interviewed about their own plan or design, one question at a time, until every decision-tree branch is resolved. NOT for proposing solutions (see mk:brainstorming), product validation (see mk:office-hours), Claude answering repo questions (see mk:ask-me), or one-shot plan review (see mk:plan-ceo-review).
+when_to_use: Asked to grill, interrogate or stress-test the user's own design.
 user-invocable: true
 owner: research
 criticality: medium

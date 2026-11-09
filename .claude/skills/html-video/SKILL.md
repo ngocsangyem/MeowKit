@@ -1,6 +1,6 @@
 ---
 name: mk:html-video
-description: Render an HTML/CSS/JS template to a local MP4 video by capturing frames with headless Chromium (via Playwright) and encoding them with ffmpeg. Use when "render my animation as a video", "export HTML to MP4", "make a video from my web template", or "capture CSS animation as MP4". NOT for recording live browser interactions (use `agent-browser record start`); NOT for screen recording; NOT for AI video generation (use mk:multimodal).
+description: Render a local HTML, CSS and JS template to MP4 by capturing frames with Playwright and encoding via ffmpeg. NOT for mk:multimodal.
 keywords:
   - html-to-video
   - mp4-export
@@ -10,7 +10,7 @@ keywords:
   - ffmpeg-encode
   - frame-capture
   - html-canvas
-when_to_use: Use to render a local HTML/CSS/JS file to an MP4 by capturing frames with Playwright and encoding with ffmpeg. NOT for live browser recording (agent-browser record) or AI video generation (mk:multimodal).
+when_to_use: Asked to export a web animation or template to an MP4 file.
 user-invocable: true
 owner: utility
 criticality: low

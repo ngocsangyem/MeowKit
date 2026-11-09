@@ -1,6 +1,6 @@
 ---
 name: mk:typescript
-description: Use when writing TypeScript code, fixing type errors, or configuring strict type safety. Auto-activates on .ts/.tsx files. Covers null handling, utility types, and ESLint.
+description: 'TypeScript authoring and strict type-safety fixes: null handling, utility types, ESLint. NOT for mk:react-patterns.'
 source: aura-frog
 original_skills:
   - typescript-expert
@@ -13,7 +13,7 @@ keywords:
   - null-handling
   - utility-types
   - ts-eslint
-when_to_use: Use when writing TypeScript or fixing type errors / configuring strict type safety. Auto-activates on .ts/.tsx files. NOT for framework-specific patterns (see mk:vue / mk:angular / mk:react-patterns).
+when_to_use: Editing .ts files or clearing type errors outside a UI framework.
 user-invocable: true
 owner: utility
 criticality: medium

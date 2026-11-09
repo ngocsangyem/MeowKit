@@ -1,6 +1,6 @@
 ---
 name: mk:respond-pr
-description: Triage reviewer comments on a GitHub PR with receiving-code-review discipline — verify each against the codebase, then accept/push-back/clarify, and optionally reply in-thread. Use when responding to received PR feedback. NOT for giving a review (see mk:review-pr); NOT for implementing the fixes (hand off to mk:fix).
+description: Triages received PR comments against the code, then accepts, pushes back or replies in-thread. NOT for mk:review-pr.
 source: local
 version: 0.1.0
 argument-hint: '<#PR | URL> [--reply]'
@@ -11,7 +11,7 @@ keywords:
   - pull-request
   - triage
   - github-threads
-when_to_use: Use to triage and reply to reviewer comments on a PR with verify-before-agree discipline. NOT for giving a review (see mk:review-pr) or implementing accepted fixes (see mk:fix).
+when_to_use: A reviewer left comments that need answering rather than a review given.
 user-invocable: true
 owner: lifecycle
 criticality: medium

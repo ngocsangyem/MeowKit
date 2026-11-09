@@ -1,6 +1,6 @@
 ---
 name: mk:chrome-profile
-description: Target a specific Google Chrome user profile for browser automation via CDP. Discovers installed profiles from the Chrome Local State file, launches Chrome with the requested profile attached to a debug port, and connects agent-browser via `agent-browser connect <port>`. Use when "automate using my Work/Personal Chrome", "open site with my saved session", or "use Chrome profile named <name>". NOT for headless scraping without an existing user profile (use mk:agent-browser directly); NOT for importing cookies only (use agent-browser --auto-connect state save).
+description: Attach browser automation to a named real Chrome profile over CDP, keeping its cookies and extensions. NOT for mk:agent-browser.
 keywords:
   - chrome-profile
   - chrome-user-profile
@@ -10,7 +10,7 @@ keywords:
   - devtools-protocol
   - profile-discovery
   - chrome-automation
-when_to_use: Use to target a named Chrome user profile (with its cookies, extensions, saved sessions) for browser automation. Requires Google Chrome installed. NOT for clean-slate headless browsing (use mk:agent-browser).
+when_to_use: Automation must reuse the user's own Chrome login or extensions.
 user-invocable: true
 owner: utility
 criticality: medium

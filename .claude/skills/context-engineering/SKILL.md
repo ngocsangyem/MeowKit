@@ -1,14 +1,6 @@
 ---
 name: mk:context-engineering
-description: >-
-  Runtime router for context decisions during a task — decide read-more / stop /
-  ask / assume / delegate, pick a minimal read-set, and time compaction. Front-page
-  mental model is Write / Select / Compress / Isolate; a lazy pattern index routes to
-  25 context-engineering patterns, one reference per decision. Use when context is
-  near budget, a long session is degrading, you must choose what to read for a task,
-  or you are deciding /compact vs /clear vs a sub-agent. NOT for structural .claude/
-  overhead audits (see mk:context-audit); NOT for owning persistence (see mk:memory);
-  NOT for USD cost (see the `mewkit budget` verb).
+description: Runtime context decisions — read more, stop, ask, assume, delegate, compact — over a pattern index. NOT for mk:context-audit.
 keywords:
   - context-engineering
   - context-budget
@@ -21,11 +13,7 @@ keywords:
   - triage
   - just-in-time
   - sub-agent
-when_to_use: >-
-  Use for runtime context decisions on the task at hand — how much to read, when to
-  stop, when to ask vs assume, when to compact or delegate. NOT for structural
-  .claude/ overhead audits (mk:context-audit); NOT for persistence itself (mk:memory);
-  NOT for USD cost (`mewkit budget`).
+when_to_use: Context nears budget mid-task, or choosing compact vs clear vs a sub-agent.
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored

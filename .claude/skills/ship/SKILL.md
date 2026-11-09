@@ -2,10 +2,7 @@
 name: mk:ship
 preamble-tier: 3
 version: 1.1.0
-description: |
-  Ship workflow with explicit scopes: prepare stages and commits locally; release pushes and creates a PR; publish manages issues and versioning. Use when asked to "ship", "deploy", "push to main", "create a PR", or "merge and push".
-  Proactively suggest when the user says code is ready or asks about deploying.
-  Supports official (→ main) and beta (→ dev/develop) ship modes with auto-detection.
+description: Commit, push, PR and release scoping for reviewed code, official or beta. NOT for mk:review.
 argument-hint: '[prepare|release|publish] [official|beta] [--skip-tests] [--dry-run] [--advice]'
 allowed-tools:
   - Bash
@@ -24,7 +21,7 @@ keywords:
   - branch-push
   - deploy-pipeline
   - gate-2-pass
-when_to_use: Use when shipping reviewed code. Bare invocation prepares a local commit; release and publish effects require explicit scope. NOT for code review (see mk:review).
+when_to_use: The review verdict passed and the change must land or be released.
 user-invocable: true
 owner: lifecycle
 criticality: high

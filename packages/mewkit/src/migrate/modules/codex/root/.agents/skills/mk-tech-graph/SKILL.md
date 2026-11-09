@@ -39,7 +39,7 @@ Generate production-quality SVG technical diagrams, optionally exported as PNG.
 
 Determine the destination before writing:
 
-1. If `session-state/active-plan` exists, write `tasks/plans/<active-plan>/visuals/<slug>.{svg,png}`.
+1. If `.meowkit/state/active-plan` exists, write `tasks/plans/<active-plan>/visuals/<slug>.{svg,png}`.
 2. Otherwise write `tasks/visuals/<slug>.{svg,png}`.
 
 Use a lowercase-hyphenated `<slug>` derived from the diagram description and create the destination directory when absent. Export PNG at 1920px only when `rsvg-convert` is present:

@@ -2,14 +2,7 @@
 name: mk:context-audit
 preamble-tier: 1
 version: 1.0.0
-description: |
-  Read-only audit of `.claude/` structural overhead. Reports prioritized
-  "remove X save Y tokens" recommendations against the model context window.
-  NOT for monetary cost tracking — that's the `mewkit budget` verb. NOT for transcript
-  size monitoring — long-session continuity defers to Claude Code native
-  compaction. NOT for runtime context decisions (what to read, when to
-  compact) — see mk:context-engineering. Use when planning to add context
-  capacity, diagnosing perceived slowdowns, or auditing health.
+description: Read-only audit of .claude/ structural overhead, ranked as remove X save Y tokens. NOT for mk:context-engineering.
 allowed-tools:
   - Bash
   - Read
@@ -26,7 +19,7 @@ keywords:
   - agents
   - mcp
   - structural
-when_to_use: Use to audit .claude/ structural overhead and surface 'remove X save Y tokens' recommendations against the model context window. NOT for USD cost tracking (see the `mewkit budget` verb). NOT for transcript size. NOT for runtime context decisions (see mk:context-engineering).
+when_to_use: Adding context capacity, or diagnosing why a session feels bloated.
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored

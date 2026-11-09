@@ -1,6 +1,6 @@
 ---
 name: mk:decision-framework
-description: 'Operational decision frameworks: triage, escalation, case management, billing ops. Use for ''how to handle X cases'', ''build triage'', ''escalation protocol''.'
+description: Build operational decision frameworks — triage, escalation, case management, billing ops. NOT for mk:party.
 version: 1.0.0
 argument-hint: '[decision domain description]'
 source: local
@@ -17,7 +17,7 @@ keywords:
   - escalation
   - case-management
   - operational-decisions
-when_to_use: Use when building operational decision frameworks — triage, escalation protocols, case management. NOT for technical architecture decisions (see mk:party).
+when_to_use: Asked how to handle a class of cases, or for an escalation protocol.
 user-invocable: true
 owner: research
 criticality: medium

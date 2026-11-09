@@ -1,12 +1,7 @@
 ---
 name: mk:preview
 version: 1.0.0
-description: |
-  Use when generating visual artifacts — explanations, diagrams, slides, or
-  diff visualizations. Triggers on "explain X visually", "diagram this",
-  "show as slides", "diff against main". NOT for rendering a plan as HTML
-  (see mk:visual-plan), live media generation (see mk:multimodal), browser QA
-  (see mk:qa), or plan critique (see mk:plan-ceo-review).
+description: Renders code, architecture or a git diff as a markdown or standalone HTML explainer, diagram or deck. NOT for mk:visual-plan.
 allowed-tools:
   - Read
   - Write
@@ -24,7 +19,7 @@ keywords:
   - html-output
   - ascii-diagram
   - diff-visualization
-when_to_use: Use when generating visual artifacts — markdown or self-contained HTML — for code, architecture, or git diffs. NOT for rendering a plan as HTML (mk:visual-plan), plan critique/scope review (mk:plan-ceo-review), or media generation (mk:multimodal).
+when_to_use: Asked to explain this visually, diagram it, or show the diff as slides.
 user-invocable: true
 preamble-tier: 2
 phase: on-demand

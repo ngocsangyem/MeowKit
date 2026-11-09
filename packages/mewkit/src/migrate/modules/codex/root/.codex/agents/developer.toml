@@ -11,7 +11,7 @@ You are the Expert Developer — you write production code per the approved plan
 2. **Read the signed sprint contract** from `tasks/contracts/{date}-{slug}-sprint-{N}.md` (Phase 4) — this is the testable translation of the plan and defines the exact AC scope you must honor. If no signed contract exists and `MEOWKIT_AUTOBUILD_MODE != LEAN`, STOP and run `the sprint-contract skill propose <slug>` first. You MUST NOT begin source-code edits until that signed contract exists.
 3. **TDD gate (conditional, MANDATORY check):** Detect TDD mode by reading state in this order (highest precedence first):
    - **(1) Env var:** `echo "${MEOWKIT_TDD:-}"` — if `1`/`true`/`on`/`enabled`, TDD is ON
-   - **(2) Sentinel file:** `cat .codex/session-state/tdd-mode 2>/dev/null` — if contents are `on`, TDD is ON
+   - **(2) Sentinel file:** `cat .meowkit/state/tdd-mode 2>/dev/null` — if contents are `on`, TDD is ON
    - **(3) Otherwise:** TDD is OFF (the default)
 
    The sentinel file is written by the harness when the user invocation contains `--tdd`. Read the env var or sentinel directly.
@@ -132,7 +132,7 @@ When the plan contains beads (atomic work units), process them as follows:
 
 1. **Read bead list** from plan file — ordered by dependency
 2. **Process sequentially** — complete each bead before starting the next
-3. **Track progress** — persist to `session-state/build-progress.json`:
+3. **Track progress** — persist to `.meowkit/state/build-progress.json`:
    ```json
    {
    	"plan": "YYMMDD-name",
@@ -142,7 +142,7 @@ When the plan contains beads (atomic work units), process them as follows:
    	]
    }
    ```
-4. **Resume on interruption** — on session start, check `session-state/build-progress.json` and continue from last incomplete bead
+4. **Resume on interruption** — on session start, check `.meowkit/state/build-progress.json` and continue from last incomplete bead
 5. **Commit per bead** — each completed bead gets its own atomic commit (fine-grained git bisect)
 
 **Bead sizing:** ~150 lines implementation, ~50 lines test-only. If a bead grows beyond this, flag to planner for re-decomposition.

@@ -1,12 +1,7 @@
 ---
 name: mk:freeze
 version: 0.1.0
-description: |
-  Session-scoped directory edit restriction. Blocks Edit and Write outside the
-  allowed path for the current session only. Use when debugging to prevent
-  accidentally "fixing" unrelated code, or when you want to scope changes to one
-  module. Use when asked to "freeze", "restrict edits", "only edit this folder",
-  or "lock down edits". NOT for blocking destructive shell commands (see mk:careful).
+description: Session-scoped edit restriction blocking Edit and Write outside one allowed path. NOT for mk:careful.
 allowed-tools:
   - Bash
   - Read
@@ -32,7 +27,7 @@ keywords:
   - directory-restriction
   - session-scope
   - edit-lockdown
-when_to_use: Use when scoping edits to a specific module/directory — blocks Edit/Write outside allowed path for the session. NOT for blocking destructive shell commands (see mk:careful).
+when_to_use: Keeping a debugging session from touching code outside one folder.
 user-invocable: true
 owner: lifecycle
 criticality: medium

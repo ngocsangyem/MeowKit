@@ -2,7 +2,7 @@
 name: mk:autobuild
 version: 1.0.0
 preamble-tier: 3
-description: Use when running an autonomous multi-hour build of a green-field product — orchestrates planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density per model tier. Triggers on /mk:autobuild, "build me a kanban app", "build a retro game maker", "autonomous build", or any green-field product spec. NOT for scoped single-task work (see mk:cook); NOT for initial project scaffolding only (see mk:bootstrap).
+description: Autonomous multi-hour green-field product build — planner, contract, generator and evaluator in a loop. NOT for mk:cook.
 argument-hint: '[task description] [--tier auto|full|lean|minimal] [--max-iter N] [--budget USD] [--tdd] [--advice]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - generator-evaluator
   - harness-contract
   - adaptive-density
-when_to_use: Use when running an autonomous multi-hour build of a green-field product (planner→contract→generator⇄evaluator loop). NOT for scoped single-task work (see mk:cook) or initial scaffolding only (see mk:bootstrap).
+when_to_use: A whole product is specified from scratch and should build unattended.
 user-invocable: true
 meowkit:
   portability: provider-only

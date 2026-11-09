@@ -8,7 +8,7 @@ feedback mechanics, and all artifact mutations.
 ## Resolve and prepare
 
 1. Resolve `$PLAN_DIR` from a plan directory or `plan.md` path. When no input is
-   supplied, use `session-state/active-plan`; otherwise ask the user.
+   supplied, use `.meowkit/state/active-plan`; otherwise ask the user.
 2. Confirm the **local** `mewkit` installation exposes `visual-plan` (minimum
    version 1.16.0). Never registry-fetch with `npx`. If it is unavailable, print
    local install/upgrade guidance and offer `--static` as the no-CLI fallback.

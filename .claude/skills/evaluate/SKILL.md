@@ -2,7 +2,7 @@
 name: mk:evaluate
 version: 1.0.0
 preamble-tier: 3
-description: Experimental behavioral evaluator. Drives a running artifact via browser/curl/CLI and records rubric evidence; the runner is not yet a fully implemented automated evaluation system.
+description: Drive a running build via browser, curl or CLI and record rubric evidence behaviourally. NOT for mk:review.
 argument-hint: '[target-url-or-path] [--rubric-preset frontend-app|backend-api|cli-tool|fullstack-product] [--max-criteria 15]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - running-build
   - active-verification
   - skeptic-persona
-when_to_use: Experimental/manual use when grading a running build behaviorally. NOT for structural code audit of a diff/PR (see mk:review) or static linting (see mk:lint-and-validate).
+when_to_use: A built artifact must be graded by what it does when actually exercised.
 user-invocable: true
 owner: testing
 criticality: high

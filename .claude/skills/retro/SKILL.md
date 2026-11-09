@@ -2,13 +2,7 @@
 name: mk:retro
 preamble-tier: 2
 version: 2.0.0
-description: |
-  Weekly-cadence engineering retrospective. Analyzes commit history, work patterns,
-  and code quality metrics with persistent history and trend tracking.
-  Team-aware: breaks down per-person contributions with praise and growth areas.
-  Use when asked to "weekly retro", "what did we ship", or "engineering retrospective".
-  Proactively suggest at the end of a work week or sprint.
-  NOT for per-session or per-task reflection (see mk:memory / Phase 6 Reflect).
+description: Engineering retrospective over commit history with trends and per-person breakdown. NOT for mk:memory.
 allowed-tools:
   - Bash
   - Read
@@ -22,7 +16,7 @@ keywords:
   - git-history
   - postmortem
   - reflection
-when_to_use: Use when running a sprint retrospective from git history.
+when_to_use: 'End of a week or sprint: what shipped and what slowed us down.'
 user-invocable: true
 owner: docs
 criticality: medium

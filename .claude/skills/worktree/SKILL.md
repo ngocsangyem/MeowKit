@@ -1,6 +1,6 @@
 ---
 name: mk:worktree
-description: Manages git worktrees for parallel agent isolation. Creates isolated worktrees for parallel agents on parallel/{name}-{timestamp} branches, merges results with conflict detection, prunes stale metadata, and reports health status. NOT for user-initiated feature branches — use git worktree directly for that.
+description: 'Full git worktree lifecycle for agent isolation: create, merge with conflict detection, prune. NOT for mk:team-config.'
 argument-hint: '[create|merge|cleanup|list|status|prune] [agent-name]'
 source: local
 keywords:
@@ -14,7 +14,7 @@ keywords:
   - worktree-cleanup
   - worktree-status
   - worktree-health
-when_to_use: 'Auto-invoked when orchestrator decomposes COMPLEX tasks into parallel subtasks per the cook parallel-execution reference. Manages the full worktree lifecycle: create before agents start, merge + integration-test after agents complete, cleanup after merge. NOT for user-initiated feature branches (use git worktree directly). NOT invoked directly by users.'
+when_to_use: Parallel agents need isolated branches, or their results must be merged back.
 user-invocable: false
 owner: git
 criticality: medium

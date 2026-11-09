@@ -1,6 +1,6 @@
 ---
 name: mk:jira-ops
-description: 'JIRA-side cache + project-context discovery via the jira-as wrapper. Triggers: ''jira cache status'', ''clear jira cache'', ''discover project context for PROJ''. Diagnostic-only — no Atlassian state changes. NOT for issue CRUD; NOT for project admin (mk:jira-admin).'
+description: 'mk:jira leaf. Cache status, cache clear, project-context discovery. NOT for mk:jira-admin.'
 phase: on-demand
 source: local
 keywords:
@@ -9,7 +9,7 @@ keywords:
   - jira-cache
   - jira-discover
   - jira-diagnostic
-when_to_use: Use to inspect / clear the jira-as local cache or discover project context (default issue types, mandatory fields). NOT for project admin (use mk:jira-admin).
+when_to_use: 'Inspect or clear the local Jira cache, or discover project defaults.'
 user-invocable: true
 context: fork
 agent: jira-ops

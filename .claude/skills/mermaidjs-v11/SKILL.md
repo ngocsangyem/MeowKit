@@ -1,8 +1,8 @@
 ---
 name: mk:mermaidjs-v11
-description: Create inline Mermaid v11 diagram blocks — flowcharts, sequence, class, ER, Gantt, state, timeline, user-journey, and 20+ other types — rendered in markdown files and browser environments. Zero external dependencies; mmdc is optional for CLI export.
+description: Write inline Mermaid v11 diagram blocks — flowchart, sequence, class, ER, state, gantt. NOT for mk:tech-graph.
 user-invocable: true
-when_to_use: Invoke when Mermaid v11 markdown diagram blocks are needed inside docs, code comments, or README files. NOT for in-HTML interactive diagrams (mk:preview --html --diagram) or publish-grade standalone SVG/PNG exports (mk:tech-graph).
+when_to_use: A diagram belongs inside a markdown file, README or code comment.
 keywords:
   - mermaid
   - mermaid-v11

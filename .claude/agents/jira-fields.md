@@ -1,6 +1,6 @@
 ---
 name: jira-fields
-description: 'Discover and configure JIRA custom fields via the jira-as CLI wrapper: list fields, find field IDs, check per-project field availability, configure agile field mappings. Routed by mk:jira-fields skill. NOT for setting per-issue field values (jira-issue update); NOT for project admin (jira-admin).'
+description: 'mk:jira executor for mk:jira-fields. Field discovery and agile field config.'
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default

@@ -1,21 +1,7 @@
 ---
 name: mk:vue-testing-best-practices
-description: >-
-  Use for Vue 3 testing best-practices review and recommendations — designing
-  and auditing Vitest + Vue Test Utils tests for components, composables, Pinia
-  stores, Vue Router, async/Suspense, Teleport, forms, and accessibility, plus
-  Playwright E2E test-design strategy. Advisory/review only — recommends patterns
-  and flags test smells; does not run tests. Complements mk:vue-best-practices
-  (feature code). Invoke for "review my Vue tests", "how should I test this
-  component/composable/store", or "Vue test best practices".
-when_to_use: >-
-  Use when the subject IS Vue 3 test-code quality — designing/auditing Vue tests
-  or choosing Vue test tooling. NOT for: running tests/TDD/non-Vue/generic
-  Playwright runner practices (mk:testing), diff/PR review or test-existence gaps
-  (mk:review), coverage maps (mk:nyquist), QA + bug-fixing a running app (mk:qa),
-  E2E spec generation/run (mk:qa-manual), browser driving
-  (mk:agent-browser/mk:playwright-cli), or Vue feature code
-  (mk:vue/mk:vue-best-practices).
+description: 'Advisory review of Vue 3 test design: Vitest, Test Utils, store, router, async cases. NOT for mk:testing.'
+when_to_use: The question is how to test a Vue component, composable or store.
 keywords:
   [
     vue-testing,

@@ -523,6 +523,14 @@ Configure hooks in `settings.json` that respond to subagent lifecycle events in 
 | `SubagentStart` | Agent type name | When a subagent begins execution |
 | `SubagentStop`  | Agent type name | When a subagent completes        |
 
+> **MeowKit note (2026-11-09, verdict `adopt`):** this page is correct and the kit's own
+> earlier claim that wiring `SubagentStart` would infinite-loop inside subagents is
+> **superseded**. The event fires once per subagent spawn or resume, cannot block subagent
+> creation, and injects context only. MeowKit still registers **no** handler and keeps
+> `.claude/settings.json`'s `"SubagentStart"` array empty — a deliberate deferral pending a
+> throttling design for in-process agent teams, where the event fires per teammate message.
+> Treat the registration example below as host documentation, not as kit configuration.
+
 Both events support matchers to target specific agent types by name. This example runs a setup script only when the `db-agent` subagent starts, and a cleanup script when any subagent stops:
 
 ```json theme={null}

@@ -17,10 +17,10 @@ Before emitting any code-fenced mermaid block, Read `references/mermaid-essentia
 
 ## Step 1 — Resolve output path
 
-CWD is the project root. Existing hooks (`pre-completion-check.cjs:51`) read from `session-state/active-plan` — match that convention. The stored value can be either an absolute path (`orientation-ritual.cjs:18` declares values "canonically absolute") or a slug (`HOOKS_INDEX.md:77` documents the value as "slug"). The two docs disagree; treat the value as opaque and detect format at read time.
+CWD is the project root. Existing hooks (`pre-completion-check.cjs:51`) read from `.meowkit/state/active-plan` — match that convention. The stored value can be either an absolute path (`orientation-ritual.cjs:18` declares values "canonically absolute") or a slug (`HOOKS_INDEX.md:77` documents the value as "slug"). The two docs disagree; treat the value as opaque and detect format at read time.
 
 ```bash
-ACTIVE_PLAN_FILE="session-state/active-plan"
+ACTIVE_PLAN_FILE=".meowkit/state/active-plan"
 
 if [ -f "$ACTIVE_PLAN_FILE" ]; then
   RAW=$(tr -d '[:space:]' < "$ACTIVE_PLAN_FILE")

@@ -1,6 +1,6 @@
 ---
 name: mk:scout
-description: Fast parallel codebase scouting. Spawns multiple Explore subagents to search directories simultaneously, returning a consolidated file map with architecture fingerprint, complexity estimates, and routing suggestions. Use before planning, debugging, or any task spanning multiple directories. NOT for reading a single known file in depth (use Read directly); NOT for semantic find-usages or go-to-definition.
+description: Parallel subagent sweep of the repository returning a file map and architecture fingerprint. NOT for mk:research.
 source: local
 keywords:
   - scout
@@ -9,7 +9,7 @@ keywords:
   - file-mapping
   - architecture-fingerprint
   - routing-suggestions
-when_to_use: Use before planning/debugging or any task spanning multiple directories — fast parallel codebase scouting. NOT for reading a single known file (use Read directly) or semantic find-usages.
+when_to_use: Starting work in unfamiliar directories and need to know where things live.
 user-invocable: true
 meowkit:
   portability: provider-only

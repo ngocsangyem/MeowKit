@@ -2,15 +2,7 @@
 name: mk:qa
 preamble-tier: 3
 version: 2.0.0
-description: |
-  Systematically QA test a web application and fix bugs found. Runs QA testing,
-  then iteratively fixes bugs in source code, committing each fix atomically and
-  re-verifying. Use when asked to "qa", "QA", "test this site", "find bugs",
-  "test and fix", or "fix what's broken".
-  Proactively suggest when the user says a feature is ready for testing
-  or asks "does this work?". Three tiers: Quick (critical/high only),
-  Standard (+ medium), Exhaustive (+ cosmetic). Produces before/after health scores,
-  fix evidence, and a ship-readiness summary.
+description: Black-box QA sweep of a running web app, then fixes each bug found and re-verifies it. NOT for mk:qa-manual.
 allowed-tools:
   - Bash
   - Read
@@ -27,7 +19,7 @@ keywords:
   - health-score
   - manual-test
   - verification
-when_to_use: Use when running quality assurance checks. General QA wrapper. NOT for E2E generation (see mk:qa-manual) or behavioral evaluation (see mk:evaluate).
+when_to_use: User says test this site and fix whatever is broken before shipping.
 user-invocable: true
 owner: testing
 criticality: medium

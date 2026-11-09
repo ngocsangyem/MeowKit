@@ -2,7 +2,7 @@
 name: mk:elicit
 version: 1.0.0
 preamble-tier: 3
-description: Structured second-pass reasoning after code review or plan evaluation. Offers named reasoning methods (pre-mortem, inversion, red team, Socratic, etc.) to re-examine findings through a specific lens. Use after /mk:review verdict or any time deeper analysis is needed on an existing output. NOT for initial review (see mk:review); NOT for creating implementation plans (see mk:plan-creator).
+description: Re-examine an existing verdict through a named reasoning lens — pre-mortem, inversion, red team, Socratic. NOT for mk:review.
 allowed-tools:
   - Read
   - Grep
@@ -17,7 +17,7 @@ keywords:
   - red-team-analysis
   - socratic
   - inversion
-when_to_use: Use after a code review or plan evaluation — re-examines findings via named reasoning methods. NOT for initial review (see mk:review) or creating plans (see mk:plan-creator).
+when_to_use: A review or evaluation already exists and needs a deeper second pass.
 user-invocable: true
 owner: research
 criticality: medium

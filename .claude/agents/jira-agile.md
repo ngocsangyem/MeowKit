@@ -1,6 +1,6 @@
 ---
 name: jira-agile
-description: 'Manage JIRA agile surfaces via the jira-as CLI wrapper: epics, sprints, backlog, ranking, story points, subtasks, velocity. Routed by mk:jira-agile skill. NOT for issue CRUD (jira-issue); NOT for issue links (jira-relationships); NOT for time tracking (jira-time).'
+description: 'mk:jira executor for mk:jira-agile. Epics, sprints, backlog, points, velocity.'
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default

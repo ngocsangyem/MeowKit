@@ -2,7 +2,7 @@
 name: mk:trace-analyze
 version: 1.0.0
 preamble-tier: 3
-description: Use when analyzing harness trace logs to surface recurring failure patterns and suggest harness improvements. Scatter-gather pattern across last N runs with mandatory HITL gate before any change is applied. Triggers on /mk:trace-analyze, "analyze traces", "find patterns in harness runs", or after a model upgrade flagged dead-weight-audit-needed.
+description: Mines harness trace logs across recent runs for recurring failure patterns, behind a human gate. NOT for mk:retro.
 argument-hint: '[--runs N] [--pattern <type>]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - scatter-gather
   - hitl-gate
   - model-upgrade-audit
-when_to_use: Use when analyzing harness trace logs to surface recurring failure patterns and suggest improvements. Mandatory HITL gate before changes apply.
+when_to_use: Harness runs keep failing the same way, or a model upgrade needs auditing.
 user-invocable: true
 owner: observability
 criticality: medium

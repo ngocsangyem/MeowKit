@@ -243,8 +243,12 @@ Hook chain verified against `settings.json` (2026-04-18). All 7 events listed.
 **Phase routing** (source: `.claude/skills/cook/references/phase-contracts.md`):
 `Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test → Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect`
 
-SubagentStart/SubagentStop: intentionally empty — hooks in these events would
-infinite-loop inside subagents (`HOOKS_INDEX.md:39` footer).
+SubagentStart/SubagentStop: intentionally empty — but by choice, not because the events
+infinite-loop inside subagents. That claim is **superseded** as of 2026-11-09 (verdict
+`adopt`): the Claude Code hooks reference, retrieved that day, documents `SubagentStart` as
+firing once per subagent spawn or resume, unable to block subagent creation, and
+context-injecting only. The unresolved item is throttling on in-process agent teams, where
+it fires again per teammate message, so no handler is registered yet.
 
 ---
 

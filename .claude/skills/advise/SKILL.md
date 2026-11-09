@@ -2,22 +2,7 @@
 name: mk:advise
 preamble-tier: 3
 version: 1.0.0
-description: |
-  Turn a raw idea into ONE honest recommendation: interview one question at a
-  time until the problem, requirements, goals, non-goals, and constraints are
-  CONFIRMED, then deliver a single verdict — do, don't, cheaper alternatives,
-  trade-offs, ordered checklist, success metrics.
-  Required: the user wants exactly ONE recommendation — not options, not a
-  debate — and their framing is open to challenge (advise may answer a different
-  question than the one asked).
-  Triggers on "what should I do about X", "advise me on X", "am I approaching
-  this right", "is this the right move".
-  Do NOT use to be interrogated with no recommendation (→ mk:grill) — advise also
-  interviews one question at a time, but only to reach a verdict.
-  Do NOT use when the framing is settled and only the options are open
-  (→ mk:brainstorming).
-  Do NOT use to decide whether something is worth building (→ mk:office-hours).
-  Do NOT use when you want several perspectives to argue it out (→ mk:party).
+description: Interview one question at a time, then deliver ONE verdict — do, don't, cheaper alternatives, trade-offs, ordered checklist, success metrics. NOT for mk:party.
 allowed-tools:
   - Read
   - Grep
@@ -34,13 +19,7 @@ keywords:
   - decision-support
   - verdict
   - trade-offs
-when_to_use: >-
-  Use when the user wants ONE honest recommendation on a raw idea or decision and
-  is open to being told their framing is wrong. NOT for interrogation with no
-  recommendation (see mk:grill; advise interviews too, but only to reach a
-  verdict). NOT for enumerating alternatives to a validated problem (see
-  mk:brainstorming). NOT for whether an idea is worth building (see
-  mk:office-hours). NOT for multi-perspective deliberation (see mk:party).
+when_to_use: User wants one honest recommendation on a decision, not a list of options.
 user-invocable: true
 owner: research
 criticality: medium

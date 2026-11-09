@@ -1,6 +1,6 @@
 ---
 name: mk:project-organization
-description: 'Use when creating files and need the correct path, organizing project layout, or enforcing naming conventions. Two modes: advisory (return path) and organize (restructure).'
+description: Returns the correct path for a new file and enforces the naming layout. NOT for mk:docs-init.
 argument-hint: '[directories or files to organize]'
 source: local
 original_path: .claude/skills/project-organization/SKILL.md
@@ -12,7 +12,7 @@ keywords:
   - plan-organization
   - report-routing
   - directory-layout
-when_to_use: Use when organizing plan/report outputs into the correct project directories.
+when_to_use: About to create a report, plan or asset with no obvious destination.
 user-invocable: true
 owner: docs
 criticality: medium

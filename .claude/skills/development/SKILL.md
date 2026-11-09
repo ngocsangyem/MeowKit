@@ -1,13 +1,13 @@
 ---
 name: mk:development
-description: Use when implementing features or writing code. TDD enforcement is opt-in via --tdd / MEOWKIT_TDD=1. Provides code patterns, skill loading, and coding standards.
+description: Write feature code to this project's standards and patterns; TDD is opt-in via --tdd. NOT for mk:cook.
 keywords:
   - development
   - feature-implementation
   - tdd-optional
   - coding-standards
   - skill-loading
-when_to_use: Use when implementing features or writing code. TDD opt-in via --tdd. NOT for orchestrated pipelines (see mk:cook).
+when_to_use: Implementing code directly, outside an orchestrated phase pipeline.
 user-invocable: true
 owner: utility
 criticality: medium

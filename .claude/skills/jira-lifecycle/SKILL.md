@@ -1,6 +1,6 @@
 ---
 name: mk:jira-lifecycle
-description: 'Drive JIRA workflow lifecycle via the jira-as wrapper: transition, assign, resolve, reopen, manage versions and components. Triggers: ''transition KEY to Status'', ''mark KEY as Done'', ''assign KEY to user'', ''reopen KEY'', ''release version'', ''create component''. NOT for issue CRUD (mk:jira-issue); NOT for bulk transitions (mk:jira-bulk).'
+description: 'mk:jira leaf. Transition, assign, resolve, reopen, versions, components. NOT for mk:jira-bulk.'
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - jira-resolve
   - jira-version
   - jira-component
-when_to_use: Use to change a Jira issue's status, assignee, or resolution, or to manage project versions/components. NOT for bulk operations.
+when_to_use: 'Change one Jira issue status or assignee, or release a version.'
 user-invocable: true
 context: fork
 agent: jira-lifecycle

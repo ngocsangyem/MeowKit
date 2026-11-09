@@ -37,4 +37,4 @@ Add beads section to the plan file after the Technical Approach section.
 - Target ~150 lines for implementation beads, ~50 lines for test-only beads
 - Every bead gets its own atomic git commit
 - Dependencies must form a DAG (no circular dependencies)
-- Progress tracked in `session-state/build-progress.json`
+- Progress tracked in `.meowkit/state/build-progress.json`

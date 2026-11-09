@@ -1,6 +1,6 @@
 ---
 name: mk:arch
-description: Architecture Decision Record lifecycle — create, list, review and impact-analyse ADRs under docs/architecture/adr/. Use when a non-obvious architectural choice needs a durable record, when asking which ADRs an existing decision affects, or when a proposed change must be checked against the decisions already taken. NOT for codebase deepening or boundary refactors (see mk:improve-codebase-architecture); NOT for trade-off debate between options (see mk:party).
+description: ADR lifecycle under docs/architecture/adr/ — create, list, review, impact-analyse. NOT for mk:improve-codebase-architecture.
 argument-hint: new [title] | list | review [number] | impact [change description]
 source: local
 trust_level: kit-authored
@@ -17,7 +17,7 @@ keywords:
   - decision-record
   - impact-analysis
   - boundary-review
-when_to_use: Use when an architectural decision must be recorded, reviewed, or checked for impact. Writes and updates ADR files; the architect agent remains the author of the decision itself.
+when_to_use: A non-obvious architectural choice needs a durable record, or a change must be checked against past ADRs.
 user-invocable: true
 owner: docs
 criticality: medium

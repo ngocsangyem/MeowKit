@@ -1,6 +1,6 @@
 ---
 name: mk:breakdown
-description: Decompose a spec or PRD into sized user stories, optionally create Jira tickets, and produce a codebase-aware tech breakdown report. Use for a Confluence page, Jira epic, GitHub issue, Linear ticket or pasted PRD that needs refined stories before planning. Stops before plan creation. NOT for sprint capacity planning (see mk:planning-engine); NOT for bulk ticket creation (see mk:story-sizer); NOT for single-ticket analysis or root-cause work (see mk:intake, mk:jira-analyst).
+description: Turn a spec, PRD or epic into sized user stories plus a codebase-aware tech report. NOT for mk:planning-engine.
 argument-hint: <source> [--source confluence|jira|github|linear|paste] [--project <KEY>]
 source: local
 trust_level: kit-authored
@@ -17,7 +17,7 @@ keywords:
   - ticket-creation
   - tech-breakdown
   - requirements-decomposition
-when_to_use: Use when a spec, PRD or issue source must become refined user stories, optional Jira tickets and a tech breakdown report. Stops before plan creation.
+when_to_use: A Confluence page, epic, issue or pasted PRD needs stories before planning.
 user-invocable: true
 owner: jira
 criticality: medium

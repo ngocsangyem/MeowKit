@@ -1,6 +1,6 @@
 ---
 name: mk:status
-description: Backward-looking delivery status for the active plan — resolves which plan is meant, then has the project-manager agent write an evidence-based status report into the plan directory. Use when asked "where are we", "what is done", "what is blocked", or for a stakeholder update. NOT for "what should I do next" advice (see mk:help); NOT for sprint capacity or ticket planning (see mk:planning-engine).
+description: 'Evidence-based delivery status for the active plan: done, blocked, changed since last report. NOT for mk:help.'
 argument-hint: '[plan-dir | plan-slug]'
 source: local
 trust_level: kit-authored
@@ -17,7 +17,7 @@ keywords:
   - plan-status
   - blocked-items
   - stakeholder-update
-when_to_use: Use when the user wants to know what is done, what is blocked and what changed since the last report for an active plan. Produces a dated report inside the plan directory.
+when_to_use: Asked where we are, or a stakeholder update is due.
 user-invocable: true
 owner: lifecycle
 criticality: medium

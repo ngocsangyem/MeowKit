@@ -20,7 +20,7 @@ Manage workflow state across sessions with handoff and resume.
 ## Plan State
 
 Saved workflow state lives in `.codex/logs/workflows/`; the active plan is resolved
-from `session-state/active-plan.json` or by scanning `tasks/plans/`. Nothing is carried
+from `.meowkit/state/active-plan.json` or by scanning `tasks/plans/`. Nothing is carried
 between sessions in the environment.
 
 ## Process

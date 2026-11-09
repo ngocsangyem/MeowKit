@@ -1,7 +1,7 @@
 ---
 name: mk:planning-engine
 version: 1.0.0
-description: Analyzes ticket complexity and maps dependencies against an existing codebase before sprint planning. Triggers on 'how complex is this ticket', 'what should we work on first', 'can we fit this in the sprint', 'tech review before planning', 'plan the sprint'. NOT for writing implementation plans (see mk:plan-creator); NOT for scope/ambition review (see mk:plan-ceo-review).
+description: Scores ticket complexity and maps dependencies against the current codebase. NOT for mk:plan-creator.
 phase: 1
 source: local
 argument-hint: review PROJ-123 [--scout] [--graph] | plan --tickets PROJ-101,PROJ-102 [--capacity 40] [--scout] [--spec <report-path>]
@@ -16,7 +16,7 @@ keywords:
   - sprint-planning
   - dependency-mapping
   - tech-review
-when_to_use: Use when analyzing ticket complexity and dependencies against existing codebase before sprint planning. NOT for writing implementation plans (see mk:plan-creator).
+when_to_use: Asked how big a ticket is, what to pick up first, or if it fits the sprint.
 user-invocable: true
 owner: lifecycle
 criticality: medium

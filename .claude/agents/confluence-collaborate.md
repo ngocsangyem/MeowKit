@@ -1,6 +1,6 @@
 ---
 name: confluence-collaborate
-description: 'Manage Confluence collaboration surface: comments, attachments, labels, watchers. Routed by mk:confluence-collaborate skill. NOT for page CRUD (confluence-page); NOT for bulk ops (confluence-bulk).'
+description: 'mk:confluence executor for mk:confluence-collaborate. Comments, labels, watchers.'
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default

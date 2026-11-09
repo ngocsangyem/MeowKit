@@ -1,6 +1,6 @@
 ---
 name: mk:figma
-description: 'Read-first Figma gateway via Figma MCP: analyze designs, implement Figma-to-code for 1–3 screens, extract design tokens, produce a Figma Evidence Packet for planning handoff, screenshot fallback. Advanced operations (Code Connect, canvas writes, design-system/library patterns) are gated references loaded only on explicit intent. Triggers: ''figma'', ''design link'', ''implement this design'', ''design tokens'', ''produce a Figma Evidence Packet''.'
+description: Figma MCP gateway — read designs, extract tokens, implement one to three screens, emit an evidence packet. NOT for mk:stitch.
 version: 1.2.0
 keywords:
   - figma
@@ -12,7 +12,7 @@ keywords:
   - code-connect
   - figma-gateway
   - evidence-packet
-when_to_use: Use when parsing Figma links, extracting design specs/tokens, producing a Figma Evidence Packet for a planning handoff, or translating a Figma design to code via Figma MCP. Read-first by default; advanced Figma operations (Code Connect, canvas writes) are gated behind explicit user intent. NOT for generating novel UI from text (see mk:stitch). NOT for general UI design systems (see mk:ui-design-system).
+when_to_use: A Figma link or design file must become specs, tokens or code.
 user-invocable: true
 owner: utility
 criticality: medium

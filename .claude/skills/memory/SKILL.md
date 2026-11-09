@@ -1,6 +1,6 @@
 ---
 name: mk:memory
-description: Plain-markdown team memory — two committed files holding only non-derivable decisions and gotchas. Use when recording a lesson a human asked to remember, or when pruning stale entries. NOT for weekly-cadence engineering retrospectives (see mk:retro); NOT for arbitrary file storage; NOT for personal recall (that belongs to the host runtime).
+description: Append or prune non-derivable decisions and gotchas in the two committed .meowkit/memory files. NOT for mk:retro.
 keywords:
   - memory
   - decisions
@@ -9,7 +9,7 @@ keywords:
   - prune
   - persistence
   - team-knowledge
-when_to_use: Use when appending a non-derivable decision or gotcha to .meowkit/memory/{decisions,gotchas}.md, or when pruning stale entries from those two files.
+when_to_use: A human asks to remember a lesson, or stale entries need removing.
 user-invocable: true
 owner: memory
 criticality: high

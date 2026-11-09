@@ -2,7 +2,7 @@
 name: mk:sprint-contract
 version: 1.0.0
 preamble-tier: 3
-description: Use when negotiating a file-based sprint contract between the generator (developer) and evaluator before code is written. Translates a product-level spec into testable acceptance criteria with rubric tie-ins. Triggers on /mk:sprint-contract, "draft a sprint contract", "negotiate scope for sprint", or before any harness-driven sprint kicks off.
+description: Negotiates generator and evaluator acceptance criteria with rubric tie-ins before code is written. NOT for mk:plan-creator.
 argument-hint: '[propose | review | amend | sign | validate | sprint-goal] [task-slug | sprint-goal-text] [--sprint N]'
 allowed-tools:
   - Bash
@@ -19,7 +19,7 @@ keywords:
   - generator-evaluator-handshake
   - scope-negotiation
   - rubric-tie-in
-when_to_use: Use when negotiating a file-based sprint contract between generator (developer) and evaluator before code is written. NOT for plan generation (see mk:plan-creator).
+when_to_use: A harness-driven sprint needs its scope signed first.
 user-invocable: true
 owner: lifecycle
 criticality: high

@@ -2,7 +2,7 @@
 name: mk:validate-plan
 version: 1.0.0
 preamble-tier: 3
-description: Validates an approved plan against 8 dimensions before Phase 3 begins. Catches incomplete acceptance criteria, missing dependencies, and unresolved risks. Use after Gate 1 approval and before Phase 2 (Test). Produces a validation report with pass/fail per dimension.
+description: Checks an approved plan across 8 dimensions for gaps before building starts. NOT for mk:plan-ceo-review.
 allowed-tools:
   - Read
   - Grep
@@ -15,7 +15,7 @@ keywords:
   - gate-1-pass
   - acceptance-criteria-check
   - 8-dimension-validation
-when_to_use: Use after Gate 1 plan approval and before Phase 2 — validates plan against 8 dimensions. NOT for creating plans (see mk:plan-creator).
+when_to_use: The plan is approved and should be stress-tested before any code.
 user-invocable: true
 owner: lifecycle
 criticality: high

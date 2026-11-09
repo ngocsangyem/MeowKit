@@ -96,7 +96,7 @@ The delegation template is inner-harness–agnostic. Inner harnesses vary along 
 |---|---|
 | Task / Agent tool surface | Does the harness expose a way to spawn a subagent? What is the call shape? |
 | Context auto-injection | Which root file (e.g. `CLAUDE.md`, `AGENTS.md`, `gemini.md`) does the harness inject into subagent context automatically, and what is its byte cap? |
-| SubagentStart hook | Is the hook surface available? On most harnesses it is NOT, because hooks fire inside subagents and infinite-loop. |
+| SubagentStart hook | Is the hook surface available? On Claude Code it IS, and the old blanket "hooks fire inside subagents and infinite-loop" answer is withdrawn (verdict **adopt**, 2026-11-09 — see the Rejected Patterns note below). Other harnesses still vary, so the question stays. |
 
 Constraints that apply when the inner harness's behavior is unknown or differs from the outer harness:
 
@@ -110,7 +110,7 @@ Patterns deliberately NOT implemented in the toolkit, with the reason each was r
 
 | Rejected pattern | Why rejected |
 |---|---|
-| `SubagentStart` hook for subagent context injection | Hooks fire inside subagents → infinite-loop risk (verified in `HOOKS_INDEX.md`). |
+| `SubagentStart` hook for subagent context injection | **Still not implemented, but for a new reason — verdict `adopt`, 2026-11-09.** The "infinite-loop" reason was wrong: the Claude Code hooks reference (retrieved 2026-11-09) documents the event as firing once when a subagent is spawned or resumed, unable to block subagent creation, and context-injecting only. What is real is a *repetition* concern, not recursion: on in-process agent teams it fires again each time a teammate handles a new message, so a throttle is a design question with no answer yet. Nothing is registered — the empty array stays empty, because a hook shipped in the same change as its own feasibility study has no independent check. |
 | `PreToolUse:Task` hook validating subagent prompts | Violates outer-harness principle. Could break legitimate Task calls. Make-correct-path-easy beats block-incorrect-path. |
 | Per-task memory namespaces | Over-engineering. The 5 boundary types above (Isolation Boundaries) already cover the leakage paths; namespacing memory adds complexity without measured benefit. |
 | AI OS / agent runtime abstraction layer | The toolkit is the outer harness, not a runtime replacement. An abstraction layer would silently break inner-harness diversity — the harness contract is whatever the host runtime exposes, not a wrapper. |

@@ -1,13 +1,7 @@
 ---
 name: mk:problem-solving
 version: 1.0.0
-description: |
-  Use when stuck on approach (not debugging). Strategic unsticking via 7 non-default techniques:
-  simplification cascades, collision-zone thinking, meta-pattern recognition, inversion, scale game,
-  first principles, via negativa. Triggers on complexity spiraling, innovation block, recurring
-  patterns across domains, forced-assumption solutions, scale uncertainty, told-it's-impossible,
-  or bloated systems needing subtraction. For evidence-based root-cause debugging, use
-  mk:sequential-thinking instead.
+description: Unsticks a stalled approach by inversion, first principles, subtraction and scale shifts. NOT for mk:investigate.
 allowed-tools:
   - Read
   - Grep
@@ -22,7 +16,7 @@ keywords:
   - approach-design
   - decomposition
   - analytical-thinking
-when_to_use: Use when applying first-principles reasoning to a complex problem. General-purpose problem decomposition.
+when_to_use: The implementation path keeps spiralling and no option feels workable.
 user-invocable: true
 owner: research
 criticality: medium

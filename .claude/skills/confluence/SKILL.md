@@ -1,6 +1,6 @@
 ---
 name: mk:confluence
-description: 'Routing skill — recommends the correct mk:confluence-* leaf for any Confluence Cloud task. Triggers: ''confluence'', ''wiki page'', ''spec page'', ambiguous Confluence intent. NOT an executor — every actual operation forks via a leaf skill.'
+description: 'Confluence Cloud routing hub. Picks the mk:confluence-* leaf and forwards it. NOT an executor.'
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - atlassian-wiki
   - wiki
   - spec-page
-when_to_use: Use when user has a Confluence intent but the specific leaf isn't clear. NOT for direct execution — forward to mk:confluence-{specific}.
+when_to_use: 'Confluence or wiki work is wanted but the leaf is unclear; the hub body routes.'
 user-invocable: true
 owner: confluence
 criticality: medium

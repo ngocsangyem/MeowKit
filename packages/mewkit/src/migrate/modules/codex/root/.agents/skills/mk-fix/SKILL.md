@@ -38,7 +38,7 @@ If 3+ fix attempts fail, STOP and question the architecture — discuss with use
 - `--review` — Human-in-the-loop. Pause at each step.
 - `--quick` — Quick profile for a known cause and ≤2 files.
 - `--parallel` — Parallel `developer` agents per independent issue.
-- `--tdd` — Force regression test BEFORE the fix (writes the `.codex/session-state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
+- `--tdd` — Force regression test BEFORE the fix (writes the `.meowkit/state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
 - `--advice` — Opt-in strategic supervision for one run. At named checkpoints (`GUIDE → RESCUE* → REVIEW → RECHECK*`, hard cap 5) the workflow asks the `athena` agent to assess the situation, recommend an operational path inside the locked scope, and — after the work — review it against the evidence, with the power to return it for correction. Standard and deep profiles only. Supervision is evidence, never approval: it clears no gate, counts as no verification, and the three-failed-attempt human STOP below still fires on its own schedule. Without the flag, zero calls happen and no state is written. Contract: `.agents/skills/rule-advice-supervision/SKILL.md` (load it only when the flag is present). Checkpoints: the Advice Checkpoints section in `references/workflow-standard.md` / `references/workflow-deep.md`.
 
 ## Plan-First Gate
@@ -170,7 +170,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 Contract: the workflow-evidence conventions. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
 
-**Storage path:** `.codex/session-state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per the skill-authoring rules Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
+**Storage path:** `.meowkit/state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per the skill-authoring rules Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
 
 **Write points (standard/deep only):** Step 2.5 (init: skill, mode, task, planPath, phase, risk, fixDiagnosis) → Step 5 (verification) → Step 6 finalize (`approvals.gate2`/`ship` as `required|not_applicable`, `memory.gotchaWritten` / `memory.decisionWritten`).
 

@@ -1,6 +1,6 @@
 ---
 name: mk:delegate
-description: Build a context-isolated prompt for one subagent — task, work context, plan reference, file ownership, acceptance criteria and constraints — and emit it for review instead of invoking the Task tool. Use when handing a single bounded job to a subagent and the prompt must carry no session history. NOT for launching a parallel agent team in worktrees (see mk:team-config); NOT for coordinating multi-runtime staged jobs (see mk:orchestrate).
+description: Assemble a context-isolated subagent prompt — task, files, criteria, constraints — and emit it for review. NOT for mk:team-config.
 argument-hint: '[task description] [--silent]'
 source: local
 trust_level: kit-authored
@@ -16,7 +16,7 @@ keywords:
   - context-isolation
   - prompt-builder
   - subagent-handoff
-when_to_use: Use when one subagent needs a clean, bounded prompt. Assembles the delegation template and emits a reviewable prompt block; it never invokes the Task tool itself.
+when_to_use: One bounded job goes to a subagent and must carry no session history.
 user-invocable: true
 owner: lifecycle
 criticality: medium

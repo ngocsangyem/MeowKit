@@ -1,9 +1,12 @@
 # Sprint 9 — implementation evidence
 
-**Status of this record: SLICE A IMPLEMENTED.** Sprint 9 is being built in three sequential slices;
-this file's slice A section is the only one written so far. Slice B (integration descriptions) and
-slice C (all other metadata, the regeneration and the post-rewrite live run) follow and will append
-their own sections.
+**Status of this record: ALL SLICES IMPLEMENTED — A, B and C.** Sprint 9 was built in three
+sequential slices; this file carries all three sections, and slice C ends with the consolidated
+acceptance-criteria table (C.11) covering all **11** criteria. Nothing is committed: the whole
+sprint sits in the working tree awaiting Gate 2. Headline numbers: always-listed
+**113 798 B → 59 401 B** against the 70 000 B gate, metadata **88 381 B → 33 984 B** against the
+44 583 B ceiling, rules unchanged at **25 417 B**, and the live routing probe **7/7 before, 7/7
+after, zero route changes**.
 
 Base read: `tasks/contracts/261109-2052-meowkit-v3-lean-runtime-sprint-9.md` (status `signed`,
 11 criteria, `generator_signed: 5417d93a`, `evaluator_signed: e3d11871`, rounds 2).
@@ -441,3 +444,598 @@ Committed: **nothing yet** — the one commit this slice is allowed to make is b
    fourth anchor exemption**, or an explicit instruction to rename bundle headings (A.5).
 3. **The budget check exits 1 on the total** and will until slice C lands. Expected, not a defect.
 4. **Follow-up, unrelated:** `web-to-markdown`'s `fetch_as_markdown.py` import path (A.4 note 3).
+
+---
+
+## Slice B
+
+Scope: the **46 integration blocks** — 24 skills (`mk:jira` and `mk:confluence` hubs, 21
+`jira-*`/`confluence-*` leaves, `mk:story-sizer`) and 22 agents (16 `jira-*`, 5 `confluence-*`,
+`story-sizer`) — rewritten to a hub-naming one-liner plus the verb set. `[AC-05]` and the
+integration half of `[AC-04]`. Nothing outside the integration family was touched: no rule, no
+non-integration skill or agent (slice C), no codex/cursor bundle description.
+
+HEAD at slice start = `3f85e7ff` ("test: record pre-rewrite routing baseline for integration
+skills"), the committed pre-rewrite routing evidence. Slice A's work was uncommitted in the tree at
+slice start and is untouched by this slice. **Nothing is committed by this slice.**
+
+### B.1 Shape of the rewrite
+
+- **Leaf skill `description`:** `mk:<hub> leaf. <verb set>. NOT for <mk:id>.` — the hub id, the verb
+  set, one exclusion clause, and no restatement of hub selection logic. The routing table, the
+  disambiguation rules and the 10+-items / label-CRUD / CQL traps stay in the two hub bodies, which
+  are not always-listed and were not edited.
+- **Leaf skill `when_to_use`:** one concrete trigger phrase per leaf, distinct from the description
+  and from every other skill's.
+- **Hub `description`:** names the family, the `mk:<family>-*` leaf namespace it selects from, and
+  `NOT an executor`. The routing detail is in the body, by reference (`the hub body holds the
+  routing table`), not restated.
+- **Agent `description`:** `mk:<hub> executor for mk:<leaf>. <verb set>.` — the hub id, the leaf id
+  it is forked by, and the verbs. This is the string the host lists, so it carries the same
+  hub/verb pattern as the skills. Agents are not required to carry an exclusion clause (`[AC-04]`
+  scopes that requirement to skills), and omitting it is what buys the agent half its margin.
+
+Every edit is confined to the `description:` and `when_to_use:` scalars. Verified mechanically: for
+each of the 46 files, the parsed frontmatter key **set** is identical to `HEAD` and every one of
+`name`, `phase`, `source`, `keywords`, `owner`, `criticality`, `status`, `runtime`,
+`requires_runtime`, `requires_external_service`, `default_enabled`, `user-invocable` and
+`dependency_edges` is byte-equal to `HEAD` — **0 violations over 46 files**. `git diff
+--name-status -- .claude` shows **no** rename, add or delete, so no path moved and no block was
+unshipped or re-flagged. Both hubs are still `default_enabled: false` with
+`requires_external_service`, exactly as at POST-8.
+
+### B.2 Per-block before/after bytes
+
+Measured by `scripts/check-always-on-budget.cjs`'s own extractor (`measureMetadata`) — the ship set
+from `kit-ship-set.cjs`, frontmatter YAML-parsed, `Buffer.byteLength` over the scalar values of
+`name` + `description` + `when_to_use` (skills) and `name` + `description` (agents). "Before" is the
+same extractor applied to `git show HEAD:<path>`.
+
+| block | kind | before B | after B | delta | after net of `name` |
+|---|---|---|---|---|---|
+| `confluence-bulk` | agent | 295 | 99 | -196 | 84 |
+| `confluence-collaborate` | agent | 219 | 103 | -116 | 81 |
+| `confluence-page` | agent | 399 | 93 | -306 | 78 |
+| `confluence-search` | agent | 325 | 93 | -232 | 76 |
+| `confluence-spec-analyst` | agent | 385 | 98 | -287 | 75 |
+| `jira-admin` | agent | 279 | 84 | -195 | 74 |
+| `jira-agile` | agent | 274 | 88 | -186 | 78 |
+| `jira-analyst` | agent | 335 | 88 | -247 | 76 |
+| `jira-bulk` | agent | 344 | 82 | -262 | 73 |
+| `jira-collaborate` | agent | 248 | 90 | -158 | 74 |
+| `jira-dev` | agent | 263 | 80 | -183 | 72 |
+| `jira-estimator` | agent | 239 | 88 | -151 | 74 |
+| `jira-evaluator` | agent | 232 | 91 | -141 | 77 |
+| `jira-fields` | agent | 308 | 87 | -221 | 76 |
+| `jira-issue` | agent | 475 | 88 | -387 | 78 |
+| `jira-jsm` | agent | 362 | 80 | -282 | 72 |
+| `jira-lifecycle` | agent | 309 | 92 | -217 | 78 |
+| `jira-ops` | agent | 238 | 81 | -157 | 73 |
+| `jira-relationships` | agent | 259 | 91 | -168 | 73 |
+| `jira-search` | agent | 271 | 89 | -182 | 78 |
+| `jira-time` | agent | 216 | 81 | -135 | 72 |
+| `story-sizer` | agent | 299 | 90 | -209 | 79 |
+| `mk:confluence` | skill (hub) | 389 | 186 | -203 | 173 |
+| `mk:confluence-bulk` | skill | 507 | 180 | -327 | 162 |
+| `mk:confluence-collaborate` | skill | 535 | 186 | -349 | 161 |
+| `mk:confluence-page` | skill | 627 | 192 | -435 | 174 |
+| `mk:confluence-search` | skill | 570 | 170 | -400 | 150 |
+| `mk:confluence-spec-analyst` | skill | 802 | 213 | -589 | 187 |
+| `mk:jira` | skill (hub) | 330 | 183 | -147 | 176 |
+| `mk:jira-admin` | skill | 584 | 177 | -407 | 164 |
+| `mk:jira-agile` | skill | 480 | 183 | -297 | 170 |
+| `mk:jira-analyst` | skill | 595 | 190 | -405 | 175 |
+| `mk:jira-bulk` | skill | 447 | 180 | -267 | 168 |
+| `mk:jira-collaborate` | skill | 468 | 174 | -294 | 155 |
+| `mk:jira-dev` | skill | 503 | 161 | -342 | 150 |
+| `mk:jira-estimator` | skill | 424 | 172 | -252 | 155 |
+| `mk:jira-evaluator` | skill | 405 | 187 | -218 | 170 |
+| `mk:jira-fields` | skill | 489 | 189 | -300 | 175 |
+| `mk:jira-issue` | skill | 527 | 168 | -359 | 155 |
+| `mk:jira-jsm` | skill | 571 | 166 | -405 | 155 |
+| `mk:jira-lifecycle` | skill | 478 | 174 | -304 | 157 |
+| `mk:jira-ops` | skill | 432 | 169 | -263 | 158 |
+| `mk:jira-relationships` | skill | 421 | 167 | -254 | 146 |
+| `mk:jira-search` | skill | 459 | 172 | -287 | 158 |
+| `mk:jira-time` | skill | 466 | 168 | -298 | 156 |
+| `mk:story-sizer` | skill | 658 | 185 | -473 | 171 |
+| **46 blocks** | | **18 741** | **6 248** | **−12 493** | **5 592** |
+
+### B.3 The 46-block total against the cap
+
+| figure | contract | measured | verdict |
+|---|---|---|---|
+| 46-block total | ≤ **6 900 B** | **6 248 B** | PASS, 652 B of headroom |
+| 46-block total net of `name` | ≤ **6 244 B** | **5 592 B** | PASS, 652 B of headroom |
+| immovable `name` floor | 656 B (skills 371 + agents 285) | **656 B** unchanged | PASS |
+| per-block average net of `name` | budget 135.7 B | **121.6 B** actual | PASS |
+| saving credited to this criterion | ≥ 11 841 B | **12 493 B** | PASS, 652 B better than planned |
+
+Always-listed moves **113 798 B → 101 305 B**. The remaining overage against the 70 000-byte gate is
+**31 305 B** — 652 B less than the 31 957 B the contract assigned to the other 124 blocks, so slice
+C inherits a slightly easier number, not a harder one. Subtotals after slice B: rules **25 417**
+(unchanged, `git diff -- .claude/rules/` empty), skills **66 181** (`name` 1 806, `description`
+41 845, `when_to_use` 22 530), agents **9 707** (`name` 473, `description` 9 234).
+
+**One honest non-pass to read:** the check's *reference* per-item figure for
+`skill (integration)` is 150 B including `name`, and **24 of 24** integration skills are over it
+(161–213 B); `agent (integration)` is **0 of 22** over. That figure is `D1`/`D7` reporting output and
+explicitly **not** a gate — the enforced integration number is the 46-block aggregate, which passes
+with 652 B spare. It is over per-skill because a skill carries two measured fields where an agent
+carries one; the contract's own 135.7 B arithmetic is an average over all 46, and the measured
+average is 121.6 B.
+
+### B.4 Omission table — exclusion clauses
+
+**Empty. All 24 integration skills carry an exclusion clause; none omitted it.**
+
+| integration skill | clause omitted? | clause carried |
+|---|---|---|
+| `mk:jira` (hub) | no | `NOT an executor.` |
+| `mk:confluence` (hub) | no | `NOT an executor.` |
+| `mk:jira-issue` | no | `NOT for mk:jira-bulk.` |
+| `mk:jira-search` | no | `NOT for mk:jira-bulk.` |
+| `mk:jira-lifecycle` | no | `NOT for mk:jira-bulk.` |
+| `mk:jira-collaborate` | no | `NOT for mk:jira-relationships.` |
+| `mk:jira-relationships` | no | `NOT for mk:jira-agile.` |
+| `mk:jira-time` | no | `NOT for mk:jira-agile.` |
+| `mk:jira-agile` | no | `NOT for mk:jira-estimator.` |
+| `mk:jira-fields` | no | `NOT for mk:jira-issue.` |
+| `mk:jira-bulk` | no | `NOT for mk:jira-issue.` |
+| `mk:jira-jsm` | no | `NOT for mk:jira-admin.` |
+| `mk:jira-admin` | no | `NOT for mk:jira-jsm.` |
+| `mk:jira-dev` | no | `NOT for mk:ship.` |
+| `mk:jira-ops` | no | `NOT for mk:jira-admin.` |
+| `mk:jira-evaluator` | no | `NOT for mk:jira-estimator.` |
+| `mk:jira-estimator` | no | `NOT for mk:story-sizer.` |
+| `mk:jira-analyst` | no | `NOT for mk:jira-evaluator.` |
+| `mk:confluence-page` | no | `NOT for mk:confluence-collaborate.` |
+| `mk:confluence-search` | no | `NOT for mk:confluence-page.` |
+| `mk:confluence-spec-analyst` | no | `NOT for mk:confluence-page.` |
+| `mk:confluence-bulk` | no | `NOT for mk:confluence-page.` |
+| `mk:confluence-collaborate` | no | `NOT for mk:confluence-page.` |
+| `mk:story-sizer` | no | `NOT for mk:jira-estimator.` |
+
+`mk:story-sizer` is **not** recorded as hubless: its description opens `mk:jira family.`, naming the
+hub it belongs to while keeping it out of the `mk:jira-*` leaf namespace it is not a leaf of.
+
+**Every `mk:*` id named in any of the 46 blocks resolves** to a directory under `.claude/skills/` —
+scripted over both fields of all 46 blocks, zero misses. The only two non-resolving tokens are the
+hub descriptions' `mk:jira-*` and `mk:confluence-*` **namespace wildcards**, which are not ids and
+were present at POST-8 in the same form; `bash scripts/check-skill-cross-refs.sh` is green on them.
+
+### B.5 Hub leaf-list check
+
+| hub | leaves in the family | leaf ids missing from the hub body |
+|---|---|---|
+| `mk:jira` | 16 (`mk:jira-admin … mk:jira-time`) | **none** |
+| `mk:confluence` | 5 (`mk:confluence-bulk … mk:confluence-spec-analyst`) | **none** |
+
+21 leaves, 21 reachable from their hub by name. Neither hub body was edited by this slice — the
+routing tables and the disambiguation rules that were already there are what the shortened leaves
+now defer to, which is the direction `D5` requires (detail in the hub, in exactly one place).
+
+### B.6 Routing specs j13–j19 still match their target leaf by construction
+
+The spec files were **not** edited. Each spec's prompt against the rewritten metadata of its
+`expected_route`:
+
+| spec | prompt hook | rewritten metadata of the expected leaf |
+|---|---|---|
+| `j13` → `mk:jira-issue` | "due date and priority on PROJ-412" | `Single-issue CRUD - create, read, update fields, delete` / `One Jira issue by key - open it, edit its fields` |
+| `j14` → `mk:jira-bulk` | "label … all 40 open bugs" | `10+ issues at once - transition, assign, label, clone, delete` / `sweeping ten or more issues in one pass`; `mk:jira-issue` carries `NOT for mk:jira-bulk` |
+| `j15` → `mk:jira-agile` | "backlog into next sprint + story-point total" | `Epics, sprints, backlog, ranking, story points, velocity` / `Move items between Jira sprints or backlog, or read sprint point totals`; `NOT for mk:jira-estimator`, and `mk:jira-estimator` is scoped to `one ticket` |
+| `j16` → `mk:jira-time` (vi) | "3 giờ làm việc … báo cáo thời gian" | `Log work, list or edit worklogs, estimates, time reports` / `Log hours against a Jira ticket or pull a worklog time report` |
+| `j17` → `mk:confluence-search` | "page in ENG labelled runbook, currentUser()" | `CQL search, space listing, saved filters, export` / `Find Confluence pages by CQL, space, label or author` |
+| `j18` → `mk:confluence-spec-analyst` | "which acceptance criteria are missing" | `Spec report of requirements, acceptance criteria, gaps, stories` / `find missing acceptance criteria in a Confluence spec` |
+| `j19` → `mk:confluence-collaborate` | "Label the page Release Checklist" | `Comments, attachments, label CRUD, watchers on one page`; `mk:confluence-page` carries `NOT for mk:confluence-collaborate` |
+
+The two documented traps are preserved in the always-listed text, not only in the hub body: the
+10+-items boundary (`j14`) sits in `mk:jira-bulk`'s own description with a reciprocal exclusion on
+`mk:jira-issue`, and label CRUD belonging to `mk:confluence-collaborate` even for one page (`j19`)
+sits in collaborate's description with a reciprocal exclusion on `mk:confluence-page`.
+
+**No routing-correctness claim is made for the rewritten metadata.** The post-rewrite live run is
+slice C's; `routing-live.md` still marks its after-half not-yet-recorded. The table above is a
+construction argument, not a measurement.
+
+### B.7 No duplicated or degenerate text
+
+Scripted over **all 128** shipped skills and **all 42** shipped agents, not only the 46:
+
+- duplicate `description` values: **0**
+- duplicate `when_to_use` values: **0**
+- empty / whitespace-only `description` or `when_to_use`: **0**
+- `description` or `when_to_use` equal to `name`: **0**
+- shipped counts unchanged: **128** skills, **42** agents, every one with a non-empty `name`,
+  `description` and (skills) `when_to_use`
+
+### B.8 Mirror surface regenerated — `[AC-11]`
+
+`node scripts/docs-manifest.cjs --check` reported 46 changed entries (`description` + `sourceHash`)
+and 2 stale generated index sections. Regenerated with `--write`:
+
+```
+✓ wrote packages/docs/docs-reference-manifest.json — 171 artifact(s)
+✓ spliced 0 of 171 reference page(s)
+✓ spliced 2 of 3 index page(s)
+```
+
+`--check` then exits **0**. The manifest still holds **171** entries (129 skills incl.
+`mk:benchmark`, 42 agents) against the budget's 170 blocks — the one-entry difference is recorded as
+correct and was not reconciled. Changed docs files: `packages/docs/docs-reference-manifest.json`,
+`packages/docs/content/docs/reference/skills/index.mdx`,
+`packages/docs/content/docs/reference/agents/index.mdx`.
+
+### B.9 Gate run on the finished slice B tree
+
+| Check | Result |
+|---|---|
+| `npm run build` | pass |
+| `npm run lint` | **0 errors** (3 pre-existing warnings, unchanged) |
+| `npm run typecheck` | pass |
+| `npm test` (vitest) | **300 files / 3380 tests, all pass** |
+| `node --test .claude/hooks/__tests__/*.test.cjs` (golden replay + hook suites) | **47/47 pass** |
+| `python3 tests/journey-validation/check-journey-specs.py` | exit 0 (19 journeys) |
+| `node packages/mewkit/dist/index.js validate --frontmatter` | exit 0 |
+| `… --packs` / `--gates` / `--docs-refs` / `--workflow` / `--substrate` | all exit 0 |
+| `bash scripts/check-skill-cross-refs.sh` | exit 0 |
+| `node scripts/docs-manifest.cjs --check` | exit 0 (after `--write`) |
+| `node scripts/check-dangling-rule-refs.cjs` | exit 0 |
+| `node scripts/check-rule-survival.cjs` | exit 0 |
+| `node scripts/check-kit-verbs.cjs` | exit 0 |
+| `node scripts/harness-inventory.cjs --check` | exit 0 |
+| `node scripts/generate-cli-manual.cjs --check` | exit 0 (unchanged no-op) |
+| `bash scripts/check-hook-registration.sh` | exit 0 |
+| `node scripts/check-node-only-runtime.cjs .` | exit 0 |
+| `node scripts/check-no-python.cjs --allow-existing-envs` | exit 0 |
+| `node scripts/check-always-on-budget.cjs .` | **exit 1 — total only, expected** (see B.3) |
+
+The budget check's two comparisons after slice B:
+
+```
+measured: rules 25417 B (limit 25600), always-listed 101305 B (limit 70000)
+FAIL: always-listed rules plus metadata are 31305 bytes over the 70000-byte budget (101305 B).
+```
+
+The rules comparison passes (**25 417 ≤ 25 600**) and `[AC-03]`'s stricter acceptance also holds
+(**25 417 ≤ 25 417**, `git diff -- .claude/rules/` empty) — no byte of the integration cut was paid
+for out of the always-on rules.
+
+### B.10 Plan-artifact token sweep
+
+`git diff -- . ':!tasks' | grep '^+'` grepped for `phase-0`, `sprint-?[0-9]`, `AC-[0-9]`,
+`Round [0-9]` and `Amendment` returns the **same two** hits slice A already recorded (A.8) — the
+pre-existing `"source": ["tasks/plans/260610-x/phase-02-*.md", …]` sample line in the two bundle
+copies. **Slice B adds zero new hits.**
+
+### B.11 What slice B changed
+
+Committed: **nothing**.
+
+| Path | Change |
+|---|---|
+| `.claude/skills/{jira,confluence}/SKILL.md` | hub `description` + `when_to_use` rewritten; bodies untouched |
+| `.claude/skills/{jira-*,confluence-*}/SKILL.md` (21 leaves) | `description` → hub id + verb set + exclusion clause; `when_to_use` → one concrete trigger |
+| `.claude/skills/story-sizer/SKILL.md` | names `mk:jira family`, verb set, exclusion clause |
+| `.claude/agents/{jira-*,confluence-*,story-sizer}.md` (22) | `description` → `mk:<hub> executor for mk:<leaf>. <verbs>.` |
+| `packages/docs/docs-reference-manifest.json` | regenerated (46 `description` + `sourceHash` entries) |
+| `packages/docs/content/docs/reference/{skills,agents}/index.mdx` | `GENERATED:reference-index` blocks re-spliced |
+
+### B.12 Open items handed to the orchestrator
+
+1. **Slice A's Gate 2 ordering block is now resolved for this slice**: the pre-rewrite routing
+   evidence is committed at `3f85e7ff`, so the metadata edits in this slice land strictly after it.
+   Amendment 1's override conditions (evidence commit an ancestor of the code commit; no metadata
+   commit between them; spec hunks matching `routing-specs-before.md`) are satisfiable from here —
+   this slice committed nothing and touched no spec or validator file.
+2. **`check-always-on-budget.cjs` still exits 1 on the total** (31 305 B over). Expected; slice C
+   owns it, and inherits 652 B of credit from this slice.
+3. **The reference per-item figure for `skill (integration)` (150 B) is exceeded by all 24**
+   integration skills while the enforced 46-block aggregate passes with 652 B spare (B.3). Flagged
+   so the evaluator reads it as reporting output rather than a breach.
+
+---
+
+## Slice C
+
+Scope: the **104** non-integration shipped skills' `description` and `when_to_use` (C1 = 51 blocks,
+C2 = 53 blocks), the post-rewrite half of the live routing run, the regeneration of the one mirror
+surface, and the full gate run on the finished tree. **Nothing is committed by any slice.**
+
+HEAD throughout slice C = `3f85e7ff` (the pre-rewrite routing-evidence commit). Slices A, B, C1 and
+C2 are present as uncommitted working-tree changes; every figure below is measured on that tree.
+
+### C.1 The two rewrite batches — per-block tables
+
+The per-block before/after byte tables live next to this file so this record stays readable:
+
+- **`slice-c1-table.md`** — 51 blocks, **31 107 B → 10 048 B** (**−21 059 B**), average **197.0 B**
+  against the 280 B reference figure. Frontmatter key-set isolation verified per file: 0 violations.
+- **`slice-c2-table.md`** — 53 blocks, **30 782 B → 9 937 B** (**−20 845 B**), average **187.5 B**.
+  Key set, every other key and the body after the frontmatter byte-equal to `HEAD`: 0 violations.
+
+Combined: **104 blocks, 61 889 B → 19 985 B, −41 904 B**, average **192.2 B** per block including
+the immovable `name` — comfortably inside the contract's **290.8 B** per-non-integration-block
+arithmetic. Both batches used the same shape: `description` = the job in one clause plus one
+`NOT for mk:<id>.` exclusion naming the nearest confusable neighbour; `when_to_use` = one concrete
+trigger, never a restatement.
+
+### C.2 The 20 non-integration agents were NOT rewritten — recorded as a decision
+
+Measured on the finished tree: the 20 non-integration agents are **7 751 B**, average **387.6 B** —
+**byte-identical to POST-8**, where the same 20 measured 7 751 B at the same 387.6 B average. Their
+`description` values were not touched by any slice (the diff over the 20 files is empty).
+
+This is deliberate, and it is a judgment the evaluator should read rather than discover:
+
+- **The gate is met without them.** Always-listed is **59 401 B** against the **70 000 B** ceiling —
+  **10 599 B** of headroom — and the metadata half is **33 984 B** against the **≤44 583 B**
+  ceiling, also **10 599 B** under. Rewriting the 20 agents would buy roughly 2–3 KB of headroom the
+  sprint does not need.
+- **No criterion requires it.** `AC-01` enforces one total and a field-presence floor. `AC-04`'s
+  exclusion-clause requirement is scoped to "every **non-integration** shipped **skill**'s
+  `description`"; for agents it requires only non-empty, non-restating `description` values, which
+  all 20 satisfy. `AC-05` covers the 22 **integration** agents, which slice B did rewrite
+  (6 574 B → 1 956 B). No AC says every block must be cut.
+- **What it costs.** The check's *reference* per-item figure for `agent` is 250 B and **19 of 20**
+  are over it (the largest: `athena` 729 B, `project-manager` 556 B, `researcher` 513 B,
+  `explore` 484 B, `brainstormer` 474 B). That figure is `D1`/`D7` reporting output and explicitly
+  not a gate. Reading it as a breach would be reading a sizing aid as a ceiling.
+- **The honest trade.** An agent `description` is what the orchestrator routes on when delegating,
+  and these 20 are the general-purpose agents (`athena`, `researcher`, `explore`, `evaluator`,
+  `security`, …) whose descriptions carry delegation criteria rather than marketing. Cutting them to
+  ~250 B with no routing evidence available for agents — the live probe covers integration **skills**
+  only — would spend routing quality to buy headroom the budget does not ask for. If a later sprint
+  wants the remaining ~2–3 KB, the descending item list the check prints names every one of them.
+
+### C.3 The `mk:advise` / `mk:grill` exclusion trade-off
+
+These were the two largest skill metadata blocks at POST-8 (**1 425 B** and **1 208 B**) and both
+owed their size to a stack of four exclusion clauses each. After the rewrite each carries **one**:
+
+| block | before | after | exclusions before | exclusion kept |
+|---|---|---|---|---|
+| `mk:advise` | 1 425 B | **244 B** | `mk:grill`, `mk:brainstorming`, `mk:office-hours`, `mk:party` | `NOT for mk:party.` |
+| `mk:grill` | 1 208 B | **204 B** | `mk:brainstorming`, `mk:office-hours`, `mk:ask-me`, `mk:plan-ceo-review` | `NOT for mk:advise.` |
+
+The trade-off, stated plainly: **six of the eight exclusion targets are no longer in always-listed
+metadata.** They are still in the skill bodies, which are not always-listed and are read only once a
+skill is selected — so the disambiguation survives *after* selection but no longer participates *in*
+it. For this pair that is the sharpest loss in the sprint, because `mk:advise` and `mk:grill` are
+genuinely adjacent (both interview one question at a time; only `advise` ends in a verdict).
+
+What was kept is the edge each block most needs in a one-line budget: `mk:grill` names `mk:advise`
+directly, so the pair is disambiguated **once**, from the grill side, inside always-listed bytes;
+`mk:advise` spends its one clause on `mk:party` (several perspectives arguing) because its own
+`description` already says "ONE verdict", which is the distinction from `grill`.
+
+**One correction to `slice-c1-table.md` note 3:** it lists `mk:advise` ↔ `mk:grill` as a *reciprocal*
+pair. It is not — `mk:advise` names `mk:party`, `mk:grill` names `mk:advise`. The disambiguation is
+one-directional, and that is what the measured text says.
+
+### C.4 Final budget numbers — `[AC-01]`, `[AC-03]`
+
+`PATH=/opt/homebrew/opt/node@24/bin:$PATH node scripts/check-always-on-budget.cjs .` → **exit 0**:
+
+```
+measured: rules 25417 B (limit 25600), always-listed 59401 B (limit 70000)
+OK: 183 B of rules headroom, 10599 B of always-listed headroom.
+```
+
+| figure | POST-8 | finished tree | contract ceiling | verdict |
+|---|---|---|---|---|
+| rules (7 files) | 25 417 B | **25 417 B** | ≤25 600 enforced, ≤25 417 this sprint | PASS, 183 B headroom, diff empty |
+| skills (128) | 74 056 B | **24 277 B** | — | −49 779 B |
+| · skills `name` / `description` / `when_to_use` | 1 806 / 47 442 / 24 808 | **1 806 / 13 933 / 8 538** | — | `name` floor untouched |
+| agents (42) | 14 325 B | **9 707 B** | — | −4 618 B (all of it integration) |
+| · agents `name` / `description` | 473 / 13 852 | **473 / 9 234** | — | `name` floor untouched |
+| metadata (skills + agents) | 88 381 B | **33 984 B** | ≤44 583 B | PASS, 10 599 B under |
+| **always-listed total** | **113 798 B** | **59 401 B** | **≤70 000 B** | **PASS, 10 599 B headroom** |
+| required cut | — | **−54 397 B** achieved | ≥43 798 B | PASS, 10 599 B beyond target |
+
+The metadata cut is **61.5 %** of the POST-8 metadata and **47.8 %** of the POST-8 always-listed
+total. **No byte of it came from the always-on rules**: the diff over `.claude/rules/` is empty
+across all slices and the rules subtotal is exactly its POST-8 value.
+
+**Independently re-derived**, as `AC-01` requires, with a throwaway script that reads the ship set
+through `kit-ship-set.cjs`'s own module API and YAML-parses each frontmatter itself (no shared code
+with the committed check beyond the ship-set module):
+
+```
+shipSetFiles 1155 | skills 128 | agents 42 (44 .md, 2 frontmatter-less indexes excluded by the parse)
+rules 25417 | skills 24277 (name 1806, description 13933, when_to_use 8538)
+agents 9707 (name 473, description 9234) | metadata 33984 | total 59401
+benchmark in ship set: false
+```
+
+Every figure agrees with the committed check **exactly**. `skills/benchmark/SKILL.md` is absent from
+the ship set, as designed, and its exclusion is not counted as a saving.
+
+### C.5 Field presence, duplicate text and id resolution — `[AC-04]`, `[AC-05]`
+
+Scripted over **all 128** shipped skills and **all 42** shipped agents on the finished tree:
+
+| assertion | result |
+|---|---|
+| skills with non-empty `name`, `description` **and** `when_to_use` | **128 / 128** |
+| agents with non-empty `name` **and** `description` | **42 / 42** |
+| `description` or `when_to_use` equal to `name` | **0** |
+| duplicate `description` across all 170 blocks (skills **and** agents in one pool) | **0** |
+| duplicate `when_to_use` across all 128 skills | **0** |
+| non-integration skills carrying an exclusion clause | **104 / 104** |
+| integration skills carrying one (exempt, but all carry it) | **24 / 24** — omission table empty (B.4) |
+| `mk:*` ids named in a `NOT for` clause | **126**, **0 unresolved** |
+| any `mk:*` token in the measured fields that does not resolve | **2**, both the hub namespace wildcards `mk:jira-*` / `mk:confluence-*` — not ids, present at POST-8 in the same form |
+| 46 integration blocks, total / net of `name` | **6 248 B** ≤ 6 900 · **5 592 B** ≤ 6 244 |
+| 104 non-integration skills, average per block | **192.2 B** against the 290.8 B arithmetic |
+| 20 non-integration agents, average per block | **387.6 B** — unchanged, C.2 |
+
+### C.6 Post-rewrite live routing run — `[AC-07]`, after-half
+
+Re-ran the committed driver `routing-probe.md` against the **new** metadata, same command shape,
+same seven prompts, cwd `$TMPDIR/mk-routing-post` (outside the repository), all writing tools on
+`--disallowed-tools`, no secret or environment variable passed:
+
+```
+cd "$TMPDIR/mk-routing-post" && /Users/sangnguyen/.local/bin/claude -p \
+  --output-format json --disallowed-tools Bash Edit Write WebFetch WebSearch < prompt-<spec-id>.txt
+```
+
+Model id reported for every call: **`claude-opus-5-5`**. Verbatim results, the per-spec verdicts and
+the leaf-for-leaf before/after comparison are appended to **`routing-live.md`**; the rendered
+post-rewrite metadata block is committed as **`routing-metadata-after.md`**.
+
+| | before (pre-rewrite) | after (post-rewrite) |
+|---|---|---|
+| metadata surface fed to the model | **13 103 B** | **5 228 B** (−60.1 %) |
+| specs attempted | 7 (`j13`–`j19`) | 7 (`j13`–`j19`) |
+| exit 0 | 7 | 7 |
+| selected the `expected_route` leaf | **7 / 7** | **7 / 7** |
+| route changes | — | **zero** |
+
+**No metadata was edited to chase a result.** The after-state is the first and only post-rewrite
+run; no route regressed, so no corrective edit and no second run was needed. Had one regressed, both
+runs would be in `routing-live.md`. Honest qualification, carried from the before-half: these are
+single samples at temperature defaults, over the integration metadata only — evidence that the
+shortened surface is *sufficient* for these seven selections, not a stability estimate, and not a
+claim about the 104 non-integration blocks, which the probe does not cover.
+
+Branch chosen, named here as `AC-07` requires: **(a) a recorded live run.** Branch (b) is not taken
+and no deferral record exists. `routing-live.md` is the only artifact at that path.
+
+### C.7 Mirror surface regenerated, and the regenerators are idempotent — `[AC-11]`
+
+`node scripts/docs-manifest.cjs --check` reported **104** stale entries (`description` +
+`sourceHash`, exactly the C1+C2 blocks) and 1 stale generated index section. Regenerated:
+
+```
+✓ wrote packages/docs/docs-reference-manifest.json — 171 artifact(s)
+✓ spliced 0 of 171 reference page(s)
+✓ spliced 1 of 3 index page(s)
+```
+
+`--check` then exits **0**: "manifest and 171 reference page(s) match the live .claude/ tree".
+
+| assertion | result |
+|---|---|
+| manifest entries | **171** — **129** skills (incl. `mk:benchmark`) + **42** agents |
+| the 171-vs-170 difference | `mk:benchmark`, present in the manifest, absent from the ship set — **recorded as correct, not reconciled** |
+| `harness-inventory.cjs --check` | exit 0 (check-only script, it has no `--write`; inventory counts unchanged) |
+| `generate-cli-manual.cjs --check` | exit 0 — **a no-op for this rewrite**, asserted as "still green", never as propagation evidence |
+| second regenerator run changes nothing | the working-tree status listing is **byte-identical** across runs (221 entries both times), and the three generated files' SHA-256 are unchanged by a third `--write` |
+
+The status listing is non-empty only because **the sprint is deliberately uncommitted**; what
+`AC-11` tests — that regenerating adds no further diff — is proven by the idempotency row. The
+criterion's literal empty-status assertion is re-checkable in one command after the code commit.
+
+### C.8 Gate run on the finished tree (Node 24, `v24.22.2`)
+
+| Check | Result |
+|---|---|
+| `npm run build` | **exit 0** |
+| `npm run lint` | **exit 0 — 0 errors**, 3 pre-existing warnings (unchanged) |
+| `npm run typecheck` | **exit 0** |
+| `npm test` (vitest) | **exit 0 — 300 files / 3 380 tests, all pass** (incl. `tests/always-on-budget-ceilings.test.ts`, 5 cases) |
+| `node --test .claude/hooks/__tests__/*.test.cjs` | **exit 0 — 47 / 47 pass** |
+| `npx vitest run tests/hooks` (golden replay, crash paths, dispatcher, isolation, env allowlist) | **exit 0 — 15 files / 297 tests** |
+| `python3 tests/journey-validation/check-journey-specs.py` | **exit 0 — 19 journeys frozen** |
+| `node scripts/check-always-on-budget.cjs .` | **exit 0** — rules 25 417 / 25 600, total 59 401 / 70 000 |
+| `node scripts/check-rule-survival.cjs` | **exit 0** — 61 pinned items over 7 always-on files |
+| `node scripts/check-dangling-rule-refs.cjs` | **exit 0** — 8 658 files scanned, 22 destinations resolve |
+| `bash scripts/check-skill-cross-refs.sh` | **exit 0** |
+| `node scripts/check-kit-verbs.cjs` | **exit 0** — 288 references over 24 commands |
+| `node scripts/check-node-only-runtime.cjs .` | **exit 0** |
+| `node scripts/check-no-python.cjs --allow-existing-envs` | **exit 0** — 26 checks |
+| `node scripts/harness-inventory.cjs --check` | **exit 0** |
+| `node scripts/docs-manifest.cjs --check` | **exit 0** (after `--write`) |
+| `node scripts/generate-cli-manual.cjs --check` | **exit 0** (no-op) |
+| `node scripts/link-checker.cjs` | **exit 0** — all links valid |
+| `bash scripts/check-hook-registration.sh` | **exit 0** — 6 hooks registered, `SubagentStart` still empty |
+| built CLI `validate` | **exit 0 — 39 passed, 0 failed**, 34 warnings, 1 n/a |
+| `validate --frontmatter` / `--packs` / `--gates` / `--docs-refs` / `--workflow` / `--substrate` / `--memory` | **exit 0 each, 0 FAIL** |
+| `node packages/mewkit/scripts/codex-compat-check.mjs` (packaged `validate --target codex`) | **exit 0 — Lane: OK** |
+| `doctor --hard-gates` (retired `MEOWKIT_*` vars unset via `env -u`) | **exit 0 — 26 passed, 0 FAIL**, 5 warnings |
+
+**On the 34 `validate` warnings:** 31 are `intent "<x>" maps to multiple capabilities`. Those
+intents are **not** derived from `description` — `build-capabilities.ts:41`'s `inferredIntents()`
+reads the `keywords` frontmatter array, which **no slice touched**. So the rewrite cannot have
+created or removed one; they are pre-existing and are `WARN` by design ("inferred keywords can
+legitimately overlap", `validate-capabilities.ts:108`). The remaining 3 are the substrate,
+provider-token-baseline and provider-operations warnings already present before the sprint.
+
+`doctor --hard-gates` was run with `MEOWKIT_TDD`, `MEOWKIT_BUILD_VERIFY`, `MEOWKIT_LOOP_DETECT`,
+`MEOWKIT_PRECOMPLETION`, `MEOWKIT_TDD_FLAG_DETECTOR`, `MEOWKIT_MEMORY_BUDGET`,
+`MEOWKIT_BUDGET_WARN` and `MEOWKIT_BUDGET_BLOCK` unset, so no inherited session variable could
+soften a gate probe. All four Gate 1 / Gate 2 probes, the privacy block and both injection probes
+PASS.
+
+### C.9 Duplicate-text and `NOT for` sweeps across skills **and** agents
+
+Run as one pool so a skill and an agent cannot share a string either: **0** duplicate `description`
+values across the 170 blocks, **0** duplicate `when_to_use` values across the 128 skills, **0**
+empty or `name`-restating fields, **126** `NOT for` ids all resolving to a directory under
+`.claude/skills/`, and the only two non-resolving `mk:` tokens are the hub namespace wildcards
+(C.5). So the cut was not achieved by collapsing blocks onto boilerplate.
+
+### C.10 Plan-artifact token sweep
+
+The working diff excluding `tasks/`, added lines only, grepped for `phase-0`, `sprint-?[0-9]`,
+`AC-[0-9]`, `Round [0-9]` and `Amendment` returns the **same two** hits slices A and B already
+recorded — the pre-existing `"source": ["tasks/plans/260610-x/phase-02-*.md", …]` sample line in the
+two bundle copies, in the diff only because the state path on the same line changed. **Slice C adds
+zero.** No added or changed file name, test name, script name or code comment carries a
+plan-artifact token; the one new file name in the sprint,
+`tests/always-on-budget-ceilings.test.ts`, is domain-named.
+
+### C.11 Acceptance criteria — status on the finished, uncommitted tree
+
+| AC | Status | Evidence |
+|---|---|---|
+| **AC-01** always-listed ≤70 000 B by the named extractor | **PASS** | C.4 — **59 401 B**, metadata **33 984 B** ≤ 44 583, cut **54 397 B** ≥ 43 798; independent re-derivation agrees exactly; 128 skills / 42 agents, zero missing fields; `benchmark` absent from the ship set |
+| **AC-02** one check, two comparisons over two disjoint sets | **PASS** | A.3 and its scratch probes, now in `tests/always-on-budget-ceilings.test.ts` (5 cases, green in `npm test`); finished tree exit 0; one extractor, one script, one CI invocation |
+| **AC-03** the cut is not paid for out of the rules | **PASS** | C.4 — rules **25 417 B** = POST-8, the `.claude/rules/` diff **empty**; 25 600 still an exit-non-zero condition (probe in A.3); `check-rule-survival.cjs` exit 0; all five safety files present |
+| **AC-04** one job, one real exclusion, every id resolves | **PASS** | C.5 — 104/104 non-integration skills carry a clause, 126 ids, **0 unresolved**, 0 duplicates, 0 empty/restating; `validate --frontmatter` and `check-skill-cross-refs.sh` exit 0 |
+| **AC-05** leaves name hub and verbs; nothing moves or disables | **PASS** | B.3–B.5 and C.5 — 46 blocks **6 248 B** ≤ 6 900 (net **5 592 B** ≤ 6 244), omission table empty, 21/21 leaves named by their hub, `default_enabled` / `requires_external_service` / `dependency_edges` / paths unchanged |
+| **AC-06** ≥6 `j13…` specs, all three literals, specs land first | **PASS on content, ordering PENDING the code commit** | A.1 — 7 specs `j13`–`j19`, 12 fields each, `model:routing`, `["live"]`, `active`; the three `12` literals and `REQUIRED_IDS` collapsed into one raised constant, equality kept; `check-journey-specs.py` exit 0 (19). Ordering is graded per **Amendment 1 §1**: the evidence commit `3f85e7ff` must be an ancestor of the code commit, with no metadata commit between, and the spec hunks must match `routing-specs-before.md` — verifiable only once the code commit exists |
+| **AC-07** live run attempted before the rewrite, exactly one artifact | **PASS on content, ordering PENDING the code commit** | C.6 and `routing-live.md` — branch **(a)**, one artifact at the literal path, command, model id, verbatim before **and** after outputs, 7/7 → 7/7, zero route changes. The before-half is committed at `3f85e7ff`, which contains no `.claude/skills` or `.claude/agents` edit; the ancestor / distinct-SHA proof completes at the code commit (**Amendment 1 §1**) |
+| **AC-08** one cited SubagentStart answer at every site, nothing registered | **PASS** | A.4 and `subagent-start-spike.md` — verdict `adopt`, dated citation chain, all six assertion sites carry it, the claude provider record's `evidence` string replaced (status/gate untouched), `"SubagentStart": []` still empty, no handler, `check-hook-registration.sh` exit 0 |
+| **AC-09** bundles no longer name the retired directory | **PASS under Amendment 1 §2** | A.5 — **53 files / 92 path occurrences → 0**, each file still naming `.meowkit/state/`; the 4 remaining occurrences are same-file markdown anchors, exempt per Amendment 1 §2; no bundle `description` touched; the three pinned legacy readers and the anchor file byte-identical; `codex-compat-check.mjs` Lane: OK |
+| **AC-10** the bead template names the real path | **PASS** | A.6 — `bead-template.md` names `.meowkit/state/`, sentence intact; no authored `.claude/**/*.md` names a project-root `session-state/`; `validate --docs-refs` and `check-dangling-rule-refs.cjs` exit 0 |
+| **AC-11** the mirror surface is regenerated and the repo is green | **PASS on content, the literal empty-status assertion PENDING the code commit** | C.7 and C.8 — `docs-manifest.cjs --check` exit 0 after `--write`, regeneration idempotent (status listing and file hashes identical on re-run), 171 entries with `mk:benchmark` recorded-not-reconciled, CLI manual a green no-op, every named validator and test exit 0, 0 FAIL anywhere, no security BLOCK, zero new plan-artifact tokens (C.10) |
+
+**9 of 11 fully PASS on this tree. 2 (`AC-06`, `AC-07`) are content-PASS with an ordering proof that
+is physically unobtainable before the code commit**, which is exactly the shape Amendment 1
+prescribed; `AC-11`'s one literal assertion (an empty working-tree status) is likewise a post-commit
+re-check. No criterion is failing.
+
+### C.12 What slice C changed
+
+Committed: **nothing**.
+
+| Path | Change |
+|---|---|
+| `.claude/skills/<104 non-integration>/SKILL.md` | `description` + `when_to_use` rewritten; no other key, no body text |
+| `packages/docs/docs-reference-manifest.json` | regenerated — 104 `description` + `sourceHash` entries |
+| `packages/docs/content/docs/reference/skills/index.mdx` | `GENERATED:reference-index` block re-spliced |
+| `tasks/reviews/evidence/…/routing-live.md` | post-rewrite half, before/after comparison, driver note |
+| `tasks/reviews/evidence/…/routing-metadata-after.md` | **new** — verbatim post-rewrite metadata block |
+| `tasks/reviews/evidence/…/slice-c1-table.md`, `slice-c2-table.md` | **new** — per-block tables |
+| `tasks/reviews/evidence/…/evidence.md` | this section |
+
+`.claude/agents/` was **not** touched by slice C (C.2). `.claude/rules/` was not touched by any
+slice.
+
+### C.13 Open items handed to the orchestrator
+
+1. **The code commit is the only remaining step**, and with it the three post-commit re-checks:
+   `AC-06`/`AC-07`'s Amendment 1 ordering proof (`merge-base --is-ancestor 3f85e7ff <code>`; the log
+   range `3f85e7ff..<code>^` over `.claude/skills .claude/agents` empty; spec hunks matching
+   `routing-specs-before.md`) and `AC-11`'s empty working-tree status.
+2. **`AC-09`'s `57 / 96` figure still needs the Amendment 1 §2 reading** when graded — the override
+   exists; the original criterion text above it does not.
+3. **The 20 non-integration agents are unrewritten by decision** (C.2), leaving ~2–3 KB of
+   available-but-unneeded headroom. If a later sprint wants it, the check's descending list names
+   every block.
+4. **One documentation correction applied here, not silently:** `slice-c1-table.md` note 3 calls
+   `mk:advise` ↔ `mk:grill` reciprocal; it is one-directional (C.3).

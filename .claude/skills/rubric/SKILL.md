@@ -2,7 +2,7 @@
 name: mk:rubric
 version: 1.0.0
 preamble-tier: 3
-description: Use when loading, listing, composing, or validating graded evaluation rubrics — PASS/WARN/FAIL grading with weighted criteria and balanced PASS/FAIL anchor examples. Triggers on /mk:rubric, "load rubric", "compose rubric preset", "validate rubric", or evaluator-style code review that needs anchor-grounded judgments.
+description: Loads, composes and validates weighted PASS/WARN/FAIL rubrics with anchor examples. NOT for mk:evaluate.
 argument-hint: '[list | load <name> | compose <preset> | validate]'
 allowed-tools:
   - Bash
@@ -17,7 +17,7 @@ keywords:
   - pass-warn-fail
   - anchor-examples
   - calibration
-when_to_use: Use when loading, listing, composing, or validating graded evaluation rubrics with PASS/WARN/FAIL grading.
+when_to_use: A grader needs a rubric preset loaded or a new one checked for balance.
 user-invocable: true
 owner: testing
 criticality: medium

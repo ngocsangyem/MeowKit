@@ -1,6 +1,6 @@
 ---
 name: mk:database
-description: "Design and safely evolve data models, database schemas, migrations, queries, indexes, and ORM data-access boundaries. Use for data-model, migration, query, index, ORM schema, or datastore-selection tasks. Discover the existing engine and migration source before proposing syntax."
+description: Data models, schemas, migrations, queries, indexes and ORM access boundaries. NOT for mk:api-design-principles.
 version: 2.0.0
 argument-hint: '[model|migration|query|index|orm|store] [description]'
 source: local
@@ -22,7 +22,7 @@ keywords:
   - data-invariants
   - backfill
   - recovery
-when_to_use: Use when designing a data model, changing a schema, writing or reviewing a migration, diagnosing a slow query, choosing an index, shaping the ORM data-access boundary, or selecting a datastore. NOT for API contracts (mk:api-design-principles), service or handler code (mk:backend-development), infrastructure and deployment (mk:devops), or the security verdict.
+when_to_use: Changing a schema, writing a migration, or diagnosing a slow query.
 user-invocable: true
 owner: portability
 criticality: high

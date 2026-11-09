@@ -1,6 +1,6 @@
 ---
 name: mk:lazy-agent-loader
-description: Deprecated compatibility shim. Agent routing reads the canonical inventory under .claude/agents/ directly; do not use this skill for agent selection.
+description: Deprecated shim; agent routing reads .claude/agents/ directly. NOT for mk:agent-detector.
 triggers:
   - never
 allowed-tools: Read, Glob
@@ -8,7 +8,7 @@ source: aura-frog
 keywords:
   - lazy-agent-loader
   - deprecated
-when_to_use: Do not invoke for new workflows. Use mk:agent-detector and the canonical .claude/agents/ inventory instead.
+when_to_use: Never invoke; kept only so older references still resolve.
 user-invocable: false
 owner: research
 criticality: medium

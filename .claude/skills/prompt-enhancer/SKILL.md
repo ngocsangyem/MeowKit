@@ -2,7 +2,7 @@
 name: mk:prompt-enhancer
 version: 1.3.1
 argument-hint: '[prompt text] [--analyze] [--score] [--deep] [--save-to <path>]'
-description: Use when refining a draft user prompt before sending it to a coding agent. Decomposes goal/context/constraints/acceptance/output-format, detects ambiguity and model-coupled framing, then emits a model-agnostic rewrite. Supports --analyze, --score, and --deep. NOT for prompts from scratch (mk:brainstorming), plans/reviews (mk:elicit), implementation plans (mk:plan-creator), or general codebase scouting (mk:scout).
+description: Rewrites a draft agent prompt into goal, context, constraints and acceptance criteria. NOT for mk:elicit.
 source: local
 allowed-tools:
   - Read
@@ -22,7 +22,7 @@ keywords:
   - prompt-evaluation
   - prompt-scoring
   - deep-prompt-mode
-when_to_use: Use when refining a draft coding-agent prompt for clarity, structure, acceptance criteria, and model-agnostic framing. NOT for prompts from scratch (mk:brainstorming), plans/reviews (mk:elicit), implementation plans (mk:plan-creator), or general codebase scouting (mk:scout).
+when_to_use: User pastes a prompt they are about to send and wants it sharpened.
 user-invocable: true
 preamble-tier: 2
 phase: on-demand
