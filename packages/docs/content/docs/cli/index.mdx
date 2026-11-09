@@ -4,7 +4,7 @@ description: "The mewkit command line, grouped by what you are trying to do."
 ---
 
 MeowKit ships one CLI package, `mewkit`. Run it from your project root; there is nothing to
-install globally — the install writes a committed launcher that makes the bare `mewkit` form
+install globally. The install writes a committed launcher that makes the bare `mewkit` form
 resolve inside the project.
 
 ## Find a command
@@ -43,8 +43,8 @@ that name resolve:
 
 - `init` writes a small launcher at `.meowkit/bin/mewkit`, **pinned** to the CLI version that
   installed the kit, and commits it. It is a resolver, not a copy of the CLI: it finds the
-  pinned version — in the project's own `node_modules` first, then from this machine's record
-  of that version — and runs it.
+  pinned version, in the project's own `node_modules` first, then from this machine's record
+  of that version, and runs it.
 - The launcher never reaches the network. If the pinned version is not available it says so
   and names `mewkit doctor`, rather than fetching mid-session.
 - Hooks do not depend on your shell: they execute the launcher through the install-written
@@ -56,7 +56,7 @@ that name resolve:
   prints the `mewkit doctor` hint instead.
 - A teammate who clones the repository gets the launcher with it and needs no install step.
 
-Requires **Node.js 24+** — the same floor `engines.node` enforces and the version the test
+Requires **Node.js 24+**, the same floor `engines.node` enforces and the version the test
 matrix runs. `mewkit doctor` fails below it and names the version it found.
 
 ## Exit codes and help
@@ -67,7 +67,7 @@ Every command answers with one of three codes:
 | --- | --- |
 | `0` | the command ran and succeeded |
 | `1` | the command ran and failed |
-| `2` | the invocation was wrong — unknown command, unknown subcommand, or a missing subcommand on a command that requires one |
+| `2` | the invocation was wrong: unknown command, unknown subcommand, or a missing subcommand on a command that requires one |
 
 A code `2` always prints the valid subcommands, so a typo tells you what you could have
 typed. `mewkit <command> <subcommand> --help` prints that subcommand's own usage and runs

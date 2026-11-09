@@ -6,7 +6,7 @@ description: "Install MeowKit and get it running in your project."
 ## Prerequisites
 
 - **Node.js** 24 or later
-- **Python** 3.9 or later, and only for the skills that run Python — the core workflow needs none. `mewkit setup` prepares one environment per skill under `.meowkit/envs/<skill>/` and installs that skill's own `requirements.txt` into it
+- **Python** 3.9 or later, and only for the skills that run Python; the core workflow needs none. `mewkit setup` prepares one environment per skill under `.meowkit/envs/<skill>/` and installs that skill's own `requirements.txt` into it
 - **Git** installed and configured
 - **Claude Code** installed ([claude.ai/code](https://claude.ai/code))
 
@@ -82,14 +82,14 @@ archive's own digest plus a SHA-256 for every file inside it, and a detached ed2
 that manifest. Before anything is extracted, `init` and `upgrade` check the signature against the
 trusted keys the CLI itself ships, then the archive digest, then every per-file digest.
 
-Verification is unconditional — when an artifact is present. There is no flag, environment variable
+Verification is unconditional when an artifact is present. There is no flag, environment variable
 or channel that skips it:
 
 - A release that carries an artifact is installed from it.
 - A release that carries no artifact at all installs through the older zip asset, so earlier
   releases keep working. **This is every release today.**
 - An artifact that is present and fails any check **stops the install**. It does not fall back to
-  the zip, even when the zip is there — a fallback would mean a tampered artifact silently
+  the zip, even when the zip is there: a fallback would mean a tampered artifact silently
   downgrades you to an unverified source. The message names which check failed, on which file, and
   what to do next, and `mewkit doctor` can repeat it later with no network.
 
