@@ -59,12 +59,12 @@ function blockReceipt(plan, kind) {
     ? [
       `Plan '${plan}' was edited after approval — the receipt is stale.`,
       'Changed scope needs re-approval (gate-rules.md: Insert/Split ⇒ re-approve).',
-      `Re-approve after the human confirms: npx mewkit plan approve ${plan}`,
+      `Re-approve after the human confirms: mewkit plan approve ${plan}`,
     ]
     : [
       `Plan '${plan}' has no approval receipt.`,
       'Gate 1 requires a human-approved plan before source edits (anti-accidental).',
-      `After the human approves, stamp it: npx mewkit plan approve ${plan}`,
+      `After the human approves, stamp it: mewkit plan approve ${plan}`,
     ];
   emit([MARKER, ...detail, 'Override (explicit downgrade): MEOWKIT_GATE1_PRESENCE_ONLY=1']);
   return 2;

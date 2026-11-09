@@ -10,9 +10,9 @@ MeowKit is authored for Claude Code and exported elsewhere. These commands do th
 Export your `.claude/` kit (agents, commands, skills, config, rules, hooks) to external coding-agent tools.
 
 ```bash
-npx mewkit migrate <tool> [flags]
-npx mewkit migrate --all
-npx mewkit migrate                    # interactive multiselect
+mewkit migrate <tool> [flags]
+mewkit migrate --all
+mewkit migrate                    # interactive multiselect
 ```
 
 **Supported tools:** `cursor`, `codex`. (`claude-code` is the source format and is not a valid migration target. Selecting any other provider name errors with this supported list.)
@@ -71,26 +71,26 @@ The runtime is **contract-driven, not config-driven**. A provider's `config.ts` 
 
 ```bash
 # Preview before any writes
-npx mewkit migrate cursor --dry-run
+mewkit migrate cursor --dry-run
 
 # Single tool, project scope
-npx mewkit migrate cursor
+mewkit migrate cursor
 
 # Both tools (uses interactive picker if TTY)
-npx mewkit migrate
+mewkit migrate
 
 # Both supported tools, non-interactive (CI-friendly)
-npx mewkit migrate --all --yes
+mewkit migrate --all --yes
 
 # Global install scope
-npx mewkit migrate codex --global
+mewkit migrate codex --global
 
 # Restrict scope to specific types
-npx mewkit migrate cursor --only=skills,rules
-npx mewkit migrate codex --skip-hooks
+mewkit migrate cursor --only=skills,rules
+mewkit migrate codex --skip-hooks
 
 # Force overwrite user edits
-npx mewkit migrate cursor --force
+mewkit migrate cursor --force
 ```
 
 ### Idempotency
@@ -124,10 +124,9 @@ A PID-based file lock at `SCOPE/.mewkit/.lock` blocks two `mewkit migrate` runs 
 Show migration-target provider support (level, role, surfaces). `explain-support` is an alias that takes a single provider. With `--lifecycle`, show the capability-adapter view instead: the four support levels, repo-context acquisition tools, storage boundary, and the per-lifecycle-event matrix (which events a provider fires and which it can actually gate/deny on).
 
 ```bash
-npx mewkit providers [<provider>] [--json]
-npx mewkit explain-support <provider>
-npx mewkit providers --lifecycle              # event × provider matrix (proven-gate markers)
-npx mewkit providers <provider> --lifecycle   # one provider: levels, acquisition, lifecycle, evidence
+mewkit providers [<provider>] [--json]
+mewkit providers --lifecycle              # event × provider matrix (proven-gate markers)
+mewkit providers <provider> --lifecycle   # one provider: levels, acquisition, lifecycle, evidence
 ```
 
 | Flag          | Description                                                                                                   |
@@ -153,7 +152,6 @@ An alias of `providers`, kept because "which providers does this support" and "e
 support matrix" are the same question asked two ways.
 
 ```bash
-npx mewkit explain-support [<provider>] [--json] [--lifecycle]
 ```
 
 ## pack
@@ -161,7 +159,7 @@ npx mewkit explain-support [<provider>] [--json] [--lifecycle]
 Manage optional capability packs layered over the base kit.
 
 ```bash
-npx mewkit pack list [--json]
-npx mewkit pack add <pack>… [--yes] [--beta]
-npx mewkit pack remove <pack>…
+mewkit pack list [--json]
+mewkit pack add <pack>… [--yes] [--beta]
+mewkit pack remove <pack>…
 ```

@@ -7,6 +7,7 @@ import { verifyPackages } from "../core/dependency-installer.js";
 import { ENVS_REL, envSkills, envUsable, readSkillRequirements, skillEnvDir } from "../core/skill-env.js";
 import { listDeps, isDepCommandPresent, type DoctorContext } from "../lib/system-deps-registry.js";
 import { isHookScript } from "../core/is-hook-script.js";
+import { NODE_FLOOR_MAJOR, NODE_FLOOR_PROSE, runningNodeMajor } from "../core/node-floor.js";
 
 export type Status = "pass" | "fail" | "warn" | "na";
 
@@ -17,12 +18,17 @@ export interface DiagResult {
 	fix?: string;
 }
 
-export function checkNodeVersion(): DiagResult {
-	const major = parseInt(process.versions.node.split(".")[0] ?? "0", 10);
-	if (major >= 20) {
-		return { name: "Node.js >= 20", status: "pass", detail: `v${process.versions.node}` };
+export function checkNodeVersion(version = process.versions.node): DiagResult {
+	const name = `Node.js >= ${NODE_FLOOR_MAJOR}`;
+	if (runningNodeMajor(version) >= NODE_FLOOR_MAJOR) {
+		return { name, status: "pass", detail: `v${version}` };
 	}
-	return { name: "Node.js >= 20", status: "fail", detail: `v${process.versions.node} — need 20+` };
+	return {
+		name,
+		status: "fail",
+		detail: `v${version} — need ${NODE_FLOOR_MAJOR} or newer`,
+		fix: `Install ${NODE_FLOOR_PROSE} (the version this project's test matrix runs), then re-run`,
+	};
 }
 
 /**

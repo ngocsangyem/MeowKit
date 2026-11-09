@@ -35,7 +35,7 @@ describe("bootstrap is a deterministic trusted constant", () => {
 
 describe("bootstrap content contract", () => {
 	it("names the resolver invocation and the outcome vocabulary", () => {
-		expect(bootstrap).toContain("npx mewkit capabilities resolve --intent");
+		expect(bootstrap).toContain("mewkit capabilities resolve --intent");
 		for (const outcome of ["selected", "ambiguous", "unavailable", "unsupported"]) {
 			expect(bootstrap).toContain(`\`${outcome}\``);
 		}
@@ -74,7 +74,7 @@ describe("bootstrap injection-safety / brand-neutrality", () => {
 	it("is brand-neutral prose — no toolkit-architecture narrative (only the invocation names the CLI)", () => {
 		// The single unavoidable CLI reference is the `mewkit capabilities resolve` invocation
 		// line; the surrounding prose must not narrate what MeowKit is.
-		const prose = bootstrap.replace(/`npx mewkit capabilities resolve[^`]*`/g, "");
+		const prose = bootstrap.replace(/`mewkit capabilities resolve[^`]*`/g, "");
 		expect(prose.toLowerCase()).not.toContain("meowkit");
 	});
 });

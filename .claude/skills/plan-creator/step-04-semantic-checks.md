@@ -42,7 +42,7 @@ Must exit 0 with `PRODUCT_SPEC_COMPLETE: N features, M user stories`. Fix any re
 Run the validation script:
 
 ```bash
-npx mewkit plan check --structural {plan_dir}/plan.md
+mewkit plan check --structural {plan_dir}/plan.md
 ```
 
 Must output `PLAN_COMPLETE`. Fix reported issues before proceeding.

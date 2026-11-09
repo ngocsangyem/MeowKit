@@ -62,7 +62,7 @@ refused by name with the three valid values listed.
 Guided post-scaffold configuration. Each step is idempotent.
 
 ```bash
-npx mewkit setup [--only=<step>]
+mewkit setup [--only=<step>]
 ```
 
 | Step        | What it does                                                    |
@@ -73,8 +73,8 @@ npx mewkit setup [--only=<step>]
 | `gitignore` | Appends MeowKit entries to `.gitignore`                         |
 
 ```bash
-npx mewkit setup              # Run all steps
-npx mewkit setup --only=venv  # Run single step
+mewkit setup              # Run all steps
+mewkit setup --only=venv  # Run single step
 ```
 
 ## doctor
@@ -82,12 +82,12 @@ npx mewkit setup --only=venv  # Run single step
 Diagnose environment issues with auto-fix for permissions.
 
 ```bash
-npx mewkit doctor [--report]
+mewkit doctor [--report]
 ```
 
-**Checks:** Node.js 20+, Python 3.9+, Git, `.claude/` structure, hooks executable, scripts present, memory writable, MCP config, Python venv, config validity.
+**Checks:** Node.js 24+, Python 3.9+, Git, `.claude/` structure, hooks executable, scripts present, memory writable, MCP config, Python venv, config validity.
 
-The Node check passes at 20 and up, while the `mewkit` package itself requires Node 24 or later. Install on 24+; a passing `doctor` on Node 20 does not mean the CLI is supported there.
+The Node check and `engines.node` state the same floor: Node 24, the version this project's test matrix runs. Below it the check fails and names the version it found.
 
 **Auto-fixes:** Hook file permissions (`chmod +x`).
 
@@ -142,7 +142,7 @@ Recent versions:
 Verify `.claude/` structure integrity.
 
 ```bash
-npx mewkit validate
+mewkit validate
 ```
 
 **Checks:** Agents (10+), skills (30+), commands dir, modes (5+), the 7 always-on rules present, hooks executable, scripts present, settings.json, config file. In the MeowKit authoring checkout, the full sweep also reports provider-specific vocabulary found in generic skill bodies as advisory portability WARNs; `--strict` promotes WARNs to errors. Run a focused suite with any of the flags below (no flag = the full sweep).
@@ -157,23 +157,13 @@ npx mewkit validate
 | `--portable` | Portable-migration manifest checks. |
 | `--strict` | Promote recommended-field WARNs to errors. |
 
-## status
-
-Print version, channel, and current config.
-
-```bash
-npx mewkit status
-```
-
-Shows: MeowKit version with channel indicator (stable/beta), project config from `.meowkit/config.json`.
-
 ## versions
 
-Print what this project has installed, which `status` does not answer: the CLI and the kit carry
+Print what this project has installed: the CLI and the kit carry
 independent versions.
 
 ```bash
-npx mewkit versions
+mewkit versions
 ```
 
 Shows the CLI version, the installed kit version, the target and delivery, and how the content

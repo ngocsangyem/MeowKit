@@ -46,5 +46,5 @@ Phase files (`phase-XX-*.md`) MUST begin with their own YAML frontmatter block. 
 See `phase-template.md` for the canonical block to prepend at file creation.
 
 ## Validation
-Run `npx mewkit plan check --structural <plan-file>` before presenting for Gate 1.
+Run `mewkit plan check --structural <plan-file>` before presenting for Gate 1.
 Output: PLAN_COMPLETE or PLAN_INCOMPLETE with missing items.

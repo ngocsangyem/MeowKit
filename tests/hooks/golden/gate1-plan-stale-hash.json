@@ -18,6 +18,6 @@
     "signal": null,
     "marker": "@@GATE_BLOCK@@",
     "stdout": "",
-    "stderr": "@@GATE_BLOCK@@\nPlan 'tasks/plans/261101-corpus-demo/plan.md' was edited after approval — the receipt is stale.\nChanged scope needs re-approval (gate-rules.md: Insert/Split ⇒ re-approve).\nRe-approve after the human confirms: npx mewkit plan approve tasks/plans/261101-corpus-demo/plan.md\nOverride (explicit downgrade): MEOWKIT_GATE1_PRESENCE_ONLY=1\n"
+    "stderr": "@@GATE_BLOCK@@\nPlan 'tasks/plans/261101-corpus-demo/plan.md' was edited after approval \u2014 the receipt is stale.\nChanged scope needs re-approval (gate-rules.md: Insert/Split \u21d2 re-approve).\nRe-approve after the human confirms: mewkit plan approve tasks/plans/261101-corpus-demo/plan.md\nOverride (explicit downgrade): MEOWKIT_GATE1_PRESENCE_ONLY=1\n"
   }
 }

@@ -31,7 +31,7 @@ Every subagent MUST end its response with a structured status block:
 
 ## A3. Document Eureka Moments
 
-When reasoning reveals a genuine insight that contradicts the conventional approach with evidence: name it — "EUREKA: Everyone does X because they assume [assumption]. But [evidence] suggests that's wrong here." — and append it as one entry to `.meowkit/memory/gotchas.md` with `npx mewkit note gotchas` (entry on stdin), never a bare `Edit`, which is neither lint-checked nor serialized against a concurrent agent. A failed write prints one line (`⚠ memory write skipped: <reason>`) and the workflow continues.
+When reasoning reveals a genuine insight that contradicts the conventional approach with evidence: name it — "EUREKA: Everyone does X because they assume [assumption]. But [evidence] suggests that's wrong here." — and append it as one entry to `.meowkit/memory/gotchas.md` with `mewkit note gotchas` (entry on stdin), never a bare `Edit`, which is neither lint-checked nor serialized against a concurrent agent. A failed write prints one line (`⚠ memory write skipped: <reason>`) and the workflow continues.
 
 ## B2. Response Structure (after code changes)
 

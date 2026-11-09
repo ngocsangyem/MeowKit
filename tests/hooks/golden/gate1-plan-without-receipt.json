@@ -18,6 +18,6 @@
     "signal": null,
     "marker": "@@GATE_BLOCK@@",
     "stdout": "",
-    "stderr": "@@GATE_BLOCK@@\nPlan 'tasks/plans/261101-corpus-demo/plan.md' has no approval receipt.\nGate 1 requires a human-approved plan before source edits (anti-accidental).\nAfter the human approves, stamp it: npx mewkit plan approve tasks/plans/261101-corpus-demo/plan.md\nOverride (explicit downgrade): MEOWKIT_GATE1_PRESENCE_ONLY=1\n"
+    "stderr": "@@GATE_BLOCK@@\nPlan 'tasks/plans/261101-corpus-demo/plan.md' has no approval receipt.\nGate 1 requires a human-approved plan before source edits (anti-accidental).\nAfter the human approves, stamp it: mewkit plan approve tasks/plans/261101-corpus-demo/plan.md\nOverride (explicit downgrade): MEOWKIT_GATE1_PRESENCE_ONLY=1\n"
   }
 }

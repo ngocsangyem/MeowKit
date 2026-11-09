@@ -175,7 +175,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 2. **Append one memory entry only when the lesson is non-derivable** from the code, the diff, or `git log` — append to `.meowkit/memory/gotchas.md` through `mewkit note`, in the store format (`mk:memory`):
 
    ```bash
-   npx mewkit note gotchas <<'EOF'
+   mewkit note gotchas <<'EOF'
    ## <one-line lesson>   <!-- YYYY-MM-DD -->
    Why: <evidence: the failure this run hit>
    Apply when: <trigger the next agent can grep for>

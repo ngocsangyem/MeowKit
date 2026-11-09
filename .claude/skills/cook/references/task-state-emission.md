@@ -17,8 +17,8 @@ inventing one is noise.
 
 WHY: The record is a resume + audit surface for real tasks, not a log of every action.
 
-The active record and its canonical pointer are created by explicit activation — `npx mewkit plan
-approve` (on by default; `--no-activate` opts out) or `npx mewkit task new --activate` for no-plan
+The active record and its canonical pointer are created by explicit activation — `mewkit plan
+approve` (on by default; `--no-activate` opts out) or `mewkit task new --activate` for no-plan
 work. Activation is all-or-fail: it commits one active record plus the canonical active-task
 pointer, or it exits non-zero without claiming success. Marking the pointed task `done` clears
 only that task's pointer, never another live task's.
@@ -57,5 +57,5 @@ WHY: A durable audit surface is worse than useless if it contains fabricated sta
 
 - `mk:cook` (single-task pipeline), `mk:plan-creator`, `mk:review`, and selected long-running
   workflows that drive an active durable task.
-- The `npx mewkit task-state` CLI is the one compatible surface; record compatibility is governed by
+- The `mewkit task-state` CLI is the one compatible surface; record compatibility is governed by
   the record's `schemaVersion` (the CLI refuses to read/overwrite an incompatible record).

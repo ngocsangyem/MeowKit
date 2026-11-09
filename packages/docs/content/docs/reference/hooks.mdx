@@ -257,25 +257,15 @@ Script paths, timeouts, and matcher chains are intentionally not listed; read
 | Event | Purpose | Can it block? |
 |---|---|---|
 | `PostToolUse` | Dispatch | Advisory |
-| `PostToolUse` | Learning observer | Advisory |
-| `PostToolUse` | Security scanning written file | **Blocking** |
-| `PostToolUseFailure` | Posttoolfailure probe | Advisory |
-| `PreCompact` | Precompact probe | Advisory |
+| `PostToolUseFailure` | Dispatch | Advisory |
+| `PreCompact` | Dispatch | Advisory |
 | `PreToolUse` | Checking file access permissions | **Blocking** |
 | `PreToolUse` | Checking Gate 1 approval | **Blocking** |
 | `PreToolUse` | Checking web fetch targets | **Blocking** |
-| `PreToolUse` | Pre task check | Advisory |
+| `PreToolUse` | Dispatch | Advisory |
 | `PreToolUse` | Running pre-ship validation | **Blocking** |
 | `SessionStart` | Dispatch | Advisory |
-| `SessionStart` | Ensuring Python skills venv | Advisory |
-| `SessionStart` | Loading capability resolution | Advisory |
-| `SessionStart` | Loading project context | Advisory |
-| `SessionStart` | Validating Jira env | Advisory |
-| `Stop` | Control probe | Advisory |
 | `Stop` | Dispatch | Advisory |
-| `Stop` | Post session | Advisory |
-| `Stop` | Pre completion check | **Blocking** |
-| `UserPromptSubmit` | Detecting --tdd flag | Advisory |
 | `UserPromptSubmit` | Dispatch | Advisory |
 
 Registered with no hooks today: `SubagentStart`, `SubagentStop`.

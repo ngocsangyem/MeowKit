@@ -209,8 +209,14 @@ jobs:
       - name: Check every mewkit verb the kit names resolves
         run: node scripts/check-kit-verbs.cjs
 
+      # The agent-facing CLI reference is generated from the same catalogue the dispatcher
+      # reads, so a surface change that skips regeneration is a stale instruction shipped
+      # to every project.
+      - name: Generated CLI reference matches the command catalogue
+        run: node scripts/generate-cli-manual.cjs --check
+
       - name: Validate README, website, and index counts (stale-index)
-        run: node packages/mewkit/dist/index.js inventory --check
+        run: node scripts/harness-inventory.cjs --check
 
       - name: Verify high-traffic dependency metadata
         run: node scripts/scan-skill-dependency-edges.mjs --check-high-traffic
@@ -293,7 +299,7 @@ jobs:
         run: npm run build -w packages/mewkit
 
       - name: Docs reference manifest and pages match the runtime
-        run: node packages/mewkit/dist/index.js docs-manifest --check
+        run: node scripts/docs-manifest.cjs --check
 
       - name: Frontmatter contract holds
         run: npm run check:frontmatter -w packages/docs

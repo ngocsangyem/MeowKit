@@ -118,7 +118,7 @@ For TRIVIAL tasks, validation is skipped.
 
 ## Gotchas
 
-- **Not the same as the structural check**: `npx mewkit plan check --structural` validates plan file *structure* (required sections exist). This skill validates plan *content quality* (are acceptance criteria binary? are risks identified?). Both can run — they check different things.
+- **Not the same as the structural check**: `mewkit plan check --structural` validates plan file *structure* (required sections exist). This skill validates plan *content quality* (are acceptance criteria binary? are risks identified?). Both can run — they check different things.
 
 ## Relationship to plan-creator v2.3.1
 

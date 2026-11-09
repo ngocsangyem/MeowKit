@@ -69,6 +69,9 @@ describe("init, offline, against an injected release", () => {
 			[
 				".meowkit/.env.example",
 				".meowkit/.gitignore",
+				// The committed launcher: a teammate's fresh clone has no install step, so the
+				// path their hooks run has to arrive with the repository.
+				".meowkit/bin/mewkit",
 				".meowkit/config.yaml",
 				".meowkit/mcp.json.example",
 			].sort(),

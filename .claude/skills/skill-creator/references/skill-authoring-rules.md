@@ -110,7 +110,7 @@ WHY: Standardized metadata keeps skill discovery predictable.
 
 ### Validation
 
-Enforced by `npx mewkit validate --frontmatter` against `.claude/schemas/skill-schema.json`. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
+Enforced by `mewkit validate --frontmatter` against `.claude/schemas/skill-schema.json`. CI runs on every PR via `ci.yml`. Two-tier severity: ERROR (schema violation) vs WARN (missing recommended). Pass `--strict` to promote WARN to ERROR.
 
 ### Deprecated fields
 
@@ -124,7 +124,7 @@ The following frontmatter fields are advisory (not hook-enforced); they annotate
 - `phase: 0 | 1 | 2 | 3 | 4 | 5 | 6 | on-demand` — anchors the skill to a workflow phase. `on-demand` means the skill is invoked by need, not by phase.
 - `trust_level: kit-authored | third-party` — provenance marker. Third-party skills should treat external input as DATA per `injection-rules.md`.
 - `injection_risk: low | medium | high` — advisory risk level for prompt-injection exposure.
-- `requires_external_service: [<service>...]` — external services the skill needs (e.g. `["jira"]`, `["gemini", "minimax"]`). Annotate every external-service entrypoint. `npx mewkit validate --frontmatter` emits a WARN (non-blocking) for an external-service entrypoint that lacks this field.
+- `requires_external_service: [<service>...]` — external services the skill needs (e.g. `["jira"]`, `["gemini", "minimax"]`). Annotate every external-service entrypoint. `mewkit validate --frontmatter` emits a WARN (non-blocking) for an external-service entrypoint that lacks this field.
 - `default_enabled: true | false` — whether the skill works without external configuration. External-service skills set `false` (fail-closed until the required env vars are present). A `true` value requires a verified external-service-free path. Declaring `requires_external_service` without `default_enabled` also WARNs.
 - `stable_output_contract: true | false` — `true` when the skill returns stable machine-readable IDs / output for created or bound runtime resources.
 

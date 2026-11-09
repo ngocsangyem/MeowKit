@@ -1,3 +1,8 @@
+// The harness inventory, for maintainers of this repository rather than for users of the
+// installed kit: it aggregates artifact governance metadata, checks the README and index
+// counts against reality, and renders the responsibility-by-coverage view. The installed
+// kit never calls it, so it is reached from a repo script instead of the published CLI —
+// a command on the user's surface is a command the user has to understand.
 import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
@@ -5,7 +10,7 @@ import { buildInventory, type InventoryEntry } from "../core/build-inventory.js"
 import { checkStaleIndex, emitCounts } from "../core/check-stale-index.js";
 import { aggregateSubstrate, emitSubstrateView, type Coverage } from "../core/substrate.js";
 
-interface InventoryOptions {
+export interface InventoryOptions {
 	json?: boolean;
 	stale?: boolean;
 	critical?: boolean;
@@ -131,7 +136,7 @@ export async function inventory(opts: InventoryOptions = {}): Promise<void> {
 		if (fails.length > 0) {
 			console.log(
 				pc.red(
-					`${fails.length} drift/incompleteness issue(s). Run \`mewkit inventory --emit-counts\` for numbers; add missing rows by hand.`,
+					`${fails.length} drift/incompleteness issue(s). Run \`node scripts/harness-inventory.cjs --emit-counts\` for numbers; add missing rows by hand.`,
 				),
 			);
 			process.exit(1);

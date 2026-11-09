@@ -60,7 +60,7 @@ If "Yes": for each selected plan, extract:
 Append ONE entry to `.meowkit/memory/decisions.md` through `mewkit note` (it creates the file on
 first write), and only when the decision is non-derivable from the code, the diff, or `git log`:
 ```bash
-npx mewkit note decisions <<'EOF'
+mewkit note decisions <<'EOF'
 ## {goal from plan} — {1-2 bullet summary of key decisions}   <!-- YYYY-MM-DD -->
 Why: {red-team findings, validation answers, 1-2 bullets}
 Apply when: {trigger the next agent can grep for}
@@ -76,10 +76,10 @@ Ask via `AskUserQuestion`. Header: "Archive Action". Question: "How to handle th
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
-| Archive | Plan may be useful later for reference, audit, or replay | Runs `npx mewkit plan archive`; preserves history in git |
+| Archive | Plan may be useful later for reference, audit, or replay | Runs `mewkit plan archive`; preserves history in git |
 | Delete | Plan is throwaway / sensitive / consumes repo space without value | Removes plan directories permanently (confirm before running rm) |
 
-If "Archive": for each selected plan run `npx mewkit plan archive tasks/plans/{plan-name}` — it stamps `status: completed` across plan.md + every phase file and `.plan-state.json` (preserving the visual block), then moves the directory to `tasks/plans/archive/{plan-name}/`.
+If "Archive": for each selected plan run `mewkit plan archive tasks/plans/{plan-name}` — it stamps `status: completed` across plan.md + every phase file and `.plan-state.json` (preserving the visual block), then moves the directory to `tasks/plans/archive/{plan-name}/`.
 If "Delete": `rm -rf tasks/plans/{plan-name}` (confirm with user first)
 
 ### A5. Summary
@@ -101,5 +101,5 @@ Ask if user wants to commit the archival changes.
 
 - NEVER touch plans with status `draft`, `in-progress`, or `pending`
 - The manual `/mk:plan archive` subcommand never archives without user confirmation. Completion-driven lifecycle archiving is separate and runs only after every plan todo is checked.
-- `npx mewkit plan archive` creates `tasks/plans/archive/` if absent and fails closed if the destination already exists
+- `mewkit plan archive` creates `tasks/plans/archive/` if absent and fails closed if the destination already exists
 - Journal capture is optional — respect user choice

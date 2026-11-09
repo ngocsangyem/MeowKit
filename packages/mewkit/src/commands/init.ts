@@ -45,6 +45,8 @@ import { loadMcpProfileCatalog, type McpProfileSelection } from "../migrate/modu
 import { applyMcpProfiles, isCloudExposedProject } from "../migrate/modules/cursor-mcp-profiles.js";
 
 export interface InitArgs {
+	/** The running CLI's version, which the committed launcher is pinned to. */
+	cliVersion?: string;
 	dryRun?: boolean;
 	force?: boolean;
 	/** Print the one mutation envelope on stdout; the narration goes to stderr. */
@@ -927,6 +929,7 @@ async function runClaudeKitInstall(
 					allowedPaths: install.allowedPaths,
 					profile: install.profile,
 					packs: install.packs,
+					cliVersion: args.cliVersion,
 					// A profile install owns the full→profile downgrade trim; full does not.
 					trimToProfile: install.allowedPaths !== undefined,
 					confirmOrphans: orphanPrompt(updateSpinner, "Applying files..."),

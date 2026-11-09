@@ -12,6 +12,33 @@ import { describe, expect, it } from "vitest";
 
 import { createProject, runMewkit, type Fixture } from "./install-harness.js";
 
+/** The project's config as the loader resolves it, keyed exactly as it is written. */
+function loadedConfig(fx: Fixture): Record<string, unknown> {
+	const script = [
+		'const { loadConfigFile } = await import(process.argv[1]);',
+		'const { configWritePath } = await import(process.argv[2]);',
+		'const { observerNames } = await import(process.argv[3]);',
+		'const root = process.argv[4];',
+		'const result = loadConfigFile(configWritePath(root), observerNames(root));',
+		'process.stdout.write(JSON.stringify(result.ok ? result.values : { error: result.error.message }));',
+	].join("\n");
+	const dist = join(process.cwd(), "packages", "mewkit", "dist");
+	const out = execFileSync(
+		process.execPath,
+		[
+			"--input-type=module",
+			"-e",
+			script,
+			join(dist, "config", "load-config.js"),
+			join(dist, "state", "resolve-config-path.js"),
+			join(dist, "config", "observer-names.js"),
+			fx.root,
+		],
+		{ encoding: "utf8" },
+	);
+	return JSON.parse(out) as Record<string, unknown>;
+}
+
 /** An installed project put back into the v2 shape, with the old file committed. */
 function v2Project(): Fixture {
 	const fx = createProject("1.0.0-fixture");
@@ -46,9 +73,13 @@ describe("a v2 project", () => {
 		expect(run.all).toContain("mewkit upgrade");
 	});
 
-	it("is reported as migration-pending by status", () => {
+	it("is reported as migration-pending by the config diagnostic too, not only by the summary", () => {
 		const fx = v2Project();
-		expect(runMewkit(fx, ["status"]).all).toContain("migration pending");
+		// `doctor` is the surface that answers "what state is this project in"; the check
+		// has to name the pending migration rather than call a legacy-only project healthy.
+		const run = runMewkit(fx, ["doctor"]);
+		expect(run.all).toContain("migration pending");
+		expect(run.all).not.toContain("[object Object]");
 	});
 
 	it("has its values carried across by upgrade, uncommented, and the rest named", () => {
@@ -91,8 +122,11 @@ describe("a v2 project", () => {
 	it("resolves the carried values through the loader afterwards", () => {
 		const fx = v2Project();
 		runMewkit(fx, ["upgrade", "--yes"], {}, "2.0.0-fixture");
-		const status = runMewkit(fx, ["status"]);
-		expect(status.all).toContain("hooks.budget-tracker: false");
-		expect(status.all).toContain("hooks.learning-observer: false");
+		// Asserted through the loader itself rather than through a printout: the property is
+		// that the migrated file RESOLVES to the user's choices, and a display surface is
+		// only one window onto that.
+		const resolved = loadedConfig(fx);
+		expect(resolved["hooks.budget-tracker"]).toBe(false);
+		expect(resolved["hooks.learning-observer"]).toBe(false);
 	});
 });

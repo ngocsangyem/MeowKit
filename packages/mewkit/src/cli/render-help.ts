@@ -6,7 +6,7 @@
 import pc from "picocolors";
 import { CLI_CATALOGUE } from "./command-catalogue.js";
 import type { FlagSpec } from "./catalogue-types.js";
-import { summaryFor } from "./flag-summary.js";
+import { flagLabel, flagText } from "./flag-summary.js";
 
 /** Flags every command accepts, listed once at the top rather than under each command. */
 function globalFlags(): FlagSpec[] {
@@ -23,23 +23,9 @@ function flagsByCommand(): Map<string, FlagSpec[]> {
 	return out;
 }
 
-function flagLabel(flag: FlagSpec): string {
-	const value = flag.type === "string" ? " <value>" : "";
-	return `--${flag.name}${value}`;
-}
-
-function flagSummary(flag: FlagSpec, command: string): string {
-	const summary = summaryFor(flag, command);
-	return flag.repeatable ? `${summary} (repeatable)` : summary;
-}
-
 /** One column width for every flag block, so the summaries line up across sections. */
 function labelWidth(): number {
 	return Math.max(...CLI_CATALOGUE.flags.map((f) => flagLabel(f).length)) + 2;
-}
-
-function pad(text: string, width: number): string {
-	return text.length >= width ? text + " " : text + " ".repeat(width - text.length);
 }
 
 export function renderHelp(version: string): string {
@@ -57,7 +43,7 @@ export function renderHelp(version: string): string {
 
 	const nameWidth = Math.max(...CLI_CATALOGUE.commands.map((c) => c.name.length)) + 2;
 	for (const cmd of CLI_CATALOGUE.commands) {
-		lines.push(`  ${pc.green(pad(cmd.name, nameWidth))}${cmd.summary}`);
+		lines.push(`  ${pc.green(cmd.name.padEnd(nameWidth))}${cmd.summary}`);
 		if (cmd.subcommands?.length) {
 			lines.push(`  ${" ".repeat(nameWidth)}${pc.dim(cmd.subcommands.join(" · "))}`);
 		}
@@ -65,7 +51,7 @@ export function renderHelp(version: string): string {
 
 	lines.push("", `${pc.bold("Global options:")}`);
 	for (const flag of globalFlags()) {
-		lines.push(`  ${pad(flagLabel(flag), flagWidth)}${flagSummary(flag, "")}`);
+		lines.push(`  ${flagLabel(flag).padEnd(flagWidth)}${flagText(flag, "")}`);
 	}
 
 	for (const cmd of CLI_CATALOGUE.commands) {
@@ -73,7 +59,7 @@ export function renderHelp(version: string): string {
 		if (flags.length === 0) continue;
 		lines.push("", `${pc.bold(`${cmd.name} options:`)}`);
 		for (const flag of flags) {
-			lines.push(`  ${pad(flagLabel(flag), flagWidth)}${flagSummary(flag, cmd.name)}`);
+			lines.push(`  ${flagLabel(flag).padEnd(flagWidth)}${flagText(flag, cmd.name)}`);
 		}
 	}
 

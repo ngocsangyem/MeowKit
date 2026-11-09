@@ -30,7 +30,7 @@ Common failure patterns when fixing bugs. Update this file when Claude produces 
 
 ### Ignoring Memory
 **Symptom:** Same bug class fixed repeatedly.
-**Fix:** Grep `.meowkit/memory/` for the task keywords at Step 0.5 and open only the matching entries. Append a new lesson with `npx mewkit note gotchas` (entry on stdin, in the store format; see SKILL.md Step 6).
+**Fix:** Grep `.meowkit/memory/` for the task keywords at Step 0.5 and open only the matching entries. Append a new lesson with `mewkit note gotchas` (entry on stdin, in the store format; see SKILL.md Step 6).
 
 ### Fixing Without Evidence
 **Symptom:** "I think I know what's wrong" → fix deployed → bug persists.

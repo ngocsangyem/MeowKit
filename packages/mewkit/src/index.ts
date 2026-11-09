@@ -1,18 +1,25 @@
 #!/usr/bin/env node
 
 import fs from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import minimist from "minimist";
 import { renderHelp } from "./cli/render-help.js";
 import { minimistOptions } from "./cli/minimist-options.js";
+import { CLI_CATALOGUE } from "./cli/command-catalogue.js";
+import {
+	INVOCATION_ERROR,
+	classifyInvocation,
+	renderCommandHelp,
+	renderInvocationError,
+	renderSubcommandHelp,
+} from "./cli/strict-dispatch.js";
 import pc from "picocolors";
 import { upgrade } from "./commands/upgrade.js";
 import { validate } from "./commands/validate.js";
 import { capabilities } from "./commands/capabilities.js";
 import { taskState } from "./commands/task-state.js";
 import { advice } from "./commands/advice.js";
-import { context } from "./commands/context.js";
 import { budget, contextBudget } from "./commands/budget.js";
 import { verdictGate } from "./commands/verdict-gate.js";
 import { note } from "./commands/note.js";
@@ -20,7 +27,6 @@ import { doctor } from "./commands/doctor.js";
 import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
-import { inventory } from "./commands/inventory.js";
 import { plan } from "./commands/plan.js";
 import { planApprove } from "./commands/plan-approve.js";
 import { planArchive } from "./commands/plan-archive.js";
@@ -34,12 +40,9 @@ import { reviewCoverage } from "./commands/review/coverage.js";
 import { reviewCompose } from "./commands/review/compose.js";
 import { reviewSubmit } from "./commands/review/submit.js";
 import { reviewCleanup } from "./commands/review/cleanup.js";
-import { configWritePath, migrationPending } from "./state/resolve-config-path.js";
-import { loadConfigFile } from "./config/load-config.js";
 import { backups } from "./commands/backups.js";
 import { uninstall } from "./commands/uninstall.js";
 import { resolveProjectRoot } from "./state/meowkit-root-resolver.js";
-import { observerNames } from "./config/observer-names.js";
 import { versions } from "./commands/versions.js";
 import { runInstall } from "./commands/run-install.js";
 
@@ -49,37 +52,6 @@ const VERSION = pkgJson.version;
 
 function printHelp(): void {
 	console.log(renderHelp(VERSION));
-}
-
-async function printStatus(): Promise<void> {
-	const channel = VERSION.includes("-beta") || VERSION.includes("-rc") ? "beta" : "stable";
-	console.log(`${pc.bold(pc.cyan("mewkit"))} ${pc.dim(`v${VERSION}`)} ${pc.dim(`(${channel})`)}`);
-	console.log();
-
-	const root = process.cwd();
-	const configPath = configWritePath(root);
-	const shown = relative(root, configPath) || configPath;
-	if (migrationPending(root)) {
-		console.log(`${pc.bold("Config:")} ${pc.yellow("migration pending")} — run \`mewkit upgrade\` to produce ${shown}`);
-		return;
-	}
-	const result = loadConfigFile(configPath, observerNames(root));
-	if (!result.ok) {
-		console.log(`${pc.bold("Config:")} ${shown} ${pc.red("invalid")}`);
-		console.log(`  ${result.error.message}`);
-		console.log(`  ${pc.dim(result.error.fix)}`);
-		return;
-	}
-	if (!result.present) {
-		console.log(`${pc.dim(`No ${shown} — every setting is at its default.`)}`);
-		return;
-	}
-	// Only the keys someone uncommented are printed. The commented stubs are the
-	// surface, not the state, and listing them would read as settings in force.
-	const entries = Object.entries(result.values).filter(([key]) => key !== "$schema");
-	console.log(`${pc.bold("Config:")} ${shown}`);
-	if (entries.length === 0) console.log(`  ${pc.dim("no key set — every setting is at its default")}`);
-	for (const [key, value] of entries) console.log(`  ${pc.dim(key)}: ${String(value)}`);
 }
 
 async function main(): Promise<void> {
@@ -94,6 +66,27 @@ async function main(): Promise<void> {
 
 	if (args.help && !command) {
 		printHelp();
+		return;
+	}
+
+	// The invocation is judged before anything runs: a wrong sub-verb must not reach a
+	// command that would answer it with its own exit code, and asking for help must
+	// never execute the thing being asked about.
+	const invocation = classifyInvocation(
+		CLI_CATALOGUE,
+		args._.map((value) => String(value)),
+		args.help === true,
+	);
+	if (invocation.kind === "unknown-subcommand" || invocation.kind === "missing-subcommand") {
+		for (const line of renderInvocationError(invocation)) console.error(pc.red(line));
+		process.exit(INVOCATION_ERROR);
+	}
+	if (invocation.kind === "command-help") {
+		console.log(renderCommandHelp(CLI_CATALOGUE, invocation.command).join("\n"));
+		return;
+	}
+	if (invocation.kind === "subcommand-help") {
+		console.log(renderSubcommandHelp(CLI_CATALOGUE, invocation.command, invocation.subcommand).join("\n"));
 		return;
 	}
 
@@ -225,7 +218,6 @@ async function main(): Promise<void> {
 			});
 			break;
 		case "providers":
-		case "explain-support":
 			await providersCommand({
 				provider: args._[1] as string | undefined,
 				json: args.json as boolean | undefined,
@@ -259,18 +251,6 @@ async function main(): Promise<void> {
 			}
 			break;
 		}
-		case "inventory":
-			await inventory({
-				json: args.json as boolean | undefined,
-				stale: args.stale as boolean | undefined,
-				critical: args.critical as boolean | undefined,
-				portableMissing: args["portable-missing"] as boolean | undefined,
-				check: args.check as boolean | undefined,
-				emitCounts: args["emit-counts"] as boolean | undefined,
-				substrate: args.substrate as boolean | undefined,
-				emit: args.emit as boolean | undefined,
-			});
-			break;
 		case "trace":
 			trace({
 				subcommand: args._[1] as string | undefined,
@@ -311,15 +291,6 @@ async function main(): Promise<void> {
 				monthly: args.monthly as boolean | undefined,
 				session: args.session as boolean | string | undefined,
 				day: args.day as boolean | string | undefined,
-			});
-			break;
-		}
-		case "docs-manifest": {
-			const { docsManifest } = await import("./commands/docs-manifest.js");
-			docsManifest({
-				check: args.check as boolean | undefined,
-				write: args.write as boolean | undefined,
-				json: args.json as boolean | undefined,
 			});
 			break;
 		}
@@ -385,9 +356,6 @@ async function main(): Promise<void> {
 				json: args.json as boolean | undefined,
 			});
 			break;
-		case "status":
-			await printStatus();
-			break;
 		case "versions":
 			versions(VERSION, { json: args.json as boolean | undefined });
 			break;
@@ -429,15 +397,6 @@ async function main(): Promise<void> {
 				correctionKind: args["correction-kind"] as string | undefined,
 				packetKind: args["packet-kind"] as string | undefined,
 				releaseStage: args["release-stage"] as string | undefined,
-				json: args.json as boolean | undefined,
-			});
-			break;
-		case "context":
-			await context({
-				subcommand: args._[1] as string | undefined,
-				target: args._[2] as string | undefined,
-				root: args.root as string | undefined,
-				task: args.task as string | undefined,
 				json: args.json as boolean | undefined,
 			});
 			break;

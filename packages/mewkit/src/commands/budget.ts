@@ -3,6 +3,7 @@ import pc from "picocolors";
 import { computeContextBudget } from "../core/context-budget.js";
 import { availableProfiles, hasPackManifest, loadPackManifest } from "../core/index.js";
 import {
+	costLogCandidate,
 	findCostLog,
 	findProjectRootFromCostLog,
 	readCostLog,
@@ -245,8 +246,10 @@ export async function budget(args: BudgetArgs): Promise<void> {
 	}
 
 	if (!logPath) {
-		console.error(pc.red("Could not find .claude/memory/cost-log.json"));
-		console.log(pc.dim("Run a meowkit agent command first to generate cost data."));
+		// Name the path the search actually looked for, from the same function the search
+		// uses. The message used to name a different file entirely.
+		console.error(pc.red(`No cost log found. Looked for ${costLogCandidate(process.cwd())} and in each parent directory.`));
+		console.log(pc.dim("Run a MeowKit agent command first; the cost log is written as sessions record usage."));
 		process.exit(1);
 	}
 

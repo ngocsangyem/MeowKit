@@ -25,7 +25,7 @@ All must be true:
 1. **Plan file exists** at `tasks/plans/YYMMDD-name/plan.md`
 2. **All required sections are populated:** Problem (what it solves, for whom), Success Criteria (measurable definition of done), Technical Approach (how it will be built)
 3. **Human has explicitly typed approval.** Approval is not inferred from silence, delay, or ambiguous responses.
-4. **A fresh approval receipt is stamped on the plan** (default-on). After the human approves, run `npx mewkit plan approve <plan-dir>`: it writes an `approval:` frontmatter block binding the approval to the current plan body (`plan_hash`). `gate-enforcement.cjs` blocks source edits until that receipt exists, and blocks again once the plan body changes (stale hash ⇒ re-approve). `MEOWKIT_GATE1_PRESENCE_ONLY=1` downgrades Gate 1 to a plan-presence check — an explicit, logged opt-out.
+4. **A fresh approval receipt is stamped on the plan** (default-on). After the human approves, run `mewkit plan approve <plan-dir>`: it writes an `approval:` frontmatter block binding the approval to the current plan body (`plan_hash`). `gate-enforcement.cjs` blocks source edits until that receipt exists, and blocks again once the plan body changes (stale hash ⇒ re-approve). `MEOWKIT_GATE1_PRESENCE_ONLY=1` downgrades Gate 1 to a plan-presence check — an explicit, logged opt-out.
 
 The receipt is written by the agent, not the host: it proves *an approval was stamped against this plan revision*, **never** *a human approved*. Its value is the revision binding, not authenticity. The agent runs `plan approve` only after a real human approval; it never self-approves.
 

@@ -47,7 +47,7 @@ NNNN numbers are sequential, zero-padded (0001, 0002, ...).
    the long-form record; the memory entry is the greppable one-liner a future session will find:
 
 ```bash
-npx mewkit note decisions <<'EOF'
+mewkit note decisions <<'EOF'
 ## <one-line decision>   <!-- YYYY-MM-DD -->
 Why: <evidence: constraint, failure, review finding>
 Apply when: <trigger the next agent can grep for>

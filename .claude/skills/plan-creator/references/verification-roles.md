@@ -13,7 +13,7 @@
 
 ## Purpose
 
-`npx mewkit plan check --structural` checks structure and frontmatter drift; it does NOT confirm that a cited file path, function name, or contract count actually exists in the codebase. Verification Roles layer on top of that structural check: each role dispatches as one read-only subagent that verifies claims against the live codebase and returns a uniform verdict list. Failed claims become interview topics in step-06, not auto-rejects — humans adjudicate.
+`mewkit plan check --structural` checks structure and frontmatter drift; it does NOT confirm that a cited file path, function name, or contract count actually exists in the codebase. Verification Roles layer on top of that structural check: each role dispatches as one read-only subagent that verifies claims against the live codebase and returns a uniform verdict list. Failed claims become interview topics in step-06, not auto-rejects — humans adjudicate.
 
 ## Where it runs
 

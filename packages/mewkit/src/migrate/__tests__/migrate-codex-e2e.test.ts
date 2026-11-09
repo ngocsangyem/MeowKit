@@ -47,7 +47,7 @@ describe("migrate fixture corpus → codex (fresh install)", () => {
 	it("projects the bounded resolver bootstrap and a data-only manifest for Codex", () => {
 		const agentsMd = readFileSync(join(env.projectDir, "AGENTS.md"), "utf-8");
 		expect(agentsMd).toContain("<!-- GENERATED:capability-bootstrap START -->");
-		expect(agentsMd).toContain("npx mewkit capabilities resolve --intent");
+		expect(agentsMd).toContain("mewkit capabilities resolve --intent");
 		const snapshot = JSON.parse(readFileSync(join(env.projectDir, ".codex", "capabilities.json"), "utf-8")) as {
 			schemaVersion: string;
 			entries: Array<{ id: string }>;

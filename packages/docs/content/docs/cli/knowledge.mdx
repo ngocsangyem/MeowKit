@@ -8,10 +8,10 @@ model cannot derive, and context evidence records what a task actually read.
 
 ## memory
 
-The store is two committed, plain-markdown files: `.meowkit/memory/decisions.md` and `.meowkit/memory/gotchas.md`. Reads are one `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` at task start. Writes go through `npx mewkit note <decisions|gotchas>`, which lint-checks the entry on stdin and appends it under a file lock. See [Memory System](/guide/memory-system) for the entry format and the read and write sets.
+The store is two committed, plain-markdown files: `.meowkit/memory/decisions.md` and `.meowkit/memory/gotchas.md`. Reads are one `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` at task start. Writes go through `mewkit note <decisions|gotchas>`, which lint-checks the entry on stdin and appends it under a file lock. See [Memory System](/guide/memory-system) for the entry format and the read and write sets.
 
 ```bash
-npx mewkit validate --memory   # lint every file in the store (CI and pre-ship hook)
+mewkit validate --memory   # lint every file in the store (CI and pre-ship hook)
 ```
 
 `validate --memory` enforces the per-file line and byte caps, the injection patterns (with decode passes), a flood check, and secret patterns. Pruning is the `/mk:memory --prune` skill flow, and every removal is human-approved.
@@ -21,10 +21,7 @@ npx mewkit validate --memory   # lint every file in the store (CI and pre-ship h
 Task-scoped repository-context evidence — an on-demand freshness + provenance ledger, not a retrieval engine. MeowKit records and verifies evidence; the host's own tools acquire the content. Each path resolves to its **own** owning repository, so a folder containing many repos (e.g. an Aspire-style parent) never conflates their context.
 
 ```bash
-npx mewkit context resolve <path> [--root <boundary>] [--json]         # owning repo, revision, content hash, redaction
-npx mewkit context check <envelope.json> [--root <boundary>] [--json]  # per-path freshness, grouped by owning repo
-npx mewkit context record --task <id> <envelope.json> [--root <boundary>] [--json]  # merge evidence into a durable task record
-```
+npx npx npx ```
 
 | Subcommand | Purpose                                                                                                                                            |
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |

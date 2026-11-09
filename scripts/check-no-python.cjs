@@ -84,7 +84,10 @@ function makeRunner(binDir) {
 			stderr,
 			pythonMentioned: complaint ? complaint[0] : null,
 			firstErrorLine: (stderr.split("\n").find(Boolean) ?? stdout.split("\n").find(Boolean) ?? "").slice(0, 160),
-			usage: /^Usage:|requires --|Unknown .* subcommand/m.test(`${stdout}\n${stderr}`),
+			// A verb group answers a bare invocation with its usage and the invocation-error
+			// exit code; both are proof the module loaded and dispatched, which is what this
+			// harness asks. "needs a subcommand" is that answer's current wording.
+			usage: /^Usage:|requires --|needs a subcommand|Unknown .* subcommand/m.test(`${stdout}\n${stderr}`),
 		};
 	};
 

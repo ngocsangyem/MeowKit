@@ -36,6 +36,20 @@ export interface CommandSpec {
 	summary: string;
 	/** Sub-verbs this command accepts, if any. */
 	subcommands?: string[];
+	/**
+	 * Whether the bare form (`mewkit <name>` with no sub-verb) is itself a valid invocation.
+	 * Declared here rather than inferred, because the dispatcher has to tell "you forgot the
+	 * sub-verb" from "this command does something on its own" — `doctor`, `budget` and
+	 * `backups` all do real work bare, while `plan` or `review` bare is a typo. A list kept
+	 * anywhere else would be a second answer to a question the catalogue already owns.
+	 */
+	requiresSubcommand?: boolean;
+	/**
+	 * Argument shape per sub-verb, keyed by sub-verb name: what `mewkit <name> <sub> --help`
+	 * prints. Only the sub-verbs that take arguments need an entry; the rest are fully
+	 * described by their name plus the flags declared for the command.
+	 */
+	subcommandUsage?: Record<string, string>;
 	/** Longer usage shown under the command in generated docs, if the shape is not obvious. */
 	usage?: string;
 	/**

@@ -342,7 +342,14 @@ async function performUpgrade(
 			release: {
 				config,
 				sourceDir,
-				options: { cleanup, assumeYes, allowedPaths, profile: installedProfile, packs: installedPacks },
+				options: {
+					cleanup,
+					assumeYes,
+					allowedPaths,
+					profile: installedProfile,
+					packs: installedPacks,
+					cliVersion: provenance.cliVersion,
+				},
 			},
 		});
 		if (emitted.stats === undefined) throw new Error("the projection applied no release content");

@@ -783,7 +783,7 @@ export async function buildDefaultChecks(
 			...checkCommandDrift(projectRoot),
 			...checkOperationConformance(meowkitDir),
 			checkGenericCoreTokens(meowkitDir),
-			// Declared doc counts vs the real inventory. `mewkit inventory --check`
+			// Declared doc counts vs the real inventory. `scripts/harness-inventory.cjs --check`
 			// owns the same check for the CI step; surfacing it here means an author
 			// sees a stale README at validate time instead of at CI time. Counts are
 			// derived from buildInventory, so this can only drift when a doc lies.

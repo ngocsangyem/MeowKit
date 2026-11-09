@@ -1,35 +1,73 @@
 // The CLI surface, declared once. minimist options, `--help`, and the docs synopsis are all
 // derived from this file, and a contract test fails if the dispatcher reads a flag that is not
 // here. Add a flag here first; nothing else needs editing.
-import type { Catalogue, FlagSpec } from "./catalogue-types.js";
+import type { Catalogue, CommandSpec, FlagSpec } from "./catalogue-types.js";
 
-const COMMANDS = [
+const COMMANDS: CommandSpec[] = [
 	{ name: "init", summary: "Scaffold or update MeowKit in the current project" },
 	{ name: "upgrade", summary: "Upgrade MeowKit to the latest version" },
-	{ name: "validate", summary: "Validate .claude/ project structure", usage: "validate [--mode authoring|flat-copy]" },
+	{
+		name: "validate",
+		summary: "Validate .claude/ project structure",
+		usage: "validate [--mode authoring|flat-copy] (--mode is a maintainer override)",
+	},
 	{
 		name: "capabilities",
 		summary: "Inspect or resolve the capability manifest",
 		subcommands: ["list", "explain", "resolve", "view", "bootstrap", "projections"],
+		subcommandUsage: {
+			explain: "capabilities explain --intent <intent>",
+			resolve: "capabilities resolve --intent <intent>",
+			view: "capabilities view [--write]",
+			projections: "capabilities projections [--provider <provider>]",
+		},
 	},
 	{ name: "budget", summary: "View token usage and cost log", subcommands: ["context"] },
 	{ name: "setup", summary: "Guided post-scaffold configuration" },
-	{ name: "skill", summary: "Per-skill interpreter environments", subcommands: ["env"], usage: "skill env <skill>|--list" },
+	{
+		name: "skill",
+		summary: "Per-skill interpreter environments",
+		subcommands: ["env"],
+		requiresSubcommand: true,
+		usage: "skill env <skill>|--list",
+		subcommandUsage: { env: "skill env <skill> | skill env --list" },
+	},
 	{ name: "doctor", summary: "Diagnose common environment issues", subcommands: ["provenance"] },
-	{ name: "status", summary: "Print version and config summary" },
 	{ name: "versions", summary: "Print the installed CLI, kit, target and delivery of this project" },
-	{ name: "task-state", summary: "Durable task record", subcommands: ["show", "update"] },
+	{
+		name: "task-state",
+		summary: "Durable task record",
+		subcommands: ["show", "update"],
+		subcommandUsage: {
+			show: "task-state show [<task-id>]",
+			update: "task-state update <task-id> [--status <status>] [--step <text>] [--next <text>]",
+		},
+	},
 	{
 		name: "advice",
 		summary: "Bounded supervision checkpoints for --advice; records evidence, approves nothing",
 		subcommands: ["begin", "commit", "status", "validate-packet"],
+		requiresSubcommand: true,
+		subcommandUsage: {
+			begin: "advice begin --run <id> --skill <skill> --stage <stage> --checkpoint <id>",
+			commit: "advice commit --run <id> --checkpoint <id> --disposition <d> --outcome <o> --reason <why>",
+			status: "advice status --run <id>",
+			"validate-packet": "advice validate-packet --evidence <path> --packet-kind <input|output|brief>",
+		},
 	},
 	{ name: "orient", summary: "Resume orientation from durable task state; reads records only" },
-	{ name: "context", summary: "Repo-context evidence", subcommands: ["resolve", "check", "record"] },
-	{ name: "task", summary: "Create and list task files", subcommands: ["new", "list"] },
-	{ name: "migrate", summary: "Export MeowKit to external coding-agent tools" },
-	{ name: "providers", summary: "Show the effective provider support matrix and enforcement levels" },
-	{ name: "explain-support", summary: "Alias of `providers`" },
+	{
+		name: "task",
+		summary: "Create and list task files",
+		subcommands: ["new", "list"],
+		requiresSubcommand: true,
+		subcommandUsage: {
+			new: 'task new "<description>" [--type <type>] [--priority <priority>]',
+			list: "task list [--status <status>] [--all]",
+		},
+	},
+	{ name: "migrate", summary: "Export MeowKit to external coding-agent tools", usage: "migrate <tool>" },
+	{ name: "providers", summary: "Show the effective provider support matrix and enforcement levels", usage: "providers [<provider>]" },
 	{
 		name: "visual-plan",
 		summary: "Visual plan contracts",
@@ -45,23 +83,68 @@ const COMMANDS = [
 			"edit",
 			"view",
 		],
+		requiresSubcommand: true,
+		subcommandUsage: {
+			validate: "visual-plan validate <plan-dir>",
+			status: "visual-plan status <plan-dir>",
+			approve: "visual-plan approve <plan-dir> [--revision <rev>]",
+			rehash: "visual-plan rehash <plan-dir>",
+			export: "visual-plan export <plan-dir> [--format <format>]",
+			"prepare-feedback": "visual-plan prepare-feedback <plan-dir> --ops <file>",
+			"apply-feedback": "visual-plan apply-feedback <plan-dir> --batch <id> [--check]",
+			patch: "visual-plan patch <plan-dir> --op <file>",
+			edit: "visual-plan edit <plan-dir>",
+			view: "visual-plan view <plan-dir> [--port <port>]",
+		},
 	},
 	{
 		name: "review",
 		summary: "High-assurance PR review, resumable across sittings via a session id",
 		subcommands: ["prepare", "read", "coverage", "compose", "submit", "cleanup"],
+		requiresSubcommand: true,
+		subcommandUsage: {
+			prepare: "review prepare <pr-url|number> [--remote <remote>]",
+			read: "review read --session <id> [--as <persona>]",
+			coverage: "review coverage --session <id>",
+			compose: "review compose --session <id> [--reply]",
+			submit: "review submit --session <id> --confirm <token>",
+			cleanup: "review cleanup --session <id>",
+		},
 	},
-	{ name: "inventory", summary: "List harness artifacts with governance metadata" },
-	{ name: "plan", summary: "Plan lifecycle", subcommands: ["status", "check", "approve", "archive"] },
-	{ name: "trace", summary: "On-demand trace recall", subcommands: ["score", "audit", "propose"] },
-	{ name: "pack", summary: "Manage install packs", subcommands: ["list", "add", "remove"] },
-	{ name: "verdict-gate", summary: "Check a review verdict against the active plan" },
+	{
+		name: "plan",
+		summary: "Plan lifecycle",
+		subcommands: ["status", "check", "approve", "archive"],
+		requiresSubcommand: true,
+		subcommandUsage: {
+			status: "plan status <plan-dir>",
+			check: "plan check <phase-file> [--structural]",
+			approve: "plan approve <plan-dir> [--by <name>]",
+			archive: "plan archive <plan-dir> [--dry-run]",
+		},
+	},
+	{
+		name: "trace",
+		summary: "On-demand trace recall",
+		subcommands: ["score", "audit", "propose"],
+		subcommandUsage: {
+			score: "trace score [--id <run>]",
+			propose: "trace propose [--commit]",
+		},
+	},
+	{
+		name: "pack",
+		summary: "Manage install packs",
+		subcommands: ["list", "add", "remove"],
+		requiresSubcommand: true,
+		subcommandUsage: { add: "pack add <pack>…", remove: "pack remove <pack>…" },
+	},
+	{ name: "verdict-gate", summary: "Check a review verdict against the active plan", usage: "verdict-gate <slug>" },
 	{
 		name: "note",
 		summary: "Append a lint-checked entry to the committed team-memory store (entry on stdin)",
 		usage: "note <decisions|gotchas>",
 	},
-	{ name: "docs-manifest", summary: "Generate or drift-check the docs reference manifest" },
 	{
 		name: "uninstall",
 		summary: "Remove the kit's own files; dry-run unless --yes, and never your data",
@@ -72,6 +155,7 @@ const COMMANDS = [
 		summary: "List and restore the snapshots the mutating commands take",
 		subcommands: ["list", "restore"],
 		usage: "backups list | backups restore <id>",
+		subcommandUsage: { restore: "backups restore <id>" },
 	},
 ];
 
@@ -101,18 +185,14 @@ const FLAGS: FlagSpec[] = [
 			"review",
 			"capabilities",
 			"pack",
-			"explain-support",
 			"providers",
 			"plan",
-			"inventory",
 			"trace",
 			"orient",
 			"budget",
 			"task-state",
 			"advice",
-			"context",
 			"visual-plan",
-			"docs-manifest",
 			"backups",
 			"uninstall",
 			"doctor",
@@ -151,18 +231,18 @@ const FLAGS: FlagSpec[] = [
 	b("allow-cloud-mcp", ["init"], "Cursor only: second opt-in for applying an MCP profile to a repo with a git remote"),
 
 	// upgrade
-	b("check", ["upgrade", "inventory", "visual-plan", "docs-manifest"], "Report without changing anything", {
-		perCommand: {
-			inventory: "Fail if README or index counts drift from reality",
-			"visual-plan": "Pre-apply gate for apply-feedback",
-			"docs-manifest": "Fail when the committed manifest no longer matches the live `.claude/` tree",
-		},
+	b("check", ["upgrade", "visual-plan"], "Report without changing anything", {
+		perCommand: { "visual-plan": "Pre-apply gate for apply-feedback" },
 	}),
 	b("list", ["upgrade"], "List available versions"),
 	b("no-cleanup", ["upgrade"], "Keep the downloaded release directory"),
 
 	// validate
-	s("mode", ["validate"], "Force authoring or flat-copy mode instead of auto-detecting"),
+	s(
+		"mode",
+		["validate"],
+		"Maintainer override: force the authoring or flat-copy run profile instead of auto-detecting it",
+	),
 	b("portable", ["validate"], "Include portable provider contract checks"),
 	b("strict", ["validate"], "Treat WARN as failure (exit 1)"),
 	b("workflow", ["validate"], "Run only the workflow.yaml drift check"),
@@ -175,9 +255,7 @@ const FLAGS: FlagSpec[] = [
 	b("memory", ["validate"], "Run only the committed team-memory store lint"),
 	b("frontmatter", ["validate"], "Run only the SKILL.md frontmatter schema and runtime-contract check"),
 	b("docs-refs", ["validate"], "Run only the `.claude` to `docs/*` reference allowlist check"),
-	b("substrate", ["validate", "inventory"], "Run only the responsibility-substrate drift and untagged check", {
-		perCommand: { inventory: "Print the responsibility-by-coverage substrate matrix" },
-	}),
+	b("substrate", ["validate"], "Run only the responsibility-substrate drift and untagged check"),
 
 	// skill env
 	b("list", ["skill"], "List every skill that declares a runtime and the state of its environment"),
@@ -197,9 +275,7 @@ const FLAGS: FlagSpec[] = [
 	s("provider", ["capabilities", "advice"], "Scope the projection to one provider", {
 		perCommand: { advice: "Runtime recorded on the receipt" },
 	}),
-	b("write", ["capabilities", "docs-manifest"], "Write the generated view rather than printing it", {
-		perCommand: { "docs-manifest": "Regenerate the committed manifest" },
-	}),
+	b("write", ["capabilities"], "Write the generated view rather than printing it"),
 	b("record", ["orient"], "Record the result to the task record; `--no-record` skips it"),
 
 	// plan
@@ -207,20 +283,11 @@ const FLAGS: FlagSpec[] = [
 	b("structural", ["plan"], "`check`: validate plan.md + its phase files against the full template"),
 	b("activate", ["plan", "task"], "Activate the task on creation; --no-activate opts out"),
 
-	// inventory
-	b("stale", ["inventory"], "Show only deprecated or experimental artifacts"),
-	b("critical", ["inventory"], "Show only criticality=critical artifacts"),
-	b("portable-missing", ["inventory"], "Show artifacts whose runtime is not portable"),
-	b("emit", ["inventory"], "Write the substrate view rather than printing it"),
-	b("emit-counts", ["inventory"], "Rewrite README and index count numbers to match reality"),
-
 	// trace
 	s("id", ["trace"], "Trace record id"),
 	s("friction", ["trace"], "Record a friction note against the current task"),
 	s("responsibility", ["trace"], "Scope to one substrate responsibility"),
 	b("commit", ["trace"], "Persist the proposal rather than previewing it"),
-
-	s("task", ["context"], "Task id to record the evidence envelope against"),
 
 	// budget
 	b("monthly", ["budget"], "Aggregate by month instead of the last ten entries"),
@@ -281,9 +348,6 @@ const FLAGS: FlagSpec[] = [
 	s("packet-kind", ["advice"], "validate-packet shape: input, output, or brief (direct consult)"),
 	s("release-stage", ["advice"], "Ship scope the call is budgeted against: prepare, release, publish"),
 
-	// context
-	s("root", ["context"], "Project root to resolve the path against"),
-
 	// task
 	s("type", ["task"], "Task type: feature, bug-fix, refactor, security"),
 	s("priority", ["task"], "Task priority"),
@@ -307,7 +371,7 @@ const FLAGS: FlagSpec[] = [
 	b("include-unportable", ["migrate"], "Install Claude Code skills for a provider with no adapter (experimental)"),
 
 	// providers
-	b("lifecycle", ["providers", "explain-support"], "Show the capability-adapter and lifecycle matrix"),
+	b("lifecycle", ["providers"], "Show the capability-adapter and lifecycle matrix"),
 
 	// visual-plan
 	s("port", ["visual-plan"], "Bind to a fixed port instead of a random one"),

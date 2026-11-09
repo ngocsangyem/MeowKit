@@ -17,6 +17,7 @@ import {
 } from "./install-metadata.js";
 import { writeInstallMetadata } from "./install-metadata-writer.js";
 import { writeRuntimeDescriptor, resolveInProjectExecutable } from "./hook-runtime.js";
+import { runningCliEntry, writeLauncher } from "./project-launcher.js";
 import { configWritePath, legacyDescriptorPath } from "../state/resolve-config-path.js";
 import { observerNames } from "../config/observer-names.js";
 import { renderConfigStub } from "../config/write-stub.js";
@@ -69,6 +70,11 @@ export interface SmartUpdateOptions {
 	allowedPaths?: Set<string>;
 	/** Installed profile name to record in metadata ("full" for whole-tree). */
 	profile?: string;
+	/**
+	 * The CLI version the committed launcher is pinned to. Omitted by callers that are not
+	 * an install (`pack add`), where the launcher the previous install wrote still stands.
+	 */
+	cliVersion?: string;
 	/** Resolved pack list to record in metadata; omit for full/legacy (sentinel). */
 	packs?: string[];
 	/**
@@ -517,22 +523,25 @@ export async function smartUpdate(
 		// install/upgrade rebuilds correct metadata from disk — the recovery path.
 		await writeInstallMetadata(dirname(claudeDir), meta);
 
-		// Write the hook runtime descriptor when an in-project mewkit executable exists (so the
-		// SessionStart hook can run `orient` without npx / parent-node_modules scanning). This is
-		// ADVISORY, unlike the metadata write above: if no in-project executable is installed yet,
-		// write NO descriptor (honest "no runtime" → the hook uses its checkpoint fallback) rather
-		// than record one the hook would reject. Refreshed on every install/upgrade.
+		// Write the committed launcher, then point the hook runtime descriptor at it, so the
+		// SessionStart hook has an executable to trust even when the CLI was invoked through
+		// `npx` and the project holds no dependency of its own. The launcher lives inside the
+		// project, so the descriptor's existing containment gate accepts it unchanged; an
+		// in-project dependency, when there is one, is still preferred as the recorded entry.
+		// ADVISORY, unlike the metadata write above: a failure here leaves the hook on its
+		// labelled checkpoint fallback rather than failing the install.
 		try {
-			const executable = resolveInProjectExecutable(targetDir);
-			if (executable) {
-				await writeRuntimeDescriptor(claudeDir, {
-					executable,
-					packageVersion: release?.version ?? "",
-					now: new Date().toISOString(),
-				});
-			}
+			const launcher = writeLauncher(targetDir, {
+				version: options.cliVersion ?? release?.version ?? "",
+				cliEntry: resolveInProjectExecutable(targetDir) ?? runningCliEntry(import.meta.url),
+			});
+			await writeRuntimeDescriptor(claudeDir, {
+				executable: launcher,
+				packageVersion: release?.version ?? "",
+				now: new Date().toISOString(),
+			});
 		} catch (err) {
-			log.warn(`Could not write hook runtime descriptor (non-fatal): ${(err as Error).message}`);
+			log.warn(`Could not write the project launcher (non-fatal): ${(err as Error).message}`);
 		}
 	}
 

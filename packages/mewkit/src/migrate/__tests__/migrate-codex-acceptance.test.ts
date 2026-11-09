@@ -129,7 +129,7 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 	it("keeps one idempotent resolver bootstrap and writes a capability snapshot", () => {
 		const agentsMd = readFileSync(join(env.projectDir, "AGENTS.md"), "utf-8");
 		expect(agentsMd.match(/GENERATED:capability-bootstrap START/g)).toHaveLength(1);
-		expect(agentsMd).toContain("npx mewkit capabilities resolve --intent");
+		expect(agentsMd).toContain("mewkit capabilities resolve --intent");
 		const snapshot = JSON.parse(readFileSync(join(env.projectDir, ".codex", "capabilities.json"), "utf-8")) as {
 			schemaVersion: string;
 			entries: unknown[];

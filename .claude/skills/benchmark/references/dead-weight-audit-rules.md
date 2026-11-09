@@ -92,7 +92,7 @@ WHY: A broken harness cannot self-test; the manual path keeps the audit possible
 The audit reasons by responsibility, not by file, and consumes recorded friction/entropy.
 Two deterministic CLI surfaces feed it (no subagent, no inner-harness hook, exit 0 — advisory):
 
-- `mewkit inventory --substrate` — artifact coverage by responsibility (covered/partial/missing).
+- `scripts/harness-inventory.cjs --substrate` (maintainer script, MeowKit repo only) — artifact coverage by responsibility (covered/partial/missing).
   Target prune/keep decisions by responsibility; a `missing` responsibility is a real gap, not noise.
 - `mewkit trace audit | propose | score` — entropy + orphaned/stale/unverified/repeated-friction
   over the append log; `trace propose` groups repeated friction (≥2) into advisory backlog items.

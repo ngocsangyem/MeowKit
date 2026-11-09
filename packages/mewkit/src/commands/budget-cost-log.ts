@@ -3,10 +3,19 @@ import path from "node:path";
 import { resolveStateDir } from "../state/resolve-state-dir.js";
 import type { CostEntry, LiveBudgetState } from "./budget-types.js";
 
+/**
+ * The path the search looks for in each directory it walks. Exported so the message a user
+ * sees when the search fails can name the same path the search used — the old message named
+ * a location this code has never read, which sent people to a file that was never there.
+ */
+export function costLogCandidate(dir: string): string {
+	return path.join(resolveStateDir(dir, "telemetry"), "cost-log.json");
+}
+
 export function findCostLog(): string | null {
 	let current = process.cwd();
 	while (true) {
-		const candidate = path.join(resolveStateDir(current, "telemetry"), "cost-log.json");
+		const candidate = costLogCandidate(current);
 		if (fs.existsSync(candidate)) {
 			return candidate;
 		}

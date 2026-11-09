@@ -18,6 +18,9 @@ const CLAUDE_DIR = path.join(ROOT, '.claude');
 const { LATEST_FILE, gitHead } = require(
   path.join(CLAUDE_DIR, 'hooks', 'lib', 'checkpoint-utils.cjs')
 );
+const { exposeLauncherOnPath, containedLauncher } = require(
+  path.join(CLAUDE_DIR, 'hooks', 'lib', 'launcher-path-env.cjs')
+);
 
 // Read-side trust gate for the runtime descriptor — MUST mirror core/hook-runtime.ts exactly
 // (same schemaVersion gate, same realpath-both-sides containment, same isFile check).
@@ -73,6 +76,12 @@ function safePlanPath(p) {
   return p;
 }
 
+// What a session is told when a trusted executable exists but could not answer, and there is
+// no checkpoint either. Labeled like the fallback: it reports a reachability fact, never
+// orientation.
+const UNREACHABLE_RUNTIME =
+  '[orientation unavailable: the installed runtime did not answer — run `mewkit doctor`]';
+
 // Checkpoint fallback — the pre-runtime resume summary, LABELED so it is never mistaken for a
 // live orientation from durable state.
 function checkpointFallback() {
@@ -99,15 +108,45 @@ function checkpointFallback() {
 
 module.exports = function orientationRitual(ctx) {
   const source = (ctx && ctx.source) || 'startup';
-  // Fresh startup orientation stays disabled until the release gate proves the runtime + latency.
+
+  // Make the bare `mewkit` form resolve for this session's shell commands. Deliberately
+  // independent of orientation: it applies on every session source, including the fresh
+  // startup that prints no orientation at all, and orientation itself reaches the CLI
+  // through the runtime descriptor rather than through PATH. A note comes back only when
+  // the bare form could not be exposed.
+  const pathNote = exposeLauncherOnPath({ projectRoot: ROOT });
+
+  // Fresh startup orientation stays disabled until the release gate proves the runtime +
+  // latency, and that silence includes this note: the PATH write above has already happened,
+  // so the bare form works either way, and a startup session that prints one line would be
+  // the fresh-startup output this handler is specifically not supposed to produce yet.
   if (source === 'startup') return '';
 
-  // Preferred path: bounded orientation from the installed runtime.
-  const exe = trustedExecutable();
-  if (exe) {
+  const prefix = pathNote ? pathNote + '\n' : '';
+
+  // Preferred path: bounded orientation from the installed runtime — the descriptor's
+  // executable when this is the project it was written in, else the committed launcher at
+  // its known project-relative path. The launcher is needed because the descriptor records
+  // an ABSOLUTE path: a teammate's clone carries the path the kit was installed under, which
+  // correctly fails containment against their own root, and an install step is exactly what
+  // a fresh clone has not run. `containedLauncher` applies the same containment rule, so it
+  // grants no reach the descriptor would not have granted.
+  let attempted = false;
+  for (const exe of [trustedExecutable(), containedLauncher(ROOT)]) {
+    if (!exe) continue;
+    attempted = true;
     const oriented = orientViaRuntime(exe);
-    if (oriented) return oriented + '\n';
+    if (oriented) return prefix + oriented + '\n';
   }
+
   // Otherwise: labeled checkpoint fallback (never claimed as recovered orientation).
-  return checkpointFallback();
+  const fallback = checkpointFallback();
+  if (fallback) return prefix + fallback;
+
+  // Nothing to fall back to AND an executable that did not answer — the case a fresh clone
+  // hits when the pinned CLI is not on this machine. Staying silent here would read as
+  // "nothing to resume", which is a different fact from "the CLI could not be reached", so
+  // say which one it is and name the command that explains it.
+  if (attempted) return `${prefix}${UNREACHABLE_RUNTIME}\n`;
+  return prefix;
 };

@@ -8,18 +8,17 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-/** The 23 core verbs, each with the fixture arguments it needs. */
+/** The core verbs, each with the fixture arguments it needs. */
 const CORE_VERBS = [
 	{ argv: ["doctor"], where: "repo" },
 	{ argv: ["orient"], where: "repo" },
-	{ argv: ["status"], where: "repo" },
+	{ argv: ["versions"], where: "repo" },
 	{ argv: ["validate", "--packs"], where: "repo" },
 	{ argv: ["validate", "--gates"], where: "repo" },
 	{ argv: ["validate", "--memory"], where: "repo" },
 	{ argv: ["validate", "--workflow"], where: "repo" },
 	{ argv: ["validate", "--agents"], where: "repo" },
 	{ argv: ["validate", "--ownership"], where: "repo" },
-	{ argv: ["inventory", "--check"], where: "repo" },
 	{ argv: ["plan", "status", "@plan"], where: "fixture" },
 	{ argv: ["plan", "check", "@phase"], where: "fixture" },
 	{ argv: ["plan", "approve", "@plan", "--by", "no-python-harness"], where: "fixture" },
@@ -30,7 +29,6 @@ const CORE_VERBS = [
 	{ argv: ["review"], where: "fixture", tolerateUsage: true },
 	{ argv: ["budget", "context"], where: "repo" },
 	{ argv: ["trace", "score"], where: "repo" },
-	{ argv: ["context", "resolve", "README.md"], where: "repo" },
 	{ argv: ["advice"], where: "fixture", tolerateUsage: true },
 	{ argv: ["skill", "env", "--list"], where: "repo" },
 ];

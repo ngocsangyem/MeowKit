@@ -1,4 +1,6 @@
-// `mewkit docs-manifest` — generate or drift-check the docs reference manifest.
+// The docs reference manifest, generated and drift-checked for maintainers of this
+// repository. Only this repo's CI consumes it, so it is reached from a repo script rather
+// than from the published CLI.
 //
 // `--check` is what CI runs: rebuild from the live `.claude/` tree and compare against the
 // committed file. A difference means a runtime fact moved and the docs were not regenerated,
@@ -56,7 +58,7 @@ export function docsManifest(args: DocsManifestArgs = {}): void {
 
 	if (args.check) {
 		if (!fs.existsSync(target)) {
-			console.error(pc.red(`Missing ${DOCS_MANIFEST_REL} — run \`mewkit docs-manifest --write\`.`));
+			console.error(pc.red(`Missing ${DOCS_MANIFEST_REL} — run \`node scripts/docs-manifest.cjs --write\`.`));
 			process.exit(1);
 		}
 		const committed = fs.readFileSync(target, "utf-8");
@@ -67,7 +69,7 @@ export function docsManifest(args: DocsManifestArgs = {}): void {
 		}
 
 		// The pages are half the contract: a manifest can be current while the pages restating it
-		// are not, which is the exact state this phase exists to make impossible.
+		// are not, and a reader trusts the page rather than the manifest.
 		if (fs.existsSync(referenceDir)) {
 			const indexes = spliceReferenceIndexes(referenceDir, claudeDir, manifest.entries, { write: false });
 			if (indexes.stale.length > 0) {
@@ -90,7 +92,7 @@ export function docsManifest(args: DocsManifestArgs = {}): void {
 		}
 
 		if (failed) {
-			console.error(`\nRegenerate with \`mewkit docs-manifest --write\` and commit the result.`);
+			console.error(`\nRegenerate with \`node scripts/docs-manifest.cjs --write\` and commit the result.`);
 			process.exit(1);
 		}
 		console.log(
@@ -133,5 +135,5 @@ function reportDrift(
 	for (const k of before.keys()) {
 		if (!after.has(k)) console.error(`  ${pc.red("removed")} ${k}`);
 	}
-	console.error(`\nRegenerate with \`mewkit docs-manifest --write\` and commit the result.`);
+	console.error(`\nRegenerate with \`node scripts/docs-manifest.cjs --write\` and commit the result.`);
 }

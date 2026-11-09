@@ -59,7 +59,7 @@ when a human asks for something to be remembered.
 Append through the CLI, never with a bare `Edit`:
 
 ```bash
-npx mewkit note gotchas <<'EOF'
+mewkit note gotchas <<'EOF'
 ## <one-line lesson>   <!-- YYYY-MM-DD -->
 Why: <evidence>
 Apply when: <trigger the next agent can grep for>
@@ -91,7 +91,7 @@ Rules:
 - **Reviewed in the PR.** Memory changes ship in the diff like any other file; the `mk:review`
   checklist asks whether the memory diff adds instruction-like text or secrets.
 - **Linted at three points.** `mewkit note` lints the entry before it appends, so a finding never
-  reaches the file. `npx mewkit validate --memory` lints the whole store and is run fail-closed by
+  reaches the file. `mewkit validate --memory` lints the whole store and is run fail-closed by
   the `pre-ship.cjs` hook on `git commit` / `push` / `merge` (exit 2 blocks the ship; if no `mewkit` CLI resolves it prints a visible SKIP instead) and by this
   kit's own CI. Both fail on injection phrases, secret-shaped tokens, an unscannable file, or a
   file over 300 lines, without echoing the matched secret. Run it yourself before you commit if

@@ -201,7 +201,7 @@
 				"dir": "command-status",
 				"verdict": "map-agent",
 				"owner": "agent:project-manager",
-				"reason": "Delivery status; owned by project-manager agent (phase 5) / mewkit status CLI."
+				"reason": "Delivery status; owned by project-manager agent / the `mewkit versions` and `mewkit doctor` CLI surface."
 			},
 			{
 				"dir": "command-test",

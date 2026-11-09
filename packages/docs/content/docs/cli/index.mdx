@@ -3,7 +3,9 @@ title: "CLI Reference"
 description: "The mewkit command line, grouped by what you are trying to do."
 ---
 
-MeowKit ships one CLI package, `mewkit`. Run it from your project root; there is nothing to install globally.
+MeowKit ships one CLI package, `mewkit`. Run it from your project root; there is nothing to
+install globally — the install writes a committed launcher that makes the bare `mewkit` form
+resolve inside the project.
 
 ## Find a command
 
@@ -24,14 +26,52 @@ cd your-project
 npx mewkit init
 
 # 2. Configure environment
-npx mewkit setup
+mewkit setup
 
 # 3. Verify installation
-npx mewkit doctor
+mewkit doctor
 
 # 4. Create your first task
-npx mewkit task new --type feature "Add user authentication"
+mewkit task new --type feature "Add user authentication"
 ```
+
+## How `mewkit` resolves after the install
+
+The first command is `npx mewkit init`, because at that point the project has nothing in it
+to run. Everything after it is written as plain `mewkit …`, and the install is what makes
+that name resolve:
+
+- `init` writes a small launcher at `.meowkit/bin/mewkit`, **pinned** to the CLI version that
+  installed the kit, and commits it. It is a resolver, not a copy of the CLI: it finds the
+  pinned version — in the project's own `node_modules` first, then from this machine's record
+  of that version — and runs it.
+- The launcher never reaches the network. If the pinned version is not available it says so
+  and names `mewkit doctor`, rather than fetching mid-session.
+- Hooks do not depend on your shell: they execute the launcher through the install-written
+  `.claude/runtime.json`, which is re-validated on every read and refuses any executable
+  outside the project.
+- For your own shell commands, the SessionStart hook puts the launcher's directory first on
+  `PATH`, so plain `mewkit …` works. That directory contains only `mewkit`, so nothing else
+  on your `PATH` changes. On Windows PowerShell the bare form is unavailable and the hook
+  prints the `mewkit doctor` hint instead.
+- A teammate who clones the repository gets the launcher with it and needs no install step.
+
+Requires **Node.js 24+** — the same floor `engines.node` enforces and the version the test
+matrix runs. `mewkit doctor` fails below it and names the version it found.
+
+## Exit codes and help
+
+Every command answers with one of three codes:
+
+| Code | Meaning |
+| --- | --- |
+| `0` | the command ran and succeeded |
+| `1` | the command ran and failed |
+| `2` | the invocation was wrong — unknown command, unknown subcommand, or a missing subcommand on a command that requires one |
+
+A code `2` always prints the valid subcommands, so a typo tells you what you could have
+typed. `mewkit <command> <subcommand> --help` prints that subcommand's own usage and runs
+nothing at all; `mewkit <command> --help` does the same for the command.
 
 ## Two things worth knowing up front
 
@@ -98,7 +138,7 @@ Validate .claude/ project structure.
 | Flag | What it does |
 |---|---|
 | `--target` `<value>` | Validate a generated provider target instead of a `.claude/` project |
-| `--mode` `<value>` | Force authoring or flat-copy mode instead of auto-detecting |
+| `--mode` `<value>` | Maintainer override: force the authoring or flat-copy run profile instead of auto-detecting it |
 | `--portable` | Include portable provider contract checks |
 | `--strict` | Treat WARN as failure (exit 1) |
 | `--workflow` | Run only the workflow.yaml drift check |
@@ -179,10 +219,6 @@ Subcommands: `provenance`.
 | `--hard-gates` | Live-probe the hard gates (plan, privacy, injection block) |
 | `--adopt` | Rebuild the ownership baseline from the local kit cache, or refuse |
 
-### `mewkit status`
-
-Print version and config summary.
-
 ### `mewkit versions`
 
 Print the installed CLI, kit, target and delivery of this project.
@@ -247,18 +283,6 @@ Resume orientation from durable task state; reads records only.
 | `--json` | Emit machine-readable JSON |
 | `--record` | Record the result to the task record; `--no-record` skips it |
 
-### `mewkit context`
-
-Repo-context evidence.
-
-Subcommands: `resolve`, `check`, `record`.
-
-| Flag | What it does |
-|---|---|
-| `--json` | Emit machine-readable JSON |
-| `--task` `<value>` | Task id to record the evidence envelope against |
-| `--root` `<value>` | Project root to resolve the path against |
-
 ### `mewkit task`
 
 Create and list task files.
@@ -309,15 +333,6 @@ Show the effective provider support matrix and enforcement levels.
 | `--json` | Emit machine-readable JSON |
 | `--lifecycle` | Show the capability-adapter and lifecycle matrix |
 
-### `mewkit explain-support`
-
-Alias of `providers`.
-
-| Flag | What it does |
-|---|---|
-| `--json` | Emit machine-readable JSON |
-| `--lifecycle` | Show the capability-adapter and lifecycle matrix |
-
 ### `mewkit visual-plan`
 
 Visual plan contracts.
@@ -353,21 +368,6 @@ Subcommands: `prepare`, `read`, `coverage`, `compose`, `submit`, `cleanup`.
 | `--as` `<value>` | Read the diff as one named persona |
 | `--reply` | Post the composed review back to the pull request |
 | `--confirm` `<value>` | Confirmation token required for the irreversible submit step |
-
-### `mewkit inventory`
-
-List harness artifacts with governance metadata.
-
-| Flag | What it does |
-|---|---|
-| `--json` | Emit machine-readable JSON |
-| `--check` | Fail if README or index counts drift from reality |
-| `--substrate` | Print the responsibility-by-coverage substrate matrix |
-| `--stale` | Show only deprecated or experimental artifacts |
-| `--critical` | Show only criticality=critical artifacts |
-| `--portable-missing` | Show artifacts whose runtime is not portable |
-| `--emit` | Write the substrate view rather than printing it |
-| `--emit-counts` | Rewrite README and index count numbers to match reality |
 
 ### `mewkit plan`
 
@@ -417,16 +417,6 @@ Check a review verdict against the active plan.
 ### `mewkit note`
 
 Append a lint-checked entry to the committed team-memory store (entry on stdin).
-
-### `mewkit docs-manifest`
-
-Generate or drift-check the docs reference manifest.
-
-| Flag | What it does |
-|---|---|
-| `--json` | Emit machine-readable JSON |
-| `--check` | Fail when the committed manifest no longer matches the live `.claude/` tree |
-| `--write` | Regenerate the committed manifest |
 
 ### `mewkit uninstall`
 

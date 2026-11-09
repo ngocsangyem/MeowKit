@@ -149,7 +149,7 @@ Selected agents (architecture row): `architect + developer + planner`.
 - Party mode is discussion-only — if an agent suggests code changes during party, redirect to the normal pipeline after the decision
 - Decision write is NOT optional — see "Memory Write" below
 - "decide" keyword ends the discussion immediately — don't use it in the topic itself (e.g., avoid "decide between REST and GraphQL")
-- `allowed-tools` is intentionally broad: `Bash` for `npx mewkit note decisions`, `Grep`/`Glob` for topic-keyword grounding against the codebase, `Read` for `prompts/*.md` references, `AskUserQuestion` for the "decide" gate. Do not trim without measuring loss.
+- `allowed-tools` is intentionally broad: `Bash` for `mewkit note decisions`, `Grep`/`Glob` for topic-keyword grounding against the codebase, `Read` for `prompts/*.md` references, `AskUserQuestion` for the "decide" gate. Do not trim without measuring loss.
 
 ## Decision Record Template (canonical)
 
@@ -178,7 +178,7 @@ After synthesis concludes, append the populated Decision Record (using the templ
 `.meowkit/memory/decisions.md` through `mewkit note`, which creates the file on first write:
 
 ```bash
-npx mewkit note decisions <<'EOF'
+mewkit note decisions <<'EOF'
 <the populated Decision Record>
 EOF
 ```
