@@ -210,6 +210,11 @@ const FLAGS: FlagSpec[] = [
 	b("force", ["init", "visual-plan", "migrate", "uninstall", "upgrade"], "Overwrite user-edited targets on conflict", {
 		perCommand: { init: "Overwrite an existing `.claude/`", uninstall: "Also remove kit paths this project has edited" },
 	}),
+	b(
+		"allow-kit-source",
+		["init", "upgrade"],
+		"Run even in the MeowKit source repo (overwrites its authored `.claude/`)",
+	),
 
 	// init
 	s("target", ["init", "validate"], "Skip the toolkit picker and create one toolkit", {

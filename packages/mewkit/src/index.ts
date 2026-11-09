@@ -109,6 +109,7 @@ async function main(): Promise<void> {
 				allowCloudMcp: args["allow-cloud-mcp"] as boolean | undefined,
 				yes: args.yes as boolean | undefined,
 				interactive: process.stdout.isTTY === true,
+				allowKitSource: args["allow-kit-source"] as boolean | undefined,
 			});
 			break;
 		case "upgrade":
@@ -124,6 +125,7 @@ async function main(): Promise<void> {
 				force: args.force as boolean | undefined,
 				dryRun: args["dry-run"] as boolean | undefined,
 				interactive: process.stdout.isTTY === true,
+				allowKitSource: args["allow-kit-source"] as boolean | undefined,
 			});
 			break;
 		case "validate": {

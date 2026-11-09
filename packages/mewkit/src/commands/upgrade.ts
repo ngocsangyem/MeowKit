@@ -27,6 +27,7 @@ import { confirmationRequiredMessage, EXIT_NEEDS_CONFIRMATION, needsConfirmation
 import { populateKitCache } from "../core/kit-cache.js";
 import { LEGACY_DESCRIPTOR_REL, legacyDescriptorPath } from "../state/resolve-config-path.js";
 import { migrateLegacyDescriptor } from "./migrate-config-descriptor.js";
+import { refuseKitSourceRepo } from "./kit-source-repo-guard.js";
 
 /** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
 const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
@@ -169,6 +170,8 @@ export interface UpgradeArgs {
 	offline?: boolean;
 	/** The running CLI's version, for the provenance this run re-stamps. */
 	cliVersion?: string;
+	/** Permit running in the MeowKit source repo, whose `.claude/` is the kit's authored source. */
+	allowKitSource?: boolean;
 }
 
 /** Read installed version from canonical metadata (instant, no npx), with legacy fallback. */
@@ -439,6 +442,7 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 	// claude-code kit; refresh every one present rather than returning after the first match.
 	// (Skip for --check/--list, which are version queries.)
 	const cwd = process.cwd();
+	if (!args.check && !args.list) refuseKitSourceRepo(cwd, "upgrade", args.allowKitSource);
 
 	// An offline run is served from this project's artifact store, and nothing
 	// else. Reaching the network "to help" would make the flag mean "prefer the

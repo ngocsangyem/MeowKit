@@ -20,6 +20,7 @@ import { populateKitCache } from "../core/kit-cache.js";
 import { confirmationRequiredMessage, EXIT_NEEDS_CONFIRMATION, needsConfirmation } from "../core/destructive-guard.js";
 import { beginMachineOutput, ensureEnvelopeOnExit, envelopeEmitter, type MutationReport } from "../core/mutation-report.js";
 import { bundleReport, installMutationReport } from "./install-report.js";
+import { refuseKitSourceRepo } from "./kit-source-repo-guard.js";
 
 import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.js";
 import type { MigrateOptions, ProviderType } from "../migrate/types.js";
@@ -66,6 +67,8 @@ export interface InitArgs {
 	target?: string;
 	/** When true, scope the post-init migration globally (~/.cursor/, etc.) instead of per-project. */
 	migrateGlobal?: boolean;
+	/** Permit running in the MeowKit source repo, whose `.claude/` is the kit's authored source. */
+	allowKitSource?: boolean;
 	/**
 	 * Install profile (core/developer/product/atlassian/security/research/full).
 	 * Omitted = full (today's behavior). Works in update mode too, to TRIM an
@@ -705,6 +708,11 @@ export async function init(args: InitArgs): Promise<void> {
 
 	/** One envelope per run, printed on the way out of whichever path ran. */
 	const emit = envelopeEmitter(json);
+
+	// Every non-dry-run path writes into targetDir (update mode or a provider bundle).
+	// Checked after the envelope guard is armed, so a `--json` caller still gets a
+	// document when the refusal exits.
+	if (!args.dryRun) refuseKitSourceRepo(targetDir, "init", args.allowKitSource);
 
 	// `--target codex` / `--target cursor` are distinct, offline paths: reconcile the
 	// authored bundle, done. No `.claude/`, no release download, no legacy converter.

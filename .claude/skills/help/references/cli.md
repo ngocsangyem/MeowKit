@@ -23,6 +23,7 @@ Flags:
   --beta                  Use the beta release channel
   --dry-run               Print what would happen without writing
   --force                 Overwrite an existing `.claude/`
+  --allow-kit-source      Run even in the MeowKit source repo (overwrites its authored `.claude/`)
   --target <value>        Skip the toolkit picker and create one toolkit
   --profile <value>       Install a subset: core, developer, product, atlassian, security, research, full
   --migrate               After unpack, prompt for export targets
@@ -43,15 +44,16 @@ Usage: `mewkit upgrade`
 Flags:
 
 ```text
-  --json        Emit machine-readable JSON
-  --yes         Answer prompts affirmatively
-  --beta        Use the beta release channel
-  --dry-run     Print what would happen without writing
-  --force       Overwrite user-edited targets on conflict
-  --offline     Install from this project's cached kit artifact only, re-verifying it, and reach no network
-  --check       Report without changing anything
-  --list        List available versions
-  --no-cleanup  Keep the downloaded release directory
+  --json              Emit machine-readable JSON
+  --yes               Answer prompts affirmatively
+  --beta              Use the beta release channel
+  --dry-run           Print what would happen without writing
+  --force             Overwrite user-edited targets on conflict
+  --allow-kit-source  Run even in the MeowKit source repo (overwrites its authored `.claude/`)
+  --offline           Install from this project's cached kit artifact only, re-verifying it, and reach no network
+  --check             Report without changing anything
+  --list              List available versions
+  --no-cleanup        Keep the downloaded release directory
 ```
 
 ## mewkit validate
