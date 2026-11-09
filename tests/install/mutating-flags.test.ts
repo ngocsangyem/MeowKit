@@ -32,7 +32,9 @@ const MUTATING = ["init", "upgrade", "setup", "uninstall", "backups", "pack", "m
 describe("the mutating set declares both flags", () => {
 	it("every one shows --json and --dry-run in its own help section", () => {
 		const fx = createProject();
-		const help = runMewkit(fx, ["--help"]).stdout;
+		// CI=true turns colour on, and the escape codes around a section heading
+		// would hide it from the split below.
+		const help = runMewkit(fx, ["--help"], { NO_COLOR: "1" }).stdout;
 		for (const verb of MUTATING) {
 			const section = help.split(`\n${verb} options:\n`)[1]?.split("\n\n")[0] ?? "";
 			expect(section, `${verb} has no help section`).not.toBe("");

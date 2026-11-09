@@ -28,8 +28,25 @@ const BASE_PATHSPECS = [
   '.claude/skills/cook/scripts',
 ];
 
-/** PATH is pinned so `command -v` probes inside the BASE scripts resolve identically. */
-const PINNED_PATH = ['/usr/bin', '/bin', '/usr/sbin', '/sbin', '/opt/homebrew/bin'].join(path.delimiter);
+/**
+ * PATH is pinned so `command -v` probes inside the BASE scripts resolve identically.
+ * The running node's own directory is added because a CI runner installs node
+ * outside every pinned directory, and a `#!/usr/bin/env node` stub then cannot
+ * start. None of the POSIX directories exist on Windows, so there the inherited
+ * PATH is kept as well, or `git` itself is unreachable.
+ */
+const PINNED_PATH = [
+  '/usr/bin', '/bin', '/usr/sbin', '/sbin', '/opt/homebrew/bin',
+  path.dirname(process.execPath),
+  ...(process.platform === 'win32' ? [process.env.PATH || ''] : []),
+].join(path.delimiter);
+
+/** Windows programs, git among them, need these to start at all. */
+const WINDOWS_BASE_ENV = process.platform === 'win32'
+  ? Object.fromEntries(['SystemRoot', 'ComSpec', 'PATHEXT', 'TEMP', 'TMP']
+    .filter((key) => process.env[key] !== undefined)
+    .map((key) => [key, process.env[key]]))
+  : {};
 
 const FIXED_GIT_DATE = '2026-01-01T00:00:00+0000';
 
@@ -56,6 +73,7 @@ function extractBase(repoRoot, baseSha, destDir) {
  */
 function pinnedEnv(home) {
   return {
+    ...WINDOWS_BASE_ENV,
     PATH: PINNED_PATH,
     HOME: home,
     SHELL: '/bin/sh',

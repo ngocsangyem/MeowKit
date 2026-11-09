@@ -115,7 +115,13 @@ const MARKERS = ['@@GATE_BLOCK@@', '@@CONTRACT_GATE_BLOCK@@', '@@PRIVACY_BLOCK@@
  * wall clock.
  */
 export const NORMALIZERS: Record<string, (text: string, projectDir: string) => string> = {
-  tmpdir: (text, projectDir) => text.split(jsonEscaped(projectDir)).join('{{TMP}}').split(projectDir).join('{{TMP}}'),
+  tmpdir: (text, projectDir) => {
+    const folded = text.split(jsonEscaped(projectDir)).join('{{TMP}}').split(projectDir).join('{{TMP}}');
+    // Fixtures were recorded with `/`; a Windows hook joins the same path with `\`.
+    return process.platform === 'win32'
+      ? folded.replace(/\{\{TMP\}\}[^\s'"]*/g, (p) => p.replace(/\\/g, '/'))
+      : folded;
+  },
   isoTimestamp: (text) => text.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/g, '{{TS}}'),
   homedir: (text, projectDir) => text.split(path.join(projectDir, 'home')).join('{{HOME}}'),
   isoDate: (text) => text.replace(/\d{4}-\d{2}-\d{2}/g, '{{DATE}}'),

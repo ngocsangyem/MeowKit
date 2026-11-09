@@ -45,7 +45,8 @@ describe('session-start context injection', () => {
     }
     expect(out, 'the context file content is injected').toContain('Use pnpm.');
     expect(out, 'scripts are listed').toContain('  - build');
-  });
+    // The first SessionStart probes every tool on PATH; a Windows runner takes over 60s.
+  }, 120_000);
 
   it('says so when the project has no context file', () => {
     const root = project({ '.claude/hooks/dispatch.cjs': '' });
