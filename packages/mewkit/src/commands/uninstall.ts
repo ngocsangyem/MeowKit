@@ -14,7 +14,14 @@ import pc from "picocolors";
 import { rmSync } from "node:fs";
 import { resolve, sep } from "node:path";
 
-import { classifyInstall, deletable, insideKitTree, NEVER_DELETE_RELS, type ClassifiedPath, type Classification } from "../core/ownership-classify.js";
+import {
+	classifyInstall,
+	deletable,
+	insideKitTree,
+	NEVER_DELETE_RELS,
+	type ClassifiedPath,
+	type Classification,
+} from "../core/ownership-classify.js";
 import { EXIT_NEEDS_CONFIRMATION } from "../core/destructive-guard.js";
 import { createSnapshot } from "../core/snapshot.js";
 
@@ -50,7 +57,9 @@ function printClasses(c: Classification, force: boolean): void {
 			console.log(`  ${item.path}${suffix}`);
 		}
 		if (name === "modified" && !force) {
-			console.log(pc.dim("  Refused: each of these differs from the kit's own copy. Pass --force to remove them anyway."));
+			console.log(
+				pc.dim("  Refused: each of these differs from the kit's own copy. Pass --force to remove them anyway."),
+			);
 		}
 	}
 	// Concatenated rather than interpolated: the post-write guard reads a
@@ -68,7 +77,9 @@ function asJson(c: Classification, planned: string[], deleted: string[], args: U
 			force: args.force === true,
 			cache: { state: c.cache.state, cachedVersion: c.cache.cachedVersion, recordedVersion: c.cache.recordedVersion },
 			classes,
-			refusals: c.paths.filter((p) => p.class === "refused" || p.class === "protected").map((p) => ({ path: p.path, reason: p.reason })),
+			refusals: c.paths
+				.filter((p) => p.class === "refused" || p.class === "protected")
+				.map((p) => ({ path: p.path, reason: p.reason })),
 			planned,
 			deleted,
 		},
@@ -87,7 +98,8 @@ export function uninstall(root: string, args: UninstallArgs): number {
 	const classification = classifyInstall(root);
 
 	if (!classification.hasBaseline) {
-		const message = "No ownership baseline: .meowkit/metadata.json is absent, so which files are the kit's cannot be known.";
+		const message =
+			"No ownership baseline: .meowkit/metadata.json is absent, so which files are the kit's cannot be known.";
 		const fix = "Run `mewkit doctor --adopt` to rebuild it from the local kit cache, then run this again.";
 		if (args.json) console.log(JSON.stringify({ ok: false, error: message, fix }, null, 2));
 		else {
@@ -103,10 +115,18 @@ export function uninstall(root: string, args: UninstallArgs): number {
 	if (preview) {
 		if (args.json) console.log(asJson(classification, planned, [], args));
 		else {
-			console.log(pc.bold(args.dryRun === true ? "uninstall --dry-run — nothing will be written" : "uninstall — preview only; pass --yes to delete"));
+			console.log(
+				pc.bold(
+					args.dryRun === true
+						? "uninstall --dry-run — nothing will be written"
+						: "uninstall — preview only; pass --yes to delete",
+				),
+			);
 			printClasses(classification, args.force === true);
 			if (classification.cache.state !== "ok") console.log(pc.yellow(`\nCache: ${classification.cache.reason}`));
-			console.log(pc.dim(`\n${planned.length} file(s) would be removed with --yes${args.force === true ? " --force" : ""}.`));
+			console.log(
+				pc.dim(`\n${planned.length} file(s) would be removed with --yes${args.force === true ? " --force" : ""}.`),
+			);
 		}
 		// A destructive command asked for in a session that cannot be prompted
 		// must not proceed blind, and must not look like success either.
@@ -143,7 +163,12 @@ export function uninstall(root: string, args: UninstallArgs): number {
 
 	console.log(pc.bold(`Removed ${deleted.length} file(s)`));
 	printClasses(classification, args.force === true);
-	if (snapshot !== null) console.log(pc.dim(`\nSnapshot ${snapshot.id} holds every file this run touched — restore with \`mewkit backups restore ${snapshot.id}\`.`));
+	if (snapshot !== null)
+		console.log(
+			pc.dim(
+				`\nSnapshot ${snapshot.id} holds every file this run touched — restore with \`mewkit backups restore ${snapshot.id}\`.`,
+			),
+		);
 	for (const f of failed) console.error(pc.red(`  could not remove ${f.path}: ${f.error}`));
 	return failed.length === 0 ? 0 : 1;
 }

@@ -94,4 +94,5 @@ describe("ship set completeness", () => {
 		// The converse: the withheld benchmark skill takes its corpus with it, so
 		// nothing shipped reaches for a spec the artifact does not carry.
 		expect(shippedSkills.has("benchmark")).toBe(false);
-	});});
+	});
+});

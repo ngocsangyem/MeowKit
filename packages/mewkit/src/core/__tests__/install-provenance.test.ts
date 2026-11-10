@@ -69,8 +69,12 @@ describe("install provenance", () => {
 			files: [],
 		};
 		const provenance = { kitVersion: "2.15.0", cliVersion: "2.3.1", target: "claude-code", delivery: "native" };
-		expect(InstallMetadataSchema.safeParse({ ...base, provenance: { ...provenance, origin: "somewhere" } }).success).toBe(false);
-		expect(InstallMetadataSchema.safeParse({ ...base, provenance: { ...provenance, origin: "release-zip" } }).success).toBe(true);
+		expect(
+			InstallMetadataSchema.safeParse({ ...base, provenance: { ...provenance, origin: "somewhere" } }).success,
+		).toBe(false);
+		expect(
+			InstallMetadataSchema.safeParse({ ...base, provenance: { ...provenance, origin: "release-zip" } }).success,
+		).toBe(true);
 	});
 
 	it("reads a record written before provenance existed without error", async () => {

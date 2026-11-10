@@ -44,23 +44,47 @@ function outOfSubsetScalar(text: string, line: number, path: string): GrammarErr
 	if (quote !== "") {
 		const body = text.slice(1);
 		const close = body.indexOf(quote);
-		if (close === -1) return fail("unterminated-quote", line, `${path} opens a quote and never closes it; add the closing ${quote}`);
+		if (close === -1)
+			return fail("unterminated-quote", line, `${path} opens a quote and never closes it; add the closing ${quote}`);
 		if (close !== body.length - 1) {
-			return fail("trailing-content-after-quote", line, `${path} has content after the closing quote; a value is one scalar, and the grammar has no '' escape`);
+			return fail(
+				"trailing-content-after-quote",
+				line,
+				`${path} has content after the closing quote; a value is one scalar, and the grammar has no '' escape`,
+			);
 		}
 		if (quote === '"' && body.includes("\\")) {
-			return fail("escape-not-supported", line, `${path} uses a backslash escape; the grammar takes characters literally, so write the character itself or drop the quotes`);
+			return fail(
+				"escape-not-supported",
+				line,
+				`${path} uses a backslash escape; the grammar takes characters literally, so write the character itself or drop the quotes`,
+			);
 		}
 		return null;
 	}
 	// Null and float are where the two readers would otherwise part company: the
 	// full parser gives `null` and `1.5`, the hand reader sees the words. Neither
 	// type is in the subset, so both refuse rather than guess.
-	if (NULLISH.test(text)) return fail("null-not-supported", line, `${path} has no value; remove the key instead of setting it to null`);
-	if (BOOLEAN_MISSPELLED.test(text)) return fail("bad-boolean-spelling", line, `${path} is ${text}, which is not a boolean here; write true or false in lower case`);
-	if (FLOATISH.test(text)) return fail("float-not-supported", line, `${path} is ${text}; the config grammar has whole numbers and strings, not decimals`);
+	if (NULLISH.test(text))
+		return fail("null-not-supported", line, `${path} has no value; remove the key instead of setting it to null`);
+	if (BOOLEAN_MISSPELLED.test(text))
+		return fail(
+			"bad-boolean-spelling",
+			line,
+			`${path} is ${text}, which is not a boolean here; write true or false in lower case`,
+		);
+	if (FLOATISH.test(text))
+		return fail(
+			"float-not-supported",
+			line,
+			`${path} is ${text}; the config grammar has whole numbers and strings, not decimals`,
+		);
 	if (INTEGERISH.test(text) && !DECIMAL_INT.test(text)) {
-		return fail("non-decimal-integer", line, `${path} is ${text}; write decimal digits with no sign, no underscores and no 0x/0o/0b prefix`);
+		return fail(
+			"non-decimal-integer",
+			line,
+			`${path} is ${text}; write decimal digits with no sign, no underscores and no 0x/0o/0b prefix`,
+		);
 	}
 	return null;
 }
@@ -98,13 +122,17 @@ export function checkGrammar(source: string): GrammarError | null {
 		if (body.trim() === "") continue;
 
 		const indent = body.length - body.trimStart().length;
-		if (indent % 2 !== 0) return fail("odd-indentation", lineNo, `indentation must be a multiple of two spaces, found ${indent}`);
+		if (indent % 2 !== 0)
+			return fail("odd-indentation", lineNo, `indentation must be a multiple of two spaces, found ${indent}`);
 		const depth = indent / 2;
-		if (depth > 1) return fail("nesting-too-deep", lineNo, "the config grammar allows two levels; this line is a third");
+		if (depth > 1)
+			return fail("nesting-too-deep", lineNo, "the config grammar allows two levels; this line is a third");
 
 		const trimmed = body.trim();
-		if (trimmed.startsWith("- ") || trimmed === "-") return fail("sequence-not-supported", lineNo, "lists are not part of the config grammar");
-		if (trimmed.startsWith("---")) return fail("document-marker-not-supported", lineNo, "document markers are not part of the config grammar");
+		if (trimmed.startsWith("- ") || trimmed === "-")
+			return fail("sequence-not-supported", lineNo, "lists are not part of the config grammar");
+		if (trimmed.startsWith("---"))
+			return fail("document-marker-not-supported", lineNo, "document markers are not part of the config grammar");
 
 		const split = trimmed.indexOf(":");
 		if (split < 1) return fail("not-a-key", lineNo, `expected "key: value", found ${JSON.stringify(trimmed)}`);
@@ -114,9 +142,14 @@ export function checkGrammar(source: string): GrammarError | null {
 		// pair to js-yaml, so the flat spelling is refused on both sides instead.
 		if (key !== SCHEMA_KEY && key.includes(".")) {
 			const [head, ...tail] = key.split(".");
-			return fail("dotted-key", lineNo, `${key} is a path, not a key; write it nested — "${head}:" on its own line, then "  ${tail.join(".")}: …" indented under it`);
+			return fail(
+				"dotted-key",
+				lineNo,
+				`${key} is a path, not a key; write it nested — "${head}:" on its own line, then "  ${tail.join(".")}: …" indented under it`,
+			);
 		}
-		if (key !== SCHEMA_KEY && !KEY.test(key)) return fail("bad-key", lineNo, `${JSON.stringify(key)} is not a valid config key`);
+		if (key !== SCHEMA_KEY && !KEY.test(key))
+			return fail("bad-key", lineNo, `${JSON.stringify(key)} is not a valid config key`);
 
 		if (depth === 0) parent = "";
 		else if (parent === "") return fail("orphan-nesting", lineNo, `${key} is indented but no parent key opened a map`);
@@ -133,10 +166,18 @@ export function checkGrammar(source: string): GrammarError | null {
 		}
 
 		const first = rest[0] as string;
-		if (first === "&" || first === "*") return fail("anchor-not-supported", lineNo, "YAML anchors and aliases are not part of the config grammar");
-		if (first === "!") return fail("tag-not-supported", lineNo, "YAML tags are not part of the config grammar; drop the tag and write the plain value");
-		if (first === "|" || first === ">") return fail("block-scalar-not-supported", lineNo, "multi-line scalars are not part of the config grammar");
-		if (first === "[" || first === "{") return fail("flow-collection-not-supported", lineNo, "inline lists and maps are not part of the config grammar");
+		if (first === "&" || first === "*")
+			return fail("anchor-not-supported", lineNo, "YAML anchors and aliases are not part of the config grammar");
+		if (first === "!")
+			return fail(
+				"tag-not-supported",
+				lineNo,
+				"YAML tags are not part of the config grammar; drop the tag and write the plain value",
+			);
+		if (first === "|" || first === ">")
+			return fail("block-scalar-not-supported", lineNo, "multi-line scalars are not part of the config grammar");
+		if (first === "[" || first === "{")
+			return fail("flow-collection-not-supported", lineNo, "inline lists and maps are not part of the config grammar");
 		const bad = outOfSubsetScalar(rest, lineNo, path);
 		if (bad !== null) return bad;
 	}

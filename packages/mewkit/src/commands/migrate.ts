@@ -96,7 +96,9 @@ export async function migrate(args: MigrateCliArgs): Promise<number> {
 					planned: [],
 					applied: [],
 					notes: [],
-					...(error === undefined ? {} : { error, fix: "Re-run `mewkit migrate <tool>` once the reason above is resolved." }),
+					...(error === undefined
+						? {}
+						: { error, fix: "Re-run `mewkit migrate <tool>` once the reason above is resolved." }),
 				});
 			}
 			endMachineOutput();

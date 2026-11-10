@@ -32,7 +32,10 @@ function buildReport(root: string, cliVersion: string): VersionsReport | { error
 		meta = readInstallMetadata(claudeDir).meta;
 	} catch (error) {
 		if (error instanceof CorruptInstallMetadataError) {
-			return { error: "This project's install record is unreadable, so its versions cannot be reported. Run `mewkit upgrade` to rebuild it." };
+			return {
+				error:
+					"This project's install record is unreadable, so its versions cannot be reported. Run `mewkit upgrade` to rebuild it.",
+			};
 		}
 		throw error;
 	}
@@ -42,7 +45,8 @@ function buildReport(root: string, cliVersion: string): VersionsReport | { error
 	// command useless in exactly the projects whose target is worth asking about.
 	if (meta === null) {
 		return {
-			error: "No MeowKit install was found in this directory, so there are no installed versions to report. Run `mewkit init` to create one.",
+			error:
+				"No MeowKit install was found in this directory, so there are no installed versions to report. Run `mewkit init` to create one.",
 		};
 	}
 	// Absent provenance is reported as unknown rather than guessed. A project

@@ -71,12 +71,15 @@ export function backupsRestore(root: string, id: string | undefined, args: Backu
 	// A restore overwrites whatever is on disk now, so it is destructive: with no
 	// terminal to confirm in it prints the plan and stops. The plan is the same
 	// one `--dry-run` prints, so the user sees exactly what was withheld.
-	const blind = args.dryRun !== true && needsConfirmation({ assumeYes: args.yes === true, interactive: args.interactive !== false });
+	const blind =
+		args.dryRun !== true &&
+		needsConfirmation({ assumeYes: args.yes === true, interactive: args.interactive !== false });
 
 	if (args.dryRun || blind) {
 		const plan = planRestore(root, manifest);
 		if (blind && !args.json) console.error(pc.yellow(confirmationRequiredMessage("backups restore")));
-		if (args.json) console.log(JSON.stringify({ ok: true, dryRun: true, needsConfirmation: blind, id, ...plan }, null, 2));
+		if (args.json)
+			console.log(JSON.stringify({ ok: true, dryRun: true, needsConfirmation: blind, id, ...plan }, null, 2));
 		else {
 			console.log(pc.bold(`Would restore ${plan.write.length} file(s) from ${id}`));
 			for (const p of plan.write) console.log(`  ${pc.cyan("restore")} ${p}`);
@@ -99,7 +102,12 @@ export function backupsRestore(root: string, id: string | undefined, args: Backu
 	return 0;
 }
 
-export function backups(root: string, subcommand: string | undefined, id: string | undefined, args: BackupsArgs): number {
+export function backups(
+	root: string,
+	subcommand: string | undefined,
+	id: string | undefined,
+	args: BackupsArgs,
+): number {
 	switch (subcommand) {
 		case undefined:
 		case "list":

@@ -29,7 +29,11 @@ export interface CacheVerdict {
 /** Whether git reports anything under the cache as tracked, re-checked per run. */
 function cacheIsTracked(root: string): boolean {
 	try {
-		const out = execFileSync("git", ["ls-files", "--", CACHE_REL], { cwd: root, encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] });
+		const out = execFileSync("git", ["ls-files", "--", CACHE_REL], {
+			cwd: root,
+			encoding: "utf-8",
+			stdio: ["ignore", "pipe", "ignore"],
+		});
 		return out.trim() !== "";
 	} catch {
 		// No git, or no repository. Then nothing is tracked, so nothing is
@@ -51,7 +55,8 @@ export function assessCache(root: string, recordedVersion: string | null): Cache
 		return {
 			...base,
 			state: "absent",
-			reason: "the local kit cache is missing, so there is nothing to check this file's content against. Run `mewkit upgrade` to re-fetch it.",
+			reason:
+				"the local kit cache is missing, so there is nothing to check this file's content against. Run `mewkit upgrade` to re-fetch it.",
 		};
 	}
 	if (cacheIsTracked(root)) {
@@ -65,7 +70,8 @@ export function assessCache(root: string, recordedVersion: string | null): Cache
 		return {
 			...base,
 			state: "version-mismatch",
-			reason: "the baseline does not record which release it came from, so the cache cannot be checked against it. Run `mewkit upgrade` to record one.",
+			reason:
+				"the baseline does not record which release it came from, so the cache cannot be checked against it. Run `mewkit upgrade` to record one.",
 		};
 	}
 	if (cachedVersion !== recordedVersion) {

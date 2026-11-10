@@ -245,7 +245,9 @@ export async function budget(args: BudgetArgs): Promise<void> {
 	if (!logPath) {
 		// Name the path the search actually looked for, from the same function the search
 		// uses. The message used to name a different file entirely.
-		console.error(pc.red(`No cost log found. Looked for ${costLogCandidate(process.cwd())} and in each parent directory.`));
+		console.error(
+			pc.red(`No cost log found. Looked for ${costLogCandidate(process.cwd())} and in each parent directory.`),
+		);
 		console.log(pc.dim("Run a MeowKit agent command first; the cost log is written as sessions record usage."));
 		process.exit(1);
 	}

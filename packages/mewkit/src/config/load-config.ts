@@ -27,9 +27,7 @@ export interface ConfigFailure {
 	scope: ConfigScope;
 }
 
-export type LoadResult =
-	| { ok: true; values: ConfigValues; present: boolean }
-	| { ok: false; error: ConfigFailure };
+export type LoadResult = { ok: true; values: ConfigValues; present: boolean } | { ok: false; error: ConfigFailure };
 
 /** `<root>/.meowkit/config.yaml`. */
 export const projectConfigPath = (root: string): string => join(root, CONFIG_REL);
@@ -43,7 +41,11 @@ const asFailure = (error: RuleError, file: string, scope: ConfigScope): ConfigFa
  * Load one config file. An absent file is success with no keys: a project
  * without a config is configured by its defaults, which is not an error.
  */
-export function loadConfigFile(file: string, observerNames: readonly string[], scope: ConfigScope = "project config"): LoadResult {
+export function loadConfigFile(
+	file: string,
+	observerNames: readonly string[],
+	scope: ConfigScope = "project config",
+): LoadResult {
 	if (!existsSync(file)) return { ok: true, values: {}, present: false };
 
 	let source: string;

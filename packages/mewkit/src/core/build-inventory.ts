@@ -371,7 +371,9 @@ export function buildInventory(claudeDir: string): Inventory {
  * resolves to the package root from both `src/core/` and the compiled
  * `dist/core/`, so the source tree and a published install read the same file.
  */
-export const METADATA_SCHEMA_PATH = fileURLToPath(new URL("../../schemas/harness-metadata-schema.json", import.meta.url));
+export const METADATA_SCHEMA_PATH = fileURLToPath(
+	new URL("../../schemas/harness-metadata-schema.json", import.meta.url),
+);
 
 interface SchemaEnums {
 	owner: Set<string>;

@@ -134,7 +134,9 @@ export function validateAgainstSchema(
 	for (const key of ["oneOf", "anyOf"] as const) {
 		const branches = schema[key];
 		if (!Array.isArray(branches)) continue;
-		const passing = branches.filter((branch) => isObject(branch) && validateAgainstSchema(value, branch, path).length === 0);
+		const passing = branches.filter(
+			(branch) => isObject(branch) && validateAgainstSchema(value, branch, path).length === 0,
+		);
 		if (passing.length === 0) {
 			out.push({ path, message: `${JSON.stringify(value)} is not valid under any of the given schemas` });
 		} else if (key === "oneOf" && passing.length > 1) {

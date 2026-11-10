@@ -56,7 +56,12 @@ function makeSourceRoot(): string {
 	writeFileSync(join(root, "release-manifest.json"), JSON.stringify({ version: "9.9.9", files: [] }));
 	writeFileSync(
 		join(root, ".meowkit", "pack-manifest.json"),
-		JSON.stringify({ schemaVersion: "1.0", base: { files: [], globs: [], commands: [], exclude: [] }, packs: {}, profiles: {} }),
+		JSON.stringify({
+			schemaVersion: "1.0",
+			base: { files: [], globs: [], commands: [], exclude: [] },
+			packs: {},
+			profiles: {},
+		}),
 	);
 	return root;
 }
@@ -67,7 +72,9 @@ describe("kit manifest signing", () => {
 		const listed = ephemeralPair();
 		const stranger = ephemeralPair();
 
-		expect(() => verifyManifestSignature(bytes, sign(bytes, listed.privatePem), "9.9.9", [listed.publicPem])).not.toThrow();
+		expect(() =>
+			verifyManifestSignature(bytes, sign(bytes, listed.privatePem), "9.9.9", [listed.publicPem]),
+		).not.toThrow();
 
 		// A good signature over the right bytes, from a key nobody trusts. The
 		// distinction matters: the remedy is to upgrade the CLI that ships the keys,

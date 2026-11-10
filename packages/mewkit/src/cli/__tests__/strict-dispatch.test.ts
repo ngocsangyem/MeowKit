@@ -154,7 +154,10 @@ describe("the removed surface", () => {
 
 	it("keeps the neighbours the removals could have caught", () => {
 		for (const name of ["providers", "budget", "orient", "versions", "validate"]) {
-			expect(CLI_CATALOGUE.commands.some((c) => c.name === name), name).toBe(true);
+			expect(
+				CLI_CATALOGUE.commands.some((c) => c.name === name),
+				name,
+			).toBe(true);
 		}
 		const budget = CLI_CATALOGUE.commands.find((c) => c.name === "budget");
 		expect(budget?.subcommands).toContain("context");

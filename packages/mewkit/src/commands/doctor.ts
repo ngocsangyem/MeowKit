@@ -416,7 +416,8 @@ function checkStateTaxonomy(root: string | null): DiagResult[] {
 			// directory that will never be written again and is safe to delete.
 			status: LEGACY_SESSION_STATE_RELS.some((rel) => fs.existsSync(path.join(root, rel))) ? "warn" : "pass",
 			name: "Pre-move session state",
-			detail: "session-state/ and .claude/session-state/ are read-only leftovers; move anything you need into .meowkit/state/ and delete them.",
+			detail:
+				"session-state/ and .claude/session-state/ are read-only leftovers; move anything you need into .meowkit/state/ and delete them.",
 		},
 	];
 	return results;

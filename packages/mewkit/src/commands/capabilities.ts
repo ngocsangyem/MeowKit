@@ -83,13 +83,7 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 		return;
 	}
 	if (sub === "resolve") {
-		resolve(
-			entries,
-			args.intent ?? args.target,
-			args.provider ?? null,
-			process.cwd(),
-			args.json ?? false,
-		);
+		resolve(entries, args.intent ?? args.target, args.provider ?? null, process.cwd(), args.json ?? false);
 		return;
 	}
 	if (sub === "view") {

@@ -94,11 +94,7 @@ function checkNoLeftoverInterpreterHooks(srcRoot: string): DiagResult {
 }
 
 /** Every configured registration starts cleanly, and nothing unrunnable is left behind. */
-export function checkHookRuntime(
-	settings: Record<string, unknown>,
-	srcRoot: string,
-	projectDir: string,
-): DiagResult[] {
+export function checkHookRuntime(settings: Record<string, unknown>, srcRoot: string, projectDir: string): DiagResult[] {
 	const offenders: string[] = [];
 	for (const ev of SWEEP_EVENTS) {
 		const runs = runConfiguredHook(settings, {

@@ -52,7 +52,9 @@ function checkPlanFile(content: string): string[] {
 	if (typeof handoff === "object" && handoff !== null && !Array.isArray(handoff)) {
 		const next = (handoff as Record<string, unknown>).next;
 		if (next !== null && next !== undefined && !HANDOFF_NEXT_VALID.includes(String(next) as never)) {
-			issues.push(`plan.md: handoff.next '${String(next)}' not in [${HANDOFF_NEXT_VALID.map((v) => `'${v}'`).join(", ")}]`);
+			issues.push(
+				`plan.md: handoff.next '${String(next)}' not in [${HANDOFF_NEXT_VALID.map((v) => `'${v}'`).join(", ")}]`,
+			);
 		}
 	}
 

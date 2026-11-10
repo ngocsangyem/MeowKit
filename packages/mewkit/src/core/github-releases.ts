@@ -83,24 +83,26 @@ export async function fetchReleases(): Promise<ReleaseInfo[]> {
 
 	const releases = (await response.json()) as GitHubRelease[];
 
-	return releases
-		.filter((r) => !r.draft)
-		.map((r) => {
-			// Find the release zip asset
-			const zipAsset = r.assets.find((a) => a.name.endsWith(".zip"));
-			return {
-				tag: r.tag_name,
-				version: r.tag_name.replace(/^v/, ""),
-				isBeta: r.prerelease,
-				downloadUrl: zipAsset?.browser_download_url ?? "",
-				publishedAt: r.published_at,
-				kitArtifact: kitArtifactAssets(r.assets),
-			};
-		})
-		// A release is installable when it carries EITHER source. Requiring a zip
-		// would hide a release published with an artifact only, and requiring an
-		// artifact would stop every older release from installing.
-		.filter((r) => r.downloadUrl !== "" || r.kitArtifact !== null);
+	return (
+		releases
+			.filter((r) => !r.draft)
+			.map((r) => {
+				// Find the release zip asset
+				const zipAsset = r.assets.find((a) => a.name.endsWith(".zip"));
+				return {
+					tag: r.tag_name,
+					version: r.tag_name.replace(/^v/, ""),
+					isBeta: r.prerelease,
+					downloadUrl: zipAsset?.browser_download_url ?? "",
+					publishedAt: r.published_at,
+					kitArtifact: kitArtifactAssets(r.assets),
+				};
+			})
+			// A release is installable when it carries EITHER source. Requiring a zip
+			// would hide a release published with an artifact only, and requiring an
+			// artifact would stop every older release from installing.
+			.filter((r) => r.downloadUrl !== "" || r.kitArtifact !== null)
+	);
 }
 
 /**

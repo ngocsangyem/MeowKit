@@ -105,7 +105,13 @@ describe("pack-helpers: installed state + settings refs", () => {
 			join(claudeDir, "settings.json"),
 			JSON.stringify({
 				hooks: {
-					S: [{ hooks: [{ type: "command", command: "node", args: ["$CLAUDE_PROJECT_DIR/.claude/hooks/jira-env-loader.sh"] }] }],
+					S: [
+						{
+							hooks: [
+								{ type: "command", command: "node", args: ["$CLAUDE_PROJECT_DIR/.claude/hooks/jira-env-loader.sh"] },
+							],
+						},
+					],
 				},
 			}),
 			"utf-8",

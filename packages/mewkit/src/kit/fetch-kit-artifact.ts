@@ -11,7 +11,9 @@ import type { KitArtifactBytes } from "./verify-kit-artifact.js";
 async function fetchBytes(url: string, what: string): Promise<Buffer> {
 	const response = await fetch(url, { headers: { "User-Agent": "mewkit" }, redirect: "follow" });
 	if (!response.ok) {
-		throw new Error(`Downloading the kit ${what} failed: ${response.status} ${response.statusText}. Nothing was installed.`);
+		throw new Error(
+			`Downloading the kit ${what} failed: ${response.status} ${response.statusText}. Nothing was installed.`,
+		);
 	}
 	return Buffer.from(await response.arrayBuffer());
 }

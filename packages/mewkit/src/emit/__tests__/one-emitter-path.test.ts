@@ -43,7 +43,10 @@ describe("the invocable surface", () => {
 		// Two for claude-code (`init`, `upgrade`); three each for codex and cursor,
 		// which `migrate` exports to as EXTERNAL tools.
 		expect(combinations).toHaveLength(8);
-		expect(combinations.filter((c) => c.target === "claude-code").map((c) => c.entryPoint)).toEqual(["init", "upgrade"]);
+		expect(combinations.filter((c) => c.target === "claude-code").map((c) => c.entryPoint)).toEqual([
+			"init",
+			"upgrade",
+		]);
 		expect(canAddress("claude-code", "migrate")).toBe(false);
 		for (const target of ["codex", "cursor"] as const) {
 			expect(combinations.filter((c) => c.target === target).map((c) => c.entryPoint)).toEqual([
@@ -117,7 +120,11 @@ describe("there is no second way in", () => {
 	it("leaves no command calling a per-target writer directly", () => {
 		for (const file of commandModules) {
 			const source = readFileSync(file, "utf8");
-			for (const writer of [/reconcileApplyCodexBundle\s*\(/, /reconcileApplyCursorBundle\s*\(/, /\bsmartUpdate\s*\(/]) {
+			for (const writer of [
+				/reconcileApplyCodexBundle\s*\(/,
+				/reconcileApplyCursorBundle\s*\(/,
+				/\bsmartUpdate\s*\(/,
+			]) {
 				expect(source).not.toMatch(writer);
 			}
 		}

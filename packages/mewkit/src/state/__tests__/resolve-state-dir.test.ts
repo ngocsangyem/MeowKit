@@ -118,7 +118,6 @@ describe("both resolvers agree", () => {
 	const shapes = ["fresh", "migrated", "legacy-gitkeep", "meowkit-no-memory"] as const;
 	const classes = ["memory", "telemetry", "state", "cache"] as const;
 
-
 	function cjsResolve(root: string, cls: string): string {
 		return execFileSync(
 			"node",

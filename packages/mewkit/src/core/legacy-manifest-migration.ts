@@ -76,11 +76,19 @@ export function carryLegacyBaseline(claudeDir: string): CarriedBaseline | null {
 	try {
 		parsed = JSON.parse(readFileSync(file, "utf-8")) as LegacyManifest;
 	} catch {
-		return { entries: [], uncarried: [{ path: LEGACY_CHECKSUM_MANIFEST_FILENAME, reason: "unreadable" }], generatedAt: "" };
+		return {
+			entries: [],
+			uncarried: [{ path: LEGACY_CHECKSUM_MANIFEST_FILENAME, reason: "unreadable" }],
+			generatedAt: "",
+		};
 	}
 	const checksums = parsed.checksums;
 	if (typeof checksums !== "object" || checksums === null) {
-		return { entries: [], uncarried: [{ path: LEGACY_CHECKSUM_MANIFEST_FILENAME, reason: "no checksum table" }], generatedAt: "" };
+		return {
+			entries: [],
+			uncarried: [{ path: LEGACY_CHECKSUM_MANIFEST_FILENAME, reason: "no checksum table" }],
+			generatedAt: "",
+		};
 	}
 
 	const entries: InstallFileEntry[] = [];

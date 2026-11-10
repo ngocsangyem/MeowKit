@@ -18,7 +18,8 @@ import type { DiagResult } from "./doctor-checks.js";
 export function checkDrift(root: string | null): DiagResult {
 	const name = "Install drift";
 	if (!root) return { name, status: "warn", detail: "Skipped — no project" };
-	if (!existsSync(join(root, ".claude"))) return { name, status: "warn", detail: "No .claude/ — nothing is installed here." };
+	if (!existsSync(join(root, ".claude")))
+		return { name, status: "warn", detail: "No .claude/ — nothing is installed here." };
 
 	const c = classifyInstall(root);
 	if (!c.hasBaseline) {
@@ -36,7 +37,10 @@ export function checkDrift(root: string | null): DiagResult {
 		name,
 		status: dirty === 0 ? "pass" : "warn",
 		detail,
-		fix: dirty === 0 ? undefined : "mewkit uninstall (preview) lists each file by class; mewkit upgrade re-lays kit files that are still pristine",
+		fix:
+			dirty === 0
+				? undefined
+				: "mewkit uninstall (preview) lists each file by class; mewkit upgrade re-lays kit files that are still pristine",
 	};
 }
 
@@ -48,7 +52,11 @@ export function checkKitCache(root: string | null): DiagResult {
 	const c = classifyInstall(root);
 	const verdict = c.hasBaseline ? c.cache : assessCache(root, null);
 	if (verdict.state === "ok") {
-		return { name, status: "pass", detail: `${CACHE_REL} holds kit ${verdict.cachedVersion ?? "?"}, which is what this install records.` };
+		return {
+			name,
+			status: "pass",
+			detail: `${CACHE_REL} holds kit ${verdict.cachedVersion ?? "?"}, which is what this install records.`,
+		};
 	}
 	return {
 		name,

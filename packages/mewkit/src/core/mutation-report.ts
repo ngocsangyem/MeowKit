@@ -119,7 +119,11 @@ export function ensureEnvelopeOnExit(command: string): void {
 	process.on("exit", (code) => {
 		if (emitted) return;
 		printMutationJson(
-			refusal(command, `${command} stopped with status ${code} before it could report.`, "The reason is on stderr — resolve it and re-run."),
+			refusal(
+				command,
+				`${command} stopped with status ${code} before it could report.`,
+				"The reason is on stderr — resolve it and re-run.",
+			),
 		);
 	});
 }

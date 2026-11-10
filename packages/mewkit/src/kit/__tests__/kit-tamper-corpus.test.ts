@@ -5,7 +5,16 @@
 // be byte-identical. That is what makes "verify before extract" a property of
 // the code rather than a claim about it: a reordering that checked digests after
 // writing would still refuse, and still fail this.
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import {
+	existsSync,
+	mkdirSync,
+	mkdtempSync,
+	readFileSync,
+	readdirSync,
+	rmSync,
+	statSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -40,8 +49,7 @@ function temp(prefix: string): string {
 
 const trusted = ephemeralKitKeys();
 const KEYS = [trusted.publicPem];
-const makeBundle = (members: CraftedMember[]): KitArtifactBytes =>
-	craftKitBundle(members, VERSION, trusted.privatePem);
+const makeBundle = (members: CraftedMember[]): KitArtifactBytes => craftKitBundle(members, VERSION, trusted.privatePem);
 
 const GOOD: CraftedMember[] = [
 	{ name: ".claude/rules/a.md", body: "alpha\n" },
@@ -78,11 +86,31 @@ function variants(): Array<{ name: string; check: KitCheck; bytes: KitArtifactBy
 	const symlink = makeBundle([...GOOD, { name: ".claude/link", body: "", typeFlag: "2", linkName: "../../outside" }]);
 
 	return [
-		{ name: "a flipped bit in the artifact", check: "artifact-digest", bytes: { ...good, artifact: flipOneBit(good.artifact, good.artifact.length - 20) } },
-		{ name: "a flipped bit in the manifest", check: "signature-untrusted-key", bytes: { ...good, manifestBytes: flipOneBit(good.manifestBytes, 40) } },
-		{ name: "a signature from an unlisted key", check: "signature-untrusted-key", bytes: { ...good, signature: signBytes(good.manifestBytes, ephemeralKitKeys().privatePem) } },
-		{ name: "a truncated artifact", check: "artifact-digest", bytes: { ...good, artifact: good.artifact.subarray(0, good.artifact.length - 40) } },
-		{ name: "a truncated manifest", check: "signature-untrusted-key", bytes: { ...good, manifestBytes: good.manifestBytes.subarray(0, good.manifestBytes.length - 30) } },
+		{
+			name: "a flipped bit in the artifact",
+			check: "artifact-digest",
+			bytes: { ...good, artifact: flipOneBit(good.artifact, good.artifact.length - 20) },
+		},
+		{
+			name: "a flipped bit in the manifest",
+			check: "signature-untrusted-key",
+			bytes: { ...good, manifestBytes: flipOneBit(good.manifestBytes, 40) },
+		},
+		{
+			name: "a signature from an unlisted key",
+			check: "signature-untrusted-key",
+			bytes: { ...good, signature: signBytes(good.manifestBytes, ephemeralKitKeys().privatePem) },
+		},
+		{
+			name: "a truncated artifact",
+			check: "artifact-digest",
+			bytes: { ...good, artifact: good.artifact.subarray(0, good.artifact.length - 40) },
+		},
+		{
+			name: "a truncated manifest",
+			check: "signature-untrusted-key",
+			bytes: { ...good, manifestBytes: good.manifestBytes.subarray(0, good.manifestBytes.length - 30) },
+		},
 		{ name: "a missing signature", check: "signature-absent", bytes: { ...good, signature: null } },
 		{ name: "a member escaping via ..", check: "member-path-unsafe", bytes: traversal },
 		{ name: "a member with an absolute path", check: "member-path-unsafe", bytes: absolute },
@@ -147,9 +175,7 @@ describe("kit artifact tamper corpus", () => {
 	it("executes nothing from the artifact: an executable member is written, never run", async () => {
 		const root = temp("mewkit-tamper-exec-");
 		const canary = join(root, "canary-ran");
-		const bundle = makeBundle([
-			{ name: ".claude/scripts/canary.sh", body: `#!/usr/bin/env bash\ntouch ${canary}\n` },
-		]);
+		const bundle = makeBundle([{ name: ".claude/scripts/canary.sh", body: `#!/usr/bin/env bash\ntouch ${canary}\n` }]);
 		const result = await installFromArtifact(root, VERSION, bundle, "verified-artifact", KEYS);
 		expect(existsSync(join(result.sourceDir, ".claude", "scripts", "canary.sh"))).toBe(true);
 		expect(existsSync(canary)).toBe(false);
@@ -162,7 +188,8 @@ describe("kit artifact tamper corpus", () => {
 		// comment promising not to spawn anything is not a constraint.
 		const reader = readFileSync(join(import.meta.dirname, "..", "kit-archive-reader.ts"), "utf8");
 		const verifier = readFileSync(join(import.meta.dirname, "..", "verify-kit-artifact.ts"), "utf8");
-		const imports = (source: string): string[] => [...source.matchAll(/^import .*?from "([^"]+)";$/gm)].map((m) => m[1]);
+		const imports = (source: string): string[] =>
+			[...source.matchAll(/^import .*?from "([^"]+)";$/gm)].map((m) => m[1]);
 		for (const module of [...imports(reader), ...imports(verifier)]) {
 			expect(module).not.toMatch(/child_process|node:vm|node:module/);
 		}

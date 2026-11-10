@@ -176,7 +176,7 @@ function checkContextBudget(content) {
 		action: withinBudget ? "inline" : "write-to-file",
 		summary: withinBudget
 			? `Content fits inline (${tokenEstimate} tokens)`
-      : `Content exceeds budget (${tokenEstimate} > ${CONTEXT_BUDGET_TOKENS}). Write full docs to .meowkit/cache/docs/ and return summary.`,
+			: `Content exceeds budget (${tokenEstimate} > ${CONTEXT_BUDGET_TOKENS}). Write full docs to .meowkit/cache/docs/ and return summary.`,
 	};
 }
 

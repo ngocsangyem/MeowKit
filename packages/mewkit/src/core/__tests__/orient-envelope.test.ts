@@ -130,7 +130,10 @@ describe("active-task pointer round-trip (canonical + legacy read compatibility)
 	it("reads a legacy path-only pointer as a legacy plan reference (no taskId)", () => {
 		const root = makeRoot();
 		mkdirSync(join(root, ".meowkit", "state"), { recursive: true });
-		writeFileSync(join(root, ".meowkit", "state", "active-plan.json"), JSON.stringify({ path: "plans/260711-x/plan.md" }));
+		writeFileSync(
+			join(root, ".meowkit", "state", "active-plan.json"),
+			JSON.stringify({ path: "plans/260711-x/plan.md" }),
+		);
 		const res = readActiveTaskPointer(root);
 		expect(res).toEqual({ kind: "legacy", planRef: "plans/260711-x/plan.md" });
 	});

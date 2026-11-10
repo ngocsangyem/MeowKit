@@ -67,7 +67,11 @@ const COMMANDS: CommandSpec[] = [
 		},
 	},
 	{ name: "migrate", summary: "Export MeowKit to external coding-agent tools", usage: "migrate <tool>" },
-	{ name: "providers", summary: "Show the effective provider support matrix and enforcement levels", usage: "providers [<provider>]" },
+	{
+		name: "providers",
+		summary: "Show the effective provider support matrix and enforcement levels",
+		usage: "providers [<provider>]",
+	},
 	{
 		name: "visual-plan",
 		summary: "Visual plan contracts",
@@ -206,9 +210,16 @@ const FLAGS: FlagSpec[] = [
 	),
 	b("yes", ["init", "upgrade", "pack", "migrate", "uninstall", "backups"], "Answer prompts affirmatively"),
 	b("beta", ["init", "upgrade", "pack"], "Use the beta release channel"),
-	b("dry-run", ["init", "plan", "migrate", "backups", "uninstall", "upgrade", "setup", "pack"], "Print what would happen without writing"),
+	b(
+		"dry-run",
+		["init", "plan", "migrate", "backups", "uninstall", "upgrade", "setup", "pack"],
+		"Print what would happen without writing",
+	),
 	b("force", ["init", "visual-plan", "migrate", "uninstall", "upgrade"], "Overwrite user-edited targets on conflict", {
-		perCommand: { init: "Overwrite an existing `.claude/`", uninstall: "Also remove kit paths this project has edited" },
+		perCommand: {
+			init: "Overwrite an existing `.claude/`",
+			uninstall: "Also remove kit paths this project has edited",
+		},
 	}),
 	b(
 		"allow-kit-source",

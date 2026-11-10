@@ -18,7 +18,12 @@ import { promptAndInstallSystemDeps } from "./setup.js";
 import { createSnapshot } from "../core/snapshot.js";
 import { populateKitCache } from "../core/kit-cache.js";
 import { confirmationRequiredMessage, EXIT_NEEDS_CONFIRMATION, needsConfirmation } from "../core/destructive-guard.js";
-import { beginMachineOutput, ensureEnvelopeOnExit, envelopeEmitter, type MutationReport } from "../core/mutation-report.js";
+import {
+	beginMachineOutput,
+	ensureEnvelopeOnExit,
+	envelopeEmitter,
+	type MutationReport,
+} from "../core/mutation-report.js";
 import { bundleReport, installMutationReport } from "./install-report.js";
 import { refuseKitSourceRepo } from "./kit-source-repo-guard.js";
 
@@ -498,7 +503,10 @@ async function initCodexTarget(
 	await warnBelowMinCodex();
 	hintLegacyMemoryForCodex(targetDir);
 	p.outro(pc.green("Codex toolkit installed!"));
-	return bundleReport("init", result.entries, false, [`Codex toolkit ready (${result.writes} written).`, ...(budgetWarn ? [budgetWarn] : [])]);
+	return bundleReport("init", result.entries, false, [
+		`Codex toolkit ready (${result.writes} written).`,
+		...(budgetWarn ? [budgetWarn] : []),
+	]);
 }
 
 /**
@@ -717,7 +725,12 @@ export async function init(args: InitArgs): Promise<void> {
 	// `--target codex` / `--target cursor` are distinct, offline paths: reconcile the
 	// authored bundle, done. No `.claude/`, no release download, no legacy converter.
 	if (args.target === "codex") {
-		const report = await initCodexTarget(targetDir, args.dryRun ?? false, args.force ?? false, parseSkillPacks(args.skillPacks));
+		const report = await initCodexTarget(
+			targetDir,
+			args.dryRun ?? false,
+			args.force ?? false,
+			parseSkillPacks(args.skillPacks),
+		);
 		emit(() => report);
 		return;
 	}
@@ -784,7 +797,14 @@ export async function init(args: InitArgs): Promise<void> {
 	p.outro(pc.green(mode === "new" ? "MeowKit installed!" : "MeowKit updated!"));
 	emit(() =>
 		stats === null
-			? { ok: true, command: "init", dryRun, planned: [], applied: [], notes: ["the base kit was not selected — nothing was installed into .claude/"] }
+			? {
+					ok: true,
+					command: "init",
+					dryRun,
+					planned: [],
+					applied: [],
+					notes: ["the base kit was not selected — nothing was installed into .claude/"],
+				}
 			: installMutationReport("init", stats, dryRun, [`mode: ${mode}`]),
 	);
 }
@@ -913,7 +933,9 @@ async function runClaudeKitInstall(
 		if (!dryRun) {
 			const snapshot = createSnapshot(targetDir, "init", [".claude"]);
 			if (snapshot !== null) {
-				p.log.info(`Snapshot ${snapshot.id} — ${snapshot.fileCount} file(s); restore with \`mewkit backups restore ${snapshot.id}\``);
+				p.log.info(
+					`Snapshot ${snapshot.id} — ${snapshot.fileCount} file(s); restore with \`mewkit backups restore ${snapshot.id}\``,
+				);
 			}
 		}
 
@@ -933,7 +955,10 @@ async function runClaudeKitInstall(
 			dryRun,
 			force,
 			kitVersion: release.version,
-			release: { config, sourceDir, options: {
+			release: {
+				config,
+				sourceDir,
+				options: {
 					allowedPaths: install.allowedPaths,
 					profile: install.profile,
 					packs: install.packs,
@@ -941,7 +966,8 @@ async function runClaudeKitInstall(
 					// A profile install owns the full→profile downgrade trim; full does not.
 					trimToProfile: install.allowedPaths !== undefined,
 					confirmOrphans: orphanPrompt(updateSpinner, "Applying files..."),
-				} },
+				},
+			},
 		});
 		// A release-kit target always yields stats; the optionality belongs to the
 		// authored-bundle branch, which this call cannot reach.
