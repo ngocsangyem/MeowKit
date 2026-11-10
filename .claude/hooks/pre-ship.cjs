@@ -31,7 +31,7 @@ process.on('uncaughtException', failClosed);
 process.on('unhandledRejection', failClosed);
 
 const { readHookInput } = require('./lib/parse-stdin.cjs');
-const { enterGuardRoot } = require('./lib/project-root.cjs');
+const { enterGuardRoot, resolveShipRoot } = require('./lib/project-root.cjs');
 const { decidePreShip } = require('./lib/core/pre-ship.cjs');
 
 const write = (stream, lines) => { if (lines.length) stream.write(`${lines.join('\n')}\n`); };
@@ -49,15 +49,17 @@ async function main() {
 
   // Every rule below is relative to the project root. A root that cannot be found or entered
   // is a block: allowing here would check the wrong tree, or none.
-  const root = enterGuardRoot(input.cwd || process.cwd());
+  // argv is the back-compatible fallback for a registration that still passes
+  // the command as a positional argument.
+  const command = input.command || process.argv[2] || '';
+  // The ship root, not the plain guard root: in a worktree session the commit acts on the
+  // worktree, so that is the tree whose changes, HEAD and verdict decide it.
+  const root = enterGuardRoot(input.cwd || process.cwd(), process.env, resolveShipRoot, command);
   if (!root) {
     write(process.stderr, [MARKER, 'Pre-ship guard cannot locate the project root it guards.', 'A ship guard that cannot tell which project it is in must not allow the command.']);
     process.exit(2);
   }
 
-  // argv is the back-compatible fallback for a registration that still passes
-  // the command as a positional argument.
-  const command = input.command || process.argv[2] || '';
   const result = decidePreShip({ root, command, env: process.env });
   write(process.stdout, result.stdout);
   write(process.stderr, result.stderr);
