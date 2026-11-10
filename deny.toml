@@ -9,7 +9,16 @@ yanked = "deny"
 [licenses]
 # Permissive licences only, listed as encountered; a new permissive one is added here,
 # a non-permissive one needs an explicit maintainer decision first.
-allow = ["MIT", "Apache-2.0", "Unicode-3.0"]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Unicode-3.0",
+    "ISC",
+    "Zlib",
+    "BSD-3-Clause",
+    # Mozilla CA bundle (webpki-roots): a permissive data licence.
+    "CDLA-Permissive-2.0",
+]
 confidence-threshold = 0.9
 
 [bans]
