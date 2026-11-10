@@ -1,0 +1,7 @@
+{
+  "kitContract": 1,
+  "requires": {
+    "mewkitMin": "0.1.0"
+  },
+  "kitVersion": "2.15.0"
+}

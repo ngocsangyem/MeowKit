@@ -1,0 +1,113 @@
+{
+  "description": "Pre-existing references in .claude/skills to files the kit does not ship (dev-only files excluded from the ship set, broken links, illustrative examples). Tolerated by check-skills-portable.cjs; remove an entry when its reference is fixed.",
+  "missing": [
+    {
+      "file": ".claude/skills/advise/references/advice-supervision-rules.md",
+      "target": ".claude/skills/benchmark/references/dead-weight-audit-rules.md"
+    },
+    {
+      "file": ".claude/skills/agent-detector/references/after-detection.md",
+      "target": ".claude/agents/[agent-name"
+    },
+    {
+      "file": ".claude/skills/autobuild/references/adaptive-density-matrix.md",
+      "target": ".claude/skills/benchmark/references/dead-weight-audit-rules.md"
+    },
+    {
+      "file": ".claude/skills/confluence/references/cli-idioms.md",
+      "target": ".claude/skills/confluence/scripts/tests/fixtures/adf-macros.json"
+    },
+    {
+      "file": ".claude/skills/cook/references/harness-rules.md",
+      "target": ".claude/skills/benchmark/references/dead-weight-audit-rules.md"
+    },
+    {
+      "file": ".claude/skills/jira-admin/references/voodoo-constants.md",
+      "target": ".claude/skills/jira-fields/scripts/list_fields.py"
+    },
+    {
+      "file": ".claude/skills/jira-admin/references/voodoo-constants.md",
+      "target": ".claude/skills/jira-fields/scripts/get_field.py"
+    },
+    {
+      "file": ".claude/skills/jira-search/references/jql-patterns.md",
+      "target": ".claude/skills/jira-search/references/field-discovery.md"
+    },
+    {
+      "file": ".claude/skills/plan-ceo-review/references/required-outputs.md",
+      "target": ".claude/skills/review/TODOS-format.md"
+    },
+    {
+      "file": ".claude/skills/plan-creator/references/visual-plan-integration.md",
+      "target": ".claude/skills/plan-creator/references/apply-feedback-protocol.md"
+    },
+    {
+      "file": ".claude/skills/preview/SKILL.md",
+      "target": ".claude/skills/preview/assets/colors.csv"
+    },
+    {
+      "file": ".claude/skills/preview/SKILL.md",
+      "target": ".claude/skills/preview/assets/typography.csv"
+    },
+    {
+      "file": ".claude/skills/prompt-enhancer/references/architecture-review-mode.md",
+      "target": ".claude/skills/prompt-enhancer/eval/canary-11-architecture-review.md"
+    },
+    {
+      "file": ".claude/skills/prompt-enhancer/references/context-safeguards.md",
+      "target": ".claude/skills/prompt-enhancer/references/pattern-index.md"
+    },
+    {
+      "file": ".claude/skills/prompt-enhancer/references/mode-routing.md",
+      "target": ".claude/skills/prompt-enhancer/eval/canary-11-architecture-review.md"
+    },
+    {
+      "file": ".claude/skills/prompt-enhancer/references/mode-routing.md",
+      "target": ".claude/skills/prompt-enhancer/eval/canary-12-research-prompt.md"
+    },
+    {
+      "file": ".claude/skills/ship/references/test-execution.md",
+      "target": ".claude/skills/review/TODOS-format.md"
+    },
+    {
+      "file": ".claude/skills/ship/references/version-changelog-todos.md",
+      "target": ".claude/skills/review/TODOS-format.md"
+    },
+    {
+      "file": ".claude/skills/skill-creator/SKILL.md",
+      "target": ".claude/skills/my-feature"
+    },
+    {
+      "file": ".claude/skills/skill-creator/references/good-vs-bad-examples.md",
+      "target": ".claude/skills/skill-creator/references/api-patterns.md"
+    },
+    {
+      "file": ".claude/skills/skill-creator/references/good-vs-bad-examples.md",
+      "target": ".claude/skills/skill-creator/references/error-codes.md"
+    },
+    {
+      "file": ".claude/skills/skill-creator/references/skill-authoring-rules.md",
+      "target": ".claude/skills/foo/log.json"
+    },
+    {
+      "file": ".claude/skills/skill-creator/references/skill-authoring-rules.md",
+      "target": ".claude/skills/skill-creator/scripts/check-skill-cross-refs.sh"
+    },
+    {
+      "file": ".claude/skills/vue-best-practices/references/async-components.md",
+      "target": ".claude/skills/vue-best-practices/references/reactivity-performance.md"
+    },
+    {
+      "file": ".claude/skills/vue-best-practices/references/perf-v-once-v-memo.md",
+      "target": ".claude/skills/vue-best-practices/references/reactivity-performance.md"
+    },
+    {
+      "file": ".claude/skills/web-to-markdown/SKILL.md",
+      "target": ".claude/skills/web-to-markdown/tests/test_smoke_real_urls.py"
+    },
+    {
+      "file": ".claude/skills/rubric/rubrics/calibration-set/README.md",
+      "target": ".claude/skills/rubric/rubrics/calibration-set/260408-kanban-app-PASS-anchor/source"
+    }
+  ]
+}

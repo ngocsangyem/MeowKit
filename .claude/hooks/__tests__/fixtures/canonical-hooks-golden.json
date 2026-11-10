@@ -1,0 +1,82 @@
+{
+  "gate: docs file passes": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "gate: test file passes": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "gate: source without plan blocks": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nNo approved plan found in tasks/plans/.\nGate 1 requires an approved plan before source code changes.\nCreate a plan first: /mk:plan-creator or /mk:fix for simple fixes.\n"
+  },
+  "gate: plan without receipt blocks": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nPlan 'tasks/plans/261110-demo/plan.md' has no approval receipt.\nGate 1 requires a human-approved plan before source edits (anti-accidental).\nAfter the human approves, stamp it: mewkit plan approve tasks/plans/261110-demo/plan.md\nOverride (explicit downgrade): MEOWKIT_GATE1_PRESENCE_ONLY=1\n"
+  },
+  "gate: stale receipt blocks": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nPlan 'tasks/plans/261110-demo/plan.md' was edited after approval — the receipt is stale.\nChanged scope needs re-approval (gate-rules.md: Insert/Split ⇒ re-approve).\nRe-approve after the human confirms: mewkit plan approve tasks/plans/261110-demo/plan.md\nOverride (explicit downgrade): MEOWKIT_GATE1_PRESENCE_ONLY=1\n"
+  },
+  "gate: fresh receipt without contract blocks": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "@@CONTRACT_GATE_BLOCK@@\nNo tasks/contracts/ directory exists.\nPhase 4 sprint contract is required for source code edits on plan: 261110-demo\n\nTo proceed, do ONE of:\n  1. Run: /mk:sprint-contract propose demo\n  2. Set: export MEOWKIT_AUTOBUILD_MODE=LEAN  (skips contract for Opus 4.6 tier)\n"
+  },
+  "gate: fresh receipt and signed contract passes": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "gate: suspicious backup dir blocks": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nNo approved plan found in tasks/plans/.\nGate 1 requires an approved plan before source code changes.\nCreate a plan first: /mk:plan-creator or /mk:fix for simple fixes.\n"
+  },
+  "gate: garbage stdin blocks": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nGate 1 received unreadable hook input (not-json).\nA write guard that cannot read what is being written must not allow it.\n"
+  },
+  "privacy: dotenv read blocks": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "@@PRIVACY_BLOCK@@\nFile '.env' matches sensitive file pattern (injection-rules.md R4).\nUse AskUserQuestion to get explicit user approval before accessing.\n"
+  },
+  "privacy: ordinary read passes": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "privacy: loopback fetch blocks": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "@@PRIVACY_BLOCK@@\nWeb fetch target '127.0.0.1' is a private/loopback/metadata address.\nSSRF risk. Use AskUserQuestion for explicit user approval before proceeding.\n"
+  },
+  "privacy: garbage stdin blocks": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "@@PRIVACY_BLOCK@@\nPrivacy guard received unreadable hook input (empty).\nA read guard that cannot read what is being accessed must not allow it.\n"
+  },
+  "pre-ship: non-ship command passes": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "pre-ship: commit without verdict blocks": {
+    "exit": 0,
+    "stdout": "SKIP: mewkit CLI not found — team memory store not linted\n=== Pre-Ship Checks ===\n\n\n=== Summary ===\nChecks run:\nPRE-SHIP PASS: All checks passed. Ready to ship.\n",
+    "stderr": ""
+  },
+  "pre-ship: garbage stdin blocks": {
+    "exit": 2,
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nPre-ship guard received unreadable hook input (not-an-object).\nA ship guard that cannot read the command must not allow it.\n"
+  }
+}

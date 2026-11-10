@@ -43,7 +43,10 @@ const manifestPath = (root: string, id: string): string => join(snapshotDir(root
 
 /** A sortable, human-readable id: the instant plus the command that took it. */
 export function snapshotId(command: string, now: Date = new Date(), suffix = ""): string {
-	const stamp = now.toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+	const stamp = now
+		.toISOString()
+		.replace(/[-:]/g, "")
+		.replace(/\.\d+Z$/, "Z");
 	return `${stamp}-${command}${suffix}`;
 }
 
@@ -100,7 +103,12 @@ export function resolveTargets(root: string, relPaths: readonly string[]): strin
  * to record. A dry run must call this not at all: writing nothing is the whole
  * promise, and a backup directory is a write.
  */
-export function createSnapshot(root: string, command: string, relPaths: readonly string[], now = new Date()): SnapshotManifest | null {
+export function createSnapshot(
+	root: string,
+	command: string,
+	relPaths: readonly string[],
+	now = new Date(),
+): SnapshotManifest | null {
 	const targets = resolveTargets(root, relPaths);
 	if (targets.length === 0) return null;
 

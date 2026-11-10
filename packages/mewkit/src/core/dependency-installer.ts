@@ -73,10 +73,7 @@ export function findPython(): string | null {
  * (a pruned cache, an upgraded system Python), and it is indistinguishable from
  * absent to every caller, so it is treated as absent here too.
  */
-export function ensureEnv(
-	projectDir: string,
-	envDir: string,
-): { envDir: string; created: boolean; repaired: boolean } {
+export function ensureEnv(projectDir: string, envDir: string): { envDir: string; created: boolean; repaired: boolean } {
 	validateEnvPath(projectDir, envDir);
 	const existedBefore = existsSync(envDir);
 	if (existedBefore && existsSync(envPythonPath(envDir))) return { envDir, created: false, repaired: false };

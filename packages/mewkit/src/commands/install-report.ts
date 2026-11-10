@@ -34,7 +34,9 @@ export function bundleReport(
 		command,
 		dryRun,
 		planned,
-		applied: dryRun ? [] : entries.filter((e) => e.wrote === true).map((e) => ({ action: e.action, path: e.targetPath })),
+		applied: dryRun
+			? []
+			: entries.filter((e) => e.wrote === true).map((e) => ({ action: e.action, path: e.targetPath })),
 		notes,
 	};
 }

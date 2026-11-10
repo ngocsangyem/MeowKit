@@ -220,7 +220,11 @@ export function checkVenv(root: string | null): DiagResult {
 			fix: `mewkit skill env ${broken[0]}`,
 		};
 	}
-	return { name, status: "pass", detail: `${ready.length}/${declared.length} provisioned under ${ENVS_REL} (created on demand)` };
+	return {
+		name,
+		status: "pass",
+		detail: `${ready.length}/${declared.length} provisioned under ${ENVS_REL} (created on demand)`,
+	};
 }
 
 /**
@@ -248,8 +252,18 @@ export function checkPipPackages(root: string | null): DiagResult {
 		for (const r of results) if (!r.installed) missing.push(`${skill}:${r.name}`);
 	}
 
-	if (!missing.length) return { name, status: "pass", detail: `${checked} pinned package(s) verified across ${provisioned.length} env(s)` };
-	return { name, status: "warn", detail: `Missing: ${missing.join(", ")}`, fix: `mewkit skill env ${missing[0]?.split(":")[0]}` };
+	if (!missing.length)
+		return {
+			name,
+			status: "pass",
+			detail: `${checked} pinned package(s) verified across ${provisioned.length} env(s)`,
+		};
+	return {
+		name,
+		status: "warn",
+		detail: `Missing: ${missing.join(", ")}`,
+		fix: `mewkit skill env ${missing[0]?.split(":")[0]}`,
+	};
 }
 
 /**

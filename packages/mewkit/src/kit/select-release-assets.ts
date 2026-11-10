@@ -28,7 +28,9 @@ export interface ReleaseAsset {
 
 /** The artifact assets of one release, or null unless all three are present. */
 export function kitArtifactAssets(assets: readonly ReleaseAsset[]): KitArtifactAssets | null {
-	const artifact = assets.find((asset) => asset.name.startsWith(ARTIFACT_PREFIX) && asset.name.endsWith(ARTIFACT_SUFFIX));
+	const artifact = assets.find(
+		(asset) => asset.name.startsWith(ARTIFACT_PREFIX) && asset.name.endsWith(ARTIFACT_SUFFIX),
+	);
 	const manifest = assets.find((asset) => asset.name === KIT_MANIFEST_FILENAME);
 	const signature = assets.find((asset) => asset.name === KIT_SIGNATURE_FILENAME);
 	if (artifact === undefined || manifest === undefined || signature === undefined) return null;

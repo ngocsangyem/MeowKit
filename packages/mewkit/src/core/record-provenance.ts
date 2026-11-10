@@ -72,15 +72,13 @@ export async function recordProvenance(root: string, facts: ProvenanceFacts): Pr
 	if (meta === null && !TARGET_SHAPES[facts.target].writes.some((rel) => existsSync(join(root, rel)))) {
 		return false;
 	}
-	const base: InstallMetadata =
-		meta ??
-		{
-			schemaVersion: "1.0",
-			tool: "meowkit",
-			version: facts.kitVersion,
-			installedAt: new Date().toISOString(),
-			files: [],
-		};
+	const base: InstallMetadata = meta ?? {
+		schemaVersion: "1.0",
+		tool: "meowkit",
+		version: facts.kitVersion,
+		installedAt: new Date().toISOString(),
+		files: [],
+	};
 	await writeInstallMetadata(root, { ...base, provenance: facts });
 	return true;
 }

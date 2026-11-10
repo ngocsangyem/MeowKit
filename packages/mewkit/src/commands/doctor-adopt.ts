@@ -46,7 +46,11 @@ export function planAdoption(root: string): { result: AdoptResult; meta: Install
 	const version = cachedKitVersion(root);
 	if (version === null) {
 		return {
-			result: { ok: false, message: `Cannot adopt a baseline: ${CACHE_REL} records no version.`, fix: "mewkit upgrade" },
+			result: {
+				ok: false,
+				message: `Cannot adopt a baseline: ${CACHE_REL} records no version.`,
+				fix: "mewkit upgrade",
+			},
 			meta: null,
 		};
 	}
@@ -73,7 +77,15 @@ export function planAdoption(root: string): { result: AdoptResult; meta: Install
 			// installer's own classification is also what makes an adopted
 			// baseline behave under `upgrade` exactly like an installed one.
 			counts.user += 1;
-			files.push({ path: rel, owner: "user", layer: "user", checksum: onDisk, baseChecksum: onDisk, installedVersion: version, installedAt });
+			files.push({
+				path: rel,
+				owner: "user",
+				layer: "user",
+				checksum: onDisk,
+				baseChecksum: onDisk,
+				installedVersion: version,
+				installedAt,
+			});
 			continue;
 		}
 		const kitHash = hashFile(cached);
@@ -135,7 +147,11 @@ export async function doctorAdopt(root: string | null, json = false): Promise<nu
 	if (json) console.log(JSON.stringify(result, null, 2));
 	else {
 		console.log(pc.green(result.message));
-		console.log(pc.dim("A file the cached kit does not hold is recorded as yours, so uninstall can never delete it as kit content."));
+		console.log(
+			pc.dim(
+				"A file the cached kit does not hold is recorded as yours, so uninstall can never delete it as kit content.",
+			),
+		);
 	}
 	return 0;
 }

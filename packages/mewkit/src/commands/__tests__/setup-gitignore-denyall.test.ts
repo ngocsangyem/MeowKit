@@ -14,8 +14,7 @@ import { describe, expect, it } from "vitest";
 
 import { KIT_DIR_GITIGNORE, STEPS, stripSupersededMeowkitIgnores } from "../setup-steps.js";
 
-const git = (root: string, ...args: string[]): string =>
-	execFileSync("git", args, { cwd: root, encoding: "utf8" });
+const git = (root: string, ...args: string[]): string => execFileSync("git", args, { cwd: root, encoding: "utf8" });
 
 /** A scratch git repository with a populated `.meowkit/`. */
 function repo(rootGitignore?: string): string {
@@ -82,7 +81,11 @@ describe("the deny-all file for .meowkit/", () => {
 		const root = repo();
 		STEPS.gitignore(root);
 		git(root, "add", "-A");
-		const tracked = git(root, "ls-files").trim().split("\n").filter((f) => f.startsWith(".meowkit/")).sort();
+		const tracked = git(root, "ls-files")
+			.trim()
+			.split("\n")
+			.filter((f) => f.startsWith(".meowkit/"))
+			.sort();
 		expect(tracked).toEqual([
 			".meowkit/.env.example",
 			".meowkit/.gitignore",
@@ -144,7 +147,13 @@ describe("an existing project's root ignore", () => {
 		const result = STEPS.gitignore(root);
 		expect(result.status).toBe("pass");
 		const body = readFileSync(join(root, ".gitignore"), "utf8");
-		for (const line of [".meowkit/.env", ".meowkit/telemetry/", ".meowkit/state/", ".meowkit/cache/", ".meowkit/envs/"]) {
+		for (const line of [
+			".meowkit/.env",
+			".meowkit/telemetry/",
+			".meowkit/state/",
+			".meowkit/cache/",
+			".meowkit/envs/",
+		]) {
 			expect(body.split("\n"), line).not.toContain(line);
 		}
 		expect(body).toContain("!.meowkit/state/keep-me.json");

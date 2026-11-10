@@ -208,7 +208,9 @@ export function checkSubstrate(claudeDir: string, opts: { missingViewSeverity?: 
 		results.push({
 			name: "Substrate view in sync",
 			status: inSync ? "pass" : "fail",
-			detail: inSync ? viewPath : "harness-substrate.md is stale — run `node scripts/harness-inventory.cjs --substrate --emit`",
+			detail: inSync
+				? viewPath
+				: "harness-substrate.md is stale — run `node scripts/harness-inventory.cjs --substrate --emit`",
 			section,
 		});
 	}

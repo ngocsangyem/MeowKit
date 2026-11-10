@@ -16,7 +16,7 @@ Analyze the files being touched in the current task. Use the following rules to 
 **Trigger:** Task touches `.ts` files in a NestJS context (files in `src/` with decorators like `@Module`, `@Controller`, `@Injectable`, or files in directories named `modules/`, `controllers/`, `services/`, `guards/`, `pipes/`, `dtos/`).
 
 **Load these references:**
-- `.claude/skills/development/references/code-patterns.md` (NestJS section)
+- `references/code-patterns.md` (NestJS section)
 - `.claude/skills/review/references/adversarial-review.md`
 - `.claude/skills/testing/references/red-green-refactor.md`
 - `.claude/skills/document-release/references/general-documentation.md`
@@ -25,7 +25,7 @@ Analyze the files being touched in the current task. Use the following rules to 
 **Trigger:** Task touches `.vue` files, or `.ts` files in a Vue context (files importing from `vue`, `pinia`, `vue-router`).
 
 **Load these references:**
-- `.claude/skills/development/references/code-patterns.md` (Vue 3 section)
+- `references/code-patterns.md` (Vue 3 section)
 - `.claude/skills/testing/references/visual-qa.md`
 - `.claude/skills/testing/references/red-green-refactor.md`
 
@@ -33,7 +33,7 @@ Analyze the files being touched in the current task. Use the following rules to 
 **Trigger:** Task touches `.swift` files, `*.xcodeproj`, `Package.swift`, or `*.xib`/`*.storyboard` files.
 
 **Load these references:**
-- `.claude/skills/development/references/code-patterns.md` (Swift section)
+- `references/code-patterns.md` (Swift section)
 - `.claude/skills/testing/references/red-green-refactor.md`
 
 ### Rule 4: Database / Migrations
@@ -58,7 +58,7 @@ Analyze the files being touched in the current task. Use the following rules to 
 ## Always-Loaded References
 
 These are loaded for EVERY task regardless of domain:
-- `.claude/skills/development/references/tdd-enforcement.md` (enforces test-first)
+- `references/tdd-enforcement.md` (enforces test-first)
 
 ## Steps to Execute
 

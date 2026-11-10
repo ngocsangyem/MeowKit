@@ -106,7 +106,12 @@ function skillNames(skillsRoot: string): string[] {
 export function checkSkillFrontmatter(root: string): FrontmatterReport {
 	const skillsRoot = path.join(root, ".claude", "skills");
 	if (!existsSync(SCHEMA_PATH)) {
-		return { errors: [], warnings: [], valid: 0, fatal: `No schema at ${SCHEMA_PATH} — this CLI install is incomplete` };
+		return {
+			errors: [],
+			warnings: [],
+			valid: 0,
+			fatal: `No schema at ${SCHEMA_PATH} — this CLI install is incomplete`,
+		};
 	}
 	if (!existsSync(skillsRoot)) return { errors: [], warnings: [], valid: 0, fatal: `No skills dir at ${skillsRoot}` };
 

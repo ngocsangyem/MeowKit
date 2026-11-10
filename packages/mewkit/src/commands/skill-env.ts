@@ -46,14 +46,12 @@ function listEnvs(projectDir: string): number {
 	for (const skill of skills) {
 		const envDir = skillEnvDir(projectDir, skill);
 		const runtime = readSkillRuntime(projectDir, skill);
-		const state = envUsable(envDir)
-			? pc.green("ready")
-			: existsSync(envDir)
-				? pc.yellow("broken")
-				: pc.dim("absent");
+		const state = envUsable(envDir) ? pc.green("ready") : existsSync(envDir) ? pc.yellow("broken") : pc.dim("absent");
 		const req = readSkillRequirements(projectDir, skill);
 		const pins = req.source ? `${req.packages.length} pinned` : "stdlib only";
-		console.log(`  ${skill.padEnd(18)} ${state.padEnd(16)} ${pc.dim(`${runtime?.entries.join(", ") ?? "binary only"} · ${pins}`)}`);
+		console.log(
+			`  ${skill.padEnd(18)} ${state.padEnd(16)} ${pc.dim(`${runtime?.entries.join(", ") ?? "binary only"} · ${pins}`)}`,
+		);
 	}
 
 	// An environment with no declaring skill is listed rather than deleted: it may
@@ -85,14 +83,18 @@ async function provisionEnv(projectDir: string, skill: string): Promise<number> 
 
 	const runtime = readSkillRuntime(projectDir, skill);
 	if (!known.includes(skill)) {
-		console.error(pc.red(`\nSkill ${skill} declares no ${RUNTIME_KEY} and pins no packages, so it needs no environment.`));
+		console.error(
+			pc.red(`\nSkill ${skill} declares no ${RUNTIME_KEY} and pins no packages, so it needs no environment.`),
+		);
 		console.error(pc.dim(`Skills that need one: ${known.join(", ") || "(none)"}\n`));
 		return 1;
 	}
 
 	if (!findPython()) {
 		console.error(pc.red(`\nNo Python interpreter found in PATH.`));
-		console.error(pc.dim(`${skill} requires ${runtime?.entries.join(", ") ?? "python"}. Install it, then re-run this command.\n`));
+		console.error(
+			pc.dim(`${skill} requires ${runtime?.entries.join(", ") ?? "python"}. Install it, then re-run this command.\n`),
+		);
 		return 1;
 	}
 
@@ -103,7 +105,9 @@ async function provisionEnv(projectDir: string, skill: string): Promise<number> 
 		// Reported and not installed: a line that fails package-name validation
 		// could be a flag or a URL, and either one turns a pinned install into an
 		// arbitrary one.
-		console.error(pc.red(`\nRejected ${req.rejected.length} requirement line(s) in ${relative(projectDir, req.source ?? "")}:`));
+		console.error(
+			pc.red(`\nRejected ${req.rejected.length} requirement line(s) in ${relative(projectDir, req.source ?? "")}:`),
+		);
 		for (const line of req.rejected) console.error(pc.red(`  ${line}`));
 		console.error(pc.dim("\nFix the pin, then re-run. Nothing was installed.\n"));
 		return 1;
@@ -118,7 +122,9 @@ async function provisionEnv(projectDir: string, skill: string): Promise<number> 
 		console.error(pc.red(`\n${err instanceof Error ? err.message : String(err)}\n`));
 		return 1;
 	}
-	console.log(`  ${pc.green("✓")} ${created ? "created" : repaired ? "repaired" : "already present"} ${pc.dim(relative(projectDir, envDir))}`);
+	console.log(
+		`  ${pc.green("✓")} ${created ? "created" : repaired ? "repaired" : "already present"} ${pc.dim(relative(projectDir, envDir))}`,
+	);
 
 	if (!req.source) {
 		// Standard-library only. An empty environment is the right answer, not a

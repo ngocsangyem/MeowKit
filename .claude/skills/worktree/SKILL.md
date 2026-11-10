@@ -37,10 +37,10 @@ Pre-flight: get repo info, then create a parallel worktree.
 
 ```bash
 # Step 1: verify repo state
-node .claude/skills/worktree/scripts/worktree.cjs info --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs info --json
 
 # Step 2: create parallel agent worktree
-node .claude/skills/worktree/scripts/worktree.cjs create "{agent-name}" --orchestrated --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs create "{agent-name}" --orchestrated --json
 ```
 
 Before creating the first parallel worktree in a repo, verify `.worktrees/` is in `.gitignore`.
@@ -82,7 +82,7 @@ Before removing a worktree, ensure the parallel agent has released its task owne
 in `mk:task-queue`. Then:
 
 ```bash
-node .claude/skills/worktree/scripts/worktree.cjs remove "{agent-name}" --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs remove "{agent-name}" --json
 ```
 
 Never cleanup a worktree with uncommitted changes — commit or stash first.
@@ -90,7 +90,7 @@ Never cleanup a worktree with uncommitted changes — commit or stash first.
 ### list
 
 ```bash
-node .claude/skills/worktree/scripts/worktree.cjs list --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs list --json
 ```
 
 ### status
@@ -98,7 +98,7 @@ node .claude/skills/worktree/scripts/worktree.cjs list --json
 Health audit of all active worktrees (ahead/behind divergence, dirty state):
 
 ```bash
-node .claude/skills/worktree/scripts/worktree.cjs status --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs status --json
 ```
 
 ### prune
@@ -107,9 +107,9 @@ Clean stale worktree metadata. Always dry-run first:
 
 ```bash
 # Safe first-pass
-node .claude/skills/worktree/scripts/worktree.cjs prune --dry-run --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs prune --dry-run --json
 # Execute if no surprises
-node .claude/skills/worktree/scripts/worktree.cjs prune --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs prune --json
 ```
 
 ### review-pr
@@ -123,9 +123,9 @@ session dir `tasks/reviews/<session>/manifest.json` (survives worktree removal) 
 
 ```bash
 # Preview only (no fetch, no worktree) — validates inputs, prints the manifest
-node .claude/skills/worktree/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --dry-run --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --dry-run --json
 # Create for real
-node .claude/skills/worktree/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --json
 ```
 
 ### review-pr-cleanup
@@ -137,9 +137,9 @@ feature worktree). Force is allowed (review worktrees are legitimately dirty aft
 build/test); ownership, not cleanliness, is the guard.
 
 ```bash
-node .claude/skills/worktree/scripts/worktree.cjs review-pr-cleanup --manifest tasks/reviews/<id>/manifest.json --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr-cleanup --manifest tasks/reviews/<id>/manifest.json --json
 # Stale-session sweep — dry-run by default; --apply to execute
-node .claude/skills/worktree/scripts/worktree.cjs review-pr-cleanup --sweep --dry-run --json
+node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr-cleanup --sweep --dry-run --json
 ```
 
 ## Gotchas

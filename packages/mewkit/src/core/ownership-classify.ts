@@ -129,7 +129,8 @@ export function classifyInstall(root: string): Classification {
 			paths.push({
 				path: rel,
 				class: "refused",
-				reason: "the baseline claims this path is kit-owned, but the kit does not ship it — the claim is not corroborated, so it is left in place",
+				reason:
+					"the baseline claims this path is kit-owned, but the kit does not ship it — the claim is not corroborated, so it is left in place",
 			});
 			continue;
 		}

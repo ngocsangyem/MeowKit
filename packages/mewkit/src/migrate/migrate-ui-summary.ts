@@ -181,7 +181,9 @@ export function emitMigrateJson(
 			path: r.action.targetPath,
 			detail: `${r.action.provider}/${r.action.type} ${r.action.item}`,
 		}));
-	const failures = results.filter((r) => !r.success).map((r) => `${r.action.provider}/${r.action.item}: ${r.error ?? "unknown error"}`);
+	const failures = results
+		.filter((r) => !r.success)
+		.map((r) => `${r.action.provider}/${r.action.item}: ${r.error ?? "unknown error"}`);
 	printMutationJson({
 		ok: opts.ok,
 		command: "migrate",

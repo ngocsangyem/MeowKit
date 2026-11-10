@@ -140,7 +140,6 @@ function python3Available(): boolean {
 
 describe("node + TS parity (shared sidecar lock across writers)", () => {
 	it("neither writer interleaves or corrupts a line under concurrent append", async () => {
-		
 		const scriptPath = join(REPO_CLAUDE, "hooks", "append-trace.cjs");
 		if (!existsSync(scriptPath)) return;
 		const { root, claudeDir, logPath } = makeProjectRoot();

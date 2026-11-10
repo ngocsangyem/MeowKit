@@ -71,5 +71,4 @@ export function buildPluginManifest(kitVersion: string): PluginManifest {
 }
 
 /** The bytes written to disk, stable across runs so a re-install is a no-op. */
-export const serializePluginManifest = (manifest: PluginManifest): string =>
-	`${JSON.stringify(manifest, null, 2)}\n`;
+export const serializePluginManifest = (manifest: PluginManifest): string => `${JSON.stringify(manifest, null, 2)}\n`;

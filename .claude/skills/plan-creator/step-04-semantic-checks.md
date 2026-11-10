@@ -32,7 +32,7 @@ Product-level plans use a different schema (product spec, not phase plan). Run t
 Run the dedicated product-spec validator (same script invoked at step-03a; running it twice is cheap and catches edits made between steps):
 
 ```bash
-.claude/skills/plan-creator/scripts/check-product-spec.sh "{plan_dir}/plan.md"
+scripts/check-product-spec.sh "{plan_dir}/plan.md"
 ```
 
 Must exit 0 with `PRODUCT_SPEC_COMPLETE: N features, M user stories`. Fix any reported issues before proceeding to step-07.

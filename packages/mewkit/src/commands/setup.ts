@@ -52,7 +52,8 @@ export async function setup(args: SetupArgs): Promise<void> {
 			// The installers are package managers writing outside the project; a
 			// preview of them is a list this command cannot honestly produce, so it
 			// says what it did not do rather than printing a plan it cannot keep.
-			const note = "Dry-run: system dependencies are installed by your package manager — nothing was run. Drop --dry-run to install.";
+			const note =
+				"Dry-run: system dependencies are installed by your package manager — nothing was run. Drop --dry-run to install.";
 			console.log(pc.yellow(note));
 			report.notes.push(note);
 			finish();

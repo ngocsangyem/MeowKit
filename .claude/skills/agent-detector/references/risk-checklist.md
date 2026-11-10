@@ -27,7 +27,7 @@ Mark each flag whose triggers match the task description. The agent emits
 
 ## Hard-Gate Cross-Reference
 
-The following flag IDs auto-escalate to COMPLEX tier per `.claude/skills/agent-detector/references/model-selection-rules.md` Rule 2 — regardless of CSV match:
+The following flag IDs auto-escalate to COMPLEX tier per `references/model-selection-rules.md` Rule 2 — regardless of CSV match:
 
 - AUTH
 - AUTHZ
@@ -46,7 +46,7 @@ matched_flags: ["AUTH", "DATA_MODEL"]
 
 Empty array `[]` is the default when no flag matches. Downstream consumers
 (orchestrator, planner) treat the array as advisory metadata; the
-authoritative tier comes from `.claude/skills/agent-detector/references/model-selection-rules.md` Rule 2 escalation.
+authoritative tier comes from `references/model-selection-rules.md` Rule 2 escalation.
 
 ## Non-Overlap Statement
 

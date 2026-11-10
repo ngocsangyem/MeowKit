@@ -34,7 +34,8 @@ test('privacy-block.cjs declares the @@PRIVACY_BLOCK@@ sentinel and exit 2', () 
 });
 
 test('privacy-block.cjs references AskUserQuestion in stderr guidance', () => {
-  const body = fs.readFileSync(PRIVACY_HOOK, 'utf8');
+  // The guidance lines live in the shared decision the hook runs.
+  const body = fs.readFileSync(path.join(path.dirname(PRIVACY_HOOK), 'lib/core/privacy.cjs'), 'utf8');
   assert.match(body, /AskUserQuestion/, 'AskUserQuestion reference removed — model would not know how to retry');
 });
 

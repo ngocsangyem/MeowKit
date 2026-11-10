@@ -54,5 +54,5 @@ The 21 domain integration agents below are NOT scored by `mk:agent-detector` and
 
 The intent → skill dispatch table is not needed to assign an agent or model tier, so
 it is loaded on demand rather than always-on. It lives in
-`.claude/skills/agent-detector/references/skill-domain-routing.md` and is read once per
+`references/skill-domain-routing.md` and is read once per
 session by `mk:agent-detector` at Step 0b (sentinel-cached).

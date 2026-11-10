@@ -7,9 +7,9 @@ Complete guide to building, tagging, and publishing MeowKit releases.
 ```
 Source of truth (.claude/)
     ↓
-prepare-release-assets.cjs → dist/meowkit-release.zip   (flat-copy distribution)
+prepare-release-assets.cjs → dist/meowkit-release.zip + dist/checksums.txt
     ↓
-GitHub Release (tag + zip asset) + release commit
+GitHub Release (tag vX.Y.Z + those two assets) + release commit
     ↓
 mewkit CLI fetches the zip at `npx mewkit init` / `npx mewkit upgrade`
 ```
@@ -431,13 +431,15 @@ node scripts/prepare-release-assets.cjs "<version>"
 This creates:
 
 - `release-manifest.json` — SHA-256 checksums for all files
-- `dist/meowkit-release.zip` — the flat-copy release package (`.claude/` + manifests; no root `CLAUDE.md`, no `tasks/`)
+- `dist/meowkit-release.zip` — the flat-copy release package (`.claude/` + manifests; no root `CLAUDE.md`, no `tasks/`); it carries `.claude/kit-contract.json`
+- `dist/checksums.txt` — `<sha256>  meowkit-release.zip`, in `sha256sum -c` format
 
 > **Note:** This script does NOT write `.claude/metadata.json` — the `mewkit` CLI writes it on install/upgrade, and `prepare-release-assets.cjs` explicitly excludes it from the zip. The shipped release version lives in `release-manifest.json`.
 
-Verify the zip:
+Verify the assets (contract inside the zip, checksum matches, no signed-artifact asset in `dist/`):
 
 ```bash
+node scripts/verify-release-assets.cjs "<version>" dist
 python3 -c "import os,zipfile; z=zipfile.ZipFile('dist/meowkit-release.zip'); print(f'Size: {os.path.getsize(\"dist/meowkit-release.zip\")/1024:.0f} KB, Files: {len(z.namelist())}')"
 ```
 
@@ -458,12 +460,12 @@ git push origin main
 git push origin v<version>
 ```
 
-### 8. Create GitHub Release with zip
+### 8. Create GitHub Release with zip and checksums
 
-**This is the critical step.** The zip file MUST be attached as a release asset.
+**This is the critical step.** The zip and `checksums.txt` MUST be attached as release assets, and nothing else.
 
 ````bash
-gh release create v<version> dist/meowkit-release.zip \
+gh release create v<version> dist/meowkit-release.zip dist/checksums.txt \
   --title "v<version> — <release title>" \
   --notes-file - <<'NOTES'
 ## <Release Title>
@@ -482,7 +484,7 @@ Upload separately:
 
 ```bash
 gh release create v<version> --title "..." --notes "..."
-gh release upload v<version> /tmp/meowkit-v<version>.zip --clobber
+gh release upload v<version> dist/meowkit-release.zip dist/checksums.txt --clobber
 ```
 
 ### 9. Verify the release
@@ -491,9 +493,9 @@ gh release upload v<version> /tmp/meowkit-v<version>.zip --clobber
 # Check tag exists
 git tag | grep v<version>
 
-# Check zip is attached
+# Check the assets
 gh release view v<version> --json assets -q '.assets[].name'
-# Must show: meowkit-release.zip or meowkit-v<version>.zip
+# Must show exactly: meowkit-release.zip, checksums.txt
 
 # Check release URL
 gh release view v<version> --json url -q '.url'
@@ -562,7 +564,7 @@ Copy this checklist for each release:
 - [ ] Multi-provider install smoke (step 1e): `init --target codex` then `init --target cursor` in one scratch project — **both** `.agents/skills` and `.cursor/skills` hold the full catalog, in either install order; re-run reports `0 written`
 - [ ] Committed and tagged
 - [ ] Pushed to GitHub (commits + tag)
-- [ ] GitHub Release created with zip asset
+- [ ] GitHub Release created with `meowkit-release.zip` and `checksums.txt`
 - [ ] Release notes include install instructions
 - [ ] If CLI was bumped: `npm -w packages/mewkit publish` ran (else step 10 skipped)
 
@@ -572,22 +574,21 @@ Copy this checklist for each release:
 - [ ] `npx mewkit init` scaffolds new version correctly
 ```
 
-## Automated Release (CI/CD)
+## Release Streams and Trust Model
 
-Push to `main` or `dev` triggers `.github/workflows/release.yml`:
+There is no automated release workflow. Releases are cut by hand:
 
-1. Semantic-release analyzes conventional commits → determines version bump
-2. `sync-package-versions.cjs` syncs version across both packages
-3. `prepare-release-assets.cjs` builds the zip + manifest at the release version
-4. `@semantic-release/github` creates GitHub Release with zip asset
-5. `@semantic-release/exec` publishes both packages to npm
-6. `@semantic-release/git` commits version files back to repo
+- **Kit** — `scripts/release.sh <version> "<title>"` tags `v<version>` and publishes `meowkit-release.zip` + `checksums.txt` to the GitHub Release. The zip carries `.claude/kit-contract.json`: `kitContract` (format version), `requires.mewkitMin` (oldest installer binary that can read this kit) and `kitVersion` (stamped from root `package.json` by `sync-versions.cjs`).
+- **CLI (npm)** — `packages/mewkit` is published to npm by hand (step 10); it has no tag. It reads the zip and ignores `checksums.txt` and `kit-contract.json`.
+- **Binary (planned)** — a native `mewkit` binary will release from this repo under its own `mewkit-v<version>` tags with no `.zip` asset, so npm CLIs never mistake it for a kit; it fetches the kit zip and checks it against `checksums.txt`.
 
-**Note:** Automated releases do NOT update `packages/docs/content/docs/changelog/index.mdx` or affected guide/reference pages. Those must be done manually before the release commit. Root `CHANGELOG.md` is a stub and is never updated per-release.
+**Trust model: checksums only.** MeowKit is open source and releases carry no signatures. `checksums.txt` is fetched from the same release as the zip, so it detects corruption and partial downloads, not a tampered release; trust rests on GitHub, TLS and who can push tags.
+
+**Never upload `meowkit-kit-*.tar.gz`, `kit-manifest.json` or `*.sig` to a release.** CLIs that understand the signed kit artifact install from it when present, and their trusted keyring is empty, so every install of that release would be refused. `verify-release-assets.cjs` fails if any of them sits in `dist/`. The signing scripts (`build-kit-artifact.cjs`, `kit-signing.cjs`) stay in the tree, unused.
 
 ### Conventional commits → version bumps
 
-The CI mapping below applies to `.claude/` content. The CLI follows the same SemVer fields, but it only bumps when `packages/mewkit/src/` changes — see step 3.
+Use the commit history to choose the kit bump. The mapping below applies to `.claude/` content. The CLI follows the same SemVer fields, but it only bumps when `packages/mewkit/src/` changes — see step 3.
 
 ```
 feat: new skill            → MINOR (1.0.0 → 1.1.0)
@@ -609,9 +610,10 @@ For CLI changes inside `packages/mewkit/src/`:
 
 | Script                                  | Purpose                                                                         |
 | --------------------------------------- | ------------------------------------------------------------------------------- |
-| `scripts/sync-package-versions.cjs`     | Sync version across both npm packages                                           |
 | `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files                                |
-| `scripts/prepare-release-assets.cjs`    | Build the release manifest + dist/meowkit-release.zip                            |
+| `scripts/prepare-release-assets.cjs`    | Build the release manifest + dist/meowkit-release.zip + dist/checksums.txt       |
+| `scripts/verify-release-assets.cjs`     | Check dist/ before upload: contract in the zip, checksum, no signed-artifact asset |
+| `scripts/sync-versions.cjs`             | Check or stamp the kit version into the derived surfaces, incl. `.claude/kit-contract.json` |
 | `packages/mewkit/scripts/copy-provider-bundles.cjs` | Stage the authored provider bundles (`modules/codex/`, `modules/cursor/`) into `dist/` — runs in `npm run build`; see step 1e |
 | `scripts/release.sh`                    | Automated release: bump → build → assets → commit → tag → push → GitHub Release |
 
@@ -731,12 +733,8 @@ Check you're logged in: `npm whoami`. Check package name isn't taken. Check `pub
 ### GitHub Release exists but no zip
 
 ```bash
-gh release upload v<version> dist/meowkit-release.zip --clobber
+gh release upload v<version> dist/meowkit-release.zip dist/checksums.txt --clobber
 ```
-
-### Semantic-release skips release
-
-No `feat:` or `fix:` commits since last release. Add a commit with the right prefix, or use `--force` on the workflow dispatch.
 
 ### A Codex or Cursor install is missing a skill/agent/rule after editing `.claude/`
 

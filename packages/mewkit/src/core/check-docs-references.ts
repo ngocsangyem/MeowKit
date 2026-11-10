@@ -24,17 +24,7 @@ export interface DocsRefResult {
 
 // Subdirectories under .claude/ that ship in the release zip.
 // Adding more subdirs is safe — they only get scanned if present.
-const SCAN_DIRS = [
-	"agents",
-	"skills",
-	"commands",
-	"memory",
-	"hooks",
-	"scripts",
-	"rules",
-	"modes",
-	"benchmarks",
-];
+const SCAN_DIRS = ["agents", "skills", "commands", "memory", "hooks", "scripts", "rules", "modes", "benchmarks"];
 
 // Skill dirs whose Grep-of-user-project semantics need an opt-out from path checks.
 const SKILL_DIR_WHITELIST = new Set(["skills/docs-finder"]);

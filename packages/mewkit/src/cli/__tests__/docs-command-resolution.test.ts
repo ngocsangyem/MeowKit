@@ -91,7 +91,9 @@ function codeSnippets(text: string): string[] {
 function invocations(page: string, text: string): Invocation[] {
 	const found: Invocation[] = [];
 	for (const snippet of codeSnippets(text)) {
-		for (const match of snippet.matchAll(/(?:^|\$ |&& |\| |; |\()\s*(?:npx\s+)?mewkit\s+([a-z][a-z-]*)((?:\s+[^\s#]+)*)/g)) {
+		for (const match of snippet.matchAll(
+			/(?:^|\$ |&& |\| |; |\()\s*(?:npx\s+)?mewkit\s+([a-z][a-z-]*)((?:\s+[^\s#]+)*)/g,
+		)) {
 			found.push({
 				verb: match[1],
 				flags: (match[2] ?? "")
@@ -156,7 +158,12 @@ describe("documented commands resolve against the catalogue", () => {
 	it("leaves the changelog pages untouched", () => {
 		const diff = execFileSync(
 			"git",
-			["diff", "56488bc520f6a042472c8b4e6259d9ff0bdae863", "--", ...CHANGELOG.map((page) => join("packages/docs/content/docs", page))],
+			[
+				"diff",
+				"56488bc520f6a042472c8b4e6259d9ff0bdae863",
+				"--",
+				...CHANGELOG.map((page) => join("packages/docs/content/docs", page)),
+			],
 			{ cwd: REPO, encoding: "utf8" },
 		);
 		expect(diff).toBe("");

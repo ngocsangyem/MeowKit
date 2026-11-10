@@ -112,10 +112,10 @@ describe('every child process a safety entrypoint starts is accounted for', () =
     }
   });
 
-  it('has exactly the four reviewed call sites', () => {
+  it('has exactly the five reviewed call sites', () => {
     // Enumerated, not counted. Adding a child process anywhere a guard can reach
     // fails here and has to be justified, which is the only way an allowlist of
-    // executables stays meaningful when three of the four targets are variables.
+    // executables stays meaningful when three of the five targets are variables.
     const actual = sites.map((s) => `${s.rel} ${s.fn}(${s.target})`).sort();
     expect(actual).toEqual(
       [
@@ -128,6 +128,8 @@ describe('every child process a safety entrypoint starts is accounted for', () =
         '.claude/hooks/lib/memory-store-lint.cjs spawnSync(command)',
         // Runs the project's own build, lint and test commands.
         '.claude/hooks/lib/preship-checks.cjs spawnSync(command)',
+        // Finds the project root when no runtime variable names it. Read-only.
+        ".claude/hooks/lib/project-root.cjs spawnSync('git')",
       ].sort(),
     );
   });

@@ -15,9 +15,7 @@ describe("priority skill profile contracts", () => {
 		const body = skill("brainstorming");
 		expect(body).toContain("Do not create a report or plan.");
 		expect(body).toContain("give 2-4 technically distinct options and one recommendation");
-		expect(body).toContain(
-			"Do not load techniques, scout, scoring, challenge, reports, plans, or handoff.",
-		);
+		expect(body).toContain("Do not load techniques, scout, scoring, challenge, reports, plans, or handoff.");
 		expect(body).not.toContain("## HTML Output");
 	});
 
@@ -62,9 +60,7 @@ describe("priority skill profile contracts", () => {
 	it("keeps quick workflow free of investigation, reviewer, and commit ceremony", () => {
 		const quickWorkflow = reference("fix", "workflow-quick.md");
 		expect(quickWorkflow).toContain("Confirm the supplied cause");
-		expect(quickWorkflow).toContain(
-			"Do not create a plan, report, memory entry, reviewer task, or commit prompt.",
-		);
+		expect(quickWorkflow).toContain("Do not create a plan, report, memory entry, reviewer task, or commit prompt.");
 		expect(quickWorkflow).not.toContain("Activate `mk:investigate`");
 	});
 

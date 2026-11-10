@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "description": "What each Claude Code hook behaviour becomes on the other runtimes. `ported` runs the same shared decision; `equivalent` is a runtime-native hook covering the same need differently; `not-ported` has no counterpart, with the reason. Every safety behaviour and every handler in handlers.json appears once. Checked by .claude/hooks/__tests__/hook-coverage.test.cjs.",
+  "statuses": ["ported", "equivalent", "not-ported"],
+  "safety": {
+    "plan-gate": {
+      "codex": { "status": "ported", "where": ".codex/hooks/gate-enforcement.cjs (PreToolUse apply_patch|Edit|Write)" },
+      "cursor": { "status": "ported", "where": ".cursor/hooks/tool-gate.cjs (preToolUse file-mutation bucket)" }
+    },
+    "privacy": {
+      "codex": {
+        "status": "ported",
+        "where": ".codex/hooks/privacy-block.cjs (PreToolUse Bash)",
+        "note": "Codex has no file-read hook; the decision runs on the shell command and the paths it names."
+      },
+      "cursor": { "status": "ported", "where": ".cursor/hooks/privacy-read-gate.cjs (beforeReadFile)" }
+    },
+    "pre-ship": {
+      "codex": { "status": "not-ported", "reason": "Runs the project's build, lint and test commands plus the Gate 2 structural proof on every ship command; carrying that library and its child processes into another runtime's hook tree is left to the release emitters." },
+      "cursor": { "status": "not-ported", "reason": "Same as codex; beforeShellExecution runs shell-gate.cjs, which does not check Gate 2." }
+    },
+    "session-context": {
+      "codex": { "status": "not-ported", "reason": "No SessionStart hook is registered in the Codex bundle; AGENTS.md carries the standing context." },
+      "cursor": { "status": "equivalent", "where": ".cursor/hooks/session-context.cjs (sessionStart)", "note": "A short pointer to .meowkit/ state, not the Claude Code orientation output." }
+    }
+  },
+  "handlers": {
+    "pre-task-check": { "codex": "not-ported", "cursor": "not-ported", "reason": "Advisory check before Bash; no blocking effect." },
+    "build-verify": { "codex": "not-ported", "cursor": "not-ported", "reason": "Advisory build after an edit; the shared gates do not depend on it." },
+    "loop-detection": { "codex": "not-ported", "cursor": "not-ported", "reason": "Advisory; Cursor bounds runaway loops with loop_limit in hooks.json." },
+    "budget-tracker": { "codex": "not-ported", "cursor": "not-ported", "reason": "Cost telemetry; Cursor records tool events through telemetry-observers.cjs instead." },
+    "auto-checkpoint": { "codex": "not-ported", "cursor": "not-ported", "reason": "Session checkpointing is Claude Code session state." },
+    "learning-observer": { "codex": "not-ported", "cursor": "equivalent", "reason": "Cursor's telemetry-observers.cjs records afterFileEdit events; Codex has no observer hook in the bundle." },
+    "post-write": { "codex": "not-ported", "cursor": "not-ported", "reason": "Post-write scan output is advisory; it does not block." },
+    "review-evidence-tag": { "codex": "not-ported", "cursor": "not-ported", "reason": "Tags Claude Code review evidence; review evidence is produced in Claude Code." },
+    "checkpoint-writer": { "codex": "not-ported", "cursor": "not-ported", "reason": "Claude Code session state." },
+    "post-session": { "codex": "not-ported", "cursor": "equivalent", "reason": "Cursor's telemetry-observers.cjs records sessionEnd; Codex has no Stop hook in the bundle." },
+    "control-probe": { "codex": "not-ported", "cursor": "not-ported", "reason": "Claude Code host diagnostics." },
+    "pre-completion-check": { "codex": "not-ported", "cursor": "equivalent", "reason": "Cursor's stop-followup.cjs sends a followup on an error stop; it never blocks." },
+    "model-detector": { "codex": "not-ported", "cursor": "not-ported", "reason": "Reads Claude Code model identifiers." },
+    "orientation-ritual": { "codex": "not-ported", "cursor": "not-ported", "reason": "Claude Code session orientation; see safety.session-context." },
+    "project-context-loader": { "codex": "not-ported", "cursor": "not-ported", "reason": "Loads docs into Claude Code context; AGENTS.md and Cursor rules carry standing context." },
+    "jira-env-loader": { "codex": "not-ported", "cursor": "not-ported", "reason": "Optional integration setup for Claude Code sessions." },
+    "capability-bootstrap": { "codex": "equivalent", "cursor": "not-ported", "reason": "Codex receives the capability block in AGENTS.md at migrate time (capability-bootstrap-projection.ts)." },
+    "safety-sentinel-inject": { "codex": "not-ported", "cursor": "not-ported", "reason": "Injects Claude Code prompt reminders; the runtime-native gates enforce instead." },
+    "tdd-flag-detector": { "codex": "not-ported", "cursor": "not-ported", "reason": "Reads Claude Code prompt flags." },
+    "precompact-probe": { "codex": "not-ported", "cursor": "equivalent", "reason": "Cursor's telemetry-observers.cjs records preCompact." },
+    "posttoolfailure-probe": { "codex": "not-ported", "cursor": "equivalent", "reason": "Cursor's telemetry-observers.cjs records postToolUseFailure." }
+  },
+  "nodeMissing": {
+    "claude-code": "Not probed. A registration whose `node` cannot start fails like any non-2 exit, which Claude Code treats as non-blocking.",
+    "codex": "Not probed. Codex documents exit 2 and the deny JSON as blocks; a spawn failure is not documented. Needs a maintainer run with node removed from PATH.",
+    "cursor": "Not probed. Every blocking registration sets failClosed: true, which Cursor documents as blocking on hook failure; confirm with node removed from PATH."
+  }
+}

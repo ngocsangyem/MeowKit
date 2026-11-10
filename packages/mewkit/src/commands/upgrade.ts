@@ -308,7 +308,11 @@ async function performUpgrade(
 					...(legacyDescriptorPath(process.cwd()) === null ? [] : [LEGACY_DESCRIPTOR_REL]),
 				]);
 		if (snapshot !== null) {
-			console.log(pc.dim(`Snapshot ${snapshot.id} — ${snapshot.fileCount} file(s); restore with \`mewkit backups restore ${snapshot.id}\``));
+			console.log(
+				pc.dim(
+					`Snapshot ${snapshot.id} — ${snapshot.fileCount} file(s); restore with \`mewkit backups restore ${snapshot.id}\``,
+				),
+			);
 		}
 
 		// Carry a superseded ownership baseline forward before anything else reads
@@ -324,8 +328,11 @@ async function performUpgrade(
 		// removed packs stay removed. Corrupt/absent metadata (or a legacy/full
 		// install with `packs` undefined) falls through to a full upgrade — never
 		// abort the very upgrade that would repair corruption.
-		const { packs: installedPacks, profile: installedProfile, delivery: installedDelivery } =
-			readInstalledShape(process.cwd());
+		const {
+			packs: installedPacks,
+			profile: installedProfile,
+			delivery: installedDelivery,
+		} = readInstalledShape(process.cwd());
 		const claudeSrc = join(sourceDir, ".claude");
 		const allowedPaths =
 			installedPacks && hasPackManifest(claudeSrc)
@@ -415,7 +422,9 @@ async function performUpgrade(
 		try {
 			if (!dryRun) populateKitCache(sourceDir, process.cwd(), latest.version);
 		} catch (err: unknown) {
-			console.log(pc.yellow(`  Could not write the local kit copy: ${err instanceof Error ? err.message : String(err)}`));
+			console.log(
+				pc.yellow(`  Could not write the local kit copy: ${err instanceof Error ? err.message : String(err)}`),
+			);
 			console.log(pc.dim("  `mewkit uninstall` will refuse to delete until `mewkit upgrade` succeeds in writing it."));
 		}
 		cleanupDownload(sourceDir);
@@ -504,14 +513,26 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 		// `--force` overwrites files this project has edited, so it is one of the
 		// four destructive invocations: in a session with no terminal to confirm
 		// in it previews and stops rather than acting on an unseen plan.
-		if (args.force === true && needsConfirmation({ assumeYes: args.yes === true, interactive: args.interactive !== false })) {
+		if (
+			args.force === true &&
+			needsConfirmation({ assumeYes: args.yes === true, interactive: args.interactive !== false })
+		) {
 			console.log(pc.yellow(confirmationRequiredMessage("upgrade --force")));
-			const preview = await performUpgrade(localVersion, useBeta, args.noCleanup !== true, true, /* dryRun */ true, /* force */ true);
+			const preview = await performUpgrade(
+				localVersion,
+				useBeta,
+				args.noCleanup !== true,
+				true,
+				/* dryRun */ true,
+				/* force */ true,
+			);
 			process.exitCode = EXIT_NEEDS_CONFIRMATION;
 			emit(() =>
 				preview === null
 					? noChange("already up to date; nothing was changed")
-					: installMutationReport("upgrade", preview, true, ["--force needs confirmation: this is the plan, nothing was written"]),
+					: installMutationReport("upgrade", preview, true, [
+							"--force needs confirmation: this is the plan, nothing was written",
+						]),
 			);
 			return;
 		}

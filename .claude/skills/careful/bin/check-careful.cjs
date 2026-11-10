@@ -23,7 +23,8 @@ const path = require('node:path');
 
 const { classify, isDisposableCleanup } = require('../references/destructive-command-patterns.cjs');
 
-const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+const { resolveProjectRoot } = require(path.join(__dirname, '../../../hooks/lib/project-root.cjs'));
+const root = resolveProjectRoot();
 
 const allow = () => {
   process.stdout.write('{}\n');

@@ -32,7 +32,7 @@ In `.meowkit/.env` (gitignored):
 | `MEOW_JIRA_EMAIL` | Atlassian account email |
 | `MEOW_JIRA_SITE_URL` | e.g. `https://your-company.atlassian.net` |
 
-The wrapper `.claude/skills/jira/scripts/jira-as.sh` translates these to jira-as's native `JIRA_API_TOKEN`, `JIRA_EMAIL`, `JIRA_SITE_URL` and exports `JIRA_OUTPUT=json` as the default.
+The wrapper `scripts/jira-as.sh` translates these to jira-as's native `JIRA_API_TOKEN`, `JIRA_EMAIL`, `JIRA_SITE_URL` and exports `JIRA_OUTPUT=json` as the default.
 
 The legacy `MEOW_*` prefix (vs. modern `MEOWKIT_*`) is a deliberate exception per migration directive.
 
@@ -71,7 +71,7 @@ The upstream `JIRA-Assistant-Skills` README mentions a `JIRA_PROFILE` env var. T
 ## Wrapper smoke test
 
 ```
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh --version
+bash scripts/jira-as.sh --version
 ```
 
 Expected: prints version, exits 0. With env missing, errors with `:?` parameter-expansion hint pointing at `.meowkit/.env.example`.

@@ -38,11 +38,41 @@ else
   bad "validate --portable (hard failure)"; tail -20 /tmp/rc-validate.txt
 fi
 
-step "Inventory check"
-$CLI inventory --check >/dev/null 2>&1 && ok "inventory --check" || bad "inventory --check"
+step "Inventory check (README, website and index counts)"
+node scripts/harness-inventory.cjs --check >/tmp/rc-inventory.txt 2>&1 && ok "harness-inventory --check" || { bad "harness-inventory --check"; tail -20 /tmp/rc-inventory.txt; }
 
-step "Version sync (root ↔ manifest; CLI recorded)"
+step "Version sync (root ↔ manifest ↔ kit contract; CLI recorded)"
 node scripts/sync-versions.cjs && ok "versions consistent" || bad "version mismatch"
+
+step "Portable skills (own paths, reference classes, tool table)"
+node scripts/check-skills-portable.cjs >/tmp/rc-portable.txt 2>&1 && ok "check-skills-portable" || { bad "check-skills-portable"; tail -20 /tmp/rc-portable.txt; }
+
+step "Kit compatibility contract"
+if node -e '
+  const c = JSON.parse(require("fs").readFileSync(".claude/kit-contract.json", "utf8"));
+  const semver = /^\d+\.\d+\.\d+(-[\w.]+)?$/;
+  if (!Number.isInteger(c.kitContract) || c.kitContract < 1) throw new Error("kitContract must be a positive integer");
+  if (!semver.test(String(c.requires && c.requires.mewkitMin))) throw new Error("requires.mewkitMin must be a semver");
+' 2>/tmp/rc-contract.txt; then
+  ok ".claude/kit-contract.json"
+else
+  bad ".claude/kit-contract.json missing or invalid"; tail -3 /tmp/rc-contract.txt
+fi
+
+# Built assets are checked only when a zip for THIS version exists. release.sh runs this gate
+# after the version bump and before it rebuilds dist/, which is gitignored and persists, so a zip
+# left from an earlier version is expected there: it is reported and skipped, not failed.
+# release.sh verifies the rebuilt assets itself before uploading.
+if [ -f dist/meowkit-release.zip ]; then
+  step "Built release assets (dist/)"
+  KIT_VERSION="$(node -p "require('./package.json').version")"
+  BUILT_VERSION="$(unzip -p dist/meowkit-release.zip .claude/kit-contract.json 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(String(JSON.parse(s).kitVersion||""))}catch{}})')"
+  if [ "$BUILT_VERSION" != "$KIT_VERSION" ]; then
+    ok "dist/ holds a ${BUILT_VERSION:-unversioned} build, not $KIT_VERSION — skipped (release.sh rebuilds and verifies it)"
+  else
+    node scripts/verify-release-assets.cjs "$KIT_VERSION" dist && ok "zip contract + checksums.txt" || bad "release assets (rebuild with prepare-release-assets.cjs)"
+  fi
+fi
 
 echo ""
 if [ "$fail" -eq 0 ]; then

@@ -31,10 +31,17 @@ const ABSOLUTE_PATH = /^(\/|[A-Za-z]:[\\/])/;
 
 const HATCH_ENV = "MEOWKIT_GATE1_PRESENCE_ONLY";
 
-const reject = (code: string, key: string, message: string, fix: string): RuleResult => ({ ok: false, error: { code, key, message, fix } });
+const reject = (code: string, key: string, message: string, fix: string): RuleResult => ({
+	ok: false,
+	error: { code, key, message, fix },
+});
 
 /** `{ ok, values }` for an already-parsed flat map, or the first rule that fired. */
-export function applyRules(values: ConfigValues, observerNames: readonly string[], scope: ConfigScope = "project config"): RuleResult {
+export function applyRules(
+	values: ConfigValues,
+	observerNames: readonly string[],
+	scope: ConfigScope = "project config",
+): RuleResult {
 	const keys = knownKeys(observerNames);
 
 	for (const [key, value] of Object.entries(values)) {
@@ -110,14 +117,29 @@ export function applyRules(values: ConfigValues, observerNames: readonly string[
 
 		const spec = keys[key];
 		if (spec.type === "boolean" && typeof value !== "boolean") {
-			return reject("wrong-type", key, `${key} in the ${scope} must be true or false, not ${JSON.stringify(value)}`, `set ${key} to true or false`);
+			return reject(
+				"wrong-type",
+				key,
+				`${key} in the ${scope} must be true or false, not ${JSON.stringify(value)}`,
+				`set ${key} to true or false`,
+			);
 		}
 		if (spec.type === "integer" && !Number.isInteger(value)) {
-			return reject("wrong-type", key, `${key} in the ${scope} must be a whole number, not ${JSON.stringify(value)}`, `set ${key} to a whole number`);
+			return reject(
+				"wrong-type",
+				key,
+				`${key} in the ${scope} must be a whole number, not ${JSON.stringify(value)}`,
+				`set ${key} to a whole number`,
+			);
 		}
 		if (spec.type === "string" && typeof value !== "string") {
 			const allowed = spec.enum ? spec.enum.join(", ") : "the documented values";
-			return reject("wrong-type", key, `${key} in the ${scope} must be a string, not ${JSON.stringify(value)}`, `set ${key} to one of ${allowed}`);
+			return reject(
+				"wrong-type",
+				key,
+				`${key} in the ${scope} must be a string, not ${JSON.stringify(value)}`,
+				`set ${key} to one of ${allowed}`,
+			);
 		}
 		if (spec.enum && !spec.enum.includes(value as string)) {
 			return reject(

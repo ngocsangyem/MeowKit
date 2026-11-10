@@ -77,12 +77,7 @@ describe("checkStaleIndex", () => {
 	});
 
 	it("FAILS on a count drift (README claims wrong skill count)", async () => {
-		const root = await makeRepo(
-			"9 skills · 1 agents · 1 rules · 1 hook scripts\n",
-			SKILLS_OK,
-			AGENTS_OK,
-			HOOKS_OK,
-		);
+		const root = await makeRepo("9 skills · 1 agents · 1 rules · 1 hook scripts\n", SKILLS_OK, AGENTS_OK, HOOKS_OK);
 		const results = checkStaleIndex(root);
 		expect(results.some((r) => r.status === "fail" && r.detail.includes("declared 9, found 1"))).toBe(true);
 	});
@@ -124,8 +119,7 @@ describe("checkStaleIndex", () => {
 	});
 
 	it("emitCounts rewrites numbers but not curated prose", async () => {
-		const staleReadme =
-			"77 skills · 17 agents · 19 rules · 27 hook scripts\nKeep this curated sentence.\n";
+		const staleReadme = "77 skills · 17 agents · 19 rules · 27 hook scripts\nKeep this curated sentence.\n";
 		const root = await makeRepo(
 			staleReadme,
 			"Curated intro.\n`mk:foo`|utility|x|monolithic\n**Total**|**76**\n",

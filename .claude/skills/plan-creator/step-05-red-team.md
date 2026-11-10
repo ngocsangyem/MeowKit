@@ -18,7 +18,7 @@ Count `phase-XX-*.md` files in `{plan_dir}`:
 | 4–5 phases  | Above + Security Adversary |
 | 6+ phases   | Above + Security Adversary + Failure Mode Analyst |
 
-Load persona prompts from `.claude/skills/plan-creator/prompts/personas/`.
+Load persona prompts from `prompts/personas/`.
 
 ### 5c. Dispatch Reviewer Subagents
 

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "description": "Claude Code tool names used in skill text, and how each runtime expresses the same action. Skill text keeps the Claude Code name; an emitter for another runtime rewrites the mention to that runtime's wording, or reports it when the value is \"unsupported\". Codex and Cursor document capabilities rather than internal tool identifiers, so their wording names the capability (Cursor: the section titles of its Agent tools page).",
+  "sources": {
+    "claude": "https://code.claude.com/docs/en/tools-reference",
+    "codex": "https://learn.chatgpt.com/docs/codex/cli",
+    "cursor": "https://cursor.com/docs/agent/tools"
+  },
+  "tools": {
+    "Agent": { "codex": "delegate to a subagent", "cursor": "delegate to a subagent" },
+    "Task": { "codex": "delegate to a subagent", "cursor": "delegate to a subagent" },
+    "AskUserQuestion": { "codex": "ask the user in a message and wait for the answer", "cursor": "Ask questions" },
+    "Bash": { "codex": "run a shell command", "cursor": "Run shell commands" },
+    "Edit": { "codex": "edit the file", "cursor": "Edit files" },
+    "Write": { "codex": "write the file", "cursor": "Edit files" },
+    "Glob": { "codex": "list files with a shell command", "cursor": "Search files and folders" },
+    "Grep": { "codex": "search file contents with a shell command", "cursor": "Search files and folders" },
+    "Read": { "codex": "read the file", "cursor": "Read files" },
+    "Skill": { "codex": "use the skill", "cursor": "use the skill" },
+    "TaskCreate": { "codex": "track the step in a checklist", "cursor": "track the step in a checklist" },
+    "TaskGet": { "codex": "track the step in a checklist", "cursor": "track the step in a checklist" },
+    "TaskList": { "codex": "track the step in a checklist", "cursor": "track the step in a checklist" },
+    "TaskUpdate": { "codex": "track the step in a checklist", "cursor": "track the step in a checklist" },
+    "TodoWrite": { "codex": "track the step in a checklist", "cursor": "track the step in a checklist" },
+    "WebFetch": { "codex": "unsupported", "cursor": "unsupported" },
+    "WebSearch": { "codex": "web search (run with `codex --search`)", "cursor": "Web" },
+    "Monitor": { "codex": "unsupported", "cursor": "unsupported" },
+    "SendMessage": { "codex": "unsupported", "cursor": "unsupported" }
+  }
+}

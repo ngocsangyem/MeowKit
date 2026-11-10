@@ -72,9 +72,9 @@ The slash command runs the pipeline:
 
 ```bash
 SCAN_ROOT="${1:-$PWD}"
-bash .claude/skills/context-audit/scripts/inventory-context.sh "$SCAN_ROOT" \
-  | bash .claude/skills/context-audit/scripts/estimate-tokens.sh \
-  | bash .claude/skills/context-audit/scripts/format-audit-report.sh
+bash ${CLAUDE_SKILL_DIR}/scripts/inventory-context.sh "$SCAN_ROOT" \
+  | bash ${CLAUDE_SKILL_DIR}/scripts/estimate-tokens.sh \
+  | bash ${CLAUDE_SKILL_DIR}/scripts/format-audit-report.sh
 ```
 
 Output is markdown, printed to terminal. The skill does NOT write any files.

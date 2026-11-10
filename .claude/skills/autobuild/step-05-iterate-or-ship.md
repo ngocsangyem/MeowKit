@@ -32,7 +32,7 @@ human approves. Setting `next_step` here is not permission to skip 5c.
 sed -i.bak "s/^iterations:.*/iterations: $iteration/" "$run_dir/run.md" && rm "$run_dir/run.md.bak"
 
 # Check budget — bail early if breached
-if ! .claude/skills/autobuild/scripts/budget-tracker.sh check >/dev/null 2>&1; then
+if ! scripts/budget-tracker.sh check >/dev/null 2>&1; then
   final_status=TIMED_OUT
   next_step="step-06-run-report.md"
 elif [ "$verdict" = "PASS" ]; then

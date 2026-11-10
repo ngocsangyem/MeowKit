@@ -54,7 +54,12 @@ function makeSourceRoot(exclude: string[] = [".claude/logs/*"]): string {
 	writeFileSync(join(root, "release-manifest.json"), JSON.stringify({ version: VERSION, files: [] }));
 	writeFileSync(
 		join(root, ".meowkit", "pack-manifest.json"),
-		JSON.stringify({ schemaVersion: "1.0", base: { files: [], globs: [], commands: [], exclude }, packs: {}, profiles: {} }),
+		JSON.stringify({
+			schemaVersion: "1.0",
+			base: { files: [], globs: [], commands: [], exclude },
+			packs: {},
+			profiles: {},
+		}),
 	);
 	return root;
 }

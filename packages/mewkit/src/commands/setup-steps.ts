@@ -108,7 +108,12 @@ function setupEnv(projectDir: string, options: StepOptions = {}): StepResult {
 	for (const existing of [envTarget, legacyEnv]) {
 		if (!existsSync(existing)) continue;
 		if (readFileSync(existing, "utf-8").trim().length > 0) {
-			return { name: "env", status: "skip", message: `${relative(projectDir, existing)} already exists`, changes: w.changes };
+			return {
+				name: "env",
+				status: "skip",
+				message: `${relative(projectDir, existing)} already exists`,
+				changes: w.changes,
+			};
 		}
 	}
 
@@ -147,7 +152,8 @@ export function stripStaleMemoryIgnore(content: string): { content: string; stri
  * with `!` is left alone — that is a decision, not a leftover.
  */
 export function stripSupersededMeowkitIgnores(content: string): { content: string; stripped: string[] } {
-	const superseded = /^\s*\.?\/?\.meowkit\/(?:telemetry|state|cache|envs|backups)\/?\*{0,2}\s*$|^\s*\.?\/?\.meowkit\/\.env\s*$/;
+	const superseded =
+		/^\s*\.?\/?\.meowkit\/(?:telemetry|state|cache|envs|backups)\/?\*{0,2}\s*$|^\s*\.?\/?\.meowkit\/\.env\s*$/;
 	const lines = content.split("\n");
 	const stripped: string[] = [];
 	const kept = lines.filter((line) => {
@@ -281,7 +287,12 @@ async function setupSkillEnvs(projectDir: string, options: StepOptions = {}): Pr
 				created.push(skill);
 			}
 		} catch (err) {
-			return { name: "skill-envs", status: "fail", message: `${skill}: ${err instanceof Error ? err.message : String(err)}`, changes: w.changes };
+			return {
+				name: "skill-envs",
+				status: "fail",
+				message: `${skill}: ${err instanceof Error ? err.message : String(err)}`,
+				changes: w.changes,
+			};
 		}
 
 		if (!req.packages.length) continue;
@@ -293,16 +304,29 @@ async function setupSkillEnvs(projectDir: string, options: StepOptions = {}): Pr
 		const results = await installPipPackages(projectDir, envDir, missing);
 		const failed = results.filter((r) => !r.success);
 		if (failed.length) {
-			return { name: "skill-envs", status: "warn", message: `${skill}: ${failed.length} of ${results.length} package(s) failed`, changes: w.changes };
+			return {
+				name: "skill-envs",
+				status: "warn",
+				message: `${skill}: ${failed.length} of ${results.length} package(s) failed`,
+				changes: w.changes,
+			};
 		}
 		w.record("install", envDir, `${results.length} package(s) for ${skill}`);
 		installed.push(`${skill} (${results.length})`);
 	}
 
 	if (!created.length && !installed.length) {
-		return { name: "skill-envs", status: "skip", message: `Already configured: ${requested.join(", ")}`, changes: w.changes };
+		return {
+			name: "skill-envs",
+			status: "skip",
+			message: `Already configured: ${requested.join(", ")}`,
+			changes: w.changes,
+		};
 	}
-	const parts = [created.length ? `created ${created.join(", ")}` : "", installed.length ? `installed ${installed.join(", ")}` : ""].filter(Boolean);
+	const parts = [
+		created.length ? `created ${created.join(", ")}` : "",
+		installed.length ? `installed ${installed.join(", ")}` : "",
+	].filter(Boolean);
 	return { name: "skill-envs", status: "pass", message: parts.join("; "), changes: w.changes };
 }
 

@@ -119,7 +119,9 @@ async function playwrightDoctorCheck(ctx: DoctorContext): Promise<DoctorResult> 
 	// Probe 2: is the Chromium binary installed?
 	// playwright install --dry-run chromium exits 0 and prints "chromium" if installed
 	const venvPlaywright =
-		process.platform === "win32" ? path.join(envDir, "Scripts", "playwright.exe") : path.join(envDir, "bin", "playwright");
+		process.platform === "win32"
+			? path.join(envDir, "Scripts", "playwright.exe")
+			: path.join(envDir, "bin", "playwright");
 
 	const dryRunProbe = spawnSync(venvPlaywright, ["install", "--dry-run", "chromium"], {
 		encoding: "utf-8",

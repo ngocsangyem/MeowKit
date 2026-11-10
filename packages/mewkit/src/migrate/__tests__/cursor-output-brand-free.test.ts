@@ -21,6 +21,24 @@ import { scanCursorDenied } from "../modules/cursor-extra-denied-tokens.js";
 const moduleDir = resolveCursorModuleDir();
 const rootDir = join(moduleDir, "root");
 
+// The shared safety-hook core is carried as byte-identical copies of the canonical hook library
+// (listed under `bundled` in core-closure.json, identity checked by core-closure.test.cjs). Its
+// code and comments name the canonical tree; what a Cursor agent reads is the deny reason, which
+// the Cursor shells pass through hook-runtime's portable wording. So the copies are not scanned
+// here, and the shells that call them are.
+const vendoredCore = new Set(
+	(
+		JSON.parse(
+			readFileSync(
+				join(moduleDir, "..", "..", "..", "..", "..", "..", ".claude", "hooks", "core-closure.json"),
+				"utf-8",
+			),
+		) as {
+			bundled: string[];
+		}
+	).bundled.map((file) => join(rootDir, ".cursor", "hooks", "lib", file)),
+);
+
 function walkFiles(dir: string, acc: string[] = []): string[] {
 	if (!existsSync(dir)) return acc;
 	for (const e of readdirSync(dir, { withFileTypes: true })) {
@@ -48,7 +66,7 @@ describe("cursor output is brand-free", () => {
 
 	it("every .cursor/** file (agents, rules, hooks, hooks.json) is free of denied tokens", () => {
 		const leaks: string[] = [];
-		for (const file of walkFiles(join(rootDir, ".cursor"))) {
+		for (const file of walkFiles(join(rootDir, ".cursor")).filter((f) => !vendoredCore.has(f))) {
 			const hits = scanCursorDenied(readFileSync(file, "utf-8"));
 			if (hits.length > 0) leaks.push(`${file.slice(rootDir.length + 1)} [${hits.join(", ")}]`);
 		}

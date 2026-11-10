@@ -34,7 +34,7 @@ runtime: claude-code
 > benchmark that scored a user's own project would be measuring a different thing under the
 > same name. Nothing in an installed project invokes it.
 
-Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (per `.claude/skills/benchmark/references/dead-weight-audit-rules.md`) consumes to make load-bearing decisions about each harness component.
+Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (per `references/dead-weight-audit-rules.md`) consumes to make load-bearing decisions about each harness component.
 
 ## When to Use
 
@@ -158,7 +158,7 @@ Each benchmark run writes a JSON dump to `.claude/benchmarks/results/{run-id}.js
 
 ## Audit Mode
 
-**Load first.** `Read` `.claude/skills/benchmark/references/dead-weight-audit-rules.md` before any audit work — it owns the audit cadence, the disable → re-measure → re-enable procedure, the PRUNE / WATCH / KEEP thresholds, the never-prune list, and the circular-dependency workaround. It left the always-on set and ships with this skill.
+**Load first.** `Read` `references/dead-weight-audit-rules.md` before any audit work — it owns the audit cadence, the disable → re-measure → re-enable procedure, the PRUNE / WATCH / KEEP thresholds, the never-prune list, and the circular-dependency workaround. It left the always-on set and ships with this skill.
 
 `scripts/git-index-audit.sh` records a reproducible git tracked-state fingerprint as a
 JSON artifact — independent of the canary benchmark loop. Use it to verify two checkouts
@@ -166,9 +166,9 @@ of a repo are identical, or to snapshot tracked state over time.
 
 ```bash
 # single-repo snapshot
-bash .claude/skills/benchmark/scripts/git-index-audit.sh [repo-path]
+bash ${CLAUDE_SKILL_DIR}/scripts/git-index-audit.sh [repo-path]
 # comparison (adds local/remote-only counts + recursive diff status)
-bash .claude/skills/benchmark/scripts/git-index-audit.sh <local> <remote>
+bash ${CLAUDE_SKILL_DIR}/scripts/git-index-audit.sh <local> <remote>
 ```
 
 **Artifact location:** `.claude/benchmarks/audits/{YYMMDD-HHMMSS}-audit.json` — a SIBLING
@@ -193,7 +193,7 @@ the toolkit's, documented here and in the script header so future comparisons ar
 - **`run-canary.sh` is an orchestrator-driven runner for the model-in-loop canary.** It writes a manifest with `PENDING` tasks then prints orchestrator instructions. The script CANNOT itself invoke `mk:autobuild` per task because each invocation requires a fresh subagent context, which only an orchestrator agent can spawn — not a shell process. **The agent invoking this skill MUST follow the printed instructions to fill in each task's results.** Failure to do so leaves the manifest as a stub.
 - **The cost cap is now enforced (not just recorded).** After each task the orchestrator appends a `{costUsd,…}` receipt to the run's `.ledger.jsonl` and runs `run-canary.sh check-cap <ledger> <cap>`; exit 2 means the cap was reached and the run STOPS. Thresholds follow `.claude/skills/cook/references/harness-rules.md` Rule 6 (warn at $30, halt at the effective cap; `--budget N` / `budget.cap` in `.meowkit/config.yaml` override the tier cap). This mirrors the TypeScript cost-ledger the deferred live backends inherit.
 - **The cross-harness journey (J10) IS automated.** Its deterministic layer runs offline in CI via the TypeScript journey runner (`packages/mewkit/src/journey-validation`) — migration → target validation → route/artifact/denied-token/side-effect oracles — with no model calls. Only the model-in-loop (live) canary above still needs the orchestrator handoff.
-- **Circular dependency with `mk:autobuild`.** This skill invokes `mk:autobuild` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. The manual fallback is documented in `.claude/skills/benchmark/references/dead-weight-audit-rules.md` Rule 8 — run individual canary specs via `/mk:cook <spec.md>` and score by hand.
+- **Circular dependency with `mk:autobuild`.** This skill invokes `mk:autobuild` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. The manual fallback is documented in `references/dead-weight-audit-rules.md` Rule 8 — run individual canary specs via `/mk:cook <spec.md>` and score by hand.
 - **Don't treat 100% pass as "harness is perfect."** Canary tasks are intentionally simple. Real-world failures live in the long tail; canary catches regressions, not all bugs.
 - **Don't skip `--full` for the dead-weight audit.** The audit needs the heavy task to detect issues that only manifest in real product builds.
 - **Don't compare runs across different model versions** without noting it in the delta table — model upgrade is a confounding variable.

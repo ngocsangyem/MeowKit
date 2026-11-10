@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /**
- * Prepare release assets for semantic-release publish step.
- * Generates the release manifest and the zip archive.
+ * Prepare the kit release assets uploaded by scripts/release.sh: the release manifest,
+ * dist/meowkit-release.zip and dist/checksums.txt (SHA-256 of the zip).
  *
  * Usage: node scripts/prepare-release-assets.cjs <version>
  */
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { execSync, spawnSync } = require("child_process");
 const { ARCHIVE_TARGETS, CRITICAL_TARGETS, shipSetExclusions, zipExcludeArgs } = require("./kit-ship-set.cjs");
 
@@ -24,6 +25,7 @@ if (!/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(version)) {
 const projectRoot = process.cwd();
 const distDir = path.join(projectRoot, "dist");
 const archivePath = path.join(distDir, "meowkit-release.zip");
+const checksumsPath = path.join(distDir, "checksums.txt");
 
 try {
   // Release identity is carried by release-manifest.json. The installed
@@ -45,8 +47,8 @@ try {
   if (!fs.existsSync(distDir)) {
     fs.mkdirSync(distDir, { recursive: true });
   }
-  if (fs.existsSync(archivePath)) {
-    fs.unlinkSync(archivePath);
+  for (const stale of [archivePath, checksumsPath]) {
+    if (fs.existsSync(stale)) fs.unlinkSync(stale);
   }
 
   // `.meowkit/pack-manifest.json` is named as a single file, never as a directory: the rest
@@ -78,6 +80,11 @@ try {
     throw new Error(`zip exited with status ${zipResult.status}`);
   }
   console.log(`Prepared ${archivePath}`);
+
+  // `sha256sum -c` format, so a user can verify a download with standard tools.
+  const digest = crypto.createHash("sha256").update(fs.readFileSync(archivePath)).digest("hex");
+  fs.writeFileSync(checksumsPath, `${digest}  ${path.basename(archivePath)}\n`, "utf8");
+  console.log(`Prepared ${checksumsPath}`);
 } catch (error) {
   console.error(`Failed to prepare release assets: ${error.message}`);
   process.exit(1);

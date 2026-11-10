@@ -29,6 +29,8 @@ default_enabled: false
 
 # mk:planning-engine — Tech Review & Sprint Planning Analysis
 
+> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+
 Codebase-aware tech breakdown and sprint planning analysis. Produces reports for human decision-making — NOT automated ticket creation, assignment, or sprint modification.
 
 ## Security

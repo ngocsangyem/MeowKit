@@ -16,18 +16,25 @@ import { envReads, requireGraph } from './lib/require-graph';
 /** What each entrypoint and its libraries may read, and nothing else. */
 const ALLOWED: Record<string, string[]> = {
   '.claude/hooks/gate-enforcement.cjs': [
-    // The project root every rule below is relative to.
+    // The project root every rule below is relative to, from lib/project-root.cjs: the
+    // launcher's, Claude Code's and Cursor's variable, first set one wins.
+    'MEOWKIT_PROJECT_DIR',
     'CLAUDE_PROJECT_DIR',
+    'CURSOR_PROJECT_DIR',
     // Downgrades the approval check to presence only, announced on stderr.
     'MEOWKIT_GATE1_PRESENCE_ONLY',
     // Density modes that skip the contract step by policy and log the bypass.
     'MEOWKIT_AUTOBUILD_MODE',
   ],
   '.claude/hooks/privacy-block.cjs': [
+    'MEOWKIT_PROJECT_DIR',
     'CLAUDE_PROJECT_DIR',
+    'CURSOR_PROJECT_DIR',
   ],
   '.claude/hooks/pre-ship.cjs': [
+    'MEOWKIT_PROJECT_DIR',
     'CLAUDE_PROJECT_DIR',
+    'CURSOR_PROJECT_DIR',
     // Selects the build/lint/test block only — never the structural ship proof.
     'MEOWKIT_HOOK_PROFILE',
     'MEOW_HOOK_PROFILE',

@@ -42,7 +42,7 @@ calibration-set/
 ```bash
 # Run evaluator against the calibration source
 .claude/skills/evaluate/scripts/run-evaluator.sh \
-  .claude/skills/rubric/rubrics/calibration-set/260408-kanban-app-PASS-anchor/source
+  rubrics/calibration-set/260408-kanban-app-PASS-anchor/source
 
 # Compare to gold-standard
 diff <(yq '.overall' calibration-set/260408-kanban-app-PASS-anchor/metadata.yaml) \

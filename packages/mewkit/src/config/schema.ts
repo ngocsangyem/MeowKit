@@ -48,7 +48,8 @@ export const USER_SCOPE_ONLY_KEY = "gate1PresenceOnly";
  * rather than reporting an unknown key.
  */
 export const STATE_ONLY_KEYS: Record<string, string> = {
-	skip_eng_review: "it suppresses the review step that gates shipping, so it is a per-project choice rather than a committed one",
+	skip_eng_review:
+		"it suppresses the review step that gates shipping, so it is a per-project choice rather than a committed one",
 };
 
 export const AUTOBUILD_MODES = ["MINIMAL", "FULL", "LEAN"] as const;
@@ -110,7 +111,10 @@ function nestedShape(): Record<string, z.ZodTypeAny> {
  * The schema for one project. `observerNames` are the kebab-case toggle keys of
  * that project's registry; each becomes an optional boolean under `hooks`.
  */
-export function buildConfigSchema(observerNames: readonly string[], scope: "project" | "user" = "project"): z.ZodTypeAny {
+export function buildConfigSchema(
+	observerNames: readonly string[],
+	scope: "project" | "user" = "project",
+): z.ZodTypeAny {
 	const hooks: Record<string, z.ZodTypeAny> = {};
 	for (const name of [...observerNames].sort()) hooks[name] = z.boolean().optional();
 	// The hatch key exists in the user file only. Admitting it to the project
@@ -126,7 +130,9 @@ export function buildConfigSchema(observerNames: readonly string[], scope: "proj
 }
 
 /** Every legal dotted key for one project, scalars plus one toggle per observer. */
-export function knownKeys(observerNames: readonly string[]): Record<string, { type: "boolean" | "integer" | "string"; enum?: readonly string[] }> {
+export function knownKeys(
+	observerNames: readonly string[],
+): Record<string, { type: "boolean" | "integer" | "string"; enum?: readonly string[] }> {
 	const keys = { ...SCALAR_KEYS };
 	for (const name of observerNames) keys[`hooks.${name}`] = { type: "boolean" };
 	return keys;

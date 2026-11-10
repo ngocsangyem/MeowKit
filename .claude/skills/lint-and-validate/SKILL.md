@@ -24,6 +24,8 @@ requires_runtime: [python>=3.9]
 
 # Lint and Validate Skill
 
+> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+
 > **MANDATORY:** Run appropriate validation tools after EVERY code change. Do not finish a task until the code is error-free.
 
 > For the full pipeline (build → lint → type-check → tests → coverage), use `mk:verify`. `mk:lint-and-validate` is a lint-only subset intended for post-edit quick checks.

@@ -49,6 +49,8 @@ context_cost: high
 
 # mk:autobuild — Autonomous Multi-Hour Build Orchestration
 
+> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+
 Step-file workflow that runs the complete generator/evaluator harness pipeline as an autonomous build. Handles green-field product builds (planner stage → contract stage → evaluator loop → ship decision) with adaptive scaffolding density based on detected model tier.
 <!-- Note: autobuild pipeline stages are numbered Step 0–6 (see Workflow section below). -->
 <!-- "Stage" is used to name pipeline roles to avoid clashing with the 7 lifecycle phases. -->

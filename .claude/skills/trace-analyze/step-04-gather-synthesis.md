@@ -9,7 +9,7 @@ Aggregate the findings from all batch researchers. Compute cross-batch frequency
 Merge all `$analysis_dir/batch-*-findings.json` files by pattern name:
 
 ```bash
-node .claude/skills/trace-analyze/scripts/trace-records.cjs synthesize "$analysis_dir"
+node scripts/trace-records.cjs synthesize "$analysis_dir"
 ```
 
 Writes `$analysis_dir/synthesized.json` and prints the unique-pattern and
@@ -20,7 +20,7 @@ run-incidence counts.
 Filter to patterns with ≥3 total occurrences (anti-overfit):
 
 ```bash
-node .claude/skills/trace-analyze/scripts/trace-records.cjs threshold "$analysis_dir" 3
+node scripts/trace-records.cjs threshold "$analysis_dir" 3
 ```
 
 Writes `$analysis_dir/filtered.json` and prints what was kept and dropped.
@@ -30,7 +30,7 @@ Writes `$analysis_dir/filtered.json` and prints what was kept and dropped.
 Optional: look for patterns that appeared in MULTIPLE batches (not just multiple runs in one batch). A pattern appearing in 2+ batches is more likely to be a real systemic issue, not a one-off:
 
 ```bash
-node .claude/skills/trace-analyze/scripts/trace-records.cjs cross-batch "$analysis_dir"
+node scripts/trace-records.cjs cross-batch "$analysis_dir"
 ```
 
 Writes `$analysis_dir/cross-batch.json` and prints the high-signal patterns.

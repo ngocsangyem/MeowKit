@@ -65,7 +65,9 @@ function isBlocking(hooksDir: string, hook: SettingsHook): boolean {
 	const body = readFileSync(abs, "utf-8");
 	return (
 		/\bexit 2\b/.test(body) ||
-		/process\.exit\(\s*2\s*\)/.test(body) || /"decision"\s*:\s*"block"/.test(body) || /"permissionDecision"\s*:\s*"deny"/.test(body)
+		/process\.exit\(\s*2\s*\)/.test(body) ||
+		/"decision"\s*:\s*"block"/.test(body) ||
+		/"permissionDecision"\s*:\s*"deny"/.test(body)
 	);
 }
 

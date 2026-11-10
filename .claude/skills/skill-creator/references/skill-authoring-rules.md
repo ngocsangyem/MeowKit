@@ -38,7 +38,7 @@ EXCEPTION: framework-internal infrastructure (the team memory store `.meowkit/me
 **Good example: Stable plugin-data path**:
 
 ```python
-# scripts/append-history.py
+# scripts/append-history.py  (illustrative; portable-ignore)
 import os
 DATA_DIR = os.environ["CLAUDE_PLUGIN_DATA"]
 LOG_PATH = f"{DATA_DIR}/standup-post/history.log"
@@ -225,10 +225,27 @@ Brand-prose lint remains diff-mode blocking: violations in changed files fail,
 while pre-existing untouched violations remain warnings. Revisit full-tree
 blocking only after a separately approved CI scope change and a clean baseline.
 
+## Rule 10: Reach the Skill's Own Files Without `.claude/`
+
+A skill never names its own directory as `.claude/skills/<name>/`: the same skill is
+installed under other roots for other runtimes. Reference a document by its path
+relative to the skill root (`references/<file>.md`). A shell resolves paths from its
+working directory, not from the skill, so a command in SKILL.md runs a bundled script
+through the skill-directory variable (`<var>/scripts/<script>`, where `<var>` is
+`CLAUDE_SKILL_DIR` in `${…}` form). On Claude Code, it is substituted only in SKILL.md,
+never in other files and never as a shell variable. Other files (references, steps) write
+`scripts/<script>` relative to the skill root, and SKILL.md then names the variable
+once so the agent knows the directory they resolve against. Rules, agents, hooks and
+other skills keep the canonical `.claude/<surface>/…` form, which installers map per
+runtime. Every host-runtime tool name a skill mentions is listed in
+`.claude/kit-capabilities.json`. A line describing
+another project's layout may carry `portable-ignore`. `node scripts/check-skills-portable.cjs`
+enforces this in the release gate and CI.
+
 ## Applies to
 
 - `mk:skill-creator` (must enforce Rules 1 + 3 + 4 + 5 in templates)
-- All future skill authoring (all 9 rules)
+- All future skill authoring (all 10 rules)
 - Quarterly audits and model-upgrade audits (Rule 3 measurable check)
 - Skill maintenance for any skill with persistent state (Rule 2)
-- Every PR that touches `.claude/` (Rule 5 mechanical check in CI)
+- Every PR that touches `.claude/` (Rule 5 and Rule 10 mechanical checks in CI)

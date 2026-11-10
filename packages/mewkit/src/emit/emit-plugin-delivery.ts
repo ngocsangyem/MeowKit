@@ -13,12 +13,16 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-import { buildPluginManifest, PLUGIN_MANIFEST_DIR, PLUGIN_MANIFEST_FILENAME, serializePluginManifest } from "./plugin-manifest.js";
+import {
+	buildPluginManifest,
+	PLUGIN_MANIFEST_DIR,
+	PLUGIN_MANIFEST_FILENAME,
+	serializePluginManifest,
+} from "./plugin-manifest.js";
 import { atomicWrite, validateWritableTargetPath } from "../migrate/portable-installer-path-safety.js";
 
 /** Where the manifest goes for a project root. */
-export const pluginManifestPath = (root: string): string =>
-	join(root, PLUGIN_MANIFEST_DIR, PLUGIN_MANIFEST_FILENAME);
+export const pluginManifestPath = (root: string): string => join(root, PLUGIN_MANIFEST_DIR, PLUGIN_MANIFEST_FILENAME);
 
 /**
  * Write the plugin manifest for an installed kit.

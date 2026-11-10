@@ -37,7 +37,13 @@ export interface PackArgs {
 }
 
 /** The `--json` envelope for `add`/`remove`; `list` keeps its own row shape. */
-function emit(command: string, dryRun: boolean, planned: PlannedChange[], applied: PlannedChange[], notes: string[]): void {
+function emit(
+	command: string,
+	dryRun: boolean,
+	planned: PlannedChange[],
+	applied: PlannedChange[],
+	notes: string[],
+): void {
 	printMutationJson({ ok: true, command, dryRun, planned, applied, notes });
 }
 

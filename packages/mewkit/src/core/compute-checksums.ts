@@ -142,4 +142,3 @@ export function buildManifest(claudeDir: string): Manifest {
 		checksums,
 	};
 }
-

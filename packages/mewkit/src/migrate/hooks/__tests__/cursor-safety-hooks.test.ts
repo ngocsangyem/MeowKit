@@ -6,6 +6,7 @@
 // files, not a re-implementation of their logic.
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,6 +15,20 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const HOOKS_DIR = join(HERE, "..", "..", "modules", "cursor", "root", ".cursor", "hooks");
 const FIXTURES_DIR = join(HERE, "cursor-hook-fixtures");
+
+const { stamp } = createRequire(import.meta.url)(join(HOOKS_DIR, "lib", "approval-receipt.cjs")) as {
+	stamp: (file: string, approver: string) => { code: number };
+};
+
+/** Give `root` an approved plan for slug `demo` and a signed sprint contract. */
+function approve(root: string): void {
+	const planDir = join(root, "tasks", "plans", "260101-demo");
+	mkdirSync(planDir, { recursive: true });
+	writeFileSync(join(planDir, "plan.md"), "---\ntitle: demo\n---\n# plan\n");
+	expect(stamp(join(planDir, "plan.md"), "tester").code).toBe(0);
+	mkdirSync(join(root, "tasks", "contracts"), { recursive: true });
+	writeFileSync(join(root, "tasks", "contracts", "260101-demo-sprint-1.md"), "---\nstatus: signed\n---\n");
+}
 
 function fixture(name: string): string {
 	return readFileSync(join(FIXTURES_DIR, `${name}.json`), "utf-8");
@@ -140,8 +155,59 @@ describe("mcp-gate.cjs (beforeMCPExecution, security-critical, cloud-unsupported
 });
 
 describe("tool-gate.cjs (preToolUse, matcher-enumerated)", () => {
-	it("allows a file-mutation tool targeting a non-protected path", () => {
+	it("allows a source write once the plan is approved and the contract signed", () => {
+		approve(dir);
 		const r = runHook("tool-gate.cjs", fixture("pre-tool-use-file-mutation-allow"), dir);
+		expect(r.json?.permission).toBe("allow");
+	});
+
+	it("denies a source write with no approved plan (Gate 1), in wording a Cursor agent can act on", () => {
+		const r = runHook("tool-gate.cjs", fixture("pre-tool-use-file-mutation-allow"), dir);
+		expect(r.json?.permission).toBe("deny");
+		expect(String(r.json?.user_message)).toContain("No approved plan found");
+		expect(String(r.json?.user_message)).toContain("the mk-plan-creator skill");
+		expect(String(r.json?.user_message)).not.toMatch(/\/mk:/);
+	});
+
+	it("denies a source write when the plan changed after approval", () => {
+		approve(dir);
+		writeFileSync(join(dir, "tasks", "plans", "260101-demo", "plan.md"), "more scope\n", { flag: "a" });
+		const r = runHook("tool-gate.cjs", fixture("pre-tool-use-file-mutation-allow"), dir);
+		expect(r.json?.permission).toBe("deny");
+		expect(String(r.json?.user_message)).toContain("receipt is stale");
+	});
+
+	it("reads a target_file field and denies a source write without a plan", () => {
+		const payload = {
+			...JSON.parse(fixture("pre-tool-use-file-mutation-allow")),
+			tool_input: { target_file: "src/a.ts" },
+		};
+		expect(runHook("tool-gate.cjs", JSON.stringify(payload), dir).json?.permission).toBe("deny");
+	});
+
+	it("denies a write whose target it cannot read", () => {
+		const payload = { ...JSON.parse(fixture("pre-tool-use-file-mutation-allow")), tool_input: { contents: "x" } };
+		expect(runHook("tool-gate.cjs", JSON.stringify(payload), dir).json?.permission).toBe("deny");
+	});
+
+	it("names no canonical kit path in a deny reason", () => {
+		approve(dir);
+		const payload = {
+			...JSON.parse(fixture("pre-tool-use-file-mutation-allow")),
+			tool_input: { path: "tasks/contracts/260101-demo-sprint-1.md" },
+		};
+		writeFileSync(join(dir, "tasks", "contracts", "260101-demo-sprint-1.md"), "not a contract\n");
+		const r = runHook("tool-gate.cjs", JSON.stringify(payload), dir);
+		expect(r.json?.permission).toBe("deny");
+		expect(String(r.json?.user_message)).not.toMatch(/\.claude\//);
+	});
+
+	it("allows a write into the runtime's own tree without a plan", () => {
+		const payload = {
+			...JSON.parse(fixture("pre-tool-use-file-mutation-allow")),
+			tool_input: { path: ".cursor/rules/a.mdc" },
+		};
+		const r = runHook("tool-gate.cjs", JSON.stringify(payload), dir);
 		expect(r.json?.permission).toBe("allow");
 	});
 

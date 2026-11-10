@@ -97,8 +97,7 @@ export async function checkHardGates(root: string | null): Promise<DiagResult[]>
 		// source write is allowed. The contract validator lives in the hook library,
 		// which the sandbox copies, so the contract gate is live here and this probe
 		// covers it as well as the approval receipt.
-		const allowName =
-			"Gate 1 + contract: allows source write once the plan is approved and the contract is signed";
+		const allowName = "Gate 1 + contract: allows source write once the plan is approved and the contract is signed";
 		project.addSignedContract("demo");
 		const stamped = project.approvePlan(planPath);
 		if (!stamped) {

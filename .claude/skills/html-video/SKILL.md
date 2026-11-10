@@ -32,14 +32,14 @@ Render a local HTML/CSS/JS animation to MP4 with Playwright frame capture and ff
 
 - **Check dependencies or choose dimensions/fps:** load [render workflow](references/render-workflow.md).
 - **Implement deterministic JavaScript, canvas, WebGL, or GSAP animation stepping:** load [template contract](references/html-template-contract.md).
-- **Capture frames directly:** execute `node .claude/skills/html-video/scripts/capture-frames.mjs <html-file> <frame-dir> <fps> <duration-seconds> <width> <height> [background-color]`.
-- **Render a complete MP4:** execute `bash .claude/skills/html-video/scripts/render-html-to-mp4.sh <html-file> <output.mp4> [fps] [duration-seconds] [width] [height] [background-color]`.
+- **Capture frames directly:** execute `node ${CLAUDE_SKILL_DIR}/scripts/capture-frames.mjs <html-file> <frame-dir> <fps> <duration-seconds> <width> <height> [background-color]`.
+- **Render a complete MP4:** execute `bash ${CLAUDE_SKILL_DIR}/scripts/render-html-to-mp4.sh <html-file> <output.mp4> [fps] [duration-seconds] [width] [height] [background-color]`.
 - **Resolve module, `file://`, codec, cleanup, or dimension failures:** load [troubleshooting](references/troubleshooting.md).
 
 ## Quick Start
 
 ```bash
-bash .claude/skills/html-video/scripts/render-html-to-mp4.sh template.html output.mp4 30 5 1920 1080
+bash ${CLAUDE_SKILL_DIR}/scripts/render-html-to-mp4.sh template.html output.mp4 30 5 1920 1080
 ```
 
 The final optional argument supplies a background colour. The script captures `fps × duration` PNG frames, encodes H.264 MP4 with `yuv420p`, cleans its temporary frame directory, and prints the output path.

@@ -30,66 +30,11 @@ function failClosed(err) {
 process.on('uncaughtException', failClosed);
 process.on('unhandledRejection', failClosed);
 
-const path = require('node:path');
 const { readHookInput } = require('./lib/parse-stdin.cjs');
-const { lintMemoryStore } = require('./lib/memory-store-lint.cjs');
-const { runPreShipChecks } = require('./lib/preship-checks.cjs');
-
-const SHIP_COMMAND = /git commit|git push|git merge/;
+const { enterGuardRoot } = require('./lib/project-root.cjs');
+const { decidePreShip } = require('./lib/core/pre-ship.cjs');
 
 const write = (stream, lines) => { if (lines.length) stream.write(`${lines.join('\n')}\n`); };
-const emitResult = (result) => {
-  write(process.stdout, result.stdout);
-  write(process.stderr, result.stderr);
-};
-
-/**
- * A missing structural checker is NOT a quiet pass. A broken install must not
- * silently downgrade to "no ship gate", because at a ship boundary that is
- * indistinguishable from a passing gate at the one moment it matters.
- */
-function blockMissingChecker(reason) {
-  write(process.stderr, [
-    MARKER,
-    `Gate 2 checker ${reason} — Gate 2 cannot be enforced.`,
-    'A ship with no enforceable Gate 2 is blocked, not waved through.',
-    'Fix: reinstall or restore the hook library, then retry.',
-  ]);
-  return 2;
-}
-
-/** Load the structural checker, or report why the ship cannot be proven. */
-function loadGate2Check(root) {
-  const modulePath = path.join(root, '.claude/hooks/lib/gate2-check.cjs');
-  try {
-    return { gate2Check: require('./lib/gate2-check.cjs').gate2Check, modulePath };
-  } catch {
-    return { gate2Check: null, modulePath };
-  }
-}
-
-function run(root, command, env) {
-  const { gate2Check, modulePath } = loadGate2Check(root);
-  if (!gate2Check) return blockMissingChecker(`${modulePath} not found`);
-
-  const gate2 = gate2Check({ root, command });
-  emitResult(gate2);
-  if (gate2.exit !== 0) return 2;
-
-  // Not a ship command: the checks below are none of this hook's business.
-  if (!SHIP_COMMAND.test(command)) return 0;
-
-  const lint = lintMemoryStore({ root, env });
-  emitResult(lint);
-  if (lint.exit !== 0) return lint.exit;
-
-  const profile = env.MEOWKIT_HOOK_PROFILE || env.MEOW_HOOK_PROFILE || 'standard';
-  if (profile === 'fast') return 0;
-
-  const checks = runPreShipChecks(root);
-  emitResult(checks);
-  return checks.exit;
-}
 
 async function main() {
   const input = await readHookInput();
@@ -102,17 +47,21 @@ async function main() {
     process.exit(2);
   }
 
-  const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-  try {
-    process.chdir(root);
-  } catch {
-    process.exit(0);
+  // Every rule below is relative to the project root. A root that cannot be found or entered
+  // is a block: allowing here would check the wrong tree, or none.
+  const root = enterGuardRoot(input.cwd || process.cwd());
+  if (!root) {
+    write(process.stderr, [MARKER, 'Pre-ship guard cannot locate the project root it guards.', 'A ship guard that cannot tell which project it is in must not allow the command.']);
+    process.exit(2);
   }
 
   // argv is the back-compatible fallback for a registration that still passes
   // the command as a positional argument.
   const command = input.command || process.argv[2] || '';
-  process.exit(run(root, command, process.env));
+  const result = decidePreShip({ root, command, env: process.env });
+  write(process.stdout, result.stdout);
+  write(process.stderr, result.stderr);
+  process.exit(result.exit);
 }
 
 main();

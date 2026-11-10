@@ -6,13 +6,13 @@ purpose: canonical-format-spec
 
 # Rubric Schema — Canonical Format
 
-This document defines the schema every rubric file in `.claude/skills/rubric/rubrics/` MUST follow. It is enforced by `mk:rubric/scripts/validate-rubric.sh`.
+This document defines the schema every rubric file in `rubrics/` MUST follow. It is enforced by `mk:rubric/scripts/validate-rubric.sh`.
 
 ## File Naming
 
 - kebab-case, descriptive: `design-quality.md`, `code-quality.md`, `ux-usability.md`
-- Located at `.claude/skills/rubric/rubrics/<name>.md`
-- Composition presets at `.claude/skills/rubric/rubrics/composition-presets/<preset>.md`
+- Located at `rubrics/<name>.md`
+- Composition presets at `rubrics/composition-presets/<preset>.md`
 
 ## Required Frontmatter
 

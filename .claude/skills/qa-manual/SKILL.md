@@ -35,6 +35,8 @@ runtime: claude-code
 
 # QA Manual Testing & E2E Code Generation
 
+> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+
 Orchestrates browser skills to act like a human tester: navigate, interact, verify, and report.
 
 ## When to Use

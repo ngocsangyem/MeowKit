@@ -44,6 +44,8 @@ dependency_edges:
 
 # mk:confluence — Routing Skill
 
+> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+
 This skill is a **pure routing layer**. Its sole purpose: identify the right `mk:confluence-*` leaf for the user's Confluence task, then point at it. **No execution.**
 
 ## Routing Table

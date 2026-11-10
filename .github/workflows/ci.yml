@@ -145,6 +145,14 @@ jobs:
       - name: Validate skill cross-refs
         run: bash scripts/check-skill-cross-refs.sh
 
+      # Skills reach their own files without `.claude/`, every other kit reference has a
+      # declared class and resolves to a shipped file, and every tool name is in the table.
+      - name: Check skills are portable across runtimes
+        run: node scripts/check-skills-portable.cjs
+
+      - name: Own-skill path rewrite has nothing left to change
+        run: node scripts/rewrite-own-skill-paths.cjs --check
+
       - name: Validate hook registration
         run: bash scripts/check-hook-registration.sh
 

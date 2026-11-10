@@ -18,7 +18,7 @@ printf '%s\n' \
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700">' \
   '  <text x="40" y="60">Example</text>' \
   '</svg>' \
-  | python3 .claude/skills/tech-graph/scripts/generate-svg-from-lines.py /path/to/output.svg
+  | python3 scripts/generate-svg-from-lines.py /path/to/output.svg
 ```
 
 The helper writes each supplied line, closes the output safely, and rejects an empty or unterminated SVG. Use `generate-from-template.py` when a supported template and JSON data fit the request; all user-provided text must stay in its JSON boundary so the generator can XML-escape it.
@@ -48,7 +48,7 @@ Common corrections:
 
 ## Validate and inspect
 
-Run `bash .claude/skills/tech-graph/scripts/validate-svg.sh <svg-file>`. When available, also run:
+Run `bash scripts/validate-svg.sh <svg-file>`. When available, also run:
 
 ```bash
 rsvg-convert file.svg -o /tmp/test.png 2>&1 && echo "✓ Valid" && rm /tmp/test.png
