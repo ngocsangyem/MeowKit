@@ -1,0 +1,32 @@
+# cargo-deny policy for the Rust workspace: known advisories, licences, sources.
+[graph]
+all-features = true
+
+[advisories]
+# Every RustSec advisory (vulnerability, unmaintained, unsound, notice) fails CI.
+yanked = "deny"
+
+[licenses]
+# Permissive licences only, listed as encountered; a new permissive one is added here,
+# a non-permissive one needs an explicit maintainer decision first.
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Unicode-3.0",
+    "ISC",
+    "Zlib",
+    "BSD-3-Clause",
+    # Mozilla CA bundle (webpki-roots): a permissive data licence.
+    "CDLA-Permissive-2.0",
+]
+confidence-threshold = 0.9
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
