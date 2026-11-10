@@ -4,6 +4,17 @@
 //! `process::exit` — so every behaviour it owns is testable without a TTY.
 #![forbid(unsafe_code)]
 
+pub mod backup;
+pub mod exec;
+pub mod fsx;
+pub mod journal;
+pub mod kit;
+pub mod lock;
+pub mod merge;
+pub mod ownership;
+pub mod plan;
+pub mod report;
+
 /// Version of the workspace, shared by every crate and printed by `--version`.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
