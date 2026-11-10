@@ -12,8 +12,18 @@
 // whole `MEOWKIT_`/`MEOW_`/`MK_` block is stripped from the inherited environment,
 // so a name exported in the invoking shell cannot decide a test's outcome.
 import { execFileSync, spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import {
+	cpSync,
+	existsSync,
+	mkdirSync,
+	mkdtempSync,
+	readFileSync,
+	readdirSync,
+	statSync,
+	writeFileSync,
+} from "node:fs";
 import { createHash } from "node:crypto";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -24,14 +34,17 @@ export const CLI = join(REPO_ROOT, "packages", "mewkit", "dist", "index.js");
 /** Preloaded into every spawned command so the run cannot reach the network. */
 export const OFFLINE_PRELOAD = join(HERE, "lib", "offline-refusal.cjs");
 
-/** The `.meowkit/` members the kit itself ships, as opposed to a project's own state. */
-export const KIT_MEOWKIT_FILES = [
-	".gitignore",
-	".env.example",
-	"gitignore.meowkit",
-	"mcp.json.example",
-	"pack-manifest.json",
-];
+/**
+ * The `.meowkit/` members the kit itself ships, read from the list the release
+ * archive is built from, so the fixture asset carries exactly what a real
+ * release does. A private copy here is how a fixture kept passing while real
+ * releases lacked three of these files.
+ */
+export const KIT_MEOWKIT_FILES: readonly string[] = (
+	createRequire(import.meta.url)(join(REPO_ROOT, "scripts", "kit-ship-set.cjs")) as {
+		KIT_MEOWKIT_FILES: readonly string[];
+	}
+).KIT_MEOWKIT_FILES;
 
 const cachedAssets = new Map<string, string>();
 
@@ -42,7 +55,8 @@ function manifestFiles(assetDir: string): { path: string; checksum: string }[] {
 		for (const name of readdirSync(dir)) {
 			const abs = join(dir, name);
 			if (statSync(abs).isDirectory()) walk(abs, `${prefix}${name}/`);
-			else out.push({ path: `${prefix}${name}`, checksum: createHash("sha256").update(readFileSync(abs)).digest("hex") });
+			else
+				out.push({ path: `${prefix}${name}`, checksum: createHash("sha256").update(readFileSync(abs)).digest("hex") });
 		}
 	};
 	walk(join(assetDir, ".claude"), "");
@@ -142,7 +156,12 @@ export interface RunResult {
 }
 
 /** Run the published CLI in the fixture. Never throws on a non-zero exit. */
-export function runMewkit(fx: Fixture, args: string[], extraEnv: Record<string, string> = {}, asVersion?: string): RunResult {
+export function runMewkit(
+	fx: Fixture,
+	args: string[],
+	extraEnv: Record<string, string> = {},
+	asVersion?: string,
+): RunResult {
 	const env = baseEnv(fx, extraEnv);
 	if (asVersion !== undefined) env.MEOWKIT_RELEASE_SOURCE = releaseAsset(asVersion);
 	const r = spawnSync(process.execPath, [CLI, ...args], {
@@ -162,7 +181,12 @@ export function runMewkit(fx: Fixture, args: string[], extraEnv: Record<string, 
  * rather than asserted in a comment above the variable that sets it.
  */
 export function runNode(fx: Fixture, args: string[]): RunResult {
-	const r = spawnSync(process.execPath, args, { cwd: fx.root, env: baseEnv(fx), encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+	const r = spawnSync(process.execPath, args, {
+		cwd: fx.root,
+		env: baseEnv(fx),
+		encoding: "utf8",
+		maxBuffer: 16 * 1024 * 1024,
+	});
 	const stdout = r.stdout ?? "";
 	const stderr = r.stderr ?? "";
 	return { status: r.status ?? -1, stdout, stderr, all: stdout + stderr };
@@ -178,5 +202,9 @@ export function installFixture(version = "9.9.9-fixture"): { fx: Fixture; run: R
 export function trackedUnder(fx: Fixture, dir: string): string[] {
 	execFileSync("git", ["add", "-A"], { cwd: fx.root });
 	const out = execFileSync("git", ["ls-files", dir], { cwd: fx.root, encoding: "utf8" });
-	return out.split("\n").map((s) => s.trim()).filter((s) => s !== "").sort();
+	return out
+		.split("\n")
+		.map((s) => s.trim())
+		.filter((s) => s !== "")
+		.sort();
 }

@@ -12,6 +12,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 interface ShipSetModule {
+	ARCHIVE_TARGETS: string[];
 	excludeMatcher: (patterns: string[]) => (rel: string) => boolean;
 	shipSetExclusions: (root: string) => string[];
 }
@@ -24,13 +25,11 @@ export const REPO = join(dirname(fileURLToPath(import.meta.url)), "..", "..", ".
 const shipSet = require(join(REPO, "scripts", "kit-ship-set.cjs")) as ShipSetModule;
 
 /** The archive roots, as the matcher sees them: repo-relative with forward slashes. */
+const ARCHIVE_ROOTS = shipSet.ARCHIVE_TARGETS.map((target) => target.replace(/\\/g, "/"));
+
+/** A path is under a root when it IS that root (a file) or sits inside it (a directory). */
 function underArchiveRoot(path: string): boolean {
-	return (
-		path.startsWith(".claude/") ||
-		path === "release-manifest.json" ||
-		path === ".meowkit/pack-manifest.json" ||
-		path === ".meowkit/harness-inventory.json"
-	);
+	return ARCHIVE_ROOTS.some((root) => path === root || path.startsWith(`${root}/`));
 }
 
 export interface ShipSetView {

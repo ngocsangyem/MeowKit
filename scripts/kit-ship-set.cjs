@@ -19,6 +19,28 @@ const path = require("path");
 const PACK_MANIFEST_REL = path.join(".meowkit", "pack-manifest.json");
 
 /**
+ * The `.meowkit/` files a published kit carries, by name. The one list the
+ * archive is built from; the installer's own copy (it ships in a package that
+ * cannot read `scripts/`) is held equal to it by a test.
+ *
+ * The three templates were once missing here while the installer, `mewkit
+ * setup` and `base.files` all treated them as shipped. Because the installer
+ * skips an absent member silently, a release install never laid them down, and
+ * `setup` quietly fell back to built-in defaults for the MCP and ignore templates.
+ */
+const KIT_MEOWKIT_FILES = [
+	".env.example",
+	"gitignore.meowkit",
+	"harness-inventory.json",
+	"mcp.json.example",
+	"pack-manifest.json",
+];
+
+function kitMeowkitTargets() {
+	return KIT_MEOWKIT_FILES.map((name) => path.join(".meowkit", name));
+}
+
+/**
  * The archive roots a published kit is built from, in a fixed order.
  *
  * Each `.meowkit/` entry is named as a single FILE, never as the directory: the
@@ -39,20 +61,15 @@ const PACK_MANIFEST_REL = path.join(".meowkit", "pack-manifest.json");
  * Every writer under it creates the directory it needs on first write, and a
  * gate reads an absent directory as "no plan" — the same block, never an error.
  */
-const ARCHIVE_TARGETS = [
-	".claude",
-	"release-manifest.json",
-	path.join(".meowkit", "pack-manifest.json"),
-	path.join(".meowkit", "harness-inventory.json"),
-];
+const ARCHIVE_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets()];
 
-/** Roots that must exist, or the build is publishing an incomplete kit. */
-const CRITICAL_TARGETS = [
-	".claude",
-	"release-manifest.json",
-	path.join(".meowkit", "pack-manifest.json"),
-	path.join(".meowkit", "harness-inventory.json"),
-];
+/**
+ * Roots that must exist, or the build is publishing an incomplete kit.
+ *
+ * Every shipped `.meowkit/` file is critical: the installer skips a member the
+ * release lacks without a word, so a missing one is only ever caught here.
+ */
+const CRITICAL_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets()];
 
 /** Read the exclusion patterns. Throws rather than defaulting to "exclude nothing". */
 function shipSetExclusions(projectRoot) {
@@ -123,6 +140,7 @@ function zipExcludeArgs(patterns) {
 module.exports = {
 	ARCHIVE_TARGETS,
 	CRITICAL_TARGETS,
+	KIT_MEOWKIT_FILES,
 	excludeMatcher,
 	shipSetExclusions,
 	shipSetFiles,
