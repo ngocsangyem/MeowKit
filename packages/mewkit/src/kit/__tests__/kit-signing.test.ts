@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { KitVerificationError } from "../kit-refusal.js";
+import { gitTrackTree } from "./helpers/git-track-tree.js";
 import { verifyManifestSignature } from "../kit-signature.js";
 import { TRUSTED_KIT_KEYS } from "../trusted-keys.js";
 
@@ -63,6 +64,7 @@ function makeSourceRoot(): string {
 			profiles: {},
 		}),
 	);
+	gitTrackTree(root);
 	return root;
 }
 

@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { readKitArchive } from "../kit-archive-reader.js";
+import { gitTrackTree } from "./helpers/git-track-tree.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, "..", "..", "..", "..", "..");
@@ -61,6 +62,7 @@ function makeSourceRoot(exclude: string[] = [".claude/logs/*"]): string {
 			profiles: {},
 		}),
 	);
+	gitTrackTree(root);
 	return root;
 }
 

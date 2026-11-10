@@ -52,6 +52,9 @@ function buildTree(options: TreeOptions): string {
 			].join("\n"),
 		);
 	}
+	// The ship set counts only git-tracked files, so the tree is a repo with everything staged.
+	spawnSync("git", ["init", "-q"], { cwd: root });
+	spawnSync("git", ["add", "-A"], { cwd: root });
 	return root;
 }
 
