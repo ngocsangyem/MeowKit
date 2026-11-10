@@ -15,6 +15,8 @@ const PRIVACY_HOOK = path.join(PROJECT_ROOT, '.claude/hooks/privacy-block.cjs');
 
 test('gate-enforcement.cjs exists and is executable', () => {
   assert.ok(fs.existsSync(GATE_HOOK), `gate-enforcement.cjs missing at ${GATE_HOOK}`);
+  // Windows has no execute bit to check; the host runs the hook through node there.
+  if (process.platform === 'win32') return;
   const stat = fs.statSync(GATE_HOOK);
   assert.ok((stat.mode & 0o111) !== 0, 'gate-enforcement.cjs not executable');
 });

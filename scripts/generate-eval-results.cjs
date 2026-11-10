@@ -16,7 +16,7 @@ const rows = [
   ["prompt-enhancer", "M", "Opt-in canary runner", "not run in PR CI"],
   ["rubric", "D", "Validate rubric schemas and presets", "passed earlier in this CI run", /run:\s+bash .claude\/skills\/rubric\/scripts\/validate-rubric\.sh/],
   ["sequential-thinking", "D", "Sequential-thinking script tests", "passed earlier in this CI run", /run:\s+bash .claude\/skills\/sequential-thinking\/scripts\/test-scripts\.sh/],
-  ["skill-creator", "D", "Validate skill-creator fixtures", "passed earlier in this CI run", /run:\s+bash tests\/fixtures\/skill-creator\/validate-fixtures\.sh/],
+  ["skill-creator", "D", "Validate skill-creator fixtures", "passed earlier in this CI run", /bash tests\/fixtures\/skill-creator\/validate-fixtures\.sh/],
   ["story-sizer", "D", "Story-sizer deterministic tests", "passed earlier in this CI run", /run:\s+bash tests\/story-sizer-all\.test\.sh/],
   ["visual-plan", "D", "Validate visual-plan eval fixtures", "passed earlier in this CI run", /run:\s+node scripts\/validate-visual-plan-evals\.cjs/],
   ["web-to-markdown", "D", "Test web-to-markdown URL SSRF guard", "passed earlier in this CI run", /run:\s+\|[\s\S]*?^[ \t]*node \.claude\/hooks\/lib\/skill-python\.cjs --skill web-to-markdown -m pytest[\s\S]*?test_safe_url\.py[\s\S]*?test_e2e_offline\.py[\s\S]*?-q/m],

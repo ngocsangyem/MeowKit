@@ -122,7 +122,9 @@ jobs:
         run: bash tests/fixtures/plan-creator/validate-fixtures.sh
 
       - name: Validate skill-creator fixtures
-        run: bash tests/fixtures/skill-creator/validate-fixtures.sh
+        run: |
+          node packages/mewkit/dist/index.js skill env skill-creator
+          bash tests/fixtures/skill-creator/validate-fixtures.sh
 
       - name: Story-sizer deterministic tests
         run: bash tests/story-sizer-all.test.sh

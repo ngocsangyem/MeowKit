@@ -40,9 +40,11 @@ function makeProject({ cliExit = 0, cliOutput = '', cli = true, store } = {}) {
   let cliPath = null;
   if (cli) {
     cliPath = path.join(dir, 'fake-mewkit');
+    // A node script, not sh: Windows can run neither a shebang nor sh, and the
+    // hook hands a node-script CLI to node there, as it does a real launcher.
     fs.writeFileSync(
       cliPath,
-      `#!/bin/sh\n${cliOutput ? `printf '%s\\n' ${JSON.stringify(cliOutput)}\n` : ''}exit ${cliExit}\n`,
+      `#!/usr/bin/env node\n${cliOutput ? `console.log(${JSON.stringify(cliOutput)});\n` : ''}process.exit(${cliExit});\n`,
     );
     fs.chmodSync(cliPath, 0o755);
   }
@@ -62,7 +64,8 @@ function runHook({ dir, cliPath }, command) {
   // lint against the fixture and make the result depend on the dev machine.
   delete env.MEOWKIT_CLI;
   if (cliPath) env.MEOWKIT_CLI = cliPath;
-  env.PATH = '/usr/bin:/bin';
+  // The stub's `env node` must find this node, wherever the runner installed it.
+  env.PATH = ['/usr/bin', '/bin', path.dirname(process.execPath)].join(path.delimiter);
   // `fast` skips the build/lint/test block below the memory check, so a
   // fixture with no package.json cannot pass for the wrong reason.
   env.MEOWKIT_HOOK_PROFILE = 'fast';
