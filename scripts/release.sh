@@ -51,7 +51,7 @@ echo ""
 # Step 0: Version-source assertion → stamp derived surfaces → release-readiness gate.
 # Root package.json is the single source of truth for the kit version; the release version MUST
 # match it (bump package.json first). We then stamp the derived surfaces from root
-# (.claude/meowkit.config.json) so the version bump is applied consistently, and run the full gate.
+# (.claude/kit-contract.json) so the version bump is applied consistently, and run the full gate.
 echo "[0/7] Release-readiness gate..."
 ROOT_VERSION=$(node -p "require('./package.json').version")
 if [ "$VERSION" != "$ROOT_VERSION" ]; then
@@ -59,7 +59,7 @@ if [ "$VERSION" != "$ROOT_VERSION" ]; then
   echo "Root package.json is the single source of truth — bump it first, then release the matching version."
   exit 1
 fi
-node scripts/sync-versions.cjs --write   # stamp .claude/meowkit.config.json (+ manifest if present)
+node scripts/sync-versions.cjs --write   # stamp .claude/kit-contract.json (+ manifest if present)
 bash scripts/release-check.sh
 
 # Step 1: Bump version (metadata only — packages/mewkit is released separately)

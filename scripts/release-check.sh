@@ -38,8 +38,8 @@ else
   bad "validate --portable (hard failure)"; tail -20 /tmp/rc-validate.txt
 fi
 
-step "Inventory check"
-$CLI inventory --check >/dev/null 2>&1 && ok "inventory --check" || bad "inventory --check"
+step "Inventory check (README, website and index counts)"
+node scripts/harness-inventory.cjs --check >/tmp/rc-inventory.txt 2>&1 && ok "harness-inventory --check" || { bad "harness-inventory --check"; tail -20 /tmp/rc-inventory.txt; }
 
 step "Version sync (root ↔ manifest ↔ kit contract; CLI recorded)"
 node scripts/sync-versions.cjs && ok "versions consistent" || bad "version mismatch"
