@@ -1,6 +1,6 @@
 ---
 name: mk:simplify
-description: Post-implementation simplification pass. Reduces complexity without changing behavior. Use after Phase 3 (Build GREEN) and before Phase 4 (Review). Catches dead code, unnecessary abstractions, over-engineering, and redundant patterns. Triggers on "simplify", "clean up", "reduce complexity", "too complex". NOT for style/convention enforcement (see mk:clean-code); NOT for reviewing diffs or PRs (see mk:review).
+description: 'Behavior-preserving reduction of freshly written code: dead code, needless abstraction. NOT for mk:clean-code.'
 argument-hint: '[file_or_directory]'
 source: local
 allowed-tools:
@@ -16,7 +16,7 @@ keywords:
   - refactor
   - reduce-complexity
   - yagni-pass
-when_to_use: Use for behavior-preserving simplification passes on existing code. NOT for authoring-time quality enforcement (see mk:clean-code).
+when_to_use: The build is green and the diff should shrink before review.
 user-invocable: true
 owner: docs
 criticality: medium

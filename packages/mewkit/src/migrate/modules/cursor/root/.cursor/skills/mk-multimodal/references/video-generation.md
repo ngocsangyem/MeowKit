@@ -29,7 +29,7 @@
 ## CLI Example
 
 ```bash
-.cursor/skills/.venv/bin/python3 .cursor/skills/multimodal/scripts/gemini_generate.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_generate.py \
   --task generate-video \
   --prompt "A cat playing piano, cinematic lighting, slow dolly in" \
   --verbose

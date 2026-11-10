@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { smartUpdate } from "../smart-update.js";
-import { buildManifest, writeManifest } from "../compute-checksums.js";
+import { seedCanonicalBaseline } from "../../../tests/helpers/superseded-baseline.js";
 import type { UserConfig } from "../substitute-placeholders.js";
 
 const tempDirs: string[] = [];
@@ -48,12 +48,12 @@ async function makeSource(version: string, files: Record<string, string>, deleti
 	return source;
 }
 
-/** Seed a target with a prior legacy install recording the given kit files pristine. */
+/** Seed a target with a prior install recording the given kit files pristine. */
 async function seedInstall(target: string, files: Record<string, string>): Promise<void> {
 	for (const [rel, content] of Object.entries(files)) {
 		await writeText(target, `.claude/${rel}`, content);
 	}
-	writeManifest(join(target, ".claude"), buildManifest(join(target, ".claude")));
+	await seedCanonicalBaseline(target);
 }
 
 describe("smartUpdate deletions processing", () => {

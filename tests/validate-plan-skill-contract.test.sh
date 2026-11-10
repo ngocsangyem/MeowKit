@@ -10,9 +10,9 @@ assert_match() {
   else FAIL=$((FAIL+1)); printf '  FAIL %s\n' "$name"; fi
 }
 
-assert_match "validates plan against 8 dimensions" 'Validates an approved plan against 8 dimensions' "$SKILL"
-assert_match "runs after Gate 1 approval and before Phase 2" 'after Gate 1 plan approval and before Phase 2' "$SKILL"
-assert_match "NOT for creating plans (routes to mk:plan-creator)" 'NOT for creating plans \(see mk:plan-creator\)' "$SKILL"
+assert_match "validates plan against 8 dimensions" '^description:.*approved plan across 8 dimensions' "$SKILL"
+assert_match "runs after Gate 1 approval and before Phase 2" 'After Gate 1 approval, before Phase 2' "$SKILL"
+assert_match "checks plans, never creates them (consumes mk:plan-creator output)" 'operates on plans from .mk:plan-creator.' "$SKILL"
 assert_match "read-only analysis: does NOT modify plan files" 'Does NOT modify plan files.*read-only analysis' "$SKILL"
 
 echo

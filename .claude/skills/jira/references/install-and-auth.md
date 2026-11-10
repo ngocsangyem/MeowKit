@@ -5,22 +5,22 @@ This file is the canonical setup reference for `mk:jira` and the 16 `mk:jira-*` 
 ## Canonical install
 
 ```
-.claude/scripts/bin/setup-workflow
+.claude/hooks/lib/setup-workflow
 ```
 
-This triggers `packages/cli/src/core/dependency-installer.ts` to read every per-skill `requirements.txt` (discovered by `skills-dependencies.ts:findRequirementsFiles()`) and `pip install` into `.claude/skills/.venv`. The jira-as binary lands at:
+This reads THIS skill's `scripts/requirements.txt` and nothing else, and installs into this skill's own environment. The jira-as binary lands at:
 
 ```
-.claude/skills/.venv/bin/jira-as
+.meowkit/envs/jira/bin/jira-as
 ```
 
 ## Manual fallback
 
 ```
-.claude/skills/.venv/bin/pip install jira-as 'jira-as[keyring]'
+.meowkit/envs/jira/bin/pip install jira-as 'jira-as[keyring]'
 ```
 
-Use only if `.claude/scripts/bin/setup-workflow` is unavailable. The wrapper resolves to the venv-local binary; do NOT rely on global PATH.
+Use only if `.claude/hooks/lib/setup-workflow` is unavailable. The wrapper resolves to the venv-local binary; do NOT rely on global PATH.
 
 ## Authentication — three required env vars
 
@@ -38,7 +38,7 @@ The legacy `MEOW_*` prefix (vs. modern `MEOWKIT_*`) is a deliberate exception pe
 
 ## Hook validation
 
-A `SessionStart` hook (`.claude/hooks/jira-env-loader.sh`) validates `.meowkit/.env` presence and the 3 keys. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper handles per-call sourcing/export.
+A `SessionStart` hook (`.claude/hooks/handlers/jira-env-loader.cjs`) validates `.meowkit/.env` presence and the 3 keys. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper handles per-call sourcing/export.
 
 Status messages:
 - `[mk:jira] env OK` — all 3 keys present
@@ -78,6 +78,6 @@ Expected: prints version, exits 0. With env missing, errors with `:?` parameter-
 
 ## Troubleshooting
 
-- **`jira-as not installed at <path>`** — run `.claude/scripts/bin/setup-workflow` (or use the manual fallback).
+- **`jira-as not installed at <path>`** — run `.claude/hooks/lib/setup-workflow` (or use the manual fallback).
 - **`MEOW_JIRA_API_TOKEN missing`** — copy `.meowkit/.env.example` to `.meowkit/.env` and fill the three vars.
 - **Wrapper works but hook says "missing"** — hook validates presence-only via grep; an empty value passes the grep but fails at the `:?` expansion. Set actual values.

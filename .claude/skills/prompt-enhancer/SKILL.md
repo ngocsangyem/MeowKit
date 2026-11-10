@@ -2,7 +2,7 @@
 name: mk:prompt-enhancer
 version: 1.3.1
 argument-hint: '[prompt text] [--analyze] [--score] [--deep] [--save-to <path>]'
-description: Use when refining a draft user prompt before sending it to a coding agent. Decomposes goal/context/constraints/acceptance/output-format, detects ambiguity and model-coupled framing, then emits a model-agnostic rewrite. Supports --analyze, --score, and --deep. NOT for prompts from scratch (mk:brainstorming), plans/reviews (mk:elicit), implementation plans (mk:plan-creator), or general codebase scouting (mk:scout).
+description: Rewrites a draft agent prompt into goal, context, constraints and acceptance criteria. NOT for mk:elicit.
 source: local
 allowed-tools:
   - Read
@@ -22,7 +22,7 @@ keywords:
   - prompt-evaluation
   - prompt-scoring
   - deep-prompt-mode
-when_to_use: Use when refining a draft coding-agent prompt for clarity, structure, acceptance criteria, and model-agnostic framing. NOT for prompts from scratch (mk:brainstorming), plans/reviews (mk:elicit), implementation plans (mk:plan-creator), or general codebase scouting (mk:scout).
+when_to_use: User pastes a prompt they are about to send and wants it sharpened.
 user-invocable: true
 preamble-tier: 2
 phase: on-demand
@@ -32,6 +32,7 @@ owner: docs
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 # mk:prompt-enhancer
@@ -78,7 +79,7 @@ Step detail in `references/decomposition-checklist.md`, `references/playbook.md`
 The skill **does not accept a `--model` flag.** Per the synthesis report
 (`tasks/reports/synthesis-260509-2058-prompting-framework.md`), model
 detection violates the model-agnostic mandate; dispatch by model-tier lives
-in `harness-rules.md` Rule 5, not here.
+in `.claude/skills/cook/references/harness-rules.md` Rule 5, not here.
 
 ## Output
 

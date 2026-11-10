@@ -18,7 +18,7 @@ Implementation entry adapter. `.codex/workflow.yaml` is the only lifecycle phase
 
 Profiles: `quick`/`--fast` (inspect → edit → focused verify → summary), `standard` (plan if needed → implement → verify → review), `release` (standard + explicit `mk:ship` request), and `high-assurance` (`--tdd --strict`, with human gates). Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`.
 
-Quick runs do not create a plan, wiki candidate, memory entry, or ship action by default. They still stop if a risk flag or changed contract requires the standard profile.
+Quick runs do not create a plan, report, memory entry, or ship action by default. They still stop if a risk flag or changed contract requires the standard profile.
 
 **Modifier flags** (layer on any mode): `--verify` [LIGHT] (light browser/artifact check) | `--strict` [HEAVY] (full evaluator pass) | `--no-strict` (suppress auto-strict)
 
@@ -28,13 +28,13 @@ Concrete cost depends on the inner harness, model tier, and target surface; trea
 
 ## TDD mode (`--tdd` flag)
 
-When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.codex/session-state/tdd-mode` via a Bash tool call BEFORE any other workflow step:
+When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.meowkit/state/tdd-mode` via a Bash tool call BEFORE any other workflow step:
 
 ```bash
-mkdir -p .codex/session-state && echo on > .codex/session-state/tdd-mode
+mkdir -p .meowkit/state && echo on > .meowkit/state/tdd-mode
 ```
 
-This sentinel file is read by `pre-implement.sh`, `tdd-detect.sh`, and downstream agents to detect TDD mode. Without `--tdd`, the sentinel is absent and the workflow runs in default mode (Phase 2 optional, no RED-phase gate).
+This sentinel file is read by `pre-implement.cjs`, `tdd-detect.sh`, and downstream agents to detect TDD mode. Without `--tdd`, the sentinel is absent and the workflow runs in default mode (Phase 2 optional, no RED-phase gate).
 
 `MEOWKIT_TDD=1` env var (set in CI / shell rc) is the highest-precedence opt-in and overrides the sentinel.
 
@@ -181,7 +181,7 @@ Concrete sub-task name and HTTP tool depend on installed skill set; cook treats 
 | 5 Ship        | `shipper` via `mk:ship`         | Only after an explicit ship request — runs full pre-ship pipeline (`git-manager` invoked inside shipper for commit + PR) |
 | 6 Reflect     | `analyst`                       | **MUST** spawn — cost + pattern analysis |
 | 6 Reflect     | `documenter`                      | **MUST** spawn — sync-back + docs        |
-| 6 Reflect     | `mk:memory` session-capture     | **MUST** spawn — 3-category learning extraction |
+| 6 Reflect     | `mk:memory`                       | Append one gotcha/decision only if non-derivable; usually nothing |
 
 During iterative build-test-fix cycles, follow `references/loop-safety-protocol.md` for checkpoint tracking, stall detection, and escalation triggers.
 
@@ -242,7 +242,6 @@ Operational gotchas live here; pre-build failure modes and rationalizations live
 - **Code mode on stale plans**: Running old plan against changed codebase. Warn if plan.md is >14 days old
 - **Fast mode shallow test coverage**: Skipping research means tests capture plan-level intent, not edge cases. Document: "fast mode = TDD-flavored, coverage may be lower"
 - **Missing model tier declaration**: Expensive models on trivial tasks, cheap models on security-critical work. Always declare tier in Phase 0
-- **Forgetting memory read/write**: Prior session learnings lost. Phase 0 reads canonical `.meowkit/memory/*.json` stores only for fix memory; Phase 6 writes canonical JSON stores and regenerates generated views when needed
 - **sub-task patterns using Agent() not delegate a sub-task ()**: delegate a sub-task () enables tracking, blocking, and progress. Always use delegate a sub-task () for phases 2-6
 - **--strict cost surprise**: `--strict` spawns the full evaluator (`mk:evaluate`) — a [HEAVY] pass. Auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress, or `--verify` for the [LIGHT] check
 - **--strict vs --verify confusion**: `--verify` = light browser check (advisory). `--strict` = full evaluator with rubrics (FAIL blocks ship). `--strict` supersedes `--verify`

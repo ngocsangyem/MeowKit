@@ -47,14 +47,14 @@ If sprint-state contract is absent OR `status: closed` → skip the amendment ce
 
 ### Validator scope (sprint-state vs sprint-contract)
 
-`mk:sprint-contract/scripts/validate-contract.sh` validates per-story sprint-CONTRACT files only (those with `contract_schema_version`, `### [AC-N]` entries). Sprint-STATE files at `sprint-state-{date}-sprint-{N}.md` use NO validator — YAML is parsed inline by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`. Do not invoke `validate-contract.sh` on a sprint-state path; it WILL fail (sprint-state lacks contract schema fields by design).
+`mk:sprint-contract/scripts/validate-contract.cjs` validates per-story sprint-CONTRACT files only (those with `contract_schema_version`, `### [AC-N]` entries). Sprint-STATE files at `sprint-state-{date}-sprint-{N}.md` use NO validator — YAML is parsed inline by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`. Do not invoke `validate-contract.cjs` on a sprint-state path; it WILL fail (sprint-state lacks contract schema fields by design).
 
 ### Wildcard-pattern collision safety verified
 
 | Script | Mechanism | Verdict |
 |---|---|---|
-| `check-contract-signed.sh` | Globs `tasks/contracts/*-"$slug"-sprint-*.md` (per-task slug between leading `*` and `-sprint-`) | SAFE — sprint-state files have no slug between leading `sprint-state-` prefix and `-sprint-` |
-| `validate-contract.sh` | Takes single explicit `$1` path; no glob | SAFE |
+| `check-contract-signed.cjs` | Globs `tasks/contracts/*-"$slug"-sprint-*.md` (per-task slug between leading `*` and `-sprint-`) | SAFE — sprint-state files have no slug between leading `sprint-state-` prefix and `-sprint-` |
+| `validate-contract.cjs` | Takes single explicit `$1` path; no glob | SAFE |
 
 ## See also
 

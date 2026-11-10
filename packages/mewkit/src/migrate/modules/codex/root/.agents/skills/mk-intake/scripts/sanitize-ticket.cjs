@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 
-const { validateContent } = require("../../../hooks/lib/validate-content.cjs");
+const { validateContent } = require("../../../../.codex/hooks/lib/validate-content.cjs");
 
 function boundedQuote(content, pattern) {
   const match = new RegExp(pattern, "i").exec(content);

@@ -131,8 +131,7 @@ Append the A1 status block exactly as defined in `AGENTS.md` (Subagent status pr
 be the same model class, the same host-enforced read-only tool set, and the same
 sub-task-return mechanism — so it cannot use less main context or enforce more
 than the built-in already does. The contract above is prompt-shaped for exactly
-that reason. See the `explore executor` entry in
-`.meowkit/memory/dead-weight-registry.md`.
+that reason.
 
 **On non-Codex providers** (no typed sub-task spawn — see
 `provider-operations.ts`, where `delegate_agent` is not `supported` outside the

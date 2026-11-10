@@ -160,7 +160,7 @@ Check trigger at: Phase 0 (Orient), after analyst loads memory.
 **Reason:** YAGNI — memory files are empty (0 sessions captured). Building consolidation for an unused system is premature. The existing self-improving loop (capture → extract → promote) needs activation first, not replacement.
 
 **What was done instead (v1.1.1):**
-- Fixed `post-session.sh` to write structured NEEDS_CAPTURE markers (not HTML comment placeholders)
+- Fixed `post-session.cjs` to write structured NEEDS_CAPTURE markers (not HTML comment placeholders)
 - Added Phase 0 retroactive capture instruction to CLAUDE.md
 - Added live capture instruction before Phase 5 for "WHY" preservation
 - Enriched patterns.json schema with category, severity, applicable_when (from Khuym compounding)

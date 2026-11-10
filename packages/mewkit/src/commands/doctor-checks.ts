@@ -2,12 +2,12 @@ import { execSync } from "node:child_process";
 import fs, { chmodSync } from "node:fs";
 import path from "node:path";
 import { resolveStateDir } from "../state/resolve-state-dir.js";
-import { resolveConfigPath } from "../state/resolve-config-path.js";
 import { commandExists } from "./setup.js";
-import { getRequirementsSource } from "../core/skills-dependencies.js";
 import { verifyPackages } from "../core/dependency-installer.js";
+import { ENVS_REL, envSkills, envUsable, readSkillRequirements, skillEnvDir } from "../core/skill-env.js";
 import { listDeps, isDepCommandPresent, type DoctorContext } from "../lib/system-deps-registry.js";
 import { isHookScript } from "../core/is-hook-script.js";
+import { NODE_FLOOR_MAJOR, NODE_FLOOR_PROSE, runningNodeMajor } from "../core/node-floor.js";
 
 export type Status = "pass" | "fail" | "warn" | "na";
 
@@ -18,15 +18,29 @@ export interface DiagResult {
 	fix?: string;
 }
 
-export function checkNodeVersion(): DiagResult {
-	const major = parseInt(process.versions.node.split(".")[0] ?? "0", 10);
-	if (major >= 20) {
-		return { name: "Node.js >= 20", status: "pass", detail: `v${process.versions.node}` };
+export function checkNodeVersion(version = process.versions.node): DiagResult {
+	const name = `Node.js >= ${NODE_FLOOR_MAJOR}`;
+	if (runningNodeMajor(version) >= NODE_FLOOR_MAJOR) {
+		return { name, status: "pass", detail: `v${version}` };
 	}
-	return { name: "Node.js >= 20", status: "fail", detail: `v${process.versions.node} — need 20+` };
+	return {
+		name,
+		status: "fail",
+		detail: `v${version} — need ${NODE_FLOOR_MAJOR} or newer`,
+		fix: `Install ${NODE_FLOOR_PROSE} (the version this project's test matrix runs), then re-run`,
+	};
 }
 
+/**
+ * Advisory, never a failure.
+ *
+ * Nothing in the core workflow needs an interpreter, so its absence is a fact
+ * about which optional skills are available — not a defect in the install. It
+ * used to be reported as a FAIL below 3.9, which told every user of a
+ * Python-free project to fix something that was not broken.
+ */
 export function checkPython(): DiagResult {
+	const name = "Python (optional)";
 	for (const cmd of ["python3 --version", "python --version"]) {
 		try {
 			const output = execSync(cmd, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
@@ -34,16 +48,14 @@ export function checkPython(): DiagResult {
 			if (match) {
 				const major = parseInt(match[1] ?? "0", 10);
 				const minor = parseInt(match[2] ?? "0", 10);
-				if (major >= 3 && minor >= 9) {
-					return { name: "Python 3.9+", status: "pass", detail: output };
-				}
-				return { name: "Python 3.9+", status: "fail", detail: `${output} — need 3.9+` };
+				if (major > 3 || (major === 3 && minor >= 9)) return { name, status: "pass", detail: output };
+				return { name, status: "warn", detail: `${output} — skills that need Python want 3.9+` };
 			}
 		} catch {
 			/* try next */
 		}
 	}
-	return { name: "Python 3.9+", status: "warn", detail: "Not found in PATH" };
+	return { name, status: "pass", detail: "Not installed — only skills that declare a runtime need it" };
 }
 
 export function checkGit(): DiagResult {
@@ -132,12 +144,17 @@ export function checkHooks(root: string | null): DiagResult {
 export function checkScripts(root: string | null): DiagResult {
 	if (!root) return { name: "Scripts", status: "warn", detail: "Skipped — no project" };
 
-	const scriptsDir = path.join(root, ".claude", "scripts");
+	const scriptsDir = path.join(root, ".claude", "hooks", "lib");
 	if (!fs.existsSync(scriptsDir)) {
-		return { name: "Scripts", status: "warn", detail: "No scripts/ directory" };
+		return { name: "Scripts", status: "warn", detail: "No hooks/lib/ directory" };
 	}
 
-	const expected = ["validate.py", "security-scan.py", "checklist.py", "injection-audit.py"];
+	// Only scripts the kit itself reaches are named here. A hard-coded list of
+	// interpreter scripts used to stand in for "is the kit intact", which made
+	// `doctor` warn whenever one of them was retired or ported — a diagnostic
+	// reporting the kit's own progress as a defect. What matters is that the
+	// directory exists and holds the entrypoints something actually calls.
+	const expected = ["injection-audit.cjs"];
 	const missing = expected.filter((s) => !fs.existsSync(path.join(scriptsDir, s)));
 
 	if (missing.length === 0) {
@@ -151,7 +168,7 @@ export function checkMemory(root: string | null): DiagResult {
 
 	const memDir = resolveStateDir(root, "memory");
 	if (!fs.existsSync(memDir)) {
-		return { name: "Memory", status: "warn", detail: "memory/ not found — will be created on first session" };
+		return { name: "Memory", status: "warn", detail: "memory/ not found — created on the first memory write" };
 	}
 
 	try {
@@ -178,56 +195,61 @@ export function checkMcp(root: string | null): DiagResult {
 	};
 }
 
+/**
+ * Report the per-skill environments, not one shared one.
+ *
+ * "Absent" is a PASS: environments are created on demand, so a project with
+ * none is a correctly configured project that has not needed one yet.
+ */
 export function checkVenv(root: string | null): DiagResult {
-	if (!root) return { name: "Skills venv", status: "warn", detail: "Skipped — no project" };
+	const name = "Skill environments";
+	if (!root) return { name, status: "warn", detail: "Skipped — no project" };
 
-	const venvDir = path.join(root, ".claude", "skills", ".venv");
-	if (fs.existsSync(venvDir)) {
-		return { name: "Skills venv", status: "pass", detail: venvDir };
+	const declared = envSkills(root);
+	if (!declared.length) return { name, status: "pass", detail: "No skill needs an environment" };
+
+	const ready = declared.filter((skill) => envUsable(skillEnvDir(root, skill)));
+	const broken = declared.filter(
+		(skill) => !envUsable(skillEnvDir(root, skill)) && fs.existsSync(skillEnvDir(root, skill)),
+	);
+	if (broken.length) {
+		return {
+			name,
+			status: "warn",
+			detail: `${broken.join(", ")} present but missing an interpreter`,
+			fix: `mewkit skill env ${broken[0]}`,
+		};
 	}
-	return {
-		name: "Skills venv",
-		status: "warn",
-		detail: "No Python venv for skills",
-		fix: "meowkit setup --only=venv",
-	};
+	return { name, status: "pass", detail: `${ready.length}/${declared.length} provisioned under ${ENVS_REL} (created on demand)` };
 }
 
+/**
+ * Verify pins only for environments that already exist.
+ *
+ * A skill with no environment is not missing packages — it is a skill nobody
+ * has asked for. Reporting its pins as "missing" is what made `doctor` list
+ * every Python dependency in the kit as a problem on a project that used none
+ * of them.
+ */
 export function checkPipPackages(root: string | null): DiagResult {
-	if (!root) return { name: "Pip packages", status: "warn", detail: "Skipped — no project" };
-	const venvDir = path.join(root, ".claude", "skills", ".venv");
-	if (!fs.existsSync(venvDir)) {
-		return { name: "Pip packages", status: "warn", detail: "Skipped — no venv (run mewkit setup --only=venv)" };
-	}
-	const { packages } = getRequirementsSource(root);
-	const results = verifyPackages(root, packages);
-	const missing = results.filter((r) => !r.installed);
-	if (missing.length === 0) {
-		return { name: "Pip packages", status: "pass", detail: `${results.length} skill packages verified` };
-	}
-	return {
-		name: "Pip packages",
-		status: "warn",
-		detail: `Missing: ${missing.map((r) => r.name).join(", ")}`,
-		fix: "meowkit setup --only=deps",
-	};
-}
+	const name = "Skill packages";
+	if (!root) return { name, status: "warn", detail: "Skipped — no project" };
 
-export function checkConfig(root: string | null): DiagResult {
-	if (!root) return { name: "Config", status: "warn", detail: "Skipped — no project" };
+	const provisioned = envSkills(root).filter((skill) => envUsable(skillEnvDir(root, skill)));
+	if (!provisioned.length) return { name, status: "pass", detail: "No environment provisioned — nothing to verify" };
 
-	const configPath = resolveConfigPath(root);
-	const shown = path.relative(root, configPath) || configPath;
-	if (!fs.existsSync(configPath)) {
-		return { name: "Config", status: "warn", detail: `${shown} not found` };
+	const missing: string[] = [];
+	let checked = 0;
+	for (const skill of provisioned) {
+		const { packages } = readSkillRequirements(root, skill);
+		if (!packages.length) continue;
+		checked += packages.length;
+		const results = verifyPackages(skillEnvDir(root, skill), packages);
+		for (const r of results) if (!r.installed) missing.push(`${skill}:${r.name}`);
 	}
 
-	try {
-		JSON.parse(fs.readFileSync(configPath, "utf-8"));
-		return { name: "Config", status: "pass", detail: `${shown} valid` };
-	} catch {
-		return { name: "Config", status: "fail", detail: `${shown} is invalid JSON` };
-	}
+	if (!missing.length) return { name, status: "pass", detail: `${checked} pinned package(s) verified across ${provisioned.length} env(s)` };
+	return { name, status: "warn", detail: `Missing: ${missing.join(", ")}`, fix: `mewkit skill env ${missing[0]?.split(":")[0]}` };
 }
 
 /**

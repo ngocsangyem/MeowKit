@@ -9,22 +9,22 @@
 
 ```bash
 # 1. Verify setup
-.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/check_setup.py
+node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/check_setup.py
 
 # 2. Analyze image
-.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/gemini_analyze.py \
+node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py \
   --files <image-path> \
   --task analyze \
   [--prompt "Focus on UI layout and color scheme"] \
   [--json]
 
 # 3. For OCR / text extraction
-.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/gemini_analyze.py \
+node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py \
   --files <image-path> \
   --task extract
 
 # 4. For multi-image comparison
-.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/gemini_analyze.py \
+node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py \
   --files before.png after.png \
   --task analyze \
   --prompt "Compare these two screenshots"

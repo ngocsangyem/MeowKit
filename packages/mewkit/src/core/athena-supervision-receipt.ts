@@ -1,6 +1,6 @@
 // Athena supervision receipt — the parent's per-checkpoint record.
 //
-// Canonical contract: `.claude/rules-conditional/advice-supervision-rules.md` §8.
+// Canonical contract: `.claude/skills/advise/references/advice-supervision-rules.md` §8.
 //
 // The receipt answers a question the dossier deliberately cannot: what was asked,
 // what came back, and what the parent DID about it. Two fields carry that and are

@@ -131,8 +131,7 @@ Append the A1 status block exactly as defined in `.claude/rules/agent-conduct.md
 be the same model class, the same host-enforced read-only tool set, and the same
 subagent-return mechanism — so it cannot use less main context or enforce more
 than the built-in already does. The contract above is prompt-shaped for exactly
-that reason. See the `explore executor` entry in
-`.meowkit/memory/dead-weight-registry.md`.
+that reason.
 
 **On non-Claude providers** (no typed subagent spawn — see
 `provider-operations.ts`, where `delegate_agent` is not `supported` outside the

@@ -1,6 +1,6 @@
 ---
 name: mk:jira-search
-description: 'JIRA search + filter management via the jira-as wrapper. Triggers: ''search jira'', ''find issues where X'', ''jql for ...'', ''export search results'', ''manage saved filters''. JQL injection-safe via the shared sanitizer. NOT for single-issue CRUD (mk:jira-issue); NOT for bulk write ops (mk:jira-bulk).'
+description: 'mk:jira leaf. JQL search, query building, saved filters, result export. NOT for mk:jira-bulk.'
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - jql-query
   - jira-filter
   - jira-export
-when_to_use: Use to find Jira issues by JQL, validate JQL, build queries from natural language, manage saved filters, or export results. NOT for single-issue CRUD.
+when_to_use: 'Find Jira issues matching criteria, or manage a saved JQL filter.'
 user-invocable: true
 context: fork
 agent: jira-search

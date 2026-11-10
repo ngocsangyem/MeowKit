@@ -2,7 +2,9 @@ import path from "node:path";
 import pc from "picocolors";
 import { computeContextBudget } from "../core/context-budget.js";
 import { availableProfiles, hasPackManifest, loadPackManifest } from "../core/index.js";
+import { resolveSessionStateFile } from "../state/resolve-state-dir.js";
 import {
+	costLogCandidate,
 	findCostLog,
 	findProjectRootFromCostLog,
 	readCostLog,
@@ -166,7 +168,7 @@ export function contextBudget(args: ContextBudgetArgs): void {
 		console.log(pc.bold(pc.cyan("Context budget")));
 		console.log(
 			pc.dim(
-				"Tiers: always-on (CLAUDE.md + rules) · conditional (rules-conditional) · on-demand (agents + commands + SKILL.md).",
+				"Tiers: always-on (rules) · conditional (loaded only on detection) · on-demand (agents + commands + SKILL.md).",
 			),
 		);
 		console.log();
@@ -224,17 +226,13 @@ export async function budget(args: BudgetArgs): Promise<void> {
 
 	if (sessionFlag !== null && !sessionId) {
 		console.error(pc.red("Could not determine the current session id."));
-		console.log(pc.dim("Expected HOOK_SESSION_ID or session-state/last-session-id."));
+		console.log(pc.dim("Expected HOOK_SESSION_ID or a last-session-id marker in .meowkit/state/."));
 		process.exit(1);
 	}
 
 	if (liveBudgetState && liveStateMatchesDay) {
-		if (logPath) {
-			console.log(`${pc.dim("Source:")} ${logPath}`);
-			console.log(`${pc.dim("Live state:")} ${path.join(projectRoot, "session-state", "budget-state.json")}`);
-		} else {
-			console.log(`${pc.dim("Live state:")} ${path.join(projectRoot, "session-state", "budget-state.json")}`);
-		}
+		if (logPath) console.log(`${pc.dim("Source:")} ${logPath}`);
+		console.log(`${pc.dim("Live state:")} ${resolveSessionStateFile(projectRoot, "budget-state.json")}`);
 		console.log();
 		if (dayFilter) {
 			console.log(`${pc.dim("Day:")} ${dayFilter}`);
@@ -245,8 +243,10 @@ export async function budget(args: BudgetArgs): Promise<void> {
 	}
 
 	if (!logPath) {
-		console.error(pc.red("Could not find .claude/memory/cost-log.json"));
-		console.log(pc.dim("Run a meowkit agent command first to generate cost data."));
+		// Name the path the search actually looked for, from the same function the search
+		// uses. The message used to name a different file entirely.
+		console.error(pc.red(`No cost log found. Looked for ${costLogCandidate(process.cwd())} and in each parent directory.`));
+		console.log(pc.dim("Run a MeowKit agent command first; the cost log is written as sessions record usage."));
 		process.exit(1);
 	}
 

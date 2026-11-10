@@ -261,7 +261,7 @@ Adapted from Doc A's checklist + Doc B's lessons:
 ## Unresolved questions
 
 1. **Inter-skill dependencies**: Doc B says "no native dep mgmt yet." MeowKit's `mk:*` namespace heavily composes skills. Should we add a manifest field (`requires_skills:`) for static analysis, even without runtime enforcement?
-2. **`${CLAUDE_PLUGIN_DATA}` portability**: Doc B introduces this as the stable-folder convention. MeowKit currently uses `.claude/memory/` and `tasks/` for persistence. Do we adopt `${CLAUDE_PLUGIN_DATA}` for new persistent skill state, or keep MeowKit-internal paths?
+2. **`${CLAUDE_PLUGIN_DATA}` portability**: Doc B introduces this as the stable-folder convention. MeowKit currently uses `.meowkit/` (memory, telemetry, state, cache) and `tasks/` for persistence. Do we adopt `${CLAUDE_PLUGIN_DATA}` for new persistent skill state, or keep MeowKit-internal paths?
 3. **500-line cap vs current MeowKit skills**: many existing `mk:*` SKILL.md files exceed 500 lines or use the step-file architecture (per `step-file-rules.md`). Should an audit be run to flag oversized monoliths for decomposition, or does step-file count as the decomposition?
 4. **Eval-driven dev workflow**: Doc A's "build evals first" is not currently a MeowKit phase. Does it slot before Phase 1 (Plan) for skill authoring, or is it a meta-skill (e.g., `mk:skill-eval`)?
 5. **Description vs `mk:` prefix**: gerund form is recommended, but MeowKit uses `mk:processing-X` style with prefix. Confirm current naming convention is intentional and not overdue for normalization.

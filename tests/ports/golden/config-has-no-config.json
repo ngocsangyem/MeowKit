@@ -1,0 +1,26 @@
+{
+  "name": "config-has-no-config",
+  "group": "workflow-config",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "config",
+    "args": [
+      "has",
+      "features.costTracking"
+    ]
+  },
+  "setup": "config-has-no-config",
+  "setupDescription": "no config file",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".claude/meowkit.config.json": null
+  }
+}

@@ -19,6 +19,7 @@ afterEach(() => roots.splice(0).forEach((d) => rmSync(d, { recursive: true, forc
 function makeRoot(): string {
 	const root = mkdtempSync(join(tmpdir(), "mewkit-activate-"));
 	roots.push(root);
+	mkdirSync(join(root, ".meowkit"), { recursive: true });
 	return root;
 }
 const NOW = "2026-07-19T12:00:00.000Z";
@@ -65,9 +66,9 @@ describe("activateTask", () => {
 
 	it("rolls back a newly-created record and throws when the pointer commit fails", async () => {
 		const root = makeRoot();
-		// Force writeActiveTaskPointer to fail: occupy session-state with a regular FILE so the
+		// Force writeActiveTaskPointer to fail: occupy the session-marker directory with a regular FILE so the
 		// pointer dir cannot be created.
-		writeFileSync(join(root, "session-state"), "not a dir");
+		writeFileSync(join(root, ".meowkit", "state"), "not a dir");
 		await expect(
 			activateTask(root, { taskId: "feat-x", planPath: "plans/x/plan.md", now: NOW }),
 		).rejects.toBeInstanceOf(ActivationError);
@@ -77,7 +78,7 @@ describe("activateTask", () => {
 
 	it("carries rolledBack=true and the task id on the ActivationError", async () => {
 		const root = makeRoot();
-		writeFileSync(join(root, "session-state"), "not a dir");
+		writeFileSync(join(root, ".meowkit", "state"), "not a dir");
 		try {
 			await activateTask(root, { taskId: "feat-y", planPath: null, now: NOW });
 			throw new Error("expected activation to fail");
@@ -93,8 +94,8 @@ describe("activateTask", () => {
 		const root = makeRoot();
 		// Pre-create the record via a first successful activation, then break the pointer path.
 		await activateTask(root, { taskId: "feat-z", planPath: "plans/z/plan.md", now: NOW });
-		rmSync(join(root, "session-state"), { recursive: true, force: true });
-		writeFileSync(join(root, "session-state"), "not a dir");
+		rmSync(join(root, ".meowkit", "state"), { recursive: true, force: true });
+		writeFileSync(join(root, ".meowkit", "state"), "not a dir");
 		await expect(
 			activateTask(root, { taskId: "feat-z", planPath: "plans/z/plan.md", now: NOW }),
 		).rejects.toBeInstanceOf(ActivationError);

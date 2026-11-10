@@ -234,18 +234,18 @@ describe("storage root (flat-copy == plugin: consumer project tasks/active)", ()
 describe("checkpoint join (active-plan pointer)", () => {
 	it("reads the pointer from active-plan.json (path), slug fallback, then legacy text, else null", () => {
 		const a = makeRoot();
-		mkdirSync(join(a, "session-state"), { recursive: true });
-		writeFileSync(join(a, "session-state", "active-plan.json"), JSON.stringify({ path: "plans/p1/plan.md" }));
+		mkdirSync(join(a, ".meowkit", "state"), { recursive: true });
+		writeFileSync(join(a, ".meowkit", "state", "active-plan.json"), JSON.stringify({ path: "plans/p1/plan.md" }));
 		expect(readActivePlanPointer(a)).toBe("plans/p1/plan.md");
 
 		const b = makeRoot();
-		mkdirSync(join(b, "session-state"), { recursive: true });
-		writeFileSync(join(b, "session-state", "active-plan.json"), JSON.stringify({ slug: "260712-x" }));
+		mkdirSync(join(b, ".meowkit", "state"), { recursive: true });
+		writeFileSync(join(b, ".meowkit", "state", "active-plan.json"), JSON.stringify({ slug: "260712-x" }));
 		expect(readActivePlanPointer(b)).toBe("260712-x");
 
 		const c = makeRoot();
-		mkdirSync(join(c, "session-state"), { recursive: true });
-		writeFileSync(join(c, "session-state", "active-plan"), "plans/legacy/plan.md\n");
+		mkdirSync(join(c, ".meowkit", "state"), { recursive: true });
+		writeFileSync(join(c, ".meowkit", "state", "active-plan"), "plans/legacy/plan.md\n");
 		expect(readActivePlanPointer(c)).toBe("plans/legacy/plan.md");
 
 		expect(readActivePlanPointer(makeRoot())).toBeNull();
@@ -254,8 +254,8 @@ describe("checkpoint join (active-plan pointer)", () => {
 	it("resume state exposes the active-plan pointer alongside records", async () => {
 		const root = makeRoot();
 		await writeTaskRecord(root, record({ taskId: "cur", planPath: "plans/p1/plan.md" }));
-		mkdirSync(join(root, "session-state"), { recursive: true });
-		writeFileSync(join(root, "session-state", "active-plan.json"), JSON.stringify({ path: "plans/p1/plan.md" }));
+		mkdirSync(join(root, ".meowkit", "state"), { recursive: true });
+		writeFileSync(join(root, ".meowkit", "state", "active-plan.json"), JSON.stringify({ path: "plans/p1/plan.md" }));
 		const state = reconstructResumeState(root);
 		expect(state.activePlanPointer).toBe("plans/p1/plan.md");
 		expect(state.records.find((r) => r.planPath === state.activePlanPointer)?.taskId).toBe("cur");

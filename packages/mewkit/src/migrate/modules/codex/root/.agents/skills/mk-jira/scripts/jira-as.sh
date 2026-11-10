@@ -2,11 +2,11 @@
 # Wraps the venv-local jira-as binary. Sources .codex/.env, translates
 # MEOW_JIRA_* → JIRA_* env, sets JIRA_OUTPUT=json default, then exec's.
 # Resolves to venv-local binary (NOT PATH) since `.codex/scripts/bin/setup-workflow` installs
-# jira-as into .agents/skills/.venv per skills-dependencies.ts.
+# jira-as into .meowkit/envs/jira per skills-dependencies.ts.
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel):-$(pwd)}"
-JIRA_AS="$ROOT/.agents/skills/.venv/bin/jira-as"
+JIRA_AS="$ROOT/.meowkit/envs/jira/bin/jira-as"
 ENV_FILE="$ROOT/.codex/.env"
 
 if [ ! -x "$JIRA_AS" ]; then

@@ -1,0 +1,25 @@
+{
+  "name": "validate-contract-valid",
+  "group": "gate-helper-validate-contract",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/skills/sprint-contract/scripts/validate-contract.sh",
+  "args": [
+    "tasks/contracts/261101-corpus-demo-sprint-1.md"
+  ],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "validate-contract-valid",
+  "setupDescription": "a schema-valid contract: 8 frontmatter fields, 5 sections, 5 ACs",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "CONTRACT_VALID: tasks/contracts/261101-corpus-demo-sprint-1.md (5 ACs, status=signed, preset=cli-tool)\n",
+    "stderr": ""
+  }
+}

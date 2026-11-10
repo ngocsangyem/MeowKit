@@ -8,16 +8,16 @@ This file is the canonical setup reference for `mk:jira` and the 16 `mk:jira-*` 
 .codex/scripts/bin/setup-workflow
 ```
 
-This triggers `packages/cli/src/core/dependency-installer.ts` to read every per-skill `requirements.txt` (discovered by `skills-dependencies.ts:findRequirementsFiles()`) and `pip install` into `.agents/skills/.venv`. The jira-as binary lands at:
+This reads THIS skill's `scripts/requirements.txt` and nothing else, and installs into this skill's own environment. The jira-as binary lands at:
 
 ```
-.agents/skills/.venv/bin/jira-as
+.meowkit/envs/jira/bin/jira-as
 ```
 
 ## Manual fallback
 
 ```
-.agents/skills/.venv/bin/pip install jira-as 'jira-as[keyring]'
+.meowkit/envs/jira/bin/pip install jira-as 'jira-as[keyring]'
 ```
 
 Use only if `.codex/scripts/bin/setup-workflow` is unavailable. The wrapper resolves to the venv-local binary; do NOT rely on global PATH.
@@ -38,7 +38,7 @@ The legacy `MEOW_*` prefix (vs. modern `MEOWKIT_*`) is a deliberate exception pe
 
 ## Hook validation
 
-A `SessionStart` hook (`.codex/hooks/jira-env-loader.sh`) validates `.codex/.env` presence and the 3 keys. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper handles per-call sourcing/export.
+A `SessionStart` hook (`.codex/hooks/handlers/jira-env-loader.cjs`) validates `.codex/.env` presence and the 3 keys. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper handles per-call sourcing/export.
 
 Status messages:
 - `[mk:jira] env OK` — all 3 keys present

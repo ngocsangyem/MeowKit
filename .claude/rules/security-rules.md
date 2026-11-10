@@ -6,47 +6,27 @@ No "skip if time pressure" exceptions. These rules apply in ALL modes, including
 
 The agent MUST NOT write any of the following without explicit human override:
 
-| Pattern                                                                    | Why it's blocked                                               |
-| -------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| Hardcoded secrets: API keys, passwords, tokens, JWT secrets in source code | Secrets in source get committed to git and leaked              |
-| `any` type in TypeScript                                                   | Use `unknown` + type guards instead. `any` defeats type safety |
-| SQL queries with string interpolation/template literals                    | SQL injection risk. Use parameterized queries                  |
-| `localStorage` for auth tokens                                             | XSS can steal tokens from localStorage. Use httpOnly cookies   |
-| `v-html` with user-provided content                                        | XSS attack vector in Vue                                       |
-| `UserDefaults` for sensitive data (Swift)                                  | Not encrypted. Use Keychain instead                            |
-| Row Level Security disabled or missing (Supabase/PostgreSQL)               | Data leakage between users                                     |
-| Controllers without auth guards (unless explicitly public and documented)  | Unauthenticated access to protected resources                  |
-| `process.env` access without ConfigService wrapper (NestJS)                | Breaks testability and validation. Use ConfigService           |
-| Anon key used in server-side context                                       | Anon key is for client-side only. Server uses service_role key |
-| Disabled certificate validation (Swift)                                    | Man-in-the-middle attack vector                                |
-| `CASCADE DELETE` without explicit approval in plan                         | Accidental data loss. Must be planned and approved             |
+| Pattern | Use instead |
+| --- | --- |
+| Hardcoded secrets: API keys, passwords, tokens, JWT secrets in source code | Config/secret store outside the repo |
+| `any` type in TypeScript | `unknown` + type guards |
+| SQL queries with string interpolation/template literals | Parameterized queries |
+| `localStorage` for auth tokens | httpOnly cookies |
+| `v-html` with user-provided content | Escaped interpolation / sanitizer |
+| `UserDefaults` for sensitive data (Swift) | Keychain |
+| Row Level Security disabled or missing (Supabase/PostgreSQL) | RLS enabled with explicit policies |
+| Controllers without auth guards (unless explicitly public and documented) | An auth guard on every route |
+| `process.env` access without ConfigService wrapper (NestJS) | ConfigService |
+| Anon key used in server-side context | service_role key server-side |
+| Disabled certificate validation (Swift) | Default certificate validation |
+| `CASCADE DELETE` without explicit approval in plan | A planned, approved migration |
 
 ## Enforcement
 
-### When reviewing existing code
+**Reviewing existing code** (`/mk:review`, `/mk:cso`): flag as **WARN**, document it in the verdict, do not auto-fix — existing code may carry context the agent lacks.
 
-If the agent detects these patterns in existing code during `/mk:review` or `/mk:audit`:
-
-- Flag as **WARN**
-- Document in the verdict/audit report
-- Do not auto-fix (existing code may have context the agent lacks)
-
-### When writing new code
-
-If the agent is about to write any of these patterns:
-
-- **BLOCK** — do not write the code
-- Ask the human for explicit override
-- If human approves override: document the reason in the plan file and proceed
-- The override and its justification become part of the review record
+**Writing new code: BLOCK** — do not write the pattern. Ask the human for an explicit override; if approved, document the reason in the plan file and proceed. The override and its justification become part of the review record.
 
 ## No Exceptions
 
-These rules cannot be bypassed by:
-
-- Mode selection (even fast/cost-saver modes check for BLOCKs)
-- Time pressure
-- Agent self-reasoning ("I think this is safe because...")
-- Scope reduction ("it's just a prototype")
-
-**Important:** ONLY a human can override, and the override is documented.
+Cannot be bypassed by mode selection (even fast/cost-saver modes check for BLOCKs), time pressure, agent self-reasoning ("I think this is safe because…"), or scope reduction ("it's just a prototype"). ONLY a human can override, and the override is documented.

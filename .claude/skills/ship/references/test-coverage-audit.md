@@ -210,12 +210,12 @@ Coverage line: `Test Coverage Audit: N new code paths. M covered (X%). K tests g
 After producing the coverage diagram, write a test plan artifact so `/mk:qa` can consume it:
 
 ```bash
-eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/memory/projects
+eval "$(.claude/hooks/lib/workflow-slug 2>/dev/null)" && mkdir -p ".meowkit/telemetry/$SLUG"
 USER=$(whoami)
 DATETIME=$(date +%Y%m%d-%H%M%S)
 ```
 
-Write to `.meowkit/memory/projects/{slug}/{user}-{branch}-ship-test-plan-{datetime}.md`:
+Write to `.meowkit/telemetry/{slug}/{user}-{branch}-ship-test-plan-{datetime}.md`:
 
 ```markdown
 # Test Plan

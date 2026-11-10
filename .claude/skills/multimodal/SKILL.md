@@ -1,6 +1,6 @@
 ---
 name: mk:multimodal
-description: Process images, video, audio, PDFs with Gemini API. Generate images (Nano Banana 2), videos (Veo 3), speech (MiniMax TTS), music (MiniMax). Convert documents to Markdown. Multi-provider fallback (Gemini → MiniMax → OpenRouter). Activate when task references media files, asks to analyze/describe/transcribe/extract/generate/convert, or involves non-text binary files.
+description: Analyse and generate images, video, audio and PDFs via Gemini or MiniMax with fallback. NOT for mk:html-video.
 version: 2.1.0
 argument-hint: '[file-path] [task]'
 phase: on-demand
@@ -30,7 +30,7 @@ keywords:
   - video
   - audio
   - minimax
-when_to_use: Use when processing images, video, audio, PDFs or generating media via Gemini/MiniMax/OpenRouter. Activate when task references media files.
+when_to_use: The task names a media file, or asks to transcribe, describe or generate one.
 user-invocable: true
 allowed-tools:
   - Bash
@@ -41,6 +41,7 @@ owner: utility
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 requires_external_service: ["gemini", "minimax"]
 default_enabled: false
 ---
@@ -71,7 +72,7 @@ verify preview IDs against the provider dashboard before relying on one.
 | Validate keys and dependencies | `scripts/check_setup.py` |
 
 ```bash
-.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/gemini_analyze.py \
+node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py \
   --files <path> --task <analyze|transcribe|extract> [--resolution low-res] [--json]
 ```
 
@@ -126,7 +127,7 @@ Force a provider: `--provider gemini|minimax|openrouter`. Override chain order v
 
 ## Gotchas
 
-- **Python venv required**: if you get `python3: command not found` or import errors, run `.claude/scripts/bin/setup-workflow` once from the project root.
+- **Python venv required**: if you get `python3: command not found` or import errors, run `.claude/hooks/lib/setup-workflow` once from the project root.
 - **Audio >15 min**: Gemini truncates silently. Split first.
 - **PDF >100 pages**: Quality degrades. Process in 20-page chunks.
 - **Video cost**: ~263 tokens/sec at default resolution. Use `--verbose` for cost estimate.

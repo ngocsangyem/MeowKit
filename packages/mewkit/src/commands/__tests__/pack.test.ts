@@ -35,7 +35,6 @@ const MANIFEST = {
 	base: {
 		files: ["CLAUDE.md", "settings.json", "pack-manifest.json", "harness-inventory.json", "rules/gate-rules.md"],
 		globs: ["hooks/**"],
-		commands: ["plan"],
 	},
 	packs: {
 		"lifecycle-core": { owners: ["lifecycle"] },
@@ -60,7 +59,6 @@ async function makeInstall(): Promise<string> {
 	await writeFile(join(sRoot, "CLAUDE.md"), "# p\n", "utf-8");
 	await w("settings.json", JSON.stringify({ permissions: { allow: [] } }));
 	await w("rules/gate-rules.md", "# gate\n");
-	await w("commands/mk/plan.md", "# plan\n");
 	await w("hooks/gate-enforcement.sh", "#!/bin/sh\n");
 	await w("hooks/jira-env-loader.sh", "#!/bin/sh\n"); // owner jira, base-covered
 	await w("skills/cooker/SKILL.md", fm("mk:cooker", "lifecycle"));
@@ -69,7 +67,6 @@ async function makeInstall(): Promise<string> {
 		schema_version: 1,
 		artifacts: {
 			"rules/gate-rules.md": { owner: "lifecycle", criticality: "critical", status: "active", runtime: "claude-code" },
-			"commands/mk/plan.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
 			"hooks/gate-enforcement.sh": {
 				owner: "security",
 				criticality: "critical",
@@ -106,7 +103,11 @@ describe("pack-helpers: installed state + settings refs", () => {
 		const claudeDir = await makeInstall();
 		await writeFile(
 			join(claudeDir, "settings.json"),
-			JSON.stringify({ hooks: { S: `bash "$CLAUDE_PROJECT_DIR/.claude/hooks/jira-env-loader.sh"` } }),
+			JSON.stringify({
+				hooks: {
+					S: [{ hooks: [{ type: "command", command: "node", args: ["$CLAUDE_PROJECT_DIR/.claude/hooks/jira-env-loader.sh"] }] }],
+				},
+			}),
 			"utf-8",
 		);
 		const refs = settingsReferencedPaths(claudeDir);

@@ -7,9 +7,15 @@ import { requireLiveHarness } from "./support/live-harness.js";
 const LIVE = requireLiveHarness();
 
 describe("classifyTier", () => {
-	it("classifies CLAUDE.md and rules/*.md as always-on", () => {
-		expect(classifyTier("CLAUDE.md")).toBe("always-on");
+	it("classifies rules/*.md as always-on", () => {
 		expect(classifyTier("rules/security-rules.md")).toBe("always-on");
+		expect(classifyTier("rules/meowkit-core.md")).toBe("always-on");
+	});
+
+	it("does not classify a root CLAUDE.md as always-on (no kit-owned CLAUDE.md ships)", () => {
+		// The always-on tier is exactly `.claude/rules/*.md`. A target project's root
+		// CLAUDE.md is the user's own file and is not part of the kit's budget.
+		expect(classifyTier("CLAUDE.md")).toBeNull();
 	});
 
 	it("classifies rules-conditional/*.md as conditional (not always-on)", () => {
@@ -46,7 +52,7 @@ describe("computeContextBudget on the live harness", () => {
 		const tierLines = tiers["always-on"].lines + tiers.conditional.lines + tiers["on-demand"].lines;
 		expect(tierFiles).toBe(core.files);
 		expect(tierLines).toBe(core.lines);
-		// always-on tier holds CLAUDE.md + rules and is non-empty for core.
+		// always-on tier holds rules/*.md and is non-empty for core.
 		expect(tiers["always-on"].files).toBeGreaterThan(0);
 	});
 

@@ -29,7 +29,7 @@ Walks `.claude/` and tells you how much of the model context window your always-
 
 | Concern              | Use this instead                                         |
 |----------------------|----------------------------------------------------------|
-| USD cost tracking    | `/mk:budget`                                              |
+| USD cost tracking    | `mewkit budget`                                              |
 | Runtime agent trim   | `mk:lazy-agent-loader`                                    |
 | Window utilization   | **`/mk:context-audit`** (this skill)                      |
 
@@ -65,13 +65,13 @@ Walks `.claude/` and tells you how much of the model context window your always-
 1. <priority finding> — saves ~<tokens>
 
 ## How to Act
-- Cost: see `/mk:budget`
+- Cost: see `mewkit budget`
 - Runtime trim: see `mk:lazy-agent-loader`
 ```
 
 ## Pro Tips
 
-- **Pair with `/mk:budget`** — context-audit reports tokens (window utilization), `/mk:budget` reports USD (monetary cost). They answer different questions.
+- **Pair with `mewkit budget`** — context-audit reports tokens (window utilization), `mewkit budget` reports USD (monetary cost). They answer different questions.
 - **Run after model upgrades** — components that were load-bearing on Opus 4.5 may be dead weight on Opus 4.7. The audit gives you the data; `harness-rules.md` Rule 7 is the playbook for acting on it.
 - **No env vars** — window size is hard-coded 200K. Override is deferred until a real 1M-context use case appears.
 

@@ -1,33 +1,36 @@
 #!/usr/bin/env node
 
 import fs from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import minimist from "minimist";
-import { helpRequest, renderHelp } from "./cli/render-help.js";
+import { renderHelp } from "./cli/render-help.js";
 import { minimistOptions } from "./cli/minimist-options.js";
+import { CLI_CATALOGUE } from "./cli/command-catalogue.js";
+import {
+	INVOCATION_ERROR,
+	classifyInvocation,
+	renderCommandHelp,
+	renderInvocationError,
+	renderSubcommandHelp,
+} from "./cli/strict-dispatch.js";
 import pc from "picocolors";
-import { init } from "./commands/init.js";
 import { upgrade } from "./commands/upgrade.js";
 import { validate } from "./commands/validate.js";
 import { capabilities } from "./commands/capabilities.js";
 import { taskState } from "./commands/task-state.js";
 import { advice } from "./commands/advice.js";
-import { context } from "./commands/context.js";
 import { budget, contextBudget } from "./commands/budget.js";
-import { memory } from "./commands/memory.js";
 import { verdictGate } from "./commands/verdict-gate.js";
+import { note } from "./commands/note.js";
 import { doctor } from "./commands/doctor.js";
 import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
-import { inventory } from "./commands/inventory.js";
 import { plan } from "./commands/plan.js";
 import { planApprove } from "./commands/plan-approve.js";
 import { planArchive } from "./commands/plan-archive.js";
 import { trace } from "./commands/trace.js";
-// NOTE: index-command is imported lazily inside its case — it pulls in `node:sqlite`
-// (experimental), so a static import would load SQLite + emit its warning on EVERY command.
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
 import { visualPlan } from "./commands/visual-plan.js";
@@ -37,7 +40,11 @@ import { reviewCoverage } from "./commands/review/coverage.js";
 import { reviewCompose } from "./commands/review/compose.js";
 import { reviewSubmit } from "./commands/review/submit.js";
 import { reviewCleanup } from "./commands/review/cleanup.js";
-import { resolveConfigPath } from "./state/resolve-config-path.js";
+import { backups } from "./commands/backups.js";
+import { uninstall } from "./commands/uninstall.js";
+import { resolveProjectRoot } from "./state/meowkit-root-resolver.js";
+import { versions } from "./commands/versions.js";
+import { runInstall } from "./commands/run-install.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(fs.readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string };
@@ -45,24 +52,6 @@ const VERSION = pkgJson.version;
 
 function printHelp(): void {
 	console.log(renderHelp(VERSION));
-}
-
-async function printStatus(): Promise<void> {
-	const channel = VERSION.includes("-beta") || VERSION.includes("-rc") ? "beta" : "stable";
-	console.log(`${pc.bold(pc.cyan("mewkit"))} ${pc.dim(`v${VERSION}`)} ${pc.dim(`(${channel})`)}`);
-	console.log();
-
-	const configPath = resolveConfigPath(process.cwd());
-	try {
-		const content = fs.readFileSync(configPath, "utf-8");
-		const config: Record<string, unknown> = JSON.parse(content) as Record<string, unknown>;
-		console.log(`${pc.bold("Config:")} ${relative(process.cwd(), configPath) || configPath}`);
-		for (const [key, value] of Object.entries(config)) {
-			console.log(`  ${pc.dim(key)}: ${String(value)}`);
-		}
-	} catch {
-		console.log(`${pc.dim("No .meowkit/config.json found.")}`);
-	}
 }
 
 async function main(): Promise<void> {
@@ -75,16 +64,39 @@ async function main(): Promise<void> {
 
 	const command = args._[0] as string | undefined;
 
-	// Before the switch, for every command: a subcommand reached with `--help` would run for real.
-	const help = helpRequest(args.help, command, VERSION);
-	if (help !== null) {
-		console.log(help);
+	if (args.help && !command) {
+		printHelp();
+		return;
+	}
+
+	// The invocation is judged before anything runs: a wrong sub-verb must not reach a
+	// command that would answer it with its own exit code, and asking for help must
+	// never execute the thing being asked about.
+	const invocation = classifyInvocation(
+		CLI_CATALOGUE,
+		args._.map((value) => String(value)),
+		args.help === true,
+	);
+	if (invocation.kind === "unknown-subcommand" || invocation.kind === "missing-subcommand") {
+		for (const line of renderInvocationError(invocation)) console.error(pc.red(line));
+		process.exit(INVOCATION_ERROR);
+	}
+	if (invocation.kind === "command-help") {
+		console.log(renderCommandHelp(CLI_CATALOGUE, invocation.command).join("\n"));
+		return;
+	}
+	if (invocation.kind === "subcommand-help") {
+		console.log(renderSubcommandHelp(CLI_CATALOGUE, invocation.command, invocation.subcommand).join("\n"));
 		return;
 	}
 
 	switch (command) {
 		case "init":
-			await init({
+			await runInstall({
+				cliVersion: VERSION,
+				delivery: args.delivery as string | undefined,
+				offline: args.offline as boolean | undefined,
+				json: args.json as boolean | undefined,
 				dryRun: args["dry-run"] as boolean | undefined,
 				force: args.force as boolean | undefined,
 				beta: args.beta as boolean | undefined,
@@ -95,16 +107,24 @@ async function main(): Promise<void> {
 				skillPacks: args["skill-packs"] as string | undefined,
 				mcpProfiles: args["mcp-profiles"] as string | undefined,
 				allowCloudMcp: args["allow-cloud-mcp"] as boolean | undefined,
+				yes: args.yes as boolean | undefined,
+				interactive: process.stdout.isTTY === true,
 				allowKitSource: args["allow-kit-source"] as boolean | undefined,
 			});
 			break;
 		case "upgrade":
 			await upgrade({
+				cliVersion: VERSION,
+				offline: args.offline as boolean | undefined,
+				json: args.json as boolean | undefined,
 				check: args.check as boolean | undefined,
 				beta: args.beta as boolean | undefined,
 				list: args.list as boolean | undefined,
 				noCleanup: args["no-cleanup"] as boolean | undefined,
 				yes: args.yes as boolean | undefined,
+				force: args.force as boolean | undefined,
+				dryRun: args["dry-run"] as boolean | undefined,
+				interactive: process.stdout.isTTY === true,
 				allowKitSource: args["allow-kit-source"] as boolean | undefined,
 			});
 			break;
@@ -129,6 +149,9 @@ async function main(): Promise<void> {
 				packs: args.packs as boolean | undefined,
 				rules: args.rules as boolean | undefined,
 				capabilities: args.capabilities as boolean | undefined,
+				memory: args.memory as boolean | undefined,
+				frontmatter: args.frontmatter as boolean | undefined,
+				docsRefs: args["docs-refs"] as boolean | undefined,
 			});
 			break;
 		}
@@ -184,7 +207,6 @@ async function main(): Promise<void> {
 				intent: args.intent as string | undefined,
 				provider: args.provider as string | undefined,
 				write: args.write as boolean | undefined,
-				record: args.record as boolean | undefined,
 			});
 			break;
 		case "pack":
@@ -194,10 +216,10 @@ async function main(): Promise<void> {
 				json: args.json as boolean | undefined,
 				yes: args.yes as boolean | undefined,
 				beta: args.beta as boolean | undefined,
+				dryRun: args["dry-run"] as boolean | undefined,
 			});
 			break;
 		case "providers":
-		case "explain-support":
 			await providersCommand({
 				provider: args._[1] as string | undefined,
 				json: args.json as boolean | undefined,
@@ -226,22 +248,11 @@ async function main(): Promise<void> {
 					subcommand: planSub,
 					target: args._[2] as string | undefined,
 					json: args.json as boolean | undefined,
+					structural: args.structural as boolean | undefined,
 				});
 			}
 			break;
 		}
-		case "inventory":
-			await inventory({
-				json: args.json as boolean | undefined,
-				stale: args.stale as boolean | undefined,
-				critical: args.critical as boolean | undefined,
-				portableMissing: args["portable-missing"] as boolean | undefined,
-				check: args.check as boolean | undefined,
-				emitCounts: args["emit-counts"] as boolean | undefined,
-				substrate: args.substrate as boolean | undefined,
-				emit: args.emit as boolean | undefined,
-			});
-			break;
 		case "trace":
 			trace({
 				subcommand: args._[1] as string | undefined,
@@ -252,33 +263,10 @@ async function main(): Promise<void> {
 				json: args.json as boolean | undefined,
 			});
 			break;
-		case "index": {
-			const { indexCommand } = await import("./commands/index-command.js");
-			indexCommand({ json: args.json as boolean | undefined });
-			break;
-		}
-		case "query": {
-			const { queryCommand } = await import("./commands/index-command.js");
-			queryCommand({
-				json: args.json as boolean | undefined,
-				task: args.task as string | undefined,
-				presets: args.presets as boolean | undefined,
-			});
-			break;
-		}
 		case "orient": {
 			const { orient } = await import("./commands/orient.js");
 			// minimist maps `--no-record` to `record === false`.
 			orient({ json: args.json as boolean | undefined, noRecord: args.record === false });
-			break;
-		}
-		case "wiki": {
-			const { wikiCommand } = await import("./wiki/interface/cli.js");
-			await wikiCommand({
-				subcommand: args._[1] as string | undefined,
-				rest: args._.slice(2).map(String),
-				flags: args as Record<string, unknown>,
-			});
 			break;
 		}
 		case "budget": {
@@ -308,31 +296,55 @@ async function main(): Promise<void> {
 			});
 			break;
 		}
-		case "memory":
-			await memory({
-				subcommand: args._[1] as string | undefined,
-				clear: args.clear as boolean | undefined,
-				stats: args.stats as boolean | undefined,
-				strict: args.strict as boolean | undefined,
-				check: args.check as boolean | undefined,
-				promptArgs: args._.slice(2).map(String),
-			});
-			break;
-		case "docs-manifest": {
-			const { docsManifest } = await import("./commands/docs-manifest.js");
-			docsManifest({
-				check: args.check as boolean | undefined,
-				write: args.write as boolean | undefined,
-				json: args.json as boolean | undefined,
-			});
-			break;
-		}
 		case "verdict-gate":
 			verdictGate({ slug: args._[1] as string | undefined });
 			break;
-		case "setup":
-			await setup({ only: args.only as string | undefined, systemDeps: args["system-deps"] as boolean | undefined });
+		case "backups": {
+			// The snapshots live under the project root, so the verb needs one;
+			// without a root there is nothing to list and nothing to restore.
+			const root = resolveProjectRoot(process.cwd()) ?? process.cwd();
+			process.exitCode = backups(root, args._[1] as string | undefined, args._[2] as string | undefined, {
+				json: args.json as boolean | undefined,
+				dryRun: args["dry-run"] as boolean | undefined,
+				yes: args.yes as boolean | undefined,
+				interactive: process.stdout.isTTY === true,
+			});
 			break;
+		}
+		case "uninstall": {
+			// Ownership is project-relative, so the verb needs a root; without one
+			// there is no install to classify.
+			const root = resolveProjectRoot(process.cwd()) ?? process.cwd();
+			process.exitCode = uninstall(root, {
+				yes: args.yes as boolean | undefined,
+				force: args.force as boolean | undefined,
+				json: args.json as boolean | undefined,
+				dryRun: args["dry-run"] as boolean | undefined,
+				interactive: process.stdout.isTTY === true,
+			});
+			break;
+		}
+		case "note":
+			// Entry text comes from stdin, not a flag — the write path is a pipe, so a
+			// multi-line entry never has to survive shell quoting.
+			await note({ file: args._[1] as string | undefined });
+			break;
+		case "setup":
+			await setup({
+				only: args.only as string | undefined,
+				systemDeps: args["system-deps"] as boolean | undefined,
+				skills: args.skills as string | undefined,
+				dryRun: args["dry-run"] as boolean | undefined,
+				json: args.json as boolean | undefined,
+			});
+			break;
+		case "skill": {
+			const { skillCommand } = await import("./commands/skill-env.js");
+			const sub = args._.slice(1).map(String);
+			if (args.list) sub.push("--list");
+			process.exitCode = await skillCommand(sub);
+			break;
+		}
 		case "doctor":
 			await doctor({
 				report: args.report as boolean | undefined,
@@ -342,11 +354,12 @@ async function main(): Promise<void> {
 				// `doctor provenance [--explain]`: read-only provenance report.
 				provenance: args._[1] === "provenance" || undefined,
 				explain: args.explain as boolean | undefined,
-				consolidation: args.consolidation as boolean | undefined,
+				adopt: args.adopt as boolean | undefined,
+				json: args.json as boolean | undefined,
 			});
 			break;
-		case "status":
-			await printStatus();
+		case "versions":
+			versions(VERSION, { json: args.json as boolean | undefined });
 			break;
 		case "task-state":
 			await taskState({
@@ -386,15 +399,6 @@ async function main(): Promise<void> {
 				correctionKind: args["correction-kind"] as string | undefined,
 				packetKind: args["packet-kind"] as string | undefined,
 				releaseStage: args["release-stage"] as string | undefined,
-				json: args.json as boolean | undefined,
-			});
-			break;
-		case "context":
-			await context({
-				subcommand: args._[1] as string | undefined,
-				target: args._[2] as string | undefined,
-				root: args.root as string | undefined,
-				task: args.task as string | undefined,
 				json: args.json as boolean | undefined,
 			});
 			break;
@@ -458,23 +462,27 @@ async function main(): Promise<void> {
 				"skip-hooks": args["skip-hooks"] as boolean | undefined,
 				install: args.install as boolean | undefined,
 				reconcile: args.reconcile as boolean | undefined,
-				"reinstall-empty-dirs": args["reinstall-empty-dirs"] as boolean | undefined,
 				"respect-deletions": args["respect-deletions"] as boolean | undefined,
 				"source-version": args["source-version"] as string | undefined,
 				providers: args.providers as boolean | undefined,
 				"all-rules": args["all-rules"] as boolean | undefined,
 				"include-mcp": args["include-mcp"] as boolean | undefined,
 				"include-unportable": args["include-unportable"] as boolean | undefined,
+				json: args.json as boolean | undefined,
 			});
 			if (exitCode !== 0) process.exit(exitCode);
 			break;
 		}
 		default:
+			// A bare `mewkit` prints help and succeeds; an unrecognized VERB is a usage
+			// error, so it must exit non-zero — otherwise a retired command (or a typo)
+			// looks like a successful no-op to any script that checks the exit code.
 			if (command) {
 				console.error(pc.red(`Unknown command: ${command}`));
 				console.log();
 			}
 			printHelp();
+			if (command) process.exit(2);
 			break;
 	}
 }

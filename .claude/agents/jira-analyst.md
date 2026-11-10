@@ -1,6 +1,6 @@
 ---
 name: jira-analyst
-description: Read full Jira ticket context (description, comments, attachments, links, media) and produce structured analysis suitable for posting back as a Jira comment. Read-only via the jira-as CLI wrapper. Routed by mk:jira-analyst skill. NOT for complexity scoring (jira-evaluator); NOT for story-point estimation (jira-estimator).
+description: 'mk:jira executor for mk:jira-analyst. Ticket context, media and RCA reading.'
 tools: Bash, Read, Grep, Glob, Write
 model: claude-opus-5
 permissionMode: default
@@ -74,7 +74,7 @@ Jira attachments are cloud-hosted. Workflow:
 **Enhanced analysis (optional):**
 
 ```bash
-.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/gemini_analyze.py <path>
+node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py <path>
 ```
 (requires `MEOWKIT_GEMINI_API_KEY`)
 

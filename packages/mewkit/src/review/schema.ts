@@ -7,7 +7,7 @@ import { z } from "zod";
 // asserted against ReviewManifestSchema by a parity test, so the .cjs boundary and
 // this contract cannot silently drift.
 //
-// Design rules (match memory/verdict-schema.ts + memory/schemas.ts):
+// Design rules (match review/verdict-schema.ts):
 //  - `.passthrough()` everywhere → unknown/future fields are kept (additive
 //    forward-compat), never rejected.
 //  - Only structurally load-bearing fields are required.

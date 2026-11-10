@@ -3,21 +3,29 @@ import path from "node:path";
 
 /**
  * Replays a Claude Code hook exactly as `.claude/settings.json` configures it:
- * same interpreter, same script, JSON on stdin (NOT positional args). This is the
- * single source of truth shared by the configured-hook integration tests and the
- * `doctor --hard-gates` probes — neither hardcodes `bash`, so both reproduce the
- * real invocation (and would catch an `sh`/dash runtime mismatch).
+ * same executable, same arguments, JSON on stdin (NOT positional args). This is
+ * the single source of truth shared by the configured-hook integration tests and
+ * the `doctor --hard-gates` probes — neither hardcodes an interpreter, so both
+ * reproduce the real invocation.
+ *
+ * Two registration shapes exist and both are honoured. Exec form puts the
+ * executable in `command` and its arguments in `args`, each passed through
+ * verbatim with no shell involved. Shell form is one `command` string handed to
+ * a shell. Reconstructing only one of them would silently skip every hook
+ * registered the other way, which is how a probe set ends up probing nothing.
  */
 
 export interface HookCommand {
-	/** The raw command string from settings.json. */
+	/** The command as written in settings.json, for reporting. */
 	raw: string;
-	/** First token of the command — e.g. "bash", "sh", "node". */
+	/** The executable — e.g. "node", "bash". */
 	interpreter: string;
 	/** Script path as written in settings.json (may contain `$CLAUDE_PROJECT_DIR`). */
 	scriptRef: string;
-	/** Basename of the script, for filtering/identification. */
+	/** Basename of the script, for filtering and identification. */
 	script: string;
+	/** Arguments after the script, as written — e.g. the event a dispatcher receives. */
+	extraArgs: string[];
 }
 
 export interface HookRunResult {
@@ -43,8 +51,6 @@ export interface RunConfiguredHookOptions {
 	toolName?: string;
 	toolInput?: HookToolInput;
 	extraEnv?: Record<string, string>;
-	/** Skip non-shell (e.g. node) commands. Default true — shell hooks are the runtime-mismatch surface. */
-	shellOnly?: boolean;
 	/** If set, only run the command whose script basename equals this value. */
 	only?: string;
 	/** Script basenames to skip (e.g. a slow bootstrap hook irrelevant to the probe). */
@@ -54,6 +60,7 @@ export interface RunConfiguredHookOptions {
 interface HookEntry {
 	type?: string;
 	command?: string;
+	args?: string[];
 }
 interface HookGroup {
 	matcher?: string;
@@ -63,11 +70,9 @@ interface SettingsShape {
 	hooks?: Record<string, HookGroup[]>;
 }
 
-const SHELL_INTERPRETERS = new Set(["sh", "bash", "dash", "zsh"]);
-
-// Per-hook subprocess ceiling. Hooks here shell out to real interpreters, and
-// several parse stdin JSON via `python3` — which can resolve to a slow launcher
-// (e.g. a pyenv shim) whose cold start balloons under load. A healthy hook runs
+// Per-hook subprocess ceiling. Hooks here run as real node subprocesses, and
+// some spawn git or the project's own build/test commands, whose cold start
+// balloons under load. A healthy hook runs
 // in ~1s, but the config that drives these (vitest.config.ts) already documents
 // that such subprocesses "legitimately take 6-30s" and sets testTimeout to 30000ms;
 // doctor --hard-gates tolerates the same. This ceiling was left at 15000ms and so
@@ -75,13 +80,37 @@ const SHELL_INTERPRETERS = new Set(["sh", "bash", "dash", "zsh"]);
 // with that documented 30s tolerance so only a truly hung hook is killed.
 const HOOK_TIMEOUT_MS = 30_000;
 
-/** First token + first double-quoted argument of a hook command string. */
-function parseCommand(raw: string): HookCommand | null {
-	const interpMatch = raw.match(/^(\S+)\s+"([^"]+)"/);
-	if (!interpMatch) return null;
-	const interpreter = interpMatch[1] ?? "";
-	const scriptRef = interpMatch[2] ?? "";
-	return { raw, interpreter, scriptRef, script: path.basename(scriptRef) };
+/**
+ * Reconstruct one registration. In exec form the first `args` element is the
+ * script and the rest are its arguments; in shell form the script is the first
+ * double-quoted token of the command string.
+ */
+function parseEntry(entry: HookEntry): HookCommand | null {
+	const command = entry.command ?? "";
+	if (!command) return null;
+
+	if (Array.isArray(entry.args)) {
+		const [scriptRef, ...extraArgs] = entry.args;
+		if (typeof scriptRef !== "string") return null;
+		return {
+			raw: `${command} ${entry.args.join(" ")}`,
+			interpreter: command,
+			scriptRef,
+			script: path.basename(scriptRef),
+			extraArgs,
+		};
+	}
+
+	const shellForm = command.match(/^(\S+)\s+"([^"]+)"/);
+	if (!shellForm) return null;
+	const scriptRef = shellForm[2] ?? "";
+	return {
+		raw: command,
+		interpreter: shellForm[1] ?? "",
+		scriptRef,
+		script: path.basename(scriptRef),
+		extraArgs: [],
+	};
 }
 
 /** Does a concrete tool name satisfy a group's matcher regex (e.g. "Edit|Write")? */
@@ -108,8 +137,7 @@ export function parseHookCommands(settings: SettingsShape, event: string, tool?:
 	for (const group of groups) {
 		if (!matcherMatches(group.matcher, tool)) continue;
 		for (const entry of group.hooks ?? []) {
-			if (typeof entry.command !== "string") continue;
-			const parsed = parseCommand(entry.command);
+			const parsed = parseEntry(entry);
 			if (parsed) out.push(parsed);
 		}
 	}
@@ -126,7 +154,6 @@ function expandScriptRef(scriptRef: string, projectDir: string): string {
  * per executed command (in settings order).
  */
 export function runConfiguredHook(settings: SettingsShape, opts: RunConfiguredHookOptions): HookRunResult[] {
-	const shellOnly = opts.shellOnly !== false;
 	const commands = parseHookCommands(settings, opts.event, opts.tool);
 
 	const input = JSON.stringify({
@@ -140,12 +167,12 @@ export function runConfiguredHook(settings: SettingsShape, opts: RunConfiguredHo
 
 	const results: HookRunResult[] = [];
 	for (const cmd of commands) {
-		if (shellOnly && !SHELL_INTERPRETERS.has(cmd.interpreter)) continue;
 		if (opts.only && cmd.script !== opts.only) continue;
 		if (opts.exclude?.includes(cmd.script)) continue;
 
 		const scriptPath = expandScriptRef(cmd.scriptRef, opts.projectDir);
-		const proc = spawnSync(cmd.interpreter, [scriptPath], {
+		const argv = [scriptPath, ...cmd.extraArgs.map((a) => expandScriptRef(a, opts.projectDir))];
+		const proc = spawnSync(cmd.interpreter, argv, {
 			cwd: opts.projectDir,
 			input,
 			encoding: "utf8",

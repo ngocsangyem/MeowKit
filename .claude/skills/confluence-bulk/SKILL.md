@@ -1,6 +1,6 @@
 ---
 name: mk:confluence-bulk
-description: 'Bulk Confluence operations on 10+ pages via the confluence-as wrapper: bulk-label / bulk-move / bulk-delete. Dry-run is MANDATORY first. Triggers: ''bulk update N pages'', ''mass label'', ''delete all pages matching CQL'', ''bulk-move pages to PARENT''. NOT for single-page ops (mk:confluence-page); NOT for comment/attachment ops (mk:confluence-collaborate).'
+description: 'mk:confluence leaf. 10+ pages at once - label, move, delete, dry-run first. NOT for mk:confluence-page.'
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - bulk-label
   - bulk-move
   - dry-run
-when_to_use: Use for any operation touching 10+ Confluence pages at once. Dry-run is MANDATORY first. NOT for single-page ops (use mk:confluence-page).
+when_to_use: 'A Confluence change sweeping ten or more pages in one pass.'
 user-invocable: true
 context: fork
 agent: confluence-bulk

@@ -34,11 +34,11 @@ give one verdict. Not a menu. Not a plan. One verdict, with its costs stated.
 
 ## Turn Mechanism — you are respawned every turn
 
-The harness has **no subagent pause/resume** (`.claude/rules/orchestration-rules.md`
+The harness has **no subagent pause/resume** (`.claude/skills/cook/references/orchestration-rules.md`
 → Rejected Patterns). You do not persist across turns. Each turn you are a fresh
 spawn, handed:
 
-1. `session-state/<advise-run>/transcript.json` — the checkpoint of every prior
+1. `.meowkit/state/<advise-run>/transcript.json` — the checkpoint of every prior
    question and answer
 2. The user's newest answer, relayed verbatim
 
@@ -98,7 +98,7 @@ gap the user steps into.
 
 You may write **only**:
 
-- `session-state/<advise-run>/…` — your transcript checkpoint
+- `.meowkit/state/<advise-run>/…` — your transcript checkpoint
 - `tasks/reports/advise-<YYMMDD-HHMM>-<slug>.md` — one canonical report, **and
   only when the user asked for the advice to be saved**
 
@@ -111,7 +111,7 @@ You must **never** write, and must refuse if instructed to:
 | `docs/knowledge/**` — knowledge docs                  | the documenter                    |
 | Source or test files                                  | the developer                     |
 | `tasks/reviews/**` — verdicts                         | `mk:review` + the human at Gate 2 |
-| `.meowkit/memory/**` — decisions and any curated store | the memory capture path           |
+| `.meowkit/memory/**` — team decisions and gotchas      | the write-set skills + `mk:memory` |
 
 These are not stylistic preferences. An advisory step that writes a plan has
 crossed Gate 1 without approval; one that writes a verdict has manufactured the

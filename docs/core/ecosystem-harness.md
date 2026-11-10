@@ -15,7 +15,7 @@ Describe how MeowKit’s ecosystem integrates Claude Code runtime artifacts (tra
 
 ### 1) Claude Code entry document
 
-- `CLAUDE.md` (repo root) is the canonical workflow description that shapes all agent behavior.
+- `.claude/rules/meowkit-core.md` (always-on) is the canonical workflow summary that shapes all agent behavior; `.claude/skills/workflow-orchestrator/workflow.yaml` is the machine-readable phase authority. The kit ships no root `CLAUDE.md`; a project may keep its own.
 
 Key characteristics:
 
@@ -26,7 +26,7 @@ Key characteristics:
 ### 2) Hook orchestration config
 
 - `.claude/settings.json` provides the hook registration + tool execution allowlist.
-- Hook wiring is driven by `.claude/hooks/` + handler dispatch (`.claude/hooks/dispatch.cjs`) and the hook input contract from `.claude/hooks/lib/read-hook-input.sh`.
+- Hook wiring is driven by `.claude/hooks/` + handler dispatch (`.claude/hooks/dispatch.cjs`) and the hook input contract from `.claude/hooks/lib/parse-stdin.cjs`.
 
 ### 3) Core rule set
 
@@ -86,7 +86,7 @@ Delegation prompts are expected to include:
 ### Doc validation & link enforcement
 
 - CI validates `.claude` → `docs/*` references via the allowlist contract.
-- The contract is defined in `.claude/rules/docs-reference-contract.md`.
+- The contract is defined in `docs/maintainer/docs-reference-contract.md`.
 - CI runs internal doc reference unit tests.
 - The allowlist covers target-project documentation, including UI specifications (`docs/ui-specs/`) and a supported recording output (`docs/how-to-login.webm`). Consumers must continue gracefully when an allowed target-project doc is absent.
 
@@ -106,7 +106,7 @@ Delegation prompts are expected to include:
 
 ## Contracts you can verify in CI
 
-- `.claude/scripts/check-docs-references.py` enforces the `.claude` → `docs/*` contract.
+- `npx mewkit validate` enforces the `.claude` → `docs/*` contract.
 
 ## How to extend the harness
 

@@ -29,7 +29,13 @@ npx mewkit init
 
 The CLI auto-detects your tech stack and asks configuration questions (project name, stack, team size, mode, memory, optional Gemini API key). Takes ~30 seconds.
 
-**What gets created:** A `.claude/` directory holding the agents, skills, lifecycle hooks, security rules, and memory system. Plus `CLAUDE.md` (the entry point Claude reads at session start).
+**What gets created:** A `.claude/` directory holding the agents, skills, lifecycle hooks and the 7 always-on rules, plus the `.meowkit/` store (config, team memory, telemetry). No root `CLAUDE.md` is installed — the always-on guidance is `.claude/rules/*.md`.
+
+Once releases carry the signed kit artifact it is verified before anything is written, and a failed
+check stops the install rather than falling back to an unverified source; no release carries it yet,
+so today's installs take the legacy zip path. Options worth knowing: pick the
+on-disk shape with `--target claude-code --delivery plugin`, install with no network from this
+project's `.meowkit/cache/` with `--offline`, and confirm what landed with `npx mewkit versions`.
 
 ### Step 2: Verify installation
 
@@ -45,12 +51,12 @@ Checks: Node.js version, Python available, Git configured, hooks executable, scr
 claude
 ```
 
-Claude reads `CLAUDE.md` automatically. The **orchestrator** agent activates and reads `memory/cost-log.json` for cost history. Topic files in `.meowkit/memory/` (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`) are loaded on-demand by consumer skills at task start — they are empty on first run.
+Claude Code auto-loads `.claude/rules/` automatically. The **orchestrator** agent activates and reads `.meowkit/telemetry/cost-log.json` for cost history. The team store `.meowkit/memory/` (`decisions.md`, `gotchas.md`) is grepped on demand by the read-set skills at task start. It is created when the first lesson is recorded.
 
 ### Step 4: Plan your first feature
 
 ```
-/mk:plan add user authentication with JWT
+/mk:plan-creator add user authentication with JWT
 ```
 
 Here's what happens behind the scenes:
@@ -85,10 +91,10 @@ This executes Phases 2-6 automatically:
 |-------|-------|-----------|-------------|
 | 0 | orchestrator | — | Reads memory, classifies complexity, assigns model tier |
 | 1 | planner | **Gate 1** | Creates plan, waits for human approval |
-| 2 | tester | `pre-implement.sh` (skill-invoked, TDD-mode only) | TDD mode: writes failing tests, blocks implementation. Default mode: optional/on-request. |
-| 3 | developer | `post-write.sh` | Implements code, security scan on every file write |
+| 2 | tester | `pre-implement.cjs` (skill-invoked, TDD-mode only) | TDD mode: writes failing tests, blocks implementation. Default mode: optional/on-request. |
+| 3 | developer | `post-write.cjs` | Implements code, security scan on every file write |
 | 4 | reviewer + security | **Gate 2** | 5-dimension audit + security audit, waits for approval |
-| 5 | shipper | `pre-ship.sh` | Test + lint + typecheck, then commit → PR |
+| 5 | shipper | `pre-ship.cjs` | Test + lint + typecheck, then commit → PR |
 | 6 | documenter + analyst | — | Update docs, capture patterns to memory |
 
 ## Next workflow

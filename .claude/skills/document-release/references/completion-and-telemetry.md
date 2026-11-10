@@ -33,8 +33,8 @@ Determine the outcome from the workflow result (success if completed normally, e
 if it failed, abort if the user interrupted).
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-`.meowkit/memory/` (user config directory, not project files). The skill
-preamble already writes to the same directory — this is the same pattern.
+`.meowkit/telemetry/` (not project files). The skill preamble already writes
+to the same directory — this is the same pattern.
 Skipping this command loses session duration and outcome data.
 
 Run this bash:
@@ -64,7 +64,7 @@ When you are in plan mode and about to call ExitPlanMode:
 3. If it does NOT — run this command:
 
 ```bash
-.claude/scripts/bin/workflow-review-log
+.claude/hooks/lib/workflow-review-log
 ```
 
 Then write a `## REVIEW REPORT` section to the end of the plan file:

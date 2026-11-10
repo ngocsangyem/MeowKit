@@ -3,7 +3,7 @@
 // revision (read from git refs directly, never a git binary), builds the pure Phase-1 envelope,
 // and prints it. Human output goes through the bounded, control-stripped renderer; --json emits
 // the full structured envelope for tooling. Read-only: it never writes task state, a pointer, or
-// a trace event, and it never scans plans or the wiki.
+// a trace event, and it never scans plans.
 import { existsSync } from "node:fs";
 import path from "node:path";
 import pc from "picocolors";

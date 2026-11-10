@@ -30,7 +30,7 @@ This skill is a **pure routing layer**. Its sole purpose: identify the right `mk
 
 ## Setup
 
-See `references/install-and-auth.md` for one-time setup (`.codex/scripts/bin/setup-workflow` installs `jira-as` into `.agents/skills/.venv`; populate `.codex/.env` with the 3 `MEOW_JIRA_*` vars).
+See `references/install-and-auth.md` for one-time setup (`.codex/scripts/bin/setup-workflow` installs `jira-as` into `.meowkit/envs/jira`; populate `.codex/.env` with the 3 `MEOW_JIRA_*` vars).
 
 ## Shared Resources (used by leaves)
 

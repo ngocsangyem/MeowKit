@@ -21,7 +21,7 @@ The planning engine. Creates a complete implementation plan before any code is w
 ## When to Use
 
 - **Gate 1 requirement:** any non-trivial task (>2 files or >30 min) REQUIRES an approved plan before code
-- **Explicit invocation:** `/mk:plan` or called by `mk:cook` / `mk:workflow-orchestrator`
+- **Explicit invocation:** `/mk:plan-creator` or called by `mk:cook` / `mk:workflow-orchestrator`
 - **NOT for:** trivial single-file changes, quick fixes with `--quick` flag, tasks that have an existing approved plan
 
 ## Core Capabilities
@@ -63,7 +63,7 @@ When two or more upstream artifacts already exist — `mk:office-hours` design d
 - **Activation:** ≥2 external artifact paths in the invocation → build the packet. 0–1 sources → skip entirely, no planning behavior change (only an activation-log line is written).
 - **Adapter, not generator:** only for artifacts that exist *before* plan-creator runs. Its own step-01 research and step-02 scout output are consumed directly by the draft step, never routed through the packet. One lone ticket is single-ticket triage — that is `mk:intake`, not a packet.
 - **Six blocks, under 120 lines:** Request · Routing · Requirements · Evidence · Scope Shape · Handoff. Every load-bearing claim carries `from: <path>` or an `[ASSUMPTION]` tag; user-confirmed upstream decisions are LOCKED (red-team may challenge but must escalate, never silently cut).
-- **Output:** drafted to `.claude/session-state/plan-creator-intake-packet.md`, then moved to `{plan_dir}/research/plan-intake-packet.md` and cited like any research report. Its path flows to steps 01–03 via the `intake_packet_path` variable (`none` when fewer than 2 artifacts).
+- **Output:** drafted to `.meowkit/state/plan-creator-intake-packet.md`, then moved to `{plan_dir}/research/plan-intake-packet.md` and cited like any research report. Its path flows to steps 01–03 via the `intake_packet_path` variable (`none` when fewer than 2 artifacts).
 - **NOT for:** single ticket/PRD triage (→ `mk:intake`), ticket complexity + dependency scoring (→ `mk:planning-engine`), or choosing an approach (→ `mk:brainstorming`). Route those; the packet only consolidates what those skills or you already produced.
 
 ## Arguments
@@ -86,7 +86,7 @@ When two or more upstream artifacts already exist — `mk:office-hours` design d
 
 ### Spike mode (Agile context)
 
-Governed by `.claude/rules-conditional/agile-feedback-cycle.md` Section 2 (loaded only when Agile context active).
+Governed by `.claude/skills/agent-detector/references/agile-feedback-cycle.md` Section 2 (loaded only when Agile context active).
 
 - Requires `--timebox <duration>` (e.g., `--timebox 2d`, `--timebox 4h`); rejected without it
 - Sets plan frontmatter `spike: true`, `timebox:`, `findings_doc:` (default `tasks/plans/{slug}/findings.md`)
@@ -111,7 +111,7 @@ If the plan frontmatter has non-empty `jira_tickets:`, `mk:plan-creator` runs th
 | 04 | Semantic checks | Validation report, two-approach selection (if applicable), Verification Roles dispatch (sub-step 4d — Light/Standard/Full tier by phase count) writes `## Verification Log` per phase file |
 | 05 | Red-team | 4-persona adversarial analysis, red-team-findings.md (7-field findings); Gate W1 Whole-Plan Consistency Sweep at exit |
 | 06 | Validation interview | 5-category questions with propagated answers; Gate W2 Whole-Plan Consistency Sweep at exit |
-| 07 | Gate 1 | Self-check (Completed/Skipped/Uncertain), AskUserQuestion, memory capture |
+| 07 | Gate 1 | Self-check (Completed/Skipped/Uncertain), AskUserQuestion; archive writes `decisions.md` |
 | 08 | Hydrate | TaskCreate with dependency chains, critical-step sub-tasks, `.plan-state.json` (v1.2) |
 | 09 | Post-plan handoff | Mode-pruned AskUserQuestion (cook / validate / red-team / autobuild / end), writes `handoff: { next, decided_at }` to plan.md frontmatter, prints command, STOPs |
 
@@ -122,12 +122,12 @@ If the plan frontmatter has non-empty `jira_tickets:`, `mk:plan-creator` runs th
 ## Usage
 
 ```bash
-/mk:plan "add two-factor authentication to login"
-/mk:plan --product-level "build a kanban board app"
-/mk:plan --bugfix "fix race condition in payment processing"
-/mk:plan --deep --two-approach "migrate from REST to GraphQL"
-/mk:plan --tdd "implement rate limiting middleware"
-/mk:plan --deep --tdd "refactor search indexing without changing ranking"
+/mk:plan-creator "add two-factor authentication to login"
+/mk:plan-creator --product-level "build a kanban board app"
+/mk:plan-creator --bugfix "fix race condition in payment processing"
+/mk:plan-creator --deep --two-approach "migrate from REST to GraphQL"
+/mk:plan-creator --tdd "implement rate limiting middleware"
+/mk:plan-creator --deep --tdd "refactor search indexing without changing ranking"
 ```
 
 ## Example Prompt

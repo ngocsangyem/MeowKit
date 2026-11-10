@@ -39,17 +39,19 @@ Files under these paths are ALWAYS skipped regardless of extension:
 
 ## Cache
 
-The hook hashes each file's content and stores the hash in `session-state/build-verify-cache.json`. If a file is edited and its hash is unchanged from the last build-verify run, the hook skips re-running the command (cached PASS).
+The hook hashes each file's content and stores the hash in `.meowkit/state/build-verify-cache.json`. If a file is edited and its hash is unchanged from the last build-verify run, the hook skips re-running the command (cached PASS).
 
-**Cache invalidation:** the cache is per-session. `session-state/` is cleared on new sessions. To force re-run, delete `session-state/build-verify-cache.json`.
+**Cache invalidation:** the cache is per-session. `.meowkit/state/` is cleared on new sessions. To force re-run, delete `.meowkit/state/build-verify-cache.json`.
 
-## Environment Variables
+## Settings
 
-| Var | Default | Purpose |
+All of it comes from the project config at `.meowkit/config.yaml`.
+
+| Key | Default | Purpose |
 |---|---|---|
-| `MEOWKIT_BUILD_VERIFY` | `on` | Set to `off` to skip the hook entirely |
-| `MEOWKIT_BUILD_VERIFY_TIMEOUT` | (per-language) | Override timeout in seconds |
-| `MEOWKIT_BUILD_VERIFY_DEBUG` | (unset) | Set to `1` for verbose stderr logging |
+| `hooks.build-verify` | `true` | Set to `false` to skip the hook entirely |
+| `buildVerify.timeoutMs` | (per-language) | Override the per-command timeout, in milliseconds |
+| `autobuild.mode` | (unset) | `MINIMAL` skips the hook |
 
 ## Output Format
 

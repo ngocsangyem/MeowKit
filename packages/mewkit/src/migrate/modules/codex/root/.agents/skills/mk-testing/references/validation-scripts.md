@@ -39,7 +39,7 @@ General validation script that checks code quality and correctness.
 
 **How to run:**
 ```bash
-.agents/skills/.venv/bin/python3 .codex/scripts/validate.py
+.meowkit/envs/testing/bin/python3 .codex/scripts/validate.py
 ```
 
 **Exit codes:**
@@ -60,7 +60,7 @@ Security-focused validation. See `review/security-checklist.md` for the full lis
 
 **How to run:**
 ```bash
-.agents/skills/.venv/bin/python3 .codex/scripts/security-scan.py
+.meowkit/envs/testing/bin/python3 .codex/scripts/security-scan.py
 ```
 
 **Exit codes:**

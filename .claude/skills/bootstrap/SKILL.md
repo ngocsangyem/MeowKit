@@ -1,13 +1,7 @@
 ---
 name: mk:bootstrap
 version: 2.1.0
-description: |
-  Use when creating a new project from scratch — orchestrates the full journey
-  from idea to running code. Research → design → plan → scaffold → implement → docs.
-  Explicit invocation only — never auto-activates.
-  CLI = project infrastructure (.claude/), bootstrap = application code + full pipeline.
-  NOT for autonomous multi-hour builds of specified products (see mk:autobuild);
-  NOT for single-task feature work on existing projects (see mk:cook).
+description: Scaffold a brand-new project from idea to running code — research, design, plan, scaffold, implement, docs. NOT for mk:autobuild.
 allowed-tools:
   - Bash
   - Read
@@ -24,7 +18,7 @@ keywords:
   - new-project
   - initial-scaffolding
   - greenfield-init
-when_to_use: Use when scaffolding a brand-new project from scratch. NOT for autonomous green-field product builds (see mk:autobuild) or single-task implementation (see mk:cook).
+when_to_use: An empty directory or fresh repo needs its first application code.
 user-invocable: true
 owner: lifecycle
 criticality: medium

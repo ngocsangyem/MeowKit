@@ -8,11 +8,27 @@ import { dirname, join } from "node:path";
 
 export const PACK_MANIFEST_FILENAME = "pack-manifest.json";
 
-/** Always-installed essentials: non-artifact files, safety rules, core commands. */
+/** Always-installed essentials: non-artifact files, safety rules, essential globs. */
 export interface PackBase {
 	files: string[];
 	globs: string[];
-	commands: string[];
+	/**
+	 * Paths the published kit must never carry, as glob patterns relative to the
+	 * repository root. `*` crosses `/`, matching the archive matcher the zip build
+	 * already used, so one pattern set means the same thing to both consumers.
+	 *
+	 * Every release archive reads this field and no consumer keeps its own copy.
+	 * Two lists drift: a pattern added to one and not the other publishes run
+	 * output, local state or a `.env` in whichever archive was forgotten, and the
+	 * forgetting is invisible because each list looks complete on its own.
+	 *
+	 * Empty when the manifest describes an INSTALLED project rather than the
+	 * source tree a release is built from: an install has nothing to publish. The
+	 * archive builders refuse outright when the field is missing, so a release
+	 * cannot be cut from a tree that has no ship set, which is the case the
+	 * field exists for.
+	 */
+	exclude: string[];
 }
 
 /** A pack derives membership from `owners` plus per-artifact add/exclude overrides. */
@@ -84,8 +100,8 @@ function validateManifest(parsed: unknown): PackManifest {
 	}
 	const m = parsed as Record<string, unknown>;
 	const base = m.base as Record<string, unknown> | undefined;
-	if (!base || !Array.isArray(base.files) || !Array.isArray(base.globs) || !Array.isArray(base.commands)) {
-		throw new PackManifestError("manifest.base must have array fields files/globs/commands");
+	if (!base || !Array.isArray(base.files) || !Array.isArray(base.globs)) {
+		throw new PackManifestError("manifest.base must have array fields files/globs");
 	}
 	if (typeof m.packs !== "object" || m.packs === null) {
 		throw new PackManifestError("manifest.packs must be an object");
@@ -104,7 +120,7 @@ function validateManifest(parsed: unknown): PackManifest {
 		base: {
 			files: (base.files as unknown[]).map(String),
 			globs: (base.globs as unknown[]).map(String),
-			commands: (base.commands as unknown[]).map(String),
+			exclude: Array.isArray(base.exclude) ? (base.exclude as unknown[]).map(String) : [],
 		},
 		packs: m.packs as Record<string, PackDef>,
 		profiles: m.profiles as Record<string, string[]>,

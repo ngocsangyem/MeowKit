@@ -1,8 +1,14 @@
 import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { tmpdir } from "node:os";
-import AdmZip from "adm-zip";
 import * as log from "./core-logger.js";
+import { localReleaseDir, localReleaseVersion, materializeLocalRelease } from "./local-release-source.js";
+import { extractReleaseZip } from "../kit/extract-release-zip.js";
+import { kitArtifactAssets } from "../kit/select-release-assets.js";
+import type { KitArtifactAssets } from "../kit/select-release-assets.js";
+import { fetchKitArtifact } from "../kit/fetch-kit-artifact.js";
+import { installFromArtifact } from "../kit/resolve-kit-content.js";
 
 /** GitHub repository for MeowKit releases */
 const GITHUB_OWNER = "ngocsangyem";
@@ -25,8 +31,18 @@ export interface ReleaseInfo {
 	tag: string;
 	version: string;
 	isBeta: boolean;
+	/** The legacy zip asset, or "" when the release carries none. */
 	downloadUrl: string;
 	publishedAt: string;
+	/**
+	 * The verified-artifact assets, when the release carries them. A release that
+	 * carries them is installed from them; the zip is taken ONLY when a release
+	 * carries no artifact at all, which is how older releases keep installing.
+	 * An artifact that is present but fails a check is a refusal, never a
+	 * fallback to the zip — a fallback would mean a tampered artifact silently
+	 * downgrades the user to the unverified path the artifact exists to replace.
+	 */
+	kitArtifact: KitArtifactAssets | null;
 }
 
 /**
@@ -34,6 +50,25 @@ export interface ReleaseInfo {
  * Returns stable and beta releases, sorted by newest first.
  */
 export async function fetchReleases(): Promise<ReleaseInfo[]> {
+	const local = localReleaseDir();
+	if (local !== null) {
+		const version = localReleaseVersion(local);
+		return [
+			{
+				tag: `v${version}`,
+				version,
+				isBeta: version.includes("-beta") || version.includes("-rc"),
+				downloadUrl: pathToFileURL(local).href,
+				publishedAt: new Date(0).toISOString(),
+				// A local release directory is already-extracted content, so there
+				// is no archive to verify and no signature to check. It is a
+				// distinct origin, recorded as such, rather than one that claims to
+				// have been verified.
+				kitArtifact: null,
+			},
+		];
+	}
+
 	const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases`;
 	const response = await fetch(url, {
 		headers: {
@@ -59,9 +94,13 @@ export async function fetchReleases(): Promise<ReleaseInfo[]> {
 				isBeta: r.prerelease,
 				downloadUrl: zipAsset?.browser_download_url ?? "",
 				publishedAt: r.published_at,
+				kitArtifact: kitArtifactAssets(r.assets),
 			};
 		})
-		.filter((r) => r.downloadUrl !== "");
+		// A release is installable when it carries EITHER source. Requiring a zip
+		// would hide a release published with an artifact only, and requiring an
+		// artifact would stop every older release from installing.
+		.filter((r) => r.downloadUrl !== "" || r.kitArtifact !== null);
 }
 
 /**
@@ -84,7 +123,22 @@ export async function getLatestBeta(): Promise<ReleaseInfo | null> {
  * Download a release zip and extract to a temp directory.
  * Returns the path to the extracted directory.
  */
-export async function downloadRelease(release: ReleaseInfo): Promise<string> {
+export async function downloadRelease(release: ReleaseInfo, projectRoot: string = process.cwd()): Promise<string> {
+	const local = localReleaseDir();
+	if (local !== null) return materializeLocalRelease(local, release.version);
+
+	// A release that carries the verified artifact is installed from it. The zip
+	// below is taken ONLY when a release carries no artifact at all, which is how
+	// older releases keep installing. An artifact that is present and fails a
+	// check raises out of here and the install stops: falling through to the zip
+	// would mean a tampered artifact silently downgrades the user to the
+	// unverified path the artifact exists to replace.
+	if (release.kitArtifact !== null) {
+		const bytes = await fetchKitArtifact(release.kitArtifact);
+		const installed = await installFromArtifact(projectRoot, release.version, bytes, "verified-artifact");
+		return installed.sourceDir;
+	}
+
 	const tempDir = join(tmpdir(), `meowkit-release-${release.version}-${Date.now()}`);
 	mkdirSync(tempDir, { recursive: true });
 
@@ -107,12 +161,10 @@ export async function downloadRelease(release: ReleaseInfo): Promise<string> {
 
 	log.debug(`Downloaded ${buffer.length} bytes to ${zipPath}`);
 
-	// Extract the zip — pure JS, works identically on macOS, Linux, Windows.
-	// (Previous `unzip` shell call failed on Windows which has no unzip by default.)
+	// Extraction is path-guarded, in the module that owns that guard.
 	const extractDir = join(tempDir, "extracted");
 	mkdirSync(extractDir, { recursive: true });
-	const zip = new AdmZip(zipPath);
-	zip.extractAllTo(extractDir, /* overwrite */ true);
+	await extractReleaseZip(zipPath, extractDir);
 
 	log.debug(`Extracted to ${extractDir}`);
 

@@ -56,7 +56,21 @@ that dispatches to a leaf agent, which then tries to spawn another agent, will f
 
 `.meowkit/` is this project's provider-neutral state root, shared across every
 authored bundle installed here (Codex, Cursor, ...) — see `.meowkit/README.md`.
-Project memory lives at `.meowkit/memory/`, never in a platform-native memory feature
-and never in another tool's own memory directory. `.meowkit/state/` holds reconcile
-ledgers — read-only from an agent's perspective; the installer/reconciler owns writes
-there.
+Project memory is two committed files, `.meowkit/memory/decisions.md` and
+`.meowkit/memory/gotchas.md` — never a platform-native memory feature and never another
+tool's own memory directory. Append non-derivable lessons only, by piping one entry to
+`npx mewkit note <decisions|gotchas>`, never a bare file edit. `.meowkit/state/` holds
+reconcile ledgers and short-lived session markers (`state/sessions/`) — ledgers are
+read-only from an agent's perspective; the installer/reconciler owns writes there.
+
+## Gates, security and compaction
+
+- **Gate 1 (plan):** an approved plan exists before any source edit. **Gate 2 (review):**
+  a passing review verdict (no FAIL dimension, no security BLOCK, WARNs acknowledged)
+  before shipping. No automation self-approves either; verdicts are evidence a human reads.
+- Blocked write patterns (hardcoded secrets, string-built SQL, tokens in browser storage,
+  ...) and the security review checklist: `.cursor/rules/domain-security.mdc`.
+- When the session is compacted or summarized, ALWAYS preserve verbatim: the data and
+  injection boundary (including the Rule of Two), the subagent status protocol, and the
+  names of the always-on safety baselines — security, injection, gates, core behaviors,
+  development.

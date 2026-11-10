@@ -18,7 +18,7 @@ interface AgentPackCatalog {
 }
 
 describe("cursor full-surface characterization: manifest inventory", () => {
-	it("declares exactly the 7 top-level managed surfaces, all active", () => {
+	it("declares exactly the 8 top-level managed surfaces, all active", () => {
 		const manifest = loadCursorBundleManifest(moduleDir);
 		expect(manifest.provider).toBe("cursor");
 		const targetPaths = manifest.entries.map((e) => e.targetPath).sort();
@@ -31,6 +31,7 @@ describe("cursor full-surface characterization: manifest inventory", () => {
 				".cursor/skills",
 				".cursor/hooks.json",
 				".cursor/hooks",
+				".cursor/scripts/skill-python.cjs",
 			].sort(),
 		);
 		expect(manifest.entries.every((e) => e.active)).toBe(true);
@@ -39,20 +40,20 @@ describe("cursor full-surface characterization: manifest inventory", () => {
 });
 
 describe("cursor full-surface characterization: skill catalog inventory", () => {
-	it("resolves exactly 128 skills across all packs, matching the on-disk skill dir count", () => {
+	it("resolves exactly 125 skills across all packs, matching the on-disk skill dir count", () => {
 		const catalog = loadSkillPackCatalog(moduleDir);
 		expect(catalog).not.toBeNull();
 		const { skills } = resolvePackSelection(catalog!, "all");
-		expect(skills.length).toBe(128);
+		expect(skills.length).toBe(125);
 
 		const onDisk = readdirSync(join(rootDir, ".cursor", "skills"), { withFileTypes: true }).filter((d) =>
 			d.isDirectory(),
 		);
-		expect(onDisk.length).toBe(128);
+		expect(onDisk.length).toBe(125);
 		expect([...skills].sort()).toEqual(onDisk.map((d) => d.name).sort());
 	});
 
-	it("the core pack (default install) is a strict 24-skill subset of the full 128", () => {
+	it("the core pack (default install) is a strict 24-skill subset of the full 125", () => {
 		const catalog = loadSkillPackCatalog(moduleDir);
 		const { skills: core } = resolvePackSelection(catalog!, []); // [] = catalog default (core)
 		const { skills: all } = resolvePackSelection(catalog!, "all");
@@ -124,7 +125,6 @@ describe("cursor full-surface characterization: rules + hooks inventory", () => 
 				"afterShellExecution",
 				"afterMCPExecution",
 				"preCompact",
-				"beforeSubmitPrompt",
 				"subagentStart",
 				"subagentStop",
 				"stop",

@@ -25,12 +25,12 @@ Config files to look for: `pyproject.toml`, `setup.cfg`, `.ruff.toml`
 
 ## Shared Validation Scripts
 
-Located at `.claude/scripts/` — project-level scripts for deterministic validation.
+Located at `.claude/skills/lint-and-validate/scripts/` — this skill's own scripts for deterministic validation.
 
 | Script             | Purpose                   | Command                                       |
 | ------------------ | ------------------------- | --------------------------------------------- |
-| `validate.py`      | General code validation   | `.claude/skills/.venv/bin/python3 .claude/scripts/validate.py`          |
-| `security-scan.py` | Security pattern scanning | `.claude/skills/.venv/bin/python3 .claude/scripts/security-scan.py`     |
+| `validate.py`      | General code validation   | `node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/validate.py`          |
+| `security-scan.py` | Security pattern scanning | `node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/security-scan.py`     |
 
 Run these in addition to ecosystem linters — they check kit-wide patterns.
 
@@ -40,7 +40,7 @@ Run these in addition to ecosystem linters — they check kit-wide patterns.
 Write/Edit code
   → npm run lint && npx tsc --noEmit   (Node.js/TS)
   → ruff check . --fix && mypy .       (Python)
-  → .claude/skills/.venv/bin/python3 .claude/scripts/validate.py (all)
+  → node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/validate.py (all)
   → Fix errors → repeat until clean
 ```
 
@@ -53,4 +53,4 @@ No code is done until all three steps pass with zero errors.
 | Lint fails          | Fix style/syntax immediately                    |
 | tsc fails           | Correct type mismatches before continuing       |
 | No tool configured  | Check for `.eslintrc`, `tsconfig.json`, `pyproject.toml` — suggest creating one |
-| Script not found    | Check `.claude/scripts/` — scripts may not be present in all projects |
+| Script not found    | Check `.claude/skills/lint-and-validate/scripts/` — scripts may not be present in all projects |

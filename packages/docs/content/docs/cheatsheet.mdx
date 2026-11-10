@@ -7,34 +7,34 @@ description: "Dense quick reference for all MeowKit commands, agents, skills, an
 
 | Command | Phase | What it does |
 |---------|-------|-------------|
-| `/mk:meow [task]` | 0 | Entry point — classifies and routes to right agent |
+| `/mk:agent-detector [task]` | 0 | Entry point — classifies and routes to right agent |
 | `/mk:breakdown <source>` | pre-1 | Spec/PRD → user stories + optional Jira tickets + tech breakdown — stops before plan |
-| `/mk:plan [feature]` | 1 | Premise challenge + two-lens plan + Gate 1 |
+| `/mk:plan-creator [feature]` | 1 | Premise challenge + two-lens plan + Gate 1 |
 | `/mk:cook [feature]` | 1→5 | Full pipeline: plan → test → build → review → ship |
 | `/mk:fix [bug]` | varies | Auto-detect complexity, route to fix strategy |
 | `/mk:review` | 4 | Multi-pass code review + adversarial analysis |
 | `/mk:ship` | 5 | Pre-ship → commit → PR → CI verify → rollback doc |
-| `/mk:test` | 2 | TDD enforcement — write or run tests |
-| `/mk:audit` | 4 | Full security scan across all platforms |
-| `/mk:validate` | any | Run deterministic Python validation scripts |
+| `/mk:testing` | 2 | TDD enforcement — write or run tests |
+| `/mk:cso` | 4 | Full security scan across all platforms |
+| `/mk:lint-and-validate` | any | Run deterministic Python validation scripts |
 | `/mk:arch [action]` | 1 | Generate, list, or analyze ADRs |
-| `/mk:design [system]` | 1 | System design consultation (docs only) |
+| `/mk:improve-codebase-architecture [system]` | 1 | System design consultation (docs only) |
 | `/mk:docs-init` | 6 | Initial codebase scan → doc skeleton |
-| `/mk:docs-sync` | 6 | Diff-aware doc updates after feature work |
-| `/mk:canary` | 5 | Staged deployment with monitoring |
+| `/mk:document-release` | 6 | Diff-aware doc updates after feature work |
+| `/mk:ship` | 5 | Staged deployment with monitoring |
 | `/mk:retro` | 6 | Sprint retrospective with trend tracking |
-| `/mk:budget` | any | Token cost tracking report |
+| `mewkit budget` | any | Token cost tracking report |
 | `/mk:party [topic]` | 1 | Multi-agent deliberation — 2-4 agents debate, forced synthesis |
-| `/mk:spawn [agent]` | any | Launch parallel agent session |
+| `/mk:team-config [agent]` | any | Launch parallel agent session |
 | `/mk:status` | any | Delivery status report via project-manager |
-| `/mk:upgrade` | any | Self-update MeowKit |
+| `mewkit upgrade` | any | Self-update MeowKit |
 | `/mk:help` | any | Scan project state, recommend next pipeline step |
 | `/mk:autobuild "build a X"` | 0→5 | Autonomous green-field build with generator/evaluator loop |
 | `/mk:evaluate` | 4 | Behavioral rubric grading with active verification |
 | `/mk:sprint-contract` | 3 | Draft contract before harness sprint |
 | `/mk:rubric` | 4 | Load/compose rubric preset |
 | `/mk:trace-analyze` | any | Scatter-gather analysis of trace log |
-| `/mk:benchmark` | any | Canary suite (quick tier default; `--full` for 6-task tier) |
+| `/mk:benchmark` | any | Canary suite (quick tier default; `--full` for 6-task tier) — maintainer-only, not in an installed kit |
 
 ## Agents Quick Reference
 
@@ -98,14 +98,14 @@ description: "Dense quick reference for all MeowKit commands, agents, skills, an
 
 | Hook | Type | What it does | Blocks? |
 |------|------|-------------|---------|
-| post-write.sh | PostToolUse | Security scan on Edit/Write | Yes |
-| post-session.sh | Stop | Capture session to memory | No |
-| pre-task-check.sh | Skill-invoked | Injection pattern detection | Yes |
-| pre-implement.sh | Skill-invoked | TDD gate — opt-in via `--tdd` / `MEOWKIT_TDD=1`; no-op otherwise | Only when TDD enabled |
-| pre-ship.sh | Skill-invoked | Test + lint + typecheck | Yes |
-| privacy-block.sh | PreToolUse | Block .env / *.key / credential reads | Yes |
-| gate-enforcement.sh | PreToolUse | Block source writes before Gate 1 approval | Yes |
-| project-context-loader.sh | SessionStart | Auto-load project-context.md into context | No |
+| post-write.cjs | PostToolUse | Security scan on Edit/Write | Yes |
+| post-session.cjs | Stop | Capture session to memory | No |
+| pre-task-check.cjs | Skill-invoked | Injection pattern detection | Yes |
+| pre-implement.cjs | Skill-invoked | TDD gate — opt-in via `--tdd` / `MEOWKIT_TDD=1`; no-op otherwise | Only when TDD enabled |
+| pre-ship.cjs | Skill-invoked | Test + lint + typecheck | Yes |
+| privacy-block.cjs | PreToolUse | Block .env / *.key / credential reads | Yes |
+| gate-enforcement.cjs | PreToolUse | Block source writes before Gate 1 approval | Yes |
+| project-context-loader.cjs | SessionStart | Auto-load project-context.md into context | No |
 
 ## Key Skills
 
@@ -129,7 +129,7 @@ description: "Dense quick reference for all MeowKit commands, agents, skills, an
 | mk:sprint-contract | Harness FULL density | Acceptance criteria contract before sprint |
 | mk:rubric | Evaluator setup | Load/compose rubric preset |
 | mk:trace-analyze | Trace log available | Root cause analysis across trace spans |
-| mk:benchmark | Canary testing | Quick or full canary suite with scored output |
+| mk:benchmark | Canary testing (maintainer-only) | Quick or full canary suite with scored output |
 
 ## Planning (Phase 1)
 
@@ -144,7 +144,7 @@ All three review skills stop after printing — you control when to run `/mk:coo
 
 | Command | What it does |
 |---------|-------------|
-| `/mk:plan "feature"` | Create plan via mk:plan-creator |
+| `/mk:plan-creator "feature"` | Create plan via mk:plan-creator |
 | `npx mewkit task new --type feature "desc"` | Create task from template |
 | `npx mewkit task list` | List active tasks |
 
@@ -164,50 +164,57 @@ All three review skills stop after printing — you control when to run `/mk:coo
 ### Non-trivial rule
 Create a task file for any change affecting > 2 files OR > 30 minutes.
 
-## Harness Env Vars
+## Settings
 
-Source of truth: `.meowkit/.env.example`. Most defaults live in `.claude/settings.json` `env` block (team-shared, git-committed); override here per-project / per-user. Uncommented values in `.meowkit/.env` win over `settings.json`; shell exports win over both.
+Behavior settings live in one committed, schema-validated file: `.meowkit/config.yaml`.
+The environment carries credentials, host values and per-invocation handoffs only.
+Source of truth for the file's key surface: `packages/mewkit/schemas/config-v1.json`.
 
 ### Density + budget
 
-| Variable | Values | Effect |
-|----------|--------|--------|
-| `MEOWKIT_AUTOBUILD_MODE` | `MINIMAL` \| `FULL` \| `LEAN` | Override auto-detected scaffolding density |
-| `MEOWKIT_MODEL_HINT` | e.g. `opus-4-6` | Tell harness which model is running (enables LEAN auto-detect) |
-| `MEOWKIT_BUDGET_WARN` | e.g. `30` | USD warn threshold (prints warning, continues) |
-| `MEOWKIT_BUDGET_BLOCK` | e.g. `100` | USD hard-block threshold (halts the run, sets `final_status=TIMED_OUT`) |
-| `MEOWKIT_BUDGET_CAP` | e.g. `50` | User-set cap; overrides `BUDGET_BLOCK` (can be lower OR higher) |
+| Key | Values | Effect |
+|-----|--------|--------|
+| `autobuild.mode` | `MINIMAL` \| `FULL` \| `LEAN` | Override auto-detected scaffolding density. Never bypasses a gate |
+| `budget.warn` | e.g. `30` | USD warn threshold (prints warning, continues) |
+| `budget.block` | e.g. `100` | USD hard-block threshold (halts the run, sets `final_status=TIMED_OUT`) |
+| `budget.cap` | e.g. `50` | User-set cap; overrides `budget.block` (can be lower OR higher) |
 
 ### Core runtime
 
-| Variable | Values | Effect |
-|----------|--------|--------|
-| `MEOWKIT_TDD` | `0` \| `1` | `1` = strict red-green-refactor (`pre-implement.sh` enforces failing-test-first); `0` = optional (default) |
-| `MEOWKIT_HOOK_PROFILE` | `standard` \| `fast` \| `strict` | Hook profile selector. Legacy alias `MEOW_HOOK_PROFILE` still accepted; new name wins if both set |
-
-### Memory loader
-
-| Variable | Values | Effect |
-|----------|--------|--------|
-| `MEOWKIT_MEMORY_BUDGET` | chars (default `4000`, ~1K tokens) | Max on-demand memory context selected per prompt |
-| `MEOWKIT_MEMORY_STALENESS_MONTHS` | months (default `6`) | Skip memory entries older than N months |
+| Key | Values | Effect |
+|-----|--------|--------|
+| `tdd` | `true` \| `false` | `true` = strict red-green-refactor (`pre-implement.cjs` enforces failing-test-first); default `false`. `MEOWKIT_TDD=1` in the environment is a supported override and wins over the file |
+| `buildVerify.timeoutMs` | milliseconds | Per-command timeout for the build-verify hook |
+| `projectContext.maxBytes` | bytes (default `12288`) | `project-context.md` size warn threshold; `0` disables |
+| `workflow.telemetry` | `on` \| `off` | Workflow telemetry preference |
+| `workflow.proactive` | `on` \| `off` | Proactive workflow suggestions |
 
 ### Hook controls
 
-Set to `off` to disable an individual hook; default `on`.
+`hooks.<name>: false` disables one observer; the default is `true`. `<name>` is the
+observer's own file base name — `build-verify`, `loop-detection`,
+`pre-completion-check`, `tdd-flag-detector`, `learning-observer`, `budget-tracker`
+and the rest of the 21 in `.claude/hooks/handlers.json`.
 
-| Variable | Effect |
-|----------|--------|
-| `MEOWKIT_BUILD_VERIFY` | Phase 4 build / lint / typecheck verification hook |
-| `MEOWKIT_LOOP_DETECT` | Loop / regression detection hook |
-| `MEOWKIT_PRECOMPLETION` | Pre-completion guard hook |
-| `MEOWKIT_TDD_FLAG_DETECTOR` | Detects `--tdd` flag and toggles strict mode |
-| `MEOWKIT_PM_AUTO` | `off` disables silent `project-manager` post-phase fires; `/mk:status` still works |
+Safety hooks cannot be disabled from any config: `gate-enforcement`, `privacy-block`,
+`pre-ship`, `gate2-check`, `check-careful`, `check-freeze` and `check-report-path` are
+rejected with a validation error, and the hook keeps blocking.
+
+### Environment
+
+| Variable | Values | Effect |
+|----------|--------|--------|
+| `MEOWKIT_TDD` | `0` \| `1` | Supported override of `tdd`, at the top of the precedence chain |
+| `MEOWKIT_HOOK_PROFILE` | `standard` \| `fast` \| `strict` | Hook profile selector, read by `pre-ship.cjs`. Legacy alias `MEOW_HOOK_PROFILE` still accepted; new name wins if both set. No config key — a safety entrypoint reads it, and those read no config file |
+| `MEOWKIT_MODEL_HINT` | e.g. `opus-4-6` | Tell the harness which model is running (enables LEAN auto-detect) |
+| `MEOWKIT_GATE1_PRESENCE_ONLY` | `1` | Downgrades Gate 1 to a plan-presence check. Every use is logged |
 
 ### Precedence reminder
 
 ```
-shell export  >  .meowkit/.env  >  .claude/settings.json "env" block
+MEOWKIT_TDD  >  CLI flag / session sentinel  >  .meowkit/config.yaml  >  ~/.meowkit/config.yaml  >  default
 ```
 
-Unquoted values strip inline comments after `#`. Quote values that contain a literal `#` (e.g. API keys): `VAR="abc#123"`.
+A malformed `config.yaml` applies no keys at all: observers fall back to their own
+defaults and keep running, safety hooks keep blocking, and `mewkit doctor` reports the
+file and the line.

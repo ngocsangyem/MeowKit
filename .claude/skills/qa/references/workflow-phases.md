@@ -250,7 +250,7 @@ The test MUST:
   ```
   // Regression: ISSUE-NNN — {what broke}
   // Found by /mk:qa on {YYYY-MM-DD}
-  // Report: .meowkit/memory/qa-reports/qa-report-{domain}-{date}.md
+  // Report: tasks/reports/qa/qa-report-{domain}-{date}.md
   ```
 
 Test type decision:
@@ -310,13 +310,13 @@ After all fixes are applied:
 
 Write the report to both local and project-scoped locations:
 
-**Local:** `.meowkit/memory/qa-reports/qa-report-{domain}-{YYYY-MM-DD}.md`
+**Local:** `tasks/reports/qa/qa-report-{domain}-{YYYY-MM-DD}.md`
 
 **Project-scoped:** Write test outcome artifact for cross-session context:
 ```bash
-eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/memory/projects
+eval "$(.claude/hooks/lib/workflow-slug 2>/dev/null)" && mkdir -p ".meowkit/telemetry/$SLUG"
 ```
-Write to `.meowkit/memory/projects/{slug}/{user}-{branch}-test-outcome-{datetime}.md`
+Write to `.meowkit/telemetry/{slug}/{user}-{branch}-test-outcome-{datetime}.md`
 
 **Per-issue additions** (beyond standard report template):
 - Fix Status: verified / best-effort / reverted / deferred

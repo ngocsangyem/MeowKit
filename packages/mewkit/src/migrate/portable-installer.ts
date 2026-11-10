@@ -224,9 +224,9 @@ function withMergeTitle(provider: ProviderType, preamble: string): string {
 
 /**
  * Priority ranking for merged instruction sections. The rank list mirrors the kit's own
- * always-on safety/baseline rule set (security-rules, injection-rules, gate-rules,
- * core-behaviors, development-rules — the same set the compaction policy preserves verbatim),
- * with the config constitution pinned first. Sections not on the list keep their existing
+ * always-on rule set (meowkit-core, security-rules, injection-rules, gate-rules,
+ * core-behaviors, development-rules, agent-conduct — the files the host auto-loads every
+ * session), with a discovered config constitution pinned first. Sections not on the list keep their existing
  * relative order after the ranked ones (stable sort).
  *
  * Codex-scoped: only Codex reorders, because Codex truncates the COMBINED instruction chain
@@ -236,11 +236,13 @@ function withMergeTitle(provider: ProviderType, preamble: string): string {
  */
 const CODEX_SECTION_PRIORITY: readonly string[] = [
 	"config",
+	"meowkit-core",
 	"security-rules",
 	"injection-rules",
 	"gate-rules",
 	"core-behaviors",
 	"development-rules",
+	"agent-conduct",
 ];
 
 interface RankableSection {

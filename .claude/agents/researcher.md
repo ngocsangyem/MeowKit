@@ -47,7 +47,6 @@ Load before starting research:
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - The specific research question or technology to evaluate
 - Current project stack (from the project instruction file or package metadata)
-- `.meowkit/memory/review-patterns.json` (canonical) first, fall back to `review-patterns.md` if absent; and `.meowkit/memory/architecture-decisions.json` (canonical) first, fall back to `architecture-decisions.md` if absent — prior research findings to avoid re-researching (see `.claude/rules/memory-read-rules.md`)
 
 ## What You Do NOT Do
 
@@ -114,5 +113,5 @@ When research requires fetching an arbitrary external URL not covered by `mk:doc
   (SSRF guard, injection scanner, DATA boundary, secret scrub). The flag is a conscious
   trust-boundary crossing — the caller acknowledges the target URL may contain prompt
   injection and that the skill's defenses are best-effort.
-- Delegation example: `.claude/skills/.venv/bin/python3 .claude/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller researcher`
+- Delegation example: `node .claude/hooks/lib/skill-python.cjs .claude/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller researcher`
 - Prefer `mk:docs-finder --wtm-approve <url>` for documentation URLs — it adds tier routing on top of the same fetch.

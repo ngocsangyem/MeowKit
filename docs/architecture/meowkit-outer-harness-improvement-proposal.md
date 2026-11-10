@@ -1,6 +1,9 @@
 # MeowKit outer-harness improvement proposal
 
 **Status:** design proposal; no runtime change in this document  
+**Superseded in part:** the wiki subsystem this proposal audits was removed in v3. Every wiki
+observation and recommendation below is historical; project knowledge now lives in the two
+committed files described in `docs/core/memory-system.md`.  
 **Audited:** 2026-07-19  
 **Scope:** MeowKit source at `bf9924e` and the installed MeowKit footprint in `/Users/sangnguyen/Documents/Aspire/`  
 **Decision:** connect existing MeowKit state, knowledge, evidence, and provider surfaces. Do not merge in the durable stores of `repository-harness` or `pro-workflow`.
@@ -91,10 +94,10 @@ flowchart LR
 | Plane | Canonical data | Derived/cache data | Rule |
 | --- | --- | --- | --- |
 | Work / authority | `tasks/active/<id>.json`, plans, reviews, contracts, evidence artifacts | display summaries only | The active record owns current step, next action, blockers, and task status |
-| Knowledge / context | approved `tasks/wikis/*/pages/*.md` | `wiki-index.db` FTS | Wiki is bounded context, never completion proof |
+| Knowledge / context | `.meowkit/memory/{decisions,gotchas}.md` | none (grep, no index) | Memory is bounded context, never completion proof |
 | Evidence / observation | append-only trace log plus referenced proof artifacts | query/index views and checkpoint | Every transition refers to a task id and relevant proof paths |
 
-There must be one authoritative store per responsibility. In particular, do **not** add a `harness.db` beside task JSON and do **not** add another wiki database beside MeowKit's canonical files and derived FTS index.
+There must be one authoritative store per responsibility. In particular, do **not** add a `harness.db` beside task JSON and do **not** add a knowledge index beside the two committed memory files.
 
 ## Proposed lifecycle
 
@@ -186,7 +189,7 @@ The first implementation is successful only when all of the following are demons
 
 - Task scaffold: `packages/mewkit/src/commands/task.ts`
 - Durable state and resume: `packages/mewkit/src/core/task-record.ts`, `packages/mewkit/src/commands/task-state.ts`
-- Installed task-state emission rule: `/Users/sangnguyen/Documents/Aspire/.claude/rules/task-state-emission.md`
+- Installed task-state emission rule: `/Users/sangnguyen/Documents/Aspire/.claude/skills/cook/references/task-state-emission.md`
 - Installed orientation/checkpoint/budget handlers: `/Users/sangnguyen/Documents/Aspire/.claude/hooks/handlers/{orientation-ritual,checkpoint-writer,budget-tracker}.cjs`
 - Wiki write/research/recall: `packages/mewkit/src/wiki/application/{service,research}.ts`, `packages/mewkit/src/wiki/recall/*`
 - Provider lifecycle/projections: `packages/mewkit/src/core/{provider-lifecycle,provider-projection}.ts`

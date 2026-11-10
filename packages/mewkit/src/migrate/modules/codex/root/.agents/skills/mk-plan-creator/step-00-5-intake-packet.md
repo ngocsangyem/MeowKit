@@ -37,7 +37,7 @@ Read `references/plan-intake-packet.md` and fill its 6-block schema:
 
 ### 0.5c. Persist
 
-Write the packet to `.codex/session-state/plan-creator-intake-packet.md`. Set:
+Write the packet to `.meowkit/state/plan-creator-intake-packet.md`. Set:
 
 - `intake_packet_path` — the path above
 - `intake_sources_count` — number of external artifacts consolidated

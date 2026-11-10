@@ -1,5 +1,4 @@
-# Auto-installed into .claude/skills/.venv by `.claude/scripts/bin/setup-workflow` / the installer
-# (discovery: packages/cli/src/core/skills-dependencies.ts findRequirementsFiles)
-# Validated by SAFE_PKG_RE before install.
+# Installed into this skill's own environment by `mewkit skill env jira`.
+# Validated by SAFE_PKG_RE before install; nothing outside this file is installed.
 jira-as
 jira-as[keyring]

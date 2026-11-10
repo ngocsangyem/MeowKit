@@ -1,0 +1,26 @@
+{
+  "name": "preimplement-strict-tdd-no-tests",
+  "group": "cli-pre-implement",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-implement.sh",
+  "args": [
+    "parser"
+  ],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}",
+    "MEOWKIT_TDD": "1"
+  },
+  "setup": "preimplement-strict-tdd-no-tests",
+  "setupDescription": "strict TDD mode with no test file naming the feature",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "marker": null,
+    "stdout": "Checking for failing tests for: parser\n",
+    "stderr": "BLOCKED: TDD mode is ON but no test file found for [parser].\nWrite failing tests first (Phase 2), or unset MEOWKIT_TDD / drop --tdd to proceed without TDD gate.\n"
+  }
+}

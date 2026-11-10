@@ -3,7 +3,7 @@
 
 set -u
 SCRIPT="$(cd "$(dirname "$0")/.." && pwd)/.claude/skills/story-sizer/scripts/parse-paste-stories.py"
-PY="$(cd "$(dirname "$0")/.." && pwd)/.claude/skills/.venv/bin/python3"
+PY="$(cd "$(dirname "$0")/.." && pwd)/.meowkit/envs/story-sizer/bin/python3"
 [ -x "$PY" ] || PY="python3"
 
 PASS=0

@@ -1,6 +1,6 @@
 ---
 name: mk:henshin
-description: Use when transforming existing code into agent-consumable surfaces — CLI (npm-publishable), MCP server (stdio/SSE/Streamable HTTP), and a companion skill. Triggers on 'agentize', 'henshin', 'expose as MCP', 'wrap as CLI', 'publish to npm', 'make LLM-accessible', 'turn into agent tool', 'expose feature as tool'. Runs when the user has existing code and wants to ship it to agents. NOT for building new code from scratch (see mk:bootstrap); NOT for reviewing or verifying existing code (see mk:review).
+description: Turn existing code into agent surfaces — an npm CLI, an MCP server over stdio, SSE or HTTP, and a companion skill. NOT for mk:skill-creator.
 argument-hint: '[feature-or-module] [--both|--mcp|--cli] [--auto|--ask] [--lean]'
 phase: on-demand
 trust_level: kit-authored
@@ -14,7 +14,7 @@ keywords:
   - wrap-as-tool
   - expose-feature
   - npm-publish
-when_to_use: Use when transforming existing code into agent-consumable surfaces — CLI/MCP server/skill. NOT for building new code from scratch (see mk:bootstrap) or reviewing code (see mk:review).
+when_to_use: Asked to expose code as MCP, wrap it as a CLI or make it LLM-accessible.
 user-invocable: true
 owner: research
 criticality: medium

@@ -1,6 +1,6 @@
 ---
 name: jira-relationships
-description: 'Manage JIRA issue relationships via the jira-as CLI wrapper: link / unlink, blockers, dependencies, clone, bulk-link. Routed by mk:jira-relationships skill. NOT for sprint/epic relationships (jira-agile); NOT for parent/subtask (jira-agile).'
+description: 'mk:jira executor for mk:jira-relationships. Issue links, blockers, clone.'
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default

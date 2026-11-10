@@ -36,7 +36,7 @@ This is a simplified view. The canonical decision matrix with per-cell rationale
 
 1. `MEOWKIT_AUTOBUILD_MODE` env var (highest priority) — `MINIMAL`, `FULL`, or `LEAN`
 2. `--tier` flag on `/mk:autobuild` — `auto`, `minimal`, `full`, `lean`
-3. `model-detector.cjs` (SessionStart handler, v2.3.0) — reads the `model` field from SessionStart stdin JSON and writes the detected tier + density to `session-state/detected-model.json`
+3. `model-detector.cjs` (SessionStart handler, v2.3.0) — reads the `model` field from SessionStart stdin JSON and writes the detected tier + density to `.meowkit/state/detected-model.json`
 4. `MEOWKIT_MODEL_HINT` env var — fallback when stdin `model` field is absent
 5. (none) → defaults to STANDARD tier → FULL density (safe fallback)
 
@@ -86,7 +86,7 @@ These gates apply regardless of density mode:
 3. **Contract gate** — if a contract exists, generator must read it before writing source code
 4. **Active-verification hard gate** — evaluator must drive the running build; static-only PASS is auto-converted to FAIL
 
-Rule 10 in `.claude/rules/harness-rules.md`: density decides HOW MUCH scaffolding the model needs. It does not lower the bar itself.
+Rule 10 in `.claude/skills/cook/references/harness-rules.md`: density decides HOW MUCH scaffolding the model needs. It does not lower the bar itself.
 
 ## Dead-Weight Audit
 

@@ -5,7 +5,7 @@ Complete guide to building, tagging, and publishing MeowKit releases.
 ## Architecture
 
 ```
-Source of truth (.claude/, tasks/, CLAUDE.md)
+Source of truth (.claude/)
     ↓
 prepare-release-assets.cjs → dist/meowkit-release.zip   (flat-copy distribution)
     ↓
@@ -106,7 +106,7 @@ When a release adds a new agent or skill, update the routing surfaces so the orc
 | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `.claude/agents/SKILLS_INDEX.md`                                | New skill — add a row in the matching phase or "Cross-Cutting (Any Phase)" table                                            |
 | `.claude/agents/AGENTS_INDEX.md`                                | New agent — add a row to the active-agents table (Type, Role, Source, phases, auto-activate, CE version)                    |
-| `.claude/rules/agent-routing.md`                                | New core/support agent — add to the 17-row table; new domain agent → add to the hub-skill family row                        |
+| `.claude/skills/agent-detector/references/agent-routing.md`     | New core/support agent — add to the 17-row table; new domain agent → add to the hub-skill family row                        |
 | `.claude/skills/agent-detector/references/lifecycle-routing.md` | New skill that maps to a user signal — add a Discovery Tree row                                                             |
 | `.claude/skills/scale-routing/data/domain-complexity.csv`       | New domain match (fintech, healthcare, etc.) — add a row with signals + level + workflow                                    |
 | `packages/docs/content/docs/reference/meta.json`                                  | New skill or agent — add to the matching group in `packages/docs/content/docs/reference/meta.json`                   |
@@ -132,12 +132,12 @@ Check `packages/mewkit/portable-manifest.json` whenever a release moves source f
 - Do not add entries for new files, deleted files, provider capability changes, or invented history.
 - Keep release checksum manifests, provider manifests, and `portable-manifest.json` separate; they serve different purposes.
 - Do not copy `portable-manifest.json` into `.claude/`. It is an npm package artifact shipped with `packages/mewkit`, not part of the project kit that `npx mewkit init` scaffolds.
-- If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `tasks/`, `CLAUDE.md`, and `release-manifest.json`.
+- If a release changes `packages/mewkit`, make sure `packages/mewkit/package.json` includes `portable-manifest.json` in `files` and publish the npm package. The GitHub release zip used by `npx mewkit init` only contains `.claude/`, `release-manifest.json`, `.meowkit/pack-manifest.json` and `.meowkit/harness-inventory.json` — no root `CLAUDE.md` and no `tasks/` scaffold ships.
 
 #### 1e. Author the Codex AND Cursor native bundles (when `.claude/` content changes)
 
 **Both Codex and Cursor ship HAND-AUTHORED native bundles. There is no porter for
-either.** A new `.claude/` skill / agent / rule / command / hook does NOT reach them
+either.** A new `.claude/` skill / agent / rule / hook does NOT reach them
 automatically. When a release adds or changes any of those, author the matching native
 file(s) **by hand in both bundles**, or the two targets silently drift from `.claude/`.
 
@@ -168,9 +168,7 @@ TDD sentinel paths, different hook scripts).
 | --- | --- | --- |
 | `skills/<name>/` | `.agents/skills/mk-<name>/SKILL.md` | `.cursor/skills/mk-<name>/SKILL.md` |
 | `agents/<name>.md` | `.codex/agents/<name>.toml` — `name`, `description`, `developer_instructions`, `model_reasoning_effort` | `.cursor/agents/<name>.md` — frontmatter is exactly `name`, `description`, `model`, `readonly`, `is_background` |
-| `commands/**` | author as a skill (Codex has no command surface) | author as a skill with `disable-model-invocation: true` (explicit `/mk-<name>` invocation only) |
-| `rules/*`, `rules-conditional/*` | guidance goes in `AGENTS.md` or a skill — native `.codex/rules/*.rules` are Starlark **command policies**, not markdown guidance | `.cursor/rules/<name>.mdc` — frontmatter is exactly `description`, `globs`, `alwaysApply`; every rule declares one activation class (`alwaysApply: true` is reserved for `runtime-invariants.mdc`) |
-| `modes/*` | author as a skill | author as a skill |
+| `rules/*` | guidance goes in `AGENTS.md` or a skill — native `.codex/rules/*.rules` are Starlark **command policies**, not markdown guidance | `.cursor/rules/<name>.mdc` — frontmatter is exactly `description`, `globs`, `alwaysApply`; every rule declares one activation class (`alwaysApply: true` is reserved for `runtime-invariants.mdc`) |
 | `settings.json` hooks | `.codex/hooks.json` + `.codex/hooks/*.cjs` | `.cursor/hooks.json` + `.cursor/hooks/*.cjs` |
 | memory | `.meowkit/memory/` (provider-neutral — never `.claude/memory/`) | `.meowkit/memory/` |
 
@@ -260,51 +258,41 @@ providers; `--skill-packs core` narrows it. A second run must report `0 written`
 > converter kept after the cutover — it converts the user's own config, not toolkit content.
 > Cursor MCP is opt-in via `modules/cursor/catalog/mcp-profiles.json` and never written by a
 > fresh install on its own.
-#### 1f. Update when the derived index or wiki schema changes
+#### 1f. Update when the memory contract changes
 
-`mewkit`'s SQLite index (`.claude/memory/wiki-index.db`) is DERIVED and disposable — canonical data lives in the append logs (`.claude/memory/*.jsonl`) and the wiki tree (`tasks/wikis/<slug>/`). The DB is rebuilt by `mewkit index` (whole index) and `mewkit wiki reindex` (wiki tables); delete → reindex → identical. A schema change therefore needs code + test + doc updates, but NOT a user-data migration.
+The team store is two committed files, `.meowkit/memory/decisions.md` and `gotchas.md`. A change to
+the entry format, the read or write sets, `npx mewkit note`, or the `validate --memory` lint must
+update, in the same PR:
 
-When you change the index/wiki schema — a new table, a new column, a new FTS shape, or a `SCHEMA_VERSION` bump — update every touchpoint below:
+- `docs/core/memory-system.md` and `packages/docs/content/docs/guide/memory-system.mdx`
+- the `.claude/rules/meowkit-core.md` Memory section, and the `mk:memory` skill
+- `docs/governance/dead-weight-audit-registry.md`, when a harness component is added or removed
 
-| Touchpoint                                                                   | What to do                                                                                                                                                                                       |
-| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `packages/mewkit/src/core/derived-index.ts` — `SCHEMA_VERSION`               | Bump the constant to the new version number.                                                                                                                                                     |
-| `packages/mewkit/src/core/derived-index.ts` — `MIGRATIONS[]`                 | APPEND a new `{ version: N, sql }` entry. Migrations are forward-only, applied when the DB's `PRAGMA user_version` is behind. NEVER edit an existing migration's SQL — installs that already ran it will not re-run it. |
-| `packages/mewkit/src/wiki/infrastructure/wiki-schema.ts` — `WIKI_DDL_STATEMENTS` / `WIKI_MIGRATION_SQL` | Wiki table + FTS DDL lives here. The v2 migration references this constant; a new wiki-table change is a NEW migration version, not an edit to v2.                            |
-| `packages/mewkit/src/wiki/infrastructure/wiki-ingest.ts`                     | Keep the JSONL → table ingest in sync with any column add/rename, or rebuilt rows silently drop the new field.                                                                                    |
-| `packages/mewkit/src/wiki/domain/types.ts`                                   | If the domain shape changed, update the types the schema mirrors.                                                                                                                                |
-| `packages/mewkit/src/core/__tests__/derived-index.test.ts`                   | This test pins `SCHEMA_VERSION` — update the expected value and add a migration test for the new version.                                                                                         |
-| `docs/architecture/system-architecture.md`                                   | Update the `SCHEMA_VERSION N` line in the Wiki Subsystem section.                                                                                                                                 |
-
-**Additive vs destructive:**
-
-- **Additive** (a new `CREATE TABLE` / `CREATE INDEX` / new column via a forward migration) auto-applies on the next `mewkit index` / `mewkit wiki reindex` — existing installs upgrade transparently, no user action.
-- **Destructive** (drop/rename a column, change an FTS table's shape) cannot be expressed as a forward `CREATE`. Either write a migration that rebuilds the affected table, or — since the DB is disposable — tell users to delete `.claude/memory/wiki-index.db` and re-run `mewkit index`. State the exact step in the CHANGELOG `Migration Notes`.
-
-Every file above lives under `packages/mewkit/src/`, so a schema change ALWAYS triggers a CLI version bump (step 3) and an npm publish (step 10).
+A format change affects existing stores, so record it in the CHANGELOG `Migration Notes` with the
+exact new entry format or command.
 
 #### 1g. No product-brand leakage in shipped content
 
-`npx mewkit init` copies `.claude/` + `tasks/` + `CLAUDE.md` into the USER's project, where every loaded skill / agent / rule / command competes for the user's context window. Shipped content MUST NOT refer to the product by name as a self-referential subject — write **"the toolkit"**, **"the harness"**, or **"this workflow"** instead of "MeowKit" / "meowkit".
+`npx mewkit init` copies `.claude/` into the USER's project, where every loaded skill / agent / rule competes for the user's context window. Shipped content MUST NOT refer to the product by name as a self-referential subject — write **"the toolkit"**, **"the harness"**, or **"this workflow"** instead of "MeowKit" / "meowkit".
 
 **Allowed (functional — keep):**
 
-- The `mewkit` CLI binary — `npx mewkit ...`, `mewkit validate`, `mewkit wiki`, etc. (it's the installed command, not brand prose).
+- The `mewkit` CLI binary — `npx mewkit ...`, `mewkit validate`, `mewkit note`, etc. (it's the installed command, not brand prose).
 - `MEOWKIT_*` environment variables (e.g. `MEOWKIT_TDD`, `MEOWKIT_AUTOBUILD_MODE`).
 - The `ngocsangyem/MeowKit` repo URL inside plugin-install commands.
 - Attribution / provenance metadata (e.g. `SKILLS_ATTRIBUTION.md`, skill `attribution:` frontmatter) — legitimate credit.
 - Real path / string literals the code depends on (`~/.meowkit/...`, `"meowkit-default"`, `meowkit:` frontmatter keys).
 
-**Scope:** this rule applies ONLY to shipped surfaces — `.claude/`, `tasks/`, and the shipped `CLAUDE.md`. The source repo's `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
+**Scope:** this rule applies ONLY to the shipped surface — `.claude/`. The source repo's `packages/`, `docs/`, and `README` are the product's own surfaces and SHOULD use the brand.
 
 **Check before release.** Scope the grep to the context-loaded prose surfaces (skill / agent / command / rule `.md`) and exclude the functional refs above — expect **zero** hits:
 
 ```bash
-grep -rinE 'meowkit' .claude/skills .claude/agents .claude/commands .claude/rules --include='*.md' \
+grep -rinE 'meowkit' .claude/skills .claude/agents .claude/rules --include='*.md' \
   | grep -vE 'MEOWKIT_|ngocsangyem/MeowKit|attribution|MeowKit-native|meowkit_tier|author: meowkit|~/\.meowkit|meowkit-default|:meowkit:'
 ```
 
-A broader `grep -ri meowkit .claude tasks` also surfaces functional hits — config identity (`metadata.json` `"name": "meowkit"`), filenames (`gitignore.meowkit`), hook log prefixes (`[meowkit]`), generated views (`harness-substrate.md`), and the kit's own `memory/` dev log. Those are expected; only **new prose** that names the product as a subject needs neutralizing.
+A broader `grep -ri meowkit .claude` also surfaces functional hits — config identity (`metadata.json` `"name": "meowkit"`), filenames (`gitignore.meowkit`), hook log prefixes (`[meowkit]`), generated views (`harness-substrate.md`). Those are expected; only **new prose** that names the product as a subject needs neutralizing.
 
 ### 2. Update CHANGELOG (`packages/docs/content/docs/changelog/index.mdx`)
 
@@ -396,7 +384,7 @@ would want it.
 
 #### When to bump
 
-Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, `tasks/`, `CLAUDE.md`, the docs site, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
+Only bump `packages/mewkit` when the release ships **changes inside `packages/mewkit/src/`**. Edits to `.claude/`, the docs site, or rules do NOT require a CLI version bump — those ride out via the release zip and `npx mewkit upgrade`.
 
 ```bash
 # Decide first — does this release touch CLI code?
@@ -443,7 +431,7 @@ node scripts/prepare-release-assets.cjs "<version>"
 This creates:
 
 - `release-manifest.json` — SHA-256 checksums for all files
-- `dist/meowkit-release.zip` — the flat-copy release package (`.claude/` + `tasks/` + `CLAUDE.md` + manifest)
+- `dist/meowkit-release.zip` — the flat-copy release package (`.claude/` + manifests; no root `CLAUDE.md`, no `tasks/`)
 
 > **Note:** This script does NOT write `.claude/metadata.json` — the `mewkit` CLI writes it on install/upgrade, and `prepare-release-assets.cjs` explicitly excludes it from the zip. The shipped release version lives in `release-manifest.json`.
 
@@ -538,8 +526,8 @@ Copy this checklist for each release:
 ### Docs
 
 - [ ] Updated affected guide/reference pages (step 1a)
-- [ ] If a new agent or skill landed: updated routing surfaces (step 1b — `SKILLS_INDEX.md`, `AGENTS_INDEX.md`, `agent-routing.md`, `lifecycle-routing.md`, sidebar config, reference page)
-- [ ] No product-brand leakage in shipped `.claude/` / `tasks/` (step 1g — brand grep shows only functional/attribution hits)
+- [ ] If a new agent or skill landed: updated routing surfaces (step 1b — `SKILLS_INDEX.md`, `AGENTS_INDEX.md`, `agent-detector/references/agent-routing.md`, `lifecycle-routing.md`, sidebar config, reference page)
+- [ ] No product-brand leakage in shipped `.claude/` (step 1g — brand grep shows only functional/attribution hits)
 - [ ] Docs build passes (`npm run build -w packages/docs`)
 
 ### Changelog
@@ -552,14 +540,12 @@ Copy this checklist for each release:
 - [ ] If `packages/mewkit/src/` changed: chose patch / minor / major bump per the SemVer table in step 3
 - [ ] Ran `npm -w packages/mewkit version <version>` (or skipped because src untouched)
 
-### Schema (only if the index/wiki schema changed — step 1f)
+### Memory contract (only if the store format, read/write sets or lint changed — step 1f)
 
-- [ ] Bumped `SCHEMA_VERSION` in `derived-index.ts` and APPENDED a new `MIGRATIONS[]` entry (never edited an existing one)
-- [ ] Updated `wiki-schema.ts` DDL and kept `wiki-ingest.ts` in sync (if wiki tables changed)
-- [ ] Updated the `SCHEMA_VERSION` assertion + added a migration test in `derived-index.test.ts`
-- [ ] Updated the `SCHEMA_VERSION` line in `docs/architecture/system-architecture.md`
-- [ ] CHANGELOG `Migration Notes`: additive = auto-applies on next `mewkit index`; destructive = users delete `wiki-index.db` and reindex
-- [ ] Confirmed this is a `packages/mewkit/src/` change → CLI bump (step 3) + npm publish (step 10)
+- [ ] Updated `docs/core/memory-system.md`, the docs-site memory guide, and the `meowkit-core.md` Memory section
+- [ ] Confirmed `npx mewkit validate --memory` and `npx mewkit note` still match the documented entry format
+- [ ] CHANGELOG `Migration Notes` records any format change that affects existing stores
+- [ ] If `packages/mewkit/src/` changed → CLI bump (step 3) + npm publish (step 10)
 
 ### Build
 
@@ -601,7 +587,7 @@ Push to `main` or `dev` triggers `.github/workflows/release.yml`:
 
 ### Conventional commits → version bumps
 
-The CI mapping below applies to `.claude/`, `tasks/`, and `CLAUDE.md` content. The CLI follows the same SemVer fields, but it only bumps when `packages/mewkit/src/` changes — see step 3.
+The CI mapping below applies to `.claude/` content. The CLI follows the same SemVer fields, but it only bumps when `packages/mewkit/src/` changes — see step 3.
 
 ```
 feat: new skill            → MINOR (1.0.0 → 1.1.0)

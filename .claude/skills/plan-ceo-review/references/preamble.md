@@ -5,17 +5,16 @@ mkdir -p .meowkit/state/sessions
 touch .meowkit/state/sessions/"$PPID"
 _SESSIONS=$(find .meowkit/state/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
 find .meowkit/state/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(.claude/scripts/bin/workflow-config get contributor 2>/dev/null || true)
-_PROACTIVE=$(.claude/scripts/bin/workflow-config get proactive 2>/dev/null || echo "true")
+_PROACTIVE=$(.claude/hooks/lib/workflow-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
 echo "PROACTIVE: $_PROACTIVE"
-source <(.claude/scripts/bin/workflow-repo-mode 2>/dev/null) || true
+source <(.claude/hooks/lib/workflow-repo-mode 2>/dev/null) || true
 REPO_MODE=${REPO_MODE:-unknown}
 echo "REPO_MODE: $REPO_MODE"
 _LAKE_SEEN=$([ -f .meowkit/state/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(.claude/scripts/bin/workflow-config get telemetry 2>/dev/null || true)
+_TEL=$(.claude/hooks/lib/workflow-config get telemetry 2>/dev/null || true)
 _TEL_PROMPTED=$([ -f .meowkit/state/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
@@ -53,7 +52,7 @@ Options:
 - A) Help improve the workflow! (recommended)
 - B) No thanks
 
-If A: run `.claude/scripts/bin/workflow-config set telemetry community`
+If A: run `.claude/hooks/lib/workflow-config set telemetry community`
 
 If B: ask a follow-up AskUserQuestion:
 
@@ -64,8 +63,8 @@ Options:
 - A) Sure, anonymous is fine
 - B) No thanks, fully off
 
-If B→A: run `.claude/scripts/bin/workflow-config set telemetry anonymous`
-If B→B: run `.claude/scripts/bin/workflow-config set telemetry off`
+If B→A: run `.claude/hooks/lib/workflow-config set telemetry anonymous`
+If B→B: run `.claude/hooks/lib/workflow-config set telemetry off`
 
 Always run:
 ```bash
@@ -74,7 +73,3 @@ touch .meowkit/state/.telemetry-prompted
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 
-## Memory
-
-- **Reads memory:** at task start, read canonical `.meowkit/memory/architecture-decisions.json`; use its Markdown view only when JSON is absent.
-- **Writes memory:** at task end, append the CEO review verdict and newly-surfaced decisions to canonical `.meowkit/memory/architecture-decisions.json`, validate it, then regenerate the Markdown view. Scrub secrets before writing.

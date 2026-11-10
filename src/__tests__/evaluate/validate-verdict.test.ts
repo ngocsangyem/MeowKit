@@ -3,8 +3,8 @@
 // evidence) must be REJECTED forever. Also covers score-deviation, missing rubric coverage,
 // hard-fail propagation, missing evaluator identity, and the valid path.
 //
-// The validator recomputes the score from the REAL .claude/rubrics preset, so the test spawns it
-// with cwd = repo root (where .claude/rubrics lives) and writes each verdict + its evidence dir in
+// The validator recomputes the score from the REAL .claude/skills/rubric/rubrics preset, so the test spawns it
+// with cwd = repo root (where .claude/skills/rubric/rubrics lives) and writes each verdict + its evidence dir in
 // a throwaway tmp dir passed by absolute path.
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";

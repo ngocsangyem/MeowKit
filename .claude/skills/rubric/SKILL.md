@@ -2,7 +2,7 @@
 name: mk:rubric
 version: 1.0.0
 preamble-tier: 3
-description: Use when loading, listing, composing, or validating graded evaluation rubrics — PASS/WARN/FAIL grading with weighted criteria and balanced PASS/FAIL anchor examples. Triggers on /mk:rubric, "load rubric", "compose rubric preset", "validate rubric", or evaluator-style code review that needs anchor-grounded judgments.
+description: Loads, composes and validates weighted PASS/WARN/FAIL rubrics with anchor examples. NOT for mk:evaluate.
 argument-hint: '[list | load <name> | compose <preset> | validate]'
 allowed-tools:
   - Bash
@@ -17,7 +17,7 @@ keywords:
   - pass-warn-fail
   - anchor-examples
   - calibration
-when_to_use: Use when loading, listing, composing, or validating graded evaluation rubrics with PASS/WARN/FAIL grading.
+when_to_use: A grader needs a rubric preset loaded or a new one checked for balance.
 user-invocable: true
 owner: testing
 criticality: medium
@@ -27,7 +27,7 @@ runtime: claude-code
 
 # Rubric Library API
 
-Discovery, composition, and validation for the rubric library at `.claude/rubrics/`.
+Discovery, composition, and validation for the rubric library at `.claude/skills/rubric/rubrics/`.
 
 > **Path convention:** Commands below assume cwd is `$CLAUDE_PROJECT_DIR` (project root). Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
 
@@ -103,7 +103,7 @@ Activate when:
 
 ## Schema
 
-Rubrics MUST conform to `.claude/rubrics/schema.md`. The validator enforces:
+Rubrics MUST conform to `.claude/skills/rubric/rubrics/schema.md`. The validator enforces:
 - Required frontmatter fields (`name`, `version`, `weight_default`, `applies_to`, `hard_fail_threshold`)
 - Required sections in order
 - ≥1 PASS + ≥1 FAIL anchor example, balanced (±1)
@@ -120,7 +120,7 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 
 ## Gotchas
 
-- **Adding a new rubric:** drop a `.md` file into `.claude/rubrics/`, run `validate-rubric.sh`, register weight in any preset that should include it.
+- **Adding a new rubric:** drop a `.md` file into `.claude/skills/rubric/rubrics/`, run `validate-rubric.sh`, register weight in any preset that should include it.
 - **Weight drift:** if you change a rubric's `weight_default`, all presets that reference it must be re-checked for sum=1.0.
 - **Anti-patterns are FIXED:** they trigger FAIL regardless of the surrounding criteria. Don't add subjective ones.
 - **Don't load all rubrics:** the evaluator should load only the relevant preset, not the whole library — context efficiency.
@@ -132,7 +132,7 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 | `scripts/load-rubric.sh` | Load + emit prompt fragment for one rubric or preset |
 | `scripts/validate-rubric.sh` | Schema conformance + weight-sum validator |
 | `references/calibration-guide.md` | How to add few-shot examples (balanced + randomized) |
-| `../../rubrics/schema.md` | Canonical rubric format specification |
+| `rubrics/schema.md` | Canonical rubric format specification |
 | `../../agents/evaluator.md` | The agent that consumes composed rubrics during behavioral active verification (Phase 3, shipped) |
 | `../mk:evaluate/SKILL.md` | The orchestration shell that drives the evaluator + invokes this skill via `compose <preset>` (Phase 3, shipped) |
 

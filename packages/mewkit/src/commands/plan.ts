@@ -1,6 +1,7 @@
 import path from "node:path";
 import pc from "picocolors";
 import { parsePlan, parsePhaseFile, REQUIRED_PHASE_SECTIONS, type PlanSummary } from "../core/plan-parser.js";
+import { checkPlanStructure, renderPlanStructure } from "../core/check-plan-structure.js";
 
 // `mewkit plan check|status` — READ-ONLY plan inspection.
 //
@@ -17,6 +18,8 @@ export interface PlanArgs {
 	subcommand?: string;
 	target?: string;
 	json?: boolean;
+	/** `check --structural <plan.md>`: validate a whole plan directory against the full template. */
+	structural?: boolean;
 }
 
 function pct(checked: number, total: number): string {
@@ -107,6 +110,9 @@ function renderCheck(file: string): number {
 const USAGE = `Usage:
   mewkit plan status <plan-dir>    Progress across plan.md + phase files (read-only)
   mewkit plan check <phase-file>   Required-section + checklist report for one phase (read-only)
+  mewkit plan check --structural <plan.md|plan-dir>
+                                   plan.md + every sibling phase file against the full
+                                   template; prints PLAN_COMPLETE or PLAN_INCOMPLETE (read-only)
   mewkit plan approve <plan-dir>   Stamp the Gate 1 approval receipt (mutating)
   mewkit plan archive <plan-dir>   Mark statuses completed + move to tasks/plans/archive/ (mutating)
 
@@ -131,6 +137,14 @@ export async function plan(args: PlanArgs): Promise<void> {
 	const resolved = path.resolve(target);
 
 	try {
+		if (subcommand === "check" && args.structural) {
+			const report = checkPlanStructure(resolved);
+			if (args.json) console.log(JSON.stringify(report, null, 2));
+			else for (const line of renderPlanStructure(report)) console.log(line);
+			process.exitCode = report.complete ? 0 : 1;
+			return;
+		}
+
 		if (subcommand === "check") {
 			const code = renderCheck(resolved);
 			if (args.json) {

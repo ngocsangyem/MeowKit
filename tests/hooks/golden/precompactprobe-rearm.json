@@ -1,0 +1,28 @@
+{
+  "name": "precompactprobe-rearm",
+  "group": "observer-precompact-probe",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/precompact-probe.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreCompact\"}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "precompactprobe-rearm",
+  "setupDescription": "BASE hook tree only",
+  "normalizers": [
+    "tmpdir",
+    "isoTimestamp"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    "session-state/session-sentinels.jsonl": "{\"session_id\":\"corpus-session\",\"event\":\"precompact_rearm\",\"ts\":\"{{TS}}\"}\n",
+    ".claude/hooks/.logs/hook-log.jsonl": "{\"ts\":\"{{TS}}\",\"hook\":\"precompact-probe\",\"event\":\"fired\",\"session\":\"corpus-session\",\"detail\":null}\n"
+  }
+}

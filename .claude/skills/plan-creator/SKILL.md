@@ -2,7 +2,7 @@
 name: mk:plan-creator
 version: 1.6.3
 preamble-tier: 3
-description: 'Creates structured multi-file implementation plans before build. Scope-aware: trivial tasks exit early, simple tasks get fast plans, complex tasks get full research + phase files + validation. Enforces Gate 1. Activated by /mk:plan or /mk:cook. NOT for ticket complexity analysis against an existing codebase (see mk:planning-engine); NOT for CEO-level scope review of existing plans (see mk:plan-ceo-review).'
+description: Writes the multi-file implementation plan a human approves at Gate 1, scaled to task size. NOT for mk:planning-engine.
 argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] [--html] [--advice] OR [archive | red-team {path} | validate {path}]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - gate-1
   - scope-adaptive
   - design-evidence
-when_to_use: Use when creating a structured multi-file implementation plan before build, including plans that consume a design evidence packet (e.g. from mk:figma) without re-analyzing the design source. NOT for ticket analysis (see mk:planning-engine) or scope review (see mk:plan-ceo-review).
+when_to_use: A non-trivial build is requested and no approved plan directory exists.
 user-invocable: true
 meowkit:
   portability: provider-only
@@ -66,13 +66,13 @@ dependency_edges:
 
 # Plan Creator
 
-Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, visual rendering, archive, and durable-memory capture stay with their existing owners.
+Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, visual rendering, archive, and memory entries stay with their existing owners.
 
 ## When to Use
 
 Activate when:
 
-- User runs `/mk:plan [task]` or `/mk:cook [task]`
+- User runs `/mk:plan-creator [task]` or `/mk:cook [task]`
 - Non-trivial task (> 2 files OR > 1h OR architectural decisions)
 - User supplies ≥2 upstream reports/specs (office-hours, brainstorming, planning-engine, confluence-spec, intake output…) → step-00.5 consolidates them into a Plan Intake Packet before planning (see `references/plan-intake-packet.md`)
 - User supplies a design evidence packet (e.g. from `mk:figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
@@ -80,7 +80,7 @@ Activate when:
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
 - Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI; visual rendering → `mk:visual-plan`.
 - Hard/deep plan creation still runs its built-in red-team and validation interview before Gate 1. These are design-quality gates, not standalone subcommands, and must never be routed away.
-- Compatibility aliases: `/mk:plan archive` → [archive workflow](references/archive-workflow.md); `/mk:plan red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `/mk:plan validate {path}` → [standalone validation workflow](references/validate-standalone.md).
+- Compatibility aliases: `/mk:plan-creator archive` → [archive workflow](references/archive-workflow.md); `/mk:plan-creator red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `/mk:plan-creator validate {path}` → [standalone validation workflow](references/validate-standalone.md).
 
 Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation. `--html` routes to `mk:visual-plan`.
 
@@ -178,7 +178,7 @@ tasks/plans/YYMMDD-name/
 - **Using `--deep` to decide architecture**: deep maps a chosen approach; if the approach is unclear, route to `mk:brainstorming` first.
 - **Dropping TDD at handoff**: when `tdd_mode=true`, step-09 MUST print cook with `--tdd`; sentinel/env state alone is not a cross-session contract.
 - **Post-Plan Handoff is deterministic**: step-09 fires `AskUserQuestion`; do NOT auto-invoke the chosen command. User must type it in a fresh session for clean context.
-- **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, autobuild, end}` fail `validate-plan.py`.
+- **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, autobuild, end}` fail the structural check.
 - **Whole-Plan Consistency Gates W1 / W2 fire after red-team and validation interview**: stage-then-apply algorithm — no edits land until the user resolves any unresolved contradictions. See `references/whole-plan-sweep.md`.
 - **`consistency_sweeps` frontmatter is optional**: legacy plans without it still validate as `PLAN_COMPLETE`.
 - **Sweep recursion is bounded**: "resolve now" caps at 2 attempts per gate; further unresolved items convert to Risk rows.
@@ -229,7 +229,6 @@ tasks/plans/YYMMDD-name/
 | `references/adr-generation.md`                     | Architecture Decision Record generation                                                                                                                                                                              |
 | `references/parallel-mode.md`                      | Ownership matrix template, parallel group rules                                                                                                                                                                      |
 | `references/two-approach-mode.md`                  | Approach file template, trade-off matrix, selection flow                                                                                                                                                             |
-| `scripts/validate-plan.py`                         | Plan completeness validator. **Depends on PyYAML** (installed via `.claude/scripts/bin/setup-workflow` into `.claude/skills/.venv/`). Run via `.claude/skills/.venv/bin/python3 scripts/validate-plan.py <plan.md>`. |
 | `scripts/check-product-spec.sh`                    | Product-spec structural validator (POSIX bash). Enforces feature count, user stories, forbidden patterns. Used by step-03a and step-04 for `--product-level` mode.                                                   |
 | `references/workflow-models/feature-model.md`      | Workflow template for feature tasks (loaded JIT by step-00)                                                                                                                                                          |
 | `references/workflow-models/bugfix-model.md`       | Workflow template for bug fix tasks (loaded JIT by step-00)                                                                                                                                                          |
@@ -243,8 +242,8 @@ tasks/plans/YYMMDD-name/
 ## Related Rules
 
 - `.claude/rules/gate-rules.md` — Gate 1 hard-stop conditions this skill enforces (plan approval before Phase 3)
-- `.claude/rules/orchestration-rules.md` — boundary contract; verification subagents stay READ-ONLY; sweep stays in planner context (never delegated)
-- `.claude/rules/task-state-emission.md` — when an active durable task record exists, emit status/step via `mewkit task-state update` (advisory; active durable tasks only)
+- `.claude/skills/cook/references/orchestration-rules.md` — boundary contract; verification subagents stay READ-ONLY; sweep stays in planner context (never delegated)
+- `.claude/skills/cook/references/task-state-emission.md` — when an active durable task record exists, emit status/step via `mewkit task-state update` (advisory; active durable tasks only)
 
 ## Start
 

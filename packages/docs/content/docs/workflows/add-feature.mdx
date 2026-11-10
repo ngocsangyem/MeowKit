@@ -70,9 +70,9 @@ Tester: "Writing tests for cart store and components..."
   Ready for implementation.
 ```
 
-The `pre-implement.sh` hook blocks the **developer** from writing code until these tests exist (in TDD mode).
+The `pre-implement.cjs` hook blocks the **developer** from writing code until these tests exist (in TDD mode).
 
-**Default mode (TDD off):** Phase 2 is skipped — the developer goes directly to implementation. The tester may be invoked on-request (e.g., `/mk:test` after implementation) or for plan-coverage reasons. `pre-implement.sh` is a no-op.
+**Default mode (TDD off):** Phase 2 is skipped — the developer goes directly to implementation. The tester may be invoked on-request (e.g., `/mk:testing` after implementation) or for plan-coverage reasons. `pre-implement.cjs` is a no-op.
 
 ### Step 5: Implementation (Phase 3)
 
@@ -86,7 +86,7 @@ Developer: "Reading plan... implementing cart store..."
   Tests: 13/13 passing ✓
 ```
 
-Every file write triggers `post-write.sh` which scans for security issues (hardcoded secrets, XSS, SQL injection).
+Every file write triggers `post-write.cjs` which scans for security issues (hardcoded secrets, XSS, SQL injection).
 
 ### Step 6: Review (Phase 4)
 
@@ -118,7 +118,7 @@ The **shipper** runs the full ship pipeline:
 
 ### Step 8: Reflect (Phase 6)
 
-The **documenter** updates project docs (adds cart section to README). The **analyst** routes learnings to the appropriate topic file (`review-patterns.json` for code patterns, `architecture-decisions.json` for design decisions — e.g., "cart feature: Pinia store pattern worked well, consider debounce for reactive controls").
+The **documenter** updates project docs (adds cart section to README). The **analyst** reports the session's recurring patterns; anything non-derivable is appended to `.meowkit/memory/gotchas.md` (or `decisions.md` for a design choice — e.g., "cart uses a Pinia store because reactive controls need debounced persistence").
 
 ## Common issues
 

@@ -10,7 +10,7 @@ Every project file belongs to one of these categories:
 | Documentation | `docs/` | Human + AI readable docs, guides, specs |
 | Tasks | `tasks/` | Plans, reviews, templates |
 | Tests | `tests/` or `__tests__/` | Test suites |
-| Scripts | `scripts/` or `.claude/scripts/` | Build, deploy, utility scripts |
+| Scripts | `scripts/` or the owning skill's `scripts/` | Build, deploy, utility scripts |
 | Assets | `assets/{type}/` | Media, branding, designs |
 | Config | Root or `.config/` | Dotfiles, config files |
 | Kit     | `.claude/` | Agent toolkit (skills, agents, rules, hooks, memory) |

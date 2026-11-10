@@ -8,7 +8,7 @@ When to research: unfamiliar tech, multiple approaches possible, architectural d
 3. **Save reports** — each report goes to `tasks/plans/YYMMDD-name/reports/`
 
 ## Report Format
-Use `tasks/templates/report.md` template. Each report must have:
+Each report must have:
 - Summary (2-3 sentences)
 - Key Findings (numbered, most important first)
 - Recommendations (actionable)

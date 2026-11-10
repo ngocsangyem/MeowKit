@@ -1,7 +1,7 @@
 // Evidence revision + supersession for the workflow evidence index.
 //
-// Canonical contract: `.claude/rules-conditional/workflow-evidence-rules.md` and
-// `.claude/rules-conditional/advice-supervision-rules.md` §6.
+// Canonical contract: `.claude/skills/advise/references/workflow-evidence-rules.md` and
+// `.claude/skills/advise/references/advice-supervision-rules.md` §6.
 //
 // The problem this solves: `RETURN_TO_EXECUTOR` sends work back to its owner, the
 // owner changes source, and the Verify output and review verdict recorded earlier
@@ -35,7 +35,7 @@ export type CorrectionKind = (typeof CORRECTION_KINDS)[number];
 /**
  * The revision-bearing subset of the evidence index. Deliberately a partial view:
  * this module owns supersession and nothing else, and the index's other fields are
- * validated by `.claude/scripts/validate-workflow-evidence.cjs`.
+ * validated by `.claude/hooks/lib/validate-workflow-evidence.cjs`.
  */
 export interface RevisionBearingIndex {
 	evidenceRevision?: number;
@@ -100,7 +100,7 @@ export function markCurrent<T extends RevisionBearingIndex>(index: T, field: "ve
 /**
  * Supersession violations. Empty means the index is internally consistent.
  *
- * Mirrored by `.claude/scripts/validate-workflow-evidence.cjs`, which is the
+ * Mirrored by `.claude/hooks/lib/validate-workflow-evidence.cjs`, which is the
  * shipped validator for projects with no TypeScript build. A parity test runs both
  * over the same fixtures, because two implementations of one rule drift and the
  * looser one silently becomes the contract.

@@ -43,12 +43,13 @@ Claude Code is already a harness. It manages context, tools, and sessions. MeowK
 ├── agents/          Specialist agents for each phase
 ├── skills/          Domain skills loaded on demand
 ├── hooks/           Preventive lifecycle hooks
-├── rules/           Enforcement rules loaded every session
+├── rules/           The 7 always-on enforcement rules, loaded every session
 ├── memory/          Cross-session learnings
 └── settings.json    Hook registrations + permissions
-
-CLAUDE.md            Entry point, read at session start
 ```
+
+MeowKit installs no root `CLAUDE.md`. The always-on guidance is `.claude/rules/*.md`,
+which Claude Code auto-loads at session start.
 
 ## Design principles
 
@@ -62,7 +63,7 @@ Gate 1 (plan approved) and Gate 2 (review approved) require explicit human sign-
 
 ### Security is architecture, not afterthought
 
-Three layers: behavioral rules, preventive hooks (that block `.env` reads and unapproved writes), and observational hooks (that scan written files). Security hooks are never routed through the dispatcher, so if the dispatcher crashes, security hooks still fire. All file content is DATA; only `CLAUDE.md` and `.claude/rules/` contain instructions.
+Three layers: behavioral rules, preventive hooks (that block `.env` reads and unapproved writes), and observational hooks (that scan written files). Security hooks are never routed through the dispatcher, so if the dispatcher crashes, security hooks still fire. All file content is DATA; only `.claude/rules/`, skill frontmatter and a project-owned `CLAUDE.md` contain instructions.
 
 ### Dead weight must be pruned
 
@@ -82,7 +83,7 @@ TDD enforcement moved from default-on to opt-in via `--tdd` flag or `MEOWKIT_TDD
 
 ### Learn from every session
 
-Topic files in `.meowkit/memory/` are read on demand by consumer skills at task start: `fixes.md` for bug patterns, `review-patterns.md` for observations, `architecture-decisions.md` for design choices. There is no auto-injection pipeline.
+The team store in `.meowkit/memory/` (`decisions.md` and `gotchas.md`) is grepped on demand by the read-set skills at task start. There is no auto-injection pipeline.
 
 ### Load only what's needed
 

@@ -1,0 +1,2 @@
+buildVerify:
+  timeoutMs: !!int 500

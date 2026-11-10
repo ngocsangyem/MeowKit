@@ -45,10 +45,10 @@ describe("routeTableEquivalence", () => {
 	it("fails on a failed NON-routable artifact (e.g. a broken hook conversion)", () => {
 		const r = routeTableEquivalence([
 			artifact({ type: "skill", status: "migrated" }),
-			artifact({ type: "hooks", sourcePath: "gate-enforcement.sh", status: "failed" }),
+			artifact({ type: "hooks", sourcePath: "gate-enforcement.cjs", status: "failed" }),
 		]);
 		expect(r.pass).toBe(false);
-		expect(r.detail).toContain("gate-enforcement.sh");
+		expect(r.detail).toContain("gate-enforcement.cjs");
 	});
 });
 

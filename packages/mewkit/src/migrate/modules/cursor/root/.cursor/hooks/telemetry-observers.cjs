@@ -6,8 +6,8 @@
 // this script which JSONL file to append to. `sessionEnd` is fire-and-forget in
 // the documented contract (no output field is read), so the session record it
 // leaves behind is telemetry, not a gate. `preCompact` is best-effort ONLY here;
-// memory commits never depend on it (they go through the transactional
-// `mewkit memory capture` CLI path instead). None of these events ever
+// memory entries never depend on it (they go through the locked, lint-checked
+// `mewkit note` CLI path instead). None of these events ever
 // block: malformed input is a silent no-op, never a deny — this file carries
 // NO security-critical logic (failClosed: false for every entry in hooks.json).
 "use strict";

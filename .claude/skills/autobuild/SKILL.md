@@ -2,7 +2,7 @@
 name: mk:autobuild
 version: 1.0.0
 preamble-tier: 3
-description: Use when running an autonomous multi-hour build of a green-field product — orchestrates planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density per model tier. Triggers on /mk:autobuild, "build me a kanban app", "build a retro game maker", "autonomous build", or any green-field product spec. NOT for scoped single-task work (see mk:cook); NOT for initial project scaffolding only (see mk:bootstrap).
+description: Autonomous multi-hour green-field product build — planner, contract, generator and evaluator in a loop. NOT for mk:cook.
 argument-hint: '[task description] [--tier auto|full|lean|minimal] [--max-iter N] [--budget USD] [--tdd] [--advice]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - generator-evaluator
   - harness-contract
   - adaptive-density
-when_to_use: Use when running an autonomous multi-hour build of a green-field product (planner→contract→generator⇄evaluator loop). NOT for scoped single-task work (see mk:cook) or initial scaffolding only (see mk:bootstrap).
+when_to_use: A whole product is specified from scratch and should build unattended.
 user-invocable: true
 meowkit:
   portability: provider-only
@@ -45,7 +45,7 @@ runtime: claude-code
 context_cost: high
 ---
 
-<!-- Lifecycle canonical source: .claude/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
+<!-- Lifecycle canonical source: .claude/skills/workflow-orchestrator/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
 
 # mk:autobuild — Autonomous Multi-Hour Build Orchestration
 
@@ -73,7 +73,7 @@ Skip when:
 4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
 5. **Run report mandatory** — every autobuild run produces `tasks/autobuild-runs/YYMMDD-{slug}/run.md` with full audit trail
 6. **Coexists with `mk:cook`** — does not replace it; both route through Gate 1 + Gate 2
-7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.claude/session-state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `harness-rules.md`) is independent of TDD mode and always applies.
+7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.meowkit/state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of `.claude/skills/cook/references/harness-rules.md`) is independent of TDD mode and always applies.
 
 ## `--advice` (composable, off by default)
 
@@ -92,7 +92,7 @@ five-round build makes no more calls than a one-round build.
 Without the flag there are zero calls and no state is written.
 
 Checkpoints: `references/advice-checkpoints.md`. Contract:
-`.claude/rules-conditional/advice-supervision-rules.md` (load only when the flag is present).
+`.claude/skills/advise/references/advice-supervision-rules.md` (load only when the flag is present).
 
 ## Workflow
 
@@ -107,6 +107,17 @@ Step 4: Evaluate            → invoke mk:evaluate
 Step 5: Iterate or Ship     → PASS → shipper; FAIL → loop to step-3 (max --max-iter)
 Step 6: Run Report          → write the audit trail
 ```
+
+### Rule Loads (just in time)
+
+These rules left the always-on set; the harness owns them at the canonical cook path — there is no duplicate copy under this skill.
+
+| Load at | Rule |
+| --- | --- |
+| Step 0, before density selection | `.claude/skills/cook/references/harness-rules.md` — the 10 harness rules this pipeline enforces (density, generator ≠ evaluator, iteration cap, budget thresholds, active-verification HARD GATE) |
+| Step 0, alongside the harness rules | `.claude/skills/cook/references/phase-contracts.md` — what each of the 7 phases expects and produces |
+| Step 3, only when the generator stage is parallelized | `.claude/skills/cook/references/parallel-execution-rules.md` — zero file overlap, max 3 agents, worktree isolation, integration test after merge |
+| Steps 5 and 6, before the project-manager delegation | `.claude/skills/cook/references/post-phase-delegation.md` — fire points (Step 5 foreground pre-escalation, Step 6 background) and skip conditions |
 
 ## Density Modes
 

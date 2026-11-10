@@ -30,7 +30,7 @@ Sets up the infrastructure for parallel agent execution. Called by the orchestra
 - **Subtask decomposition:** parses the approved plan to identify independent subtasks
 - **Ownership map:** assigns file ownership globs per subtask, validates zero overlap
 - **Worktree creation:** creates one git worktree per parallel agent via `mk:worktree`
-- **Task queue init:** creates `session-state/task-queue.json` with claiming protocol via `mk:task-queue`
+- **Task queue init:** creates `.meowkit/state/task-queue.json` with claiming protocol via `mk:task-queue`
 - **Validation:** checks for overlapping ownership before dispatching agents
 
 ## Workflow

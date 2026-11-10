@@ -13,7 +13,7 @@ Install the CLI. Every `mk:jira-*` skill uses it, and there is no global install
 npx mewkit setup
 ```
 
-That puts `jira-as` in `.claude/skills/.venv/bin/`. Then put three values in `.meowkit/.env`, which is gitignored:
+That puts `jira-as` in the `jira` skill's environment under `.meowkit/envs/jira/bin/`. Then put three values in `.meowkit/.env`, which is gitignored:
 
 | Variable | What it is |
 |---|---|
@@ -21,7 +21,7 @@ That puts `jira-as` in `.claude/skills/.venv/bin/`. Then put three values in `.m
 | `MEOW_JIRA_EMAIL` | The Atlassian account that token belongs to |
 | `MEOW_JIRA_SITE_URL` | Your site, for example `https://your-company.atlassian.net` |
 
-Start a session. The `jira-env-loader.sh` hook checks the file and prints either `[mk:jira] env OK` or `[mk:jira] <KEY> missing`, so you find out at session start rather than mid-task. The wrapper translates `MEOW_JIRA_*` into the native `JIRA_*` variables per call, which is why your shell never needs them.
+Start a session. The `jira-env-loader.cjs` hook checks the file and prints either `[mk:jira] env OK` or `[mk:jira] <KEY> missing`, so you find out at session start rather than mid-task. The wrapper translates `MEOW_JIRA_*` into the native `JIRA_*` variables per call, which is why your shell never needs them.
 
 The full variable list is in [Configuration](/reference/configuration#jira).
 

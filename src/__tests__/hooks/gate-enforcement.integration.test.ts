@@ -22,11 +22,11 @@ function runGate(filePath: string, extraEnv?: Record<string, string>) {
 		tool: "Write",
 		toolName: "Write",
 		toolInput: { file_path: filePath },
-		only: "gate-enforcement.sh",
+		only: "gate-enforcement.cjs",
 		extraEnv,
 	});
-	const gate = results.find((r) => r.script === "gate-enforcement.sh");
-	expect(gate, "gate-enforcement.sh was not configured/run for PreToolUse Write").toBeDefined();
+	const gate = results.find((r) => r.script === "gate-enforcement.cjs");
+	expect(gate, "gate-enforcement.cjs was not configured/run for PreToolUse Write").toBeDefined();
 	return gate!;
 }
 
@@ -52,6 +52,7 @@ describe("gate-enforcement (configured-hook integration)", () => {
 	it("approved (receipt-stamped) plan → source write allowed (exit 0)", () => {
 		project = scaffold();
 		const planPath = project.addPlan({ nested: true });
+		project.addSignedContract("demo");
 		expect(project.approvePlan(planPath)).toBe(true);
 		const r = runGate("src/app.ts");
 		expect(r.status).toBe(0);
@@ -61,6 +62,7 @@ describe("gate-enforcement (configured-hook integration)", () => {
 	it("plan edited after approval → stale receipt re-blocks (exit 2)", () => {
 		project = scaffold();
 		const planPath = project.addPlan({ nested: true });
+		project.addSignedContract("demo");
 		expect(project.approvePlan(planPath)).toBe(true);
 		fs.appendFileSync(planPath, "\nAdded scope after approval.\n"); // addPlan returns an absolute path
 		const r = runGate("src/app.ts");
@@ -71,6 +73,8 @@ describe("gate-enforcement (configured-hook integration)", () => {
 	it("MEOWKIT_GATE1_PRESENCE_ONLY=1 → plan presence alone allows (escape hatch, exit 0)", () => {
 		project = scaffold();
 		project.addPlan({ nested: true }); // unapproved
+		// The downgrade waives the receipt check only; the contract step still runs.
+		project.addSignedContract("demo");
 		const r = runGate("src/app.ts", { MEOWKIT_GATE1_PRESENCE_ONLY: "1" });
 		expect(r.status).toBe(0);
 	});

@@ -1,6 +1,6 @@
 ---
 name: mk:confluence
-description: 'Routing skill — recommends the correct mk:confluence-* leaf for any Confluence Cloud task. Triggers: ''confluence'', ''wiki page'', ''spec page'', ambiguous Confluence intent. NOT an executor — every actual operation forks via a leaf skill.'
+description: 'Confluence Cloud routing hub. Picks the mk:confluence-* leaf and forwards it. NOT an executor.'
 phase: on-demand
 source: local
 keywords:
@@ -10,12 +10,13 @@ keywords:
   - atlassian-wiki
   - wiki
   - spec-page
-when_to_use: Use when user has a Confluence intent but the specific leaf isn't clear. NOT for direct execution — forward to mk:confluence-{specific}.
+when_to_use: 'Confluence or wiki work is wanted but the leaf is unclear; the hub body routes.'
 user-invocable: true
 owner: confluence
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 requires_external_service: ["confluence"]
 default_enabled: false
 dependency_edges:
@@ -69,14 +70,14 @@ This skill is a **pure routing layer**. Its sole purpose: identify the right `mk
 
 ## Setup
 
-See `references/install-and-auth.md` for one-time setup (`.claude/scripts/bin/setup-workflow` installs `confluence-assistant-skills` into `.claude/skills/.venv` per `scripts/requirements.txt`; populate `.meowkit/.env` with the 3 `MEOW_CONFLUENCE_*` vars).
+See `references/install-and-auth.md` for one-time setup (`mewkit skill env confluence` installs `confluence-assistant-skills` into `.meowkit/envs/confluence/` per `scripts/requirements.txt`; populate `.meowkit/.env` with the 3 `MEOW_CONFLUENCE_*` vars). That reference also carries the **guided setup** sequence — the one place in this family that walks a user through credentials step by step, including the never-echo-the-token rule. Setup is the single operation the hub performs rather than routing, because it is a precondition for every leaf and belongs to no one of them.
 
 ## Shared Resources (used by leaves)
 
 - `scripts/confluence-as.sh` — env-translating wrapper (`MEOW_CONFLUENCE_*` → `CONFLUENCE_*`, sets `CONFLUENCE_OUTPUT=json`, refuses settings.local.json fallback, gates non-Cloud URLs)
 - `scripts/cql-sanitize.sh` — CQL injection guard for user-derived input
 - `scripts/adf-to-md.sh` + `scripts/adf_to_md.py` — macro-aware ADF→Markdown walker (panel, decisionList/Item, taskList/Item, expand, mention, media, inlineCard preserved with explicit labels)
-- `scripts/requirements.txt` — pip dependency manifest auto-discovered by `.claude/scripts/bin/setup-workflow`
+- `scripts/requirements.txt` — pip dependency manifest auto-discovered by `.claude/hooks/lib/setup-workflow`
 - `scripts/smoke-live.sh` — manual live-creds smoke test
 - `references/install-and-auth.md` — env vars, setup, Cloud-only gate, escape hatch
 - `references/cli-idioms.md` — wrapper invocation patterns + safe-invocation rules + conversion-helper idioms

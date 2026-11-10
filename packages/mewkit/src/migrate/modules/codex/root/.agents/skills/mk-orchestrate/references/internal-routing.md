@@ -81,7 +81,7 @@ dispatch contract requires and keeps the shape consistent with every other
 in-session delegation.
 
 Independent same-stage jobs may launch together up to `concurrency`, capped at
-3 concurrent internal agents per `parallel-execution-rules.md` regardless of
+3 concurrent internal agents per the parallel-execution rules regardless of
 what the spec requests — a ceiling that applies only to internal dispatch, not
 to external CLI runtimes. Parallel writing jobs require disjoint ownership and
 separate worktrees, created via `mk:worktree`. The prompt pins the agent to
@@ -90,7 +90,7 @@ sandbox.
 
 Internal jobs must not perform `destructive: true` or credentialed external
 actions unless the live harness supplies controls that satisfy the R3 policy
-and the human approval recorded per `intervention-recording-rules.md` and
+and the human approval recorded per the intervention-recording invariant in AGENTS.md and
 `gate-rules.md` is already in hand. When it does not, route to a qualified
 externally isolated candidate or block.
 

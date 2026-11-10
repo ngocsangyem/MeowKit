@@ -226,18 +226,6 @@ describe("telemetry-observers.cjs (fail-open, PII-scrubbed)", () => {
 	});
 });
 
-describe("prompt-capture.cjs (beforeSubmitPrompt, noncritical, block-only contract never exercised)", () => {
-	it("always continues for a plain prompt (fast no-op)", () => {
-		const r = runHook("prompt-capture.cjs", fixture("before-submit-prompt-plain"), dir);
-		expect(r.json).toEqual({ continue: true });
-	});
-
-	it("always continues even for a capture-prefixed prompt (capture is a side effect, never blocking)", () => {
-		const r = runHook("prompt-capture.cjs", fixture("before-submit-prompt-capture"), dir);
-		expect(r.json).toEqual({ continue: true });
-	});
-});
-
 describe("subagent-lifecycle.cjs (subagentStart/subagentStop, noncritical)", () => {
 	it("allows subagentStart and logs telemetry", () => {
 		const r = runHook("subagent-lifecycle.cjs", fixture("subagent-start"), dir);

@@ -7,10 +7,6 @@
 - [Completeness Principle — Boil the Lake](#completeness-principle-boil-the-lake)
 - [Repo Ownership Mode — See Something, Say Something](#repo-ownership-mode-see-something-say-something)
 - [Search Before Building](#search-before-building)
-- [Contributor Mode](#contributor-mode)
-- [Steps to reproduce](#steps-to-reproduce)
-- [Raw output](#raw-output)
-- [What would make this a 10](#what-would-make-this-a-10)
 - [Completion Status Protocol](#completion-status-protocol)
   - [Escalation](#escalation)
 - [Telemetry (run last)](#telemetry-run-last)
@@ -79,50 +75,8 @@ Before building infrastructure, unfamiliar patterns, or anything the runtime mig
 **Eureka moment:** When first-principles reasoning reveals conventional wisdom is wrong, name it:
 "EUREKA: Everyone does X because [assumption]. But [evidence] shows this is wrong. Y is better because [reasoning]."
 
-Log eureka moments:
-```bash
-jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> .meowkit/telemetry/eureka.jsonl 2>/dev/null || true
-```
-Replace SKILL_NAME and ONE_LINE_SUMMARY. Runs inline — don't stop the workflow.
 
 **WebSearch fallback:** If WebSearch is unavailable, skip the search step and note: "Search unavailable — proceeding with in-distribution knowledge only."
-
-## Contributor Mode
-
-If `_CONTRIB` is `true`: you are in **contributor mode**. You're a toolkit user who also helps make the toolkit better.
-
-**At the end of each major workflow step** (not after every single command), reflect on the tooling you used. Rate your experience 0 to 10. If it wasn't a 10, think about why. If there is an obvious, actionable bug OR an insightful, interesting thing that could have been done better by tooling code or skill markdown — file a field report. Maybe our contributor will help make us better!
-
-**Calibration — this is the bar:** For example, if `agent-browser eval "await fetch(...)"` failed with `SyntaxError: await is only valid in async functions` because the runner didn't wrap expressions in async context, that would be small but reasonable input that the toolkit should handle — worth filing. Things less consequential than this, ignore.
-
-**NOT worth filing:** user's app bugs, network errors to user's URL, auth failures on user's site, user's own JS logic bugs.
-
-**To file:** write `.meowkit/memory/contributor-logs/{slug}.md` with **all sections below** (do not truncate — include every section through the Date/Version footer):
-
-```
-# {Title}
-
-Hey tooling maintainers — ran into this while using /{skill-name}:
-
-**What I was trying to do:** {what the user/agent was attempting}
-**What happened instead:** {what actually happened}
-**My rating:** {0-10} — {one sentence on why it wasn't a 10}
-
-## Steps to reproduce
-1. {step}
-
-## Raw output
-```
-{paste the actual error or unexpected output here}
-```
-
-## What would make this a 10
-{one sentence: what the toolkit should have done differently}
-
-**Date:** {YYYY-MM-DD} | **Version:** {toolkit version} | **Skill:** /{skill}
-```
-
-Slug: lowercase, hyphens, max 60 chars (e.g. `browse-js-no-await`). Skip if file already exists. Max 3 reports per session. File inline and continue — don't stop the workflow. Tell user: "Filed tooling field report: {title}"
 
 ## Completion Status Protocol
 
@@ -157,8 +111,8 @@ Determine the outcome from the workflow result (success if completed normally, e
 if it failed, abort if the user interrupted).
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-`.meowkit/memory/` (user config directory, not project files). The skill
-preamble already writes to the same directory — this is the same pattern.
+`.meowkit/telemetry/` (not project files). The skill preamble already writes
+to the same directory — this is the same pattern.
 Skipping this command loses session duration and outcome data.
 
 Run this bash:
@@ -186,7 +140,7 @@ When you are in plan mode and about to call ExitPlanMode:
 3. If it does NOT — run this command:
 
 ```bash
-.claude/scripts/bin/workflow-review-log
+.claude/hooks/lib/workflow-review-log
 ```
 
 Then write a `## REVIEW REPORT` section to the end of the plan file:

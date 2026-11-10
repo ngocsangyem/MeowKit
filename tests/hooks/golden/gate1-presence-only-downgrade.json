@@ -1,0 +1,24 @@
+{
+  "name": "gate1-presence-only-downgrade",
+  "group": "gate1",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/gate-enforcement.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"src/app.ts\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}",
+    "MEOWKIT_GATE1_PRESENCE_ONLY": "1"
+  },
+  "setup": "gate1-presence-only-downgrade",
+  "setupDescription": "unstamped plan + signed contract, with the presence-only downgrade set",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": "Gate 1: downgraded to presence-only via MEOWKIT_GATE1_PRESENCE_ONLY=1 (approval receipt NOT verified).\n"
+  }
+}

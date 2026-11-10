@@ -1,0 +1,25 @@
+{
+  "name": "validate-gate-2-invalid",
+  "group": "gate-helper-validate-gate-2",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/skills/cook/scripts/validate-gate-2.sh",
+  "args": [
+    "tasks/reviews/261101-corpus-demo-verdict.md"
+  ],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "validate-gate-2-invalid",
+  "setupDescription": "a verdict carrying a FAIL dimension",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "marker": null,
+    "stdout": "GATE_2_BLOCKED: has-FAIL-dimensions(1) — review verdict, score: 9/10\nHuman approval required to override.\n",
+    "stderr": ""
+  }
+}

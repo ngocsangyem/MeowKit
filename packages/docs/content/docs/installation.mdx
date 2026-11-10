@@ -6,7 +6,7 @@ description: "Install MeowKit and get it running in your project."
 ## Prerequisites
 
 - **Node.js** 24 or later
-- **Python** 3.9 or later. `mewkit setup` creates a virtualenv at `.claude/skills/.venv` and pip-installs `google-genai`, `pillow`, and `python-dotenv`, plus any per-skill `requirements.txt`
+- **Python** 3.9 or later, and only for the skills that run Python; the core workflow needs none. `mewkit setup` prepares one environment per skill under `.meowkit/envs/<skill>/` and installs that skill's own `requirements.txt` into it
 - **Git** installed and configured
 - **Claude Code** installed ([claude.ai/code](https://claude.ai/code))
 
@@ -27,7 +27,7 @@ On a fresh install the CLI prompts, in order:
 | Toolkits, a multiselect of Claude Code / Codex / Cursor | Claude Code preselected |
 | Install profile | `full` |
 | Project description (optional) | skipped |
-| Install Python skill dependencies into `.claude/skills/.venv` | no |
+| Install Python skill dependencies into `.meowkit/envs/<skill>/` | no |
 | Gemini API key (optional) | no |
 | Fallback API keys for external providers (optional) | no |
 
@@ -38,6 +38,7 @@ All other settings use fixed defaults: cost tracking enabled, memory enabled, mo
 Skip the interactive prompts with flags:
 
 ```bash
+npx mewkit init --target claude-code  # Skip the picker, Claude Code only
 npx mewkit init --target codex     # Skip the picker, Codex-only toolkit
 npx mewkit init --target cursor    # Skip the picker, .claude/ plus export to Cursor
 npx mewkit init --force            # Overwrite existing .claude/
@@ -45,7 +46,81 @@ npx mewkit init --dry-run          # Preview without writing
 npx mewkit init --profile core     # Install a right-sized profile subset
 ```
 
-Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that flow directly.
+Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that flow directly. An
+unrecognized target is refused by name with the three valid ones listed, rather than falling through
+to the default install.
+
+### Delivery shape
+
+`--target claude-code` has two on-disk shapes, and `--delivery` picks one:
+
+```bash
+npx mewkit init --target claude-code --delivery native  # .claude/, the default
+npx mewkit init --target claude-code --delivery plugin  # plus .claude-plugin/plugin.json
+```
+
+Both deliveries carry the same content, written by the same emitter. `plugin` adds the manifest
+Claude Code reads to load the kit as a plugin; everything else sits in the standard locations the
+host already scans. There is no separate build step, and MeowKit is not published to a plugin
+marketplace.
+
+`--delivery` is meaningful for `claude-code` only. Codex and Cursor each have a single shape, so
+passing it with either is refused rather than ignored.
+
+## Verified install
+
+<Callout type="info">
+  **Not live yet.** No published release carries the signed artifact, and the CLI ships no trusted
+  signing key, so every install today takes the legacy zip path described below. The verification
+  engine is in place and is what will run once releases carry the artifact and a key is published;
+  until then this section describes behaviour you cannot yet observe. `npx mewkit versions` reports
+  the `origin` your project actually used.
+</Callout>
+
+The kit is designed to be published as a signed artifact: a single archive, a manifest carrying the
+archive's own digest plus a SHA-256 for every file inside it, and a detached ed25519 signature over
+that manifest. Before anything is extracted, `init` and `upgrade` check the signature against the
+trusted keys the CLI itself ships, then the archive digest, then every per-file digest.
+
+Verification is unconditional when an artifact is present. There is no flag, environment variable
+or channel that skips it:
+
+- A release that carries an artifact is installed from it.
+- A release that carries no artifact at all installs through the older zip asset, so earlier
+  releases keep working. **This is every release today.**
+- An artifact that is present and fails any check **stops the install**. It does not fall back to
+  the zip, even when the zip is there: a fallback would mean a tampered artifact silently
+  downgrades you to an unverified source. The message names which check failed, on which file, and
+  what to do next, and `mewkit doctor` can repeat it later with no network.
+
+## Offline install
+
+`--offline` installs from the artifact this project already cached, and reaches no network:
+
+```bash
+npx mewkit init --offline
+npx mewkit upgrade --offline
+```
+
+The cache is project-local, at `.meowkit/cache/`, and untracked. What comes out of it is put
+through the **same** signature and digest checks a download gets: a cached file is a local file, and
+it is not trusted more for being local.
+
+Because the cache is per project, `--offline` works only in a project that has installed at least
+once. In a project that has not, it refuses and names the two ways forward: point
+`MEOWKIT_RELEASE_SOURCE` at a directory holding an already-extracted release, or run
+`mewkit upgrade` once with network access so the project caches the artifact.
+
+## What is installed here
+
+```bash
+npx mewkit versions
+```
+
+Prints this project's CLI version, kit version, target and delivery, plus how the content arrived.
+It exits non-zero in a directory with no install, so a script can tell "nothing installed" from
+"installed with an unusual version". A project installed before these were recorded reports them as
+`unknown` rather than guessing.
 
 ## What gets generated
 
@@ -66,19 +141,18 @@ Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that 
 ├── metadata.json    What this install put on disk, and what you have edited since
 ├── pack-manifest.json  Which packs this release ships
 ├── harness-inventory.json  Generated registry of .claude/ artifacts
-├── memory/          Fix patterns, review patterns, architecture decisions
+├── memory/          decisions.md + gotchas.md, committed
 ├── telemetry/       Cost log, trace log
 ├── state/           Session markers
-└── cache/           Derived wiki index, rebuildable
+└── cache/           Derived caches, rebuildable
 
-CLAUDE.md             Entry point for Claude Code
 .mcp.json.example     Optional MCP server config
 ```
 
 The split follows ownership: `.claude/` holds what Claude Code itself reads, so
 `settings.json` and `.mcp.json` stay there. Everything MeowKit owns lives in `.meowkit/`.
-Only `config.json` is meant to be committed; the state directories are machine-written
-and belong in `.gitignore` (`mewkit setup` appends them for you).
+`config.json` and `memory/*.md` are meant to be committed; the other state directories are
+machine-written and belong in `.gitignore` (`mewkit setup` appends them for you).
 
 `metadata.json` is worth knowing about even though you never edit it. It records what the
 install wrote and what its contents were, which is how `mewkit upgrade` can tell a file you
@@ -126,7 +200,7 @@ Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 | `.claude/` already exists | Use `--force` flag or delete manually |
 | Hooks not executable | Run `chmod +x .claude/hooks/*.sh` |
 | Python scripts fail | Ensure Python 3.9+ is in PATH |
-| Claude Code doesn't load CLAUDE.md | Restart Claude Code session |
+| Claude Code doesn't load `.claude/rules/` | Restart the Claude Code session; `npx mewkit validate` confirms all 7 always-on rules are present |
 | The agent refuses to edit any file | Gate 1 is unapproved, which is the gate working. See [When a gate blocks you](/core-concepts/gates#when-a-gate-blocks-you) |
 | `doctor` reports hooks not executable after a fresh clone | `npx mewkit doctor` fixes this itself; permissions do not survive some archive formats |
 

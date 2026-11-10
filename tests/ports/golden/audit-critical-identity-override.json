@@ -1,0 +1,26 @@
+{
+  "name": "audit-critical-identity-override",
+  "group": "injection-audit",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "scan-dir",
+    "args": [
+      "."
+    ]
+  },
+  "setup": "audit-critical-identity-override",
+  "setupDescription": "one scanned file claims its instructions were replaced",
+  "normalizers": [
+    "tmpdir",
+    "logStamp"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "stdout": "Injection audit scanning: .\n[CRITICAL] [IDENTITY_OVERRIDE] Agent identity may have been overridden: my new instructions are — notes/fetched-page.md (line 2)\n\n--- Audit Summary ---\nCRITICAL: 1\nSUSPICIOUS: 0\n\n==== CRITICAL — Possible successful prompt injection ====\nHALT: Review findings above. Do NOT proceed without human review.\nFindings logged to: .meowkit/telemetry/security-log.md\n",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/security-log.md": "[{{STAMP}}] [CRITICAL] [manual-audit] Agent identity may have been overridden: my new instructions are — notes/fetched-page.md\n"
+  }
+}

@@ -154,8 +154,8 @@ Mostly second-person **"you"** for guides ("When you start a Claude Code session
 
 - Product name: **MeowKit** (one word, camel-cased both halves).
 - CLI: lowercase `mewkit` — yes, dropped "o", that's intentional (npm package name).
-- Commands: `/mk:cook`, `/mk:fix`, `/mk:plan` — always lowercased, slash-prefixed, colon-namespaced.
-- Skills: `mk:agent-detector`, `mk:plan-creator` — lowercase-kebab.
+- Skill invocations: `/mk:cook`, `/mk:fix`, `/mk:plan-creator` — always lowercased, slash-prefixed, colon-namespaced.
+- Skill names in prose: `mk:agent-detector`, `mk:plan-creator` — lowercase-kebab.
 - Agents: lowercase single-word or hyphenated (`orchestrator`, `ui-ux-designer`).
 - Phases: title-cased with number — **Phase 3 Build**.
 - Gates: **Gate 1**, **Gate 2** — bold, numbered.

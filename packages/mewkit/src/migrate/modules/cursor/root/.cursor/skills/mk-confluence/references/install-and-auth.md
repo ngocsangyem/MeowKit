@@ -23,7 +23,7 @@ The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load 
 - `confluence-assistant-skills==0.2.0` — distribution package; ships the `confluence-as` binary
 - `assistant-skills-lib==1.0.1` — transitive infra dep
 
-Verify: `ls .cursor/skills/.venv/bin/ | grep confluence-as`
+Verify: `ls .meowkit/envs/confluence/bin/ | grep confluence-as`
 
 ## Binary name
 

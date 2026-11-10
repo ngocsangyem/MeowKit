@@ -106,7 +106,7 @@ Before stage construction:
    writer has the required isolation.
 9. Stop for explicit human approval before destructive or external side
    effects — the approval and its scope are recorded per
-   `intervention-recording-rules.md`; the gate itself is owned by
+   the intervention-recording invariant in AGENTS.md; the gate itself is owned by
    `gate-rules.md` and is never satisfied by a passing check alone.
 
 Unknown flags, models, or controls fail validation. Re-read live help or current

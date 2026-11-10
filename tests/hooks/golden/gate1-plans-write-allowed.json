@@ -1,0 +1,23 @@
+{
+  "name": "gate1-plans-write-allowed",
+  "group": "gate1",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/gate-enforcement.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"tasks/plans/261101-corpus-demo/phase-01-setup.md\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "gate1-plans-write-allowed",
+  "setupDescription": "no plan at all; the write itself targets tasks/plans/",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  }
+}

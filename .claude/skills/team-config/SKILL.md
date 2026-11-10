@@ -1,6 +1,6 @@
 ---
 name: mk:team-config
-description: Set up parallel agent team for COMPLEX tasks. Creates worktree structure, generates ownership map, and initializes task queue. Use when orchestrator decomposes a task into parallel subtasks, or when asked to "set up team", "parallel setup", or "configure worktrees".
+description: 'Sets up a parallel agent team: worktrees, ownership map, task queue. NOT for mk:worktree.'
 argument-hint: '"task description" --agents N'
 source: local
 allowed-tools:
@@ -14,7 +14,7 @@ keywords:
   - ownership-map
   - parallel-team-init
   - task-queue-init
-when_to_use: Auto-invoked when orchestrator decomposes a COMPLEX task into parallel subtasks — sets up worktrees, ownership map, task queue. Not user-callable directly.
+when_to_use: Auto-invoked when a complex task is split into parallel subtasks.
 user-invocable: false
 owner: git
 criticality: medium
@@ -31,7 +31,7 @@ Sets up the infrastructure for parallel agent execution. Called by orchestrator 
 1. **Analyzes the task** — identifies independent subtasks from the plan
 2. **Generates ownership map** — assigns file ownership globs per subtask
 3. **Creates worktrees** — one git worktree per parallel agent
-4. **Initializes task queue** — `session-state/task-queue.json` with claiming protocol
+4. **Initializes task queue** — `.meowkit/state/task-queue.json` with claiming protocol
 5. **Validates no overlap** — checks ownership globs for conflicts before starting
 
 ## Setup Flow
@@ -56,7 +56,7 @@ Parallel agents start claiming tasks
 When team mode activates, `Read` `references/team-coordination.md` — the team-only
 coordination rules (file ownership per task, no force-push, worktree-branch commits,
 actionable completion messages, lead docs-impact ownership). These were moved out of
-always-loaded `parallel-execution-rules.md` so they load only on team activation.
+always-loaded `.claude/skills/cook/references/parallel-execution-rules.md` so they load only on team activation.
 
 ## Ownership Map Template
 
@@ -64,7 +64,7 @@ See `templates/ownership-map-template.md` for the format agents use to declare f
 
 ## Constraints
 
-- Max 3 parallel agents (from `parallel-execution-rules.md`)
+- Max 3 parallel agents (from `.claude/skills/cook/references/parallel-execution-rules.md`)
 - Only COMPLEX tasks qualify (orchestrator enforces this)
 - Gates (1 and 2) are never parallelized
 - All worktrees branch from current feature branch HEAD
@@ -81,4 +81,4 @@ See `templates/ownership-map-template.md` for the format agents use to declare f
 After all parallel agents complete and integration test passes:
 1. Merge all worktree branches to feature branch
 2. Remove worktrees via `mk:worktree cleanup`
-3. Archive `session-state/task-queue.json`
+3. Archive `.meowkit/state/task-queue.json`

@@ -1,6 +1,6 @@
 ---
 name: jira-admin
-description: Execute JIRA project + user + group + scheme + automation administration via the jira-as CLI wrapper (11 sub-domains, ~65 verbs). Routed by mk:jira-admin skill. Requires Jira admin role. NOT for per-issue ops (jira-issue / jira-lifecycle); NOT for JSM admin (jira-jsm).
+description: 'mk:jira executor for mk:jira-admin. Project, user, group and scheme admin.'
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default

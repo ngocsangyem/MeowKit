@@ -21,7 +21,7 @@ The triage step (03) categorizes findings within the diff. The sweep checks whet
 ### 1. Locate the active plan
 
 ```bash
-PLAN_DIR=$(cat session-state/active-plan 2>/dev/null)
+PLAN_DIR=$(cat .meowkit/state/active-plan 2>/dev/null)
 [ -z "$PLAN_DIR" ] && echo "No active plan; skipping sweep" && exit 0
 [ -d "$PLAN_DIR" ] || { echo "Active plan dir missing: $PLAN_DIR"; exit 0; }
 ```
@@ -73,7 +73,7 @@ The reviewer agent flags these to the human as "plan-file inconsistency, fix bef
 ## Skip Conditions
 
 Skip silently when:
-- No active plan in `session-state/active-plan`
+- No active plan in `.meowkit/state/active-plan`
 - Plan dir does not exist
 - Plan has only `plan.md` and no phase files (single-file plans cannot drift cross-file)
 

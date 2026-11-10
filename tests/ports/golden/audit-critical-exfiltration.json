@@ -1,0 +1,26 @@
+{
+  "name": "audit-critical-exfiltration",
+  "group": "injection-audit",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "scan-dir",
+    "args": [
+      "."
+    ]
+  },
+  "setup": "audit-critical-exfiltration",
+  "setupDescription": "one scanned file pipes a local file to a remote collector",
+  "normalizers": [
+    "tmpdir",
+    "logStamp"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "stdout": "Injection audit scanning: .\n[CRITICAL] [EXFILTRATION] Potential data exfiltration pattern: curl\\s+.*-d\\s+@ — tools/upload.sh (line 2)\n\n--- Audit Summary ---\nCRITICAL: 1\nSUSPICIOUS: 0\n\n==== CRITICAL — Possible successful prompt injection ====\nHALT: Review findings above. Do NOT proceed without human review.\nFindings logged to: .meowkit/telemetry/security-log.md\n",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/security-log.md": "[{{STAMP}}] [CRITICAL] [manual-audit] Potential data exfiltration pattern: curl\\s+.*-d\\s+@ — tools/upload.sh\n"
+  }
+}

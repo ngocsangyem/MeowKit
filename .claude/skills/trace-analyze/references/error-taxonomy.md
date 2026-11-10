@@ -51,8 +51,8 @@ Each entry has:
 
 - **Trace signal:** `file_edited` records on files matching `**/package.json` or `**/Cargo.toml` early in a run_id (within first 5 events) — agent searching for tool config instead of using LocalContext
 - **Threshold:** ≥3 runs
-- **Root cause:** Agent fails search + discovery, doesn't use LocalContext expansion from project-context-loader.sh
-- **Mitigation:** Verify LocalContext block is firing (Phase 7 extension to project-context-loader.sh). Check session-start trace for the LocalContext output. If missing, fix the hook.
+- **Root cause:** Agent fails search + discovery, doesn't use LocalContext expansion from project-context-loader.cjs
+- **Mitigation:** Verify LocalContext block is firing (Phase 7 extension to project-context-loader.cjs). Check session-start trace for the LocalContext output. If missing, fix the hook.
 
 ### `time-budget-exceeded`
 

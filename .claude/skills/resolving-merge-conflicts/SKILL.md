@@ -2,15 +2,7 @@
 name: mk:resolving-merge-conflicts
 preamble-tier: 2
 version: 1.0.0
-description: |
-  Resolve an in-progress git merge or rebase conflict end to end: read the
-  conflict state, recover each side's original intent, resolve every hunk,
-  run the project's checks, and prepare the merge/rebase for an explicitly approved finish.
-  Use when asked to "resolve merge conflicts", "fix this rebase", "finish the
-  merge", or when `git status` shows conflicted (unmerged) paths.
-  NOT for the full ship pipeline that merges the base branch first (see mk:ship);
-  NOT for debugging a runtime bug or test failure unrelated to a conflict
-  (see mk:investigate / mk:fix).
+description: Resolves an in-progress merge or rebase hunk by hunk, then runs the project checks. NOT for mk:ship.
 allowed-tools:
   - Bash
   - Read
@@ -25,7 +17,7 @@ keywords:
   - conflict-resolution
   - unmerged-paths
   - three-way-merge
-when_to_use: Use when a git merge or rebase is in progress and has conflicted paths to resolve. NOT for the base-branch merge step of shipping (see mk:ship); NOT for non-conflict bugs (see mk:investigate).
+when_to_use: git status reports unmerged paths.
 user-invocable: true
 owner: git
 criticality: high

@@ -1,6 +1,6 @@
 ---
 name: mk:pack
-description: 'Pack an EXTERNAL repository into a single AI-friendly file (markdown/xml/json). Use for third-party library analysis, security audits, or handoff to external LLMs. Do NOT use to pack the current project for inbound context — the host runtime already reads files lazily. Triggers: ''pack this repo'', ''snapshot of X'', ''export codebase'', ''repomix''.'
+description: Packs an external repository into one AI-readable markdown, xml or json file. NOT for mk:scout.
 argument-hint: <source> [--style markdown|xml|json|plain] [--include pattern] [--ignore pattern] [--remove-comments] [--compress] [--self] [--no-security-check]
 trust_level: kit-authored
 injection_risk: medium
@@ -12,7 +12,7 @@ keywords:
   - third-party-snapshot
   - ai-friendly-export
   - handoff
-when_to_use: Use when packing an EXTERNAL repository into a single AI-friendly file. NOT for packing the current project (the host runtime reads files lazily).
+when_to_use: Handing a third-party repo to another LLM or auditing a dependency's source.
 user-invocable: true
 owner: lifecycle
 criticality: medium

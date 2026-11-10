@@ -31,8 +31,10 @@ export default defineConfig({
 		// This is not masking: the tests complete and pass well under this ceiling; only
 		// the ceiling was wrong.
 		testTimeout: 30000,
-		// plugin/** is a generated mirror of .claude/ (via `mewkit build-plugin`); its
-		// test files are duplicates of source tests and must not be collected here.
+		// plugin/** is a local mirror of .claude/ that a plugin-delivery install
+		// (`mewkit init --target claude-code --delivery plugin`) may leave in a
+		// working copy; its test files are duplicates of source tests and must not be
+		// collected here.
 		// `*.test.cjs` under `.claude/` are node-native `assert` tests (run via `node`/`node --test`
 		// in CI), NOT vitest suites — Vitest would collect them and report "No test suite found".
 		// Exclude the whole class here rather than one file at a time.
@@ -46,6 +48,8 @@ export default defineConfig({
 			"**/dist/**",
 			".claude/**/*.test.cjs",
 			"plugin/**",
+			// Sibling session checkouts: separate revisions, not this tree's suites.
+			".claude/worktrees/**",
 			"**/migrate/modules/codex/root/**",
 			"**/migrate/modules/cursor/root/**",
 		],

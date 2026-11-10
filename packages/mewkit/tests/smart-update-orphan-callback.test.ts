@@ -37,11 +37,13 @@ beforeEach(() => {
 	fs.mkdirSync(path.join(targetDir, ".claude", "rules"), { recursive: true });
 	fs.writeFileSync(path.join(targetDir, ".claude", "rules", "keep.md"), "kept");
 	fs.writeFileSync(path.join(targetDir, ".claude", "rules", "stale.md"), "stale");
-	// Prior meowkit install — gates orphan cleanup. Without this file present,
-	// smartUpdate skips orphan cleanup entirely (fresh / non-meowkit .claude/).
+	// Prior meowkit install — gates orphan cleanup. Without an ownership record,
+	// smartUpdate skips orphan cleanup entirely (fresh / non-meowkit .claude/),
+	// because every file there would otherwise be offered for deletion.
+	fs.mkdirSync(path.join(targetDir, ".meowkit"), { recursive: true });
 	fs.writeFileSync(
-		path.join(targetDir, ".claude", "meowkit.manifest.json"),
-		JSON.stringify({ version: "v0", generatedAt: "2026-05-09", checksums: {} }),
+		path.join(targetDir, ".meowkit", "metadata.json"),
+		JSON.stringify({ schemaVersion: "1.0", tool: "meowkit", version: "2.0.0", installedAt: "", files: [] }),
 	);
 });
 
@@ -108,9 +110,9 @@ describe("smartUpdate confirmOrphans callback", () => {
 		expect(fs.existsSync(path.join(targetDir, ".claude", "rules", "stale.md"))).toBe(true);
 	});
 
-	it("skips orphan cleanup entirely when no prior meowkit.manifest.json exists", async () => {
+	it("skips orphan cleanup entirely when there is no prior ownership record", async () => {
 		// Simulate fresh install or .claude/ owned by another toolkit (claudekit etc.)
-		fs.unlinkSync(path.join(targetDir, ".claude", "meowkit.manifest.json"));
+		fs.unlinkSync(path.join(targetDir, ".meowkit", "metadata.json"));
 
 		let called = false;
 		const stats = await smartUpdate(config, sourceDir, targetDir, false, false, {

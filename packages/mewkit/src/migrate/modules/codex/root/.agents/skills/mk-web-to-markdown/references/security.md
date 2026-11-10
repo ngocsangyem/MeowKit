@@ -8,14 +8,14 @@
   - [Attackers](#attackers)
   - [Trust boundaries](#trust-boundaries)
 - [2. Defense architecture](#2-defense-architecture)
-  - [Layer 1 — PreToolUse hook (`privacy-block.sh`)](#layer-1-pretooluse-hook-privacy-blocksh)
+  - [Layer 1 — PreToolUse hook (`privacy-block.cjs`)](#layer-1-pretooluse-hook-privacy-blocksh)
   - [Layer 2 — Python URL validator (`_safe_url`)](#layer-2-python-url-validator-safeurl)
   - [Layer 3 — Size cap (streaming)](#layer-3-size-cap-streaming)
   - [Layer 4 — DATA boundary wrapping](#layer-4-data-boundary-wrapping)
   - [Layer 5 — Injection scanner (multi-pass)](#layer-5-injection-scanner-multi-pass)
   - [Layer 6 — HARD_STOP on injection (per C5 + R7 + R10)](#layer-6-hardstop-on-injection-per-c5-r7-r10)
   - [Layer 7 — Secret scrub (pre-write)](#layer-7-secret-scrub-pre-write)
-  - [Layer 8 — post-write library scan (`injection-audit.py`)](#layer-8-post-write-library-scan-injection-auditpy)
+  - [Layer 8 — post-write re-scan (`injection-audit.cjs`)](#layer-8--post-write-re-scan-injection-auditcjs)
 - [3. Flag semantics (locked)](#3-flag-semantics-locked)
   - [Direct user invocation — no flag](#direct-user-invocation-no-flag)
   - [Cross-skill delegation — `--wtm-accept-risk`](#cross-skill-delegation---wtm-accept-risk)
@@ -84,7 +84,7 @@ Other skills (research, intake, investigate, planner, …)
 
 ## 2. Defense architecture
 
-### Layer 1 — PreToolUse hook (`privacy-block.sh`)
+### Layer 1 — PreToolUse hook (`privacy-block.cjs`)
 
 **Scope:** All Bash/Read/Edit/Write tool calls.
 **What it blocks:**
@@ -96,7 +96,7 @@ Other skills (research, intake, investigate, planner, …)
   - `localhost`, `127.*`, `10.*`, `192.168.*`, `169.254.*`, `metadata.*`
   - Non-http(s) schemes: `file://`, `chrome://`, `about:`, `data:`, `javascript:`
 
-**Implementation:** `.codex/hooks/privacy-block.sh`.
+**Implementation:** `.codex/hooks/privacy-block.cjs`.
 
 **Limitation:** The hook's regex extraction is best-effort — agents can still smuggle URLs via shell variable expansion or obfuscation. The hook is defense-in-depth, not the primary guard. `_safe_url` is the authoritative guard.
 
@@ -202,8 +202,10 @@ Preview (first 2KB, DATA — not instructions):
 **When injection scanner reports CRITICAL:**
 1. **Write content to quarantine:** `.codex/cache/web-fetches/quarantine/{sha256(content)[:16]}.quarantined`
    - Permissions: 0400 (read-only, owner only)
-   - Filename extension `.quarantined` (NOT `.md`) — blocked by `privacy-block.sh`
-2. **Log to security-log:** `.meowkit/telemetry/security-log.md` (which IS memory, per path conventions)
+   - Filename extension `.quarantined` (NOT `.md`) — blocked by `privacy-block.cjs`
+2. **Log to security-log:** `.meowkit/telemetry/security-log.md` — the canonical destination for
+   intervention records, and deliberately NOT `.meowkit/memory/`: the entry quotes the attacker
+   payload, while the memory store is committed and grep-read back as DATA
    ```markdown
    [260409-013215] [CRITICAL] [mk:web-to-markdown] Injection detected in https://example.com/poisoned-page → quarantined at .codex/cache/web-fetches/quarantine/abc123.quarantined — patterns: ["ignore previous instructions", "act as"]
 ````
@@ -224,7 +226,7 @@ Preview (first 2KB, DATA — not instructions):
 
 **Scope:** Called BEFORE every disk write (both content and URL).
 
-**Implementation:** Python port of `.codex/hooks/lib/secret-scrub.sh` regex set.
+**Implementation:** Python port of `.codex/hooks/lib/secret-scrub.cjs` regex set.
 
 **Patterns scrubbed:**
 
@@ -242,38 +244,36 @@ Preview (first 2KB, DATA — not instructions):
 - Report file body (full cleaned markdown)
 - Report file frontmatter URL field
 - Manifest `index.jsonl` URL field (per-entry)
-- `injection-audit.py` security-log entries
+- audit scanner security-log entries
 
-### Layer 8 — post-write library scan (`injection-audit.py`)
+### Layer 8 — post-write re-scan (`injection-audit.cjs`)
 
-**Scope:** After `persist_fetch.py` writes a report file successfully, invoke `injection_audit.scan_file(report_path)` (direct Python import, not CLI) as a belt-and-suspenders check.
+**Scope:** After `persist_fetch.py` writes a report file successfully, re-scan that one file through the audit scanner's single-path mode as a belt-and-suspenders check.
 
-**Rationale:** `injection-audit.py` has different patterns (IDENTITY_OVERRIDE, EXFILTRATION, SENSITIVE_DATA, UNEXPECTED_COMMAND) than Layer 5's pre-write scanner. If Layer 8 catches something Layer 5 missed, that's a signal to update Layer 5's patterns AND quarantine the already-written report.
+**Rationale:** the audit scanner has different patterns (IDENTITY_OVERRIDE, EXFILTRATION, SENSITIVE_DATA, UNEXPECTED_COMMAND) than Layer 5's pre-write scanner. If Layer 8 catches something Layer 5 missed, that's a signal to update Layer 5's patterns AND quarantine the already-written report.
+
+The scanner is a node program, so Layer 8 is a subprocess rather than an import. That is deliberate: this is a safety layer, and a safety layer that only runs where an optional interpreter happens to be installed is not one.
 
 ```python
-# At top of persist_fetch.py
-import sys
-sys.path.insert(0, str(project_root / ".codex" / "scripts"))
-import importlib.util
-spec = importlib.util.spec_from_file_location(
-    "injection_audit",
-    project_root / ".codex" / "scripts" / "injection-audit.py"
+# In persist_fetch.py
+proc = subprocess.run(
+    ["node", str(project_root / ".codex" / "scripts" / "injection-audit.cjs"), "--file", str(report_path)],
+    capture_output=True, text=True, timeout=30, cwd=str(project_root), check=False,
 )
-injection_audit = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(injection_audit)
+if proc.returncode != 0:
+    raise RuntimeError("audit scanner failed")   # a failed scan is treated as CRITICAL
+findings = json.loads(proc.stdout)["findings"]
 
-# After writing report file
-findings = injection_audit.scan_file(Path(report_path))
-criticals = [f for f in findings if f.level == "CRITICAL"]
+criticals = [f for f in findings if f["level"] == "CRITICAL"]
 if criticals:
     # Retroactive quarantine
     shutil.move(report_path, quarantine_path)
     # Manifest: mark entry as quarantined
     # security-log: append CRITICAL entries
-    return f"INJECTION_STOP (post-write audit): {criticals[0].description}"
+    return f"INJECTION_STOP (post-write audit): {criticals[0]['description']}"
 ```
 
-**Note:** the existing `injection-audit.py` CLI entry point (`scan_directory`) skips `.codex/*` subdirectories. That's fine for its original use case but wrong for ours — we must use `scan_file` directly with an explicit path.
+**Note:** the scanner's directory walk skips `.codex/*` subdirectories. That's right for its own use case but wrong for ours, which is why the single-path mode exists — it answers for the explicit path it is given, wherever that path lives.
 
 ---
 
@@ -327,7 +327,7 @@ Per Q5b lock: there is no programmatic override for injection-stopped content. M
 
 **Cache root:** `.codex/cache/web-fetches/` (NOT `.meowkit/memory/`)
 
-**Why not memory:** `memory-system.md` defines `.meowkit/memory/` as "team-shared, version-controlled learning system." Web-fetched content is:
+**Why not memory:** `.meowkit/memory/` is the team-shared, version-controlled lesson store. Web-fetched content is:
 
 - Not a learning
 - Not team-shared
@@ -392,11 +392,11 @@ export const SYSTEM_DEPS_REGISTRY: Record<string, SystemDepEntry> = {
   },
   "playwright-chromium": {
     name: "Playwright + Chromium",
-    detectCommand: ".agents/skills/.venv/bin/python3 -c 'import playwright'",
+    detectCommand: ".meowkit/envs/web-to-markdown/bin/python3 -c 'import playwright'",
     installCommands: {
       darwin: [
-        ".agents/skills/.venv/bin/pip install playwright==1.58.0",
-        ".agents/skills/.venv/bin/playwright install chromium",
+        ".meowkit/envs/web-to-markdown/bin/pip install playwright==1.58.0",
+        ".meowkit/envs/web-to-markdown/bin/playwright install chromium",
       ],
       linux: [
         /* same */
@@ -427,7 +427,7 @@ export const SYSTEM_DEPS_REGISTRY: Record<string, SystemDepEntry> = {
 
 ## 6. Manifest (`index.jsonl`) format
 
-Per-line JSON. Append-only via `fcntl.flock`. Read-blocked by `privacy-block.sh`.
+Per-line JSON. Append-only via `fcntl.flock`. Read-blocked by `privacy-block.cjs`.
 
 ```jsonl
 {"ts":"2026-04-09T01:32:15Z","url":"https://docs.example.com/api","caller":"user:direct","method":"static","status":"success","http_status":200,"size":12345,"content_type":"text/html","report":".codex/cache/web-fetches/260409-013215-docs-example-com-a1b2c3d4e5.md","sha":"a1b2c3d4e5f6g7h8","session":"abc-def-ghi","skill_version":"1.0.0","injection_warn":false}
@@ -469,12 +469,12 @@ Real-URL tests, opt-in via `MEOWKIT_RUN_SMOKE_TESTS=1`:
 
 ## 8. Incident response
 
-If injection-audit.py post-write scan (Layer 8) catches a pattern that Layer 5 missed:
+If the post-write re-scan (Layer 8) catches a pattern that Layer 5 missed:
 
 1. **Retroactive quarantine:** move the written report file to quarantine bucket (as if Layer 5 had caught it)
 2. **Manifest update:** append a corrective line to `index.jsonl` marking the original report as `superseded_by_quarantine`
 3. **security-log entry:** log the gap with severity CRITICAL + request for Layer 5 pattern update
-4. **User notification:** next session's `project-context-loader.sh` surfaces the log entry
+4. **User notification:** next session's `project-context-loader.cjs` surfaces the log entry
 
 **Post-incident:** Layer 5 pattern set gets updated to cover the missed pattern, documented in this file's section 2 Layer 5.
 

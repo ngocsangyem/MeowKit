@@ -1,6 +1,6 @@
 // `mewkit advice begin|commit|status` — the parent-side surface for `--advice`.
 //
-// Canonical contract: `.claude/rules-conditional/advice-supervision-rules.md`.
+// Canonical contract: `.claude/skills/advise/references/advice-supervision-rules.md`.
 //
 // Skills are prose, so they cannot call the supervision core directly; this command
 // is how a checkpoint reaches it. That is the point of the split: the SKILL decides
@@ -325,7 +325,7 @@ async function commit(projectRoot: string, args: AdviceOptions): Promise<void> {
 		mkdirSync(path.dirname(absReceipt), { recursive: true });
 		writeFileSync(absReceipt, renderReceipt(receipt), "utf-8");
 	} catch (err) {
-		// Advisory, never silent (`memory-read-rules.md` no-silent-skip): the checkpoint
+		// Advisory, never silent (a failed record write prints one line): the checkpoint
 		// still commits, because losing cap accounting is worse than losing the record.
 		receiptWritten = false;
 		console.error(pc.yellow(`⚠ receipt write failed: ${(err as Error).message}`));

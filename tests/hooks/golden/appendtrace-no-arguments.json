@@ -1,0 +1,27 @@
+{
+  "name": "appendtrace-no-arguments",
+  "group": "cli-append-trace",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/append-trace.sh",
+  "args": [],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "appendtrace-no-arguments",
+  "setupDescription": "no event type and no payload",
+  "normalizers": [
+    "tmpdir",
+    "isoTimestamp"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/trace-log.jsonl": "{\"schema_version\":\"1.0\",\"ts\":\"{{TS}}\",\"event\":\"unknown\",\"run_id\":\"\",\"harness_version\":\"3.0.0\",\"model\":\"\",\"density\":\"\",\"data\":{}}\n"
+  }
+}

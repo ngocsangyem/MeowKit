@@ -1,8 +1,8 @@
 ---
 name: mk:stitch
-description: Generate novel UI from a text prompt via Stitch AI. Exports Tailwind/HTML, produces DESIGN.md for mk:frontend-design handoff. NOT for implementing existing designs — use mk:figma or mk:frontend-design for that.
+description: Generates a novel UI design from a text prompt via Stitch AI, exporting Tailwind and HTML. NOT for mk:figma.
 user-invocable: true
-when_to_use: Generate a new UI design from a text description (text-prompt → novel design). NOT for implementing an existing design source — use mk:figma for Figma URLs or mk:frontend-design for an existing spec/mockup/DESIGN.md. Stitch generates novel designs from scratch; it does not interpret existing visual sources.
+when_to_use: No design source exists and one must be invented from a description.
 category: frontend
 phase: on-demand
 keywords:

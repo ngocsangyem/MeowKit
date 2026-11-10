@@ -1,6 +1,6 @@
 ---
 name: mk:lint-and-validate
-description: 'Automatic quality control, linting, and static analysis after code modifications. Triggers on: lint, format, check, validate, types, static analysis. NOT for full build verification (see mk:verify); NOT for test coverage (see mk:testing).'
+description: Run linting, formatting and static analysis right after a code edit. NOT for mk:verify.
 allowed-tools: Read, Glob, Grep, Bash
 phase: on-demand
 trust_level: third-party
@@ -13,12 +13,13 @@ keywords:
   - type-check
   - quality-control
   - post-edit-check
-when_to_use: Use for automatic quality control / linting / static analysis after code modifications. NOT for full build verification (see mk:verify) or test coverage (see mk:testing).
+when_to_use: A file was just modified and needs a quick quality gate.
 user-invocable: true
 owner: testing
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 # Lint and Validate Skill

@@ -17,6 +17,7 @@ import {
 	smartUpdate,
 	type UserConfig,
 } from "../core/index.js";
+import { printMutationJson, type PlannedChange } from "../core/mutation-report.js";
 import {
 	computeRemovablePaths,
 	CorruptInstallMetadataError,
@@ -31,7 +32,17 @@ export interface PackArgs {
 	json?: boolean;
 	yes?: boolean;
 	beta?: boolean;
+	/** Resolve the plan and print it; write and delete nothing. */
+	dryRun?: boolean;
 }
+
+/** The `--json` envelope for `add`/`remove`; `list` keeps its own row shape. */
+function emit(command: string, dryRun: boolean, planned: PlannedChange[], applied: PlannedChange[], notes: string[]): void {
+	printMutationJson({ ok: true, command, dryRun, planned, applied, notes });
+}
+
+const asChanges = (action: string, paths: string[]): PlannedChange[] =>
+	[...paths].sort().map((path) => ({ action, path: join(".claude", path) }));
 
 /** Packs that are core safety surface — never removable. */
 const PROTECTED_PACKS = new Set([BASE_PACK, "lifecycle-core"]);
@@ -41,8 +52,10 @@ const BLANK_CONFIG: UserConfig = { description: "", enableCostTracking: true, en
 export async function pack(args: PackArgs): Promise<void> {
 	const claudeDir = join(process.cwd(), ".claude");
 	if (!hasPackManifest(claudeDir)) {
+		// Errors and their fixes go to stderr: a `--json` run must leave stdout
+		// holding nothing but the envelope.
 		console.error(pc.red("Pack management requires meowkit with a pack-manifest.json."));
-		console.log(pc.dim("Run `mewkit upgrade` first, then retry."));
+		console.error(pc.dim("Run `mewkit upgrade` first, then retry."));
 		process.exit(1);
 	}
 	const manifest = loadPackManifest(claudeDir);
@@ -53,7 +66,7 @@ export async function pack(args: PackArgs): Promise<void> {
 	} catch (err) {
 		if (err instanceof CorruptInstallMetadataError) {
 			console.error(pc.red(`Installed metadata is corrupt: ${err.detail}`));
-			console.log(pc.dim("Run `mewkit upgrade` to repair, then retry."));
+			console.error(pc.dim("Run `mewkit upgrade` to repair, then retry."));
 			process.exit(1);
 		}
 		throw err;
@@ -68,7 +81,7 @@ export async function pack(args: PackArgs): Promise<void> {
 			return packRemove(claudeDir, manifest, state.meta, state.installedPacks, args);
 		default:
 			console.error(pc.red(`Unknown pack subcommand: ${args.subcommand ?? "(none)"}`));
-			console.log(pc.dim("Usage: mewkit pack <list|add|remove> [packs...]"));
+			console.error(pc.dim("Usage: mewkit pack <list|add|remove> [packs...]"));
 			process.exit(1);
 	}
 }
@@ -121,8 +134,11 @@ async function packAdd(
 	}
 	const installedSet = new Set(installed);
 	const newPacks = requested.filter((n) => !installedSet.has(n));
+	const dryRun = args.dryRun === true;
 	if (newPacks.length === 0) {
-		console.log(pc.dim(`Already installed: ${requested.join(", ") || "(nothing requested)"} — nothing to do.`));
+		const note = `Already installed: ${requested.join(", ") || "(nothing requested)"} — nothing to do.`;
+		if (args.json === true) emit("pack add", dryRun, [], [], [note]);
+		else console.log(pc.dim(note));
 		return;
 	}
 
@@ -131,7 +147,10 @@ async function packAdd(
 		console.error(pc.red("No releases found on GitHub."));
 		process.exit(1);
 	}
-	console.log(pc.dim(`Fetching v${release.version} to add: ${newPacks.join(", ")}...`));
+	// The release is fetched even for a dry run: which files a pack consists of is
+	// recorded in the release's own manifest, so a plan that did not read it would
+	// be a guess. The fetch lands in a tmpdir; the project is untouched.
+	if (args.json !== true) console.log(pc.dim(`Fetching v${release.version} to add: ${newPacks.join(", ")}...`));
 	const sourceDir = await downloadRelease(release);
 	try {
 		const srcClaude = join(sourceDir, ".claude");
@@ -139,20 +158,39 @@ async function packAdd(
 		const installedPaths = new Set((meta?.files ?? []).map((f) => f.path));
 		const resolved = resolvePacksDetailed(srcClaude, srcManifest, newPacks).paths;
 		const allowed = new Set([...resolved].filter((pth) => !installedPaths.has(pth)));
+		const planned = asChanges("create", [...allowed]);
 
 		// Store only user-selected packs — `base` is the always-implicit pseudo-pack,
 		// re-prepended by readInstalledState; keeping it out of metadata keeps the
 		// stored list semantically "the optional domains installed".
 		const nextPacks = [...new Set([...installed, ...newPacks])].filter((n) => n !== BASE_PACK);
 		// cleanup:false ⇒ a focused add only WRITES new files; it never deletes.
-		const stats = await smartUpdate(BLANK_CONFIG, sourceDir, process.cwd(), false, false, {
+		//
+		// The updater is called directly here, and this is the one place outside the
+		// shared target projection that does. The projection exists so that `init`,
+		// `upgrade` and `migrate` cannot disagree about what a target's on-disk shape
+		// IS — they each lay the whole shape down, so a difference between them is a
+		// defect. This does something else: it adds a named SUBSET to a shape that is
+		// already on disk, bounded by `allowedPaths` and with deletion off. Routing it
+		// through the projection would make a partial write look like one of those
+		// three full ones, and the next reader would reasonably expect it to produce
+		// the same tree they do.
+		const stats = await smartUpdate(BLANK_CONFIG, sourceDir, process.cwd(), dryRun, false, {
 			cleanup: false,
 			allowedPaths: allowed,
 			profile: meta?.profile,
 			packs: nextPacks,
 			assumeYes: true,
 		});
-		console.log(pc.green(`Added ${newPacks.join(", ")}: ${stats.added} file(s) written, ${stats.updated} updated.`));
+		const summary = dryRun
+			? `Dry-run: would add ${newPacks.join(", ")} — ${planned.length} file(s), nothing written.`
+			: `Added ${newPacks.join(", ")}: ${stats.added} file(s) written, ${stats.updated} updated.`;
+		if (args.json === true) {
+			emit("pack add", dryRun, planned, dryRun ? [] : planned, [summary]);
+			return;
+		}
+		for (const change of planned) console.log(`  ${pc.dim(dryRun ? "would create" : "create")} ${change.path}`);
+		console.log(dryRun ? pc.yellow(summary) : pc.green(summary));
 	} finally {
 		cleanupDownload(sourceDir);
 	}
@@ -188,9 +226,30 @@ async function packRemove(
 		meta?.files ?? [],
 	);
 
+	const dryRun = args.dryRun === true;
+	const planned = asChanges("delete", deletable);
+	const preservedNote = preserved.length > 0 ? [`${preserved.length} shared/base/modified file(s) preserved.`] : [];
+
 	if (deletable.length === 0) {
-		console.log(pc.dim(`Nothing to remove for ${requested.join(", ")} (no pristine pack-exclusive files).`));
-		if (preserved.length > 0) console.log(pc.yellow(`${preserved.length} shared/modified file(s) preserved.`));
+		const note = `Nothing to remove for ${requested.join(", ")} (no pristine pack-exclusive files).`;
+		if (args.json === true) emit("pack remove", dryRun, [], [], [note, ...preservedNote]);
+		else {
+			console.log(pc.dim(note));
+			for (const line of preservedNote) console.log(pc.yellow(line));
+		}
+		return;
+	}
+
+	// A dry run stops here: the metadata rewrite below is itself a write, so the
+	// preview must come before it rather than inside the deletion loop.
+	if (dryRun) {
+		const note = `Dry-run: would delete ${deletable.length} file(s) for ${requested.join(", ")} — nothing was written.`;
+		if (args.json === true) emit("pack remove", true, planned, [], [note, ...preservedNote]);
+		else {
+			for (const change of planned) console.log(`  ${pc.dim("would delete")} ${change.path}`);
+			console.log(pc.yellow(note));
+			for (const line of preservedNote) console.log(pc.yellow(line));
+		}
 		return;
 	}
 
@@ -200,7 +259,8 @@ async function packRemove(
 			initialValue: false,
 		});
 		if (p.isCancel(confirm) || confirm !== true) {
-			console.log(pc.dim("Cancelled."));
+			if (args.json === true) emit("pack remove", false, planned, [], ["Cancelled."]);
+			else console.log(pc.dim("Cancelled."));
 			return;
 		}
 	}
@@ -213,13 +273,17 @@ async function packRemove(
 			unlinkSync(join(claudeDir, pth));
 			deleted.push(pth);
 		} catch (err) {
-			console.log(pc.yellow(`Failed to delete ${pth}: ${(err as Error).message}`));
+			console.error(pc.yellow(`Failed to delete ${pth}: ${(err as Error).message}`));
 		}
 	}
 	await rebuildMetadata(claudeDir, meta, nextPacks);
 
-	console.log(pc.green(`Removed ${requested.join(", ")}: ${deleted.length} file(s) deleted.`));
-	if (preserved.length > 0) {
-		console.log(pc.yellow(`${preserved.length} shared/base/modified file(s) preserved.`));
+	const summary = `Removed ${requested.join(", ")}: ${deleted.length} file(s) deleted.`;
+	if (args.json === true) {
+		emit("pack remove", false, planned, asChanges("delete", deleted), [summary, ...preservedNote]);
+		return;
 	}
+	for (const change of planned) console.log(`  ${pc.dim("delete")} ${change.path}`);
+	console.log(pc.green(summary));
+	for (const line of preservedNote) console.log(pc.yellow(line));
 }

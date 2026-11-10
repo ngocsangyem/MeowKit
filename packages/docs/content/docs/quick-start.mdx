@@ -13,6 +13,13 @@ npx mewkit init
 
 The CLI walks you through a short set of prompts, and every one after the toolkit picker is skippable. See [Installation](/installation) for the full list and the flags that skip them. Takes ~30 seconds.
 
+Once releases carry the signed kit artifact, its signature and per-file digests are checked before
+anything is written and a failed check stops the install rather than falling back to an unverified
+source; no release carries it yet, so today's installs take the legacy zip path (see
+[Installation](/installation)). Pick the on-disk shape with `npx mewkit init --target claude-code --delivery plugin`, install
+without a network from this project's `.meowkit/cache/` with `npx mewkit init --offline`, and check
+what landed with `npx mewkit versions`.
+
 After scaffolding completes, run setup and verify:
 
 ```bash
@@ -36,14 +43,15 @@ Open your terminal in the project directory and start Claude Code:
 claude
 ```
 
-Claude automatically reads `CLAUDE.md` and loads MeowKit's agents, skills, and rules.
+Claude Code auto-loads `.claude/rules/`, the 7 always-on rules, plus MeowKit's agents and
+skills. MeowKit installs no root `CLAUDE.md`. If your project keeps one, it stays yours.
 
 ## Step 4: Run your first command
 
 Plan the task you just created:
 
 ```
-/mk:plan add user authentication with JWT
+/mk:plan-creator add user authentication with JWT
 ```
 
 MeowKit will:
@@ -74,7 +82,7 @@ This runs the complete workflow. Each phase activates the appropriate agent, and
 
 ## What happened behind the scenes
 
-When you ran `/mk:plan`, MeowKit:
+When you ran `/mk:plan-creator`, MeowKit:
 
 1. **Phase 0 (Orient):** Read relevant topic files on-demand for past patterns, assigned model tier
 2. **Phase 1 (Plan):** Planner agent created a structured plan with product + engineering lens

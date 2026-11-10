@@ -43,12 +43,11 @@ function artifactPaths(claudeDir: string, entry: InventoryEntry): string[] {
 	return [entry.path];
 }
 
-/** Always-installed essentials: explicit files, expanded globs, and core commands. */
+/** Always-installed essentials: explicit files plus expanded globs. */
 function baseSeed(claudeDir: string, manifest: PackManifest): Set<string> {
 	const set = new Set<string>();
 	for (const f of manifest.base.files) set.add(norm(f));
 	for (const g of manifest.base.globs) for (const f of expandBaseGlob(claudeDir, g)) set.add(norm(f));
-	for (const c of manifest.base.commands) set.add(`commands/mk/${c}.md`);
 	return set;
 }
 

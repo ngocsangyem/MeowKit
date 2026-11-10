@@ -14,7 +14,7 @@ forbid-list AND match the allow-list to be read.
 
 Usage (stdin JSON):
   echo '{"keywords": ["auth"], "symbols": ["login"], "git_root": "/abs/path"}' \
-    | .cursor/skills/.venv/bin/python3 scripts/scout-context.py
+    | .meowkit/envs/prompt-enhancer/bin/python3 scripts/scout-context.py
 
 Output (stdout JSON):
   {

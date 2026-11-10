@@ -10,7 +10,7 @@ description: "Migration guide for the TDD-optional change. TDD enforcement is no
 | Before | After |
 |--------|-------|
 | Every implementation required a failing test first | Failing tests required only when `--tdd` is set or `MEOWKIT_TDD=1` is exported |
-| `pre-implement.sh` hook blocked source-code edits without RED tests | Hook is a no-op in default mode; only blocks in TDD mode |
+| `pre-implement.cjs` hook blocked source-code edits without RED tests | Hook is a no-op in default mode; only blocks in TDD mode |
 | Developer agent refused to start without failing tests | Developer implements directly per the approved plan in default mode |
 | Phase 2 was mandatory | Phase 2 is optional in default mode (skipped unless requested) |
 | `tester` agent always invoked before `developer` | Tester invoked only in TDD mode or on-request |
@@ -30,10 +30,10 @@ Pass `--tdd` to any cook/test/fix invocation:
 ```bash
 /mk:cook --tdd "build payment processor"
 /mk:fix --tdd "checkout total calculation off by one"
-/mk:test --tdd
+/mk:testing --tdd
 ```
 
-The slash command writes a sentinel file `.claude/session-state/tdd-mode` that hooks and downstream agents read. The sentinel persists for the session and is cleared at the next session start.
+The slash command writes a sentinel file `.meowkit/state/tdd-mode` that hooks and downstream agents read. The sentinel persists for the session and is cleared at the next session start.
 
 ### Per-shell (recommended for CI / production projects)
 
@@ -64,20 +64,15 @@ grep -rn "Phase 2 Test RED\|Phase 2: Test RED" tasks/plans/
 ```
 If matches return, those plans were authored under strict TDD assumptions and need one of the three options above before continuing.
 
-## `MEOW_PROFILE=fast` deprecation
+## The deprecated profile alias is gone
 
-Legacy users: `MEOW_PROFILE=fast` still bypasses TDD, but now emits a stderr deprecation warning on first use per session:
+v2 accepted a legacy profile alias that bypassed TDD and warned on first use per
+session that it would be removed in the next major version. v3 is that version: it is
+removed, and nothing reads it. If a shell still exports it, `mewkit doctor` names it and
+tells you what to set instead. Migrate to:
 
-```
-[tdd] DEPRECATION: MEOW_PROFILE=fast will be removed in the next major version; use MEOWKIT_TDD=1 or --tdd flag instead (or unset for the new default-OFF behavior)
-```
-
-The alias will be removed in the next MAJOR version (v3.0 or equivalent). Migrate to:
-
-- **Default mode** (no env var, no flag) — matches the old `fast` profile behavior for TDD bypass
-- **`MEOWKIT_TDD=1`** / **`--tdd`** — for explicit strict mode
-
-No immediate action required; update before v3.0 ships.
+- **Default mode** (no setting at all) — TDD is off, which is what that alias produced
+- **`tdd: true`** in `.meowkit/config.yaml`, **`MEOWKIT_TDD=1`**, or **`--tdd`** — for explicit strict mode
 
 ## Why optional?
 
@@ -90,7 +85,7 @@ User feedback: strict TDD added friction for spike work, tooling scripts, and pr
 ## Related
 
 - [`tdd-rules.md`](/reference/rules-index) — the rule file (now opt-in)
-- [`pre-implement.sh`](/reference/hooks) — the hook (now opt-in)
+- [`pre-implement.cjs`](/reference/hooks) — the hook (now opt-in)
 - [`developer.md`](/reference/agents/developer) — the agent (now opt-in)
 - [`tester.md`](/reference/agents/tester) — the agent (now opt-in)
 - [`mk:cook`](/reference/skills/cook) — the entry point (`--tdd` flag added)

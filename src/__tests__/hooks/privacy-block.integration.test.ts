@@ -18,10 +18,10 @@ function runPrivacy(filePath: string) {
 		tool: "Read",
 		toolName: "Read",
 		toolInput: { file_path: filePath },
-		only: "privacy-block.sh",
+		only: "privacy-block.cjs",
 	});
-	const r = results.find((x) => x.script === "privacy-block.sh");
-	expect(r, "privacy-block.sh was not configured/run for PreToolUse Read").toBeDefined();
+	const r = results.find((x) => x.script === "privacy-block.cjs");
+	expect(r, "privacy-block.cjs was not configured/run for PreToolUse Read").toBeDefined();
 	return r!;
 }
 

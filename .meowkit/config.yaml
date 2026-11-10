@@ -1,0 +1,65 @@
+# MeowKit project configuration — committed, human-owned, schema-validated.
+#
+# Every setting below is commented out. Uncomment only what this project
+# decides, so the committed file reads as a list of choices rather than a
+# copy of the defaults.
+#
+# Two levels of keys; values are true/false, whole numbers or plain strings.
+# A gate is not a preference: there is no `gates.` or `paths.` key at any
+# scope, and an unknown key is an error rather than being ignored.
+
+$schema: https://meowkit.dev/schemas/config-v1.json
+
+# strict test-first mode. MEOWKIT_TDD in the environment still outranks this.
+tdd: false
+
+#autobuild:
+#  # density preset. Sets density only; it cannot bypass the contract gate.
+#  mode: MINIMAL   # one of: MINIMAL, FULL, LEAN
+
+#budget:
+#  # session token budget.
+#  cap: 200000
+#  # percent of the cap at which a warning is printed.
+#  warn: 75
+#  # percent of the cap at which work is blocked.
+#  block: 95
+
+#buildVerify:
+#  # how long the post-write build check may take.
+#  timeoutMs: 120000
+
+#projectContext:
+#  # ceiling on the project-context file injected at session start.
+#  maxBytes: 16000
+
+#workflow:
+#  # off, community or anonymous.
+#  telemetry: off   # one of: off, community, anonymous
+#  # whether skills volunteer suggestions.
+#  proactive: false
+
+# hooks.<name>: false switches one observer off. The seven hard-blocking
+# checks are absent on purpose — they cannot be disabled from this file.
+hooks:
+#  auto-checkpoint: false
+  budget-tracker: true
+#  build-verify: false
+#  capability-bootstrap: false
+#  checkpoint-writer: false
+#  control-probe: false
+#  jira-env-loader: false
+  learning-observer: true
+#  loop-detection: false
+#  model-detector: false
+#  orientation-ritual: false
+#  post-session: false
+#  post-write: false
+#  posttoolfailure-probe: false
+#  pre-completion-check: false
+#  pre-task-check: false
+#  precompact-probe: false
+#  project-context-loader: false
+#  review-evidence-tag: false
+#  safety-sentinel-inject: false
+#  tdd-flag-detector: false

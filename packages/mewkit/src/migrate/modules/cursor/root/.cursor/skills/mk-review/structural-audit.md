@@ -68,6 +68,7 @@ Invoke this skill during code review — after tests pass but before approving a
 - [ ] Authentication/authorization checks present
 - [ ] No sensitive data exposure (logs, error messages, responses)
 - [ ] No injection vulnerabilities (SQL, XSS, command injection)
+- [ ] Memory diff adds no instruction-like text and no secrets
 
 **Verdict criteria:**
 - **PASS** — no security issues found

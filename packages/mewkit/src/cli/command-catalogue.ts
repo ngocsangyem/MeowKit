@@ -1,43 +1,73 @@
 // The CLI surface, declared once. minimist options, `--help`, and the docs synopsis are all
 // derived from this file, and a contract test fails if the dispatcher reads a flag that is not
 // here. Add a flag here first; nothing else needs editing.
-//
-// Known boundary: `wiki` receives the whole parsed args object as a pass-through bag and reads
-// its own flags from it (`--max-pages`, `--include-content`, and ~20 more). Those are not
-// dispatcher reads, so they are deliberately absent rather than half-covered. Declaring them
-// here without routing them through minimist would claim a contract that does not hold.
-import type { Catalogue, FlagSpec } from "./catalogue-types.js";
+import type { Catalogue, CommandSpec, FlagSpec } from "./catalogue-types.js";
 
-const COMMANDS = [
+const COMMANDS: CommandSpec[] = [
 	{ name: "init", summary: "Scaffold or update MeowKit in the current project" },
 	{ name: "upgrade", summary: "Upgrade MeowKit to the latest version" },
-	{ name: "validate", summary: "Validate .claude/ project structure", usage: "validate [--mode authoring|flat-copy]" },
+	{
+		name: "validate",
+		summary: "Validate .claude/ project structure",
+		usage: "validate [--mode authoring|flat-copy] (--mode is a maintainer override)",
+	},
 	{
 		name: "capabilities",
 		summary: "Inspect or resolve the capability manifest",
 		subcommands: ["list", "explain", "resolve", "view", "bootstrap", "projections"],
+		subcommandUsage: {
+			explain: "capabilities explain --intent <intent>",
+			resolve: "capabilities resolve --intent <intent>",
+			view: "capabilities view [--write]",
+			projections: "capabilities projections [--provider <provider>]",
+		},
 	},
 	{ name: "budget", summary: "View token usage and cost log", subcommands: ["context"] },
-	{
-		name: "memory",
-		summary: "Manage agent memory (lessons and patterns)",
-		subcommands: ["capture", "render-views", "seed-from-md"],
-	},
 	{ name: "setup", summary: "Guided post-scaffold configuration" },
+	{
+		name: "skill",
+		summary: "Per-skill interpreter environments",
+		subcommands: ["env"],
+		requiresSubcommand: true,
+		usage: "skill env <skill>|--list",
+		subcommandUsage: { env: "skill env <skill> | skill env --list" },
+	},
 	{ name: "doctor", summary: "Diagnose common environment issues", subcommands: ["provenance"] },
-	{ name: "status", summary: "Print version and config summary" },
-	{ name: "task-state", summary: "Durable task record", subcommands: ["show", "update"] },
+	{ name: "versions", summary: "Print the installed CLI, kit, target and delivery of this project" },
+	{
+		name: "task-state",
+		summary: "Durable task record",
+		subcommands: ["show", "update"],
+		subcommandUsage: {
+			show: "task-state show [<task-id>]",
+			update: "task-state update <task-id> [--status <status>] [--step <text>] [--next <text>]",
+		},
+	},
 	{
 		name: "advice",
 		summary: "Bounded supervision checkpoints for --advice; records evidence, approves nothing",
 		subcommands: ["begin", "commit", "status", "validate-packet"],
+		requiresSubcommand: true,
+		subcommandUsage: {
+			begin: "advice begin --run <id> --skill <skill> --stage <stage> --checkpoint <id>",
+			commit: "advice commit --run <id> --checkpoint <id> --disposition <d> --outcome <o> --reason <why>",
+			status: "advice status --run <id>",
+			"validate-packet": "advice validate-packet --evidence <path> --packet-kind <input|output|brief>",
+		},
 	},
 	{ name: "orient", summary: "Resume orientation from durable task state; reads records only" },
-	{ name: "context", summary: "Repo-context evidence", subcommands: ["resolve", "check", "record"] },
-	{ name: "task", summary: "Create and list task files", subcommands: ["new", "list"] },
-	{ name: "migrate", summary: "Export MeowKit to external coding-agent tools" },
-	{ name: "providers", summary: "Show the effective provider support matrix and enforcement levels" },
-	{ name: "explain-support", summary: "Alias of `providers`" },
+	{
+		name: "task",
+		summary: "Create and list task files",
+		subcommands: ["new", "list"],
+		requiresSubcommand: true,
+		subcommandUsage: {
+			new: 'task new "<description>" [--type <type>] [--priority <priority>]',
+			list: "task list [--status <status>] [--all]",
+		},
+	},
+	{ name: "migrate", summary: "Export MeowKit to external coding-agent tools", usage: "migrate <tool>" },
+	{ name: "providers", summary: "Show the effective provider support matrix and enforcement levels", usage: "providers [<provider>]" },
 	{
 		name: "visual-plan",
 		summary: "Visual plan contracts",
@@ -53,26 +83,80 @@ const COMMANDS = [
 			"edit",
 			"view",
 		],
+		requiresSubcommand: true,
+		subcommandUsage: {
+			validate: "visual-plan validate <plan-dir>",
+			status: "visual-plan status <plan-dir>",
+			approve: "visual-plan approve <plan-dir> [--revision <rev>]",
+			rehash: "visual-plan rehash <plan-dir>",
+			export: "visual-plan export <plan-dir> [--format <format>]",
+			"prepare-feedback": "visual-plan prepare-feedback <plan-dir> --ops <file>",
+			"apply-feedback": "visual-plan apply-feedback <plan-dir> --batch <id> [--check]",
+			patch: "visual-plan patch <plan-dir> --op <file>",
+			edit: "visual-plan edit <plan-dir>",
+			view: "visual-plan view <plan-dir> [--port <port>]",
+		},
 	},
 	{
 		name: "review",
 		summary: "High-assurance PR review, resumable across sittings via a session id",
 		subcommands: ["prepare", "read", "coverage", "compose", "submit", "cleanup"],
+		requiresSubcommand: true,
+		subcommandUsage: {
+			prepare: "review prepare <pr-url|number> [--remote <remote>]",
+			read: "review read --session <id> [--as <persona>]",
+			coverage: "review coverage --session <id>",
+			compose: "review compose --session <id> [--reply]",
+			submit: "review submit --session <id> --confirm <token>",
+			cleanup: "review cleanup --session <id>",
+		},
 	},
-	{ name: "inventory", summary: "List harness artifacts with governance metadata" },
-	{ name: "plan", summary: "Plan lifecycle", subcommands: ["status", "check", "approve", "archive"] },
-	{ name: "trace", summary: "On-demand trace recall", subcommands: ["score", "audit", "propose"] },
 	{
-		name: "wiki",
-		summary: "Long-term project knowledge",
-		subcommands: ["context", "init", "propose", "approve", "search", "reindex", "handoff"],
-		passThrough: true,
+		name: "plan",
+		summary: "Plan lifecycle",
+		subcommands: ["status", "check", "approve", "archive"],
+		requiresSubcommand: true,
+		subcommandUsage: {
+			status: "plan status <plan-dir>",
+			check: "plan check <phase-file> [--structural]",
+			approve: "plan approve <plan-dir> [--by <name>]",
+			archive: "plan archive <plan-dir> [--dry-run]",
+		},
 	},
-	{ name: "index", summary: "Build or refresh the derived SQLite index over the append logs" },
-	{ name: "query", summary: "Read-only aggregate queries over the derived index" },
-	{ name: "pack", summary: "Manage install packs", subcommands: ["list", "add", "remove"] },
-	{ name: "verdict-gate", summary: "Check a review verdict against the active plan" },
-	{ name: "docs-manifest", summary: "Generate or drift-check the docs reference manifest" },
+	{
+		name: "trace",
+		summary: "On-demand trace recall",
+		subcommands: ["score", "audit", "propose"],
+		subcommandUsage: {
+			score: "trace score [--id <run>]",
+			propose: "trace propose [--commit]",
+		},
+	},
+	{
+		name: "pack",
+		summary: "Manage install packs",
+		subcommands: ["list", "add", "remove"],
+		requiresSubcommand: true,
+		subcommandUsage: { add: "pack add <pack>…", remove: "pack remove <pack>…" },
+	},
+	{ name: "verdict-gate", summary: "Check a review verdict against the active plan", usage: "verdict-gate <slug>" },
+	{
+		name: "note",
+		summary: "Append a lint-checked entry to the committed team-memory store (entry on stdin)",
+		usage: "note <decisions|gotchas>",
+	},
+	{
+		name: "uninstall",
+		summary: "Remove the kit's own files; dry-run unless --yes, and never your data",
+		usage: "uninstall [--yes] [--force] [--json] [--dry-run]",
+	},
+	{
+		name: "backups",
+		summary: "List and restore the snapshots the mutating commands take",
+		subcommands: ["list", "restore"],
+		usage: "backups list | backups restore <id>",
+		subcommandUsage: { restore: "backups restore <id>" },
+	},
 ];
 
 /** `b`/`s` keep the table readable; the type is the thing most likely to be wrong. */
@@ -101,28 +185,30 @@ const FLAGS: FlagSpec[] = [
 			"review",
 			"capabilities",
 			"pack",
-			"explain-support",
 			"providers",
 			"plan",
-			"inventory",
 			"trace",
-			"index",
-			"query",
 			"orient",
 			"budget",
 			"task-state",
 			"advice",
-			"context",
 			"visual-plan",
-			"docs-manifest",
+			"backups",
+			"uninstall",
+			"doctor",
+			"init",
+			"setup",
+			"migrate",
+			"upgrade",
+			"versions",
 		],
 		"Emit machine-readable JSON",
 	),
-	b("yes", ["upgrade", "pack", "migrate"], "Answer prompts affirmatively"),
+	b("yes", ["init", "upgrade", "pack", "migrate", "uninstall", "backups"], "Answer prompts affirmatively"),
 	b("beta", ["init", "upgrade", "pack"], "Use the beta release channel"),
-	b("dry-run", ["init", "plan", "migrate"], "Print what would happen without writing"),
-	b("force", ["init", "visual-plan", "migrate"], "Overwrite user-edited targets on conflict", {
-		perCommand: { init: "Overwrite an existing `.claude/`" },
+	b("dry-run", ["init", "plan", "migrate", "backups", "uninstall", "upgrade", "setup", "pack"], "Print what would happen without writing"),
+	b("force", ["init", "visual-plan", "migrate", "uninstall", "upgrade"], "Overwrite user-edited targets on conflict", {
+		perCommand: { init: "Overwrite an existing `.claude/`", uninstall: "Also remove kit paths this project has edited" },
 	}),
 	b(
 		"allow-kit-source",
@@ -140,24 +226,30 @@ const FLAGS: FlagSpec[] = [
 	b("migrate", ["init"], "After unpack, prompt for export targets"),
 	b("migrate-global", ["init"], "Use global install paths instead of project-local"),
 	s("skill-packs", ["init"], "Comma-separated skill packs to install"),
+	s("delivery", ["init"], "Claude Code only: native or plugin on-disk shape"),
+	b(
+		"offline",
+		["init", "upgrade"],
+		"Install from this project's cached kit artifact only, re-verifying it, and reach no network",
+	),
 	s("mcp-profiles", ["init"], "Cursor only: MCP profile names, or 'all', to merge into .cursor/mcp.json"),
 	b("allow-cloud-mcp", ["init"], "Cursor only: second opt-in for applying an MCP profile to a repo with a git remote"),
 
 	// upgrade
-	b("check", ["upgrade", "inventory", "visual-plan", "docs-manifest"], "Report without changing anything", {
-		perCommand: {
-			inventory: "Fail if README or index counts drift from reality",
-			"visual-plan": "Pre-apply gate for apply-feedback",
-			"docs-manifest": "Fail when the committed manifest no longer matches the live `.claude/` tree",
-		},
+	b("check", ["upgrade", "visual-plan"], "Report without changing anything", {
+		perCommand: { "visual-plan": "Pre-apply gate for apply-feedback" },
 	}),
 	b("list", ["upgrade"], "List available versions"),
 	b("no-cleanup", ["upgrade"], "Keep the downloaded release directory"),
 
 	// validate
-	s("mode", ["validate"], "Force authoring or flat-copy mode instead of auto-detecting"),
+	s(
+		"mode",
+		["validate"],
+		"Maintainer override: force the authoring or flat-copy run profile instead of auto-detecting it",
+	),
 	b("portable", ["validate"], "Include portable provider contract checks"),
-	b("strict", ["validate", "memory"], "Treat WARN as failure (exit 1)"),
+	b("strict", ["validate"], "Treat WARN as failure (exit 1)"),
 	b("workflow", ["validate"], "Run only the workflow.yaml drift check"),
 	b("gates", ["validate"], "Run only the gate-authority contract check"),
 	b("ownership", ["validate"], "Run only the artifact ownership-completeness check"),
@@ -165,9 +257,14 @@ const FLAGS: FlagSpec[] = [
 	b("packs", ["validate"], "Run only the pack-manifest coherence and safety check"),
 	b("rules", ["validate"], "Run only the routing-table-breadth check"),
 	b("capabilities", ["validate"], "Run only the capability manifest checks"),
-	b("substrate", ["validate", "inventory"], "Run only the responsibility-substrate drift and untagged check", {
-		perCommand: { inventory: "Print the responsibility-by-coverage substrate matrix" },
-	}),
+	b("memory", ["validate"], "Run only the committed team-memory store lint"),
+	b("frontmatter", ["validate"], "Run only the SKILL.md frontmatter schema and runtime-contract check"),
+	b("docs-refs", ["validate"], "Run only the `.claude` to `docs/*` reference allowlist check"),
+	b("substrate", ["validate"], "Run only the responsibility-substrate drift and untagged check"),
+
+	// skill env
+	b("list", ["skill"], "List every skill that declares a runtime and the state of its environment"),
+	s("skills", ["setup"], "Comma-separated skills whose interpreter environment setup should create"),
 
 	// review
 	s("remote", ["review"], "Git remote to fetch the pull request from"),
@@ -183,21 +280,13 @@ const FLAGS: FlagSpec[] = [
 	s("provider", ["capabilities", "advice"], "Scope the projection to one provider", {
 		perCommand: { advice: "Runtime recorded on the receipt" },
 	}),
-	b("write", ["capabilities", "docs-manifest"], "Write the generated view rather than printing it", {
-		perCommand: { "docs-manifest": "Regenerate the committed manifest" },
-	}),
-	b("record", ["capabilities", "orient"], "Record the result to the task record; `--no-record` skips it"),
+	b("write", ["capabilities"], "Write the generated view rather than printing it"),
+	b("record", ["orient"], "Record the result to the task record; `--no-record` skips it"),
 
 	// plan
 	s("by", ["plan"], "Approver name recorded on the approval receipt"),
+	b("structural", ["plan"], "`check`: validate plan.md + its phase files against the full template"),
 	b("activate", ["plan", "task"], "Activate the task on creation; --no-activate opts out"),
-
-	// inventory
-	b("stale", ["inventory"], "Show only deprecated or experimental artifacts"),
-	b("critical", ["inventory"], "Show only criticality=critical artifacts"),
-	b("portable-missing", ["inventory"], "Show artifacts whose runtime is not portable"),
-	b("emit", ["inventory"], "Write the substrate view rather than printing it"),
-	b("emit-counts", ["inventory"], "Rewrite README and index count numbers to match reality"),
 
 	// trace
 	s("id", ["trace"], "Trace record id"),
@@ -205,20 +294,10 @@ const FLAGS: FlagSpec[] = [
 	s("responsibility", ["trace"], "Scope to one substrate responsibility"),
 	b("commit", ["trace"], "Persist the proposal rather than previewing it"),
 
-	// query
-	s("task", ["query", "context"], "Task id to scope the query to", {
-		perCommand: { context: "Task id to record the evidence envelope against" },
-	}),
-	b("presets", ["query"], "List the built-in query presets"),
-
 	// budget
 	b("monthly", ["budget"], "Aggregate by month instead of the last ten entries"),
 	s("day", ["budget"], "Filter to today, or to a specific YYYY-MM-DD"),
 	s("fail-over", ["budget"], "Exit non-zero when a profile exceeds N tokens"),
-
-	// memory
-	b("clear", ["memory"], "Clear all memory, with confirmation"),
-	b("stats", ["memory"], "Show sessions captured and patterns learned"),
 
 	// setup
 	s("only", ["setup", "migrate"], "Run a single setup step", {
@@ -231,8 +310,8 @@ const FLAGS: FlagSpec[] = [
 	b("providers", ["doctor", "migrate"], "Include provider contract diagnostics"),
 	b("state", ["doctor"], "Include state taxonomy diagnostics"),
 	b("explain", ["doctor"], "Explain the provenance result rather than summarizing it"),
-	b("consolidation", ["doctor"], "Show the consolidation ledger; status is not a runtime-availability claim"),
 	b("hard-gates", ["doctor"], "Live-probe the hard gates (plan, privacy, injection block)"),
+	b("adopt", ["doctor"], "Rebuild the ownership baseline from the local kit cache, or refuse"),
 
 	// task-state
 	s("status", ["task-state", "task"], "Task status: active, blocked, done", {
@@ -274,9 +353,6 @@ const FLAGS: FlagSpec[] = [
 	s("packet-kind", ["advice"], "validate-packet shape: input, output, or brief (direct consult)"),
 	s("release-stage", ["advice"], "Ship scope the call is budgeted against: prepare, release, publish"),
 
-	// context
-	s("root", ["context"], "Project root to resolve the path against"),
-
 	// task
 	s("type", ["task"], "Task type: feature, bug-fix, refactor, security"),
 	s("priority", ["task"], "Task priority"),
@@ -293,14 +369,13 @@ const FLAGS: FlagSpec[] = [
 	b("skip-config", ["migrate"], "Do not convert configuration"),
 	b("skip-rules", ["migrate"], "Do not convert rules"),
 	b("skip-hooks", ["migrate"], "Do not convert hooks"),
-	b("reinstall-empty-dirs", ["migrate"], "Recreate directories that were emptied by a prior run"),
 	b("respect-deletions", ["migrate"], "Honor deletions.json rather than reinstating removed files"),
 	b("all-rules", ["migrate"], "Merge every rule into the provider instruction file"),
 	b("include-mcp", ["migrate"], "Also convert .mcp.json servers into the provider MCP config"),
 	b("include-unportable", ["migrate"], "Install Claude Code skills for a provider with no adapter (experimental)"),
 
 	// providers
-	b("lifecycle", ["providers", "explain-support"], "Show the capability-adapter and lifecycle matrix"),
+	b("lifecycle", ["providers"], "Show the capability-adapter and lifecycle matrix"),
 
 	// visual-plan
 	s("port", ["visual-plan"], "Bind to a fixed port instead of a random one"),

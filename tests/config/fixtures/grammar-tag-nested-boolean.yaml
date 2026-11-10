@@ -1,0 +1,2 @@
+hooks:
+  budget-tracker: !!bool false

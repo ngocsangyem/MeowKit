@@ -6,8 +6,8 @@
 
 - [When to Use](#when-to-use)
 - [Available Scripts](#available-scripts)
-  - [`.claude/scripts/validate.py`](#claudescriptsvalidatepy)
-  - [`.claude/scripts/security-scan.py`](#claudescriptssecurity-scanpy)
+  - [`.claude/skills/lint-and-validate/scripts/validate.py`](#claudescriptsvalidatepy)
+  - [`.claude/skills/lint-and-validate/scripts/security-scan.py`](#claudescriptssecurity-scanpy)
 - [Why Deterministic Validation Matters](#why-deterministic-validation-matters)
 - [How to Extend](#how-to-extend)
 - [Integration with Workflow](#integration-with-workflow)
@@ -25,7 +25,7 @@ Also run on-demand whenever you want to verify code quality without relying on s
 
 ## Available Scripts
 
-### `.claude/scripts/validate.py`
+### `.claude/skills/lint-and-validate/scripts/validate.py`
 
 General validation script that checks code quality and correctness.
 
@@ -39,14 +39,14 @@ General validation script that checks code quality and correctness.
 
 **How to run:**
 ```bash
-.claude/skills/.venv/bin/python3 .claude/scripts/validate.py
+node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/validate.py
 ```
 
 **Exit codes:**
 - `0` — all checks passed
 - `1` — one or more checks failed (details in output)
 
-### `.claude/scripts/security-scan.py`
+### `.claude/skills/lint-and-validate/scripts/security-scan.py`
 
 Security-focused validation. See `review/security-checklist.md` for the full list of checks.
 
@@ -60,7 +60,7 @@ Security-focused validation. See `review/security-checklist.md` for the full lis
 
 **How to run:**
 ```bash
-.claude/skills/.venv/bin/python3 .claude/scripts/security-scan.py
+node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/security-scan.py
 ```
 
 **Exit codes:**

@@ -1,6 +1,6 @@
 ---
 name: mk:story-sizer
-description: Pre-ticket Fibonacci sizing for a paste-mode batch of user stories. Default mode is advisory-only (writes a Story Sizing Report). Opt-in `--auto-create` delegates ticket creation to mk:jira-issue + mk:jira-collaborate with mandatory dry-run + single batch confirmation gate. NOT for single-ticket estimation (mk:jira-estimator); NOT for sprint capacity (mk:planning-engine).
+description: 'mk:jira family. Fibonacci-sizes a pasted batch of stories before tickets exist. NOT for mk:jira-estimator.'
 argument-hint: '--paste [--scout] [--story <id>] | --paste --auto-create --project <KEY> [--epic <KEY>]'
 phase: on-demand
 source: local
@@ -13,7 +13,7 @@ keywords:
   - split-recommendation
   - auto-create-gated
   - estimate
-when_to_use: Use when sizing a batch of suggested user stories BEFORE Jira tickets exist (e.g., after a spec scan). Default emits a Story Sizing Report; --auto-create delegates ticket creation behind a single confirmation gate. NOT for sizing one Jira ticket (use mk:jira-estimator).
+when_to_use: 'Size a batch of draft user stories that have no Jira tickets yet.'
 user-invocable: true
 context: fork
 agent: story-sizer
@@ -21,6 +21,7 @@ owner: lifecycle
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 # mk:story-sizer
@@ -75,4 +76,4 @@ End-to-end default flow + `--scout` extract-or-prompt pattern + filtering rules:
 
 - The `source_hash` recorded in the report header is the SHA-256 of the _exact_ paste body. If you edit the paste locally between sizing and `--auto-create`, the source-consistency check will ABORT — re-paste the modified body and re-run `--paste` to regenerate the report.
 - `--scout` does not auto-invoke `/mk:scout`. Run `/mk:scout` first when you want codebase signals; otherwise the report carries `[NO_CODEBASE_CONTEXT]`.
-- DoR advisory only appears when `mk:agent-detector` loaded `.claude/rules-conditional/agile-story-gates.md` for the current session.
+- DoR advisory only appears when `mk:agent-detector` loaded `.claude/skills/agent-detector/references/agile-story-gates.md` for the current session.

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync, existsSync, readdirSync, lstatSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, lstatSync } from "node:fs";
 import { join, relative } from "node:path";
 
 /** File layer determines update behavior */
@@ -23,7 +23,13 @@ export interface Manifest {
 	checksums: Record<string, ManifestEntry>;
 }
 
-const MANIFEST_FILENAME = "meowkit.manifest.json";
+/**
+ * The superseded per-file checksum manifest. Nothing writes or reads it any
+ * more; the name survives so a project that still carries one does not have it
+ * hashed as kit content, and so the one-shot migration that retires it has a
+ * single place to get the name from.
+ */
+export const LEGACY_CHECKSUM_MANIFEST_FILENAME = "meowkit.manifest.json";
 
 /** Directories classified as "core" — overwritten on update if unchanged */
 const CORE_DIRS = new Set(["agents", "commands", "hooks", "modes", "rules", "scripts"]);
@@ -81,7 +87,7 @@ export function collectFiles(dir: string, baseDir: string): string[] {
 		"__pycache__",
 		"node_modules",
 		".DS_Store",
-		MANIFEST_FILENAME,
+		LEGACY_CHECKSUM_MANIFEST_FILENAME,
 		"metadata.json",
 		".metadata.lock",
 	]);
@@ -137,19 +143,3 @@ export function buildManifest(claudeDir: string): Manifest {
 	};
 }
 
-/** Write manifest to disk */
-export function writeManifest(targetDir: string, manifest: Manifest): void {
-	const path = join(targetDir, MANIFEST_FILENAME);
-	writeFileSync(path, JSON.stringify(manifest, null, 2) + "\n", "utf-8");
-}
-
-/** Read existing manifest from disk. Returns null if not found or invalid. */
-export function readManifest(targetDir: string): Manifest | null {
-	const path = join(targetDir, MANIFEST_FILENAME);
-	if (!existsSync(path)) return null;
-	try {
-		return JSON.parse(readFileSync(path, "utf-8")) as Manifest;
-	} catch {
-		return null;
-	}
-}

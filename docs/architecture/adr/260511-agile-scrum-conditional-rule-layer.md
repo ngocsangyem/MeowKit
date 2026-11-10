@@ -1,7 +1,9 @@
 # ADR: Agile/Scrum Conditional Rule Layer
 
 **Date:** 2026-05-11
-**Status:** Accepted
+**Status:** Accepted — the decision stands; the three conditional rules now live in
+`.claude/skills/agent-detector/references/`, not in a top-level `.claude/rules-conditional/`
+directory. Paths below are the ones that existed when this was decided.
 **Deciders:** ngocsangyem (user), Claude (agent)
 **Plan:** `plans/260510-2333-agile-scrum-rule-layer-design/`
 
@@ -13,7 +15,7 @@ Adding a conventional Agile framework would have meant a parallel pipeline (a ne
 
 ## Decision
 
-Add **3 conditional rules** in `.claude/rules-conditional/agile-*.md` loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected. Total budget ≤6 KB target (delivered ~7.4 KB; trade-off accepted to preserve mechanical specificity). No new agents, no new hooks, no new gates. All integration is done by extending existing skills (`mk:plan-creator`, `mk:sprint-contract`, `mk:retro`, `mk:jira-agile`, `mk:ship`, `project-manager` agent).
+Add **3 conditional rules** in `.claude/skills/agent-detector/references/agile-*.md` loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected. Total budget ≤6 KB target (delivered ~7.4 KB; trade-off accepted to preserve mechanical specificity). No new agents, no new hooks, no new gates. All integration is done by extending existing skills (`mk:plan-creator`, `mk:sprint-contract`, `mk:retro`, `mk:jira-agile`, `mk:ship`, `project-manager` agent).
 
 The 3 rules cover:
 
@@ -42,7 +44,7 @@ The DoD prompts are gated by `verdict.jira_tickets:` non-empty — but `mk:ship`
 
 ### Sprint-state contract introduces a NEW file class in `tasks/contracts/`
 
-Path discipline: leading `sprint-state-` prefix prevents glob collision with the existing `check-contract-signed.sh` glob (`tasks/contracts/*-{slug}-sprint-*.md`). Verified safe — sprint-state files have no slug between leading `*` and `-sprint-`.
+Path discipline: leading `sprint-state-` prefix prevents glob collision with the existing `check-contract-signed.cjs` glob (`tasks/contracts/*-{slug}-sprint-*.md`). Verified safe — sprint-state files have no slug between leading `*` and `-sprint-`.
 
 ### Concurrent-write safety requires `flock`
 

@@ -81,7 +81,7 @@ A complete plan showing the expected detail level for a 7-phase implementation i
 **Agent:** orchestrator  
 **Time budget:** 15 minutes
 
-- Read `.meowkit/memory/architecture-decisions.md` (and `architecture-decisions.json`) for prior billing decisions
+- Search `.meowkit/memory/` for "billing", "stripe", "webhook" and open only the matching entries
 - Run `mk:scout` on `src/billing/` — confirm directory doesn't exist yet
 - Run `mk:scale-routing` — confirm domain=fintech, level=high, model=COMPLEX
 - Declare: `Task complexity: COMPLEX`
@@ -180,8 +180,7 @@ Review dimensions: Correctness, Maintainability, Performance, Security, Coverage
 
 - Update `docs/project-context.md`: add billing domain, Stripe SDK version, webhook event list
 - Update `docs/architecture/system-architecture.md`: add subscription state machine diagram
-- `mk:memory` session-capture: log any Stripe API surprises, webhook ordering issues
-- (User keyboard shortcut example) the user can type `##pattern:bug-class Stripe webhook events arrive out of order — always check current_period_end before updating status` to route via `immediate-capture-handler.cjs` to `.meowkit/memory/fixes.json`. Agents in this skill instead call `Edit` directly on `fixes.md` + `fixes.json` (see `.cursor/skills/memory/references/capture-architecture.md`).
+- One `gotchas.md` entry if a Stripe surprise is non-derivable from the code — e.g. "Stripe webhook events arrive out of order — check `current_period_end` before updating status" (see `mk:memory` for the entry format).
 - Docs impact: major
 
 ---

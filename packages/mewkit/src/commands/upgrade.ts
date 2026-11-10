@@ -5,20 +5,28 @@ import {
 	fetchReleases,
 	downloadRelease,
 	cleanupDownload,
-	smartUpdate,
 	readInstallMetadata,
 	hasPackManifest,
 	loadPackManifest,
 	resolvePacks,
 } from "../core/index.js";
-import type { ReleaseInfo, UserConfig } from "../core/index.js";
+import type { ReleaseInfo, UpdateStats, UserConfig } from "../core/index.js";
+import { beginMachineOutput, envelopeEmitter, type MutationReport } from "../core/mutation-report.js";
+import { installMutationReport } from "./install-report.js";
 import { runMigrate } from "../migrate/migrate-orchestrator.js";
 import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
-import { reconcileApplyCodexBundle } from "../migrate/modules/codex-reconcile-apply.js";
+import { emitCodexTarget, emitCursorTarget } from "../emit/emit-bundle-target.js";
+import { emitTarget } from "../emit/emit-target.js";
 import { resolveCursorModuleDir } from "../migrate/modules/cursor-authored-bundle.js";
-import { reconcileApplyCursorBundle } from "../migrate/modules/cursor-reconcile-apply.js";
 import { describeRetiredSkills } from "../migrate/modules/retired-skill-cleanup.js";
 import { meowkitStatePaths } from "../state/meowkit-state-paths.js";
+import { reportOrphanedV2Stores } from "../core/report-orphaned-stores.js";
+import { createSnapshot } from "../core/snapshot.js";
+import { carryBaselineForward, offlineRefusal, readInstalledShape, restampProvenance } from "./upgrade-preflight.js";
+import { confirmationRequiredMessage, EXIT_NEEDS_CONFIRMATION, needsConfirmation } from "../core/destructive-guard.js";
+import { populateKitCache } from "../core/kit-cache.js";
+import { LEGACY_DESCRIPTOR_REL, legacyDescriptorPath } from "../state/resolve-config-path.js";
+import { migrateLegacyDescriptor } from "./migrate-config-descriptor.js";
 import { refuseKitSourceRepo } from "./kit-source-repo-guard.js";
 
 /** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
@@ -44,7 +52,7 @@ async function refreshCursorBundle(projectDir: string): Promise<void> {
 		console.error(pc.red("Cursor bundle not found in this install — reinstall the `mewkit` package."));
 		return;
 	}
-	const result = await reconcileApplyCursorBundle(moduleDir, projectDir, { projectRoot: projectDir });
+	const result = await emitCursorTarget("upgrade", projectDir, moduleDir);
 	const preserved = result.entries.filter((e) => e.action === "skip" && e.reasonCode === "user-edits-preserved").length;
 	console.log(
 		pc.green(
@@ -105,7 +113,7 @@ async function upgradeCodexToolkit(projectDir: string): Promise<void> {
 		console.error(pc.red("Codex bundle not found in this install — reinstall the `mewkit` package."));
 		process.exit(1);
 	}
-	const result = await reconcileApplyCodexBundle(moduleDir, projectDir, { projectRoot: projectDir });
+	const result = await emitCodexTarget("upgrade", projectDir, moduleDir);
 	const preserved = result.entries.filter((e) => e.action === "skip" && e.reasonCode === "user-edits-preserved").length;
 	console.log(
 		pc.green(
@@ -145,6 +153,24 @@ export interface UpgradeArgs {
 	list?: boolean;
 	noCleanup?: boolean;
 	yes?: boolean;
+	/** Overwrite files this project has edited. Destructive, so it is gated. */
+	force?: boolean;
+	/** Plan only: no snapshot, no write, no cache rewrite. */
+	dryRun?: boolean;
+	/** False in a non-TTY session; the destructive guard reads it. */
+	interactive?: boolean;
+	/** Print the one mutation envelope on stdout; the narration goes to stderr. */
+	json?: boolean;
+	/**
+	 * Install from this project's cached kit artifact only, re-verifying it, and
+	 * reach no network. A cached file is a local file: it is put through the same
+	 * digest and signature checks a download gets, because it is not trusted more
+	 * for being local.
+	 */
+	offline?: boolean;
+	/** The running CLI's version, for the provenance this run re-stamps. */
+	cliVersion?: string;
+	/** Permit running in the MeowKit source repo, whose `.claude/` is the kit's authored source. */
 	allowKitSource?: boolean;
 }
 
@@ -231,7 +257,10 @@ async function performUpgrade(
 	useBeta: boolean,
 	cleanup: boolean,
 	assumeYes: boolean,
-): Promise<void> {
+	dryRun: boolean,
+	force: boolean,
+	provenance: { cliVersion: string; offline: boolean } = { cliVersion: "unknown", offline: false },
+): Promise<UpdateStats | null> {
 	console.log(pc.dim("Fetching latest release from GitHub..."));
 
 	const releases = await fetchReleases();
@@ -246,7 +275,7 @@ async function performUpgrade(
 
 	if (localVersion === latest.version) {
 		console.log(pc.green(`Already up to date (v${latest.version}).`));
-		return;
+		return null;
 	}
 
 	console.log(`Upgrading: ${pc.dim(localVersion ?? "none")} → ${pc.cyan(latest.version)}`);
@@ -269,35 +298,77 @@ async function performUpgrade(
 			geminiApiKey: null,
 		};
 
+		// Before the first write of the run: a copy of everything the release
+		// could overwrite, plus the v2 descriptor the migration below replaces.
+		// A dry run takes none, because it writes nothing to recover from.
+		const snapshot = dryRun
+			? null
+			: createSnapshot(process.cwd(), "upgrade", [
+					".claude",
+					...(legacyDescriptorPath(process.cwd()) === null ? [] : [LEGACY_DESCRIPTOR_REL]),
+				]);
+		if (snapshot !== null) {
+			console.log(pc.dim(`Snapshot ${snapshot.id} — ${snapshot.fileCount} file(s); restore with \`mewkit backups restore ${snapshot.id}\``));
+		}
+
+		// Carry a superseded ownership baseline forward before anything else reads
+		// one. After the snapshot, so the original is recoverable, and before the
+		// update, so the update compares against a real baseline rather than
+		// against nothing — a project with no baseline has every file look
+		// user-authored, which blocks the cleanup it came here for.
+		if (!dryRun) {
+			for (const line of await carryBaselineForward(process.cwd())) console.log(pc.dim(line));
+		}
+
 		// Pack-aware upgrade: a partial install upgrades only its installed packs;
 		// removed packs stay removed. Corrupt/absent metadata (or a legacy/full
 		// install with `packs` undefined) falls through to a full upgrade — never
 		// abort the very upgrade that would repair corruption.
-		let installedPacks: string[] | undefined;
-		let installedProfile: string | undefined;
-		try {
-			const { meta } = readInstallMetadata(join(process.cwd(), ".claude"));
-			installedPacks = meta?.packs;
-			installedProfile = meta?.profile;
-		} catch {
-			installedPacks = undefined;
-		}
+		const { packs: installedPacks, profile: installedProfile, delivery: installedDelivery } =
+			readInstalledShape(process.cwd());
 		const claudeSrc = join(sourceDir, ".claude");
 		const allowedPaths =
 			installedPacks && hasPackManifest(claudeSrc)
 				? resolvePacks(claudeSrc, loadPackManifest(claudeSrc), installedPacks)
 				: undefined;
 
-		const stats = await smartUpdate(config, sourceDir, process.cwd(), /* dryRun */ false, /* force */ false, {
-			cleanup,
-			assumeYes,
-			allowedPaths,
-			profile: installedProfile,
-			packs: installedPacks,
+		// Through the one projection the install used. Upgrade writing the shape
+		// itself is how an upgraded project drifts from a freshly installed one.
+		const emitted = await emitTarget({
+			target: "claude-code",
+			delivery: installedDelivery,
+			entryPoint: "upgrade",
+			projectRoot: process.cwd(),
+			dryRun,
+			force,
+			kitVersion: latest.version,
+			release: {
+				config,
+				sourceDir,
+				options: {
+					cleanup,
+					assumeYes,
+					allowedPaths,
+					profile: installedProfile,
+					packs: installedPacks,
+					cliVersion: provenance.cliVersion,
+				},
+			},
 		});
+		if (emitted.stats === undefined) throw new Error("the projection applied no release content");
+		const stats = emitted.stats;
+
+		if (!dryRun) {
+			await restampProvenance(process.cwd(), {
+				kitVersion: latest.version,
+				cliVersion: provenance.cliVersion,
+				delivery: installedDelivery,
+				offline: provenance.offline,
+			});
+		}
 
 		console.log();
-		console.log(pc.green(pc.bold("Upgrade complete!")));
+		console.log(pc.green(pc.bold(dryRun ? "Upgrade plan (nothing was written)" : "Upgrade complete!")));
 		console.log(`  ${pc.dim("Before:")} ${localVersion ?? "not installed"}`);
 		console.log(`  ${pc.dim("After:")}  ${latest.version}`);
 		console.log();
@@ -313,10 +384,15 @@ async function performUpgrade(
 			console.log(`  ${pc.red("removed")} ${stats.orphansDeleted.length}  ${pc.dim("(release no longer ships)")}`);
 		}
 		if (stats.orphansSkipped.length > 0) {
+			// NAME them. A count alone is unactionable: a leftover rule file still auto-loads
+			// and can outrank the current release's guidance, and the user cannot judge the risk
+			// — or delete the file by hand — from the number alone.
 			console.log(
-				pc.yellow(`\n  ${stats.orphansSkipped.length} orphan file(s) detected but not deleted (use --yes to confirm).`),
+				pc.yellow(`\n  ${stats.orphansSkipped.length} orphan file(s) detected but not deleted (use --yes to confirm):`),
 			);
+			for (const relPath of stats.orphansSkipped) console.log(pc.yellow(`    .claude/${relPath}`));
 		}
+		reportOrphanedV2Stores(process.cwd());
 
 		if (stats.userModified.length > 0) {
 			console.log(
@@ -324,14 +400,42 @@ async function performUpgrade(
 			);
 		}
 
-		// Propagate the upgrade to any installed downstream provider toolkits.
-		await reMigrateInstalledProviders(process.cwd());
+		if (!dryRun) {
+			migrateLegacyDescriptor(process.cwd());
+
+			// Propagate the upgrade to any installed downstream provider toolkits.
+			await reMigrateInstalledProviders(process.cwd());
+		}
+		return stats;
 	} finally {
+		// The local kit copy is written BEFORE the download is removed: the
+		// temp directory is the only place the kit's own bytes exist, and every
+		// later deletion decision is checked against them. A dry run leaves the
+		// existing cache alone, because it installed nothing.
+		try {
+			if (!dryRun) populateKitCache(sourceDir, process.cwd(), latest.version);
+		} catch (err: unknown) {
+			console.log(pc.yellow(`  Could not write the local kit copy: ${err instanceof Error ? err.message : String(err)}`));
+			console.log(pc.dim("  `mewkit uninstall` will refuse to delete until `mewkit upgrade` succeeds in writing it."));
+		}
 		cleanupDownload(sourceDir);
 	}
 }
 
 export async function upgrade(args: UpgradeArgs): Promise<void> {
+	const json = args.json === true;
+	if (json) beginMachineOutput();
+	/** One envelope per run, whichever of this command's several ends is reached. */
+	const emit = envelopeEmitter(json);
+	const noChange = (note: string): MutationReport => ({
+		ok: true,
+		command: "upgrade",
+		dryRun: args.dryRun === true,
+		planned: [],
+		applied: [],
+		notes: [note],
+	});
+
 	// Provider-only project(s) (`init --target codex` / `init --target cursor`): no
 	// `.claude/` to update — refresh whichever authored bundle(s) are present instead of the
 	// release flow. A project can have more than one provider-only bundle installed with no
@@ -339,12 +443,37 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 	// (Skip for --check/--list, which are version queries.)
 	const cwd = process.cwd();
 	if (!args.check && !args.list) refuseKitSourceRepo(cwd, "upgrade", args.allowKitSource);
+
+	// An offline run is served from this project's artifact store, and nothing
+	// else. Reaching the network "to help" would make the flag mean "prefer the
+	// cache", which is a different promise: a user who passed it because the
+	// network is metered, untrusted or absent would get the fetch they ruled out.
+	if (args.offline === true) {
+		const refusal = offlineRefusal(cwd, getLocalVersion());
+		if (refusal !== null) {
+			console.error(pc.red(refusal));
+			emit(() => ({
+				ok: false,
+				command: "upgrade",
+				dryRun: args.dryRun === true,
+				planned: [],
+				applied: [],
+				notes: [],
+				error: refusal,
+				fix: "Point MEOWKIT_RELEASE_SOURCE at an extracted release, or run `mewkit upgrade` once with network access.",
+			}));
+			process.exitCode = 1;
+			return;
+		}
+	}
+
 	if (!args.check && !args.list && !existsSync(join(cwd, ".claude"))) {
 		const hasCodex = existsSync(join(cwd, ".codex"));
 		const hasCursor = hasCursorLedger(cwd);
 		if (hasCodex || hasCursor) {
 			if (hasCodex) await upgradeCodexToolkit(cwd);
 			if (hasCursor) await upgradeCursorToolkit(cwd);
+			emit(() => noChange("refreshed the authored provider bundle(s); this project has no .claude/"));
 			return;
 		}
 	}
@@ -362,19 +491,44 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 	try {
 		if (args.list) {
 			await listReleases(localVersion);
+			emit(() => noChange("listed the available releases; nothing was changed"));
 			return;
 		}
 
 		if (args.check) {
 			await checkVersion(localVersion, useBeta);
+			emit(() => noChange("reported the installed version against the channel; nothing was changed"));
 			return;
 		}
 
-		await performUpgrade(
+		// `--force` overwrites files this project has edited, so it is one of the
+		// four destructive invocations: in a session with no terminal to confirm
+		// in it previews and stops rather than acting on an unseen plan.
+		if (args.force === true && needsConfirmation({ assumeYes: args.yes === true, interactive: args.interactive !== false })) {
+			console.log(pc.yellow(confirmationRequiredMessage("upgrade --force")));
+			const preview = await performUpgrade(localVersion, useBeta, args.noCleanup !== true, true, /* dryRun */ true, /* force */ true);
+			process.exitCode = EXIT_NEEDS_CONFIRMATION;
+			emit(() =>
+				preview === null
+					? noChange("already up to date; nothing was changed")
+					: installMutationReport("upgrade", preview, true, ["--force needs confirmation: this is the plan, nothing was written"]),
+			);
+			return;
+		}
+
+		const stats = await performUpgrade(
 			localVersion,
 			useBeta,
 			/* cleanup */ args.noCleanup !== true,
 			/* assumeYes */ args.yes === true,
+			/* dryRun */ args.dryRun === true,
+			/* force */ args.force === true,
+			{ cliVersion: args.cliVersion ?? "unknown", offline: args.offline === true },
+		);
+		emit(() =>
+			stats === null
+				? noChange("already up to date; nothing was changed")
+				: installMutationReport("upgrade", stats, args.dryRun === true, [`from ${localVersion ?? "not installed"}`]),
 		);
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err);

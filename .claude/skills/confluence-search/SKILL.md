@@ -1,6 +1,6 @@
 ---
 name: mk:confluence-search
-description: 'Confluence CQL search + space list + saved-filter + export via the confluence-as wrapper. Triggers: ''search confluence'', ''find pages where X'', ''cql for ...'', ''export search results'', ''list spaces'', ''manage saved filters''. CQL injection-safe via the shared sanitizer. NOT for single-page CRUD (mk:confluence-page); NOT for bulk write ops (mk:confluence-bulk).'
+description: 'mk:confluence leaf. CQL search, space listing, saved filters, export. NOT for mk:confluence-page.'
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - confluence-filter
   - confluence-export
   - confluence-space-list
-when_to_use: Use to find Confluence pages by CQL, validate CQL, build queries from natural language, list spaces, manage saved filters, or export results. NOT for single-page CRUD (use mk:confluence-page).
+when_to_use: 'Find Confluence pages by CQL, space, label or author.'
 user-invocable: true
 context: fork
 agent: confluence-search

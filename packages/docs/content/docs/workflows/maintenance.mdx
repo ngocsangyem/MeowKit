@@ -62,7 +62,7 @@ The **developer** applies the fix with MeowKit's constraints:
 
 ### Step 4: Capture learnings
 
-The **analyst** routes the finding to `.meowkit/memory/fixes.json` (bug-class fix pattern):
+`mk:fix` appends one entry to `.meowkit/memory/gotchas.md`:
 
 ```
 Project: legacy-dashboard
@@ -70,7 +70,7 @@ Pattern: Dashboard has N+1 query patterns — check any service making
          per-record DB calls. Repository pattern should use eager loading.
 ```
 
-Next time `mk:fix` runs, it loads `fixes.md`/`fixes.json` at task start and surfaces this pattern.
+Next time `mk:fix` runs, its task-start grep over `.meowkit/memory/` finds the entry and surfaces it.
 
 ### Step 5: Document what you found
 

@@ -64,7 +64,7 @@ description: "Detects the right agent and complexity tier at Phase 0 orient; run
    2. **Detect Agile context — OR-logic, any one match triggers load:**
       - glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
       - Active plan frontmatter has non-empty `jira_tickets:`
-      - `MEOW_JIRA_BASE_URL` env var is set
+      - `MEOW_JIRA_SITE_URL` env var is set
       - Last user message matches `[A-Z]{2,10}-\d+` (Jira-key pattern)
    3. **If Agile context detected, `Read` the 3 conditional rules:**
       - the agile story-gate conventions
@@ -78,7 +78,7 @@ description: "Detects the right agent and complexity tier at Phase 0 orient; run
 1. **Check cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
 2. **Score agents** -- analyze task content, extract keywords, check project context across all layers (0-4). See `references/multi-layer-detection.md`, `references/scoring-and-thresholds.md`
 3. **Select model + mode** -- map complexity to model tier, check team mode eligibility. See `references/model-selection.md`, `references/complexity-detection.md`, `references/team-mode.md`
-4. **Evaluate risk flags** -- read the risk checklist (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per `rules/model-selection-rules.md` Rule 2 — regardless of `mk:scale-routing` outcome.
+4. **Evaluate risk flags** -- read the risk checklist (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per the model-selection rules Rule 2 — regardless of `mk:scale-routing` outcome.
 5. **Output + hand off** -- show detection banner (including `matched_flags` line if non-empty), load agent instructions, invoke skill. See `references/detection-process.md`, `references/after-detection.md`
 
 ## References

@@ -1,6 +1,6 @@
 ---
 name: mk:frontend-design
-description: Use when designing UI components, reviewing visual design, building design systems, or checking accessibility. Auto-activates on frontend design tasks and UI reviews.
+description: Design and review UI components, visual hierarchy, states and accessibility. NOT for mk:ui-design-system.
 source: local
 original_skills:
   - ui-ux-pro-max
@@ -12,7 +12,7 @@ keywords:
   - screenshot-replication
   - design-implementation
   - best-practices
-when_to_use: Use when replicating a mockup/screenshot or building React/TS components with best practices. NOT for design-system audits (see mk:ui-design-system).
+when_to_use: Building or critiquing how one screen looks, lays out and behaves.
 user-invocable: true
 owner: utility
 criticality: medium

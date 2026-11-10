@@ -39,7 +39,7 @@ Use planner agent to create implementation plan.
 **Output:** `Step 4: Plan created — [N] phases`
 
 ### Step 5: Implement
-Implement per plan. Follow `.claude/rules/tdd-rules.md` for flag precedence and regression-test requirements; do not restate or weaken that contract here.
+Implement per plan. Follow `.claude/skills/cook/references/tdd-rules.md` for flag precedence and regression-test requirements; do not restate or weaken that contract here.
 
 **Parallel Verification** after implementation.
 
@@ -68,7 +68,7 @@ Skip this whole section unless the run was invoked with `--advice`. Without the
 flag there are zero advisory calls and nothing here loads.
 
 On the first checkpoint of a run, read
-`.claude/rules-conditional/advice-supervision-rules.md` — it is the contract this
+`.claude/skills/advise/references/advice-supervision-rules.md` — it is the contract this
 section implements.
 
 ### Checkpoints

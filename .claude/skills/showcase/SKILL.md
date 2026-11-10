@@ -1,7 +1,6 @@
 ---
 name: mk:showcase
-description: |
-  Create a self-contained, visually polished HTML showcase page for a topic or set of artifacts. Supply a mission (topic summary) and optional artifact paths explicitly — the skill never auto-scans the repo. Writes output to assets/showcase/<mission>/. Screenshots are optional (requires Puppeteer). Publishing is local-only by default; publish requests without a configured path fail clearly.
+description: Builds a standalone polished HTML showcase page from a stated mission and given artifact paths. NOT for mk:preview.
 user-invocable: true
 version: 1.0.0
 source: port
@@ -16,8 +15,7 @@ keywords:
   - portfolio
   - visual
   - publish
-when_to_use: |
-  Use when the user wants a packaged, shareable deliverable — a polished HTML page (with optional screenshots) for a topic, demo, or work summary. NOT for rendering a plan as HTML (use mk:visual-plan); NOT for generic code or diagram visuals (use mk:preview); NOT for plan critique (use mk:plan-ceo-review).
+when_to_use: User wants one shareable packaged page for a demo or work summary.
 argument-hint: <mission> [artifact-paths…] [--no-screenshots] [--no-publish] [--languages en|vi|en,vi]
 owner: utility
 criticality: medium

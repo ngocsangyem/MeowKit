@@ -29,8 +29,8 @@ If this project ships project-level `validate.py` / `security-scan.py` scripts f
 
 | Script             | Purpose                   | Command                                                            |
 | ------------------ | ------------------------- | ------------------------------------------------------------------- |
-| `validate.py`      | General code validation   | `.cursor/skills/.venv/bin/python3 <path-to-validate.py>`          |
-| `security-scan.py` | Security pattern scanning | `.cursor/skills/.venv/bin/python3 <path-to-security-scan.py>`     |
+| `validate.py`      | General code validation   | `.meowkit/envs/lint-and-validate/bin/python3 <path-to-validate.py>`          |
+| `security-scan.py` | Security pattern scanning | `.meowkit/envs/lint-and-validate/bin/python3 <path-to-security-scan.py>`     |
 
 ## Quality Loop
 

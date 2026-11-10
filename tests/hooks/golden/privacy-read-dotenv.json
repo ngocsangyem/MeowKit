@@ -1,0 +1,23 @@
+{
+  "name": "privacy-read-dotenv",
+  "group": "privacy",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/privacy-block.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\".env\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "privacy-read-dotenv",
+  "setupDescription": "BASE hook tree only",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@PRIVACY_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@PRIVACY_BLOCK@@\nFile '.env' matches sensitive file pattern (injection-rules.md R4).\nUse AskUserQuestion to get explicit user approval before accessing.\n"
+  }
+}

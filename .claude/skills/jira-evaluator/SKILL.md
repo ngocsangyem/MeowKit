@@ -1,6 +1,6 @@
 ---
 name: mk:jira-evaluator
-description: 'Evaluate Jira ticket complexity + inconsistencies via the jira-evaluator agent. Read-only. Triggers: ''evaluate KEY'', ''analyze ticket complexity for KEY'', ''check ticket quality for KEY''. NOT for estimation (mk:jira-estimator); NOT for full RCA (mk:jira-analyst).'
+description: 'mk:jira leaf. Score one ticket for complexity and inconsistencies, read-only. NOT for mk:jira-estimator.'
 phase: on-demand
 source: local
 keywords:
@@ -9,7 +9,7 @@ keywords:
   - ticket-evaluation
   - complexity-analysis
   - ticket-quality
-when_to_use: Use when user wants complexity assessment + inconsistency check on a single ticket. NOT for execution; NOT for estimation only.
+when_to_use: 'Ask how complex or how self-contradictory a single Jira ticket is.'
 user-invocable: true
 context: fork
 agent: jira-evaluator

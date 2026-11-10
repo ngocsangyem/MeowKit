@@ -38,7 +38,6 @@ __pycache__/
 *.pyc
 *.pyo
 .venv/
-.claude/skills/.venv/
 
 # Coverage
 coverage/
@@ -46,6 +45,18 @@ coverage/
 
 # Ephemeral runtime state
 session-state/
+
+# `.meowkit/` state classes. `.meowkit/config.json` and the team memory in
+# `.meowkit/memory/` are committed on purpose, so the ignores are per-class.
+# telemetry/ holds the cost, trace and security logs — machine-local, and the
+# security log quotes attacker payloads, so it must never be committed.
+.meowkit/telemetry/
+.meowkit/state/
+.meowkit/cache/
+
+# Security Posture Reports and other run output under tasks/reports/ carry
+# unpatched vulnerability detail. Never committed, never archived.
+tasks/reports/
 
 # Rendered plan HTML — derived from plan.md/phase-*.md, may hold sensitive plan
 # content and pulls the Mermaid CDN. Regenerate via mk:visual-plan / --html.
@@ -60,7 +71,8 @@ tasks/plans/**/*.html
 !.claude/memory/.gitkeep
 
 # Agent scratch memory (subagent-written, machine-local — like .claude/memory).
-# Swept into plugin/agent-memory/ by build-plugin; never committed or shipped.
+# A plugin-delivery install can mirror it under plugin/agent-memory/ in a working
+# copy; neither location is ever committed or shipped.
 .claude/agent-memory/
 plugin/agent-memory/
 .claude/cache/
@@ -71,3 +83,8 @@ plugin/agent-memory/
 release-manifest.json
 
 tmp/
+
+# Per-skill interpreter environments. Created on demand by `mewkit skill env`,
+# machine-local and reproducible from each skill's own pinned requirements, so
+# there is nothing here worth committing.
+.meowkit/envs/

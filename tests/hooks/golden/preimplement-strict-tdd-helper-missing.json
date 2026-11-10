@@ -1,0 +1,26 @@
+{
+  "name": "preimplement-strict-tdd-helper-missing",
+  "group": "cli-pre-implement",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-implement.sh",
+  "args": [
+    "parser"
+  ],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}",
+    "MEOWKIT_TDD": "1"
+  },
+  "setup": "preimplement-strict-tdd-helper-missing",
+  "setupDescription": "strict TDD mode with lib/tdd-detect.sh deleted — the fail-closed path",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 1,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": "[tdd] WARN: tdd-detect.sh missing at {{TMP}}/.claude/hooks/lib/tdd-detect.sh\nBLOCKED: TDD helper missing, cannot verify strict mode\n"
+  }
+}

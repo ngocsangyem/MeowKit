@@ -1,16 +1,7 @@
 ---
 name: mk:visual-plan
 version: 1.2.0
-description: |
-  Use when a plan directory (plan.md + phase-*.md) needs a visual review. By DEFAULT
-  this drives the STRUCTURED visual-plan artifact (visual-plan/plan.json) via the
-  mewkit visual-plan CLI — generate if absent, validate, open the local studio
-  (view/edit), and export plan.html from the approved artifact. Pass --static for the
-  legacy prompt-only single-file plan.html template render. Triggers on "render this
-  plan", "visualize the plan", "open the plan studio", "make a shareable plan page",
-  "plan.html". This is the canonical owner of plan-as-visual-review. NOT for plan
-  critique or scope review (see mk:plan-ceo-review / mk:validate-plan), NOT for generic
-  code/diagram/diff visuals (see mk:preview), NOT for live media generation (see mk:multimodal).
+description: Renders a plan directory as the structured visual-plan artifact, local studio and exported plan.html. NOT for mk:preview.
 allowed-tools:
   - Read
   - Write
@@ -30,7 +21,7 @@ keywords:
   - wireframe
   - mermaid
   - builderio-blocks
-when_to_use: Use to visually review a plan directory (plan.md + phase-*.md). Default = the structured visual-plan artifact + local studio (view/edit) + export; --static = the legacy single-file plan.html template render. Canonical owner of plan-as-visual-review. NOT for generic code/diagram/diff visuals (mk:preview), NOT for plan critique (mk:plan-ceo-review), NOT for plan validation (mk:validate-plan).
+when_to_use: Asked to visualize, open or share a plan directory as a page.
 user-invocable: true
 preamble-tier: 2
 phase: on-demand
@@ -51,7 +42,7 @@ plan-as-visual-review; it does not critique or validate the plan.
 
 Invocation: `/mk:visual-plan <plan-dir | plan.md> [--static] [--wireframe]`.
 
-Resolve `$PLAN_DIR` from the argument, or from `session-state/active-plan` when
+Resolve `$PLAN_DIR` from the argument, or from `.meowkit/state/active-plan` when
 available. If neither resolves a plan directory, ask the user for it.
 
 | Request | Load and follow |

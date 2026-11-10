@@ -11,7 +11,7 @@ assert_match() {
 }
 
 assert_match "finishing the merge/rebase requires explicit user go-ahead" 'requires explicit user go-ahead' "$SKILL"
-assert_match "scope: NOT for the full mk:ship base-branch-merge pipeline" 'NOT for the full ship pipeline that merges the base branch first \(see mk:ship\)' "$SKILL"
+assert_match "scope: NOT for the full mk:ship base-branch-merge pipeline" '^description:.*NOT for mk:ship' "$SKILL"
 assert_match "resolution must not invent new behaviour" 'Do not invent new behaviour' "$SKILL"
 assert_match "ask first before running completion commands" 'Ask first.*present the resolved files and check results' "$SKILL"
 

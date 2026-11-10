@@ -3,6 +3,7 @@
 // depends_on), that every governed artifact belongs to ≥1 pack or base, and — the
 // non-negotiable safety invariant — that base carries the full gate/privacy/dispatch
 // chain at its exact verified paths. Mirrors checkOwnership's quad-state pattern.
+import { ALWAYS_ON_RULE_PATHS } from "./always-on-rules.js";
 import { buildInventory } from "./build-inventory.js";
 import {
 	availablePacks,
@@ -17,32 +18,48 @@ import type { CheckResult } from "../commands/validate.js";
 import type { Status } from "../commands/doctor-checks.js";
 
 /**
- * Safety surface that MUST resolve into `base` for every profile — the Phase-1
- * gate + privacy hooks, the dispatch chain, settings, statusline, and the always-on
- * rules. Paths are exact (note `hooks/lib/...`); a missing one makes a profile
- * shippable without enforcement, so each absence is a hard FAIL.
+ * Safety surface that MUST resolve into `base` for every profile — the three write
+ * guards and their gate libraries listed below, the dispatch chain, the completion gate,
+ * settings, statusline, and the always-on rules. Paths are exact (note
+ * `hooks/lib/...`); a missing one makes a profile shippable without enforcement,
+ * so each absence is a hard FAIL.
+ *
+ * The three entrypoint paths were command files until the kit stopped shipping a
+ * command surface; they were renamed to the skill and reference that absorbed each
+ * job rather than dropped, because the invariant is "every profile can reach these
+ * jobs", not "these three files exist".
+ *
+ * Two entries were removed when the shell runtime went away, both because the
+ * thing they named no longer exists rather than because enforcement shrank:
+ * `hooks/lib/read-hook-input.sh` was replaced by `hooks/lib/parse-stdin.cjs`,
+ * which is already listed, and `hooks/lib/load-dotenv.sh` is no longer on any
+ * guard's path — the dotenv is read by one integration handler, so its port is
+ * an integration library, not a safety surface.
  */
 export const SAFETY_PATHS = [
 	"statusline.cjs",
 	"settings.json",
-	"hooks/gate-enforcement.sh",
-	"hooks/privacy-block.sh",
-	"hooks/pre-completion-check.sh",
-	"hooks/lib/read-hook-input.sh",
-	"hooks/lib/load-dotenv.sh",
+	"hooks/gate-enforcement.cjs",
+	"hooks/privacy-block.cjs",
+	"hooks/pre-ship.cjs",
+	"hooks/handlers/pre-completion-check.cjs",
 	"hooks/dispatch.cjs",
 	"hooks/lib/parse-stdin.cjs",
 	"hooks/lib/shared-state.cjs",
 	"hooks/handlers.json",
-	"rules/security-rules.md",
-	"rules/injection-rules.md",
-	"rules/gate-rules.md",
-	"rules/core-behaviors.md",
-	"rules/development-rules.md",
-	// essential cross-profile commands — a profile without these has no /mk:plan etc.
-	"commands/mk/plan.md",
-	"commands/mk/upgrade.md",
-	"commands/mk/validate.md",
+	"hooks/lib/gate2-check.cjs",
+	"hooks/lib/approval-receipt.cjs",
+	"hooks/lib/validate-contract.cjs",
+	"hooks/lib/check-contract-signed.cjs",
+	"hooks/lib/validate-gate-2.cjs",
+	...ALWAYS_ON_RULE_PATHS,
+	// Essential cross-profile entrypoints. Each names the surface that now owns a job
+	// the kit used to expose as its own slash command: planning, the self-update path,
+	// and deterministic validation. A profile missing one of these has no way to reach
+	// that job at all, which is why they sit in the safety list rather than in a pack.
+	"skills/plan-creator/SKILL.md",
+	"skills/help/references/cli.md",
+	"skills/lint-and-validate/SKILL.md",
 ];
 
 const PASS = (name: string, detail: string): CheckResult => ({ name, status: "pass", detail, section: "Packs" });

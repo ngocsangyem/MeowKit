@@ -32,7 +32,6 @@ Follow it inline, **skipping these sections** (already handled by the parent ski
 - stop and ask the user in chat Format
 - Completeness Principle — Boil the Lake
 - Search Before Building
-- Contributor Mode
 - Completion Status Protocol
 - Telemetry (run last)
 
@@ -43,8 +42,8 @@ After the office-hours skill completes, re-run the design doc check:
 ```bash
 SLUG=$(.codex/scripts/bin/workflow-slug 2>/dev/null || basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr '/' '-' || echo 'no-branch')
-DESIGN=$(ls -t .meowkit/memory/projects/*-$BRANCH-design-*.md 2>/dev/null | head -1)
-[ -z "$DESIGN" ] && DESIGN=$(ls -t .meowkit/memory/projects/*-design-*.md 2>/dev/null | head -1)
+DESIGN=$(ls -t tasks/plans/*/*-$BRANCH-design-*.md 2>/dev/null | head -1)
+[ -z "$DESIGN" ] && DESIGN=$(ls -t tasks/plans/*/*-design-*.md 2>/dev/null | head -1)
 [ -n "$DESIGN" ] && echo "Design doc found: $DESIGN" || echo "No design doc found"
 ```
 
@@ -69,7 +68,7 @@ If they choose A: Read the office-hours skill file from disk:
 
 Follow it inline, skipping these sections (already handled by parent skill):
 Preamble, stop and ask the user in chat Format, Completeness Principle, Search Before Building,
-Contributor Mode, Completion Status Protocol, Telemetry.
+Completion Status Protocol, Telemetry.
 
 Note current Step 0A progress so you don't re-ask questions already answered.
 After completion, re-run the design doc check and resume the review.

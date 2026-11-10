@@ -100,7 +100,7 @@
 			]
 		},
 		"operations": {
-			"description": "Ops, docs-site, wiki, session-scoped guardrails, parallel-agent, and browser-automation helpers.",
+			"description": "Ops, docs-site, session-scoped guardrails, parallel-agent, and browser-automation helpers.",
 			"dependsOn": ["core"],
 			"skills": [
 				"mk-agent-browser",
@@ -122,9 +122,6 @@
 				"mk-task-queue",
 				"mk-team-config",
 				"mk-web-to-markdown",
-				"mk-wiki",
-				"mk-wiki-render",
-				"mk-wiki-research",
 				"mk-worktree"
 			]
 		},

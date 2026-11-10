@@ -17,7 +17,7 @@ MeowKit runs the full pre-ship checklist: test → lint → typecheck → commit
 
 ```
 Phase 4 review approved (Gate 2)
-  → pre-ship.sh: full test + lint + typecheck
+  → pre-ship.cjs: full test + lint + typecheck
   → git-manager: stage changes, conventional commit
   → shipper: push branch, create PR
   → Wait for CI
@@ -60,7 +60,7 @@ The scope and description come from the approved plan. No manual commit message 
 - **Never pushes to main directly.** Always creates a PR.
 - **CI must pass before merging.** The shipper verifies CI status.
 - **Rollback docs required.** Every ship documents how to revert.
-- **Pre-ship hook runs first.** `pre-ship.sh` blocks the ship if tests, lint, or typecheck fail.
+- **Pre-ship hook runs first.** `pre-ship.cjs` blocks the ship if tests, lint, or typecheck fail.
 
 ## Hotfix exception
 
@@ -74,14 +74,16 @@ Hotfixes still require Gate 2 approval but may skip non-critical checks. Documen
 
 ## Memory capture
 
-Before shipping, capture non-obvious decisions and corrections:
+Before shipping, ask for the non-derivable decisions and corrections to be written down. Each becomes one entry in `.meowkit/memory/`:
 
-```
-##decision: Used connection pool over per-request connection, load testing showed 3x throughput
-##pattern:bug-class Race condition in payment retry, fixed with idempotency key
+```md
+## Connection pool, not per-request connection   <!-- 2026-11-01 -->
+Why: load testing showed 3x throughput; per-request exhausted the pool under burst
+Apply when: adding any new DB-backed endpoint to this service
+Source: PR #318
 ```
 
-These persist to `.meowkit/memory/` for future sessions.
+The store is committed, so the entry ships in the same PR and is reviewed with the code.
 
 ## When it goes wrong
 

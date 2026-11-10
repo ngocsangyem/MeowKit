@@ -1,0 +1,28 @@
+{
+  "name": "gate1-lean-mode-contract-bypass",
+  "group": "gate1",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/gate-enforcement.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"src/app.ts\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}",
+    "MEOWKIT_AUTOBUILD_MODE": "LEAN"
+  },
+  "setup": "gate1-lean-mode-contract-bypass",
+  "setupDescription": "stamped plan, no contracts dir, MEOWKIT_AUTOBUILD_MODE=LEAN",
+  "normalizers": [
+    "tmpdir",
+    "isoTimestamp"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/lean-bypass.log": "{{TS}} MEOWKIT_AUTOBUILD_MODE=LEAN bypassed contract gate\n"
+  }
+}

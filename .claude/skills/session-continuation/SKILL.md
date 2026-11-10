@@ -1,6 +1,6 @@
 ---
 name: mk:session-continuation
-description: 'Persists and restores mid-session workflow progress across context resets. Use when resuming workflows, saving state, or handling context compaction. Triggers on: handoff, save state, resume workflow.'
+description: Persists and restores mid-workflow progress across context resets and handoffs. NOT for mk:memory.
 triggers:
   - handoff
   - save state
@@ -15,7 +15,7 @@ keywords:
   - resume-workflow
   - context-reset
   - state-persistence
-when_to_use: Auto-invoked when persisting/restoring mid-session workflow progress across context resets. Not user-callable directly.
+when_to_use: Auto-invoked on compaction or resume. Not user-callable.
 user-invocable: false
 owner: docs
 criticality: medium
@@ -37,15 +37,11 @@ Manage workflow state across sessions with handoff and resume.
 - Session ending with incomplete workflow
 - Incomplete workflow from previous session
 
-## Plan State Variables
+## Plan State
 
-```toon
-state_vars[4]{var,purpose,persistence}:
-  MEOWKIT_ACTIVE_PLAN,Current active plan path,Session temp file
-  MEOWKIT_SUGGESTED_PLAN,Branch-matched plan hint,Inferred from git branch
-  MEOWKIT_COMPLEXITY,Auto-detected task complexity,Session memory
-  MEOWKIT_ACTIVE_AGENTS,Currently active agents,Session memory
-```
+Saved workflow state lives in `.claude/logs/workflows/`; the active plan is resolved
+from `.meowkit/state/active-plan.json` or by scanning `tasks/plans/`. Nothing is carried
+between sessions in the environment.
 
 ## Process
 

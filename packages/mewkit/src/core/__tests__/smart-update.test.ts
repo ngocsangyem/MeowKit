@@ -2,7 +2,9 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { buildManifest, classifyLayer, hashFile, readManifest, writeManifest } from "../compute-checksums.js";
+import { classifyLayer, hashFile } from "../compute-checksums.js";
+import { indexByPath, readInstallMetadata } from "../install-metadata.js";
+import { seedCanonicalBaseline } from "../../../tests/helpers/superseded-baseline.js";
 import { smartUpdate } from "../smart-update.js";
 import { buildInstallMetadata, readInstallMetadata } from "../install-metadata.js";
 import { writeInstallMetadata } from "../install-metadata-writer.js";
@@ -48,17 +50,21 @@ describe("smart update manifest ownership", () => {
 		await writeText(target, ".claude/rules/core-behaviors.md", "old behaviors\n");
 		await writeText(target, ".claude/settings.json", "{}\n");
 
-		const oldManifest = buildManifest(join(target, ".claude"));
-		writeManifest(join(target, ".claude"), oldManifest);
+		await seedCanonicalBaseline(target);
 
 		const stats = await smartUpdate(config, source, target, false, false, { cleanup: false });
 
 		await expect(readFile(join(target, ".claude/rules/core-behaviors.md"), "utf-8")).resolves.toBe("new behaviors\n");
 		expect(stats.updated).toBeGreaterThanOrEqual(1);
 		expect(stats.userModified).toEqual([]);
-		const manifest = readManifest(join(target, ".claude"));
-		expect(manifest?.checksums["rules/core-behaviors.md"]?.owner).toBe("meowkit");
-		expect(manifest?.checksums["rules/core-behaviors.md"]?.sourceChecksum).toMatch(/^[a-f0-9]{64}$/);
+		// The canonical record is read directly now. This fixture's source carries no
+		// release manifest, so there are no incoming payload hashes to recognize the
+		// forward copy against, and the entry is labeled from the prior baseline
+		// alone — which is what makes the release's own hashes load-bearing rather
+		// than cosmetic.
+		const byPath = indexByPath(readInstallMetadata(join(target, ".claude")).meta?.files ?? []);
+		expect(byPath["rules/core-behaviors.md"]?.owner).toBe("meowkit-modified");
+		expect(byPath["rules/core-behaviors.md"]?.checksum).toMatch(/^[a-f0-9]{64}$/);
 	});
 
 	it("skips user-modified core files but still merges settings.json", async () => {
@@ -74,8 +80,7 @@ describe("smart update manifest ownership", () => {
 		await writeText(target, ".claude/rules/core-behaviors.md", "installed behaviors\n");
 		await writeText(target, ".claude/settings.json", JSON.stringify({ permissions: { allow: ["Bash(git status)"] } }));
 
-		const oldManifest = buildManifest(join(target, ".claude"));
-		writeManifest(join(target, ".claude"), oldManifest);
+		await seedCanonicalBaseline(target);
 		await writeText(target, ".claude/rules/core-behaviors.md", "user edit\n");
 
 		const stats = await smartUpdate(config, source, target, false, false, { cleanup: false });

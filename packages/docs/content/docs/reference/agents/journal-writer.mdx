@@ -49,7 +49,7 @@ The journal-writer operates at Phase 6 (Reflect) and during escalations at any p
 - **Structured journal entries** — writes entries at `docs/journal/YYMMDD-title.md` with a consistent structure: What Happened, The Brutal Truth, What Was Tried, Root Cause, Lessons Learned, Next Steps.
 - **Brutally honest assessment** — the "Brutal Truth" section captures whether the failure was preventable, whether there were warning signs, and whether corners were cut. This section is never skipped.
 - **Evidence-based documentation** — references specific files, line numbers, error messages, and commit hashes. "Tests failed" is not acceptable; "the auth middleware test failed because the JWT mock didn't match the production token format" is.
-- **Pattern feeding** — journal entries feed into the analyst's pattern extraction (`memory/patterns.json`), enabling systemic issue detection across sessions.
+- **Pattern feeding** — journal entries feed into the analyst's pattern review, enabling systemic issue detection across sessions.
 - **Prevention focus** — every journal entry must answer: "How do we prevent this next time?" with specific, actionable next steps.
 
 ## Journal Entry Structure
@@ -70,7 +70,7 @@ Every journal entry follows this structure:
 - [x] Documents facts and evidence — never fabricates or exaggerates events
 - [x] References specific files, line numbers, error messages, and commit hashes
 - [x] Checks existing journal entries to avoid duplicating known issues
-- [x] Checks `patterns.json` to determine if this is a recurring pattern
+- [x] Checks earlier journal entries to determine if this is a recurring pattern
 - [x] Focuses on prevention — every entry answers "how do we prevent this next time?"
 - [x] Keeps entries concise — every sentence earns its place
 - [x] Never modifies source code, tests, plans, reviews, or deployment configs

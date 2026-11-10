@@ -29,7 +29,7 @@ LOOP:
 ```
 
 High-risk flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM,
-PUBLIC_CONTRACT, WEAK_PROOF from `.claude/rules/risk-checklist.md`) force
+PUBLIC_CONTRACT, WEAK_PROOF from `.claude/skills/agent-detector/references/risk-checklist.md`) force
 explicit human approval before finalize regardless of cycle outcome.
 
 ## Human-in-the-Loop Mode

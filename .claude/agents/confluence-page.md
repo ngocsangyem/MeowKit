@@ -1,6 +1,6 @@
 ---
 name: confluence-page
-description: 'Execute Confluence page CRUD + hierarchy + version ops via the confluence-as CLI wrapper. Use for: ''create page in SPACE'', ''show page 12345'', ''update page'', ''delete page'', ''children/ancestors of page''. Routed by mk:confluence-page skill. NOT for bulk ops (confluence-bulk); NOT for spec analysis (confluence-spec-analyst); NOT for comments/attachments/labels (confluence-collaborate).'
+description: 'mk:confluence executor for mk:confluence-page. Page CRUD, versions, hierarchy.'
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default
@@ -74,7 +74,7 @@ End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.
 2|Auth or settings.local.json fallback — wrapper rejected; user moves credentials to `.meowkit/.env`
 3|Cloud-only gate — site URL is non-Cloud; user uses MCP escape hatch per install-and-auth.md
 4|Network / DNS — retry once; check VPN
-5|Permission (401/403) — token may be rotated; user re-runs `/mk:confluence-setup`
+5|Permission (401/403) — token may be rotated; user re-runs the guided setup in `mk:confluence`
 ```
 
 ## Gotchas

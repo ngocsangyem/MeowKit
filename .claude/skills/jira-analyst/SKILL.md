@@ -1,6 +1,6 @@
 ---
 name: mk:jira-analyst
-description: 'Full Jira ticket context analysis via the jira-analyst agent — including media (attached images / PDFs / screenshots) and linked issues. Produces structured findings suitable for posting back as a Jira comment. Read-only. Triggers: ''analyze KEY'', ''rca for KEY'', ''describe KEY with media''. NOT for complexity scoring (mk:jira-evaluator); NOT for story-point estimation (mk:jira-estimator).'
+description: 'mk:jira leaf. Read a ticket with comments, links and media, then report findings. NOT for mk:jira-evaluator.'
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - ticket-rca
   - media-analysis
   - attachment-analysis
-when_to_use: Use when user wants full ticket context (description + comments + attachments + links + media analysis) consolidated into a structured report. Read-only — user reviews before posting back.
+when_to_use: 'Want full context or an RCA on a Jira ticket, attachments included.'
 user-invocable: true
 context: fork
 agent: jira-analyst

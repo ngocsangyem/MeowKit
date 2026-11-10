@@ -74,7 +74,7 @@ The skill will: load the plan file, score all 8 dimensions, run the consistency 
 ## Pro Tips
 - The consistency sweep catches contradictions across distributed plan files -- a phase file referencing a component that plan.md renamed, or declaring scope that plan.md marks out-of-scope
 - Sweep failures do NOT auto-fail the validation -- they surface inconsistencies the human must reconcile
-- This skill checks content quality, not structure. The `validate-plan.py` script checks plan file *structure* (required sections exist). Both can and should run
+- This skill checks content quality, not structure. `npx mewkit plan check --structural` checks plan file *structure* (required sections exist). Both can and should run
 - Three-result output: PASS = proceed, FAIL = revise that dimension, WARN = user discretion
 
 ### Notes

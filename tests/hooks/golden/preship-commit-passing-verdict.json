@@ -1,0 +1,23 @@
+{
+  "name": "preship-commit-passing-verdict",
+  "group": "gate2-preship",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-ship.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git commit -m \\\"feat: add thing\\\"\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "preship-commit-passing-verdict",
+  "setupDescription": "one passing verdict naming HEAD; no package.json so no build/lint/test runs",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "Gate 2 structural check PASSED for plan 'corpus-demo' (verdict: tasks/reviews/261101-corpus-demo-verdict.md).\n  PROVEN:    verdict present, no FAIL dimension, no security BLOCK, and bound\n             to the shipped revision (b5c9dd3).\n  UNPROVEN:  human approval — this check cannot establish it (the verdict is\n             agent-writable). Gate 2 approval remains the human's, at the gate.\nSKIP: mewkit CLI not found — team memory store not linted\n=== Pre-Ship Checks ===\n\n\n=== Summary ===\nChecks run:\nPRE-SHIP PASS: All checks passed. Ready to ship.\n",
+    "stderr": ""
+  }
+}

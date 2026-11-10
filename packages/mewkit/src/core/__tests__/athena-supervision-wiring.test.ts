@@ -27,7 +27,7 @@ import { AdviceRefusal, EVIDENCE_INDEX_FILENAME, runAdvice } from "../../command
 // Resolve the repo from this file, not `process.cwd()`: cwd passes from the repo root
 // and fails from `packages/mewkit`, and the newer tests here already moved off it.
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../../../..");
-const VALIDATOR = join(REPO_ROOT, ".claude/scripts/validate-workflow-evidence.cjs");
+const VALIDATOR = join(REPO_ROOT, ".claude/hooks/lib/validate-workflow-evidence.cjs");
 
 const tempRoot = (): string => mkdtempSync(join(tmpdir(), "athena-wiring-"));
 

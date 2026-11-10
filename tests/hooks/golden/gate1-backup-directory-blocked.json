@@ -1,0 +1,23 @@
+{
+  "name": "gate1-backup-directory-blocked",
+  "group": "gate1",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/gate-enforcement.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"tasks/contracts.bak/app.ts\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "gate1-backup-directory-blocked",
+  "setupDescription": "stamped plan + signed contract; the write targets a .bak/ directory",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@GATE_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nSuspicious backup/legacy directory in path: tasks/contracts.bak/app.ts\nMove the file to a clean location or rename the parent directory.\n"
+  }
+}

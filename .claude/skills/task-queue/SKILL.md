@@ -1,6 +1,6 @@
 ---
 name: mk:task-queue
-description: Task claiming and ownership tracking for parallel agent execution. Agents claim tasks from a shared queue with file ownership enforcement. Use during parallel execution phases when multiple agents work simultaneously.
+description: Shared task claiming with file-ownership enforcement for parallel agents. NOT for mk:team-config.
 source: local
 keywords:
   - task-queue
@@ -8,7 +8,7 @@ keywords:
   - parallel-execution
   - claim-task
   - file-ownership
-when_to_use: Auto-invoked when multiple agents claim tasks during parallel execution. Not user-callable directly.
+when_to_use: Auto-invoked when several agents claim work. Not user-callable.
 user-invocable: false
 owner: git
 criticality: medium
@@ -22,7 +22,7 @@ Manages task assignment and file ownership during parallel execution.
 
 ## Task Queue
 
-Tasks are tracked in `session-state/task-queue.json`:
+Tasks are tracked in `.meowkit/state/task-queue.json`:
 
 ```json
 {
@@ -80,7 +80,7 @@ Before any file write, check if the file matches the agent's declared ownership.
 - **Orchestrator** creates the task queue when decomposing parallel work
 - **Parallel agents** claim and complete tasks
 - **Orchestrator** monitors queue for completion and triggers integration test
-- Queue is ephemeral (session-state/) — recreated per parallel execution
+- Queue is ephemeral (.meowkit/state/) — recreated per parallel execution
 
 ## Team Coordination
 
@@ -92,5 +92,5 @@ on team activation.
 
 - **Race condition on claims:** Two agents reading `task-queue.json` simultaneously may both claim the same task. Mitigation: orchestrator is the sole claim-serializer — agents REQUEST claims through orchestrator, never self-claim directly
 - **Ownership globs must not overlap:** `src/api/*` and `src/api/auth/*` overlap — the more specific glob must be in the SAME task, not split across agents
-- **Queue file doesn't auto-create:** Orchestrator must create `session-state/task-queue.json` before dispatching parallel agents. If missing, agents should STOP and report, not create it themselves
+- **Queue file doesn't auto-create:** Orchestrator must create `.meowkit/state/task-queue.json` before dispatching parallel agents. If missing, agents should STOP and report, not create it themselves
 - **Completed tasks are not removed:** Tasks stay in queue with `status=completed` for audit trail. Queue is cleaned up only when the parallel execution phase ends

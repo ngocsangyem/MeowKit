@@ -1,6 +1,6 @@
 ---
 name: mk:llms
-description: Generate llms.txt files from project documentation following the llmstxt.org spec. Use when asked to create AI-friendly documentation indexes, generate llms.txt, or make a project discoverable by AI assistants.
+description: Generate llms.txt indexes from project docs per the llmstxt.org spec. NOT for mk:docs-init.
 argument-hint: '[path] [--full] [--output path] [--url base]'
 source: local
 original_path: .claude/skills/llms/SKILL.md
@@ -11,12 +11,13 @@ keywords:
   - llm-friendly-docs
   - ai-discoverability
   - agentic-content
-when_to_use: Use when generating llms.txt or LLM-friendly documentation for AI consumers.
+when_to_use: Making a project discoverable to AI assistants through llms.txt.
 user-invocable: true
 owner: docs
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 # llms.txt Generator
@@ -54,11 +55,11 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 
 ```bash
 # Generate llms.txt (script does the heavy lifting)
-.claude/skills/.venv/bin/python3 .claude/skills/llms/scripts/generate-llms-txt.py \
+node .claude/hooks/lib/skill-python.cjs .claude/skills/llms/scripts/generate-llms-txt.py \
   --source ./docs [--output .] [--base-url https://example.com/docs] [--full]
 
 # Preview metadata first (Claude reviews before generating)
-.claude/skills/.venv/bin/python3 .claude/skills/llms/scripts/generate-llms-txt.py \
+node .claude/hooks/lib/skill-python.cjs .claude/skills/llms/scripts/generate-llms-txt.py \
   --source ./docs --json
 ```
 
@@ -110,4 +111,4 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 
 ## Gotchas
 
-- **Python venv required**: run `.claude/scripts/bin/setup-workflow` once from the project root before invoking this skill. Re-run after upgrading the toolkit.
+- **Python venv required**: run `.claude/hooks/lib/setup-workflow` once from the project root before invoking this skill. Re-run after upgrading the toolkit.

@@ -34,7 +34,7 @@ Create or update it with:
 
 ```
 /mk:docs-init    # generate from codebase analysis (new projects)
-/mk:docs-sync    # diff-aware update after feature work
+/mk:document-release    # diff-aware update after feature work
 ```
 
 ## Task Flow
@@ -151,7 +151,7 @@ Skills that enforce this gate:
 
 ### Orchestrator Entry Point Rule (v2.5.0)
 
-Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). `.claude/rules/orchestration-rules.md` "Orchestrator Entry Point Rule" declares arbitration to prevent duplicate Gate 1 enforcement (relocated from `CLAUDE.md` in v2.7.5):
+Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). `.claude/skills/cook/references/orchestration-rules.md` "Orchestrator Entry Point Rule" declares arbitration to prevent duplicate Gate 1 enforcement (relocated from `CLAUDE.md` in v2.7.5):
 
 - **Explicit `/mk:cook` invocation** → `mk:cook` owns the pipeline. `mk:workflow-orchestrator` does NOT activate for the rest of the session.
 - **Session start, complex-feature intent** → `mk:workflow-orchestrator` activates via `autoInvoke`. Defers to `mk:cook` for single-task requests.
@@ -189,7 +189,7 @@ skills/mk:review/
 
 - **Token efficiency** — only the active step is in context, not the entire workflow
 - **Auditability** — each step produces a discrete artifact
-- **Resumability** — state persists to `session-state/{skill-name}-progress.json`; interrupted workflows resume from the last completed step
+- **Resumability** — state persists to `.meowkit/state/{skill-name}-progress.json`; interrupted workflows resume from the last completed step
 
 **Rules:**
 
@@ -244,7 +244,7 @@ Cross-cutting skills are loaded by individual agents as needed — they are not 
 | Debug an issue                                           | `mk:investigate`                      | 3     |
 | Review code                                              | `mk:review`                           | 4     |
 | Deepen review findings                                   | `mk:elicit`                           | 4     |
-| Security audit                                           | `mk:cso`, `mk:audit`                  | 2, 4  |
+| Security audit                                           | `mk:cso`                              | 2, 4  |
 | Ship / deploy                                            | `mk:ship`                             | 5     |
 | Update docs after shipping                               | `mk:document-release`                 | 6     |
 | Run a retrospective                                      | `mk:retro`                            | 6     |

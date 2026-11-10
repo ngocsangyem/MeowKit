@@ -1,9 +1,10 @@
 import { mkdtempSync, readFileSync, rmSync, statSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { emitActiveOverlay } from "../../../emit/emit-active-overlay.js";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { resolveCodexModuleDir, loadCodexBundleManifest, copyAuthoredCodexBundle } from "../codex-authored-bundle.js";
-import { applyActiveCodexOverlay } from "../codex-reconcile-apply.js";
+
 import { codexTargetProfile } from "../../../validate/targets/codex-target.js";
 
 const moduleDir = resolveCodexModuleDir();
@@ -31,11 +32,11 @@ describe("authored codex bundle", () => {
 				".codex/agents",
 				".codex/config.toml",
 				".codex/hooks.json",
-				".codex/hooks/capture.cjs",
 				".codex/hooks/gate-enforcement.cjs",
 				".codex/hooks/lib",
 				".codex/hooks/privacy-block.cjs",
 				".codex/rules/default.rules",
+				".codex/scripts/skill-python.cjs",
 				"AGENTS.md",
 			].sort(),
 		);
@@ -51,7 +52,7 @@ describe("authored codex bundle", () => {
 		expect(existsSync(join(target, ".agents", "skills", "mk-fix", "SKILL.md"))).toBe(true);
 		// Hooks resolve the project root via git (Codex exposes no CODEX_PROJECT_DIR); wrapper executable.
 		expect(readFileSync(join(target, ".codex", "hooks.json"), "utf-8")).toContain("git rev-parse --show-toplevel");
-		expect(statSync(join(target, ".codex", "hooks", "capture.cjs")).mode & 0o777).toBe(0o755);
+		expect(statSync(join(target, ".codex", "hooks", "gate-enforcement.cjs")).mode & 0o777).toBe(0o755);
 	});
 
 	it("the agent roster is re-authored by execution envelope (orchestrator dropped, effort assigned)", () => {
@@ -106,11 +107,11 @@ describe("authored codex bundle", () => {
 	});
 
 	it("the migrate overlay writes EVERY authored surface (cutover complete — all 10 entries active)", async () => {
-		// Phase-9 cutover complete: all ten manifest entries are active, so the overlay writes the
+		// Cutover complete: every manifest entry is active, so the overlay writes the
 		// full authored tree. For AGENTS.md the overlay writes the authored BASE; the source-rules
 		// merge-single (config/rules) then merges onto it in the full migrate flow (not exercised by
 		// this direct-overlay test), and the capability-bootstrap injector adds its block.
-		const overlay = await applyActiveCodexOverlay(target, { moduleDir });
+		const overlay = await emitActiveOverlay("codex", target, false, moduleDir);
 		const written = overlay.entries.map((e) => e.targetPath).sort();
 		expect(written).toEqual(
 			[
@@ -119,11 +120,11 @@ describe("authored codex bundle", () => {
 				".codex/agents",
 				".codex/config.toml",
 				".codex/hooks.json",
-				".codex/hooks/capture.cjs",
 				".codex/hooks/gate-enforcement.cjs",
 				".codex/hooks/lib",
 				".codex/hooks/privacy-block.cjs",
 				".codex/rules/default.rules",
+				".codex/scripts/skill-python.cjs",
 			].sort(),
 		);
 		expect(overlay.writes).toBe(10);

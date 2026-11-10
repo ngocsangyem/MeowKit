@@ -157,9 +157,12 @@ export function checkAgentConformance(repoRoot: string): CheckResult[] {
 		}
 	}
 
-	const routingPath = path.join(claudeDir, "rules", "agent-routing.md");
+	// The prose routing table is loaded just in time by the agent-detector skill, so it
+	// lives in that skill's references rather than in always-on rules.
+	const routingRelPath = path.join("skills", "agent-detector", "references", "agent-routing.md");
+	const routingPath = path.join(claudeDir, routingRelPath);
 	const routing = fs.existsSync(routingPath) ? fs.readFileSync(routingPath, "utf-8") : "";
-	if (!routing) results.push(fail("Agent routing index", "Missing .claude/rules/agent-routing.md"));
+	if (!routing) results.push(fail("Agent routing index", `Missing .claude/${routingRelPath}`));
 	for (const entry of inventory.entries.filter((item) => item.type === "agent" && item.routing === "hub-only")) {
 		if (!routing.includes(entry.id))
 			results.push(warn(`Agent hub route: ${entry.path}`, "hub leaf is not listed in the prose routing table"));

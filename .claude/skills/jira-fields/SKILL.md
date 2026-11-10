@@ -1,6 +1,6 @@
 ---
 name: mk:jira-fields
-description: 'JIRA custom field discovery + configuration via the jira-as wrapper. Triggers: ''field ID for X'', ''list custom fields'', ''check fields for project PROJ'', ''configure agile fields for board''. Read ops are open; create/configure-agile require admin. NOT for setting per-issue field values (mk:jira-issue update).'
+description: 'mk:jira leaf. Custom field discovery - field IDs, project scope, agile field config. NOT for mk:jira-issue.'
 phase: on-demand
 source: local
 keywords:
@@ -9,7 +9,7 @@ keywords:
   - custom-fields
   - field-discovery
   - agile-field-config
-when_to_use: Use to discover field IDs / names / scope, check per-project field availability, or configure agile field mappings. NOT for setting individual field values on a ticket.
+when_to_use: 'Find a Jira custom field ID or check which fields a project exposes.'
 user-invocable: true
 context: fork
 agent: jira-fields

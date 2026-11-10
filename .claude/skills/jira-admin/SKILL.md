@@ -1,6 +1,6 @@
 ---
 name: mk:jira-admin
-description: 'JIRA project / user / group / scheme / automation administration via the jira-as wrapper (11 sub-domains, ~65 verbs). Triggers: ''create JIRA project'', ''list users'', ''delete user USERNAME'', ''list permission schemes'', ''create group NAME''. Requires admin role. Destructive ops (project/user/group delete) require 2-step token confirmation. NOT for per-issue ops (mk:jira-issue / mk:jira-lifecycle); NOT for JSM admin (mk:jira-jsm).'
+description: 'mk:jira leaf. Project, user, group, scheme and automation administration. NOT for mk:jira-jsm.'
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - group-admin
   - permission-scheme
   - jira-automation
-when_to_use: Use for Jira admin tasks — projects, users, groups, schemes, automation. Requires admin role. Destructive ops need 2-step token confirmation.
+when_to_use: 'Create a Jira project, or manage users, groups and permission schemes.'
 user-invocable: true
 context: fork
 agent: jira-admin

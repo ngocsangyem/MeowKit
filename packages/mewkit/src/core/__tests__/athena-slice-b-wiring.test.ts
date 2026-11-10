@@ -97,7 +97,7 @@ describe("role boundaries the wiring must not erode", () => {
 });
 
 describe("the canonical rule agrees with the wiring", () => {
-	const rule = flat(".claude/rules-conditional/advice-supervision-rules.md");
+	const rule = flat(".claude/skills/advise/references/advice-supervision-rules.md");
 
 	it("lists all four wired skills inside the wired bullet, not merely somewhere in the file", () => {
 		// Anchored to the "— wired." sentence: every skill name appears elsewhere in

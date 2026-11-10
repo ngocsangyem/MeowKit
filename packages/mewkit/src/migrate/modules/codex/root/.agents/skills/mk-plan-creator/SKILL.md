@@ -5,7 +5,7 @@ description: "Structured multi-file implementation plans before build; scope-awa
 
 # Plan Creator
 
-Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, visual rendering, archive, and durable-memory capture stay with their existing owners.
+Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, visual rendering, archive, and durable-memory writes stay with their existing owners.
 
 ## When to Use
 
@@ -116,7 +116,7 @@ tasks/plans/YYMMDD-name/
 - **Using `--deep` to decide architecture**: deep maps a chosen approach; if the approach is unclear, route to `mk:brainstorming` first.
 - **Dropping TDD at handoff**: when `tdd_mode=true`, step-09 MUST print cook with `--tdd`; sentinel/env state alone is not a cross-session contract.
 - **Post-Plan Handoff is deterministic**: step-09 fires `stop and ask the user in chat`; do NOT auto-invoke the chosen command. User must type it in a fresh session for clean context.
-- **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, autobuild, end}` fail `validate-plan.py`.
+- **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, autobuild, end}` fail the structural check.
 - **Whole-Plan Consistency Gates W1 / W2 fire after red-team and validation interview**: stage-then-apply algorithm — no edits land until the user resolves any unresolved contradictions. See `references/whole-plan-sweep.md`.
 - **`consistency_sweeps` frontmatter is optional**: legacy plans without it still validate as `PLAN_COMPLETE`.
 - **Sweep recursion is bounded**: "resolve now" caps at 2 attempts per gate; further unresolved items convert to Risk rows.
@@ -181,7 +181,6 @@ flag is present).
 | `references/adr-generation.md`                     | Architecture Decision Record generation                                                                                                                                                                              |
 | `references/parallel-mode.md`                      | Ownership matrix template, parallel group rules                                                                                                                                                                      |
 | `references/two-approach-mode.md`                  | Approach file template, trade-off matrix, selection flow                                                                                                                                                             |
-| `scripts/validate-plan.py`                         | Plan completeness validator. **Depends on PyYAML** (installed via `.codex/scripts/bin/setup-workflow` into `.agents/skills/.venv/`). Run via `.agents/skills/.venv/bin/python3 scripts/validate-plan.py <plan.md>`. |
 | `scripts/check-product-spec.sh`                    | Product-spec structural validator (POSIX bash). Enforces feature count, user stories, forbidden patterns. Used by step-03a and step-04 for `--product-level` mode.                                                   |
 | `references/workflow-models/feature-model.md`      | Workflow template for feature tasks (loaded JIT by step-00)                                                                                                                                                          |
 | `references/workflow-models/bugfix-model.md`       | Workflow template for bug fix tasks (loaded JIT by step-00)                                                                                                                                                          |

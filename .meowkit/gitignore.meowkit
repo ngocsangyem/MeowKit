@@ -1,14 +1,19 @@
 # MeowKit — append to your .gitignore
+#
+# Nothing under `.meowkit/` is listed here. `.meowkit/.gitignore` is
+# authoritative for that directory: it denies everything and re-includes the
+# files a team shares. Describing the same paths in two files is how one of the
+# two goes stale.
 .env
 .env.local
 
-# `.meowkit/` holds project state. These classes are machine-written and either
-# disposable or private. `.meowkit/config.json` is your project's config and
-# SHOULD be committed, so the ignores are per-class rather than the whole dir.
-.meowkit/memory/
-.meowkit/telemetry/
-.meowkit/state/
-.meowkit/cache/
+# Pre-move session markers. The hooks write under `.meowkit/state/` now, which
+# `.meowkit/.gitignore` already denies; this line keeps an older project's
+# leftover directory out of `git status` until it is deleted.
+session-state/
+
+# Security Posture Reports and other run output under tasks/reports/ carry
+# unpatched vulnerability detail, so they stay machine-local.
+tasks/reports/
 
 .claude/logs/
-.claude/skills/.venv/

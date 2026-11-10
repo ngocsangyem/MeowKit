@@ -1,6 +1,6 @@
 // Athena supervision dossier — the parent-owned continuity record.
 //
-// Canonical contract: `.claude/rules-conditional/advice-supervision-rules.md`.
+// Canonical contract: `.claude/skills/advise/references/advice-supervision-rules.md`.
 //
 // Athena is a long-lived LEAD but never a long-lived SESSION: each call is a fresh
 // fork. Continuity therefore cannot come from a transcript, so it comes from one

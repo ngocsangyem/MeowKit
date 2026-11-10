@@ -41,7 +41,7 @@ See `references/project-detection.md` for detailed detection logic and edge case
 
 By default this skill checks only what changed — it does NOT lint or test the whole
 project. Post-change verification stays fast and focused on the current work; the
-complete whole-project gate runs later at ship time (`pre-ship.sh`).
+complete whole-project gate runs later at ship time (`pre-ship.cjs`).
 
 1. Collect the changed files from git — union of committed-since-base + staged +
    unstaged + untracked:

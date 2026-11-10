@@ -287,7 +287,7 @@ Full rules in `mk:frontend-design/references/anti-slop-directives.md`. Quick gut
 
 ## Style preset rotation (persistent state)
 
-To force aesthetic variety between consecutive runs, rotate through palette + typography combinations. State lives in `${CLAUDE_PLUGIN_DATA}/preview/style-rotation.json` per `skill-authoring-rules.md` Rule 2.
+To force aesthetic variety between consecutive runs, rotate through palette + typography combinations. State lives in `${CLAUDE_PLUGIN_DATA}/preview/style-rotation.json` per `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 2.
 
 ```bash
 ROTATION_DIR="${CLAUDE_PLUGIN_DATA:-}"

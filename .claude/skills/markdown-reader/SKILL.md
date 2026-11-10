@@ -1,7 +1,6 @@
 ---
 name: mk:markdown-reader
-description: |
-  Serve any markdown file or directory as a calm, book-like reader via a local HTTP server (127.0.0.1 only). Best for long-form documents — RFCs, runbooks, design docs, plan files — where comfortable in-browser reading matters. Supports Mermaid diagrams, dark/light mode, plan navigation sidebar, and keyboard shortcuts. Requires explicit start and stop lifecycle.
+description: Serve markdown files as a book-like reader on 127.0.0.1 with Mermaid and dark mode. NOT for mk:preview.
 user-invocable: true
 version: 1.0.0
 source: port
@@ -16,8 +15,7 @@ keywords:
   - mermaid
   - local-server
   - book-reader
-when_to_use: |
-  Use when the user wants to read long markdown files comfortably in the browser — RFCs, runbooks, plan files, design docs, reports. NOT for self-contained HTML artifacts produced by mk:brainstorming --html or mk:plan-creator --html (those open directly in the browser without a server). NOT a dependency of any other skill.
+when_to_use: Long-form reading of an RFC, runbook, design doc or plan in a browser.
 argument-hint: <file-or-directory> [--stop]
 owner: utility
 criticality: medium

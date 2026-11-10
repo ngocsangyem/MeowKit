@@ -5,7 +5,7 @@ are zero supervision calls, no dossier, no receipt, and the step sequence is
 byte-identical to an unsupervised run.
 
 The contract this implements is
-`.claude/rules-conditional/advice-supervision-rules.md`. Where the two disagree, the
+`.claude/skills/advise/references/advice-supervision-rules.md`. Where the two disagree, the
 contract wins.
 
 ## Checkpoints
@@ -29,7 +29,7 @@ exist. REVIEW fires before the gate step, never inside it.
 **Athena does not approve Gate 1, and a REVIEW checkpoint is not a pre-approval.**
 
 `step-07-gate` is unchanged: the human reads the plan and approves it, and
-`npx mewkit plan approve` stamps the receipt. A `READY_FOR_EXISTING_GATE` disposition
+`mewkit plan approve` stamps the receipt. A `READY_FOR_EXISTING_GATE` disposition
 means "the plan is in a state where presenting Gate 1 is the correct next step" —
 nothing more. Presenting it earlier, skipping it, or citing Athena's directive as
 part of the approval is a Gate Authority Invariant violation

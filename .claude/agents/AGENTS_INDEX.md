@@ -6,7 +6,7 @@
 **Agent registry views (generated):** 18 core/support direct-only; 21 domain hub-only; 1 intelligence direct-only; 1 intelligence direct-and-harness; 1 internal harness.
 <!-- GENERATED:agent-views END -->
 
-<!-- GENERATED:agent-table-cardinality (`mewkit inventory --emit-counts`; validated by `mewkit validate --agents`) -->
+<!-- GENERATED:agent-table-cardinality (`scripts/harness-inventory.cjs --emit-counts` in the kit source repo; validated by `mewkit validate --agents`) -->
 ```toon
 [42]{agent_file,type,role,source,workflow_phases,auto_activate,ce_version,last_improved}
 `orchestrator.md`|Core|Task router, complexity classification, model tier assignment|original|Phase 0 (Orient)|Yes — every task|260326|260326
@@ -28,7 +28,7 @@
 `documenter.md`|Core|Living documentation, changelog generation, docs sync|original|Phase 6 (Reflect)|Routed by orchestrator after ship|260326|260326
 `analyst.md`|Core|Cost tracking, pattern extraction, lessons learned|original|Phase 0, 6|Auto at session start/end|260326|260326
 `journal-writer.md`|Support|Failure documentation, root cause analysis, lessons|Credit: Duy Nguyen|Phase 6 (Reflect), escalations|On failure/escalation|260326|260326
-`project-manager.md`|Core|Cross-workflow delivery tracking, evidence-based status reports|original|on-demand (0–6)|Explicit delegation, `/mk:status`, or `post-phase-delegation.md` rule|260422|260422
+`project-manager.md`|Core|Cross-workflow delivery tracking, evidence-based status reports|original|on-demand (0–6)|Explicit delegation, `/mk:status`, or `.claude/skills/cook/references/post-phase-delegation.md` rule|260422|260422
 `jira-issue.md`|Domain|JIRA issue CRUD via jira-as wrapper (create/get/update/delete)|Adapted from JIRA-Assistant-Skills v4.0.1|on-demand|Forked from `mk:jira-issue` skill|260510|260510
 `jira-search.md`|Domain|JIRA search + filter management via jira-as (JQL query/validate/build/export, saved filters)|Adapted from JIRA-Assistant-Skills v4.0.1|on-demand|Forked from `mk:jira-search` skill|260510|260510
 `jira-lifecycle.md`|Domain|Workflow lifecycle: transition / assign / resolve / reopen / version / component|Adapted from JIRA-Assistant-Skills v4.0.1|on-demand|Forked from `mk:jira-lifecycle` skill|260510|260510

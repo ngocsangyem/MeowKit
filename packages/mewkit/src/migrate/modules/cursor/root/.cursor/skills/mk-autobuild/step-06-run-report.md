@@ -12,7 +12,7 @@ Before finalizing the run report, delegate to `project-manager` (background):
 Delegate to the project-manager agent:
 "Generate delivery status for plan at $plan_dir. Write report to
 $plan_dir/status-reports/$(date +%y%m%d)-status.md.
-Load template from tasks/templates/pm-status-template.md.
+Load template from .cursor/skills/mk-autobuild/assets/pm-status-template.md.
 Run in the background — do not block step-06 finalization."
 ```
 
@@ -114,25 +114,6 @@ Next action: $next_action_summary
 ═══════════════════════════════════════════════════════════════════
 EOF
 ```
-
-### 6c-bis. Terminal Wiki Handoff (advisory, fail-open)
-
-The finalized `$run_dir/run.md` is the run's terminal artifact. Per the shared contract in
-`.cursor/skills/wiki/references/terminal-handoff-advisory.md`, hand it to the wiki after the
-summary print. Advisory only — never blocks, never approves. Skip when
-`MEOWKIT_AUTOBUILD_MODE=MINIMAL` (consistent with the PM-delegation skip).
-
-Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip + print the command):
-
-```bash
-npx mewkit wiki handoff propose \
-  --skill mk:autobuild \
-  --from "$run_dir/run.md" \
-  --slug <resolved-wiki-slug> \
-  --verified-outcome
-```
-
-Do NOT run `wiki approve`. Do NOT add `wiki reindex` to this step.
 
 ### 6d. Final git commit
 

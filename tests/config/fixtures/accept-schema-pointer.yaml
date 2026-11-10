@@ -1,0 +1,3 @@
+# The live `$schema` line the installer writes, beside one real setting.
+$schema: https://meowkit.dev/schemas/config-v1.json
+tdd: true

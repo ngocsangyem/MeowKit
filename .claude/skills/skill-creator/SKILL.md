@@ -1,6 +1,6 @@
 ---
 name: mk:skill-creator
-description: 'Create new skills with proper structure, compliance checks, and registration. Use when asked to create a skill, build a new skill, or scaffold a skill template. Enforces mk: prefix, sub-agents.md structure, and context engineering principles.'
+description: Scaffolds and registers a new skill with required frontmatter and compliance checks. NOT for mk:skill-template-secure.
 argument-hint: '[skill-name] [description]'
 source: local
 original_path: .claude/skills/skill-creator/SKILL.md
@@ -11,12 +11,13 @@ keywords:
   - scaffold-skill
   - authoring-template
   - gotchas-section
-when_to_use: Use when creating a new skill — scaffolds SKILL.md with required sections per skill-authoring-rules.
+when_to_use: 'A new mk: skill must be created or an existing one restructured.'
 user-invocable: true
 owner: portability
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 # Skill Creator
@@ -43,14 +44,15 @@ Meta skill — not tied to a specific Phase. Invoked on-demand for skill develop
 
 ```bash
 # Scaffold a new skill (creates directory + template SKILL.md)
-.claude/skills/.venv/bin/python3 .claude/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .claude/skills
+node .claude/hooks/lib/skill-python.cjs .claude/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .claude/skills
 
 # Validate an existing skill against compliance checklist
-.claude/skills/.venv/bin/python3 .claude/skills/skill-creator/scripts/validate-skill.py .claude/skills/my-feature
+node .claude/hooks/lib/skill-python.cjs .claude/skills/skill-creator/scripts/validate-skill.py .claude/skills/my-feature
 ```
 
 ## Process
 
+0. **Load the authoring rules** — `Read` `.claude/skills/skill-creator/references/skill-authoring-rules.md`. The 9 rules (mandatory `## Gotchas`, `${CLAUDE_PLUGIN_DATA}` for persistent state, the ≤500-line cap, required frontmatter, the docs-reference contract, control-to-risk, portability) left the always-on set and live with this skill; everything below is written against them.
 1. **Gather intent** — what should the skill do? When should it trigger? What output format?
 2. **Scaffold** — run `init-skill.py` to create directory + template SKILL.md with TODO markers
 3. **Fill content** — Claude completes each TODO section in the generated template
@@ -104,7 +106,7 @@ After generating, check:
 - [ ] Handoff protocol (next agent specified)
 - [ ] Output format uses template with placeholders
 - [ ] Failure handling covers identified failure modes
-- [ ] SKILL.md ≤ 500 lines (per `skill-authoring-rules.md` Rule 3; overflow → references/ or step files)
+- [ ] SKILL.md ≤ 500 lines (per `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 3; overflow → references/ or step files)
 - [ ] `## Gotchas` section present (per Rule 1 — mandatory, placeholder acceptable day-1)
 - [ ] No conflict with existing `.claude/rules/`
 
@@ -131,7 +133,7 @@ If FAIL: fix failing items before registering.
 
 1. **Skills are folders** — use scripts/, references/, assets/, lib/ creatively. See `references/filesystem-patterns.md`.
 2. **Gotchas = highest signal** — every skill MUST have a `## Gotchas` section. A day-1 placeholder is allowed; replace it as real failures emerge.
-3. **Progressive disclosure** — SKILL.md stays under 500 lines per `skill-authoring-rules.md` Rule 3. Details live in references/ loaded on-demand. Step-file skills (with `workflow.md`) auto-pass.
+3. **Progressive disclosure** — SKILL.md stays under 500 lines per `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 3. Details live in references/ loaded on-demand. Step-file skills (with `workflow.md`) auto-pass.
 4. **Avoid railroading** — describe outcomes, not step-by-step procedures. See `references/good-vs-bad-examples.md`.
 5. **Description = trigger condition** — must answer "When should I use this?" not "What does this do?" Start with "Use when..."
 6. **On-demand hooks** — skills can register session-scoped hooks in frontmatter for enforcement during execution.
@@ -168,7 +170,7 @@ If FAIL: fix failing items before registering.
 
 ## Gotchas
 
-- **Template must include `## Gotchas` header** — even as a placeholder. `skill-authoring-rules.md` Rule 1 is hard-enforced by `validate-skill.py`. Day-1 skills may use `(none yet — grow from observed failures)` but the header itself is mandatory.
+- **Template must include `## Gotchas` header** — even as a placeholder. `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 1 is hard-enforced by `validate-skill.py`. Day-1 skills may use `(none yet — grow from observed failures)` but the header itself is mandatory.
 <!-- research-citation -->
-- **Line cap is 500, not 150** — the canonical threshold comes from `skill-authoring-rules.md` Rule 3 (Anthropic progressive-disclosure guidance). Step-file skills (with `workflow.md`) auto-pass regardless of line count.
-- **Persistent state goes to `${CLAUDE_PLUGIN_DATA}`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. framework-internal paths (`.meowkit/memory/`, `session-state/`) are exempt.
+- **Line cap is 500, not 150** — the canonical threshold comes from `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 3 (Anthropic progressive-disclosure guidance). Step-file skills (with `workflow.md`) auto-pass regardless of line count.
+- **Persistent state goes to `${CLAUDE_PLUGIN_DATA}`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. framework-internal paths (`.meowkit/memory/`, `.meowkit/state/`) are exempt.

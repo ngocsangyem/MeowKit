@@ -1,0 +1,25 @@
+{
+  "name": "audit-unscanned-suffix-ignored",
+  "group": "injection-audit",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "scan-dir",
+    "args": [
+      "."
+    ]
+  },
+  "setup": "audit-unscanned-suffix-ignored",
+  "setupDescription": "a critical payload in a suffix the walk does not scan",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "stdout": "Injection audit scanning: .\n\n--- Audit Summary ---\nCRITICAL: 0\nSUSPICIOUS: 0\n\nCLEAN — no injection indicators found.\n",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/security-log.md": null
+  }
+}

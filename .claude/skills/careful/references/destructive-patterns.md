@@ -1,10 +1,10 @@
 # Destructive Command Patterns
 
 > Patterns that trigger a warning in `mk:careful` mode.
-> Referenced by: `.claude/skills/careful/SKILL.md` and `.claude/skills/careful/bin/check-careful.sh`
+> Referenced by: `.claude/skills/careful/SKILL.md` and `.claude/skills/careful/bin/check-careful.cjs`
 > Update this file when new destructive patterns are discovered in production — and keep the hook in sync.
 >
-> **Implementation status:** `check-careful.sh` enforces all CRITICAL and HIGH patterns listed below. Production auto-block is active: when `NODE_ENV`, `APP_ENV`, or `ENVIRONMENT` contains `production`/`prod`/`staging`, CRITICAL patterns return `permissionDecision: "block"` (no override) instead of `"ask"`.
+> **Implementation status:** `check-careful.cjs` enforces all CRITICAL and HIGH patterns listed below. Production auto-block is active: when `NODE_ENV`, `APP_ENV`, or `ENVIRONMENT` contains `production`/`prod`/`staging`, CRITICAL patterns return `permissionDecision: "block"` (no override) instead of `"ask"`.
 
 ## Contents
 
@@ -128,13 +128,13 @@ These patterns are explicitly allowed without warning — they target disposable
 
 ## How the Hook Detects Patterns
 
-The `check-careful.sh` script reads the Bash tool's `command` field from the tool input JSON. It matches against the patterns above using regex, then returns `permissionDecision: "ask"` with a warning message if a match is found. The user can override each warning individually.
+The `check-careful.cjs` script reads the Bash tool's `command` field from the tool input JSON. It matches against the patterns above using regex, then returns `permissionDecision: "ask"` with a warning message if a match is found. The user can override each warning individually.
 
 Pattern matching is command-scoped — the hook checks the actual bash command string, not file content. This prevents false positives on source code that mentions these commands in comments or strings.
 
 ### Override Mechanism
 
-When the hook triggers a warning, the user is prompted to confirm. Overrides are logged to the canonical `.meowkit/memory/security-findings.json` store with timestamp and command for audit trail.
+When the hook triggers a warning, the user is prompted to confirm. Overrides are logged to `.meowkit/telemetry/security-log.md` with timestamp and command for the audit trail.
 
 ---
 

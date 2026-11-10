@@ -8,7 +8,7 @@ description: "Sprint goal, DoR/DoD, retro→action loop, and spike governance vi
 **Best for:** Teams running Jira-tracked sprints with the toolkit
 **Time estimate:** Per-sprint ceremonies; no setup beyond opt-in frontmatter
 **Skills used:** [mk:plan-creator](/reference/skills/plan-creator), [mk:sprint-contract](/reference/skills/sprint-contract), [mk:retro](/reference/skills/retro), [mk:jira-agile](/reference/skills/jira-agile), [mk:ship](/reference/skills/ship), [mk:agent-detector](/reference/skills/agent-detector)
-**Rules:** `agile-story-gates.md`, `agile-sprint-commitment.md`, `agile-feedback-cycle.md` (in `.claude/rules-conditional/`)
+**Rules:** `agile-story-gates.md`, `agile-sprint-commitment.md`, `agile-feedback-cycle.md` (in `.claude/skills/agent-detector/references/`)
 
 ## Quick path
 
@@ -45,10 +45,10 @@ The 3 Agile rules load via `mk:agent-detector` Step 0b ONLY when an Agile contex
 |---------|-----------|
 | Sprint-state contract present | Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result |
 | Plan frontmatter | `jira_tickets:` non-empty in active plan |
-| Env var | `MEOW_JIRA_BASE_URL` set |
+| Env var | `MEOW_JIRA_SITE_URL` set |
 | User prompt | Last user message matches `[A-Z]{2,10}-\d+` |
 
-A pre-flight check verifies the `.claude/rules-conditional/` directory exists; if absent, the load is skipped silently.
+A pre-flight check verifies `references/agile-story-gates.md` exists beside the skill; if absent, the load is skipped silently.
 
 ## Sprint Setup
 
@@ -87,7 +87,7 @@ Now `mk:plan-creator` will run the DoR advisory at Phase 1 entry, and `mk:ship` 
 
 ### Definition of Ready (Phase 1 entry)
 
-When you run `/mk:plan` on a plan that has `jira_tickets:`, the DoR advisory checks each ticket:
+When you run `/mk:plan-creator` on a plan that has `jira_tickets:`, the DoR advisory checks each ticket:
 
 1. AC text present
 2. Non-zero story-point estimate
@@ -149,7 +149,7 @@ After the narrative is written, when an Agile context is active, `mk:retro` pars
 |--------|--------|
 | Create Jira story now | `mk:jira-issue create` body pre-filled — REQUIRES user review |
 | Add to plan TODO | Append to active plan |
-| Document as no-action | Append to `.meowkit/memory/retros/{date}-decisions.md` with reason |
+| Document as no-action | Record the disposition in the retro report under `tasks/reports/retros/` |
 | Defer to next retro | Carry forward |
 
 The retro is not "complete" until every action has a disposition.
@@ -181,7 +181,7 @@ At spike completion: "Convert findings to delivery story? [Yes — extract AC | 
 - **Reports-not-automation** preserved — every action surfaces a prompt; no silent ticket creation
 - **Sprint-state contracts** at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Leading `sprint-state-` prefix prevents glob collision with the existing contract validator
 - **Concurrent-write safety** — writers acquire `flock` before any read-modify-write cycle on sprint-state files; YAML frontmatter append is non-atomic across shells
-- **Validator scope** — `validate-contract.sh` validates per-story sprint-CONTRACT files only; sprint-STATE files have NO validator (YAML parsed inline by consuming skills)
+- **Validator scope** — `validate-contract.cjs` validates per-story sprint-CONTRACT files only; sprint-STATE files have NO validator (YAML parsed inline by consuming skills)
 
 ## Out of Scope
 

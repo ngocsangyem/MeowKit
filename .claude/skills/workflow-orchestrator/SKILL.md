@@ -1,6 +1,6 @@
 ---
 name: mk:workflow-orchestrator
-description: Auto-invoked 7-phase workflow for complex-feature intent. Includes fasttrack mode for pre-approved specs. NOT for explicit user-invoked single tasks (see mk:cook); NOT for green-field autonomous builds (see mk:autobuild); NOT for simple bug fixes (see mk:fix).
+description: Auto-routes complex-feature intent through the 7-phase workflow, fasttracking signed specs. NOT for mk:cook.
 triggers:
   - implement feature
   - build feature
@@ -20,7 +20,7 @@ keywords:
   - intent-detection
   - fasttrack
   - complex-feature
-when_to_use: Auto-invoked on complex-feature intent — routes through 7-phase workflow. NOT for explicit user-invoked single tasks (see mk:cook). Not user-callable directly.
+when_to_use: Auto-invoked on complex feature intent. Not user-callable.
 user-invocable: false
 owner: lifecycle
 criticality: high
@@ -45,15 +45,15 @@ dependency_edges:
 
 # Workflow Orchestrator
 
-<!-- Canonical source: .claude/workflow.yaml -->
+<!-- Canonical source: workflow.yaml -->
 
 **Priority:** CRITICAL — Use for complex feature implementations.
 
-> Only activates on session start for complex-feature intent. If `/mk:cook` was explicitly invoked in this session, do not activate — `mk:cook` owns the pipeline. See `.claude/rules/orchestration-rules.md`"Orchestrator Entry Point Rule".
+> Only activates on session start for complex-feature intent. If `/mk:cook` was explicitly invoked in this session, do not activate — `mk:cook` owns the pipeline. See `.claude/skills/cook/references/orchestration-rules.md`"Orchestrator Entry Point Rule".
 
 ## Canonical Lifecycle
 
-`.claude/workflow.yaml` is the sole source for phase sequence, gates, leads, and required outputs. This adapter must not restate phase details. For execution load `references/workflow-phases.md`, which renders that contract.
+`.claude/skills/workflow-orchestrator/workflow.yaml` is the sole source for phase sequence, gates, leads, and required outputs. This adapter must not restate phase details. For execution load `references/workflow-phases.md`, which renders that contract.
 
 On a non-trivial task, route to `mk:plan-creator`; proceed only after Gate 1. Fasttrack accepts only a pre-approved spec. Gate 2 remains human approval before an explicit ship request.
 
@@ -66,22 +66,21 @@ On a non-trivial task, route to `mk:plan-creator`; proceed only after Gate 1. Fa
 ## Pre-Execution Checklist
 
 1. **agent-detector** → Select lead agent (MANDATORY)
-2. **Load context** → Read canonical `.meowkit/memory/fixes.json` + `.meowkit/memory/architecture-decisions.json` (Phase 0 Orient; fall back to matching `.md` views only when JSON is absent)
-3. **Show agent banner** at start of response
-4. **Verify task complexity** — if simple, suggest lighter approach
-5. **Challenge requirements** → Ask clarifying questions before Phase 1
+2. **Show agent banner** at start of response
+3. **Verify task complexity** — if simple, suggest lighter approach
+4. **Challenge requirements** → Ask clarifying questions before Phase 1
 
 ## Process
 
-See `.claude/rules/phase-contracts.md` for input/output expectations per phase. (Loaded by `mk:agent-detector` Step 0b at session start.)
+See `.claude/skills/cook/references/phase-contracts.md` for input/output expectations per phase. (Loaded by `mk:agent-detector` Step 0b at session start.)
 
-1. **Run pre-execution checklist** — select lead agent, load memory, show agent banner, verify complexity, challenge requirements.
+1. **Run pre-execution checklist** — select lead agent, show agent banner, verify complexity, challenge requirements.
 
 2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 7-phase flow.
 
-3. **Execute the canonical lifecycle** — load `references/workflow-phases.md` and follow `.claude/workflow.yaml`; do not duplicate or override its phase ordering, TDD rules, required outputs, or gates.
+3. **Execute the canonical lifecycle** — load `references/workflow-phases.md` and follow `.claude/skills/workflow-orchestrator/workflow.yaml`; do not duplicate or override its phase ordering, TDD rules, required outputs, or gates.
 
-4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit. Also delegate to `project-manager` after each phase transition per `.claude/rules/post-phase-delegation.md` Rule 1 (background, non-blocking — include "Run in the background" in the prompt). Skipped when `MEOWKIT_PM_AUTO=off`.
+4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit. Also delegate to `project-manager` after each phase transition per `.claude/skills/cook/references/post-phase-delegation.md` Rule 1 (background, non-blocking — include "Run in the background" in the prompt). Skipped when `MEOWKIT_PM_AUTO=off`.
 
 Only the canonical gates authorize transition. Shipping and reflection require explicit user direction; they do not auto-run after review.
 
@@ -105,7 +104,7 @@ Only the canonical gates authorize transition. Shipping and reflection require e
   boundaries so a resumed run keeps one budget instead of minting a fresh one. Carry
   nothing else: no flag, no dossier, no directive history, and no routing ability.
   Spawned subagents receive a task-specific directive only, so an orchestrated child can
-  never supervise itself (`.claude/rules-conditional/advice-supervision-rules.md` §1, §9).
+  never supervise itself (`.claude/skills/advise/references/advice-supervision-rules.md` §1, §9).
 
 ## Related Rules
 

@@ -1,11 +1,7 @@
 ---
 name: mk:react-patterns
 version: 1.0.0
-description: |
-  Use when writing, reviewing, or optimizing React/Next.js code. Triggers on
-  .tsx/.jsx files, React component work, Next.js routes, bundle optimization,
-  re-render issues, or performance improvements. Auto-activates alongside
-  mk:typescript when React project detected.
+description: 'React and Next.js authoring and review: hooks, re-renders, server components, bundle size. NOT for mk:typescript.'
 allowed-tools:
   - Read
   - Grep
@@ -19,7 +15,7 @@ keywords:
   - performance
   - re-render
   - bundle-optimization
-when_to_use: Use when writing/reviewing/optimizing React/Next.js code. Triggers on .tsx/.jsx files. NOT for generic TypeScript (see mk:typescript) or Vue/Angular.
+when_to_use: Editing .tsx or .jsx, or chasing a re-render or Next.js route problem.
 user-invocable: true
 owner: utility
 criticality: medium

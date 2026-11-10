@@ -20,7 +20,7 @@
 ## Gotchas Growth Protocol
 
 The `## Gotchas` section in `SKILL.md` is the highest-signal content (per
-`skill-authoring-rules.md` Rule 1). After every observed failure during eval
+`.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 1). After every observed failure during eval
 or post-rollout, append one bullet to the Gotchas list with format:
 
 ```
@@ -222,7 +222,7 @@ claude-prompting-best-practices universal-vs-Claude-specific filter.
 
 **Guard:** Do NOT add an overlay for ANY model. The universal kernel works on
 Claude, GPT/Codex, and Gemini without dispatch. Model-tier dispatch lives in
-`harness-rules.md` Rule 5, not in this skill.
+`.claude/skills/cook/references/harness-rules.md` Rule 5, not in this skill.
 
 **`--deep` boost:** Not applicable (this is a framing fix, not a content fix).
 

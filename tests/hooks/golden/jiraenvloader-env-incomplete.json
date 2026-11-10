@@ -1,0 +1,23 @@
+{
+  "name": "jiraenvloader-env-incomplete",
+  "group": "observer-jira-env-loader",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/jira-env-loader.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"SessionStart\"}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "jiraenvloader-env-incomplete",
+  "setupDescription": ".meowkit/.env missing MEOW_JIRA_SITE_URL",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "[mk:jira] MEOW_JIRA_SITE_URL missing in .meowkit/.env\n",
+    "stderr": ""
+  }
+}

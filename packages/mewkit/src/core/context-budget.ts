@@ -5,8 +5,10 @@
 // and auditable" and backs the CI guardrail. Read-only; no untrusted exec.
 //
 // Loadable files split across three tiers by HOW the harness loads them:
-//   - always-on:  CLAUDE.md + rules/*.md           — auto-loaded every session
-//   - conditional: rules-conditional/*.md           — loaded by agent-detector only
+//   - always-on:  rules/*.md                        — auto-loaded every session
+//                                                      (no kit-owned root CLAUDE.md ships)
+//   - conditional: rules-conditional/*.md           — retired from the kit; still
+//     classified so an installed project that has not upgraded yet is measured
 //                                                      when its trigger fires (e.g. Agile)
 //   - on-demand:  agents, commands, SKILL.md        — loaded when the artifact activates
 // All three count toward the budget total; the tier split makes the always-on
@@ -44,7 +46,6 @@ export interface ContextBudgetReport {
  * enters context as a loadable entrypoint.
  */
 export function classifyTier(relPath: string): ContextTier | null {
-	if (relPath === "CLAUDE.md") return "always-on";
 	if (/^rules\/.+\.md$/.test(relPath)) return "always-on";
 	if (/^rules-conditional\/.+\.md$/.test(relPath)) return "conditional";
 	if (/^agents\/(?!.*_INDEX\.md$).+\.md$/.test(relPath)) return "on-demand";
@@ -76,8 +77,7 @@ export function computeContextBudget(claudeDir: string, profile: string): Contex
 	for (const rel of paths) {
 		const tier = classifyTier(rel);
 		if (tier === null) continue; // already filtered, but keeps the type narrow
-		// CLAUDE.md lives at the project root, not inside .claude/.
-		const abs = rel === "CLAUDE.md" ? join(claudeDir, "..", "CLAUDE.md") : join(claudeDir, rel);
+		const abs = join(claudeDir, rel);
 		try {
 			const body = readFileSync(abs, "utf-8");
 			const fileLines = body.split("\n").length;

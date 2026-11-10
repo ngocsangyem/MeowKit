@@ -50,7 +50,7 @@ Cost drift usually signals the problem is larger than scoped, or the approach is
 
 ## Escalation Triggers
 
-Stop the loop and escalate (per `tdd-rules.md` 3-strike rule) when:
+Stop the loop and escalate (per `.claude/skills/cook/references/tdd-rules.md` 3-strike rule) when:
 
 - **No progress after 2 checkpoints** → reduce scope or try different approach
 - **Identical failure** across 3 iterations (same test, same error, same line) → the fix hypothesis is wrong; change approach entirely

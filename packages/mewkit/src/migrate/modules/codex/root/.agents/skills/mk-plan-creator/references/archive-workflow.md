@@ -49,7 +49,7 @@ For each selected plan, ask via `stop and ask the user in chat`. Header: "Journa
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
-| Yes — capture learnings | Plan has Red Team Review or Validation Log sections with decisions worth replaying | Appends key decisions and patterns to the canonical `.meowkit/memory/architecture-decisions.json` |
+| Yes — capture learnings | Plan has Red Team Review or Validation Log sections with decisions worth replaying | Appends one decision entry to `.meowkit/memory/decisions.md` |
 | No — just archive | Plan was trivial / experimental and has no reusable knowledge | Archives without capturing learnings |
 
 If "Yes": for each selected plan, extract:
@@ -57,20 +57,17 @@ If "Yes": for each selected plan, extract:
 - Red Team findings (if Red Team Review section exists)
 - Validation answers (if Validation Log section exists)
 
-Append the entry to the CANONICAL store `.meowkit/memory/architecture-decisions.json` — NOT
-the `.md` view (a `.md` write is invisible to JSON-first readers; see
-AGENTS.md (Memory) → Write Rules). Add to the `patterns` array (create the
-file with the v2.0.0 skeleton if absent), bump `metadata.last_updated`, leave `version`:
+Append ONE entry to `.meowkit/memory/decisions.md` through `mewkit note` (it creates the file on
+first write), and only when the decision is non-derivable from the code, the diff, or `git log`:
+```bash
+npx mewkit note decisions <<'EOF'
+## {goal from plan} — {1-2 bullet summary of key decisions}   <!-- YYYY-MM-DD -->
+Why: {red-team findings, validation answers, 1-2 bullets}
+Apply when: {trigger the next agent can grep for}
+Source: tasks/plans/archive/{plan-name}/plan.md
+EOF
 ```
-id: archive-{plan-name}
-type: decision
-pattern: {goal from plan} — {1-2 bullet summary of key decisions}
-context: learnings — {red-team findings, validation answers, 1-2 bullets}
-status: archived-{completed|cancelled}
-date: {date}
-```
-(Match the canonical shape `immediate-capture-handler.cjs` writes: `type` + `pattern` + `context`.)
-If the write fails, print `⚠ memory capture skipped: <reason>` — do not skip silently.
+No secrets — `mewkit note` exits non-zero on a secret-shaped token and writes nothing. If the write fails, print `⚠ memory write skipped: <reason>` — do not skip silently.
 
 ### A4. Archive Action
 

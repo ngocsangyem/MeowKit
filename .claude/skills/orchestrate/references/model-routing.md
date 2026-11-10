@@ -95,8 +95,8 @@ Secrets never belong in prompts, logs, inventory, or reports at any tier — see
 `injection-rules.md` Rule 4 (sensitive-file protection) and Rule 5 (no external
 exfiltration). Route any secret-bearing plan through those rules instead of
 proceeding here. R3 approval and its rationale are durable per
-`intervention-recording-rules.md`; the gate itself is owned by `gate-rules.md`
-and is never satisfied by this file.
+`.claude/rules/gate-rules.md` (Recording Human Interventions); the gate itself is
+owned by that same rule and is never satisfied by this file.
 
 ## Routing Rules
 
@@ -186,7 +186,7 @@ still exists in the current session.
 
 C1/C2/C3 and R0–R3 are the job-routing axes this file owns; they are separate
 from — and layered on top of — the toolkit's own TRIVIAL/STANDARD/COMPLEX
-model-tier policy (`mk:scale-routing` plus `.claude/rules/model-selection-rules.md`).
+model-tier policy (`mk:scale-routing` plus `.claude/skills/agent-detector/references/model-selection-rules.md`).
 When a job routes to an internal agent, that agent's underlying model tier is
 decided entirely by the toolkit's existing tier policy; this file only decides
 which agent is qualified and how isolated its write must be. Do not re-derive
@@ -236,4 +236,4 @@ run; this document does not preselect them.
 - Fallbacks meet the same floors as their primary route.
 - The arbiter is C3 and its independence or same-family limitation is stated.
 - Destructive or external approvals are recorded per
-  `intervention-recording-rules.md`, not merely implied by a PASS verdict.
+  `.claude/rules/gate-rules.md` (Recording Human Interventions), not merely implied by a PASS verdict.

@@ -42,7 +42,7 @@ Must exit 0 with `PRODUCT_SPEC_COMPLETE: N features, M user stories`. Fix any re
 Run the validation script:
 
 ```bash
-.claude/skills/.venv/bin/python3 .claude/skills/plan-creator/scripts/validate-plan.py {plan_dir}/plan.md
+mewkit plan check --structural {plan_dir}/plan.md
 ```
 
 Must output `PLAN_COMPLETE`. Fix reported issues before proceeding.
@@ -52,7 +52,7 @@ Must output `PLAN_COMPLETE`. Fix reported issues before proceeding.
 before leaving this step; only then go to step-07-gate.md. If `html_mode == false`,
 go directly to step-07-gate.md.
 
-**Skip if:** `planning_mode = product-level` — the `validate-plan.py` script expects phase files and per-phase schema. Product-level plans have a different schema (product spec). Section 4a' above replaces 4b for this mode. Go directly to step-07-gate.md (step-05 red-team and step-06 validation interview are also skipped for product-level v1 — the spec is the deliverable, phase decomposition happens in `mk:autobuild`).
+**Skip if:** `planning_mode = product-level` — the structural check expects phase files and per-phase schema. Product-level plans have a different schema (product spec). Section 4a' above replaces 4b for this mode. Go directly to step-07-gate.md (step-05 red-team and step-06 validation interview are also skipped for product-level v1 — the spec is the deliverable, phase decomposition happens in `mk:autobuild`).
 
 ### 4c. Two-Approach Selection (conditional: `planning_mode = two`)
 

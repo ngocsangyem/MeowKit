@@ -14,7 +14,7 @@ assert_match() {
 assert_match "two-gate model: Gate 1 before build, Gate 2 before ship" 'proceed only after Gate 1.*Gate 2 remains human approval' "$SKILL"
 assert_match "Phase 3.6 Verify present in canonical phase sequence" '3\.6.*Verify' "$WORKFLOW_PHASES"
 assert_match "defers to mk:cook when explicitly invoked (mutual exclusion)" 'do not activate.*.mk:cook. owns the pipeline' "$SKILL"
-assert_match "NOT for explicit user-invoked single tasks (see mk:cook)" 'NOT for explicit user-invoked single tasks \(see mk:cook\)' "$SKILL"
+assert_match "NOT for explicit user-invoked single tasks (see mk:cook)" '^description:.*NOT for mk:cook' "$SKILL"
 
 echo
 echo "Results: $PASS passed, $FAIL failed"

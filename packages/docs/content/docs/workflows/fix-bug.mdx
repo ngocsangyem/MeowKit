@@ -117,7 +117,7 @@ If the developer's self-healing exhausted 3 attempts, the **journal-writer** doc
 | Root cause first | mk:investigate | Iron Law prevents fixing symptoms |
 | Scope control | mk:freeze | Prevents touching unrelated code |
 | Regression test | tester | Proves the bug existed AND the fix works |
-| Security scan | post-write.sh | Checks every edited file for new vulnerabilities |
+| Security scan | post-write.cjs | Checks every edited file for new vulnerabilities |
 | Minimal diff | developer | Fixes root cause with fewest lines changed |
 | Evidence-based | reviewer | Verifies fix with test output, not "should work" |
 

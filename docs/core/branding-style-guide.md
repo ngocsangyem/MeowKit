@@ -1,6 +1,6 @@
 # Branding Style Guide
 
-Single-page reference for what stays branded ("MeowKit", "Claude Code", "Anthropic") versus what gets neutralized to runtime-agnostic prose. Enforced by `.claude/scripts/lint-brand-prose.sh` on every PR that touches `meowkit/.claude/**/*.md`.
+Single-page reference for what stays branded ("MeowKit", "Claude Code", "Anthropic") versus what gets neutralized to runtime-agnostic prose. Enforced by `scripts/lint-brand-prose.sh` on every PR that touches `meowkit/.claude/**/*.md`.
 
 ## Where brand lives
 
@@ -96,7 +96,7 @@ Acceptable: `<!-- research-citation -->\nAnthropic's field report confirms the f
 
 ```bash
 cd meowkit
-bash .claude/scripts/lint-brand-prose.sh
+bash scripts/lint-brand-prose.sh
 ```
 
 Expected exit codes:
@@ -111,7 +111,7 @@ Expected exit codes:
 
 ## Related
 
-- `.claude/scripts/lint-brand-prose.sh` — the enforcement
-- `.claude/scripts/check-anthropic-context.py` — Anthropic context-window helper
+- `scripts/lint-brand-prose.sh` — the enforcement
+- `scripts/check-anthropic-context.py` — Anthropic context-window helper
 - `packages/mewkit/src/migrate/converters/md-strip.ts` — runtime substitution
 - `packages/mewkit/src/migrate/converters/fm-strip.ts` — Codex/Kiro/Cursor merged-agents header

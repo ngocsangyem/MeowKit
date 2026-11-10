@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-# setup-workflow — neutral wrapper for the installed setup command.
-set -euo pipefail
-exec npx mewkit setup "$@"

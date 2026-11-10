@@ -59,7 +59,7 @@ Skip this whole section unless the run was invoked with `--advice`. Without the
 flag there are zero advisory calls and nothing here loads.
 
 On the first checkpoint of a run, read
-`.claude/rules-conditional/advice-supervision-rules.md` — it is the contract this
+`.claude/skills/advise/references/advice-supervision-rules.md` — it is the contract this
 section implements.
 
 ### Checkpoints

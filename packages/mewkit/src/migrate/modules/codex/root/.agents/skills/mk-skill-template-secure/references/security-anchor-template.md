@@ -46,7 +46,7 @@ No automated execution when all three are active simultaneously.
 | `mk:docs-finder` — fetches URLs, no credentials, no writes | yes | no | no | LOW — only [A] |
 | `mk:freeze` — no external input, no secrets, blocks writes | no | no | yes | LOW — only [C] |
 | `mk:multimodal` — reads files, uses API key, writes output | yes | yes | yes | HIGH — all three |
-| `mk:audit` — reads code, no secrets, no writes | yes | no | no | LOW |
+| `mk:cso` — reads code, no secrets, no writes | yes | no | no | LOW |
 
 When a skill hits all three, add: `Human-in-the-loop required for destructive actions.` to the Allowed Operations section.
 

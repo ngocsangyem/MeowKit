@@ -58,7 +58,6 @@ Analyze the files being touched in the current task. Use the following rules to 
 ## Always-Loaded References
 
 These are loaded for EVERY task regardless of domain:
-- `.claude/skills/memory/references/session-capture.md` (captures learnings)
 - `.claude/skills/development/references/tdd-enforcement.md` (enforces test-first)
 
 ## Steps to Execute

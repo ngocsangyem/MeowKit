@@ -1,57 +1,65 @@
-// The config resolver decides which file a project's settings are read from, so an install
-// created before the move must keep working. These cover the four shapes a project can be in.
+// The config resolver names ONE file and never falls back.
+//
+// The fallback it used to have mattered while the thing being resolved was an
+// install descriptor that had moved. The committed config is a different kind of
+// document, so a project still carrying only the old descriptor is not "served
+// by the legacy path" — it is migration-pending, a state the resolver reports
+// rather than papers over. These cover the four shapes a project can be in.
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { configWritePath, resolveConfigPath, usingLegacyConfig } from "../resolve-config-path.js";
+import { configWritePath, legacyDescriptorPath, migrationPending } from "../resolve-config-path.js";
 
 const roots: string[] = [];
 afterEach(() => roots.splice(0).forEach((d) => rmSync(d, { recursive: true, force: true })));
 
-function makeRoot(shape: "empty" | "legacy" | "canonical" | "both"): string {
+function makeRoot(shape: "empty" | "descriptor" | "pre-move-descriptor" | "config" | "both"): string {
 	const root = mkdtempSync(join(tmpdir(), "mewkit-config-"));
 	roots.push(root);
-	if (shape === "legacy" || shape === "both") {
+	if (shape === "pre-move-descriptor") {
 		mkdirSync(join(root, ".claude"), { recursive: true });
 		writeFileSync(join(root, ".claude", "meowkit.config.json"), "{}");
 	}
-	if (shape === "canonical" || shape === "both") {
+	if (shape === "descriptor" || shape === "both") {
 		mkdirSync(join(root, ".meowkit"), { recursive: true });
 		writeFileSync(join(root, ".meowkit", "config.json"), "{}");
+	}
+	if (shape === "config" || shape === "both") {
+		mkdirSync(join(root, ".meowkit"), { recursive: true });
+		writeFileSync(join(root, ".meowkit", "config.yaml"), "tdd: true\n");
 	}
 	return root;
 }
 
-describe("resolveConfigPath", () => {
-	it("writes to `.meowkit/config.json` regardless of what exists", () => {
-		for (const shape of ["empty", "legacy", "canonical", "both"] as const) {
+describe("configWritePath", () => {
+	it("names `.meowkit/config.yaml` whatever the project shape is", () => {
+		for (const shape of ["empty", "descriptor", "pre-move-descriptor", "config", "both"] as const) {
 			const root = makeRoot(shape);
-			expect(configWritePath(root)).toBe(join(root, ".meowkit", "config.json"));
+			expect(configWritePath(root)).toBe(join(root, ".meowkit", "config.yaml"));
 		}
 	});
 
-	it("reads the canonical file when it exists", () => {
-		const root = makeRoot("canonical");
-		expect(resolveConfigPath(root)).toBe(join(root, ".meowkit", "config.json"));
-		expect(usingLegacyConfig(root)).toBe(false);
+	it("reports a project with only the v2 descriptor as migration-pending", () => {
+		const root = makeRoot("descriptor");
+		expect(migrationPending(root)).toBe(true);
+		expect(legacyDescriptorPath(root)).toBe(join(root, ".meowkit", "config.json"));
 	});
 
-	it("falls back to a pre-move install so upgrading does not orphan its config", () => {
-		const root = makeRoot("legacy");
-		expect(resolveConfigPath(root)).toBe(join(root, ".claude", "meowkit.config.json"));
-		expect(usingLegacyConfig(root)).toBe(true);
+	it("reports the pre-move descriptor the same way", () => {
+		const root = makeRoot("pre-move-descriptor");
+		expect(migrationPending(root)).toBe(true);
+		expect(legacyDescriptorPath(root)).toBe(join(root, ".claude", "meowkit.config.json"));
 	});
 
-	it("prefers the canonical file once both exist, so a migrated project stops reading the old one", () => {
+	it("is not migration-pending once the committed config exists, even with the old file present", () => {
 		const root = makeRoot("both");
-		expect(resolveConfigPath(root)).toBe(join(root, ".meowkit", "config.json"));
-		expect(usingLegacyConfig(root)).toBe(false);
+		expect(migrationPending(root)).toBe(false);
 	});
 
-	it("reports the path it would create when neither exists, never a legacy path", () => {
+	it("is not migration-pending for a project with neither file — that is defaults", () => {
 		const root = makeRoot("empty");
-		expect(resolveConfigPath(root)).toBe(join(root, ".meowkit", "config.json"));
-		expect(usingLegacyConfig(root)).toBe(false);
+		expect(migrationPending(root)).toBe(false);
+		expect(legacyDescriptorPath(root)).toBeNull();
 	});
 });

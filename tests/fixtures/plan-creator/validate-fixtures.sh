@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Validates plan-creator fixtures against validate-plan.py.
+# Validates plan-creator fixtures against `mewkit plan check --structural`.
 #
 # Each fixture has an expected verdict:
 #   legacy-v1-5/             → PLAN_COMPLETE (legacy compat)
@@ -18,21 +18,10 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
-VALIDATOR="${REPO_ROOT}/.claude/skills/plan-creator/scripts/validate-plan.py"
-PYTHON="${REPO_ROOT}/.claude/skills/.venv/bin/python3"
+CLI="${REPO_ROOT}/packages/mewkit/dist/index.js"
 
-if [ ! -x "${PYTHON}" ]; then
-  echo "ERROR: ${PYTHON} not found. Run 'npx mewkit setup' to create the venv." >&2
-  exit 2
-fi
-
-if ! "${PYTHON}" -c 'import yaml' 2>/dev/null; then
-  echo "ERROR: PyYAML missing from ${PYTHON}. Run 'npx mewkit setup'." >&2
-  exit 2
-fi
-
-if [ ! -f "${VALIDATOR}" ]; then
-  echo "ERROR: validator not found at ${VALIDATOR}" >&2
+if [ ! -f "${CLI}" ]; then
+  echo "ERROR: CLI not built at ${CLI}. Run 'npm run build' first." >&2
   exit 2
 fi
 
@@ -60,7 +49,7 @@ for fixture in ${FIXTURES}; do
     continue
   fi
 
-  output="$("${PYTHON}" "${VALIDATOR}" "${plan_path}" 2>&1)"
+  output="$(node "${CLI}" plan check --structural "${plan_path}" 2>&1)"
   first_line="${output%%$'\n'*}"
 
   case "${first_line}" in

@@ -1,0 +1,23 @@
+{
+  "name": "gate1-source-edit-no-plan",
+  "group": "gate1",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/gate-enforcement.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"src/app.ts\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "gate1-source-edit-no-plan",
+  "setupDescription": "BASE hook tree only; no tasks/plans/ at all",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@GATE_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nNo approved plan found in tasks/plans/.\nGate 1 requires an approved plan before source code changes.\nCreate a plan first: /mk:plan-creator or /mk:fix for simple fixes.\n"
+  }
+}

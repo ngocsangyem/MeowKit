@@ -2,14 +2,7 @@
 name: mk:context-audit
 preamble-tier: 1
 version: 1.0.0
-description: |
-  Read-only audit of `.claude/` structural overhead. Reports prioritized
-  "remove X save Y tokens" recommendations against the model context window.
-  NOT for monetary cost tracking — that's /mk:budget. NOT for transcript
-  size monitoring — long-session continuity defers to Claude Code native
-  compaction. NOT for runtime context decisions (what to read, when to
-  compact) — see mk:context-engineering. Use when planning to add context
-  capacity, diagnosing perceived slowdowns, or auditing health.
+description: Read-only audit of .claude/ structural overhead, ranked as remove X save Y tokens. NOT for mk:context-engineering.
 allowed-tools:
   - Bash
   - Read
@@ -26,7 +19,7 @@ keywords:
   - agents
   - mcp
   - structural
-when_to_use: Use to audit .claude/ structural overhead and surface 'remove X save Y tokens' recommendations against the model context window. NOT for USD cost tracking (see /mk:budget). NOT for transcript size. NOT for runtime context decisions (see mk:context-engineering).
+when_to_use: Adding context capacity, or diagnosing why a session feels bloated.
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored
@@ -44,11 +37,11 @@ Read-only audit of `.claude/` structural overhead. Surfaces what is loaded into
 every host-runtime session and how much of the context window it consumes,
 then recommends the highest-leverage trims.
 
-Complementary lens: `mewkit inventory --substrate` shows the same artifact set
+Complementary lens: `mewkit validate --substrate` shows the same artifact set
 grouped by the responsibility each serves (covered / partial / missing), so a trim
 can be checked against responsibility coverage before removing an artifact. The
 per-phase read budget that bounds what an audit-driven session should load lives in
-`rules/context-budget-rules.md`.
+`.claude/skills/agent-detector/references/context-budget-rules.md`.
 
 ## When to Use
 
@@ -60,13 +53,13 @@ Three concrete triggers:
    over-compacted, audit to see if structural overhead has grown past 10%.
 3. **Periodic health audit** — quarterly or on model upgrades, confirm
    the always-on bundle still pays its keep (paired with the dead-weight audit
-   in `harness-rules.md` Rule 7).
+   in `.claude/skills/cook/references/harness-rules.md` Rule 7).
 
 ## Context vs Cost (Boundary)
 
 | Concern                         | Mechanism                                                | Unit          |
 | ------------------------------- | -------------------------------------------------------- | ------------- |
-| Monetary cost                   | `/mk:budget` + `../autobuild/scripts/budget-tracker.sh`  | USD           |
+| Monetary cost                   | `mewkit budget` + `../autobuild/scripts/budget-tracker.sh` | USD           |
 | Window utilization (this skill) | `/mk:context-audit` + `scripts/inventory-context.sh`      | tokens / %    |
 
 The three concerns are deliberately separate. This skill measures only what
@@ -121,13 +114,13 @@ Steps:
 ... (sorted by token impact, descending)
 
 ## How to Act
-- Cost: see `/mk:budget`
+- Cost: see `mewkit budget`
 - Runtime trim: see `mk:lazy-agent-loader`
 ```
 
 The 10% / 25% thresholds are the canonical source of truth for token-overhead
 banners — see `references/token-cost-model.md`. They are NOT linked to
-`MEOWKIT_BUDGET_*` env vars (those are USD amounts, not token percentages).
+the `budget.*` config keys (those are USD amounts, not token percentages).
 
 ## Integration Points
 
@@ -139,7 +132,7 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 - **No env vars introduced.** Window size is hard-coded 200K; override deferred
   until a real 1M-context use case appears.
 - **Discovery:** via `keywords:` frontmatter and a cross-reference from
-  `/mk:budget`. There is no separate routing rule.
+  `mewkit budget`. There is no separate routing rule.
 
 ## Gotchas
 
@@ -147,7 +140,7 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 
 ## Related Rules
 
-- `.claude/rules/skill-authoring-rules.md` — discovery + Gotchas section requirements
+- `.claude/skills/skill-creator/references/skill-authoring-rules.md` — discovery + Gotchas section requirements
 - `.claude/rules/injection-rules.md` Rule 11 — Skill Rule of Two; this skill
   scores 2 of 3 (untrusted SCAN_ROOT input + filename inventory may surface
   sensitive paths) so paths are canonicalized via `realpath` and never executed.

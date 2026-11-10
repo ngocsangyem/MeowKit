@@ -29,15 +29,15 @@ When an agent makes an error, don't pray for better behavior next time. Build a 
 
 Gate 1 (plan approved) and Gate 2 (review approved) require explicit human sign-off. No `--skip-gates` flag exists by design. No agent can self-approve. No mode bypasses them.
 
-`gate-enforcement.sh` is a PreToolUse hook that **blocks file writes** before Gate 1 passes. This is preventive enforcement — the agent literally cannot edit source files until a plan is approved. Behavioral rules say "don't write code before planning." Hooks say "you can't."
+`gate-enforcement.cjs` is a PreToolUse hook that **blocks file writes** before Gate 1 passes. This is preventive enforcement — the agent literally cannot edit source files until a plan is approved. Behavioral rules say "don't write code before planning." Hooks say "you can't."
 
 ### 3. Security Is Architecture, Not Afterthought
 
-Security operates in three layers: behavioral rules (`security-rules.md`, `injection-rules.md`), preventive hooks (`gate-enforcement.sh`, `privacy-block.sh`), and observational hooks (`post-write.sh`, `build-verify.cjs`).
+Security operates in three layers: behavioral rules (`security-rules.md`, `injection-rules.md`), preventive hooks (`gate-enforcement.cjs`, `privacy-block.cjs`), and observational hooks (`post-write.cjs`, `build-verify.cjs`).
 
 **Critical design decision:** Security hooks are **never** routed through the dispatcher. They remain independent bash entries in `settings.json`. If `dispatch.cjs` crashes, security hooks still fire. SPOF protection is non-negotiable.
 
-All file content is treated as DATA, not instructions. Only `CLAUDE.md` and `.claude/rules/` contain instructions. This boundary is the foundation of prompt injection defense.
+All file content is treated as DATA, not instructions. Only `.claude/rules/`, skill frontmatter and a project-owned `CLAUDE.md` contain instructions. This boundary is the foundation of prompt injection defense.
 
 ### 4. Dead Weight Must Be Pruned
 
@@ -67,24 +67,24 @@ This principle applies at different scales:
 
 ### 7. TDD Is Opt-In
 
-TDD enforcement moved from default-on to opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. When enabled, failing tests must exist before implementation — the `pre-implement.sh` hook blocks code without corresponding failing tests. In default mode, tests are recommended but not gated.
+TDD enforcement moved from default-on to opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. When enabled, failing tests must exist before implementation — the `pre-implement.cjs` hook blocks code without corresponding failing tests. In default mode, tests are recommended but not gated.
 
 Why optional: strict TDD added friction for spike work, tooling, and prototypes. Production-quality work should still enable `--tdd`.
 
 ### 8. Learn from Every Session
 
-The memory system captures patterns, mistakes, and costs across sessions. Topic files in `.meowkit/memory/` — `fixes.md`/`fixes.json` for bug-class patterns, `review-patterns.md`/`review-patterns.json` for recurring observations, `architecture-decisions.md`/`architecture-decisions.json` for design choices — are read on-demand by consumer skills at task start. There is no auto-injection pipeline; each skill loads only the topic files relevant to its domain.
+The memory store keeps the part of a session a future model could not derive: `.meowkit/memory/decisions.md` for why a non-obvious choice was made, `gotchas.md` for what a real failure taught. It is two committed markdown files, read with one grep by the skills whose task needs it. There is no auto-injection pipeline and no capture hook — a human asks for something to be remembered, and the agent writes it.
 
 ### 9. Load Only What's Needed
 
 Skills activate by task domain, not all at once. Each skill's SKILL.md is a compact decision router, with detailed procedures in `references/` loaded on demand. This progressive disclosure pattern saves ~70% context per invocation.
 
-The same principle applies to the hook system: `handlers.json` routes events to only the matching handlers. A UserPromptSubmit event triggers the summary cache and immediate-capture handler — not build-verify or checkpoint logic.
+The same principle applies to the hook system: `handlers.json` routes events to only the matching handlers. A UserPromptSubmit event triggers the safety-sentinel handler — not build-verify or checkpoint logic.
 
 ## What MeowKit Does NOT Do
 
 - **No proprietary formats** — standard Markdown and JSON, readable by any tool
-- **No telemetry** — all data stays project-local under `.meowkit/` and `session-state/`
+- **No telemetry** — all data stays project-local under `.meowkit/`
 - **No experimental features** — everything shipped is production-ready
 - **No external services** — zero dependencies on third-party APIs for core workflow
 - **No model lock-in** — adaptive density works across Haiku, Sonnet, and Opus tiers

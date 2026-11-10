@@ -3,11 +3,17 @@
 Step-file workflow for structured plan creation. Scope-aware with fast/hard modes.
 Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 
+## Step-File Contract
+
+- One step at a time — NEVER load multiple step files at once.
+- Read the ENTIRE step file before executing any instruction in it.
+- Complete the current step before reading the next — NEVER skip steps or optimize the sequence.
+- Follow the step's instructions exactly — do not improvise, add steps, or deviate.
+- Persist intermediate state the next step needs: frontmatter variables, or `.meowkit/state/{skill}-progress.json` when it must survive a context reset.
+- A step file that chains to `references/*.md` opens with a `## Contents` ToC, so a partial read lands on navigation.
+
 ## Rules
 
-- NEVER load multiple step files simultaneously
-- ALWAYS read entire step file before execution
-- NEVER skip steps or optimize the sequence
 - ALWAYS halt at Gate 1 and wait for human approval
 
 ## Steps
@@ -18,7 +24,7 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 3. `step-02-codebase-analysis.md` — Scout + project docs reading (hard/deep/parallel/two only; deep: bounded scope map per `references/deep-mode.md`)
 4. `step-03-draft-plan.md` — Write plan.md overview + phase-XX files. Integrate research findings. Deep: phase map. TDD: inject regression-first sections.
    - **Branch:** if `planning_mode = product-level`, use `step-03a-product-spec.md` instead (writes plan.md only — user stories, features, design language; NO phase files).
-5. `step-04-semantic-checks.md` — Semantic checks + structural validation (validate-plan.py). Fast mode: skip validation, go to step-07.
+5. `step-04-semantic-checks.md` — Semantic checks + structural validation (`mewkit plan check --structural`). Fast mode: skip validation, go to step-07.
 6. `step-05-red-team.md` — Plan red team (hard/deep/parallel/two only): 4-persona scaling, red-team-findings.md, subagent dispatch, adjudication
 7. `step-06-validation-interview.md` — Validation interview (hard/deep/parallel/two only): 3-5 critical questions with detection keywords, section-mapped answer propagation
 8. `step-07-gate.md` — Self-check + Gate 1: AskUserQuestion (Approve | Modify | Reject)
@@ -77,7 +83,7 @@ Step 0: Scope Challenge
               ↓
 Step 0.5: Intake Packet (conditional — ≥2 external artifacts)
     ├── < 2 sources → skip clean (intake_packet_path = none)
-    └── ≥ 2 sources → consolidate into .claude/session-state/plan-creator-intake-packet.md
+    └── ≥ 2 sources → consolidate into .meowkit/state/plan-creator-intake-packet.md
          ↓
 Step 1: Research (hard/deep/parallel/two only)
     ├── EXPANSION: 2 researchers, broader questions
@@ -103,7 +109,7 @@ Step 3: Draft Plan
          ↓
 Step 4: Semantic Checks
     ├── 4a. Semantic checks (goal=outcome, ACs=binary, constraints non-empty)
-    ├── 4b. Structural validation (validate-plan.py) — must output PLAN_COMPLETE
+    ├── 4b. Structural validation (`mewkit plan check --structural`) — must output PLAN_COMPLETE
     ├── 4c. Two-Approach Selection (planning_mode = two only)
     ├── 4d. Verification Roles (skipped in fast / product-level)
     │   ├── Tier: 1–2 = Light, 3–4 = Standard, 5+ = Full

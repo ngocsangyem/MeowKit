@@ -1,0 +1,23 @@
+{
+  "name": "validate-contract-usage-error",
+  "group": "gate-helper-validate-contract",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/skills/sprint-contract/scripts/validate-contract.sh",
+  "args": [],
+  "stdin": null,
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "validate-contract-usage-error",
+  "setupDescription": "no argument at all — the usage-error exit",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": "usage: {{TMP}}/.claude/skills/sprint-contract/scripts/validate-contract.sh <path-to-contract.md>\n"
+  }
+}

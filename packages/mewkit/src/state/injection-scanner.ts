@@ -1,8 +1,8 @@
 // Canonical TS port of the MeowKit content scanners, owned by the runtime-neutral
-// state layer so every writer (memory, wiki, migrate, hooks) shares ONE source —
-// never a hand-synced copy. `wiki/infrastructure/scan-patterns.ts` re-exports this
-// module for backward compatibility; the installed hook `validate-content.cjs` is
-// generated from this source (no dynamic require of a project-controlled file).
+// state layer so every writer (migrate, hooks, the trace log, `validate --memory`)
+// shares ONE source — never a hand-synced copy. The installed hook
+// `validate-content.cjs` is generated from this source (no dynamic require of a
+// project-controlled file).
 //
 // MIRROR these sources pattern-for-pattern when they change:
 //   - hooks/lib/validate-content.cjs   → INJECTION_PATTERNS + validateContent
@@ -39,8 +39,8 @@ export const INJECTION_PATTERNS: readonly RegExp[] = [
 	/developer\s+mode\s+(?:enabled|on)/i,
 	// Expansion toward web-to-markdown Layer-5 parity. Scoped to ASSISTANT-DIRECTED
 	// phrasings only — generic shell/code terms (curl, rm -rf, execute) are intentionally NOT
-	// here, since a dev-knowledge wiki carries legitimate shell examples (avoid false-positive
-	// quarantine of real content).
+	// here, since committed project knowledge carries legitimate shell examples (avoid
+	// false-positive rejection of real content).
 	/from\s+now\s+on[, ]+you\s+(?:are|will|must|should)/i,
 	/stay\s+in\s+character/i,
 	/roleplay\s+as/i,
@@ -95,7 +95,11 @@ export const SECRET_PATTERNS: readonly (readonly [RegExp, string])[] = [
 	[/(api[_-]?key|apikey|password|passwd|secret|token)(\s*[:=]\s*)["']?[A-Za-z0-9_/+=.-]{16,}["']?/gi, "$1$2[REDACTED]"],
 	[/Bearer [A-Za-z0-9_/+=.-]{20,}/g, "Bearer [REDACTED]"],
 	[/(mysql|postgres|postgresql|mongodb|redis):\/\/[^\s"']+/gi, "$1://[REDACTED-DB-URL]"],
-	[/[A-Za-z0-9._%+-]{3,}@[A-Za-z0-9.-]{3,}\.[A-Za-z]{2,}/g, "[REDACTED-EMAIL]"],
+	// Bounded on every quantifier. The unbounded form (`{3,}@[A-Za-z0-9.-]{3,}\.`) backtracks
+	// quadratically on a long non-matching run, which is reachable from any pasted log line —
+	// a 64KB line took 7.4s, a 480KB line ~7min. RFC-5321 limits a local part to 64 octets and
+	// a label to 63, so bounding costs no real-world match.
+	[/[A-Za-z0-9._%+-]{3,64}@[A-Za-z0-9-]{1,63}(?:\.[A-Za-z0-9-]{1,63}){0,8}\.[A-Za-z]{2,24}/g, "[REDACTED-EMAIL]"],
 	[/(MEOWKIT_[A-Z_]*(?:KEY|SECRET|TOKEN|PASSWORD))(\s*=\s*)\S{8,}/g, "$1$2[REDACTED]"],
 ];
 

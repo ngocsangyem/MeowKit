@@ -6,7 +6,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 VALIDATOR="${REPO_ROOT}/.claude/skills/skill-creator/scripts/validate-skill.py"
-PYTHON="${REPO_ROOT}/.claude/skills/.venv/bin/python3"
+PYTHON="${REPO_ROOT}/.meowkit/envs/skill-creator/bin/python3"
 
 if [ ! -x "${PYTHON}" ] || [ ! -f "${VALIDATOR}" ]; then
   echo "ERROR: skill validator or Python venv is unavailable" >&2

@@ -1,0 +1,149 @@
+{
+	"$schema": "https://json-schema.org/draft-07/schema#",
+	"$id": "https://meowkit.dev/schemas/config-v1.json",
+	"title": "MeowKit project configuration",
+	"description": "The committed, human-owned project config at .meowkit/config.yaml. Generated from the loader's own schema; edit that, not this. There is no gates.* and no paths.* property at any scope, and unknown keys are errors rather than being ignored.",
+	"type": "object",
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"tdd": {
+			"type": "boolean"
+		},
+		"autobuild": {
+			"type": "object",
+			"properties": {
+				"mode": {
+					"type": "string",
+					"enum": [
+						"MINIMAL",
+						"FULL",
+						"LEAN"
+					]
+				}
+			},
+			"additionalProperties": false
+		},
+		"budget": {
+			"type": "object",
+			"properties": {
+				"cap": {
+					"type": "integer"
+				},
+				"warn": {
+					"type": "integer"
+				},
+				"block": {
+					"type": "integer"
+				}
+			},
+			"additionalProperties": false
+		},
+		"buildVerify": {
+			"type": "object",
+			"properties": {
+				"timeoutMs": {
+					"type": "integer"
+				}
+			},
+			"additionalProperties": false
+		},
+		"projectContext": {
+			"type": "object",
+			"properties": {
+				"maxBytes": {
+					"type": "integer"
+				}
+			},
+			"additionalProperties": false
+		},
+		"workflow": {
+			"type": "object",
+			"properties": {
+				"telemetry": {
+					"type": "string",
+					"enum": [
+						"off",
+						"community",
+						"anonymous"
+					]
+				},
+				"proactive": {
+					"type": "boolean"
+				}
+			},
+			"additionalProperties": false
+		},
+		"hooks": {
+			"type": "object",
+			"properties": {
+				"auto-checkpoint": {
+					"type": "boolean"
+				},
+				"budget-tracker": {
+					"type": "boolean"
+				},
+				"build-verify": {
+					"type": "boolean"
+				},
+				"capability-bootstrap": {
+					"type": "boolean"
+				},
+				"checkpoint-writer": {
+					"type": "boolean"
+				},
+				"control-probe": {
+					"type": "boolean"
+				},
+				"jira-env-loader": {
+					"type": "boolean"
+				},
+				"learning-observer": {
+					"type": "boolean"
+				},
+				"loop-detection": {
+					"type": "boolean"
+				},
+				"model-detector": {
+					"type": "boolean"
+				},
+				"orientation-ritual": {
+					"type": "boolean"
+				},
+				"post-session": {
+					"type": "boolean"
+				},
+				"post-write": {
+					"type": "boolean"
+				},
+				"posttoolfailure-probe": {
+					"type": "boolean"
+				},
+				"pre-completion-check": {
+					"type": "boolean"
+				},
+				"pre-task-check": {
+					"type": "boolean"
+				},
+				"precompact-probe": {
+					"type": "boolean"
+				},
+				"project-context-loader": {
+					"type": "boolean"
+				},
+				"review-evidence-tag": {
+					"type": "boolean"
+				},
+				"safety-sentinel-inject": {
+					"type": "boolean"
+				},
+				"tdd-flag-detector": {
+					"type": "boolean"
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"additionalProperties": false
+}

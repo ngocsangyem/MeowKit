@@ -1,6 +1,6 @@
 ---
 name: confluence-spec-analyst
-description: Read full Confluence spec page (+ children + images) and produce structured Spec Research Report with requirements, acceptance criteria, gaps, ambiguities, suggested user stories. Read-only via the confluence-as CLI wrapper. Routed by mk:confluence-spec-analyst skill. NOT for raw page CRUD (confluence-page); NOT for ticket complexity scoring (planning-engine).
+description: 'mk:confluence executor for mk:confluence-spec-analyst. Spec report reading.'
 tools: Bash, Read, Grep, Glob, Write
 disallowedTools: Edit
 model: claude-opus-5
@@ -121,7 +121,7 @@ Use the template in `references/report-template.md`. Every requirement / AC / ga
 
 Resolve report path:
 
-1. If active plan present (read `MEOWKIT_ACTIVE_PLAN` env or scan `tasks/plans/` for current): write to `{plan_dir}/research/confluence-spec-{YYMMDD}-{HHMM}-{title-slug}.md`
+1. If active plan present (read `.meowkit/state/active-plan.json` or scan `tasks/plans/` for current): write to `{plan_dir}/research/confluence-spec-{YYMMDD}-{HHMM}-{title-slug}.md`
 2. Else: write to `tasks/reports/confluence-spec-{YYMMDD}-{HHMM}-{title-slug}.md`
 
 Compute `sha256` of the fetched root markdown (not the report). Append to the report's footer as `**Source page hash:** <hex>` for staleness detection on re-runs.

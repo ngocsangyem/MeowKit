@@ -99,29 +99,9 @@ Print exactly one line matching the selection:
 | Hand off to mk:autobuild | `Run: the autobuild skill {absolute-path-to-plan.md}` |
 | End | (no command line — print "Plan complete. No next command queued.") |
 
-If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.codex/session-state/tdd-mode` surviving a fresh session.
+If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.meowkit/state/tdd-mode` surviving a fresh session.
 
 After the command line, print the Context Reminder block from `references/gate-1-approval.md` with the absolute path substituted.
-
-### 9f-bis. Terminal Wiki Handoff (advisory, fail-open)
-
-The plan was just approved, so `plan.md` is a durable, user-chosen artifact. Per the
-shared contract in `.agents/skills/wiki/references/terminal-handoff-advisory.md`, hand it
-to the wiki AFTER the command line is printed and BEFORE the STOP. This adds no gate and
-no prompt; a failure is advisory only.
-
-Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip):
-
-```bash
-npx mewkit wiki handoff propose \
-  --skill mk:plan-creator \
-  --from {plan_dir}/plan.md \
-  --slug <resolved-wiki-slug> \
-  --explicit-intent
-```
-
-If no unique slug resolves, print the command above with a literal `--slug <slug>` for the
-user and continue. Do NOT run `wiki approve`. Do NOT add `wiki reindex` to this step.
 
 ### 9g. Stop
 
@@ -132,7 +112,6 @@ user and continue. Do NOT run `wiki approve`. Do NOT add `wiki reindex` to this 
 - `plan.md` frontmatter contains `handoff: { next, decided_at }`.
 - Suggested command printed.
 - Context Reminder block printed.
-- Terminal wiki handoff attempted (advisory, fail-open) per 9f-bis.
 - Session STOPs.
 
 ## Next

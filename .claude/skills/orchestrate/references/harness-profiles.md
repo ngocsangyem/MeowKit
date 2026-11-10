@@ -96,7 +96,7 @@ Profile safety behavior by observed control, not product reputation.
   the current harness proves cancellation.
 - **Bypass controls:** identify the live runtime's bypass options only to keep
   them disabled by default. Never add one to a default command; a human
-  bypass approval is recorded per `intervention-recording-rules.md`, never
+  bypass approval is recorded per `.claude/rules/gate-rules.md` (Recording Human Interventions), never
   self-granted.
 
 An auto-approved or all-or-nothing write path is constrained for any shared

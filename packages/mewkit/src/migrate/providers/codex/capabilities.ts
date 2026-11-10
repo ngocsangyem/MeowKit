@@ -54,7 +54,7 @@ export const CODEX_MIN_SUPPORTED_VERSION = "0.142.0";
 //   2. {"decision":"block","reason":"..."}
 //   3. exit code 2 + reason on stderr (direct parity with Claude's exit-2 convention)
 // "Any deny decision overrides allow decisions from other hooks." Therefore the
-// safety hooks (gate-enforcement.sh, privacy-block.sh) migrate as REAL blocking
+// safety hooks (gate-enforcement.cjs, privacy-block.cjs) migrate as REAL blocking
 // wrappers — their exit-2 semantics port directly through the generated wrapper.
 
 /** True when the installed Codex version is at/above the supported hook tier. */

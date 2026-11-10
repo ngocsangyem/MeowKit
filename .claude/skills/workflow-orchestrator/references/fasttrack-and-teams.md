@@ -68,6 +68,6 @@ workflow:status   → Shows current phase, completed phases, pending tasks
 Phase-specific context is loaded from the kit's built-in rules:
 
 - Phase 1: `.claude/rules/gate-rules.md` (Gate 1 approval)
-- Phase 2-3: `.claude/rules/tdd-rules.md` (RED/GREEN enforcement)
+- Phase 2-3: `.claude/skills/cook/references/tdd-rules.md` (RED/GREEN enforcement)
 - Phase 4: `.claude/rules/gate-rules.md` (Gate 2 approval) + `.claude/rules/security-rules.md`
 - Phase 5: `.claude/rules/development-rules.md` (pre-commit checks)

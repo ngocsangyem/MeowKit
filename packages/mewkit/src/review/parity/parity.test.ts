@@ -249,7 +249,7 @@ describe("Parity matrix (20 capability rows)", () => {
 		// the gate2 coverage validator accepts a session-observed complete PASS bundle
 		let code = 0;
 		try {
-			execFileSync("node", [path.join(REPO, ".claude/scripts/validate-review-coverage.cjs"), proofPath], {
+			execFileSync("node", [path.join(REPO, ".claude/hooks/lib/validate-review-coverage.cjs"), proofPath], {
 				stdio: ["pipe", "pipe", "pipe"],
 			});
 		} catch (e) {

@@ -9,11 +9,11 @@
 ## 1. System Overview
 
 MeowKit is a prompt-engineering framework that extends Claude Code with structured
-workflows, quality gates, memory persistence, and 128 domain skills. It operates
+workflows, quality gates, memory persistence, and 129 domain skills. It operates
 through three mechanisms:
 
 1. **Rules** (`.claude/rules/*.md`) — behavioral instructions loaded every session;
-   27 rule files, priority-ordered; 2 are NEVER-override (`security-rules.md`,
+   7 rule files, priority-ordered; 2 are NEVER-override (`security-rules.md`,
    `injection-rules.md`). Source: `RULES_INDEX.md` loading-priority table.
 2. **Hooks** (`.claude/hooks/*.sh`, `.cjs`) — shell/Node scripts triggered by
    Claude Code events before or after tool calls. Source: `settings.json` (7 hook
@@ -25,7 +25,7 @@ through three mechanisms:
 
 There is no executable runtime. MeowKit shapes LLM behavior through prompt
 engineering, preventive hooks, and structured file conventions.
-Source: `CLAUDE.md` Role section; `settings.json` hook registrations.
+Source: `.claude/rules/meowkit-core.md` Role line; `settings.json` hook registrations.
 
 ## Ecosystem Harness (start here)
 
@@ -51,10 +51,10 @@ For the end-to-end integration story (rules + hooks + skills + artifacts), see:
 | Agent registry views                   | generated | `AGENTS_INDEX.md` generated view block     | Counts are derived from canonical agent frontmatter and validated by `mewkit validate --agents`.                                  |
 | Hook events (settings.json)            | 7        | `settings.json` hooks keys                 | SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit, SubagentStart, SubagentStop                                       |
 | Node handlers on disk                  | 8        | `ls .claude/hooks/handlers/*.cjs`          | Re-verified 2026-04-29 — disk has 8, matches HOOKS_INDEX. CF-M2 closed (audit cited stale 12).                                  |
-| Node handlers documented (HOOKS_INDEX) | 5 active | `HOOKS_INDEX.md:39` footer                 | memory-filter, memory-parser, memory-injector, memory-loader deleted (v2.4.0); immediate-capture-handler retained (CF-M1 closed) |
+| Node handlers documented (HOOKS_INDEX) | 9 active | `HOOKS_INDEX.md` footer                    | The memory auto-inject handlers and the prompt-prefix capture handler are all deleted; memory loads on demand per skill |
 | Slash commands                         | 21       | `ls .claude/commands/meow/*.md`            | `status.md` added 260422 alongside project-manager agent                                                                         |
 | Rules files                            | 18       | `ls .claude/rules/*.md` excl. RULES_INDEX  | RULES_INDEX table lists 18 rows — matches disk (`risk-checklist.md` added at slot 13b for Phase 0 horizontal-risk evaluation)    |
-| Memory files                           | 13       | `CLAUDE.md` Memory section                 | fixes.{md,json}, review-patterns.{md,json}, architecture-decisions.{md,json}, security-notes.md, security-log.md, cost-log.json, decisions.md, quick-notes.md, trace-log.jsonl, last-model-id.txt, lessons.md, lessons-archive.md, patterns.json |
+| Memory files                           | 2        | `.claude/rules/meowkit-core.md` Memory     | `.meowkit/memory/decisions.md`, `.meowkit/memory/gotchas.md` — committed, read by grep. Logs/state/caches live in `.meowkit/{telemetry,state,cache}/` |
 
 **Skill type breakdown** (source: `inventory-summary.md`): workflow 33, verification 17,
 reference 11, business-process 7, scaffolding 5, cicd 3, library-api-reference 2 = **78**.
@@ -231,34 +231,38 @@ Hook chain verified against `settings.json` (2026-04-18). All 7 events listed.
 
 | Event                     | Hooks (in order)                                                                                                              | Source line             |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `SessionStart`            | project-context-loader.sh → dispatch.cjs (model-detector.cjs, orientation-ritual.cjs)                                         | `settings.json:18-33`   |
-| `PreToolUse Edit\|Write`  | gate-enforcement.sh → privacy-block.sh                                                                                        | `settings.json:36-52`   |
-| `PreToolUse Read`         | privacy-block.sh                                                                                                              | `settings.json:53-63`   |
-| `PreToolUse Bash`         | pre-task-check.sh → pre-ship.sh → privacy-block.sh                                                                            | `settings.json:64-85`   |
-| `PostToolUse Edit\|Write` | post-write.sh → learning-observer.sh → dispatch.cjs (build-verify, loop-detection, budget-tracker, auto-checkpoint)           | `settings.json:87-108`  |
+| `SessionStart`            | project-context-loader.cjs → dispatch.cjs (model-detector.cjs, orientation-ritual.cjs)                                         | `settings.json:18-33`   |
+| `PreToolUse Edit\|Write`  | gate-enforcement.cjs → privacy-block.cjs                                                                                        | `settings.json:36-52`   |
+| `PreToolUse Read`         | privacy-block.cjs                                                                                                              | `settings.json:53-63`   |
+| `PreToolUse Bash`         | pre-task-check.cjs → pre-ship.cjs → privacy-block.cjs                                                                            | `settings.json:64-85`   |
+| `PostToolUse Edit\|Write` | post-write.cjs → learning-observer.cjs → dispatch.cjs (build-verify, loop-detection, budget-tracker, auto-checkpoint)           | `settings.json:87-108`  |
 | `PostToolUse Bash`        | cost-meter.sh → dispatch.cjs (budget-tracker)                                                                                 | `settings.json:109-123` |
-| `UserPromptSubmit`        | tdd-flag-detector.sh → dispatch.cjs (immediate-capture-handler, orientation-ritual)                                           | `settings.json:152-173` |
-| `Stop`                    | pre-completion-check.sh → post-session.sh → dispatch.cjs (auto-checkpoint, checkpoint-writer)                                 | `settings.json:125-151` |
+| `UserPromptSubmit`        | tdd-flag-detector.cjs → dispatch.cjs (safety-sentinel-inject)                                                                  | `settings.json:152-173` |
+| `Stop`                    | pre-completion-check.cjs → post-session.cjs → dispatch.cjs (auto-checkpoint, checkpoint-writer)                                 | `settings.json:125-151` |
 
-**Phase routing** (source: `.claude/rules/phase-contracts.md`):
+**Phase routing** (source: `.claude/skills/cook/references/phase-contracts.md`):
 `Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test → Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect`
 
-SubagentStart/SubagentStop: intentionally empty — hooks in these events would
-infinite-loop inside subagents (`HOOKS_INDEX.md:39` footer).
+SubagentStart/SubagentStop: intentionally empty — but by choice, not because the events
+infinite-loop inside subagents. That claim is **superseded** as of 2026-11-09 (verdict
+`adopt`): the Claude Code hooks reference, retrieved that day, documents `SubagentStart` as
+firing once per subagent spawn or resume, unable to block subagent creation, and
+context-injecting only. The unresolved item is throttling on in-process agent teams, where
+it fires again per teammate message, so no handler is registered yet.
 
 ---
 
 ## 5. Gate Enforcement
 
-Source: `.claude/rules/gate-rules.md`, `settings.json:41` (gate-enforcement.sh
+Source: `.claude/rules/gate-rules.md`, `settings.json:41` (gate-enforcement.cjs
 registration), `RULES_INDEX.md` Enforcement Mechanism Matrix.
 
 | Gate                | Trigger                              | Mechanism                                                                         | Bypass                                                                        |
 | ------------------- | ------------------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Gate 1              | After Phase 1, before any code write | **Hook-preventive**: `gate-enforcement.sh` on PreToolUse Edit\|Write; timeout 10s | `/mk:fix` simple; scale-routing one-shot (`scale-adaptive-rules.md` Rule 4) |
+| Gate 1              | After Phase 1, before any code write | **Hook-preventive**: `gate-enforcement.cjs` on PreToolUse Edit\|Write; timeout 10s | `/mk:fix` simple; scale-routing one-shot (`scale-adaptive-rules.md` Rule 4) |
 | Gate 2              | After Phase 4, before Phase 5        | **Behavioral**: reviewer verdict at `tasks/reviews/` required                     | None — zero exceptions (`gate-rules.md` Gate 2 section)                       |
 | Active Verification | Phase 4 evaluator PASS               | **Script**: `validate-verdict.sh` rejects PASS with empty `evidence/` dir         | None — hard gate (`harness-rules.md` Rule 8)                                  |
-| Sprint Contract     | FULL density harness Phase 3         | **Hook**: `gate-enforcement.sh` contract gate                                     | `MEOWKIT_AUTOBUILD_MODE=LEAN` or `MINIMAL`                                      |
+| Sprint Contract     | FULL density harness Phase 3         | **Hook**: `gate-enforcement.cjs` contract gate                                     | `MEOWKIT_AUTOBUILD_MODE=LEAN` or `MINIMAL`                                      |
 
 **Known issue — gate-owning agents don't reference gate-rules.md:**
 planner (`planner.md` Required Context, CF-M3), reviewer (`reviewer.md:132`, CF-M5),
@@ -309,26 +313,22 @@ Note: jira-evaluator, jira-estimator, jira-analyst moved to project-scoped (`.cl
 
 ## 7. Context & Memory System
 
-Source: `CLAUDE.md` Memory section; `HOOKS_INDEX.md` State Files table.
+Source: `.claude/rules/meowkit-core.md` Memory section; `HOOKS_INDEX.md` State Files table.
 
-Memory path: `.claude/memory/` (NOT bare `memory/` — see CF-C6).
-Source: `CLAUDE.md` Memory section; `HOOKS_INDEX.md` State Files table.
+Memory path: `.meowkit/memory/` (NOT bare `memory/` — see CF-C6).
+Source: `.claude/rules/meowkit-core.md` Memory section; `HOOKS_INDEX.md` State Files table.
 
 | File                                                        | When read                                                    | Writer                                         |
 | ----------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------- |
-| `fixes.md` + `fixes.json`                                   | On-demand (mk:fix)                                         | immediate-capture-handler.cjs, session-capture |
-| `review-patterns.md` + `review-patterns.json`               | On-demand (mk:review, mk:plan-creator)                   | immediate-capture-handler.cjs, session-capture |
-| `architecture-decisions.md` + `architecture-decisions.json` | On-demand (mk:plan-creator, mk:cook)                     | immediate-capture-handler.cjs, session-capture |
-| `security-notes.md`                                         | On-demand (mk:cso)                                         | Manual / session-capture                       |
-| `cost-log.json`                                             | Phase 0/6                                                    | post-session.sh (atomic temp-rename)           |
-| `decisions.md`                                              | On-demand (architect)                                        | Manual                                         |
-| `security-log.md`                                           | On-demand (security agent)                                   | Manual / injection-audit.py                    |
-| `quick-notes.md`                                            | Phase 6 Reflect                                              | immediate-capture-handler.cjs                  |
-| `trace-log.jsonl`                                           | On-demand                                                    | append-trace.sh                                |
+| `memory/gotchas.md`                                         | Grep on demand (mk:fix, mk:investigate, mk:review, mk:plan-creator, planner agent, mk:cso, `/mk:retro`) | mk:fix, mk:review, mk:retro, architect agent, mk:memory (via `mewkit note`) |
+| `memory/decisions.md`                                       | Grep on demand (same read set)                               | architect agent, mk:memory, mk:party, mk:plan-creator archive (via `mewkit note`) |
+| `telemetry/cost-log.json`                                   | Phase 0/6                                                    | post-session.cjs (atomic temp-rename)           |
+| `telemetry/security-log`                                    | On-demand (security agent)                                   | injection-audit.cjs, quarantine writers         |
+| `telemetry/trace-log.jsonl`                                 | On-demand                                                    | append-trace.cjs                                |
 
 **Per-turn context budget** (~0KB auto-inject, source: `HOOKS_INDEX.md` handler rows):
-memory-loader.cjs deleted in v2.4.0 — no per-turn memory injection. SessionStart also loads
-`docs/project-context.md` via project-context-loader.sh — **CF-C5 OPEN**: file
+No per-turn memory injection — the auto-inject handlers are deleted. SessionStart also loads
+`docs/project-context.md` via project-context-loader.cjs — **CF-C5 OPEN**: file
 does not exist; loads nothing.
 
 ---
@@ -343,7 +343,7 @@ architecture: separate agents, separate contexts; self-evaluation forbidden
 
 | Step | Action                                                                                                                                            | Rule      |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| 0    | Tier Detection — model-detector.cjs → session-state/detected-model.json → MINIMAL\|FULL\|LEAN                                                     | Rule 5    |
+| 0    | Tier Detection — model-detector.cjs → .meowkit/state/detected-model.json → MINIMAL\|FULL\|LEAN                                                     | Rule 5    |
 | 1    | Plan — mk:plan-creator --product-level; user stories NOT file paths → Gate 1                                                                    | Rule 1, 3 |
 | 2    | Contract — mk:sprint-contract (FULL: required; LEAN: optional; MINIMAL: skip)                                                                   | Rule 3    |
 | 3    | Generate — developer agent (isolated context)                                                                                                     | Rule 2    |
@@ -394,8 +394,8 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | CF-C1 | `mk:debug/SKILL.md:1-4`                      | Deprecated skill missing `deprecated: true` + `superseded_by:` YAML — parsers miss it                                          | CLOSED (skill removed v2.4.4) |
 | CF-C2 | `mk:shipping/SKILL.md:1-4`                   | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
 | CF-C3 | `mk:documentation/SKILL.md:1-4`              | Same YAML deprecation key absence                                                                                              | CLOSED (skill removed v2.4.4) |
-| CF-C4 | `mk:multimodal/SKILL.md:45`                  | `.claude/skills/.venv/bin/python3` ABSENT — all Python scripts fail; blocks mk:llms, mk:web-to-markdown, mk:plan-creator | OPEN (re-verified 2026-04-29; loader warns; covered by `mewkit setup venv`) |
-| CF-C5 | `plan-creator/step-02-codebase-analysis.md:21` | `docs/project-context.md` missing; project-context-loader.sh nudges agent but no setup-time auto-prompt                        | PARTIAL → CLOSED 2026-04-29 (mewkit setup `project-context` step added; warns user to invoke `/mk:project-context` on first session) |
+| CF-C4 | `mk:multimodal/SKILL.md`                     | A skill's interpreter environment is absent — that skill's scripts fail; the core workflow is unaffected | RESOLVED: envs are per-skill and created on demand; the resolver names the skill and the command that provisions it |
+| CF-C5 | `plan-creator/step-02-codebase-analysis.md:21` | `docs/project-context.md` missing; project-context-loader.cjs nudges agent but no setup-time auto-prompt                        | PARTIAL → CLOSED 2026-04-29 (mewkit setup `project-context` step added; warns user to invoke `/mk:project-context` on first session) |
 | CF-C6 | `mk:cook/SKILL.md:159`                       | Audit cited bare `memory/lessons.md` path. Re-verification 2026-04-29: line 159 is `## Gotchas`, line 170 has correct `.claude/memory/fixes.md` prefix | CLOSED 2026-04-29 (re-verified — already correct in current tree) |
 
 ### High-Impact High Findings (re-verified 2026-04-29)
@@ -403,13 +403,13 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | ID     | File:Line                            | Issue                                                                        | Status |
 | ------ | ------------------------------------ | ---------------------------------------------------------------------------- | ------ |
 | CF-H7  | `mk:lazy-agent-loader/SKILL.md:13` | Audit cited hardcoded agent count "15" | CLOSED 2026-04-29 — `grep -nE "[0-9]+ agent"` returns nothing; no hardcoded count exists in current tree |
-| CF-H11 | `commands/meow/meow.md:20`           | `/mk:command` routed but `mk:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `.claude/rules/skill-authoring-rules.md` (post-dated audit) |
+| CF-H11 | `commands/meow/meow.md:20`           | `/mk:command` routed but `mk:command` not in inventory (phantom)         | CLOSED 2026-04-29 — refs resolve via `commands/meow/<name>.md` per `.claude/skills/skill-creator/references/skill-authoring-rules.md` (post-dated audit) |
 | CF-H12 | `commands/meow/meow.md:20,40`        | `mk:plan/arch/design/test` phantom routing targets | CLOSED 2026-04-29 — all 4 resolve via `commands/meow/<name>.md` |
 | CF-H13 | `commands/meow/plan.md`              | `mk:plan` phantom                                                          | CLOSED 2026-04-29 — `commands/meow/plan.md` exists |
 | CF-H14 | `commands/meow/validate.md`          | `mk:audit`, `mk:validate` phantom                                        | CLOSED 2026-04-29 — both resolve in `commands/meow/` |
 | CF-H15 | `commands/meow/summary.md`           | `mk:summary` phantom                                                       | CLOSED 2026-04-29 — `commands/meow/summary.md` exists |
 
-**Re-verification finding (CF-H11–H15):** the audit pre-dated `.claude/rules/skill-authoring-rules.md` (originally in `meowkit/CLAUDE.md`, relocated 2026-05-09), which formalizes that a command without a matching skill is NOT phantom (per audit-rubric RF-14). All 7 cited refs resolve to a command file. **A future cross-ref CI script will guard against regressions.**
+**Re-verification finding (CF-H11–H15):** the audit pre-dated `.claude/skills/skill-creator/references/skill-authoring-rules.md` (originally in `meowkit/CLAUDE.md`, relocated 2026-05-09), which formalizes that a command without a matching skill is NOT phantom (per audit-rubric RF-14). All 7 cited refs resolve to a command file. **A future cross-ref CI script will guard against regressions.**
 
 **Total post-re-verify (2026-04-29):** 1 CRITICAL OPEN (CF-C4), 0 HIGH OPEN (5 closed). Re-baseline of MEDIUM/LOW deferred to next audit pass.
 
@@ -420,9 +420,9 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | S1 — Feature request routing   | PARTIAL | `commands/meow/meow.md:40` phantom routing (CF-H12)                |
 | S2 — `/mk:cook <plan>`       | PARTIAL | `mk:cook/SKILL.md:159` bare memory path (CF-C6)                  |
 | S3 — `/mk:autobuild "build X"` | PARTIAL | `evaluator.md` Required Context missing rubric-rules.md (CF-M4)    |
-| S4 — Python skill runtime      | BROKEN  | `.claude/skills/.venv/bin/python3` absent (CF-C4)                  |
+| S4 — Python skill runtime      | OK      | per-skill envs under `.meowkit/envs/`, created on demand (CF-C4)   |
 | S5 — Session reset mid-phase   | PARTIAL | `plan-creator/step-02:21` loads missing project-context.md (CF-C5) |
-| S6 — `/meow fix` dispatcher    | PARTIAL | `commands/meow/fix.md:58` phantom `/mk:plan` ref (CF-M29)        |
+| S6 — `/meow fix` dispatcher    | PARTIAL | `commands/meow/fix.md:58` phantom `/mk:plan-creator` ref (CF-M29)        |
 
 Source: `audit-findings/simulation-traces.md` Scenario Verdict Summary table.
 
@@ -443,4 +443,4 @@ Source: `audit-findings/simulation-traces.md` Scenario Verdict Summary table.
 - Regressed: 0
 
 **Next audit trigger:** mandatory on next model upgrade per `harness-rules.md` Rule 7
-(dead-weight audit playbook: `.claude/rules/dead-weight-audit-rules.md`).
+(dead-weight audit playbook: `.claude/skills/benchmark/references/dead-weight-audit-rules.md`).

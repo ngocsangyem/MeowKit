@@ -2,7 +2,7 @@
 name: mk:brainstorming
 preamble-tier: 3
 version: 2.1.0
-description: Generate or compare multiple technical approaches for one validated decision. Do not use for product discovery or an existing plan.
+description: Generate and compare several technical approaches to one already-validated decision. NOT for mk:office-hours.
 allowed-tools:
   - Read
   - Grep
@@ -16,7 +16,7 @@ keywords:
   - compare-approaches
   - trade-off-analysis
   - alternatives
-when_to_use: Use for generating or comparing multiple technical approaches to one validated decision. NOT for product validation (mk:office-hours), debugging (mk:investigate), or critique of an existing plan (mk:plan-ceo-review or mk:elicit).
+when_to_use: The problem is settled and the options are open — what are my choices for X.
 user-invocable: true
 owner: research
 criticality: medium
@@ -32,7 +32,7 @@ Use for generating or comparing multiple technical approaches to one validated d
 
 ## Profiles
 
-- **quick** / `--depth quick` (default) — restate the decision in one line; give 2-4 technically distinct options and one recommendation. If a material fact is missing, state the assumption rather than running discovery. Return inline and stop. Do not load techniques, scout, scoring, challenge, reports, plans, wiki candidates, memory, or handoff.
+- **quick** / `--depth quick` (default) — restate the decision in one line; give 2-4 technically distinct options and one recommendation. If a material fact is missing, state the assumption rather than running discovery. Return inline and stop. Do not load techniques, scout, scoring, challenge, reports, plans, or handoff.
 - **deep** / `--depth deep` — load the needed technique and use the deep workflow below. A report, HTML output, or handoff is optional and only produced when requested or needed by an active plan.
 
 ## Routing
@@ -52,7 +52,7 @@ Use at least two alternatives. Quick returns 2-4; deep generates 3-8 and never m
 
 1. Restate the validated decision and any material assumption.
 2. Give 2-4 technically distinct options with the key trade-off for each.
-3. Recommend one option and return inline. Do not create a report, plan, wiki candidate, or memory entry.
+3. Recommend one option and return inline. Do not create a report or plan.
 
 ## Deep Workflow
 
@@ -66,7 +66,7 @@ calls and no state. See `references/advice-checkpoints.md`.
 2. If 3+ independently shippable concerns are bundled, ask to choose one. Use a compact scout summary only when current codebase touchpoints change the decision.
 3. Load one technique from `references/techniques/`; generate 3-8 technical approaches without scoring while generating.
 4. Run one anti-bias pivot, then the challenge pass in `references/challenge-pass.md` before recommending.
-5. Load scoring only for deep scoring. Write a report, HTML output, or handoff only when requested or needed by an active plan. For a requested report, an optional `mewkit wiki handoff suggest` follows `.claude/skills/wiki/references/terminal-handoff-advisory.md`; it is fail-open and never runs for quick.
+5. Load scoring only for deep scoring. Write a report, HTML output, or handoff only when requested or needed by an active plan.
 
 ## References
 

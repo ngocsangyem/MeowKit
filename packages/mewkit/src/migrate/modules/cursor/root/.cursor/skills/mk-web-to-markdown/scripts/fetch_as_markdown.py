@@ -16,7 +16,7 @@ Security layers (delegated to sub-modules):
     Layer 5  — injection_detect.scan() on cleaned markdown before persist
     Layer 6  — HARD_STOP on injection hit → quarantine + security-log + INJECTION_STOP
     Layer 7  — secret_scrub inside persist_fetch (pre-write)
-    Layer 8  — injection-audit.py post-write scan inside persist_fetch
+    Layer 8  — post-write re-scan through injection-audit.cjs inside persist_fetch
     Layer 1.5 — Playwright scheme reject (file://, chrome://, about:)
     Layer 1.6 — Three-gate JS: playwright importable + MEOWKIT_WEB_FETCH_JS=1 + js=True
 

@@ -61,11 +61,11 @@ The chosen density and its source are logged in the run report's "Density Decisi
 
 Per the "dead-weight thesis," every model upgrade is an opportunity to test whether existing scaffolding is still load-bearing. When a new model tier rolls out (Sonnet 4.6, Opus 4.7, Haiku 5.x):
 
-1. Re-run the calibration set (Phase 8 — `mk:benchmark`) with the new model on FULL density
+1. Re-run the calibration set (Phase 8 — `mk:benchmark`, available only in this repository) with the new model on FULL density
 2. Re-run the same set on LEAN density
 3. If LEAN performance matches FULL within 5%, downgrade the tier's matrix entry from FULL to LEAN
 4. If LEAN performance exceeds FULL (faster, cheaper, equivalent quality), upgrade aggressively
-5. Log the decision (component, model tier, density choice, measured delta, audit date) in the dead-weight audit registry per `.claude/rules/dead-weight-audit-rules.md` Rule 6
+5. Log the decision (component, model tier, density choice, measured delta, audit date) in the dead-weight audit registry per `.claude/skills/benchmark/references/dead-weight-audit-rules.md` Rule 6 (this repository only)
 
 The matrix is **not** static. It encodes the current best understanding of "where does scaffolding stop helping and start hurting?" — and that boundary moves with model capability.
 
@@ -80,8 +80,8 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 
 ## See Also
 
-- `.claude/rules/dead-weight-audit-rules.md` — audit cadence, measurement, thresholds, never-prune list
-- `.claude/rules/harness-rules.md` Rule 7 — when the dead-weight audit must be re-run
+- `.claude/skills/benchmark/references/dead-weight-audit-rules.md` — audit cadence, measurement, thresholds, never-prune list (this repository only)
+- `.claude/skills/cook/references/harness-rules.md` Rule 7 — when the dead-weight audit must be re-run
 - `.claude/skills/scale-routing/SKILL.md` Output Schema v2.1 — `autobuild_density` field
-- `.claude/skills/benchmark/` — calibration replay automation
+- `.claude/skills/benchmark/` — calibration replay automation (this repository only; an installed kit does not carry it)
 - Anthropic harness design article (Prithvi Rajasekaran, Labs) <!-- research-citation -->

@@ -76,9 +76,9 @@ Agents own distinct artifact classes to avoid write conflicts.
 `tasks/plans/`|planner
 `tasks/reviews/`|reviewer
 `docs/`|documenter
-`.claude/memory/`|analyst, documenter
+`.meowkit/memory/`|write-set skills and agents (via `npx mewkit note`)
 ```
 
 ## Routing updates for new agents
 
-When a new reusable agent lands, update the routing surfaces listed in `RELEASING.md` step 1b: `.claude/agents/AGENTS_INDEX.md`, `.claude/rules/agent-routing.md`, lifecycle routing, the docs sidebar (`packages/docs/content/docs/reference/meta.json`), and the matching reference page.
+When a new reusable agent lands, update the routing surfaces listed in `RELEASING.md` step 1b: `.claude/agents/AGENTS_INDEX.md`, `.claude/skills/agent-detector/references/agent-routing.md`, lifecycle routing, the docs sidebar (`packages/docs/content/docs/reference/meta.json`), and the matching reference page.

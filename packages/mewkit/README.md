@@ -27,7 +27,6 @@ npx mewkit <command>             # runtime commands (see below)
 | `mewkit capabilities` | Resolve installed skills/commands for an intent: `list`, `explain`, `resolve`, `projections` |
 | `mewkit visual-plan` | Structured visual plan: validate / approve / edit / view + feedback loop |
 | `mewkit task` | `new` / `list` — structured task files |
-| `mewkit status` | Print version, channel, and config |
 
 ## Init & targets
 

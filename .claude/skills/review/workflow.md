@@ -2,11 +2,17 @@
 
 Scope-aware parallel review with adversarial persona passes, forced-finding, and triage.
 
+## Step-File Contract
+
+- One step at a time — NEVER load multiple step files at once.
+- Read the ENTIRE step file before executing any instruction in it.
+- Complete the current step before reading the next — NEVER skip steps or optimize the sequence.
+- Follow the step's instructions exactly — do not improvise, add steps, or deviate.
+- Persist intermediate state the next step needs: frontmatter variables, or `.meowkit/state/{skill}-progress.json` when it must survive a context reset.
+- A step file that chains to `references/*.md` opens with a `## Contents` ToC, so a partial read lands on navigation.
+
 ## Rules
 
-- NEVER load multiple step files simultaneously
-- ALWAYS read entire step file before execution
-- NEVER skip steps or optimize the sequence
 - ALWAYS halt at triage and wait for human input on FAIL findings
 
 ## Steps

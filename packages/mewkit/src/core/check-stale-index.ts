@@ -12,9 +12,7 @@ import type { CheckResult } from "../commands/validate.js";
 interface ActualCounts {
 	skills: InventoryEntry[];
 	agents: InventoryEntry[];
-	commands: InventoryEntry[];
 	rules: InventoryEntry[]; // rules/
-	rulesConditional: InventoryEntry[]; // rules-conditional/
 	hooks: InventoryEntry[];
 }
 
@@ -25,9 +23,7 @@ function actualCounts(claudeDir: string): ActualCounts {
 	return {
 		skills: byType("skill"),
 		agents: byType("agent"),
-		commands: byType("command"),
 		rules: rules.filter((e) => e.path.startsWith("rules/")),
-		rulesConditional: rules.filter((e) => e.path.startsWith("rules-conditional/")),
 		hooks: byType("hook"),
 	};
 }
@@ -68,7 +64,6 @@ export function countSpecs(repoRoot: string): CountSpec[] {
 	return [
 		{ source: "README.md", label: "skills", pattern: /(\d+)\s+skills/g, actual: a.skills.length },
 		{ source: "README.md", label: "agents", pattern: /(\d+)\s+(?:specialist\s+)?agents/g, actual: a.agents.length },
-		{ source: "README.md", label: "commands", pattern: /(\d+)\s+(?:slash\s+)?commands/g, actual: a.commands.length },
 		{ source: "README.md", label: "rules", pattern: /(\d+)\s+(?:enforcement\s+)?rules/g, actual: a.rules.length },
 		{ source: "README.md", label: "hook scripts", pattern: /(\d+)\s+hook scripts/g, actual: a.hooks.length },
 		{
@@ -85,8 +80,11 @@ export function countSpecs(repoRoot: string): CountSpec[] {
 		},
 		{
 			source: ".claude/hooks/HOOKS_INDEX.md",
-			label: "shell hooks",
-			pattern: /(\d+)\s+shell hook/g,
+			// "shell hooks" until the runtime became node, at which point the token
+			// stopped existing and the check reported "token not found" forever. The
+			// label has to describe the hooks that are actually shipped.
+			label: "node hooks",
+			pattern: /(\d+)\s+node hook/g,
 			actual: a.hooks.length,
 		},
 		// docs/core/meowkit-architecture.md — the UNDATED overview prose only. The dated

@@ -1,0 +1,23 @@
+{
+  "name": "privacy-bash-webfetch-loopback",
+  "group": "privacy",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/privacy-block.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"python3 scripts/fetch_as_markdown.py http://localhost:8080/admin\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "privacy-bash-webfetch-loopback",
+  "setupDescription": "a Bash web-fetch invocation aimed at a loopback address",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@PRIVACY_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@PRIVACY_BLOCK@@\nWeb fetch target 'localhost' is a private/loopback/metadata address.\nSSRF risk. Use AskUserQuestion for explicit user approval before proceeding.\n"
+  }
+}

@@ -6,8 +6,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { z } from "zod";
-import { collectFiles, hashFile, classifyLayer, readManifest } from "./compute-checksums.js";
-import type { Manifest } from "./compute-checksums.js";
+import { collectFiles, hashFile, classifyLayer } from "./compute-checksums.js";
 import { resolveMetadataPath } from "../state/resolve-metadata-path.js";
 
 export const INSTALL_METADATA_FILENAME = "metadata.json";
@@ -24,6 +23,34 @@ export const InstallFileEntrySchema = z.object({
 });
 export type InstallFileEntry = z.infer<typeof InstallFileEntrySchema>;
 
+/**
+ * How the installed content arrived. A CLOSED set, so an unexpected value is a
+ * validation error rather than a free string nothing can assert against —
+ * "verified-artifact" has to mean the signature and digests were checked, and an
+ * open string would let any writer claim it.
+ */
+export const INSTALL_ORIGINS = ["verified-artifact", "release-zip", "local-release-dir", "local-cache"] as const;
+export type InstallOrigin = (typeof INSTALL_ORIGINS)[number];
+
+/**
+ * What produced this install, beside what it produced.
+ *
+ * Added as its own object rather than by renaming the fields already here:
+ * `version` IS the kit version and every reader depends on it, so renaming it
+ * would break them all to say the same thing in a different word, and `scope`
+ * stays exactly where it is for the same reason. Absent on anything installed
+ * before this record existed, which reads back as unknown rather than as an
+ * error or an invented value.
+ */
+export const InstallProvenanceSchema = z.object({
+	kitVersion: z.string(),
+	cliVersion: z.string(),
+	target: z.enum(["claude-code", "codex", "cursor"]),
+	delivery: z.enum(["native", "plugin"]),
+	origin: z.enum(INSTALL_ORIGINS),
+});
+export type InstallProvenance = z.infer<typeof InstallProvenanceSchema>;
+
 export const InstallMetadataSchema = z.object({
 	schemaVersion: z.literal("1.0"),
 	tool: z.string().default("meowkit"),
@@ -39,10 +66,12 @@ export const InstallMetadataSchema = z.object({
 	 * auto-adopt new packs on upgrade" sentinel — never a frozen all-packs list.
 	 */
 	packs: z.array(z.string()).optional(),
+	/** What produced this install. Absent on installs predating the record. */
+	provenance: InstallProvenanceSchema.optional(),
 });
 export type InstallMetadata = z.infer<typeof InstallMetadataSchema>;
 
-export type MetadataSource = "new" | "legacy-manifest" | "legacy-metadata" | "none";
+export type MetadataSource = "new" | "legacy-metadata" | "none";
 export interface ReadInstallMetadataResult {
 	source: MetadataSource;
 	meta: InstallMetadata | null;
@@ -65,15 +94,12 @@ export function indexByPath(entries: InstallFileEntry[]): Record<string, Install
 
 /**
  * Read installed metadata with explicit source precedence:
- *   new (schemaVersion) > legacy checksum manifest > version-only metadata > none.
- * The legacy-manifest branch never trusts `Manifest.version` (hardcoded upstream);
- * it sources the version from a sibling version-only metadata.json when present.
+ *   new (schemaVersion) > version-only metadata > none.
  * Throws CorruptInstallMetadataError when a schemaVersion-bearing file fails Zod.
  *
- * Still takes the provider directory, because the legacy-manifest recovery branch reads
- * `.claude/` and callers may point it at a migration source rather than the live project. The
- * canonical metadata resolves from that directory's parent, so a pre-move install keeps its
- * baseline and a migrated one stops reading the old file.
+ * Still takes the provider directory, because callers may point it at a migration
+ * source rather than at the live project; the canonical metadata resolves from
+ * that directory's parent.
  */
 export function readInstallMetadata(claudeDir: string): ReadInstallMetadataResult {
 	const metadataPath = resolveMetadataPath(dirname(claudeDir));
@@ -97,11 +123,6 @@ export function readInstallMetadata(claudeDir: string): ReadInstallMetadataResul
 		}
 	}
 
-	const legacyManifest = readManifest(claudeDir);
-	if (legacyManifest !== null) {
-		return { source: "legacy-manifest", meta: mapLegacyManifest(legacyManifest, legacyMetadataVersion) };
-	}
-
 	if (legacyMetadataVersion !== null) {
 		return {
 			source: "legacy-metadata",
@@ -116,43 +137,6 @@ export function readInstallMetadata(claudeDir: string): ReadInstallMetadataResul
 	}
 
 	return { source: "none", meta: null };
-}
-
-/**
- * Read ONLY the legacy `meowkit.manifest.json` as canonical-shaped metadata,
- * or null when absent. Used as a recovery path when the canonical metadata.json
- * is present but corrupt, so user-edit protection still has a prior baseline.
- */
-export function readLegacyManifestMetadata(claudeDir: string): InstallMetadata | null {
-	const manifest = readManifest(claudeDir);
-	return manifest === null ? null : mapLegacyManifest(manifest, null);
-}
-
-/**
- * Project a legacy `meowkit.manifest.json` onto the canonical shape. The legacy
- * `sha256` maps to BOTH `checksum` and `baseChecksum` so the user-edit comparison
- * stays equivalent. Version comes from a sibling version-only metadata.json or "".
- */
-function mapLegacyManifest(manifest: Manifest, legacyVersion: string | null): InstallMetadata {
-	const files: InstallFileEntry[] = [];
-	for (const [path, entry] of Object.entries(manifest.checksums)) {
-		files.push({
-			path,
-			owner: entry.owner ?? (entry.layer === "user" ? "user" : "meowkit"),
-			layer: entry.layer,
-			checksum: entry.sha256,
-			baseChecksum: entry.baseChecksum ?? entry.sha256,
-			installedVersion: entry.installedVersion,
-			installedAt: entry.installedAt,
-		});
-	}
-	return {
-		schemaVersion: "1.0",
-		tool: "meowkit",
-		version: legacyVersion ?? "",
-		installedAt: manifest.generatedAt,
-		files,
-	};
 }
 
 export interface BuildInstallMetadataOptions {
@@ -178,6 +162,8 @@ export interface BuildInstallMetadataOptions {
 	profile?: string;
 	/** Resolved pack list for a partial install; omit for full/legacy (sentinel). */
 	packs?: string[];
+	/** What produced this install; omit when the caller cannot establish it. */
+	provenance?: InstallProvenance;
 }
 
 /**
@@ -269,5 +255,6 @@ export function buildInstallMetadata(claudeDir: string, opts: BuildInstallMetada
 	if (opts.mergedSettings && opts.mergedSettings.length > 0) meta.settings = { merged: opts.mergedSettings };
 	if (opts.profile) meta.profile = opts.profile;
 	if (opts.packs) meta.packs = opts.packs;
+	if (opts.provenance) meta.provenance = opts.provenance;
 	return meta;
 }

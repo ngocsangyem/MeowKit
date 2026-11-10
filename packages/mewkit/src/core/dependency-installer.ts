@@ -1,11 +1,19 @@
-/** Dependency installer — venv creation, pip install, package verification */
+/**
+ * Dependency installer — environment creation, pip install, package verification.
+ *
+ * Every function here takes the environment DIRECTORY it should act on, rather
+ * than deriving one shared path from the project root. That is the whole shape
+ * of the change: there is no single environment to derive, so a caller that
+ * cannot name which skill it is installing for cannot install at all.
+ */
 
-import { existsSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { existsSync, mkdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { execFileSync, spawn } from "node:child_process";
 import pc from "picocolors";
 import type { SkillsDependency } from "./skills-dependencies.js";
 import { validatePackageName, getBasePackageName } from "./skills-dependencies.js";
+import { ENVS_REL, envPipPath, envPythonPath } from "./skill-env.js";
 
 export interface InstallResult {
 	name: string;
@@ -18,14 +26,19 @@ export interface PackageVerification {
 	installed: boolean;
 }
 
-const VENV_RELATIVE = join(".claude", "skills", ".venv");
 const PIP_TIMEOUT_MS = 120_000;
 
-/** Validate a path stays inside the .claude directory */
-function validateInsideClaude(projectDir: string, targetPath: string): void {
-	const claudeDir = resolve(projectDir, ".claude");
-	if (!resolve(targetPath).startsWith(claudeDir)) {
-		throw new Error(`Path escapes .claude directory: ${targetPath}`);
+/**
+ * An environment path must stay inside `.meowkit/envs/`.
+ *
+ * The guard is on the directory an install writes into, because that is the
+ * value a caller could get wrong — a skill name arriving from a command line
+ * must not be able to aim pip at the project tree.
+ */
+export function validateEnvPath(projectDir: string, targetPath: string): void {
+	const envsRoot = resolve(projectDir, ENVS_REL);
+	if (!resolve(targetPath).startsWith(envsRoot)) {
+		throw new Error(`Path escapes ${ENVS_REL}: ${targetPath}`);
 	}
 }
 
@@ -52,35 +65,29 @@ export function findPython(): string | null {
 	return null;
 }
 
-/** Get platform-correct pip binary path inside the venv */
-export function getPipPath(projectDir: string): string {
-	const venvDir = join(projectDir, VENV_RELATIVE);
-	const pipPath = process.platform === "win32" ? join(venvDir, "Scripts", "pip.exe") : join(venvDir, "bin", "pip");
-	validateInsideClaude(projectDir, pipPath);
-	return pipPath;
-}
-
-/** Get platform-correct python binary path inside the venv */
-export function getVenvPythonPath(projectDir: string): string {
-	const venvDir = join(projectDir, VENV_RELATIVE);
-	const pythonPath =
-		process.platform === "win32" ? join(venvDir, "Scripts", "python.exe") : join(venvDir, "bin", "python3");
-	validateInsideClaude(projectDir, pythonPath);
-	return pythonPath;
-}
-
-/** Ensure the skills venv exists. Creates it if missing. */
-export function ensureVenv(projectDir: string): { venvDir: string; created: boolean } {
-	const venvDir = join(projectDir, VENV_RELATIVE);
-	validateInsideClaude(projectDir, venvDir);
-	if (existsSync(venvDir)) return { venvDir, created: false };
+/**
+ * Ensure one environment exists and holds an interpreter.
+ *
+ * "Repair" and "create" are the same operation on purpose. An environment whose
+ * directory survived but whose interpreter did not is the common real failure
+ * (a pruned cache, an upgraded system Python), and it is indistinguishable from
+ * absent to every caller, so it is treated as absent here too.
+ */
+export function ensureEnv(
+	projectDir: string,
+	envDir: string,
+): { envDir: string; created: boolean; repaired: boolean } {
+	validateEnvPath(projectDir, envDir);
+	const existedBefore = existsSync(envDir);
+	if (existedBefore && existsSync(envPythonPath(envDir))) return { envDir, created: false, repaired: false };
 
 	const python = findPython();
-	if (!python) throw new Error("python3 not found in PATH. Install Python 3.9+ first.");
+	if (!python) throw new Error("No Python interpreter found in PATH.");
 
-	console.log(pc.dim("  Creating Python venv..."));
-	execFileSync(python, ["-m", "venv", venvDir], { stdio: "pipe" });
-	return { venvDir, created: true };
+	mkdirSync(dirname(envDir), { recursive: true });
+	console.log(pc.dim(existedBefore ? "  Repairing environment..." : "  Creating environment..."));
+	execFileSync(python, ["-m", "venv", envDir], { stdio: "pipe" });
+	return { envDir, created: !existedBefore, repaired: existedBefore };
 }
 
 /** Install a single pip package with timeout */
@@ -117,13 +124,15 @@ function installOnePackage(pipPath: string, packageName: string): Promise<Instal
 	});
 }
 
-/** Install pip packages sequentially into the venv */
+/** Install pip packages sequentially into one environment */
 export async function installPipPackages(
 	projectDir: string,
+	envDir: string,
 	packages: readonly SkillsDependency[],
 ): Promise<InstallResult[]> {
-	const pipPath = getPipPath(projectDir);
-	if (!existsSync(pipPath)) throw new Error(`pip not found at ${pipPath}. Run 'mewkit setup --only=venv' first.`);
+	validateEnvPath(projectDir, envDir);
+	const pipPath = envPipPath(envDir);
+	if (!existsSync(pipPath)) throw new Error(`pip not found at ${pipPath}.`);
 
 	const results: InstallResult[] = [];
 	for (const pkg of packages) {
@@ -142,11 +151,11 @@ const IMPORT_NAME_MAP: Record<string, string> = {
 	"google-genai": "google.genai",
 };
 
-/** Verify which packages are installed in the venv */
-export function verifyPackages(projectDir: string, packages: readonly SkillsDependency[]): PackageVerification[] {
-	const pythonPath = getVenvPythonPath(projectDir);
+/** Verify which packages are installed in one environment */
+export function verifyPackages(envDir: string, packages: readonly SkillsDependency[]): PackageVerification[] {
+	const pythonPath = envPythonPath(envDir);
 	if (!existsSync(pythonPath)) return packages.map((p) => ({ name: p.name, installed: false }));
-	const pipPath = getPipPath(projectDir);
+	const pipPath = envPipPath(envDir);
 
 	return packages.map((pkg) => {
 		const basePkgName = getBasePackageName(pkg.name);

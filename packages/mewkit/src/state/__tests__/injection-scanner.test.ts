@@ -3,9 +3,6 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { validateContent, scrubSecrets, normalizeForScan, INJECTION_PATTERNS } from "../injection-scanner.js";
-// The wiki re-export must resolve to the SAME canonical source (single truth,
-// no third copy). Importing from the old path exercises the re-export.
-import { validateContent as wikiValidate } from "../../wiki/infrastructure/scan-patterns.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(here, "..", ".."); // packages/mewkit/src
@@ -29,10 +26,6 @@ describe("injection-scanner (relocated canonical scanner)", () => {
 		expect(normalizeForScan("a​b")).toBe("ab");
 		expect(INJECTION_PATTERNS.length).toBeGreaterThan(8);
 	});
-
-	it("wiki scan-patterns re-exports the same canonical validateContent", () => {
-		expect(wikiValidate).toBe(validateContent);
-	});
 });
 
 describe("no dynamic require of project-controlled hook files", () => {
@@ -47,6 +40,28 @@ describe("no dynamic require of project-controlled hook files", () => {
 		}
 		return out;
 	}
+
+	it("still redacts a real email address", () => {
+		expect(scrubSecrets("contact ada@example.com today")).toContain("[REDACTED-EMAIL]");
+		expect(scrubSecrets("ops@sub.department.example.co.uk")).toContain("[REDACTED-EMAIL]");
+	});
+
+	it("the email pattern is BOUNDED — a long non-matching run does not backtrack quadratically", () => {
+		// Every quantifier in the email pattern used to be open-ended, so a pasted stack trace or
+		// minified blob backtracked O(n^2): 64KB took 7.4s and 480KB extrapolated to ~7 minutes —
+		// on a blocking per-PR lint step, and inside the trace write lock. RFC 5321 bounds a
+		// local part to 64 octets and a label to 63, so bounding costs no real-world match.
+		const timeFor = (bytes: number): number => {
+			const line = `${"a".repeat(bytes)}@`;
+			const started = Date.now();
+			scrubSecrets(line);
+			return Date.now() - started;
+		};
+		timeFor(1024); // warm up, so JIT noise does not land in the measured run
+		expect(timeFor(64 * 1024)).toBeLessThan(1000);
+		// Quadratic growth would be ~4x per doubling; bounded growth is roughly linear.
+		expect(timeFor(128 * 1024)).toBeLessThan(2000);
+	});
 
 	it("src/state and src/memory contain zero require() of validate-content.cjs", () => {
 		const files = [...tsFiles(join(srcRoot, "state")), ...tsFiles(join(srcRoot, "memory"))];

@@ -1,6 +1,6 @@
 ---
 name: mk:worktree
-description: Manages git worktrees for parallel agent isolation. Creates isolated worktrees for parallel agents on parallel/{name}-{timestamp} branches, merges results with conflict detection, prunes stale metadata, and reports health status. NOT for user-initiated feature branches — use git worktree directly for that.
+description: 'Full git worktree lifecycle for agent isolation: create, merge with conflict detection, prune. NOT for mk:team-config.'
 argument-hint: '[create|merge|cleanup|list|status|prune] [agent-name]'
 source: local
 keywords:
@@ -14,7 +14,7 @@ keywords:
   - worktree-cleanup
   - worktree-status
   - worktree-health
-when_to_use: 'Auto-invoked when orchestrator decomposes COMPLEX tasks into parallel subtasks per parallel-execution-rules.md. Manages the full worktree lifecycle: create before agents start, merge + integration-test after agents complete, cleanup after merge. NOT for user-initiated feature branches (use git worktree directly). NOT invoked directly by users.'
+when_to_use: Parallel agents need isolated branches, or their results must be merged back.
 user-invocable: false
 owner: git
 criticality: medium
@@ -51,7 +51,7 @@ echo '.worktrees/' >> .gitignore
 ```
 
 The script places the worktree at `.worktrees/{agent-name}` on branch
-`parallel/{agent-name}-{timestamp}` per `parallel-execution-rules.md` Rule 3.
+`parallel/{agent-name}-{timestamp}` per `.claude/skills/cook/references/parallel-execution-rules.md` Rule 3.
 
 ### merge
 
@@ -64,13 +64,13 @@ git merge --no-ff {branch} -m "merge: parallel/{agent-name} into {feature-branch
 On conflict: list conflicting files, STOP, report to orchestrator. Do NOT auto-resolve —
 human or lead agent decides.
 
-On success: run the full test suite (parallel-execution-rules.md Rule 5). After integration
+On success: run the full test suite (.claude/skills/cook/references/parallel-execution-rules.md Rule 5). After integration
 test passes, delegate to `project-manager` (background):
 
 ```
 "Generate delivery status for plan at {plan-dir}. Write report to
 {plan-dir}/status-reports/{YYMMDD}-status.md (create subdir if absent).
-Load template from tasks/templates/pm-status-template.md.
+Load template from .claude/skills/status/assets/pm-status-template.md.
 Run in the background — do not block the caller."
 ```
 
@@ -158,7 +158,7 @@ node .claude/skills/worktree/scripts/worktree.cjs review-pr-cleanup --sweep --dr
   and report to orchestrator, never auto-resolve
 - `mk:task-queue` ownership must be released before worktree cleanup, or the next agent
   cannot claim that task
-- Max 3 active worktrees at any time (parallel-execution-rules.md Rule 2) — `status`
+- Max 3 active worktrees at any time (.claude/skills/cook/references/parallel-execution-rules.md Rule 2) — `status`
   command shows current count
 - On macOS, paths with `:` in skill names need quoting in shell commands
 

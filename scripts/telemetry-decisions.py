@@ -3,7 +3,7 @@
 apply documented gate thresholds, and emit ship/reject recommendations.
 
 Reads:
-  .claude/hooks/.logs/hook-log.jsonl   (hook-fire telemetry)
+  .meowkit/telemetry/hook-log.jsonl   (hook-fire telemetry)
   .claude/memory/trace-log.jsonl       (harness/build telemetry)
 
 Time window: default last 14 days; override with --days N.
@@ -173,7 +173,7 @@ def main() -> int:
         return 2
 
     cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=args.days)
-    hook_log = args.root / ".claude/hooks/.logs/hook-log.jsonl"
+    hook_log = args.root / ".meowkit/telemetry/hook-log.jsonl"
     trace_log = args.root / ".claude/memory/trace-log.jsonl"
 
     hook_rows = filter_window(load_jsonl(hook_log), cutoff)

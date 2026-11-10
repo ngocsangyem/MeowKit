@@ -18,7 +18,7 @@ Optional: API Changes, Migration Notes, Solution Options
 - Gate 2: Review approved before shipping
 
 ## TDD Enforcement
-Phase 2 is **OPT-IN.** With `--tdd` / `MEOWKIT_TDD=1`, the `pre-implement.sh` hook blocks code without failing tests (mandatory red phase). In default mode (TDD off), the hook is a no-op and the developer implements directly per the approved plan.
+Phase 2 is **OPT-IN.** With `--tdd` / `MEOWKIT_TDD=1`, the `pre-implement.cjs` hook blocks code without failing tests (mandatory red phase). In default mode (TDD off), the hook is a no-op and the developer implements directly per the approved plan.
 
 ## Context Reminder (MANDATORY)
 

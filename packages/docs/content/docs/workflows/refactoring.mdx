@@ -31,7 +31,7 @@ The [mk:scout](/reference/skills/scout) skill spawns parallel Explore agents to 
 ### Step 2: Plan the refactor
 
 ```
-/mk:plan refactor payment module — extract service layer from controllers
+/mk:plan-creator refactor payment module — extract service layer from controllers
 ```
 
 The **planner** creates a plan. For refactoring, the plan focuses on:
@@ -80,7 +80,7 @@ The **reviewer** pays special attention to:
 | Breaking existing behavior | TDD: tests must pass before AND after |
 | Scope creep | Plan defines what changes and what doesn't |
 | Unreviewed pattern changes | Architect reviews new patterns, creates ADR |
-| Accidental security regression | `post-write.sh` scans every file write |
+| Accidental security regression | `post-write.cjs` scans every file write |
 
 ## Next workflow
 

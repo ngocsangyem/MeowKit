@@ -1,0 +1,23 @@
+{
+  "name": "gate1-plan-without-receipt",
+  "group": "gate1",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/gate-enforcement.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"src/app.ts\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "gate1-plan-without-receipt",
+  "setupDescription": "one plan file, never stamped (approval-receipt verify -> 10)",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@GATE_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nPlan 'tasks/plans/261101-corpus-demo/plan.md' has no approval receipt.\nGate 1 requires a human-approved plan before source edits (anti-accidental).\nAfter the human approves, stamp it: mewkit plan approve tasks/plans/261101-corpus-demo/plan.md\nOverride (explicit downgrade): MEOWKIT_GATE1_PRESENCE_ONLY=1\n"
+  }
+}

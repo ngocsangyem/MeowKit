@@ -40,7 +40,9 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 PROJECT_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]+$")
@@ -143,14 +145,39 @@ def _check_injection(record: dict, patterns: tuple[str, ...], project_root: Path
 
 
 def _fire_injection_audit(project_root: Path, record: dict, field: str, pattern: str) -> None:
-    auditor = project_root / ".cursor/scripts/injection-audit.py"
+    """
+    Record a matched injection pattern in the audit trail, so the refusal stays
+    reviewable after the fact instead of scrolling past once.
+
+    The matched text goes to the scanner as a temp file (the scanner answers
+    about files; this text is a record field that was never written to one) and
+    is removed immediately, because it is the payload. Best-effort throughout:
+    an absent, slow or broken scanner must not crash a gate that has already
+    decided to refuse.
+    """
+    auditor = project_root / ".cursor/scripts/injection-audit.cjs"
     if not auditor.exists():
         return
+
+    handle, tmp_path = tempfile.mkstemp(prefix="story-field-", suffix=".md")
     try:
-        os.execv  # noqa: F401 -- presence check only; real subprocess invocation kept out of hot path
-    except AttributeError:
-        return
-    # Defer to the auditor only if explicitly present; do not crash the gate on auditor failure.
+        with os.fdopen(handle, "w", encoding="utf-8") as fh:
+            fh.write(f"story {record.get('id')} {field} matched {pattern}\n")
+        subprocess.run(
+            ["node", str(auditor), "--file", tmp_path],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            cwd=str(project_root),
+            check=False,
+        )
+    except (OSError, ValueError, subprocess.SubprocessError):
+        pass
+    finally:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
 
 
 def _check_length(record: dict) -> dict | None:

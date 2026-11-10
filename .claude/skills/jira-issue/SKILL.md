@@ -1,6 +1,6 @@
 ---
 name: mk:jira-issue
-description: 'JIRA issue CRUD via the jira-as wrapper. Triggers: ''create bug/task/story'', ''show me PROJ-123'', ''get/view/look up issue'', ''update PROJ-123'', ''delete PROJ-123''. NOT for transitions (mk:jira-lifecycle); NOT for comments/attachments (mk:jira-collaborate); NOT for bulk ops (mk:jira-bulk); NOT for issue links (mk:jira-relationships); NOT for time logging (mk:jira-time); NOT for sprint/epic (mk:jira-agile).'
+description: 'mk:jira leaf. Single-issue CRUD - create, read, update fields, delete. NOT for mk:jira-bulk.'
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - get-issue
   - update-issue
   - delete-issue
-when_to_use: Use to create / read / update / delete a single Jira issue. NOT for state transitions (use mk:jira-lifecycle).
+when_to_use: 'One Jira issue by key - open it, edit its fields, or delete it.'
 user-invocable: true
 context: fork
 agent: jira-issue

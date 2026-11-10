@@ -1,6 +1,6 @@
 ---
 name: jira-dev
-description: 'Generate developer artifacts from JIRA tickets via the jira-as CLI wrapper: branch names, PR descriptions, parsed commits, commit/PR-to-issue links. Routed by mk:jira-dev skill. NOT for executing git/gh commands (mk:ship); NOT for issue CRUD (jira-issue).'
+description: 'mk:jira executor for mk:jira-dev. Branch names, PR bodies, commit links.'
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default

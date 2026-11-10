@@ -40,7 +40,7 @@ For each image / PDF / screenshot:
 
 1. `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment download <KEY> --attachment-id <ID> --output /tmp/jira-attach-<ID>.<ext>`
 2. `Read("/tmp/jira-attach-<ID>.<ext>")` → multimodal vision analysis
-3. Optional Gemini enhancement: `.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/gemini_analyze.py <path>` (requires `MEOWKIT_GEMINI_API_KEY`)
+3. Optional Gemini enhancement: `node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py <path>` (requires `MEOWKIT_GEMINI_API_KEY`)
 4. Cleanup `/tmp/...`
 
 Attachment limit: if >5 media items, analyze the 5 most recently added.

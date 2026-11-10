@@ -70,19 +70,22 @@ const CLAUDE_CODE_LIFECYCLE: LifecycleMap = {
 		status: "supported",
 		gate: false,
 		evidence:
-			"UserPromptSubmit block is a documented host capability, but no shipped hook blocks there (handlers are inject/capture only) — no in-repo proof",
+			"UserPromptSubmit block is a documented host capability, but no shipped hook blocks there (handlers are inject-only) — no in-repo proof",
 	},
 	stop: {
 		status: "supported",
 		gate: true,
 		evidence: "Stop hook can block the stop (pre-completion-check security-BLOCK, exit 2)",
-		proof: ".claude/hooks/__tests__/test-pre-completion-check.sh",
+		proof: "tests/hooks/completion-gate.test.ts",
 	},
 	pre_compaction: { status: "supported", gate: false, evidence: "PreCompact hook in shipped settings.json (observe)" },
+	// `status: "supported"` describes the HOST, not this kit: the shipped SubagentStart registration
+	// is an empty array, so the evidence cites host documentation rather than an in-repo hook.
 	subagent_start: {
 		status: "supported",
 		gate: false,
-		evidence: "SubagentStart hook in shipped settings.json (observe)",
+		evidence:
+			"Host capability, documented in the Claude Code hooks reference (retrieved 2026-11-09): fires once per subagent spawn/resume, cannot block, context-injection only. This kit registers NO handler — settings.json's SubagentStart array is deliberately empty — so there is no in-repo proof and none is claimed",
 	},
 	subagent_stop: { status: "supported", gate: false, evidence: "SubagentStop hook in shipped settings.json (observe)" },
 };

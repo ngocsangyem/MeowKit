@@ -103,7 +103,7 @@ Machine-readable handoff for downstream skills:
 ## Resume / Progress State
 
 ```
-session-state/mk-loop-progress.json
+.meowkit/state/mk-loop-progress.json
 ```
 
 Holds resumable state and the concurrent-run lock:

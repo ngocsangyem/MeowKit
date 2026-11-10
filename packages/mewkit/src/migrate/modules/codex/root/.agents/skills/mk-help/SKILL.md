@@ -18,7 +18,7 @@ actionable hit" behavior would have returned (back-compat); ranks 2–3 are alte
 one-line rationale. This skill is read-only: it reads state, never writes it.
 
 ### 1. Paused Step-File Workflows
-Check `session-state/*-progress.json` for any in-progress step-file workflow.
+Check `.meowkit/state/*-progress.json` for any in-progress step-file workflow.
 - Found → "Resume [skill] at step [N]. Run `/mk:[skill]` to continue."
 
 ### 2. In-Progress Plans
@@ -43,19 +43,19 @@ No plans, no reviews, no changes.
 
 ## Additional Scan Sources (read after sources 1–5)
 
-ALL four may be absent at rest (e.g. `session-state/checkpoints/` does not exist until
+ALL four may be absent at rest (e.g. `.meowkit/state/checkpoints/` does not exist until
 runtime). Absent file → skip silently; note the skip only under `--verbose`. Never error
 on a missing source.
 
 | # | Source | Fields to read | Absent-case |
 |---|--------|----------------|-------------|
-| 6 | `session-state/checkpoints/checkpoint-latest.json` | `state.model_tier`, `progress.plan_path`, `environment.{git_branch,working_dir_clean,uncommitted_changes}`, `budget.{estimated_spent_usd,turn_count}`, `created_at` | skip; no checkpoint context |
-| 7 | `session-state/budget-state.json` | `estimated_cost_usd`, `turn_count`, `warnings_emitted` (advisory only) | skip; no budget caution |
-| 8 | `session-state/detected-model.json` | `tier` (authoritative current-session tier) | skip; tier unknown |
+| 6 | `.meowkit/state/checkpoints/checkpoint-latest.json` | `state.model_tier`, `progress.plan_path`, `environment.{git_branch,working_dir_clean,uncommitted_changes}`, `budget.{estimated_spent_usd,turn_count}`, `created_at` | skip; no checkpoint context |
+| 7 | `.meowkit/state/budget-state.json` | `estimated_cost_usd`, `turn_count`, `warnings_emitted` (advisory only) | skip; no budget caution |
+| 8 | `.meowkit/state/detected-model.json` | `tier` (authoritative current-session tier) | skip; tier unknown |
 | 9 | `tasks/reviews/<slug>-verdict.json` | `decision`, `dimensions[].verdict`, `created_at`; `.md` is prose fallback | use git/plan scan only |
 | 10 | `docs/development-roadmap.md` (when present; Type-1 allowlisted) | current phase / milestone progress | skip; tag `(CF-C5)` if relied on |
 
-**Model tier:** source the current tier from `session-state/detected-model.json` (written
+**Model tier:** source the current tier from `.meowkit/state/detected-model.json` (written
 fresh at SessionStart). Do NOT source `model_tier` from `budget-state.json` — it has no
 `created_at`/session marker and may carry a prior session's tier. Treat budget figures as
 advisory unless a current-session signal corroborates them.
@@ -84,7 +84,7 @@ For skill suggestions based on task type, see `mk:agent-detector` (its `../agent
 
 ## State-to-Recommendation Map
 
-> Alias: `the plan skill` routes to `mk:plan-creator` (slash-command wrapper at `.codex/commands/mk/plan.md`). Subcommands `red-team`, `validate`, `archive` are handled by the same skill.
+> `mk:plan-creator` is the planning entrypoint, and its `red-team`, `validate` and `archive` subcommands are handled by that same skill — there is no separate dispatcher to route through.
 
 | State | Pipeline Phase | Recommendation |
 |-------|---------------|----------------|
@@ -131,11 +131,11 @@ Set `MEOWKIT_HOOK_PROFILE=strict` to enable ALL hooks including post-session cap
 ## Gotchas
 
 - Multiple in-progress plans create ambiguity — ask user which to focus on, don't guess
-- `session-state/` files from previous sessions may be stale — check timestamps, warn if >24h old
+- `.meowkit/state/` files from previous sessions may be stale — check timestamps, warn if >24h old
 - Git status can be noisy (untracked IDE files) — focus on files in `src/`, `lib/`, `app/`, `tests/`
 - Don't recommend skipping phases — even if the user seems impatient, show the full path
 - Fast paths are not loopholes — Gate 2 (review) is NEVER bypassed; security hooks are NEVER skipped
-- `session-state/checkpoints/` does not exist until runtime — its absence is normal, not an error; skip silently
+- `.meowkit/state/checkpoints/` does not exist until runtime — its absence is normal, not an error; skip silently
 - `budget-state.json` is missing at session start — treat budget figures as advisory; never source model tier from it (use `detected-model.json`)
 - Prefer the machine-readable `*-verdict.json` over the `.md` prose verdict; a verdict is blocked when `decision === "BLOCKED"` (never a top-level `"FAIL"`)
 - This is the forward-looking navigator — backward-looking delivery status stays with `the status skill`; do not duplicate it here
@@ -154,7 +154,7 @@ no scanner script; the shape documents what the ranking reasons about.
       "action": "the cook skill tasks/plans/260610-x/plan.md",
       "priority": "high",
       "rationale": "Plan approved (Gate 1), phase-02 in-progress at 3/7 checkboxes; budget $4.20 of $30",
-      "source": ["tasks/plans/260610-x/phase-02-*.md", "session-state/budget-state.json"]
+      "source": ["tasks/plans/260610-x/phase-02-*.md", ".meowkit/state/budget-state.json"]
     }
   ],
   "progress": { "plan": "260610-x", "phases_done": 1, "phases_total": 6, "checkbox_pct": 43 }

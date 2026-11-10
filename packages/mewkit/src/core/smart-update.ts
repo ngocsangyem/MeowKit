@@ -1,27 +1,27 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from "node:fs";
 import { join, relative, isAbsolute, dirname } from "node:path";
 import * as log from "./core-logger.js";
-import { processTemplate } from "./substitute-placeholders.js";
 import type { UserConfig } from "./substitute-placeholders.js";
 import { mergeSettingsFile } from "./merge-settings.js";
-import { writeManifest, hashFile, classifyLayer } from "./compute-checksums.js";
-import type { Manifest } from "./compute-checksums.js";
+import { hashFile, classifyLayer } from "./compute-checksums.js";
 import { loadIgnorePatterns, walkDir, copyFile } from "./smart-update-utils.js";
 import { findOrphans } from "./find-orphans.js";
 import { readReleaseMetadata, toOrphanManifest, mapPathToLastModified, mapPathToChecksum } from "./release-metadata.js";
 import {
 	readInstallMetadata,
-	readLegacyManifestMetadata,
 	buildInstallMetadata,
 	indexByPath,
 	CorruptInstallMetadataError,
-	type InstallFileEntry,
 	type MetadataSource,
 	type ReadInstallMetadataResult,
 } from "./install-metadata.js";
 import { writeInstallMetadata } from "./install-metadata-writer.js";
 import { writeRuntimeDescriptor, resolveInProjectExecutable } from "./hook-runtime.js";
-import { configWritePath } from "../state/resolve-config-path.js";
+import { runningCliEntry, writeLauncher } from "./project-launcher.js";
+import { configWritePath, legacyDescriptorPath } from "../state/resolve-config-path.js";
+import { observerNames } from "../config/observer-names.js";
+import { renderConfigStub } from "../config/write-stub.js";
+import { copyKitMeowkitFiles, writeKitDirGitignore } from "./install-meowkit-dir.js";
 
 export interface UpdateStats {
 	updated: number;
@@ -70,6 +70,11 @@ export interface SmartUpdateOptions {
 	allowedPaths?: Set<string>;
 	/** Installed profile name to record in metadata ("full" for whole-tree). */
 	profile?: string;
+	/**
+	 * The CLI version the committed launcher is pinned to. Omitted by callers that are not
+	 * an install (`pack add`), where the launcher the previous install wrote still stands.
+	 */
+	cliVersion?: string;
 	/** Resolved pack list to record in metadata; omit for full/legacy (sentinel). */
 	packs?: string[];
 	/**
@@ -85,7 +90,7 @@ export interface SmartUpdateOptions {
  * Smart update from a downloaded release directory.
  *
  * @param config - User configuration (description, API keys, etc.)
- * @param sourceDir - Path to extracted release (contains .claude/, tasks/, CLAUDE.md)
+ * @param sourceDir - Path to extracted release (contains .claude/ and tasks/)
  * @param targetDir - User's project directory
  * @param dryRun - Preview only, no writes
  * @param force - Overwrite all files, ignore user modifications
@@ -231,35 +236,31 @@ export async function smartUpdate(
 
 	const claudeDir = join(targetDir, ".claude");
 
-	// CLAUDE.md at project root
-	const claudeMdSrc = join(sourceDir, "CLAUDE.md");
-	const claudeMdDest = join(targetDir, "CLAUDE.md");
-	if (existsSync(claudeMdSrc) && !existsSync(claudeMdDest)) {
-		processTemplate(claudeMdSrc, claudeMdDest, config, dryRun);
-		stats.added++;
-	}
+	// No kit-owned root CLAUDE.md is created or refreshed. The always-on guidance ships as
+	// `.claude/rules/*.md`, which the host auto-loads; a root CLAUDE.md in a target project
+	// is the user's own file and is never written, templated or deleted here.
 
-	// config.json template (generated, not from release). Written to the `.meowkit/` state
-	// root; an install still holding the pre-move `.claude/meowkit.config.json` keeps working
-	// through the read fallback until this writes the canonical file.
-	const configDest = configWritePath(dirname(claudeDir));
-	if (!existsSync(configDest) && !existsSync(join(claudeDir, "meowkit.config.json"))) {
+	// The project config. A commented stub per key rather than a descriptor of
+	// values: the file is committed, so an uncommented line has to mean someone
+	// decided something. A project that still carries the v2 `config.json` is
+	// left alone here — `upgrade` migrates it, which is a different operation
+	// from scaffolding a fresh one, and it must snapshot first.
+	const projectRoot = dirname(claudeDir);
+	const configDest = configWritePath(projectRoot);
+	if (!existsSync(configDest) && legacyDescriptorPath(projectRoot) === null) {
 		if (!dryRun) {
 			mkdirSync(dirname(configDest), { recursive: true });
-			const configContent = JSON.stringify(
-				{
-					$schema: "https://meowkit.dev/schema/config.json",
-					version: "1.0.0",
-					project: { description: config.description || "" },
-					features: { costTracking: config.enableCostTracking, memory: config.enableMemory },
-				},
-				null,
-				2,
-			);
-			writeFileSync(configDest, configContent + "\n", "utf-8");
+			writeFileSync(configDest, renderConfigStub(observerNames(projectRoot)), "utf-8");
 		}
 		stats.added++;
 	}
+
+	// The shipped `.meowkit/` members and the deny-all ignore file. The ignore
+	// file is what keeps every machine-written class under `.meowkit/` — the
+	// local kit copy among them — out of a commit, so an install that skipped it
+	// left the one guarantee the deletion path relies on unenforced.
+	stats.added += copyKitMeowkitFiles(sourceDir, projectRoot, dryRun).length;
+	if (writeKitDirGitignore(projectRoot, dryRun)) stats.added++;
 
 	// Write .env with API keys (single read-modify-write cycle). Target `.meowkit/.env`, but
 	// keep editing a pre-move `.claude/.env` when that is the file the project already has —
@@ -393,8 +394,10 @@ export async function smartUpdate(
 	// from the SINGLE pre-write read at the top of smartUpdate so a later
 	// metadata write cannot flip it. A version-only `metadata.json`
 	// (`legacy-metadata`) does NOT count — it can come from the old pipeline on a
-	// non-checksum install — so only `new` and `legacy-manifest` enable cleanup.
-	const hasPriorMeowkitInstall = priorSource === "new" || priorSource === "legacy-manifest";
+	// non-checksum install — so only a canonical record enables cleanup. A project
+	// whose only baseline is the superseded checksum manifest is carried forward by
+	// the one-shot migration before this point, so it reaches here as `new`.
+	const hasPriorMeowkitInstall = priorSource === "new";
 	if (cleanup && hasPriorMeowkitInstall) {
 		const releaseManifest = release ? toOrphanManifest(release) : null;
 		if (!releaseManifest) {
@@ -506,6 +509,12 @@ export async function smartUpdate(
 			mergedSettings: settingsMerged ? ["settings.json"] : undefined,
 			profile: options.profile,
 			packs: options.packs,
+			// Carried forward, not re-derived. Provenance records what produced the
+			// install — the target, the delivery and the origin — and the updater
+			// knows none of those. Rebuilding the record without it would silently
+			// convert every upgraded project back to "unknown provenance", which is
+			// how a plugin-delivered project would look native again.
+			provenance: prior.meta?.provenance,
 		});
 		// Content has already been mutated on disk. A metadata write failure here is
 		// fatal, not a warning: silently leaving new content under stale metadata is
@@ -513,55 +522,32 @@ export async function smartUpdate(
 		// writer leaves the prior metadata.json intact on failure, so re-running the
 		// install/upgrade rebuilds correct metadata from disk — the recovery path.
 		await writeInstallMetadata(dirname(claudeDir), meta);
-		// One-release rollback dual-write of the legacy manifest. Only after the
-		// canonical write succeeds — if the canonical write fails above we never reach
-		// here, so the previous legacy manifest stays on disk for the next run.
-		// Derived from the entries just computed, avoiding a second scan+hash of .claude/.
-		writeManifest(claudeDir, legacyManifestFromInstallMeta(meta));
 
-		// Write the hook runtime descriptor when an in-project mewkit executable exists (so the
-		// SessionStart hook can run `orient` without npx / parent-node_modules scanning). This is
-		// ADVISORY, unlike the metadata write above: if no in-project executable is installed yet,
-		// write NO descriptor (honest "no runtime" → the hook uses its checkpoint fallback) rather
-		// than record one the hook would reject. Refreshed on every install/upgrade.
+		// Write the committed launcher, then point the hook runtime descriptor at it, so the
+		// SessionStart hook has an executable to trust even when the CLI was invoked through
+		// `npx` and the project holds no dependency of its own. The launcher lives inside the
+		// project, so the descriptor's existing containment gate accepts it unchanged; an
+		// in-project dependency, when there is one, is still preferred as the recorded entry.
+		// ADVISORY, unlike the metadata write above: a failure here leaves the hook on its
+		// labelled checkpoint fallback rather than failing the install.
 		try {
-			const executable = resolveInProjectExecutable(targetDir);
-			if (executable) {
-				await writeRuntimeDescriptor(claudeDir, {
-					executable,
-					packageVersion: release?.version ?? "",
-					now: new Date().toISOString(),
-				});
-			}
+			const launcher = writeLauncher(targetDir, {
+				version: options.cliVersion ?? release?.version ?? "",
+				cliEntry: resolveInProjectExecutable(targetDir) ?? runningCliEntry(import.meta.url),
+			});
+			await writeRuntimeDescriptor(claudeDir, {
+				executable: launcher,
+				packageVersion: release?.version ?? "",
+				now: new Date().toISOString(),
+			});
 		} catch (err) {
-			log.warn(`Could not write hook runtime descriptor (non-fatal): ${(err as Error).message}`);
+			log.warn(`Could not write the project launcher (non-fatal): ${(err as Error).message}`);
 		}
 	}
 
 	log.setData("update", stats);
 
 	return stats;
-}
-
-/**
- * Project canonical install metadata onto the legacy `Manifest` shape for the
- * one-release dual-write, reproducing `buildManifest`'s output without a second
- * directory walk (the hashes are already in `meta.files`).
- */
-function legacyManifestFromInstallMeta(meta: { installedAt: string; files: InstallFileEntry[] }): Manifest {
-	const checksums: Manifest["checksums"] = {};
-	for (const f of meta.files) {
-		checksums[f.path] = {
-			sha256: f.checksum,
-			layer: f.layer,
-			owner: f.layer === "user" ? "user" : "meowkit",
-			baseChecksum: f.checksum,
-			sourceChecksum: f.checksum,
-			targetChecksum: f.checksum,
-			installedAt: meta.installedAt,
-		};
-	}
-	return { version: "0.2.0", generatedAt: meta.installedAt, checksums };
 }
 
 function toManifestPath(relPath: string): string {
@@ -576,18 +562,20 @@ function isWithinDir(dir: string, target: string): boolean {
 
 /**
  * Read the prior installed state for the user-edit baseline and orphan guard.
- * If the canonical metadata.json is present but corrupt, fall back to the legacy
- * manifest so user-edit protection still has a baseline, rather than treating
- * every file as unmodified.
+ *
+ * A corrupt canonical record is reported as "no baseline" rather than guessed
+ * at. There used to be a second file to fall back to; now there is one record,
+ * and the honest answer when it cannot be read is that nothing is known — which
+ * makes the run protective (every file looks user-authored) instead of
+ * destructive (every file looks removable).
  */
 function readPriorInstallState(claudeDir: string): ReadInstallMetadataResult {
 	try {
 		return readInstallMetadata(claudeDir);
 	} catch (err) {
 		if (err instanceof CorruptInstallMetadataError) {
-			log.warn(`Installed metadata is corrupt (${err.detail}); falling back to legacy manifest detection.`);
-			const legacy = readLegacyManifestMetadata(claudeDir);
-			return legacy ? { source: "legacy-manifest", meta: legacy } : { source: "none", meta: null };
+			log.warn(`Installed metadata is corrupt (${err.detail}); treating this project as having no recorded baseline.`);
+			return { source: "none", meta: null };
 		}
 		throw err;
 	}

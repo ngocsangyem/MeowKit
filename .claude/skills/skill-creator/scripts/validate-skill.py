@@ -88,7 +88,7 @@ def validate_skill(skill_path):
     else:
         results.append(("Output template", False, "No output format section or template"))
 
-    # Check 7: SKILL.md line count (progressive disclosure per skill-authoring-rules.md Rule 3)
+    # Check 7: SKILL.md line count (progressive disclosure per .claude/skills/skill-creator/references/skill-authoring-rules.md Rule 3)
     line_count = len(content.splitlines())
     has_refs = (skill_path / "references").exists()
     has_workflow = (skill_path / "workflow.md").exists()
@@ -101,7 +101,7 @@ def validate_skill(skill_path):
     else:
         results.append(("Progressive disclosure", False, f"{line_count} lines, no references/ — should split"))
 
-    # Check 8: Gotchas section present (skill-authoring-rules.md Rule 1 — mandatory)
+    # Check 8: Gotchas section present (.claude/skills/skill-creator/references/skill-authoring-rules.md Rule 1 — mandatory)
     if re.search(r"^##\s+Gotchas\b", content, re.MULTILINE):
         results.append(("Gotchas section", True, "`## Gotchas` header present"))
     else:

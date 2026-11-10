@@ -12,7 +12,6 @@ const read = (rel: string) => readFileSync(resolve(root, rel), 'utf-8');
 // Files that are telemetry/observability or curated data — none may be catted into
 // a prompt-injection path.
 const NEVER_INJECTED = [
-  'trace-log.jsonl',
   'learning-observer.jsonl',
   'hook-log.jsonl',
   'cost-log.json',
@@ -20,8 +19,8 @@ const NEVER_INJECTED = [
 
 // Hooks that write to stdout on a context-injection event (their stdout reaches the model).
 const INJECTION_PATH_HOOKS = [
-  '.claude/hooks/project-context-loader.sh', // SessionStart — emits the Config block
-  '.claude/hooks/tdd-flag-detector.sh', // UserPromptSubmit
+  '.claude/hooks/handlers/project-context-loader.cjs', // SessionStart — emits the Config block
+  '.claude/hooks/handlers/tdd-flag-detector.cjs', // UserPromptSubmit
 ];
 
 describe('no context pollution', () => {
@@ -41,13 +40,13 @@ describe('no context pollution', () => {
 
   it('telemetry files keep their writers (data is logged, just never injected)', () => {
     // hook-log.jsonl still written (its telemetry-decisions.py reader needs it).
-    expect(read('.claude/hooks/lib/hook-logger.sh')).toContain('hook-log.jsonl');
-    // trace-log via append-trace.sh remains the canonical stream.
-    expect(existsSync(resolve(root, '.claude/hooks/append-trace.sh'))).toBe(true);
+    expect(read('.claude/hooks/lib/hook-logger.cjs')).toContain('hook-log.jsonl');
+    // trace-log via append-trace.cjs remains the canonical stream.
+    expect(existsSync(resolve(root, '.claude/hooks/append-trace.cjs'))).toBe(true);
   });
 
   it('learning-observer only the churn record is gated; it is not an injection source', () => {
-    const obs = read('.claude/hooks/learning-observer.sh');
+    const obs = read('.claude/hooks/handlers/learning-observer.cjs');
     // It writes to session-state, never to stdout-as-context.
     expect(obs).not.toMatch(/printf[^\n]*learning-observer[^\n]*>&1/);
   });

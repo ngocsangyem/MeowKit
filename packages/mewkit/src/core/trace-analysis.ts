@@ -2,7 +2,7 @@
 // supplies records and `now`. On-demand only: nothing here runs in a hook hot-path. Everything
 // is advisory — these functions report; they never gate.
 
-/** One JSONL trace record (shape written by hooks/append-trace.sh; fields are best-effort). */
+/** One JSONL trace record (shape written by hooks/append-trace.cjs; fields are best-effort). */
 export interface TraceRecord {
 	schema_version?: string;
 	ts?: string;

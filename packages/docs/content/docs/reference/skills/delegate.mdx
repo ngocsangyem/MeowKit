@@ -1,0 +1,39 @@
+---
+title: "mk:delegate"
+description: "Build one context-isolated subagent prompt — injection-guarded fields, no session history — and emit it for review instead of invoking the Task tool."
+---
+
+{/* GENERATED:reference-facts START */}
+
+| | |
+|---|---|
+| **Source** | [`.claude/skills/delegate/SKILL.md`](https://github.com/ngocsangyem/MeowKit/blob/main/.claude/skills/delegate/SKILL.md) |
+| **Owner** | `lifecycle` |
+| **Runtime** | `claude-code` |
+| **Risk** | medium |
+
+{/* GENERATED:reference-facts END */}
+
+## What This Skill Does
+
+Assembles the delegation template into a reviewable prompt block: task, work context, plan reference, files to modify, files to read, acceptance criteria and constraints. It emits the prompt rather than invoking the Task tool, so a human sees exactly what the subagent will receive.
+
+## When to Use
+
+- One bounded job is being handed to one subagent
+- The prompt must carry no session history and no orchestrator reasoning
+
+**NOT for:** launching a parallel agent team in worktrees (`mk:team-config`); coordinating staged jobs across runtimes (`mk:orchestrate`).
+
+## Isolation Guarantee
+
+The emitted prompt carries no session history, no prior conversation, no project instruction file content, and no orchestrator reasoning chain. The subagent starts with the listed fields and nothing else.
+
+## Injection Guard
+
+Every field is user-supplied text, so each one is scanned for the override patterns in `injection-rules.md` Rule 1 before assembly. On a match the run stops, names the offending field, and asks for a revision — it never silently sanitizes and emits.
+
+## Pro Tips
+
+- `--silent` skips the interactive questions for hosts with no interactive question tool. The injection guard still runs and exits non-zero on a match.
+- When the work context differs from the current directory, every path in the prompt uses the work-context root.

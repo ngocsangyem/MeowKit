@@ -2,9 +2,17 @@
 
 7-step workflow (numbered 0–6) orchestrating an autonomous multi-hour build via planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density.
 
+## Step-File Contract
+
+- One step at a time — NEVER load multiple step files at once.
+- Read the ENTIRE step file before executing any instruction in it.
+- Complete the current step before reading the next — NEVER skip steps or optimize the sequence.
+- Follow the step's instructions exactly — do not improvise, add steps, or deviate.
+- Persist intermediate state the next step needs: frontmatter variables, or `.meowkit/state/{skill}-progress.json` when it must survive a context reset.
+- A step file that chains to `references/*.md` opens with a `## Contents` ToC, so a partial read lands on navigation.
+
 ## Rules
 
-- NEVER load multiple step files simultaneously — JIT load one at a time
 - ALWAYS halt at iteration cap (`--max-iter`, default 3) — escalate to human, don't loop forever
 - ALWAYS write a run report (step-06) even on failure / timeout / escalation
 - ALWAYS commit per step — every step's output gets a git commit for resumability

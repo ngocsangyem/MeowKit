@@ -30,14 +30,12 @@ function makeClaudeDir(): string {
 		"---\nname: mk:foo\ndescription: Foo skill\nowner: lifecycle\nkeywords:\n  - alpha\n  - beta\nwhen_to_use: use foo\n---\n# Foo\n",
 	);
 	w("agents/bar.md", "---\nname: bar\ndescription: Bar agent\nowner: review\n---\n# Bar\n");
-	w("commands/mk/baz.md", "# baz\n");
 	w("hooks/qux.sh", "#!/bin/bash\nexit 0\n");
 	w("rules/some-rule.md", "# rule\n");
 	writeFileSync(
 		join(c, "harness-inventory.json"),
 		JSON.stringify({
 			artifacts: {
-				"commands/mk/baz.md": { owner: "utility", criticality: "medium", status: "active", runtime: "claude-code" },
 				"hooks/qux.sh": { owner: "security", criticality: "critical", status: "active", runtime: "claude-code" },
 				"rules/some-rule.md": { owner: "lifecycle", criticality: "medium", status: "active", runtime: "claude-code" },
 			},
@@ -47,12 +45,11 @@ function makeClaudeDir(): string {
 }
 
 describe("buildCapabilities", () => {
-	it("projects disk skills/agents/commands/hooks to capabilities and EXCLUDES rules", () => {
+	it("projects disk skills/agents/hooks to capabilities and EXCLUDES rules", () => {
 		const caps = buildCapabilities(makeClaudeDir());
 		const byId = new Map(caps.map((c) => [c.id, c]));
 		expect(byId.get("mk:foo")?.kind).toBe("skill");
 		expect(byId.get("bar")?.kind).toBe("agent");
-		expect(byId.get("baz")?.kind).toBe("command");
 		expect(byId.get("qux")?.kind).toBe("hook");
 		// rule is inventory-only context, never a capability
 		expect(caps.some((c) => c.id === "some-rule")).toBe(false);
@@ -137,7 +134,7 @@ describe("contextRequirement overlay (Phase 5 slice 2)", () => {
 
 	it("authored tool/service entries never carry a contextRequirement", () => {
 		const caps = buildCapabilities(makeFlagshipDir());
-		for (const id of ["jira", "browser", "project-context", "task-record", "trace-log", "wiki-recall"]) {
+		for (const id of ["jira", "browser", "project-context", "task-record", "trace-log"]) {
 			expect(caps.find((c) => c.id === id)?.contextRequirement, id).toBeNull();
 		}
 	});
@@ -150,8 +147,8 @@ describe("renderCapabilityView", () => {
 		expect(view).toContain("| Capability | Kind | Invocation | Intent source | Intents (user phrases) |");
 		// The fixture skill mk:foo has inferred keyword intents ⇒ it appears.
 		expect(view).toContain("`mk:foo`");
-		// A command with no intents (baz) does not appear.
-		expect(view).not.toContain("`baz`");
+		// A hook carries no intents (qux) and does not appear.
+		expect(view).not.toContain("`qux`");
 	});
 });
 

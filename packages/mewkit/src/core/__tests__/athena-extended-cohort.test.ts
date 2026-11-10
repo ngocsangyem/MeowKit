@@ -613,7 +613,7 @@ describe("boundaries the extended wiring must not erode", () => {
 });
 
 describe("the canonical rule agrees with the extended wiring", () => {
-	const rule = flat(".claude/rules-conditional/advice-supervision-rules.md");
+	const rule = flat(".claude/skills/advise/references/advice-supervision-rules.md");
 
 	it("lists all six wired skills inside the wired sentence", () => {
 		const wiredSentence = /((?:`mk:[a-z-]+`(?: \(deep only\))?,? ?)+) — wired\./.exec(rule)?.[1] ?? "";

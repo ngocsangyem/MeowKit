@@ -1,13 +1,13 @@
 ---
 name: mk:skill-template-secure
-description: Secure skill template with prompt injection defenses. Copy this template when creating new skills.
+description: The injection-hardened SKILL.md template new skills are copied from. NOT for mk:skill-creator.
 keywords:
   - skill-template
   - security-anchor
   - injection-defense
   - scaffold
   - copy-template
-when_to_use: Auto-invoked by mk:skill-creator when scaffolding a new skill. Not user-callable directly.
+when_to_use: Auto-invoked while scaffolding a skill. Not user-callable.
 user-invocable: false
 trust_level: kit-authored
 injection_risk: low

@@ -72,7 +72,7 @@ Skills should satisfy **at most two** of these three properties:
 | `mk:docs-finder` -- fetches URLs, no credentials, no writes | yes | no | no | LOW |
 | `mk:freeze` -- no external input, no secrets, blocks writes | no | no | yes | LOW |
 | `mk:multimodal` -- reads files, uses API key, writes output | yes | yes | yes | HIGH |
-| `mk:audit` -- reads code, no secrets, no writes | yes | no | no | LOW |
+| `mk:scout` -- reads code, no secrets, no writes | yes | no | no | LOW |
 
 When a skill hits all three, add: `Human-in-the-loop required for destructive actions.` to the Allowed Operations section.
 

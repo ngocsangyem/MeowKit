@@ -1,7 +1,8 @@
 #!/bin/bash
 # check-skill-cross-refs.sh — exits non-zero if a skill or local entrypoint reference fails to resolve.
-# Resolves mk:* references to a skill or command, and explicit local references/
-# scripts/ paths relative to the SKILL.md or step file that names them.
+# Resolves mk:* references to a skill, and explicit local references/scripts/ paths
+# relative to the SKILL.md or step file that names them. Skills are the kit's only
+# routable surface, so a mk:* token resolves against the skill inventory or fails.
 #
 # Usage: bash scripts/check-skill-cross-refs.sh [project-root]
 # Exit:  0 if clean; 1 if any phantom ref found.
@@ -14,7 +15,6 @@ cd "$ROOT" || { echo "Cannot cd to $ROOT" >&2; exit 1; }
 
 # Build authoritative inventories — bare-name folders only, ignore dotfiles + non-skill files
 SKILLS=$(ls .claude/skills/ 2>/dev/null | grep -v '^\.' | grep -v 'SKILLS_ATTRIBUTION' | sort -u)
-COMMANDS=$(ls .claude/commands/mk/ 2>/dev/null | sed -n 's/\.md$//p' | sort -u)
 
 # Zero-match guard: an empty inventory must not phantom-pass.
 if [ -z "$SKILLS" ]; then
@@ -25,11 +25,12 @@ fi
 # Allowlist:
 #   - Deprecated aliases per meowkit-architecture.md (debug, shipping, documentation)
 #   - Documentation placeholders that are NOT real routing targets:
-#     * command       — generic syntax placeholder in commands/mk/mk.md printf
 #     * my-feature    — example skill name in mk:skill-creator CLI usage docs
 #     * research      — illustrative skill name in mk:web-to-markdown composition examples
 #     * evil-skill    — fictional name in mk:web-to-markdown security warning examples
-ALLOWLIST="debug shipping documentation command my-feature research evil-skill figma-code-connect figma-library figma-write"
+#     * my-skill      — example dir tree in the skill-authoring rules (progressive disclosure)
+#     * my-workflow   — example dir tree in the skill-authoring rules (step-file decomposition)
+ALLOWLIST="debug shipping documentation my-feature my-skill my-workflow research evil-skill figma-code-connect figma-library figma-write"
 
 PHANTOM=0
 while read -r ref; do
@@ -42,16 +43,14 @@ while read -r ref; do
   # Skip partial regex captures from wildcard/placeholder families such as mk:jira-* or mk:jira-{leaf}.
   case "$name" in *-) continue ;; esac
 
-  # Skip if resolves as skill OR command. Skills whose folder keeps the canonical
-  # mk: prefix resolve as mk-<name> directories.
+  # Skills whose folder keeps the canonical mk: prefix resolve as mk-<name> dirs.
   if echo "$SKILLS" | grep -qx "$name"; then continue; fi
   if echo "$SKILLS" | grep -qx "mk-$name"; then continue; fi
-  if echo "$COMMANDS" | grep -qx "$name"; then continue; fi
 
-  echo "PHANTOM: mk:$name (no skill dir, no command file)" >&2
+  echo "PHANTOM: mk:$name (no skill dir)" >&2
   PHANTOM=1
 done < <(
-  find .claude/commands .claude/skills \
+  find .claude/skills \
     \( -path '*/.*' -o -path '*/.venv/*' -o -path '*/node_modules/*' \) -prune -o \
     -type f \( -name '*.md' -o -name '*.json' \) -print0 \
     | xargs -0 grep -hoE 'mk:[a-z][a-z0-9-]*-?\*?' 2>/dev/null \

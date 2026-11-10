@@ -6,7 +6,7 @@
 ## Context
 
 Gate 2 requires that a human explicitly approved a change before it ships. The structural
-check in `.claude/hooks/lib/gate2-check.sh` enforces what it can at `git commit` / `push`
+check in `.claude/hooks/lib/gate2-check.cjs` enforces what it can at `git commit` / `push`
 / `merge`: a verdict for the active plan exists, names no FAIL dimension and no security
 BLOCK, and any present workflow-evidence index does not contradict it.
 

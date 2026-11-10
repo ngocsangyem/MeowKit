@@ -209,13 +209,13 @@ the document-release workflow.
 Log coverage and plan completion data so `/mk:retro` can track trends:
 
 ```bash
-eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/memory/projects
+eval "$(.claude/hooks/lib/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/telemetry
 ```
 
-Append to `.meowkit/memory/projects/$BRANCH-reviews.jsonl`:
+Append to `.meowkit/telemetry/$BRANCH-reviews.jsonl`:
 
 ```bash
-echo '{"skill":"ship","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","coverage_pct":COVERAGE_PCT,"plan_items_total":PLAN_TOTAL,"plan_items_done":PLAN_DONE,"verification_result":"VERIFY_RESULT","version":"VERSION","branch":"BRANCH"}' >> .meowkit/memory/projects/$BRANCH-reviews.jsonl
+echo '{"skill":"ship","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","coverage_pct":COVERAGE_PCT,"plan_items_total":PLAN_TOTAL,"plan_items_done":PLAN_DONE,"verification_result":"VERIFY_RESULT","version":"VERSION","branch":"BRANCH"}' >> .meowkit/telemetry/$BRANCH-reviews.jsonl
 ```
 
 Substitute from earlier steps:

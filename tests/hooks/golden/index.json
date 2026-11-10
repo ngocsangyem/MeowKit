@@ -1,0 +1,612 @@
+{
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "recorder": "scripts/record-hook-golden-corpus.cjs",
+  "fixtureCount": 82,
+  "groups": {
+    "gate1": 13,
+    "gate2-preship": 12,
+    "privacy": 5,
+    "stdin-unreadable": 6,
+    "post-write": 2,
+    "pre-completion-check": 2,
+    "guard-careful": 2,
+    "guard-freeze": 3,
+    "guard-investigate": 3,
+    "gate-helper-validate-contract": 3,
+    "gate-helper-check-contract-signed": 4,
+    "gate-helper-validate-gate-2": 3,
+    "observer-pre-task-check": 3,
+    "observer-tdd-flag-detector": 3,
+    "observer-learning-observer": 2,
+    "observer-capability-bootstrap": 2,
+    "observer-jira-env-loader": 3,
+    "observer-precompact-probe": 1,
+    "observer-posttoolfailure-probe": 1,
+    "observer-control-probe": 1,
+    "cli-pre-implement": 5,
+    "cli-append-trace": 3
+  },
+  "fixtures": [
+    {
+      "name": "gate1-source-edit-no-plan",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "gate1-plan-without-receipt",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "gate1-plan-stale-hash",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "gate1-approved-plan-signed-contract",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "gate1-approved-plan-unsigned-contract",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 2,
+      "marker": "@@CONTRACT_GATE_BLOCK@@"
+    },
+    {
+      "name": "gate1-approved-plan-no-contracts-dir",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 2,
+      "marker": "@@CONTRACT_GATE_BLOCK@@"
+    },
+    {
+      "name": "gate1-plans-write-allowed",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "gate1-test-file-allowed",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "gate1-contract-edit-valid",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "gate1-contract-edit-invalid",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "gate1-presence-only-downgrade",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "gate1-lean-mode-contract-bypass",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "gate1-backup-directory-blocked",
+      "group": "gate1",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "preship-non-ship-command",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "preship-commit-no-active-plan-pointer",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "preship-commit-no-verdict",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "preship-commit-fail-verdict",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "preship-commit-docs-only-na",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "preship-commit-two-verdicts",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "preship-commit-verdict-not-naming-head",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "preship-commit-passing-verdict",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "preship-commit-security-verdict-block",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "preship-gate2-checker-absent",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "preship-memory-lint-failure",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 2,
+      "marker": "@@GATE_BLOCK@@"
+    },
+    {
+      "name": "preship-build-step-failure",
+      "group": "gate2-preship",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 2,
+      "marker": null
+    },
+    {
+      "name": "privacy-read-dotenv",
+      "group": "privacy",
+      "entrypoint": ".claude/hooks/privacy-block.sh",
+      "exit": 2,
+      "marker": "@@PRIVACY_BLOCK@@"
+    },
+    {
+      "name": "privacy-read-webfetch-manifest",
+      "group": "privacy",
+      "entrypoint": ".claude/hooks/privacy-block.sh",
+      "exit": 2,
+      "marker": "@@PRIVACY_BLOCK@@"
+    },
+    {
+      "name": "privacy-read-ordinary-file",
+      "group": "privacy",
+      "entrypoint": ".claude/hooks/privacy-block.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "privacy-bash-reads-dotenv",
+      "group": "privacy",
+      "entrypoint": ".claude/hooks/privacy-block.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "privacy-bash-webfetch-loopback",
+      "group": "privacy",
+      "entrypoint": ".claude/hooks/privacy-block.sh",
+      "exit": 2,
+      "marker": "@@PRIVACY_BLOCK@@"
+    },
+    {
+      "name": "stdin-empty-gate-enforcement",
+      "group": "stdin-unreadable",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "stdin-not-json-gate-enforcement",
+      "group": "stdin-unreadable",
+      "entrypoint": ".claude/hooks/gate-enforcement.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "stdin-empty-privacy-block",
+      "group": "stdin-unreadable",
+      "entrypoint": ".claude/hooks/privacy-block.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "stdin-not-json-privacy-block",
+      "group": "stdin-unreadable",
+      "entrypoint": ".claude/hooks/privacy-block.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "stdin-empty-pre-ship",
+      "group": "stdin-unreadable",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "stdin-not-json-pre-ship",
+      "group": "stdin-unreadable",
+      "entrypoint": ".claude/hooks/pre-ship.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "postwrite-blocked-pattern",
+      "group": "post-write",
+      "entrypoint": ".claude/hooks/post-write.sh",
+      "exit": 2,
+      "marker": null
+    },
+    {
+      "name": "postwrite-clean-file",
+      "group": "post-write",
+      "entrypoint": ".claude/hooks/post-write.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "precompletion-security-verdict-block",
+      "group": "pre-completion-check",
+      "entrypoint": ".claude/hooks/pre-completion-check.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "precompletion-clean-signed-contract",
+      "group": "pre-completion-check",
+      "entrypoint": ".claude/hooks/pre-completion-check.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "careful-destructive-command",
+      "group": "guard-careful",
+      "entrypoint": ".claude/skills/careful/bin/check-careful.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "careful-safe-command",
+      "group": "guard-careful",
+      "entrypoint": ".claude/skills/careful/bin/check-careful.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "freeze-edit-outside-boundary",
+      "group": "guard-freeze",
+      "entrypoint": ".claude/skills/freeze/bin/check-freeze.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "freeze-edit-inside-boundary",
+      "group": "guard-freeze",
+      "entrypoint": ".claude/skills/freeze/bin/check-freeze.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "freeze-no-boundary-configured",
+      "group": "guard-freeze",
+      "entrypoint": ".claude/skills/freeze/bin/check-freeze.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "investigate-report-path-wrong",
+      "group": "guard-investigate",
+      "entrypoint": ".claude/skills/investigate/bin/check-report-path.sh",
+      "exit": 2,
+      "marker": null
+    },
+    {
+      "name": "investigate-report-path-right",
+      "group": "guard-investigate",
+      "entrypoint": ".claude/skills/investigate/bin/check-report-path.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "investigate-report-path-missing",
+      "group": "guard-investigate",
+      "entrypoint": ".claude/skills/investigate/bin/check-report-path.sh",
+      "exit": 2,
+      "marker": null
+    },
+    {
+      "name": "validate-contract-valid",
+      "group": "gate-helper-validate-contract",
+      "entrypoint": ".claude/skills/sprint-contract/scripts/validate-contract.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "validate-contract-invalid",
+      "group": "gate-helper-validate-contract",
+      "entrypoint": ".claude/skills/sprint-contract/scripts/validate-contract.sh",
+      "exit": 1,
+      "marker": null
+    },
+    {
+      "name": "validate-contract-usage-error",
+      "group": "gate-helper-validate-contract",
+      "entrypoint": ".claude/skills/sprint-contract/scripts/validate-contract.sh",
+      "exit": 2,
+      "marker": null
+    },
+    {
+      "name": "check-contract-signed-valid",
+      "group": "gate-helper-check-contract-signed",
+      "entrypoint": ".claude/skills/sprint-contract/scripts/check-contract-signed.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "check-contract-signed-invalid",
+      "group": "gate-helper-check-contract-signed",
+      "entrypoint": ".claude/skills/sprint-contract/scripts/check-contract-signed.sh",
+      "exit": 1,
+      "marker": "@@CONTRACT_GATE_BLOCK@@"
+    },
+    {
+      "name": "check-contract-signed-no-plans-dir",
+      "group": "gate-helper-check-contract-signed",
+      "entrypoint": ".claude/skills/sprint-contract/scripts/check-contract-signed.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "check-contract-signed-lean-bypass",
+      "group": "gate-helper-check-contract-signed",
+      "entrypoint": ".claude/skills/sprint-contract/scripts/check-contract-signed.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "validate-gate-2-valid",
+      "group": "gate-helper-validate-gate-2",
+      "entrypoint": ".claude/skills/cook/scripts/validate-gate-2.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "validate-gate-2-invalid",
+      "group": "gate-helper-validate-gate-2",
+      "entrypoint": ".claude/skills/cook/scripts/validate-gate-2.sh",
+      "exit": 1,
+      "marker": null
+    },
+    {
+      "name": "validate-gate-2-file-missing",
+      "group": "gate-helper-validate-gate-2",
+      "entrypoint": ".claude/skills/cook/scripts/validate-gate-2.sh",
+      "exit": 1,
+      "marker": null
+    },
+    {
+      "name": "pretaskcheck-injection-blocked",
+      "group": "observer-pre-task-check",
+      "entrypoint": ".claude/hooks/pre-task-check.sh",
+      "exit": 1,
+      "marker": null
+    },
+    {
+      "name": "pretaskcheck-clean-task",
+      "group": "observer-pre-task-check",
+      "entrypoint": ".claude/hooks/pre-task-check.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "pretaskcheck-no-task-description",
+      "group": "observer-pre-task-check",
+      "entrypoint": ".claude/hooks/pre-task-check.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "tddflag-sets-sentinel",
+      "group": "observer-tdd-flag-detector",
+      "entrypoint": ".claude/hooks/tdd-flag-detector.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "tddflag-clears-sentinel",
+      "group": "observer-tdd-flag-detector",
+      "entrypoint": ".claude/hooks/tdd-flag-detector.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "tddflag-no-flag-noop",
+      "group": "observer-tdd-flag-detector",
+      "entrypoint": ".claude/hooks/tdd-flag-detector.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "learningobserver-first-edit",
+      "group": "observer-learning-observer",
+      "entrypoint": ".claude/hooks/learning-observer.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "learningobserver-third-edit",
+      "group": "observer-learning-observer",
+      "entrypoint": ".claude/hooks/learning-observer.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "capabilitybootstrap-file-present",
+      "group": "observer-capability-bootstrap",
+      "entrypoint": ".claude/hooks/capability-bootstrap.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "capabilitybootstrap-file-absent",
+      "group": "observer-capability-bootstrap",
+      "entrypoint": ".claude/hooks/capability-bootstrap.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "jiraenvloader-env-absent",
+      "group": "observer-jira-env-loader",
+      "entrypoint": ".claude/hooks/jira-env-loader.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "jiraenvloader-env-complete",
+      "group": "observer-jira-env-loader",
+      "entrypoint": ".claude/hooks/jira-env-loader.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "jiraenvloader-env-incomplete",
+      "group": "observer-jira-env-loader",
+      "entrypoint": ".claude/hooks/jira-env-loader.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "precompactprobe-rearm",
+      "group": "observer-precompact-probe",
+      "entrypoint": ".claude/hooks/precompact-probe.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "posttoolfailureprobe-fired",
+      "group": "observer-posttoolfailure-probe",
+      "entrypoint": ".claude/hooks/posttoolfailure-probe.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "controlprobe-fired",
+      "group": "observer-control-probe",
+      "entrypoint": ".claude/hooks/control-probe.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "preimplement-tdd-off-default",
+      "group": "cli-pre-implement",
+      "entrypoint": ".claude/hooks/pre-implement.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "preimplement-strict-tdd-no-tests",
+      "group": "cli-pre-implement",
+      "entrypoint": ".claude/hooks/pre-implement.sh",
+      "exit": 1,
+      "marker": null
+    },
+    {
+      "name": "preimplement-strict-tdd-sentinel-on",
+      "group": "cli-pre-implement",
+      "entrypoint": ".claude/hooks/pre-implement.sh",
+      "exit": 1,
+      "marker": null
+    },
+    {
+      "name": "preimplement-strict-tdd-helper-missing",
+      "group": "cli-pre-implement",
+      "entrypoint": ".claude/hooks/pre-implement.sh",
+      "exit": 1,
+      "marker": null
+    },
+    {
+      "name": "preimplement-no-feature-argument",
+      "group": "cli-pre-implement",
+      "entrypoint": ".claude/hooks/pre-implement.sh",
+      "exit": 1,
+      "marker": null
+    },
+    {
+      "name": "appendtrace-file-edited",
+      "group": "cli-append-trace",
+      "entrypoint": ".claude/hooks/append-trace.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "appendtrace-scrubs-secret",
+      "group": "cli-append-trace",
+      "entrypoint": ".claude/hooks/append-trace.sh",
+      "exit": 0,
+      "marker": null
+    },
+    {
+      "name": "appendtrace-no-arguments",
+      "group": "cli-append-trace",
+      "entrypoint": ".claude/hooks/append-trace.sh",
+      "exit": 0,
+      "marker": null
+    }
+  ],
+  "notRecorded": {
+    "post-session": "reads the live transcript path and writes duration/token fields derived from it; no fixture can supply a transcript whose derived numbers are stable across runs",
+    "project-context-loader": "emits the repo-relative content of docs/ and .claude/rules/ at BASE, so its output is a copy of files this sprint is also changing; verified by a node unit test over a pinned fixture tree instead"
+  },
+  "authoredAfterBase": {
+    "privacy-read-webfetch-manifest-state-cache": "BASE matched only the pre-move cache root, so it cannot produce this block"
+  }
+}

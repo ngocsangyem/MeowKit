@@ -1,6 +1,6 @@
 ---
 name: mk:agent-browser
-description: Browser automation CLI for AI agents using agent-browser. Use for navigating websites, clicking/filling pages, screenshots, data extraction, web app testing, exploratory QA, dogfooding, Electron apps, Slack automation, Vercel Sandbox browser runs, AWS AgentCore cloud browsers, auth-heavy flows, and long autonomous browser sessions. Prefer over generic browser tools when a fresh/tool-managed Chrome session is fine. NOT for the user's real Chrome cookies/profile (see mk:chrome-profile); NOT for reusable Playwright specs (see mk:qa-manual).
+description: Drive a browser from the CLI — navigate, click, fill, screenshot, extract, exercise a web app. NOT for mk:chrome-profile.
 allowed-tools: Bash(agent-browser:*), Bash(npx agent-browser:*)
 source: vercel-labs/agent-browser
 version: 0.2.0
@@ -16,7 +16,7 @@ keywords:
   - slack
   - vercel-sandbox
   - agentcore
-when_to_use: Use when AI needs browser/app automation through agent-browser. Use mk:chrome-profile when the user's real Chrome login state is required. Use mk:qa-manual for reusable Playwright test specs.
+when_to_use: Automating or QA-ing a web app in a fresh tool-managed Chrome session.
 user-invocable: true
 owner: utility
 criticality: medium

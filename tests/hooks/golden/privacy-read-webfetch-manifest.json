@@ -1,0 +1,23 @@
+{
+  "name": "privacy-read-webfetch-manifest",
+  "group": "privacy",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/privacy-block.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\".claude/cache/web-fetches/index.jsonl\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "privacy-read-webfetch-manifest",
+  "setupDescription": "BASE hook tree only",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@PRIVACY_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@PRIVACY_BLOCK@@\nFile '.claude/cache/web-fetches/index.jsonl' is a web-to-markdown cache artifact.\nThe manifest contains browsing history; quarantined files contain injection-stopped content.\nReading these files may disclose browsing history OR re-inject untrusted content into agent context.\nUse AskUserQuestion to get explicit user approval before accessing.\n"
+  }
+}

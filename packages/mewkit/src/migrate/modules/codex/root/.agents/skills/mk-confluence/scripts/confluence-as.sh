@@ -10,7 +10,7 @@
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel):-$(pwd)}"
-CONFLUENCE_AS="$ROOT/.agents/skills/.venv/bin/confluence-as"
+CONFLUENCE_AS="$ROOT/.meowkit/envs/confluence/bin/confluence-as"
 ENV_FILE="$ROOT/.codex/.env"
 LOCAL_SETTINGS="$ROOT/.codex/settings.local.json"
 

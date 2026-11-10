@@ -19,7 +19,7 @@ Without the trailing slash, a prefix check would produce false matches on siblin
 The resolved freeze path is persisted to a state file:
 
 ```
-${PLUGIN_DATA:-.meowkit/memory}/freeze-dir.txt
+${PLUGIN_DATA:-.meowkit/state}/freeze-dir.txt
 ```
 
 The hook script reads this file on every Edit and Write invocation. The state persists for
@@ -27,7 +27,7 @@ the entire session — the user does not need to re-specify the path on each inv
 
 ## Hook Enforcement
 
-The `check-freeze.sh` script runs as a pre-write guard on both edit and write operations,
+The `check-freeze.cjs` script runs as a pre-write guard on both edit and write operations,
 invoked by this project's configured hooks when present.
 
 On each invocation:
@@ -63,4 +63,4 @@ edits, but deliberate shell commands can still touch any file.
 Freeze is session-scoped. It deactivates when:
 - The conversation ends or a new session starts
 - A new freeze is set with a different path (overwrites state file)
-- The user manually deletes the state file at `${PLUGIN_DATA:-.meowkit/memory}/freeze-dir.txt`
+- The user manually deletes the state file at `${PLUGIN_DATA:-.meowkit/state}/freeze-dir.txt`

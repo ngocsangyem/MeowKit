@@ -112,14 +112,6 @@
 				"failClosed": false
 			}
 		],
-		"beforeSubmitPrompt": [
-			{
-				"command": "node .cursor/hooks/prompt-capture.cjs",
-				"type": "command",
-				"timeout": 10,
-				"failClosed": false
-			}
-		],
 		"subagentStart": [
 			{
 				"command": "node .cursor/hooks/subagent-lifecycle.cjs",

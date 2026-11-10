@@ -1,6 +1,7 @@
 ---
 name: "mk-prompt-enhancer"
 description: "Refine a draft prompt before sending to a coding agent: decomposes goal/context/constraints, flags ambiguity, emits a model-agnostic rewrite. NOT for prompts from scratch (mk:brainstorming)."
+requires_runtime: ["python>=3.9"]
 ---
 
 # mk:prompt-enhancer
@@ -47,7 +48,7 @@ Step detail in `references/decomposition-checklist.md`, `references/playbook.md`
 The skill **does not accept a `--model` flag.** Per the synthesis report
 (`tasks/reports/synthesis-260509-2058-prompting-framework.md`), model
 detection violates the model-agnostic mandate; dispatch by model-tier lives
-in `harness-rules.md` Rule 5, not here.
+in the harness rules Rule 5, not here.
 
 ## Output
 

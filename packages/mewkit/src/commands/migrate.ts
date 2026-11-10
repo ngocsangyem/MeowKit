@@ -4,36 +4,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import pc from "picocolors";
 import { MewkitMigrateError, runMigrate } from "../migrate/migrate-orchestrator.js";
+import { beginMachineOutput, endMachineOutput, jsonEmitted, printMutationJson } from "../core/mutation-report.js";
 import type { MigrateOptions } from "../migrate/types.js";
-import { resolveProjectRoot } from "../state/meowkit-root-resolver.js";
-import { runMemoryPreflight } from "../migrate/memory-preflight/memory-preflight.js";
-import { renderPreflightReport } from "../migrate/memory-preflight/memory-preflight-report.js";
-import { runMemoryMigrationTransaction } from "../migrate/memory-preflight/memory-migration-transaction.js";
-
-// Legacy `.claude/memory/` → `.meowkit/` migration step, run before provider install.
-// Read-only on `--dry-run`; otherwise executes the locked, atomic transaction.
-// Silent (returns null) when there is nothing to stage and no conflicts, so projects
-// with no legacy memory content — or already migrated — see no noise and existing
-// migrate behavior is unchanged. Returns a non-zero exit code only to abort on
-// conflicts (never overwritten/merged automatically).
-async function runMemoryMigrationStep(dryRun: boolean | undefined): Promise<number | null> {
-	const projectRoot = resolveProjectRoot(process.cwd());
-	if (!projectRoot) return null;
-	const plan = await runMemoryPreflight(projectRoot);
-	if (plan.actions.length === 0 && plan.conflicts.length === 0) return null; // nothing to do
-
-	console.log(renderPreflightReport(plan));
-	if (dryRun) return null; // dry-run: report only, no transaction
-	if (plan.conflicts.length > 0) {
-		console.error(pc.red("Memory migration aborted: resolve the conflicts above, then re-run."));
-		return 2;
-	}
-	const result = await runMemoryMigrationTransaction(plan, { projectRoot });
-	const fenced = result.fenced.length > 0 ? `, ${result.fenced.length} left live in legacy (source changed)` : "";
-	console.log(pc.green(`Memory migrated: ${result.published} published, ${result.quarantined} quarantined${fenced}.`));
-	return null;
-}
-
 export interface MigrateCliArgs {
 	_: string[];
 	all?: boolean;
@@ -48,20 +20,44 @@ export interface MigrateCliArgs {
 	"skip-hooks"?: boolean;
 	install?: boolean;
 	reconcile?: boolean;
-	"reinstall-empty-dirs"?: boolean;
 	"respect-deletions"?: boolean;
 	"source-version"?: string;
 	providers?: boolean;
 	"all-rules"?: boolean;
 	"include-mcp"?: boolean;
 	"include-unportable"?: boolean;
+	json?: boolean;
 }
+
+/**
+ * Runtimes this command cannot export to, because they are not external to it.
+ *
+ * Named rather than left to the unknown-tool error. `mewkit migrate claude-code`
+ * is a reasonable thing to type and a wrong thing to run: this command exists to
+ * export the kit to OTHER tools, and Claude Code is the shape the kit is authored
+ * in. Reported as "not an external tool" rather than "unknown tool", because the
+ * second sends the user looking for a spelling mistake.
+ */
+const NOT_EXTERNAL_TOOLS: Record<string, string> = {
+	"claude-code": "mewkit init / mewkit upgrade",
+	"claude-plugin": "mewkit init --target claude-code --delivery plugin",
+};
 
 export async function migrate(args: MigrateCliArgs): Promise<number> {
 	const tool = args._[1];
 
+	const notExternal = tool === undefined ? undefined : NOT_EXTERNAL_TOOLS[tool];
+	if (notExternal !== undefined) {
+		console.error(
+			`\`mewkit migrate\` exports MeowKit to external coding-agent tools, and "${tool}" is not one of them — ` +
+				`it is the kit's own runtime, so there is nothing to export it to. Use \`${notExternal}\` instead. Nothing was written.`,
+		);
+		return 1;
+	}
+
 	const options: MigrateOptions = {
 		tool,
+		json: args.json,
 		all: args.all,
 		global: args.global,
 		yes: args.yes,
@@ -74,7 +70,6 @@ export async function migrate(args: MigrateCliArgs): Promise<number> {
 		skipHooks: args["skip-hooks"],
 		install: args.install,
 		reconcile: args.reconcile,
-		reinstallEmptyDirs: args["reinstall-empty-dirs"],
 		respectDeletions: args["respect-deletions"],
 		sourceVersion: args["source-version"],
 		providers: args.providers,
@@ -86,17 +81,38 @@ export async function migrate(args: MigrateCliArgs): Promise<number> {
 	const __dirname = dirname(fileURLToPath(import.meta.url));
 	const bundledKitDir = join(__dirname, "..", "..", ".claude");
 
+	// `--json`: the plan narrates on stderr for the whole run so stdout carries
+	// the envelope alone. The run can also end before the plan exists — a refused
+	// tool, a cancelled confirm, a throw — so whichever return is reached, exactly
+	// one envelope is printed.
+	if (args.json === true) beginMachineOutput();
+	const finish = (exitCode: number, error?: string): number => {
+		if (args.json === true) {
+			if (!jsonEmitted()) {
+				printMutationJson({
+					ok: exitCode === 0,
+					command: "migrate",
+					dryRun: args["dry-run"] === true,
+					planned: [],
+					applied: [],
+					notes: [],
+					...(error === undefined ? {} : { error, fix: "Re-run `mewkit migrate <tool>` once the reason above is resolved." }),
+				});
+			}
+			endMachineOutput();
+		}
+		return exitCode;
+	};
+
 	try {
-		const memExit = await runMemoryMigrationStep(options.dryRun);
-		if (memExit !== null) return memExit;
-		return await runMigrate(options, { bundledKitDir, argv: process.argv.slice(2) });
+		return finish(await runMigrate(options, { bundledKitDir, argv: process.argv.slice(2) }));
 	} catch (err) {
 		if (err instanceof MewkitMigrateError) {
 			console.error(pc.red(err.message));
-			return err.exitCode;
+			return finish(err.exitCode, err.message);
 		}
 		const msg = err instanceof Error ? err.message : String(err);
 		console.error(pc.red(`Migrate failed: ${msg}`));
-		return 1;
+		return finish(1, msg);
 	}
 }

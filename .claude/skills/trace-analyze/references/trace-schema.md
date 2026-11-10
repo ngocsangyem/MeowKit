@@ -1,6 +1,6 @@
 # Trace Log Schema
 
-Reference for `.meowkit/telemetry/trace-log.jsonl` records. Append-only JSONL written by `append-trace.sh`.
+Reference for `.meowkit/telemetry/trace-log.jsonl` records. Append-only JSONL written by `append-trace.cjs`.
 
 ## Top-Level Fields
 
@@ -19,22 +19,22 @@ Reference for `.meowkit/telemetry/trace-log.jsonl` records. Append-only JSONL wr
 
 | Event | Emitter | Payload schema |
 |---|---|---|
-| `file_edited` | `learning-observer.sh` | `{file: str, edit_count: int}` |
+| `file_edited` | `learning-observer.cjs` | `{file: str, edit_count: int}` |
 | ~~`build_verify_result`~~ | **DEPRECATED (v2.4.0)** — `.sh` emitter removed; `handlers/build-verify.cjs` does NOT re-emit | `{file: str, exit_code: int, command: str}` (historical only) |
 | ~~`loop_warning`~~ | **DEPRECATED (v2.4.0)** — `.sh` emitter removed; `handlers/loop-detection.cjs` does NOT re-emit | `{file: str, count: int, threshold: 4 \| 8}` (historical only) |
 | `harness_run_start` | `mk:autobuild` step-00 | `{task: str, density: str, model: str, run_id: str}` |
 | `contract_signed` | `mk:sprint-contract` sign action | `{slug: str, sprint: int, generator_sha: str, evaluator_sha: str}` |
 | `verdict_written` | `mk:evaluate` step-04 | `{slug: str, overall: str, weighted_score: float, hard_fail: bool, evidence_count: int}` |
 | `cost_sample` | `budget-tracker.sh` | `{step: str, usd: float, cumulative_usd: float}` |
-| `session_end` | `post-session.sh` | `{duration_seconds: int, total_cost_usd: float, error_count: int}` |
-| `dead_weight_audit_needed` | `post-session.sh` (model change) | `{old_model: str, new_model: str}` |
-| `benchmark_result` | `mk:benchmark/scripts/run-canary.sh` (inline at manifest write — see C2 fix 260408) | `{run_id: str, tier: str, model: str, manifest_path: str}` |
+| `session_end` | `post-session.cjs` | `{duration_seconds: int, total_cost_usd: float, error_count: int}` |
+| `dead_weight_audit_needed` | `post-session.cjs` (model change) | `{old_model: str, new_model: str}` |
+| `benchmark_result` | `mk:benchmark/scripts/run-canary.sh`, this repository only (inline at manifest write — see C2 fix 260408) | `{run_id: str, tier: str, model: str, manifest_path: str}` |
 
 ## Trace Ownership (Phase 8 P23)
 
 Each event type has exactly ONE canonical emitter. No double-emission across hooks:
 
-- `learning-observer.sh` is the only emitter of `file_edited`
+- `learning-observer.cjs` is the only emitter of `file_edited`
 - ~~`post-write-build-verify.sh`~~ removed v2.4.0; `build_verify_result` is no longer emitted (verify-result feedback now via stdout, not trace)
 - ~~`post-write-loop-detection.sh`~~ removed v2.4.0; `loop_warning` is no longer emitted (warn/escalate now via stdout markers `@@LOOP_DETECT_WARN@@` / `@@LOOP_DETECT_ESCALATE@@`)
 
@@ -49,7 +49,7 @@ This prevents trace inflation from redundant records.
 
 ## Secret Scrubbing
 
-Every record passes through `lib/secret-scrub.sh` before write. Patterns redacted:
+Every record passes through `lib/secret-scrub.cjs` before write. Patterns redacted:
 - OpenAI keys (`sk-...`)
 <!-- research-citation -->
 - Anthropic keys (`sk-ant-...`)
@@ -65,28 +65,27 @@ False positives are acceptable; missed secrets are not.
 
 ## Rotation
 
-When `trace-log.jsonl` exceeds 50MB, `append-trace.sh` rotates it:
+When `trace-log.jsonl` exceeds 50MB, `append-trace.cjs` rotates it:
 1. Move to `trace-log.{YYMMDD-HHMMSS}.jsonl`
 2. gzip in place → `trace-log.{YYMMDD-HHMMSS}.jsonl.gz`
 3. Truncate the original
 
-Rotated logs remain in `.meowkit/memory/` for historical analysis. They are NOT deleted automatically.
+Rotated logs remain in `.meowkit/telemetry/` for historical analysis. They are NOT deleted automatically.
 
 ## Reading Records
 
-Always parse via `.claude/skills/.venv/bin/python3` (per kit rules — no `jq` dependency):
+Parse on node (no `jq` dependency, and no interpreter the project may not have):
 
-```python
-import json
-with open('.meowkit/telemetry/trace-log.jsonl') as f:
-    for line in f:
-        if not line.strip():
-            continue
-        record = json.loads(line)
-        # ... process record
+```js
+const fs = require("node:fs");
+for (const line of fs.readFileSync(".meowkit/telemetry/trace-log.jsonl", "utf8").split("\n")) {
+	if (!line.trim()) continue;
+	const record = JSON.parse(line);
+	// ... process record
+}
 ```
 
-`mk:trace-analyze` uses this pattern in `step-01-ingest.md`.
+`mk:trace-analyze` uses `scripts/trace-records.cjs` for this, driven from `step-01-ingest.md`.
 
 ## Append-Only Discipline
 

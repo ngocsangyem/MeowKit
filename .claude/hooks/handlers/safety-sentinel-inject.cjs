@@ -5,8 +5,8 @@
 // is observed by `mk:agent-detector` step-0/step-0b inside the skill
 // (Read-only context) to skip the 10-file rule load on turns 2..N.
 //
-// State format: single append-only JSONL log at
-// `session-state/session-sentinels.jsonl`. Two line shapes for a session:
+// State format: single append-only JSONL log in the session-marker state class,
+// `session-sentinels.jsonl`. Two line shapes for a session:
 //
 //   verification (Stop):   {"session_id":"<id>","safety":true,"phase_zero":true,"ts":"<iso>"}
 //   re-arm (PreCompact):   {"session_id":"<id>","event":"precompact_rearm","ts":"<iso>"}
@@ -14,7 +14,7 @@
 // Reader finds, for the current session, the latest verification line and the
 // latest re-arm line, then emits a flag's cached marker ONLY when that
 // verification is more recent than the last re-arm. The file is truncated by
-// project-context-loader.sh on new-session detection (HOOK_SESSION_ID change),
+// project-context-loader.cjs on new-session detection (HOOK_SESSION_ID change),
 // so it never accumulates state from prior sessions.
 //
 // Why the recency compare: compaction drops the safety-baseline rule TEXT from
@@ -28,9 +28,9 @@
 //
 // Architectural notes:
 //  - The skill is `allowed-tools: [Read]`. Filesystem ops live in hook
-//    context (here / post-session.sh), not in the skill.
+//    context (here / post-session.cjs), not in the skill.
 //  - HOOK_SESSION_ID arrives via ctx.session_id (parsed by dispatch.cjs).
-//  - Sentinel WRITE happens in post-session.sh (Stop event), not here.
+//  - Sentinel WRITE happens in post-session.cjs (Stop event), not here.
 //  - This hook only READS the JSONL and emits markers. No state mutation.
 //
 // Bypass: MEOWKIT_SKIP_SAFETY_SENTINEL=off disables marker injection.
@@ -38,7 +38,8 @@
 
 'use strict';
 const fs = require('fs');
-const path = require('path');
+
+const { projectRoot, sessionStateFile } = require('../lib/meowkit-paths.cjs');
 
 const STATE_FILE = 'session-sentinels.jsonl';
 
@@ -50,8 +51,8 @@ module.exports = async function (ctx /*, state */) {
   const sessionId = (ctx && ctx.session_id) || process.env.HOOK_SESSION_ID || '';
   if (!sessionId) return '';
 
-  const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-  const stateFile = path.join(root, 'session-state', STATE_FILE);
+  const root = projectRoot();
+  const stateFile = sessionStateFile(STATE_FILE, root);
 
   let raw;
   try {

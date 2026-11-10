@@ -7,7 +7,7 @@
 
 set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel):-$(pwd)}"
-PY="$ROOT/.agents/skills/.venv/bin/python3"
+PY="$ROOT/.meowkit/envs/confluence/bin/python3"
 SCRIPT="$ROOT/.agents/skills/confluence/scripts/adf_to_md.py"
 WRAPPER="$ROOT/.agents/skills/confluence/scripts/confluence-as.sh"
 

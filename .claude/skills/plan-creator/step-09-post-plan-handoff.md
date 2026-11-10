@@ -23,7 +23,7 @@ For risk-tiered routing, invoke via `/mk:cook` or `/mk:fix`.
 
 ### 9b. Live Risk Re-Scan
 
-Run a single grep pass over `plan.md` and every `phase-XX-*.md` for trigger keywords from `.claude/rules/risk-checklist.md`: `AUTH`, `AUTHZ`, `DATA_MODEL`, `AUDIT_SEC`, `EXT_SYSTEM`. Use literal-string match (no regex).
+Run a single grep pass over `plan.md` and every `phase-XX-*.md` for trigger keywords from `.claude/skills/agent-detector/references/risk-checklist.md`: `AUTH`, `AUTHZ`, `DATA_MODEL`, `AUDIT_SEC`, `EXT_SYSTEM`. Use literal-string match (no regex).
 
 If any keyword appears that was NOT in the original `matched_flags`, print this advisory and treat the re-scan match as the effective risk set for option ordering:
 
@@ -59,8 +59,8 @@ Build the question payload using the option set above. Each option has `label` a
     "header": "Next Step",
     "options": [
       { "label": "Cook (Recommended)", "description": "Run /mk:cook to implement the plan" },
-      { "label": "Validate", "description": "Run /mk:plan validate for a critical-questions interview" },
-      { "label": "Red-team", "description": "Run /mk:plan red-team for adversarial review" },
+      { "label": "Validate", "description": "Run /mk:plan-creator validate for a critical-questions interview" },
+      { "label": "Red-team", "description": "Run /mk:plan-creator red-team for adversarial review" },
       { "label": "End", "description": "Stop here — review plan before deciding" }
     ],
     "multiSelect": false
@@ -94,34 +94,14 @@ Print exactly one line matching the selection:
 | Cook (parallel + TDD) | `Run: /mk:cook --parallel {absolute-path-to-plan.md} --tdd` |
 | Cook (fast mode) | `Run: /mk:cook --auto {absolute-path-to-plan.md}` |
 | Cook (fast + TDD) | `Run: /mk:cook --auto {absolute-path-to-plan.md} --tdd` |
-| Validate | `Run: /mk:plan validate {absolute-path-to-plan.md}` |
-| Red-team | `Run: /mk:plan red-team {absolute-path-to-plan.md}` |
+| Validate | `Run: /mk:plan-creator validate {absolute-path-to-plan.md}` |
+| Red-team | `Run: /mk:plan-creator red-team {absolute-path-to-plan.md}` |
 | Hand off to mk:autobuild | `Run: /mk:autobuild {absolute-path-to-plan.md}` |
 | End | (no command line — print "Plan complete. No next command queued.") |
 
-If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.claude/session-state/tdd-mode` surviving a fresh session.
+If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.meowkit/state/tdd-mode` surviving a fresh session.
 
 After the command line, print the Context Reminder block from `references/gate-1-approval.md` with the absolute path substituted.
-
-### 9f-bis. Terminal Wiki Handoff (advisory, fail-open)
-
-The plan was just approved, so `plan.md` is a durable, user-chosen artifact. Per the
-shared contract in `.claude/skills/wiki/references/terminal-handoff-advisory.md`, hand it
-to the wiki AFTER the command line is printed and BEFORE the STOP. This adds no gate and
-no prompt; a failure is advisory only.
-
-Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip):
-
-```bash
-npx mewkit wiki handoff propose \
-  --skill mk:plan-creator \
-  --from {plan_dir}/plan.md \
-  --slug <resolved-wiki-slug> \
-  --explicit-intent
-```
-
-If no unique slug resolves, print the command above with a literal `--slug <slug>` for the
-user and continue. Do NOT run `wiki approve`. Do NOT add `wiki reindex` to this step.
 
 ### 9g. Stop
 
@@ -132,7 +112,6 @@ user and continue. Do NOT run `wiki approve`. Do NOT add `wiki reindex` to this 
 - `plan.md` frontmatter contains `handoff: { next, decided_at }`.
 - Suggested command printed.
 - Context Reminder block printed.
-- Terminal wiki handoff attempted (advisory, fail-open) per 9f-bis.
 - Session STOPs.
 
 ## Next

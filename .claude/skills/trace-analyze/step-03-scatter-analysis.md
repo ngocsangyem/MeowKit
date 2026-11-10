@@ -71,15 +71,9 @@ done
 Print a one-line summary per batch:
 
 ```bash
-PY=".claude/skills/.venv/bin/python3"
-[ -x "$PY" ] || PY="python3"
 for i in $(seq 1 "$batch_count"); do
-  "$PY" -c "
-import json
-with open('$analysis_dir/batch-${i}-findings.json') as f:
-    d = json.load(f)
-print(f'Batch ${i}: {len(d)} pattern(s) detected')
-"
+  node .claude/skills/trace-analyze/scripts/trace-records.cjs count \
+    "$analysis_dir/batch-${i}-findings.json" "$i"
 done
 ```
 

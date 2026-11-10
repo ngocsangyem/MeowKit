@@ -2,7 +2,7 @@
 name: mk:nyquist
 version: 1.0.0
 preamble-tier: 3
-description: Test-to-requirement coverage mapping. Reads plan acceptance criteria and test files, produces a coverage gap report showing which requirements have no tests. Use during Phase 2 (Test) or Phase 4 (Review) to verify test completeness. Named after the Nyquist sampling theorem — sufficient test coverage prevents aliased (missed) requirements. NOT for running tests (see mk:testing); NOT for structural code review (see mk:review).
+description: Maps plan acceptance criteria onto test files and reports which requirements have no test. NOT for mk:testing.
 allowed-tools:
   - Read
   - Grep
@@ -14,7 +14,7 @@ keywords:
   - requirement-mapping
   - coverage-gap
   - acceptance-criteria
-when_to_use: Use during Phase 2 or Phase 4 to map test coverage to plan acceptance criteria — finds aliased (missed) requirements. NOT for running tests (see mk:testing) or structural code review (see mk:review).
+when_to_use: Asked whether the suite actually covers every acceptance criterion.
 user-invocable: true
 owner: research
 criticality: medium

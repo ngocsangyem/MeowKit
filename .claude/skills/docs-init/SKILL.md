@@ -1,11 +1,7 @@
 ---
 name: mk:docs-init
 version: 1.0.0
-description: |
-  Use when a project has no docs/ directory or needs initial documentation
-  generated from codebase analysis. Triggers on "init docs", "create documentation",
-  "generate docs", "docs init", or when docs/ is empty. Do NOT use for updating
-  existing docs (use mk:document-release).
+description: Generate a project's first docs/ set from codebase analysis. NOT for mk:document-release.
 allowed-tools:
   - Bash
   - Read
@@ -22,7 +18,7 @@ keywords:
   - docs-scaffolding
   - new-project-docs
   - codebase-analysis
-when_to_use: Use when a project has no docs/ directory and needs initial documentation generated from codebase analysis. NOT for updating existing docs (see mk:document-release).
+when_to_use: The docs/ directory is missing or empty and needs a baseline set.
 user-invocable: true
 owner: docs
 criticality: medium

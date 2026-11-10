@@ -1,6 +1,7 @@
 ---
 name: "mk-multimodal"
 description: "Process images/video/audio/PDFs via Gemini API; generate images/video/speech/music; convert docs to Markdown. Multi-provider fallback. Use for analyze/transcribe/generate/convert on media files."
+requires_runtime: ["python>=3.9"]
 ---
 
 <!-- SECURITY ANCHOR
@@ -29,7 +30,7 @@ verify preview IDs against the provider dashboard before relying on one.
 | Validate keys and dependencies | `scripts/check_setup.py` |
 
 ```bash
-.agents/skills/.venv/bin/python3 .agents/skills/multimodal/scripts/gemini_analyze.py \
+node .codex/scripts/skill-python.cjs .agents/skills/multimodal/scripts/gemini_analyze.py \
   --files <path> --task <analyze|transcribe|extract> [--resolution low-res] [--json]
 ```
 

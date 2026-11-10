@@ -7,9 +7,13 @@ const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-const CHECKPOINT_DIR = path.join(ROOT, 'session-state', 'checkpoints');
+const { projectRoot, sessionStateDir, sessionStateFile } = require('./meowkit-paths.cjs');
+
+const ROOT = projectRoot();
+const CHECKPOINT_DIR = path.join(sessionStateDir(ROOT), 'checkpoints');
 const LATEST_FILE = path.join(CHECKPOINT_DIR, 'checkpoint-latest.json');
+/** The checkpoint to read: the canonical file, or a pre-move one while it is all a project has. */
+const LATEST_READ_FILE = sessionStateFile(path.join('checkpoints', 'checkpoint-latest.json'), ROOT);
 
 // Unavailable git values are NULL, never the string 'unknown' — a fabricated-looking token in a
 // durable record is worse than an honest absent value the reader must handle.
@@ -49,7 +53,7 @@ function gitStatus() {
 // Sequence is display-only; collisions are acceptable.
 function readPreviousSequence() {
   try {
-    const prev = JSON.parse(fs.readFileSync(LATEST_FILE, 'utf8'));
+    const prev = JSON.parse(fs.readFileSync(LATEST_READ_FILE, 'utf8'));
     return typeof prev.sequence === 'number' ? prev.sequence : 0;
   } catch {
     return 0;
@@ -69,6 +73,7 @@ function writeCheckpoint(checkpoint) {
 module.exports = {
   CHECKPOINT_DIR,
   LATEST_FILE,
+  LATEST_READ_FILE,
   gitHead,
   gitBranch,
   gitStatus,

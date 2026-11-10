@@ -1,19 +1,23 @@
 #!/usr/bin/env bash
-# Wraps the venv-local jira-as binary. Sources .meowkit/.env (and the pre-move .claude/.env), translates
+# Wraps the jira-as binary. Sources .meowkit/.env (and the pre-move .claude/.env), translates
 # MEOW_JIRA_* → JIRA_* env, sets JIRA_OUTPUT=json default, then exec's.
-# Resolves to venv-local binary (NOT PATH) since `.claude/scripts/bin/setup-workflow` installs
-# jira-as into .claude/skills/.venv per skills-dependencies.ts.
+#
+# Resolved from THIS SKILL's own environment, never from PATH: the binary is
+# installed by `mewkit skill env jira` from this skill's pinned requirements, and
+# a `jira-as` that happens to be on PATH is some other installation with some
+# other version.
 set -euo pipefail
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-JIRA_AS="$ROOT/.claude/skills/.venv/bin/jira-as"
+JIRA_AS="$ROOT/.meowkit/envs/jira/bin/jira-as"
 # Legacy first, canonical second: with `set -a` a later assignment wins, so
 # `.meowkit/.env` stays authoritative when a project still has both files.
 ENV_FILES="$ROOT/.claude/.env $ROOT/.meowkit/.env"
 
 if [ ! -x "$JIRA_AS" ]; then
-  echo "[mk:jira] jira-as not installed at $JIRA_AS" >&2
-  echo "[mk:jira] Run: .claude/scripts/bin/setup-workflow    (auto-installs from .claude/skills/jira/scripts/requirements.txt)" >&2
+  echo "[jira] jira-as not installed at $JIRA_AS" >&2
+  echo "[jira] Run: mewkit skill env jira" >&2
+  echo "[jira] That installs only what .claude/skills/jira/scripts/requirements.txt pins." >&2
   exit 127
 fi
 

@@ -1,6 +1,6 @@
 ---
 name: mk:confluence-spec-analyst
-description: 'Deep spec analysis on a Confluence page. Reads page (+ children) via the confluence-as wrapper, produces a structured Spec Research Report with requirements, acceptance criteria, gaps, ambiguities, and suggested user stories for human review. Read-only — does NOT create Jira tickets. Triggers: ''analyze spec for PAGE-ID'', ''extract requirements from confluence page'', ''spec research on URL''. NOT for raw page CRUD (mk:confluence-page); NOT for ticket complexity scoring (mk:planning-engine).'
+description: 'mk:confluence leaf. Spec report of requirements, acceptance criteria, gaps, stories. NOT for mk:confluence-page.'
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - gap-detection
   - story-suggestion
   - weasel-word
-when_to_use: Use to extract structured requirements / acceptance criteria / gaps from a Confluence spec page. Output is a research report for human consumption — does NOT auto-create Jira tickets. NOT for raw page CRUD (use mk:confluence-page); NOT for sprint planning (use mk:planning-engine).
+when_to_use: 'Pull requirements or find missing acceptance criteria in a Confluence spec.'
 user-invocable: true
 context: fork
 agent: confluence-spec-analyst

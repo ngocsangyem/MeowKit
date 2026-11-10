@@ -1,12 +1,21 @@
 import fs from "node:fs";
 import path from "node:path";
-import { resolveStateDir } from "../state/resolve-state-dir.js";
+import { resolveSessionStateFile, resolveStateDir } from "../state/resolve-state-dir.js";
 import type { CostEntry, LiveBudgetState } from "./budget-types.js";
+
+/**
+ * The path the search looks for in each directory it walks. Exported so the message a user
+ * sees when the search fails can name the same path the search used — the old message named
+ * a location this code has never read, which sent people to a file that was never there.
+ */
+export function costLogCandidate(dir: string): string {
+	return path.join(resolveStateDir(dir, "telemetry"), "cost-log.json");
+}
 
 export function findCostLog(): string | null {
 	let current = process.cwd();
 	while (true) {
-		const candidate = path.join(resolveStateDir(current, "telemetry"), "cost-log.json");
+		const candidate = costLogCandidate(current);
 		if (fs.existsSync(candidate)) {
 			return candidate;
 		}
@@ -37,7 +46,7 @@ export function resolveCurrentSessionId(projectRoot: string): string | null {
 		return envSessionId;
 	}
 
-	const lastSessionFile = path.join(projectRoot, "session-state", "last-session-id");
+	const lastSessionFile = resolveSessionStateFile(projectRoot, "last-session-id");
 	if (!fs.existsSync(lastSessionFile)) {
 		return null;
 	}
@@ -47,7 +56,7 @@ export function resolveCurrentSessionId(projectRoot: string): string | null {
 }
 
 export function readLiveBudgetState(projectRoot: string): LiveBudgetState | null {
-	const budgetStateFile = path.join(projectRoot, "session-state", "budget-state.json");
+	const budgetStateFile = resolveSessionStateFile(projectRoot, "budget-state.json");
 	if (!fs.existsSync(budgetStateFile)) {
 		return null;
 	}

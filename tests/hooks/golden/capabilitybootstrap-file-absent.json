@@ -1,0 +1,23 @@
+{
+  "name": "capabilitybootstrap-file-absent",
+  "group": "observer-capability-bootstrap",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/capability-bootstrap.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"SessionStart\"}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "capabilitybootstrap-file-absent",
+  "setupDescription": "no capability-bootstrap.md (partial install)",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "",
+    "stderr": ""
+  }
+}

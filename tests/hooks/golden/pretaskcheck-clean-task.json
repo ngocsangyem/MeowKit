@@ -1,0 +1,23 @@
+{
+  "name": "pretaskcheck-clean-task",
+  "group": "observer-pre-task-check",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-task-check.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"npm run build\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "pretaskcheck-clean-task",
+  "setupDescription": "BASE hook tree only",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "marker": null,
+    "stdout": "PASS — no injection patterns detected.\n",
+    "stderr": ""
+  }
+}

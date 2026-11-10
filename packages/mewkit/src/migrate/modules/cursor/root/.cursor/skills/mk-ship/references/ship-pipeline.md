@@ -44,8 +44,8 @@ npm run lint      # or: yarn lint, flake8, swiftlint
 npx tsc --noEmit  # or: mypy, swift build
 
 # Run the project's shared validation scripts, if present (path varies by project)
-.cursor/skills/.venv/bin/python3 <path-to-validate.py>
-.cursor/skills/.venv/bin/python3 <path-to-security-scan.py>
+.meowkit/envs/ship/bin/python3 <path-to-validate.py>
+.meowkit/envs/ship/bin/python3 <path-to-security-scan.py>
 ```
 
 **Gate:** If ANY command exits with a non-zero code, STOP. Fix the issue before proceeding.

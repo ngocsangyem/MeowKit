@@ -15,12 +15,12 @@ import { readInstallMetadata } from "../core/install-metadata.js";
 // separate, explicitly-named command.
 //
 // The hash + frontmatter surgery live in the pure-sh helper
-// `.claude/hooks/lib/approval-receipt.sh` — the SAME file the shell Gate 1 hook
+// `.claude/hooks/lib/approval-receipt.cjs` — the SAME file the shell Gate 1 hook
 // uses to VERIFY. Shelling out to it (rather than reimplementing the hash in TS)
 // is what guarantees the writer and the verifier can never drift. Anti-accidental
 // per ADR 260715: this records "an approval was stamped against this plan
 // revision", NOT a host-authenticated "a human approved" — the agent must only run
-// it after a real human approval (intervention-recording-rules.md Rule 3).
+// it after a real human approval (gate-rules.md, Recording Human Interventions).
 
 export interface PlanApproveArgs {
 	/** Plan directory or a plan.md path. */
@@ -123,7 +123,7 @@ export async function planApprove(args: PlanApproveArgs): Promise<void> {
 
 	// The receipt helper is shipped under .claude/hooks/lib/. It is resolved relative
 	// to the project root (cwd), matching where the Gate 1 hook reads it from.
-	const helper = path.resolve(".claude/hooks/lib/approval-receipt.sh");
+	const helper = path.resolve(".claude/hooks/lib/approval-receipt.cjs");
 	if (!fs.existsSync(helper)) {
 		console.log(pc.red(`plan approve: approval-receipt helper not found at ${helper}`));
 		console.log(pc.dim("This project may predate the receipt mechanism — reinstall .claude/ hooks."));
@@ -134,7 +134,11 @@ export async function planApprove(args: PlanApproveArgs): Promise<void> {
 	const approver = typeof args.by === "string" && args.by.trim().length > 0 ? args.by.trim() : gitUserOrHuman();
 
 	try {
-		const out = execFileSync("sh", [helper, "stamp", planFile, approver], { encoding: "utf8" });
+		// The helper is a node module. It was a shell script once and this call site
+		// kept `sh` after the port, which made the receipt unstampable on every host:
+		// `sh` reads `'use strict';` as a command. Run it on the interpreter that is
+		// already running, which also means no shell is needed to stamp a gate.
+		const out = execFileSync(process.execPath, [helper, "stamp", planFile, approver], { encoding: "utf8" });
 		process.stdout.write(out);
 		console.log(pc.green("✓ Gate 1 approval receipt stamped."));
 		console.log(

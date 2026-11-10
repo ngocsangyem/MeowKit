@@ -1,12 +1,7 @@
 ---
 name: mk:freeze
 version: 0.1.0
-description: |
-  Session-scoped directory edit restriction. Blocks Edit and Write outside the
-  allowed path for the current session only. Use when debugging to prevent
-  accidentally "fixing" unrelated code, or when you want to scope changes to one
-  module. Use when asked to "freeze", "restrict edits", "only edit this folder",
-  or "lock down edits". NOT for blocking destructive shell commands (see mk:careful).
+description: Session-scoped edit restriction blocking Edit and Write outside one allowed path. NOT for mk:careful.
 allowed-tools:
   - Bash
   - Read
@@ -16,12 +11,14 @@ hooks:
     - matcher: Edit
       hooks:
         - type: command
-          command: bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh
+          command: node
+          args: ["${CLAUDE_PROJECT_DIR}/.claude/skills/freeze/bin/check-freeze.cjs"]
           statusMessage: Checking freeze boundary...
     - matcher: Write
       hooks:
         - type: command
-          command: bash ${CLAUDE_SKILL_DIR}/bin/check-freeze.sh
+          command: node
+          args: ["${CLAUDE_PROJECT_DIR}/.claude/skills/freeze/bin/check-freeze.cjs"]
           statusMessage: Checking freeze boundary...
 source: gstack
 keywords:
@@ -30,7 +27,7 @@ keywords:
   - directory-restriction
   - session-scope
   - edit-lockdown
-when_to_use: Use when scoping edits to a specific module/directory — blocks Edit/Write outside allowed path for the session. NOT for blocking destructive shell commands (see mk:careful).
+when_to_use: Keeping a debugging session from touching code outside one folder.
 user-invocable: true
 owner: lifecycle
 criticality: medium
@@ -68,7 +65,7 @@ echo "$FREEZE_DIR"
 
 ```bash
 FREEZE_DIR="${FREEZE_DIR%/}/"
-STATE_DIR="${CLAUDE_PLUGIN_DATA:-.meowkit/memory}"
+STATE_DIR="${CLAUDE_PLUGIN_DATA:-.meowkit/state}"
 mkdir -p "$STATE_DIR"
 echo "$FREEZE_DIR" > "$STATE_DIR/freeze-dir.txt"
 echo "Freeze boundary set: $FREEZE_DIR"

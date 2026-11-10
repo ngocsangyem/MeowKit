@@ -1,0 +1,23 @@
+{
+  "name": "preship-commit-security-verdict-block",
+  "group": "gate2-preship",
+  "base": "b8556870d9f9f65ff82ececec44f9d2a751b2e37",
+  "entrypoint": ".claude/hooks/pre-ship.sh",
+  "args": [],
+  "stdin": "{\"session_id\":\"corpus-session\",\"cwd\":\"{{TMP}}\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git commit -m \\\"feat: add thing\\\"\"}}\n",
+  "env": {
+    "CLAUDE_PROJECT_DIR": "{{TMP}}"
+  },
+  "setup": "preship-commit-security-verdict-block",
+  "setupDescription": "a security verdict with a FAIL dimension (lib/gate2-check.sh:206 path)",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 2,
+    "signal": null,
+    "marker": "@@GATE_BLOCK@@",
+    "stdout": "",
+    "stderr": "@@GATE_BLOCK@@\nGate 2 structural check FAILED — ship blocked.\n\nSecurity verdict 'tasks/reviews/261101-corpus-demo-security-verdict.md' blocks plan 'corpus-demo'.\nFix: resolve the security findings and obtain a new PASS security verdict.\n\nGate 2 is human-approved and has no exceptions (.claude/rules/gate-rules.md).\nThis check proves only that the paperwork exists and is self-consistent;\nit does not and cannot prove a human approved anything.\n"
+  }
+}

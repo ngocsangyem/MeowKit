@@ -17,8 +17,8 @@ Then read AGENTS.md, TODOS.md, and any existing architecture docs.
 ```bash
 SLUG=$(.codex/scripts/bin/workflow-slug 2>/dev/null || basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr '/' '-' || echo 'no-branch')
-DESIGN=$(ls -t .meowkit/memory/projects/*-$BRANCH-design-*.md 2>/dev/null | head -1)
-[ -z "$DESIGN" ] && DESIGN=$(ls -t .meowkit/memory/projects/*-design-*.md 2>/dev/null | head -1)
+DESIGN=$(ls -t tasks/plans/*/*-$BRANCH-design-*.md 2>/dev/null | head -1)
+[ -z "$DESIGN" ] && DESIGN=$(ls -t tasks/plans/*/*-design-*.md 2>/dev/null | head -1)
 [ -n "$DESIGN" ] && echo "Design doc found: $DESIGN" || echo "No design doc found"
 ```
 If a design doc exists (from `the office-hours skill`), read it. Use it as the source of truth for the problem statement, constraints, and chosen approach. If it has a `Supersedes:` field, note that this is a revised design.
@@ -27,7 +27,7 @@ If a design doc exists (from `the office-hours skill`), read it. Use it as the s
 
 Reuses $SLUG and $BRANCH from the design doc check above:
 ```bash
-HANDOFF=$(ls -t .meowkit/memory/projects/*-$BRANCH-ceo-handoff-*.md 2>/dev/null | head -1)
+HANDOFF=$(ls -t tasks/plans/*/*-$BRANCH-ceo-handoff-*.md 2>/dev/null | head -1)
 [ -n "$HANDOFF" ] && echo "HANDOFF_FOUND: $HANDOFF" || echo "NO_HANDOFF"
 ```
 If this block runs in a separate shell from the design doc check, recompute $SLUG and $BRANCH first using the same commands from that block.

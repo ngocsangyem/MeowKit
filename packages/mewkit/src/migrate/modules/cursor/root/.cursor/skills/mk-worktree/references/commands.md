@@ -110,7 +110,7 @@ node .cursor/skills/worktree/scripts/worktree.cjs create "{agent-name}" --orches
 ```
 
 Places worktree at `.worktrees/{agent-name}` on branch `parallel/{agent-name}-{timestamp}`.
-Matches `parallel-execution-rules.md` Rule 3 exactly.
+Matches the parallel-execution rules Rule 3 exactly.
 
 ### Feature mode (standard)
 

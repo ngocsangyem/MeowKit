@@ -1,0 +1,23 @@
+{
+  "name": "audit-single-file-clean",
+  "group": "injection-audit",
+  "base": "a190cc91692acf90fb3bfde4c3aee2479f717d9e",
+  "invocation": {
+    "kind": "scan-one",
+    "target": "CHANGELOG.md"
+  },
+  "setup": "audit-single-file-clean",
+  "setupDescription": "an explicit path with nothing to report",
+  "normalizers": [
+    "tmpdir"
+  ],
+  "expect": {
+    "exit": 0,
+    "signal": null,
+    "stdout": "{\"path\":\"CHANGELOG.md\",\"findings\":[]}\n",
+    "stderr": ""
+  },
+  "sideEffects": {
+    ".meowkit/telemetry/security-log.md": null
+  }
+}

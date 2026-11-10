@@ -6,7 +6,7 @@ Spawn the `developer` subagent to implement the build per the signed contract (o
 
 ### 3a. Pre-flight checks
 
-- `gate-enforcement.sh` will block source-code edits unless either (a) a signed contract exists OR (b) `MEOWKIT_AUTOBUILD_MODE=LEAN`
+- `gate-enforcement.cjs` will block source-code edits unless either (a) a signed contract exists OR (b) `MEOWKIT_AUTOBUILD_MODE=LEAN`
 - Confirm `plan_dir` is set (from step-01)
 - Confirm `contract_path` is set OR null with reason logged (from step-02)
 - Confirm `budget_spent` is below `budget_cap`

@@ -1,6 +1,6 @@
 ---
 name: mk:loop
-description: 'Use when autonomously improving a measurable scalar metric through bounded, git-tracked iterations: modify one scoped change, verify, keep or revert. Triggers on /mk:loop, ''optimize coverage/bundle size/lint count'', ''iterate until the metric improves''. NOT for subjective cleanup (see mk:cook), known-root-cause bugs (see mk:fix), behavioral grading (see mk:evaluate), or shipping (see mk:ship).'
+description: Iterate on one measurable scalar — modify, verify, keep or revert — in bounded git-tracked trials. NOT for mk:evaluate.
 version: 1.0.0
 argument-hint: '[Goal: ...] [Scope: globs] [Metric: name] [Direction: higher|lower] [Verify: cmd] [Guard: cmd] [Iterations: N]'
 source: local
@@ -26,7 +26,7 @@ keywords:
   - keep-or-revert
   - bounded
   - regression-guard
-when_to_use: Use when an objective scalar metric can drive repeated scoped trials with keep/revert. NOT for subjective goals (mk:cook), known bugs (mk:fix), or behavioral grading (mk:evaluate).
+when_to_use: Asked to optimize coverage, bundle size or lint count until it improves.
 user-invocable: true
 metadata:
   attribution: Loop pattern adapted from autoresearch by Udit Goenka (MIT); MeowKit-native gates, git policy, and artifacts.
@@ -203,5 +203,5 @@ Schema details (TSV columns, statuses, resume state): [`references/result-schema
 
 Loop pattern (Modify → Verify → Keep/Discard with safety guardrails) adapted from
 autoresearch by Udit Goenka (MIT). Toolkit-native re-homing: boundary-gated autonomy,
-conventional `*(loop):` commit policy, `tasks/reports` + `session-state` artifacts, and the
+conventional `*(loop):` commit policy, `tasks/reports` + `.meowkit/state` artifacts, and the
 Skill Rule of Two posture. Not a verbatim copy.

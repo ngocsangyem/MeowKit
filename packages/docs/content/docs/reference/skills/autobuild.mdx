@@ -32,7 +32,7 @@ Autonomous build pipeline for green-field products. Runs planner → contract �
 - **Budget enforcement:** Warns at $30, requires approval at $100, hard-blocks at user-set `--budget` value
 - **Run reports:** Every run produces a full audit trail at `tasks/autobuild-runs/YYMMDD-{slug}/run.md` including budget trail, per-step artifacts, and final verdict
 - **Resumability:** Checkpoints at every step — if killed mid-run, `--resume {run-id}` picks up at the last completed step
-- **TDD opt-in:** `--tdd` writes the `.claude/session-state/tdd-mode` sentinel; developer waits on tester before each generator iteration
+- **TDD opt-in:** `--tdd` writes the `.meowkit/state/tdd-mode` sentinel; developer waits on tester before each generator iteration
 
 ## Usage
 
@@ -82,7 +82,7 @@ Override: `--tier` flag or `MEOWKIT_AUTOBUILD_MODE`. Density never bypasses gate
 - **6-hour wall-clock timeout** — hard limit per Anthropic's observed runs; checkpoints every step for resumability
 - **Max 3 iteration rounds** between generator and evaluator before escalating to human
 - **Run report mandatory** — every run writes full audit trail
-- **TDD opt-in:** `--tdd` writes `.claude/session-state/tdd-mode` sentinel; developer waits on tester before each generator iteration
+- **TDD opt-in:** `--tdd` writes `.meowkit/state/tdd-mode` sentinel; developer waits on tester before each generator iteration
 
 ## Outputs
 

@@ -4,7 +4,7 @@
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 EXEC="$ROOT/.claude/skills/story-sizer/scripts/execute-auto-create.py"
-PY="$ROOT/.claude/skills/.venv/bin/python3"
+PY="$ROOT/.meowkit/envs/story-sizer/bin/python3"
 [ -x "$PY" ] || PY="python3"
 export CLAUDE_PROJECT_DIR="$ROOT"
 

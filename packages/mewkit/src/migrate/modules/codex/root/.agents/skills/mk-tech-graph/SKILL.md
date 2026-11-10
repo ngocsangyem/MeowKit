@@ -1,6 +1,7 @@
 ---
 name: "mk-tech-graph"
 description: "Generate publish-grade SVG+PNG technical diagrams (architecture, data flow, sequence, ER, state-machine, etc.) in 8 styles. Writes to tasks/visuals/. Needs rsvg-convert for PNG; else SVG-only."
+requires_runtime: ["python>=3.9"]
 ---
 
 # Tech Graph
@@ -38,7 +39,7 @@ Generate production-quality SVG technical diagrams, optionally exported as PNG.
 
 Determine the destination before writing:
 
-1. If `session-state/active-plan` exists, write `tasks/plans/<active-plan>/visuals/<slug>.{svg,png}`.
+1. If `.meowkit/state/active-plan` exists, write `tasks/plans/<active-plan>/visuals/<slug>.{svg,png}`.
 2. Otherwise write `tasks/visuals/<slug>.{svg,png}`.
 
 Use a lowercase-hyphenated `<slug>` derived from the diagram description and create the destination directory when absent. Export PNG at 1920px only when `rsvg-convert` is present:

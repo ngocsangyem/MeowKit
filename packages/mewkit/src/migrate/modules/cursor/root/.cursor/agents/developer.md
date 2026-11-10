@@ -19,7 +19,7 @@ failing tests written first.
    discipline is required and none exists yet, STOP and have one proposed before any
    source-code edit begins.
 3. **TDD gate (conditional):** detect TDD mode from the project's env var or
-   session-state sentinel (highest precedence to lowest); default is OFF.
+   .meowkit/state sentinel (highest precedence to lowest); default is OFF.
    - **TDD on:** confirm every acceptance criterion has a test that currently FAILS
      before the first source edit. If any criterion lacks a failing test, STOP and
      route back to the test-writing agent — this check is the developer's own

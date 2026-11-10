@@ -68,25 +68,25 @@ run_test "Gate 1: file not found" 1 sh "$SCRIPT_DIR/validate-gate-1.sh" "$TMPDIR
 # --- Gate 2 Tests ---
 
 # Test 4: Clean review (no critical, no FAIL)
-run_test "Gate 2: clean review" 0 sh -c "printf 'Score: 9.2/10\nCritical (0): []\nWarnings (1): [minor issue]\n' | sh '$SCRIPT_DIR/validate-gate-2.sh' -"
+run_test "Gate 2: clean review" 0 sh -c "printf 'Score: 9.2/10\nCritical (0): []\nWarnings (1): [minor issue]\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
 
 # Test 5: Review with critical issues
-run_test "Gate 2: critical issues" 1 sh -c "printf 'Score: 6/10\nCritical (2): [XSS, SQL injection]\nSecurity: FAIL\n' | sh '$SCRIPT_DIR/validate-gate-2.sh' -"
+run_test "Gate 2: critical issues" 1 sh -c "printf 'Score: 6/10\nCritical (2): [XSS, SQL injection]\nSecurity: FAIL\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
 
 # Test 6: Review with FAIL dimension
-run_test "Gate 2: FAIL dimension" 1 sh -c "printf 'Score: 7/10\nFAIL: architecture violated\n' | sh '$SCRIPT_DIR/validate-gate-2.sh' -"
+run_test "Gate 2: FAIL dimension" 1 sh -c "printf 'Score: 7/10\nFAIL: architecture violated\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
 
 # Test 8: Incidental "failed" in prose should NOT trigger block
-run_test "Gate 2: incidental 'failed' in prose" 0 sh -c "printf 'Score: 8.5/10\nCritical (0): []\nThis approach failed to consider edge cases but was corrected.\n' | sh '$SCRIPT_DIR/validate-gate-2.sh' -"
+run_test "Gate 2: incidental 'failed' in prose" 0 sh -c "printf 'Score: 8.5/10\nCritical (0): []\nThis approach failed to consider edge cases but was corrected.\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
 
 # Test 7: File not found
-run_test "Gate 2: file not found" 1 sh "$SCRIPT_DIR/validate-gate-2.sh" "$TMPDIR/nonexistent-verdict.md"
+run_test "Gate 2: file not found" 1 node "$SCRIPT_DIR/validate-gate-2.cjs" "$TMPDIR/nonexistent-verdict.md"
 
 # Test 9: Side effects detected without addendum should block
-run_test "Gate 2: side effects no addendum" 1 sh -c "printf 'Score: 8/10\nCritical (0): []\nSide Effects Detected: Yes\n- Regression in auth flow\n' | sh '$SCRIPT_DIR/validate-gate-2.sh' -"
+run_test "Gate 2: side effects no addendum" 1 sh -c "printf 'Score: 8/10\nCritical (0): []\nSide Effects Detected: Yes\n- Regression in auth flow\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
 
 # Test 10: Side effects detected WITH User Decision Addendum should pass
-run_test "Gate 2: side effects with addendum" 0 sh -c "printf 'Score: 8/10\nCritical (0): []\nSide Effects Detected: Yes\n- Regression in auth flow\n\n## User Decision Addendum\nUser selected: Add compatibility shim at auth boundary\nResumption point: Phase 3\n' | sh '$SCRIPT_DIR/validate-gate-2.sh' -"
+run_test "Gate 2: side effects with addendum" 0 sh -c "printf 'Score: 8/10\nCritical (0): []\nSide Effects Detected: Yes\n- Regression in auth flow\n\n## User Decision Addendum\nUser selected: Add compatibility shim at auth boundary\nResumption point: Phase 3\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
 
 # Test 11: A security BLOCK verdict fails independently of review evidence
 cat > "$TMPDIR/security-security-verdict.md" <<'VERDICT'
@@ -94,7 +94,7 @@ cat > "$TMPDIR/security-security-verdict.md" <<'VERDICT'
 | --- | --- | --- |
 | R7 | FAIL | Prompt injection does not halt |
 VERDICT
-run_test "Gate 2: security BLOCK verdict" 1 sh "$SCRIPT_DIR/validate-gate-2.sh" "$TMPDIR/security-security-verdict.md"
+run_test "Gate 2: security BLOCK verdict" 1 node "$SCRIPT_DIR/validate-gate-2.cjs" "$TMPDIR/security-security-verdict.md"
 
 # --- Declarative workflow contracts ---
 

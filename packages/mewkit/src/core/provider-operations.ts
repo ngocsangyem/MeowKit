@@ -97,7 +97,7 @@ export const OPERATION_AUTHORITY: Record<LogicalOperation, OperationAuthority> =
 		mayNot:
 			"Spawn a reviewer/evaluator to produce a verdict outside the orchestrated flow, or bypass the orchestrator boundary.",
 		rationale:
-			"orchestration-rules.md routes delegation through the orchestrator. A skill that could spawn its own evaluator could manufacture the verdict that authorizes its own ship.",
+			"cook/references/orchestration-rules.md routes delegation through the orchestrator. A skill that could spawn its own evaluator could manufacture the verdict that authorizes its own ship.",
 	},
 };
 

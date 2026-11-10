@@ -1,6 +1,6 @@
 ---
 name: mk:jira-lifecycle
-description: 'Drive JIRA workflow lifecycle via the jira-as wrapper: transition, assign, resolve, reopen, manage versions and components. Triggers: ''transition KEY to Status'', ''mark KEY as Done'', ''assign KEY to user'', ''reopen KEY'', ''release version'', ''create component''. NOT for issue CRUD (mk:jira-issue); NOT for bulk transitions (mk:jira-bulk).'
+description: 'mk:jira leaf. Transition, assign, resolve, reopen, versions, components. NOT for mk:jira-bulk.'
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - jira-resolve
   - jira-version
   - jira-component
-when_to_use: Use to change a Jira issue's status, assignee, or resolution, or to manage project versions/components. NOT for bulk operations.
+when_to_use: 'Change one Jira issue status or assignee, or release a version.'
 user-invocable: true
 context: fork
 agent: jira-lifecycle
@@ -49,6 +49,7 @@ Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key 
 - Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - **Authoritative source for THIS project's workflow** (discovered, not templated):
   - `references/workflow-discovery.md` — discovery + caching protocol (READ FIRST)
+  - `references/workflow-cache-layout.md` — what the cache directory holds, and whether to commit it
   - `tasks/jira-workflows/<workflow-slug>.md` — discovered workflow definitions
   - `tasks/jira-workflows/_schemes/<PROJECT_KEY>.md` — project → workflow mapping
   - Discovery script: `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ...` — wrapped by `fetch-workflow.sh`

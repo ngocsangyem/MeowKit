@@ -12,7 +12,7 @@ plan-as-visual-review; it does not critique or validate the plan.
 
 Invocation: `the visual-plan skill <plan-dir | plan.md> [--static] [--wireframe]`.
 
-Resolve `$PLAN_DIR` from the argument, or from `session-state/active-plan` when
+Resolve `$PLAN_DIR` from the argument, or from `.meowkit/state/active-plan` when
 available. If neither resolves a plan directory, ask the user for it.
 
 | Request | Load and follow |

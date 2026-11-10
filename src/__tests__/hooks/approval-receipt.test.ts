@@ -1,4 +1,4 @@
-// Round-trip tests for .claude/hooks/lib/approval-receipt.sh — the single home for the
+// Round-trip tests for .claude/hooks/lib/approval-receipt.cjs — the single home for the
 // Gate 1 approval receipt (the SAME helper the shell gate verifies with). Asserts the
 // exit-code contract the gate depends on: 0 fresh · 10 no-receipt · 11 stale, plus the
 // load-bearing property that the body hash EXCLUDES frontmatter (so the stamp cannot
@@ -9,7 +9,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-const HELPER = path.resolve(process.cwd(), ".claude/hooks/lib/approval-receipt.sh");
+const HELPER = path.resolve(process.cwd(), ".claude/hooks/lib/approval-receipt.cjs");
 
 let tmp: string | null = null;
 afterEach(() => {
@@ -24,14 +24,23 @@ function makePlan(body = "# Demo\n\nScope body line.\n", extraFm = ""): string {
 	return p;
 }
 
+/**
+ * The receipt helper is a library, not a CLI, so it is driven as one in a child
+ * process: the same module the gate requires, with its result surfaced as the
+ * exit code and the status line the subcommands used to print.
+ */
 function run(sub: string, file: string, approver?: string) {
-	const args = [HELPER, sub, file];
-	if (approver) args.push(approver);
-	const r = spawnSync("sh", args, { encoding: "utf8" });
+	const driver = [
+		`const lib = require(${JSON.stringify(HELPER)});`,
+		`const r = lib[${JSON.stringify(sub)}](process.argv[1], process.argv[2] || undefined);`,
+		'process.stdout.write(String(r.status) + "\\n");',
+		'process.exit(r.code);',
+	].join("\n");
+	const r = spawnSync(process.execPath, ["-e", driver, file, approver ?? ""], { encoding: "utf8" });
 	return { status: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "" };
 }
 
-describe("approval-receipt.sh", () => {
+describe("approval-receipt.cjs", () => {
 	it("verify on an unstamped plan reports no-receipt (exit 10)", () => {
 		const p = makePlan();
 		const r = run("verify", p);

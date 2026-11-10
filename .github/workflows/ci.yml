@@ -36,9 +36,6 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Wiki-research security corpus
-        run: npx vitest run packages/mewkit/src/wiki/infrastructure/__tests__/fetcher-adapter.test.ts packages/mewkit/src/wiki/infrastructure/__tests__/scanner-adapter.test.ts packages/mewkit/src/wiki/application/__tests__/research-quarantine.test.ts
-
       - name: Validate visual-plan eval fixtures
         run: node scripts/validate-visual-plan-evals.cjs
 
@@ -81,26 +78,43 @@ jobs:
       - name: mk:help skill contract test
         run: bash tests/help-skill-contract.test.sh
 
-      - name: Smoke-test memory CLI
+      - name: Lint the committed team-memory store
+        # Bounded: the lint reads user-pasted content, so a pathological line must fail the
+        # step rather than burn toward the 6-hour job ceiling.
+        timeout-minutes: 5
         run: |
-          node packages/mewkit/dist/index.js memory validate
-          node packages/mewkit/dist/index.js memory render-views
+          set -euo pipefail
+          # This repo's own store (may be absent — that is a legitimate PASS).
+          node packages/mewkit/dist/index.js validate --memory
+          # A store with REAL entries, so the step is not vacuous. Copied to a temp project
+          # root (and git-init'd, since the root resolver keys off the VCS root) because the
+          # fixture lives inside this repo and would otherwise resolve to the repo root.
+          fixture_root="$(mktemp -d)"
+          cp -R tests/fixtures/memory-store/. "$fixture_root/"
+          git -C "$fixture_root" init -q .
+          ( cd "$fixture_root" && node "$GITHUB_WORKSPACE/packages/mewkit/dist/index.js" validate --memory )
 
-      - name: Setup Python venv
-        run: |
-          python3 -m venv .claude/skills/.venv
-          .claude/skills/.venv/bin/pip install --quiet pyyaml jsonschema pytest
+      - name: Zero-residue check (memory/wiki)
+        run: node scripts/check-memory-wiki-residue.cjs
 
+      # Each Python-owning skill gets its OWN environment from its OWN pinned
+      # requirements. No shared environment and no blanket install: a package one
+      # skill pins must not become every skill's dependency, and a step that
+      # passed only because another step installed something is a step that lies.
       - name: Multimodal mock tests
-        run: .claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/tests/run_tests.py
+        run: |
+          node packages/mewkit/dist/index.js skill env multimodal
+          node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/tests/run_tests.py
 
       - name: Validate Figma evidence packet fixtures
-        run: .claude/skills/.venv/bin/python3 .claude/skills/figma/evals/validate-evidence-packets.py
+        run: |
+          node packages/mewkit/dist/index.js skill env figma
+          node .claude/hooks/lib/skill-python.cjs .claude/skills/figma/evals/validate-evidence-packets.py
 
       - name: Test web-to-markdown URL SSRF guard
         run: |
-          .claude/skills/.venv/bin/pip install --quiet -r .claude/skills/web-to-markdown/scripts/requirements.txt
-          .claude/skills/.venv/bin/python3 -m pytest \
+          node packages/mewkit/dist/index.js skill env web-to-markdown
+          node .claude/hooks/lib/skill-python.cjs --skill web-to-markdown -m pytest \
             .claude/skills/web-to-markdown/tests/test_safe_url.py \
             .claude/skills/web-to-markdown/tests/test_e2e_offline.py -q
 
@@ -108,28 +122,31 @@ jobs:
         run: bash tests/fixtures/plan-creator/validate-fixtures.sh
 
       - name: Validate skill-creator fixtures
-        run: bash tests/fixtures/skill-creator/validate-fixtures.sh
+        run: |
+          node packages/mewkit/dist/index.js skill env skill-creator
+          bash tests/fixtures/skill-creator/validate-fixtures.sh
 
       - name: Story-sizer deterministic tests
         run: bash tests/story-sizer-all.test.sh
 
       - name: Routing eval (Track D, EN + VI)
-        run: .claude/skills/.venv/bin/python3 .claude/skills/scale-routing/eval/run-routing-eval.py
+        run: |
+          node packages/mewkit/dist/index.js skill env scale-routing
+          node .claude/hooks/lib/skill-python.cjs .claude/skills/scale-routing/eval/run-routing-eval.py
 
       - name: Critical-skill contract coverage suites
         run: bash tests/skill-contract-coverage.test.sh
 
+      # Repo-development tooling: no skill owns it, so it runs on the runner's own
+      # interpreter and never inside a skill environment.
       - name: Real-world journey specs frozen + valid
-        run: .claude/skills/.venv/bin/python3 tests/journey-validation/check-journey-specs.py
+        run: python3 tests/journey-validation/check-journey-specs.py
 
       - name: Validate skill cross-refs
         run: bash scripts/check-skill-cross-refs.sh
 
       - name: Validate hook registration
         run: bash scripts/check-hook-registration.sh
-
-      - name: Validate hook shell consistency
-        run: bash scripts/check-hook-shell-consistency.sh
 
       - name: Validate workflow spec drift
         run: node packages/mewkit/dist/index.js validate --workflow
@@ -165,14 +182,43 @@ jobs:
       - name: Validate plugin namespace + manifest contract
         run: node packages/mewkit/dist/index.js validate --plugin
 
-      # The core context-budget guardrail is not enforced in CI. Its cap (131000) was set
-      # against a measured ~104.7k core and the profile has since grown past it, so the gate
-      # blocked every run rather than catching new growth. Measure on demand with
-      # `mewkit budget context --profile core`; re-add a step here once a cap is re-baselined
-      # against the real profile size.
+      # One budget number: the always-on rule set a session loads on every turn. The old
+      # 131000-token core guardrail was never enforced (it blocked every run instead of
+      # catching growth) and is replaced by this hard byte budget. Measure the wider core
+      # profile on demand with `mewkit budget context --profile core`.
+      - name: Check always-on rule budget
+        run: node scripts/check-always-on-budget.cjs .
+
+      - name: Check always-on safety text survives compression
+        run: node scripts/check-rule-survival.cjs .
+
+      - name: Check for dangling references to relocated rules
+        run: node scripts/check-dangling-rule-refs.cjs .
+
+      # Every environment name the shipped kit reads is classified in
+      # env-name-classification.json, which the check loads as its allowlist
+      # rather than restating. Catches both a literal read and a name composed
+      # from a prefix and a suffix literal, which a literal scan cannot see.
+      - name: Check environment-name reads are classified
+        run: node scripts/check-env-reads.cjs
+
+      - name: Check the published config schema is not stale
+        run: node scripts/generate-config-schema.cjs --check
+
+      # A `mewkit <verb>` a skill tells an agent to run must exist. A renamed or
+      # never-shipped verb fails mid-session, inside a workflow the agent cannot
+      # finish; the catalogue is the source, so this cannot go stale.
+      - name: Check every mewkit verb the kit names resolves
+        run: node scripts/check-kit-verbs.cjs
+
+      # The agent-facing CLI reference is generated from the same catalogue the dispatcher
+      # reads, so a surface change that skips regeneration is a stale instruction shipped
+      # to every project.
+      - name: Generated CLI reference matches the command catalogue
+        run: node scripts/generate-cli-manual.cjs --check
 
       - name: Validate README, website, and index counts (stale-index)
-        run: node packages/mewkit/dist/index.js inventory --check
+        run: node scripts/harness-inventory.cjs --check
 
       - name: Verify high-traffic dependency metadata
         run: node scripts/scan-skill-dependency-edges.mjs --check-high-traffic
@@ -184,19 +230,16 @@ jobs:
         run: node scripts/terminology-linter.cjs
 
       - name: Validate skill frontmatter
-        run: .claude/skills/.venv/bin/python3 scripts/validate-skill-frontmatter.py
+        run: node packages/mewkit/dist/index.js validate --frontmatter
 
       - name: Validate docs references on Type-1 allowlist
-        run: python3 .claude/scripts/check-docs-references.py .claude
-
-      - name: Unit-test docs-references validator
-        run: python3 .claude/scripts/tests/test-check-docs-references.py
-
-      - name: Unit-test skill-frontmatter validator
-        run: .claude/skills/.venv/bin/python3 .claude/scripts/tests/test-validate-skill-frontmatter.py
+        run: node packages/mewkit/dist/index.js validate --docs-refs
 
       - name: Validate rule availability
         run: bash scripts/validate-rule-availability.sh
+
+      - name: Check the shared executables need node only
+        run: node scripts/check-node-only-runtime.cjs .
 
       # Diff-mode brand-prose lint: violations in PR-changed files fail; pre-existing
       # legacy violations in untouched files are WARN-only. Needs a base ref — resolve
@@ -209,7 +252,7 @@ jobs:
           if [ -n "$BASE" ]; then echo "LINT_BASE_REF=$BASE" >> "$GITHUB_ENV"; fi
 
       - name: Lint brand prose in changed .claude markdown (diff mode)
-        run: LINT_MODE=diff bash .claude/scripts/lint-brand-prose.sh
+        run: LINT_MODE=diff bash scripts/lint-brand-prose.sh
 
       - name: "Reject residual meow: namespace"
         run: |
@@ -217,7 +260,7 @@ jobs:
             echo "ERROR: legacy 'meow:' frontmatter found — use 'mk:' instead." >&2
             exit 1
           fi
-          if grep -rEn '/meow:[a-z]' .claude/commands/ .claude/rules/ CLAUDE.md 2>/dev/null; then
+          if grep -rEn '/meow:[a-z]' .claude/skills/ .claude/rules/ CLAUDE.md 2>/dev/null; then
             echo "ERROR: legacy '/meow:' slash references found — use '/mk:' instead." >&2
             exit 1
           fi
@@ -261,7 +304,7 @@ jobs:
         run: npm run build -w packages/mewkit
 
       - name: Docs reference manifest and pages match the runtime
-        run: node packages/mewkit/dist/index.js docs-manifest --check
+        run: node scripts/docs-manifest.cjs --check
 
       - name: Frontmatter contract holds
         run: npm run check:frontmatter -w packages/docs
@@ -313,3 +356,36 @@ jobs:
 
       - name: Codex bundle parity + version-support unit tests
         run: npx vitest run packages/mewkit/src/migrate/modules/codex/__tests__/packaged-bundle-parity.test.ts packages/mewkit/src/migrate/hooks/__tests__/codex-version-support.test.ts
+
+  # The hook runtime is node-only, which is only worth anything if it runs where
+  # there is no POSIX shell. This job proves that on the one host that can: the
+  # hook suites, the node-native hook tests, and doctor with its hard-gate probes
+  # actually executing rather than skipping. Every step is node, no bash.
+  hooks-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Hook suites (golden replay, crash paths, dispatcher, isolation, env allowlist)
+        run: npx vitest run tests/hooks
+
+      - name: Node-native hook tests
+        run: node --test .claude/hooks/__tests__/*.test.cjs
+
+      # The hard-gate probes used to be skipped on this platform because the hooks
+      # were POSIX shell. They are node now, so a skip here would mean the only
+      # thing this port exists for is never verified.
+      - name: Doctor hard gates
+        run: node packages/mewkit/dist/index.js doctor --hard-gates

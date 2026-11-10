@@ -13,7 +13,7 @@ Standard delegate a sub-task () invocation patterns for cook workflow phases.
   - [Test Failure — Debugger](#test-failure-debugger)
 - [Phase 4: Review — Code Review](#phase-4-review-code-review)
   - [Phase 5 Ship — Shipper](#phase-5-ship--shipper)
-- [Phase 6: Reflect — Sync-back + Docs + Memory](#phase-6-reflect-sync-back-docs-memory)
+- [Phase 6: Reflect — Sync-back + Docs](#phase-6-reflect-sync-back-docs)
 - [UI Work (Conditional)](#ui-work-conditional)
 
 
@@ -43,7 +43,7 @@ Acceptance criteria: <binary pass/fail checks>
 Constraints: <what must NOT change>
 ```
 
-Each per-phase section below adds a one-line **Scope** annotation defining what to pass and explicitly what NOT to pass (isolation boundary, per `orchestration-rules.md` "Isolation Boundaries"). Adds ~10–15 tokens per template, paid only when this file is loaded (JIT).
+Each per-phase section below adds a one-line **Scope** annotation defining what to pass and explicitly what NOT to pass (isolation boundary, per the orchestration rules "Isolation Boundaries"). Adds ~10–15 tokens per template, paid only when this file is loaded (JIT).
 
 ## Phase 0: Orient — Scout
 
@@ -133,12 +133,12 @@ Suggestions (1): ["Consider extracting helper for date formatting"]
 ### Phase 5 Ship — Shipper
 
 ```
-delegate a sub-task (subagent_type="shipper", prompt="Run full pre-ship pipeline: pre-ship.sh (test+lint+typecheck), conventional commit (via git-manager), create PR if on feature branch, verify CI, document rollback. Use mk:ship.", description="Ship + PR")
+delegate a sub-task (subagent_type="shipper", prompt="Run full pre-ship pipeline: pre-ship.cjs (test+lint+typecheck), conventional commit (via git-manager), create PR if on feature branch, verify CI, document rollback. Use mk:ship.", description="Ship + PR")
 ```
 
 **Scope (shipper):** pass branch name, base branch, plan-file path (for PR body), changed-file list. Do NOT pass plan internals, session conversation. Shipper invokes `git-manager` internally for raw git ops.
 
-## Phase 6: Reflect — Sync-back + Docs + Memory
+## Phase 6: Reflect — Sync-back + Docs
 
 **Orchestrator** (detailed sync-back):
 
@@ -155,14 +155,7 @@ delegate a sub-task (subagent_type="planner", prompt="Run full sync-back for [pl
 delegate a sub-task (subagent_type="documenter", prompt="Evaluate docs impact for changes: [file-list]. Update docs/ directory if needed. State explicitly: Docs impact: [none|minor|major]", description="Update docs")
 ```
 
-**Scope (documenter):** pass changed-file list, docs/ root, target-project doc allowlist (per `docs-reference-contract.md`). Do NOT pass plan internals, session conversation, code diffs.
-
-**Memory capture:**
-```
-delegate a sub-task (subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .meowkit/memory/fixes.json (canonical); write architectural decisions to .meowkit/memory/architecture-decisions.json (canonical); write review patterns to .meowkit/memory/review-patterns.json (canonical).", description="Session memory capture")
-```
-
-**Scope (analyst memory):** pass plan-file path, reviewer findings, decisions log, `.meowkit/memory/*.json` canonical store paths. Do NOT pass full conversation transcript (the analyst infers learnings from artifacts, not chat).
+**Scope (documenter):** pass changed-file list, docs/ root, target-project doc allowlist (per the docs-reference contract). Do NOT pass plan internals, session conversation, code diffs.
 
 ## UI Work (Conditional)
 

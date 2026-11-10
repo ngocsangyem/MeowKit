@@ -1,7 +1,7 @@
-// Gate 2 ship-boundary enforcement — regression fixtures for lib/gate2-check.sh.
+// Gate 2 ship-boundary enforcement — regression fixtures for lib/gate2-check.cjs.
 //
 // These assert the EXIT CODE, not the message. Per this repo's hook contract
-// (gate-enforcement.sh:121-122) exit 2 stops the tool call and exit 1 is
+// (gate-enforcement.cjs:121-122) exit 2 stops the tool call and exit 1 is
 // advisory — a check that prints "BLOCKED" and exits 1 does not block. Asserting
 // on stderr text would pass for exactly that bug, so every blocking case here
 // asserts `status === 2`.
@@ -19,7 +19,7 @@ const path = require('node:path');
 const { execFileSync, spawnSync } = require('node:child_process');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
-const CHECK = path.join(PROJECT_ROOT, '.claude/hooks/lib/gate2-check.sh');
+const CHECK = path.join(PROJECT_ROOT, '.claude/hooks/lib/gate2-check.cjs');
 
 /**
  * Build an isolated git repo carrying the pieces the check reads.
@@ -38,15 +38,15 @@ function makeRepo({ files = {}, activePlan, verdicts = {}, committed = {}, unsta
   git('config', 'user.email', 'test@example.com');
   git('config', 'user.name', 'test');
 
-  // Mirror the real repo: session-state is transient and gitignored, so
+  // Mirror the real repo: runtime state is transient and gitignored, so
   // `git add .` never stages it. Without this the fixture's own scaffolding
   // reads as untracked ship-capable files and every case blocks.
-  write(dir, '.gitignore', 'session-state/\n');
+  write(dir, '.gitignore', '.meowkit/\n');
 
   // Real validators — the check delegates to them rather than re-parsing.
   // Committed as baseline because they are tracked files in a real install.
-  copyIn(dir, '.claude/skills/cook/scripts/validate-gate-2.sh');
-  copyIn(dir, '.claude/scripts/validate-workflow-evidence.cjs');
+  copyIn(dir, '.claude/skills/cook/scripts/validate-gate-2.cjs');
+  copyIn(dir, '.claude/hooks/lib/validate-workflow-evidence.cjs');
 
   // Baseline commit so HEAD exists and diffs have something to compare against.
   write(dir, 'README.md', '# baseline\n');
@@ -55,7 +55,7 @@ function makeRepo({ files = {}, activePlan, verdicts = {}, committed = {}, unsta
   git('commit', '-qm', 'baseline');
 
   if (activePlan !== undefined) {
-    write(dir, 'session-state/active-plan.json', JSON.stringify({ path: activePlan }));
+    write(dir, '.meowkit/state/active-plan.json', JSON.stringify({ path: activePlan }));
   }
   // The Gate 2 revision binding requires the verdict to name current HEAD. Bind it
   // here so a "passing" fixture actually reaches (and passes) that check; tests that
@@ -92,9 +92,20 @@ function copyIn(dir, rel) {
   fs.chmodSync(dst, 0o755);
 }
 
-/** Run the check as the hook runs it. Returns {status, stderr, stdout}. */
+/**
+ * Run the check the way the hook runs it. The check is a library, so it is loaded
+ * in a child process rather than executed: that keeps the real cwd and environment
+ * in play while still exercising the exact module the guard requires.
+ */
 function runCheck(dir, command, env = {}) {
-  const r = spawnSync('sh', [CHECK, command], {
+  const driver = [
+    `const { gate2Check } = require(${JSON.stringify(CHECK)});`,
+    'const r = gate2Check({ root: process.env.CLAUDE_PROJECT_DIR, command: process.argv[1] });',
+    'if (r.stdout.length) process.stdout.write(r.stdout.join("\\n") + "\\n");',
+    'if (r.stderr.length) process.stderr.write(r.stderr.join("\\n") + "\\n");',
+    'process.exit(r.exit);',
+  ].join('\n');
+  const r = spawnSync(process.execPath, ['-e', driver, command], {
     cwd: dir,
     encoding: 'utf8',
     env: { ...process.env, CLAUDE_PROJECT_DIR: dir, ...env },
@@ -343,16 +354,16 @@ test('push with no upstream fails closed rather than guessing the range', () => 
 });
 
 // --- Wiring: the check must actually be reachable from the live hook --------
-// A perfect checker that pre-ship.sh never calls, or calls below the profile
+// A perfect checker that pre-ship.cjs never calls, or calls below the profile
 // early-exit, enforces nothing. These assert the wiring, not the checker.
 
-const PRE_SHIP = path.join(PROJECT_ROOT, '.claude/hooks/pre-ship.sh');
+const PRE_SHIP = path.join(PROJECT_ROOT, '.claude/hooks/pre-ship.cjs');
 
-test('pre-ship.sh invokes the Gate 2 check ABOVE the fast-profile early-exit', () => {
+test('pre-ship.cjs invokes the Gate 2 check ABOVE the fast-profile early-exit', () => {
   const body = fs.readFileSync(PRE_SHIP, 'utf8');
-  const checkAt = body.indexOf('gate2-check.sh');
-  const fastExitAt = body.indexOf('fast) exit 0');
-  assert.ok(checkAt > -1, 'pre-ship.sh no longer calls gate2-check.sh — Gate 2 unenforced');
+  const checkAt = body.indexOf('gate2-check.cjs');
+  const fastExitAt = body.indexOf("profile === 'fast'");
+  assert.ok(checkAt > -1, 'pre-ship.cjs no longer calls gate2-check.cjs — Gate 2 unenforced');
   assert.ok(fastExitAt > -1, 'fast-profile early-exit vanished — test needs updating');
   assert.ok(
     checkAt < fastExitAt,
@@ -360,58 +371,56 @@ test('pre-ship.sh invokes the Gate 2 check ABOVE the fast-profile early-exit', (
   );
 });
 
-test('pre-ship.sh propagates the Gate 2 block as exit 2, not exit 1', () => {
+test('pre-ship.cjs propagates the Gate 2 block as exit 2, not exit 1', () => {
   const body = fs.readFileSync(PRE_SHIP, 'utf8');
   assert.match(
     body,
-    /"\$GATE2_CHECK"\s+"\$COMMAND"\s*\|\|\s*exit 2/,
+    /if \(gate2\.exit !== 0\) return 2;/,
     'must exit 2: exit 1 is advisory and the commit would proceed anyway',
   );
 });
 
-test('sourcing a missing hook lib cannot abort the script before Gate 2 runs', () => {
-  // `.` is a POSIX special builtin: sourcing a MISSING file kills the shell, and
-  // `2>/dev/null || true` does NOT catch it. An aborted hook exits non-2, which
-  // is advisory — so a missing lib would silently disable Gate 2 entirely.
+test('a missing hook library cannot let a ship through', () => {
+  // A node module that fails to load throws, and an uncaught throw exits non-2,
+  // which is advisory — so an unloadable guard would read as permission. The
+  // guard installs its fail-closed handlers before requiring anything, which is
+  // what makes that impossible.
   const body = fs.readFileSync(PRE_SHIP, 'utf8');
-  const sources = body.split('\n').filter((l) => /^\s*\.\s+"/.test(l));
-  assert.ok(sources.length > 0, 'expected pre-ship.sh to source at least one lib');
-  for (const line of sources) {
-    const idx = body.indexOf(line);
-    const preceding = body.slice(Math.max(0, idx - 240), idx);
-    assert.match(preceding, /if \[ -f /,
-      `unguarded source would abort the hook if the lib is absent: ${line.trim()}`);
-  }
+  const handlerAt = body.indexOf("process.on('uncaughtException'");
+  const firstRequireAt = body.indexOf("require('node:path')");
+  assert.ok(handlerAt > -1, 'the fail-closed handler is gone — a crash would wave the ship through');
+  assert.ok(firstRequireAt > -1, 'test needs updating: the first require moved');
+  assert.ok(handlerAt < firstRequireAt, 'the handler must be installed BEFORE anything is required');
 });
 
-test('pre-ship.sh FAILS CLOSED (exit 2) on a ship command when the checker is absent', () => {
+test('pre-ship.cjs FAILS CLOSED (exit 2) on a ship command when the checker is absent', () => {
   // A missing checker at a ship boundary must not silently downgrade to "no Gate 2".
   // Run the real hook with the gate2-check lib deleted from an otherwise-real install.
   const dir = makeRepo({ activePlan: 'tasks/plans/260715-1200-demo', files: { 'src/app.ts': 'export const x = 1;\n' } });
-  copyIn(dir, '.claude/hooks/pre-ship.sh');
-  copyIn(dir, '.claude/hooks/lib/load-dotenv.sh');
-  copyIn(dir, '.claude/hooks/lib/read-hook-input.sh');
-  // Deliberately do NOT copy gate2-check.sh — simulate the broken install.
-  const r = spawnSync('sh', [path.join(dir, '.claude/hooks/pre-ship.sh'), 'git commit -m "feat: x"'], {
+  copyIn(dir, '.claude/hooks/pre-ship.cjs');
+  copyIn(dir, '.claude/hooks/lib/load-dotenv.cjs');
+  copyIn(dir, '.claude/hooks/lib/parse-stdin.cjs');
+  // Deliberately do NOT copy gate2-check.cjs — simulate the broken install.
+  const r = spawnSync(process.execPath, [path.join(dir, '.claude/hooks/pre-ship.cjs'), 'git commit -m "feat: x"'], {
     cwd: dir, encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: dir },
   });
   assert.equal(r.status, 2, 'a ship with no enforceable Gate 2 must be blocked, not waved through');
   assert.match(r.stderr, /cannot be enforced|@@GATE_BLOCK@@/);
 });
 
-test('end-to-end: pre-ship.sh blocks a ship-capable commit under the fast profile', () => {
+test('end-to-end: pre-ship.cjs blocks a ship-capable commit under the fast profile', () => {
   // The full live path — hook entrypoint, not the helper in isolation.
   const dir = makeRepo({
     activePlan: 'tasks/plans/260715-1200-demo',
     files: { 'src/app.ts': 'export const x = 1;\n' },
   });
-  copyIn(dir, '.claude/hooks/pre-ship.sh');
-  copyIn(dir, '.claude/hooks/lib/gate2-check.sh');
+  copyIn(dir, '.claude/hooks/pre-ship.cjs');
+  copyIn(dir, '.claude/hooks/lib/gate2-check.cjs');
   // A real install has these; without them the hook would abort at its own
   // source lines and never reach the gate.
-  copyIn(dir, '.claude/hooks/lib/load-dotenv.sh');
-  copyIn(dir, '.claude/hooks/lib/read-hook-input.sh');
-  const r = spawnSync('sh', [path.join(dir, '.claude/hooks/pre-ship.sh'), 'git commit -m "feat: x"'], {
+  copyIn(dir, '.claude/hooks/lib/load-dotenv.cjs');
+  copyIn(dir, '.claude/hooks/lib/parse-stdin.cjs');
+  const r = spawnSync(process.execPath, [path.join(dir, '.claude/hooks/pre-ship.cjs'), 'git commit -m "feat: x"'], {
     cwd: dir,
     encoding: 'utf8',
     env: { ...process.env, CLAUDE_PROJECT_DIR: dir, MEOW_HOOK_PROFILE: 'fast' },

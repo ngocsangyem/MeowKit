@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # changed-files-lint.test.sh — tests scripts/lib/changed-files.sh + the brand-prose
-# diff-mode severity split in .claude/scripts/lint-brand-prose.sh.
+# diff-mode severity split in scripts/lint-brand-prose.sh.
 #
 # Builds throwaway git repos in mktemp dirs, each with a minimal .claude tree and a
 # copy of the real lint scripts, then asserts:
@@ -15,8 +15,8 @@
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 LIB="$ROOT/scripts/lib/changed-files.sh"
-LINT="$ROOT/.claude/scripts/lint-brand-prose.sh"
-HELPER="$ROOT/.claude/scripts/check-anthropic-context.py"
+LINT="$ROOT/scripts/lint-brand-prose.sh"
+HELPER="$ROOT/scripts/check-anthropic-context.py"
 
 PASS=0
 FAIL=0
@@ -28,13 +28,13 @@ assert() {
 }
 
 # Stage a throwaway git repo that mirrors the real script layout so the lint script's
-# relative source path (../../scripts/lib/changed-files.sh) resolves.
+# relative source path (lib/changed-files.sh, beside the script) resolves.
 stage_repo() {
   local d="$1"
-  mkdir -p "$d/.claude/scripts" "$d/scripts/lib"
+  mkdir -p "$d/scripts/lib" "$d/.claude"
   cp "$LIB" "$d/scripts/lib/changed-files.sh"
-  cp "$LINT" "$d/.claude/scripts/lint-brand-prose.sh"
-  cp "$HELPER" "$d/.claude/scripts/check-anthropic-context.py"
+  cp "$LINT" "$d/scripts/lint-brand-prose.sh"
+  cp "$HELPER" "$d/scripts/check-anthropic-context.py"
   : > "$d/.claude/.brand-allowlist.txt"
   ( cd "$d" && git init -q && git config user.email t@t && git config user.name t \
       && git add -A && git commit -qm init )
@@ -56,7 +56,7 @@ OUT=$( . "$LIB"; unset LINT_BASE_REF GITHUB_BASE_REF 2>/dev/null; resolve_base_r
 # ---- Case 3: violation introduced in a CHANGED file → exit 1 ----
 D="$(mktemp -d)"; stage_repo "$D"
 ( cd "$D" && printf '# Doc\n\nMeowKit is a toolkit.\n' > .claude/newdoc.md && git add -A && git commit -qm "add doc with violation" )
-( cd "$D" && LINT_MODE=diff LINT_BASE_REF=HEAD~1 bash .claude/scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
+( cd "$D" && LINT_MODE=diff LINT_BASE_REF=HEAD~1 bash scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
 [ "$RC" = "1" ] && assert "violation in changed file → exit 1" 1 || assert "violation in changed file → exit 1" 0
 rm -rf "$D"
 
@@ -65,39 +65,39 @@ D="$(mktemp -d)"; stage_repo "$D"
 # Commit a violation first (becomes legacy), then make an unrelated clean change.
 ( cd "$D" && printf '# Legacy\n\nMeowKit is a toolkit.\n' > .claude/legacy.md && git add -A && git commit -qm "legacy violation" )
 ( cd "$D" && printf '# Clean\n\nNothing to see.\n' > .claude/clean.md && git add -A && git commit -qm "clean change" )
-OUT=$( cd "$D" && LINT_MODE=diff LINT_BASE_REF=HEAD~1 bash .claude/scripts/lint-brand-prose.sh 2>&1 ); RC=$?
+OUT=$( cd "$D" && LINT_MODE=diff LINT_BASE_REF=HEAD~1 bash scripts/lint-brand-prose.sh 2>&1 ); RC=$?
 { [ "$RC" = "0" ] && echo "$OUT" | grep -qi "legacy"; } \
   && assert "legacy-only violation → exit 0 + WARN" 1 || assert "legacy-only violation → exit 0 + WARN" 0
 rm -rf "$D"
 
 # ---- Case 5: diff mode, no base, local → exit 0 (warn-only) ----
 D="$(mktemp -d)"; stage_repo "$D"
-( cd "$D" && env -u LINT_BASE_REF -u GITHUB_BASE_REF -u GITHUB_ACTIONS LINT_MODE=diff bash .claude/scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
+( cd "$D" && env -u LINT_BASE_REF -u GITHUB_BASE_REF -u GITHUB_ACTIONS LINT_MODE=diff bash scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
 [ "$RC" = "0" ] && assert "diff mode, no base, local → exit 0" 1 || assert "diff mode, no base, local → exit 0" 0
 rm -rf "$D"
 
 # ---- Case 6: diff mode, no base, CI env → exit 1 ----
 D="$(mktemp -d)"; stage_repo "$D"
-( cd "$D" && env -u LINT_BASE_REF -u GITHUB_BASE_REF LINT_MODE=diff GITHUB_ACTIONS=true bash .claude/scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
+( cd "$D" && env -u LINT_BASE_REF -u GITHUB_BASE_REF LINT_MODE=diff GITHUB_ACTIONS=true bash scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
 [ "$RC" = "1" ] && assert "diff mode, no base, CI env → exit 1" 1 || assert "diff mode, no base, CI env → exit 1" 0
 rm -rf "$D"
 
 # ---- Cases 7–9: invalid allowlist entries → exit 1 ----
 D="$(mktemp -d)"; stage_repo "$D"
 ( cd "$D" && printf '.claude/clean.md\n' > .claude/.brand-allowlist.txt \
-    && bash .claude/scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
+    && bash scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
 [ "$RC" = "1" ] && assert "allowlist entry without reason → exit 1" 1 || assert "allowlist entry without reason → exit 1" 0
 rm -rf "$D"
 
 D="$(mktemp -d)"; stage_repo "$D"
 ( cd "$D" && printf 'plugin/clean.md # wrong root\n' > .claude/.brand-allowlist.txt \
-    && bash .claude/scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
+    && bash scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
 [ "$RC" = "1" ] && assert "allowlist entry outside .claude → exit 1" 1 || assert "allowlist entry outside .claude → exit 1" 0
 rm -rf "$D"
 
 D="$(mktemp -d)"; stage_repo "$D"
 ( cd "$D" && printf '.claude/**/*.md # broad exclusion\n' > .claude/.brand-allowlist.txt \
-    && bash .claude/scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
+    && bash scripts/lint-brand-prose.sh >/dev/null 2>&1 ); RC=$?
 [ "$RC" = "1" ] && assert "allowlist glob entry → exit 1" 1 || assert "allowlist glob entry → exit 1" 0
 rm -rf "$D"
 

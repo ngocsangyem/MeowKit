@@ -1,4 +1,4 @@
-// The ONE trace-append primitive. Every TypeScript writer (task-state emission, wiki adapter,
+// The ONE trace-append primitive. Every TypeScript writer (task-state emission, orient,
 // CLI friction) builds its line and rotates through here, and the shell hook contends on the same
 // sidecar lock path with the same protocol — so there is a single append implementation and a
 // single lock object. Records are secret-scrubbed before write; append failure is the caller's to
@@ -9,7 +9,7 @@ import { gzipSync } from "node:zlib";
 import path from "node:path";
 import { withFileLock, withFileLockSync } from "./file-lock.js";
 import { resolveStateDir } from "../state/resolve-state-dir.js";
-import { scrubSecrets } from "../wiki/infrastructure/scan-patterns.js";
+import { scrubSecrets } from "../state/injection-scanner.js";
 
 export const TRACE_SCHEMA_VERSION = "1.0";
 /** Append logs are telemetry in the `.meowkit/` taxonomy. */
@@ -40,13 +40,18 @@ export interface TraceAppendInput {
 	now?: Date;
 }
 
-/** Recursively secret-scrub every string in an arbitrary data value before it is persisted. */
+/** Recursively secret-scrub every string in an arbitrary data value before it is persisted.
+ *
+ *  KEYS are scrubbed as well as values. A caller that builds a map keyed by user-supplied
+ *  text (an env var name, a header, a path fragment) puts that text in the key position, and
+ *  a key-position secret used to reach the log verbatim while the same string as a value was
+ *  correctly redacted. */
 function scrubDeep(value: unknown): unknown {
 	if (typeof value === "string") return scrubSecrets(value);
 	if (Array.isArray(value)) return value.map(scrubDeep);
 	if (value && typeof value === "object") {
 		const out: Record<string, unknown> = {};
-		for (const [k, v] of Object.entries(value)) out[k] = scrubDeep(v);
+		for (const [k, v] of Object.entries(value)) out[scrubSecrets(k)] = scrubDeep(v);
 		return out;
 	}
 	return value;
@@ -70,17 +75,22 @@ function rotationStamp(now: Date): string {
 }
 
 function buildRecord(input: TraceAppendInput, now: Date): Record<string, unknown> {
+	// EVERY string field is scrubbed, not just the `data` payload. `run_id`, `model`,
+	// `task_id` and `plan_path` are all caller- or environment-supplied (`trace --id`,
+	// MEOWKIT_RUN_ID), so a credential pasted into any of them reached the log verbatim while
+	// the same string nested under `data` was redacted. `ts` and the schema version are
+	// generated here and need no scrub.
 	const record: Record<string, unknown> = {
 		schema_version: TRACE_SCHEMA_VERSION,
 		ts: isoSeconds(now),
-		event: input.event,
-		run_id: input.runId ?? process.env["MEOWKIT_RUN_ID"] ?? "",
-		harness_version: input.harnessVersion ?? process.env["MEOWKIT_HARNESS_VERSION"] ?? "3.0.0",
-		model: input.model ?? process.env["MEOWKIT_MODEL_HINT"] ?? "",
-		density: input.density ?? process.env["MEOWKIT_AUTOBUILD_MODE"] ?? "",
+		event: scrubSecrets(input.event),
+		run_id: scrubSecrets(input.runId ?? process.env["MEOWKIT_RUN_ID"] ?? ""),
+		harness_version: scrubSecrets(input.harnessVersion ?? process.env["MEOWKIT_HARNESS_VERSION"] ?? "3.0.0"),
+		model: scrubSecrets(input.model ?? process.env["MEOWKIT_MODEL_HINT"] ?? ""),
+		density: scrubSecrets(input.density ?? process.env["MEOWKIT_AUTOBUILD_MODE"] ?? ""),
 	};
-	if (input.taskId) record["task_id"] = input.taskId;
-	if (input.planPath) record["plan_path"] = input.planPath;
+	if (input.taskId) record["task_id"] = scrubSecrets(input.taskId);
+	if (input.planPath) record["plan_path"] = scrubSecrets(input.planPath);
 	record["data"] = scrubDeep(input.data ?? {});
 	return record;
 }
@@ -116,7 +126,7 @@ export async function appendTraceRecord(projectRoot: string, input: TraceAppendI
 	await withFileLock(lockPath, async () => writeAndRotate(projectRoot, line, now));
 }
 
-/** Synchronous sibling for sync callers (the wiki trace adapter) — same lock, same record shape. */
+/** Synchronous sibling for sync callers (orient, CLI friction) — same lock, same record shape. */
 export function appendTraceRecordSync(projectRoot: string, input: TraceAppendInput): void {
 	const now = input.now ?? new Date();
 	const line = JSON.stringify(buildRecord(input, now));

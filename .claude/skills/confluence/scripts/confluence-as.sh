@@ -10,7 +10,7 @@
 set -euo pipefail
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-CONFLUENCE_AS="$ROOT/.claude/skills/.venv/bin/confluence-as"
+CONFLUENCE_AS="$ROOT/.meowkit/envs/confluence/bin/confluence-as"
 # Legacy first, canonical second: with `set -a` a later assignment wins, so
 # `.meowkit/.env` stays authoritative when a project still has both files.
 ENV_FILES="$ROOT/.claude/.env $ROOT/.meowkit/.env"
@@ -18,7 +18,7 @@ LOCAL_SETTINGS="$ROOT/.claude/settings.local.json"
 
 if [ ! -x "$CONFLUENCE_AS" ]; then
   echo "[mk:confluence] confluence-as not installed at $CONFLUENCE_AS" >&2
-  echo "[mk:confluence] Run: .claude/scripts/bin/setup-workflow    (auto-installs from .claude/skills/confluence/scripts/requirements.txt)" >&2
+  echo "[mk:confluence] Run: .claude/hooks/lib/setup-workflow    (auto-installs from .claude/skills/confluence/scripts/requirements.txt)" >&2
   exit 127
 fi
 

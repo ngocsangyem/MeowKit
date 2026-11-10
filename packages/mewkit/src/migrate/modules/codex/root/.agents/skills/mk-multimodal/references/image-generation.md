@@ -34,11 +34,11 @@ When Google billing is unavailable, image gen falls back to OpenRouter via chat 
 
 ```bash
 # Default (Nano Banana 2)
-.agents/skills/.venv/bin/python3 .agents/skills/multimodal/scripts/gemini_generate.py \
+node .codex/scripts/skill-python.cjs .agents/skills/multimodal/scripts/gemini_generate.py \
   --task generate-image --prompt "UI mockup, flat vector"
 
 # With aspect ratio
-.agents/skills/.venv/bin/python3 .agents/skills/multimodal/scripts/gemini_generate.py \
+node .codex/scripts/skill-python.cjs .agents/skills/multimodal/scripts/gemini_generate.py \
   --task generate-image --prompt "Sunset landscape" --aspect-ratio 16:9
 ```
 

@@ -1,5 +1,5 @@
 import pc from "picocolors";
-import { evaluateVerdictGate } from "../memory/verdict-schema.js";
+import { evaluateVerdictGate } from "../review/verdict-schema.js";
 
 // `mewkit verdict-gate <slug | path>` — Gate 2 proof-bundle check. Reads the
 // machine-readable verdict JSON and exits:

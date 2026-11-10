@@ -5,10 +5,13 @@
 // Estimation: chars / 4 ≈ tokens (rough, English text). Imprecise but order-of-magnitude.
 // Pricing: per 1M tokens (input/output) by model tier.
 //
-// Thresholds (configurable via env):
-//   MEOWKIT_BUDGET_WARN  — warning threshold in USD (default: 30)
-//   MEOWKIT_BUDGET_BLOCK — hard block threshold in USD (default: 100)
-//   MEOWKIT_BUDGET_CAP   — user override for hard block (can be lower OR higher)
+// Thresholds come from the project config, which is committed and therefore the
+// same for everyone on the team:
+//   budget.warn   warning threshold in USD (default: 30)
+//   budget.block  hard block threshold in USD (default: 100)
+//   budget.cap    overrides the hard block, lower OR higher
+
+const { resolveConfig } = require('../lib/read-config.cjs');
 
 // Pricing per 1M tokens [input, output] in USD
 const PRICING = {
@@ -59,17 +62,17 @@ module.exports = function budgetTracker(ctx, state) {
   state.save('budget-state', budget);
 
   // Check thresholds (explicit undefined check to allow 0 as valid value)
-  const warnEnv = process.env.MEOWKIT_BUDGET_WARN;
-  const blockEnv = process.env.MEOWKIT_BUDGET_BLOCK;
-  const capEnv = process.env.MEOWKIT_BUDGET_CAP;
-  const warnThreshold = warnEnv !== undefined ? Number(warnEnv) : 30;
-  // MEOWKIT_BUDGET_CAP overrides the hard block if set
-  const blockThreshold = capEnv !== undefined ? Number(capEnv) : (blockEnv !== undefined ? Number(blockEnv) : 100);
+  const { values } = resolveConfig({ root: ctx.root });
+  const warnThreshold = values['budget.warn'] !== undefined ? Number(values['budget.warn']) : 30;
+  // `budget.cap` overrides the hard block when it is set.
+  const blockThreshold = values['budget.cap'] !== undefined
+    ? Number(values['budget.cap'])
+    : (values['budget.block'] !== undefined ? Number(values['budget.block']) : 100);
 
   if (budget.estimated_cost_usd >= blockThreshold) {
     budget.warnings_emitted += 1;
     state.save('budget-state', budget);
-    return `@@BUDGET_BLOCK@@\nEstimated cost: $${budget.estimated_cost_usd} (cap: $${blockThreshold}). Session budget exceeded.\nReview session-state/budget-state.json for details. Consider wrapping up.\n@@END_BUDGET@@\n`;
+    return `@@BUDGET_BLOCK@@\nEstimated cost: $${budget.estimated_cost_usd} (cap: $${blockThreshold}). Session budget exceeded.\nReview .meowkit/state/budget-state.json for details. Consider wrapping up.\n@@END_BUDGET@@\n`;
   }
 
   if (budget.estimated_cost_usd >= warnThreshold && budget.warnings_emitted === 0) {

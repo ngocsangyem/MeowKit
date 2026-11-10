@@ -1,6 +1,7 @@
 ---
 name: "mk-evaluate"
 description: "Experimental behavioral evaluator. Drives a running artifact via browser/curl/CLI and records rubric evidence; the runner is not yet a fully implemented automated evaluation system."
+requires_runtime: ["python>=3.9"]
 ---
 
 # mk:evaluate — Experimental Behavioral Verification
@@ -45,16 +46,6 @@ Step 5: Generator Feedback → produce one-line fix guidance per FAIL/WARN; emit
 - `tasks/reviews/YYMMDD-{slug}-evalverdict.md` — structured verdict (YAML frontmatter + per-rubric sections)
 - `tasks/reviews/YYMMDD-{slug}-evalverdict-evidence/` — directory of screenshots, HTTP captures, CLI transcripts
 - Returned to caller: `PASS | WARN | FAIL` + path to verdict file + generator feedback summary
-
-## Memory Write
-
-After each completed evaluation, update the canonical `.meowkit/memory/review-patterns.json` store and regenerate Markdown views. Do not write the generated `review-patterns.md` view directly.
-
-```
-| {date} | {artifact-id} | {verdict: PASS/WARN/FAIL} | {top-criterion} | {score} |
-```
-
-Use `mkdir -p .meowkit/memory` before the append to avoid silent failure on missing directory. This persists evaluation patterns across sessions for `mk:elicit` and `mk:review` to reference.
 
 ## Verdict Schema
 

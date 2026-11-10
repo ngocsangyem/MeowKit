@@ -1,6 +1,6 @@
 ---
 name: jira-evaluator
-description: Analyze a single Jira ticket for complexity + inconsistencies via the jira-as CLI wrapper. Read-only. Routed by mk:jira-evaluator skill. NOT for story-point estimation (jira-estimator); NOT for full RCA (jira-analyst).
+description: 'mk:jira executor for mk:jira-evaluator. Complexity and inconsistency scoring.'
 tools: Bash, Read, Grep, Glob, Write
 model: claude-opus-5
 permissionMode: default

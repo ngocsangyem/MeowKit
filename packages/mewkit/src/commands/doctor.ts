@@ -3,7 +3,6 @@ import path from "node:path";
 import pc from "picocolors";
 import {
 	checkClaudeDir,
-	checkConfig,
 	checkGit,
 	checkInstallMode,
 	checkHooks,
@@ -18,7 +17,11 @@ import {
 	type DiagResult,
 	type Status,
 } from "./doctor-checks.js";
-import { checkMemoryHealth } from "./doctor-memory-checks.js";
+import { checkProjectConfig, checkRemovedEnvNames } from "./doctor-config-checks.js";
+import { ownershipChecks } from "./doctor-ownership-checks.js";
+import { checkBaselineMigration, checkMixedDelivery, checkRefusedVersions } from "./doctor-kit-checks.js";
+import { hasLegacyManifest } from "../core/legacy-manifest-migration.js";
+import { doctorAdopt } from "./doctor-adopt.js";
 import { checkHardGates } from "./doctor-hard-gates.js";
 import { checkCodexHookTrust } from "./doctor-codex-hook-trust.js";
 import { checkCursor } from "./doctor-cursor.js";
@@ -29,9 +32,9 @@ import {
 } from "../migrate/provider-contract-diagnostics.js";
 import { readInstallMetadata, CorruptInstallMetadataError } from "../core/install-metadata.js";
 import { readPortableRegistry } from "../migrate/reconcile/portable-registry.js";
-import { getConsolidationLedger, type ConsolidationStatus } from "../core/consolidation-ledger.js";
 import { TARGET_PROFILES } from "../validate/targets/target-profile.js";
-import { resolveConfigPath } from "../state/resolve-config-path.js";
+import { configWritePath } from "../state/resolve-config-path.js";
+import { LEGACY_SESSION_STATE_RELS, resolveStateDir } from "../state/resolve-state-dir.js";
 
 function statusIcon(status: Status): string {
 	switch (status) {
@@ -56,8 +59,8 @@ function providerSeverityToStatus(severity: ProviderDiagnosticSeverity): Status 
 function findProjectRoot(): string | null {
 	const cwd = process.cwd();
 	const hasDotClaude = fs.existsSync(path.join(cwd, ".claude"));
-	const hasConfig = fs.existsSync(resolveConfigPath(cwd));
-	const hasManifest = fs.existsSync(path.join(cwd, ".claude", "meowkit.manifest.json"));
+	const hasConfig = fs.existsSync(configWritePath(cwd));
+	const hasManifest = hasLegacyManifest(path.join(cwd, ".claude"));
 	const hasClaude = fs.existsSync(path.join(cwd, "CLAUDE.md"));
 	if (hasDotClaude || hasConfig || hasManifest || hasClaude) {
 		return cwd;
@@ -72,8 +75,15 @@ export async function doctor(args?: {
 	hardGates?: boolean;
 	provenance?: boolean;
 	explain?: boolean;
-	consolidation?: boolean;
+	adopt?: boolean;
+	json?: boolean;
 }): Promise<void> {
+	if (args?.adopt) {
+		// Adoption writes the ownership baseline, so it is its own operation
+		// rather than one row among the diagnostics.
+		process.exitCode = await doctorAdopt(findProjectRoot(), args.json ?? false);
+		return;
+	}
 	if (args?.provenance) {
 		explainProvenance(findProjectRoot(), args.explain ?? false);
 		return;
@@ -94,7 +104,12 @@ export async function doctor(args?: {
 		checkPython(),
 		checkGit(),
 		checkClaudeDir(root),
-		checkConfig(root),
+		checkProjectConfig(root),
+		...checkRemovedEnvNames(root),
+		...ownershipChecks(root),
+		checkBaselineMigration(root),
+		checkRefusedVersions(root),
+		checkMixedDelivery(root),
 		checkInstallMode(root),
 		checkHooks(root),
 		checkScripts(root),
@@ -160,15 +175,10 @@ export async function doctor(args?: {
 
 	if (args?.state) {
 		results.push(...checkStateTaxonomy(root));
-		results.push(...checkMemoryHealth(root));
 	}
 
 	if (args?.hardGates) {
 		results.push(...(await checkHardGates(root)));
-	}
-
-	if (args?.consolidation) {
-		results.push(...checkConsolidation());
 	}
 
 	for (const r of results) {
@@ -391,49 +401,22 @@ async function checkMetadataHealth(root: string | null): Promise<DiagResult[]> {
 	return results;
 }
 
-/**
- * Phase-7 consolidation ledger surfacing. Reports each candidate's deprecation/experimental/
- * authoring-only status HONESTLY: the status label is NOT a runtime-availability claim (a
- * deprecated or authoring-only artifact may be fully functional at runtime). Every candidate is
- * `deletionThisPhase:false`, so nothing here is a failure — statuses map to pass/na/warn, never
- * fail. The `detail` always names the outstanding gates so a reader sees WHY nothing is removed.
- */
-function checkConsolidation(): DiagResult[] {
-	const statusToDiag: Record<ConsolidationStatus, Status> = {
-		canonical: "pass",
-		"keep-legacy": "pass",
-		"authoring-only": "na",
-		experimental: "na",
-		deprecated: "warn",
-		undecided: "na",
-	};
-	return getConsolidationLedger().map((c) => ({
-		status: statusToDiag[c.status],
-		name: `Consolidation: ${c.id} [${c.status}]`,
-		// Honest: status is a classification, not a runtime-availability verdict. Gates say why it stays.
-		detail: `${c.purpose} — status is a classification, not a runtime-availability claim; not removed this phase. Gates: ${c.remainingGates.join("; ")}`,
-	}));
-}
-
 function checkStateTaxonomy(root: string | null): DiagResult[] {
 	if (!root) {
 		return [{ status: "warn", name: "State taxonomy", detail: "Project root not found; skipped state path checks." }];
 	}
 	const results: DiagResult[] = [
 		{
-			status: fs.existsSync(path.join(root, "session-state")) ? "pass" : "warn",
+			status: fs.existsSync(resolveStateDir(root, "state")) ? "pass" : "warn",
 			name: "Runtime state directory",
-			detail: "Ephemeral runtime files use project-root session-state/.",
+			detail: "Ephemeral session markers use .meowkit/state/.",
 		},
 		{
-			status: fs.existsSync(path.join(root, ".claude", "session-state")) ? "warn" : "pass",
-			name: "Legacy Claude session state",
-			detail: ".claude/session-state/ is legacy; prefer project-root session-state/ for runtime state.",
-		},
-		{
-			status: fs.existsSync(path.join(root, "tasks", "autobuild-runs")) ? "pass" : "warn",
-			name: "Autobuild run ledger",
-			detail: "Autobuild audit events belong under tasks/autobuild-runs/.",
+			// Pre-move locations are still READ, so residue is not a failure — it is a
+			// directory that will never be written again and is safe to delete.
+			status: LEGACY_SESSION_STATE_RELS.some((rel) => fs.existsSync(path.join(root, rel))) ? "warn" : "pass",
+			name: "Pre-move session state",
+			detail: "session-state/ and .claude/session-state/ are read-only leftovers; move anything you need into .meowkit/state/ and delete them.",
 		},
 	];
 	return results;

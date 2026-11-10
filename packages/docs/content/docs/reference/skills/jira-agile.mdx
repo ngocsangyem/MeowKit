@@ -64,7 +64,7 @@ Mixing project keys and board IDs is the #1 source of "board not found" errors.
 
 ## Sprint Commitment Hooks (Agile mode)
 
-When `tasks/contracts/sprint-state-{date}-sprint-{N}.md` exists with `status: active`, governed by `.claude/rules-conditional/agile-sprint-commitment.md` (loaded only when Agile context detected):
+When `tasks/contracts/sprint-state-{date}-sprint-{N}.md` exists with `status: active`, governed by `.claude/skills/agent-detector/references/agile-sprint-commitment.md` (loaded only when Agile context detected):
 
 ### `sprint add KEY` and `sprint remove KEY` (post-start)
 
@@ -86,6 +86,6 @@ If sprint-state contract is absent OR `status: closed`, the amendment ceremony i
 
 ### Validator scope (sprint-state vs sprint-contract)
 
-- `mk:sprint-contract/scripts/validate-contract.sh` validates per-story sprint-CONTRACT files only
+- `mk:sprint-contract/scripts/validate-contract.cjs` validates per-story sprint-CONTRACT files only
 - Sprint-STATE files have NO validator — YAML parsed inline by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`
-- Do not invoke `validate-contract.sh` on a sprint-state path; it WILL fail (sprint-state lacks contract schema fields by design)
+- Do not invoke `validate-contract.cjs` on a sprint-state path; it WILL fail (sprint-state lacks contract schema fields by design)

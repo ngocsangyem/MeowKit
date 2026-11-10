@@ -16,7 +16,7 @@
 
 **Before running full detection, check if a cached result can be reused.**
 
-Cache file: `.claude/cache/agent-detection-cache.json`
+Cache file: `.meowkit/cache/agent-detection-cache.json`
 
 ```toon
 cache_check[4]{condition,action}:
@@ -90,16 +90,11 @@ Extracted:
 **IMPORTANT:** Use cached project detection to avoid re-scanning every task.
 
 ```bash
-# 1. Check topic files for cached project context (on-demand reads):
-.meowkit/memory/fixes.json                                  # bug-class lessons (mk:fix)
-.meowkit/memory/review-patterns.json                        # review/architecture patterns
-.meowkit/memory/architecture-decisions.json                 # past architectural decisions
-
-# 2. If context is insufficient:
+# 1. If context is insufficient:
    -> Run mk:scout for codebase structure
    -> Read package.json, tsconfig.json, etc. directly
 
-# 3. For fresh codebase scan:
+# 2. For fresh codebase scan:
    -> Use /mk:scout [target] for parallel directory search
 ```
 

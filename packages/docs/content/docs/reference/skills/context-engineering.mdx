@@ -34,7 +34,7 @@ The whole surface reduces to four operations — **Write** (push durable state o
 - Auditing `.claude/` token overhead → `mk:context-audit`.
 - Persisting a learning or reading memory topic files → `mk:memory`.
 - Finding *where* code lives → `mk:scout` (or `Read` for one known file).
-- USD run cost → `mk:budget`.
+- USD run cost → `mewkit budget`.
 - A trivial 1–2 file task — no routing needed; just do it.
 
 ## Boundaries
@@ -44,7 +44,7 @@ The whole surface reduces to four operations — **Write** (push durable state o
 | How much of `.claude/` is statically loaded? (structural) | `mk:context-audit` |
 | Actually read/write memory topic files | `mk:memory` |
 | Where does code X live? | `mk:scout` |
-| What does a run cost in USD? | `mk:budget` |
+| What does a run cost in USD? | `mewkit budget` |
 | **What should I read / when do I stop, ask, compact, delegate? (runtime)** | **`mk:context-engineering`** (this skill) |
 
 One-line rule: a *structural* question about the always-on setup → `mk:context-audit`; a *runtime* question about this task → here. If a request is ambiguous ("this project's context is messy"), the skill asks one question — structural setup or this session's runtime context? — then routes.

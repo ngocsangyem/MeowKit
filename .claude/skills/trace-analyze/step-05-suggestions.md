@@ -21,7 +21,7 @@ For each above-threshold pattern, write a YAML-style suggestion entry:
   occurrences: 5
   affected_runs: ["260408-1430-foo", "260408-1530-bar", "260408-1630-baz"]
   target: hook
-  suggested_file: .claude/hooks/pre-completion-check.sh
+  suggested_file: .claude/hooks/handlers/pre-completion-check.cjs
   change_description: |
     Tighten evidence detection — currently allows session_end without verdict_written
     when build_verify exit_code=0. Add explicit "did you actually run the build?" check

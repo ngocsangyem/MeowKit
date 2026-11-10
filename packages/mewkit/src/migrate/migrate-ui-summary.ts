@@ -4,6 +4,7 @@ import pc from "picocolors";
 import type { ReconcileBanner, ReconcileAction, ReconcilePlan } from "./reconcile/reconcile-types.js";
 import type { InstallResult } from "./portable-installer.js";
 import type { ConversionReport } from "./validation/migrate-conversion-report.js";
+import { printMutationJson, type PlannedChange } from "../core/mutation-report.js";
 
 export interface PreflightContext {
 	source: { root: string; origin: string };
@@ -155,4 +156,38 @@ export function printFinalSummary(results: InstallResult[]): void {
 			);
 		}
 	}
+}
+
+/**
+ * The machine-readable form of everything the two printers above put on screen:
+ * one item per planned action, in the same grouping order, plus the result lines
+ * as notes. It is the same envelope the other mutating commands print, so a
+ * caller parses one shape across the CLI rather than one per verb.
+ */
+export function emitMigrateJson(
+	actions: ReconcileAction[],
+	results: InstallResult[],
+	opts: { dryRun: boolean; ok: boolean; notes?: string[] },
+): void {
+	const planned: PlannedChange[] = actions.map((action) => ({
+		action: action.action,
+		path: action.targetPath,
+		detail: `${action.provider}/${action.type} ${action.item}`,
+	}));
+	const applied: PlannedChange[] = results
+		.filter((r) => r.success)
+		.map((r) => ({
+			action: r.action.action,
+			path: r.action.targetPath,
+			detail: `${r.action.provider}/${r.action.type} ${r.action.item}`,
+		}));
+	const failures = results.filter((r) => !r.success).map((r) => `${r.action.provider}/${r.action.item}: ${r.error ?? "unknown error"}`);
+	printMutationJson({
+		ok: opts.ok,
+		command: "migrate",
+		dryRun: opts.dryRun,
+		planned,
+		applied: opts.dryRun ? [] : applied,
+		notes: [...(opts.notes ?? []), ...failures],
+	});
 }

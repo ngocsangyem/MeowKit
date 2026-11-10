@@ -26,7 +26,17 @@ import type { Manifest } from "./compute-checksums.js";
  * `mewkit upgrade` pass flag and remove the leftover files. Once the dir is
  * empty across all known installs, this entry can be retired.
  */
-export const DEFAULT_ORPHAN_SCOPES = ["rules", "rules-conditional", "skills", "agents", "hooks"] as const;
+export const DEFAULT_ORPHAN_SCOPES = [
+	"rules",
+	"rules-conditional",
+	"skills",
+	"agents",
+	"hooks",
+	// `scripts` is kit-owned and was missing, so a script the release stopped shipping stayed
+	// on disk forever. That matters most for retired MIGRATORS: a leftover migrator keeps
+	// offering to rebuild a store the current version no longer has.
+	"scripts",
+] as const;
 
 /**
  * Files matching any of these regexes are user customizations and never deleted,

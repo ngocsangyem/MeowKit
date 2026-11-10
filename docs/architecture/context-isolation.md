@@ -18,7 +18,7 @@ MeowKit is an **outer harness** — it sits on top of inner coding agents (Claud
 
 MeowKit controls what context is **injected** at session boundaries. It cannot control what the inner harness retains or compresses within its context window. All isolation mechanisms must respect this constraint.
 
-**Critical constraint:** MeowKit deliberately leaves `SubagentStart`/`SubagentStop` hooks empty — wiring them would cause infinite recursion inside subagents. All subagent isolation is prompt-protocol-based.
+**Critical constraint:** MeowKit deliberately leaves `SubagentStart`/`SubagentStop` hooks empty, and as of 2026-11-09 the reason is a choice rather than a platform limit (verdict `adopt`). The earlier "wiring them would cause infinite recursion inside subagents" claim is **superseded**: the Claude Code hooks reference (retrieved 2026-11-09) documents `SubagentStart` as firing once per subagent spawn or resume, unable to block subagent creation, and injecting context only. The open question is throttling on in-process agent teams, where it fires per teammate message. Until that is designed, all subagent isolation stays prompt-protocol-based and nothing is registered.
 
 ## Context Injection Points
 
@@ -26,10 +26,10 @@ MeowKit controls what context is **injected** at session boundaries. It cannot c
 
 | Source                      | Content                             | Token estimate | Cap                   |
 | --------------------------- | ----------------------------------- | -------------- | --------------------- |
-| `project-context-loader.sh` | `docs/project-context.md`           | ~500–3000t     | 12KB warn, 24KB error |
-| `project-context-loader.sh` | `.claude/memory/preferences.md`     | ≤1000t         | 4096B hard cap        |
-| `project-context-loader.sh` | Directory tree (depth 2)            | ~80t           | 30 lines              |
-| `project-context-loader.sh` | Tool availability + package scripts | ~100t          | 10 scripts            |
+| `project-context-loader.cjs` | `docs/project-context.md`           | ~500–3000t     | 12KB warn, 24KB error |
+| `project-context-loader.cjs` | `.claude/memory/preferences.md`     | ≤1000t         | 4096B hard cap        |
+| `project-context-loader.cjs` | Directory tree (depth 2)            | ~80t           | 30 lines              |
+| `project-context-loader.cjs` | Tool availability + package scripts | ~100t          | 10 scripts            |
 | `orientation-ritual.cjs`    | Checkpoint context (resume only)    | ~100t          | Fixed schema          |
 
 ### 2. UserPromptSubmit (every user message)
@@ -65,20 +65,20 @@ Skills load step files JIT (one step at a time). Memory topic files load per-ski
 - `orientation-ritual.cjs`: ~100-token checkpoint recovery on resume (not full transcript re-injection).
 - Step-file JIT architecture: workflow steps load one at a time; never bulk-loaded.
 - Memory tombstone: auto-inject memory pipeline removed (v2.4.0); memory is on-demand per skill.
-- `session-state/` lifecycle: root-level runtime files are cleared on session ID change.
+- `.meowkit/state/` lifecycle: runtime markers are cleared on session ID change.
 
 **Moderate:**
 
 - Orchestration prompt template: documented delegation checklist with named anti-patterns.
-- `gate-enforcement.sh` + `privacy-block.sh`: block access to sensitive files/dirs before they enter context.
+- `gate-enforcement.cjs` + `privacy-block.cjs`: block access to sensitive files/dirs before they enter context.
 - Build-verify cache: file-hash cache skips re-running build on unchanged files.
 
 ## Subagent Delegation Protocol
 
-Use `mk:spawn` to assemble a context-isolated subagent prompt. The command enforces the isolation boundary by construction — it outputs a prompt that contains only what the subagent needs.
+Use `mk:team-config` to assemble a context-isolated subagent prompt. The skill enforces the isolation boundary by construction — it outputs a prompt that contains only what the subagent needs.
 
 ```
-/mk:spawn [task description]
+/mk:team-config [task description]
 ```
 
 **Anti-patterns (from orchestration-rules.md):**
@@ -109,7 +109,7 @@ These approaches were explicitly evaluated and rejected:
 
 | Pattern                                           | Reason                                                                    |
 | ------------------------------------------------- | ------------------------------------------------------------------------- |
-| SubagentStart hook for context injection          | Infinite-loop inside subagents — documented platform constraint           |
+| SubagentStart hook for context injection          | Deferred, not impossible (verdict `adopt`, 2026-11-09): the "infinite-loop / documented platform constraint" reason was wrong — the event fires once per spawn or resume, cannot block, injects context only. Open item is throttling on agent teams, where it fires per teammate message. Nothing registered. |
 | PreToolUse:Task hook to validate subagent prompts | Violates outer-harness principle; blocks legitimate Task calls            |
 | Per-task memory namespaces                        | Requires database infrastructure; plan directory already serves this role |
 | Vector embedding of conversation history          | Requires external infra; over-engineering for a workflow harness          |
@@ -119,22 +119,20 @@ These approaches were explicitly evaluated and rejected:
 
 ## Memory Lifecycle
 
-Memory topic files in `.claude/memory/` have a 90-day automated pruning policy:
+Memory topic files in `.meowkit/memory/` have a 90-day automated pruning policy:
 
-- `post-session.sh` runs pruning on Stop (daily rate-limit via `session-state/last-prune-date`)
+- `post-session.cjs` runs pruning on Stop (daily rate-limit via `.meowkit/state/last-prune-date`)
 - Only entries with ISO 8601 date markers in headers are pruned
 - Entries without date markers are preserved (require manual review)
-- Pruned entries logged to `.claude/memory/pruned-log.md`
-- Override: `MEOWKIT_MEMORY_PRUNE=off` / `MEOWKIT_MEMORY_PRUNE_AGE_DAYS=N`
+- Pruned entries logged to `.meowkit/memory/pruned-log.md`
+- The 90-day window is fixed; there is no setting for it
 
-## Env Var Reference
+## Settings Reference
 
-| Variable                            | Default | Effect                                               |
-| ----------------------------------- | ------- | ---------------------------------------------------- |
-| `MEOWKIT_MAX_PROJECT_CONTEXT_BYTES` | `12288` | project-context.md size warn threshold; `0` disables |
-| `MEOWKIT_SKIP_SAFETY_SENTINEL`      | `on`    | Set `off` to always run agent-detector 9-file check  |
-| `MEOWKIT_MEMORY_PRUNE`              | `on`    | Set `off` to disable auto-pruning                    |
-| `MEOWKIT_MEMORY_PRUNE_AGE_DAYS`     | `90`    | Days before memory entries are pruned                |
+| Source | Key | Default | Effect |
+| ------ | --- | ------- | ------ |
+| `.meowkit/config.yaml` | `projectContext.maxBytes` | `12288` | project-context.md size warn threshold; `0` disables |
+| environment | `MEOWKIT_SKIP_SAFETY_SENTINEL` | `on` | Set `off` to always run the agent-detector 9-file check |
 
 ## See Also
 

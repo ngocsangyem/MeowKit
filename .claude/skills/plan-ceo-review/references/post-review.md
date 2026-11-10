@@ -20,8 +20,8 @@ After producing the Completion Summary, clean up any handoff notes for this bran
 the review is complete and the context is no longer needed.
 
 ```bash
-eval "$(.claude/scripts/bin/workflow-slug 2>/dev/null)"
-rm -f .meowkit/memory/projects/*-$BRANCH-ceo-handoff-*.md 2>/dev/null || true
+eval "$(.claude/hooks/lib/workflow-slug 2>/dev/null)"
+rm -f tasks/plans/*/*-$BRANCH-ceo-handoff-*.md 2>/dev/null || true
 ```
 
 ## Review Log
@@ -29,13 +29,13 @@ rm -f .meowkit/memory/projects/*-$BRANCH-ceo-handoff-*.md 2>/dev/null || true
 After producing the Completion Summary above, persist the review result.
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes review metadata to
-`.meowkit/memory/` (user config directory, not project files). The skill preamble
-already writes to `.meowkit/state/sessions/` and `.meowkit/memory/` — this is
+`.meowkit/telemetry/` (not project files). The skill preamble
+already writes to `.meowkit/state/sessions/` and `.meowkit/telemetry/` — this is
 the same pattern. The review dashboard depends on this data. Skipping this
 command breaks the review readiness dashboard in /ship.
 
 ```bash
-.claude/scripts/bin/workflow-review-log '{"skill":"plan-ceo-review","timestamp":"TIMESTAMP","status":"STATUS","unresolved":N,"critical_gaps":N,"mode":"MODE","scope_proposed":N,"scope_accepted":N,"scope_deferred":N,"commit":"COMMIT"}'
+.claude/hooks/lib/workflow-review-log '{"skill":"plan-ceo-review","timestamp":"TIMESTAMP","status":"STATUS","unresolved":N,"critical_gaps":N,"mode":"MODE","scope_proposed":N,"scope_accepted":N,"scope_deferred":N,"commit":"COMMIT"}'
 ```
 
 Before running this command, substitute the placeholder values from the Completion Summary you just produced:
@@ -54,7 +54,7 @@ Before running this command, substitute the placeholder values from the Completi
 After completing the review, read the review log and config to display the dashboard.
 
 ```bash
-.claude/scripts/bin/workflow-review-log
+.claude/hooks/lib/workflow-review-log
 ```
 
 Parse the output. Find the most recent entry for each skill (plan-ceo-review, plan-ceo-review, review, plan-design-review, design-review-lite, adversarial-review, codex-review, codex-plan-review). Ignore entries with timestamps older than 7 days. For the Eng Review row, show whichever is more recent between `review` (diff-scoped pre-landing review) and `plan-ceo-review` (plan-stage architecture review). Append "(DIFF)" or "(PLAN)" to the status to distinguish. For the Adversarial row, show whichever is more recent between `adversarial-review` (new auto-scaled) and `codex-review` (legacy). For Design Review, show whichever is more recent between `plan-design-review` (full visual audit) and `design-review-lite` (code-level check). Append "(FULL)" or "(LITE)" to the status to distinguish. Display:
@@ -76,7 +76,7 @@ Parse the output. Find the most recent entry for each skill (plan-ceo-review, pl
 ```
 
 **Review tiers:**
-- **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be disabled globally with `workflow-config set skip_eng_review true` (the "don't bother me" setting).
+- **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be opted out of per project with `workflow-config set skip_eng_review true`, which records the choice in `.meowkit/state/` rather than in the committed config (the "don't bother me" setting).
 - **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
 - **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
 - **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get one Claude adversarial pass. Large diffs (200+) get two Claude adversarial passes (attack-surface + failure-mode). No configuration needed.
@@ -86,7 +86,7 @@ Parse the output. Find the most recent entry for each skill (plan-ceo-review, pl
 - **CLEARED**: Eng Review has >= 1 entry within 7 days from either `review` or `plan-ceo-review` with status "clean" (or `skip_eng_review` is `true`)
 - **NOT CLEARED**: Eng Review missing, stale (>7 days), or has open issues
 - CEO and Design reviews are shown for context but never block shipping
-- If `skip_eng_review` config is `true`, Eng Review shows "SKIPPED (global)" and verdict is CLEARED
+- If `skip_eng_review` is `true` in this project's session state, Eng Review shows "SKIPPED (opted out)" and verdict is CLEARED
 
 **Staleness detection:** After displaying the dashboard, check if any existing reviews may be stale:
 - Parse the `---HEAD---` section from the bash output to get the current HEAD commit hash
@@ -181,7 +181,7 @@ At the end of the review, if the vision produced a compelling feature direction,
 
 "The vision from this review produced {N} accepted scope expansions. Want to promote it to a design doc in the repo?"
 - **A)** Promote to `docs/designs/{FEATURE}.md` (committed to repo, visible to the team)
-- **B)** Keep in `.meowkit/memory/projects/` only (local, personal reference)
+- **B)** Keep in `tasks/plans/<slug>/` only (local, personal reference)
 - **C)** Skip
 
 If promoted, copy the CEO plan content to `docs/designs/{FEATURE}.md` (create the directory if needed) and update the `status` field in the original CEO plan from `ACTIVE` to `PROMOTED`.

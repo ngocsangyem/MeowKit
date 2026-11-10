@@ -64,31 +64,31 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 
 	it("emits the authored Codex hook set (runnable, single-root) and still accounts for every source hook", () => {
 		const commands = hookCommands();
-		// Phase-9 flip: the hooks surface is authored. hooks.json declares the 3 native Codex
-		// safety+capture hooks (capture, privacy-block, gate-enforcement) — NOT a 1:1 map of the
-		// 22 source Claude hooks. Each resolves its wrapper via the git root (Codex exposes no
+		// Phase-9 flip: the hooks surface is authored. hooks.json declares the 2 native Codex
+		// safety hooks (privacy-block, gate-enforcement) — NOT a 1:1 map of the
+		// 21 source Claude hooks. Each resolves its wrapper via the git root (Codex exposes no
 		// project-dir env), single-root, runnable.
-		expect(commands).toHaveLength(3);
+		expect(commands).toHaveLength(2);
 		for (const command of commands) {
 			expect(command).not.toContain(`${env.projectDir}/${env.projectDir}`);
 			expect(command).toContain("git rev-parse --show-toplevel");
-			expect(command).toMatch(/\.codex\/hooks\/(capture|privacy-block|gate-enforcement)\.cjs/);
+			expect(command).toMatch(/\.codex\/hooks\/(privacy-block|gate-enforcement)\.cjs/);
 		}
-		for (const name of ["capture", "privacy-block", "gate-enforcement"]) {
+		for (const name of ["privacy-block", "gate-enforcement"]) {
 			expect(existsSync(join(env.projectDir, ".codex", "hooks", `${name}.cjs`)), name).toBe(true);
 		}
 
 		// The migration report still accounts for every source hook — none silently
-		// dropped. Codex hooks conversion is nulled (the 3 native hooks above ship via
+		// dropped. Codex hooks conversion is nulled (the 2 native hooks above ship via
 		// the authored bundle, not this reporting path), so every source .claude hook
 		// is now uniformly recorded "skipped" rather than converted/"migrated" —
 		// including the safety-critical ones, which the native bundle installs
 		// directly instead.
 		const hookRecords = readReport().artifacts.filter((a) => a.type === "hooks");
 		const migratedOrSkipped = hookRecords.filter((a) => a.status === "migrated" || a.status === "skipped");
-		expect(migratedOrSkipped.length).toBe(22);
-		expect(hookRecords.find((a) => a.sourcePath === "gate-enforcement.sh")?.status).toBe("skipped");
-		expect(hookRecords.find((a) => a.sourcePath === "privacy-block.sh")?.status).toBe("skipped");
+		expect(migratedOrSkipped.length).toBe(21);
+		expect(hookRecords.find((a) => a.sourcePath === "gate-enforcement.cjs")?.status).toBe("skipped");
+		expect(hookRecords.find((a) => a.sourcePath === "privacy-block.cjs")?.status).toBe("skipped");
 	});
 
 	it("does not auto-port a non-roster user agent (custom-helper) — agents conversion is nulled", () => {
@@ -129,7 +129,7 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 	it("keeps one idempotent resolver bootstrap and writes a capability snapshot", () => {
 		const agentsMd = readFileSync(join(env.projectDir, "AGENTS.md"), "utf-8");
 		expect(agentsMd.match(/GENERATED:capability-bootstrap START/g)).toHaveLength(1);
-		expect(agentsMd).toContain("npx mewkit capabilities resolve --intent");
+		expect(agentsMd).toContain("mewkit capabilities resolve --intent");
 		const snapshot = JSON.parse(readFileSync(join(env.projectDir, ".codex", "capabilities.json"), "utf-8")) as {
 			schemaVersion: string;
 			entries: unknown[];
@@ -143,7 +143,7 @@ describe("migrate codex acceptance — kit-install completeness", () => {
 		const report = readReport();
 		const { counts } = report.header;
 		expect(counts.migrated + counts.skipped + counts.failed + counts.narrowed).toBe(counts.total);
-		expect(hookCommands()).toHaveLength(3); // authored hook set (phase-9 flip), idempotent on re-run
+		expect(hookCommands()).toHaveLength(2); // authored hook set (phase-9 flip), idempotent on re-run
 		const agentsMd = readFileSync(join(env.projectDir, "AGENTS.md"), "utf-8");
 		expect(agentsMd.match(/GENERATED:capability-bootstrap START/g)).toHaveLength(1);
 	});

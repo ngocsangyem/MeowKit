@@ -63,15 +63,6 @@ export const AUTHORED_CAPABILITIES: CapabilityEntry[] = [
 		requirements: [{ type: "file_or_config", id: "docs/project-context.md", provenance: "authored" }],
 	}),
 	authored({
-		id: "wiki-recall",
-		kind: "context-service",
-		description: "Disciplined recall of long-term, provenance-bearing project knowledge.",
-		intents: ["search project knowledge", "recall prior decisions"],
-		// Provided by the `mewkit wiki context` subcommand — availability = CLI present,
-		// not a file on disk (a path probe would misreport a CLI subcommand as missing).
-		requirements: [{ type: "external_binary", id: "mewkit", provenance: "authored" }],
-	}),
-	authored({
 		id: "task-record",
 		kind: "state-service",
 		description: "Durable task/plan records under tasks/.",
@@ -130,13 +121,11 @@ export const AUTHORED_INTENTS: Record<string, { intents: string[]; aliases?: str
 		intents: ["review this code", "code review", "check before shipping", "audit the change"],
 		aliases: ["review"],
 	},
-	// Batch 2: fix/test/ship + wiki authoring + memory. jira/browser stay owned by their
-	// authored tool entries; wiki-recall (read service) keeps the recall intents, so mk:wiki
-	// here owns only the authoring verbs — no phrase collides across capabilities.
+	// Batch 2: fix/test/ship + memory. jira/browser stay owned by their authored tool
+	// entries — no phrase collides across capabilities.
 	"mk:fix": { intents: ["fix this bug", "fix the failing test", "debug this error"], aliases: ["fix"] },
 	"mk:testing": { intents: ["run the tests", "write tests for this", "check test coverage"], aliases: ["test"] },
 	"mk:ship": { intents: ["ship this change", "open a pull request", "create the PR"], aliases: ["ship"] },
-	"mk:wiki": { intents: ["propose a wiki page", "initialize the wiki", "approve a wiki page"], aliases: ["wiki"] },
 	"mk:memory": { intents: ["remember this decision", "recall a past fix", "prune old memory"], aliases: ["memory"] },
 };
 
@@ -144,7 +133,7 @@ export const AUTHORED_INTENTS: Record<string, { intents: string[]; aliases?: str
  * Capabilities that must acquire a task-scoped repo-context envelope before source-grounded work
  * (Phase 5, slice 2). Applied as an authored overlay in build-capabilities. Only the
  * source-grounded flagship flows are here — scout/research/planning + build/fix/test + review.
- * Ship (VCS operation), memory, wiki authoring, and the external-tool entries need no repo
+ * Ship (VCS operation), memory, and the external-tool entries need no repo
  * grounding before they run, so they are deliberately absent. Keys must be real capability ids
  * (validated by the live-harness test).
  */

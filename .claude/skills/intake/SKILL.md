@@ -1,6 +1,6 @@
 ---
 name: mk:intake
-description: 'Ticket/PRD intake: product area classification, completeness scoring, RCA, technical assessment. Works with Jira (via mk:jira-issue / jira-as), Linear (via MCP), GitHub (via gh CLI), or manual paste. Triggers: ''analyze ticket'', ''intake PRD'', ''triage issue'', ''classify ticket'', ''check ticket''.'
+description: Classify and score an incoming ticket or PRD — product area, completeness, root cause, technical read. NOT for mk:breakdown.
 phase: 0
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - completeness-scoring
   - triage
   - jira-linear-github
-when_to_use: Use when triaging tickets/PRDs — product-area classification, completeness, RCA. NOT for sprint planning against codebase (see mk:planning-engine).
+when_to_use: A single Jira, Linear or GitHub item needs triage before anyone plans.
 user-invocable: true
 owner: research
 criticality: medium
@@ -76,7 +76,7 @@ https://*.atlassian.net/wiki/spaces/{KEY}/pages/{ID}            -- without slug
 Shortlinks (`*.atlassian.net/wiki/x/{shortcode}`) are NOT auto-resolved in v1 — surfaced as a Gotcha; user is prompted to paste the canonical URL or page id.
 
 When a Confluence URL is detected:
-1. Pre-flight: check `MEOW_CONFLUENCE_*` env vars are set. If missing, surface "Confluence not configured. Run /mk:confluence-setup" and exit cleanly without attempting fetch.
+1. Pre-flight: check `MEOW_CONFLUENCE_*` env vars are set. If missing, surface "Confluence not configured. Run mk:confluence for guided setup" and exit cleanly without attempting fetch.
 2. When configured, confirm with user: "Detected Confluence page {id} in space {KEY}. Fetch content for intake analysis? [Y/n]"
 3. On approval: invoke `confluence-as.sh page get --page-id {id}` directly via the wrapper. Use returned markdown as intake source content.
 4. The intake report's "Source Summary" section cites the Confluence URL + page metadata. The "Suggested Actions" section recommends: "For deep spec analysis (requirements, AC, gaps), run: `/mk:confluence-spec-analyst <page-id>`". intake does NOT auto-invoke spec-analyst (no skill-to-skill chaining).
@@ -135,7 +135,7 @@ Identify affected files, test coverage gaps, and implementation complexity.
 
 ### Step 8b: Jira enrichment
 
-If the `mk:jira-*` family is available (jira-as installed via `.claude/scripts/bin/setup-workflow` + `.meowkit/.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
+If the `mk:jira-*` family is available (jira-as installed via `.claude/hooks/lib/setup-workflow` + `.meowkit/.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
 Suggest `mk:jira-*` actions per `references/jira-handoff-protocol.md`.
 
 ### Step 9: Generate output
@@ -201,7 +201,7 @@ vendor changelog, a referenced external document), this skill delegates to
   (SSRF guard, injection scanner, DATA boundary, secret scrub). The flag is a conscious
   trust-boundary crossing — the caller acknowledges the target URL may contain prompt
   injection and that the skill's defenses are best-effort.
-- Delegation example: `.claude/skills/.venv/bin/python3 .claude/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller mk:intake`
+- Delegation example: `node .claude/hooks/lib/skill-python.cjs .claude/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller mk:intake`
 
 ## References
 

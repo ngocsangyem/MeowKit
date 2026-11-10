@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Generate release manifest with SHA-256 checksums for all release assets.
- * Tracks .claude/, tasks/, and root config files.
+ * Tracks .claude/ and tasks/. No root-level file ships: the always-on guidance lives in
+ * `.claude/rules/*.md`, and a target project's own root CLAUDE.md is never kit-owned.
  *
  * Usage: node scripts/generate-release-manifest.cjs [version]
  * Output: release-manifest.json in project root
@@ -13,7 +14,6 @@ const crypto = require("crypto");
 const { execSync } = require("child_process");
 
 const INCLUDE_DIRS = [".claude", "tasks"];
-const INCLUDE_FILES = ["CLAUDE.md"];
 
 const SKIP_DIRS = new Set([
   "node_modules", ".venv", "venv", "__pycache__", ".git",
@@ -84,14 +84,6 @@ function main() {
       const files = scanDirectory(dirPath);
       allFiles.push(...files);
       console.log(`  ${dir}: ${files.length} files`);
-    }
-  }
-
-  // Add root-level files
-  for (const file of INCLUDE_FILES) {
-    const filePath = path.join(projectRoot, file);
-    if (fs.existsSync(filePath)) {
-      allFiles.push(filePath);
     }
   }
 

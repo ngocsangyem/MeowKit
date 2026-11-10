@@ -10,7 +10,7 @@
    - Security audit → `mk:cso`
    - For the full intent → skill dispatch table, see
      `.cursor/skills/agent-detector/references/skill-domain-routing.md` (loaded at Step 0b).
-4. **Context is loaded on demand** by the consumer skill via explicit reads of `.meowkit/memory/` topic files (`fixes.md`, `review-patterns.md`, `architecture-decisions.md`). `.meowkit/memory/` is this project's own memory convention — it is NOT any host-runtime platform's built-in auto-memory.
+4. **Context is loaded on demand** by the consumer skill — a read-set skill greps `.meowkit/memory/` (`decisions.md`, `gotchas.md`) for its task keywords and opens only the matching entries. `.meowkit/memory/` is this project's own memory convention — it is NOT any host-runtime platform's built-in auto-memory.
 
 ---
 

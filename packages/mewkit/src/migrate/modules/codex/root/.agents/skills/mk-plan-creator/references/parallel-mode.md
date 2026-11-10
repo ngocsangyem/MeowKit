@@ -49,7 +49,7 @@ parallel_group: "A"
 
 ## Integration with Project Rules
 
-Parallel phases MUST follow `parallel-execution-rules.md`:
+Parallel phases MUST follow the parallel-execution rules:
 - Worktree isolation per agent
 - Gate 1 and Gate 2 are never parallelized
 - Full test suite required after merge

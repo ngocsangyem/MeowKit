@@ -2,11 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { resolveInventoryPath } from "../state/resolve-inventory-path.js";
 import pc from "picocolors";
+import { ALWAYS_ON_RULE_PATHS } from "../core/always-on-rules.js";
 import { checkDocsReferences } from "../core/check-docs-references.js";
+import { checkSkillFrontmatter } from "../core/check-skill-frontmatter.js";
+import { resolveContractPath } from "../core/docs-reference-contract-paths.js";
 import { collectProviderContractDiagnostics } from "../migrate/provider-contract-diagnostics.js";
 import { isHookScript } from "../core/is-hook-script.js";
 import { checkWorkflowDrift } from "../core/check-workflow-drift.js";
-import { checkGateAuthority, checkCommandDrift } from "../core/check-gate-authority.js";
+import { checkGateAuthority } from "../core/check-gate-authority.js";
 import { assertOperationsNotInvocable } from "../core/provider-operations.js";
 import {
 	findOperationConformance,
@@ -20,6 +23,7 @@ import { checkOwnership } from "../core/build-inventory.js";
 import { checkAgentConformance } from "../core/check-agent-conformance.js";
 import { checkSubstrate } from "../core/substrate.js";
 import { checkPacks } from "../core/check-packs.js";
+import { checkMemoryStore } from "../core/check-memory-store.js";
 import { checkPluginNamespace } from "../core/namespace-purity.js";
 import { validateCapabilities } from "../core/validate-capabilities.js";
 import { buildCapabilities } from "../core/build-capabilities.js";
@@ -29,7 +33,10 @@ import { discoverSkills } from "../migrate/discovery/index.js";
 import { buildPortableSkillsByProvider } from "../migrate/portability-policy.js";
 import { getTargetProfile, targetProfileNames } from "../validate/targets/target-profile.js";
 import type { Status } from "./doctor-checks.js";
-import { resolveConfigPath } from "../state/resolve-config-path.js";
+import { configWritePath, migrationPending } from "../state/resolve-config-path.js";
+import { loadConfigFile } from "../config/load-config.js";
+import { observerNames } from "../config/observer-names.js";
+import { resolveProjectRoot } from "../state/meowkit-root-resolver.js";
 
 // validate reports STRUCTURE & WIRING only — that gate files exist and are wired, not that
 // they actually block. Behavioral proof is `doctor --hard-gates`. Statuses are honest:
@@ -50,6 +57,7 @@ export type Section =
 	| "Gates"
 	| "Capabilities"
 	| "Agents"
+	| "Memory"
 	| "Target";
 
 export interface CheckResult {
@@ -66,7 +74,7 @@ export interface CheckResult {
  *   coherence, routing-table breadth) alongside consumer checks.
  * - `flat-copy`: a project that installed `.claude/` by copy. Gets only
  *   consumer-actionable checks; authoring-coherence checks are suppressed because a
- *   consumer legitimately customizes `CLAUDE.md`/`rules` (tripping workflow-drift and
+ *   consumer legitimately customizes `rules` (tripping workflow-drift and
  *   routing-breadth), so those checks would surface as false failures in a healthy
  *   consumer install.
  * Provider projections are validated by adapter-specific paths (e.g. `--portable`),
@@ -95,6 +103,12 @@ interface ValidateOptions {
 	capabilities?: boolean;
 	/** Scope the run to the declared agent-contract conformance check. */
 	agents?: boolean;
+	/** Scope the run to the committed team-memory store lint (used by CI). */
+	memory?: boolean;
+	/** Scope the run to the SKILL.md frontmatter schema + runtime contract check (used by CI). */
+	frontmatter?: boolean;
+	/** Scope the run to the `.claude` → `docs/*` reference allowlist check (used by CI). */
+	docsRefs?: boolean;
 	/** Validate a GENERATED provider target instead of a `.claude/` project: the provider key
 	 * (e.g. "codex"). Requires `targetDir`. Mutually exclusive with `--portable`. */
 	target?: string;
@@ -200,30 +214,86 @@ export function checkHooksExecutable(meowkitDir: string): CheckResult[] {
 	return results;
 }
 
+/**
+ * SKILL.md frontmatter against the schema, plus the runtime contract.
+ *
+ * Schema violations and runtime-contract breaks are FAIL; the advisory
+ * tool-contract and recommended-field gaps are WARN, so the calibration fields
+ * can be adopted gradually without blocking every unrelated change.
+ */
+export function checkFrontmatterContract(projectRoot: string): CheckResult[] {
+	const report = checkSkillFrontmatter(projectRoot);
+	if (report.fatal) {
+		return [{ name: "Skill frontmatter", status: "fail", detail: report.fatal, section: "Structure" }];
+	}
+	const results: CheckResult[] = [];
+	if (report.errors.length > 0) {
+		results.push({
+			name: "Skill frontmatter",
+			status: "fail",
+			detail: `${report.errors.length} error(s)\n         ${report.errors.slice(0, 10).join("\n         ")}`,
+			section: "Structure",
+		});
+	} else if (report.valid === 0) {
+		results.push({
+			name: "Skill frontmatter",
+			status: "fail",
+			detail: "Zero SKILL.md files found under .claude/skills/",
+			section: "Structure",
+		});
+	} else {
+		results.push({
+			name: "Skill frontmatter",
+			status: "pass",
+			detail: `${report.valid} skill(s) validated against skill-schema.json`,
+			section: "Structure",
+		});
+	}
+	if (report.warnings.length > 0) {
+		results.push({
+			name: "Skill frontmatter advisories",
+			status: "warn",
+			detail: `${report.warnings.length} warning(s)\n         ${report.warnings.slice(0, 10).join("\n         ")}`,
+			section: "Structure",
+		});
+	}
+	return results;
+}
+
 function checkConfigJson(meowkitDir: string): CheckResult {
-	// `meowkitDir` is the provider install dir; the config now lives beside it under `.meowkit/`.
-	const configPath = resolveConfigPath(path.dirname(meowkitDir));
+	// `meowkitDir` is the provider install dir; the config lives beside it under `.meowkit/`.
+	const name = "Project config valid";
+	const root = path.dirname(meowkitDir);
+	const configPath = configWritePath(root);
 	if (!fs.existsSync(configPath)) {
-		return { name: "Config JSON valid", status: "fail", detail: `Missing: ${configPath}`, section: "Structure" };
+		// Absent is not invalid. A project with no config runs on its defaults,
+		// and one that still has the v2 descriptor has an upgrade to run.
+		const detail = migrationPending(root)
+			? `${configPath} absent — the v2 descriptor is still in place; run \`mewkit upgrade\``
+			: `${configPath} absent — every setting is at its default`;
+		return { name, status: "warn", detail, section: "Structure" };
 	}
-	try {
-		JSON.parse(fs.readFileSync(configPath, "utf-8"));
-		return { name: "Config JSON valid", status: "pass", detail: configPath, section: "Structure" };
-	} catch (error: unknown) {
-		const message = error instanceof Error ? error.message : String(error);
-		return { name: "Config JSON valid", status: "fail", detail: `Invalid JSON: ${message}`, section: "Structure" };
-	}
+	const result = loadConfigFile(configPath, observerNames(root));
+	if (result.ok) return { name, status: "pass", detail: configPath, section: "Structure" };
+	return { name, status: "fail", detail: `${result.error.message} [${result.error.code}]`, section: "Structure" };
 }
 
 function checkDocsRefsContract(meowkitDir: string): CheckResult[] {
-	const contractPath = path.join(meowkitDir, "rules", "docs-reference-contract.md");
-	if (!fs.existsSync(contractPath)) {
-		return [
-			{ name: "Docs-reference contract present", status: "fail", detail: `Missing: ${contractPath}`, section: "Docs" },
-		];
-	}
 	try {
-		const { scannedFiles, findings, errorCount, warnCount } = checkDocsReferences(meowkitDir);
+		const { scannedFiles, findings, errorCount, warnCount, notApplicable } = checkDocsReferences(meowkitDir);
+		// The contract is a source-repo-only maintainer document. A consumer project ships
+		// `.claude/` without it, so its absence is N/A — there is no allowlist to check
+		// against, and failing here would fail every consumer install.
+		if (notApplicable) {
+			return [
+				{
+					name: "Docs references on Type-1 allowlist",
+					status: "pass",
+					detail: `N/A — maintainer contract absent (${resolveContractPath(meowkitDir)})`,
+					section: "Docs",
+				},
+			];
+		}
 		const summary = `Scanned ${scannedFiles} files — ${errorCount} error(s), ${warnCount} warning(s)`;
 		const status: Status = errorCount > 0 ? "fail" : warnCount > 0 ? "warn" : "pass";
 		const detail =
@@ -671,7 +741,7 @@ export function checkCapabilityViewDrift(meowkitDir: string, projectRoot: string
 /**
  * Assemble the default-run checks for a given mode. Consumer-actionable checks run in
  * both modes; authoring-coherence checks run only in `authoring` mode — in a flat-copy
- * consumer they would be false failures (consumer customization of CLAUDE.md/rules trips
+ * consumer they would be false failures (consumer customization of rules/ trips
  * drift + routing-breadth). Pure and side-effect-free so it can be tested directly
  * against a fixture.
  */
@@ -686,13 +756,19 @@ export async function buildDefaultChecks(
 	const results: CheckResult[] = [
 		checkDirExists(meowkitDir, "agents"),
 		checkDirExists(meowkitDir, "hooks"),
-		checkFileExists(projectRoot, "CLAUDE.md", "Structure"),
+		// The always-on rule set replaces the former root-`CLAUDE.md` presence check: these
+		// files are what the host auto-loads every session, so a missing one silently drops
+		// enforcement. Consumer-actionable in both modes.
+		...ALWAYS_ON_RULE_PATHS.map((rel) => checkFileExists(meowkitDir, rel, "Structure")),
 		checkConfigJson(meowkitDir),
 		...checkHooksExecutable(meowkitDir),
 		...checkDocsRefsContract(meowkitDir),
 		// Namespace purity is cheap and consumer-relevant (a leaked double-prefix would
 		// misbehave in the consumer too), so it runs in both modes.
 		...checkPluginNamespace(meowkitDir),
+		// The team-memory store is consumer-owned content: a consumer's store can carry
+		// instruction-like text or a secret just as easily as the source checkout's can.
+		...checkMemoryStore(projectRoot),
 	];
 
 	if (mode === "authoring") {
@@ -704,15 +780,14 @@ export async function buildDefaultChecks(
 			// Gate-authority stays strict even in the default run: an un-synced
 			// install cannot explain a file that grants automated gate approval.
 			...checkGateAuthority(projectRoot),
-			...checkCommandDrift(projectRoot),
 			...checkOperationConformance(meowkitDir),
 			checkGenericCoreTokens(meowkitDir),
-			// Declared doc counts vs the real inventory. `mewkit inventory --check`
+			// Declared doc counts vs the real inventory. `scripts/harness-inventory.cjs --check`
 			// owns the same check for the CI step; surfacing it here means an author
 			// sees a stale README at validate time instead of at CI time. Counts are
 			// derived from buildInventory, so this can only drift when a doc lies.
 			...checkStaleIndex(projectRoot),
-			...checkOwnership(meowkitDir, { missingInfraSeverity: "warn" }),
+			...checkOwnership(meowkitDir),
 			...checkAgentConformance(projectRoot),
 			...checkSubstrate(meowkitDir, { missingViewSeverity: "warn" }),
 			...checkPacks(meowkitDir, { missingInfraSeverity: "warn" }),
@@ -755,6 +830,21 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		return;
 	}
 
+	// `--memory` lints CONSUMER content (`.meowkit/memory/`), which exists on every runtime —
+	// the Codex bundle installs `.agents/`, the Cursor bundle `.cursor/`, and both instruct the
+	// user to run this lint. Gating it behind the `.claude/` lookup made the only automated
+	// guard unreachable on exactly those targets, and the error named `.claude/` rather than
+	// memory, so the user read "not a Claude project" and dropped the step. It runs FIRST, and
+	// independently of any provider directory.
+	if (args.memory) {
+		const memoryRoot = resolveProjectRoot(process.cwd()) ?? process.cwd();
+		console.log(pc.bold(pc.cyan("Linting the committed team-memory store...")));
+		console.log(`${pc.dim("Project root:")} ${memoryRoot}`);
+		console.log();
+		renderResultsAndExit(checkMemoryStore(memoryRoot), args.strict ?? false);
+		return;
+	}
+
 	console.log(pc.bold(pc.cyan("Validating .claude/ project structure...")));
 	console.log(
 		pc.dim("Scope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block."),
@@ -778,7 +868,7 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 	if (args.workflow) {
 		results = checkWorkflowDrift(projectRoot);
 	} else if (args.gates) {
-		results = [...checkGateAuthority(projectRoot), ...checkCommandDrift(projectRoot)];
+		results = checkGateAuthority(projectRoot);
 	} else if (args.ownership) {
 		results = checkOwnership(meowkitDir);
 	} else if (args.substrate) {
@@ -791,6 +881,10 @@ export async function validate(args: ValidateOptions = {}): Promise<void> {
 		results = checkCapabilitiesSection(meowkitDir);
 	} else if (args.agents) {
 		results = checkAgentConformance(projectRoot);
+	} else if (args.frontmatter) {
+		results = checkFrontmatterContract(projectRoot);
+	} else if (args.docsRefs) {
+		results = checkDocsRefsContract(meowkitDir);
 	} else {
 		const mode = args.mode ?? detectValidateMode(projectRoot);
 		console.log(
@@ -830,6 +924,7 @@ function renderResultsAndExit(results: CheckResult[], strict: boolean): void {
 		Rules: true,
 		Capabilities: true,
 		Agents: true,
+		Memory: true,
 		Target: true,
 	};
 	const sections = Object.keys(SECTION_ORDER) as Section[];

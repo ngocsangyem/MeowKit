@@ -9,11 +9,11 @@ Read-only audit of the project's agent-tree (`.cursor/` + `.cursor/skills/`) str
 every host-runtime session and how much of the context window it consumes,
 then recommends the highest-leverage trims.
 
-Complementary lens: `mewkit inventory --substrate` shows the same artifact set
+Complementary lens: `scripts/harness-inventory.cjs --substrate` (a maintainer script in the toolkit source repository, not part of this install) shows the same artifact set
 grouped by the responsibility each serves (covered / partial / missing), so a trim
 can be checked against responsibility coverage before removing an artifact. The
 per-phase read budget that bounds what an audit-driven session should load lives in
-`rules/context-budget-rules.md`.
+the context-budget rules.
 
 ## When to Use
 
@@ -25,7 +25,7 @@ Three concrete triggers:
    over-compacted, audit to see if structural overhead has grown past 10%.
 3. **Periodic health audit** — quarterly or on model upgrades, confirm
    the always-on bundle still pays its keep (paired with the dead-weight audit
-   in `harness-rules.md` Rule 7).
+   in the harness rules Rule 7).
 
 ## Context vs Cost (Boundary)
 

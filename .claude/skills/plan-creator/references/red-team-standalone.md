@@ -1,6 +1,6 @@
 # Red Team Standalone Subcommand
 
-Subcommand: `/mk:plan red-team {plan_path}`
+Subcommand: `/mk:plan-creator red-team {plan_path}`
 
 Run an adversarial red-team review on an existing plan without going through the full planning pipeline.
 
@@ -9,8 +9,8 @@ Run an adversarial red-team review on an existing plan without going through the
 Activated when argument starts with `red-team` followed by a path to a plan directory or plan.md file.
 
 Examples:
-- `/mk:plan red-team tasks/plans/260411-my-feature/`
-- `/mk:plan red-team tasks/plans/260411-my-feature/plan.md`
+- `/mk:plan-creator red-team tasks/plans/260411-my-feature/`
+- `/mk:plan-creator red-team tasks/plans/260411-my-feature/plan.md`
 
 ## Workflow
 

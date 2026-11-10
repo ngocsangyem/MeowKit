@@ -1,6 +1,6 @@
 ---
 name: mk:web-to-markdown
-description: Fetch a URL and return clean markdown. Use when the agent needs an arbitrary external page (blog, RFC, GitHub issue, vendor doc) not covered by mk:docs-finder. Triggers on URLs in chat. Static-only by default; opt-in JS rendering available.
+description: Fetches one arbitrary URL and returns clean markdown. NOT for mk:docs-finder.
 argument-hint: <url> [--wtm-accept-risk] [--wtm-approve]
 keywords:
   - web-to-markdown
@@ -8,12 +8,13 @@ keywords:
   - page-to-markdown
   - external-page
   - one-shot-fetch
-when_to_use: Use when fetching an arbitrary external page (blog, RFC, GitHub issue, vendor doc) not covered by mk:docs-finder. NOT for library/framework docs (see mk:docs-finder).
+when_to_use: A blog post, RFC or GitHub issue link must be read as text.
 user-invocable: true
 owner: docs
 criticality: medium
 status: active
 runtime: claude-code
+requires_runtime: [python>=3.9]
 ---
 
 <!--
@@ -94,14 +95,14 @@ See `references/security.md` for the full threat model, attack surface, and defe
 4. Injection scanner: 50+ patterns + encoding detection (base64/ROT13/Unicode/zero-width) + context-flood WARN
 5. **HARD_STOP on injection hit** — content quarantined, no programmatic override, manual user inspection required
 6. Secret scrub on content AND URL BEFORE any disk write
-7. `privacy-block.sh` hook-layer enforcement of SSRF + cache/manifest read blocks
-8. `injection-audit.py` post-write library scan (called from `persist_fetch.persist` via `scan_file` import, not CLI)
+7. `privacy-block.cjs` hook-layer enforcement of SSRF + cache/manifest read blocks
+8. Post-write re-scan through `injection-audit.cjs --file` (called from `persist_fetch.persist`, which treats a failed scan as CRITICAL)
 
 ## Gotchas
 
-- **Playwright is opt-in.** Default is static fetch only. JS-rendered pages return an error pointing to `.claude/scripts/bin/setup-workflow --system-deps`. This is intentional — 200MB Chromium download is not worth the 5% of pages that need it.
+- **Playwright is opt-in.** Default is static fetch only. JS-rendered pages return an error pointing to `.claude/hooks/lib/setup-workflow --system-deps`. This is intentional — 200MB Chromium download is not worth the 5% of pages that need it.
 - **robots.txt is respected with a 24h cache.** Some doc sites disallow scraping; skill honors this. Override requires manual user action.
-- **Fetch persistence grows unbounded in v1.** Manual cleanup via `rm -rf .claude/cache/web-fetches/*`. v2 will add TTL auto-cleanup.
+- **Fetch persistence grows unbounded in v1.** Manual cleanup via `rm -rf .meowkit/cache/web-fetches/*`. v2 will add TTL auto-cleanup.
 - **Reports may contain PII.** Secret-scrub catches credentials but does NOT catch names, emails, user IDs in page body text. Treat cached reports as sensitive.
 - **Injection STOP has no bypass.** If the scanner halts a fetch, no flag reopens it. The user must manually inspect the quarantine file.
 - **Slug is sha256-hashed path.** Filenames don't carry path-embedded tokens — good for security, annoying for `ls`-based discovery. Use the manifest `index.jsonl` (behind privacy-block) to search.
@@ -122,15 +123,15 @@ See `references/security.md` for the full threat model, attack surface, and defe
 **Static fetch (always):**
 
 ```bash
-.claude/skills/.venv/bin/pip install -r scripts/requirements.txt
+mewkit skill env web-to-markdown    # installs exactly scripts/requirements.txt
 # requests, readability-lxml, html2text, lxml, charset-normalizer
 ```
 
-**JS rendering (opt-in via `.claude/scripts/bin/setup-workflow --system-deps`):**
+**JS rendering (opt-in via `.claude/hooks/lib/setup-workflow --system-deps`):**
 
 ```bash
-.claude/skills/.venv/bin/pip install playwright==1.58.0
-.claude/skills/.venv/bin/playwright install chromium  # ~200MB one-time
+.meowkit/envs/web-to-markdown/bin/pip install playwright==1.58.0
+.meowkit/envs/web-to-markdown/bin/playwright install chromium  # ~200MB one-time
 ```
 
 To enable JS rendering at runtime, set `MEOWKIT_WEB_FETCH_JS=1` before invoking the skill. All three gates must be open: Playwright installed, `MEOWKIT_WEB_FETCH_JS=1`, and `js=True` per-call argument. See `references/security.md` for the three-layer JS gate spec.

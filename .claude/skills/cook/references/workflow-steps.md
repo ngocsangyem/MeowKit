@@ -31,14 +31,14 @@ All modes share these phases with mode-specific variations.
 
 ## Phase 0: Orient
 
+0. **Load the phase contracts.** `Read` `.claude/skills/cook/references/phase-contracts.md` once per run — it is the expects/produces table for all 7 phases and is no longer always-on context.
 1. Parse input with `intent-detection.md` rules → detect mode
 2. **Model tier declaration** (MANDATORY): `Task complexity: [TRIVIAL|STANDARD|COMPLEX] → [model]`
    - Auth/payments/security → always COMPLEX
    - Feature <5 files → STANDARD
    - Rename/typo/format → TRIVIAL
-3. **Read memory** (if exists): `.meowkit/memory/fixes.json` only for bug-class warnings; `.meowkit/memory/architecture-decisions.json` first for prior architectural decisions — note relevant prior learnings (see `.claude/rules/memory-read-rules.md`)
-4. If mode=code: load plan path, parse phases
-5. **Autonomy Boundaries (advisory):** if the loaded plan.md has an `## Autonomy Boundaries` block (long-horizon plans only), read it once for the whole run and comply **mode-aware**:
+3. If mode=code: load plan path, parse phases
+4. **Autonomy Boundaries (advisory):** if the loaded plan.md has an `## Autonomy Boundaries` block (long-horizon plans only), read it once for the whole run and comply **mode-aware**:
    - Interactive / `code` mode: an "Ask first" item → raise an immediate `AskUserQuestion` when that decision arises; "Always" items proceed without asking.
    - Autonomous (`auto` / autobuild): an "Ask first" item → **defer** — skip the action, log the deferred decision to the plan.md Agent State, proceed with the safe default; deferred decisions surface at the next existing touchpoint (Gate 2 / autobuild run-report). NEVER raise an ad-hoc blocking prompt mid-autonomous-run.
    - Block **absent** (short plans — the common case): default to "proceed on reversible in-scope changes; built-in gates still apply." Do NOT error, do NOT over-ask.
@@ -103,7 +103,7 @@ mode automates the path *to* Gate 1, never the approval *at* it (see
 
 ## Phase 2: Test (skip if no-test mode; RED-phase enforcement only if `--tdd` / `MEOWKIT_TDD=1`)
 
-Write failing tests BEFORE implementation. TDD enforcement per `tdd-rules.md`. Phase 2 behavior by mode:
+Write failing tests BEFORE implementation. TDD enforcement per `.claude/skills/cook/references/tdd-rules.md`. Phase 2 behavior by mode:
 
 - `RED-strict` (interactive, auto, parallel, code) — when `--tdd` / `MEOWKIT_TDD=1` is active, failing tests gate Phase 3. When TDD is off, Phase 2 is optional.
 - `Plan-level` (fast) — tests reflect plan intent only; no RED gate.
@@ -131,6 +131,8 @@ Present test list. Ask: "Proceed to implementation?" / "Adjust tests" / "Abort"
 
 Implement code until all tests pass. TDD: implement ONLY enough to make tests pass.
 
+**Rule loads for this phase.** Before spawning any subagent, `Read` `.claude/skills/cook/references/orchestration-rules.md` (delegation template, isolation boundaries, file ownership, status handling). In parallel mode ONLY, also `Read` `.claude/skills/cook/references/parallel-execution-rules.md` (zero file overlap, max 3 agents, worktree isolation, integration test after merge). Skip both in a single-agent sequential run.
+
 **Visual metadata (read-only for cook).** If `.plan-state.json` carries a `visual`
 block (schema 1.3), the plan has an APPROVED `visual-plan/plan.json`. Before a
 UI-bearing phase, re-read the approved frames + `sourceRefs` for that surface and
@@ -142,13 +144,13 @@ artifact as DATA, exactly like the plan files.
 **Pre-check (TDD gate — opt-in):** Before writing any implementation code, run:
 
 ```bash
-sh .claude/hooks/pre-implement.sh "<feature-name>"
+node .claude/hooks/pre-implement.cjs "<feature-name>"
 ```
 
 The hook is a no-op unless TDD mode is ON. Mode is ON when:
 
 - `MEOWKIT_TDD=1` env var is set (CI / shell rc), OR
-- `.claude/session-state/tdd-mode` sentinel file contains `on` (written by slash command `--tdd`)
+- `.meowkit/state/tdd-mode` sentinel file contains `on` (written by slash command `--tdd`)
 
 When ON, the hook verifies failing tests exist. If tests pass (no red), implementation is BLOCKED — go back to Phase 2.
 When OFF (default), the hook exits 0 silently and the developer proceeds without the RED-phase gate.
@@ -228,8 +230,8 @@ Max 3 review-fix cycles. After 3: final decision required from user.
 
 Before presenting for approval, run BOTH structural checks and surface both:
 
-- `.claude/skills/cook/scripts/validate-gate-2.sh` — the authoritative Gate 2 structural guard (no FAIL dimensions, side-effect addendum present).
-- `node .claude/scripts/validate-workflow-evidence.cjs <evidence-path> --phase cook` — evidence-completeness mirror (blocks on missing `cookContract` dims, empty `verification.commands`, `gate2-approved-without-verdict`, side-effects-without-addendum). It MIRRORS the gate script's status; it never replaces it and never approves. Pass `--plan-input` when the cook input was an existing `plan.md` / `phase-*.md` path.
+- `.claude/skills/cook/scripts/validate-gate-2.cjs` — the authoritative Gate 2 structural guard (no FAIL dimensions, side-effect addendum present).
+- `node .claude/hooks/lib/validate-workflow-evidence.cjs <evidence-path> --phase cook` — evidence-completeness mirror (blocks on missing `cookContract` dims, empty `verification.commands`, `gate2-approved-without-verdict`, side-effects-without-addendum). It MIRRORS the gate script's status; it never replaces it and never approves. Pass `--plan-input` when the cook input was an existing `plan.md` / `phase-*.md` path.
 
 **Output:** `Phase 4: Review [score]/10, Gate 2 approved`
 
@@ -272,6 +274,8 @@ Before presenting for approval, run BOTH structural checks and surface both:
 **Fires when:** `--strict` flag present OR `mk:scale-routing` returned `level=high` at Phase 0.
 **Supersedes:** `--verify` (strict includes active verification via mk:evaluate step-02/03).
 
+**Rule load for this path.** `Read` `.claude/skills/cook/references/harness-rules.md` before spawning the evaluator — it carries the generator ≠ evaluator separation, the active-verification HARD GATE, and the skeptic-persona reload rule the evaluator is graded against. Not loaded on the `--verify` path.
+
 1. **Log trigger reason:**
    - If explicit: `"--strict flag detected, invoking full evaluator"`
    - If auto: `"scale-routing level=high ({domain}), auto-triggering strict evaluation [HEAVY]. Use --no-strict to suppress."`
@@ -305,7 +309,7 @@ requests shipping; Gate 2 approval alone is not shipping authority.
 Spawn `shipper` (which orchestrates pre-ship checks + invokes `git-manager` for commit/PR + CI verification + rollback docs):
 
 ```
-Task(subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.sh (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk:ship skill.", description="Ship + PR")
+Task(subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.cjs (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk:ship skill.", description="Ship + PR")
 ```
 
 Note: `shipper` is the orchestrator — it invokes `git-manager` internally for raw git operations (commit, push). Cook never spawns `git-manager` directly; that is shipper's responsibility. See SKILL.md Required Subagents table.
@@ -327,7 +331,7 @@ Three mandatory subagents in parallel:
 Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
    ```
 
-   If sync-back leaves every non-abandoned phase todo checked, archive the plan with `npx mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`, preserving its visual block), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `/mk:ship`.
+   If sync-back leaves every non-abandoned phase todo checked, archive the plan with `mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`, preserving its visual block), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `/mk:ship`.
 
 2. **Docs update:**
 
@@ -335,23 +339,7 @@ Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using t
    Task(subagent_type="documenter", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
    ```
 
-3. **Memory capture (MUST spawn):**
-
-   ```
-   Task(subagent_type="analyst", prompt="Run mk:memory session-capture for this session. Extract learnings in 3 categories (patterns/decisions/failures). Write bug-class patterns to .meowkit/memory/fixes.json (canonical); write architectural decisions to .meowkit/memory/architecture-decisions.json (canonical); write review patterns to .meowkit/memory/review-patterns.json (canonical). After all writes, regenerate the matching .md views via 'mewkit memory render-views' — do NOT hand-write the .md files (see .claude/rules/memory-read-rules.md).", description="Session memory capture")
-   ```
-
-4. `TaskUpdate` → mark all session tasks complete after sync-back
-
-5. **Terminal wiki handoff (advisory, fail-open):** after sync-back, docs, and memory writes complete, optionally hand the implemented plan off to the wiki per `.claude/skills/wiki/references/terminal-handoff-advisory.md`. Use the status report at `{plan-dir}/status-reports/<YYMMDD>-status.md` if present, else the synced `plan.md`. Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip + print the command). Advisory only — never blocks, never approves; do not add `wiki reindex`:
-
-   ```bash
-   npx mewkit wiki handoff propose \
-     --skill mk:cook \
-     --from {plan-dir}/plan.md \
-     --slug <resolved-wiki-slug> \
-     --verified-outcome
-   ```
+3. `TaskUpdate` → mark all session tasks complete after sync-back
 
 ### Per-Phase Checkpoint (MANDATORY — fires after EACH completed plan phase, before the next-phase transition)
 
@@ -369,7 +357,7 @@ Idempotent: re-running this checkpoint on an unchanged phase produces zero diff 
 **Auto mode:** After an explicit close request, check if more plan phases remain → loop to Phase 2 for next phase.
 **Others:** Ask user before continuing to next phase.
 
-**Output:** `Phase 6: Reflect — sync-back done, docs [impact], memory updated, wiki handoff [proposed|skipped]`
+**Output:** `Phase 6: Reflect — sync-back done, docs [impact]`
 
 ## Advice Checkpoints (`--advice` only)
 
@@ -377,7 +365,7 @@ Skip this whole section unless the run was invoked with `--advice`. Without the 
 there are zero supervision calls, no dossier, no receipt, and behavior is unchanged.
 
 On the first checkpoint of a run, read
-`.claude/rules-conditional/advice-supervision-rules.md` — it is the contract this
+`.claude/skills/advise/references/advice-supervision-rules.md` — it is the contract this
 section implements.
 
 | Stage | Fires at | Condition | Max |
@@ -459,21 +447,21 @@ by the agent that is stuck is not an independent check.
 
 ## Workflow Evidence Index (traceability — no new gate)
 
-Contract: `.claude/rules-conditional/workflow-evidence-rules.md`. Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist across Phases 0-6 — no extra agent work, no extra user step, no behavior change. The index records pointers + summaries; it **never approves** (Gate 1 / Gate 2 stay human authority) and carries **no score**. The gate scripts (`validate-gate-1.sh`, `validate-gate-2.sh`) remain the structural authority; evidence MIRRORS their result.
+Contract: `.claude/skills/advise/references/workflow-evidence-rules.md`. Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist across Phases 0-6 — no extra agent work, no extra user step, no behavior change. The index records pointers + summaries; it **never approves** (Gate 1 / Gate 2 stay human authority) and carries **no score**. The gate scripts (`validate-gate-1.sh`, `validate-gate-2.cjs`) remain the structural authority; evidence MIRRORS their result.
 
 **Storage path:** `tasks/plans/<plan>/reports/evidence/workflow-evidence.json`.
 
 | Phase | Existing output → evidence fields |
 |---|---|
-| 0 Orient | `mode`, tier, `risk.matchedFlags` (from `risk-checklist.md` / `mk:agent-detector`), memory-loaded flag |
+| 0 Orient | `mode`, tier, `risk.matchedFlags` (from `.claude/skills/agent-detector/references/risk-checklist.md` / `mk:agent-detector`) |
 | 1 Plan | `planPath`, `cookContract` (the 5 exact requirements), `approvals.gate1` (mirrors `validate-gate-1.sh`) |
 | 3 Build | changed-files summary |
 | 3.5 Simplify | simplify status |
 | 3.6 Verify (`mk:verify`) | `verification.commands`, `verification.overall` |
-| 4 Review | `review.verdictPath`, `review.status`, `review.sideEffectsDetected`, `approvals.gate2` (mirrors `validate-gate-2.sh`) |
+| 4 Review | `review.verdictPath`, `review.status`, `review.sideEffectsDetected`, `approvals.gate2` (mirrors `validate-gate-2.cjs`) |
 | 4.5 Verify | `--verify`/`--strict` run state only — RECORD result; does NOT change advisory vs hard-gate semantics |
 | 5 Ship | ship pre-flight status → `approvals.ship` |
-| 6 Reflect | `memory.*` capture status |
+| 6 Reflect | sync-back + docs-impact status |
 
 `cookContract` is populated from the Phase 1 five exact requirements; **skip it only when the input was an existing `plan.md` / `phase-*.md` path** (the contract already lives in the plan — pass `--plan-input` to the validator). Evidence completeness must pass before presenting Gate 2 (see Phase 4 GATE 2). Scrub secrets/PII; store pointers + summaries, not raw logs.
 

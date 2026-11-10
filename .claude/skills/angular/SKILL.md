@@ -1,10 +1,7 @@
 ---
 name: mk:angular
 version: 1.0.0
-description: |
-  Use when working with Angular code — components, signals, services, forms,
-  routing, HTTP, testing, SSR, or tooling. Targets Angular v20+ modern patterns.
-  Auto-activates on .ts files in Angular projects (detected via angular.json).
+description: Angular v20+ patterns — components, signals, services, forms, routing, HTTP, SSR, testing. NOT for mk:typescript.
 allowed-tools:
   - Read
   - Grep
@@ -30,7 +27,7 @@ keywords:
   - angular-cli
   - framework-specific
   - ts-angular
-when_to_use: Use when writing Angular v20+ code (components, signals, services, forms, routing, HTTP, SSR). Auto-activates on .ts files in Angular projects. NOT for generic TypeScript (see mk:typescript) or Vue/React.
+when_to_use: Editing .ts or .html files in a project that has an angular.json.
 user-invocable: true
 owner: utility
 criticality: medium

@@ -1,228 +1,186 @@
 # MeowKit Memory System
 
-> Per-project, machine-local memory for MeowKit skills. Topic files live at `.meowkit/memory/` and are read on demand — no auto-injection pipeline. Separate from the host runtime's platform auto-memory.
+> One plain-markdown, committed, team-shared store at `.meowkit/memory/`. Two files, one grep to
+> read, one command to write, one lint to protect. No index, no JSON sidecars, no capture hook.
+> Separate from the host runtime's personal auto-memory.
 
-## 1. Overview
+## 1. Premise
 
-MeowKit maintains a per-project memory system at `.meowkit/memory/`. It is a **MeowKit convention** — a directory owned by MeowKit skills and hooks, scoped to a single project, and explicitly read/written by the skills that need it.
+Current models search a repository well, and most project knowledge is derivable from code, git
+history, plans and reviews. What a model cannot derive is **why** a non-obvious decision was made,
+and which **gotchas** were learned from a real failure.
 
-### Separate from Claude Code auto-memory
+That knowledge is small, team-shared, and reviewable in a git diff. So the store is plain markdown,
+committed to the repo, and read with `grep`.
 
-Claude Code ships its own auto-memory system. It is **not** the same as MeowKit's memory.
+Personal memory belongs to the host runtime. Claude Code's auto-memory is per user and per machine;
+the toolkit does not duplicate it.
 
-| System | Path | Scope | Auto-load | Written by |
-|---|---|---|---|---|
-| Claude Code auto-memory | `~/.claude/projects/<project>/memory/` (directory) | Per-git-repo, machine-local | `MEMORY.md` auto-loads at SessionStart (capped at **200 lines or 25 KB**, whichever comes first). Topic files in the same directory load on demand. | Claude via its standard Write/Edit tools |
-| MeowKit memory | `<repo>/.meowkit/memory/` | Per-repo, machine-local (gitignored from v2.4.1+) | Never auto-loaded. Consumer skills `Read` the relevant topic file at task start. | MeowKit hooks (`immediate-capture-handler`, `post-session.sh`) and skills (`mk:memory`, `mk:fix`, etc.) |
-
-The two systems are complementary: Claude Code's auto-memory captures the user's personal, cross-project habits; MeowKit's `.meowkit/memory/` captures project-specific engineering artifacts (fix patterns, review findings, architecture decisions, cost telemetry) needed by MeowKit's 7-phase workflow.
-
-### Machine-local by default (v2.4.1+)
-
-`.meowkit/memory/*` is gitignored. Only `.gitkeep` is tracked, so the directory survives clones but its contents do not. Fresh installs via `npx mewkit setup` start with an empty memory directory.
-
-**Why:** memory content is developer-specific working state. Committing it would mix personal session history, secrets, and transient captures into shared git history — and would ship the MeowKit dev team's own memory to every downstream install.
-
-### No auto-inject pipeline
-
-MeowKit **does not** inject memory content into every prompt turn. Consumer skills load only the topic files they need when a task starts. This:
-- Eliminates the per-turn token cost of a global memory filter.
-- Removes the trust-boundary concern of memory content being rendered as LLM instructions.
-- Makes the read path explicit and auditable per skill.
-
-The prior auto-inject pipeline (`memory-loader`, `memory-parser`, `memory-filter`, `memory-injector`) was removed in v2.4.1.
-
-## 2. File Layout
+## 2. The store
 
 ```
 .meowkit/memory/
-  fixes.md                    # Bug-class session learnings (mk:fix)
-  fixes.json                  # Structured fix patterns — schema v2.0.0
-  review-patterns.md          # Review / architecture patterns (mk:review, mk:plan-creator)
-  review-patterns.json        # Structured review patterns — schema v2.0.0
-  architecture-decisions.md   # Architectural decisions (mk:plan-creator, mk:cook)
-  architecture-decisions.json # Structured decisions — schema v2.0.0
-  security-notes.md           # Curated security findings (mk:cso, mk:review)
-  cost-log.json               # Token usage per task — auto-appended by Stop hook
-  decisions.md                # Long-form ADRs — owned by architect agent
-  security-log.md             # Raw security audit log
-  quick-notes.md              # ##note: capture staging — processed at Reflect
-  trace-log.jsonl             # Harness trace events (append-trace.sh)
-  last-model-id.txt           # Model-change detection for dead-weight audit
-  lessons.md                  # ARCHIVED stub — content migrated to topic files (v2.4.1)
-  lessons-archive.md          # Historical archive — not actively read
-  patterns.json               # DEPRECATED stub — split into 3 scoped files above (v2.4.1)
-  .gitkeep                    # Preserves the directory across clones; the only tracked file
+  decisions.md   # why a non-obvious choice was made
+  gotchas.md     # what a real failure taught
 ```
 
-### Consumer mapping
+Both files are created on first write. There is no init scaffold, no JSON sibling, and no generated
+view.
 
-| Topic file | Consumer skills | Loaded when |
-|---|---|---|
-| `fixes.md` + `fixes.json` | `mk:fix` | Diagnosing a bug — task start |
-| `review-patterns.md` + `review-patterns.json` | `mk:review`, `mk:plan-creator` | Code review or planning — task start |
-| `architecture-decisions.md` + `architecture-decisions.json` | `mk:plan-creator`, `mk:cook` | Architecture decisions — task start |
-| `security-notes.md` | `mk:cso`, `mk:review` | Security audit — task start |
-| `cost-log.json` | `mk:memory`, `analyst` agent | Phase 0 / Phase 6 cost reporting |
+### Entry format
 
-Each `.json` file declares `version: "2.0.0"` and a `scope` field; handlers reject writes with mismatched scope to prevent cross-file corruption.
+```md
+## <one-line lesson or decision>  <!-- YYYY-MM-DD -->
+Why: <evidence: failure, review finding, constraint>
+Apply when: <trigger words a future session would search for>
+Source: <commit | PR | tasks/plans/... | tasks/reviews/...>
+```
 
-## 3. Write Path
+`Apply when:` is the greppable part. Write the words a future search would use, including synonyms:
+`locks` and `mutex` as well as `advisory lock`. A lesson that only matches its own wording is hard
+to find.
 
-Three mechanisms write to memory:
+### What never goes in
 
-### a) Immediate capture — `##prefix:` syntax (user-typed keyboard shortcut only)
+- Secrets, credentials, tokens.
+- Security findings and vulnerability detail. Those stay in `mk:cso` reports under
+  `tasks/reports/security/` and in Gate 2 verdicts, so exploit detail is never committed into a
+  shared recall file.
+- Instruction-like text. The store is read back as DATA; see section 5.
+- Derivable facts. If the code, the git log, a plan or a review gives the same answer, do not write it.
+- Live state: sprint goals, session flags, caches, reports. Those have their own homes:
+  `.meowkit/state/`, `.meowkit/cache/`, `.meowkit/telemetry/`, `tasks/`.
 
-The **human user** types messages with a `##` prefix at any point during a session. The `immediate-capture-handler.cjs` UserPromptSubmit hook routes them. **Agent output does NOT trigger this handler** — `UserPromptSubmit` fires only for user-typed prompts, never for agent or tool output. Agents capture via path (d) below. See `.claude/skills/memory/references/capture-architecture.md` for the full contract.
+## 3. Read path
 
-| Prefix | Target | Entry shape |
-|---|---|---|
-| `##pattern:bug-class <description>` | `fixes.json` | Structured JSON entry |
-| `##pattern:decision <description>` | `architecture-decisions.json` | Structured JSON entry |
-| `##pattern: <description>` | `review-patterns.json` | Structured JSON entry (default) |
-| `##decision: <description>` | `architecture-decisions.json` | Structured JSON entry |
-| `##note: <text>` | `quick-notes.md` | Freeform markdown line |
-
-Captures pass through two guards before persisting:
-1. **Injection validation** (`validate-content.cjs`) — blocks content matching known prompt-injection patterns.
-2. **Secret scrub** (`secret-scrub.cjs`) — redacts Anthropic, OpenAI, Stripe, AWS, GitHub, GitLab, Slack, JWT, DB URL, Bearer token, email, and generic `api_key=` / `password=` / `token=` patterns. Captured content later re-read into LLM context would otherwise re-expose secrets.
-
-Writes are atomic (temp-file + rename) and use per-target-file locks, so concurrent `##decision:` / `##pattern:decision` writes to the same target serialize correctly.
-
-### b) Session end — `post-session.sh`
-
-The Stop hook:
-- Appends a cost entry to `cost-log.json` using atomic `os.replace`.
-- Flips the model-change flag in `last-model-id.txt` when the active model changes, triggering the dead-weight audit playbook.
-
-### c) Skill-invoked session capture
-
-At Phase 6 (Reflect), the agent reads `.claude/skills/memory/references/session-capture.md` and follows its 4 steps to extract patterns / decisions / failures from the session and append to the right topic files via direct `Edit`. This is **prose-driven LLM execution**, not a CLI subcommand — there is no `mewkit memory session-capture` script because content extraction needs LLM analysis a static CLI cannot produce.
-
-### d) Agent-authored entry — direct `Edit`
-
-When an agent (or skill) identifies a learning while running, it calls `Edit` directly on the appropriate topic file. There is no hook — the agent is responsible for scrubbing secrets in-content before writing. Topic file routing follows the table in `.claude/skills/memory/references/capture-architecture.md`. This is the working write path for agents; the user-typed `##prefix:` handler does NOT fire on agent output.
-
-## 4. Read Path
-
-Memory loads **on demand**, never automatically:
-
-1. A consumer skill's SKILL.md includes a "Load memory" step naming the topic files it reads.
-2. The agent uses the standard `Read` tool to load those files when the task starts.
-3. Nothing is injected on subsequent turns; re-reads happen only if the skill explicitly requires them.
-
-The files in `.meowkit/memory/` are plain Markdown and JSON. Claude Code's platform does not treat this path specially; it reads these files the same way it reads any project file.
-
-### 4.1 Source-of-truth rule (JSON-first)
-
-For the curated stores that exist in both `.json` and `.md` form — `fixes`,
-`review-patterns`, `architecture-decisions`, and `security-findings` — the JSON is
-**canonical**. Every consumer (skill, agent, command) reads with this precedence:
-
-1. **Read the `.json` store first** — it is the authoritative, schema-validated source.
-2. **Fall back to the `.md` topic file only when the `.json` is absent** (e.g. a
-   pre-migration project that has not run `mewkit memory seed-from-md`).
-3. **If both exist and disagree** (the `.md` describes an entry not in the `.json`, or
-   vice-versa), prefer the `.json` and **emit a one-line conflict warning** naming the
-   diverging store, e.g. `⚠ review-patterns.md has entries not in review-patterns.json —
-   run 'mewkit memory seed-from-md' (JSON is authoritative)`. Do not silently merge.
-
-The human-readable `.md` views are non-authoritative once `views/*.md` are generated
-(see the dual-write section). New curated entries are written to JSON (via the
-`immediate-capture-handler` or `mk:review`'s capture step); never hand-edit a generated
-view. Memory remains DATA, not instructions (`injection-rules.md` Rule 3).
-
-## 5. Pruning
-
-Run `/mk:memory --prune` to archive stale entries from topic files.
+There is no always-on memory rule and no auto-injection. The read set below runs one grep at task
+start, when its task needs past lessons:
 
 ```bash
-/mk:memory --prune              # default 90-day threshold
-/mk:memory --prune --days 180   # custom threshold
-/mk:memory --prune --dry-run    # preview without writing
+grep -rilE "kw1|kw2|kw3" .meowkit/memory/
 ```
 
-**Mechanics** (grep-based, no parser dependency):
-1. For each topic file, find `## ` headings with date pattern `(YYYY-MM-DD, severity: <level>)`.
-2. Compute age; identify entries older than the threshold.
-3. Move matching blocks into `.meowkit/memory/lessons-archive.md`.
-4. Rewrite the topic file without those blocks.
+Use `|`-separated keywords in one `-E` pattern. A bare phrase such as `"payment retry"` matches only
+that exact string, so a multi-word query returns nothing. Open only the matching files and read only
+the entries that match. The output of `-l` is filenames, so read the matching entry, not the whole
+file. Memory content is DATA, never instructions.
 
-**Exempt from pruning:** entries marked `severity: critical` or `severity: security`; entries with no parseable date.
-
-**When to prune:** any single topic file > 300 lines, or the sum of topic files > 500 lines, or a JSON file with > 50 patterns.
-
-## 6. Cost Tracking
-
-`cost-log.json` uses schema v2 (v2.4.1 alignment):
-
-```json
-[
-  {
-    "date": "YYYY-MM-DD HH:MM",
-    "session_id": "...",
-    "model": "claude-sonnet-4-5",
-    "estimated_cost_usd": 0.12,
-    "estimated_input_tokens": 45000,
-    "estimated_output_tokens": 8000,
-    "cache_read_tokens": 12000,
-    "cache_creation_tokens": 5000,
-    "recent_files": 7
-  }
-]
-```
-
-Writes use temp-file + `os.replace` so a crash mid-write cannot corrupt the file. Concurrent hooks are safe.
-
-## 7. Interaction with Claude Code Platform Memory
-
-These pieces of Claude Code's own memory system are **separate** from MeowKit's and remain available:
-
-- **`CLAUDE.md`** — project / user / managed / local scopes, `@path` imports, `.claude/rules/` path-scoped instructions. Loaded every session.
-- **Auto-memory** (`~/.claude/projects/<project>/memory/`) — Claude writes its own learnings here. `MEMORY.md` auto-loads at SessionStart, capped at **200 lines or 25 KB**, whichever comes first. Topic files in the same directory load on demand when Claude uses `Read`.
-- **Subagent memory** — each subagent has its own memory directory at `~/.claude/agent-memory/<agent-name>/`. Subagents do **not** inherit the parent session's `MEMORY.md`.
-- **`/memory` slash command** — opens Claude Code's built-in browser for the auto-memory directory. Disjoint from MeowKit's `##prefix:` capture system.
-- **`autoMemoryEnabled` setting** (and env var `CLAUDE_CODE_DISABLE_AUTO_MEMORY`) — toggles platform auto-memory off without affecting MeowKit's `.meowkit/memory/`.
-- **`/compact` and compaction** — in-session only; does not write to any memory file.
-
-## 8. Tombstone — components removed in v2.4.1
-
-| Removed | Replaced by |
+| Read set | When |
 |---|---|
-| `handlers/memory-loader.cjs` | On-demand skill-level `Read` calls |
-| `handlers/memory-parser.cjs` | Direct Markdown / JSON reads; no parser |
-| `handlers/memory-filter.cjs` | Per-skill scoped topic files |
-| `handlers/memory-injector.cjs` | No auto-inject; trust boundary enforced behaviorally |
-| `NEEDS_CAPTURE` marker system | Eliminated; retroactive capture replaced by direct writes and Phase 6 `mk:memory session-capture` |
-| `lessons.md` as active store | Archived stub; content migrated to topic files via `memory-topic-file-migrator.cjs` |
-| `patterns.json` monolith | Deprecated stub; replaced by `fixes.json` + `review-patterns.json` + `architecture-decisions.json` |
-| `.meowkit/memory/*` committed to git | Gitignored — machine-local by default |
-| `##pattern:` / `##decision:` / `##note:` as agent-output API | Agent-authored entries via direct `Edit` (path 3d). `##prefix:` remains a user-typed keyboard shortcut only — the handler does NOT fire on agent or tool output. See `.claude/skills/memory/references/capture-architecture.md`. |
-| `patterns.json` / `lessons.md` as active write targets | Split topic files since v2.4.1 (`fixes.{json,md}`, `review-patterns.{json,md}`, `architecture-decisions.{json,md}`). Any agent or skill writing to the old monolith files is spec drift; the legacy files remain on disk as gravestone markers. |
+| `mk:fix`, `mk:investigate` | Diagnosing a bug or a failure |
+| `mk:review` | Reviewing a change |
+| `mk:plan-creator`, the planner agent | Planning |
+| `mk:cso` | Security audit |
+| `/mk:retro` (command) | Weekly retrospective |
 
-## 9. Migration (pre-v2.4.1 → v2.4.1)
+Every other skill and agent reads nothing from the store.
 
-If you are upgrading a project that still has an active `lessons.md` or a monolithic `patterns.json`:
+## 4. Write path
+
+Writes go through one command, `npx mewkit note`. It takes the entry on stdin, lint-checks it, and
+appends it under the same file lock the trace log uses, so two concurrent writers cannot lose an
+entry.
 
 ```bash
-node .claude/scripts/memory-topic-file-migrator.cjs
+printf '%s\n' \
+  '## Advisory lock release needs the owner pid  <!-- 2026-11-01 -->' \
+  'Why: stale lock reclaimed while the owner was alive; see the lock test.' \
+  'Apply when: lock, mutex, advisory lock, stale pid' \
+  'Source: tasks/reviews/example-verdict.md' \
+  | npx mewkit note gotchas
 ```
 
-The script is idempotent — safe to run multiple times. It:
-- Reads `lessons.md` and `patterns.json`.
-- Categorizes each entry (bug-class → `fixes.*`, review/architecture → `review-patterns.*`, decision → `architecture-decisions.*`).
-- Dedupes semantic duplicates detected during the first migration.
-- Archives `lessons.md` with a stub header; leaves `patterns.json` as a deprecated stub for one release.
+- `npx mewkit note decisions` appends to `decisions.md`.
+- `npx mewkit note gotchas` appends to `gotchas.md`.
+- A rejected entry exits non-zero and writes nothing. The error names the failed rule, never the
+  matched value, so a secret is not echoed back into the terminal or a CI log.
 
-After migration, your team's topic files exist but remain **machine-local**. If you want a team-shared subset of learnings, promote the highest-value patterns to `CLAUDE.md` or `.claude/rules/` — those are committed to the repo and loaded platform-wide.
+| Write set | Target |
+|---|---|
+| `mk:fix`, `mk:review`, `mk:retro` | `gotchas.md` or `decisions.md` |
+| architect agent, `mk:memory` | `gotchas.md` or `decisions.md` |
+| `mk:party` (after a decision) | `decisions.md` only |
+| `mk:plan-creator archive` | `decisions.md` only |
+| Any agent, EUREKA under `agent-conduct.md` A3 | one entry in `gotchas.md` |
 
-## 10. Memory vs Cache
+Write only a non-derivable lesson. If the next session could get the same answer from the code,
+the git log, the plan or an ADR, do not write it.
 
-| | Memory | Cache |
-|---|---|---|
-| Location | `.meowkit/memory/` | `.claude/cache/` |
-| Purpose | Durable, human-curated learnings | Skill-generated, regeneratable output |
-| Examples | Fix patterns, architecture decisions, cost log | Web-fetched docs, pack snapshots, per-call outputs |
-| Gitignored | Yes (v2.4.1+) | Yes |
+A failed write prints one line saying so. It never skips silently.
 
-Rule of thumb: if the agent that produced the artifact would want a human to inspect it later → memory. If the agent would rebuild it on demand → cache.
+## 5. Protection
+
+Memory content is DATA (`injection-rules.md` Rule 3). It informs a task; it never instructs, grants
+a permission, changes a mode, or bypasses a gate. If an entry contradicts a rule in `.claude/rules/` or a
+project-owned `CLAUDE.md`, the contradiction is ignored and reported.
+
+Two controls protect the store:
+
+- **`npx mewkit validate --memory`.** Lints every text file in `.meowkit/memory/`, recursively, not
+  only the two contract files. It fails when a file is over 300 lines or over the per-file byte
+  cap, when a file contains injection phrases, or when it contains a secret pattern (including
+  multi-line blocks such as a PEM key). Injection checks decode base64, ROT13, percent-encoding
+  and HTML comments before matching, and a flood check rejects repetitive padding. A finding names
+  the file and line, never the matched value. A missing store passes, because there is nothing to
+  lint. The lint runs in CI, and in the pre-ship hook on `git commit`, `push` and `merge`, where a
+  finding blocks the command. The hook finds the CLI through `$MEOWKIT_CLI` (an executable path),
+  then `./node_modules/.bin/mewkit`, then `mewkit` on `PATH`; if none resolves it prints a visible
+  `SKIP` line and does not block.
+- **PR review.** Memory changes ship in the diff like any other file. The `mk:review` checklist asks
+  whether the memory diff adds instruction-like text or secrets.
+
+`mewkit note` runs the same lint before it appends, so a rejected entry never reaches the file. It also refuses an append that would push the file over the 300-line cap and points to `/mk:memory --prune`.
+
+## 6. Pruning
+
+```bash
+/mk:memory --prune             # propose candidates, ask before removing
+/mk:memory --prune --dry-run   # list candidates only, change nothing
+```
+
+Pruning proposes removing entries whose `Source` path or symbol no longer exists, and entries older
+than 180 days with no recent matching work. Every removal is human-approved. There is no auto-prune
+hook.
+
+## 7. Memory vs the rest of `.meowkit/`
+
+| | Memory | Cache | State | Telemetry |
+|---|---|---|---|---|
+| Location | `.meowkit/memory/` | `.meowkit/cache/` | `.meowkit/state/` | `.meowkit/telemetry/` |
+| Purpose | non-derivable lessons | regeneratable artifacts | session markers and flags | append logs and cost records |
+| Committed | Yes | No | No | No |
+
+Rule of thumb: if a human should read it in a PR, it is memory. If an agent can rebuild it on
+demand, it is cache. If it only matters inside one session, it is state. Cost records and the
+security log live in telemetry, not in memory.
+
+## 8. Relationship to host-runtime memory
+
+These host features are separate and remain available:
+
+- **`.claude/rules/`** (the 7 always-on rules, loaded every session), SKILL.md frontmatter and
+  a project-owned `CLAUDE.md`: the only instruction sources. The kit ships no root `CLAUDE.md`.
+- **Auto-memory** (`~/.claude/projects/<project>/memory/`): the user's personal, per-machine
+  learnings. Toggled by `autoMemoryEnabled` or `CLAUDE_CODE_DISABLE_AUTO_MEMORY`; unaffected by the
+  toolkit's store.
+- **Subagent memory** (`~/.claude/agent-memory/<agent>/`): per agent, not inherited from the parent.
+- **`/compact`**: in-session only; writes to no memory file.
+
+## 9. Removed
+
+| Removed | Replacement |
+|---|---|
+| The curated JSON stores (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`, `security-findings.json`) and their generated markdown views | `decisions.md` and `gotchas.md` |
+| The memory CLI verbs (`memory`, `index` and `query` subcommands), the view renderer and the seeding command | `grep` for reads, `npx mewkit note` for writes |
+| The wiki subsystem: the `wiki` CLI verbs, the `mk:wiki` skill family, the SQLite index and the propose/approve gate | None; the two committed files replace it |
+| The prompt-prefix capture hook (`##pattern:`, `##decision:`, `##note:`) | A human asks; the write-set skill runs `mewkit note` |
+| The auto-prune Stop hook | `/mk:memory --prune`, human-approved |
+| The memory migrator scripts | None. Read a v2 store by hand, then delete it |
+| The auto-inject recall path (the `knowledgeRecall` envelope in `mewkit capabilities`, and `wiki-context-rules.md`) | On-demand grep in the read-set skills |
+| The `memory-read-rules.md` and `wiki-context-rules.md` rules | Section 3 of this page and the `.claude/rules/meowkit-core.md` Memory section |
+
+## 10. Upgrading from v2
+
+The v2 JSON stores are not migrated. They are not read by the v3 skills. To keep anything from them,
+read the file by hand, append the lesson to `gotchas.md` or `decisions.md` with `npx mewkit note`,
+then delete the old file. The security log is not in memory: it lives under `.meowkit/telemetry/`.

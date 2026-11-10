@@ -18,20 +18,20 @@ Rules derived from in-repo governance and enforcement sources (.claude/rules/*, 
 | Sprint-state contracts  | `tasks/contracts/sprint-state-YYMMDD-sprint-N.md`                          | `tasks/contracts/state/`, missing `sprint-state-` prefix            |
 | Evaluator verdicts      | `tasks/reviews/YYMMDD-name-evalverdict.md`                                 | `evalverdicts/`, separate from review verdict                       |
 | Harness runs            | `tasks/autobuild-runs/YYMMDD-HHMM-name/run.md`                               | `runs/`, `harness/`                                                 |
-| Rubric library          | `.claude/rubrics/<name>.md`                                                | `rubrics/`, `.claude/skills/rubric/rubrics/`                   |
-| Memory files            | `.claude/memory/lessons.md`                                                | `memory/lessons.md` (bare)                                          |
-| Web fetch cache         | `.claude/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256-path[:10]}.md` | `.claude/memory/web-fetches/` (memory is for learnings, not caches) |
-| Web fetch manifest      | `.claude/cache/web-fetches/index.jsonl` (append-only)                      | `.claude/memory/web-fetches/index.jsonl`                            |
-| Web fetch quarantine    | `.claude/cache/web-fetches/quarantine/{sha256}.quarantined`                | `.claude/memory/quarantine/`, `quarantine/`                         |
+| Rubric library          | `.claude/skills/rubric/rubrics/<name>.md`                                  | `rubrics/`, `.claude/rubrics/`                                      |
+| Memory files            | `.meowkit/memory/decisions.md`, `.meowkit/memory/gotchas.md`               | `.claude/memory/lessons.md`, `memory/lessons.md` (bare)             |
+| Web fetch cache         | `.meowkit/cache/web-fetches/{YYMMDD}-{HHMMSS}-{host}-{sha256-path[:10]}.md` | `.claude/cache/web-fetches/`, `.meowkit/memory/web-fetches/` (memory is for learnings, not caches) |
+| Web fetch manifest      | `.meowkit/cache/web-fetches/index.jsonl` (append-only)                     | `.claude/cache/web-fetches/index.jsonl`, `.meowkit/memory/web-fetches/index.jsonl` |
+| Web fetch quarantine    | `.meowkit/cache/web-fetches/quarantine/{sha256}.quarantined`               | `.claude/cache/web-fetches/quarantine/`, `quarantine/`              |
 | ADR files               | `docs/architecture/adr/YYMMDD-title.md`                                    | `docs/architecture/NNNN-title.md`                                   |
-| Runtime session state   | `session-state/` (project root)                                            | `.claude/session-state/` for general runtime state                  |
-| Provider session exceptions | `.claude/session-state/` for TDD sentinels, workflow evidence, and plan intake | `session-state/` for those provider-scoped artifacts                |
+| Runtime session state   | `.meowkit/state/`                                                          | `session-state/` (project root), `.claude/session-state/`           |
+| Session markers         | `.meowkit/state/` for TDD sentinels, workflow evidence, and plan intake    | any provider-scoped `session-state/` directory for those artifacts  |
 | Skill references        | `.claude/skills/*/references/*.md`                                    | `domain/file.md` (short form)                                       |
 | Gate validation scripts | `.claude/skills/cook/scripts/validate-gate-*.sh`                      | `scripts/validate-gate-*.sh`                                        |
 
 **Rule:** When referencing any file in a skill or agent, use the FULL path from project root. Never use shortened or assumed paths. Before merging, grep for the path in all consuming files.
 
-**State taxonomy:** Project-root `session-state/` is the canonical ephemeral runtime root for active-plan, model, budget, checkpoint, task-queue, and hook-progress state. `.claude/session-state/` is a provider-scoped exception root: TDD sentinels, workflow evidence, and plan-creator intake packets live there. Durable workflow artifacts live under `tasks/` (`plans/`, `contracts/`, `reviews/`, `autobuild-runs/`); curated reusable memory lives under `.claude/memory/`. `tasks/completed/` is not a canonical active path until an archive writer owns it.
+**State taxonomy:** `.meowkit/state/` is the one canonical ephemeral runtime root — active-plan, model, budget, checkpoint, task-queue and hook-progress state, and the TDD sentinels, workflow evidence and plan-creator intake packets that used to sit in a second, provider-scoped root. Project-root `session-state/` and `.claude/session-state/` are read-only pre-move leftovers: they are still READ so a pre-move install keeps working, and nothing writes to them again. Durable workflow artifacts live under `tasks/` (`plans/`, `contracts/`, `reviews/`, `autobuild-runs/`), each created by its first writer rather than scaffolded; curated reusable memory lives under `.meowkit/memory/`. `tasks/completed/` is not a canonical active path until an archive writer owns it.
 
 ---
 
@@ -106,20 +106,20 @@ Every hook in `.claude/hooks/` MUST be registered in `.claude/settings.json`. An
 
 **Canonical convention (per `code.claude.com/docs/en/hooks`):** Claude Code passes hook input as a **JSON object on stdin**, not as positional args. Phase 7 of the harness plan migrated all meowkit hooks to consume stdin via a shared parser shim.
 
-**Canonical parser:** `.claude/hooks/lib/read-hook-input.sh`. Every hook sources this at the top and consumes exported env vars:
+**Canonical parser:** `.claude/hooks/lib/parse-stdin.cjs`. Every hook sources this at the top and consumes exported env vars:
 
 ```bash
 #!/bin/bash
 # Source the parser shim (sets HOOK_* env vars from stdin JSON)
-if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh" ]; then
-  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+if [ -f "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/parse-stdin.cjs" ]; then
+  . "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/parse-stdin.cjs"
 fi
 
 # Prefer the stdin-parsed value; fall back to $1 positional for back-compat
 FILE_PATH="${HOOK_FILE_PATH:-$1}"
 ```
 
-**Exported env vars (from `lib/read-hook-input.sh`):**
+**Exported env vars (from `lib/parse-stdin.cjs`):**
 
 | Var                    | Source in JSON         | When set                   |
 | ---------------------- | ---------------------- | -------------------------- |
@@ -141,7 +141,7 @@ FILE_PATH="${HOOK_FILE_PATH:-$1}"
 Never register expensive hooks (test suites, builds) on broad matchers like `Bash`. Gate them by inspecting the input early and exiting 0 for non-matching cases:
 
 ```bash
-. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/read-hook-input.sh"
+. "${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lib/parse-stdin.cjs"
 COMMAND="${HOOK_COMMAND:-$1}"
 
 # Only run on git commit/push commands
@@ -160,16 +160,18 @@ esac
 **Rule:** ALL python script invocations MUST use the venv interpreter:
 
 ```bash
-# WRONG
-python .claude/scripts/validate.py
+# WRONG — the system interpreter has none of the skill's packages
+python .claude/skills/lint-and-validate/scripts/validate.py
 python3 .claude/skills/multimodal/scripts/check_setup.py
 
 # RIGHT
-.claude/skills/.venv/bin/python3 .claude/scripts/validate.py
-.claude/skills/.venv/bin/python3 .claude/skills/multimodal/scripts/check_setup.py
+node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/validate.py
+node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/check_setup.py
 ```
 
-The venv is created by `npx mewkit setup`. If it doesn't exist, the `project-context-loader.sh` SessionStart hook warns the user.
+`skill-python.cjs` resolves the environment for the skill that owns the script, under
+`.meowkit/envs/<skill>/`, and creates it on first use. `npx mewkit setup` can prepare them
+ahead of time; there is no single shared venv.
 
 ---
 
@@ -223,42 +225,32 @@ Gate 2: after Phase 4 (human approval required, NO EXCEPTIONS)
 
 **Source:** B2-C8, B6-C1, B8-C4, B10-C3
 
-### Always Use `.claude/memory/` Prefix
+### Store Location
+
+The team store is two committed files. Use the `.meowkit/` prefix; `.claude/memory/` is not a store.
 
 ```
 # WRONG
 memory/lessons.md
-memory/patterns.json
-memory/decisions.md
+.claude/memory/lessons.md
+.meowkit/memory/patterns.json
 
 # RIGHT
-.claude/memory/lessons.md
-.claude/memory/patterns.json
-.claude/memory/decisions.md
+.meowkit/memory/decisions.md
+.meowkit/memory/gotchas.md
 ```
 
-### patterns.json Schema
+### Entry Format
 
-New entries should include all fields:
-
-```json
-{
-  "id": "kebab-case-id",
-  "type": "success | correction",
-  "category": "pattern | decision | failure",
-  "severity": "critical | standard",
-  "applicable_when": "one sentence condition",
-  "scope": "optional/path",
-  "context": "when this applies",
-  "pattern": "what to do or avoid",
-  "frequency": 1,
-  "lastSeen": "YYYY-MM-DD"
-}
+```md
+## <one-line lesson or decision>  <!-- YYYY-MM-DD -->
+Why: <evidence: failure, review finding, constraint>
+Apply when: <trigger words a future session would search for>
+Source: <commit | PR | tasks/plans/... | tasks/reviews/...>
 ```
 
-Missing `category`/`severity`/`applicable_when` are allowed for backward compatibility. Missing `severity` defaults to `"standard"`.
-
----
+Skills read the store with `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` and write it with
+`npx mewkit note <decisions|gotchas>`. See `docs/core/memory-system.md` for the read and write sets.
 
 ## 8. Skill Structure
 
@@ -308,7 +300,7 @@ Missing `category`/`severity`/`applicable_when` are allowed for backward compati
 
 **Source:** plan `260510-2333-agile-scrum-rule-layer-design`
 
-The toolkit has a thin Agile governance layer. Three rules live in `.claude/rules-conditional/` and are loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected. Non-Agile sessions pay zero context cost.
+The toolkit has a thin Agile governance layer. Three rules live in `.claude/skills/agent-detector/references/` and are loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected. Non-Agile sessions pay zero context cost.
 
 | Rule | Source | Loaded by | Integration |
 |---|---|---|---|
@@ -320,10 +312,10 @@ The toolkit has a thin Agile governance layer. Three rules live in `.claude/rule
 
 - Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
 - Active plan frontmatter has non-empty `jira_tickets:`
-- `MEOW_JIRA_BASE_URL` env var set
+- `MEOW_JIRA_SITE_URL` env var set
 - Last user message matches `[A-Z]{2,10}-\d+`
 
-**Sprint-state contracts:** sprint-LEVEL state lives at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Template: `mk:sprint-contract/assets/sprint-state-template.md`. Concurrent writes require `flock`; YAML append is non-atomic across shells. The existing `validate-contract.sh` does NOT validate sprint-state files (different schema by design).
+**Sprint-state contracts:** sprint-LEVEL state lives at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Template: `mk:sprint-contract/assets/sprint-state-template.md`. Concurrent writes require `flock`; YAML append is non-atomic across shells. The existing `validate-contract.cjs` does NOT validate sprint-state files (different schema by design).
 
 **Spike governance:** `mk:plan-creator --spike --timebox <duration>` produces a two-phase investigation plan from `mk:plan-creator/assets/spike-plan-template.md`. INCOMPATIBLE with `mk:autobuild` FULL density (harness gate breaks). Run via `mk:cook` or `mk:plan-creator --fast`.
 
@@ -336,8 +328,8 @@ Before merging any skill, agent, hook, or rule change:
 - [ ] All file paths referenced exist (grep every path)
 - [ ] All `subagent_type` values are in the valid list (Section 2)
 - [ ] All hooks referenced are registered in `settings.json`
-- [ ] All python commands use `.claude/skills/.venv/bin/python3`
-- [ ] Memory paths use `.claude/memory/` prefix
+- [ ] All skill python commands go through `node .claude/hooks/lib/skill-python.cjs`
+- [ ] Memory paths use `.meowkit/memory/` (only `decisions.md` and `gotchas.md`)
 - [ ] No bare `memory/` or `ck:` references
 - [ ] Verdict uses PASS/WARN/FAIL (not APPROVE/BLOCK)
 - [ ] Phase model uses 7 phases (not 5)

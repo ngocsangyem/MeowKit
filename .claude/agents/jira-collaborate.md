@@ -1,6 +1,6 @@
 ---
 name: jira-collaborate
-description: 'Manage JIRA collaboration surface: comments, attachments, watchers, notifications. Routed by mk:jira-collaborate skill. NOT for issue CRUD (jira-issue); NOT for issue links (jira-relationships); NOT for transitions (jira-lifecycle).'
+description: 'mk:jira executor for mk:jira-collaborate. Comments, attachments, watchers.'
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default

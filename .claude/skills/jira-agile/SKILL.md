@@ -1,6 +1,6 @@
 ---
 name: mk:jira-agile
-description: 'JIRA agile via the jira-as wrapper: epics, sprints, backlog, ranking, story points, subtasks, velocity. Triggers: ''create sprint'', ''add KEY to sprint'', ''set story points on KEY'', ''rank KEY before KEY'', ''velocity for board'', ''epic add''. Board ID ≠ project key. NOT for issue CRUD (mk:jira-issue); NOT for time tracking (mk:jira-time).'
+description: 'mk:jira leaf. Epics, sprints, backlog, ranking, story points, velocity. NOT for mk:jira-estimator.'
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - jira-backlog
   - story-points
   - velocity
-when_to_use: Use to manage epics, sprints, backlog, ranking, story-point estimates, subtasks, or velocity reports. NOT for individual issue CRUD.
+when_to_use: 'Move items between Jira sprints or backlog, or read sprint point totals.'
 user-invocable: true
 context: fork
 agent: jira-agile
@@ -67,14 +67,14 @@ If sprint-state contract is absent OR `status: closed` → skip the amendment ce
 
 ### Validator scope (sprint-state vs sprint-contract)
 
-`mk:sprint-contract/scripts/validate-contract.sh` validates per-story sprint-CONTRACT files only (those with `contract_schema_version`, `### [AC-N]` entries). Sprint-STATE files at `sprint-state-{date}-sprint-{N}.md` use NO validator — YAML is parsed inline by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`. Do not invoke `validate-contract.sh` on a sprint-state path; it WILL fail (sprint-state lacks contract schema fields by design).
+`mk:sprint-contract/scripts/validate-contract.cjs` validates per-story sprint-CONTRACT files only (those with `contract_schema_version`, `### [AC-N]` entries). Sprint-STATE files at `sprint-state-{date}-sprint-{N}.md` use NO validator — YAML is parsed inline by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`. Do not invoke `validate-contract.cjs` on a sprint-state path; it WILL fail (sprint-state lacks contract schema fields by design).
 
 ### Glob-collision safety verified
 
 | Script | Mechanism | Verdict |
 |---|---|---|
-| `check-contract-signed.sh` | Globs `tasks/contracts/*-"$slug"-sprint-*.md` (per-task slug between leading `*` and `-sprint-`) | SAFE — sprint-state files have no slug between leading `sprint-state-` prefix and `-sprint-` |
-| `validate-contract.sh` | Takes single explicit `$1` path; no glob | SAFE |
+| `check-contract-signed.cjs` | Globs `tasks/contracts/*-"$slug"-sprint-*.md` (per-task slug between leading `*` and `-sprint-`) | SAFE — sprint-state files have no slug between leading `sprint-state-` prefix and `-sprint-` |
+| `validate-contract.cjs` | Takes single explicit `$1` path; no glob | SAFE |
 
 ## See also
 

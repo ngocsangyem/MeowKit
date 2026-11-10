@@ -28,6 +28,7 @@
  */
 
 import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import path from "node:path";
 
 // ---------------------------------------------------------------------------
@@ -77,6 +78,11 @@ export interface SystemDepEntry {
 // Registry
 // ---------------------------------------------------------------------------
 
+/** The skill that drives a browser, and therefore owns the browser. */
+const PLAYWRIGHT_SKILL = "web-to-markdown";
+const PLAYWRIGHT_ENV_REL = `.meowkit/envs/${PLAYWRIGHT_SKILL}`;
+const PLAYWRIGHT_ENV_WIN = `.meowkit\\envs\\${PLAYWRIGHT_SKILL}`;
+
 /**
  * Dedicated Playwright doctor check (locked decision #3):
  * Two probes — package import AND chromium binary presence.
@@ -84,10 +90,19 @@ export interface SystemDepEntry {
  * succeeds without downloading the ~130MB Chromium binary.
  */
 async function playwrightDoctorCheck(ctx: DoctorContext): Promise<DoctorResult> {
-	const venvPython = path.join(ctx.projectRoot, ".claude", "skills", ".venv", "bin", "python3");
-	// On Windows the venv layout differs
-	const venvPythonWin = path.join(ctx.projectRoot, ".claude", "skills", ".venv", "Scripts", "python.exe");
-	const python = process.platform === "win32" ? venvPythonWin : venvPython;
+	// Playwright is a browser driver for ONE skill, so it is installed into that
+	// skill's own environment. It used to go into a shared one, which made a
+	// ~200MB browser a dependency of every Python skill in the kit.
+	const envDir = path.join(ctx.projectRoot, PLAYWRIGHT_ENV_REL);
+	const python =
+		process.platform === "win32" ? path.join(envDir, "Scripts", "python.exe") : path.join(envDir, "bin", "python3");
+
+	if (!existsSync(python)) {
+		return {
+			status: "MISSING_PACKAGE",
+			message: `No environment for ${PLAYWRIGHT_SKILL} — run: mewkit skill env ${PLAYWRIGHT_SKILL}`,
+		};
+	}
 
 	// Probe 1: can we import playwright?
 	const importProbe = spawnSync(python, ["-c", "import playwright"], {
@@ -104,9 +119,7 @@ async function playwrightDoctorCheck(ctx: DoctorContext): Promise<DoctorResult> 
 	// Probe 2: is the Chromium binary installed?
 	// playwright install --dry-run chromium exits 0 and prints "chromium" if installed
 	const venvPlaywright =
-		process.platform === "win32"
-			? path.join(ctx.projectRoot, ".claude", "skills", ".venv", "Scripts", "playwright.exe")
-			: path.join(ctx.projectRoot, ".claude", "skills", ".venv", "bin", "playwright");
+		process.platform === "win32" ? path.join(envDir, "Scripts", "playwright.exe") : path.join(envDir, "bin", "playwright");
 
 	const dryRunProbe = spawnSync(venvPlaywright, ["install", "--dry-run", "chromium"], {
 		encoding: "utf-8",
@@ -170,19 +183,19 @@ export const SYSTEM_DEPS: Record<string, SystemDepEntry> = {
 		key: "playwright-chromium",
 		name: "Playwright + Chromium",
 		// Detect by importing the Python package (not a PATH command)
-		detectCommand: ".claude/skills/.venv/bin/python3 -c 'import playwright'",
+		detectCommand: `${PLAYWRIGHT_ENV_REL}/bin/python3 -c 'import playwright'`,
 		installCommands: {
 			darwin: [
-				".claude/skills/.venv/bin/pip install playwright==1.58.0",
-				".claude/skills/.venv/bin/playwright install chromium",
+				`${PLAYWRIGHT_ENV_REL}/bin/pip install playwright==1.58.0`,
+				`${PLAYWRIGHT_ENV_REL}/bin/playwright install chromium`,
 			],
 			linux: [
-				".claude/skills/.venv/bin/pip install playwright==1.58.0",
-				".claude/skills/.venv/bin/playwright install chromium",
+				`${PLAYWRIGHT_ENV_REL}/bin/pip install playwright==1.58.0`,
+				`${PLAYWRIGHT_ENV_REL}/bin/playwright install chromium`,
 			],
 			win32: [
-				".claude\\skills\\.venv\\Scripts\\pip install playwright==1.58.0",
-				".claude\\skills\\.venv\\Scripts\\playwright install chromium",
+				`${PLAYWRIGHT_ENV_WIN}\\Scripts\\pip install playwright==1.58.0`,
+				`${PLAYWRIGHT_ENV_WIN}\\Scripts\\playwright install chromium`,
 			],
 		},
 		sizeBytes: 200_000_000,
@@ -204,8 +217,8 @@ export function listDeps(): SystemDepEntry[] {
  * Check whether a PATH-based dep's binary (or any of its aliases) is present.
  * Uses detectCommands when set (multi-probe); falls back to single detectCommand probe.
  *
- * NOT suitable for venv-based deps (playwright-chromium) — callers must handle
- * those separately (detectCommand includes ".venv").
+ * NOT suitable for env-based deps (playwright-chromium) — callers must handle
+ * those separately, because their binary lives in a skill env, not on PATH.
  */
 export function isDepCommandPresent(dep: SystemDepEntry, commandAvailableFn: (cmd: string) => boolean): boolean {
 	const probes = dep.detectCommands ?? [dep.detectCommand];

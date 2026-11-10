@@ -1,6 +1,6 @@
 ---
 name: mk:verify
-description: "Unified verification: build→lint→test→type-check→coverage. Use for 'is everything green', 'run all checks', 'verify build'. Auto-called by mk:cook. NOT for lint/format only (see mk:lint-and-validate); NOT for test-to-requirement coverage mapping (see mk:nyquist)."
+description: 'One unified pass: build, lint, test, type-check, coverage. NOT for mk:lint-and-validate.'
 version: 1.0.0
 argument-hint: "[--full] [--coverage-threshold N] [--skip-build] [--skip-coverage]"
 source: local
@@ -15,7 +15,7 @@ keywords:
   - coverage
   - unified-verification
   - pre-ship
-when_to_use: Use for unified verification — build→lint→test→type-check→coverage. Auto-called by mk:cook. NOT for lint/format only (see mk:lint-and-validate) or coverage mapping (see mk:nyquist).
+when_to_use: Asked whether everything is green, or a build just finished.
 user-invocable: true
 owner: lifecycle
 criticality: high
@@ -61,7 +61,7 @@ See `references/project-detection.md` for detailed detection logic and edge case
 
 By default this skill checks only what changed — it does NOT lint or test the whole
 project. Post-change verification stays fast and focused on the current work; the
-complete whole-project gate runs later at ship time (`pre-ship.sh`).
+complete whole-project gate runs later at ship time (`pre-ship.cjs`).
 
 1. Collect the changed files from git — union of committed-since-base + staged +
    unstaged + untracked:

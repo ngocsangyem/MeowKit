@@ -169,13 +169,13 @@ This escalation fires on its own schedule. A `--advice` rescue earlier in the lo
 neither delays it nor substitutes for it, and Athena is not consulted here — the
 decision below is the human's.
 
-**PM foreground invocation (per `.claude/rules/post-phase-delegation.md` Rule 5 — the only foreground PM call):**
+**PM foreground invocation (per `.claude/skills/cook/references/post-phase-delegation.md` Rule 5 — the only foreground PM call):**
 
 ```
 Delegate to the project-manager agent (foreground):
 "Generate delivery status for plan at $plan_dir. Write report to
 $plan_dir/status-reports/$(date +%y%m%d)-status.md.
-Load template from tasks/templates/pm-status-template.md."
+Load template from .claude/skills/status/assets/pm-status-template.md."
 ```
 
 Wait for PM to return the report path, then include the headline in the escalation question so the user sees current state before deciding. Skip the PM call entirely when `MEOWKIT_PM_AUTO=off`.

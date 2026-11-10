@@ -4,8 +4,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { smartUpdate } from "../smart-update.js";
-import { buildManifest, hashFile, writeManifest } from "../compute-checksums.js";
+import { hashFile } from "../compute-checksums.js";
+import { migrateLegacyBaseline } from "../legacy-manifest-migration.js";
+import { writeSupersededBaseline } from "../../../tests/helpers/superseded-baseline.js";
 import { readInstallMetadata, indexByPath } from "../install-metadata.js";
+import { writeInstallMetadata } from "../install-metadata-writer.js";
 import type { UserConfig } from "../substitute-placeholders.js";
 
 const tempDirs: string[] = [];
@@ -55,16 +58,24 @@ async function makeSource(version: string, files: Record<string, string>): Promi
 	return source;
 }
 
-describe("smartUpdate migration from legacy manifest", () => {
-	it("writes canonical metadata, preserves user edits, dual-writes legacy, and sets version from release", async () => {
+describe("smartUpdate carrying a superseded baseline forward", () => {
+	it("writes canonical metadata, preserves user edits, retires the superseded file, and sets version from release", async () => {
 		const source = await makeSource("2.9.20", { "rules/core-behaviors.md": "release content\n" });
 		const target = await makeTempRoot();
 
-		// Seed an existing install with a legacy manifest recording the shipped hash.
+		// Seed the project in the shape a user upgrading from an older install has:
+		// its ONLY ownership baseline is the superseded checksum file.
 		await writeText(target, ".claude/rules/core-behaviors.md", "shipped content\n");
-		writeManifest(join(target, ".claude"), buildManifest(join(target, ".claude")));
+		writeSupersededBaseline(join(target, ".claude"));
 		// User then edits the kit file.
 		await writeText(target, ".claude/rules/core-behaviors.md", "user edit\n");
+
+		// The carry-forward runs before the update, so the update compares against a
+		// real baseline. Without it the project has none, every file looks
+		// user-authored, and the edit protection below would pass for the wrong reason.
+		const carried = await migrateLegacyBaseline(target);
+		expect(carried?.carried).toBeGreaterThan(0);
+		expect(carried?.uncarried).toEqual([]);
 
 		const stats = await smartUpdate(config, source, target, false, false, { cleanup: false });
 
@@ -82,8 +93,28 @@ describe("smartUpdate migration from legacy manifest", () => {
 		const byPath = indexByPath(meta?.files ?? []);
 		expect(byPath["rules/core-behaviors.md"]?.owner).toBe("meowkit-modified");
 
-		// Legacy manifest still written this release (dual-write).
-		expect(existsSync(join(target, ".claude", "meowkit.manifest.json"))).toBe(true);
+		// The superseded file is retired, and only after the canonical record exists:
+		// an interrupted carry leaves the old baseline rather than none at all.
+		expect(existsSync(join(target, ".claude", "meowkit.manifest.json"))).toBe(false);
+	});
+
+	it("keeps the merged-settings record already in the canonical metadata", async () => {
+		const target = await makeTempRoot();
+		await writeText(target, ".claude/rules/core-behaviors.md", "shipped content\n");
+		writeSupersededBaseline(join(target, ".claude"));
+		await writeInstallMetadata(target, {
+			schemaVersion: "1.0",
+			tool: "meowkit",
+			version: "2.9.19",
+			installedAt: "2026-05-30T00:00:00.000Z",
+			files: [],
+			settings: { merged: ["settings.json"] },
+		});
+
+		await migrateLegacyBaseline(target);
+
+		const { meta } = readInstallMetadata(join(target, ".claude"));
+		expect(meta?.settings).toEqual({ merged: ["settings.json"] });
 	});
 
 	it("propagates the release sourceTimestamp into pristine kit entries", async () => {

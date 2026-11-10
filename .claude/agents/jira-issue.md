@@ -1,6 +1,6 @@
 ---
 name: jira-issue
-description: 'Execute JIRA issue CRUD via the jira-as CLI wrapper. Use for: ''create bug/task/story'', ''show me PROJ-123'', ''update issue'', ''delete PROJ-123''. Routed by mk:jira-issue skill — receives task brief via skill-content injection. NOT for transitions (jira-lifecycle); NOT for comments/attachments (jira-collaborate); NOT for bulk ops on 10+ issues (jira-bulk); NOT for issue links (jira-relationships); NOT for time logging (jira-time); NOT for sprint/epic (jira-agile).'
+description: 'mk:jira executor for mk:jira-issue. Create, read, update and delete one issue.'
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default
@@ -26,7 +26,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 
 ## Pre-flight
 
-The parent SessionStart hook (`jira-env-loader.sh`) already validated `.meowkit/.env` presence + the 3 `MEOW_JIRA_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
+The parent SessionStart hook (`jira-env-loader.cjs`) already validated `.meowkit/.env` presence + the 3 `MEOW_JIRA_*` keys. Trust that env. If a wrapper invocation fails with `:?` on a key, escalate to the user — do NOT prompt for a token.
 
 All `jira-as` invocations MUST go through:
 
@@ -71,4 +71,4 @@ End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.
 
 ## Gotchas
 
-- (none yet — grow from observed failures per `skill-authoring-rules.md` Rule 1)
+- (none yet — grow from observed failures per `.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 1)

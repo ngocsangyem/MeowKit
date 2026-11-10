@@ -43,7 +43,7 @@ applies the deterministic cap table, resolves anchors by snippet, and writes the
 verdict proof bundle (`<id>-verdict.json`, embedding the coverage block + hash) plus a
 `SubmitPayload`. A `PASS` decision is emitted ONLY with complete, `session-observed`
 coverage; attested sessions cap at `PASS_WITH_RISK`. The composed decision is
-Gate-2-eligible only at `session-observed` — `gate2-check.sh` re-validates the embedded
+Gate-2-eligible only at `session-observed` — `gate2-check.cjs` re-validates the embedded
 coverage block for review-session verdicts.
 
 ## Verdict Rules
@@ -138,11 +138,11 @@ Side Effects Detected: Yes
 
 **Authoring rules:**
 - Emit ONLY when an existing-behavior break is the cause. New-code bugs go in the dimension table as normal CRITICAL/MAJOR findings.
-- Plaintext line only — NOT a markdown header (`## Side Effects Detected: Yes` will not be recognized by `validate-gate-2.sh`).
+- Plaintext line only — NOT a markdown header (`## Side Effects Detected: Yes` will not be recognized by `validate-gate-2.cjs`).
 - Each bullet names the affected behavior or caller (e.g., `- POST /api/users no longer accepts trailing slashes — breaks 3 existing callers`).
 - Absence of the line = no signal. Backward-compatible.
 
-When this signal is present, the cook orchestrator MUST follow the "Regression Recovery Options" pattern in `.cursor/skills/cook/references/review-cycle.md` (presents 2–4 options to the user; user selection recorded as a `## User Decision Addendum` block on the verdict file). `validate-gate-2.sh` blocks Gate 2 until the addendum is present.
+When this signal is present, the cook orchestrator MUST follow the "Regression Recovery Options" pattern in `.cursor/skills/cook/references/review-cycle.md` (presents 2–4 options to the user; user selection recorded as a `## User Decision Addendum` block on the verdict file). `validate-gate-2.cjs` blocks Gate 2 until the addendum is present.
 
 ## Proof Bundle (machine-readable verdict)
 
@@ -171,27 +171,6 @@ Then self-check the bundle: run `npx mewkit verdict-gate <slug>`. It exits 0 on
 `PASS`/`PASS_WITH_RISK` and non-zero on `BLOCKED`/invalid/missing. The markdown
 verdict remains the authoritative human narrative; the JSON is the machine gate
 input. The bundle stays under `tasks/` and is never injected into model context.
-
-## Terminal Wiki Handoff (advisory, fail-open)
-
-After the verdict markdown is written to `tasks/reviews/<slug>-verdict.md`, optionally hand
-it to the wiki per the shared contract in
-`.cursor/skills/wiki/references/terminal-handoff-advisory.md`. Only worth recall when the
-verdict carries a WARN or FAIL pattern, a security finding, or an accepted policy decision —
-**skip a routine clean PASS** (the salience gate would discard it anyway). Advisory only:
-never blocks, never approves.
-
-Resolve the slug (env `MEOWKIT_WIKI_SLUG` → the sole `tasks/wikis/<slug>/wiki.json` → else skip + print):
-
-```bash
-npx mewkit wiki handoff propose \
-  --skill mk:review \
-  --from tasks/reviews/<slug>-verdict.md \
-  --slug <resolved-wiki-slug> \
-  --verified-outcome
-```
-
-Do NOT run `wiki approve`. Do NOT add `wiki reindex` to this step.
 
 ## After Verdict
 

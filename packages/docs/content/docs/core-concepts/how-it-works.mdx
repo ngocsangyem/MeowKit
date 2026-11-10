@@ -37,12 +37,12 @@ Rules define the WHY. Hooks enforce the WHAT. A rule says "don't write code befo
 
 Shell and Node.js scripts triggered by Claude Code lifecycle events: SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit. They intercept tool calls before they execute:
 
-- `gate-enforcement.sh` blocks file writes before Gate 1 approval
-- `privacy-block.sh` blocks reads of `.env`, SSH keys, and credentials
-- `post-write.sh` security-scans every written file
-- `pre-completion-check.sh` blocks session end without verification evidence
+- `gate-enforcement.cjs` blocks file writes before Gate 1 approval
+- `privacy-block.cjs` blocks reads of `.env`, SSH keys, and credentials
+- `post-write.cjs` security-scans every written file
+- `pre-completion-check.cjs` blocks session end without verification evidence
 
-Critical design: security hooks (`gate-enforcement.sh`, `privacy-block.sh`) are never routed through the dispatcher. If `dispatch.cjs` crashes, security hooks still fire, so there is no single point of failure.
+Critical design: security hooks (`gate-enforcement.cjs`, `privacy-block.cjs`) are never routed through the dispatcher. If `dispatch.cjs` crashes, security hooks still fire, so there is no single point of failure.
 
 Under the hooks, a Node.js dispatch system (`dispatch.cjs` + `handlers.json`) runs infrastructure handlers: model detection, budget tracking, build verification, loop detection, and checkpoint management. These fire automatically; agents don't invoke them.
 
@@ -52,9 +52,9 @@ Hook events fire at key moments, each dispatching to specific handlers:
 
 ```
 SessionStart    → model-detector (tier → density) · orientation-ritual (resume from checkpoint) · project-context-loader
-UserPromptSubmit → immediate-capture-handler (captures ##prefix messages)
+UserPromptSubmit → safety-sentinel-inject (re-arms the safety baseline) · tdd-flag-detector
 PostToolUse     → build-verify (compile/lint, hash-cached) · loop-detection (warn@4 edits, escalate@8) · budget-tracker (warn $30, block $100) · auto-checkpoint (every 20 calls)
-Stop            → pre-completion-check (block without verification evidence) · checkpoint-writer · post-session (capture patterns to memory)
+Stop            → pre-completion-check (block without verification evidence) · checkpoint-writer · post-session (cost log + session_end trace)
 ```
 
 **Crash recovery:** `auto-checkpoint` saves every 20 calls. If a session crashes before `Stop`, the next session's `orientation-ritual` resumes from the last checkpoint.
@@ -95,37 +95,40 @@ Agents invoke skills as tools. The orchestrator loads `agent-detector` and `scou
 
 ## Memory: learning across sessions
 
-MeowKit stores engineering learnings in `.meowkit/memory/`: fix patterns, review findings, architecture decisions. Skills read relevant topic files at task start:
+MeowKit keeps one small, committed, team-shared store at `.meowkit/memory/`: two plain-markdown
+files, no index, no JSON sidecars.
 
-| Topic file | Consumer | Read when |
-|-----------|----------|-----------|
-| `fixes.md` + `fixes.json` | `mk:fix` | Bug diagnosis |
-| `review-patterns.md` + `review-patterns.json` | `mk:review`, `mk:plan-creator` | Code review or planning |
-| `architecture-decisions.md` + `architecture-decisions.json` | `mk:plan-creator`, `mk:cook` | Architecture work |
+| File | Holds |
+|---|---|
+| `decisions.md` | why a non-obvious choice was made |
+| `gotchas.md` | what a real failure taught |
 
-There is no auto-injection pipeline. Each skill loads only the topic files relevant to its domain.
+The premise is that current models search a repository well, so most project knowledge is
+derivable from code, git history, plans and reviews. Only the non-derivable part is written down.
 
-Write paths: immediate capture via `##pattern:` / `##decision:` / `##note:` prefixes during a session, session-end auto-capture via `post-session.sh`, and Phase 6 `mk:memory session-capture`.
+**Read:** the read-set skills (`mk:fix`, `mk:investigate`, `mk:review`, `mk:plan-creator`, `mk:cso`, the planner agent and `/mk:retro`) run
+one `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` at task start and open only the matching
+entries. There is no auto-injection pipeline and no always-on memory rule; every other skill reads
+nothing.
 
-### Wiki: gated long-term knowledge
+**Write:** `mk:fix`, `mk:review`, `mk:retro`, `mk:memory`, and the `architect` agent append one
+entry; `mk:party` and `mk:plan-creator archive` add `decisions.md` entries only. Each writes one
+entry when the lesson is non-derivable. There is no capture hook: a human asks for something to be
+remembered and the agent writes it.
 
-Curated memory above is short-lived, schema-validated JSON for engineering learnings. For long-term, provenance-bearing project knowledge there is a separate layer, the **`mewkit wiki`** subsystem (`mk:wiki` / `mk:wiki-research` / `mk:wiki-render`). Canonical pages live under `tasks/wikis/<slug>/`; a derived, rebuildable FTS index lives in `.meowkit/cache/wiki-index.db`.
+**Boundary:** memory content is DATA (`injection-rules.md` Rule 3). It never overrides a rule,
+grants a permission, or bypasses a gate. Secrets and security findings never enter the store; those
+stay in `mk:cso` reports and Gate 2 verdicts. Because the store ships in the PR diff, git review
+plus `mewkit validate --memory` (size cap, injection patterns, secret patterns) is the gate.
 
-Its defining property is an **anti-self-poisoning write model**: external content and agent output are DATA, so an agent may only *propose* a `WikiCandidate`. A canonical page is written **only** through a human `mewkit wiki approve`, which always re-runs the secret-scrub and multi-pass injection scanner. There is no path from assistant output to a canonical page. This mirrors the same security stance the hooks enforce elsewhere: untrusted input never becomes a trusted instruction.
-
-| | Curated memory (`fixes`, `review-patterns`, …) | Wiki (`mewkit wiki`) |
-|---|---|---|
-| Lifetime | Short-term engineering learnings | Long-term project knowledge |
-| Store | Schema-validated JSON in `.meowkit/memory/` | Canonical files in `tasks/wikis/<slug>/` + derived FTS index |
-| Write path | Agent/hook capture by prefix | Agent proposes; **human approves** (re-scans) |
-| Read | Skill loads its topic file at task start | `mewkit wiki search` / `hint` (FTS, provenance-bearing) |
+See [Memory System](/guide/memory-system) for the entry format and the full read/write sets.
 
 ## Putting it together: a feature request
 
 ```mermaid
 flowchart TD
     U["User: 'Add Stripe payment checkout'"]
-    P0["<b>Phase 0</b> — orchestrator classifies → COMPLEX (fintech domain)<br/>Loads architecture-decisions.md for past payment patterns"]
+    P0["<b>Phase 0</b> — orchestrator classifies → COMPLEX (fintech domain)<br/>Greps `.meowkit/memory/` for past payment decisions"]
     P1["<b>Phase 1</b> — planner creates plan<br/>GATE 1: human approves"]
     P2["<b>Phase 2</b> — tester writes failing tests (if --tdd enabled)"]
     P3["<b>Phase 3</b> — developer implements → build-verify.cjs checks every file<br/>budget-tracker.cjs warns at $30, blocks at $100"]

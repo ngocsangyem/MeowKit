@@ -1,6 +1,6 @@
 ---
 name: confluence-bulk
-description: 'Execute bulk Confluence operations on 10+ pages via the confluence-as CLI wrapper: bulk-label, bulk-move, bulk-delete. Dry-run is MANDATORY first. Routed by mk:confluence-bulk skill. NOT for single-page ops (confluence-page); NOT for comments/attachments (confluence-collaborate).'
+description: 'mk:confluence executor for mk:confluence-bulk. Sweeps over 10+ pages, dry-run first.'
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default

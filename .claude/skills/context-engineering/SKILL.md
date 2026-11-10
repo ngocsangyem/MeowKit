@@ -1,14 +1,6 @@
 ---
 name: mk:context-engineering
-description: >-
-  Runtime router for context decisions during a task — decide read-more / stop /
-  ask / assume / delegate, pick a minimal read-set, and time compaction. Front-page
-  mental model is Write / Select / Compress / Isolate; a lazy pattern index routes to
-  25 context-engineering patterns, one reference per decision. Use when context is
-  near budget, a long session is degrading, you must choose what to read for a task,
-  or you are deciding /compact vs /clear vs a sub-agent. NOT for structural .claude/
-  overhead audits (see mk:context-audit); NOT for owning persistence (see mk:memory);
-  NOT for USD cost (see mk:budget).
+description: Runtime context decisions — read more, stop, ask, assume, delegate, compact — over a pattern index. NOT for mk:context-audit.
 keywords:
   - context-engineering
   - context-budget
@@ -21,11 +13,7 @@ keywords:
   - triage
   - just-in-time
   - sub-agent
-when_to_use: >-
-  Use for runtime context decisions on the task at hand — how much to read, when to
-  stop, when to ask vs assume, when to compact or delegate. NOT for structural
-  .claude/ overhead audits (mk:context-audit); NOT for persistence itself (mk:memory);
-  NOT for USD cost (mk:budget).
+when_to_use: Context nears budget mid-task, or choosing compact vs clear vs a sub-agent.
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored
@@ -61,7 +49,7 @@ structural `.claude/` setup or this session's runtime context? — then route.
 - Auditing `.claude/` token overhead → `mk:context-audit`.
 - Persisting a learning or reading memory topic files → `mk:memory`.
 - Finding *where* code lives → `mk:scout` (or `Read` for one known file).
-- USD run cost → `mk:budget`.
+- USD run cost → `mewkit budget`.
 - A trivial 1–2 file task — no routing needed; just do it.
 
 ## Four Operations
@@ -77,7 +65,7 @@ The whole surface reduces to four moves. Name the one you need, then triage.
 
 Pointer-style — the rules below own the detail; do not restate them here.
 
-- **Read more** — only when a Retrieval Trigger in `context-budget-rules.md` matches (schema/contract change, security surface, cross-cutting refactor, failed verification, resume). No trigger → no read. (Rule file is present in a toolkit install; if absent downstream, fall back to: read only what a named acceptance criterion requires.)
+- **Read more** — only when a Retrieval Trigger in `.claude/skills/agent-detector/references/context-budget-rules.md` matches (schema/contract change, security surface, cross-cutting refactor, failed verification, resume). No trigger → no read. (Rule file is present in a toolkit install; if absent downstream, fall back to: read only what a named acceptance criterion requires.)
 - **Stop** — you have enough to act, OR two consecutive reads changed no decision, OR the phase/tier read ceiling is reached. "Seems right" without evidence is not stop — verify.
 - **Ask** — an ungreppable fact, a spec-vs-code conflict, or a business/irreversible decision (`core-behaviors.md` #2, if present). Scout first: if grep/read answers it, don't ask.
 - **Assume** — cheap-to-fix uncertainty. Emit an `ASSUMPTIONS I'M MAKING` block (format in Output Format below; matches `core-behaviors.md` #1 where present) and proceed; never silently guess.
@@ -97,7 +85,7 @@ when it is greppable — read it. An unverifiable fact is an **Ask** or an expli
 Context triage:
 - [ ] 1. Phase + tier — which of Orient/Plan/Test/Build/Review/Ship/Reflect, and low/standard/complex?
 - [ ] 2. Context risk — near ceiling? drifting? poisoned by a prior claim? key fact buried? (labeled heuristics, not measured)
-- [ ] 3. Minimal read-set — the smallest set for THIS step (see context-budget-rules.md phase×tier, if present)
+- [ ] 3. Minimal read-set — the smallest set for THIS step (see .claude/skills/agent-detector/references/context-budget-rules.md phase×tier, if present)
 - [ ] 4. Route — load exactly ONE section of references/pattern-index.md matching the intent
 - [ ] 5. Apply + emit the output contract (Context decision: …)
 ```
@@ -157,6 +145,6 @@ or I'll proceed with these.`
 ## Related Skills
 
 - `mk:context-audit` — use instead for structural `.claude/` overhead (tokens/% statically loaded).
-- `mk:memory` — use instead to actually read/write canonical `.meowkit/memory/` JSON stores; this skill only decides a write is warranted.
+- `mk:memory` — use instead to actually record or prune an entry in `.meowkit/memory/`; this skill only decides a write is warranted.
 - `mk:scout` — use instead to discover *where* code lives; this skill decides *how much* to read.
 - `mk:agent-detector` — use the canonical agent inventory for routing and on-demand instruction loading.
