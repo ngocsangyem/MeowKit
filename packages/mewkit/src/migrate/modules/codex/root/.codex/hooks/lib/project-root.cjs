@@ -28,8 +28,9 @@ function isDirectory(p) {
 function gitTopLevel(cwd) {
   const result = spawnSync('git', ['rev-parse', '--show-toplevel'], { cwd, encoding: 'utf8', timeout: 2000 });
   if (result.status !== 0 || typeof result.stdout !== 'string') return null;
+  // git prints forward slashes on Windows; resolve to the platform form the variable branch returns.
   const top = result.stdout.trim();
-  return top !== '' && isDirectory(top) ? top : null;
+  return top !== '' && isDirectory(top) ? path.resolve(top) : null;
 }
 
 function resolveProjectRoot(env = process.env, cwd = process.cwd()) {

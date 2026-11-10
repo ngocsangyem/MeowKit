@@ -232,12 +232,13 @@ installed under other roots for other runtimes. Reference a document by its path
 relative to the skill root (`references/<file>.md`). A shell resolves paths from its
 working directory, not from the skill, so a command in SKILL.md runs a bundled script
 through the skill-directory variable (`<var>/scripts/<script>`, where `<var>` is
-`CLAUDE_SKILL_DIR` in `${…}` form) — Claude Code substitutes it only in SKILL.md, never
-in other files and never as a shell variable. Other files (references, steps) write
+`CLAUDE_SKILL_DIR` in `${…}` form). On Claude Code, it is substituted only in SKILL.md,
+never in other files and never as a shell variable. Other files (references, steps) write
 `scripts/<script>` relative to the skill root, and SKILL.md then names the variable
-once so the agent knows the directory they resolve against. Rules, agents, hooks and other skills keep the canonical
-`.claude/<surface>/…` form, which installers map per runtime. Every Claude Code tool
-name a skill mentions is listed in `.claude/kit-capabilities.json`. A line describing
+once so the agent knows the directory they resolve against. Rules, agents, hooks and
+other skills keep the canonical `.claude/<surface>/…` form, which installers map per
+runtime. Every host-runtime tool name a skill mentions is listed in
+`.claude/kit-capabilities.json`. A line describing
 another project's layout may carry `portable-ignore`. `node scripts/check-skills-portable.cjs`
 enforces this in the release gate and CI.
 

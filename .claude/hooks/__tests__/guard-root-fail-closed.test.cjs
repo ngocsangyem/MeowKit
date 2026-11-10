@@ -63,7 +63,10 @@ test('the guard root comes from the first set variable, then the git top level, 
   const repo = tempDir('guard-root-git-');
   spawnSync('git', ['init', '-q', repo]);
   fs.mkdirSync(path.join(repo, 'src'));
-  assert.equal(resolveGuardRoot({}, path.join(repo, 'src')), repo);
+  // Compare real paths: on Windows git reports the long form of an 8.3 temp directory.
+  const gitRoot = resolveGuardRoot({}, path.join(repo, 'src'));
+  assert.ok(gitRoot, 'a git top level resolves');
+  assert.equal(fs.realpathSync.native(gitRoot), fs.realpathSync.native(repo));
 
   // A marker directory is not a root: outside git, with no variable, there is none.
   const marked = tempDir('guard-root-marker-');
