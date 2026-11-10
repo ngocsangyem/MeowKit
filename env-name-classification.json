@@ -300,7 +300,7 @@
       "name": "MEOWKIT_HOOK_PROFILE",
       "class": "safety-path",
       "key": "",
-      "reader": "hooks/pre-ship.cjs and three observers; no config key by design"
+      "reader": "hooks/lib/core/pre-ship.cjs and three observers; no config key by design"
     },
     {
       "name": "MEOWKIT_IMAGE_GEN_MODEL",
@@ -439,6 +439,12 @@
       "class": "toggle",
       "key": "hooks.pre-completion-check",
       "reader": "no reader; the off switch is hooks.pre-completion-check, applied by hooks/lib/handler-registry.cjs before the handler is loaded"
+    },
+    {
+      "name": "MEOWKIT_PROJECT_DIR",
+      "class": "runtime-handoff",
+      "key": "",
+      "reader": "hooks/lib/project-root.cjs (the project root a launcher passes to a guard or skill script on a runtime that sets no project-dir variable of its own)"
     },
     {
       "name": "MEOWKIT_KIT_SIGNING_KEY",
@@ -595,7 +601,7 @@
       "name": "MEOW_HOOK_PROFILE",
       "class": "safety-path",
       "key": "",
-      "reader": "hooks/pre-ship.cjs and three observers; no config key by design"
+      "reader": "hooks/lib/core/pre-ship.cjs and three observers; no config key by design"
     },
     {
       "name": "MEOW_JIRA_API_TOKEN",

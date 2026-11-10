@@ -26,6 +26,8 @@ requires_runtime: [python>=3.9]
 
 # mk:story-sizer
 
+> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+
 Forks to the `story-sizer` agent (system prompt at `.claude/agents/story-sizer.md`). v1 ships paste-mode only: the user provides a markdown block of stories, the agent applies heuristics, and a Story Sizing Report is written to `tasks/reports/story-sizing-{YYMMDD}-{slug}.md`. No Jira side effects in default mode.
 
 ## Triggers

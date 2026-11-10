@@ -117,7 +117,7 @@ batches_total: {if multi-batch}
 This is the active-verification enforcement. Run after writing the verdict file:
 
 ```bash
-.claude/skills/evaluate/scripts/validate-verdict.sh "$verdict_file"
+scripts/validate-verdict.sh "$verdict_file"
 ```
 
 The validator checks (v2):

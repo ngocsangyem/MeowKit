@@ -59,7 +59,7 @@ Use only for a novel, text-prompt design. Existing design sources belong to `mk:
 Set `STITCH_API_KEY` in the project env file, then install the scripts once:
 
 ```bash
-cd .claude/skills/stitch/scripts && npm install
+cd ${CLAUDE_SKILL_DIR}/scripts && npm install
 ```
 
 Run the prerequisite check before any API command; it fails before a network request if the key
@@ -74,7 +74,7 @@ Before any script runs, verify both prerequisites:
 [ -z "$STITCH_API_KEY" ] && { echo "[X] STITCH_API_KEY not set — add it to the project env file"; exit 1; }
 
 # tsx gate
-npx tsx --version 2>/dev/null || { echo "[X] tsx not found — run: cd .claude/skills/stitch/scripts && npm install"; exit 1; }
+npx tsx --version 2>/dev/null || { echo "[X] tsx not found — run: cd ${CLAUDE_SKILL_DIR}/scripts && npm install"; exit 1; }
 ```
 
 `stitch-api-call.ts` also checks `STITCH_API_KEY` as its first action before any Stitch SDK
@@ -84,24 +84,24 @@ call. If the key is unset the script exits 1 immediately — no network request 
 
 ```bash
 # 1. Check quota
-npx tsx .claude/skills/stitch/scripts/stitch-quota.ts check
+npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-quota.ts check
 
 # 2. Generate (API call only — returns JSON with screenId + imageUrl)
-npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts \
+npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-api-call.ts \
   generate "A checkout page with cart summary and payment form"
 
 # 3. Export + write files (pipe: API call → schema-validate → write to disk)
-npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts export <screen-id> | \
-  npx tsx .claude/skills/stitch/scripts/stitch-write-output.ts
+npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-api-call.ts export <screen-id> | \
+  npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-write-output.ts
 ```
 
 ## Commands
 
 | Task | Command / contract |
 |---|---|
-| Check quota | `npx tsx .claude/skills/stitch/scripts/stitch-quota.ts check` |
-| Generate | `npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts generate "<prompt>"` — returns `screenId`, `projectId`, `imageUrl`, and quota data |
-| Export | `npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts export <screen-id> \| npx tsx .claude/skills/stitch/scripts/stitch-write-output.ts` |
+| Check quota | `npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-quota.ts check` |
+| Generate | `npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-api-call.ts generate "<prompt>"` — returns `screenId`, `projectId`, `imageUrl`, and quota data |
+| Export | `npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-api-call.ts export <screen-id> \| npx tsx ${CLAUDE_SKILL_DIR}/scripts/stitch-write-output.ts` |
 
 Show `imageUrl` and obtain user approval before exporting. Detailed flags, quota operations, and
 the API/write security boundary: [references/stitch-operations.md](references/stitch-operations.md).

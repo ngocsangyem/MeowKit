@@ -20,7 +20,7 @@ Task(
   description="Analyze trace batch {N} for error patterns",
   prompt="
     Read the error taxonomy at:
-      .claude/skills/trace-analyze/references/error-taxonomy.md
+      references/error-taxonomy.md
 
     Read the batch records at:
       $analysis_dir/batch-{N}.jsonl
@@ -72,7 +72,7 @@ Print a one-line summary per batch:
 
 ```bash
 for i in $(seq 1 "$batch_count"); do
-  node .claude/skills/trace-analyze/scripts/trace-records.cjs count \
+  node scripts/trace-records.cjs count \
     "$analysis_dir/batch-${i}-findings.json" "$i"
 done
 ```

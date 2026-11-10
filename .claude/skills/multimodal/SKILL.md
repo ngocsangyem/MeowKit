@@ -72,7 +72,7 @@ verify preview IDs against the provider dashboard before relying on one.
 | Validate keys and dependencies | `scripts/check_setup.py` |
 
 ```bash
-node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py \
+node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/gemini_analyze.py \
   --files <path> --task <analyze|transcribe|extract> [--resolution low-res] [--json]
 ```
 

@@ -60,6 +60,6 @@ When quota is exhausted:
 Local tracking can drift if designs are generated outside this skill (Stitch web UI, other tools).
 If you hit `RATE_LIMITED` from the Stitch API despite the local tracker showing credits:
 
-1. Run `npx tsx .claude/skills/stitch/scripts/stitch-quota.ts reset`
+1. Run `npx tsx scripts/stitch-quota.ts reset`
 2. The Stitch API enforces the real limit — local tracker is advisory only
 3. On `RATE_LIMITED`, `stitch-api-call.ts` auto-syncs the tracker to `count = limit`

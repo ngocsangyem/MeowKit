@@ -117,10 +117,10 @@ case "$tier" in
 esac
 step_cost_usd=$(awk -v s="$elapsed_seconds" -v r="$rate" 'BEGIN { printf "%.2f", (s/60.0)*r }')
 
-MEOWKIT_RUN_ID="$run_id" .claude/skills/autobuild/scripts/budget-tracker.sh add "$step_cost_usd" "step-03-iter-${iteration}"
+MEOWKIT_RUN_ID="$run_id" scripts/budget-tracker.sh add "$step_cost_usd" "step-03-iter-${iteration}"
 
 # Check thresholds — exit code 0 ok, 1 warn, 2 hard block, 3 user cap
-if ! MEOWKIT_RUN_ID="$run_id" .claude/skills/autobuild/scripts/budget-tracker.sh check; then
+if ! MEOWKIT_RUN_ID="$run_id" scripts/budget-tracker.sh check; then
   exit_code=$?
   if [ "$exit_code" -ge 2 ]; then
     final_status=TIMED_OUT

@@ -2,7 +2,7 @@
 
 This file is the **canonical syntax reference** for every `mk:jira-*` agent and skill.
 
-When in doubt, run `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <group> <verb> --help` to confirm the actual signature for any specific command — `--help` is always authoritative.
+When in doubt, run `bash scripts/jira-as.sh <group> <verb> --help` to confirm the actual signature for any specific command — `--help` is always authoritative.
 
 ## Core Rule: positional issue/project keys; flags for everything else
 
@@ -20,7 +20,7 @@ Everywhere else, **assume flags** and verify per-command via `--help`.
 All `jira-as` invocations from agents/skills MUST go through:
 
 ```
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <args>
+bash scripts/jira-as.sh <args>
 ```
 
 The wrapper:
@@ -53,7 +53,7 @@ Most parameters beyond the primary issue/project key are flags. Always confirm v
 - The wrapper sets `JIRA_OUTPUT=json` default. Per-call `--output json` flag is unnecessary.
 - Agents pipe through `jq` to project only what's needed: `... | jq '{key, summary: .fields.summary}'`.
 - Never copy raw stdout into Claude's context — always project via `jq`.
-- User override: `JIRA_OUTPUT=text bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ...` still works.
+- User override: `JIRA_OUTPUT=text bash scripts/jira-as.sh ...` still works.
 
 ## Common per-command flags
 
@@ -90,7 +90,7 @@ These appear across many groups (verify per call via `--help`):
 When authoring a `jira-{leaf}` agent's Operations table, run:
 
 ```
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <group> <verb> --help
+bash scripts/jira-as.sh <group> <verb> --help
 ```
 
 Capture the actual signature. Do NOT infer flags from prose examples in this file or other docs — `--help` is authoritative.

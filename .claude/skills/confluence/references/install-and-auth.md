@@ -19,10 +19,10 @@ a wizard that skips to the prompt leaves credentials in a tree with no binary to
 5. Append them to `.meowkit/.env` with `>>` redirection — never echo the token back, so the
    value never enters the transcript.
 6. Re-run `chmod 0600 .meowkit/.env`.
-7. Validate: `bash .claude/skills/confluence/scripts/confluence-as.sh space list 2>&1 | head -20`.
+7. Validate: `bash scripts/confluence-as.sh space list 2>&1 | head -20`.
    Expect non-error JSON. On exit 2, 3 or 127, surface the exit code's meaning from the table
    below and offer a retry rather than a second credential prompt.
-8. Optional once per install: `bash .claude/skills/confluence/scripts/smoke-live.sh`, which tells
+8. Optional once per install: `bash scripts/smoke-live.sh`, which tells
    the user whether `MEOW_CONFLUENCE_STDOUT_FILTER=trim-tail` applies to their version.
 9. On success, name one concrete next step — a page read through `mk:confluence-page`, or a spec
    analysis through `mk:confluence-spec-analyst`.
@@ -46,7 +46,7 @@ The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load 
 
 ## Install
 
-`.claude/hooks/lib/setup-workflow` auto-installs from `.claude/skills/confluence/scripts/requirements.txt`:
+`.claude/hooks/lib/setup-workflow` auto-installs from `scripts/requirements.txt`:
 
 - `confluence-assistant-skills==0.2.0` — distribution package; ships the `confluence-as` binary
 - `assistant-skills-lib==1.0.1` — transitive infra dep
@@ -82,7 +82,7 @@ The wrapper has an optional `MEOW_CONFLUENCE_STDOUT_FILTER` knob:
 - `off` (default) — pass through raw output
 - `trim-tail` — strip the trailing line and validate JSON; use only after `smoke-live.sh` confirms the upstream `print_success` writes to stdout (not stderr)
 
-Run `bash .claude/skills/confluence/scripts/smoke-live.sh` once to determine which mode applies for your installed version.
+Run `bash scripts/smoke-live.sh` once to determine which mode applies for your installed version.
 
 ## Gotchas
 

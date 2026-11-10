@@ -64,7 +64,7 @@ Cache files include:
 | `mk:planning-engine` | Status categories                        | Identify "blocked" / "in-progress" / "done" categories for capacity analysis                  |
 | `mk:jira-evaluator`  | Status count, transition count           | Workflow shape feeds complexity signal (>5 states + parallel branches = more complex tickets) |
 
-## What lives here vs `$CLAUDE_PROJECT_DIR/.claude/skills/jira-lifecycle/references/patterns/`
+## What lives here vs `references/patterns/`
 
 - **Here (`tasks/jira-workflows/`)**: discovered, instance-specific, authoritative for this project's actual Jira.
 - **There (`patterns/`)**: educational concept references describing common workflow shapes (standard 3-state, software-dev with code-review, JSM-request, incident). **NOT authoritative**; use them to understand patterns, not to predict your project's actual statuses.

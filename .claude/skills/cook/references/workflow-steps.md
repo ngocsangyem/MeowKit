@@ -31,7 +31,7 @@ All modes share these phases with mode-specific variations.
 
 ## Phase 0: Orient
 
-0. **Load the phase contracts.** `Read` `.claude/skills/cook/references/phase-contracts.md` once per run — it is the expects/produces table for all 7 phases and is no longer always-on context.
+0. **Load the phase contracts.** `Read` `references/phase-contracts.md` once per run — it is the expects/produces table for all 7 phases and is no longer always-on context.
 1. Parse input with `intent-detection.md` rules → detect mode
 2. **Model tier declaration** (MANDATORY): `Task complexity: [TRIVIAL|STANDARD|COMPLEX] → [model]`
    - Auth/payments/security → always COMPLEX
@@ -84,7 +84,7 @@ Valid flags to pass to `mk:plan-creator`:
 
 ### GATE 1 (Non-Auto Mode)
 
-**Before presenting Gate 1 in non-auto modes**, run `.claude/skills/cook/scripts/validate-gate-1.sh <plan-path>` as a structural pre-check. If exit ≠ 0, surface the blocker message to the user as a preflight WARNING above the Gate 1 prompt — then still present the prompt. In non-auto modes the script is **advisory**: the user retains override authority and may approve a plan that fails structural check. This preserves the "no hidden execution transitions" constraint.
+**Before presenting Gate 1 in non-auto modes**, run `scripts/validate-gate-1.sh <plan-path>` as a structural pre-check. If exit ≠ 0, surface the blocker message to the user as a preflight WARNING above the Gate 1 prompt — then still present the prompt. In non-auto modes the script is **advisory**: the user retains override authority and may approve a plan that fails structural check. This preserves the "no hidden execution transitions" constraint.
 
 Present plan summary. Use `AskUserQuestion` (header: "Gate 1"):
 
@@ -103,7 +103,7 @@ mode automates the path *to* Gate 1, never the approval *at* it (see
 
 ## Phase 2: Test (skip if no-test mode; RED-phase enforcement only if `--tdd` / `MEOWKIT_TDD=1`)
 
-Write failing tests BEFORE implementation. TDD enforcement per `.claude/skills/cook/references/tdd-rules.md`. Phase 2 behavior by mode:
+Write failing tests BEFORE implementation. TDD enforcement per `references/tdd-rules.md`. Phase 2 behavior by mode:
 
 - `RED-strict` (interactive, auto, parallel, code) — when `--tdd` / `MEOWKIT_TDD=1` is active, failing tests gate Phase 3. When TDD is off, Phase 2 is optional.
 - `Plan-level` (fast) — tests reflect plan intent only; no RED gate.
@@ -131,7 +131,7 @@ Present test list. Ask: "Proceed to implementation?" / "Adjust tests" / "Abort"
 
 Implement code until all tests pass. TDD: implement ONLY enough to make tests pass.
 
-**Rule loads for this phase.** Before spawning any subagent, `Read` `.claude/skills/cook/references/orchestration-rules.md` (delegation template, isolation boundaries, file ownership, status handling). In parallel mode ONLY, also `Read` `.claude/skills/cook/references/parallel-execution-rules.md` (zero file overlap, max 3 agents, worktree isolation, integration test after merge). Skip both in a single-agent sequential run.
+**Rule loads for this phase.** Before spawning any subagent, `Read` `references/orchestration-rules.md` (delegation template, isolation boundaries, file ownership, status handling). In parallel mode ONLY, also `Read` `references/parallel-execution-rules.md` (zero file overlap, max 3 agents, worktree isolation, integration test after merge). Skip both in a single-agent sequential run.
 
 **Visual metadata (read-only for cook).** If `.plan-state.json` carries a `visual`
 block (schema 1.3), the plan has an APPROVED `visual-plan/plan.json`. Before a
@@ -230,7 +230,7 @@ Max 3 review-fix cycles. After 3: final decision required from user.
 
 Before presenting for approval, run BOTH structural checks and surface both:
 
-- `.claude/skills/cook/scripts/validate-gate-2.cjs` — the authoritative Gate 2 structural guard (no FAIL dimensions, side-effect addendum present).
+- `scripts/validate-gate-2.cjs` — the authoritative Gate 2 structural guard (no FAIL dimensions, side-effect addendum present).
 - `node .claude/hooks/lib/validate-workflow-evidence.cjs <evidence-path> --phase cook` — evidence-completeness mirror (blocks on missing `cookContract` dims, empty `verification.commands`, `gate2-approved-without-verdict`, side-effects-without-addendum). It MIRRORS the gate script's status; it never replaces it and never approves. Pass `--plan-input` when the cook input was an existing `plan.md` / `phase-*.md` path.
 
 **Output:** `Phase 4: Review [score]/10, Gate 2 approved`
@@ -274,7 +274,7 @@ Before presenting for approval, run BOTH structural checks and surface both:
 **Fires when:** `--strict` flag present OR `mk:scale-routing` returned `level=high` at Phase 0.
 **Supersedes:** `--verify` (strict includes active verification via mk:evaluate step-02/03).
 
-**Rule load for this path.** `Read` `.claude/skills/cook/references/harness-rules.md` before spawning the evaluator — it carries the generator ≠ evaluator separation, the active-verification HARD GATE, and the skeptic-persona reload rule the evaluator is graded against. Not loaded on the `--verify` path.
+**Rule load for this path.** `Read` `references/harness-rules.md` before spawning the evaluator — it carries the generator ≠ evaluator separation, the active-verification HARD GATE, and the skeptic-persona reload rule the evaluator is graded against. Not loaded on the `--verify` path.
 
 1. **Log trigger reason:**
    - If explicit: `"--strict flag detected, invoking full evaluator"`

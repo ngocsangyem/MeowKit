@@ -28,7 +28,7 @@ mkdir -p "$analysis_dir"
 JSON parsing runs on node — guaranteed present, and no `jq` dependency:
 
 ```bash
-node .claude/skills/trace-analyze/scripts/trace-records.cjs ingest \
+node scripts/trace-records.cjs ingest \
   "$TRACE_LOG" "$analysis_dir" "${runs:-20}"
 ```
 

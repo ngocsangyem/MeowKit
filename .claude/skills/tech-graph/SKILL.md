@@ -48,18 +48,18 @@ Generate production-quality SVG technical diagrams, optionally exported as PNG.
 1. Classify the request with the diagram catalog; extract layers, nodes, edges, flows, and groups.
 2. Load the selected style reference. Style 8 requires hand-authored SVG; do not use the template generator.
 3. Load visual vocabulary/layout guidance, map nodes and arrows, and use a legend for two or more arrow types.
-4. Generate with the relevant helper: run `python3 .claude/skills/tech-graph/scripts/generate-from-template.py` for supported templates, or run `python3 .claude/skills/tech-graph/scripts/generate-svg-from-lines.py <output.svg>` and pipe SVG lines to stdin for hand-authored output.
-5. Run `bash .claude/skills/tech-graph/scripts/validate-svg.sh <output.svg>`. If available, run `rsvg-convert <output.svg> -o /dev/null` as an additional check.
+4. Generate with the relevant helper: run `python3 ${CLAUDE_SKILL_DIR}/scripts/generate-from-template.py` for supported templates, or run `python3 ${CLAUDE_SKILL_DIR}/scripts/generate-svg-from-lines.py <output.svg>` and pipe SVG lines to stdin for hand-authored output.
+5. Run `bash ${CLAUDE_SKILL_DIR}/scripts/validate-svg.sh <output.svg>`. If available, run `rsvg-convert <output.svg> -o /dev/null` as an additional check.
 6. Check `rsvg-convert` before PNG export. When absent, keep the SVG and report the install hint; never auto-install or fail the task.
 7. If image reading is available, inspect the exported PNG and correct collisions, overflow, crossings, or covered legends before delivery.
 
 ## Helpers
 
-- Run `bash .claude/skills/tech-graph/scripts/generate-diagram.sh -t <type> -s <style> -o <output.svg>` to validate an existing SVG and export PNG when available.
-- Run `python3 .claude/skills/tech-graph/scripts/generate-from-template.py <template> <output.svg> '<json>'` to render a built-in starter template from escaped JSON data.
-- Run `python3 .claude/skills/tech-graph/scripts/generate-svg-from-lines.py <output.svg>` to write hand-authored SVG lines safely from stdin.
-- Run `bash .claude/skills/tech-graph/scripts/validate-svg.sh <svg-file>` to validate XML, markers, attributes, and path data.
-- Run `bash .claude/skills/tech-graph/scripts/test-all-styles.sh` to batch-test styles and produce its report.
+- Run `bash ${CLAUDE_SKILL_DIR}/scripts/generate-diagram.sh -t <type> -s <style> -o <output.svg>` to validate an existing SVG and export PNG when available.
+- Run `python3 ${CLAUDE_SKILL_DIR}/scripts/generate-from-template.py <template> <output.svg> '<json>'` to render a built-in starter template from escaped JSON data.
+- Run `python3 ${CLAUDE_SKILL_DIR}/scripts/generate-svg-from-lines.py <output.svg>` to write hand-authored SVG lines safely from stdin.
+- Run `bash ${CLAUDE_SKILL_DIR}/scripts/validate-svg.sh <svg-file>` to validate XML, markers, attributes, and path data.
+- Run `bash ${CLAUDE_SKILL_DIR}/scripts/test-all-styles.sh` to batch-test styles and produce its report.
 
 ## Output
 

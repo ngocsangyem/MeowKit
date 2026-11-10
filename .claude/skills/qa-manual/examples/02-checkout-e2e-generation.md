@@ -185,7 +185,7 @@ src/pages/Checkout.vue:48:    <button data-testid="place-order">Place Order</but
 ## Validation
 
 ```bash
-$ sh .claude/skills/qa-manual/scripts/run-playwright.sh tests/e2e/checkout-flow/checkout-flow.spec.ts
+$ sh scripts/run-playwright.sh tests/e2e/checkout-flow/checkout-flow.spec.ts
 Running: tests/e2e/checkout-flow/checkout-flow.spec.ts
   ✓ Checkout Flow > complete checkout from product to confirmation (3.2s)
 PASS — all tests in tests/e2e/checkout-flow/checkout-flow.spec.ts passed

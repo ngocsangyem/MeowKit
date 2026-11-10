@@ -9,7 +9,7 @@ STITCH_QUOTA_LIMIT=400
 ```
 
 The env hook loads the project env file; never hardcode the key. Install the local scripts with
-`cd .claude/skills/stitch/scripts && npm install`. `tsx` comes from `scripts/package.json`.
+`cd scripts && npm install`. `tsx` comes from `scripts/package.json`.
 
 For native Stitch design context in a host runtime, load
 [stitch-mcp-setup.md](stitch-mcp-setup.md).

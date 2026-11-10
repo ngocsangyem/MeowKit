@@ -80,7 +80,10 @@ echo "  All JSON configs valid."
 echo "[3/7] Building release assets..."
 node scripts/prepare-release-assets.cjs "$VERSION"
 
-# Verify zip
+# Verify the assets about to be published: contract inside the zip, checksum matches,
+# and no signed-artifact asset in dist/ (artifact-aware CLIs would refuse the install).
+node scripts/verify-release-assets.cjs "$VERSION" dist
+
 ZIP_SIZE=$(python3 -c "import os; print(f'{os.path.getsize(\"dist/meowkit-release.zip\")/1024:.0f}')")
 echo "  Release zip: ${ZIP_SIZE} KB"
 
@@ -111,7 +114,9 @@ else
   git push origin "v$VERSION"
 fi
 
-# Step 7: Create or update GitHub Release (overwrite asset on existing tag)
+# Step 7: Create or update GitHub Release (overwrite assets on existing tag).
+# Only these two assets are ever uploaded. Never upload meowkit-kit-*.tar.gz, kit-manifest.json
+# or *.sig: CLIs that understand the signed artifact have an empty keyring and would refuse it.
 echo "[7/7] Publishing GitHub Release..."
 RELEASE_NOTES="## $TITLE
 
@@ -126,11 +131,11 @@ npx mewkit upgrade
 \`\`\`"
 
 if gh release view "v$VERSION" >/dev/null 2>&1; then
-  echo "  Release v$VERSION already exists — uploading asset with --clobber."
-  gh release upload "v$VERSION" dist/meowkit-release.zip --clobber
+  echo "  Release v$VERSION already exists — uploading assets with --clobber."
+  gh release upload "v$VERSION" dist/meowkit-release.zip dist/checksums.txt --clobber
   gh release edit "v$VERSION" --title "v$VERSION — $TITLE" --notes "$RELEASE_NOTES"
 else
-  gh release create "v$VERSION" dist/meowkit-release.zip \
+  gh release create "v$VERSION" dist/meowkit-release.zip dist/checksums.txt \
     --title "v$VERSION — $TITLE" \
     --notes "$RELEASE_NOTES"
 fi
@@ -141,5 +146,5 @@ echo "=== Release v$VERSION Complete ==="
 echo ""
 echo "Verify:"
 echo "  Tag:   $(git tag | grep "v$VERSION")"
-echo "  Asset: $(gh release view "v$VERSION" --json assets -q '.assets[].name')"
+echo "  Assets (expect meowkit-release.zip, checksums.txt): $(gh release view "v$VERSION" --json assets -q '.assets[].name' | tr '\n' ' ')"
 echo "  URL:   $(gh release view "v$VERSION" --json url -q '.url')"

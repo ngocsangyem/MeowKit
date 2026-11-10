@@ -34,95 +34,10 @@ process.on('uncaughtException', failClosed);
 process.on('unhandledRejection', failClosed);
 
 const { readHookInput } = require('./lib/parse-stdin.cjs');
+const { enterGuardRoot } = require('./lib/project-root.cjs');
+const { decidePrivacy } = require('./lib/core/privacy.cjs');
 
-/** Credential-bearing files: dotenv, keys, certificates, credential stores, ssh. */
-const SENSITIVE_PATH = /\.env($|\.)|\.key$|\.pem$|credentials|secret|keystore|\.ssh\//i;
-
-/**
- * Web-fetch artifacts. The manifest is a browsing history, and a quarantined
- * file holds content a previous fetch stopped as untrusted — reading either
- * discloses history or re-injects that content into context.
- */
-// Both cache roots are matched: the canonical one and the pre-move one, so a stale
-// cache in a project installed earlier stays as protected as a new one.
-const FETCH_ARTIFACT = /(?:\.meowkit|\.claude)\/cache\/web-fetches\/index\.jsonl$|\.quarantined$/;
-
-/** Commands that invoke the fetch tooling, where a URL argument is worth inspecting. */
-const FETCH_COMMAND = /fetch_as_markdown\.py|web-to-markdown|mk:web-to-markdown/;
-
-const URL_IN_COMMAND = /https?:\/\/[^\s"'`]+/;
-
-/** Hosts a fetch must not reach: loopback, private ranges, link-local, metadata. */
-const UNSAFE_HOST = /^(localhost|127\..*|10\..*|192\.168\..*|169\.254\..*|metadata\.google\.internal|metadata\..*)$/;
-
-const UNSAFE_SCHEME = /^(file:\/\/|chrome:\/\/|about:|data:|javascript:)/;
-
-const emit = (lines) => process.stderr.write(`${lines.join('\n')}\n`);
-
-const ASK_FIRST = 'Use AskUserQuestion to get explicit user approval before accessing.';
-
-function checkFilePath(filePath) {
-  if (!filePath) return 0;
-
-  if (SENSITIVE_PATH.test(filePath)) {
-    emit([
-      MARKER,
-      `File '${filePath}' matches sensitive file pattern (injection-rules.md R4).`,
-      ASK_FIRST,
-    ]);
-    return 2;
-  }
-
-  if (FETCH_ARTIFACT.test(filePath)) {
-    emit([
-      MARKER,
-      `File '${filePath}' is a web-to-markdown cache artifact.`,
-      'The manifest contains browsing history; quarantined files contain injection-stopped content.',
-      'Reading these files may disclose browsing history OR re-inject untrusted content into agent context.',
-      ASK_FIRST,
-    ]);
-    return 2;
-  }
-  return 0;
-}
-
-/** Host as a fetch would resolve it: drop the scheme, any userinfo, and the path. */
-function hostOf(url) {
-  return url.replace(/^https?:\/\//, '').replace(/[:/].*$/, '').replace(/.*@/, '');
-}
-
-/**
- * Defence in depth only. The fetch tool does its own URL validation; this is a
- * second refusal at the boundary so an unsafe target is stopped before the
- * fetcher ever starts.
- */
-function checkCommand(command) {
-  if (!command || !FETCH_COMMAND.test(command)) return 0;
-
-  // Best-effort: the agent may quote the URL in any number of ways.
-  const match = command.match(URL_IN_COMMAND);
-  if (!match) return 0;
-  const url = match[0];
-
-  const host = hostOf(url);
-  if (UNSAFE_HOST.test(host)) {
-    emit([
-      MARKER,
-      `Web fetch target '${host}' is a private/loopback/metadata address.`,
-      'SSRF risk. Use AskUserQuestion for explicit user approval before proceeding.',
-    ]);
-    return 2;
-  }
-  if (UNSAFE_SCHEME.test(url)) {
-    emit([
-      MARKER,
-      `Web fetch target scheme in '${url}' is not http/https.`,
-      'Unsafe scheme — use AskUserQuestion for explicit user approval before proceeding.',
-    ]);
-    return 2;
-  }
-  return 0;
-}
+const emit = (lines) => { if (lines.length) process.stderr.write(`${lines.join('\n')}\n`); };
 
 async function main() {
   const input = await readHookInput();
@@ -135,18 +50,20 @@ async function main() {
     process.exit(2);
   }
 
-  const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-  try {
-    process.chdir(root);
-  } catch {
-    process.exit(0);
+  // Every rule below is relative to the project root. A root that cannot be found or entered
+  // is a block: allowing here would check the wrong tree, or none.
+  const root = enterGuardRoot(input.cwd || process.cwd());
+  if (!root) {
+    emit([MARKER, 'Privacy guard cannot locate the project root it guards.', 'A read guard that cannot tell which project it is in must not allow the access.']);
+    process.exit(2);
   }
 
   // argv is the back-compatible fallback for a registration that still passes
   // the target as a positional argument.
   const filePath = input.filePath || process.argv[2] || '';
-  const fileExit = checkFilePath(filePath);
-  process.exit(fileExit !== 0 ? fileExit : checkCommand(input.command));
+  const result = decidePrivacy({ paths: [filePath], command: input.command });
+  emit(result.stderr);
+  process.exit(result.exit);
 }
 
 main();

@@ -7,7 +7,7 @@ Group records by `run_id` and split into ≤3 batches for the scatter step. Hono
 ### 2a. Group by run_id
 
 ```bash
-node .claude/skills/trace-analyze/scripts/trace-records.cjs partition "$analysis_dir"
+node scripts/trace-records.cjs partition "$analysis_dir"
 ```
 
 Writes `batch-{N}.jsonl` for each batch and prints one line per batch plus a

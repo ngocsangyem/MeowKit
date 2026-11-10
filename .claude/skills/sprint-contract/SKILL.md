@@ -101,7 +101,8 @@ The signature workflow uses **two commits per agent** to avoid the chicken-and-e
 
 ### `validate`
 
-```node .claude/skills/sprint-contract/scripts/validate-contract.cjs tasks/contracts/{path}.md
+```bash
+node ${CLAUDE_SKILL_DIR}/scripts/validate-contract.cjs tasks/contracts/{path}.md
 ```
 
 ### `sprint-goal` (Agile mode — gated by `agile-sprint-commitment.md` 1)

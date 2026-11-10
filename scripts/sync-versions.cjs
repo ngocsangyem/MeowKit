@@ -3,7 +3,8 @@
  * Single-source version sync for the KIT (harness) version.
  *
  * Source of truth: root `package.json` `version`. This script stamps that version into the kit's
- * tracked identity file `.meowkit/config.json` and into `release-manifest.json`, and
+ * tracked identity file `.meowkit/config.json`, into `.claude/kit-contract.json` (`kitVersion`) and
+ * into `release-manifest.json`, and
  * records the CLI package version (`packages/mewkit/package.json`, a SEPARATE semver track) into
  * the manifest as `cliVersion` (recorded, never overwritten to match the kit).
  *
@@ -28,6 +29,9 @@ const CANONICAL_CONFIG = path.join(root, ".meowkit", "config.json");
 const LEGACY_CONFIG = path.join(root, ".claude", "meowkit.config.json");
 const KIT_CONFIG = fs.existsSync(CANONICAL_CONFIG) ? CANONICAL_CONFIG : LEGACY_CONFIG;
 const RELEASE_MANIFEST = path.join(root, "release-manifest.json");
+// The kit's compatibility contract ships inside the release zip; its `kitVersion` is what an
+// installer reads to know which kit it unpacked, so it must equal the kit version exactly.
+const KIT_CONTRACT = path.join(root, ".claude", "kit-contract.json");
 
 const write = process.argv.includes("--write");
 
@@ -47,6 +51,7 @@ const cliVersion = readJson(CLI_PKG).version;
 // release by generate-release-manifest.cjs).
 const targets = [
 	{ file: KIT_CONFIG, field: "version", expected: kitVersion, stamp: true, optional: false },
+	{ file: KIT_CONTRACT, field: "kitVersion", expected: kitVersion, stamp: true, optional: false },
 	{ file: RELEASE_MANIFEST, field: "version", expected: kitVersion, stamp: true, optional: true },
 	{ file: RELEASE_MANIFEST, field: "cliVersion", expected: cliVersion, stamp: true, optional: true },
 ];

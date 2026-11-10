@@ -12,7 +12,8 @@ const path = require('node:path');
 
 const { checkContractSigned } = require(path.join(__dirname, '../../../hooks/lib/check-contract-signed.cjs'));
 
-const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+const { resolveProjectRoot } = require(path.join(__dirname, '../../../hooks/lib/project-root.cjs'));
+const root = resolveProjectRoot();
 const result = checkContractSigned({ root, env: process.env });
 if (result.stdout.length) process.stdout.write(`${result.stdout.join('\n')}\n`);
 if (result.stderr.length) process.stderr.write(`${result.stderr.join('\n')}\n`);

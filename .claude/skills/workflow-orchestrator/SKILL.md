@@ -53,7 +53,7 @@ dependency_edges:
 
 ## Canonical Lifecycle
 
-`.claude/skills/workflow-orchestrator/workflow.yaml` is the sole source for phase sequence, gates, leads, and required outputs. This adapter must not restate phase details. For execution load `references/workflow-phases.md`, which renders that contract.
+`workflow.yaml` is the sole source for phase sequence, gates, leads, and required outputs. This adapter must not restate phase details. For execution load `references/workflow-phases.md`, which renders that contract.
 
 On a non-trivial task, route to `mk:plan-creator`; proceed only after Gate 1. Fasttrack accepts only a pre-approved spec. Gate 2 remains human approval before an explicit ship request.
 
@@ -78,7 +78,7 @@ See `.claude/skills/cook/references/phase-contracts.md` for input/output expecta
 
 2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 7-phase flow.
 
-3. **Execute the canonical lifecycle** — load `references/workflow-phases.md` and follow `.claude/skills/workflow-orchestrator/workflow.yaml`; do not duplicate or override its phase ordering, TDD rules, required outputs, or gates.
+3. **Execute the canonical lifecycle** — load `references/workflow-phases.md` and follow `workflow.yaml`; do not duplicate or override its phase ordering, TDD rules, required outputs, or gates.
 
 4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit. Also delegate to `project-manager` after each phase transition per `.claude/skills/cook/references/post-phase-delegation.md` Rule 1 (background, non-blocking — include "Run in the background" in the prompt). Skipped when `MEOWKIT_PM_AUTO=off`.
 

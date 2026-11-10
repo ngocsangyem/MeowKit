@@ -33,6 +33,7 @@ describe("authored codex bundle", () => {
 				".codex/config.toml",
 				".codex/hooks.json",
 				".codex/hooks/gate-enforcement.cjs",
+				".codex/hooks/hook-runtime-config.json",
 				".codex/hooks/lib",
 				".codex/hooks/privacy-block.cjs",
 				".codex/rules/default.rules",
@@ -106,7 +107,7 @@ describe("authored codex bundle", () => {
 		expect(fails, `unexpected failures: ${fails.map((f) => `${f.name} — ${f.detail}`).join("; ")}`).toEqual([]);
 	});
 
-	it("the migrate overlay writes EVERY authored surface (cutover complete — all 10 entries active)", async () => {
+	it("the migrate overlay writes EVERY authored surface (cutover complete — all 11 entries active)", async () => {
 		// Cutover complete: every manifest entry is active, so the overlay writes the
 		// full authored tree. For AGENTS.md the overlay writes the authored BASE; the source-rules
 		// merge-single (config/rules) then merges onto it in the full migrate flow (not exercised by
@@ -121,13 +122,14 @@ describe("authored codex bundle", () => {
 				".codex/config.toml",
 				".codex/hooks.json",
 				".codex/hooks/gate-enforcement.cjs",
+				".codex/hooks/hook-runtime-config.json",
 				".codex/hooks/lib",
 				".codex/hooks/privacy-block.cjs",
 				".codex/rules/default.rules",
 				".codex/scripts/skill-python.cjs",
 			].sort(),
 		);
-		expect(overlay.writes).toBe(10);
+		expect(overlay.writes).toBe(11);
 		expect(existsSync(join(target, "AGENTS.md"))).toBe(true); // authored AGENTS.md base
 		expect(existsSync(join(target, ".codex", "config.toml"))).toBe(true); // authored config base
 		expect(existsSync(join(target, ".agents", "skills", "mk-fix", "SKILL.md"))).toBe(true); // authored skill

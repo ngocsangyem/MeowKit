@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "description": "Every .claude/hooks/lib file each shared safety behaviour loads, relative to .claude/hooks/lib. `lib` is the require closure of the behaviour's Claude Code shell; `spawned` are lib scripts it runs as child processes. `bundled` is what a non-Claude runtime's hook tree carries: the runtime shells there require exactly these files, copied byte for byte by scripts/sync-hook-core.cjs. Checked by .claude/hooks/__tests__/core-closure.test.cjs.",
+  "behaviours": {
+    "plan-gate": {
+      "shell": "gate-enforcement.cjs",
+      "lib": [
+        "approval-receipt.cjs",
+        "check-contract-signed.cjs",
+        "core/plan-gate.cjs",
+        "gate1-hatch.cjs",
+        "gate1-path-rules.cjs",
+        "parse-stdin.cjs",
+        "plan-discovery.cjs",
+        "project-root.cjs",
+        "validate-contract.cjs"
+      ],
+      "spawned": []
+    },
+    "privacy": {
+      "shell": "privacy-block.cjs",
+      "lib": ["core/privacy.cjs", "parse-stdin.cjs", "project-root.cjs"],
+      "spawned": []
+    },
+    "pre-ship": {
+      "shell": "pre-ship.cjs",
+      "lib": [
+        "core/pre-ship.cjs",
+        "gate2-change-set.cjs",
+        "gate2-check.cjs",
+        "gate2-structural-checks.cjs",
+        "gate2-verdict-lookup.cjs",
+        "memory-store-lint.cjs",
+        "meowkit-paths.cjs",
+        "parse-stdin.cjs",
+        "preship-checks.cjs",
+        "project-root.cjs",
+        "validate-gate-2.cjs"
+      ],
+      "spawned": ["validate-review-coverage.cjs", "validate-workflow-evidence.cjs"]
+    }
+  },
+  "bundled": [
+    "approval-receipt.cjs",
+    "check-contract-signed.cjs",
+    "core/plan-gate.cjs",
+    "core/privacy.cjs",
+    "gate1-hatch.cjs",
+    "gate1-path-rules.cjs",
+    "hook-runtime.cjs",
+    "plan-discovery.cjs",
+    "project-root.cjs",
+    "validate-contract.cjs"
+  ],
+  "bundleLibDirs": [
+    "packages/mewkit/src/migrate/modules/codex/root/.codex/hooks/lib",
+    "packages/mewkit/src/migrate/modules/cursor/root/.cursor/hooks/lib"
+  ]
+}

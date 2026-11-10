@@ -12,7 +12,7 @@
 ffprobe -v quiet -show_format -print_format json <audio-file> | jq '.format.duration'
 
 # 2a. Short audio (< 15 min) — direct transcription
-node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py \
+node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py \
   --files <audio-file> \
   --task transcribe
 
@@ -20,13 +20,13 @@ node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini
 ffmpeg -i <audio-file> -f segment -segment_time 900 -c copy /tmp/segment_%03d.mp3
 
 for f in /tmp/segment_*.mp3; do
-  node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py \
+  node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py \
     --files "$f" --task transcribe >> full_transcript.md
 done
 
 # 3. For video → extract audio first
 ffmpeg -i video.mp4 -vn -acodec mp3 audio.mp3
-node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py \
+node .claude/hooks/lib/skill-python.cjs scripts/gemini_analyze.py \
   --files audio.mp3 --task transcribe
 ```
 

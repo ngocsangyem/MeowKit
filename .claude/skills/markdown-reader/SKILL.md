@@ -47,20 +47,20 @@ Without installation you will get **Error 500: Error rendering markdown**.
 
 ```bash
 # View a markdown file (opens browser automatically)
-node .claude/skills/markdown-reader/scripts/server.cjs \
+node ${CLAUDE_SKILL_DIR}/scripts/server.cjs \
   --file ./tasks/plans/my-plan/plan.md
 
 # Browse a directory
-node .claude/skills/markdown-reader/scripts/server.cjs \
+node ${CLAUDE_SKILL_DIR}/scripts/server.cjs \
   --dir ./tasks/plans
 
 # Background mode (foreground process for Claude Code task runners)
-node .claude/skills/markdown-reader/scripts/server.cjs \
+node ${CLAUDE_SKILL_DIR}/scripts/server.cjs \
   --file ./README.md \
   --foreground
 
 # Stop all running instances
-node .claude/skills/markdown-reader/scripts/server.cjs --stop
+node ${CLAUDE_SKILL_DIR}/scripts/server.cjs --stop
 ```
 
 The server binds to `127.0.0.1` (localhost) only. Served files are not reachable from

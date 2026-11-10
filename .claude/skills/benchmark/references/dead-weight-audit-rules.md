@@ -99,7 +99,7 @@ Two deterministic CLI surfaces feed it (no subagent, no inner-harness hook, exit
 
 ## Applies To
 
-- `.claude/skills/benchmark/` — the measurement runner
+- `` — the measurement runner
 - `.claude/skills/autobuild/` — adaptive-density decisions consume the audit's output
 - `.claude/skills/trace-analyze/` — field-data complement to the benchmark
 - `.claude/skills/cook/references/harness-rules.md` Rule 7 — points at this rule for the audit specifics

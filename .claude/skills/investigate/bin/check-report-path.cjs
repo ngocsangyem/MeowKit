@@ -27,7 +27,8 @@ const deny = (reason) => {
   process.exit(2);
 };
 
-const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+const { resolveProjectRoot } = require(path.join(__dirname, '../../../hooks/lib/project-root.cjs'));
+const root = resolveProjectRoot();
 
 const HELPER = path.join(__dirname, '../../../hooks/lib/parse-stdin.cjs');
 let readHookInput;

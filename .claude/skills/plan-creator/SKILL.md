@@ -66,6 +66,8 @@ dependency_edges:
 
 # Plan Creator
 
+> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+
 Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, visual rendering, archive, and memory entries stay with their existing owners.
 
 ## When to Use

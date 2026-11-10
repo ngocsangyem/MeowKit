@@ -1,7 +1,7 @@
 # Destructive Command Patterns
 
 > Patterns that trigger a warning in `mk:careful` mode.
-> Referenced by: `.claude/skills/careful/SKILL.md` and `.claude/skills/careful/bin/check-careful.cjs`
+> Referenced by: `SKILL.md` and `bin/check-careful.cjs`
 > Update this file when new destructive patterns are discovered in production — and keep the hook in sync.
 >
 > **Implementation status:** `check-careful.cjs` enforces all CRITICAL and HIGH patterns listed below. Production auto-block is active: when `NODE_ENV`, `APP_ENV`, or `ENVIRONMENT` contains `production`/`prod`/`staging`, CRITICAL patterns return `permissionDecision: "block"` (no override) instead of `"ask"`.

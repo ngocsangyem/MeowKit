@@ -137,7 +137,7 @@ If no frontend is involved (CLI tool, backend API, data pipeline), write "N/A â€
 Run the dedicated product-spec validator script (NOT inline bash â€” per `lessons-build-skill.md` "Store Scripts" principle):
 
 ```bash
-.claude/skills/plan-creator/scripts/check-product-spec.sh "{plan_dir}/plan.md"
+scripts/check-product-spec.sh "{plan_dir}/plan.md"
 ```
 
 The script enforces:

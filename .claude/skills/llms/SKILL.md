@@ -55,11 +55,11 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 
 ```bash
 # Generate llms.txt (script does the heavy lifting)
-node .claude/hooks/lib/skill-python.cjs .claude/skills/llms/scripts/generate-llms-txt.py \
+node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/generate-llms-txt.py \
   --source ./docs [--output .] [--base-url https://example.com/docs] [--full]
 
 # Preview metadata first (Claude reviews before generating)
-node .claude/hooks/lib/skill-python.cjs .claude/skills/llms/scripts/generate-llms-txt.py \
+node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/generate-llms-txt.py \
   --source ./docs --json
 ```
 

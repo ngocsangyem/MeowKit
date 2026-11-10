@@ -27,7 +27,7 @@ runtime: claude-code
 
 # Rubric Library API
 
-Discovery, composition, and validation for the rubric library at `.claude/skills/rubric/rubrics/`.
+Discovery, composition, and validation for the rubric library at `rubrics/`.
 
 > **Path convention:** Commands below assume cwd is `$CLAUDE_PROJECT_DIR` (project root). Prefix paths with `"$CLAUDE_PROJECT_DIR/"` when invoking from subdirectories.
 
@@ -55,16 +55,16 @@ Activate when:
 
 ```bash
 # List all rubrics
-.claude/skills/rubric/scripts/load-rubric.sh --list
+${CLAUDE_SKILL_DIR}/scripts/load-rubric.sh --list
 
 # Load one rubric for the evaluator
-.claude/skills/rubric/scripts/load-rubric.sh design-quality
+${CLAUDE_SKILL_DIR}/scripts/load-rubric.sh design-quality
 
 # Compose a preset (returns all member rubrics + weight table)
-.claude/skills/rubric/scripts/load-rubric.sh --preset frontend-app
+${CLAUDE_SKILL_DIR}/scripts/load-rubric.sh --preset frontend-app
 
 # Validate every rubric file in the library
-.claude/skills/rubric/scripts/validate-rubric.sh
+${CLAUDE_SKILL_DIR}/scripts/validate-rubric.sh
 ```
 
 ## Output Schema
@@ -103,7 +103,7 @@ Activate when:
 
 ## Schema
 
-Rubrics MUST conform to `.claude/skills/rubric/rubrics/schema.md`. The validator enforces:
+Rubrics MUST conform to `rubrics/schema.md`. The validator enforces:
 - Required frontmatter fields (`name`, `version`, `weight_default`, `applies_to`, `hard_fail_threshold`)
 - Required sections in order
 - ≥1 PASS + ≥1 FAIL anchor example, balanced (±1)
@@ -120,7 +120,7 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 
 ## Gotchas
 
-- **Adding a new rubric:** drop a `.md` file into `.claude/skills/rubric/rubrics/`, run `validate-rubric.sh`, register weight in any preset that should include it.
+- **Adding a new rubric:** drop a `.md` file into `rubrics/`, run `validate-rubric.sh`, register weight in any preset that should include it.
 - **Weight drift:** if you change a rubric's `weight_default`, all presets that reference it must be re-checked for sum=1.0.
 - **Anti-patterns are FIXED:** they trigger FAIL regardless of the surrounding criteria. Don't add subjective ones.
 - **Don't load all rubrics:** the evaluator should load only the relevant preset, not the whole library — context efficiency.

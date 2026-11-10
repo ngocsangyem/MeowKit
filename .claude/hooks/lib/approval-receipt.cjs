@@ -144,3 +144,19 @@ function stamp(file, approver = 'human', today = new Date()) {
 }
 
 module.exports = { FRESH, NO_RECEIPT, STALE, UNREADABLE, hash, planBody, planHash, stamp, storedHash, verify };
+
+// Command line: `node approval-receipt.cjs stamp <plan.md> [approver] | verify <plan.md> | hash <plan.md>`.
+// `mewkit plan approve` runs this file directly. Without this entry the module loaded, did
+// nothing and exited 0, so the caller reported a stamp that was never written. Every outcome
+// other than FRESH exits with its non-zero code, so a caller can never mistake a no-op for success.
+if (require.main === module) {
+  const [command, file, approver] = process.argv.slice(2);
+  const commands = { stamp: () => stamp(file, approver || 'human'), verify: () => verify(file), hash: () => hash(file) };
+  if (!commands[command] || !file) {
+    process.stderr.write('Usage: approval-receipt.cjs stamp <plan.md> [approver] | verify <plan.md> | hash <plan.md>\n');
+    process.exit(2);
+  }
+  const result = commands[command]();
+  (result.code === FRESH ? process.stdout : process.stderr).write(`${result.status}\n`);
+  process.exit(result.code);
+}

@@ -49,6 +49,15 @@
 			"active": true
 		},
 		{
+			"sourcePath": "root/.codex/hooks/hook-runtime-config.json",
+			"targetPath": ".codex/hooks/hook-runtime-config.json",
+			"provider": "codex",
+			"mode": "0644",
+			"ownership": "managed-replace",
+			"scopeTags": ["managed-runtime"],
+			"active": true
+		},
+		{
 			"sourcePath": "root/.codex/hooks/privacy-block.cjs",
 			"targetPath": ".codex/hooks/privacy-block.cjs",
 			"provider": "codex",

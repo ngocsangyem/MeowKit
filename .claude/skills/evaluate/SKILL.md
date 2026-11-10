@@ -32,6 +32,8 @@ requires_runtime: [python>=3.9]
 
 # mk:evaluate — Experimental Behavioral Verification
 
+> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+
 Step-file workflow that drives a running build, probes each rubric criterion via active verification, and produces a graded verdict with runtime evidence. Owned by the `evaluator` agent (Phase 3+).
 
 ## When to Use

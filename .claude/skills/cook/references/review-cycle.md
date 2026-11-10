@@ -9,7 +9,7 @@ cycle = 0
 LOOP:
   1. Spawn reviewer subagent → score, critical_count, warnings, suggestions
 
-  2. Run .claude/skills/cook/scripts/validate-gate-2.cjs (if available)
+  2. Run scripts/validate-gate-2.cjs (if available)
 
   3. DISPLAY FINDINGS:
      Review: [score]/10

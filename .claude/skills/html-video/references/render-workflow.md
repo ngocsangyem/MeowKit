@@ -27,7 +27,7 @@ WIDTH=1920
 HEIGHT=1080
 FRAME_DIR="/tmp/mk-html-video-frames-$$"
 
-node .claude/skills/html-video/scripts/capture-frames.mjs \
+node scripts/capture-frames.mjs \
   "$HTML_FILE" "$FRAME_DIR" "$FPS" "$DURATION" "$WIDTH" "$HEIGHT"
 ```
 

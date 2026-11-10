@@ -23,7 +23,8 @@ const allow = () => {
   process.exit(0);
 };
 
-const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+const { resolveProjectRoot } = require(path.join(__dirname, '../../../hooks/lib/project-root.cjs'));
+const root = resolveProjectRoot();
 const stateDir = process.env.CLAUDE_PLUGIN_DATA || path.join(root, '.meowkit/state');
 const boundaryFile = path.join(stateDir, 'freeze-dir.txt');
 

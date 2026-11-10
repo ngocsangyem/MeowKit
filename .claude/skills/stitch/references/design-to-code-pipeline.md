@@ -29,12 +29,12 @@ Text prompt → stitch-api-call.ts generate → stitch-api-call.ts export
 
 ```bash
 # 1. Generate
-npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts \
+npx tsx scripts/stitch-api-call.ts \
   generate "E-commerce product page with image gallery, price, reviews, add-to-cart"
 
 # 2. Export + write
-npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts export <screen-id> --format all | \
-  npx tsx .claude/skills/stitch/scripts/stitch-write-output.ts
+npx tsx scripts/stitch-api-call.ts export <screen-id> --format all | \
+  npx tsx scripts/stitch-write-output.ts
 
 # 3. Implement (mk:frontend-design reads DESIGN.md as design spec)
 # Activate mk:frontend-design: "Implement from tasks/designs/<plan>/<screen-id>/DESIGN.md"
@@ -59,12 +59,12 @@ Prompt → Generate → Variants → User Picks → Export + Write → Implement
 
 ```bash
 # Generate with variants
-npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts \
+npx tsx scripts/stitch-api-call.ts \
   generate "SaaS pricing page" --variants 3
 
 # User reviews images, picks variant 2 (screen-id from variants[] in JSON output)
-npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts export <variant-2-screen-id> --format all | \
-  npx tsx .claude/skills/stitch/scripts/stitch-write-output.ts
+npx tsx scripts/stitch-api-call.ts export <variant-2-screen-id> --format all | \
+  npx tsx scripts/stitch-write-output.ts
 ```
 
 ## DESIGN.md Specification
@@ -133,12 +133,12 @@ Always check quota before generating:
 
 ```bash
 # Pre-check
-npx tsx .claude/skills/stitch/scripts/stitch-quota.ts check
+npx tsx scripts/stitch-quota.ts check
 
 # If exhausted (exit code 2):
 # → Use mk:frontend-design for text-based design instead
 
 # If credits available:
-npx tsx .claude/skills/stitch/scripts/stitch-api-call.ts generate "<prompt>"
+npx tsx scripts/stitch-api-call.ts generate "<prompt>"
 # (quota auto-tracked inside stitch-api-call.ts)
 ```

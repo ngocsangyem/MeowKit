@@ -71,7 +71,7 @@ Invoke `project-manager` with the resolved plan directory:
 Generate delivery status for plan at <plan-dir>.
 Write report to <plan-dir>/status-reports/{YYMMDD}-status.md
 (create the status-reports/ subdir if absent).
-Load template from .claude/skills/status/assets/pm-status-template.md.
+Load template from ${CLAUDE_SKILL_DIR}/assets/pm-status-template.md.
 ```
 
 **Foreground invocation** — do not include "run in the background" in the prompt. The run waits
@@ -111,6 +111,6 @@ only the silent background fires described in
 ## Related
 
 - Agent: `.claude/agents/project-manager.md`
-- Template: `.claude/skills/status/assets/pm-status-template.md`
+- Template: `assets/pm-status-template.md`
 - Background auto-fire policy: `.claude/skills/cook/references/post-phase-delegation.md`
 - Forward-looking alternative: `mk:help`

@@ -32,6 +32,8 @@ adapted_for: claude-code
 
 # mk:trace-analyze — Scatter-Gather Trace Analysis
 
+> Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
+
 Step-file workflow that ingests `.meowkit/telemetry/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel `researcher` subagents, gathers cross-batch patterns, and gates suggestions through human review before any harness change is applied.
 
 ## Deterministic CLI companion

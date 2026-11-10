@@ -11,7 +11,7 @@ Pick the autobuild scaffolding density (`MINIMAL`, `FULL`, `LEAN`) based on the 
 3. **`density-select.sh`** (or invoke `mk:scale-routing` directly): emits the density token based on detected model + tier.
 
 ```bash
-density=$(.claude/skills/autobuild/scripts/density-select.sh)
+density=$(scripts/density-select.sh)
 ```
 
 The script returns one of: `MINIMAL`, `FULL`, `LEAN`. See `references/adaptive-density-matrix.md` for the full decision table.

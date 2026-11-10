@@ -51,7 +51,7 @@ Follow these steps strictly in order:
 2. **Load persisted preferences** (optional) — read user preferences from
    `${CLAUDE_PLUGIN_DATA}/showcase/preferences.json`:
    ```bash
-   node .claude/skills/showcase/scripts/preferences.js get
+   node ${CLAUDE_SKILL_DIR}/scripts/preferences.js get
    ```
    CLI flags override stored preferences for the current run.
 
@@ -76,14 +76,14 @@ Follow these steps strictly in order:
 
 6. **Screenshots** (`--no-screenshots` skips this step entirely):
    ```bash
-   node .claude/skills/showcase/scripts/capture-sections.js \
+   node ${CLAUDE_SKILL_DIR}/scripts/capture-sections.js \
      --url "file:///path/to/index.html" \
      --output-dir "assets/showcase/<mission-slug>/images" \
      --sections "#hero,#section-2,#section-3" \
      --ratios "horizontal,vertical,square" \
      --settle-delay 1500
    ```
-   Puppeteer must be installed (`npm install` in `.claude/skills/showcase/scripts/`).
+   Puppeteer must be installed (`npm install` in `scripts/`).
    If capture fails (Puppeteer absent, Chrome unavailable), report the error and the
    local HTML path — do NOT silently skip or mark the task complete.
 
@@ -115,16 +115,16 @@ assets/showcase/<mission-slug>/
 
 ```bash
 # Print resolved preferences
-node .claude/skills/showcase/scripts/preferences.js get
+node ${CLAUDE_SKILL_DIR}/scripts/preferences.js get
 
 # Persist opt-outs
-node .claude/skills/showcase/scripts/preferences.js set --no-screenshots --no-publish
+node ${CLAUDE_SKILL_DIR}/scripts/preferences.js set --no-screenshots --no-publish
 
 # Single-language mode
-node .claude/skills/showcase/scripts/preferences.js set --languages en
+node ${CLAUDE_SKILL_DIR}/scripts/preferences.js set --languages en
 
 # Reset to defaults
-node .claude/skills/showcase/scripts/preferences.js reset
+node ${CLAUDE_SKILL_DIR}/scripts/preferences.js reset
 ```
 
 State is written to `${CLAUDE_PLUGIN_DATA}/showcase/preferences.json` (stable across
@@ -133,7 +133,7 @@ plugin upgrades). Override path for tests: `MK_SHOWCASE_PREFS_PATH` env var.
 ## Capture Script Options
 
 ```bash
-node .claude/skills/showcase/scripts/capture-sections.js \
+node ${CLAUDE_SKILL_DIR}/scripts/capture-sections.js \
   --url         "file:///absolute/path/to/index.html"  # required
   --output-dir  "./images"                               # required
   --sections    "#hero,#about,#features"                # required; CSS selectors
@@ -148,7 +148,7 @@ node .claude/skills/showcase/scripts/capture-sections.js \
 
 **Install Puppeteer** (required for screenshots):
 ```bash
-cd .claude/skills/showcase/scripts && npm install
+cd ${CLAUDE_SKILL_DIR}/scripts && npm install
 ```
 
 ## Security

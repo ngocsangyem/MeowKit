@@ -3,7 +3,7 @@
 Catalog of all evaluation rubrics and composition presets used by the `evaluator` agent (via `mk:evaluate`) and the standalone `mk:rubric` skill.
 
 > Generated reference. To regenerate, run:
-> `.claude/skills/rubric/scripts/load-rubric.sh --list`
+> `scripts/load-rubric.sh --list`
 
 ## Rubrics
 
@@ -32,16 +32,16 @@ Catalog of all evaluation rubrics and composition presets used by the `evaluator
 
 ## Schema
 
-All rubrics conform to `schema.md`. Validator: `.claude/skills/rubric/scripts/validate-rubric.sh`.
+All rubrics conform to `schema.md`. Validator: `scripts/validate-rubric.sh`.
 
 ## Adding a Custom Rubric
 
-1. Drop a `.md` file into `.claude/skills/rubric/rubrics/` following the schema
+1. Drop a `.md` file into `rubrics/` following the schema
 2. Run `validate-rubric.sh path/to/new-rubric.md`
 3. Optionally register in a composition preset (re-validate weight sum after)
 4. Add a row to this index
 
-See `meowkit/.claude/skills/rubric/references/calibration-guide.md` for anchor-example rules.
+See `meowkit/references/calibration-guide.md` for anchor-example rules.
 
 ## Hard-Fail Semantics
 
@@ -55,7 +55,7 @@ In a composition, **any single rubric returning a verdict ≥ its hard_fail_thre
 ## Files
 
 ```
-.claude/skills/rubric/rubrics/
+rubrics/
 ├── RUBRICS_INDEX.md             ← this file
 ├── schema.md                    ← canonical rubric format spec
 ├── product-depth.md
@@ -84,5 +84,5 @@ Rubrics use SemVer in their frontmatter. Bump `version`:
 
 - Phase 2 plan: `plans/260407-2331-meowkit-harness-gan-architecture/phase-02-graded-evaluation-rubric-library.md`
 - Phase 3 (consumer, **shipped 260408**): the `evaluator` agent at `.claude/agents/evaluator.md` and `mk:evaluate` skill at `.claude/skills/evaluate/`
-- Registers `.claude/skills/rubric/rubrics/` in `meowkit-rules.md` canonical paths table (pending — until then, this directory is convention-only, not in the canonical table)
-- Calibration: `meowkit/.claude/skills/rubric/references/calibration-guide.md`
+- Registers `rubrics/` in `meowkit-rules.md` canonical paths table (pending — until then, this directory is convention-only, not in the canonical table)
+- Calibration: `meowkit/references/calibration-guide.md`

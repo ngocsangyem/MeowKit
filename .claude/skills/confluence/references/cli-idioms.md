@@ -32,7 +32,7 @@ Stored variable values do not trigger command substitution on simple expansion, 
 ## Read-only ops
 
 ```bash
-WRAPPER="$CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh"
+WRAPPER="scripts/confluence-as.sh"
 
 bash "$WRAPPER" page get --page-id 12345
 bash "$WRAPPER" space list --limit 50
@@ -52,7 +52,7 @@ bash "$WRAPPER" page delete --page-id 12345 --confirm
 User-derived input MUST flow through `cql-sanitize.sh` before reaching `--cql`:
 
 ```bash
-SANITIZER="$CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/cql-sanitize.sh"
+SANITIZER="scripts/cql-sanitize.sh"
 SAFE=$(bash "$SANITIZER" "$USER_TERM") || {
   echo "rejected: $USER_TERM"; exit 1
 }
@@ -90,10 +90,10 @@ confluence-as uses cursor pagination. CLI commands handle paging internally and 
 
 ```bash
 # stdin (no second fetch): pipe an ADF body in, get MD out
-printf '%s' "$ADF_JSON" | bash "$ROOT/.claude/skills/confluence/scripts/adf-to-md.sh"
+printf '%s' "$ADF_JSON" | bash "$ROOT/scripts/adf-to-md.sh"
 
 # fetch-and-convert (--page-id): single round-trip via the wrapper
-bash "$ROOT/.claude/skills/confluence/scripts/adf-to-md.sh" --page-id 12345
+bash "$ROOT/scripts/adf-to-md.sh" --page-id 12345
 ```
 
 Reverse direction (md → adf) is deferred — no current consumer calls
