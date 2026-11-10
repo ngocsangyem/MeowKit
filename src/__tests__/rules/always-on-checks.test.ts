@@ -38,6 +38,9 @@ function makeAlwaysOnTree(): string {
 	for (const name of ALWAYS_ON_RULES) {
 		fs.copyFileSync(path.join(REPO_ROOT, ".claude", "rules", name), path.join(rules, name));
 	}
+	// The ship set counts only git-tracked files, so the tree is a repo with everything staged.
+	execFileSync("git", ["init", "-q"], { cwd: temp, stdio: "pipe" });
+	execFileSync("git", ["add", "-A"], { cwd: temp, stdio: "pipe" });
 	return temp;
 }
 

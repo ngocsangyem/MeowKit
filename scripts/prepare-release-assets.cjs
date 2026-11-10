@@ -10,7 +10,13 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { execSync, spawnSync } = require("child_process");
-const { ARCHIVE_TARGETS, CRITICAL_TARGETS, shipSetExclusions, zipExcludeArgs } = require("./kit-ship-set.cjs");
+const {
+  ARCHIVE_TARGETS,
+  CRITICAL_TARGETS,
+  excludeMatcher,
+  shipSetExclusions,
+  shipSetFiles,
+} = require("./kit-ship-set.cjs");
 
 const version = process.argv[2];
 if (!version) {
@@ -66,16 +72,19 @@ try {
     }
   }
 
-  // Exclusions come from the pack manifest's `base.exclude`, which the kit
-  // artifact build reads too. Patterns are passed as separate args (no shell) so
-  // glob expansion is done by zip's matcher, not by the shell — `*` then
-  // correctly crosses `/`, which is the semantics the shared matcher implements.
-  const excludes = zipExcludeArgs(shipSetExclusions(projectRoot));
-  const zipResult = spawnSync(
-    "zip",
-    ["-r", archivePath, ...archiveTargets, ...excludes],
-    { stdio: "inherit" }
-  );
+  // The zip carries exactly the shared ship set — the same list the kit
+  // artifact build archives — fed to zip on stdin. Letting zip walk the targets
+  // itself would publish whatever else sits in the working tree (untracked or
+  // git-ignored files), which `base.exclude` alone cannot anticipate.
+  const files = shipSetFiles(projectRoot, excludeMatcher(shipSetExclusions(projectRoot)));
+  if (files.length === 0) throw new Error("the ship set is empty — nothing would be published");
+  // `zip -@` reads one name per line, so a name with a line break would be split.
+  const unlistable = files.find((f) => /[\r\n]/.test(f));
+  if (unlistable) throw new Error(`cannot pass a path with a line break to zip: ${JSON.stringify(unlistable)}`);
+  const zipResult = spawnSync("zip", [archivePath, "-@"], {
+    input: `${files.join("\n")}\n`,
+    stdio: ["pipe", "inherit", "inherit"],
+  });
   if (zipResult.status !== 0) {
     throw new Error(`zip exited with status ${zipResult.status}`);
   }

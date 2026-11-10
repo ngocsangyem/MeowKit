@@ -13,6 +13,7 @@
  * A pattern must match the whole repo-relative path.
  */
 
+const { execFileSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
@@ -102,7 +103,42 @@ function excludeMatcher(patterns) {
 }
 
 /**
+ * Files the release pipeline writes into the tree just before archiving. They
+ * are git-ignored on purpose, so the tracked-files check would otherwise drop
+ * them from the kit they describe.
+ */
+const BUILD_OUTPUTS = new Set(["release-manifest.json"]);
+
+/**
+ * Every path git tracks under `projectRoot`, relative to it, forward slashes.
+ *
+ * Throws outside a git work tree rather than returning "everything": a release
+ * built where tracking cannot be checked must not quietly fall back to shipping
+ * whatever happens to be on disk.
+ */
+function trackedFiles(projectRoot) {
+	let out;
+	try {
+		out = execFileSync("git", ["ls-files", "-z", "--", "."], {
+			cwd: projectRoot,
+			stdio: ["ignore", "pipe", "pipe"],
+			// The default 1 MB cap is within a few times of this repo's listing today.
+			maxBuffer: 64 * 1024 * 1024,
+		});
+	} catch (error) {
+		throw new Error(`cannot list git-tracked files in ${projectRoot}: ${error.message}`);
+	}
+	return new Set(out.toString("utf8").split("\0").filter(Boolean));
+}
+
+/**
  * Every file the kit ships, repo-relative with forward slashes, sorted.
+ *
+ * Only files git tracks are shipped (plus the named BUILD_OUTPUTS). A release is
+ * built from a maintainer's working tree, and that tree carries files the repo
+ * never meant to publish — `.claude/settings.local.json` ignored through a
+ * personal global ignore, `.DS_Store`, scratch output. `base.exclude` can only
+ * list what someone thought of; the tracked check closes the rest.
  *
  * Member order is pinned here rather than taken from the filesystem: readdir
  * order varies by filesystem and by machine, and an archive whose member order
@@ -110,6 +146,7 @@ function excludeMatcher(patterns) {
  * unusable as an identity for the content.
  */
 function shipSetFiles(projectRoot, isExcluded) {
+	const tracked = trackedFiles(projectRoot);
 	const files = [];
 	const walk = (rel) => {
 		const abs = path.join(projectRoot, rel);
@@ -121,6 +158,7 @@ function shipSetFiles(projectRoot, isExcluded) {
 		}
 		if (!stat.isFile()) return;
 		if (isExcluded(rel)) return;
+		if (!tracked.has(rel) && !BUILD_OUTPUTS.has(rel)) return;
 		files.push(rel);
 	};
 	for (const target of ARCHIVE_TARGETS) {
