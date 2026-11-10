@@ -1,0 +1,12 @@
+[package]
+name = "mewkit-core"
+description = "Runtime-agnostic core of the mewkit installer: no CLI parsing, prompts or process exits."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

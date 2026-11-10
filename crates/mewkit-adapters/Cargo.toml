@@ -1,0 +1,15 @@
+[package]
+name = "mewkit-adapters"
+description = "Per-runtime adapters (Claude Code, Codex, Cursor) for the mewkit installer."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+mewkit-core = { path = "../mewkit-core" }
+
+[lints]
+workspace = true

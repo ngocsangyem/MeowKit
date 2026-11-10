@@ -88,3 +88,6 @@ tmp/
 # machine-local and reproducible from each skill's own pinned requirements, so
 # there is nothing here worth committing.
 .meowkit/envs/
+
+# Rust build output
+target/

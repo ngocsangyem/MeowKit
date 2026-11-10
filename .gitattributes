@@ -1,0 +1,2 @@
+# Golden manifests are compared byte-for-byte on every OS.
+crates/mewkit-cli/tests/golden/** text eol=lf
