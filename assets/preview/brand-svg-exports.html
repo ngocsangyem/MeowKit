@@ -1,42 +1,55 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<link rel="stylesheet" href="../colors_and_type.css" />
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand — Exported files</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
-  body { margin: 0; padding: 22px 24px; font-family: var(--mk-font-sans); background: var(--mk-bg-base); display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .tile { background: var(--mk-neutral-0); border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 24px 20px 14px; position: relative; min-height: 110px; display: grid; place-items: center; }
-  .tile.dark { background: var(--mk-neutral-950); border-color: rgba(255,255,255,.08); }
-  .tile .tag { position: absolute; top: 10px; left: 14px; font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-neutral-500); }
-  .tile.dark .tag { color: var(--mk-neutral-300); }
-  .tile img { max-width: 80%; height: auto; }
-  .fav-row { display: flex; align-items: flex-end; gap: 20px; }
-  .fav-row img { height: auto; }
-  .fav-row .lbl { font-family: var(--mk-font-mono); font-size: 10px; color: var(--mk-neutral-500); letter-spacing: .08em; margin-top: 6px; text-align: center; }
-  .fav-row .col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 22px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .tile { border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 28px 18px 14px; position: relative; min-height: 120px; display: grid; place-items: center; }
+  .tile.night { background: var(--mk-neutral-900); border-color: rgb(238 242 247 / .12); }
+  .tile.haze { background: var(--mk-neutral-200); }
+  .tag { position: absolute; top: 10px; left: 14px; font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-fg-2); }
+  .tile.night .tag { color: var(--mk-neutral-300); }
+  .tile.haze .tag { color: var(--mk-neutral-700); }
+  .tile img { width: 78%; max-width: 260px; height: auto; display: block; }
+  .tile.sym img { width: auto; height: 54px; }
+  .row { display: flex; align-items: flex-end; gap: 22px; }
+  .row figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .row figcaption { font-family: var(--mk-font-mono); font-size: 10px; color: var(--mk-fg-2); }
+  .row img { width: auto; }
+  .og { grid-column: span 2; }
+  .og img { width: 100%; max-width: none; border-radius: var(--mk-radius-xs); }
 </style>
 </head>
 <body>
+  <div class="tile"><span class="tag">meow-logo.svg</span><img src="../branding/meow-logo.svg" alt="Lockup"></div>
+  <div class="tile night"><span class="tag">meow-logo-dark.svg</span><img src="../branding/meow-logo-dark.svg" alt="Lockup reversed"></div>
+  <div class="tile haze"><span class="tag">meow-logo-mono.svg</span><img src="../branding/meow-logo-mono.svg" alt="Lockup in one colour"></div>
+
+  <div class="tile sym"><span class="tag">meow-symbol.svg</span><img src="../branding/meow-symbol.svg" alt="Symbol"></div>
+  <div class="tile sym night"><span class="tag">meow-symbol-dark.svg</span><img src="../branding/meow-symbol-dark.svg" alt="Symbol reversed"></div>
+  <div class="tile sym"><span class="tag">meow-symbol-small.svg</span><img src="../branding/meow-symbol-small.svg" alt="Small cut, cursor only"></div>
+
+  <div class="tile"><span class="tag">meow-logo-animated.svg</span><img src="../branding/meow-logo-animated.svg" alt="Animated lockup, SVG"></div>
+  <div class="tile"><span class="tag">meow-logo-animated.gif</span><img src="../branding/meow-logo-animated.gif" alt="Animated lockup, GIF"></div>
   <div class="tile">
-    <span class="tag">MEOW-LOGO.SVG</span>
-    <img src="../assets/branding/meow-logo.svg" alt="/meow logo" />
-  </div>
-  <div class="tile dark">
-    <span class="tag">MEOW-LOGO-DARK.SVG</span>
-    <img src="../assets/branding/meow-logo-dark.svg" alt="/meow logo dark" />
-  </div>
-  <div class="tile">
-    <span class="tag">MEOW-LOGO-MONO.SVG</span>
-    <img src="../assets/branding/meow-logo-mono.svg" alt="/meow logo mono" />
-  </div>
-  <div class="tile">
-    <span class="tag">MEOW-FAVICON.SVG · 16 · 32 · 64</span>
-    <div class="fav-row">
-      <div class="col"><img src="../assets/branding/meow-favicon.svg" width="16" height="16" /><span class="lbl">16</span></div>
-      <div class="col"><img src="../assets/branding/meow-favicon.svg" width="32" height="32" /><span class="lbl">32</span></div>
-      <div class="col"><img src="../assets/branding/meow-favicon.svg" width="64" height="64" /><span class="lbl">64</span></div>
+    <span class="tag">favicons · 16 · 32 · 180</span>
+    <div class="row">
+      <figure><img src="../branding/meow-favicon-16.png" width="16" height="16" alt="Favicon 16"><figcaption>16.png</figcaption></figure>
+      <figure><img src="../branding/meow-favicon-32.png" width="32" height="32" alt="Favicon 32"><figcaption>32.png</figcaption></figure>
+      <figure><img src="../branding/meow-favicon.svg" width="48" height="48" alt="Favicon SVG"><figcaption>.svg</figcaption></figure>
+      <figure><img src="../branding/meow-apple-touch-icon.png" width="60" height="60" alt="Apple touch icon"><figcaption>apple 180</figcaption></figure>
     </div>
   </div>
+
+  <div class="tile og"><span class="tag">meow-og.png · 1200 × 630</span><img src="../branding/meow-og.png" alt="Open Graph card"></div>
+  <div class="tile"><span class="tag">meow-favicon.ico · 16 + 32</span><img src="../branding/meow-favicon.ico" width="32" height="32" alt="Favicon ICO" style="width:32px"></div>
 </body>
 </html>

@@ -2,242 +2,168 @@
 const mobileOpen = ref(false)
 
 const navLinks = [
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Capabilities', href: '#features' },
+  { label: 'Workflow', href: '#workflow' },
+  { label: 'Features', href: '#features' },
+  { label: 'Questions', href: '#questions' },
   { label: 'Install', href: '#install' },
-  // external flag = open in a new tab (also skips the smooth-scroll handler)
-  { label: 'Demo', href: '/demo', external: true },
-  { label: 'Docs', href: 'https://docs.meowkit.dev/', external: true },
 ]
 
-function toggleMobile() {
-  mobileOpen.value = !mobileOpen.value
-}
+const docsUrl = 'https://docs.meowkit.dev/'
 
 function closeMobile() {
   mobileOpen.value = false
 }
 
-function handleNavClick(event: MouseEvent, href: string, external?: boolean) {
-  if (external || !href.startsWith('#')) return
-  event.preventDefault()
+function handleNavClick(event: MouseEvent, href: string) {
+  if (!href.startsWith('#')) return
   closeMobile()
-
   const target = document.querySelector<HTMLElement>(href)
   if (!target) return
-
-  const currentY = window.scrollY
-  const targetY = target.getBoundingClientRect().top + currentY
-
-  // If the scroll path crosses the sticky-scroll section, the browser's smooth-scroll
-  // crawls through ~1800px of non-moving sticky content, appearing to freeze.
-  // Detect crossing and jump instantly instead.
-  const scrollTrack = document.querySelector<HTMLElement>('.hiw-scroll-track')
-  let behavior: ScrollBehavior = 'smooth'
-
-  if (scrollTrack) {
-    const trackStart = scrollTrack.getBoundingClientRect().top + currentY
-    const trackEnd = trackStart + scrollTrack.offsetHeight
-    const crossesDown = currentY < trackEnd && targetY > trackEnd
-    const crossesUp = currentY > trackStart && targetY < trackStart
-    if (crossesDown || crossesUp) behavior = 'instant'
-  }
-
-  target.scrollIntoView({ behavior })
+  event.preventDefault()
+  const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  target.scrollIntoView({ block: 'start', behavior: smooth ? 'smooth' : 'auto' })
+  history.replaceState(null, '', href)
 }
 </script>
 
 <template>
-  <header role="banner">
-    <!-- Floating pill: detached from page edges, blur sits over the dark canvas -->
-    <nav class="nav-pill" aria-label="Main navigation">
-      <TheLogo size="sm" />
+  <header class="topbar" :class="{ 'is-open': mobileOpen }" role="banner">
+    <div class="mk-wrap topbar__row">
+      <a class="mk-skip" href="#main-content">Skip to content</a>
+      <TheLogo size="sm" class="topbar__brand" />
 
-      <ul class="nav-pill__links" role="list">
-        <li v-for="link in navLinks" :key="link.href">
-          <a
-            :href="link.href"
-            class="nav-pill__link"
-            :target="link.external ? '_blank' : undefined"
-            :rel="link.external ? 'noopener noreferrer' : undefined"
-            @click="handleNavClick($event, link.href, link.external)"
-          >{{ link.label }}</a>
-        </li>
-      </ul>
+      <nav class="topbar__menu" aria-label="Main">
+        <a
+          v-for="link in navLinks"
+          :key="link.href"
+          class="topbar__item"
+          :href="link.href"
+          @click="handleNavClick($event, link.href)"
+        >{{ link.label }}</a>
+      </nav>
 
-      <a
-        href="https://github.com/ngocsangyem/MeowKit"
-        class="nav-pill__cta"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="View MeowKit on GitHub"
-      >GitHub</a>
+      <div class="topbar__actions">
+        <a class="topbar__item topbar__item--docs" :href="docsUrl">Docs</a>
+        <a class="mk-btn mk-btn--primary topbar__cta" href="#install" @click="handleNavClick($event, '#install')">
+          Install MeowKit
+        </a>
+      </div>
 
-      <!-- Mobile toggle -->
       <button
-        class="nav-pill__toggle"
+        class="topbar__burger"
+        type="button"
         :aria-expanded="mobileOpen"
-        aria-controls="mobile-menu"
-        aria-label="Toggle navigation menu"
-        @click="toggleMobile"
+        aria-controls="nav-sheet"
+        aria-label="Menu"
+        @click="mobileOpen = !mobileOpen"
       >
-        <svg v-if="!mobileOpen" class="nav-pill__toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-        <svg v-else class="nav-pill__toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <path
+            :d="mobileOpen ? 'M4 4l10 10M14 4L4 14' : 'M2 5h14M2 13h14'"
+            stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"
+          />
         </svg>
       </button>
-    </nav>
+    </div>
 
-    <!-- Mobile menu: sheet below the pill -->
-    <Transition name="slide-down">
-      <div v-if="mobileOpen" id="mobile-menu" class="nav-sheet">
-        <ul role="list" class="nav-sheet__links">
-          <li v-for="link in navLinks" :key="link.href">
-            <a
-              :href="link.href"
-              class="nav-sheet__link"
-              :target="link.external ? '_blank' : undefined"
-              :rel="link.external ? 'noopener noreferrer' : undefined"
-              @click="handleNavClick($event, link.href, link.external)"
-            >{{ link.label }}</a>
-          </li>
-          <li>
-            <a
-              href="https://github.com/ngocsangyem/MeowKit"
-              class="nav-sheet__link"
-              target="_blank"
-              rel="noopener noreferrer"
-              @click="closeMobile"
-            >GitHub</a>
-          </li>
-        </ul>
-      </div>
-    </Transition>
+    <div v-show="mobileOpen" id="nav-sheet" class="topbar__drawer">
+      <a
+        v-for="link in navLinks"
+        :key="link.href"
+        class="topbar__drawer-link"
+        :href="link.href"
+        @click="handleNavClick($event, link.href)"
+      >{{ link.label }}</a>
+      <a class="topbar__drawer-link" :href="docsUrl" @click="closeMobile">Docs</a>
+      <a class="mk-btn mk-btn--primary topbar__drawer-cta" href="#install" @click="handleNavClick($event, '#install')">
+        Install MeowKit
+      </a>
+    </div>
   </header>
 </template>
 
 <style scoped>
-.nav-pill {
-  position: fixed;
-  top: var(--space-md);
-  left: 50%;
-  transform: translateX(-50%);
-  display: inline-flex;
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--mk-z-bar);
+  background: var(--mk-veil);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: var(--mk-hairline) solid var(--mk-line);
+}
+
+.topbar__row {
+  display: flex;
   align-items: center;
-  gap: var(--space-lg);
-  padding: var(--space-xs) var(--space-md);
-  background: var(--color-nav-veil);
-  backdrop-filter: blur(14px) saturate(120%);
-  -webkit-backdrop-filter: blur(14px) saturate(120%);
-  border: var(--rule-hair) solid var(--color-rule);
-  border-radius: var(--radius-pill);
-  z-index: var(--z-nav);
-  max-width: calc(100vw - 2rem);
+  gap: var(--mk-space-sm);
+  min-height: var(--mk-bar-height);
 }
 
-.nav-pill__links {
-  display: none;
-  align-items: center;
-  gap: var(--space-lg);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
+.topbar__brand { margin-inline-end: auto; }
 
-@media (min-width: 40rem) {
-  .nav-pill__links { display: flex; }
-}
+.topbar__menu,
+.topbar__actions { display: none; }
 
-.nav-pill__link {
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
+.topbar__item {
+  font-size: var(--mk-text-base);
+  color: var(--mk-ink);
   text-decoration: none;
   white-space: nowrap;
-  transition: color var(--dur-short) var(--ease-out);
+  transition: color var(--mk-dur-base) var(--mk-ease);
 }
-.nav-pill__link:hover { color: var(--color-ink); }
+.topbar__item:hover { color: var(--mk-accent); }
 
-.nav-pill__cta {
-  display: none;
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--color-accent);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color var(--dur-short) var(--ease-out);
-}
-.nav-pill__cta:hover { color: var(--color-focus); }
-
-@media (min-width: 40rem) {
-  .nav-pill__cta { display: inline-flex; }
-}
-
-.nav-pill__toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  margin: calc(var(--space-xs) * -1) calc(var(--space-xs) * -1);
-  border: none;
-  background: transparent;
-  color: var(--color-ink-2);
+.topbar__burger {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  /* no negative inline margin: the button must end on the container's right
+   * line, not 10px past it */
+  margin-inline-end: 0;
+  border: 0;
+  border-radius: var(--mk-radius-chip);
+  background: none;
+  color: var(--mk-ink);
   cursor: pointer;
-  transition: color var(--dur-short) var(--ease-out);
-}
-.nav-pill__toggle:hover { color: var(--color-ink); }
-
-@media (min-width: 40rem) {
-  .nav-pill__toggle { display: none; }
 }
 
-.nav-pill__toggle-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-/* ─ Mobile sheet ─ */
-.nav-sheet {
-  position: fixed;
-  top: calc(var(--space-md) + 3.5rem);
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(20rem, calc(100vw - 2rem));
-  padding: var(--space-sm);
-  background: var(--color-paper-2);
-  border: var(--rule-hair) solid var(--color-rule);
-  border-radius: var(--radius-sm);
-  z-index: var(--z-nav);
-}
-
-@media (min-width: 40rem) {
-  .nav-sheet { display: none; }
-}
-
-.nav-sheet__links {
+/* ─ The sheet: a plain stacked list under the bar ─ */
+.topbar__drawer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  gap: var(--mk-space-3xs);
+  width: min(100% - 2 * var(--mk-rail), var(--mk-measure));
+  margin-inline: auto;
+  padding-block: var(--mk-space-xs) var(--mk-space-md);
+  border-top: var(--mk-hairline) solid var(--mk-line);
+}
+.topbar__drawer-link {
+  padding: var(--mk-space-xs) 0;
+  font-size: var(--mk-text-base);
+  color: var(--mk-ink);
+  text-decoration: none;
+}
+.topbar__drawer-cta { margin-top: var(--mk-space-2xs); }
+
+@media (min-width: 900px) {
+  .topbar__menu,
+  .topbar__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--mk-space-md);
+  }
+  .topbar__menu { margin-inline: auto; }
+  .topbar__brand { margin-inline-end: 0; }
+  .topbar__burger,
+  .topbar__drawer { display: none; }
 }
 
-.nav-sheet__link {
-  display: block;
-  padding: var(--space-sm);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-base);
-  color: var(--color-ink-2);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color var(--dur-short) var(--ease-out),
-              background-color var(--dur-short) var(--ease-out);
-}
-.nav-sheet__link:hover {
-  color: var(--color-ink);
-  background: var(--color-paper-3);
+/* The bar never widens the page: below 360px the wordmark alone carries the brand
+ * and the menu button stays reachable. */
+@media (max-width: 359px) {
+  .topbar__row { gap: var(--mk-space-2xs); }
 }
 </style>

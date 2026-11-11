@@ -1,26 +1,31 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Type — Body &amp; Inline</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Type — Body and inline</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
-  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; max-width: 720px; }
-  .eyebrow { font-family: var(--mk-font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mk-accent-glow); }
-  p { font-size: 16px; line-height: 1.6; color: var(--mk-fg-1); margin: 10px 0; }
-  .sub { font-size: 13px; color: var(--mk-fg-2); line-height: 1.55; }
-  code { font-family: var(--mk-font-mono); font-size: .92em; padding: 2px 6px; border-radius: 4px; background: rgba(37,99,235,.14); color: var(--mk-accent-glow); }
-  a { color: var(--mk-accent-glow); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  blockquote { margin: 14px 0; padding: 10px 16px; border-left: 2px solid var(--mk-accent-glow); color: var(--mk-fg-1); font-size: 15px; background: rgba(37,99,235,.08); border-radius: 0 6px 6px 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; max-width: 760px; }
+  .eyebrow { font-family: var(--mk-font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mk-fg-brand); }
+  p { font-size: 16px; line-height: 1.6; color: var(--mk-neutral-900); margin: 12px 0; }
+  .lede { font-size: 20px; line-height: 1.45; }
+  .caption { font-size: 13px; line-height: 1.55; color: var(--mk-fg-2); }
+  code { font-family: var(--mk-font-mono); font-size: .92em; padding: 2px 6px; border-radius: var(--mk-radius-xs); background: var(--mk-neutral-200); color: var(--mk-neutral-900); }
+  a { color: var(--mk-blue-700); text-decoration: underline; text-underline-offset: 2px; }
+  blockquote { margin: 16px 0; padding: 10px 18px; border-left: 2px solid var(--mk-blue-600); font-family: var(--mk-font-display); font-size: 20px; line-height: 1.35; color: var(--mk-neutral-900); }
 </style>
 </head>
 <body>
-  <div class="eyebrow">Body · Inter 400 · 16 / 1.6</div>
-  <p>MeowKit installs a <code>.claude/</code> directory that Claude Code reads at session start. It enforces a 7-phase workflow with two hard gates — no code ships without an approved plan and a passing review.</p>
-  <blockquote>AI agents need enforced discipline, not best practices.</blockquote>
-  <p class="sub">Secondary text uses <code>--mk-fg-2</code> (#94A3B8) at 13 / 1.55 — for captions, table metadata, and sidebar item descriptions. Links like <a href="#">docs.meowkit.dev</a> take the accent glow.</p>
+  <div class="eyebrow">Body · Onest 400 · 16 / 1.6</div>
+  <p class="lede">MeowKit installs a <code>.claude/</code> directory that Claude Code reads at the start of a session.</p>
+  <p>It runs a seven-phase workflow with two hard gates: no code is written before the plan is approved, and nothing ships before the review passes. Memory is two committed markdown files, so what the team learned survives the session.</p>
+  <blockquote>Rules define why. Hooks enforce what.</blockquote>
+  <p class="caption">Captions and metadata use muted <code>#566178</code> at 5.5:1 — short labels only. Body copy stays ink at 15.5:1, and links take <code>--mk-blue-700</code> at 6.6:1 with an underline, like <a href="#">this one</a>.</p>
 </body>
 </html>

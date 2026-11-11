@@ -1,25 +1,44 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<link rel="stylesheet" href="../colors_and_type.css"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand — Animated logo</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
-  body { margin: 0; padding: 24px; font-family: var(--mk-font-sans); background: var(--mk-bg-base); display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .tile { background: var(--mk-neutral-0); border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 24px 20px 14px; position: relative; min-height: 140px; display: grid; place-items: center; }
-  .tile.dark { background: var(--mk-neutral-950); }
-  .tag { position: absolute; top: 10px; left: 14px; font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-neutral-500); }
-  .tile.dark .tag { color: var(--mk-neutral-300); }
-  img { max-width: 80%; height: auto; }
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 22px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .tile { border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 30px 20px 14px; position: relative; min-height: 140px; display: grid; place-items: center; }
+  .tag { position: absolute; top: 10px; left: 14px; font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-fg-2); }
+  img { width: 76%; max-width: 340px; height: auto; display: block; }
+  .note { grid-column: 1 / -1; border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 16px 18px; font-size: 14px; line-height: 1.6; }
+  .note h2 { font-family: var(--mk-font-display); font-weight: 400; font-size: 22px; letter-spacing: -.015em; margin: 0 0 8px; }
+  .note ul { margin: 0; padding-left: 18px; }
+  .note li { margin: 3px 0; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
   <div class="tile">
-    <span class="tag">MEOW-LOGO-ANIMATED.GIF</span>
-    <img src="../assets/branding/meow-logo-animated.gif" alt="/meow animated logo"/>
+    <span class="tag">meow-logo-animated.svg</span>
+    <img src="../branding/meow-logo-animated.svg" alt="MeowKit lockup with the cursor blinking">
   </div>
-  <div class="tile dark">
-    <span class="tag">INLINE SVG (SMIL)</span>
-    <img src="../assets/branding/meow-logo-animated.svg" alt="/meow animated SVG"/>
+  <div class="tile">
+    <span class="tag">meow-logo-animated.gif · 608 × 120</span>
+    <img src="../branding/meow-logo-animated.gif" alt="MeowKit lockup with the cursor blinking, GIF">
+  </div>
+  <div class="note">
+    <h2>Blink</h2>
+    <ul>
+      <li>The cursor-cat blinks like a caret: on, off, 1100ms period, stepped — no fade, no easing, nothing else moves.</li>
+      <li>The SVG animates with SMIL and stays crisp at any size. The GIF is for surfaces that strip SVG animation, such as GitHub README files.</li>
+      <li>One blinking mark per view, and never next to a second animation.</li>
+      <li>Honour <code>prefers-reduced-motion</code>: swap in the static <code>meow-logo.svg</code>.</li>
+    </ul>
   </div>
 </body>
 </html>

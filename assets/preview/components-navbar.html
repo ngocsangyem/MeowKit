@@ -1,43 +1,52 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Components — Navbar</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
-  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 24px; }
-  .nav { height: 56px; display:flex; align-items:center; gap: 18px; padding: 0 18px; background: rgba(15,23,42,.85); backdrop-filter: blur(12px); border: 1px solid var(--mk-border-subtle); border-radius: 12px; }
-  .brand { display:flex; align-items:center; gap: 10px; font-weight: 500; font-size: 17px; letter-spacing: .02em; }
-  .mk-logo { font-family: var(--mk-font-mono); font-weight: 500; font-size: 16px; margin-right: 4px; display: inline-flex; align-items: baseline; color: var(--mk-neutral-0); }
-  .mk-logo .s { color: var(--mk-accent-glow); font-weight: 600; margin-right: 1px; }
-  .mk-logo .c { display: inline-block; width: 2px; height: 14px; background: var(--mk-accent-glow); margin-left: 3px; transform: translateY(2px); }
-  .links { display:flex; gap: 18px; margin-left: 12px; font-size: 14px; }
-  .links a { color: var(--mk-fg-2); text-decoration: none; transition: color .15s; }
-  .links a.active { color: var(--mk-accent-glow); }
-  .links a:hover { color: var(--mk-accent-glow); }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .nav { height: 56px; display: flex; align-items: center; gap: 20px; padding: 0 16px; border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); background: var(--mk-neutral-50); }
+  .nav .mark img { height: 20px; width: auto; display: block; }
+  .links { display: flex; gap: 18px; font-size: 15px; }
+  .links a { color: var(--mk-neutral-900); text-decoration: none; }
+  .links a.on { color: var(--mk-blue-700); }
+  .links a:hover { text-decoration: underline; }
   .spacer { flex: 1; }
-  .search { display:flex; align-items:center; gap: 8px; padding: 6px 10px; border: 1px solid var(--mk-border-subtle); border-radius: 6px; font-size: 13px; color: var(--mk-fg-3); min-width: 180px; background: var(--mk-bg-surface); }
-  .kbd { font-family: var(--mk-font-mono); font-size: 11px; padding: 1px 5px; border-radius: 3px; background: rgba(148,163,184,.14); color: var(--mk-fg-2); border: 1px solid var(--mk-border-subtle); margin-left: auto; }
-  .iconbtn { width: 32px; height: 32px; display:grid; place-items:center; border-radius: 6px; color: var(--mk-fg-2); font-family: var(--mk-font-mono); font-size: 14px; cursor: pointer; }
-  .iconbtn:hover { background: rgba(37,99,235,.08); color: var(--mk-accent-glow); }
+  .search { display: flex; align-items: center; gap: 8px; min-width: 190px; padding: 7px 10px; border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-sm); background: var(--mk-neutral-0); font-size: 14px; color: var(--mk-neutral-700); }
+  .kbd { margin-left: auto; font-family: var(--mk-font-mono); font-size: 11px; padding: 1px 5px; border-radius: var(--mk-radius-xs); border: 1px solid var(--mk-border-subtle); background: var(--mk-neutral-100); }
+  .cta { height: 36px; padding: 0 18px; border-radius: var(--mk-radius-pill); background: var(--mk-neutral-900); color: var(--mk-neutral-50); font-size: 14px; font-weight: 500; display: grid; place-items: center; }
+  .nav.night { background: var(--mk-neutral-900); border-color: rgb(238 242 247 / .12); }
+  .nav.night .links a { color: var(--mk-neutral-50); }
+  .nav.night .links a.on { color: var(--mk-blue-300); }
+  .nav.night .search { background: var(--mk-neutral-800); border-color: rgb(238 242 247 / .2); color: var(--mk-neutral-300); }
+  .nav.night .kbd { background: transparent; border-color: rgb(238 242 247 / .2); color: var(--mk-neutral-300); }
+  .nav.night .cta { background: var(--mk-blue-600); color: #f7f9fc; }
+  .note { font-size: 14px; line-height: 1.6; margin: 4px 0 0; max-width: 820px; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
   <div class="nav">
-    <div class="brand"><span class="mk-logo"><span class="s">/</span>meow<span class="c"></span></span>MeowKit</div>
-    <div class="links">
-      <a href="#" class="active">Guide</a>
-      <a href="#">Workflows</a>
-      <a href="#">Reference</a>
-      <a href="#">CLI</a>
-      <a href="#">Cheatsheet</a>
-    </div>
+    <span class="mark"><img src="../branding/meow-logo.svg" alt="MeowKit"></span>
+    <div class="links"><a href="#" class="on">Guide</a><a href="#">Workflows</a><a href="#">Reference</a><a href="#">CLI</a><a href="#">Cheatsheet</a></div>
     <div class="spacer"></div>
-    <div class="search"><span>⌕</span>Search <span class="kbd">⌘K</span></div>
-    <div class="iconbtn">◐</div>
-    <div class="iconbtn">⎋</div>
+    <div class="search">Search<span class="kbd">&#8984;K</span></div>
+    <span class="cta">Install</span>
   </div>
+  <div class="nav night">
+    <span class="mark"><img src="../branding/meow-logo-dark.svg" alt="MeowKit"></span>
+    <div class="links"><a href="#" class="on">Guide</a><a href="#">Workflows</a><a href="#">Reference</a><a href="#">CLI</a><a href="#">Cheatsheet</a></div>
+    <div class="spacer"></div>
+    <div class="search">Search<span class="kbd">&#8984;K</span></div>
+    <span class="cta">Install</span>
+  </div>
+  <p class="note">The lockup sits at 20px tall with one cursor width of clear space before the links. The bar is a flat surface with a hairline — no translucency and no blur. The active link takes dusk on paper, sky on night; the install pill is the only filled control.</p>
 </body>
 </html>

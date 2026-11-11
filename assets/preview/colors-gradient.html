@@ -1,33 +1,53 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Colors — Gradient</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colors — Flat fills</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
-  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px; display: flex; gap: 16px; align-items: stretch; }
-  .g1 { flex: 1; border-radius: 12px; background: var(--mk-gradient-brand); padding: 16px; color: #fff; display: flex; flex-direction: column; justify-content: space-between; }
-  .g1 .title { font-size: 32px; font-weight: 400; letter-spacing: .02em; line-height: 1.1; }
-  .g1 .meta { font-family: var(--mk-font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .9; }
-  .g2 { width: 230px; border-radius: 12px; padding: 16px; display:flex; flex-direction: column; justify-content: space-between; background: var(--mk-gradient-space); color: #fff; }
-  .g2 .label { font-family: var(--mk-font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
-  .hero-title {
-    font-size: 36px; font-weight: 400; letter-spacing: .02em; line-height: 1.1;
-    background: var(--mk-gradient-brand);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: stretch; }
+  .panel { border-radius: var(--mk-radius-md); padding: 18px; min-height: 190px; display: flex; flex-direction: column; justify-content: space-between; }
+  .panel .title { font-family: var(--mk-font-display); font-weight: 400; font-size: 30px; line-height: 1.08; letter-spacing: -.02em; }
+  .panel .meta { font-family: var(--mk-font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+  .dusk { background: #2f66b3; color: #f7f9fc; }
+  .dusk .meta { color: #eef2f7; }
+  .night { background: #131a27; color: #eef2f7; }
+  .night .meta { color: #9aa6bb; }
+  .haze { background: #c8d5e6; color: #131a27; }
+  .haze .meta { color: #3a4558; }
+  .note { grid-column: 1 / -1; border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 16px 18px; font-size: 14px; line-height: 1.6; }
+  .note h2 { font-family: var(--mk-font-display); font-weight: 400; font-size: 22px; letter-spacing: -.015em; margin: 0 0 8px; }
+  .note ul { margin: 0; padding-left: 18px; }
+  .note li { margin: 3px 0; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
-  <div class="g1">
-    <div class="title">Enforced discipline.</div>
-    <div class="meta">brand · linear 135° · #2563EB → #60A5FA</div>
+  <div class="panel dusk">
+    <div class="title">Approve the plan.</div>
+    <div class="meta">dusk #2f66b3 · white #f7f9fc · 5.4:1</div>
   </div>
-  <div class="g2">
-    <div class="hero-title">MeowKit</div>
-    <div class="label">Radial · #1E3A5F → #05070A · "deep space"</div>
+  <div class="panel night">
+    <div class="title">Two gates, seven phases.</div>
+    <div class="meta">night #131a27 · paper #eef2f7 · 15.5:1</div>
+  </div>
+  <div class="panel haze">
+    <div class="title">Read the docs.</div>
+    <div class="meta">haze #c8d5e6 · ink #131a27 · 11.7:1</div>
+  </div>
+  <div class="note">
+    <h2>Fills are flat</h2>
+    <ul>
+      <li>Large areas take one solid colour: dusk for the accent panel, night for terminals and hero blocks, haze for quiet frames and footers.</li>
+      <li>No gradient fills and no gradient text. <code>--mk-gradient-brand</code> and <code>--mk-gradient-space</code> survive only so old callers keep working — both now resolve to a single flat colour.</li>
+      <li>No glow, no blur, no texture. Depth comes from the hairline and from the step between paper, surface and haze.</li>
+    </ul>
   </div>
 </body>
 </html>

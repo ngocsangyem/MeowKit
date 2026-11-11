@@ -1,20 +1,25 @@
 import { RootProvider } from 'fumadocs-ui/provider/next';
-import { Inter, Space_Grotesk } from 'next/font/google';
+import { Newsreader, Onest } from 'next/font/google';
 import type { ReactNode } from 'react';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { siteUrl, siteName, siteDescription } from '@/lib/site';
 import { SoftwareApplicationJsonLd } from '@/components/json-ld';
 import './global.css';
 
-const inter = Inter({
+// Onest carries body text and section headings.
+const onest = Onest({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-onest',
+  display: 'swap',
 });
 
-const spaceGrotesk = Space_Grotesk({
+// Newsreader carries page titles. `axes: ['opsz']` keeps the optical-size axis, so the
+// face is cut for display at a title's size instead of being a 16px text face scaled up.
+const newsreader = Newsreader({
   subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-space-grotesk',
+  axes: ['opsz'],
+  variable: '--font-newsreader',
+  display: 'swap',
 });
 
 // No webfont for code on purpose — see the --font-mono note in global.css. Code blocks use
@@ -61,11 +66,15 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     images: '/og-image.png',
   },
-  other: {
-    /* Matches the ocean preset's dark background, hsl(220 60% 8%), so the
-       mobile browser chrome does not band against the page. */
-    'theme-color': '#081021',
-  },
+};
+
+/* One entry per theme so the mobile browser chrome matches whichever ground is on
+   screen: mist paper in light, night in dark. A single value bands against the other. */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#eef2f7' },
+    { media: '(prefers-color-scheme: dark)', color: '#131a27' },
+  ],
 };
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -73,7 +82,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${spaceGrotesk.variable}`}
+      className={`${onest.variable} ${newsreader.variable}`}
     >
       <body className="flex min-h-screen flex-col">
         <SoftwareApplicationJsonLd />

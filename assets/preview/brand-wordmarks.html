@@ -1,54 +1,57 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<link rel="stylesheet" href="../colors_and_type.css" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand — Wordmark</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
-  body { margin: 0; background: var(--mk-bg-base); padding: 22px 24px; font-family: var(--mk-font-sans); display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .tile { background: var(--mk-neutral-0); border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 22px 20px 14px; display: flex; flex-direction: column; gap: 10px; min-height: 110px; justify-content: center; position: relative; }
-  .tile .tag { position: absolute; top: 10px; left: 14px; font-family: 'Fira Code', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-neutral-500); }
-
-  .word { font-family: 'Inter', sans-serif; font-size: 44px; line-height: 1; letter-spacing: -.01em; }
-
-  .w-gradient {
-    font-weight: 500;
-    background: var(--mk-gradient-brand);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .w-dual { font-weight: 500; color: var(--mk-neutral-900); }
-  .w-dual .kit { color: var(--mk-blue-600); }
-
-  .prompt {
-    font-family: 'Fira Code', monospace; font-size: 38px; font-weight: 500;
-    display: inline-flex; align-items: baseline;
-  }
-  .prompt .slash { color: var(--mk-blue-600); font-weight: 600; }
-  .prompt .body { color: var(--mk-neutral-900); }
-
-  .ascii {
-    font-family: 'Fira Code', monospace; font-size: 36px; color: var(--mk-neutral-900);
-    letter-spacing: 2px;
-  }
-  .ascii .brack { color: var(--mk-blue-600); }
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 22px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .tile { border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 30px 20px 14px; position: relative; min-height: 130px; display: grid; place-items: center; }
+  .tile.night { background: var(--mk-neutral-900); border-color: rgb(238 242 247 / .12); }
+  .tile.haze { background: var(--mk-neutral-200); }
+  .tag { position: absolute; top: 10px; left: 14px; font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-fg-2); }
+  .tile.night .tag { color: var(--mk-neutral-300); }
+  .tile.haze .tag { color: var(--mk-neutral-700); }
+  .tile img { width: 72%; max-width: 360px; height: auto; display: block; }
+  .tile.scale img { width: 180px; }
+  .note { grid-column: 1 / -1; border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 16px 18px; font-size: 14px; line-height: 1.6; }
+  .note h2 { font-family: var(--mk-font-display); font-weight: 400; font-size: 22px; margin: 0 0 8px; letter-spacing: -.015em; }
+  .note ul { margin: 0; padding-left: 18px; }
+  .note li { margin: 3px 0; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
   <div class="tile">
-    <span class="tag">GRADIENT WORDMARK</span>
-    <span class="word w-gradient">MeowKit</span>
+    <span class="tag">meow-logo.svg · on paper</span>
+    <img src="../branding/meow-logo.svg" alt="meowkit wordmark lockup on paper">
   </div>
-  <div class="tile">
-    <span class="tag">DUAL-TONE</span>
-    <span class="word w-dual">Meow<span class="kit">Kit</span></span>
+  <div class="tile night">
+    <span class="tag">meow-logo-dark.svg · on night</span>
+    <img src="../branding/meow-logo-dark.svg" alt="meowkit wordmark lockup reversed on night">
   </div>
-  <div class="tile">
-    <span class="tag">PROMPT · /MEOW:KIT</span>
-    <span class="prompt"><span class="slash">/</span><span class="body">mk:kit</span></span>
+  <div class="tile haze">
+    <span class="tag">meow-logo-mono.svg · one colour</span>
+    <img src="../branding/meow-logo-mono.svg" alt="meowkit wordmark lockup in one colour">
   </div>
-  <div class="tile">
-    <span class="tag">ASCII CAT · =^··^=</span>
-    <span class="ascii"><span class="brack">=</span>^··^<span class="brack">=</span></span>
+  <div class="tile scale">
+    <span class="tag">minimum · 96px wide</span>
+    <img src="../branding/meow-logo.svg" alt="meowkit wordmark lockup at small size" style="width:96px">
+  </div>
+  <div class="note">
+    <h2>Wordmark rules</h2>
+    <ul>
+      <li>The wordmark is <code>meowkit</code>, lowercase, set in JetBrains Mono and stored as outlines — the SVG needs no font to render.</li>
+      <li>It is never typed as live text and never re-spaced, re-weighted or re-cased. Use the SVG file.</li>
+      <li>In prose the product is <strong>MeowKit</strong>; the CLI is <code>mewkit</code>. Only the mark is lowercase.</li>
+      <li>The lockup stops at 96px wide. Below that use <code>meow-symbol.svg</code>, or <code>meow-symbol-small.svg</code> under 24px.</li>
+    </ul>
   </div>
 </body>
 </html>

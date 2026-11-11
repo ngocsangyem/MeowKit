@@ -1,38 +1,44 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Colors — Neutrals</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
   body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px; }
-  .row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
-  .sw { height: 84px; border-radius: 8px; border: 1px solid var(--mk-border-subtle); display:flex; align-items:flex-end; padding: 8px; font-family: var(--mk-font-mono); font-size: 10px; }
-  .sw.dark-text { color: rgba(0,0,0,.75); }
-  .sw.light-text { color: rgba(255,255,255,.9); }
-  .sw .name { font-weight:500; }
-  .sw .hex { opacity:.75; }
-  .meta { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--mk-font-mono); font-size: 10px; color: var(--mk-fg-2); letter-spacing: .08em; text-transform: uppercase; }
+  .row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; }
+  figure { margin: 0; }
+  .sw { height: 92px; border-radius: var(--mk-radius-xs); border: 1px solid var(--mk-border-subtle); }
+  figcaption { font-family: var(--mk-font-mono); font-size: 11px; line-height: 1.45; margin-top: 8px; color: var(--mk-fg-1); }
+  figcaption .hex { color: var(--mk-fg-2); }
+  .meta { display: flex; justify-content: space-between; gap: 20px; margin-top: 16px; font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); letter-spacing: .06em; text-transform: uppercase; }
+  p { font-size: 14px; line-height: 1.6; margin: 14px 0 0; max-width: 900px; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
   <div class="row">
-    <div class="sw dark-text" style="background:#FFFFFF"><div><div class="name">0</div><div class="hex">#FFFFFF</div></div></div>
-    <div class="sw dark-text" style="background:#F8FAFC"><div><div class="name">50</div><div class="hex">#F8FAFC</div></div></div>
-    <div class="sw dark-text" style="background:#E2E8F0"><div><div class="name">100</div><div class="hex">#E2E8F0</div></div></div>
-    <div class="sw dark-text" style="background:#CBD5E1"><div><div class="name">200</div><div class="hex">#CBD5E1</div></div></div>
-    <div class="sw dark-text" style="background:#94A3B8"><div><div class="name">300</div><div class="hex">#94A3B8</div></div></div>
-    <div class="sw light-text" style="background:#64748B"><div><div class="name">500</div><div class="hex">#64748B</div></div></div>
-    <div class="sw light-text" style="background:#334155"><div><div class="name">700</div><div class="hex">#334155</div></div></div>
-    <div class="sw light-text" style="background:#1E293B"><div><div class="name">800 · surface</div><div class="hex">#1E293B</div></div></div>
-    <div class="sw light-text" style="background:#0F172A"><div><div class="name">900 · base</div><div class="hex">#0F172A</div></div></div>
-    <div class="sw light-text" style="background:#05070A"><div><div class="name">950 · space</div><div class="hex">#05070A</div></div></div>
+    <figure><div class="sw" style="background:#f7f9fc"></div><figcaption>0 · white<br><span class="hex">#f7f9fc</span></figcaption></figure>
+    <figure><div class="sw" style="background:#eef2f7"></div><figcaption>50 · paper<br><span class="hex">#eef2f7</span></figcaption></figure>
+    <figure><div class="sw" style="background:#e0e7f0"></div><figcaption>100 · surface<br><span class="hex">#e0e7f0</span></figcaption></figure>
+    <figure><div class="sw" style="background:#c8d5e6"></div><figcaption>200 · haze<br><span class="hex">#c8d5e6</span></figcaption></figure>
+    <figure><div class="sw" style="background:#9aa6bb"></div><figcaption>300<br><span class="hex">#9aa6bb</span></figcaption></figure>
+    <figure><div class="sw" style="background:#566178"></div><figcaption>500 · muted<br><span class="hex">#566178</span></figcaption></figure>
+    <figure><div class="sw" style="background:#3a4558"></div><figcaption>700<br><span class="hex">#3a4558</span></figcaption></figure>
+    <figure><div class="sw" style="background:#1b2435"></div><figcaption>800 · raised<br><span class="hex">#1b2435</span></figcaption></figure>
+    <figure><div class="sw" style="background:#131a27"></div><figcaption>900 · night<br><span class="hex">#131a27</span></figcaption></figure>
+    <figure><div class="sw" style="background:#0d121c"></div><figcaption>950 · code<br><span class="hex">#0d121c</span></figcaption></figure>
   </div>
   <div class="meta">
-    <span>mk-neutral-0 → mk-neutral-950</span>
-    <span>Slate family · dark mode bg = 900</span>
+    <span>--mk-neutral-0 → --mk-neutral-950</span>
+    <span>blue-tinted · never pure black, never pure white</span>
   </div>
+  <p>Mist paper <code>#eef2f7</code> is the ground in light mode; night <code>#131a27</code> is the ground in dark mode, the fill of terminals, and the ink of body text on paper — 15.5:1. Muted <code>#566178</code> is 5.5:1 on paper: captions, labels and metadata, never body copy.</p>
 </body>
 </html>

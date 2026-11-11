@@ -1,230 +1,168 @@
 # MeowKit Design System
 
-> **AI Agent Toolkit for Claude Code** — enforced discipline, 7-phase workflow, zero external deps.
+> **AI agent toolkit for Claude Code** — enforced discipline, a 7-phase workflow, zero external deps.
 
-This project contains the design tokens, type system, iconography, and UI kits used across the MeowKit product surface. Use it to brand new prototypes, slides, docs, or production UIs consistently.
+Design tokens, type, the logo masters and preview pages for the MeowKit product surface. Use it to brand prototypes, slides, docs or production UI consistently.
 
 ---
 
 ## Product context
 
-**MeowKit** installs a `.claude/` directory that Claude Code reads at session start. It enforces a structured 7-phase workflow (Orient → Plan → Test → Build → Review → Ship → Reflect) with two hard gates, TDD opt-in, 4-layer security scanning, and cross-session memory. It ships as an npm CLI (`npx mewkit init`) plus a documentation site.
+**MeowKit** installs a `.claude/` directory that Claude Code reads at the start of a session. It runs a 7-phase workflow (Orient → Plan → Test → Build → Review → Ship → Reflect) with two hard gates, TDD opt-in, layered security scanning and cross-session memory. It ships as an npm CLI (`npx mewkit init`) plus a documentation site at [docs.meowkit.dev](https://docs.meowkit.dev/).
 
-Core numbers (for copy that references scale): **58+ skills · 15+ agents · 18+ commands · 7+ modes · 17+ rules · 9+ hooks · 4-layer+ security**.
+Numbers for copy that references scale, from the root `README.md`: **129 skills · 42 agents · 7 rules · 27 hook scripts · 4-layer+ security**.
 
-### Primary mark — Slash-MK Prompt
+---
 
-The official MeowKit logo is **`/mk`** rendered as a slash-command prompt with a blinking caret. It reads directly from the product's core invocation pattern: every skill in the kit starts with `/mk:` — so the mark *is* the command. CLI-native, code-native, scales from favicon to banner without bitmap assets.
+## The mark — prompt + cursor
 
-- Slash `/` in solid brand blue `#2563EB` (weight 600) — the accent hit
-- `mk` in **Fira Code 500**, filled with the brand gradient `#1D4ED8 → #3B82F6`
-- Caret block in brand blue, blinking at 1.1s
-- On dark surfaces, slash + caret shift to accent glow `#60A5FA`, gradient shifts to `#93C5FD → #60A5FA`
+Two shapes that are already on screen when you talk to an agent: the **chevron** you type after, and the **block cursor** that waits for the answer. The cursor has two ears cut out of its top edge. Nothing is added after that.
 
-The face of the brand is not a character — it's the command itself. Signals: CLI-first, code-first, disciplined (slash = command boundary), playful (the wordplay on `meow`).
+- Chevron in night `#131a27` — the prompt.
+- Cursor in dusk blue `#2f66b3` — the reply. On night it flips to paper and sky.
+- Wordmark `meowkit`, lowercase, JetBrains Mono, stored as outlines.
+- 45° and 90° angles only. No curve, no radius, no gradient, no glow.
 
-### Products represented
-
-| Surface | What it is | Where the visuals come from |
-|---|---|---|
-| **CLI** (`mewkit`) | npm-distributed command runner — `init`, `setup`, `doctor`, `validate`, `budget`, `memory` | Monospace terminal output with ✓/✗ glyphs and `mk:` namespaced skill calls |
-| **Docs website** | Fumadocs site at `docs.meowkit.dev` — home, guide, workflows, reference, cheatsheet | `packages/docs/app/global.css` — full token system + Fumadocs `--color-fd-*` mappings |
-| **`.claude/` runtime** | Markdown agents / skills / rules consumed by Claude Code itself | Plain Markdown, code blocks, tables — very CLI-native |
-
-### Sources
-
-All visual context was pulled from the public repo **[ngocsangyem/MeowKit](https://github.com/ngocsangyem/MeowKit)** (default branch `main`). Key files:
-
-- `assets/branding/design-tokens.json` — canonical theme JSON
-- `packages/docs/app/global.css` — brand token system + Fumadocs `--color-fd-*` mappings, full light + dark themes
-- `packages/docs/app/(home)/page.tsx` + `packages/docs/components/home/` — hero copy + feature clusters
-- `packages/docs/content/docs/introduction.mdx`, `why-meowkit.mdx`, `cheatsheet.mdx`, `quick-start.mdx` — tone + voice samples
-- `README.md` + `CLAUDE.md` — product positioning
-
-No Figma was provided. All tokens were reconstructed from the CSS + JSON above — which is itself the source of truth in the repo.
+The whole system is flat: there is no illustrated mascot, no face, no paw.
 
 ---
 
 ## Index
 
 | File / folder | What's in it |
-|---|---|
-| `README.md` | This file — context, foundations, content rules, iconography |
-| `SKILL.md` | Agent Skills manifest — makes this system usable as a downloadable Claude Code skill |
-| `colors_and_type.css` | All CSS variables (brand primitives, light/dark tokens, typography roles) |
-| `assets/branding/` | `design-tokens.json` canonical token source |
-| `preview/` | Design-system preview cards (colors, type, spacing, components, brand) |
-| `ui_kits/website/` | Docs-site design recreation — hero, features, sidebar, code blocks |
-| `ui_kits/cli/` | Terminal UI kit — `mewkit init`, `/mk:cook`, `/mk:ship` simulated sessions |
+| --- | --- |
+| `README.md` | This file — context, the mark, palette, type, usage rules |
+| `SKILL.md` | Agent Skills manifest — makes this system usable as a Claude Code skill |
+| `design-tokens.json` | Canonical token source (mirrored to `docs/design/` and `packages/mewkit/assets/`) |
+| `css/colors_and_type.css` | CSS variables: brand primitives, light/night themes, typography roles |
+| `branding/` | The logo masters — see the table below |
+| `preview/` | Design-system preview pages (brand, colour, type, spacing, components) |
+| `wireframes/` | Construction sheets: how the mark is built, one-colour cuts, lockup measures |
+
+Related: `docs/design/meowkit-design-guideline.md` (the written guideline) and `docs/design/meowkit-tokens.css` (the same tokens under short role names).
 
 ---
 
-## Visual foundations
+## Branding files
 
-### Palette
+| File | Use for |
+| --- | --- |
+| `meow-symbol.svg` | The symbol on paper and any light ground |
+| `meow-symbol-dark.svg` | The symbol on night and any dark ground |
+| `meow-symbol-small.svg` | Cursor only — the cut for sizes under 24px |
+| `meow-logo.svg` | Horizontal lockup, light grounds |
+| `meow-logo-dark.svg` | Horizontal lockup reversed, dark grounds |
+| `meow-logo-mono.svg` | One-colour lockup: print, stamp, single ink |
+| `meow-logo-white.svg` | One-colour white lockup (`#f7f9fc`) for dusk or night fills |
+| `meow-symbol-white.svg` | One-colour white symbol for dusk or night fills |
+| `meow-logo-animated.svg` | The lockup with the cursor blinking (SMIL, stays crisp) |
+| `meow-logo-animated.gif` | Same blink, 608 × 120, for surfaces that strip SVG animation |
+| `meow-favicon.svg` | Browser tab — cursor on a night tile |
+| `meow-favicon.ico` | Browser tab fallback, 16 + 32 |
+| `meow-favicon-16.png` · `-32.png` | Raster favicons |
+| `meow-apple-touch-icon.png` | 180 × 180 home-screen icon |
+| `meow-og.png` | 1200 × 630 social card |
 
-- **Primary — Royal Blue `#2563EB`**: the signature mascot collar. Used on links, primary buttons, active sidebar items, focus rings, brand gradients.
-- **Accent glow `#60A5FA`**: the dark-mode "brand" substitute. Hero titles, active nav text, inline-code color, link hover.
-- **Neutrals — slate family** (`#F8FAFC` → `#05070A`): all backgrounds, borders, and text. Never pure black; dark-mode base is `#0F172A` (blue-tinted slate-900).
-- **Semantic**: success `#12B76A`, warning `#F79009`, danger `#F04438`, info = brand blue.
-- **Gradient**: `linear-gradient(135deg, #2563EB 0%, #60A5FA 100%)` — applied as `background-clip: text` on hero titles and as a solid fill on primary buttons.
-
-Dark mode is the hero mode. Light mode exists and works, but screenshots, hero art, and the mascot background all assume dark.
-
-### Typography
-
-- **Sans — Inter** (all UI + body copy). From `design-tokens.json`: headings are `fontWeight: 400` with `letterSpacing: 0.02em` — not bold, airy, tech-forward.
-- **Mono — Fira Code** with Geist Mono / JetBrains Mono fallbacks. Used for terminal output, code blocks, `mk:` skill refs, eyebrows.
-- Headings go up to ~48–64px for hero. Body is 15–16px. Tables and reference content drop to 13–14px.
-- ALL CAPS is reserved for eyebrows / section markers (mono, 12px, +0.12em tracking).
-
-### Spacing
-
-4-based scale: `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80`. Cards pad at 16–24; sections at 48–80. Sidebar items pad 6–8 vertical.
-
-### Backgrounds
-
-- Light mode: layered slate neutrals — `#F8FAFC` base, `#FFFFFF` surface, `#F1F5F9` soft.
-- Dark mode: slate-900 base, slate-800 surface, **deep-space blue `#1E3A5F` soft** — this deep blue is the mascot halo colour and shows up under code blocks and elevated surfaces.
-- No full-bleed hero images. No patterns. No textures. Occasional subtle radial gradients on hero sections (blue glow bottom-center).
-
-### Borders
-
-Always thin (1px) and subtle:
-- Light: `#E2E8F0` subtle, `#CBD5E1` strong.
-- Dark: `rgba(255,255,255,0.08)` subtle, `rgba(255,255,255,0.15)` strong.
-- Brand-colored borders only on hover/focus of feature cards (`rgba(37,99,235,0.4)`).
-
-### Corners
-
-Small by default. `4px` on buttons (explicit from `design-tokens.json`), `6–10px` on inputs and small cards, `16px` on feature cards and modals. Pills (`9999px`) only for badges.
-
-### Shadows
-
-Understated. Light mode uses `0 2px 8px rgba(15,23,42,0.06)` on cards. Dark mode mostly uses **glow** instead: `0 0 20px rgba(37,99,235,0.35)` for focused / primary affordances. Inner 1-px glow (`inset 0 0 0 1px rgba(96,165,250,0.35)`) on feature-card hover in dark.
-
-### Transparency & blur
-
-Used sparingly. Navbar has a translucent backdrop (`rgba(15,23,42,0.85)` in dark, `rgba(245,247,250,0.85)` in light) with `backdrop-filter: blur(12px)`. Hover states use 6–15% brand-tinted overlays rather than changing the base color.
-
-### Motion
-
-Short, linear-ish easing. `150ms` for hover / color transitions, `250ms` for larger state changes, `400ms` max. Preferred easing `cubic-bezier(0.2, 0.8, 0.2, 1)`. No bounces. No parallax. Feature cards change border-color on hover — no transform, no scale.
-
-### Hover / press
-
-- Hover: background tints to 6–15% brand alpha; links brighten (`blue-600` → `blue-500` in light; `accent-glow` → `accent-soft` in dark); feature cards deepen border.
-- Press: we don't scale buttons. Primary button: `opacity: 0.9`. Secondary: background fills with `mk-active-bg`.
-
-### Focus
-
-Always a 3px outer ring in brand color (`rgba(37,99,235,0.35)` light / `rgba(96,165,250,0.45)` dark). Never removed.
-
-### Cards
-
-Flat surface (`--mk-bg-surface`), thin subtle border, small shadow in light / no shadow in dark, 10–16px radius. Hover → border darkens to brand. No colored left-border accents. No gradients.
-
-### Layout rules
-
-- Max content width: ~1200px for docs-style layouts, ~720px for prose.
-- Fixed top navbar, fixed left sidebar on docs pages.
-- Right-rail "on this page" TOC at wide breakpoints.
-- Everything else is standard left-to-right reading flow.
+Geometry, for anyone rebuilding a layout around it: the symbol viewBox is `8 48 240 170` (chevron 72 × 112, cursor 120 × 146, gap 24); the lockup viewBox is `8 45 876 173`, ratio 5.06 : 1, with 62 units between the cursor and the first letter.
 
 ---
 
-## Content fundamentals
+## Usage rules
 
-### Voice
+- **Clear space** — the width of the cat-cursor on all four sides (120 units; about 13.7% of the lockup's width). Nothing crosses it.
+- **Minimum size** — lockup **96px wide**; symbol **16px** (use the favicon there). Under 24px drop the chevron and use `meow-symbol-small.svg`.
+- **Pick the cut, don't re-colour** — light ground takes `meow-logo.svg`, dark takes `-dark`, single ink takes `-mono`, a dusk fill takes the whole mark in white `#f7f9fc`.
+- **Never redraw the mark in live text.** The wordmark is outlined in the file; typing `meowkit` in a font is not the wordmark.
+- **No effects** — no gradient, glow, drop shadow, outline, rotation or stretch.
+- **One blink per view.** The cursor blinks on, off, 1100ms, stepped. Honour `prefers-reduced-motion` by serving the static SVG.
 
-Direct, terse, technical, confident. "Enforced discipline, not best practices." Writes the way engineers talk in a PR description: active voice, short sentences, no throat-clearing.
+---
 
-Sample one-liners (real, from the site):
+## Palette
 
-> "AI coding tools are powerful but undirected."
-> "The cost of a bad ship > the cost of a 30-second approval."
-> "Every step is visible. Every claim is verified."
-> "Rules define why; hooks enforce what."
+One accent, flat fills, light by default.
 
-### Address
+| Role | Hex | Use |
+| --- | --- | --- |
+| Mist paper | `#eef2f7` | Page ground, light mode |
+| Surface | `#e0e7f0` | Cards, panels, secondary buttons |
+| Haze | `#c8d5e6` | Lit frames, footers, hover fills |
+| Night | `#131a27` | Ink, terminals, dark-mode ground |
+| Night raised | `#1b2435` | Cards and panels on night |
+| White | `#f7f9fc` | Text on dusk |
+| **Dusk** | `#2f66b3` | The one accent on light grounds |
+| **Sky** | `#8fb5e8` | The one accent on night |
+| Muted | `#566178` | Secondary text on paper |
+| Muted dark | `#9aa6bb` | Secondary text on night |
 
-Mostly second-person **"you"** for guides ("When you start a Claude Code session…"), third-person for architectural descriptions ("MeowKit fixes this by…"). Rarely first-person; avoid "we".
+Signals: success `#2f7a55`, warning `#9a5d0c`, danger `#b13f37` — on night `#7fc4a0`, `#e3b46a`, `#ef9a90`.
+Hairlines: `rgb(19 26 39 / 0.13)` on paper, `rgb(238 242 247 / 0.12)` on night.
 
-### Casing
+**Contrast** — ink on paper 15.5:1, paper on night 15.5:1, sky on night 8.3:1, muted-dark on night 7.1:1, muted on paper 5.5:1, white on dusk 5.4:1, dusk on paper 5.1:1. Body text is always ink on paper or paper on night. Dusk is for labels, links, fills and the mark — never for sentences; a dusk link inside running text uses `#26559a` (6.6:1) with an underline.
 
-- Product name: **MeowKit** (one word, camel-cased both halves).
-- CLI: lowercase `mewkit` — yes, dropped "o", that's intentional (npm package name).
-- Skill invocations: `/mk:cook`, `/mk:fix`, `/mk:plan-creator` — always lowercased, slash-prefixed, colon-namespaced.
-- Skill names in prose: `mk:agent-detector`, `mk:plan-creator` — lowercase-kebab.
-- Agents: lowercase single-word or hyphenated (`orchestrator`, `ui-ux-designer`).
-- Phases: title-cased with number — **Phase 3 Build**.
-- Gates: **Gate 1**, **Gate 2** — bold, numbered.
+**No gradients.** `--mk-gradient-brand` and `--mk-gradient-space` remain in the CSS so existing callers keep working, and both resolve to a single flat colour.
 
-### Emphasis
+---
 
-- **Bold** for first mention of technical nouns and for `IMPORTANT:` prefixes inside agent docs.
-- `code` for file paths, env vars (`MEOWKIT_TDD=1`), CLI flags (`--tdd`), and every command.
-- `>` blockquotes for thesis statements (rare, punchy).
-- Never italic.
+## Typography
 
-### Emoji
+| Role | Face | Size / weight |
+| --- | --- | --- |
+| Display | Newsreader 400 | 56 / 1.04, tracking −0.024em |
+| h1 · h2 | Newsreader 400 | 48 and 36, −0.02em |
+| h3 · h4 | Onest 500 · 600 | 28 and 22 |
+| Lede | Onest 400 | 20 / 1.45 |
+| Body | Onest 400 | 16 / 1.6 |
+| Caption | Onest 400 | 13 / 1.55, muted |
+| Label, eyebrow | JetBrains Mono 500 | 11–13, uppercase, +0.1em |
+| Code | JetBrains Mono 400 | 13–14 / 1.7 |
 
-**Used, but sparingly and purposefully.** Feature cards on the homepage each lead with a single topic emoji: 🔒 (gates), 🧪 (TDD), 🛡️ (security), 🧠 (agents), ⚡ (skills), 💾 (memory), 📋 (tasks), 🎯 (routing), 🗣️ (party), 🔍 (review), 🚦 (hooks), 🧭 (help). One emoji per card, always at the start. Never mid-sentence. Never in body prose. Never decorative 🚀✨ / sparkles.
+Newsreader is the one warm thing beside a monospace command — always 400, never bold, never in dusk. Onest runs text and buttons. JetBrains Mono carries the wordmark, commands, paths, counts and UI labels; uppercase mono is the eyebrow, and the only place caps are allowed. Docs code blocks fall back to the platform monospace, because a latin-subset webfont shears box-drawing diagrams.
 
-Also used in CLI output: `✓` (ASCII check), `✗` (cross), `✋` (gate marker in tables), `→` (arrow between states).
+---
 
-### Tables
+## Shape, spacing and motion
 
-Heavy use. Almost every reference page has 2+ tables. Columns are terse — single words or short phrases. No full-sentence cells. Headers sentence-case.
+- **Radii** — 4px chips and inline code, 6px fields, 8px cards and code blocks, pill buttons. 16 and 24 exist for large containers.
+- **Spacing** — 4-based: 4, 8, 12, 16, 24, 32, 48, 64, 80. Cards pad at 16–24; sections at 48–80.
+- **Borders** — always 1px hairlines. Brand-coloured borders only on hover or focus.
+- **Elevation** — the step between paper, surface and haze, plus the hairline. Shadows are the exception (`0 2px 8px` at 6%, `0 8px 24px` at 10%), low-opacity night, never tinted.
+- **Focus** — a solid 3px dusk ring (sky on night). Never removed, never replaced by a glow.
+- **Motion** — 120ms hover, 240ms state change, `cubic-bezier(0.2, 0.8, 0.2, 1)`. No bounce, no parallax, no scale on press.
+- **No blur** — no `filter`, no `backdrop-filter`, no translucent navbar.
 
-### Diagrams
+---
 
-Inline ASCII boxes with `→` arrows and square brackets for gates:
+## Content
 
-```
-Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test
-→ Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect
-```
+**Voice.** Direct, terse, technical, confident. Active voice, short sentences, no throat-clearing — the way an engineer writes a PR description.
 
-### Vibe
+**Casing.** Product name **MeowKit**, one word. CLI lowercase `mewkit` (the dropped "o" is the npm package name). Skills `/mk:cook`, `/mk:fix`, `/mk:plan-creator` — lowercase, slash-prefixed, colon-namespaced. Phases title-cased with a number (**Phase 3 Build**). Gates bold and numbered (**Gate 1**).
 
-Think: "Tailwind docs × Rust `cargo` output × a cat sticker on a terminal." Crisp, accountable, slightly smug. Assumes the reader is an engineer who respects their tools.
+**Emphasis.** Bold on the first mention of a technical noun; `code` for paths, env vars, flags and every command; blockquotes for thesis statements, rarely. Never italic.
 
-### Don't
+**Emoji.** One topic emoji per feature card, at the start — 🔒 gates, 🧪 TDD, 🛡️ security, 🧠 agents, ⚡ skills, 💾 memory. Never mid-sentence, never in body prose, never decorative. CLI output uses `✓ ✗ → ✋`.
 
-- No exclamation points (exception: "Best kit so far!" in the credits — singular).
-- No marketing fluff ("revolutionize", "unleash", "seamlessly", "powerful", "magical").
-- No AI-speak ("Let's dive in", "In this guide we'll…").
-- No long summaries — the `cheatsheet.md` style is the north star.
+**Tables and diagrams.** Tables carry most reference content; cells hold a phrase, not a sentence. Diagrams are inline ASCII with `→` arrows and square brackets for gates.
+
+**Don't.** No exclamation points. No marketing verbs ("revolutionize", "unleash", "seamlessly"). No AI-speak ("let's dive in"). No long summaries.
 
 ---
 
 ## Iconography
 
-MeowKit has **no bundled icon font or SVG set**. Iconography is:
+No bundled icon font or SVG set. In order of preference:
 
-1. **Emoji** — one per feature card, mapped by topic (see Content → Emoji above). This IS the icon system on the homepage.
-2. **Unicode glyphs** — `✓ ✗ → ✋ ⚠️` in CLI output and tables.
-3. **ASCII box-drawing / diagrams** — `├── │ └──` in tree listings, `→ [GATE 1]` in phase diagrams. Monospace.
-4. **The `/meow` slash-prompt mark** — the sole brand glyph, typographic, no bitmap artwork needed.
+1. **Unicode** — `✓ ✗ → ✋ ⚠ × ⌕ ≡ ⧉`, matching the terminal.
+2. **ASCII box-drawing** — `├── │ └──` for trees, `→ [GATE 1]` for phase diagrams.
+3. **One topic emoji** per feature card.
 
-No Lucide, no Heroicons, no Material icons in the source. When building UIs that need generic UI affordances (close, search, menu, copy), either:
-- Use **Unicode** (`×`, `⌕`, `≡`, `⧉`) — matches the CLI/terminal aesthetic, recommended default.
-- Or substitute **Lucide** stroke-1.5 icons from CDN (`https://unpkg.com/lucide-static/icons/...`) — closest match to the clean tech feel. **Flag this substitution when you use it** — it's not native to the brand.
-
-### Assets inventory (`assets/branding/`)
-
-| File | Use for |
-|---|---|
-| `design-tokens.json` | Canonical token JSON — don't edit; mirror into `colors_and_type.css` |
-
-The logo is produced in code (Fira Code 500 + gradient + caret); there are no bitmap logo files. See `preview/brand-logo.html` and `preview/logo-hifi.html` for the mark at every size and variant.
+If a third-party set is substituted (for example Lucide, stroke 1.5), flag the substitution in the output — it is not native to the brand.
 
 ---
 
-## Known gaps & flags
+## Known gaps
 
-- **Fonts not bundled.** The repo references Inter + Fira Code by name but doesn't ship `.ttf` / `.woff2` files. This system loads them from Google Fonts via `<link>`. **Ask the user for self-hosted font files if you need offline / commercial distribution.**
-- **No icon set.** Flagged above. If you add Lucide, note the substitution in the output's footer.
-- **No Figma file.** All component recreations are reconstructed from CSS + screenshots of the live docs site. Minor rendering differences from the official site are expected.
-- **Light-mode is secondary.** The docs site ships dark-mode by default visually. Light mode tokens are complete but less exercised.
+- **Fonts are not bundled.** Newsreader, Onest and JetBrains Mono load from Google Fonts by `<link>`. Ask for self-hosted `.woff2` files before shipping offline or commercially.
+- **No icon set.** See above.
+- **No Figma file.** Everything is reconstructed from the tokens and the SVG masters in `branding/`, which are the source of truth.

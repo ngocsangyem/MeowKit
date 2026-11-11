@@ -1,179 +1,303 @@
-/* Hallmark · genre: atmospheric · macrostructure: Narrative Workflow · F4 knobs: numbering=1.0, layout=vertical, connector=line
- * theme: custom · vibe: "enforced discipline, late-night, instrument-grade" · paper: oklch(13% 0.015 250) · accent: oklch(64% 0.17 252)
- * display: Geist 700 · body: Geist 400 · mono: Geist Mono · axes: dark / geometric-sans / cool
- * nav: N5 floating pill · footer: Ft5 statement · enrichment: none (single static bloom)
- * studied: no · context: user-confirmed · pre-emit critique: P4 H5 E4 S4 R5 V5
+/* MeowKit landing — base layer and page primitives.
+ *
+ * Every primitive is namespaced `mk-`. The prefix is not decoration: this
+ * stylesheet shares a document with Tailwind and @nuxt/ui, and an unprefixed
+ * `.grid` or `.card` silently overrides a utility of the same name (it did —
+ * a bare `.grid > * { grid-column: 1 / -1 }` flattened the galaxy page's
+ * Tailwind two-column layout). Namespacing makes that class of bug impossible.
+ *
+ * Written for this repository against the roles in tokens.css.
  */
 @import "tailwindcss";
 @import "@nuxt/ui";
 @import "./tokens.css";
 
-/* ─── Tailwind v4 theme mapping (references canonical tokens) ─────────── */
+/* Tailwind reads the same roles, so a utility and a primitive agree. */
 @theme inline {
-  --color-brand:  var(--color-accent);
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --color-brand: var(--mk-accent);
+  --font-sans: 'Onest', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
-/* ─── Base ────────────────────────────────────────────────────────────── */
+/* ─── Document ─────────────────────────────────────────────────────────── */
 @layer base {
   html {
-    color-scheme: dark;
-    background-color: var(--color-paper);
-    color: var(--color-ink);
-    font-family: var(--font-body);
+    color-scheme: light;
     overflow-x: clip;
+    /* No `scroll-behavior: smooth` here. It would also animate the scroll the
+     * browser performs when focus moves, so a keyboard user tabbing down the
+     * page watches the viewport glide instead of arriving. Anchor clicks ask
+     * for smooth explicitly in the nav handler; focus stays instant. */
+    scroll-padding-block-start: calc(var(--mk-bar-height) + var(--mk-space-sm));
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
     min-height: 100dvh;
     overflow-x: clip;
+    /* body is what the reader actually sees behind the page, so it states the
+     * ground itself rather than inheriting one from the UI layer */
+    background-color: var(--mk-paper);
+    color: var(--mk-ink);
+    font: 400 var(--mk-text-base)/1.55 var(--mk-font-sans);
     -webkit-font-smoothing: antialiased;
-    /* The atmospheric ground: one fixed brand-blue bloom, zero runtime cost. */
-    background-image: radial-gradient(
-      ellipse 70% 45% at 82% -6%,
-      var(--color-bloom) 0%,
-      transparent 65%
-    );
-    background-attachment: fixed;
   }
 
-  ::selection {
-    background: var(--color-selection);
-    color: var(--color-ink);
+  h1, h2, h3 {
+    margin: 0;
+    font-family: var(--mk-font-display);
+    font-weight: var(--mk-serif-weight);
+    letter-spacing: var(--mk-serif-track);
+    color: var(--mk-ink);
+    overflow-wrap: break-word;
   }
+  h1 { font-size: var(--mk-text-h1); line-height: 1.06; }
+  h2 { font-size: var(--mk-text-h2); line-height: 1.12; }
+  h3 { font-size: var(--mk-text-h3); line-height: 1.25; }
+  p { margin: 0; }
 
-  *:focus-visible {
-    outline: 2px solid var(--color-focus);
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
+  ::selection { background: var(--mk-selection); }
+
 }
 
-/* ─── Components ──────────────────────────────────────────────────────── */
+/* ─── Primitives ───────────────────────────────────────────────────────── */
 @layer components {
-  .container-landing {
-    max-width: 72rem;
+  /* The one column the header, every section and the footer share. */
+  .mk-wrap {
+    box-sizing: content-box;
+    max-width: var(--mk-measure);
     margin-inline: auto;
-    padding-inline: var(--page-gutter);
+    padding-inline: var(--mk-rail);
   }
 
-  /* Primary CTA — accent pill; the accent's one large surface on the page */
-  .btn-fill {
+  .mk-section { padding-block: var(--mk-band-top) var(--mk-band-bottom); }
+
+  /* Twelve tracks. Children are full width until a width class opts them out,
+   * which keeps every section single-column on a phone by default. */
+  .mk-grid {
+    display: grid;
+    gap: var(--mk-row-gap) var(--mk-column-gap);
+    grid-template-columns: repeat(var(--mk-tracks, 12), minmax(0, 1fr));
+  }
+  .mk-grid > * {
+    grid-column: 1 / -1;
+    min-inline-size: 0;
+  }
+
+  /* `auto / span N` keeps the start line free so a start class can place the
+   * item without collapsing it to a single track. */
+  @media (min-width: 56.25rem) {
+    .mk-col-2 { grid-column: auto / span 2; }
+    .mk-col-4 { grid-column: auto / span 4; }
+    .mk-col-5 { grid-column: auto / span 5; }
+    .mk-col-6 { grid-column: auto / span 6; }
+    .mk-col-start-7 { grid-column-start: 7; }
+  }
+
+  /* Rhythm between stacked siblings, set once on the parent. */
+  .mk-flow > * + * { margin-block-start: var(--mk-flow-gap, var(--mk-space-sm)); }
+  .mk-flow--roomy { --mk-flow-gap: var(--mk-space-md); }
+
+  /* ── Type roles ─────────────────────────────────────────────────────── */
+  .mk-lead {
+    font-size: var(--mk-text-lead);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+  .mk-small { font-size: var(--mk-text-small); line-height: 1.45; }
+  .mk-label {
+    font-family: var(--mk-font-mono);
+    font-size: var(--mk-text-micro);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--mk-muted);
+  }
+  .mk-dim { color: var(--mk-muted); }
+
+  .mk-head {
+    max-width: 48rem;
+    margin-block-end: var(--mk-head-offset);
+  }
+
+  /* ── Controls ───────────────────────────────────────────────────────── */
+  .mk-btn {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-xs);
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--radius-pill);
-    border: none;
-    font-weight: 500;
-    font-size: var(--text-base);
-    color: var(--color-accent-ink);
-    background: var(--color-accent);
-    min-height: 44px;
-    white-space: nowrap;
+    justify-content: center;
+    gap: var(--mk-space-2xs);
+    min-height: 2.75rem;
+    padding-inline: var(--mk-space-md);
+    border: var(--mk-hairline) solid transparent;
+    border-radius: var(--mk-radius-button);
+    font: 500 var(--mk-text-base)/1.2 var(--mk-font-sans);
+    text-align: center;
     text-decoration: none;
-    cursor: pointer;
-    transition: background-color var(--dur-short) var(--ease-out),
-                transform 100ms var(--ease-out);
-  }
-  .btn-fill:hover { background: var(--color-focus); transform: translateY(-1px); }
-  .btn-fill:active { transform: translateY(1px); }
-  .btn-fill:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-  /* Typographic CTA — a word, an arrow, a 1px underline */
-  .btn-text {
-    display: inline-flex;
-    align-items: baseline;
-    gap: var(--space-2xs);
-    font-size: var(--text-base);
-    color: var(--color-ink-2);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.3em;
-    text-decoration-color: var(--color-rule);
     white-space: nowrap;
-    transition: color var(--dur-short) var(--ease-out),
-                text-decoration-color var(--dur-short) var(--ease-out);
+    cursor: pointer;
+    transition: background-color var(--mk-dur-base) var(--mk-ease),
+                border-color var(--mk-dur-base) var(--mk-ease);
   }
-  .btn-text:hover { color: var(--color-ink); text-decoration-color: var(--color-accent); }
+  .mk-btn--primary {
+    background: var(--mk-ink);
+    border: var(--mk-hairline) solid var(--mk-ink);
+    color: var(--mk-paper);
+  }
+  .mk-btn--primary:hover { background: var(--mk-accent); }
+  .mk-btn--secondary {
+    background: var(--mk-surface);
+    border: var(--mk-hairline) solid var(--mk-line);
+    color: var(--mk-ink);
+  }
+  .mk-btn--secondary:hover { background: var(--mk-haze); }
+  .mk-btn__arrow { flex: none; inline-size: 0.875rem; block-size: 0.875rem; }
 
-  /* Machine register — commands, stage numerals, data */
-  .mono {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    color: var(--color-muted);
+  /* A badge that happens to be a link. */
+  .mk-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--mk-space-2xs);
+    min-height: 2rem;
+    padding: var(--mk-space-3xs) var(--mk-space-xs);
+    border: var(--mk-hairline) solid var(--mk-line);
+    border-radius: var(--mk-radius-button);
+    background: var(--mk-surface);
+    font-size: var(--mk-text-micro);
+    color: var(--mk-ink);
+    text-decoration: none;
   }
 
-  /* Section head — stacked, left-aligned, no eyebrow */
-  .section-head {
-    max-width: 42rem;
-    margin-block-end: var(--space-2xl);
+  .mk-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--mk-space-2xs);
+    font-weight: 500;
+    color: var(--mk-ink);
+    text-decoration: underline;
+    text-decoration-thickness: var(--mk-hairline);
+    text-decoration-color: var(--mk-line);
+    text-underline-offset: 0.3em;
+    transition: text-decoration-color var(--mk-dur-base) var(--mk-ease);
   }
-  .section-head__title {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: var(--text-display-s);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    color: var(--color-ink);
-    margin: 0;
-    overflow-wrap: anywhere;
+  .mk-link:hover { text-decoration-color: var(--mk-accent); }
+
+  /* ── Surfaces ───────────────────────────────────────────────────────── */
+  .mk-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mk-space-2xs);
     min-width: 0;
+    padding: var(--mk-space-md);
+    border: var(--mk-hairline) solid var(--mk-line);
+    border-radius: var(--mk-radius-card);
+    background: var(--mk-surface);
   }
-  .section-head__sub {
-    font-size: var(--text-md);
-    color: var(--color-muted);
-    line-height: 1.6;
-    max-width: 60ch;
-    margin: var(--space-md) 0 0;
+  .mk-card > h3 {
+    font-family: var(--mk-font-sans);
+    font-weight: 500;
+    font-size: var(--mk-text-title);
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+  }
+  /* Body copy stays ink. Muted is 5.6:1 on paper — a caption colour, short of
+   * the 7:1 this palette holds body text to. */
+  .mk-card > p {
+    max-inline-size: 54ch;
+    color: var(--mk-ink);
   }
 
-  /* Typographic code frame — top rule + mono label, no fake window chrome */
-  .code-frame {
-    border-block: var(--rule-hair) solid var(--color-rule);
-    padding-block: var(--space-lg);
+  /* The inset ground a product shot is staged on, cropped by its own fade. */
+  .mk-stage {
+    position: relative;
+    block-size: var(--mk-stage-height, 20rem);
+    margin-block-start: var(--mk-space-md);
+    border-radius: var(--mk-radius-inset);
+    background: var(--mk-haze);
+    overflow: hidden;
   }
-  .code-frame__label {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-    margin: 0 0 var(--space-md);
+  .mk-stage::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    block-size: 3.5rem;
+    background: linear-gradient(transparent, var(--mk-haze));
+    pointer-events: none;
   }
-  .code-frame pre {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    line-height: 1.8;
-    color: var(--color-ink-2);
-    overflow-x: auto;
+
+  /* Carried by assistive tech only — live regions, the readable copy of a
+   * sentence that is split into animated spans. */
+  .mk-sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Hidden by clipping, never by an off-screen offset: a box parked at a large
+   * negative inset still counts as content outside a narrow viewport. */
+  .mk-skip {
+    position: absolute;
+    inset-block-start: var(--mk-space-2xs);
+    inset-inline-start: var(--mk-space-sm);
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    z-index: calc(var(--mk-z-bar) + 1);
+  }
+  .mk-skip:focus {
+    display: inline-flex;
+    align-items: center;
+    inline-size: auto;
+    block-size: 2.75rem;
+    padding-inline: var(--mk-space-md);
+    border-radius: var(--mk-radius-button);
+    overflow: visible;
+    clip-path: none;
+    background: var(--mk-ink);
+    color: var(--mk-paper);
+    text-decoration: none;
   }
 }
 
-/* ─── Hero entrance — the page's one orchestrated moment (SSR-safe) ───── */
-.hero-content {
-  animation: hero-enter 0.7s var(--ease-out) 0.05s both;
-}
-@keyframes hero-enter {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: none; }
+/* ─── Focus ────────────────────────────────────────────────────────────────
+ * Unlayered on purpose: a rule inside @layer base loses to the UI layer's own
+ * `outline-none` utilities, which would leave a keyboard user with no ring. */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--mk-focus);
+  outline-offset: 3px;
+  border-radius: var(--mk-radius-chip);
 }
 
-/* ─── Mobile nav disclosure ───────────────────────────────────────────── */
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: opacity var(--dur-short) var(--ease-out);
+/* ─── Scroll reveal ────────────────────────────────────────────────────────
+ * The hidden resting state applies only under `html.mk-reveal-armed`, which
+ * use-reveal.ts sets once it has actually found targets to observe. Nothing
+ * else may set it: if the composable never runs, or its selector stops
+ * matching, the content simply stays visible instead of disappearing. */
+.mk-reveal-armed .mk-reveal {
+  opacity: 0;
+  transform: translateY(0.875rem);
+  transition: opacity 0.6s var(--mk-ease-out), transform 0.6s var(--mk-ease-out);
 }
-.slide-down-enter-from,
-.slide-down-leave-to { opacity: 0; }
+.mk-reveal-armed .mk-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
 
-/* ─── Reduced motion ──────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+  .mk-reveal-armed .mk-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
   *, *::before, *::after {
-    animation-duration: 150ms !important;
+    animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 150ms !important;
+    transition-duration: 1ms !important;
   }
 }

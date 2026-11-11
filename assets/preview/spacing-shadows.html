@@ -1,28 +1,39 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Spacing — Shadows &amp; Glow</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spacing — Elevation</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
-  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 28px 24px; display: flex; gap: 22px; justify-content: space-between; align-items: center; }
-  .tile { flex: 1; height: 90px; background: var(--mk-bg-surface); border: 1px solid var(--mk-border-subtle); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
-  .n { font-size: 12.5px; font-weight: 500; }
-  .v { font-family: var(--mk-font-mono); font-size: 10.5px; color: var(--mk-fg-2); letter-spacing: .04em; }
-  .s-card { box-shadow: 0 2px 8px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04); }
-  .s-lift { box-shadow: 0 8px 24px rgba(15,23,42,.35); }
-  .s-glow { box-shadow: 0 0 20px rgba(37,99,235,.35); border-color: rgba(96,165,250,.3); }
-  .s-glow-s { box-shadow: 0 0 40px rgba(37,99,235,.55); border-color: rgba(96,165,250,.5); }
-  .s-inset { box-shadow: inset 0 0 0 1px rgba(96,165,250,.35); }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 28px 24px; }
+  .row { display: flex; gap: 22px; align-items: center; }
+  .tile { flex: 1; height: 96px; background: var(--mk-neutral-0); border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .n { font-size: 14px; font-weight: 500; }
+  .v { font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); letter-spacing: .04em; }
+  .e-flat { box-shadow: none; }
+  .e-card { box-shadow: var(--mk-shadow-card); }
+  .e-soft { box-shadow: var(--mk-shadow-soft); }
+  .e-lift { box-shadow: var(--mk-shadow-lift); }
+  .e-step { background: var(--mk-neutral-200); border-color: transparent; }
+  p { font-size: 14px; line-height: 1.6; margin: 20px 0 0; max-width: 880px; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
-  <div class="tile s-card"><div class="n">card</div><div class="v">soft light-mode</div></div>
-  <div class="tile s-lift"><div class="n">lift</div><div class="v">modal · 8·24</div></div>
-  <div class="tile s-glow"><div class="n">glow</div><div class="v">primary · .35</div></div>
-  <div class="tile s-glow-s"><div class="n">glow-strong</div><div class="v">focus · .55</div></div>
-  <div class="tile s-inset"><div class="n">inset-glow</div><div class="v">feature hover</div></div>
+  <div class="row">
+    <div class="tile e-flat"><div class="n">flat</div><div class="v">hairline only · default</div></div>
+    <div class="tile e-card"><div class="n">card</div><div class="v">0 2px 8px · 6%</div></div>
+    <div class="tile e-soft"><div class="n">soft</div><div class="v">0 4px 12px · 8%</div></div>
+    <div class="tile e-lift"><div class="n">lift</div><div class="v">0 8px 24px · 10%</div></div>
+    <div class="tile e-step"><div class="n">step</div><div class="v">surface → haze</div></div>
+  </div>
+  <p>Depth comes from the colour step first — paper to surface to haze — and from the hairline. Shadows are the exception: <code>--mk-shadow-card</code> for a card that must float over content, <code>--mk-shadow-lift</code> for a dialog. They are low-opacity night, never tinted blue.</p>
+  <p><strong>Glows are retired.</strong> Nothing in this identity emits light: no coloured halo, no blurred ring, no <code>filter</code>. A focus ring is a solid 3px dusk ring with no blur, and a hover is a 6% tint.</p>
 </body>
 </html>

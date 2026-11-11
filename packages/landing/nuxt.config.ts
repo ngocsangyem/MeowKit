@@ -69,8 +69,12 @@ export default defineNuxtConfig({
   // ─── Fonts ──────────────────────────────────────────────────────────────
   fonts: {
     families: [
-      { name: 'Geist', provider: 'google', weights: [400, 500, 700] },
-      { name: 'Geist Mono', provider: 'google', weights: [400], display: 'optional' },
+      // Display — Newsreader 400 is the headline voice; 500 for the rare emphasis
+      { name: 'Newsreader', provider: 'google', weights: [400, 500] },
+      // Text
+      { name: 'Onest', provider: 'google', weights: [400, 500, 700] },
+      // Wordmark, commands and UI labels
+      { name: 'JetBrains Mono', provider: 'google', weights: [400, 500] },
     ],
     defaults: { preload: true },
   },
@@ -86,6 +90,14 @@ export default defineNuxtConfig({
     theme: {
       colors: ['primary', 'neutral'],
     },
+  },
+
+  // The landing identity is light-first and has no approved dark treatment for
+  // its sections. Left on `system`, @nuxt/ui adds `html.dark` and paints the
+  // body slate-900 while the page's ink text stays dark — unreadable.
+  colorMode: {
+    preference: 'light',
+    fallback: 'light',
   },
 
   $development: {
@@ -119,9 +131,6 @@ export default defineNuxtConfig({
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes('use-particles') || id.includes('particles-canvas')) {
-              return 'particles'
-            }
             if (id.includes('node_modules/vue') || id.includes('node_modules/@vue')) {
               return 'vendor-vue'
             }

@@ -12,14 +12,17 @@ export default function HomePage() {
     <main className="flex flex-1 flex-col">
       <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-6 py-16 md:grid-cols-2 md:px-12 md:py-24 lg:px-16">
         <div className="flex flex-col gap-6">
+          {/* Ink, not accent. The accent is a signal — links, active state, the primary
+              action — and a headline painted in it spends the one colour the brand has
+              on something that was already the largest thing on the page. */}
           <h1
-            className="text-4xl font-bold tracking-tight text-fd-primary md:text-5xl"
+            className="text-4xl font-normal tracking-[-0.028em] md:text-5xl"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             MeowKit
           </h1>
           <p
-            className="text-2xl font-bold tracking-tight md:text-3xl"
+            className="text-2xl font-normal tracking-[-0.022em] md:text-3xl"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Enforced discipline for AI coding agents

@@ -162,13 +162,13 @@ onBeforeUnmount(() => cancelAnimationFrame(raf))
       :style="{
         left: `${tooltip.x + 14}px`,
         top: `${tooltip.y + 14}px`,
-        background: 'var(--color-paper-2)',
-        borderColor: 'var(--color-rule)',
-        color: 'var(--color-ink)',
+        background: 'var(--mk-night-raised)',
+        borderColor: 'var(--mk-night-edge)',
+        color: 'var(--mk-night-ink)',
       }"
     >
       <span class="font-medium">{{ tooltip.label }}</span>
-      <span class="ml-2" style="color: var(--color-muted)">{{ tooltip.sub }}</span>
+      <span class="ml-2" style="color: var(--mk-night-muted)">{{ tooltip.sub }}</span>
     </div>
     <!-- Screen-reader mirror of the canvas content -->
     <ul class="sr-only">

@@ -1,37 +1,44 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Components — Sidebar Item</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Components — Sidebar item</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
-  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px; display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start;}
-  .side { background: var(--mk-bg-base); border: 1px solid var(--mk-border-subtle); border-radius: 10px; padding: 14px 8px; }
-  .group { font-family: var(--mk-font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-fg-3); padding: 6px 12px; margin-top: 6px; }
-  .item { position: relative; display: flex; align-items: center; padding: 6px 12px; font-size: 13.5px; color: var(--mk-fg-2); cursor: pointer; border-radius: 4px; }
-  .item:hover { color: var(--mk-fg-1); }
-  .item.active { color: var(--mk-accent-glow); }
-  .item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 2px; background: var(--mk-accent-glow); border-radius: 2px; }
-  .note { color: var(--mk-fg-2); font-size: 13px; line-height: 1.55; padding: 10px 4px; }
-  .note b { color: var(--mk-fg-1); font-weight: 500; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px; display: grid; grid-template-columns: 270px 1fr; gap: 24px; align-items: start; }
+  .side { border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 14px 8px; background: var(--mk-neutral-50); }
+  .group { font-family: var(--mk-font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-fg-2); padding: 6px 12px; margin-top: 8px; }
+  .item { position: relative; display: flex; align-items: center; padding: 7px 12px; font-size: 14px; color: var(--mk-neutral-900); border-radius: var(--mk-radius-xs); cursor: pointer; }
+  .item:hover { background: var(--mk-hover-bg); }
+  .item.on { color: var(--mk-blue-700); background: var(--mk-active-bg); }
+  .item.on::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 2px; background: var(--mk-blue-600); }
+  .note { font-size: 14px; line-height: 1.6; }
+  .note h2 { font-family: var(--mk-font-display); font-weight: 400; font-size: 22px; letter-spacing: -.015em; margin: 0 0 8px; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
-  <div class="side">
+  <nav class="side">
     <div class="group">Guide</div>
     <div class="item">Introduction</div>
     <div class="item">Installation</div>
-    <div class="item">Quick Start</div>
+    <div class="item">Quick start</div>
     <div class="group">Workflow</div>
     <div class="item">Philosophy</div>
-    <div class="item active">Workflow Phases</div>
-    <div class="item">Memory System</div>
-    <div class="item">Model Routing</div>
-  </div>
+    <div class="item on">Workflow phases</div>
+    <div class="item">Memory system</div>
+    <div class="item">Model routing</div>
+  </nav>
   <div class="note">
-    <b>Sidebar item</b> — default <span style="color:var(--mk-fg-3)">#94A3B8</span>, hover brightens to fg-1, active gets the accent glow (#60A5FA) with a 2px left indicator. Groups use mono eyebrow type.
+    <h2>Sidebar item</h2>
+    <p>Items read as ink on paper at 15.5:1 — never muted, because a navigation label is a target, not metadata. Hover fills with a 6% dusk tint. The active item takes dusk text, a 12% tint and a 2px dusk bar at the left edge.</p>
+    <p>Group headers are the one muted element here: JetBrains Mono 11px, uppercase, <code>--mk-fg-2</code>. Radius is 4px on items, 8px on the panel.</p>
   </div>
 </body>
 </html>

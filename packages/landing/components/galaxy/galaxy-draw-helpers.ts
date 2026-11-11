@@ -6,13 +6,13 @@ import type { SatelliteMap, GalaxyNodeKind } from '~/composables/use-galaxy-data
 
 // Single source of truth for kind accents; the page legend reads the same map.
 export const KIND_COLORS: Record<GalaxyNodeKind, string> = {
-  skill: '#6ea8ff',
-  agent: '#e0a63f',
-  command: '#46c78f',
-  hook: '#c084f5',
+  skill: '#8fb5e8',
+  agent: '#eef2f7',
+  command: '#5c87c4',
+  hook: '#9aa6bb',
 }
-export const INK = '#e8ecf5'
-export const MUTED = '#8b94a8'
+export const INK = '#eef2f7'
+export const MUTED = '#9aa6bb'
 
 const GOLDEN = 2.399963229728653
 
@@ -136,7 +136,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, s: DrawState) {
   ctx.setLineDash([])
   ctx.globalAlpha = 0.8
   ctx.fillStyle = MUTED
-  ctx.font = '13px "Geist Mono", monospace'
+  ctx.font = '13px "JetBrains Mono", ui-monospace, monospace'
   ctx.textAlign = 'center'
   ctx.fillText(`+${map.belt.count} more in the belt`, 0, -layout.beltR - 14)
   ctx.globalAlpha = 1
@@ -206,7 +206,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, s: DrawState) {
     }
     if (isPlanet) {
       ctx.fillStyle = INK
-      ctx.font = '600 14px Geist, sans-serif'
+      ctx.font = '600 14px Onest, system-ui, sans-serif'
       ctx.textAlign = 'center'
       ctx.fillText(inst.label, pos.x, pos.y + r + 20)
     }

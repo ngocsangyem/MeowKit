@@ -1,34 +1,48 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Components — Inputs</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
-  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
-  .field { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--mk-border-subtle); border-radius: 6px; background: var(--mk-bg-surface); }
-  .field.focus { border-color: var(--mk-accent-glow); box-shadow: 0 0 0 3px rgba(96,165,250,.35); }
-  .field .ic { color: var(--mk-fg-3); font-family: var(--mk-font-mono); font-size: 14px; }
-  .field input { background: transparent; border: 0; outline: 0; color: var(--mk-fg-1); font: inherit; flex: 1; font-size: 14px; }
-  .field input::placeholder { color: var(--mk-fg-3); }
-  .kbd { font-family: var(--mk-font-mono); font-size: 11px; padding: 2px 6px; border-radius: 4px; background: rgba(148,163,184,.14); color: var(--mk-fg-2); border: 1px solid var(--mk-border-subtle); }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
   .row { display: flex; gap: 12px; align-items: center; }
-  .lbl { font-family: var(--mk-font-mono); font-size: 10.5px; color: var(--mk-fg-2); letter-spacing: .1em; text-transform: uppercase; width: 70px; }
-  .sel { display:inline-flex; align-items:center; gap:6px; background: rgba(37,99,235,.14); color: var(--mk-accent-glow); border: 1px solid rgba(96,165,250,.3); border-radius: 6px; padding: 6px 10px; font-size: 13px; }
+  .lbl { font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); letter-spacing: .1em; text-transform: uppercase; width: 84px; flex: 0 0 84px; }
+  .field { flex: 1; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-sm); background: var(--mk-neutral-0); }
+  .field.focus { border-color: var(--mk-blue-600); box-shadow: var(--mk-focus-ring); }
+  .field.error { border-color: var(--mk-danger); }
+  .field .ic { font-family: var(--mk-font-mono); font-size: 14px; color: var(--mk-neutral-700); }
+  .field input { flex: 1; border: 0; outline: 0; background: transparent; font-family: var(--mk-font-sans); font-size: 15px; color: var(--mk-neutral-900); }
+  .field input::placeholder { color: var(--mk-neutral-700); }
+  .kbd { font-family: var(--mk-font-mono); font-size: 11px; padding: 2px 6px; border-radius: var(--mk-radius-xs); border: 1px solid var(--mk-border-subtle); background: var(--mk-neutral-100); color: var(--mk-neutral-700); }
+  .sel { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: var(--mk-radius-sm); border: 1px solid var(--mk-border-subtle); background: var(--mk-neutral-100); font-size: 14px; color: var(--mk-neutral-900); }
+  .sel.on { border-color: var(--mk-blue-600); color: var(--mk-blue-700); }
+  .err { font-size: 13px; color: var(--mk-danger); margin-left: 96px; }
+  .note { font-size: 14px; line-height: 1.6; margin: 4px 0 0; max-width: 820px; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
-  <div class="row"><div class="lbl">default</div>
-    <div class="field" style="flex:1"><span class="ic">⌕</span><input placeholder="Search docs…" /><span class="kbd">⌘ K</span></div>
+  <div class="row"><span class="lbl">default</span>
+    <div class="field"><span class="ic">&#8997;</span><input placeholder="Search the docs" aria-label="Search the docs"><span class="kbd">&#8984; K</span></div>
   </div>
-  <div class="row"><div class="lbl">focus</div>
-    <div class="field focus" style="flex:1"><span class="ic">⌕</span><input value="mk:plan-creator" /><span class="kbd">enter</span></div>
+  <div class="row"><span class="lbl">focus</span>
+    <div class="field focus"><span class="ic">&#8997;</span><input value="mk:plan-creator" aria-label="Search the docs, focused"><span class="kbd">enter</span></div>
   </div>
-  <div class="row"><div class="lbl">select</div>
-    <div class="sel">Tier · STANDARD <span style="opacity:.6">▾</span></div>
-    <div class="sel" style="background:rgba(247,144,9,.14); color:#F79009; border-color:rgba(247,144,9,.3)">Mode · strict <span style="opacity:.6">▾</span></div>
+  <div class="row"><span class="lbl">error</span>
+    <div class="field error"><span class="ic">&#8997;</span><input value="rm -rf" aria-label="Search the docs, invalid"></div>
   </div>
+  <div class="err">Command not found in this kit.</div>
+  <div class="row"><span class="lbl">select</span>
+    <span class="sel">Tier · STANDARD &#9662;</span>
+    <span class="sel on">Mode · strict &#9662;</span>
+  </div>
+  <p class="note">Fields are 6px, white on paper, with a hairline border. Focus moves the border to dusk and adds the 3px dusk ring from <code>--mk-focus-ring</code> — never removed, never replaced by a glow. Error swaps the border to danger and puts the reason in a sentence underneath.</p>
 </body>
 </html>
