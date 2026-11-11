@@ -78,6 +78,26 @@ pub fn store(
     })
 }
 
+/// Every readable cache entry, in no particular order. An unreadable entry is
+/// skipped, as `--offline` skips it.
+pub fn list(cache_dir: &Path) -> Vec<Entry> {
+    let mut out: Vec<Entry> = std::fs::read_dir(cache_dir)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter(|d| !d.file_name().to_string_lossy().starts_with('.'))
+        .filter_map(|d| load(&d.path()).ok().flatten())
+        .collect();
+    // Newest first, by version rather than by name (2.10.0 above 2.9.0).
+    out.sort_by_cached_key(|e| {
+        std::cmp::Reverse(Version::parse(&format!(
+            "v{}",
+            e.meta.version.trim_start_matches('v')
+        )))
+    });
+    out
+}
+
 /// The newest cached kit, or the newest of `version`, for `--offline`.
 pub fn newest(cache_dir: &Path, version: Option<&str>) -> Result<Entry, KitError> {
     let mut best: Option<(Option<Version>, Entry)> = None;

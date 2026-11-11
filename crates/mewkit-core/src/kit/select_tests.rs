@@ -75,3 +75,26 @@ fn a_draft_is_never_chosen_even_by_tag() {
     draft.draft = true;
     assert!(choose(&[draft], Some("v2.17.0"), true).is_err());
 }
+
+#[test]
+fn available_lists_installable_releases_newest_first() {
+    let releases: Vec<Release> = serde_json::from_str(
+        r#"[
+        {"tag_name":"v2.15.0","assets":[{"name":"meowkit-release.zip","browser_download_url":"u"}]},
+        {"tag_name":"v2.16.0","assets":[{"name":"meowkit-release.zip","browser_download_url":"u"},{"name":"checksums.txt","browser_download_url":"c"}]},
+        {"tag_name":"v2.17.0-beta.1","prerelease":true,"assets":[{"name":"meowkit-release.zip","browser_download_url":"u"}]},
+        {"tag_name":"v2.18.0","draft":true,"assets":[{"name":"meowkit-release.zip","browser_download_url":"u"}]},
+        {"tag_name":"mewkit-v0.1.0","assets":[{"name":"meowkit-release.zip","browser_download_url":"u"}]},
+        {"tag_name":"v2.14.0","assets":[]}
+    ]"#,
+    )
+    .unwrap();
+    let names = |beta| -> Vec<String> {
+        available(&releases, beta)
+            .into_iter()
+            .map(|l| format!("{}{}", l.version, if l.verified { "+" } else { "" }))
+            .collect()
+    };
+    assert_eq!(names(false), ["2.16.0+", "2.15.0"]);
+    assert_eq!(names(true), ["2.17.0-beta.1", "2.16.0+", "2.15.0"]);
+}

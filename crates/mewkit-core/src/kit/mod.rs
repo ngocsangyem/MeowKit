@@ -13,9 +13,10 @@ mod select;
 
 use std::path::{Path, PathBuf};
 
+pub use cache::{Entry as CachedKit, list as cached_kits};
 pub use checksum::expected_for;
 pub use contract::KitContract;
-pub use select::{ARCHIVE_NAME, CHECKSUMS_NAME, Release};
+pub use select::{ARCHIVE_NAME, CHECKSUMS_NAME, Listed, Release};
 
 use crate::fsx::sha256_hex;
 use crate::ownership::Origin;
@@ -152,6 +153,14 @@ pub fn resolve(req: &KitRequest, http: &dyn Http) -> Result<Kit, KitError> {
         contract: entry.contract,
         notices,
     })
+}
+
+/// Kit releases that can be installed, newest first (network).
+pub fn list_available(http: &dyn Http, beta: bool) -> Result<Vec<select::Listed>, KitError> {
+    let listing = http.get(RELEASES_URL, MAX_LISTING_BYTES)?;
+    let releases: Vec<Release> = serde_json::from_slice(&listing)
+        .map_err(|e| KitError::Http(format!("unreadable release listing: {e}")))?;
+    Ok(select::available(&releases, beta))
 }
 
 /// Download, verify and cache one release.

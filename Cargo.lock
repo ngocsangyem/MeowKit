@@ -467,6 +467,7 @@ dependencies = [
  "mewkit-core",
  "serde_json",
  "tempfile",
+ "toml_edit",
  "zip",
 ]
 
