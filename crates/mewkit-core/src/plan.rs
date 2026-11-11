@@ -6,6 +6,7 @@
 use serde_json::{Map, Value};
 
 use crate::fsx::RelPath;
+pub use crate::merge::hook_groups::Handler;
 
 /// File format of a user-owned file the kit merges into.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -52,6 +53,19 @@ pub enum Op {
         key: Vec<String>,
         names: Vec<String>,
     },
+    /// Insert or replace kit hook handlers in the `hooks.<event>` array of a
+    /// Claude Code `settings.json` or Codex `hooks.json`.
+    MergeHooks {
+        path: RelPath,
+        event: String,
+        handlers: Vec<Handler>,
+    },
+    /// Undo a `MergeHooks`; the ownership index supplies the handlers it added.
+    StripHooks {
+        path: RelPath,
+        event: String,
+        ids: Vec<String>,
+    },
 }
 
 impl Op {
@@ -62,7 +76,9 @@ impl Op {
             | Op::MergeBlock { path, .. }
             | Op::StripBlock { path, .. }
             | Op::MergeEntries { path, .. }
-            | Op::StripEntries { path, .. } => path,
+            | Op::StripEntries { path, .. }
+            | Op::MergeHooks { path, .. }
+            | Op::StripHooks { path, .. } => path,
         }
     }
 }

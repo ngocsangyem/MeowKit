@@ -75,7 +75,7 @@ pub fn strip(
     Ok(render(&doc))
 }
 
-fn parse(text: &str) -> Result<Value, MergeError> {
+pub(super) fn parse(text: &str) -> Result<Value, MergeError> {
     if text.trim().is_empty() {
         return Ok(Value::Object(Map::new()));
     }
@@ -107,7 +107,7 @@ fn not_object(key: &[&str]) -> MergeError {
     MergeError::Malformed(format!("`{}` is not a JSON object", key.join(".")))
 }
 
-fn render(doc: &Value) -> String {
+pub(super) fn render(doc: &Value) -> String {
     let mut out = serde_json::to_string_pretty(doc).expect("a Value serializes");
     out.push('\n');
     out

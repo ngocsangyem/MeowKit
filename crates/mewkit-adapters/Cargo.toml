@@ -10,7 +10,9 @@ publish.workspace = true
 
 [dependencies]
 mewkit-core = { path = "../mewkit-core" }
+serde_json = { version = "1.0.154", features = ["preserve_order"] }
 thiserror = "2.0.21"
+toml_edit = "0.25.19"
 
 [lints]
 workspace = true
