@@ -3,6 +3,7 @@
 //! behaviour itself belongs in `mewkit-core` and `mewkit-adapters`.
 #![forbid(unsafe_code)]
 
+mod adopt;
 mod commands;
 mod failure;
 mod kit_args;

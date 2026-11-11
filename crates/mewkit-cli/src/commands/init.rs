@@ -3,7 +3,8 @@ use clap::Args;
 use mewkit_adapters::contract::{OwnershipIndex, written_hashes};
 use mewkit_core::exec::ExecOptions;
 
-use super::{Common, Job, emitter_for, parse_targets, prepare, run_jobs, stamp};
+use super::{Common, Job, drop_retired, emitter_for, parse_targets, prepare, run_jobs, stamp};
+use crate::adopt;
 use crate::failure::Failure;
 use crate::kit_args::{KitArgs, contract_label};
 use crate::output;
@@ -41,11 +42,24 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
     let mut jobs = Vec::new();
     for runtime in targets {
         let e = emitter_for(runtime)?;
-        let plan = prepare(&place, e, &kit, &packs)?;
-        let hashes = written_hashes(&plan);
-        let mut index = place.index(runtime)?.unwrap_or_else(|| {
-            OwnershipIndex::new(&kit.version, &contract_label(&kit), kit.origin)
-        });
+        let mut plan = prepare(&place, e, &kit, &packs)?;
+        let mut hashes = written_hashes(&plan);
+        let mut index = match place.index(runtime)? {
+            Some(index) => index,
+            None => match adopt::record(&place, runtime)? {
+                Some(record) => {
+                    let index = adopt::take_over(&place, e, &record, &mut plan, &kit);
+                    // No old kit exists: the adopted hashes corroborate removing
+                    // what the npm install had and this kit no longer ships.
+                    drop_retired(&place, e, &index, &mut plan)?;
+                    for (p, h) in &index.paths {
+                        hashes.entry(p.clone()).or_insert_with(|| h.clone());
+                    }
+                    index
+                }
+                None => OwnershipIndex::new(&kit.version, &contract_label(&kit), kit.origin),
+            },
+        };
         stamp(&mut index, &kit, &packs);
         jobs.push(Job {
             e,

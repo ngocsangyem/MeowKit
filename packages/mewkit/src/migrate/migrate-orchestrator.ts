@@ -1,6 +1,7 @@
 // Main migration orchestrator. Composes all phases into runMigrate(options).
 
 import { existsSync } from "node:fs";
+import { mewkitNextIndex, mewkitNextRefusal } from "../commands/mewkit-next-ownership-guard.js";
 import { readFile } from "node:fs/promises";
 import { join, relative, dirname } from "node:path";
 import * as p from "@clack/prompts";
@@ -96,6 +97,13 @@ export async function runMigrate(options: MigrateOptions, ctx: RunMigrateContext
 	const targets = await selectProviders(options);
 	warnUnverifiedProviders(targets);
 	const isGlobal = await selectScope(options);
+	for (const target of targets) {
+		const owned = mewkitNextIndex(process.cwd(), target, isGlobal);
+		if (owned !== undefined) {
+			console.error(pc.red(mewkitNextRefusal("migrate", target, owned)));
+			return 1;
+		}
+	}
 
 	const lockResult = await acquireMigrationLock({ scope: isGlobal ? "global" : "project" });
 	if (!lockResult.acquired) {

@@ -19,6 +19,7 @@ import { assessCache } from "../core/kit-cache-trust.js";
 import { insideKitScope } from "../core/ownership-classify.js";
 import { readInstallMetadata, type InstallFileEntry, type InstallMetadata } from "../core/install-metadata.js";
 import { writeInstallMetadata } from "../core/install-metadata-writer.js";
+import { mewkitNextIndex, mewkitNextRefusal } from "./mewkit-next-ownership-guard.js";
 
 export interface AdoptResult {
 	ok: boolean;
@@ -130,6 +131,14 @@ export async function doctorAdopt(root: string | null, json = false): Promise<nu
 	if (root === null) {
 		if (json) console.log(JSON.stringify({ ok: false, message: "No project here." }, null, 2));
 		else console.error(pc.red("No MeowKit project here."));
+		return 1;
+	}
+
+	const owned = mewkitNextIndex(root, "claude-code");
+	if (owned !== undefined) {
+		const message = mewkitNextRefusal("doctor --adopt", "claude-code", owned);
+		if (json) console.log(JSON.stringify({ ok: false, message }, null, 2));
+		else console.error(pc.red(message));
 		return 1;
 	}
 

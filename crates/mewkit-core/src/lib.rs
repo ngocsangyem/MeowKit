@@ -4,6 +4,7 @@
 //! `process::exit` — so every behaviour it owns is testable without a TTY.
 #![forbid(unsafe_code)]
 
+pub mod adopt;
 pub mod backup;
 pub mod exec;
 pub mod fsx;

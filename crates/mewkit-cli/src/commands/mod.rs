@@ -6,7 +6,7 @@ pub mod upgrade;
 use std::collections::BTreeMap;
 
 use clap::Args;
-use mewkit_adapters::contract::{Kit, OwnershipIndex, Plan, RelPath, Runtime, written_hashes};
+use mewkit_adapters::contract::{Kit, Op, OwnershipIndex, Plan, RelPath, Runtime, written_hashes};
 use mewkit_adapters::{EmitRequest, Emitter, emitter};
 use mewkit_core::exec::{ExecOptions, execute};
 
@@ -146,4 +146,26 @@ pub fn run_jobs(
     }
     output::print(&outcomes, json);
     Ok(outcomes)
+}
+
+/// Remove what `index` owns that the new plan no longer writes, inside the
+/// emitter's roots. Each removal still needs the bytes to match a known kit
+/// hash. Returns how many paths were queued.
+pub fn drop_retired(
+    place: &Place,
+    e: &dyn Emitter,
+    index: &OwnershipIndex,
+    plan: &mut Plan,
+) -> Result<usize, Failure> {
+    let new = written_hashes(plan);
+    let roots = e.roots(&place.scope);
+    let mut queued = 0;
+    for path in index.paths.keys().filter(|p| !new.contains_key(*p)) {
+        let path = RelPath::new(path)?;
+        if roots.iter().any(|r| path.is_within(r)) {
+            plan.ops.push(Op::RemoveFile { path });
+            queued += 1;
+        }
+    }
+    Ok(queued)
 }
