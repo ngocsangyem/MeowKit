@@ -68,9 +68,15 @@ fn scripts(place: &Place, runtime: Runtime) -> Check {
             }
         })
         .collect();
+    // Cursor runs user hooks from `~/.cursor/`, so a global install's
+    // relative paths start there; every other hook file runs from the root.
+    let base = match (runtime, place.scope.kind) {
+        (Runtime::Cursor, ScopeKind::Global) => file.parent().unwrap_or(&place.scope.root),
+        _ => &place.scope.root,
+    };
     let missing: Vec<&String> = scripts
         .iter()
-        .filter(|s| !resolve(&place.scope.root, s).is_file())
+        .filter(|s| !resolve(base, s).is_file())
         .collect();
     if missing.is_empty() {
         Check::new(

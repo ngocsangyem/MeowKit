@@ -89,8 +89,8 @@ opposite models — know which applies before editing.
   user-edited managed files are preserved or reported as an explicit conflict, never
   silently overwritten. Adding a `.claude/` skill/agent/rule/command/hook means
   hand-authoring the matching Codex-native file(s) — see `RELEASING.md` step 1e.
-- **Cursor — runtime converter** (no bundle). `migrate cursor` converts `.claude/` on the
-  fly: `agents/*.md` → `.cursor/rules/*.mdc` (fm-to-fm), rules + config → `.mdc`
+- **Cursor — converted at install time by the npm CLI** (no authored bundle). `migrate cursor` converts
+  `.claude/` on the fly: `agents/*.md` → `.cursor/rules/*.mdc` (fm-to-fm), rules + config → `.mdc`
   (md-to-mdc), `skills/` direct-copied; Cursor has no command or hook surface. New
   `.claude/` content reaches Cursor automatically.
 
@@ -100,6 +100,27 @@ own custom agents/commands/hooks (toolkit agents ship in the bundle); the only k
 converter is the opt-in `--include-mcp` `.mcp.json` → `config.toml [mcp_servers]` merge.
 The shared converters (`converters/{md-strip,fm-to-fm,md-to-mdc,direct-copy}.ts`) + the
 reference-rewriter family still serve Cursor and the surviving Codex config/rules path.
+
+## Rust installer (`mewkit-next`) and the two release streams
+
+`crates/` holds `mewkit-next`, the native installer replacing the npm CLI's install lifecycle
+(`init`, `upgrade`, `uninstall`, `doctor`, `providers`, `versions`, plus `self-update`).
+
+- **Adapter contract** (ADR [`261110-rust-adapter-contract.md`](adr/261110-rust-adapter-contract.md)):
+  one emitter per runtime in `crates/mewkit-adapters` (`claude_code`, `codex`, `cursor`) turns
+  the kit into a `Plan` of owned-data ops; `crates/mewkit-core` executes every plan through one
+  journal with backups, dry-run and an ownership index per runtime and scope. Cursor here is an
+  emitter like the others, not a converter.
+- **Scopes:** project (state in `.meowkit/`) and global (home directory, state in
+  `~/.mewkit/state/`), honouring `CLAUDE_CONFIG_DIR` and `CODEX_HOME`.
+- **Two release streams** (ADR [`261110-two-release-streams.md`](adr/261110-two-release-streams.md)):
+  the kit ships on `v*` tags as `meowkit-release.zip`; the binary ships on `mewkit-v*` tags as
+  six `mewkit-next-*.tar.gz` archives with `binary-manifest.json`, never as GitHub's latest
+  release and never with a `.zip`, so deployed npm CLIs cannot mistake it for a kit.
+  `install.sh` / `install.ps1` pin each archive by SHA-256 and size; no signatures.
+- **Proof:** `crates/mewkit-cli/tests/lifecycle_matrix.rs` runs install → doctor → edit →
+  upgrade → uninstall for each runtime at both scopes. Retiring the npm CLI follows
+  [`docs/maintainer/mewkit-next-cutover.md`](../maintainer/mewkit-next-cutover.md).
 
 ## Team memory store
 

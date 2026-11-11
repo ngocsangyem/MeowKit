@@ -193,6 +193,26 @@ echo "MEOWKIT_GEMINI_API_KEY=your-key" >> .meowkit/.env
 
 Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 
+## Preview: the `mewkit-next` binary
+
+`mewkit-next` is a native installer for the same kit, in preview beside the npm CLI. It installs, upgrades, removes and checks the kit for Claude Code, Codex and Cursor, in a project or in your home directory, and needs no Node.js to run itself. Every other command still comes from the npm CLI; see [mewkit-next](/cli/mewkit-next) for what it covers.
+
+Linux and macOS:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh
+```
+
+Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.ps1 | iex
+```
+
+The installer puts `mewkit-next` in `~/.local/bin` (set `MEWKIT_INSTALL_DIR` to change it) and says so when that directory is not on your `PATH`. `MEWKIT_CHANNEL=beta` installs the newest prerelease. Each installer carries, for every platform, the exact download URL, SHA-256 and size of the release it installs, and refuses a download that differs; there is no signature. Until the first binary release, the installers say no release is pinned.
+
+Later updates: `mewkit-next self-update`, which checks the release's `binary-manifest.json` digest and size before replacing itself and keeps the previous binary beside it with an `.old` suffix.
+
 ## Troubleshooting
 
 | Issue | Fix |

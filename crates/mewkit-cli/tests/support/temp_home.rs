@@ -13,6 +13,10 @@ use tempfile::TempDir;
 /// from every spawned command so the invoking shell cannot decide a result.
 const STRIPPED_PREFIXES: [&str; 3] = ["MEOWKIT_", "MEOW_", "MK_"];
 
+/// Variables that move a runtime's global directory out of `HOME`; one
+/// inherited from the invoking shell would send a global install there.
+const RELOCATING_VARS: [&str; 2] = ["CLAUDE_CONFIG_DIR", "CODEX_HOME"];
+
 /// A scratch home and project root, removed when dropped.
 pub struct TempHome {
     dir: TempDir,
@@ -47,6 +51,9 @@ impl TempHome {
             if STRIPPED_PREFIXES.iter().any(|p| key_str.starts_with(p)) {
                 cmd.env_remove(&key);
             }
+        }
+        for var in RELOCATING_VARS {
+            cmd.env_remove(var);
         }
         cmd.current_dir(self.project())
             .env("HOME", &home)

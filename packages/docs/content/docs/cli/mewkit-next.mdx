@@ -1,0 +1,93 @@
+---
+title: "mewkit-next"
+description: "The native installer in preview: install, upgrade, remove and check the kit for Claude Code, Codex and Cursor."
+---
+
+`mewkit-next` installs the kit with one emitter per runtime, so each runtime gets files in its own format instead of a converted copy of `.claude/`. It covers the install lifecycle only; every other command (`plan`, `task`, `review`, `validate`, …) still comes from the npm `mewkit` CLI. [Installation](/installation#preview-the-mewkit-next-binary) shows how to get it.
+
+## Runtimes and scopes
+
+| Runtime | `--target` | Project install | `--global` install |
+| --- | --- | --- | --- |
+| Claude Code | `claude-code` | `.claude/` | `~/.claude/` (or `CLAUDE_CONFIG_DIR`) |
+| Codex | `codex` | `.codex/`, `.agents/skills/`, a block in `AGENTS.md` | `~/.codex/` (or `CODEX_HOME`), `~/.agents/skills/` |
+| Cursor | `cursor` | `.cursor/` | `~/.cursor/` |
+
+`--target` takes a comma-separated list or `all`. mewkit's own state (ownership indexes, lock, kit cache) lives in `.meowkit/` for a project and `~/.mewkit/state/` for a global install. Files you already had are merged, never replaced: hook files handler by handler, Markdown by a marked block, JSON and TOML by key.
+
+Before `init`, `upgrade` or `uninstall` changes anything, it copies every file it is about to change or remove into a new directory under `.meowkit/backups/` (`~/.mewkit/state/backups/` globally).
+
+## init
+
+```bash
+mewkit-next init --target claude-code,cursor
+mewkit-next init --global --target all
+mewkit-next init --target codex --dry-run
+```
+
+Downloads the newest kit release (`--beta` allows a prerelease; `--kit-version v2.16.0` pins one), checks it against the release's `checksums.txt` and its `kit-contract.json`, and writes it for each runtime. `--skill-packs` adds optional packs to the core skills. `--offline` uses the newest kit already in the cache; `--kit-archive <zip>` installs a local `meowkit-release.zip`, checked against `--kit-sha256` or a `checksums.txt` beside it.
+
+## upgrade
+
+```bash
+mewkit-next upgrade
+mewkit-next upgrade --target cursor --dry-run
+```
+
+Moves the runtimes installed here to the newest kit, with the packs they were installed with. A file you edited after the kit wrote it is kept and named, and the command exits 6; `--force` replaces it.
+
+## uninstall
+
+```bash
+mewkit-next uninstall            # shows what would go
+mewkit-next uninstall --yes
+mewkit-next uninstall --global --target codex --yes
+```
+
+Removes exactly what the kit installed: owned files, merged hook handlers, blocks and keys. Your own content in shared files stays. An edited file is kept unless `--force`.
+
+## doctor
+
+```bash
+mewkit-next doctor
+mewkit-next doctor --global --json
+```
+
+Read-only. Checks Node.js, both scopes' installs (owned files present or edited), that every kit hook script a hook file names exists, Codex project trust, and which kit hook behaviours a runtime does not carry. Exits 1 when a check fails.
+
+## providers
+
+```bash
+mewkit-next providers --target codex
+```
+
+What each runtime would get from the kit at this scope: files, skills, hooks, and the gaps, without installing anything.
+
+## versions
+
+```bash
+mewkit-next versions
+mewkit-next versions --offline
+```
+
+The kits installed here, the kits in the cache, the kits available on GitHub, and the kit contract range this binary supports.
+
+## self-update
+
+```bash
+mewkit-next self-update --check
+mewkit-next self-update
+mewkit-next self-update --channel beta
+```
+
+Fetches the newest binary release's `binary-manifest.json`, refuses an older version, checks the archive's SHA-256 and size, and replaces itself, keeping the previous binary beside it with an `.old` suffix. `--check` only reports, and exits 3 when an update exists. When the running version has been withdrawn, it says so.
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| 0 | Done |
+| 1 | Failed; nothing was left half-applied |
+| 2 | The command line was wrong |
+| 3 | A dry run found changes to make (or `self-update --check` found an update) |
+| 6 | Files you edited were kept; `--force` replaces or removes them |

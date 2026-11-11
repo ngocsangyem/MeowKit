@@ -31,13 +31,22 @@ pub fn take(
     Ok(Some(dest))
 }
 
-/// `<backups_dir>/<unix-seconds>-<pid>[-n]`, created 0700.
+/// Ignores everything beside it, so git never offers a backup for commit.
+const IGNORE_ALL: &[u8] = b"# Created by mewkit-next: backups can hold credentials.\n*\n";
+
+/// `<backups_dir>/<unix-seconds>-<pid>[-n]`, created 0700. The backups
+/// directory carries its own `.gitignore`, since it sits in the user's project
+/// and nothing else keeps it out of a commit.
 fn unique_dir(backups_dir: &Path) -> io::Result<PathBuf> {
     let secs = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| d.as_secs());
     let base = format!("{secs}-{}", std::process::id());
     std::fs::create_dir_all(backups_dir)?;
+    let ignore = backups_dir.join(".gitignore");
+    if !ignore.exists() {
+        std::fs::write(&ignore, IGNORE_ALL)?;
+    }
     for n in 0u32.. {
         let name = if n == 0 {
             base.clone()
@@ -95,6 +104,11 @@ mod tests {
             .unwrap();
         assert_eq!(std::fs::read(dir.join("a/f.txt")).unwrap(), b"old");
         assert!(!dir.join("new.txt").exists());
+        assert_eq!(
+            std::fs::read(backups.path().join(".gitignore")).unwrap(),
+            IGNORE_ALL,
+            "the backups are kept out of git"
+        );
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
