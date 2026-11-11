@@ -29,6 +29,7 @@ import type { InstallDelivery, InstallTarget } from "../commands/init-target-del
 import { emitPluginDelivery } from "./emit-plugin-delivery.js";
 import type { EmitEntryPoint } from "./target-shape.js";
 import { TARGET_SHAPES } from "./target-shape.js";
+import { assertNotMewkitNext } from "../commands/mewkit-next-ownership-guard.js";
 
 export interface EmitRequest {
 	target: InstallTarget;
@@ -88,6 +89,8 @@ export const resetEmitterPassages = (): void => {
  * for the same target, which is the drift this module exists to prevent.
  */
 export async function emitTarget(request: EmitRequest): Promise<EmitResult> {
+	// Every write of a target passes here, from init, upgrade and migrate alike.
+	assertNotMewkitNext(request.entryPoint, request.projectRoot, request.target, request.global === true);
 	const shape = TARGET_SHAPES[request.target];
 	const result: EmitResult = {
 		target: request.target,

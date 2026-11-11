@@ -28,6 +28,7 @@ import { populateKitCache } from "../core/kit-cache.js";
 import { LEGACY_DESCRIPTOR_REL, legacyDescriptorPath } from "../state/resolve-config-path.js";
 import { migrateLegacyDescriptor } from "./migrate-config-descriptor.js";
 import { refuseKitSourceRepo } from "./kit-source-repo-guard.js";
+import { type GuardedRuntime, mewkitNextIndex } from "./mewkit-next-ownership-guard.js";
 
 /** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
 const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
@@ -77,13 +78,23 @@ async function refreshCursorBundle(projectDir: string): Promise<void> {
  *  regenerates `.cursor/` content from `.claude/` from scratch and has no notion of the
  *  authored bundle's ledger, so it would clobber authored files. The authored bundle is
  *  refreshed via the reconciler instead (`refreshCursorBundle`), same as `upgradeCursorToolkit`. */
-async function reMigrateInstalledProviders(projectDir: string): Promise<void> {
+export async function reMigrateInstalledProviders(projectDir: string): Promise<void> {
+	// A runtime mewkit-next owns is left to it: refreshing it here would be refused
+	// (and fail this whole upgrade after `.claude/` was already written).
+	const rustOwned = (tool: GuardedRuntime): boolean => {
+		const index = mewkitNextIndex(projectDir, tool);
+		if (index === undefined) return false;
+		console.log(pc.dim(`Skipping ${tool}: it is managed by mewkit-next (${index}); run \`mewkit-next upgrade\`.`));
+		return true;
+	};
 	const cursorLedgerPresent = hasCursorLedger(projectDir);
-	if (cursorLedgerPresent) await refreshCursorBundle(projectDir);
+	const cursorOwned = rustOwned("cursor");
+	if (cursorLedgerPresent && !cursorOwned) await refreshCursorBundle(projectDir);
 
 	const installed = PROPAGATABLE_PROVIDERS.filter(({ tool, dir }) => {
-		if (tool === "cursor" && cursorLedgerPresent) return false;
-		return existsSync(join(projectDir, dir));
+		if (!existsSync(join(projectDir, dir))) return false;
+		if (tool === "cursor") return !cursorLedgerPresent && !cursorOwned;
+		return !rustOwned(tool as GuardedRuntime);
 	});
 	if (installed.length === 0) return;
 	console.log(

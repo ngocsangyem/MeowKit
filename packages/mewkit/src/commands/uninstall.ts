@@ -11,6 +11,7 @@
 // `.meowkit/`, delete a path the trusted kit source does not corroborate, or
 // guess ownership when there is no baseline.
 import pc from "picocolors";
+import { mewkitNextIndex, mewkitNextRefusal } from "./mewkit-next-ownership-guard.js";
 import { rmSync } from "node:fs";
 import { resolve, sep } from "node:path";
 
@@ -95,6 +96,13 @@ function asJson(c: Classification, planned: string[], deleted: string[], args: U
  * "it failed".
  */
 export function uninstall(root: string, args: UninstallArgs): number {
+	const owned = mewkitNextIndex(root, "claude-code");
+	if (owned !== undefined) {
+		const message = mewkitNextRefusal("uninstall", "claude-code", owned);
+		if (args.json) console.log(JSON.stringify({ ok: false, error: message }, null, 2));
+		else console.error(pc.red(message));
+		return 1;
+	}
 	const classification = classifyInstall(root);
 
 	if (!classification.hasBaseline) {
