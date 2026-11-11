@@ -5,13 +5,14 @@
 //! blocks, entries and hook handlers are taken out.
 use crate::contract::{EmitError, Format, Op, OwnershipIndex, Plan, RelPath};
 use crate::kit_files::rel;
+use mewkit_core::plan::HookLayout;
 
-/// `is_hook_file` names the files whose `hooks.<event>` sections hold hook
-/// handlers (merged with `MergeHooks`) rather than named entries.
+/// `hook_layout` names the files whose `hooks.<event>` sections hold hook
+/// handlers (merged with `MergeHooks`) rather than named entries, and how.
 pub fn plan_from_index(
     roots: &[RelPath],
     owned: &OwnershipIndex,
-    is_hook_file: impl Fn(&str) -> bool,
+    hook_layout: impl Fn(&str) -> Option<HookLayout>,
 ) -> Result<Plan, EmitError> {
     let within = |p: &RelPath| {
         roots
@@ -31,20 +32,18 @@ pub fn plan_from_index(
             continue;
         }
         for (id, sec) in sections {
+            let layout = hook_layout(file).filter(|_| sec.key.len() == 2 && sec.key[0] == "hooks");
             ops.push(match sec.format {
                 Format::Markdown => Op::StripBlock {
                     path: path.clone(),
                     id: id.clone(),
                 },
-                Format::Json
-                    if is_hook_file(file) && sec.key.len() == 2 && sec.key[0] == "hooks" =>
-                {
-                    Op::StripHooks {
-                        path: path.clone(),
-                        event: sec.key[1].clone(),
-                        ids: sec.names.clone(),
-                    }
-                }
+                Format::Json if let Some(layout) = layout => Op::StripHooks {
+                    path: path.clone(),
+                    event: sec.key[1].clone(),
+                    ids: sec.names.clone(),
+                    layout,
+                },
                 format => Op::StripEntries {
                     path: path.clone(),
                     format,

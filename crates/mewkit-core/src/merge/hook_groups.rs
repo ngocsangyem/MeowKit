@@ -1,6 +1,10 @@
-//! Hook handlers in the `hooks.<Event>` array shared by Claude Code
-//! `settings.json` and Codex `hooks.json`:
-//! `{"hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [{"command": …}]}]}}`.
+//! Hook handlers in the `hooks.<event>` array of a runtime's hook file, in
+//! one of two layouts:
+//! - [`HookLayout::Grouped`] (Claude Code `settings.json`, Codex `hooks.json`):
+//!   `{"hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [{"command": …}]}]}}`;
+//! - [`HookLayout::Flat`] (Cursor `hooks.json`): the event array holds the
+//!   handlers themselves, each with its own optional `matcher`:
+//!   `{"hooks": {"preToolUse": [{"matcher": "^edit", "command": …}]}}`.
 //!
 //! A handler is identified by its group's matcher plus its command line
 //! (`command`, then any `args`: Claude Code handlers are all `"command": "node"`
@@ -11,6 +15,16 @@ use serde_json::{Map, Value};
 
 use super::json_entries::{parse, render};
 use super::{EntriesMerged, MergeError};
+
+/// How an event array holds its handlers.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum HookLayout {
+    /// Groups of `{matcher, hooks: [handler]}`.
+    #[default]
+    Grouped,
+    /// Handlers directly, each carrying its own `matcher`.
+    Flat,
+}
 
 /// One kit hook handler and the matcher of the group it belongs in.
 #[derive(Clone, Debug, PartialEq)]
@@ -68,7 +82,14 @@ fn matcher_of(group: &Value) -> Option<&str> {
 /// Add or replace `handlers` under `hooks.<event>`, creating containers as needed.
 /// `created` counts the containers made, innermost first: 1 = the event array,
 /// 2 = also the `hooks` object.
-pub fn merge(text: &str, event: &str, handlers: &[Handler]) -> Result<EntriesMerged, MergeError> {
+/// In [`HookLayout::Flat`] the handler object itself carries `matcher`, which
+/// must equal [`Handler::matcher`].
+pub fn merge(
+    text: &str,
+    event: &str,
+    handlers: &[Handler],
+    layout: HookLayout,
+) -> Result<EntriesMerged, MergeError> {
     let mut doc = parse(text)?;
     let root = doc.as_object_mut().expect("parse returns an object");
     let mut created = 0;
@@ -96,6 +117,27 @@ pub fn merge(text: &str, event: &str, handlers: &[Handler]) -> Result<EntriesMer
             )));
         }
         let cmd = command(&h.handler)?;
+        if layout == HookLayout::Flat {
+            if matcher_of(&h.handler) != h.matcher.as_deref() {
+                return Err(MergeError::Malformed(format!(
+                    "a `hooks.{event}` handler's matcher disagrees with its own `matcher` key"
+                )));
+            }
+            let same = |x: &Value| {
+                matcher_of(x) == h.matcher.as_deref()
+                    && command(x).ok().as_deref() == Some(cmd.as_str())
+            };
+            match groups.iter_mut().find(|x| same(x)) {
+                Some(existing) => {
+                    if *existing != h.handler {
+                        replaced.push(id_of(h.matcher.as_deref(), &cmd));
+                    }
+                    *existing = h.handler.clone();
+                }
+                None => groups.push(h.handler.clone()),
+            }
+            continue;
+        }
         let group = groups
             .iter_mut()
             .find(|g| matcher_of(g) == h.matcher.as_deref());
@@ -131,6 +173,8 @@ pub fn merge(text: &str, event: &str, handlers: &[Handler]) -> Result<EntriesMer
         text: render(&doc),
         created,
         replaced,
+        // An identical user handler is adopted (ADR 261110-rust-adapter-contract).
+        already: Vec::new(),
     })
 }
 
@@ -143,6 +187,7 @@ pub fn strip(
     event: &str,
     ids: &[String],
     created: usize,
+    layout: HookLayout,
 ) -> Result<String, MergeError> {
     let mut doc = parse(text)?;
     let root = doc.as_object_mut().expect("parse returns an object");
@@ -163,6 +208,13 @@ pub fn strip(
     let mut emptied = vec![false; groups.len()];
     for id in ids {
         let (matcher, cmd) = split_id(id)?;
+        if layout == HookLayout::Flat {
+            let before = groups.len();
+            groups
+                .retain(|x| !(matcher_of(x) == matcher && command(x).ok().as_deref() == Some(cmd)));
+            changed |= groups.len() != before;
+            continue;
+        }
         for (i, group) in groups.iter_mut().enumerate() {
             if matcher_of(group) != matcher {
                 continue;
@@ -194,158 +246,5 @@ pub fn strip(
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
-
-    fn h(matcher: Option<&str>, cmd: &str) -> Handler {
-        Handler {
-            matcher: matcher.map(str::to_owned),
-            handler: json!({"type": "command", "command": cmd}),
-        }
-    }
-
-    fn ids(hs: &[Handler]) -> Vec<String> {
-        hs.iter().map(|x| x.id().unwrap()).collect()
-    }
-
-    #[test]
-    fn joins_the_users_group_with_the_same_matcher_and_strips_back() {
-        let user = render(&json!({"hooks": {"PreToolUse": [
-            {"matcher": "Bash", "hooks": [{"type": "command", "command": "mine"}]}
-        ]}, "other": 1}));
-        let kit = [
-            h(Some("Bash"), "kit-a"),
-            h(Some("Edit"), "kit-b"),
-            h(None, "kit-c"),
-        ];
-        let out = merge(&user, "PreToolUse", &kit).unwrap();
-        assert_eq!(out.created, 0);
-        let v: Value = serde_json::from_str(&out.text).unwrap();
-        let groups = v["hooks"]["PreToolUse"].as_array().unwrap();
-        assert_eq!(groups.len(), 3);
-        assert_eq!(groups[0]["hooks"].as_array().unwrap().len(), 2);
-        assert!(groups[2].get("matcher").is_none());
-        assert_eq!(strip(&out.text, "PreToolUse", &ids(&kit), 0).unwrap(), user);
-    }
-
-    #[test]
-    fn removes_only_the_containers_it_created() {
-        for (user, created) in [("", 2), ("{\n  \"hooks\": {}\n}\n", 1)] {
-            let kit = [h(Some("Bash"), "k")];
-            let out = merge(user, "Stop", &kit).unwrap();
-            assert_eq!(out.created, created);
-            let back = strip(&out.text, "Stop", &ids(&kit), out.created).unwrap();
-            let want = if user.is_empty() { "{}\n" } else { user };
-            assert_eq!(back, want);
-        }
-    }
-
-    #[test]
-    fn re_merge_is_idempotent_and_reports_replaced_user_handlers() {
-        let kit = [h(Some("Bash"), "k")];
-        let once = merge("", "PreToolUse", &kit).unwrap();
-        let twice = merge(&once.text, "PreToolUse", &kit).unwrap();
-        assert_eq!(once.text, twice.text);
-        assert!(twice.replaced.is_empty());
-
-        let mut changed = kit[0].clone();
-        changed.handler["timeout"] = json!(5);
-        let out = merge(&once.text, "PreToolUse", &[changed]).unwrap();
-        assert_eq!(out.replaced, ids(&kit));
-    }
-
-    #[test]
-    fn nothing_to_strip_leaves_text_byte_identical() {
-        let tabbed = "{\n\t\"hooks\": {\"Stop\": []}\n}\n";
-        assert_eq!(
-            strip(tabbed, "Stop", &ids(&[h(None, "x")]), 0).unwrap(),
-            tabbed
-        );
-        assert_eq!(
-            strip(tabbed, "PreToolUse", &ids(&[h(None, "x")]), 0).unwrap(),
-            tabbed
-        );
-    }
-
-    #[test]
-    fn handlers_that_differ_only_in_args_stay_distinct() {
-        let with = |arg: &str| Handler {
-            matcher: Some("Edit".into()),
-            handler: json!({"type": "command", "command": "node", "args": [arg]}),
-        };
-        let kit = [with("a.cjs"), with("b.cjs")];
-        let out = merge("", "PreToolUse", &kit).unwrap();
-        let v: Value = serde_json::from_str(&out.text).unwrap();
-        assert_eq!(
-            v["hooks"]["PreToolUse"][0]["hooks"]
-                .as_array()
-                .unwrap()
-                .len(),
-            2
-        );
-        let back = strip(&out.text, "PreToolUse", &ids(&kit[..1]), out.created).unwrap();
-        let v: Value = serde_json::from_str(&back).unwrap();
-        assert_eq!(v["hooks"]["PreToolUse"][0]["hooks"][0]["args"][0], "b.cjs");
-    }
-
-    #[test]
-    fn kit_created_containers_go_even_if_the_handlers_were_removed_by_hand() {
-        let kit = [h(Some("Bash"), "k")];
-        let out = merge("", "Stop", &kit).unwrap();
-        let by_hand = out
-            .text
-            .replace(
-                r#"{
-            "type": "command",
-            "command": "k"
-          }"#,
-                "",
-            )
-            .replace("[\n          \n        ]", "[]");
-        let v: Value = serde_json::from_str(&by_hand).unwrap();
-        assert!(
-            v["hooks"]["Stop"][0]["hooks"]
-                .as_array()
-                .unwrap()
-                .is_empty(),
-            "{by_hand}"
-        );
-        // The user's emptied group is theirs now; the event array is not removed under it.
-        let back = strip(&by_hand, "Stop", &ids(&kit), out.created).unwrap();
-        assert_eq!(back, by_hand);
-        assert_eq!(
-            strip(
-                "{\n  \"hooks\": {\n    \"Stop\": []\n  }\n}\n",
-                "Stop",
-                &ids(&kit),
-                2
-            )
-            .unwrap(),
-            "{}\n"
-        );
-    }
-
-    #[test]
-    fn a_users_own_empty_group_survives_a_strip() {
-        let user = render(&json!({"hooks": {"Stop": [{"matcher": "X", "hooks": []}]}}));
-        let kit = [h(Some("Y"), "k")];
-        let out = merge(&user, "Stop", &kit).unwrap();
-        assert_eq!(
-            strip(&out.text, "Stop", &ids(&kit), out.created).unwrap(),
-            user
-        );
-    }
-
-    #[test]
-    fn rejects_malformed_shapes() {
-        assert!(merge(r#"{"hooks": []}"#, "Stop", &[h(None, "x")]).is_err());
-        assert!(merge(r#"{"hooks": {"Stop": {}}}"#, "Stop", &[h(None, "x")]).is_err());
-        let bad = Handler {
-            matcher: None,
-            handler: json!({"type": "command"}),
-        };
-        assert!(merge("", "Stop", &[bad]).is_err());
-        assert!(merge("", "Stop", &[h(Some(""), "x")]).is_err());
-    }
-}
+#[path = "hook_groups_tests.rs"]
+mod tests;

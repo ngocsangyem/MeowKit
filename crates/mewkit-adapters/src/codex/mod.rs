@@ -6,20 +6,24 @@
 //! user may own as well: `AGENTS.md` gets a marked block, `.codex/hooks.json`
 //! gets hook handlers and `.codex/config.toml` gets keys, each recorded so
 //! uninstall takes out only what the kit added.
-mod bundle;
 mod rewrite;
 mod shared;
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use crate::bundle::{Bundle, Spec};
 use crate::contract::{
     EmitError, EmitRequest, Emitter, Op, OwnershipIndex, Plan, RelPath, Runtime, Scope, ScopeKind,
 };
 use crate::kit_files::{self, rel};
 use crate::{report_gate, strip};
 
-pub use bundle::BUNDLE;
-use bundle::{Bundle, skill_of};
+/// The authored Codex bundle in the kit.
+pub const BUNDLE: Spec = Spec {
+    runtime: "Codex",
+    dir: "packages/mewkit/src/migrate/modules/codex",
+    skills: ".agents/skills/",
+};
 pub use shared::{AGENTS_MD, AGENTS_MD_BUDGET, BLOCK_ID, CONFIG_TOML, HOOKS_JSON};
 
 /// Claude Code-only names that mean nothing to Codex.
@@ -61,11 +65,11 @@ impl Emitter for Codex {
                 what: "global scope yet".into(),
             });
         }
-        let bundle = Bundle::open(&req.kit.dir)?;
+        let bundle = Bundle::open(&req.kit.dir, &BUNDLE)?;
         let chosen = bundle.select(req.packs, req.disabled)?;
         let mut skill_files: BTreeMap<&str, BTreeSet<String>> = BTreeMap::new();
         for f in &bundle.files {
-            if let Some(s) = skill_of(&f.rel) {
+            if let Some(s) = bundle.skill_of(&f.rel) {
                 let inner = &f.rel[".agents/skills/".len() + s.len() + 1..];
                 skill_files.entry(s).or_default().insert(inner.to_owned());
             }
@@ -78,7 +82,7 @@ impl Emitter for Codex {
                 HOOKS_JSON => ops.extend(shared::hooks_json(&kit_files::read_text(&f.abs)?)?),
                 CONFIG_TOML => ops.push(shared::config_toml(&kit_files::read_text(&f.abs)?)?),
                 path => {
-                    let skill = skill_of(path);
+                    let skill = bundle.skill_of(path);
                     if skill.is_some_and(|s| !chosen.contains(s)) {
                         continue;
                     }
@@ -117,6 +121,8 @@ impl Emitter for Codex {
     }
 
     fn plan_strip(&self, scope: &Scope, owned: &OwnershipIndex) -> Result<Plan, EmitError> {
-        strip::plan_from_index(&self.roots(scope), owned, |f| f == HOOKS_JSON)
+        strip::plan_from_index(&self.roots(scope), owned, |f| {
+            (f == HOOKS_JSON).then_some(mewkit_core::plan::HookLayout::Grouped)
+        })
     }
 }

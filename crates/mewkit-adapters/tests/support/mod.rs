@@ -51,7 +51,8 @@ pub fn request<'a>(
 }
 
 pub struct Project<E: Emitter> {
-    _dir: tempfile::TempDir,
+    /// `None` for a project sharing another's directory.
+    _dir: Option<tempfile::TempDir>,
     pub scope: Scope,
     emitter: E,
     index: RefCell<OwnershipIndex>,
@@ -65,8 +66,19 @@ impl<E: Emitter> Project<E> {
             root: dir.path().to_path_buf(),
         };
         Self {
-            _dir: dir,
+            _dir: Some(dir),
             scope,
+            emitter,
+            index: RefCell::new(OwnershipIndex::new("0.0.0-test", "1", Origin::LocalDir)),
+        }
+    }
+
+    /// Another runtime installed into the same project directory, with its own
+    /// ownership index. `self` must outlive it: it owns the directory.
+    pub fn alongside<F: Emitter>(&self, emitter: F) -> Project<F> {
+        Project {
+            _dir: None,
+            scope: self.scope.clone(),
             emitter,
             index: RefCell::new(OwnershipIndex::new("0.0.0-test", "1", Origin::LocalDir)),
         }
@@ -101,7 +113,10 @@ impl<E: Emitter> Project<E> {
         let exec_scope = ExecScope {
             root: self.scope.root.clone(),
             roots: self.emitter.roots(&self.scope),
-            index_file: rel(".meowkit/state/ownership/test.json"),
+            index_file: rel(&format!(
+                ".meowkit/state/ownership/{}.json",
+                self.emitter.target().name()
+            )),
             lock_file: rel(".meowkit/state/mewkit.lock"),
             backups_dir: rel(".meowkit/backups"),
         };
@@ -147,6 +162,8 @@ const ARCHIVE_ROOTS: &[&str] = &[
     ".claude",
     "packages/mewkit/src/migrate/modules/codex/root",
     "packages/mewkit/src/migrate/modules/codex/catalog/skill-packs.json",
+    "packages/mewkit/src/migrate/modules/cursor/root",
+    "packages/mewkit/src/migrate/modules/cursor/catalog/skill-packs.json",
 ];
 
 fn build_kit() -> PathBuf {

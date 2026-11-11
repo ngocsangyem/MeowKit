@@ -26,4 +26,7 @@ pub struct EntriesMerged {
     pub created: usize,
     /// Names that already existed with a different value and were overwritten.
     pub replaced: Vec<String>,
+    /// Names that already existed with the same value: the user's own, which
+    /// the kit must not record as installed or a strip would take them out.
+    pub already: Vec<String>,
 }
