@@ -7,17 +7,25 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use crate::fsx::{RelPath, atomic_write};
+use crate::layout::Layout;
 
-/// Copy each existing `paths` entry from `root` into a new directory under
+/// Copy each existing `paths` entry, as `layout` resolves it, into a new directory under
 /// `backups_dir`. Returns `None` (and creates nothing) when none of them exist.
-pub fn take(root: &Path, paths: &[&RelPath], backups_dir: &Path) -> io::Result<Option<PathBuf>> {
-    let existing: Vec<&&RelPath> = paths.iter().filter(|p| p.under(root).is_file()).collect();
+pub fn take(
+    layout: &Layout,
+    paths: &[&RelPath],
+    backups_dir: &Path,
+) -> io::Result<Option<PathBuf>> {
+    let existing: Vec<&&RelPath> = paths
+        .iter()
+        .filter(|p| layout.resolve(p).is_file())
+        .collect();
     if existing.is_empty() {
         return Ok(None);
     }
     let dest = unique_dir(backups_dir)?;
     for path in existing {
-        let src = path.under(root);
+        let src = layout.resolve(path);
         atomic_write(&path.under(&dest), &std::fs::read(&src)?, mode_of(&src)?)?;
     }
     Ok(Some(dest))
@@ -82,7 +90,7 @@ mod tests {
             RelPath::new("a/f.txt").unwrap(),
             RelPath::new("new.txt").unwrap(),
         );
-        let dir = take(root.path(), &[&f, &missing], backups.path())
+        let dir = take(&Layout::at(root.path()), &[&f, &missing], backups.path())
             .unwrap()
             .unwrap();
         assert_eq!(std::fs::read(dir.join("a/f.txt")).unwrap(), b"old");
@@ -96,7 +104,7 @@ mod tests {
             );
         }
         assert!(
-            take(root.path(), &[&missing], backups.path())
+            take(&Layout::at(root.path()), &[&missing], backups.path())
                 .unwrap()
                 .is_none()
         );

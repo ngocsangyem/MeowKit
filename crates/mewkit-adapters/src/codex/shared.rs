@@ -2,7 +2,8 @@
 use serde_json::{Map, Value};
 use toml_edit::{DocumentMut, Item};
 
-use crate::contract::{EmitError, Format, Op};
+use super::global;
+use crate::contract::{EmitError, Format, Op, Scope};
 use crate::kit_files::rel;
 use mewkit_core::plan::{Handler, HookLayout};
 
@@ -14,9 +15,9 @@ pub const BLOCK_ID: &str = "meowkit";
 /// Codex's default `project_doc_max_bytes`: guidance past it is never read.
 pub const AGENTS_MD_BUDGET: usize = 32 * 1024;
 
-/// The kit's `AGENTS.md` text as a managed block. Over budget fails: a
-/// truncated block would drop the safety summary without saying so.
-pub fn agents_md(text: &str) -> Result<Op, EmitError> {
+/// The kit's `AGENTS.md` text as a managed block in `path`. Over budget
+/// fails: a truncated block would drop the safety summary without saying so.
+pub fn agents_md(text: &str, path: &str) -> Result<Op, EmitError> {
     if text.len() > AGENTS_MD_BUDGET {
         return Err(EmitError::Kit(format!(
             "Codex AGENTS.md guidance is {} bytes, over the {AGENTS_MD_BUDGET}-byte budget",
@@ -24,14 +25,15 @@ pub fn agents_md(text: &str) -> Result<Op, EmitError> {
         )));
     }
     Ok(Op::MergeBlock {
-        path: rel(AGENTS_MD)?,
+        path: rel(path)?,
         id: BLOCK_ID.into(),
         content: text.trim_end().to_owned(),
     })
 }
 
-/// One `MergeHooks` per event in the bundle's `hooks.json`.
-pub fn hooks_json(text: &str) -> Result<Vec<Op>, EmitError> {
+/// One `MergeHooks` per event in the bundle's `hooks.json`; a global install
+/// keeps only the handlers [`global::keeps`], anchored at absolute paths.
+pub fn hooks_json(text: &str, global: Option<&Scope>) -> Result<Vec<Op>, EmitError> {
     let doc: Value = serde_json::from_str(text).map_err(|e| bad(HOOKS_JSON, e))?;
     let events = doc["hooks"]
         .as_object()
@@ -48,9 +50,16 @@ pub fn hooks_json(text: &str) -> Result<Vec<Op>, EmitError> {
                 .and_then(Value::as_str)
                 .map(str::to_owned);
             for handler in group["hooks"].as_array().into_iter().flatten() {
+                let mut handler = handler.clone();
+                if let Some(scope) = global {
+                    if !global::keeps(&handler) {
+                        continue;
+                    }
+                    global::anchor(&mut handler, scope)?;
+                }
                 handlers.push(Handler {
                     matcher: matcher.clone(),
-                    handler: handler.clone(),
+                    handler,
                 });
             }
         }

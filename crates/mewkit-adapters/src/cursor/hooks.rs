@@ -21,8 +21,13 @@ pub const BLOCKING: &[&str] = &[
     "beforeSubmitPrompt",
 ];
 
-/// `version` as an entry plus one flat `MergeHooks` per non-empty event.
-pub fn ops(text: &str) -> Result<Vec<Op>, EmitError> {
+/// Scripts a global install registers: the privacy read gate and the session
+/// context. User hooks run from `~/.cursor/`, so their paths become `./hooks/…`.
+const GLOBAL_SCRIPTS: &[&str] = &["privacy-read-gate.cjs", "session-context.cjs"];
+
+/// `version` as an entry plus one flat `MergeHooks` per non-empty event;
+/// `global` keeps only [`GLOBAL_SCRIPTS`], relative to `~/.cursor`.
+pub fn ops(text: &str, global: bool) -> Result<Vec<Op>, EmitError> {
     let bad =
         |e: &dyn std::fmt::Display| EmitError::Kit(format!("Cursor bundle {HOOKS_JSON}: {e}"));
     let doc: Value = serde_json::from_str(text).map_err(|e| bad(&e))?;
@@ -52,6 +57,22 @@ pub fn ops(text: &str) -> Result<Vec<Op>, EmitError> {
             let obj = handler
                 .as_object_mut()
                 .ok_or_else(|| bad(&format!("a `hooks.{event}` handler is not an object")))?;
+            if global {
+                let Some(Value::String(cmd)) = obj.get("command") else {
+                    continue;
+                };
+                if !GLOBAL_SCRIPTS
+                    .iter()
+                    .any(|s| cmd.ends_with(&format!("/hooks/{s}")))
+                {
+                    continue;
+                }
+                let cmd = cmd.replace(" .cursor/", " ./");
+                if cmd.contains(".cursor/") {
+                    return Err(bad(&format!("`{cmd}` cannot run from ~/.cursor")));
+                }
+                obj.insert("command".into(), Value::String(cmd));
+            }
             if blocking {
                 obj.insert("failClosed".into(), Value::Bool(true));
             }
@@ -81,11 +102,14 @@ mod tests {
 
     #[test]
     fn blocking_handlers_fail_closed_and_others_keep_their_value() {
-        let ops = ops(r#"{"version": 1, "hooks": {
+        let ops = ops(
+            r#"{"version": 1, "hooks": {
             "preToolUse": [{"matcher": "^read", "command": "a", "failClosed": false}],
             "sessionStart": [{"command": "b", "failClosed": false}],
             "stop": []
-        }}"#)
+        }}"#,
+            false,
+        )
         .unwrap();
         assert_eq!(ops.len(), 3, "version entry + two non-empty events");
         let fail_closed = |i: usize| match &ops[i] {
@@ -94,5 +118,32 @@ mod tests {
         };
         assert_eq!(fail_closed(1), true);
         assert_eq!(fail_closed(2), false);
+    }
+
+    #[test]
+    fn a_global_install_keeps_the_privacy_and_session_hooks_from_home() {
+        let ops = ops(
+            r#"{"version": 1, "hooks": {
+            "sessionStart": [{"command": "node .cursor/hooks/session-context.cjs"}],
+            "beforeReadFile": [{"command": "node .cursor/hooks/privacy-read-gate.cjs"}],
+            "beforeShellExecution": [{"command": "node .cursor/hooks/shell-gate.cjs"}]
+        }}"#,
+            true,
+        )
+        .unwrap();
+        let commands: Vec<_> = ops
+            .iter()
+            .filter_map(|o| match o {
+                Op::MergeHooks { handlers, .. } => Some(handlers[0].handler["command"].clone()),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(
+            commands,
+            [
+                "node ./hooks/session-context.cjs",
+                "node ./hooks/privacy-read-gate.cjs"
+            ]
+        );
     }
 }

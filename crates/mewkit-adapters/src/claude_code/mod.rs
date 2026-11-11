@@ -1,9 +1,12 @@
-//! Claude Code emitter, project scope.
+//! Claude Code emitter.
 //!
 //! The kit's `.claude/` tree is Claude Code's native layout, so files install
 //! as they ship. `settings.json` is the one file the user owns too: the kit's
 //! hook handlers, `env` entries and `statusLine` are merged into it and
-//! recorded, so uninstall takes out only what the kit added.
+//! recorded, so uninstall takes out only what the kit added. A global
+//! install writes a subset: see [`global`].
+mod global;
+
 use serde_json::{Map, Value};
 
 use crate::contract::{
@@ -11,7 +14,7 @@ use crate::contract::{
     ScopeKind,
 };
 use crate::kit_files::{self, rel};
-use crate::strip;
+use crate::{scope, strip};
 use mewkit_core::plan::{Handler, HookLayout};
 
 pub const SETTINGS: &str = ".claude/settings.json";
@@ -26,17 +29,16 @@ impl Emitter for ClaudeCode {
     fn roots(&self, scope: &Scope) -> Vec<RelPath> {
         match scope.kind {
             ScopeKind::Project => vec![RelPath::new(".claude").expect("static root")],
-            ScopeKind::Global => vec![],
+            ScopeKind::Global => global::DIRS
+                .iter()
+                .chain([&SETTINGS])
+                .map(|r| RelPath::new(r).expect("static root"))
+                .collect(),
         }
     }
 
     fn prepare(&self, req: &EmitRequest<'_>) -> Result<Plan, EmitError> {
-        if req.scope.kind == ScopeKind::Global {
-            return Err(EmitError::Unsupported {
-                runtime: "claude-code",
-                what: "global scope yet".into(),
-            });
-        }
+        let global = (req.scope.kind == ScopeKind::Global).then_some(req.scope);
         let src = req.kit.dir.join(".claude");
         if !src.is_dir() {
             return Err(EmitError::Kit("the kit has no .claude/ tree".into()));
@@ -48,7 +50,10 @@ impl Emitter for ClaudeCode {
             }
             let path = format!(".claude/{}", f.rel);
             if path == SETTINGS {
-                settings(&kit_files::read_text(&f.abs)?, &mut plan)?;
+                settings(&kit_files::read_text(&f.abs)?, global, &mut plan)?;
+                continue;
+            }
+            if global.is_some() && !global::installs(&path) {
                 continue;
             }
             plan.ops.push(Op::WriteFile {
@@ -57,6 +62,7 @@ impl Emitter for ClaudeCode {
                 mode: kit_files::mode(&f.abs),
             });
         }
+        plan.notices.extend(scope::privacy_elsewhere(req, SETTINGS));
         Ok(plan)
     }
 
@@ -76,8 +82,9 @@ fn maintainer_only(rel: &str) -> bool {
 
 /// Merge ops for the kit's `settings.json`. Keys the merge engines cannot
 /// add without replacing the user's own values (`permissions` is a list) are
-/// reported instead of written.
-fn settings(text: &str, plan: &mut Plan) -> Result<(), EmitError> {
+/// reported instead of written. A global install merges only the hooks
+/// [`global::keeps`], anchored at their absolute paths.
+fn settings(text: &str, global: Option<&Scope>, plan: &mut Plan) -> Result<(), EmitError> {
     let bad = |e: &dyn std::fmt::Display| EmitError::Kit(format!("{SETTINGS}: {e}"));
     let doc: Value = serde_json::from_str(text).map_err(|e| bad(&e))?;
     let doc = doc.as_object().ok_or_else(|| bad(&"not a JSON object"))?;
@@ -92,9 +99,16 @@ fn settings(text: &str, plan: &mut Plan) -> Result<(), EmitError> {
                     for group in groups.as_array().ok_or_else(|| bad(&format!("hooks.{event} is not an array")))? {
                         let matcher = group.get("matcher").and_then(Value::as_str).map(str::to_owned);
                         for handler in group["hooks"].as_array().into_iter().flatten() {
+                            let mut handler = handler.clone();
+                            if let Some(scope) = global {
+                                if !global::keeps(event, &handler) {
+                                    continue;
+                                }
+                                global::anchor(&mut handler, scope)?;
+                            }
                             handlers.push(Handler {
                                 matcher: matcher.clone(),
-                                handler: handler.clone(),
+                                handler,
                             });
                         }
                     }
@@ -108,6 +122,7 @@ fn settings(text: &str, plan: &mut Plan) -> Result<(), EmitError> {
                     }
                 }
             }
+            _ if global.is_some() => {}
             "env" => plan.ops.push(Op::MergeEntries {
                 path: path.clone(),
                 format: Format::Json,
@@ -121,6 +136,11 @@ fn settings(text: &str, plan: &mut Plan) -> Result<(), EmitError> {
                 .notices
                 .push(format!("{SETTINGS}: the kit's `{other}` is not merged into your settings; add it yourself if you want it")),
         }
+    }
+    if global.is_some() {
+        plan.notices.push(format!(
+            "global install: {SETTINGS} gets only the privacy and session hooks; the kit's other settings are per project"
+        ));
     }
     if !top.is_empty() {
         plan.ops.push(Op::MergeEntries {

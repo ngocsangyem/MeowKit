@@ -42,7 +42,7 @@ fn seeded() -> tempfile::TempDir {
 #[test]
 fn commit_keeps_changes() {
     let dir = seeded();
-    let mut j = Journal::new(dir.path());
+    let mut j = Journal::new(&Layout::at(dir.path()));
     j.write(&rel("a/keep.txt"), b"changed", None).unwrap();
     j.write(&rel("new/deep/file.txt"), b"new", None).unwrap();
     j.remove(&rel("top.txt")).unwrap();
@@ -59,7 +59,7 @@ fn commit_keeps_changes() {
 fn rollback_restores_files_and_removes_created_dirs() {
     let dir = seeded();
     let before = snapshot(dir.path());
-    let mut j = Journal::new(dir.path());
+    let mut j = Journal::new(&Layout::at(dir.path()));
     j.write(&rel("a/keep.txt"), b"changed", None).unwrap();
     j.write(&rel("a/keep.txt"), b"changed twice", None).unwrap();
     j.write(&rel("new/deep/file.txt"), b"new", None).unwrap();
@@ -74,7 +74,7 @@ fn drop_without_commit_rolls_back() {
     let dir = seeded();
     let before = snapshot(dir.path());
     {
-        let mut j = Journal::new(dir.path());
+        let mut j = Journal::new(&Layout::at(dir.path()));
         j.write(&rel("x/y.txt"), b"tmp", None).unwrap();
         j.remove(&rel("a/keep.txt")).unwrap();
     }
@@ -84,7 +84,7 @@ fn drop_without_commit_rolls_back() {
 #[test]
 fn rollback_keeps_a_created_dir_the_user_filled_meanwhile() {
     let dir = seeded();
-    let mut j = Journal::new(dir.path());
+    let mut j = Journal::new(&Layout::at(dir.path()));
     j.write(&rel("made/file.txt"), b"kit", None).unwrap();
     std::fs::write(dir.path().join("made/user.txt"), b"user").unwrap();
     j.rollback().unwrap();
@@ -102,7 +102,7 @@ fn rollback_restores_file_mode() {
     let dir = seeded();
     let path = dir.path().join("a/keep.txt");
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
-    let mut j = Journal::new(dir.path());
+    let mut j = Journal::new(&Layout::at(dir.path()));
     j.write(&rel("a/keep.txt"), b"x", Some(0o600)).unwrap();
     j.rollback().unwrap();
     assert_eq!(
@@ -145,7 +145,7 @@ proptest! {
         let dir = seeded();
         let before = snapshot(dir.path());
         {
-            let mut j = Journal::new(dir.path());
+            let mut j = Journal::new(&Layout::at(dir.path()));
             for op in ops.iter().take(cut) {
                 match op {
                     TestOp::Write(i, b) => j.write(&rel(PATHS[*i]), b, None).unwrap(),

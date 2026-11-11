@@ -13,6 +13,7 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 
 use crate::fsx::{RelPath, is_never_delete, sha256_hex};
+use crate::layout::Layout;
 use crate::plan::Format;
 
 /// The index schema this binary writes and reads.
@@ -164,7 +165,7 @@ pub enum Class {
 /// `kit_hash` answers the SHA-256 of the kit's own bytes for a path, or `None`
 /// when the kit does not ship it.
 pub fn classify(
-    root: &Path,
+    layout: &Layout,
     index: &OwnershipIndex,
     roots: &[RelPath],
     kit_hash: &dyn Fn(&RelPath) -> Option<String>,
@@ -175,7 +176,7 @@ pub fn classify(
         let class = if is_never_delete(&path) {
             Class::Protected
         } else {
-            match std::fs::read(path.under(root)) {
+            match std::fs::read(layout.resolve(&path)) {
                 Err(e) if e.kind() == io::ErrorKind::NotFound => Class::Missing,
                 Err(e) => return Err(e),
                 Ok(bytes) => match kit_hash(&path) {
@@ -194,7 +195,7 @@ pub fn classify(
         out.push((path, class));
     }
     for r in roots {
-        for path in files_under(root, r)? {
+        for path in files_under(layout, r)? {
             if !index.paths.contains_key(path.as_str()) && !is_never_delete(&path) {
                 out.push((path, Class::Orphan));
             }
@@ -204,11 +205,11 @@ pub fn classify(
 }
 
 /// Regular files at or under `dir`, without following symlinked directories.
-fn files_under(root: &Path, dir: &RelPath) -> io::Result<Vec<RelPath>> {
+fn files_under(layout: &Layout, dir: &RelPath) -> io::Result<Vec<RelPath>> {
     let mut out = Vec::new();
     let mut stack = vec![dir.clone()];
     while let Some(rel) = stack.pop() {
-        let meta = match std::fs::symlink_metadata(rel.under(root)) {
+        let meta = match std::fs::symlink_metadata(layout.resolve(&rel)) {
             Ok(m) => m,
             Err(e) if e.kind() == io::ErrorKind::NotFound => continue,
             Err(e) => return Err(e),
@@ -216,7 +217,7 @@ fn files_under(root: &Path, dir: &RelPath) -> io::Result<Vec<RelPath>> {
         if meta.is_file() {
             out.push(rel);
         } else if meta.is_dir() {
-            for entry in std::fs::read_dir(rel.under(root))? {
+            for entry in std::fs::read_dir(layout.resolve(&rel))? {
                 let name = entry?.file_name();
                 let child = format!("{rel}/{}", name.to_string_lossy());
                 // A name a RelPath cannot hold (`:`/`\`) is never ours to judge.

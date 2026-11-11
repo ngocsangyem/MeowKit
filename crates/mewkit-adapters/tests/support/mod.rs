@@ -8,7 +8,7 @@ use std::process::Command;
 use std::sync::OnceLock;
 
 use mewkit_adapters::contract::{Kit, OwnershipIndex, Plan, RelPath, written_hashes};
-use mewkit_adapters::{EmitRequest, Emitter, Scope, ScopeKind};
+use mewkit_adapters::{EmitRequest, Emitter, Scope};
 use mewkit_core::exec::{ExecOptions, Scope as ExecScope, execute};
 use mewkit_core::fsx::sha256_hex;
 use mewkit_core::ownership::Origin;
@@ -47,6 +47,7 @@ pub fn request<'a>(
         packs,
         disabled,
         fresh: false,
+        other_scope: None,
     }
 }
 
@@ -61,10 +62,39 @@ pub struct Project<E: Emitter> {
 impl<E: Emitter> Project<E> {
     pub fn new(emitter: E) -> Self {
         let dir = tempfile::tempdir().unwrap();
-        let scope = Scope {
-            kind: ScopeKind::Project,
-            root: dir.path().to_path_buf(),
-        };
+        let scope = Scope::project(dir.path());
+        Self {
+            _dir: Some(dir),
+            scope,
+            emitter,
+            index: RefCell::new(OwnershipIndex::new("0.0.0-test", "1", Origin::LocalDir)),
+        }
+    }
+
+    /// A global install into a fresh temp home; `env` answers the runtime
+    /// directory variables (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`).
+    pub fn global(emitter: E, env: &[(&str, &Path)]) -> Self {
+        let dir = tempfile::tempdir().unwrap();
+        let scope = Scope::global(dir.path(), |name| {
+            env.iter()
+                .find(|(n, _)| *n == name)
+                .map(|(_, v)| v.as_os_str().to_owned())
+        })
+        .unwrap();
+        Self {
+            _dir: Some(dir),
+            scope,
+            emitter,
+            index: RefCell::new(OwnershipIndex::new("0.0.0-test", "1", Origin::LocalDir)),
+        }
+    }
+
+    /// A global install into a fresh temp home that `setup` prepares first
+    /// (a symlinked runtime dir, say), with no variables set.
+    pub fn new_home_with(emitter: E, setup: impl FnOnce(&Path)) -> Self {
+        let dir = tempfile::tempdir().unwrap();
+        setup(dir.path());
+        let scope = Scope::global(dir.path(), |_| None).unwrap();
         Self {
             _dir: Some(dir),
             scope,
@@ -102,6 +132,18 @@ impl<E: Emitter> Project<E> {
         self.index.borrow().clone()
     }
 
+    /// The emitter's install plan for this scope, default packs.
+    pub fn emitter_prepare(&self, kit: &Kit) -> Plan {
+        self.emitter
+            .prepare(&request(kit, &self.scope, &[], &[]))
+            .unwrap()
+    }
+
+    /// The emitter's removal plan from this scope's index.
+    pub fn strip_plan(&self) -> Plan {
+        self.emitter.plan_strip(&self.scope, &self.index()).unwrap()
+    }
+
     /// Run `plan`; the kit's own hash of a path is what a default install writes.
     pub fn execute(&self, plan: &Plan, kit: &Kit) -> EmitReport {
         let install = self
@@ -112,6 +154,7 @@ impl<E: Emitter> Project<E> {
         let kit_hash = |p: &RelPath| hashes.get(p.as_str()).cloned();
         let exec_scope = ExecScope {
             root: self.scope.root.clone(),
+            mounts: self.scope.mounts.clone(),
             roots: self.emitter.roots(&self.scope),
             index_file: rel(&format!(
                 ".meowkit/state/ownership/{}.json",

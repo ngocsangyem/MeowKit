@@ -15,6 +15,7 @@ fn rel(s: &str) -> RelPath {
 fn scope(root: &Path) -> Scope {
     Scope {
         root: root.to_path_buf(),
+        mounts: vec![],
         roots: vec![rel(".codex"), rel("AGENTS.md")],
         index_file: rel(".meowkit/state/ownership/codex.json"),
         lock_file: rel(".meowkit/state/mewkit.lock"),
@@ -639,5 +640,55 @@ fn a_toml_entry_the_user_already_had_is_not_claimed() {
     assert_eq!(
         index.sections[".codex/config.toml"]["mcp_servers"].names,
         ["kit"]
+    );
+}
+
+#[test]
+fn a_mounted_directory_outside_the_root_installs_and_strips_back() {
+    let home = tempfile::tempdir().unwrap();
+    let elsewhere = tempfile::tempdir().unwrap();
+    let codex_home = elsewhere.path().join("codex home");
+    std::fs::create_dir(&codex_home).unwrap();
+    std::fs::write(codex_home.join("config.toml"), "model = \"x\"\n").unwrap();
+    let mut s = scope(home.path());
+    s.mounts = vec![mewkit_core::layout::Mount {
+        at: rel(".codex"),
+        dir: codex_home.clone(),
+    }];
+    let mut index = fresh_index();
+    execute(
+        &install_plan(),
+        &s,
+        &mut index,
+        &kit,
+        ExecOptions::default(),
+    )
+    .unwrap();
+    assert_eq!(
+        std::fs::read(codex_home.join("hooks/gate.cjs")).unwrap(),
+        b"gate"
+    );
+    assert!(!home.path().join(".codex").exists(), "nothing at ~/.codex");
+    assert!(
+        home.path()
+            .join(".meowkit/state/ownership/codex.json")
+            .is_file(),
+        "state stays under the root"
+    );
+    assert!(index.paths.contains_key(".codex/hooks/gate.cjs"));
+
+    execute(
+        &uninstall_plan(),
+        &s,
+        &mut index,
+        &kit,
+        ExecOptions::default(),
+    )
+    .unwrap();
+    assert!(!codex_home.join("hooks").exists(), "emptied dirs pruned");
+    assert!(codex_home.is_dir(), "never above the mount");
+    assert_eq!(
+        std::fs::read_to_string(codex_home.join("config.toml")).unwrap(),
+        "model = \"x\"\n"
     );
 }

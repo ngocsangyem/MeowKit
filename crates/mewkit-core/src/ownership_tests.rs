@@ -38,11 +38,12 @@ fn fixture() -> (tempfile::TempDir, OwnershipIndex, BTreeMap<String, String>) {
 fn classifies_every_case() {
     let (dir, index, kit) = fixture();
     let lookup = |p: &RelPath| kit.get(p.as_str()).cloned();
-    let got: BTreeMap<String, Class> = classify(dir.path(), &index, &[rel(".codex")], &lookup)
-        .unwrap()
-        .into_iter()
-        .map(|(p, c)| (p.as_str().to_owned(), c))
-        .collect();
+    let got: BTreeMap<String, Class> =
+        classify(&Layout::at(dir.path()), &index, &[rel(".codex")], &lookup)
+            .unwrap()
+            .into_iter()
+            .map(|(p, c)| (p.as_str().to_owned(), c))
+            .collect();
     let want: BTreeMap<String, Class> = [
         (".codex/clean.md", Class::Clean),
         (".codex/edited.md", Class::Modified),
@@ -65,7 +66,7 @@ fn a_lying_index_cannot_make_a_user_file_clean() {
         .paths
         .insert(".codex/user-own.md".into(), sha256_hex(b"mine"));
     let lookup = |p: &RelPath| kit.get(p.as_str()).cloned();
-    let classes = classify(dir.path(), &index, &[], &lookup).unwrap();
+    let classes = classify(&Layout::at(dir.path()), &index, &[], &lookup).unwrap();
     let class = classes
         .iter()
         .find(|(p, _)| p.as_str() == ".codex/user-own.md")

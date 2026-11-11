@@ -9,6 +9,7 @@ pub mod exec;
 pub mod fsx;
 pub mod journal;
 pub mod kit;
+pub mod layout;
 pub mod lock;
 pub mod merge;
 pub mod ownership;

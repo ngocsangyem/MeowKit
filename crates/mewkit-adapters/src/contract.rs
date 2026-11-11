@@ -6,6 +6,7 @@ use std::path::PathBuf;
 
 pub use mewkit_core::fsx::RelPath;
 pub use mewkit_core::kit::Kit;
+pub use mewkit_core::layout::Mount;
 pub use mewkit_core::ownership::OwnershipIndex;
 pub use mewkit_core::plan::{Format, Op, Plan};
 
@@ -42,11 +43,14 @@ pub enum ScopeKind {
     Global,
 }
 
-/// Where an install goes: a project root or the home directory.
+/// Where an install goes: a project root or the home directory. Build one
+/// with [`Scope::project`] or [`Scope::global`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Scope {
     pub kind: ScopeKind,
     pub root: PathBuf,
+    /// Runtime directories resolved outside `root` (global scope only).
+    pub mounts: Vec<Mount>,
 }
 
 /// Everything `prepare` reads. The borrows end when `prepare` returns.
@@ -59,6 +63,8 @@ pub struct EmitRequest<'a> {
     pub disabled: &'a [String],
     /// Ignore what is installed and plan a full reinstall.
     pub fresh: bool,
+    /// This runtime's ownership index at the other scope, if it has one.
+    pub other_scope: Option<&'a OwnershipIndex>,
 }
 
 #[derive(Debug, thiserror::Error)]
