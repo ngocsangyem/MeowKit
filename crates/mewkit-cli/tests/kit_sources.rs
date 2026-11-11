@@ -1,41 +1,10 @@
 //! Kit flags: a local archive fills the scope's cache, `--offline` reads it.
 mod support;
 
-use std::io::Write;
-use std::path::{Path, PathBuf};
-
-use mewkit_core::fsx::sha256_hex;
-use support::kit::{kit, sha_tree};
+use support::archive;
+use support::kit::sha_tree;
 use support::temp_home::TempHome;
 use support::{code, text};
-
-/// This checkout's kit as a release zip in `dir`, with its SHA-256.
-fn archive(dir: &Path) -> (PathBuf, String) {
-    let root = kit().dir;
-    let file = dir.join("meowkit-release.zip");
-    let mut zip = zip::ZipWriter::new(std::fs::File::create(&file).unwrap());
-    let opts = zip::write::SimpleFileOptions::default();
-    let mut todo = vec![root.clone()];
-    while let Some(d) = todo.pop() {
-        for entry in std::fs::read_dir(&d).unwrap() {
-            let path = entry.unwrap().path();
-            if path.is_dir() {
-                todo.push(path);
-                continue;
-            }
-            let name = path
-                .strip_prefix(&root)
-                .unwrap()
-                .to_string_lossy()
-                .replace('\\', "/");
-            zip.start_file(name, opts).unwrap();
-            zip.write_all(&std::fs::read(&path).unwrap()).unwrap();
-        }
-    }
-    zip.finish().unwrap();
-    let sha = sha256_hex(&std::fs::read(&file).unwrap());
-    (file, sha)
-}
 
 #[test]
 fn an_archive_install_is_cached_for_offline_installs_and_uninstall() {

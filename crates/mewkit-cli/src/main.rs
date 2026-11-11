@@ -14,7 +14,10 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 
-use commands::{init::InitArgs, uninstall::UninstallArgs, upgrade::UpgradeArgs};
+use commands::{
+    doctor::DoctorArgs, init::InitArgs, providers::ProvidersArgs, uninstall::UninstallArgs,
+    upgrade::UpgradeArgs, versions::VersionsArgs,
+};
 use failure::Failure;
 
 #[derive(Parser)]
@@ -38,6 +41,12 @@ enum Command {
     Upgrade(UpgradeArgs),
     /// Remove the kit again (shows what would go unless --yes).
     Uninstall(UninstallArgs),
+    /// Check the toolchain, the installs here and their hooks.
+    Doctor(DoctorArgs),
+    /// What each runtime gets from the kit: files, skills, hooks, gaps.
+    Providers(ProvidersArgs),
+    /// Kits installed, cached and available, and the supported kit contract.
+    Versions(VersionsArgs),
     /// Any command this binary does not implement yet.
     #[command(external_subcommand)]
     NotPorted(Vec<String>),
@@ -48,6 +57,9 @@ fn main() -> ExitCode {
         Command::Init(args) => commands::init::run(&args),
         Command::Upgrade(args) => commands::upgrade::run(&args),
         Command::Uninstall(args) => commands::uninstall::run(&args),
+        Command::Doctor(args) => commands::doctor::run(&args),
+        Command::Providers(args) => commands::providers::run(&args),
+        Command::Versions(args) => commands::versions::run(&args),
         Command::NotPorted(argv) => {
             let name = argv.first().map(String::as_str).unwrap_or_default();
             Err(Failure::usage(format!(

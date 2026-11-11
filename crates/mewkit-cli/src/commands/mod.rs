@@ -1,7 +1,10 @@
 //! The lifecycle commands, and the pieces they share.
+pub mod doctor;
 pub mod init;
+pub mod providers;
 pub mod uninstall;
 pub mod upgrade;
+pub mod versions;
 
 use std::collections::BTreeMap;
 

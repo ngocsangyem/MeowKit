@@ -6,7 +6,10 @@ pub mod temp_home;
 #[path = "../../../mewkit-adapters/tests/support/mod.rs"]
 pub mod kit;
 
-use std::path::Path;
+use std::io::Write;
+use std::path::{Path, PathBuf};
+
+use mewkit_core::fsx::sha256_hex;
 use std::process::Output;
 
 use temp_home::TempHome;
@@ -58,4 +61,32 @@ pub fn text(out: &Output) -> String {
         String::from_utf8_lossy(&out.stdout),
         String::from_utf8_lossy(&out.stderr)
     )
+}
+
+/// This checkout's kit as a release zip in `dir`, with its SHA-256.
+pub fn archive(dir: &Path) -> (PathBuf, String) {
+    let root = kit::kit().dir;
+    let file = dir.join("meowkit-release.zip");
+    let mut zip = zip::ZipWriter::new(std::fs::File::create(&file).unwrap());
+    let opts = zip::write::SimpleFileOptions::default();
+    let mut todo = vec![root.clone()];
+    while let Some(d) = todo.pop() {
+        for entry in std::fs::read_dir(&d).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                todo.push(path);
+                continue;
+            }
+            let name = path
+                .strip_prefix(&root)
+                .unwrap()
+                .to_string_lossy()
+                .replace('\\', "/");
+            zip.start_file(name, opts).unwrap();
+            zip.write_all(&std::fs::read(&path).unwrap()).unwrap();
+        }
+    }
+    zip.finish().unwrap();
+    let sha = sha256_hex(&std::fs::read(&file).unwrap());
+    (file, sha)
 }

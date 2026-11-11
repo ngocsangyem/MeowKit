@@ -70,6 +70,36 @@ pub fn choose(releases: &[Release], tag: Option<&str>, beta: bool) -> Result<Cho
     })
 }
 
+/// One installable kit release, as `versions` lists it.
+#[derive(Debug, PartialEq, Eq)]
+pub struct Listed {
+    pub version: String,
+    pub prerelease: bool,
+    /// Publishes a `checksums.txt`, so it installs without `--allow-unverified-kit`.
+    pub verified: bool,
+}
+
+/// Every non-draft kit release with an archive, newest first; prereleases
+/// only with `beta`.
+pub fn available(releases: &[Release], beta: bool) -> Vec<Listed> {
+    let mut out: Vec<(Version, Listed)> = releases
+        .iter()
+        .filter(|r| !r.draft && (beta || !r.prerelease) && asset(r, ARCHIVE_NAME).is_some())
+        .filter_map(|r| {
+            Some((
+                Version::parse(&r.tag_name)?,
+                Listed {
+                    version: r.tag_name.trim_start_matches('v').to_owned(),
+                    prerelease: r.prerelease,
+                    verified: asset(r, CHECKSUMS_NAME).is_some(),
+                },
+            ))
+        })
+        .collect();
+    out.sort_by(|a, b| b.0.cmp(&a.0));
+    out.into_iter().map(|(_, l)| l).collect()
+}
+
 fn asset<'a>(r: &'a Release, name: &str) -> Option<&'a str> {
     r.assets
         .iter()
