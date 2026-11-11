@@ -52,7 +52,8 @@ pub enum ExecError {
 }
 
 /// Apply `plan` to `scope`, updating `index` only if everything succeeded.
-/// `kit_hash` answers the kit's own SHA-256 for a path (`None`: not shipped).
+/// `kit_hash` answers the SHA-256 of the bytes the kit installs at a path
+/// (`None`: not shipped): what the emitter writes, after any rewrite.
 pub fn execute(
     plan: &Plan,
     scope: &Scope,
@@ -163,8 +164,26 @@ pub fn execute(
             .map_err(io("writing the ownership index"))?;
     }
     journal.commit();
+    for d in decisions
+        .iter()
+        .filter(|d| matches!(d.action, Action::Remove))
+    {
+        prune_empty_parents(&scope.root, &d.path);
+    }
     *index = work;
     Ok(report)
+}
+
+/// After a removal, take out the directories it left empty, innermost first,
+/// stopping at the first one that still holds anything. Best effort: the
+/// install is already committed, and an empty directory left behind is harmless.
+fn prune_empty_parents(root: &Path, path: &RelPath) {
+    let mut dir = path.under(root);
+    while dir.pop() && dir != root && dir.starts_with(root) {
+        if std::fs::remove_dir(&dir).is_err() {
+            break;
+        }
+    }
 }
 
 fn apply_record(index: &mut OwnershipIndex, path: &RelPath, record: &Record) {

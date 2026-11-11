@@ -437,3 +437,91 @@ fn a_symlinked_state_dir_fails_before_the_ledger_is_written() {
     assert!(files(outside.path()).is_empty());
     assert!(!dir.path().join("AGENTS.md").exists());
 }
+
+fn hooks_op(commands: &[&str]) -> Op {
+    Op::MergeHooks {
+        path: rel(".codex/hooks.json"),
+        event: "PreToolUse".into(),
+        handlers: commands
+            .iter()
+            .map(|c| mewkit_core::plan::Handler {
+                matcher: Some("Bash".into()),
+                handler: json!({"type": "command", "command": c}),
+            })
+            .collect(),
+    }
+}
+
+fn entries_op(names: &[&str]) -> Op {
+    Op::MergeEntries {
+        path: rel(".codex/config.toml"),
+        format: Format::Toml,
+        key: vec!["mcp_servers".into()],
+        entries: names
+            .iter()
+            .map(|n| ((*n).to_owned(), json!({"command": "node"})))
+            .collect(),
+    }
+}
+
+#[test]
+fn an_upgrade_takes_out_hooks_and_entries_the_new_kit_dropped() {
+    let dir = tempfile::tempdir().unwrap();
+    let s = scope(dir.path());
+    let user_hooks = "{\n  \"hooks\": {\n    \"PreToolUse\": [\n      {\n        \"matcher\": \"Bash\",\n        \"hooks\": [\n          {\n            \"command\": \"mine\"\n          }\n        ]\n      }\n    ]\n  }\n}\n";
+    std::fs::create_dir_all(dir.path().join(".codex")).unwrap();
+    std::fs::write(dir.path().join(".codex/hooks.json"), user_hooks).unwrap();
+    let mut index = OwnershipIndex::new("1", "1", Origin::LocalDir);
+    let no_kit = |_: &RelPath| None;
+    let run = |ops: Vec<Op>, index: &mut OwnershipIndex| {
+        let plan = Plan {
+            ops,
+            ..Plan::default()
+        };
+        execute(&plan, &s, index, &no_kit, ExecOptions::default()).unwrap();
+    };
+    run(
+        vec![hooks_op(&["old", "kept"]), entries_op(&["old", "kept"])],
+        &mut index,
+    );
+    run(vec![hooks_op(&["kept"]), entries_op(&["kept"])], &mut index);
+
+    let hooks = std::fs::read_to_string(dir.path().join(".codex/hooks.json")).unwrap();
+    assert!(!hooks.contains("\"old\""), "{hooks}");
+    assert!(hooks.contains("\"mine\"") && hooks.contains("\"kept\""));
+    let config = std::fs::read_to_string(dir.path().join(".codex/config.toml")).unwrap();
+    assert!(
+        !config.contains("old") && config.contains("kept"),
+        "{config}"
+    );
+
+    let strip = Plan {
+        ops: vec![
+            Op::StripHooks {
+                path: rel(".codex/hooks.json"),
+                event: "PreToolUse".into(),
+                ids: index.sections[".codex/hooks.json"]["hooks.PreToolUse"]
+                    .names
+                    .clone(),
+            },
+            Op::StripEntries {
+                path: rel(".codex/config.toml"),
+                format: Format::Toml,
+                key: vec!["mcp_servers".into()],
+                names: index.sections[".codex/config.toml"]["mcp_servers"]
+                    .names
+                    .clone(),
+            },
+        ],
+        ..Plan::default()
+    };
+    execute(&strip, &s, &mut index, &no_kit, ExecOptions::default()).unwrap();
+    assert_eq!(
+        std::fs::read_to_string(dir.path().join(".codex/hooks.json")).unwrap(),
+        user_hooks
+    );
+    assert!(
+        !dir.path().join(".codex/config.toml").exists(),
+        "kit-created file goes when empty"
+    );
+}

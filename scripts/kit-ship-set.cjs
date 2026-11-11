@@ -42,6 +42,15 @@ function kitMeowkitTargets() {
 }
 
 /**
+ * The Codex bundle the npm CLI installs today. `mewkit-next` installs Codex from
+ * the kit artifact, so the kit carries the bundle at its source path rather than
+ * a second copy that would drift from it. It sits outside `.claude/` on purpose:
+ * a Claude Code install copies `.claude/` whole, and must not lay down Codex files.
+ */
+const CODEX_BUNDLE = "packages/mewkit/src/migrate/modules/codex";
+const RUNTIME_BUNDLE_TARGETS = [`${CODEX_BUNDLE}/root`, `${CODEX_BUNDLE}/catalog/skill-packs.json`];
+
+/**
  * The archive roots a published kit is built from, in a fixed order.
  *
  * Each `.meowkit/` entry is named as a single FILE, never as the directory: the
@@ -62,7 +71,7 @@ function kitMeowkitTargets() {
  * Every writer under it creates the directory it needs on first write, and a
  * gate reads an absent directory as "no plan" — the same block, never an error.
  */
-const ARCHIVE_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets()];
+const ARCHIVE_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets(), ...RUNTIME_BUNDLE_TARGETS];
 
 /**
  * Roots that must exist, or the build is publishing an incomplete kit.
@@ -70,7 +79,7 @@ const ARCHIVE_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTarget
  * Every shipped `.meowkit/` file is critical: the installer skips a member the
  * release lacks without a word, so a missing one is only ever caught here.
  */
-const CRITICAL_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets()];
+const CRITICAL_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets(), ...RUNTIME_BUNDLE_TARGETS];
 
 /** Read the exclusion patterns. Throws rather than defaulting to "exclude nothing". */
 function shipSetExclusions(projectRoot) {
@@ -177,6 +186,7 @@ function zipExcludeArgs(patterns) {
 
 module.exports = {
 	ARCHIVE_TARGETS,
+	CODEX_BUNDLE,
 	CRITICAL_TARGETS,
 	KIT_MEOWKIT_FILES,
 	excludeMatcher,

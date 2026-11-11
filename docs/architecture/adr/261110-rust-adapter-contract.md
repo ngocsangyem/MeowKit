@@ -55,17 +55,27 @@ ends when `prepare` returns.
 
 `Op::{ WriteFile{path,bytes,mode}, RemoveFile{path}, MergeBlock{path,id,content},
 StripBlock{path,id}, MergeEntries{path,format,key,entries},
-StripEntries{path,format,key,names} }`. Blocks are Markdown only, so they carry no format;
-entries are JSON or TOML. Split by **file ownership**: `WriteFile` / `RemoveFile`
+StripEntries{path,format,key,names}, MergeHooks{path,event,handlers},
+StripHooks{path,event,ids} }`. Blocks are Markdown only, so they carry no format;
+entries are JSON or TOML. Hooks are the `hooks.<event>` array of groups shared by Claude Code
+`settings.json` and Codex `hooks.json`: named entries cannot express an array, so a kit handler
+joins the user's group with the same matcher (a user handler identical to a kit one is
+adopted as the kit's, which is what migrating from an npm CLI install needs), identified by matcher plus command line
+(`command` and `args` — every Claude Code handler is `"command": "node"`), and is recorded as a
+`Section` keyed `hooks.<event>`. Split by **file ownership**: `WriteFile` / `RemoveFile`
 for files we own outright; the merge/strip pairs for user-owned files where our contribution
 must be surgically added and removed. Each pair carries a property test of
 `strip(merge(user, x)) == user`: byte-exact for Markdown and TOML; for JSON, equal values in
-the same key order, since a JSON merge rewrites the file with 2-space indentation.
+the same key order, since a JSON merge rewrites the file with 2-space indentation (accepted:
+a user's tab, 4-space or CRLF layout is normalised the first time the kit edits the file). A
+re-merge first takes out the names a previous kit recorded and this one dropped, so an upgrade
+never orphans a hook handler or entry.
 
 ### One executor (`mewkit-core::exec`)
 
 `execute(plan, scope, index, kit_hash, opts) -> Result<EmitReport, ExecError>`, in fixed order
-(`kit_hash` answers the kit's own SHA-256 for a path; the delete rule below rests on it;
+(`kit_hash` answers the SHA-256 of the bytes the kit installs at a path — what the emitter's
+plan writes, after any rewrite, never the raw kit file; the delete rule below rests on it;
 `exec::Scope` is the resolved root, roots and state paths, distinct from the adapters' `Scope`):
 **validate** every op path against `roots` (no absolute path outside the scope root, no `..`, no
 symlinked parent — including the executor's own index, lock and backup paths — and no op of any
@@ -73,8 +83,10 @@ kind on the never-delete set for memory, telemetry, state, cache, backups and `.
 report with no disk contact → otherwise **scope lock** → **backup** every path an op changes →
 **journal** pre-images → **apply** ops → **ownership index** → **commit**. Drop without commit
 rolls back; rollback restores pre-images and removes created files and empty created directories.
+After a commit, directories a removal left empty are pruned up to the scope root, so uninstall
+leaves no skeleton of the kit's tree.
 
-Mutation paths, dry-run output and backup sets are *derived from the plan* — they cannot drift,
+Mutation paths, dry-run output and backup sets are _derived from the plan_ — they cannot drift,
 because there is nothing to keep in sync.
 
 ### Registry
@@ -122,30 +134,30 @@ agent, so there is no consumer. Adding them is Ask-first.
 
 ## Name mapping
 
-| Ours | AgentKit's recovered name | Difference |
-| --- | --- | --- |
-| `Emitter::target() -> Runtime` | `Emitter.Target() string` | enum, not string — exhaustive match |
-| `Emitter::prepare() -> Plan` | `Emitter.Prepare() (PreparedEmission, error)` | data, not an object with behaviour |
-| — | `Emitter.Emit()` | dropped: `prepare` + `execute` is the only path |
-| `mewkit-core::exec::execute` | `PreparedEmission.Apply()` | one core function, not per-emitter |
-| `Emitter::roots()` | `PreparedOutputRoots.OutputRoots()` | on the emitter, available with no prepare |
-| `Plan.ops` paths | `Global/ProjectMutationPathsEmitter` | derived, not declared |
-| `Emitter::plan_strip()` | exported per-runtime `Plan*Strip` / `Strip*` funcs | on the trait |
-| `Plan.notices` / `dropped_hooks` / `narrowed_hooks` / `unsupported` | `EmitReport.Notices` / `HookGroupsDropped` / `HookMatchersNarrowed` / `CapabilityExclusions` | computed at plan time, carried into the report |
-| `EmitRequest<'a>` | `EmitRequest` (28 fields) | 7 fields; the rest were per-command flags |
-| `Journal` | `TreeJournal` / `FileJournal` | one type, `commit` / `rollback` |
-| `OwnershipIndex` | `codexOwnershipIndex` / `cursor.ownershipIndex` | one shape for all targets; `schema_version` added |
-| `paths` / `hooks` / `mcp_servers` maps | `paths`+`path_hashes` / `hook_ids`+`hook_hashes` / `mcp_servers`+`mcp_hashes` | id→hash map, not two parallel arrays |
-| `registry()` | `Register` / `RegisterEmitter` / `RegisterInstallable` | one registry, static |
-| not present | `AgentAdapter.Invoke` / `.Stream` | excluded, see above |
+| Ours                                                                | AgentKit's recovered name                                                                    | Difference                                        |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `Emitter::target() -> Runtime`                                      | `Emitter.Target() string`                                                                    | enum, not string — exhaustive match               |
+| `Emitter::prepare() -> Plan`                                        | `Emitter.Prepare() (PreparedEmission, error)`                                                | data, not an object with behaviour                |
+| —                                                                   | `Emitter.Emit()`                                                                             | dropped: `prepare` + `execute` is the only path   |
+| `mewkit-core::exec::execute`                                        | `PreparedEmission.Apply()`                                                                   | one core function, not per-emitter                |
+| `Emitter::roots()`                                                  | `PreparedOutputRoots.OutputRoots()`                                                          | on the emitter, available with no prepare         |
+| `Plan.ops` paths                                                    | `Global/ProjectMutationPathsEmitter`                                                         | derived, not declared                             |
+| `Emitter::plan_strip()`                                             | exported per-runtime `Plan*Strip` / `Strip*` funcs                                           | on the trait                                      |
+| `Plan.notices` / `dropped_hooks` / `narrowed_hooks` / `unsupported` | `EmitReport.Notices` / `HookGroupsDropped` / `HookMatchersNarrowed` / `CapabilityExclusions` | computed at plan time, carried into the report    |
+| `EmitRequest<'a>`                                                   | `EmitRequest` (28 fields)                                                                    | 7 fields; the rest were per-command flags         |
+| `Journal`                                                           | `TreeJournal` / `FileJournal`                                                                | one type, `commit` / `rollback`                   |
+| `OwnershipIndex`                                                    | `codexOwnershipIndex` / `cursor.ownershipIndex`                                              | one shape for all targets; `schema_version` added |
+| `paths` / `hooks` / `mcp_servers` maps                              | `paths`+`path_hashes` / `hook_ids`+`hook_hashes` / `mcp_servers`+`mcp_hashes`                | id→hash map, not two parallel arrays              |
+| `registry()`                                                        | `Register` / `RegisterEmitter` / `RegisterInstallable`                                       | one registry, static                              |
+| not present                                                         | `AgentAdapter.Invoke` / `.Stream`                                                            | excluded, see above                               |
 
 ## Rejected alternatives
 
-| Alternative | Why rejected |
-| --- | --- |
-| **Boxed `PreparedEmission`** — the literal port | The prepared value borrows kit and manifest, so the lifetime propagates into the command layer and any future parallel-target work; and it reinstates per-emitter `apply` — three copies of the journal/backup/ownership sequence that must not differ between runtimes, plus a per-emitter dry run with its own bugs. |
-| **Hand-declared mutation paths** (`GlobalMutationPaths` / `ProjectMutationPaths`) | Two sources of truth. A path written by `apply` but missing from the declaration is never backed up and never removed; a path declared but not written makes doctor report phantom files. Deriving both from `plan.ops` makes that bug class unrepresentable. |
-| **JS delegation shim** — Rust CLI shelling out to the Node emitters | Rejected by the locked plan decision (full rewrite, no shim): keeps the bundle-per-runtime design that is the reason for this work, needs Node on every install path rather than only for hooks, leaves two ownership-ledger formats to reconcile at cutover. |
+| Alternative                                                                       | Why rejected                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Boxed `PreparedEmission`** — the literal port                                   | The prepared value borrows kit and manifest, so the lifetime propagates into the command layer and any future parallel-target work; and it reinstates per-emitter `apply` — three copies of the journal/backup/ownership sequence that must not differ between runtimes, plus a per-emitter dry run with its own bugs. |
+| **Hand-declared mutation paths** (`GlobalMutationPaths` / `ProjectMutationPaths`) | Two sources of truth. A path written by `apply` but missing from the declaration is never backed up and never removed; a path declared but not written makes doctor report phantom files. Deriving both from `plan.ops` makes that bug class unrepresentable.                                                          |
+| **JS delegation shim** — Rust CLI shelling out to the Node emitters               | Rejected by the locked plan decision (full rewrite, no shim): keeps the bundle-per-runtime design that is the reason for this work, needs Node on every install path rather than only for hooks, leaves two ownership-ledger formats to reconcile at cutover.                                                          |
 
 ## Consequences
 
@@ -169,6 +181,14 @@ agent, so there is no consumer. Adding them is Ask-first.
   string Codex and Cursor expect; and the Cursor-only `sessionEnd`, `subagentStart`,
   `subagentStop` plus the MCP execution events the current Cursor bundle already ships with no
   Claude-side source — carry them or record a decision to drop them, or Cursor regresses.
+- **Codex content (maintainer decision, 2026-11-11).** The Codex emitter installs the authored
+  bundle (`packages/mewkit/src/migrate/modules/codex/root`) rather than projecting `.claude/`:
+  the kit artifact carries the bundle at that source path, outside `.claude/` so a Claude Code
+  install never lays down Codex files, and with one copy so the npm CLI and `mewkit-next`
+  cannot drift. The emitter adds skill-pack selection, root-anchored script commands, merged
+  `AGENTS.md` / `hooks.json` / `config.toml`, and a post-plan report of Claude-only tokens and
+  installed paths the text names but the plan does not write. The neutral hook manifest above
+  is first needed by the Cursor emitter.
 - Capabilities no manifest shape can express (Codex has no read-tool hook, no tool-failure
   event) stay runtime gaps: reported in `Plan.unsupported` and surfaced by `doctor`.
 - Kit integrity is a checksum, not a signature: anyone able to publish a release in this

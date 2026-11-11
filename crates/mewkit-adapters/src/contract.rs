@@ -71,6 +71,22 @@ pub enum EmitError {
     Unsupported { runtime: &'static str, what: String },
 }
 
+/// The SHA-256 of every file `plan` writes, by path: the `kit_hash` the
+/// executor needs to corroborate a removal. It is the hash of the bytes the
+/// emitter installs (after any rewrite such as Codex's root-anchored script
+/// commands), never of the raw kit file, so compute it from a fresh `prepare`.
+pub fn written_hashes(plan: &Plan) -> std::collections::BTreeMap<String, String> {
+    plan.ops
+        .iter()
+        .filter_map(|op| match op {
+            Op::WriteFile { path, bytes, .. } => {
+                Some((path.to_string(), mewkit_core::fsx::sha256_hex(bytes)))
+            }
+            _ => None,
+        })
+        .collect()
+}
+
 pub trait Emitter: Sync {
     fn target(&self) -> Runtime;
     /// The only paths this emitter's plans may touch, relative to the scope root.
