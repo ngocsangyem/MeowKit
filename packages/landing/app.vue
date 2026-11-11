@@ -2,7 +2,7 @@
 useHead({
   htmlAttrs: { lang: 'en' },
   meta: [
-    { name: 'theme-color', content: '#060A13' },
+    { name: 'theme-color', content: '#eef2f7' },
     { name: 'application-name', content: 'MeowKit' },
   ],
   link: [

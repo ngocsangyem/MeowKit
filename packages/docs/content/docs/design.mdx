@@ -22,7 +22,7 @@ The site runs on [Fumadocs](https://fumadocs.dev) on the Next.js App Router. Lay
 
 ## The system in one paragraph
 
-Cool paper, one blue signal accent, and a display/body/code type stack: Space Grotesk for display, Inter for body, the platform mono for code. Colour is the Fumadocs `ocean` preset. Neutrals are blue-tinted slate rather than true grey, which is what keeps the light theme from reading as clinical white and the dark theme from reading as flat black. The accent is navy in light and pale blue in dark.
+Mist paper, one blue signal accent, and a display/body/code type stack: Newsreader for display, Onest for body, the platform mono for code. Light is the primary theme, a cool paper ground carrying night ink, and dark inverts it to night carrying paper ink. Neutrals are blue-tinted slate rather than true grey, which keeps the light theme from reading as clinical white and the dark theme from reading as flat black. There is exactly one accent: dusk blue in light, sky blue in dark.
 
 ## Rules worth keeping
 
@@ -39,9 +39,9 @@ These are decisions, not defaults. Changing one is fine; changing one by acciden
 
 Colour arrives as a whole palette, not as a list of values:
 
-1. **Retheme** by swapping the preset import in `app/global.css`, currently `@import 'fumadocs-ui/css/ocean.css'`. Fumadocs ships eleven of these; each sets every `--color-fd-*` slot for light and dark at once. One line moves the entire site.
-2. **Re-map one role** by declaring that single `--color-fd-*` slot below the import. It wins on cascade order, so an override is deliberate and visible rather than a whole second palette shadowing the first.
+1. **Re-map a role** by editing its `--color-fd-*` slot in the brand block in `app/global.css`. There is one such block for light and one for dark, and they are the only place in the site that re-declares a slot. Edit the slot, not the component that uses it.
+2. **Retheme wholesale** by replacing both blocks. Fumadocs' baseline values come from the `lib/default-colors.css` import above them; a preset such as `@import 'fumadocs-ui/css/ocean.css'` can take that import's place and set every slot for light and dark at once.
 
-Overriding every slot is how you end up with a preset that loads and does nothing. Reaching past both to style a component directly is how a design system stops being one.
+Keeping the override in one named block is what makes a Fumadocs upgrade safe: anything the release changes that is not one of those slot names lands as intended. Reaching past the slots to style a component directly is how a design system stops being one.
 
 Run `npm run dev` in `packages/docs` to see changes. `npm run build` is what CI runs.

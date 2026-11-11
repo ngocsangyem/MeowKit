@@ -1,35 +1,45 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Components — Code Block</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Components — Code block</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
-  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px 24px; }
-  .wrap { border: 1px solid var(--mk-border-subtle); border-radius: 10px; overflow: hidden; background: var(--mk-bg-surface); }
-  .bar { display:flex; align-items:center; justify-content:space-between; padding: 6px 12px; border-bottom: 1px solid var(--mk-border-subtle); font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); letter-spacing: .06em; text-transform: uppercase; }
-  .bar .copy { color: var(--mk-fg-3); font-size: 11px; }
-  pre { margin: 0; padding: 14px 16px; font-family: var(--mk-font-mono); font-size: 13px; line-height: 1.65; color: var(--mk-fg-1); overflow:auto; }
-  .k { color: #93C5FD; }
-  .s { color: #12B76A; }
-  .c { color: var(--mk-fg-2); }
-  .v { color: #F79009; }
-  .p { color: #F8FAFC; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .wrap { border-radius: var(--mk-radius-md); overflow: hidden; background: var(--mk-neutral-900); }
+  .bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid rgb(238 242 247 / .12); font-family: var(--mk-font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--mk-neutral-300); }
+  pre { margin: 0; padding: 14px 16px; font-family: var(--mk-font-mono); font-size: 13px; line-height: 1.7; color: #eef2f7; overflow-x: auto; }
+  .c { color: #9aa6bb; }
+  .k { color: #8fb5e8; }
+  .s { color: #7fc4a0; }
+  .v { color: #e3b46a; }
+  .light { border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); background: var(--mk-neutral-100); padding: 14px 16px; font-family: var(--mk-font-mono); font-size: 13px; line-height: 1.7; color: var(--mk-neutral-900); white-space: pre; overflow-x: auto; }
+  .note { font-size: 14px; line-height: 1.6; margin: 0; max-width: 820px; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="bar"><span>bash</span><span class="copy">⧉ copy</span></div>
-<pre><span class="c"># Install MeowKit in 30 seconds</span>
+    <div class="bar"><span>bash</span><span>copy</span></div>
+<pre><span class="c"># Install MeowKit</span>
 <span class="k">npx</span> mewkit init
 <span class="k">npx</span> mewkit setup      <span class="c"># venv, MCP, .env, .gitignore</span>
-<span class="k">npx</span> mewkit doctor     <span class="c"># verify environment</span>
+<span class="k">npx</span> mewkit doctor     <span class="c"># verify the environment</span>
 
-<span class="c"># Your first task</span>
+<span class="c"># First task</span>
 <span class="k">npx</span> mewkit task new <span class="v">--type</span> feature <span class="s">"add auth"</span>
-<span class="p">/mk:cook</span>                <span class="c">→ Plan · Test · Build · [GATE 2] · Ship</span></pre>
+/mk:cook                <span class="c">-&gt; Plan · Test · Build · [GATE 2] · Ship</span></pre>
   </div>
+  <div class="light">tasks/plans/261111-add-auth/
+├── plan.md
+├── phase-01-schema.md
+└── phase-02-endpoints.md</div>
+  <p class="note">Terminals and code run on night <code>#131a27</code> with paper text at 15.5:1. Four syntax roles only: comment <code>#9aa6bb</code> 7.1:1, keyword sky 8.3:1, string <code>#7fc4a0</code> 8.6:1, value <code>#e3b46a</code> 9.1:1. Inline trees and paths can sit on a surface card instead. Box-drawing characters use the platform mono so the columns stay square.</p>
 </body>
 </html>

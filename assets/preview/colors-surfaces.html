@@ -1,45 +1,54 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Colors — Surfaces (Light vs Dark)</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colors — Surfaces (paper vs night)</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
-  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px; display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .pane { border-radius: 12px; overflow: hidden; border: 1px solid var(--mk-border-subtle); }
-  .pane-h { padding: 8px 12px; font-family: var(--mk-font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; }
-  .stack { display: grid; grid-template-rows: 1fr 1fr 1fr; height: 210px; }
-  .stack .s { display:flex; align-items:center; justify-content:space-between; padding: 0 14px; font-size: 12px; font-family: var(--mk-font-mono); }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .pane { border-radius: var(--mk-radius-md); overflow: hidden; border: 1px solid var(--mk-border-subtle); }
+  .pane-h { padding: 9px 14px; font-family: var(--mk-font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+  .stack { display: grid; grid-template-rows: 1fr 1fr 1fr; height: 220px; }
+  .s { display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font-family: var(--mk-font-mono); font-size: 12px; }
 
-  .light .pane-h { background: #fff; color: #0F172A; border-bottom: 1px solid #E2E8F0; }
-  .light .s1 { background: #F8FAFC; color: #0F172A; }
-  .light .s2 { background: #FFFFFF; color: #334155; border-top: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
-  .light .s3 { background: #F1F5F9; color: #334155; }
+  .light .pane-h { background: #e0e7f0; color: #131a27; border-bottom: 1px solid rgb(19 26 39 / .13); }
+  .light .s1 { background: #eef2f7; color: #131a27; }
+  .light .s2 { background: #e0e7f0; color: #131a27; border-top: 1px solid rgb(19 26 39 / .13); border-bottom: 1px solid rgb(19 26 39 / .13); }
+  .light .s3 { background: #c8d5e6; color: #131a27; }
 
-  .dk .pane-h { background: #0F172A; color: #F8FAFC; border-bottom: 1px solid rgba(255,255,255,.08); }
-  .dk .s1 { background: #0F172A; color: #F8FAFC; }
-  .dk .s2 { background: #1E293B; color: #94A3B8; border-top: 1px solid rgba(255,255,255,.08); border-bottom: 1px solid rgba(255,255,255,.08);}
-  .dk .s3 { background: #1E3A5F; color: #F8FAFC; }
+  .dk { border-color: rgb(238 242 247 / .12); }
+  .dk .pane-h { background: #1b2435; color: #eef2f7; border-bottom: 1px solid rgb(238 242 247 / .12); }
+  .dk .s1 { background: #131a27; color: #eef2f7; }
+  .dk .s2 { background: #1b2435; color: #eef2f7; border-top: 1px solid rgb(238 242 247 / .12); border-bottom: 1px solid rgb(238 242 247 / .12); }
+  .dk .s3 { background: #0d121c; color: #eef2f7; }
+
+  .note { grid-column: 1 / -1; font-size: 14px; line-height: 1.6; margin: 0; max-width: 880px; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
   <div class="pane light">
-    <div class="pane-h">Light</div>
+    <div class="pane-h">Light · mist paper</div>
     <div class="stack">
-      <div class="s s1"><span>base</span><span>#F8FAFC</span></div>
-      <div class="s s2"><span>surface</span><span>#FFFFFF</span></div>
-      <div class="s s3"><span>soft / code</span><span>#F1F5F9</span></div>
+      <div class="s s1"><span>base · page ground</span><span>#eef2f7</span></div>
+      <div class="s s2"><span>surface · cards, panels</span><span>#e0e7f0</span></div>
+      <div class="s s3"><span>haze · lit frames, footer</span><span>#c8d5e6</span></div>
     </div>
   </div>
   <div class="pane dk">
-    <div class="pane-h">Dark · hero</div>
+    <div class="pane-h">Dark · night</div>
     <div class="stack">
-      <div class="s s1"><span>base</span><span>#0F172A</span></div>
-      <div class="s s2"><span>surface</span><span>#1E293B</span></div>
-      <div class="s s3"><span>soft · deep-space</span><span>#1E3A5F</span></div>
+      <div class="s s1"><span>base · page ground</span><span>#131a27</span></div>
+      <div class="s s2"><span>raised · cards, panels</span><span>#1b2435</span></div>
+      <div class="s s3"><span>code · terminals</span><span>#0d121c</span></div>
     </div>
   </div>
+  <p class="note">Light is the default. Three steps per theme, each separated by a hairline — <code>rgb(19 26 39 / .13)</code> on paper, <code>rgb(238 242 247 / .12)</code> on night. Elevation is a step in the ramp, not a shadow and never a glow.</p>
 </body>
 </html>

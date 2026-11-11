@@ -1,45 +1,151 @@
 @import 'tailwindcss';
-@import 'fumadocs-ui/css/ocean.css';
+
+/* Fumadocs' baseline slot values. This used to be the `ocean` preset; ocean set a
+ * royal-blue ramp and painted a gradient on `.dark body`, and both are gone from the
+ * brand. `lib/default-colors.css` is the same file every preset starts from, so a slot
+ * added by a future Fumadocs release still arrives with a value instead of rendering
+ * an undefined colour — the two blocks below re-map the ones the brand owns. */
+@import 'fumadocs-ui/css/lib/default-colors.css';
 @import 'fumadocs-ui/css/preset.css';
 
+/* next-themes toggles a `.dark` class on <html>, but Tailwind v4's stock `dark:` variant
+   reads prefers-color-scheme. Without this the reversed nav lockup would follow the OS
+   instead of the theme switch and show white-on-white for anyone whose OS is dark and
+   whose site theme is light. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ==================================================================
- * Colour comes from the Fumadocs `ocean` preset — a blue-tinted
- * neutral ramp with a navy signal accent in light and a pale-blue one
- * in dark. Nothing below re-declares a --color-fd-* slot; retheme by
- * swapping the preset import above, re-map by overriding a single
- * slot here. Typography is the only thing this file owns.
+ * BRAND PALETTE → FUMADOCS SLOTS — LIGHT
+ *
+ * Values are the MeowKit tokens (assets/design-tokens.json, mirrored as
+ * CSS roles in docs/design/meowkit-tokens.css). This block and its dark
+ * twin below are the ONLY places the docs site re-declares a
+ * --color-fd-* slot: every name here is a documented Fumadocs slot, and
+ * nothing outside these two blocks overrides one. A Fumadocs upgrade can
+ * therefore change any internal without the theme drifting, and a
+ * component that wants a colour asks for a slot rather than a hex.
+ *
+ * Light is the primary theme: mist paper ground, ink text, ONE accent
+ * (dusk #2f66b3). The accent is a signal — links, active state, focus,
+ * primary action — never a surface fill.
  * ================================================================== */
+@theme {
+  --color-fd-background: #eef2f7; /* mist paper */
+  --color-fd-foreground: #131a27; /* night ink */
+
+  --color-fd-muted: #e0e7f0; /* surface */
+  --color-fd-muted-foreground: #566178;
+
+  --color-fd-popover: #f7f9fc; /* white — lifts a floating panel off the paper */
+  --color-fd-popover-foreground: #131a27;
+
+  --color-fd-card: #e0e7f0; /* surface */
+  --color-fd-card-foreground: #131a27;
+
+  --color-fd-border: rgb(19 26 39 / 0.13); /* hairline, ink at low alpha */
+
+  /* `primary` is the brand accent; `accent` is Fumadocs' hover/active
+     SURFACE, which is why one is dusk blue and the other is haze. */
+  --color-fd-primary: #2f66b3; /* dusk */
+  --color-fd-primary-foreground: #f7f9fc;
+  --color-fd-secondary: #e0e7f0;
+  --color-fd-secondary-foreground: #131a27;
+  --color-fd-accent: #c8d5e6; /* haze */
+  --color-fd-accent-foreground: #131a27;
+
+  --color-fd-ring: #2f66b3;
+  --color-fd-overlay: rgb(19 26 39 / 0.2);
+
+  /* Signals. `info` is the accent rather than a second blue — the palette
+     carries one accent, and a default vivid blue beside dusk reads as two. */
+  --color-fd-info: #2f66b3;
+  --color-fd-success: #2f7a55;
+  --color-fd-warning: #9a5d0c;
+  --color-fd-error: #b13f37;
+  --color-fd-idea: #9a5d0c;
+
+  --color-fd-diff-add: rgb(47 122 85 / 0.1);
+  --color-fd-diff-add-symbol: #2f7a55;
+  --color-fd-diff-remove: rgb(177 63 55 / 0.1);
+  --color-fd-diff-remove-symbol: #b13f37;
+}
+
+/* ==================================================================
+ * BRAND PALETTE → FUMADOCS SLOTS — DARK
+ * Night ground, paper ink, sky accent. Same rule: documented slots only.
+ * ================================================================== */
+.dark {
+  --color-fd-background: #131a27; /* night */
+  --color-fd-foreground: #eef2f7; /* mist paper */
+
+  --color-fd-muted: #1b2435; /* night raised */
+  --color-fd-muted-foreground: #9aa6bb;
+
+  --color-fd-popover: #1b2435;
+  --color-fd-popover-foreground: #eef2f7;
+
+  --color-fd-card: #1b2435;
+  --color-fd-card-foreground: #eef2f7;
+
+  --color-fd-border: rgb(238 242 247 / 0.12);
+
+  --color-fd-primary: #8fb5e8; /* sky */
+  --color-fd-primary-foreground: #131a27;
+  --color-fd-secondary: #1b2435;
+  --color-fd-secondary-foreground: #eef2f7;
+  /* Hover surface is paper at low alpha, not a mixed tone: on night it has to
+     sit between the ground and the raised surface without picking up a hue. */
+  --color-fd-accent: rgb(238 242 247 / 0.08);
+  --color-fd-accent-foreground: #eef2f7;
+
+  --color-fd-ring: #8fb5e8;
+  --color-fd-overlay: rgb(19 26 39 / 0.6);
+
+  --color-fd-info: #8fb5e8;
+  --color-fd-success: #7fc4a0;
+  --color-fd-warning: #e3b46a;
+  --color-fd-error: #ef9a90;
+  --color-fd-idea: #e3b46a;
+
+  --color-fd-diff-add: rgb(127 196 160 / 0.12);
+  --color-fd-diff-add-symbol: #7fc4a0;
+  --color-fd-diff-remove: rgb(239 154 144 / 0.12);
+  --color-fd-diff-remove-symbol: #ef9a90;
+}
 
 @theme inline {
-  /* Space Grotesk display · Inter body · platform mono for code */
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  /* Newsreader display · Onest text · platform mono for code */
+  --font-sans: var(--font-onest), system-ui, sans-serif;
   /* The code font must cover box-drawing (U+2500-257F) and geometric shapes (U+25A0-25FF)
      in the SAME face as its letters. A Google webfont loaded with `subsets: ['latin']`
      does not: those glyphs resolve through per-character fallback to a face with a
      different advance width, so a 66-character line of ASCII art renders anywhere from
      521px to 735px and every column shears. Platform monos ship the full block, so any
-     preformatted diagram that is still literal text stays aligned. */
-  --font-mono:
-    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
-  --font-display: var(--font-space-grotesk), var(--font-inter), sans-serif;
+     preformatted diagram that is still literal text stays aligned. This is also why the
+     brand's JetBrains Mono stops at the logo and UI labels and never reaches code. */
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  --font-display: var(--font-newsreader), 'Iowan Old Style', Georgia, serif;
 }
 
-/* Display typography — Space Grotesk carries headings site-wide */
-.prose h1,
+/* Display typography. Newsreader carries the page title at its text weight — the
+   serif is the voice of the brand, and at 400 it stays a title rather than a banner.
+   Section headings below it stay in Onest: inside a long reference page the sans is
+   the faster scan, which is what the approved docs mockup renders.
+   `#nd-page > h1` is the title Fumadocs renders from frontmatter. It sits OUTSIDE the
+   `.prose` container, so a `.prose h1` rule alone silently misses every doc title —
+   and it carries a `font-semibold` utility, which an id-qualified rule outranks. */
+#nd-page > h1,
+.prose h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.022em;
+}
+
 .prose h2,
 .prose h3,
 .prose h4 {
-  font-family: var(--font-display);
+  font-weight: 500;
   letter-spacing: -0.02em;
-}
-
-.prose h1 {
-  font-weight: 700;
-}
-
-.prose h2,
-.prose h3 {
-  font-weight: 600;
 }
 
 /* Tables — tabular numerals, matching the instrument-panel register */

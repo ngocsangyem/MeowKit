@@ -1,5 +1,35 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 
+// The nav mark is the brand lockup from `assets/branding/meow-logo{,-dark}.svg`, copied
+// into `public/` under the names the site already linked. Two files rather than one
+// recoloured by CSS: the masters are the source of truth for the mark, and inlining their
+// path data here would fork it. Both ship in the markup and CSS hides one, so the swap
+// happens with the theme class and never lags a frame behind the toggle.
+//
+// Plain <img>, not next/image: an SVG served from `public/` needs no resizing, and
+// next/image would only pass it through behind `dangerouslyAllowSVG`.
+function NavTitle() {
+  return (
+    <>
+      <img
+        src="/logo.svg"
+        alt="MeowKit"
+        className="h-5 w-auto dark:hidden"
+        width={101}
+        height={20}
+      />
+      <img
+        src="/logo-dark.svg"
+        alt=""
+        aria-hidden
+        className="hidden h-5 w-auto dark:block"
+        width={101}
+        height={20}
+      />
+    </>
+  );
+}
+
 // Shared layout options for HomeLayout and DocsLayout.
 // The Guide/CLI/Reference/Workflows tabs are driven by root:true meta.json
 // folders (rendered as sidebar tabs). These links reproduce the VitePress
@@ -7,7 +37,7 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: 'MeowKit',
+      title: <NavTitle />,
     },
     githubUrl: 'https://github.com/ngocsangyem/MeowKit',
     links: [

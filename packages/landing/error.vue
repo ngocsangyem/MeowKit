@@ -20,7 +20,7 @@ function handleError() {
           ? "The page you're looking for doesn't exist."
           : error.statusMessage || 'An unexpected error occurred.' }}
       </p>
-      <button class="btn-fill" @click="handleError">Back to home</button>
+      <button class="mk-btn mk-btn--primary" @click="handleError">Back to home</button>
     </div>
   </div>
 </template>
@@ -31,38 +31,38 @@ function handleError() {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-xl) var(--page-gutter);
+  padding: var(--mk-space-2xl) var(--mk-rail);
 }
 
 .error-page__inner {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-md);
+  gap: var(--mk-space-sm);
   text-align: left;
 }
 
 .error-page__code {
-  font-family: var(--font-mono);
-  font-size: var(--text-3xl);
+  font-family: var(--mk-font-mono);
+  font-size: var(--mk-text-h1);
   font-variant-numeric: tabular-nums;
   line-height: 1;
-  color: var(--color-accent);
+  color: var(--mk-accent);
 }
 
 .error-page__heading {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-xl);
-  letter-spacing: -0.02em;
-  color: var(--color-ink);
+  font-family: var(--mk-font-display);
+  font-weight: var(--mk-serif-weight);
+  font-size: var(--mk-text-h2);
+  letter-spacing: var(--mk-serif-track);
+  color: var(--mk-ink);
   margin: 0;
 }
 
 .error-page__sub {
-  font-size: var(--text-base);
-  color: var(--color-muted);
+  font-size: var(--mk-text-base);
+  color: var(--mk-muted);
   max-width: 44ch;
-  margin: 0 0 var(--space-xs);
+  margin: 0 0 var(--mk-space-2xs);
 }
 </style>

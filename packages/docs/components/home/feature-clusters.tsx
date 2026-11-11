@@ -92,8 +92,10 @@ export function FeatureClusters() {
           className="border-t border-fd-border pt-8 [&+&]:mt-16"
         >
           <header className="mb-8">
+            {/* Cluster titles are the display moment: Newsreader at its text weight,
+                which is the weight the brand's serif is cut for. */}
             <h2
-              className="text-2xl font-semibold tracking-tight"
+              className="text-[28px] font-normal tracking-[-0.022em]"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               {cluster.title}
@@ -108,10 +110,9 @@ export function FeatureClusters() {
                 key={item.title}
                 className="rounded-lg border border-fd-border bg-fd-card p-6 transition-colors hover:border-fd-primary/40"
               >
-                <h3
-                  className="mb-2 text-base font-semibold tracking-tight"
-                  style={{ fontFamily: 'var(--font-display)' }}
-                >
+                {/* Card titles stay in Onest — inside a grid of twelve, the sans is the
+                    faster read and the serif is reserved for the section above them. */}
+                <h3 className="mb-2 text-base font-medium tracking-tight">
                   {item.title}
                 </h3>
                 <p className="text-sm leading-relaxed text-fd-muted-foreground">

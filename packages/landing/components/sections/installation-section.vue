@@ -1,106 +1,92 @@
 <script setup lang="ts">
+/* Section 6 — the one command. Copy verbatim from the mockup; the command is
+ * also copyable, which the static mockup could not offer. */
+const COMMAND = 'npx mewkit init'
 const { copied, copy } = useClipboard()
-
-const installCmd = 'npx mewkit init'
-
-function handleCopy() {
-  copy(installCmd)
-}
 </script>
 
 <template>
-  <section id="install" class="install" aria-labelledby="install-heading">
-    <div class="container-landing">
-      <div class="section-head">
-        <h2 id="install-heading" class="section-head__title">
-          One command to enforce discipline.
-        </h2>
+  <section class="mk-section" id="install" aria-labelledby="install-h">
+    <div class="mk-wrap mk-grid">
+      <div class="mk-col-5 mk-flow mk-flow--roomy in__copy">
+        <h2 id="install-h">Install MeowKit with one command</h2>
+
+        <p class="mk-lead">
+          Run
+          <button
+            class="in__cmd"
+            type="button"
+            :aria-label="copied ? `Copied ${COMMAND} to the clipboard` : `Copy ${COMMAND}`"
+            @click="copy(COMMAND)"
+          >
+            <code>{{ COMMAND }}</code>
+            <span class="in__cmd-hint" aria-hidden="true">{{ copied ? 'Copied' : 'Copy' }}</span>
+          </button>
+          <!-- the visual label is decorative; the result is announced here -->
+          <span class="mk-sr-only" role="status" aria-live="polite">
+            {{ copied ? `Copied ${COMMAND} to the clipboard` : '' }}
+          </span>
+          in a project. It fetches the latest release, asks for your config and writes two directories.
+        </p>
+
+        <p class="mk-dim">.claude holds the skills, agents, rules and hooks.</p>
+        <p class="mk-dim">.meowkit holds memory, state and config.</p>
+        <p><a class="mk-link" href="https://docs.meowkit.dev/">Read the quick start</a></p>
       </div>
 
-      <!-- Terminal-true quick start: real commands, typographic frame, no fake chrome -->
-      <div class="code-frame install__frame">
-        <div class="install__frame-head">
-          <p class="code-frame__label">Quick start</p>
-          <button
-            class="install__copy"
-            :class="{ 'install__copy--done': copied }"
-            :aria-label="copied ? 'Copied' : 'Copy install command'"
-            @click="handleCopy"
-          >
-            {{ copied ? 'Copied' : 'Copy' }}
-          </button>
-        </div>
-        <pre aria-label="Quick start commands"><code><span class="tok-prompt">$</span> <span class="tok-cmd">npx mewkit init</span>          <span class="tok-comment"># scaffold the harness into your project</span>
-<span class="tok-prompt">$</span> <span class="tok-cmd">npx mewkit setup</span>        <span class="tok-comment"># choose your workflow modes and agents</span>
-<span class="tok-prompt">$</span> <span class="tok-cmd">/mk:cook "add feature X"</span> <span class="tok-comment"># the 7-phase pipeline enforces the rest</span><span class="install__caret" aria-hidden="true">▮</span></code></pre>
+      <div class="mk-col-6 mk-col-start-7 in__frame mk-reveal">
+        <TerminalRun />
       </div>
     </div>
   </section>
 </template>
 
 <style scoped>
-.install {
-  padding-block: var(--space-3xl);
-}
+.in__copy { align-self: center; }
 
-.install__frame {
-  max-width: 48rem;
-}
-
-.install__frame-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-md);
-}
-
-.install__copy {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: var(--space-2xs) var(--space-sm);
-  border: var(--rule-hair) solid var(--color-rule);
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-muted);
+.in__cmd {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-2xs);
+  vertical-align: baseline;
+  padding: 2px var(--mk-space-2xs);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-radius-chip);
+  background: var(--mk-surface);
+  font: inherit;
+  color: inherit;
   cursor: pointer;
-  white-space: nowrap;
-  transition: border-color var(--dur-short) var(--ease-out),
-              color var(--dur-short) var(--ease-out);
+  transition: background-color var(--mk-dur-base) var(--mk-ease);
 }
-.install__copy:hover {
-  border-color: var(--color-accent);
-  color: var(--color-ink);
+.in__cmd:hover { background: var(--mk-haze); }
+.in__cmd code { font-family: var(--mk-font-mono); font-size: 0.9em; color: var(--mk-ink); background: none; }
+
+/* Muted is 4.99:1 on the resting surface — fine for a caption — but only
+ * 4.18:1 once hover deepens the ground to haze, so the hint takes ink there.
+ * 12px is the floor for this label; 11px was below it. */
+.in__cmd-hint {
+  font-family: var(--mk-font-mono);
+  font-size: 0.75rem;
+  color: var(--mk-muted);
+  transition: color var(--mk-dur-base) var(--mk-ease);
 }
-.install__copy:active {
-  transform: translateY(1px);
-}
-.install__copy:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.install__copy--done {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+.in__cmd:hover .in__cmd-hint,
+.in__cmd:focus-visible .in__cmd-hint { color: var(--mk-ink); }
+
+/* the terminal sits on the haze stage, cropped at the foot like the feature panels */
+.in__frame {
+  display: flex;
+  justify-content: center;
+  padding: var(--mk-space-xl) var(--mk-space-md) 0;
+  border-radius: var(--mk-radius-card);
+  background: var(--mk-haze);
+  overflow: hidden;
 }
 
-.tok-prompt { color: var(--color-accent); }
-.tok-cmd { color: var(--color-ink); }
-.tok-comment { color: var(--color-muted); }
-
-.install__caret {
-  display: inline-block;
-  width: 1ch;
-  color: var(--color-accent);
-  animation: caret-blink 1s steps(2) infinite;
+@media (max-width: 899px) {
+  .in__copy { margin-block-end: var(--mk-head-offset); }
 }
-
-@keyframes caret-blink {
-  50% { opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .install__caret { animation: none; }
+@media (max-width: 639px) {
+  .in__frame { padding: var(--mk-space-md) var(--mk-space-xs) 0; }
 }
 </style>

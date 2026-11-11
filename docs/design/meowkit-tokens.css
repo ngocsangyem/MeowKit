@@ -1,42 +1,98 @@
-/* MeowKit Design System - CSS Tokens */
+/* MeowKit design tokens as CSS custom properties.
+ * Values come from assets/design-tokens.json; keep the two in step.
+ * Light-first: :root is mist paper; [data-theme="dark"] / .dark is night. */
 
 :root {
-  /* Colors */
-  --mk-bg: #05070A;
-  --mk-bg-secondary: #0A1F44;
-  --mk-surface: #111418;
-  --mk-surface-alpha: rgba(17, 20, 24, 0.9);
-  --mk-border: rgba(255, 255, 255, 0.05);
-  --mk-text-primary: #F8FAFC;
-  --mk-text-secondary: #94A3B8;
-  --mk-brand-mascot: #2563EB;
-  --mk-brand-active: #E1E1E1;
+  /* Base */
+  --mk-paper: #eef2f7;
+  --mk-surface: #e0e7f0;
+  --mk-haze: #c8d5e6;
+  --mk-night: #131a27;
+  --mk-night-raised: #1b2435;
+  --mk-white: #f7f9fc;
 
-  /* Typography */
-  --mk-font-heading: 'Inter', sans-serif;
-  --mk-font-mono: 'Fira Code', 'Geist Mono', monospace;
-  --mk-heading-weight: 400;
-  --mk-heading-tracking: 0.02em;
+  /* Accent: dusk on light grounds, sky on night. One accent only. */
+  --mk-dusk: #2f66b3;
+  --mk-sky: #8fb5e8;
+
+  /* Signal */
+  --mk-success: #2f7a55;
+  --mk-warning: #9a5d0c;
+  --mk-danger: #b13f37;
+
+  /* Themed roles (light) */
+  --mk-bg: var(--mk-paper);
+  --mk-bg-raised: var(--mk-surface);
+  --mk-ink: var(--mk-night);
+  --mk-muted: #566178;
+  --mk-line: rgb(19 26 39 / 0.13);
+  --mk-accent: var(--mk-dusk);
+  --mk-on-accent: var(--mk-white);
+
+  /* Type */
+  --mk-font-display: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+  --mk-font-sans: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mk-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  /* Docs code blocks stay on the platform mono: box-drawing diagrams shear in a subset webfont. */
+  --mk-font-code: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  /* Shape and motion */
+  --mk-radius-chip: 4px;
+  --mk-radius-card: 8px;
+  --mk-radius-button: 99px;
+  --mk-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --mk-dur-fast: 120ms;
+  --mk-dur-base: 240ms;
 }
 
-/* Sharp Glass Effect */
-.mk-glass-panel {
-  background: var(--mk-bg-secondary);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--mk-border);
+[data-theme='dark'],
+.dark {
+  --mk-bg: var(--mk-night);
+  --mk-bg-raised: var(--mk-night-raised);
+  --mk-ink: var(--mk-paper);
+  --mk-muted: #9aa6bb;
+  --mk-line: rgb(238 242 247 / 0.12);
+  --mk-accent: var(--mk-sky);
+  --mk-on-accent: var(--mk-night);
+  --mk-success: #7fc4a0;
+  --mk-warning: #e3b46a;
+  --mk-danger: #ef9a90;
 }
 
-/* Primary Button */
-.mk-btn-primary {
-  background-color: var(--mk-brand-mascot);
-  color: #FFFFFF;
-  font-weight: 500;
-  border-radius: 4px;
+/* Buttons are pills: ink primary, surface secondary, dusk for the one action that matters. */
+.mk-btn {
+  height: 44px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--mk-radius-button);
+  font: 500 16px/1 var(--mk-font-sans);
+  cursor: pointer;
+  transition: transform var(--mk-dur-fast) var(--mk-ease);
 }
+.mk-btn:hover { transform: translateY(-1px); }
+.mk-btn:active { transform: translateY(1px); }
+.mk-btn--primary { background: var(--mk-ink); color: var(--mk-bg); }
+.mk-btn--secondary { background: var(--mk-bg-raised); color: var(--mk-ink); }
+.mk-btn--accent { background: var(--mk-accent); color: var(--mk-on-accent); }
 
-/* Surface Card */
 .mk-card {
-  background: var(--mk-surface);
-  border: 1px solid var(--mk-border);
-  border-radius: 8px;
+  background: var(--mk-bg-raised);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-radius-card);
+}
+
+.mk-chip {
+  font: 500 12px/1 var(--mk-font-mono);
+  padding: 6px 8px;
+  border-radius: var(--mk-radius-chip);
+  border: 1px solid var(--mk-line);
+  color: var(--mk-muted);
+}
+
+.mk-term {
+  font: 400 14px/1.7 var(--mk-font-mono);
+  background: var(--mk-night);
+  color: var(--mk-paper);
+  border-radius: var(--mk-radius-card);
+  padding: 16px 18px;
 }

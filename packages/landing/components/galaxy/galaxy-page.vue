@@ -37,37 +37,44 @@ const planetLabels = computed(() =>
 </script>
 
 <template>
-  <div class="container-landing py-12">
+  <div class="mk-wrap py-12">
     <header>
-      <h1 class="font-semibold" style="font-size: var(--text-2xl); color: var(--color-ink)">
+      <h1 class="font-semibold" style="font-size: var(--mk-text-h3); color: var(--mk-ink)">
         The MeowKit galaxy
       </h1>
-      <p v-if="map" class="mt-2" style="color: var(--color-ink-2)">
+      <p v-if="map" class="mt-2" style="color: var(--mk-muted)">
         {{ map.meta.tagline }}.
-        <span style="color: var(--color-muted)">Snapshot {{ map.meta.date }}.</span>
+        <span style="color: var(--mk-muted)">Snapshot {{ map.meta.date }}.</span>
       </p>
     </header>
 
     <div v-if="map" class="mt-5 flex flex-wrap items-center gap-x-8 gap-y-3">
       <div v-for="stat in statRows" :key="stat.label" class="flex items-baseline gap-2">
-        <span class="text-xl font-semibold" style="color: var(--color-ink)">{{ stat.value }}</span>
-        <span class="text-sm" style="color: var(--color-muted)">{{ stat.label }}</span>
+        <span class="text-xl font-semibold" style="color: var(--mk-ink)">{{ stat.value }}</span>
+        <span class="text-sm" style="color: var(--mk-muted)">{{ stat.label }}</span>
       </div>
       <ul class="ml-auto flex items-center gap-5" aria-label="Legend">
-        <li v-for="item in legend" :key="item.kind" class="flex items-center gap-2 text-sm" style="color: var(--color-ink-2)">
-          <span class="inline-block h-2.5 w-2.5 rounded-full" :style="{ background: KIND_COLORS[item.kind] }" aria-hidden="true" />
+        <li v-for="item in legend" :key="item.kind" class="flex items-center gap-2 text-sm" style="color: var(--mk-muted)">
+          <!-- the hairline keeps a near-paper swatch (agent) visible on the light page -->
+          <span
+            class="inline-block h-2.5 w-2.5 rounded-full"
+            :style="{ background: KIND_COLORS[item.kind], boxShadow: 'inset 0 0 0 1px var(--mk-line)' }"
+            aria-hidden="true"
+          />
           {{ item.label }}
         </li>
       </ul>
     </div>
 
+    <!-- Tailwind's own `grid`: this is a two-column page layout, not the
+         12-track page primitive, and the two must never be confused again. -->
     <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div
         class="h-[70vh] min-h-[26rem] rounded-lg border"
-        style="background: var(--color-paper); border-color: var(--color-rule)"
+        style="background: var(--mk-night); border-color: var(--mk-line)"
       >
         <GalaxyCanvas v-if="map" :map="map" @select="selected = $event" />
-        <div v-else class="flex h-full items-center justify-center text-sm" style="color: var(--color-muted)">
+        <div v-else class="flex h-full items-center justify-center text-sm" style="color: var(--mk-muted)">
           <span v-if="error">Could not load the satellite map.</span>
           <span v-else>Loading the galaxy…</span>
         </div>
@@ -75,7 +82,7 @@ const planetLabels = computed(() =>
       <GalaxyDetailPanel :node="selected" :planet-labels="planetLabels" />
     </div>
 
-    <p class="mt-4 text-sm" style="color: var(--color-muted)">
+    <p class="mt-4 text-sm" style="color: var(--mk-muted)">
       Planets are the workflow hubs — the skills with the most outbound references. Satellites are the
       skills and agents they call. Drag to pan, scroll to zoom.
     </p>

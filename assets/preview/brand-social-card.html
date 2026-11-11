@@ -1,73 +1,62 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<link rel="stylesheet" href="../colors_and_type.css" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand — Social card</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
-  body { margin: 0; background: var(--mk-bg-base); padding: 18px; font-family: var(--mk-font-sans); }
-  .og {
-    aspect-ratio: 1200 / 628;
-    width: 100%;
-    background: var(--mk-gradient-space);
-    border-radius: var(--mk-radius-md);
-    padding: 30px 36px;
-    position: relative;
-    overflow: hidden;
-    color: #fff;
-    display: flex; flex-direction: column; justify-content: space-between;
-  }
-  .og::before {
-    content: '';
-    position: absolute; inset: 0;
-    background:
-      radial-gradient(1px 1px at 18% 28%, rgba(255,255,255,.45), transparent 100%),
-      radial-gradient(1px 1px at 72% 18%, rgba(255,255,255,.3), transparent 100%),
-      radial-gradient(1px 1px at 38% 78%, rgba(255,255,255,.35), transparent 100%),
-      radial-gradient(1px 1px at 85% 62%, rgba(255,255,255,.28), transparent 100%),
-      radial-gradient(2px 2px at 58% 40%, rgba(96,165,250,.55), transparent 100%);
-    pointer-events: none;
-  }
-  .og > * { position: relative; z-index: 1; }
-  .logo {
-    display: inline-flex; align-items: baseline;
-    font-family: 'Fira Code', ui-monospace, monospace;
-    font-size: 20px; font-weight: 500; color: rgba(255,255,255,.9);
-  }
-  .logo .slash { color: var(--mk-accent-glow); font-weight: 600; }
-  .logo .caret { display: inline-block; width: 2px; height: 18px; background: var(--mk-accent-glow); margin-left: 4px; }
-
-  .eyebrow { font-family: 'Fira Code', monospace; font-size: 12px; letter-spacing: .18em; color: var(--mk-accent-glow); text-transform: uppercase; margin-bottom: 10px; }
-  .title {
-    font-family: 'Inter', sans-serif; font-weight: 400;
-    font-size: 46px; line-height: 1.1; letter-spacing: .01em; margin: 0; max-width: 82%;
-    background: linear-gradient(135deg, #fff 0%, #93C5FD 100%);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .footer { display: flex; align-items: center; gap: 14px; font-family: 'Fira Code', monospace; font-size: 13px; color: rgba(255,255,255,.7); }
-  .chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 12px; border-radius: 9999px;
-    background: rgba(37,99,235,.22); border: 1px solid rgba(96,165,250,.35);
-    color: var(--mk-accent-soft);
-  }
-  .chip .s { color: var(--mk-accent-glow); font-weight: 600; }
-  .dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,.35); }
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  .tag { font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-fg-2); display: block; margin-bottom: 8px; }
+  .shipped img { width: 100%; height: auto; display: block; border-radius: var(--mk-radius-md); border: 1px solid var(--mk-border-subtle); }
+  .og { aspect-ratio: 1200 / 630; background: var(--mk-neutral-50); border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 30px 34px; display: flex; flex-direction: column; }
+  .og .top { display: flex; align-items: center; justify-content: space-between; }
+  .og .top img { height: 22px; width: auto; display: block; }
+  .og .url { font-family: var(--mk-font-mono); font-size: 13px; color: var(--mk-fg-2); }
+  .og .mid { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+  .og h2 { font-family: var(--mk-font-display); font-weight: 400; font-size: 44px; line-height: 1.06; letter-spacing: -.024em; margin: 0; max-width: 14ch; color: var(--mk-neutral-900); }
+  .og .sub { font-size: 16px; line-height: 1.45; margin: 0; color: var(--mk-neutral-900); }
+  .og .rule { height: 8px; border-radius: var(--mk-radius-xs); background: var(--mk-blue-600); }
+  .note { grid-column: 1 / -1; font-size: 14px; line-height: 1.6; }
+  .note h2 { font-family: var(--mk-font-display); font-weight: 400; font-size: 22px; letter-spacing: -.015em; margin: 0 0 8px; }
+  .note ul { margin: 0; padding-left: 18px; }
+  .note li { margin: 3px 0; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
-  <div class="og">
-    <span class="logo"><span class="slash">/</span>meow<span class="caret"></span></span>
-    <div>
-      <div class="eyebrow">AI AGENT TOOLKIT · CLAUDE CODE</div>
-      <h2 class="title">Ship production code<br>without breaking gates.</h2>
+  <div class="shipped">
+    <span class="tag">meow-og.png · shipped file</span>
+    <img src="../branding/meow-og.png" alt="MeowKit Open Graph card">
+  </div>
+  <div>
+    <span class="tag">layout · 1200 × 630</span>
+    <div class="og">
+      <div class="top">
+        <img src="../branding/meow-logo.svg" alt="MeowKit">
+        <span class="url">meowkit.dev</span>
+      </div>
+      <div class="mid">
+        <h2>Workflow toolkit for coding agents</h2>
+        <p class="sub">Plans the work, stops at two gates, ships reviewed code.</p>
+      </div>
+      <div class="rule"></div>
     </div>
-    <div class="footer">
-      <span class="chip"><span class="s">/</span>mk:cook</span>
-      <span>skills</span><span class="dot"></span>
-      <span>agents</span><span class="dot"></span>
-      <span>hard gates</span>
-    </div>
+  </div>
+  <div class="note">
+    <h2>Rules</h2>
+    <ul>
+      <li>Mist paper ground, flat. No gradient wash, no starfield, no glow, no photograph.</li>
+      <li>Lockup top-left at 22px tall with the domain opposite it in JetBrains Mono. Keep one cursor width of clear space from both edges.</li>
+      <li>Headline in Newsreader 400, two lines at most, ink at 15.5:1. One line of Onest underneath.</li>
+      <li>Dusk <code>#2f66b3</code> appears once, as the bar along the bottom — the card's only accent.</li>
+      <li>Copy comes from <code>README.md</code>; no claim that is not already there.</li>
+    </ul>
   </div>
 </body>
 </html>

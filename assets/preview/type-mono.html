@@ -1,28 +1,36 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Type — Mono / Code</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Type — Mono and code</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
   body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; }
-  .eyebrow { font-family: var(--mk-font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mk-accent-glow); margin-bottom: 10px; }
-  pre { font-family: var(--mk-font-mono); font-size: 13.5px; line-height: 1.65; margin: 0; padding: 14px 16px; background: var(--mk-bg-surface); border: 1px solid var(--mk-border-subtle); border-radius: 10px; color: var(--mk-fg-1); overflow:auto; }
-  .c-k { color: #93C5FD; } /* keyword */
-  .c-s { color: #12B76A; } /* string-ish success */
-  .c-c { color: var(--mk-fg-2); } /* comment */
-  .c-v { color: #F79009; } /* value */
+  .eyebrow { font-family: var(--mk-font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mk-fg-brand); margin-bottom: 12px; }
+  .specimen { font-family: var(--mk-font-mono); font-size: 30px; font-weight: 400; color: var(--mk-neutral-900); margin: 0 0 6px; }
+  .roles { font-family: var(--mk-font-mono); font-size: 13px; color: var(--mk-fg-2); margin-bottom: 18px; }
+  pre { font-family: var(--mk-font-mono); font-size: 13px; line-height: 1.7; margin: 0; padding: 16px 18px; background: var(--mk-neutral-900); border-radius: var(--mk-radius-md); color: #eef2f7; overflow-x: auto; }
+  .c { color: #9aa6bb; } .k { color: #8fb5e8; } .s { color: #7fc4a0; } .v { color: #e3b46a; }
+  p { font-size: 14px; line-height: 1.6; margin: 16px 0 0; max-width: 860px; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
-  <div class="eyebrow">Mono · Fira Code 400 · 13.5 / 1.65</div>
-<pre><span class="c-c"># Phase 3 — Build</span>
-<span class="c-k">$</span> npx mewkit <span class="c-v">doctor</span>
-<span class="c-s">✓</span> Node <span class="c-v">20.11.1</span>
-<span class="c-s">✓</span> Python <span class="c-v">3.11.6</span>  <span class="c-c"># stdlib only</span>
-<span class="c-s">✓</span> .claude/ present
-<span class="c-k">$</span> /mk:cook <span class="c-v">"add JWT auth"</span>  <span class="c-c">→ [GATE 1]</span></pre>
+  <div class="eyebrow">Mono · JetBrains Mono 400 / 500</div>
+  <p class="specimen">/mk:cook &#183; mewkit init</p>
+  <div class="roles">wordmark &#183; commands &#183; paths &#183; counts &#183; UI labels &#183; eyebrows</div>
+<pre><span class="c"># Phase 3 — Build</span>
+<span class="k">$</span> npx mewkit doctor
+<span class="s">&#10003;</span> Node <span class="v">20.11.1</span>
+<span class="s">&#10003;</span> Python <span class="v">3.11.6</span>   <span class="c"># stdlib only</span>
+<span class="s">&#10003;</span> .claude/ present
+<span class="k">$</span> /mk:cook <span class="v">"add JWT auth"</span>   <span class="c">-&gt; [GATE 1]</span></pre>
+  <p>JetBrains Mono carries everything the product types back at you. Docs code blocks are the exception: they fall back to the platform monospace through <code>--mk-font-mono</code>'s stack, because a latin-subset webfont shears box-drawing diagrams. Uppercase mono with 0.14em tracking is the eyebrow; it is the only place caps are allowed.</p>
 </body>
 </html>

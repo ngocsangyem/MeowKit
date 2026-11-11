@@ -1,31 +1,39 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Components — Tables</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
-  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 16px 20px; }
-  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-  th { text-align: left; padding: 8px 12px; font-weight: 500; color: var(--mk-accent-glow); background: var(--mk-bg-base); border-bottom: 2px solid var(--mk-border-subtle); font-size: 12.5px; letter-spacing: .02em; }
-  td { padding: 8px 12px; border-bottom: 1px solid var(--mk-border-subtle); color: var(--mk-fg-1); }
-  tr:nth-child(even) td { background: rgba(30,41,59,.6); }
-  code { font-family: var(--mk-font-mono); font-size: .92em; padding: 1px 5px; border-radius: 3px; background: rgba(37,99,235,.14); color: var(--mk-accent-glow); }
-  .gate { color: #F79009; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; padding: 9px 12px; font-family: var(--mk-font-mono); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--mk-blue-700); border-bottom: 1px solid var(--mk-neutral-200); }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--mk-border-subtle); color: var(--mk-neutral-900); }
+  tbody tr:nth-child(even) td { background: var(--mk-neutral-100); }
+  td.num { font-family: var(--mk-font-mono); }
+  .gate { font-family: var(--mk-font-mono); font-size: 12px; color: var(--mk-warning); }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
+  .note { font-size: 14px; line-height: 1.6; margin: 14px 0 0; max-width: 860px; }
 </style>
 </head>
 <body>
   <table>
-    <thead><tr><th>Phase</th><th>Name</th><th>Gate?</th><th>What happens</th></tr></thead>
+    <thead><tr><th>Phase</th><th>Name</th><th>Gate</th><th>What happens</th></tr></thead>
     <tbody>
-      <tr><td>0</td><td>Orient</td><td>—</td><td>Read memory, load skills, route model tier</td></tr>
-      <tr><td>1</td><td>Plan</td><td class="gate">✋ Gate 1</td><td>Challenge premises, create plan, human approval</td></tr>
-      <tr><td>2</td><td>Test</td><td>—</td><td>Failing tests first (TDD via <code>--tdd</code>)</td></tr>
-      <tr><td>3</td><td>Build</td><td>—</td><td>Implement per plan; until tests pass in TDD mode</td></tr>
-      <tr><td>4</td><td>Review</td><td class="gate">✋ Gate 2</td><td>5-dimension audit, human approval</td></tr>
+      <tr><td class="num">0</td><td>Orient</td><td>—</td><td>Read memory, load skills, route the model tier</td></tr>
+      <tr><td class="num">1</td><td>Plan</td><td class="gate">Gate 1</td><td>Challenge the premise, write the plan, human approves</td></tr>
+      <tr><td class="num">2</td><td>Test</td><td>—</td><td>Failing tests first under <code>--tdd</code></td></tr>
+      <tr><td class="num">3</td><td>Build</td><td>—</td><td>Implement to the plan, then simplify and verify</td></tr>
+      <tr><td class="num">4</td><td>Review</td><td class="gate">Gate 2</td><td>Five-dimension audit, human approves</td></tr>
+      <tr><td class="num">5</td><td>Ship</td><td>—</td><td>Commit, pull request, release</td></tr>
     </tbody>
   </table>
+  <p class="note">Headers are JetBrains Mono uppercase in dusk over a single <code>haze</code> rule; rows separate with hairlines and alternate onto surface. Numbers and commands stay monospaced so columns line up. Cells hold a phrase, never a sentence with a full stop.</p>
 </body>
 </html>

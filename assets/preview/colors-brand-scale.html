@@ -1,38 +1,45 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Colors — Brand Blue Scale</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colors — Blue scale</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
   body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 18px; }
-  .row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
-  .sw { height: 84px; border-radius: 8px; border: 1px solid var(--mk-border-subtle); display:flex; align-items:flex-end; padding: 8px; font-family: var(--mk-font-mono); font-size: 10px; color: rgba(255,255,255,.95); }
-  .sw.dark-text { color: rgba(0,0,0,.75); }
-  .sw .name { font-weight:500; }
-  .sw .hex { opacity:.75; }
-  .meta { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--mk-font-mono); font-size: 10px; color: var(--mk-fg-2); letter-spacing: .08em; text-transform: uppercase; }
-  .star { border: 2px solid var(--mk-accent-glow); box-shadow: var(--mk-shadow-glow); }
+  .row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; }
+  figure { margin: 0; }
+  .sw { height: 92px; border-radius: var(--mk-radius-xs); border: 1px solid var(--mk-border-subtle); }
+  .sw.star { outline: 2px solid var(--mk-neutral-900); outline-offset: 2px; }
+  figcaption { font-family: var(--mk-font-mono); font-size: 11px; line-height: 1.45; margin-top: 8px; color: var(--mk-fg-1); }
+  figcaption .hex { color: var(--mk-fg-2); }
+  .meta { display: flex; justify-content: space-between; gap: 20px; margin-top: 16px; font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); letter-spacing: .06em; text-transform: uppercase; }
+  p { font-size: 14px; line-height: 1.6; margin: 14px 0 0; max-width: 900px; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
   <div class="row">
-    <div class="sw dark-text" style="background:#EFF6FF"><div><div class="name">50</div><div class="hex">#EFF6FF</div></div></div>
-    <div class="sw dark-text" style="background:#DBEAFE"><div><div class="name">100</div><div class="hex">#DBEAFE</div></div></div>
-    <div class="sw dark-text" style="background:#BFDBFE"><div><div class="name">200</div><div class="hex">#BFDBFE</div></div></div>
-    <div class="sw dark-text" style="background:#93C5FD"><div><div class="name">300</div><div class="hex">#93C5FD</div></div></div>
-    <div class="sw" style="background:#60A5FA"><div><div class="name">400 · glow</div><div class="hex">#60A5FA</div></div></div>
-    <div class="sw" style="background:#3B82F6"><div><div class="name">500</div><div class="hex">#3B82F6</div></div></div>
-    <div class="sw star" style="background:#2563EB"><div><div class="name">600 · BRAND</div><div class="hex">#2563EB</div></div></div>
-    <div class="sw" style="background:#1D4ED8"><div><div class="name">700</div><div class="hex">#1D4ED8</div></div></div>
-    <div class="sw" style="background:#1E40AF"><div><div class="name">800</div><div class="hex">#1E40AF</div></div></div>
-    <div class="sw" style="background:#1E3A5F"><div><div class="name">900 · space</div><div class="hex">#1E3A5F</div></div></div>
+    <figure><div class="sw" style="background:#eef3fa"></div><figcaption>50<br><span class="hex">#eef3fa</span></figcaption></figure>
+    <figure><div class="sw" style="background:#dde8f6"></div><figcaption>100<br><span class="hex">#dde8f6</span></figcaption></figure>
+    <figure><div class="sw" style="background:#c3d6ef"></div><figcaption>200<br><span class="hex">#c3d6ef</span></figcaption></figure>
+    <figure><div class="sw star" style="background:#8fb5e8"></div><figcaption>300 · sky<br><span class="hex">#8fb5e8</span></figcaption></figure>
+    <figure><div class="sw" style="background:#6491d1"></div><figcaption>400<br><span class="hex">#6491d1</span></figcaption></figure>
+    <figure><div class="sw" style="background:#4477c0"></div><figcaption>500<br><span class="hex">#4477c0</span></figcaption></figure>
+    <figure><div class="sw star" style="background:#2f66b3"></div><figcaption>600 · dusk<br><span class="hex">#2f66b3</span></figcaption></figure>
+    <figure><div class="sw" style="background:#26559a"></div><figcaption>700<br><span class="hex">#26559a</span></figcaption></figure>
+    <figure><div class="sw" style="background:#1f4580"></div><figcaption>800<br><span class="hex">#1f4580</span></figcaption></figure>
+    <figure><div class="sw" style="background:#1b2435"></div><figcaption>900 · raised<br><span class="hex">#1b2435</span></figcaption></figure>
   </div>
   <div class="meta">
-    <span>mk-blue-50 → mk-blue-900</span>
-    <span>--mk-blue-600 · Royal Blue · brand primary</span>
+    <span>--mk-blue-50 → --mk-blue-900</span>
+    <span>dusk 5.1:1 on paper · sky 8.3:1 on night</span>
   </div>
+  <p>One accent, two stops. <strong>Dusk <code>#2f66b3</code></strong> is the accent on paper: labels, links, fills and the mark. <strong>Sky <code>#8fb5e8</code></strong> is the accent on night. Neither is body text — body text is ink on paper and paper on night. The remaining steps are for fills, hairlines and hover tints only.</p>
 </body>
 </html>

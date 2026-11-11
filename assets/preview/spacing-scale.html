@@ -1,27 +1,35 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Spacing — Scale</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
   body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; }
   .row { display: flex; align-items: center; gap: 14px; padding: 6px 0; }
-  .tag { width: 80px; font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); letter-spacing: .04em; }
-  .bar { height: 14px; background: var(--mk-accent-glow); border-radius: 3px; box-shadow: 0 0 14px rgba(96,165,250,.35); }
-  .px { margin-left: auto; font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); }
+  .tag { width: 90px; font-family: var(--mk-font-mono); font-size: 12px; color: var(--mk-fg-1); }
+  .bar { height: 14px; background: var(--mk-blue-600); border-radius: 2px; }
+  .px { margin-left: auto; font-family: var(--mk-font-mono); font-size: 12px; color: var(--mk-fg-2); }
+  .use { font-family: var(--mk-font-sans); font-size: 13px; color: var(--mk-fg-1); width: 220px; }
+  p { font-size: 14px; line-height: 1.6; margin: 16px 0 0; max-width: 880px; }
 </style>
 </head>
 <body>
-  <div class="row"><div class="tag">space-1</div><div class="bar" style="width:4px"></div><div class="px">4px</div></div>
-  <div class="row"><div class="tag">space-2</div><div class="bar" style="width:8px"></div><div class="px">8px</div></div>
-  <div class="row"><div class="tag">space-3</div><div class="bar" style="width:12px"></div><div class="px">12px</div></div>
-  <div class="row"><div class="tag">space-4</div><div class="bar" style="width:16px"></div><div class="px">16px</div></div>
-  <div class="row"><div class="tag">space-6</div><div class="bar" style="width:24px"></div><div class="px">24px</div></div>
-  <div class="row"><div class="tag">space-8</div><div class="bar" style="width:32px"></div><div class="px">32px</div></div>
-  <div class="row"><div class="tag">space-12</div><div class="bar" style="width:48px"></div><div class="px">48px</div></div>
-  <div class="row"><div class="tag">space-16</div><div class="bar" style="width:64px"></div><div class="px">64px</div></div>
+  <div class="row"><span class="tag">space-1</span><span class="bar" style="width:4px"></span><span class="use">chip padding</span><span class="px">4px</span></div>
+  <div class="row"><span class="tag">space-2</span><span class="bar" style="width:8px"></span><span class="use">icon gap</span><span class="px">8px</span></div>
+  <div class="row"><span class="tag">space-3</span><span class="bar" style="width:12px"></span><span class="use">label to field</span><span class="px">12px</span></div>
+  <div class="row"><span class="tag">space-4</span><span class="bar" style="width:16px"></span><span class="use">grid gutter, card padding</span><span class="px">16px</span></div>
+  <div class="row"><span class="tag">space-6</span><span class="bar" style="width:24px"></span><span class="use">card padding, tile inset</span><span class="px">24px</span></div>
+  <div class="row"><span class="tag">space-8</span><span class="bar" style="width:32px"></span><span class="use">block to block</span><span class="px">32px</span></div>
+  <div class="row"><span class="tag">space-12</span><span class="bar" style="width:48px"></span><span class="use">section spacing</span><span class="px">48px</span></div>
+  <div class="row"><span class="tag">space-16</span><span class="bar" style="width:64px"></span><span class="use">section spacing, page top</span><span class="px">64px</span></div>
+  <div class="row"><span class="tag">space-20</span><span class="bar" style="width:80px"></span><span class="use">page bottom</span><span class="px">80px</span></div>
+  <p>A 4-based scale. Cards pad at 16–24, sections breathe at 48–80, inline gaps stay at 4–12. Pick from the scale rather than typing a number; anything off the scale reads as a mistake once two of them sit side by side.</p>
 </body>
 </html>

@@ -1,12 +1,6 @@
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
-
-const ValuePropSection = defineAsyncComponent(() => import('~/components/sections/value-prop-section.vue'))
-const HowItWorksSection = defineAsyncComponent(() => import('~/components/sections/how-it-works-section.vue'))
-const FeaturesGridSection = defineAsyncComponent(() => import('~/components/sections/features-grid-section.vue'))
-const TechnicalSpecsSection = defineAsyncComponent(() => import('~/components/sections/technical-specs-section.vue'))
-const InstallationSection = defineAsyncComponent(() => import('~/components/sections/installation-section.vue'))
-const CtaSection = defineAsyncComponent(() => import('~/components/sections/cta-section.vue'))
+// Sections are auto-imported from ~/components (pathPrefix: false).
+useReveal()
 
 const siteUrl = 'https://meowkit.dev'
 // nuxt-seo-utils auto-appends "| MeowKit" — keep this title without the brand prefix
@@ -74,7 +68,7 @@ useHead({
               'Two-gate approval workflow',
               'TDD enforcement',
               '4-layer security scanning',
-              '77 skills, 17 agents',
+              '129 skills, 42 agents',
               'MIT licensed',
             ],
           },
@@ -132,13 +126,13 @@ useHead({
 </script>
 
 <template>
-  <div>
-    <HeroSection />
-    <ValuePropSection />
-    <HowItWorksSection />
-    <FeaturesGridSection />
-    <TechnicalSpecsSection />
-    <InstallationSection />
-    <CtaSection />
-  </div>
+  <!-- No wrapper element: every block of <main> is a <section> of its own.
+       Safe as a fragment root because no page transition is configured. -->
+  <HeroSection />
+  <WorkflowSection />
+  <GateRuleSection />
+  <FeaturesGridSection />
+  <QuestionsSection />
+  <InstallationSection />
+  <CtaSection />
 </template>

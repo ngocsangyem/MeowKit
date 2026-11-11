@@ -1,83 +1,80 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<link rel="stylesheet" href="../colors_and_type.css" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand — Lockups</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
-  body { margin: 0; background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 22px 24px; font-family: var(--mk-font-sans); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-  .tile { background: var(--mk-neutral-0); border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 22px 18px 14px; position: relative; min-height: 110px; display: grid; place-items: center; }
-  .tile.dark { background: var(--mk-neutral-950); border-color: rgba(255,255,255,.08); }
-  .tile .tag { position: absolute; top: 10px; left: 14px; font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-neutral-500); }
-  .tile.dark .tag { color: var(--mk-neutral-300); }
-
-  .sm { display: inline-flex; align-items: baseline; font-family: var(--mk-font-mono); font-weight: 500; line-height: 1; letter-spacing: -.01em; }
-  .sm .slash { color: var(--mk-blue-600); font-weight: 600; margin-right: 2px; }
-  .sm .meow {
-    background: linear-gradient(135deg, var(--mk-blue-700) 0%, var(--mk-blue-500) 100%);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .sm .caret { display: inline-block; width: .1em; height: 1em; background: var(--mk-blue-600); margin-left: .12em; transform: translateY(.08em); }
-  .tile.dark .sm .slash { color: var(--mk-accent-glow); }
-  .tile.dark .sm .meow { background: linear-gradient(135deg, var(--mk-accent-soft) 0%, var(--mk-accent-glow) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-  .tile.dark .sm .caret { background: var(--mk-accent-glow); }
-
-  .word { font-family: var(--mk-font-sans); font-weight: 500; letter-spacing: -.005em; color: var(--mk-neutral-900); }
-  .tile.dark .word { color: var(--mk-neutral-0); }
-  .tagline { font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-neutral-500); letter-spacing: .06em; margin-top: 8px; }
-  .tile.dark .tagline { color: var(--mk-neutral-300); }
-
-  .horiz { display: flex; align-items: baseline; gap: 14px; }
-  .stack { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 22px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .tile { border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 28px 18px 14px; position: relative; min-height: 120px; display: grid; place-items: center; }
+  .tile.surface { background: var(--mk-neutral-100); }
+  .tile.haze { background: var(--mk-neutral-200); }
+  .tile.night { background: var(--mk-neutral-900); border-color: rgb(238 242 247 / .12); }
+  .tag { position: absolute; top: 10px; left: 14px; font-family: var(--mk-font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-fg-2); }
+  .tile.night .tag { color: var(--mk-neutral-300); }
+  .tile.haze .tag { color: var(--mk-neutral-700); }
+  .tile img { width: 80%; max-width: 280px; height: auto; display: block; }
+  .tile.sym img { width: auto; height: 60px; }
+  .span2 { grid-column: span 2; }
+  .note { border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 16px 18px; font-size: 14px; line-height: 1.6; }
+  .note h2 { font-family: var(--mk-font-display); font-weight: 400; font-size: 22px; letter-spacing: -.015em; margin: 0 0 8px; }
+  .note ul { margin: 0; padding-left: 18px; }
+  .note li { margin: 3px 0; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
+  figure { margin: 0; display: grid; place-items: center; gap: 10px; }
+  figcaption { font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); }
+  .clearspace { border: 2px dashed var(--mk-neutral-200); padding: 44px; display: inline-block; }
+  .clearspace .inner { outline: 1px solid var(--mk-fg-2); display: block; }
+  .clearspace img { width: 320px; display: block; }
 </style>
 </head>
 <body>
-  <!-- A horizontal -->
   <div class="tile">
-    <span class="tag">A · HORIZONTAL</span>
-    <div class="horiz">
-      <span class="sm" style="font-size: 34px;"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
-      <span class="word" style="font-size: 28px;">MeowKit</span>
-    </div>
+    <span class="tag">A · horizontal on paper</span>
+    <img src="../branding/meow-logo.svg" alt="Horizontal lockup on paper">
+  </div>
+  <div class="tile surface">
+    <span class="tag">B · on surface</span>
+    <img src="../branding/meow-logo.svg" alt="Horizontal lockup on surface">
+  </div>
+  <div class="tile night">
+    <span class="tag">C · reversed on night</span>
+    <img src="../branding/meow-logo-dark.svg" alt="Horizontal lockup reversed on night">
+  </div>
+  <div class="tile haze">
+    <span class="tag">D · one colour on haze</span>
+    <img src="../branding/meow-logo-mono.svg" alt="One-colour lockup on haze">
+  </div>
+  <div class="tile sym">
+    <span class="tag">E · symbol only</span>
+    <img src="../branding/meow-symbol.svg" alt="Symbol on paper">
+  </div>
+  <div class="tile sym night">
+    <span class="tag">F · symbol on night</span>
+    <img src="../branding/meow-symbol-dark.svg" alt="Symbol reversed on night">
   </div>
 
-  <!-- B stacked -->
-  <div class="tile">
-    <span class="tag">B · STACKED</span>
-    <div class="stack">
-      <span class="sm" style="font-size: 32px;"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
-      <span class="word" style="font-size: 22px;">MeowKit</span>
-      <span class="tagline">AI AGENT TOOLKIT</span>
-    </div>
+  <div class="tile span2" style="place-items:center">
+    <span class="tag">clear space · one cursor width</span>
+    <figure>
+      <div class="clearspace"><div class="inner"><img src="../branding/meow-logo.svg" alt="Lockup with clear space marked"></div></div>
+      <figcaption>clear space = the width of the cat-cursor on every side</figcaption>
+    </figure>
   </div>
-
-  <!-- C /mk:kit -->
-  <div class="tile">
-    <span class="tag">C · /MEOW:KIT</span>
-    <span class="sm" style="font-size: 38px;"><span class="slash">/</span><span class="meow">mk:kit</span><span class="caret"></span></span>
-  </div>
-
-  <!-- D dark horizontal -->
-  <div class="tile dark">
-    <span class="tag">D · DARK · HORIZONTAL</span>
-    <div class="horiz">
-      <span class="sm" style="font-size: 34px;"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
-      <span class="word" style="font-size: 28px;">MeowKit</span>
-    </div>
-  </div>
-
-  <!-- E dark primary -->
-  <div class="tile dark">
-    <span class="tag">E · DARK · PRIMARY</span>
-    <span class="sm" style="font-size: 42px;"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
-  </div>
-
-  <!-- F mono -->
-  <div class="tile">
-    <span class="tag">F · MONO INK</span>
-    <span class="sm" style="font-size: 42px; color: var(--mk-neutral-900);">
-      <span style="color: var(--mk-neutral-900); font-weight: 600;">/</span><span style="color: var(--mk-neutral-900); -webkit-text-fill-color: var(--mk-neutral-900); background: none;">meow</span><span class="caret" style="background: var(--mk-neutral-900);"></span>
-    </span>
+  <div class="note">
+    <h2>Lockup rules</h2>
+    <ul>
+      <li>One lockup: symbol left, wordmark right. No stacked cut, no tagline locked to the mark.</li>
+      <li>Keep the width of the cat-cursor clear on all four sides.</li>
+      <li>Lockup minimum 96px wide. Symbol minimum 16px — use <code>meow-favicon.svg</code> or <code>meow-symbol-small.svg</code> there.</li>
+      <li>Never re-colour, rotate, outline or add a shadow. Four cuts cover every ground.</li>
+    </ul>
   </div>
 </body>
 </html>

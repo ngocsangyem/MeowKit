@@ -1,97 +1,68 @@
 <script setup lang="ts">
-const features = [
-  {
-    name: '17 specialist agents',
-    body: 'Dedicated agents for planning, security, review, testing, documentation, and more — each with scoped file ownership and model-tier routing.',
-  },
-  {
-    name: '77 domain skills',
-    body: 'From database migrations to multimodal AI, frontend design to CTF research — skills activate only when the task demands them.',
-  },
-  {
-    name: 'Cross-session memory',
-    body: 'Lessons, fixes, review patterns, and architecture decisions persist across sessions. The harness learns from every run.',
-  },
-  {
-    name: 'Scale-adaptive intelligence',
-    body: 'Domain complexity classification routes every task into TRIVIAL, STANDARD, or COMPLEX — picking the right model and scaffolding density automatically.',
-  },
-  {
-    name: 'Party mode',
-    body: 'Multi-agent deliberation for architectural decisions. Multiple agents argue different positions before a decision is made.',
-  },
-  {
-    name: 'Adversarial review',
-    body: 'Gate 2 runs parallel reviewers across correctness, security, design, scope, and craft. Any FAIL blocks the ship.',
-  },
-  {
-    name: 'Zero external dependencies',
-    body: 'Pure prompt engineering — no SDK required. Works offline, works in any Claude Code environment, no vendor lock-in.',
-  },
-  {
-    name: 'TDD pipeline',
-    body: 'Opt-in test-first enforcement with RED → GREEN → REFACTOR gates. Self-healing loop with 3-attempt cap and human escalation.',
-  },
-]
+/* Section 4 — what the hooks actually enforce. Copy verbatim from the mockup. */
 </script>
 
 <template>
-  <section id="features" class="spec" aria-labelledby="features-heading">
-    <div class="container-landing">
-      <div class="section-head">
-        <h2 id="features-heading" class="section-head__title">
-          Everything the harness enforces for you.
+  <section class="mk-section" id="features" aria-labelledby="features-h">
+    <div class="mk-wrap">
+      <div class="mk-head fg__head">
+        <h2 id="features-h">
+          Hooks enforce the rules. <span class="mk-dim">The agent cannot talk its way past them.</span>
         </h2>
       </div>
 
-      <!-- Spec sheet: each capability is a row, not a card -->
-      <dl class="spec__sheet">
-        <div v-for="feat in features" :key="feat.name" class="spec__row">
-          <dt class="spec__name">{{ feat.name }}</dt>
-          <dd class="spec__body">{{ feat.body }}</dd>
-        </div>
-      </dl>
+      <div class="mk-grid fg__grid">
+        <article class="mk-card mk-col-6 mk-reveal">
+          <h3>Blocks edits without an approved plan</h3>
+          <p>A hook refuses every source edit until the plan carries an approval receipt, and again once the plan body changes.</p>
+          <div class="mk-stage fg__panel"><GateChecklist /></div>
+        </article>
+
+        <article class="mk-card mk-col-6 mk-reveal">
+          <h3>Scans every write for blocked patterns</h3>
+          <p>Hardcoded secrets, interpolated SQL and auth tokens in localStorage are stopped as the file is written.</p>
+          <div class="mk-stage fg__panel fg__panel--low"><ScanNotices /></div>
+        </article>
+
+        <article class="mk-card mk-col-6 mk-reveal">
+          <h3>Keeps team memory in two files</h3>
+          <p>Decisions and gotchas live in committed markdown. Skills grep them at the start of a task and open only the matching entries.</p>
+          <div class="mk-stage fg__panel"><MemoryFiles /></div>
+        </article>
+
+        <article class="mk-card mk-col-6 mk-reveal">
+          <h3>Installs into three coding agents</h3>
+          <p>Claude Code gets real hook enforcement. Cursor and Codex get the same skills; on Codex the gates advise and do not block.</p>
+          <div class="mk-stage fg__panel fg__panel--flat"><AgentsHub /></div>
+        </article>
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped>
-.spec {
-  padding-block: var(--space-3xl);
-}
+.fg__head h2 { max-width: 20ch; }
 
-.spec__sheet {
-  margin: 0;
-  border-block-start: var(--rule-hair) solid var(--color-rule);
-}
+.fg__grid { row-gap: var(--mk-row-gap); }
 
-.spec__row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-2xs) var(--space-xl);
-  padding-block: var(--space-md);
-  border-block-end: var(--rule-hair) solid var(--color-rule-2);
+/* the picture sits on the stage, cropped at the foot by the panel's own fade */
+.fg__panel {
+  --mk-stage-height: 300px;
+  display: flex;
+  justify-content: center;
+  padding: var(--mk-space-lg) var(--mk-space-md) 0;
 }
+.fg__panel--low { align-items: flex-end; padding-block: 0 var(--mk-space-lg); }
+.fg__panel--low::after { display: none; }
+.fg__panel--flat { align-items: center; padding: var(--mk-space-sm); }
+.fg__panel--flat::after { display: none; }
 
-@media (min-width: 40rem) {
-  .spec__row {
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    padding-block: var(--space-lg);
-  }
-}
+@media (min-width: 1024px) { .fg__panel { --mk-stage-height: 336px; } }
 
-.spec__name {
-  font-weight: 500;
-  font-size: var(--text-base);
-  color: var(--color-ink);
-  margin: 0;
-}
-
-.spec__body {
-  font-size: var(--text-sm);
-  color: var(--color-muted);
-  line-height: 1.65;
-  max-width: 64ch;
-  margin: 0;
+/* On a phone the pictures are illustrations, not evidence: show a slice. */
+@media (max-width: 639px) {
+  .fg__panel { --mk-stage-height: 180px; padding: var(--mk-space-sm) var(--mk-space-xs) 0; }
+  .fg__panel--low { padding-block: 0 var(--mk-space-sm); }
+  .fg__panel--flat { --mk-stage-height: 200px; }
 }
 </style>

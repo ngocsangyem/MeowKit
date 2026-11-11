@@ -1,5 +1,6 @@
 import { defineDocs, defineConfig, frontmatterSchema } from 'fumadocs-mdx/config';
 import { remarkMdxMermaid, remarkMdxFiles } from 'fumadocs-core/mdx-plugins';
+import { meowkitLight, meowkitDark } from './lib/shiki-meowkit-themes';
 import { z } from 'zod';
 
 // The frontmatter contract: which runtime file owns a page's facts, and when a human last
@@ -40,5 +41,10 @@ export default defineConfig({
     // subset omits U+2500-257F — the glyphs fall back to a font with a different advance
     // width and the columns shear apart. A real tree component has no column to shear.
     remarkPlugins: [remarkMdxMermaid, remarkMdxFiles],
+    // Syntax colours from the MeowKit palette; defaultColor false keeps Fumadocs' light/dark CSS switch.
+    rehypeCodeOptions: {
+      themes: { light: meowkitLight, dark: meowkitDark },
+      defaultColor: false,
+    },
   },
 });

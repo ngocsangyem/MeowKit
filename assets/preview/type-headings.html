@@ -1,27 +1,34 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Type — Heading Scale</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../colors_and_type.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Type — Heading scale</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
   html, body { margin: 0; }
   body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 20px 24px; }
-  .row { display: grid; grid-template-columns: 120px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--mk-border-subtle); }
-  .row:last-child { border-bottom: 0; }
-  .tag { font-family: var(--mk-font-mono); font-size: 10.5px; color: var(--mk-fg-2); letter-spacing: .08em; text-transform: uppercase; }
-  h1,h2,h3,h4 { margin: 0; color: var(--mk-fg-1); }
-  h1 { font-size: 48px; font-weight: 400; letter-spacing: .02em; line-height: 1.1; }
-  h2 { font-size: 36px; font-weight: 500; letter-spacing: .02em; line-height: 1.15; }
-  h3 { font-size: 28px; font-weight: 500; line-height: 1.2; }
-  h4 { font-size: 22px; font-weight: 600; line-height: 1.25; }
+  .row { display: grid; grid-template-columns: 180px 1fr; gap: 16px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--mk-border-subtle); }
+  .row:last-of-type { border-bottom: 0; }
+  .tag { font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); letter-spacing: .08em; text-transform: uppercase; }
+  h1, h2, h3, h4 { margin: 0; color: var(--mk-neutral-900); }
+  h1 { font-family: var(--mk-font-display); font-size: 48px; font-weight: 400; letter-spacing: -.02em; line-height: 1.15; }
+  h2 { font-family: var(--mk-font-display); font-size: 36px; font-weight: 400; letter-spacing: -.02em; line-height: 1.15; }
+  h3 { font-family: var(--mk-font-sans); font-size: 28px; font-weight: 500; line-height: 1.3; }
+  h4 { font-family: var(--mk-font-sans); font-size: 22px; font-weight: 600; line-height: 1.3; }
+  p { font-size: 14px; line-height: 1.6; margin: 16px 0 0; max-width: 860px; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
-  <div class="row"><div class="tag">h1 · 48 / 400</div><h1>Phase 3 — Build</h1></div>
-  <div class="row"><div class="tag">h2 · 36 / 500</div><h2>Two hard gates</h2></div>
-  <div class="row"><div class="tag">h3 · 28 / 500</div><h3>Workflow phases</h3></div>
-  <div class="row"><div class="tag">h4 · 22 / 600</div><h4>mk:plan-creator</h4></div>
+  <div class="row"><span class="tag">h1 · newsreader 400 · 48</span><h1>Phase 3 — Build</h1></div>
+  <div class="row"><span class="tag">h2 · newsreader 400 · 36</span><h2>Two hard gates</h2></div>
+  <div class="row"><span class="tag">h3 · onest 500 · 28</span><h3>Workflow phases</h3></div>
+  <div class="row"><span class="tag">h4 · onest 600 · 22</span><h4>mk:plan-creator</h4></div>
+  <p>The two top levels are Newsreader at 400 with tight tracking; h3 and h4 switch to Onest so the page stops looking like an essay once headings get short. Headings are always ink — a heading in dusk reads as a link. <code>.mk-h1</code> … <code>.mk-h4</code> carry these settings.</p>
 </body>
 </html>

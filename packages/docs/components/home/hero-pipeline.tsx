@@ -14,7 +14,9 @@ export function HeroPipeline() {
   return (
     <div
       aria-label="MeowKit workflow: plan, Gate 1 human approval, build, Gate 2 review verdict, ship"
-      className="w-full max-w-[300px] rounded-lg border border-fd-border bg-fd-card p-4 pb-5 shadow-sm"
+      // Flat card on a hairline: depth in this identity comes from the surface step
+      // between ground and card, not from a shadow.
+      className="w-full max-w-[300px] rounded-lg border border-fd-border bg-fd-card p-4 pb-5"
       style={{ fontFamily: 'var(--font-mono)' }}
     >
       <div className="mb-4 flex items-baseline justify-between border-b border-fd-border pb-3">

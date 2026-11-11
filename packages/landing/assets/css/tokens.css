@@ -1,65 +1,110 @@
-/* MeowKit design tokens — single source of truth.
- * Every colour and font in components must reference these by name. */
+/* MeowKit landing — design tokens.
+ *
+ * Role names follow the canonical set in docs/design/meowkit-tokens.css
+ * (--mk-paper, --mk-ink, --mk-dusk, --mk-radius-*, --mk-ease …) so the landing,
+ * the docs site and the brand sheet speak one vocabulary. Everything a
+ * component needs is named here; no component hard-codes a colour or a size.
+ *
+ * Light-first: mist paper ground, night reserved for terminals and the hero
+ * session. Flat colour throughout — no gradient, no glow, one accent.
+ */
 :root {
-  /* ─── Colour · dark cool palette, brand-blue anchor (hue 250) ───────── */
-  --color-paper:      oklch(13% 0.015 250);
-  --color-paper-2:    oklch(17% 0.017 250);
-  --color-paper-3:    oklch(21% 0.018 250);
-  --color-ink:        oklch(94% 0.008 250);
-  --color-ink-2:      oklch(80% 0.010 250);
-  --color-muted:      oklch(64% 0.014 250);
-  --color-rule:       oklch(29% 0.020 250);
-  --color-rule-2:     oklch(22% 0.016 250);
-  --color-accent:     oklch(64% 0.17 252);
-  --color-accent-ink: oklch(13% 0.030 250);
-  --color-focus:      oklch(70% 0.20 252);
-  --color-bloom:      oklch(30% 0.09 252 / 0.35);
-  --color-selection:  oklch(64% 0.17 252 / 0.3);
-  --color-nav-veil:   oklch(17% 0.017 250 / 0.78);
+  /* ── Base palette ───────────────────────────────────────────────────── */
+  --mk-paper: #eef2f7;
+  --mk-surface: #e0e7f0;
+  --mk-haze: #c8d5e6;
+  --mk-night: #131a27;
+  --mk-night-raised: #1b2435;
+  --mk-white: #f7f9fc;
 
-  /* ─── Type ──────────────────────────────────────────────────────────── */
-  --font-display: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-body:    "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono:    "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
+  /* One accent: dusk on light grounds, sky where the ground is night. */
+  --mk-dusk: #2f66b3;
+  --mk-sky: #8fb5e8;
 
-  /* 1.25 major-third scale from 16px */
-  --text-xs:   0.8rem;
-  --text-sm:   0.875rem;
-  --text-base: 1rem;
-  --text-md:   1.125rem;
-  --text-lg:   1.5625rem;
-  --text-xl:   1.9531rem;
-  --text-2xl:  2.4414rem;
-  --text-3xl:  3.0518rem;
-  --text-display-s: clamp(1.9531rem, 2.5vw + 1rem, 3.0518rem);
-  --text-display:   clamp(2.75rem, 5vw + 1rem, 5.25rem);
+  /* ── Themed roles ───────────────────────────────────────────────────── */
+  --mk-ink: var(--mk-night);
+  --mk-muted: #566178;
+  --mk-line: #c3cedd;
+  --mk-line-soft: #d5dde8;
+  --mk-accent: var(--mk-dusk);
+  --mk-on-accent: var(--mk-white);
 
-  /* ─── Space · 4pt scale ─────────────────────────────────────────────── */
-  --space-2xs: 0.25rem;
-  --space-xs:  0.5rem;
-  --space-sm:  0.75rem;
-  --space-md:  1rem;
-  --space-lg:  1.5rem;
-  --space-xl:  2.5rem;
-  --space-2xl: 4rem;
-  --space-3xl: 6rem;
-  --page-gutter: clamp(1rem, 4vw, 2.5rem);
+  /* Night roles — the terminal, the hero session, the galaxy canvas. */
+  --mk-night-edge: #2a3447;
+  --mk-night-ink: var(--mk-paper);
+  --mk-night-muted: #9aa6bb;
+  --mk-night-line: rgb(255 255 255 / 0.08);
 
-  /* ─── Motion ────────────────────────────────────────────────────────── */
-  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-micro: 120ms;
-  --dur-short: 220ms;
-  --dur-long:  420ms;
+  --mk-focus: var(--mk-dusk);
+  --mk-selection: var(--mk-haze);
+  --mk-veil: rgb(238 242 247 / 0.86);
 
-  /* ─── Shape / depth ─────────────────────────────────────────────────── */
-  --rule-hair: 1px;
-  --radius-sm: 6px;
-  --radius-pill: 999px;
+  /* ── Type ───────────────────────────────────────────────────────────── */
+  --mk-font-display: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+  --mk-font-sans: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mk-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  --z-base: 1;
-  --z-raised: 10;
-  --z-sticky: 200;
-  --z-nav: 300;
+  /* The serif is set at its text weight; the size carries the emphasis. */
+  --mk-serif-weight: 400;
+  --mk-serif-track: -0.022em;
+
+  /* Named steps, not numbered ones: a step is chosen by the job it does.
+   * The three largest interpolate between a 390px phone and a 1440px desktop. */
+  --mk-text-micro: 0.8125rem;
+  --mk-text-small: 0.875rem;
+  --mk-text-base: 1rem;
+  --mk-text-lead: clamp(1.0625rem, 0.33vw + 0.98rem, 1.25rem);
+  --mk-text-title: clamp(1.125rem, 0.24vw + 1.07rem, 1.25rem);
+  --mk-text-h3: clamp(1.375rem, 0.71vw + 1.2rem, 1.75rem);
+  --mk-text-h2: clamp(1.875rem, 1.72vw + 1.46rem, 3rem);
+  --mk-text-h1: clamp(2.125rem, 3.24vw + 1.59rem, 4.5rem);
+
+  /* ── Space ──────────────────────────────────────────────────────────── */
+  --mk-space-3xs: 0.25rem;
+  --mk-space-2xs: 0.5rem;
+  --mk-space-xs: 0.75rem;
+  --mk-space-sm: 1rem;
+  --mk-space-md: 1.5rem;
+  --mk-space-lg: 2rem;
+  --mk-space-xl: 3rem;
+  --mk-space-2xl: 4rem;
+  --mk-space-3xl: 6rem;
+  --mk-space-4xl: 8rem;
+
+  /* ── Page frame ─────────────────────────────────────────────────────────
+   * The rail and the band breathe with the viewport through clamp(), so the
+   * frame needs no breakpoint of its own; only genuine layout changes do. */
+  --mk-measure: 76rem;
+  --mk-rail: clamp(1.25rem, 5.4vw, 5rem);
+  --mk-band-top: clamp(4.5rem, 7vw, 7.5rem);
+  --mk-band-bottom: clamp(3rem, 4.5vw, 4.5rem);
+  --mk-column-gap: clamp(0.75rem, 1.7vw, 1.5rem);
+  --mk-row-gap: clamp(0.75rem, 1.7vw, 1.5rem);
+  --mk-head-offset: clamp(2rem, 3.2vw, 3rem);
+  --mk-hero-offset: clamp(2.5rem, 3.4vw, 3rem);
+  --mk-bar-height: 3.5rem;
+
+  /* ── Shape and depth ────────────────────────────────────────────────── */
+  --mk-hairline: 1px;
+  --mk-radius-chip: 4px;
+  --mk-radius-inset: 6px;
+  --mk-radius-card: 8px;
+  --mk-radius-button: 99px;
+  --mk-lift-card: 0 1px 2px rgb(19 26 39 / 0.04), 0 12px 32px -20px rgb(19 26 39 / 0.3);
+  --mk-lift-night: 0 0 0 1px rgb(255 255 255 / 0.07), 0 30px 70px -30px rgb(0 0 0 / 0.8);
+
+  /* ── Motion ─────────────────────────────────────────────────────────── */
+  --mk-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --mk-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --mk-dur-fast: 120ms;
+  --mk-dur-base: 240ms;
+  --mk-dur-slow: 420ms;
+
+  /* ── Stacking ───────────────────────────────────────────────────────── */
+  --mk-z-raised: 10;
+  --mk-z-bar: 300;
+}
+
+@media (min-width: 40rem) {
+  :root { --mk-bar-height: 4.5rem; }
 }

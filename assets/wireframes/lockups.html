@@ -1,156 +1,116 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Lockup Wireframes</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MeowKit — Lockup construction</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
-  html, body { margin: 0; font-family: ui-monospace, 'Fira Code', monospace; background: #fafafa; color: #111; }
-  body { padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 1100px; margin: 0 auto; }
-  h1 { grid-column: 1 / -1; font-family: system-ui, sans-serif; font-size: 18px; font-weight: 500; margin: 0 0 8px; }
-  h1 small { color: #666; font-weight: 400; font-size: 12px; margin-left: 10px; }
-  .frame { border: 1px dashed #999; border-radius: 8px; padding: 16px; background: #fff; position: relative; min-height: 140px; }
-  .tag { position: absolute; top: -9px; left: 12px; background: #fafafa; padding: 0 6px; font-size: 11px; color: #666; letter-spacing: .08em; text-transform: uppercase; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 32px; max-width: 1180px; margin: 0 auto; }
+  h1 { font-family: var(--mk-font-display); font-weight: 400; font-size: 40px; letter-spacing: -.022em; line-height: 1.08; margin: 0 0 8px; }
+  .lede { font-size: 17px; line-height: 1.55; max-width: 780px; margin: 0 0 32px; }
+  h2 { font-family: var(--mk-font-mono); font-size: 13px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-fg-2); margin: 40px 0 16px; }
 
-  /* primitives */
-  .box { border: 1px dashed #bbb; display: grid; place-items: center; font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: .08em; background: repeating-linear-gradient(45deg, #f5f5f5 0 6px, #fff 6px 12px); }
-  .mask { border: 1px dashed #bbb; display: grid; place-items: center; font-size: 10px; color: #888; border-radius: 999px; background: repeating-linear-gradient(45deg, #eef 0 6px, #fff 6px 12px); }
-  .txt { border-bottom: 1px solid #333; height: 14px; }
-  .txt.sm { height: 8px; border-bottom-color: #999; }
-  .txt.xs { height: 6px; border-bottom-color: #bbb; }
+  .sheet { border: 1px dashed var(--mk-neutral-200); border-radius: var(--mk-radius-md); background: var(--mk-neutral-0); padding: 28px 28px 20px; }
+  .measure { position: relative; max-width: 760px; }
+  .measure img { width: 100%; max-width: 760px; height: auto; display: block; }
+  .measure .rule { position: absolute; top: -10px; bottom: -10px; width: 1px; background: var(--mk-blue-600); }
+  .bar { display: flex; max-width: 760px; margin-top: 14px; font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-1); }
+  .bar span { border-top: 1px solid var(--mk-neutral-500); padding-top: 6px; text-align: center; }
+  .bar .sym { width: 26%; }
+  .bar .gap { width: 7.1%; color: var(--mk-blue-700); font-size: 10px; }
+  .bar .word { width: 66.9%; }
+  .caption { font-size: 13px; line-height: 1.55; color: var(--mk-neutral-900); margin: 16px 0 0; max-width: 760px; }
 
-  /* A horizontal */
-  .a { display: flex; align-items: center; gap: 14px; }
-  .a .mark { width: 56px; height: 56px; flex: 0 0 56px; border-radius: 50%; }
-  .a .stack { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-  .a .w { width: 60%; height: 22px; border-bottom: 2px solid #111; }
-  .a .sub { width: 45%; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .card { border: 1px dashed var(--mk-neutral-200); border-radius: var(--mk-radius-md); background: var(--mk-neutral-0); padding: 24px 18px 14px; position: relative; min-height: 200px; display: flex; flex-direction: column; gap: 12px; }
+  .card .tag { position: absolute; top: -9px; left: 14px; background: var(--mk-bg-base); padding: 0 8px; font-family: var(--mk-font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-fg-2); }
+  .card .stage { flex: 1; display: grid; place-items: center; }
+  .card .stage img { max-width: 100%; height: auto; }
+  .card .meta { font-size: 13px; line-height: 1.5; border-top: 1px solid var(--mk-border-subtle); padding-top: 9px; color: var(--mk-neutral-900); }
 
-  /* B stacked */
-  .b { display: flex; flex-direction: column; gap: 10px; }
-  .b .top { display: flex; align-items: center; gap: 10px; }
-  .b .mark { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; }
-  .b .w { width: 130px; height: 18px; border-bottom: 2px solid #111; }
-  .b .tagline { width: 80%; height: 10px; border-bottom: 1px solid #666; }
-  .b .tagline2 { width: 65%; height: 10px; border-bottom: 1px solid #666; }
+  .clearspace { display: inline-block; border: 1px dashed var(--mk-blue-600); padding: 40px; }
+  .clearspace .inner { outline: 1px solid var(--mk-neutral-500); display: block; }
+  .clearspace img { width: 290px; display: block; }
 
-  /* C monogram */
-  .c { display: flex; align-items: center; gap: 14px; }
-  .c .mono { width: 64px; height: 64px; flex: 0 0 64px; border-radius: 14px; border: 1px dashed #555; display: grid; place-items: center; background: repeating-linear-gradient(45deg, #eef 0 6px, #fff 6px 12px); position: relative; }
-  .c .mono::before, .c .mono::after { content: ''; position: absolute; top: -6px; width: 14px; height: 14px; border: 1px dashed #555; background: #eef; clip-path: polygon(0 100%, 50% 0, 100% 100%); }
-  .c .mono::before { left: 8px; }
-  .c .mono::after  { right: 8px; }
-  .c .letter { font-family: system-ui, sans-serif; font-size: 28px; color: #333; }
-  .c .stack { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-  .c .w { width: 55%; height: 20px; border-bottom: 2px solid #111; }
-  .c .sub { width: 70%; }
+  .steps { display: flex; align-items: flex-end; gap: 36px; flex-wrap: wrap; }
+  .steps figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .steps figcaption { font-family: var(--mk-font-mono); font-size: 11px; color: var(--mk-fg-2); }
 
-  /* D favicon crops */
-  .d { display: flex; align-items: center; gap: 18px; justify-content: space-between; }
-  .d .row { display: flex; align-items: center; gap: 12px; }
-  .d .s16 { width: 16px; height: 16px; border-radius: 3px; }
-  .d .s32 { width: 32px; height: 32px; border-radius: 6px; }
-  .d .s64 { width: 64px; height: 64px; border-radius: 14px; }
-  .d .lbl { font-size: 11px; color: #666; letter-spacing: .08em; text-transform: uppercase; }
-
-  /* E social card - spans both columns */
-  .e-wrap { grid-column: 1 / -1; }
-  .e { aspect-ratio: 1200 / 628; padding: 28px 32px; display: grid; grid-template-columns: 1fr 180px; gap: 20px; align-items: center; }
-  .e .left { display: flex; flex-direction: column; gap: 10px; }
-  .e .eyebrow { width: 180px; height: 8px; border-bottom: 1px solid #888; }
-  .e .title1 { width: 70%; height: 24px; border-bottom: 2px solid #111; }
-  .e .title2 { width: 60%; height: 24px; border-bottom: 2px solid #111; }
-  .e .tag1 { width: 75%; height: 10px; border-bottom: 1px solid #999; margin-top: 8px; }
-  .e .tag2 { width: 55%; height: 10px; border-bottom: 1px solid #999; }
-  .e .cta { display: flex; gap: 10px; margin-top: 12px; }
-  .e .chip { width: 120px; height: 24px; border: 1px dashed #555; border-radius: 4px; }
-  .e .chip.mono { width: 160px; background: repeating-linear-gradient(45deg, #f5f5f5 0 6px, #fff 6px 12px); }
-  .e .mark { width: 160px; height: 160px; border-radius: 50%; justify-self: end; }
-
-  /* F/G/H wordmarks */
-  .wm-wrap { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-  .wm { border: 1px dashed #999; border-radius: 8px; padding: 22px; background: #fff; display: grid; place-items: center; min-height: 90px; position: relative; }
-  .wm .tag { top: -9px; }
-  .wm .type { width: 70%; height: 24px; border-bottom: 2px solid #111; }
-
-  .note { grid-column: 1 / -1; font-size: 11px; color: #666; line-height: 1.5; font-family: system-ui, sans-serif; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-family: var(--mk-font-mono); font-size: 12px; margin: 0; }
+  dt { color: var(--mk-fg-2); } dd { margin: 0; }
+  .note { font-size: 14px; line-height: 1.6; max-width: 880px; margin: 28px 0 0; }
+  code { font-family: var(--mk-font-mono); font-size: .92em; }
 </style>
 </head>
 <body>
-  <h1>Logo lockup wireframes <small>low-fi structural sketches · no real mascot or typography</small></h1>
+  <h1>Lockup construction</h1>
+  <p class="lede">One lockup: symbol left, wordmark right, baseline shared. Everything below is measured off <code>meow-logo.svg</code>, whose viewBox is 876 × 173 units.</p>
 
-  <div class="frame a">
-    <span class="tag">A · horizontal lockup</span>
-    <div class="box mark">mark<br>56</div>
-    <div class="stack">
-      <div class="w"></div>
-      <div class="txt sm sub"></div>
+  <h2>01 · Anatomy</h2>
+  <div class="sheet">
+    <div class="measure">
+      <img src="../branding/meow-logo.svg" alt="MeowKit lockup with its three zones marked">
+      <span class="rule" style="left:26%"></span>
+      <span class="rule" style="left:33.1%"></span>
     </div>
+    <div class="bar">
+      <span class="sym">symbol · 228u</span>
+      <span class="gap">gap 62u</span>
+      <span class="word">wordmark · meowkit</span>
+    </div>
+    <p class="caption">The gap between the cursor and the first letter is 62 units — about half the cursor's width. It is the only adjustable measure in the file, and it is already set; do not re-space it.</p>
   </div>
 
-  <div class="frame b">
-    <span class="tag">B · stacked + tagline</span>
-    <div class="top">
-      <div class="box mark">mark<br>40</div>
-      <div class="w"></div>
-    </div>
-    <div class="tagline"></div>
-    <div class="tagline2"></div>
-  </div>
-
-  <div class="frame c">
-    <span class="tag">C · monogram tile</span>
-    <div class="mono"><span class="letter">M</span></div>
-    <div class="stack">
-      <div class="w"></div>
-      <div class="txt sm sub"></div>
-    </div>
-  </div>
-
-  <div class="frame d">
-    <span class="tag">D · favicon crops</span>
-    <div class="row">
-      <div class="mask s16"></div>
-      <div class="mask s32"></div>
-      <div class="mask s64"></div>
-    </div>
-    <span class="lbl">16 · 32 · 64</span>
-  </div>
-
-  <div class="e-wrap">
-    <div class="frame e">
-      <span class="tag">E · social / OG card (1200×628)</span>
-      <div class="left">
-        <div class="eyebrow"></div>
-        <div class="title1"></div>
-        <div class="title2"></div>
-        <div class="tag1"></div>
-        <div class="tag2"></div>
-        <div class="cta">
-          <div class="chip mono"></div>
-          <div class="chip"></div>
-        </div>
+  <h2>02 · Clear space and minimums</h2>
+  <div class="grid">
+    <div class="card" style="grid-column: span 2">
+      <span class="tag">Clear space</span>
+      <div class="stage">
+        <span class="clearspace"><span class="inner"><img src="../branding/meow-logo.svg" alt="Lockup inside its clear-space boundary"></span></span>
       </div>
-      <div class="mask mark">mark</div>
+      <div class="meta">Keep one cursor width — 120 units, about 13.7% of the lockup's width — free on all four sides. Nothing crosses it: no text, no rule, no card edge.</div>
+    </div>
+    <div class="card">
+      <span class="tag">Spec</span>
+      <div class="stage" style="place-items:start center">
+        <dl>
+          <dt>viewBox</dt><dd>8 45 876 173</dd>
+          <dt>ratio</dt><dd>5.06 : 1</dd>
+          <dt>symbol</dt><dd>228 × 146</dd>
+          <dt>gap</dt><dd>62</dd>
+          <dt>clear space</dt><dd>120</dd>
+          <dt>min width</dt><dd>96px</dd>
+        </dl>
+      </div>
+      <div class="meta">Below 96px the wordmark closes up — switch to the symbol.</div>
     </div>
   </div>
 
-  <div class="wm-wrap">
-    <div class="wm">
-      <span class="tag">F · gradient wordmark</span>
-      <div class="type"></div>
-    </div>
-    <div class="wm">
-      <span class="tag">G · dual-tone wordmark</span>
-      <div class="type"></div>
-    </div>
-    <div class="wm">
-      <span class="tag">H · /mk:kit prompt</span>
-      <div class="type"></div>
+  <h2>03 · Size steps</h2>
+  <div class="sheet">
+    <div class="steps">
+      <figure><img src="../branding/meow-logo.svg" alt="Lockup at 320 pixels" style="width:320px"><figcaption>320 · hero</figcaption></figure>
+      <figure><img src="../branding/meow-logo.svg" alt="Lockup at 160 pixels" style="width:160px"><figcaption>160 · docs header</figcaption></figure>
+      <figure><img src="../branding/meow-logo.svg" alt="Lockup at 96 pixels" style="width:96px"><figcaption>96 · minimum</figcaption></figure>
+      <figure><img src="../branding/meow-symbol.svg" alt="Symbol at 32 pixels" style="height:32px"><figcaption>32 · symbol</figcaption></figure>
+      <figure><img src="../branding/meow-symbol-small.svg" alt="Small cut at 20 pixels" style="height:20px"><figcaption>20 · small cut</figcaption></figure>
     </div>
   </div>
 
-  <div class="note">
-    Dashed boxes = mascot / mark placeholder. Solid underlines = real type slot (weight heavier = larger type). Circular dashed = round-crop mask. Repeating stripes = gradient/filled area. Wireframes are structural only — no color, no real type.
+  <h2>04 · Cuts</h2>
+  <div class="grid">
+    <div class="card"><span class="tag">meow-logo.svg</span><div class="stage"><img src="../branding/meow-logo.svg" alt="Lockup on paper" style="width:90%"></div><div class="meta">Paper and any light ground.</div></div>
+    <div class="card" style="background:var(--mk-neutral-900);border-color:rgb(238 242 247 / .2)"><span class="tag">meow-logo-dark.svg</span><div class="stage"><img src="../branding/meow-logo-dark.svg" alt="Lockup on night" style="width:90%"></div><div class="meta" style="color:var(--mk-neutral-50);border-color:rgb(238 242 247 / .2)">Night and any dark ground.</div></div>
+    <div class="card" style="background:var(--mk-neutral-200)"><span class="tag">meow-logo-mono.svg</span><div class="stage"><img src="../branding/meow-logo-mono.svg" alt="One-colour lockup" style="width:90%"></div><div class="meta">One ink: stamps, print, embroidery.</div></div>
   </div>
+
+  <p class="note">No stacked cut and no tagline locked to the mark — a tagline sits in the layout as ordinary text. Never rebuild the lockup by placing the symbol beside typed letters: the wordmark in the file is outlined and already spaced.</p>
 </body>
 </html>

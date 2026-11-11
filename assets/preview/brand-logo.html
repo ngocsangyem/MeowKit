@@ -1,33 +1,47 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<link rel="stylesheet" href="../colors_and_type.css" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand — Primary mark</title>
+<link rel="icon" href="../branding/meow-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..500&family=Onest:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/colors_and_type.css">
 <style>
-  body { margin: 0; font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 28px 32px; display: flex; align-items: center; gap: 40px; }
-  .mark {
-    display: inline-flex; align-items: baseline;
-    font-family: var(--mk-font-mono);
-    font-size: 72px; font-weight: 500; line-height: 1; letter-spacing: -.01em;
-  }
-  .mark .slash { color: var(--mk-blue-600); font-weight: 600; margin-right: 2px; }
-  .mark .meow {
-    background: linear-gradient(135deg, var(--mk-blue-700) 0%, var(--mk-blue-500) 100%);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .mark .caret { display: inline-block; width: 6px; height: 64px; background: var(--mk-blue-600); margin-left: 10px; transform: translateY(6px); animation: blink 1.1s steps(2) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-  .meta { display: flex; flex-direction: column; gap: 4px; }
-  .meta h1 { font-size: 20px; font-weight: 500; margin: 0; color: var(--mk-neutral-900); }
-  .meta p  { font-family: var(--mk-font-mono); font-size: 12px; color: var(--mk-neutral-500); margin: 0; letter-spacing: .06em; }
+  html, body { margin: 0; }
+  body { font-family: var(--mk-font-sans); background: var(--mk-bg-base); color: var(--mk-fg-1); padding: 28px 32px; display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+  .stage { border: 1px solid var(--mk-border-subtle); border-radius: var(--mk-radius-md); padding: 32px 36px; display: grid; place-items: center; }
+  .stage img { width: 320px; height: auto; display: block; }
+  .meta { max-width: 420px; display: flex; flex-direction: column; gap: 10px; }
+  .meta h1 { font-family: var(--mk-font-display); font-size: 36px; font-weight: 400; letter-spacing: -.02em; line-height: 1.1; margin: 0; }
+  .meta p { margin: 0; font-size: 15px; line-height: 1.55; }
+  dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; font-family: var(--mk-font-mono); font-size: 12px; }
+  dt { color: var(--mk-fg-2); }
+  dd { margin: 0; }
+  .sym { display: flex; align-items: flex-end; gap: 20px; padding-top: 4px; }
+  .sym img { height: 56px; width: auto; }
+  .sym img.small { height: 40px; }
 </style>
 </head>
 <body>
-  <span class="mark"><span class="slash">/</span><span class="meow">meow</span><span class="caret"></span></span>
+  <div class="stage"><img src="../branding/meow-logo.svg" alt="MeowKit horizontal lockup"></div>
   <div class="meta">
     <h1>Primary mark</h1>
-    <p>SLASH-MEOW PROMPT · FIRA CODE 500 · GRADIENT #2563EB → #60A5FA</p>
+    <p>A prompt chevron and a cursor with cat ears. The chevron is the prompt you type into; the block is the caret that answers.</p>
+    <dl>
+      <dt>lockup</dt><dd>meow-logo.svg</dd>
+      <dt>symbol</dt><dd>meow-symbol.svg</dd>
+      <dt>chevron</dt><dd>#131a27 night</dd>
+      <dt>cursor</dt><dd>#2f66b3 dusk</dd>
+      <dt>wordmark</dt><dd>JetBrains Mono, lowercase, outlined</dd>
+      <dt>min size</dt><dd>lockup 96px wide · symbol 16px</dd>
+    </dl>
+    <div class="sym">
+      <img src="../branding/meow-symbol.svg" alt="MeowKit symbol">
+      <img class="small" src="../branding/meow-symbol-small.svg" alt="MeowKit small cut, cursor only">
+    </div>
   </div>
 </body>
 </html>
