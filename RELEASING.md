@@ -576,15 +576,43 @@ Copy this checklist for each release:
 
 ## Release Streams and Trust Model
 
-There is no automated release workflow. Releases are cut by hand:
+The kit and the npm CLI are released by hand; the `mewkit-next` binary is built and published by a workflow on its tag:
 
 - **Kit** — `scripts/release.sh <version> "<title>"` tags `v<version>` and publishes `meowkit-release.zip` + `checksums.txt` to the GitHub Release. The zip carries `.claude/kit-contract.json`: `kitContract` (format version), `requires.mewkitMin` (oldest installer binary that can read this kit) and `kitVersion` (stamped from root `package.json` by `sync-versions.cjs`).
 - **CLI (npm)** — `packages/mewkit` is published to npm by hand (step 10); it has no tag. It reads the zip and ignores `checksums.txt` and `kit-contract.json`.
-- **Binary (planned)** — a native `mewkit` binary will release from this repo under its own `mewkit-v<version>` tags with no `.zip` asset, so npm CLIs never mistake it for a kit; it fetches the kit zip and checks it against `checksums.txt`.
+- **Binary** — the Rust installer `mewkit-next` releases from this repo under its own `mewkit-v<version>` tags with no `.zip` asset, so npm CLIs never mistake it for a kit; it fetches the kit zip and checks it against `checksums.txt`. See [Binary release stream](#binary-release-stream-mewkit-next) and ADR `docs/architecture/adr/261110-two-release-streams.md`.
 
 **Trust model: checksums only.** MeowKit is open source and releases carry no signatures. `checksums.txt` is fetched from the same release as the zip, so it detects corruption and partial downloads, not a tampered release; trust rests on GitHub, TLS and who can push tags.
 
 **Never upload `meowkit-kit-*.tar.gz`, `kit-manifest.json` or `*.sig` to a release.** CLIs that understand the signed kit artifact install from it when present, and their trusted keyring is empty, so every install of that release would be refused. `verify-release-assets.cjs` fails if any of them sits in `dist/`. The signing scripts (`build-kit-artifact.cjs`, `kit-signing.cjs`) stay in the tree, unused.
+
+### Binary release stream (`mewkit-next`)
+
+**What a release is.** Pushing the tag `mewkit-v<version>` runs `.github/workflows/rust-release.yml`. The tag must equal `version` under `[workspace.package]` in `Cargo.toml`, so bump that in a reviewed PR first. The workflow:
+
+1. builds six targets: `{x86_64,aarch64}-unknown-linux-musl` (static), `{x86_64,aarch64}-apple-darwin`, `{x86_64,aarch64}-pc-windows-msvc` (static C runtime);
+2. packs each as `mewkit-next-<version>-<target>.tar.gz` (Windows too: never `.zip`);
+3. writes `checksums.txt` and `binary-manifest.json` (`version`, `channel`, `published_at`, `min_supported`, per-target `url`, `sha256`, `size`) from the archives;
+4. creates the release as a draft, uploads everything, then publishes it with `--latest=false`; a version with `-` (e.g. `0.2.0-beta.1`) is a prerelease on the beta channel;
+5. opens a PR `release/installer-pins-mewkit-v<version>` that re-renders `install.sh` and `install.ps1` with the new pins.
+
+`workflow_dispatch` (Actions → "Rust release" → Run workflow) builds all six targets and publishes nothing. **Run it once before the first tag**: it is the only proof that the arm64 runners build every target.
+
+**`releases/latest` keeps pointing at a kit.** Binary releases are never `latest`, so `https://github.com/ngocsangyem/MeowKit/releases/latest` keeps resolving to the newest stable kit. npm CLIs list releases and pick the newest one with a `.zip` (or the kit-artifact assets), which binary releases never have. Link a binary release by its tag. `github-releases-binary-coexistence.test.ts` proves the npm filter skips binary releases; it fails if an asset name drifts into its reach.
+
+**Repository settings the workflow needs (owner):**
+
+- Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests", for the pin PR.
+- Optional secret `RELEASE_PR_TOKEN` (fine-grained token: contents and pull requests, write, this repository). Without it the pin PR is opened by `GITHUB_TOKEN`, and GitHub runs no CI on PRs that token opens; with it, the pin PR gets CI like any other.
+- Branch protection on `main` requiring review. The installers' pins are the root of trust for a first install; they must reach `main` only through a reviewed PR.
+
+**Reviewing a pin PR.** Check that every URL is under `releases/download/mewkit-v<version>/`, and that the digests match the release's `checksums.txt`. `node scripts/release/render-installers.mjs --check` passes on the PR branch.
+
+**Trust model (no signatures).** A first install trusts `install.sh` / `install.ps1` as served over TLS from `main`; they refuse any archive whose size or SHA-256 differs from the pin. `mewkit-next self-update` fetches `binary-manifest.json` over TLS from this repository's newest release on its channel, refuses an older version, and checks the archive's SHA-256 and size before replacing itself (the previous binary is kept for rollback). Anyone who can publish a release here can ship code to `self-update` users; that is the accepted cost of not managing signing keys.
+
+**Withdrawing a bad version.** Set the repository variable `MEWKIT_MIN_SUPPORTED` (Settings → Variables → Actions) to the first good version and publish a fixed release. Its manifest carries that floor, and `self-update` on any older binary reports that the running version is withdrawn and names the release to move to. Deleting a release does not withdraw it from users who have it.
+
+**Kit releases check the binary.** `scripts/release-check.sh` installs the candidate kit with the newest published `mewkit-next` (`init --dry-run` for claude-code, codex and cursor). A kit whose `kitContract` or `requires.mewkitMin` is beyond that binary fails the release. Install the binary first (`install.sh`) or point `MEWKIT_NEXT_BIN` at one; until a binary release exists the step is skipped, and only when `gh` can confirm that.
 
 ### Conventional commits → version bumps
 
@@ -616,6 +644,9 @@ For CLI changes inside `packages/mewkit/src/`:
 | `scripts/sync-versions.cjs`             | Check or stamp the kit version into the derived surfaces, incl. `.claude/kit-contract.json` |
 | `packages/mewkit/scripts/copy-provider-bundles.cjs` | Stage the authored provider bundles (`modules/codex/`, `modules/cursor/`) into `dist/` — runs in `npm run build`; see step 1e |
 | `scripts/release.sh`                    | Automated release: bump → build → assets → commit → tag → push → GitHub Release |
+| `scripts/release/build-binary-manifest.mjs` | Binary stream: `binary-manifest.json` + `checksums.txt` from the six archives (run by `rust-release.yml`) |
+| `scripts/release/render-installers.mjs` | Binary stream: render `install.sh` / `install.ps1` from their templates and `installer-pins.json`; `--check` fails on drift |
+| `scripts/release/check-kit-against-binary.sh` | Kit gate: `init --dry-run` of a staged kit for the three runtimes with a given `mewkit-next` |
 
 ## Release History
 

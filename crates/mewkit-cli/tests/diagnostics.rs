@@ -155,3 +155,23 @@ fn doctor_finds_global_hook_scripts_under_a_home_with_spaces() {
     let report = text(&env.mewkit_next(&["doctor", "--global"]));
     assert!(report.contains("no kit hook runs"), "{report}");
 }
+
+/// Global Cursor hooks run from `~/.cursor`, so their `./hooks/…` paths start
+/// there: doctor finds them, and still notices one that is gone.
+#[test]
+fn doctor_resolves_global_cursor_hooks_from_the_cursor_dir() {
+    let env = TempHome::new();
+    let out = env.with_kit(&["init", "--target", "cursor", "--global"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    let out = env.mewkit_next(&["doctor", "--global", "--target", "cursor"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+
+    std::fs::remove_file(env.home().join(".cursor/hooks/privacy-read-gate.cjs")).unwrap();
+    let out = env.mewkit_next(&["doctor", "--global", "--target", "cursor"]);
+    assert_eq!(code(&out), 1, "{}", text(&out));
+    assert!(
+        text(&out).contains("missing: ./hooks/privacy-read-gate.cjs"),
+        "{}",
+        text(&out)
+    );
+}

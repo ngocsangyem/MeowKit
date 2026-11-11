@@ -90,6 +90,8 @@ npx mewkit doctor     # Verify environment
 | ------------------------------------------------ | ------------------ | ----------------------------------------------------- |
 | [`mewkit`](https://www.npmjs.com/package/mewkit) | `npx mewkit <cmd>` | CLI — init, upgrade, doctor, validate, budget, memory |
 
+**Preview:** `mewkit-next`, a native installer for Claude Code, Codex and Cursor (install, upgrade, uninstall, doctor, self-update), will ship as a binary on `mewkit-v*` releases; until the first one is published the installers say no release is pinned. Install it with [`install.sh`](install.sh) or [`install.ps1`](install.ps1); see [Installation](https://docs.meowkit.dev/installation#preview-the-mewkit-next-binary). Everything else stays in the npm CLI.
+
 ## Requirements
 
 - Node.js 24+
