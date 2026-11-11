@@ -6,7 +6,7 @@
 //! SHA-256 → binary taken out in memory → atomic replace. A manifest older
 //! than the running binary (a replayed one) is refused, never applied.
 mod archive;
-mod manifest;
+pub mod manifest;
 mod replace;
 
 use std::path::{Path, PathBuf};

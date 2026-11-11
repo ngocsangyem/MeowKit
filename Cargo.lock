@@ -473,9 +473,11 @@ name = "mewkit-cli"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "flate2",
  "mewkit-adapters",
  "mewkit-core",
  "serde_json",
+ "tar",
  "tempfile",
  "toml_edit",
  "zip",

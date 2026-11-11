@@ -1,2 +1,7 @@
 # Golden manifests are compared byte-for-byte on every OS.
 crates/mewkit-cli/tests/golden/** text eol=lf
+
+# Shell installers break on CRLF; keep every installer source LF everywhere.
+install.sh text eol=lf
+install.ps1 text eol=lf
+scripts/release/*.tmpl text eol=lf

@@ -59,6 +59,36 @@ else
   bad ".claude/kit-contract.json missing or invalid"; tail -3 /tmp/rc-contract.txt
 fi
 
+# The kit must install with the mewkit-next users already have. The binary is
+# $MEWKIT_NEXT_BIN, else `mewkit-next` on PATH. With neither, the gate is skipped
+# only while `gh` can prove no binary release exists; otherwise it fails.
+step "Candidate kit against the published mewkit-next"
+NEXT_BIN="${MEWKIT_NEXT_BIN:-$(command -v mewkit-next 2>/dev/null || true)}"
+if [ -z "$NEXT_BIN" ]; then
+  if ! TAGS="$(gh release list --limit 100 --json tagName -q '.[].tagName' 2>/dev/null)"; then
+    bad "no mewkit-next binary, and gh cannot list releases to show none is published: install mewkit-next (install.sh) or set MEWKIT_NEXT_BIN"
+  elif printf '%s\n' "$TAGS" | grep -q '^mewkit-v'; then
+    bad "no mewkit-next binary: install it (install.sh) or set MEWKIT_NEXT_BIN"
+  else
+    ok "skipped — no mewkit-next binary release is published yet"
+  fi
+else
+  GATE_TMP="$(mktemp -d)"
+  "$NEXT_BIN" self-update --check >"$GATE_TMP/update.txt" 2>&1
+  case $? in
+    0) ;;
+    3) bad "$NEXT_BIN is not the newest published mewkit-next; run \`mewkit-next self-update\` first" ;;
+    *) printf '  note: could not check that %s is the newest release (%s)\n' "$NEXT_BIN" "$(tail -1 "$GATE_TMP/update.txt")" ;;
+  esac
+  if node scripts/release/stage-candidate-kit.cjs "$GATE_TMP/kit" >"$GATE_TMP/stage.txt" 2>&1 \
+    && bash scripts/release/check-kit-against-binary.sh "$NEXT_BIN" "$GATE_TMP/kit"; then
+    ok "init --dry-run plans the candidate kit for claude-code, codex and cursor"
+  else
+    bad "the candidate kit does not install with $NEXT_BIN"; tail -3 "$GATE_TMP/stage.txt"
+  fi
+  rm -rf "$GATE_TMP"
+fi
+
 # Built assets are checked only when a zip for THIS version exists. release.sh runs this gate
 # after the version bump and before it rebuilds dist/, which is gitignored and persists, so a zip
 # left from an earlier version is expected there: it is reported and skipped, not failed.

@@ -1,0 +1,220 @@
+name: Rust release
+
+# The binary release stream. A `mewkit-vX.Y.Z` tag (beta: `mewkit-vX.Y.Z-beta.N`)
+# builds mewkit-next for six targets, publishes them with binary-manifest.json
+# and checksums.txt, and opens a pull request that re-pins install.sh and
+# install.ps1. Kit releases are `v*` tags from scripts/release.sh; nothing here
+# may look like one to the npm CLI already in users' hands: archives are
+# `.tar.gz` named `mewkit-next-*` (never `.zip`), and the release is created
+# with --latest=false so `releases/latest` keeps resolving to a kit.
+#
+# Run it by hand (workflow_dispatch) to build every target without publishing.
+
+on:
+  push:
+    tags: ["mewkit-v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  version:
+    name: Read the release version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        name: Tag and crate version must agree
+        shell: bash
+        run: |
+          crate=$(sed -n '/^\[workspace.package\]/,/^\[/s/^version = "\(.*\)"/\1/p' Cargo.toml)
+          [ -n "$crate" ] || { echo "::error::no workspace version in Cargo.toml"; exit 1; }
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            tag=${GITHUB_REF_NAME#mewkit-v}
+            if [ "$tag" != "$crate" ]; then
+              echo "::error::tag $GITHUB_REF_NAME does not match the workspace version $crate"
+              exit 1
+            fi
+          fi
+          echo "version=$crate" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.target }}
+    needs: version
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { target: x86_64-unknown-linux-musl, os: ubuntu-latest }
+          - { target: aarch64-unknown-linux-musl, os: ubuntu-24.04-arm }
+          - { target: x86_64-apple-darwin, os: macos-latest }
+          - { target: aarch64-apple-darwin, os: macos-latest }
+          - { target: x86_64-pc-windows-msvc, os: windows-latest }
+          - { target: aarch64-pc-windows-msvc, os: windows-11-arm }
+    runs-on: ${{ matrix.os }}
+    env:
+      TARGET: ${{ matrix.target }}
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install rustup when the image has none
+        shell: bash
+        run: |
+          command -v rustup >/dev/null && exit 0
+          case "$RUNNER_OS" in
+            Windows)
+              case "$RUNNER_ARCH" in ARM64) host=aarch64-pc-windows-msvc ;; *) host=x86_64-pc-windows-msvc ;; esac
+              curl -fsSLo "$RUNNER_TEMP/rustup-init.exe" \
+                "https://static.rust-lang.org/rustup/dist/$host/rustup-init.exe"
+              "$RUNNER_TEMP/rustup-init.exe" -y --default-toolchain none --profile minimal
+              printf '%s\n' "$USERPROFILE\\.cargo\\bin" >> "$GITHUB_PATH" ;;
+            *)
+              curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --default-toolchain none --profile minimal
+              echo "$HOME/.cargo/bin" >> "$GITHUB_PATH" ;;
+          esac
+
+      - name: Install the pinned toolchain and target
+        shell: bash
+        run: |
+          rustup toolchain install
+          rustup target add "$TARGET"
+
+      - name: Install musl tools
+        if: contains(matrix.target, 'linux-musl')
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Build
+        shell: bash
+        run: |
+          # Windows: link the C runtime statically so no VC++ redistributable is needed.
+          case "$TARGET" in *windows*) export RUSTFLAGS="-C target-feature=+crt-static" ;; esac
+          # musl: compile ring's C with musl-gcc, not the glibc cc.
+          case "$TARGET" in *linux-musl) export "CC_${TARGET//-/_}=musl-gcc" ;; esac
+          cargo build --release --locked --target "$TARGET" -p mewkit-cli
+          if [[ "$TARGET" == *linux-musl ]]; then
+            file "target/$TARGET/release/mewkit-next" | tee /dev/stderr | grep -q 'statically linked' \
+              || { echo "::error::the musl binary is not statically linked"; exit 1; }
+          fi
+
+      - name: Package
+        shell: bash
+        run: |
+          exe=mewkit-next; case "$TARGET" in *windows*) exe=mewkit-next.exe ;; esac
+          name="mewkit-next-$VERSION-$TARGET"
+          mkdir -p "dist/$name"
+          cp "target/$TARGET/release/$exe" LICENSE "dist/$name/"
+          tar -C dist -czf "dist/$name.tar.gz" "$name"
+          ls -l "dist/$name/$exe" "dist/$name.tar.gz"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mewkit-next-${{ matrix.target }}
+          path: dist/mewkit-next-${{ needs.version.outputs.version }}-${{ matrix.target }}.tar.gz
+          if-no-files-found: error
+
+  publish:
+    name: Publish the release
+    if: github.ref_type == 'tag'
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Build binary-manifest.json and checksums.txt
+        env:
+          # Raise to withdraw older versions (self-update then tells their users to move on).
+          MIN_SUPPORTED: ${{ vars.MEWKIT_MIN_SUPPORTED }}
+        run: |
+          node scripts/release/build-binary-manifest.mjs --version "$VERSION" --dir dist \
+            ${MIN_SUPPORTED:+--min-supported "$MIN_SUPPORTED"}
+          if find dist -iname '*.zip' | grep -q .; then echo "::error::a binary release must carry no .zip"; exit 1; fi
+
+      - name: Create the release (never marked latest)
+        run: |
+          # shellcheck disable=SC2016 # the backticks are Markdown inside a JS template string
+          notes=$(node -e '
+            const m = require("./dist/binary-manifest.json");
+            const rows = Object.entries(m.targets).map(([t, a]) => `| ${t} | ${(a.size / 1048576).toFixed(1)} MiB | \`${a.sha256}\` |`);
+            console.log([
+              `mewkit-next ${m.version} (${m.channel}). Install: see install.sh / install.ps1 on the default branch once the pin PR is merged; update: \`mewkit-next self-update\`.`,
+              "", "| Target | Archive size | SHA-256 |", "| --- | --- | --- |", ...rows,
+            ].join("\n"));
+          ')
+          prerelease=; case "$VERSION" in *-*) prerelease=--prerelease ;; esac
+          # Draft first: the release becomes visible only once every asset is uploaded.
+          gh release create "$GITHUB_REF_NAME" --draft --verify-tag --latest=false $prerelease \
+            --title "mewkit-next $VERSION" --notes "$notes" \
+            dist/mewkit-next-*.tar.gz dist/checksums.txt dist/binary-manifest.json
+          gh release edit "$GITHUB_REF_NAME" --draft=false --latest=false
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binary-manifest
+          path: dist/binary-manifest.json
+
+  pin-installers:
+    name: Open the installer pin pull request
+    needs: [version, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      BASE: ${{ github.event.repository.default_branch }}
+      # A pull request opened with the default token triggers no CI. With a
+      # RELEASE_PR_TOKEN secret (fine-grained: contents + pull requests write)
+      # the pin PR runs the installer checks like any other.
+      GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: binary-manifest
+          path: dist
+      - name: Re-render install.sh and install.ps1 and open a pull request
+        run: |
+          node scripts/release/render-installers.mjs --manifest dist/binary-manifest.json
+          branch="release/installer-pins-mewkit-v$VERSION"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add install.sh install.ps1 scripts/release/installer-pins.json
+          git commit -m "build(release): pin installers to mewkit-next $VERSION"
+          # A re-run of the same tag replaces its own pin branch and reuses its PR.
+          git push --force origin "$branch"
+          if gh pr view "$branch" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            echo "pin PR for $branch already open"; exit 0
+          fi
+          gh pr create --base "$BASE" --head "$branch" \
+            --title "build(release): pin installers to mewkit-next $VERSION" \
+            --body "Pins install.sh and install.ps1 to the archives of mewkit-v$VERSION (URL, SHA-256 and size from its binary-manifest.json). Compare each digest with the release's checksums.txt before merging: merging is what makes the installers serve this version."
