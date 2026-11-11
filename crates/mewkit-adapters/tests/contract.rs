@@ -1,6 +1,6 @@
 //! A stub emitter's plans run through the core executor: install, then strip.
 use mewkit_adapters::contract::{Kit, Op, OwnershipIndex, Plan, RelPath};
-use mewkit_adapters::{EmitError, EmitRequest, Emitter, Runtime, Scope, ScopeKind};
+use mewkit_adapters::{EmitError, EmitRequest, Emitter, Runtime, Scope};
 use mewkit_core::exec::{ExecOptions, Scope as ExecScope, execute};
 use mewkit_core::fsx::sha256_hex;
 use mewkit_core::ownership::Origin;
@@ -70,12 +70,10 @@ fn a_stub_emitter_installs_and_strips_through_the_executor() {
     };
     let project = tempfile::tempdir().unwrap();
     std::fs::write(project.path().join("AGENTS.md"), "# Mine\n").unwrap();
-    let scope = Scope {
-        kind: ScopeKind::Project,
-        root: project.path().to_path_buf(),
-    };
+    let scope = Scope::project(project.path());
     let exec_scope = ExecScope {
         root: scope.root.clone(),
+        mounts: vec![],
         roots: Stub.roots(&scope),
         index_file: rel(".meowkit/state/ownership/codex.json"),
         lock_file: rel(".meowkit/state/mewkit.lock"),
@@ -87,6 +85,7 @@ fn a_stub_emitter_installs_and_strips_through_the_executor() {
         packs: &[],
         disabled: &[],
         fresh: false,
+        other_scope: None,
     };
     let plan = Stub.prepare(&req).unwrap();
     let mut index = OwnershipIndex::new(&kit.version, "1", kit.origin);

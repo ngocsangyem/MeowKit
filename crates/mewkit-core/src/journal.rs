@@ -14,6 +14,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use crate::fsx::{RelPath, atomic_write};
+use crate::layout::Layout;
 
 enum PreImage {
     Absent,
@@ -21,7 +22,7 @@ enum PreImage {
 }
 
 pub struct Journal {
-    root: PathBuf,
+    layout: Layout,
     /// Pre-images in the order paths were first touched.
     entries: Vec<(PathBuf, PreImage)>,
     seen: HashSet<PathBuf>,
@@ -31,9 +32,9 @@ pub struct Journal {
 }
 
 impl Journal {
-    pub fn new(root: &Path) -> Self {
+    pub fn new(layout: &Layout) -> Self {
         Self {
-            root: root.to_path_buf(),
+            layout: layout.clone(),
             entries: Vec::new(),
             seen: HashSet::new(),
             created_dirs: Vec::new(),
@@ -43,7 +44,7 @@ impl Journal {
 
     /// Write `bytes` to `path`, recording its pre-image first.
     pub fn write(&mut self, path: &RelPath, bytes: &[u8], mode: Option<u32>) -> io::Result<()> {
-        let abs = path.under(&self.root);
+        let abs = self.layout.resolve(path);
         self.record(&abs)?;
         if let Some(parent) = abs.parent() {
             self.create_dirs(parent)?;
@@ -53,7 +54,7 @@ impl Journal {
 
     /// Remove `path` if it exists, recording its pre-image first.
     pub fn remove(&mut self, path: &RelPath) -> io::Result<()> {
-        let abs = path.under(&self.root);
+        let abs = self.layout.resolve(path);
         self.record(&abs)?;
         match std::fs::remove_file(&abs) {
             Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(()),
@@ -110,7 +111,7 @@ impl Journal {
     fn create_dirs(&mut self, dir: &Path) -> io::Result<()> {
         let missing: Vec<PathBuf> = dir
             .ancestors()
-            .take_while(|d| *d != self.root && !d.exists())
+            .take_while(|d| *d != self.layout.root() && !d.exists())
             .map(Path::to_path_buf)
             .collect();
         std::fs::create_dir_all(dir)?;

@@ -1,4 +1,4 @@
-//! Cursor emitter, project scope.
+//! Cursor emitter.
 //!
 //! Cursor content comes from the authored bundle the kit carries (maintainer
 //! decision 2026-11-11: the bundle is the Cursor overlay, as for Codex).
@@ -10,6 +10,10 @@
 //!   handler with `failClosed: true`;
 //! - agents keep only the frontmatter keys Cursor documents;
 //! - every rule must carry frontmatter that yields exactly one rule type.
+//!
+//! A global install writes `~/.cursor/` the same way, minus what Cursor has
+//! no user-level file for (rules, the core rule), and registers only the
+//! privacy read gate and the session context.
 mod frontmatter;
 mod hooks;
 
@@ -18,7 +22,7 @@ use crate::contract::{
     EmitError, EmitRequest, Emitter, Op, OwnershipIndex, Plan, RelPath, Runtime, Scope, ScopeKind,
 };
 use crate::kit_files::{self, rel};
-use crate::{report_gate, strip};
+use crate::{report_gate, scope, strip};
 use mewkit_core::plan::HookLayout;
 
 pub use hooks::{BLOCKING, HOOKS_JSON};
@@ -53,29 +57,28 @@ impl Emitter for Cursor {
         Runtime::Cursor
     }
 
-    fn roots(&self, scope: &Scope) -> Vec<RelPath> {
-        match scope.kind {
-            ScopeKind::Project => vec![RelPath::new(".cursor").expect("static root")],
-            ScopeKind::Global => vec![],
-        }
+    fn roots(&self, _scope: &Scope) -> Vec<RelPath> {
+        vec![RelPath::new(".cursor").expect("static root")]
     }
 
     fn prepare(&self, req: &EmitRequest<'_>) -> Result<Plan, EmitError> {
-        if req.scope.kind == ScopeKind::Global {
-            return Err(EmitError::Unsupported {
-                runtime: "cursor",
-                what: "global scope yet".into(),
-            });
-        }
+        let global = req.scope.kind == ScopeKind::Global;
+        let mut rules_left_out = 0;
         let bundle = Bundle::open(&req.kit.dir, &BUNDLE)?;
         let chosen = bundle.select(req.packs, req.disabled)?;
         let mut plan = Plan::default();
         for f in &bundle.files {
             let path = f.rel.as_str();
             let (path, bytes) = match path {
+                "AGENTS.md" | CORE_RULE if global => continue,
+                p if global && p.starts_with(".cursor/rules/") => {
+                    rules_left_out += 1;
+                    continue;
+                }
                 "AGENTS.md" => (CORE_RULE, core_rule(&kit_files::read_text(&f.abs)?)),
                 HOOKS_JSON => {
-                    plan.ops.extend(hooks::ops(&kit_files::read_text(&f.abs)?)?);
+                    plan.ops
+                        .extend(hooks::ops(&kit_files::read_text(&f.abs)?, global)?);
                     continue;
                 }
                 CORE_RULE => {
@@ -119,11 +122,17 @@ impl Emitter for Cursor {
                 "skill pack lists {missing}, which the Cursor bundle does not ship"
             ));
         }
-        if req.scope.root.join(".claude/skills").is_dir() {
-            plan.notices.push(
-                "this project also has .claude/skills, which Cursor reads too: skills may be listed twice".into(),
-            );
+        if global {
+            plan.notices.push(format!(
+                "Cursor reads no rules from ~/.cursor: the core rule and {rules_left_out} other rules apply only where MeowKit is installed in the project"
+            ));
         }
+        if req.scope.resolve(&rel(".claude/skills")?).is_dir() {
+            plan.notices
+                .push("Cursor also reads .claude/skills here: skills may be listed twice".into());
+        }
+        plan.notices
+            .extend(scope::privacy_elsewhere(req, HOOKS_JSON));
         plan.notices
             .extend(report_gate::check(&plan, DENIED, &[".cursor/"]));
         Ok(plan)

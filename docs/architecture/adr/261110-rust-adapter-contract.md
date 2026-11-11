@@ -89,6 +89,27 @@ rolls back; rollback restores pre-images and removes created files and empty cre
 After a commit, directories a removal left empty are pruned up to the scope root, so uninstall
 leaves no skeleton of the kit's tree.
 
+**Scopes and mounts.** Plan and index paths are always root-relative (`.claude/…`, `.codex/…`).
+A project scope resolves them under the project root. A global scope's root is the home
+directory, and each runtime directory (`.claude`, `.codex`, `.agents`, `.cursor`) is _mounted_
+at its real location: `CLAUDE_CONFIG_DIR` / `CODEX_HOME` when set (any absolute directory,
+inside home or not; a relative value is refused), symlinks resolved, Windows `\\?\` prefix
+dropped (`Scope::global`). The executor resolves paths through that `Layout`: the
+symlinked-parent check starts at the mount and refuses a mount that has become a link; pruning
+stops at the root for a mount inside it and at the mount for one outside it. The ownership
+index records the root-relative path, so its schema is unchanged; uninstalling after the
+variable moved acts at the new location, where the executor's hash check still guards
+deletion. Global content per runtime: Claude Code writes `agents/`, `skills/`, `rules/`,
+`hooks/` and merges only the privacy and SessionStart hooks into `settings.json`, with
+absolute script paths in `args`; Codex writes the bundle's `.codex/` tree to `CODEX_HOME`
+(its `AGENTS.md` guidance as a block in `<CODEX_HOME>/AGENTS.md`, never `~/AGENTS.md`; no
+`config.toml` keys), skills to `~/.agents/skills` with absolute script paths, and registers
+only the privacy hook with its quoted absolute path; Cursor writes `~/.cursor/` minus rules
+(it reads none from there; a notice says so) and registers the privacy read gate and the
+session context as `node ./hooks/…` (user hooks run from `~/.cursor`). When the same
+runtime's index at the other scope already owns a privacy hook, the plan says it will run at
+both scopes (`EmitRequest::other_scope`); both stay registered.
+
 Mutation paths, dry-run output and backup sets are _derived from the plan_ — they cannot drift,
 because there is nothing to keep in sync.
 

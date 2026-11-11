@@ -12,6 +12,7 @@ pub mod cursor;
 mod kit_files;
 pub mod registry;
 mod report_gate;
+mod scope;
 mod strip;
 
 pub use contract::{EmitError, EmitRequest, Emitter, Runtime, Scope, ScopeKind};

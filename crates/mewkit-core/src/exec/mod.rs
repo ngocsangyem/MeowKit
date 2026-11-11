@@ -11,6 +11,7 @@ use std::path::{Path, PathBuf};
 use crate::backup;
 use crate::fsx::{PathError, RelPath, check_parents, check_within, is_never_delete};
 use crate::journal::Journal;
+use crate::layout::{Layout, Mount};
 use crate::lock::{LockError, ScopeLock};
 use crate::ownership::OwnershipIndex;
 use crate::plan::Plan;
@@ -21,6 +22,9 @@ use decide::{Action, Record, decide};
 pub struct Scope {
     /// The project root, or the home directory for a global install.
     pub root: PathBuf,
+    /// Prefixes resolved outside `root` (a global runtime directory
+    /// elsewhere); empty for a project.
+    pub mounts: Vec<Mount>,
     /// The only places this target's ops may touch.
     pub roots: Vec<RelPath>,
     /// The ownership index file, e.g. `.meowkit/state/ownership/codex.json`.
@@ -61,9 +65,10 @@ pub fn execute(
     kit_hash: &dyn Fn(&RelPath) -> Option<String>,
     opts: ExecOptions,
 ) -> Result<EmitReport, ExecError> {
+    let layout = Layout::new(&scope.root, scope.mounts.clone());
     for op in &plan.ops {
         check_within(op.path(), &scope.roots)?;
-        check_parents(&scope.root, op.path())?;
+        layout.check_parents(op.path())?;
         // User and machine state is off limits to every op, not only removals.
         if is_never_delete(op.path()) {
             return Err(PathError::NeverDelete(op.path().to_string()).into());
@@ -85,7 +90,7 @@ pub fn execute(
     for op in &plan.ops {
         let current = match pending.get(op.path()) {
             Some(bytes) => bytes.clone(),
-            None => read_opt(&op.path().under(&scope.root))?,
+            None => read_opt(&layout.resolve(op.path()))?,
         };
         let d = decide(op, current, &work, kit_hash, opts.force)?;
         match &d.action {
@@ -131,14 +136,10 @@ pub fn execute(
         let action = action.to_owned();
         move |source| ExecError::Io { action, source }
     };
-    report.backup = backup::take(
-        &scope.root,
-        &changing,
-        &scope.backups_dir.under(&scope.root),
-    )
-    .map_err(io("backup"))?;
+    report.backup = backup::take(&layout, &changing, &scope.backups_dir.under(&scope.root))
+        .map_err(io("backup"))?;
 
-    let mut journal = Journal::new(&scope.root);
+    let mut journal = Journal::new(&layout);
     for d in &decisions {
         match &d.action {
             Action::Write { bytes, mode } => journal
@@ -168,17 +169,19 @@ pub fn execute(
         .iter()
         .filter(|d| matches!(d.action, Action::Remove))
     {
-        prune_empty_parents(&scope.root, &d.path);
+        prune_empty_parents(&layout, &d.path);
     }
     *index = work;
     Ok(report)
 }
 
 /// After a removal, take out the directories it left empty, innermost first,
-/// stopping at the first one that still holds anything. Best effort: the
-/// install is already committed, and an empty directory left behind is harmless.
-fn prune_empty_parents(root: &Path, path: &RelPath) {
-    let mut dir = path.under(root);
+/// stopping at the first one that still holds anything and never reaching
+/// [`Layout::prune_floor`]. Best effort: the install is already committed,
+/// and an empty directory left behind is harmless.
+fn prune_empty_parents(layout: &Layout, path: &RelPath) {
+    let root = layout.prune_floor(path);
+    let mut dir = layout.resolve(path);
     while dir.pop() && dir != root && dir.starts_with(root) {
         if std::fs::remove_dir(&dir).is_err() {
             break;

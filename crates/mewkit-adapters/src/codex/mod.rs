@@ -1,11 +1,12 @@
-//! Codex emitter, project scope.
+//! Codex emitter.
 //!
 //! Codex content comes from the authored bundle the kit carries (maintainer
 //! decision 2026-11-11: the bundle is the Codex overlay; nothing is projected
 //! from `.claude/`). Files map 1:1 onto the project, with three exceptions the
 //! user may own as well: `AGENTS.md` gets a marked block, `.codex/hooks.json`
 //! gets hook handlers and `.codex/config.toml` gets keys, each recorded so
-//! uninstall takes out only what the kit added.
+//! uninstall takes out only what the kit added. Global scope: see [`global`].
+mod global;
 mod rewrite;
 mod shared;
 
@@ -16,7 +17,7 @@ use crate::contract::{
     EmitError, EmitRequest, Emitter, Op, OwnershipIndex, Plan, RelPath, Runtime, Scope, ScopeKind,
 };
 use crate::kit_files::{self, rel};
-use crate::{report_gate, strip};
+use crate::{report_gate, scope, strip};
 
 /// The authored Codex bundle in the kit.
 pub const BUNDLE: Spec = Spec {
@@ -54,17 +55,27 @@ impl Emitter for Codex {
                 .iter()
                 .map(|r| RelPath::new(r).expect("static root"))
                 .collect(),
-            ScopeKind::Global => vec![],
+            ScopeKind::Global => [".agents/skills", ".codex"]
+                .iter()
+                .map(|r| RelPath::new(r).expect("static root"))
+                .collect(),
         }
     }
 
     fn prepare(&self, req: &EmitRequest<'_>) -> Result<Plan, EmitError> {
-        if req.scope.kind == ScopeKind::Global {
-            return Err(EmitError::Unsupported {
-                runtime: "codex",
-                what: "global scope yet".into(),
-            });
-        }
+        let global = (req.scope.kind == ScopeKind::Global).then_some(req.scope);
+        let agents_md = if global.is_some() {
+            global::AGENTS_MD
+        } else {
+            AGENTS_MD
+        };
+        let anchor = |p: &str, quoted: bool| match global {
+            None => format!(".agents/skills/{p}"),
+            Some(scope) => {
+                let path = RelPath::new(&format!(".agents/skills/{p}")).expect("kit path");
+                global::quote_in(&scope.resolve(&path), cfg!(windows), quoted)
+            }
+        };
         let bundle = Bundle::open(&req.kit.dir, &BUNDLE)?;
         let chosen = bundle.select(req.packs, req.disabled)?;
         let mut skill_files: BTreeMap<&str, BTreeSet<String>> = BTreeMap::new();
@@ -78,8 +89,15 @@ impl Emitter for Codex {
         let mut ops = Vec::new();
         for f in &bundle.files {
             match f.rel.as_str() {
-                AGENTS_MD => ops.push(shared::agents_md(&kit_files::read_text(&f.abs)?)?),
-                HOOKS_JSON => ops.extend(shared::hooks_json(&kit_files::read_text(&f.abs)?)?),
+                AGENTS_MD => ops.push(shared::agents_md(
+                    &kit_files::read_text(&f.abs)?,
+                    agents_md,
+                )?),
+                HOOKS_JSON => {
+                    ops.extend(shared::hooks_json(&kit_files::read_text(&f.abs)?, global)?)
+                }
+                // Project settings (`project_doc_max_bytes`); a global install leaves the user's config alone.
+                CONFIG_TOML if global.is_some() => {}
                 CONFIG_TOML => ops.push(shared::config_toml(&kit_files::read_text(&f.abs)?)?),
                 path => {
                     let skill = bundle.skill_of(path);
@@ -89,7 +107,8 @@ impl Emitter for Codex {
                     let mut bytes = kit_files::read(&f.abs)?;
                     if let Some(s) = skill
                         && let Ok(text) = std::str::from_utf8(&bytes)
-                        && let Some(anchored) = rewrite::root_anchor(text, s, &skill_files[s])
+                        && let Some(anchored) =
+                            rewrite::root_anchor(text, s, &skill_files[s], &anchor)
                     {
                         bytes = anchored.into_bytes();
                     }
@@ -112,9 +131,13 @@ impl Emitter for Codex {
                 "skill pack lists {missing}, which the Codex bundle does not ship"
             ));
         }
-        plan.notices.push(
-            "Codex reads .codex/hooks.json and .codex/config.toml only after you trust this project".into(),
-        );
+        if global.is_none() {
+            plan.notices.push(
+                "Codex reads .codex/hooks.json and .codex/config.toml only after you trust this project".into(),
+            );
+        }
+        plan.notices
+            .extend(scope::privacy_elsewhere(req, HOOKS_JSON));
         plan.notices
             .extend(report_gate::check(&plan, DENIED, INSTALLED_PREFIXES));
         Ok(plan)
