@@ -16,3 +16,9 @@ unsafe_code = "forbid"
 
 [workspace.lints.clippy]
 all = { level = "warn", priority = -1 }
+
+# The published binaries: one optimised, stripped static artifact per target.
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

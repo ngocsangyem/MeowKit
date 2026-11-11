@@ -1,5 +1,6 @@
 //! Shared helpers for `mewkit-cli` integration tests.
 #![allow(dead_code)]
+pub mod release;
 pub mod temp_home;
 
 /// The adapters' kit builder and tree hashing, shared rather than copied.

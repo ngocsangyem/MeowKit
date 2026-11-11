@@ -24,5 +24,7 @@ toml_edit = "0.25.19"
 workspace = true
 
 [dev-dependencies]
+flate2 = "1.1.11"
+tar = { version = "0.4", default-features = false }
 tempfile = "3.27.0"
 zip = { version = "9.5.0", default-features = false, features = ["deflate"] }

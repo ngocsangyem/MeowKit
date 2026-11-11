@@ -72,7 +72,7 @@ impl Manifest {
 }
 
 /// `1.2.3` or `1.2.3-beta.1`, with or without a leading `v`.
-pub fn version(v: &str) -> Option<Version> {
+pub(crate) fn version(v: &str) -> Option<Version> {
     Version::parse(&format!("v{}", v.strip_prefix('v').unwrap_or(v)))
 }
 
