@@ -108,16 +108,24 @@ fn asset<'a>(r: &'a Release, name: &str) -> Option<&'a str> {
 }
 
 /// `vMAJOR.MINOR.PATCH[-pre]`. Field order is the sort order: a release
-/// (`release: true`) beats every prerelease of the same core version.
+/// (`release: true`) beats every prerelease of the same core version, and
+/// prerelease identifiers compare as semver says (`beta.10` above `beta.2`).
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub(super) struct Version {
+pub(crate) struct Version {
     core: (u64, u64, u64),
     release: bool,
-    pre: String,
+    pre: Vec<Ident>,
+}
+
+/// One dot-separated prerelease identifier; numeric ones sort first.
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+enum Ident {
+    Num(u64),
+    Alpha(String),
 }
 
 impl Version {
-    pub(super) fn parse(tag: &str) -> Option<Self> {
+    pub(crate) fn parse(tag: &str) -> Option<Self> {
         let rest = tag.strip_prefix('v')?;
         let (core, pre) = rest.split_once('-').unwrap_or((rest, ""));
         let mut nums = core.split('.').map(|n| n.parse::<u64>().ok());
@@ -128,8 +136,19 @@ impl Version {
         Some(Self {
             core,
             release: pre.is_empty(),
-            pre: pre.to_owned(),
+            pre: pre
+                .split('.')
+                .filter(|i| !i.is_empty())
+                .map(|i| {
+                    i.parse()
+                        .map_or_else(|_| Ident::Alpha(i.to_owned()), Ident::Num)
+                })
+                .collect(),
         })
+    }
+
+    pub(crate) fn is_release(&self) -> bool {
+        self.release
     }
 }
 

@@ -15,8 +15,8 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 
 use commands::{
-    doctor::DoctorArgs, init::InitArgs, providers::ProvidersArgs, uninstall::UninstallArgs,
-    upgrade::UpgradeArgs, versions::VersionsArgs,
+    doctor::DoctorArgs, init::InitArgs, providers::ProvidersArgs, self_update::SelfUpdateArgs,
+    uninstall::UninstallArgs, upgrade::UpgradeArgs, versions::VersionsArgs,
 };
 use failure::Failure;
 
@@ -47,6 +47,8 @@ enum Command {
     Providers(ProvidersArgs),
     /// Kits installed, cached and available, and the supported kit contract.
     Versions(VersionsArgs),
+    /// Replace this binary with the newest release (SHA-256 verified).
+    SelfUpdate(SelfUpdateArgs),
     /// Any command this binary does not implement yet.
     #[command(external_subcommand)]
     NotPorted(Vec<String>),
@@ -60,6 +62,7 @@ fn main() -> ExitCode {
         Command::Doctor(args) => commands::doctor::run(&args),
         Command::Providers(args) => commands::providers::run(&args),
         Command::Versions(args) => commands::versions::run(&args),
+        Command::SelfUpdate(args) => commands::self_update::run(&args),
         Command::NotPorted(argv) => {
             let name = argv.first().map(String::as_str).unwrap_or_default();
             Err(Failure::usage(format!(
