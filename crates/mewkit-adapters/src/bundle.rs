@@ -1,4 +1,5 @@
-//! The authored Codex bundle the kit carries, and which of its skills to install.
+//! An authored runtime bundle the kit carries (Codex, Cursor), and which of
+//! its skills to install.
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
@@ -7,23 +8,31 @@ use serde_json::Value;
 use crate::contract::EmitError;
 use crate::kit_files::{self, KitFile};
 
-/// Where the kit artifact carries the bundle (its source path in the repo).
-pub const BUNDLE: &str = "packages/mewkit/src/migrate/modules/codex";
-const SKILLS: &str = ".agents/skills/";
+/// Where a runtime's bundle sits in the kit and how it lays out skills.
+pub struct Spec {
+    /// The runtime's display name, for errors.
+    pub runtime: &'static str,
+    /// The bundle's source path in the repo, which the kit artifact keeps.
+    pub dir: &'static str,
+    /// Where skill directories live inside `root`, with a trailing `/`.
+    pub skills: &'static str,
+}
 
 pub struct Bundle {
+    pub spec: &'static Spec,
     /// Files of `<kit>/<BUNDLE>/root`; their paths map 1:1 onto project paths.
     pub files: Vec<KitFile>,
     catalog: Option<Value>,
 }
 
 impl Bundle {
-    pub fn open(kit_dir: &Path) -> Result<Self, EmitError> {
-        let base = kit_dir.join(BUNDLE);
+    pub fn open(kit_dir: &Path, spec: &'static Spec) -> Result<Self, EmitError> {
+        let base = kit_dir.join(spec.dir);
         let root = base.join("root");
         if !root.is_dir() {
             return Err(EmitError::Kit(format!(
-                "the kit has no Codex bundle at {BUNDLE}/root (kit too old for mewkit-next?)"
+                "the kit has no {} bundle at {}/root (kit too old for mewkit-next?)",
+                spec.runtime, spec.dir
             )));
         }
         let packs = base.join("catalog/skill-packs.json");
@@ -36,6 +45,7 @@ impl Bundle {
             None
         };
         Ok(Self {
+            spec,
             files: kit_files::walk(&root)?,
             catalog,
         })
@@ -43,12 +53,22 @@ impl Bundle {
 
     /// Every skill directory name in the bundle.
     pub fn skills(&self) -> BTreeSet<&str> {
-        self.files.iter().filter_map(|f| skill_of(&f.rel)).collect()
+        self.files
+            .iter()
+            .filter_map(|f| self.skill_of(&f.rel))
+            .collect()
     }
 
     /// Skills to install. No packs: every skill, as the npm CLI installs today.
     /// Packs: the default pack, the named packs and their `dependsOn`, closed.
     /// `disabled` names skills by bundle name (`mk-x`) or kit name (`x`).
+    /// The skill directory `rel` belongs to, if it is inside one.
+    pub fn skill_of<'a>(&self, rel: &'a str) -> Option<&'a str> {
+        rel.strip_prefix(self.spec.skills)?
+            .split_once('/')
+            .map(|(s, _)| s)
+    }
+
     pub fn select(
         &self,
         packs: &[String],
@@ -69,7 +89,10 @@ impl Bundle {
 
     fn pack_skills(&self, packs: &[String]) -> Result<BTreeSet<String>, EmitError> {
         let catalog = self.catalog.as_ref().ok_or_else(|| {
-            EmitError::Kit("packs requested but the kit has no Codex pack catalog".into())
+            EmitError::Kit(format!(
+                "packs requested but the kit has no {} pack catalog",
+                self.spec.runtime
+            ))
         })?;
         let table: BTreeMap<&str, &Value> = catalog["packs"]
             .as_object()
@@ -87,9 +110,9 @@ impl Bundle {
             if !seen.insert(name.clone()) {
                 continue;
             }
-            let pack = table
-                .get(name.as_str())
-                .ok_or_else(|| EmitError::Kit(format!("unknown Codex skill pack {name:?}")))?;
+            let pack = table.get(name.as_str()).ok_or_else(|| {
+                EmitError::Kit(format!("unknown {} skill pack {name:?}", self.spec.runtime))
+            })?;
             for s in pack["skills"].as_array().into_iter().flatten() {
                 skills.insert(s.as_str().unwrap_or_default().to_owned());
             }
@@ -99,9 +122,4 @@ impl Bundle {
         }
         Ok(skills)
     }
-}
-
-/// The skill directory a bundle path belongs to, if it is under `.agents/skills/`.
-pub fn skill_of(rel: &str) -> Option<&str> {
-    rel.strip_prefix(SKILLS)?.split_once('/').map(|(s, _)| s)
 }

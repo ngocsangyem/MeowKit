@@ -12,7 +12,7 @@ use crate::contract::{
 };
 use crate::kit_files::{self, rel};
 use crate::strip;
-use mewkit_core::plan::Handler;
+use mewkit_core::plan::{Handler, HookLayout};
 
 pub const SETTINGS: &str = ".claude/settings.json";
 
@@ -61,7 +61,9 @@ impl Emitter for ClaudeCode {
     }
 
     fn plan_strip(&self, scope: &Scope, owned: &OwnershipIndex) -> Result<Plan, EmitError> {
-        strip::plan_from_index(&self.roots(scope), owned, |f| f == SETTINGS)
+        strip::plan_from_index(&self.roots(scope), owned, |f| {
+            (f == SETTINGS).then_some(HookLayout::Grouped)
+        })
     }
 }
 
@@ -101,6 +103,7 @@ fn settings(text: &str, plan: &mut Plan) -> Result<(), EmitError> {
                             path: path.clone(),
                             event: event.clone(),
                             handlers,
+                            layout: HookLayout::Grouped,
                         });
                     }
                 }

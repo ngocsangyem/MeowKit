@@ -190,7 +190,7 @@ fn packs_select_the_default_pack_and_its_dependencies() {
     assert!(written(&all).count() > written(&plan).count());
     assert!(
         kit.dir
-            .join(BUNDLE)
+            .join(BUNDLE.dir)
             .join("catalog/skill-packs.json")
             .is_file()
     );

@@ -166,6 +166,12 @@ pub(super) fn decide(
             .map_err(|e| merge_err(&path, e))?;
             let id = key.join(".");
             let prior = sections.and_then(|s| s.get(&id));
+            // An entry the user already had with the kit's value stays theirs,
+            // unless an earlier install of the kit is what put it there.
+            let names = names
+                .into_iter()
+                .filter(|n| !out.already.contains(n) || prior.is_some_and(|p| p.names.contains(n)))
+                .collect();
             let section = Section {
                 format: *format,
                 key: key.clone(),
@@ -217,7 +223,10 @@ pub(super) fn decide(
             }
         }
         Op::MergeHooks {
-            event, handlers, ..
+            event,
+            handlers,
+            layout,
+            ..
         } => {
             let id = hooks_section_id(event);
             let prior = sections.and_then(|s| s.get(&id));
@@ -230,11 +239,11 @@ pub(super) fn decide(
             // first, or an upgrade would leave them pointing at removed scripts.
             let base = match stale(prior, &names) {
                 gone if gone.is_empty() => text()?,
-                gone => hook_groups::strip(&text()?, event, &gone, 0)
+                gone => hook_groups::strip(&text()?, event, &gone, 0, *layout)
                     .map_err(|e| merge_err(&path, e))?,
             };
-            let out =
-                hook_groups::merge(&base, event, handlers).map_err(|e| merge_err(&path, e))?;
+            let out = hook_groups::merge(&base, event, handlers, *layout)
+                .map_err(|e| merge_err(&path, e))?;
             // `hooks` is created by the first event merged into the file; later
             // events inherit that, so whichever is stripped last removes it.
             let hooks_created = sections.is_some_and(|s| {
@@ -263,7 +272,9 @@ pub(super) fn decide(
                 Record::AddSection(id, section),
             )
         }
-        Op::StripHooks { event, ids, .. } => {
+        Op::StripHooks {
+            event, ids, layout, ..
+        } => {
             let id = hooks_section_id(event);
             match sections.and_then(|s| s.get(&id)) {
                 None => (
@@ -271,7 +282,7 @@ pub(super) fn decide(
                     Record::None,
                 ),
                 Some(sec) => {
-                    let stripped = hook_groups::strip(&text()?, event, ids, sec.created)
+                    let stripped = hook_groups::strip(&text()?, event, ids, sec.created, *layout)
                         .map_err(|e| merge_err(&path, e))?;
                     (
                         strip_action(&current, stripped, sec, "{}\n"),

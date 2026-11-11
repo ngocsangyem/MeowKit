@@ -42,13 +42,18 @@ function kitMeowkitTargets() {
 }
 
 /**
- * The Codex bundle the npm CLI installs today. `mewkit-next` installs Codex from
- * the kit artifact, so the kit carries the bundle at its source path rather than
- * a second copy that would drift from it. It sits outside `.claude/` on purpose:
- * a Claude Code install copies `.claude/` whole, and must not lay down Codex files.
+ * The Codex and Cursor bundles the npm CLI installs today. `mewkit-next` installs
+ * both runtimes from the kit artifact, so the kit carries each bundle at its
+ * source path rather than a second copy that would drift from it. They sit
+ * outside `.claude/` on purpose: a Claude Code install copies `.claude/` whole,
+ * and must not lay down Codex or Cursor files.
  */
 const CODEX_BUNDLE = "packages/mewkit/src/migrate/modules/codex";
-const RUNTIME_BUNDLE_TARGETS = [`${CODEX_BUNDLE}/root`, `${CODEX_BUNDLE}/catalog/skill-packs.json`];
+const CURSOR_BUNDLE = "packages/mewkit/src/migrate/modules/cursor";
+const RUNTIME_BUNDLE_TARGETS = [CODEX_BUNDLE, CURSOR_BUNDLE].flatMap((b) => [
+	`${b}/root`,
+	`${b}/catalog/skill-packs.json`,
+]);
 
 /**
  * The archive roots a published kit is built from, in a fixed order.
@@ -187,6 +192,7 @@ function zipExcludeArgs(patterns) {
 module.exports = {
 	ARCHIVE_TARGETS,
 	CODEX_BUNDLE,
+	CURSOR_BUNDLE,
 	CRITICAL_TARGETS,
 	KIT_MEOWKIT_FILES,
 	excludeMatcher,

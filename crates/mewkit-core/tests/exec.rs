@@ -442,6 +442,7 @@ fn hooks_op(commands: &[&str]) -> Op {
     Op::MergeHooks {
         path: rel(".codex/hooks.json"),
         event: "PreToolUse".into(),
+        layout: mewkit_core::plan::HookLayout::Grouped,
         handlers: commands
             .iter()
             .map(|c| mewkit_core::plan::Handler {
@@ -500,6 +501,7 @@ fn an_upgrade_takes_out_hooks_and_entries_the_new_kit_dropped() {
             Op::StripHooks {
                 path: rel(".codex/hooks.json"),
                 event: "PreToolUse".into(),
+                layout: mewkit_core::plan::HookLayout::Grouped,
                 ids: index.sections[".codex/hooks.json"]["hooks.PreToolUse"]
                     .names
                     .clone(),
@@ -523,5 +525,119 @@ fn an_upgrade_takes_out_hooks_and_entries_the_new_kit_dropped() {
     assert!(
         !dir.path().join(".codex/config.toml").exists(),
         "kit-created file goes when empty"
+    );
+}
+
+#[test]
+fn an_entry_the_user_already_had_with_the_kits_value_survives_uninstall() {
+    let dir = tempfile::tempdir().unwrap();
+    let s = scope(dir.path());
+    let user = "{\n  \"version\": 1,\n  \"mine\": true\n}\n";
+    std::fs::create_dir_all(dir.path().join(".codex")).unwrap();
+    std::fs::write(dir.path().join(".codex/x.json"), user).unwrap();
+    let mut index = OwnershipIndex::new("1", "1", Origin::LocalDir);
+    let no_kit = |_: &RelPath| None;
+    let entries = json!({"version": 1, "kit": 2}).as_object().unwrap().clone();
+    let install = Plan {
+        ops: vec![Op::MergeEntries {
+            path: rel(".codex/x.json"),
+            format: Format::Json,
+            key: vec![],
+            entries,
+        }],
+        ..Plan::default()
+    };
+    // Twice: a re-merge must not start claiming the user's entry either.
+    for _ in 0..2 {
+        execute(&install, &s, &mut index, &no_kit, ExecOptions::default()).unwrap();
+    }
+    assert_eq!(index.sections[".codex/x.json"][""].names, ["kit"]);
+    let strip = Plan {
+        ops: vec![Op::StripEntries {
+            path: rel(".codex/x.json"),
+            format: Format::Json,
+            key: vec![],
+            names: index.sections[".codex/x.json"][""].names.clone(),
+        }],
+        ..Plan::default()
+    };
+    execute(&strip, &s, &mut index, &no_kit, ExecOptions::default()).unwrap();
+    assert_eq!(
+        std::fs::read_to_string(dir.path().join(".codex/x.json")).unwrap(),
+        user
+    );
+}
+
+fn flat_hooks_op(commands: &[&str]) -> Op {
+    Op::MergeHooks {
+        path: rel(".codex/flat.json"),
+        event: "preToolUse".into(),
+        layout: mewkit_core::plan::HookLayout::Flat,
+        handlers: commands
+            .iter()
+            .map(|c| mewkit_core::plan::Handler {
+                matcher: None,
+                handler: json!({"command": c, "failClosed": true}),
+            })
+            .collect(),
+    }
+}
+
+#[test]
+fn a_flat_upgrade_drops_the_old_handler_and_uninstall_restores_the_user_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let s = scope(dir.path());
+    let user = "{\n  \"version\": 1,\n  \"hooks\": {\n    \"preToolUse\": [\n      {\n        \"command\": \"mine\"\n      }\n    ]\n  }\n}\n";
+    std::fs::create_dir_all(dir.path().join(".codex")).unwrap();
+    std::fs::write(dir.path().join(".codex/flat.json"), user).unwrap();
+    let mut index = OwnershipIndex::new("1", "1", Origin::LocalDir);
+    let no_kit = |_: &RelPath| None;
+    for ops in [flat_hooks_op(&["old", "kept"]), flat_hooks_op(&["kept"])] {
+        let plan = Plan {
+            ops: vec![ops],
+            ..Plan::default()
+        };
+        execute(&plan, &s, &mut index, &no_kit, ExecOptions::default()).unwrap();
+    }
+    let text = std::fs::read_to_string(dir.path().join(".codex/flat.json")).unwrap();
+    assert!(
+        !text.contains("\"old\"") && text.contains("\"kept\""),
+        "{text}"
+    );
+
+    let strip = Plan {
+        ops: vec![Op::StripHooks {
+            path: rel(".codex/flat.json"),
+            event: "preToolUse".into(),
+            layout: mewkit_core::plan::HookLayout::Flat,
+            ids: index.sections[".codex/flat.json"]["hooks.preToolUse"]
+                .names
+                .clone(),
+        }],
+        ..Plan::default()
+    };
+    execute(&strip, &s, &mut index, &no_kit, ExecOptions::default()).unwrap();
+    assert_eq!(
+        std::fs::read_to_string(dir.path().join(".codex/flat.json")).unwrap(),
+        user
+    );
+}
+
+#[test]
+fn a_toml_entry_the_user_already_had_is_not_claimed() {
+    let dir = tempfile::tempdir().unwrap();
+    let s = scope(dir.path());
+    let user = "[mcp_servers.kept]\ncommand = \"node\"\n";
+    std::fs::create_dir_all(dir.path().join(".codex")).unwrap();
+    std::fs::write(dir.path().join(".codex/config.toml"), user).unwrap();
+    let mut index = OwnershipIndex::new("1", "1", Origin::LocalDir);
+    let plan = Plan {
+        ops: vec![entries_op(&["kept", "kit"])],
+        ..Plan::default()
+    };
+    execute(&plan, &s, &mut index, &|_| None, ExecOptions::default()).unwrap();
+    assert_eq!(
+        index.sections[".codex/config.toml"]["mcp_servers"].names,
+        ["kit"]
     );
 }

@@ -55,11 +55,14 @@ ends when `prepare` returns.
 
 `Op::{ WriteFile{path,bytes,mode}, RemoveFile{path}, MergeBlock{path,id,content},
 StripBlock{path,id}, MergeEntries{path,format,key,entries},
-StripEntries{path,format,key,names}, MergeHooks{path,event,handlers},
-StripHooks{path,event,ids} }`. Blocks are Markdown only, so they carry no format;
-entries are JSON or TOML. Hooks are the `hooks.<event>` array of groups shared by Claude Code
-`settings.json` and Codex `hooks.json`: named entries cannot express an array, so a kit handler
-joins the user's group with the same matcher (a user handler identical to a kit one is
+StripEntries{path,format,key,names}, MergeHooks{path,event,handlers,layout},
+StripHooks{path,event,ids,layout} }`. Blocks are Markdown only, so they carry no format;
+entries are JSON or TOML. An entry the user already had with the kit's value is not recorded,
+so uninstall leaves it (a user's `"version": 1` in Cursor's `hooks.json` survives). Hooks are
+the `hooks.<event>` array: `Grouped` (groups of `{matcher, hooks: [...]}`, Claude Code
+`settings.json` and Codex `hooks.json`) or `Flat` (handlers directly, each with its own
+`matcher`, Cursor `hooks.json`). Named entries cannot express an array, so a kit handler
+joins the user's group with the same matcher (or sits beside the user's handlers when flat) (a user handler identical to a kit one is
 adopted as the kit's, which is what migrating from an npm CLI install needs), identified by matcher plus command line
 (`command` and `args` — every Claude Code handler is `"command": "node"`), and is recorded as a
 `Section` keyed `hooks.<event>`. Split by **file ownership**: `WriteFile` / `RemoveFile`
@@ -188,7 +191,16 @@ agent, so there is no consumer. Adding them is Ask-first.
   cannot drift. The emitter adds skill-pack selection, root-anchored script commands, merged
   `AGENTS.md` / `hooks.json` / `config.toml`, and a post-plan report of Claude-only tokens and
   installed paths the text names but the plan does not write. The neutral hook manifest above
-  is first needed by the Cursor emitter.
+  is not built: the Cursor emitter installs its authored bundle the same way.
+- **Cursor content (maintainer decision, 2026-11-11).** As for Codex, the Cursor emitter installs
+  the authored bundle (`packages/mewkit/src/migrate/modules/cursor/root`), shipped in the kit at
+  that path. It writes nothing at the project's `AGENTS.md` (left to the user and to the Codex
+  install): the bundle's `AGENTS.md` becomes the always-applied rule
+  `.cursor/rules/meowkit-core.mdc`. `.cursor/hooks.json` is merged flat, and every handler on an
+  event that can deny (`preToolUse`, `subagentStart`, `before*`) is installed with
+  `failClosed: true`, overriding the bundle where it says `false`: a crashed gate must block.
+  Agents keep only the five frontmatter keys Cursor documents; a rule whose frontmatter yields
+  more than one rule type fails the plan.
 - Capabilities no manifest shape can express (Codex has no read-tool hook, no tool-failure
   event) stay runtime gaps: reported in `Plan.unsupported` and surfaced by `doctor`.
 - Kit integrity is a checksum, not a signature: anyone able to publish a release in this

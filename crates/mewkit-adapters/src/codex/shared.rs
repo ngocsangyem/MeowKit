@@ -4,7 +4,7 @@ use toml_edit::{DocumentMut, Item};
 
 use crate::contract::{EmitError, Format, Op};
 use crate::kit_files::rel;
-use mewkit_core::plan::Handler;
+use mewkit_core::plan::{Handler, HookLayout};
 
 pub const AGENTS_MD: &str = "AGENTS.md";
 pub const HOOKS_JSON: &str = ".codex/hooks.json";
@@ -61,6 +61,7 @@ pub fn hooks_json(text: &str) -> Result<Vec<Op>, EmitError> {
             path: rel(HOOKS_JSON)?,
             event: event.clone(),
             handlers,
+            layout: HookLayout::Grouped,
         });
     }
     Ok(ops)

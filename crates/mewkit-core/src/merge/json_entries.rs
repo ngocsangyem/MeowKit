@@ -27,18 +27,19 @@ pub fn merge(
         node = obj.get_mut(*k).expect("just ensured");
     }
     let target = node.as_object_mut().ok_or_else(|| not_object(key))?;
-    let mut replaced = Vec::new();
+    let (mut replaced, mut already) = (Vec::new(), Vec::new());
     for (name, value) in entries {
-        if let Some(old) = target.insert(name.clone(), value.clone())
-            && &old != value
-        {
-            replaced.push(name.clone());
+        match target.insert(name.clone(), value.clone()) {
+            Some(old) if &old == value => already.push(name.clone()),
+            Some(_) => replaced.push(name.clone()),
+            None => {}
         }
     }
     Ok(EntriesMerged {
         text: render(&doc),
         created,
         replaced,
+        already,
     })
 }
 

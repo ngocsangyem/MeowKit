@@ -32,13 +32,15 @@ pub fn merge(
             .and_then(Item::as_table_mut)
             .ok_or_else(|| not_table(&key[..=depth]))?;
     }
-    let mut replaced = Vec::new();
+    let (mut replaced, mut already) = (Vec::new(), Vec::new());
     for (name, value) in entries {
         let item = to_item(value)?;
-        if let Some(old) = table.get(name)
-            && old.to_string().trim() != item.to_string().trim()
-        {
-            replaced.push(name.clone());
+        if let Some(old) = table.get(name) {
+            if old.to_string().trim() == item.to_string().trim() {
+                already.push(name.clone());
+            } else {
+                replaced.push(name.clone());
+            }
         }
         table.insert(name, item);
     }
@@ -46,6 +48,7 @@ pub fn merge(
         text: doc.to_string(),
         created,
         replaced,
+        already,
     })
 }
 
