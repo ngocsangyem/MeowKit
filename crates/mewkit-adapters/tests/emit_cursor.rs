@@ -117,6 +117,8 @@ fn rules_and_agents_carry_only_what_cursor_reads() {
     let mut agents = 0;
     for (path, text) in texts(&plan).filter(|(p, _)| p.starts_with(".cursor/agents/")) {
         agents += 1;
+        // A Windows checkout has CRLF; agents with nothing to drop pass through as is.
+        let text = text.replace("\r\n", "\n");
         let front = text.split("\n---\n").next().unwrap();
         for line in front.lines().skip(1).filter(|l| !l.starts_with([' ', '-'])) {
             let key = line.split(':').next().unwrap();
