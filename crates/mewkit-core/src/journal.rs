@@ -44,6 +44,7 @@ impl Journal {
 
     /// Write `bytes` to `path`, recording its pre-image first.
     pub fn write(&mut self, path: &RelPath, bytes: &[u8], mode: Option<u32>) -> io::Result<()> {
+        fault::point();
         let abs = self.layout.resolve(path);
         self.record(&abs)?;
         if let Some(parent) = abs.parent() {
@@ -54,6 +55,7 @@ impl Journal {
 
     /// Remove `path` if it exists, recording its pre-image first.
     pub fn remove(&mut self, path: &RelPath) -> io::Result<()> {
+        fault::point();
         let abs = self.layout.resolve(path);
         self.record(&abs)?;
         match std::fs::remove_file(&abs) {
@@ -142,3 +144,26 @@ fn file_mode(_path: &Path) -> io::Result<Option<u32>> {
 #[cfg(test)]
 #[path = "journal_tests.rs"]
 mod tests;
+
+/// Crash injection for the interrupted-run tests: a debug build with
+/// `MEWKIT_NEXT_FAULT_AFTER=n` aborts the process just before its (n+1)th
+/// change to disk, as a power cut would. Release builds compile it out.
+mod fault {
+    #[cfg(debug_assertions)]
+    pub fn point() {
+        use std::sync::atomic::{AtomicU64, Ordering};
+        static DONE: AtomicU64 = AtomicU64::new(0);
+        let Some(limit) = std::env::var("MEWKIT_NEXT_FAULT_AFTER")
+            .ok()
+            .and_then(|v| v.parse::<u64>().ok())
+        else {
+            return;
+        };
+        if DONE.fetch_add(1, Ordering::SeqCst) >= limit {
+            std::process::abort();
+        }
+    }
+
+    #[cfg(not(debug_assertions))]
+    pub fn point() {}
+}

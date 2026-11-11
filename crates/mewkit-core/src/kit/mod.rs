@@ -13,6 +13,7 @@ mod select;
 
 use std::path::{Path, PathBuf};
 
+pub use checksum::expected_for;
 pub use contract::KitContract;
 pub use select::{ARCHIVE_NAME, CHECKSUMS_NAME, Release};
 

@@ -3,12 +3,18 @@
 //! behaviour itself belongs in `mewkit-core` and `mewkit-adapters`.
 #![forbid(unsafe_code)]
 
+mod commands;
+mod failure;
+mod kit_args;
+mod output;
+mod place;
+
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 
-/// Exit code for a usage error, matching clap's own usage-error code.
-const EXIT_USAGE: u8 = 2;
+use commands::{init::InitArgs, uninstall::UninstallArgs, upgrade::UpgradeArgs};
+use failure::Failure;
 
 #[derive(Parser)]
 #[command(
@@ -25,20 +31,35 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Install the kit into this project, or your home with --global.
+    Init(InitArgs),
+    /// Move the installed runtimes to a newer kit, keeping your edits.
+    Upgrade(UpgradeArgs),
+    /// Remove the kit again (shows what would go unless --yes).
+    Uninstall(UninstallArgs),
     /// Any command this binary does not implement yet.
     #[command(external_subcommand)]
     NotPorted(Vec<String>),
 }
 
 fn main() -> ExitCode {
-    match Cli::parse().command {
+    let result = match Cli::parse().command {
+        Command::Init(args) => commands::init::run(&args),
+        Command::Upgrade(args) => commands::upgrade::run(&args),
+        Command::Uninstall(args) => commands::uninstall::run(&args),
         Command::NotPorted(argv) => {
             let name = argv.first().map(String::as_str).unwrap_or_default();
-            eprintln!(
-                "mewkit-next: unknown command '{name}'. It is not ported yet; \
+            Err(Failure::usage(format!(
+                "unknown command '{name}'. It is not ported yet; \
                  run it with the npm `mewkit` CLI (`npx mewkit {name}`)."
-            );
-            ExitCode::from(EXIT_USAGE)
+            )))
+        }
+    };
+    match result {
+        Ok(code) => ExitCode::from(code),
+        Err(failure) => {
+            eprintln!("mewkit-next: {failure}");
+            ExitCode::from(failure.code)
         }
     }
 }

@@ -465,7 +465,9 @@ dependencies = [
  "clap",
  "mewkit-adapters",
  "mewkit-core",
+ "serde_json",
  "tempfile",
+ "zip",
 ]
 
 [[package]]

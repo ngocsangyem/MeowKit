@@ -4,6 +4,7 @@
 //! ownership index → commit. Mutation paths, dry-run output and the backup set
 //! are all derived from the same decisions, so they cannot drift apart.
 mod decide;
+mod interrupted;
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -82,6 +83,43 @@ pub fn execute(
     } else {
         Some(ScopeLock::acquire(&scope.lock_file.under(&scope.root))?)
     };
+    let record = interrupted::record_file(&scope.lock_file).under(&scope.root);
+    let io = |action: &str| {
+        let action = action.to_owned();
+        move |source| ExecError::Io { action, source }
+    };
+    let mut notices = Vec::new();
+    if opts.dry_run {
+        if interrupted::pending(&record) {
+            notices.push(
+                "an earlier run was interrupted; the next run restores its files first, \
+                 so this preview may differ from what it does"
+                    .to_owned(),
+            );
+        }
+    } else if let Some(restored) =
+        interrupted::recover(&layout, &record).map_err(io("recovering an interrupted run"))?
+    {
+        for path in &restored {
+            prune_empty_parents(&layout, path);
+        }
+        notices.push(format!(
+            "restored {} file(s) an interrupted run had changed",
+            restored.len()
+        ));
+        // The caller read the index before recovery. Keep what it says about
+        // the kit, but own exactly what the restored index owns.
+        let saved = OwnershipIndex::load(&scope.index_file.under(&scope.root))
+            .map_err(|e| ExecError::Io {
+                action: "reloading the ownership index".into(),
+                source: std::io::Error::other(e.to_string()),
+            })?
+            .unwrap_or_else(|| OwnershipIndex::new("", "", index.origin));
+        index.paths = saved.paths;
+        index.hooks = saved.hooks;
+        index.mcp_servers = saved.mcp_servers;
+        index.sections = saved.sections;
+    }
 
     // Decide every op against disk as earlier ops will have left it.
     let mut work = index.clone();
@@ -108,7 +146,10 @@ pub fn execute(
 
     let mut report = EmitReport {
         dry_run: opts.dry_run,
-        notices: plan.notices.clone(),
+        notices: notices
+            .into_iter()
+            .chain(plan.notices.iter().cloned())
+            .collect(),
         dropped_hooks: plan.dropped_hooks.clone(),
         narrowed_hooks: plan.narrowed_hooks.clone(),
         unsupported: plan.unsupported.clone(),
@@ -127,17 +168,17 @@ pub fn execute(
         return Ok(report);
     }
 
+    // The index rides along so an interrupted run can be put back whole.
     let changing: Vec<&RelPath> = decisions
         .iter()
         .filter(|d| matches!(d.action, Action::Write { .. } | Action::Remove))
         .map(|d| &d.path)
+        .chain([&scope.index_file])
         .collect();
-    let io = |action: &str| {
-        let action = action.to_owned();
-        move |source| ExecError::Io { action, source }
-    };
     report.backup = backup::take(&layout, &changing, &scope.backups_dir.under(&scope.root))
         .map_err(io("backup"))?;
+    interrupted::begin(&record, report.backup.as_deref(), &changing)
+        .map_err(io("recording the run"))?;
 
     let mut journal = Journal::new(&layout);
     for d in &decisions {
@@ -165,10 +206,16 @@ pub fn execute(
             .map_err(io("writing the ownership index"))?;
     }
     journal.commit();
-    for d in decisions
-        .iter()
-        .filter(|d| matches!(d.action, Action::Remove))
-    {
+    interrupted::end(&record).map_err(io("finishing the run"))?;
+    // A removal that found its file already gone (a rerun after a crash)
+    // prunes too: the crashed run never got that far.
+    for d in decisions.iter().filter(|d| {
+        matches!(d.action, Action::Remove)
+            || matches!(
+                (&d.action, &d.record),
+                (Action::Unchanged, Record::DisownFile)
+            )
+    }) {
         prune_empty_parents(&layout, &d.path);
     }
     *index = work;
