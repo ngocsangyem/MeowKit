@@ -5,11 +5,11 @@
 //! `checksums.txt` or a kit without a contract is refused unless the caller
 //! passes `allow_unverified`, which is then recorded as the install's origin.
 mod cache;
-mod checksum;
+pub(crate) mod checksum;
 pub mod contract;
 mod extract;
 pub mod http;
-mod select;
+pub(crate) mod select;
 
 use std::path::{Path, PathBuf};
 
@@ -26,7 +26,7 @@ pub const RELEASES_URL: &str =
     "https://api.github.com/repos/ngocsangyem/MeowKit/releases?per_page=100";
 /// Archive and checksum URLs must point here; anything else in the listing is refused.
 pub const DOWNLOAD_PREFIX: &str = "https://github.com/ngocsangyem/MeowKit/releases/download/";
-const MAX_LISTING_BYTES: u64 = 8 * 1024 * 1024;
+pub(crate) const MAX_LISTING_BYTES: u64 = 8 * 1024 * 1024;
 const MAX_ARCHIVE_BYTES: u64 = 256 * 1024 * 1024;
 const MAX_CHECKSUMS_BYTES: u64 = 64 * 1024;
 

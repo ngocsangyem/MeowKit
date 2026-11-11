@@ -2,6 +2,7 @@
 pub mod doctor;
 pub mod init;
 pub mod providers;
+pub mod self_update;
 pub mod uninstall;
 pub mod upgrade;
 pub mod versions;

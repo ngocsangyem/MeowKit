@@ -16,6 +16,7 @@ pub mod merge;
 pub mod ownership;
 pub mod plan;
 pub mod report;
+pub mod update;
 
 /// Version of the workspace, shared by every crate and printed by `--version`.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
