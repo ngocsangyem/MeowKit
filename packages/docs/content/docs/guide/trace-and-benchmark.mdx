@@ -46,8 +46,8 @@ Append-only JSONL. Every record has the same top-level envelope:
 
 | Event type | Emitter | When |
 |---|---|---|
-| `build_verify_result` | `post-write-build-verify.sh` | Compile/lint failure on a file write |
-| `loop_warning` | `post-write-loop-detection.sh` | Edit count hits threshold (N=4 or N=8) |
+| `build_verify_result` | `build-verify.cjs` | Compile/lint failure on a file write |
+| `loop_warning` | `loop-detection.cjs` | Edit count hits threshold (N=4 or N=8) |
 | `pre_completion_block` | `pre-completion-check.cjs` | Session blocked for missing verification |
 | `session_end` | `post-session.cjs` | Session closes normally |
 | `eval_verdict` | `mk:evaluate` step | Evaluator emits PASS/WARN/FAIL with rubric scores |

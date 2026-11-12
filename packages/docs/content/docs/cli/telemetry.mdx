@@ -1,6 +1,6 @@
 ---
 title: "Cost and Telemetry"
-description: "See what a session cost, what it did, and what the kit contains."
+description: "See what a session cost, what it did, and which capabilities the kit declares."
 ---
 
 Read-only reporting over logs the harness already writes. Nothing here changes project state.
@@ -58,13 +58,6 @@ mewkit trace audit            # orphaned / stale / unverified / repeated-frictio
 mewkit trace propose          # group repeated friction (≥2) into advisory backlog items
 mewkit trace score            # entropy score
 mewkit trace --friction "<note>" [--responsibility <r>] [--commit]
-```
-
-## inventory
-
-Report harness-artifact coverage. With `--substrate`, map artifacts onto the responsibility taxonomy (covered / partial / missing); `--emit` rewrites the generated `harness-substrate.md` view.
-
-```bash
 ```
 
 ## capabilities

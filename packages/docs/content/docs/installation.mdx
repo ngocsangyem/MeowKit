@@ -16,7 +16,7 @@ description: "Install MeowKit and get it running in your project."
 npx mewkit init
 ```
 
-On a fresh install, `mewkit init` first asks which toolkits to set up, a multiselect of **Claude Code** (preselected), **Codex**, and **Cursor**, then provisions each: Claude Code generates the `.claude/` directory, Codex copies the authored Codex bundle, Cursor installs `.claude/` and exports it to `.cursor/`. Selecting only Codex yields a codex-only project.
+On a fresh install, `mewkit init` first asks which toolkits to set up, a multiselect of **Claude Code** (preselected), **Codex**, and **Cursor**, then provisions each: Claude Code generates the `.claude/` directory, Codex copies the authored Codex bundle, Cursor copies the authored Cursor bundle (`AGENTS.md` plus a `.cursor/` tree of agents, rules, skills and hooks). Neither Codex nor Cursor needs `.claude/`, and nothing is converted. Selecting only Codex yields a codex-only project.
 
 ### Interactive setup
 
@@ -31,7 +31,7 @@ On a fresh install the CLI prompts, in order:
 | Gemini API key (optional) | no |
 | Fallback API keys for external providers (optional) | no |
 
-All other settings use fixed defaults: cost tracking enabled, memory enabled, mode set to `balanced`. Stack detection is not performed. In **update mode** (an existing `.claude/`), the toolkit picker is skipped and init just refreshes `.claude/`.
+All other settings use the defaults in the shipped `.meowkit/config.yaml`. Stack detection is not performed. In **update mode** (an existing `.claude/`), the toolkit picker is skipped and init just refreshes `.claude/`.
 
 ### CLI flags
 
@@ -40,7 +40,7 @@ Skip the interactive prompts with flags:
 ```bash
 npx mewkit init --target claude-code  # Skip the picker, Claude Code only
 npx mewkit init --target codex     # Skip the picker, Codex-only toolkit
-npx mewkit init --target cursor    # Skip the picker, .claude/ plus export to Cursor
+npx mewkit init --target cursor    # Skip the picker, Cursor-only toolkit
 npx mewkit init --force            # Overwrite existing .claude/
 npx mewkit init --dry-run          # Preview without writing
 npx mewkit init --profile core     # Install a right-sized profile subset
@@ -70,14 +70,13 @@ passing it with either is refused rather than ignored.
 ## Verified install
 
 <Callout type="info">
-  **Not live yet.** No published release carries the signed artifact, and the CLI ships no trusted
-  signing key, so every install today takes the legacy zip path described below. The verification
-  engine is in place and is what will run once releases carry the artifact and a key is published;
-  until then this section describes behaviour you cannot yet observe. `npx mewkit versions` reports
-  the `origin` your project actually used.
+  **Dormant.** Releases carry no signatures: the release policy is checksums only, and the CLI
+  ships an empty trusted keyring. Every install takes the zip path described below. The
+  verification engine stays in the CLI and runs only if a release ever carries the artifact.
+  `npx mewkit versions` reports the `origin` your project actually used.
 </Callout>
 
-The kit is designed to be published as a signed artifact: a single archive, a manifest carrying the
+The engine expects a signed artifact: a single archive, a manifest carrying the
 archive's own digest plus a SHA-256 for every file inside it, and a detached ed25519 signature over
 that manifest. Before anything is extracted, `init` and `upgrade` check the signature against the
 trusted keys the CLI itself ships, then the archive digest, then every per-file digest.
@@ -128,15 +127,16 @@ It exits non-zero in a directory with no install, so a script can tell "nothing 
 .claude/              What Claude Code reads
 ├── agents/          Specialist agents for each phase
 ├── skills/          Domain skills with mk: namespace
-├── hooks/           Lifecycle hooks
-├── rules/           Enforcement rules
-├── scripts/         Python validators
-│   └── bin/         Shell utilities
-├── modes/           Behavioral modes
-└── settings.json    Hook registrations
+├── hooks/           Lifecycle hooks, all Node (.cjs)
+├── rules/           The 7 always-on rules
+├── settings.json    Hook registrations
+├── kit-contract.json      Kit version and CLI requirements
+├── kit-capabilities.json  How each runtime names Claude Code tools
+└── statusline.cjs   Status line
 
 .meowkit/             Your project's own state
-├── config.json      Project configuration, commit this
+├── config.yaml      Project configuration, commit this
+├── bin/mewkit       Launcher pinned to the installing CLI version, committed
 ├── .env             API keys, gitignored, shared by every provider
 ├── metadata.json    What this install put on disk, and what you have edited since
 ├── pack-manifest.json  Which packs this release ships
@@ -144,14 +144,14 @@ It exits non-zero in a directory with no install, so a script can tell "nothing 
 ├── memory/          decisions.md + gotchas.md, committed
 ├── telemetry/       Cost log, trace log
 ├── state/           Session markers
-└── cache/           Derived caches, rebuildable
-
-.mcp.json.example     Optional MCP server config
+├── envs/            One Python environment per skill, from `mewkit setup`
+├── cache/           Derived caches, rebuildable
+└── mcp.json.example Optional MCP server config
 ```
 
 The split follows ownership: `.claude/` holds what Claude Code itself reads, so
 `settings.json` and `.mcp.json` stay there. Everything MeowKit owns lives in `.meowkit/`.
-`config.json` and `memory/*.md` are meant to be committed; the other state directories are
+`config.yaml` and `memory/*.md` are meant to be committed; the other state directories are
 machine-written and belong in `.gitignore` (`mewkit setup` appends them for you).
 
 `metadata.json` is worth knowing about even though you never edit it. It records what the
@@ -168,17 +168,19 @@ An install created before these files moved keeps working: readers fall back to 
 npx mewkit doctor
 ```
 
-This checks: Node.js version, Python version, Git availability, hooks executable, scripts present.
+This checks: Node.js version, Python version, Git availability, hooks executable, hook libraries present.
 
 ## Post-install setup
 
 ### MCP servers (optional)
 
-Copy `.mcp.json.example` to `.mcp.json` and configure servers you need:
+`mewkit setup` copies `.meowkit/mcp.json.example` to `.mcp.json` and leaves an existing `.mcp.json` alone. Run only that step with:
 
 ```bash
-cp .mcp.json.example .mcp.json
+npx mewkit setup --only mcp
 ```
+
+Then edit `.mcp.json` to add the keys for the servers you need.
 
 Available MCP servers: Context7 (docs), Playwright (QA), Sequential Thinking.
 
@@ -197,6 +199,13 @@ Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 
 `mewkit-next` is a native installer for the same kit, in preview beside the npm CLI. It installs, upgrades, removes and checks the kit for Claude Code, Codex and Cursor, in a project or in your home directory, and needs no Node.js to run itself. Every other command still comes from the npm CLI; see [mewkit-next](/cli/mewkit-next) for what it covers.
 
+<Callout type="info">
+  The commands below install `mewkit-next`, not `mewkit`. It covers `init`, `upgrade`,
+  `uninstall`, `doctor`, `providers`, `versions` and `self-update` only. `setup`, `plan approve`, `note`, `validate`,
+  `task` and the rest still run as `npx mewkit`, so keep Node.js 24+ even after a `curl` or
+  `irm` install.
+</Callout>
+
 Linux and macOS:
 
 ```bash
@@ -209,16 +218,16 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.ps1 | iex
 ```
 
-The installer puts `mewkit-next` in `~/.local/bin` (set `MEWKIT_INSTALL_DIR` to change it) and says so when that directory is not on your `PATH`. `MEWKIT_CHANNEL=beta` installs the newest prerelease. Each installer carries, for every platform, the exact download URL, SHA-256 and size of the release it installs, and refuses a download that differs; there is no signature. Until the first binary release, the installers say no release is pinned.
+The installer puts `mewkit-next` in `~/.local/bin` (set `MEWKIT_INSTALL_DIR` to change it) and says so when that directory is not on your `PATH`. `MEWKIT_CHANNEL=beta` installs the newest prerelease. Each installer carries, for every platform, the exact download URL, SHA-256 and size of the release it installs, and refuses a download that differs; there is no signature. Set `MEWKIT_VERSION` to make the installer refuse unless the version it pins is the one you named. Until the first binary release, the installers say no release is pinned.
 
-Later updates: `mewkit-next self-update`, which checks the release's `binary-manifest.json` digest and size before replacing itself and keeps the previous binary beside it with an `.old` suffix.
+`mewkit-next` also checks the kit zip against the release's `checksums.txt`; the npm CLI does not, it reads the zip and ignores that file. Later updates: `mewkit-next self-update`, which checks the release's `binary-manifest.json` digest and size before replacing itself and keeps the previous binary beside it with an `.old` suffix.
 
 ## Troubleshooting
 
 | Issue | Fix |
 |-------|-----|
 | `.claude/` already exists | Use `--force` flag or delete manually |
-| Hooks not executable | Run `chmod +x .claude/hooks/*.sh` |
+| Hooks not executable | Run `chmod +x .claude/hooks/*` |
 | Python scripts fail | Ensure Python 3.9+ is in PATH |
 | Claude Code doesn't load `.claude/rules/` | Restart the Claude Code session; `npx mewkit validate` confirms all 7 always-on rules are present |
 | The agent refuses to edit any file | Gate 1 is unapproved, which is the gate working. See [When a gate blocks you](/core-concepts/gates#when-a-gate-blocks-you) |
@@ -229,7 +238,7 @@ Later updates: `mewkit-next self-update`, which checks the release's `binary-man
 After scaffolding, finalize setup:
 
 ```bash
-npx mewkit setup    # Post-scaffold configuration (venv, MCP, env, gitignore)
+npx mewkit setup    # Post-scaffold configuration (skill environments, MCP, env, gitignore)
 npx mewkit doctor   # Verify installation
 ```
 

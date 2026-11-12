@@ -19,7 +19,7 @@ npx mewkit init
 # Skip the picker — Codex-only toolkit (copies the authored Codex bundle, no .claude/)
 npx mewkit init --target codex
 
-# Skip the picker — Cursor toolkit (unpacks .claude/ then exports to Cursor)
+# Skip the picker — Cursor toolkit (copies the authored Cursor bundle, no .claude/)
 npx mewkit init --target cursor
 
 # Global install scope
@@ -38,7 +38,7 @@ refused by name with the three valid values listed.
 
 | Flag                  | Description                                                                                                                                        |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--target <provider>` | Skip the picker and create one provider toolkit. `codex` copies the authored Codex bundle (codex-only, no `.claude/`); any other provider (e.g. `cursor`) unpacks `.claude/` then exports to it |
+| `--target <provider>` | Skip the picker and create one provider toolkit. `codex` and `cursor` each copy their authored bundle (no `.claude/`, no release download); `claude-code` installs the `.claude/` kit |
 | `--migrate`           | After unpack, prompt for export targets via the standalone migrate multiselect (TTY required)                                                     |
 | `--migrate-global`    | Use global install paths (`~/.cursor/`, etc.) instead of project-local                                                                            |
 
@@ -46,16 +46,14 @@ refused by name with the three valid values listed.
 
 - **Claude Code** → installs the `.claude/` kit from the latest release (today's behavior).
 - **Codex** → copies the authored Codex bundle (`AGENTS.md`, `.codex/`, `.agents/skills/`); non-fatal if it can't (warns and continues).
-- **Cursor** → installs `.claude/` (needed as the export source) then exports to `.cursor/`.
-- Selecting **only Codex** yields a codex-only project — no release download, no `.claude/`.
+- **Cursor** → copies the authored Cursor bundle (`AGENTS.md` plus a `.cursor/` tree of agents, rules, skills and hooks); non-fatal if it can't.
+- Selecting only Codex, only Cursor, or both yields a project with no `.claude/` and no release download.
 - The picker is shown for **new installs only** and only when no provider flag is passed. In update mode (existing `.claude/`), init refreshes `.claude/` without prompting; use `mewkit upgrade` to propagate to installed provider toolkits.
 
 **Behavior:**
 
-- `--target codex` is offline: it copies the Codex bundle shipped in the package — no release download, no `.claude/`, no conversion. It fails closed if `AGENTS.md` already exists (re-run with `--force`).
-- For non-codex targets, export runs after the kit unpacks; failures don't roll back the kit install — re-run `mewkit migrate` to retry.
-- Init uses the same orchestrator, registry, and reconciler as the standalone `migrate` command. Idempotent re-runs work the same way.
-- `--target` implies `--yes` (non-interactive) for the export step, so it's safe in CI scripts.
+- `--target codex` and `--target cursor` are offline: each copies the bundle shipped in the package — no release download, no `.claude/`, no conversion. Codex fails closed if `AGENTS.md` already exists (re-run with `--force`).
+- `--migrate` runs the same orchestrator, registry, and reconciler as the standalone `migrate` command, after the kit unpacks. A failed export doesn't roll back the kit install; re-run `mewkit migrate` to retry.
 
 ## setup
 
@@ -69,12 +67,13 @@ mewkit setup [--only=<step>]
 | ----------- | --------------------------------------------------------------- |
 | `skill-envs` | Prepares the per-skill Python environments under `.meowkit/envs/<skill>/` |
 | `mcp`       | Copies `mcp.json.example` → `.mcp.json`                         |
-| `env`       | Copies `env.example` → `.env`                                   |
+| `env`       | Creates `.meowkit/.env` for your API keys                       |
 | `gitignore` | Appends MeowKit entries to `.gitignore`                         |
+| `project-context` | Prints the `/mk:project-context` command to run in your first session (it writes `docs/project-context.md`) |
 
 ```bash
 mewkit setup              # Run all steps
-mewkit setup --only=venv  # Run single step
+mewkit setup --only=env   # Run single step
 ```
 
 ## doctor
@@ -82,10 +81,12 @@ mewkit setup --only=venv  # Run single step
 Diagnose environment issues with auto-fix for permissions.
 
 ```bash
-mewkit doctor [--report]
+mewkit doctor [--report] [--json] [--providers] [--state] [--hard-gates]
+mewkit doctor provenance [--explain]
+mewkit doctor --adopt
 ```
 
-**Checks:** Node.js 24+, Python 3.9+, Git, `.claude/` structure, hooks executable, scripts present, memory writable, MCP config, Python venv, config validity.
+**Checks:** Node.js 24+, Python 3.9+ (optional), Git, `.claude/` structure, hooks executable, hook libraries present, memory writable, MCP config, config validity.
 
 The Node check and `engines.node` state the same floor: Node 24, the version this project's test matrix runs. Below it the check fails and names the version it found.
 
@@ -94,7 +95,14 @@ The Node check and `engines.node` state the same floor: Node 24, the version thi
 | Flag              | Description                                                                                            |
 | ----------------- | ------------------------------------------------------------------------------------------------------ |
 | `--report`        | Print shareable diagnostic report                                                                      |
-| `--consolidation` | Show the consolidation/deprecation ledger — each candidate's status (canonical / keep-legacy / authoring-only / experimental / deprecated). Status is a classification, **not** a runtime-availability claim. |
+| `--json`          | Machine-readable output                                                                                |
+| `--providers`     | Include provider contract diagnostics                                                                  |
+| `--state`         | Include state taxonomy diagnostics                                                                     |
+| `--explain`       | Explain the provenance result rather than summarizing it (used with `provenance`)                      |
+| `--hard-gates`    | Live-probe the hard gates: plan, privacy and injection block                                           |
+| `--adopt`         | Rebuild the ownership baseline from the local kit cache, or refuse. Refused on a runtime that `mewkit-next` owns |
+
+`mewkit doctor provenance` reports which installed files can be verified from local evidence alone, and `--explain` says what it can and cannot prove.
 
 ## upgrade
 
@@ -145,7 +153,7 @@ Verify `.claude/` structure integrity.
 mewkit validate
 ```
 
-**Checks:** Agents (10+), skills (30+), commands dir, modes (5+), the 7 always-on rules present, hooks executable, scripts present, settings.json, config file. In the MeowKit authoring checkout, the full sweep also reports provider-specific vocabulary found in generic skill bodies as advisory portability WARNs; `--strict` promotes WARNs to errors. Run a focused suite with any of the flags below (no flag = the full sweep).
+**Checks:** `agents/` and `hooks/` present, the 7 always-on rules present, config validity, hooks executable, docs references resolve, plugin namespace, the team-memory store. In the MeowKit authoring checkout, the full sweep also reports provider-specific vocabulary found in generic skill bodies as advisory portability WARNs; `--strict` promotes WARNs to errors. Run a focused suite with any of the flags below (no flag = the full sweep).
 
 | Flag | Description |
 | --- | --- |

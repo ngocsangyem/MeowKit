@@ -2,7 +2,7 @@
 title: "Gates & Security"
 description: "How Gate 1 and Gate 2 enforce discipline, and how MeowKit's 4-layer security model prevents prompt injection."
 sourceOfTruth: ".claude/rules/gate-rules.md"
-lastVerified: "2026-07-26"
+lastVerified: "2026-11-12"
 ---
 
 ## The two hard gates
@@ -12,7 +12,7 @@ MeowKit has two hard stops that no agent, mode, or flag can bypass. Both require
 | Gate | When | What it blocks | Mechanism |
 |------|------|---------------|-----------|
 | **Gate 1** | After Phase 1 (Plan) | Any source code writes | `gate-enforcement.cjs` hook on PreToolUse (Edit\|Write) |
-| **Gate 2** | After Phase 4 (Review) | Shipping / deployment | Behavioral: reviewer verdict required at `tasks/reviews/` |
+| **Gate 2** | After Phase 4 (Review) | Shipping / deployment | `gate2-check.cjs` on PreToolUse (Bash): `git commit`, push and merge are blocked until an approved verdict at `tasks/reviews/` names the current HEAD |
 
 ### Gate 1: Plan before code
 
@@ -36,6 +36,10 @@ Gate 2 ensures no unreviewed code reaches production. The reviewer produces a ve
 3. **Test coverage.** Edge cases covered, testing behavior rather than implementation
 4. **Security.** Passes the `security-rules.md` checklist
 5. **Performance.** No N+1 queries, no blocking async
+
+### Gate 1 on Codex and Cursor
+
+Codex and Cursor enforce Gate 1 with their own hooks, which call the same plan-gate decision as `gate-enforcement.cjs`. Codex runs it on `apply_patch`, `Edit` and `Write`; Cursor runs it in `tool-gate.cjs` on `preToolUse`. The privacy block is narrower on Codex: it has no file-read hook, so the check runs on Bash commands only and sees the paths the command names. The pre-ship check and the Gate 2 proof are not ported to either runtime. See [runtime parity](/reference/hooks#runtime-parity).
 
 ## Plan-first gate pattern
 
@@ -101,7 +105,7 @@ These run after the tool call. They provide feedback but don't block: the hook e
 - Parallel agents run in isolated git worktrees
 - Subagents do not inherit the parent session's memory
 - Evaluator and generator are hard-separated (prevent self-evaluation bias)
-- `dispatch.cjs` crash does not affect security hooks (they're independent bash entries in `settings.json`)
+- `dispatch.cjs` crash does not affect security hooks (they're independent entries in `settings.json`)
 
 ## Next steps
 

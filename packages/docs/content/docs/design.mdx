@@ -11,14 +11,19 @@ The site runs on [Fumadocs](https://fumadocs.dev) on the Next.js App Router. Lay
 
 | What | File |
 |---|---|
-| Colour tokens, light and dark themes, display typography | `app/global.css` |
+| Palette values | `assets/design-tokens.json` at the repo root |
+| Token-to-slot mapping, light and dark themes, display typography | `app/global.css` |
+| Logo, favicon and share image | `public/logo.svg`, `public/logo-dark.svg` and the favicon files beside them |
+| Code syntax theme | `lib/shiki-meowkit-themes.ts`, wired in `source.config.ts` |
 | Fonts loaded and applied | `app/layout.tsx` |
 | Sidebar, nav, shared layout options | `lib/layout.shared.tsx` |
 | Home page | `app/(home)/page.tsx`, `components/home/` |
 | MDX components available inside pages | `components/mdx.tsx`, `components/mdx/` |
 | Navigation order and section labels | `content/docs/**/meta.json` |
 
-`app/global.css` is the source of truth for the palette. This page deliberately does not restate the values, because a second copy of a colour ramp is a copy that goes stale and the CSS is readable on its own.
+The palette values come from `assets/design-tokens.json`. `app/global.css` maps those tokens onto Fumadocs colour slots (see the comment at the top of the light block). This page deliberately does not restate the values, because a second copy of a colour ramp is a copy that goes stale.
+
+The nav logo is the brand lockup from `assets/branding/`, copied into `public/` as `logo.svg` and `logo-dark.svg`. `lib/layout.shared.tsx` renders both and CSS shows the one that matches the theme. Edit the masters in `assets/branding/`, then copy them over, rather than editing the copies.
 
 ## The system in one paragraph
 

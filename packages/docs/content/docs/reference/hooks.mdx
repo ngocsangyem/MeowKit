@@ -2,7 +2,7 @@
 title: "Hooks"
 description: "MeowKit's lifecycle hooks — what they enforce, when they run."
 sourceOfTruth: ".claude/settings.json"
-lastVerified: "2026-07-26"
+lastVerified: "2026-11-12"
 ---
 
 MeowKit uses lifecycle hooks to enforce discipline at the tool level. Some hooks are registered in `.claude/settings.json` (automatic), others are invoked by skills.
@@ -139,20 +139,35 @@ Hooks are registered in `.claude/settings.json`:
 }
 ```
 
-## JSON-on-stdin Convention (260408 Migration)
+## JSON-on-stdin Convention
 
 All meowkit hooks read input as JSON on stdin (per [Claude Code hook docs](https://code.claude.com/docs/en/hooks)), parsed by the shared reader `lib/parse-stdin.cjs`. It returns `toolName`, `filePath`, `command`, `sessionId`, `eventName`, `transcriptPath` and the raw payload. Write guards use its `readHookInput` form, which also reports *why* input was unreadable so the guard can refuse rather than wave the call through; observers receive the same payload from the dispatcher. Hooks still honour a legacy `$1` positional argument for back-compat — both forms coexist safely.
 
-Phase 7 of the harness plan migrated all 10 pre-existing hooks and added 4 new middleware hooks to this convention.
-
 ## Shared Hook Libraries
 
-Sourceable libraries in `.claude/hooks/lib/` — not hooks themselves:
+Node modules in `.claude/hooks/lib/`, loaded with `require()`. They are not hooks themselves.
 
-- `lib/parse-stdin.cjs` — JSON-on-stdin parser. Source with `. lib/parse-stdin.cjs`; never execute directly. Requires Bash 3.2+. Falls back to system `python3` if venv unavailable. Gracefully degrades (empty vars + warning) if no Python found.
-- `lib/secret-scrub.cjs` — shared secret redaction. Exports a `scrub_secrets()` function covering Anthropic/OpenAI/AWS/GH/GL/Slack/JWT/PEM patterns. Sourced by hooks that persist content (`append-trace.cjs`).
+- `lib/parse-stdin.cjs` is the JSON-on-stdin parser. It reads all of stdin, parses it, and resolves a relative `tool_input.file_path` against the working directory.
+- `lib/secret-scrub.cjs` is the shared secret redaction. It covers Anthropic, OpenAI, AWS, GitHub, GitLab, Slack, JWT and PEM patterns, and hooks that persist content (`append-trace.cjs`) call it before writing.
 
-## Middleware Hooks (Phase 7)
+### `lib/core`
+
+`lib/core/` holds the decisions that the write, read and shell guards share across runtimes: `plan-gate.cjs` (Gate 1), `privacy.cjs` (sensitive paths and unsafe fetch targets) and `pre-ship.cjs` (the ship-boundary checks, including the Gate 2 structural proof). Each module is a pure decision. It reads the project tree but never touches stdin, stdout or the exit code, and returns `{ exit, stdout, stderr }`, where exit 2 is a block. Claude Code's `gate-enforcement.cjs`, `privacy-block.cjs` and `pre-ship.cjs` wrap these modules, and the Codex and Cursor hook files call the same code, so a change to a decision reaches every runtime that carries it.
+
+### Runtime parity
+
+Codex and Cursor do not run every Claude Code hook. `.claude/hooks/hook-coverage.json` records what each safety behaviour and each handler becomes on the other two runtimes, and a test checks that every one appears there.
+
+| Behavior | Claude Code | Codex | Cursor |
+| --- | --- | --- | --- |
+| Gate 1 plan gate | `gate-enforcement.cjs` | Ported: `PreToolUse` on `apply_patch\|Edit\|Write` | Ported: `tool-gate.cjs` on `preToolUse` |
+| Privacy block | `privacy-block.cjs` | Ported, Bash only: Codex has no file-read hook, so the decision runs on the shell command and the paths it names | Ported: `privacy-read-gate.cjs` on `beforeReadFile` |
+| Pre-ship checks and Gate 2 proof | `pre-ship.cjs` | Not ported | Not ported: `shell-gate.cjs` does not check Gate 2 |
+| Session context | `project-context-loader.cjs` | Not ported: `AGENTS.md` carries the standing context | Equivalent: `session-context.cjs`, a short pointer to `.meowkit/` state |
+
+Of the 21 handlers in `handlers.json`, most are Claude Code only. Cursor's `telemetry-observers.cjs` covers `learning-observer`, `post-session`, `precompact-probe` and `posttoolfailure-probe`, and its `stop-followup.cjs` stands in for `pre-completion-check` without blocking. Codex gets the `capability-bootstrap` text through `AGENTS.md` at migrate time.
+
+## Middleware Hooks
 
 ### `build-verify` (handler)
 
@@ -180,9 +195,9 @@ Fires on the **Stop** event (not SubagentStop). Hard gate: if no verification ev
 - **Timeout:** 5s
 - **Source:** `.claude/hooks/handlers/pre-completion-check.cjs`
 
-## Node.js Dispatch System (v2.3.0)
+## Node.js Dispatch System
 
-`dispatch.cjs` is a central Node.js dispatcher registered in `settings.json` alongside existing shell hooks. It reads `handlers.json` at runtime and dispatches to handler modules sequentially for each event.
+`dispatch.cjs` is a central Node.js dispatcher registered in `settings.json` alongside the write guards. It reads `handlers.json` at runtime and dispatches to handler modules sequentially for each event.
 
 **Usage in settings.json:**
 ```
@@ -204,6 +219,9 @@ node dispatch.cjs <EventName> [Matcher]
 | budget-tracker | `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | `tool_input`, `tool_response` | Estimates cost; warns $30, blocks $100 |
 | auto-checkpoint | `handlers/auto-checkpoint.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Checkpoint every 20 calls |
 | checkpoint-writer | `handlers/checkpoint-writer.cjs` | Stop | — | — | Sequenced checkpoint with git state |
+| capability-bootstrap | `handlers/capability-bootstrap.cjs` | SessionStart | — | — | Emits the committed capability-resolution guidance; silent when the file is absent |
+| jira-env-loader | `handlers/jira-env-loader.cjs` | SessionStart | — | — | Reports whether the Jira credentials are present; never prints or exports them. The only handler that reads the project dotenv |
+| review-evidence-tag | `handlers/review-evidence-tag.cjs` | PostToolUse | Bash | `tool_input.command` | When the session runs `mewkit review read --session`, records a hook-side event so `mewkit review coverage` can mark the read as session-observed |
 | safety-sentinel-inject | `handlers/safety-sentinel-inject.cjs` | UserPromptSubmit | — | `prompt` | Emits the cached-skip marker, or forces a safety-baseline re-read after compaction |
 
 > **Note:** The memory auto-inject handlers and the prompt-prefix capture handler are all removed. Memory is read on demand by the read-set skills (one grep) and written by the write-set skills — there is no per-turn auto-injection and no hook capture.
@@ -213,6 +231,7 @@ node dispatch.cjs <EventName> [Matcher]
 | Library | File | Purpose |
 |---------|------|---------|
 | parse-stdin | `lib/parse-stdin.cjs` | Parses Claude Code JSON-on-stdin once; `dispatch.cjs` passes result to all handlers |
+| core | `lib/core/*.cjs` | Gate 1, privacy and pre-ship decisions shared with the Codex and Cursor hooks |
 | shared-state | `lib/shared-state.cjs` | In-process state bag for cross-handler state sharing |
 | checkpoint-utils | `lib/checkpoint-utils.cjs` | Read/write checkpoint files; shared by orientation-ritual and checkpoint-writer |
 

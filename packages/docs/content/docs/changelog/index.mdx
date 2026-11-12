@@ -11,6 +11,38 @@ npx mewkit upgrade
 
 Fresh install: `npx mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
 
+## Unreleased
+
+### Highlights
+
+The kit is now a lean tree: `.claude/` ships agents, hooks, rules, skills, `settings.json`, `statusline.cjs`, `kit-contract.json` and `kit-capabilities.json`, and everything the kit writes at runtime lives under `.meowkit/`. Kit releases carry a checksum file, the safety hooks share one core across Claude Code, Codex and Cursor, and a native installer, `mewkit-next`, is in preview beside the npm CLI. The docs and landing page also move to a new Prompt + Cursor identity.
+
+### Features
+
+- `mewkit-next`, a Rust installer, installs, upgrades, removes and checks the kit for Claude Code, Codex and Cursor, in a project or with `--global`. It writes each runtime's own file format instead of converting `.claude/`, and it adopts a runtime the npm CLI installed. See [mewkit-next](/cli/mewkit-next). It is a preview: the npm CLI stays the source for every other command.
+- Kit releases publish a `checksums.txt` and a `.claude/kit-contract.json` (contract version, minimum installer, kit version). `mewkit-next` checks the kit zip against them; the npm CLI does not.
+- Codex gets native `PreToolUse` safety hooks: a privacy guard on Bash commands that touch `.env*`, key or credential files, and a Gate 1 guard that denies source edits without an approved plan. Codex and Cursor Gate 1 now require the approval receipt and a signed contract, the same as Claude Code. `.claude/hooks/hook-coverage.json` records which hook behaviours each runtime carries.
+- The plan gate, privacy and pre-ship decisions moved into `hooks/lib/core`, one copy shared by the three runtimes. A guard that cannot resolve a trusted project root denies instead of allowing.
+- Skills reach their own files by skill-relative paths, so they run on runtimes other than Claude Code. CI checks this.
+
+### CLI
+
+- `mewkit init` writes a committed launcher at `.meowkit/bin/mewkit`, and a SessionStart hook puts it on the agent's `PATH`, so bare `mewkit ...` resolves in a fresh clone.
+- An unknown command or subcommand exits 2 and lists the valid choices. Every subcommand answers `--help`, and the CLI manual is generated from the command catalogue.
+
+### Improvements
+
+- Session state, caches and the hook log resolve through one `.meowkit` path resolver. Installs made before the move still read the old locations.
+- Always-listed context (rules plus skill and agent metadata) is held under 70,000 B by `scripts/check-always-on-budget.cjs`, down from 113,798 B to 59,426 B. See [Rules Index](/reference/rules-index).
+- Node.js 24 is the one declared minimum.
+- New identity: an ink `>` chevron beside a blue cat-eared cursor, one family of muted blues, with `assets/design-tokens.json` as the single token source.
+
+### Removals
+
+- Modes are gone, and the kit no longer ships a scripts or commands folder under `.claude`. Their content moved into skills, `hooks/lib` and repository scripts.
+- The kit no longer ships task templates or scaffolds `tasks/`. `mewkit task new` writes inline frontmatter and uses a template only if your project keeps one.
+- The CLI commands `context`, `explain-support` and `status` are removed. `inventory` and `docs-manifest` moved to repository scripts outside the published package.
+
 ## 2.15.0 (2026-07-27) — Strategic Supervision & the Portable Backend Surface
 
 Ships as kit **2.15.0** and **`mewkit` CLI 2.3.1** (patch — the CLI gains a new command surface and a safer upgrade path without changing an existing flag or subcommand). A new advisory agent can supervise a single delivery run when you ask for it, and the backend skill surface becomes portable across every supported runtime.
