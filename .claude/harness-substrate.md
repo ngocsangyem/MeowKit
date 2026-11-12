@@ -21,4 +21,4 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 | Gate enforcement *(kit)* | ✅ covered | 6 | 6 | gate-rules, gate-enforcement, pre-implement |
 
 **Coverage:** 11/12 responsibilities have active artifacts. Missing: Intervention recording.
-**Untagged:** 0 registry + 171 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).
+**Untagged:** 0 registry + 170 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).

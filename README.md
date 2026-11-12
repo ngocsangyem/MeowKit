@@ -9,7 +9,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  129 skills &middot; 42 agents &middot; 7 rules &middot; 27 hook scripts &middot; 4-layer+ security
+  128 skills &middot; 42 agents &middot; 7 rules &middot; 27 hook scripts &middot; 4-layer+ security
 </p>
 
 <p align="center">
@@ -105,7 +105,7 @@ npx mewkit doctor     # Verify environment
 meowkit/
 ├── .claude/                  Source of truth — agents, skills, rules, hooks
 │   ├── agents/               42 specialist agents
-│   ├── skills/               129 skills (mk: namespace) — 128 ship; benchmark is maintainer-only
+│   ├── skills/               128 skills (mk: namespace) — 127 ship; benchmark is maintainer-only
 │   ├── rules/                7 enforcement rules (always-on)
 │   ├── hooks/                27 hook scripts — lifecycle hooks + handlers — plus their libraries
 │   ├── statusline.cjs
