@@ -12,14 +12,32 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = { version = "1.0.154", features = ["preserve_order"] }
+# Alphabetical, so a new dependency has one obvious home.
 flate2 = "1.1.11"
+# The memory content scan runs ~50 injection patterns and ~19 secret patterns per
+# line. `regex` is linear-time by construction, which is the property the TS port
+# had to buy by hand-bounding every quantifier in the email pattern.
+regex = "1.13.1"
+serde = { version = "1.0.229", features = ["derive"] }
+# The general YAML reader (skill frontmatter, workflow specs) — NOT the config
+# reader, which stays a hand parser because a dependency-free hook parses the
+# same file. Chosen over `serde_yaml` (deprecated since 0.9.34), `serde_yml`
+# (RUSTSEC-2025-0068, unsound and unmaintained) and `yaml-rust`
+# (RUSTSEC-2024-0320): it is pure Rust, actively released, and advisory-free,
+# which `cargo deny` requires. Pinned EXACTLY because it is the least
+# established of these dependencies and it replaces js-yaml kit-wide; its
+# `granit-parser` dependency comes with it. Full rationale and the YAML
+# 1.1-vs-1.2 caveats: `src/yaml_doc.rs`.
+serde-saphyr = { version = "=2.1.1", default-features = false, features = ["deserialize"] }
+serde_json = { version = "1.0.154", features = ["preserve_order"] }
 sha2 = "0.11.1"
 tar = { version = "0.4", default-features = false }
 tempfile = "3.27.0"
 thiserror = "2.0.21"
 toml_edit = "0.25.19"
+# NFKC for the normalize pass of the injection scan (homoglyph folding). A UAX#15
+# decomposition table is not something to hand-roll.
+unicode-normalization = "0.1.26"
 ureq = "3.5.1"
 zip = { version = "9.5.0", default-features = false, features = ["deflate"] }
 

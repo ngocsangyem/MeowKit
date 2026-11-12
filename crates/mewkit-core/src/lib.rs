@@ -6,17 +6,26 @@
 
 pub mod adopt;
 pub mod backup;
+pub mod config;
 pub mod exec;
 pub mod fsx;
 pub mod journal;
+pub mod js_number;
+pub mod js_regex;
 pub mod kit;
 pub mod layout;
 pub mod lock;
+pub mod memory;
 pub mod merge;
 pub mod ownership;
+pub mod path_shape;
 pub mod plan;
 pub mod report;
+pub mod schema;
+pub mod semver;
+pub mod state_paths;
 pub mod update;
+pub mod yaml_doc;
 
 /// Version of the workspace, shared by every crate and printed by `--version`.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

@@ -51,6 +51,14 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
+      # `tests/reader_agreement.rs` runs the shipped `.cjs` config reader under
+      # Node and compares it to this crate, fixture by fixture. It FAILS when
+      # Node is absent rather than skipping, so the runtime is requested
+      # explicitly instead of relying on whatever the runner image preinstalls.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
       - name: Format
         run: cargo fmt --all --check
 

@@ -9,6 +9,7 @@ mod failure;
 mod kit_args;
 mod output;
 mod place;
+mod prompt;
 
 use std::process::ExitCode;
 

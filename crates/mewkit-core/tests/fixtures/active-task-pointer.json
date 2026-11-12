@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "1.0",
+  "taskId": "261112-rust-port-fixture",
+  "planPath": "tasks/plans/261112-rust-port-mewkit-cli/plan.md",
+  "planSlug": "rust-port-mewkit-cli",
+  "path": "tasks/plans/261112-rust-port-mewkit-cli/plan.md",
+  "slug": "rust-port-mewkit-cli"
+}

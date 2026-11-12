@@ -17,6 +17,16 @@ path = "src/main.rs"
 mewkit-core = { path = "../mewkit-core" }
 mewkit-adapters = { path = "../mewkit-adapters" }
 clap = { version = "4.6.7", features = ["derive"] }
+# Terminal pickers. `inquire` over `dialoguer` for three reasons: it reports a
+# missing terminal as its own `NotTTY` error (the non-TTY path is a first-class
+# outcome rather than a guess from an io error), ESC maps to
+# `OperationCanceled` the way `@clack/prompts`'s `isCancel` does, and
+# `raw_prompt` returns the chosen INDEX so a label never has to double as the
+# answer. Its backend is crossterm, whose default `windows` feature pulls
+# `winapi` + `crossterm_winapi` — the Windows CI leg draws on the real console
+# API, not a POSIX shim. Default features are off: `fuzzy`, `macros` and
+# `one-liners` are convenience only, and the four pickers here need none of them.
+inquire = { version = "0.9.4", default-features = false, features = ["crossterm"] }
 serde_json = { version = "1.0.154", features = ["preserve_order"] }
 toml_edit = "0.25.19"
 
