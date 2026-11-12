@@ -19,7 +19,7 @@ import {
 } from "./doctor-checks.js";
 import { checkProjectConfig, checkRemovedEnvNames } from "./doctor-config-checks.js";
 import { ownershipChecks } from "./doctor-ownership-checks.js";
-import { checkBaselineMigration, checkMixedDelivery, checkRefusedVersions } from "./doctor-kit-checks.js";
+import { checkBaselineMigration, checkMixedDelivery } from "./doctor-kit-checks.js";
 import { hasLegacyManifest } from "../core/legacy-manifest-migration.js";
 import { doctorAdopt } from "./doctor-adopt.js";
 import { checkHardGates } from "./doctor-hard-gates.js";
@@ -108,7 +108,6 @@ export async function doctor(args?: {
 		...checkRemovedEnvNames(root),
 		...ownershipChecks(root),
 		checkBaselineMigration(root),
-		checkRefusedVersions(root),
 		checkMixedDelivery(root),
 		checkInstallMode(root),
 		checkHooks(root),

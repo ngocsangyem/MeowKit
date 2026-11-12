@@ -42,6 +42,10 @@ The kit is now a lean tree: `.claude/` ships agents, hooks, rules, skills, `sett
 - Modes are gone, and the kit no longer ships a scripts or commands folder under `.claude`. Their content moved into skills, `hooks/lib` and repository scripts.
 - The kit no longer ships task templates or scaffolds `tasks/`. `mewkit task new` writes inline frontmatter and uses a template only if your project keeps one.
 - The CLI commands `context`, `explain-support` and `status` are removed. `inventory` and `docs-manifest` moved to repository scripts outside the published package.
+- The `mewkit visual-plan` command and the `mk:visual-plan` skill are removed, with `plan.html` export and the local studio. Use `mk:preview` for explainers, diagrams and diffs, or `mk:tech-graph` for standalone diagram files. The old skill page redirects to [mk:preview](/reference/skills/preview).
+- `mk:plan-creator --html` is removed. Plans are no longer rendered as HTML.
+- `mewkit migrate` is removed, along with `init --migrate` and `init --migrate-global` and the migrate-only flags. Install Codex or Cursor with `mewkit init --target codex` or `mewkit init --target cursor`. `mewkit upgrade` refreshes a bundle installed that way. A `.cursor/` or `.codex/` directory left by the old converter is not refreshed, and upgrade prints a notice to run `mewkit init --target <tool>`. Legacy `.claude/memory/` is not imported; copy what you need into `.meowkit/memory/`. The `.mcp.json` merge into Codex `config.toml [mcp_servers]` (`--include-mcp`) is gone too; add MCP servers to `.codex/config.toml` by hand. The migration guide is replaced by [Portability](/cli/portability).
+- The signed kit artifact engine is removed: signatures, trusted keys, quarantine and the artifact cache. `init --offline` and `upgrade --offline` are removed with it. A kit release is a zip with a `checksums.txt`.
 
 ## 2.15.0 (2026-07-27) — Strategic Supervision & the Portable Backend Surface
 

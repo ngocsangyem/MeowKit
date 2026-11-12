@@ -90,9 +90,9 @@ export function buildProviders(manifests: ProviderManifest[] = manifestRegistry)
 
 /**
  * Build provider configs from manifests WITHOUT disabling undocumented surfaces.
- * Used by `provider-registry.ts` so the `providers` export preserves the
- * pre-override state that `applyMewkitOverrides()` expects to mutate in-place.
- * The disable loop runs later when `applyMewkitOverrides()` is called.
+ * Used by `provider-registry.ts` for the `providers` singleton, whose callers
+ * read surface fields from this raw view. buildProviders() is the
+ * documented-surface view.
  */
 export function buildProvidersRaw(
 	manifests: ProviderManifest[] = manifestRegistry,
@@ -102,8 +102,7 @@ export function buildProvidersRaw(
 	for (const manifest of manifests) {
 		const config = cloneConfig(manifest.config);
 		applyOverrides(config, manifest.overrides);
-		// Deliberately skips disableUndocumentedSurfaces — applyMewkitOverrides()
-		// handles that step for all providers uniformly after construction.
+		// Deliberately skips disableUndocumentedSurfaces; see the doc comment above.
 		out[manifest.id as ProviderType] = config;
 	}
 	return out;

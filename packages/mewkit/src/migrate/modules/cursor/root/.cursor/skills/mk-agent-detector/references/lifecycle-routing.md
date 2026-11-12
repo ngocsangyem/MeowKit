@@ -35,9 +35,8 @@ Advisory only — does not change agent-detector scoring or output format.
 | Factual project question with sources ("how does X work *here*", "explain X in this repo", "is it true that ... in the repo", "why is X structured this way") | any | mk:ask-me (cited inline answer; NOT library docs — see mk:docs-finder; NOT "why is X broken" — see mk:investigate) |
 | Deep multi-source technical research with a cited report ("research X", "evaluate X vs Y", "how do others solve Z", "find best practices for X") | any | mk:research (delegates to researcher sub-task(s), primary-source discipline + retrieval-call cap, one cited report, optional `--html`; NOT single-library docs — see mk:docs-finder; NOT project-only Q&A — see mk:ask-me) |
 | Visualize code, draw diagram, build slide deck, visualize a git diff | any | mk:preview |
-| Publish-grade diagram for blog, doc, slide, or editorial image (SVG/PNG export) | any | mk:tech-graph (NOT for in-HTML diagrams — use mk:preview --html --diagram; NOT for plan rendering — use mk:visual-plan) |
+| Publish-grade diagram for blog, doc, slide, or editorial image (SVG/PNG export) | any | mk:tech-graph (NOT for in-HTML diagrams — use mk:preview --html --diagram) |
 | Mermaid v11 diagram block embedded in markdown, README, or code comments | any | mk:mermaidjs-v11 (NOT for in-HTML — use mk:preview --html --diagram; NOT for standalone SVG/PNG — use mk:tech-graph) |
-| Render a plan as a shareable, block-disciplined plan.html artifact at the plan-dir root | any | mk:visual-plan (canonical plan-as-HTML owner, scannable in <30s; NOT generic code/diagram/diff visuals — see mk:preview; NOT plan critique — see mk:plan-ceo-review) |
 | Visualize a git diff or PR before review | Review | mk:preview (`--html --diff`) |
 | Ready to ship/deploy | Ship | mk:ship |
 | Resolve an in-progress git merge or rebase conflict ("finish the merge", "fix this rebase", unmerged paths) | any | mk:resolving-merge-conflicts (read state → recover intent → resolve hunks → run checks → finish; always resolves, never --abort; NOT the base-branch merge of shipping — see mk:ship) |

@@ -46,7 +46,7 @@ npx mewkit init --dry-run          # Preview without writing
 npx mewkit init --profile core     # Install a right-sized profile subset
 ```
 
-Passing `--target` (or `--migrate`) skips the toolkit multiselect and runs that flow directly. An
+Passing `--target` skips the toolkit multiselect and runs that flow directly. An
 unrecognized target is refused by name with the three valid ones listed, rather than falling through
 to the default install.
 
@@ -67,48 +67,15 @@ marketplace.
 `--delivery` is meaningful for `claude-code` only. Codex and Cursor each have a single shape, so
 passing it with either is refused rather than ignored.
 
-## Verified install
+## Release checks
 
-<Callout type="info">
-  **Dormant.** Releases carry no signatures: the release policy is checksums only, and the CLI
-  ships an empty trusted keyring. Every install takes the zip path described below. The
-  verification engine stays in the CLI and runs only if a release ever carries the artifact.
-  `npx mewkit versions` reports the `origin` your project actually used.
-</Callout>
+A kit release is a zip archive with a `checksums.txt` file. The release carries no signature, so the
+npm CLI has no signed-artifact check. `mewkit-next` checks the zip against `checksums.txt` before it
+installs; see [mewkit-next](/cli/mewkit-next).
 
-The engine expects a signed artifact: a single archive, a manifest carrying the
-archive's own digest plus a SHA-256 for every file inside it, and a detached ed25519 signature over
-that manifest. Before anything is extracted, `init` and `upgrade` check the signature against the
-trusted keys the CLI itself ships, then the archive digest, then every per-file digest.
-
-Verification is unconditional when an artifact is present. There is no flag, environment variable
-or channel that skips it:
-
-- A release that carries an artifact is installed from it.
-- A release that carries no artifact at all installs through the older zip asset, so earlier
-  releases keep working. **This is every release today.**
-- An artifact that is present and fails any check **stops the install**. It does not fall back to
-  the zip, even when the zip is there: a fallback would mean a tampered artifact silently
-  downgrades you to an unverified source. The message names which check failed, on which file, and
-  what to do next, and `mewkit doctor` can repeat it later with no network.
-
-## Offline install
-
-`--offline` installs from the artifact this project already cached, and reaches no network:
-
-```bash
-npx mewkit init --offline
-npx mewkit upgrade --offline
-```
-
-The cache is project-local, at `.meowkit/cache/`, and untracked. What comes out of it is put
-through the **same** signature and digest checks a download gets: a cached file is a local file, and
-it is not trusted more for being local.
-
-Because the cache is per project, `--offline` works only in a project that has installed at least
-once. In a project that has not, it refuses and names the two ways forward: point
-`MEOWKIT_RELEASE_SOURCE` at a directory holding an already-extracted release, or run
-`mewkit upgrade` once with network access so the project caches the artifact.
+`npx mewkit versions` reports how this project's content arrived. The `origin` is `release-zip` for a
+normal release download, or `local-release-dir` when `MEOWKIT_RELEASE_SOURCE` points at an
+already-extracted release.
 
 ## What is installed here
 

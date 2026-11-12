@@ -1,18 +1,6 @@
 import { defineConfig } from "vitest/config";
-import react from "@vitejs/plugin-react";
-import { resolve } from "node:path";
-
-const orchvizWebRoot = resolve(__dirname, "packages", "mewkit", "src", "orchviz-web");
 
 export default defineConfig({
-	plugins: [react()],
-	resolve: {
-		alias: { "@": orchvizWebRoot },
-		// Force a single React copy so hooks work under any installer layout.
-		// pnpm's nested node_modules can resolve two React instances (react-dom
-		// binds one, the component binds another) → null hooks dispatcher.
-		dedupe: ["react", "react-dom"],
-	},
 	test: {
 		fileParallelism: false,
 		// Many suites here spawn real subprocesses (hooks, python, git). Running tests
@@ -52,10 +40,6 @@ export default defineConfig({
 			".claude/worktrees/**",
 			"**/migrate/modules/codex/root/**",
 			"**/migrate/modules/cursor/root/**",
-		],
-		environmentMatchGlobs: [
-			["packages/mewkit/src/**/__tests__/**/*.test.tsx", "jsdom"],
-			["packages/**/*.test.tsx", "jsdom"],
 		],
 	},
 });

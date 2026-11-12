@@ -15,9 +15,9 @@ import { readActiveTaskPointer, clearActiveTaskPointer } from "../core/task-reco
 //   2. Clear a dangling active-task pointer that still points at this plan.
 //   3. Move the whole plan directory into `tasks/plans/archive/<name>/`.
 //
-// The CLI-managed `.plan-state.json` `visual` block and the visual canvas
-// (`visual-plan/plan.json`) are lifecycle-agnostic — they are preserved verbatim
-// and travel with the directory. Only per-phase `status` fields are rewritten.
+// Every other `.plan-state.json` key and every other file in the plan dir is
+// preserved verbatim and travels with the directory. Only per-phase `status`
+// fields are rewritten.
 
 export interface PlanArchiveArgs {
 	/** Plan directory or a plan.md path inside it. */
@@ -68,8 +68,8 @@ function setFrontmatterStatusCompleted(mdPath: string, write: boolean): boolean 
 }
 
 /**
- * Mark every `phases[*].status` completed in `.plan-state.json`, preserving every other key
- * (including the CLI-managed `visual` block). Returns true when a change was made.
+ * Mark every `phases[*].status` completed in `.plan-state.json`, preserving every other key.
+ * Returns true when a change was made.
  */
 function markPlanStateCompleted(planStatePath: string, write: boolean): boolean {
 	if (!fs.existsSync(planStatePath)) return false;
@@ -119,7 +119,7 @@ function printReport(report: ArchiveReport, projectRoot: string, dryRun: boolean
 		`  ${pc.dim("phases:")}  ${pc.green(`${report.phasesUpdated}`)}/${report.phaseFilesTotal} set to completed`,
 	);
 	if (report.planStateUpdated)
-		console.log(`  ${pc.dim(".plan-state.json:")} phase statuses → completed (visual block preserved)`);
+		console.log(`  ${pc.dim(".plan-state.json:")} phase statuses → completed (other keys preserved)`);
 	if (report.pointerCleared) console.log(`  ${pc.dim("active pointer:")} cleared`);
 	if (dryRun) console.log(pc.dim("\n  (dry-run — no files written or moved)"));
 }

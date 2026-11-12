@@ -9,14 +9,8 @@ import { meowkitStatePaths } from "../../state/meowkit-state-paths.js";
 // the `.claude/` release flow — mirrors upgrade-codex-toolkit.test.ts.
 //
 // The second describe block covers the red-team-flagged mixed case: a `.claude/` +
-// authored-`.cursor/` project must never re-run the LEGACY `.claude/` → `.cursor/` converter
-// over the authored bundle. That path runs the full `.claude/` release flow, so network calls
-// are mocked out; `runMigrate` is spied on to prove it is never invoked for "cursor".
-
-const runMigrateSpy = vi.fn(async () => 0);
-vi.mock("../../migrate/migrate-orchestrator.js", () => ({
-	runMigrate: (...args: unknown[]) => runMigrateSpy(...args),
-}));
+// authored-`.cursor/` project refreshes the authored bundle alongside `.claude/`. That path
+// runs the full `.claude/` release flow, so network calls are mocked out.
 
 vi.mock("../../core/index.js", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("../../core/index.js")>();
@@ -50,7 +44,6 @@ beforeEach(() => {
 	orig = process.cwd();
 	dir = mkdtempSync(join(tmpdir(), "upgrade-cursor-"));
 	process.chdir(dir);
-	runMigrateSpy.mockClear();
 });
 afterEach(() => {
 	process.chdir(orig);
@@ -73,7 +66,6 @@ describe("upgrade — cursor-only project", () => {
 		expect(existsSync(join(dir, ".meowkit", "README.md"))).toBe(true);
 		// It did NOT create a Claude Code kit, and never touched the network layer.
 		expect(existsSync(join(dir, ".claude"))).toBe(false);
-		expect(runMigrateSpy).not.toHaveBeenCalled();
 	});
 });
 
@@ -92,7 +84,6 @@ describe("upgrade — mixed .claude/ + authored .cursor/ project", () => {
 		await upgrade({});
 
 		// The legacy exporter was never invoked for cursor (nor for codex — no .codex/ here).
-		expect(runMigrateSpy).not.toHaveBeenCalled();
 		// The pre-existing legacy `.cursor/` content is left completely untouched.
 		expect(readFileSync(join(dir, ".cursor", "legacy-marker.mdc"), "utf-8")).toBe("# legacy converter output\n");
 		// The authored bundle WAS refreshed via the reconciler (not the legacy converter).

@@ -31,11 +31,9 @@ The CLI auto-detects your tech stack and asks configuration questions (project n
 
 **What gets created:** A `.claude/` directory holding the agents, skills, lifecycle hooks and the 7 always-on rules, plus the `.meowkit/` store (config, team memory, telemetry). No root `CLAUDE.md` is installed — the always-on guidance is `.claude/rules/*.md`.
 
-Once releases carry the signed kit artifact it is verified before anything is written, and a failed
-check stops the install rather than falling back to an unverified source; no release carries it yet,
-so today's installs take the legacy zip path. Options worth knowing: pick the
-on-disk shape with `--target claude-code --delivery plugin`, install with no network from this
-project's `.meowkit/cache/` with `--offline`, and confirm what landed with `npx mewkit versions`.
+The kit ships as a release zip with a `checksums.txt`, and the install checks the zip against that
+file before it extracts anything. Options worth knowing: pick the on-disk shape with
+`--target claude-code --delivery plugin`, and confirm what landed with `npx mewkit versions`.
 
 ### Step 2: Verify installation
 

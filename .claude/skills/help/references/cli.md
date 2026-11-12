@@ -26,11 +26,8 @@ Flags:
   --allow-kit-source      Run even in the MeowKit source repo (overwrites its authored `.claude/`)
   --target <value>        Skip the toolkit picker and create one toolkit
   --profile <value>       Install a subset: core, developer, product, atlassian, security, research, full
-  --migrate               After unpack, prompt for export targets
-  --migrate-global        Use global install paths instead of project-local
   --skill-packs <value>   Comma-separated skill packs to install
   --delivery <value>      Claude Code only: native or plugin on-disk shape
-  --offline               Install from this project's cached kit artifact only, re-verifying it, and reach no network
   --mcp-profiles <value>  Cursor only: MCP profile names, or 'all', to merge into .cursor/mcp.json
   --allow-cloud-mcp       Cursor only: second opt-in for applying an MCP profile to a repo with a git remote
 ```
@@ -50,7 +47,6 @@ Flags:
   --dry-run           Print what would happen without writing
   --force             Overwrite user-edited targets on conflict
   --allow-kit-source  Run even in the MeowKit source repo (overwrites its authored `.claude/`)
-  --offline           Install from this project's cached kit artifact only, re-verifying it, and reach no network
   --check             Report without changing anything
   --list              List available versions
   --no-cleanup        Keep the downloaded release directory
@@ -91,7 +87,7 @@ Usage: `mewkit capabilities`
 Subcommands:
 
 - `list`
-- `explain` — `mewkit capabilities explain --intent <intent>`
+- `explain` — `mewkit capabilities explain <capability-id>`
 - `resolve` — `mewkit capabilities resolve --intent <intent>`
 - `view` — `mewkit capabilities view [--write]`
 - `bootstrap`
@@ -290,36 +286,6 @@ Flags:
   --all               Include completed and backlog tasks
 ```
 
-## mewkit migrate
-
-Export MeowKit to external coding-agent tools
-
-Usage: `mewkit migrate <tool>`
-
-Flags:
-
-```text
-  --json                    Emit machine-readable JSON
-  --yes                     Answer prompts affirmatively
-  --dry-run                 Print what would happen without writing
-  --force                   Overwrite user-edited targets on conflict
-  --only <value>            Limit to item types: agents, commands, skills, config, rules, hooks
-  --providers               Include provider contract diagnostics
-  --all                     Export every item type rather than the default subset
-  --global                  Use global install paths instead of project-local
-  --source <value>          Migration source root
-  --source-version <value>  Version to record for the migration source
-  --install                 Install the runtime for the target provider
-  --reconcile               Reconcile an existing export instead of writing fresh
-  --skip-config             Do not convert configuration
-  --skip-rules              Do not convert rules
-  --skip-hooks              Do not convert hooks
-  --respect-deletions       Honor deletions.json rather than reinstating removed files
-  --all-rules               Merge every rule into the provider instruction file
-  --include-mcp             Also convert .mcp.json servers into the provider MCP config
-  --include-unportable      Install Claude Code skills for a provider with no adapter (experimental)
-```
-
 ## mewkit providers
 
 Show the effective provider support matrix and enforcement levels
@@ -331,42 +297,6 @@ Flags:
 ```text
   --json       Emit machine-readable JSON
   --lifecycle  Show the capability-adapter and lifecycle matrix
-```
-
-## mewkit visual-plan
-
-Visual plan contracts
-
-Usage: `mewkit visual-plan`
-
-Subcommands (one is required):
-
-- `validate` — `mewkit visual-plan validate <plan-dir>`
-- `status` — `mewkit visual-plan status <plan-dir>`
-- `approve` — `mewkit visual-plan approve <plan-dir> [--revision <rev>]`
-- `rehash` — `mewkit visual-plan rehash <plan-dir>`
-- `export` — `mewkit visual-plan export <plan-dir> [--format <format>]`
-- `prepare-feedback` — `mewkit visual-plan prepare-feedback <plan-dir> --ops <file>`
-- `apply-feedback` — `mewkit visual-plan apply-feedback <plan-dir> --batch <id> [--check]`
-- `patch` — `mewkit visual-plan patch <plan-dir> --op <file>`
-- `edit` — `mewkit visual-plan edit <plan-dir>`
-- `view` — `mewkit visual-plan view <plan-dir> [--port <port>]`
-
-Flags:
-
-```text
-  --json              Emit machine-readable JSON
-  --force             Overwrite user-edited targets on conflict
-  --check             Pre-apply gate for apply-feedback
-  --port <value>      Bind to a fixed port instead of a random one
-  --open              Auto-launch the browser
-  --no-open           Do not launch the browser
-  --revision <value>  Pin approve to the exact reviewed revision
-  --format <value>    Export format
-  --ops <value>       Operations file for prepare-feedback
-  --op <value>        Operations file for patch
-  --batch <value>     Feedback batch id for apply-feedback
-  --receipt <value>   Record apply-feedback outcomes to this file
 ```
 
 ## mewkit review

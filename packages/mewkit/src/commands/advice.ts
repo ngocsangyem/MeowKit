@@ -424,11 +424,9 @@ function applyEvidenceCorrection(projectRoot: string, args: AdviceOptions): void
 
 	// Inside the project is not narrow enough. `applyCorrection` spreads whatever JSON
 	// object it reads and writes it back, so any JSON file in the repo was a legal write
-	// target. Pointed at a Gate-1-approved `visual-plan/plan.json` — which carries its own
-	// top-level `review.status` — a correction flipped that status to "superseded",
-	// injected four foreign fields, and broke the artifact against its own pinned hash.
-	// That is a supervision event silently mutating the HTML pipeline's artifact, which
-	// the two flags being orthogonal is supposed to make impossible.
+	// target. Pointed at another owner's approved artifact that carries its own top-level
+	// `review.status`, a correction flipped that status to "superseded", injected four
+	// foreign fields, and broke the artifact against its own pinned hash.
 	//
 	// The index has one name everywhere it is written, so the name is the check.
 	if (path.basename(real) !== EVIDENCE_INDEX_FILENAME)

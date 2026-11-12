@@ -28,7 +28,7 @@ describe("the declared Node floor", () => {
 
 	it("is the same number in the README and the docs pages that state one", () => {
 		expect(read("README.md")).toContain(`- ${NODE_FLOOR_PROSE}`);
-		for (const page of ["cli/commands.mdx", "cli/project-setup.mdx"]) {
+		for (const page of ["cli/index.mdx", "cli/project-setup.mdx", "installation.mdx", "workflows/new-project.mdx"]) {
 			const text = read(path.join("packages", "docs", "content", "docs", page));
 			expect(text, page).toContain(`Node.js ${NODE_FLOOR_MAJOR}+`);
 			// The old prose promised a lower floor than `engines` enforced.

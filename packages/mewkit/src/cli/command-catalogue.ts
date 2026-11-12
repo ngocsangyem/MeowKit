@@ -16,7 +16,7 @@ const COMMANDS: CommandSpec[] = [
 		summary: "Inspect or resolve the capability manifest",
 		subcommands: ["list", "explain", "resolve", "view", "bootstrap", "projections"],
 		subcommandUsage: {
-			explain: "capabilities explain --intent <intent>",
+			explain: "capabilities explain <capability-id>",
 			resolve: "capabilities resolve --intent <intent>",
 			view: "capabilities view [--write]",
 			projections: "capabilities projections [--provider <provider>]",
@@ -66,40 +66,10 @@ const COMMANDS: CommandSpec[] = [
 			list: "task list [--status <status>] [--all]",
 		},
 	},
-	{ name: "migrate", summary: "Export MeowKit to external coding-agent tools", usage: "migrate <tool>" },
 	{
 		name: "providers",
 		summary: "Show the effective provider support matrix and enforcement levels",
 		usage: "providers [<provider>]",
-	},
-	{
-		name: "visual-plan",
-		summary: "Visual plan contracts",
-		subcommands: [
-			"validate",
-			"status",
-			"approve",
-			"rehash",
-			"export",
-			"prepare-feedback",
-			"apply-feedback",
-			"patch",
-			"edit",
-			"view",
-		],
-		requiresSubcommand: true,
-		subcommandUsage: {
-			validate: "visual-plan validate <plan-dir>",
-			status: "visual-plan status <plan-dir>",
-			approve: "visual-plan approve <plan-dir> [--revision <rev>]",
-			rehash: "visual-plan rehash <plan-dir>",
-			export: "visual-plan export <plan-dir> [--format <format>]",
-			"prepare-feedback": "visual-plan prepare-feedback <plan-dir> --ops <file>",
-			"apply-feedback": "visual-plan apply-feedback <plan-dir> --batch <id> [--check]",
-			patch: "visual-plan patch <plan-dir> --op <file>",
-			edit: "visual-plan edit <plan-dir>",
-			view: "visual-plan view <plan-dir> [--port <port>]",
-		},
 	},
 	{
 		name: "review",
@@ -196,26 +166,24 @@ const FLAGS: FlagSpec[] = [
 			"budget",
 			"task-state",
 			"advice",
-			"visual-plan",
 			"backups",
 			"uninstall",
 			"doctor",
 			"init",
 			"setup",
-			"migrate",
 			"upgrade",
 			"versions",
 		],
 		"Emit machine-readable JSON",
 	),
-	b("yes", ["init", "upgrade", "pack", "migrate", "uninstall", "backups"], "Answer prompts affirmatively"),
+	b("yes", ["init", "upgrade", "pack", "uninstall", "backups"], "Answer prompts affirmatively"),
 	b("beta", ["init", "upgrade", "pack"], "Use the beta release channel"),
 	b(
 		"dry-run",
-		["init", "plan", "migrate", "backups", "uninstall", "upgrade", "setup", "pack"],
+		["init", "plan", "backups", "uninstall", "upgrade", "setup", "pack"],
 		"Print what would happen without writing",
 	),
-	b("force", ["init", "visual-plan", "migrate", "uninstall", "upgrade"], "Overwrite user-edited targets on conflict", {
+	b("force", ["init", "uninstall", "upgrade"], "Overwrite user-edited targets on conflict", {
 		perCommand: {
 			init: "Overwrite an existing `.claude/`",
 			uninstall: "Also remove kit paths this project has edited",
@@ -234,22 +202,13 @@ const FLAGS: FlagSpec[] = [
 	s("profile", ["init", "budget"], "Install a subset: core, developer, product, atlassian, security, research, full", {
 		perCommand: { budget: "Estimate one context profile instead of all of them" },
 	}),
-	b("migrate", ["init"], "After unpack, prompt for export targets"),
-	b("migrate-global", ["init"], "Use global install paths instead of project-local"),
 	s("skill-packs", ["init"], "Comma-separated skill packs to install"),
 	s("delivery", ["init"], "Claude Code only: native or plugin on-disk shape"),
-	b(
-		"offline",
-		["init", "upgrade"],
-		"Install from this project's cached kit artifact only, re-verifying it, and reach no network",
-	),
 	s("mcp-profiles", ["init"], "Cursor only: MCP profile names, or 'all', to merge into .cursor/mcp.json"),
 	b("allow-cloud-mcp", ["init"], "Cursor only: second opt-in for applying an MCP profile to a repo with a git remote"),
 
 	// upgrade
-	b("check", ["upgrade", "visual-plan"], "Report without changing anything", {
-		perCommand: { "visual-plan": "Pre-apply gate for apply-feedback" },
-	}),
+	b("check", ["upgrade"], "Report without changing anything"),
 	b("list", ["upgrade"], "List available versions"),
 	b("no-cleanup", ["upgrade"], "Keep the downloaded release directory"),
 
@@ -311,14 +270,12 @@ const FLAGS: FlagSpec[] = [
 	s("fail-over", ["budget"], "Exit non-zero when a profile exceeds N tokens"),
 
 	// setup
-	s("only", ["setup", "migrate"], "Run a single setup step", {
-		perCommand: { migrate: "Limit to item types: agents, commands, skills, config, rules, hooks" },
-	}),
+	s("only", ["setup"], "Run a single setup step"),
 	b("system-deps", ["setup"], "Install system-level dependencies"),
 
 	// doctor
 	b("report", ["doctor"], "Print a shareable diagnostic report"),
-	b("providers", ["doctor", "migrate"], "Include provider contract diagnostics"),
+	b("providers", ["doctor"], "Include provider contract diagnostics"),
 	b("state", ["doctor"], "Include state taxonomy diagnostics"),
 	b("explain", ["doctor"], "Explain the provenance result rather than summarizing it"),
 	b("hard-gates", ["doctor"], "Live-probe the hard gates (plan, privacy, injection block)"),
@@ -367,37 +324,11 @@ const FLAGS: FlagSpec[] = [
 	// task
 	s("type", ["task"], "Task type: feature, bug-fix, refactor, security"),
 	s("priority", ["task"], "Task priority"),
-	b("all", ["task", "migrate"], "Include completed and backlog tasks", {
-		perCommand: { migrate: "Export every item type rather than the default subset" },
-	}),
+	b("all", ["task"], "Include completed and backlog tasks"),
 
-	// migrate
-	b("global", ["migrate"], "Use global install paths instead of project-local"),
-	s("source", ["migrate"], "Migration source root"),
-	s("source-version", ["migrate"], "Version to record for the migration source"),
-	b("install", ["migrate"], "Install the runtime for the target provider"),
-	b("reconcile", ["migrate"], "Reconcile an existing export instead of writing fresh"),
-	b("skip-config", ["migrate"], "Do not convert configuration"),
-	b("skip-rules", ["migrate"], "Do not convert rules"),
-	b("skip-hooks", ["migrate"], "Do not convert hooks"),
-	b("respect-deletions", ["migrate"], "Honor deletions.json rather than reinstating removed files"),
-	b("all-rules", ["migrate"], "Merge every rule into the provider instruction file"),
-	b("include-mcp", ["migrate"], "Also convert .mcp.json servers into the provider MCP config"),
-	b("include-unportable", ["migrate"], "Install Claude Code skills for a provider with no adapter (experimental)"),
 
 	// providers
 	b("lifecycle", ["providers"], "Show the capability-adapter and lifecycle matrix"),
-
-	// visual-plan
-	s("port", ["visual-plan"], "Bind to a fixed port instead of a random one"),
-	b("open", ["visual-plan"], "Auto-launch the browser"),
-	b("no-open", ["visual-plan"], "Do not launch the browser"),
-	s("revision", ["visual-plan"], "Pin approve to the exact reviewed revision"),
-	s("format", ["visual-plan"], "Export format"),
-	s("ops", ["visual-plan"], "Operations file for prepare-feedback"),
-	s("op", ["visual-plan"], "Operations file for patch"),
-	s("batch", ["visual-plan"], "Feedback batch id for apply-feedback"),
-	s("receipt", ["visual-plan"], "Record apply-feedback outcomes to this file"),
 ];
 
 export const CLI_CATALOGUE: Catalogue = {

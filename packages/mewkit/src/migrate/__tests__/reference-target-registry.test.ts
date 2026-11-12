@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
 	buildReferenceRewriteTable,
@@ -63,21 +61,5 @@ describe("reference target registry", () => {
 		const globalTarget = getReferenceTarget("codex", "config", "global");
 		expect(projectTarget?.path).toBe("AGENTS.md");
 		expect(globalTarget?.path).toBe("~/.codex/AGENTS.md");
-	});
-});
-
-describe("converter source hygiene", () => {
-	// Mapping literals must live only in the reference registry. If this fails,
-	// a converter re-introduced its own `.claude`/provider-root strings.
-	const guardedFiles = ["md-strip.ts", "direct-copy.ts"];
-
-	it("refactored converters contain no source-root or provider-root literals", () => {
-		for (const file of guardedFiles) {
-			const source = readFileSync(fileURLToPath(new URL(`../converters/${file}`, import.meta.url)), "utf-8");
-			expect(source, `${file} must not embed ".claude" literals`).not.toMatch(/\.claude/);
-			expect(source, `${file} must not embed provider root literals`).not.toMatch(
-				/"\.(codex|cursor|gemini|opencode|factory|windsurf|agent|roo|kilocode|goose|agents|cline|openhands|github)\//,
-			);
-		}
 	});
 });

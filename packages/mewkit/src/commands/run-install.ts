@@ -19,7 +19,6 @@ import { TARGET_SHAPES } from "../emit/target-shape.js";
 
 export interface RunInstallArgs extends InitArgs {
 	delivery?: string;
-	offline?: boolean;
 	cliVersion: string;
 }
 
@@ -72,6 +71,6 @@ export async function runInstall(args: RunInstallArgs): Promise<void> {
 		cliVersion: args.cliVersion,
 		target: shape.target,
 		delivery: shape.delivery,
-		origin: installOrigin(args.offline === true),
+		origin: installOrigin(),
 	});
 }

@@ -9,7 +9,7 @@
 
 <p align="center">
   <strong>AI agent toolkit for Claude Code</strong><br>
-  129 skills &middot; 42 agents &middot; 7 rules &middot; 27 hook scripts &middot; 4-layer+ security
+  128 skills &middot; 42 agents &middot; 7 rules &middot; 27 hook scripts &middot; 4-layer+ security
 </p>
 
 <p align="center">
@@ -47,11 +47,9 @@ Installs the `mk` plugin from the MeowKit marketplace. Skills (`/mk:*`), agents 
 
 > **Codex support is an experimental projection.** MeowKit is fully enforced on Claude Code (real hooks gate behavior); on Codex the capability projection is advisory — hook enforcement is version-gated and not statically guaranteed, so gates deter but do not block. Run `mewkit providers codex --lifecycle` to see exactly what is enforced vs advisory.
 >
-> **Full semantic parity is a staged, measured track — reported as a parity score.** Migration to Codex is default-deny: a `runtime: portable` skill installs; a `runtime: claude-code` skill installs only through a tested adapter, otherwise it is skipped with a report reason (never copied unadapted). `mewkit providers codex` and the migration output print `skill parity: N%` (portable+adapted ÷ total). The score starts low on purpose — it is the honest roadmap of the parity track, raised by porting skills to `runtime: portable`. Override the policy with `mewkit migrate codex --include-unportable` (installs host-bound skills with an EXPERIMENTAL marker).
+> **Codex and Cursor get an authored bundle, not a conversion.** `mewkit init --target codex|cursor` copies a hand-maintained native bundle shipped with the CLI; nothing is converted from `.claude/` at install time. The bundles are checked structurally (artifact set, denied tokens, install idempotency) in CI. That is evidence of structural parity, not of identical behavior across hosts.
 >
-> **Parity is machine-verified, and labeled for what it proves.** The cross-harness journey (J10) runs a deterministic layer in CI — migration → target validation → route/artifact/denied-token/side-effect oracles — with no model calls. This proves **structural** parity (the same ask resolves to an equivalent capability or a clean unsupported-capability error, never silent degradation); it is not evidence of semantic/behavioral equivalence, which awaits the model-in-loop layer (a named follow-up). Any parity claim here is either the measured skill-parity score above or this structural check — not an unverified assertion.
->
-> **Validate a generated Codex project** with `mewkit validate --target codex <dir>` — a read-only post-migration gate that checks the config/hook wiring, that hook wrappers exist + are executable + carry the deny contract, that agent TOMLs parse, and that installed skills declare a supported runtime and carry no host-bound tool tokens. `mewkit doctor --providers` run inside a migrated project recognizes it and points at this command.
+> **Validate a generated Codex project** with `mewkit validate --target codex <dir>` — a read-only post-install gate that checks the config/hook wiring, that hook wrappers exist + are executable + carry the deny contract, that agent TOMLs parse, and that installed skills declare a supported runtime and carry no host-bound tool tokens. `mewkit doctor --providers` run inside a Codex project recognizes it and points at this command.
 
 ```bash
 npx mewkit init --target claude-code --delivery plugin
@@ -107,7 +105,7 @@ npx mewkit doctor     # Verify environment
 meowkit/
 ├── .claude/                  Source of truth — agents, skills, rules, hooks
 │   ├── agents/               42 specialist agents
-│   ├── skills/               129 skills (mk: namespace) — 128 ship; benchmark is maintainer-only
+│   ├── skills/               128 skills (mk: namespace) — 127 ship; benchmark is maintainer-only
 │   ├── rules/                7 enforcement rules (always-on)
 │   ├── hooks/                27 hook scripts — lifecycle hooks + handlers — plus their libraries
 │   ├── statusline.cjs

@@ -8,17 +8,10 @@ estimates and how it derives the structural-overhead percentage banners.
 Every counted byte is divided by 4 to estimate tokens. This is the same
 heuristic encoded in:
 
-- the cost-tracking token estimator (`CHARS_PER_TOKEN = 4`)
 - `.claude/hooks/handlers/budget-tracker.cjs` (cost-tracking path)
 
-We inline the heuristic in shell rather than calling
-`token-estimator.ts` because:
-
-1. The TS module exports a programmatic API only (no CLI entry).
-2. `dist/` is `.gitignore`d and not present on a fresh the installer install,
-   so a Node bridge would require an extra build step.
-3. The heuristic is a single expression. Mirroring it inline keeps the audit
-   script zero-dep.
+The audit script inlines the heuristic rather than calling into the hook
+because it is a single expression, and mirroring it keeps the script zero-dep.
 
 **Consistency over precision.** The chars/4 heuristic is wrong in the same
 direction as `budget-tracker.cjs`. That makes audit results comparable

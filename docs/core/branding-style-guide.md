@@ -13,7 +13,7 @@ Brand prose belongs at the **repo level**, not inside the runtime markdown:
 - `docs/branding-*`
 - `assets/**`
 
-Brand does **not** belong in `.claude/` markdown body text. Converters substitute target-aware names at `mewkit migrate` time; source must use neutral terms for that to work.
+Brand does **not** belong in `.claude/` markdown body text. The Codex and Cursor bundles are authored from it with target-aware names; neutral source terms keep that rewrite mechanical.
 
 ## Allowed in runtime markdown text
 
@@ -59,10 +59,10 @@ The lint and the migrate converter both honor these markers.
 
 ## Why these rules
 
-Phase 1 of the brand-prose plan added narrative substitution to `packages/mewkit/src/migrate/converters/md-strip.ts`. At `mewkit migrate codex|kiro|cursor` time, the converter rewrites brand prose into the target's display name. For that pipeline to produce clean output:
+When `.claude/` content is carried into the authored Codex and Cursor bundles, brand prose is rewritten into the target's display name. For that rewrite to produce clean output:
 
-1. Source must use neutral terms — converters can't substitute words that aren't there.
-2. Identifiers stay verbatim — converters route them per-target by their own path-rewrite rules, not by string substitution.
+1. Source must use neutral terms — the rewrite cannot substitute words that are not there.
+2. Identifiers stay verbatim — they are routed per target by path rules, not by string substitution.
 3. Citations stay verbatim — academic provenance is data, not branding.
 
 ## Before / after examples
@@ -113,5 +113,3 @@ Expected exit codes:
 
 - `scripts/lint-brand-prose.sh` — the enforcement
 - `scripts/check-anthropic-context.py` — Anthropic context-window helper
-- `packages/mewkit/src/migrate/converters/md-strip.ts` — runtime substitution
-- `packages/mewkit/src/migrate/converters/fm-strip.ts` — Codex/Kiro/Cursor merged-agents header

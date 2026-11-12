@@ -61,11 +61,6 @@ Operational result:
 - Claude Code produces JSONL transcript events.
 - Transcript-tailing visualization (the experimental `orchviz` runtime) was retired in v2.13.6; transcripts remain the raw data plane for memory/trace tooling.
 
-### Visual plan review (visual-plan studio)
-
-- `mewkit visual-plan` serves a transient `127.0.0.1` studio to review and edit a plan's structured visual artifact (`visual-plan/plan.json`), gated by a deterministic CLI (`validate` / `approve` / `export`).
-- The studio is built on the shared loopback primitives in `packages/mewkit/src/local-web/` (Host/Origin guards, ETag + `If-Match` writes, atomic file writes, path boundary) — the safety model inherited from the retired orchviz server.
-
 ## Orchestration layer (skills + delegations)
 
 ### Routing
@@ -102,7 +97,6 @@ Delegation prompts are expected to include:
 ### Diagram assets
 
 - Static architecture diagrams live under `docs/architecture/diagrams/*`.
-- The visual-plan studio provides an interactive plan-review layer distinct from static images.
 
 ## Contracts you can verify in CI
 

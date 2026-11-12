@@ -191,10 +191,10 @@ Superseded evidence must never read as current at a later gate or ship preflight
 **A correction's only write target is an existing `workflow-evidence.json` inside the
 project.** The index lives under several roots but always under that name, so the name is
 the check; the CLI refuses any other path. Without that bound, `--evidence` accepted any
-JSON object in the project and the correction spread it and wrote it back — pointed at a
-Gate-1-approved `visual-plan/plan.json`, which carries its own top-level `review.status`,
-it flipped that status to `superseded`, injected fields the visual schema does not define,
-and broke the artifact against its own pinned hash. Supervision does not write another
+JSON object in the project and the correction spread it and wrote it back — pointed at
+another owner's approved artifact, which carries its own top-level status field, it
+flipped that status to `superseded`, injected fields that artifact's schema does not
+define, and broke it against its own pinned hash. Supervision does not write another
 owner's artifact.
 
 Both the boundary check and the name check run on the **resolved** path. A textual check

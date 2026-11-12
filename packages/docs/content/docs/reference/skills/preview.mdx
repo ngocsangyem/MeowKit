@@ -1,6 +1,6 @@
 ---
 title: "mk:preview"
-description: "Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, and git diffs. Display only; not for plan rendering or plan critique."
+description: "Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, and git diffs. Display only; not for plan critique."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -17,7 +17,7 @@ description: "Generate visual artifacts — markdown or self-contained HTML — 
 
 ## What This Skill Does
 
-Generates visual artifacts — markdown and self-contained HTML files — for explaining code, drawing diagrams, building slide decks, and visualizing git diffs. Rendering a plan as HTML belongs to `mk:visual-plan`. No live server, no Python, no D3. Pure markdown + HTML + bash file ops. Output writes to `tasks/plans/{active-plan}/visuals/` when an active plan exists, otherwise falls back to `tasks/visuals/`.
+Generates visual artifacts — markdown and self-contained HTML files — for explaining code, drawing diagrams, building slide decks, and visualizing git diffs. No live server, no Python, no D3. Pure markdown + HTML + bash file ops. Output writes to `tasks/plans/{active-plan}/visuals/` when an active plan exists, otherwise falls back to `tasks/visuals/`.
 
 ## When to Use
 
@@ -28,7 +28,7 @@ Triggers:
 - Stakeholders prefer a self-contained HTML they can open without a server
 
 Anti-triggers:
-- Render a plan as HTML — use `mk:visual-plan`
+- Publish-grade SVG or PNG diagram files — use `mk:tech-graph`
 - Plan critique or scope review — use `mk:plan-ceo-review`
 - Image / video / audio generation — use `mk:multimodal`
 - Browser QA testing — use `mk:qa`
@@ -44,7 +44,7 @@ Anti-triggers:
 - **Style rotation** — palette and typography vary per run via `${CLAUDE_PLUGIN_DATA}/preview/style-rotation.json`; deterministic-hash fallback when env var is unset
 - **Plan-aware output paths** — detects `.meowkit/state/active-plan` (handles both absolute path and slug formats); falls back loudly with stderr `warn:`
 - **Anti-slop guarantees** — no Inter font, no indigo/violet accent, no gradient text, no glow shadows, no emoji headers, no three-dot chrome
-- **Display, not critique** — `--html --diff` RENDERS; verdict stays with `mk:review` and `mk:plan-ceo-review`, and plan-as-HTML rendering stays with `mk:visual-plan`
+- **Display, not critique** — `--html --diff` RENDERS; verdict stays with `mk:review` and `mk:plan-ceo-review`
 
 ## Usage
 
@@ -67,7 +67,7 @@ Anti-triggers:
 /mk:preview --html --diff '#142'              # PR number (requires gh)
 ```
 
-`--ascii` does not combine with `--html` (terminal-only by design). To render a plan as HTML, use `mk:visual-plan`.
+`--ascii` does not combine with `--html` (terminal-only by design).
 
 ## Argument Resolution
 
@@ -111,7 +111,7 @@ The fallback path is logged on stderr (`warn:`) so silent path mismatches surfac
 - `mk:ui-design-system` — palette and typography selection from `assets/colors.csv` (160 rows) and `assets/typography.csv` (73 rows)
 - `mk:frontend-design` — anti-slop forbidden patterns. Cited via `references/anti-slop-directives.md`, not duplicated.
 - `mk:web-to-markdown` — for users who want to view a generated markdown file in a browser (no server bundled here)
-- `mk:visual-plan` — the canonical owner of plan-as-HTML rendering; route plan-render requests there
+- `mk:tech-graph` — publish-grade SVG and PNG diagrams when you need a standalone file rather than an HTML page
 
 ## Mermaid v11 Embedded Reference
 

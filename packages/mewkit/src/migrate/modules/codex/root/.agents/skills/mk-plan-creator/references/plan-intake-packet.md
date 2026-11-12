@@ -100,7 +100,6 @@ Six blocks, in this order. Target the whole packet at UNDER 120 lines.
 | Ticket complexity + dependency mapping against the codebase | `mk:planning-engine` |
 | Exploring solution approaches, trade-off analysis | `mk:brainstorming` |
 | Plan structural validation | `npx mewkit plan check --structural` |
-| Rendering plans to HTML | `mk:visual-plan` |
 
 If a request fits one of these rows, the packet does not absorb it — hand off.
 The packet only consolidates artifacts those skills (or the user) already produced.

@@ -1,14 +1,6 @@
 import { defineConfig } from "vitest/config";
-import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-	plugins: [react()],
-	resolve: {
-		// Force a single React copy so hooks work under any installer layout.
-		// pnpm's nested node_modules can resolve two React instances (react-dom
-		// binds one, the component binds another) → null hooks dispatcher.
-		dedupe: ["react", "react-dom"],
-	},
 	test: {
 		fileParallelism: false,
 		// Match the root config: integration tests here shell out to real subprocesses
@@ -19,8 +11,7 @@ export default defineConfig({
 		maxConcurrency: 1,
 		include: [
 			"tests/**/*.test.ts",
-			"src/**/__tests__/**/*.test.{ts,tsx}",
-			"visual-plan-web/**/__tests__/**/*.test.{ts,tsx}",
+			"src/**/__tests__/**/*.test.ts",
 		],
 		// Live-Cursor integration tests (real IDE/CLI, only runnable when Cursor is
 		// installed) live in their own `*.live.test.ts` files and run via the
@@ -28,9 +19,5 @@ export default defineConfig({
 		// — never in this serialized unit suite, so a hanging live fixture can never
 		// stall it.
 		exclude: ["**/*.live.test.ts"],
-		environmentMatchGlobs: [
-			["src/**/__tests__/**/*.test.tsx", "jsdom"],
-			["visual-plan-web/**/__tests__/**/*.test.tsx", "jsdom"],
-		],
 	},
 });

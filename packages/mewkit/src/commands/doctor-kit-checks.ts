@@ -1,21 +1,13 @@
 // What `doctor` says about the kit's delivery: a baseline that has not been
-// carried forward yet, and a version that cannot be installed at all.
+// carried forward yet, and a project that carries two deliveries at once.
 //
-// Both exist because the cause is otherwise only visible inside the command
-// that fails. A project whose ownership record is still the superseded file is
-// owned, not unowned — reporting it as unowned would send the user to adoption,
-// which rebuilds a baseline it already has. And a version whose artifact failed
-// verification blocks every install of that version until a new release is cut;
-// told only "download failed", the user retries forever.
-//
-// The blocked-version row reads the record a refused attempt left in the project
-// and NOTHING else. No request is made: a diagnostic that reaches the network to
-// explain a failure is a diagnostic that cannot run where the failure happened.
+// A project whose ownership record is still the superseded file is owned, not
+// unowned. Reporting it as unowned would send the user to adoption, which
+// rebuilds a baseline it already has.
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 import { hasLegacyManifest, migrationPendingMessage } from "../core/legacy-manifest-migration.js";
-import { listVerificationFailures } from "../kit/kit-quarantine.js";
 import type { DiagResult } from "./doctor-checks.js";
 
 /** Whether this project's ownership baseline still needs carrying forward. */
@@ -32,23 +24,6 @@ export function checkBaselineMigration(root: string | null): DiagResult {
 		status: "warn",
 		detail: migrationPendingMessage(),
 		fix: "mewkit upgrade — it snapshots first, carries the baseline forward, then retires the old file",
-	};
-}
-
-/** Any version this project tried to install and refused, read with no network. */
-export function checkRefusedVersions(root: string | null): DiagResult {
-	const name = "Kit verification";
-	if (!root) return { name, status: "warn", detail: "Skipped — no project" };
-	const failures = listVerificationFailures(root);
-	if (failures.length === 0) {
-		return { name, status: "pass", detail: "No refused kit version recorded in this project." };
-	}
-	const latest = failures[0];
-	return {
-		name,
-		status: "fail",
-		detail: `${latest.message} Kit ${latest.version} cannot be installed in this project until a new release is published.`,
-		fix: "Wait for a new release, then run `mewkit upgrade`. Re-running this version will refuse again.",
 	};
 }
 

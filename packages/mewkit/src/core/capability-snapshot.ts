@@ -28,7 +28,7 @@ function validateSnapshot(manifest: CapabilityManifest, snapshotPath: string): C
 	for (const entry of manifest.entries) {
 		if (!KNOWN_INVOCATION_IDS.has(entry.invocation.id)) {
 			throw new Error(
-				`Capability snapshot at ${snapshotPath} contains unknown invocation id for ${entry.id}. Regenerate it with \`npx mewkit migrate codex\`.`,
+				`Capability snapshot at ${snapshotPath} contains unknown invocation id for ${entry.id}. Regenerate it with \`npx mewkit init --target codex\`.`,
 			);
 		}
 	}
@@ -42,13 +42,13 @@ export function readCapabilitySnapshot(snapshotPath: string): CapabilityEntry[] 
 	} catch (error) {
 		const detail = error instanceof Error ? error.message : String(error);
 		throw new Error(
-			`Could not read capability snapshot at ${snapshotPath}: ${detail}. Regenerate it with \`npx mewkit migrate codex\`.`,
+			`Could not read capability snapshot at ${snapshotPath}: ${detail}. Regenerate it with \`npx mewkit init --target codex\`.`,
 		);
 	}
 	const parsed = CapabilityManifestSchema.safeParse(raw);
 	if (!parsed.success) {
 		throw new Error(
-			`Capability snapshot at ${snapshotPath} is invalid: ${parsed.error.issues[0]?.message ?? "schema validation failed"}. Regenerate it with \`npx mewkit migrate codex\`.`,
+			`Capability snapshot at ${snapshotPath} is invalid: ${parsed.error.issues[0]?.message ?? "schema validation failed"}. Regenerate it with \`npx mewkit init --target codex\`.`,
 		);
 	}
 	return validateSnapshot(parsed.data, snapshotPath);

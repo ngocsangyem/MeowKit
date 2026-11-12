@@ -4,39 +4,12 @@ For full meowkit system architecture see `meowkit-architecture.md`.
 
 ---
 
-## Local Web Loopback + Visual-Plan Studio (v2.13.6)
+## Retired local-web surfaces (historical)
 
-The experimental `mewkit orchviz` visualizer (and its `src/orchviz/` module) was
-removed in v2.13.6. Its loopback-server safety model survived as the reusable
-primitives under `packages/mewkit/src/local-web/`, now consumed by the
-`mewkit visual-plan` studio (`packages/mewkit/src/visual-plan/`, layered
-domain → application → infrastructure → interface/server).
-
-### Shared Loopback Primitives (`src/local-web/`)
-
-| Module | Guarantee |
-| --- | --- |
-| `local-server.ts` | Transient HTTP server bound to `127.0.0.1` only; no hosted service. |
-| `host-guard.ts` | Host-header allowlist — blocks DNS-rebinding even on the loopback bind. |
-| `origin-guard.ts` | Origin allowlist for state-changing requests (`127.0.0.1`/`localhost` + port, exact match). |
-| `etag.ts` | sha256 content ETags; writes require `If-Match` — stale revision → 409, client re-fetches. |
-| `atomic-write.ts` | Same-directory tmp file + `renameSync` (POSIX-atomic); tmp unlinked on failure. |
-| `path-boundary.ts` | Resolved paths must stay inside the served root — no traversal. |
-| `request-body.ts` / `static-handler.ts` / `open-browser.ts` | Size-capped body reads, strict-CSP static serving, browser launch. |
-
-### Visual-Plan Studio (consumer)
-
-- Canonical artifact: `{plan_dir}/visual-plan/plan.json` (schema `visual-plan/v1`) —
-  coverage ledger + frames/connectors/annotations. The deterministic CLI owns
-  `validate` / `status` / `approve --revision` (single writer of `review.status`) /
-  `rehash` / `export --format html`.
-- `edit` serves the studio with a single-editor lock; `view` is read-only.
-  Wireframe HTML is sanitized at both save and render; pages serve under a strict CSP.
-- Reviewer edits freeze into immutable feedback batches; `apply-feedback` is
-  receipted and stale-safe (double-apply refused). An unresolved receipt op blocks
-  `approve` at that revision.
-- Editor-conflict semantics are unchanged from the old write surface: atomic rename
-  means an external editor sees a complete new file version, never a partial write.
+No MeowKit CLI binds a local HTTP port any more. `mewkit orchviz` (and `src/orchviz/`)
+was removed in v2.13.6; the `mewkit visual-plan` studio, the shared loopback primitives
+it reused (`src/local-web/`) and `src/token-estimator/` were removed in the current
+unreleased change. The code remains in git history.
 
 ## Context Boundary
 
@@ -75,31 +48,35 @@ The release ships ONE full tarball; install size is controlled at install time, 
 - **Pack-aware `upgrade`**: reads `metadata.packs` (corrupt/absent ⇒ full); a partial install upgrades only its packs, removed packs stay removed.
 - **Guardrails**: `mewkit validate --packs` (manifest coherence, completeness, the exact-path safety invariant) and `mewkit budget context --profile <p> [--fail-over N]` (loadable-context estimator) — both wired into CI. The safety invariant is enforced by an explicit exact-path assertion (not by registering dispatched files in the inventory, which would collide with the Phase-2 ownership check).
 
-## Migration Targets (`mewkit migrate`)
+## Install Targets (Codex, Cursor)
 
-`mewkit` exports the Claude-format kit to two external coding-agent tools, maintained on
-opposite models — know which applies before editing.
+Codex and Cursor are **both hand-authored bundles** — nothing converts `.claude/` at
+install time. The `mewkit migrate` verb and its whole converter pipeline (md-strip,
+fm-strip, direct-copy, orchestrator, reconciler entrypoint, the `--include-mcp`
+`.mcp.json` → `config.toml` merge) are removed.
 
-- **Codex — hand-authored bundle** (`packages/mewkit/src/migrate/modules/codex/`). NOT a
-  runtime transform: a Codex-native tree (`root/`) + a per-surface `manifest.json`
-  (`active` flags) + `catalog/skill-packs.json` (7 install packs, char-budgeted) +
-  `compliance/` evidence. `migrate codex` / `init --target codex` copy the bundle through
-  the reconciler (`codex-reconcile-apply.ts`) against a project-local ledger
-  (`.meowkit/state/codex-ledger.json`); a second run converges to zero drift and
-  user-edited managed files are preserved or reported as an explicit conflict, never
-  silently overwritten. Adding a `.claude/` skill/agent/rule/command/hook means
-  hand-authoring the matching Codex-native file(s) — see `RELEASING.md` step 1e.
-- **Cursor — converted at install time by the npm CLI** (no authored bundle). `migrate cursor` converts
-  `.claude/` on the fly: `agents/*.md` → `.cursor/rules/*.mdc` (fm-to-fm), rules + config → `.mdc`
-  (md-to-mdc), `skills/` direct-copied; Cursor has no command or hook surface. New
-  `.claude/` content reaches Cursor automatically.
-
-The semantic porter and the generic Codex converter pipeline were removed in CLI 2.1.0
-once all Codex surfaces were authored, so `migrate codex` no longer converts a project's
-own custom agents/commands/hooks (toolkit agents ship in the bundle); the only kept Codex
-converter is the opt-in `--include-mcp` `.mcp.json` → `config.toml [mcp_servers]` merge.
-The shared converters (`converters/{md-strip,fm-to-fm,md-to-mdc,direct-copy}.ts`) + the
-reference-rewriter family still serve Cursor and the surviving Codex config/rules path.
+- **Bundle shape** — `packages/mewkit/src/migrate/modules/{codex,cursor}/` (the `migrate/`
+  path is kept on purpose; it moves in a later phase). Each bundle is a provider-native
+  tree (`root/`) + a per-surface `manifest.json` (`active` flags, `ownership`) +
+  `catalog/` install packs (char-budgeted; Cursor also carries `agent-packs.json` and
+  `mcp-profiles.json`) + `compliance/` evidence. Codex surfaces (11 manifest entries):
+  `AGENTS.md`, `.codex/config.toml`, `.codex/rules/`, `.codex/agents/`, `.codex/hooks.json`
+  + `.codex/hooks/` (`lib/`, `hook-runtime-config.json`, `gate-enforcement.cjs`,
+  `privacy-block.cjs`), `.codex/scripts/skill-python.cjs`, `.agents/skills/` — all
+  `managed-replace`; there is no prompts/command surface. Cursor surfaces: `AGENTS.md`,
+  `.cursor/{rules,agents,skills,hooks}` (+ `hooks.json`, `scripts/`) — no command surface.
+- **Install** — `mewkit init --target codex|cursor` applies the bundle through
+  `codex-reconcile-apply.ts` / `cursor-reconcile-apply.ts` against a project-local ledger
+  (`.meowkit/state/codex-ledger.json`, `cursor-ledger.json`). A second run converges to
+  zero drift; a user-edited managed file is preserved and reported as an explicit
+  conflict, never silently overwritten.
+- **Upgrade** — `mewkit upgrade` refreshes a bundle only when its ledger exists
+  (`refreshInstalledProviders` in `commands/upgrade.ts`). A `.codex/` or `.cursor/`
+  directory with no ledger is an old `migrate` export: it is left untouched with a notice
+  pointing at `init --target <tool>`. A tree claimed by `mewkit-next` is skipped too.
+- **Authoring cost** — new `.claude/` content reaches Codex or Cursor only by
+  hand-authoring the matching provider-native file(s) in **both** bundles; see
+  `RELEASING.md` step 1e. Neither target picks up kit changes automatically.
 
 ## Rust installer (`mewkit-next`) and the two release streams
 
@@ -118,6 +95,11 @@ reference-rewriter family still serve Cursor and the surviving Codex config/rule
   six `mewkit-next-*.tar.gz` archives with `binary-manifest.json`, never as GitHub's latest
   release and never with a `.zip`, so deployed npm CLIs cannot mistake it for a kit.
   `install.sh` / `install.ps1` pin each archive by SHA-256 and size; no signatures.
+  Neither stream is signed: the kit signature engine (its `src/kit/` modules, the signing
+  scripts, `--offline`) is removed and the current CLI installs the release zip
+  (`src/kit/` now holds only the zip extractor). npm CLIs ≤2.3.1
+  still prefer a signed kit artifact against an empty keyring, so releases must never
+  carry one (`RELEASING.md`).
 - **Proof:** `crates/mewkit-cli/tests/lifecycle_matrix.rs` runs install → doctor → edit →
   upgrade → uninstall for each runtime at both scopes. Retiring the npm CLI follows
   [`docs/maintainer/mewkit-next-cutover.md`](../maintainer/mewkit-next-cutover.md).

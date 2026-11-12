@@ -27,7 +27,7 @@ const paths = (items: { path: string }[]): string[] => items.map((i) => i.path).
 const whole = (fx: Fixture): Record<string, string> => manifest(fx.root, ".");
 
 /** The closed mutating set, and the one place a user looks for a flag. */
-const MUTATING = ["init", "upgrade", "setup", "uninstall", "backups", "pack", "migrate"];
+const MUTATING = ["init", "upgrade", "setup", "uninstall", "backups", "pack"];
 
 describe("the mutating set declares both flags", () => {
 	it("every one shows --json and --dry-run in its own help section", () => {
@@ -144,28 +144,5 @@ describe("upgrade", () => {
 		expect(dry.dryRun).toBe(true);
 		expect(dry.applied).toEqual([]);
 		expect(whole(fx)).toEqual(before);
-	});
-});
-
-describe("migrate", () => {
-	it("--dry-run --json plans an export and writes nothing", () => {
-		const { fx } = installFixture();
-		const before = whole(fx);
-		const run = runMewkit(fx, ["migrate", "codex", "--yes", "--dry-run", "--json"]);
-		const env = envelope(run);
-		expect(env.command).toBe("migrate");
-		expect(env.dryRun).toBe(true);
-		expect(env.planned.length).toBeGreaterThan(0);
-		expect(env.applied).toEqual([]);
-		expect(whole(fx)).toEqual(before);
-	});
-
-	it("--json reports a refusal as an envelope rather than an empty stdout", () => {
-		const { fx } = installFixture();
-		const run = runMewkit(fx, ["migrate", "not-a-provider", "--yes", "--json"]);
-		expect(run.status).not.toBe(0);
-		const env = envelope(run);
-		expect(env.ok).toBe(false);
-		expect(env.error).toBeTruthy();
 	});
 });

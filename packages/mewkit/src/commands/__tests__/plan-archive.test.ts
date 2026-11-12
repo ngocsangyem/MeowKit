@@ -6,14 +6,14 @@ import { planArchive } from "../plan-archive.js";
 import { writeActiveTaskPointer, readActiveTaskPointer, normalizeTaskId } from "../../core/task-record.js";
 
 // `mewkit plan archive <plan-dir>` finishes a plan: stamps `status: completed` across
-// plan.md + phase files + `.plan-state.json` phase statuses (preserving the visual
-// block), leaves `visual-plan/plan.json` untouched, and moves the dir into
+// plan.md + phase files + `.plan-state.json` phase statuses (preserving every other
+// key), leaves other files in the plan dir untouched, and moves the dir into
 // `tasks/plans/archive/`.
 
 let projectRoot: string;
 let origCwd: string;
 
-function makePlan(name: string, opts: { planState?: boolean; visual?: boolean } = {}): string {
+function makePlan(name: string, opts: { planState?: boolean; extra?: boolean } = {}): string {
 	const dir = join(projectRoot, "tasks", "plans", name);
 	mkdirSync(dir, { recursive: true });
 	writeFileSync(join(dir, "plan.md"), "---\ntitle: X\nstatus: draft\n---\n\nBody with a later status: draft line.\n");
@@ -30,16 +30,16 @@ function makePlan(name: string, opts: { planState?: boolean; visual?: boolean } 
 						"phase-01-setup": { status: "pending", tasks_completed: 0, tasks_total: 2 },
 						"phase-02-build": { status: "in-progress", tasks_completed: 1, tasks_total: 3 },
 					},
-					visual: { schema: "visual-plan/v1", path: "visual-plan/plan.json", revision: 4, review_status: "approved" },
+					custom: { schema: "custom/v1", path: "assets/data.json", revision: 4, review_status: "approved" },
 				},
 				null,
 				2,
 			),
 		);
 	}
-	if (opts.visual) {
-		mkdirSync(join(dir, "visual-plan"));
-		writeFileSync(join(dir, "visual-plan", "plan.json"), JSON.stringify({ review: { status: "approved" }, lanes: [] }));
+	if (opts.extra) {
+		mkdirSync(join(dir, "assets"));
+		writeFileSync(join(dir, "assets", "data.json"), JSON.stringify({ review: { status: "approved" }, lanes: [] }));
 	}
 	return dir;
 }
@@ -75,7 +75,7 @@ describe("plan archive", () => {
 		expect(process.exitCode).toBe(0);
 	});
 
-	it("marks .plan-state.json phase statuses completed while preserving the visual block + other keys", async () => {
+	it("marks .plan-state.json phase statuses completed while preserving other keys", async () => {
 		makePlan("260101-1300-state", { planState: true });
 		await planArchive({ target: join(projectRoot, "tasks", "plans", "260101-1300-state") });
 
@@ -87,24 +87,24 @@ describe("plan archive", () => {
 		// Non-status fields preserved.
 		expect(state.phases["phase-02-build"].tasks_completed).toBe(1);
 		expect(state.planning_mode).toBe("hard");
-		// CLI-managed visual block preserved verbatim.
-		expect(state.visual).toEqual({
-			schema: "visual-plan/v1",
-			path: "visual-plan/plan.json",
+		// Unknown blocks preserved verbatim.
+		expect(state.custom).toEqual({
+			schema: "custom/v1",
+			path: "assets/data.json",
 			revision: 4,
 			review_status: "approved",
 		});
 	});
 
-	it("leaves visual-plan/plan.json untouched (review status is not lifecycle)", async () => {
-		makePlan("260101-1400-visual", { visual: true });
+	it("leaves other files in the plan dir untouched", async () => {
+		makePlan("260101-1400-extra", { extra: true });
 		const before = readFileSync(
-			join(projectRoot, "tasks", "plans", "260101-1400-visual", "visual-plan", "plan.json"),
+			join(projectRoot, "tasks", "plans", "260101-1400-extra", "assets", "data.json"),
 			"utf-8",
 		);
-		await planArchive({ target: join(projectRoot, "tasks", "plans", "260101-1400-visual") });
+		await planArchive({ target: join(projectRoot, "tasks", "plans", "260101-1400-extra") });
 		const after = readFileSync(
-			join(projectRoot, "tasks", "plans", "archive", "260101-1400-visual", "visual-plan", "plan.json"),
+			join(projectRoot, "tasks", "plans", "archive", "260101-1400-extra", "assets", "data.json"),
 			"utf-8",
 		);
 		expect(after).toBe(before);

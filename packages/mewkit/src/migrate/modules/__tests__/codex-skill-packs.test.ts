@@ -90,15 +90,15 @@ describe("validateSkillPackCatalog (shipped catalog)", () => {
 describe("codex shipped surface (explicit counts)", () => {
 	const catalog = loadSkillPackCatalog(moduleDir);
 
-	it("resolves exactly 126 skills across all packs, matching the on-disk skill dir count", () => {
+	it("resolves exactly 125 skills across all packs, matching the on-disk skill dir count", () => {
 		expect(catalog).not.toBeNull();
 		const { skills } = resolvePackSelection(catalog!, "all");
-		expect(skills.length).toBe(126);
+		expect(skills.length).toBe(125);
 
 		const onDisk = readdirSync(resolveBundleSkillsRoot(moduleDir), { withFileTypes: true })
 			.filter((d) => d.isDirectory())
 			.map((d) => d.name);
-		expect(onDisk.length).toBe(126);
+		expect(onDisk.length).toBe(125);
 		expect([...skills].sort()).toEqual([...onDisk].sort());
 	});
 

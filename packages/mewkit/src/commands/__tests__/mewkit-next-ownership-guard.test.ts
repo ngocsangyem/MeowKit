@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { init } from "../init.js";
 import { uninstall } from "../uninstall.js";
-import { reMigrateInstalledProviders } from "../upgrade.js";
+import { refreshInstalledProviders } from "../upgrade.js";
 import { MewkitNextOwnedError, mewkitNextIndex } from "../mewkit-next-ownership-guard.js";
 
 // A runtime installed by the Rust `mewkit-next` CLI carries its ownership index;
@@ -75,7 +75,7 @@ describe("mewkit-next ownership guard", () => {
 		writeFileSync(join(dir, ".cursor", "mine.md"), "mine\n");
 		ownedByMewkitNext("cursor");
 		const log = vi.spyOn(console, "log").mockImplementation(() => {});
-		await expect(reMigrateInstalledProviders(dir)).resolves.toBeUndefined();
+		await expect(refreshInstalledProviders(dir)).resolves.toBeUndefined();
 		expect(log.mock.calls.flat().join("\n")).toMatch(/managed by mewkit-next/);
 		expect(readdirSync(join(dir, ".cursor"))).toEqual(["mine.md"]);
 	});

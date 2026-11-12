@@ -14,7 +14,7 @@ const root = projectRoot();
 const payload = readStdinPayload();
 let verdict = evaluateReadPolicy(payload);
 if (!verdict.blocked && loadRuntime(__dirname, { emitted: true }) !== "cursor") {
-	verdict = { blocked: true, reason: ".cursor/hooks/hook-runtime-config.json is missing or not for cursor; reinstall with `mewkit migrate cursor`" };
+	verdict = { blocked: true, reason: ".cursor/hooks/hook-runtime-config.json is missing or not for cursor; reinstall with `mewkit init --target cursor`" };
 }
 if (!verdict.blocked) {
 	const shared = decidePrivacy({ paths: [payload.file_path] });
