@@ -71,15 +71,6 @@ export function validate(targetDir: string): ValidationResult {
 	const skillCount = countSubdirs(join(claude, "skills"));
 	check(`Skills: ${skillCount} directories (need 30+)`, skillCount >= 30, issues);
 
-	// Commands
-	const cmdDir = join(claude, "commands");
-	const cmdExists = existsSync(cmdDir);
-	check("Commands directory exists", cmdExists, issues);
-
-	// Modes
-	const modeCount = countMdFiles(join(claude, "modes"));
-	check(`Modes: ${modeCount} files (need 5+)`, modeCount >= 5, issues);
-
 	// Rules — the invariant is the always-on set itself, not a file count. Every one of
 	// these is auto-loaded each session and carries enforcement no other file repeats, so
 	// a missing one makes the install unsafe; extra rule files are a user's own business.
@@ -106,9 +97,6 @@ export function validate(targetDir: string): ValidationResult {
 	} else {
 		check("Hooks directory exists", false, issues);
 	}
-
-	// Scripts
-	check("Scripts directory exists", existsSync(join(claude, "scripts")), issues);
 
 	// Settings
 	check("settings.json exists", existsSync(join(claude, "settings.json")), issues);

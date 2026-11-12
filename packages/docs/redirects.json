@@ -76,6 +76,14 @@
     {
       "from": "/reference/templates/security-audit",
       "to": "/cli/planning"
+    },
+    {
+      "from": "/reference/skills/visual-plan",
+      "to": "/reference/skills/preview"
+    },
+    {
+      "from": "/migration",
+      "to": "/cli/portability"
     }
   ]
 }

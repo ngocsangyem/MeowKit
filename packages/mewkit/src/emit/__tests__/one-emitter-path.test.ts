@@ -114,7 +114,6 @@ describe("there is no second way in", () => {
 	const commandModules = [
 		join(SRC, "commands", "init.ts"),
 		join(SRC, "commands", "upgrade.ts"),
-		join(SRC, "migrate", "migrate-orchestrator.ts"),
 	];
 
 	it("leaves no command calling a per-target writer directly", () => {

@@ -20,7 +20,6 @@ npx mewkit plan archive <plan-dir> --dry-run
 `plan archive` finishes a plan in one step:
 
 - Stamps `status: completed` in `plan.md` frontmatter, every `phase-*.md` frontmatter, and every `phases[*].status` in `.plan-state.json` (the plan-creator checkpoint).
-- Preserves the CLI-managed `.plan-state.json` `visual` block and leaves `visual-plan/plan.json` untouched — both are lifecycle-agnostic and travel with the directory.
 - Clears a dangling active-task pointer that still points at the plan.
 - Moves the whole directory into `tasks/plans/archive/<name>/` — fail-closed if the destination exists, no-op if already archived.
 
@@ -174,54 +173,6 @@ npx mewkit advice status --run fix-260727-auth
 ```
 
 **When it refuses:** a call past the cap, an illegal stage/disposition pair, a `--checkpoint` reused under a different stage, a corrupt dossier, or `--evidence` pointing anywhere but an existing `workflow-evidence.json` inside the project. A refusal is final for that checkpoint — continue unsupervised, or escalate when the refusal says to.
-
-## visual-plan
-
-Structured visual review for UI-bearing plans. The canonical artifact
-`visual-plan/plan.json` (schema `visual-plan/v1`) is a coverage ledger + canvas
-(lanes, surface-locked artboards, semantic-HTML wireframes, connectors,
-annotations). Deterministic subcommands validate and gate it; `edit`/`view`
-serve a transient 127.0.0.1 React studio that renders and edits it.
-
-```bash
-npx mewkit visual-plan <subcommand> <plan-dir> [flags]
-```
-
-### Subcommands
-
-| Subcommand                          | Description                                                                 |
-| ----------------------------------- | -------------------------------------------------------------------------- |
-| `validate`                          | Schema + coverage closure + ref resolution + safe-HTML + source-hash freshness (exact JSON-path errors) |
-| `status`                            | Coverage summary (resolved/planned/omitted/unresolved) + review status     |
-| `approve --revision <n>`            | Single writer of `review.status`; the Gate-1 transition (pins the reviewed revision) |
-| `rehash`                            | Refresh pinned source hashes after an intentional Markdown edit (clears approval) |
-| `export --format html`             | Self-contained `plan.html` from the approved artifact                       |
-| `view` / `edit`                     | Transient studio — read-only / editable (single-editor lock)               |
-| `prepare-feedback --ops <f>`        | Freeze accumulated semantic ops into an immutable `visual-feedback/v1` batch + Copy Command |
-| `apply-feedback --batch <id>`       | `--check` (pre-apply stale gate) / `--receipt <f>` (record per-op outcomes) |
-| `patch --op <f>`                    | Apply one typed visual op (lane/order/annotation/connector-label/field)     |
-
-### Flags
-
-| Flag                   | Description                                              |
-| ---------------------- | ------------------------------------------------------- |
-| `--port <number>`      | `edit`/`view`: bind to fixed port (`0` = random)        |
-| `--open` / `--no-open` | `edit`/`view`: auto-launch browser (default: `--open`)  |
-| `--force`              | `edit`: override another session's single-editor lock   |
-| `--json`              | Machine-readable output for the deterministic subcommands |
-
-### Security
-
-- The studio server binds `127.0.0.1` only; Host-header guarded against DNS rebinding.
-- Strict CSP (`script-src 'self'`); path traversal blocked on the static server.
-- Wireframe HTML is DOMPurify-sanitized at BOTH save and render time via one shared allowlist.
-- Writes use optimistic concurrency: `PATCH` requires `If-Match`; a stale ETag returns 409.
-- Feedback batch ids are charset-validated before any path join; batches + receipts are write-once.
-
-### Notes
-
-- If the studio bundle is missing at `dist/visual-plan-web/`, run `npm run build:web` in the `mewkit` package to produce it.
-- The deterministic contract commands (`validate`/`status`/`approve`/`rehash`/`prepare-feedback`/`apply-feedback`/`patch`) run with no browser and no network.
 
 ## orient
 

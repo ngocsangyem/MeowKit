@@ -1,5 +1,5 @@
 // Authored Codex bundle: hand-maintained Codex-native content under
-// `modules/codex/`, copied verbatim into a target project by `mewkit migrate codex`
+// `modules/codex/`, copied verbatim into a target project by `mewkit init --target codex`
 // (no runtime transform). This is the copy mechanism + manifest loader.
 //
 // Phased transition (author-first, delete-converters-last): each manifest entry

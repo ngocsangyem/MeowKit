@@ -3,7 +3,7 @@ name: mk:plan-creator
 version: 1.6.3
 preamble-tier: 3
 description: Writes the multi-file implementation plan a human approves at Gate 1, scaled to task size. NOT for mk:planning-engine.
-argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] [--html] [--advice] OR [archive | red-team {path} | validate {path}]'
+argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] [--advice] OR [archive | red-team {path} | validate {path}]'
 allowed-tools:
   - Bash
   - Read
@@ -60,15 +60,13 @@ dependency_edges:
     type: peer
   - id: mk:validate-plan
     type: peer
-  - id: mk:visual-plan
-    type: peer
 ---
 
 # Plan Creator
 
 > Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
 
-Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, visual rendering, archive, and memory entries stay with their existing owners.
+Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, archive, and memory entries stay with their existing owners.
 
 ## When to Use
 
@@ -80,11 +78,11 @@ Activate when:
 - User supplies a design evidence packet (e.g. from `mk:figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
 - Gate 1 requires a plan before Phase 3
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
-- Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI; visual rendering → `mk:visual-plan`.
+- Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI.
 - Hard/deep plan creation still runs its built-in red-team and validation interview before Gate 1. These are design-quality gates, not standalone subcommands, and must never be routed away.
 - Compatibility aliases: `/mk:plan-creator archive` → [archive workflow](references/archive-workflow.md); `/mk:plan-creator red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `/mk:plan-creator validate {path}` → [standalone validation workflow](references/validate-standalone.md).
 
-Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation. `--html` routes to `mk:visual-plan`.
+Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation.
 
 Skip when:
 
@@ -115,7 +113,6 @@ Skip when:
 
 - `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
 - `--advice` — opt-in strategic supervision for one planning run, capped at 4 calls: GUIDE after the scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before Gate 1, RECHECK after a correction. Athena reads the plan and can return it to the planner; it never writes the plan and never approves Gate 1. Without the flag there are zero calls and no state. See `references/advice-checkpoints.md`.
-- Visual work belongs to `mk:visual-plan`. Plan-creator emits only the handoff metadata needed for that skill; Markdown plan files remain source of truth.
 
 ## Requirements Capture Contract
 

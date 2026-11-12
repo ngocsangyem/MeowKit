@@ -88,7 +88,7 @@ Fetches the newest binary release's `binary-manifest.json`, refuses an older ver
 
 ## Ownership and the npm CLI
 
-Once `mewkit-next` owns a runtime, the npm CLI leaves it alone. The ownership index sits at `.meowkit/state/ownership/<runtime>.json` (`~/.mewkit/state/ownership/<runtime>.json` for a global install). While that file is present, `mewkit init`, `upgrade`, `migrate`, `uninstall` and `doctor --adopt` refuse to touch that runtime, because the npm CLI does not read the index and `--force` would overwrite its files wholesale. The refusal names the `mewkit-next` command to use instead. A stray, empty or corrupt file at that path does not lock the npm CLI out.
+Once `mewkit-next` owns a runtime, the npm CLI leaves it alone. The ownership index sits at `.meowkit/state/ownership/<runtime>.json` (`~/.mewkit/state/ownership/<runtime>.json` for a global install). While that file is present, `mewkit init`, `upgrade`, `uninstall` and `doctor --adopt` refuse to touch that runtime, because the npm CLI does not read the index and `--force` would overwrite its files wholesale. The refusal names the `mewkit-next` command to use instead. A stray, empty or corrupt file at that path does not lock the npm CLI out.
 
 ## Exit codes
 

@@ -18,11 +18,11 @@ Activate when:
 - User supplies a design evidence packet (e.g. from `mk:figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
 - Gate 1 requires a plan before Phase 3
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
-- Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI; visual rendering → `mk:visual-plan`.
+- Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI.
 - Hard/deep plan creation still runs its built-in red-team and validation interview before Gate 1. These are design-quality gates, not standalone subcommands, and must never be routed away.
 - Compatibility aliases: `the plan skill archive` → [archive workflow](references/archive-workflow.md); `the plan skill red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `the plan skill validate {path}` → [standalone validation workflow](references/validate-standalone.md).
 
-Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation. `--html` routes to `mk:visual-plan`.
+Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation.
 
 Skip when:
 
@@ -52,7 +52,6 @@ Skip when:
 **Composable flags:**
 
 - `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
-- Visual work belongs to `mk:visual-plan`. Plan-creator emits only the handoff metadata needed for that skill; Markdown plan files remain source of truth.
 
 ## Requirements Capture Contract
 

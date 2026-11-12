@@ -33,14 +33,12 @@ export interface ProvenanceFacts {
  * source differently.
  *
  * A configured local release directory is its own origin rather than being
- * folded into one of the download paths: it is already-extracted content with no
- * archive to verify, and calling it a verified artifact would be a false claim
- * in the one field a user checks to find out whether verification happened.
+ * folded into the download path: it is already-extracted content, not a
+ * downloaded release zip.
  */
-export function installOrigin(offline: boolean): InstallOrigin {
-	if (offline) return "local-cache";
+export function installOrigin(): InstallOrigin {
 	const configured = process.env.MEOWKIT_RELEASE_SOURCE;
-	return configured !== undefined && configured.trim() !== "" ? "local-release-dir" : "verified-artifact";
+	return configured !== undefined && configured.trim() !== "" ? "local-release-dir" : "release-zip";
 }
 
 /**

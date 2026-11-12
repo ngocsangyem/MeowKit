@@ -31,7 +31,7 @@ const { enterGuardRoot } = require("./lib/project-root.cjs");
 const { decidePlanGate } = require("./lib/core/plan-gate.cjs");
 
 if (loadRuntime(__dirname, { emitted: true }) !== "codex") {
-	deny("Gate 1 cannot run: .codex/hooks/hook-runtime-config.json is missing or not for codex. Reinstall with `mewkit migrate codex`.");
+	deny("Gate 1 cannot run: .codex/hooks/hook-runtime-config.json is missing or not for codex. Reinstall with `mewkit init --target codex`.");
 }
 
 const input = readPayload();

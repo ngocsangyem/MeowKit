@@ -70,7 +70,7 @@ export async function capabilities(args: CapabilitiesOptions = {}): Promise<void
 	if (!source) {
 		console.error(
 			pc.red(
-				"Could not find a capability source. Expected .claude/ or a Codex projection at .codex/capabilities.json. Run `npx mewkit init` or `npx mewkit migrate codex`.",
+				"Could not find a capability source. Expected .claude/ or a Codex projection at .codex/capabilities.json. Run `npx mewkit init` or `npx mewkit init --target codex`.",
 			),
 		);
 		process.exit(1);

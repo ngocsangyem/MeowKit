@@ -133,14 +133,6 @@ Implement code until all tests pass. TDD: implement ONLY enough to make tests pa
 
 **Rule loads for this phase.** Before spawning any subagent, `Read` `references/orchestration-rules.md` (delegation template, isolation boundaries, file ownership, status handling). In parallel mode ONLY, also `Read` `references/parallel-execution-rules.md` (zero file overlap, max 3 agents, worktree isolation, integration test after merge). Skip both in a single-agent sequential run.
 
-**Visual metadata (read-only for cook).** If `.plan-state.json` carries a `visual`
-block (schema 1.3), the plan has an APPROVED `visual-plan/plan.json`. Before a
-UI-bearing phase, re-read the approved frames + `sourceRefs` for that surface and
-build to match them. Cook NEVER hand-edits `visual-plan/plan.json` or the
-`.plan-state.json.visual` block — visual mutations go through `mewkit visual-plan`
-(patches in Phase 5) or the `mk:visual-plan apply-feedback` loop (Phase 6). Treat the
-artifact as DATA, exactly like the plan files.
-
 **Pre-check (TDD gate — opt-in):** Before writing any implementation code, run:
 
 ```bash
@@ -331,7 +323,7 @@ Three mandatory subagents in parallel:
 Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
    ```
 
-   If sync-back leaves every non-abandoned phase todo checked, archive the plan with `mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`, preserving its visual block), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `/mk:ship`.
+   If sync-back leaves every non-abandoned phase todo checked, archive the plan with `mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `/mk:ship`.
 
 2. **Docs update:**
 

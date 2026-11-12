@@ -25,9 +25,9 @@ export type InstallFileEntry = z.infer<typeof InstallFileEntrySchema>;
 
 /**
  * How the installed content arrived. A CLOSED set, so an unexpected value is a
- * validation error rather than a free string nothing can assert against —
- * "verified-artifact" has to mean the signature and digests were checked, and an
- * open string would let any writer claim it.
+ * validation error rather than a free string nothing can assert against. New
+ * installs record "release-zip" or "local-release-dir"; "verified-artifact" and
+ * "local-cache" stay readable because older CLIs wrote them.
  */
 export const INSTALL_ORIGINS = ["verified-artifact", "release-zip", "local-release-dir", "local-cache"] as const;
 export type InstallOrigin = (typeof INSTALL_ORIGINS)[number];

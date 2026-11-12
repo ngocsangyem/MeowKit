@@ -23,7 +23,7 @@ const root = enterGuardRoot(payload && typeof payload.cwd === "string" && payloa
 /** The Gate 1 verdict for a file mutation the matcher table allowed. */
 function planGate() {
 	if (loadRuntime(__dirname, { emitted: true }) !== "cursor") {
-		return { permission: "deny", reason: ".cursor/hooks/hook-runtime-config.json is missing or not for cursor; reinstall with `mewkit migrate cursor`", matcherId: "gate-1" };
+		return { permission: "deny", reason: ".cursor/hooks/hook-runtime-config.json is missing or not for cursor; reinstall with `mewkit init --target cursor`", matcherId: "gate-1" };
 	}
 	if (!root) return { permission: "deny", reason: "cannot locate the project root Gate 1 guards", matcherId: "gate-1" };
 	// A write whose target cannot be read is an unknown payload shape, not a write to nothing.

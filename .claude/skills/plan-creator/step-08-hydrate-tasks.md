@@ -11,8 +11,7 @@ Skip task hydration if:
 - Task tools unavailable (GUI editor extensions) — plan files are the source of truth
 
 Skipping hydration skips only the TaskCreate calls (8b/8c). The §8d checkpoint
-(`.plan-state.json`, including PRESERVING the CLI-written `visual` block for
-`html_mode == true` plans) still runs regardless.
+(`.plan-state.json`) still runs regardless.
 
 ### 8b. Create Tasks from Phases
 
@@ -64,27 +63,9 @@ Write `{plan_dir}/.plan-state.json` for cross-session resilience:
   },
   "selected_approach": "a",
   "verification_tier": "standard",
-  "consistency_sweeps_passed": { "red_team": true, "validation": true },
-  "visual": {
-    "schema": "visual-plan/v1",
-    "path": "visual-plan/plan.json",
-    "revision": 4,
-    "hash": "sha256:...",
-    "source_plan_hash": "sha256:...",
-    "review_status": "approved",
-    "pending_feedback": []
-  }
+  "consistency_sweeps_passed": { "red_team": true, "validation": true }
 }
 ```
-
-**v1.3 schema notes (additive, reader-compatible).** The `visual` block is NEW in
-v1.3 and present ONLY when `html_mode == true`. It is CLI-MANAGED: written
-by `mewkit visual-plan approve`/`rehash` (which do read-modify-write, preserving
-every other field). Do NOT hand-write it. Because `approve` already ran at step-07,
-this step MUST PRESERVE the existing `visual` block — read the current
-`.plan-state.json`, keep its `visual` key verbatim, and write your other fields
-around it (never clobber it). When `html_mode == false`, omit `visual` entirely. See
-`references/visual-plan-integration.md` §8.
 
 **v1.2 fields still apply.** `verification_tier` and `consistency_sweeps_passed`
 (v1.2) remain optional-and-additive. All readers MUST treat unknown/missing fields
@@ -142,5 +123,4 @@ Also: `.plan-state.json` checkpoint created.
 
 ## Next
 
-- If `html_mode = true` → read and follow `step-08b-html-render.md` (renders `plan.html`, then chains to step-09).
-- Otherwise → read and follow `step-09-post-plan-handoff.md`.
+Read and follow `step-09-post-plan-handoff.md`.

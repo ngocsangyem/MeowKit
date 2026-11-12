@@ -1,38 +1,13 @@
-// The three things an upgrade settles around the update itself: whether an
-// offline run can proceed at all, carrying a superseded ownership baseline
-// forward, and re-stamping what produced the install.
-//
-// They live here rather than in the command because each is a decision with its
-// own reason, and the command is already long enough that a reader looking for
-// "why did my offline upgrade refuse" has to scan past the release-selection,
-// snapshot, pack-resolution and reporting legs to find it. None of them is
-// release-flow logic; all three are things true before or after the content
-// moves.
+// The things an upgrade settles around the update itself: carrying a superseded
+// ownership baseline forward, reading the installed shape, and re-stamping what
+// produced the install. None of them is release-flow logic; each is true before
+// or after the content moves.
 import { join } from "node:path";
 
 import { readInstallMetadata } from "../core/install-metadata.js";
 import { migrateLegacyBaseline } from "../core/legacy-manifest-migration.js";
 import { installOrigin, recordProvenance } from "../core/record-provenance.js";
-import { hasStoredArtifact } from "../kit/kit-artifact-store.js";
-import { offlineCacheMissError, offlineQuarantinedError } from "../kit/kit-offline.js";
-import { readVerificationFailure } from "../kit/kit-quarantine.js";
 import type { InstallDelivery } from "./init-target-delivery.js";
-
-/**
- * Why an offline run in this project cannot proceed, or null when it can.
- *
- * A recorded refusal wins over a stored artifact: the record means an attempt at
- * that version already failed its checks, and the bytes beside it are the ones
- * that failed. Installing from them because they are conveniently local is the
- * one thing the record exists to prevent.
- */
-export function offlineRefusal(root: string, installedVersion: string | null): string | null {
-	if (installedVersion === null) return offlineCacheMissError("the requested").message;
-	const refused = readVerificationFailure(root, installedVersion);
-	if (refused !== null) return offlineQuarantinedError(refused).message;
-	if (!hasStoredArtifact(root, installedVersion)) return offlineCacheMissError(installedVersion).message;
-	return null;
-}
 
 /** What the caller should say, line by line, about a baseline it carried forward. */
 export async function carryBaselineForward(root: string): Promise<string[]> {
@@ -84,13 +59,13 @@ export function readInstalledShape(root: string): InstalledShape {
  */
 export async function restampProvenance(
 	root: string,
-	facts: { kitVersion: string; cliVersion: string; delivery: InstallDelivery; offline: boolean },
+	facts: { kitVersion: string; cliVersion: string; delivery: InstallDelivery },
 ): Promise<void> {
 	await recordProvenance(root, {
 		kitVersion: facts.kitVersion,
 		cliVersion: facts.cliVersion,
 		target: "claude-code",
 		delivery: facts.delivery,
-		origin: installOrigin(facts.offline),
+		origin: installOrigin(),
 	});
 }

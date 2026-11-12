@@ -35,14 +35,11 @@ Commit this file, and commit `memory/*.md` — the team memory store is reviewed
 The other `.meowkit/` subdirectories (`telemetry/`, `state/`, `cache/`) are machine-written and
 belong in `.gitignore`.
 
-`.meowkit/cache/` is the project's ONE cache of kit bytes: the kit content the install laid down,
-and under it the verified release artifact with its manifest and signature, keyed by version. There
-is no second cache and nothing under `$HOME` — the cache's trust property is that it is untracked,
+`.meowkit/cache/` is the project's ONE cache of kit bytes: the kit content the install laid down.
+There is no second cache and nothing under `$HOME`. The cache's trust property is that it is untracked,
 so a pull request can neither introduce nor alter it, and `uninstall` and `doctor --adopt` depend on
-that. It is also what `npx mewkit init --offline` and `npx mewkit upgrade --offline` install from,
-after re-running the same signature and digest checks a download gets. Because it is per project,
-`--offline` works only where an install has already happened; a project with no network and no cache
-is served by `MEOWKIT_RELEASE_SOURCE` instead.
+that. To install from a release that is already extracted on disk, point `MEOWKIT_RELEASE_SOURCE`
+at that directory.
 
 ```yaml
 # .meowkit/config.yaml
@@ -68,9 +65,7 @@ agent selects its own model:
 - **Claude Code** — each `.claude/agents/*.md` declares a `model:` in frontmatter (`opus`, `sonnet`, `haiku`, `fable`, or `inherit`).
 - **Codex** — each authored agent TOML (`.codex/agents/*.toml`) carries `model_reasoning_effort`, derived from the source Claude tier (opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` agents omit it and inherit Codex's default). `model` is left unset because Codex model ids are deployment-specific — pin one by editing the agent TOML or via a Codex [config profile](https://learn.chatgpt.com/docs/config-file/config-sample).
 
-There is no `modelRouting` config key. When `mewkit migrate` converts a Claude agent whose
-tier has no Codex model id, it discloses the source model as a commented hint and the target
-inherits its own default. MeowKit never hardcodes target model IDs.
+There is no `modelRouting` config key. MeowKit never hardcodes target model IDs.
 
 ## .claude/settings.json
 

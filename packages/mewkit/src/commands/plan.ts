@@ -118,7 +118,7 @@ const USAGE = `Usage:
 
 status/check are read-only by design: the plan Markdown stays the sole authority
 here, and this module imports no write API. The mutating siblings (approve,
-archive) live in their own modules. HTML rendering lives in \`mewkit visual-plan\`.`;
+archive) live in their own modules.`;
 
 export async function plan(args: PlanArgs): Promise<void> {
 	const { subcommand, target } = args;

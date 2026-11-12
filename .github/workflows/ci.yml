@@ -36,9 +36,6 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Validate visual-plan eval fixtures
-        run: node scripts/validate-visual-plan-evals.cjs
-
       - name: Worktree command contract tests
         run: node .claude/skills/worktree/scripts/worktree.test.cjs
 

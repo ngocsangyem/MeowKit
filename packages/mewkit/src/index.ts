@@ -24,7 +24,6 @@ import { budget, contextBudget } from "./commands/budget.js";
 import { verdictGate } from "./commands/verdict-gate.js";
 import { note } from "./commands/note.js";
 import { doctor } from "./commands/doctor.js";
-import { migrate } from "./commands/migrate.js";
 import { setup } from "./commands/setup.js";
 import { task } from "./commands/task.js";
 import { plan } from "./commands/plan.js";
@@ -33,7 +32,6 @@ import { planArchive } from "./commands/plan-archive.js";
 import { trace } from "./commands/trace.js";
 import { pack } from "./commands/pack.js";
 import { providersCommand } from "./commands/providers.js";
-import { visualPlan } from "./commands/visual-plan.js";
 import { reviewPrepare } from "./commands/review/prepare.js";
 import { reviewRead } from "./commands/review/read.js";
 import { reviewCoverage } from "./commands/review/coverage.js";
@@ -95,14 +93,11 @@ async function main(): Promise<void> {
 			await runInstall({
 				cliVersion: VERSION,
 				delivery: args.delivery as string | undefined,
-				offline: args.offline as boolean | undefined,
 				json: args.json as boolean | undefined,
 				dryRun: args["dry-run"] as boolean | undefined,
 				force: args.force as boolean | undefined,
 				beta: args.beta as boolean | undefined,
-				migrate: args.migrate as boolean | undefined,
 				target: args.target as string | undefined,
-				migrateGlobal: args["migrate-global"] as boolean | undefined,
 				profile: args.profile as string | undefined,
 				skillPacks: args["skill-packs"] as string | undefined,
 				mcpProfiles: args["mcp-profiles"] as string | undefined,
@@ -115,7 +110,6 @@ async function main(): Promise<void> {
 		case "upgrade":
 			await upgrade({
 				cliVersion: VERSION,
-				offline: args.offline as boolean | undefined,
 				json: args.json as boolean | undefined,
 				check: args.check as boolean | undefined,
 				beta: args.beta as boolean | undefined,
@@ -416,61 +410,6 @@ async function main(): Promise<void> {
 				activate: args.activate === true,
 				cliVersion: VERSION,
 			});
-			break;
-		}
-		case "visual-plan": {
-			const vpPortRaw = args.port as string | number | undefined;
-			let vpPort: number | undefined;
-			if (vpPortRaw !== undefined) {
-				const parsed = typeof vpPortRaw === "number" ? vpPortRaw : parseInt(String(vpPortRaw), 10);
-				if (!Number.isInteger(parsed) || parsed < 0 || parsed > 65535) {
-					console.error(pc.red(`Invalid --port value: ${String(vpPortRaw)} (must be 0-65535; 0 = random)`));
-					process.exit(2);
-				}
-				vpPort = parsed;
-			}
-			await visualPlan({
-				subcommand: args._[1] as string | undefined,
-				planDir: args._[2] as string | undefined,
-				revision: args.revision as string | undefined,
-				json: args.json as boolean | undefined,
-				open: args.open as boolean | undefined,
-				noOpen: args["no-open"] as boolean | undefined,
-				force: args.force as boolean | undefined,
-				port: vpPort,
-				format: args.format as string | undefined,
-				ops: args.ops as string | undefined,
-				batch: args.batch as string | undefined,
-				check: args.check as boolean | undefined,
-				receipt: args.receipt as string | undefined,
-				op: args.op as string | undefined,
-			});
-			break;
-		}
-		case "migrate": {
-			const exitCode = await migrate({
-				_: args._.map(String),
-				all: args.all as boolean | undefined,
-				global: args.global as boolean | undefined,
-				yes: args.yes as boolean | undefined,
-				"dry-run": args["dry-run"] as boolean | undefined,
-				force: args.force as boolean | undefined,
-				source: args.source as string | undefined,
-				only: args.only as string | undefined,
-				"skip-config": args["skip-config"] as boolean | undefined,
-				"skip-rules": args["skip-rules"] as boolean | undefined,
-				"skip-hooks": args["skip-hooks"] as boolean | undefined,
-				install: args.install as boolean | undefined,
-				reconcile: args.reconcile as boolean | undefined,
-				"respect-deletions": args["respect-deletions"] as boolean | undefined,
-				"source-version": args["source-version"] as string | undefined,
-				providers: args.providers as boolean | undefined,
-				"all-rules": args["all-rules"] as boolean | undefined,
-				"include-mcp": args["include-mcp"] as boolean | undefined,
-				"include-unportable": args["include-unportable"] as boolean | undefined,
-				json: args.json as boolean | undefined,
-			});
-			if (exitCode !== 0) process.exit(exitCode);
 			break;
 		}
 		default:

@@ -14,7 +14,7 @@ GitHub Release (tag vX.Y.Z + those two assets) + release commit
 mewkit CLI fetches the zip at `npx mewkit init` / `npx mewkit upgrade`
 ```
 
-**One distribution, one source.** `.claude/` is the source of truth; the release zip ships it as-is, and `npx mewkit init` downloads and unpacks it. The Codex-native toolkit is a separate, package-shipped bundle (`packages/mewkit/src/migrate/modules/codex/`) that `mewkit migrate codex` / `init --target codex` copy — see step 1e.
+**One distribution, one source.** `.claude/` is the source of truth; the release zip ships it as-is, and `npx mewkit init` downloads and unpacks it. The Codex-native toolkit is a separate, package-shipped bundle (`packages/mewkit/src/migrate/modules/codex/`) that `init --target codex` copies — see step 1e.
 
 **Key insight (flat-copy):** the `mewkit` CLI downloads `meowkit-release.zip` from GitHub Releases at runtime. If the release has no zip asset, the CLI cannot find it and falls back to an older version.
 
@@ -125,7 +125,7 @@ Must complete with no errors. Chunk size warnings are normal.
 
 #### 1d. Update portable migration manifest when paths move
 
-Check `packages/mewkit/portable-manifest.json` whenever a release moves source files or provider install paths used by `mewkit migrate`.
+Nothing reads `packages/mewkit/portable-manifest.json` since `mewkit migrate` was retired; the file is removed with the rest of the npm CLI. Until then, keep it unchanged.
 
 - Add a `renames` entry when a shipped `.claude/` source item moves or is renamed.
 - Add a `providerPathMigrations` entry when a target provider path changes, such as moving Codex skills to a new directory.
@@ -141,9 +141,8 @@ either.** A new `.claude/` skill / agent / rule / hook does NOT reach them
 automatically. When a release adds or changes any of those, author the matching native
 file(s) **by hand in both bundles**, or the two targets silently drift from `.claude/`.
 
-> A legacy `.claude/`→`.cursor/` converter still exists behind `mewkit migrate cursor`, but
-> `init --target cursor` no longer uses it and its removal is gated on the cursor
-> cutover-gates record. **Never rely on it to carry new content.**
+> There is no converter: the legacy `.claude/`→`.cursor/` exporter left with `mewkit migrate`.
+> **The authored bundles are the only way new content reaches Codex or Cursor.**
 
 **Bundle roots and their managed surfaces** (one manifest entry per top-level surface):
 
@@ -253,9 +252,8 @@ ls .cursor/skills | wc -l   # cursor skills — BOTH must be the full catalog co
 Run it in **both orders**. An omitted `--skill-packs` installs the full catalog for both
 providers; `--skill-packs core` narrows it. A second run must report `0 written`.
 
-> **MCP servers → Codex:** `mewkit migrate codex --include-mcp` still merges a project's
-> `.mcp.json` into `.codex/config.toml [mcp_servers]` (opt-in). This is the only codex
-> converter kept after the cutover — it converts the user's own config, not toolkit content.
+> **MCP servers → Codex:** the `.mcp.json` → `.codex/config.toml [mcp_servers]` merge
+> left with `mewkit migrate`; add servers to `config.toml` by hand.
 > Cursor MCP is opt-in via `modules/cursor/catalog/mcp-profiles.json` and never written by a
 > fresh install on its own.
 #### 1f. Update when the memory contract changes
@@ -584,7 +582,7 @@ The kit and the npm CLI are released by hand; the `mewkit-next` binary is built 
 
 **Trust model: checksums only.** MeowKit is open source and releases carry no signatures. `checksums.txt` is fetched from the same release as the zip, so it detects corruption and partial downloads, not a tampered release; trust rests on GitHub, TLS and who can push tags.
 
-**Never upload `meowkit-kit-*.tar.gz`, `kit-manifest.json` or `*.sig` to a release.** CLIs that understand the signed kit artifact install from it when present, and their trusted keyring is empty, so every install of that release would be refused. `verify-release-assets.cjs` fails if any of them sits in `dist/`. The signing scripts (`build-kit-artifact.cjs`, `kit-signing.cjs`) stay in the tree, unused.
+**Never upload `meowkit-kit-*.tar.gz`, `kit-manifest.json` or `*.sig` to a release.** npm CLIs up to 2.3.1 install from the signed kit artifact when a release carries it, and their trusted keyring is empty, so every install of that release would be refused. `verify-release-assets.cjs` fails if any of them sits in `dist/`. The signing engine and its scripts were removed.
 
 ### Binary release stream (`mewkit-next`)
 

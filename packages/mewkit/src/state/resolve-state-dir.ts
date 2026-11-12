@@ -3,7 +3,7 @@
 // `.meowkit/` root; this module decides WHICH root a given project should use.
 //
 // A project whose memory still lives at `.claude/memory` keeps using it until
-// `mewkit migrate` moves it — writing to the new taxonomy while old content sits
+// the user moves it — writing to the new taxonomy while old content sits
 // in the legacy tree would split a user's history across two directories. Same
 // rule as the shell/cjs helpers in .claude/hooks/lib/meowkit-paths.*, so every
 // writer agrees on one location.

@@ -13,7 +13,6 @@ import {
 import type { ReleaseInfo, UpdateStats, UserConfig } from "../core/index.js";
 import { beginMachineOutput, envelopeEmitter, type MutationReport } from "../core/mutation-report.js";
 import { installMutationReport } from "./install-report.js";
-import { runMigrate } from "../migrate/migrate-orchestrator.js";
 import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
 import { emitCodexTarget, emitCursorTarget } from "../emit/emit-bundle-target.js";
 import { emitTarget } from "../emit/emit-target.js";
@@ -22,7 +21,7 @@ import { describeRetiredSkills } from "../migrate/modules/retired-skill-cleanup.
 import { meowkitStatePaths } from "../state/meowkit-state-paths.js";
 import { reportOrphanedV2Stores } from "../core/report-orphaned-stores.js";
 import { createSnapshot } from "../core/snapshot.js";
-import { carryBaselineForward, offlineRefusal, readInstalledShape, restampProvenance } from "./upgrade-preflight.js";
+import { carryBaselineForward, readInstalledShape, restampProvenance } from "./upgrade-preflight.js";
 import { confirmationRequiredMessage, EXIT_NEEDS_CONFIRMATION, needsConfirmation } from "../core/destructive-guard.js";
 import { populateKitCache } from "../core/kit-cache.js";
 import { LEGACY_DESCRIPTOR_REL, legacyDescriptorPath } from "../state/resolve-config-path.js";
@@ -30,23 +29,28 @@ import { migrateLegacyDescriptor } from "./migrate-config-descriptor.js";
 import { refuseKitSourceRepo } from "./kit-source-repo-guard.js";
 import { type GuardedRuntime, mewkitNextIndex } from "./mewkit-next-ownership-guard.js";
 
-/** Provider toolkits that upgrade can propagate to, keyed by their project marker dir. */
-const PROPAGATABLE_PROVIDERS: ReadonlyArray<{ tool: string; dir: string }> = [
+/** Provider toolkits whose authored bundle an upgrade refreshes, keyed by their project marker dir. */
+const PROVIDER_TOOLKITS: ReadonlyArray<{ tool: GuardedRuntime; dir: string }> = [
 	{ tool: "cursor", dir: ".cursor" },
 	{ tool: "codex", dir: ".codex" },
 ];
 
-/** True when `projectDir` has an AUTHORED Cursor install — the cursor reconciliation ledger
- *  exists. This is the disambiguation signal (not `.cursor/` dir presence): a legacy
- *  `.claude/` → `.cursor/` converter export also creates a `.cursor/` dir, so dir presence
- *  alone cannot tell an authored bundle apart from a legacy export. */
+/** True when `projectDir` has an AUTHORED install of `tool`: its reconciliation ledger
+ *  exists. Dir presence alone cannot tell an authored bundle apart from an export made by
+ *  the retired `.claude/` converter. */
+function hasProviderLedger(projectDir: string, tool: GuardedRuntime): boolean {
+	const paths = meowkitStatePaths(join(projectDir, ".meowkit"));
+	return existsSync(tool === "cursor" ? paths.cursorLedger : paths.codexLedger);
+}
+
+/** Cursor-only alias kept for the cursor-only entrypoint. */
 function hasCursorLedger(projectDir: string): boolean {
-	return existsSync(meowkitStatePaths(join(projectDir, ".meowkit")).cursorLedger);
+	return hasProviderLedger(projectDir, "cursor");
 }
 
 /** Refresh the authored Cursor bundle in place (reconciled — user edits preserved or
  *  reported as conflicts, never blind-overwritten). Shared by `upgradeCursorToolkit`
- *  (cursor-only project) and `reMigrateInstalledProviders` (mixed project). */
+ *  (cursor-only project) and `refreshInstalledProviders` (mixed project). */
 async function refreshCursorBundle(projectDir: string): Promise<void> {
 	const moduleDir = resolveCursorModuleDir();
 	if (!existsSync(join(moduleDir, "manifest.json"))) {
@@ -69,60 +73,13 @@ async function refreshCursorBundle(projectDir: string): Promise<void> {
 	for (const line of describeRetiredSkills(result.retired)) console.log(pc.dim(`  ${line}`));
 }
 
-/** After a `.claude/` upgrade, re-export to any installed downstream provider toolkit
- *  so the whole install moves together (a bare `mewkit upgrade` no longer leaves
- *  .cursor/.codex stale). Best-effort: a failing provider is reported, not fatal.
- *
- *  Cursor is special-cased: a mixed `.claude/` + authored `.cursor/` project (the ledger
- *  exists) must NEVER re-run the legacy `.claude/` → `.cursor/` converter — that converter
- *  regenerates `.cursor/` content from `.claude/` from scratch and has no notion of the
- *  authored bundle's ledger, so it would clobber authored files. The authored bundle is
- *  refreshed via the reconciler instead (`refreshCursorBundle`), same as `upgradeCursorToolkit`. */
-export async function reMigrateInstalledProviders(projectDir: string): Promise<void> {
-	// A runtime mewkit-next owns is left to it: refreshing it here would be refused
-	// (and fail this whole upgrade after `.claude/` was already written).
-	const rustOwned = (tool: GuardedRuntime): boolean => {
-		const index = mewkitNextIndex(projectDir, tool);
-		if (index === undefined) return false;
-		console.log(pc.dim(`Skipping ${tool}: it is managed by mewkit-next (${index}); run \`mewkit-next upgrade\`.`));
-		return true;
-	};
-	const cursorLedgerPresent = hasCursorLedger(projectDir);
-	const cursorOwned = rustOwned("cursor");
-	if (cursorLedgerPresent && !cursorOwned) await refreshCursorBundle(projectDir);
-
-	const installed = PROPAGATABLE_PROVIDERS.filter(({ tool, dir }) => {
-		if (!existsSync(join(projectDir, dir))) return false;
-		if (tool === "cursor") return !cursorLedgerPresent && !cursorOwned;
-		return !rustOwned(tool as GuardedRuntime);
-	});
-	if (installed.length === 0) return;
-	console.log(
-		`\n${pc.bold("Propagating upgrade to installed provider toolkits:")} ${installed.map((p) => p.tool).join(", ")}`,
-	);
-	for (const { tool } of installed) {
-		try {
-			await runMigrate(
-				{ tool, source: join(projectDir, ".claude"), force: true, yes: true },
-				{ bundledKitDir: join(projectDir, ".claude"), argv: [] },
-			);
-		} catch (err) {
-			const msg = err instanceof Error ? err.message : String(err);
-			console.log(pc.yellow(`[!] Re-exporting ${tool} failed (${msg}) — re-run 'mewkit migrate ${tool}'.`));
-		}
-	}
-}
-
-/** A codex-only project (from `init --target codex`) has no `.claude/`; upgrade it by
- *  reconciling the authored Codex bundle from the installed package against the project
- *  ledger. Managed artifacts are refreshed, but a user-edited file is PRESERVED and
- *  reported as a conflict rather than silently overwritten. */
-async function upgradeCodexToolkit(projectDir: string): Promise<void> {
-	console.log(pc.bold("Codex toolkit detected (no .claude/) — refreshing from the installed mewkit bundle."));
+/** Refresh the authored Codex bundle in place, reconciled against its ledger. Best-effort,
+ *  like `refreshCursorBundle`: one broken provider must not abort the others. */
+async function refreshCodexBundle(projectDir: string): Promise<void> {
 	const moduleDir = resolveCodexModuleDir();
 	if (!existsSync(join(moduleDir, "manifest.json"))) {
 		console.error(pc.red("Codex bundle not found in this install — reinstall the `mewkit` package."));
-		process.exit(1);
+		return;
 	}
 	const result = await emitCodexTarget("upgrade", projectDir, moduleDir);
 	const preserved = result.entries.filter((e) => e.action === "skip" && e.reasonCode === "user-edits-preserved").length;
@@ -140,6 +97,47 @@ async function upgradeCodexToolkit(projectDir: string): Promise<void> {
 	for (const line of describeRetiredSkills(result.retired)) console.log(pc.dim(`  ${line}`));
 }
 
+/** After a `.claude/` upgrade, refresh every authored provider bundle installed beside it
+ *  so the whole install moves together. A `.cursor/` or `.codex/` dir with no ledger is an
+ *  export from the retired `.claude/` converter: it is left alone and the user is told how
+ *  to switch to the authored bundle. A runtime mewkit-next owns is left to it. */
+export async function refreshInstalledProviders(projectDir: string): Promise<void> {
+	for (const { tool, dir } of PROVIDER_TOOLKITS) {
+		if (!existsSync(join(projectDir, dir)) && !hasProviderLedger(projectDir, tool)) continue;
+		const index = mewkitNextIndex(projectDir, tool);
+		if (index !== undefined) {
+			console.log(pc.dim(`Skipping ${tool}: it is managed by mewkit-next (${index}); run \`mewkit-next upgrade\`.`));
+			continue;
+		}
+		if (hasProviderLedger(projectDir, tool)) {
+			if (tool === "cursor") await refreshCursorBundle(projectDir);
+			else await refreshCodexBundle(projectDir);
+			continue;
+		}
+		console.log(
+			pc.yellow(
+				`[!] ${dir}/ looks like an export from the retired \`mewkit migrate\`; it was not refreshed. ` +
+					`Run \`mewkit init --target ${tool}\` to install the maintained ${tool} bundle.`,
+			),
+		);
+	}
+}
+
+/** A codex-only project (from `init --target codex`) has no `.claude/`; upgrade it by
+ *  reconciling the authored Codex bundle from the installed package against the project
+ *  ledger. Managed artifacts are refreshed, but a user-edited file is PRESERVED and
+ *  reported as a conflict rather than silently overwritten. */
+async function upgradeCodexToolkit(projectDir: string): Promise<void> {
+	console.log(pc.bold("Codex toolkit detected (no .claude/) — refreshing from the installed mewkit bundle."));
+	// Fail closed as the solo entrypoint; the shared refresh stays best-effort.
+	const moduleDir = resolveCodexModuleDir();
+	if (!existsSync(join(moduleDir, "manifest.json"))) {
+		console.error(pc.red("Codex bundle not found in this install — reinstall the `mewkit` package."));
+		process.exit(1);
+	}
+	await refreshCodexBundle(projectDir);
+}
+
 /** A cursor-only project (from `init --target cursor`) has no `.claude/`; upgrade it by
  *  reconciling the authored Cursor bundle from the installed package against the project
  *  ledger. Gated on the ledger's presence (not `.cursor/` dir), since a `.cursor/` dir alone
@@ -148,7 +146,7 @@ async function upgradeCursorToolkit(projectDir: string): Promise<void> {
 	console.log(pc.bold("Cursor toolkit detected (no .claude/) — refreshing from the installed mewkit bundle."));
 	// Fail closed as the solo entrypoint (parity with upgradeCodexToolkit): a cursor-only
 	// project whose install is corrupt must not silently exit 0 having done nothing. The
-	// shared refreshCursorBundle stays best-effort for the mixed-project reMigrate path,
+	// shared refreshCursorBundle stays best-effort for the mixed-project refresh path,
 	// where one broken provider must not abort propagation to the others.
 	const moduleDir = resolveCursorModuleDir();
 	if (!existsSync(join(moduleDir, "manifest.json"))) {
@@ -172,13 +170,6 @@ export interface UpgradeArgs {
 	interactive?: boolean;
 	/** Print the one mutation envelope on stdout; the narration goes to stderr. */
 	json?: boolean;
-	/**
-	 * Install from this project's cached kit artifact only, re-verifying it, and
-	 * reach no network. A cached file is a local file: it is put through the same
-	 * digest and signature checks a download gets, because it is not trusted more
-	 * for being local.
-	 */
-	offline?: boolean;
 	/** The running CLI's version, for the provenance this run re-stamps. */
 	cliVersion?: string;
 	/** Permit running in the MeowKit source repo, whose `.claude/` is the kit's authored source. */
@@ -270,7 +261,7 @@ async function performUpgrade(
 	assumeYes: boolean,
 	dryRun: boolean,
 	force: boolean,
-	provenance: { cliVersion: string; offline: boolean } = { cliVersion: "unknown", offline: false },
+	provenance: { cliVersion: string } = { cliVersion: "unknown" },
 ): Promise<UpdateStats | null> {
 	console.log(pc.dim("Fetching latest release from GitHub..."));
 
@@ -381,7 +372,6 @@ async function performUpgrade(
 				kitVersion: latest.version,
 				cliVersion: provenance.cliVersion,
 				delivery: installedDelivery,
-				offline: provenance.offline,
 			});
 		}
 
@@ -421,8 +411,8 @@ async function performUpgrade(
 		if (!dryRun) {
 			migrateLegacyDescriptor(process.cwd());
 
-			// Propagate the upgrade to any installed downstream provider toolkits.
-			await reMigrateInstalledProviders(process.cwd());
+			// Refresh any authored provider bundle installed beside `.claude/`.
+			await refreshInstalledProviders(process.cwd());
 		}
 		return stats;
 	} finally {
@@ -463,29 +453,6 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 	// (Skip for --check/--list, which are version queries.)
 	const cwd = process.cwd();
 	if (!args.check && !args.list) refuseKitSourceRepo(cwd, "upgrade", args.allowKitSource);
-
-	// An offline run is served from this project's artifact store, and nothing
-	// else. Reaching the network "to help" would make the flag mean "prefer the
-	// cache", which is a different promise: a user who passed it because the
-	// network is metered, untrusted or absent would get the fetch they ruled out.
-	if (args.offline === true) {
-		const refusal = offlineRefusal(cwd, getLocalVersion());
-		if (refusal !== null) {
-			console.error(pc.red(refusal));
-			emit(() => ({
-				ok: false,
-				command: "upgrade",
-				dryRun: args.dryRun === true,
-				planned: [],
-				applied: [],
-				notes: [],
-				error: refusal,
-				fix: "Point MEOWKIT_RELEASE_SOURCE at an extracted release, or run `mewkit upgrade` once with network access.",
-			}));
-			process.exitCode = 1;
-			return;
-		}
-	}
 
 	if (!args.check && !args.list && !existsSync(join(cwd, ".claude"))) {
 		const hasCodex = existsSync(join(cwd, ".codex"));
@@ -555,7 +522,7 @@ export async function upgrade(args: UpgradeArgs): Promise<void> {
 			/* assumeYes */ args.yes === true,
 			/* dryRun */ args.dryRun === true,
 			/* force */ args.force === true,
-			{ cliVersion: args.cliVersion ?? "unknown", offline: args.offline === true },
+			{ cliVersion: args.cliVersion ?? "unknown" },
 		);
 		emit(() =>
 			stats === null

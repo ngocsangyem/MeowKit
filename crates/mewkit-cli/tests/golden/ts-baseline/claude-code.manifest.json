@@ -521,8 +521,8 @@
     },
     {
       "path": ".claude/hooks/lib/meowkit-paths.cjs",
-      "sha256": "c822eaa0e91dfc9d2c2d0f6a8ebd46e46f90038de3c8e504bca82f155e18da00",
-      "size": 3417,
+      "sha256": "2d7163d311d1592b83b7180163b3817d182c9d2f50b0f1ace586f85c6bcda294",
+      "size": 3409,
       "exec": true
     },
     {
@@ -545,8 +545,8 @@
     },
     {
       "path": ".claude/hooks/lib/project-root.cjs",
-      "sha256": "77cf8ab524341a1cbe93eb2b9be5c5e18260e1be104fd5b0b53c9613db259bff",
-      "size": 2966,
+      "sha256": "51bdfc52d59b9e3bdebe9ad3d8d16914736d95c2b95c69e9a07958aea641395c",
+      "size": 6837,
       "exec": true
     },
     {
@@ -689,8 +689,8 @@
     },
     {
       "path": ".claude/hooks/pre-ship.cjs",
-      "sha256": "f1f889504a4b81025f571230a2e347e6b6e275b5a4e71446407170b2bdd8925c",
-      "size": 2843,
+      "sha256": "b82d8691d3bf85737f59f4151c7e802c105500b412a7b3a3b28690e9301c9964",
+      "size": 3068,
       "exec": true
     },
     {
@@ -780,8 +780,8 @@
     },
     {
       "path": ".claude/skills/advise/references/advice-supervision-rules.md",
-      "sha256": "53980646fac6f1f56ff2e57aecb2ea46075fe87d9fc9b128eab47ffa7098bcaa",
-      "size": 20848
+      "sha256": "51f6762f75fa9d31af90ad7fc803384958659e25ecf13f18925e9d60cf26a90e",
+      "size": 20832
     },
     {
       "path": ".claude/skills/advise/references/routing-canaries.md",
@@ -948,8 +948,8 @@
     },
     {
       "path": ".claude/skills/agent-detector/references/lifecycle-routing.md",
-      "sha256": "f37805d9ed167db7effb0a7630349203ca5f81f56cd26c51e489e2165773592d",
-      "size": 6189
+      "sha256": "62eda7bb88debd64223c16f98619128825add05a8b1dd42c18d7244a4674b876",
+      "size": 5873
     },
     {
       "path": ".claude/skills/agent-detector/references/model-selection-rules.md",
@@ -983,8 +983,8 @@
     },
     {
       "path": ".claude/skills/agent-detector/references/skill-domain-routing.md",
-      "sha256": "1072ca13b0f024d624ba63fd575aa63e80d37a7e9ac62080ebfbb67de63f2b53",
-      "size": 3655
+      "sha256": "7edfb072e0f0a4a252390c71d9eb9a013abd27fa510b5fc0956c8a09e41488a9",
+      "size": 3610
     },
     {
       "path": ".claude/skills/agent-detector/references/team-mode.md",
@@ -1671,8 +1671,8 @@
     },
     {
       "path": ".claude/skills/cook/references/workflow-steps.md",
-      "sha256": "4545d657c5c2872b9b390831354422c3f4c4f9398bd32369e174cec1b1ba8c74",
-      "size": 28613
+      "sha256": "4e83a2d5cb3da85c95e6ac82bdcb82365eb7676719fd3c0a41550955efdfe42d",
+      "size": 28047
     },
     {
       "path": ".claude/skills/cook/scripts/test-scripts.sh",
@@ -2407,8 +2407,8 @@
     },
     {
       "path": ".claude/skills/help/references/cli.md",
-      "sha256": "f0b45b7e22466ed041b9b7dd41cb9f08e0e9007296ac333326b75f2a0d768eaf",
-      "size": 17100
+      "sha256": "b81c56a9d5e8e746863e25fe897d2adabdabd9c38cb1c305f05de1a4481cdcf2",
+      "size": 13780
     },
     {
       "path": ".claude/skills/henshin/SKILL.md",
@@ -3527,8 +3527,8 @@
     },
     {
       "path": ".claude/skills/plan-creator/SKILL.md",
-      "sha256": "f3f2e679bc978dafb430ce44378da0bf200e9fd78e6f69a0a619b7904ba90b92",
-      "size": 27005
+      "sha256": "7d42e35e329a89b648236830ff615c525b9788aa6f69d35582bd93a4544b17a4",
+      "size": 26709
     },
     {
       "path": ".claude/skills/plan-creator/assets/bead-template.md",
@@ -3587,8 +3587,8 @@
     },
     {
       "path": ".claude/skills/plan-creator/references/advice-checkpoints.md",
-      "sha256": "b207ff4459b19bafc35341fa603c1ba4ee5bd253c7d312a3e2e2ede20b4dd506",
-      "size": 6581
+      "sha256": "5fe2f9f52cfbe0f351265100b8447d02866a444dec0a921398bd8108f7d42caf",
+      "size": 4627
     },
     {
       "path": ".claude/skills/plan-creator/references/anthropic-example-plan.md",
@@ -3652,8 +3652,8 @@
     },
     {
       "path": ".claude/skills/plan-creator/references/plan-intake-packet.md",
-      "sha256": "5a50790b8fca7b8b0b19f5753180a4aefcc253c1a7a251a7447b009bf03622d4",
-      "size": 4870
+      "sha256": "cafcc7b207544fada77c4973f70189e6b11c950bb949acf53a85d6bdb3d33aeb",
+      "size": 4823
     },
     {
       "path": ".claude/skills/plan-creator/references/plan-mutation-protocol.md",
@@ -3721,11 +3721,6 @@
       "size": 6157
     },
     {
-      "path": ".claude/skills/plan-creator/references/visual-plan-integration.md",
-      "sha256": "b66a63f2c2af261f4e06b7600d13aaa29a7582d99104ce989ff4ef844c68b477",
-      "size": 11150
-    },
-    {
       "path": ".claude/skills/plan-creator/references/whole-plan-sweep.md",
       "sha256": "df6da06f9d9b602c2d8fae9ff424848e9c50daee9d3dd39411867a6a0278b58d",
       "size": 9615
@@ -3768,8 +3763,8 @@
     },
     {
       "path": ".claude/skills/plan-creator/step-00-scope-challenge.md",
-      "sha256": "6e640fc99b0e2772fd3321fb22731a8ba10b91cfc8734d4b535c3db038556600",
-      "size": 13360
+      "sha256": "542c509727d61fd1de02ecd47b6d3541d046c0b078928cc215dca11a81620c35",
+      "size": 12334
     },
     {
       "path": ".claude/skills/plan-creator/step-01-research.md",
@@ -3778,13 +3773,13 @@
     },
     {
       "path": ".claude/skills/plan-creator/step-02-codebase-analysis.md",
-      "sha256": "384574b907a0578a0c2fe25be6cc750496900b4b2acdabb156012909c391a21e",
-      "size": 2905
+      "sha256": "c61452220055bd057eb8fb7dd5c21e4e2bf62b6f3ac71e1d6632325d156be461",
+      "size": 2086
     },
     {
       "path": ".claude/skills/plan-creator/step-03-draft-plan.md",
-      "sha256": "30f9fdd9bd41229672cebbcc0c2b2b4371c7db70296fee338d440eba4adfc00b",
-      "size": 15275
+      "sha256": "5b79ac154296df460d20f7fb1f5c0d696663cee9ac0bcb1cb2247957a59c35a1",
+      "size": 14456
     },
     {
       "path": ".claude/skills/plan-creator/step-03a-product-spec.md",
@@ -3793,33 +3788,28 @@
     },
     {
       "path": ".claude/skills/plan-creator/step-04-semantic-checks.md",
-      "sha256": "b423d2ecc64b61f67f7ab7b93fa05379fab4c0e769534ecf0edc4c1e07f2ace3",
-      "size": 8736
+      "sha256": "4dff7e0f8b5f242cc8e491b38655efc2aaaf07c33ba8c7e9468fef9afe6617fa",
+      "size": 7653
     },
     {
       "path": ".claude/skills/plan-creator/step-05-red-team.md",
-      "sha256": "a0e4ca48e1f976ae236021b878ab3861a6b319fdbc92b1f7d8cfa8aeebbd87de",
-      "size": 12652
+      "sha256": "90183813d1a15b8d299a2ff47f68d26fab3319540c343aa6ae541abf2b2b4a4c",
+      "size": 11945
     },
     {
       "path": ".claude/skills/plan-creator/step-06-validation-interview.md",
-      "sha256": "2e0a7590abc335fb0b0782b8a9ce77e318106a5ac987d166c4d8d90341e03596",
-      "size": 7807
+      "sha256": "55653caf40e5e793a6a22e1ffb83e67b1c293de2c26cda0b651e145953f9110c",
+      "size": 6974
     },
     {
       "path": ".claude/skills/plan-creator/step-07-gate.md",
-      "sha256": "4baac6a6c18532b695ea19c6eb91e685668f7feeec62e94886a0678edbe0c8c4",
-      "size": 3733
+      "sha256": "b736066d3fdf91822bdedcf535c5292cc82e0cb80e695e5e8ee6041e415f145c",
+      "size": 2854
     },
     {
       "path": ".claude/skills/plan-creator/step-08-hydrate-tasks.md",
-      "sha256": "aa7e4dc10369f7963ef1063442d1f5accdafa5542548771721c732cdc9a8164e",
-      "size": 6935
-    },
-    {
-      "path": ".claude/skills/plan-creator/step-08b-html-render.md",
-      "sha256": "aa9fa7b7e2a6453f6eafe02befeef7d6790f51254efe47a81ef238ddad10648c",
-      "size": 3038
+      "sha256": "f3d254ed4b79391b393de2c74ac6ccb006739baa701e04d0f45bd5d302242479",
+      "size": 5882
     },
     {
       "path": ".claude/skills/plan-creator/step-09-post-plan-handoff.md",
@@ -3828,13 +3818,13 @@
     },
     {
       "path": ".claude/skills/plan-creator/workflow-fast.md",
-      "sha256": "e8921ad07e781b7f295f3df2c15f18a9ec4d490fef4afcd4cea025f71c19e263",
-      "size": 3803
+      "sha256": "ed947f079a6423c8e8102c3f29e0eb228fc12cff578464211fe481859cc979ff",
+      "size": 2764
     },
     {
       "path": ".claude/skills/plan-creator/workflow.md",
-      "sha256": "3442b32f6245eae77b83854648ffd9e1d191b8fd55f89f0e3377a0b8af27a6e5",
-      "size": 13102
+      "sha256": "3efadef41781606ff1198bace6bf48ea8f4cc06755f08bb9c08d211a1a878e35",
+      "size": 11206
     },
     {
       "path": ".claude/skills/planning-engine/SKILL.md",
@@ -3928,8 +3918,8 @@
     },
     {
       "path": ".claude/skills/preview/SKILL.md",
-      "sha256": "f5c416fdbb2eea9968c9388a5d9f4fbb0400863f5d988e2165e84ce9fa813a33",
-      "size": 11098
+      "sha256": "7be2117b439ac9d2961adff5fcafeceffc2cfcfd2729bbbe89d5913a824517b4",
+      "size": 10778
     },
     {
       "path": ".claude/skills/preview/assets/architecture.html",
@@ -3953,8 +3943,8 @@
     },
     {
       "path": ".claude/skills/preview/references/analytical-modes.md",
-      "sha256": "d695d923b0e5852fd361c75e8de61dd417e0d139890094cb549e3155561041c4",
-      "size": 4845
+      "sha256": "deefdbf5b90d3c90204f1016c4258df0e8b97b2f8dfb3ee33afc6d78921a3c35",
+      "size": 4681
     },
     {
       "path": ".claude/skills/preview/references/generation-modes.md",
@@ -5422,116 +5412,6 @@
       "size": 6610
     },
     {
-      "path": ".claude/skills/visual-plan/SKILL.md",
-      "sha256": "9edf207134cbea3b1fc2e32ca73c837e294a4249e7db6bb1d6a918d19344fdcc",
-      "size": 3290
-    },
-    {
-      "path": ".claude/skills/visual-plan/assets/block-api-endpoint.html",
-      "sha256": "3d43420c60b283852144ce00290464e4734536269e6d8478a2dfe637c740c5be",
-      "size": 965
-    },
-    {
-      "path": ".claude/skills/visual-plan/assets/block-architecture-diagram.html",
-      "sha256": "c91efc24b2d04b024cf21472adf0e93eb26816fa595eb22a5fed894e0ab77622",
-      "size": 839
-    },
-    {
-      "path": ".claude/skills/visual-plan/assets/block-data-model.html",
-      "sha256": "8fc2d8d6479276e1e764d6638e0714e140f15084f9b5f34f591b4c52bd9d82fd",
-      "size": 849
-    },
-    {
-      "path": ".claude/skills/visual-plan/assets/block-decision-cards.html",
-      "sha256": "5c42412bc5b32268f0810899c5ee16ed5668ddd1723a4383e153dc94f41b3fa0",
-      "size": 1192
-    },
-    {
-      "path": ".claude/skills/visual-plan/assets/block-file-map.html",
-      "sha256": "30d516d598177c2b57cf1a3c2108f7c274f7ec4d8a2f680dcea9d10ad71754a9",
-      "size": 931
-    },
-    {
-      "path": ".claude/skills/visual-plan/assets/block-phase-timeline.html",
-      "sha256": "28cdbc0bdf18c85c72b2be5baee2058492919384ba0c50b6de0036ddd0b26a46",
-      "size": 896
-    },
-    {
-      "path": ".claude/skills/visual-plan/assets/block-steps-checklist.html",
-      "sha256": "7fc97ff4e87c98547766bd9836a292651cf121b6a90075e16af72b15a84523f7",
-      "size": 820
-    },
-    {
-      "path": ".claude/skills/visual-plan/assets/block-wireframe-screen.html",
-      "sha256": "1fb6f517d8a4a944c3d8d749efaa3cd96127a5e3699523dadacb8736638762f6",
-      "size": 1627
-    },
-    {
-      "path": ".claude/skills/visual-plan/assets/plan-template.html",
-      "sha256": "4b1aa1f4c533d60422658b80a71dc932b77b25571bdff96ccdd537fcf5d5794d",
-      "size": 13462
-    },
-    {
-      "path": ".claude/skills/visual-plan/assets/prototype-flow-template.html",
-      "sha256": "a5d46a5ebb9c2283a16d1fa6a6c8486b7376abe9ff76c3711c225642d31c2022",
-      "size": 14156
-    },
-    {
-      "path": ".claude/skills/visual-plan/evals/01-architecture-plan.json",
-      "sha256": "3e888e30f47c26c5af6af832606b2c9c37f4f7e98064ed359974b0b277220bbc",
-      "size": 1607
-    },
-    {
-      "path": ".claude/skills/visual-plan/evals/02-ui-plan-wireframe.json",
-      "sha256": "c9308669292a8d5a55957a8b10a76031fcced07a2a566b8f29cc240dad128e3d",
-      "size": 1358
-    },
-    {
-      "path": ".claude/skills/visual-plan/evals/03-multiphase-plan.json",
-      "sha256": "a85c0195dea6667be62f2c7775551f52249c56cb14e60e16939b3fc5a8fb9865",
-      "size": 1373
-    },
-    {
-      "path": ".claude/skills/visual-plan/references/apply-feedback-protocol.md",
-      "sha256": "cca0cbdf4583907e31f0973165fa95530539ebf85b92798969af8d439c8bd569",
-      "size": 3785
-    },
-    {
-      "path": ".claude/skills/visual-plan/references/block-vocabulary.md",
-      "sha256": "37e2ca3141acc7b2bf8ed5d4a5a5c0014cbf4d8a8b0fa2661fa0ca9461e5b68d",
-      "size": 5240
-    },
-    {
-      "path": ".claude/skills/visual-plan/references/exemplar.md",
-      "sha256": "238d41136b635f874339b1dc47de0191fa040abd74ec9aee6108d4ee0eeb0090",
-      "size": 3075
-    },
-    {
-      "path": ".claude/skills/visual-plan/references/plan-document-quality.md",
-      "sha256": "983725b093d492fb9b51dd881b172e39624ac80db78a2f90231c3e12d4dad741",
-      "size": 3853
-    },
-    {
-      "path": ".claude/skills/visual-plan/references/prototype-flow-explorer.md",
-      "sha256": "2333d4d8f7cecca00f28a31d03d87f33218a2aaf76b48c52fff8ccffdb2a6de7",
-      "size": 3748
-    },
-    {
-      "path": ".claude/skills/visual-plan/references/static-html-rendering-pipeline.md",
-      "sha256": "1d8887b2cf79b2eb89097f2a32f11834ee3680148076aa853a7a3fb49f6cb190",
-      "size": 4095
-    },
-    {
-      "path": ".claude/skills/visual-plan/references/structured-artifact-studio-pipeline.md",
-      "sha256": "4ba74653811eadab05845c8337ff0ffc20b3d2e0bf0683e9852887527efb5fbb",
-      "size": 2652
-    },
-    {
-      "path": ".claude/skills/visual-plan/references/wireframe-rules.md",
-      "sha256": "3eccff7585009298167d0fa74fe966cab8735863573215fb3fe2f35157b3a5fa",
-      "size": 5780
-    },
-    {
       "path": ".claude/skills/vue-best-practices/SKILL.md",
       "sha256": "a7ee29a06cbfb1fff3665d874b076a5ae09a4a104be801d6d052e287d888d3ae",
       "size": 8533
@@ -5931,6 +5811,11 @@
       "exec": true
     },
     {
+      "path": ".meowkit/.env.example",
+      "sha256": "beb8ab7710535c96ba06ed556dae9dd1cca7a0d466e1b0824e2e72917d1ba122",
+      "size": 5060
+    },
+    {
       "path": ".meowkit/.gitignore",
       "sha256": "96c18bd172c42d99cace76e59b4108008fa5b975f0065f5da6623fa1da46ee9d",
       "size": 99
@@ -5948,8 +5833,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/agents/SKILLS_INDEX.md",
-      "sha256": "3ba644e0e3fb4473edc95d4266dc9e8f8d8964831b6bc331f012eda95fa5067f",
-      "size": 16690
+      "sha256": "218e9942a29a3b3b7753b46e7422a9982e77388fdb15f89f86d9b9eaf243880b",
+      "size": 16270
     },
     {
       "path": ".meowkit/cache/.claude/agents/advisor.md",
@@ -6429,8 +6314,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/hooks/lib/meowkit-paths.cjs",
-      "sha256": "c822eaa0e91dfc9d2c2d0f6a8ebd46e46f90038de3c8e504bca82f155e18da00",
-      "size": 3417
+      "sha256": "2d7163d311d1592b83b7180163b3817d182c9d2f50b0f1ace586f85c6bcda294",
+      "size": 3409
     },
     {
       "path": ".meowkit/cache/.claude/hooks/lib/parse-stdin.cjs",
@@ -6449,8 +6334,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/hooks/lib/project-root.cjs",
-      "sha256": "77cf8ab524341a1cbe93eb2b9be5c5e18260e1be104fd5b0b53c9613db259bff",
-      "size": 2966
+      "sha256": "51bdfc52d59b9e3bdebe9ad3d8d16914736d95c2b95c69e9a07958aea641395c",
+      "size": 6837
     },
     {
       "path": ".meowkit/cache/.claude/hooks/lib/read-config.cjs",
@@ -6577,8 +6462,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/hooks/pre-ship.cjs",
-      "sha256": "f1f889504a4b81025f571230a2e347e6b6e275b5a4e71446407170b2bdd8925c",
-      "size": 2843,
+      "sha256": "b82d8691d3bf85737f59f4151c7e802c105500b412a7b3a3b28690e9301c9964",
+      "size": 3068,
       "exec": true
     },
     {
@@ -6669,8 +6554,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/advise/references/advice-supervision-rules.md",
-      "sha256": "53980646fac6f1f56ff2e57aecb2ea46075fe87d9fc9b128eab47ffa7098bcaa",
-      "size": 20848
+      "sha256": "51f6762f75fa9d31af90ad7fc803384958659e25ecf13f18925e9d60cf26a90e",
+      "size": 20832
     },
     {
       "path": ".meowkit/cache/.claude/skills/advise/references/routing-canaries.md",
@@ -6837,8 +6722,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/agent-detector/references/lifecycle-routing.md",
-      "sha256": "f37805d9ed167db7effb0a7630349203ca5f81f56cd26c51e489e2165773592d",
-      "size": 6189
+      "sha256": "62eda7bb88debd64223c16f98619128825add05a8b1dd42c18d7244a4674b876",
+      "size": 5873
     },
     {
       "path": ".meowkit/cache/.claude/skills/agent-detector/references/model-selection-rules.md",
@@ -6872,8 +6757,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/agent-detector/references/skill-domain-routing.md",
-      "sha256": "1072ca13b0f024d624ba63fd575aa63e80d37a7e9ac62080ebfbb67de63f2b53",
-      "size": 3655
+      "sha256": "7edfb072e0f0a4a252390c71d9eb9a013abd27fa510b5fc0956c8a09e41488a9",
+      "size": 3610
     },
     {
       "path": ".meowkit/cache/.claude/skills/agent-detector/references/team-mode.md",
@@ -7559,8 +7444,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/cook/references/workflow-steps.md",
-      "sha256": "4545d657c5c2872b9b390831354422c3f4c4f9398bd32369e174cec1b1ba8c74",
-      "size": 28613
+      "sha256": "4e83a2d5cb3da85c95e6ac82bdcb82365eb7676719fd3c0a41550955efdfe42d",
+      "size": 28047
     },
     {
       "path": ".meowkit/cache/.claude/skills/cook/scripts/test-scripts.sh",
@@ -8295,8 +8180,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/help/references/cli.md",
-      "sha256": "f0b45b7e22466ed041b9b7dd41cb9f08e0e9007296ac333326b75f2a0d768eaf",
-      "size": 17100
+      "sha256": "b81c56a9d5e8e746863e25fe897d2adabdabd9c38cb1c305f05de1a4481cdcf2",
+      "size": 13780
     },
     {
       "path": ".meowkit/cache/.claude/skills/henshin/SKILL.md",
@@ -9406,8 +9291,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/SKILL.md",
-      "sha256": "f3f2e679bc978dafb430ce44378da0bf200e9fd78e6f69a0a619b7904ba90b92",
-      "size": 27005
+      "sha256": "7d42e35e329a89b648236830ff615c525b9788aa6f69d35582bd93a4544b17a4",
+      "size": 26709
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/assets/bead-template.md",
@@ -9466,8 +9351,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/advice-checkpoints.md",
-      "sha256": "b207ff4459b19bafc35341fa603c1ba4ee5bd253c7d312a3e2e2ede20b4dd506",
-      "size": 6581
+      "sha256": "5fe2f9f52cfbe0f351265100b8447d02866a444dec0a921398bd8108f7d42caf",
+      "size": 4627
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/anthropic-example-plan.md",
@@ -9531,8 +9416,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/plan-intake-packet.md",
-      "sha256": "5a50790b8fca7b8b0b19f5753180a4aefcc253c1a7a251a7447b009bf03622d4",
-      "size": 4870
+      "sha256": "cafcc7b207544fada77c4973f70189e6b11c950bb949acf53a85d6bdb3d33aeb",
+      "size": 4823
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/plan-mutation-protocol.md",
@@ -9600,11 +9485,6 @@
       "size": 6157
     },
     {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/references/visual-plan-integration.md",
-      "sha256": "b66a63f2c2af261f4e06b7600d13aaa29a7582d99104ce989ff4ef844c68b477",
-      "size": 11150
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/plan-creator/references/whole-plan-sweep.md",
       "sha256": "df6da06f9d9b602c2d8fae9ff424848e9c50daee9d3dd39411867a6a0278b58d",
       "size": 9615
@@ -9647,8 +9527,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-00-scope-challenge.md",
-      "sha256": "6e640fc99b0e2772fd3321fb22731a8ba10b91cfc8734d4b535c3db038556600",
-      "size": 13360
+      "sha256": "542c509727d61fd1de02ecd47b6d3541d046c0b078928cc215dca11a81620c35",
+      "size": 12334
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-01-research.md",
@@ -9657,13 +9537,13 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-02-codebase-analysis.md",
-      "sha256": "384574b907a0578a0c2fe25be6cc750496900b4b2acdabb156012909c391a21e",
-      "size": 2905
+      "sha256": "c61452220055bd057eb8fb7dd5c21e4e2bf62b6f3ac71e1d6632325d156be461",
+      "size": 2086
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-03-draft-plan.md",
-      "sha256": "30f9fdd9bd41229672cebbcc0c2b2b4371c7db70296fee338d440eba4adfc00b",
-      "size": 15275
+      "sha256": "5b79ac154296df460d20f7fb1f5c0d696663cee9ac0bcb1cb2247957a59c35a1",
+      "size": 14456
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-03a-product-spec.md",
@@ -9672,33 +9552,28 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-04-semantic-checks.md",
-      "sha256": "b423d2ecc64b61f67f7ab7b93fa05379fab4c0e769534ecf0edc4c1e07f2ace3",
-      "size": 8736
+      "sha256": "4dff7e0f8b5f242cc8e491b38655efc2aaaf07c33ba8c7e9468fef9afe6617fa",
+      "size": 7653
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-05-red-team.md",
-      "sha256": "a0e4ca48e1f976ae236021b878ab3861a6b319fdbc92b1f7d8cfa8aeebbd87de",
-      "size": 12652
+      "sha256": "90183813d1a15b8d299a2ff47f68d26fab3319540c343aa6ae541abf2b2b4a4c",
+      "size": 11945
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-06-validation-interview.md",
-      "sha256": "2e0a7590abc335fb0b0782b8a9ce77e318106a5ac987d166c4d8d90341e03596",
-      "size": 7807
+      "sha256": "55653caf40e5e793a6a22e1ffb83e67b1c293de2c26cda0b651e145953f9110c",
+      "size": 6974
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-07-gate.md",
-      "sha256": "4baac6a6c18532b695ea19c6eb91e685668f7feeec62e94886a0678edbe0c8c4",
-      "size": 3733
+      "sha256": "b736066d3fdf91822bdedcf535c5292cc82e0cb80e695e5e8ee6041e415f145c",
+      "size": 2854
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-08-hydrate-tasks.md",
-      "sha256": "aa7e4dc10369f7963ef1063442d1f5accdafa5542548771721c732cdc9a8164e",
-      "size": 6935
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/plan-creator/step-08b-html-render.md",
-      "sha256": "aa9fa7b7e2a6453f6eafe02befeef7d6790f51254efe47a81ef238ddad10648c",
-      "size": 3038
+      "sha256": "f3d254ed4b79391b393de2c74ac6ccb006739baa701e04d0f45bd5d302242479",
+      "size": 5882
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/step-09-post-plan-handoff.md",
@@ -9707,13 +9582,13 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/workflow-fast.md",
-      "sha256": "e8921ad07e781b7f295f3df2c15f18a9ec4d490fef4afcd4cea025f71c19e263",
-      "size": 3803
+      "sha256": "ed947f079a6423c8e8102c3f29e0eb228fc12cff578464211fe481859cc979ff",
+      "size": 2764
     },
     {
       "path": ".meowkit/cache/.claude/skills/plan-creator/workflow.md",
-      "sha256": "3442b32f6245eae77b83854648ffd9e1d191b8fd55f89f0e3377a0b8af27a6e5",
-      "size": 13102
+      "sha256": "3efadef41781606ff1198bace6bf48ea8f4cc06755f08bb9c08d211a1a878e35",
+      "size": 11206
     },
     {
       "path": ".meowkit/cache/.claude/skills/planning-engine/SKILL.md",
@@ -9807,8 +9682,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/preview/SKILL.md",
-      "sha256": "f5c416fdbb2eea9968c9388a5d9f4fbb0400863f5d988e2165e84ce9fa813a33",
-      "size": 11098
+      "sha256": "7be2117b439ac9d2961adff5fcafeceffc2cfcfd2729bbbe89d5913a824517b4",
+      "size": 10778
     },
     {
       "path": ".meowkit/cache/.claude/skills/preview/assets/architecture.html",
@@ -9832,8 +9707,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/preview/references/analytical-modes.md",
-      "sha256": "d695d923b0e5852fd361c75e8de61dd417e0d139890094cb549e3155561041c4",
-      "size": 4845
+      "sha256": "deefdbf5b90d3c90204f1016c4258df0e8b97b2f8dfb3ee33afc6d78921a3c35",
+      "size": 4681
     },
     {
       "path": ".meowkit/cache/.claude/skills/preview/references/generation-modes.md",
@@ -11303,116 +11178,6 @@
       "size": 6610
     },
     {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/SKILL.md",
-      "sha256": "9edf207134cbea3b1fc2e32ca73c837e294a4249e7db6bb1d6a918d19344fdcc",
-      "size": 3290
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/assets/block-api-endpoint.html",
-      "sha256": "3d43420c60b283852144ce00290464e4734536269e6d8478a2dfe637c740c5be",
-      "size": 965
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/assets/block-architecture-diagram.html",
-      "sha256": "c91efc24b2d04b024cf21472adf0e93eb26816fa595eb22a5fed894e0ab77622",
-      "size": 839
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/assets/block-data-model.html",
-      "sha256": "8fc2d8d6479276e1e764d6638e0714e140f15084f9b5f34f591b4c52bd9d82fd",
-      "size": 849
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/assets/block-decision-cards.html",
-      "sha256": "5c42412bc5b32268f0810899c5ee16ed5668ddd1723a4383e153dc94f41b3fa0",
-      "size": 1192
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/assets/block-file-map.html",
-      "sha256": "30d516d598177c2b57cf1a3c2108f7c274f7ec4d8a2f680dcea9d10ad71754a9",
-      "size": 931
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/assets/block-phase-timeline.html",
-      "sha256": "28cdbc0bdf18c85c72b2be5baee2058492919384ba0c50b6de0036ddd0b26a46",
-      "size": 896
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/assets/block-steps-checklist.html",
-      "sha256": "7fc97ff4e87c98547766bd9836a292651cf121b6a90075e16af72b15a84523f7",
-      "size": 820
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/assets/block-wireframe-screen.html",
-      "sha256": "1fb6f517d8a4a944c3d8d749efaa3cd96127a5e3699523dadacb8736638762f6",
-      "size": 1627
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/assets/plan-template.html",
-      "sha256": "4b1aa1f4c533d60422658b80a71dc932b77b25571bdff96ccdd537fcf5d5794d",
-      "size": 13462
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/assets/prototype-flow-template.html",
-      "sha256": "a5d46a5ebb9c2283a16d1fa6a6c8486b7376abe9ff76c3711c225642d31c2022",
-      "size": 14156
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/evals/01-architecture-plan.json",
-      "sha256": "3e888e30f47c26c5af6af832606b2c9c37f4f7e98064ed359974b0b277220bbc",
-      "size": 1607
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/evals/02-ui-plan-wireframe.json",
-      "sha256": "c9308669292a8d5a55957a8b10a76031fcced07a2a566b8f29cc240dad128e3d",
-      "size": 1358
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/evals/03-multiphase-plan.json",
-      "sha256": "a85c0195dea6667be62f2c7775551f52249c56cb14e60e16939b3fc5a8fb9865",
-      "size": 1373
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/references/apply-feedback-protocol.md",
-      "sha256": "cca0cbdf4583907e31f0973165fa95530539ebf85b92798969af8d439c8bd569",
-      "size": 3785
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/references/block-vocabulary.md",
-      "sha256": "37e2ca3141acc7b2bf8ed5d4a5a5c0014cbf4d8a8b0fa2661fa0ca9461e5b68d",
-      "size": 5240
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/references/exemplar.md",
-      "sha256": "238d41136b635f874339b1dc47de0191fa040abd74ec9aee6108d4ee0eeb0090",
-      "size": 3075
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/references/plan-document-quality.md",
-      "sha256": "983725b093d492fb9b51dd881b172e39624ac80db78a2f90231c3e12d4dad741",
-      "size": 3853
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/references/prototype-flow-explorer.md",
-      "sha256": "2333d4d8f7cecca00f28a31d03d87f33218a2aaf76b48c52fff8ccffdb2a6de7",
-      "size": 3748
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/references/static-html-rendering-pipeline.md",
-      "sha256": "1d8887b2cf79b2eb89097f2a32f11834ee3680148076aa853a7a3fb49f6cb190",
-      "size": 4095
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/references/structured-artifact-studio-pipeline.md",
-      "sha256": "4ba74653811eadab05845c8337ff0ffc20b3d2e0bf0683e9852887527efb5fbb",
-      "size": 2652
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/visual-plan/references/wireframe-rules.md",
-      "sha256": "3eccff7585009298167d0fa74fe966cab8735863573215fb3fe2f35157b3a5fa",
-      "size": 5780
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/vue-best-practices/SKILL.md",
       "sha256": "a7ee29a06cbfb1fff3665d874b076a5ae09a4a104be801d6d052e287d888d3ae",
       "size": 8533
@@ -11809,9 +11574,24 @@
       "exec": true
     },
     {
+      "path": ".meowkit/cache/.meowkit/.env.example",
+      "sha256": "beb8ab7710535c96ba06ed556dae9dd1cca7a0d466e1b0824e2e72917d1ba122",
+      "size": 5060
+    },
+    {
+      "path": ".meowkit/cache/.meowkit/gitignore.meowkit",
+      "sha256": "7ea561d6a94c9293f78d49350daea8cc805dafb024c407a92402e01a6b2be07b",
+      "size": 702
+    },
+    {
       "path": ".meowkit/cache/.meowkit/harness-inventory.json",
       "sha256": "9ba16591cb2d3ce0d68791cebafac8ed40279b9a73ccc6b1b5b241f722976a46",
       "size": 7023
+    },
+    {
+      "path": ".meowkit/cache/.meowkit/mcp.json.example",
+      "sha256": "1a79c59e61186f412d080e7f18355adf76b67457a9a3cf1146bd60fe88b15f4f",
+      "size": 342
     },
     {
       "path": ".meowkit/cache/.meowkit/pack-manifest.json",
@@ -11829,9 +11609,19 @@
       "size": 2091
     },
     {
+      "path": ".meowkit/gitignore.meowkit",
+      "sha256": "7ea561d6a94c9293f78d49350daea8cc805dafb024c407a92402e01a6b2be07b",
+      "size": 702
+    },
+    {
       "path": ".meowkit/harness-inventory.json",
       "sha256": "9ba16591cb2d3ce0d68791cebafac8ed40279b9a73ccc6b1b5b241f722976a46",
       "size": 7023
+    },
+    {
+      "path": ".meowkit/mcp.json.example",
+      "sha256": "1a79c59e61186f412d080e7f18355adf76b67457a9a3cf1146bd60fe88b15f4f",
+      "size": 342
     },
     {
       "path": ".meowkit/metadata.json",

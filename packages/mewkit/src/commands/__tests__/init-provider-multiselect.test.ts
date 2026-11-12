@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 //    (no .claude/, no network), and the picker route produces the SAME tree as
 //    the equivalent `--target` flag (picker/flag parity — red team: divergence);
 //  - the picker is SUPPRESSED whenever an explicit provider intent is given
-//    (update mode, or --target, or --migrate) — the gate that keeps those flows intact.
+//    (update mode, or --target) — the gate that keeps those flows intact.
 
 const multiselectResult = { value: ["codex"] as string[] };
 const multiselectSpy = vi.fn(async () => multiselectResult.value);
@@ -81,12 +81,6 @@ describe("init provider multiselect", () => {
 		mkdirSync(join(dir, ".claude"));
 		const { init } = await import("../init.js");
 		await init({}).catch(() => undefined); // base install exits early (no releases)
-		expect(multiselectSpy).not.toHaveBeenCalled();
-	});
-
-	it("does NOT show the picker when --migrate is passed (keeps the legacy export flow)", async () => {
-		const { init } = await import("../init.js");
-		await init({ migrate: true }).catch(() => undefined);
 		expect(multiselectSpy).not.toHaveBeenCalled();
 	});
 

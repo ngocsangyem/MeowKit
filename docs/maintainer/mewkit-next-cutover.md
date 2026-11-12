@@ -59,13 +59,13 @@ larger than its number.
 | `verdict-gate` | 3 | 30 | port group 2 |
 | `trace` | 12 | 175 | port group 2 |
 | `budget` | 9 | 477 | port group 2 |
-| `visual-plan` | 56 | 3,075 | port group 3 |
+| `visual-plan` | 56 | 3,075 | removed from the npm CLI and the kit; not ported |
 | `setup` | 2 | 707 | port group 3 |
 | `skill` (`skill env`) | 15 | 174 | port group 3 |
 | `pack` | 4 | 436 | port group 3 |
 | `capabilities` | 9 | 297 | port group 3 |
 | `backups` | 3 | 122 | port group 3 |
-| `migrate` | 3 | 15,155 | group 3: retire, not port — the emitters replace `migrate codex` / `migrate cursor`; the kit's 3 references are rewritten to `init --target` |
+| `migrate` | 3 | 15,155 | retired from the npm CLI, not ported — `init --target codex|cursor` replaces it; the kit's references point at `init --target` |
 
 The measurement also matches `mewkit sync` (a prose mention in a third-party skill's
 `SYNC.md`) and `mewkit runtime` (a code comment); neither is a command.
@@ -78,8 +78,8 @@ Each group is its own plan, in this order, because later groups call earlier one
    memory writes and session orientation depend on them; every workflow skill calls one.
 2. **Review and evidence** — `review`, `advice`, `verdict-gate`, `trace`, `budget`. Gate 2's
    structural check and the review pipeline; they read state written by group 1.
-3. **Tooling** — `visual-plan` (largest: a local web studio), `setup`, `skill`, `pack`,
-   `capabilities`, `backups`; retire `migrate`.
+3. **Tooling** — `setup`, `skill`, `pack`, `capabilities`, `backups` (`visual-plan` and
+   `migrate` were removed instead of ported).
 4. **Rename and retire** — the criteria above, then rename the binary, update the kit's
    references in one kit release, and stop npm publishing.
 

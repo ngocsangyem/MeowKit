@@ -5,12 +5,11 @@ description: "Start a project, keep it healthy, and upgrade it."
 
 Everything that touches the shape of the project itself: creating it, configuring it, checking it is sound, and moving it forward a version.
 
-## init — provider selection & one-shot export
+## init — provider selection
 
 On a **fresh install** with no provider flag, `mewkit init` opens a provider multiselect —
 **Claude Code** (checked by default), **Codex**, **Cursor** — and provisions each picked
-toolkit. Any explicit provider intent (`--target <provider>` or `--migrate`) skips the picker
-and keeps its own flow.
+toolkit. `--target <provider>` skips the picker and keeps its own flow.
 
 ```bash
 # Fresh install → provider multiselect (Claude Code preselected)
@@ -22,14 +21,8 @@ npx mewkit init --target codex
 # Skip the picker — Cursor toolkit (copies the authored Cursor bundle, no .claude/)
 npx mewkit init --target cursor
 
-# Global install scope
-npx mewkit init --target cursor --migrate-global
-
 # Claude Code, laid down as a plugin rather than as .claude/
 npx mewkit init --target claude-code --delivery plugin
-
-# Re-install from this project's cached artifact, reaching no network
-npx mewkit init --offline
 ```
 
 `--delivery` is meaningful for `--target claude-code` only; the other two targets have one shape
@@ -39,8 +32,6 @@ refused by name with the three valid values listed.
 | Flag                  | Description                                                                                                                                        |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--target <provider>` | Skip the picker and create one provider toolkit. `codex` and `cursor` each copy their authored bundle (no `.claude/`, no release download); `claude-code` installs the `.claude/` kit |
-| `--migrate`           | After unpack, prompt for export targets via the standalone migrate multiselect (TTY required)                                                     |
-| `--migrate-global`    | Use global install paths (`~/.cursor/`, etc.) instead of project-local                                                                            |
 
 **Provider multiselect** (fresh install, no `--target`):
 
@@ -53,7 +44,7 @@ refused by name with the three valid values listed.
 **Behavior:**
 
 - `--target codex` and `--target cursor` are offline: each copies the bundle shipped in the package — no release download, no `.claude/`, no conversion. Codex fails closed if `AGENTS.md` already exists (re-run with `--force`).
-- `--migrate` runs the same orchestrator, registry, and reconciler as the standalone `migrate` command, after the kit unpacks. A failed export doesn't roll back the kit install; re-run `mewkit migrate` to retry.
+- Codex and Cursor installs keep their own ledger. `mewkit upgrade` refreshes them from it, and never touches a `.cursor/` or `.codex/` directory it did not install. See [Portability](/cli/portability).
 
 ## setup
 
@@ -109,7 +100,7 @@ The Node check and `engines.node` state the same floor: Node 24, the version thi
 Update mewkit to the latest version.
 
 ```bash
-npx mewkit upgrade [--check] [--beta] [--list] [--offline]
+npx mewkit upgrade [--check] [--beta] [--list]
 ```
 
 | Flag        | Description                                                            |
@@ -117,10 +108,10 @@ npx mewkit upgrade [--check] [--beta] [--list] [--offline]
 | `--check`   | Show available update (shows both stable and beta)                     |
 | `--beta`    | Install beta channel                                                   |
 | `--list`    | List all available versions with channel info                          |
-| `--offline` | Install from this project's cached artifact only, and reach no network |
 
-The release's signed kit artifact is verified before anything is extracted, and `--offline` re-runs
-the same checks on the cached copy in `.meowkit/cache/` rather than trusting it for being local.
+A kit release is a zip plus a `checksums.txt`. Upgrade checks the zip against that file before
+extracting anything. After a `.claude/` upgrade it also refreshes any Codex or Cursor bundle this
+project installed with `mewkit init --target`.
 
 **Examples:**
 

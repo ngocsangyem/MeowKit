@@ -2,12 +2,12 @@
 # estimate-tokens.sh — Reads inventory JSON from stdin, emits enriched JSON.
 #
 # Adds:
-#   - per-entry "estimated_tokens" (chars/4, mirrors token-estimator.ts)
+#   - per-entry "estimated_tokens" (chars/4, mirrors budget-tracker.cjs)
 #   - "totals.{category}_tokens", "totals.structural_overhead_tokens"
 #   - "totals.window_size_tokens" (hard-coded 200000)
 #   - "totals.structural_overhead_pct"
 #
-# Heuristic source-of-truth: token-estimator.ts
+# Heuristic source-of-truth: hooks/handlers/budget-tracker.cjs
 # (CHARS_PER_TOKEN = 4). We inline the same heuristic to avoid a Node bridge that
 # would require dist/ — not present on a fresh the installer install.
 #
@@ -29,7 +29,7 @@ import json, sys, math
 window = int(sys.argv[1])
 data = json.loads(sys.stdin.read())
 
-CHARS_PER_TOKEN = 4  # mirrors token-estimator.ts
+CHARS_PER_TOKEN = 4  # mirrors budget-tracker.cjs
 
 def tokens_of(byte_count):
     if not byte_count:

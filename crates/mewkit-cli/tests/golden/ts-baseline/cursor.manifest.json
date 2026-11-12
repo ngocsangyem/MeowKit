@@ -283,8 +283,8 @@
     },
     {
       "path": ".cursor/hooks/lib/project-root.cjs",
-      "sha256": "77cf8ab524341a1cbe93eb2b9be5c5e18260e1be104fd5b0b53c9613db259bff",
-      "size": 2966,
+      "sha256": "51bdfc52d59b9e3bdebe9ad3d8d16914736d95c2b95c69e9a07958aea641395c",
+      "size": 6837,
       "exec": true
     },
     {
@@ -325,8 +325,8 @@
     },
     {
       "path": ".cursor/hooks/privacy-read-gate.cjs",
-      "sha256": "4718de32c8e3480af1cd8ba3312d07068259122a98ef87a37aa9442ce5ed1f30",
-      "size": 1525
+      "sha256": "007a60db3c2b5564956ff3754ff80f7edda1915245488afff55581db8f0b4304",
+      "size": 1531
     },
     {
       "path": ".cursor/hooks/session-context.cjs",
@@ -355,8 +355,8 @@
     },
     {
       "path": ".cursor/hooks/tool-gate.cjs",
-      "sha256": "3dbdb66dea9be56472c180f9ef9cd306bbb029964a1e3d316b7a7151e1713805",
-      "size": 2944
+      "sha256": "6ca0b6a5613f1274b1f7819b33ebecbe1806004e8e0c32ff86420f068fba7eac",
+      "size": 2950
     },
     {
       "path": ".cursor/rules/domain-advice-supervision.mdc",
@@ -529,8 +529,8 @@
     },
     {
       "path": ".cursor/skills/mk-agent-detector/references/lifecycle-routing.md",
-      "sha256": "3fb70b5cec2a2bb6708bb92b2901a37af98f751828e927b92e45cd8bac5cc0cf",
-      "size": 6185
+      "sha256": "418b812238f7c96b9f2e3f03d96036b1cc1728d96c535fde80444da91172a4aa",
+      "size": 5869
     },
     {
       "path": ".cursor/skills/mk-agent-detector/references/model-selection.md",
@@ -549,8 +549,8 @@
     },
     {
       "path": ".cursor/skills/mk-agent-detector/references/skill-domain-routing.md",
-      "sha256": "52ee5c6cf8be2ce05ae6ed84774880b10df3bddfe03d5b25b0bb6c321e4c66ff",
-      "size": 3655
+      "sha256": "f26041075acb8ce95d697087a5bf564ed0737ca1652fb94fb4786ad78c41fae6",
+      "size": 3610
     },
     {
       "path": ".cursor/skills/mk-agent-detector/references/team-mode.md",
@@ -1263,8 +1263,8 @@
     },
     {
       "path": ".cursor/skills/mk-cook/references/workflow-steps.md",
-      "sha256": "a82a4f2922756c7f79b7e4c706d39bf81101f20d370df3f98ec32a6b25489c08",
-      "size": 23022
+      "sha256": "79b3728eb1c84a6c234d227ed6aa67ef3c50d25d7707b9001c5c30b83a06b490",
+      "size": 22456
     },
     {
       "path": ".cursor/skills/mk-cook/scripts/test-scripts.sh",
@@ -3130,8 +3130,8 @@
     },
     {
       "path": ".cursor/skills/mk-plan-creator/SKILL.md",
-      "sha256": "46f2e8811232f4df46615d307d5cc3cc3d4fcec21827e6ebde69c4ce0b51bfa1",
-      "size": 25713
+      "sha256": "59ec8a267880bb4755c386b70c53575ad1bb130458849d1202a3062bd28c4933",
+      "size": 25482
     },
     {
       "path": ".cursor/skills/mk-plan-creator/assets/bead-template.md",
@@ -3250,8 +3250,8 @@
     },
     {
       "path": ".cursor/skills/mk-plan-creator/references/plan-intake-packet.md",
-      "sha256": "2246010358262f8e39ef18d9c8b1ce76aaa4005407557db18a2c90ee91caa255",
-      "size": 4874
+      "sha256": "586b49f7791f1a85b19b002b0b9aec15d8d10b39da20c729afca649c25c0a808",
+      "size": 4827
     },
     {
       "path": ".cursor/skills/mk-plan-creator/references/plan-mutation-protocol.md",
@@ -3319,11 +3319,6 @@
       "size": 6173
     },
     {
-      "path": ".cursor/skills/mk-plan-creator/references/visual-plan-integration.md",
-      "sha256": "c184c08eaa5a0c7d2c7475c9fef3a30f6c359228dc2526c07e7f4e10f5221b7d",
-      "size": 11156
-    },
-    {
       "path": ".cursor/skills/mk-plan-creator/references/whole-plan-sweep.md",
       "sha256": "937849c9196699ce8312778aacf98b88cc3f79f89a80526adefecbefcb23720f",
       "size": 9665
@@ -3366,8 +3361,8 @@
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-00-scope-challenge.md",
-      "sha256": "91f641c76b7fa8ab97a0cf546f695e4de177c40ef64ae9b208fc82c8aa28d176",
-      "size": 13186
+      "sha256": "0289d4b20f08871030b27fb2737aa3826ed50dcab8362098b5ee6b5572dd6b12",
+      "size": 12160
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-01-research.md",
@@ -3376,13 +3371,13 @@
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-02-codebase-analysis.md",
-      "sha256": "5e891a53e260796f6aea153649a1c6271bac7e05f61af09bada7a12aa0a5fee2",
-      "size": 2905
+      "sha256": "a5fc82a0c36171b02f5e29bb8bfd3b54d4fac583a32bdebc5fd7485449a70121",
+      "size": 2086
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-03-draft-plan.md",
-      "sha256": "561f14585f16ebe46fddc0633883647b49a12405fee69a1bd4a16ba554074976",
-      "size": 15250
+      "sha256": "c2a77fcbef894dafa9a4c71eca71054fa7aeb0a71a8bddb93bc233a36e879729",
+      "size": 14431
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-03a-product-spec.md",
@@ -3391,33 +3386,28 @@
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-04-semantic-checks.md",
-      "sha256": "d0dd690a96fc786544fe8c7a4b60214af34f227960e096994ecf605a281d7589",
-      "size": 8781
+      "sha256": "d40ae625eeefedbafbdb57d28350d096dcde0b62dd4a626638feebe54de47c77",
+      "size": 7698
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-05-red-team.md",
-      "sha256": "c99e97f4844188c1e5039095dd7723ee23679d4298833b5f98315570a5c9e762",
-      "size": 12394
+      "sha256": "ecd06f8c379314523b63872fc956a9f363be115378ac9aa8fb739d27f507ac5d",
+      "size": 11687
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-06-validation-interview.md",
-      "sha256": "3672e5493f25e93ea100beadd58aaa36db8c46e904fcdb81d933f860e0d87c78",
-      "size": 7818
+      "sha256": "794f434d77b3da52d5b7c0de533d608bdb09efd1dfffba7303569ef565ccdd3d",
+      "size": 6985
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-07-gate.md",
-      "sha256": "b1b1849b9672f3d38908a0b6625f00c7af3ea22f65ed7e58294e19ddcb7bbedb",
-      "size": 3442
+      "sha256": "6e8af86faeae67f9fd02df4cf8dc5f5de2796f4ce0248be195e5647b2bd0b248",
+      "size": 2563
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-08-hydrate-tasks.md",
-      "sha256": "bee8926b51774a05b0c39d399a783a65141d2f96b21e0bdcdcfd4df466e4f563",
-      "size": 6947
-    },
-    {
-      "path": ".cursor/skills/mk-plan-creator/step-08b-html-render.md",
-      "sha256": "aa9fa7b7e2a6453f6eafe02befeef7d6790f51254efe47a81ef238ddad10648c",
-      "size": 3038
+      "sha256": "7e845621be5a5caa25d12bddd4943849703aeaa1b26cbd9a2a99d793bac76342",
+      "size": 5894
     },
     {
       "path": ".cursor/skills/mk-plan-creator/step-09-post-plan-handoff.md",
@@ -3426,13 +3416,13 @@
     },
     {
       "path": ".cursor/skills/mk-plan-creator/workflow-fast.md",
-      "sha256": "018c1b303720bcc7c2bb7462d88d1cc6b4006cd0daac0e938ae649392c2a1836",
-      "size": 3823
+      "sha256": "f6667cc0a46e4998235819af5157040dc52f63c1b4d44154c1c51a3770e35e72",
+      "size": 2784
     },
     {
       "path": ".cursor/skills/mk-plan-creator/workflow.md",
-      "sha256": "e46cb0ea148c8c4804af2924d68ba0e097d61a487368bc704f44884f20123bb8",
-      "size": 12761
+      "sha256": "f264cc5ece013c92818d78c7227fa1eba429107d30e6468eec937c57a585c20d",
+      "size": 10865
     },
     {
       "path": ".cursor/skills/mk-planning-engine/SKILL.md",
@@ -3526,8 +3516,8 @@
     },
     {
       "path": ".cursor/skills/mk-preview/SKILL.md",
-      "sha256": "0fd9984cd5d29f9128bfef17d25c9fd007d1dd13bde2f96e47e1f789f6eabc49",
-      "size": 10711
+      "sha256": "e7abcc7e206a0c2d370e033aefe01abff7f9ed26777f131983c9457b9c5a561d",
+      "size": 10398
     },
     {
       "path": ".cursor/skills/mk-preview/assets/architecture.html",
@@ -3551,8 +3541,8 @@
     },
     {
       "path": ".cursor/skills/mk-preview/references/analytical-modes.md",
-      "sha256": "ffefe2cd125bfac688dd6ad94d190c8eee21a62e3adc3d5885ff51106a5c90c7",
-      "size": 4846
+      "sha256": "c512710cc254e3ae73c3ee210210cc9124c9a95874c3b2b7afc4917a02a7ccf2",
+      "size": 4682
     },
     {
       "path": ".cursor/skills/mk-preview/references/generation-modes.md",
@@ -5083,116 +5073,6 @@
       "path": ".cursor/skills/mk-verify/references/project-detection.md",
       "sha256": "f5ab3e695c509522365ac329bed32f680765a3856aeb8318e936187ae79db05c",
       "size": 6624
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/SKILL.md",
-      "sha256": "ce1329f7b98467057dd8fbfcfc39d2017aaa39a3e854a3f622f4d1113989e0ad",
-      "size": 2845
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/assets/block-api-endpoint.html",
-      "sha256": "3d43420c60b283852144ce00290464e4734536269e6d8478a2dfe637c740c5be",
-      "size": 965
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/assets/block-architecture-diagram.html",
-      "sha256": "c91efc24b2d04b024cf21472adf0e93eb26816fa595eb22a5fed894e0ab77622",
-      "size": 839
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/assets/block-data-model.html",
-      "sha256": "8fc2d8d6479276e1e764d6638e0714e140f15084f9b5f34f591b4c52bd9d82fd",
-      "size": 849
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/assets/block-decision-cards.html",
-      "sha256": "5c42412bc5b32268f0810899c5ee16ed5668ddd1723a4383e153dc94f41b3fa0",
-      "size": 1192
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/assets/block-file-map.html",
-      "sha256": "30d516d598177c2b57cf1a3c2108f7c274f7ec4d8a2f680dcea9d10ad71754a9",
-      "size": 931
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/assets/block-phase-timeline.html",
-      "sha256": "28cdbc0bdf18c85c72b2be5baee2058492919384ba0c50b6de0036ddd0b26a46",
-      "size": 896
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/assets/block-steps-checklist.html",
-      "sha256": "7fc97ff4e87c98547766bd9836a292651cf121b6a90075e16af72b15a84523f7",
-      "size": 820
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/assets/block-wireframe-screen.html",
-      "sha256": "1fb6f517d8a4a944c3d8d749efaa3cd96127a5e3699523dadacb8736638762f6",
-      "size": 1627
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/assets/plan-template.html",
-      "sha256": "4b1aa1f4c533d60422658b80a71dc932b77b25571bdff96ccdd537fcf5d5794d",
-      "size": 13462
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/assets/prototype-flow-template.html",
-      "sha256": "a5d46a5ebb9c2283a16d1fa6a6c8486b7376abe9ff76c3711c225642d31c2022",
-      "size": 14156
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/evals/01-architecture-plan.json",
-      "sha256": "8cb8e6f997bc08d6ffe5acc0cfc0df46c5fb6c1fb72c67d4e94ed2d7bf699708",
-      "size": 1588
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/evals/02-ui-plan-wireframe.json",
-      "sha256": "a68b19f2bfdb3707351e6534659f00565888d91b13733bcae15bce204bc4c56e",
-      "size": 1341
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/evals/03-multiphase-plan.json",
-      "sha256": "dacfbd71a598fcffa0820f85de5a3d6fb3aadfc64847917450c14323fff6fb9c",
-      "size": 1365
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/references/apply-feedback-protocol.md",
-      "sha256": "b84867e8e86a8ffaeb49912f6a23a0fb4d628b398f821c38b767f4dbaf32dfdf",
-      "size": 3791
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/references/block-vocabulary.md",
-      "sha256": "37e2ca3141acc7b2bf8ed5d4a5a5c0014cbf4d8a8b0fa2661fa0ca9461e5b68d",
-      "size": 5240
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/references/exemplar.md",
-      "sha256": "238d41136b635f874339b1dc47de0191fa040abd74ec9aee6108d4ee0eeb0090",
-      "size": 3075
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/references/plan-document-quality.md",
-      "sha256": "983725b093d492fb9b51dd881b172e39624ac80db78a2f90231c3e12d4dad741",
-      "size": 3853
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/references/prototype-flow-explorer.md",
-      "sha256": "2333d4d8f7cecca00f28a31d03d87f33218a2aaf76b48c52fff8ccffdb2a6de7",
-      "size": 3748
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/references/static-html-rendering-pipeline.md",
-      "sha256": "9b326d5c6f921bcb635cdcc8a7f779e4cf5a01abf6feb8df4c98de5ebfeb5b88",
-      "size": 4101
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/references/structured-artifact-studio-pipeline.md",
-      "sha256": "4ba74653811eadab05845c8337ff0ffc20b3d2e0bf0683e9852887527efb5fbb",
-      "size": 2652
-    },
-    {
-      "path": ".cursor/skills/mk-visual-plan/references/wireframe-rules.md",
-      "sha256": "3eccff7585009298167d0fa74fe966cab8735863573215fb3fe2f35157b3a5fa",
-      "size": 5780
     },
     {
       "path": ".cursor/skills/mk-vue-best-practices/SKILL.md",

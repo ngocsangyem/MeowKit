@@ -124,9 +124,8 @@ the `budget.*` config keys (those are USD amounts, not token percentages).
 
 ## Integration Points
 
-- **Reuses, does not duplicate:** `packages/mewkit/src/token-estimator/index.ts`
-  is the canonical chars/4 source. Shell scripts inline the same heuristic with
-  a citation comment, avoiding a Node bridge that would require `dist/`.
+- **Reuses, does not duplicate:** the chars/4 heuristic of the budget-tracker
+  hook. Shell scripts inline the same heuristic with a citation comment.
 - **Reads, does not write:** `.meowkit/telemetry/cost-log.json`,
   `.claude/`, `.mcp.json`. No file writes anywhere.
 - **No env vars introduced.** Window size is hard-coded 200K; override deferred

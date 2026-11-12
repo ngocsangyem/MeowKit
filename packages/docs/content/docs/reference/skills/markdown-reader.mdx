@@ -33,8 +33,7 @@ Triggers:
 
 Anti-triggers:
 
-- Self-contained HTML artifacts from `mk:brainstorming --html` or `mk:plan-creator --html` — those open directly in the browser, no server needed
-- Plan rendering as a shareable page — use `mk:visual-plan`
+- Self-contained HTML artifacts from `mk:brainstorming --html` — those open directly in the browser, no server needed
 - Packaged showcase deliverables — use `mk:showcase`
 
 ## Installation (Required Once)
@@ -84,7 +83,7 @@ when `CLAUDE_PLUGIN_DATA` is unset). This survives plugin upgrades.
 
 - **Install first**: `npm install` must run from `.claude/skills/markdown-reader/` before first use
 - **Port conflicts**: server auto-increments 3456–3500; check `${CLAUDE_PLUGIN_DATA}/markdown-reader/` for stale `.pid` files if `--stop` doesn't clear them
-- **Not a dependency**: `mk:brainstorming --html` and `mk:plan-creator --html` never start or depend on this server
+- **Not a dependency**: `mk:brainstorming --html` never starts or depends on this server
 - **Images in markdown**: paths must be relative to the markdown file; served via `/file/*` with path-safety validation
 
 ## Workflow Position

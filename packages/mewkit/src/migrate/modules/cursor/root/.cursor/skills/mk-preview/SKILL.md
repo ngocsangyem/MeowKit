@@ -1,11 +1,11 @@
 ---
 name: "mk-preview"
-description: "Generate visual artifacts: explanations, diagrams, slides, diff views. NOT plan-as-HTML (mk:visual-plan), live media gen (mk:multimodal), or browser QA (mk:qa)."
+description: "Generate visual artifacts: explanations, diagrams, slides, diff views. NOT publish-grade diagrams (mk:tech-graph), live media gen (mk:multimodal), or browser QA (mk:qa)."
 ---
 
 # mk:preview
 
-Generates visual artifacts — markdown and self-contained HTML — for explaining code, drawing diagrams, building slide decks, and visualizing diffs. Rendering a plan as HTML belongs to `mk:visual-plan`.
+Generates visual artifacts — markdown and self-contained HTML — for explaining code, drawing diagrams, building slide decks, and visualizing diffs.
 
 No live server. No Python. Pure markdown + HTML + bash file operations. Output writes to `tasks/plans/{active-plan}/visuals/` when an active plan exists; otherwise falls back to `tasks/visuals/`.
 
@@ -16,8 +16,6 @@ No live server. No Python. Pure markdown + HTML + bash file operations. Output w
 - Step-by-step content benefits from slides over a single long page
 - A pre-PR diff review needs visual KPIs, file map, and change cards
 - Stakeholders prefer a self-contained HTML page they can open in a browser without a server
-
-For rendering a plan directory as a shareable HTML page, use `mk:visual-plan`.
 
 ## Default (No Arguments)
 
@@ -55,7 +53,7 @@ Recommended default: `--explain` or `--html --explain`.
 
 - `the preview skill --html --diff [ref]` — visualize a git diff. Default `ref` = `main`. Accepts branch, commit, range, PR number.
 
-`--ascii` does not combine with `--html` (terminal-only by design). To render a plan as HTML, use `mk:visual-plan`.
+`--ascii` does not combine with `--html` (terminal-only by design).
 
 ## Argument Resolution
 
@@ -128,7 +126,6 @@ Templates in `assets/` are out-of-band — they are not auto-Read; the agent rea
 - `mk:ui-design-system` — palette and typography selection (`assets/colors.csv` 160 rows, `assets/typography.csv` 73 rows). HTML modes vary palette per run.
 - `mk:frontend-design` — anti-slop forbidden patterns. Cited via `../frontend-design/references/anti-slop-directives.md`, not duplicated.
 - `mk:web-to-markdown` — for users who want to view a generated markdown file in a browser, no server bundled here.
-- `mk:visual-plan` — the owner of plan-as-HTML rendering; route plan-render requests there.
 
 ## Gotchas
 
@@ -150,4 +147,4 @@ Templates in `assets/` are out-of-band — they are not auto-Read; the agent rea
 ## Composes Into
 
 - `mk:cook` may invoke `--explain` to communicate a complex implementation phase
-- `mk:visual-plan` owns plan-as-HTML rendering; `mk:plan-ceo-review` CRITIQUES plans — neither overlaps this skill's generic explain/diagram/slides/diff output
+- `mk:plan-ceo-review` CRITIQUES plans; it does not overlap this skill's generic explain/diagram/slides/diff output

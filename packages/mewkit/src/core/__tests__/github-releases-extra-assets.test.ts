@@ -60,11 +60,10 @@ function stubNetwork(): string[] {
 }
 
 describe("kit release with checksums.txt and kit-contract.json", () => {
-	it("selects the zip asset, not checksums.txt, and sees no signed artifact", async () => {
+	it("selects the zip asset, not checksums.txt", async () => {
 		stubNetwork();
 		const [release] = await fetchReleases();
 		expect(release.downloadUrl).toBe(ZIP_URL);
-		expect(release.kitArtifact).toBeNull();
 	});
 
 	it("downloads and extracts the zip, contract file included, without fetching checksums.txt", async () => {

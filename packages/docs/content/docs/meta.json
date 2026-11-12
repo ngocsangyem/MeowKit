@@ -5,7 +5,6 @@
     "introduction",
     "installation",
     "quick-start",
-    "migration",
     "migration/tdd-optional",
     "---Core Concepts---",
     "core-concepts/what-is-meowkit",

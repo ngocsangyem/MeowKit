@@ -143,8 +143,8 @@
     },
     {
       "path": ".agents/skills/mk-agent-detector/references/lifecycle-routing.md",
-      "sha256": "9b242ac992650bd13094411ab8876df84df170d2c15cd3badbc2d2d7f0aaa7a9",
-      "size": 6187
+      "sha256": "3bb7b659123d206fc018c9b2ed455c8208af144c5d530f950f28503dac31d533",
+      "size": 5871
     },
     {
       "path": ".agents/skills/mk-agent-detector/references/model-selection.md",
@@ -163,8 +163,8 @@
     },
     {
       "path": ".agents/skills/mk-agent-detector/references/skill-domain-routing.md",
-      "sha256": "52ee5c6cf8be2ce05ae6ed84774880b10df3bddfe03d5b25b0bb6c321e4c66ff",
-      "size": 3655
+      "sha256": "f26041075acb8ce95d697087a5bf564ed0737ca1652fb94fb4786ad78c41fae6",
+      "size": 3610
     },
     {
       "path": ".agents/skills/mk-agent-detector/references/team-mode.md",
@@ -877,8 +877,8 @@
     },
     {
       "path": ".agents/skills/mk-cook/references/workflow-steps.md",
-      "sha256": "cf4f35132c2e3f46f0f1207e8f0e4913825ac54a90c2604eac31ccc9b0217156",
-      "size": 22908
+      "sha256": "60549e6f3733f701d65a8790aeb8395205a394b7666656cd0252e4b7a95dff1e",
+      "size": 22342
     },
     {
       "path": ".agents/skills/mk-cook/scripts/test-scripts.sh",
@@ -2744,8 +2744,8 @@
     },
     {
       "path": ".agents/skills/mk-plan-creator/SKILL.md",
-      "sha256": "33fd71f325da2af098a802bf1e877345fc7ff090e899fc2d1497c5a669790ea0",
-      "size": 25685
+      "sha256": "f205b52599344a8222123fb92c2f43399b44ca91ec1502f639cd522f5ca44dbd",
+      "size": 25454
     },
     {
       "path": ".agents/skills/mk-plan-creator/assets/bead-template.md",
@@ -2864,8 +2864,8 @@
     },
     {
       "path": ".agents/skills/mk-plan-creator/references/plan-intake-packet.md",
-      "sha256": "2246010358262f8e39ef18d9c8b1ce76aaa4005407557db18a2c90ee91caa255",
-      "size": 4874
+      "sha256": "586b49f7791f1a85b19b002b0b9aec15d8d10b39da20c729afca649c25c0a808",
+      "size": 4827
     },
     {
       "path": ".agents/skills/mk-plan-creator/references/plan-mutation-protocol.md",
@@ -2933,11 +2933,6 @@
       "size": 6159
     },
     {
-      "path": ".agents/skills/mk-plan-creator/references/visual-plan-integration.md",
-      "sha256": "c184c08eaa5a0c7d2c7475c9fef3a30f6c359228dc2526c07e7f4e10f5221b7d",
-      "size": 11156
-    },
-    {
       "path": ".agents/skills/mk-plan-creator/references/whole-plan-sweep.md",
       "sha256": "ff743d74f2b8079f3ca0559070212cf428fd268733b85e3db27c693787a9c94f",
       "size": 9665
@@ -2980,8 +2975,8 @@
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-00-scope-challenge.md",
-      "sha256": "bdc2525f38a76e3cb8c5c1c54e0b8075a6ea6fb2e72b84af7e49d273217c15db",
-      "size": 13186
+      "sha256": "9eb1b2aa7095d59a0bb2a070c3535237416ebdf56b8982d7f52d7e088c4de772",
+      "size": 12160
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-01-research.md",
@@ -2990,13 +2985,13 @@
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-02-codebase-analysis.md",
-      "sha256": "384574b907a0578a0c2fe25be6cc750496900b4b2acdabb156012909c391a21e",
-      "size": 2905
+      "sha256": "c61452220055bd057eb8fb7dd5c21e4e2bf62b6f3ac71e1d6632325d156be461",
+      "size": 2086
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-03-draft-plan.md",
-      "sha256": "561f14585f16ebe46fddc0633883647b49a12405fee69a1bd4a16ba554074976",
-      "size": 15250
+      "sha256": "c2a77fcbef894dafa9a4c71eca71054fa7aeb0a71a8bddb93bc233a36e879729",
+      "size": 14431
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-03a-product-spec.md",
@@ -3005,33 +3000,28 @@
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-04-semantic-checks.md",
-      "sha256": "bc3b350d9a83241d17a3b0284a51636c79d5d1f4cdaea6a68f0968ee13bc1a01",
-      "size": 8781
+      "sha256": "d30357ef39801754d4dd7d58ce60e73fc5445b5a290ecda3d9c41ce5e8b3b120",
+      "size": 7698
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-05-red-team.md",
-      "sha256": "fed31e3a6efc537f22c39f72a8e575d1a0a529f42ca63262888c6ea60585896c",
-      "size": 12394
+      "sha256": "679b989da29cd27da92f597f7f7872d12dc1c8325cc2679563dfc05579a8d743",
+      "size": 11687
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-06-validation-interview.md",
-      "sha256": "3672e5493f25e93ea100beadd58aaa36db8c46e904fcdb81d933f860e0d87c78",
-      "size": 7818
+      "sha256": "794f434d77b3da52d5b7c0de533d608bdb09efd1dfffba7303569ef565ccdd3d",
+      "size": 6985
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-07-gate.md",
-      "sha256": "b1b1849b9672f3d38908a0b6625f00c7af3ea22f65ed7e58294e19ddcb7bbedb",
-      "size": 3442
+      "sha256": "6e8af86faeae67f9fd02df4cf8dc5f5de2796f4ce0248be195e5647b2bd0b248",
+      "size": 2563
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-08-hydrate-tasks.md",
-      "sha256": "49e8caccb0ac0cf0302aa5f459d689e9cd5ac927fc60a83f6b800b25df369ff7",
-      "size": 6947
-    },
-    {
-      "path": ".agents/skills/mk-plan-creator/step-08b-html-render.md",
-      "sha256": "aa9fa7b7e2a6453f6eafe02befeef7d6790f51254efe47a81ef238ddad10648c",
-      "size": 3038
+      "sha256": "4ba9c9fc48800362c948f7c127be96ff381e7801a8973fd9a359c37d64bf2df7",
+      "size": 5894
     },
     {
       "path": ".agents/skills/mk-plan-creator/step-09-post-plan-handoff.md",
@@ -3040,13 +3030,13 @@
     },
     {
       "path": ".agents/skills/mk-plan-creator/workflow-fast.md",
-      "sha256": "018c1b303720bcc7c2bb7462d88d1cc6b4006cd0daac0e938ae649392c2a1836",
-      "size": 3823
+      "sha256": "f6667cc0a46e4998235819af5157040dc52f63c1b4d44154c1c51a3770e35e72",
+      "size": 2784
     },
     {
       "path": ".agents/skills/mk-plan-creator/workflow.md",
-      "sha256": "e3e97d454ea0ef4af92fe524d2658fc6e9f0b92b6df7350be4192bc443bc55f9",
-      "size": 12739
+      "sha256": "7329879c0bf943d5b4d68815f9b8e786b8df2c998b22d1b267eeae53854709ef",
+      "size": 10843
     },
     {
       "path": ".agents/skills/mk-planning-engine/SKILL.md",
@@ -3140,8 +3130,8 @@
     },
     {
       "path": ".agents/skills/mk-preview/SKILL.md",
-      "sha256": "0fd9984cd5d29f9128bfef17d25c9fd007d1dd13bde2f96e47e1f789f6eabc49",
-      "size": 10711
+      "sha256": "e7abcc7e206a0c2d370e033aefe01abff7f9ed26777f131983c9457b9c5a561d",
+      "size": 10398
     },
     {
       "path": ".agents/skills/mk-preview/assets/architecture.html",
@@ -3165,8 +3155,8 @@
     },
     {
       "path": ".agents/skills/mk-preview/references/analytical-modes.md",
-      "sha256": "771546a002a9d85fce7256681f8f15b2a8578cb46852e3c1bf4c1fbef87ee863",
-      "size": 4844
+      "sha256": "226ca5c2abbf45c74cbeaf477715f4789c324ea082784478a110cc8b04409854",
+      "size": 4680
     },
     {
       "path": ".agents/skills/mk-preview/references/generation-modes.md",
@@ -4699,116 +4689,6 @@
       "size": 6624
     },
     {
-      "path": ".agents/skills/mk-visual-plan/SKILL.md",
-      "sha256": "ce1329f7b98467057dd8fbfcfc39d2017aaa39a3e854a3f622f4d1113989e0ad",
-      "size": 2845
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/assets/block-api-endpoint.html",
-      "sha256": "3d43420c60b283852144ce00290464e4734536269e6d8478a2dfe637c740c5be",
-      "size": 965
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/assets/block-architecture-diagram.html",
-      "sha256": "c91efc24b2d04b024cf21472adf0e93eb26816fa595eb22a5fed894e0ab77622",
-      "size": 839
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/assets/block-data-model.html",
-      "sha256": "8fc2d8d6479276e1e764d6638e0714e140f15084f9b5f34f591b4c52bd9d82fd",
-      "size": 849
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/assets/block-decision-cards.html",
-      "sha256": "5c42412bc5b32268f0810899c5ee16ed5668ddd1723a4383e153dc94f41b3fa0",
-      "size": 1192
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/assets/block-file-map.html",
-      "sha256": "30d516d598177c2b57cf1a3c2108f7c274f7ec4d8a2f680dcea9d10ad71754a9",
-      "size": 931
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/assets/block-phase-timeline.html",
-      "sha256": "28cdbc0bdf18c85c72b2be5baee2058492919384ba0c50b6de0036ddd0b26a46",
-      "size": 896
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/assets/block-steps-checklist.html",
-      "sha256": "7fc97ff4e87c98547766bd9836a292651cf121b6a90075e16af72b15a84523f7",
-      "size": 820
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/assets/block-wireframe-screen.html",
-      "sha256": "1fb6f517d8a4a944c3d8d749efaa3cd96127a5e3699523dadacb8736638762f6",
-      "size": 1627
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/assets/plan-template.html",
-      "sha256": "4b1aa1f4c533d60422658b80a71dc932b77b25571bdff96ccdd537fcf5d5794d",
-      "size": 13462
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/assets/prototype-flow-template.html",
-      "sha256": "a5d46a5ebb9c2283a16d1fa6a6c8486b7376abe9ff76c3711c225642d31c2022",
-      "size": 14156
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/evals/01-architecture-plan.json",
-      "sha256": "8cb8e6f997bc08d6ffe5acc0cfc0df46c5fb6c1fb72c67d4e94ed2d7bf699708",
-      "size": 1588
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/evals/02-ui-plan-wireframe.json",
-      "sha256": "a68b19f2bfdb3707351e6534659f00565888d91b13733bcae15bce204bc4c56e",
-      "size": 1341
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/evals/03-multiphase-plan.json",
-      "sha256": "dacfbd71a598fcffa0820f85de5a3d6fb3aadfc64847917450c14323fff6fb9c",
-      "size": 1365
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/references/apply-feedback-protocol.md",
-      "sha256": "b84867e8e86a8ffaeb49912f6a23a0fb4d628b398f821c38b767f4dbaf32dfdf",
-      "size": 3791
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/references/block-vocabulary.md",
-      "sha256": "37e2ca3141acc7b2bf8ed5d4a5a5c0014cbf4d8a8b0fa2661fa0ca9461e5b68d",
-      "size": 5240
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/references/exemplar.md",
-      "sha256": "238d41136b635f874339b1dc47de0191fa040abd74ec9aee6108d4ee0eeb0090",
-      "size": 3075
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/references/plan-document-quality.md",
-      "sha256": "983725b093d492fb9b51dd881b172e39624ac80db78a2f90231c3e12d4dad741",
-      "size": 3853
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/references/prototype-flow-explorer.md",
-      "sha256": "2333d4d8f7cecca00f28a31d03d87f33218a2aaf76b48c52fff8ccffdb2a6de7",
-      "size": 3748
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/references/static-html-rendering-pipeline.md",
-      "sha256": "9b326d5c6f921bcb635cdcc8a7f779e4cf5a01abf6feb8df4c98de5ebfeb5b88",
-      "size": 4101
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/references/structured-artifact-studio-pipeline.md",
-      "sha256": "4ba74653811eadab05845c8337ff0ffc20b3d2e0bf0683e9852887527efb5fbb",
-      "size": 2652
-    },
-    {
-      "path": ".agents/skills/mk-visual-plan/references/wireframe-rules.md",
-      "sha256": "3eccff7585009298167d0fa74fe966cab8735863573215fb3fe2f35157b3a5fa",
-      "size": 5780
-    },
-    {
       "path": ".agents/skills/mk-vue-best-practices/SKILL.md",
       "sha256": "1283c721d6d26144d449bd81958e5643f9139d19f40ba9b57595c2096bd057bf",
       "size": 8229
@@ -5435,8 +5315,8 @@
     },
     {
       "path": ".codex/hooks/gate-enforcement.cjs",
-      "sha256": "0f46d9f2db2a1eb796f8230989ce069e8dea3e1ad917be8b427a6d6407d71dfd",
-      "size": 3190,
+      "sha256": "65ae121eddc8dbd74a5be736a1a6cdcd2e3a615dae7a6dd49193089fed690dad",
+      "size": 3196,
       "exec": true
     },
     {
@@ -5499,8 +5379,8 @@
     },
     {
       "path": ".codex/hooks/lib/project-root.cjs",
-      "sha256": "77cf8ab524341a1cbe93eb2b9be5c5e18260e1be104fd5b0b53c9613db259bff",
-      "size": 2966,
+      "sha256": "51bdfc52d59b9e3bdebe9ad3d8d16914736d95c2b95c69e9a07958aea641395c",
+      "size": 6837,
       "exec": true
     },
     {
@@ -5516,8 +5396,8 @@
     },
     {
       "path": ".codex/hooks/privacy-block.cjs",
-      "sha256": "823db7768803ee96db5c773c2f31602e9c77088a5a02a2fce2983996201bf3bb",
-      "size": 2773,
+      "sha256": "8840c8e970ff9777cfbcc0fabd86bbe76c6faa8dc38538c1ac70dfc91f529b97",
+      "size": 2779,
       "exec": true
     },
     {

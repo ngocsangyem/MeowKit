@@ -88,7 +88,7 @@ describe("findGenericCoreTokens", () => {
 	});
 
 	it("keeps the cleaned light-touch skills free of generic-core tokens", () => {
-		for (const skill of ["multimodal", "advise", "visual-plan", "stitch"]) {
+		for (const skill of ["multimodal", "advise", "stitch"]) {
 			expect(findGenericCoreTokens(join(process.cwd(), ".claude"), `skills/${skill}`)).toEqual([]);
 		}
 	});

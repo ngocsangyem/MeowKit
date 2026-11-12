@@ -31,7 +31,7 @@ The orchestrator routes by skill names:
 | One honest recommendation on a raw idea or decision, after the user's framing is challenged and confirmed | `mk:advise` — NOT for interrogation with no recommendation (`mk:grill`); NOT for enumerating alternatives to an already-validated problem (`mk:brainstorming`); NOT for "is this worth building at all" (`mk:office-hours`); NOT for multi-perspective deliberation (`mk:party`) |
 
 | Long-form markdown reading in browser (RFCs, runbooks, plan files, design docs) | `mk:markdown-reader` — NOT for self-contained --html artifacts from mk:brainstorming or mk:plan-creator; those open directly in the browser without a server |
-| Packaged shareable deliverable (demo page, social/portfolio HTML, topic showcase with optional screenshots) | `mk:showcase` — NOT for plan rendering (use mk:visual-plan); NOT for generic explain/diagram visuals (use mk:preview) |
+| Packaged shareable deliverable (demo page, social/portfolio HTML, topic showcase with optional screenshots) | `mk:showcase` — NOT for generic explain/diagram visuals (use mk:preview) |
 | Generate a NEW UI design from a text prompt (no existing design source) | `mk:stitch` — NOT for implementing an existing design; use mk:figma (Figma URL) or mk:frontend-design (existing spec/mockup/DESIGN.md) for that |
 | Implement an existing design (Figma URL, mockup, spec, or DESIGN.md) | `mk:figma` (Figma URL) or `mk:frontend-design` (spec/mockup) — NOT mk:stitch (Stitch generates novel designs from text, not from existing sources) |
 

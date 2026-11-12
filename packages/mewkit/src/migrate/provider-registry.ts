@@ -9,8 +9,8 @@ import type { ProviderConfig, ProviderType } from "./types.js";
 
 export { binaryCache, hasBinaryInPath } from "./providers/detection-helpers.js";
 
-// Compose configs WITHOUT the surface-disable step so that the providers
-// singleton matches the pre-refactor module-load state. applyMewkitOverrides()
-// runs the disable loop uniformly when first invoked — preserving callers that
-// observe the pre-disable map at import time.
+// Compose configs WITHOUT the surface-disable step. Callers read surfaces from
+// this raw view too (portability-policy reads `skills`, the reference-target
+// registry reads per-type paths), so switching it to buildProviders() changes
+// what they see; do that only deliberately.
 export const providers: Record<ProviderType, ProviderConfig> = buildProvidersRaw(manifestRegistry);

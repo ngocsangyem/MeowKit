@@ -79,7 +79,7 @@ describe("deterministic gate coverage: every declared group has an owning suite"
 		"5 correction cycle": ["athena-supervision-wiring.test.ts", "evidence revision and supersession"],
 		"6 authority": ["athena-provider-parity.test.ts", "no plane claims gate authority"],
 		"7 handoff and propagation": ["athena-extended-cohort.test.ts", "the orchestrator forwards a run id"],
-		"8 html matrix": ["athena-html-orthogonality.test.ts", "the flags are parsed independently"],
+		"8 correction target": ["advice-correction-target-guard.test.ts", "a correction cannot write another owner's artifact"],
 		"9 provider packaging": ["athena-provider-parity.test.ts", "declared support states are honest"],
 		"10 fallback": ["athena-provider-parity.test.ts", "keeps the fallback line"],
 		"11 state failure": ["athena-supervision-wiring.test.ts", "corrupt dossier"],

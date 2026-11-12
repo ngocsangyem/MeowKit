@@ -203,7 +203,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 ### Cross-Cutting (Any Phase)
 
 ```toon
-[19]{skill,owner,trigger}
+[18]{skill,owner,trigger}
 `mk:ask-me`|any agent|Evidence-grounded project Q&A — "how does X work here", claim-checks, constraint summaries — answered with cited `file:line` sources. Read-only; redirects ideation/decisions/debugging/review to the owning specialist skill.
 `mk:research`|researcher (delegated)|Deep multi-source technical research producing one cited report — technology evaluation, ecosystem comparison, standards fact-finding, "how do others solve X". Delegates to researcher subagent(s) under primary-source discipline + a retrieval-call cap; optional editorial HTML via `--html`. NOT single-library docs (see mk:docs-finder); NOT project-only Q&A (see mk:ask-me).
 `mk:careful`|any agent|Before destructive commands
@@ -212,8 +212,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:multimodal`|any agent|Visual content analysis
 `mk:web-to-markdown`|any agent|Fetch arbitrary URLs as clean markdown — use when URL is not covered by mk:docs-finder. Static-only by default; Playwright opt-in via `.claude/hooks/lib/setup-workflow --system-deps`.
 `mk:henshin`|any agent|Planning front door for wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. Adapted from external agentization patterns.
-`mk:preview`|any agent|Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, and git diffs. Display only; NOT for rendering a plan as HTML (mk:visual-plan), plan critique (mk:plan-ceo-review), or media generation (mk:multimodal).
-`mk:visual-plan`|any agent|Visual review of a plan (plan.md + phase-*.md). Default: structured visual-plan/plan.json artifact + local studio (view/edit/export) via the mewkit visual-plan CLI; `--static` renders the legacy single-file plan.html. Canonical plan-as-visual-review owner; NOT generic code/diagram/diff visuals (mk:preview), NOT plan critique (mk:plan-ceo-review).
+`mk:preview`|any agent|Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, and git diffs. Display only; NOT for plan critique (mk:plan-ceo-review) or media generation (mk:multimodal).
 `mk:story-sizer`|story-sizer|Pre-ticket Fibonacci sizing of paste-mode user stories. Default writes a Story Sizing Report. Opt-in `--auto-create` delegates to `mk:jira-issue` + `mk:jira-collaborate` with a single batch confirmation gate.
 `mk:chom`|researcher|Copy-cat / replicate features from external systems, repos, or ideas into the current project
 `mk:pack`|developer|Pack an external repository into a single AI-friendly file for third-party analysis or handoff to external LLMs
@@ -243,7 +242,7 @@ Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
 Knowledge/Wiki|3
-**Total**|**129**
+**Total**|**128**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

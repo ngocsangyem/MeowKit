@@ -191,14 +191,6 @@ If `MEOWKIT_TDD=1` env var is set, auto-enable `tdd_mode = true`.
 
 Default: `tdd_mode = false`.
 
-**`--html` flag detection (the single opt-in for visual planning):**
-
-If `--html` is present in the arguments (e.g., `--hard --html`), set `html_mode = true`. This flag is composable with any planning mode and does NOT change the planning mode. `html_mode = true` is the ONLY switch that turns on the structured visual-plan pipeline — the gated visual sub-steps (UI evidence inventory → generate `visual-plan/plan.json` → validate → Gate-1 approve → schema-1.3 block), and then step-08b exports `plan.html` from the approved artifact. When `html_mode = false` (the default), plan-creator does NO visual work at all: no classification, no artifact, no visual Gate-1 precondition.
-
-`--html` is rejected by the `archive` / `red-team` / `validate` subcommands (those do not produce a plan to render); detection here is the single source of truth for the flag.
-
-Default: `html_mode = false`.
-
 ## Output
 
 - `task_complexity` — trivial, simple, or complex
@@ -206,9 +198,8 @@ Default: `html_mode = false`.
 - `workflow_model` — feature, bugfix, refactor, or security
 - `scope_mode` — EXPANSION, HOLD, or REDUCTION (hard mode only; fast = HOLD default; product-level = EXPANSION default; spike skips scope question)
 - `tdd_mode` — true or false (composable flag, independent of planning_mode)
-- `html_mode` — true or false (composable flag, independent of planning_mode; gates ALL visual sub-steps)
 - `spike_meta` — `{ timebox, findings_doc, story_points }` when planning_mode = spike; unset otherwise
-- Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode} | tdd: {tdd_mode} | html: {html_mode}"`
+- Print: `"Scope: {complexity} → mode: {mode} | model: {workflow_model} | scope: {scope_mode} | tdd: {tdd_mode}"`
 
 ## Next
 

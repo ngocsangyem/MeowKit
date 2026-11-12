@@ -38,10 +38,6 @@
       "target": ".claude/skills/review/TODOS-format.md"
     },
     {
-      "file": ".claude/skills/plan-creator/references/visual-plan-integration.md",
-      "target": ".claude/skills/plan-creator/references/apply-feedback-protocol.md"
-    },
-    {
       "file": ".claude/skills/preview/SKILL.md",
       "target": ".claude/skills/preview/assets/colors.csv"
     },

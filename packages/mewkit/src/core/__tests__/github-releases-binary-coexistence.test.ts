@@ -8,7 +8,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { fetchReleases, getLatestBeta, getLatestStable } from "../github-releases.js";
-import { kitArtifactAssets } from "../../kit/select-release-assets.js";
 import { TARGETS, TAG_PREFIX, assetName } from "../../../../../scripts/release/binary-targets.mjs";
 
 const DL = "https://github.com/ngocsangyem/MeowKit/releases/download";
@@ -77,9 +76,15 @@ describe("binary releases beside kit releases", () => {
 	});
 
 	it("gives a binary release no .zip and no kit-artifact assets", () => {
+		// Older npm CLIs still select a release by the signed-artifact names, so a
+		// binary release must not carry any of them either.
+		const artifactName = (name: string): boolean =>
+			(name.startsWith("meowkit-kit-") && name.endsWith(".tar.gz")) ||
+			name === "kit-manifest.json" ||
+			name === "kit-manifest.json.sig";
 		for (const release of LISTING.filter((r) => r.tag_name.startsWith(TAG_PREFIX))) {
 			expect(release.assets.some((a) => a.name.endsWith(".zip"))).toBe(false);
-			expect(kitArtifactAssets(release.assets)).toBeNull();
+			expect(release.assets.some((a) => artifactName(a.name))).toBe(false);
 		}
 	});
 });

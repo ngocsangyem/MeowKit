@@ -57,7 +57,7 @@ Steps:
    byte/line counts per category (AGENTS.md chain, agents, skills, rules,
    commands, MCP) as JSON.
 2. **Estimate** — `estimate-tokens.sh` enriches the inventory with
-   `estimated_tokens` (chars/4 heuristic, mirrors `budget-tracker.cjs`) and
+   `estimated_tokens` (chars/4 heuristic) and
    computes `totals` including `structural_overhead_pct` against a 200K window.
 3. **Format** — `format-audit-report.sh` emits a 5-section markdown report:
    header, summary table, top consumers, recommendations, footer.
@@ -96,9 +96,8 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 
 ## Integration Points
 
-- **Reuses, does not duplicate:** `packages/mewkit/src/token-estimator/index.ts`
-  is the canonical chars/4 source. Shell scripts inline the same heuristic with
-  a citation comment, avoiding a Node bridge that would require `dist/`.
+- **Self-contained heuristic:** `scripts/estimate-tokens.sh` defines the chars/4
+  estimate inline; it needs no hook or build step.
 - **Reads, does not write:** `.meowkit/telemetry/cost-log.json`,
   `.codex/`, `.mcp.json`. No file writes anywhere.
 - **No env vars introduced.** Window size is hard-coded 200K; override deferred

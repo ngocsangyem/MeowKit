@@ -26,7 +26,7 @@ const { denyReason, loadRuntime, targetPaths } = require("./lib/hook-runtime.cjs
 const { decidePrivacy } = require("./lib/core/privacy.cjs");
 
 if (loadRuntime(__dirname, { emitted: true }) !== "codex") {
-	deny("Privacy guard cannot run: .codex/hooks/hook-runtime-config.json is missing or not for codex. Reinstall with `mewkit migrate codex`.");
+	deny("Privacy guard cannot run: .codex/hooks/hook-runtime-config.json is missing or not for codex. Reinstall with `mewkit init --target codex`.");
 }
 
 const input = readPayload();

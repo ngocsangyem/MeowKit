@@ -27,8 +27,7 @@ import {
 import { bundleReport, installMutationReport } from "./install-report.js";
 import { refuseKitSourceRepo } from "./kit-source-repo-guard.js";
 
-import { runMigrate, MewkitMigrateError } from "../migrate/migrate-orchestrator.js";
-import type { MigrateOptions, ProviderType } from "../migrate/types.js";
+import type { ProviderType } from "../migrate/types.js";
 import { providers } from "../migrate/provider-registry.js";
 import { resolveCodexModuleDir } from "../migrate/modules/codex-authored-bundle.js";
 import { packSelectionBudgetWarning, type PackSelection } from "../migrate/modules/codex-skill-packs.js";
@@ -60,18 +59,12 @@ export interface InitArgs {
 	/** False in a non-TTY session; the destructive guard reads it. */
 	interactive?: boolean;
 	beta?: boolean;
-	/** When true, run interactive provider multiselect after init unpacks. */
-	migrate?: boolean;
 	/**
 	 * Target provider toolkit to create. `codex` and `cursor` each copy their own
-	 * authored bundle directly (a provider-only project, no `.claude/`). Any other
-	 * supported provider unpacks `.claude/` then exports to it via the legacy
-	 * converter. Omitted = the default Claude Code kit (`.claude/`). Replaces the
-	 * old `--migrate-to`.
+	 * authored bundle directly (a provider-only project, no `.claude/`). Omitted = the
+	 * default Claude Code kit (`.claude/`).
 	 */
 	target?: string;
-	/** When true, scope the post-init migration globally (~/.cursor/, etc.) instead of per-project. */
-	migrateGlobal?: boolean;
 	/** Permit running in the MeowKit source repo, whose `.claude/` is the kit's authored source. */
 	allowKitSource?: boolean;
 	/**
@@ -527,15 +520,14 @@ async function warnBelowMinCodex(): Promise<void> {
 }
 
 /**
- * Codex install copies the authored bundle but does NOT run the legacy `.claude/memory/`
- * → `.meowkit/` import (that lives in the `mewkit migrate` flow). If a repo carries legacy
- * memory, surface a hint instead of silently leaving it behind — the user runs the import
- * explicitly so it stays an opt-in, conflict-aware transaction.
+ * Codex install copies the authored bundle and does NOT import a legacy `.claude/memory/`
+ * into `.meowkit/`. If a repo carries legacy memory, say so instead of silently leaving it
+ * behind; the user copies what they still need.
  */
 function hintLegacyMemoryForCodex(targetDir: string): void {
 	if (fs.existsSync(join(targetDir, ".claude", "memory"))) {
 		p.log.info(
-			"Legacy .claude/memory/ detected — import it into .meowkit/ with: mewkit migrate codex (loss-aware, conflict-safe; not run automatically).",
+			"Legacy .claude/memory/ detected — it is not imported. Copy what you still need into .meowkit/memory/.",
 		);
 	}
 }
@@ -611,15 +603,13 @@ async function warnBelowMinCursor(): Promise<void> {
 }
 
 /**
- * Cursor install copies the authored bundle but does NOT run the legacy `.claude/memory/`
- * → `.meowkit/` import (that lives in the `mewkit migrate` flow). If a repo carries legacy
- * memory, surface a hint instead of silently leaving it behind. Mirrors
- * `hintLegacyMemoryForCodex`.
+ * Cursor install copies the authored bundle and does NOT import a legacy `.claude/memory/`.
+ * Mirrors `hintLegacyMemoryForCodex`.
  */
 function hintLegacyMemoryForCursor(targetDir: string): void {
 	if (fs.existsSync(join(targetDir, ".claude", "memory"))) {
 		p.log.info(
-			"Legacy .claude/memory/ detected — import it into .meowkit/ with: mewkit migrate cursor (loss-aware, conflict-safe; not run automatically).",
+			"Legacy .claude/memory/ detected — it is not imported. Copy what you still need into .meowkit/memory/.",
 		);
 	}
 }
@@ -767,12 +757,12 @@ export async function init(args: InitArgs): Promise<void> {
 	if (mode === "update") p.log.info("Existing .claude/ detected — running in update mode.");
 
 	// The provider multiselect is the default ONLY for a bare fresh `init` — any explicit
-	// provider intent (`--target`, `--migrate`) bypasses it and keeps its own flow. Update
+	// provider intent (`--target`) bypasses it and keeps its own flow. Update
 	// mode keeps today's behavior (refresh .claude/); use `mewkit upgrade` to propagate.
-	const picked = !args.target && !args.migrate && !args.yes && mode === "new" ? await promptProviders() : null;
+	const picked = !args.target && !args.yes && mode === "new" ? await promptProviders() : null;
 	// Codex and Cursor are both additive, offline authored-bundle installs — picking either
 	// (without also picking claude-code) never forces the base kit. No picker (update mode,
-	// `--target`, or `--migrate`) ⇒ base install as today.
+	// or `--target`) ⇒ base install as today.
 	const installClaudeKit = picked ? picked.includes("claude-code") : true;
 
 	const stats = installClaudeKit ? await runClaudeKitInstall(args, targetDir, mode, dryRun, force) : null;
@@ -789,10 +779,6 @@ export async function init(args: InitArgs): Promise<void> {
 			await addCursorBundle(targetDir, force, args.mcpProfiles, args.allowCloudMcp, parseSkillPacks(args.skillPacks));
 	}
 
-	// Legacy explicit paths: `--target <provider>` / `--migrate` (never active with the picker).
-	if (!dryRun && !picked && (args.migrate || args.target)) {
-		await runPostInitMigrate(args, targetDir);
-	}
 
 	p.outro(pc.green(mode === "new" ? "MeowKit installed!" : "MeowKit updated!"));
 	emit(() =>
@@ -1031,44 +1017,5 @@ async function runClaudeKitInstall(
 			}
 		}
 		cleanupDownload(sourceDir);
-	}
-}
-
-/**
- * Run a migration after init unpacks .claude/. Failure here does NOT roll back the
- * unpack — we surface the error and continue. User can re-run `mewkit migrate` later.
- */
-async function runPostInitMigrate(args: InitArgs, projectDir: string): Promise<void> {
-	console.log(`\n${pc.bold("? Phase 4: Export to external tools")}`);
-
-	const migrateOptions: MigrateOptions = {
-		global: args.migrateGlobal ?? false,
-		yes: !!args.target, // explicit --target → non-interactive; bare --migrate stays interactive
-		source: join(projectDir, ".claude"),
-		force: true,
-	};
-
-	if (args.target) {
-		const trimmed = args.target.trim();
-		if (trimmed === "all") migrateOptions.all = true;
-		else migrateOptions.tools = [trimmed];
-	}
-
-	try {
-		const exitCode = await runMigrate(migrateOptions, {
-			bundledKitDir: join(projectDir, ".claude"),
-			argv: [],
-		});
-		if (exitCode !== 0) {
-			console.log(pc.yellow(`[!] Migration exited with code ${exitCode} — re-run "mewkit migrate" to retry.`));
-		}
-	} catch (err) {
-		if (err instanceof MewkitMigrateError) {
-			console.log(pc.red(`[!] Migration failed: ${err.message}`));
-			console.log(pc.dim(`    Re-run: mewkit migrate <tool>`));
-		} else {
-			const msg = err instanceof Error ? err.message : String(err);
-			console.log(pc.red(`[!] Migration error: ${msg}`));
-		}
 	}
 }

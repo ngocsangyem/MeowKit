@@ -6,7 +6,7 @@
 // exactly what `mewkit init --target cursor` calls (see commands/init.ts).
 //
 // This differs from cursor-bundle-lint.test.ts's "reconcile-install smoke" (default `core`
-// pack only) by installing the FULL bundle (all 125 skills via packs: "all") and asserting
+// pack only) by installing the FULL bundle (all 124 skills via packs: "all") and asserting
 // every top-level surface category lands, not just the 3 core agents.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { mkdtemp, readdir, rm } from "node:fs/promises";
@@ -49,7 +49,7 @@ describe("migrate cursor acceptance — full-bundle install completeness", () =>
 		expect(existsSync(join(projectDir, ".claude"))).toBe(false);
 	});
 
-	it("installs all 41 agents and all 125 skills with the 'all' pack selection", async () => {
+	it("installs all 41 agents and all 124 skills with the 'all' pack selection", async () => {
 		await reconcileApplyCursorBundle(moduleDir, projectDir, {
 			packs: "all",
 			adoptHomeRegistry: false,
@@ -62,7 +62,7 @@ describe("migrate cursor acceptance — full-bundle install completeness", () =>
 		const skillDirs = readdirSync(join(projectDir, ".cursor", "skills"), { withFileTypes: true }).filter((d) =>
 			d.isDirectory(),
 		);
-		expect(skillDirs.length).toBe(125);
+		expect(skillDirs.length).toBe(124);
 	});
 
 	it("is idempotent on a second run over the generated output — zero writes, zero conflicts", async () => {

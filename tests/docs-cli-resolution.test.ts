@@ -18,7 +18,6 @@ const DOCS = path.join(REPO_ROOT, "packages", "docs", "content", "docs");
 
 /** The pages that named a removed or moved verb before this change. */
 const UPDATED_PAGES = [
-	"cli/commands.mdx",
 	"cli/index.mdx",
 	"cli/knowledge.mdx",
 	"cli/portability.mdx",
