@@ -14,9 +14,15 @@ use std::io;
 /// on every platform mislabelled the other platform's code — 40 is `EMSGSIZE` on
 /// macOS and 62 is `ETIME` on Linux, so each one reported the other's error as a
 /// symlink loop.
-#[cfg(any(target_os = "macos", target_os = "ios", target_os = "freebsd"))]
+#[cfg(all(
+    unix,
+    any(target_os = "macos", target_os = "ios", target_os = "freebsd")
+))]
 const ELOOP: i32 = 62;
-#[cfg(not(any(target_os = "macos", target_os = "ios", target_os = "freebsd")))]
+#[cfg(all(
+    unix,
+    not(any(target_os = "macos", target_os = "ios", target_os = "freebsd"))
+))]
 const ELOOP: i32 = 40;
 
 /// The libc name for a raw code, on a platform where the raw code IS an errno.
@@ -70,6 +76,8 @@ pub fn errno_of(error: &io::Error) -> String {
 mod tests {
     use super::*;
 
+    // Raw numbers are errnos only on unix; on Windows they are Win32 codes.
+    #[cfg(unix)]
     #[test]
     fn the_common_names_match_what_node_reports() {
         for (code, name) in [
@@ -83,6 +91,7 @@ mod tests {
         }
     }
 
+    #[cfg(unix)]
     #[test]
     fn eloop_is_this_platforms_number_and_not_the_other_platforms() {
         assert_eq!(errno_of(&io::Error::from_raw_os_error(ELOOP)), "ELOOP");
