@@ -5,3 +5,10 @@ crates/mewkit-cli/tests/golden/** text eol=lf
 install.sh text eol=lf
 install.ps1 text eol=lf
 scripts/release/*.tmpl text eol=lf
+
+# Rust parity tests compare these byte-for-byte against the TS readers on every OS.
+crates/mewkit-core/tests/** text eol=lf
+tests/config/fixtures/** text eol=lf
+packages/mewkit/src/state/injection-scanner.ts text eol=lf
+# This fixture tests CRLF input, so its bytes must never be converted.
+tests/config/fixtures/accept-crlf.yaml -text

@@ -1,0 +1,21 @@
+{
+	"schema_version": "1.0",
+	"slug": "rust-port-mewkit-cli",
+	"gate": "review",
+	"decision": "PASS_WITH_RISK",
+	"dimensions": [
+		{
+			"name": "Correctness",
+			"verdict": "PASS"
+		},
+		{
+			"name": "Security",
+			"verdict": "WARN",
+			"note": "scanner parity pinned against Node"
+		}
+	],
+	"evidence_refs": [
+		"tasks/reviews/261112-rust-port-mewkit-cli-verdict.md"
+	],
+	"created_at": "2026-11-12T09:30:00.000Z"
+}

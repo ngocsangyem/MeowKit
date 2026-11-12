@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0",
+  "taskId": "261112-rust-port-fixture",
+  "planPath": "tasks/plans/261112-rust-port-mewkit-cli/plan.md",
+  "status": "active",
+  "currentStep": "phase 2",
+  "repos": [
+    {
+      "identity": "/work/meowkit",
+      "revision": "6e2dddc4"
+    }
+  ],
+  "blockers": [],
+  "nextAction": "port the memory scan",
+  "verificationSummaries": [],
+  "evidenceRefs": [],
+  "capabilityDecisions": [],
+  "writtenByCli": "2.3.1",
+  "writtenByKit": "2.3.1",
+  "updatedAt": "2026-11-12T09:00:00.000Z"
+}
