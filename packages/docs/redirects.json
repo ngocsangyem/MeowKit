@@ -56,6 +56,26 @@
     {
       "from": "/cli/task-commands",
       "to": "/cli/planning"
+    },
+    {
+      "from": "/reference/templates",
+      "to": "/cli/planning"
+    },
+    {
+      "from": "/reference/templates/feature-implementation",
+      "to": "/cli/planning"
+    },
+    {
+      "from": "/reference/templates/bug-fix",
+      "to": "/cli/planning"
+    },
+    {
+      "from": "/reference/templates/refactor",
+      "to": "/cli/planning"
+    },
+    {
+      "from": "/reference/templates/security-audit",
+      "to": "/cli/planning"
     }
   ]
 }

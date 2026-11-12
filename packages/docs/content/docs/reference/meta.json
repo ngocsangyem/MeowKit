@@ -4,12 +4,6 @@
   "pages": [
     "agents",
     "skills",
-    "---Templates---",
-    "templates/index",
-    "templates/feature-implementation",
-    "templates/bug-fix",
-    "templates/refactor",
-    "templates/security-audit",
     "---Indexes---",
     "rules-index",
     "---Configuration---",

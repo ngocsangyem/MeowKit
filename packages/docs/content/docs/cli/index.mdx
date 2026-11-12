@@ -3,9 +3,7 @@ title: "CLI Reference"
 description: "The mewkit command line, grouped by what you are trying to do."
 ---
 
-MeowKit ships one CLI package, `mewkit`. Run it from your project root; there is nothing to
-install globally. The install writes a committed launcher that makes the bare `mewkit` form
-resolve inside the project.
+MeowKit ships two CLIs. `mewkit` is the npm package that this page covers; run it from your project root, since there is nothing to install globally. The install writes a committed launcher that makes the bare `mewkit` form resolve inside the project. `mewkit-next` is a Rust binary that only handles the install lifecycle (`init`, `upgrade`, `uninstall`, `doctor`, `providers`, `versions`, `self-update`); see [mewkit-next](/cli/mewkit-next).
 
 ## Find a command
 
@@ -14,9 +12,10 @@ resolve inside the project.
 | Create a project, configure it, check it is healthy, upgrade it | [Project Setup](/cli/project-setup) |
 | Write a plan, create a task, see where a task stands, record a supervised run | [Planning and Tasks](/cli/planning) |
 | Review a pull request across several sittings | [Review](/cli/review) |
-| Lint the memory store, check the context budget | [Memory and Context](/cli/knowledge) |
+| Lint the memory store | [Memory](/cli/knowledge) |
 | Export the kit to Codex or Cursor, or see what they support | [Portability](/cli/portability) |
-| See what a session cost, what it did, what the kit contains | [Cost and Telemetry](/cli/telemetry) |
+| See what a session cost, check the context budget, read a trace | [Cost and Telemetry](/cli/telemetry) |
+| Install with the Rust binary instead of npm | [mewkit-next](/cli/mewkit-next) |
 
 ## Get started
 
@@ -75,7 +74,7 @@ nothing at all; `mewkit <command> --help` does the same for the command.
 
 ## Two things worth knowing up front
 
-`npx mewkit init` both scaffolds and updates. The first run opens a toolkit picker (Claude Code, Codex, Cursor, with Claude Code preselected) and copies the full system into `.claude/` for each provider you choose; `--target <provider>` skips the picker. Later runs are a smart update: unchanged core files are overwritten, files you edited are left alone, new files are added, and there is no picker.
+`npx mewkit init` both scaffolds and updates. The first run opens a toolkit picker (Claude Code, Codex, Cursor, with Claude Code preselected) and installs the kit for each provider you choose: the full `.claude/` system for Claude Code, and an authored bundle for Codex or Cursor (`AGENTS.md` plus that tool's own files); `--target <provider>` skips the picker. Later runs are a smart update: unchanged core files are overwritten, files you edited are left alone, new files are added, and there is no picker.
 
 Everything else is a runtime toolbox for daily use. None of it is required to run MeowKit, and none of it changes your project unless the command says it does.
 

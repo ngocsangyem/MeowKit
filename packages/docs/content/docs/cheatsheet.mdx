@@ -148,15 +148,14 @@ All three review skills stop after printing — you control when to run `/mk:coo
 | `npx mewkit task new --type feature "desc"` | Create task from template |
 | `npx mewkit task list` | List active tasks |
 
-## Task Templates
+## Task types
 
-| Template | Use when | Create with |
-|----------|----------|-------------|
+| Type | Use when | Create with |
+|------|----------|-------------|
 | feature | Adding new functionality | `npx mewkit task new --type feature` |
 | bug-fix | Fixing broken behavior | `npx mewkit task new --type bug-fix` |
 | refactor | Restructuring code | `npx mewkit task new --type refactor` |
 | security | Security review | `npx mewkit task new --type security` |
-| guideline | Team standards | Copy from `tasks/templates/guideline.md` |
 
 ### Task status flow
 `draft` → `in-progress` → `blocked` → `review` → `done`

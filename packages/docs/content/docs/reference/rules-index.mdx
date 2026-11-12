@@ -28,6 +28,8 @@ Source file: `docs/governance/rules-index.md`
 
 `mewkit validate` checks all 7 for presence — a missing file silently drops enforcement.
 
+Rules are not the only thing a session carries before any skill runs: every skill's `name`, `description` and `when_to_use`, and every agent's `name` and `description`, are listed too. `scripts/check-always-on-budget.cjs` holds both under a byte ceiling: the rules alone at 25,600 B, and rules plus that metadata at 70,000 B. Today they measure 25,417 B and 59,426 B. The script exits non-zero when either ceiling is exceeded, so a rule or description that grows has to pay for itself.
+
 ## Moved Rules — Where They Live Now
 
 Each rule below left `.claude/rules/` in the context diet. Nothing was dropped: the

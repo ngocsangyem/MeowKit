@@ -15,7 +15,7 @@ description: "The native installer in preview: install, upgrade, remove and chec
 
 `--target` takes a comma-separated list or `all`. mewkit's own state (ownership indexes, lock, kit cache) lives in `.meowkit/` for a project and `~/.mewkit/state/` for a global install. Files you already had are merged, never replaced: hook files handler by handler, Markdown by a marked block, JSON and TOML by key.
 
-Before `init`, `upgrade` or `uninstall` changes anything, it copies every file it is about to change or remove into a new directory under `.meowkit/backups/` (`~/.mewkit/state/backups/` globally).
+`init`, `upgrade` and `uninstall` all take `--json` (print one JSON document), `--force` (replace or remove files you edited) and `--global` (act on your home directory). Before `init`, `upgrade` or `uninstall` changes anything, it copies every file it is about to change or remove into a new directory under `.meowkit/backups/` (`~/.mewkit/state/backups/` globally).
 
 ## init
 
@@ -25,7 +25,11 @@ mewkit-next init --global --target all
 mewkit-next init --target codex --dry-run
 ```
 
-Downloads the newest kit release (`--beta` allows a prerelease; `--kit-version v2.16.0` pins one), checks it against the release's `checksums.txt` and its `kit-contract.json`, and writes it for each runtime. `--skill-packs` adds optional packs to the core skills. `--offline` uses the newest kit already in the cache; `--kit-archive <zip>` installs a local `meowkit-release.zip`, checked against `--kit-sha256` or a `checksums.txt` beside it.
+Downloads the newest kit release (`--beta` allows a prerelease; `--kit-version v2.16.0` pins one), checks it against the release's `checksums.txt` and its `kit-contract.json`, and writes it for each runtime. `--skill-packs` adds optional packs to the core skills. `--offline` uses the newest kit already in the cache; `--kit-archive <zip>` installs a local `meowkit-release.zip`, checked against `--kit-sha256` or a `checksums.txt` beside it. `--allow-unverified-kit` accepts a kit that has no checksum or no `kit-contract.json`; leave it off unless you built the kit yourself.
+
+### Taking over an npm install
+
+If the npm `mewkit` CLI installed a runtime in this project, `init --target <runtime>` adopts it. The npm CLI's install record becomes the starting ownership index, kit files are refreshed, files the kit no longer ships are removed when they still match what the record says was installed, and files you edited are kept. Adoption works at project scope only, and only when you ask for it with `init`. `upgrade` never adopts: on a runtime with an npm install record and no ownership index, it names the `init` command to run.
 
 ## upgrade
 
@@ -34,7 +38,7 @@ mewkit-next upgrade
 mewkit-next upgrade --target cursor --dry-run
 ```
 
-Moves the runtimes installed here to the newest kit, with the packs they were installed with. A file you edited after the kit wrote it is kept and named, and the command exits 6; `--force` replaces it.
+Moves the runtimes installed here to the newest kit, with the packs they were installed with. It takes the same kit-source flags as `init`. A file you edited after the kit wrote it is kept and named, and the command exits 6; `--force` replaces it.
 
 ## uninstall
 
@@ -81,6 +85,10 @@ mewkit-next self-update --channel beta
 ```
 
 Fetches the newest binary release's `binary-manifest.json`, refuses an older version, checks the archive's SHA-256 and size, and replaces itself, keeping the previous binary beside it with an `.old` suffix. `--check` only reports, and exits 3 when an update exists. When the running version has been withdrawn, it says so.
+
+## Ownership and the npm CLI
+
+Once `mewkit-next` owns a runtime, the npm CLI leaves it alone. The ownership index sits at `.meowkit/state/ownership/<runtime>.json` (`~/.mewkit/state/ownership/<runtime>.json` for a global install). While that file is present, `mewkit init`, `upgrade`, `migrate`, `uninstall` and `doctor --adopt` refuse to touch that runtime, because the npm CLI does not read the index and `--force` would overwrite its files wholesale. The refusal names the `mewkit-next` command to use instead. A stray, empty or corrupt file at that path does not lock the npm CLI out.
 
 ## Exit codes
 

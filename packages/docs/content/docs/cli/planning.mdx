@@ -28,7 +28,7 @@ Agents run it automatically at the end of a completed plan (cook Phase 6). `--dr
 
 ## task new
 
-Create a new task file from a template.
+Create a new task file. `task new` writes the frontmatter and body itself; if your project keeps its own `tasks/templates/<type>.md` (`feature-implementation.md`, `bug-fix.md`, `refactor.md` or `security-audit.md`), it uses that file instead. The kit ships none.
 
 ```bash
 npx mewkit task new --type <type> "description"
@@ -44,7 +44,7 @@ npx mewkit task new --type <type> "description"
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `--type` | Template type: `feature`, `bug-fix`, `refactor`, `security` | `feature` |
+| `--type` | Task type: `feature`, `bug-fix`, `refactor`, `security` | `feature` |
 | `--priority` | Priority: `critical`, `high`, `medium`, `low` | `medium` |
 
 **Examples:**
@@ -54,7 +54,7 @@ npx mewkit task new --type feature "Add user authentication"
 # Creates: tasks/active/260327-add-user-authentication.feature.md
 
 npx mewkit task new --type bug-fix --priority high "Fix login timeout"
-# Creates: tasks/active/260327-fix-login-timeout.bug-fix.md
+# Creates: tasks/active/260327-fix-login-timeout.bug.md
 ```
 ## task list
 

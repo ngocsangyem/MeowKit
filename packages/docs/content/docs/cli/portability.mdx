@@ -116,11 +116,11 @@ A `mewkit upgrade` followed by `mewkit migrate cursor` propagates kit updates to
 
 ### Concurrent invocations
 
-A PID-based file lock at `SCOPE/.mewkit/.lock` blocks two `mewkit migrate` runs from racing on the same registry. Stale locks (dead PID) are auto-cleared after 60 seconds.
+A PID-based file lock blocks two `mewkit migrate` runs from racing on the same registry. The lock lives at `.meowkit/state/migrate.lock` for a project install and in the `.lock` file under `~/.mewkit/` with `--global`. A lock held by a dead PID is cleared on the next run.
 
 ## providers
 
-Show migration-target provider support (level, role, surfaces). `explain-support` is an alias that takes a single provider. With `--lifecycle`, show the capability-adapter view instead: the four support levels, repo-context acquisition tools, storage boundary, and the per-lifecycle-event matrix (which events a provider fires and which it can actually gate/deny on).
+Show migration-target provider support (level, role, surfaces). Pass a provider name to see one. With `--lifecycle`, show the capability-adapter view instead: the four support levels, repo-context acquisition tools, storage boundary, and the per-lifecycle-event matrix (which events a provider fires and which it can actually gate/deny on).
 
 ```bash
 mewkit providers [<provider>] [--json]
@@ -144,14 +144,6 @@ as a runtime having done the thing. A capability leaves `unverified` only from a
 live run. Codex additionally reports its mutation ban as `degraded (behavioral)`, because a
 Codex agent definition carries no per-agent tool field to enforce one — Claude Code and
 Cursor enforce theirs structurally.
-
-## explain-support
-
-An alias of `providers`, kept because "which providers does this support" and "explain the
-support matrix" are the same question asked two ways.
-
-```bash
-```
 
 ## pack
 
