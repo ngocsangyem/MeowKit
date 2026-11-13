@@ -32,3 +32,30 @@ fn is_interactive_answers_without_touching_the_terminal_state() {
     // property a command relies on when it picks an implementation.
     assert_eq!(is_interactive(), is_interactive());
 }
+
+/// The branch a CI run, a hook and a piped shell all take: a question is
+/// refused with the flag that answers it, never asked on a terminal that will
+/// never respond and never silently defaulted.
+#[test]
+fn without_a_terminal_the_factory_hands_back_the_refusing_picker() {
+    let ask = Ask::new("Which runtime?", Flag::new("--target"));
+    let choices = [Choice::plain("codex"), Choice::plain("cursor")];
+    let mut picker = prompt_for(false);
+
+    let error = picker
+        .select(&ask, &choices)
+        .expect_err("there is no terminal");
+    assert_eq!(
+        error,
+        PromptError::NoTerminal {
+            usage: "--target <codex|cursor>".into()
+        }
+    );
+    // A confirm is refused too, rather than answered from its default.
+    assert!(matches!(
+        picker.confirm(&Ask::new("Proceed?", Flag::new("--yes")), true),
+        Err(PromptError::NoTerminal { .. })
+    ));
+    // And the refusal exits like the command-line problem it is.
+    assert_eq!(Failure::from(error).code, USAGE);
+}

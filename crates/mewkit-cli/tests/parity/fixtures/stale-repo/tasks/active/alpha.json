@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0",
+  "taskId": "alpha",
+  "planPath": "tasks/plans/261112-alpha-work/plan.md",
+  "status": "active",
+  "currentStep": "phase 3 build",
+  "repos": [
+    {
+      "identity": "{{PROJECT}}",
+      "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "identity": "/nonexistent/repo-that-was-removed",
+      "revision": "cccccccccccccccccccccccccccccccccccccccc"
+    }
+  ],
+  "blockers": [],
+  "nextAction": "port the orient verb",
+  "verificationSummaries": [],
+  "evidenceRefs": [],
+  "capabilityDecisions": [],
+  "writtenByCli": "2.3.1",
+  "writtenByKit": "2.15.0",
+  "updatedAt": "2026-11-10T08:30:00Z"
+}

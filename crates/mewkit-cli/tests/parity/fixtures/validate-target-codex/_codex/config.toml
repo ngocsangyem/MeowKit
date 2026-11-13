@@ -1,0 +1,5 @@
+[agents.developer]
+config_file = "agents/developer.toml"
+
+[shell_environment_policy.set]
+MEOW_JIRA_URL = "https://example.invalid"

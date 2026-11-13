@@ -3,7 +3,12 @@ title: "Planning and Tasks"
 description: "Create plans and task records, see where a task stands, and record the checkpoints of a supervised run."
 ---
 
-The commands behind Gate 1 and the durable task record. If you are asking "what am I supposed to be doing", `orient` answers it.
+The commands behind Gate 1 and the durable task record. If you are asking "what am I supposed to be doing", `orient` answers it. `plan`, `task`, `task-state` and `orient` run from either CLI; `advice` is npm-only for now.
+
+<Callout type="info">
+  During the move to one CLI, these commands run from either CLI with the same output: `npx mewkit <command>` or the
+  native `mewkit-next <command>` ([mewkit-next](/cli/mewkit-next)). Skills and hooks still call the npm CLI.
+</Callout>
 
 ## plan
 

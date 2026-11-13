@@ -114,6 +114,35 @@ pub fn using_legacy_memory_tree(project_root: &Path) -> bool {
         .any(|name| names.iter().any(|found| found == name))
 }
 
+/// Where session markers used to live, newest-first: the project root, then
+/// inside the kit tree. A READER still accepts both, so a project that recorded
+/// a pointer before the taxonomy settled keeps resolving it. No writer uses
+/// them — a write always lands in `state/`, so these drain instead of filling.
+/// Mirrors `.claude/hooks/lib/meowkit-paths.cjs`, so the hooks and the CLI agree.
+pub const LEGACY_SESSION_STATE_RELS: [&str; 2] = ["session-state", ".claude/session-state"];
+
+/// A session marker to READ: the canonical path when it exists, else a pre-move
+/// path that does, else the canonical one — so an absent marker is reported at
+/// the location a writer would use.
+pub fn resolve_session_state_file(project_root: &Path, rel: &str) -> PathBuf {
+    let canonical = resolve_state_dir(project_root, StateClass::State).join(rel);
+    if canonical.exists() {
+        return canonical;
+    }
+    for legacy in LEGACY_SESSION_STATE_RELS {
+        // The constant uses `/` for both segments; `join` on each one keeps it
+        // a real path separator on Windows too.
+        let candidate = legacy
+            .split('/')
+            .fold(project_root.to_path_buf(), |acc, part| acc.join(part))
+            .join(rel);
+        if candidate.exists() {
+            return candidate;
+        }
+    }
+    canonical
+}
+
 /// Absolute directory for one taxonomy class under the given project root.
 ///
 /// The legacy fallback is scoped to `memory` ONLY. Telemetry, state and cache were

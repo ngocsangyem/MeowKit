@@ -83,6 +83,14 @@ fm-strip, direct-copy, orchestrator, reconciler entrypoint, the `--include-mcp`
 `crates/` holds `mewkit-next`, the native installer replacing the npm CLI's install lifecycle
 (`init`, `upgrade`, `uninstall`, `doctor`, `providers`, `versions`, plus `self-update`).
 
+- **Ported verbs** — the binary also runs `plan` (`status`, `check`, `approve`, `archive`),
+  `task`, `task-state`, `note`, `orient` and `validate`, with the logic in `mewkit-core`
+  (`plan_doc`, `task_files`, `task_state`, `task_store`, `note`, `orient`, `validate`) and
+  argv parsed with the npm CLI's minimist tolerance (`crates/mewkit-cli/src/argv_compat.rs`),
+  so invocations written against that CLI keep running. TS-vs-Rust parity cases live in
+  `crates/mewkit-cli/tests/parity/` (the `parity` job in `.github/workflows/rust-ci.yml`).
+  The kit's hooks still invoke the npm `mewkit`, so nothing switches over until the rename
+  step of the cutover.
 - **Adapter contract** (ADR [`261110-rust-adapter-contract.md`](adr/261110-rust-adapter-contract.md)):
   one emitter per runtime in `crates/mewkit-adapters` (`claude_code`, `codex`, `cursor`) turns
   the kit into a `Plan` of owned-data ops; `crates/mewkit-core` executes every plan through one

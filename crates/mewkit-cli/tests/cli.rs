@@ -49,14 +49,56 @@ fn help_succeeds() {
     assert!(String::from_utf8_lossy(&out.stdout).contains("npm `mewkit` CLI"));
 }
 
+/// The example verb has to be one this binary does NOT implement, so it moves
+/// as the port advances — it named `plan` until `plan` landed. `review` is the
+/// current choice because nothing in the queue claims it; whoever ports it next
+/// picks another unimplemented verb rather than deleting this test, which is the
+/// only check that an unported verb points the user at the CLI that has it.
 #[test]
 fn unknown_command_exits_2_and_names_the_npm_cli() {
-    let out = TempHome::new().mewkit_next(&["plan", "--json"]);
+    let out = TempHome::new().mewkit_next(&["review", "--json"]);
     assert_eq!(out.status.code(), Some(2));
     let stderr = String::from_utf8_lossy(&out.stderr);
     assert!(
-        stderr.contains("unknown command 'plan'"),
+        stderr.contains("unknown command 'review'"),
         "stderr: {stderr}"
     );
     assert!(stderr.contains("npm `mewkit` CLI"), "stderr: {stderr}");
+}
+
+/// The npm CLI parses with minimist, which keeps an undeclared flag or a stray
+/// word as data that `orient` never reads. Hooks and skills were written against
+/// that, so the port tolerates the same invocations instead of failing them.
+#[test]
+fn an_unknown_flag_or_a_stray_positional_is_ignored_like_the_npm_cli() {
+    for args in [
+        vec!["orient", "--no-recrd", "--no-record"],
+        vec!["orient", "--json=yes", "--no-record"],
+        vec!["orient", "stray", "--no-record"],
+    ] {
+        let out = TempHome::new().mewkit_next(&args);
+        assert_eq!(out.status.code(), Some(0), "args {args:?}");
+        assert!(!out.stdout.is_empty(), "args {args:?} must still orient");
+    }
+}
+
+/// Bare `orient` records the advisory measurement, as its help says; this is
+/// a deliberate change from the npm CLI, which recorded only on `--record`.
+#[test]
+fn bare_orient_records_and_no_record_does_not() {
+    let trace = ".meowkit/telemetry/trace-log.jsonl";
+    let env = TempHome::new();
+    assert_eq!(
+        env.mewkit_next(&["orient", "--no-record"]).status.code(),
+        Some(0)
+    );
+    assert!(
+        !env.project().join(trace).exists(),
+        "--no-record wrote a trace"
+    );
+    assert_eq!(env.mewkit_next(&["orient"]).status.code(), Some(0));
+    assert!(
+        env.project().join(trace).exists(),
+        "bare orient did not record"
+    );
 }

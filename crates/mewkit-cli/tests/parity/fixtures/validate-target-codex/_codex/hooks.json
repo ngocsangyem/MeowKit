@@ -1,0 +1,13 @@
+{
+ "hooks": {
+  "PreToolUse": [
+   {
+    "hooks": [
+     {
+      "command": "\"$(git rev-parse --show-toplevel)\"/.codex/hooks/gate.cjs"
+     }
+    ]
+   }
+  ]
+ }
+}

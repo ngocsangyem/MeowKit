@@ -48,12 +48,12 @@ larger than its number.
 | `doctor` | 10 | — | ported |
 | `providers` | 2 | — | ported |
 | `versions` | 2 | — | ported |
-| `plan` (incl. `approve`, `archive`) | 31 | 537 | port group 1 |
-| `task` | 5 | 458 | port group 1 |
-| `task-state` | 11 | 239 | port group 1 |
-| `note` | 28 | 164 | port group 1 |
-| `orient` | 3 | 82 | port group 1 |
-| `validate` | 11 | 1,461 | port group 1 |
+| `plan` (incl. `approve`, `archive`) | 31 | 537 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
+| `task` | 5 | 458 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
+| `task-state` | 11 | 239 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
+| `note` | 28 | 164 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
+| `orient` | 3 | 82 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
+| `validate` | 11 | 1,461 | ported (parity cases incl. the real repo kit); `--portable` on a project that carries a generated Codex tree still refers to the npm CLI |
 | `review` | 30 | 2,077 | port group 2 |
 | `advice` | 40 | 624 | port group 2 |
 | `verdict-gate` | 3 | 30 | port group 2 |

@@ -1,0 +1,5 @@
+[agents.developer]
+config_file = "agents/missing.toml"
+
+[mcp_servers.jira]
+api_key = "sk-not-a-real-key"

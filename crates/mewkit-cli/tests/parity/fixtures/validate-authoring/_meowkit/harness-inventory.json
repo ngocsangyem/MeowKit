@@ -1,0 +1,60 @@
+{
+ "artifacts": {
+  "rules/meowkit-core.md": {
+   "owner": "lifecycle",
+   "criticality": "critical",
+   "status": "active",
+   "runtime": "portable",
+   "responsibility": "gate-enforcement"
+  },
+  "rules/security-rules.md": {
+   "owner": "lifecycle",
+   "criticality": "critical",
+   "status": "active",
+   "runtime": "portable",
+   "responsibility": "gate-enforcement"
+  },
+  "rules/injection-rules.md": {
+   "owner": "lifecycle",
+   "criticality": "critical",
+   "status": "active",
+   "runtime": "portable",
+   "responsibility": "gate-enforcement"
+  },
+  "rules/gate-rules.md": {
+   "owner": "lifecycle",
+   "criticality": "critical",
+   "status": "active",
+   "runtime": "portable",
+   "responsibility": "gate-enforcement"
+  },
+  "rules/core-behaviors.md": {
+   "owner": "lifecycle",
+   "criticality": "critical",
+   "status": "active",
+   "runtime": "portable",
+   "responsibility": "gate-enforcement"
+  },
+  "rules/development-rules.md": {
+   "owner": "lifecycle",
+   "criticality": "critical",
+   "status": "active",
+   "runtime": "portable",
+   "responsibility": "gate-enforcement"
+  },
+  "rules/agent-conduct.md": {
+   "owner": "lifecycle",
+   "criticality": "critical",
+   "status": "active",
+   "runtime": "portable",
+   "responsibility": "gate-enforcement"
+  },
+  "hooks/pre-ship.cjs": {
+   "owner": "lifecycle",
+   "criticality": "critical",
+   "status": "active",
+   "runtime": "claude-code",
+   "responsibility": "gate-enforcement"
+  }
+ }
+}

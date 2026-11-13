@@ -1,0 +1,1 @@
+prefix_rule(program="rm", decision="forbidden")

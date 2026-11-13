@@ -8,8 +8,10 @@
 //! terminal that will never respond, defaulting silently, or asking a question
 //! nobody can see.
 //!
-//! Nothing is wired into a command yet: the pickers land with the verbs that
-//! own them. Until then every item here is unreachable from `main`, which is
+//! No command asks a question yet: the pickers land with the verbs that own
+//! them, through [`default_prompt`], which is the one place the two
+//! implementations are chosen between. Until then every item here is
+//! unreachable from `main`, which is
 //! what this allow covers — `expect` cannot be used instead, because the test
 //! target DOES reach them and the expectation would go unfulfilled there.
 //! Delete the allow with the first wiring.
@@ -91,9 +93,36 @@ pub trait Prompt {
 /// Both matter: inquire reads keys from stdin and draws on stderr, so a piped
 /// stdin (`mewkit init < /dev/null`) and a redirected stderr are each enough to
 /// make a picker unanswerable.
+///
+/// Deliberately NOT stdout: a command whose stdout is piped (`mewkit orient |
+/// jq`, a hook capturing the output) can still hold a perfectly usable
+/// terminal, and treating that as non-interactive would refuse a question
+/// nobody needed to refuse.
 pub fn is_interactive() -> bool {
     use std::io::IsTerminal;
     std::io::stdin().is_terminal() && std::io::stderr().is_terminal()
+}
+
+/// The picker this environment can actually answer: a terminal one when there
+/// is a terminal, the flag-naming refusal otherwise.
+///
+/// Every command asks through this, so the non-interactive path is chosen ONCE
+/// rather than per call site — a command that probed interactivity itself would
+/// eventually probe it differently, and the difference would show up as a hook
+/// hanging on a picker it cannot draw.
+pub fn default_prompt() -> Box<dyn Prompt> {
+    prompt_for(is_interactive())
+}
+
+/// [`default_prompt`] with the decision supplied, so the non-terminal branch is
+/// testable without a terminal — and without making a test depend on how the
+/// suite was launched.
+pub fn prompt_for(interactive: bool) -> Box<dyn Prompt> {
+    if interactive {
+        Box::new(tty::Tty::new())
+    } else {
+        Box::new(non_tty::NonTty::new())
+    }
 }
 
 #[cfg(test)]

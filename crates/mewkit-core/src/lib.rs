@@ -17,14 +17,26 @@ pub mod layout;
 pub mod lock;
 pub mod memory;
 pub mod merge;
+pub mod note;
+pub mod orient;
 pub mod ownership;
 pub mod path_shape;
 pub mod plan;
+pub mod plan_doc;
+pub mod project_root;
+pub mod repo_context;
 pub mod report;
 pub mod schema;
 pub mod semver;
+pub mod sidecar_lock;
 pub mod state_paths;
+pub mod task_files;
+pub mod task_state;
+pub mod task_store;
+pub mod time_utc;
+pub mod trace;
 pub mod update;
+pub mod validate;
 pub mod yaml_doc;
 
 /// Version of the workspace, shared by every crate and printed by `--version`.

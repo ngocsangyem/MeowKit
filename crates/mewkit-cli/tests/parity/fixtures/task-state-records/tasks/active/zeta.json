@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "taskId": "zeta",
+  "planPath": null,
+  "status": "active",
+  "currentStep": "",
+  "repos": [],
+  "blockers": [],
+  "nextAction": "",
+  "verificationSummaries": [],
+  "evidenceRefs": [],
+  "capabilityDecisions": [],
+  "writtenByCli": "2.3.1",
+  "writtenByKit": "",
+  "updatedAt": "2026-11-11T09:00:00.000Z"
+}

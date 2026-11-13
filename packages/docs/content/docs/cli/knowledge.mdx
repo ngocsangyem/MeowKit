@@ -5,6 +5,11 @@ description: "The committed team memory store and how to lint it."
 
 The store is two committed, plain-markdown files: `.meowkit/memory/decisions.md` and `.meowkit/memory/gotchas.md`. Reads are one `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` at task start. Writes go through `mewkit note <decisions|gotchas>`, which lint-checks the entry on stdin and appends it under a file lock. See [Memory System](/guide/memory-system) for the entry format and the read and write sets.
 
+<Callout type="info">
+  During the move to one CLI, these commands run from either CLI with the same output: `npx mewkit <command>` or the
+  native `mewkit-next <command>` ([mewkit-next](/cli/mewkit-next)). Skills and hooks still call the npm CLI.
+</Callout>
+
 ```bash
 mewkit validate --memory   # lint every file in the store (CI and pre-ship hook)
 ```

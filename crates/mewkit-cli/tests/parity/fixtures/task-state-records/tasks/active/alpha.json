@@ -1,0 +1,27 @@
+{
+  "taskId": "alpha",
+  "schemaVersion": "1.0",
+  "status": "blocked",
+  "planPath": "tasks/plans/261112-alpha-work/plan.md",
+  "currentStep": "phase 3 build",
+  "nextAction": "port task-state",
+  "repos": [
+    { "identity": "/srv/alpha", "revision": "aaaaaaa" },
+    { "identity": "/srv/beta", "revision": null }
+  ],
+  "blockers": ["the npm CLI still owns plan approve"],
+  "verificationSummaries": [{ "ref": "cargo-test", "result": "pass" }],
+  "evidenceRefs": ["tasks/reports/261112-port.md"],
+  "capabilityDecisions": [
+    {
+      "capabilityId": "cap.memory.write",
+      "decision": "selected",
+      "reason": "the store is the only shared artifact",
+      "adapterSnapshotId": "snap-7"
+    }
+  ],
+  "writtenByCli": "2.3.1",
+  "writtenByKit": "2.15.0",
+  "updatedAt": "2026-11-10T08:30:00.000Z",
+  "futureField": "an additive field an older binary must not strip"
+}
