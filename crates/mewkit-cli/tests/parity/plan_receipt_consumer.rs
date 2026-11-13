@@ -119,7 +119,10 @@ const FIXTURES_WITH_HELPER: [&str; 3] = [
 fn every_fixture_copy_of_the_receipt_helper_matches_the_shipped_one() {
     let repo = parity::repo_root();
     let shipped = repo.join(".claude/hooks/lib/approval-receipt.cjs");
-    let expected = std::fs::read(&shipped).expect("read the shipped helper");
+    // A Windows checkout gives the shipped hook CRLF while the fixtures are
+    // pinned to LF, so line endings are not drift; any other byte is.
+    let lf = |bytes: Vec<u8>| String::from_utf8_lossy(&bytes).replace("\r\n", "\n");
+    let expected = lf(std::fs::read(&shipped).expect("read the shipped helper"));
     for fixture in FIXTURES_WITH_HELPER {
         let vendored = repo
             .join("crates/mewkit-cli/tests/parity/fixtures")
@@ -127,7 +130,7 @@ fn every_fixture_copy_of_the_receipt_helper_matches_the_shipped_one() {
             .join("_claude/hooks/lib/approval-receipt.cjs");
         assert_eq!(
             expected,
-            std::fs::read(&vendored).expect("read the fixture helper"),
+            lf(std::fs::read(&vendored).expect("read the fixture helper")),
             "{fixture}'s copy of approval-receipt.cjs has drifted from {} — \
              copy it again and re-run the approve parity cases",
             shipped.display()
