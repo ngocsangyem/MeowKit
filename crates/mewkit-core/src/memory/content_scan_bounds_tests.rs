@@ -45,8 +45,11 @@ fn bounds_the_scan_a_2mb_single_line_is_reported_not_scanned() {
     // The TS budget is 2s, which is what an optimised build spends (~0.12s here).
     // An unoptimised test build runs the whole-body pass an order of magnitude
     // slower, so the budget follows the profile instead of the assertion being
-    // dropped — the property under test is "bounded", not "fast".
-    let budget = if cfg!(debug_assertions) { 15 } else { 2 };
+    // dropped — the property under test is "bounded", not "fast". ~3s alone in a
+    // debug build, but a shared CI runner executing the whole lib suite in
+    // parallel has taken 15.7s; an unbounded scan of 2MB would take far longer
+    // than 60s, so that budget still tells the two apart.
+    let budget = if cfg!(debug_assertions) { 60 } else { 2 };
     assert!(
         started.elapsed() < std::time::Duration::from_secs(budget),
         "took {:?}, budget {budget}s",

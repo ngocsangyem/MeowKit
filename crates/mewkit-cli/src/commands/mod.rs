@@ -1,10 +1,16 @@
 //! The lifecycle commands, and the pieces they share.
 pub mod doctor;
 pub mod init;
+pub mod note;
+pub mod orient;
+pub mod plan;
 pub mod providers;
 pub mod self_update;
+pub mod task;
+pub mod task_state;
 pub mod uninstall;
 pub mod upgrade;
+pub mod validate;
 pub mod versions;
 
 use std::collections::BTreeMap;

@@ -1,0 +1,3 @@
+A FILE where the state directory belongs, so the pointer commit cannot create
+it. That makes `task new --activate` fail at the pointer step with the record
+already written — the one path where the activation rollback runs.

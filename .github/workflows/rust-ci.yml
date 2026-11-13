@@ -13,6 +13,10 @@ on:
       - "install.sh"
       - "install.ps1"
       - ".github/workflows/rust-ci.yml"
+      # The parity job compares against the npm CLI and the shipped hooks, so a
+      # change on either side must re-run it.
+      - "packages/mewkit/src/**"
+      - ".claude/hooks/**"
       - ".github/workflows/rust-release.yml"
   push:
     branches: [main]
@@ -26,6 +30,10 @@ on:
       - "install.sh"
       - "install.ps1"
       - ".github/workflows/rust-ci.yml"
+      # The parity job compares against the npm CLI and the shipped hooks, so a
+      # change on either side must re-run it.
+      - "packages/mewkit/src/**"
+      - ".claude/hooks/**"
       - ".github/workflows/rust-release.yml"
 
 env:
@@ -67,6 +75,44 @@ jobs:
 
       - name: Test
         run: cargo test --workspace --locked
+
+  parity:
+    name: TS-vs-Rust parity (orient and the verbs ported after it)
+    # Ubuntu only: the cases compare two CLIs against each other on the SAME
+    # machine, so they catch a port's behaviour difference wherever they run.
+    # The per-OS risks they do not cover (line endings, path separators) are
+    # covered by the `check` matrix above, which runs the unit tests on all
+    # three.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      # pnpm before setup-node so the pnpm store cache can resolve. Version
+      # comes from the root package.json packageManager field, exactly as in
+      # ci.yml — this repo has no npm lockfile, so `npm ci` would fail here.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The comparison runs the npm CLI as a user runs it — from its build
+      # output — so the build is a prerequisite, not an optimisation. The cases
+      # FAIL rather than skip when `dist/index.js` is missing, which is why this
+      # job never silently proves nothing.
+      - name: Build the npm CLI
+        run: npm run build -w packages/mewkit
+
+      - name: Parity cases
+        run: cargo test -p mewkit-cli --test parity --locked -- --include-ignored
 
   deny:
     name: cargo-deny (advisories, licences, sources)

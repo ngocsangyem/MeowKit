@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "taskId": "alpha",
+  "planPath": null,
+  "status": "active",
+  "currentStep": "phase 3 build",
+  "repos": [],
+  "blockers": [],
+  "nextAction": "port task-state",
+  "verificationSummaries": [],
+  "evidenceRefs": [],
+  "capabilityDecisions": [],
+  "writtenByCli": "2.3.1",
+  "writtenByKit": "",
+  "updatedAt": "2026-11-10T08:30:00.000Z"
+}

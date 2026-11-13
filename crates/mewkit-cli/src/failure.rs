@@ -53,6 +53,7 @@ macro_rules! failed_from {
 
 failed_from!(
     std::io::Error,
+    mewkit_core::task_store::PointerError,
     mewkit_core::kit::KitError,
     mewkit_core::exec::ExecError,
     mewkit_core::ownership::IndexError,

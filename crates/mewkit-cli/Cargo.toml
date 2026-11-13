@@ -13,6 +13,13 @@ publish.workspace = true
 name = "mewkit-next"
 path = "src/main.rs"
 
+# The TS-vs-Rust comparison, declared rather than auto-discovered so the target
+# name is stable in the one command that runs it:
+# `cargo test -p mewkit-cli --test parity -- --include-ignored`.
+[[test]]
+name = "parity"
+path = "tests/parity/main.rs"
+
 [dependencies]
 mewkit-core = { path = "../mewkit-core" }
 mewkit-adapters = { path = "../mewkit-adapters" }
@@ -35,6 +42,10 @@ workspace = true
 
 [dev-dependencies]
 flate2 = "1.1.11"
+# The parity harness normalises away a timestamp, a temp path and a version
+# before it compares two CLIs; `regex` is already in the dependency tree
+# through mewkit-core, so this adds no new reviewed crate.
+regex = "1.13.1"
 tar = { version = "0.4", default-features = false }
 tempfile = "3.27.0"
 zip = { version = "9.5.0", default-features = false, features = ["deflate"] }

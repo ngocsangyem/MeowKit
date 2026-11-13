@@ -1,0 +1,13 @@
+{
+ "hooks": {
+  "PreToolUse": [
+   {
+    "hooks": [
+     {
+      "command": "node .codex/hooks/absent.cjs"
+     }
+    ]
+   }
+  ]
+ }
+}

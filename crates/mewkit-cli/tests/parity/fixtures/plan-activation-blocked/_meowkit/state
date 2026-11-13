@@ -1,0 +1,2 @@
+A FILE where the state DIRECTORY belongs: the pointer commit cannot create it,
+which is how this fixture makes activation fail after the receipt is stamped.

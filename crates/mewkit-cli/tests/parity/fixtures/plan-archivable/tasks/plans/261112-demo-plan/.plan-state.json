@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0",
+  "slug": "261112-demo-plan",
+  "note": "every key other than phases[*].status must survive the archive verbatim",
+  "phases": {
+    "phase-01-setup.md": {
+      "status": "in_progress",
+      "startedAt": "2026-11-12T00:00:00.000Z"
+    },
+    "phase-02-absent.md": {
+      "status": "completed"
+    }
+  }
+}

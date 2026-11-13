@@ -97,3 +97,41 @@ fn falls_back_to_the_legacy_memory_tree_only_for_a_real_store() {
     std::fs::create_dir_all(root.join(".meowkit").join("memory")).unwrap();
     assert!(!using_legacy_memory_tree(root));
 }
+
+#[test]
+fn a_session_marker_resolves_canonical_first_then_each_pre_move_location() {
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path();
+    let canonical = root.join(".meowkit").join("state").join("active-plan.json");
+
+    // Absent everywhere: reported where a writer would put it.
+    assert_eq!(
+        resolve_session_state_file(root, "active-plan.json"),
+        canonical
+    );
+
+    // The oldest location is still read…
+    let oldest = root.join(".claude").join("session-state");
+    std::fs::create_dir_all(&oldest).unwrap();
+    std::fs::write(oldest.join("active-plan.json"), "{}").unwrap();
+    assert_eq!(
+        resolve_session_state_file(root, "active-plan.json"),
+        oldest.join("active-plan.json")
+    );
+
+    // …until a newer one exists, in the documented precedence order.
+    let newer = root.join("session-state");
+    std::fs::create_dir_all(&newer).unwrap();
+    std::fs::write(newer.join("active-plan.json"), "{}").unwrap();
+    assert_eq!(
+        resolve_session_state_file(root, "active-plan.json"),
+        newer.join("active-plan.json")
+    );
+
+    std::fs::create_dir_all(canonical.parent().unwrap()).unwrap();
+    std::fs::write(&canonical, "{}").unwrap();
+    assert_eq!(
+        resolve_session_state_file(root, "active-plan.json"),
+        canonical
+    );
+}

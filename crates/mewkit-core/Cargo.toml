@@ -14,6 +14,29 @@ workspace = true
 [dependencies]
 # Alphabetical, so a new dependency has one obvious home.
 flate2 = "1.1.11"
+# The LOCAL calendar date, for the `YYMMDD` stamp `task new` puts in a filename.
+# The standard library has no local calendar, and both alternatives were worse:
+# `unsafe` for `localtime_r` (this workspace forbids it), or naming the file by
+# the UTC date, which disagrees with the npm CLI — and with the user's own
+# calendar — for part of every day. Jiff reads the system zone with safe code on
+# every platform the CLI ships to (`/etc/localtime` on Unix, the Windows
+# time-zone API there), and is `Unlicense OR MIT`, which `cargo deny` accepts.
+#
+# The features are the minimum for "what day is it here": no `tz-fat` (a
+# lookup-speed tradeoff that costs heap for a once-per-command call), no
+# `perf-inline`, no `tzdb-concatenated` (Android), no `serde`/`logging`/`static`.
+# `tzdb-bundle-platform` is what makes Windows work — it carries the database
+# only on platforms that have no system copy, and tz-data updates still arrive
+# through `jiff-tzdb`'s own version range rather than through this pin.
+#
+# Pinned EXACTLY because this crate decides a FILENAME a human reads and a script
+# globs: a date that moves should be a deliberate upgrade, not a `cargo update`.
+jiff = { version = "=0.2.43", default-features = false, features = [
+    "std",
+    "tz-system",
+    "tzdb-zoneinfo",
+    "tzdb-bundle-platform",
+] }
 # The memory content scan runs ~50 injection patterns and ~19 secret patterns per
 # line. `regex` is linear-time by construction, which is the property the TS port
 # had to buy by hand-bounding every quantifier in the email pattern.

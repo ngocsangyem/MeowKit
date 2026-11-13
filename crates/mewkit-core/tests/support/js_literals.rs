@@ -8,6 +8,12 @@
 //! The scanner follows the ECMAScript rule for where a regex literal ends: an
 //! unescaped `/` that is not inside a character class. `[a/b]` therefore does
 //! not terminate the literal, which a naive `rfind('/')` gets wrong.
+//!
+//! Shared by several drift tests, each of which needs a different subset: a
+//! test that only reads an `export const` does not touch the regex scanner.
+//! Hence the allow — the alternative is a second `read_source` per test, which
+//! is the duplication this module exists to remove.
+#![allow(dead_code)]
 
 use std::fs;
 use std::path::{Path, PathBuf};

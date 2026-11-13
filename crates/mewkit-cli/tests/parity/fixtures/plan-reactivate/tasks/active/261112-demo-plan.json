@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0",
+  "taskId": "261112-demo-plan",
+  "planPath": "tasks/plans/261112-demo-plan/plan.md",
+  "status": "blocked",
+  "currentStep": "waiting on review",
+  "repos": [
+    {
+      "identity": "/somewhere/else",
+      "revision": "aaaaaaa"
+    }
+  ],
+  "blockers": [
+    "the reviewer is asleep"
+  ],
+  "nextAction": "nudge the reviewer",
+  "verificationSummaries": [
+    {
+      "ref": "cargo test",
+      "result": "pass"
+    }
+  ],
+  "evidenceRefs": [
+    "src/main.rs"
+  ],
+  "capabilityDecisions": [],
+  "writtenByCli": "0.0.1",
+  "writtenByKit": "0.0.1",
+  "updatedAt": "2026-11-01T00:00:00.000Z",
+  "aFieldANewerWriterAdded": "must survive this update"
+}

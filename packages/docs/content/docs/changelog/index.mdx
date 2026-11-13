@@ -29,6 +29,7 @@ The kit is now a lean tree: `.claude/` ships agents, hooks, rules, skills, `sett
 
 - `mewkit init` writes a committed launcher at `.meowkit/bin/mewkit`, and a SessionStart hook puts it on the agent's `PATH`, so bare `mewkit ...` resolves in a fresh clone.
 - An unknown command or subcommand exits 2 and lists the valid choices. Every subcommand answers `--help`, and the CLI manual is generated from the command catalogue.
+- `mewkit-next` now runs `plan`, `task`, `task-state`, `note`, `orient` and `validate`, with the same output, exit codes and written files as the npm CLI, checked by TS-vs-Rust parity tests. Two differences: bare `mewkit-next orient` records its `orient_run` trace (pass `--no-record` to skip it, as the SessionStart hook does), where the npm CLI recorded only on `--record`; and `validate --portable` on a project that carries a generated Codex tree still points you at the npm CLI.
 
 ### Improvements
 

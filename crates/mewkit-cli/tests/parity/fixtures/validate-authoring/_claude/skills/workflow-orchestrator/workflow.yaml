@@ -1,0 +1,11 @@
+phases:
+  - id: 0
+    name: Orient
+  - id: 1
+    name: Plan
+    gate: gate_1
+gates:
+  - id: gate_1
+    required_output: "tasks/plans/*/plan.md"
+sources:
+  - path: docs/core/meowkit-architecture.md

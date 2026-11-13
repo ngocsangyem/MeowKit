@@ -16,6 +16,7 @@ use serde_json::{Value, json};
 
 use super::dossier::Dossier;
 use crate::js_number::js_number;
+use crate::js_regex;
 
 /// Reading a dossier back. A corrupt record is a REFUSAL, never an empty run.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -27,6 +28,36 @@ pub enum DossierRead {
 
 static FRONTMATTER_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?s)^---\n(.*?)\n---\n").expect("static frontmatter pattern"));
+
+/// The keys the inline checkpoint marker can carry, each with the pattern that
+/// pulls its quoted value out.
+///
+/// Compiled through [`crate::js_regex`] like every other ported pattern: the
+/// TypeScript reader builds this as a `RegExp` with no `u` flag, where `\s` is
+/// the ECMAScript whitespace set — which INCLUDES U+FEFF (Rust's
+/// `\p{White_Space}` does not) and EXCLUDES U+0085 (Rust's does). A marker
+/// separated by either character was read differently by the two CLIs, and here
+/// that means one reports a corrupt dossier and resets a supervision budget the
+/// other still caps. Built once: the key set is fixed, and the pattern used to
+/// be recompiled for every key of every parse.
+static MARKER_KEY_RES: LazyLock<Vec<(&'static str, Regex)>> = LazyLock::new(|| {
+    ["checkpointId", "stage", "state", "partition"]
+        .into_iter()
+        .map(|key| {
+            let pattern = format!(r#"{key}:\s*("(?:[^"\\]|\\.)*")"#);
+            (
+                key,
+                js_regex::compile(&pattern).expect("static key pattern"),
+            )
+        })
+        .collect()
+});
+
+fn marker_key_pattern(key: &str) -> Option<&'static Regex> {
+    MARKER_KEY_RES
+        .iter()
+        .find_map(|(name, re)| (*name == key).then_some(re))
+}
 
 /// Pull one frontmatter scalar line's raw value (everything after the first colon).
 fn frontmatter_value<'a>(frontmatter: &'a str, key: &str) -> Option<&'a str> {
@@ -86,7 +117,7 @@ pub fn parse_dossier(text: &str) -> DossierRead {
             // `{ key: "value", … }` — the inline form the renderer emits. Read
             // the known keys only.
             let read = |key: &str| -> Option<String> {
-                let re = Regex::new(&format!(r#"{key}:\s*("(?:[^"\\]|\\.)*")"#)).ok()?;
+                let re = marker_key_pattern(key)?;
                 unquote(re.captures(raw)?.get(1).map(|m| m.as_str()))
             };
             let mut marker = serde_json::Map::new();

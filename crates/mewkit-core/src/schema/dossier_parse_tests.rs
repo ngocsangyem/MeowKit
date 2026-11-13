@@ -108,3 +108,38 @@ fn a_well_formed_correction_count_is_read_as_written() {
         other => panic!("expected a parsed dossier, got {other:?}"),
     }
 }
+
+/// The checkpoint marker is read with ECMAScript whitespace semantics, because
+/// the other writer of this file is a `RegExp` with no `u` flag. The two
+/// characters where the engines disagree are the whole test: JavaScript's `\s`
+/// matches U+FEFF and not U+0085, and Rust's default `\s` does the opposite —
+/// so a marker separated by either one used to be read by one CLI and reported
+/// corrupt by the other.
+#[test]
+fn the_checkpoint_marker_separator_follows_javascript_whitespace() {
+    let mut with_checkpoint = dossier();
+    with_checkpoint.checkpoint = serde_json::from_value(
+        json!({"checkpointId": "cp-1", "stage": "GUIDE", "state": "pending"}),
+    )
+    .expect("valid checkpoint marker");
+    let rendered = render_dossier(&with_checkpoint);
+    assert!(
+        rendered.contains("checkpointId: \"cp-1\""),
+        "the render shape this test rests on changed: {rendered}"
+    );
+
+    // U+FEFF: JavaScript matches it, so the marker still reads.
+    let feff = rendered.replace("checkpointId: ", "checkpointId:\u{feff}");
+    match parse_dossier(&feff) {
+        DossierRead::Found(back) => assert_eq!(*back, with_checkpoint),
+        other => panic!("U+FEFF must separate the key, got {other:?}"),
+    }
+
+    // U+0085: JavaScript does NOT match it, so the key reads as missing and the
+    // record fails closed rather than being accepted on a Rust-only reading.
+    let nel = rendered.replace("checkpointId: ", "checkpointId:\u{85}");
+    match parse_dossier(&nel) {
+        DossierRead::Corrupt(_) => {}
+        other => panic!("U+0085 must not separate the key, got {other:?}"),
+    }
+}
