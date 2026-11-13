@@ -18,11 +18,17 @@ use crate::minimist_flags::{ALIASES, is_global_boolean, is_global_flag};
 /// The verbs whose argv gets minimist semantics.
 pub const PORTED_VERBS: &[&str] = &[
     "advice",
+    "backups",
     "budget",
+    "capabilities",
+    "init",
     "note",
     "orient",
+    "pack",
     "plan",
     "review",
+    "setup",
+    "skill",
     "task",
     "task-state",
     "trace",

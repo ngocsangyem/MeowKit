@@ -49,19 +49,18 @@ fn help_succeeds() {
     assert!(String::from_utf8_lossy(&out.stdout).contains("npm `mewkit` CLI"));
 }
 
-/// The example verb has to be one this binary does NOT implement, so it moves
-/// as the port advances — it named `plan` until `plan` landed, then `review`
-/// until that landed. `capabilities` is the current choice because nothing in
-/// the queue claims it; whoever ports it next picks another unimplemented verb
-/// rather than deleting this test, which is the only check that an unported
-/// verb points the user at the CLI that has it.
+/// The example verb has to be one this binary does NOT implement. It named
+/// `plan`, then `review`, then `capabilities` as each was ported; once every
+/// npm verb is ported, no real verb is left, so it names one that neither CLI
+/// has. This stays the only check that a verb this binary lacks points the user
+/// at the npm CLI, until cutover retires that CLI and this wording with it.
 #[test]
 fn unknown_command_exits_2_and_names_the_npm_cli() {
-    let out = TempHome::new().mewkit_next(&["capabilities", "--json"]);
+    let out = TempHome::new().mewkit_next(&["no-such-verb", "--json"]);
     assert_eq!(out.status.code(), Some(2));
     let stderr = String::from_utf8_lossy(&out.stderr);
     assert!(
-        stderr.contains("unknown command 'capabilities'"),
+        stderr.contains("unknown command 'no-such-verb'"),
         "stderr: {stderr}"
     );
     assert!(stderr.contains("npm `mewkit` CLI"), "stderr: {stderr}");

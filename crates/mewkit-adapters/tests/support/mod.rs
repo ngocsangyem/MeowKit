@@ -203,6 +203,12 @@ pub fn sha_tree(root: &Path) -> BTreeMap<PathBuf, String> {
 
 const ARCHIVE_ROOTS: &[&str] = &[
     ".claude",
+    ".meowkit/.env.example",
+    ".meowkit/gitignore.meowkit",
+    ".meowkit/harness-inventory.json",
+    ".meowkit/mcp.json.example",
+    ".meowkit/pack-manifest.json",
+    "packages/mewkit/src/migrate/modules/cursor/catalog/mcp-profiles.json",
     "packages/mewkit/src/migrate/modules/codex/root",
     "packages/mewkit/src/migrate/modules/codex/catalog/skill-packs.json",
     "packages/mewkit/src/migrate/modules/cursor/root",

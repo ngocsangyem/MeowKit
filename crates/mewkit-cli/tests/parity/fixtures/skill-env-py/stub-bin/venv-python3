@@ -1,0 +1,4 @@
+#!/bin/sh
+# The interpreter inside a stubbed environment: nothing is ever importable.
+echo "venv-python3 $*" >> calls.log
+exit 1

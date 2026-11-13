@@ -1,0 +1,7 @@
+node_modules/
+.meowkit/memory/
+.meowkit/telemetry/
+/.meowkit/state/**
+!.meowkit/state/keep
+.meowkit/.env
+session-state/

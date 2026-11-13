@@ -1,0 +1,24 @@
+#!/bin/sh
+# pip inside a stubbed environment: an install is recorded in the environment's
+# own `installed` file, and `show` reads it back.
+echo "pip $*" >> calls.log
+env_dir="$(dirname "$0")/.."
+base=$(echo "$2" | sed 's/[=<>!~].*//' | tr 'A-Z' 'a-z')
+case "$1" in
+  install)
+    case "$2" in
+      fail-*)
+        echo "ERROR: Could not find a version that satisfies the requirement $2" >&2
+        echo "ERROR: No matching distribution found for $2" >&2
+        exit 1
+        ;;
+    esac
+    echo "$base" >> "$env_dir/installed"
+    echo "Collecting $2"
+    ;;
+  show)
+    grep -qx "$base" "$env_dir/installed" 2>/dev/null
+    exit $?
+    ;;
+esac
+exit 0

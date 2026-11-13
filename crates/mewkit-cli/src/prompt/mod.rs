@@ -8,14 +8,8 @@
 //! terminal that will never respond, defaulting silently, or asking a question
 //! nobody can see.
 //!
-//! No command asks a question yet: the pickers land with the verbs that own
-//! them, through [`default_prompt`], which is the one place the two
-//! implementations are chosen between. Until then every item here is
-//! unreachable from `main`, which is
-//! what this allow covers — `expect` cannot be used instead, because the test
-//! target DOES reach them and the expectation would go unfulfilled there.
-//! Delete the allow with the first wiring.
-#![allow(dead_code)]
+//! Commands ask through [`default_prompt`], the one place the two
+//! implementations are chosen between.
 
 use std::fmt;
 
@@ -85,6 +79,9 @@ pub trait Prompt {
 
     fn confirm(&mut self, ask: &Ask<'_>, default: bool) -> PromptResult<bool>;
 
+    /// No ported picker asks for free text yet; both implementations keep it
+    /// tested so the first one that does inherits the flag-naming refusal.
+    #[cfg_attr(not(test), allow(dead_code))]
     fn text(&mut self, ask: &Ask<'_>, default: Option<&str>) -> PromptResult<String>;
 }
 

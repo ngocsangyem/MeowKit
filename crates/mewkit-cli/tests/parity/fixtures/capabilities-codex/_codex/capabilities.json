@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0",
+  "entries": [
+    {
+      "id": "mk:scout",
+      "kind": "skill",
+      "description": "Find the files a change touches.",
+      "aliases": ["scout"],
+      "sourcePath": "skills/scout/SKILL.md",
+      "owner": "kit",
+      "installedState": "installed",
+      "intents": ["scout the codebase"],
+      "invocation": { "kind": "skill", "id": "invoke-skill" },
+      "contextRequirement": { "reason": "reads files" },
+      "support": { "codex": { "discoverable": true, "selectable": true, "invocable": false, "enforceable": false } },
+      "provenance": { "intents": "authored" },
+      "ignoredExtra": 1
+    },
+    {
+      "id": "browser",
+      "kind": "tool",
+      "description": "Browser automation.",
+      "invocation": { "kind": "none", "id": "none" },
+      "requirements": [{ "type": "external_binary", "id": "chromium" }]
+    }
+  ]
+}

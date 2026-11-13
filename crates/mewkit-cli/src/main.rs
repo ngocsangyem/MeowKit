@@ -24,6 +24,10 @@ use commands::{
     uninstall::UninstallArgs, upgrade::UpgradeArgs, validate::ValidateArgs,
     verdict_gate::VerdictGateArgs, versions::VersionsArgs,
 };
+use commands::{
+    backups::BackupsArgs, capabilities::CapabilitiesArgs, pack::PackArgs, setup::SetupArgs,
+    skill::SkillArgs,
+};
 use failure::Failure;
 
 #[derive(Parser)]
@@ -84,6 +88,16 @@ enum Command {
     Trace(TraceArgs),
     /// Token and USD spend from the cost log.
     Budget(BudgetArgs),
+    /// Guided post-scaffold configuration.
+    Setup(SetupArgs),
+    /// Per-skill interpreter environments.
+    Skill(SkillArgs),
+    /// Manage install packs.
+    Pack(PackArgs),
+    /// Explain, resolve and project the kit's capabilities.
+    Capabilities(CapabilitiesArgs),
+    /// List or restore the backups lifecycle commands left behind.
+    Backups(BackupsArgs),
     /// Any command this binary does not implement yet.
     #[command(external_subcommand)]
     NotPorted(Vec<String>),
@@ -109,6 +123,11 @@ fn main() -> ExitCode {
         Command::Advice(args) => commands::advice::run(&args),
         Command::Trace(args) => commands::trace::run(&args),
         Command::Budget(args) => commands::budget::run(&args),
+        Command::Setup(args) => commands::setup::run(&args),
+        Command::Skill(args) => commands::skill::run(&args),
+        Command::Pack(args) => commands::pack::run(&args),
+        Command::Capabilities(args) => commands::capabilities::run(&args),
+        Command::Backups(args) => commands::backups::run(&args),
         Command::NotPorted(argv) => {
             let name = argv.first().map(String::as_str).unwrap_or_default();
             Err(Failure::usage(format!(

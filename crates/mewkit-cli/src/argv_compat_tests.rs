@@ -24,7 +24,7 @@ fn cli() -> Command {
                 .subcommand(Command::new("approve").arg(Arg::new("dir")))
                 .subcommand(Command::new("status")),
         )
-        .subcommand(Command::new("init").arg(flag("json")))
+        .subcommand(Command::new("upgrade").arg(flag("json")))
 }
 
 fn run(args: &[&str]) -> Vec<String> {
@@ -35,7 +35,10 @@ fn run(args: &[&str]) -> Vec<String> {
 
 #[test]
 fn a_verb_that_is_not_ported_passes_through_untouched() {
-    assert_eq!(run(&["init", "--bogus", "x"]), ["init", "--bogus", "x"]);
+    assert_eq!(
+        run(&["upgrade", "--bogus", "x"]),
+        ["upgrade", "--bogus", "x"]
+    );
 }
 
 #[test]

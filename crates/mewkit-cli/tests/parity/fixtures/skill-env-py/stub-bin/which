@@ -1,0 +1,3 @@
+#!/bin/sh
+# Only python3 exists on this machine, whatever the real PATH holds.
+[ "$1" = "python3" ]

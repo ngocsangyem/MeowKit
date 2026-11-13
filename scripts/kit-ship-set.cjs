@@ -50,10 +50,11 @@ function kitMeowkitTargets() {
  */
 const CODEX_BUNDLE = "packages/mewkit/src/migrate/modules/codex";
 const CURSOR_BUNDLE = "packages/mewkit/src/migrate/modules/cursor";
+// Cursor alone ships the MCP profile catalog `init --mcp-profiles` merges from.
 const RUNTIME_BUNDLE_TARGETS = [CODEX_BUNDLE, CURSOR_BUNDLE].flatMap((b) => [
 	`${b}/root`,
 	`${b}/catalog/skill-packs.json`,
-]);
+]).concat(`${CURSOR_BUNDLE}/catalog/mcp-profiles.json`);
 
 /**
  * The archive roots a published kit is built from, in a fixed order.

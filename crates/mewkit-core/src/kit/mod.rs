@@ -5,6 +5,7 @@
 //! `checksums.txt` or a kit without a contract is refused unless the caller
 //! passes `allow_unverified`, which is then recorded as the install's origin.
 mod cache;
+pub mod channels;
 pub(crate) mod checksum;
 pub mod contract;
 mod extract;

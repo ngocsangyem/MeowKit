@@ -71,7 +71,7 @@ pub fn choose(releases: &[Release], tag: Option<&str>, beta: bool) -> Result<Cho
 }
 
 /// One installable kit release, as `versions` lists it.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Listed {
     pub version: String,
     pub prerelease: bool,

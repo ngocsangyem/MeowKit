@@ -1,0 +1,16 @@
+{
+  "id": "20261101T100000Z-upgrade",
+  "createdAt": "2026-11-01T10:00:00.000Z",
+  "command": "upgrade",
+  "fileCount": 2,
+  "files": [
+    {
+      "path": ".claude/a.md",
+      "checksum": "c8518d7e574626e44644fb5dd1348aec70ed95b22336992a981336f5a0c69be3"
+    },
+    {
+      "path": ".claude/b.md",
+      "checksum": "adb9939a136c004291fad5ab5ef7c08d27a31bf689d6d48239eee80ce2165483"
+    }
+  ]
+}

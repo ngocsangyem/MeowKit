@@ -1,19 +1,25 @@
 //! The lifecycle commands, and the pieces they share.
 pub mod advice;
+pub mod backups;
 pub mod budget;
+pub mod capabilities;
 pub mod doctor;
 pub mod init;
 pub mod note;
 pub mod orient;
+pub mod pack;
 pub mod plan;
 pub mod providers;
 pub mod review;
 pub mod self_update;
+pub mod setup;
+pub mod skill;
 pub mod task;
 pub mod task_state;
 pub mod trace;
 pub mod uninstall;
 pub mod upgrade;
+mod upgrade_query;
 pub mod validate;
 pub mod verdict_gate;
 pub mod versions;
@@ -42,6 +48,20 @@ pub struct Common {
     /// Replace or remove files you edited after the kit installed them.
     #[arg(long)]
     pub force: bool,
+}
+
+/// True when `--force` was asked for with no terminal to confirm it in and no
+/// `--yes`: the command then previews and exits 3 instead of overwriting files
+/// the user edited on an unseen plan. Prints why.
+pub fn unconfirmed_force(command: &str, force: bool, yes: bool) -> bool {
+    let unconfirmed = force && !yes && !crate::prompt::is_interactive();
+    if unconfirmed {
+        eprintln!(
+            "{command} --force can overwrite or remove files and this session has no terminal \
+             to confirm in. Nothing was written. Re-run with --yes (or --dry-run to see the plan)."
+        );
+    }
+    unconfirmed
 }
 
 /// `claude-code,codex` (or `all`) as runtimes, in the order given.

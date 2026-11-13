@@ -1,11 +1,11 @@
 //! The Claude Code emitter against the kit this checkout publishes.
 mod support;
 
-use std::collections::BTreeSet;
+use std::collections::BTreeMap;
 
 use mewkit_adapters::Emitter;
 use mewkit_adapters::claude_code::{ClaudeCode, SETTINGS};
-use mewkit_adapters::contract::{Op, Plan};
+use mewkit_adapters::contract::Op;
 use serde_json::Value;
 use support::{Project, kit, repo, request, sha_tree};
 
@@ -85,28 +85,47 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
         .unwrap(),
     )
     .unwrap();
-    let ts: BTreeSet<&str> = baseline["files"]
+    // What the npm CLI wrote that this install does not, by decision
+    // (DIVERGENCES.md): settings.json is merged, not written; the launcher,
+    // runtime descriptor, install metadata and the npm CLI's own kit copy and
+    // state are not part of a runtime install here.
+    let kept_apart = |p: &str| {
+        matches!(
+            p,
+            ".claude/settings.json"
+                | ".claude/runtime.json"
+                | ".meowkit/bin/mewkit"
+                | ".meowkit/metadata.json"
+        ) || p.starts_with(".meowkit/cache/")
+            || p.starts_with(".meowkit/state/")
+            || p.starts_with("~/")
+    };
+    let ts: BTreeMap<&str, Option<&str>> = baseline["files"]
         .as_array()
         .unwrap()
         .iter()
-        .map(|f| f["path"].as_str().unwrap())
-        .filter(|p| p.starts_with(".claude/"))
+        .map(|f| (f["path"].as_str().unwrap(), f["sha256"].as_str()))
+        .filter(|(p, _)| !kept_apart(p))
         .collect();
-    let ours: BTreeSet<&str> = written(&plan).collect();
-    // DIVERGENCES.md: settings.json is merged, not written; runtime.json is the
-    // npm CLI's own launcher record.
-    let only_ts: Vec<_> = ts
-        .difference(&ours)
-        .filter(|p| !matches!(**p, ".claude/settings.json" | ".claude/runtime.json"))
+    let ours: BTreeMap<&str, String> = plan
+        .ops
+        .iter()
+        .filter_map(|o| match o {
+            Op::WriteFile { path, bytes, .. } => {
+                Some((path.as_str(), mewkit_core::fsx::sha256_hex(bytes)))
+            }
+            _ => None,
+        })
         .collect();
+    let only_ts: Vec<_> = ts.keys().filter(|p| !ours.contains_key(**p)).collect();
     assert!(only_ts.is_empty(), "missing vs TS: {only_ts:?}");
-    let only_ours: Vec<_> = ours.difference(&ts).collect();
+    let only_ours: Vec<_> = ours.keys().filter(|p| !ts.contains_key(**p)).collect();
     assert!(only_ours.is_empty(), "extra vs TS: {only_ours:?}");
-}
-
-fn written(plan: &Plan) -> impl Iterator<Item = &str> {
-    plan.ops.iter().filter_map(|o| match o {
-        Op::WriteFile { path, .. } => Some(path.as_str()),
-        _ => None,
-    })
+    // Every non-volatile file carries the same bytes as the npm CLI's.
+    let differ: Vec<_> = ts
+        .iter()
+        .filter(|(p, digest)| digest.is_some_and(|d| d != ours[**p]))
+        .map(|(p, _)| p)
+        .collect();
+    assert!(differ.is_empty(), "bytes differ from TS: {differ:?}");
 }

@@ -3,7 +3,7 @@ title: "mewkit-next"
 description: "The native installer in preview: install, upgrade, remove and check the kit for Claude Code, Codex and Cursor."
 ---
 
-`mewkit-next` installs the kit with one emitter per runtime, so each runtime gets files in its own format instead of a converted copy of `.claude/`. It covers the install lifecycle plus `plan`, `task`, `task-state`, `note`, `orient`, `validate`, `review`, `verdict-gate`, `advice`, `trace` and `budget`, which behave as the npm commands of the same name (their pages are [Planning and Tasks](/cli/planning), [Memory](/cli/knowledge), [Review](/cli/review) and [Cost and Telemetry](/cli/telemetry)). Every other command (`setup`, `pack`, `capabilities`, …) still comes from the npm `mewkit` CLI. [Installation](/installation#preview-the-mewkit-next-binary) shows how to get it.
+`mewkit-next` installs the kit with one emitter per runtime, so each runtime gets files in its own format instead of a converted copy of `.claude/`. It covers the install lifecycle plus `plan`, `task`, `task-state`, `note`, `orient`, `validate`, `review`, `verdict-gate`, `advice`, `trace`, `budget`, `setup`, `skill env`, `pack`, `capabilities` and `backups`, which behave as the npm commands of the same name (their pages are [Planning and Tasks](/cli/planning), [Memory](/cli/knowledge), [Review](/cli/review) and [Cost and Telemetry](/cli/telemetry)). `setup` adds `--yes` to answer its system-dependencies question when there is no terminal to ask in. [Installation](/installation#preview-the-mewkit-next-binary) shows how to get it.
 
 ## Runtimes and scopes
 
@@ -15,7 +15,7 @@ description: "The native installer in preview: install, upgrade, remove and chec
 
 `--target` takes a comma-separated list or `all`. mewkit's own state (ownership indexes, lock, kit cache) lives in `.meowkit/` for a project and `~/.mewkit/state/` for a global install. Files you already had are merged, never replaced: hook files handler by handler, Markdown by a marked block, JSON and TOML by key.
 
-`init`, `upgrade` and `uninstall` all take `--json` (print one JSON document), `--force` (replace or remove files you edited) and `--global` (act on your home directory). Before `init`, `upgrade` or `uninstall` changes anything, it copies every file it is about to change or remove into a new directory under `.meowkit/backups/` (`~/.mewkit/state/backups/` globally).
+`init`, `upgrade` and `uninstall` all take `--json` (print one JSON document), `--force` (replace or remove files you edited) and `--global` (act on your home directory). With no terminal to confirm in (CI, a pipe, a hook), `init --force` and `upgrade --force` only show their plan and exit 3 unless `--yes` is also passed. Before `init`, `upgrade` or `uninstall` changes anything, it copies every file it is about to change or remove into a new directory under `.meowkit/backups/` (`~/.mewkit/state/backups/` globally).
 
 ## init
 
@@ -26,6 +26,8 @@ mewkit-next init --target codex --dry-run
 ```
 
 Downloads the newest kit release (`--beta` allows a prerelease; `--kit-version v2.16.0` pins one), checks it against the release's `checksums.txt` and its `kit-contract.json`, and writes it for each runtime. `--skill-packs` adds optional packs to the core skills. `--offline` uses the newest kit already in the cache; `--kit-archive <zip>` installs a local `meowkit-release.zip`, checked against `--kit-sha256` or a `checksums.txt` beside it. `--allow-unverified-kit` accepts a kit that has no checksum or no `kit-contract.json`; leave it off unless you built the kit yourself.
+
+For Claude Code, `--profile` (`core`, `developer`, `product`, `atlassian`, `security`, `research`, `full`) installs a subset of the kit; running `init` again with a narrower profile removes what it no longer includes, unless you edited it. `--delivery native|plugin` picks the on-disk shape. For Cursor, `--mcp-profiles <names|all>` merges MCP servers into `.cursor/mcp.json` (your own servers win), and a project with a git remote also needs `--allow-cloud-mcp`. Without `--target`, a terminal shows a picker; with no terminal, `--yes` or an existing `.claude/` means Claude Code, and otherwise the command exits 2 naming `--target`.
 
 ### Taking over an npm install
 
@@ -38,7 +40,7 @@ mewkit-next upgrade
 mewkit-next upgrade --target cursor --dry-run
 ```
 
-Moves the runtimes installed here to the newest kit, with the packs they were installed with. It takes the same kit-source flags as `init`. A file you edited after the kit wrote it is kept and named, and the command exits 6; `--force` replaces it.
+Moves the runtimes installed here to the newest kit, with the packs they were installed with. It takes the same kit-source flags as `init`. A file you edited after the kit wrote it is kept and named, and the command exits 6; `--force` replaces it. `--check` compares each installed runtime with the newest release (`--beta` for the prerelease channel) and `--list` shows the recent releases; neither changes anything, and with `--offline` both read the kits in the cache instead of GitHub. `--no-cleanup` is accepted for scripts written for the npm CLI: a downloaded kit always stays in the cache.
 
 ## uninstall
 
@@ -57,7 +59,7 @@ mewkit-next doctor
 mewkit-next doctor --global --json
 ```
 
-Read-only. Checks Node.js, both scopes' installs (owned files present or edited), that every kit hook script a hook file names exists, Codex project trust, and which kit hook behaviours a runtime does not carry. Exits 1 when a check fails.
+Without flags it changes nothing. Checks Node.js, both scopes' installs (owned files present or edited), that every kit hook script a hook file names exists, Codex project trust, and which kit hook behaviours a runtime does not carry. Exits 1 when a check fails. `doctor provenance` (with `--explain` for the files behind it) classifies each installed file against the install baseline, as the npm CLI does. `--adopt` rebuilds that baseline from the local kit cache (it writes `.meowkit/metadata.json`) or refuses. `--hard-gates` runs the kit's plan, privacy, injection and ship hooks in a scratch project and reports which ones block. `--report` appends a shareable report block, `--providers` adds what each runtime's adapter can enforce, and `--state` adds the state taxonomy.
 
 ## providers
 
@@ -65,7 +67,7 @@ Read-only. Checks Node.js, both scopes' installs (owned files present or edited)
 mewkit-next providers --target codex
 ```
 
-What each runtime would get from the kit at this scope: files, skills, hooks, and the gaps, without installing anything.
+What each runtime would get from the kit at this scope: files, skills, hooks, and the gaps, without installing anything. `providers <runtime>` is the same as `--target <runtime>`. `--lifecycle` shows instead which lifecycle events each runtime fires and which of them can block, as the npm CLI does; `providers codex --lifecycle` adds support levels, invocation shapes and enforcement gaps for one runtime.
 
 ## versions
 
@@ -97,5 +99,5 @@ Once `mewkit-next` owns a runtime, the npm CLI leaves it alone. The ownership in
 | 0 | Done |
 | 1 | Failed; nothing was left half-applied |
 | 2 | The command line was wrong |
-| 3 | A dry run found changes to make (or `self-update --check` found an update) |
+| 3 | A dry run found changes to make, `--force` had no terminal and no `--yes` to confirm it, or `self-update --check` found an update |
 | 6 | Files you edited were kept; `--force` replaces or removes them |

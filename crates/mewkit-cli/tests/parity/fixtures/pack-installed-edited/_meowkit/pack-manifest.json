@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0",
+  "base": {
+    "files": [
+      "settings.json",
+      "rules/gate-rules.md"
+    ],
+    "globs": [],
+    "exclude": []
+  },
+  "packs": {
+    "lifecycle-core": {
+      "owners": [
+        "lifecycle"
+      ]
+    },
+    "testing": {
+      "owners": [
+        "testing"
+      ]
+    },
+    "docs": {
+      "owners": [
+        "docs"
+      ]
+    }
+  },
+  "profiles": {
+    "core": [
+      "base",
+      "lifecycle-core"
+    ],
+    "full": [
+      "*"
+    ]
+  }
+}

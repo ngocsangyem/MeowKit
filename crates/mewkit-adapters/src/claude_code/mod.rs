@@ -6,6 +6,10 @@
 //! recorded, so uninstall takes out only what the kit added. A global
 //! install writes a subset: see [`global`].
 mod global;
+mod kit_dir;
+mod selection;
+
+pub use kit_dir::{GITIGNORE, PLUGIN_MANIFEST, plugin_manifest};
 
 use serde_json::{Map, Value};
 
@@ -28,7 +32,13 @@ impl Emitter for ClaudeCode {
 
     fn roots(&self, scope: &Scope) -> Vec<RelPath> {
         match scope.kind {
-            ScopeKind::Project => vec![RelPath::new(".claude").expect("static root")],
+            // `.meowkit` and `.claude-plugin` hold the shared kit files and the
+            // plugin manifest; state, caches and backups under `.meowkit` are
+            // never deleted whatever an index says.
+            ScopeKind::Project => [".claude", ".meowkit", ".claude-plugin"]
+                .iter()
+                .map(|r| RelPath::new(r).expect("static root"))
+                .collect(),
             ScopeKind::Global => global::DIRS
                 .iter()
                 .chain([&SETTINGS])
@@ -43,9 +53,11 @@ impl Emitter for ClaudeCode {
         if !src.is_dir() {
             return Err(EmitError::Kit("the kit has no .claude/ tree".into()));
         }
+        let (selection, notice) = selection::Selection::of(req, &src)?;
         let mut plan = Plan::default();
+        plan.notices.extend(notice);
         for f in kit_files::walk(&src)? {
-            if maintainer_only(&f.rel) {
+            if maintainer_only(&f.rel) || !selection.installs(&f.rel) {
                 continue;
             }
             let path = format!(".claude/{}", f.rel);
@@ -61,6 +73,9 @@ impl Emitter for ClaudeCode {
                 bytes: kit_files::read(&f.abs)?,
                 mode: kit_files::mode(&f.abs),
             });
+        }
+        if global.is_none() {
+            kit_dir::push_shared(req, &mut plan)?;
         }
         plan.notices.extend(scope::privacy_elsewhere(req, SETTINGS));
         Ok(plan)

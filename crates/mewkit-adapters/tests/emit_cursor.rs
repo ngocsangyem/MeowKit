@@ -147,12 +147,14 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
         .map(|f| f["path"].as_str().unwrap())
         .collect();
     let ours: BTreeSet<&str> = written(&plan).collect();
-    // DIVERGENCES.md: skill tests are not in the kit; .meowkit/ is the npm CLI's
-    // own state; hooks.json is merged; AGENTS.md is installed as the core rule.
+    // DIVERGENCES.md: skill tests are not in the kit; the npm CLI's install
+    // metadata and ledger under .meowkit/ are replaced by the ownership index;
+    // hooks.json is merged; AGENTS.md is installed as the core rule.
     let only_ts: Vec<_> = ts
         .difference(&ours)
         .filter(|p| {
-            !p.starts_with(".meowkit/")
+            **p != ".meowkit/metadata.json"
+                && !p.starts_with(".meowkit/state/")
                 && !p.contains("/tests/")
                 && !p.contains(".test.")
                 && !matches!(**p, "AGENTS.md" | HOOKS_JSON)
