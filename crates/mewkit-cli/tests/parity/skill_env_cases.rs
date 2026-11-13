@@ -9,6 +9,7 @@
 use crate::parity;
 
 /// PATH with a fixture's `stub-bin/` in front.
+#[cfg(unix)]
 pub(crate) fn stubbed_path() -> String {
     format!(
         "stub-bin:{}",
