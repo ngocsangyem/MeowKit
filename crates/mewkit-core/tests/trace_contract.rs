@@ -26,8 +26,9 @@ fn exported(source: &str, name: &str) -> String {
         .find(&marker)
         .unwrap_or_else(|| panic!("{name} is no longer exported from {TRACE_TS}"));
     let rest = &source[start + marker.len()..];
+    // `;` alone, not `;\n`: a Windows checkout gives the TS source CRLF.
     let end = rest
-        .find(";\n")
+        .find(';')
         .unwrap_or_else(|| panic!("{name}'s declaration has no `;`"));
     rest[..end].trim().to_string()
 }
