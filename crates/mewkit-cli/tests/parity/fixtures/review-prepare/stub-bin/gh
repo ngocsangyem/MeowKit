@@ -1,0 +1,13 @@
+#!/bin/sh
+# Stand-in for the GitHub CLI: records the argv it was handed into the project
+# (so the two CLIs' calls are compared like any other written file) and answers
+# with fixed PR metadata. No network, no credentials, no live pull request.
+printf '%s\n' "$*" >> gh-calls.txt
+if [ "${STUB_GH:-ok}" = "fail" ]; then
+	echo "gh: not authenticated" >&2
+	exit 1
+fi
+case "$2" in
+	view) printf '{"title":"a title","author":{"login":"someone-else"},"state":"OPEN"}\n' ;;
+	checks) printf 'build\tpass\t1m\n' ;;
+esac

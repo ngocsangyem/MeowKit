@@ -1,0 +1,52 @@
+{
+  "tier": "small",
+  "entries": [
+    {
+      "id": "issue-fidelity",
+      "dimension": "issue-fidelity",
+      "briefFile": "briefs/issue-fidelity.md",
+      "expectedReads": [
+        "diff.patch",
+        "briefs/issue-fidelity.md"
+      ],
+      "wholeDiff": true,
+      "focus": "Whole-diff role — reason over the ENTIRE diff; a per-chunk view cannot prove this."
+    },
+    {
+      "id": "correctness",
+      "dimension": "correctness",
+      "briefFile": "briefs/correctness.md",
+      "expectedReads": [
+        "diff.patch",
+        "briefs/correctness.md"
+      ]
+    },
+    {
+      "id": "security",
+      "dimension": "security",
+      "briefFile": "briefs/security.md",
+      "expectedReads": [
+        "diff.patch",
+        "briefs/security.md"
+      ]
+    },
+    {
+      "id": "tests",
+      "dimension": "tests",
+      "briefFile": "briefs/tests.md",
+      "expectedReads": [
+        "diff.patch",
+        "briefs/tests.md"
+      ]
+    },
+    {
+      "id": "build-test",
+      "dimension": "build-test",
+      "briefFile": "briefs/build-test.md",
+      "expectedReads": [
+        "diff.patch",
+        "briefs/build-test.md"
+      ]
+    }
+  ]
+}

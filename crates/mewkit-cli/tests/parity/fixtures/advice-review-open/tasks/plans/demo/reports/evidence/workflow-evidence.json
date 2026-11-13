@@ -1,0 +1,7 @@
+{
+  "plan": "261113-demo",
+  "evidenceRevision": 2,
+  "verification": { "evidenceRevision": 2, "status": "valid" },
+  "review": { "evidenceRevision": 2, "status": "valid" },
+  "approvals": { "gate1": "approved", "gate2": "approved", "gate1Revision": 1 }
+}

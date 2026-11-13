@@ -16,7 +16,19 @@ use clap::{ArgAction, Command};
 use crate::minimist_flags::{ALIASES, is_global_boolean, is_global_flag};
 
 /// The verbs whose argv gets minimist semantics.
-pub const PORTED_VERBS: &[&str] = &["note", "orient", "plan", "task", "task-state", "validate"];
+pub const PORTED_VERBS: &[&str] = &[
+    "advice",
+    "budget",
+    "note",
+    "orient",
+    "plan",
+    "review",
+    "task",
+    "task-state",
+    "trace",
+    "validate",
+    "verdict-gate",
+];
 
 /// `argv` as clap should see it. Only rewritten when argv[1] is a ported verb.
 pub fn normalise(argv: Vec<String>, root: &Command) -> Vec<String> {

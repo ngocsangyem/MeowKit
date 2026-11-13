@@ -1,0 +1,29 @@
+[
+	{
+		"date": "2026-11-10T08:15:00Z",
+		"command": "cook",
+		"tier": "STANDARD",
+		"estimated_tokens": 12500,
+		"task": "port the note verb"
+	},
+	{
+		"date": "2026-11-11T09:30:00Z",
+		"session_id": "sess-alpha",
+		"model": "claude-opus-5",
+		"tokens_in": 1200,
+		"tokens_out": "800",
+		"cache_write_tokens": 50,
+		"cache_read_tokens": 4000
+	},
+	{
+		"date": "2026-11-12T10:00:00Z",
+		"command": "review",
+		"tier": "COMPLEX",
+		"estimated_tokens": "9000",
+		"task_summary": "gate 2 verdict for the evidence verbs"
+	},
+	{
+		"date": "2026-11-12T11:00:00Z",
+		"session_id": "sess-beta"
+	}
+]

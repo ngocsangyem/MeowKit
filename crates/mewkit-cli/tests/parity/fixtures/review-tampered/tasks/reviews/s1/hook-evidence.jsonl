@@ -1,0 +1,6 @@
+{"session":"s1","kind":"read","target":"diff.patch","at":"2026-11-13T00:00:00Z","source":"hook"}
+{"session":"s1","kind":"read","target":"briefs/issue-fidelity.md","at":"2026-11-13T00:00:00Z","source":"hook"}
+{"session":"s1","kind":"read","target":"briefs/correctness.md","at":"2026-11-13T00:00:00Z","source":"hook"}
+{"session":"s1","kind":"read","target":"briefs/security.md","at":"2026-11-13T00:00:00Z","source":"hook"}
+{"session":"s1","kind":"read","target":"briefs/tests.md","at":"2026-11-13T00:00:00Z","source":"hook"}
+{"session":"s1","kind":"read","target":"briefs/build-test.md","at":"2026-11-13T00:00:00Z","source":"hook"}

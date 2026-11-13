@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0.0",
+  "session": "s1",
+  "nonce": "owner-nonce",
+  "worktreePath": ".worktrees/review-pr-7-s1",
+  "pr": 7,
+  "ref": "refs/mewkit/review-pr-7-s1",
+  "headSha": "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+  "baseSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "baseBranch": "main",
+  "baseRemote": "origin",
+  "host": "github",
+  "owner": "o",
+  "repo": "r",
+  "createdAt": "2026-11-13T00:00:00Z"
+}

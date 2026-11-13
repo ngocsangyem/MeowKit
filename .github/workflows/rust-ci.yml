@@ -17,6 +17,8 @@ on:
       # change on either side must re-run it.
       - "packages/mewkit/src/**"
       - ".claude/hooks/**"
+      # `review prepare` and `review cleanup` exec the kit's worktree action.
+      - ".claude/skills/worktree/scripts/**"
       - ".github/workflows/rust-release.yml"
   push:
     branches: [main]
@@ -34,6 +36,8 @@ on:
       # change on either side must re-run it.
       - "packages/mewkit/src/**"
       - ".claude/hooks/**"
+      # `review prepare` and `review cleanup` exec the kit's worktree action.
+      - ".claude/skills/worktree/scripts/**"
       - ".github/workflows/rust-release.yml"
 
 env:

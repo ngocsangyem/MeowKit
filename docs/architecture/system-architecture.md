@@ -84,8 +84,10 @@ fm-strip, direct-copy, orchestrator, reconciler entrypoint, the `--include-mcp`
 (`init`, `upgrade`, `uninstall`, `doctor`, `providers`, `versions`, plus `self-update`).
 
 - **Ported verbs** — the binary also runs `plan` (`status`, `check`, `approve`, `archive`),
-  `task`, `task-state`, `note`, `orient` and `validate`, with the logic in `mewkit-core`
-  (`plan_doc`, `task_files`, `task_state`, `task_store`, `note`, `orient`, `validate`) and
+  `task`, `task-state`, `note`, `orient`, `validate`, `review`, `verdict-gate`, `advice`,
+  `trace` and `budget`, with the logic in `mewkit-core` (`plan_doc`, `task_files`,
+  `task_state`, `task_store`, `note`, `orient`, `validate`, `review`, `verdict_gate`, `advice`,
+  `trace_analysis`, `budget`) and
   argv parsed with the npm CLI's minimist tolerance (`crates/mewkit-cli/src/argv_compat.rs`),
   so invocations written against that CLI keep running. TS-vs-Rust parity cases live in
   `crates/mewkit-cli/tests/parity/` (the `parity` job in `.github/workflows/rust-ci.yml`).

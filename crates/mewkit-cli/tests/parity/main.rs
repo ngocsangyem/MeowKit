@@ -44,7 +44,9 @@
 //! deliberately renders itself (clap's help). A declared redaction that never
 //! matches is itself a failure, so an allowance cannot outlive the difference
 //! it was written for.
+mod advice_cases;
 mod argv_table;
+mod budget_cases;
 mod harness;
 mod hook_contract;
 mod note_cases;
@@ -56,8 +58,10 @@ mod plan_check_cases;
 mod plan_invocation_cases;
 mod plan_receipt_consumer;
 mod plan_status_cases;
+mod review_cases;
 mod task_cases;
 mod task_state_cases;
+mod trace_cases;
 mod validate_authoring_cases;
 mod validate_default_cases;
 mod validate_memory_cases;
@@ -66,6 +70,7 @@ mod validate_repo_cases;
 mod validate_scoped_cases;
 mod validate_target_cases;
 mod validate_usage_cases;
+mod verdict_gate_cases;
 
 /// The harness, under the name the cases call it by.
 pub(crate) use harness as parity;

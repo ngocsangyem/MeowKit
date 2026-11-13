@@ -1,0 +1,9 @@
+{
+  "host": "github",
+  "owner": "o",
+  "repo": "r",
+  "pr": 7,
+  "headSha": "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+  "event": "APPROVE",
+  "body": "x"
+}

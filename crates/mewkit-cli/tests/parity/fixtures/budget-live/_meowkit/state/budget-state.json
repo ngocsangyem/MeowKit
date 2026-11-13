@@ -1,0 +1,8 @@
+{
+	"session_id": "sess-live",
+	"estimated_input_tokens": 182450,
+	"estimated_output_tokens": "23100",
+	"estimated_cost_usd": 1.125,
+	"turn_count": 47,
+	"warnings_emitted": 0
+}

@@ -106,7 +106,8 @@ impl Verdict {
 
 /// Resolve a slug or an explicit path to the verdict JSON path, matching the TS
 /// resolver: an explicit `.json` stands, a `.md` becomes its JSON sibling, and a
-/// bare slug resolves under `tasks/reviews/`.
+/// bare slug resolves under `tasks/reviews/` through `path.join` — normalised
+/// and platform-separated, so a message naming the path reads the same.
 pub fn resolve_verdict_path(slug_or_path: &str) -> String {
     if slug_or_path.ends_with(".json") {
         return slug_or_path.to_string();
@@ -114,7 +115,7 @@ pub fn resolve_verdict_path(slug_or_path: &str) -> String {
     if let Some(stem) = slug_or_path.strip_suffix(".md") {
         return format!("{stem}.json");
     }
-    format!("tasks/reviews/{slug_or_path}-verdict.json")
+    crate::node_path::join_relative(&["tasks", "reviews", &format!("{slug_or_path}-verdict.json")])
 }
 
 #[cfg(test)]

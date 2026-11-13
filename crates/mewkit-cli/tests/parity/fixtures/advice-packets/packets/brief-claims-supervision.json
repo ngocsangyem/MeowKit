@@ -1,0 +1,9 @@
+{
+  "situation": "the backfill is slower than the writer",
+  "decisionRecommendation": "hold the reader",
+  "nextFalsifiableCheck": "replay one hour of traffic",
+  "escalationPoint": "a human decides the gap window",
+  "confidence": "high",
+  "disposition": "RETURN_TO_EXECUTOR",
+  "stray": 1
+}

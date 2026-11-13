@@ -5,6 +5,11 @@ description: "Run a resumable multi-pass review, and check a verdict."
 
 Review is a sequence of steps with a session id rather than one long command, so a review of a large change can be picked up where it stopped.
 
+<Callout type="info">
+  During the move to one CLI, these commands run from either CLI with the same output: `npx mewkit <command>` or the
+  native `mewkit-next <command>` ([mewkit-next](/cli/mewkit-next)). Skills and hooks still call the npm CLI.
+</Callout>
+
 ## review
 
 Drive a multi-pass pull-request review as a sequence of resumable steps, so a long review
