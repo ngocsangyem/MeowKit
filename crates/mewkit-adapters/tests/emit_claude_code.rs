@@ -112,7 +112,7 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
         .iter()
         .filter_map(|o| match o {
             Op::WriteFile { path, bytes, .. } => {
-                Some((path.as_str(), mewkit_core::fsx::sha256_hex(bytes)))
+                Some((path.as_str(), mewkit_core::fsx::sha256_hex(&lf(bytes))))
             }
             _ => None,
         })
@@ -128,4 +128,22 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
         .map(|(p, _)| p)
         .collect();
     assert!(differ.is_empty(), "bytes differ from TS: {differ:?}");
+}
+
+/// The kit is read from this checkout's `.claude/`, which a Windows checkout
+/// writes with CRLF line endings, while the baseline hashes the LF bytes the
+/// npm CLI wrote. On Windows, compare with CRLF folded to LF; elsewhere the
+/// bytes are compared exactly.
+fn lf(bytes: &[u8]) -> Vec<u8> {
+    if !cfg!(windows) {
+        return bytes.to_vec();
+    }
+    let mut out = Vec::with_capacity(bytes.len());
+    for (i, b) in bytes.iter().enumerate() {
+        if *b == b'\r' && bytes.get(i + 1) == Some(&b'\n') {
+            continue;
+        }
+        out.push(*b);
+    }
+    out
 }
