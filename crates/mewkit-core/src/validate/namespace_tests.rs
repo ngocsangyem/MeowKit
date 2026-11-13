@@ -100,7 +100,11 @@ fn an_unknown_subagent_reference_warns_and_names_the_file() {
     assert!(
         rows[2]
             .detail
-            .contains("skills/cook/SKILL.md → ghost-agent"),
+            // The npm CLI renders this with path.relative, so separators are the OS's.
+            .contains(&format!(
+                "{} → ghost-agent",
+                Path::new("skills").join("cook").join("SKILL.md").display()
+            )),
         "{}",
         rows[2].detail
     );

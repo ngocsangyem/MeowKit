@@ -55,7 +55,9 @@ fn an_append_adds_one_blank_line_between_entries() {
     let written = append_note(dir.path(), NoteFile::Gotchas, ENTRY).unwrap();
     assert_eq!(
         written,
-        std::path::Path::new(".meowkit/memory/gotchas.md")
+        std::path::Path::new(".meowkit")
+            .join("memory")
+            .join("gotchas.md")
             .display()
             .to_string()
     );
@@ -153,7 +155,10 @@ fn a_clean_entry_reports_the_relative_path_it_wrote() {
         out,
         format!(
             "appended to {}\n",
-            std::path::Path::new(".meowkit/memory/decisions.md").display()
+            std::path::Path::new(".meowkit")
+                .join("memory")
+                .join("decisions.md")
+                .display()
         )
     );
 }
