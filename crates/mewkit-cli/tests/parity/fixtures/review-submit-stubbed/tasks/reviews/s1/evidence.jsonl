@@ -1,0 +1,10 @@
+{"session":"s1","kind":"read","target":"diff.patch","at":"2026-11-13T00:00:00Z","reviewer":"issue-fidelity","source":"cli"}
+{"session":"s1","kind":"read","target":"briefs/issue-fidelity.md","at":"2026-11-13T00:00:00Z","reviewer":"issue-fidelity","source":"cli"}
+{"session":"s1","kind":"read","target":"diff.patch","at":"2026-11-13T00:00:00Z","reviewer":"correctness","source":"cli"}
+{"session":"s1","kind":"read","target":"briefs/correctness.md","at":"2026-11-13T00:00:00Z","reviewer":"correctness","source":"cli"}
+{"session":"s1","kind":"read","target":"diff.patch","at":"2026-11-13T00:00:00Z","reviewer":"security","source":"cli"}
+{"session":"s1","kind":"read","target":"briefs/security.md","at":"2026-11-13T00:00:00Z","reviewer":"security","source":"cli"}
+{"session":"s1","kind":"read","target":"diff.patch","at":"2026-11-13T00:00:00Z","reviewer":"tests","source":"cli"}
+{"session":"s1","kind":"read","target":"briefs/tests.md","at":"2026-11-13T00:00:00Z","reviewer":"tests","source":"cli"}
+{"session":"s1","kind":"read","target":"diff.patch","at":"2026-11-13T00:00:00Z","reviewer":"build-test","source":"cli"}
+{"session":"s1","kind":"read","target":"briefs/build-test.md","at":"2026-11-13T00:00:00Z","reviewer":"build-test","source":"cli"}

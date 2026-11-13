@@ -1,0 +1,11 @@
+{
+  "situation": "the backfill is slower than the writer, so the reader sees gaps",
+  "decisionRecommendation": "ship the writer, hold the reader until the backfill drains",
+  "rejectedAlternatives": "shipping both behind a flag doubles the states to test",
+  "nextFalsifiableCheck": "replay one hour of traffic against the half-backfilled table",
+  "risksAndRollback": "revert the writer; the table is additive",
+  "escalationPoint": "a human decides if the gap window is acceptable to users",
+  "assumptions": "the backfill rate stays within an order of magnitude",
+  "confidence": "medium",
+  "evidenceRead": ["tasks/reports/261113-demo-run-advice-1.md"]
+}

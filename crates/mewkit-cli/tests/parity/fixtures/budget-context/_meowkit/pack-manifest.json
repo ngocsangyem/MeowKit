@@ -1,0 +1,17 @@
+{
+	"schemaVersion": "1.0",
+	"base": {
+		"files": ["commands/mk/cook.md"],
+		"globs": ["rules/**", "rules-conditional/**"],
+		"exclude": []
+	},
+	"packs": {
+		"core": { "owners": ["core"], "artifactsAdd": [], "artifactsExclude": [] },
+		"product": { "owners": ["product"], "artifactsAdd": [], "artifactsExclude": [] }
+	},
+	"profiles": {
+		"core": ["core"],
+		"developer": ["core", "product"],
+		"full": ["*"]
+	}
+}

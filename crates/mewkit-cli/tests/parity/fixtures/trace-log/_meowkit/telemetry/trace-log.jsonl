@@ -1,0 +1,28 @@
+{"schema_version":"1.0","ts":"2020-01-01T00:00:00Z","event":"edit","run_id":"r1"}
+{"schema_version":"1.0","ts":"2020-01-02","event":"build","run_id":"r1"}
+{"ts":"2999-01-01T00:00:00Z","event":"edit","run_id":"r2"}
+{"ts":"2999-01-01T00:00:00Z","event":"test","run_id":"r2"}
+{"ts":"2999-01-01T00:00:00Z","event":"review","run_id":"r2"}
+{"ts":"2999-01-01T00:00:00Z","event":"lint","run_id":"r2"}
+{"ts":"2999-01-01T00:00:00Z","event":"edit","run_id":"r2"}
+{"ts":"2999-01-01T00:00:00Z","event":"edit","run_id":"r2"}
+{"ts":"2999-01-01T00:00:00Z","event":"test","run_id":"r2"}
+{"ts":"2999-01-01T00:00:00Z","event":"test","run_id":"r2"}
+{"ts":"2999-01-01T00:00:00Z","event":"edit","run_id":"r2"}
+{"ts":"2999-01-01T00:00:00Z","event":"edit","run_id":"r2"}
+{"event":"implement","run_id":"10"}
+{"event":"evaluate","run_id":"2"}
+
+{"event":null}
+{"event":5,"run_id":""}
+[1,2]
+{not json
+"just a string"
+{"ts":"bad","event":"friction","data":{"message":"Slow build.","responsibility":"ci"}}
+{"event":"friction","run_id":"r3","data":{"message":"slow   build"}}
+{"event":"friction","data":{"message":"\"Slow Build\"","responsibility":"other"}}
+{"event":"friction","data":{"message":"a flaky test","responsibility":"ci"}}
+{"event":"friction","data":{"message":"A flaky test!"}}
+{"event":"friction","data":{"message":"once"}}
+{"event":"friction","data":{"message":42}}
+{"event":"friction","data":"not an object"}

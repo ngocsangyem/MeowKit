@@ -5,18 +5,22 @@
 #![forbid(unsafe_code)]
 
 pub mod adopt;
+pub mod advice;
 pub mod backup;
+pub mod budget;
 pub mod config;
 pub mod exec;
 pub mod fsx;
 pub mod journal;
 pub mod js_number;
 pub mod js_regex;
+pub mod js_value;
 pub mod kit;
 pub mod layout;
 pub mod lock;
 pub mod memory;
 pub mod merge;
+pub mod node_path;
 pub mod note;
 pub mod orient;
 pub mod ownership;
@@ -26,6 +30,7 @@ pub mod plan_doc;
 pub mod project_root;
 pub mod repo_context;
 pub mod report;
+pub mod review;
 pub mod schema;
 pub mod semver;
 pub mod sidecar_lock;
@@ -35,8 +40,11 @@ pub mod task_state;
 pub mod task_store;
 pub mod time_utc;
 pub mod trace;
+pub mod trace_analysis;
 pub mod update;
 pub mod validate;
+pub mod verdict_gate;
+pub mod verdict_shape;
 pub mod yaml_doc;
 
 /// Version of the workspace, shared by every crate and printed by `--version`.

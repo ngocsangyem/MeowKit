@@ -1,0 +1,6 @@
+diff --git a/src/a.ts b/src/a.ts
+--- a/src/a.ts
++++ b/src/a.ts
+@@ -1,0 +1,1 @@
++const x = 1;
+TAMPER

@@ -18,10 +18,11 @@ use std::process::ExitCode;
 use clap::{CommandFactory, Parser, Subcommand};
 
 use commands::{
-    doctor::DoctorArgs, init::InitArgs, note::NoteArgs, orient::OrientArgs, plan::PlanArgs,
-    providers::ProvidersArgs, self_update::SelfUpdateArgs, task::TaskArgs,
-    task_state::TaskStateArgs, uninstall::UninstallArgs, upgrade::UpgradeArgs,
-    validate::ValidateArgs, versions::VersionsArgs,
+    advice::AdviceArgs, budget::BudgetArgs, doctor::DoctorArgs, init::InitArgs, note::NoteArgs,
+    orient::OrientArgs, plan::PlanArgs, providers::ProvidersArgs, review::ReviewArgs,
+    self_update::SelfUpdateArgs, task::TaskArgs, task_state::TaskStateArgs, trace::TraceArgs,
+    uninstall::UninstallArgs, upgrade::UpgradeArgs, validate::ValidateArgs,
+    verdict_gate::VerdictGateArgs, versions::VersionsArgs,
 };
 use failure::Failure;
 
@@ -67,6 +68,22 @@ enum Command {
     TaskState(TaskStateArgs),
     /// Check this project's structure and wiring (not that the gates block).
     Validate(ValidateArgs),
+    /// Check a review verdict's paperwork for Gate 2 (evidence, not approval).
+    #[command(name = "verdict-gate")]
+    VerdictGate(VerdictGateArgs),
+    /// Prepare, read, compose and submit a structured code review.
+    Review(ReviewArgs),
+    /// Athena supervision checkpoints: evidence in, advice out (never approval).
+    ///
+    /// Boxed: the npm CLI parses one global flag table, so this verb declares
+    /// every flag its four subcommands accept and its argument struct is twice
+    /// the size of the next largest. Inline, it would set the size of EVERY
+    /// variant of this enum.
+    Advice(Box<AdviceArgs>),
+    /// On-demand trace recall: score, audit, propose, record friction.
+    Trace(TraceArgs),
+    /// Token and USD spend from the cost log.
+    Budget(BudgetArgs),
     /// Any command this binary does not implement yet.
     #[command(external_subcommand)]
     NotPorted(Vec<String>),
@@ -87,6 +104,11 @@ fn main() -> ExitCode {
         Command::Task(args) => commands::task::run(&args),
         Command::TaskState(args) => commands::task_state::run(&args),
         Command::Validate(args) => commands::validate::run(&args),
+        Command::VerdictGate(args) => commands::verdict_gate::run(&args),
+        Command::Review(args) => commands::review::run(&args),
+        Command::Advice(args) => commands::advice::run(&args),
+        Command::Trace(args) => commands::trace::run(&args),
+        Command::Budget(args) => commands::budget::run(&args),
         Command::NotPorted(argv) => {
             let name = argv.first().map(String::as_str).unwrap_or_default();
             Err(Failure::usage(format!(

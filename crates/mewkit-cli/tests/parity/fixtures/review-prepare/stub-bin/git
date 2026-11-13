@@ -1,0 +1,27 @@
+#!/bin/sh
+# Deterministic stand-in for git on the `review prepare` path. The cases decide
+# what the repository looks like, so nothing here touches a real repository and
+# no remote is ever contacted.
+case "$1" in
+	remote)
+		printf 'origin\tgit@github.com:me/fork.git (fetch)\n'
+		printf 'origin\tgit@github.com:me/fork.git (push)\n'
+		printf 'upstream\thttps://github.com/acme/widget.git (fetch)\n'
+		;;
+	diff)
+		printf 'diff --git a/src/a.ts b/src/a.ts\n'
+		printf -- '--- a/src/a.ts\n'
+		printf '+++ b/src/a.ts\n'
+		printf '@@ -1,0 +1,1 @@\n'
+		printf '+export const helper = 1;\n'
+		;;
+	grep)
+		# `path:line:matched source` — the matched text must NOT survive into
+		# the impact map, which is what the citation case asserts.
+		printf 'src/caller.ts:4:import { helper } from "./a";\n'
+		;;
+	*)
+		echo "stub git: unsupported $1" >&2
+		exit 1
+		;;
+esac

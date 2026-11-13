@@ -1,0 +1,13 @@
+{
+  "runId": 1,
+  "skill": "",
+  "stage": "BOGUS",
+  "checkpointId": "cp-1",
+  "mission": "m",
+  "lockedDecisions": "nope",
+  "currentState": "s",
+  "evidenceRefs": [{ "path": "", "relevance": "r" }],
+  "question": "q",
+  "riskAndReversibility": "r",
+  "extraKey": 1
+}

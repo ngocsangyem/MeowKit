@@ -54,11 +54,11 @@ larger than its number.
 | `note` | 28 | 164 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
 | `orient` | 3 | 82 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
 | `validate` | 11 | 1,461 | ported (parity cases incl. the real repo kit); `--portable` on a project that carries a generated Codex tree still refers to the npm CLI |
-| `review` | 30 | 2,077 | port group 2 |
-| `advice` | 40 | 624 | port group 2 |
-| `verdict-gate` | 3 | 30 | port group 2 |
-| `trace` | 12 | 175 | port group 2 |
-| `budget` | 9 | 477 | port group 2 |
+| `review` | 30 | 2,077 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`); `cleanup` delegates to the kit's worktree script as the npm CLI does |
+| `advice` | 40 | 624 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
+| `verdict-gate` | 3 | 30 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`); a markdown-only verdict is still tolerated as in the npm CLI, where `validate-gate-2.cjs` blocks a FAIL line |
+| `trace` | 12 | 175 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
+| `budget` | 9 | 477 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
 | `visual-plan` | 56 | 3,075 | removed from the npm CLI and the kit; not ported |
 | `setup` | 2 | 707 | port group 3 |
 | `skill` (`skill env`) | 15 | 174 | port group 3 |

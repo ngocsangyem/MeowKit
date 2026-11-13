@@ -1,0 +1,86 @@
+[
+	{
+		"date": "2026-11-01T07:03:00Z",
+		"command": "cook",
+		"tier": "STANDARD",
+		"estimated_tokens": 1000,
+		"task": "bead 01"
+	},
+	{
+		"date": "2026-11-02T07:06:00Z",
+		"command": "review",
+		"tier": "COMPLEX",
+		"estimated_tokens": 2000,
+		"task": "bead 02"
+	},
+	{
+		"date": "2026-11-03T07:09:00Z",
+		"command": "cook",
+		"tier": "STANDARD",
+		"estimated_tokens": 3000,
+		"task": "bead 03"
+	},
+	{
+		"date": "2026-11-04T07:12:00Z",
+		"command": "review",
+		"tier": "COMPLEX",
+		"estimated_tokens": 4000,
+		"task": "bead 04"
+	},
+	{
+		"date": "2026-11-05T07:15:00Z",
+		"command": "cook",
+		"tier": "STANDARD",
+		"estimated_tokens": 5000,
+		"task": "bead 05"
+	},
+	{
+		"date": "2026-11-06T07:18:00Z",
+		"command": "review",
+		"tier": "COMPLEX",
+		"estimated_tokens": 6000,
+		"task": "bead 06"
+	},
+	{
+		"date": "2026-11-07T07:21:00Z",
+		"command": "cook",
+		"tier": "STANDARD",
+		"estimated_tokens": 7000,
+		"task": "bead 07"
+	},
+	{
+		"date": "2026-11-08T07:24:00Z",
+		"command": "review",
+		"tier": "COMPLEX",
+		"estimated_tokens": 8000,
+		"task": "bead 08"
+	},
+	{
+		"date": "2026-11-09T07:27:00Z",
+		"command": "cook",
+		"tier": "STANDARD",
+		"estimated_tokens": 9000,
+		"task": "bead 09"
+	},
+	{
+		"date": "2026-11-10T07:30:00Z",
+		"command": "review",
+		"tier": "COMPLEX",
+		"estimated_tokens": 10000,
+		"task": "bead 10"
+	},
+	{
+		"date": "2026-11-11T07:33:00Z",
+		"command": "cook",
+		"tier": "STANDARD",
+		"estimated_tokens": 11000,
+		"task": "bead 11"
+	},
+	{
+		"date": "2026-11-12T07:36:00Z",
+		"command": "review",
+		"tier": "COMPLEX",
+		"estimated_tokens": 12000,
+		"task": "bead 12"
+	}
+]

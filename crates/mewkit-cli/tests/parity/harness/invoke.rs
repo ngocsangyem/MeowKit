@@ -62,6 +62,10 @@ fn command(program: &str, project: &Path, home: &Path, env: &[(String, String)])
     // The npm CLI colours its errors whenever `CI` is set, even without a TTY;
     // this CLI never colours. NO_COLOR wins over CI, so both print plain text.
     cmd.env_remove("FORCE_COLOR").env("NO_COLOR", "1");
+    // `toLocaleString()` follows the host locale in Node, and this CLI prints
+    // the en-US pattern; pin the locale so a comparison cannot depend on the
+    // machine running it.
+    cmd.env("LANG", "en_US.UTF-8").env("LC_ALL", "en_US.UTF-8");
     cmd.current_dir(project)
         .env("HOME", home)
         .env("USERPROFILE", home);

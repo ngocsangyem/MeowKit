@@ -101,11 +101,19 @@ fn keeps_the_review_session_proof_bundle_fields_the_coverage_hook_reads() {
     assert_eq!(back["coverage"]["report"]["complete"], json!(true));
 }
 
+fn native(path: &str) -> String {
+    path.replace('/', std::path::MAIN_SEPARATOR_STR)
+}
+
 #[test]
 fn resolve_verdict_path_handles_a_slug_a_markdown_sibling_and_an_explicit_path() {
     assert_eq!(
         resolve_verdict_path("261112-rust-port"),
-        "tasks/reviews/261112-rust-port-verdict.json"
+        native("tasks/reviews/261112-rust-port-verdict.json")
+    );
+    assert_eq!(
+        resolve_verdict_path("x/../y"),
+        native("tasks/reviews/y-verdict.json")
     );
     assert_eq!(
         resolve_verdict_path("tasks/reviews/x-verdict.md"),

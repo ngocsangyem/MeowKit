@@ -1,0 +1,1 @@
+{"schema_version":"1","slug":"risk","gate":"review","decision":"PASS_WITH_RISK","dimensions":[{"name":"Tests","verdict":"WARN","note":"thin"}],"created_at":"t"}

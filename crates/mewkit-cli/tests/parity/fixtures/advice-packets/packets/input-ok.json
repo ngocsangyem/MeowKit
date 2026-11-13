@@ -1,0 +1,21 @@
+{
+  "runId": "demo-run",
+  "skill": "mk:cook",
+  "stage": "REVIEW",
+  "checkpointId": "cp-1",
+  "mission": "finish the migration without breaking the readers",
+  "lockedDecisions": ["the schema stays additive"],
+  "currentState": "the writer is done, the reader is half ported",
+  "workerSummary": "two files changed, one test added",
+  "evidenceRefs": [
+    {
+      "path": "tasks/reports/261113-demo-run-advice-1.md",
+      "relevance": "the prior directive",
+      "provenance": "written by this run",
+      "summary": "what the last checkpoint asked for"
+    }
+  ],
+  "priorDirective": null,
+  "question": "is the reader safe to ship before the backfill?",
+  "riskAndReversibility": "reversible by reverting one commit"
+}

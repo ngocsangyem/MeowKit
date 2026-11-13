@@ -1,0 +1,9 @@
+#!/bin/sh
+# Stand-in for the GitHub CLI on the one path that WRITES. Every call is
+# appended to a file inside the project, so the parity comparison of the file
+# tree is also a comparison of what each CLI would have posted — and a case
+# that expects NO post fails loudly if a call appears.
+printf '%s\n' "$*" >> gh-calls.txt
+case "$1" in
+	api) printf '%s\n' "${STUB_HEAD:-hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh}" ;;
+esac
