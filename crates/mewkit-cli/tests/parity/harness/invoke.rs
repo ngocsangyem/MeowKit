@@ -59,6 +59,9 @@ fn command(program: &str, project: &Path, home: &Path, env: &[(String, String)])
     for var in STRIPPED_VARS {
         cmd.env_remove(var);
     }
+    // The npm CLI colours its errors whenever `CI` is set, even without a TTY;
+    // this CLI never colours. NO_COLOR wins over CI, so both print plain text.
+    cmd.env_remove("FORCE_COLOR").env("NO_COLOR", "1");
     cmd.current_dir(project)
         .env("HOME", home)
         .env("USERPROFILE", home);
