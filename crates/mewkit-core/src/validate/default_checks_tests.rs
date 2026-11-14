@@ -6,17 +6,17 @@ use super::{ValidateMode, build_default_checks, detect_validate_mode};
 
 fn run(mode: ValidateMode, portable: bool) -> (tempfile::TempDir, Vec<super::CheckResult>) {
     let dir = tempfile::tempdir().expect("a temp dir");
-    let results = build_default_checks(&dir.path().join(".claude"), dir.path(), mode, portable)
-        .expect("every default check is ported");
+    let results = build_default_checks(&dir.path().join(".claude"), dir.path(), mode, portable);
     (dir, results)
 }
 
 #[test]
-fn the_cli_source_tree_is_what_makes_a_checkout_authoring() {
+fn the_cli_crate_is_what_makes_a_checkout_authoring() {
     let dir = tempfile::tempdir().expect("a temp dir");
     assert_eq!(detect_validate_mode(dir.path()), ValidateMode::FlatCopy);
-    fs::create_dir_all(dir.path().join("packages").join("mewkit").join("src"))
-        .expect("create the source tree");
+    let manifest = dir.path().join(crate::kit_source::KIT_SOURCE_MARKER);
+    fs::create_dir_all(manifest.parent().unwrap()).expect("create the crate dir");
+    fs::write(&manifest, "[package]\nname = \"mewkit-cli\"\n").expect("write the manifest");
     assert_eq!(detect_validate_mode(dir.path()), ValidateMode::Authoring);
 }
 
@@ -125,30 +125,17 @@ fn portable_adds_the_provider_contract_rows_in_either_mode() {
 }
 
 #[test]
-fn a_generated_codex_tree_under_portable_is_refused_by_name() {
-    // The projection rows need the portability-policy engine, which is not
-    // ported: refusing beats reporting a subset of the projection.
+fn a_codex_tree_under_portable_points_at_the_target_check() {
     let dir = tempfile::tempdir().expect("a temp dir");
     fs::create_dir_all(dir.path().join(".codex")).expect("create the codex tree");
-    let refusal = build_default_checks(
-        &dir.path().join(".claude"),
-        dir.path(),
-        ValidateMode::FlatCopy,
-        true,
-    )
-    .expect_err("a projected tree is refused");
-    assert!(
-        refusal.to_string().contains("Codex projection rows"),
-        "{refusal}"
-    );
-    // Without `--portable` the same project validates normally.
-    assert!(
-        build_default_checks(
-            &dir.path().join(".claude"),
-            dir.path(),
-            ValidateMode::FlatCopy,
-            false
-        )
-        .is_ok()
-    );
+    let claude = dir.path().join(".claude");
+    let with = build_default_checks(&claude, dir.path(), ValidateMode::FlatCopy, true);
+    let row = with
+        .iter()
+        .find(|r| r.name == "Codex projection")
+        .expect("the pointer row");
+    assert_eq!(row.status, Status::Na);
+    assert!(row.detail.contains("--target codex"), "{}", row.detail);
+    let without = build_default_checks(&claude, dir.path(), ValidateMode::FlatCopy, false);
+    assert!(without.iter().all(|r| r.name != "Codex projection"));
 }

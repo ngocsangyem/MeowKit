@@ -1,13 +1,10 @@
 //! The project config surface: one declaration, used for validation of a parsed
 //! config.
 //!
-//! It does NOT generate the published JSON Schema that the config's own
-//! `$schema` line points at. `buildConfigSchema`/`nestedShape` — the zod
-//! builders the TypeScript emits `config-v1.json` from — are not ported, and no
-//! Rust emitter exists; [`SCHEMA_URL`] below is the URL the stub writes, not a
-//! promise that this crate produces the document. Which crate publishes
-//! `config-v1.json` after cutover is a phase 7 decision. [`super::shape_check`]
-//! is the validation half that the zod builders also provided.
+//! The published JSON Schema that the config's own `$schema` line points at is
+//! rendered from this same surface by [`super::json_schema`], and a test holds
+//! the committed `schemas/config-v1.json` to that rendering. [`super::shape_check`]
+//! is the validation half.
 //!
 //! Observer toggles are not written out here. They are derived from the handler
 //! registry, so an observer cannot exist without a toggle and a toggle cannot

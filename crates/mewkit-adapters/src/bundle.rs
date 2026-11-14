@@ -1,7 +1,7 @@
 //! An authored runtime bundle the kit carries (Codex, Cursor), and which of
 //! its skills to install.
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use serde_json::Value;
 
@@ -14,6 +14,9 @@ pub struct Spec {
     pub runtime: &'static str,
     /// The bundle's source path in the repo, which the kit artifact keeps.
     pub dir: &'static str,
+    /// Where kits released before the bundles moved keep it. Read only when
+    /// `dir` is absent, so a new binary still installs from an older kit.
+    pub legacy_dir: &'static str,
     /// Where skill directories live inside `root`, with a trailing `/`.
     pub skills: &'static str,
 }
@@ -24,6 +27,20 @@ pub const ALL_PACKS: &str = "all";
 /// valid pack name, so it cannot collide with one.
 pub const DEFAULT_ONLY: &str = "@default";
 
+impl Spec {
+    /// The bundle directory inside `kit_dir`: `dir`, or `legacy_dir` when only
+    /// an older kit layout is present.
+    pub fn base(&self, kit_dir: &Path) -> PathBuf {
+        let current = kit_dir.join(self.dir);
+        let legacy = kit_dir.join(self.legacy_dir);
+        if !current.join("root").is_dir() && legacy.join("root").is_dir() {
+            legacy
+        } else {
+            current
+        }
+    }
+}
+
 pub struct Bundle {
     pub spec: &'static Spec,
     /// Files of `<kit>/<BUNDLE>/root`; their paths map 1:1 onto project paths.
@@ -33,11 +50,11 @@ pub struct Bundle {
 
 impl Bundle {
     pub fn open(kit_dir: &Path, spec: &'static Spec) -> Result<Self, EmitError> {
-        let base = kit_dir.join(spec.dir);
+        let base = spec.base(kit_dir);
         let root = base.join("root");
         if !root.is_dir() {
             return Err(EmitError::Kit(format!(
-                "the kit has no {} bundle at {}/root (kit too old for mewkit-next?)",
+                "the kit has no {} bundle at {}/root (kit too old for this binary?)",
                 spec.runtime, spec.dir
             )));
         }
@@ -141,5 +158,30 @@ impl Bundle {
             }
         }
         Ok(skills)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const SPEC: Spec = Spec {
+        runtime: "Test",
+        dir: "kit/bundles/test",
+        legacy_dir: "old/modules/test",
+        skills: "skills/",
+    };
+
+    #[test]
+    fn base_prefers_the_current_layout_and_falls_back_to_the_legacy_one() {
+        let kit = tempfile::tempdir().unwrap();
+        // Neither present: the current path, so the error names where it should be.
+        assert_eq!(SPEC.base(kit.path()), kit.path().join(SPEC.dir));
+
+        std::fs::create_dir_all(kit.path().join(SPEC.legacy_dir).join("root")).unwrap();
+        assert_eq!(SPEC.base(kit.path()), kit.path().join(SPEC.legacy_dir));
+
+        std::fs::create_dir_all(kit.path().join(SPEC.dir).join("root")).unwrap();
+        assert_eq!(SPEC.base(kit.path()), kit.path().join(SPEC.dir));
     }
 }

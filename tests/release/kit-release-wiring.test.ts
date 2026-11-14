@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const REPO = join(HERE, "..", "..", "..", "..", "..");
+const REPO = join(HERE, "..", "..");
 
 describe("kit ship set", () => {
 	it("gives the ship set one source, read by the zip builder", () => {

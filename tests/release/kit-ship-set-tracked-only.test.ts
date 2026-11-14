@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const REPO = join(HERE, "..", "..", "..", "..", "..");
+const REPO = join(HERE, "..", "..");
 
 interface ShipSetModule {
 	excludeMatcher(patterns: string[]): (rel: string) => boolean;

@@ -26,7 +26,7 @@ const RULES = [
     // superseded values verbatim, so both are exempt for historical accuracy.
     ignoreFiles: ['changelog.mdx', 'archive.mdx'],
   },
-  // Inventory-derived counts are checked by \`scripts/harness-inventory.cjs --check\`; this
+  // Inventory-derived counts are checked by \`cargo test -p mewkit-core --test bless_inventory_counts\`; this
   // terminology-only linter must not carry a second volatile count source.
   // Legacy: memory-loader was deleted in v2.4.1
   {

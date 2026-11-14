@@ -122,9 +122,9 @@ pub fn check_substrate(claude_dir: &Path, missing_view_severity: Status) -> Vec<
             "Substrate view present",
             missing_view_severity,
             if missing_view_severity == Status::Warn {
-                "No .claude/harness-substrate.md — run `node scripts/harness-inventory.cjs --substrate --emit`"
+                "No .claude/harness-substrate.md — run `MEWKIT_BLESS=1 cargo test -p mewkit-core --test bless_substrate_view`"
             } else {
-                "Missing .claude/harness-substrate.md (run `node scripts/harness-inventory.cjs --substrate --emit`)"
+                "Missing .claude/harness-substrate.md (run `MEWKIT_BLESS=1 cargo test -p mewkit-core --test bless_substrate_view`)"
             },
             Section::Substrate,
         ));
@@ -139,7 +139,7 @@ pub fn check_substrate(claude_dir: &Path, missing_view_severity: Status) -> Vec<
             if in_sync {
                 view_path.display().to_string()
             } else {
-                "harness-substrate.md is stale — run `node scripts/harness-inventory.cjs --substrate --emit`".to_string()
+                "harness-substrate.md is stale — run `MEWKIT_BLESS=1 cargo test -p mewkit-core --test bless_substrate_view`".to_string()
             },
             Section::Substrate,
         ));

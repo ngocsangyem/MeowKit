@@ -189,8 +189,8 @@ fn packs_select_the_default_pack_and_its_dependencies() {
     let all = Codex.prepare(&request(&kit, &p.scope, &[], &[])).unwrap();
     assert!(written(&all).count() > written(&plan).count());
     assert!(
-        kit.dir
-            .join(BUNDLE.dir)
+        BUNDLE
+            .base(&kit.dir)
             .join("catalog/skill-packs.json")
             .is_file()
     );

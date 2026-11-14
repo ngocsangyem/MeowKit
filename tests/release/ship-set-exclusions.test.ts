@@ -51,7 +51,7 @@ describe("ship set withholding", () => {
 		// of validating anything.
 		for (const name of ["skill-schema.json", "harness-metadata-schema.json"]) {
 			expect(shipped).not.toContain(`.claude/schemas/${name}`);
-			expect(tracked.filter((path) => path.endsWith(`/${name}`))).toEqual([`packages/mewkit/schemas/${name}`]);
+			expect(tracked.filter((path) => path.endsWith(`/${name}`))).toEqual([`crates/mewkit-core/schemas/${name}`]);
 		}
 	});
 

@@ -19,7 +19,7 @@ use serde_json::{Map, Value};
 use super::json_schema_lite::{format_violation, validate_against_schema};
 use super::runtime_contract::{RUNTIME_KEY, documented_python_scripts, runtime_contract_errors};
 
-const SKILL_SCHEMA: &str = include_str!("../../../../packages/mewkit/schemas/skill-schema.json");
+const SKILL_SCHEMA: &str = include_str!("../../schemas/skill-schema.json");
 
 /// Recommended-but-not-required fields. Missing ⇒ WARN.
 const RECOMMENDED_FIELDS: [&str; 1] = ["when_to_use"];

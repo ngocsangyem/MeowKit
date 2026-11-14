@@ -794,8 +794,8 @@
     },
     {
       "path": ".agents/skills/mk-context-audit/SKILL.md",
-      "sha256": "36af938c924efbc1f9dab3ea93f737b26872f6bbf864f4df417a710c758b27a7",
-      "size": 4948
+      "sha256": "122343f65011a49234fea1a947816d2faa8e45be71613c84454e0957c3d5ec09",
+      "size": 5025
     },
     {
       "path": ".agents/skills/mk-context-audit/references/.gitkeep",

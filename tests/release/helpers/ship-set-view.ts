@@ -19,8 +19,8 @@ interface ShipSetModule {
 
 const require = createRequire(import.meta.url);
 
-/** The repository root, five levels up from `src/kit/__tests__/helpers/`. */
-export const REPO = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..", "..", "..");
+/** The repository root, two levels up from `tests/release/helpers/`. */
+export const REPO = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
 const shipSet = require(join(REPO, "scripts", "kit-ship-set.cjs")) as ShipSetModule;
 

@@ -51,7 +51,7 @@ pub fn plan(kit: &Kit, root: &Path, req: &Request<'_>) -> Outcome {
         }
         return out;
     }
-    let bundle = kit.dir.join(BUNDLE.dir);
+    let bundle = BUNDLE.base(&kit.dir);
     let catalog = match mcp_profiles::load(&bundle) {
         Ok(c) => c,
         Err(e) => {

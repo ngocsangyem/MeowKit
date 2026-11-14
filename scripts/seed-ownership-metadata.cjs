@@ -11,7 +11,7 @@
  * NOT wired to CI. Run once, then hand-promote critical/high values as needed.
  *
  * Governance owner is distinct from install-metadata.ts owner (install provenance).
- * See packages/mewkit/schemas/harness-metadata-schema.json for allowed enum values —
+ * See crates/mewkit-core/schemas/harness-metadata-schema.json for allowed enum values —
  * the enums travel with the validator that enforces them.
  *
  * Usage (from meowkit/ root):

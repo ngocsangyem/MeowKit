@@ -26,7 +26,7 @@ describe("the config stub", () => {
 	});
 
 	it("points at the schema the generator publishes", () => {
-		const schema = require_(join(REPO_ROOT, "packages/mewkit/schemas/config-v1.json")) as { $id: string };
+		const schema = require_(join(REPO_ROOT, "crates/mewkit-core/schemas/config-v1.json")) as { $id: string };
 		expect(schema.$id).toBe(SCHEMA_URL);
 	});
 

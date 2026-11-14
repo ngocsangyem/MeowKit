@@ -176,13 +176,8 @@ describe("the two descriptions of the config surface agree", () => {
 		expect(fromTable).toEqual(ENV_OVERRIDES);
 	});
 
-	it("the published JSON Schema is a no-op to regenerate", () => {
-		const out = execFileSync("node", ["scripts/generate-config-schema.cjs", "--check"], { cwd: REPO_ROOT, encoding: "utf8" });
-		expect(out).toContain("up to date");
-	});
-
 	it("declares no gates or paths property, and no pm.auto", () => {
-		const schema = require_(join(REPO_ROOT, "packages/mewkit/schemas/config-v1.json")) as {
+		const schema = require_(join(REPO_ROOT, "crates/mewkit-core/schemas/config-v1.json")) as {
 			properties: Record<string, unknown>;
 			additionalProperties: boolean;
 		};
@@ -190,7 +185,7 @@ describe("the two descriptions of the config surface agree", () => {
 		expect(Object.keys(schema.properties)).not.toContain("paths");
 		expect(Object.keys(schema.properties)).not.toContain("pm");
 		expect(schema.additionalProperties).toBe(false);
-		const text = require_("node:fs").readFileSync(join(REPO_ROOT, "packages/mewkit/schemas/config-v1.json"), "utf8") as string;
+		const text = require_("node:fs").readFileSync(join(REPO_ROOT, "crates/mewkit-core/schemas/config-v1.json"), "utf8") as string;
 		expect(text).not.toContain("pm.auto");
 		expect(text).not.toContain('"auto"');
 	});

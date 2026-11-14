@@ -14,11 +14,10 @@ pub struct OrientArgs {
     #[arg(long)]
     pub json: bool,
     /// Record the advisory `orient_run` measurement (the default).
-    ///
-    /// The npm CLI records only when `--record` is passed, because its parser
-    /// pre-sets every declared boolean to false; its own help says recording is
-    /// the default. This CLI does what the help says. The SessionStart hook
-    /// passes `--no-record`, so it is unaffected.
+    // The npm CLI records only when `--record` is passed, because its parser
+    // pre-sets every declared boolean to false; its own help says recording is
+    // the default. This CLI does what the help says. The SessionStart hook
+    // passes `--no-record`, so it is unaffected.
     #[arg(long, overrides_with = "no_record")]
     pub record: bool,
     /// Skip the advisory measurement, leaving the run strictly read-only.

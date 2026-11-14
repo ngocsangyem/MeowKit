@@ -39,7 +39,7 @@ else
 fi
 
 step "Inventory check (README, website and index counts)"
-node scripts/harness-inventory.cjs --check >/tmp/rc-inventory.txt 2>&1 && ok "harness-inventory --check" || { bad "harness-inventory --check"; tail -20 /tmp/rc-inventory.txt; }
+cargo test -p mewkit-core --locked --test bless_substrate_view --test bless_inventory_counts --test bless_docs_manifest >/tmp/rc-inventory.txt 2>&1 && ok "generated artifacts match the inventory" || { bad "generated artifacts drifted (regenerate with MEWKIT_BLESS=1)"; tail -20 /tmp/rc-inventory.txt; }
 
 step "Version sync (root ↔ manifest ↔ kit contract; CLI recorded)"
 node scripts/sync-versions.cjs && ok "versions consistent" || bad "version mismatch"

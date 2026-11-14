@@ -367,12 +367,12 @@ export function buildInventory(claudeDir: string): Inventory {
  *
  * It describes the ENUMS this engine enforces, which makes it engine knowledge:
  * a copy installed per project could disagree with the code reading it, and the
- * published kit would carry a file only a maintainer tool opens. `../../schemas/`
- * resolves to the package root from both `src/core/` and the compiled
- * `dist/core/`, so the source tree and a published install read the same file.
+ * published kit would carry a file only a maintainer tool opens. It lives with
+ * the Rust crate that embeds it; this path reaches it from both `src/core/` and
+ * the compiled `dist/core/` inside the repository.
  */
 export const METADATA_SCHEMA_PATH = fileURLToPath(
-	new URL("../../schemas/harness-metadata-schema.json", import.meta.url),
+	new URL("../../../../crates/mewkit-core/schemas/harness-metadata-schema.json", import.meta.url),
 );
 
 interface SchemaEnums {

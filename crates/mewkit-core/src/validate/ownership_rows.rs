@@ -21,11 +21,10 @@ use super::inventory::REQUIRED_FIELDS;
 use super::inventory_build::build_inventory;
 use super::result::{CheckResult, Section, Status};
 
-/// The governance schema, as shipped in `packages/mewkit/schemas/`. Embedded
+/// The governance schema, as shipped in `crates/mewkit-core/schemas/`. Embedded
 /// from there rather than copied so the two CLIs cannot disagree about an enum:
 /// one file, read by both, and `cargo build` fails if it moves.
-const METADATA_SCHEMA: &str =
-    include_str!("../../../../packages/mewkit/schemas/harness-metadata-schema.json");
+const METADATA_SCHEMA: &str = include_str!("../../schemas/harness-metadata-schema.json");
 
 /// The allowed values for one schema property.
 pub fn schema_enum(property: &str) -> BTreeSet<String> {

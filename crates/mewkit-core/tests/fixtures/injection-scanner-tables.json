@@ -1,0 +1,252 @@
+{
+  "injection": [
+    {
+      "source": "ignore\\s+(?:previous|all)\\s+instructions",
+      "flags": "i"
+    },
+    {
+      "source": "disregard\\s+(?:rules|instructions|safety)",
+      "flags": "i"
+    },
+    {
+      "source": "you\\s+are\\s+now",
+      "flags": "i"
+    },
+    {
+      "source": "forget\\s+your",
+      "flags": "i"
+    },
+    {
+      "source": "new\\s+system\\s+prompt",
+      "flags": "i"
+    },
+    {
+      "source": "<\\/?memory-data[^>]*>",
+      "flags": "i"
+    },
+    {
+      "source": "pretend\\s+you\\s+are",
+      "flags": "i"
+    },
+    {
+      "source": "act\\s+as\\s+if",
+      "flags": "i"
+    },
+    {
+      "source": "your\\s+(?:previous\\s+)?instructions\\s+(?:have\\s+been\\s+)?updated",
+      "flags": "i"
+    },
+    {
+      "source": "call\\s+the\\s+\\w+\\s+tool",
+      "flags": "i"
+    },
+    {
+      "source": "use\\s+the\\s+(?:bash|write|edit|read)\\s+tool",
+      "flags": "i"
+    },
+    {
+      "source": "add\\s+this\\s+to\\s+your\\s+memory",
+      "flags": "i"
+    },
+    {
+      "source": "\\bDAN\\s+mode\\b",
+      "flags": "i"
+    },
+    {
+      "source": "you'?re\\s+an?\\s+uncensored",
+      "flags": "i"
+    },
+    {
+      "source": "\\bjailbreak\\b",
+      "flags": "i"
+    },
+    {
+      "source": "(?:reveal|print|repeat|show)\\s+(?:your|the)\\s+(?:system\\s+)?(?:prompt|instructions)",
+      "flags": "i"
+    },
+    {
+      "source": "(?:override|bypass|ignore)\\s+(?:the\\s+)?(?:safety|security|content)\\s+(?:filter|policy|guidelines)",
+      "flags": "i"
+    },
+    {
+      "source": "without\\s+(?:any\\s+)?restrictions?",
+      "flags": "i"
+    },
+    {
+      "source": "exfiltrat",
+      "flags": "i"
+    },
+    {
+      "source": "(?:send|post|upload|leak)\\s+(?:the\\s+)?(?:secret|token|password|api[_-]?key|env|credentials?)",
+      "flags": "i"
+    },
+    {
+      "source": "do\\s+not\\s+(?:tell|inform|alert|warn)\\s+(?:the\\s+)?(?:user|human)",
+      "flags": "i"
+    },
+    {
+      "source": "system\\s*:\\s*you\\s+(?:are|must)",
+      "flags": "i"
+    },
+    {
+      "source": "developer\\s+mode\\s+(?:enabled|on)",
+      "flags": "i"
+    },
+    {
+      "source": "from\\s+now\\s+on[, ]+you\\s+(?:are|will|must|should)",
+      "flags": "i"
+    },
+    {
+      "source": "stay\\s+in\\s+character",
+      "flags": "i"
+    },
+    {
+      "source": "roleplay\\s+as",
+      "flags": "i"
+    },
+    {
+      "source": "act\\s+as\\s+(?:an?\\s+)?(?:dan|jailbroken|unfiltered|uncensored)",
+      "flags": "i"
+    },
+    {
+      "source": "this\\s+is\\s+(?:just\\s+)?a\\s+test\\s+of\\s+your",
+      "flags": "i"
+    },
+    {
+      "source": "decode\\s+the\\s+following\\s+(?:base64|rot13|text|string)",
+      "flags": "i"
+    },
+    {
+      "source": "\\bsudo\\s+mode\\b",
+      "flags": "i"
+    },
+    {
+      "source": "disable\\s+(?:your\\s+)?(?:safety|guardrails?|filters?)",
+      "flags": "i"
+    },
+    {
+      "source": "turn\\s+off\\s+(?:your\\s+)?safety",
+      "flags": "i"
+    },
+    {
+      "source": "send\\s+(?:it|this|them|the\\s+\\w+)\\s+to\\s+https?:\\/\\/",
+      "flags": "i"
+    },
+    {
+      "source": "(?:post|upload)\\s+(?:the\\s+)?(?:secret|token|key|data|env|file)\\s+to\\b",
+      "flags": "i"
+    },
+    {
+      "source": "what\\s+(?:is|are)\\s+your\\s+(?:initial\\s+|original\\s+)?instructions",
+      "flags": "i"
+    },
+    {
+      "source": "repeat\\s+the\\s+(?:words|text|content)\\s+above",
+      "flags": "i"
+    },
+    {
+      "source": "ignore\\s+(?:the\\s+)?(?:above|preceding|prior)\\b",
+      "flags": "i"
+    },
+    {
+      "source": "override\\s+(?:your\\s+)?(?:prior|previous)\\s+(?:directives|rules|instructions)",
+      "flags": "i"
+    },
+    {
+      "source": "new\\s+persona\\b",
+      "flags": "i"
+    }
+  ],
+  "secret": [
+    {
+      "source": "sk-ant-[A-Za-z0-9_-]{20,}",
+      "flags": "g",
+      "replacement": "[REDACTED-ANTHROPIC-KEY]"
+    },
+    {
+      "source": "sk-[A-Za-z0-9_-]{20,}",
+      "flags": "g",
+      "replacement": "[REDACTED-OPENAI-KEY]"
+    },
+    {
+      "source": "sk_(live|test)_[A-Za-z0-9]{16,}",
+      "flags": "g",
+      "replacement": "[REDACTED-STRIPE-KEY]"
+    },
+    {
+      "source": "rk_(live|test)_[A-Za-z0-9]{16,}",
+      "flags": "g",
+      "replacement": "[REDACTED-STRIPE-RESTRICTED-KEY]"
+    },
+    {
+      "source": "pk_(live|test)_[A-Za-z0-9]{16,}",
+      "flags": "g",
+      "replacement": "[REDACTED-STRIPE-PUB-KEY]"
+    },
+    {
+      "source": "AKIA[0-9A-Z]{16}",
+      "flags": "g",
+      "replacement": "[REDACTED-AWS-KEY]"
+    },
+    {
+      "source": "ghp_[A-Za-z0-9]{30,}",
+      "flags": "g",
+      "replacement": "[REDACTED-GH-TOKEN]"
+    },
+    {
+      "source": "gho_[A-Za-z0-9]{30,}",
+      "flags": "g",
+      "replacement": "[REDACTED-GH-OAUTH]"
+    },
+    {
+      "source": "glpat-[A-Za-z0-9_-]{20,}",
+      "flags": "g",
+      "replacement": "[REDACTED-GITLAB-PAT]"
+    },
+    {
+      "source": "xox[bpars]-[0-9]+-[0-9]+-[0-9]+-[A-Za-z0-9]{24,}",
+      "flags": "g",
+      "replacement": "[REDACTED-SLACK-TOKEN]"
+    },
+    {
+      "source": "https:\\/\\/hooks\\.slack\\.com\\/services\\/[A-Z0-9/]+",
+      "flags": "g",
+      "replacement": "[REDACTED-SLACK-WEBHOOK]"
+    },
+    {
+      "source": "eyJ[A-Za-z0-9_-]{20,}\\.[A-Za-z0-9_-]{20,}\\.[A-Za-z0-9_-]{20,}",
+      "flags": "g",
+      "replacement": "[REDACTED-JWT]"
+    },
+    {
+      "source": "-----BEGIN [A-Z ]*PRIVATE KEY-----[^-]*-----END [A-Z ]*PRIVATE KEY-----",
+      "flags": "g",
+      "replacement": "[REDACTED-PRIVATE-KEY]"
+    },
+    {
+      "source": "(api[_-]?key|apikey|password|passwd|secret|token)(\\s*[:=]\\s*)[\"']?[A-Za-z0-9_/+=.-]{16,}[\"']?",
+      "flags": "gi",
+      "replacement": "$1$2[REDACTED]"
+    },
+    {
+      "source": "Bearer [A-Za-z0-9_/+=.-]{20,}",
+      "flags": "g",
+      "replacement": "Bearer [REDACTED]"
+    },
+    {
+      "source": "(mysql|postgres|postgresql|mongodb|redis):\\/\\/[^\\s\"']+",
+      "flags": "gi",
+      "replacement": "$1://[REDACTED-DB-URL]"
+    },
+    {
+      "source": "[A-Za-z0-9._%+-]{3,64}@[A-Za-z0-9-]{1,63}(?:\\.[A-Za-z0-9-]{1,63}){0,8}\\.[A-Za-z]{2,24}",
+      "flags": "g",
+      "replacement": "[REDACTED-EMAIL]"
+    },
+    {
+      "source": "(MEOWKIT_[A-Z_]*(?:KEY|SECRET|TOKEN|PASSWORD))(\\s*=\\s*)\\S{8,}",
+      "flags": "g",
+      "replacement": "$1$2[REDACTED]"
+    }
+  ]
+}

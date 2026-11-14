@@ -25,6 +25,7 @@
 pub mod config_rules;
 pub mod config_scalar;
 pub mod config_values;
+pub mod json_schema;
 pub mod key_surface;
 pub mod load_config;
 pub mod observer_names;
@@ -38,6 +39,7 @@ pub mod yaml_grammar;
 
 pub use config_rules::{ConfigScope, RuleError, apply_rules};
 pub use config_values::{ConfigValue, ConfigValues};
+pub use json_schema::{config_json_schema, render_config_json_schema};
 pub use load_config::{
     CONFIG_REL, ConfigFailure, LoadedConfig, load_config_file, project_config_path,
     user_config_path,
