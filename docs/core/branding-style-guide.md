@@ -27,7 +27,7 @@ Do **not** wrap runtime-specific claims in `> **On Claude Code:** ...` blockquot
 
 These are operational tokens, not prose:
 
-- `mewkit` / `npx mewkit ...` — CLI commands
+- `mewkit` / `mk` — CLI commands (`mk` is the short alias)
 - `mk:` — skill namespace prefix
 - `MEOW_*` / `MEOWKIT_*` — env var names
 - `$CLAUDE_PROJECT_DIR`, `${CLAUDE_PLUGIN_DATA}`, hook event names, tool names — runtime-injected APIs

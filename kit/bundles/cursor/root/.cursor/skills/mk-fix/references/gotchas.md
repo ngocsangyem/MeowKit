@@ -30,7 +30,7 @@ Common failure patterns when fixing bugs. Update this file when Codex produces w
 
 ### Ignoring Memory
 **Symptom:** Same bug class fixed repeatedly.
-**Fix:** Search `.meowkit/memory/` for the task keywords at Step 0.5 and open only the matching entries. Append a new lesson through `npx mewkit note gotchas` in the store format (see SKILL.md Step 6).
+**Fix:** Search `.meowkit/memory/` for the task keywords at Step 0.5 and open only the matching entries. Append a new lesson through `mewkit note gotchas` in the store format (see SKILL.md Step 6).
 
 ### Fixing Without Evidence
 **Symptom:** "I think I know what's wrong" → fix deployed → bug persists.

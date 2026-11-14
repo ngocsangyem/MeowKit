@@ -95,4 +95,4 @@ node .cursor/scripts/skill-python.cjs .cursor/skills/llms/scripts/generate-llms-
 
 ## Gotchas
 
-- **Python venv required**: run `npx mewkit setup` once from the project root before invoking this skill. Re-run after upgrading the toolkit.
+- **Python venv required**: run `mewkit setup` once from the project root before invoking this skill. Re-run after upgrading the toolkit.

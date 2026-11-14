@@ -2379,7 +2379,7 @@
       "title": "mk:resolving-merge-conflicts",
       "description": "Resolves an in-progress merge or rebase hunk by hunk, then runs the project checks. NOT for mk:ship.",
       "sourcePath": "skills/resolving-merge-conflicts/SKILL.md",
-      "sourceHash": "0f03d4916168202c55221901a8f5f63b2374b36a1d29a7c118745883e287c714",
+      "sourceHash": "7925ea93288e34ec66ec0beb2a0b9aae6acc8c60dec9f16689488a7450037466",
       "aliases": [],
       "owner": "git",
       "phase": null,

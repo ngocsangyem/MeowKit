@@ -35,6 +35,7 @@ pub enum TaskCommand {
         // durable state.
         #[arg(long, overrides_with = "no_activate")]
         activate: bool,
+        /// The explicit opt-out, accepted so a caller can state the default.
         #[arg(long = "no-activate", overrides_with = "activate")]
         no_activate: bool,
     },

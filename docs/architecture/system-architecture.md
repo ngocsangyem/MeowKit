@@ -40,62 +40,62 @@ Agile/Scrum: 3 conditional rules in `.claude/skills/agent-detector/references/ag
 
 ## Install Profiles & Packs (modular install)
 
-The release ships ONE full tarball; install size is controlled at install time, not at packaging time. `.claude/pack-manifest.json` maps 7 profiles (`core`/`developer`/`product`/`atlassian`/`security`/`research`/`full`) onto the governance `owner` field plus a `base` essentials set (safety rules, all hooks, settings, statusline, core `/mk:*` commands).
+The release ships ONE full kit zip; install size is controlled at install time, not at packaging time. `.claude/pack-manifest.json` maps 7 profiles (`core`/`developer`/`product`/`atlassian`/`security`/`research`/`full`) onto the governance `owner` field plus a `base` essentials set (safety rules, all hooks, settings, statusline, core `/mk:*` commands).
 
-- **Resolver** (`packages/mewkit/src/core/pack-resolver.ts`): a pure function turning a profile → the exact set of `.claude/`-relative paths. `full`/`*` short-circuits to `collectFiles` (byte-identical to today's install). Skills expand to their whole directory; `depends_on` closure is implemented but inert (no edges yet).
-- **Filter** (`smart-update.ts`): an optional `allowedPaths` skip-predicate writes only a profile's files; `init --profile` records `profile`+`packs` in `metadata.json` (`full`/none ⇒ `packs: undefined` sentinel = auto-adopt). A profile downgrade (full→core) runs an opt-in trim pass (`trimToProfile`, init-only) that deletes pristine excluded files and preserves user-modified ones.
-- **`mewkit pack`** (`commands/pack.ts`): `list`/`add`/`remove` manage domains post-install. `remove` deletes only pristine, pack-exclusive, kit-owned files — base-covered, dual-homed, settings.json-referenced, and user-edited files survive — and rebuilds metadata write-before-delete for crash safety.
-- **Pack-aware `upgrade`**: reads `metadata.packs` (corrupt/absent ⇒ full); a partial install upgrades only its packs, removed packs stay removed.
-- **Guardrails**: `mewkit validate --packs` (manifest coherence, completeness, the exact-path safety invariant) and `mewkit budget context --profile <p> [--fail-over N]` (loadable-context estimator) — both wired into CI. The safety invariant is enforced by an explicit exact-path assertion (not by registering dispatched files in the inventory, which would collide with the Phase-2 ownership check).
+- **Selection** (`crates/mewkit-adapters/src/claude_code/selection.rs`): no packs means the whole tree; named packs install base plus those packs (a profile is flattened to its packs first), and a disabled skill leaves its directory out. `init --profile` re-run with a narrower profile removes what it no longer includes, unless the user edited it.
+- **`mewkit pack`** (`crates/mewkit-cli/src/commands/pack/`): `list`/`add`/`remove` manage domains post-install. `add` is a scoped install; `remove` deletes only pristine, pack-exclusive, kit-owned files (`crates/mewkit-core/src/pack_removal.rs`) — base-covered, dual-homed, settings.json-referenced and user-edited files survive.
+- **Pack-aware `upgrade`**: a partial install upgrades only its packs; removed packs stay removed.
+- **Guardrails**: `mewkit validate --packs` (manifest coherence, completeness, the exact-path safety invariant) and `mewkit budget context --profile <p> [--fail-over N]` (loadable-context estimator) — both wired into CI.
 
 ## Install Targets (Codex, Cursor)
 
 Codex and Cursor are **both hand-authored bundles** — nothing converts `.claude/` at
-install time. The `mewkit migrate` verb and its whole converter pipeline (md-strip,
-fm-strip, direct-copy, orchestrator, reconciler entrypoint, the `--include-mcp`
-`.mcp.json` → `config.toml` merge) are removed.
+install time. The `mewkit migrate` verb and its converter pipeline are removed.
 
-- **Bundle shape** — `packages/mewkit/src/migrate/modules/{codex,cursor}/` (the `migrate/`
-  path is kept on purpose; it moves in a later phase). Each bundle is a provider-native
-  tree (`root/`) + a per-surface `manifest.json` (`active` flags, `ownership`) +
-  `catalog/` install packs (char-budgeted; Cursor also carries `agent-packs.json` and
-  `mcp-profiles.json`) + `compliance/` evidence. Codex surfaces (11 manifest entries):
-  `AGENTS.md`, `.codex/config.toml`, `.codex/rules/`, `.codex/agents/`, `.codex/hooks.json`
-  + `.codex/hooks/` (`lib/`, `hook-runtime-config.json`, `gate-enforcement.cjs`,
-  `privacy-block.cjs`), `.codex/scripts/skill-python.cjs`, `.agents/skills/` — all
-  `managed-replace`; there is no prompts/command surface. Cursor surfaces: `AGENTS.md`,
-  `.cursor/{rules,agents,skills,hooks}` (+ `hooks.json`, `scripts/`) — no command surface.
-- **Install** — `mewkit init --target codex|cursor` applies the bundle through
-  `codex-reconcile-apply.ts` / `cursor-reconcile-apply.ts` against a project-local ledger
-  (`.meowkit/state/codex-ledger.json`, `cursor-ledger.json`). A second run converges to
-  zero drift; a user-edited managed file is preserved and reported as an explicit
-  conflict, never silently overwritten.
-- **Upgrade** — `mewkit upgrade` refreshes a bundle only when its ledger exists
-  (`refreshInstalledProviders` in `commands/upgrade.ts`). A `.codex/` or `.cursor/`
-  directory with no ledger is an old `migrate` export: it is left untouched with a notice
-  pointing at `init --target <tool>`. A tree claimed by `mewkit-next` is skipped too.
+- **Bundle shape** — `kit/bundles/{codex,cursor}/`: a provider-native tree (`root/`) plus
+  `catalog/` install packs (`skill-packs.json`; Cursor also carries `mcp-profiles.json`).
+  Codex surfaces: `AGENTS.md`, `.codex/config.toml`, `.codex/rules/`, `.codex/agents/`,
+  `.codex/hooks.json` + `.codex/hooks/`, `.codex/scripts/`, `.agents/skills/`. Cursor
+  surfaces: `AGENTS.md` (installed as the always-applied rule
+  `.cursor/rules/meowkit-core.mdc`) and `.cursor/{rules,agents,skills,hooks}`. Neither has a
+  command surface.
+- **Install** — `mewkit init --target codex|cursor` runs that runtime's emitter
+  (`crates/mewkit-adapters/src/{codex,cursor}/`). Files map 1:1 onto the project, except
+  the ones a user may own too: Codex merges a marked block into `AGENTS.md`, hook handlers
+  into `.codex/hooks.json` and keys into `.codex/config.toml`; Cursor merges
+  `.cursor/hooks.json` handler by handler. Each is recorded so uninstall takes out only what
+  the kit added. A second run converges to zero drift; a user-edited kit file is kept and
+  reported, never silently overwritten.
+- **Upgrade** — `mewkit upgrade` refreshes the runtimes it finds an ownership index for. A
+  runtime the npm CLI installed is adopted only by an explicit `init --target <tool>`.
 - **Authoring cost** — new `.claude/` content reaches Codex or Cursor only by
   hand-authoring the matching provider-native file(s) in **both** bundles; see
   `RELEASING.md` step 1e. Neither target picks up kit changes automatically.
 
-## Rust installer (`mewkit-next`) and the two release streams
+## The `mewkit` binary and the two release streams
 
-`crates/` holds `mewkit-next`, the native installer replacing the npm CLI's install lifecycle
-(`init`, `upgrade`, `uninstall`, `doctor`, `providers`, `versions`, plus `self-update`).
+`crates/` holds the one CLI, the native `mewkit` binary (`mk` is the same binary, linked beside it on Unix and copied on Windows, and the
+pre-rename name still runs for one release with a notice). It replaced the npm
+`mewkit` package, which is deleted; see
+[`docs/maintainer/npm-cli-retirement.md`](../maintainer/npm-cli-retirement.md).
 
-- **Ported verbs** — the binary also runs `plan` (`status`, `check`, `approve`, `archive`),
+- **Verbs** — the install lifecycle (`init`, `upgrade`, `uninstall`, `doctor`, `providers`,
+  `versions`, `self-update`) plus `plan` (`status`, `check`, `approve`, `archive`),
   `task`, `task-state`, `note`, `orient`, `validate`, `review`, `verdict-gate`, `advice`,
   `trace`, `budget`, `setup`, `skill env`, `pack`, `capabilities` and `backups`, with the
   logic in `mewkit-core` (`plan_doc`, `task_files`, `task_state`, `task_store`, `note`,
   `orient`, `validate`, `review`, `verdict_gate`, `advice`, `trace_analysis`, `budget`,
   `setup`, `skill_env`, `system_deps`, `toolchain` (the one place Python, pip and package
   managers are spawned), `pack_removal`, `mcp_profiles`, `capability`, `snapshot`,
-  `baseline`) and
-  argv parsed with the npm CLI's minimist tolerance (`crates/mewkit-cli/src/argv_compat.rs`),
-  so invocations written against that CLI keep running. TS-vs-Rust parity cases live in
-  `crates/mewkit-cli/tests/parity/` (the `parity` job in `.github/workflows/rust-ci.yml`).
-  The kit's hooks still invoke the npm `mewkit`, so nothing switches over until the rename
-  step of the cutover.
+  `baseline`). The verbs ported from the npm CLI parse argv with its minimist tolerance
+  (`crates/mewkit-cli/src/argv_compat.rs`), so invocations written against that CLI keep
+  running.
+- **Behaviour record** — what the npm CLI did on each case was recorded before it was
+  deleted and is frozen in `crates/mewkit-cli/tests/golden/npm/`;
+  `cargo test -p mewkit-cli --test npm_behaviour` holds the binary to it, and
+  `tests/golden/DIVERGENCES.md` lists the deliberate differences.
+- **Hooks** — the kit's hooks stay Node scripts. They reach the CLI through the committed
+  launcher `.meowkit/bin/mewkit` (via `.claude/runtime.json`), which runs the binary.
 - **Adapter contract** (ADR [`261110-rust-adapter-contract.md`](adr/261110-rust-adapter-contract.md)):
   one emitter per runtime in `crates/mewkit-adapters` (`claude_code`, `codex`, `cursor`) turns
   the kit into a `Plan` of owned-data ops; `crates/mewkit-core` executes every plan through one
@@ -105,17 +105,13 @@ fm-strip, direct-copy, orchestrator, reconciler entrypoint, the `--include-mcp`
   `~/.mewkit/state/`), honouring `CLAUDE_CONFIG_DIR` and `CODEX_HOME`.
 - **Two release streams** (ADR [`261110-two-release-streams.md`](adr/261110-two-release-streams.md)):
   the kit ships on `v*` tags as `meowkit-release.zip`; the binary ships on `mewkit-v*` tags as
-  six `mewkit-next-*.tar.gz` archives with `binary-manifest.json`, never as GitHub's latest
+  six `mewkit-*.tar.gz` archives with `binary-manifest.json`, never as GitHub's latest
   release and never with a `.zip`, so deployed npm CLIs cannot mistake it for a kit.
   `install.sh` / `install.ps1` pin each archive by SHA-256 and size; no signatures.
-  Neither stream is signed: the kit signature engine (its `src/kit/` modules, the signing
-  scripts, `--offline`) is removed and the current CLI installs the release zip
-  (`src/kit/` now holds only the zip extractor). npm CLIs ≤2.3.1
-  still prefer a signed kit artifact against an empty keyring, so releases must never
-  carry one (`RELEASING.md`).
+  Neither stream is signed. npm CLIs ≤2.3.1 still prefer a signed kit artifact against an
+  empty keyring, so releases must never carry one (`RELEASING.md`).
 - **Proof:** `crates/mewkit-cli/tests/lifecycle_matrix.rs` runs install → doctor → edit →
-  upgrade → uninstall for each runtime at both scopes. Retiring the npm CLI follows
-  [`docs/maintainer/mewkit-next-cutover.md`](../maintainer/mewkit-next-cutover.md).
+  upgrade → uninstall for each runtime at both scopes.
 
 ## Team memory store
 
@@ -144,22 +140,23 @@ propose/approve chokepoint, handoff-class registry, recall envelope) was removed
 had zero recorded use, and `grep` over two committed files covers the same need. The code
 remains in git history.
 
-## High-assurance PR review pipeline (`src/review/`, `src/commands/review/`)
+## High-assurance PR review pipeline (`crates/mewkit-core/src/review/`)
 
 The `mewkit review *` command group + the `mk:review-pr --assured` lane run a
 deterministic, evidence-gated PR review as a `ReviewSession` under
-`tasks/reviews/<session>/`. All git/gh calls use array-argv `execFileSync` (no shell).
+`tasks/reviews/<session>/`. All git/gh calls pass an argument vector, never a shell string (`review/exec.rs`).
 
-- **`review/schema.ts`** — canonical Zod contract (ReviewSession, ReviewManifest,
+- **`review/session.rs`** — the session contract (ReviewSession, ReviewManifest,
   EvidenceEvent, Finding, VerdictState, SubmitPayload); `ref`/`worktreePath` are
-  regex-pinned to the `review-pr-` namespace. **`review/pr-target.ts`** parses a PR
-  target and selects the BASE-repo remote (fork-safe, never guesses). **`review/impact-map.ts`**
-  derives a deterministic, diff-scoped impact map + scout-escalation. **`review/roster.ts`**
+  regex-pinned to the `review-pr-` namespace. **`review/pr_target.rs`** parses a PR
+  target and selects the BASE-repo remote (fork-safe, never guesses). **`review/impact_map.rs`**
+  derives a deterministic, diff-scoped impact map + scout-escalation. **`review/roster.rs`**
   selects a scope-driven topology (small/medium/large tiers, whole-diff roles that
   per-chunk territory reviewers cannot own, heavy-file invariant slices).
-  **`review/verdict.ts`** is the pure cap table; **`review/anchors.ts`** resolves inline
+  **`review/verdict.rs`** is the pure cap table; **`review/anchors.rs`** resolves inline
   comment anchors by snippet, never by agent-reported line number.
-- **`commands/review/`** — `prepare` (isolated SHA-bound worktree via
+- **Stages** (`review/{prepare,read,coverage,compose,submit,cleanup}.rs`, wired in
+  `crates/mewkit-cli/src/commands/review/`) — `prepare` (isolated SHA-bound worktree via
   `worktree.cjs review-pr` + immutable hash-pinned diff + `untrusted/` quarantine +
   roster/briefs), `read` (path-confined evidence-recording wrapper), `coverage`
   (roster ∩ evidence gap gate + evidence level), `compose` (the mechanical gate: verify

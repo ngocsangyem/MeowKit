@@ -586,8 +586,8 @@ release they also place `mewkit-next` with a rename notice, then that name is dr
 **`releases/latest` keeps pointing at a kit.** Binary releases are never `latest`, so
 `https://github.com/ngocsangyem/MeowKit/releases/latest` keeps resolving to the newest stable kit.
 Kit consumers pick the newest release with a `.zip`, which binary releases never have. Link a binary
-release by its tag. `github-releases-binary-coexistence.test.ts` proves the kit filter skips binary
-releases; it fails if an asset name drifts into its reach.
+release by its tag. `crates/mewkit-core/src/kit/select_tests.rs` proves the binary's own kit
+selection skips binary releases; deployed npm CLIs skip them because no binary asset is a `.zip`.
 
 **Repository settings the workflow needs (owner):**
 

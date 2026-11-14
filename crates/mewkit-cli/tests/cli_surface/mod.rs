@@ -6,6 +6,8 @@
 //! any special casing.
 #![allow(dead_code)]
 
+pub mod references;
+
 use std::collections::BTreeMap;
 use std::process::Command;
 

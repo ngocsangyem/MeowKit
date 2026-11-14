@@ -3,7 +3,7 @@ title: "Memory System"
 description: "One committed, two-file team memory store: the entry format, who reads it, who writes it, and how it is reviewed."
 ---
 
-MeowKit keeps one small, committed, team-shared memory store at `.meowkit/memory/`. Two plain-markdown files, read with `grep` and written with `npx mewkit note`. No index, no JSON sidecars, no capture hook, no auto-injection.
+MeowKit keeps one small, committed, team-shared memory store at `.meowkit/memory/`. Two plain-markdown files, read with `grep` and written with `mewkit note`. No index, no JSON sidecars, no capture hook, no auto-injection.
 
 ## Why so little
 
@@ -81,10 +81,10 @@ printf '%s\n' \
   'Why: stale lock reclaimed while the owner was alive; see the lock test.' \
   'Apply when: lock, mutex, advisory lock, stale pid' \
   'Source: tasks/reviews/example-verdict.md' \
-  | npx mewkit note gotchas
+  | mewkit note gotchas
 ```
 
-Use `npx mewkit note decisions` for `decisions.md`. A rejected entry exits non-zero and writes nothing. The error names the failed rule, never the matched value.
+Use `mewkit note decisions` for `decisions.md`. A rejected entry exits non-zero and writes nothing. The error names the failed rule, never the matched value.
 
 | Write set | Target |
 |---|---|
@@ -106,7 +106,7 @@ Because the store is committed, two controls replace the old scanner-and-approve
 - **PR review.** `mk:review` carries one checklist item: the memory diff adds no instruction-like text and no secrets.
 
 ```bash
-npx mewkit validate --memory
+mewkit validate --memory
 ```
 
 `mewkit note` runs the same lint before it appends, so a rejected entry never reaches the file. It also refuses an append that would push the file over the 300-line cap and points to `/mk:memory --prune`.
@@ -125,7 +125,7 @@ Claude Code has its own auto-memory at `~/.claude/projects/PROJECT/memory/`, sco
 
 ## Upgrading from v2
 
-The v2 JSON stores (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`) are not migrated and the v3 skills do not read them. To keep anything from them, read the file by hand, append the lesson with `npx mewkit note`, then delete the old file.
+The v2 JSON stores (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`) are not migrated and the v3 skills do not read them. To keep anything from them, read the file by hand, append the lesson with `mewkit note`, then delete the old file.
 
 ## See also
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/* The install picture: `npx mewkit init` running to completion.
+/* The install picture: `mewkit init` running to completion.
  * The command types itself on a CSS steps() animation and the caret blinks —
  * both are skipped wholesale under prefers-reduced-motion. */
 const steps = [
@@ -28,7 +28,7 @@ const summary = [
       <div class="tr__ln tr__cmd">
         <span class="tr__cwd">~/<span class="tr__up">acme/</span>api</span>
         <span class="tr__sig">$</span>
-        <span class="tr__typed">npx mewkit init</span>
+        <span class="tr__typed">mewkit init</span>
       </div>
 
       <div class="tr__ln tr__meter tr__out" style="--i: 1">
@@ -106,7 +106,7 @@ const summary = [
 .tr__typed {
   overflow: hidden;
   white-space: nowrap;
-  animation: tr-type 1.1s steps(15) both;
+  animation: tr-type 1.1s steps(11) both;
 }
 .tr__out { animation: tr-in 0.3s var(--mk-ease-out) calc(1.15s + var(--i) * 0.11s) both; }
 
@@ -138,7 +138,7 @@ const summary = [
   animation: tr-blink 1.1s steps(1) infinite;
 }
 
-@keyframes tr-type { from { width: 0; } to { width: 15ch; } }
+@keyframes tr-type { from { width: 0; } to { width: 11ch; } }
 @keyframes tr-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes tr-blink { 50% { opacity: 0; } }
 

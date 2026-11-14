@@ -100,7 +100,7 @@ Delegation prompts are expected to include:
 
 ## Contracts you can verify in CI
 
-- `npx mewkit validate` enforces the `.claude` → `docs/*` contract.
+- `mewkit validate` enforces the `.claude` → `docs/*` contract.
 
 ## How to extend the harness
 

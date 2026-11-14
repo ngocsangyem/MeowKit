@@ -1,7 +1,7 @@
 <script setup lang="ts">
-/* Section 6 — the one command. Copy verbatim from the mockup; the command is
- * also copyable, which the static mockup could not offer. */
-const COMMAND = 'npx mewkit init'
+/* Section 6 — install the binary, then init. The install command is copyable;
+ * Windows users follow the docs link to the PowerShell installer. */
+const COMMAND = 'curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh'
 const { copied, copy } = useClipboard()
 </script>
 
@@ -9,10 +9,10 @@ const { copied, copy } = useClipboard()
   <section class="mk-section" id="install" aria-labelledby="install-h">
     <div class="mk-wrap mk-grid">
       <div class="mk-col-5 mk-flow mk-flow--roomy in__copy">
-        <h2 id="install-h">Install MeowKit with one command</h2>
+        <h2 id="install-h">Install MeowKit in two commands</h2>
 
         <p class="mk-lead">
-          Run
+          Install the <code>mewkit</code> binary with
           <button
             class="in__cmd"
             type="button"
@@ -26,7 +26,7 @@ const { copied, copy } = useClipboard()
           <span class="mk-sr-only" role="status" aria-live="polite">
             {{ copied ? `Copied ${COMMAND} to the clipboard` : '' }}
           </span>
-          in a project. It fetches the latest release, asks for your config and writes two directories.
+          then run <code>mewkit init</code> in a project. It fetches the latest kit release, checks it and writes two directories.
         </p>
 
         <p class="mk-dim">.claude holds the skills, agents, rules and hooks.</p>
@@ -59,7 +59,9 @@ const { copied, copy } = useClipboard()
   transition: background-color var(--mk-dur-base) var(--mk-ease);
 }
 .in__cmd:hover { background: var(--mk-haze); }
-.in__cmd code { font-family: var(--mk-font-mono); font-size: 0.9em; color: var(--mk-ink); background: none; }
+/* the install command carries a long URL; let it break anywhere so a phone never scrolls sideways */
+.in__cmd { max-width: 100%; text-align: left; }
+.in__cmd code { font-family: var(--mk-font-mono); font-size: 0.9em; color: var(--mk-ink); background: none; overflow-wrap: anywhere; min-width: 0; }
 
 /* Muted is 4.99:1 on the resting surface — fine for a caption — but only
  * 4.18:1 once hover deepens the ground to haze, so the hint takes ink there.

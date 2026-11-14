@@ -1,9 +1,9 @@
-# `mewkit-next` runtime smoke checklist
+# `mewkit` runtime smoke checklist
 
-CI proves what `mewkit-next` writes (`lifecycle_matrix`, the emitter goldens). It cannot prove
+CI proves what `mewkit` writes (`lifecycle_matrix`, the emitter goldens). It cannot prove
 that a real runtime **reads** it: that needs an authenticated Claude Code, Codex CLI and
 Cursor, which an agent must not drive. A maintainer runs this list on a real machine for every
-binary beta, and before the [cutover](mewkit-next-cutover.md). A failed item reopens the code
+binary beta and before each stable binary release. A failed item reopens the code
 that emits that runtime's files; it is not waived.
 
 The list covers a **project** install. A global install carries less: global Cursor registers
@@ -12,9 +12,9 @@ only the privacy and session-context hooks, so the plan gate (item 8) does not a
 ## Setup (once per run)
 
 1. Install the binary under test: `curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | MEWKIT_CHANNEL=beta sh`
-   (Windows: `install.ps1`). Record `mewkit-next --version`.
+   (Windows: `install.ps1`). Record `mewkit --version`.
 2. Make a throwaway git project with one source file, e.g. `src/app.js`.
-3. In it: `mewkit-next init --target all`, then `mewkit-next doctor`. Every runtime's install
+3. In it: `mewkit init --target all`, then `mewkit doctor`. Every runtime's install
    and hooks rows must read `ok`. For Codex, trust the project in Codex first; doctor warns
    until then.
 
@@ -37,12 +37,12 @@ Run each in a fresh session of that runtime, opened in the project.
 | 8 | Cursor | Ask it to change `src/app.js` with no approved plan | Blocked, with the reason |
 | 9 | Cursor | Run a skill with a bundled script | The script runs |
 
-Then `mewkit-next uninstall --target all --yes`; `git status` must show only what you added,
+Then `mewkit uninstall --target all --yes`; `git status` must show only what you added,
 plus `.meowkit/` (mewkit's state and backups stay; they are never deleted).
 
 ## Record
 
-Copy this table into the binary release's notes or the PR that prepares the cutover.
+Copy this table into the binary release's notes.
 
 | # | Result (pass/fail) | Runtime version | Notes |
 | ---: | --- | --- | --- |
@@ -56,4 +56,4 @@ Copy this table into the binary release's notes or the PR that prepares the cuto
 | 8 | PENDING | | |
 | 9 | PENDING | | |
 
-Binary: `mewkit-next` ______ · Kit: ______ · OS: ______ · Date: ______ · By: ______
+Binary: `mewkit` ______ · Kit: ______ · OS: ______ · Date: ______ · By: ______

@@ -26,6 +26,7 @@ pub struct KitArgs {
     /// --kit-sha256 or a checksums.txt beside it.
     #[arg(long, value_name = "ZIP", conflicts_with_all = ["offline", "kit_dir"])]
     pub kit_archive: Option<PathBuf>,
+    /// The expected SHA-256 of the --kit-archive zip, in hex.
     #[arg(long, value_name = "HEX", requires = "kit_archive")]
     pub kit_sha256: Option<String>,
     /// Use an unpacked kit directory as is (development only).

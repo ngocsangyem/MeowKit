@@ -7,7 +7,7 @@ description: "Set up MeowKit in a new or existing project and run your first tas
 
 **Best for:** First-time users  
 **Time estimate:** 5 minutes  
-**Skills used:** `npx mewkit init`, [mk:plan-creator](/reference/skills/plan-creator)
+**Skills used:** `mewkit init`, [mk:plan-creator](/reference/skills/plan-creator)
 
 ## Overview
 
@@ -24,7 +24,7 @@ This workflow gets you from an empty project to a fully configured MeowKit envir
 ### Step 1: Install MeowKit
 
 ```bash
-npx mewkit init
+mewkit init
 ```
 
 The CLI auto-detects your tech stack and asks configuration questions (project name, stack, team size, mode, memory, optional Gemini API key). Takes ~30 seconds.
@@ -33,12 +33,12 @@ The CLI auto-detects your tech stack and asks configuration questions (project n
 
 The kit ships as a release zip with a `checksums.txt`, and the install checks the zip against that
 file before it extracts anything. Options worth knowing: pick the on-disk shape with
-`--target claude-code --delivery plugin`, and confirm what landed with `npx mewkit versions`.
+`--target claude-code --delivery plugin`, and confirm what landed with `mewkit versions`.
 
 ### Step 2: Verify installation
 
 ```bash
-npx mewkit doctor
+mewkit doctor
 ```
 
 Checks: Node.js version, Python available, Git configured, hooks executable, scripts present.

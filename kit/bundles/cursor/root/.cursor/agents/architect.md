@@ -46,7 +46,7 @@ as an Architecture Decision Record (ADR).
    one-liner a future session will find:
 
    ```bash
-   npx mewkit note decisions <<'EOF'
+   mewkit note decisions <<'EOF'
    ## <one-line decision>   <!-- YYYY-MM-DD -->
    Why: <evidence: constraint, failure, review finding>
    Apply when: <trigger the next agent can grep for>

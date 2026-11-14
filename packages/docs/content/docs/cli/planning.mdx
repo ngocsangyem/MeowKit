@@ -3,23 +3,18 @@ title: "Planning and Tasks"
 description: "Create plans and task records, see where a task stands, and record the checkpoints of a supervised run."
 ---
 
-The commands behind Gate 1 and the durable task record. If you are asking "what am I supposed to be doing", `orient` answers it. `plan`, `task`, `task-state`, `orient` and `advice` run from either CLI.
-
-<Callout type="info">
-  During the move to one CLI, these commands run from either CLI with the same output: `npx mewkit <command>` or the
-  native `mewkit-next <command>` ([mewkit-next](/cli/mewkit-next)). Skills and hooks still call the npm CLI.
-</Callout>
+The commands behind Gate 1 and the durable task record. If you are asking "what am I supposed to be doing", `orient` answers it.
 
 ## plan
 
 Plan lifecycle. `status` / `check` are read-only (the plan Markdown stays the sole authority); `approve` / `archive` are the two mutating subcommands and live in their own modules so the read-only path imports no write API.
 
 ```bash
-npx mewkit plan status <plan-dir>       # checkbox progress across plan.md + phase files
-npx mewkit plan check <phase-file>      # required-section + checklist report for one phase
-npx mewkit plan approve <plan-dir>      # stamp the Gate 1 approval receipt (after a human approves)
-npx mewkit plan archive <plan-dir>      # mark completed + move to tasks/plans/archive/
-npx mewkit plan archive <plan-dir> --dry-run
+mewkit plan status <plan-dir>       # checkbox progress across plan.md + phase files
+mewkit plan check <phase-file>      # required-section + checklist report for one phase
+mewkit plan approve <plan-dir>      # stamp the Gate 1 approval receipt (after a human approves)
+mewkit plan archive <plan-dir>      # mark completed + move to tasks/plans/archive/
+mewkit plan archive <plan-dir> --dry-run
 ```
 
 `plan archive` finishes a plan in one step:
@@ -35,7 +30,7 @@ Agents run it automatically at the end of a completed plan (cook Phase 6). `--dr
 Create a new task file. `task new` writes the frontmatter and body itself; if your project keeps its own `tasks/templates/<type>.md` (`feature-implementation.md`, `bug-fix.md`, `refactor.md` or `security-audit.md`), it uses that file instead. The kit ships none.
 
 ```bash
-npx mewkit task new --type <type> "description"
+mewkit task new --type <type> "description"
 ```
 
 **Arguments:**
@@ -54,10 +49,10 @@ npx mewkit task new --type <type> "description"
 **Examples:**
 
 ```bash
-npx mewkit task new --type feature "Add user authentication"
+mewkit task new --type feature "Add user authentication"
 # Creates: tasks/active/260327-add-user-authentication.feature.md
 
-npx mewkit task new --type bug-fix --priority high "Fix login timeout"
+mewkit task new --type bug-fix --priority high "Fix login timeout"
 # Creates: tasks/active/260327-fix-login-timeout.bug.md
 ```
 ## task list
@@ -65,7 +60,7 @@ npx mewkit task new --type bug-fix --priority high "Fix login timeout"
 List task files with status.
 
 ```bash
-npx mewkit task list [--all] [--status <status>]
+mewkit task list [--all] [--status <status>]
 ```
 
 **Flags:**
@@ -78,13 +73,13 @@ npx mewkit task list [--all] [--status <status>]
 **Examples:**
 
 ```bash
-npx mewkit task list
+mewkit task list
 # Lists active tasks only
 
-npx mewkit task list --all
+mewkit task list --all
 # Lists all tasks (active + completed + backlog)
 
-npx mewkit task list --status blocked
+mewkit task list --status blocked
 # Lists only blocked tasks
 ```
 
@@ -93,14 +88,14 @@ npx mewkit task list --status blocked
 Reconstruct durable resume state from the task records under `tasks/active/` — files only, no network. Marks the record whose plan matches the active-plan pointer as current, and surfaces any incompatible/corrupt record as an issue rather than crashing.
 
 ```bash
-npx mewkit task-state show [--json]
+mewkit task-state show [--json]
 ```
 ## task-state update
 
 Atomically update a durable task record (created for planned / long-running work). Used by orchestration workflows to record status, the last completed step, the next action, and capability decisions so a fresh session can resume. Advisory — a failed write is surfaced but never blocks the workflow.
 
 ```bash
-npx mewkit task-state update <id> [--status <active|blocked|done>] [--step "<what just finished>"] [--next "<next action>"] [--plan <path>] [--json]
+mewkit task-state update <id> [--status <active|blocked|done>] [--step "<what just finished>"] [--next "<next action>"] [--plan <path>] [--json]
 ```
 
 **Flags:**
@@ -115,10 +110,10 @@ npx mewkit task-state update <id> [--status <active|blocked|done>] [--step "<wha
 **Examples:**
 
 ```bash
-npx mewkit task-state show
+mewkit task-state show
 # Lists active task records + the current-plan marker
 
-npx mewkit task-state update feat-auth --status active --step "wired login route" --next "add refresh-token test"
+mewkit task-state update feat-auth --status active --step "wired login route" --next "add refresh-token test"
 ```
 
 ## advice
@@ -128,10 +123,10 @@ Records the checkpoints of an opt-in supervised run — the `--advice` flag on `
 **Supervision is evidence, not authority.** Nothing here clears a gate, and a recorded directive never counts as verification.
 
 ```bash
-npx mewkit advice begin --run <id> --skill <skill> --stage <stage> --checkpoint <id>
-npx mewkit advice commit --run <id> --checkpoint <id> --disposition <value> --outcome <value> --reason "<one line>"
-npx mewkit advice status --run <id>
-npx mewkit advice validate-packet --evidence <file.json> --packet-kind input|output|brief
+mewkit advice begin --run <id> --skill <skill> --stage <stage> --checkpoint <id>
+mewkit advice commit --run <id> --checkpoint <id> --disposition <value> --outcome <value> --reason "<one line>"
+mewkit advice status --run <id>
+mewkit advice validate-packet --evidence <file.json> --packet-kind input|output|brief
 ```
 
 **Subcommands:**
@@ -154,27 +149,27 @@ npx mewkit advice validate-packet --evidence <file.json> --packet-kind input|out
 ```bash
 # Open a checkpoint. Repeating the same --checkpoint returns the recorded
 # result and spends no slot, which is what makes resume safe.
-npx mewkit advice begin --run fix-260727-auth --skill mk:fix --stage GUIDE --checkpoint guide-1
+mewkit advice begin --run fix-260727-auth --skill mk:fix --stage GUIDE --checkpoint guide-1
 
 # Record what came back, and what you decided to do with it. --reason is
 # required even when you adopted the directive.
-npx mewkit advice commit --run fix-260727-auth --checkpoint guide-1 \
+mewkit advice commit --run fix-260727-auth --checkpoint guide-1 \
   --disposition CONTINUE_WITH_DIRECTIVE --outcome adopted \
   --reason "matches the evidence in the root-cause proof" \
   --directive "fix the guard, not the caller" --next "write the regression test"
 
 # Send work back, and supersede the evidence it invalidated.
-npx mewkit advice commit --run fix-260727-auth --checkpoint review-1 \
+mewkit advice commit --run fix-260727-auth --checkpoint review-1 \
   --disposition RETURN_TO_EXECUTOR --outcome adopted --reason "coverage gap" \
   --correction "cover the expired-token path" \
   --evidence tasks/plans/260727-auth/reports/evidence/workflow-evidence.json \
   --correction-kind source
 
 # Ship charges each release stage its own budget.
-npx mewkit advice begin --run ship-260727 --skill mk:ship --stage GUIDE \
+mewkit advice begin --run ship-260727 --skill mk:ship --stage GUIDE \
   --checkpoint publish-guide --release-stage publish
 
-npx mewkit advice status --run fix-260727-auth
+mewkit advice status --run fix-260727-auth
 ```
 
 **When it refuses:** a call past the cap, an illegal stage/disposition pair, a `--checkpoint` reused under a different stage, a corrupt dossier, or `--evidence` pointing anywhere but an existing `workflow-evidence.json` inside the project. A refusal is final for that checkpoint — continue unsupervised, or escalate when the refusal says to.
@@ -184,7 +179,7 @@ npx mewkit advice status --run fix-260727-auth
 Print where the current task sits in the workflow, and what the next action is.
 
 ```bash
-npx mewkit orient [--json] [--no-record]
+mewkit orient [--json] [--no-record]
 ```
 
 Reads plans, reviews, tests, and git state rather than asking you. `--no-record` skips writing

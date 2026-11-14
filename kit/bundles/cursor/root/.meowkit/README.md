@@ -5,7 +5,7 @@ authored provider bundle (Codex, Cursor, ...), not just this one.
 
 - `memory/` — team memory: the two committed files `decisions.md` and `gotchas.md`
   (imported from `.claude/memory/` when present; `.claude/agent-memory/` is never
-  auto-ingested). Append through `npx mewkit note <decisions|gotchas>`.
+  auto-ingested). Append through `mewkit note <decisions|gotchas>`.
 - `state/` — reconciliation ledgers and lock files (e.g. `cursor-ledger.json`,
   `codex-ledger.json`) that record what an authored bundle installed here, so re-running
   `mewkit init` / `mewkit upgrade` is idempotent and never silently overwrites your edits.
