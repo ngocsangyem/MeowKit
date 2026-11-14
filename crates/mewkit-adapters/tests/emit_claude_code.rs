@@ -107,13 +107,11 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
         .map(|f| (f["path"].as_str().unwrap(), f["sha256"].as_str()))
         .filter(|(p, _)| !kept_apart(p))
         .collect();
-    let ours: BTreeMap<&str, String> = plan
+    let ours: BTreeMap<&str, Vec<String>> = plan
         .ops
         .iter()
         .filter_map(|o| match o {
-            Op::WriteFile { path, bytes, .. } => {
-                Some((path.as_str(), mewkit_core::fsx::sha256_hex(&lf(bytes))))
-            }
+            Op::WriteFile { path, bytes, .. } => Some((path.as_str(), digests(bytes))),
             _ => None,
         })
         .collect();
@@ -124,26 +122,31 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
     // Every non-volatile file carries the same bytes as the npm CLI's.
     let differ: Vec<_> = ts
         .iter()
-        .filter(|(p, digest)| digest.is_some_and(|d| d != ours[**p]))
+        .filter(|(p, digest)| digest.is_some_and(|d| !ours[**p].iter().any(|o| o == d)))
         .map(|(p, _)| p)
         .collect();
     assert!(differ.is_empty(), "bytes differ from TS: {differ:?}");
 }
 
-/// The kit is read from this checkout's `.claude/`, which a Windows checkout
-/// writes with CRLF line endings, while the baseline hashes the LF bytes the
-/// npm CLI wrote. On Windows, compare with CRLF folded to LF; elsewhere the
-/// bytes are compared exactly.
-fn lf(bytes: &[u8]) -> Vec<u8> {
+/// The digests a written file may match the baseline by.
+///
+/// The kit is read from this checkout's `.claude/`. A Windows checkout writes
+/// git-converted text files with CRLF, while the baseline hashes the LF bytes
+/// the npm CLI wrote, so on Windows the CRLF-folded bytes may match instead.
+/// The raw bytes always count: git leaves binaries (a PNG header holds
+/// `\r\n`) and files stored with CRLF as they are, and folding those would
+/// break a correct match. Elsewhere only the exact bytes count.
+fn digests(bytes: &[u8]) -> Vec<String> {
+    let raw = mewkit_core::fsx::sha256_hex(bytes);
     if !cfg!(windows) {
-        return bytes.to_vec();
+        return vec![raw];
     }
-    let mut out = Vec::with_capacity(bytes.len());
+    let mut folded = Vec::with_capacity(bytes.len());
     for (i, b) in bytes.iter().enumerate() {
         if *b == b'\r' && bytes.get(i + 1) == Some(&b'\n') {
             continue;
         }
-        out.push(*b);
+        folded.push(*b);
     }
-    out
+    vec![raw, mewkit_core::fsx::sha256_hex(&folded)]
 }
