@@ -25,11 +25,11 @@ fn handler_output(descriptor_edit: impl FnOnce(&mut Value)) -> String {
     )
     .expect("copy the handler");
     let binary = s.project.join(".claude").join(if cfg!(windows) {
-        "mewkit-next.exe"
+        "mewkit.exe"
     } else {
-        "mewkit-next"
+        "mewkit"
     });
-    std::fs::copy(env!("CARGO_BIN_EXE_mewkit-next"), &binary).expect("copy the binary");
+    std::fs::copy(env!("CARGO_BIN_EXE_mewkit"), &binary).expect("copy the binary");
 
     // The descriptor comes from the Rust schema module, not from this file.
     let described = mewkit_core::schema::runtime_descriptor::describe(

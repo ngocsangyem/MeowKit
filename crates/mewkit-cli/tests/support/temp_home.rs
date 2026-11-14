@@ -25,7 +25,7 @@ pub struct TempHome {
 impl TempHome {
     pub fn new() -> Self {
         let dir = tempfile::Builder::new()
-            .prefix("mewkit-next test-")
+            .prefix("mewkit test-")
             .tempdir()
             .expect("create temp dir");
         std::fs::create_dir_all(dir.path().join("home")).expect("create home");
@@ -61,12 +61,12 @@ impl TempHome {
         cmd
     }
 
-    /// Run the `mewkit-next` binary built for this test run.
-    pub fn mewkit_next(&self, args: &[&str]) -> Output {
-        self.command(env!("CARGO_BIN_EXE_mewkit-next"))
+    /// Run the `mewkit` binary built for this test run.
+    pub fn mewkit(&self, args: &[&str]) -> Output {
+        self.command(env!("CARGO_BIN_EXE_mewkit"))
             .args(args)
             .output()
-            .expect("spawn mewkit-next")
+            .expect("spawn mewkit")
     }
 }
 

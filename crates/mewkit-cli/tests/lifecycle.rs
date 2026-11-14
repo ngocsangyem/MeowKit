@@ -57,7 +57,7 @@ fn a_second_uninstall_has_nothing_to_do() {
     let out = env.with_kit(&["uninstall", "--yes"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     assert!(sha_tree(&env.project()).is_empty());
-    let again = env.mewkit_next(&["uninstall", "--yes"]);
+    let again = env.mewkit(&["uninstall", "--yes"]);
     assert_eq!(code(&again), 0);
     assert!(
         text(&again).contains("nothing to uninstall"),
@@ -114,7 +114,7 @@ fn upgrade_and_uninstall_name_what_is_not_installed() {
     let env = TempHome::new();
     let out = env.with_kit(&["upgrade", "--target", "codex"]);
     assert_eq!(code(&out), 2, "{}", text(&out));
-    let out = env.mewkit_next(&["init", "--target", "vscode"]);
+    let out = env.mewkit(&["init", "--target", "vscode"]);
     assert_eq!(code(&out), 2, "{}", text(&out));
 }
 

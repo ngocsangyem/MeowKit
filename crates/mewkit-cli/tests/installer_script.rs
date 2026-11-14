@@ -13,7 +13,7 @@ use support::temp_home::TempHome;
 use support::{code, text};
 
 const VERSION: &str = "9.9.9";
-const BODY: &[u8] = b"pretend this is mewkit-next\n";
+const BODY: &[u8] = b"pretend this is mewkit\n";
 
 /// An installer pinned to `served` (stable channel), where the server sends
 /// `sent` instead when it is given; returns the server and the rendered dir.
@@ -53,6 +53,22 @@ fn setup(sent: Option<Vec<u8>>) -> (Server, tempfile::TempDir) {
     (server, dir)
 }
 
+/// Far longer than `BODY`, so its archive cannot land on the pinned size by chance (gzip
+/// sizes of two short bodies can coincide).
+const OTHER_BODY: &[u8] =
+    b"other bytes entirely: a body several times the length of the real one, \
+so the compressed archive is certainly a different size from the pinned archive";
+
+/// The installer's output with whitespace folded: PowerShell wraps an error at the console
+/// width and prefixes each continuation line with `|`, so a phrase can straddle a break.
+fn said(out: &Output) -> String {
+    text(out)
+        .split_whitespace()
+        .filter(|w| *w != "|")
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 fn install(env: &TempHome, rendered: &Path, dest: &Path, vars: &[(&str, &str)]) -> Output {
     let mut cmd = if cfg!(windows) {
         let mut c = env.command("pwsh");
@@ -79,11 +95,11 @@ fn install(env: &TempHome, rendered: &Path, dest: &Path, vars: &[(&str, &str)]) 
 }
 
 fn installed(dest: &Path) -> PathBuf {
-    dest.join(if cfg!(windows) {
-        "mewkit-next.exe"
-    } else {
-        "mewkit-next"
-    })
+    named(dest, "mewkit")
+}
+
+fn named(dest: &Path, name: &str) -> PathBuf {
+    dest.join(format!("{name}{}", std::env::consts::EXE_SUFFIX))
 }
 
 #[test]
@@ -94,6 +110,11 @@ fn the_pinned_archive_installs() {
     let out = install(&env, rendered.path(), &dest, &[]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     assert_eq!(std::fs::read(installed(&dest)).unwrap(), BODY);
+    // `mk` and the pre-rename `mewkit-next` run the same binary: a link on Unix, a copy
+    // on Windows. Reading through either yields the installed bytes.
+    for alias in ["mk", "mewkit-next"] {
+        assert_eq!(std::fs::read(named(&dest, alias)).unwrap(), BODY, "{alias}");
+    }
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
@@ -103,7 +124,30 @@ fn the_pinned_archive_installs() {
             .mode();
         assert_eq!(mode & 0o111, 0o111, "executable: {mode:o}");
     }
-    assert!(text(&out).contains("not on your PATH"), "{}", text(&out));
+    assert!(said(&out).contains("not on your PATH"), "{}", text(&out));
+}
+
+/// `mk` is short enough that another tool may own it: the installer must not clobber it.
+#[cfg(unix)]
+#[test]
+fn an_mk_owned_by_another_tool_is_left_alone() {
+    use std::os::unix::fs::PermissionsExt;
+    let env = TempHome::new();
+    let (_server, rendered) = setup(None);
+    let dest = env.home().join("bin");
+    std::fs::create_dir_all(&dest).unwrap();
+    let foreign = b"#!/bin/sh\necho 'mk 4.2 (some other tool)'\n";
+    std::fs::write(dest.join("mk"), foreign).unwrap();
+    std::fs::set_permissions(dest.join("mk"), std::fs::Permissions::from_mode(0o755)).unwrap();
+    let out = install(&env, rendered.path(), &dest, &[]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert_eq!(std::fs::read(dest.join("mk")).unwrap(), foreign);
+    assert!(
+        said(&out).contains("is not mewkit; left as it is"),
+        "{}",
+        text(&out)
+    );
+    assert_eq!(std::fs::read(named(&dest, "mewkit-next")).unwrap(), BODY);
 }
 
 #[test]
@@ -117,7 +161,7 @@ fn a_tampered_archive_installs_nothing() {
     let dest = env.home().join("bin");
     let out = install(&env, rendered.path(), &dest, &[]);
     assert_eq!(code(&out), 1, "{}", text(&out));
-    assert!(text(&out).contains("SHA-256 mismatch"), "{}", text(&out));
+    assert!(said(&out).contains("SHA-256 mismatch"), "{}", text(&out));
     assert!(!dest.exists(), "nothing written");
 }
 
@@ -125,11 +169,11 @@ fn a_tampered_archive_installs_nothing() {
 fn an_archive_of_another_size_installs_nothing() {
     let env = TempHome::new();
     let target = current_target().unwrap();
-    let (_server, rendered) = setup(Some(archive(VERSION, target, b"other bytes entirely")));
+    let (_server, rendered) = setup(Some(archive(VERSION, target, OTHER_BODY)));
     let dest = env.home().join("bin");
     let out = install(&env, rendered.path(), &dest, &[]);
     assert_eq!(code(&out), 1, "{}", text(&out));
-    assert!(text(&out).contains("the pin says"), "{}", text(&out));
+    assert!(said(&out).contains("the pin says"), "{}", text(&out));
     assert!(!dest.exists(), "nothing written");
 }
 
@@ -145,11 +189,11 @@ fn another_version_or_an_unpinned_channel_is_refused_before_any_download() {
         &[("MEWKIT_VERSION", "v1.0.0")],
     );
     assert_eq!(code(&out), 1, "{}", text(&out));
-    assert!(text(&out).contains("by hand, verified"), "{}", text(&out));
+    assert!(said(&out).contains("by hand, verified"), "{}", text(&out));
     let out = install(&env, rendered.path(), &dest, &[("MEWKIT_CHANNEL", "beta")]);
     assert_eq!(code(&out), 1, "{}", text(&out));
     assert!(
-        text(&out).contains("pins no beta release"),
+        said(&out).contains("pins no beta release"),
         "{}",
         text(&out)
     );

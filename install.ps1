@@ -1,4 +1,4 @@
-# Install mewkit-next on Windows.
+# Install mewkit on Windows.
 #
 #   irm https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.ps1 | iex
 #
@@ -28,9 +28,9 @@ $Pins = @{
 }
 
 # Throw, never exit: under `irm | iex` an exit would close the user's shell.
-function Fail([string]$Message) { throw "mewkit-next install: error: $Message" }
+function Fail([string]$Message) { throw "mewkit install: error: $Message" }
 
-function Say([string]$Message) { Write-Host "mewkit-next install: $Message" }
+function Say([string]$Message) { Write-Host "mewkit install: $Message" }
 
 function Get-Target {
 	if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
@@ -47,7 +47,7 @@ function Get-Target {
 	switch ($arch.ToUpperInvariant()) {
 		{ $_ -in 'X64', 'AMD64' } { return 'x86_64-pc-windows-msvc' }
 		'ARM64' { return 'aarch64-pc-windows-msvc' }
-		default { Fail "no mewkit-next build for the $arch processor" }
+		default { Fail "no mewkit build for the $arch processor" }
 	}
 }
 
@@ -64,12 +64,12 @@ function Install-MewkitNext {
 	$want = $env:MEWKIT_VERSION
 	if ($want -and $want.TrimStart('v') -ne $pin.Version) {
 		Fail (@(
-				"this installer pins mewkit-next $($pin.Version) on $channel, not $($want.TrimStart('v')).",
+				"this installer pins mewkit $($pin.Version) on $channel, not $($want.TrimStart('v')).",
 				'  To install another version by hand, verified:',
-				"    1. download mewkit-next-<version>-$target.tar.gz and checksums.txt from",
+				"    1. download mewkit-<version>-$target.tar.gz and checksums.txt from",
 				'       https://github.com/ngocsangyem/MeowKit/releases/tag/mewkit-v<version>',
 				'    2. compare (Get-FileHash <archive> -Algorithm SHA256).Hash with its line in checksums.txt',
-				'    3. extract it (tar -xzf <archive>) and put mewkit-next.exe in a directory on your PATH'
+				'    3. extract it (tar -xzf <archive>) and put mewkit.exe in a directory on your PATH'
 			) -join "`n")
 	}
 	# Windows' own bsdtar: a GNU tar from Git for Windows earlier on PATH reads C:\ as a remote host.
@@ -78,11 +78,11 @@ function Install-MewkitNext {
 		Fail "$tar is missing (Windows 10 1803 or later ships it); nothing was installed"
 	}
 
-	$tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("mewkit-next-" + [System.Guid]::NewGuid().ToString('N'))
+	$tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("mewkit-" + [System.Guid]::NewGuid().ToString('N'))
 	New-Item -ItemType Directory -Path $tmp | Out-Null
 	try {
-		$archive = Join-Path $tmp 'mewkit-next.tar.gz'
-		Say "downloading mewkit-next $($pin.Version) for $target"
+		$archive = Join-Path $tmp 'mewkit.tar.gz'
+		Say "downloading mewkit $($pin.Version) for $target"
 		try {
 			Invoke-WebRequest -UseBasicParsing -Uri $pin.Url -OutFile $archive
 		} catch {
@@ -97,11 +97,11 @@ function Install-MewkitNext {
 		New-Item -ItemType Directory -Path $out | Out-Null
 		& $tar -xzf $archive -C $out
 		if ($LASTEXITCODE -ne 0) { Fail 'the archive did not extract; nothing was installed' }
-		$bin = Get-ChildItem -LiteralPath $out -Recurse -Depth 1 -File -Filter 'mewkit-next.exe' | Select-Object -First 1
-		if (-not $bin) { Fail 'the archive holds no mewkit-next.exe; nothing was installed' }
+		$bin = Get-ChildItem -LiteralPath $out -Recurse -Depth 1 -File -Filter 'mewkit.exe' | Select-Object -First 1
+		if (-not $bin) { Fail 'the archive holds no mewkit.exe; nothing was installed' }
 
-		$dest = Join-Path $installDir 'mewkit-next.exe'
-		$staged = Join-Path $installDir ".mewkit-next.install.$PID.exe"
+		$dest = Join-Path $installDir 'mewkit.exe'
+		$staged = Join-Path $installDir ".mewkit.install.$PID.exe"
 		try {
 			New-Item -ItemType Directory -Path $installDir -Force | Out-Null
 			Copy-Item -LiteralPath $bin.FullName -Destination $staged -Force
@@ -129,9 +129,34 @@ function Install-MewkitNext {
 			if ((Test-Path -LiteralPath "$dest.old") -and -not (Test-Path -LiteralPath $dest)) {
 				Move-Item -LiteralPath "$dest.old" -Destination $dest -ErrorAction SilentlyContinue
 			}
-			Fail "cannot place $dest ($why); nothing new was installed and any previous mewkit-next is back in place"
+			Fail "cannot place $dest ($why); nothing new was installed and any previous mewkit is back in place"
 		}
+		# `mk` is the short name; `mewkit-next` is the pre-rename name, kept one release so
+		# existing scripts still run. Windows has no reliable unprivileged symlink, so each
+		# is a copy; `mewkit self-update` refreshes the copies it finds beside it.
 		Say "installed $dest ($($pin.Version), $channel)"
+		foreach ($alias in @('mk.exe', 'mewkit-next.exe')) {
+			$aliasPath = Join-Path $installDir $alias
+			try {
+				if (Test-Path -LiteralPath $aliasPath) {
+					# A name another tool owns is left alone: only a mewkit binary is replaced.
+					$banner = ''
+					if (Test-Path -LiteralPath $aliasPath -PathType Leaf) {
+						$banner = (& $aliasPath --version 2>$null | Select-Object -First 1)
+					}
+					if ("$banner" -notmatch '^mewkit(-next)? ') {
+						Say "$aliasPath exists and is not mewkit; left as it is (run mewkit.exe directly)"
+						continue
+					}
+					Remove-Item -LiteralPath "$aliasPath.old" -Force -ErrorAction SilentlyContinue
+					Move-Item -LiteralPath $aliasPath -Destination "$aliasPath.old" -Force
+				}
+				Copy-Item -LiteralPath $dest -Destination $aliasPath -Force
+				Say "placed $aliasPath"
+			} catch {
+				Say "could not place $aliasPath ($($_.Exception.Message)); run mewkit.exe directly"
+			}
+		}
 
 		$userPath = [System.Environment]::GetEnvironmentVariable('Path', 'User')
 		$onPath = @(($userPath, $env:Path) -join ';' -split ';' | Where-Object { $_.TrimEnd('\') -ieq $installDir.TrimEnd('\') }).Count -gt 0
@@ -139,7 +164,7 @@ function Install-MewkitNext {
 			Say "$installDir is not on your PATH; add it, e.g.:"
 			Say "  [Environment]::SetEnvironmentVariable('Path', `"$installDir;`" + [Environment]::GetEnvironmentVariable('Path', 'User'), 'User')"
 		}
-		Say 'later updates: mewkit-next self-update'
+		Say 'later updates: mewkit self-update'
 	} finally {
 		Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue
 	}

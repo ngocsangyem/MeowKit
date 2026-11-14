@@ -22,7 +22,7 @@ fn stage() -> tempfile::TempDir {
 fn gate(kit: &Path) -> Output {
     Command::new("bash")
         .arg(repo().join("scripts/release/check-kit-against-binary.sh"))
-        .arg(env!("CARGO_BIN_EXE_mewkit-next"))
+        .arg(env!("CARGO_BIN_EXE_mewkit"))
         .arg(kit)
         .output()
         .expect("run the gate")

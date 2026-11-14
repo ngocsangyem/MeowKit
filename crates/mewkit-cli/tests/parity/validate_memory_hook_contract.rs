@@ -54,11 +54,11 @@ fn run_guard(case: &'static str, fixture: &'static str) -> Option<String> {
     );
 
     let binary = project.join(if cfg!(windows) {
-        "mewkit-next.exe"
+        "mewkit.exe"
     } else {
-        "mewkit-next"
+        "mewkit"
     });
-    std::fs::copy(env!("CARGO_BIN_EXE_mewkit-next"), &binary).expect("copy the binary");
+    std::fs::copy(env!("CARGO_BIN_EXE_mewkit"), &binary).expect("copy the binary");
 
     let driver = scratch.path().join("drive-memory-guard.cjs");
     std::fs::write(&driver, DRIVER).expect("write the driver");

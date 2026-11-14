@@ -1,6 +1,6 @@
-//! `mewkit-next`: the Rust mewkit CLI, installed beside the npm `mewkit` CLI
-//! until cutover. It parses arguments and maps outcomes to exit codes; the
-//! behaviour itself belongs in `mewkit-core` and `mewkit-adapters`.
+//! `mewkit` (also `mk`): the native mewkit CLI. It parses arguments and maps
+//! outcomes to exit codes; the behaviour itself belongs in `mewkit-core` and
+//! `mewkit-adapters`.
 #![forbid(unsafe_code)]
 
 mod adopt;
@@ -32,10 +32,10 @@ use failure::Failure;
 
 #[derive(Parser)]
 #[command(
-    name = "mewkit-next",
+    name = "mewkit",
     version = mewkit_core::VERSION,
     about = "Install and manage the MeowKit kit for Claude Code, Codex and Cursor (preview).",
-    after_help = "Commands not listed here still live in the npm `mewkit` CLI.",
+    after_help = "Commands not listed here still live in the npm `mewkit` package (`npx mewkit`).",
     arg_required_else_help = true
 )]
 struct Cli {
@@ -104,6 +104,7 @@ enum Command {
 }
 
 fn main() -> ExitCode {
+    rename_notice();
     let result = match parse_cli().command {
         Command::Init(args) => commands::init::run(&args),
         Command::Upgrade(args) => commands::upgrade::run(&args),
@@ -139,9 +140,19 @@ fn main() -> ExitCode {
     match result {
         Ok(code) => ExitCode::from(code),
         Err(failure) => {
-            eprintln!("mewkit-next: {failure}");
+            eprintln!("mewkit: {failure}");
             ExitCode::from(failure.code)
         }
+    }
+}
+
+/// Run under the pre-rename name, say once what to type instead, then carry on: scripts
+/// and old kits that call `mewkit-next` keep working for the release that keeps the link.
+/// The notice goes to stderr so stdout stays parseable.
+fn rename_notice() {
+    let invoked = std::env::args_os().next().map(std::path::PathBuf::from);
+    if invoked.as_deref().and_then(std::path::Path::file_stem) == Some("mewkit-next".as_ref()) {
+        eprintln!("mewkit-next is now mewkit; run \"mewkit\" (or \"mk\")");
     }
 }
 

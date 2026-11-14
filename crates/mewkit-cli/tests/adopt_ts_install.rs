@@ -1,5 +1,5 @@
 //! Taking over installs the npm `mewkit` CLI made. The npm install is stood
-//! in for by a `mewkit-next` install whose ownership index is replaced with
+//! in for by a `mewkit` install whose ownership index is replaced with
 //! an npm-format record (same schema and checksums the npm CLI writes).
 mod support;
 
@@ -150,7 +150,7 @@ fn a_kit_directory_with_no_record_is_named_with_the_command_that_takes_it_over()
     let out = env.with_kit(&["upgrade"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     assert!(
-        text(&out).contains("codex has no install record: `mewkit-next init --target codex`"),
+        text(&out).contains("codex has no install record: `mewkit init --target codex`"),
         "{}",
         text(&out)
     );

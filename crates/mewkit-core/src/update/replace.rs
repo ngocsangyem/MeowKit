@@ -21,7 +21,7 @@ pub fn replace(exe: &Path, bytes: &[u8]) -> io::Result<PathBuf> {
         .file_name()
         .ok_or_else(|| io::Error::other(format!("{} has no file name", exe.display())))?;
     let mut staged = tempfile::Builder::new()
-        .prefix(".mewkit-next-update-")
+        .prefix(".mewkit-update-")
         .tempfile_in(dir)
         .map_err(unchanged)?;
     io::Write::write_all(&mut staged, bytes).map_err(unchanged)?;

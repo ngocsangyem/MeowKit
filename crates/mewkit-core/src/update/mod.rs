@@ -5,12 +5,14 @@
 //! Order: manifest → not older than the running version → archive size and
 //! SHA-256 → binary taken out in memory → atomic replace. A manifest older
 //! than the running binary (a replayed one) is refused, never applied.
+mod aliases;
 mod archive;
 pub mod manifest;
 mod replace;
 
 use std::path::{Path, PathBuf};
 
+pub use aliases::refresh as refresh_aliases;
 pub use archive::binary_name;
 pub use manifest::{Manifest, Target, current_target};
 
@@ -118,7 +120,13 @@ pub fn apply(http: &dyn Http, offer: &Offer, exe: &Path) -> Result<PathBuf, KitE
         )));
     }
     checksum::verify(&bytes, &t.sha256, &t.url)?;
-    let binary = archive::binary_from(&bytes, binary_name())?;
+    let binary = archive::binary_in(&bytes)?;
+    // Replace the real file, never a link to it (`mk`): replacing the link would leave
+    // the binary old and the kept `.old` copy pointing at the new one.
+    let exe = &exe.canonicalize().map_err(|source| KitError::Io {
+        action: format!("resolving {}", exe.display()),
+        source,
+    })?;
     replace::replace(exe, &binary).map_err(|source| KitError::Io {
         action: format!("replacing {}", exe.display()),
         source,

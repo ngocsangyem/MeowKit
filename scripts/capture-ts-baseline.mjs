@@ -2,7 +2,7 @@
 /**
  * Freeze what the npm `mewkit` CLI installs today, per target, as golden manifests.
  *
- * The Rust `mewkit-next` must either reproduce these trees or list each intended
+ * The Rust `mewkit` must either reproduce these trees or list each intended
  * difference in `crates/mewkit-cli/tests/golden/DIVERGENCES.md`. A manifest is a
  * reference, not a contract: it records `relative path`, `sha256`, `size` and an
  * `exec` flag (POSIX execute bit) for every file one `init --target <t> --yes`

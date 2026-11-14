@@ -44,7 +44,7 @@ fn scripts(place: &Place, runtime: Runtime) -> Check {
             name,
             Status::Warn,
             format!(
-                "{} is missing, so no kit hook runs; `mewkit-next upgrade --force` registers them again",
+                "{} is missing, so no kit hook runs; `mewkit upgrade --force` registers them again",
                 file.display()
             ),
         );
@@ -90,7 +90,7 @@ fn scripts(place: &Place, runtime: Runtime) -> Check {
             name,
             Status::Fail,
             format!(
-                "registered but missing: {}; `mewkit-next upgrade --force` restores them",
+                "registered but missing: {}; `mewkit upgrade --force` restores them",
                 list.join(", ")
             ),
         )

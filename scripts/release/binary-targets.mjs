@@ -38,7 +38,7 @@ export function channelOf(version) {
 
 /** The archive asset name for one target: prefixed so no kit selector can match it. */
 export function assetName(version, target) {
-	return `mewkit-next-${checkVersion(version)}-${target}.tar.gz`;
+	return `mewkit-${checkVersion(version)}-${target}.tar.gz`;
 }
 
 /** The download URL of one archive of the release tagged `mewkit-v<version>`. */

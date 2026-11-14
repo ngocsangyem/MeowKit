@@ -589,7 +589,7 @@ The kit and the npm CLI are released by hand; the `mewkit-next` binary is built 
 **What a release is.** Pushing the tag `mewkit-v<version>` runs `.github/workflows/rust-release.yml`. The tag must equal `version` under `[workspace.package]` in `Cargo.toml`, so bump that in a reviewed PR first. The workflow:
 
 1. builds six targets: `{x86_64,aarch64}-unknown-linux-musl` (static), `{x86_64,aarch64}-apple-darwin`, `{x86_64,aarch64}-pc-windows-msvc` (static C runtime);
-2. packs each as `mewkit-next-<version>-<target>.tar.gz` (Windows too: never `.zip`);
+2. packs each as `mewkit-<version>-<target>.tar.gz` (Windows too: never `.zip`);
 3. writes `checksums.txt` and `binary-manifest.json` (`version`, `channel`, `published_at`, `min_supported`, per-target `url`, `sha256`, `size`) from the archives;
 4. creates the release as a draft, uploads everything, then publishes it with `--latest=false`; a version with `-` (e.g. `0.2.0-beta.1`) is a prerelease on the beta channel;
 5. opens a PR `release/installer-pins-mewkit-v<version>` that re-renders `install.sh` and `install.ps1` with the new pins.

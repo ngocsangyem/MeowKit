@@ -1,11 +1,11 @@
 name: Rust release
 
 # The binary release stream. A `mewkit-vX.Y.Z` tag (beta: `mewkit-vX.Y.Z-beta.N`)
-# builds mewkit-next for six targets, publishes them with binary-manifest.json
+# builds mewkit for six targets, publishes them with binary-manifest.json
 # and checksums.txt, and opens a pull request that re-pins install.sh and
 # install.ps1. Kit releases are `v*` tags from scripts/release.sh; nothing here
 # may look like one to the npm CLI already in users' hands: archives are
-# `.tar.gz` named `mewkit-next-*` (never `.zip`), and the release is created
+# `.tar.gz` named `mewkit-*` (never `.zip`), and the release is created
 # with --latest=false so `releases/latest` keeps resolving to a kit.
 #
 # Run it by hand (workflow_dispatch) to build every target without publishing.
@@ -103,15 +103,15 @@ jobs:
           case "$TARGET" in *linux-musl) export "CC_${TARGET//-/_}=musl-gcc" ;; esac
           cargo build --release --locked --target "$TARGET" -p mewkit-cli
           if [[ "$TARGET" == *linux-musl ]]; then
-            file "target/$TARGET/release/mewkit-next" | tee /dev/stderr | grep -q 'statically linked' \
+            file "target/$TARGET/release/mewkit" | tee /dev/stderr | grep -q 'statically linked' \
               || { echo "::error::the musl binary is not statically linked"; exit 1; }
           fi
 
       - name: Package
         shell: bash
         run: |
-          exe=mewkit-next; case "$TARGET" in *windows*) exe=mewkit-next.exe ;; esac
-          name="mewkit-next-$VERSION-$TARGET"
+          exe=mewkit; case "$TARGET" in *windows*) exe=mewkit.exe ;; esac
+          name="mewkit-$VERSION-$TARGET"
           mkdir -p "dist/$name"
           cp "target/$TARGET/release/$exe" LICENSE "dist/$name/"
           tar -C dist -czf "dist/$name.tar.gz" "$name"
@@ -119,8 +119,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: mewkit-next-${{ matrix.target }}
-          path: dist/mewkit-next-${{ needs.version.outputs.version }}-${{ matrix.target }}.tar.gz
+          name: mewkit-${{ matrix.target }}
+          path: dist/mewkit-${{ needs.version.outputs.version }}-${{ matrix.target }}.tar.gz
           if-no-files-found: error
 
   publish:
@@ -159,15 +159,15 @@ jobs:
             const m = require("./dist/binary-manifest.json");
             const rows = Object.entries(m.targets).map(([t, a]) => `| ${t} | ${(a.size / 1048576).toFixed(1)} MiB | \`${a.sha256}\` |`);
             console.log([
-              `mewkit-next ${m.version} (${m.channel}). Install: see install.sh / install.ps1 on the default branch once the pin PR is merged; update: \`mewkit-next self-update\`.`,
+              `mewkit ${m.version} (${m.channel}). Install: see install.sh / install.ps1 on the default branch once the pin PR is merged; update: \`mewkit self-update\`.`,
               "", "| Target | Archive size | SHA-256 |", "| --- | --- | --- |", ...rows,
             ].join("\n"));
           ')
           prerelease=; case "$VERSION" in *-*) prerelease=--prerelease ;; esac
           # Draft first: the release becomes visible only once every asset is uploaded.
           gh release create "$GITHUB_REF_NAME" --draft --verify-tag --latest=false $prerelease \
-            --title "mewkit-next $VERSION" --notes "$notes" \
-            dist/mewkit-next-*.tar.gz dist/checksums.txt dist/binary-manifest.json
+            --title "mewkit $VERSION" --notes "$notes" \
+            dist/mewkit-*.tar.gz dist/checksums.txt dist/binary-manifest.json
           gh release edit "$GITHUB_REF_NAME" --draft=false --latest=false
 
       - uses: actions/upload-artifact@v4
@@ -209,12 +209,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
           git add install.sh install.ps1 scripts/release/installer-pins.json
-          git commit -m "build(release): pin installers to mewkit-next $VERSION"
+          git commit -m "build(release): pin installers to mewkit $VERSION"
           # A re-run of the same tag replaces its own pin branch and reuses its PR.
           git push --force origin "$branch"
           if gh pr view "$branch" --json state -q .state 2>/dev/null | grep -q OPEN; then
             echo "pin PR for $branch already open"; exit 0
           fi
           gh pr create --base "$BASE" --head "$branch" \
-            --title "build(release): pin installers to mewkit-next $VERSION" \
+            --title "build(release): pin installers to mewkit $VERSION" \
             --body "Pins install.sh and install.ps1 to the archives of mewkit-v$VERSION (URL, SHA-256 and size from its binary-manifest.json). Compare each digest with the release's checksums.txt before merging: merging is what makes the installers serve this version."

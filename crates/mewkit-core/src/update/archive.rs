@@ -8,12 +8,21 @@ use crate::kit::KitError;
 /// Largest binary accepted after decompression.
 const MAX_BINARY_BYTES: u64 = 128 * 1024 * 1024;
 
-pub fn binary_name() -> &'static str {
-    if cfg!(windows) {
-        "mewkit-next.exe"
-    } else {
-        "mewkit-next"
-    }
+pub fn binary_name() -> String {
+    format!("mewkit{}", std::env::consts::EXE_SUFFIX)
+}
+
+/// The binary out of a release archive: `mewkit`, or `mewkit-next` in an archive
+/// built before the rename, so an update across the rename still finds it.
+pub fn binary_in(archive: &[u8]) -> Result<Vec<u8>, KitError> {
+    let primary = binary_name();
+    binary_from(archive, &primary).or_else(|first| {
+        binary_from(
+            archive,
+            &format!("mewkit-next{}", std::env::consts::EXE_SUFFIX),
+        )
+        .map_err(|_| first)
+    })
 }
 
 /// The bytes of `name` inside the gzipped tar `archive`.

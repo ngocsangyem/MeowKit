@@ -68,7 +68,7 @@ pub fn provider_checks() -> Vec<Check> {
             let name = format!("Provider adapter: {provider}");
             if view.gating_events.is_empty() {
                 Check::new(name, Status::Warn, format!(
-                    "{}: no proven deny/block, so no safety hook is enforced; cannot guarantee a block on {} (see `mewkit-next providers {provider} --lifecycle`)",
+                    "{}: no proven deny/block, so no safety hook is enforced; cannot guarantee a block on {} (see `mewkit providers {provider} --lifecycle`)",
                     view.projection.status, gaps.join(", ")
                 ))
             } else {

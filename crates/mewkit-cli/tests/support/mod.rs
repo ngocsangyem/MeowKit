@@ -16,19 +16,19 @@ use std::process::Output;
 use temp_home::TempHome;
 
 impl TempHome {
-    /// `mewkit-next` with this checkout's kit (`--kit-dir`) after `args`.
+    /// `mewkit` with this checkout's kit (`--kit-dir`) after `args`.
     pub fn with_kit(&self, args: &[&str]) -> Output {
         let kit = kit::kit();
         let dir = kit.dir.to_string_lossy().into_owned();
         let mut all: Vec<&str> = args.to_vec();
         all.extend(["--kit-dir", &dir, "--allow-unverified-kit"]);
-        self.mewkit_next(&all)
+        self.mewkit(&all)
     }
 
     /// Like [`TempHome::with_kit`], aborting before the `n`th disk change.
     pub fn with_kit_crashing_after(&self, n: u32, args: &[&str]) -> Output {
         let kit = kit::kit();
-        self.command(env!("CARGO_BIN_EXE_mewkit-next"))
+        self.command(env!("CARGO_BIN_EXE_mewkit"))
             .args(args)
             .args([
                 "--kit-dir",
@@ -37,7 +37,7 @@ impl TempHome {
             ])
             .env("MEWKIT_NEXT_FAULT_AFTER", n.to_string())
             .output()
-            .expect("spawn mewkit-next")
+            .expect("spawn mewkit")
     }
 }
 

@@ -59,25 +59,30 @@ else
   bad ".claude/kit-contract.json missing or invalid"; tail -3 /tmp/rc-contract.txt
 fi
 
-# The kit must install with the mewkit-next users already have. The binary is
-# $MEWKIT_NEXT_BIN, else `mewkit-next` on PATH. With neither, the gate is skipped
-# only while `gh` can prove no binary release exists; otherwise it fails.
-step "Candidate kit against the published mewkit-next"
-NEXT_BIN="${MEWKIT_NEXT_BIN:-$(command -v mewkit-next 2>/dev/null || true)}"
+# The kit must install with the mewkit binary users already have. The binary is
+# $MEWKIT_NEXT_BIN (named before the rename), else `mk` on PATH, else a pre-rename
+# `mewkit-next`. A bare `mewkit` is not looked up: on a machine that still has the npm
+# CLI it is that CLI's shim. With none, the gate is skipped only while `gh` can prove
+# no binary release exists; otherwise it fails.
+step "Candidate kit against the published mewkit binary"
+NEXT_BIN="${MEWKIT_NEXT_BIN:-$(command -v mk 2>/dev/null || command -v mewkit-next 2>/dev/null || true)}"
 if [ -z "$NEXT_BIN" ]; then
   if ! TAGS="$(gh release list --limit 100 --json tagName -q '.[].tagName' 2>/dev/null)"; then
-    bad "no mewkit-next binary, and gh cannot list releases to show none is published: install mewkit-next (install.sh) or set MEWKIT_NEXT_BIN"
+    bad "no mewkit binary (mk), and gh cannot list releases to show none is published: install it (install.sh) or set MEWKIT_NEXT_BIN"
   elif printf '%s\n' "$TAGS" | grep -q '^mewkit-v'; then
-    bad "no mewkit-next binary: install it (install.sh) or set MEWKIT_NEXT_BIN"
+    bad "no mewkit binary (mk): install it (install.sh) or set MEWKIT_NEXT_BIN"
   else
-    ok "skipped — no mewkit-next binary release is published yet"
+    ok "skipped — no mewkit binary release is published yet"
   fi
+# `mk` is a short name another tool may own; only a `mewkit X` banner is the binary.
+elif ! "$NEXT_BIN" --version 2>/dev/null | grep -Eq '^mewkit(-next)? '; then
+  bad "$NEXT_BIN is not a mewkit binary (its --version is not \`mewkit X\`): set MEWKIT_NEXT_BIN"
 else
   GATE_TMP="$(mktemp -d)"
   "$NEXT_BIN" self-update --check >"$GATE_TMP/update.txt" 2>&1
   case $? in
     0) ;;
-    3) bad "$NEXT_BIN is not the newest published mewkit-next; run \`mewkit-next self-update\` first" ;;
+    3) bad "$NEXT_BIN is not the newest published mewkit; run \`mewkit self-update\` first" ;;
     *) printf '  note: could not check that %s is the newest release (%s)\n' "$NEXT_BIN" "$(tail -1 "$GATE_TMP/update.txt")" ;;
   esac
   if node scripts/release/stage-candidate-kit.cjs "$GATE_TMP/kit" >"$GATE_TMP/stage.txt" 2>&1 \

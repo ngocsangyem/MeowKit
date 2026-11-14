@@ -1,4 +1,4 @@
-//! Per-runtime adapters for the `mewkit-next` installer.
+//! Per-runtime adapters for the `mewkit` installer.
 //!
 //! Each runtime the kit installs into gets one [`Emitter`] here, built on
 //! `mewkit-core` and listed in [`registry`].
