@@ -42,12 +42,12 @@ larger than its number.
 
 | Verb | Kit refs | TS lines | Status |
 | --- | ---: | ---: | --- |
-| `init` | 2 | — | ported |
-| `upgrade` | 2 | — | ported |
+| `init` | 2 | — | ported, incl. `--profile`, `--delivery`, `--mcp-profiles`, `--allow-cloud-mcp` and the target and profile pickers; what it writes differs from the npm CLI by design (`crates/mewkit-cli/tests/golden/DIVERGENCES.md`) |
+| `upgrade` | 2 | — | ported, incl. `--check`, `--list`, `--yes`; `--no-cleanup` is accepted and has nothing to keep |
 | `uninstall` | 2 | — | ported |
-| `doctor` | 10 | — | ported |
-| `providers` | 2 | — | ported |
-| `versions` | 2 | — | ported |
+| `doctor` | 10 | — | ported, incl. `provenance`, `--explain`, `--adopt`, `--hard-gates` (parity cases); `--report`, `--providers`, `--state` extend the binary's own report |
+| `providers` | 2 | — | ported, incl. `--lifecycle` and `<provider>` (parity cases); without `--lifecycle` it shows what the kit projects for each runtime, not the npm CLI's support matrix |
+| `versions` | 2 | — | ported; reports installed, cached and available kits rather than the npm CLI's four install facts |
 | `plan` (incl. `approve`, `archive`) | 31 | 537 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
 | `task` | 5 | 458 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
 | `task-state` | 11 | 239 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
@@ -60,11 +60,11 @@ larger than its number.
 | `trace` | 12 | 175 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
 | `budget` | 9 | 477 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
 | `visual-plan` | 56 | 3,075 | removed from the npm CLI and the kit; not ported |
-| `setup` | 2 | 707 | port group 3 |
-| `skill` (`skill env`) | 15 | 174 | port group 3 |
-| `pack` | 4 | 436 | port group 3 |
-| `capabilities` | 9 | 297 | port group 3 |
-| `backups` | 3 | 122 | port group 3 |
+| `setup` | 2 | 707 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`); adds `--yes` for the system-deps question, which the npm CLI cannot answer without a terminal |
+| `skill` (`skill env`) | 15 | 174 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
+| `pack` | 4 | 436 | ported (parity cases for listing and refusals; installs and removals end to end in `tests/init_flags.rs`) |
+| `capabilities` | 9 | 297 | ported (TS-vs-Rust parity cases: `cargo test -p mewkit-cli --test parity`) |
+| `backups` | 3 | 122 | ported (TS-vs-Rust parity cases); reads and restores the npm CLI's snapshots, refuses a snapshot whose manifest names a path outside the project (the npm CLI writes it), and lists the plain copies `init`/`upgrade`/`uninstall` take as not restorable here |
 | `migrate` | 3 | 15,155 | retired from the npm CLI, not ported — `init --target codex|cursor` replaces it; the kit's references point at `init --target` |
 
 The measurement also matches `mewkit sync` (a prose mention in a third-party skill's

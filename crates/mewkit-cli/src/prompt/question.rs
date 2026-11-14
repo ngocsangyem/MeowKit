@@ -26,6 +26,8 @@ impl Choice {
         }
     }
 
+    /// A value shown under a display label; the ported pickers show raw values.
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn labelled(value: impl Into<String>, label: impl Into<String>) -> Self {
         Self {
             value: value.into(),

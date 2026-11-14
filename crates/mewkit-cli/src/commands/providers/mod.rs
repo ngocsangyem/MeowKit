@@ -1,5 +1,13 @@
 //! `mewkit-next providers`: what each runtime gets from the kit at this scope —
 //! files, skills actually projected, hooks, and what it cannot carry.
+//!
+//! `--lifecycle` switches to the capability-adapter view the npm CLI shares
+//! (see `lifecycle`). Without it, this verb reports what the KIT PROJECTS per
+//! runtime, and a positional `<provider>` is the same as `--target <provider>`.
+//! The npm CLI's default view is a provider support matrix built by its
+//! retired migrate layer; that view is not ported, on purpose, because this
+//! verb was designed to report the projection rather than a support claim.
+mod lifecycle;
 use std::collections::BTreeSet;
 
 use clap::Args;
@@ -13,6 +21,12 @@ use crate::place::Place;
 
 #[derive(Args, Debug)]
 pub struct ProvidersArgs {
+    /// One runtime to show; the same as `--target <provider>`.
+    pub provider: Option<String>,
+    /// Show the capability-adapter view: the lifecycle-event matrix, or one
+    /// provider's adapter detail.
+    #[arg(long)]
+    pub lifecycle: bool,
     /// Runtimes to show (comma-separated); default: all.
     #[arg(long, value_name = "TARGETS")]
     pub target: Vec<String>,
@@ -29,11 +43,16 @@ pub struct ProvidersArgs {
 }
 
 pub fn run(args: &ProvidersArgs) -> Result<u8, Failure> {
+    if args.lifecycle {
+        return lifecycle::run(args.provider.as_deref(), args.json);
+    }
     let place = Place::new(args.global)?;
-    let targets = if args.target.is_empty() {
+    let mut wanted = args.target.clone();
+    wanted.extend(args.provider.clone());
+    let targets = if wanted.is_empty() {
         parse_targets(&["all".into()])?
     } else {
-        parse_targets(&args.target)?
+        parse_targets(&wanted)?
     };
     let kit = resolve(&args.kit, &place)?;
     let mut rows = Vec::new();

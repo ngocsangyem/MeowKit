@@ -82,6 +82,19 @@ fn upgrade_keeps_an_edit_until_forced_and_keeps_the_packs() {
     assert_eq!(skills(&p), installed, "packs come from the index");
 
     let out = env.with_kit(&["upgrade", "--force"]);
+    assert_eq!(
+        code(&out),
+        3,
+        "no terminal: --force needs --yes; {}",
+        text(&out)
+    );
+    assert_eq!(
+        read(&p, EDITED),
+        "mine\n",
+        "an unconfirmed --force writes nothing"
+    );
+
+    let out = env.with_kit(&["upgrade", "--force", "--yes"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     assert_ne!(read(&p, EDITED), "mine\n");
 

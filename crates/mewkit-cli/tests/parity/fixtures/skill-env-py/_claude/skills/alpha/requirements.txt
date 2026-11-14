@@ -1,0 +1,4 @@
+# pinned for alpha only
+requests==2.31.0
+
+pillow>=10.0

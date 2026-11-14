@@ -46,12 +46,17 @@
 //! it was written for.
 mod advice_cases;
 mod argv_table;
+mod backups_cases;
 mod budget_cases;
+mod capabilities_cases;
+mod doctor_cases;
 mod harness;
 mod hook_contract;
+mod init_cases;
 mod note_cases;
 mod orient_cases;
 mod orient_flag_cases;
+mod pack_cases;
 mod plan_approve_cases;
 mod plan_archive_cases;
 mod plan_check_cases;
@@ -59,6 +64,8 @@ mod plan_invocation_cases;
 mod plan_receipt_consumer;
 mod plan_status_cases;
 mod review_cases;
+mod setup_cases;
+mod skill_env_cases;
 mod task_cases;
 mod task_state_cases;
 mod trace_cases;

@@ -18,6 +18,12 @@ pub struct Spec {
     pub skills: &'static str,
 }
 
+/// The pack list that selects every pack in the catalog.
+pub const ALL_PACKS: &str = "all";
+/// The pack list for "no named pack": the catalog's default pack alone. Not a
+/// valid pack name, so it cannot collide with one.
+pub const DEFAULT_ONLY: &str = "@default";
+
 pub struct Bundle {
     pub spec: &'static Spec,
     /// Files of `<kit>/<BUNDLE>/root`; their paths map 1:1 onto project paths.
@@ -100,7 +106,16 @@ impl Bundle {
             .iter()
             .map(|(k, v)| (k.as_str(), v))
             .collect();
-        let mut todo: Vec<String> = packs.to_vec();
+        // `all` names every pack; `DEFAULT_ONLY` names none, which leaves the
+        // catalog's default pack (the npm CLI's reading of an empty list).
+        let mut todo: Vec<String> = Vec::new();
+        for name in packs {
+            match name.as_str() {
+                ALL_PACKS => todo.extend(table.keys().map(|k| (*k).to_owned())),
+                DEFAULT_ONLY => {}
+                _ => todo.push(name.clone()),
+            }
+        }
         if let Some(default) = catalog["defaultPack"].as_str() {
             todo.push(default.to_owned());
         }
@@ -111,7 +126,12 @@ impl Bundle {
                 continue;
             }
             let pack = table.get(name.as_str()).ok_or_else(|| {
-                EmitError::Kit(format!("unknown {} skill pack {name:?}", self.spec.runtime))
+                let mut known: Vec<&str> = table.keys().copied().collect();
+                known.sort_unstable();
+                EmitError::Kit(format!(
+                    "unknown skill pack: \"{name}\" (known: {})",
+                    known.join(", ")
+                ))
             })?;
             for s in pack["skills"].as_array().into_iter().flatten() {
                 skills.insert(s.as_str().unwrap_or_default().to_owned());

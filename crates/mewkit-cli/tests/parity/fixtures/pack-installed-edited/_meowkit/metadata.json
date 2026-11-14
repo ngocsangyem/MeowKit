@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0",
+  "tool": "meowkit",
+  "version": "1.0.0",
+  "scope": "local",
+  "installedAt": "2026-01-01T00:00:00.000Z",
+  "files": [
+    {
+      "path": "settings.json",
+      "owner": "meowkit",
+      "layer": "core",
+      "checksum": "78922a784ee78e9e50587e93628cd3b9d4dfbe49087adc4514e6781cea38cbb9",
+      "baseChecksum": "78922a784ee78e9e50587e93628cd3b9d4dfbe49087adc4514e6781cea38cbb9"
+    },
+    {
+      "path": "rules/gate-rules.md",
+      "owner": "meowkit",
+      "layer": "core",
+      "checksum": "b53de24efca885870a2da981663ab056c5bf737218281603e6f2cfb2b2e09b31",
+      "baseChecksum": "b53de24efca885870a2da981663ab056c5bf737218281603e6f2cfb2b2e09b31"
+    },
+    {
+      "path": "skills/cook/SKILL.md",
+      "owner": "meowkit",
+      "layer": "skill",
+      "checksum": "eea6a8aaa452c2b4031e57b221b8372d5cf00be97f2b1ac12c0b593364f22b8f",
+      "baseChecksum": "eea6a8aaa452c2b4031e57b221b8372d5cf00be97f2b1ac12c0b593364f22b8f"
+    },
+    {
+      "path": "skills/qa/SKILL.md",
+      "owner": "meowkit",
+      "layer": "skill",
+      "checksum": "2ba342ab254bbf19f044dc5dac041ede07e114ce251960f2de061a680f84cb2f",
+      "baseChecksum": "2ba342ab254bbf19f044dc5dac041ede07e114ce251960f2de061a680f84cb2f"
+    },
+    {
+      "path": "skills/qa/notes.md",
+      "owner": "meowkit",
+      "layer": "skill",
+      "checksum": "72dc806553c0fc5ce2e14f229eb04da7040eb6ec7a9e70c8152cfa7a7ca5805f",
+      "baseChecksum": "72dc806553c0fc5ce2e14f229eb04da7040eb6ec7a9e70c8152cfa7a7ca5805f"
+    },
+    {
+      "path": "skills/docs-writer/SKILL.md",
+      "owner": "meowkit",
+      "layer": "skill",
+      "checksum": "39edfc50341d775c80f6c45e8f3722d96c861fe7488f03d97719c159af9a7bdf",
+      "baseChecksum": "39edfc50341d775c80f6c45e8f3722d96c861fe7488f03d97719c159af9a7bdf"
+    }
+  ],
+  "packs": [
+    "lifecycle-core",
+    "testing",
+    "docs"
+  ]
+}

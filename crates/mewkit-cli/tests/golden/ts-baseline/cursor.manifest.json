@@ -1180,8 +1180,8 @@
     },
     {
       "path": ".cursor/skills/mk-context-audit/SKILL.md",
-      "sha256": "9bf3895d493ce350380c7f2eb0a62f80064a90e9f38f7a02a8859be403552332",
-      "size": 5121
+      "sha256": "496d91cb205bda757a50879b20cf2a9d6cb44ad404a22fb96ca3bb12cc2412dc",
+      "size": 4989
     },
     {
       "path": ".cursor/skills/mk-context-audit/references/.gitkeep",
@@ -1190,8 +1190,8 @@
     },
     {
       "path": ".cursor/skills/mk-context-audit/references/token-cost-model.md",
-      "sha256": "ed350640bb810bcabdd8df47fa58a48803005bd6c7cea9f51fb7dc7d3c0dd534",
-      "size": 4337
+      "sha256": "8d8f2c8a5c87bc4130f8b7b5624691035753ba310895ac09cbfa99c25d763b41",
+      "size": 3860
     },
     {
       "path": ".cursor/skills/mk-context-audit/scripts/.gitkeep",
@@ -1200,8 +1200,8 @@
     },
     {
       "path": ".cursor/skills/mk-context-audit/scripts/estimate-tokens.sh",
-      "sha256": "42117276b257fb8f3bd3d7551d756e77e657fd2103b8ace64b18a197ffefbf4f",
-      "size": 2458,
+      "sha256": "97503c1c8341f9213027a4b9efb6b4dc15a42dcaba9b0f0cf30258a30b5d7730",
+      "size": 2426,
       "exec": true
     },
     {

@@ -7,13 +7,16 @@ use clap::Args;
 use mewkit_adapters::contract::written_hashes;
 use mewkit_core::exec::ExecOptions;
 
+use super::upgrade_query::{self, Query};
 use super::{
     Common, Job, drop_retired, emitter_for, hashes_of, parse_targets, prepare, run_jobs, stamp,
+    unconfirmed_force,
 };
-use crate::failure::Failure;
+use crate::failure::{Failure, PENDING};
 use crate::kit_args::{KitArgs, installed_kit};
 use crate::output;
 use crate::place::Place;
+
 use mewkit_adapters::contract::Runtime;
 
 #[derive(Args, Debug)]
@@ -25,6 +28,19 @@ pub struct UpgradeArgs {
     /// kit is still kept in the cache).
     #[arg(long)]
     pub dry_run: bool,
+    /// Report the installed kit against the newest release; change nothing.
+    #[arg(long, conflicts_with_all = ["list", "dry_run"])]
+    pub check: bool,
+    /// List the kit releases that can be installed; change nothing.
+    #[arg(long, conflicts_with = "dry_run")]
+    pub list: bool,
+    /// Accepted for scripts written for the npm CLI. There is no download
+    /// directory to keep: a downloaded kit always stays in the cache.
+    #[arg(long)]
+    pub no_cleanup: bool,
+    /// Confirm --force in a session with no terminal (CI, a pipe, a hook).
+    #[arg(long)]
+    pub yes: bool,
     #[command(flatten)]
     pub common: Common,
     #[command(flatten)]
@@ -33,6 +49,22 @@ pub struct UpgradeArgs {
 
 pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
     let place = Place::new(args.common.global)?;
+    if args.check || args.list {
+        let query = if args.check {
+            Query::Check
+        } else {
+            Query::List
+        };
+        return upgrade_query::run(
+            &place,
+            query,
+            args.kit.beta,
+            args.kit.offline,
+            args.common.json,
+        );
+    }
+    let unconfirmed = unconfirmed_force("upgrade", args.common.force, args.yes);
+    let dry_run = args.dry_run || unconfirmed;
     let installed = place.installed()?;
     let targets = if args.target.is_empty() {
         installed.clone()
@@ -97,12 +129,15 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
         &place,
         jobs,
         ExecOptions {
-            dry_run: args.dry_run,
+            dry_run,
             force: args.common.force,
         },
         args.common.json,
     )?;
-    Ok(output::exit_code(&outcomes, args.dry_run))
+    if unconfirmed {
+        return Ok(PENDING);
+    }
+    Ok(output::exit_code(&outcomes, dry_run))
 }
 
 /// What is here that `upgrade` does not manage, and the command that takes it over.

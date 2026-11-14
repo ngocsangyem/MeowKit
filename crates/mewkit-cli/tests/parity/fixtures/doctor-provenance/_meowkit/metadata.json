@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "1.0",
+  "tool": "meowkit",
+  "version": "1.2.3",
+  "scope": "local",
+  "installedAt": "2026-11-01T10:00:00.000Z",
+  "files": [
+    {
+      "path": "rules/ok.md",
+      "owner": "meowkit",
+      "layer": "core",
+      "checksum": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+      "baseChecksum": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "memory/note.md",
+      "owner": "user",
+      "layer": "user",
+      "checksum": "1b16b1df538ba12dc3f97edbb85caa7050d46c148134290feba80f8236c83db9",
+      "baseChecksum": "1b16b1df538ba12dc3f97edbb85caa7050d46c148134290feba80f8236c83db9",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "hooks/nobase.cjs",
+      "owner": "meowkit",
+      "layer": "core",
+      "checksum": "aaa9402664f1a41f40ebbc52c9993eb66aeb366602958fdfaa283b71e64db123",
+      "baseChecksum": "",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s00/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "b70a14ee1e15d7aa94bd810ec06f4cb77a346e8f33aef6bfeae3d7c4442d7a93",
+      "baseChecksum": "ea29aff4f763a1dbbe46bc514fcb1b30a3242b07a477117fc79e2e476c94e449",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s01/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "ec31682fde561917952ff78a7a8adeffd0febc372dd26871916c46c630381b45",
+      "baseChecksum": "03e0769b10886aef0ff2170851dd67d41755c87037c4319d9901e7fdf518c485",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s02/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "844ecc08164e2eab27634a9adee1afa6599e589570e719784e080ce747fc0e45",
+      "baseChecksum": "ad4063bd788deb6e33c38277838197a09aea6c4c94ead7fb948da1f6bac447ee",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s03/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "844b69c4d54cc264bc2dadb6bb70f53bc123beafc0f58d81ed8cd4a07c24a5a7",
+      "baseChecksum": "ab67eec2395b9f39493bac6d9b3fb81c7c4ba7fbd7f0c73bd84e7970352d3553",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s04/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "7985b0c8b858e77f57c6d403b315ade04d2485d6ec2d09694256eadd20db6f27",
+      "baseChecksum": "e5df1183e5b2c7c124b6d1a6ffa927374f32849477b0f6e47601feecdeb7ef85",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s05/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "29f2394eb92d0ded9247b8d7188ebddae3e13c71ebcf939302619b29604486b0",
+      "baseChecksum": "c1084b5865d0b5ac17a37b858a1d96a8cc29b152ff7111b5f830b7476e496428",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s06/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "0520220e0f12bb847b57ad4bb3dfe908368a1057a7028b92186e73769fe3cc62",
+      "baseChecksum": "d1eef6b6e884ad072a37ac1bccb8f1f559a92374f83401790bd52a53e46bf1fa",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s07/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "8cf3ebbdacddfddd6f13673f945f523cc9813df2fcdf2a420a230d283bdf4a7a",
+      "baseChecksum": "9e83f0f4b6c672060db4db2f5c7fdba3518d8447350c338b083bbb3a0e0d296e",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s08/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "240a42374fa81d24508638282a416c46b2ff7d1dc529871e7151e5eeffd77b13",
+      "baseChecksum": "3bba6fd3e6602d3f7ce5cf48e5c8785a2e8825e22048fca2b6c64b1342ebb72c",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s09/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "05bb5f0450bd7ae843ecf0b0a59698fd93d83a3930686eb7cfcf33fbb26edde4",
+      "baseChecksum": "ac9f23c193df1aa65333ee0cfe836f561f91d9ff5003efc2803a2b3e81800880",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s10/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "96a610aee3735ad666d7a40a0f030498b6b8b26ea3240a7308723b61a7794a87",
+      "baseChecksum": "d9f3357feaf033a6739b5ed5f048c43054809b13198736853c17969c29bc905a",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "path": "skills/s11/SKILL.md",
+      "owner": "meowkit-modified",
+      "layer": "skill",
+      "checksum": "fe372293ac6fc8767d248278e9ceacbb53aa57de8d3b30ef20813933935d1332",
+      "baseChecksum": "451c2e2d8ebde07da0d3cb5cde1eedfc1e819204e9c66d37ffa9e2d9604360dd",
+      "installedVersion": "1.2.3",
+      "installedAt": "2026-11-01T10:00:00.000Z"
+    }
+  ]
+}

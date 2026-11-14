@@ -1,0 +1,6 @@
+#!/bin/sh
+# Only the package managers exist on this machine.
+case "$1" in
+  brew|apt-get|sudo) exit 0 ;;
+  *) exit 1 ;;
+esac

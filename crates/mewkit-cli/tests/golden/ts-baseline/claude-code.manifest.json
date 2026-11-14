@@ -1553,8 +1553,8 @@
     },
     {
       "path": ".claude/skills/context-audit/SKILL.md",
-      "sha256": "d6c8e585c6aabd560b39242794837ac2fb7abc96bf8057b6b95d315cac20cc01",
-      "size": 5418
+      "sha256": "668d8cb2f6c39464fa8cd83139217b4cd3c5c2183da64955e40c7f673bec5288",
+      "size": 5335
     },
     {
       "path": ".claude/skills/context-audit/references/.gitkeep",
@@ -1563,8 +1563,8 @@
     },
     {
       "path": ".claude/skills/context-audit/references/token-cost-model.md",
-      "sha256": "4bb71feaf285c4389a3825b928d0211ee6983ecbd66d8a4f105b5d3ec1ca4878",
-      "size": 4340
+      "sha256": "d5df3e1b09c50882ccdb3700c902b332166a7a8b6b45d76637f7c82008e6118f",
+      "size": 4053
     },
     {
       "path": ".claude/skills/context-audit/scripts/.gitkeep",
@@ -1573,8 +1573,8 @@
     },
     {
       "path": ".claude/skills/context-audit/scripts/estimate-tokens.sh",
-      "sha256": "1ac835bab768ed1a200c51d597c1e8484004a86bd185099c2ae774770c9527fe",
-      "size": 2463,
+      "sha256": "3df9f4b8f9b27e00cf5a291d186dab05198d32d5075b55e20a2f3d2a5833c591",
+      "size": 2478,
       "exec": true
     },
     {
@@ -7326,8 +7326,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/context-audit/SKILL.md",
-      "sha256": "d6c8e585c6aabd560b39242794837ac2fb7abc96bf8057b6b95d315cac20cc01",
-      "size": 5418
+      "sha256": "668d8cb2f6c39464fa8cd83139217b4cd3c5c2183da64955e40c7f673bec5288",
+      "size": 5335
     },
     {
       "path": ".meowkit/cache/.claude/skills/context-audit/references/.gitkeep",
@@ -7336,8 +7336,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/context-audit/references/token-cost-model.md",
-      "sha256": "4bb71feaf285c4389a3825b928d0211ee6983ecbd66d8a4f105b5d3ec1ca4878",
-      "size": 4340
+      "sha256": "d5df3e1b09c50882ccdb3700c902b332166a7a8b6b45d76637f7c82008e6118f",
+      "size": 4053
     },
     {
       "path": ".meowkit/cache/.claude/skills/context-audit/scripts/.gitkeep",
@@ -7346,8 +7346,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/context-audit/scripts/estimate-tokens.sh",
-      "sha256": "1ac835bab768ed1a200c51d597c1e8484004a86bd185099c2ae774770c9527fe",
-      "size": 2463,
+      "sha256": "3df9f4b8f9b27e00cf5a291d186dab05198d32d5075b55e20a2f3d2a5833c591",
+      "size": 2478,
       "exec": true
     },
     {

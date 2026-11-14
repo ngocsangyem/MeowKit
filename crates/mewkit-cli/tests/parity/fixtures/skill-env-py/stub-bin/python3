@@ -1,0 +1,16 @@
+#!/bin/sh
+# Records what would have run and lays down a venv-shaped directory, so the
+# compared file tree shows the effect without a real interpreter.
+echo "python3 $*" >> calls.log
+if [ "$1" = "-m" ] && [ "$2" = "venv" ]; then
+  case "$3" in
+    *vfail)
+      echo "Error: venv boom" >&2
+      exit 1
+      ;;
+  esac
+  mkdir -p "$3/bin"
+  cp "$(dirname "$0")/venv-python3" "$3/bin/python3"
+  cp "$(dirname "$0")/venv-pip" "$3/bin/pip"
+fi
+exit 0

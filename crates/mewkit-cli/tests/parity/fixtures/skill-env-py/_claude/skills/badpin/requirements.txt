@@ -1,0 +1,3 @@
+-r evil.txt
+ok==1
+git+https://example.invalid/x.git

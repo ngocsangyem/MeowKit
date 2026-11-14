@@ -57,8 +57,16 @@ impl Emitter for Cursor {
         Runtime::Cursor
     }
 
-    fn roots(&self, _scope: &Scope) -> Vec<RelPath> {
-        vec![RelPath::new(".cursor").expect("static root")]
+    fn roots(&self, scope: &Scope) -> Vec<RelPath> {
+        // `.meowkit` holds the bundle's README, which a project install keeps.
+        let roots: &[&str] = match scope.kind {
+            ScopeKind::Project => &[".cursor", ".meowkit"],
+            ScopeKind::Global => &[".cursor"],
+        };
+        roots
+            .iter()
+            .map(|r| RelPath::new(r).expect("static root"))
+            .collect()
     }
 
     fn prepare(&self, req: &EmitRequest<'_>) -> Result<Plan, EmitError> {
@@ -86,8 +94,9 @@ impl Emitter for Cursor {
                         "the Cursor bundle ships {CORE_RULE}, which its AGENTS.md is installed as"
                     )));
                 }
-                // The npm CLI's own state notes; mewkit-next keeps state elsewhere.
-                p if p.starts_with(".meowkit/") => continue,
+                // The project README is the only `.meowkit/` file the bundle
+                // ships; a global install has no `.meowkit` to put it in.
+                p if global && p.starts_with(".meowkit/") => continue,
                 p if p.starts_with(".cursor/agents/") && p.ends_with(".md") => {
                     let (text, dropped) =
                         frontmatter::keep_keys(&kit_files::read_text(&f.abs)?, AGENT_KEYS);

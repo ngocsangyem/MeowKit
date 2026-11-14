@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "kit_version": "1.0.0",
+  "kit_contract": "1",
+  "packs": [
+    "base",
+    "lifecycle-core",
+    "testing",
+    "docs"
+  ],
+  "origin": "local-dir",
+  "paths": {
+    ".claude/settings.json": "78922a784ee78e9e50587e93628cd3b9d4dfbe49087adc4514e6781cea38cbb9",
+    ".claude/rules/gate-rules.md": "b53de24efca885870a2da981663ab056c5bf737218281603e6f2cfb2b2e09b31",
+    ".claude/skills/cook/SKILL.md": "eea6a8aaa452c2b4031e57b221b8372d5cf00be97f2b1ac12c0b593364f22b8f",
+    ".claude/skills/qa/SKILL.md": "2ba342ab254bbf19f044dc5dac041ede07e114ce251960f2de061a680f84cb2f",
+    ".claude/skills/qa/notes.md": "72dc806553c0fc5ce2e14f229eb04da7040eb6ec7a9e70c8152cfa7a7ca5805f",
+    ".claude/skills/docs-writer/SKILL.md": "39edfc50341d775c80f6c45e8f3722d96c861fe7488f03d97719c159af9a7bdf"
+  },
+  "hooks": {},
+  "mcp_servers": {},
+  "sections": {}
+}

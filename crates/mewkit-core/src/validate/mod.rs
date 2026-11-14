@@ -71,6 +71,7 @@ mod ownership_rows;
 mod pack_files;
 mod pack_manifest;
 mod pack_manifest_shape;
+mod pack_resolve;
 mod packs;
 mod packs_safety;
 mod portability;
@@ -153,6 +154,7 @@ pub use pack_manifest::{
     BASE_PACK, PackManifest, PackManifestError, flatten_profile, has_pack_manifest,
     load_pack_manifest, pack_manifest_path,
 };
+pub use pack_resolve::{Resolved, resolve_packs, resolve_profile};
 pub use packs::check_packs;
 pub use portability::check_portability;
 pub use pseudo_capabilities::{
