@@ -141,12 +141,24 @@ fn resolve_reports_availability_from_the_host() {
         ("capabilities-resolve-mcp", "jira issue"),
         ("capabilities-resolve-file", "load project context"),
         ("capabilities-resolve-self", "record friction"),
-        ("capabilities-resolve-binary", "browser automation"),
     ] {
         let (ts, _) = caps(name, INSTALL, &["resolve", "--intent", intent]);
         assert_eq!(ts.code, 0, "{}", ts.describe());
         assert!(ts.stdout.contains("→"), "{name}: {}", ts.describe());
     }
+    // chromium was not on PATH where the npm output was recorded; CI runners
+    // may have it, so PATH here is an empty directory to keep it unavailable.
+    let empty = tempfile::tempdir().expect("empty PATH dir");
+    let (ts, _) = npm::case("capabilities-resolve-binary")
+        .fixture(INSTALL)
+        .args(&["capabilities", "resolve", "--intent", "browser automation"])
+        .env("PATH", &empty.path().to_string_lossy())
+        .run();
+    assert!(
+        ts.stdout.contains("external_binary:chromium → unavailable"),
+        "{}",
+        ts.describe()
+    );
 }
 
 #[test]
