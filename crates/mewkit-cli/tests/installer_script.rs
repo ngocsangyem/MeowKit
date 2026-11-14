@@ -59,10 +59,27 @@ const OTHER_BODY: &[u8] =
     b"other bytes entirely: a body several times the length of the real one, \
 so the compressed archive is certainly a different size from the pinned archive";
 
-/// The installer's output with whitespace folded: PowerShell wraps an error at the console
-/// width and prefixes each continuation line with `|`, so a phrase can straddle a break.
+/// The installer's output as plain words: PowerShell colours an error with ANSI escapes,
+/// wraps it at the console width and prefixes each continuation line with `|`, so a phrase
+/// can straddle a break.
 fn said(out: &Output) -> String {
-    text(out)
+    let mut plain = String::new();
+    let raw = text(out);
+    let mut chars = raw.chars().peekable();
+    while let Some(c) = chars.next() {
+        if c == '\x1b' && chars.peek() == Some(&'[') {
+            // A CSI sequence ends at its first byte in `@`..=`~`.
+            chars.next();
+            for c in chars.by_ref() {
+                if ('@'..='~').contains(&c) {
+                    break;
+                }
+            }
+        } else {
+            plain.push(c);
+        }
+    }
+    plain
         .split_whitespace()
         .filter(|w| *w != "|")
         .collect::<Vec<_>>()
