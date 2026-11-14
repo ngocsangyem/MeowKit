@@ -9,8 +9,8 @@ use super::result::{CheckResult, Section, Status};
 
 /// Models the taxonomy resolves: the two named profiles and the three tiers.
 /// `inherit` and an empty value are resolvable by definition — they ask for the
-/// target's own default. Mirrors `migrate/model-taxonomy.ts`, where only an
-/// unknown non-empty string produces an "Unknown model" warning.
+/// target's own default. Only an unknown non-empty string is reported. This is
+/// the one table a model rename has to be edited in.
 const RESOLVABLE_MODELS: [&str; 5] = ["fable", "claude-opus-5", "opus", "sonnet", "haiku"];
 
 fn model_is_resolvable(model: &str) -> bool {

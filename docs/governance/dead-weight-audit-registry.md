@@ -43,7 +43,7 @@ Delta convention: `measured_delta = baseline_avg − disabled_avg` on the calibr
 | Always-loaded memory and wiki instruction rules (`rules/memory-read-rules.md`, `rules/wiki-context-rules.md`) | The model needs instructions on how to read the memory and wiki surfaces at every session start | not measured (benchmark baseline deferred by owner) | n/a (not measured) | 2026-11-01 | PRUNE (provisional; Rule 5 re-audit pending) |
 | `validate --memory` lint (`core/check-memory-store.ts`) | A committed, grep-read store must be checked at the PR boundary for injection, obfuscated injection, secrets, size and flood (`injection-rules.md` Rules 8–9) | N/A (**NEVER-PRUNE** — security defense, Rule 4) | n/a (not measured) | 2026-11-01 | KEEP |
 | `mewkit note <decisions\|gotchas>` | Every memory append must be lint-checked and serialized under a file lock, so a rejected or concurrent write never corrupts or silently loses an entry, and a secret is never echoed | N/A (**NEVER-PRUNE** — write-path security gate, Rule 4) | n/a (not measured) | 2026-11-01 | KEEP |
-| Zero-residue CI check (`scripts/check-memory-wiki-residue.cjs`) | Removed wiki and JSON-store names must not reappear in `.claude/` or `packages/mewkit/src/` (AC-04 pinned roots) | N/A (correctness — residue oracle; no benchmark delta) | n/a (not measured) | 2026-11-01 | KEEP |
+| Zero-residue CI check (`scripts/check-memory-wiki-residue.cjs`) | Removed wiki and JSON-store names must not reappear in `.claude/` or `crates/` (AC-04 pinned roots; `crates/` replaced `packages/mewkit/src/` when the npm CLI was retired) | N/A (correctness — residue oracle; no benchmark delta) | n/a (not measured) | 2026-11-01 | KEEP |
 
 ## Notes
 
