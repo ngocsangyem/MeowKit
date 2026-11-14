@@ -11,7 +11,14 @@ import fs from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { cliRecordPath, LAUNCHER_REL, launcherPath, launcherSource, writeLauncher } from "../project-launcher.js";
+import {
+	cliRecordPath,
+	LAUNCHER_REL,
+	LAUNCHER_UNAVAILABLE_EXIT,
+	launcherPath,
+	launcherSource,
+	writeLauncher,
+} from "../project-launcher.js";
 import { executableIsTrusted } from "../hook-runtime.js";
 
 function scratchProject(): string {
@@ -37,12 +44,26 @@ function fakeCli(dir: string, output: string): string {
 	return entry;
 }
 
+/**
+ * The launcher also accepts a native binary from PATH, MEWKIT_INSTALL_DIR and ~/.local/bin,
+ * so a run that left those as the developer's own would pass or fail on whatever binary that
+ * machine has. Every run gets a PATH holding only node, a scratch HOME and no install dir;
+ * a case that wants a binary puts one on PATH itself.
+ */
 function runLauncher(root: string, env: NodeJS.ProcessEnv = {}): { status: number; out: string } {
+	const home = scratchHome();
 	try {
 		const out = execFileSync(process.execPath, [launcherPath(root), "--version"], {
 			cwd: root,
 			encoding: "utf-8",
-			env: { ...process.env, ...env },
+			env: {
+				...process.env,
+				PATH: path.dirname(process.execPath),
+				HOME: home,
+				USERPROFILE: home,
+				MEWKIT_INSTALL_DIR: "",
+				...env,
+			},
 			stdio: ["pipe", "pipe", "pipe"],
 		});
 		return { status: 0, out };
@@ -80,8 +101,9 @@ describe("the launcher file", () => {
 
 	it("carries no copy of the CLI, only a resolution of one", () => {
 		// A vendored engine would be a second thing to keep current; the whole point is
-		// that the launcher is small enough to read.
-		expect(launcherSource("1.2.3").split("\n").length).toBeLessThan(80);
+		// that the launcher is small enough to read. The bound grew from 80 when the launcher
+		// learned to find and version-check the native binary, which is resolution, not engine.
+		expect(launcherSource("1.2.3").split("\n").length).toBeLessThan(130);
 	});
 
 	it("passes the existing containment gate, and an exiled copy does not", () => {
@@ -146,7 +168,9 @@ describe("launcher resolution", () => {
 			storeHome: scratchHome(),
 		});
 		const result = runLauncher(root);
-		expect(result.status).not.toBe(0);
+		// 127, not a generic failure: the memory lint at a ship boundary reads it as "no CLI
+		// here" and skips, where any other non-zero status would block the commit.
+		expect(result.status).toBe(LAUNCHER_UNAVAILABLE_EXIT);
 		expect(result.out).toContain("0.0.0-absent");
 		expect(result.out).toContain("mewkit doctor");
 		// A refusal is a message, not a crash report.

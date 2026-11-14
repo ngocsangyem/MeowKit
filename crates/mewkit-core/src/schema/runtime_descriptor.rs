@@ -1,6 +1,8 @@
 //! The installed-runtime descriptor: how a hook finds a REAL, trusted mewkit
 //! executable instead of calling a bare package runner or trusting whatever is
-//! on `PATH`.
+//! on `PATH`. What it admits is an in-project file, normally the committed
+//! launcher, which may in turn run the native binary it finds on `PATH` after
+//! checking its name and `--version`.
 //!
 //! Installation writes it; the SessionStart hook reads it and RE-VALIDATES the
 //! executable, because the descriptor is an ordinary file in the project and a

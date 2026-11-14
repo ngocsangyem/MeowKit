@@ -86,20 +86,19 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
     )
     .unwrap();
     // What the npm CLI wrote that this install does not, by decision
-    // (DIVERGENCES.md): settings.json is merged, not written; the launcher,
-    // runtime descriptor, install metadata and the npm CLI's own kit copy and
-    // state are not part of a runtime install here.
+    // (DIVERGENCES.md): settings.json is merged, not written; install metadata
+    // and the npm CLI's own kit copy and state are not part of a runtime
+    // install here.
     let kept_apart = |p: &str| {
-        matches!(
-            p,
-            ".claude/settings.json"
-                | ".claude/runtime.json"
-                | ".meowkit/bin/mewkit"
-                | ".meowkit/metadata.json"
-        ) || p.starts_with(".meowkit/cache/")
+        matches!(p, ".claude/settings.json" | ".meowkit/metadata.json")
+            || p.starts_with(".meowkit/cache/")
             || p.starts_with(".meowkit/state/")
             || p.starts_with("~/")
     };
+    // Written by both, with bytes that name the installing CLI: the launcher
+    // pins its version and kind, the descriptor its absolute path. The
+    // launcher's own parity test compares the template itself.
+    let names_the_installer = |p: &str| matches!(p, ".meowkit/bin/mewkit" | ".claude/runtime.json");
     let ts: BTreeMap<&str, Option<&str>> = baseline["files"]
         .as_array()
         .unwrap()
@@ -122,6 +121,7 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
     // Every non-volatile file carries the same bytes as the npm CLI's.
     let differ: Vec<_> = ts
         .iter()
+        .filter(|(p, _)| !names_the_installer(p))
         .filter(|(p, digest)| digest.is_some_and(|d| !ours[**p].iter().any(|o| o == d)))
         .map(|(p, _)| p)
         .collect();
