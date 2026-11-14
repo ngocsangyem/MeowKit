@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "MeowKit Capabilities\n2 capabilities — 0 error(s), 0 warning(s)\n\nskill\n  mk:scout — Find the files a change touches.\n\ntool\n  browser — Browser automation.\n\n",
+  "stderr": "",
+  "files": {
+    ".codex/capabilities.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"entries\": [\n    {\n      \"id\": \"mk:scout\",\n      \"kind\": \"skill\",\n      \"description\": \"Find the files a change touches.\",\n      \"aliases\": [\"scout\"],\n      \"sourcePath\": \"skills/scout/SKILL.md\",\n      \"owner\": \"kit\",\n      \"installedState\": \"installed\",\n      \"intents\": [\"scout the codebase\"],\n      \"invocation\": { \"kind\": \"skill\", \"id\": \"invoke-skill\" },\n      \"contextRequirement\": { \"reason\": \"reads files\" },\n      \"support\": { \"codex\": { \"discoverable\": true, \"selectable\": true, \"invocable\": false, \"enforceable\": false } },\n      \"provenance\": { \"intents\": \"authored\" },\n      \"ignoredExtra\": 1\n    },\n    {\n      \"id\": \"browser\",\n      \"kind\": \"tool\",\n      \"description\": \"Browser automation.\",\n      \"invocation\": { \"kind\": \"none\", \"id\": \"none\" },\n      \"requirements\": [{ \"type\": \"external_binary\", \"id\": \"chromium\" }]\n    }\n  ]\n}\n"
+  }
+}

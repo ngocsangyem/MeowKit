@@ -1,0 +1,10 @@
+{
+  "exit_code": 0,
+  "stdout": "Updated task record: tasks/active/fresh.json\n",
+  "stderr": "",
+  "files": {
+    ".meowkit/telemetry/trace-log.jsonl": "{\"schema_version\":\"1.0\",\"ts\":\"2026-11-14T16:26:18Z\",\"event\":\"task_transition\",\"run_id\":\"fixed-run\",\"harness_version\":\"3.0.0\",\"model\":\"\",\"density\":\"\",\"task_id\":\"fresh\",\"plan_path\":\"tasks/plans/261112-demo/plan.md\",\"data\":{\"status\":\"active\",\"step\":\"ported note\",\"next\":\"port task\"}}\n",
+    "README.md": "A project with no task tree yet.\n",
+    "tasks/active/fresh.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"fresh\",\n  \"planPath\": \"tasks/plans/261112-demo/plan.md\",\n  \"status\": \"active\",\n  \"currentStep\": \"ported note\",\n  \"repos\": [],\n  \"blockers\": [],\n  \"nextAction\": \"port task\",\n  \"verificationSummaries\": [],\n  \"evidenceRefs\": [],\n  \"capabilityDecisions\": [],\n  \"writtenByCli\": \"2.3.1\",\n  \"writtenByKit\": \"\",\n  \"updatedAt\": \"2026-11-14T16:26:18.001Z\"\n}\n"
+  }
+}

@@ -6,7 +6,6 @@
 // in the tree does — every call site tests `!== 0` — and this test is what keeps that true,
 // because the property is cheap to hold and expensive to discover having lost.
 import { describe, expect, it } from "vitest";
-import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -94,20 +93,5 @@ describe("committed callers of the CLI", () => {
 		]) {
 			expect(EXIT_ONE.test(allowed), allowed).toBe(false);
 		}
-	});
-
-	it("still distinguishes a usage error from a command that ran and failed", () => {
-		const cli = path.join(REPO_ROOT, "packages", "mewkit", "dist", "index.js");
-		const codeOf = (args: string[]): number => {
-			try {
-				execFileSync(process.execPath, [cli, ...args], { cwd: REPO_ROOT, stdio: ["pipe", "pipe", "pipe"] });
-				return 0;
-			} catch (err) {
-				return (err as { status?: number | null }).status ?? -1;
-			}
-		};
-		expect(codeOf(["zzbogus"])).toBe(2);
-		expect(codeOf(["plan", "zzbogus"])).toBe(2);
-		expect(codeOf(["versions"])).toBe(0);
 	});
 });

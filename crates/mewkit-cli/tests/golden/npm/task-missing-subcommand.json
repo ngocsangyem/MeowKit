@@ -1,0 +1,8 @@
+{
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "`mewkit task` needs a subcommand.\nValid subcommands: new, list\nRun `mewkit task --help` for usage.\n",
+  "files": {
+    "README.md": "A project with no task tree yet.\n"
+  }
+}

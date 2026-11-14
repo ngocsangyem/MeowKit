@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "mewkit orient\n\nResume orientation from durable task state; reads records only\n\nFlags:\n  --json    Emit machine-readable JSON\n  --record  Record the result to the task record; `--no-record` skips it\n",
+  "stderr": "",
+  "files": {
+    "tasks/active/alpha.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"alpha\",\n  \"planPath\": \"tasks/plans/261112-alpha-work/plan.md\",\n  \"status\": \"active\",\n  \"currentStep\": \"phase 3 build\",\n  \"repos\": [],\n  \"blockers\": [],\n  \"nextAction\": \"port the orient verb\",\n  \"verificationSummaries\": [],\n  \"evidenceRefs\": [],\n  \"capabilityDecisions\": [],\n  \"writtenByCli\": \"2.3.1\",\n  \"writtenByKit\": \"2.15.0\",\n  \"updatedAt\": \"2026-11-10T08:30:00Z\"\n}\n"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Checkpoint refused: mk:ship budgets supervision per release stage — name one of prepare, release, publish\n",
+  "files": {}
+}

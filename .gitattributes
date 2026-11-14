@@ -6,16 +6,15 @@ install.sh text eol=lf
 install.ps1 text eol=lf
 scripts/release/*.tmpl text eol=lf
 
-# Rust parity tests compare these byte-for-byte against the TS readers on every OS.
+# Rust tests compare these byte for byte on every OS.
 crates/mewkit-core/tests/** text eol=lf
-# The TS-vs-Rust parity fixtures are read by both CLIs and their bytes end up in
+# The npm-behaviour fixtures are read by the CLI and their bytes end up in
 # a comparison, so a CRLF checkout on Windows would fail the Windows leg alone.
-crates/mewkit-cli/tests/parity/fixtures/** text eol=lf
+crates/mewkit-cli/tests/npm_behaviour/fixtures/** text eol=lf
 tests/config/fixtures/** text eol=lf
-packages/mewkit/src/state/injection-scanner.ts text eol=lf
 # These fixtures test CRLF input, so their bytes must never be converted.
 tests/config/fixtures/accept-crlf.yaml -text
-crates/mewkit-cli/tests/parity/fixtures/plan-approvable/tasks/plans/261112-crlf-plan/plan.md -text
+crates/mewkit-cli/tests/npm_behaviour/fixtures/plan-approvable/tasks/plans/261112-crlf-plan/plan.md -text
 
-# The launcher template is compared byte for byte with the npm CLI's output on every OS.
+# The launcher template is written into installs as it is, on every OS.
 crates/mewkit-adapters/src/claude_code/launcher.cjs.tmpl text eol=lf

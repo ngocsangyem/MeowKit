@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Could not find .claude/ directory to write the bootstrap file.\n",
+  "files": {
+    "README.md": "# Not a MeowKit project\n"
+  }
+}

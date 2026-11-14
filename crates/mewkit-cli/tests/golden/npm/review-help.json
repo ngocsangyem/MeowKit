@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "stdout": "mewkit review\n\nHigh-assurance PR review, resumable across sittings via a session id\n\nSubcommands:\n  prepare — mewkit review prepare <pr-url|number> [--remote <remote>]\n  read — mewkit review read --session <id> [--as <persona>]\n  coverage — mewkit review coverage --session <id>\n  compose — mewkit review compose --session <id> [--reply]\n  submit — mewkit review submit --session <id> --confirm <token>\n  cleanup — mewkit review cleanup --session <id>\n\nOne subcommand is required.\n\nFlags:\n  --json             Emit machine-readable JSON\n  --remote <value>   Git remote to fetch the pull request from\n  --session <value>  Review session id from `review prepare`\n  --as <value>       Read the diff as one named persona\n  --reply            Post the composed review back to the pull request\n  --confirm <value>  Confirmation token required for the irreversible submit step\n",
+  "stderr": "",
+  "files": {}
+}

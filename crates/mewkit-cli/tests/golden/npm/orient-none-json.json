@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "{\n  \"schemaVersion\": \"1.0\",\n  \"activeTask\": null,\n  \"candidates\": [],\n  \"staleWarnings\": [],\n  \"issues\": [],\n  \"pointerKind\": \"none\",\n  \"outcome\": \"none\"\n}\n",
+  "stderr": "",
+  "files": {
+    "README.md": "A project with no durable task state at all: the case a fresh clone hits.\n"
+  }
+}

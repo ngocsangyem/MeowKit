@@ -38,8 +38,8 @@ belong in `.gitignore`.
 `.meowkit/cache/` is the project's ONE cache of kit bytes: the kit content the install laid down.
 There is no second cache and nothing under `$HOME`. The cache's trust property is that it is untracked,
 so a pull request can neither introduce nor alter it, and `uninstall` and `doctor --adopt` depend on
-that. To install from a release that is already extracted on disk, point `MEOWKIT_RELEASE_SOURCE`
-at that directory.
+that. To install from a kit zip you already have, pass it to `mewkit init --kit-archive`
+(see [Installation](/installation)).
 
 ```yaml
 # .meowkit/config.yaml
@@ -170,7 +170,7 @@ The SessionStart hook `jira-env-loader.cjs` validates `.meowkit/.env` presence +
 **Setup (one-time):**
 
 ```bash
-npx mewkit setup           # auto-installs jira-as into .meowkit/envs/jira/
+mewkit setup               # auto-installs jira-as into .meowkit/envs/jira/
 cp .meowkit/.env.example .meowkit/.env
 # edit MEOW_JIRA_API_TOKEN, MEOW_JIRA_EMAIL, MEOW_JIRA_SITE_URL
 ```

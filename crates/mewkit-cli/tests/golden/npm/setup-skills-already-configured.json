@@ -1,0 +1,14 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup\n\n  ○ skill-envs: Already configured: alpha\n\n  Summary: 0 configured, 1 skipped\n",
+  "stderr": "",
+  "files": {
+    ".claude/skills/alpha/SKILL.md": "---\nname: alpha\nrequires_runtime: [python>=3.9]\n---\n# alpha\n",
+    ".claude/skills/alpha/requirements.txt": "requests==2.31.0\n",
+    ".meowkit/envs/alpha/bin/pip": "#!/bin/sh\n# pip inside a stubbed environment: an install is recorded in the environment's\n# own `installed` file, and `show` reads it back.\necho \"pip $*\" >> calls.log\nenv_dir=\"$(dirname \"$0\")/..\"\nbase=$(echo \"$2\" | sed 's/[=<>!~].*//' | tr 'A-Z' 'a-z')\ncase \"$1\" in\n  install)\n    case \"$2\" in\n      fail-*)\n        echo \"ERROR: Could not find a version that satisfies the requirement $2\" >&2\n        echo \"ERROR: No matching distribution found for $2\" >&2\n        exit 1\n        ;;\n    esac\n    echo \"$base\" >> \"$env_dir/installed\"\n    echo \"Collecting $2\"\n    ;;\n  show)\n    grep -qx \"$base\" \"$env_dir/installed\" 2>/dev/null\n    exit $?\n    ;;\nesac\nexit 0\n",
+    ".meowkit/envs/alpha/bin/python3": "#!/bin/sh\n# The interpreter inside a stubbed environment: nothing is ever importable.\necho \"venv-python3 $*\" >> calls.log\nexit 1\n",
+    ".meowkit/envs/alpha/installed": "requests\n",
+    "calls.log": "pip show requests\n",
+    "stub-bin/which": "#!/bin/sh\n# Only python3 exists on this machine, whatever the real PATH holds.\n[ \"$1\" = \"python3\" ]\n"
+  }
+}

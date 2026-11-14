@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Rejected: the entry is missing a Apply when: line, a Source: line.\nUsage: mewkit note <decisions|gotchas>   (entry text on stdin)\n\nThe entry must start with a `## ` heading line and contain:\n  Why:          why the decision/gotcha is non-obvious\n  Apply when:   the situation a future session should recognise\n  Source:       the file, symbol or commit it came from\n\nExample:\n  printf '## Vitest serializes files here   <!-- 2026-11-01 -->\\nWhy: ...\\nApply when: ...\\nSource: vitest.config.ts\\n' \\\n    | mewkit note gotchas\n",
+  "files": {
+    "README.md": "A project with no memory store yet.\n"
+  }
+}

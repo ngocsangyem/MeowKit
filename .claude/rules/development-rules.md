@@ -14,7 +14,7 @@ NEVER create new "enhanced" or "v2" files. ALWAYS update existing files directly
 
 ## Code Quality
 
-ALWAYS run the compile/build command after creating or modifying a code file; zero compilation errors before proceeding. Defaults here: `npm run build`, `npm run lint`, `npm run typecheck`, `npm test`; downstream, prefer the commands documented in that project's `README.md`, `CLAUDE.md` or `docs/`.
+ALWAYS run the compile/build command after creating or modifying a code file; zero compilation errors before proceeding. Defaults here: `cargo build`, `cargo test --workspace`, `npm run lint`, `npm test`; downstream, prefer the commands documented in that project's `README.md`, `CLAUDE.md` or `docs/`.
 
 NEVER simulate, mock, or stub implementation code to pass tests or CI — mocks hide real integration failures. Implement real code and use test databases/services.
 

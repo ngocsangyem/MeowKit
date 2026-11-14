@@ -1,0 +1,9 @@
+{
+  "exit_code": 1,
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nDocs\n  [WARN] Docs references on Type-1 allowlist\n         Scanned 1 files — 0 error(s), 1 warning(s)\n\n0 passed, 1 warnings\n",
+  "stderr": "",
+  "files": {
+    ".claude/skills/cook/SKILL.md": "---\nname: mk:cook\ndescription: Build a feature.\n---\n\nLater docs/future-thing.md.\n",
+    "docs/maintainer/docs-reference-contract.md": "# Docs reference contract\n\n<!-- ALLOWLIST-START -->\ndocs/project-context.md\n<!-- ALLOWLIST-END -->\n\n<!-- RESERVED-START -->\ndocs/future-thing.md\n<!-- RESERVED-END -->\n"
+  }
+}

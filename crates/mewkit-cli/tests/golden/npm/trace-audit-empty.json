@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "Trace audit — entropy & drift\n  records=0  entropy=0 bits  orphaned=0  stale=0  unverified-runs=0\n  No repeated friction.\n",
+  "stderr": "",
+  "files": {
+    ".claude/settings.json": "{}\n"
+  }
+}

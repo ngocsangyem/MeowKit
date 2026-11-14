@@ -1,0 +1,23 @@
+{
+  "exit_code": 0,
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nRules\n  [WARN] Routing-table breadth: rules/skill-routing.md\n         An intent→skill routing table (≥8 mk: rows) lives in always-loaded rules/skill-routing.md. Move skill-dispatch tables into a skill reference loaded on demand (see agent-detector references/skill-domain-routing.md).\n\n0 passed, 1 warnings\n",
+  "stderr": "",
+  "files": {
+    ".claude/agents/developer.md": "---\nname: developer\ndescription: Writes production code.\n---\n\nProse.\n",
+    ".claude/hooks/HOOKS_INDEX.md": "# Hooks\n\nTwo of them.\n",
+    ".claude/hooks/append-trace.cjs": "#!/usr/bin/env node\n'use strict';\n// A hook script, enough to be one.\n",
+    ".claude/hooks/lib/shared.cjs": "// a library, not a hook\n",
+    ".claude/hooks/pre-ship.cjs": "#!/usr/bin/env node\n'use strict';\n// A hook script, enough to be one.\n",
+    ".claude/rules/agent-conduct.md": "# agent-conduct.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/core-behaviors.md": "# core-behaviors.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/development-rules.md": "# development-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/gate-rules.md": "# gate-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/injection-rules.md": "# injection-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/meowkit-core.md": "# meowkit-core.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/security-rules.md": "# security-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/skill-routing.md": "# Skill routing\n\n| Intent | Skill |\n| --- | --- |\n| do thing 0 | `mk:cook` |\n| do thing 1 | `mk:cook` |\n| do thing 2 | `mk:cook` |\n| do thing 3 | `mk:cook` |\n| do thing 4 | `mk:cook` |\n| do thing 5 | `mk:cook` |\n| do thing 6 | `mk:cook` |\n| do thing 7 | `mk:cook` |\n| do thing 8 | `mk:cook` |\n",
+    ".claude/skills/cook/SKILL.md": "---\nname: mk:cook\ndescription: Build a feature.\n---\n\nDelegate with subagent_type: developer.\n",
+    ".git/HEAD": "ref: refs/heads/main\n",
+    ".meowkit/memory/decisions.md": "## A kebab-case file name is what search tools read  <!-- 2026-11-01 -->\n\nWhy: a long name beats a short one when a tool greps for purpose.\nApply when: naming any new file.\nSource: a review of three renamed modules.\n"
+  }
+}

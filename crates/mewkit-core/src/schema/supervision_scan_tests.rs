@@ -103,8 +103,8 @@ fn word_count_splits_on_whitespace_runs() {
 }
 
 // The rows below are the cases where Rust and JavaScript regex semantics
-// differ, with the verdict Node produced through the compiled TypeScript
-// (`packages/mewkit/dist/core/athena-supervision-packet.js`):
+// differ, with the verdict Node produced through the npm CLI's compiled TypeScript
+// supervision-packet module (since retired):
 //
 //   import { scanSecrets, scanBulkContent, scanAuthorityLanguage } from "…";
 //   console.log(JSON.stringify(scanSecrets("éAKIAIOSFODNN7EXAMPLE")));

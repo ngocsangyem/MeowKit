@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "No snapshot named nope, and this project has none. A snapshot is written by init, upgrade and uninstall.\nRun `mewkit backups list` to see what this project has.\n",
+  "files": {
+    "README.md": "A project with no durable task state at all: the case a fresh clone hits.\n"
+  }
+}

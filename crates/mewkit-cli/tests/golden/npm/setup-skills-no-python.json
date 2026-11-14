@@ -1,0 +1,10 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup\n\n  ○ skill-envs: No Python interpreter in PATH — skipped alpha; install Python, then re-run\n\n  Summary: 0 configured, 1 skipped\n",
+  "stderr": "",
+  "files": {
+    ".claude/skills/alpha/SKILL.md": "---\nname: alpha\nrequires_runtime: [python>=3.9]\n---\n# alpha\n",
+    ".claude/skills/alpha/requirements.txt": "# pinned for alpha only\nrequests==2.31.0\n\npillow>=10.0\n",
+    "stub-bin/which": "#!/bin/sh\n# No interpreter on this machine.\nexit 1\n"
+  }
+}

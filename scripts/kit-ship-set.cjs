@@ -48,8 +48,8 @@ function kitMeowkitTargets() {
  * outside `.claude/` on purpose: a Claude Code install copies `.claude/` whole,
  * and must not lay down Codex or Cursor files.
  */
-const CODEX_BUNDLE = "packages/mewkit/src/migrate/modules/codex";
-const CURSOR_BUNDLE = "packages/mewkit/src/migrate/modules/cursor";
+const CODEX_BUNDLE = "kit/bundles/codex";
+const CURSOR_BUNDLE = "kit/bundles/cursor";
 // Cursor alone ships the MCP profile catalog `init --mcp-profiles` merges from.
 const RUNTIME_BUNDLE_TARGETS = [CODEX_BUNDLE, CURSOR_BUNDLE].flatMap((b) => [
 	`${b}/root`,

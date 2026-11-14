@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Fatal: EISDIR: illegal operation on a directory, read\n",
+  "files": {
+    ".meowkit/state/active-plan/.gitkeep": "a pointer file that is a directory, so the last reader cannot read it\n"
+  }
+}

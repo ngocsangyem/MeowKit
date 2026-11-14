@@ -1,0 +1,10 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "invalid capability decision \"skiped\" — expected selected|skipped|unavailable|unsupported\n",
+  "files": {
+    ".meowkit/state/active-plan.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"alpha\",\n  \"planPath\": \"tasks/plans/261112-alpha-work/plan.md\",\n  \"planSlug\": \"261112-alpha-work\",\n  \"path\": \"tasks/plans/261112-alpha-work/plan.md\",\n  \"slug\": \"261112-alpha-work\"\n}\n",
+    "tasks/active/alpha.json": "{\n  \"taskId\": \"alpha\",\n  \"schemaVersion\": \"1.0\",\n  \"status\": \"blocked\",\n  \"planPath\": \"tasks/plans/261112-alpha-work/plan.md\",\n  \"currentStep\": \"phase 3 build\",\n  \"nextAction\": \"port task-state\",\n  \"repos\": [\n    { \"identity\": \"/srv/alpha\", \"revision\": \"aaaaaaa\" },\n    { \"identity\": \"/srv/beta\", \"revision\": null }\n  ],\n  \"blockers\": [\"the npm CLI still owns plan approve\"],\n  \"verificationSummaries\": [{ \"ref\": \"cargo-test\", \"result\": \"pass\" }],\n  \"evidenceRefs\": [\"tasks/reports/261112-port.md\"],\n  \"capabilityDecisions\": [\n    {\n      \"capabilityId\": \"cap.memory.write\",\n      \"decision\": \"selected\",\n      \"reason\": \"the store is the only shared artifact\",\n      \"adapterSnapshotId\": \"snap-7\"\n    }\n  ],\n  \"writtenByCli\": \"2.3.1\",\n  \"writtenByKit\": \"2.15.0\",\n  \"updatedAt\": \"2026-11-10T08:30:00.000Z\",\n  \"futureField\": \"an additive field an older binary must not strip\"\n}\n",
+    "tasks/active/zeta.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"zeta\",\n  \"planPath\": null,\n  \"status\": \"active\",\n  \"currentStep\": \"\",\n  \"repos\": [],\n  \"blockers\": [],\n  \"nextAction\": \"\",\n  \"verificationSummaries\": [],\n  \"evidenceRefs\": [],\n  \"capabilityDecisions\": [],\n  \"writtenByCli\": \"2.3.1\",\n  \"writtenByKit\": \"\",\n  \"updatedAt\": \"2026-11-11T09:00:00.000Z\"\n}\n"
+  }
+}

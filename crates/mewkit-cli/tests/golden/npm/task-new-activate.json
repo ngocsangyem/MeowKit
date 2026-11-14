@@ -1,0 +1,12 @@
+{
+  "exit_code": 0,
+  "stdout": "\n  ✓ Created: <project>/tasks/active/261114-add-user-authentication.feature.md\n\n  ✓ Activated task add-user-authentication (no-plan) → tasks/active/add-user-authentication.json\n\n",
+  "stderr": "",
+  "files": {
+    ".meowkit/state/active-plan.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"add-user-authentication\",\n  \"planPath\": null,\n  \"planSlug\": null\n}\n",
+    ".meowkit/telemetry/trace-log.jsonl": "{\"schema_version\":\"1.0\",\"ts\":\"2026-11-14T16:26:16Z\",\"event\":\"task_transition\",\"run_id\":\"fixed-run\",\"harness_version\":\"3.0.0\",\"model\":\"\",\"density\":\"\",\"task_id\":\"add-user-authentication\",\"data\":{\"status\":\"active\",\"trigger\":\"task-new\"}}\n",
+    "README.md": "A project with no task tree yet.\n",
+    "tasks/active/261114-add-user-authentication.feature.md": "---\ntitle: \"Add user authentication\"\ntype: feature\nstatus: draft\nphase: 1\npriority: medium\neffort: medium\ncreated: 2026-11-14\nbranch: feature/add-user-authentication\nagent: \"\"\n---\n\n# Add user authentication\n\n<!-- Fill in sections from the template -->\n\n## Agent State\n\nCurrent phase: 1 — Planning\nLast action: Task file created\nNext action: Get Gate 1 approval before writing any tests or code\nBlockers: none\nDecisions made: none yet\n",
+    "tasks/active/add-user-authentication.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"add-user-authentication\",\n  \"planPath\": null,\n  \"status\": \"active\",\n  \"currentStep\": \"\",\n  \"repos\": [],\n  \"blockers\": [],\n  \"nextAction\": \"begin work\",\n  \"verificationSummaries\": [],\n  \"evidenceRefs\": [],\n  \"capabilityDecisions\": [],\n  \"writtenByCli\": \"2.3.1\",\n  \"writtenByKit\": \"\",\n  \"updatedAt\": \"2026-11-14T16:26:16.147Z\"\n}\n"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "mewkit skill env — per-skill interpreter environments\n\nUsage:\n  mewkit skill env <skill>    create or repair the environment for one skill\n  mewkit skill env --list     show every skill that declares a runtime\n",
+  "stderr": "",
+  "files": {}
+}

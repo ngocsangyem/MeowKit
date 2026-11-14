@@ -81,12 +81,12 @@ const RETIRED_PATHS = [
 
 /**
  * Scan roots. `dir` entries are walked; `file` entries are single files. Tests are
- * excluded from the CLI source root: a test asserting behavior on a deliberately
+ * excluded from scanned roots: a test asserting behavior on a deliberately
  * absent path is not a reference a reader could follow.
  */
 const ROOTS = [
 	{ kind: "dir", path: ".claude" },
-	{ kind: "dir", path: "packages/mewkit/src" },
+	{ kind: "dir", path: "kit/bundles" },
 	{ kind: "dir", path: "docs" },
 	{ kind: "dir", path: "packages/docs/content" },
 	{ kind: "dir", path: "packages/docs/scripts" },
@@ -101,7 +101,6 @@ const ROOTS = [
 
 /** Prefixes within a scanned root that are never read (not exemptions — not references). */
 const PRUNED_PREFIXES = [
-	"packages/mewkit/src/migrate/__tests__/",
 	".meowkit/telemetry/", // append-only event log: past events, not live references
 	".claude/session-state/",
 	".claude/logs/",

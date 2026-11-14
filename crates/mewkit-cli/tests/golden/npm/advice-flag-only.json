@@ -1,0 +1,6 @@
+{
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "`mewkit advice` needs a subcommand.\nValid subcommands: begin, commit, status, validate-packet\nRun `mewkit advice --help` for usage.\n",
+  "files": {}
+}

@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "stdout": "{\n  \"records\": [\n    {\n      \"schemaVersion\": \"1.0\",\n      \"taskId\": \"alpha\",\n      \"planPath\": null,\n      \"status\": \"active\",\n      \"currentStep\": \"phase 3 build\",\n      \"repos\": [],\n      \"blockers\": [],\n      \"nextAction\": \"port task-state\",\n      \"verificationSummaries\": [],\n      \"evidenceRefs\": [],\n      \"capabilityDecisions\": [],\n      \"writtenByCli\": \"2.3.1\",\n      \"writtenByKit\": \"\",\n      \"updatedAt\": \"2026-11-10T08:30:00.000Z\"\n    }\n  ],\n  \"issues\": [\n    {\n      \"taskId\": \"broken\",\n      \"problem\": \"Expected double-quoted property name in JSON at position 46 (line 2 column 1)\"\n    }\n  ],\n  \"activePlanPointer\": null\n}\n",
+  "stderr": "",
+  "files": {
+    "tasks/active/alpha.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"alpha\",\n  \"planPath\": null,\n  \"status\": \"active\",\n  \"currentStep\": \"phase 3 build\",\n  \"repos\": [],\n  \"blockers\": [],\n  \"nextAction\": \"port task-state\",\n  \"verificationSummaries\": [],\n  \"evidenceRefs\": [],\n  \"capabilityDecisions\": [],\n  \"writtenByCli\": \"2.3.1\",\n  \"writtenByKit\": \"\",\n  \"updatedAt\": \"2026-11-10T08:30:00.000Z\"\n}\n",
+    "tasks/active/broken.json": "{ \"schemaVersion\": \"1.0\", \"taskId\": \"broken\",\n"
+  }
+}

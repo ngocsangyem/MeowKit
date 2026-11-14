@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "Supervision run ship-run\n  skill: mk:ship   calls per release stage: prepare 1/4   release 0/4   publish 0/4   corrections: 0\n  stage: REVIEW   open checkpoint: cp-2\n  latest directive: (none)\n  next safe action: (none)\n  receipts: tasks/reports/261113-ship-run-advice-1.md\n  supervision continuity — never verification, never a gate approval.\n",
+  "stderr": "",
+  "files": {
+    "tasks/reports/ship-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"ship-run\"\nskill: \"mk:ship\"\nstage: \"REVIEW\"\nlockedDecisionPointers: []\ncorrectionCount: 0\nreceiptPointers: [\"tasks/reports/261113-ship-run-advice-1.md\"]\ncheckpoint: { checkpointId: \"cp-2\", stage: \"REVIEW\", state: \"pending\", partition: \"prepare\" }\nhistory: [{\"checkpointId\":\"cp-1\",\"stage\":\"GUIDE\",\"disposition\":\"CONTINUE_WITH_DIRECTIVE\",\"partition\":\"prepare\"}]\nescalatedToHuman: false\n---\n\n# Supervision run ship-run\n\nThis is supervision continuity, NEVER verification and never a gate approval.\n\n**Latest directive:** (none yet)\n**Next safe action:** (none recorded)\n"
+  }
+}

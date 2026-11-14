@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "\n  No tasks/ directory found. Run from a MeowKit project.\n\n",
+  "stderr": "",
+  "files": {
+    "README.md": "A project with no task tree yet.\n"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "Unknown `advice` subcommand: bogus\nValid subcommands: begin, commit, status, validate-packet\nRun `mewkit advice --help` for usage.\n",
+  "files": {}
+}

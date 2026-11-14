@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup\n\n  ! project-context: Run `/mk:project-context init` in your first session to create docs/project-context.md\n\n  Summary: 0 configured, 0 skipped, 1 warnings\n",
+  "stderr": "",
+  "files": {}
+}

@@ -78,24 +78,21 @@ fn mk_and_mewkit_next_run_the_same_binary() {
 fn help_succeeds() {
     let out = TempHome::new().mewkit(&["--help"]);
     assert!(out.status.success());
-    assert!(String::from_utf8_lossy(&out.stdout).contains("npm `mewkit` package"));
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    assert!(stdout.contains("Usage: mewkit"), "{stdout}");
+    assert!(
+        !stdout.contains("npm"),
+        "the help names no npm CLI: {stdout}"
+    );
 }
 
-/// The example verb has to be one this binary does NOT implement. It named
-/// `plan`, then `review`, then `capabilities` as each was ported; once every
-/// npm verb is ported, no real verb is left, so it names one that neither CLI
-/// has. This stays the only check that a verb this binary lacks points the user
-/// at the npm CLI, until cutover retires that CLI and this wording with it.
+/// An unknown verb is a usage error from the parser, exit 2, naming the verb.
 #[test]
-fn unknown_command_exits_2_and_names_the_npm_cli() {
+fn unknown_command_exits_2() {
     let out = TempHome::new().mewkit(&["no-such-verb", "--json"]);
     assert_eq!(out.status.code(), Some(2));
     let stderr = String::from_utf8_lossy(&out.stderr);
-    assert!(
-        stderr.contains("unknown command 'no-such-verb'"),
-        "stderr: {stderr}"
-    );
-    assert!(stderr.contains("npm `mewkit` CLI"), "stderr: {stderr}");
+    assert!(stderr.contains("no-such-verb"), "stderr: {stderr}");
 }
 
 /// The npm CLI parses with minimist, which keeps an undeclared flag or a stray

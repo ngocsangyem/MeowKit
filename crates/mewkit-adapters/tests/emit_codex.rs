@@ -99,7 +99,7 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
     let plan = Codex.prepare(&request(&kit, &p.scope, &[], &[])).unwrap();
     let baseline: Value = serde_json::from_slice(
         &std::fs::read(
-            support::repo().join("crates/mewkit-cli/tests/golden/ts-baseline/codex.manifest.json"),
+            support::repo().join("crates/mewkit-cli/tests/golden/baseline/codex.manifest.json"),
         )
         .unwrap(),
     )

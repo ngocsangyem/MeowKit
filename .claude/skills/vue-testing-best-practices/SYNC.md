@@ -51,9 +51,8 @@ Authored for this toolkit. An upstream re-sync MUST NOT delete these:
 
 ## Sync-Drift Strategy
 
-There is **no automated directory-overwrite sync pipeline** in this repo (verified: the only
-`sync` script is `scripts/sync-package-versions.cjs` for npm versions; no `.syncignore` or
-`mewkit sync` directory mirror exists). Re-syncing is a **manual diff-and-re-apply** process,
+There is **no automated directory-overwrite sync pipeline** in this repo (verified: no
+`sync` script, `.syncignore` or `mewkit sync` directory mirror exists). Re-syncing is a **manual diff-and-re-apply** process,
 identical to the sibling `mk:vue-best-practices` (`SOURCE.md`):
 
 1. Diff the 11 vendored-verbatim references above against the pinned upstream commit.

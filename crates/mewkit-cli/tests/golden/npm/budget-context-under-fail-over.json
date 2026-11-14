@@ -1,0 +1,17 @@
+{
+  "exit_code": 0,
+  "stdout": "Context budget\nTiers: always-on (rules) · conditional (loaded only on detection) · on-demand (agents + commands + SKILL.md).\n\n  core\n    TIER         FILES   LINES     ~TOKENS\n    always-on    2       11        42\n    conditional  1       4         16\n    on-demand    3       31        86\n    total        6       46        142\n\n  developer\n    TIER         FILES   LINES     ~TOKENS\n    always-on    2       11        42\n    conditional  1       4         16\n    on-demand    4       43        119\n    total        7       58        175\n\n  full\n    TIER         FILES   LINES     ~TOKENS\n    always-on    2       11        42\n    conditional  1       4         16\n    on-demand    4       43        119\n    total        7       58        175\n\n",
+  "stderr": "",
+  "files": {
+    ".claude/agents/agents_INDEX.md": "# Agent index\n\nGenerated listing; never loaded as an agent.\n",
+    ".claude/agents/designer.md": "---\nname: designer\nowner: product\ncriticality: medium\nstatus: active\nruntime: claude\n---\n\n# Designer\n\nShapes the product surface.\n",
+    ".claude/agents/planner.md": "---\nname: planner\nowner: core\ncriticality: high\nstatus: active\nruntime: claude\n---\n\n# Planner\n\nWrites the plan.\n",
+    ".claude/commands/mk/cook.md": "---\ndescription: Run the cook skill.\n---\n\nRun /mk:cook.\n",
+    ".claude/rules-conditional/agile-rules.md": "# Agile rules\n\nLoaded only when an Agile context is detected.\n",
+    ".claude/rules/core-behaviors.md": "# Core behaviours\n\nSurface assumptions before implementing.\nVerify, never assume.\n",
+    ".claude/rules/security-rules.md": "# Security rules\n\nNo hardcoded secrets.\nParameterised queries only.\nNo any type.\n",
+    ".claude/skills/cook/SKILL.md": "---\nname: cook\nowner: core\ncriticality: high\nstatus: active\nruntime: claude\ndescription: Build a feature through the phase workflow.\n---\n\n# Cook\n\nThe build phase entrypoint.\n",
+    ".claude/skills/cook/references/tdd-rules.md": "# TDD rules\n\nAn on-demand reference; never loaded with the skill entrypoint.\n",
+    ".meowkit/pack-manifest.json": "{\n\t\"schemaVersion\": \"1.0\",\n\t\"base\": {\n\t\t\"files\": [\"commands/mk/cook.md\"],\n\t\t\"globs\": [\"rules/**\", \"rules-conditional/**\"],\n\t\t\"exclude\": []\n\t},\n\t\"packs\": {\n\t\t\"core\": { \"owners\": [\"core\"], \"artifactsAdd\": [], \"artifactsExclude\": [] },\n\t\t\"product\": { \"owners\": [\"product\"], \"artifactsAdd\": [], \"artifactsExclude\": [] }\n\t},\n\t\"profiles\": {\n\t\t\"core\": [\"core\"],\n\t\t\"developer\": [\"core\", \"product\"],\n\t\t\"full\": [\"*\"]\n\t}\n}\n"
+  }
+}

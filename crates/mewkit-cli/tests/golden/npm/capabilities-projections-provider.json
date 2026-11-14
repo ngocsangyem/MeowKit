@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "Capability provider projections\nFour independent levels; `enforceable` is claimed only where a real gating hook exists.\n\nclaude-code (supported, placement: sessionstart-hook)\n  discoverable=supported  selectable=supported  invocable=supported  enforceable=supported\n  Bootstrap on a SessionStart hook; host invokes skills/agents; real hooks gate behavior (enforceable).\n\nclaude-plugin (supported, placement: sessionstart-hook-via-plugin-build)\n  discoverable=supported  selectable=supported  invocable=supported  enforceable=supported\n  Same SessionStart hook, propagated into the plugin payload at plugin generation; plugin hooks gate behavior.\n\ncodex (partial, placement: instruction-file)\n  discoverable=supported  selectable=supported  invocable=advisory  enforceable=unsupported\n  Migration writes a bounded AGENTS bootstrap plus validated .codex/capabilities.json; skill/command projection is advisory and hook enforcement version-gated ⇒ not enforceable.\n\nqwen (report-only, placement: none)\n  discoverable=unknown  selectable=unknown  invocable=unknown  enforceable=unknown\n  No tested projection — report-only; no capability behavior is claimed until a qwen adapter is authored.\n\nProviders not listed are report-only — no capability behavior is claimed for them.\n",
+  "stderr": "",
+  "files": {
+    "README.md": "A project with no durable task state at all: the case a fresh clone hits.\n"
+  }
+}

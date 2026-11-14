@@ -208,11 +208,11 @@ const ARCHIVE_ROOTS: &[&str] = &[
     ".meowkit/harness-inventory.json",
     ".meowkit/mcp.json.example",
     ".meowkit/pack-manifest.json",
-    "packages/mewkit/src/migrate/modules/cursor/catalog/mcp-profiles.json",
-    "packages/mewkit/src/migrate/modules/codex/root",
-    "packages/mewkit/src/migrate/modules/codex/catalog/skill-packs.json",
-    "packages/mewkit/src/migrate/modules/cursor/root",
-    "packages/mewkit/src/migrate/modules/cursor/catalog/skill-packs.json",
+    "kit/bundles/cursor/catalog/mcp-profiles.json",
+    "kit/bundles/codex/root",
+    "kit/bundles/codex/catalog/skill-packs.json",
+    "kit/bundles/cursor/root",
+    "kit/bundles/cursor/catalog/skill-packs.json",
 ];
 
 fn build_kit() -> PathBuf {

@@ -1,0 +1,14 @@
+{
+  "exit_code": 0,
+  "stdout": "MeowKit packs\nbase is always installed (safety rules, hooks, settings, core commands).\n\n  [installed] lifecycle-core (1 files)\n  [installed] testing (2 files)\n  [installed] docs (1 files)\n",
+  "stderr": "",
+  "files": {
+    ".claude/rules/gate-rules.md": "gate\n",
+    ".claude/settings.json": "{\n  \"hooks\": {}\n}\n",
+    ".claude/skills/cook/SKILL.md": "---\nname: mk:cook\ndescription: cook skill\nowner: lifecycle\ncriticality: standard\nstatus: active\nruntime: claude-code\n---\n\n# cook\n",
+    ".claude/skills/docs-writer/SKILL.md": "---\nname: mk:docs-writer\ndescription: docs-writer skill\nowner: docs\ncriticality: standard\nstatus: active\nruntime: claude-code\n---\n\n# docs-writer\n",
+    ".claude/skills/qa/SKILL.md": "---\nname: mk:qa\ndescription: qa skill\nowner: testing\ncriticality: standard\nstatus: active\nruntime: claude-code\n---\n\n# qa\n",
+    ".claude/skills/qa/notes.md": "qa notes\n",
+    ".meowkit/pack-manifest.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"base\": {\n    \"files\": [\n      \"settings.json\",\n      \"rules/gate-rules.md\"\n    ],\n    \"globs\": [],\n    \"exclude\": []\n  },\n  \"packs\": {\n    \"lifecycle-core\": {\n      \"owners\": [\n        \"lifecycle\"\n      ]\n    },\n    \"testing\": {\n      \"owners\": [\n        \"testing\"\n      ]\n    },\n    \"docs\": {\n      \"owners\": [\n        \"docs\"\n      ]\n    }\n  },\n  \"profiles\": {\n    \"core\": [\n      \"base\",\n      \"lifecycle-core\"\n    ],\n    \"full\": [\n      \"*\"\n    ]\n  }\n}\n"
+  }
+}

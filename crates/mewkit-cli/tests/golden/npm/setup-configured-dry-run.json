@@ -1,0 +1,11 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup — dry run, nothing will be written\n\n  ✓ gitignore: Wrote .meowkit/.gitignore (deny-all + the shared allowlist); Removed the stale .meowkit/memory/ ignore — the v3 team store is committed; Removed 3 .meowkit/ line(s) now covered by .meowkit/.gitignore\n      would create .meowkit/.gitignore\n      would update .gitignore\n\n  Summary: 1 configured, 0 skipped\n",
+  "stderr": "",
+  "files": {
+    ".gitignore": "node_modules/\n.meowkit/memory/\n.meowkit/telemetry/\n/.meowkit/state/**\n!.meowkit/state/keep\n.meowkit/.env\nsession-state/\n",
+    ".mcp.json": "{}\n",
+    ".meowkit/.env": "MEOWKIT_GEMINI_API_KEY=abc\n",
+    "docs/project-context.md": "# Project context\n"
+  }
+}

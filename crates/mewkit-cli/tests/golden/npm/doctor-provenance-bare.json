@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "MeowKit Provenance\nRead-only: reports what can and cannot be proven locally. No fetch, no relabel.\n\n  No installed metadata found — provenance cannot be established.\n  Run `mewkit upgrade` to write canonical metadata, then re-run this command.\n",
+  "stderr": "",
+  "files": {
+    ".claude/README.md": "x\n"
+  }
+}

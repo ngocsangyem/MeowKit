@@ -2,7 +2,7 @@
 // (replayed via the configured interpreter + stdin). Asserts {@@PRIVACY_BLOCK@@ on
 // stderr, exit 2} exactly — privacy is a hard block, not advisory.
 import { describe, it, expect, afterEach } from "vitest";
-import { runConfiguredHook } from "../../../packages/mewkit/src/core/hook-runner.js";
+import { runConfiguredHook } from "./support/hook-runner.js";
 import { scaffold, SETTINGS, type HarnessProject } from "./_scaffold.js";
 
 let project: HarnessProject | null = null;

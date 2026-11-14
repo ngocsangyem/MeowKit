@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup — System Dependencies\n\nDry-run: system dependencies are installed by your package manager — nothing was run. Drop --dry-run to install.\n",
+  "stderr": "",
+  "files": {}
+}

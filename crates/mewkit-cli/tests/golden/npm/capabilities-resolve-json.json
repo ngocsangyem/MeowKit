@@ -1,0 +1,15 @@
+{
+  "exit_code": 0,
+  "stdout": "{\n  \"intent\": \"implement this feature\",\n  \"provider\": \"claude-code\",\n  \"ambiguous\": false,\n  \"status\": \"selected\",\n  \"candidates\": [\n    {\n      \"id\": \"mk:cook\",\n      \"kind\": \"skill\",\n      \"score\": 12,\n      \"reason\": \"matched 2 authored intent term(s)\",\n      \"support\": null,\n      \"requirements\": [],\n      \"contextRequirement\": {\n        \"scope\": \"task-repo\",\n        \"reason\": \"edits source and must verify against fresh, correctly-scoped evidence\"\n      },\n      \"verification\": {\n        \"kind\": \"unknown\"\n      },\n      \"invocable\": \"unknown\",\n      \"availability\": []\n    }\n  ],\n  \"acquisition\": {\n    \"provider\": \"claude-code\",\n    \"status\": \"supported\",\n    \"read\": {\n      \"tool\": \"Read\",\n      \"note\": \"typed host-native file read\"\n    },\n    \"search\": {\n      \"tool\": \"Grep+Glob\",\n      \"note\": \"typed content search (Grep) + filename search (Glob)\"\n    },\n    \"evidence\": \"Claude Code exposes typed Read/Grep/Glob tools the agent invokes to acquire evidence; MeowKit records the resulting envelope.\"\n  },\n  \"adapterCitation\": {\n    \"provider\": \"claude-code\",\n    \"projectionStatus\": \"supported\",\n    \"projectionEvidence\": \"Bootstrap on a SessionStart hook; host invokes skills/agents; real hooks gate behavior (enforceable).\",\n    \"gatingEvents\": [\n      \"pre_tool\",\n      \"stop\"\n    ]\n  }\n}\n",
+  "stderr": "",
+  "files": {
+    ".claude/agents/developer.md": "---\nname: developer\ndescription: Writes production code.\nowner: kit\ncriticality: high\nstatus: stable\nruntime: node\nmodel: sonnet\ntools: Read, Write\n---\n\nProse.\n",
+    ".claude/hooks/append-trace.cjs": "'use strict';\n",
+    ".claude/hooks/references/capability-bootstrap.md": "stale\n",
+    ".claude/rules/meowkit-core.md": "# Core\n",
+    ".claude/skills/cook/SKILL.md": "---\nname: mk:cook\ndescription: Implement a planned feature end to end.\nowner: kit\ncriticality: high\nstatus: stable\nruntime: node\ndepends_on: [mk:scout, mk:ghost]\n---\n\nCook.\n",
+    ".claude/skills/deploy/SKILL.md": "---\nname: mk:deploy\ndescription: Ship the release to production servers.\nowner: kit\ncriticality: low\nstatus: stable\nruntime: node\nkeywords: [release, deploy, production release]\n---\n\nDeploy.\n",
+    ".claude/skills/scout/SKILL.md": "---\nname: mk:scout\ndescription: Find the files a change touches.\nowner: kit\ncriticality: high\nstatus: stable\nruntime: node\nkeywords: [Locate, Files]\nwhen_to_use: Before editing unfamiliar code.\n---\n\nScout.\n",
+    ".mcp.json": "{\"mcpServers\": {\"jira\": {\"command\": \"x\"}}}\n"
+  }
+}

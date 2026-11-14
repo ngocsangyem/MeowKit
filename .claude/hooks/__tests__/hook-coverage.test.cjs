@@ -19,8 +19,8 @@ const closure = JSON.parse(fs.readFileSync(path.join(HOOKS, 'core-closure.json')
 
 const RUNTIMES = ['codex', 'cursor'];
 const BUNDLE_ROOT = {
-  codex: 'packages/mewkit/src/migrate/modules/codex/root',
-  cursor: 'packages/mewkit/src/migrate/modules/cursor/root',
+  codex: 'kit/bundles/codex/root',
+  cursor: 'kit/bundles/cursor/root',
 };
 
 test('every handler in handlers.json has exactly one coverage row', () => {

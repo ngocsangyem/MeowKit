@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup\n\n  ✓ mcp: Created .mcp.json — edit API keys inside.\n      did create .mcp.json\n\n  Summary: 1 configured, 0 skipped\n",
+  "stderr": "",
+  "files": {
+    ".mcp.json": "{\n  \"mcpServers\": {\n    \"context7\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@upstash/context7-mcp\", \"--api-key\", \"YOUR_API_KEY\"]\n    },\n    \"sequential-thinking\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-sequential-thinking\"]\n    },\n    \"playwright\": {\n      \"command\": \"npx\",\n      \"args\": [\"@playwright/mcp@latest\"]\n    }\n  }\n}\n"
+  }
+}

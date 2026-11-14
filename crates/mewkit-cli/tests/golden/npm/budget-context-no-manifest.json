@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Context budget requires .claude/pack-manifest.json — run `mewkit upgrade` first.\n",
+  "files": {}
+}

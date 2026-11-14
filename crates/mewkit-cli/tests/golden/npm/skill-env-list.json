@@ -1,0 +1,24 @@
+{
+  "exit_code": 0,
+  "stdout": "\nPer-skill environments  .meowkit/envs\n\n  alpha              absent           python>=3.9 · 2 pinned\n  badpin             absent           python · 1 pinned\n  failpin            absent           python · 1 pinned\n  pinonly            absent           binary only · 1 pinned\n  stdlib             broken           python · stdlib only\n  vfail              absent           python · stdlib only\n\n  No longer declared: gone\n\n",
+  "stderr": "",
+  "files": {
+    ".claude/skills/alpha/SKILL.md": "---\nname: alpha\nrequires_runtime: [python>=3.9]\n---\n# alpha\n",
+    ".claude/skills/alpha/requirements.txt": "# pinned for alpha only\nrequests==2.31.0\n\npillow>=10.0\n",
+    ".claude/skills/badpin/SKILL.md": "---\nname: badpin\nrequires_runtime: [python]\n---\n# badpin\n",
+    ".claude/skills/badpin/requirements.txt": "-r evil.txt\nok==1\ngit+https://example.invalid/x.git\n",
+    ".claude/skills/failpin/SKILL.md": "---\nname: failpin\nrequires_runtime: [python]\n---\n# failpin\n",
+    ".claude/skills/failpin/requirements.txt": "fail-pkg==1\n",
+    ".claude/skills/pinonly/SKILL.md": "---\nname: pinonly\n---\n# pinonly\n",
+    ".claude/skills/pinonly/scripts/requirements.txt": "tool-binary==1.0\n",
+    ".claude/skills/plain/SKILL.md": "---\nname: plain\n---\n# plain\n",
+    ".claude/skills/stdlib/SKILL.md": "---\nname: stdlib\nrequires_runtime:\n  - python\n---\n# stdlib\n",
+    ".claude/skills/vfail/SKILL.md": "---\nname: vfail\nrequires_runtime: [python]\n---\n# vfail\n",
+    ".meowkit/envs/gone/notes.txt": "An environment whose skill no longer exists.\n",
+    ".meowkit/envs/stdlib/notes.txt": "A directory that survived without its interpreter.\n",
+    "stub-bin/python3": "#!/bin/sh\n# Records what would have run and lays down a venv-shaped directory, so the\n# compared file tree shows the effect without a real interpreter.\necho \"python3 $*\" >> calls.log\nif [ \"$1\" = \"-m\" ] && [ \"$2\" = \"venv\" ]; then\n  case \"$3\" in\n    *vfail)\n      echo \"Error: venv boom\" >&2\n      exit 1\n      ;;\n  esac\n  mkdir -p \"$3/bin\"\n  cp \"$(dirname \"$0\")/venv-python3\" \"$3/bin/python3\"\n  cp \"$(dirname \"$0\")/venv-pip\" \"$3/bin/pip\"\nfi\nexit 0\n",
+    "stub-bin/venv-pip": "#!/bin/sh\n# pip inside a stubbed environment: an install is recorded in the environment's\n# own `installed` file, and `show` reads it back.\necho \"pip $*\" >> calls.log\nenv_dir=\"$(dirname \"$0\")/..\"\nbase=$(echo \"$2\" | sed 's/[=<>!~].*//' | tr 'A-Z' 'a-z')\ncase \"$1\" in\n  install)\n    case \"$2\" in\n      fail-*)\n        echo \"ERROR: Could not find a version that satisfies the requirement $2\" >&2\n        echo \"ERROR: No matching distribution found for $2\" >&2\n        exit 1\n        ;;\n    esac\n    echo \"$base\" >> \"$env_dir/installed\"\n    echo \"Collecting $2\"\n    ;;\n  show)\n    grep -qx \"$base\" \"$env_dir/installed\" 2>/dev/null\n    exit $?\n    ;;\nesac\nexit 0\n",
+    "stub-bin/venv-python3": "#!/bin/sh\n# The interpreter inside a stubbed environment: nothing is ever importable.\necho \"venv-python3 $*\" >> calls.log\nexit 1\n",
+    "stub-bin/which": "#!/bin/sh\n# Only python3 exists on this machine, whatever the real PATH holds.\n[ \"$1\" = \"python3\" ]\n"
+  }
+}

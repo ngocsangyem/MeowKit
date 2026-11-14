@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "Token Budget & Cost Log\n\nSource: <project>/.meowkit/telemetry/cost-log.json\n\n",
+  "stderr": "Failed to read cost log: Unexpected end of JSON input\n",
+  "files": {
+    ".meowkit/telemetry/cost-log.json": "{ \"date\": \n"
+  }
+}

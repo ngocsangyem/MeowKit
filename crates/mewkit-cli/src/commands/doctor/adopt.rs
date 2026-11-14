@@ -2,8 +2,8 @@
 //! kit cache, or refuse. Nothing is written on a refusal: a partial baseline
 //! is worse than none.
 //!
-//! A runtime that `mewkit-next` installed is refused too: its ownership index
-//! is the record there, and a second baseline beside it would disagree.
+//! A runtime this binary installed is refused too: its ownership index is the
+//! record there, and a second baseline beside it would disagree.
 use std::path::Path;
 
 use mewkit_core::baseline::{plan_adoption, write_install_metadata};
@@ -11,8 +11,8 @@ use serde_json::{Value, json};
 
 use crate::failure::Failure;
 
-/// The `mewkit-next` ownership index for claude-code here, if it is a real one.
-fn next_index(root: &Path) -> Option<std::path::PathBuf> {
+/// This binary's ownership index for claude-code here, if it is a real one.
+fn native_index(root: &Path) -> Option<std::path::PathBuf> {
     let file = root.join(".meowkit/state/ownership/claude-code.json");
     let parsed: Value = serde_json::from_slice(&std::fs::read(&file).ok()?).ok()?;
     (parsed.get("schema_version").is_some() && parsed.get("paths").is_some()).then_some(file)
@@ -34,9 +34,9 @@ pub fn run(root: Option<&Path>, json: bool) -> Result<u8, Failure> {
         }
         return Ok(1);
     };
-    if let Some(index) = next_index(root) {
+    if let Some(index) = native_index(root) {
         let message = format!(
-            "mewkit doctor --adopt: claude-code here was installed by mewkit-next ({}).\n  Manage it with mewkit-next instead: `mewkit-next upgrade`, `mewkit-next uninstall --target claude-code`.",
+            "mewkit doctor --adopt: claude-code here was installed by the mewkit binary ({}), so it has nothing to adopt.\n  Manage it with `mewkit upgrade` and `mewkit uninstall --target claude-code`.",
             index.display()
         );
         if json {

@@ -32,7 +32,7 @@ const REPLACED_CLASSES = new Set(['toggle', 'drop']);
 const READER_PATH = /[A-Za-z0-9_.\-/]+\.(?:cjs|mjs|js|ts|tsx|py|sh|md|json)/g;
 
 /** Reader columns are written relative to the kit, the CLI source, or the root. */
-const READER_ROOTS = ['.claude', path.join('packages', 'mewkit', 'src'), '.'];
+const READER_ROOTS = ['.claude', '.'];
 
 /** The first root under which `token` exists, as an absolute path, or null. */
 function resolveReader(root, token) {

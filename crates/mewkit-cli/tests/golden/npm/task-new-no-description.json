@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Description is required. Usage: meowkit task new [--type feature] \"description\"\n",
+  "files": {
+    "README.md": "A project with no task tree yet.\n"
+  }
+}

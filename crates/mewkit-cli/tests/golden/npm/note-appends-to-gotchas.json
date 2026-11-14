@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "stdout": "appended to .meowkit/memory/gotchas.md\n",
+  "stderr": "",
+  "files": {
+    ".meowkit/memory/gotchas.md": "## Vitest serializes files in one worker here\nWhy: the suite shares a fixed port\nApply when: a suite hangs with no output\nSource: vitest.config.ts\n",
+    "README.md": "A project with no memory store yet.\n"
+  }
+}

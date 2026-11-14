@@ -6,6 +6,7 @@
     "installation",
     "quick-start",
     "migration/tdd-optional",
+    "migration/from-npx-mewkit",
     "---Core Concepts---",
     "core-concepts/what-is-meowkit",
     "core-concepts/how-it-works",

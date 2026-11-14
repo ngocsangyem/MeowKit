@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "No supervision run \"demo-run\" — run `mewkit advice begin` first.\n",
+  "files": {}
+}

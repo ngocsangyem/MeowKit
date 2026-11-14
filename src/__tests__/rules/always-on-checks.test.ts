@@ -6,7 +6,20 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { ALWAYS_ON_RULES } from "../../../packages/mewkit/src/core/always-on-rules.js";
+
+/**
+ * The `.claude/rules/*.md` files a session auto-loads on every turn, in load order. Mirrors
+ * `ALWAYS_ON_RULES` in `crates/mewkit-core/src/validate/structure.rs`, the CLI's own copy.
+ */
+const ALWAYS_ON_RULES = [
+	"meowkit-core.md",
+	"security-rules.md",
+	"injection-rules.md",
+	"gate-rules.md",
+	"core-behaviors.md",
+	"development-rules.md",
+	"agent-conduct.md",
+] as const;
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const BUDGET = path.join(REPO_ROOT, "scripts", "check-always-on-budget.cjs");

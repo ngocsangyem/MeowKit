@@ -1,7 +1,7 @@
 //! The receipt's cross-language contract, pinned from the Rust side.
 //!
 //! The Node verifier is exercised against these same bytes by
-//! `crates/mewkit-cli/tests/parity/plan_receipt_consumer.rs`; what is asserted
+//! `crates/mewkit-cli/tests/npm_behaviour/plan_receipt_consumer.rs`; what is asserted
 //! here is the shape of the body the digest is taken over, because that is what
 //! makes the two agree.
 use std::io::Write;

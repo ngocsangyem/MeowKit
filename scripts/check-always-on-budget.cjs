@@ -37,7 +37,7 @@ const MEASURED_FIELDS = { skill: ["name", "description", "when_to_use"], agent: 
 // scratch copy of a tree that has no node_modules of its own.
 let yaml;
 try {
-	const paths = ["../packages/mewkit/node_modules", "../node_modules"].map((p) => path.join(__dirname, p));
+	const paths = ["../node_modules"].map((p) => path.join(__dirname, p));
 	yaml = require(require.resolve("js-yaml", { paths }));
 } catch {
 	console.error("check-always-on-budget: cannot resolve js-yaml — run `npm install`.");

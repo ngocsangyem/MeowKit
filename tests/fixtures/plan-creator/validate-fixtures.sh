@@ -18,10 +18,11 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
-CLI="${REPO_ROOT}/packages/mewkit/dist/index.js"
+# The native CLI: $MEWKIT when set (CI points it at the built binary), else a local debug build.
+CLI="${MEWKIT:-${REPO_ROOT}/target/debug/mewkit}"
 
-if [ ! -f "${CLI}" ]; then
-  echo "ERROR: CLI not built at ${CLI}. Run 'npm run build' first." >&2
+if [ ! -x "${CLI}" ]; then
+  echo "ERROR: no mewkit binary at ${CLI}. Run 'cargo build -p mewkit-cli' or set MEWKIT." >&2
   exit 2
 fi
 
@@ -49,7 +50,7 @@ for fixture in ${FIXTURES}; do
     continue
   fi
 
-  output="$(node "${CLI}" plan check --structural "${plan_path}" 2>&1)"
+  output="$("${CLI}" plan check --structural "${plan_path}" 2>&1)"
   first_line="${output%%$'\n'*}"
 
   case "${first_line}" in

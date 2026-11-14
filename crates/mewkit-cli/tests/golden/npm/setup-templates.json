@@ -1,0 +1,14 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup\n\n  ○ skill-envs: No skills selected — pass --skills=<a,b> or run `mewkit skill env <skill>`\n  ✓ mcp: Created .mcp.json — edit API keys inside.\n      did copy .mcp.json (from .meowkit/mcp.json.example)\n  ○ env: .claude/.env already exists\n  ✓ gitignore: Wrote .meowkit/.gitignore (deny-all + the shared allowlist); Appended MeowKit entries to .gitignore\n      did create .meowkit/.gitignore\n      did append .gitignore\n  ! project-context: Run `/mk:project-context generate` in your first session to create docs/project-context.md\n\n  Summary: 2 configured, 2 skipped, 1 warnings\n",
+  "stderr": "",
+  "files": {
+    ".claude/.env": "LEGACY_KEY=1\n",
+    ".gitignore": "\n# from the shipped template\nsession-state/\n",
+    ".mcp.json": "{\"mcpServers\":{\"demo\":{\"command\":\"demo\"}}}\n",
+    ".meowkit/.gitignore": "*\n!.gitignore\n!config.yaml\n!.env.example\n!mcp.json.example\n!bin/\n!bin/mewkit\n!memory/\n!memory/*.md\n",
+    ".meowkit/gitignore.meowkit": "# from the shipped template\nsession-state/\n",
+    ".meowkit/mcp.json.example": "{\"mcpServers\":{\"demo\":{\"command\":\"demo\"}}}\n",
+    "package.json": "{}\n"
+  }
+}

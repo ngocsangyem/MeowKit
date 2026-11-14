@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Checkpoint refused: \"staging\" is not a release stage for mk:ship — expected prepare, release, publish\n",
+  "files": {}
+}

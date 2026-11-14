@@ -6,7 +6,7 @@
 import { describe, it, expect, afterEach } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { runConfiguredHook } from "../../../packages/mewkit/src/core/hook-runner.js";
+import { runConfiguredHook } from "./support/hook-runner.js";
 import { scaffold, SETTINGS, type HarnessProject } from "./_scaffold.js";
 
 let project: HarnessProject | null = null;

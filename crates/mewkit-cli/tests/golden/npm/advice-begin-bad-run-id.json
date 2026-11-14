@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Refused: embedded supervision requires a valid supervisionRunId — a direct consult cannot become supervision\n",
+  "files": {}
+}

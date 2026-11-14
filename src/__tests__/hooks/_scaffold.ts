@@ -2,7 +2,7 @@
 // shared production scaffolder so tests and `doctor --hard-gates` use one implementation.
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { scaffoldHarnessProject, type HarnessProject } from "../../../packages/mewkit/src/core/harness-scaffold.js";
+import { scaffoldHarnessProject, type HarnessProject } from "./support/harness-scaffold.js";
 
 const REPO_ROOT = resolve(process.cwd());
 

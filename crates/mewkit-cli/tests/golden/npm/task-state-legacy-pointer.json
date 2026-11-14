@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "stdout": "Durable task state\n  active plan: 261112-alpha-work\n  alpha [active] tasks/plans/261112-alpha-work/plan.md ◀ current\n    step: (none)  next: (none)\n",
+  "stderr": "",
+  "files": {
+    ".meowkit/state/active-plan.json": "{\n  \"path\": \"261112-alpha-work\"\n}\n",
+    "tasks/active/alpha.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"alpha\",\n  \"planPath\": \"tasks/plans/261112-alpha-work/plan.md\",\n  \"status\": \"active\",\n  \"currentStep\": \"\",\n  \"repos\": [],\n  \"blockers\": [],\n  \"nextAction\": \"\",\n  \"verificationSummaries\": [],\n  \"evidenceRefs\": [],\n  \"capabilityDecisions\": [],\n  \"writtenByCli\": \"2.3.1\",\n  \"writtenByKit\": \"\",\n  \"updatedAt\": \"2026-11-10T08:30:00.000Z\"\n}\n"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "Unknown `trace` subcommand: nonsense\nValid subcommands: score, audit, propose\nRun `mewkit trace --help` for usage.\n",
+  "files": {
+    ".claude/settings.json": "{}\n"
+  }
+}

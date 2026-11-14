@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "\nMeowKit Setup\n\n",
+  "stderr": "Unknown step: bogus. Available: skill-envs, mcp, env, gitignore, project-context\n",
+  "files": {}
+}

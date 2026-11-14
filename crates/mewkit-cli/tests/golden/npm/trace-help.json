@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "mewkit trace\n\nOn-demand trace recall\n\nSubcommands:\n  score — mewkit trace score [--id <run>]\n  audit\n  propose — mewkit trace propose [--commit]\n\nFlags:\n  --json                    Emit machine-readable JSON\n  --id <value>              Trace record id\n  --friction <value>        Record a friction note against the current task\n  --responsibility <value>  Scope to one substrate responsibility\n  --commit                  Persist the proposal rather than previewing it\n",
+  "stderr": "",
+  "files": {
+    ".claude/settings.json": "{}\n"
+  }
+}

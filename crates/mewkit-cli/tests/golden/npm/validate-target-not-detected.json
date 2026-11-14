@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "Validating cursor target: <project>\n\nNot a cursor target (no generated cursor layout found at <project>).\n",
+  "stderr": "",
+  "files": {
+    "README.md": "# Not a MeowKit project\n"
+  }
+}

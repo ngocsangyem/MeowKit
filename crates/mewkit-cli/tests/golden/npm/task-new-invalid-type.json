@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Invalid --type \"chore\". Must be one of: feature, bug-fix, refactor, security\n",
+  "files": {
+    "README.md": "A project with no task tree yet.\n"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "MeowKit Provenance\nRead-only: reports what can and cannot be proven locally. No fetch, no relabel.\n\n  Metadata source: legacy-metadata\n  Baseline is reconstructed from disk (source=legacy-metadata), not a trusted release payload —\n  as-shipped identity is NOT provable for these files. Run `mewkit upgrade` to write\n  canonical metadata with real baselines.\n  No file-level provenance recorded — nothing can be proven. Run `mewkit upgrade`.\n",
+  "stderr": "",
+  "files": {
+    ".claude/metadata.json": "{\n  \"version\": \"1.0.0\"\n}\n"
+  }
+}

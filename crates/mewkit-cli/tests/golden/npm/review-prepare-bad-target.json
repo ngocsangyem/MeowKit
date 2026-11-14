@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "{\n  \"ok\": false,\n  \"error\": \"unrecognized PR target: \\\"not a pr\\\" (use a PR URL, owner/repo#123, or a bare number)\"\n}\n",
+  "stderr": "",
+  "files": {}
+}

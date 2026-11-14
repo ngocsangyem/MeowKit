@@ -1,0 +1,6 @@
+{
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "`mewkit skill` needs a subcommand.\nValid subcommands: env\nRun `mewkit skill --help` for usage.\n",
+  "files": {}
+}

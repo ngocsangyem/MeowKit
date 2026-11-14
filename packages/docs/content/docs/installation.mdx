@@ -1,92 +1,102 @@
 ---
 title: "Installation"
-description: "Install MeowKit and get it running in your project."
+description: "Install the mewkit binary, then add MeowKit to a project."
 ---
+
+MeowKit has one CLI: the native `mewkit` binary, with `mk` as a short alias. Install it first, then add the kit to each project.
 
 ## Prerequisites
 
-- **Node.js** 24 or later
-- **Python** 3.9 or later, and only for the skills that run Python; the core workflow needs none. `mewkit setup` prepares one environment per skill under `.meowkit/envs/<skill>/` and installs that skill's own `requirements.txt` into it
 - **Git** installed and configured
 - **Claude Code** installed ([claude.ai/code](https://claude.ai/code))
+- **Node.js** 24 or later, for the kit's hooks. The `mewkit` binary does not need Node.js.
+- **Python** 3.9 or later, only for the skills that run Python. The core workflow needs none. `mewkit setup` prepares one environment per skill under `.meowkit/envs/<skill>/`.
 
-## Install
+## Install the CLI
 
-```bash
-npx mewkit init
-```
-
-On a fresh install, `mewkit init` first asks which toolkits to set up, a multiselect of **Claude Code** (preselected), **Codex**, and **Cursor**, then provisions each: Claude Code generates the `.claude/` directory, Codex copies the authored Codex bundle, Cursor copies the authored Cursor bundle (`AGENTS.md` plus a `.cursor/` tree of agents, rules, skills and hooks). Neither Codex nor Cursor needs `.claude/`, and nothing is converted. Selecting only Codex yields a codex-only project.
-
-### Interactive setup
-
-On a fresh install the CLI prompts, in order:
-
-| Prompt | Default |
-|--------|---------|
-| Toolkits, a multiselect of Claude Code / Codex / Cursor | Claude Code preselected |
-| Install profile | `full` |
-| Project description (optional) | skipped |
-| Install Python skill dependencies into `.meowkit/envs/<skill>/` | no |
-| Gemini API key (optional) | no |
-| Fallback API keys for external providers (optional) | no |
-
-All other settings use the defaults in the shipped `.meowkit/config.yaml`. Stack detection is not performed. In **update mode** (an existing `.claude/`), the toolkit picker is skipped and init just refreshes `.claude/`.
-
-### CLI flags
-
-Skip the interactive prompts with flags:
+macOS and Linux:
 
 ```bash
-npx mewkit init --target claude-code  # Skip the picker, Claude Code only
-npx mewkit init --target codex     # Skip the picker, Codex-only toolkit
-npx mewkit init --target cursor    # Skip the picker, Cursor-only toolkit
-npx mewkit init --force            # Overwrite existing .claude/
-npx mewkit init --dry-run          # Preview without writing
-npx mewkit init --profile core     # Install a right-sized profile subset
+curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh
 ```
 
-Passing `--target` skips the toolkit multiselect and runs that flow directly. An
-unrecognized target is refused by name with the three valid ones listed, rather than falling through
-to the default install.
+Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.ps1 | iex
+```
+
+The installer checks the archive's size and SHA-256 against the pins it carries, then puts `mewkit` on your PATH with `mk` beside it. `mk` is the same binary, so `mk doctor` and `mewkit doctor` do the same thing.
+
+| Variable | Effect |
+|----------|--------|
+| `MEWKIT_INSTALL_DIR` | Install somewhere other than the default directory |
+| `MEWKIT_VERSION` | Refuse to install unless the pinned version is the one you name |
+| `MEWKIT_CHANNEL=beta` | Install the newest prerelease instead of the newest stable release |
+
+Later updates come from `mewkit self-update`. It checks the release's `binary-manifest.json` and the archive's SHA-256 and size before it replaces the binary, and it keeps the previous binary beside it.
+
+<Callout type="info">
+  The installer also places `mewkit-next` for one release, with a notice that the name has changed. Use `mewkit` or `mk` instead. If an existing `mk` on your PATH is not MeowKit, the installer leaves it alone and reports it.
+</Callout>
+
+## Add MeowKit to a project
+
+From the project directory:
+
+```bash
+mewkit init
+```
+
+Without flags, `init` asks which runtimes to set up: Claude Code, Codex and Cursor. Claude Code is preselected. Codex and Cursor each get their own authored bundle. Nothing is converted from `.claude/`, and a Codex-only or Cursor-only project does not need `.claude/`. In a project that already has `.claude/`, `init` refreshes it and skips the picker.
+
+### Flags
+
+| Command | Effect |
+|---------|--------|
+| `mewkit init --target claude-code` | Claude Code only, no picker |
+| `mewkit init --target codex` | Codex bundle only |
+| `mewkit init --target cursor` | Cursor bundle only |
+| `mewkit init --target all` | All three runtimes |
+| `mewkit init --profile core` | Claude Code: install a subset (`core`, `developer`, `product`, `atlassian`, `security`, `research`, `full`) |
+| `mewkit init --yes` | Take every default and ask nothing |
+| `mewkit init --dry-run` | Show what would change and change nothing |
+| `mewkit init --force` | Replace or remove files you edited after the kit installed them |
+| `mewkit init --kit-version v2.16.0` | Install exactly this kit release |
+| `mewkit init --global` | Act on your home directory instead of the project |
+
+An unrecognized `--target` is refused by name, with the valid values listed.
 
 ### Delivery shape
 
 `--target claude-code` has two on-disk shapes, and `--delivery` picks one:
 
 ```bash
-npx mewkit init --target claude-code --delivery native  # .claude/, the default
-npx mewkit init --target claude-code --delivery plugin  # plus .claude-plugin/plugin.json
+mewkit init --target claude-code --delivery native  # .claude/, the default
+mewkit init --target claude-code --delivery plugin  # plus .claude-plugin/plugin.json
 ```
 
-Both deliveries carry the same content, written by the same emitter. `plugin` adds the manifest
-Claude Code reads to load the kit as a plugin; everything else sits in the standard locations the
-host already scans. There is no separate build step, and MeowKit is not published to a plugin
-marketplace.
+Both deliveries carry the same content. `plugin` adds the manifest Claude Code reads to load the kit as a plugin. MeowKit is not published to a plugin marketplace.
 
-`--delivery` is meaningful for `claude-code` only. Codex and Cursor each have a single shape, so
-passing it with either is refused rather than ignored.
+`--delivery` applies to `claude-code` only. Codex and Cursor each have one shape, so passing `--delivery` with either is refused.
 
-## Release checks
+### Install from a downloaded zip
 
-A kit release is a zip archive with a `checksums.txt` file. The release carries no signature, so the
-npm CLI has no signed-artifact check. `mewkit-next` checks the zip against `checksums.txt` before it
-installs; see [mewkit-next](/cli/mewkit-next).
+To install a kit zip you already have, pass it with `--kit-archive`. Its SHA-256 comes from a `checksums.txt` beside it, or from `--kit-sha256`:
 
-`npx mewkit versions` reports how this project's content arrived. The `origin` is `release-zip` for a
-normal release download, or `local-release-dir` when `MEOWKIT_RELEASE_SOURCE` points at an
-already-extracted release.
+```bash
+mewkit init --kit-archive ./meowkit-release.zip
+```
+
+A kit release is a zip with a `checksums.txt`. The binary checks the zip against that file before it installs anything.
 
 ## What is installed here
 
 ```bash
-npx mewkit versions
+mewkit versions
 ```
 
-Prints this project's CLI version, kit version, target and delivery, plus how the content arrived.
-It exits non-zero in a directory with no install, so a script can tell "nothing installed" from
-"installed with an unusual version". A project installed before these were recorded reports them as
-`unknown` rather than guessing.
+Prints this project's CLI version, kit version, target and delivery, and how the content arrived. It exits non-zero in a directory with no install, so a script can tell "nothing installed" from "installed with an unusual version".
 
 ## What gets generated
 
@@ -116,35 +126,35 @@ It exits non-zero in a directory with no install, so a script can tell "nothing 
 └── mcp.json.example Optional MCP server config
 ```
 
-The split follows ownership: `.claude/` holds what Claude Code itself reads, so
-`settings.json` and `.mcp.json` stay there. Everything MeowKit owns lives in `.meowkit/`.
-`config.yaml` and `memory/*.md` are meant to be committed; the other state directories are
-machine-written and belong in `.gitignore` (`mewkit setup` appends them for you).
+The split follows ownership: `.claude/` holds what Claude Code itself reads, so `settings.json` and
+`.mcp.json` stay there. Everything MeowKit owns lives in `.meowkit/`. `config.yaml` and `memory/*.md`
+are meant to be committed; the other state directories are machine-written and belong in
+`.gitignore` (`mewkit setup` appends them for you).
 
-`metadata.json` is worth knowing about even though you never edit it. It records what the
-install wrote and what its contents were, which is how `mewkit upgrade` can tell a file you
-edited from one it shipped. Delete it and the next upgrade has no baseline, so it treats every
-file as untouched.
+`metadata.json` is worth knowing about even though you never edit it. It records what the install
+wrote and what its contents were, which is how `mewkit upgrade` can tell a file you edited from one
+it shipped. Delete it and the next upgrade has no baseline, so it treats every file as untouched.
 
-An install created before these files moved keeps working: readers fall back to the old
-`.claude/` locations, and the next `upgrade` migrates each one forward.
+An install created before these files moved keeps working: readers fall back to the old `.claude/`
+locations, and the next `upgrade` migrates each one forward.
 
 ## Verify installation
 
 ```bash
-npx mewkit doctor
+mewkit doctor
 ```
 
-This checks: Node.js version, Python version, Git availability, hooks executable, hook libraries present.
+`doctor` checks the toolchain (Node.js, Python, Git), the installs in this project, and their hooks.
 
 ## Post-install setup
 
 ### MCP servers (optional)
 
-`mewkit setup` copies `.meowkit/mcp.json.example` to `.mcp.json` and leaves an existing `.mcp.json` alone. Run only that step with:
+`mewkit setup` copies `.meowkit/mcp.json.example` to `.mcp.json` and leaves an existing `.mcp.json`
+alone. Run only that step with:
 
 ```bash
-npx mewkit setup --only mcp
+mewkit setup --only mcp
 ```
 
 Then edit `.mcp.json` to add the keys for the servers you need.
@@ -153,7 +163,7 @@ Available MCP servers: Context7 (docs), Playwright (QA), Sequential Thinking.
 
 ### Gemini API key (optional)
 
-For `mk:multimodal` (image/video/audio analysis):
+For `mk:multimodal` (image, video and audio analysis):
 
 ```bash
 # Add to .meowkit/.env, gitignored, secrets stay local
@@ -162,32 +172,9 @@ echo "MEOWKIT_GEMINI_API_KEY=your-key" >> .meowkit/.env
 
 Get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 
-## Preview: the `mewkit-next` binary
+## Coming from the npm CLI
 
-`mewkit-next` is a native installer for the same kit, in preview beside the npm CLI. It installs, upgrades, removes and checks the kit for Claude Code, Codex and Cursor, in a project or in your home directory, and needs no Node.js to run itself. Every other command still comes from the npm CLI; see [mewkit-next](/cli/mewkit-next) for what it covers.
-
-<Callout type="info">
-  The commands below install `mewkit-next`, not `mewkit`. It covers `init`, `upgrade`,
-  `uninstall`, `doctor`, `providers`, `versions`, `self-update`, `plan`, `task`, `task-state`, `note`,
-  `orient` and `validate`. `setup`, `review`, `advice` and the rest still run as `npx mewkit`, and the
-  kit's hooks still call the npm CLI, so keep Node.js 24+ even after a `curl` or `irm` install.
-</Callout>
-
-Linux and macOS:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh
-```
-
-Windows (PowerShell):
-
-```powershell
-irm https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.ps1 | iex
-```
-
-The installer puts `mewkit-next` in `~/.local/bin` (set `MEWKIT_INSTALL_DIR` to change it) and says so when that directory is not on your `PATH`. `MEWKIT_CHANNEL=beta` installs the newest prerelease. Each installer carries, for every platform, the exact download URL, SHA-256 and size of the release it installs, and refuses a download that differs; there is no signature. Set `MEWKIT_VERSION` to make the installer refuse unless the version it pins is the one you named. Until the first binary release, the installers say no release is pinned.
-
-`mewkit-next` also checks the kit zip against the release's `checksums.txt`; the npm CLI does not, it reads the zip and ignores that file. Later updates: `mewkit-next self-update`, which checks the release's `binary-manifest.json` digest and size before replacing itself and keeps the previous binary beside it with an `.old` suffix.
+If a project still runs `npx mewkit`, read [Moving from npx mewkit](/migration/from-npx-mewkit) before you change anything. The kit already in the project keeps working.
 
 ## Troubleshooting
 
@@ -196,17 +183,18 @@ The installer puts `mewkit-next` in `~/.local/bin` (set `MEWKIT_INSTALL_DIR` to 
 | `.claude/` already exists | Use `--force` flag or delete manually |
 | Hooks not executable | Run `chmod +x .claude/hooks/*` |
 | Python scripts fail | Ensure Python 3.9+ is in PATH |
-| Claude Code doesn't load `.claude/rules/` | Restart the Claude Code session; `npx mewkit validate` confirms all 7 always-on rules are present |
+| Claude Code doesn't load `.claude/rules/` | Restart the Claude Code session; `mewkit validate` confirms all 7 always-on rules are present |
 | The agent refuses to edit any file | Gate 1 is unapproved, which is the gate working. See [When a gate blocks you](/core-concepts/gates#when-a-gate-blocks-you) |
-| `doctor` reports hooks not executable after a fresh clone | `npx mewkit doctor` fixes this itself; permissions do not survive some archive formats |
+| `doctor` reports hooks not executable after a fresh clone | Run `chmod +x .claude/hooks/*`; permissions do not survive some archive formats |
+| A hook fails to start | Check that Node.js 24+ is on your PATH. The hooks run on Node even though the binary does not |
 
 ## Next steps
 
 After scaffolding, finalize setup:
 
 ```bash
-npx mewkit setup    # Post-scaffold configuration (skill environments, MCP, env, gitignore)
-npx mewkit doctor   # Verify installation
+mewkit setup    # Post-scaffold configuration (skill environments, MCP, env, gitignore)
+mewkit doctor   # Verify installation
 ```
 
 - [Quick Start](/quick-start): your first task with MeowKit

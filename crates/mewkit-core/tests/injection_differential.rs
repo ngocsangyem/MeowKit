@@ -10,8 +10,8 @@
 //! ## How the expectations were produced
 //!
 //! Each `expected` is the value Node printed for the same input, through the
-//! compiled TypeScript (`packages/mewkit/dist/state/injection-scanner.js`,
-//! built by `npm run build --prefix packages/mewkit`):
+//! npm CLI's compiled TypeScript injection scanner (since retired, so the
+//! values cannot be re-derived):
 //!
 //! ```js
 //! import { validateContent, scrubSecrets } from ".../injection-scanner.js";
@@ -20,8 +20,7 @@
 //! ```
 //!
 //! They are hard-coded rather than produced at test time on purpose: this test
-//! must fail on a Rust regression even on a machine with no Node and no build
-//! of the TypeScript. `reader_agreement.rs` is the live-comparison counterpart.
+//! must fail on a Rust regression even on a machine with no Node. `reader_agreement.rs` is the live-comparison counterpart.
 
 use mewkit_core::memory::{scrub_secrets, validate_content};
 

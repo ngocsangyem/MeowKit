@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "stdout": "appended to .meowkit/memory/decisions.md\n",
+  "stderr": "",
+  "files": {
+    ".meowkit/memory/decisions.md": "## We kept the sidecar lock\nWhy: three languages contend on it\nApply when: a writer is tempted to flock a descriptor\nSource: crates/mewkit-core/src/sidecar_lock.rs\n",
+    "README.md": "A project with no memory store yet.\n"
+  }
+}

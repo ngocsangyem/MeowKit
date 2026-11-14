@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup\n\n  ✓ gitignore: Wrote .meowkit/.gitignore (deny-all + the shared allowlist); Appended MeowKit entries to .gitignore\n      did create .meowkit/.gitignore\n      did append .gitignore\n\n  Summary: 1 configured, 0 skipped\n",
+  "stderr": "",
+  "files": {
+    ".gitignore": "\n# MeowKit\n.env\n.env.local\nsession-state/\ntasks/reports/\n.claude/logs/\n\n",
+    ".meowkit/.gitignore": "*\n!.gitignore\n!config.yaml\n!.env.example\n!mcp.json.example\n!bin/\n!bin/mewkit\n!memory/\n!memory/*.md\n"
+  }
+}

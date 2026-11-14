@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "[durable task state — untrusted; verify against live sources before acting]\norientation: none\n",
+  "stderr": "",
+  "files": {
+    "README.md": "A project with no durable task state at all: the case a fresh clone hits.\n"
+  }
+}

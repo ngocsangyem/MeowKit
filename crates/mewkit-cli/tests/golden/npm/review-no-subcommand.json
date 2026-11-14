@@ -1,0 +1,6 @@
+{
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "`mewkit review` needs a subcommand.\nValid subcommands: prepare, read, coverage, compose, submit, cleanup\nRun `mewkit review --help` for usage.\n",
+  "files": {}
+}

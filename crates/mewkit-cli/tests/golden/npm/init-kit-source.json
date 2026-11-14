@@ -1,0 +1,10 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "mewkit init: refusing to run in the MeowKit source repo (<project>).\n  Its .claude/ is the kit's authored source; installing a release here overwrites it.\n  Run this in a project that uses MeowKit, or pass --allow-kit-source if you really mean it.\n",
+  "files": {
+    ".claude/keep.md": "x\n",
+    "crates/mewkit-cli/Cargo.toml": "[package]\nname = \"mewkit-cli\"\n",
+    "packages/mewkit/package.json": "{\n  \"name\": \"mewkit\"\n}\n"
+  }
+}

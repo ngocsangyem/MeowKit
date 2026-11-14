@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "stdout": "Checkpoint \"cp-1\" already ran — returning the recorded result, no slot spent.\n  latest directive: finish the migration first\n  next safe action: run the suite\n",
+  "stderr": "",
+  "files": {
+    "tasks/reports/261113-demo-run-advice-1.md": "---\nkind: advice-receipt\nrunId: \"demo-run\"\nstage: \"GUIDE\"\ndisposition: \"CONTINUE_WITH_DIRECTIVE\"\noutcome: \"adopted\"\nreason: \"the plan holds\"\ntaskId: \"none\"\nprovider: \"unknown\"\nskill: \"mk:cook\"\ncheckpointId: \"cp-1\"\n---\n\nThis is a record of supervision, NEVER verification and never a gate approval.\n\n**Question asked:** (not recorded)\n\n**Directive:** finish the migration first\n\n**Required corrections:**\n\nnone\n\n**Evidence pointers:**\n\nnone\n\n**Next safe action:** run the suite\n",
+    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nstage: \"GUIDE\"\nlockedDecisionPointers: []\ncorrectionCount: 0\nreceiptPointers: [\"tasks/reports/261113-demo-run-advice-1.md\"]\ncheckpoint: { checkpointId: \"cp-1\", stage: \"GUIDE\", state: \"committed\" }\nhistory: [{\"checkpointId\":\"cp-1\",\"stage\":\"GUIDE\",\"disposition\":\"CONTINUE_WITH_DIRECTIVE\"}]\nescalatedToHuman: false\n---\n\n# Supervision run demo-run\n\nThis is supervision continuity, NEVER verification and never a gate approval.\n\n**Latest directive:** finish the migration first\n**Next safe action:** run the suite\n"
+  }
+}

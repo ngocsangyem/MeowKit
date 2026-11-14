@@ -1,0 +1,22 @@
+{
+  "exit_code": 0,
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nDocs\n  [PASS] Docs references on Type-1 allowlist\n\n1 passed\n",
+  "stderr": "",
+  "files": {
+    ".claude/agents/developer.md": "---\nname: developer\ndescription: Writes production code.\n---\n\nProse.\n",
+    ".claude/hooks/HOOKS_INDEX.md": "# Hooks\n\nTwo of them.\n",
+    ".claude/hooks/append-trace.cjs": "#!/usr/bin/env node\n'use strict';\n// A hook script, enough to be one.\n",
+    ".claude/hooks/lib/shared.cjs": "// a library, not a hook\n",
+    ".claude/hooks/pre-ship.cjs": "#!/usr/bin/env node\n'use strict';\n// A hook script, enough to be one.\n",
+    ".claude/rules/agent-conduct.md": "# agent-conduct.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/core-behaviors.md": "# core-behaviors.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/development-rules.md": "# development-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/gate-rules.md": "# gate-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/injection-rules.md": "# injection-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/meowkit-core.md": "# meowkit-core.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/security-rules.md": "# security-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/skills/cook/SKILL.md": "---\nname: mk:cook\ndescription: Build a feature.\n---\n\nDelegate with subagent_type: developer.\n",
+    ".git/HEAD": "ref: refs/heads/main\n",
+    ".meowkit/memory/decisions.md": "## A kebab-case file name is what search tools read  <!-- 2026-11-01 -->\n\nWhy: a long name beats a short one when a tool greps for purpose.\nApply when: naming any new file.\nSource: a review of three renamed modules.\n"
+  }
+}

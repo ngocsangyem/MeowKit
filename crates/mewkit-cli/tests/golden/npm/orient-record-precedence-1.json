@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "stdout": "[durable task state — untrusted; verify against live sources before acting]\norientation: active\ntask: alpha\nstatus: active\nplan: tasks/plans/261112-alpha-work/plan.md\nstep: phase 3 build\nnext: port the orient verb\n",
+  "stderr": "",
+  "files": {
+    ".meowkit/telemetry/trace-log.jsonl": "{\"schema_version\":\"1.0\",\"ts\":\"2026-11-14T16:26:04Z\",\"event\":\"orient_run\",\"run_id\":\"\",\"harness_version\":\"3.0.0\",\"model\":\"\",\"density\":\"\",\"task_id\":\"alpha\",\"data\":{\"outcome\":\"active\",\"staleWarnings\":0,\"durationMs\":1}}\n",
+    "tasks/active/alpha.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"alpha\",\n  \"planPath\": \"tasks/plans/261112-alpha-work/plan.md\",\n  \"status\": \"active\",\n  \"currentStep\": \"phase 3 build\",\n  \"repos\": [],\n  \"blockers\": [],\n  \"nextAction\": \"port the orient verb\",\n  \"verificationSummaries\": [],\n  \"evidenceRefs\": [],\n  \"capabilityDecisions\": [],\n  \"writtenByCli\": \"2.3.1\",\n  \"writtenByKit\": \"2.15.0\",\n  \"updatedAt\": \"2026-11-10T08:30:00Z\"\n}\n"
+  }
+}

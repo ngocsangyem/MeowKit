@@ -1,0 +1,16 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "✗ verdict-gate blocked (invalid):\n  schema_version: Expected string, received number\n  slug: String must contain at least 1 character(s)\n  gate: Invalid enum value. Expected 'review' | 'contract', received 'x'\n  decision: Expected 'PASS' | 'PASS_WITH_RISK' | 'BLOCKED', received number\n  dimensions.0: Expected object, received string\n  dimensions.1.name: String must contain at least 1 character(s)\n  dimensions.1.verdict: Invalid enum value. Expected 'PASS' | 'WARN' | 'FAIL', received 'NO'\n  dimensions.1.note: Expected string, received null\n  evidence_refs.0: Expected string, received number\n  created_at: Expected string, received null\n",
+  "files": {
+    "tasks/reviews/blocked-verdict.json": "{\"schema_version\":\"1\",\"slug\":\"blocked\",\"gate\":\"review\",\"decision\":\"BLOCKED\",\"dimensions\":[{\"name\":\"Security\",\"verdict\":\"FAIL\"}],\"created_at\":\"t\"}\n",
+    "tasks/reviews/blocked-verdict.md": "# Verdict: blocked\n\n| Dimension | Verdict |\n|---|---|\n| Security | FAIL |\n",
+    "tasks/reviews/broken-verdict.json": "{\"schema_version\":\n",
+    "tasks/reviews/dir-verdict.json/.keep": "",
+    "tasks/reviews/legacy-verdict.md": "# Verdict: legacy\n\n| Dimension | Verdict |\n|---|---|\n| Security | FAIL |\n",
+    "tasks/reviews/pass-verdict.json": "{\"schema_version\":\"1\",\"slug\":\"pass\",\"gate\":\"review\",\"decision\":\"PASS\",\"dimensions\":[{\"name\":\"Security\",\"verdict\":\"PASS\"}],\"created_at\":\"2026-11-13T00:00:00Z\"}\n",
+    "tasks/reviews/pass-verdict.md": "# Verdict: pass\n\n| Dimension | Verdict |\n|---|---|\n| Security | PASS |\n",
+    "tasks/reviews/risk-verdict.json": "{\"schema_version\":\"1\",\"slug\":\"risk\",\"gate\":\"review\",\"decision\":\"PASS_WITH_RISK\",\"dimensions\":[{\"name\":\"Tests\",\"verdict\":\"WARN\",\"note\":\"thin\"}],\"created_at\":\"t\"}\n",
+    "tasks/reviews/shape-verdict.json": "{\"schema_version\":1,\"slug\":\"\",\"gate\":\"x\",\"decision\":3,\"dimensions\":[\"a\",{\"name\":\"\",\"verdict\":\"NO\",\"note\":null}],\"evidence_refs\":[1],\"created_at\":null}\n"
+  }
+}

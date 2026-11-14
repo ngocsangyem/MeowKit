@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "Could not find .claude/ directory.\n",
+  "files": {
+    "README.md": "A project with no durable task state at all: the case a fresh clone hits.\n"
+  }
+}

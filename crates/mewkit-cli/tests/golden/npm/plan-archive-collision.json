@@ -1,0 +1,9 @@
+{
+  "exit_code": 1,
+  "stdout": "plan archive: tasks/plans/archive/261112-demo-plan already exists — refusing to overwrite.\n",
+  "stderr": "",
+  "files": {
+    "tasks/plans/261112-demo-plan/plan.md": "---\ntitle: Demo plan\ntype: feature\nstatus: in_progress\npriority: high\n---\n\n# Demo plan\n\n## Goal\n\nThe demo plan reaches Gate 1 with nothing missing.\n\n## Phases\n\n- phase-01-setup.md\n\n## Todo List\n\n- [x] Write the overview\n- [ ] Hand it to the human\n",
+    "tasks/plans/archive/261112-demo-plan/plan.md": "---\ntitle: Demo plan\ntype: feature\nstatus: in_progress\npriority: high\n---\n\n# Demo plan\n\n## Goal\n\nThe demo plan reaches Gate 1 with nothing missing.\n\n## Phases\n\n- phase-01-setup.md\n\n## Todo List\n\n- [x] Write the overview\n- [ ] Hand it to the human\n"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "exit_code": 1,
+  "stdout": "Validating codex target: <project>\n\nTarget\n  [FAIL] Codex AGENTS.md present\n         Missing: <project>/AGENTS.md\n  [PASS] Codex config.toml parses\n  [FAIL] Codex config.toml agent refs\n         config_file missing for: developer\n  [FAIL] Codex config.toml secret-free\n         secret-like keys with values: mcp_servers.jira.api_key\n  [PASS] Codex hooks.json parses\n  [FAIL] Codex hook wrappers exist\n         missing: absent.cjs\n  [WARN] Codex hook deny contract\n         no wrapper declares an allowedPermissionValues deny rule (no gating hook migrated?)\n  [PASS] Codex agent TOMLs parse\n  [FAIL] Codex agent name field\n         missing name field: three.toml\n  [FAIL] Codex agent required fields\n         missing required field(s): one.toml (developer_instructions)\n  [FAIL] Codex agent name uniqueness\n         duplicate agent name(s): \"duplicate\" in one.toml, two.toml\n  [FAIL] Codex root reference graph\n         dangling reference(s): .codex/hooks/absent.cjs\n  [FAIL] Codex exec-policy rules valid\n         invalid decision value(s): exec.rules: decision=\"reject\"\n  [PASS] Codex installed skills parse\n  [FAIL] Codex installed skills runtime-supported\n         runtime: claude-code installed (default-deny breach): leaky\n  [FAIL] Codex installed skills tool-token clean\n         host-bound tool tokens present: leaky [mk/meow slash command]\n  [WARN] Codex installed skills path refs\n         preserved out-of-set path ref(s) — verify they resolve on Codex: leaky [.claude path, CLAUDE.md reference]\n  [FAIL] Codex no native memory surface\n         `.codex/memory` present — MeowKit must never write native Codex memory\n  [FAIL] Codex no legacy prompts surface\n         `.codex/prompts` present — deprecated custom prompts must be Agent Skills\n\n4 passed, 2 warnings, 13 failed\n",
+  "stderr": "",
+  "files": {
+    ".agents/skills/leaky/SKILL.md": "---\nname: leaky\nruntime: claude-code\n---\n\nRun /mk:cook and read CLAUDE.md under .claude/ first.\n",
+    ".codex/agents/one.toml": "name = \"duplicate\"\ndescription = \"First.\"\n",
+    ".codex/agents/three.toml": "description = \"An agent that forgot its auto-load identity.\"\ndeveloper_instructions = \"Do.\"\n",
+    ".codex/agents/two.toml": "name = \"duplicate\"\ndescription = \"Second.\"\ndeveloper_instructions = \"Do.\"\n",
+    ".codex/config.toml": "[agents.developer]\nconfig_file = \"agents/missing.toml\"\n\n[mcp_servers.jira]\napi_key = \"sk-not-a-real-key\"\n",
+    ".codex/hooks.json": "{\n \"hooks\": {\n  \"PreToolUse\": [\n   {\n    \"hooks\": [\n     {\n      \"command\": \"node .codex/hooks/absent.cjs\"\n     }\n    ]\n   }\n  ]\n }\n}\n",
+    ".codex/memory/notes.md": "# Native memory\n",
+    ".codex/prompts/legacy.md": "# Legacy\n",
+    ".codex/rules/exec.rules": "prefix_rule(program=\"rm\", decision=\"reject\")\n"
+  }
+}

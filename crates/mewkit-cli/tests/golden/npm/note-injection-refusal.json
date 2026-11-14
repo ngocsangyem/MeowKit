@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Rejected: 1 finding(s) — nothing was written.\n  injection: line 2\n",
+  "files": {
+    "README.md": "A project with no memory store yet.\n"
+  }
+}

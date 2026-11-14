@@ -1,0 +1,11 @@
+{
+  "exit_code": 1,
+  "stdout": "Committed REVIEW/cp-1 — disposition RETURN_TO_EXECUTOR, outcome adopted.\n  receipt: tasks/reports/261114-demo-run-advice-1.md\n",
+  "stderr": "Cannot apply correction: evidence file not found: ../workflow-evidence.json\n",
+  "files": {
+    "tasks/plans/demo/reports/evidence/review-artifact.json": "{ \"review\": { \"status\": \"approved\" }, \"hash\": \"pinned\" }\n",
+    "tasks/plans/demo/reports/evidence/workflow-evidence.json": "{\n  \"plan\": \"261113-demo\",\n  \"evidenceRevision\": 2,\n  \"verification\": { \"evidenceRevision\": 2, \"status\": \"valid\" },\n  \"review\": { \"evidenceRevision\": 2, \"status\": \"valid\" },\n  \"approvals\": { \"gate1\": \"approved\", \"gate2\": \"approved\", \"gate1Revision\": 1 }\n}\n",
+    "tasks/reports/261114-demo-run-advice-1.md": "---\nkind: advice-receipt\nrunId: \"demo-run\"\nstage: \"REVIEW\"\ndisposition: \"RETURN_TO_EXECUTOR\"\noutcome: \"adopted\"\nreason: \"the proof is stale\"\ntaskId: \"none\"\nprovider: \"unknown\"\nskill: \"mk:cook\"\ncheckpointId: \"cp-1\"\n---\n\nThis is a record of supervision, NEVER verification and never a gate approval.\n\n**Question asked:** (not recorded)\n\n**Directive:** (none)\n\n**Required corrections:**\n\n1. add the regression test\n\n**Evidence pointers:**\n\nnone\n\n**Next safe action:** (none recorded)\n",
+    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nstage: \"REVIEW\"\nlockedDecisionPointers: []\ncorrectionCount: 1\nreceiptPointers: [\"tasks/reports/261114-demo-run-advice-1.md\"]\ncheckpoint: { checkpointId: \"cp-1\", stage: \"REVIEW\", state: \"committed\" }\nhistory: [{\"checkpointId\":\"cp-1\",\"stage\":\"REVIEW\",\"disposition\":\"RETURN_TO_EXECUTOR\"}]\nescalatedToHuman: false\n---\n\n# Supervision run demo-run\n\nThis is supervision continuity, NEVER verification and never a gate approval.\n\n**Latest directive:** (none yet)\n**Next safe action:** (none recorded)\n"
+  }
+}

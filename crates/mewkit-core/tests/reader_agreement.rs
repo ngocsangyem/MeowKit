@@ -12,9 +12,7 @@
 //! FAILS. It used to print a skip notice and return, which `cargo test`
 //! swallows without `--nocapture`: a CI leg without Node went green while the
 //! comparison never ran, which is the one outcome a cross-reader test must not
-//! have. Set `MEWKIT_SKIP_NODE_PARITY=1` to opt out deliberately — the opt-out
-//! is explicit, named in the failure message, and visible in the CI
-//! configuration that uses it.
+//! have. There is no opt-out: the CI legs install Node for this test.
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -66,13 +64,6 @@ fn node_available() -> bool {
 /// Every fixture committed at review time. A fixture may be ADDED without
 /// touching this number; losing one is a corpus regression.
 const EXPECTED_FIXTURES: usize = 58;
-
-/// The explicit opt-out. Any value other than `0`/`false`/empty counts.
-const SKIP_ENV: &str = "MEWKIT_SKIP_NODE_PARITY";
-
-fn skip_requested() -> bool {
-    env::var(SKIP_ENV).is_ok_and(|value| !matches!(value.as_str(), "" | "0" | "false"))
-}
 
 #[derive(Debug, PartialEq)]
 enum Verdict {
@@ -155,15 +146,10 @@ fn hook_verdict(probe: &Path, file: &Path) -> Verdict {
 
 #[test]
 fn the_hook_reader_and_this_crate_agree_on_every_fixture() {
-    if skip_requested() {
-        eprintln!("{SKIP_ENV} is set: the hook reader was not run");
-        return;
-    }
     assert!(
         node_available(),
         "node is not installed, so the hook reader cannot be run and the two \
-         readers were NOT compared. Install node, or set {SKIP_ENV}=1 to accept \
-         that this leg proves nothing."
+         readers were NOT compared. Install node."
     );
     let probe_dir = tempfile::tempdir().expect("a temporary directory");
     let probe = probe_dir.path().join("probe.cjs");

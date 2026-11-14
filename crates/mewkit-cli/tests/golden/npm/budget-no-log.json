@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "Token Budget & Cost Log\n\nRun a MeowKit agent command first; the cost log is written as sessions record usage.\n",
+  "stderr": "No cost log found. Looked for <project>/.meowkit/telemetry/cost-log.json and in each parent directory.\n",
+  "files": {}
+}

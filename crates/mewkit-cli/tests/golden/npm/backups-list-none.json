@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "No snapshots. One is written before each init, upgrade and uninstall.\n",
+  "stderr": "",
+  "files": {
+    "README.md": "A project with no durable task state at all: the case a fresh clone hits.\n"
+  }
+}

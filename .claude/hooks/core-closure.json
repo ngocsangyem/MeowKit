@@ -53,7 +53,7 @@
     "validate-contract.cjs"
   ],
   "bundleLibDirs": [
-    "packages/mewkit/src/migrate/modules/codex/root/.codex/hooks/lib",
-    "packages/mewkit/src/migrate/modules/cursor/root/.cursor/hooks/lib"
+    "kit/bundles/codex/root/.codex/hooks/lib",
+    "kit/bundles/cursor/root/.cursor/hooks/lib"
   ]
 }

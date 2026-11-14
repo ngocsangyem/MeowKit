@@ -1,0 +1,6 @@
+{
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "Invalid --fail-over value: abc (expected a number)\n",
+  "files": {}
+}
