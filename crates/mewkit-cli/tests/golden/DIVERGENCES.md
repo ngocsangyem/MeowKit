@@ -28,6 +28,12 @@ Differences in what `init` accepts, not in what it writes (so not in the manifes
 - `--mcp-profiles` reads `catalog/mcp-profiles.json` from the kit's Cursor bundle, which `scripts/kit-ship-set.cjs` ships. An older kit without it reports "no mcp-profiles.json catalog shipped" and installs without MCP.
 - A project with a git remote needs `--allow-cloud-mcp`; without a terminal there is nobody to ask, so it is blocked (the npm CLI does the same on the explicit `--target cursor` path).
 
+## Printed messages
+
+Differences in what a command prints, pinned by the hand-edited goldens under `npm/`:
+
+- `capabilities` with no source (`npm/capabilities-no-source.json`) and with an invalid Codex snapshot (`capabilities-bad-snapshot`, whose stderr the case ignores and asserts on its own) tell the user to run `mewkit init …`, where the npm CLI said `npx mewkit init …`. `setup --system-deps`, when declined, likewise names `mewkit setup --system-deps` and `mewkit doctor` (no golden covers it). Maintainer decision 2026-11-15: the npm CLI is retired, so the native binary names itself and the kit and docs use the `mewkit <verb>` form.
+
 Regeneration is manual and not gated in CI: the kit changes often and every
 change moves thousands of digests. A CI job must exist before any phase claims
 parity from these manifests.

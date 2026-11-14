@@ -87,7 +87,7 @@ pub fn run(args: &CapabilitiesArgs) -> Result<u8, Failure> {
         Ok(Some(source)) => source,
         Ok(None) => {
             return refuse(
-                "Could not find a capability source. Expected .claude/ or a Codex projection at .codex/capabilities.json. Run `npx mewkit init` or `npx mewkit init --target codex`.",
+                "Could not find a capability source. Expected .claude/ or a Codex projection at .codex/capabilities.json. Run `mewkit init` or `mewkit init --target codex`.",
             );
         }
         Err(message) => return refuse(&message),

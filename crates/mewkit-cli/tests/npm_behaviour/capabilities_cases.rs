@@ -326,6 +326,8 @@ fn a_mistyped_subcommand_is_an_invocation_error() {
     );
 }
 
+/// The golden's stderr was edited by hand: the npm CLI said `npx mewkit init`,
+/// this binary names itself as `mewkit init` (see `tests/golden/DIVERGENCES.md`).
 #[test]
 fn without_any_source_the_verbs_that_need_one_refuse() {
     let (ts, _) = caps("capabilities-no-source", "validate-empty", &["list"]);
@@ -383,6 +385,13 @@ fn a_snapshot_naming_an_unknown_invocation_id_is_refused() {
     );
     assert!(
         rust.stderr.contains("unknown invocation id for evil"),
+        "{}",
+        rust.describe()
+    );
+    // The npm CLI said `npx mewkit init`; this binary names itself (DIVERGENCES.md).
+    assert!(
+        rust.stderr
+            .contains("Regenerate it with `mewkit init --target codex`."),
         "{}",
         rust.describe()
     );

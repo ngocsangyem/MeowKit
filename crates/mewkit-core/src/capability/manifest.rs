@@ -154,7 +154,7 @@ pub fn build_entries(claude_dir: &Path) -> Vec<Entry> {
 
 /// Read and validate a portable snapshot. The messages name the regenerate command.
 pub fn read_snapshot(path: &Path) -> Result<Vec<Entry>, String> {
-    let regenerate = "Regenerate it with `npx mewkit init --target codex`.";
+    let regenerate = "Regenerate it with `mewkit init --target codex`.";
     let display = path.display();
     let raw: Value = std::fs::read(path)
         .map_err(|e| e.to_string())
