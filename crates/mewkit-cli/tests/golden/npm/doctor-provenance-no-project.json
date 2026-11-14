@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "MeowKit Provenance\nRead-only: reports what can and cannot be proven locally. No fetch, no relabel.\n\n  Project root not found — nothing to explain.\n",
+  "stderr": "",
+  "files": {
+    "README.md": "# Not a MeowKit project\n"
+  }
+}

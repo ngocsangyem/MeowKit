@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "stdout": "mewkit skill env <skill>|--list\n\nPer-skill interpreter environments\n\nSubcommands:\n  env — mewkit skill env <skill> | skill env --list\n\nOne subcommand is required.\n\nFlags:\n  --list  List every skill that declares a runtime and the state of its environment\n",
+  "stderr": "",
+  "files": {}
+}

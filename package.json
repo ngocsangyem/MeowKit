@@ -5,12 +5,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm -w packages/mewkit run build",
     "docs:build": "npm run build -w packages/docs",
-    "lint": "eslint packages/*/src/**/*.ts",
-    "typecheck": "tsc --noEmit -p packages/mewkit/tsconfig.json",
-    "format": "npx prettier --write \"packages/*/src/**/*.{ts,js,json}\"",
-    "format:check": "npx prettier --check \"packages/*/src/**/*.{ts,js,json}\"",
+    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format": "npx prettier --write \"{src,tests}/**/*.ts\"",
+    "format:check": "npx prettier --check \"{src,tests}/**/*.ts\"",
     "test": "vitest run",
     "release:check": "bash scripts/release-check.sh",
     "sync-versions": "node scripts/sync-versions.cjs",

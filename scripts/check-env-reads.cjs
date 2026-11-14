@@ -23,7 +23,7 @@ const { auditTable } = require('./lib/env-table-audit.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const TABLE_REL = 'env-name-classification.json';
-const TREES = ['.claude', path.join('packages', 'mewkit', 'src')];
+const TREES = ['.claude'];
 
 function loadTable() {
   const file = path.join(ROOT, TABLE_REL);

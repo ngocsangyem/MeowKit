@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "✗ no impact-map.json in tasks/reviews/ghost (run 'mewkit review prepare' first)\n",
+  "files": {}
+}

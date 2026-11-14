@@ -27,7 +27,7 @@ const path = require("node:path");
 const data = require("./dangling-rule-refs-data.cjs");
 
 const PREFIXED_RE = new RegExp(`rules(?:-conditional)?/(${data.MOVED.map((m) => m.name).join("|")})\\.md`);
-const BUNDLE_PREFIX = "packages/mewkit/src/migrate/modules/";
+const BUNDLE_PREFIX = "kit/bundles/";
 
 /** Repo-relative POSIX path of every readable text file under the scan roots. */
 function collectFiles(root) {

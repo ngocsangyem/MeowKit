@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Pack management requires meowkit with a pack-manifest.json.\nRun `mewkit upgrade` first, then retry.\n",
+  "files": {
+    ".claude/settings.json": "{}\n"
+  }
+}

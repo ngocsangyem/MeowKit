@@ -6,7 +6,7 @@
     "mark": "Prompt + Cursor: ink > chevron, blue cat-eared cursor, lowercase mono wordmark meowkit",
     "theme": "light-first, night for dark mode",
     "updated": "2026-11-11",
-    "canonical": "assets/design-tokens.json (mirrored byte-for-byte to docs/design/ and packages/mewkit/assets/)"
+    "canonical": "assets/design-tokens.json (mirrored byte-for-byte to docs/design/)"
   },
   "color": {
     "base": {

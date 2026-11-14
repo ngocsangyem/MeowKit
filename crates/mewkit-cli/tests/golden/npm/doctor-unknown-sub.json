@@ -1,0 +1,8 @@
+{
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "Unknown `doctor` subcommand: provenence\nValid subcommands: provenance\nRun `mewkit doctor --help` for usage.\n",
+  "files": {
+    ".claude/README.md": "x\n"
+  }
+}

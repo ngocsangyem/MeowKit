@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "No MeowKit project here.\n",
+  "files": {
+    "README.md": "# Not a MeowKit project\n"
+  }
+}

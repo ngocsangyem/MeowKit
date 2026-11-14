@@ -1,0 +1,18 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "mewkit doctor --adopt: claude-code here was installed by mewkit-next (<project>/.meowkit/state/ownership/claude-code.json).\n  Manage it with mewkit-next instead: `mewkit-next upgrade`, `mewkit-next uninstall --target claude-code`.\n",
+  "files": {
+    ".claude/memory/note.md": "note\n",
+    ".claude/rules/a.md": "kit rule\n",
+    ".claude/rules/b.md": "mine\n",
+    ".claude/skills/x/SKILL.md": "edited skill\n",
+    ".claude/worktrees/w/f.md": "scratch\n",
+    ".meowkit/cache/.claude/hooks/h.cjs": "kit hook\n",
+    ".meowkit/cache/.claude/rules/a.md": "kit rule\n",
+    ".meowkit/cache/.claude/skills/x/SKILL.md": "kit skill\n",
+    ".meowkit/cache/version": "1.2.3\n",
+    ".meowkit/metadata.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"tool\": \"meowkit\",\n  \"version\": \"1.2.3\",\n  \"scope\": \"project\",\n  \"installedAt\": \"2026-10-01T00:00:00.000Z\",\n  \"files\": [],\n  \"profile\": \"full\",\n  \"packs\": [\n    \"core\"\n  ]\n}\n",
+    ".meowkit/state/ownership/claude-code.json": "{\n  \"schema_version\": 1,\n  \"paths\": {}\n}\n"
+  }
+}

@@ -1,15 +1,14 @@
-//! Which `.claude/` files a Claude Code install carries for a pack selection,
-//! and that it agrees with the npm CLI's resolver for every shipped profile.
+//! Which `.claude/` files a Claude Code install carries
+//! for each pack selection.
 mod support;
 
 use std::collections::BTreeSet;
-use std::process::Command;
 
 use mewkit_adapters::Emitter;
 use mewkit_adapters::claude_code::ClaudeCode;
 use mewkit_adapters::contract::{Op, Plan};
-use mewkit_core::validate::{load_pack_manifest, resolve_profile};
-use support::{Project, kit, repo, request};
+
+use support::{Project, kit, request};
 
 fn claude_files(plan: &Plan) -> BTreeSet<String> {
     plan.ops
@@ -114,45 +113,4 @@ fn the_plugin_envelope_is_one_metadata_file() {
     assert_eq!(doc["name"], "meowkit");
     assert_eq!(doc["version"], "1.2.3");
     assert!(doc.get("skills").is_none() && doc.get("agents").is_none());
-}
-
-/// The npm CLI's `resolveProfile` over the same kit tree, as a sorted list.
-fn ts_profile(profile: &str, claude_dir: &std::path::Path) -> Vec<String> {
-    let dist = repo().join("packages/mewkit/dist/core");
-    let script = format!(
-        "const m = await import('file://{d}/pack-manifest.js'); \
-         const r = await import('file://{d}/pack-resolver.js'); \
-         const dir = process.argv[1]; \
-         const set = r.resolveProfile(dir, m.loadPackManifest(dir), process.argv[2]); \
-         console.log(JSON.stringify([...set].sort()));",
-        d = dist.display()
-    );
-    let out = Command::new("node")
-        .args(["--input-type=module", "-e", &script])
-        .arg(claude_dir)
-        .arg(profile)
-        .output()
-        .expect("node is installed");
-    assert!(
-        out.status.success(),
-        "{}",
-        String::from_utf8_lossy(&out.stderr)
-    );
-    serde_json::from_slice(&out.stdout).unwrap()
-}
-
-#[test]
-#[ignore = "needs node and the TS build"]
-fn every_profile_resolves_to_the_npm_cli_set() {
-    let kit = kit();
-    let claude = kit.dir.join(".claude");
-    let manifest = load_pack_manifest(&claude).unwrap();
-    for profile in manifest.available_profiles() {
-        let ours: Vec<String> = resolve_profile(&claude, &manifest, profile)
-            .unwrap()
-            .paths
-            .into_iter()
-            .collect();
-        assert_eq!(ours, ts_profile(profile, &claude), "profile {profile}");
-    }
 }

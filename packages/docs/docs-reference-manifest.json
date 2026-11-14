@@ -949,7 +949,7 @@
       "title": "mk:benchmark",
       "description": "Experimental/manual harness canary procedure. It records benchmark manifests and scores but does not provide a fully automated runner.",
       "sourcePath": "skills/benchmark/SKILL.md",
-      "sourceHash": "ab2391f54f4bf1ef7f5cb44824945e328323e42d776fcf18ad74fa403158adbf",
+      "sourceHash": "0c765764ccd0906169eaa7bdeca534e1f0875d12cb9dc405fe9c26020dfb1095",
       "aliases": [],
       "owner": "testing",
       "phase": null,

@@ -1,7 +1,7 @@
 // What `mewkit migrate codex` and `mewkit migrate cursor` lay down cannot
 // instruct an agent to read a variable the kit deleted.
 //
-// The provider projections under `src/migrate/modules/` are mirrors of
+// The provider projections under `kit/bundles/` are mirrors of
 // `.claude/`, and nothing regenerates them: no generator produces that tree, so
 // it is maintained by hand. The environment-name scan excludes it — were it in
 // scope, a mirror's own copy of a name would keep that name in the universe for
@@ -19,7 +19,7 @@ const require_ = createRequire(import.meta.url);
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 const TABLE_REL = "env-name-classification.json";
-const PROJECTIONS_REL = "packages/mewkit/src/migrate/modules";
+const PROJECTIONS_REL = "kit/bundles";
 
 interface Table {
 	names: { name: string; class: string }[];

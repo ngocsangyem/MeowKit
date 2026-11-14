@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Refused: run \"demo-run\" escalated to a human and is unresolved — that decision is theirs, not a retry.\nEscalate to a human — this is not a retry.\n",
+  "files": {
+    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nstage: \"RECHECK\"\nlockedDecisionPointers: []\ncorrectionCount: 2\nreceiptPointers: [\"tasks/reports/261113-demo-run-advice-1.md\", \"tasks/reports/261113-demo-run-advice-2.md\"]\ncheckpoint: { checkpointId: \"cp-2\", stage: \"RECHECK\", state: \"committed\" }\nhistory: [{\"checkpointId\":\"cp-1\",\"stage\":\"REVIEW\",\"disposition\":\"RETURN_TO_EXECUTOR\"},{\"checkpointId\":\"cp-2\",\"stage\":\"RECHECK\",\"disposition\":\"RETURN_TO_EXECUTOR\"}]\nescalatedToHuman: true\n---\n\n# Supervision run demo-run\n\nThis is supervision continuity, NEVER verification and never a gate approval.\n\n**Latest directive:** (none yet)\n**Next safe action:** (none recorded)\n"
+  }
+}

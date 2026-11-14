@@ -47,7 +47,7 @@ describe("ship set completeness", () => {
 		]) {
 			expect(shipped).toContain(template);
 			// One copy inside the kit tree. The hand-authored provider bundles under
-			// `packages/mewkit/src/migrate/modules/` carry their own mirrors by design
+			// `kit/bundles/` carry their own mirrors by design
 			// and are not kit content, so they are outside this claim.
 			const name = template.split("/").pop();
 			expect(tracked.filter((path) => path.startsWith(".claude/") && path.endsWith(`/${name}`))).toEqual([template]);

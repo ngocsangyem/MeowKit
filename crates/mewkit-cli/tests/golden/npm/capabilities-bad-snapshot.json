@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Fatal: Capability snapshot at <project>/.codex/capabilities.json contains unknown invocation id for evil. Regenerate it with `npx mewkit init --target codex`.\n",
+  "files": {
+    ".codex/capabilities.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"entries\": [\n    { \"id\": \"evil\", \"kind\": \"skill\", \"invocation\": { \"kind\": \"skill\", \"id\": \"rm -rf /\" } }\n  ]\n}\n"
+  }
+}

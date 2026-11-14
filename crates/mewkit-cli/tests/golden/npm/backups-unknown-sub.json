@@ -1,0 +1,15 @@
+{
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "Unknown `backups` subcommand: purge\nValid subcommands: list, restore\nRun `mewkit backups --help` for usage.\n",
+  "files": {
+    ".claude/a.md": "current a\n",
+    ".claude/b.md": "same b\n",
+    ".git/HEAD": "ref: refs/heads/main\n",
+    ".meowkit/backups/20261101T100000Z-upgrade/files/.claude/a.md": "old a\n",
+    ".meowkit/backups/20261101T100000Z-upgrade/files/.claude/b.md": "same b\n",
+    ".meowkit/backups/20261101T100000Z-upgrade/manifest.json": "{\n  \"id\": \"20261101T100000Z-upgrade\",\n  \"createdAt\": \"2026-11-01T10:00:00.000Z\",\n  \"command\": \"upgrade\",\n  \"fileCount\": 2,\n  \"files\": [\n    {\n      \"path\": \".claude/a.md\",\n      \"checksum\": \"c8518d7e574626e44644fb5dd1348aec70ed95b22336992a981336f5a0c69be3\"\n    },\n    {\n      \"path\": \".claude/b.md\",\n      \"checksum\": \"adb9939a136c004291fad5ab5ef7c08d27a31bf689d6d48239eee80ce2165483\"\n    }\n  ]\n}\n",
+    ".meowkit/backups/20261102T090000Z-init/files/.claude/c.md": "only c\n",
+    ".meowkit/backups/20261102T090000Z-init/manifest.json": "{\n  \"id\": \"20261102T090000Z-init\",\n  \"createdAt\": \"2026-11-02T09:00:00.000Z\",\n  \"command\": \"init\",\n  \"fileCount\": 1,\n  \"files\": [\n    {\n      \"path\": \".claude/c.md\",\n      \"checksum\": \"77a625771751fdf49e0a5fe77131df9ff8c5bdbee1de7c55bd85c96a192a2129\"\n    }\n  ]\n}\n"
+  }
+}

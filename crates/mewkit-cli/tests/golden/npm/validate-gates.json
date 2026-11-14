@@ -1,0 +1,22 @@
+{
+  "exit_code": 1,
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nGates\n  [FAIL] Automated gate-approval claims (1)\n         .claude/rules/gate-rules.md:4 found \"In fast mode the runner auto-approves Gate 2 when the tests pass.\" — expected \"automation executes between gates; a human approves the gate\"\n\n0 passed, 1 failed\n",
+  "stderr": "",
+  "files": {
+    ".claude/agents/developer.md": "---\nname: developer\ndescription: Writes production code.\n---\n\nProse.\n",
+    ".claude/hooks/HOOKS_INDEX.md": "# Hooks\n\nTwo of them.\n",
+    ".claude/hooks/append-trace.cjs": "#!/usr/bin/env node\n'use strict';\n// A hook script, enough to be one.\n",
+    ".claude/hooks/lib/shared.cjs": "// a library, not a hook\n",
+    ".claude/hooks/pre-ship.cjs": "#!/usr/bin/env node\n'use strict';\n// A hook script, enough to be one.\n",
+    ".claude/rules/agent-conduct.md": "# agent-conduct.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/core-behaviors.md": "# core-behaviors.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/development-rules.md": "# development-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/gate-rules.md": "# Gate rules\n\nGate 2 is never auto-approved.\nIn fast mode the runner auto-approves Gate 2 when the tests pass.\nThe reviewer may quote it: auto-approves Gate 1. <!-- lint-allow-gate-authority -->\n",
+    ".claude/rules/injection-rules.md": "# injection-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/meowkit-core.md": "# meowkit-core.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/security-rules.md": "# security-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/skills/cook/SKILL.md": "---\nname: mk:cook\ndescription: Build a feature.\n---\n\nDelegate with subagent_type: developer.\n",
+    ".git/HEAD": "ref: refs/heads/main\n",
+    ".meowkit/memory/decisions.md": "## A kebab-case file name is what search tools read  <!-- 2026-11-01 -->\n\nWhy: a long name beats a short one when a tool greps for purpose.\nApply when: naming any new file.\nSource: a review of three renamed modules.\n"
+  }
+}

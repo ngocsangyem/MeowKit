@@ -1,0 +1,12 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup\n\n  ○ skill-envs: No skills selected — pass --skills=<a,b> or run `mewkit skill env <skill>`\n  ○ mcp: .mcp.json already exists\n  ○ env: .meowkit/.env already exists\n  ✓ gitignore: Wrote .meowkit/.gitignore (deny-all + the shared allowlist); Removed the stale .meowkit/memory/ ignore — the v3 team store is committed; Removed 3 .meowkit/ line(s) now covered by .meowkit/.gitignore\n      did create .meowkit/.gitignore\n      did update .gitignore\n  ○ project-context: docs/project-context.md already exists\n\n  Summary: 1 configured, 4 skipped\n",
+  "stderr": "",
+  "files": {
+    ".gitignore": "node_modules/\n!.meowkit/state/keep\nsession-state/\n",
+    ".mcp.json": "{}\n",
+    ".meowkit/.env": "MEOWKIT_GEMINI_API_KEY=abc\n",
+    ".meowkit/.gitignore": "*\n!.gitignore\n!config.yaml\n!.env.example\n!mcp.json.example\n!bin/\n!bin/mewkit\n!memory/\n!memory/*.md\n",
+    "docs/project-context.md": "# Project context\n"
+  }
+}

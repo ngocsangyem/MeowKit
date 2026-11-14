@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Checkpoint refused: mk:cook has a per-run cap and takes no release stage\n",
+  "files": {}
+}

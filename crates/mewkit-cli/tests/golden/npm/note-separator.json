@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "appended to .meowkit/memory/gotchas.md\n",
+  "stderr": "",
+  "files": {
+    ".meowkit/memory/gotchas.md": "## An earlier lesson   <!-- 2026-11-01 -->\nWhy: it was not obvious\nApply when: a later session wonders\nSource: packages/mewkit/src/index.ts\n\n## Vitest serializes files in one worker here\nWhy: the suite shares a fixed port\nApply when: a suite hangs with no output\nSource: vitest.config.ts\n"
+  }
+}

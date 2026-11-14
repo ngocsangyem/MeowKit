@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "No bootstrap projection for provider \"qwen\" (report-only). Projected: claude-code, claude-plugin, codex.\n",
+  "files": {
+    "README.md": "A project with no durable task state at all: the case a fresh clone hits.\n"
+  }
+}

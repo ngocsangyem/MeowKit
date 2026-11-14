@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Checkpoint refused: mk:brainstorming reached its 4-call supervision cap in this run\nEscalate to a human — this is not a retry.\n",
+  "files": {
+    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:brainstorming\"\nstage: \"REVIEW\"\nlockedDecisionPointers: []\ncorrectionCount: 1\nreceiptPointers: [\"tasks/reports/261113-demo-run-advice-1.md\", \"tasks/reports/261113-demo-run-advice-2.md\", \"tasks/reports/261113-demo-run-advice-3.md\", \"tasks/reports/261113-demo-run-advice-4.md\"]\ncheckpoint: { checkpointId: \"cp-4\", stage: \"REVIEW\", state: \"committed\" }\nhistory: [{\"checkpointId\":\"cp-1\",\"stage\":\"GUIDE\",\"disposition\":\"CONTINUE_WITH_DIRECTIVE\"},{\"checkpointId\":\"cp-2\",\"stage\":\"RESCUE\",\"disposition\":\"CONTINUE_WITH_DIRECTIVE\"},{\"checkpointId\":\"cp-3\",\"stage\":\"RESCUE\",\"disposition\":\"CONTINUE_WITH_DIRECTIVE\"},{\"checkpointId\":\"cp-4\",\"stage\":\"REVIEW\",\"disposition\":\"RETURN_TO_EXECUTOR\"}]\nescalatedToHuman: true\n---\n\n# Supervision run demo-run\n\nThis is supervision continuity, NEVER verification and never a gate approval.\n\n**Latest directive:** (none yet)\n**Next safe action:** (none recorded)\n"
+  }
+}

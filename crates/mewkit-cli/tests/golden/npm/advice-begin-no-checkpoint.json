@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "`advice begin` requires --checkpoint <checkpointId>.\n",
+  "files": {}
+}

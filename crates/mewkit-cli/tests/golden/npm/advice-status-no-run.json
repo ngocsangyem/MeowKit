@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "`advice status` requires --run <supervisionRunId>.\n",
+  "files": {}
+}

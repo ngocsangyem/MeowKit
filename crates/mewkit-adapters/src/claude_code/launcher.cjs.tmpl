@@ -37,6 +37,7 @@ function recordedEntry() {
   }
 }
 
+// Legacy path: a project whose kit the retired npm CLI installed keeps running its own copy.
 function nodeCli() {
   const candidates = [
     path.join(PROJECT_ROOT, 'node_modules', 'mewkit', 'dist', 'index.js'),

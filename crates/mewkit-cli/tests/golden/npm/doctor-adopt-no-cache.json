@@ -1,0 +1,9 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Cannot adopt a baseline: the local kit cache is missing, so there is nothing to check this file's content against. Run `mewkit upgrade` to re-fetch it.\nFix: mewkit upgrade — it re-fetches the kit and writes the cache this would compare against\n",
+  "files": {
+    ".claude/rules/a.md": "x\n",
+    ".meowkit/metadata.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"tool\": \"meowkit\",\n  \"version\": \"1.2.3\",\n  \"installedAt\": \"2026-10-01T00:00:00.000Z\",\n  \"files\": []\n}\n"
+  }
+}

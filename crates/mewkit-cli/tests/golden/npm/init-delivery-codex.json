@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "--delivery is meaningful for --target claude-code only, and \"codex\" has a single on-disk shape, so passing --delivery plugin here would have no effect. Drop the flag, or change the target. Nothing was written.\n",
+  "files": {
+    "README.md": "A project with no durable task state at all: the case a fresh clone hits.\n"
+  }
+}

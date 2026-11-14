@@ -19,13 +19,14 @@ const { spawnSync } = require('node:child_process');
 
 const { isMissingExecutable } = require('./preship-checks.cjs');
 
+// Legacy: a project that installed the kit with the retired npm CLI still has its own copy.
 const LOCAL_BIN = './node_modules/.bin/mewkit';
 // The committed project launcher. It finds the CLI that installed the kit, the Node
 // package or the native binary, so a project installed by the binary, with no
 // node_modules, is linted too.
 const LAUNCHER = './.meowkit/bin/mewkit';
 // What the launcher exits with when it finds no CLI to run (the shell's "command not
-// found"); `project-launcher-source.ts` writes it.
+// found"); the installer's launcher template writes it.
 const LAUNCHER_UNAVAILABLE = 127;
 
 function isExecutable(p) {

@@ -1,0 +1,9 @@
+{
+  "exit_code": 1,
+  "stdout": "PLAN_INCOMPLETE: 1 error(s), 0 warning(s)\n  - File not found: <project>/tasks/plans/261112-not-here\n",
+  "stderr": "",
+  "files": {
+    "tasks/plans/261112-demo-plan/phase-01-setup.md": "---\nphase: 1\ntitle: Setup\nstatus: pending\npriority: high\neffort: S\ndependencies: [bootstrap, toolchain]\n---\n\n## Context Links\n\nThe plan overview.\n\n## Overview\n\nSet the project up.\n\n## Key Insights\n\nNothing surprising yet.\n\n## Requirements\n\nA toolchain.\n\n## Architecture\n\nOne crate.\n\n## Related Code Files\n\n- src/main.rs\n\n## Implementation Steps\n\n1. Install the toolchain.\n\n## Todo List\n\n- [x] Install the toolchain\n- [ ] Prove it builds\n\n## Success Criteria\n\nIt builds.\n\n## Risk Assessment\n\nThe toolchain may be absent.\n\n## Security Considerations\n\nNothing is downloaded.\n\n## Next Steps\n\nPhase 2.\n",
+    "tasks/plans/261112-demo-plan/plan.md": "---\ntitle: Demo plan\ntype: feature\nstatus: in_progress\npriority: high\n---\n\n# Demo plan\n\n## Goal\n\nThe demo plan reaches Gate 1 with nothing missing.\n\n## Phases\n\n- phase-01-setup.md\n\n## Todo List\n\n- [x] Write the overview\n- [ ] Hand it to the human\n"
+  }
+}

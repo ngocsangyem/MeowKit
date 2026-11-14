@@ -12,8 +12,5 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true
-  },
-  "references": [
-    { "path": "packages/mewkit" }
-  ]
+  }
 }

@@ -10,14 +10,15 @@
 set -u
 cd "$(dirname "$0")/.."
 
-CLI="node packages/mewkit/dist/index.js"
+# The native CLI: $MEWKIT when set, else the debug build the first step makes.
+CLI="${MEWKIT:-target/debug/mewkit}"
 fail=0
 step() { printf '\n\033[1m[release-check] %s\033[0m\n' "$1"; }
 ok()   { printf '  \033[32m✓ %s\033[0m\n' "$1"; }
 bad()  { printf '  \033[31m✗ %s\033[0m\n' "$1"; fail=1; }
 
-step "Build (CLI needs dist)"
-npm run build >/dev/null 2>&1 && ok "build" || bad "build"
+step "Build the mewkit binary"
+cargo build -p mewkit-cli --locked >/dev/null 2>&1 && ok "cargo build" || bad "cargo build"
 
 # step "Unit tests (npm test)"
 npm test >/dev/null 2>&1 && ok "npm test" || bad "npm test"
@@ -25,14 +26,11 @@ npm test >/dev/null 2>&1 && ok "npm test" || bad "npm test"
 step "Lint"
 npm run lint >/dev/null 2>&1 && ok "lint" || bad "lint"
 
-step "Typecheck"
-npm run typecheck >/dev/null 2>&1 && ok "typecheck" || bad "typecheck"
-
 step "Format check"
 npm run format:check >/dev/null 2>&1 && ok "format:check" || bad "format:check"
 
 step "Portable validation (hard-fails block; warnings advisory)"
-if $CLI validate --portable >/tmp/rc-validate.txt 2>&1; then
+if "$CLI" validate --portable >/tmp/rc-validate.txt 2>&1; then
   ok "validate --portable ($(grep -oE '[0-9]+ warnings' /tmp/rc-validate.txt | head -1 || echo '0 warnings') — advisory)"
 else
   bad "validate --portable (hard failure)"; tail -20 /tmp/rc-validate.txt

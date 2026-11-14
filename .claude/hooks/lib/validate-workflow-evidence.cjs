@@ -36,9 +36,9 @@ function nonEmptyArray(v) {
 }
 
 // --- Evidence revision / supersession ---------------------------------------
-// Mirrors packages/mewkit/src/core/workflow-evidence-revision.ts. That module is the
-// semantic owner (it also APPLIES corrections); this is the shipped checker for
-// projects with no TypeScript build. A parity test runs both over shared fixtures,
+// Mirrors crates/mewkit-core/src/advice/evidence.rs. That module is the semantic
+// owner (the CLI also APPLIES corrections); this is the shipped checker hooks run
+// without the binary. A parity test runs both over shared fixtures,
 // because two implementations of one rule drift and the looser one quietly wins.
 //
 // Absent fields mean revision 1 and nothing superseded, so an index written before

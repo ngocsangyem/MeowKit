@@ -1,0 +1,14 @@
+{
+  "exit_code": 0,
+  "stdout": "Validating codex target: <project>\n\nTarget\n  [PASS] Codex AGENTS.md present\n  [PASS] Codex config.toml parses\n  [PASS] Codex config.toml agent refs\n  [PASS] Codex config.toml secret-free\n  [PASS] Codex hooks.json parses\n  [PASS] Codex hook wrappers exist + executable\n  [PASS] Codex hook deny contract\n  [PASS] Codex agent TOMLs parse\n  [PASS] Codex agent name field\n  [PASS] Codex agent required fields\n  [PASS] Codex agent name uniqueness\n  [PASS] Codex root reference graph\n  [PASS] Codex exec-policy rules valid\n  [PASS] Codex installed skills parse\n  [PASS] Codex installed skills runtime-supported\n  [PASS] Codex installed skills tool-token clean\n  [PASS] Codex no native memory surface\n  [PASS] Codex no legacy prompts surface\n\n18 passed\n",
+  "stderr": "",
+  "files": {
+    ".agents/skills/cook/SKILL.md": "---\nname: cook\nruntime: portable\n---\n\nPortable prose.\n",
+    ".codex/agents/developer.toml": "name = \"developer\"\ndescription = \"Writes production code.\"\ndeveloper_instructions = \"Implement against the plan.\"\n",
+    ".codex/config.toml": "[agents.developer]\nconfig_file = \"agents/developer.toml\"\n\n[shell_environment_policy.set]\nMEOW_JIRA_URL = \"https://example.invalid\"\n",
+    ".codex/hooks.json": "{\n \"hooks\": {\n  \"PreToolUse\": [\n   {\n    \"hooks\": [\n     {\n      \"command\": \"\\\"$(git rev-parse --show-toplevel)\\\"/.codex/hooks/gate.cjs\"\n     }\n    ]\n   }\n  ]\n }\n}\n",
+    ".codex/hooks/gate.cjs": "'use strict';\nconst SCRUB_RULES = {\"PreToolUse\":{\"allowedPermissionValues\":[\"allow\",\"deny\"]}};\nmodule.exports = { SCRUB_RULES };\n",
+    ".codex/rules/exec.rules": "prefix_rule(program=\"rm\", decision=\"forbidden\")\n",
+    "AGENTS.md": "# Agents\n\nProjected instructions.\n"
+  }
+}

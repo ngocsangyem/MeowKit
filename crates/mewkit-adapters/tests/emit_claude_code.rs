@@ -80,7 +80,7 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
         .unwrap();
     let baseline: Value = serde_json::from_slice(
         &std::fs::read(
-            repo().join("crates/mewkit-cli/tests/golden/ts-baseline/claude-code.manifest.json"),
+            repo().join("crates/mewkit-cli/tests/golden/baseline/claude-code.manifest.json"),
         )
         .unwrap(),
     )
@@ -118,14 +118,28 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
     assert!(only_ts.is_empty(), "missing vs TS: {only_ts:?}");
     let only_ours: Vec<_> = ours.keys().filter(|p| !ts.contains_key(**p)).collect();
     assert!(only_ours.is_empty(), "extra vs TS: {only_ours:?}");
-    // Every non-volatile file carries the same bytes as the npm CLI's.
+    // Every non-volatile file carries the bytes the npm CLI wrote. The baseline is
+    // frozen, so a file the install copies from the kit is held to the kit's current
+    // copy instead: the npm CLI copied those verbatim, and a later kit edit must not
+    // read as an install difference.
+    let source = |p: &str| {
+        let file = kit.dir.join(p);
+        file.is_file()
+            .then(|| mewkit_core::fsx::sha256_hex(&std::fs::read(file).unwrap()))
+    };
     let differ: Vec<_> = ts
         .iter()
         .filter(|(p, _)| !names_the_installer(p))
-        .filter(|(p, digest)| digest.is_some_and(|d| !ours[**p].iter().any(|o| o == d)))
+        .filter(|(p, digest)| {
+            let want = source(p).or_else(|| digest.map(str::to_owned));
+            want.is_some_and(|d| !ours[**p].contains(&d))
+        })
         .map(|(p, _)| p)
         .collect();
-    assert!(differ.is_empty(), "bytes differ from TS: {differ:?}");
+    assert!(
+        differ.is_empty(),
+        "bytes differ from the npm CLI's: {differ:?}"
+    );
 }
 
 /// The digests a written file may match the baseline by.

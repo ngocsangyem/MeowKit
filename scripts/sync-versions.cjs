@@ -4,7 +4,7 @@
  *
  * Source of truth: root `package.json` `version`. This script stamps that version into
  * `.claude/kit-contract.json` (`kitVersion`) and into `release-manifest.json`, and
- * records the CLI package version (`packages/mewkit/package.json`, a SEPARATE semver track) into
+ * records the `mewkit` binary's version (root `Cargo.toml`, a SEPARATE semver track) into
  * the manifest as `cliVersion` (recorded, never overwritten to match the kit).
  *
  * Field-level only: it touches `version` / `cliVersion`, never the manifest's `files[]` (that is
@@ -16,10 +16,10 @@
 
 const fs = require("fs");
 const path = require("path");
+const { cliVersion: readCliVersion } = require("./lib/cli-version.cjs");
 
 const root = path.join(__dirname, "..");
 const ROOT_PKG = path.join(root, "package.json");
-const CLI_PKG = path.join(root, "packages", "mewkit", "package.json");
 // No project config is stamped: `.meowkit/config.yaml` holds preferences and has no version
 // field, and the install descriptor that once carried one (`.meowkit/config.json`) was retired
 // with it. The shipped kit's version lives in the contract below.
@@ -38,7 +38,7 @@ function writeJson(p, obj) {
 }
 
 const kitVersion = readJson(ROOT_PKG).version;
-const cliVersion = readJson(CLI_PKG).version;
+const cliVersion = readCliVersion(root);
 
 // Each target: the file, the field, the expected value, whether --write stamps it, and whether it
 // is optional. `optional: true` = a gitignored, release-time artifact (release-manifest.json)

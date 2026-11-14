@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "Token Budget & Cost Log\n\nSource: <project>/.meowkit/telemetry/cost-log.json\n\nSession: sess-beta\n\n  Date              Command         Tier            Tokens  Task                          \n  --------------------------------------------------------------------------------------\n  2026-11-12T11:00:0session         unknown              0  session sess-beta             \n\nTotal estimated tokens: 0\n",
+  "stderr": "",
+  "files": {
+    ".meowkit/telemetry/cost-log.json": "[\n\t{\n\t\t\"date\": \"2026-11-10T08:15:00Z\",\n\t\t\"command\": \"cook\",\n\t\t\"tier\": \"STANDARD\",\n\t\t\"estimated_tokens\": 12500,\n\t\t\"task\": \"port the note verb\"\n\t},\n\t{\n\t\t\"date\": \"2026-11-11T09:30:00Z\",\n\t\t\"session_id\": \"sess-alpha\",\n\t\t\"model\": \"claude-opus-5\",\n\t\t\"tokens_in\": 1200,\n\t\t\"tokens_out\": \"800\",\n\t\t\"cache_write_tokens\": 50,\n\t\t\"cache_read_tokens\": 4000\n\t},\n\t{\n\t\t\"date\": \"2026-11-12T10:00:00Z\",\n\t\t\"command\": \"review\",\n\t\t\"tier\": \"COMPLEX\",\n\t\t\"estimated_tokens\": \"9000\",\n\t\t\"task_summary\": \"gate 2 verdict for the evidence verbs\"\n\t},\n\t{\n\t\t\"date\": \"2026-11-12T11:00:00Z\",\n\t\t\"session_id\": \"sess-beta\"\n\t}\n]\n"
+  }
+}

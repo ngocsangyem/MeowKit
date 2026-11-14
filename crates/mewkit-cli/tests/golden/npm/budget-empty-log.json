@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "Token Budget & Cost Log\n\nSource: <project>/.meowkit/telemetry/cost-log.json\n\nNo cost entries recorded yet.\n",
+  "stderr": "",
+  "files": {
+    ".meowkit/telemetry/cost-log.json": "[]\n"
+  }
+}

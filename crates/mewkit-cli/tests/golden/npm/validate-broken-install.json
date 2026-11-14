@@ -1,0 +1,16 @@
+{
+  "exit_code": 1,
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nMode: flat-copy (auto-detected) — consumer checks only; authoring-coherence checks suppressed\n\nStructure\n  [FAIL] Directory exists: agents\n         Missing: <project>/.claude/agents\n  [PASS] Directory exists: hooks\n  [PASS] File exists: rules/meowkit-core.md\n  [PASS] File exists: rules/security-rules.md\n  [PASS] File exists: rules/injection-rules.md\n  [PASS] File exists: rules/gate-rules.md\n  [PASS] File exists: rules/core-behaviors.md\n  [FAIL] File exists: rules/development-rules.md\n         Missing: <project>/.claude/rules/development-rules.md\n  [FAIL] File exists: rules/agent-conduct.md\n         Missing: <project>/.claude/rules/agent-conduct.md\n  [WARN] Project config valid\n         <project>/.meowkit/config.yaml absent — every setting is at its default\n\nHooks\n  [FAIL] Hook executable: pre-ship.cjs\n         Not executable: <project>/.claude/hooks/pre-ship.cjs\n\nDocs\n  [PASS] Docs references on Type-1 allowlist\n\nPlugin\n  [PASS] Agent names are bare\n  [FAIL] Skill names are mk:-scoped\n         non-mk: skill names: cook → other:cook\n  [WARN] subagent_type refs resolve\n         unknown refs: skills/cook/SKILL.md → ghost-agent\n\nMemory\n  [PASS] Team memory store lint\n\n9 passed, 2 warnings, 5 failed\n",
+  "stderr": "",
+  "files": {
+    ".claude/hooks/pre-ship.cjs": "#!/usr/bin/env node\n'use strict';\n// A hook script, enough to be one.\n",
+    ".claude/rules/core-behaviors.md": "# core-behaviors.md\n\nProse.\n",
+    ".claude/rules/gate-rules.md": "# gate-rules.md\n\nProse.\n",
+    ".claude/rules/injection-rules.md": "# injection-rules.md\n\nProse.\n",
+    ".claude/rules/meowkit-core.md": "# meowkit-core.md\n\nProse.\n",
+    ".claude/rules/security-rules.md": "# security-rules.md\n\nProse.\n",
+    ".claude/skills/cook/SKILL.md": "---\nname: other:cook\ndescription: Leaked namespace.\n---\n\nDelegate with subagent_type: ghost-agent.\n",
+    ".git/HEAD": "ref: refs/heads/main\n",
+    ".meowkit/memory/decisions.md": "## A kebab-case file name is what search tools read  <!-- 2026-11-01 -->\n\nWhy: a long name beats a short one when a tool greps for purpose.\nApply when: naming any new file.\nSource: a review of three renamed modules.\n"
+  }
+}

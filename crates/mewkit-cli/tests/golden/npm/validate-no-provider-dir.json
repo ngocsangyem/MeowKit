@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\n",
+  "stderr": "Could not find .claude/ directory in the current directory.\n",
+  "files": {
+    "README.md": "# Not a MeowKit project\n"
+  }
+}

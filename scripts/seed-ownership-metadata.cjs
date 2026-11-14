@@ -24,18 +24,17 @@ const fs   = require("fs");
 const path = require("path");
 
 // ---------------------------------------------------------------------------
-// js-yaml resolution: try packages/mewkit then repo root node_modules
+// js-yaml resolution: the repo root's node_modules
 // ---------------------------------------------------------------------------
 let yaml;
 try {
   yaml = require(require.resolve("js-yaml", {
     paths: [
-      path.join(__dirname, "../packages/mewkit/node_modules"),
       path.join(__dirname, "../node_modules"),
     ],
   }));
 } catch (e) {
-  console.error("Cannot resolve js-yaml. Run: npm install in packages/mewkit or repo root.");
+  console.error("Cannot resolve js-yaml. Run: pnpm install in the repo root.");
   process.exit(2);
 }
 

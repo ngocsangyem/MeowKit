@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "Checkpoint GUIDE/cp-3 opened (1 of 4 for mk:ship / publish).\n  dossier: tasks/reports/ship-run-athena-supervision.md\n  legal dispositions: CONTINUE_WITH_DIRECTIVE, ESCALATE_TO_HUMAN, BLOCKED_MISSING_EVIDENCE\n  supervision is evidence — it clears no gate and counts as no verification.\n",
+  "stderr": "",
+  "files": {
+    "tasks/reports/ship-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"ship-run\"\nskill: \"mk:ship\"\nstage: \"GUIDE\"\nlockedDecisionPointers: []\ncorrectionCount: 0\nreceiptPointers: [\"tasks/reports/261113-ship-run-advice-1.md\"]\ncheckpoint: { checkpointId: \"cp-3\", stage: \"GUIDE\", state: \"pending\", partition: \"publish\" }\nhistory: [{\"checkpointId\":\"cp-1\",\"stage\":\"GUIDE\",\"disposition\":\"CONTINUE_WITH_DIRECTIVE\",\"partition\":\"prepare\"}]\nescalatedToHuman: false\n---\n\n# Supervision run ship-run\n\nThis is supervision continuity, NEVER verification and never a gate approval.\n\n**Latest directive:** (none yet)\n**Next safe action:** (none recorded)\n"
+  }
+}

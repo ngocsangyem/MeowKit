@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "stdout": "Recorded friction. [ci] hook slow, token=[redacted] and [redacted]\n",
+  "stderr": "",
+  "files": {
+    ".claude/settings.json": "{}\n",
+    ".meowkit/telemetry/trace-log.jsonl": "{\"schema_version\":\"1.0\",\"ts\":\"2026-11-14T16:26:18Z\",\"event\":\"friction\",\"run_id\":\"run-7\",\"harness_version\":\"3.0.0\",\"model\":\"\",\"density\":\"\",\"data\":{\"message\":\"hook slow, token=[redacted] and [redacted]\",\"responsibility\":\"ci\"}}\n"
+  }
+}

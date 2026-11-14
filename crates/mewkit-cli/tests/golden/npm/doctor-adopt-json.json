@@ -1,0 +1,17 @@
+{
+  "exit_code": 0,
+  "stdout": "{\n  \"ok\": true,\n  \"message\": \"Adopted 4 file(s) against the cached kit 1.2.3: 1 unchanged, 1 edited, 2 yours.\",\n  \"counts\": {\n    \"meowkit\": 1,\n    \"modified\": 1,\n    \"user\": 2\n  },\n  \"version\": \"1.2.3\"\n}\n",
+  "stderr": "",
+  "files": {
+    ".claude/memory/note.md": "note\n",
+    ".claude/rules/a.md": "kit rule\n",
+    ".claude/rules/b.md": "mine\n",
+    ".claude/skills/x/SKILL.md": "edited skill\n",
+    ".claude/worktrees/w/f.md": "scratch\n",
+    ".meowkit/cache/.claude/hooks/h.cjs": "kit hook\n",
+    ".meowkit/cache/.claude/rules/a.md": "kit rule\n",
+    ".meowkit/cache/.claude/skills/x/SKILL.md": "kit skill\n",
+    ".meowkit/cache/version": "1.2.3\n",
+    ".meowkit/metadata.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"tool\": \"meowkit\",\n  \"version\": \"1.2.3\",\n  \"scope\": \"project\",\n  \"installedAt\": \"2026-10-01T00:00:00.000Z\",\n  \"files\": [\n    {\n      \"path\": \"memory/note.md\",\n      \"owner\": \"user\",\n      \"layer\": \"user\",\n      \"checksum\": \"389ed6887e49a315f706f6c2b931b1dcf0d797c91437124f32eb98555c669758\",\n      \"baseChecksum\": \"389ed6887e49a315f706f6c2b931b1dcf0d797c91437124f32eb98555c669758\",\n      \"installedVersion\": \"1.2.3\",\n      \"installedAt\": \"2026-11-14T16:26:00.155Z\"\n    },\n    {\n      \"path\": \"rules/a.md\",\n      \"owner\": \"meowkit\",\n      \"layer\": \"core\",\n      \"checksum\": \"937603e86dabd6b7c8268b51d3c4a3bfad271d86625cfd63b688b54b5eaf706d\",\n      \"baseChecksum\": \"937603e86dabd6b7c8268b51d3c4a3bfad271d86625cfd63b688b54b5eaf706d\",\n      \"installedVersion\": \"1.2.3\",\n      \"installedAt\": \"2026-11-14T16:26:00.155Z\"\n    },\n    {\n      \"path\": \"rules/b.md\",\n      \"owner\": \"user\",\n      \"layer\": \"user\",\n      \"checksum\": \"fcbc800db3f1867000b852f1ce0044b8f1584f76ade1ed6e65189824f95c3cda\",\n      \"baseChecksum\": \"fcbc800db3f1867000b852f1ce0044b8f1584f76ade1ed6e65189824f95c3cda\",\n      \"installedVersion\": \"1.2.3\",\n      \"installedAt\": \"2026-11-14T16:26:00.155Z\"\n    },\n    {\n      \"path\": \"skills/x/SKILL.md\",\n      \"owner\": \"meowkit-modified\",\n      \"layer\": \"skill\",\n      \"checksum\": \"5773c4238b0bfe709d5b44d8b898d70b67ad6fd20af3753210bfc9401c1ad16d\",\n      \"baseChecksum\": \"3e67e97b6e5a47dae2ac6bfeb9019e8877eddde12a306275764c2e68b981f968\",\n      \"installedVersion\": \"1.2.3\",\n      \"installedAt\": \"2026-11-14T16:26:00.155Z\"\n    }\n  ],\n  \"profile\": \"full\",\n  \"packs\": [\n    \"core\"\n  ]\n}\n"
+  }
+}

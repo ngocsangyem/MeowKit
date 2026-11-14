@@ -4,7 +4,7 @@
 // blocks on stdout with exit 1 (advisory by design), so the contract pinned here is
 // {marker on stdout, exit 1} — distinct from the gate/privacy exit-2 hard blocks.
 import { describe, it, expect, afterEach } from "vitest";
-import { runConfiguredHook } from "../../../packages/mewkit/src/core/hook-runner.js";
+import { runConfiguredHook } from "./support/hook-runner.js";
 import { scaffold, SETTINGS, type HarnessProject } from "./_scaffold.js";
 
 const INJECTION_MARKER = "==== BLOCK — Prompt injection patterns detected ====";

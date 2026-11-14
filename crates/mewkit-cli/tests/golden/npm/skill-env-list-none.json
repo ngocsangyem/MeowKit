@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "stdout": "\nPer-skill environments  .meowkit/envs\n\n  No skill declares requires_runtime or pins packages.\n\n",
+  "stderr": "",
+  "files": {}
+}

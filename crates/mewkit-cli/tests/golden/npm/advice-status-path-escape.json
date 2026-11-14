@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Fatal: invalid supervision run id: \"../escape\"\n",
+  "files": {}
+}

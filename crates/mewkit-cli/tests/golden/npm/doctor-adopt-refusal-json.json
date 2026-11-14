@@ -1,0 +1,17 @@
+{
+  "exit_code": 1,
+  "stdout": "{\n  \"ok\": false,\n  \"message\": \"Cannot adopt a baseline: the cache holds kit 1.2.3 while this install records 9.9.9, so its content is the wrong release to compare against. Run `mewkit upgrade` to refresh it.\",\n  \"fix\": \"mewkit upgrade — it re-fetches the kit and writes the cache this would compare against\"\n}\n",
+  "stderr": "",
+  "files": {
+    ".claude/memory/note.md": "note\n",
+    ".claude/rules/a.md": "kit rule\n",
+    ".claude/rules/b.md": "mine\n",
+    ".claude/skills/x/SKILL.md": "edited skill\n",
+    ".claude/worktrees/w/f.md": "scratch\n",
+    ".meowkit/cache/.claude/hooks/h.cjs": "kit hook\n",
+    ".meowkit/cache/.claude/rules/a.md": "kit rule\n",
+    ".meowkit/cache/.claude/skills/x/SKILL.md": "kit skill\n",
+    ".meowkit/cache/version": "1.2.3\n",
+    ".meowkit/metadata.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"tool\": \"meowkit\",\n  \"version\": \"9.9.9\",\n  \"scope\": \"project\",\n  \"installedAt\": \"2026-10-01T00:00:00.000Z\",\n  \"files\": [],\n  \"profile\": \"full\",\n  \"packs\": [\n    \"core\"\n  ]\n}\n"
+  }
+}

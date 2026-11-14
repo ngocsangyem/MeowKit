@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Refused: supervision record \"demo-run\" is unreadable (history is not valid JSON) — repair or remove it first.\n",
+  "files": {
+    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nhistory: not json at all\n---\n\n# Supervision run demo-run\n"
+  }
+}

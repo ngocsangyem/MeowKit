@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "Trace score — by lane (run)\n  no trace records yet.\n",
+  "stderr": "",
+  "files": {
+    ".claude/settings.json": "{}\n"
+  }
+}

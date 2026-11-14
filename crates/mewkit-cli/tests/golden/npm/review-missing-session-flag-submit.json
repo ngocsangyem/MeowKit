@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Fatal: The \"path\" argument must be of type string. Received undefined\n",
+  "files": {}
+}

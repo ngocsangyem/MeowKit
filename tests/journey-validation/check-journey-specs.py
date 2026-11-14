@@ -7,8 +7,8 @@ EXPECTED_JOURNEY_COUNT), cover the required clusters, be bilingual, declare a va
 oracle_layers on every journey, and carry no silently-dropped journey (every journey is
 active, the cross-harness one via its deterministic oracle layer).
 
-This does NOT run the journeys — the deterministic layer is executed by the TypeScript runner
-(packages/mewkit/src/journey-validation); this script guards the fixture's shape.
+This does NOT run the journeys: their deterministic runner was part of the retired TypeScript
+CLI, so this script guards only the fixture's shape.
 Exit 0 = specs valid & frozen-shape intact. Exit 1 = a spec defect.
 """
 from __future__ import annotations

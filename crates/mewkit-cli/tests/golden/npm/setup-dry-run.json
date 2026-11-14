@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup — dry run, nothing will be written\n\n  ○ skill-envs: No skills selected — pass --skills=<a,b> or run `mewkit skill env <skill>`\n  ✓ mcp: Created .mcp.json — edit API keys inside.\n      would create .mcp.json\n  ✓ env: Created .meowkit/.env — add your API keys.\n      would mkdir .meowkit\n      would create .meowkit/.env\n  ✓ gitignore: Wrote .meowkit/.gitignore (deny-all + the shared allowlist); Appended MeowKit entries to .gitignore\n      would create .meowkit/.gitignore\n      would append .gitignore\n  ! project-context: Run `/mk:project-context init` in your first session to create docs/project-context.md\n\n  Summary: 3 configured, 1 skipped, 1 warnings\n",
+  "stderr": "",
+  "files": {}
+}

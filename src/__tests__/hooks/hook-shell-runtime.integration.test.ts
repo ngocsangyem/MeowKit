@@ -8,7 +8,7 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
-import { runConfiguredHook } from "../../../packages/mewkit/src/core/hook-runner.js";
+import { runConfiguredHook } from "./support/hook-runner.js";
 import { scaffold, SETTINGS, type HarnessProject } from "./_scaffold.js";
 
 // ensure-skills-venv.sh builds a Python venv (slow, side-effecty) and does NOT source

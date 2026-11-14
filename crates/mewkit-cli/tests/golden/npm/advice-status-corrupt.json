@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Supervision state for run \"demo-run\" is unreadable (history is not valid JSON).\nSupervision is disabled for this run until <project>/tasks/reports/demo-run-athena-supervision.md is repaired or removed.\nThe ordinary workflow continues unsupervised — it is not blocked by this.\n",
+  "files": {
+    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nhistory: not json at all\n---\n\n# Supervision run demo-run\n"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Refused: outcome: Invalid enum value. Expected 'adopted' | 'rejected' | 'deferred', received ''\n",
+  "files": {
+    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nstage: \"GUIDE\"\nlockedDecisionPointers: []\ncorrectionCount: 0\nreceiptPointers: []\ncheckpoint: { checkpointId: \"cp-1\", stage: \"GUIDE\", state: \"pending\" }\nhistory: []\nescalatedToHuman: false\n---\n\n# Supervision run demo-run\n\nThis is supervision continuity, NEVER verification and never a gate approval.\n\n**Latest directive:** (none yet)\n**Next safe action:** (none recorded)\n"
+  }
+}

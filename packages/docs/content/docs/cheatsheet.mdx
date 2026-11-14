@@ -3,6 +3,22 @@ title: "Cheatsheet"
 description: "Dense quick reference for all MeowKit commands, agents, skills, and workflow phases."
 ---
 
+## CLI
+
+The native `mewkit` binary is the only CLI. `mk` is the same binary under a shorter name. See [Installation](/installation).
+
+| Command | What it does |
+|---------|-------------|
+| `mewkit init` | Install the kit into this project (`--target`, `--profile`, `--dry-run`) |
+| `mewkit upgrade` | Move the installed runtimes to a newer kit, keeping your edits |
+| `mewkit doctor` | Check the toolchain, the installs and their hooks |
+| `mewkit validate` | Check this project's structure and wiring |
+| `mewkit setup` | Guided post-scaffold configuration |
+| `mewkit versions` | Kits installed, cached and available |
+| `mewkit self-update` | Replace this binary with the newest release |
+
+Run `mewkit --help` for the full list.
+
 ## Slash Commands
 
 | Command | Phase | What it does |
@@ -145,17 +161,17 @@ All three review skills stop after printing — you control when to run `/mk:coo
 | Command | What it does |
 |---------|-------------|
 | `/mk:plan-creator "feature"` | Create plan via mk:plan-creator |
-| `npx mewkit task new --type feature "desc"` | Create task from template |
-| `npx mewkit task list` | List active tasks |
+| `mewkit task new --type feature "desc"` | Create task from template |
+| `mewkit task list` | List active tasks |
 
 ## Task types
 
 | Type | Use when | Create with |
 |------|----------|-------------|
-| feature | Adding new functionality | `npx mewkit task new --type feature` |
-| bug-fix | Fixing broken behavior | `npx mewkit task new --type bug-fix` |
-| refactor | Restructuring code | `npx mewkit task new --type refactor` |
-| security | Security review | `npx mewkit task new --type security` |
+| feature | Adding new functionality | `mewkit task new --type feature` |
+| bug-fix | Fixing broken behavior | `mewkit task new --type bug-fix` |
+| refactor | Restructuring code | `mewkit task new --type refactor` |
+| security | Security review | `mewkit task new --type security` |
 
 ### Task status flow
 `draft` → `in-progress` → `blocked` → `review` → `done`

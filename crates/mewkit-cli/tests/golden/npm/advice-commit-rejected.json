@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "stdout": "Committed GUIDE/cp-1 — disposition CONTINUE_WITH_DIRECTIVE, outcome rejected.\n  receipt: tasks/reports/261114-demo-run-advice-1.md\n",
+  "stderr": "",
+  "files": {
+    "tasks/reports/261114-demo-run-advice-1.md": "---\nkind: advice-receipt\nrunId: \"demo-run\"\nstage: \"GUIDE\"\ndisposition: \"CONTINUE_WITH_DIRECTIVE\"\noutcome: \"rejected\"\nreason: \"the directive misreads the schema\"\ntaskId: \"t-1\"\nprovider: \"claude\"\nskill: \"mk:cook\"\ncheckpointId: \"cp-1\"\n---\n\nThis is a record of supervision, NEVER verification and never a gate approval.\n\n**Question asked:** is it safe to ship first\n\n**Directive:** revert the writer\n\n**Required corrections:**\n\nnone\n\n**Evidence pointers:**\n\n- tasks/reports/x.md\n\n**Next safe action:** ship the reader\n",
+    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nstage: \"GUIDE\"\nlockedDecisionPointers: []\ncorrectionCount: 0\nreceiptPointers: [\"tasks/reports/261114-demo-run-advice-1.md\"]\ncheckpoint: { checkpointId: \"cp-1\", stage: \"GUIDE\", state: \"committed\" }\nhistory: [{\"checkpointId\":\"cp-1\",\"stage\":\"GUIDE\",\"disposition\":\"CONTINUE_WITH_DIRECTIVE\"}]\nescalatedToHuman: false\n---\n\n# Supervision run demo-run\n\nThis is supervision continuity, NEVER verification and never a gate approval.\n\n**Latest directive:** revert the writer\n**Next safe action:** ship the reader\n"
+  }
+}

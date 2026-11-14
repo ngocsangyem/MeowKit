@@ -37,14 +37,8 @@ jobs:
           cargo build -p mewkit-cli --locked
           echo "MEWKIT=$GITHUB_WORKSPACE/target/debug/mewkit" >> "$GITHUB_ENV"
 
-      - name: Build packages
-        run: npm run build
-
       - name: Lint
         run: npm run lint
-
-      - name: Typecheck
-        run: npm run typecheck
 
       - name: Test
         run: npm test
@@ -344,36 +338,6 @@ jobs:
       - name: Build docs site
         run: npm run build -w packages/docs
 
-  # Windows is a supported Codex target (user decision). This job proves the authored
-  # bundle installs and structurally validates on windows-latest — the authored hook
-  # commands carry a `commandWindows` variant, so the install must not assume a POSIX
-  # shell. Node-only steps (no bash) keep the job cross-platform. Codex CLI is absent,
-  # so the canary's live checks skip; the structural install + validate is the proof.
-  codex-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      # pnpm before setup-node so the pnpm store cache can resolve. Version comes
-      # from the root package.json packageManager field.
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - name: Build packages
-        run: npm run build
-
-      - name: Codex bundle structural canary (Windows)
-        run: node packages/mewkit/scripts/codex-compat-check.mjs
-
-      - name: Codex bundle parity + version-support unit tests
-        run: npx vitest run packages/mewkit/src/migrate/modules/codex/__tests__/packaged-bundle-parity.test.ts packages/mewkit/src/migrate/hooks/__tests__/codex-version-support.test.ts
-
   # The hook runtime is node-only, which is only worth anything if it runs where
   # there is no POSIX shell. This job proves that on the one host that can: the
   # hook suites, the node-native hook tests, and doctor with its hard-gate probes
@@ -411,3 +375,19 @@ jobs:
       # thing this port exists for is never verified.
       - name: Doctor hard gates
         run: target/debug/mewkit.exe doctor --hard-gates
+
+      # Windows is a supported Codex target: the authored hook commands carry a
+      # `commandWindows` variant, so the install must not assume a POSIX shell. Codex
+      # itself is absent, so the structural install and validate are the proof.
+      - name: Codex bundle installs and validates (Windows)
+        shell: pwsh
+        run: |
+          $project = Join-Path $env:RUNNER_TEMP "codex-project"
+          New-Item -ItemType Directory -Force -Path $project | Out-Null
+          git -C $project init -q .
+          Push-Location $project
+          & "$env:GITHUB_WORKSPACE\target\debug\mewkit.exe" init --target codex --yes --kit-dir "$env:GITHUB_WORKSPACE" --allow-unverified-kit
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Pop-Location
+          & "$env:GITHUB_WORKSPACE\target\debug\mewkit.exe" validate --target codex $project
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

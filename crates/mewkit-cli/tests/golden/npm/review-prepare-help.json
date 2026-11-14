@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "stdout": "mewkit review prepare <pr-url|number> [--remote <remote>]\n\nreview prepare — High-assurance PR review, resumable across sittings via a session id\n\nFlags:\n  --json             Emit machine-readable JSON\n  --remote <value>   Git remote to fetch the pull request from\n  --session <value>  Review session id from `review prepare`\n  --as <value>       Read the diff as one named persona\n  --reply            Post the composed review back to the pull request\n  --confirm <value>  Confirmation token required for the irreversible submit step\n",
+  "stderr": "",
+  "files": {}
+}

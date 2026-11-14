@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "Provider lifecycle-event support (Phase 6)\nok = fires · adv = fires, version-gated/observe · no = absent · ? = unknown · ! = proven gate (deny/block)\n\n  EVENT             claude-code    claude-plugin  codex          \n  session_start     ok             ok             ok             \n  pre_tool          ok!            ok!            adv            \n  post_tool         ok             ok             ok             \n  tool_failure      ok             ok             no             \n  prompt_submitted  ok             ok             ok             \n  stop              ok!            ok!            ok             \n  pre_compaction    ok             ok             ok             \n  subagent_start    ok             ok             ok             \n  subagent_stop     ok             ok             ok             \n\nRun `mewkit providers <provider> --lifecycle` for support levels, acquisition, storage, and evidence.\n",
+  "stderr": "",
+  "files": {
+    "README.md": "# Not a MeowKit project\n"
+  }
+}

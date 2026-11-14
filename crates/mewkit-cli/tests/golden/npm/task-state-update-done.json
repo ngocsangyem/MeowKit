@@ -1,0 +1,10 @@
+{
+  "exit_code": 0,
+  "stdout": "Updated task record: tasks/active/alpha.json\n",
+  "stderr": "",
+  "files": {
+    ".meowkit/telemetry/trace-log.jsonl": "{\"schema_version\":\"1.0\",\"ts\":\"2026-11-14T16:26:18Z\",\"event\":\"task_transition\",\"run_id\":\"fixed-run\",\"harness_version\":\"3.0.0\",\"model\":\"\",\"density\":\"\",\"task_id\":\"alpha\",\"plan_path\":\"tasks/plans/261112-alpha-work/plan.md\",\"data\":{\"status\":\"done\",\"step\":\"phase 3 build\",\"next\":\"port task-state\"}}\n",
+    "tasks/active/alpha.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"alpha\",\n  \"planPath\": \"tasks/plans/261112-alpha-work/plan.md\",\n  \"status\": \"done\",\n  \"currentStep\": \"phase 3 build\",\n  \"repos\": [\n    {\n      \"identity\": \"/srv/alpha\",\n      \"revision\": \"aaaaaaa\"\n    },\n    {\n      \"identity\": \"/srv/beta\",\n      \"revision\": null\n    }\n  ],\n  \"blockers\": [\n    \"the npm CLI still owns plan approve\"\n  ],\n  \"nextAction\": \"port task-state\",\n  \"verificationSummaries\": [\n    {\n      \"ref\": \"cargo-test\",\n      \"result\": \"pass\"\n    }\n  ],\n  \"evidenceRefs\": [\n    \"tasks/reports/261112-port.md\"\n  ],\n  \"capabilityDecisions\": [\n    {\n      \"capabilityId\": \"cap.memory.write\",\n      \"decision\": \"selected\",\n      \"reason\": \"the store is the only shared artifact\",\n      \"adapterSnapshotId\": \"snap-7\"\n    }\n  ],\n  \"writtenByCli\": \"2.3.1\",\n  \"writtenByKit\": \"2.15.0\",\n  \"updatedAt\": \"2026-11-14T16:26:18.257Z\",\n  \"futureField\": \"an additive field an older binary must not strip\"\n}\n",
+    "tasks/active/zeta.json": "{\n  \"schemaVersion\": \"1.0\",\n  \"taskId\": \"zeta\",\n  \"planPath\": null,\n  \"status\": \"active\",\n  \"currentStep\": \"\",\n  \"repos\": [],\n  \"blockers\": [],\n  \"nextAction\": \"\",\n  \"verificationSummaries\": [],\n  \"evidenceRefs\": [],\n  \"capabilityDecisions\": [],\n  \"writtenByCli\": \"2.3.1\",\n  \"writtenByKit\": \"\",\n  \"updatedAt\": \"2026-11-11T09:00:00.000Z\"\n}\n"
+  }
+}

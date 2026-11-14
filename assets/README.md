@@ -33,7 +33,7 @@ The whole system is flat: there is no illustrated mascot, no face, no paw.
 | --- | --- |
 | `README.md` | This file — context, the mark, palette, type, usage rules |
 | `SKILL.md` | Agent Skills manifest — makes this system usable as a Claude Code skill |
-| `design-tokens.json` | Canonical token source (mirrored to `docs/design/` and `packages/mewkit/assets/`) |
+| `design-tokens.json` | Canonical token source (mirrored to `docs/design/`) |
 | `css/colors_and_type.css` | CSS variables: brand primitives, light/night themes, typography roles |
 | `branding/` | The logo masters — see the table below |
 | `preview/` | Design-system preview pages (brand, colour, type, spacing, components) |

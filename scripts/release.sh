@@ -62,7 +62,7 @@ fi
 node scripts/sync-versions.cjs --write   # stamp .claude/kit-contract.json (+ manifest if present)
 bash scripts/release-check.sh
 
-# Step 1: Bump version (metadata only — packages/mewkit is released separately)
+# Step 1: Bump version (metadata only — the mewkit binary is released separately)
 echo "[1/7] Bumping version to $VERSION..."
 # metadata.json is updated by prepare-release-assets.cjs in step 3
 
@@ -125,9 +125,9 @@ See [changelog](https://docs.meowkit.dev/changelog) for full details.
 ### Install
 
 \`\`\`bash
-npx mewkit init
+mewkit init
 # or upgrade:
-npx mewkit upgrade
+mewkit upgrade
 \`\`\`"
 
 if gh release view "v$VERSION" >/dev/null 2>&1; then

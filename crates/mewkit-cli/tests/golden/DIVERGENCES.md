@@ -1,12 +1,10 @@
 # Intended divergences from the TS baseline
 
-`ts-baseline/*.manifest.json` record what `mewkit init --target <t> --yes` (npm CLI)
-writes today, produced by `node scripts/capture-ts-baseline.mjs` from this
-checkout's git-tracked kit. They are a reference, not a contract: `mewkit`
-must match them or list the difference here, with the decision behind it.
-
-Regenerate after any change to the kit or the npm CLI's install path, and check
-with `node scripts/capture-ts-baseline.mjs --check` (needs `npm run build`).
+`baseline/*.manifest.json` record what `mewkit init --target <t> --yes` (npm CLI)
+wrote at origin/main 861db010. They are frozen: the npm CLI and the script that
+produced them are gone, so they cannot be regenerated. They are a reference, not a
+contract: `mewkit` must match them or list the difference here, with the decision
+behind it.
 
 | Target      | Path(s)                                                                         | TS behaviour                                                     | mewkit                                                                                                                                           | Decision                                                                                                                      |
 | ----------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
@@ -16,7 +14,7 @@ with `node scripts/capture-ts-baseline.mjs --check` (needs `npm run build`).
 | cursor | skill test files, skill packs | tests installed; every skill | tests not installed; packs as for Codex | `base.exclude` |
 | claude-code | `.claude/settings.json`                                                         | copied when absent, else append-only merge deduped on `command`  | kit hook handlers (keyed by matcher + `command` + `args`), `env` and `statusLine` merged and recorded; `permissions` not merged, reported as a notice | a list cannot be merged without replacing the user's own entries; the TS dedupe drops handlers that share `"command": "node"` |
 | claude-code | `.meowkit/metadata.json`, `.meowkit/cache/**`, `~/.mewkit/cli/*.json` | install metadata, a copy of the kit and a per-version CLI record | not written; ownership index under `.meowkit/state/ownership/`, kit cache under `.meowkit/cache/kits/`. The shared `.meowkit/` files (`pack-manifest.json`, `harness-inventory.json`, `config.yaml`, `.gitignore`, `.env.example`, `gitignore.meowkit`, `mcp.json.example`) are written, byte for byte | the per-version record locates a Node entry point, which this binary does not have. One index shape for every target |
-| claude-code | `.claude/runtime.json`, `.meowkit/bin/mewkit` | launcher pinned to the npm version with `INSTALLED_BY = "node"`; descriptor with `writtenAt` set | the same launcher pinned to this binary's version with `INSTALLED_BY = "native"` (binary first, npm CLI second); descriptor naming it, `writtenAt` empty | both name the installing CLI; the launcher template is compared byte for byte by `tests/parity/launcher_cases.rs`. An empty `writtenAt` keeps an unchanged install's upgrade dry run clean |
+| claude-code | `.claude/runtime.json`, `.meowkit/bin/mewkit` | launcher pinned to the npm version with `INSTALLED_BY = "node"`; descriptor with `writtenAt` set | the same launcher pinned to this binary's version with `INSTALLED_BY = "native"` (binary first, npm CLI second); descriptor naming it, `writtenAt` empty | both name the installing CLI; the launcher template is no longer compared with the npm CLI's, which is gone. An empty `writtenAt` keeps an unchanged install's upgrade dry run clean |
 | codex       | `AGENTS.md`                                                                     | whole file replaced                                              | kit text in a `meowkit` marked block; user text kept                                                                                                  | user-owned file                                                                                                               |
 | codex       | `.codex/hooks.json`, `.codex/config.toml`                                       | whole file replaced                                              | kit handlers / keys merged and recorded                                                                                                               | user-owned files                                                                                                              |
 | codex       | `.agents/skills/*/SKILL.md` and references with `node scripts/…` style commands | skill-relative                                                   | root-anchored: `node .agents/skills/<skill>/scripts/…`                                                                                                | probe (a): Codex runs commands from the project root (2026-11-10)                                                             |

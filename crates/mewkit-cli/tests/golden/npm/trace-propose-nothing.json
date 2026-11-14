@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "stdout": "Trace propose — 0 advisory item(s) (dry-run)\n  Nothing to propose — no repeated friction or drift.\n\nRe-run with --commit to append these to the advisory backlog.\n",
+  "stderr": "",
+  "files": {
+    ".claude/settings.json": "{}\n",
+    ".meowkit/telemetry/trace-log.jsonl": "{\"ts\":\"2999-01-01T00:00:00Z\",\"event\":\"edit\",\"run_id\":\"r\"}\n{\"ts\":\"2999-01-01T00:00:00Z\",\"event\":\"test\",\"run_id\":\"r\"}\n"
+  }
+}

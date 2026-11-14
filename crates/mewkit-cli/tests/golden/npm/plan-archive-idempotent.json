@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "plan archive: 261112-demo-plan is already archived — nothing to do.\n",
+  "stderr": "",
+  "files": {
+    "tasks/plans/archive/261112-demo-plan/plan.md": "---\ntitle: Demo plan\ntype: feature\nstatus: in_progress\npriority: high\n---\n\n# Demo plan\n\n## Goal\n\nThe demo plan reaches Gate 1 with nothing missing.\n\n## Phases\n\n- phase-01-setup.md\n\n## Todo List\n\n- [x] Write the overview\n- [ ] Hand it to the human\n"
+  }
+}

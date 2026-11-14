@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Zero-residue check for the memory diet: the shipped kit (`.claude/`) and the CLI source
-// (`packages/mewkit/src/`) must carry no reference to the deleted wiki, the deleted JSON
+// (`crates/`) must carry no reference to the deleted wiki, the deleted JSON
 // memory stores, their generated views, the capture hook, or the relocated artifact paths.
 //
 // Tests and release history are excluded: a test may legitimately assert that a token is
@@ -14,7 +14,7 @@ const path = require("node:path");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 
-const SCAN_ROOTS = [".claude", path.join("packages", "mewkit", "src")];
+const SCAN_ROOTS = [".claude", "crates"];
 
 const RESIDUE_SOURCE = [
 	"mewkit wiki",
@@ -43,6 +43,7 @@ function isExcluded(relPath) {
 	const parts = relPath.split(path.sep);
 	if (parts.includes("__tests__") || parts.includes("tests")) return true;
 	if (/\.(test|spec)\.[cm]?[jt]sx?$/.test(relPath)) return true;
+	if (/_tests?\.rs$/.test(relPath)) return true;
 	const base = path.basename(relPath).toLowerCase();
 	if (base.startsWith("changelog") || base.startsWith("release-notes")) return true;
 	return false;

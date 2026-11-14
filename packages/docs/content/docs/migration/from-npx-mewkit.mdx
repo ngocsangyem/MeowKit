@@ -1,0 +1,61 @@
+---
+title: "Moving from npx mewkit"
+description: "Move a project from the Node mewkit CLI (npx mewkit) to the native mewkit binary."
+---
+
+> **The Node `mewkit` CLI is no longer maintained.** Its last published version is `mewkit@2.3.1`.
+> It still installs, but it gets no new fixes and no kit support. The native `mewkit` binary is the
+> only CLI now. Its short alias is `mk`.
+
+The project's kit does not change when you switch CLIs. `.claude/` and `.meowkit/` stay as they are,
+and `mewkit upgrade` moves them forward from there.
+
+## What changes
+
+| Before (npm CLI) | After (native binary) |
+|------------------|-----------------------|
+| `npx mewkit init` | `mewkit init` |
+| `npx mewkit <verb>` | `mewkit <verb>`, or `mk <verb>` |
+| Installed with `npm install -g mewkit` or as a project devDependency | Installed by `install.sh` (macOS, Linux) or `install.ps1` (Windows) |
+| Node.js needed to run the CLI | Node.js needed only for the kit's hooks |
+| `npx mewkit upgrade` | `mewkit upgrade`; `mewkit self-update` updates the binary itself |
+
+## Steps
+
+1. **Install the binary.** Follow [Installation](/installation#install-the-cli). Check that `mewkit --version` prints a version.
+
+2. **Remove the npm package.** Run the command that matches how you installed it:
+
+   ```bash
+   npm uninstall -g mewkit   # global install
+   npm uninstall mewkit      # project devDependency, run in the project
+   ```
+
+3. **Check each project.** From the project directory, run:
+
+   ```bash
+   mewkit doctor
+   ```
+
+   `doctor` reports the toolchain, the installs in this project and their hooks. Fix anything it flags.
+
+4. **Update the commands you run.** Replace `npx mewkit` with `mewkit` (or `mk`) in your shell history,
+   `package.json` scripts, CI jobs and any team docs.
+
+## What stays the same
+
+- **Your kit.** `.claude/`, `.meowkit/` and `.meowkit/config.yaml` keep working unchanged.
+- **Hooks.** Hooks look for `mewkit` on your PATH first. A project that still has the npm CLI in
+  `node_modules/.bin` keeps running it until you remove it.
+- **Memory and state.** `.meowkit/memory/`, plans and tasks are not touched by the switch.
+
+## Commands the binary does not have
+
+The binary covers the lifecycle verbs listed by `mewkit --help`. If a command you rely on is not
+in that list, it was not ported yet. Run it through `npx mewkit` for now; the npm package still works
+for every verb it had. Open an issue on the repository so the gap is tracked.
+
+## Next steps
+
+- [Installation](/installation): install options and flags for the binary
+- [Cheatsheet](/cheatsheet): the common commands in one place

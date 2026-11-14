@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Fatal: pack-manifest.json is not valid JSON: Unexpected end of JSON input\n",
+  "files": {
+    ".meowkit/pack-manifest.json": "{ \"base\": \n"
+  }
+}

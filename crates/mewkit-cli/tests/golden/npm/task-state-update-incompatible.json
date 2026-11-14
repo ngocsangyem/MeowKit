@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Refusing to update: Incompatible task record: record schemaVersion \"9.9\" not in supported [\"1.0\"]\n",
+  "files": {
+    "tasks/active/future.json": "{\n  \"schemaVersion\": \"9.9\",\n  \"taskId\": \"future\",\n  \"status\": \"active\",\n  \"updatedAt\": \"2026-11-10T08:30:00.000Z\"\n}\n"
+  }
+}

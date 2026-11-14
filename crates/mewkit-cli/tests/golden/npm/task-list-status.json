@@ -1,0 +1,11 @@
+{
+  "exit_code": 0,
+  "stdout": "\n  Status      Type          Priority  Title                                     Path\n  ────────────────────────────────────────────────────────────────────────────────────────────────────\n  in-progress feature       high      Port the note verb                        tasks/active/261101-port-the-note-verb.feature.md\n\n  1 task found\n\n",
+  "stderr": "",
+  "files": {
+    "tasks/active/261101-port-the-note-verb.feature.md": "---\ntitle: \"Port the note verb\"\ntype: feature\nstatus: in-progress\npriority: high\ncreated: 2026-11-01\n---\n\n# Port the note verb\n",
+    "tasks/active/261102-fix-the-lock-reclaim.bug.md": "---\ntitle: \"Fix the lock reclaim: stale stamps only\"\ntype: bug-fix\nstatus: blocked\npriority: medium\ncreated: 2026-11-02\n---\n\n# Fix the lock reclaim\n",
+    "tasks/active/261103-no-frontmatter.md": "# A task file with no frontmatter at all\n\nIt still appears in the listing, with every column defaulted.\n",
+    "tasks/done/261001-ship-the-harness.feature.md": "---\ntitle: \"Ship the parity harness\"\ntype: feature\nstatus: done\npriority: low\ncreated: 2026-10-01\n---\n\n# Ship the parity harness\n"
+  }
+}

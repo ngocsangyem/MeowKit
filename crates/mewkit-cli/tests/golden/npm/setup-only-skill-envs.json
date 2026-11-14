@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "stdout": "\nMeowKit Setup\n\n  ○ skill-envs: No skills selected — pass --skills=<a,b> or run `mewkit skill env <skill>`\n\n  Summary: 0 configured, 1 skipped\n",
+  "stderr": "",
+  "files": {}
+}

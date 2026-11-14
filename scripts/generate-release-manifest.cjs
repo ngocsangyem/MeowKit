@@ -10,6 +10,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { cliVersion: readCliVersion } = require("./lib/cli-version.cjs");
 const crypto = require("crypto");
 const { execSync } = require("child_process");
 
@@ -103,13 +104,13 @@ function main() {
     }
   }
 
-  // The CLI package (`packages/mewkit`) rides its own semver track; record it so the manifest
-  // states which CLI shipped this kit release without conflating the two versions.
+  // The `mewkit` binary rides its own semver track; record it so the manifest states which
+  // CLI shipped this kit release without conflating the two versions.
   let cliVersion = "unknown";
   try {
-    cliVersion = JSON.parse(fs.readFileSync(path.join(projectRoot, "packages", "mewkit", "package.json"), "utf8")).version;
+    cliVersion = readCliVersion(projectRoot) ?? "unknown";
   } catch {
-    console.warn("Warning: could not read CLI package version");
+    console.warn("Warning: could not read the CLI version from Cargo.toml");
   }
 
   const manifest = {

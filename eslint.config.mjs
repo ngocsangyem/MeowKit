@@ -6,7 +6,7 @@ export default tseslint.config(
     ignores: ["**/dist/**", "**/node_modules/**", "**/*.cjs", "**/*.js"],
   },
   {
-    files: ["packages/*/src/**/*.ts"],
+    files: ["src/**/*.ts", "tests/**/*.ts"],
     extends: [tseslint.configs.recommended],
     languageOptions: {
       globals: { ...globals.node },

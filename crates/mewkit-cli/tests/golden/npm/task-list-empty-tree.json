@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "stdout": "\n  No task files found in <project>/tasks/active\n\n",
+  "stderr": "",
+  "files": {
+    "tasks/active/.gitkeep": ""
+  }
+}

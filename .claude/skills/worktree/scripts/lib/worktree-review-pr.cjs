@@ -18,9 +18,9 @@
  * before use as defense-in-depth. Do not reintroduce the shared string-based
  * `git()` helper on any path that carries manifest/back-reference data.
  *
- * Canonical schema: packages/mewkit/src/review/schema.ts (ReviewManifestSchema).
- * This CommonJS module cannot import it; a vitest parity test asserts the manifest
- * emitted here validates under that schema, so the two sides cannot drift.
+ * Canonical schema: crates/mewkit-core/src/schema/review_manifest.rs (ReviewManifest).
+ * This CommonJS module cannot import it and nothing checks the two against each
+ * other, so a change to either side must be made to the other by hand.
  */
 
 const fs = require('fs');

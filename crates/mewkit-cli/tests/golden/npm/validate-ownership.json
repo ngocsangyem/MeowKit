@@ -1,0 +1,29 @@
+{
+  "exit_code": 1,
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nOwnership\n  [FAIL] Ownership: skills/agent-detector\n         unknown: skill directory has no SKILL.md (not a known runtime dir)\n  [FAIL] Ownership: skills/workflow-orchestrator\n         unknown: skill directory has no SKILL.md (not a known runtime dir)\n  [FAIL] Ownership coverage\n         2 artifact(s) with missing/invalid metadata\n\n0 passed, 3 failed\n",
+  "stderr": "",
+  "files": {
+    ".claude/agents/AGENTS_INDEX.md": "# Agents\n\n[1]{agent_file\n\ndeveloper\n\n<!-- GENERATED:agent-views START -->\n**Agent registry views (generated):** 1 core/support direct-only; 0 domain hub-only; 0 intelligence direct-only; 0 intelligence direct-and-harness; 0 internal harness.\n<!-- GENERATED:agent-views END -->\n",
+    ".claude/agents/SKILLS_INDEX.md": "# Skills\n\n**Total**|**1**\n\nmk:cook\n",
+    ".claude/agents/developer.md": "---\nname: developer\ndescription: Use for implementation. Does not review its own work.\nmodel: inherit\ntools: Read, Write\nowner: lifecycle\ncriticality: high\nstatus: active\nruntime: claude-code\nresponsibility: task-specification\n---\n\n## Exclusive Ownership\n\nOwns `src/*`.\n",
+    ".claude/hooks/HOOKS_INDEX.md": "# Hooks\n\n1 node hook\n\npre-ship\n",
+    ".claude/hooks/pre-ship.cjs": "#!/usr/bin/env node\n'use strict';\n// A hook script, enough to be one.\n",
+    ".claude/rules/agent-conduct.md": "# agent-conduct.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/core-behaviors.md": "# core-behaviors.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/development-rules.md": "# development-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/gate-rules.md": "# gate-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/injection-rules.md": "# injection-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/meowkit-core.md": "# meowkit-core.md\n\nProse that carries enforcement.\n",
+    ".claude/rules/security-rules.md": "# security-rules.md\n\nProse that carries enforcement.\n",
+    ".claude/skills/agent-detector/references/agent-routing.md": "# Agent routing\n\nThe routing table lives here, loaded just in time.\n",
+    ".claude/skills/cook/SKILL.md": "---\nname: mk:cook\ndescription: Build a feature end to end, with the gates in the right order.\nwhen_to_use: When a feature has an approved plan.\nowner: lifecycle\ncriticality: high\nstatus: active\nruntime: portable\nresponsibility: verification\n---\n\nDelegate with subagent_type: developer.\n",
+    ".claude/skills/workflow-orchestrator/workflow.yaml": "phases:\n  - id: 0\n    name: Orient\n  - id: 1\n    name: Plan\n    gate: gate_1\ngates:\n  - id: gate_1\n    required_output: \"tasks/plans/*/plan.md\"\nsources:\n  - path: docs/core/meowkit-architecture.md\n",
+    ".git/HEAD": "ref: refs/heads/main\n",
+    ".meowkit/harness-inventory.json": "{\n \"artifacts\": {\n  \"rules/meowkit-core.md\": {\n   \"owner\": \"lifecycle\",\n   \"criticality\": \"critical\",\n   \"status\": \"active\",\n   \"runtime\": \"portable\",\n   \"responsibility\": \"gate-enforcement\"\n  },\n  \"rules/security-rules.md\": {\n   \"owner\": \"lifecycle\",\n   \"criticality\": \"critical\",\n   \"status\": \"active\",\n   \"runtime\": \"portable\",\n   \"responsibility\": \"gate-enforcement\"\n  },\n  \"rules/injection-rules.md\": {\n   \"owner\": \"lifecycle\",\n   \"criticality\": \"critical\",\n   \"status\": \"active\",\n   \"runtime\": \"portable\",\n   \"responsibility\": \"gate-enforcement\"\n  },\n  \"rules/gate-rules.md\": {\n   \"owner\": \"lifecycle\",\n   \"criticality\": \"critical\",\n   \"status\": \"active\",\n   \"runtime\": \"portable\",\n   \"responsibility\": \"gate-enforcement\"\n  },\n  \"rules/core-behaviors.md\": {\n   \"owner\": \"lifecycle\",\n   \"criticality\": \"critical\",\n   \"status\": \"active\",\n   \"runtime\": \"portable\",\n   \"responsibility\": \"gate-enforcement\"\n  },\n  \"rules/development-rules.md\": {\n   \"owner\": \"lifecycle\",\n   \"criticality\": \"critical\",\n   \"status\": \"active\",\n   \"runtime\": \"portable\",\n   \"responsibility\": \"gate-enforcement\"\n  },\n  \"rules/agent-conduct.md\": {\n   \"owner\": \"lifecycle\",\n   \"criticality\": \"critical\",\n   \"status\": \"active\",\n   \"runtime\": \"portable\",\n   \"responsibility\": \"gate-enforcement\"\n  },\n  \"hooks/pre-ship.cjs\": {\n   \"owner\": \"lifecycle\",\n   \"criticality\": \"critical\",\n   \"status\": \"active\",\n   \"runtime\": \"claude-code\",\n   \"responsibility\": \"gate-enforcement\"\n  }\n }\n}\n",
+    ".meowkit/memory/decisions.md": "## A kebab-case file name is what search tools read  <!-- 2026-11-01 -->\n\nWhy: a long name beats a short one when a tool greps for purpose.\nApply when: naming any new file.\nSource: a review of three renamed modules.\n",
+    "README.md": "MeowKit ships 1 skills, 1 agents, 7 rules and 1 hook scripts.\n",
+    "crates/mewkit-cli/Cargo.toml": "[package]\nname = \"mewkit-cli\"\n",
+    "docs/core/meowkit-architecture.md": "# Architecture\n\nIt carries 1 domain skills and 7 rule files.\n",
+    "packages/mewkit/src/.gitkeep": ""
+  }
+}

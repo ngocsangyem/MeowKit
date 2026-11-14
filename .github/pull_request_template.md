@@ -23,7 +23,7 @@
 
 - [ ] Tests pass (`npm test`)
 - [ ] Lint passes (`npm run lint`)
-- [ ] Build passes (`npm run build`)
+- [ ] Rust build and tests pass (`cargo test --workspace`)
 - [ ] Docs build passes (`npm run build -w packages/docs`)
 - [ ] Manual testing: <!-- describe -->
 

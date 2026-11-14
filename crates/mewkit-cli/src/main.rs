@@ -28,14 +28,12 @@ use commands::{
     backups::BackupsArgs, capabilities::CapabilitiesArgs, pack::PackArgs, setup::SetupArgs,
     skill::SkillArgs,
 };
-use failure::Failure;
 
 #[derive(Parser)]
 #[command(
     name = "mewkit",
     version = mewkit_core::VERSION,
-    about = "Install and manage the MeowKit kit for Claude Code, Codex and Cursor (preview).",
-    after_help = "Commands not listed here still live in the npm `mewkit` package (`npx mewkit`).",
+    about = "Install and manage the MeowKit kit for Claude Code, Codex and Cursor.",
     arg_required_else_help = true
 )]
 struct Cli {
@@ -98,9 +96,6 @@ enum Command {
     Capabilities(CapabilitiesArgs),
     /// List or restore the backups lifecycle commands left behind.
     Backups(BackupsArgs),
-    /// Any command this binary does not implement yet.
-    #[command(external_subcommand)]
-    NotPorted(Vec<String>),
 }
 
 fn main() -> ExitCode {
@@ -129,13 +124,6 @@ fn main() -> ExitCode {
         Command::Pack(args) => commands::pack::run(&args),
         Command::Capabilities(args) => commands::capabilities::run(&args),
         Command::Backups(args) => commands::backups::run(&args),
-        Command::NotPorted(argv) => {
-            let name = argv.first().map(String::as_str).unwrap_or_default();
-            Err(Failure::usage(format!(
-                "unknown command '{name}'. It is not ported yet; \
-                 run it with the npm `mewkit` CLI (`npx mewkit {name}`)."
-            )))
-        }
     };
     match result {
         Ok(code) => ExitCode::from(code),

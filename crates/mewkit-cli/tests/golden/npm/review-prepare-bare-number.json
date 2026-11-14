@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Fatal: (input ?? \"\").trim is not a function\n",
+  "files": {}
+}

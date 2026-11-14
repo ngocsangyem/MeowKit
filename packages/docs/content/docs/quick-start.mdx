@@ -7,28 +7,34 @@ This guide gets you from zero to your first MeowKit-managed task in 5 minutes.
 
 ## Step 1: Install MeowKit
 
+Install the `mewkit` binary, then add the kit to your project:
+
 ```bash
-npx mewkit init
+curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh   # macOS and Linux
+cd your-project
+mewkit init
 ```
 
-The CLI walks you through a short set of prompts, and every one after the toolkit picker is skippable. See [Installation](/installation) for the full list and the flags that skip them. Takes ~30 seconds.
+On Windows, use `irm https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.ps1 | iex` in PowerShell.
 
-The kit ships as a release zip with a `checksums.txt`. See [Installation](/installation#release-checks) for what that covers. Pick the on-disk shape with `npx mewkit init --target claude-code --delivery plugin`, and check what landed with `npx mewkit versions`.
+`mewkit init` walks you through a short set of prompts. Every one after the runtime picker is skippable. See [Installation](/installation) for the full list and the flags that skip them. Takes ~30 seconds.
+
+Pick the on-disk shape with `mewkit init --target claude-code --delivery plugin`, and check what landed with `mewkit versions`.
 
 After scaffolding completes, run setup and verify:
 
 ```bash
-npx mewkit setup
-npx mewkit doctor
+mewkit setup
+mewkit doctor
 ```
 
 ## Step 2: Create your first task
 
 ```bash
-npx mewkit task new --type feature "Add user authentication with JWT"
+mewkit task new --type feature "Add user authentication with JWT"
 ```
 
-This writes a task file to `tasks/active/` with the fields for that task type already in its frontmatter. If your project keeps its own template, such as `tasks/templates/feature-implementation.md`, the command uses that instead. Open it and fill in the acceptance criteria; they are what the plan and the review are both measured against, so vague criteria produce a vague plan.
+This writes a task file to `tasks/active/` with the fields for that task type already in its frontmatter. If your project keeps its own template, such as `tasks/templates/feature-implementation.md`, the command uses that instead. Open it and fill in the acceptance criteria. They are what the plan and the review are both measured against, so vague criteria produce a vague plan.
 
 ## Step 3: Start a Claude Code session
 
