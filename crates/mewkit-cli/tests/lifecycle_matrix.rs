@@ -109,7 +109,7 @@ fn cell(runtime: &str, scope: Scope) {
         "{cell}: indexed but missing {missing:?}"
     );
 
-    let out = env.mewkit_next(&scope.args("doctor", runtime, &["--json"]));
+    let out = env.mewkit(&scope.args("doctor", runtime, &["--json"]));
     assert_eq!(code(&out), 0, "{cell} doctor: {}", text(&out));
     let checks: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
     let status = |name: &str| {

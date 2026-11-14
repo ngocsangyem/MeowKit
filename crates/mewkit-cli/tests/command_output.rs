@@ -9,7 +9,7 @@ use support::{code, text, write};
 fn nothing_to_do_prints_an_empty_json_list() {
     let env = TempHome::new();
     for args in [["uninstall", "--json"], ["upgrade", "--json"]] {
-        let out = env.mewkit_next(&args);
+        let out = env.mewkit(&args);
         assert_eq!(code(&out), 0, "{}", text(&out));
         assert_eq!(String::from_utf8_lossy(&out.stdout).trim(), "[]");
     }
@@ -21,7 +21,7 @@ fn uninstall_without_the_kit_says_so_first_and_does_not_exit_zero() {
     // A development install is never cached, so the kit is not available later.
     let out = env.with_kit(&["init", "--target", "codex"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
-    let out = env.mewkit_next(&["uninstall", "--yes"]);
+    let out = env.mewkit(&["uninstall", "--yes"]);
     let stdout = String::from_utf8_lossy(&out.stdout);
     assert_eq!(code(&out), 6, "{}", text(&out));
     let note = stdout

@@ -15,7 +15,7 @@ fn a_codex_tree_under_portable_points_at_the_target_check() {
     std::fs::create_dir_all(project.join(".claude").join("rules")).expect("create .claude/rules");
     std::fs::create_dir_all(project.join(".codex")).expect("create the codex tree");
 
-    let out = env.mewkit_next(&["validate", "--mode", "flat-copy", "--portable"]);
+    let out = env.mewkit(&["validate", "--mode", "flat-copy", "--portable"]);
     let stdout = String::from_utf8_lossy(&out.stdout);
     // A report, and an honest non-zero code for an install this incomplete;
     // never the usage error a refusal would give.
@@ -31,7 +31,7 @@ fn portable_without_a_codex_tree_reports_the_surface_matrix_alone() {
     let env = TempHome::new();
     std::fs::create_dir_all(env.project().join(".claude").join("rules"))
         .expect("create .claude/rules");
-    let out = env.mewkit_next(&["validate", "--mode", "flat-copy", "--portable"]);
+    let out = env.mewkit(&["validate", "--mode", "flat-copy", "--portable"]);
     let stdout = String::from_utf8_lossy(&out.stdout);
     assert_eq!(
         stdout.matches("Provider contract: ").count(),

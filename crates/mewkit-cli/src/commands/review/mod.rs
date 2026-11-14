@@ -10,7 +10,7 @@
 //!
 //! Like every ported verb, a failure prints the npm CLI's own line and exits
 //! non-zero rather than returning a [`Failure`], which would prefix
-//! `mewkit-next:` and break the parity those callers depend on.
+//! `mewkit:` and break the parity those callers depend on.
 mod emit;
 mod stages;
 

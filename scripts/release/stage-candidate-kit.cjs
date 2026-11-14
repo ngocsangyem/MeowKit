@@ -2,7 +2,7 @@
 /**
  * Copy the kit this checkout would publish (the ship set every release archive
  * is built from) into an empty directory, so the binary release gate can run
- * `mewkit-next init` against exactly the candidate kit before it is tagged.
+ * `mewkit init` against exactly the candidate kit before it is tagged.
  *
  * Usage: node scripts/release/stage-candidate-kit.cjs <outDir>
  */

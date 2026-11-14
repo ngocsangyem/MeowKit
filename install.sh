@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install mewkit-next on Linux or macOS.
+# Install mewkit on Linux or macOS.
 #
 #   curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh
 #
@@ -18,8 +18,8 @@
 # installer-pins.json. Edit those, never this file.
 set -eu
 
-say() { printf 'mewkit-next install: %s\n' "$1"; }
-die() { printf 'mewkit-next install: error: %s\n' "$1" >&2; exit 1; }
+say() { printf 'mewkit install: %s\n' "$1"; }
+die() { printf 'mewkit install: error: %s\n' "$1" >&2; exit 1; }
 
 # The pinned archive for a channel and target: "version url sha256 size".
 pin() {
@@ -34,7 +34,7 @@ target() {
 	case "$arch" in
 		x86_64 | amd64) arch=x86_64 ;;
 		arm64 | aarch64) arch=aarch64 ;;
-		*) die "no mewkit-next build for the $arch processor" ;;
+		*) die "no mewkit build for the $arch processor" ;;
 	esac
 	case "$os" in
 		Linux) echo "$arch-unknown-linux-musl" ;;
@@ -46,7 +46,7 @@ target() {
 			echo "$arch-apple-darwin"
 			;;
 		MINGW* | MSYS* | CYGWIN* | Windows_NT) die "on Windows, run install.ps1 in PowerShell instead" ;;
-		*) die "no mewkit-next build for $os" ;;
+		*) die "no mewkit build for $os" ;;
 	esac
 }
 
@@ -87,24 +87,24 @@ main() {
 	version=$1 url=$2 want_sha=$3 want_size=$4
 
 	if [ -n "${MEWKIT_VERSION:-}" ] && [ "${MEWKIT_VERSION#v}" != "$version" ]; then
-		die "this installer pins mewkit-next $version on $channel, not ${MEWKIT_VERSION#v}.
+		die "this installer pins mewkit $version on $channel, not ${MEWKIT_VERSION#v}.
   To install another version by hand, verified:
-    1. download mewkit-next-<version>-$tgt.tar.gz and checksums.txt from
+    1. download mewkit-<version>-$tgt.tar.gz and checksums.txt from
        https://github.com/ngocsangyem/MeowKit/releases/tag/mewkit-v<version>
     2. check it: sha256sum -c --ignore-missing checksums.txt   (macOS: shasum -a 256 -c)
-    3. extract it and put mewkit-next in a directory on your PATH"
+    3. extract it and put mewkit in a directory on your PATH"
 	fi
 
-	tmp=$(mktemp -d 2>/dev/null || mktemp -d -t mewkit-next)
+	tmp=$(mktemp -d 2>/dev/null || mktemp -d -t mewkit)
 	trap 'rm -rf "$tmp"' EXIT
 	trap 'exit 130' INT
 	trap 'exit 143' TERM
-	archive=$tmp/mewkit-next.tar.gz
+	archive=$tmp/mewkit.tar.gz
 
 	# Refuse before downloading when the result could not be checked.
 	sha256_of /dev/null >/dev/null 2>&1 || die "no SHA-256 tool (sha256sum, shasum or openssl); cannot verify the download, so nothing was installed"
 
-	say "downloading mewkit-next $version for $tgt"
+	say "downloading mewkit $version for $tgt"
 	download "$url" "$archive" || die "download failed: $url"
 	size=$(wc -c <"$archive" | tr -d ' ')
 	[ "$size" = "$want_size" ] || die "the download is $size bytes, the pin says $want_size; nothing was installed"
@@ -113,21 +113,36 @@ main() {
 
 	mkdir "$tmp/x"
 	tar -xzf "$archive" -C "$tmp/x" || die "the archive did not extract; nothing was installed"
-	bin=$(find "$tmp/x" -maxdepth 2 -type f -name mewkit-next | head -n 1)
-	[ -n "$bin" ] || die "the archive holds no mewkit-next binary; nothing was installed"
+	bin=$(find "$tmp/x" -maxdepth 2 -type f -name mewkit | head -n 1)
+	[ -n "$bin" ] || die "the archive holds no mewkit binary; nothing was installed"
 
 	mkdir -p "$install_dir" || die "cannot create $install_dir"
-	staged=$install_dir/.mewkit-next.install.$$
+	staged=$install_dir/.mewkit.install.$$
 	cp "$bin" "$staged" || { rm -f "$staged"; die "cannot write to $install_dir"; }
 	chmod 755 "$staged"
-	mv -f "$staged" "$install_dir/mewkit-next" || { rm -f "$staged"; die "cannot place $install_dir/mewkit-next"; }
-	say "installed $install_dir/mewkit-next ($version, $channel)"
+	mv -f "$staged" "$install_dir/mewkit" || { rm -f "$staged"; die "cannot place $install_dir/mewkit"; }
+	say "installed $install_dir/mewkit ($version, $channel)"
+
+	# `mk` is the short name; `mewkit-next` is the pre-rename name, kept one release so
+	# existing scripts still run (the binary prints a rename notice under it). A name
+	# already taken by something that is not a mewkit binary is left alone: `mk` is short
+	# enough that another tool may own it. The binary is installed either way.
+	for alias in mk mewkit-next; do
+		link=$install_dir/$alias
+		if [ -e "$link" ] || [ -L "$link" ]; then
+			if [ -d "$link" ] || ! "$link" --version 2>/dev/null | grep -Eq '^mewkit(-next)? '; then
+				say "$link exists and is not mewkit; left as it is (run mewkit directly)"
+				continue
+			fi
+		fi
+		ln -sf mewkit "$link" && say "linked $link to mewkit" || say "could not link $link; run mewkit directly"
+	done
 
 	case ":${PATH:-}:" in
 		*":$install_dir:"*) ;;
 		*) say "$install_dir is not on your PATH; add it, e.g.:  export PATH=\"$install_dir:\$PATH\"" ;;
 	esac
-	say "later updates: mewkit-next self-update"
+	say "later updates: mewkit self-update"
 }
 
 main "$@"

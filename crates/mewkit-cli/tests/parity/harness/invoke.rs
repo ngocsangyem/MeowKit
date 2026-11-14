@@ -133,7 +133,7 @@ pub fn run_rust(
     env: &[(String, String)],
     stdin: Option<&str>,
 ) -> Run {
-    let mut cmd = command(env!("CARGO_BIN_EXE_mewkit-next"), project, home, env);
+    let mut cmd = command(env!("CARGO_BIN_EXE_mewkit"), project, home, env);
     cmd.args(args);
-    finish(cmd, "mewkit-next", stdin)
+    finish(cmd, "mewkit", stdin)
 }

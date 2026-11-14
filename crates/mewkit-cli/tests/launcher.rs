@@ -17,7 +17,7 @@ use support::{code, text};
 
 /// The directory holding the binary under test.
 fn binary_dir() -> PathBuf {
-    Path::new(env!("CARGO_BIN_EXE_mewkit-next"))
+    Path::new(env!("CARGO_BIN_EXE_mewkit"))
         .parent()
         .expect("the binary has a directory")
         .to_path_buf()
@@ -80,7 +80,7 @@ fn the_launcher_runs_the_binary_with_no_node_modules() {
     assert_eq!(code(&out), 0, "{}", text(&out));
     assert_eq!(
         String::from_utf8_lossy(&out.stdout).trim(),
-        format!("mewkit-next {}", mewkit_core::VERSION)
+        format!("mewkit {}", mewkit_core::VERSION)
     );
     // What the SessionStart orientation hook runs through the descriptor.
     let out = launch(&env, &["orient", "--no-record"]);

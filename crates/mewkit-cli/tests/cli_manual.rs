@@ -19,7 +19,7 @@ fn manual_path() -> PathBuf {
 /// Heading depth grows with nesting but stops at 4 so deep paths stay readable.
 fn render_node(out: &mut String, node: &Node) {
     let level = "#".repeat((node.path.len() + 1).min(4));
-    let help = node.help.replace("mewkit-next", "mewkit");
+    let help = &node.help;
     let _ = write!(
         out,
         "{level} mewkit {}\n\n```text\n{}\n```\n\n",

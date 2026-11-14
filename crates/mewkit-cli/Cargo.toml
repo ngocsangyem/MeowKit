@@ -1,6 +1,6 @@
 [package]
 name = "mewkit-cli"
-description = "The mewkit-next command line: argument parsing, output and exit codes."
+description = "The mewkit command line: argument parsing, output and exit codes."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -8,9 +8,11 @@ license.workspace = true
 repository.workspace = true
 publish.workspace = true
 
-# Named mewkit-next until cutover so it can sit beside the npm `mewkit` CLI.
+# One binary. `mk` and the pre-rename `mewkit-next` are links (copies on Windows) the
+# installer and self-update place beside it, not further `[[bin]]` targets: each target
+# would compile and ship another full copy.
 [[bin]]
-name = "mewkit-next"
+name = "mewkit"
 path = "src/main.rs"
 
 # The TS-vs-Rust comparison, declared rather than auto-discovered so the target

@@ -1,4 +1,4 @@
-//! `mewkit-next doctor`: checks of the toolchain, the installs at this scope
+//! `mewkit doctor`: checks of the toolchain, the installs at this scope
 //! and the other one, and whether their hooks can run. Plain `doctor` changes
 //! nothing; `--adopt` writes the install baseline and `--hard-gates` runs the
 //! kit's hooks in a scratch project. It never marks a project or hook as trusted.

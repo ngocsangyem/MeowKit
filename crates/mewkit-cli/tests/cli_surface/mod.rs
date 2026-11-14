@@ -9,7 +9,7 @@
 use std::collections::BTreeMap;
 use std::process::Command;
 
-const BIN: &str = env!("CARGO_BIN_EXE_mewkit-next");
+const BIN: &str = env!("CARGO_BIN_EXE_mewkit");
 
 /// One command in the tree: the path from the root, its raw help, its children.
 pub struct Node {
@@ -69,13 +69,12 @@ fn help_of(path: &[String]) -> String {
         .env_remove("COLUMNS")
         .env("NO_COLOR", "1")
         .output()
-        .expect("run mewkit-next --help");
+        .expect("run mewkit --help");
     assert!(out.status.success(), "`--help` failed for {path:?}");
     let help = String::from_utf8(out.stdout).expect("help is utf-8");
     // clap names the program in usage lines from argv[0], which on Windows carries the
     // `.exe` suffix; the committed manual is platform-neutral, so drop it and fold CRLF.
-    help.replace("\r\n", "\n")
-        .replace("mewkit-next.exe", "mewkit-next")
+    help.replace("\r\n", "\n").replace("mewkit.exe", "mewkit")
 }
 
 /// Names under the `Commands:` heading: the lines indented exactly two spaces.

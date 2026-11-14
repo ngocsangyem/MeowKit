@@ -45,7 +45,7 @@ pub fn checks(place: &Place, other: Option<&Place>, targets: &[Runtime]) -> Vec<
                 Status::Warn,
                 format!(
                     "this MeowKit project has no project install of {0}; the plan and review gates \
-                     run only from project hooks: `mewkit-next init --target {0}`",
+                     run only from project hooks: `mewkit init --target {0}`",
                     runtime.name()
                 ),
             ));
@@ -96,7 +96,7 @@ fn index_check(place: &Place, runtime: Runtime, out: &mut Vec<Check>) -> Option<
         (
             Status::Warn,
             format!(
-                "{summary} (e.g. {}); `mewkit-next upgrade --force` restores them",
+                "{summary} (e.g. {}); `mewkit upgrade --force` restores them",
                 sample.join(", ")
             ),
         )

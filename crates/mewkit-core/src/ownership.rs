@@ -78,7 +78,7 @@ pub enum IndexError {
     Invalid { path: String, reason: String },
     #[error(
         "ownership index {path} has schema {found}, newer than this binary's {SCHEMA_VERSION}; \
-         run `mewkit-next self-update`"
+         run `mewkit self-update`"
     )]
     Newer { path: String, found: u64 },
 }

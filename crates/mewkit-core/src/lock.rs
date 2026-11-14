@@ -1,4 +1,4 @@
-//! One writer per scope: a second `mewkit-next` (or a concurrent run of the
+//! One writer per scope: a second `mewkit` (or a concurrent run of the
 //! same one) waiting on a half-applied install would see a torn tree.
 use std::fs::{File, OpenOptions, TryLockError};
 use std::io;

@@ -2,13 +2,13 @@
 
 `ts-baseline/*.manifest.json` record what `mewkit init --target <t> --yes` (npm CLI)
 writes today, produced by `node scripts/capture-ts-baseline.mjs` from this
-checkout's git-tracked kit. They are a reference, not a contract: `mewkit-next`
+checkout's git-tracked kit. They are a reference, not a contract: `mewkit`
 must match them or list the difference here, with the decision behind it.
 
 Regenerate after any change to the kit or the npm CLI's install path, and check
 with `node scripts/capture-ts-baseline.mjs --check` (needs `npm run build`).
 
-| Target      | Path(s)                                                                         | TS behaviour                                                     | mewkit-next                                                                                                                                           | Decision                                                                                                                      |
+| Target      | Path(s)                                                                         | TS behaviour                                                     | mewkit                                                                                                                                           | Decision                                                                                                                      |
 | ----------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | cursor      | `AGENTS.md`                                                                     | written                                                          | not written; its text installs as `.cursor/rules/meowkit-core.mdc` (`alwaysApply: true`)                                                              | plan.md user decision 5 (2026-11-10)                                                                                          |
 | cursor      | `.cursor/hooks.json`                                                            | whole file replaced                                              | kit handlers merged flat and recorded; `version` merged; every handler on a blocking event gets `failClosed: true`                                    | user-owned file; maintainer decision 2026-11-11: a crashed gate must block                                                    |

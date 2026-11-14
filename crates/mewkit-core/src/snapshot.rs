@@ -63,7 +63,7 @@ pub fn outside_path(manifest: &Manifest) -> Option<&str> {
         .find(|p| !is_inside(p))
 }
 
-/// Backup directories with no snapshot manifest: the plain copies `mewkit-next`
+/// Backup directories with no snapshot manifest: the plain copies `mewkit`
 /// takes before `init`, `upgrade` and `uninstall` write. Listed so they are not
 /// mistaken for "no backups"; this command does not restore them.
 pub fn plain_copies(root: &Path) -> Vec<String> {

@@ -1,4 +1,4 @@
-//! `mewkit-next init`: install the kit for one or more runtimes.
+//! `mewkit init`: install the kit for one or more runtimes.
 mod choose;
 mod guard;
 mod mcp;

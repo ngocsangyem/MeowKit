@@ -77,7 +77,7 @@ fn list(root: &Path, args: &BackupsArgs) -> Result<u8, Failure> {
     }
     if !copies.is_empty() {
         println!(
-            "{} plain copy(ies) taken by mewkit-next init, upgrade or uninstall: {}",
+            "{} plain copy(ies) taken by mewkit init, upgrade or uninstall: {}",
             copies.len(),
             copies.join(", ")
         );

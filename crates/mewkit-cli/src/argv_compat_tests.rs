@@ -6,7 +6,7 @@ use super::normalise;
 /// pair, `note` with one positional and a value flag, `plan` with sub-verbs.
 fn cli() -> Command {
     let flag = |name: &'static str| Arg::new(name).long(name).action(ArgAction::SetTrue);
-    Command::new("mewkit-next")
+    Command::new("mewkit")
         .subcommand(
             Command::new("orient")
                 .arg(flag("json"))
@@ -28,7 +28,7 @@ fn cli() -> Command {
 }
 
 fn run(args: &[&str]) -> Vec<String> {
-    let mut argv = vec!["mewkit-next".to_string()];
+    let mut argv = vec!["mewkit".to_string()];
     argv.extend(args.iter().map(|a| a.to_string()));
     normalise(argv, &cli())[1..].to_vec()
 }
@@ -123,7 +123,7 @@ fn everything_after_a_double_dash_is_kept_verbatim() {
 /// command, which is why `main.rs` builds the root before rewriting argv.
 #[test]
 fn a_global_flag_on_the_verb_is_kept_after_a_sub_verb() {
-    let mut root = Command::new("mewkit-next").subcommand(
+    let mut root = Command::new("mewkit").subcommand(
         Command::new("task-state")
             .arg(
                 Arg::new("json")
@@ -134,7 +134,7 @@ fn a_global_flag_on_the_verb_is_kept_after_a_sub_verb() {
             .subcommand(Command::new("show").arg(Arg::new("id"))),
     );
     root.build();
-    let argv = ["mewkit-next", "task-state", "show", "--json"]
+    let argv = ["mewkit", "task-state", "show", "--json"]
         .map(String::from)
         .to_vec();
     assert_eq!(
@@ -147,7 +147,7 @@ fn a_global_flag_on_the_verb_is_kept_after_a_sub_verb() {
 /// sub-verb must reach that sub-verb, value and all.
 #[test]
 fn a_flag_before_its_sub_verb_still_reaches_it() {
-    let mut root = Command::new("mewkit-next").subcommand(
+    let mut root = Command::new("mewkit").subcommand(
         Command::new("plan").subcommand(
             Command::new("approve")
                 .arg(Arg::new("dir"))
@@ -156,17 +156,9 @@ fn a_flag_before_its_sub_verb_still_reaches_it() {
         ),
     );
     root.build();
-    let argv = [
-        "mewkit-next",
-        "plan",
-        "--by",
-        "me",
-        "--json",
-        "approve",
-        "d",
-    ]
-    .map(String::from)
-    .to_vec();
+    let argv = ["mewkit", "plan", "--by", "me", "--json", "approve", "d"]
+        .map(String::from)
+        .to_vec();
     assert_eq!(
         normalise(argv, &root)[1..],
         ["plan", "approve", "d", "--by=me", "--json"]

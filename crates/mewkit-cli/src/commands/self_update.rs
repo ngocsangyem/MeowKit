@@ -1,4 +1,4 @@
-//! `mewkit-next self-update`: replace this binary with the newest release on
+//! `mewkit self-update`: replace this binary with the newest release on
 //! its channel. Verification is by SHA-256 and size from the release's
 //! `binary-manifest.json`, fetched over TLS from this repository; there is no
 //! signature. The previous binary is kept beside the new one as `.old`.
@@ -40,7 +40,7 @@ pub fn run(args: &SelfUpdateArgs) -> Result<u8, Failure> {
     }
     if offer.is_ahead() {
         println!(
-            "mewkit-next {} is newer than the newest {} release ({})",
+            "mewkit {} is newer than the newest {} release ({})",
             offer.running,
             if channel == Channel::Beta {
                 "beta"
@@ -52,12 +52,12 @@ pub fn run(args: &SelfUpdateArgs) -> Result<u8, Failure> {
         return Ok(OK);
     }
     if !offer.is_newer() {
-        println!("mewkit-next {} is up to date", offer.running);
+        println!("mewkit {} is up to date", offer.running);
         return Ok(OK);
     }
     if args.check {
         println!(
-            "mewkit-next {} is available ({} running, {})",
+            "mewkit {} is available ({} running, {})",
             offer.latest, offer.running, offer.target
         );
         return Ok(PENDING);
@@ -67,11 +67,20 @@ pub fn run(args: &SelfUpdateArgs) -> Result<u8, Failure> {
         .map_err(|e| Failure::failed(format!("cannot locate the running binary: {e}")))?;
     let old = update::apply(&http, &offer, &exe)?;
     println!(
-        "updated mewkit-next {} -> {} ({}); the previous binary is kept at {}",
+        "updated mewkit {} -> {} ({}); the previous binary is kept at {}",
         offer.running,
         offer.latest,
         exe.display(),
         old.display()
     );
+    // The binary is updated whatever happens here: a name that cannot be placed is a
+    // warning, not a failed update.
+    let names = update::refresh_aliases(&exe);
+    if !names.placed.is_empty() {
+        println!("placed beside it: {}", names.placed.join(", "));
+    }
+    for problem in &names.problems {
+        eprintln!("warning: {problem}");
+    }
     Ok(OK)
 }

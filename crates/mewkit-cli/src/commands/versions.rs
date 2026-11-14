@@ -1,4 +1,4 @@
-//! `mewkit-next versions`: which kits are installed, cached and available,
+//! `mewkit versions`: which kits are installed, cached and available,
 //! and which kit contract this binary accepts.
 use clap::Args;
 use mewkit_adapters::contract::Runtime;
@@ -93,7 +93,7 @@ pub fn run(args: &VersionsArgs) -> Result<u8, Failure> {
 fn print_human(doc: &Value) {
     let s = |v: &Value| v.as_str().map_or_else(|| v.to_string(), str::to_owned);
     println!(
-        "mewkit-next {} (kit contract {}..={})",
+        "mewkit {} (kit contract {}..={})",
         s(&doc["binary"]),
         doc["kitContract"]["min"],
         doc["kitContract"]["max"]

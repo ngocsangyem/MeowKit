@@ -35,7 +35,7 @@ jobs:
       - name: Build the mewkit binary
         run: |
           cargo build -p mewkit-cli --locked
-          echo "MEWKIT=$GITHUB_WORKSPACE/target/debug/mewkit-next" >> "$GITHUB_ENV"
+          echo "MEWKIT=$GITHUB_WORKSPACE/target/debug/mewkit" >> "$GITHUB_ENV"
 
       - name: Build packages
         run: npm run build
@@ -410,4 +410,4 @@ jobs:
       # were POSIX shell. They are node now, so a skip here would mean the only
       # thing this port exists for is never verified.
       - name: Doctor hard gates
-        run: target/debug/mewkit-next.exe doctor --hard-gates
+        run: target/debug/mewkit.exe doctor --hard-gates

@@ -42,7 +42,7 @@ function kitMeowkitTargets() {
 }
 
 /**
- * The Codex and Cursor bundles the npm CLI installs today. `mewkit-next` installs
+ * The Codex and Cursor bundles the npm CLI installs today. The `mewkit` binary installs
  * both runtimes from the kit artifact, so the kit carries each bundle at its
  * source path rather than a second copy that would drift from it. They sit
  * outside `.claude/` on purpose: a Claude Code install copies `.claude/` whole,

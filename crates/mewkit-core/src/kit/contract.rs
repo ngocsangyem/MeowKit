@@ -48,12 +48,12 @@ pub fn check(c: &KitContract, binary: &str) -> Result<(), KitError> {
     if !SUPPORTED.contains(&c.kit_contract) {
         let (lo, hi) = (SUPPORTED.start(), SUPPORTED.end());
         let hint = if c.kit_contract > *hi {
-            "; run `mewkit-next self-update`"
+            "; run `mewkit self-update`"
         } else {
-            "; install an older mewkit-next or a newer kit"
+            "; install an older mewkit or a newer kit"
         };
         return Err(KitError::Contract(format!(
-            "kit {} uses kit contract {}, and this mewkit-next reads {lo}–{hi}{hint}",
+            "kit {} uses kit contract {}, and this mewkit reads {lo}–{hi}{hint}",
             c.kit_version, c.kit_contract
         )));
     }
@@ -67,7 +67,7 @@ pub fn check(c: &KitContract, binary: &str) -> Result<(), KitError> {
         .ok_or_else(|| KitError::Contract(format!("binary version {binary:?} is not a version")))?;
     if min > have {
         return Err(KitError::Contract(format!(
-            "kit {} needs mewkit ≥ {}; this is {binary}. Run `mewkit-next self-update`",
+            "kit {} needs mewkit ≥ {}; this is {binary}. Run `mewkit self-update`",
             c.kit_version, c.requires.mewkit_min
         )));
     }

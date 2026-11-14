@@ -1,4 +1,4 @@
-//! `mewkit-next upgrade`: move every installed runtime here to a newer kit.
+//! `mewkit upgrade`: move every installed runtime here to a newer kit.
 //!
 //! Targets and skill packs come from the ownership indexes. Files the new
 //! kit no longer ships are removed when their bytes still match what the
@@ -73,7 +73,7 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
     };
     if let Some(r) = targets.iter().find(|r| !installed.contains(r)) {
         return Err(Failure::usage(format!(
-            "{} is not installed here ({}); use `mewkit-next init --target {}`",
+            "{} is not installed here ({}); use `mewkit init --target {}`",
             r.name(),
             place.label(),
             r.name()
@@ -161,14 +161,14 @@ fn unmanaged_hint(place: &Place) -> String {
     let mut out = String::new();
     if !npm.is_empty() {
         out += &format!(
-            "; the npm mewkit CLI installed {0} here: `mewkit-next init --target {0}` \
+            "; the npm mewkit CLI installed {0} here: `mewkit init --target {0}` \
              (with the --skill-packs you want) takes it over, keeping files you edited",
             npm.join(",")
         );
     }
     if !bare.is_empty() {
         out += &format!(
-            "; {0} has no install record: `mewkit-next init --target {0}` installs the kit \
+            "; {0} has no install record: `mewkit init --target {0}` installs the kit \
              there and keeps every file that differs from it",
             bare.join(",")
         );

@@ -13,7 +13,7 @@ fn json(out: &std::process::Output) -> Value {
 #[test]
 fn versions_lists_installed_and_cached_kits_offline() {
     let env = TempHome::new();
-    let out = env.mewkit_next(&["versions", "--offline", "--json"]);
+    let out = env.mewkit(&["versions", "--offline", "--json"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     let doc = json(&out);
     assert_eq!(doc["installed"], serde_json::json!([]));
@@ -23,7 +23,7 @@ fn versions_lists_installed_and_cached_kits_offline() {
     let scratch = tempfile::tempdir().unwrap();
     let (zip, sha) = archive(scratch.path());
     let zip = zip.to_string_lossy().into_owned();
-    let out = env.mewkit_next(&[
+    let out = env.mewkit(&[
         "init",
         "--target",
         "codex",
@@ -34,7 +34,7 @@ fn versions_lists_installed_and_cached_kits_offline() {
         "--allow-unverified-kit",
     ]);
     assert_eq!(code(&out), 0, "{}", text(&out));
-    let doc = json(&env.mewkit_next(&["versions", "--offline", "--json"]));
+    let doc = json(&env.mewkit(&["versions", "--offline", "--json"]));
     assert_eq!(doc["installed"][0]["target"], "codex");
     assert_eq!(doc["installed"][0]["scope"], "project");
     assert_eq!(doc["installed"][0]["origin"], "archive");
@@ -70,7 +70,7 @@ fn doctor_passes_a_clean_install_and_fails_a_missing_hook_script() {
         code(&env.with_kit(&["init", "--target", "claude-code,codex,cursor"])),
         0
     );
-    let out = env.mewkit_next(&["doctor", "--json"]);
+    let out = env.mewkit(&["doctor", "--json"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     let checks = json(&out);
     let find = |name: &str| -> Value {
@@ -102,7 +102,7 @@ fn doctor_passes_a_clean_install_and_fails_a_missing_hook_script() {
         })
         .expect("a registered hook script");
     std::fs::remove_file(&script).unwrap();
-    let out = env.mewkit_next(&["doctor"]);
+    let out = env.mewkit(&["doctor"]);
     assert_eq!(code(&out), 1, "{}", text(&out));
     assert!(
         text(&out).contains("registered but missing"),
@@ -120,7 +120,7 @@ fn doctor_warns_about_two_scopes_and_a_project_relying_on_global_hooks() {
         0
     );
     write(&env.project(), ".meowkit/config.yaml", "tdd: off\n");
-    let out = env.mewkit_next(&["doctor", "--target", "codex"]);
+    let out = env.mewkit(&["doctor", "--target", "codex"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     assert!(
         text(&out).contains("no project install of codex"),
@@ -129,7 +129,7 @@ fn doctor_warns_about_two_scopes_and_a_project_relying_on_global_hooks() {
     );
 
     assert_eq!(code(&env.with_kit(&["init", "--target", "codex"])), 0);
-    let out = env.mewkit_next(&["doctor", "--target", "codex"]);
+    let out = env.mewkit(&["doctor", "--target", "codex"]);
     assert!(
         text(&out).contains("installed both in this project and globally"),
         "{}",
@@ -145,14 +145,14 @@ fn doctor_finds_global_hook_scripts_under_a_home_with_spaces() {
         let out = env.with_kit(&["init", "--target", t, "--global"]);
         assert_eq!(code(&out), 0, "{}", text(&out));
     }
-    let out = env.mewkit_next(&["doctor", "--global"]);
+    let out = env.mewkit(&["doctor", "--global"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     let report = text(&out);
     assert!(!report.contains("registered but missing"), "{report}");
     assert!(report.contains("kit hook scripts found"), "{report}");
 
     std::fs::remove_file(env.home().join(".codex/hooks.json")).unwrap();
-    let report = text(&env.mewkit_next(&["doctor", "--global"]));
+    let report = text(&env.mewkit(&["doctor", "--global"]));
     assert!(report.contains("no kit hook runs"), "{report}");
 }
 
@@ -163,11 +163,11 @@ fn doctor_resolves_global_cursor_hooks_from_the_cursor_dir() {
     let env = TempHome::new();
     let out = env.with_kit(&["init", "--target", "cursor", "--global"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
-    let out = env.mewkit_next(&["doctor", "--global", "--target", "cursor"]);
+    let out = env.mewkit(&["doctor", "--global", "--target", "cursor"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
 
     std::fs::remove_file(env.home().join(".cursor/hooks/privacy-read-gate.cjs")).unwrap();
-    let out = env.mewkit_next(&["doctor", "--global", "--target", "cursor"]);
+    let out = env.mewkit(&["doctor", "--global", "--target", "cursor"]);
     assert_eq!(code(&out), 1, "{}", text(&out));
     assert!(
         text(&out).contains("missing: ./hooks/privacy-read-gate.cjs"),

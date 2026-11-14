@@ -32,16 +32,16 @@ pub fn node(script: &str, args: &[&str]) -> Output {
 }
 
 pub fn asset_name(version: &str, target: &str) -> String {
-    format!("mewkit-next-{version}-{target}.tar.gz")
+    format!("mewkit-{version}-{target}.tar.gz")
 }
 
 /// A release archive for `target` whose binary holds `body`, laid out as the
 /// release job lays it out: one top directory holding the binary.
 pub fn archive(version: &str, target: &str, body: &[u8]) -> Vec<u8> {
     let exe = if target.contains("windows") {
-        "mewkit-next.exe"
+        "mewkit.exe"
     } else {
-        "mewkit-next"
+        "mewkit"
     };
     let mut tar = tar::Builder::new(flate2::write::GzEncoder::new(
         Vec::new(),
@@ -53,7 +53,7 @@ pub fn archive(version: &str, target: &str, body: &[u8]) -> Vec<u8> {
     header.set_cksum();
     tar.append_data(
         &mut header,
-        format!("mewkit-next-{version}-{target}/{exe}"),
+        format!("mewkit-{version}-{target}/{exe}"),
         body,
     )
     .unwrap();

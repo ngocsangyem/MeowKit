@@ -37,7 +37,7 @@ const VERSION = ${JSON.stringify(version)};
 const INSTALLED_BY = ${JSON.stringify(installedBy)};
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const UNAVAILABLE = ${LAUNCHER_UNAVAILABLE_EXIT};
-const BINARY_NAMES = ['mewkit-next', 'mewkit'];
+const BINARY_NAMES = ['mewkit', 'mk', 'mewkit-next'];
 
 function usableFile(candidate) {
   if (!candidate || !path.isAbsolute(candidate)) return null;
@@ -91,7 +91,7 @@ function compatible(found) {
   return true;
 }
 
-// \`mewkit-next 0.1.0\`. The Node package prints a bare version, so its \`mewkit\` shim on
+// \`mewkit 0.1.0\` (\`mewkit-next 0.1.0\` before the rename). The Node package prints a bare version, so its \`mewkit\` shim on
 // PATH is never taken for the binary.
 function binaryVersion(file) {
   const r = spawnSync(file, ['--version'], { encoding: 'utf8', timeout: 5000 });

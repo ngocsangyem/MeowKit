@@ -14,7 +14,7 @@ fn installed_from_archive() -> (TempHome, tempfile::TempDir) {
     let env = TempHome::new();
     let scratch = tempfile::tempdir().unwrap();
     let (zip, sha) = archive(scratch.path());
-    let out = env.mewkit_next(&[
+    let out = env.mewkit(&[
         "init",
         "--target",
         "codex",
@@ -37,13 +37,13 @@ fn check_compares_the_install_with_the_cached_kit_and_changes_nothing() {
     let (env, _scratch) = installed_from_archive();
     let before = sha_tree(&env.project());
 
-    let out = env.mewkit_next(&["upgrade", "--check", "--offline"]);
+    let out = env.mewkit(&["upgrade", "--check", "--offline"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     let shown = text(&out);
     assert!(shown.contains("installed (project): codex kit"), "{shown}");
     assert!(shown.contains("already up to date"), "{shown}");
 
-    let doc = json(&env.mewkit_next(&["upgrade", "--check", "--offline", "--json"]));
+    let doc = json(&env.mewkit(&["upgrade", "--check", "--offline", "--json"]));
     let row = &doc["installed"][0];
     assert_eq!(row["target"], "codex");
     assert!(row["update"].is_null(), "{doc}");
@@ -59,18 +59,18 @@ fn check_compares_the_install_with_the_cached_kit_and_changes_nothing() {
 #[test]
 fn list_marks_the_installed_release() {
     let (env, _scratch) = installed_from_archive();
-    let doc = json(&env.mewkit_next(&["upgrade", "--list", "--offline", "--json"]));
+    let doc = json(&env.mewkit(&["upgrade", "--list", "--offline", "--json"]));
     let releases = doc["releases"].as_array().expect("releases");
     assert_eq!(releases.len(), 1, "{doc}");
     assert_eq!(releases[0]["installedBy"], serde_json::json!(["codex"]));
-    let out = env.mewkit_next(&["upgrade", "--list", "--offline"]);
+    let out = env.mewkit(&["upgrade", "--list", "--offline"]);
     assert!(text(&out).contains("installed: codex"), "{}", text(&out));
 }
 
 #[test]
 fn queries_answer_with_nothing_installed_or_cached() {
     let env = TempHome::new();
-    let out = env.mewkit_next(&["upgrade", "--check", "--offline"]);
+    let out = env.mewkit(&["upgrade", "--check", "--offline"]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     assert!(
         text(&out).contains("installed (project): nothing"),
@@ -82,7 +82,7 @@ fn queries_answer_with_nothing_installed_or_cached() {
         "{}",
         text(&out)
     );
-    let doc = json(&env.mewkit_next(&["upgrade", "--list", "--offline", "--json"]));
+    let doc = json(&env.mewkit(&["upgrade", "--list", "--offline", "--json"]));
     assert_eq!(doc["releases"], serde_json::json!([]));
 }
 
@@ -93,7 +93,7 @@ fn check_is_not_a_dry_run_and_not_a_list() {
         ["upgrade", "--check", "--dry-run"],
         ["upgrade", "--check", "--list"],
     ] {
-        let out = env.mewkit_next(&args);
+        let out = env.mewkit(&args);
         assert_eq!(code(&out), 2, "{args:?}: {}", text(&out));
     }
 }

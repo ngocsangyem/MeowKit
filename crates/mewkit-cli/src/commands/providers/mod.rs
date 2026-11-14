@@ -1,4 +1,4 @@
-//! `mewkit-next providers`: what each runtime gets from the kit at this scope —
+//! `mewkit providers`: what each runtime gets from the kit at this scope —
 //! files, skills actually projected, hooks, and what it cannot carry.
 //!
 //! `--lifecycle` switches to the capability-adapter view the npm CLI shares

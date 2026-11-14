@@ -32,7 +32,7 @@ pub fn take(
 }
 
 /// Ignores everything beside it, so git never offers a backup for commit.
-const IGNORE_ALL: &[u8] = b"# Created by mewkit-next: backups can hold credentials.\n*\n";
+const IGNORE_ALL: &[u8] = b"# Created by mewkit: backups can hold credentials.\n*\n";
 
 /// `<backups_dir>/<unix-seconds>-<pid>[-n]`, created 0700. The backups
 /// directory carries its own `.gitignore`, since it sits in the user's project

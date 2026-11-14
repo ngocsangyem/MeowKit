@@ -31,10 +31,7 @@ impl Http for UreqHttp {
         let mut resp = self
             .agent
             .get(url)
-            .header(
-                "User-Agent",
-                concat!("mewkit-next/", env!("CARGO_PKG_VERSION")),
-            )
+            .header("User-Agent", concat!("mewkit/", env!("CARGO_PKG_VERSION")))
             .header(
                 "Accept",
                 "application/vnd.github+json, application/octet-stream",

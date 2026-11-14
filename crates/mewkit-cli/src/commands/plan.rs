@@ -3,7 +3,7 @@
 //!
 //! The npm CLI prints its own failures on STDOUT and exits non-zero, so this
 //! command returns the exit code it was given rather than a [`Failure`]: a
-//! `Failure` would print `mewkit-next: …` on stderr and lose the parity the
+//! `Failure` would print `mewkit: …` on stderr and lose the parity the
 //! hooks and skills that read this output depend on.
 use std::path::Path;
 
