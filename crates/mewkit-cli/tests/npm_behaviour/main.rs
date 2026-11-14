@@ -20,6 +20,12 @@
 //! `verdict_gate_cases.rs`) run the shipped `.cjs` hooks and so need `node` on
 //! PATH; they fail, not skip, when it is missing.
 //!
+//! Unix only. The goldens were recorded on macOS and the npm comparison only
+//! ever ran on Linux, so their paths use `/`, their fixtures rely on the
+//! executable bit, and the `git`/`gh` stand-ins are shell scripts. None of
+//! that holds on Windows, where `tests/cli.rs` and the adapter tests cover
+//! the binary instead.
+//!
 //! ## Writing a case (the whole API)
 //!
 //! ```ignore
@@ -45,6 +51,7 @@
 //! deliberately renders itself (clap's help). A declared redaction that never
 //! matches is itself a failure, so an allowance cannot outlive the difference
 //! it was written for.
+#![cfg(unix)]
 mod advice_cases;
 mod argv_table;
 mod backups_cases;
