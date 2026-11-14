@@ -14,7 +14,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { KIT_MEOWKIT_FILES as INSTALLER_MEOWKIT_FILES } from "../../core/install-meowkit-dir.js";
-import { REPO } from "./helpers/ship-set-view.js";
+import { REPO } from "../../../../../tests/release/helpers/ship-set-view.js";
 
 interface ShipSetModule {
 	ARCHIVE_TARGETS: string[];

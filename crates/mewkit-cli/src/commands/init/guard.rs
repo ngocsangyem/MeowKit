@@ -7,21 +7,15 @@
 use std::path::Path;
 
 use mewkit_adapters::ScopeKind;
+use mewkit_core::kit_source::is_kit_source_checkout;
 
 use crate::failure::FAILED;
 use crate::place::Place;
 
-/// True when `dir` is the MeowKit source repo: `.claude/` plus the `mewkit`
-/// package itself.
+/// True when `dir` is the MeowKit source repo: `.claude/` plus this CLI's own
+/// crate manifest.
 fn is_kit_source(dir: &Path) -> bool {
-    if !dir.join(".claude").exists() {
-        return false;
-    }
-    let Ok(text) = std::fs::read_to_string(dir.join("packages/mewkit/package.json")) else {
-        return false;
-    };
-    serde_json::from_str::<serde_json::Value>(&text)
-        .is_ok_and(|v| v["name"].as_str() == Some("mewkit"))
+    dir.join(".claude").exists() && is_kit_source_checkout(dir)
 }
 
 /// The exit code when this project is the kit source and no override was given.

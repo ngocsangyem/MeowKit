@@ -278,8 +278,8 @@ fn the_kit_source_repo_is_refused_unless_allowed() {
     write(&p, ".claude/keep", "");
     write(
         &p,
-        "packages/mewkit/package.json",
-        "{\"name\": \"mewkit\"}\n",
+        "crates/mewkit-cli/Cargo.toml",
+        "[package]\nname = \"mewkit-cli\"\n",
     );
     let out = env.with_kit(&["init", "--target", "codex"]);
     assert_eq!(code(&out), 1, "{}", text(&out));

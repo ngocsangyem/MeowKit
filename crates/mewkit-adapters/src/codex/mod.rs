@@ -22,7 +22,8 @@ use crate::{report_gate, scope, strip};
 /// The authored Codex bundle in the kit.
 pub const BUNDLE: Spec = Spec {
     runtime: "Codex",
-    dir: "packages/mewkit/src/migrate/modules/codex",
+    dir: "kit/bundles/codex",
+    legacy_dir: "packages/mewkit/src/migrate/modules/codex",
     skills: ".agents/skills/",
 };
 pub use shared::{AGENTS_MD, AGENTS_MD_BUDGET, BLOCK_ID, CONFIG_TOML, HOOKS_JSON};

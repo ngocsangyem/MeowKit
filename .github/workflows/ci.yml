@@ -24,6 +24,19 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # The mewkit CLI is the Rust binary: every `mewkit <verb>` step below runs it, and
+      # the kit-facing bless tests run here because Rust CI is path-filtered and would not
+      # see a `.claude/` change.
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build the mewkit binary
+        run: |
+          cargo build -p mewkit-cli --locked
+          echo "MEWKIT=$GITHUB_WORKSPACE/target/debug/mewkit-next" >> "$GITHUB_ENV"
+
       - name: Build packages
         run: npm run build
 
@@ -82,14 +95,14 @@ jobs:
         run: |
           set -euo pipefail
           # This repo's own store (may be absent — that is a legitimate PASS).
-          node packages/mewkit/dist/index.js validate --memory
+          "$MEWKIT" validate --memory
           # A store with REAL entries, so the step is not vacuous. Copied to a temp project
           # root (and git-init'd, since the root resolver keys off the VCS root) because the
           # fixture lives inside this repo and would otherwise resolve to the repo root.
           fixture_root="$(mktemp -d)"
           cp -R tests/fixtures/memory-store/. "$fixture_root/"
           git -C "$fixture_root" init -q .
-          ( cd "$fixture_root" && node "$GITHUB_WORKSPACE/packages/mewkit/dist/index.js" validate --memory )
+          ( cd "$fixture_root" && "$MEWKIT" validate --memory )
 
       - name: Zero-residue check (memory/wiki)
         run: node scripts/check-memory-wiki-residue.cjs
@@ -100,17 +113,17 @@ jobs:
       # passed only because another step installed something is a step that lies.
       - name: Multimodal mock tests
         run: |
-          node packages/mewkit/dist/index.js skill env multimodal
+          "$MEWKIT" skill env multimodal
           node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/tests/run_tests.py
 
       - name: Validate Figma evidence packet fixtures
         run: |
-          node packages/mewkit/dist/index.js skill env figma
+          "$MEWKIT" skill env figma
           node .claude/hooks/lib/skill-python.cjs .claude/skills/figma/evals/validate-evidence-packets.py
 
       - name: Test web-to-markdown URL SSRF guard
         run: |
-          node packages/mewkit/dist/index.js skill env web-to-markdown
+          "$MEWKIT" skill env web-to-markdown
           node .claude/hooks/lib/skill-python.cjs --skill web-to-markdown -m pytest \
             .claude/skills/web-to-markdown/tests/test_safe_url.py \
             .claude/skills/web-to-markdown/tests/test_e2e_offline.py -q
@@ -120,7 +133,7 @@ jobs:
 
       - name: Validate skill-creator fixtures
         run: |
-          node packages/mewkit/dist/index.js skill env skill-creator
+          "$MEWKIT" skill env skill-creator
           bash tests/fixtures/skill-creator/validate-fixtures.sh
 
       - name: Story-sizer deterministic tests
@@ -128,7 +141,7 @@ jobs:
 
       - name: Routing eval (Track D, EN + VI)
         run: |
-          node packages/mewkit/dist/index.js skill env scale-routing
+          "$MEWKIT" skill env scale-routing
           node .claude/hooks/lib/skill-python.cjs .claude/skills/scale-routing/eval/run-routing-eval.py
 
       - name: Critical-skill contract coverage suites
@@ -154,38 +167,37 @@ jobs:
         run: bash scripts/check-hook-registration.sh
 
       - name: Validate workflow spec drift
-        run: node packages/mewkit/dist/index.js validate --workflow
+        run: '"$MEWKIT" validate --workflow'
 
       - name: Validate gate-authority contract
-        run: node packages/mewkit/dist/index.js validate --gates
+        run: '"$MEWKIT" validate --gates'
 
-      # plugin/ is generated from .claude/. Regenerate into a scratch dir and
-      # diff: catches both a forgotten regenerate (plugin ships stale behavior)
-      # and a hand-edit (the next build silently discards it).
-      - name: Validate plugin parity
-        run: node packages/mewkit/dist/index.js validate --parity
+      # The default run: in this checkout it is the authoring-coherence suite.
+      - name: Validate the kit source (authoring suite)
+        run: '"$MEWKIT" validate'
 
       - name: Validate artifact ownership metadata
-        run: node packages/mewkit/dist/index.js validate --ownership
+        run: '"$MEWKIT" validate --ownership'
 
       - name: Validate declared agent contracts
-        run: node packages/mewkit/dist/index.js validate --agents
+        run: '"$MEWKIT" validate --agents'
 
       - name: Validate pack manifest coherence + safety invariant
-        run: node packages/mewkit/dist/index.js validate --packs
+        run: '"$MEWKIT" validate --packs'
 
-      # Structural Codex compatibility canary: install the authored bundle via
-      # `init --target codex` into a temp dir and run structural validation on the
-      # RESULT. No Codex CLI in CI, so the live execpolicy/version checks skip
-      # gracefully; the structural proof is blocking (a broken bundle fails here).
+      # Structural Codex compatibility canary: install this checkout's bundle with
+      # `init --target codex` into a temp project and validate the RESULT, so a broken
+      # authored bundle fails here.
       - name: Codex bundle compatibility lane (structural)
-        run: node packages/mewkit/scripts/codex-compat-check.mjs
+        run: |
+          set -euo pipefail
+          project="$(mktemp -d)"
+          git -C "$project" init -q .
+          ( cd "$project" && "$MEWKIT" init --target codex --yes --kit-dir "$GITHUB_WORKSPACE" --allow-unverified-kit )
+          "$MEWKIT" validate --target codex "$project"
 
       - name: Validate responsibility substrate (tagging + view drift)
-        run: node packages/mewkit/dist/index.js validate --substrate
-
-      - name: Validate plugin namespace + manifest contract
-        run: node packages/mewkit/dist/index.js validate --plugin
+        run: '"$MEWKIT" validate --substrate'
 
       # One budget number: the always-on rule set a session loads on every turn. The old
       # 131000-token core guardrail was never enforced (it blocked every run instead of
@@ -207,23 +219,20 @@ jobs:
       - name: Check environment-name reads are classified
         run: node scripts/check-env-reads.cjs
 
-      - name: Check the published config schema is not stale
-        run: node scripts/generate-config-schema.cjs --check
+      # Generated kit files are rendered from Rust and compared byte-for-byte with the
+      # committed copies: the substrate view, the declared counts, the config schema
+      # (observer toggles come from the hook registry) and the agent-facing CLI reference.
+      # Regenerate with `MEWKIT_BLESS=1 cargo test -p <crate> --test <name>`.
+      - name: Substrate view and README/index counts match the inventory
+        run: cargo test -p mewkit-core --locked --test bless_substrate_view --test bless_inventory_counts
 
-      # A `mewkit <verb>` a skill tells an agent to run must exist. A renamed or
-      # never-shipped verb fails mid-session, inside a workflow the agent cannot
-      # finish; the catalogue is the source, so this cannot go stale.
-      - name: Check every mewkit verb the kit names resolves
-        run: node scripts/check-kit-verbs.cjs
+      - name: Published config schema matches the config surface
+        run: cargo test -p mewkit-core --locked --test config_schema
 
-      # The agent-facing CLI reference is generated from the same catalogue the dispatcher
-      # reads, so a surface change that skips regeneration is a stale instruction shipped
-      # to every project.
-      - name: Generated CLI reference matches the command catalogue
-        run: node scripts/generate-cli-manual.cjs --check
-
-      - name: Validate README, website, and index counts (stale-index)
-        run: node scripts/harness-inventory.cjs --check
+      # A `mewkit <verb>` a skill tells an agent to run must exist, and the CLI reference
+      # shipped to every project must match the binary.
+      - name: Kit verbs resolve and the CLI reference matches the binary
+        run: cargo test -p mewkit-cli --locked --test kit_verbs --test cli_manual
 
       - name: Verify high-traffic dependency metadata
         run: node scripts/scan-skill-dependency-edges.mjs --check-high-traffic
@@ -235,10 +244,10 @@ jobs:
         run: node scripts/terminology-linter.cjs
 
       - name: Validate skill frontmatter
-        run: node packages/mewkit/dist/index.js validate --frontmatter
+        run: '"$MEWKIT" validate --frontmatter'
 
       - name: Validate docs references on Type-1 allowlist
-        run: node packages/mewkit/dist/index.js validate --docs-refs
+        run: '"$MEWKIT" validate --docs-refs'
 
       - name: Validate rule availability
         run: bash scripts/validate-rule-availability.sh
@@ -304,12 +313,15 @@ jobs:
         run: npm run typecheck -w packages/docs
 
       # Honest drift detection needs the manifest re-derived against the live `.claude/` tree,
-      # so this job builds the generator rather than trusting the committed JSON.
-      - name: Build the CLI (the docs manifest generator)
-        run: npm run build -w packages/mewkit
+      # so this job renders it from Rust rather than trusting the committed JSON. Regenerate
+      # with `MEWKIT_BLESS=1 cargo test -p mewkit-core --test bless_docs_manifest`.
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
 
       - name: Docs reference manifest and pages match the runtime
-        run: node scripts/docs-manifest.cjs --check
+        run: cargo test -p mewkit-core --locked --test bless_docs_manifest
 
       - name: Frontmatter contract holds
         run: npm run check:frontmatter -w packages/docs
@@ -380,8 +392,13 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build packages
-        run: npm run build
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build the mewkit binary
+        run: cargo build -p mewkit-cli --locked
 
       - name: Hook suites (golden replay, crash paths, dispatcher, isolation, env allowlist)
         run: npx vitest run tests/hooks
@@ -393,4 +410,4 @@ jobs:
       # were POSIX shell. They are node now, so a skip here would mean the only
       # thing this port exists for is never verified.
       - name: Doctor hard gates
-        run: node packages/mewkit/dist/index.js doctor --hard-gates
+        run: target/debug/mewkit-next.exe doctor --hard-gates

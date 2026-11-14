@@ -46,11 +46,10 @@ const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---/;
  * never received one — or whose copy a user edited — made the check report a
  * fatal instead of validating anything.
  *
- * `../../schemas/` resolves to the package root from both `src/core/` and the
- * compiled `dist/core/`, so the source tree and a published install read the
- * same file through the same path.
+ * The schema lives with the Rust crate that embeds it; this path reaches it
+ * from both `src/core/` and the compiled `dist/core/` inside the repository.
  */
-const SCHEMA_PATH = fileURLToPath(new URL("../../schemas/skill-schema.json", import.meta.url));
+const SCHEMA_PATH = fileURLToPath(new URL("../../../../crates/mewkit-core/schemas/skill-schema.json", import.meta.url));
 
 export interface FrontmatterReport {
 	errors: string[];

@@ -21,15 +21,8 @@
 //! `--portable` adds the provider-contract surface matrix in either mode, and
 //! `--target <provider>` validates a GENERATED provider tree instead of this
 //! one.
-//!
-//! ## The one thing that is not ported
-//!
-//! The Codex PROJECTION rows under `--portable` (for a generated `.codex/` or
-//! `.agents/skills` tree inside the project being validated) count the skills a
-//! provider may carry, which needs the portability-policy engine. A project
-//! carrying such a tree is refused by name through [`NotPorted`] rather than
-//! half-reported: a partial report that exited 0 would be read by CI as a full
-//! pass, which is the one outcome a validator must not produce.
+//! A Codex tree inside the project is pointed at `--target codex` rather than
+//! re-checked under `--portable`.
 mod agent_conformance;
 mod agent_registry_rows;
 mod agent_sources;
@@ -81,6 +74,7 @@ mod result;
 mod routing_breadth;
 mod runtime_contract;
 mod stale_index;
+mod stale_index_emit;
 mod stale_index_specs;
 mod structure;
 mod substrate;
@@ -114,7 +108,7 @@ pub use capability_rows::{
     ViewDriftState, capability_view_drift, check_capabilities_section, check_capability_view_drift,
     render_capability_view,
 };
-pub use default_checks::{NotPorted, ValidateMode, build_default_checks, detect_validate_mode};
+pub use default_checks::{ValidateMode, build_default_checks, detect_validate_mode};
 pub use docs_refs::{
     CONTRACT_REL_PATH, DocsRefFinding, DocsRefResult, RefLevel, check_docs_references,
 };
@@ -165,6 +159,7 @@ pub use result::{CheckResult, Section, Status, ok};
 pub use routing_breadth::{check_routing_table_breadth, resolve_inventory_path};
 pub use runtime_contract::{RUNTIME_KEY, documented_python_scripts, runtime_contract_errors};
 pub use stale_index::{CountDiff, check_stale_index, compare_counts, missing_rows};
+pub use stale_index_emit::rewrite_count_tokens;
 pub use structure::{
     ALWAYS_ON_RULES, always_on_rule_paths, check_config, check_dir_exists, check_file_exists,
 };

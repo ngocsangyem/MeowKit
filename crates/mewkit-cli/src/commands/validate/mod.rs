@@ -17,16 +17,15 @@ use mewkit_core::validate::{
 
 use crate::failure::{FAILED, Failure};
 
-use scoped::{not_ported_failure, scoped_run};
+use scoped::scoped_run;
 use target::validate_target;
 
 #[derive(Args, Debug)]
 pub struct ValidateArgs {
     /// Maintainer override for the detected consumer profile.
-    ///
-    /// The value is checked by hand rather than by a clap `value_parser`: the
-    /// npm CLI rejects a bad mode with its own message and exit 1, and clap's
-    /// usage error would exit 2 — a different answer to the same mistake.
+    // The value is checked by hand rather than by a clap `value_parser`: the
+    // npm CLI rejects a bad mode with its own message and exit 1, and clap's
+    // usage error would exit 2 — a different answer to the same mistake.
     #[arg(long, value_name = "MODE")]
     pub mode: Option<String>,
     /// Validate a generated provider target instead of a `.claude/` project.
@@ -122,9 +121,8 @@ pub fn run(args: &ValidateArgs) -> Result<u8, Failure> {
     let project_root = meowkit_dir.parent().unwrap_or(&cwd).to_path_buf();
 
     match scoped_run(args, &meowkit_dir, &project_root) {
-        Ok(Some(results)) => report(results, args.strict),
-        Ok(None) => default_run(args, mode_override, &meowkit_dir, &project_root),
-        Err(not_ported) => Err(not_ported_failure(&not_ported)),
+        Some(results) => report(results, args.strict),
+        None => default_run(args, mode_override, &meowkit_dir, &project_root),
     }
 }
 
@@ -146,10 +144,10 @@ fn default_run(
         mode.description()
     );
     println!();
-    match build_default_checks(meowkit_dir, project_root, mode, args.portable) {
-        Ok(results) => report(results, args.strict),
-        Err(not_ported) => Err(not_ported_failure(&not_ported)),
-    }
+    report(
+        build_default_checks(meowkit_dir, project_root, mode, args.portable),
+        args.strict,
+    )
 }
 
 /// Print the report and hand back the code it earned: 0, or 1 for a FAIL (or a

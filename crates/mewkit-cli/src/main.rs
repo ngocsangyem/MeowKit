@@ -78,11 +78,11 @@ enum Command {
     /// Prepare, read, compose and submit a structured code review.
     Review(ReviewArgs),
     /// Athena supervision checkpoints: evidence in, advice out (never approval).
-    ///
-    /// Boxed: the npm CLI parses one global flag table, so this verb declares
-    /// every flag its four subcommands accept and its argument struct is twice
-    /// the size of the next largest. Inline, it would set the size of EVERY
-    /// variant of this enum.
+    //
+    // Boxed: the npm CLI parses one global flag table, so this verb declares
+    // every flag its four subcommands accept and its argument struct is twice
+    // the size of the next largest. Inline, it would set the size of EVERY
+    // variant of this enum. (Plain comment: a doc line would reach `--help`.)
     Advice(Box<AdviceArgs>),
     /// On-demand trace recall: score, audit, propose, record friction.
     Trace(TraceArgs),

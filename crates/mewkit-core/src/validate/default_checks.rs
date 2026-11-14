@@ -63,43 +63,14 @@ impl ValidateMode {
 
 /// Detect the mode from the project layout.
 ///
-/// The source checkout ships the CLI TypeScript source beside its `.claude/`; a
-/// consumer flat-copy install has `.claude/` and no CLI source tree. That single
+/// The source checkout carries this CLI's own crate beside its `.claude/`; a
+/// consumer flat-copy install has `.claude/` and no CLI source. That single
 /// filesystem signal is the discriminator, and an explicit mode overrides it.
 pub fn detect_validate_mode(project_root: &Path) -> ValidateMode {
-    let cli_source = project_root.join("packages").join("mewkit").join("src");
-    if cli_source.exists() {
+    if crate::kit_source::is_kit_source_checkout(project_root) {
         ValidateMode::Authoring
     } else {
         ValidateMode::FlatCopy
-    }
-}
-
-/// A run this binary cannot answer, named so the caller can route it.
-///
-/// Carrying the npm invocation rather than a bare "unsupported" is the point: a
-/// user who asked for a check must be told where the check still lives, and CI
-/// must not read the refusal as a verdict about the project. One path still
-/// uses it — see [`build_default_checks`].
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct NotPorted {
-    /// What was asked for, in the user's own terms (`--workflow`, `authoring`).
-    pub asked_for: String,
-    /// The npm invocation that answers it today.
-    pub npm_invocation: String,
-    /// The checks that are missing, for a message that says why.
-    pub missing: Vec<&'static str>,
-}
-
-impl std::fmt::Display for NotPorted {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "validate {} is not ported yet ({}). Run it with the npm `mewkit` CLI: `{}`.",
-            self.asked_for,
-            self.missing.join(", "),
-            self.npm_invocation
-        )
     }
 }
 
@@ -114,7 +85,7 @@ pub fn build_default_checks(
     project_root: &Path,
     mode: ValidateMode,
     portable: bool,
-) -> Result<Vec<CheckResult>, NotPorted> {
+) -> Vec<CheckResult> {
     let mut results = vec![
         check_dir_exists(meowkit_dir, "agents"),
         check_dir_exists(meowkit_dir, "hooks"),
@@ -165,21 +136,27 @@ pub fn build_default_checks(
 
     if portable {
         results.extend(check_portability());
-        // The Codex PROJECTION rows (for a generated `.codex/`/`.agents/` tree
-        // in THIS project) need the portability-policy engine to count the
-        // skills a provider may carry. That engine is not ported, so a project
-        // that HAS such a tree is refused by name rather than half-reported.
-        if project_root.join(".codex").exists()
-            || project_root.join(".agents").join("skills").exists()
-        {
-            return Err(NotPorted {
-                asked_for: "--portable for a project carrying a generated Codex tree".to_string(),
-                npm_invocation: "npx mewkit validate --portable".to_string(),
-                missing: vec!["the Codex projection rows (portable-skill policy)"],
-            });
-        }
+        results.extend(codex_tree_pointer(project_root));
     }
-    Ok(results)
+    results
+}
+
+/// A Codex tree in this project is checked by `--target codex`, which reads
+/// what an install actually writes. The surface matrix above describes the
+/// provider contracts, not one install, so it says where that check lives
+/// instead of re-deriving a skill count from `.claude/skills` that an install
+/// filtered by packs would never match.
+fn codex_tree_pointer(project_root: &Path) -> Option<CheckResult> {
+    let has_tree = project_root.join(".codex").exists()
+        || project_root.join(".agents").join("skills").exists();
+    has_tree.then(|| {
+        CheckResult::new(
+            "Codex projection",
+            Status::Na,
+            "a Codex tree is present; validate it with `mewkit validate --target codex .`",
+            Section::Portability,
+        )
+    })
 }
 
 #[cfg(test)]

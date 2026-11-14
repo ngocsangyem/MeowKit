@@ -5,7 +5,9 @@
 //! render→parse round trip inside one implementation passes while the on-disk
 //! format diverges. These fixtures were produced by running the shipped
 //! TypeScript writers — `activateTask`, `writeDossier`, `VerdictSchema.parse` —
-//! see `tests/fixtures/generate.mjs` for the exact script and how to re-run it.
+//! before that implementation was retired. They are frozen: projects installed
+//! by the npm CLI still carry files in exactly this shape, so the Rust readers
+//! must keep accepting them.
 //!
 //! What this catches that nothing else does: a field the TS writes and the Rust
 //! does not model, a key spelling that drifted, a renderer whose output the Rust

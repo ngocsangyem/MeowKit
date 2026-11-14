@@ -30,7 +30,8 @@ pub use hooks::{BLOCKING, HOOKS_JSON};
 /// The authored Cursor bundle in the kit.
 pub const BUNDLE: Spec = Spec {
     runtime: "Cursor",
-    dir: "packages/mewkit/src/migrate/modules/cursor",
+    dir: "kit/bundles/cursor",
+    legacy_dir: "packages/mewkit/src/migrate/modules/cursor",
     skills: ".cursor/skills/",
 };
 /// Where the bundle's `AGENTS.md` guidance is installed.

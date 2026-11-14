@@ -2407,8 +2407,8 @@
     },
     {
       "path": ".claude/skills/help/references/cli.md",
-      "sha256": "b81c56a9d5e8e746863e25fe897d2adabdabd9c38cb1c305f05de1a4481cdcf2",
-      "size": 13780
+      "sha256": "5d39bcef88e97124c580cc329cea73ffe4eb172ca1ed4498c9d9640e412a2fe0",
+      "size": 23347
     },
     {
       "path": ".claude/skills/henshin/SKILL.md",
@@ -5828,8 +5828,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/agents/AGENTS_INDEX.md",
-      "sha256": "5bb3c5aaf724c46c7cc28d541351e1619317e1de6c6eeaa946f8e3a44b73bd7b",
-      "size": 10548
+      "sha256": "23e6a07a1cc89ddf4ec841a1eb58485016ac0384f235cb6a37f7ff75ff738d5d",
+      "size": 10575
     },
     {
       "path": ".meowkit/cache/.claude/agents/SKILLS_INDEX.md",
@@ -8180,8 +8180,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/skills/help/references/cli.md",
-      "sha256": "b81c56a9d5e8e746863e25fe897d2adabdabd9c38cb1c305f05de1a4481cdcf2",
-      "size": 13780
+      "sha256": "5d39bcef88e97124c580cc329cea73ffe4eb172ca1ed4498c9d9640e412a2fe0",
+      "size": 23347
     },
     {
       "path": ".meowkit/cache/.claude/skills/henshin/SKILL.md",

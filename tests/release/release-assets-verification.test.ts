@@ -10,9 +10,9 @@ import { join } from "node:path";
 
 import { afterAll, describe, expect, it } from "vitest";
 
-import { craftZip } from "../../../tests/helpers/craft-zip.js";
+import { craftZip } from "./helpers/craft-zip.js";
 // The script the release runs, not a copy of its rules.
-import { verifyReleaseAssets } from "../../../../../scripts/verify-release-assets.cjs";
+import { verifyReleaseAssets } from "../../scripts/verify-release-assets.cjs";
 
 const VERSION = "9.9.9";
 const roots: string[] = [];

@@ -9,9 +9,11 @@ Read-only audit of `.codex/` structural overhead. Surfaces what is loaded into
 every host-runtime session and how much of the context window it consumes,
 then recommends the highest-leverage trims.
 
-Complementary lens: `scripts/harness-inventory.cjs --substrate` (a maintainer script in the toolkit source repository, not part of this install) shows the same artifact set
-grouped by the responsibility each serves (covered / partial / missing), so a trim
-can be checked against responsibility coverage before removing an artifact. The
+Complementary lens: the toolkit source repository (not part of this install) keeps a
+generated substrate view that groups the same artifact set by the responsibility each
+serves (covered / partial / missing), and `mewkit validate --substrate` there reports
+whether that view is in sync and every responsibility is covered, so a trim can be
+checked against responsibility coverage before removing an artifact. The
 per-phase read budget that bounds what an audit-driven session should load lives in
 the context-budget rules.
 
