@@ -67,11 +67,11 @@ fn the_session_start_handler_accepts_the_rust_orientation() {
     .expect("copy the handler");
 
     let binary = project.join(".claude").join(if cfg!(windows) {
-        "mewkit-next.exe"
+        "mewkit.exe"
     } else {
-        "mewkit-next"
+        "mewkit"
     });
-    std::fs::copy(env!("CARGO_BIN_EXE_mewkit-next"), &binary).expect("copy the binary");
+    std::fs::copy(env!("CARGO_BIN_EXE_mewkit"), &binary).expect("copy the binary");
     std::fs::write(
         project.join(".claude").join("runtime.json"),
         format!(

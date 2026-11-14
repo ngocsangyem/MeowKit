@@ -161,7 +161,7 @@ pub fn run(args: &AdviceArgs) -> Result<u8, Failure> {
         }
         // `Fatal:` on stdout's sibling stream and exit 1, which is what the npm
         // CLI's top-level handler prints — not this binary's own
-        // `mewkit-next: …`, because a skill greps these lines.
+        // `mewkit: …`, because a skill greps these lines.
         Err(AdviceError::Hard(message)) => {
             eprintln!("Fatal: {message}");
             Ok(FAILED)

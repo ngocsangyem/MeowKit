@@ -1,4 +1,4 @@
-//! End-to-end checks of the `mewkit-next` binary's entry surface.
+//! End-to-end checks of the `mewkit` binary's entry surface.
 mod support;
 
 use support::temp_home::{TempHome, assert_home_is_temp};
@@ -33,20 +33,52 @@ fn spawned_command_sees_the_redirected_home() {
 
 #[test]
 fn version_prints_workspace_version() {
-    let out = TempHome::new().mewkit_next(&["--version"]);
+    let out = TempHome::new().mewkit(&["--version"]);
     assert!(out.status.success());
     let stdout = String::from_utf8_lossy(&out.stdout);
     assert_eq!(
         stdout.trim(),
-        format!("mewkit-next {}", env!("CARGO_PKG_VERSION"))
+        format!("mewkit {}", env!("CARGO_PKG_VERSION"))
+    );
+}
+
+/// The installer places `mk` and `mewkit-next` beside `mewkit`: a link on Unix, a copy on
+/// Windows. `mk` must behave exactly as `mewkit`; `mewkit-next` may only add the rename
+/// notice on stderr, so a script or old kit that still calls it keeps parsing stdout.
+#[test]
+fn mk_and_mewkit_next_run_the_same_binary() {
+    let env = TempHome::new();
+    let dir = tempfile::tempdir().unwrap();
+    let run = |name: &str| {
+        let path = dir
+            .path()
+            .join(format!("{name}{}", std::env::consts::EXE_SUFFIX));
+        #[cfg(unix)]
+        std::os::unix::fs::symlink(env!("CARGO_BIN_EXE_mewkit"), &path).unwrap();
+        #[cfg(not(unix))]
+        std::fs::copy(env!("CARGO_BIN_EXE_mewkit"), &path).unwrap();
+        env.command(&path).arg("--version").output().unwrap()
+    };
+    let canonical = env.mewkit(&["--version"]);
+    let mk = run("mk");
+    assert_eq!(mk.status.code(), Some(0));
+    assert_eq!(mk.stdout, canonical.stdout);
+    assert_eq!(mk.stderr, canonical.stderr);
+
+    let next = run("mewkit-next");
+    assert_eq!(next.status.code(), Some(0));
+    assert_eq!(next.stdout, canonical.stdout);
+    assert_eq!(
+        String::from_utf8_lossy(&next.stderr).trim(),
+        r#"mewkit-next is now mewkit; run "mewkit" (or "mk")"#
     );
 }
 
 #[test]
 fn help_succeeds() {
-    let out = TempHome::new().mewkit_next(&["--help"]);
+    let out = TempHome::new().mewkit(&["--help"]);
     assert!(out.status.success());
-    assert!(String::from_utf8_lossy(&out.stdout).contains("npm `mewkit` CLI"));
+    assert!(String::from_utf8_lossy(&out.stdout).contains("npm `mewkit` package"));
 }
 
 /// The example verb has to be one this binary does NOT implement. It named
@@ -56,7 +88,7 @@ fn help_succeeds() {
 /// at the npm CLI, until cutover retires that CLI and this wording with it.
 #[test]
 fn unknown_command_exits_2_and_names_the_npm_cli() {
-    let out = TempHome::new().mewkit_next(&["no-such-verb", "--json"]);
+    let out = TempHome::new().mewkit(&["no-such-verb", "--json"]);
     assert_eq!(out.status.code(), Some(2));
     let stderr = String::from_utf8_lossy(&out.stderr);
     assert!(
@@ -76,7 +108,7 @@ fn an_unknown_flag_or_a_stray_positional_is_ignored_like_the_npm_cli() {
         vec!["orient", "--json=yes", "--no-record"],
         vec!["orient", "stray", "--no-record"],
     ] {
-        let out = TempHome::new().mewkit_next(&args);
+        let out = TempHome::new().mewkit(&args);
         assert_eq!(out.status.code(), Some(0), "args {args:?}");
         assert!(!out.stdout.is_empty(), "args {args:?} must still orient");
     }
@@ -89,14 +121,14 @@ fn bare_orient_records_and_no_record_does_not() {
     let trace = ".meowkit/telemetry/trace-log.jsonl";
     let env = TempHome::new();
     assert_eq!(
-        env.mewkit_next(&["orient", "--no-record"]).status.code(),
+        env.mewkit(&["orient", "--no-record"]).status.code(),
         Some(0)
     );
     assert!(
         !env.project().join(trace).exists(),
         "--no-record wrote a trace"
     );
-    assert_eq!(env.mewkit_next(&["orient"]).status.code(), Some(0));
+    assert_eq!(env.mewkit(&["orient"]).status.code(), Some(0));
     assert!(
         env.project().join(trace).exists(),
         "bare orient did not record"

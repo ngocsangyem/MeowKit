@@ -13,7 +13,7 @@ use support::temp_home::TempHome;
 use support::{code, text};
 
 const VERSION: &str = "9.9.9";
-const BODY: &[u8] = b"pretend this is mewkit-next\n";
+const BODY: &[u8] = b"pretend this is mewkit\n";
 
 /// An installer pinned to `served` (stable channel), where the server sends
 /// `sent` instead when it is given; returns the server and the rendered dir.
@@ -79,11 +79,11 @@ fn install(env: &TempHome, rendered: &Path, dest: &Path, vars: &[(&str, &str)]) 
 }
 
 fn installed(dest: &Path) -> PathBuf {
-    dest.join(if cfg!(windows) {
-        "mewkit-next.exe"
-    } else {
-        "mewkit-next"
-    })
+    named(dest, "mewkit")
+}
+
+fn named(dest: &Path, name: &str) -> PathBuf {
+    dest.join(format!("{name}{}", std::env::consts::EXE_SUFFIX))
 }
 
 #[test]
@@ -94,6 +94,11 @@ fn the_pinned_archive_installs() {
     let out = install(&env, rendered.path(), &dest, &[]);
     assert_eq!(code(&out), 0, "{}", text(&out));
     assert_eq!(std::fs::read(installed(&dest)).unwrap(), BODY);
+    // `mk` and the pre-rename `mewkit-next` run the same binary: a link on Unix, a copy
+    // on Windows. Reading through either yields the installed bytes.
+    for alias in ["mk", "mewkit-next"] {
+        assert_eq!(std::fs::read(named(&dest, alias)).unwrap(), BODY, "{alias}");
+    }
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
@@ -104,6 +109,29 @@ fn the_pinned_archive_installs() {
         assert_eq!(mode & 0o111, 0o111, "executable: {mode:o}");
     }
     assert!(text(&out).contains("not on your PATH"), "{}", text(&out));
+}
+
+/// `mk` is short enough that another tool may own it: the installer must not clobber it.
+#[cfg(unix)]
+#[test]
+fn an_mk_owned_by_another_tool_is_left_alone() {
+    use std::os::unix::fs::PermissionsExt;
+    let env = TempHome::new();
+    let (_server, rendered) = setup(None);
+    let dest = env.home().join("bin");
+    std::fs::create_dir_all(&dest).unwrap();
+    let foreign = b"#!/bin/sh\necho 'mk 4.2 (some other tool)'\n";
+    std::fs::write(dest.join("mk"), foreign).unwrap();
+    std::fs::set_permissions(dest.join("mk"), std::fs::Permissions::from_mode(0o755)).unwrap();
+    let out = install(&env, rendered.path(), &dest, &[]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert_eq!(std::fs::read(dest.join("mk")).unwrap(), foreign);
+    assert!(
+        text(&out).contains("is not mewkit; left as it is"),
+        "{}",
+        text(&out)
+    );
+    assert_eq!(std::fs::read(named(&dest, "mewkit-next")).unwrap(), BODY);
 }
 
 #[test]

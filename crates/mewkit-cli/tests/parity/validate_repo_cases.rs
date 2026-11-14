@@ -31,7 +31,7 @@ fn compare_in_repo(name: &'static str, args: &[&str]) -> Option<parity::Run> {
     assert_eq!(
         ts.code,
         rust.code,
-        "[{name}] exit code differs\n--- npm CLI ---\n{}\n--- mewkit-next ---\n{}",
+        "[{name}] exit code differs\n--- npm CLI ---\n{}\n--- mewkit ---\n{}",
         ts.describe(),
         rust.describe()
     );

@@ -1,4 +1,4 @@
-//! Runtime-agnostic core of the `mewkit-next` installer.
+//! Runtime-agnostic core of the `mewkit` installer.
 //!
 //! This crate stays a pure library — no argument parsing, no prompts, no
 //! `process::exit` — so every behaviour it owns is testable without a TTY.

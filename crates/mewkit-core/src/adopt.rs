@@ -1,5 +1,5 @@
 //! What the npm `mewkit` CLI recorded about an install, read so that
-//! `mewkit-next` can take the install over.
+//! `mewkit` can take the install over.
 //!
 //! A path is adopted only when its bytes on disk still match the recorded
 //! checksum, so a file the user edited after the npm install stays theirs.

@@ -9,7 +9,7 @@
 //! The npm CLI classifies a wrong sub-verb from its catalogue before dispatching
 //! and hooks read that exact text, so [`run`] reproduces the refusal verbatim
 //! instead of letting clap word it. A failure prints the npm CLI's own line and
-//! exits non-zero rather than returning a [`Failure`], whose `mewkit-next:`
+//! exits non-zero rather than returning a [`Failure`], whose `mewkit:`
 //! prefix would break that parity.
 use std::path::Path;
 

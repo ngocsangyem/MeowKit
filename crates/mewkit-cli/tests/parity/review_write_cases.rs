@@ -277,7 +277,7 @@ fn a_prepared_session_is_identical_apart_from_its_generated_id() {
     assert_eq!(
         folded(&ts_project, &ts_id, &mut normaliser),
         folded(&rust_project, &rust_id, &mut normaliser),
-        "the prepared sessions differ\n--- npm CLI ---\n{}\n--- mewkit-next ---\n{}",
+        "the prepared sessions differ\n--- npm CLI ---\n{}\n--- mewkit ---\n{}",
         ts.describe(),
         rust.describe()
     );

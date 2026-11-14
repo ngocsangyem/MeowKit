@@ -1,7 +1,7 @@
 //! TS-vs-Rust parity: the same command, the same fixture, two CLIs.
 //!
 //! Every case copies a fixture into two temp projects, runs
-//! `node packages/mewkit/dist/index.js <args>` in one and `mewkit-next` in the
+//! `node packages/mewkit/dist/index.js <args>` in one and `mewkit` in the
 //! other, and compares the exit code, stdout, stderr and the file tree each one
 //! left behind. A port is "done" when its cases pass — not when its unit tests
 //! do, because a unit test asserts what the porter BELIEVES the npm CLI does.

@@ -1,4 +1,4 @@
-//! `mewkit-next uninstall`: take the kit out again. A dry run unless `--yes`.
+//! `mewkit uninstall`: take the kit out again. A dry run unless `--yes`.
 //!
 //! Only what the ownership index records is touched, and a file is removed
 //! only when its bytes still match what the kit installed. That check needs

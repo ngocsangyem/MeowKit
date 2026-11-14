@@ -178,7 +178,7 @@ fn print_human(query: Query, doc: &Value, offline: bool) {
             };
             for r in pending {
                 println!(
-                    "update available for {}: {} → {}; run `mewkit-next upgrade{flag}`",
+                    "update available for {}: {} → {}; run `mewkit upgrade{flag}`",
                     s(&r["target"]),
                     s(&r["kitVersion"]),
                     s(&r["update"])

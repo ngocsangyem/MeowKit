@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# Can the mewkit-next users already have install this candidate kit?
+# Can the mewkit users already have install this candidate kit?
 #
 # Runs `init --dry-run` for every runtime, in a scratch project with a scratch
 # home, against an unpacked kit. A failure here means a kit release would
 # break every binary install: the kit's contract is outside the binary's range,
 # it needs a newer binary (`requires.mewkitMin`), or an emitter cannot plan it.
 #
-# Usage: scripts/release/check-kit-against-binary.sh <mewkit-next> <kit-dir>
+# Usage: scripts/release/check-kit-against-binary.sh <mewkit> <kit-dir>
 # Exit: 0 every runtime plans, 1 one does not, 2 usage.
 set -u
 bin=${1:-}
 kit=${2:-}
 if [ -z "$bin" ] || [ -z "$kit" ] || [ ! -d "$kit" ]; then
-	echo "usage: $0 <mewkit-next> <kit-dir>" >&2
+	echo "usage: $0 <mewkit> <kit-dir>" >&2
 	exit 2
 fi
 # Each run happens in its own scratch directory, so relative paths are made absolute.

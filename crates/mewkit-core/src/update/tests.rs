@@ -30,7 +30,7 @@ fn tar_gz(name: &str, bytes: &[u8]) -> Vec<u8> {
     h.set_size(bytes.len() as u64);
     h.set_mode(0o755);
     h.set_cksum();
-    tar.append_data(&mut h, format!("mewkit-next-x/{name}"), bytes)
+    tar.append_data(&mut h, format!("mewkit-x/{name}"), bytes)
         .unwrap();
     tar.into_inner().unwrap().finish().unwrap()
 }
@@ -71,7 +71,7 @@ fn manifest(version: &str, url: &str, sha: &str, size: u64) -> String {
 /// plus a kit release that must be ignored.
 fn server(version: &str, archive: &[u8], manifest_body: Option<String>) -> Fake {
     let tag = format!("{TAG_PREFIX}{version}");
-    let url = format!("{DL}{tag}/mewkit-next-x.tar.gz");
+    let url = format!("{DL}{tag}/mewkit-x.tar.gz");
     let body = manifest_body
         .unwrap_or_else(|| manifest(version, &url, &sha256_hex(archive), archive.len() as u64));
     let mut map = HashMap::new();
@@ -109,7 +109,7 @@ fn exe_in(dir: &std::path::Path) -> std::path::PathBuf {
 
 #[test]
 fn a_valid_update_replaces_the_binary_and_keeps_the_old_one() {
-    let archive = tar_gz(binary_name(), b"new binary");
+    let archive = tar_gz(&binary_name(), b"new binary");
     let http = server("1.1.0", &archive, None);
     let offer = check(&http, "1.0.0", Channel::Stable).unwrap();
     assert_eq!(offer.latest, "1.1.0");
@@ -131,8 +131,36 @@ fn a_valid_update_replaces_the_binary_and_keeps_the_old_one() {
 }
 
 #[test]
+fn an_archive_from_before_the_rename_still_updates() {
+    let legacy = format!("mewkit-next{}", std::env::consts::EXE_SUFFIX);
+    let archive = tar_gz(&legacy, b"new binary");
+    let http = server("1.1.0", &archive, None);
+    let offer = check(&http, "1.0.0", Channel::Stable).unwrap();
+    let dir = tempfile::tempdir().unwrap();
+    let exe = exe_in(dir.path());
+    apply(&http, &offer, &exe).unwrap();
+    assert_eq!(std::fs::read(&exe).unwrap(), b"new binary");
+}
+
+#[cfg(unix)]
+#[test]
+fn updating_through_the_mk_link_replaces_the_real_binary() {
+    let archive = tar_gz(&binary_name(), b"new binary");
+    let http = server("1.1.0", &archive, None);
+    let offer = check(&http, "1.0.0", Channel::Stable).unwrap();
+    let dir = tempfile::tempdir().unwrap();
+    let exe = exe_in(dir.path());
+    let mk = dir.path().join("mk");
+    std::os::unix::fs::symlink(exe.file_name().unwrap(), &mk).unwrap();
+    let old = apply(&http, &offer, &mk).unwrap();
+    assert_eq!(std::fs::read(&exe).unwrap(), b"new binary");
+    assert!(mk.symlink_metadata().unwrap().file_type().is_symlink());
+    assert_eq!(std::fs::read(&old).unwrap(), b"old binary");
+}
+
+#[test]
 fn the_same_version_is_up_to_date() {
-    let archive = tar_gz(binary_name(), b"new binary");
+    let archive = tar_gz(&binary_name(), b"new binary");
     let offer = check(&server("1.0.0", &archive, None), "1.0.0", Channel::Stable).unwrap();
     assert!(!offer.is_newer());
 }
@@ -155,8 +183,8 @@ fn refused(http: &Fake, running: &str) -> String {
 
 #[test]
 fn a_digest_mismatch_is_refused() {
-    let archive = tar_gz(binary_name(), b"new binary");
-    let url = format!("{DL}{TAG_PREFIX}1.1.0/mewkit-next-x.tar.gz");
+    let archive = tar_gz(&binary_name(), b"new binary");
+    let url = format!("{DL}{TAG_PREFIX}1.1.0/mewkit-x.tar.gz");
     let body = manifest("1.1.0", &url, &"0".repeat(64), archive.len() as u64);
     let err = refused(&server("1.1.0", &archive, Some(body)), "1.0.0");
     assert!(err.contains("SHA-256"), "{err}");
@@ -164,8 +192,8 @@ fn a_digest_mismatch_is_refused() {
 
 #[test]
 fn a_size_mismatch_is_refused() {
-    let archive = tar_gz(binary_name(), b"new binary");
-    let url = format!("{DL}{TAG_PREFIX}1.1.0/mewkit-next-x.tar.gz");
+    let archive = tar_gz(&binary_name(), b"new binary");
+    let url = format!("{DL}{TAG_PREFIX}1.1.0/mewkit-x.tar.gz");
     let body = manifest(
         "1.1.0",
         &url,
@@ -178,7 +206,7 @@ fn a_size_mismatch_is_refused() {
 
 #[test]
 fn a_truncated_archive_is_refused_even_when_the_manifest_matches_it() {
-    let full = tar_gz(binary_name(), &[7u8; 4096]);
+    let full = tar_gz(&binary_name(), &[7u8; 4096]);
     let cut = &full[..full.len() / 2];
     let err = refused(&server("1.1.0", cut, None), "1.0.0");
     assert!(err.contains("binary archive"), "{err}");
@@ -188,12 +216,12 @@ fn a_truncated_archive_is_refused_even_when_the_manifest_matches_it() {
 fn an_archive_without_the_binary_is_refused() {
     let archive = tar_gz("something-else", b"x");
     let err = refused(&server("1.1.0", &archive, None), "1.0.0");
-    assert!(err.contains("no mewkit-next"), "{err}");
+    assert!(err.contains("no mewkit"), "{err}");
 }
 
 #[test]
 fn an_older_manifest_is_never_applied() {
-    let archive = tar_gz(binary_name(), b"new binary");
+    let archive = tar_gz(&binary_name(), b"new binary");
     let http = server("1.0.0", &archive, None);
     let offer = check(&http, "1.2.0", Channel::Stable).unwrap();
     assert!(offer.is_ahead() && !offer.is_newer() && offer.archive.is_none());
@@ -202,7 +230,7 @@ fn an_older_manifest_is_never_applied() {
     // Even an offer forged to carry an archive is refused by `apply`.
     let forged = Offer {
         archive: Some(Target {
-            url: format!("{DL}{TAG_PREFIX}1.0.0/mewkit-next-x.tar.gz"),
+            url: format!("{DL}{TAG_PREFIX}1.0.0/mewkit-x.tar.gz"),
             sha256: sha256_hex(&archive),
             size: archive.len() as u64,
         }),
@@ -225,8 +253,8 @@ fn prerelease_identifiers_compare_numerically() {
 
 #[test]
 fn a_beta_manifest_is_refused_on_stable() {
-    let archive = tar_gz(binary_name(), b"new binary");
-    let url = format!("{DL}{TAG_PREFIX}1.1.0/mewkit-next-x.tar.gz");
+    let archive = tar_gz(&binary_name(), b"new binary");
+    let url = format!("{DL}{TAG_PREFIX}1.1.0/mewkit-x.tar.gz");
     let body = manifest("1.1.0", &url, &sha256_hex(&archive), archive.len() as u64)
         .replace("\"stable\"", "\"beta\"");
     let err = refused(&server("1.1.0", &archive, Some(body)), "1.0.0");
@@ -235,8 +263,8 @@ fn a_beta_manifest_is_refused_on_stable() {
 
 #[test]
 fn min_supported_above_version_is_malformed() {
-    let archive = tar_gz(binary_name(), b"new binary");
-    let url = format!("{DL}{TAG_PREFIX}1.1.0/mewkit-next-x.tar.gz");
+    let archive = tar_gz(&binary_name(), b"new binary");
+    let url = format!("{DL}{TAG_PREFIX}1.1.0/mewkit-x.tar.gz");
     let body = manifest("1.1.0", &url, &sha256_hex(&archive), archive.len() as u64)
         .replace("\"0.1.0\"", "\"2.0.0\"");
     let err = refused(&server("1.1.0", &archive, Some(body)), "1.0.0");
@@ -247,7 +275,7 @@ fn min_supported_above_version_is_malformed() {
 #[test]
 fn replace_keeps_the_original_mode() {
     use std::os::unix::fs::PermissionsExt;
-    let archive = tar_gz(binary_name(), b"new binary");
+    let archive = tar_gz(&binary_name(), b"new binary");
     let http = server("1.1.0", &archive, None);
     let offer = check(&http, "1.0.0", Channel::Stable).unwrap();
     let dir = tempfile::tempdir().unwrap();
@@ -262,7 +290,7 @@ fn replace_keeps_the_original_mode() {
 #[test]
 fn a_read_only_directory_changes_nothing() {
     use std::os::unix::fs::PermissionsExt;
-    let archive = tar_gz(binary_name(), b"new binary");
+    let archive = tar_gz(&binary_name(), b"new binary");
     let http = server("1.1.0", &archive, None);
     let offer = check(&http, "1.0.0", Channel::Stable).unwrap();
     let dir = tempfile::tempdir().unwrap();
@@ -279,8 +307,8 @@ fn a_read_only_directory_changes_nothing() {
 
 #[test]
 fn a_manifest_that_disagrees_with_its_tag_is_refused() {
-    let archive = tar_gz(binary_name(), b"new binary");
-    let url = format!("{DL}{TAG_PREFIX}1.5.0/mewkit-next-x.tar.gz");
+    let archive = tar_gz(&binary_name(), b"new binary");
+    let url = format!("{DL}{TAG_PREFIX}1.5.0/mewkit-x.tar.gz");
     let body = manifest("1.5.0", &url, &sha256_hex(&archive), archive.len() as u64);
     let err = refused(&server("1.1.0", &archive, Some(body)), "1.0.0");
     assert!(err.contains("but its release is 1.1.0"), "{err}");
@@ -288,10 +316,10 @@ fn a_manifest_that_disagrees_with_its_tag_is_refused() {
 
 #[test]
 fn an_archive_url_outside_this_repository_is_refused() {
-    let archive = tar_gz(binary_name(), b"new binary");
+    let archive = tar_gz(&binary_name(), b"new binary");
     let body = manifest(
         "1.1.0",
-        "https://example.com/mewkit-next-x.tar.gz",
+        "https://example.com/mewkit-x.tar.gz",
         &sha256_hex(&archive),
         archive.len() as u64,
     );
@@ -326,8 +354,8 @@ fn stable_skips_prereleases_and_kit_tags_while_beta_takes_them() {
 
 #[test]
 fn a_running_version_below_min_supported_is_withdrawn() {
-    let archive = tar_gz(binary_name(), b"new binary");
-    let url = format!("{DL}{TAG_PREFIX}1.1.0/mewkit-next-x.tar.gz");
+    let archive = tar_gz(&binary_name(), b"new binary");
+    let url = format!("{DL}{TAG_PREFIX}1.1.0/mewkit-x.tar.gz");
     let body = manifest("1.1.0", &url, &sha256_hex(&archive), archive.len() as u64)
         .replace("\"0.1.0\"", "\"1.1.0\"");
     let offer = check(
