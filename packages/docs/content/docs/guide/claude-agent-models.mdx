@@ -110,8 +110,8 @@ a source-of-truth system.
 
 A value outside this set fails `mewkit validate --agents` with
 `model "<value>" is not in the taxonomy`. To pin a different exact id, register it as a
-named profile in `packages/mewkit/src/migrate/model-taxonomy.ts` first — that table is the
-single place a model rename has to be edited.
+named profile in `RESOLVABLE_MODELS` in `crates/mewkit-core/src/validate/agent_registry_rows.rs`
+first — that table is the single place a model rename has to be edited.
 
 ## Account-tier caveat
 
