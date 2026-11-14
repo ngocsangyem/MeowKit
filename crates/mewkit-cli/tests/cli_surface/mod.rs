@@ -71,7 +71,11 @@ fn help_of(path: &[String]) -> String {
         .output()
         .expect("run mewkit-next --help");
     assert!(out.status.success(), "`--help` failed for {path:?}");
-    String::from_utf8(out.stdout).expect("help is utf-8")
+    let help = String::from_utf8(out.stdout).expect("help is utf-8");
+    // clap names the program in usage lines from argv[0], which on Windows carries the
+    // `.exe` suffix; the committed manual is platform-neutral, so drop it and fold CRLF.
+    help.replace("\r\n", "\n")
+        .replace("mewkit-next.exe", "mewkit-next")
 }
 
 /// Names under the `Commands:` heading: the lines indented exactly two spaces.

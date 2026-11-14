@@ -60,10 +60,19 @@ fn manual_matches_clap_definition() {
     let current = std::fs::read_to_string(&path)
         .unwrap_or_default()
         .replace("\r\n", "\n");
+    // Name the first differing line so a failure on a platform nobody can bless from
+    // locally is diagnosable from the CI log alone.
+    let first_diff = current
+        .lines()
+        .zip(rendered.lines())
+        .enumerate()
+        .find(|(_, (a, b))| a != b)
+        .map(|(i, (a, b))| format!("line {}:\n  committed: {a}\n  rendered:  {b}", i + 1))
+        .unwrap_or_else(|| "the files differ in length".to_string());
     assert!(
         current == rendered,
         ".claude/skills/help/references/cli.md is stale or missing: the CLI surface changed \
-         without the manual being regenerated.\nFix: MEWKIT_BLESS=1 cargo test -p mewkit-cli \
-         --test cli_manual"
+         without the manual being regenerated.\n{first_diff}\nFix: MEWKIT_BLESS=1 cargo test \
+         -p mewkit-cli --test cli_manual"
     );
 }
