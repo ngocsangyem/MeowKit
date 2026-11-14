@@ -16,3 +16,6 @@ packages/mewkit/src/state/injection-scanner.ts text eol=lf
 # These fixtures test CRLF input, so their bytes must never be converted.
 tests/config/fixtures/accept-crlf.yaml -text
 crates/mewkit-cli/tests/parity/fixtures/plan-approvable/tasks/plans/261112-crlf-plan/plan.md -text
+
+# The launcher template is compared byte for byte with the npm CLI's output on every OS.
+crates/mewkit-adapters/src/claude_code/launcher.cjs.tmpl text eol=lf

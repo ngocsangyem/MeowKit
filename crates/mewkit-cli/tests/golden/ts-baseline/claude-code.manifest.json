@@ -515,8 +515,8 @@
     },
     {
       "path": ".claude/hooks/lib/memory-store-lint.cjs",
-      "sha256": "c342692e20eb7993443d3001c0d5c94548e350259cc56f24f665a25f161f047f",
-      "size": 3729,
+      "sha256": "a77bf6417b3ca9ffe340773cc7ec0e0fc145d08334cee07ef964a144f870e0d7",
+      "size": 4493,
       "exec": true
     },
     {
@@ -5822,8 +5822,8 @@
     },
     {
       "path": ".meowkit/bin/mewkit",
-      "sha256": "1732d22b19334d8c87e9b27ba987f4de24837f885729c981b472bd0f1d991e14",
-      "size": 1935,
+      "sha256": "d688508a4647fc8ab1d8a93dfee1e06a70e41e1d70d52af0c74f8bce1ad61680",
+      "size": 4300,
       "exec": true
     },
     {
@@ -6309,8 +6309,8 @@
     },
     {
       "path": ".meowkit/cache/.claude/hooks/lib/memory-store-lint.cjs",
-      "sha256": "c342692e20eb7993443d3001c0d5c94548e350259cc56f24f665a25f161f047f",
-      "size": 3729
+      "sha256": "a77bf6417b3ca9ffe340773cc7ec0e0fc145d08334cee07ef964a144f870e0d7",
+      "size": 4493
     },
     {
       "path": ".meowkit/cache/.claude/hooks/lib/meowkit-paths.cjs",

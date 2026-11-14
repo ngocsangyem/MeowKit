@@ -20,6 +20,13 @@ const { spawnSync } = require('node:child_process');
 const { isMissingExecutable } = require('./preship-checks.cjs');
 
 const LOCAL_BIN = './node_modules/.bin/mewkit';
+// The committed project launcher. It finds the CLI that installed the kit, the Node
+// package or the native binary, so a project installed by the binary, with no
+// node_modules, is linted too.
+const LAUNCHER = './.meowkit/bin/mewkit';
+// What the launcher exits with when it finds no CLI to run (the shell's "command not
+// found"); `project-launcher-source.ts` writes it.
+const LAUNCHER_UNAVAILABLE = 127;
 
 function isExecutable(p) {
   try {
@@ -34,14 +41,16 @@ function isExecutable(p) {
  * The CLI to lint with. An explicitly configured path and the project-local
  * install are proved to exist before use; a bare name is left to the launch
  * below, which reports "no such executable" distinctly from a lint failure.
- * Nothing here consults the search path, so the guard's environment set stays
- * closed.
+ * This function consults no search path itself; the project launcher, when it
+ * is the CLI chosen, does: it looks for the native binary on PATH, in
+ * MEWKIT_INSTALL_DIR and in ~/.local/bin, by absolute path only.
  */
 function resolveCli(root, env) {
   const configured = env.MEOWKIT_CLI || '';
   if (configured && isExecutable(configured)) return configured;
   const local = path.join(root, LOCAL_BIN);
   if (isExecutable(local)) return LOCAL_BIN;
+  if (isExecutable(path.join(root, LAUNCHER))) return LAUNCHER;
   return 'mewkit';
 }
 
@@ -84,6 +93,8 @@ function lintMemoryStore({ root = process.cwd(), env = process.env } = {}) {
   const [command, args] = launchArgs(cli, root, ['validate', '--memory']);
   const r = spawnSync(command, args, { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
   if (isMissingExecutable(r)) return SKIP;
+  // The launcher ran but found no CLI behind it: the same "not found", one step removed.
+  if (cli === LAUNCHER && r.status === LAUNCHER_UNAVAILABLE) return SKIP;
   if (!r.error && r.status === 0) return { exit: 0, stdout: [], stderr: [] };
   // Streams are merged because the CLI reports findings on either one.
   const output = `${r.stdout || ''}${r.stderr || ''}`.replace(/\n$/, '');

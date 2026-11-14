@@ -7,6 +7,7 @@
 //! install writes a subset: see [`global`].
 mod global;
 mod kit_dir;
+pub mod launcher;
 mod selection;
 
 pub use kit_dir::{GITIGNORE, PLUGIN_MANIFEST, plugin_manifest};
@@ -76,6 +77,7 @@ impl Emitter for ClaudeCode {
         }
         if global.is_none() {
             kit_dir::push_shared(req, &mut plan)?;
+            launcher::push(req, &mut plan)?;
         }
         plan.notices.extend(scope::privacy_elsewhere(req, SETTINGS));
         Ok(plan)

@@ -43,9 +43,11 @@ that name resolve:
 - `init` writes a small launcher at `.meowkit/bin/mewkit`, **pinned** to the CLI version that
   installed the kit, and commits it. It is a resolver, not a copy of the CLI: it finds the
   pinned version, in the project's own `node_modules` first, then from this machine's record
-  of that version, and runs it.
-- The launcher never reaches the network. If the pinned version is not available it says so
-  and names `mewkit doctor`, rather than fetching mid-session.
+  of that version, and runs it. If neither is there, it runs the native
+  [`mewkit-next`](/cli/mewkit-next) binary when one is installed. A project that
+  `mewkit-next init` installed tries the binary first and the npm CLI second.
+- The launcher never reaches the network. If no CLI is available it says so, names
+  `mewkit doctor` and exits 127, rather than fetching mid-session.
 - Hooks do not depend on your shell: they execute the launcher through the install-written
   `.claude/runtime.json`, which is re-validated on every read and refuses any executable
   outside the project.
