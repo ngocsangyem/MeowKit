@@ -1,50 +1,59 @@
 ---
 title: "Project Setup"
-description: "Start a project, keep it healthy, and upgrade it."
+description: "Install, upgrade, remove and check the kit, and configure a project."
 ---
 
-Everything that touches the shape of the project itself: creating it, configuring it, checking it is sound, and moving it forward a version.
+Everything that touches the shape of the project itself: installing the kit, configuring it, checking it is sound, and moving it to a newer kit. Which runtime gets which files, and where, is under [Runtimes and scopes](/cli#runtimes-and-scopes).
 
-## init — provider selection
+`init`, `upgrade` and `uninstall` all take `--json` (print one JSON document), `--force` (replace or remove files you edited) and `--global` (act on your home directory). With no terminal to confirm in (CI, a pipe, a hook), `init --force` and `upgrade --force` only show their plan and exit 3 unless `--yes` is also passed. Before any of them changes anything, it copies every file it is about to change or remove into a new directory under `.meowkit/backups/` (`~/.mewkit/state/backups/` globally); `mewkit backups list` and `mewkit backups restore` read them back.
 
-On a **fresh install** with no provider flag, `mewkit init` opens a provider multiselect —
-**Claude Code** (checked by default), **Codex**, **Cursor** — and provisions each picked
-toolkit. `--target <provider>` skips the picker and keeps its own flow.
+## init
 
 ```bash
-# Fresh install → provider multiselect (Claude Code preselected)
-npx mewkit init
-
-# Skip the picker — Codex-only toolkit (copies the authored Codex bundle, no .claude/)
-npx mewkit init --target codex
-
-# Skip the picker — Cursor toolkit (copies the authored Cursor bundle, no .claude/)
-npx mewkit init --target cursor
-
-# Claude Code, laid down as a plugin rather than as .claude/
-npx mewkit init --target claude-code --delivery plugin
+mewkit init                                   # picker: Claude Code, Codex, Cursor
+mewkit init --target claude-code,cursor
+mewkit init --target claude-code --delivery plugin
+mewkit init --global --target all
+mewkit init --target codex --dry-run
 ```
 
-`--delivery` is meaningful for `--target claude-code` only; the other two targets have one shape
-each, so passing it with either is refused rather than ignored. An unrecognized `--target` is
-refused by name with the three valid values listed.
+Downloads the newest kit release (`--beta` allows a prerelease; `--kit-version v2.16.0` pins one), checks it against the release's `checksums.txt` and its `kit-contract.json`, and writes it for each runtime. `--offline` uses the newest kit already in the cache; `--kit-archive <zip>` installs a local `meowkit-release.zip`, checked against `--kit-sha256` or a `checksums.txt` beside it. `--allow-unverified-kit` accepts a kit that has no checksum or no `kit-contract.json`; leave it off unless you built the kit yourself.
 
-| Flag                  | Description                                                                                                                                        |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--target <provider>` | Skip the picker and create one provider toolkit. `codex` and `cursor` each copy their authored bundle (no `.claude/`, no release download); `claude-code` installs the `.claude/` kit |
+Without `--target`, a terminal shows a picker with Claude Code preselected. With no terminal, `--yes` or an existing `.claude/` means Claude Code, and otherwise the command exits 2 naming `--target`. An unrecognized `--target` is refused by name.
 
-**Provider multiselect** (fresh install, no `--target`):
+| Flag | Runtime | Effect |
+| --- | --- | --- |
+| `--profile <name>` | Claude Code | Install a subset: `core`, `developer`, `product`, `atlassian`, `security`, `research`, `full`. Running `init` again with a narrower profile removes what it no longer includes, unless you edited it |
+| `--delivery native\|plugin` | Claude Code | The on-disk shape: the host's own directory, or the same content plus a plugin manifest. Refused with the other runtimes |
+| `--skill-packs <packs>` | Codex, Cursor | Comma-separated skill packs, or `all`. Omitted installs every skill; an empty value installs the default pack only |
+| `--mcp-profiles <names\|all>` | Cursor | Merge MCP servers into `.cursor/mcp.json`; your own servers win. A project with a git remote also needs `--allow-cloud-mcp` |
 
-- **Claude Code** → installs the `.claude/` kit from the latest release (today's behavior).
-- **Codex** → copies the authored Codex bundle (`AGENTS.md`, `.codex/`, `.agents/skills/`); non-fatal if it can't (warns and continues).
-- **Cursor** → copies the authored Cursor bundle (`AGENTS.md` plus a `.cursor/` tree of agents, rules, skills and hooks); non-fatal if it can't.
-- Selecting only Codex, only Cursor, or both yields a project with no `.claude/` and no release download.
-- The picker is shown for **new installs only** and only when no provider flag is passed. In update mode (existing `.claude/`), init refreshes `.claude/` without prompting; use `mewkit upgrade` to propagate to installed provider toolkits.
+For Claude Code at project scope, `init` also writes the committed launcher `.meowkit/bin/mewkit` and the `.claude/runtime.json` that points the hooks at it ([how hooks reach mewkit](/cli#how-hooks-reach-mewkit)). In the MeowKit source repository itself, `init` refuses unless you pass `--allow-kit-source`, because `.claude/` there is the kit's authored source.
 
-**Behavior:**
+### Taking over an npm install
 
-- `--target codex` and `--target cursor` are offline: each copies the bundle shipped in the package — no release download, no `.claude/`, no conversion. Codex fails closed if `AGENTS.md` already exists (re-run with `--force`).
-- Codex and Cursor installs keep their own ledger. `mewkit upgrade` refreshes them from it, and never touches a `.cursor/` or `.codex/` directory it did not install. See [Portability](/cli/portability).
+If the retired npm `mewkit` CLI installed a runtime in this project, `init --target <runtime>` adopts it. The npm CLI's install record becomes the starting ownership index, kit files are refreshed, files the kit no longer ships are removed when they still match what the record says was installed, and files you edited are kept. Adoption works at project scope only, and only when you ask for it with `init`. `upgrade` never adopts: on a runtime with an npm install record and no ownership index, it names the `init` command to run. [Moving from the npm CLI](/migration/from-npx-mewkit) walks through it.
+
+## upgrade
+
+```bash
+mewkit upgrade
+mewkit upgrade --target cursor --dry-run
+mewkit upgrade --check
+mewkit upgrade --list
+```
+
+Moves the runtimes installed here to the newest kit, with the packs they were installed with. It takes the same kit-source flags as `init`. A file you edited after the kit wrote it is kept and named, and the command exits 6; `--force` replaces it. `--check` compares each installed runtime with the newest release (`--beta` for the prerelease channel) and `--list` shows the recent releases; neither changes anything, and with `--offline` both read the kits in the cache instead of GitHub. `--no-cleanup` is accepted for scripts written for the npm CLI: a downloaded kit always stays in the cache.
+
+## uninstall
+
+```bash
+mewkit uninstall            # shows what would go
+mewkit uninstall --yes
+mewkit uninstall --global --target codex --yes
+```
+
+Removes exactly what the kit installed: owned files, merged hook handlers, blocks and keys. Your own content in shared files stays. An edited file is kept unless `--force`.
 
 ## setup
 
@@ -69,72 +78,36 @@ mewkit setup --only=env   # Run single step
 
 ## doctor
 
-Diagnose environment issues with auto-fix for permissions.
+```bash
+mewkit doctor
+mewkit doctor --global --json
+mewkit doctor provenance --explain
+mewkit doctor --hard-gates
+```
+
+Without flags it changes nothing. Checks Node.js (the kit's hooks need 24+), both scopes' installs (owned files present or edited), that every kit hook script a hook file names exists, Codex project trust, and which kit hook behaviours a runtime does not carry. Exits 1 when a check fails.
+
+| Flag | Effect |
+| --- | --- |
+| `--report` | Append a shareable report block |
+| `--providers` | Add what each runtime's adapter can enforce |
+| `--state` | Add the state taxonomy |
+| `--hard-gates` | Run the kit's plan, privacy, injection and ship hooks in a scratch project and report which ones block |
+| `--explain` | With `provenance`: name the files behind each count |
+| `--adopt` | Rebuild the npm CLI's ownership baseline (`.meowkit/metadata.json`) from the local kit cache, or refuse |
+| `--target`, `--global`, `--json` | Narrow to some runtimes, check your home directory, print JSON |
+
+`mewkit doctor provenance` classifies each installed file against the install baseline and says what local evidence can and cannot prove.
+
+## providers
 
 ```bash
-mewkit doctor [--report] [--json] [--providers] [--state] [--hard-gates]
-mewkit doctor provenance [--explain]
-mewkit doctor --adopt
+mewkit providers --target codex
+mewkit providers --lifecycle
+mewkit providers codex --lifecycle
 ```
 
-**Checks:** Node.js 24+, Python 3.9+ (optional), Git, `.claude/` structure, hooks executable, hook libraries present, memory writable, MCP config, config validity.
-
-The Node check and `engines.node` state the same floor: Node 24, the version this project's test matrix runs. Below it the check fails and names the version it found.
-
-**Auto-fixes:** Hook file permissions (`chmod +x`).
-
-| Flag              | Description                                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------------------------ |
-| `--report`        | Print shareable diagnostic report                                                                      |
-| `--json`          | Machine-readable output                                                                                |
-| `--providers`     | Include provider contract diagnostics                                                                  |
-| `--state`         | Include state taxonomy diagnostics                                                                     |
-| `--explain`       | Explain the provenance result rather than summarizing it (used with `provenance`)                      |
-| `--hard-gates`    | Live-probe the hard gates: plan, privacy and injection block                                           |
-| `--adopt`         | Rebuild the ownership baseline from the local kit cache, or refuse. Refused on a runtime that `mewkit-next` owns |
-
-`mewkit doctor provenance` reports which installed files can be verified from local evidence alone, and `--explain` says what it can and cannot prove.
-
-## upgrade
-
-Update mewkit to the latest version.
-
-```bash
-npx mewkit upgrade [--check] [--beta] [--list]
-```
-
-| Flag        | Description                                                            |
-| ----------- | ---------------------------------------------------------------------- |
-| `--check`   | Show available update (shows both stable and beta)                     |
-| `--beta`    | Install beta channel                                                   |
-| `--list`    | List all available versions with channel info                          |
-
-A kit release is a zip plus a `checksums.txt`. Upgrade checks the zip against that file before
-extracting anything. After a `.claude/` upgrade it also refreshes any Codex or Cursor bundle this
-project installed with `mewkit init --target`.
-
-**Examples:**
-
-```bash
-npx mewkit upgrade              # Upgrade to latest stable
-npx mewkit upgrade --beta       # Upgrade to latest beta
-npx mewkit upgrade --check      # Check without installing
-npx mewkit upgrade --list       # Show all versions
-```
-
-**Output of `--list`:**
-
-```
-Channels:
-  stable:  1.2.0
-  beta:    1.3.0-beta.2
-
-Recent versions:
-  1.2.0 (installed)
-  1.1.1
-  1.1.0
-  1.0.0
-```
+What each runtime would get from the kit at this scope: files, skills, hooks, and the gaps, without installing anything. `providers <runtime>` is the same as `--target <runtime>`. `--lifecycle` shows instead which lifecycle events each runtime fires and which of them can block; with one runtime it adds support levels, invocation shapes and enforcement gaps.
 
 ## validate
 
@@ -158,12 +131,19 @@ mewkit validate
 
 ## versions
 
-Print what this project has installed: the CLI and the kit carry
-independent versions.
-
 ```bash
 mewkit versions
+mewkit versions --offline
 ```
 
-Shows the CLI version, the installed kit version, the target and delivery, and how the content
-arrived. Exits non-zero in a directory with no install.
+The kits installed here, the kits in the cache, the kits available on GitHub (`--beta` includes prereleases, `--offline` skips GitHub), and the kit contract range this binary supports.
+
+## self-update
+
+```bash
+mewkit self-update --check
+mewkit self-update
+mewkit self-update --channel beta
+```
+
+Fetches the newest binary release's `binary-manifest.json`, refuses an older version, checks the archive's SHA-256 and size, and replaces itself, keeping the previous binary beside it with an `.old` suffix. `--check` only reports, and exits 3 when an update exists. When the running version has been withdrawn, it says so.

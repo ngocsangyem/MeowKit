@@ -34,6 +34,7 @@ pub enum PlanCommand {
     Check {
         /// The phase file, or the plan.md / plan directory with --structural.
         target: Option<String>,
+        /// Print the report as JSON.
         #[arg(long)]
         json: bool,
         /// Validate plan.md + every sibling phase file against the full template.

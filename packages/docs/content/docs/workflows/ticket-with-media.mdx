@@ -47,8 +47,8 @@ Jira access needs the `jira-as` CLI and three variables in `.meowkit/.env`. [Jir
 |------|----------------|---------|
 | Figma MCP | Exact design data (colors, spacing, tokens) | `claude mcp add figma` |
 | Gemini API key | Better image/video analysis | Set `MEOWKIT_GEMINI_API_KEY` in `.meowkit/.env` |
-| FFmpeg | Video frame extraction, image optimization | `brew install ffmpeg` or `npx mewkit setup --system-deps` |
-| ImageMagick | Image resize/conversion | `brew install imagemagick` or `npx mewkit setup --system-deps` |
+| FFmpeg | Video frame extraction, image optimization | `brew install ffmpeg` or `mewkit setup --system-deps` |
+| ImageMagick | Image resize/conversion | `brew install imagemagick` or `mewkit setup --system-deps` |
 
 <Callout title="None of these are required" type="info">
 
@@ -126,7 +126,7 @@ flowchart TD
     Y["Extract key frames (scene changes only)<br/><code>ffmpeg -i bug-reproduction.mp4 -vf select='gt(scene,0.3)' -vsync vfq frame_%03d.jpg</code>"]
     Y2["Result: 8-15 key frames from a 2-minute video<br/>3600 raw frames → 12 key frames = 99.7% reduction"]
     N["Cannot analyze video"]
-    N2["'Video attached but FFmpeg not installed.<br/>Install: brew install ffmpeg — or — npx mewkit setup --system-deps<br/>Workaround: manually screenshot key moments and attach as images'"]
+    N2["'Video attached but FFmpeg not installed.<br/>Install: brew install ffmpeg — or — mewkit setup --system-deps<br/>Workaround: manually screenshot key moments and attach as images'"]
 
     Q -->|yes| Y --> Y2
     Q -->|no| N --> N2

@@ -105,7 +105,7 @@ useHead({
                 name: 'Is MeowKit free to use?',
                 acceptedAnswer: {
                   '@type': 'Answer',
-                  text: 'Yes. MeowKit is MIT licensed and free to use. Install with: npx mewkit init',
+                  text: 'Yes. MeowKit is MIT licensed and free to use. Install the mewkit binary with the script in the docs, then run: mewkit init',
                 },
               },
               {

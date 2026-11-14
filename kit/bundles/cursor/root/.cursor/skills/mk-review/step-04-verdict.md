@@ -167,7 +167,7 @@ verdict at `tasks/reviews/<slug>-verdict.json` (atomic write):
 Map the overall verdict to `decision`: Overall **PASS** → `PASS`; Overall **WARN** →
 `PASS_WITH_RISK`; Overall **FAIL** → `BLOCKED`. List all five dimensions.
 
-Then self-check the bundle: run `npx mewkit verdict-gate <slug>`. It exits 0 on
+Then self-check the bundle: run `mewkit verdict-gate <slug>`. It exits 0 on
 `PASS`/`PASS_WITH_RISK` and non-zero on `BLOCKED`/invalid/missing. The markdown
 verdict remains the authoritative human narrative; the JSON is the machine gate
 input. The bundle stays under `tasks/` and is never injected into model context.

@@ -76,7 +76,7 @@ Agents own distinct artifact classes to avoid write conflicts.
 `tasks/plans/`|planner
 `tasks/reviews/`|reviewer
 `docs/`|documenter
-`.meowkit/memory/`|write-set skills and agents (via `npx mewkit note`)
+`.meowkit/memory/`|write-set skills and agents (via `mewkit note`)
 ```
 
 ## Routing updates for new agents

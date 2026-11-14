@@ -57,8 +57,8 @@ pub(super) fn run(out: Out, yes: bool) -> Result<bool, Failure> {
             install_single_dep(dep, &project, &mut |line| out.line(line));
         }
     } else {
-        out.line("\n  \u{26a0} Skipped. Install later with: npx mewkit setup --system-deps");
-        out.line("    Run npx mewkit doctor to check what's missing.");
+        out.line("\n  \u{26a0} Skipped. Install later with: mewkit setup --system-deps");
+        out.line("    Run mewkit doctor to check what's missing.");
     }
     Ok(true)
 }

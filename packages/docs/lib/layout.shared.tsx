@@ -60,11 +60,7 @@ export function baseOptions(): BaseLayoutProps {
             url: 'https://github.com/ngocsangyem/MeowKit/releases',
             external: true,
           },
-          {
-            text: 'npm: mewkit',
-            url: 'https://www.npmjs.com/package/mewkit',
-            external: true,
-          },
+          { text: 'Migration: from the npm CLI', url: '/migration/from-npx-mewkit' },
         ],
       },
     ],

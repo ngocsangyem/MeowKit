@@ -5,7 +5,8 @@
 ## Quick Start
 
 ```bash
-npx mewkit init
+curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh
+mewkit init
 ```
 
 ## Key Resources
@@ -13,7 +14,7 @@ npx mewkit init
 - [Homepage](https://meowkit.dev)
 - [Documentation](https://docs.meowkit.dev)
 - [GitHub](https://github.com/ngocsangyem/MeowKit)
-- [npm package](https://www.npmjs.com/package/mewkit)
+- [Releases](https://github.com/ngocsangyem/MeowKit/releases)
 
 ## What MeowKit Does
 
@@ -40,18 +41,21 @@ MeowKit enforces a 7-phase workflow for AI coding agents (Claude Code):
 ## Installation
 
 ```bash
+# Install the mewkit binary (mk is a short alias); Windows: see docs.meowkit.dev/installation
+curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh
+
 # Initialize MeowKit in your project
-npx mewkit init
+mewkit init
 
 # Set up Python skills and optional deps (ImageMagick, FFmpeg, Playwright)
-npx mewkit setup
+mewkit setup
 
 # Verify environment
-npx mewkit doctor
+mewkit doctor
 ```
 
 ## Requirements
 
-- Node.js 20+
+- Node.js 24+ (for the kit's hooks; the mewkit binary needs none)
 - Claude Code CLI
 - Git

@@ -9,7 +9,7 @@ active-verification hard gate) are marked **NEVER-PRUNE** per Rule 4 — their c
 is not the right metric for a safety net.
 
 This document is MeowKit-repo-internal (it audits MeowKit's own components) and is not
-shipped by `npx mewkit init`; no shipped `.claude/` file references it.
+shipped by `mewkit init`; no shipped `.claude/` file references it.
 
 Delta convention: `measured_delta = baseline_avg − disabled_avg` on the calibration set
 (Rule 2). `N/A` = a correctness/safety component whose value is not a benchmark delta.
@@ -42,7 +42,7 @@ Delta convention: `measured_delta = baseline_avg − disabled_avg` on the calibr
 | Memory migrators (`scripts/memory-migrator.cjs`, `scripts/memory-topic-file-migrator.cjs`) | v2 stores must be migrated in place on upgrade | not measured (benchmark baseline deferred by owner) | n/a (not measured) | 2026-11-01 | PRUNE (provisional; Rule 5 re-audit pending) |
 | Always-loaded memory and wiki instruction rules (`rules/memory-read-rules.md`, `rules/wiki-context-rules.md`) | The model needs instructions on how to read the memory and wiki surfaces at every session start | not measured (benchmark baseline deferred by owner) | n/a (not measured) | 2026-11-01 | PRUNE (provisional; Rule 5 re-audit pending) |
 | `validate --memory` lint (`core/check-memory-store.ts`) | A committed, grep-read store must be checked at the PR boundary for injection, obfuscated injection, secrets, size and flood (`injection-rules.md` Rules 8–9) | N/A (**NEVER-PRUNE** — security defense, Rule 4) | n/a (not measured) | 2026-11-01 | KEEP |
-| `mewkit note <decisions\|gotchas>` (`npx mewkit note`) | Every memory append must be lint-checked and serialized under a file lock, so a rejected or concurrent write never corrupts or silently loses an entry, and a secret is never echoed | N/A (**NEVER-PRUNE** — write-path security gate, Rule 4) | n/a (not measured) | 2026-11-01 | KEEP |
+| `mewkit note <decisions\|gotchas>` | Every memory append must be lint-checked and serialized under a file lock, so a rejected or concurrent write never corrupts or silently loses an entry, and a secret is never echoed | N/A (**NEVER-PRUNE** — write-path security gate, Rule 4) | n/a (not measured) | 2026-11-01 | KEEP |
 | Zero-residue CI check (`scripts/check-memory-wiki-residue.cjs`) | Removed wiki and JSON-store names must not reappear in `.claude/` or `packages/mewkit/src/` (AC-04 pinned roots) | N/A (correctness — residue oracle; no benchmark delta) | n/a (not measured) | 2026-11-01 | KEEP |
 
 ## Notes

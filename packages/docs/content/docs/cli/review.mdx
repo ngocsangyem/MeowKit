@@ -5,23 +5,18 @@ description: "Run a resumable multi-pass review, and check a verdict."
 
 Review is a sequence of steps with a session id rather than one long command, so a review of a large change can be picked up where it stopped.
 
-<Callout type="info">
-  During the move to one CLI, these commands run from either CLI with the same output: `npx mewkit <command>` or the
-  native `mewkit-next <command>` ([mewkit-next](/cli/mewkit-next)). Skills and hooks still call the npm CLI.
-</Callout>
-
 ## review
 
 Drive a multi-pass pull-request review as a sequence of resumable steps, so a long review
 survives a lost session.
 
 ```bash
-npx mewkit review prepare <target> [--remote <name>] [--json]
-npx mewkit review read <target> --session <id> --as <persona>
-npx mewkit review coverage --session <id> [--json]
-npx mewkit review compose --session <id> [--json]
-npx mewkit review submit --session <id> [--reply] [--confirm <value>] [--json]
-npx mewkit review cleanup --session <id> [--json]
+mewkit review prepare <target> [--remote <name>] [--json]
+mewkit review read <target> --session <id> --as <persona>
+mewkit review coverage --session <id> [--json]
+mewkit review compose --session <id> [--json]
+mewkit review submit --session <id> [--reply] [--confirm <value>] [--json]
+mewkit review cleanup --session <id> [--json]
 ```
 
 | Subcommand | What it does |
@@ -41,5 +36,5 @@ the whole point: reviewing a large PR across several sittings does not restart f
 Gate 2 proof-bundle check. Reads a machine-readable review verdict and exits `0` (PASS / PASS_WITH_RISK or a tolerated legacy markdown-only verdict), `1` (BLOCKED / invalid / missing), or `2` (usage error).
 
 ```bash
-npx mewkit verdict-gate <slug | path-to-verdict.json>
+mewkit verdict-gate <slug | path-to-verdict.json>
 ```

@@ -1,13 +1,14 @@
 # ADR: the Rust installer's adapter contract is a data plan plus one executor
 
 - Date: 2026-11-10
-- Status: proposed
-- Scope: `crates/mewkit-adapters`, `crates/mewkit-core` of the `mewkit-next` binary
+- Status: accepted (implemented in `crates/`)
+- Scope: `crates/mewkit-adapters`, `crates/mewkit-core` of the `mewkit` binary (in preview at
+  the time under its pre-rename name)
 - Plan: [`tasks/plans/261110-runtime-correct-multi-runtime-delivery/`](../../../tasks/plans/261110-runtime-correct-multi-runtime-delivery/)
 
 ## Context
 
-`mewkit-next` must install, upgrade, remove and diagnose the kit on three runtimes (Claude Code,
+The Rust binary must install, upgrade, remove and diagnose the kit on three runtimes (Claude Code,
 Codex, Cursor) at two scopes (project, global). The Node CLI it replaces does this with
 hand-maintained per-runtime bundles and target-name branching; every new runtime fact edits
 shared code. Target design: one emitter per runtime behind a single contract.
@@ -208,8 +209,8 @@ agent, so there is no consumer. Adding them is Ask-first.
 - **Codex content (maintainer decision, 2026-11-11).** The Codex emitter installs the authored
   bundle (`packages/mewkit/src/migrate/modules/codex/root`) rather than projecting `.claude/`:
   the kit artifact carries the bundle at that source path, outside `.claude/` so a Claude Code
-  install never lays down Codex files, and with one copy so the npm CLI and `mewkit-next`
-  cannot drift. The emitter adds skill-pack selection, root-anchored script commands, merged
+  install never lays down Codex files, and with one copy so the npm CLI and the binary
+  cannot drift. (The bundles now live at `kit/bundles/{codex,cursor}/`.) The emitter adds skill-pack selection, root-anchored script commands, merged
   `AGENTS.md` / `hooks.json` / `config.toml`, and a post-plan report of Claude-only tokens and
   installed paths the text names but the plan does not write. The neutral hook manifest above
   is not built: the Cursor emitter installs its authored bundle the same way.

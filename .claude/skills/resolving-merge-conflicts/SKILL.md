@@ -123,7 +123,7 @@ cat package.json        # scripts: typecheck / lint / test / build / format
 ls Makefile justfile pyproject.toml Cargo.toml go.mod 2>/dev/null
 ```
 
-Run what exists (for this kit: `npm run typecheck`, `npm test`, `npm run lint`). Fix
+Run what exists (for example `cargo test` and `cargo clippy` in a Rust project, or the `typecheck`, `test` and `lint` scripts in `package.json`). Fix
 anything the merge broke — a resolution can be marker-free yet semantically wrong (e.g.
 a function both sides renamed differently). Re-run until green.
 

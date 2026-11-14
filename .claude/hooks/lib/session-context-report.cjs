@@ -160,7 +160,7 @@ function installBlock(root, env = process.env) {
     '## MeowKit CLI not available',
     'This project carries `.claude/` but no `mewkit` CLI (no committed launcher, no node_modules, nothing on PATH).',
     'Gates, guards and observers all still run — none of them needs it — but the checks that call it skip instead.',
-    'Run `mewkit doctor` (via `npx`, since nothing is installed here) to see what this clone is missing.',
+    'Install the `mewkit` binary (https://docs.meowkit.dev/installation), then run `mewkit doctor` to see what this clone is missing.',
   ];
 }
 

@@ -310,7 +310,7 @@ Three mandatory sub-task in parallel:
 delegate a sub-task (subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .cursor/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
    ```
 
-   If sync-back leaves every non-abandoned phase todo checked, archive the plan with `npx mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `the ship skill`.
+   If sync-back leaves every non-abandoned phase todo checked, archive the plan with `mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `the ship skill`.
 
 2. **Docs update:**
 

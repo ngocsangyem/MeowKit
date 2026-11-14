@@ -170,7 +170,7 @@ node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/check_
 ```
 
 `skill-python.cjs` resolves the environment for the skill that owns the script, under
-`.meowkit/envs/<skill>/`, and creates it on first use. `npx mewkit setup` can prepare them
+`.meowkit/envs/<skill>/`, and creates it on first use. `mewkit setup` can prepare them
 ahead of time; there is no single shared venv.
 
 ---
@@ -250,7 +250,7 @@ Source: <commit | PR | tasks/plans/... | tasks/reviews/...>
 ```
 
 Skills read the store with `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` and write it with
-`npx mewkit note <decisions|gotchas>`. See `docs/core/memory-system.md` for the read and write sets.
+`mewkit note <decisions|gotchas>`. See `docs/core/memory-system.md` for the read and write sets.
 
 ## 8. Skill Structure
 

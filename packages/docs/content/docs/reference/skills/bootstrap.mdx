@@ -16,7 +16,7 @@ description: "End-to-end project orchestrator — research -> design -> plan -> 
 
 End-to-end project orchestrator for new projects from scratch. Research -> design -> plan -> scaffold -> implement -> docs.
 
-**CLI boundary:** `npx mewkit init` = project infrastructure (`.claude/`). `mk:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
+**CLI boundary:** `mewkit init` = project infrastructure (`.claude/`). `mk:bootstrap` = application code + full pipeline. Zero overlap. Never touch `.claude/`.
 
 ## What This Skill Does
 
@@ -35,7 +35,7 @@ mk:bootstrap [requirements] --parallel
 
 **Do NOT invoke when:**
 - Project already has source code — use `mk:plan-creator` + `mk:cook` directly
-- You only need kit setup — use CLI (`npx mewkit init`)
+- You only need kit setup — use CLI (`mewkit init`)
 - You need autonomous multi-hour builds of specified products — use `mk:autobuild`
 - You need single-task feature work on existing projects — use `mk:cook`
 
@@ -252,7 +252,7 @@ Exits `BOOTSTRAP_VALID` (0) or `BOOTSTRAP_INCOMPLETE` (1) with error details.
 
 ## Gotchas
 
-- **Duplicating CLI init**: generating `.claude/` files that `npx mewkit init` already provides — NEVER touch `.claude/`; bootstrap owns `src/` and `tests/` only
+- **Duplicating CLI init**: generating `.claude/` files that `mewkit init` already provides — NEVER touch `.claude/`; bootstrap owns `src/` and `tests/` only
 - **Over-scaffolding**: generating 20+ files for a simple project — ask user about scope first; match generated files to actual needs
 - **Context overflow on large stacks**: generating NestJS monorepo in one shot — progressive generation: structure first, then one module at a time; verify compilation between steps
 - **Wrong naming conventions**: CamelCase files in TypeScript project — always check `agent-conduct.md` B1 for detected stack; ask user if stack is unknown

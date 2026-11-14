@@ -107,7 +107,7 @@ fix is the habit, not more tooling.
 When a loop stalls or you correct the agent by hand, don't stop at fixing the instance — record it:
 
 ```bash
-npx mewkit trace --friction "evaluator passed a build with broken auth flow"
+mewkit trace --friction "evaluator passed a build with broken auth flow"
 ```
 
 `mewkit trace propose` groups repeated friction (2+ occurrences) into advisory backlog items. When a friction item traces back to one skill, the natural place to encode the fix is that skill's **Gotchas** section — it exists to grow one bullet per observed failure. One recorded friction note is worth more than three silent workarounds.

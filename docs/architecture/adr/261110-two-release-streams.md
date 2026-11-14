@@ -1,16 +1,16 @@
-# ADR: the kit and the `mewkit-next` binary ship as two release streams
+# ADR: the kit and the `mewkit` binary ship as two release streams
 
 - Date: 2026-11-11
-- Status: proposed
+- Status: accepted (the binary was renamed to `mewkit` and the npm CLI retired; see Update)
 - Scope: GitHub releases of this repository, `.github/workflows/rust-release.yml`,
-  `install.sh`, `install.ps1`, `mewkit-next self-update`, `scripts/release-check.sh`
+  `install.sh`, `install.ps1`, `mewkit self-update`, `scripts/release-check.sh`
 - Related: [261110-rust-adapter-contract.md](261110-rust-adapter-contract.md)
 
 ## Context
 
 The kit (`.claude/` content) is released as `meowkit-release.zip` on `v*` tags, and the npm
-`mewkit` CLI downloads it. `mewkit-next`, the Rust installer, is a native binary for six
-targets. It needs its own releases, and those releases share the repository's release list
+`mewkit` CLI downloads it. The Rust installer (then in preview under a separate name) is a
+native binary for six targets. It needs its own releases, and those releases share the repository's release list
 with the kit.
 
 Deployed npm CLIs cannot be changed. Their release filter
@@ -30,12 +30,12 @@ custody). Integrity therefore rests on SHA-256 digests and on who can change the
 | --- | --- | --- |
 | Tag | `vX.Y.Z`, `vX.Y.Z-beta.N` | `mewkit-vX.Y.Z`, `mewkit-vX.Y.Z-beta.N` |
 | Built by | `scripts/release.sh` | `rust-release.yml` on the tag |
-| Assets | `meowkit-release.zip`, `checksums.txt` | `mewkit-next-<ver>-<target>.tar.gz` ×6, `checksums.txt`, `binary-manifest.json` |
+| Assets | `meowkit-release.zip`, `checksums.txt` | `mewkit-<ver>-<target>.tar.gz` ×6, `checksums.txt`, `binary-manifest.json` |
 | `releases/latest` | yes, for a stable kit | never (`--latest=false`) |
-| Consumer | npm `mewkit`, `mewkit-next init/upgrade` | `install.sh`, `install.ps1`, `mewkit-next self-update` |
+| Consumer | deployed npm `mewkit`, `mewkit init/upgrade` | `install.sh`, `install.ps1`, `mewkit self-update` |
 
 - Binary archives are `.tar.gz` on every target, Windows included, and every asset name
-  starts with `mewkit-next-`. No binary asset can match the npm filter.
+  starts with `mewkit-`. No binary asset can match the npm filter.
 - A prerelease version (`-beta.N`) is published as a GitHub prerelease.
 - `binary-manifest.json` (`version`, `channel`, `published_at`, `min_supported`, per-target
   `url`, `sha256`, `size`) is what `self-update` reads. Raising `min_supported` withdraws a
@@ -48,22 +48,29 @@ custody). Integrity therefore rests on SHA-256 digests and on who can change the
   digest and size. Anyone who can publish a release here can ship code to `self-update` users;
   that is accepted and stated in `RELEASING.md`.
 - **Kit release gate.** `scripts/release-check.sh` installs the candidate kit with the newest
-  published `mewkit-next` (`init --dry-run`, all three runtimes). A kit whose `kitContract` or
+  published `mewkit` binary (`init --dry-run`, all three runtimes). A kit whose `kitContract` or
   `requires.mewkitMin` is beyond that binary fails the kit release.
 
 ## Consequences
 
-- A test (`github-releases-binary-coexistence.test.ts`) runs the npm filter over a fixture
-  that mixes both streams, using the real asset names from `scripts/release/binary-targets.mjs`.
-  Renaming a binary asset into the npm filter's reach fails it.
+- The binary's own kit selection never takes a `mewkit-v*` release as a kit
+  (`crates/mewkit-core/src/kit/select_tests.rs`). The deployed npm filter is protected by
+  the asset shape alone: binary assets are `.tar.gz`, never `.zip`.
 - `releases/latest` keeps meaning "the newest stable kit". Binary links use the tag
   (`releases/tag/mewkit-v…`) or the pinned installers.
 - Installer pins lag a release until its pin PR merges; the installers refuse a channel with
   no pin instead of guessing.
 - Adding signing later is additive: a signature asset beside `binary-manifest.json` and a
   verifier in the installers and `self-update`. Nothing in this decision blocks it.
-- When `mewkit-next` is renamed to `mewkit` (see `docs/maintainer/mewkit-next-cutover.md`),
-  the binary tag prefix and asset prefix stay as they are, so old clients keep finding updates.
+- The tag prefix `mewkit-v` predates the rename and did not change, so binaries released
+  before it keep finding updates through `self-update`.
+
+## Update (2026-11-15)
+
+The binary was renamed to `mewkit` (with `mk` as a short alias) and the npm CLI was retired;
+see [`docs/maintainer/npm-cli-retirement.md`](../../maintainer/npm-cli-retirement.md). Asset
+names moved to the `mewkit-` prefix with the rename; they are still `.tar.gz` only, so the
+decision above holds unchanged.
 
 ## Alternatives rejected
 

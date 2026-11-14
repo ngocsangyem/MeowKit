@@ -16,7 +16,7 @@ const columns = [
   ] },
   { title: 'Source', links: [
     { label: 'GitHub', href: 'https://github.com/ngocsangyem/MeowKit' },
-    { label: 'npm', href: 'https://www.npmjs.com/package/mewkit' },
+    { label: 'Releases', href: 'https://github.com/ngocsangyem/MeowKit/releases' },
   ] },
 ]
 

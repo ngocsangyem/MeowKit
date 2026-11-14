@@ -34,7 +34,7 @@ Options:
       --beta                  Let a prerelease be the newest kit
       --offline               Make no network request: use the newest kit in this scope's cache (or the cached --kit-version)
       --kit-archive <ZIP>     Install from a local meowkit-release.zip; its SHA-256 comes from --kit-sha256 or a checksums.txt beside it
-      --kit-sha256 <HEX>      
+      --kit-sha256 <HEX>      The expected SHA-256 of the --kit-archive zip, in hex
       --allow-unverified-kit  Accept a kit with no checksum or no kit-contract.json
   -h, --help                  Print help
 ```
@@ -60,7 +60,7 @@ Options:
       --beta                  Let a prerelease be the newest kit
       --offline               Make no network request: use the newest kit in this scope's cache (or the cached --kit-version)
       --kit-archive <ZIP>     Install from a local meowkit-release.zip; its SHA-256 comes from --kit-sha256 or a checksums.txt beside it
-      --kit-sha256 <HEX>      
+      --kit-sha256 <HEX>      The expected SHA-256 of the --kit-archive zip, in hex
       --allow-unverified-kit  Accept a kit with no checksum or no kit-contract.json
   -h, --help                  Print help
 ```
@@ -82,7 +82,7 @@ Options:
       --beta                  Let a prerelease be the newest kit
       --offline               Make no network request: use the newest kit in this scope's cache (or the cached --kit-version)
       --kit-archive <ZIP>     Install from a local meowkit-release.zip; its SHA-256 comes from --kit-sha256 or a checksums.txt beside it
-      --kit-sha256 <HEX>      
+      --kit-sha256 <HEX>      The expected SHA-256 of the --kit-archive zip, in hex
       --allow-unverified-kit  Accept a kit with no checksum or no kit-contract.json
   -h, --help                  Print help
 ```
@@ -129,7 +129,7 @@ Options:
       --beta                  Let a prerelease be the newest kit
       --offline               Make no network request: use the newest kit in this scope's cache (or the cached --kit-version)
       --kit-archive <ZIP>     Install from a local meowkit-release.zip; its SHA-256 comes from --kit-sha256 or a checksums.txt beside it
-      --kit-sha256 <HEX>      
+      --kit-sha256 <HEX>      The expected SHA-256 of the --kit-archive zip, in hex
       --allow-unverified-kit  Accept a kit with no checksum or no kit-contract.json
   -h, --help                  Print help
 ```
@@ -220,7 +220,7 @@ Arguments:
   [TARGET]  The phase file, or the plan.md / plan directory with --structural
 
 Options:
-      --json        
+      --json        Print the report as JSON
       --structural  Validate plan.md + every sibling phase file against the full template
   -h, --help        Print help
 ```
@@ -301,7 +301,7 @@ Options:
       --type <TYPE>          Task type: feature, bug-fix, refactor, security
       --priority <PRIORITY>  Task priority
       --activate             Activate the task on creation; `--no-activate` opts out
-      --no-activate          
+      --no-activate          The explicit opt-out, accepted so a caller can state the default
   -h, --help                 Print help
 ```
 
@@ -461,7 +461,7 @@ Options:
       --outcome <OUTCOME>
           What the PARENT did with the directive: adopted, rejected, deferred
       --reason <REASON>
-          Why — required even when the directive was adopted
+          Why; required even when the directive was adopted
       --question <QUESTION>
           The question the checkpoint asked
       --directive <DIRECTIVE>
@@ -481,7 +481,7 @@ Options:
       --evidence <EVIDENCE>
           `commit`: the workflow evidence index a correction supersedes. `validate-packet`: the packet to check
       --correction-kind <CORRECTION_KIND>
-          `commit`: source or scope — scope also returns Gate 1 to required
+          `commit`: source or scope; scope also returns Gate 1 to required
       --packet-kind <PACKET_KIND>
           `validate-packet`: input, output or brief
       --release-stage <RELEASE_STAGE>
@@ -583,7 +583,7 @@ Options:
       --beta                  Let a prerelease be the newest kit
       --offline               Make no network request: use the newest kit in this scope's cache (or the cached --kit-version)
       --kit-archive <ZIP>     Install from a local meowkit-release.zip; its SHA-256 comes from --kit-sha256 or a checksums.txt beside it
-      --kit-sha256 <HEX>      
+      --kit-sha256 <HEX>      The expected SHA-256 of the --kit-archive zip, in hex
       --allow-unverified-kit  Accept a kit with no checksum or no kit-contract.json
   -h, --help                  Print help
 ```

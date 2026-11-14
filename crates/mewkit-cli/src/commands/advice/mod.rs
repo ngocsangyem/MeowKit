@@ -51,7 +51,7 @@ pub struct AdviceArgs {
     /// What the PARENT did with the directive: adopted, rejected, deferred.
     #[arg(long)]
     pub outcome: Option<String>,
-    /// Why — required even when the directive was adopted.
+    /// Why; required even when the directive was adopted.
     #[arg(long)]
     pub reason: Option<String>,
     /// The question the checkpoint asked.
@@ -82,7 +82,7 @@ pub struct AdviceArgs {
     /// `validate-packet`: the packet to check.
     #[arg(long)]
     pub evidence: Option<String>,
-    /// `commit`: source or scope — scope also returns Gate 1 to required.
+    /// `commit`: source or scope; scope also returns Gate 1 to required.
     #[arg(long = "correction-kind")]
     pub correction_kind: Option<String>,
     /// `validate-packet`: input, output or brief.

@@ -117,7 +117,7 @@ Before adding a `docs/*` reference to any file under `.claude/`:
 2. Is the target a kit-internal policy file? → Banned. Inline the policy or drop the link if context is enough.
 3. Is the target a research / attribution source? → Banned. Use plain prose ("Source: <Author> — <Title>").
 4. Is the target a template placeholder example? → Use an angle-bracket placeholder `<path-to-related-doc-in-your-project>`, not a literal path.
-5. Run the validator after editing: `npx mewkit validate` (the docs-reference check runs as part of it).
+5. Run the validator after editing: `mewkit validate` (the docs-reference check runs as part of it).
 
 ## Validator
 
