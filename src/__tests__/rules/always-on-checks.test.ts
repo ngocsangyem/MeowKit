@@ -75,23 +75,23 @@ describe("check-always-on-budget", () => {
 		);
 		const result = run(BUDGET, root);
 		expect(result.status).toBe(0);
-		expect(result.output).toContain(`measured: rules ${expected} B (limit 18500)`);
+		expect(result.output).toContain(`measured: rules ${expected} B (limit 18191)`);
 		// With no skills or agents in the tree, the two measured sets coincide.
 		expect(result.output).toContain(`always-listed ${expected} B (limit 70000)`);
-		expect(expected).toBeLessThanOrEqual(18500);
+		expect(expected).toBeLessThanOrEqual(18191);
 	});
 
-	it("fails at one byte over the 18500-byte limit", () => {
+	it("fails at one byte over the 18191-byte limit", () => {
 		const root = makeAlwaysOnTree();
 		const rules = path.join(root, ".claude", "rules");
 		const current = ALWAYS_ON_RULES.reduce((sum, name) => sum + fs.statSync(path.join(rules, name)).size, 0);
-		fs.appendFileSync(path.join(rules, "meowkit-core.md"), "x".repeat(18501 - current));
+		fs.appendFileSync(path.join(rules, "meowkit-core.md"), "x".repeat(18192 - current));
 		const result = run(BUDGET, root);
 		expect(result.status).toBe(1);
-		expect(result.output).toContain("measured: rules 18501 B (limit 18500)");
-		// The rules ceiling is its own enforced comparison: 18501 B is nowhere near the
+		expect(result.output).toContain("measured: rules 18192 B (limit 18191)");
+		// The rules ceiling is its own enforced comparison: 18192 B is nowhere near the
 		// always-listed ceiling, so a tree that breaches only the rules must still fail.
-		expect(result.output).toContain("always-on rules are 1 bytes over the 18500-byte budget");
+		expect(result.output).toContain("always-on rules are 1 bytes over the 18191-byte budget");
 	});
 
 	it("exits 2 when the rules directory is unreadable", () => {

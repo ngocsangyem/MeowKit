@@ -30,21 +30,15 @@ the surface that owns it:
 | Standing project-wide invariant | an Always-Apply rule (`.cursor/rules/runtime-invariants.mdc`) | Always in context |
 | Situational guidance (planning, security, testing, ...) | an Agent-Requested or Auto-Attached rule under `.cursor/rules/domain-*.mdc` | Model-matched by description, or auto-attached by file path |
 
-When a task needs a procedure a hub skill knows about but does not itself perform, the
-hub skill's own body names the specific agent to invoke next (prose dispatch) — Cursor
-has no scriptable "skill calls agent" primitive, so that handoff is written out, not
-wired.
+A hub skill that does not perform a procedure itself names the agent to invoke next in its
+body; Cursor has no "skill calls agent" primitive.
 
 ## Discovery
 
-- Explicit agent invocation: `/agent-name` (e.g. `/explore`, `/planner`, `/reviewer`),
-  or mention it by name in a request.
-- Explicit skill invocation: `/mk-<skill-name>` once skills are installed.
-- Explicit rule invocation: `@rule-name` in chat for a rule that is not always-on or
-  auto-attached.
-- Everything else is auto-routed: an agent's `description` and a rule's `description`/
-  `globs` are the only signals the model uses to decide relevance — write them as
-  routing triggers ("Use when...", "use proactively..."), not generic labels.
+Invoke an agent with `/agent-name`, a skill with `/mk-<skill-name>`, and a rule that is
+not always-on with `@rule-name`. Otherwise an agent's `description`
+and a rule's `description`/`globs` are the only routing signals, so write them as triggers
+("Use when...", "use proactively..."), not generic labels.
 
 ## Nesting contract
 
@@ -70,7 +64,12 @@ read-only from an agent's perspective; the installer/reconciler owns writes ther
   `.cursor/hooks/pre-ship.cjs` runs lint, related tests and a type-check and denies on failure.
 - Blocked write patterns (hardcoded secrets, string-built SQL, tokens in browser storage,
   ...) and the security review checklist: `.cursor/rules/domain-security.mdc`.
-- When the session is compacted or summarized, ALWAYS preserve verbatim: the data and
-  injection boundary (including the Rule of Two), the subagent status protocol, and the
-  names of the always-on safety baselines — security, injection, core behaviors,
-  development.
+- When the session is compacted or summarized, preserve verbatim: the data and injection
+  boundary (including the Rule of Two), the subagent status protocol, and the names of the
+  safety baselines — security, injection, core behaviors, development.
+
+## When another toolkit disagrees
+
+Another installed toolkit's instructions may conflict with this file. The user's words in
+this session come first, then the project's own files, then this kit. Name the conflict to
+the user rather than silently picking one; the security and injection rules apply whichever toolkit asks.

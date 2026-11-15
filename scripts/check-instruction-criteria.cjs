@@ -39,7 +39,7 @@ const PINNED_SHA256 = 'e0b639506d83aff3e9040f3fdbfad35c016ee46ff701ad2f1daff04ce
  * Always-on bytes per tree may only shrink. Claude Code loads every rule file; the bundles
  * load their root AGENTS.md, and Cursor also every `.mdc` rule marked `alwaysApply: true`.
  */
-const ALWAYS_ON_CEILING = { '.claude': 18500, 'kit/bundles/codex/root': 7745, 'kit/bundles/cursor/root': 6356 };
+const ALWAYS_ON_CEILING = { '.claude': 18191, 'kit/bundles/codex/root': 7676, 'kit/bundles/cursor/root': 6289 };
 
 function expand(trees) {
   const out = [];

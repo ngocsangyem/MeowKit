@@ -936,7 +936,6 @@
       "kit/bundles/codex/root/.codex/agents/ui-ux-designer.toml": 1
     },
     "A14": {
-      ".claude/rules/meowkit-core.md": 1,
       ".claude/skills/autobuild/step-05-iterate-or-ship.md": 1,
       ".claude/skills/autobuild/step-06-run-report.md": 1,
       ".claude/skills/confluence/references/install-and-auth.md": 1,
