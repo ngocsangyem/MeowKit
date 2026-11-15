@@ -2,7 +2,7 @@
 name: jira-estimator
 description: Use for heuristic story-point estimation of a single Jira ticket via the jira-as CLI wrapper. Read-only against Jira. Not for complexity/inconsistency analysis or a full root-cause analysis.
 model: claude-opus-5[effort=high]
-readonly: true
+readonly: false
 is_background: true
 ---
 

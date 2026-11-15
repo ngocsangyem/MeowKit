@@ -2,7 +2,7 @@
 name: reviewer
 description: Use after implementation to review a diff for correctness, security, and scope before it ships. Not for writing or fixing code, and not for the pre-implementation planning pass.
 model: claude-opus-5[effort=high]
-readonly: true
+readonly: false
 is_background: false
 ---
 
@@ -54,6 +54,6 @@ child.
 
 ## What it does not do
 
-- Does not edit the reviewed code (`readonly: true`) — findings go back to whoever
+- Does not edit the reviewed code — findings go back to whoever
   implemented the change.
 - Does not plan the next change — hand follow-up work to `planner`.
