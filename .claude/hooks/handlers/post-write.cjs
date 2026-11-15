@@ -8,9 +8,9 @@
 // pre-write guards' job, and quarantining a bad one is nobody's job yet — this
 // reports honestly instead of pretending otherwise.
 //
-// Findings go to stderr. On this event stderr is the channel the host forwards
-// to the model; a non-blocking exit would surface as a hook error notice
-// instead, which the model does not see.
+// A BLOCK finding goes to stderr with exit 2, the PostToolUse form the host
+// forwards to the model. Warnings alone go back as `context`, because stderr at
+// exit 0 surfaces only as a hook notice the model does not see.
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -103,8 +103,10 @@ module.exports = function postWrite(ctx) {
   const { out, hasBlock } = findingsFor(content, checks, fileName);
   if (out.length === 0) return { stdout: `PASS — no issues found in ${fileName}\n`, feedback: false };
 
-  // Marked as feedback so the dispatcher emits it after every other observer
-  // has had its turn, and so a BLOCK reaches the model rather than being
-  // swallowed with the rest of the advisory output.
-  return { stderr: `${out.join('\n')}\n`, exitCode: hasBlock ? 2 : 0, feedback: true };
+  // A BLOCK is marked as feedback so the dispatcher emits it after every other
+  // observer has had its turn, failing the tool result so the model sees it.
+  if (hasBlock) return { stderr: `${out.join('\n')}\n`, exitCode: 2, feedback: true };
+  // Warnings alone do not fail the result; stderr at exit 0 never reaches the model, so
+  // they go as context, which the dispatcher sends in the host's model-visible field.
+  return { context: `Security scan warnings in ${fileName} (the write was saved; review before moving on):\n${out.join('\n')}` };
 };

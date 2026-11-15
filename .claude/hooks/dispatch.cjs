@@ -16,6 +16,20 @@
 // check answers with a JSON block decision. These are emitted only AFTER every
 // other observer has run, so a block never costs the rest of the chain its turn.
 //
+// A handler that has something the model should act on returns it as `context`.
+// Claude Code reads plain stdout on PreToolUse/PostToolUse as transcript only, so
+// there that text goes out as `hookSpecificOutput.additionalContext`, the
+// documented model-visible field. On UserPromptSubmit and SessionStart plain
+// stdout already reaches the model, so context is written as stdout unless a
+// JSON document is being sent. When an observer exits non-zero the host ignores
+// stdout JSON (exit 2 shows stderr), so the context joins stderr instead. Events
+// with no model-visible field for it drop the context and say so on stderr.
+//
+// stdout is either plain text or one JSON document, never both, because the host
+// parses it as JSON only when JSON is all there is. When a document goes out,
+// leftover plain stdout rides in it: as more `additionalContext` on events whose
+// stdout the model reads, as `systemMessage` (shown to the user) elsewhere.
+//
 // Each handler is required lazily inside the try block. Loading them up front
 // would let one unparseable file take down the whole event.
 
@@ -26,6 +40,15 @@ const HOOKS_DIR = path.join(ROOT, '.claude', 'hooks');
 
 const report = (message) => process.stderr.write(`dispatch: ${message}\n`);
 
+/** Events whose plain stdout the host shows to the model. */
+const MODEL_STDOUT_EVENTS = new Set(['UserPromptSubmit', 'SessionStart']);
+
+/** Events that accept `hookSpecificOutput.additionalContext`. */
+const CONTEXT_EVENTS = new Set(['PreToolUse', 'PostToolUse', 'PostToolUseFailure', ...MODEL_STDOUT_EVENTS]);
+
+/** The host caps one hook's model-visible text at 10,000 characters. */
+const CONTEXT_LIMIT = 10000;
+
 /**
  * Normalise what a handler returned. A plain string is stdout; an object may
  * also carry stderr and an exit code. Anything else is treated as "nothing to
@@ -33,11 +56,12 @@ const report = (message) => process.stderr.write(`dispatch: ${message}\n`);
  */
 function normalizeResult(value) {
   if (!value) return null;
-  if (typeof value === 'string') return { stdout: value, stderr: '', exitCode: 0, feedback: false };
+  if (typeof value === 'string') return { stdout: value, stderr: '', context: '', exitCode: 0, feedback: false };
   if (typeof value !== 'object') return null;
   return {
     stdout: typeof value.stdout === 'string' ? value.stdout : '',
     stderr: typeof value.stderr === 'string' ? value.stderr : '',
+    context: typeof value.context === 'string' ? value.context.trim() : '',
     exitCode: Number.isInteger(value.exitCode) ? value.exitCode : 0,
     feedback: value.feedback === true,
   };
@@ -110,18 +134,38 @@ async function main() {
     }
   }
 
-  // A feedback result may answer in the host's JSON form (a Stop block decision). The host
-  // parses stdout as JSON only when JSON is all there is, so when one does, the JSON objects
-  // are merged into the one stdout document and every other stdout line moves to stderr.
-  const hostJson = feedback.map((r) => parseObject(r.stdout)).filter(Boolean);
-  let exitCode = 0;
-  for (const result of [...advisory, ...feedback]) {
-    const isJson = hostJson.length > 0 && parseObject(result.stdout) !== null;
-    if (result.stdout && !isJson) (hostJson.length ? process.stderr : process.stdout).write(result.stdout);
-    if (result.stderr) process.stderr.write(result.stderr);
-    if (result.exitCode > exitCode) exitCode = result.exitCode;
+  const results = [...advisory, ...feedback];
+  const exitCode = results.reduce((max, r) => Math.max(max, r.exitCode), 0);
+  for (const r of results) if (r.stderr) process.stderr.write(r.stderr);
+
+  // A feedback result may answer in the host's JSON form (a Stop block decision).
+  const isHostJson = (r) => r.feedback && parseObject(r.stdout) !== null;
+  const hostJson = results.filter(isHostJson).map((r) => parseObject(r.stdout));
+  const plain = results.filter((r) => r.stdout && !isHostJson(r)).map((r) => r.stdout).join('');
+  let context = results.map((r) => r.context).filter(Boolean).join('\n\n');
+
+  if (exitCode !== 0) {
+    process.stdout.write(plain);
+    if (context) process.stderr.write(`${context}\n`);
+    process.exit(exitCode);
   }
-  if (hostJson.length) process.stdout.write(`${JSON.stringify(Object.assign({}, ...hostJson))}\n`);
+  if (context && !CONTEXT_EVENTS.has(event)) {
+    report(`${event} has no model-visible field for observer context; dropped: ${context.slice(0, 200)}`);
+    context = '';
+  }
+
+  const modelReadsStdout = MODEL_STDOUT_EVENTS.has(event);
+  if (hostJson.length === 0 && (!context || modelReadsStdout)) {
+    process.stdout.write(plain + (context ? `${context}\n` : ''));
+    process.exit(0);
+  }
+
+  const doc = Object.assign({}, ...hostJson);
+  let forModel = [modelReadsStdout ? plain.trim() : '', context].filter(Boolean).join('\n\n');
+  if (forModel.length > CONTEXT_LIMIT) forModel = `${forModel.slice(0, CONTEXT_LIMIT - 20)}\n[truncated]`;
+  if (forModel) doc.hookSpecificOutput = { ...doc.hookSpecificOutput, hookEventName: event, additionalContext: forModel };
+  if (!modelReadsStdout && plain.trim()) doc.systemMessage = [doc.systemMessage, plain.trim()].filter(Boolean).join('\n');
+  process.stdout.write(`${JSON.stringify(doc)}\n`);
   process.exit(exitCode);
 }
 

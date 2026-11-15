@@ -123,7 +123,9 @@ module.exports = function buildVerify(ctx, state) {
     const lines = output.split('\n').slice(0, 50).join('\n');
     // Exit 2 with stderr is the PostToolUse form Claude Code shows to the model; plain
     // stdout reaches only the transcript. The edit has already happened either way.
-    return { stderr: `@@BUILD_VERIFY_ERROR@@\nfile: ${filePath}\n\n${lines}\n@@END_BUILD_VERIFY@@\n`, exitCode: 2, feedback: true };
+    const advice = 'The edit was saved, but the build check now fails on this file. Fix these errors '
+      + 'before further edits, since later changes stack on a broken build.';
+    return { stderr: `@@BUILD_VERIFY_ERROR@@\nfile: ${filePath}\n${advice}\n\n${lines}\n@@END_BUILD_VERIFY@@\n`, exitCode: 2, feedback: true };
   }
 
   // Cache the clean hash

@@ -5,7 +5,9 @@
 // Estimation: chars / 4 ≈ tokens (rough, English text). Imprecise but order-of-magnitude.
 // Pricing: per 1M tokens (input/output) by model tier.
 //
-// Advisory: both messages are printed for the transcript and nothing is stopped. The
+// User-facing only: both notices are plain stdout, which the host keeps in the transcript and
+// does not show to the model. That is deliberate: a spend figure in the model's context
+// changes how much it spends, and a cost estimate is the user's call. Nothing is stopped. The
 // estimate resets with each new session (project-context-loader clears the state file).
 //
 // Thresholds come from the project config, which is committed and therefore the
@@ -75,7 +77,7 @@ module.exports = function budgetTracker(ctx, state) {
   if (budget.estimated_cost_usd >= blockThreshold) {
     budget.warnings_emitted += 1;
     state.save('budget-state', budget);
-    return `@@BUDGET_BLOCK@@\nEstimated cost: $${budget.estimated_cost_usd} (cap: $${blockThreshold}). Session estimate is over the cap. Advisory: nothing is stopped.\nDetails: .meowkit/state/budget-state.json.\n@@END_BUDGET@@\n`;
+    return `@@BUDGET_OVER@@\nEstimated cost: $${budget.estimated_cost_usd} (cap: $${blockThreshold}). Session estimate is over the cap. Advisory: nothing is stopped.\nDetails: .meowkit/state/budget-state.json.\n@@END_BUDGET@@\n`;
   }
 
   if (budget.estimated_cost_usd >= warnThreshold && budget.warnings_emitted === 0) {

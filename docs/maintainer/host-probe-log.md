@@ -18,6 +18,7 @@ Cursor Agent 2026.07.23-e383d2b.
 
 | # | Probe | Host | Known behaviour | Source | Status | Design it selects |
 |---|---|---|---|---|---|---|
+| P1 | `hookSpecificOutput.additionalContext` reaches the model on PreToolUse, PostToolUse and PostToolUseFailure | Claude Code | "Add context for Claude": wrapped in a system reminder next to the tool result; plain stdout on these events is not listed as model-visible; 10,000-character cap | [hooks reference](https://code.claude.com/docs/en/hooks), checked 2026-11-16 | documented, not probed | Observers return `context`; `dispatch.cjs` sends it as `additionalContext` on tool events (`docs/maintainer/hook-output-channels.md`) |
 | P1 | Plain hook stdout reaches the model on PostToolUse and Stop | Claude Code | Not stated as model-visible. Exit 2 on PostToolUse shows stderr to Claude; `hookSpecificOutput.additionalContext` continues a Stop turn as feedback | [#37], [#31] | documented, not probed | Model-visible feedback uses `hookSpecificOutput.additionalContext` (Stop) or exit 2 + stderr (PostToolUse); plain stdout is treated as user-only |
 | P1 | Same | Codex | Stop `decision: "block"` or exit 2 with stderr continues the turn with the reason as a new prompt | [#9] | documented, not probed | Codex completion check blocks with `decision: "block"` and a reason |
 | P1 | Same | Cursor | Stop `decision: "block"` + `reason` (Claude Code format) becomes an automatic follow-up; native hooks use `followup_message` | [#46] | documented, not probed | Cursor completion check returns `followup_message` |

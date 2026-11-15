@@ -36,7 +36,7 @@ Each event type has exactly ONE canonical emitter. No double-emission across hoo
 
 - `learning-observer.cjs` is the only emitter of `file_edited`
 - ~~`post-write-build-verify.sh`~~ removed v2.4.0; `build_verify_result` is no longer emitted (verify-result feedback now via stdout, not trace)
-- ~~`post-write-loop-detection.sh`~~ removed v2.4.0; `loop_warning` is no longer emitted (warn/escalate now via stdout markers `@@LOOP_DETECT_WARN@@` / `@@LOOP_DETECT_ESCALATE@@`)
+- ~~`post-write-loop-detection.sh`~~ removed v2.4.0; `loop_warning` is no longer emitted (the `loop-detection` handler now reminds the model through `additionalContext` instead)
 
 This prevents trace inflation from redundant records.
 

@@ -38,9 +38,12 @@ otherwise read as permission.
 
 **Observers** — every entry in `handlers.json` — run through `dispatch.cjs` and fail
 OPEN: one that throws is reported and the rest still run. Three of them have their output
-passed through rather than swallowed: `post-write.cjs` and `build-verify.cjs` report a
-finding the model sees (exit 2, stderr), and the opt-in `pre-completion-check.cjs` answers
-with a block decision. These are emitted after every other observer has run.
+passed through rather than swallowed: `build-verify.cjs` and a BLOCK finding of
+`post-write.cjs` reach the model (exit 2, stderr), and the opt-in `pre-completion-check.cjs` answers
+with a block decision. These are emitted after every other observer has run. An observer
+with advice for the model returns `context`; on tool events the dispatcher sends it as
+`hookSpecificOutput.additionalContext`, because plain stdout there reaches only the
+transcript.
 
 **CLI modules** are invoked with arguments by an agent or another module, not by an
 event, so they appear in no registry.
@@ -69,14 +72,14 @@ later; nothing is switchable yet.
 
 | Handler | Event | Matcher | Toggle key | Timeout | Purpose |
 |---|---|---|---|---|---|
-| `pre-task-check.cjs` | PreToolUse | Bash | preTaskCheck | — | Reports prompt-injection patterns in a command (advisory) |
+| `pre-task-check.cjs` | PreToolUse | Bash | preTaskCheck | — | Reports prompt-injection patterns in a command to the model as additionalContext (advisory) |
 | `build-verify.cjs` | PostToolUse | Edit\|Write | buildVerify | — | Runs the project build after an edit |
-| `loop-detection.cjs` | PostToolUse | Edit\|Write | loopDetection | — | Detects repeated identical edits |
-| `budget-tracker.cjs` | PostToolUse | Edit\|Write | budgetTracker | — | Accumulates token and cost estimates |
+| `loop-detection.cjs` | PostToolUse | Edit\|Write | loopDetection | — | Reminds the model, as additionalContext, at 4 and 8 edits to one file, then every 4 |
+| `budget-tracker.cjs` | PostToolUse | Edit\|Write | budgetTracker | — | Accumulates token and cost estimates; notices are user-only |
 | `auto-checkpoint.cjs` | PostToolUse | Edit\|Write | autoCheckpoint | — | Writes a checkpoint after an edit |
 | `learning-observer.cjs` | PostToolUse | Edit\|Write | learningObserver | — | Per-file edit ledger and the canonical edit record |
 | `post-write.cjs` | PostToolUse | Edit\|Write | postWrite | — | Security scan of a file that has already been written; fails the tool result on a blocked pattern |
-| `budget-tracker.cjs` | PostToolUse | Bash | budgetTracker | — | Accumulates token and cost estimates |
+| `budget-tracker.cjs` | PostToolUse | Bash | budgetTracker | — | Accumulates token and cost estimates; notices are user-only |
 | `review-evidence-tag.cjs` | PostToolUse | Bash | reviewEvidenceTag | — | Tags review evidence from a command |
 | `verification-evidence.cjs` | PostToolUse, SessionStart | Bash | verificationEvidence | — | Records the session's starting tree and the tree at each passing verification command, for the opt-in completion check |
 | `checkpoint-writer.cjs` | Stop | — | checkpointWriter | — | Writes the end-of-session checkpoint |

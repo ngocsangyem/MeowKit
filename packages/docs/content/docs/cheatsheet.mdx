@@ -116,7 +116,7 @@ Run `mewkit --help` for the full list.
 |------|------|-------------|---------|
 | post-write.cjs | PostToolUse | Security scan on Edit/Write | Yes |
 | post-session.cjs | Stop | Capture session to memory | No |
-| pre-task-check.cjs | Skill-invoked | Injection pattern detection | Yes |
+| pre-task-check.cjs | PreToolUse Bash | Injection pattern detection, reported to the model | No |
 | pre-implement.cjs | Skill-invoked | TDD gate — opt-in via `--tdd` / `MEOWKIT_TDD=1`; no-op otherwise | Only when TDD enabled |
 | pre-ship.cjs | Skill-invoked | Test + lint + typecheck | Yes |
 | privacy-block.cjs | PreToolUse | Block .env / *.key / credential reads | Yes |

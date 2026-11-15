@@ -36,7 +36,7 @@ These run when specific skills call them:
 
 | Script              | Phase     | What it does                       | Blocks?                  |
 | ------------------- | --------- | ---------------------------------- | ------------------------ |
-| `pre-task-check.cjs` | Any       | Prompt injection pattern detection | Yes (BLOCK on injection) |
+| `pre-task-check.cjs` | Any       | Prompt injection pattern detection; findings reach the model as `additionalContext` | No (advisory) |
 | `pre-implement.cjs`  | Phase 2-3 | TDD gate — opt-in (see note below) | Only when TDD enabled    |
 | `pre-ship.cjs`       | Phase 5   | Test + lint + typecheck            | Yes                      |
 | `append-trace.cjs`   | Any       | Append JSONL trace record to `.meowkit/telemetry/trace-log.jsonl` (secret-scrubbed, atomic, auto-rotates at 50MB) | No                       |
@@ -171,7 +171,7 @@ Of the 21 handlers in `handlers.json`, most are Claude Code only. Cursor's `tele
 
 ### `build-verify` (handler)
 
-Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Classifies the written file by extension (`ts/tsx` → `tsc --noEmit\|eslint`; `js` → `eslint`; `py` → `ruff check\|mypy`; `go` → `go build ./...`; `rs` → `cargo check`; `rb` → `ruby -c\|rubocop`). Errors emitted to stdout as `@@BUILD_VERIFY_ERROR@@ … @@END_BUILD_VERIFY@@` blocks (fed back to agent). Results cached by file content hash — unchanged files are skipped. Skips `node_modules/`, `vendor/`, `dist/`, `tasks/`, `docs/`, `.claude/`, test files, and map/lock files.
+Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Classifies the written file by extension (`ts/tsx` → `tsc --noEmit\|eslint`; `js` → `eslint`; `py` → `ruff check\|mypy`; `go` → `go build ./...`; `rs` → `cargo check`; `rb` → `ruby -c\|rubocop`). On a failure it exits 2 and writes a `@@BUILD_VERIFY_ERROR@@ … @@END_BUILD_VERIFY@@` block to stderr, the PostToolUse form Claude Code shows to the model; the edit itself is already saved. Results cached by file content hash — unchanged files are skipped. Skips `node_modules/`, `vendor/`, `dist/`, `tasks/`, `docs/`, `.claude/`, test files, and map/lock files.
 
 - **Opt-out:** `hooks.build-verify: false`
 - **Timeout override:** `buildVerify.timeoutMs` (default 30s for TS; 35s hook registration timeout)
@@ -180,7 +180,7 @@ Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Classifies the written f
 
 ### `loop-detection` (handler)
 
-Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits keyed `{session_id}:{realpath}` in `.meowkit/state/edit-counts.json`. Warns at N≥4 (`@@LOOP_DETECT_WARN@@`) and escalates at N≥8 (`@@LOOP_DETECT_ESCALATE@@`) — doom-loop prevention per LangChain harness research. Never blocks; messages are fed back via stdout.
+Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits keyed `{session_id}:{realpath}` in `.meowkit/state/edit-counts.json`. Reminds the model at 4 edits, asks it to re-plan at 8, and repeats every 4 edits after, as `hookSpecificOutput.additionalContext` (the model-visible PostToolUse field). Never blocks.
 
 - **Opt-out:** `hooks.loop-detection: false`
 - **Timeout:** 3s

@@ -125,9 +125,9 @@ describe('the handlers whose output means something are passed through', () => {
     const dir = tree([{ name: 'completion', source: BLOCKING_DECISION }, { name: 'healthy', source: HEALTHY }]);
     const r = dispatch(dir);
     expect(r.exit, 'a decision is not an error').toBe(0);
-    expect(JSON.parse(r.stdout)).toEqual({ decision: 'block', reason: 'no evidence' });
-    // The advisory observer still ran; its text moved aside rather than breaking the JSON.
-    expect(r.stderr).toContain('healthy-ran');
+    // The advisory observer still ran; its text rides in the document as a user notice
+    // rather than breaking the JSON or vanishing onto stderr.
+    expect(JSON.parse(r.stdout)).toEqual({ decision: 'block', reason: 'no evidence', systemMessage: 'healthy-ran' });
   });
 
   it('a feedback handler that crashes stays fail-open like any other', () => {

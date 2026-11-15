@@ -99,7 +99,7 @@ For each session-state file, here is what it does and why `--resume` cannot repl
 
 | File | Writer | Reader | Why session-state, not `--resume` |
 |---|---|---|---|
-| `budget-state.json` | `budget-tracker.cjs` (PostToolUse) | Same handler + `auto-checkpoint`, `checkpoint-writer`, `post-session.cjs` | Live token/cost counter. Each write IS an enforcement action — `budget-tracker` returns `@@BUDGET_BLOCK@@` over cap. |
+| `budget-state.json` | `budget-tracker.cjs` (PostToolUse) | Same handler + `auto-checkpoint`, `checkpoint-writer`, `post-session.cjs` | Live token/cost counter. Advisory: over the cap `budget-tracker` prints a user-only `@@BUDGET_OVER@@` notice and stops nothing. |
 | `detected-model.json` | `model-detector.cjs` (SessionStart) | `budget-tracker`, `auto-checkpoint`, `checkpoint-writer` | Model tier drives hook density. Set from SessionStart `model` field. |
 | `edit-counts.json` | `loop-detection.cjs` (PostToolUse Edit/Write) | Same handler | Doom-loop guard. Keyed by `{session_id}:{realpath}`. |
 | `precompletion-attempts.json` | `pre-completion-check.cjs` (Stop) | Same hook | 3-attempt re-entry cap on Stop verification gate. |
