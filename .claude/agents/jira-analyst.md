@@ -2,7 +2,7 @@
 name: jira-analyst
 description: 'mk:jira executor for mk:jira-analyst. Ticket context, media and RCA reading.'
 tools: Bash, Read, Grep, Glob, Write, Edit
-model: claude-opus-5
+model: opus
 permissionMode: default
 memory: project
 color: cyan

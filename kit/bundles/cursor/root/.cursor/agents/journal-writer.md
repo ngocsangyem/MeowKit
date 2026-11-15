@@ -1,7 +1,7 @@
 ---
 name: journal-writer
 description: Use when something goes wrong — repeated test failures, production bugs, failed refactors, or a security vulnerability. Documents the raw reality of what happened and what was learned.
-model: claude-sonnet-5
+model: composer-2.5[fast=true]
 readonly: false
 is_background: true
 ---

@@ -1,7 +1,7 @@
 ---
 name: ui-ux-designer
 description: Use when frontend work requires UI/UX design decisions — component design, design systems, wireframes, accessibility audits, responsive layout. Not for production source implementation.
-model: claude-sonnet-5
+model: claude-opus-5[effort=high]
 readonly: false
 is_background: false
 ---

@@ -9,6 +9,21 @@ Update a row when the vendor page changes, and put the date you opened the page 
 A status is copied from the vendor page, not inferred: when the page does not name an id, the
 status is `not listed`.
 
+## Tier mapping
+
+Each agent's pin follows its Claude Code tier (the table in
+`.claude/skills/agent-detector/references/model-selection-rules.md`); the bundles derive from it.
+Chosen 2026-11-15.
+
+| Claude Code tier | Claude Code | Codex | Cursor |
+|---|---|---|---|
+| haiku | `haiku` | `gpt-6-luna` | `composer-2.5[fast=true]` |
+| sonnet | `sonnet` | `gpt-6.1-sol` | `composer-2.5[fast=true]` |
+| opus | `opus` | `gpt-6-astra` | `claude-opus-5[effort=high]` |
+| fable | `fable` | `gpt-6-astra` | `claude-fable-5` |
+
+On Codex, Enterprise and Edu admins must enable `gpt-6-luna` before it can run.
+
 ## Pins
 
 | Id | Runtime | Status | Source | Checked | Notes |

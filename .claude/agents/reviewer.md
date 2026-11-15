@@ -2,7 +2,7 @@
 name: reviewer
 description: Structural code review agent that performs deep 5-dimension reviews and writes the review verdict the change should pass before it ships. Use in Phase 4 after developer completes implementation and tester confirms green phase. Not for runtime-evaluation or security verdicts.
 tools: Read, Grep, Glob, Bash, Write, Task, Edit
-model: claude-opus-5
+model: opus
 memory: project
 owner: testing
 criticality: high

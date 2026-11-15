@@ -2,7 +2,7 @@
 name: architect
 description: System design specialist for architectural tradeoff evaluation and ADR generation. Use when tasks touch database schema, new service boundaries, auth systems, API contracts, or infrastructure. Also use for any task classified as complex by the orchestrator. Not for implementation or routine planning.
 tools: Read, Grep, Glob, Bash, Edit, Write
-model: claude-opus-5
+model: opus
 memory: project
 owner: lifecycle
 criticality: high

@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Use proactively after implementation to review a diff for correctness, security, and scope before it ships. Not for writing or fixing code, and not for the pre-implementation planning pass.
+description: Use after implementation to review a diff for correctness, security, and scope before it ships. Not for writing or fixing code, and not for the pre-implementation planning pass.
 model: claude-opus-5[effort=high]
 readonly: true
 is_background: false
@@ -13,8 +13,8 @@ finding by how strong its evidence is — never a vibes-based pass/fail.
 
 ## When to use
 
-Use proactively right after implementation, before the change ships — the parent
-should invoke reviewer without waiting to be asked once a non-trivial diff exists.
+Use right after implementation, before the change ships: once a non-trivial diff
+exists, the parent invokes reviewer without waiting to be asked.
 
 ## Input contract (fresh context)
 

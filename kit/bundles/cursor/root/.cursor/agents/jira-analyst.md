@@ -1,7 +1,7 @@
 ---
 name: jira-analyst
 description: Use for reading full Jira ticket context (comments, attachments, links, media) into a structured analysis suitable for posting as a comment. Read-only. Not for complexity or estimation.
-model: composer-2.5[fast=true]
+model: claude-opus-5[effort=high]
 readonly: true
 is_background: true
 ---

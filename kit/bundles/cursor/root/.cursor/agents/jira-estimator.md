@@ -1,7 +1,7 @@
 ---
 name: jira-estimator
 description: Use for heuristic story-point estimation of a single Jira ticket via the jira-as CLI wrapper. Read-only against Jira. Not for complexity/inconsistency analysis or a full root-cause analysis.
-model: composer-2.5[fast=true]
+model: claude-opus-5[effort=high]
 readonly: true
 is_background: true
 ---
