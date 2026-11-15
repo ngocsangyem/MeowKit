@@ -43,8 +43,8 @@ For `review --scout`:
    (skills cannot invoke other skills programmatically)
 2. If scout output is in session context, extract it
 3. Read("agents/tech-analyzer.md") → agent_def
-4. Agent(subagent_type: "general-purpose",
-         prompt: "{agent_def}\n\nScout output:\n{scout_output}\n\nTask: review PROJ-123")
+4. Delegate to a general-purpose subagent with
+         prompt: "{agent_def}\n\nScout output:\n{scout_output}\n\nTask: review PROJ-123"
 5. Capture output → write report to tasks/reports/ or plan research/
 ```
 Note: If scout was NOT run, proceed without it → `[NO_CODEBASE_CONTEXT]` in report.
@@ -64,8 +64,8 @@ For `plan`:
       ## Gaps & Ambiguities sections; pass extracted content + report path
       to the agent as additional input.
 2. Read("agents/planning-reporter.md") → agent_def
-3. Agent(subagent_type: "general-purpose",
-         prompt: "{agent_def}\n\nSpec context:\n{spec_extracted_or_NONE}\n\nTask: plan tickets PROJ-101,PROJ-102 --capacity 40")
+3. Delegate to a general-purpose subagent with
+         prompt: "{agent_def}\n\nSpec context:\n{spec_extracted_or_NONE}\n\nTask: plan tickets PROJ-101,PROJ-102 --capacity 40"
 4. Capture output → write report. Report includes ## Spec Context section when --spec was provided.
 ```
 

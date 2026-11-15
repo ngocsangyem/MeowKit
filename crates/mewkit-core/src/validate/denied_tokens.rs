@@ -10,29 +10,36 @@ use std::sync::LazyLock;
 use regex::Regex;
 
 /// Claude-Code-bound constructs that must not appear in content installed for
-/// another provider. "subagent" is deliberately NOT denied: it is native Codex
+/// another provider. The JavaScript instruction checker reads the same set from
+/// `scripts/lib/host-foreign-tokens.json`; a test fails when the two differ.
+/// "subagent" is deliberately NOT denied: it is native Codex
 /// vocabulary, and flagging it was a false positive.
 static DENIED_TOKENS: LazyLock<Vec<(&'static str, Regex)>> = LazyLock::new(|| {
-    [
-        ("mk/meow slash command", r"/(?:mk|meow):[a-z]", true),
-        ("AskUserQuestion tool", r"\bAskUserQuestion\b", false),
-        (".claude path", r"\.claude/", false),
-        ("CLAUDE.md reference", r"\bCLAUDE\.md\b", false),
-        ("Task( tool call", r"\bTask\(", false),
-        ("Claude env var", r"\$\{?CLAUDE_[A-Z0-9_]+", false),
-        ("Anthropic env var", r"\$\{?ANTHROPIC_[A-Z0-9_]+", false),
-    ]
-    .iter()
-    .map(|(label, source, case_insensitive)| {
-        let compiled = if *case_insensitive {
-            crate::js_regex::compile_ci(source)
-        } else {
-            crate::js_regex::compile(source)
-        };
-        (*label, compiled.expect("a static denied-token pattern"))
-    })
-    .collect()
+    DENIED_TOKEN_SOURCES
+        .iter()
+        .map(|(label, source, case_insensitive)| {
+            let compiled = if *case_insensitive {
+                crate::js_regex::compile_ci(source)
+            } else {
+                crate::js_regex::compile(source)
+            };
+            (*label, compiled.expect("a static denied-token pattern"))
+        })
+        .collect()
 });
+
+/// (label, JavaScript-syntax pattern, case-insensitive) for each denied token.
+const DENIED_TOKEN_SOURCES: [(&str, &str, bool); 9] = [
+    ("mk/meow slash command", r"/(?:mk|meow):[a-z]", true),
+    ("AskUserQuestion tool", r"\bAskUserQuestion\b", false),
+    (".claude path", r"\.claude/", false),
+    ("CLAUDE.md reference", r"\bCLAUDE\.md\b", false),
+    ("Task( tool call", r"\bTask\(", false),
+    ("Claude env var", r"\$\{?CLAUDE_[A-Z0-9_]+", false),
+    ("Anthropic env var", r"\$\{?ANTHROPIC_[A-Z0-9_]+", false),
+    ("subagent_type parameter", r"\bsubagent_type\b", false),
+    ("TodoWrite tool", r"\bTodoWrite\b", false),
+];
 
 /// Labels whose findings are a WARN rather than a FAIL.
 pub(super) const PATH_CLASS: [&str; 2] = [".claude path", "CLAUDE.md reference"];
@@ -45,3 +52,7 @@ pub(super) fn scan_denied_tokens(content: &str) -> Vec<&'static str> {
         .map(|(label, _)| *label)
         .collect()
 }
+
+#[cfg(test)]
+#[path = "denied_tokens_tests.rs"]
+mod denied_tokens_tests;

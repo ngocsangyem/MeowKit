@@ -1,0 +1,1 @@
+Read ${CLAUDE_PROJECT_DIR}.

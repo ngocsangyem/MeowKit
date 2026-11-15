@@ -203,6 +203,11 @@ jobs:
       - name: Check always-on rule budget
         run: node scripts/check-always-on-budget.cjs .
 
+      # Mechanical instruction criteria on all three trees (.claude and both bundles).
+      # The baseline holds findings that predate a criterion; a file fails only when it grows.
+      - name: Check instruction criteria
+        run: node scripts/check-instruction-criteria.cjs --baseline scripts/instruction-criteria-baseline.json
+
       - name: Check always-on safety text survives compression
         run: node scripts/check-rule-survival.cjs .
 
