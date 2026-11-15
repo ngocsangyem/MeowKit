@@ -1,6 +1,6 @@
 ---
 source: original
-applies_to: [Phase 1 entry, Gate 2]
+applies_to: [Phase 1 entry, Phase 4 verdict]
 loaded_by: mk:agent-detector Step 0b (Agile context only)
 trust_level: HIGH
 ---
@@ -30,9 +30,9 @@ DoR PROJ-123:  ✓ AC  ✗ estimate  ⚠ evaluator 22d old  ✓ no blockers
 
 **NEVER hard-block. INSTEAD:** surface gaps; human decides.
 
-## 2 — Definition of Done (Gate 2 PASS extension)
+## 2 — Definition of Done (review-verdict extension)
 
-**Triggers:** Gate 2 verdict written PASS/WARN.
+**Triggers:** review verdict written PASS/WARN.
 
 Three opt-in actions via AskUserQuestion. Every step Jira-offline-safe:
 
@@ -55,5 +55,5 @@ ABSENCE = non-Agile mode; rule silently skips all checks.
 ## Integrations
 
 - `mk:plan-creator` Phase 1 entry → 1
-- `mk:ship` Gate 2 PASS → 2 (LOCKED owner; covers `mk:cook`→`mk:ship` chain)
+- `mk:ship` on a PASS verdict → 2 (LOCKED owner; covers `mk:cook`→`mk:ship` chain)
 - the `project-manager` agent, `mk:sprint-contract` → 3

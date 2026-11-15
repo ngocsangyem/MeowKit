@@ -27,7 +27,7 @@ Phase files (`phase-XX-*.md`) MUST begin with their own YAML frontmatter block. 
 
 | Field | Type | Allowed values | Default | Notes |
 |-------|------|----------------|---------|-------|
-| phase | int | ≥1 (max enforced by `step-03-draft-plan.md`, currently 7) | filename-derived | required |
+| phase | int | ≥1 (max set by `step-03-draft-plan.md`, currently 7) | filename-derived | required |
 | title | string | — | heading-derived | required |
 | status | enum | `pending \| active \| in_progress \| completed \| failed \| abandoned` | `pending` | NEVER `completed` at creation |
 | priority | enum | `P1 \| P2 \| P3` | `P2` | phase-level priority — distinct from plan.md `critical/high/medium/low` |
@@ -37,7 +37,7 @@ Phase files (`phase-XX-*.md`) MUST begin with their own YAML frontmatter block. 
 **Source-of-truth contract:** the frontmatter is machine-readable truth. The `## Overview` block in markdown body is a human-readable MIRROR — sync-back regenerates the `**Status:**`, `**Priority:**`, `**Effort:**`, `**Depends on:**` lines from frontmatter on every cook finalize-step run.
 
 **Anti-patterns (ALL forbidden):**
-- `status: completed` at creation — breaks Gate 1 + cook re-hydration
+- `status: completed` at creation — breaks cook re-hydration (phases skip as done)
 - `status: unknown` written from frontmatter — `unknown` is a parser sentinel for parse failures only
 - `status: draft` or `status: done` — not in the parser `PhaseStatus` union; normalizes to `unknown`
 - Editing `**Status:**` in Overview prose directly — sync-back overwrites it; edit frontmatter instead
@@ -46,5 +46,5 @@ Phase files (`phase-XX-*.md`) MUST begin with their own YAML frontmatter block. 
 See `phase-template.md` for the canonical block to prepend at file creation.
 
 ## Validation
-Run `mewkit plan check --structural <plan-file>` before presenting for Gate 1.
+Run `mewkit plan check --structural <plan-file>` before presenting the plan.
 Output: PLAN_COMPLETE or PLAN_INCOMPLETE with missing items.

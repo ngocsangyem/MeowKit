@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-time. Worklogs, estimates and time re
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default
-memory: project
 color: orange
 owner: jira
 criticality: medium

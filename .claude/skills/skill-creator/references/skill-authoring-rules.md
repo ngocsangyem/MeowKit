@@ -118,9 +118,9 @@ Enforced by `mewkit validate --frontmatter` against the `skill-schema.json` the 
 
 ## Advisory Frontmatter Fields
 
-The following frontmatter fields are advisory (not hook-enforced); they annotate skills for humans and downstream tooling.
+The following frontmatter fields are advisory — no hook reads them; they annotate skills for humans and downstream tooling.
 
-- `preamble-tier: 1 | 2 | 3` — context-injection priority for the skill's preamble block. 1 = low (loaded on demand), 2 = medium, 3 = high (injected before other context). Skills that depend on memory-read or gate-check preambles typically set `3`.
+- `preamble-tier: 1 | 2 | 3` — context-injection priority for the skill's preamble block. 1 = low (loaded on demand), 2 = medium, 3 = high (injected before other context). Skills that depend on memory-read or ship-check preambles typically set `3`.
 - `phase: 0 | 1 | 2 | 3 | 4 | 5 | 6 | on-demand` — anchors the skill to a workflow phase. `on-demand` means the skill is invoked by need, not by phase.
 - `trust_level: kit-authored | third-party` — provenance marker. Third-party skills should treat external input as DATA per `injection-rules.md`.
 - `injection_risk: low | medium | high` — advisory risk level for prompt-injection exposure.
@@ -130,7 +130,7 @@ The following frontmatter fields are advisory (not hook-enforced); they annotate
 
 ### Tool Contract Rule
 
-A skill that creates, binds, or selects external runtime resources MUST honor these contract properties (advisory — documented here, not hook-enforced; promotion to `--strict` is deferred until the WARN check is calibrated over one release):
+A skill that creates, binds, or selects external runtime resources MUST honor these contract properties (advisory — documented here, read by no hook; promotion to `--strict` is deferred until the WARN check is calibrated over one release):
 
 1. **Fail closed on ambiguity.** When external-resource selection is ambiguous (multiple candidates, missing identifier), stop and ask — never guess a target.
 2. **Return stable machine-readable IDs.** For any created/bound runtime resource, surface a stable ID a downstream step can re-bind to, not a transient label.
@@ -216,8 +216,8 @@ unverified, so a provider projection must remain conditional until the target
 host contract has been verified.
 
 The default cook workflow stops before shipping. Shipping remains an explicit,
-human-approved action. A plan Insert or Split requires Gate 1 re-approval;
-Skip or Reorder must notify the user and leave an audit-log entry.
+human-approved action. A plan Insert or Split means taking the revised plan back to
+the user; Skip or Reorder must notify the user and leave an audit-log entry.
 
 ## Rule 9: Enforce Brand Prose Incrementally
 

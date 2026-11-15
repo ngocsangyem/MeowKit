@@ -36,9 +36,10 @@ fires before the gate step, never inside it.
 
 - **The plan itself.** Athena writes no plan file and edits no phase file. It reads and
   may return the plan to the planner.
-- **Gate 1.** It stays human. A REVIEW directive is evidence presented at the gate.
-- **A scope correction** invalidates Gate 1 and requires a new human approval; an
-  in-scope correction keeps it and invalidates downstream evidence.
+- **The conversation with the user.** It stays the user's. A REVIEW directive is input to
+  it, never a substitute for it.
+- **A scope correction** means the plan the user saw no longer describes the work: present
+  it again. An in-scope correction keeps it and invalidates downstream evidence.
 
 ## Fallback
 

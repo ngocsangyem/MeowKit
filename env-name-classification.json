@@ -149,7 +149,7 @@
       "name": "MEOWKIT_AUTOBUILD_MODE",
       "class": "safety-path",
       "key": "autobuild.mode",
-      "reader": "hooks/lib/check-contract-signed.cjs (gate bypass, env only); density readers use the config key"
+      "reader": "hooks/lib/trace-log.cjs (trace density field, env only); density readers use the config key"
     },
     {
       "name": "MEOWKIT_BUDGET_BLOCK",
@@ -231,9 +231,9 @@
     },
     {
       "name": "MEOWKIT_GATE1_PRESENCE_ONLY",
-      "class": "safety-path",
+      "class": "drop",
       "key": "",
-      "reader": "hooks/lib/gate1-hatch.cjs, reached from hooks/gate-enforcement.cjs"
+      "reader": "no reader; the plan gate it downgraded was removed"
     },
     {
       "name": "MEOWKIT_GEMINI_API_KEY",
@@ -287,7 +287,7 @@
       "name": "MEOWKIT_HOOK_PROFILE",
       "class": "safety-path",
       "key": "",
-      "reader": "hooks/lib/core/pre-ship.cjs and three observers; no config key by design"
+      "reader": "hooks/handlers/learning-observer.cjs, hooks/handlers/post-session.cjs and hooks/handlers/pre-task-check.cjs; the ship check ignores it; no config key by design"
     },
     {
       "name": "MEOWKIT_IMAGE_GEN_MODEL",
@@ -570,7 +570,7 @@
       "name": "MEOW_HOOK_PROFILE",
       "class": "safety-path",
       "key": "",
-      "reader": "hooks/lib/core/pre-ship.cjs and three observers; no config key by design"
+      "reader": "hooks/handlers/learning-observer.cjs, hooks/handlers/post-session.cjs and hooks/handlers/pre-task-check.cjs; the ship check ignores it; no config key by design"
     },
     {
       "name": "MEOW_JIRA_API_TOKEN",

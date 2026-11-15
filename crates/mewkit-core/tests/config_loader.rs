@@ -45,10 +45,12 @@ fn fixture_files() -> Vec<String> {
 fn the_corpus_covers_every_grammar_and_rejection_class() {
     let files = fixture_files();
     // The real floor: `>= 12` stayed green with 46 of the 58 fixtures deleted.
-    // A fixture may be ADDED without touching this number.
+    // A fixture may be ADDED without touching this number. Lowered to 55 when
+    // the plan and review-verdict gates went: three fixtures rejected a config
+    // key and two protected hook names that no longer exist.
     assert!(
-        files.len() >= 58,
-        "the corpus shrank to {} fixtures, below the 58 committed",
+        files.len() >= 55,
+        "the corpus shrank to {} fixtures, below the 55 committed",
         files.len()
     );
     for prefix in ["accept-", "grammar-", "reject-"] {
@@ -142,13 +144,13 @@ fn a_grammar_failure_names_the_file_and_the_line() {
 #[test]
 fn a_protected_hook_says_which_hook_and_why() {
     let error = load_config_file(
-        &fixtures_dir().join("reject-protected-gate2-check.yaml"),
+        &fixtures_dir().join("reject-protected-pre-ship.yaml"),
         &names(),
         ConfigScope::ProjectConfig,
     )
     .expect_err("a protected hook");
-    assert!(error.message.contains("gate2-check"), "{}", error.message);
-    assert!(error.message.contains("Gate 2"), "{}", error.message);
+    assert!(error.message.contains("pre-ship"), "{}", error.message);
+    assert!(error.message.contains("related tests"), "{}", error.message);
     assert!(error.fix.contains("not a preference"), "{}", error.fix);
 }
 
@@ -164,13 +166,6 @@ fn a_rejected_key_names_the_scope_it_came_from() {
         assert!(error.message.contains(scope.as_str()), "{}", error.message);
         assert_eq!(error.scope, scope);
     }
-}
-
-#[test]
-fn the_gate_one_hatch_key_is_accepted_in_the_user_file_only() {
-    let file = fixtures_dir().join("reject-user-scope-only.yaml");
-    assert!(load_config_file(&file, &names(), ConfigScope::UserConfig).is_ok());
-    assert!(load_config_file(&file, &names(), ConfigScope::ProjectConfig).is_err());
 }
 
 #[test]

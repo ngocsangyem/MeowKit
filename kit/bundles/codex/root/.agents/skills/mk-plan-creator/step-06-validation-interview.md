@@ -135,7 +135,7 @@ Outputs:
 - `### Whole-Plan Consistency Sweep — <ISO>` block appended to each affected phase file's `## Validation Log` section (create section if missing); the orchestrator performs ONE Edit per phase file
 - plan.md frontmatter updated with `consistency_sweeps.validation: { reconciled, unresolved, ran_at }`
 
-If `unresolved > 0`, FIRE the W2 `stop and ask the user in chat` blocker (see decision tree in `references/whole-plan-sweep.md`). BLOCK step-07 Gate 1 until the user selects one of:
+If `unresolved > 0`, FIRE the W2 `stop and ask the user in chat` blocker (see decision tree in `references/whole-plan-sweep.md`). Do not present the plan in step-07 until the user selects one of:
 
 - "Apply pending edits and resolve now" — planner rewrites locally; recursion bounded at 2 attempts.
 - "Accept risk: proceed with unresolved contradictions (writes Risk rows + ## Validation Log)" — write a Risk Assessment row to each affected phase file referencing the deferred contradiction count; proceed.

@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-ops. Cache status, clear, project dis
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default
-memory: project
 color: yellow
 owner: jira
 criticality: medium

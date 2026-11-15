@@ -23,6 +23,7 @@ pub const REMOVED_ENV_NAMES: &[(&str, &str)] = &[
     ("MEOWKIT_BUILD_VERIFY_DEBUG", ""),
     ("MEOWKIT_BUILD_VERIFY_TIMEOUT", "buildVerify.timeoutMs"),
     ("MEOWKIT_COMPLEXITY", ""),
+    ("MEOWKIT_GATE1_PRESENCE_ONLY", ""),
     ("MEOWKIT_HARNESS_MODE", ""),
     ("MEOWKIT_HARNESS_RESUME_STEP", ""),
     ("MEOWKIT_LOOP_DETECT", "hooks.loop-detection"),
@@ -53,17 +54,21 @@ pub fn replacement_for(name: &str) -> Option<&'static str> {
 mod tests {
     use super::*;
 
-    /// The one name that still outranks its config key is not in the list: it is
-    /// read, and telling a user to unset it would switch an enforcement mode off.
+    /// The names that still outrank their config key are not in the list: they
+    /// are read, and telling a user to unset one would switch an enforcement
+    /// mode off.
     #[test]
     fn the_names_still_read_are_absent() {
-        for name in [
-            "MEOWKIT_TDD",
-            "MEOWKIT_AUTOBUILD_MODE",
-            "MEOWKIT_GATE1_PRESENCE_ONLY",
-        ] {
+        for name in ["MEOWKIT_TDD", "MEOWKIT_AUTOBUILD_MODE"] {
             assert!(replacement_for(name).is_none(), "{name} is still read");
         }
+    }
+
+    /// The plan gate's downgrade switch is a DROPPED name now, so a shell still
+    /// exporting it is told so rather than silently believing it still matters.
+    #[test]
+    fn the_plan_gate_downgrade_switch_reads_as_dropped() {
+        assert_eq!(replacement_for("MEOWKIT_GATE1_PRESENCE_ONLY"), Some(""));
     }
 
     #[test]

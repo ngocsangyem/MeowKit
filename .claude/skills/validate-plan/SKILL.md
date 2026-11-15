@@ -2,7 +2,7 @@
 name: mk:validate-plan
 version: 1.0.0
 preamble-tier: 3
-description: Checks an approved plan across 8 dimensions for gaps before building starts. NOT for mk:plan-ceo-review.
+description: Checks an agreed plan across 8 dimensions for gaps before building starts. NOT for mk:plan-ceo-review.
 allowed-tools:
   - Read
   - Grep
@@ -12,10 +12,10 @@ source: new
 keywords:
   - validate-plan
   - plan-validation
-  - gate-1-pass
+  - plan-quality-check
   - acceptance-criteria-check
   - 8-dimension-validation
-when_to_use: The plan is approved and should be stress-tested before any code.
+when_to_use: The plan is agreed and should be stress-tested before any code.
 user-invocable: true
 owner: lifecycle
 criticality: high
@@ -25,16 +25,16 @@ runtime: claude-code
 
 # Plan Validation — 8-Dimension Quality Check
 
-Audits an approved plan against 8 dimensions to catch gaps before implementation begins.
-Does NOT replace Gate 1 (human approval), modify plans, or route edits itself. If it
-finds an Insert or Split mutation is needed, the planner performs it and returns to
-Gate 1 for re-approval; Skip and Reorder changes require notification plus audit log.
+Audits an agreed plan against 8 dimensions to catch gaps before implementation begins.
+Does not replace the conversation with the user, modify plans, or route edits itself. If it
+finds an Insert or Split mutation is needed, the planner performs it and presents the plan
+again; Skip and Reorder changes require notification plus audit log.
 
 > For green-field harness sprints (generator↔evaluator loop), use `mk:sprint-contract` instead. `mk:validate-plan` operates on plans from `mk:plan-creator` (cook flow only).
 
 ## When to Use
 
-- After Gate 1 approval, before Phase 2 (Test)
+- Once the plan is agreed, before Phase 2 (Test)
 - When `/mk:cook` detects a COMPLEX task (auto-suggested)
 - When user wants to stress-test a plan before committing to implementation
 - When user says "validate this plan", "check my plan", "is this plan complete"
@@ -110,7 +110,7 @@ sweep_failures:
 In `/mk:cook`, validation runs automatically for COMPLEX tasks:
 
 ```
-Gate 1 (plan approved) → mk:validate-plan → Phase 2 (Test)
+plan agreed → mk:validate-plan → Phase 2 (Test)
 ```
 
 For STANDARD tasks, validation is optional (user-triggered).
@@ -126,7 +126,7 @@ Note: plan-creator's step-06 now includes an enhanced validation interview with 
 
 ## What This Skill Does NOT Do
 
-- Does NOT replace Gate 1 — human approval still required
+- Does NOT replace the user's own read of the plan
 - Does NOT modify plan files — read-only analysis
 - Does NOT generate tests — that's Phase 2 (tester agent)
-- Does NOT block Gate 1 — runs after Gate 1, before Phase 2
+- Does NOT block anything — runs after the plan is agreed, before Phase 2

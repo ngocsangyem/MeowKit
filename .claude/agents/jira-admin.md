@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-admin. Project, user, group and schem
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default
-memory: project
 color: red
 owner: jira
 criticality: medium

@@ -6,7 +6,7 @@ Spawn the `developer` sub-task to implement the build per the signed contract (o
 
 ### 3a. Pre-flight checks
 
-- `gate-enforcement.cjs` will block source-code edits unless either (a) a signed contract exists OR (b) `MEOWKIT_AUTOBUILD_MODE=LEAN`
+- Confirm the sprint contract is signed, or that `MEOWKIT_AUTOBUILD_MODE=LEAN` made it unnecessary — the developer grades itself against whichever document holds the criteria
 - Confirm `plan_dir` is set (from step-01)
 - Confirm `contract_path` is set OR null with reason logged (from step-02)
 - Confirm `budget_spent` is below `budget_cap`

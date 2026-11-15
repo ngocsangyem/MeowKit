@@ -57,11 +57,9 @@ const HOOK_EXTENSIONS = new Set([".cjs", ".mjs", ".js", ".sh"]);
 // to come from the generator.
 const HOOK_GOVERNANCE = {
   // Write guards — only exit 2 blocks a tool call, so a crash here reads as permission.
-  "gate-enforcement":      { criticality: "critical", responsibility: "gate-enforcement" },
   "privacy-block":         { criticality: "critical", responsibility: "permissions" },
-  "pre-completion-check":  { criticality: "critical", responsibility: "gate-enforcement" },
-  "pre-ship":              { criticality: "high",     responsibility: "gate-enforcement" },
-  "pre-implement":         { criticality: "high",     responsibility: "gate-enforcement" },
+  "pre-completion-check":  { criticality: "critical", responsibility: "verification" },
+  "pre-ship":              { criticality: "high",     responsibility: "verification" },
   "pre-task-check":        { criticality: "high",     responsibility: "gate-enforcement" },
   // The dispatcher decides whether any observer runs at all.
   dispatch:                { criticality: "high",     responsibility: "observability" },
@@ -70,6 +68,7 @@ const HOOK_GOVERNANCE = {
   "safety-sentinel-inject":{ criticality: "high",     responsibility: "context-selection" },
   "build-verify":          { criticality: "medium",   responsibility: "verification" },
   "review-evidence-tag":   { criticality: "medium",   responsibility: "verification" },
+  "verification-evidence": { criticality: "medium",   responsibility: "verification" },
   "append-trace":          { criticality: "medium",   responsibility: "observability" },
   "control-probe":         { criticality: "medium",   responsibility: "observability" },
   "post-session":          { criticality: "medium",   responsibility: "observability" },
@@ -97,10 +96,10 @@ function deriveOwner(name) {
   // name = skill dir name, agent basename, rule basename, command basename, or hook basename
   if (/^jira/.test(name))              return "jira";
   if (/^confluence/.test(name))        return "confluence";
-  if (/^(gate-enforcement|privacy-block|secret-scrub|control-probe)/.test(name)) return "security";
+  if (/^(privacy-block|secret-scrub|control-probe)/.test(name)) return "security";
   if (/^(memory|loop)/.test(name))  return "memory";
   if (/^(cook|plan-creator|plan-ceo-review|planning-engine|workflow-orchestrator|ship|review|autobuild|validate-plan|agent-detector|bootstrap|pack|freeze)/.test(name)) return "lifecycle";
-  if (/^(scout|investigate|sequential-thinking|brainstorming|decision-framework|elicit|problem-solving|office-hours|party|careful|intake|help|nyquist|henshin|chom|loop|lazy-agent-loader)/.test(name)) return "research";
+  if (/^(scout|investigate|sequential-thinking|brainstorming|decision-framework|elicit|problem-solving|office-hours|party|careful|intake|help|nyquist|henshin|chom|loop)/.test(name)) return "research";
   if (/^(testing|benchmark|qa|qa-manual|playwright-cli|verify|lint-and-validate|build-fix|rubric|evaluate)/.test(name)) return "testing";
   if (/^(docs-finder|docs-init|document-release|project-context|project-organization|llms|web-to-markdown|retro|preview|session-continuation|fix|simplify|context-audit|prompt-enhancer)/.test(name)) return "docs";
   if (/^(git-manager|worktree|ship|task-queue|team-config)/.test(name) && !/^ship/.test(name)) return "git";
@@ -109,7 +108,7 @@ function deriveOwner(name) {
   if (/^(sprint-contract|story-sizer|breakdown)/.test(name)) return "lifecycle";
   if (/^(typescript|angular|vue|react-patterns|frontend-design|ui-design-system|figma|database|clean-code|development|multimodal|cso|vulnerability-scanner)/.test(name)) return "utility";
   // Hooks by pattern
-  if (/^(pre-implement|pre-ship|pre-completion-check|post-write|tdd-flag-detector|project-context-loader|jira-env-loader)/.test(name)) return "lifecycle";
+  if (/^(pre-implement|pre-ship|pre-completion-check|verification-evidence|post-write|tdd-flag-detector|project-context-loader|jira-env-loader)/.test(name)) return "lifecycle";
   if (/^(append-trace|learning-observer|post-session|posttoolfailure-probe|precompact-probe|pre-task-check|control-probe)/.test(name)) return "observability";
   // Agents by role
   if (/^(orchestrator|planner|developer|architect|brainstormer|project-manager|story-sizer)/.test(name)) return "lifecycle";

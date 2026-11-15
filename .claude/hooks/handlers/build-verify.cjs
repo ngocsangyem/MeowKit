@@ -1,6 +1,6 @@
 // build-verify.cjs — PostToolUse handler: auto-run compile/lint after Edit/Write.
 // Ported from post-write-build-verify.sh. Same logic:
-//   classify file by extension → check cache → run compile/lint → emit errors.
+//   classify file by extension → check cache → run compile/lint → report errors to the model.
 //
 // Settings, from the project config and nowhere else:
 //   hooks.build-verify: false  — switch the observer off. The dispatcher drops
@@ -29,6 +29,10 @@ const COMMANDS_BY_EXT = {
   rs: ['cargo check'],
   rb: ['ruby -c', 'rubocop'],
 };
+
+// Commands that check the whole project and take no file argument: `cargo check <path>` and
+// `go build ./... <path>` are usage errors that would reach the model as a build failure.
+const WHOLE_PROJECT = new Set(['go build ./...', 'cargo check']);
 
 const TIMEOUT_BY_EXT = {
   rs: 60000,
@@ -100,7 +104,8 @@ module.exports = function buildVerify(ctx, state) {
 
     try {
       const parts = cmd.split(/\s+/);
-      execFileSync(parts[0], [...parts.slice(1), filePath], {
+      const args = WHOLE_PROJECT.has(cmd) ? parts.slice(1) : [...parts.slice(1), filePath];
+      execFileSync(parts[0], args, {
         cwd: ROOT,
         timeout: timeoutMs,
         stdio: ['pipe', 'pipe', 'pipe'],
@@ -116,7 +121,9 @@ module.exports = function buildVerify(ctx, state) {
   if (failed) {
     // Truncate output to first 50 lines
     const lines = output.split('\n').slice(0, 50).join('\n');
-    return `@@BUILD_VERIFY_ERROR@@\nfile: ${filePath}\n\n${lines}\n@@END_BUILD_VERIFY@@\n`;
+    // Exit 2 with stderr is the PostToolUse form Claude Code shows to the model; plain
+    // stdout reaches only the transcript. The edit has already happened either way.
+    return { stderr: `@@BUILD_VERIFY_ERROR@@\nfile: ${filePath}\n\n${lines}\n@@END_BUILD_VERIFY@@\n`, exitCode: 2, feedback: true };
   }
 
   // Cache the clean hash

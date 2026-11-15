@@ -16,9 +16,8 @@
 //!
 //! Plain `cargo test -p mewkit-cli --test npm_behaviour --locked`; no Node and
 //! no build step. The hook-contract cases (`hook_contract.rs`, `hook_mirrors/`,
-//! `plan_receipt_consumer.rs`, `validate_memory_hook_contract.rs`,
-//! `verdict_gate_cases.rs`) run the shipped `.cjs` hooks and so need `node` on
-//! PATH; they fail, not skip, when it is missing.
+//! `validate_memory_hook_contract.rs`) run the shipped `.cjs` hooks and so need
+//! `node` on PATH; they fail, not skip, when it is missing.
 //!
 //! Unix only. The goldens were recorded on macOS and the npm comparison only
 //! ever ran on Linux, so their paths use `/`, their fixtures rely on the
@@ -66,11 +65,9 @@ mod note_cases;
 mod orient_cases;
 mod orient_flag_cases;
 mod pack_cases;
-mod plan_approve_cases;
 mod plan_archive_cases;
 mod plan_check_cases;
 mod plan_invocation_cases;
-mod plan_receipt_consumer;
 mod plan_status_cases;
 mod review_cases;
 mod setup_cases;
@@ -86,7 +83,6 @@ mod validate_repo_cases;
 mod validate_scoped_cases;
 mod validate_target_cases;
 mod validate_usage_cases;
-mod verdict_gate_cases;
 
 /// The harness, under the name the cases call it by.
 pub(crate) use harness as npm;

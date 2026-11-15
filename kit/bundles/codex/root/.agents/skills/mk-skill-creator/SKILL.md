@@ -153,7 +153,7 @@ If FAIL: fix failing items before registering.
 
 ## Gotchas
 
-- **Template must include `## Gotchas` header** — even as a placeholder. The skill-authoring rules Rule 1 is hard-enforced by `validate-skill.py`. Day-1 skills may use `(none yet — grow from observed failures)` but the header itself is mandatory.
+- **Template must include `## Gotchas` header** — even as a placeholder. The skill-authoring rules Rule 1 is checked by this skill's `scripts/validate-skill.py` (Check 8). Day-1 skills may use `(none yet — grow from observed failures)` but the header itself is mandatory.
 <!-- research-citation -->
 - **Line cap is 500, not 150** — the canonical threshold comes from the skill-authoring rules Rule 3 (Anthropic progressive-disclosure guidance). Step-file skills (with `workflow.md`) auto-pass regardless of line count.
 - **Persistent state goes to `${PLUGIN_DATA}`, not skill directory** — Rule 2 prevents data loss on plugin upgrade. framework-internal paths (`.meowkit/memory/`, `.meowkit/state/`) are exempt.

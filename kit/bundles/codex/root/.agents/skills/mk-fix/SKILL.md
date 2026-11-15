@@ -23,9 +23,9 @@ Bug → Mode Select → [Check Memory: standard/deep] → Scout (MANDATORY) → 
 
 - **quick** — known cause and one or two files: minimal scout, compact root-cause proof, edit, focused before/after check, and summary. No default plan, report, memory entry, commit prompt, or sub-task fan-out.
 - **standard** (default) — full evidence chain, root-cause proof, focused regression test, relevant suite, and review.
-- **deep** — standard plus an approved plan when a contract or architecture changes.
+- **deep** — standard plus a plan agreed with the user when a contract or architecture changes.
 
-**HARD GATE**
+**Diagnose before fixing**
 
 Do NOT propose or implement fixes before completing Steps 1-2 (Scout + Diagnose).
 Symptom fixes are failure. Find the cause first through structured analysis, NEVER guessing.
@@ -46,8 +46,8 @@ If 3+ fix attempts fail, STOP and question the architecture — discuss with use
 For moderate/complex bugs:
 
 1. Run `mk:investigate` to confirm root cause. A supplied diagnostic report is evidence to validate and extend, never a substitute for investigation.
-2. If fix affects > 2 files → request an approved plan with `mk:plan-creator "bug fix: {symptom and affected area}"`
-3. Wait for Gate 1 approval
+2. If fix affects > 2 files → write a plan with `mk:plan-creator "bug fix: {symptom and affected area}"`
+3. Agree the plan with the user before changing code
 
 Skip: `--quick` mode (single file, clear cause).
 
@@ -85,7 +85,7 @@ Output: confirmed root cause (not symptom) with evidence chain + confidence leve
 
 **BLOCK:** If confidence < medium → gather more evidence before fixing. Never fix a "maybe."
 
-## Step 2.5 — Root-Cause Proof Checkpoint (HARD GATE)
+## Step 2.5 — Root-Cause Proof Checkpoint
 
 Operationalizes AGENTS.md (Core behaviors) Rule 6 ("Verify, Don't Assume"). The six fields are the named output of the Step 2 diagnosis (`references/diagnosis-protocol.md` Phase 4). **Do NOT start Step 4 (Fix) until all six are populated** — empty fields mean the diagnosis is not yet proven.
 
@@ -154,11 +154,11 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
    - A fact learned from outside the repo (a person, vendor docs, a ticket, chat) stays non-derivable
      after you comment it at the fix site: the comment reaches only that file. Write the entry when
      another site could hit the same trap.
-   - **Scrub secrets / tokens / PII before writing.** `mewkit note` lints the entry and exits non-zero without writing or echoing the match, but it rejects rather than redacts — you are responsible for what you pipe in. Vulnerability detail stays in the `cso` report and the Gate 2 verdict, never in memory.
+   - **Scrub secrets / tokens / PII before writing.** `mewkit note` lints the entry and exits non-zero without writing or echoing the match, but it rejects rather than redacts — you are responsible for what you pipe in. Vulnerability detail stays in the `cso` report and the review verdict, never in memory.
    - A failed write is never silent: print one line — `⚠ memory write skipped: <reason>` — and continue.
    - Quick runs never write memory. Skip when `the fix skill --no-capture` was passed or the lesson is derivable from code/git.
 
-3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per the post-phase-delegation conventions Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — Gate 1 bypass path means no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
+3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per the post-phase-delegation conventions Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — a simple fix has no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
 
 4. `documenter` agent → update `./docs`.
 
@@ -168,13 +168,13 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 ## Workflow Evidence Index
 
-Contract: the workflow-evidence conventions. The index records pointers + summaries of this run; it **never approves anything** (Gate 2 / ship stay human authority) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
+Contract: the workflow-evidence conventions. The index records pointers + summaries of this run; it **never approves anything** (reviewing and shipping stay the user's call) and carries **no score**. Generated for standalone Standard/Complex/Parallel fixes; quick and simple fixes keep focused evidence in their response.
 
 **Storage path:** `.meowkit/state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (framework-internal state per the skill-authoring rules Rule 2). For a fix that escalated to a plan, use `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` instead.
 
-**Write points (standard/deep only):** Step 2.5 (init: skill, mode, task, planPath, phase, risk, fixDiagnosis) → Step 5 (verification) → Step 6 finalize (`approvals.gate2`/`ship` as `required|not_applicable`, `memory.gotchaWritten` / `memory.decisionWritten`).
+**Write points (standard/deep only):** Step 2.5 (init: skill, mode, task, planPath, phase, risk, fixDiagnosis) → Step 5 (verification) → Step 6 finalize (`approvals.ship` as `required|not_applicable`, `memory.gotchaWritten` / `memory.decisionWritten`).
 
-**Validate before approval:** run `node .codex/scripts/validate-workflow-evidence.cjs <path> --phase fix` before the user-approval prompt (Step 6 item 5). Surface any `EVIDENCE_BLOCKED:<reasons>` and fill the missing fields — do not present for approval on a blocked index. A high-risk flag (`risk.requiresHumanApproval`) forces explicit human approval before finalize regardless of mode.
+**Re-read before presenting:** check the index against the shape table in the workflow-evidence conventions before the commit prompt (Step 6 item 5), and fill any missing field — nothing validates it for you. A high-risk flag (`risk.requiresHumanApproval`) means asking the user explicitly before finalize, regardless of mode.
 
 **Evidence ≠ memory:** the evidence file is one-run proof; `.meowkit/memory/gotchas.md` is the durable lesson store. Keep them separate — standalone `the fix skill` owns its evidence write; inside `the cook skill` the pipeline (Phase 6) owns the evidence write, so do NOT double-write. Scrub secrets / tokens / PII and store pointers/summaries only — never raw command logs.
 

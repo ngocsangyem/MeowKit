@@ -23,7 +23,7 @@ code-heavy content and underestimates dense prose.
 | Category    | Loaded When                                     | Notes |
 | ----------- | ----------------------------------------------- | ----- |
 | CLAUDE.md   | Every session, at preamble                      | Lives in always-on bundle. Trims here have the highest leverage. |
-| agents      | On `Task` invocation; `mk:lazy-agent-loader` defers | Per-agent overhead is realized only when an agent is spawned. Many agent files inflate the static bundle even when unused. |
+| agents      | On `Task` invocation | Per-agent overhead is realized only when an agent is spawned. Many agent files inflate the static bundle even when unused. |
 | skills      | On skill activation                             | SKILL.md frontmatter is always loaded; body is JIT. Frontmatter bloat is a hidden cost. |
 | rules       | Always-on for `injection-rules.md`, `security-rules.md`, etc. | The 5 essentials are non-negotiable; auxiliary rules can grow without bound. |
 | commands    | When user invokes the slash                     | Per-command overhead is realized at invoke time. Often small but counted in the structural budget for completeness. |

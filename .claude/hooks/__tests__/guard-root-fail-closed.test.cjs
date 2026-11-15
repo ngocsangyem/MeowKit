@@ -1,7 +1,7 @@
 // The safety guards block when they cannot tell which project they guard.
 //
 // They used to take CLAUDE_PROJECT_DIR or the working directory and exit 0 when entering it
-// failed, so a stale variable or a runtime that sets none let every write, read and ship
+// failed, so a stale variable or a runtime that sets none let every read and ship
 // through. These tests run the real hooks with no usable root and check the block, and pin
 // the order the guard root is resolved in.
 //
@@ -29,7 +29,6 @@ function run(hook, stdin, env, cwd) {
 }
 
 const CASES = [
-  ['gate-enforcement.cjs', { tool_name: 'Write', tool_input: { file_path: 'src/a.ts', content: 'x' } }, '@@GATE_BLOCK@@'],
   ['privacy-block.cjs', { tool_name: 'Read', tool_input: { file_path: 'src/a.ts' } }, '@@PRIVACY_BLOCK@@'],
   ['pre-ship.cjs', { tool_name: 'Bash', tool_input: { command: 'git commit -m x' } }, '@@GATE_BLOCK@@'],
 ];
@@ -76,20 +75,3 @@ test('the guard root comes from the first set variable, then the git top level, 
   assert.equal(resolveGuardRoot({}, tempDir('guard-root-none-')), null);
 });
 
-// Allow rules (docs, tests, kit trees) describe files of THIS project. A target that resolves
-// outside the root, or climbs out of an allowed tree with `..`, must face the plan check.
-for (const [label, target] of [
-  ['climbs out of docs with ..', 'docs/../src/a.ts'],
-  ['is a kit file outside the project', path.join(os.homedir(), '.claude', 'hooks', 'evil.cjs')],
-  ['is a test file outside the project', path.join(os.tmpdir(), 'evil.test.ts')],
-  ['climbs above the root into a kit tree', '../outside/.claude/x.cjs'],
-]) {
-  test(`gate-enforcement.cjs blocks a write that ${label} when no plan exists`, () => {
-    const root = tempDir('guard-root-confine-');
-    spawnSync('git', ['init', '-q', root]);
-    const stdin = JSON.stringify({ hook_event_name: 'PreToolUse', cwd: root, tool_name: 'Write', tool_input: { file_path: target, content: 'x' } });
-    const result = run('gate-enforcement.cjs', stdin, { CLAUDE_PROJECT_DIR: root }, root);
-    assert.equal(result.status, 2, result.stderr);
-    assert.match(result.stderr, /No approved plan found/);
-  });
-}

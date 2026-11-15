@@ -20,7 +20,6 @@ import path from 'node:path';
 import { REPO_ROOT, commandLiterals, literalTarget, requireGraph, spawnSites } from './lib/require-graph';
 
 const ENTRYPOINTS = [
-  '.claude/hooks/gate-enforcement.cjs',
   '.claude/hooks/privacy-block.cjs',
   '.claude/hooks/pre-ship.cjs',
 ];
@@ -30,19 +29,13 @@ const FORBIDDEN_MODULES = ['http', 'https', 'net', 'dgram', 'tls'];
 /**
  * Executables a guard may start.
  *
- * `git` reads what a command would ship. The resolved kit CLI lints the team
- * memory store — the only reason a path variable for it exists. `node` runs the
- * two in-repo validators that own the evidence and coverage formats. The rest
- * are the project's own build, lint and test commands, which the ship guard has
- * always run and which the ship decision does not depend on.
+ * `git` reads what a command would ship and resolves aliases. The resolved kit CLI
+ * lints the team memory store — the only reason a path variable for it exists. The
+ * rest are the project's own lint, test and type-check commands, which the ship
+ * check runs on the changed files; eslint, vitest and jest are run from the
+ * project's own node_modules/.bin.
  */
-const ALLOWED_COMMANDS = ['git', 'mewkit', 'npm', 'npx', 'swift', 'swiftlint', 'pytest', 'ruff', 'flake8'];
-
-/** The only scripts a guard may hand to `node`. */
-const ALLOWED_NODE_TARGETS = [
-  '.claude/hooks/lib/validate-workflow-evidence.cjs',
-  '.claude/hooks/lib/validate-review-coverage.cjs',
-];
+const ALLOWED_COMMANDS = ['git', 'mewkit', 'npm', 'npx', 'swift', 'swiftlint', 'ruff', 'flake8', 'eslint', 'vitest', 'jest'];
 
 /** Host credential surfaces no hook may touch. Exact tokens, so a rules handler named for security does not trip it. */
 const CREDENTIAL_TOKENS = ['.credentials', 'keychain', 'security find-generic-password'];
@@ -101,32 +94,29 @@ describe('every child process a safety entrypoint starts is accounted for', () =
     }
   });
 
-  it('passes only this node binary and the two in-repo validators to node', () => {
-    const nodeSites = sites.filter((s) => s.target.includes('execPath'));
-    expect(nodeSites.length, 'the node-run validators are reachable').toBeGreaterThan(0);
-    const named = uniqueFiles
-      .flatMap((f) => commandLiterals(f.source))
-      .filter((lit) => lit.startsWith('.claude/hooks/lib/'));
-    for (const target of new Set(named)) {
-      expect(ALLOWED_NODE_TARGETS, `node target ${target}`).toContain(target);
-    }
+  it('hands no in-repo script to node', () => {
+    expect(sites.filter((s) => s.target.includes('execPath')), 'a guard spawning node').toEqual([]);
+    const named = uniqueFiles.flatMap((f) => commandLiterals(f.source)).filter((lit) => lit.startsWith('.claude/hooks/lib/'));
+    expect(named, 'a lib script named as a command').toEqual([]);
   });
 
-  it('has exactly the five reviewed call sites', () => {
+  it('has exactly the six reviewed call sites', () => {
     // Enumerated, not counted. Adding a child process anywhere a guard can reach
     // fails here and has to be justified, which is the only way an allowlist of
-    // executables stays meaningful when three of the five targets are variables.
+    // executables stays meaningful when two of the six targets are variables.
     const actual = sites.map((s) => `${s.rel} ${s.fn}(${s.target})`).sort();
     expect(actual).toEqual(
       [
-        // Reads what a command would ship. History only; never rewrites it.
-        ".claude/hooks/lib/gate2-change-set.cjs spawnSync('git')",
-        // Runs the two in-repo validators that own the evidence formats.
-        '.claude/hooks/lib/gate2-structural-checks.cjs spawnSync(process.execPath)',
+        // Reads the files a ship action carries. History only; never rewrites it.
+        ".claude/hooks/lib/changed-files.cjs spawnSync('git')",
+        // Resolves a git alias before matching the subcommand. Read-only.
+        ".claude/hooks/lib/ship-command.cjs spawnSync('git')",
+        // Keys the run-once marker by HEAD and the staged tree (`write-tree` stores a tree object only).
+        ".claude/hooks/lib/ship-run-once.cjs spawnSync('git')",
         // Runs the resolved kit CLI to lint the team memory store; on Windows a
         // node-script CLI is run by this node, so the target is node or the CLI.
         '.claude/hooks/lib/memory-store-lint.cjs spawnSync(command)',
-        // Runs the project's own build, lint and test commands.
+        // Runs the project's own lint, test and type-check commands.
         '.claude/hooks/lib/preship-checks.cjs spawnSync(command)',
         // Finds the project root when no runtime variable names it. Read-only.
         ".claude/hooks/lib/project-root.cjs spawnSync('git')",

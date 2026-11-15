@@ -1,8 +1,8 @@
 //! The verdict JSON's shape check, reporting zod 3's own issue messages in
 //! zod's order: schema keys in declaration order, array items by index, every
 //! issue collected rather than the first. `schema::verdict` is the typed model;
-//! this is the refusal text `verdict-gate` prints, which a serde error cannot
-//! reproduce.
+//! this is the refusal text a reader of a hand-written verdict needs, which a
+//! serde error cannot reproduce.
 use serde_json::Value;
 
 const DIMENSION_VERDICTS: &[&str] = &["PASS", "WARN", "FAIL"];

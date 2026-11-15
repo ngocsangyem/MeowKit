@@ -31,12 +31,10 @@ const DEFAULT_OUT = path.join(REPO_ROOT, 'tests/hooks/golden');
 const MARKERS = ['@@GATE_BLOCK@@', '@@CONTRACT_GATE_BLOCK@@', '@@PRIVACY_BLOCK@@'];
 
 const CASES = [
-  ...require('./lib/hook-corpus-cases-gate1.cjs'),
   ...require('./lib/hook-corpus-cases-preship.cjs'),
   ...require('./lib/hook-corpus-cases-privacy.cjs'),
   ...require('./lib/hook-corpus-cases-feedback.cjs'),
   ...require('./lib/hook-corpus-cases-guards.cjs'),
-  ...require('./lib/hook-corpus-cases-gate-helpers.cjs'),
   ...require('./lib/hook-corpus-cases-observers.cjs'),
   ...require('./lib/hook-corpus-cases-cli.cjs'),
 ];

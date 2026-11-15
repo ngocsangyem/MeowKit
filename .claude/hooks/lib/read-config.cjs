@@ -1,9 +1,9 @@
 'use strict';
 // read-config.cjs — the hook side of the project config.
 //
-// Deliberately NOT reachable from `gate-enforcement.cjs`, `privacy-block.cjs` or
-// `pre-ship.cjs`. A committed file is editable by anyone who can open a pull
-// request, so the property worth having is that those three cannot read it at
+// Deliberately NOT reachable from `privacy-block.cjs` or `pre-ship.cjs`. A
+// committed file is editable by anyone who can open a pull request, so the
+// property worth having is that those guards cannot read it at
 // all — stronger than validating what they read, and asserted structurally by
 // the environment-allowlist test rather than left to review.
 //

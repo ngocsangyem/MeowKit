@@ -7,8 +7,8 @@ use std::path::Path;
 
 use mewkit_core::validate::{
     CheckResult, Status, check_agent_conformance, check_capabilities_section,
-    check_docs_refs_contract, check_frontmatter_contract, check_gate_authority, check_ownership,
-    check_packs, check_routing_table_breadth, check_substrate, check_workflow_drift,
+    check_docs_refs_contract, check_frontmatter_contract, check_ownership, check_packs,
+    check_routing_table_breadth, check_substrate, check_workflow_drift,
 };
 
 use super::ValidateArgs;
@@ -25,15 +25,6 @@ pub(super) fn scoped_run(
     if args.workflow {
         // Strict in a scoped run: an absent spec is a FAIL for the CI step.
         return Some(check_workflow_drift(project_root, Status::Fail));
-    }
-    if args.gates {
-        // Strict in a scoped run, as the CI step needs: an absent scan target
-        // is a FAIL, not a WARN.
-        return Some(check_gate_authority(
-            project_root,
-            &[".claude"],
-            Status::Fail,
-        ));
     }
     if args.ownership {
         return Some(check_ownership(meowkit_dir));

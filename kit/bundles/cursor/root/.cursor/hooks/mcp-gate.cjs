@@ -12,7 +12,7 @@ const verdict = evaluateMcpPolicy(payload, root);
 
 emit(
 	decideWithKillSwitch({
-		killSwitchActive: isKillSwitchActive(root),
+		killSwitchActive: isKillSwitchActive(),
 		blocked: verdict.blocked,
 		reason: verdict.reason,
 		blockedOutput: { permission: "deny", user_message: `Blocked by MeowKit MCP allowlist gate: ${verdict.reason}` },

@@ -90,7 +90,7 @@ Do NOT run mk:plan-ceo-review automatically.
 Do NOT begin Phase 2.
 Human decides the next step.
 
-<!-- GATE 1 HARD STOP — CEO Review
-     Human decides: run /mk:cook to implement,
+<!-- STOP HERE — CEO Review
+     The user decides: run /mk:cook to implement,
      or run mk:review for engineering review.
      Agent does not chain reviews automatically. -->

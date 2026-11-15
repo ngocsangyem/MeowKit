@@ -51,5 +51,5 @@ parallel_group: "A"
 
 Parallel phases MUST follow `.claude/skills/cook/references/parallel-execution-rules.md`:
 - Worktree isolation per agent
-- Gate 1 and Gate 2 are never parallelized
+- Agreeing the plan and reviewing the result are never parallelized
 - Full test suite required after merge

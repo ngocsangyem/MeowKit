@@ -33,7 +33,6 @@ pub const PORTED_VERBS: &[&str] = &[
     "task-state",
     "trace",
     "validate",
-    "verdict-gate",
 ];
 
 /// `argv` as clap should see it. Only rewritten when argv[1] is a ported verb.

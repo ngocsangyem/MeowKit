@@ -108,7 +108,6 @@
 				"mk-chrome-profile",
 				"mk-docs-finder",
 				"mk-freeze",
-				"mk-lazy-agent-loader",
 				"mk-llms",
 				"mk-loop",
 				"mk-markdown-reader",

@@ -97,7 +97,6 @@
     "skill-template-secure",
     "---Infrastructure---",
     "agent-detector",
-    "lazy-agent-loader",
     "scale-routing",
     "skill-creator",
     "project-organization",

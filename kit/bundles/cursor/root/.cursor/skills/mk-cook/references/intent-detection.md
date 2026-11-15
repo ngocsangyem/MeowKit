@@ -67,21 +67,21 @@ Detect multiple features from natural language:
 
 ## Mode Behaviors
 
-| Mode        | Research | TDD        | Gate 1             | Gate 2    | Parallel  |
-| ----------- | -------- | ---------- | ------------------ | --------- | --------- |
-| interactive | Yes      | RED-strict | Human              | Human     | No        |
-| auto        | Yes      | RED-strict | **Human**          | **Human** | Per phase |
-| fast        | Skip     | Plan-level | Human              | **Human** | No        |
-| parallel    | Optional | RED-strict | Human              | **Human** | Yes       |
-| no-test     | Yes      | Skip       | Human              | **Human** | No        |
-| code        | Skip     | RED-strict | Skip (plan exists) | **Human** | Per plan  |
+| Mode        | Research | TDD        | Plan agreed with user | Review verdict | Parallel  |
+| ----------- | -------- | ---------- | --------------------- | -------------- | --------- |
+| interactive | Yes      | RED-strict | Yes                   | Discussed      | No        |
+| auto        | Yes      | RED-strict | No pause              | In run summary | Per phase |
+| fast        | Skip     | Plan-level | Yes                   | Discussed      | No        |
+| parallel    | Optional | RED-strict | Yes                   | Discussed      | Yes       |
+| no-test     | Yes      | Skip       | Yes                   | Discussed      | No        |
+| code        | Skip     | RED-strict | Already done          | Discussed      | Per plan  |
 
-**Gate 1 and Gate 2: human approval mandatory in every mode — see AGENTS.md (Gates) for the full contract.** No mode auto-approves a gate. Auto mode automates the work between gates; validator and evaluator output is evidence presented at a gate, never the approval itself. (`code` mode skips Gate 1 because the plan it executes was already approved at Gate 1 when it was created.)
+Every mode writes a plan and ends Phase 4 with a review verdict; what varies is whether the run pauses to discuss them. `auto` does not pause — it puts the plan path, the structure-check result and the verdict path in the run summary, which the user reads before shipping. `code` mode skips the plan conversation because the plan it executes was already agreed when it was written.
 
 **TDD column:**
 
-- `RED-strict` = failing tests written in Phase 2 before any implementation. Enforced ONLY when `--tdd` / `MEOWKIT_TDD=1` is active; otherwise Phase 2 stays optional and the developer may implement directly per the approved plan.
-- `Plan-level` = tests cover plan intent (not research-level edge cases), no RED gate.
+- `RED-strict` = failing tests written in Phase 2 before any implementation. Applies ONLY when `--tdd` / `MEOWKIT_TDD=1` is active; otherwise Phase 2 stays optional and the developer may implement directly per the agreed plan.
+- `Plan-level` = tests cover plan intent (not research-level edge cases), no RED phase.
 - `Skip` = no Phase 2 (`--no-test` mode; user explicitly opted out).
 
 ## Modifier Flags

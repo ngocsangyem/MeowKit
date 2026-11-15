@@ -4,7 +4,6 @@ subagent_type: advisory
 description: 'Use this agent when you need to brainstorm software solutions, evaluate architectural approaches, or debate technical decisions before implementation. Examples: "Should I use WebSockets or SSE for real-time?", "What''s the best approach for file uploads?", "Evaluate REST vs GraphQL for our API." Use proactively during Phase 1 (Plan) when the task involves significant technical decisions or multiple viable approaches. Not for implementation or final decisions.'
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 model: claude-opus-5
-memory: project
 source: local
 owner: lifecycle
 criticality: medium
@@ -75,6 +74,6 @@ This agent operates in **Phase 1 (Plan)** of the workflow.
 - Must NOT make final implementation decisions — always present options for human approval.
 - Must NOT skip the multi-approach evaluation — always consider alternatives.
 - Must NOT violate the security rules (see `.claude/rules/security-rules.md`).
-- Must NOT recommend approaches that would bypass Gate 1 or Gate 2 enforcement.
+- Must NOT recommend approaches that would bypass the ship check or the privacy guard.
 
 Update your agent memory as you discover architectural patterns, recurring decisions, and lessons learned. This builds institutional knowledge across conversations.

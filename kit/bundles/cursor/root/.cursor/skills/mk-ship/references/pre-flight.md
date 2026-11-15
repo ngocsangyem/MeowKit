@@ -69,7 +69,7 @@ If `mk:verify` returns PASS: continue to Step 0.9.
 
 1. Look for `workflow-evidence.json` at the planned path `tasks/plans/<plan>/reports/evidence/` first, then the standalone path `.meowkit/state/evidence/<slug>/`.
 2. **If absent** (older runs, `--quick` fixes): proceed exactly as today — no new hard dependency. Do not block on a missing file.
-3. **If present:** report `approvals` (gate1/gate2/ship), `review.verdictPath` + `review.status`, `verification.overall`, and `risk.requiresHumanApproval`. Block ONLY where the existing Gate 2 / ship rules already block — e.g. missing verdict, a FAIL dimension, or an unacknowledged high-risk approval. Evidence cannot turn a `mk:verify` FAIL into a pass and cannot mark Gate 2 approved on its own (human approval per AGENTS.md (Gates) still required).
+3. **If present:** report `approvals.ship`, `review.verdictPath` + `review.status`, `verification.overall`, and `risk.requiresHumanApproval`. Call out what is missing — no verdict, a FAIL dimension, an unacknowledged high-risk item — and say the change is not ready. Evidence cannot turn a `mk:verify` FAIL into a pass, and it is never the user's decision to ship.
 
 Contract: the workflow-evidence conventions.
 

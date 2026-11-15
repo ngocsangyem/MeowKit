@@ -6,7 +6,7 @@ purpose: canonical-format-spec
 
 # Rubric Schema — Canonical Format
 
-This document defines the schema every rubric file in `rubrics/` MUST follow. It is enforced by `mk:rubric/scripts/validate-rubric.sh`.
+This document defines the schema every rubric file in `rubrics/` MUST follow. The check that enforces it is this skill's `scripts/validate-rubric.sh`.
 
 ## File Naming
 

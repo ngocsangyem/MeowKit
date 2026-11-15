@@ -12,7 +12,6 @@ Skills for task classification, context loading, and agent routing.
 | Skill | What it does |
 |-------|-------------|
 | `mk:agent-detector` | Auto-detect agent, complexity, and model tier per message |
-| `mk:lazy-agent-loader` | On-demand agent loading for token efficiency |
 | `mk:scout` | Parallel codebase exploration via Explore subagents |
 | `mk:scale-routing` | Domain-based complexity classification (CSV-driven) |
 | `mk:project-context` | Generate/update `docs/project-context.md` from codebase |
@@ -269,7 +268,6 @@ _Generated from `.claude/`. Every skill on disk appears here; the sections above
 | [`mk:jira-relationships`](/reference/skills/jira-relationships) | mk:jira leaf. Issue links, blockers, dependencies, clone, bulk-link. NOT for mk:jira-agile. |
 | [`mk:jira-search`](/reference/skills/jira-search) | mk:jira leaf. JQL search, query building, saved filters, result export. NOT for mk:jira-bulk. |
 | [`mk:jira-time`](/reference/skills/jira-time) | mk:jira leaf. Log work, list or edit worklogs, estimates, time reports. NOT for mk:jira-agile. |
-| [`mk:lazy-agent-loader`](/reference/skills/lazy-agent-loader) | Deprecated shim; agent routing reads .claude/agents/ directly. NOT for mk:agent-detector. |
 | [`mk:lint-and-validate`](/reference/skills/lint-and-validate) | Run linting, formatting and static analysis right after a code edit. NOT for mk:verify. |
 | [`mk:llms`](/reference/skills/llms) | Generate llms.txt indexes from project docs per the llmstxt.org spec. NOT for mk:docs-init. |
 | [`mk:loop`](/reference/skills/loop) | Iterate on one measurable scalar — modify, verify, keep or revert — in bounded git-tracked trials. NOT for mk:evaluate. |
@@ -283,7 +281,7 @@ _Generated from `.claude/`. Every skill on disk appears here; the sections above
 | [`mk:pack`](/reference/skills/pack) | Packs an external repository into one AI-readable markdown, xml or json file. NOT for mk:scout. |
 | [`mk:party`](/reference/skills/party) | Runs a 2-4 agent round-table on one architecture trade-off. NOT for mk:brainstorming. |
 | [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review) | Founder-mode critique of a written plan: premises, ambition, scope expansion or reduction. NOT for mk:validate-plan. |
-| [`mk:plan-creator`](/reference/skills/plan-creator) | Writes the multi-file implementation plan a human approves at Gate 1, scaled to task size. NOT for mk:planning-engine. |
+| [`mk:plan-creator`](/reference/skills/plan-creator) | Writes the multi-file implementation plan the user agrees before building, scaled to task size. NOT for mk:planning-engine. |
 | [`mk:planning-engine`](/reference/skills/planning-engine) | Scores ticket complexity and maps dependencies against the current codebase. NOT for mk:plan-creator. |
 | [`mk:playwright-cli`](/reference/skills/playwright-cli) | Scripted browser control via the Playwright CLI: navigate, fill, screenshot, extract. NOT for mk:agent-browser. |
 | [`mk:preview`](/reference/skills/preview) | Renders code, architecture or a git diff as a markdown or standalone HTML explainer, diagram or deck. NOT for mk:tech-graph. |
@@ -298,7 +296,7 @@ _Generated from `.claude/`. Every skill on disk appears here; the sections above
 | [`mk:resolving-merge-conflicts`](/reference/skills/resolving-merge-conflicts) | Resolves an in-progress merge or rebase hunk by hunk, then runs the project checks. NOT for mk:ship. |
 | [`mk:respond-pr`](/reference/skills/respond-pr) | Triages received PR comments against the code, then accepts, pushes back or replies in-thread. NOT for mk:review-pr. |
 | [`mk:retro`](/reference/skills/retro) | Engineering retrospective over commit history with trends and per-person breakdown. NOT for mk:memory. |
-| [`mk:review`](/reference/skills/review) | Multi-pass adversarial structural review of a diff, PR or commit; writes the Gate 2 verdict a human approves. NOT for mk:evaluate. |
+| [`mk:review`](/reference/skills/review) | Multi-pass adversarial structural review of a diff, PR or commit; writes the verdict a human reads before shipping. NOT for mk:evaluate. |
 | [`mk:review-pr`](/reference/skills/review-pr) | Single-pass checklist review of someone else's GitHub PR, optionally posted via gh. NOT for mk:review. |
 | [`mk:rubric`](/reference/skills/rubric) | Loads, composes and validates weighted PASS/WARN/FAIL rubrics with anchor examples. NOT for mk:evaluate. |
 | [`mk:scale-routing`](/reference/skills/scale-routing) | Matches task keywords against the domain-complexity table and returns complexity and execution tier. NOT for mk:agent-detector. |
@@ -321,7 +319,7 @@ _Generated from `.claude/`. Every skill on disk appears here; the sections above
 | [`mk:trace-analyze`](/reference/skills/trace-analyze) | Mines harness trace logs across recent runs for recurring failure patterns, behind a human gate. NOT for mk:retro. |
 | [`mk:typescript`](/reference/skills/typescript) | TypeScript authoring and strict type-safety fixes: null handling, utility types, ESLint. NOT for mk:react-patterns. |
 | [`mk:ui-design-system`](/reference/skills/ui-design-system) | Designs UI components and design systems and audits WCAG accessibility. NOT for mk:frontend-design. |
-| [`mk:validate-plan`](/reference/skills/validate-plan) | Checks an approved plan across 8 dimensions for gaps before building starts. NOT for mk:plan-ceo-review. |
+| [`mk:validate-plan`](/reference/skills/validate-plan) | Checks an agreed plan across 8 dimensions for gaps before building starts. NOT for mk:plan-ceo-review. |
 | [`mk:verify`](/reference/skills/verify) | One unified pass: build, lint, test, type-check, coverage. NOT for mk:lint-and-validate. |
 | [`mk:vue`](/reference/skills/vue) | Everyday Vue 3 authoring: Composition API, composables, reactivity, Pinia, routing, forms. NOT for mk:vue-best-practices. |
 | [`mk:vue-best-practices`](/reference/skills/vue-best-practices) | Deep Vue 3 review and the ordered workflow: built-ins, animation, slots, performance pass. NOT for mk:vue. |

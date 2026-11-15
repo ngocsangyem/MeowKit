@@ -2,7 +2,7 @@
 //
 // In a worktree session the project-dir variable still names the main checkout. The guard used
 // to evaluate that checkout, so a commit in the worktree was blocked or cleared by the main
-// checkout's branch, HEAD and plan pointer. These tests pin which tree is judged.
+// checkout's branch, HEAD and staged files. These tests pin which tree is judged.
 //
 // Run with: node --test .claude/hooks/__tests__/
 
@@ -36,6 +36,9 @@ function repoWithWorktree() {
   git(main, 'config', 'user.name', 'test');
   write(main, '.gitignore', '.meowkit/\nworktrees/\n');
   write(main, 'README.md', '# base\n');
+  // A lint that fails on a marker, so which tree the check reads shows in its verdict.
+  write(main, 'package.json', JSON.stringify({ scripts: { lint: 'node lint.cjs' } }));
+  write(main, 'lint.cjs', "const s = require('child_process').execFileSync('git', ['diff', '--cached']).toString();\nprocess.exit(s.includes('LINT_ERROR') ? 1 : 0);\n");
   git(main, 'add', '-A');
   git(main, 'commit', '-qm', 'base');
   const worktree = path.join(main, 'worktrees', 'side');
@@ -106,8 +109,8 @@ test('an unrelated repository or a directory outside git cannot move the ship ro
 test('pre-ship.cjs judges the worktree a commit runs in, not the main checkout', () => {
   const { main, worktree } = repoWithWorktree();
   // The main checkout has nothing staged, so judged there the commit has nothing to check.
-  // The worktree stages a ship-capable file and has no plan pointer, so judged there it blocks.
-  write(worktree, 'src/a.ts', 'export const a = 1;\n');
+  // The worktree stages a file whose lint fails, so judged there it blocks.
+  write(worktree, 'src/a.ts', '// LINT_ERROR\nexport const a = 1;\n');
   git(worktree, 'add', 'src/a.ts');
 
   const stdin = JSON.stringify({
@@ -123,6 +126,5 @@ test('pre-ship.cjs judges the worktree a commit runs in, not the main checkout',
     env: { PATH: process.env.PATH, HOME: worktree, CLAUDE_PROJECT_DIR: main },
   });
   assert.equal(result.status, 2, result.stderr);
-  assert.match(result.stderr, /src\/a\.ts/);
-  assert.match(result.stderr, /no active-plan pointer/);
+  assert.match(`${result.stdout}${result.stderr}`, /lint/i);
 });

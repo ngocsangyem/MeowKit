@@ -16,9 +16,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 /** Patterns per file type, with the severity that classifies each one. */
+// A secret assignment: the unspaced form as before, or any spacing when the value is a
+// quoted literal (`apiKey = "..."`), which the unspaced pattern used to miss.
+const SECRET = /api_key=|apiKey=|secret=|password=|token=|(?:api_?key|secret|password|token)\s*[=:]\s*["'][^"'\s]{6,}["']/i;
+
 const CHECKS = {
   ts: [
-    ['BLOCK', 'Hardcoded secret detected', /api_key=|apiKey=|secret=|password=|token=/],
+    ['BLOCK', 'Hardcoded secret detected', SECRET],
     ['BLOCK', "Usage of 'any' type", /: any|as any/],
     ['WARN', 'process.env without validation', /process\.env\./],
     ['BLOCK', 'Potential SQL injection via template literal', /`[^`]*(SELECT|INSERT|UPDATE|DELETE)/],
@@ -32,8 +36,18 @@ const CHECKS = {
     ['BLOCK', 'UserDefaults used for sensitive data', /UserDefaults.*password|UserDefaults.*token|UserDefaults.*secret/],
     ['BLOCK', 'Disabled certificate validation', /allowsInvalidSSLCertificate|disableCertificatePinning/],
   ],
+  py: [
+    ['BLOCK', 'Hardcoded secret detected', SECRET],
+    ['BLOCK', 'Potential SQL injection via f-string or format', /f["'][^"']*(SELECT|INSERT|UPDATE|DELETE)|["'][^"']*(SELECT|INSERT|UPDATE|DELETE)[^"']*["']\s*(%|\.format\()/],
+    ['BLOCK', 'Disabled certificate validation', /verify\s*=\s*False/],
+  ],
+  go: [
+    ['BLOCK', 'Hardcoded secret detected', SECRET],
+    ['BLOCK', 'Potential SQL injection via Sprintf', /Sprintf\(\s*["`][^"`]*(SELECT|INSERT|UPDATE|DELETE)/],
+    ['BLOCK', 'Disabled certificate validation', /InsecureSkipVerify:\s*true/],
+  ],
   sql: [
-    ['BLOCK', 'RLS disabled', /ENABLE ROW LEVEL SECURITY.*false|NO FORCE ROW LEVEL SECURITY/],
+    ['BLOCK', 'RLS disabled', /DISABLE ROW LEVEL SECURITY|NO FORCE ROW LEVEL SECURITY/i],
     ['WARN', 'CASCADE DELETE detected — review carefully', /CASCADE/],
   ],
   sh: [
@@ -49,7 +63,7 @@ const CHECKS = {
 };
 
 /** Extensions that share a rule set. */
-const ALIASES = { js: 'ts', bash: 'sh' };
+const ALIASES = { tsx: 'ts', js: 'ts', jsx: 'ts', mjs: 'ts', cjs: 'ts', bash: 'sh' };
 
 function findingsFor(content, checks, fileName) {
   const lines = content.split('\n');

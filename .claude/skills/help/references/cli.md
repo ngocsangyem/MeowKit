@@ -179,14 +179,13 @@ Options:
 ## mewkit plan
 
 ```text
-Inspect, approve or archive a plan under tasks/plans/
+Inspect or archive a plan under tasks/plans/
 
 Usage: mewkit plan <COMMAND>
 
 Commands:
   status   Progress across plan.md + its phase files (read-only)
   check    Required-section report for one phase file (read-only)
-  approve  Stamp the Gate 1 approval receipt (mutating)
   archive  Mark statuses completed + move to tasks/plans/archive/ (mutating)
   help     Print this message or the help of the given subcommand(s)
 
@@ -223,23 +222,6 @@ Options:
       --json        Print the report as JSON
       --structural  Validate plan.md + every sibling phase file against the full template
   -h, --help        Print help
-```
-
-### mewkit plan approve
-
-```text
-Stamp the Gate 1 approval receipt (mutating)
-
-Usage: mewkit plan approve [OPTIONS] [TARGET]
-
-Arguments:
-  [TARGET]  The plan directory, or a plan.md inside it
-
-Options:
-      --by <BY>      Approver name recorded on the approval receipt
-      --activate     Also activate the task durably; the npm CLI's default is OFF
-      --no-activate  The explicit opt-out, accepted so a caller can state the default
-  -h, --help         Print help
 ```
 
 ### mewkit plan archive
@@ -376,7 +358,7 @@ Options:
 ## mewkit validate
 
 ```text
-Check this project's structure and wiring (not that the gates block)
+Check this project's structure and wiring (not that the guards block)
 
 Usage: mewkit validate [OPTIONS] [DIR]
 
@@ -389,7 +371,6 @@ Options:
       --portable           Include the portable provider-contract checks
       --strict             Treat WARN as failure (exit 1)
       --workflow           Run only the workflow.yaml drift check
-      --gates              Run only the gate-authority contract check
       --ownership          Run only the artifact ownership-completeness check
       --agents             Run only the declared agent-contract conformance checks
       --substrate          Run only the responsibility-substrate drift and untagged check
@@ -400,20 +381,6 @@ Options:
       --frontmatter        Run only the SKILL.md frontmatter schema and runtime-contract check
       --docs-refs          Run only the `.claude` to `docs/*` reference allowlist check
   -h, --help               Print help
-```
-
-## mewkit verdict-gate
-
-```text
-Check a review verdict's paperwork for Gate 2 (evidence, not approval)
-
-Usage: mewkit verdict-gate [slug | path]
-
-Arguments:
-  [slug | path]  A review slug, or a path to the verdict `.json` (or its `.md` sibling)
-
-Options:
-  -h, --help  Print help
 ```
 
 ## mewkit review
@@ -481,7 +448,7 @@ Options:
       --evidence <EVIDENCE>
           `commit`: the workflow evidence index a correction supersedes. `validate-packet`: the packet to check
       --correction-kind <CORRECTION_KIND>
-          `commit`: source or scope; scope also returns Gate 1 to required
+          `commit`: source or scope; scope also marks the plan agreement required again
       --packet-kind <PACKET_KIND>
           `validate-packet`: input, output or brief
       --release-stage <RELEASE_STAGE>

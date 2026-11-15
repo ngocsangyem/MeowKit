@@ -80,7 +80,7 @@ Load before architectural evaluation:
 - Existing ADRs from `docs/architecture/adr/`: prior decisions and patterns
 - Current codebase structure (via Glob/Grep — navigate, don't dump)
 - Technology stack constraints from CLAUDE.md
-- `.claude/rules/security-rules.md` + `.claude/rules/gate-rules.md`: rules that constrain architectural decisions
+- `.claude/rules/security-rules.md`: rules that constrain architectural decisions
 
 ## Ambiguity Resolution
 

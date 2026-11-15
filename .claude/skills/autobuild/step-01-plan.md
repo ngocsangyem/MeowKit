@@ -50,9 +50,9 @@ slug=$(basename "$plan_dir" | sed -E 's/^[0-9]{6}(-[0-9]{4})?-//')
 
 Persist `plan_dir` and `slug` for downstream steps.
 
-### 1d. Verify Gate 1
+### 1d. Check the plan landed
 
-The planner enforces Gate 1 internally (user must approve the plan before the plan-creator skill returns). If the planner reports the plan was rejected or modified, halt the autobuild workflow and surface the user feedback — do NOT proceed to step-02.
+The planner agrees the plan with the user before `mk:plan-creator` returns. If it reports the plan was rejected or reworked, halt the autobuild workflow and surface the user's feedback — do NOT proceed to step-02 on a plan the user did not want.
 
 ### 1e. Append to run report
 
@@ -61,7 +61,7 @@ The planner enforces Gate 1 internally (user must approve the plan before the pl
 - Mode: --product-level
 - Plan: {absolute path}
 - Slug: {slug}
-- Gate 1: approved
+- Plan agreed with user: {yes | reworked}
 - Features: {N from check-product-spec.sh output}
 - User stories: {M}
 - Time: {duration}

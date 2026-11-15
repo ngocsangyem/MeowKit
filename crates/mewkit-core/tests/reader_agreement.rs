@@ -63,7 +63,12 @@ fn node_available() -> bool {
 
 /// Every fixture committed at review time. A fixture may be ADDED without
 /// touching this number; losing one is a corpus regression.
-const EXPECTED_FIXTURES: usize = 58;
+///
+/// Lowered from 58 when the plan gate and the review-verdict gate were removed:
+/// the three fixtures that rejected `gate1PresenceOnly`, the user-scope-only
+/// rule and the two protected gate hooks describe keys and hooks that no longer
+/// exist, so they could not be kept.
+const EXPECTED_FIXTURES: usize = 55;
 
 #[derive(Debug, PartialEq)]
 enum Verdict {
@@ -82,7 +87,7 @@ fn rust_verdict(source: &str, observer_names: &[String]) -> Verdict {
     // The whole Rust pipeline, not two thirds of it: the shape layer runs in
     // `load_config_file`, so a fixture it refused and the hook accepted would be
     // a divergence this test exists to find.
-    if check_shape(&values, observer_names, ConfigScope::ProjectConfig).is_err() {
+    if check_shape(&values, observer_names).is_err() {
         return Verdict::Rejected("schema-violation".to_string());
     }
     let mut applied: Vec<(String, ConfigValue)> = values

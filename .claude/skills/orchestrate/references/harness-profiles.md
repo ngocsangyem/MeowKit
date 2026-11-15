@@ -96,15 +96,14 @@ Profile safety behavior by observed control, not product reputation.
   the current harness proves cancellation.
 - **Bypass controls:** identify the live runtime's bypass options only to keep
   them disabled by default. Never add one to a default command; a human
-  bypass approval is recorded per `.claude/rules/gate-rules.md` (Recording Human Interventions), never
+  bypass approval is recorded per `.claude/rules/meowkit-core.md` (Recording Human Overrides), never
   self-granted.
 
 An auto-approved or all-or-nothing write path is constrained for any shared
 tree. It may handle read/report work; writing requires isolated R2 treatment
 under [model-routing.md](model-routing.md). Destructive or external work still
-requires explicit approval and the R3 gate (`gate-rules.md`), and a blocked
-write pattern from `security-rules.md` is never satisfied by switching
-harnesses.
+requires explicit approval and R3 treatment, and a blocked write pattern from
+`security-rules.md` is never satisfied by switching harnesses.
 
 ## Capture Quality
 

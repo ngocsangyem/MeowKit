@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-bulk. Sweeps over 10+ issues, dry-run
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default
-memory: project
 color: red
 owner: jira
 criticality: medium

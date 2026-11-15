@@ -31,8 +31,11 @@ fn an_unknown_plan_subcommand_is_an_invocation_error() {
 }
 
 /// minimist reads flags wherever they sit, so a flag written before the
-/// sub-verb must change the output (`--json`) and the receipt (`--by`) the same
-/// way in both CLIs.
+/// sub-verb must reach it and change the output (`--json`) in both CLIs.
+///
+/// The mutating half of this case used `--by` before `plan approve`; that
+/// subcommand is gone, and no surviving `plan` sub-verb takes a global flag
+/// that changes what it writes.
 #[test]
 fn a_flag_before_the_sub_verb_reaches_it() {
     let (ts, _) = npm::case("plan-json-before-status")
@@ -40,17 +43,4 @@ fn a_flag_before_the_sub_verb_reaches_it() {
         .args(&["plan", "--json", "status", "tasks/plans/261112-demo-plan"])
         .run();
     assert!(ts.stdout.trim_start().starts_with('{'), "{}", ts.describe());
-
-    let (ts, _) = npm::case("plan-by-before-approve")
-        .fixture("plan-approvable")
-        .args(&[
-            "plan",
-            "--by",
-            "flag-first",
-            "approve",
-            "tasks/plans/261112-demo-plan",
-        ])
-        .writes(&["tasks/plans/261112-demo-plan/plan.md"])
-        .run();
-    assert_eq!(ts.code, 0, "{}", ts.describe());
 }

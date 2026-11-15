@@ -142,7 +142,7 @@ Record these binary fields for each:
     `critical_actions_count: 1`, `blocked_or_needs_answer_count: 1`; flow artifact paths set.
   - Plan: state ACs for all explicit states; `Invite→modal` proceeds; `Submit→success`
     (unwired, server mutation) → validation-matrix item + `blocked_on:` on ONLY the
-    invite-flow phase; Gate 1 still presentable; agent-browser vs Playwright split correct.
+    invite-flow phase; plan still presentable to the user; agent-browser vs Playwright split correct.
 
 ### E11 Spec conflict
 

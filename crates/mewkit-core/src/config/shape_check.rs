@@ -12,9 +12,8 @@
 //! ([`super::schema::SCALAR_KEYS`] plus one toggle per observer) and refuses
 //! anything that is not exactly in it, in zod's wording, under zod's error code.
 
-use super::config_rules::ConfigScope;
 use super::config_values::{ConfigValue, ConfigValues};
-use super::schema::{USER_SCOPE_ONLY_KEY, ValueKind, known_keys};
+use super::schema::{ValueKind, known_keys};
 use super::yaml_grammar::SCHEMA_KEY;
 
 /// One key the declared shape does not admit. `key` is the dotted key, as zod
@@ -68,11 +67,7 @@ fn wrong_type(key: &str, kind: ValueKind, value: &ConfigValue) -> Result<(), Sha
 
 /// `Ok(())` when every key is admitted by the declared shape, or the first key
 /// that is not.
-pub fn check_shape(
-    values: &ConfigValues,
-    observer_names: &[String],
-    scope: ConfigScope,
-) -> Result<(), ShapeViolation> {
+pub fn check_shape(values: &ConfigValues, observer_names: &[String]) -> Result<(), ShapeViolation> {
     let keys = known_keys(observer_names);
     for (key, value) in values.iter() {
         // A `$schema` line is a pointer rather than a setting, so the rules skip
@@ -81,14 +76,6 @@ pub fn check_shape(
         if key == SCHEMA_KEY {
             if !matches!(value, ConfigValue::Str(_)) {
                 wrong_type(key, ValueKind::String, value)?;
-            }
-            continue;
-        }
-        if key == USER_SCOPE_ONLY_KEY {
-            if scope != ConfigScope::UserConfig {
-                unrecognized(key)?;
-            } else if !matches!(value, ConfigValue::Bool(_)) {
-                wrong_type(key, ValueKind::Boolean, value)?;
             }
             continue;
         }

@@ -43,9 +43,6 @@ pub struct ValidateArgs {
     /// Run only the workflow.yaml drift check.
     #[arg(long)]
     pub workflow: bool,
-    /// Run only the gate-authority contract check.
-    #[arg(long)]
-    pub gates: bool,
     /// Run only the artifact ownership-completeness check.
     #[arg(long)]
     pub ownership: bool,

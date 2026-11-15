@@ -112,7 +112,7 @@ describe('a broken observer does not stop the others', () => {
   });
 });
 
-describe('the two handlers whose output means something are passed through', () => {
+describe('the handlers whose output means something are passed through', () => {
   it('a blocked write pattern fails the result, after the others run', () => {
     const dir = tree([{ name: 'scan', source: BLOCKING_WRITE_SCAN }, { name: 'healthy', source: HEALTHY }]);
     const r = dispatch(dir);
@@ -121,14 +121,13 @@ describe('the two handlers whose output means something are passed through', () 
     expect(r.stdout, 'the other observer was not cut short').toContain('healthy-ran');
   });
 
-  it('a block decision reaches stdout, after the others run', () => {
+  it('a block decision is the only thing on stdout, so the host can parse it', () => {
     const dir = tree([{ name: 'completion', source: BLOCKING_DECISION }, { name: 'healthy', source: HEALTHY }]);
     const r = dispatch(dir);
     expect(r.exit, 'a decision is not an error').toBe(0);
-    expect(r.stdout).toContain('"decision":"block"');
-    expect(r.stdout).toContain('healthy-ran');
-    // Advisory output first, so a decision is the last thing the host reads.
-    expect(r.stdout.indexOf('healthy-ran')).toBeLessThan(r.stdout.indexOf('"decision"'));
+    expect(JSON.parse(r.stdout)).toEqual({ decision: 'block', reason: 'no evidence' });
+    // The advisory observer still ran; its text moved aside rather than breaking the JSON.
+    expect(r.stderr).toContain('healthy-ran');
   });
 
   it('a feedback handler that crashes stays fail-open like any other', () => {
@@ -169,6 +168,7 @@ describe('the shipped registry', () => {
     const existing = [
       'auto-checkpoint', 'budget-tracker', 'build-verify', 'checkpoint-writer', 'loop-detection',
       'model-detector', 'orientation-ritual', 'review-evidence-tag', 'safety-sentinel-inject',
+      'verification-evidence', 'pre-completion-check',
     ];
     const registered = new Set(registry.handlers.map((h) => path.basename(h.handler, '.cjs')));
     for (const name of existing) expect(registered.has(name), `${name} is still registered`).toBe(true);
@@ -179,7 +179,7 @@ describe('the shipped registry', () => {
     // here would inherit this chain's fail-open contract.
     for (const entry of registry.handlers) {
       expect(entry.handler, 'a write guard in the observer registry').not.toMatch(
-        /gate-enforcement|privacy-block|pre-ship/,
+        /privacy-block|pre-ship/,
       );
     }
   });

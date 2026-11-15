@@ -90,8 +90,9 @@ Orchestration never relaxes the toolkit's non-negotiable rules:
   side effects require explicit human approval for that exact scope, and are
   recorded per the intervention-recording invariant in AGENTS.md. `--yes` only pre-approves the
   scope the spec already describes.
-- **Gates are human-owned** — orchestrate never self-approves Gate 1 or Gate 2
-  (`gate-rules.md`).
+- **Irreversible actions are the user's** — orchestrate never decides on its own to
+  push, merge, release or deploy; the host's permission prompt and an explicit scope
+  in the spec are what authorize those.
 
 ## Pipeline
 

@@ -37,7 +37,6 @@ else:
 ESSENTIAL_BASENAMES = {
     "security-rules.md",
     "injection-rules.md",
-    "gate-rules.md",
     "core-behaviors.md",
     "development-rules.md",
 }
@@ -107,10 +106,10 @@ for cat, label, path_or_name, toks in flat:
         continue
     if cat == "skill":
         recs.append((toks, f"Skill `{label}` (~{toks:,} tokens) is loaded statically. "
-                          f"If not in active rotation, consider lazy-loading via `mk:lazy-agent-loader`."))
+                          f"If not in active rotation, consider archiving it."))
     elif cat == "agent":
         recs.append((toks, f"Agent `{label}` (~{toks:,} tokens) — confirm it is still load-bearing; "
-                          f"unused agents can be archived or moved behind `mk:lazy-agent-loader`."))
+                          f"unused agents can be archived."))
     elif cat == "rule":
         recs.append((toks, f"Rule file `{label}` (~{toks:,} tokens) — review whether it is still "
                           f"load-bearing or can be merged into a peer rule."))
@@ -137,7 +136,7 @@ print()
 print("## How to Act")
 print()
 print("- **Cost (USD):** see `mewkit budget`.")
-print("- **Runtime trim:** see `mk:lazy-agent-loader`.")
+print("- **Runtime trim:** an agent file costs tokens only when that agent is spawned; archive unused ones.")
 print()
 print("All recommendations above are framed as *consider* — the audit reports state,")
 print("it does not auto-edit. Decide based on active workflows, not file size alone.")

@@ -42,8 +42,7 @@ The brainstormer generates the option set. Athena does **not**:
   missing, it names the gap; this skill generates it.
 - It does not choose for the user. It recommends one direction **inside the
   user-approved scope**, and that recommendation is evidence the user reads.
-- It never adds a gate. Brainstorming has no Gate 1, and supervision does not create
-  one.
+- It never adds a stop. Brainstorming has none, and supervision does not create one.
 
 A run where Athena replaces the option set has failed, even if the answer was good.
 

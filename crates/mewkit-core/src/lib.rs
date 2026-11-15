@@ -54,7 +54,6 @@ pub mod trace;
 pub mod trace_analysis;
 pub mod update;
 pub mod validate;
-pub mod verdict_gate;
 pub mod verdict_shape;
 pub mod yaml_doc;
 

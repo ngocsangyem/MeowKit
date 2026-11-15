@@ -1,6 +1,6 @@
 # Challenge Framework
 
-Used in Phase 4 (HARD GATE) of `mk:henshin`. Pressure-tests assumptions, surfaces constraints, cuts scope. Phase 5 does not emit until these questions have answers.
+Used in Phase 4 (the user's decision) of `mk:henshin`. Pressure-tests assumptions, surfaces constraints, cuts scope. Phase 5 does not emit until these questions have answers.
 
 ## 7-question interview
 
@@ -46,9 +46,9 @@ If "yes" to any: cut the capability. Err on the side of fewer, sharper tools.
 - **Identifiers agent-friendly** (names) vs DB-friendly (UUIDs) → prefer names
 - **Tool descriptions pass the "when would I use this?" test** for a first-time reader → green
 
-## HARD GATE decision matrix (Phase 4 output)
+## Phase 4 decision matrix (Phase 4 output)
 
-Fill every row. Empty rows block the gate.
+Fill every row. An empty row means the decision has not been made yet.
 
 ```markdown
 | # | Decision | Options | Chosen | Rationale |

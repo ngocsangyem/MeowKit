@@ -116,7 +116,7 @@ The packet **must not** contain, and this skill must never produce:
 - A plan phase graph — that is `mk:plan-creator`, after the user acts on advice
 - An ADR — that is the architect's artifact
 - A diff, patch, or source change
-- A review verdict — Gate 2 belongs to `mk:review` and the human
+- A review verdict — that is `mk:review`'s output, read by the user
 - Any mutation of `.meowkit/memory/` decisions
 
 Advise **never auto-runs** `mk:plan-creator` or `mk:cook`. It ends with the

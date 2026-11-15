@@ -1,10 +1,15 @@
-//! `doctor --hard-gates`: a live behavioural check of the hard gates — the
+//! `doctor --hard-gates`: a live behavioural check of the hard guards — the
 //! question structural validation cannot answer, "are the controls actually
 //! blocking right now?".
 //!
 //! It scaffolds a throwaway project from the user's OWN hooks and settings and
 //! runs real probes through the configured interpreter. A control it cannot
 //! exercise here is reported `warn`, never a silent `ok`.
+//!
+//! The guards probed are the ones the kit still ships: the privacy block on a
+//! sensitive read, the injection scanner on a Bash command, and the ship check
+//! on a commit. The flag keeps its name because scripts and recordings call it
+//! that; what it probes is whatever still enforces.
 mod runner;
 mod scaffold;
 mod sweep;
@@ -69,7 +74,7 @@ fn expect_hard_block(name: &str, run: Option<HookRun>, marker: &str) -> Check {
             "Expected a hard block (exit 2, {marker} on stderr) but got exit {}.",
             code(run.status)
         ),
-        Some("Verify the guard is registered for this event and check its gate logic."),
+        Some("Verify the guard is registered for this event and check its decision logic."),
     )
 }
 
@@ -94,7 +99,7 @@ pub fn checks(root: &Path) -> Vec<Check> {
             return vec![row(
                 "Hard gates",
                 Status::Fail,
-                ".claude/settings.json is not valid JSON, so no gate can be probed.",
+                ".claude/settings.json is not valid JSON, so no guard can be probed.",
                 None,
             )];
         }
@@ -111,55 +116,7 @@ pub fn checks(root: &Path) -> Vec<Check> {
         }
     };
     let dir = project.dir.as_path();
-    let write = || {
-        pre_tool(
-            &settings,
-            dir,
-            "Write",
-            json!({"file_path": "src/app.ts"}),
-            "gate-enforcement.cjs",
-        )
-    };
     let mut out = Vec::new();
-
-    // A source write BEFORE any plan must hard-block.
-    project.clear_plans();
-    out.push(expect_hard_block(
-        "Gate 1: blocks source write with no plan",
-        write(),
-        "@@GATE_BLOCK@@",
-    ));
-
-    // A plan WITHOUT an approval receipt must still hard-block.
-    let plan = project.add_nested_plan();
-    out.push(expect_hard_block(
-        "Gate 1: blocks source write when the plan is not approved",
-        write(),
-        "@@GATE_BLOCK@@",
-    ));
-
-    // Once the receipt is stamped AND the sprint contract is signed, the write is allowed.
-    let allow = "Gate 1 + contract: allows source write once the plan is approved and the contract is signed";
-    project.add_signed_contract();
-    if project.approve_plan(&plan) {
-        let after = write();
-        out.push(match after {
-            Some(r) if r.status == Some(0) => {
-                row(allow, Status::Ok, "Allowed (exit 0) after receipt.", None)
-            }
-            other => row(
-                allow,
-                Status::Fail,
-                format!(
-                    "Expected allow (exit 0) after approval but got exit {}.",
-                    code(other.and_then(|r| r.status))
-                ),
-                Some("Check the approval-receipt verify path in gate-enforcement.cjs."),
-            ),
-        });
-    } else {
-        out.push(row(allow, Status::Warn, "Could not stamp the approval receipt in the sandbox (approval-receipt module absent?).", None));
-    }
 
     // A .env read must hard-block.
     project.add_env_file();
@@ -214,20 +171,67 @@ pub fn checks(root: &Path) -> Vec<Check> {
         ),
     });
 
-    // A ship command with no review verdict must hard-block.
-    project.stage_ship_commit();
-    out.push(expect_hard_block(
-        "Gate 2: blocks a commit with no verdict",
-        pre_tool(
-            &settings,
-            dir,
-            "Bash",
-            json!({"command": "git commit -m \"feat: thing\""}),
-            "pre-ship.cjs",
-        ),
-        "@@GATE_BLOCK@@",
-    ));
-
+    out.extend(ship_checks(&settings, &project));
     out.extend(sweep::checks(&settings, root, dir));
+    out
+}
+
+/// The ship check on a commit whose checks fail, and on a command that ships
+/// nothing.
+///
+/// The failing case is a project whose `lint` script exits non-zero: that is a
+/// check result the probe controls, unlike a lint over the user's own tree. The
+/// hook prints `PRE-SHIP BLOCKED` rather than a marker on this path, so the
+/// exit code and that line are what is asserted.
+fn ship_checks(settings: &Value, project: &Scaffold) -> Vec<Check> {
+    let ship = |command: &str| {
+        pre_tool(
+            settings,
+            &project.dir,
+            "Bash",
+            json!({"command": command}),
+            "pre-ship.cjs",
+        )
+    };
+    let name = "Ship check: blocks a commit whose checks fail";
+    if !project.stage_failing_ship_commit() {
+        return vec![row(
+            name,
+            Status::Warn,
+            "Could not build a staged git change in the sandbox (no git?).",
+            None,
+        )];
+    }
+    let blocked = ship("git commit -m \"feat: thing\"");
+    let mut out = vec![match blocked {
+        Some(r) if r.status == Some(2) && r.stderr.contains("PRE-SHIP BLOCKED") => {
+            row(name, Status::Ok, "Blocked as expected (exit 2).", None)
+        }
+        other => row(
+            name,
+            Status::Fail,
+            format!(
+                "Expected a block (exit 2, PRE-SHIP BLOCKED on stderr) but got exit {}.",
+                code(other.and_then(|r| r.status))
+            ),
+            Some("Check the ship-command parser and the lint/test/type-check block."),
+        ),
+    }];
+
+    let name = "Ship check: leaves a command that ships nothing alone";
+    out.push(match ship("git status --short") {
+        Some(r) if r.status == Some(0) && r.stdout.is_empty() && r.stderr.is_empty() => {
+            row(name, Status::Ok, "Passed through silently (exit 0).", None)
+        }
+        other => row(
+            name,
+            Status::Fail,
+            format!(
+                "Expected a silent exit 0 but got exit {}.",
+                code(other.and_then(|r| r.status))
+            ),
+            Some("Check the ship-command parser: it is matching a command that ships nothing."),
+        ),
+    });
     out
 }

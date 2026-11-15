@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 // Codex PreToolUse privacy guard (Bash matcher).
 //
-// Two refusals. A command that references a sensitive file — .env*, *.pem, *.key, *.keystore,
-// credentials, an *.ssh/* path, or an SSH private key — is denied so a secret cannot be read or
-// exfiltrated without explicit user approval (injection-rules R4). Then the shared privacy
-// decision Claude Code runs (lib/core/privacy.cjs, copied from .claude/hooks/lib) refuses
-// fetches aimed at loopback, private or metadata hosts and paths the call names.
+// The shared privacy decision Claude Code and Cursor run (lib/core/privacy.cjs, copied from
+// .claude/hooks/lib) judges every path the command names and every path the call carries, so
+// a credential file cannot be read or exfiltrated without explicit user approval
+// (injection-rules R4); it also refuses fetches aimed at loopback, private or metadata hosts.
 //
 // Codex hook contract (learn.chatgpt.com/docs/hooks, verified 2026-07-26):
 //   stdin  = JSON { hook_event_name, tool_name, tool_input: { command }, cwd, ... }
@@ -35,18 +34,14 @@ if (!input) deny("Privacy guard received unreadable hook input. A read guard tha
 const toolInput = input && typeof input.tool_input === "object" && input.tool_input ? input.tool_input : {};
 const command = typeof toolInput.command === "string" ? toolInput.command : "";
 
-// Sensitive-file references, in a file-path-like context (extension or path marker) so a
-// bare word like "secret" in prose does not trip the guard. Mirrors the R4 path patterns.
-const SENSITIVE_FILE =
-	/(?:^|[\s'"`=(><|;&@])(?:[\w./~-]*\.env(?:\.[\w-]+)?|[\w./~-]*\.(?:pem|key|keystore)|[\w./~-]*credentials[\w./-]*|[\w./~-]*secrets?\.[\w]+|[\w./~-]*\.ssh\/[\w./-]*|id_(?:rsa|ed25519|dsa|ecdsa))(?:$|[\s'"`:,;&|)])/i;
+// Words in the command that look like paths (a `/`, a `.`, a leading `~`, or a bare private
+// key name) go to the shared decision with the paths the call names, so Codex refuses exactly
+// the names Claude Code and Cursor refuse. A bare word such as `secrets` in
+// `kubectl get secrets` is not a path and is left alone.
+const commandPaths = command
+	.split(/[\s'"`=(><|;&@:,]+/)
+	.filter((word) => word && !/^-/.test(word) && (/[./~]/.test(word) || /^id_(?:rsa|ed25519|ecdsa|dsa)$/i.test(word)));
 
-if (SENSITIVE_FILE.test(command)) {
-	deny(
-		"Command references a sensitive file (.env / *.pem / *.key / *.keystore / credentials / secret file / SSH key). " +
-			"Get explicit user approval before reading or transmitting it (injection-rules R4).",
-	);
-}
-
-const result = decidePrivacy({ paths: targetPaths(toolInput), command });
+const result = decidePrivacy({ paths: [...targetPaths(toolInput), ...commandPaths], command });
 if (result.exit === 2) deny(denyReason(result, "codex"));
 process.exit(0);

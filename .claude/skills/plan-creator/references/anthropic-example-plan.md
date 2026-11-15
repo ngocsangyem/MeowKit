@@ -221,4 +221,4 @@ Hobbyists, design students, indie devs, and former arcade kids who want to make 
 
 ## Handoff
 
-After Gate 1, hand off to `mk:autobuild`. It negotiates a sprint contract with the generator and runs the generator ⇄ evaluator loop until rubric scores pass.
+Once the plan is agreed, hand off to `mk:autobuild`. It negotiates a sprint contract with the generator and runs the generator ⇄ evaluator loop until rubric scores pass.

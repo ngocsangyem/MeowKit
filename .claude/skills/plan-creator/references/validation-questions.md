@@ -1,6 +1,6 @@
 # Validation Question Framework
 
-Generate 3-5 critical questions from plan content before Gate 1. Runs in hard/deep/parallel/two modes (skipped in fast).
+Generate 3-5 critical questions from plan content before presenting the plan. Runs in hard/deep/parallel/two modes (skipped in fast).
 
 ## Question Categories
 

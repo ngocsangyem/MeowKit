@@ -12,11 +12,14 @@ use super::result::{CheckResult, Section, Status, display_join, ok};
 /// The `.claude/rules/*.md` files a session auto-loads on every turn, in load
 /// order. Mirrors `core/always-on-rules.ts`: each file carries enforcement no
 /// other file repeats, so a missing one silently drops it.
-pub const ALWAYS_ON_RULES: [&str; 7] = [
+///
+/// `gate-rules.md` was one of them until planning and review stopped being hard
+/// stops. The kit no longer ships it, so requiring it would fail every healthy
+/// install; the rules that remain still carry what is actually enforced.
+pub const ALWAYS_ON_RULES: [&str; 6] = [
     "meowkit-core.md",
     "security-rules.md",
     "injection-rules.md",
-    "gate-rules.md",
     "core-behaviors.md",
     "development-rules.md",
     "agent-conduct.md",

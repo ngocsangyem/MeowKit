@@ -104,9 +104,10 @@ fn the_safety_invariant_names_every_file_base_is_missing() {
     let rows = check_packs(&claude(dir.path()), Status::Fail);
     let detail = detail_of(&rows, "Base safety invariant").expect("the safety row");
     assert!(detail.starts_with("base missing required safety file(s): "));
-    // The one file base DOES carry is not listed; the gate chain is.
+    // The one file base DOES carry is not listed; the guard chain is.
     assert!(!detail.contains("statusline.cjs"), "{detail}");
-    assert!(detail.contains("hooks/gate-enforcement.cjs"), "{detail}");
+    assert!(detail.contains("hooks/privacy-block.cjs"), "{detail}");
+    assert!(detail.contains("hooks/lib/ship-command.cjs"), "{detail}");
     assert!(detail.contains("rules/injection-rules.md"), "{detail}");
 }
 

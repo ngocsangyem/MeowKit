@@ -91,7 +91,7 @@ See `references/security.md` for the full threat model, attack surface, and defe
 - **robots.txt is respected with a 24h cache.** Some doc sites disallow scraping; skill honors this. Override requires manual user action.
 - **Fetch persistence grows unbounded in v1.** Manual cleanup via `rm -rf .codex/cache/web-fetches/*`. v2 will add TTL auto-cleanup.
 - **Reports may contain PII.** Secret-scrub catches credentials but does NOT catch names, emails, user IDs in page body text. Treat cached reports as sensitive.
-- **Injection STOP has no bypass.** If the scanner halts a fetch, no flag reopens it. The user must manually inspect the quarantine file.
+- **Injection STOP is not overridable by a flag.** If the scanner halts a fetch, this skill offers nothing that reopens it; the user must manually inspect the quarantine file.
 - **Slug is sha256-hashed path.** Filenames don't carry path-embedded tokens — good for security, annoying for `ls`-based discovery. Use the manifest `index.jsonl` (behind privacy-block) to search.
 
 ## Files

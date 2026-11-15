@@ -212,9 +212,9 @@ Resume orientation from durable task state; reads records only
 
 ### `mewkit plan`
 
-Inspect, approve or archive a plan under tasks/plans/
+Inspect or archive a plan under tasks/plans/
 
-Subcommands: `status`, `check`, `approve`, `archive`.
+Subcommands: `status`, `check`, `archive`.
 
 ### `mewkit plan status`
 
@@ -232,16 +232,6 @@ Required-section report for one phase file (read-only)
 |---|---|
 | `--json` | Print the report as JSON |
 | `--structural` | Validate plan.md + every sibling phase file against the full template |
-
-### `mewkit plan approve`
-
-Stamp the Gate 1 approval receipt (mutating)
-
-| Flag | What it does |
-|---|---|
-| `--by` `<BY>` | Approver name recorded on the approval receipt |
-| `--activate` | Also activate the task durably; the npm CLI's default is OFF |
-| `--no-activate` | The explicit opt-out, accepted so a caller can state the default |
 
 ### `mewkit plan archive`
 
@@ -317,7 +307,7 @@ Record a transition on one task's record
 
 ### `mewkit validate`
 
-Check this project's structure and wiring (not that the gates block)
+Check this project's structure and wiring (not that the guards block)
 
 | Flag | What it does |
 |---|---|
@@ -326,7 +316,6 @@ Check this project's structure and wiring (not that the gates block)
 | `--portable` | Include the portable provider-contract checks |
 | `--strict` | Treat WARN as failure (exit 1) |
 | `--workflow` | Run only the workflow.yaml drift check |
-| `--gates` | Run only the gate-authority contract check |
 | `--ownership` | Run only the artifact ownership-completeness check |
 | `--agents` | Run only the declared agent-contract conformance checks |
 | `--substrate` | Run only the responsibility-substrate drift and untagged check |
@@ -336,10 +325,6 @@ Check this project's structure and wiring (not that the gates block)
 | `--memory` | Run only the committed team-memory store lint |
 | `--frontmatter` | Run only the SKILL.md frontmatter schema and runtime-contract check |
 | `--docs-refs` | Run only the `.claude` to `docs/*` reference allowlist check |
-
-### `mewkit verdict-gate`
-
-Check a review verdict's paperwork for Gate 2 (evidence, not approval)
 
 ### `mewkit review`
 
@@ -380,7 +365,7 @@ Subcommands: `begin`, `commit`, `status`, `validate-packet`.
 | `--task-id` `<TASK_ID>` | Task id recorded on the receipt |
 | `--provider` `<PROVIDER>` | Runtime recorded on the receipt |
 | `--evidence` `<EVIDENCE>` | `commit`: the workflow evidence index a correction supersedes. `validate-packet`: the packet to check |
-| `--correction-kind` `<CORRECTION_KIND>` | `commit`: source or scope; scope also returns Gate 1 to required |
+| `--correction-kind` `<CORRECTION_KIND>` | `commit`: source or scope; scope also marks the plan agreement required again |
 | `--packet-kind` `<PACKET_KIND>` | `validate-packet`: input, output or brief |
 | `--release-stage` `<RELEASE_STAGE>` | The release stage whose budget this call spends (`mk:ship` only) |
 | `--json` | `status`: print the dossier as JSON |

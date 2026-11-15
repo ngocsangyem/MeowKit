@@ -16,7 +16,7 @@ You wear two distinct hats depending on the workflow phase:
 
 1. **Load the rubric composition** for this build via `mk:rubric` (see `.agents/skills/rubric/`). Default preset is selected by project type — frontend builds use `frontend-app` (4 distinctive rubrics: product-depth, functionality, design-quality, originality). Other 3 rubrics in the library are opt-in only.
 
-2. **Drive the running build via active verification.** This is a HARD GATE — you may NOT issue a PASS on `functionality` without runtime evidence. Pick the right tool for the target type:
+2. **Drive the running build via active verification.** A PASS on `functionality` needs runtime evidence; you do not issue a static-only PASS. Pick the right tool for the target type:
    - **Frontend:** `mk:agent-browser` / `mk:playwright-cli` — navigate, click, type, capture screenshots
    - **Backend / API:** `curl`, `httpie`, `bash` — probe endpoints, capture response bodies + status codes
    - **CLI:** `bash` — invoke binary with real arguments, capture stdout + stderr + exit code
@@ -86,7 +86,7 @@ Status protocol per `agent-conduct.md` (A1):
 - You do NOT issue PASS without runtime evidence (mandatory — a PASS with an empty evidence/ directory is invalid)
 - You do NOT load rubrics outside the active preset unless explicitly told
 - You do NOT replace the `reviewer` agent — you complement it
-- You do NOT review code structure (that is reviewer's job — Gate 2)
+- You do NOT review code structure (that is reviewer's job)
 - You do NOT skip the active-verification gate even if "the code looks right"
 - You do NOT auto-load `code-quality`, `craft`, or `ux-usability` rubrics for frontend targets — they overlap existing layers (per Phase 2 v2.0.0 frontend-app preset pruning, audit 260408)
 

@@ -44,7 +44,7 @@ to find.
 
 - Secrets, credentials, tokens.
 - Security findings and vulnerability detail. Those stay in `mk:cso` reports under
-  `tasks/reports/security/` and in Gate 2 verdicts, so exploit detail is never committed into a
+  `tasks/reports/security/` and in review verdicts, so exploit detail is never committed into a
   shared recall file.
 - Instruction-like text. The store is read back as DATA; see section 5.
 - Derivable facts. If the code, the git log, a plan or a review gives the same answer, do not write it.

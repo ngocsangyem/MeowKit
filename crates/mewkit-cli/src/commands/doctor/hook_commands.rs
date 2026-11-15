@@ -28,14 +28,17 @@ pub fn kit_scripts(command: &str) -> Vec<String> {
         .collect()
 }
 
+/// What a hook script's file name ends in. One list, so recognizing a kit
+/// script and deciding which word of a command line is the program being run
+/// cannot drift apart.
+pub const SCRIPT_EXTENSIONS: [&str; 5] = [".cjs", ".js", ".mjs", ".sh", ".py"];
+
 /// A script file directly inside a `hooks` directory (any config root, so a
 /// relocated `CLAUDE_CONFIG_DIR` or `CODEX_HOME` counts too).
 pub fn script_token(word: &str) -> Option<String> {
     let (dir, file) = word.rsplit_once('/')?;
     let in_hooks = dir == "hooks" || dir.ends_with("/hooks");
-    let script = [".cjs", ".js", ".mjs", ".sh", ".py"]
-        .iter()
-        .any(|e| file.ends_with(e));
+    let script = SCRIPT_EXTENSIONS.iter().any(|e| file.ends_with(e));
     (in_hooks && script).then(|| word.to_owned())
 }
 
@@ -74,8 +77,8 @@ mod tests {
     #[test]
     fn finds_kit_hook_scripts_in_commands() {
         assert_eq!(
-            kit_scripts(r#"node "$CLAUDE_PROJECT_DIR/.claude/hooks/gate-enforcement.cjs" --x"#),
-            ["$ROOT/.claude/hooks/gate-enforcement.cjs"]
+            kit_scripts(r#"node "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-ship.cjs" --x"#),
+            ["$ROOT/.claude/hooks/pre-ship.cjs"]
         );
         assert_eq!(
             kit_scripts(r#"node "$(git rev-parse --show-toplevel)/.codex/hooks/x.cjs""#),

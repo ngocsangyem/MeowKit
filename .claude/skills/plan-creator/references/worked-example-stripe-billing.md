@@ -1,6 +1,6 @@
 # Worked Example: Add Stripe Subscription Billing
 
-> **TDD-mode example.** This worked example assumes `--tdd` / `MEOWKIT_TDD=1`. Phase 2 Test RED is shown as mandatory; in default mode (TDD off), Phase 2 would be optional and the developer would implement directly per the approved plan. Payment-processing work like Stripe billing is exactly the kind of production-quality task where opting into `--tdd` is recommended.
+> **TDD-mode example.** This worked example assumes `--tdd` / `MEOWKIT_TDD=1`. Phase 2 Test RED is shown as mandatory; in default mode (TDD off), Phase 2 would be optional and the developer would implement directly per the agreed plan. Payment-processing work like Stripe billing is exactly the kind of production-quality task where opting into `--tdd` is recommended.
 
 ## Contents
 
@@ -8,10 +8,10 @@
 - [Requirements](#requirements)
 - [Architecture Changes](#architecture-changes)
 - [Phase 0: Orient](#phase-0-orient)
-- [Phase 1: Plan (Gate 1)](#phase-1-plan-gate-1)
+- [Phase 1: Plan](#phase-1-plan)
 - [Phase 2: Test RED](#phase-2-test-red)
 - [Phase 3: Build GREEN](#phase-3-build-green)
-- [Phase 4: Review (Gate 2)](#phase-4-review-gate-2)
+- [Phase 4: Review](#phase-4-review)
 - [Phase 5: Ship](#phase-5-ship)
 - [Phase 6: Reflect](#phase-6-reflect)
 - [Risks & Mitigations](#risks-mitigations)
@@ -87,11 +87,11 @@ A complete plan showing the expected detail level for a 7-phase implementation i
 - Declare: `Task complexity: COMPLEX → Opus`
 - Confirm no existing Stripe integration to avoid duplication
 
-**Gate 1 inputs produced:** scope confirmed, blast radius mapped (6 new files, 3 modified)
+**Inputs produced for the plan:** scope confirmed, blast radius mapped (6 new files, 3 modified)
 
 ---
 
-## Phase 1: Plan (Gate 1)
+## Phase 1: Plan
 
 **Agent:** planner + architect  
 **Time budget:** 2 hours
@@ -100,7 +100,7 @@ A complete plan showing the expected detail level for a 7-phase implementation i
 - Researcher B: Next.js webhook handling, idempotency, event deduplication
 - Architect: ADR for subscription state machine (pending → active → canceled → past_due)
 - Output: `tasks/plans/YYMMDD-stripe-billing/plan.md` + phase-02 through phase-06 files
-- **GATE 1 STOP** — human approves plan before any code
+- **Stop here** — settle the plan with the user before any code
 
 ---
 
@@ -142,7 +142,7 @@ All 6 tests must pass (GREEN) before Phase 4.
 
 ---
 
-## Phase 4: Review (Gate 2)
+## Phase 4: Review
 
 **Agent:** reviewer + security  
 **Time budget:** 2 hours
@@ -156,7 +156,7 @@ Security adversary checks (mandatory for payments):
 
 Review dimensions: Correctness, Maintainability, Performance, Security, Coverage
 
-**GATE 2 STOP** — human approves verdict before Phase 5
+**Stop here** — read the verdict with the user before Phase 5
 
 ---
 
@@ -203,4 +203,4 @@ Review dimensions: Correctness, Maintainability, Performance, Security, Coverage
 - [ ] Stripe test webhook `customer.subscription.updated` processed correctly in staging
 - [ ] Free-tier user cannot access `/dashboard/pro-feature` (returns 403)
 - [ ] Pro-tier user can access `/dashboard/pro-feature` (returns 200)
-- [ ] Gate 2 verdict: no FAIL dimensions, security dimension PASS
+- [ ] Review verdict: no FAIL dimensions, security dimension PASS

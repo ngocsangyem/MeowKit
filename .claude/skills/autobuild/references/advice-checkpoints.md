@@ -13,7 +13,7 @@ contract wins.
 |---|---|---|---:|
 | GUIDE | end of step-02, after the contract decision, **before** step-03 Generate | always, when the flag is on | 1 |
 | RESCUE | step-05, on the loop path | plateau or scope drift — see below | 2 |
-| REVIEW | step-05 §5c, after the terminal evaluator verdict, **before** the Gate 2 question | always, when the flag is on | 1 |
+| REVIEW | step-05 §5c, after the terminal evaluator verdict, **before** the ship question | always, when the flag is on | 1 |
 | RECHECK | after corrections from a `RETURN_TO_EXECUTOR` | only after a return | 1 |
 
 Hard cap **5 calls per run**. Checkpoints are macro boundaries — never per generated
@@ -44,10 +44,10 @@ RESCUE there spends a slot on a step that was already going to succeed.
 - **The budget tracker.** A BLOCK from `budget-tracker.sh` halts the run immediately,
   supervised or not. Athena does not weigh in on whether to keep spending.
 - **The 6-hour timeout.**
-- **Gate 2 at §5c.** Athena's REVIEW is evidence presented alongside the evaluator
-  verdict. Both are things the human reads; neither is the approval.
+- **The ship question at §5c.** Athena's REVIEW is evidence presented alongside the
+  evaluator verdict. Both are things the user reads; neither is the decision.
 - **The evaluator's verdict.** `evaluator` owns PASS/WARN/FAIL and the
-  active-verification hard gate. Athena may find that the evidence and the verdict
+  active-verification requirement. Athena may find that the evidence and the verdict
   disagree and return the work — it may not regrade it.
 
 ## Call
@@ -104,11 +104,11 @@ Route on the disposition:
 
 - `CONTINUE_WITH_DIRECTIVE` — proceed into step-03; the directive is input to the
   generator's brief, not a replacement for the signed contract.
-- `READY_FOR_EXISTING_GATE` — present Gate 2 at §5c as normal. Gate 2 is **not** cleared.
+- `READY_FOR_EXISTING_GATE` — ask the ship question at §5c as normal. It is **not** answered for the user.
 - `RETURN_TO_EXECUTOR` — route corrections to the generator and re-enter step-03 with
   them in the feedback packet, then re-evaluate. The evaluator verdict that preceded the
-  correction describes code that no longer exists, so it cannot be the one presented at
-  Gate 2 — a fresh step-04 pass is required before §5c.
+  correction describes code that no longer exists, so it cannot be the one the user is
+  shown — a fresh step-04 pass is required before §5c.
 - `ESCALATE_TO_HUMAN` — stop at the existing human touchpoint (§5c or §5e).
 - `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
 
@@ -117,8 +117,8 @@ any other loop back to step-03. Otherwise supervision would be a way around the 
 
 A second unresolved return escalates to a human; there is no third opinion.
 
-Record the checkpoint in the step's run-report section, next to the Gate 2 line, so the
-audit trail shows what was advised and what the human decided — in that order.
+Record the checkpoint in the step's run-report section, next to the ship-decision line, so
+the audit trail shows what was advised and what the user decided — in that order.
 
 If the runtime cannot delegate to `athena`, print exactly
 `advice checkpoint unavailable in this runtime: <reason>` and continue unsupervised.

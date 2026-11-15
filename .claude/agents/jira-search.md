@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-search. JQL search, saved filters, re
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default
-memory: project
 color: green
 owner: jira
 criticality: medium

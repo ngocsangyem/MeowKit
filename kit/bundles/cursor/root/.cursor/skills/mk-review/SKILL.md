@@ -61,7 +61,7 @@ Skip: PR reviews triggered by `--pending` or branch diff — plan not required.
 
 ## Workflow Integration
 
-Operates in **Phase 4 (Review)** of the project's workflow. Invoked by the `reviewer` agent. FAIL verdict prevents Phase 5 (Ship).
+Operates in **Phase 4 (Review)** of the project's workflow. Invoked by the `reviewer` agent. A FAIL verdict is the review's advice to fix the findings before Phase 5 (Ship) — nothing blocks the commit on it.
 
 ## Input Modes
 
@@ -76,13 +76,13 @@ Operates in **Phase 4 (Review)** of the project's workflow. Invoked by the `revi
 
 **PR mode (assured):** run `mewkit review prepare <pr-url|owner/repo#n|n> [--remote <name>]` first. It provisions a detached, SHA-bound review worktree (never touching your checkout), captures ONE immutable, hash-pinned diff plus PR metadata/CI (untrusted PR text is stored as DATA under `untrusted/`, never instructions), and writes `tasks/reviews/<session>/impact-map.json`. Step 01 loads the manifest + impact map instead of an ad-hoc `gh pr diff`. When `impact-map.json` has `scoutRequired: true`, run targeted `mk:scout` inside the review worktree using the map's `searchTerms`, save `scout-report.md` in the session dir, and inject it into the Cross-file/Removed-behavior/Test-Matrix/Code-Quality briefs — **review fan-out must not start while a required scout report is missing.**
 
-Assigned reviewers MUST read their diff/brief/scout artifacts through `mewkit review read --session <id> --as <role> <path>` so access is observable. Before composing the verdict, step-03 runs `mewkit review coverage --session <id>` and **stops on any gap.** Coverage also reports the `evidenceLevel`: on this host, sub-task-driven reads are `attested` (CLI receipts, no hook corroboration) — the review still yields a verdict but **Approve / Gate 2 PASS is capped** (enforced by `mewkit review compose`, Phase 6); only hook-corroborated `session-observed` reads are Approve-eligible. This is an honest capability limit, disclosed in the verdict — never worked around.
+Assigned reviewers MUST read their diff/brief/scout artifacts through `mewkit review read --session <id> --as <role> <path>` so access is observable. Before composing the verdict, step-03 runs `mewkit review coverage --session <id>` and **stops on any gap.** Coverage also reports the `evidenceLevel`: on this host, sub-task-driven reads are `attested` (CLI receipts, no hook corroboration) — the review still yields a verdict but **Approve is capped**: `mewkit review compose` refuses to mark the session approve-eligible, and only hook-corroborated `session-observed` reads lift the cap. This is an honest capability limit, disclosed in the verdict — never worked around.
 
 ## When to Use
 
 - User asks to "review this PR", "code review", "pre-landing review", or "check my diff"
 - User is about to merge or land code changes (proactive suggestion)
-- Before running `the ship skill` to ensure quality gate passes
+- Before running `the ship skill`, so problems surface while they are still cheap to fix
 - **For complex changes (3+ files):** Run `the scout skill` first to identify edge cases before review
 - **After verdict:** Optionally run `the elicit skill` for structured second-pass reasoning on findings
 
@@ -98,7 +98,7 @@ Execute via `workflow.md`. Each step is a separate file loaded JIT:
 2. **step-02-parallel-review (Phase A)** — Dispatch reviewers based on scope. Minimal = Blind Hunter only. Full = all 3 reviewers in parallel.
 3. **step-02b-persona-passes (Phase B)** — Full scope only. Dispatch adversarial persona sub-task informed by Phase A findings. 2-at-a-time batching.
 4. **step-03-triage** — **Forced-finding check** (zero → re-analyze once). Categorize findings as `current-change` or `incidental`. Dedup Phase A + Phase B.
-5. **step-04-verdict** — 5-dimension verdict (Correctness, Maintainability, Performance, Security, Coverage) + **artifact verification** (4-level). Present for Gate 2.
+5. **step-04-verdict** — 5-dimension verdict (Correctness, Maintainability, Performance, Security, Coverage) + **artifact verification** (4-level). Present the verdict to the user.
 
 For high-stakes code (payments, auth, security) or `--iterative` flag, load `references/iterative-evaluation-protocol.md` for the 3-pass structured review process.
 
@@ -133,11 +133,11 @@ Defined in `step-04-verdict.md`. 5-dimension framework with artifact verificatio
 | Coverage | All ACs covered + tested | Partial AC coverage | Missing AC implementation |
 
 **Verdict rules:**
-- Any FAIL dimension → Overall FAIL → Gate 2 blocks
-- All PASS → Overall PASS → Gate 2 eligible
-- Mix of PASS/WARN → Overall WARN → Gate 2 eligible with acknowledgment
+- Any FAIL dimension → Overall FAIL → fix the findings before shipping
+- All PASS → Overall PASS → ready to ship
+- Mix of PASS/WARN → Overall WARN → ready to ship once the user has seen each WARN
 
-FAIL verdict prevents `the ship skill` from executing (Gate 2 enforcement).
+A FAIL verdict is advice, not a block: say plainly that the change is not ready and name what to fix. The one ship-time control is the ship check (lint, related tests, type-check) that `pre-ship.cjs` runs on commit, push and merge.
 
 ### Side-Effect Signal (additive, positive-presence-only)
 
@@ -148,9 +148,9 @@ Side Effects Detected: Yes
 - <bullet list of detected effects, one per line>
 ```
 
-`validate-gate-2.cjs` recognizes this signal and blocks Gate 2 UNTIL a `## User Decision Addendum` block is appended containing the user's chosen recovery option. See cook `../cook/references/review-cycle.md` "Regression Recovery Options" for the addendum format and the four standard recovery options.
+This signal is the review's loudest finding. Surface it to the user and do not call the change ready to ship until a `## User Decision Addendum` block is appended to the verdict recording the recovery option the user chose. See cook `../cook/references/review-cycle.md` "Regression Recovery Options" for the addendum format and the four standard recovery options.
 
-**Backward-compat (CRITICAL):** absence of the `Side Effects Detected` field is NOT a block signal. Existing verdicts that pre-date this contract continue to pass unchanged. The new signal is positive-presence-only — never negative-absence.
+**Backward-compat (CRITICAL):** absence of the `Side Effects Detected` field means "nothing detected", not "something hidden". Verdicts that pre-date this contract read unchanged. The signal is positive-presence-only — never negative-absence.
 
 ### Evidence Index (recording only)
 
@@ -177,14 +177,14 @@ Want deeper analysis? Run the elicit skill to re-examine findings through a spec
 ```
 
 Elicitation output appends to the verdict file as a supplementary section.
-It does NOT change the verdict — it adds depth for informed Gate 2 decisions.
+It does NOT change the verdict — it adds depth for an informed ship decision.
 
 **Auto-suggestion:** If verdict is WARN with security findings → suggest `red-team`.
 If verdict is WARN with coverage gaps → suggest `pre-mortem`.
 
 ## Related Rules
 
-- AGENTS.md (Gates) — Gate 2 conditions this skill enforces; FAIL verdict blocks Phase 5 (Ship)
+- AGENTS.md (Ship check, security and compaction) — where review sits in the workflow, and the ship check that runs on commit, push and merge
 - the task-state conventions — when an active durable task record exists, record the review verdict/step via `mewkit task-state update` (advisory; active durable tasks only)
 
 ## Gotchas

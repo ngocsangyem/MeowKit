@@ -5,42 +5,6 @@
 //! beside this one, because a hook rather than a CI step reads it.
 use crate::npm;
 
-/// The gate-authority floor: one asserted claim is reported, while a statement
-/// of the contract and a suppressed quotation are not.
-#[test]
-fn an_automated_gate_approval_claim_fails_the_gates_check() {
-    let (ts, _) = npm::case("validate-gates")
-        .fixture("validate-gate-authority")
-        .args(&["validate", "--gates"])
-        .run();
-    assert_eq!(ts.code, 1, "{}", ts.describe());
-    assert!(
-        ts.stdout
-            .contains("[FAIL] Automated gate-approval claims (1)"),
-        "exactly one of the fixture's three lines may be reported: {}",
-        ts.describe()
-    );
-}
-
-/// Prose that states the contract is not prose that breaks it: the same check
-/// over a tree with no claim at all passes.
-#[test]
-fn a_clean_tree_passes_the_gates_check() {
-    let (ts, _) = npm::case("validate-gates-clean")
-        .fixture("validate-flat-copy")
-        .args(&["validate", "--gates"])
-        .run();
-    assert_eq!(ts.code, 0, "{}", ts.describe());
-    // The scanned-file count lives in the PASS row's detail, which the
-    // renderer suppresses; the row's NAME is what a reader sees.
-    assert!(
-        ts.stdout
-            .contains("[PASS] No automated gate-approval claims"),
-        "{}",
-        ts.describe()
-    );
-}
-
 /// A broad intent→skill table in an always-loaded rule file WARNs, which does
 /// not fail the build on its own.
 #[test]

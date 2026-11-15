@@ -37,9 +37,9 @@ fn a_mode_is_parsed_only_from_its_two_documented_spellings() {
 #[test]
 fn an_empty_project_fails_the_flat_copy_run_on_every_presence_row() {
     let (_dir, results) = run(ValidateMode::FlatCopy, false);
-    // Two directories, seven always-on rules, and the hooks row.
+    // Two directories, six always-on rules, and the hooks row.
     let failures = results.iter().filter(|r| r.status == Status::Fail).count();
-    assert!(failures >= 10, "{results:#?}");
+    assert!(failures >= 9, "{results:#?}");
     assert!(
         results.iter().any(|r| r.section == Section::Memory),
         "the memory lint runs in a consumer install too"
@@ -66,7 +66,6 @@ fn the_flat_copy_run_covers_every_consumer_actionable_section() {
     // so those rows would be false failures in a healthy consumer install.
     for section in [
         Section::Workflow,
-        Section::Gates,
         Section::Ownership,
         Section::Substrate,
         Section::Packs,
@@ -88,7 +87,6 @@ fn the_authoring_run_adds_every_coherence_section() {
     let (_dir, results) = run(ValidateMode::Authoring, false);
     for section in [
         Section::Workflow,
-        Section::Gates,
         Section::Portability,
         Section::Inventory,
         Section::Ownership,

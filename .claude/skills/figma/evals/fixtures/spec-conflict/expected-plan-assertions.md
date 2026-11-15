@@ -2,7 +2,7 @@
 
 What a plan built by `mk:plan-creator` from this fixture's packet + flow ledger MUST
 contain. Binary checks. Built FROM the packet — no Figma MCP call. This fixture proves the adjudication +
-phase-blocking path: block only affected phases (not Gate 1), and resolve source conflicts
+phase-blocking path: block only affected phases (not the whole plan), and resolve source conflicts
 through a decision ledger with no silent winner.
 
 ## Assertions
@@ -19,7 +19,7 @@ through a decision ledger with no silent winner.
 - [ ] `blocked_on:` appears on EXACTLY the affected phase; unrelated phases are not blocked.
 - [ ] `status:` frontmatter enum is unchanged (still a valid PHASE_VALID_STATUS value);
       the block is expressed only via the additive `blocked_on:` field.
-- [ ] Gate 1 remains presentable (ambiguity explicit) — the whole plan is not blocked.
+- [ ] The plan remains presentable to the user (ambiguity explicit) — the whole plan is not blocked.
 - [ ] No silent pick of the prototype's navigate outcome anywhere in the plan.
 
 ## Decision ledger (expected row)

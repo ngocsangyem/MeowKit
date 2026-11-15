@@ -189,9 +189,8 @@ fn an_absent_plan_is_reported_as_an_incomplete_structure() {
     assert!(ts.stdout.contains("File not found:"), "{}", ts.describe());
 }
 
-/// A plan authored on Windows reaches a verdict rather than a crash. Its
-/// frontmatter IS parsed here (the fence regex allows `\r\n`), unlike the
-/// receipt's line reader — which is why `plan approve` refuses the same file.
+/// A plan authored on Windows reaches a verdict rather than a crash: the fence
+/// regex allows `\r\n`, so its frontmatter is parsed like any other plan's.
 #[test]
 fn a_crlf_plan_still_reaches_a_structural_verdict() {
     let (ts, _) = npm::case("plan-check-structural-crlf")

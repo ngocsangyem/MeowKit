@@ -8,8 +8,10 @@
 // privacy-block.cjs R4 pattern set, adapted to match a `file_path` value
 // directly (not a shell command string).
 const SENSITIVE_PATH =
-	/(?:^|[\\/])(?:\.env(?:\.[\w-]+)?|[\w.-]*\.(?:pem|key|keystore)|[\w.-]*credentials[\w.-]*|[\w.-]*secrets?\.[\w]+|id_(?:rsa|ed25519|dsa|ecdsa))$/i;
-const PRIVATE_DIR = /(?:^|[\\/])\.(?:ssh|aws|gnupg)(?:[\\/]|$)/i;
+	/(?:^|[\\/])(?:\.env(?:\.[\w-]+)?|\.envrc|\.npmrc|[\w.-]*\.(?:pem|key|keystore)|[\w.-]*credentials[\w.-]*|[\w.-]*secrets?\.[\w]+|id_(?:rsa|ed25519|dsa|ecdsa))$/i;
+const PRIVATE_DIR = /(?:^|[\\/])\.(?:ssh|aws|gnupg)(?:[\\/]|$)|(?:^|[\\/])\.kube[\\/]config$/i;
+// Template dotenv files carry placeholders; the shared decision exempts the same exact name.
+const EXEMPT_BASENAME = /^\.env\.example$/i;
 
 /**
  * Evaluate the read-gate policy for a `beforeReadFile` payload.
@@ -24,10 +26,11 @@ function evaluateReadPolicy(payload) {
 		return { blocked: true, reason: "beforeReadFile payload missing file_path (unknown schema)" };
 	}
 	const normalized = filePath.replace(/\\/g, "/");
-	if (SENSITIVE_PATH.test(normalized) || PRIVATE_DIR.test(normalized)) {
+	const base = normalized.slice(normalized.lastIndexOf("/") + 1);
+	if (!EXEMPT_BASENAME.test(base) && (SENSITIVE_PATH.test(normalized) || PRIVATE_DIR.test(normalized))) {
 		return { blocked: true, reason: `sensitive/private file path: ${filePath}` };
 	}
 	return { blocked: false, reason: "path is not sensitive" };
 }
 
-module.exports = { evaluateReadPolicy, SENSITIVE_PATH, PRIVATE_DIR };
+module.exports = { evaluateReadPolicy, SENSITIVE_PATH, PRIVATE_DIR, EXEMPT_BASENAME };

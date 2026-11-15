@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-lifecycle. Transition, assign, resolv
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default
-memory: project
 color: yellow
 owner: jira
 criticality: medium

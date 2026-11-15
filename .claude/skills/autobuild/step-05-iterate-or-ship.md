@@ -8,15 +8,15 @@ Branch on the verdict from step-04. PASS → ship. WARN/FAIL with iterations rem
 
 | verdict | iteration < max_iter? | budget OK? | Action |
 |---|---|---|---|
-| `PASS` | — | — | Present Gate 2 (5c). On approval: route to shipper, set `final_status=PASS`, go to step-06 |
+| `PASS` | — | — | Ask the user about shipping (5c). On yes: route to shipper, set `final_status=PASS`, go to step-06 |
 | `WARN` | yes | yes | Loop to step-03 with feedback |
-| `WARN` | no | — | Present Gate 2 (5c) with every WARN itemized for acknowledgment. On approval: route to shipper, set `final_status=WARN`, go to step-06. On rejection: no ship |
+| `WARN` | no | — | Ask the user about shipping (5c) with every WARN itemized. On yes: route to shipper, set `final_status=WARN`, go to step-06. On no: no ship |
 | `FAIL` | yes | yes | Loop to step-03 with feedback |
 | `FAIL` | no | — | `final_status=ESCALATED`, go to step-06 + escalate via AskUserQuestion (5e) |
-| any | — | NO (budget breach) | `final_status=TIMED_OUT`, go to step-06 — no ship, no gate |
+| any | — | NO (budget breach) | `final_status=TIMED_OUT`, go to step-06 — no ship, no question |
 
-Both ship-capable rows (`PASS`, `WARN`-at-cap) route through the SAME human Gate 2 in 5c.
-A human rejection at that gate means no ship, in either row.
+Both ship-capable rows (`PASS`, `WARN`-at-cap) route through the SAME ship question in 5c.
+A "no" there means no ship, in either row.
 
 ### 5b. Compute the next action
 
@@ -24,8 +24,8 @@ This step does NOT branch with `goto`. Bash has no goto, and the autobuild workf
 
 Compute `next_action` based on verdict + iteration counter + budget. `next_step` is the
 step to read once this one finishes — for the two ship-capable actions (`ship`,
-`ship_with_warnings`) that only happens AFTER the human Gate 2 in 5c, and only if the
-human approves. Setting `next_step` here is not permission to skip 5c.
+`ship_with_warnings`) that only happens after the user has answered the ship question in
+5c, and only if the answer was yes. Setting `next_step` here does not skip 5c.
 
 ```bash
 # Persist iteration to run report frontmatter (for --resume)
@@ -43,8 +43,8 @@ elif { [ "$verdict" = "WARN" ] || [ "$verdict" = "FAIL" ]; } && [ "$iteration" -
   next_step="step-03-generate.md"  # loop back
   next_action="loop"
 elif [ "$verdict" = "WARN" ] && [ "$iteration" -ge "$max_iter" ]; then
-  # Ship-capable: goes through the SAME human Gate 2 as PASS (5c), with every
-  # WARN itemized for acknowledgment. next_step is where 5c lands AFTER approval.
+  # Ship-capable: goes through the SAME ship question as PASS (5c), with every
+  # WARN itemized. next_step is where 5c lands after a yes.
   final_status=WARN
   next_step="step-06-run-report.md"
   next_action="ship_with_warnings"
@@ -60,28 +60,26 @@ fi
 
 Handles BOTH ship-capable actions — `next_action == ship` and
 `next_action == ship_with_warnings`. Every path that reaches a shipper passes through
-this gate; there is no second ship route.
+here; there is no second ship route.
 
-A verdict is **evidence**, not approval. Per `.claude/rules/gate-rules.md` (The Gate
-Authority Invariant), Gate 2 is human-only and has no exceptions — so a verdict routes to
-Gate 2 *presentation*, it does not clear Gate 2. There is no env var or density mode that
-skips this prompt.
+A verdict is **evidence**, not a decision: it describes what the evaluator found, and the
+user decides what to do about it.
 
 **`--advice` runs only:** fire the REVIEW checkpoint here, **before** the question below,
 per `references/advice-checkpoints.md`. It reads the terminal verdict and its evidence
 and may return the work for correction — in which case re-enter step-03 and re-evaluate,
-because the verdict presented at Gate 2 must describe the code that exists. A
-`READY_FOR_EXISTING_GATE` disposition means only that presenting Gate 2 is the correct
-next step. Athena's read is a second piece of evidence beside the evaluator's verdict;
-it is not a second approval, and it is not the approval.
+because the verdict put in front of the user must describe the code that exists. A
+`READY_FOR_EXISTING_GATE` disposition means only that asking the ship question is the
+correct next step. Athena's read is a second piece of evidence beside the evaluator's verdict;
+it is not a decision.
 
-**First, present Gate 2 via AskUserQuestion. Do NOT dispatch the shipper until the human approves.**
+**First, ask via AskUserQuestion. Do not dispatch the shipper before the user answers.**
 
-Surface the verdict and its evidence so the human decides on what the evaluator actually
+Surface the verdict and its evidence so the user decides on what the evaluator actually
 found — not on the fact that it returned a grade.
 
-For `ship_with_warnings`, Gate 2 condition 3 requires that **each WARN is explicitly seen
-and accepted**. Itemize every WARN in the question; a count alone is not acknowledgment:
+For `ship_with_warnings`, itemize every WARN in the question so each one is seen; a count
+alone is not an answer:
 
 ```bash
 # Itemize the WARNs so each one is acknowledged, not summarized away.
@@ -90,13 +88,13 @@ awk '/^## Warnings/,/^## [^W]/' "$verdict_path" | sed '/^## /d;/^$/d' > "$run_di
 
 ```
 AskUserQuestion(
-  question: "Autobuild finished $slug with a {PASS | WARN-at-cap} verdict after $iteration iteration(s). Gate 2 requires your approval before shipping.
+  question: "Autobuild finished $slug with a {PASS | WARN-at-cap} verdict after $iteration iteration(s).
              Verdict: tasks/reviews/{slug}-evalverdict.md · Evidence: $run_dir/evidence/
-             {if ship_with_warnings: 'Unresolved WARNs you are accepting:' + contents of $run_dir/warns-iter-${iteration}.md}
+             {if ship_with_warnings: 'Unresolved WARNs you would be accepting:' + contents of $run_dir/warns-iter-${iteration}.md}
              Ship?",
   options: [
-    { label: "Approve and ship", description: "Gate 2 approved{if ship_with_warnings: '; the WARNs above are accepted as-is'}. Dispatch the shipper (mk:review still runs for the structural audit)." },
-    { label: "Reject — iterate with feedback", description: "Gate 2 not approved. Provide a reason; it becomes the feedback packet and re-enters step-03." },
+    { label: "Ship it", description: "{if ship_with_warnings: 'The WARNs above are accepted as-is. '}Dispatch the shipper (mk:review still runs for the structural audit)." },
+    { label: "Iterate with feedback", description: "Not yet. Provide a reason; it becomes the feedback packet and re-enters step-03." },
     { label: "Abort", description: "Stop the autobuild workflow. No ship, no further iterations; the evidence stays for manual triage." }
   ]
 )
@@ -104,21 +102,21 @@ AskUserQuestion(
 
 Routing:
 
-- **Approve and ship** → dispatch the shipper below, then step-06. Keep `final_status` as computed in 5b (`PASS` or `WARN`).
-- **Reject — iterate with feedback** → write the user's reason to `$run_dir/feedback-iter-${iteration}.md`, set `next_step="step-03-generate.md"`, and re-enter the loop (raise `max_iter` by 1 if already at cap).
+- **Ship it** → dispatch the shipper below, then step-06. Keep `final_status` as computed in 5b (`PASS` or `WARN`).
+- **Iterate with feedback** → write the user's reason to `$run_dir/feedback-iter-${iteration}.md`, set `next_step="step-03-generate.md"`, and re-enter the loop (raise `max_iter` by 1 if already at cap).
 - **Abort** → set `final_status=ESCALATED`, proceed to step-06 with no shipper dispatch.
 
-This is a distinct gate from the 5e escalation prompt. 5e fires only on the FAIL-at-cap
+This question is distinct from the 5e escalation prompt. 5e fires only on the FAIL-at-cap
 path and never runs on PASS or WARN — it is not a substitute for this step.
 
-**After** the human approves, dispatch the shipper subagent, then proceed to step-06.
+**After** the user says yes, dispatch the shipper subagent, then proceed to step-06.
 On `ship_with_warnings`, pass the acknowledged WARNs through so the release notes record
 what was accepted:
 
 ```
 Task(
   subagent_type="shipper",
-  description="Ship $slug after human Gate 2 approval",
+  description="Ship $slug after the user chose to ship",
   prompt="
     Read tasks/reviews/{slug}-evalverdict.md for the passing verdict.
     Read tasks/handoff/{slug}-sprint-1.md for the build summary.
@@ -127,14 +125,14 @@ Task(
     Files to modify: standard ship pipeline files (CHANGELOG, VERSION, git tags)
     Files to read: tasks/reviews/*-evalverdict.md, tasks/handoff/*.md, .claude/agents/shipper.md
     Acceptance criteria:
-      - Gate 2 approved by the human at step-05 (recorded above) — the evaluator verdict is
-        the evidence that was presented, not the approval itself
-      - mk:review run for structural audit (do NOT bypass)
+      - The user chose to ship at step-05 (recorded above) — the evaluator verdict is the
+        evidence that was presented, not the decision itself
+      - mk:review run for structural audit (do NOT skip)
       - Conventional commit + PR created
       - If shipping with warnings: every acknowledged WARN from
         $run_dir/warns-iter-{N}.md is recorded in the release notes
     Constraints:
-      - Do NOT bypass mk:review even though the evaluator passed
+      - Do NOT skip mk:review even though the evaluator passed
       - Do NOT modify source files; only release artifacts
   "
 )
@@ -203,7 +201,7 @@ If user picks "Abort and triage": set `final_status=ESCALATED`, proceed to step-
 ## Step 05 — Iterate or Ship (iteration {N})
 - Verdict in: {PASS | WARN | FAIL}
 - Action: {ship | ship_with_warnings | loop | escalate | timeout}
-- Gate 2: {approved by human | rejected by human | N/A — no ship attempted}
+- Ship decision: {user said ship | user said no | N/A — no ship attempted}
 - Advice checkpoints (`--advice` runs only): {stage/checkpointId + disposition per call, or "none"}
 - Final status: {PASS | WARN | FAIL | ESCALATED | TIMED_OUT}
 - Iterations completed: {N}
@@ -211,23 +209,23 @@ If user picks "Abort and triage": set `final_status=ESCALATED`, proceed to step-
 - Feedback packet (if loop): {path to feedback-iter-{N}.md}
 ```
 
-Record the Gate 2 line for every run. A ship recorded with no human approval is the
-regression this step exists to prevent — the run report is where it stays visible.
+Record the ship-decision line for every run. A ship recorded with no answer from the user
+is the thing this step exists to make visible.
 
 ## Output
 
 - `final_status` set
 - Either looped back to step-03 OR proceeding to step-06
 - Run report updated with Step 05 section
-- No shipper dispatched without a recorded human Gate 2 approval
+- No shipper dispatched without a recorded ship decision from the user
 
-Print: `"Action: {ship|ship_with_warnings|loop|escalate|timeout}. Gate 2: {approved|rejected|N/A}. Final status: $final_status."`
+Print: `"Action: {ship|ship_with_warnings|loop|escalate|timeout}. Ship decision: {ship|no|N/A}. Final status: $final_status."`
 
 ## Next
 
 Read and follow whichever step is named in `$next_step`:
 
-- `step-03-generate.md` if looping (next iteration with feedback, or after a Gate 2 rejection)
+- `step-03-generate.md` if looping (next iteration with feedback, or after the user declined to ship)
 - `step-06-run-report.md` for ship / escalate / timeout
 
 The loop control is the `$next_step` variable, not a goto statement. Bash has no goto.

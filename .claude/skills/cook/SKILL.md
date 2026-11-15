@@ -46,7 +46,7 @@ dependency_edges:
 
 > Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
 
-Implementation entry adapter. `.claude/skills/workflow-orchestrator/workflow.yaml` is the only lifecycle phase-sequence authority; this skill selects a profile, invokes the relevant owners, and presents the required gates. TDD is opt-in via `--tdd`.
+Implementation entry adapter. `.claude/skills/workflow-orchestrator/workflow.yaml` is the only lifecycle phase-sequence authority; this skill selects a profile, invokes the relevant owners, and keeps the user in the loop at the plan and review points. TDD is opt-in via `--tdd`.
 
 ## Usage
 
@@ -57,7 +57,7 @@ Implementation entry adapter. `.claude/skills/workflow-orchestrator/workflow.yam
 /cook tasks/plans/260329-feature/plan.md --auto
 ```
 
-Profiles: `quick`/`--fast` (inspect → edit → focused verify → summary), `standard` (plan if needed → implement → verify → review), `release` (standard + explicit `mk:ship` request), and `high-assurance` (`--tdd --strict`, with human gates). Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`.
+Profiles: `quick`/`--fast` (inspect → edit → focused verify → summary), `standard` (plan if needed → implement → verify → review), `release` (standard + explicit `mk:ship` request), and `high-assurance` (`--tdd --strict`, with the plan and the review verdict walked through with the user). Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`.
 
 Quick runs do not create a plan, report, memory entry, or ship action by default. They still stop if a risk flag or changed contract requires the standard profile.
 
@@ -65,14 +65,14 @@ Quick runs do not create a plan, report, memory entry, or ship action by default
 
 Concrete cost depends on the inner harness, model tier, and target surface; treat `[LIGHT]` vs `[HEAVY]` as relative ordering only.
 
-**`--verify` is advisory** (does not block ship). **`--strict` is a hard gate** (FAIL blocks ship and routes back to Phase 3).
+**`--verify` is advisory** (the run continues either way). **`--strict` is blocking inside this skill**: an evaluator FAIL routes the work back to Phase 3 instead of reporting completion.
 
 **`--advice`** (composable, off by default) — opt-in strategic supervision for one
-run. At named checkpoints (GUIDE after Gate 1, RESCUE on a stall or contradiction,
+run. At named checkpoints (GUIDE once the plan is agreed, RESCUE on a stall or contradiction,
 REVIEW after Verify and before the reviewer, RECHECK after a correction; hard cap 5)
 the `athena` agent assesses the situation, recommends an operational path inside the
-locked scope, and may return the work for correction. It never approves: Gate 1 and
-Gate 2 remain human, the reviewer keeps its verdict, and supervision counts as no
+locked scope, and may return the work for correction. It never approves: the plan and
+the review verdict stay with the user and the reviewer, and supervision counts as no
 verification. Without the flag there are zero calls and no state is written.
 Checkpoints: `references/workflow-steps.md` → Advice Checkpoints. Contract:
 `.claude/skills/advise/references/advice-supervision-rules.md` (load only when the flag is present).
@@ -85,7 +85,7 @@ When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.
 mkdir -p .meowkit/state && echo on > .meowkit/state/tdd-mode
 ```
 
-This sentinel file is read by `pre-implement.cjs`, `tdd-detect.cjs`, and downstream agents to detect TDD mode. Without `--tdd`, the sentinel is absent and the workflow runs in default mode (Phase 2 optional, no RED-phase gate).
+This sentinel file is read by `tdd-detect.cjs` and downstream agents to detect TDD mode. Without `--tdd`, the sentinel is absent and the workflow runs in default mode (Phase 2 optional, no RED phase).
 
 `MEOWKIT_TDD=1` env var (set in CI / shell rc) is the highest-precedence opt-in and overrides the sentinel.
 
@@ -95,13 +95,13 @@ When loading an existing plan, scan `plan.md` and phase files for `tdd: true`, `
 Plan contains TDD sections but cook is not in TDD mode. Re-run with --tdd to enforce RED-first execution, or continue in default mode with TDD guidance only.
 ```
 
-**HARD GATE**
+**Plan first**
 
-Do NOT write implementation code until a plan exists and Gate 1 is approved.
-In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): do NOT skip Test RED phase — write failing tests BEFORE implementation.
-In default mode: Phase 2 is optional; the developer may implement directly per the approved plan.
-Exception: `--fast` mode skips research but still requires plan + (in TDD mode) TDD-flavored tests.
-User override: Planning may be skipped only when the user explicitly says "just code it" or "skip planning" **and** Phase 0 found zero matched risk flags. Record the human override and rationale per `.claude/rules/gate-rules.md` (Recording Human Interventions); otherwise explain why Gate 1 still applies.
+Write the plan and agree it with the user before writing implementation code — a wrong plan costs more than the conversation. No hook blocks the edit; the practice is the control.
+In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): write failing tests before implementation, so the tests define the spec rather than describe the result.
+In default mode: Phase 2 is optional; the developer may implement directly per the agreed plan.
+`--fast` skips research but still writes a plan and, in TDD mode, TDD-flavored tests.
+Skipping the plan: reasonable when the user explicitly says "just code it" or "skip planning" **and** Phase 0 found zero matched risk flags. Note what was skipped and why in the run summary; otherwise say why the plan is still worth writing.
 
 ## Anti-Rationalization
 
@@ -123,10 +123,10 @@ See `references/intent-detection.md` for full detection logic.
 | -------------------------------- | ----------- | --------------------------------------------- |
 | Path to `plan.md` / `phase-*.md` | code        | Execute existing plan                         |
 | "fast", "quick"                  | fast        | Skip research, plan→test→code                 |
-| "trust me", "auto"               | auto        | Auto-fix issues, human gates still enforced   |
+| "trust me", "auto"               | auto        | Auto-fix issues, run through without pausing  |
 | 3+ features OR "parallel"        | parallel    | Multi-agent execution                         |
 | "no test", "skip test"           | no-test     | Skip Test phase only when TDD is not enabled; `--no-test` + `--tdd` is invalid and requires user resolution |
-| Default                          | interactive | Full workflow with user approval at each gate |
+| Default                          | interactive | Full workflow, checking in with the user at the plan and the review |
 | `--verify`                       | (modifier)  | Light browser check after review (Phase 4.5)  |
 | `--strict`                       | (modifier)  | Full evaluator after review (Phase 4.5)        |
 | `--no-strict`                    | (modifier)  | Suppress auto-strict from scale-routing        |
@@ -145,15 +145,15 @@ flowchart TD
     SP --> C[Phase 1: Research + Plan]
     C --> RQ{5 dims captured?}
     RQ -->|No| C
-    RQ -->|Yes| G1[GATE 1: Human Approval]
-    G1 -->|approved| D
-    G1 -->|rejected| C
+    RQ -->|Yes| PP[Present plan to user]
+    PP -->|agreed| D
+    PP -->|changes asked for| C
     D --> E[Phase 2: Test - RED if --tdd, optional otherwise]
     E --> F[Phase 3: Build GREEN]
     F --> S[mk:simplify — MANDATORY]
     S --> V[mk:verify — MANDATORY]
-    V --> G2[Phase 4: Review — GATE 2]
-    G2 -->|approved| BV{--verify or --strict?}
+    V --> G2[Phase 4: Review]
+    G2 -->|verdict PASS| BV{--verify or --strict?}
     BV -->|"--verify"| P45A["Phase 4.5 --verify advisory"]
     BV -->|"--strict"| P45B["Phase 4.5 --strict blocking"]
     BV -->|neither| SR[Report completion]
@@ -161,7 +161,7 @@ flowchart TD
     P45B --> BG{evaluator FAIL?}
     BG -->|no| SR
     BG -->|yes| F
-    G2 -->|rejected| F
+    G2 -->|verdict FAIL| F
     SR --> STOP[Stop and await user direction]
     STOP -->|explicit ship request| H[Phase 5: Ship]
     STOP -->|explicit close request| I[Phase 6: Reflect]
@@ -209,9 +209,9 @@ Every clarifying-question option MUST cite scout findings (e.g., file paths). Va
 | no-test     | Yes      | Skip         |
 | code        | Skip     | RED-strict   |
 
-Gate 1 routing, parallelism, and full per-phase progression live in `references/intent-detection.md` (canonical Mode Behaviors table).
+Plan routing, parallelism, and full per-phase progression live in `references/intent-detection.md` (canonical Mode Behaviors table).
 
-**Gate 2: human approval mandatory in all modes — see `.claude/rules/gate-rules.md` for the full contract.** If the reviewer surfaces a regression / side effect / broken workflow, follow the Regression Recovery Options pattern in `references/review-cycle.md` rather than silently patching.
+Phase 4 produces a review verdict in every mode; read it before shipping. If the reviewer surfaces a regression / side effect / broken workflow, follow the Regression Recovery Options pattern in `references/review-cycle.md` rather than silently patching.
 
 ## Required Subagents
 
@@ -224,7 +224,7 @@ Gate 1 routing, parallelism, and full per-phase progression live in `references/
 | 3 Build GREEN | `developer` via `mk:investigate` | Root-cause analysis when tests fail after 3 self-heal attempts |
 | 3.5 Simplify  | `developer` via `mk:simplify`   | **MANDATORY** after Phase 3 GREEN — run before verify  |
 | 3.6 Verify    | `mk:verify`                     | **MANDATORY** after simplify — unified build+lint+test+coverage check before Phase 4 |
-| 4 Review      | `reviewer` via `mk:review`      | **MUST** spawn — Gate 2                  |
+| 4 Review      | `reviewer` via `mk:review`      | **MUST** spawn — writes the review verdict |
 | 4.5 Verify    | `browser-automation subagent` or `HTTP verification tool` | Only if `--verify` flag (light browser check) |
 | 4.5 Verify    | `evaluator` via `mk:evaluate`   | Only if `--strict` flag or auto-triggered     |
 
@@ -252,9 +252,9 @@ After `mk:simplify` completes, run `mk:verify` for a unified build→lint→type
 
 If `mk:verify` FAILS after simplify: send back to developer to fix, then re-run verify before proceeding to Phase 4. Do not skip verify or proceed to review with a failing verify result.
 
-## Status Report (Post-Gate 2)
+## Status Report (After Review)
 
-After a Gate 2 verdict PASS, delegate to `project-manager` per `references/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Stop after reporting completion; invoke `mk:ship` only when the user explicitly requests shipping. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
+After a review verdict of PASS, delegate to `project-manager` per `references/post-phase-delegation.md` Rule 1 (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Stop after reporting completion; invoke `mk:ship` only when the user explicitly requests shipping. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
 
 ## Durable Task State (when an active task record exists)
 
@@ -262,8 +262,8 @@ When this run drives an **active durable task** (a `tasks/active/<id>.json` exis
 
 ## Related Rules
 
-- `.claude/rules/gate-rules.md` — Gate 1 (Plan) and Gate 2 (Review) hard-stop conditions this skill enforces across all modes
-- `.claude/skills/advise/references/workflow-evidence-rules.md` — workflow evidence index (traceability over existing Phase 0-6 outputs; mirrors the gate scripts, never approves). See `references/workflow-steps.md` → Workflow Evidence Index
+- `.claude/rules/meowkit-core.md` — the phase sequence, planning and review as practices, and the ship check
+- `.claude/skills/advise/references/workflow-evidence-rules.md` — workflow evidence index (traceability over existing Phase 0-6 outputs; it records what happened, never approves). See `references/workflow-steps.md` → Workflow Evidence Index
 
 ## Rule Loads (just in time)
 
@@ -275,8 +275,8 @@ These rules are no longer always-on: cook owns them and `Read`s each one at the 
 | Phase 2 Test (TDD mode only) | `references/tdd-rules.md` | RED-phase definition, self-heal cap, escalation form |
 | Phase 3 Build, parallel mode only | `references/parallel-execution-rules.md` | zero-overlap ownership, max-3 agents, worktree isolation, integration test after merge |
 | Phase 3 Build, whenever a subagent is spawned | `references/orchestration-rules.md` | delegation template, isolation boundaries, file ownership, status handling |
-| Phase 4.5 `--strict` / generator ⇄ evaluator work | `references/harness-rules.md` | generator ≠ evaluator separation, active-verification HARD GATE, iteration cap |
-| After Gate 2 PASS | `references/post-phase-delegation.md` | PM delegation fire points and skip conditions |
+| Phase 4.5 `--strict` / generator ⇄ evaluator work | `references/harness-rules.md` | generator ≠ evaluator separation, active verification, iteration cap |
+| After a review verdict of PASS | `references/post-phase-delegation.md` | PM delegation fire points and skip conditions |
 | Phase transitions, active durable task only | `references/task-state-emission.md` | when/what/how to emit durable task-state events (advisory) |
 
 ## Gotchas
@@ -284,9 +284,8 @@ These rules are no longer always-on: cook owns them and `Read`s each one at the 
 Operational gotchas live here; pre-build failure modes and rationalizations live in `references/failure-catalog.md`.
 
 - **Skipping mk:simplify before review**: Tests pass but code is still complex → run `/mk:simplify` between Phase 3 and Phase 4 every time, no exceptions
-- **Skipping Gate 1 on "simple" features**: Features that seem simple grow during implementation. Always create a plan file; cancel it if truly trivial
-<!-- lint-allow-gate-authority -->
-- **Auto-approve sneaking bugs past Gate 2**: "auto" means automatic execution *between* gates, NOT automatic approval. Auto mode auto-fixes but NEVER auto-approves Gate 2 — gate-rules.md says NO exceptions. The workflow evidence index must be complete before Gate 2 is presented
+- **Skipping the plan on "simple" features**: Features that seem simple grow during implementation. Write the plan file; cancel it if the work turns out to be trivial
+- **`--auto` hiding a bad review**: auto mode auto-fixes and runs through without pausing, so nobody reads the verdict as it is written. Read the review verdict and the workflow evidence index at the end of an auto run before you ship anything
 - **Context loss between phases**: Long multi-phase workflows exceed the context window — the external-memory write after each completed plan phase is the load-bearing action that lets a fresh session resume the correct phase. This is a mandatory step, not a habit: see the **Per-Phase Checkpoint** in `references/workflow-steps.md` (Phase 6) — flip the phase-file checkboxes and update plan.md Agent State before any next-phase transition
 - **Parallel mode deadlocks**: Phase dependencies cause deadlock when phase-03 waits for phase-02 results. Map dependency graph before spawning parallel agents
 - **Code mode on stale plans**: Running old plan against changed codebase. Warn if plan.md is >14 days old

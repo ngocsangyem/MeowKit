@@ -2,7 +2,7 @@
 name: mk:plan-creator
 version: 1.6.3
 preamble-tier: 3
-description: Writes the multi-file implementation plan a human approves at Gate 1, scaled to task size. NOT for mk:planning-engine.
+description: Writes the multi-file implementation plan the user agrees before building, scaled to task size. NOT for mk:planning-engine.
 argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] [--advice] OR [archive | red-team {path} | validate {path}]'
 allowed-tools:
   - Bash
@@ -18,10 +18,10 @@ keywords:
   - plan-creator
   - implementation-plan
   - phase-files
-  - gate-1
+  - plan-handoff
   - scope-adaptive
   - design-evidence
-when_to_use: A non-trivial build is requested and no approved plan directory exists.
+when_to_use: A non-trivial build is requested and no agreed plan directory exists.
 user-invocable: true
 meowkit:
   portability: provider-only
@@ -66,7 +66,7 @@ dependency_edges:
 
 > Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
 
-Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, archive, and memory entries stay with their existing owners.
+Public surface: classify → inspect → capture missing decisions → draft → validate → present to the user. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, archive, and memory entries stay with their existing owners.
 
 ## When to Use
 
@@ -76,17 +76,17 @@ Activate when:
 - Non-trivial task (> 2 files OR > 1h OR architectural decisions)
 - User supplies ≥2 upstream reports/specs (office-hours, brainstorming, planning-engine, confluence-spec, intake output…) → step-00.5 consolidates them into a Plan Intake Packet before planning (see `references/plan-intake-packet.md`)
 - User supplies a design evidence packet (e.g. from `mk:figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
-- Gate 1 requires a plan before Phase 3
+- Phase 3 needs a plan to build from
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
 - Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI.
-- Hard/deep plan creation still runs its built-in red-team and validation interview before Gate 1. These are design-quality gates, not standalone subcommands, and must never be routed away.
+- Hard/deep plan creation still runs its built-in red-team and validation interview before presenting the plan. These are design-quality steps, not standalone subcommands, and must never be routed away.
 - Compatibility aliases: `/mk:plan-creator archive` → [archive workflow](references/archive-workflow.md); `/mk:plan-creator red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `/mk:plan-creator validate {path}` → [standalone validation workflow](references/validate-standalone.md).
 
 Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation.
 
 Skip when:
 
-- `/mk:fix` with complexity=simple (Gate 1 exception)
+- `/mk:fix` with complexity=simple (the fix is the plan)
 - `mk:scale-routing` returns workflow=one-shot + zero blast radius
 
 ## Arguments
@@ -112,7 +112,7 @@ Skip when:
 **Composable flags:**
 
 - `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
-- `--advice` — opt-in strategic supervision for one planning run, capped at 4 calls: GUIDE after the scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before Gate 1, RECHECK after a correction. Athena reads the plan and can return it to the planner; it never writes the plan and never approves Gate 1. Without the flag there are zero calls and no state. See `references/advice-checkpoints.md`.
+- `--advice` — opt-in strategic supervision for one planning run, capped at 4 calls: GUIDE after the scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before the plan is presented, RECHECK after a correction. Athena reads the plan and can return it to the planner; it never writes the plan and never settles it with the user. Without the flag there are zero calls and no state. See `references/advice-checkpoints.md`.
 
 ## Requirements Capture Contract
 
@@ -146,7 +146,7 @@ Step 3: Draft Plan → plan.md (≤80 lines) + phase-XX files (12-section templa
 Step 4: Semantic Checks → goal/ACs/constraints + structural validation
 Step 5: Red Team (hard/deep/parallel/two only) → 4-persona scaling, red-team-findings.md, adjudication
 Step 6: Validation Interview (hard/deep/parallel/two only) → 3-5 critical questions with detection keywords, propagate answers
-Step 7: Gate 1 → self-check + AskUserQuestion (Approve | Modify | Reject)
+Step 7: Present plan → self-check + AskUserQuestion (Looks right | Modify | Reject)
 Step 8: Hydrate Tasks → phase checkboxes → session tasks
 Step 9: Post-Plan Handoff → mode-pruned AskUserQuestion (cook|validate|red-team|end) → write `handoff.next` to plan.md → STOP
 ```
@@ -169,7 +169,7 @@ tasks/plans/YYMMDD-name/
 
 - **Wrong workflow model**: feature-model on a bug fix skips investigation → confirm type at Step 0
 - **Goal describes activity**: "Implement OAuth" vs "Users can log in with OAuth" → rewrite as outcome
-- **ACs can't be verified**: "code is clean" blocks Gate 2 → every AC must reference a command/file check
+- **ACs can't be verified**: "code is clean" gives the reviewer nothing to check → every AC must reference a command/file check
 - **Monolithic plan**: plan.md over 80 lines → move detail to phase files or research reports
 - **Research disconnected**: findings archived but not cited in plan → Step 3 MUST integrate research into Key Insights
 - **Over-planning trivial tasks**: 2-file config change gets full research → Step 0 scope gate exits early
@@ -200,9 +200,9 @@ tasks/plans/YYMMDD-name/
 | `references/design-evidence-consumption.md`        | Consuming a design evidence packet (e.g. Figma): do/don't, adjudication precedence, decision-ledger, flow→validation-matrix, `blocked_on:` phase blocking. Never re-analyzes the design source.                        |
 | `step-05-red-team.md`                              | Red team review: persona scaling, subagent dispatch, adjudication                                                                                                                                                    |
 | `step-06-validation-interview.md`                  | Critical question generation and answer propagation                                                                                                                                                                  |
-| `step-07-gate.md`                                  | Self-check and Gate 1 AskUserQuestion presentation                                                                                                                                                                   |
-| `step-09-post-plan-handoff.md`                     | Deterministic post-Gate-1 handoff: mode-pruned `AskUserQuestion` (cook \| validate \| red-team \| autobuild \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
-| `references/whole-plan-sweep.md`                   | Whole-Plan Consistency Sweep algorithm (Gates W1 + W2). Stage-then-apply: read-only Pass 1 stages Pending Sweep Edits; decision check blocks on unresolved contradictions; write Pass 2 applies edits and logs.   |
+| `step-07-gate.md`                                  | Self-check and the AskUserQuestion that presents the plan                                                                                                                                                            |
+| `step-09-post-plan-handoff.md`                     | Deterministic post-plan handoff: mode-pruned `AskUserQuestion` (cook \| validate \| red-team \| autobuild \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
+| `references/whole-plan-sweep.md`                   | Whole-Plan Consistency Sweep algorithm (checks W1 + W2). Stage-then-apply: read-only Pass 1 stages Pending Sweep Edits; decision check blocks on unresolved contradictions; write Pass 2 applies edits and logs.   |
 | `references/deep-mode.md`                          | Deep mode contract: when to use/avoid, scout budgets, phase-map appendix, context rules.                                                                                                                             |
 | `references/tdd-mode.md`                           | TDD flag contract: phase sections, optional frontmatter, cook handoff propagation, RED-task hydration.                                                                                                                |
 | `references/verification-roles.md`                 | Verification Roles for step-04 sub-step 4d (Fact Checker / Flow Tracer / Scope Auditor / Contract Verifier) with tier selection by phase count. Subagents are READ-ONLY; orchestrator writes the `## Verification Log`. |
@@ -220,7 +220,7 @@ tasks/plans/YYMMDD-name/
 | `references/plan-organization.md`                  | Directory structure, naming, size rules                                                                                                                                                                              |
 | `references/output-standards.md`                   | YAML frontmatter, required sections                                                                                                                                                                                  |
 | `references/validation-questions.md`               | Critical question categories for interview                                                                                                                                                                           |
-| `references/gate-1-approval.md`                    | AskUserQuestion gate + Context Reminder                                                                                                                                                                              |
+| `references/plan-presentation.md`                  | AskUserQuestion that presents the plan + Context Reminder                                                                                                                                                            |
 | `references/task-management.md`                    | Hydration, cross-session resume, sync-back                                                                                                                                                                           |
 | `references/solution-evaluation.md`                | Trade-off scoring criteria                                                                                                                                                                                           |
 | `references/gotchas.md`                            | Full gotchas list                                                                                                                                                                                                    |
@@ -240,7 +240,7 @@ tasks/plans/YYMMDD-name/
 
 ## Related Rules
 
-- `.claude/rules/gate-rules.md` — Gate 1 hard-stop conditions this skill enforces (plan approval before Phase 3)
+- `.claude/rules/meowkit-core.md` — planning as a practice: write the plan and agree it with the user before Phase 3
 - `.claude/skills/cook/references/orchestration-rules.md` — boundary contract; verification subagents stay READ-ONLY; sweep stays in planner context (never delegated)
 - `.claude/skills/cook/references/task-state-emission.md` — when an active durable task record exists, emit status/step via `mewkit task-state update` (advisory; active durable tasks only)
 

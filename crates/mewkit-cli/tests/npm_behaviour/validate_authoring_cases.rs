@@ -28,7 +28,6 @@ fn the_authoring_run_reports_every_section() {
         "Portability",
         "Docs",
         "Workflow",
-        "Gates",
         "Ownership",
         "Substrate",
         "Packs",

@@ -48,7 +48,7 @@ dependencies: []
 
 | Field | Type | Allowed values | Default | Notes |
 |-------|------|----------------|---------|-------|
-| phase | int | ≥1 (max enforced by `step-03-draft-plan.md`, currently 7) | filename-derived | required |
+| phase | int | ≥1 (max set by `step-03-draft-plan.md`, currently 7) | filename-derived | required |
 | title | string | — | heading-derived | required |
 | status | enum | `pending \| active \| in_progress \| completed \| failed \| abandoned` | `pending` | NEVER `completed` at creation. `unknown` is reserved as a parser sentinel — never written from frontmatter. |
 | priority | enum | `P1 \| P2 \| P3` | `P2` | matches Overview convention |
@@ -220,7 +220,7 @@ These sections are written by skill steps, not authored by humans. They are OPTI
 
 ## Anti-patterns
 
-- ❌ Writing `status: completed` at phase-file creation — defeats Gate 1, breaks cook re-hydration
+- ❌ Writing `status: completed` at phase-file creation — breaks cook re-hydration
 - ❌ Writing `status: unknown` from frontmatter — `unknown` is a parser sentinel for parse failures only
 - ❌ Writing `status: draft` or `status: done` — not in the parser union; will normalize to `unknown`. Use `pending` or `completed`.
 - ❌ Hand-editing the Overview `**Status:**` line directly — sync-back regenerates from frontmatter, your edit will be lost. Edit frontmatter instead.

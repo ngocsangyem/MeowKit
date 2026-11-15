@@ -78,7 +78,7 @@ fn a_lying_index_cannot_make_a_user_file_clean() {
 fn round_trips_through_json() {
     let (dir, mut index, _) = fixture();
     index.packs = vec!["core".into()];
-    index.hooks.insert("gate-enforcement".into(), "ab".into());
+    index.hooks.insert("pre-ship".into(), "ab".into());
     let block = Section {
         format: crate::plan::Format::Markdown,
         key: vec![],

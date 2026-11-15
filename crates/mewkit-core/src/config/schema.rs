@@ -13,9 +13,9 @@
 //!
 //! What is deliberately absent matters as much as what is present. There is no
 //! `gates.*` and no `paths.*` key, at any scope: a configurable workflow path
-//! would move writes out of the rules Gate 1 keys off, and a gate is not a
-//! preference. An unknown key is a loud error rather than a silently ignored
-//! one.
+//! would move writes out of the paths the guards key off, and enforcement is
+//! not a preference. An unknown key is a loud error rather than a silently
+//! ignored one.
 //!
 //! This module owns what a config may NOT say — the refused namespaces, the
 //! protected hooks, the state-only keys, the user-scope hatch. The KEYS it may
@@ -29,35 +29,25 @@ pub const SCHEMA_URL: &str = "https://meowkit.dev/schemas/config-v1.json";
 pub const FORBIDDEN_NAMESPACES: &[(&str, &str)] = &[
     (
         "gates",
-        "gate behaviour is not configurable from any file, at any scope",
+        "MeowKit has no configurable gates; the ship check is not a preference",
     ),
     (
         "paths",
-        "a configurable workflow path would move writes out of the gate rules that key off it",
+        "a configurable workflow path would move writes out of the paths the guards key off",
     ),
 ];
 
 /// Hooks that may never be switched off, and why, for the rejection message.
 pub const PROTECTED_HOOKS: &[(&str, &str)] = &[
-    (
-        "gate-enforcement",
-        "Gate 1 blocks source writes before the plan is approved",
-    ),
     ("privacy-block", "it blocks reads of credential files"),
     (
         "pre-ship",
-        "it proves Gate 2 before a commit, push or merge",
+        "it runs lint, related tests and type-check before a commit, push or merge",
     ),
-    ("gate2-check", "it is the Gate 2 proof the ship path runs"),
     ("check-careful", "it is a hard-blocking guard"),
     ("check-freeze", "it is a hard-blocking guard"),
     ("check-report-path", "it is a hard-blocking guard"),
 ];
-
-/// The key that downgrades Gate 1 to a plan-presence check. Legal in the USER
-/// file only; the gate reads it through its own single-key reader and never
-/// through this table.
-pub const USER_SCOPE_ONLY_KEY: &str = "gate1PresenceOnly";
 
 /// Settings that live in session state and may never become config keys, with
 /// the reason each one stays out. A committed key here would let a pull request

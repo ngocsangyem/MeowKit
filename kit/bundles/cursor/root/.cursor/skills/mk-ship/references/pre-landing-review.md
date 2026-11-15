@@ -2,7 +2,7 @@
 
 ## Step 3.5: Pre-Landing Review
 
-Structural review is owned by `mk:review` at Gate 2 — ship does not re-run the full adversarial pipeline. Ship's pre-landing check is a lightweight diff-based pass only.
+Structural review is owned by `mk:review` — ship does not re-run the full adversarial pipeline. Ship's pre-landing check is a lightweight diff-based pass only.
 
 1. Run `git diff origin/<base>` to get the full diff (scoped to feature changes against the freshly-fetched base branch).
 
@@ -12,7 +12,7 @@ Structural review is owned by `mk:review` at Gate 2 — ship does not re-run the
 
 Design review is delegated to `mk:review/references/design-review.md` — rubric-based, diff-scoped. Ship does not re-implement it.
 
-If the diff is frontend-only and Gate 2 was skipped for any reason, load `mk:review/references/design-review.md` and follow the rubric pipeline there.
+If the diff is frontend-only and no `mk:review` pass ran, load `mk:review/references/design-review.md` and follow the rubric pipeline there.
 
 ## Classify findings
 

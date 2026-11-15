@@ -132,7 +132,7 @@ analysis, but it does not invoke `the plan-creator skill`, `the cook skill`,
 Transformation Spec ready.
 
 Surface: <cli | mcp | both> | Capabilities: <n kept / n cut>
-Risk: <low | medium | high> | HARD GATE: approved by <user>
+Risk: <low | medium | high> | Phase 4 decisions: made by <user>
 
 To plan implementation, run:
   the plan-creator skill "Agentize <module>" --product-level

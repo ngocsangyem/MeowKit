@@ -18,14 +18,14 @@ failing tests written first.
    translation of the plan defining the exact acceptance-criteria scope. If contract
    discipline is required and none exists yet, STOP and have one proposed before any
    source-code edit begins.
-3. **TDD gate (conditional):** detect TDD mode from the project's env var or
+3. **TDD mode check:** detect TDD mode from the project's env var or
    .meowkit/state sentinel (highest precedence to lowest); default is OFF.
    - **TDD on:** confirm every acceptance criterion has a test that currently FAILS
      before the first source edit. If any criterion lacks a failing test, STOP and
      route back to the test-writing agent — this check is the developer's own
      responsibility regardless of who invoked it.
    - **TDD off (default):** proceed directly to implementation; tests are
-     recommended but not gated.
+     recommended, not required.
 4. **Writes production code** that satisfies every signed acceptance criterion. In TDD
    mode, code must also make the failing tests pass.
 5. **Follows existing codebase patterns** — never introduces a new pattern without an
@@ -76,7 +76,7 @@ A signed sprint contract is immutable during implementation.
   implementation can't satisfy that rubric's anchor pattern, the criterion fails.
 - A lean/adaptive density mode may waive the contract requirement for a complex,
   highly capable model tier — implementation still targets the underlying spec
-  directly, only the contract gate is skipped.
+  directly, only the contract step is skipped.
 
 ## Exclusive ownership
 
@@ -87,7 +87,7 @@ or modifies production source in those directories.
 
 - After implementation → recommend routing to the tester for green-phase
   verification.
-- All tests passing → recommend routing to the reviewer for the pre-ship gate.
+- All tests passing → recommend routing to the reviewer for review.
 - After 3 failed self-heal attempts → escalate with a failure report.
 - Always include: files created/modified, test results, any plan deviations.
 

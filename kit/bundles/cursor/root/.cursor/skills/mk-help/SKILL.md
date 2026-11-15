@@ -23,13 +23,13 @@ Check `.meowkit/state/*-progress.json` for any in-progress step-file workflow.
 
 ### 2. In-Progress Plans
 Check `tasks/plans/` for plan files without matching review verdicts.
-- Plan exists, no tests → "Plan approved. Next: run tester agent (Phase 2 — RED)"
+- Plan exists, no tests → "Plan agreed. Next: run tester agent (Phase 2 — RED)"
 - Plan exists, tests failing → "Tests failing. Next: run developer agent (Phase 3 — GREEN)"
 - Plan exists, tests passing, no review → "Tests green. Next: run reviewer agent (Phase 4 — Review)"
 
 ### 3. Pending Reviews
 Check `tasks/reviews/` for verdict files with WARN or action items.
-- WARN verdict → "Review has warnings. Acknowledge and approve for Gate 2, or fix findings."
+- WARN verdict → "Review has warnings. Read them and decide, or fix the findings."
 - FAIL verdict → "Review failed. Fix required changes, then re-run reviewer."
 
 ### 4. Uncommitted Changes
@@ -92,7 +92,7 @@ For skill suggestions based on task type, see `mk:agent-detector` (its `../agent
 | Existing plan — stress-test | Standalone subcommand | "`the plan skill red-team {path}` — adversarial review of existing plan" |
 | Existing plan — interview | Standalone subcommand | "`the plan skill validate {path}` — critical question interview on existing plan" |
 | Completed/cancelled plans | Housekeeping | "`the plan skill archive` — archive completed or cancelled plans" |
-| Plan approved, no tests | Phase 2 (TDD mode only) | "In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): run tester agent — write failing tests (RED phase). In default mode: skip Phase 2; run developer directly" |
+| Plan agreed, no tests | Phase 2 (TDD mode only) | "In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): run tester agent — write failing tests (RED phase). In default mode: skip Phase 2; run developer directly" |
 | Tests written, failing | Phase 3 | "Run developer agent — implement to pass tests (GREEN)" |
 | Tests passing, no review | Phase 4 | "Run `the review skill` — adversarial code review" |
 | Review PASS/WARN | Phase 5 | "Run `the ship skill` — commit, PR, deploy" |
@@ -115,15 +115,15 @@ For skill suggestions based on task type, see `mk:agent-detector` (its `../agent
 
 Not every task needs the full 7-phase pipeline. Mention these when relevant:
 
-| Situation | Fast Path | What it bypasses |
-|-----------|-----------|-----------------|
-| Simple bug fix, typo, rename, config tweak | `the fix skill` | Gate 1 (plan approval) — scope is the plan |
-| Task flagged as `one-shot` by scale-routing | Auto Gate 1 bypass | Gate 1 — zero blast radius confirmed |
+| Situation | Fast Path | What it skips |
+|-----------|-----------|---------------|
+| Simple bug fix, typo, rename, config tweak | `the fix skill` | the plan file — the scope is the plan |
+| Task flagged as `one-shot` by scale-routing | no plan file | the plan file — zero blast radius confirmed |
 | Rapid iteration / spike work | `MEOWKIT_HOOK_PROFILE=fast` | post-write scan, pre-ship, pre-task-check, TDD check |
 
-**Quick fix?** Use `the fix skill` — bypasses Gate 1 for simple changes.
+**Quick fix?** Use `the fix skill` — no separate plan file for simple changes.
 
-**Small config change?** Scale-routing may auto-bypass Gate 1 when blast radius is zero.
+**Small config change?** Scale-routing may skip the plan file when blast radius is zero.
 
 **Hook profiles:** Set `MEOWKIT_HOOK_PROFILE=fast` for rapid iteration (skips non-critical hooks).
 Set `MEOWKIT_HOOK_PROFILE=strict` to enable ALL hooks including post-session capture.
@@ -134,7 +134,7 @@ Set `MEOWKIT_HOOK_PROFILE=strict` to enable ALL hooks including post-session cap
 - `.meowkit/state/` files from previous sessions may be stale — check timestamps, warn if >24h old
 - Git status can be noisy (untracked IDE files) — focus on files in `src/`, `lib/`, `app/`, `tests/`
 - Don't recommend skipping phases — even if the user seems impatient, show the full path
-- Fast paths are not loopholes — Gate 2 (review) is NEVER bypassed; security hooks are NEVER skipped
+- Fast paths are not loopholes — still review the diff before shipping, and security hooks are NEVER skipped
 - `.meowkit/state/checkpoints/` does not exist until runtime — its absence is normal, not an error; skip silently
 - `budget-state.json` is missing at session start — treat budget figures as advisory; never source model tier from it (use `detected-model.json`)
 - Prefer the machine-readable `*-verdict.json` over the `.md` prose verdict; a verdict is blocked when `decision === "BLOCKED"` (never a top-level `"FAIL"`)
@@ -153,7 +153,7 @@ no scanner script; the shape documents what the ranking reasons about.
       "rank": 1,
       "action": "the cook skill tasks/plans/260610-x/plan.md",
       "priority": "high",
-      "rationale": "Plan approved (Gate 1), phase-02 in-progress at 3/7 checkboxes; budget $4.20 of $30",
+      "rationale": "Plan agreed, phase-02 in-progress at 3/7 checkboxes; budget $4.20 of $30",
       "source": ["tasks/plans/260610-x/phase-02-*.md", ".meowkit/state/budget-state.json"]
     }
   ],

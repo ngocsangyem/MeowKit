@@ -30,8 +30,8 @@ Modes (all user-explicit — chom does NOT auto-derive adaptation depth):
 
 Speed flags (default OFF):
 
-- `--lean`: skip Phase 1 researcher-agent background gathering. HARD GATE still enforced.
-- `--auto`: auto-approve non-HARD-GATE steps. HARD GATE still requires human approval.
+- `--lean`: skip Phase 1 researcher-agent background gathering. The Phase 4 decision still goes to the user.
+- `--auto`: run the mechanical steps without asking. The Phase 4 decision still goes to the user.
 
 **Migration (v1 → v2):** `--analyze` (v1 default) now aliases the no-flag default and emits a deprecation notice. Removed in v1.2.
 
@@ -65,10 +65,10 @@ Clean up cloned repos after analysis.
 ## Workflow
 
 ```
-[1. Recon] → [2. Map] → [3. Analyze] → [4. Challenge] ══ HARD GATE ══ [5. Decision] → [6. Handoff]
+[1. Recon] → [2. Map] → [3. Analyze] → [4. Challenge] ══ USER DECIDES ══ [5. Decision] → [6. Handoff]
 ```
 
-Hard gate: Phase 4 must complete and get human approval before Phase 5. HARD GATE is non-bypassable — no flag (including `--lean` or `--auto`) skips human approval here.
+Phase 4 must complete and the user must answer it before Phase 5. Whether to replicate someone else's design is a business decision, so no flag — `--lean` or `--auto` included — answers it for them.
 
 ### 1. Recon
 
@@ -78,7 +78,7 @@ For web URLs: fetch content, capture structure and behavior.
 
 `--lean` effect depends on input type:
 - **freeform text input:** skip the `researcher` agent background gathering; proceed to Phase 2 with only the user's description + `docs/project-context.md`
-- **git URL / local path:** no-op (scout is the primary recon tool and is not skipped; HARD GATE compensates for reduced context)
+- **git URL / local path:** no-op (scout is the primary recon tool and is not skipped; the Phase 4 decision compensates for reduced context)
 - **web URL:** no-op (fetch is primary)
 - **image/screenshot:** no-op (multimodal is primary)
 
@@ -149,9 +149,9 @@ Same as Replication Spec but replace sections 2+5 with Head-to-Head table + Take
 
 This skill emits handoff text. It does NOT invoke any other skill mid-flow — including `the plan-creator skill`, `the brainstorming skill`, `the cook skill`, `the sequential-thinking skill`.
 
-This is chom's design choice, not a a platform rule. Skills *can* reference other skills and the model may invoke them; chom opts out because mid-flow invocations of other orchestration skills (`plan-creator`, `brainstorming`, `cook`) would break phase ownership — each of those skills has its own multi-phase workflow that would interleave with chom's HARD GATE discipline. chom's job ends at Phase 6 Handoff; the user invokes the next skill.
+This is chom's design choice, not a a platform rule. Skills *can* reference other skills and the model may invoke them; chom opts out because mid-flow invocations of other orchestration skills (`plan-creator`, `brainstorming`, `cook`) would break phase ownership — each of those skills has its own multi-phase workflow that would interleave with chom's phase discipline. chom's job ends at Phase 6 Handoff; the user invokes the next skill.
 
-HARD GATE (Phase 4 human approval) is non-bypassable. No flag, including `--lean` or `--auto`, skips this step.
+The Phase 4 decision belongs to the user. No flag, including `--lean` or `--auto`, answers it for them.
 
 ## Error Recovery
 
@@ -168,7 +168,7 @@ HARD GATE (Phase 4 human approval) is non-bypassable. No flag, including `--lean
 - **chom never declares adaptation depth.** Pick `--copy`/`--improve`/`--port` explicitly if you want the analysis biased toward that intent. No-flag runs emit a Replication Spec without mode declaration.
 - **API-surface queries use `the pack skill --compress`**, not chom. If the question is "what's the public API of library X" rather than "should we replicate it," pack's Tree-sitter signature extraction is the right tool. chom is for replication decisions, not API exploration.
 - **3+ layers trigger sequential-thinking handoff**, not auto-invocation. Trace the flow via `the sequential-thinking skill`, then return to chom.
-- **HARD GATE applies in all modes**, including `--lean` and `--auto`. Phase 4 human approval is never skipped.
+- **The Phase 4 decision applies in all modes**, including `--lean` and `--auto`. It is the user's call, never the run's.
 - **No local context = generic advice**: always read `docs/project-context.md` first. Without it, recommendations won't fit your stack.
 - **"Obvious" copies hide complexity**: auth flows, data models, API contracts — the challenge phase is NEVER skipped.
 - **chom never chains into other skills mid-flow**: handoff text only. USER invokes plan-creator / cook / sequential-thinking. See Boundary Rules for rationale.

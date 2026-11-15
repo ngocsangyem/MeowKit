@@ -71,7 +71,7 @@ For 95% of autobuild runs, sub-task are correct. Teams are appropriate when: (a)
 | Iteration loops historically averaging 4+ rounds | **Teams** (latency is the bottleneck) |
 | Debugging a failing harness | **sub-task** (audit trail required) |
 | User explicitly requests `--teams` | **Teams** (user owns the trade-off) |
-| Production ship pipeline | **sub-task** (Gate 2 needs reproducibility) |
+| Production ship pipeline | **sub-task** (the review needs a reproducible audit trail) |
 | Research / experiments | **Teams** (iteration speed matters more than reproducibility) |
 
 ## Configuration
@@ -115,7 +115,7 @@ Both can READ the contract at `tasks/contracts/*.md`. Neither can WRITE to it wi
 
 ## Risk Notes
 
-- Teams mode **does not bypass** any gate. Gate 1, Gate 2, and the contract gate all still apply.
-- Teams mode **does not reduce** the active-verification HARD GATE. The evaluator still runs `validate-verdict.sh` on every verdict.
+- Teams mode **changes nothing about the practices**: the plan is still agreed with the user, the sprint contract is still negotiated, and the diff is still reviewed before shipping.
+- Teams mode **does not reduce** the evaluator's active-verification requirement. The evaluator still runs `validate-verdict.sh` on every verdict.
 - Teams mode **increases** the cost of context window per agent (long-lived = continuous consumption).
 - If a team session crashes mid-iteration, the recovery path is to fall back to sub-task and resume from the last committed step.

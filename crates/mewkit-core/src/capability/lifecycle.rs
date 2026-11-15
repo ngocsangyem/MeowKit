@@ -78,7 +78,7 @@ fn claude_code() -> LifecycleMap {
             "pre_tool",
             gated(
                 "PreToolUse hook denies a tool call via exit 2 / permissionDecision:deny",
-                "src/__tests__/hooks/gate-enforcement.integration.test.ts",
+                "tests/hooks/golden/privacy-read-dotenv.json",
             ),
         ),
         (

@@ -8,7 +8,6 @@ use std::path::Path;
 use super::agent_conformance::check_agent_conformance;
 use super::capability_rows::{check_capabilities_section, check_capability_view_drift};
 use super::docs_refs_rows::check_docs_refs_contract;
-use super::gate_authority_rows::check_gate_authority;
 use super::hooks::check_hooks_executable;
 use super::namespace::check_plugin_namespace;
 use super::operation_rows::{check_generic_core_tokens, check_operation_conformance};
@@ -113,13 +112,6 @@ pub fn build_default_checks(
         // (prompting an upgrade) rather than failing an un-synced install. The
         // scoped flags stay strict, which is what the CI steps use.
         results.extend(check_workflow_drift(project_root, Status::Warn));
-        // Gate-authority stays STRICT even here: an un-synced install cannot
-        // explain a file that grants automated gate approval.
-        results.extend(check_gate_authority(
-            project_root,
-            &[".claude"],
-            Status::Fail,
-        ));
         results.extend(check_operation_conformance(meowkit_dir));
         results.push(check_generic_core_tokens(meowkit_dir));
         // Declared doc counts against the real inventory: surfacing it here

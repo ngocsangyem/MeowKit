@@ -8,7 +8,7 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 - NEVER load multiple step files simultaneously
 - ALWAYS read entire step file before execution
 - NEVER skip steps or optimize the sequence
-- ALWAYS halt at Gate 1 and wait for human approval
+- ALWAYS present the plan and wait for the user's answer before any code
 
 ## Steps
 
@@ -21,7 +21,7 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 5. `step-04-semantic-checks.md` — Semantic checks + structural validation (`mewkit plan check --structural`). Fast mode: skip validation, go to step-07.
 6. `step-05-red-team.md` — Plan red team (hard/deep/parallel/two only): 4-persona scaling, red-team-findings.md, sub-task dispatch, adjudication
 7. `step-06-validation-interview.md` — Validation interview (hard/deep/parallel/two only): 3-5 critical questions with detection keywords, section-mapped answer propagation
-8. `step-07-gate.md` — Self-check + Gate 1: stop and ask the user in chat (Approve | Modify | Reject)
+8. `step-07-gate.md` — Self-check + present the plan: stop and ask the user in chat (Looks right | Modify | Reject)
 9. `step-08-hydrate-tasks.md` — Create session tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
 10. `step-09-post-plan-handoff.md` — Deterministic mode-pruned `stop and ask the user in chat`: Cook | Validate | Red-team | End. Writes `handoff.next` to plan.md frontmatter, prints suggested command, STOPs.
 
@@ -118,7 +118,7 @@ Step 6: Validation Interview (hard/deep/parallel/two only — skipped in fast)
          ├── If unresolved > 0 → stop and ask the user in chat (resolve/accept-risk/cancel)
          └── Pass 2 applies edits + writes Validation Log + frontmatter
          ↓
-Step 7: Gate 1
+Step 7: Present the plan
     ├── Self-check: Completed / Skipped / Uncertain
     └── stop and ask the user in chat (Approve | Modify | Reject)
          ↓
@@ -144,7 +144,7 @@ Step 9: Post-Plan Handoff
 - `--parallel`: step-03 adds ownership matrix; step-08 uses parallel group hydration.
 - `--two`: step-03 produces 2 approach files (no plan.md yet); step-04 asks user to select before step-05.
 - `selected_approach` is only set in `two` mode; all other modes leave it unset.
-- `--product-level`: step-03 → step-03a (spec only, no phase files). step-03a runs a LIGHT codebase scout on non-empty repos via an ALLOWLIST of `README*`/`docs/`/`brand/`/`tasks/plans/` (BLOCKLIST: `src/`, source files, schemas) — output is injected as agent working memory only, never written to `plan.md`. Hands off to `mk:autobuild` after Gate 1, NOT directly to developer. Auto-detected by step-00 on green-field "build a X app" prompts; explicit flag bypasses detection. Optional: `--no-design` skips design sub-task, `--no-scout` skips codebase scout.
+- `--product-level`: step-03 → step-03a (spec only, no phase files). step-03a runs a LIGHT codebase scout on non-empty repos via an ALLOWLIST of `README*`/`docs/`/`brand/`/`tasks/plans/` (BLOCKLIST: `src/`, source files, schemas) — output is injected as agent working memory only, never written to `plan.md`. Hands off to `mk:autobuild` once the spec is agreed, NOT directly to developer. Auto-detected by step-00 on green-field "build a X app" prompts; explicit flag bypasses detection. Optional: `--no-design` skips design sub-task, `--no-scout` skips codebase scout.
 - `--spike`: time-boxed investigation. Skips step-01 (research), step-02 (codebase analysis), step-05 (red team), step-06 (validation interview). step-03 uses `assets/spike-plan-template.md` with two phases (investigate + findings — NO test/ship). Requires `--timebox <duration>`. Incompatible with `--product-level` and `mk:autobuild` FULL. Run via `mk:cook` or `mk:plan-creator --fast`.
 
 ## Next

@@ -42,7 +42,7 @@ Create or update it with:
 ```mermaid
 flowchart TD
     T["Task received"]
-    P0["<b>Phase 0: Orient</b><br/>agent-detector scores all agents<br/>lazy-agent-loader loads winner"]
+    P0["<b>Phase 0: Orient</b><br/>agent-detector scores all agents"]
     P1["<b>Phase 1: Plan</b><br/>planner loads: plan-creator, office-hours"]
     P2["<b>Phase 2: Test</b><br/>tester loads: testing, lint-and-validate<br/>(RED if --tdd, optional otherwise)"]
     P3["<b>Phase 3: Build</b><br/>developer loads: development, typescript/vue, clean-code"]
@@ -57,7 +57,7 @@ flowchart TD
 
 | Agent          | Phase  | Skills Loaded                                                          |
 | -------------- | ------ | ---------------------------------------------------------------------- |
-| orchestrator   | 0      | agent-detector, lazy-agent-loader, scout                               |
+| orchestrator   | 0      | agent-detector, scout                               |
 | planner        | 1      | plan-creator, plan-ceo-review, validate-plan, office-hours             |
 | architect      | 1      | plan-creator (ADR references)                                          |
 | tester         | 2      | testing, lint-and-validate, qa, qa-manual, nyquist                     |
@@ -90,7 +90,7 @@ Below the agent/skill layer, MeowKit runs a **Node.js hook dispatch system** (`d
 ```mermaid
 flowchart TD
     T[Task] --> P0[Phase 0: Orient]
-    P0 --> S0[agent-detector\nlazy-agent-loader\nscout]
+    P0 --> S0[agent-detector\nscout]
 
     P0 --> P1[Phase 1: Plan ✋ Gate 1]
     P1 --> S1[plan-creator\noffice-hours\nplan-ceo-review\n\nvalidate-plan]

@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-agile. Epics, sprints, backlog, point
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default
-memory: project
 color: pink
 owner: jira
 criticality: medium

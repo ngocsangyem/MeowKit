@@ -102,9 +102,8 @@ Profile safety behavior by observed control, not product reputation.
 An auto-approved or all-or-nothing write path is constrained for any shared
 tree. It may handle read/report work; writing requires isolated R2 treatment
 under [model-routing.md](model-routing.md). Destructive or external work still
-requires explicit approval and the R3 gate (`gate-rules.md`), and a blocked
-write pattern from `security-rules.md` is never satisfied by switching
-harnesses.
+requires explicit approval and R3 treatment, and a blocked write pattern from
+`security-rules.md` is never satisfied by switching harnesses.
 
 ## Capture Quality
 

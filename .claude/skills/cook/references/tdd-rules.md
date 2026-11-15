@@ -61,10 +61,9 @@ GUARD: Production-facing code ALWAYS requires TDD regardless of size. When in do
 ## When TDD is disabled (default)
 
 - Tests are good practice; the tester agent writes them when invoked but does NOT block the developer
-- No RED-phase gate; the developer may implement directly per the approved plan
-- The `pre-implement.cjs` hook is a no-op (exits 0 silently)
-- All other quality rules STILL APPLY: `security-rules.md`, `injection-rules.md`, Gate 1, Gate 2, naming, code quality, review verdict
+- No RED phase; the developer may implement directly per the agreed plan
+- All other quality rules STILL APPLY: `security-rules.md`, `injection-rules.md`, the plan, the review verdict, naming, code quality
 - "Tests must pass before commit" from `development-rules.md` STILL APPLIES **IF tests exist** — you just don't have to write them first
-- Reviewer may flag missing tests as a WARN at Gate 2; user decides whether to address before ship
+- Reviewer may flag missing tests as a WARN in the verdict; user decides whether to address before ship
 
 **To opt back in:** add `export MEOWKIT_TDD=1` to your shell rc, OR pass `--tdd` per command, OR write `on` to `.meowkit/state/tdd-mode` (the slash command does this when `--tdd` is detected).

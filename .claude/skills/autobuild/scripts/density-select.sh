@@ -62,7 +62,25 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# 3. Tier auto-detection (if not provided via flag)
+# 3. The shared model table, when this script runs from a Claude Code install: one source
+#    for this script and the session-start model detector. The rules below are the same
+#    table for installs without .claude/hooks.
+lookup="$(cd "$(dirname "$0")" && pwd)/../../../hooks/lib/density-lookup.cjs"
+if [ -f "$lookup" ] && command -v node >/dev/null 2>&1 && [ -n "$model" ]; then
+  if found="$(node "$lookup" "$model")"; then
+    looked_tier="${found% *}"
+    looked_density="${found#* }"
+    if [ -z "$tier" ] || [ "$tier" = "auto" ]; then
+      echo "$looked_density"
+      exit 0
+    fi
+    case "$tier" in
+      complex|COMPLEX) [ "$looked_tier" = "COMPLEX" ] && { echo "$looked_density"; exit 0; } ;;
+    esac
+  fi
+fi
+
+# 4. Tier auto-detection (if not provided via flag)
 if [ -z "$tier" ] || [ "$tier" = "auto" ]; then
   case "$model" in
     *haiku*)
@@ -95,7 +113,7 @@ case "$tier" in
     ;;
 esac
 
-# 4. Apply decision rules
+# 5. Apply decision rules
 case "$tier" in
   TRIVIAL)
     echo "MINIMAL"

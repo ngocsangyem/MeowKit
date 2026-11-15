@@ -31,10 +31,3 @@ mewkit review cleanup --session <id> [--json]
 Every subcommand after `prepare` takes the `--session` id that `prepare` returned. That id is
 the whole point: reviewing a large PR across several sittings does not restart from nothing.
 
-## verdict-gate
-
-Gate 2 proof-bundle check. Reads a machine-readable review verdict and exits `0` (PASS / PASS_WITH_RISK or a tolerated legacy markdown-only verdict), `1` (BLOCKED / invalid / missing), or `2` (usage error).
-
-```bash
-mewkit verdict-gate <slug | path-to-verdict.json>
-```

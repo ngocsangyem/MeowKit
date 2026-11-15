@@ -46,9 +46,10 @@ pub fn ok(condition: bool) -> Status {
 ///
 /// The order of these variants IS the output order (see
 /// [`Section::ORDER`]). `Inventory` is produced by `inventory --check` rather
-/// than by any check here; it stays in the list because the npm CLI's
-/// exhaustiveness map lists it, and a row that cannot be printed is worse than
-/// an unused heading.
+/// than by any check here, and `Gates` now has no check at all; both stay in
+/// the list because the npm CLI's exhaustiveness map lists them, and a row that
+/// cannot be printed is worse than an unused heading. The renderer skips a
+/// section with no rows, so neither reaches the report.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Section {
     Structure,

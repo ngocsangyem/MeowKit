@@ -140,7 +140,7 @@ Route on the disposition:
 - `READY_FOR_EXISTING_GATE` — run the normal Step 5 review. The gate is NOT cleared.
 - `RETURN_TO_EXECUTOR` — apply the corrections, then supersede the stale evidence:
   `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence <workflow-evidence.json> --correction-kind source|scope`.
-  Re-run Step 4 before the review. `scope` also returns Gate 1 to `required`.
+  Re-run Step 4 before the review. `scope` also sends the plan back to the user.
 - `ESCALATE_TO_HUMAN` — stop at the existing human touchpoint.
 - `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
 

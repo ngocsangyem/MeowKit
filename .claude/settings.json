@@ -33,19 +33,11 @@
             "type": "command",
             "command": "node",
             "args": [
-              "${CLAUDE_PROJECT_DIR}/.claude/hooks/gate-enforcement.cjs"
-            ],
-            "timeout": 10,
-            "statusMessage": "Checking Gate 1 approval..."
-          },
-          {
-            "type": "command",
-            "command": "node",
-            "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/privacy-block.cjs"
             ],
             "timeout": 5,
-            "statusMessage": "Checking file access permissions..."
+            "statusMessage": "Checking file access permissions...",
+            "onFailure": "block"
           }
         ]
       },
@@ -59,7 +51,8 @@
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/privacy-block.cjs"
             ],
             "timeout": 5,
-            "statusMessage": "Checking file access permissions..."
+            "statusMessage": "Checking file access permissions...",
+            "onFailure": "block"
           }
         ]
       },
@@ -72,8 +65,8 @@
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-ship.cjs"
             ],
-            "timeout": 30,
-            "statusMessage": "Running pre-ship validation..."
+            "timeout": 300,
+            "statusMessage": "Running ship check (lint, related tests, type-check)..."
           },
           {
             "type": "command",
@@ -82,7 +75,8 @@
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/privacy-block.cjs"
             ],
             "timeout": 5,
-            "statusMessage": "Checking web fetch targets..."
+            "statusMessage": "Checking web fetch targets...",
+            "onFailure": "block"
           },
           {
             "type": "command",

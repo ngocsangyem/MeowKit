@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-dev. Branch names, PR bodies, commit 
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default
-memory: project
 color: blue
 owner: jira
 criticality: medium

@@ -140,6 +140,9 @@
 				},
 				"tdd-flag-detector": {
 					"type": "boolean"
+				},
+				"verification-evidence": {
+					"type": "boolean"
 				}
 			},
 			"additionalProperties": false

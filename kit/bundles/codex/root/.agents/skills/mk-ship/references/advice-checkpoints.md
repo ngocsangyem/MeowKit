@@ -58,7 +58,7 @@ it through, or shorten the wait.
   version, publish, or deploy. That comes only from an explicit `release` or `publish`
   scope plus the existing explicit confirmations, both unchanged by this flag.
 - **Red or pending CI.** It keeps its existing repair-or-stop route.
-- **Gate 2.** It stays with the review skill and the human.
+- **The review verdict.** It stays with the review skill, and the decision with the user.
 - **External effects.** Posting an assessment to a PR or issue is an external effect
   needing the same explicit authority as any other. The default is a local receipt only.
 

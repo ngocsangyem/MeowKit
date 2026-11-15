@@ -87,8 +87,8 @@ Rules that keep the cadence bounded:
 
 **Rescue complements human stops; it never delays them.** The `mk-fix` rule — 3+ failed
 attempts means stop and question the architecture with the user — fires on its own
-schedule whether or not counsel was taken at two failures. The same holds for the Gate 1
-question, the Gate 2 question, and any explicit business decision.
+schedule whether or not counsel was taken at two failures. The same holds for the plan
+question, the ship question, and any explicit business decision.
 
 ## 3 — Input packet (the parent supplies)
 
@@ -177,11 +177,12 @@ tester, whoever owns it — never to Athena.
 1. The executor addresses each correction or records why it is rejected.
 2. Source changes advance `evidenceRevision` and mark stale verification and review
    evidence **superseded**; normal checks re-run.
-3. Plan or scope changes additionally invalidate Gate 1 and require a new human approval.
-   In-scope source corrections keep Gate 1 but invalidate downstream evidence.
+3. Plan or scope changes additionally invalidate the agreed plan: take the revised plan
+   back to the user before building on it. In-scope source corrections leave the plan
+   standing but invalidate downstream evidence.
 4. Athena rechecks once by default. A second unresolved return escalates.
 
-Superseded evidence must never read as current at a later gate or ship preflight.
+Superseded evidence must never read as current at a later review or ship preflight.
 
 **A correction's only write target is an existing `workflow-evidence.json` inside the
 project.** The index lives under several roots but always under that name, so the name is
@@ -201,11 +202,11 @@ same owner as `--html` alone would for the same final Markdown.
 
 They meet only in the correction loop, because a supervised correction edits Markdown and
 the visual artifact pins hashes of it. The Markdown plan stays the source of truth; REVIEW
-fires before the gate step where the visual preconditions are checked; and a returned
+fires before the step where the visual preconditions are checked; and a returned
 correction invalidates the artifact's pinned hashes exactly like any other Markdown edit —
 rehash (which clears the prior visual approval), re-validate, re-review, re-approve, then
-present the ordinary Gate 1. A stale artifact never reaches the gate beside a corrected
-plan.
+take the plan to the user as usual. A stale artifact never reaches the user beside a
+corrected plan.
 
 Athena approves no visual, edits no HTML, changes no filename or path, opens no browser,
 and turns no dossier or receipt into a rendered artifact.
@@ -228,7 +229,7 @@ Athena MUST NOT:
   rule.
 - Emit a verdict, score, grade, or security clearance. The `reviewer`, `evaluator` and
   `security` agents own those.
-- Approve, clear, unblock, or advance Gate 1, Gate 2, a security review, CI, a merge, a
+- Approve, clear, unblock, or advance a plan, a review, a security review, CI, a merge, a
   deploy, or any user business decision.
 - Change the executor's model, profile, or effort. `--advice` supervises the workflow, not
   the model running it.
@@ -394,8 +395,8 @@ outcome.
 - `READY_FOR_EXISTING_GATE` — run the skill's normal next gate or review. It is NOT cleared.
 - `RETURN_TO_EXECUTOR` — apply the corrections, then supersede the stale evidence:
   `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence <workflow-evidence.json> --correction-kind source|scope`.
-  Re-run the skill's verification before its review. `scope` also returns Gate 1 to
-  `required`.
+  Re-run the skill's verification before its review. `scope` also returns the plan to the
+  user for agreement.
 - `ESCALATE_TO_HUMAN` — stop at the existing human touchpoint.
 - `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
 

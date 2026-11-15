@@ -42,12 +42,14 @@ Cleanup: `git worktree remove .worktrees/{agent-name}`
 
 WHY: Worktrees provide filesystem-level isolation.
 
-## Rule 4: Gates Are Never Parallel
+## Rule 4: Planning and Review Are Never Parallel
 
-Gate 1 (plan approval) and Gate 2 (review approval) are ALWAYS sequential.
-They ALWAYS require human approval. They NEVER run in parallel with other work.
+Agreeing the plan and reviewing the diff are always sequential: one plan for the whole
+decomposition, one review of the merged result. Never run either alongside the work it
+is about.
 
-WHY: Parallel gates defeat the approval discipline.
+WHY: A plan discussed while the code is already being written, or a review of one branch
+while two others keep moving, describes a state that no longer exists.
 
 ## Rule 5: Integration Test After Merge
 

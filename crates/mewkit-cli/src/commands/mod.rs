@@ -21,7 +21,6 @@ pub mod uninstall;
 pub mod upgrade;
 mod upgrade_query;
 pub mod validate;
-pub mod verdict_gate;
 pub mod versions;
 
 use std::collections::BTreeMap;

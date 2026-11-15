@@ -20,9 +20,9 @@ requires_tdd_mode: true
 
 Build a `slugify(title: string): string` function using strict TDD (Phase 2 RED → Phase 3 GREEN). Tests must be written FIRST and FAIL before any implementation exists.
 
-This canary tests that the harness still enforces RED-phase discipline when TDD mode is explicitly enabled. Verifies that:
+This canary tests that the harness still keeps RED-phase discipline when TDD mode is explicitly enabled. Verifies that:
 1. Sentinel file or env var triggers TDD mode
-2. `pre-implement.cjs` blocks if no failing test exists for the feature
+2. No implementation lands before a failing test exists for the feature
 3. Developer agent waits on tester before starting Phase 3
 4. Anti-rationalization rules (no test minimization, no mock substitution) hold
 

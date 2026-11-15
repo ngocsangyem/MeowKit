@@ -26,7 +26,7 @@ Single shallow checklist pass over a PR → Summary / Risk / Findings / Verdict.
 Default prints to chat. `--reply` posts the verdict via `gh pr review`. Read-only on code.
 
 This is the SHALLOW lane. For a deep multi-pass adversarial audit of your own diff,
-use `mk:review` (Phase 4 Gate-2 review). This skill does NOT re-run that engine — it
+use `mk:review` (the Phase 4 review). This skill does NOT re-run that engine — it
 is one comment-sized pass for a teammate's or external PR.
 
 ## Process Flow
@@ -42,7 +42,7 @@ PR ref → gh pr view / gh pr diff / gh pr checks → read changed files for con
 - `<#PR | URL>` — PR number (`123`) or full GitHub PR URL. Required.
 - `--reply` — opt-in. Post the verdict to GitHub via `gh pr review`. **Default writes nothing.**
 - `--assured` — opt-in. Run the full high-assurance ReviewSession pipeline instead of the
-  shallow lane (see below). Does NOT create a Gate 2 approval by itself.
+  shallow lane (see below). It still does not decide whether the PR lands.
 
 ## Lanes
 
@@ -145,7 +145,7 @@ retry with `--comment` and warn the user that self-approval is not permitted.
 
 ## Defers to
 
-- `mk:review` — deep multi-pass adversarial Gate-2 audit of your own diff.
+- `mk:review` — deep multi-pass adversarial audit of your own diff.
 - `mk:respond-pr` — triaging reviewer comments you received.
 - `mk:fix` / `mk:cook` — implementing any accepted change. This skill never edits code.
 

@@ -1,3 +1,0 @@
-# Hooks
-
-Two of them.

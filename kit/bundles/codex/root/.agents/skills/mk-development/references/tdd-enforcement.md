@@ -1,6 +1,6 @@
 # Skill: TDD Enforcement (only when `--tdd` / `MEOWKIT_TDD=1`)
 
-**This reference applies ONLY when TDD mode is enabled.** Default mode (TDD off) skips RED-phase enforcement entirely — the developer implements directly per the approved plan and the `pre-implement.cjs` hook is a no-op.
+**This reference applies ONLY when TDD mode is enabled.** Default mode (TDD off) skips the RED phase entirely — the developer implements directly per the agreed plan. No hook enforces test-first in either mode.
 
 **Purpose (in TDD mode):** Enforce test-first development. No implementation code is written until failing tests exist and are verified.
 
@@ -8,7 +8,7 @@
 
 In TDD mode, invoke this skill for ALL feature development and bug fixes. The only exceptions are: documentation-only changes, config-only changes, and pure refactors with existing test coverage.
 
-In default mode (TDD off), this skill is irrelevant — no RED gate exists. Tests are still recommended for production-quality work; opt into strict mode via `--tdd` or `export MEOWKIT_TDD=1`.
+In default mode (TDD off), this skill is irrelevant — there is no RED phase. Tests are still recommended for production-quality work; opt into strict mode via `--tdd` or `export MEOWKIT_TDD=1`.
 
 ## Rules
 

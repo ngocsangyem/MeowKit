@@ -1,11 +1,11 @@
 ---
 name: "mk-plan-creator"
-description: "Structured multi-file implementation plans before build; scope-aware, enforces Gate 1. NOT for ticket sizing (mk:planning-engine) or plan CEO-review (mk:plan-ceo-review)."
+description: "Structured multi-file implementation plans before build; scope-aware, agreed with the user. NOT for ticket sizing (mk:planning-engine) or plan CEO-review (mk:plan-ceo-review)."
 ---
 
 # Plan Creator
 
-Public surface: classify → inspect → capture missing decisions → draft → validate → Gate 1. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, visual rendering, archive, and durable-memory writes stay with their existing owners.
+Public surface: classify → inspect → capture missing decisions → draft → validate → present to the user. Produces plan.md overview + phase-XX detail files; execution, existing-plan audits, visual rendering, archive, and durable-memory writes stay with their existing owners.
 
 ## When to Use
 
@@ -15,17 +15,17 @@ Activate when:
 - Non-trivial task (> 2 files OR > 1h OR architectural decisions)
 - User supplies ≥2 upstream reports/specs (office-hours, brainstorming, planning-engine, confluence-spec, intake output…) → step-00.5 consolidates them into a Plan Intake Packet before planning (see `references/plan-intake-packet.md`)
 - User supplies a design evidence packet (e.g. from `mk:figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
-- Gate 1 requires a plan before Phase 3
+- Phase 3 needs a plan to build from
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
 - Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI.
-- Hard/deep plan creation still runs its built-in red-team and validation interview before Gate 1. These are design-quality gates, not standalone subcommands, and must never be routed away.
+- Hard/deep plan creation still runs its built-in red-team and validation interview before presenting the plan. These are design-quality steps, not standalone subcommands, and must never be routed away.
 - Compatibility aliases: `the plan skill archive` → [archive workflow](references/archive-workflow.md); `the plan skill red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `the plan skill validate {path}` → [standalone validation workflow](references/validate-standalone.md).
 
 Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation.
 
 Skip when:
 
-- `the fix skill` with complexity=simple (Gate 1 exception)
+- `the fix skill` with complexity=simple (the fix is the plan)
 - `mk:scale-routing` returns workflow=one-shot + zero blast radius
 
 ## Arguments
@@ -84,7 +84,7 @@ Step 3: Draft Plan → plan.md (≤80 lines) + phase-XX files (12-section templa
 Step 4: Semantic Checks → goal/ACs/constraints + structural validation
 Step 5: Red Team (hard/deep/parallel/two only) → 4-persona scaling, red-team-findings.md, adjudication
 Step 6: Validation Interview (hard/deep/parallel/two only) → 3-5 critical questions with detection keywords, propagate answers
-Step 7: Gate 1 → self-check + stop and ask the user in chat (Approve | Modify | Reject)
+Step 7: Present plan → self-check + stop and ask the user in chat (Looks right | Modify | Reject)
 Step 8: Hydrate Tasks → phase checkboxes → session tasks
 Step 9: Post-Plan Handoff → mode-pruned stop and ask the user in chat (cook|validate|red-team|end) → write `handoff.next` to plan.md → STOP
 ```
@@ -107,7 +107,7 @@ tasks/plans/YYMMDD-name/
 
 - **Wrong workflow model**: feature-model on a bug fix skips investigation → confirm type at Step 0
 - **Goal describes activity**: "Implement OAuth" vs "Users can log in with OAuth" → rewrite as outcome
-- **ACs can't be verified**: "code is clean" blocks Gate 2 → every AC must reference a command/file check
+- **ACs can't be verified**: "code is clean" gives the reviewer nothing to check → every AC must reference a command/file check
 - **Monolithic plan**: plan.md over 80 lines → move detail to phase files or research reports
 - **Research disconnected**: findings archived but not cited in plan → Step 3 MUST integrate research into Key Insights
 - **Over-planning trivial tasks**: 2-file config change gets full research → Step 0 scope gate exits early
@@ -130,7 +130,7 @@ scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before t
 step, RECHECK after a correction.
 
 Athena reads the plan and can return it to the planner. It never writes the plan and never
-approves Gate 1.
+settles it with the user.
 
 Without the flag there are zero calls and no state is written.
 
@@ -152,9 +152,9 @@ flag is present).
 | `references/design-evidence-consumption.md`        | Consuming a design evidence packet (e.g. Figma): do/don't, adjudication precedence, decision-ledger, flow→validation-matrix, `blocked_on:` phase blocking. Never re-analyzes the design source.                        |
 | `step-05-red-team.md`                              | Red team review: persona scaling, sub-task dispatch, adjudication                                                                                                                                                    |
 | `step-06-validation-interview.md`                  | Critical question generation and answer propagation                                                                                                                                                                  |
-| `step-07-gate.md`                                  | Self-check and Gate 1 stop and ask the user in chat presentation                                                                                                                                                                   |
-| `step-09-post-plan-handoff.md`                     | Deterministic post-Gate-1 handoff: mode-pruned `stop and ask the user in chat` (cook \| validate \| red-team \| autobuild \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
-| `references/whole-plan-sweep.md`                   | Whole-Plan Consistency Sweep algorithm (Gates W1 + W2). Stage-then-apply: read-only Pass 1 stages Pending Sweep Edits; decision check blocks on unresolved contradictions; write Pass 2 applies edits and logs.   |
+| `step-07-gate.md`                                  | Self-check and the question that presents the plan to the user                                                                                                                                                                     |
+| `step-09-post-plan-handoff.md`                     | Deterministic post-plan handoff: mode-pruned `stop and ask the user in chat` (cook \| validate \| red-team \| autobuild \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
+| `references/whole-plan-sweep.md`                   | Whole-Plan Consistency Sweep algorithm (checks W1 + W2). Stage-then-apply: read-only Pass 1 stages Pending Sweep Edits; decision check blocks on unresolved contradictions; write Pass 2 applies edits and logs.   |
 | `references/deep-mode.md`                          | Deep mode contract: when to use/avoid, scout budgets, phase-map appendix, context rules.                                                                                                                             |
 | `references/tdd-mode.md`                           | TDD flag contract: phase sections, optional frontmatter, cook handoff propagation, RED-task hydration.                                                                                                                |
 | `references/verification-roles.md`                 | Verification Roles for step-04 sub-step 4d (Fact Checker / Flow Tracer / Scope Auditor / Contract Verifier) with tier selection by phase count. sub-task are READ-ONLY; orchestrator writes the `## Verification Log`. |
@@ -172,7 +172,7 @@ flag is present).
 | `references/plan-organization.md`                  | Directory structure, naming, size rules                                                                                                                                                                              |
 | `references/output-standards.md`                   | YAML frontmatter, required sections                                                                                                                                                                                  |
 | `references/validation-questions.md`               | Critical question categories for interview                                                                                                                                                                           |
-| `references/gate-1-approval.md`                    | stop and ask the user in chat gate + Context Reminder                                                                                                                                                                              |
+| `references/plan-presentation.md`                  | the question that presents the plan + Context Reminder                                                                                                                                                                             |
 | `references/task-management.md`                    | Hydration, cross-session resume, sync-back                                                                                                                                                                           |
 | `references/solution-evaluation.md`                | Trade-off scoring criteria                                                                                                                                                                                           |
 | `references/gotchas.md`                            | Full gotchas list                                                                                                                                                                                                    |
@@ -193,7 +193,7 @@ flag is present).
 
 ## Related Rules
 
-- AGENTS.md (Gates) — Gate 1 hard-stop conditions this skill enforces (plan approval before Phase 3)
+- AGENTS.md (Planning, review and the ship check) — planning as a practice: write the plan and agree it with the user before Phase 3
 - AGENTS.md (Delegation & subagents) — boundary contract; verification sub-task stay READ-ONLY; sweep stays in planner context (never delegated)
 
 ## Start

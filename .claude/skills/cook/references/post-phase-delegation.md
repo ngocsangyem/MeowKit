@@ -14,7 +14,7 @@ hooks cannot invoke the Agent tool (verified).
 
 | Skill                          | Fire point                                                 | Mode        |
 | ------------------------------ | ---------------------------------------------------------- | ----------- |
-| `mk:cook`                    | After Gate 2 verdict PASS, before Phase 5 ship             | background  |
+| `mk:cook`                    | After a review verdict of PASS, before Phase 5 ship        | background  |
 | `mk:autobuild`                 | Step 5 pre-escalation (before AskUserQuestion on iter cap) | **foreground** |
 | `mk:autobuild`                 | Step 6 final run report                                    | background  |
 | `mk:workflow-orchestrator`   | After each phase transition (post-SubagentStop)            | background  |
@@ -49,7 +49,7 @@ WHY: Prompt text is the dispatch signal; one pattern prevents drift.
 
 PM is NOT invoked when ANY of the following is true:
 
-- `mk:fix` with `complexity=simple` (Gate 1 bypass path — no plan to track)
+- `mk:fix` with `complexity=simple` (the fix is the plan — no plan file to track)
 - `mk:autobuild` with `MEOWKIT_AUTOBUILD_MODE=MINIMAL` (dead-weight thesis)
 - Environment variable `MEOWKIT_PM_AUTO=off` (user opt-out; `/mk:status` still works)
 - No active plan at `tasks/plans/` (nothing to track)

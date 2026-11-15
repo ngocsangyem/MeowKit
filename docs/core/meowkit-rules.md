@@ -208,16 +208,15 @@ Always: `tasks/reviews/YYMMDD-name-verdict.md`
 MeowKit uses a **7-phase** model. All references must use this sequence:
 
 ```
-Phase 0: Orient → Phase 1: Plan [GATE 1] → Phase 2: Test RED
-→ Phase 3: Build → Phase 4: Review [GATE 2] → Phase 5: Ship → Phase 6: Reflect
+Phase 0: Orient → Phase 1: Plan → Phase 2: Test RED
+→ Phase 3: Build → Phase 4: Review → Phase 5: Ship → Phase 6: Reflect
 ```
 
-Gate 1: after Phase 1 (human approval required)
-Gate 2: after Phase 4 (human approval required, NO EXCEPTIONS)
+Planning and review are practices with no gate: the plan is agreed with the user before Phase 3 and the diff is reviewed before Phase 5, but no hook blocks either step. The ship check is the one enforced ship-time control (`docs/core/enforcement-matrix.md`).
 
 **Rule:** Never use a 5-phase model. If you see one, fix it. The workflow-orchestrator was migrated from 5-phase to 7-phase in the audit.
 
-`mk:cook` reports the completed review after Gate 2, then stops for user direction. It enters Phase 5 only after an explicit ship request, and Phase 6 only after an explicit close/reflect request.
+`mk:cook` reports the completed review, then stops for user direction. It enters Phase 5 only after an explicit ship request, and Phase 6 only after an explicit close/reflect request.
 
 ---
 
@@ -304,7 +303,7 @@ The toolkit has a thin Agile governance layer. Three rules live in `.claude/skil
 
 | Rule | Source | Loaded by | Integration |
 |---|---|---|---|
-| `agile-story-gates.md` | original | `mk:agent-detector` Step 0b (Agile context) | `mk:plan-creator` Phase 1 entry (DoR 1); `mk:ship` Gate 2 PASS (DoD 2); traceability frontmatter 3 |
+| `agile-story-gates.md` | original | `mk:agent-detector` Step 0b (Agile context) | `mk:plan-creator` Phase 1 entry (DoR 1); `mk:ship` review PASS (DoD 2); traceability frontmatter 3 |
 | `agile-sprint-commitment.md` | original | `mk:agent-detector` Step 0b (Agile context) | `mk:sprint-contract sprint-goal` 1; `mk:jira-agile sprint add/remove` 2; `mk:jira-agile sprint close` 3 |
 | `agile-feedback-cycle.md` | original | `mk:agent-detector` Step 0b (Agile context) | `mk:retro` post-narrative step 5 (action-item ceremony 1); `mk:plan-creator --spike` (spike governance 2) |
 

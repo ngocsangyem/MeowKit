@@ -106,7 +106,7 @@ Include a 1-line rationale for each disposition.
 {
   "questions": [{
     "question": "Red Team Review complete.\n\n{N} findings: {accepted} accepted, {rejected} rejected.\n\nBreakdown: {C} Critical, {H} High, {M} Medium\n\nAccepted findings summary:\n{bullet list of accepted findings with severity}\n\nHow do you want to proceed?",
-    "header": "Red Team Review — Gate 1",
+    "header": "Red Team Review",
     "options": [
       { "label": "Apply all accepted findings", "description": "Recommended — apply agent-accepted findings to phase files" },
       { "label": "Review each one individually", "description": "Step through each accepted finding: Apply / Skip / Modify" },

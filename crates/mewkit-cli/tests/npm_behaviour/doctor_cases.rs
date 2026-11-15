@@ -6,8 +6,8 @@
 //! kit projects per runtime, the npm CLI's checks its own toolchain — so the
 //! diagnostic flags (`--state`, `--providers`, `--report`, `--hard-gates`) add
 //! rows to each CLI's OWN report and are checked as such: `--hard-gates`
-//! compares which probes pass or fail on both, the rest assert what the Rust
-//! report carries.
+//! asserts that every guard the kit still ships blocks when it should, the rest
+//! assert what the Rust report carries.
 //!
 //! `--providers` reports adapter enforcement (`providers --lifecycle`'s truth)
 //! where the npm CLI reports per-surface contract diagnostics from its retired
@@ -267,11 +267,14 @@ fn hard_gates_without_a_harness_has_nothing_to_probe() {
     );
 }
 
-/// The npm CLI reported every one of these probes as passing on the shipped
-/// hooks, and the hooks have not changed in a way either CLI should notice, so
-/// each must still pass here.
+/// Every probe `--hard-gates` still runs must pass on the shipped hooks.
+///
+/// The probe set is no longer the npm CLI's: the plan and review-verdict probes
+/// went with the gates they exercised, and the ship check took the commit probe
+/// over. What survives is the live proof that the shipped guards block — the
+/// question `validate` cannot answer.
 #[test]
-fn hard_gates_pass_every_probe_the_npm_cli_passed() {
+fn hard_gates_pass_every_probe_the_kit_still_ships() {
     let scratch = tempfile::tempdir().expect("scratch dir");
     let (home, project) = (scratch.path().join("home"), scratch.path().join("project"));
     for dir in [&home, &project] {
@@ -286,13 +289,11 @@ fn hard_gates_pass_every_probe_the_npm_cli_passed() {
         None,
     );
     let probes = [
-        "Gate 1: blocks source write with no plan",
-        "Gate 1: blocks source write when the plan is not approved",
-        "Gate 1 + contract: allows source write once the plan is approved and the contract is signed",
         "Privacy: blocks .env read",
         "Injection: reports remote-exec Bash",
         "Injection: allows a normal Bash command",
-        "Gate 2: blocks a commit with no verdict",
+        "Ship check: blocks a commit whose checks fail",
+        "Ship check: leaves a command that ships nothing alone",
         "Runtime: every configured hook executes cleanly",
         "Runtime: no leftover shell or interpreter hooks",
     ];

@@ -2,7 +2,7 @@
 // Always-on context budget: what a session loads or lists BEFORE any skill runs must stay small.
 //
 // Two enforced ceilings, answered by one check with one extractor:
-//   (i)  the always-on rules alone        — every `.md` under `<root>/.claude/rules/`   <= 25600 B
+//   (i)  the always-on rules alone        — every `.md` under `<root>/.claude/rules/`   <= 18500 B
 //   (ii) everything always listed         — those rules PLUS shipped skill/agent metadata <= 70000 B
 // Keeping (i) live matters because a combined total alone would let rules grow while metadata
 // paid for it, or let metadata grow while an always-on safety rule was cut.
@@ -22,7 +22,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { excludeMatcher, shipSetExclusions, shipSetFiles } = require("./kit-ship-set.cjs");
 
-const LIMIT_RULES_BYTES = 25600;
+const LIMIT_RULES_BYTES = 18500;
 const LIMIT_ALWAYS_LISTED_BYTES = 70000;
 
 // Reference only, never a gate: the per-item figures the budget was sized from. Printed so a

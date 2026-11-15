@@ -11,8 +11,6 @@
 //! writes: `validate` reads. The npm CLI's output on this tree is not frozen —
 //! the tree changes with every commit, so it would go stale at once — which
 //! leaves each case to assert that the run actually read the kit.
-use std::path::Path;
-
 use crate::npm;
 
 /// Run one argv in the repository root and check that it wrote nothing.
@@ -56,7 +54,6 @@ fn the_default_run_matches_on_this_repositorys_own_kit() {
         "Portability",
         "Docs",
         "Workflow",
-        "Gates",
         "Ownership",
         "Substrate",
         "Packs",
@@ -133,44 +130,6 @@ fn the_memory_lint_matches_on_this_repositorys_own_store() {
         &run,
         &format!("Project root: {}", npm::repo_root().display()),
     );
-}
-
-/// The gate-authority scan over every `.md` under `.claude/` — the check whose
-/// whole value is in the breadth of prose it reads.
-///
-/// The file COUNT is in the PASS row's detail, which the renderer suppresses by
-/// design, so the breadth is asserted against the filesystem instead; the
-/// comparison above is what proves both CLIs read it the same way.
-#[test]
-fn the_gate_authority_scan_matches_across_the_whole_claude_tree() {
-    let run = compare_in_repo("repo-validate-gates", &["validate", "--gates"]);
-    assert_substantial(
-        "repo-validate-gates",
-        &run,
-        "automated gate-approval claims",
-    );
-    let prose = count_markdown(&npm::repo_root().join(".claude"));
-    assert!(
-        prose > 50,
-        "only {prose} prose files live under .claude/, which is not this kit"
-    );
-}
-
-/// Every `.md` under one tree, to prove a scan had something to scan.
-fn count_markdown(dir: &Path) -> usize {
-    let Ok(read) = std::fs::read_dir(dir) else {
-        return 0;
-    };
-    read.filter_map(Result::ok)
-        .map(|entry| {
-            let path = entry.path();
-            if path.is_dir() {
-                count_markdown(&path)
-            } else {
-                usize::from(path.extension().is_some_and(|ext| ext == "md"))
-            }
-        })
-        .sum()
 }
 
 #[test]

@@ -7,7 +7,7 @@ Compact workflow for `--fast` flag or simple tasks. Skips research, codebase ana
 - NEVER load multiple step files simultaneously
 - ALWAYS read entire step file before execution
 - NEVER skip steps in the fast sequence
-- ALWAYS halt at Gate 1 and wait for human approval
+- ALWAYS present the plan and wait for the user's answer before any code
 
 ## Steps
 
@@ -15,7 +15,7 @@ Compact workflow for `--fast` flag or simple tasks. Skips research, codebase ana
    - 1b. `step-00-5-intake-packet.md` — Conditional (≥2 external artifacts in invocation): consolidate pre-existing upstream artifacts into a Plan Intake Packet. 0–1 sources → clean skip.
 2. `step-03-draft-plan.md` — Write plan.md overview only (no phase files in fast mode unless task warrants them)
 3. `step-04-semantic-checks.md` — Semantic content checks only; skip structural validation
-4. `step-07-gate.md` — Gate 1 presentation and approval
+4. `step-07-gate.md` — present the plan and settle it with the user
 5. `step-08-hydrate-tasks.md` — Create session tasks + checkpoint file
 
 **Skipped:** step-01 (research), step-02 (codebase analysis), step-05 (red team), step-06 (validation interview)
@@ -51,7 +51,7 @@ Step 3: Draft Plan
 Step 4: Semantic Checks
     └── Semantic checks only — no structural validation, no red team
          ↓
-Step 7: Gate 1
+Step 7: Present the plan
     └── Self-check → AskUserQuestion (Approve | Modify | Reject)
          ↓
 Step 8: Hydrate Tasks

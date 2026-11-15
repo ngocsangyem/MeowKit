@@ -55,7 +55,7 @@ mod tests {
     #[test]
     fn containment_refuses_every_escape_the_typescript_refuses() {
         assert!(is_contained_relative("skills/cook/SKILL.md"));
-        assert!(is_contained_relative("hooks/lib/gate2-check.cjs"));
+        assert!(is_contained_relative("hooks/lib/ship-command.cjs"));
         // Names that merely CONTAIN dots are not escapes.
         assert!(is_contained_relative("rules/..rules.md"));
         assert!(is_contained_relative("a/.../b"));

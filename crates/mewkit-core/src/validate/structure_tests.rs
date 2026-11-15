@@ -12,9 +12,9 @@ fn project() -> tempfile::TempDir {
 }
 
 #[test]
-fn the_always_on_set_is_the_seven_rule_files() {
+fn the_always_on_set_is_the_six_rule_files() {
     let paths = always_on_rule_paths();
-    assert_eq!(paths.len(), 7);
+    assert_eq!(paths.len(), 6);
     assert!(paths.contains(&"rules/injection-rules.md".to_string()));
     assert!(paths.iter().all(|p| p.starts_with("rules/")));
 }
@@ -23,10 +23,10 @@ fn the_always_on_set_is_the_seven_rule_files() {
 fn a_missing_file_names_the_path_it_looked_for() {
     let project = project();
     let claude = project.path().join(".claude");
-    let row = check_file_exists(&claude, "rules/gate-rules.md", Section::Structure);
+    let row = check_file_exists(&claude, "rules/not-a-rule.md", Section::Structure);
     assert_eq!(row.status, Status::Fail);
     assert!(row.detail.starts_with("Missing: "), "{}", row.detail);
-    assert!(row.detail.ends_with("gate-rules.md"), "{}", row.detail);
+    assert!(row.detail.ends_with("not-a-rule.md"), "{}", row.detail);
 }
 
 #[test]

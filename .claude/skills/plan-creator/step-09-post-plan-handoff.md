@@ -101,7 +101,7 @@ Print exactly one line matching the selection:
 
 If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.meowkit/state/tdd-mode` surviving a fresh session.
 
-After the command line, print the Context Reminder block from `references/gate-1-approval.md` with the absolute path substituted.
+After the command line, print the Context Reminder block from `references/plan-presentation.md` with the absolute path substituted.
 
 ### 9g. Stop
 

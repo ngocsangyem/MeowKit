@@ -30,7 +30,6 @@ Walks `.claude/` and tells you how much of the model context window your always-
 | Concern              | Use this instead                                         |
 |----------------------|----------------------------------------------------------|
 | USD cost tracking    | `mewkit budget`                                              |
-| Runtime agent trim   | `mk:lazy-agent-loader`                                    |
 | Window utilization   | **`/mk:context-audit`** (this skill)                      |
 
 ## Usage
@@ -66,7 +65,7 @@ Walks `.claude/` and tells you how much of the model context window your always-
 
 ## How to Act
 - Cost: see `mewkit budget`
-- Runtime trim: see `mk:lazy-agent-loader`
+- Runtime trim: an agent file costs tokens only when that agent is spawned; archive unused ones
 ```
 
 ## Pro Tips
