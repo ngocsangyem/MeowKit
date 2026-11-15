@@ -22,7 +22,7 @@ NEVER finish a session with failing tests. Fix all failures before completing; e
 
 NEVER ignore failing tests, delete tests, weaken assertions, or introduce fake data solely to pass CI. Address the root cause, then re-run the relevant checks.
 
-Those two rules apply whenever tests exist. Tests are optional in default mode and required in strict mode (`MEOWKIT_TDD=1` / `--tdd`, where `pre-implement.cjs` enforces failing-test-first); a zero-test repo is permitted and the reviewer may WARN at Gate 2. Policy: `.claude/skills/cook/references/tdd-rules.md`.
+Those two rules apply whenever tests exist. Tests are optional in default mode and expected in strict mode (`MEOWKIT_TDD=1` / `--tdd`: write the failing test first; no hook checks the order); a zero-test repo is permitted and the reviewer may WARN on it. Policy: `.claude/skills/cook/references/tdd-rules.md`.
 
 ## Pre-Commit Rules
 

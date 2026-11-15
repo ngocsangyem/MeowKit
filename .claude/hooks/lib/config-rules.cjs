@@ -17,10 +17,6 @@ const {
   knownKeys,
 } = require('./config-keys.cjs');
 
-// Named here rather than required from the gate's hatch reader: this module must
-// not be a path by which anything reaches that reader.
-const HATCH_KEY = 'gate1PresenceOnly';
-const HATCH_ENV = 'MEOWKIT_GATE1_PRESENCE_ONLY';
 
 /** A committed file must not hold a secret, however the user spelled the key. */
 const SECRET_WORD = /keys|token|secret|password/i;
@@ -87,21 +83,6 @@ function applyRules(values, { root, scope = 'project config' } = {}) {
         key,
         `${key} is not a config key in the ${scope}: ${STATE_ONLY_KEYS[key]}`,
         `remove the key and run .claude/hooks/lib/workflow-config set ${key} true, which records it in .meowkit/state/`,
-      );
-    }
-
-    if (key === HATCH_KEY) {
-      // The gate reads this key through its own single-key reader, never through
-      // here. It is accepted in the user file only so that setting the hatch
-      // does not invalidate the rest of a user's file, and rejected in the
-      // project file because a committed gate downgrade is the whole thing the
-      // config surface is shaped to make impossible.
-      if (scope === 'user config') continue;
-      return reject(
-        'user-scope-only',
-        key,
-        `${key} is not a project-config key: a committed file must not be able to downgrade Gate 1`,
-        `move it to ~/.meowkit/config.yaml, or export ${HATCH_ENV} for one session`,
       );
     }
 

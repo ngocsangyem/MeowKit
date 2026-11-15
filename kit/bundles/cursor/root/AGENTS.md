@@ -63,14 +63,14 @@ tool's own memory directory. Append non-derivable lessons only, by piping one en
 reconcile ledgers and short-lived session markers (`state/sessions/`) — ledgers are
 read-only from an agent's perspective; the installer/reconciler owns writes there.
 
-## Gates, security and compaction
+## Ship check, security and compaction
 
-- **Gate 1 (plan):** an approved plan exists before any source edit. **Gate 2 (review):**
-  a passing review verdict (no FAIL dimension, no security BLOCK, WARNs acknowledged)
-  before shipping. No automation self-approves either; verdicts are evidence a human reads.
+- Plan a non-trivial change with the user and review the diff before shipping; nothing
+  blocks on either. On `git commit|push|merge` and `gh pr create|merge`,
+  `.cursor/hooks/pre-ship.cjs` runs lint, related tests and a type-check and denies on failure.
 - Blocked write patterns (hardcoded secrets, string-built SQL, tokens in browser storage,
   ...) and the security review checklist: `.cursor/rules/domain-security.mdc`.
 - When the session is compacted or summarized, ALWAYS preserve verbatim: the data and
   injection boundary (including the Rule of Two), the subagent status protocol, and the
-  names of the always-on safety baselines — security, injection, gates, core behaviors,
+  names of the always-on safety baselines — security, injection, core behaviors,
   development.

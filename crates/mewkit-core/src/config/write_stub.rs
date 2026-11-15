@@ -22,13 +22,15 @@ const HEADER: &[&str] = &[
     "# copy of the defaults.",
     "#",
     "# Two levels of keys; values are true/false, whole numbers or plain strings.",
-    "# A gate is not a preference: there is no `gates.` or `paths.` key at any",
-    "# scope, and an unknown key is an error rather than being ignored.",
+    "# Enforcement is not a preference: there is no `gates.` or `paths.` key at",
+    "# any scope, and an unknown key is an error rather than being ignored.",
 ];
 
+// No count: the number of blocking checks changes with the kit, and a stale
+// number in a file every project commits is worse than no number.
 const HOOKS_NOTE: &[&str] = &[
-    "# hooks.<name>: false switches one observer off. The seven hard-blocking",
-    "# checks are absent on purpose — they cannot be disabled from this file.",
+    "# hooks.<name>: false switches one observer off. The hard-blocking checks",
+    "# are absent on purpose — they cannot be disabled from this file.",
 ];
 
 /// An example value per numeric key. A stub a user uncomments has to be a value

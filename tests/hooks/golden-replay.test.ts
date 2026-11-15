@@ -10,15 +10,15 @@
 //
 //   stdin-unreadable    Unreadable input used to pass silently. A write guard that
 //               cannot read what is being written must not allow it, so these
-//               six now block. The recording is kept as the before-state and
+//               four now block. The recording is kept as the before-state and
 //               asserted against the new behavior rather than deleted.
 //
-//   self-path   Three diagnostics quote the implementation file they are about
-//               ("run this validator", "this checker is missing", "usage: this
-//               script"). The port changes that filename, so one line differs
-//               while the decision, exit code and every other line match. These
-//               are listed by name and get a second, named substitution. This is
-//               the only deviation from whole-stream parity in the suite.
+//   self-path   A diagnostic that quotes the implementation file it is about
+//               differs by that filename after the port, while the decision, exit
+//               code and every other line match. Such fixtures are listed by name
+//               and get a second, named substitution. None remain recorded; the
+//               mechanism is kept for the next one. This is the only deviation
+//               from whole-stream parity in the suite.
 //               One further deviation applies to SIDE EFFECTS, not to streams:
 //               a recorded state path is read from the class that content lives
 //               in now (`lib/state-relocation.ts`), content still compared whole.
@@ -29,14 +29,9 @@ import { type Fixture, loadFixtures, replay, selfPath } from './lib/replay-harne
 
 /** Every recorded group. All of them are replayed against the node tree. */
 const PARITY_GROUPS = [
-  'gate1',
   'gate2-preship',
   'privacy',
-  'gate-helper-validate-contract',
-  'gate-helper-check-contract-signed',
-  'gate-helper-validate-gate-2',
   'post-write',
-  'pre-completion-check',
   'guard-careful',
   'guard-freeze',
   'guard-investigate',
@@ -48,28 +43,17 @@ const PARITY_GROUPS = [
   'observer-precompact-probe',
   'observer-posttoolfailure-probe',
   'observer-control-probe',
-  'cli-pre-implement',
   'cli-append-trace',
 ];
 
 /** Groups whose streams need no normalizer beyond the temp path. */
 const STREAMS_ONLY_GROUPS = [
-  'gate1',
   'gate2-preship',
   'privacy',
-  'gate-helper-validate-contract',
-  'gate-helper-check-contract-signed',
-  'gate-helper-validate-gate-2',
 ];
 
 /** Fixtures whose output quotes the implementation's own filename. */
-const SELF_PATH_FIXTURES = new Set([
-  'gate1-contract-edit-invalid',
-  'preship-gate2-checker-absent',
-  'validate-contract-usage-error',
-  'preimplement-no-feature-argument',
-  'preimplement-strict-tdd-helper-missing',
-]);
+const SELF_PATH_FIXTURES = new Set<string>([]);
 
 /**
  * Guard groups whose recorded stdout is the shell guard's undocumented envelope.
@@ -180,8 +164,8 @@ describe('every recorded fixture replays against the node tree', () => {
 describe('unreadable hook input blocks instead of passing silently', () => {
   const d2 = fixtures.filter((f) => f.group === 'stdin-unreadable');
 
-  it('records six before-state fixtures', () => {
-    expect(d2).toHaveLength(6);
+  it('records four before-state fixtures', () => {
+    expect(d2).toHaveLength(4);
     for (const f of d2) expect(f.expect.exit, `${f.name} was recorded as a silent pass`).toBe(0);
   });
 

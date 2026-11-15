@@ -10,7 +10,7 @@ shell to start and the kit runs on a host that has none. There is no exception: 
 registration runs a shell, a `.sh` file or an interpreter, and `mewkit doctor` sweeps
 the hook paths for one.
 
-The kit ships 27 node hooks: the 6 entrypoints directly under `hooks/`, which the host
+The kit ships 26 node hooks: the 4 entrypoints directly under `hooks/`, which the host
 registers or an agent invokes, and the 21 observers under `hooks/handlers/`, which
 `dispatch.cjs` runs. Nothing under `lib/` is a hook — the host registers none of it — and
 neither are the sidecars (`HOOKS_INDEX.md`, `handlers.json`) or `__tests__/`.
@@ -18,10 +18,10 @@ neither are the sidecars (`HOOKS_INDEX.md`, `handlers.json`) or `__tests__/`.
 `lib/` holds two kinds of file, and the difference matters when reading a registration:
 the shared modules a hook `require`s, and the kit's own command-line tools, which a skill
 or an agent runs by path and no event ever starts — `injection-audit.cjs`,
-`skill-python.cjs`, `validate-workflow-evidence.cjs`, `validate-review-coverage.cjs`,
-`workflow-config`, `workflow-slug`, `workflow-repo-mode`, `workflow-diff-scope`,
-`workflow-review-log` and `setup-workflow`. They live beside the libraries because they
-share them and because the whole tree carries one runtime rule: node, and nothing else.
+`skill-python.cjs`, `workflow-config`, `workflow-slug`, `workflow-repo-mode`,
+`workflow-diff-scope`, `workflow-review-log` and `setup-workflow`. They live beside the
+libraries because they share them and because the whole tree carries one runtime rule:
+node, and nothing else.
 
 Input arrives as JSON on stdin. A write guard reads it with the fail-closed reader
 (`lib/parse-stdin.cjs` `readHookInput`), which reports why input was unreadable so the
@@ -29,7 +29,7 @@ guard can refuse; an observer reads the same payload from the dispatcher.
 
 ## Two contracts, deliberately opposite
 
-**Write guards** — `gate-enforcement.cjs`, `privacy-block.cjs`, `pre-ship.cjs` — are
+**Write guards** — `privacy-block.cjs` and `pre-ship.cjs` — are
 registered directly, never through the dispatcher, and fail CLOSED: each installs
 top-level error handlers that print its marker and exit 2 before any library is
 required, so a crash, a syntax error or a missing library still blocks. Only exit 2
@@ -37,10 +37,10 @@ blocks a tool call; every other exit is advisory, which is why a crashing guard 
 otherwise read as permission.
 
 **Observers** — every entry in `handlers.json` — run through `dispatch.cjs` and fail
-OPEN: one that throws is reported and the rest still run. Two of them have their output
-passed through rather than swallowed: `post-write.cjs` fails the tool result on a
-blocked pattern, and `pre-completion-check.cjs` answers with a block decision. Both are
-emitted after every other observer has run.
+OPEN: one that throws is reported and the rest still run. Three of them have their output
+passed through rather than swallowed: `post-write.cjs` and `build-verify.cjs` report a
+finding the model sees (exit 2, stderr), and the opt-in `pre-completion-check.cjs` answers
+with a block decision. These are emitted after every other observer has run.
 
 **CLI modules** are invoked with arguments by an agent or another module, not by an
 event, so they appear in no registry.
@@ -53,10 +53,9 @@ later; nothing is switchable yet.
 | Hook | Event | Matcher | Toggle key | Timeout | Purpose |
 |---|---|---|---|---|---|
 | `dispatch.cjs` | SessionStart | — | — | 15s | Runs the observers registered for one event, fail-open |
-| `gate-enforcement.cjs` | PreToolUse | Edit\|Write | — | 10s | Blocks a source write before the plan is approved and before the sprint contract is signed |
 | `privacy-block.cjs` | PreToolUse | Edit\|Write | — | 5s | Refuses reads of credential-bearing files and web-fetch artifacts, and obviously unsafe fetch targets |
 | `privacy-block.cjs` | PreToolUse | Read | — | 5s | Refuses reads of credential-bearing files and web-fetch artifacts, and obviously unsafe fetch targets |
-| `pre-ship.cjs` | PreToolUse | Bash | — | 30s | Ship-boundary guard: structural review proof, team-memory lint, then the build/lint/test block |
+| `pre-ship.cjs` | PreToolUse | Bash | — | 300s | Ship check: team-memory lint, then lint on the changed files, the tests related to them and a type-check |
 | `privacy-block.cjs` | PreToolUse | Bash | — | 5s | Refuses reads of credential-bearing files and web-fetch artifacts, and obviously unsafe fetch targets |
 | `dispatch.cjs` | PreToolUse | Bash | — | 10s | Runs the observers registered for one event, fail-open |
 | `dispatch.cjs` | PostToolUse | Edit\|Write | — | 40s | Runs the observers registered for one event, fail-open |
@@ -79,10 +78,11 @@ later; nothing is switchable yet.
 | `post-write.cjs` | PostToolUse | Edit\|Write | postWrite | — | Security scan of a file that has already been written; fails the tool result on a blocked pattern |
 | `budget-tracker.cjs` | PostToolUse | Bash | budgetTracker | — | Accumulates token and cost estimates |
 | `review-evidence-tag.cjs` | PostToolUse | Bash | reviewEvidenceTag | — | Tags review evidence from a command |
+| `verification-evidence.cjs` | PostToolUse, SessionStart | Bash | verificationEvidence | — | Records the session's starting tree and the tree at each passing verification command, for the opt-in completion check |
 | `checkpoint-writer.cjs` | Stop | — | checkpointWriter | — | Writes the end-of-session checkpoint |
 | `post-session.cjs` | Stop | — | postSession | — | Records cost and trace data when a session ends |
 | `control-probe.cjs` | Stop | — | controlProbe | — | A known-good fire, used as a control signal |
-| `pre-completion-check.cjs` | Stop | — | preCompletionCheck | — | Refuses to end a session that owes verification, up to a bounded number of attempts |
+| `pre-completion-check.cjs` | Stop | — | preCompletionCheck | — | Opt-in: continues a turn whose edits are unverified, at most twice |
 | `model-detector.cjs` | SessionStart | — | modelDetector | — | Records the active model at session start |
 | `orientation-ritual.cjs` | SessionStart | — | orientationRitual | — | Emits the orientation prompt at session start |
 | `project-context-loader.cjs` | SessionStart | — | projectContextLoader | — | Injects the project's own context and resets per-session state |
@@ -97,7 +97,6 @@ later; nothing is switchable yet.
 
 | Module | Event | Matcher | Toggle key | Timeout | Purpose |
 |---|---|---|---|---|---|
-| `pre-implement.cjs` | — (argv) | — | — | — | Refuses to start implementing until a failing test exists. Argv-driven, fail-closed in strict mode |
 | `append-trace.cjs` | — (argv) | — | — | — | Writes one record to the shared trace history. Argv-driven |
 
 ## Where observer output lands
@@ -111,5 +110,5 @@ separate and internal — hook-fire telemetry, kept uncompressed so it stays gre
 
 `scripts/check-hook-registration.sh` catches drift in both directions plus the registry:
 a hook on disk that nothing registers, a registration with no file, and a registry entry
-with no file. `mewkit doctor --hard-gates` probes the guards behaviourally and reports a
-leftover shell hook as a finding.
+with no file. `mewkit doctor --hard-gates` probes the write guards behaviourally and
+reports a leftover shell hook as a finding.

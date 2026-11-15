@@ -90,8 +90,8 @@ sandbox.
 
 Internal jobs must not perform `destructive: true` or credentialed external
 actions unless the live harness supplies controls that satisfy the R3 policy
-and the human approval recorded per the intervention-recording invariant in AGENTS.md and
-`gate-rules.md` is already in hand. When it does not, route to a qualified
+and the human approval recorded per the intervention-recording invariant in AGENTS.md
+is already in hand. When it does not, route to a qualified
 externally isolated candidate or block.
 
 ## Tool Boundaries

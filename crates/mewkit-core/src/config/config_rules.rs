@@ -9,9 +9,7 @@
 //! Each message names the key, the scope it came from, and what to do instead,
 //! because "invalid config" tells a user nothing they can act on.
 use super::config_values::{ConfigValue, ConfigValues};
-use super::schema::{
-    USER_SCOPE_ONLY_KEY, ValueKind, forbidden_namespace, known_keys, protected_hook, state_only_key,
-};
+use super::schema::{ValueKind, forbidden_namespace, known_keys, protected_hook, state_only_key};
 use super::yaml_grammar::SCHEMA_KEY;
 use crate::path_shape::is_absolute_path;
 
@@ -70,8 +68,6 @@ fn looks_like_secret(text: &str) -> bool {
         .iter()
         .any(|word| lowered.contains(word))
 }
-
-const HATCH_ENV: &str = "MEOWKIT_GATE1_PRESENCE_ONLY";
 
 /// `Ok(())` for an already-parsed flat map, or the first rule that fired.
 ///
@@ -145,20 +141,6 @@ pub fn apply_rules(
                 format!(
                     "remove the key and run .claude/hooks/lib/workflow-config set {key} true, which records it in .meowkit/state/"
                 ),
-            );
-        }
-
-        if key == USER_SCOPE_ONLY_KEY {
-            if scope == ConfigScope::UserConfig {
-                continue;
-            }
-            return reject(
-                "user-scope-only",
-                key,
-                format!(
-                    "{key} is not a project-config key: a committed file must not be able to downgrade Gate 1"
-                ),
-                format!("move it to ~/.meowkit/config.yaml, or export {HATCH_ENV} for one session"),
             );
         }
 

@@ -14,11 +14,11 @@ Coverage of each vendor-neutral substrate responsibility, generated from the har
 | Task state | ✅ covered | 3 | 3 | agent-conduct, auto-checkpoint, checkpoint-writer |
 | Observability | ✅ covered | 6 | 6 | append-trace, dispatch, control-probe |
 | Failure attribution | ✅ covered | 2 | 2 | loop-detection, posttoolfailure-probe |
-| Verification | ✅ covered | 4 | 4 | development-rules, build-verify, review-evidence-tag |
+| Verification | ✅ covered | 7 | 7 | development-rules, pre-ship, build-verify |
 | Permissions | ✅ covered | 3 | 3 | injection-rules, security-rules, privacy-block |
 | Entropy auditing | ✅ covered | 1 | 1 | budget-tracker |
 | Intervention recording | ⬜ missing | 0 | 0 | — |
-| Gate enforcement *(kit)* | ✅ covered | 6 | 6 | gate-rules, gate-enforcement, pre-implement |
+| Gate enforcement *(kit)* | ✅ covered | 1 | 1 | pre-task-check |
 
 **Coverage:** 11/12 responsibilities have active artifacts. Missing: Intervention recording.
-**Untagged:** 0 registry + 170 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).
+**Untagged:** 0 registry + 169 frontmatter artifacts carry no responsibility (frontmatter is tag-on-touch; registry should be 100%).

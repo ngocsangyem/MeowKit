@@ -90,8 +90,8 @@ sandbox.
 
 Internal jobs must not perform `destructive: true` or credentialed external
 actions unless the live harness supplies controls that satisfy the R3 policy
-and the human approval recorded per `.claude/rules/gate-rules.md` (Recording Human Interventions) and
-`gate-rules.md` is already in hand. When it does not, route to a qualified
+and the human approval recorded per `.claude/rules/meowkit-core.md` (Recording Human
+Overrides) is already in hand. When it does not, route to a qualified
 externally isolated candidate or block.
 
 ## Tool Boundaries

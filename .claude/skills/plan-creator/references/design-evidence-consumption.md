@@ -83,7 +83,7 @@ assertions/snapshots → `mk:playwright-cli` / `mk:qa-manual`.
 ## Phase-level blocking (blocked_on)
 
 Unresolved **high-risk** flow ambiguity blocks only the affected phase — never the whole
-plan (Gate 1 may still approve when ambiguity is explicit).
+plan (the user may still accept it when the ambiguity is explicit).
 
 Represent the block with an additive optional phase-frontmatter field `blocked_on:` — a list
 of `"<ledger-id>: <one-line question>"` strings. The `status:` enum is unchanged (still a

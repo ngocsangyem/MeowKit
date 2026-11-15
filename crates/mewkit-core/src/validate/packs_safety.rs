@@ -7,8 +7,9 @@
 use super::structure::always_on_rule_paths;
 
 /// The safety surface that must resolve into `base` for every profile: the
-/// write guards and their gate libraries, the dispatch chain, the completion
-/// gate, settings, statusline and the always-on rules.
+/// privacy guard, the ship check and the libraries it decides from, the
+/// dispatch chain, the completion check, settings, statusline and the
+/// always-on rules.
 ///
 /// The three skill/reference entries are essential cross-profile entrypoints —
 /// each names the surface that now owns a job the kit used to expose as its own
@@ -17,7 +18,6 @@ pub(super) fn safety_paths() -> Vec<String> {
     let mut paths: Vec<String> = [
         "statusline.cjs",
         "settings.json",
-        "hooks/gate-enforcement.cjs",
         "hooks/privacy-block.cjs",
         "hooks/pre-ship.cjs",
         "hooks/handlers/pre-completion-check.cjs",
@@ -25,11 +25,12 @@ pub(super) fn safety_paths() -> Vec<String> {
         "hooks/lib/parse-stdin.cjs",
         "hooks/lib/shared-state.cjs",
         "hooks/handlers.json",
-        "hooks/lib/gate2-check.cjs",
-        "hooks/lib/approval-receipt.cjs",
-        "hooks/lib/validate-contract.cjs",
-        "hooks/lib/check-contract-signed.cjs",
-        "hooks/lib/validate-gate-2.cjs",
+        "hooks/lib/core/pre-ship.cjs",
+        "hooks/lib/ship-command.cjs",
+        "hooks/lib/changed-files.cjs",
+        "hooks/lib/ship-run-once.cjs",
+        "hooks/lib/preship-checks.cjs",
+        "hooks/lib/memory-store-lint.cjs",
     ]
     .iter()
     .map(|path| (*path).to_string())

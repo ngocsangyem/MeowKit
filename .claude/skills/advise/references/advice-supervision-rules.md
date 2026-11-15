@@ -90,7 +90,7 @@ Rules that keep the cadence bounded:
 **Rescue complements human STOPs; it never delays them.** `mk:fix`'s rule — 3+
 failed attempts ⇒ STOP and question the architecture with the user — fires on its
 own schedule whether or not counsel was taken at two failures. The same holds for
-the Gate 1 question, the Gate 2 question, and any explicit business decision.
+the plan question, the ship question, and any explicit business decision.
 
 ## 3 — Input packet (the parent supplies)
 
@@ -181,12 +181,12 @@ tester, whoever owns it — never to Athena.
 1. The executor addresses each correction or records why it is rejected.
 2. Source changes advance `evidenceRevision` and mark stale verification/review
    evidence **superseded**; normal checks re-run.
-3. Plan or scope changes additionally invalidate Gate 1 and require a new human
-   approval. In-scope source corrections keep Gate 1 but invalidate downstream
-   evidence.
+3. Plan or scope changes additionally invalidate the agreed plan: take the revised
+   plan back to the user before building on it. In-scope source corrections leave the
+   plan standing but invalidate downstream evidence.
 4. Athena rechecks once by default. A second unresolved return escalates.
 
-Superseded evidence must never read as current at a later gate or ship preflight.
+Superseded evidence must never read as current at a later review or ship preflight.
 
 **A correction's only write target is an existing `workflow-evidence.json` inside the
 project.** The index lives under several roots but always under that name, so the name is
@@ -214,11 +214,11 @@ same owner as `--html` alone would for the same final Markdown.
 
 They meet only in the correction loop, because a supervised correction edits Markdown and
 the visual artifact pins hashes of it. The Markdown plan stays the source of truth;
-REVIEW fires before the gate step where the visual preconditions are checked; and a
+REVIEW fires before the step where the visual preconditions are checked; and a
 returned correction invalidates the artifact's pinned hashes exactly like any other
 Markdown edit — rehash (which clears the prior visual approval), re-validate, re-review,
-re-approve, then present the ordinary Gate 1. A stale artifact never reaches the gate
-beside a corrected plan.
+re-approve, then take the plan to the user as usual. A stale artifact never reaches the
+user beside a corrected plan.
 
 Athena approves no visual, edits no HTML, changes no filename or path, opens no browser,
 and turns no dossier or receipt into a rendered artifact. This is structural: the adapter
@@ -234,17 +234,16 @@ Athena MUST NOT:
 - Interview the user. That is `advisor`, behind `mk:advise`, unchanged by this rule.
 - Emit a verdict, score, grade, or security clearance. `reviewer`, `evaluator` and
   `security` own those.
-- Approve, clear, unblock, or advance Gate 1, Gate 2, a security review, CI, a
+- Approve, clear, unblock, or advance a plan, a review, a security review, CI, a
   merge, a deploy, or any user business decision.
 - Change the executor's model, profile, or effort. `--advice` supervises the
   workflow, not the model running it.
 - Spawn another Athena or any lifecycle agent.
 
-**Gate Authority Invariant** (`.claude/rules/gate-rules.md`): automation executes
-BETWEEN gates and never supplies the authority OF a gate. An Athena directive is in
-exactly the same class as an evaluator verdict or a green test suite — evidence
-presented to a human at the gate, never the approval itself. Prose that lets
-supervision advance a gate, in any wording, is a violation.
+**Supervision is never authority.** An Athena directive is in exactly the same class as
+an evaluator verdict or a green test suite — evidence presented to the user, never the
+decision itself. Prose that lets supervision decide whether work ships, in any wording,
+is a violation.
 
 A directive is also **not verification**. Verification comes from tests, review
 verdicts and validators. Supervision never counts toward it.

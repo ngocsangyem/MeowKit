@@ -49,7 +49,7 @@ fn a_subset_keeps_base_and_leaves_other_domains_out() {
         .prepare(&request(&kit, &p.scope, &packs, &[]))
         .unwrap();
     let files = claude_files(&plan);
-    for must in ["rules/gate-rules.md", "rules/security-rules.md"] {
+    for must in ["rules/injection-rules.md", "rules/security-rules.md"] {
         assert!(files.contains(must), "base file {must} is always installed");
     }
     assert!(

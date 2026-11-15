@@ -95,8 +95,8 @@ Secrets never belong in prompts, logs, inventory, or reports at any tier — see
 `injection-rules.md` Rule 4 (sensitive-file protection) and Rule 5 (no external
 exfiltration). Route any secret-bearing plan through those rules instead of
 proceeding here. R3 approval and its rationale are durable per
-`.claude/rules/gate-rules.md` (Recording Human Interventions); the gate itself is
-owned by that same rule and is never satisfied by this file.
+`.claude/rules/meowkit-core.md` (Recording Human Overrides). The approval comes from the
+user — or the host's own permission prompt — never from this file.
 
 ## Routing Rules
 
@@ -236,4 +236,4 @@ run; this document does not preselect them.
 - Fallbacks meet the same floors as their primary route.
 - The arbiter is C3 and its independence or same-family limitation is stated.
 - Destructive or external approvals are recorded per
-  `.claude/rules/gate-rules.md` (Recording Human Interventions), not merely implied by a PASS verdict.
+  `.claude/rules/meowkit-core.md` (Recording Human Overrides), not merely implied by a PASS verdict.

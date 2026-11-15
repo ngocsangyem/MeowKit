@@ -1,7 +1,7 @@
 'use strict';
 // launcher-path-env.cjs — make the bare `mewkit` form resolve in the agent's shell.
 //
-// The kit tells the agent to run `mewkit plan approve …`. That name only resolves if it is
+// The kit tells the agent to run `mewkit task new …`. That name only resolves if it is
 // on PATH, and an install leaves it in the project rather than on the machine. The host
 // offers exactly one committed way to set a variable for later shell commands: a SessionStart
 // hook appends an assignment to the file named by CLAUDE_ENV_FILE, whose contents the host

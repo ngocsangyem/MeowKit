@@ -1,17 +1,18 @@
 //! `mewkit validate` — does this install's STRUCTURE and WIRING hold?
 //!
 //! Port of `commands/validate.ts` and the `core/check-*.ts` modules it calls.
-//! The scope is deliberately narrow and is stated in the output: that gate files
-//! exist and are wired, NOT that they actually block. Behavioural proof is
-//! `doctor --hard-gates`. So the statuses are honest — PASS / WARN / N/A / FAIL
-//! — and WARN or N/A does not fail the build unless `--strict` is passed.
+//! The scope is deliberately narrow and is stated in the output: that the
+//! guard files exist and are wired, NOT that they actually block. Behavioural
+//! proof is `doctor --hard-gates`. So the statuses are honest — PASS / WARN /
+//! N/A / FAIL — and WARN or N/A does not fail the build unless `--strict` is
+//! passed.
 //!
 //! ## The two profiles
 //!
 //! The CONSUMER-actionable checks run in both modes: the directories, the
 //! always-on rules, the config, the hooks, the docs references, namespace
 //! purity and the committed team-memory store. The AUTHORING-coherence suite
-//! runs only in `authoring` — workflow drift, gate authority, operation
+//! runs only in `authoring` — workflow drift, operation
 //! conformance, the generic-core baseline, the stale index, ownership,
 //! agent conformance, the responsibility substrate, pack coherence,
 //! routing-table breadth and the capability manifest with its generated view.
@@ -41,9 +42,6 @@ mod docs_refs_tokens;
 mod entry;
 mod frontmatter;
 mod frontmatter_rows;
-mod gate_authority;
-mod gate_authority_patterns;
-mod gate_authority_rows;
 mod generic_tokens;
 mod generic_tokens_body;
 mod hooks;
@@ -119,8 +117,6 @@ pub use frontmatter::{
     tool_contract_warnings,
 };
 pub use frontmatter_rows::check_frontmatter_contract;
-pub use gate_authority::{GateAuthorityViolation, scan_for_gate_authority};
-pub use gate_authority_rows::check_gate_authority;
 pub use generic_tokens::{
     GenericCoreTokenFinding, TokenCategory, find_generic_core_tokens, summarize_generic_core_tokens,
 };

@@ -1,5 +1,7 @@
 //! Shared helpers for `mewkit-cli` integration tests.
 #![allow(dead_code)]
+pub mod gate_kit;
+pub mod gate_retire;
 pub mod release;
 pub mod temp_home;
 
@@ -51,6 +53,20 @@ pub fn read(root: &Path, rel: &str) -> String {
     std::fs::read_to_string(root.join(rel)).unwrap()
 }
 
+/// Copy every file under `source` into `dest`, creating directories as needed.
+pub fn copy_tree(source: &Path, dest: &Path) {
+    std::fs::create_dir_all(dest).expect("create a directory");
+    for entry in std::fs::read_dir(source).expect("read a directory") {
+        let entry = entry.expect("a directory entry");
+        let target = dest.join(entry.file_name());
+        if entry.path().is_dir() {
+            copy_tree(&entry.path(), &target);
+        } else {
+            std::fs::copy(entry.path(), &target).expect("copy a file");
+        }
+    }
+}
+
 /// `out`'s exit code, with its output on failure to explain an assert.
 pub fn code(out: &Output) -> i32 {
     out.status.code().unwrap_or(-1)
@@ -66,11 +82,14 @@ pub fn text(out: &Output) -> String {
 
 /// This checkout's kit as a release zip in `dir`, with its SHA-256.
 pub fn archive(dir: &Path) -> (PathBuf, String) {
-    let root = kit::kit().dir;
-    let file = dir.join("meowkit-release.zip");
-    let mut zip = zip::ZipWriter::new(std::fs::File::create(&file).unwrap());
+    zip_tree(&kit::kit().dir, &dir.join("meowkit-release.zip"))
+}
+
+/// Every file under `root` as a release zip at `file`, with the zip's SHA-256.
+pub fn zip_tree(root: &Path, file: &Path) -> (PathBuf, String) {
+    let mut zip = zip::ZipWriter::new(std::fs::File::create(file).unwrap());
     let opts = zip::write::SimpleFileOptions::default();
-    let mut todo = vec![root.clone()];
+    let mut todo = vec![root.to_path_buf()];
     while let Some(d) = todo.pop() {
         for entry in std::fs::read_dir(&d).unwrap() {
             let path = entry.unwrap().path();
@@ -79,7 +98,7 @@ pub fn archive(dir: &Path) -> (PathBuf, String) {
                 continue;
             }
             let name = path
-                .strip_prefix(&root)
+                .strip_prefix(root)
                 .unwrap()
                 .to_string_lossy()
                 .replace('\\', "/");
@@ -88,6 +107,6 @@ pub fn archive(dir: &Path) -> (PathBuf, String) {
         }
     }
     zip.finish().unwrap();
-    let sha = sha256_hex(&std::fs::read(&file).unwrap());
-    (file, sha)
+    let sha = sha256_hex(&std::fs::read(file).unwrap());
+    (file.to_path_buf(), sha)
 }

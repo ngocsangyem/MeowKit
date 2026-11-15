@@ -8,7 +8,6 @@
 
 const { PROJECT_DIR_ENV: PROJ, bash, read } = require('./hook-corpus-payload.cjs');
 
-const GATE = '.claude/hooks/gate-enforcement.sh';
 const PRIVACY = '.claude/hooks/privacy-block.sh';
 const PRESHIP = '.claude/hooks/pre-ship.sh';
 
@@ -57,7 +56,7 @@ const privacyCases = [
   },
 ].map((c) => ({ group: 'privacy', entrypoint: PRIVACY, env: PROJ, ...c }));
 
-const stdinCases = [GATE, PRIVACY, PRESHIP].flatMap((entrypoint) => {
+const stdinCases = [PRIVACY, PRESHIP].flatMap((entrypoint) => {
   const short = entrypoint.replace('.claude/hooks/', '').replace('.sh', '');
   return [
     { name: `stdin-empty-${short}`, stdin: '', setupDescription: 'BASE hook tree only; stdin is an empty pipe' },

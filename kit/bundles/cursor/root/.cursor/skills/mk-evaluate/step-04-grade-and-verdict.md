@@ -112,9 +112,9 @@ batches_total: {if multi-batch}
 (populated by validate-verdict.sh — see 4f)
 ```
 
-### 4f. Run validate-verdict.sh — HARD GATE
+### 4f. Run validate-verdict.sh
 
-This is the active-verification enforcement. Run after writing the verdict file:
+This is where active verification is enforced. Run after writing the verdict file:
 
 ```bash
 .cursor/skills/evaluate/scripts/validate-verdict.sh "$verdict_file"
@@ -122,7 +122,7 @@ This is the active-verification enforcement. Run after writing the verdict file:
 
 The validator checks (v2):
 1. Frontmatter has all required fields, including the `evaluator:` identity block
-2. `evidence_dir` exists and is non-empty (per the active-verification HARD GATE locked 260408)
+2. `evidence_dir` exists and is non-empty (the active-verification requirement, locked 260408)
 3. Every PASS/WARN rubric cites at least one evidence file in its section
 4. Evidence files referenced in the verdict actually exist on disk; a per-file SHA-256 + type manifest is written next to the evidence dir
 5. `weighted_score` is RECOMPUTED from the preset weights × per-rubric verdicts and must match the declared value within 0.01

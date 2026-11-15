@@ -7,6 +7,12 @@
 				"type": "command",
 				"timeout": 10,
 				"failClosed": false
+			},
+			{
+				"command": "node .cursor/hooks/completion-check.cjs",
+				"type": "command",
+				"timeout": 15,
+				"failClosed": false
 			}
 		],
 		"sessionEnd": [
@@ -31,6 +37,12 @@
 				"type": "command",
 				"timeout": 10,
 				"failClosed": true
+			},
+			{
+				"command": "node .cursor/hooks/pre-ship.cjs",
+				"type": "command",
+				"timeout": 300,
+				"failClosed": false
 			}
 		],
 		"beforeMCPExecution": [
@@ -69,6 +81,12 @@
 				"command": "node .cursor/hooks/telemetry-observers.cjs",
 				"type": "command",
 				"timeout": 10,
+				"failClosed": false
+			},
+			{
+				"command": "node .cursor/hooks/completion-check.cjs",
+				"type": "command",
+				"timeout": 15,
 				"failClosed": false
 			}
 		],

@@ -1,15 +1,11 @@
-// completion-gate.test.ts — refusing to end a session without verification, and
-// the cases where refusing would be wrong.
+// completion-gate.test.ts — the opt-in Stop-time completion check.
 //
-// This gate answers with a decision rather than a failing exit, and it is routed
-// through a fail-open chain, so both halves need holding down: the block has to
-// survive the chain, and the many "do not block" cases have to stay
-// non-blocking. A gate that blocks a session it does not govern is the failure
-// that gets it switched off.
-//
-// These assertions carry over from the shell regression test for the same hook.
+// Off by default. When switched on, a stop with files changed since the session's last
+// passing verification command asks for one more turn, at most twice, then ends with a
+// notice. Edits are read from the working tree, so one made through the shell counts.
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -19,145 +15,184 @@ import { fileURLToPath } from 'node:url';
 const require_ = createRequire(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
-type Result = { stdout?: string; stderr?: string; feedback?: boolean } | null;
-type Handler = (ctx: { root: string; session_id?: string }) => Result;
+type Ctx = { root: string; session_id?: string; event?: string; tool_input?: { command?: string }; stop_hook_active?: boolean };
+type Result = { stdout?: string; feedback?: boolean } | null;
+type Handler = (ctx: Ctx) => Result;
 
-function loadHandler(): Handler {
-  const mod: unknown = require_(path.join(REPO_ROOT, '.claude/hooks/handlers/pre-completion-check.cjs'));
-  if (typeof mod !== 'function') throw new Error('pre-completion-check.cjs does not export a handler');
+function load(rel: string): Handler {
+  const mod: unknown = require_(path.join(REPO_ROOT, '.claude/hooks', rel));
+  if (typeof mod !== 'function') throw new Error(`${rel} does not export a handler`);
   return mod as Handler;
 }
 
-const SLUG = 'demo-task';
-const PLAN_DIR = `tasks/plans/261101-${SLUG}`;
+const stop = load('handlers/pre-completion-check.cjs');
+const evidence = load('handlers/verification-evidence.cjs');
+const core = require_(path.join(REPO_ROOT, '.claude/hooks/lib/core/completion-check.cjs')) as {
+  classifyCommand(command: string): string | null;
+};
 
-function project(files: Record<string, string> = {}): string {
+const made: string[] = [];
+const savedHome = process.env.HOME;
+afterEach(() => {
+  process.env.HOME = savedHome;
+  for (const dir of made.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
+});
+
+/** A git project with the observer registry; the check is on unless `enabled` is false. */
+function project({ enabled = true, git = true } = {}): string {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mk-completion-'));
-  for (const [rel, content] of Object.entries(files)) {
-    const abs = path.join(dir, rel);
-    fs.mkdirSync(path.dirname(abs), { recursive: true });
-    fs.writeFileSync(abs, content);
+  made.push(dir);
+  process.env.HOME = dir;
+  fs.mkdirSync(path.join(dir, '.claude/hooks'), { recursive: true });
+  fs.copyFileSync(path.join(REPO_ROOT, '.claude/hooks/handlers.json'), path.join(dir, '.claude/hooks/handlers.json'));
+  fs.mkdirSync(path.join(dir, '.meowkit'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.gitignore'), '.meowkit/state/\n');
+  if (enabled) fs.writeFileSync(path.join(dir, '.meowkit/config.yaml'), 'hooks:\n  pre-completion-check: true\n');
+  fs.writeFileSync(path.join(dir, 'app.ts'), 'export const a = 1;\n');
+  if (git) {
+    const run = (...args: string[]) => execFileSync('git', args, { cwd: dir, stdio: 'ignore' });
+    run('init', '-q');
+    run('-c', 'user.email=t@t', '-c', 'user.name=t', 'add', '-A');
+    run('-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-qm', 'init');
   }
   return dir;
 }
 
-const VERIFICATION_REQUIRED = JSON.stringify({ required: true, slug: `261101-${SLUG}` });
-const ACTIVE_PLAN = JSON.stringify({ path: PLAN_DIR });
+const start = (root: string, session = 's1') => evidence({ root, session_id: session, event: 'SessionStart' });
+const ran = (root: string, command: string, session = 's1') =>
+  evidence({ root, session_id: session, event: 'PostToolUse', tool_input: { command } });
+const stopAt = (root: string, session = 's1') => stop({ root, session_id: session, event: 'Stop' });
+const edit = (root: string, text = 'export const a = 2;\n') => fs.writeFileSync(path.join(root, 'app.ts'), text);
+const decision = (r: Result) => (r && r.stdout ? JSON.parse(r.stdout) : null);
 
-const PASSING_VERDICT = ['# Verdict', '', 'Score: 9/10', '', '| Functionality | PASS |', '', 'Critical (0)', ''].join('\n');
-const FAILING_SECURITY = ['# Security Verdict', '', 'Score: 4/10', '', '| Security | FAIL |', '', 'Critical (0)', ''].join('\n');
-const SIGNED_CONTRACT = ['---', 'status: signed', '---', '', '# Contract', ''].join('\n');
-
-const decision = (result: Result): { decision?: string; reason?: string } =>
-  (result && result.stdout ? JSON.parse(result.stdout) : {});
-
-describe('a session with no verification obligation may end', () => {
-  const handler = loadHandler();
-
-  it('allows a plan-only session with no requirement marker', () => {
-    const root = project({ [`${PLAN_DIR}/plan.md`]: '# plan\n' });
-    expect(handler({ root, session_id: 's1' })).toBeNull();
+describe('the completion check is off by default', () => {
+  it('never blocks without the config switch', () => {
+    const root = project({ enabled: false });
+    start(root);
+    edit(root);
+    expect(stopAt(root)).toBeNull();
+    expect(fs.existsSync(path.join(root, '.meowkit/state/completion-evidence.json'))).toBe(false);
   });
 
-  it('allows a session whose marker says verification is not required', () => {
-    const root = project({ '.meowkit/state/verification-required.json': JSON.stringify({ required: false }) });
-    expect(handler({ root, session_id: 's2' })).toBeNull();
-  });
-
-  it('allows a session whose marker names no plan, and says why', () => {
-    const root = project({ '.meowkit/state/verification-required.json': JSON.stringify({ required: true }) });
-    const result = handler({ root, session_id: 's3' });
-    expect(result?.stdout ?? '').toBe('');
-    expect(result?.stderr ?? '').toContain('active plan slug missing');
+  it('does not arm outside a git repository', () => {
+    const root = project({ git: false });
+    start(root);
+    edit(root);
+    expect(stopAt(root)).toBeNull();
   });
 });
 
-describe('a session that owes verification is blocked until it has some', () => {
-  const handler = loadHandler();
-
-  const required = () => project({
-    '.meowkit/state/verification-required.json': VERIFICATION_REQUIRED,
-    '.meowkit/state/active-plan.json': ACTIVE_PLAN,
-    [`${PLAN_DIR}/plan.md`]: '# plan\n',
+describe('the completion check, switched on', () => {
+  it('allows a stop when nothing changed since the session started', () => {
+    const root = project();
+    start(root);
+    expect(stopAt(root)).toBeNull();
   });
 
-  it('blocks when no evidence exists, and counts the attempt', () => {
-    const root = required();
-    const result = handler({ root, session_id: 's4' });
-    expect(decision(result).decision).toBe('block');
-    expect(decision(result).reason).toContain('attempt 1/3');
-    expect(result?.feedback, 'the decision must survive the chain').toBe(true);
-    expect(JSON.parse(fs.readFileSync(path.join(root, '.meowkit/state/precompletion-attempts.json'), 'utf8'))).toEqual({ [SLUG]: 1 });
+  it('does not count changes already in the tree when the session began', () => {
+    const root = project();
+    edit(root, 'export const before = 1;\n');
+    start(root);
+    expect(stopAt(root)).toBeNull();
   });
 
-  it('gives up after the third attempt rather than looping forever', () => {
-    const root = required();
-    for (let i = 1; i <= 3; i += 1) {
-      expect(decision(handler({ root, session_id: `s5-${i}` })).reason, `attempt ${i}`).toContain(`attempt ${i}/3`);
-    }
-    const past = handler({ root, session_id: 's5-4' });
-    expect(past?.stdout ?? '', 'no further block').toBe('');
-    expect(past?.stderr ?? '').toContain('Max PreCompletion re-entries reached');
-    // The counter is cleared so the next session starts fresh rather than
-    // inheriting an exhausted cap.
-    expect(JSON.parse(fs.readFileSync(path.join(root, '.meowkit/state/precompletion-attempts.json'), 'utf8'))).toEqual({});
+  it('arms on an unverified edit and blocks with a reason the host feeds back', () => {
+    const root = project();
+    start(root);
+    edit(root);
+    const r = stopAt(root);
+    expect(r?.feedback).toBe(true);
+    expect(decision(r)).toMatchObject({ decision: 'block' });
+    expect(decision(r).reason).toMatch(/last passing test, build, lint or type-check/);
   });
 
-  it('allows the stop once an evaluator verdict exists, and clears the counter', () => {
-    const root = required();
-    handler({ root, session_id: 's6' });
-    fs.mkdirSync(path.join(root, 'tasks/reviews'), { recursive: true });
-    fs.writeFileSync(path.join(root, `tasks/reviews/261101-${SLUG}-evalverdict.md`), PASSING_VERDICT);
-
-    expect(handler({ root, session_id: 's6' })).toBeNull();
-    expect(JSON.parse(fs.readFileSync(path.join(root, '.meowkit/state/precompletion-attempts.json'), 'utf8'))).toEqual({});
+  it('counts an edit made through the shell, with no edit hook involved', () => {
+    const root = project();
+    start(root);
+    execFileSync('sh', ['-c', 'echo "export const b = 3;" > shell-made.ts'], { cwd: root });
+    expect(decision(stopAt(root))).toMatchObject({ decision: 'block' });
   });
 
-  it('accepts a signed sprint contract as verification', () => {
-    const root = required();
-    fs.mkdirSync(path.join(root, 'tasks/contracts'), { recursive: true });
-    fs.writeFileSync(path.join(root, `tasks/contracts/261101-${SLUG}-sprint-1.md`), SIGNED_CONTRACT);
-    expect(handler({ root, session_id: 's7' })).toBeNull();
+  it('releases once a verification command passes after the edit', () => {
+    const root = project();
+    start(root);
+    edit(root);
+    ran(root, 'npm test');
+    expect(stopAt(root)).toBeNull();
   });
 
-  it('resolves the plan slug from a path-only pointer', () => {
-    const root = project({
-      '.meowkit/state/verification-required.json': JSON.stringify({ required: true }),
-      '.meowkit/state/active-plan.json': ACTIVE_PLAN,
-      [`${PLAN_DIR}/plan.md`]: '# plan\n',
-    });
-    const result = handler({ root, session_id: 's8' });
-    expect(decision(result).reason, 'the slug came from the pointer path').toContain(PLAN_DIR);
+  it('arms again when files change after the pass', () => {
+    const root = project();
+    start(root);
+    ran(root, 'npx vitest run');
+    edit(root);
+    expect(decision(stopAt(root))).toMatchObject({ decision: 'block' });
+  });
+
+  it('blocks at most twice, then ends the session with one notice', () => {
+    const root = project();
+    start(root);
+    edit(root);
+    expect(decision(stopAt(root))).toMatchObject({ decision: 'block' });
+    expect(decision(stopAt(root))).toMatchObject({ decision: 'block' });
+    expect(decision(stopAt(root)).systemMessage).toMatch(/still unverified after 2 reminders/);
+    expect(stopAt(root)).toBeNull();
+  });
+
+  it('gives a new session no pass and no spent reminders from the last one', () => {
+    const root = project();
+    start(root, 's1');
+    edit(root);
+    ran(root, 'npm test', 's1');
+    start(root, 's2');
+    edit(root, 'export const a = 9;\n');
+    expect(decision(stopAt(root, 's2'))).toMatchObject({ decision: 'block' });
+  });
+
+  it('is satisfied by a trivial passing command: evidence of effort, not proof', () => {
+    const root = project();
+    start(root);
+    edit(root);
+    ran(root, 'node --test --test-name-pattern=nothing-matches');
+    expect(stopAt(root)).toBeNull();
+  });
+
+  it('records no pass for a command that is not a verification runner', () => {
+    const root = project();
+    start(root);
+    edit(root);
+    ran(root, 'echo tests passed');
+    expect(decision(stopAt(root))).toMatchObject({ decision: 'block' });
+  });
+
+  it('with the observer switched off, still blocks on edits after the first stop', () => {
+    const root = project();
+    fs.appendFileSync(path.join(root, '.meowkit/config.yaml'), '  verification-evidence: false\n');
+    expect(stopAt(root)).toBeNull();
+    edit(root);
+    expect(decision(stopAt(root))).toMatchObject({ decision: 'block' });
   });
 });
 
-describe('a security block beats otherwise-valid evidence', () => {
-  const handler = loadHandler();
-
-  it('blocks even when an evaluator verdict is present', () => {
-    const root = project({
-      '.meowkit/state/verification-required.json': VERIFICATION_REQUIRED,
-      '.meowkit/state/active-plan.json': ACTIVE_PLAN,
-      [`${PLAN_DIR}/plan.md`]: '# plan\n',
-      [`tasks/reviews/261101-${SLUG}-evalverdict.md`]: PASSING_VERDICT,
-      [`tasks/reviews/261101-${SLUG}-security-verdict.md`]: FAILING_SECURITY,
-    });
-    const result = handler({ root, session_id: 's9' });
-    expect(decision(result).decision).toBe('block');
-    expect(decision(result).reason).toContain('Security verdict');
-    // Nothing is counted against the attempt cap: a security finding is not a
-    // missing artifact that three more tries would produce.
-    expect(fs.existsSync(path.join(root, '.meowkit/state/precompletion-attempts.json'))).toBe(false);
+describe('which commands count as a verification pass', () => {
+  it.each([
+    ['npm test', 'test'],
+    ['pnpm run test -- --run', 'test'],
+    ['npx vitest run src', 'test'],
+    ['cargo test --workspace', 'test'],
+    ['CI=1 pytest -q', 'test'],
+    ['cd pkg && go test ./...', 'test'],
+    ['tsc --noEmit', 'typecheck'],
+    ['npm run lint', 'lint'],
+    ['cargo build', 'build'],
+  ])('%s is %s', (command, cls) => {
+    expect(core.classifyCommand(command)).toBe(cls);
   });
 
-  it('allows the stop once the security verdict passes', () => {
-    const root = project({
-      '.meowkit/state/verification-required.json': VERIFICATION_REQUIRED,
-      '.meowkit/state/active-plan.json': ACTIVE_PLAN,
-      [`${PLAN_DIR}/plan.md`]: '# plan\n',
-      [`tasks/reviews/261101-${SLUG}-evalverdict.md`]: PASSING_VERDICT,
-      [`tasks/reviews/261101-${SLUG}-security-verdict.md`]: PASSING_VERDICT.replace('# Verdict', '# Security Verdict'),
-    });
-    expect(handler({ root, session_id: 's10' })).toBeNull();
-  });
+  it.each(['npm test | tail -5', 'npm test; true', 'npm test || true', 'npm test &', 'echo $(npm test)', 'git commit -m test', 'cat test.log'])(
+    '%s is not a pass, because its exit status is not the runner\'s',
+    (command) => {
+      expect(core.classifyCommand(command)).toBeNull();
+    },
+  );
 });

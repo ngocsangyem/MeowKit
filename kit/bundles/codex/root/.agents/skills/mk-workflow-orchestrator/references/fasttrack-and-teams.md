@@ -4,7 +4,7 @@
 
 ## Fast-Track Mode
 
-**When:** User provides complete specs. Skips Phase 1, auto-executes Phases 2-5 without approval gates.
+**When:** User provides complete specs. Skips Phase 1 and runs Phases 2-5 without pausing.
 
 **Triggers:** `fasttrack: <specs>` | `workflow:fasttrack <file>` | "just build it"
 
@@ -12,7 +12,7 @@
 
 Overview, Requirements, Technical Design, API/Interfaces, Data Model, Acceptance Criteria. If missing: ask user.
 
-### Execution: Phase 2 → 3 → 4 → 5 (no approval gates, stops only on errors)
+### Execution: Phase 2 → 3 → 4 → 5 (no pauses, stops only on errors)
 
 | Condition                   | Phase | Action                           |
 | --------------------------- | ----- | -------------------------------- |
@@ -22,11 +22,11 @@ Overview, Requirements, Technical Design, API/Interfaces, Data Model, Acceptance
 | Coverage below 80%          | 5     | Add tests, retry twice, then ask |
 | Token limit warning         | Any   | Save state and handoff           |
 
-### Switching: standard → fasttrack ("approve phase 1, then fasttrack"), fasttrack → standard (on error, auto-switches)
+### Switching: standard → fasttrack ("agree phase 1, then fasttrack"), fasttrack → standard (on error, auto-switches)
 
 ## Agent Teams Mode (Experimental)
 
-**Gate:** ONLY for Deep complexity with 2+ domains scoring >=50. Quick/Standard use single-agent.
+**Condition:** ONLY for Deep complexity with 2+ domains scoring >=50. Quick/Standard use single-agent.
 
 ### Phase Team Composition
 
@@ -67,7 +67,7 @@ workflow:status   → Shows current phase, completed phases, pending tasks
 
 Phase-specific context is loaded from the kit's built-in rules:
 
-- Phase 1: AGENTS.md (Gates) (Gate 1 approval)
+- Phase 1: AGENTS.md (Planning, review and the ship check) (planning as a practice)
 - Phase 2-3: AGENTS.md (Development / TDD) (RED/GREEN enforcement)
-- Phase 4: AGENTS.md (Gates) (Gate 2 approval) + AGENTS.md (Security)
+- Phase 4: AGENTS.md (Planning, review and the ship check) (review as a practice) + AGENTS.md (Security)
 - Phase 5: AGENTS.md (Development) (pre-commit checks)

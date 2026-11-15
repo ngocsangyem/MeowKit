@@ -49,7 +49,7 @@ jobs:
       - name: Sequential-thinking script tests
         run: bash .claude/skills/sequential-thinking/scripts/test-scripts.sh
 
-      - name: Cook gate contract tests
+      - name: Cook workflow contract tests
         run: bash .claude/skills/cook/scripts/test-scripts.sh
 
       - name: Fix skill contract tests
@@ -148,6 +148,9 @@ jobs:
 
       - name: Validate skill cross-refs
         run: bash scripts/check-skill-cross-refs.sh
+
+      - name: Cross-ref checker catches a seeded dead path
+        run: bash tests/skill-cross-refs.test.sh
 
       # Skills reach their own files without `.claude/`, every other kit reference has a
       # declared class and resolves to a shipped file, and every tool name is in the table.

@@ -10,49 +10,10 @@
 // Emits: human-readable model detection line to stdout (reaches model via SessionStart)
 
 const { configValue } = require('../lib/read-config.cjs');
+const { lookup } = require('../lib/density-lookup.cjs');
 
-const MODEL_TIERS = {
-  // Opus models → COMPLEX
-  'claude-opus-4-6': { tier: 'COMPLEX', density: 'LEAN' },
-  'claude-opus-4-5': { tier: 'COMPLEX', density: 'FULL' },
-  'claude-opus-4': { tier: 'COMPLEX', density: 'FULL' },
-  // Sonnet models → STANDARD
-  'claude-sonnet-4-6': { tier: 'STANDARD', density: 'FULL' },
-  'claude-sonnet-4-5': { tier: 'STANDARD', density: 'FULL' },
-  'claude-sonnet-4': { tier: 'STANDARD', density: 'FULL' },
-  // Haiku models → TRIVIAL
-  'claude-haiku-4-5': { tier: 'TRIVIAL', density: 'MINIMAL' },
-  'claude-haiku-4': { tier: 'TRIVIAL', density: 'MINIMAL' },
-};
-
-// Match model ID to tier by prefix (handles version suffixes like -20251001)
-function classifyModel(modelId) {
-  if (!modelId) return null;
-  const normalized = modelId.toLowerCase();
-
-  // Try exact match first
-  if (MODEL_TIERS[normalized]) {
-    return { ...MODEL_TIERS[normalized], match: 'exact' };
-  }
-
-  // Try prefix match (handles date suffixes)
-  for (const [key, value] of Object.entries(MODEL_TIERS)) {
-    if (normalized.startsWith(key)) {
-      return { ...value, match: 'prefix' };
-    }
-  }
-
-  // Fallback: classify by model family keyword
-  if (normalized.includes('opus')) {
-    // Opus 4.6+ gets LEAN density; older Opus gets FULL
-    const density = normalized.includes('4-6') || normalized.includes('4.6') ? 'LEAN' : 'FULL';
-    return { tier: 'COMPLEX', density, match: 'keyword' };
-  }
-  if (normalized.includes('sonnet')) return { tier: 'STANDARD', density: 'FULL', match: 'keyword' };
-  if (normalized.includes('haiku')) return { tier: 'TRIVIAL', density: 'MINIMAL', match: 'keyword' };
-
-  return null;
-}
+// Model id → tier and density: one table shared with the autobuild density script.
+const classifyModel = lookup;
 
 module.exports = function modelDetector(ctx, state) {
   // CF2 fix: dispatch.cjs already routes only SessionStart events to this handler.

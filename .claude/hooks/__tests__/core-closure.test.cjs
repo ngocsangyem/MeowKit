@@ -52,8 +52,9 @@ for (const [name, entry] of Object.entries(closure.behaviours)) {
 }
 
 test('the bundled set is the shared behaviours plus the runtime adapter, nothing else', () => {
-  const shared = new Set(['hook-runtime.cjs']);
-  for (const name of ['plan-gate', 'privacy']) {
+  // The completion-check core requires only node built-ins; the Codex and Cursor stop hooks load it.
+  const shared = new Set(['hook-runtime.cjs', 'core/completion-check.cjs']);
+  for (const name of ['privacy', 'pre-ship']) {
     for (const file of closure.behaviours[name].lib) if (file !== 'parse-stdin.cjs') shared.add(file);
   }
   for (const file of graph(path.join(LIB, 'hook-runtime.cjs')).lib) shared.add(file);

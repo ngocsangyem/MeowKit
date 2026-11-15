@@ -31,12 +31,15 @@ fn installs_into_a_project_and_strips_back_byte_for_byte() {
     assert!(agents.contains("<!-- mewkit:begin meowkit -->"));
     let hooks: Value = serde_json::from_str(&p.read(".codex/hooks.json")).unwrap();
     let pre = hooks["hooks"]["PreToolUse"].as_array().unwrap();
+    // The user's own handler, then the bundle's two Bash guards: the privacy
+    // block and the ship check. The kit registers no other PreToolUse group,
+    // so the merge lands entirely in the user's.
     assert_eq!(
         pre[0]["hooks"].as_array().unwrap().len(),
-        2,
-        "kit handler joins the user's Bash group"
+        3,
+        "the kit handlers join the user's Bash group"
     );
-    assert!(pre.iter().any(|g| g["matcher"] == "apply_patch|Edit|Write"));
+    assert_eq!(pre.len(), 1, "the kit adds no second PreToolUse group");
     assert!(
         p.read(".codex/config.toml")
             .contains("project_doc_max_bytes = 32768")

@@ -37,7 +37,7 @@ Output: delta findings (new issues introduced, prior issues resolved). Do NOT is
 
 Re-review only items still unresolved from Pass 1 and Pass 2. No new scope expansion.
 
-Output: single final verdict (PASS / WARN / FAIL) across all 5 dimensions. This verdict is the Gate 2 input.
+Output: single final verdict (PASS / WARN / FAIL) across all 5 dimensions. This verdict is what the user reads before shipping.
 
 If Pass 3 still has unresolved CRITICAL items → FAIL verdict, escalate to user.
 
@@ -47,7 +47,7 @@ If Pass 3 still has unresolved CRITICAL items → FAIL verdict, escalate to user
 
 **Developer never self-evaluates.** The developer who made the changes cannot serve as reviewer for any of the 3 passes.
 
-Violating either rule invalidates the review. Gate 2 cannot be presented from a compromised review.
+Violating either rule invalidates the review: a compromised review yields no verdict, and the run says so rather than emitting one.
 
 ## Exit Condition
 
@@ -57,8 +57,8 @@ The iterative process exits when:
 
 Or when Pass 3 completes (maximum — do not run Pass 4 under any circumstances).
 
-## Gate 2 Integration
+## Verdict Integration
 
-The iterative evaluation protocol produces a single final verdict, identical in format to the standard review verdict. Gate 2 receives this verdict and applies the same approval rules.
+The iterative evaluation protocol produces a single final verdict, identical in format to the standard review verdict, and the same verdict rules apply to it.
 
 The iterative process replaces steps 02-03 of the standard workflow. Step-04 (verdict) runs once, after Pass 3, using the cumulative findings from all 3 passes.

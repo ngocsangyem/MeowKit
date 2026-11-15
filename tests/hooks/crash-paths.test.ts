@@ -39,14 +39,6 @@ const PAYLOAD = JSON.stringify({
 
 const ENTRYPOINTS: Entrypoint[] = [
   {
-    name: 'gate-enforcement',
-    file: '.claude/hooks/gate-enforcement.cjs',
-    marker: '@@GATE_BLOCK@@',
-    lib: '.claude/hooks/lib/gate1-path-rules.cjs',
-    libExport: 'isContractFile',
-    stdin: PAYLOAD,
-  },
-  {
     name: 'privacy-block',
     file: '.claude/hooks/privacy-block.cjs',
     marker: '@@PRIVACY_BLOCK@@',
@@ -58,8 +50,8 @@ const ENTRYPOINTS: Entrypoint[] = [
     name: 'pre-ship',
     file: '.claude/hooks/pre-ship.cjs',
     marker: '@@GATE_BLOCK@@',
-    lib: '.claude/hooks/lib/gate2-check.cjs',
-    libExport: 'gate2Check',
+    lib: '.claude/hooks/lib/ship-command.cjs',
+    libExport: 'parseShipCommand',
     stdin: PAYLOAD,
   },
 ];
@@ -120,7 +112,7 @@ describe('safety entrypoints fail closed on every crash path', () => {
   it('covers every entrypoint against every scenario', () => {
     // Guards the shape of the matrix: dropping an entrypoint or a scenario would
     // otherwise quietly shrink the proof rather than fail.
-    expect(ENTRYPOINTS).toHaveLength(3);
+    expect(ENTRYPOINTS).toHaveLength(2);
     expect(SCENARIOS).toHaveLength(5);
   });
 });

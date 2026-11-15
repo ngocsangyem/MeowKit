@@ -14,16 +14,11 @@
 
 /**
  * Hooks that may never be switched off, each with why, for the rejection
- * message. Four are the gate and ship path, three are the hard-blocking guards.
- * `gate2-check` is a library rather than a registration, and is on the list
- * anyway because a user will reasonably try the name — an unknown-key error
- * would be true but unhelpful.
+ * message: the credential guard, the ship check, and the hard-blocking guards.
  */
 const PROTECTED_REASON = {
-  'gate-enforcement': 'Gate 1 blocks source writes before the plan is approved',
   'privacy-block': 'it blocks reads of credential files',
-  'pre-ship': 'it proves Gate 2 before a commit, push or merge',
-  'gate2-check': 'it is the Gate 2 proof the ship path runs',
+  'pre-ship': 'it runs lint, related tests and type-check before a commit, push or merge',
   'check-careful': 'it is a hard-blocking guard',
   'check-freeze': 'it is a hard-blocking guard',
   'check-report-path': 'it is a hard-blocking guard',
@@ -45,8 +40,8 @@ const STATE_ONLY_KEYS = {
 
 /** Key prefixes that are rejected outright rather than being unknown keys. */
 const FORBIDDEN_NAMESPACES = {
-  gates: 'gate behaviour is not configurable from any file, at any scope',
-  paths: 'a configurable workflow path would move writes out of the gate rules that key off it',
+  gates: 'MeowKit has no configurable gates; the ship check is not a preference',
+  paths: 'a configurable workflow path would move writes out of the paths the guards key off',
 };
 
 /** Scalar keys with a fixed name. `enum` constrains a string key. */

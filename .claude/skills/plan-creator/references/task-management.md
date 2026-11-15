@@ -132,7 +132,7 @@ if new_status != current_status:
 
 ### Anti-patterns
 
-- ❌ "Stamp at creation" — writing `status: completed` when scaffolding the phase file. Defeats Gate 1, breaks cook re-hydration (phases skip as "completed").
+- ❌ "Stamp at creation" — writing `status: completed` when scaffolding the phase file. Breaks cook re-hydration (phases skip as "completed").
 - ❌ "Stamp completed without counting `[x]`" — drift between frontmatter and todo state. The structural check (`mewkit plan check --structural`) catches this with a hard error.
 
 ### Cross-Skill Notes
@@ -162,7 +162,7 @@ The phase status enum has 7 values. Each has a documented producer (who writes i
 > `.plan-state.json` is deliberately absent from this matrix: its `status` / `tasks_completed` fields are DERIVED from the phase-file checkboxes (the authoritative producers above), written at hydration and regenerated at the final sync-back. Treat it as a regenerable cache, not a status producer — never hand-mutate it mid-run.
 
 ## Cook Handoff
-After Gate 1: output cook command with absolute path:
+Once the plan is agreed: output cook command with absolute path:
 ```bash
 /mk:cook /absolute/path/to/plans/YYMMDD-name/plan.md
 ```

@@ -1,4 +1,5 @@
 // loop-detection.cjs — PostToolUse handler: warn when same file edited too many times.
+// Advisory: the messages suggest a change of approach; no edit is refused.
 // Ported from post-write-loop-detection.sh. Same logic:
 //   track per-file edit count, warn at 4, escalate at 8.
 //
@@ -42,7 +43,7 @@ module.exports = function loopDetection(ctx, state) {
     return [
       '@@LOOP_DETECT_ESCALATE@@',
       `Max edit budget exceeded for ${filePath} (${count} edits this session).`,
-      'Halt and re-plan. Repeated small variations to the same file almost always indicate a flawed approach.',
+      'Advisory: consider re-planning. Repeated small variations to the same file usually indicate a flawed approach.',
       'Re-read the plan/contract, challenge your assumptions, and consider a different strategy before the next edit.',
       '@@END_LOOP_DETECT@@',
       '',

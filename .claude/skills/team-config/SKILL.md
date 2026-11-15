@@ -37,7 +37,7 @@ Sets up the infrastructure for parallel agent execution. Called by orchestrator 
 ## Setup Flow
 
 ```
-Plan approved (Gate 1)
+Plan agreed with the user
     ↓
 Orchestrator identifies parallel opportunity
     ↓

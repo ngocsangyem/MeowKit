@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-issue. Create, read, update and delet
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default
-memory: project
 color: blue
 owner: jira
 criticality: medium

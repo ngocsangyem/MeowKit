@@ -27,6 +27,19 @@ Source: prompt-crafting-for-different-models.md — Model Selection Strategy tab
 
 > Note: TRIVIAL (cosmetic: rename, typo, format) is distinct from MICRO-TASK (non-production logic <30 lines). MICRO-TASK is only relevant when TDD is enabled (`MEOWKIT_TDD=1` / `--tdd`) — it exempts non-production code from the RED-phase requirement. In default mode (TDD off), the exemption is moot since no RED gate exists. See .claude/skills/cook/references/tdd-rules.md.
 
+## Agent `model:` Pins
+
+An agent's `model:` frontmatter follows its tier in the table above. Pins are not changed per task; the tier declared for a task picks which agent runs, not which model that agent uses.
+
+| Agent tier | `model:` value | Agents |
+| --- | --- | --- |
+| COMPLEX (design, review, security, judgment) | `claude-opus-5` | architect, brainstormer, developer, evaluator, planner, reviewer, security, ui-ux-designer, confluence-spec-analyst, jira-analyst, jira-estimator, jira-evaluator |
+| STANDARD (implementation support, research, multi-step integration work) | `sonnet` | analyst, journal-writer, orchestrator, researcher, tester, confluence-bulk, confluence-page, jira-admin, jira-bulk, jira-collaborate, jira-dev, jira-jsm, jira-lifecycle |
+| TRIVIAL (mechanical, single-call or report-only) | `haiku` | documenter, explore, git-manager, project-manager, shipper, story-sizer, confluence-collaborate, confluence-search, jira-agile, jira-fields, jira-issue, jira-ops, jira-relationships, jira-search, jira-time |
+| Strategy consult (one recommendation, no lifecycle phase) | `fable` | advisor, athena |
+
+A new agent takes the pin of its tier.
+
 ## Rules
 
 ### Rule 1: Declare before work

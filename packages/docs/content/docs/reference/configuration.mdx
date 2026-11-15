@@ -47,7 +47,7 @@ tdd: false
 
 budget:
   warn: 30     # USD, prints a warning
-  block: 100   # USD, blocks further work
+  block: 100   # USD, prints an over-budget notice (advisory)
 
 hooks:
   build-verify: false   # switch one observer off
@@ -183,8 +183,8 @@ These are keys in `.meowkit/config.yaml`, not environment variables.
 |-----|---------|---------|-------------|
 | `autobuild.mode` | *(auto-detected)* | Override scaffolding density: `MINIMAL` (Haiku), `FULL` (Sonnet/Opus 4.5), `LEAN` (Opus 4.6+) | When auto-detection picks wrong density. Does NOT bypass gates — a project config saying `LEAN` still faces the sprint-contract gate, and `mewkit doctor` says so. |
 | `budget.warn` | `30` | USD threshold for budget warning message | Lower for cost-conscious sessions, higher for long research runs. |
-| `budget.block` | `100` | USD threshold for hard session block | Emergency brake. Session halts at this amount. |
-| `budget.cap` | *(none)* | User override for hard block — can be lower OR higher than `budget.block` | `budget.cap: 200` for intentional high-budget harness runs, `15` for tight budgets. |
+| `budget.block` | `100` | USD threshold for the over-budget notice | Advisory: the notice is printed and nothing is stopped. |
+| `budget.cap` | *(none)* | Overrides `budget.block` — can be lower OR higher | `budget.cap: 200` for intentional high-budget harness runs, `15` for tight budgets. |
 
 `MEOWKIT_RUN_ID` stays in the environment: it is a per-invocation handoff set by
 `mk:autobuild` step-00, which a committed file cannot carry.

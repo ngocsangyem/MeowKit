@@ -11,19 +11,19 @@
 [42]{agent_file,type,role,source,workflow_phases,auto_activate,ce_version,last_improved}
 `orchestrator.md`|Core|Task router, complexity classification, model tier assignment|original|Phase 0 (Orient)|Yes — every task|260326|260326
 `explore.md`|Support|Fast read-only codebase search and orientation: locates code, traces call/data paths, reports `path:line` evidence|original|Phase 0 (Orient), any|Routed by orchestrator or explicit|260725|260725
-`planner.md`|Core|Two-lens planning (product + engineering) + product-level mode for green-field builds, Gate 1 enforcement|original|Phase 1 (Plan)|Routed by orchestrator|260326|260408
+`planner.md`|Core|Two-lens planning (product + engineering) + product-level mode for green-field builds|original|Phase 1 (Plan)|Routed by orchestrator|260326|260408
 `brainstormer.md`|Support|Solution brainstorming, architecture evaluation, trade-off analysis|Credit: Duy Nguyen|Phase 1 (Plan)|Routed by orchestrator or explicit|260326|260326
 `advisor.md`|Support|Reframe-then-recommend advisory executor: interviews one question per turn, confirms the real problem, emits ONE verdict packet|original|on-demand|Invoked ONLY by mk:advise — never orchestrator-routed|260715|260715
-`athena.md`|Intelligence|Strategic intelligence and lifecycle supervisor: assesses difficult situations, recommends an operational direction, then GUIDE/RESCUE/REVIEW/RECHECK for an opted-in run; holds no gate authority|original|on-demand|Explicit direct consult where runtime supports it, or named `--advice` checkpoints; never orchestrator-routed|260726|260726
+`athena.md`|Intelligence|Strategic intelligence and lifecycle supervisor: assesses difficult situations, recommends an operational direction, then GUIDE/RESCUE/REVIEW/RECHECK for an opted-in run; holds no approval authority|original|on-demand|Explicit direct consult where runtime supports it, or named `--advice` checkpoints; never orchestrator-routed|260726|260726
 `researcher.md`|Support|Technology research, library evaluation, documentation gathering|Credit: Duy Nguyen|Phase 0, 1, 4|Routed by orchestrator or explicit|260326|260326
 `architect.md`|Core|ADR generation, system design, architecture review|original|Phase 1 (Plan)|Routed by orchestrator for complex tasks|260326|260326
 `tester.md`|Core|Test writing; TDD enforcement (red/green/refactor) when `--tdd` / `MEOWKIT_TDD=1`; non-blocking test writing in default mode|original|Phase 2 (Test)|Routed by orchestrator (always in TDD mode; on-request in default mode)|260326|260409
 `security.md`|Core|Risk-triggered deep security audit, BLOCK verdicts, platform-specific rules; deterministic post-write scan|original|Phase 2, 4|Deep audit on flagged risk surfaces; post-write scan on every write|260326|260326
 `developer.md`|Core|Implementation per approved plan; strict TDD when `--tdd` / `MEOWKIT_TDD=1`; direct implementation in default mode; self-healing|original|Phase 3 (Build)|Routed by orchestrator (after tester in TDD mode; directly after planner in default mode)|260326|260409
 `ui-ux-designer.md`|Support|UI design, design systems, accessibility, responsive layouts|original|Phase 3 (Build GREEN)|Routed when frontend detected|260326|260330
-`reviewer.md`|Core|5-dimension code review, Gate 2 enforcement, adversarial personas, artifact verification|original|Phase 4 (Review)|Routed by orchestrator after developer|260326|260331
+`reviewer.md`|Core|5-dimension code review, review verdict, adversarial personas, artifact verification|original|Phase 4 (Review)|Routed by orchestrator after developer|260326|260331
 `evaluator.md`|Core|Behavioral active-verification of running builds against rubric library; skeptic persona; produces graded verdict with concrete runtime evidence (screenshots/curl/CLI). Distinct from reviewer (structural).|original|Phase 3 (active verification) + Phase 4 (contract reviewer)|Routed by harness after generator iteration; explicit via /mk:evaluate|260408|260408
-`shipper.md`|Core|Deployment pipeline, conventional commits, PR creation|original|Phase 5 (Ship)|Routed by orchestrator after Gate 2|260326|260326
+`shipper.md`|Core|Deployment pipeline, conventional commits, PR creation|original|Phase 5 (Ship)|Routed by orchestrator after review|260326|260326
 `git-manager.md`|Support|Git operations: stage, commit, push with conventional commits|Adapted from external skill patterns|Phase 5 (Ship), any|On "commit"/"push" request|260329|260329
 `documenter.md`|Core|Living documentation, changelog generation, docs sync|original|Phase 6 (Reflect)|Routed by orchestrator after ship|260326|260326
 `analyst.md`|Core|Cost tracking, pattern extraction, lessons learned|original|Phase 0, 6|Auto at session start/end|260326|260326

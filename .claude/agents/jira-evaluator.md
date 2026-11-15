@@ -1,7 +1,7 @@
 ---
 name: jira-evaluator
 description: 'mk:jira executor for mk:jira-evaluator. Complexity and inconsistency scoring.'
-tools: Bash, Read, Grep, Glob, Write
+tools: Bash, Read, Grep, Glob, Write, Edit
 model: claude-opus-5
 permissionMode: default
 memory: project

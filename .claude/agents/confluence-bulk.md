@@ -4,7 +4,6 @@ description: 'mk:confluence executor for mk:confluence-bulk. Sweeps over 10+ pag
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default
-memory: project
 color: red
 owner: confluence
 criticality: medium

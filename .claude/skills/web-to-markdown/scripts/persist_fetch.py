@@ -58,7 +58,7 @@ PROJECT_ROOT = _find_project_root()
 CACHE_ROOT = PROJECT_ROOT / ".meowkit" / "cache" / "web-fetches"
 QUARANTINE_DIR = CACHE_ROOT / "quarantine"
 MANIFEST_PATH = CACHE_ROOT / "index.jsonl"
-# Canonical destination named by `.claude/rules/gate-rules.md` (Recording Human Interventions): the
+# Canonical destination named by `.claude/rules/meowkit-core.md` (Recording Human Overrides): the
 # telemetry class, NOT `.meowkit/memory/`. `_log_security` appends the finding description
 # — a description of the attacker payload — plus the quarantine path. The memory store is
 # committed and grep-read back as DATA by the read-set skills, so logging a quarantine

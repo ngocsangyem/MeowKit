@@ -65,7 +65,7 @@ Validation complete: {plan_dir}/plan.md
 
 ## Rules
 
-- This subcommand does NOT run red-team, semantic checks, or Gate 1
+- This subcommand does NOT run red-team, semantic checks, or the plan presentation
 - It ONLY runs the validation interview (step-06)
 - Answers are propagated directly to existing plan files
 - Can be run multiple times on the same plan (new sessions append to Validation Log)

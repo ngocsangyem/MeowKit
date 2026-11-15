@@ -50,7 +50,8 @@ Task(
     Draft 5–15 ACs in Given/When/Then form. Each must have a Verification line and a Rubric tie-in.
 
     Save to tasks/contracts/{date-time}-{slug}-sprint-1.md.
-    Run validate-contract.cjs to confirm schema clean.
+    Re-read the draft against assets/contract-template.md to confirm every section
+    and every AC form is present.
 
     Work context: $(pwd)
   "
@@ -81,10 +82,13 @@ contract_path=$(ls -t tasks/contracts/*-${slug}-sprint-1.md | head -1)
 
 ### 2c. Verify both signatures present
 
-```node .claude/skills/sprint-contract/scripts/check-contract-signed.cjs
+```bash
+grep -E '^(generator_signed|evaluator_signed|status):' "$contract_path"
 ```
 
-Must exit 0. If exit 1, the autobuild workflow halts — escalate to user.
+Both signature fields must hold a real commit SHA and `status` must be `signed`. A
+placeholder (`null`, `pending`, `todo`, empty) means that agent has not signed: the
+autobuild workflow halts — escalate to user.
 
 ### 2d. Append to run report
 

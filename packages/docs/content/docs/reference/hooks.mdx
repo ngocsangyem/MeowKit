@@ -274,17 +274,16 @@ Script paths, timeouts, and matcher chains are intentionally not listed; read
 
 | Event | Purpose | Can it block? |
 |---|---|---|
-| `PostToolUse` | Dispatch | Advisory |
-| `PostToolUseFailure` | Dispatch | Advisory |
-| `PreCompact` | Dispatch | Advisory |
+| `PostToolUse` | Dispatch | **Blocking** |
+| `PostToolUseFailure` | Dispatch | **Blocking** |
+| `PreCompact` | Dispatch | **Blocking** |
 | `PreToolUse` | Checking file access permissions | **Blocking** |
-| `PreToolUse` | Checking Gate 1 approval | **Blocking** |
 | `PreToolUse` | Checking web fetch targets | **Blocking** |
-| `PreToolUse` | Dispatch | Advisory |
-| `PreToolUse` | Running pre-ship validation | **Blocking** |
-| `SessionStart` | Dispatch | Advisory |
-| `Stop` | Dispatch | Advisory |
-| `UserPromptSubmit` | Dispatch | Advisory |
+| `PreToolUse` | Dispatch | **Blocking** |
+| `PreToolUse` | Running ship check (lint, related tests, type-check) | **Blocking** |
+| `SessionStart` | Dispatch | **Blocking** |
+| `Stop` | Dispatch | **Blocking** |
+| `UserPromptSubmit` | Dispatch | **Blocking** |
 
 Registered with no hooks today: `SubagentStart`, `SubagentStop`.
 

@@ -8,6 +8,7 @@ use mewkit_adapters::contract::{OwnershipIndex, RelPath, Runtime};
 use serde_json::Value;
 
 use super::hook_commands::{ROOT, kit_scripts, normalize, script_token};
+use super::host_config::{ConfigRead, config_text};
 use super::{Check, Status};
 use crate::kit_args::installed_kit;
 use crate::place::Place;
@@ -25,7 +26,7 @@ pub fn checks(place: &Place, runtime: Runtime, index: &OwnershipIndex) -> Vec<Ch
     out
 }
 
-fn hook_file(runtime: Runtime) -> &'static str {
+pub(super) fn hook_file(runtime: Runtime) -> &'static str {
     match runtime {
         Runtime::ClaudeCode => ".claude/settings.json",
         Runtime::Codex => ".codex/hooks.json",
@@ -33,32 +34,34 @@ fn hook_file(runtime: Runtime) -> &'static str {
     }
 }
 
-/// Every kit hook script the hook file names must exist.
-fn scripts(place: &Place, runtime: Runtime) -> Check {
-    let name = format!("{} hooks ({})", runtime.name(), place.label());
-    let file = place
+/// Where `runtime`'s hook registrations live at `place`, whether or not the
+/// file is there.
+pub(super) fn hook_path(place: &Place, runtime: Runtime) -> PathBuf {
+    place
         .scope
-        .resolve(&RelPath::new(hook_file(runtime)).expect("static path"));
-    let Ok(text) = std::fs::read_to_string(&file) else {
-        return Check::new(
-            name,
-            Status::Warn,
-            format!(
-                "{} is missing, so no kit hook runs; `mewkit upgrade --force` registers them again",
-                file.display()
-            ),
-        );
-    };
-    let Ok(doc) = serde_json::from_str::<Value>(&text) else {
-        return Check::new(
-            name,
-            Status::Fail,
-            format!("{} is not valid JSON", file.display()),
-        );
-    };
+        .resolve(&RelPath::new(hook_file(runtime)).expect("static path"))
+}
+
+/// The hook file at `place` and what it says, or `None` when there is no file,
+/// it cannot be read under the cap, or it is not JSON. The rows that report on
+/// registrations each say that in their own words, so the distinction is theirs
+/// to draw and not this reader's.
+///
+/// The read is bounded: this is called for the hook file of every runtime at
+/// every scope, installed or not, so it reaches `~/.claude/settings.json` on a
+/// machine where nothing was installed — a path whose contents are entirely
+/// outside this project's control.
+pub(super) fn hook_doc(place: &Place, runtime: Runtime) -> Option<(PathBuf, Value)> {
+    let file = hook_path(place, runtime);
+    let doc = serde_json::from_str::<Value>(&config_text(&file).text()?).ok()?;
+    Some((file, doc))
+}
+
+/// Every kit script path the document registers, root forms normalized.
+pub(super) fn registered(doc: &Value) -> Vec<String> {
     let mut strings = Vec::new();
     collect(&doc["hooks"], &mut strings);
-    let scripts: Vec<String> = strings
+    strings
         .iter()
         .flat_map(|(s, whole)| {
             if *whole {
@@ -67,13 +70,52 @@ fn scripts(place: &Place, runtime: Runtime) -> Check {
                 kit_scripts(s)
             }
         })
-        .collect();
-    // Cursor runs user hooks from `~/.cursor/`, so a global install's
-    // relative paths start there; every other hook file runs from the root.
-    let base = match (runtime, place.scope.kind) {
+        .collect()
+}
+
+/// Where a registration's relative path starts. Cursor runs user hooks from
+/// `~/.cursor/`, so a global install's relative paths begin there; every other
+/// hook file runs from the root.
+pub(super) fn base_dir<'a>(place: &'a Place, runtime: Runtime, file: &'a Path) -> &'a Path {
+    match (runtime, place.scope.kind) {
         (Runtime::Cursor, ScopeKind::Global) => file.parent().unwrap_or(&place.scope.root),
         _ => &place.scope.root,
+    }
+}
+
+/// Every kit hook script the hook file names must exist.
+fn scripts(place: &Place, runtime: Runtime) -> Check {
+    let name = format!("{} hooks ({})", runtime.name(), place.label());
+    let file = hook_path(place, runtime);
+    let text = match config_text(&file) {
+        ConfigRead::Text(text) => text,
+        // Absent and unusable are one answer here — a named pipe or a file
+        // past the cap registers nothing, exactly as a missing file does — but
+        // the message says which, because the fixes differ.
+        other => {
+            let why = match other {
+                ConfigRead::Absent => "is missing",
+                _ => "is not a readable file of a sane size",
+            };
+            return Check::new(
+                name,
+                Status::Warn,
+                format!(
+                    "{} {why}, so no kit hook runs; `mewkit upgrade --force` registers them again",
+                    file.display()
+                ),
+            );
+        }
     };
+    let Ok(doc) = serde_json::from_str::<Value>(&text) else {
+        return Check::new(
+            name,
+            Status::Fail,
+            format!("{} is not valid JSON", file.display()),
+        );
+    };
+    let scripts = registered(&doc);
+    let base = base_dir(place, runtime, &file);
     let missing: Vec<&String> = scripts
         .iter()
         .filter(|s| !resolve(base, s).is_file())
@@ -122,7 +164,7 @@ fn collect(v: &Value, out: &mut Vec<(String, bool)>) {
     }
 }
 
-fn resolve(root: &Path, token: &str) -> PathBuf {
+pub(super) fn resolve(root: &Path, token: &str) -> PathBuf {
     let t = token.trim_start_matches(ROOT).trim_start_matches("./");
     let p = Path::new(t);
     if p.is_absolute() {

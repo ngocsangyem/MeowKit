@@ -2,8 +2,7 @@
 // hook-corpus-fs.cjs — file-tree and git builders for the BASE hook golden corpus.
 //
 // Every case gets a fresh throwaway "project": a copy of the extracted BASE
-// hook tree plus whatever plans, contracts, verdicts, state files or git
-// history that case needs. Artifact bodies live in hook-corpus-content.cjs.
+// hook tree plus whatever state files or git history that case needs.
 
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
@@ -43,12 +42,6 @@ function newProject(baseTree, projectDir) {
   return projectDir;
 }
 
-/** Deterministic mtimes: gate-enforcement picks the newest plan by mtime. */
-function setMtime(root, rel, epochSeconds) {
-  const abs = path.join(root, rel);
-  fs.utimesSync(abs, epochSeconds, epochSeconds);
-}
-
 function git(projectDir, args, home) {
   return execFileSync('git', args, {
     cwd: projectDir,
@@ -61,7 +54,7 @@ function git(projectDir, args, home) {
 /**
  * Initialise a git repo with one commit, then optionally stage more files.
  * The pinned identity and dates in `pinnedEnv` make the resulting SHAs stable,
- * which the Gate 2 revision-binding fixtures depend on.
+ * so recorded output that names a commit replays unchanged.
  */
 function initGit(projectDir, home, { commit = [], stage = [], untracked = [] } = {}) {
   git(projectDir, ['init', '-q', '-b', 'main'], home);
@@ -74,38 +67,6 @@ function initGit(projectDir, home, { commit = [], stage = [], untracked = [] } =
   if (stage.length) git(projectDir, ['add', ...stage.map(([rel]) => rel)], home);
   for (const [rel, content] of untracked) writeFile(projectDir, rel, content);
   return git(projectDir, ['rev-parse', '--short', 'HEAD'], home).trim();
-}
-
-/**
- * Stamp a fresh approval receipt using the helper in the tree under test, so the
- * stored hash is produced by the same code the gate verifies with.
- *
- * The two implementations are reached differently: the shell one is a CLI
- * invoked with `sh` (its file is mode 644, which is also how the gate calls it),
- * and the node one is a library loaded in a child process. Hard-coding either
- * would make this helper work for one tree and silently fail for the other.
- */
-function stampApproval(ctx, planRel) {
-  const run = (command, args) =>
-    execFileSync(command, args, {
-      cwd: ctx.projectDir,
-      env: pinnedEnv(ctx.home),
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-
-  if ((ctx.ext || '.sh') === '.cjs') {
-    const lib = path.join(ctx.projectDir, '.claude/hooks/lib/approval-receipt.cjs');
-    run(process.execPath, ['-e', `require(${JSON.stringify(lib)}).stamp(${JSON.stringify(planRel)}, "human")`]);
-    return;
-  }
-  run('sh', [path.join(ctx.projectDir, '.claude/hooks/lib/approval-receipt.sh'), 'stamp', planRel, 'human']);
-}
-
-/** Stamp an approval and then edit the body, so the stored plan_hash goes stale. */
-function stampThenEdit(ctx, planRel) {
-  stampApproval(ctx, planRel);
-  fs.appendFileSync(path.join(ctx.projectDir, planRel), '\nAn edit made after approval.\n');
 }
 
 /** A node stub standing in for the resolved mewkit CLI (`MEOWKIT_CLI`). */
@@ -125,10 +86,6 @@ module.exports = {
   newProject,
   removeLib,
   removePath,
-  setMtime,
-  stampApproval,
-  stampThenEdit,
   writeFakeCli,
   writeFile,
-  ...require('./hook-corpus-content.cjs'),
 };

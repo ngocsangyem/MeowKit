@@ -17,17 +17,17 @@ mewkit review coverage --session <session-id> --json
   never waved through.
 - **`evidenceLevel: attested`** (CLI receipts without hook corroboration — the normal
   case for subagent-driven reviews on this host, per the capability spike): the review
-  may proceed to a verdict, but **Approve / Gate 2 PASS is capped** — `mewkit review
-  compose` (Phase 6) refuses PASS/Approve on an attested session. Disclose this in the
+  may proceed to a verdict, but **Approve is capped** — `mewkit review compose`
+  refuses PASS/Approve on an attested session. Disclose this in the
   verdict: "evidence level: attested — session-observed access recorded via CLI
   receipts; individual-reviewer provenance is not host-provable."
 - **`evidenceLevel: session-observed`** (hook-corroborated, driving-session reads):
   full Approve eligibility. **Honesty caveat:** the evidence logs are session-dir
   files the acting session can write, so `session-observed` is *anti-accidental*
   corroboration, not tamper-proof, and never establishes independent-reviewer
-  provenance. It is evidence a human reads at Gate 2, not authority that clears it.
+  provenance. It is evidence a human reads, not authority on its own.
 
-Skip this gate for branch-diff / `--pending` / commit reviews (no session).
+Skip this coverage check for branch-diff / `--pending` / commit reviews (no session).
 
 ## Zero-Finding Check (Forced-Finding Protocol)
 
@@ -48,12 +48,12 @@ Before categorizing, check total findings count from all reviewers (Phase A + Ph
 
 ### current-change
 Finding is directly caused by or related to the current diff.
-**Action:** Must be addressed before Gate 2 approval.
+**Action:** Must be addressed before the change ships.
 
 ### incidental
 Finding exists in code touched by the diff but is NOT caused by the current change.
 Pre-existing tech debt, style inconsistencies, or unrelated issues.
-**Action:** Log to `tasks/backlog/review-backlog.md` for future addressing. Does NOT block Gate 2.
+**Action:** Log to `tasks/backlog/review-backlog.md` for future addressing. Does NOT hold up this change.
 Create the file if it doesn't exist.
 
 ## Triage Rules

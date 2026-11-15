@@ -10,11 +10,11 @@
 // watching. That is exactly why the write guards are NOT routed through here —
 // they need the opposite behavior and are registered on their own.
 //
-// Two observers are an exception to "output is advisory", and both have their
-// output passed through rather than swallowed: the write scanner reports a
-// finding and fails the tool result, and the completion check answers with a
-// block decision. Both are emitted only AFTER every other observer has run, so
-// a block never costs the rest of the chain its turn.
+// Three observers are an exception to "output is advisory", and their output is
+// passed through rather than swallowed: the write scanner and the build check
+// report a failure the model sees (exit 2, stderr), and the opt-in completion
+// check answers with a JSON block decision. These are emitted only AFTER every
+// other observer has run, so a block never costs the rest of the chain its turn.
 //
 // Each handler is required lazily inside the try block. Loading them up front
 // would let one unparseable file take down the whole event.
@@ -41,6 +41,17 @@ function normalizeResult(value) {
     exitCode: Number.isInteger(value.exitCode) ? value.exitCode : 0,
     feedback: value.feedback === true,
   };
+}
+
+/** The object a stdout string holds when it is exactly one JSON object, else null. */
+function parseObject(text) {
+  if (typeof text !== 'string' || !text.trim().startsWith('{')) return null;
+  try {
+    const value = JSON.parse(text);
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
+  } catch {
+    return null;
+  }
 }
 
 async function callHandler(entry, ctx, state) {
@@ -99,12 +110,18 @@ async function main() {
     }
   }
 
+  // A feedback result may answer in the host's JSON form (a Stop block decision). The host
+  // parses stdout as JSON only when JSON is all there is, so when one does, the JSON objects
+  // are merged into the one stdout document and every other stdout line moves to stderr.
+  const hostJson = feedback.map((r) => parseObject(r.stdout)).filter(Boolean);
   let exitCode = 0;
   for (const result of [...advisory, ...feedback]) {
-    if (result.stdout) process.stdout.write(result.stdout);
+    const isJson = hostJson.length > 0 && parseObject(result.stdout) !== null;
+    if (result.stdout && !isJson) (hostJson.length ? process.stderr : process.stdout).write(result.stdout);
     if (result.stderr) process.stderr.write(result.stderr);
     if (result.exitCode > exitCode) exitCode = result.exitCode;
   }
+  if (hostJson.length) process.stdout.write(`${JSON.stringify(Object.assign({}, ...hostJson))}\n`);
   process.exit(exitCode);
 }
 

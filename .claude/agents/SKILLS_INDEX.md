@@ -10,7 +10,6 @@ Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 [13]{skill,owner,type,architecture}
 `mk:agent-detector`|orchestrator|utility|monolithic
 `mk:help`|orchestrator|utility|monolithic
-`mk:lazy-agent-loader`|orchestrator|utility|monolithic
 `mk:project-context`|orchestrator|utility|monolithic
 `mk:scale-routing`|orchestrator|utility|monolithic
 `mk:scout`|orchestrator|cross-cutting|monolithic
@@ -27,7 +26,7 @@ Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 
 ```toon
 [10]{skill,owner,type,architecture}
-`mk:plan-creator`|planner|planning|step-file (v1.5.0: scope challenge, multi-file output, plan red team, sync-back, **--product-level mode** for green-field app builds via step-03a; **--deep mode** for per-phase scouting; **--tdd flag** injects TDD sections into phase files; **standalone subcommands**: archive/red-team/validate; outputs `red-team-findings.md`; solution design checklist in each phase; memory capture at Gate 1)
+`mk:plan-creator`|planner|planning|step-file (v1.5.0: scope challenge, multi-file output, plan red team, sync-back, **--product-level mode** for green-field app builds via step-03a; **--deep mode** for per-phase scouting; **--tdd flag** injects TDD sections into phase files; **standalone subcommands**: archive/red-team/validate; outputs `red-team-findings.md`; solution design checklist in each phase; memory capture when the plan is agreed)
 `mk:plan-ceo-review`|planner|planning|monolithic (v2.0: layered verification pipeline — pre-screen + two-lens eval + severity tiers + adversarial necessity + append-only verdict)
 `mk:validate-plan`|planner|planning|monolithic
 `mk:brainstorming`|brainstormer|planning|monolithic
@@ -138,13 +137,13 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 [10]{skill,owner,type,architecture}
 `mk:review`|reviewer|review|**step-file** (4 steps)
 `mk:rubric`|evaluator|review|monolithic (v1.0.0: 7 rubrics + 4 composition presets at .claude/skills/rubric/rubrics/, weighted graded grading with PASS/WARN/FAIL anchors and load/compose/validate scripts; frontend-app preset pruned to 4 distinctive rubrics in v2.0.0 per audit 260408)
-`mk:evaluate`|evaluator|review|**step-file** (v1.0.0: 5 steps — load-rubrics → boot-app → probe-criteria → grade-and-verdict → feedback-to-generator. Active-verification HARD GATE: validate-verdict.sh rejects PASS verdicts with empty evidence/. Skeptic persona enforced on every criterion grading.)
-`mk:sprint-contract`|developer (propose/amend) + evaluator (review)|planning|monolithic (v1.0.0, 130 lines: propose/review/amend/sign actions inline. Phase 4 file-based contract negotiation between generator and evaluator before source edits. Enforced by gate-enforcement.cjs; bypassable via MEOWKIT_AUTOBUILD_MODE=LEAN.)
+`mk:evaluate`|evaluator|review|**step-file** (v1.0.0: 5 steps — load-rubrics → boot-app → probe-criteria → grade-and-verdict → feedback-to-generator. Active verification: validate-verdict.sh rejects PASS verdicts with empty evidence/. Skeptic persona enforced on every criterion grading.)
+`mk:sprint-contract`|developer (propose/amend) + evaluator (review)|planning|monolithic (v1.0.0, 130 lines: propose/review/amend/sign actions inline. Phase 4 file-based contract negotiation between generator and evaluator before source edits; no hook checks the signature.)
 `mk:autobuild`|orchestrator (planner/developer/evaluator/shipper agents dispatched per step)|orchestration|**step-file** (v1.0.0: 7 steps — tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report. Adaptive density MINIMAL/FULL/LEAN. Budget tracker with $30 warn / $100 block. 6h hard timeout. Resumable via --resume.)
 `mk:trace-analyze`|researcher (3 parallel) + main agent synthesis|analysis|**step-file** (v1.0.0: 6 steps — ingest → partition → scatter → gather → suggestions → HITL gate. Reads `.meowkit/telemetry/trace-log.jsonl`, finds patterns via error-taxonomy, mandatory HITL approval. Anti-overfit threshold ≥3 occurrences.)
 `mk:benchmark`|orchestrator (invokes mk:autobuild per spec)|measurement|monolithic (v1.0.0: run/compare subcommands. Quick tier 5 tasks ≤$5; full tier 6 tasks ≤$30. Records to `.claude/benchmarks/results/{run-id}.json` + trace-log.jsonl. Backs the dead-weight audit with measured deltas. Maintainer-only: runs from the MeowKit repository and is not part of an installed kit.)
 `mk:elicit`|reviewer|review|monolithic
-`mk:review-pr`|reviewer|review|monolithic (v0.1.0: single shallow correctness/security/breaking/AI-slop pass on a GitHub PR → Summary/Risk/Findings/Verdict. Default prints; --reply posts via gh pr review. Read-only on code. Shallow lane vs mk:review's deep Gate-2 engine.)
+`mk:review-pr`|reviewer|review|monolithic (v0.1.0: single shallow correctness/security/breaking/AI-slop pass on a GitHub PR → Summary/Risk/Findings/Verdict. Default prints; --reply posts via gh pr review. Read-only on code. Shallow lane vs mk:review's deep review engine.)
 `mk:respond-pr`|reviewer|review|monolithic (v0.1.0: triage reviewer comments with receiving-review discipline — verify each vs codebase, then accept/push-back/clarify. Default dry; --reply posts in-thread. Never edits code — accepted items hand off to mk:fix.)
 ```
 
@@ -242,7 +241,7 @@ Diagram|2
 HTML/Browser-Packaging|2
 External-Service-Design|1
 Knowledge/Wiki|3
-**Total**|**128**
+**Total**|**127**
 ```
 
 Note: Some skills appear in multiple categories (scout, investigate). Count reflects primary category. `mk:memory` counted under Memory (not Utility). `mk:retro` counted under Memory (not Documentation).

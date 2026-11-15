@@ -8,20 +8,19 @@ trust_level: HIGH
 # Workflow Evidence Index
 
 **Core rule:** ONE JSON file per run indexes pointers + normalized summaries of
-what already exists (plan, diagnosis, verify output, verdict, approvals). It is
+what already exists (plan, diagnosis, verify output, verdict, ship decision). It is
 an INDEX, not a second source of truth, and it **never approves anything**.
-Gate 1 and Gate 2 remain human authority (`.claude/rules/gate-rules.md`).
+Whether to ship stays the user's call.
 
-Validator (executable source of truth for these rules):
-`.claude/hooks/lib/validate-workflow-evidence.cjs`. Zero runtime deps, Node
-builtins, native JSON. Exit 0 = `EVIDENCE_OK`; exit 1 = `EVIDENCE_BLOCKED:<reasons>`.
+There is no validator: the skill that writes the index owns its shape. `mewkit advice
+commit --evidence <path>` reads the index and supersedes stale entries after a
+returned correction.
 
 ## 1 — The Hard Line
 
-Evidence can say **"ready for Gate 2"**, never **"Gate 2 approved."** It records
-the *result* of the gate scripts and human approval; it does not produce them.
-The validator performs **NO score check** — score is advisory display only and is
-never an approval predicate.
+Evidence can say **"ready to ship"**, never **"shipping approved."** It records what
+already happened; it does not produce a decision. Score is advisory display only and
+is never a predicate for anything.
 
 ## 2 — Fields (minimum shape)
 
@@ -38,25 +37,23 @@ never an approval predicate.
 | `cookContract` | object | `{ expectedOutput, acceptanceCriteria[], scopeBoundary[], constraints[], touchpoints[] }` — `mk:cook` only (five dimensions) |
 | `verification` | object | `{ commands[], overall }` — pointers/summary, NOT raw logs |
 | `review` | object | `{ verdictPath, status, sideEffectsDetected, userDecisionAddendum? }` |
-| `approvals` | object | `{ gate1, gate2, ship }` — each `not_applicable` \| `required` \| `approved` |
+| `approvals` | object | `{ ship }` — `not_applicable` \| `required` \| `approved` |
 | `memory` | object | `{ gotchaWritten, decisionWritten }` — whether an entry was appended, NOT the entry text |
 
-## 3 — Validation Rules (enforced by the `.cjs`)
+## 3 — Shape Rules (the writer's responsibility)
 
 - `skill` ∈ {`mk:fix`, `mk:cook`}; `task` non-empty.
 - `risk.matchedFlags` ⊆ the 9 IDs in `.claude/skills/agent-detector/references/risk-checklist.md`
   (`AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF`).
 - `mk:fix` → all six `fixDiagnosis` fields populated before implementation.
-- `mk:cook` → all five `cookContract` dimensions populated before Gate 1, **unless**
-  the input was an existing `plan.md` / `phase-*.md` path (pass `--plan-input`).
+- `mk:cook` → all five `cookContract` dimensions populated before the build starts,
+  **unless** the input was an existing `plan.md` / `phase-*.md` path.
 - `verification.commands` non-empty before review/finalize.
-- `approvals.gate2 === "approved"` requires a non-empty `review.verdictPath`.
-- `review.sideEffectsDetected === true` requires a non-empty `review.userDecisionAddendum`
-  — mirrors `cook/scripts/validate-gate-2.cjs` (mirror status; does NOT replace that script).
-- **No score validation anywhere.**
+- `approvals.ship === "approved"` requires a non-empty `review.verdictPath`.
+- `review.sideEffectsDetected === true` requires a non-empty `review.userDecisionAddendum`.
+- **No score anywhere is a predicate.**
 
-Run before presenting for approval:
-`node .claude/hooks/lib/validate-workflow-evidence.cjs <path> --phase fix|cook [--plan-input]`.
+Re-read the index against this table before presenting it; nothing checks it for you.
 
 ## 4 — Storage Rules
 
@@ -86,6 +83,6 @@ nothing (`injection-rules.md` Rules 5-6).
 ## Integrations
 
 - `mk:fix` Step 2.5 / Step 5 / Step 6 → produces fix evidence
-- `mk:cook` Phase 0-6 → produces cook evidence (mirrors gate scripts)
+- `mk:cook` Phase 0-6 → produces cook evidence
 - `mk:review` → records `review.verdictPath`
 - `mk:ship` pre-flight → reads evidence (augments, never overrides `mk:verify`)

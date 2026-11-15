@@ -1,28 +1,22 @@
 //! The shipped Node hook modules that re-implement what the Rust CLI owns.
 //!
-//! Hooks stay `.cjs` and ship without a build, so four of them carry a
+//! Hooks stay `.cjs` and ship without a build, so some of them carry a
 //! hand-written copy of a rule or a file format the CLI also implements. A copy
 //! drifts silently: the CLI's tests stay green, the hook's stay green, and the
-//! gate it guards misbehaves in a real project. Each test here runs the REAL
+//! rule it enforces misbehaves in a real project. Each test here runs the REAL
 //! Rust binary on a temp project to produce the artifact, then the REAL `.cjs`
 //! module over it, and asserts the module's verdict — plus a negative case that
 //! changes the artifact's shape, proving the check would notice a rename.
 //!
 //! Coverage by module:
-//! - `approval-receipt.cjs`: the verify/stale path and the fixture-copy pin live
-//!   in `plan_receipt_consumer.rs`; this file adds the `hash` agreement and the
-//!   field-rename negative.
-//! - `validate-workflow-evidence.cjs`: the index a returned correction rewrites.
 //! - `meowkit-paths.cjs`: where `note`, `task new --activate` and `orient` put
 //!   and look for state.
 //! - `orientation-ritual.cjs`: its end-to-end acceptance of the orientation is in
 //!   `hook_contract.rs`; this file adds the runtime descriptor the Rust schema
 //!   module produces (`init --target claude-code` writes it through the adapters
 //!   launcher), which that test writes by hand.
-mod approval_receipt;
 mod meowkit_paths;
 mod orientation_ritual;
-mod workflow_evidence;
 
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
@@ -85,10 +79,6 @@ pub(super) fn node(s: &Scratch, args: &[&OsStr]) -> (i32, String) {
         String::from_utf8_lossy(&out.stderr)
     );
     (out.status.code().unwrap_or(-1), text.trim().to_string())
-}
-
-pub(super) fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(&std::fs::read(path).expect("read a json file")).expect("parse json")
 }
 
 pub(super) fn write_json(path: &Path, value: &Value) {

@@ -82,7 +82,7 @@ pub struct AdviceArgs {
     /// `validate-packet`: the packet to check.
     #[arg(long)]
     pub evidence: Option<String>,
-    /// `commit`: source or scope; scope also returns Gate 1 to required.
+    /// `commit`: source or scope; scope also marks the plan agreement required again.
     #[arg(long = "correction-kind")]
     pub correction_kind: Option<String>,
     /// `validate-packet`: input, output or brief.

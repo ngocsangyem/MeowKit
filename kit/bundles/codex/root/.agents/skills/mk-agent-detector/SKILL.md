@@ -13,7 +13,7 @@ description: "Detects the right agent and complexity tier at Phase 0 orient; run
 
 ## Workflow
 
-0. **Safety baseline precheck (HARD GATE).** Before any other step, scan the context window for the cached-sentinel marker emitted by `safety-sentinel-inject.cjs`:
+0. **Safety baseline precheck (do this first).** Before any other step, scan the context window for the cached-sentinel marker emitted by `safety-sentinel-inject.cjs`:
 
    ```
    ## Safety baseline: verified (cached, session <id>)

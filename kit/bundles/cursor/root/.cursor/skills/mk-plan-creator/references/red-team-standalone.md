@@ -54,7 +54,7 @@ Severity: {C} Critical, {H} High, {M} Medium
 
 ## Rules
 
-- This subcommand does NOT run semantic checks, validation interview, or Gate 1
+- This subcommand does NOT run semantic checks, the validation interview, or the plan presentation
 - It ONLY runs the red-team review (step-05)
 - Findings report written to `{plan_dir}/red-team-findings.md` (full detail)
 - Summary written to plan.md `## Red Team Review` section with link to findings file

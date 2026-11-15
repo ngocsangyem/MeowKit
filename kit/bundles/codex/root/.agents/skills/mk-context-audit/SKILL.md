@@ -89,7 +89,7 @@ Steps:
 
 ## How to Act
 - Cost: see `the budget skill`
-- Runtime trim: see `mk:lazy-agent-loader`
+- Runtime trim: an agent file costs tokens only when that agent is spawned; archive agent files that are never used
 ```
 
 The 10% / 25% thresholds are the canonical source of truth for token-overhead

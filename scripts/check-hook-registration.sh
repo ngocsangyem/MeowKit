@@ -37,8 +37,7 @@ DISK_HOOKS=$(find "$HOOKS_DIR" -maxdepth 1 -type f \( -name '*.sh' -o -name '*.c
 # Indirect-call allowlist — hooks that are NOT registered in settings.json by design,
 # because they're invoked through other paths verified at audit time:
 #   append-trace.cjs   — argv-driven writer; called by the session and edit observers
-#   pre-implement.cjs  — argv-driven; invoked by the implementing agent, not by an event
-INDIRECT_CALL_ALLOWLIST="append-trace.cjs pre-implement.cjs"
+INDIRECT_CALL_ALLOWLIST="append-trace.cjs"
 
 # Hooks registered in settings.json — extract every command string and pull the basename
 PY=".claude/skills/.venv/bin/python3"

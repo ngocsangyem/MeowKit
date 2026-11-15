@@ -82,6 +82,28 @@ done < <(
     -type f \( -name 'SKILL.md' -o -name 'step-*.md' \) -print
 )
 
+# Explicit `.claude/...` paths named by an entrypoint, an agent or a rule must exist, so a
+# deleted or moved kit file cannot stay quoted as live. Files a user or a session creates at
+# run time (MCP config, agent memory, product areas) are optional and exempt.
+OPTIONAL_PATHS=".claude/mcp.json .claude/.mcp.json .claude/product-areas.yaml"
+while IFS= read -r file; do
+  while IFS= read -r ref; do
+    [ -z "$ref" ] && continue
+    case " $OPTIONAL_PATHS " in *" $ref "*) continue ;; esac
+    case "$ref" in .claude/agent-memory/*|.claude/session-state/*|.claude/logs/*|.claude/cache/*) continue ;; esac
+    if [ ! -e "$ref" ]; then
+      echo "DEAD_PATH: $file -> $ref" >&2
+      PHANTOM=1
+    fi
+  done < <(
+    perl -ne 'while (/(?:^|[\s`("])(\.claude\/[A-Za-z0-9._\/-]+\.(?:md|cjs|sh|json|py|yaml))/g) { print "$1\n" }' "$file"
+  )
+done < <(
+  find .claude/skills .claude/agents .claude/rules \
+    \( -path '*/.*' -o -path '*/.venv/*' -o -path '*/node_modules/*' \) -prune -o \
+    -type f \( -name 'SKILL.md' -o -name 'step-*.md' -o -path '.claude/agents/*.md' -o -path '.claude/rules/*.md' \) -print 2>/dev/null
+)
+
 if [ "$PHANTOM" -eq 0 ]; then
   echo "OK: all skill and local entrypoint refs resolve"
   exit 0

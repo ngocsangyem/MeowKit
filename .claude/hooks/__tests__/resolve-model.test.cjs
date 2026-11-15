@@ -103,3 +103,20 @@ test('a pre-move artifact location is still read', () => {
 		assert.equal(resolve(root), 'claude-opus-4-6');
 	}
 });
+
+test('the density script and the model detector return the same density for every model in the table', () => {
+	const { execFileSync } = require('node:child_process');
+	const { lookup, MODEL_TIERS } = require('../lib/density-lookup.cjs');
+	const detector = require('../handlers/model-detector.cjs');
+	const script = path.join(__dirname, '../../skills/autobuild/scripts/density-select.sh');
+	const env = { PATH: process.env.PATH, HOME: os.tmpdir() };
+	for (const id of [...Object.keys(MODEL_TIERS), 'claude-opus-5-5', 'claude-unknown-1']) {
+		const expected = (lookup(id) || { density: 'FULL' }).density;
+		const fromScript = execFileSync('bash', [script, '--model', id], { env, encoding: 'utf8' }).trim();
+		const saved = {};
+		const state = { save: (_name, data) => Object.assign(saved, data), load: () => null };
+		detector({ model: id, root: projectWith() }, state);
+		assert.equal(fromScript, expected, `script, ${id}`);
+		assert.equal(saved.density, expected, `detector, ${id}`);
+	}
+});

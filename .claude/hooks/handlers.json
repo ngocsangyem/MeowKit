@@ -13,6 +13,7 @@
 
     { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/budget-tracker.cjs", "toggleKey": "budget-tracker" },
     { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/review-evidence-tag.cjs", "toggleKey": "review-evidence-tag" },
+    { "event": "PostToolUse", "matcher": "Bash", "handler": "./handlers/verification-evidence.cjs", "toggleKey": "verification-evidence" },
 
     { "event": "Stop", "handler": "./handlers/checkpoint-writer.cjs", "toggleKey": "checkpoint-writer" },
     { "event": "Stop", "handler": "./handlers/post-session.cjs", "toggleKey": "post-session" },
@@ -24,6 +25,7 @@
     { "event": "SessionStart", "handler": "./handlers/project-context-loader.cjs", "toggleKey": "project-context-loader" },
     { "event": "SessionStart", "handler": "./handlers/jira-env-loader.cjs", "toggleKey": "jira-env-loader" },
     { "event": "SessionStart", "handler": "./handlers/capability-bootstrap.cjs", "toggleKey": "capability-bootstrap" },
+    { "event": "SessionStart", "handler": "./handlers/verification-evidence.cjs", "toggleKey": "verification-evidence" },
 
     { "event": "UserPromptSubmit", "handler": "./handlers/safety-sentinel-inject.cjs", "toggleKey": "safety-sentinel-inject" },
     { "event": "UserPromptSubmit", "handler": "./handlers/tdd-flag-detector.cjs", "toggleKey": "tdd-flag-detector" },

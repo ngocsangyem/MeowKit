@@ -21,8 +21,7 @@ use commands::{
     advice::AdviceArgs, budget::BudgetArgs, doctor::DoctorArgs, init::InitArgs, note::NoteArgs,
     orient::OrientArgs, plan::PlanArgs, providers::ProvidersArgs, review::ReviewArgs,
     self_update::SelfUpdateArgs, task::TaskArgs, task_state::TaskStateArgs, trace::TraceArgs,
-    uninstall::UninstallArgs, upgrade::UpgradeArgs, validate::ValidateArgs,
-    verdict_gate::VerdictGateArgs, versions::VersionsArgs,
+    uninstall::UninstallArgs, upgrade::UpgradeArgs, validate::ValidateArgs, versions::VersionsArgs,
 };
 use commands::{
     backups::BackupsArgs, capabilities::CapabilitiesArgs, pack::PackArgs, setup::SetupArgs,
@@ -59,7 +58,7 @@ enum Command {
     SelfUpdate(SelfUpdateArgs),
     /// Resume orientation from durable task state; reads records only.
     Orient(OrientArgs),
-    /// Inspect, approve or archive a plan under tasks/plans/.
+    /// Inspect or archive a plan under tasks/plans/.
     Plan(PlanArgs),
     /// Append a lint-checked entry to the team-memory store (entry on stdin).
     Note(NoteArgs),
@@ -68,11 +67,8 @@ enum Command {
     /// Show or update the durable task record.
     #[command(name = "task-state")]
     TaskState(TaskStateArgs),
-    /// Check this project's structure and wiring (not that the gates block).
+    /// Check this project's structure and wiring (not that the guards block).
     Validate(ValidateArgs),
-    /// Check a review verdict's paperwork for Gate 2 (evidence, not approval).
-    #[command(name = "verdict-gate")]
-    VerdictGate(VerdictGateArgs),
     /// Prepare, read, compose and submit a structured code review.
     Review(ReviewArgs),
     /// Athena supervision checkpoints: evidence in, advice out (never approval).
@@ -114,7 +110,6 @@ fn main() -> ExitCode {
         Command::Task(args) => commands::task::run(&args),
         Command::TaskState(args) => commands::task_state::run(&args),
         Command::Validate(args) => commands::validate::run(&args),
-        Command::VerdictGate(args) => commands::verdict_gate::run(&args),
         Command::Review(args) => commands::review::run(&args),
         Command::Advice(args) => commands::advice::run(&args),
         Command::Trace(args) => commands::trace::run(&args),

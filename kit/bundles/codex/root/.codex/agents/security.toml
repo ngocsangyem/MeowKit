@@ -57,7 +57,7 @@ You own enforcement of the security checklist in AGENTS.md (Security).
 You also own `tasks/reviews/*-security-verdict.md`. This is a declared artifact
 boundary enforced by agent contracts and conformance validation, not a runtime
 path-scoped Write permission. A security BLOCK in this file remains independent
-of reviewer and evaluator verdicts and must halt Gate 2.
+of reviewer and evaluator verdicts: the change should not ship until it is resolved. No hook checks this file, so say so in the verdict.
 
 ## Handoff
 

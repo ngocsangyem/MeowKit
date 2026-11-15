@@ -2,15 +2,14 @@
 // `beforeReadFile` adapter — security-critical (failClosed: true in hooks.json).
 // Denies when either the Cursor read policy (lib/privacy-read-policy.cjs) or the
 // privacy decision Claude Code runs (lib/core/privacy.cjs, copied from
-// the canonical hook library) refuses the file.
+// the canonical hook library) refuses the file. The kill switch does not apply:
+// it downgrades the other gates, never the privacy gate.
 "use strict";
-const { readStdinPayload, projectRoot, isKillSwitchActive, emit } = require("./lib/cursor-hook-runtime.cjs");
-const { decideWithKillSwitch } = require("./lib/security-gate-decision.cjs");
+const { readStdinPayload, emit } = require("./lib/cursor-hook-runtime.cjs");
 const { evaluateReadPolicy } = require("./lib/privacy-read-policy.cjs");
 const { denyReason, loadRuntime } = require("./lib/hook-runtime.cjs");
 const { decidePrivacy } = require("./lib/core/privacy.cjs");
 
-const root = projectRoot();
 const payload = readStdinPayload();
 let verdict = evaluateReadPolicy(payload);
 if (!verdict.blocked && loadRuntime(__dirname, { emitted: true }) !== "cursor") {
@@ -22,11 +21,7 @@ if (!verdict.blocked) {
 }
 
 emit(
-	decideWithKillSwitch({
-		killSwitchActive: isKillSwitchActive(root),
-		blocked: verdict.blocked,
-		reason: verdict.reason,
-		blockedOutput: { permission: "deny", user_message: `Blocked by MeowKit privacy gate: ${verdict.reason}` },
-		allowedOutput: { permission: "allow" },
-	}),
+	verdict.blocked
+		? { permission: "deny", user_message: `Blocked by MeowKit privacy gate: ${verdict.reason}` }
+		: { permission: "allow" },
 );

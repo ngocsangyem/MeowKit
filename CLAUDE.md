@@ -4,8 +4,8 @@ This file provides guidance to Claude Code when working in this repository.
 
 ## Role
 
-Analyze requirements, delegate to appropriate agents, enforce quality gates,
-and ship production-ready code following the 7-phase workflow.
+Analyze requirements, delegate to appropriate agents, and ship production-ready
+code following the 7-phase workflow.
 
 ## Workflow
 
@@ -13,27 +13,26 @@ and ship production-ready code following the 7-phase workflow.
 <!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
 
 ```
-Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test (RED if --tdd, else optional)
+Phase 0 Orient → Phase 1 Plan → Phase 2 Test (RED if --tdd, else optional)
 → Phase 3 Build → Phase 3.5 Simplify (mandatory) → Phase 3.6 Verify (mandatory)
-→ Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect
+→ Phase 4 Review → Phase 5 Ship → Phase 6 Reflect
 ```
 
 **TDD mode:** opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. See `.claude/skills/cook/references/tdd-rules.md`.
 **Phase 3 substeps (mandatory):** after Build GREEN, `mk:simplify` runs first, then `mk:verify` (unified build+lint+test+coverage). Both are mandatory before Phase 4.
-**Phase 3 autobuild contract substep:** developer reads signed `tasks/contracts/*-{slug}-sprint-*.md` BEFORE source edits (enforced by `gate-enforcement.sh`; bypass: `MEOWKIT_AUTOBUILD_MODE=LEAN`). See `.claude/skills/cook/references/harness-rules.md` Rule 3.
+**Phase 3 autobuild contract substep:** in autobuild runs the developer reads the signed `tasks/contracts/*-{slug}-sprint-*.md` before source edits (LEAN density skips the contract; no hook checks it). See `.claude/skills/cook/references/harness-rules.md` Rule 3.
 
 **IMPORTANT:** Before a task in the memory read set (see Memory below), run one grep: `grep -rilE "kw1|kw2|kw3" .meowkit/memory/`; read `.claude/rules/core-behaviors.md` (6 mandatory behaviors) — both apply in ALL modes.
 **IMPORTANT:** Activate only skills needed for the current task domain; declare model tier (TRIVIAL · STANDARD · COMPLEX) before every task.
-**IMPORTANT:** Non-trivial task (>2 files OR >30 min) = approved plan required before any code; for architectural trade-offs use `/mk:party`.
+**IMPORTANT:** Non-trivial task (>2 files OR >30 min) = write the plan and agree it with the user before any code; for architectural trade-offs use `/mk:party`.
 **IMPORTANT:** COMPLEX tasks with independent subtasks may use parallel execution (max 3 agents, worktree isolation per `.claude/skills/cook/references/parallel-execution-rules.md`).
 **IMPORTANT:** For green-field product builds prefer `/mk:autobuild` over `/mk:cook` — adaptive density (MINIMAL/FULL/LEAN) per model tier.
 
-## Gates
+## Ship Check
 
-Two hard stops. No bypass. No exceptions. See `.claude/rules/gate-rules.md`.
+Planning and review are practices, not gates: no hook blocks an edit on a missing plan or a commit on a missing review verdict (`tasks/reviews/*-verdict.md`).
 
-- **Gate 1** — Formally the Phase 1→2 transition; effectively blocks Phase 3 in default (non-TDD) mode where Phase 2 is skipped. An approved plan (`tasks/plans/*/plan.md`) must exist before any source edits begin.
-- **Gate 2** — Review approved (`tasks/reviews/*-verdict.md`) before Phase 5 begins.
+The one enforced ship-time control is the ship check: on `git commit`, `git push`, `git merge` and `gh pr create|merge`, `pre-ship` runs lint on the changed files, their related tests and a type-check, and refuses the command when one fails. What is enforced on each runtime: `docs/core/enforcement-matrix.md`.
 
 ## Model Routing
 
@@ -70,7 +69,7 @@ Task file requires before Phase 3:
 - [ ] Constraints (what must NOT change)
 - [ ] Scope (in / out of scope)
 
-ALWAYS read task file before touching code. NEVER start Phase 3 without Gate 1. NEVER mark done without all criteria checked.
+ALWAYS read task file before touching code. Agree the plan before Phase 3. NEVER mark done without all criteria checked.
 
 ## Memory
 
@@ -116,7 +115,7 @@ When Claude Code auto-compacts this session, ALWAYS preserve verbatim:
 
 - The full text of every numbered Rule in `.claude/rules/injection-rules.md` (especially Rule 11 — Skill Rule of Two — which is itself a rescue rule from a prior compaction regression)
 - The Subagent Status Protocol from `.claude/rules/agent-conduct.md` (A1)
-- The names of the 5 always-on safety/baseline rules: `security-rules.md`, `injection-rules.md`, `gate-rules.md`, `core-behaviors.md`, `development-rules.md`
+- The names of the 4 always-on safety/baseline rules: `security-rules.md`, `injection-rules.md`, `core-behaviors.md`, `development-rules.md`
 
 WHY: Compaction summarizes; safety rules cannot be summarized without losing enforcement specifics. Always preserve verbatim` block.
 

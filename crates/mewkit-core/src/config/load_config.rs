@@ -126,7 +126,7 @@ pub fn load_config_file(
     // produces a message naming one key. Running both means a shape the rules
     // somehow let through is still refused rather than applied — the comment
     // `load-config.ts:118-120` carries, and the reason the layer is still here.
-    check_shape(&values, observer_names, scope).map_err(|error| from_shape(error, file, scope))?;
+    check_shape(&values, observer_names).map_err(|error| from_shape(error, file, scope))?;
 
     Ok(LoadedConfig {
         values,

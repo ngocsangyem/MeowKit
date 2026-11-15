@@ -5,7 +5,7 @@ description: "Negotiates a file-based sprint contract between generator and eval
 
 # mk:sprint-contract — File-Based Sprint Contract Protocol
 
-Negotiation protocol between generator and evaluator. Produces a signed contract file at `tasks/contracts/{date}-{slug}-sprint-{N}.md` BEFORE the generator writes any source code. Enforced by `gate-enforcement.cjs` (Phase 4 extension).
+Negotiation protocol between generator and evaluator. Produces a signed contract file at `tasks/contracts/{date}-{slug}-sprint-{N}.md` before the generator writes any source code, so both agents are grading the same scope. The contract is a shared document, not a checkpoint: no hook blocks an edit while it is unsigned.
 
 > For single-task plan validation (cook flow), use `mk:validate-plan` instead. `mk:sprint-contract` is for product-level specs feeding into `mk:autobuild` only.
 
@@ -20,7 +20,7 @@ Activate when:
 Skip when:
 - `MEOWKIT_AUTOBUILD_MODE=LEAN` (adaptive density bypass for the complex/capable tier)
 - The plan is `--fast` mode (overhead exceeds value)
-- The task is `the fix skill simple` (Gate 1 already bypassed; contract bypass too)
+- The task is `the fix skill simple` (one small fix needs no sprint-level scope negotiation)
 
 ## Subcommands
 
@@ -30,7 +30,6 @@ Skip when:
 | `review` | evaluator | Critiques the proposed contract for testability + scope clarity; produces clarification requests |
 | `amend` | generator | Iterates on the contract per evaluator feedback; status stays `negotiating`; rounds += 1 |
 | `sign` | both | Both agents commit to the contract via git commit messages; status: `negotiating → signed` |
-| `validate` | anyone | Runs `validate-contract.cjs` to check schema conformance |
 | `sprint-goal` | user | Writes/reads/aligns sprint-LEVEL goal in `tasks/contracts/sprint-state-{date}-sprint-{N}.md` (Agile mode) |
 
 ## Workflow (Inline — monolithic, < 150 lines)
@@ -43,7 +42,7 @@ Skip when:
 4. Copy `assets/contract-template.md` → `tasks/contracts/{YYMMDD-HHMM}-{slug}-sprint-{N}.md`
 5. Populate: 5–15 ACs in Given/When/Then form, each bound to one preset rubric, each with a Verification line. Every preset rubric should have ≥1 AC binding
 6. Set frontmatter: `status: negotiating`, `rounds: 0`, `created: {YYMMDD-HHMM}`
-7. Run `validate-contract.cjs`; fix and re-validate until clean
+7. Re-read the draft against `assets/contract-template.md` — every section present, every AC in Given/When/Then form with a rubric binding and a Verification line
 8. Print: `"Contract proposed at {path}. Awaiting evaluator review."`
 
 ### `review` (evaluator)
@@ -59,7 +58,7 @@ Skip when:
 
 1. Address every clarification from the previous round in the relevant ACs (replace, don't delete)
 2. Append `Round {N+1} (proposer): {summary of changes}` to the log
-3. Re-run `validate-contract.cjs`
+3. Re-check the amended ACs against the template's AC form
 4. Signal evaluator to `review` again
 
 ### `sign` (both agents in sequence)
@@ -71,14 +70,9 @@ The signature workflow uses **two commits per agent** to avoid the chicken-and-e
 3. **Evaluator (commit 1):** verify the contract is unchanged from commit 2 above. Then `git add` + `git commit -m "contract: evaluator commits sprint {N} for {slug}"`.
 4. **Evaluator (commit 2 — capture SHA):** `eval_sha=$(git rev-parse HEAD)`. Edit the frontmatter: `evaluator_signed: $eval_sha`, `status: signed`. Then `git add` + `git commit -m "contract: evaluator signs sprint {N} for {slug} (sha=$eval_sha)"`.
 5. The git log IS the audit trail — every signature commit is verifiable via `git log --oneline tasks/contracts/{path}.md`.
-6. After both sign, `gate-enforcement.cjs` allows source edits for this sprint.
+6. Once both signatures are real SHAs and `status: signed`, the sprint's scope is agreed and the generator starts implementing.
 
-**Validator enforcement:** `check-contract-signed.cjs` rejects placeholder values (`null`, `pending`, `todo`, empty, quoted variants of these). Only a real `git rev-parse HEAD` SHA passes.
-
-### `validate`
-
-```node .cursor/skills/sprint-contract/scripts/validate-contract.cjs tasks/contracts/{path}.md
-```
+**Signature discipline:** `generator_signed` and `evaluator_signed` hold a real `git rev-parse HEAD` SHA. A placeholder (`null`, `pending`, `todo`, empty) means that agent has not signed — read it that way rather than treating the field as decoration. Nothing checks this for you.
 
 ### `sprint-goal` (Agile mode — gated by `agile-sprint-commitment.md` 1)
 
@@ -92,13 +86,13 @@ Sprint-LEVEL goal management. Writes to `tasks/contracts/sprint-state-{date}-spr
 
 **Concurrent-write safety:** `sprint-goal set` MUST acquire `flock` on the sprint-state file before any read-modify-write. YAML frontmatter append is non-atomic across shells; lock is the only mitigation. Release on completion or error.
 
-**Validator scope:** the existing `validate-contract.cjs` is for sprint-CONTRACT files only. Sprint-STATE files have NO validator; YAML is parsed inline by consuming skills (this skill, `mk:agent-detector` Step 0b, `mk:jira-agile`).
+**Schema scope:** `assets/contract-template.md` is the schema for sprint-CONTRACT files only. Sprint-STATE files follow `assets/sprint-state-template.md`; their YAML is parsed inline by consuming skills (this skill, `mk:agent-detector` Step 0b, `mk:jira-agile`).
 
 **Why this lives here:** `tasks/contracts/` already belongs to this skill; co-locating `sprint-goal` avoids creating a sibling skill that duplicates path discipline.
 
 ### Mid-build amendment (post-sign)
 
-The amendment flow MUST null both signature fields BEFORE adding the amendment block. Otherwise stale SHAs from the prior signing round would falsely pass `check-contract-signed.cjs`.
+The amendment flow MUST null both signature fields BEFORE adding the amendment block. Otherwise stale SHAs from the prior signing round would read as agreement to criteria neither agent has seen.
 
 1. **Generator opens amendment:**
    - Edit the frontmatter: `status: amended`, `generator_signed: null`, `evaluator_signed: null`
@@ -106,7 +100,7 @@ The amendment flow MUST null both signature fields BEFORE adding the amendment b
    - DO NOT edit the original signed criteria — append the revised version as a new AC or override note
    - `git commit -m "contract: amendment N for sprint {N} ({slug})"`
 2. **Both agents re-sign** following the same two-commit pattern from `sign` action above. New SHAs replace the nulled fields.
-3. **`gate-enforcement.cjs` enforcement:** between step 1 and step 2 (sigs are null but status is `amended`), source edits are BLOCKED. The check-contract-signed.cjs script rejects amended-status contracts that have null/placeholder sigs. This is the intended discipline — you can't push source code while an amendment is in-flight.
+3. **While the amendment is in flight** (status `amended`, both sigs null), the sprint has no agreed scope: hold off on source edits until both agents have re-signed. This is discipline, not a block — nothing stops the write.
 
 Original signed criteria stay visible — amendments are append-only history.
 
@@ -114,17 +108,16 @@ Original signed criteria stay visible — amendments are append-only history.
 
 When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 
-- The contract negotiation is **skipped entirely** (per Phase 5 adaptive density policy for the complex/capable tier — capable models self-derive criteria from the product spec)
-- `gate-enforcement.cjs` honors the env var and allows source edits without contract verification
-- LEAN bypasses are logged to `.meowkit/telemetry/lean-bypass.log` for audit
-- LEAN mode is a PROJECT-level setting, not per-file override
+- The contract negotiation is **skipped entirely** (per the Phase 5 adaptive density policy for the complex/capable tier — capable models self-derive criteria from the product spec)
+- The generator implements against the product spec directly, and the evaluator grades against it
+- LEAN mode is a PROJECT-level setting, not a per-file override
 
 ## Gotchas
 
 - **Don't mutate signed criteria.** Revisions go in the Amendments section, not by editing original ACs in place
 - **Don't exceed 2 negotiation rounds.** Escalate to human on round 3 — agents that can't converge in 2 rounds won't converge in 5
 - **Don't skip the rubric tie-in.** Each AC must reference one rubric in the active preset, otherwise the evaluator has no anchor for grading
-- **Don't write source code without checking the contract.** `gate-enforcement.cjs` will block; the developer agent's "Contract Discipline" section codifies this behavioral requirement too
+- **Don't write source code without reading the contract.** Nothing stops you, which is exactly why it is worth doing; the developer agent's "Contract Discipline" section says the same
 - **Don't sign without git commits.** The git log is the audit trail — `generator_signed` and `evaluator_signed` fields hold real SHAs, not "yes" placeholders
 
 ## References
@@ -133,10 +126,7 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 |---|---|
 | `assets/contract-template.md` | Canonical per-story sprint-contract schema with placeholder ACs |
 | `assets/sprint-state-template.md` | Sprint-LEVEL state contract template (used by `sprint-goal set`; tracks goal + committed_tickets + amendments + closure summary) |
-| `scripts/validate-contract.cjs` | Schema + AC-form validator (POSIX-aware Bash 3.2+) |
-| `scripts/check-contract-signed.cjs` | Gate helper called by `gate-enforcement.cjs` to block source edits before sign |
 | `references/bdd-to-ac-mapping.md` | How Gherkin scenarios map to acceptance criteria |
-| `../../hooks/gate-enforcement.cjs` | Hook that enforces the contract gate on Edit/Write of source files |
 | `../../agents/developer.md` | Generator agent — owns `propose` and `amend` actions |
 | `../../agents/evaluator.md` | Evaluator agent — owns `review` action; also Phase 3 active-verification consumer |
 | `..the rubric skill/` | Rubric library — provides composed presets the contract binds to |
@@ -144,7 +134,7 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 
 ## Related Rules
 
-- `AGENTS.md` (Gates) — Gate 1 contract-signing requirement this skill enforces before source edits are allowed
+- `AGENTS.md` (Ship check, security and compaction) — where the contract sits in the workflow, and the ship check that runs on commit, push and merge
 
 ## Start
 

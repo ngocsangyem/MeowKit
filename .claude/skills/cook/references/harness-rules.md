@@ -26,7 +26,7 @@ Flow: generator → handoff → evaluator fresh context → graded verdict with 
 Per the adaptive density policy (`.claude/skills/autobuild/references/adaptive-density-matrix.md`):
 
 - `MINIMAL` (Haiku) — contract skipped (harness short-circuits to `mk:cook`)
-- `FULL` (Sonnet, Opus 4.5) — contract REQUIRED before any source-code edit; enforced by `gate-enforcement.cjs`
+- `FULL` (Sonnet, Opus 4.5) — write and sign the contract before any source-code edit; no hook checks it, so the discipline is the harness's own
 - `LEAN` (Opus 4.6+) — contract OPTIONAL; skip if estimated ACs < 5
 
 **WHY:** Contracts prevent silent substitution on intermediate tiers but add dead weight on trivial/capable tiers.
@@ -65,7 +65,7 @@ Every harness component encodes an assumption about what the model CANNOT do. Wh
 
 Use the audit playbook with measured baselines after model upgrades.
 
-## Rule 8: Active Verification Is a HARD GATE
+## Rule 8: Active Verification Is Required of the Evaluator
 
 <!-- The evaluator runs at autobuild Step 4 (the evaluator stage). "Phase 3" was a former -->
 <!-- autobuild-internal label — Step 4 is the correct identifier in the current pipeline. -->
@@ -79,11 +79,11 @@ The evaluator MUST re-anchor its skeptic persona (`mk:evaluate/prompts/skeptic-p
 
 **WHY:** Persona re-anchoring prevents leniency drift during long grading sessions.
 
-## Rule 10: No Density Override Bypasses Gates
+## Rule 10: No Density Override Lowers the Quality Bar
 
-<!-- The contract gate is the autobuild sprint-contract stage (Step 2 of the pipeline). -->
-<!-- "Phase 4" was a former autobuild-internal label — use "contract gate" to avoid -->
+<!-- The contract stage is the autobuild sprint-contract stage (Step 2 of the pipeline). -->
+<!-- "Phase 4" was a former autobuild-internal label — use "contract stage" to avoid -->
 <!-- clashing with lifecycle Phase 4 (Review). -->
-`MEOWKIT_AUTOBUILD_MODE=LEAN` and any `--tier` flag override scaffolding density, NOT gates. Gate 1 (plan), Gate 2 (review verdict), the autobuild contract gate (Step 2), and the active-verification HARD GATE all still apply regardless of density mode.
+`MEOWKIT_AUTOBUILD_MODE=LEAN` and any `--tier` flag override scaffolding density, not the work. The plan, the review verdict, the autobuild contract stage (Step 2) and the evaluator's active verification still apply regardless of density mode.
 
 **WHY:** Density changes scaffolding amount, not the quality bar.

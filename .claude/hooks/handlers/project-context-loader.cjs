@@ -82,6 +82,8 @@ function resetSessionState(root, sessionId) {
   };
   write('edit-counts.json', '{}');
   write('build-verify-cache.json', '{}');
+  // The cost estimate is per session; `null` makes the tracker start a fresh one.
+  write('budget-state.json', 'null');
   // Keyed by session id, so a recycled id could otherwise match a stale entry.
   write('session-sentinels.jsonl', '');
   // Cleared in every location a marker may sit, pre-move ones included: a stale

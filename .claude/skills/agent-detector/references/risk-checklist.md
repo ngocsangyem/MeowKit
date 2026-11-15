@@ -21,11 +21,11 @@ Mark each flag whose triggers match the task description. The agent emits
 | PUBLIC_CONTRACT | Public API/contract | OpenAPI change, public REST/GraphQL surface, SDK signature, response envelope, client-visible behavior | Force `mk:plan-creator --hard`; require coverage check |
 | CROSS_PLATFORM | Cross-platform impact | iOS+Android, web+mobile, server+client, desktop/mobile/browser split, native shell, deep links | Allow parallel-execution per `.claude/skills/cook/references/parallel-execution-rules.md` Rule 6 |
 | EXISTING_BEHAVIOR | Touches existing behavior | refactor, edit of >2 production files, touches >5 callers, already test-covered behavior changes | Apply `core-behaviors.md` Rule 5 (Scope Discipline); require `mk:simplify` |
-| WEAK_PROOF | Weak proof | touches code with <50% test coverage OR no tests in path; unclear test coverage around affected area | Reviewer adds WARN at Gate 2; user opt-in for `--tdd` recommended |
+| WEAK_PROOF | Weak proof | touches code with <50% test coverage OR no tests in path; unclear test coverage around affected area | Reviewer adds WARN in the verdict; user opt-in for `--tdd` recommended |
 
 (`Multi-domain` is intentionally omitted — already covered by `mk:scale-routing` CSV.)
 
-## Hard-Gate Cross-Reference
+## Tier-Escalation Cross-Reference
 
 The following flag IDs auto-escalate to COMPLEX tier per `references/model-selection-rules.md` Rule 2 — regardless of CSV match:
 

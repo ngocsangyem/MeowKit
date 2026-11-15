@@ -48,7 +48,7 @@ delegate a sub-task (
     - Contract: ${contract_path:-'(no contract — grade against product spec directly)'}
     - Iteration: $iteration of $max_iter
 
-    HARD GATE: every verdict must include non-empty evidence/ directory.
+    REQUIRED: every verdict must include a non-empty evidence/ directory.
     validate-verdict.sh enforces this — empty evidence → automatic FAIL conversion.
 
     Skeptic persona: leniency is a failure. Mark WARN when unsure, never PASS.

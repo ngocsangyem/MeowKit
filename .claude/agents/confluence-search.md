@@ -4,7 +4,6 @@ description: 'mk:confluence executor for mk:confluence-search. CQL search, space
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default
-memory: project
 color: green
 owner: confluence
 criticality: medium

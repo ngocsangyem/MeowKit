@@ -89,8 +89,8 @@ was taken at two failures.
 
 Athena is not a substitute for Step 3 brainstorming or Step 4 planning: it assesses
 a decision the pipeline is already facing and recommends one operational path inside
-the locked scope. It never authors a plan or a phase graph, and it never approves
-Gate 1 on the Step 4 plan.
+the locked scope. It never authors a plan or a phase graph, and it never agrees the
+Step 4 plan on the user's behalf.
 
 ### Call
 
@@ -154,8 +154,8 @@ Route on the disposition:
 - `READY_FOR_EXISTING_GATE` — run the normal Step 7 review. The gate is NOT cleared.
 - `RETURN_TO_EXECUTOR` — apply the corrections, then supersede the stale evidence:
   `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence <workflow-evidence.json> --correction-kind source|scope`.
-  Re-run Step 6 before the review. A `scope` correction also returns Gate 1 to
-  `required` — a plan change needs a fresh human approval, which Athena cannot give.
+  Re-run Step 6 before the review. A `scope` correction also sends the plan back to the
+  user — a plan change needs their agreement, which Athena cannot give.
 - `ESCALATE_TO_HUMAN` — stop at the existing human touchpoint.
 - `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
 
@@ -166,9 +166,9 @@ keep the file and skip this step — never invent a record.
 A failed receipt write prints a one-line notice and the run continues; it never
 blocks and is never skipped silently.
 
-**Supervision is evidence, not authority.** It cannot pass, clear, or unblock any
-gate — including Gate 1 on the Step 4 plan — and it is never counted as
-verification. Verification stays with Step 6 tests and the Step 7 review verdict.
+**Supervision is evidence, not authority.** It cannot agree the Step 4 plan, clear the
+Step 7 review, or stand in for either — and it is never counted as verification.
+Verification stays with Step 6 tests and the Step 7 review verdict.
 
 If the runtime cannot delegate to `athena`, print exactly
 `advice checkpoint unavailable in this runtime: <reason>` and continue

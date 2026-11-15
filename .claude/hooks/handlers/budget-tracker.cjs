@@ -5,11 +5,14 @@
 // Estimation: chars / 4 ≈ tokens (rough, English text). Imprecise but order-of-magnitude.
 // Pricing: per 1M tokens (input/output) by model tier.
 //
+// Advisory: both messages are printed for the transcript and nothing is stopped. The
+// estimate resets with each new session (project-context-loader clears the state file).
+//
 // Thresholds come from the project config, which is committed and therefore the
 // same for everyone on the team:
-//   budget.warn   warning threshold in USD (default: 30)
-//   budget.block  hard block threshold in USD (default: 100)
-//   budget.cap    overrides the hard block, lower OR higher
+//   budget.warn   first-warning threshold in USD (default: 30)
+//   budget.block  over-budget notice threshold in USD (default: 100)
+//   budget.cap    overrides budget.block, lower OR higher
 
 const { resolveConfig } = require('../lib/read-config.cjs');
 
@@ -72,13 +75,13 @@ module.exports = function budgetTracker(ctx, state) {
   if (budget.estimated_cost_usd >= blockThreshold) {
     budget.warnings_emitted += 1;
     state.save('budget-state', budget);
-    return `@@BUDGET_BLOCK@@\nEstimated cost: $${budget.estimated_cost_usd} (cap: $${blockThreshold}). Session budget exceeded.\nReview .meowkit/state/budget-state.json for details. Consider wrapping up.\n@@END_BUDGET@@\n`;
+    return `@@BUDGET_BLOCK@@\nEstimated cost: $${budget.estimated_cost_usd} (cap: $${blockThreshold}). Session estimate is over the cap. Advisory: nothing is stopped.\nDetails: .meowkit/state/budget-state.json.\n@@END_BUDGET@@\n`;
   }
 
   if (budget.estimated_cost_usd >= warnThreshold && budget.warnings_emitted === 0) {
     budget.warnings_emitted += 1;
     state.save('budget-state', budget);
-    return `@@BUDGET_WARN@@\nEstimated cost: $${budget.estimated_cost_usd} (warn at $${warnThreshold}, cap at $${blockThreshold}).\n@@END_BUDGET@@\n`;
+    return `@@BUDGET_WARN@@\nEstimated cost: $${budget.estimated_cost_usd} (warn at $${warnThreshold}, cap at $${blockThreshold}). Advisory.\n@@END_BUDGET@@\n`;
   }
 
   return '';

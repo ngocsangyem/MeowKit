@@ -9,11 +9,11 @@
 ## 1. System Overview
 
 MeowKit is a prompt-engineering framework that extends Claude Code with structured
-workflows, quality gates, memory persistence, and 128 domain skills. It operates
+workflows, quality gates, memory persistence, and 127 domain skills. It operates
 through three mechanisms:
 
 1. **Rules** (`.claude/rules/*.md`) — behavioral instructions loaded every session;
-   7 rule files, priority-ordered; 2 are NEVER-override (`security-rules.md`,
+   6 rule files, priority-ordered; 2 are NEVER-override (`security-rules.md`,
    `injection-rules.md`). Source: `RULES_INDEX.md` loading-priority table.
 2. **Hooks** (`.claude/hooks/*.sh`, `.cjs`) — shell/Node scripts triggered by
    Claude Code events before or after tool calls. Source: `settings.json` (7 hook
@@ -87,7 +87,6 @@ flowchart TD
         SR[mk:scale-routing]
         WO[mk:workflow-orchestrator\nautoInvoke:true]
         H[mk:autobuild]
-        LAL[mk:lazy-agent-loader]
         PC[mk:project-context]
         SK[mk:skill-creator]
         SECON[mk:session-continuation]
@@ -187,7 +186,6 @@ flowchart TD
 
     %% Phase flow — critical calls
     AD -->|calls| SR
-    AD -->|calls| LAL
     SR -->|calls| PLANC
     PLANC -->|calls| COOK
     COOK -->|calls| REV
@@ -216,7 +214,6 @@ flowchart TD
     PLANC:::gapNode
     WO:::gapNode
     MM:::critNode
-    LAL:::highNode
 
     classDef gapNode fill:#ff9900,color:#000
     classDef critNode fill:#ff0000,color:#fff
@@ -232,7 +229,7 @@ Hook chain verified against `settings.json` (2026-04-18). All 7 events listed.
 | Event                     | Hooks (in order)                                                                                                              | Source line             |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | `SessionStart`            | project-context-loader.cjs → dispatch.cjs (model-detector.cjs, orientation-ritual.cjs)                                         | `settings.json:18-33`   |
-| `PreToolUse Edit\|Write`  | gate-enforcement.cjs → privacy-block.cjs                                                                                        | `settings.json:36-52`   |
+| `PreToolUse Edit\|Write`  | privacy-block.cjs                                                                                                               | `settings.json:36-52`   |
 | `PreToolUse Read`         | privacy-block.cjs                                                                                                              | `settings.json:53-63`   |
 | `PreToolUse Bash`         | pre-task-check.cjs → pre-ship.cjs → privacy-block.cjs                                                                            | `settings.json:64-85`   |
 | `PostToolUse Edit\|Write` | post-write.cjs → learning-observer.cjs → dispatch.cjs (build-verify, loop-detection, budget-tracker, auto-checkpoint)           | `settings.json:87-108`  |
@@ -241,7 +238,7 @@ Hook chain verified against `settings.json` (2026-04-18). All 7 events listed.
 | `Stop`                    | pre-completion-check.cjs → post-session.cjs → dispatch.cjs (auto-checkpoint, checkpoint-writer)                                 | `settings.json:125-151` |
 
 **Phase routing** (source: `.claude/skills/cook/references/phase-contracts.md`):
-`Phase 0 Orient → Phase 1 Plan [GATE 1] → Phase 2 Test → Phase 3 Build → Phase 4 Review [GATE 2] → Phase 5 Ship → Phase 6 Reflect`
+`Phase 0 Orient → Phase 1 Plan → Phase 2 Test → Phase 3 Build → Phase 4 Review → Phase 5 Ship → Phase 6 Reflect`
 
 SubagentStart/SubagentStop: intentionally empty — but by choice, not because the events
 infinite-loop inside subagents. That claim is **superseded** as of 2026-11-09 (verdict
@@ -252,25 +249,17 @@ it fires again per teammate message, so no handler is registered yet.
 
 ---
 
-## 5. Gate Enforcement
+## 5. Enforcement
 
-Source: `.claude/rules/gate-rules.md`, `settings.json:41` (gate-enforcement.cjs
-registration), `RULES_INDEX.md` Enforcement Mechanism Matrix.
+MeowKit has no plan-approval or review-approval gate. What each runtime enforces, and the
+states in which installed hooks do not run, is in `docs/core/enforcement-matrix.md`.
 
-| Gate                | Trigger                              | Mechanism                                                                         | Bypass                                                                        |
-| ------------------- | ------------------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Gate 1              | After Phase 1, before any code write | **Hook-preventive**: `gate-enforcement.cjs` on PreToolUse Edit\|Write; timeout 10s | `/mk:fix` simple; scale-routing one-shot (`scale-adaptive-rules.md` Rule 4) |
-| Gate 2              | After Phase 4, before Phase 5        | **Behavioral**: reviewer verdict at `tasks/reviews/` required                     | None — zero exceptions (`gate-rules.md` Gate 2 section)                       |
-| Active Verification | Phase 4 evaluator PASS               | **Script**: `validate-verdict.sh` rejects PASS with empty `evidence/` dir         | None — hard gate (`harness-rules.md` Rule 8)                                  |
-| Sprint Contract     | FULL density harness Phase 3         | **Hook**: `gate-enforcement.cjs` contract gate                                     | `MEOWKIT_AUTOBUILD_MODE=LEAN` or `MINIMAL`                                      |
-
-**Known issue — gate-owning agents don't reference gate-rules.md:**
-planner (`planner.md` Required Context, CF-M3), reviewer (`reviewer.md:132`, CF-M5),
-evaluator (`evaluator.md` Required Context, CF-M4), plan-creator (`plan-creator/SKILL.md`,
-CF-H5), workflow-orchestrator (`workflow-orchestrator/SKILL.md`, CF-H6), sprint-contract
-(`sprint-contract/SKILL.md`, CF-M10), ship (`ship/SKILL.md`, CF-M25), review
-(`review/SKILL.md`, CF-M26). Gate behavior depends on agent compliance, not textual
-anchor. See `consolidated.md` Cross-Cutting Pattern 2.
+| Control             | Trigger                                     | Mechanism                                                                    |
+| ------------------- | ------------------------------------------- | ---------------------------------------------------------------------------- |
+| Ship check          | `git commit\|push\|merge`, `gh pr create\|merge` | **Hook**: `pre-ship.cjs` runs lint, related tests and a type-check          |
+| Credential reads    | Read, Edit/Write, Bash                      | **Hook**: `privacy-block.cjs`, blocks when the hook fails                    |
+| Active Verification | Phase 4 evaluator PASS                      | **Script**: `validate-verdict.sh` rejects PASS with empty `evidence/` dir    |
+| Planning, review    | Phase 1, Phase 4                            | **Advisory**: instructions only                                              |
 
 ---
 
@@ -282,7 +271,7 @@ agent frontmatter by `mewkit validate --agents`.
 | Agent           | Type    | Phase           | Role                                                                         |
 | --------------- | ------- | --------------- | ---------------------------------------------------------------------------- |
 | orchestrator    | Core    | 0               | Route tasks, assign model tier                                               |
-| planner         | Core    | 1               | Scope-adaptive planning, Gate 1                                              |
+| planner         | Core    | 1               | Scope-adaptive planning                                                      |
 | architect       | Core    | 1               | ADRs, system design (opus tier)                                              |
 | researcher      | Support | 0, 1, 4         | Technology research (CLAUDE.md table omits Phase 4 — CF-M31)                 |
 | brainstormer    | Support | 1               | Trade-off analysis                                                           |
@@ -290,7 +279,7 @@ agent frontmatter by `mewkit validate --agents`.
 | developer       | Core    | 3               | Implementation                                                               |
 | ui-ux-designer  | Support | 3               | Design systems, accessibility                                                |
 | security        | Core    | 2, 4            | Audit, BLOCK verdicts (complex tier)                                         |
-| reviewer        | Core    | 4               | Structural audit, Gate 2                                                     |
+| reviewer        | Core    | 4               | Structural audit, review verdict                                             |
 | evaluator       | Core    | 4               | Behavioral verification, rubric grading                                      |
 | shipper         | Core    | 5               | Deploy pipeline (haiku tier)                                                 |
 | git-manager     | Support | 5               | Git operations, conventional commits                                         |
@@ -344,7 +333,7 @@ architecture: separate agents, separate contexts; self-evaluation forbidden
 | Step | Action                                                                                                                                            | Rule      |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | 0    | Tier Detection — model-detector.cjs → .meowkit/state/detected-model.json → MINIMAL\|FULL\|LEAN                                                     | Rule 5    |
-| 1    | Plan — mk:plan-creator --product-level; user stories NOT file paths → Gate 1                                                                    | Rule 1, 3 |
+| 1    | Plan — mk:plan-creator --product-level; user stories NOT file paths → plan agreed                                                               | Rule 1, 3 |
 | 2    | Contract — mk:sprint-contract (FULL: required; LEAN: optional; MINIMAL: skip)                                                                   | Rule 3    |
 | 3    | Generate — developer agent (isolated context)                                                                                                     | Rule 2    |
 | 4    | Evaluate — evaluator (fresh context, skeptic-persona per criterion); MUST drive running build; validate-verdict.sh rejects empty evidence/ → FAIL | Rule 8, 9 |
@@ -381,7 +370,7 @@ Source for all: `audit-rubric-final.md` Section A; `mk:skill-creator/SKILL.md`.
 | 4   | Outcome + constraint over railroaded steps — >5 sequential "Step N: run X" = FAIL                                                                   | A5, RF-4     | —                                                      |
 | 5   | Named cross-skill dependencies — implicit dependency without naming it = FAIL                                                                       | A10, RF-8    | 10 phantom command refs (CF-H11–CF-H15, CF-M29)        |
 | 6   | Description = trigger, not summary — no trigger language = FAIL                                                                                     | A7, RF-3     | CF-M14, CF-M16, CF-L5                                  |
-| 7   | Behavioral rules upgraded to preventive hooks — Gate 1 hook-enforced (`settings.json:41`) because behavioral-only rules fail under context pressure | —            | Gate-owning agents lack gate-rules.md refs (Section 5) |
+| 7   | Behavioral rules upgraded to preventive hooks where a mechanism exists — the ship check and credential guard are hooks (Section 5)             | —            | —                                                      |
 
 ---
 

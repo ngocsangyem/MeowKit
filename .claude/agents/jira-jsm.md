@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-jsm. Service desks, requests, queues,
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default
-memory: project
 color: cyan
 owner: jira
 criticality: medium

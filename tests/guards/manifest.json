@@ -1,0 +1,75 @@
+{
+  "counts": {
+    "guard": 48,
+    "expectedFail": 0
+  },
+  "guard": [
+    "cc: a non-ship command runs no ship check",
+    "cc: a source Write with no plan is allowed by every registered hook",
+    "cc: every registered PreToolUse guard has a case",
+    "cc: privacy allows a Read of a source file",
+    "cc: privacy blocks a Read of .env",
+    "cc: privacy blocks on unreadable hook input",
+    "cc: privacy blocks when its library crashes",
+    "cc: privacy decides the shared corpus: new names, traversal, case, symlink, near misses",
+    "cc: ship check allows a clean commit",
+    "cc: ship check blocks a commit that stages a lint error",
+    "cc: ship check blocks a commit whose related test fails",
+    "cc: ship check sees: gh pr create --fill",
+    "cc: ship check sees: gh pr merge 1",
+    "cc: ship check sees: git  commit -m x",
+    "cc: ship check sees: git -C . commit -m x",
+    "cc: ship check sees: git -c x=y commit -m x",
+    "cc: ship check sees: git ci -m x",
+    "cc: with no related-test mode the ship check says tests did not run",
+    "codex: a source Write with no plan is allowed by every registered hook",
+    "codex: completion check, when on, continues a turn with unverified edits until a check passes",
+    "codex: every registered PreToolUse guard has a case",
+    "codex: privacy allows an ordinary command",
+    "codex: privacy blocks a command that reads .env",
+    "codex: privacy blocks on unreadable hook input",
+    "codex: privacy decides the shared corpus on a command naming each file",
+    "codex: ship check blocks a commit that stages a lint error",
+    "codex: ship check blocks a commit whose related test fails",
+    "codex: with no related-test mode the ship check says tests did not run",
+    "cursor+cc: a dual install runs the ship check once per command",
+    "cursor: MCP gate allows an allowlisted server",
+    "cursor: MCP gate denies when no allowlist is configured",
+    "cursor: a source write with no plan is allowed by every registered hook",
+    "cursor: completion check, when on, sends a follow-up for unverified edits until a check passes",
+    "cursor: every registered guard has a case",
+    "cursor: read gate allows a source file",
+    "cursor: read gate decides the shared corpus",
+    "cursor: read gate denies .env",
+    "cursor: read gate ignores the kill switch",
+    "cursor: shell gate allows an ordinary command",
+    "cursor: shell gate denies a destructive command",
+    "cursor: shell gate kill switch (env) downgrades a deny",
+    "cursor: ship check blocks a commit that stages a lint error",
+    "cursor: ship check blocks a commit whose related test fails",
+    "cursor: the kill-switch flag file does not disable the shell gate",
+    "cursor: tool gate allows a read-only tool",
+    "cursor: tool gate denies a write to .git",
+    "cursor: tool gate denies an unclassified tool",
+    "cursor: with no related-test mode the ship check says tests did not run"
+  ],
+  "expectedFail": [],
+  "removed": [
+    {
+      "id": "cc: privacy blocks a Read of .envrc",
+      "reason": "gap closed; the name is in the shared privacy corpus case on all three runtimes"
+    },
+    {
+      "id": "cc: privacy blocks a Read of .npmrc",
+      "reason": "gap closed; the name is in the shared privacy corpus case on all three runtimes"
+    },
+    {
+      "id": "cc: privacy blocks a Read of id_rsa",
+      "reason": "gap closed; the name is in the shared privacy corpus case on all three runtimes"
+    },
+    {
+      "id": "cc: privacy blocks a Read of .kube/config",
+      "reason": "gap closed; the name is in the shared privacy corpus case on all three runtimes"
+    }
+  ]
+}

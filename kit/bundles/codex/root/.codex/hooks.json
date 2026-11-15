@@ -10,18 +10,53 @@
 						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/privacy-block.cjs')\"",
 						"timeout": 10,
 						"statusMessage": "Privacy guard (sensitive files)"
+					},
+					{
+						"type": "command",
+						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/pre-ship.cjs\"",
+						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/pre-ship.cjs')\"",
+						"timeout": 300,
+						"statusMessage": "Ship check (lint, related tests, type-check)"
 					}
 				]
-			},
+			}
+		],
+		"SessionStart": [
 			{
-				"matcher": "apply_patch|Edit|Write",
 				"hooks": [
 					{
 						"type": "command",
-						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/gate-enforcement.cjs\"",
-						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/gate-enforcement.cjs')\"",
-						"timeout": 10,
-						"statusMessage": "Gate 1 (approved plan required)"
+						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/completion-check.cjs\"",
+						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/completion-check.cjs')\"",
+						"timeout": 15,
+						"statusMessage": "Completion check (session baseline, opt-in)"
+					}
+				]
+			}
+		],
+		"PostToolUse": [
+			{
+				"matcher": "Bash",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/completion-check.cjs\"",
+						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/completion-check.cjs')\"",
+						"timeout": 15,
+						"statusMessage": "Completion check (verification evidence, opt-in)"
+					}
+				]
+			}
+		],
+		"Stop": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/completion-check.cjs\"",
+						"commandWindows": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/completion-check.cjs')\"",
+						"timeout": 15,
+						"statusMessage": "Completion check (unverified edits, opt-in)"
 					}
 				]
 			}

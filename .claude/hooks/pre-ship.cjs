@@ -1,13 +1,8 @@
 #!/usr/bin/env node
 'use strict';
-// pre-ship.cjs — the ship-boundary guard. Registered on Bash; only git commit,
-// push and merge trigger it, and everything else passes through untouched.
-//
-// Order is load-bearing. The structural ship proof and the team-memory lint run
-// ABOVE the profile check on purpose: the ship gate has no exceptions, "even
-// fast mode", and fast is exactly the profile under which someone is most
-// tempted to ship unreviewed. The build, lint and test block below stays
-// profile-gated, because those are speed trade-offs and these two are not.
+// pre-ship.cjs — the ship check. Registered on Bash; a git commit, push or merge
+// and `gh pr create|merge` trigger it (lib/ship-command.cjs), and everything else
+// passes through untouched. The decision lives in lib/core/pre-ship.cjs.
 //
 // Exit 2 is the only blocking value. Exit 1 is advisory — it would print
 // "BLOCKED" and let the ship happen anyway — so no blocking path here may use

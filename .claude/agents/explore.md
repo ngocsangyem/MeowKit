@@ -3,7 +3,6 @@ name: explore
 description: 'Fast, read-only agent optimized for searching and analyzing codebases. Use when locating code, tracing how a feature or bug path actually works, or building repo orientation before unfamiliar work. Examples: "Where is the session timeout enforced?", "What calls createInvoice?", "How is the webhook wired end to end?" Use proactively before planning or reviewing unfamiliar code. Not for implementation, plans, or review verdicts — it reports findings and never writes files.'
 tools: Read, Grep, Glob, Bash
 model: haiku
-memory: project
 source: local
 owner: research
 criticality: medium

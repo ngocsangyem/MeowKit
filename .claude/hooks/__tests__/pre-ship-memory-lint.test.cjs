@@ -9,11 +9,6 @@
 // hook's reaction to each exit code, which is the hook's whole contribution.
 // The lint's own detection surface is covered by the CLI's test suite.
 //
-// Gate 2 runs before this check in the real hook, so each fixture ships a stub
-// gate2-check.cjs that exits 0 — the real Gate 2 behavior has its own fixtures
-// in gate2-ship-boundary.test.cjs, and letting it block here would mask the
-// case under test.
-//
 // Run with: node --test .claude/hooks/__tests__/
 
 const { test } = require('node:test');
@@ -32,8 +27,6 @@ const HOOK = path.join(PROJECT_ROOT, '.claude/hooks/pre-ship.cjs');
  */
 function makeProject({ cliExit = 0, cliOutput = '', cli = true, store } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pre-ship-memory-'));
-
-  write(dir, '.claude/hooks/lib/gate2-check.cjs', '#!/bin/sh\nexit 0\n');
 
   if (store !== undefined) write(dir, '.meowkit/memory/gotchas.md', store);
 

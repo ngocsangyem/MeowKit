@@ -38,11 +38,11 @@ Replace subjective orchestrator judgment with deterministic, auditable domain-ba
 
 ## Routing Logic
 
-| Level | Execution Tier | Gate 1 | Workflow |
-|-------|-----------|--------|---------|
-| low | minimal | Bypass eligible (one-shot) | Minimal |
-| medium | standard | Required | Standard phases |
-| high | high-assurance | Required | Full phases + security |
+| Level | Execution Tier | Plan file | Workflow |
+|-------|-----------|-----------|---------|
+| low | minimal | May be skipped (one-shot) | Minimal |
+| medium | standard | Write it, agree it | Standard phases |
+| high | high-assurance | Write it, agree it | Full phases + security |
 
 ## Provider Boundary
 

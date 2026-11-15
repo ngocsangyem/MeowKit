@@ -232,12 +232,6 @@
       "exec": true
     },
     {
-      "path": ".claude/hooks/gate-enforcement.cjs",
-      "sha256": "2f855b3af388cb50894b8ffa4635049812e1b8d46d82eb2e0283eb971020adbb",
-      "size": 2717,
-      "exec": true
-    },
-    {
       "path": ".claude/hooks/handlers.json",
       "sha256": "cda78984f1cbe4a771abc1b95f43188ce3da68bed8b8a60502820d01b4f0c136",
       "size": 3206,
@@ -370,22 +364,20 @@
       "exec": true
     },
     {
+      "path": ".claude/hooks/handlers/verification-evidence.cjs",
+      "sha256": "301f5af02d0b4bd124e98eb6215764344acdc5b57de404c3ca70ed2b551284dd",
+      "size": 1522
+    },
+    {
       "path": ".claude/hooks/hook-coverage.json",
       "sha256": "17843419828dc1a2420b00f52837b9968d9c390efeda1234495ace179d034f92",
       "size": 5647,
       "exec": true
     },
     {
-      "path": ".claude/hooks/lib/approval-receipt.cjs",
-      "sha256": "352e397d83d829db4a8766749c1fd3a447eb9dd4f50112d12e7e4bf73c3de445",
-      "size": 6419,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/lib/check-contract-signed.cjs",
-      "sha256": "035875e3540bd4da2a4fab99f8ef7f390ab8c15e5909dbedf6ea32f7053dd51a",
-      "size": 5566,
-      "exec": true
+      "path": ".claude/hooks/lib/changed-files.cjs",
+      "sha256": "205471efd3e43730de84f4da70b606ea7f24fa8f6a24187789ba84637f868309",
+      "size": 2176
     },
     {
       "path": ".claude/hooks/lib/checkpoint-utils.cjs",
@@ -412,10 +404,9 @@
       "exec": true
     },
     {
-      "path": ".claude/hooks/lib/core/plan-gate.cjs",
-      "sha256": "185dfd6a6f8fbdbd2999636f12908aaef5dee0124ba70ed883bd2b9b379e3a64",
-      "size": 5860,
-      "exec": true
+      "path": ".claude/hooks/lib/core/completion-check.cjs",
+      "sha256": "9a4f22cc03e38ffdf6607f1326b57daf33e2dd22cb7e767bf98d069d24035fc9",
+      "size": 9546
     },
     {
       "path": ".claude/hooks/lib/core/pre-ship.cjs",
@@ -430,40 +421,9 @@
       "exec": true
     },
     {
-      "path": ".claude/hooks/lib/gate1-hatch.cjs",
-      "sha256": "e57cbd07cab1723cb2e885e2018685b7ba0f8a58b225b954bacf37f1fe05bd26",
-      "size": 5188,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/lib/gate1-path-rules.cjs",
-      "sha256": "0b277edf59db91b3cb87f2eb128515f9515370e599f8614a1d535987fe92598d",
-      "size": 3247,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/lib/gate2-change-set.cjs",
-      "sha256": "9335cd797e58cc9fe2df3d933de21f4ee715540031adf73d1c626f37b85110e1",
-      "size": 4035,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/lib/gate2-check.cjs",
-      "sha256": "7eaf7adf409851ce7e7f45c8cdb315d97131587708aef3794b2be410f64b2f79",
-      "size": 7542,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/lib/gate2-structural-checks.cjs",
-      "sha256": "6051d9bdb4c8958d58d5b77079a049c8a11646f9e936bb8a84d1741499ee1f01",
-      "size": 5388,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/lib/gate2-verdict-lookup.cjs",
-      "sha256": "51ee105796d6d91861bacf8151153196a277b447feaef98a73d2dd859a18bf88",
-      "size": 3912,
-      "exec": true
+      "path": ".claude/hooks/lib/density-lookup.cjs",
+      "sha256": "9b1bb4dded9ffed8cc4ec28d26da0ba35a8b8ee1cd25a7475454f4f9f7acfade",
+      "size": 2710
     },
     {
       "path": ".claude/hooks/lib/handler-registry.cjs",
@@ -532,12 +492,6 @@
       "exec": true
     },
     {
-      "path": ".claude/hooks/lib/plan-discovery.cjs",
-      "sha256": "794dcce027da3951e65ef7715a42478a3bf65c41c54fb8d600c70f66e3603492",
-      "size": 2298,
-      "exec": true
-    },
-    {
       "path": ".claude/hooks/lib/preship-checks.cjs",
       "sha256": "3f8fb68f8012cbaf23db8a056e9db0ec7024c72e0631f59dd9a5a5387590984b",
       "size": 4907,
@@ -586,6 +540,16 @@
       "exec": true
     },
     {
+      "path": ".claude/hooks/lib/ship-command.cjs",
+      "sha256": "8fd5bba89fa90259293df1b0b58c09721f12cbe9b109667ffe58518a97e000b9",
+      "size": 5098
+    },
+    {
+      "path": ".claude/hooks/lib/ship-run-once.cjs",
+      "sha256": "28fc48ea0fd647150033eb7ef6b6a12abad3aa073d026990b35efa8d0cfeb5cf",
+      "size": 3411
+    },
+    {
       "path": ".claude/hooks/lib/sidecar-lock.cjs",
       "sha256": "04d90239c3c176b1fa49b75dc8823aa84fba0a0040e22ff69000ca37200a7e58",
       "size": 3289,
@@ -613,30 +577,6 @@
       "path": ".claude/hooks/lib/validate-content.cjs",
       "sha256": "2c000464c99dea34e11ce0821e319555b43c3b89fb0e202dc6e585bda9d47c1d",
       "size": 1132,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/lib/validate-contract.cjs",
-      "sha256": "b79390c1b95b43ee7c8ea0463ef173dcc1b5d398706b280b824b30cf16ca64b5",
-      "size": 5049,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/lib/validate-gate-2.cjs",
-      "sha256": "4b45b562a3153ee14917ae51cb5b54f28b95d592a4bb15ebeed17049279e22e1",
-      "size": 3203,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/lib/validate-review-coverage.cjs",
-      "sha256": "a7c2898bdda564e8e9a4f1c8b8c7717cb0271df3b1dbbd73ec3cfedc62e7a22f",
-      "size": 2287,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/lib/validate-workflow-evidence.cjs",
-      "sha256": "a421d263ddde0f1f8973c1858905ed6d0a1da837d4e6a8e4776d70cdba7b2b48",
-      "size": 12812,
       "exec": true
     },
     {
@@ -679,12 +619,6 @@
       "path": ".claude/hooks/lib/yaml-subset.cjs",
       "sha256": "e09f5a159d4029c308d670e84e52172b86a3d5546f58d795890a948d6ffa2dc6",
       "size": 8322,
-      "exec": true
-    },
-    {
-      "path": ".claude/hooks/pre-implement.cjs",
-      "sha256": "160f37d6eab104ae488dbd1f2cdca0b3dc00c5afe727fe4352994a7f724995a3",
-      "size": 4712,
       "exec": true
     },
     {
@@ -743,11 +677,6 @@
       "path": ".claude/rules/development-rules.md",
       "sha256": "5a20e188699be5ff9549d6a5cd4ff291a8c9d0c949f4d32e990fef54d2d0da8f",
       "size": 3770
-    },
-    {
-      "path": ".claude/rules/gate-rules.md",
-      "sha256": "331860985b59dae9f958937a1d3bd536659df71d2cadac2436c8318881b424e2",
-      "size": 7642
     },
     {
       "path": ".claude/rules/injection-rules.md",
@@ -1684,12 +1613,6 @@
       "path": ".claude/skills/cook/scripts/validate-gate-1.sh",
       "sha256": "eeb76165925aba8c7695779aeecf82aed16729554fdb13fd93ffcb2be814e1fd",
       "size": 1427,
-      "exec": true
-    },
-    {
-      "path": ".claude/skills/cook/scripts/validate-gate-2.cjs",
-      "sha256": "9be4820f5b2b3b37a3abc1ea8b20c4bc0dd19d49b589ea4d46b2c57a75dbda71",
-      "size": 946,
       "exec": true
     },
     {
@@ -2775,19 +2698,9 @@
       "size": 3762
     },
     {
-      "path": ".claude/skills/jira-lifecycle/references/patterns/incident-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
-    },
-    {
       "path": ".claude/skills/jira-lifecycle/references/patterns/jsm-request-workflow.md",
       "sha256": "0fc30795137460342a80be6ff249c6e567ea637727dbf41f53e6ae662f88d98b",
       "size": 3509
-    },
-    {
-      "path": ".claude/skills/jira-lifecycle/references/patterns/jsm-request-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
     },
     {
       "path": ".claude/skills/jira-lifecycle/references/patterns/software-dev-workflow.md",
@@ -2795,19 +2708,9 @@
       "size": 3743
     },
     {
-      "path": ".claude/skills/jira-lifecycle/references/patterns/software-dev-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
-    },
-    {
       "path": ".claude/skills/jira-lifecycle/references/patterns/standard-workflow.md",
       "sha256": "c0d3b500596ff1b212cb39dfe5fe8e1157cb3af1f5efcdd80b96efc66c43515c",
       "size": 2402
-    },
-    {
-      "path": ".claude/skills/jira-lifecycle/references/patterns/standard-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
     },
     {
       "path": ".claude/skills/jira-lifecycle/references/workflow-cache-layout.md",
@@ -2941,16 +2844,6 @@
       "path": ".claude/skills/jira/scripts/requirements.txt",
       "sha256": "107364a16acdea254aa1008ef1945dcd7179df787c4260c57a879c148c7cee2e",
       "size": 182
-    },
-    {
-      "path": ".claude/skills/lazy-agent-loader/SKILL.md",
-      "sha256": "fd43e924c7e18943be2bbe67ea2f62c87970b08254eb4a45855b647072c021c2",
-      "size": 788
-    },
-    {
-      "path": ".claude/skills/lazy-agent-loader/references/loading-details.md",
-      "sha256": "a4d901526f8d6b656f8e3340903009e0bf59f60f68d13c6caa64069acec767d3",
-      "size": 1678
     },
     {
       "path": ".claude/skills/lint-and-validate/SKILL.md",
@@ -3621,11 +3514,6 @@
       "size": 1477
     },
     {
-      "path": ".claude/skills/plan-creator/references/gate-1-approval.md",
-      "sha256": "85bcb627fc580f78b5060ae59f0fd27e817b4eb67edbb7039ebfd8081f326beb",
-      "size": 3517
-    },
-    {
       "path": ".claude/skills/plan-creator/references/gotchas.md",
       "sha256": "31503f64b8b94366233cb0c6259805ed80ab914fcb9402f125a527f360d623a2",
       "size": 2847
@@ -3664,6 +3552,11 @@
       "path": ".claude/skills/plan-creator/references/plan-organization.md",
       "sha256": "968f7ccd03e06102dafc6d0805687167b104127dcaf54b20552c16d358d4898d",
       "size": 980
+    },
+    {
+      "path": ".claude/skills/plan-creator/references/plan-presentation.md",
+      "sha256": "09b2c00df76a8d5249222fa765e9cfb434f448bfc3934717b69bda570b74c383",
+      "size": 3515
     },
     {
       "path": ".claude/skills/plan-creator/references/red-team-standalone.md",
@@ -4886,18 +4779,6 @@
       "path": ".claude/skills/sprint-contract/references/bdd-to-ac-mapping.md",
       "sha256": "89f3d566b813514e9d6679797eb7a03c97bc8969cace61ba197182973dcb457f",
       "size": 7034
-    },
-    {
-      "path": ".claude/skills/sprint-contract/scripts/check-contract-signed.cjs",
-      "sha256": "454758658bcc2bea41e44060e1adcd05a256ff8acf21fa01771fc0a835f2d727",
-      "size": 928,
-      "exec": true
-    },
-    {
-      "path": ".claude/skills/sprint-contract/scripts/validate-contract.cjs",
-      "sha256": "834dfc36fa5c6880b299fa62ed9d600a0e5885f00d5606233cc2d45757b20372",
-      "size": 817,
-      "exec": true
     },
     {
       "path": ".claude/skills/status/SKILL.md",
@@ -8714,16 +8595,6 @@
       "size": 182
     },
     {
-      "path": ".meowkit/cache/.claude/skills/lazy-agent-loader/SKILL.md",
-      "sha256": "fd43e924c7e18943be2bbe67ea2f62c87970b08254eb4a45855b647072c021c2",
-      "size": 788
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/lazy-agent-loader/references/loading-details.md",
-      "sha256": "a4d901526f8d6b656f8e3340903009e0bf59f60f68d13c6caa64069acec767d3",
-      "size": 1678
-    },
-    {
       "path": ".meowkit/cache/.claude/skills/lint-and-validate/SKILL.md",
       "sha256": "89e8ab3092b7a325b88304cdb6cabf411a85300eecff0a3ef2368e13bef1f8eb",
       "size": 3805
@@ -11605,8 +11476,8 @@
     },
     {
       "path": ".meowkit/config.yaml",
-      "sha256": "e4b57801669dfbbd75c904c69214ae9b4cd593b4a5faf018e2a654b1de3c6b4a",
-      "size": 2091
+      "sha256": "da3a5becec94893e5656ac2f7fbdebd40dc8e726e3de9bc782bb8b3be64bb241",
+      "size": 2122
     },
     {
       "path": ".meowkit/gitignore.meowkit",

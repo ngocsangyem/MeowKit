@@ -1,7 +1,7 @@
 ---
 name: story-sizer
 description: 'mk:jira family executor for mk:story-sizer. Fibonacci sizing of pasted stories.'
-tools: Bash, Read, Grep, Glob, Write
+tools: Bash, Read, Grep, Glob, Write, Edit
 model: haiku
 permissionMode: default
 memory: project

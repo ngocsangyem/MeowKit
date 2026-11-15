@@ -190,7 +190,7 @@ Both keys optional and additive — legacy plans without the block still validat
 When the user accepts unresolved contradictions in W2, write a Risk Assessment row to EACH affected phase file:
 
 ```
-| Deferred consistency contradiction (count: K) | L | M | See ## Validation Log; reviewer adjudicates at Gate 2 |
+| Deferred consistency contradiction (count: K) | L | M | See ## Validation Log; the reviewer adjudicates it at Phase 4 |
 ```
 
 Use the option label: **"Accept risk: proceed with unresolved contradictions (writes Risk rows + ## Validation Log)"**.

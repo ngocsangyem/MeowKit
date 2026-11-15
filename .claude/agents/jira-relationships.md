@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-relationships. Issue links, blockers,
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default
-memory: project
 color: purple
 owner: jira
 criticality: medium

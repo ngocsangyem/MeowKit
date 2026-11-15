@@ -4,12 +4,11 @@
 // b225a319699fdffce38f8c0ac63e30465a31137c. Needles are matched against whitespace-
 // normalized file text, so re-wrapping or table re-padding does not hide a deletion.
 
-/** The 7 always-on rule files searched for every item below. */
+/** The 6 always-on rule files searched for every item below. */
 const ALWAYS_ON_FILES = [
 	"meowkit-core.md",
 	"security-rules.md",
 	"injection-rules.md",
-	"gate-rules.md",
 	"core-behaviors.md",
 	"development-rules.md",
 	"agent-conduct.md",
@@ -52,17 +51,11 @@ const securityEnforcement = [
 	},
 ];
 
-const gateConditions = [
-	["Gate 1 condition 1", "**Plan file exists**"],
-	["Gate 1 condition 2", "**All required sections are populated:**"],
-	["Gate 1 condition 3", "**Human has explicitly typed approval.**"],
-	["Gate 1 condition 4", "**A fresh approval receipt is stamped on the plan**"],
-	["Gate 2 condition 1", "**Verdict file exists**"],
-	["Gate 2 condition 2", "**No FAIL dimensions**"],
-	["Gate 2 condition 3", "**All WARN items acknowledged**"],
-	["Gate 2 condition 4", "**Security scan shows no BLOCK items**"],
-	["Gate 2 condition 5", "Same standard as Gate 1"],
-].map(([name, needle]) => ({ name: `${name} (${needle})`, needle }));
+/** What stays true after the approval gates were removed: the ship check and its scope. */
+const shipCheck = [
+	["ship check runs on ship commands", "the `pre-ship` hook runs lint on the changed files, the tests related to them and a type-check"],
+	["ship check says when tests did not run", "it runs lint and type-check only and says so"],
+].map(([name, needle]) => ({ name: `meowkit-core ${name}`, needle }));
 
 const a1Block = [
 	"**Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT",
@@ -109,7 +102,7 @@ const ORACLE = [
 	...injectionHeadings,
 	...securityRows,
 	...securityEnforcement,
-	...gateConditions,
+	...shipCheck,
 	...a1Block,
 	...a1TableRows,
 	...coreBehaviorHeadings,

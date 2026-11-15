@@ -87,16 +87,12 @@ fn every_rejection_class_fires_its_own_rule() {
         "absolute-path"
     );
     assert_eq!(
-        code(vec![("hooks.gate2-check", ConfigValue::Bool(false))]),
+        code(vec![("hooks.privacy-block", ConfigValue::Bool(false))]),
         "protected-hook"
     );
     assert_eq!(
         code(vec![("skip_eng_review", ConfigValue::Bool(true))]),
         "state-only-key"
-    );
-    assert_eq!(
-        code(vec![("gate1PresenceOnly", ConfigValue::Bool(true))]),
-        "user-scope-only"
     );
     assert_eq!(
         code(vec![("sparkles", ConfigValue::Bool(true))]),
@@ -118,19 +114,6 @@ fn every_rejection_class_fires_its_own_rule() {
 }
 
 #[test]
-fn the_hatch_key_is_legal_in_the_user_file_only() {
-    let pairs = vec![("gate1PresenceOnly", ConfigValue::Bool(true))];
-    assert!(verdict(pairs.clone(), ConfigScope::UserConfig).is_ok());
-    let error = verdict(pairs, ConfigScope::ProjectConfig).expect_err("a committed downgrade");
-    assert_eq!(error.code, "user-scope-only");
-    assert!(
-        error.fix.contains("MEOWKIT_GATE1_PRESENCE_ONLY"),
-        "{}",
-        error.fix
-    );
-}
-
-#[test]
 fn an_unregistered_observer_toggle_is_an_unknown_key() {
     let values: ConfigValues = vec![("hooks.not-installed", ConfigValue::Bool(false))]
         .into_iter()
@@ -147,7 +130,7 @@ fn a_protected_hook_is_refused_even_with_no_registry() {
         .collect();
     let error = apply_rules(&values, &[], ConfigScope::ProjectConfig).expect_err("protected");
     assert_eq!(error.code, "protected-hook");
-    assert!(error.message.contains("Gate 2"), "{}", error.message);
+    assert!(error.message.contains("related tests"), "{}", error.message);
 }
 
 #[test]

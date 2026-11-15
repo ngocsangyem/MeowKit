@@ -95,8 +95,8 @@ Secrets never belong in prompts, logs, inventory, or reports at any tier — see
 `injection-rules.md` Rule 4 (sensitive-file protection) and Rule 5 (no external
 exfiltration). Route any secret-bearing plan through those rules instead of
 proceeding here. R3 approval and its rationale are durable per
-the intervention-recording invariant in AGENTS.md; the gate itself is owned by `gate-rules.md`
-and is never satisfied by this file.
+the intervention-recording invariant in AGENTS.md. The approval comes from the user — or
+the host's own permission prompt — never from this file.
 
 ## Routing Rules
 

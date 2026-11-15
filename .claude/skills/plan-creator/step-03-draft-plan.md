@@ -68,7 +68,7 @@ Add a `## Autonomy Boundaries` section to plan.md **only** when the run is long-
 
 WHY: across a multi-session or autonomous run, the only signals are global hard-stops (stop) or nothing (proceed). That binary causes both over-asking (interrupting a long run for trivia) and over-reach (silently making a reversible-but-significant choice). A persistent three-tier block, carried in the plan so it survives a cold-start resume, gives the executor a middle tier.
 
-This block is **advisory** and carries only the **extra latitude specific to THIS task** — a delta over the always-on rules, NOT a restatement of them. Derive each item from this task's risk surface; do NOT copy generic defaults (running tests, naming, refactor-in-owned-files, schema-change escalation, budget tier, out-of-scope files) — those already live in the baseline rules and restating them duplicates rules and invites drift. Keep it short (the ≤80-line plan.md budget). The user tunes it at Gate 1.
+This block is **advisory** and carries only the **extra latitude specific to THIS task** — a delta over the always-on rules, NOT a restatement of them. Derive each item from this task's risk surface; do NOT copy generic defaults (running tests, naming, refactor-in-owned-files, schema-change escalation, budget tier, out-of-scope files) — those already live in the baseline rules and restating them duplicates rules and invites drift. Keep it short (the ≤80-line plan.md budget). The user tunes it when the plan is presented.
 
 ```markdown
 ## Autonomy Boundaries
@@ -77,7 +77,7 @@ Baseline rules (security, gates, tests, naming, scope, budget) always apply; bel
 
 - **Always (autonomous):** {reversible, in-scope choices the executor may make without asking — e.g. "pick the internal helper name", "choose the test fixture layout"}
 - **Ask first:** {reversible-but-significant choices to surface before acting — e.g. "swap the charting lib", "change the public API response shape", "add a new top-level route"}
-- **Never:** see `.claude/rules/security-rules.md` and `.claude/rules/gate-rules.md` (hard stops — not restated here).
+- **Never:** see `.claude/rules/security-rules.md` and `.claude/rules/injection-rules.md` (hard stops — not restated here).
 ```
 
 #### Conditional: `## User-Confirmed Decisions` (intake packet only)

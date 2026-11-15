@@ -1,5 +1,5 @@
 #!/bin/sh
-# test-scripts.sh — Test both gate validation scripts
+# test-scripts.sh — Test the plan-structure check and cook's workflow contracts
 # Usage: sh test-scripts.sh
 # Runs from the scripts/ directory
 
@@ -35,7 +35,7 @@ run_test() {
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
-# --- Gate 1 Tests ---
+# --- Plan structure tests ---
 
 # Test 1: Valid plan with all sections
 cat > "$TMPDIR/valid-plan.md" << 'PLAN'
@@ -52,7 +52,7 @@ Implement OAuth2 flow.
 |---|-------|
 | 1 | Auth  |
 PLAN
-run_test "Gate 1: valid plan" 0 sh "$SCRIPT_DIR/validate-gate-1.sh" "$TMPDIR/valid-plan.md"
+run_test "Plan structure: valid plan" 0 sh "$SCRIPT_DIR/validate-gate-1.sh" "$TMPDIR/valid-plan.md"
 
 # Test 2: Plan missing success criteria
 cat > "$TMPDIR/incomplete-plan.md" << 'PLAN'
@@ -60,41 +60,10 @@ cat > "$TMPDIR/incomplete-plan.md" << 'PLAN'
 ## Problem
 Something is broken.
 PLAN
-run_test "Gate 1: missing sections" 1 sh "$SCRIPT_DIR/validate-gate-1.sh" "$TMPDIR/incomplete-plan.md"
+run_test "Plan structure: missing sections" 1 sh "$SCRIPT_DIR/validate-gate-1.sh" "$TMPDIR/incomplete-plan.md"
 
 # Test 3: Non-existent file
-run_test "Gate 1: file not found" 1 sh "$SCRIPT_DIR/validate-gate-1.sh" "$TMPDIR/nonexistent.md"
-
-# --- Gate 2 Tests ---
-
-# Test 4: Clean review (no critical, no FAIL)
-run_test "Gate 2: clean review" 0 sh -c "printf 'Score: 9.2/10\nCritical (0): []\nWarnings (1): [minor issue]\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
-
-# Test 5: Review with critical issues
-run_test "Gate 2: critical issues" 1 sh -c "printf 'Score: 6/10\nCritical (2): [XSS, SQL injection]\nSecurity: FAIL\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
-
-# Test 6: Review with FAIL dimension
-run_test "Gate 2: FAIL dimension" 1 sh -c "printf 'Score: 7/10\nFAIL: architecture violated\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
-
-# Test 8: Incidental "failed" in prose should NOT trigger block
-run_test "Gate 2: incidental 'failed' in prose" 0 sh -c "printf 'Score: 8.5/10\nCritical (0): []\nThis approach failed to consider edge cases but was corrected.\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
-
-# Test 7: File not found
-run_test "Gate 2: file not found" 1 node "$SCRIPT_DIR/validate-gate-2.cjs" "$TMPDIR/nonexistent-verdict.md"
-
-# Test 9: Side effects detected without addendum should block
-run_test "Gate 2: side effects no addendum" 1 sh -c "printf 'Score: 8/10\nCritical (0): []\nSide Effects Detected: Yes\n- Regression in auth flow\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
-
-# Test 10: Side effects detected WITH User Decision Addendum should pass
-run_test "Gate 2: side effects with addendum" 0 sh -c "printf 'Score: 8/10\nCritical (0): []\nSide Effects Detected: Yes\n- Regression in auth flow\n\n## User Decision Addendum\nUser selected: Add compatibility shim at auth boundary\nResumption point: Phase 3\n' | node '$SCRIPT_DIR/validate-gate-2.cjs' -"
-
-# Test 11: A security BLOCK verdict fails independently of review evidence
-cat > "$TMPDIR/security-security-verdict.md" <<'VERDICT'
-| Rule | Verdict | Evidence |
-| --- | --- | --- |
-| R7 | FAIL | Prompt injection does not halt |
-VERDICT
-run_test "Gate 2: security BLOCK verdict" 1 node "$SCRIPT_DIR/validate-gate-2.cjs" "$TMPDIR/security-security-verdict.md"
+run_test "Plan structure: file not found" 1 sh "$SCRIPT_DIR/validate-gate-1.sh" "$TMPDIR/nonexistent.md"
 
 # --- Declarative workflow contracts ---
 

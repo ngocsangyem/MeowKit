@@ -1,0 +1,60 @@
+{
+	"_about": {
+		"what": "An optional host profile that makes the agent's own session refuse to rewrite the files its guards are made of: the hook scripts, the hook registrations, and the ownership index `mewkit doctor` compares them against.",
+		"why": "Nothing in the workflow stops an edit to a guard. The `guards: integrity` row in `mewkit doctor` reports that one happened, after the fact. This profile is the half that happens before: the host refuses the write.",
+		"how": "Merge the `permissions` and `sandbox` blocks into `.claude/settings.json` (or your managed settings, which the agent cannot edit back). Keys are Claude Code's; Codex and Cursor name theirs differently, and the paths below are the same for all three.",
+		"limits": [
+			"A deny rule is not a security boundary. Claude Code's own documentation says so: `Bash(rm *)` does not match `/bin/rm`, and a Python or Node subprocess that opens a file names no file to match. The `sandbox.filesystem.denyWrite` block below is the OS-level half, and the one worth having.",
+			"A profile in a project settings file can be edited by whatever can edit the project. Managed settings are the only tier an agent in the session cannot reach.",
+			"`Read` and `Edit` deny rules cover the built-in file tools, the Bash file commands the host recognises and redirection targets — not `grep -r`, and not a subprocess."
+		],
+		"covers": [
+			".claude/hooks",
+			".claude/settings.json",
+			".codex/hooks",
+			".codex/hooks.json",
+			".codex/config.toml",
+			".cursor/hooks",
+			".cursor/hooks.json",
+			".meowkit/state/ownership"
+		]
+	},
+	"permissions": {
+		"deny": [
+			"Edit(.claude/hooks/**)",
+			"Write(.claude/hooks/**)",
+			"Edit(.claude/settings.json)",
+			"Write(.claude/settings.json)",
+			"Edit(.claude/settings.local.json)",
+			"Write(.claude/settings.local.json)",
+			"Edit(.codex/hooks/**)",
+			"Write(.codex/hooks/**)",
+			"Edit(.codex/hooks.json)",
+			"Write(.codex/hooks.json)",
+			"Edit(.codex/config.toml)",
+			"Write(.codex/config.toml)",
+			"Edit(.cursor/hooks/**)",
+			"Write(.cursor/hooks/**)",
+			"Edit(.cursor/hooks.json)",
+			"Write(.cursor/hooks.json)",
+			"Edit(.meowkit/state/ownership/**)",
+			"Write(.meowkit/state/ownership/**)"
+		]
+	},
+	"sandbox": {
+		"enabled": true,
+		"filesystem": {
+			"denyWrite": [
+				".claude/hooks",
+				".claude/settings.json",
+				".claude/settings.local.json",
+				".codex/hooks",
+				".codex/hooks.json",
+				".codex/config.toml",
+				".cursor/hooks",
+				".cursor/hooks.json",
+				".meowkit/state/ownership"
+			]
+		}
+	}
+}

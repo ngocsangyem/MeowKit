@@ -14,7 +14,7 @@ This enables suggesting the right skill — not just the right model tier.
 | **Refactor** | "refactor", "clean up", "extract", "simplify", "rename" | `mk:cook --fast` | Behavior unchanged — structure only |
 | **Security** | "vulnerability", "CVE", "audit", "penetration", "secrets" | `mk:cso` | Forces COMPLEX tier — no downgrade |
 | **DevOps** | "deploy", "CI/CD", "pipeline", "docker", "kubernetes" | `mk:cook` | Infrastructure as code follows standard flow |
-| **Documentation** | "docs", "README", "changelog", "API docs" | `mk:docs-init` or `mk:document-release` | MICRO-TASK eligible — Gate 1 bypass possible |
+| **Documentation** | "docs", "README", "changelog", "API docs" | `mk:docs-init` or `mk:document-release` | MICRO-TASK eligible — may skip the plan file |
 | **Review** | "review", "PR", "pull request", "check" | `mk:review` | Adversarial 4-step review workflow |
 | **Intake** | "PRD", "ticket", "issue", "analyze ticket", "triage" | `mk:intake` | Phase 2 — not yet available in v1.x |
 

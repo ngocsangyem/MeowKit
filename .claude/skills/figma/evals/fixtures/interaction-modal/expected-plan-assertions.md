@@ -15,7 +15,7 @@ contain. Binary checks. Built FROM the packet — no Figma MCP call.
       not wired in prototype = high-risk ambiguity).
 - [ ] Exactly the invite-flow phase carries `blocked_on:`; other phases (e.g. static
       members table) are NOT blocked.
-- [ ] Gate 1 can still approve the plan (ambiguity is explicit) — block is phase-scoped.
+- [ ] The plan can still be agreed with the user (ambiguity is explicit) — the block is phase-scoped.
 - [ ] Browser-evidence task routed to `mk:agent-browser`; deterministic checks to
       `mk:playwright-cli` / `mk:qa-manual` (not merged into one owner).
 

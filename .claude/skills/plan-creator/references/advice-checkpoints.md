@@ -22,26 +22,24 @@ phase file, or per red-team finding.
 
 GUIDE fires after the scope challenge because that is where the scope stops moving;
 supervising a scope that is still being negotiated advises on a plan that will not
-exist. REVIEW fires before the gate step, never inside it.
+exist. REVIEW fires before the presentation step, never inside it.
 
-## The Gate 1 boundary — the thing most likely to go wrong here
+## The user boundary — the thing most likely to go wrong here
 
-**Athena does not approve Gate 1, and a REVIEW checkpoint is not a pre-approval.**
+**Athena does not settle the plan with the user, and a REVIEW checkpoint is not a
+substitute for that conversation.**
 
-`step-07-gate` is unchanged: the human reads the plan and approves it, and
-`mewkit plan approve` stamps the receipt. A `READY_FOR_EXISTING_GATE` disposition
-means "the plan is in a state where presenting Gate 1 is the correct next step" —
-nothing more. Presenting it earlier, skipping it, or citing Athena's directive as
-part of the approval is a Gate Authority Invariant violation
-(`.claude/rules/gate-rules.md`).
+`step-07-gate` is unchanged: the user reads the plan and says whether it is right. A
+`READY_FOR_EXISTING_GATE` disposition means "the plan is in a state where presenting it
+is the correct next step" — nothing more. Skipping the presentation, or citing Athena's
+directive instead of the user's answer, replaces the one judgement the step exists for.
 
 Athena also does not write the plan. `RETURN_TO_EXECUTOR` routes corrections back to
 the **planner**, which edits the plan and re-runs the normal checks; the corrected
-plan then goes to Gate 1 the ordinary way.
+plan then goes to the user the ordinary way.
 
-If the correction changes scope rather than wording, the plan body changes, so any
-previously stamped approval goes stale and re-approval is required — that is the
-existing receipt mechanism working, not a new rule.
+If the correction changes scope rather than wording, the plan the user saw no longer
+describes the work, so present it again rather than carrying the earlier answer forward.
 
 ## Call
 
@@ -87,10 +85,10 @@ Route on the disposition:
 
 - `CONTINUE_WITH_DIRECTIVE` — continue the step sequence; the directive is input to
   planning, not a replacement for a step.
-- `READY_FOR_EXISTING_GATE` — run `step-07-gate` as normal. Gate 1 is **not** cleared.
+- `READY_FOR_EXISTING_GATE` — run `step-07-gate` as normal. The user's answer is still owed.
 - `RETURN_TO_EXECUTOR` — the planner applies each correction or records why it is
   rejected, the normal semantic and validation checks re-run, then RECHECK once.
-- `ESCALATE_TO_HUMAN` — stop at the existing human touchpoint.
+- `ESCALATE_TO_HUMAN` — stop and ask the user.
 - `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
 
 A second unresolved return escalates to a human; there is no third opinion.

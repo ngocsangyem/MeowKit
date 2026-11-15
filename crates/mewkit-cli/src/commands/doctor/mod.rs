@@ -2,15 +2,30 @@
 //! and the other one, and whether their hooks can run. Plain `doctor` changes
 //! nothing; `--adopt` writes the install baseline and `--hard-gates` runs the
 //! kit's hooks in a scratch project. It never marks a project or hook as trusted.
+//!
+//! It also reports where the kit shares a host with something else — agent
+//! names, hook registrations, instruction files, the skill listing and a host
+//! loading a second runtime's tree — plus the two rows that can go non-green
+//! without anything being broken: a check weakened by config or environment,
+//! and a guard file that no longer matches what was installed. Those rows are
+//! `ok` or `warn` and never `fail`, so they change no exit code.
 mod adopt;
 mod codex_trust;
+mod coexistence;
+mod coexistence_hooks;
+mod coexistence_scan;
+mod coexistence_sources;
 mod extras;
 mod hard_gates;
 mod hook_commands;
+mod hook_lines;
 mod hooks;
+mod host_config;
 mod installs;
+mod integrity;
 mod provenance;
 mod toolchain;
+mod weakened;
 
 use clap::Args;
 use mewkit_adapters::contract::Runtime;
@@ -107,8 +122,20 @@ pub fn run(args: &DoctorArgs) -> Result<u8, Failure> {
         parse_targets(&args.target)?
     };
     let place = Place::new(args.global)?;
+    // The other scope may not resolve — an unset home is a scope fewer to read,
+    // not an error — and when the project IS the home directory the two scopes
+    // are one tree, where every name would be found at "both" scopes because
+    // there is only one. Either way the coexistence rows get the scopes that
+    // are really distinct; `installs` still sees both, because its question is
+    // about two installs rather than two trees.
+    let other = place.other();
+    let elsewhere = other.as_ref().filter(|o| !same_root(o, &place));
+    let scopes: Vec<&Place> = [Some(&place), elsewhere].into_iter().flatten().collect();
     let mut checks = toolchain::checks();
-    checks.extend(installs::checks(&place, place.other().as_ref(), &targets));
+    checks.extend(installs::checks(&place, other.as_ref(), &targets));
+    checks.extend(coexistence::checks(&scopes, &targets));
+    checks.push(weakened::check(&scopes));
+    checks.push(integrity::check(&scopes, &targets));
     let root = extras::project_root();
     if args.providers {
         checks.extend(extras::provider_checks());
@@ -150,4 +177,15 @@ pub fn run(args: &DoctorArgs) -> Result<u8, Failure> {
     } else {
         OK
     })
+}
+
+/// True when two places resolve to one directory, as they do for a project
+/// opened in the home directory. The comparison canonicalizes both: the global
+/// scope already resolves its root through any symlink, the project scope keeps
+/// the working directory as given, and on macOS those two spellings of the same
+/// directory differ (`/var/…` against `/private/var/…`).
+fn same_root(a: &Place, b: &Place) -> bool {
+    let real =
+        |p: &Place| std::fs::canonicalize(&p.scope.root).unwrap_or_else(|_| p.scope.root.clone());
+    real(a) == real(b)
 }

@@ -30,8 +30,8 @@ Skip when:
 3. **6-hour wall-clock timeout** — hard limit per Anthropic's observed runs <!-- research-citation -->; checkpoints every step for resumability
 4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
 5. **Run report mandatory** — every autobuild run produces `tasks/autobuild-runs/YYMMDD-{slug}/run.md` with full audit trail
-6. **Coexists with `mk:cook`** — does not replace it; both route through Gate 1 + Gate 2
-7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED-phase gate. With `--tdd`: writes the `.meowkit/state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. Active-verification HARD GATE (Rule 8 of the harness rules) is independent of TDD mode and always applies.
+6. **Coexists with `mk:cook`** — does not replace it; both plan with the user first and review the diff before shipping
+7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED phase. With `--tdd`: writes the `.meowkit/state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. The evaluator's active-verification requirement (Rule 8 of the harness rules) is independent of TDD mode and always applies.
 
 ## Workflow
 
@@ -103,7 +103,7 @@ ended: 2026-04-08T15:18:00Z
 ## Gotchas
 
 - **Don't run on a non-green-field task.** Use `mk:cook` for single features, bug fixes, refactors. The autobuild workflow is for "build me an app" scope.
-- **Density override stays in scope.** `MEOWKIT_AUTOBUILD_MODE=LEAN` does NOT skip Gate 2. Review verdict is still mandatory before ship.
+- **Density override stays in scope.** `MEOWKIT_AUTOBUILD_MODE=LEAN` drops the sprint contract, not the review: still review the diff and write the verdict before shipping.
 - **Iteration loops are bounded.** Max 3 by default. After round 3, escalate — don't keep iterating blindly.
 - **Budget check is authoritative.** If `budget-tracker.sh` says block, the autobuild workflow halts even mid-iteration.
 - **Run reports are append-only.** Don't edit prior steps' entries — the report is the audit trail.
@@ -113,13 +113,13 @@ ended: 2026-04-08T15:18:00Z
 
 Opt-in strategic supervision for one run. At named macro checkpoints — GUIDE at the
 Plan/Contract boundary, RESCUE on a plateau or scope drift, REVIEW after the terminal
-evaluator verdict and before the Gate 2 question, RECHECK after a correction; hard cap
+evaluator verdict and before the ship question, RECHECK after a correction; hard cap
 5 — the `athena` agent assesses the situation, recommends an operational path inside the
 locked scope, and may return the work for correction.
 
-It never approves. Gate 2 stays human, the evaluator keeps its verdict and its
-active-verification hard gate, and the iteration cap and budget thresholds keep their own
-schedules. Checkpoints are macro boundaries — never per generated artifact and never per
+It never approves. The ship decision stays the user's, the evaluator keeps its verdict and
+its active-verification requirement, and the iteration cap and budget thresholds keep their
+own schedules. Checkpoints are macro boundaries — never per generated artifact and never per
 evaluator iteration, so a five-round build makes no more calls than a one-round build.
 
 Without the flag there are zero calls and no state is written.

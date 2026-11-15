@@ -22,13 +22,6 @@
       "runtime": "claude-code",
       "responsibility": "verification"
     },
-    "rules/gate-rules.md": {
-      "owner": "lifecycle",
-      "criticality": "critical",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "gate-enforcement"
-    },
     "rules/injection-rules.md": {
       "owner": "security",
       "criticality": "critical",
@@ -64,26 +57,12 @@
       "runtime": "claude-code",
       "responsibility": "observability"
     },
-    "hooks/gate-enforcement.cjs": {
-      "owner": "security",
-      "criticality": "critical",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "gate-enforcement"
-    },
-    "hooks/pre-implement.cjs": {
-      "owner": "lifecycle",
-      "criticality": "high",
-      "status": "active",
-      "runtime": "claude-code",
-      "responsibility": "gate-enforcement"
-    },
     "hooks/pre-ship.cjs": {
       "owner": "lifecycle",
       "criticality": "high",
       "status": "active",
       "runtime": "claude-code",
-      "responsibility": "gate-enforcement"
+      "responsibility": "verification"
     },
     "hooks/privacy-block.cjs": {
       "owner": "security",
@@ -195,7 +174,7 @@
       "criticality": "critical",
       "status": "active",
       "runtime": "claude-code",
-      "responsibility": "gate-enforcement"
+      "responsibility": "verification"
     },
     "hooks/handlers/pre-task-check.cjs": {
       "owner": "observability",
@@ -217,6 +196,13 @@
       "status": "active",
       "runtime": "claude-code",
       "responsibility": "context-selection"
+    },
+    "hooks/handlers/verification-evidence.cjs": {
+      "owner": "lifecycle",
+      "criticality": "medium",
+      "status": "active",
+      "runtime": "claude-code",
+      "responsibility": "verification"
     },
     "hooks/handlers/review-evidence-tag.cjs": {
       "owner": "lifecycle",

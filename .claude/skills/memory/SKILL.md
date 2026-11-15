@@ -80,7 +80,7 @@ Rules:
   after a code comment records it at one site; write it when another site could hit the same trap.
 - **One entry per lesson.** If an entry already covers it, update that entry instead of adding
   a duplicate.
-- **No secrets, no vulnerability detail.** Security findings stay in `mk:cso` reports and Gate 2
+- **No secrets, no vulnerability detail.** Security findings stay in `mk:cso` reports and review
   verdicts, so exploit detail is never committed into a shared recall file. Scrub tokens and PII
   before you pipe an entry in — `mewkit note` rejects a secret-shaped token rather than scrubbing
   it, and a rejected entry is not written. It also rejects quoted injection phrases: to record a

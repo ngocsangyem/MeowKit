@@ -188,7 +188,7 @@ fn a_planted_bad_flag_is_caught() {
     let dir = tempfile::tempdir().expect("tempdir");
     fs::write(
         dir.path().join("a.md"),
-        "Run `mewkit plan approve x --by me --sign`, then `mk upgrade --check | head`.\n\
+        "Run `mewkit plan archive x --dry-run --sign`, then `mk upgrade --check | head`.\n\
          `mewkit budget --monthly --nope` and `mewkit task new --type feature \"x\"`.\n",
     )
     .expect("write");
@@ -196,7 +196,7 @@ fn a_planted_bad_flag_is_caught() {
     assert_eq!(
         s.findings,
         [
-            "a.md:1: `mewkit plan approve` has no `--sign`",
+            "a.md:1: `mewkit plan archive` has no `--sign`",
             "a.md:2: `mewkit budget` has no `--nope`",
         ]
     );

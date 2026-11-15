@@ -34,24 +34,23 @@ default_enabled: true
 
 ## Workflow
 
-0. **Safety baseline precheck (HARD GATE).** Before any other step, scan the context window for the cached-sentinel marker emitted by `safety-sentinel-inject.cjs`:
+0. **Safety baseline precheck (do this first).** Before any other step, scan the context window for the cached-sentinel marker emitted by `safety-sentinel-inject.cjs`:
 
    ```
    ## Safety baseline: verified (cached, session <id>)
    ```
 
    If the marker IS present (turns 2..N of the same session): emit
-   `Safety baseline: verified (cached)` and SKIP the 7-file Read loop below.
-   The 7 rules remain in context from the inner harness's `.claude/rules/` auto-load;
+   `Safety baseline: verified (cached)` and SKIP the Read loop below.
+   The rules remain in context from the inner harness's `.claude/rules/` auto-load;
    the sentinel only suppresses redundant re-reads.
 
    If the marker is ABSENT (turn 1 of a new session, OR
-   `MEOWKIT_SKIP_SAFETY_SENTINEL=off`): `Read` each of the 7 always-on
+   `MEOWKIT_SKIP_SAFETY_SENTINEL=off`): `Read` each of the always-on
    safety/baseline rules — exactly the files in `.claude/rules/`, no more:
    - `.claude/rules/meowkit-core.md`
    - `.claude/rules/security-rules.md`
    - `.claude/rules/injection-rules.md`
-   - `.claude/rules/gate-rules.md`
    - `.claude/rules/core-behaviors.md`
    - `.claude/rules/development-rules.md`
    - `.claude/rules/agent-conduct.md`
@@ -63,7 +62,7 @@ default_enabled: true
    Refusing to route any task. Restore the rule (git checkout / the installer) before retrying.
    ```
 
-   Do NOT proceed to detection. Do NOT route to any agent. The 7 rules are the deterministic baseline; their absence indicates either repo corruption or a partial install. Replaces the unverified directory-auto-load assumption with a positive existence check.
+   Do NOT proceed to detection. Do NOT route to any agent. Those rules are the deterministic baseline; their absence indicates either repo corruption or a partial install. Replaces the unverified directory-auto-load assumption with a positive existence check.
 
 0a. **Project context first.** When `docs/project-context.md` exists, `Read` it BEFORE any task-specific context — it is the project constitution (stack, conventions, anti-patterns), and loading it first prevents conflicting convention guesses (agent-conduct A2, detailed in `.claude/skills/cook/references/agent-conduct-extended.md`). If it is absent, log `project-context: absent; proceeding without it` and continue — this is never an abort.
 
@@ -73,7 +72,7 @@ default_enabled: true
    ## Phase-zero rules: verified (cached, session <id>)
    ```
 
-   If the marker IS present: emit `Phase-zero rules: verified (cached)` and SKIP the 7-file Read loop. If ABSENT (turn 1 or env-var override), `Read` each phase-zero file. These moved out of the always-on set and are now loaded just in time, once per agent-detector invocation:
+   If the marker IS present: emit `Phase-zero rules: verified (cached)` and SKIP the Read loop. If ABSENT (turn 1 or env-var override), `Read` each phase-zero file. These moved out of the always-on set and are now loaded just in time, once per agent-detector invocation:
    - `.claude/skills/cook/references/phase-contracts.md` — what each phase expects/produces
    - `references/agent-routing.md` — agent → role → phase table
    - `references/model-selection-rules.md` — task-type → model-tier mapping

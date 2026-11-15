@@ -67,9 +67,9 @@ matches what actually happened.
 
 ## What supervision does NOT touch here
 
-- **Gate 2.** `mk:review` owns the verdict; the human owns the approval. Ship does not
-  re-run adversarial review and Athena does not stand in for either.
-- **The plan-first gate**, the explicit confirmations, and `--skip-tests`.
+- **The review verdict.** `mk:review` owns it; the user decides what to do about it. Ship
+  does not re-run adversarial review and Athena does not stand in for either.
+- **The plan-first requirement**, the explicit confirmations, and `--skip-tests`.
 - **CI status.** Green, red and pending each keep their existing route.
 - **External comments.** An Athena assessment posted to a PR or issue is an external
   effect and needs the same explicit `release` / `publish` authority as any other. The

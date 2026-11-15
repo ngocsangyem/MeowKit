@@ -35,12 +35,10 @@ export interface CorpusCase {
 }
 
 const CASE_MODULES = [
-  'hook-corpus-cases-gate1',
   'hook-corpus-cases-preship',
   'hook-corpus-cases-privacy',
   'hook-corpus-cases-feedback',
   'hook-corpus-cases-guards',
-  'hook-corpus-cases-gate-helpers',
   'hook-corpus-cases-observers',
   'hook-corpus-cases-cli',
 ];

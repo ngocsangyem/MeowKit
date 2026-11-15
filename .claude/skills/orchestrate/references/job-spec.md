@@ -106,8 +106,8 @@ Before stage construction:
    writer has the required isolation.
 9. Stop for explicit human approval before destructive or external side
    effects — the approval and its scope are recorded per
-   `.claude/rules/gate-rules.md` (Recording Human Interventions); the gate itself is
-   owned by that same rule and is never satisfied by a passing check alone.
+   `.claude/rules/meowkit-core.md` (Recording Human Overrides). The approval comes from
+   the user — or the host's own permission prompt — never from a passing check.
 
 Unknown flags, models, or controls fail validation. Re-read live help or current
 official documentation; never guess a replacement. A job whose `prompt` would

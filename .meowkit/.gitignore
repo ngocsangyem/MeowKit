@@ -3,6 +3,7 @@
 !config.yaml
 !.env.example
 !mcp.json.example
+!host-guard-profile.example.json
 !bin/
 !bin/mewkit
 !memory/

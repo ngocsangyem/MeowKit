@@ -14,16 +14,17 @@ $schema: https://meowkit.dev/schemas/config-v1.json
 tdd: false
 
 #autobuild:
-#  # density preset. Sets density only; it cannot bypass the contract gate.
+#  # density preset. Sets scaffolding density only.
 #  mode: MINIMAL   # one of: MINIMAL, FULL, LEAN
 
 #budget:
-#  # session token budget.
-#  cap: 200000
-#  # percent of the cap at which a warning is printed.
-#  warn: 75
-#  # percent of the cap at which work is blocked.
-#  block: 95
+#  # estimated session cost in USD; both notices are advisory and stop nothing.
+#  # cost at which the first warning is printed (default 30).
+#  warn: 30
+#  # cost at which the over-budget notice is printed (default 100).
+#  block: 100
+#  # overrides block when set.
+#  cap: 100
 
 #buildVerify:
 #  # how long the post-write build check may take.
@@ -39,8 +40,9 @@ tdd: false
 #  # whether skills volunteer suggestions.
 #  proactive: false
 
-# hooks.<name>: false switches one observer off. The seven hard-blocking
-# checks are absent on purpose — they cannot be disabled from this file.
+# hooks.<name>: false switches one observer off. The credential guard and the
+# ship check are absent on purpose — they cannot be disabled from this file.
+# pre-completion-check is the exception: off unless set to true.
 hooks:
 #  auto-checkpoint: false
   budget-tracker: true
@@ -56,10 +58,11 @@ hooks:
 #  post-session: false
 #  post-write: false
 #  posttoolfailure-probe: false
-#  pre-completion-check: false
+#  pre-completion-check: true
 #  pre-task-check: false
 #  precompact-probe: false
 #  project-context-loader: false
 #  review-evidence-tag: false
 #  safety-sentinel-inject: false
 #  tdd-flag-detector: false
+#  verification-evidence: false

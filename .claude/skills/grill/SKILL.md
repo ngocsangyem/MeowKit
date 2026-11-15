@@ -59,11 +59,11 @@ grill = "is this plan fully resolved?".
 | Apply named reasoning lenses to existing findings      | `mk:elicit`           |
 | Constitution derived from the CODEBASE (not the human) | `mk:project-context`  |
 
-## Plan-First Gate
+## Plan-First Boundary
 
 Grill produces a knowledge doc — it is a pre-planning elicitation step, the same
-class as `mk:office-hours` and `mk:brainstorming`. Always skips Gate 1. It writes
-ONLY `docs/knowledge/<slug>.md`; it never writes code or implementation files.
+class as `mk:office-hours` and `mk:brainstorming`, so it needs no plan of its own.
+It writes ONLY `docs/knowledge/<slug>.md`; it never writes code or implementation files.
 
 ## Entry — resolve the input
 

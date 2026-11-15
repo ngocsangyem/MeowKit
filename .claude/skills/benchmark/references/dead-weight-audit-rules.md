@@ -44,11 +44,11 @@ WHY: Without an explicit threshold, audits drift toward "keep everything just in
 The following classes are exempt from pruning regardless of measured delta:
 
 - **Security defenses** (everything in `.claude/rules/security-rules.md` and `.claude/rules/injection-rules.md`)
-- **Active-verification hard gate** for the evaluator (per `.claude/skills/cook/references/harness-rules.md` Rule 8)
-- **Gate 1 / Gate 2 approval flows** (per `.claude/rules/gate-rules.md`)
+- **The evaluator's active-verification requirement** (per `.claude/skills/cook/references/harness-rules.md` Rule 8)
+- **The ship check** — lint, related tests and a type-check on commit, push and merge (`.claude/hooks/pre-ship.cjs`)
 - The cost of one bypass exceeds all the misses combined
 
-WHY: Security and gate components protect against catastrophic failure modes that measurement cannot capture. Catch-rate is not the right metric for safety nets.
+WHY: These components protect against catastrophic failure modes that measurement cannot capture. Catch-rate is not the right metric for safety nets.
 
 ## Rule 5: Re-Audit Across Two Consecutive Model Versions Before Pruning
 

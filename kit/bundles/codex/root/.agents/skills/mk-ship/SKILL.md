@@ -13,16 +13,16 @@ Bare `the ship skill` defaults to `prepare`: inspect and stage the selected chan
 
 ## Workflow Integration
 
-Operates in **Phase 5 (Ship)** of the project's workflow. Invoked by the `shipper` agent after Gate 2 approval.
+Operates in **Phase 5 (Ship)** of the project's workflow. Invoked by the `shipper` agent once the review verdict says the change is ready.
 
-## Agile DoD prompts (Gate 2 PASS — gated by `agile-story-gates.md` 2 when loaded)
+## Agile DoD prompts (verdict PASS — per `agile-story-gates.md` 2 when loaded)
 
 After the verdict file is read at the start of the workflow:
 
 1. **Early-return guard (preserves zero-cost for non-Agile sessions):** if verdict frontmatter has no `jira_tickets:` field OR the field is an empty array → SKIP the entire DoD block. ONE frontmatter read; no stop and ask the user in chat calls; no further branching. Proceed directly to ship
 2. **If verdict has `jira_tickets:` non-empty AND verdict status is PASS/WARN:**
    - Per `agile-story-gates.md` 2 — three opt-in actions via stop and ask the user in chat (each cancel-safe, each Jira-offline-safe):
-     1. **Verdict→Jira comment.** "Post the Gate 2 verdict summary to PROJ-123 as a comment? [Y/n/edit]" → `mk:jira-collaborate add comment KEY=PROJ-123` with verdict's Summary + Risks. Set verdict frontmatter `posted_to_jira: true|deferred`
+     1. **Verdict→Jira comment.** "Post the review verdict summary to PROJ-123 as a comment? [Y/n/edit]" → `mk:jira-collaborate add comment KEY=PROJ-123` with verdict's Summary + Risks. Set verdict frontmatter `posted_to_jira: true|deferred`
      2. **Status transition.** "Transition PROJ-123 to Done? [Y/n/skip]" → `mk:jira-lifecycle transition KEY=PROJ-123 to=Done`. Set `transitioned_to_done: true|deferred`
      3. **Business AC checkbox.** Source priority: (a) Jira AC field via `mk:jira-issue get`; (b) **fallback to plan.md `## Acceptance Criteria`** if Jira read fails or AC field is empty. Y/n per item before allowing the rest of the ship pipeline
 3. Honor each user answer; update verdict frontmatter accordingly (`bool|deferred` per offline fallback)
@@ -70,7 +70,7 @@ Report exactly one classification and one short evidence line in the final summa
 
 **Prepare (default)** — Initialize, inspect selected changes, check review readiness, run scoped verification, and present the exact files proposed for staging. Ask before including uncommitted changes and again before creating a local commit. If `--dry-run`, output this plan and stop.
 
-**Review** — Run structural + design review, resolve PR comments. Adversarial review is Gate 2's responsibility (`mk:review`); ship does not re-run it. See `references/pre-landing-review.md`
+**Review** — Run structural + design review, resolve PR comments. Adversarial review belongs to `mk:review`; ship does not re-run it. See `references/pre-landing-review.md`
 
 **Release (explicit)** — After `prepare` and an explicit request, push the branch and create or update its PR. Run document-release before merge so documentation lands in the same PR.
 
@@ -122,8 +122,8 @@ per release stage**: `prepare`, `release` and `publish` each carry their own bud
 **Counsel is not authorization.** A directive never creates the authority to push, open a
 PR, merge, version, publish, or deploy. Those come only from an explicit `release` or
 `publish` scope plus the existing explicit confirmations, both unchanged by this flag. Red
-or pending CI keeps its existing repair-or-stop route. Gate 2 stays with the review skill
-and the human. Posting an assessment to a PR or issue is an external effect needing the
+or pending CI keeps its existing repair-or-stop route. The verdict stays with the review
+skill and the decision with the user. Posting an assessment to a PR or issue is an external effect needing the
 same explicit authority as any other — the default is a local receipt only.
 
 Without the flag there are zero calls and no state is written.
@@ -158,7 +158,7 @@ flag is present).
 
 ## Related Rules
 
-- AGENTS.md (Gates) — Gate 2 (Review) approval is required before this skill may execute; no exceptions
+- AGENTS.md (Planning, review and the ship check) — review before shipping, and the ship check that runs lint, related tests and a type-check on commit, push and merge
 
 ## Gotchas
 

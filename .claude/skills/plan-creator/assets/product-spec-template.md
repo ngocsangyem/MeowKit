@@ -122,7 +122,7 @@ Each feature MUST have:
 
 ## Handoff
 
-After this spec is approved at Gate 1, hand off to the **harness** skill (NOT directly to developer).
+Once the user has agreed this spec, hand off to the **harness** skill (NOT directly to developer).
 The harness will decompose, negotiate a sprint contract, and drive the generator ⇄ evaluator loop.
 
 ## Agent State

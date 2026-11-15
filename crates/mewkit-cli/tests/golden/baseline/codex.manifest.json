@@ -893,12 +893,6 @@
       "exec": true
     },
     {
-      "path": ".agents/skills/mk-cook/scripts/validate-gate-2.cjs",
-      "sha256": "c84880510db3526a00c65f649b0b0706ed748d0ed77ba737e4f9d518ecce3321",
-      "size": 3372,
-      "exec": true
-    },
-    {
       "path": ".agents/skills/mk-cso/SKILL.md",
       "sha256": "83a1d9db223d247d5f0c673ef1bd98a48e0fb92850526f894487bd895115d1c5",
       "size": 6980
@@ -1989,19 +1983,9 @@
       "size": 3896
     },
     {
-      "path": ".agents/skills/mk-jira-lifecycle/references/patterns/incident-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
-    },
-    {
       "path": ".agents/skills/mk-jira-lifecycle/references/patterns/jsm-request-workflow.md",
       "sha256": "1651cb310059acfee6f589ea3bed22473e30954aea4bba54e6e076a887434da8",
       "size": 3630
-    },
-    {
-      "path": ".agents/skills/mk-jira-lifecycle/references/patterns/jsm-request-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
     },
     {
       "path": ".agents/skills/mk-jira-lifecycle/references/patterns/software-dev-workflow.md",
@@ -2009,19 +1993,9 @@
       "size": 3890
     },
     {
-      "path": ".agents/skills/mk-jira-lifecycle/references/patterns/software-dev-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
-    },
-    {
       "path": ".agents/skills/mk-jira-lifecycle/references/patterns/standard-workflow.md",
       "sha256": "e828e4b7c40d9463d0166fd4d302598eea732628e7212684047992390dc7b400",
       "size": 2510
-    },
-    {
-      "path": ".agents/skills/mk-jira-lifecycle/references/patterns/standard-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
     },
     {
       "path": ".agents/skills/mk-jira-lifecycle/references/workflow-discovery.md",
@@ -2150,16 +2124,6 @@
       "path": ".agents/skills/mk-jira/scripts/requirements.txt",
       "sha256": "a03083e37f9a52c05a280601ea60d6b48c7fd09009cd26a75f8cc43a86348161",
       "size": 223
-    },
-    {
-      "path": ".agents/skills/mk-lazy-agent-loader/SKILL.md",
-      "sha256": "0bc06f1281a32ded053df79e45dcc49b3d57f6b4e32578ca4bc2d39700437b91",
-      "size": 568
-    },
-    {
-      "path": ".agents/skills/mk-lazy-agent-loader/references/loading-details.md",
-      "sha256": "bc9cccc319b60576c25420298cecc445c2e35cfe8ab6c1ef37a9c41402aa1554",
-      "size": 1674
     },
     {
       "path": ".agents/skills/mk-lint-and-validate/SKILL.md",
@@ -2833,11 +2797,6 @@
       "size": 1477
     },
     {
-      "path": ".agents/skills/mk-plan-creator/references/gate-1-approval.md",
-      "sha256": "cb71af2bf9923c52211308f3ee90d24e5a6470c3a1e5f6fb36192a5d93e02837",
-      "size": 3580
-    },
-    {
       "path": ".agents/skills/mk-plan-creator/references/gotchas.md",
       "sha256": "05664a8508ac7a3c5843d8d2856e202a20359da3c647fdb1af2393421b0559f4",
       "size": 2859
@@ -2876,6 +2835,11 @@
       "path": ".agents/skills/mk-plan-creator/references/plan-organization.md",
       "sha256": "968f7ccd03e06102dafc6d0805687167b104127dcaf54b20552c16d358d4898d",
       "size": 980
+    },
+    {
+      "path": ".agents/skills/mk-plan-creator/references/plan-presentation.md",
+      "sha256": "72c545db992a83be5a01cec8d5da4a750c57df0591ad90db37ab701ab2179874",
+      "size": 3578
     },
     {
       "path": ".agents/skills/mk-plan-creator/references/red-team-standalone.md",
@@ -4175,18 +4139,6 @@
       "size": 7034
     },
     {
-      "path": ".agents/skills/mk-sprint-contract/scripts/check-contract-signed.cjs",
-      "sha256": "062b440e2022fc0ff1965dbf7d2b250059f8970e5f54d9d4a3007f8ccfab6b18",
-      "size": 5804,
-      "exec": true
-    },
-    {
-      "path": ".agents/skills/mk-sprint-contract/scripts/validate-contract.cjs",
-      "sha256": "ea0784649f73f7aac8a0f1977df8a1a71c69f9e95487e282e3b43af51ab0b39f",
-      "size": 5357,
-      "exec": true
-    },
-    {
       "path": ".agents/skills/mk-stitch/SKILL.md",
       "sha256": "e0aaa16953b9c78df99c4e244e783dd3e56e5788efca700c053d488977a49513",
       "size": 4790
@@ -5314,10 +5266,9 @@
       "size": 972
     },
     {
-      "path": ".codex/hooks/gate-enforcement.cjs",
-      "sha256": "65ae121eddc8dbd74a5be736a1a6cdcd2e3a615dae7a6dd49193089fed690dad",
-      "size": 3196,
-      "exec": true
+      "path": ".codex/hooks/completion-check.cjs",
+      "sha256": "cce934f218d313e1892665f68a8e718145c1a782f1be0b3960a2f6b06a456eee",
+      "size": 2912
     },
     {
       "path": ".codex/hooks/hook-runtime-config.json",
@@ -5325,16 +5276,9 @@
       "size": 43
     },
     {
-      "path": ".codex/hooks/lib/approval-receipt.cjs",
-      "sha256": "352e397d83d829db4a8766749c1fd3a447eb9dd4f50112d12e7e4bf73c3de445",
-      "size": 6419,
-      "exec": true
-    },
-    {
-      "path": ".codex/hooks/lib/check-contract-signed.cjs",
-      "sha256": "035875e3540bd4da2a4fab99f8ef7f390ab8c15e5909dbedf6ea32f7053dd51a",
-      "size": 5566,
-      "exec": true
+      "path": ".codex/hooks/lib/changed-files.cjs",
+      "sha256": "205471efd3e43730de84f4da70b606ea7f24fa8f6a24187789ba84637f868309",
+      "size": 2176
     },
     {
       "path": ".codex/hooks/lib/codex-hook-runtime.cjs",
@@ -5342,27 +5286,19 @@
       "size": 5254
     },
     {
-      "path": ".codex/hooks/lib/core/plan-gate.cjs",
-      "sha256": "185dfd6a6f8fbdbd2999636f12908aaef5dee0124ba70ed883bd2b9b379e3a64",
-      "size": 5860,
-      "exec": true
+      "path": ".codex/hooks/lib/core/completion-check.cjs",
+      "sha256": "9a4f22cc03e38ffdf6607f1326b57daf33e2dd22cb7e767bf98d069d24035fc9",
+      "size": 9546
+    },
+    {
+      "path": ".codex/hooks/lib/core/pre-ship.cjs",
+      "sha256": "3ab13e63c652264eca6193794b51fe62f7847821b2f67c00a9acef495998c9b7",
+      "size": 1960
     },
     {
       "path": ".codex/hooks/lib/core/privacy.cjs",
       "sha256": "9d0fd8805098741db0f999bf493517be77ae6d9f0f1bda4864e86f0140b02bbf",
       "size": 4058,
-      "exec": true
-    },
-    {
-      "path": ".codex/hooks/lib/gate1-hatch.cjs",
-      "sha256": "e57cbd07cab1723cb2e885e2018685b7ba0f8a58b225b954bacf37f1fe05bd26",
-      "size": 5188,
-      "exec": true
-    },
-    {
-      "path": ".codex/hooks/lib/gate1-path-rules.cjs",
-      "sha256": "0b277edf59db91b3cb87f2eb128515f9515370e599f8614a1d535987fe92598d",
-      "size": 3247,
       "exec": true
     },
     {
@@ -5372,10 +5308,14 @@
       "exec": true
     },
     {
-      "path": ".codex/hooks/lib/plan-discovery.cjs",
-      "sha256": "794dcce027da3951e65ef7715a42478a3bf65c41c54fb8d600c70f66e3603492",
-      "size": 2298,
-      "exec": true
+      "path": ".codex/hooks/lib/memory-store-lint.cjs",
+      "sha256": "ce178dc281bcfabd22aa150c5bf6358a1dab375acfb54982898ff62338c0c385",
+      "size": 4591
+    },
+    {
+      "path": ".codex/hooks/lib/preship-checks.cjs",
+      "sha256": "cfe383d791376ec38a20cc53d8fced13aaa2183bd8d05c80e031c4be78ef7340",
+      "size": 8121
     },
     {
       "path": ".codex/hooks/lib/project-root.cjs",
@@ -5384,15 +5324,24 @@
       "exec": true
     },
     {
+      "path": ".codex/hooks/lib/ship-command.cjs",
+      "sha256": "8fd5bba89fa90259293df1b0b58c09721f12cbe9b109667ffe58518a97e000b9",
+      "size": 5098
+    },
+    {
+      "path": ".codex/hooks/lib/ship-run-once.cjs",
+      "sha256": "28fc48ea0fd647150033eb7ef6b6a12abad3aa073d026990b35efa8d0cfeb5cf",
+      "size": 3411
+    },
+    {
       "path": ".codex/hooks/lib/validate-content.cjs",
       "sha256": "cfd6a9a2d0b0759ef61bf55682f1c5e66b850e58f6f1158b67923b4c1d4b64f5",
       "size": 1121
     },
     {
-      "path": ".codex/hooks/lib/validate-contract.cjs",
-      "sha256": "b79390c1b95b43ee7c8ea0463ef173dcc1b5d398706b280b824b30cf16ca64b5",
-      "size": 5049,
-      "exec": true
+      "path": ".codex/hooks/pre-ship.cjs",
+      "sha256": "9e9c75459cb6377c7148d49faf37241e0479ee6ff1f78331d25e73aa9780feca",
+      "size": 1939
     },
     {
       "path": ".codex/hooks/privacy-block.cjs",

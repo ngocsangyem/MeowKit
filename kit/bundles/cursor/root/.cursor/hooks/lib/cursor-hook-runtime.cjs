@@ -4,8 +4,7 @@
 // `*-policy.cjs` modules next to this file). Kept dependency-free (Node core only)
 // so hooks run with zero install step inside a user's project.
 "use strict";
-const { existsSync, readFileSync } = require("node:fs");
-const { join } = require("node:path");
+const { readFileSync } = require("node:fs");
 
 /** Read + parse the hook's JSON payload from stdin. Returns null on empty,
  *  unreadable, or unparseable stdin — callers treat null as "cannot verify this
@@ -42,31 +41,16 @@ function projectRoot() {
 const KILL_SWITCH_ENV = "MEWKIT_CURSOR_HOOKS_KILL_SWITCH";
 const KILL_SWITCH_TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
 
-/** Flag-file path for the kill switch, under `.meowkit/state` — never `.cursor/`,
- *  since `.meowkit/` is the one MeowKit-owned state root and this flag is runtime
- *  state, not a shipped bundle asset. `doctor-cursor.ts` prints a hint at this
- *  same path (kept in sync manually — see that file's header comment). */
-function killSwitchFlagPath(root) {
-	return join(root, ".meowkit", "state", "cursor-hooks-kill-switch");
-}
-
 /**
- * True when the security-gate kill switch is active: either the sentinel env var
- * is truthy, or the flag file exists under `.meowkit/state`. An active kill
- * switch downgrades every security-critical gate's deny/ask decision to allow
- * (see `security-gate-decision.cjs`) — the documented schema-drift-brick escape
- * hatch. Unknown-but-critical schema STILL denies by default while the switch is
- * off; this function does not change deny logic itself, only whether the caller
- * is permitted to downgrade it.
+ * True when the security-gate kill switch is set in the environment. An active kill switch
+ * downgrades the shell, MCP and tool gates' deny/ask decisions to allow (see
+ * `security-gate-decision.cjs`) — the escape hatch for a host schema change that bricks them.
+ * It is read from the environment only: a file an agent can write must not be able to switch
+ * gates off. The privacy read gate never consults it.
  */
-function isKillSwitchActive(root) {
+function isKillSwitchActive() {
 	const envValue = (process.env[KILL_SWITCH_ENV] || "").trim().toLowerCase();
-	if (KILL_SWITCH_TRUE_VALUES.has(envValue)) return true;
-	try {
-		return existsSync(killSwitchFlagPath(root));
-	} catch {
-		return false;
-	}
+	return KILL_SWITCH_TRUE_VALUES.has(envValue);
 }
 
 /** Write a loud, unmissable warning to stderr — used whenever the kill switch
@@ -88,7 +72,6 @@ function emit(decision) {
 module.exports = {
 	readStdinPayload,
 	projectRoot,
-	killSwitchFlagPath,
 	isKillSwitchActive,
 	warnLoud,
 	emit,

@@ -13,7 +13,7 @@ requirements exist but no corresponding test validates them.
 - Phase 2 (Test): After tester writes initial tests, verify all acceptance criteria are covered
 - Phase 4 (Review): As part of test coverage dimension, verify no gaps
 - User says "check test coverage", "are all requirements tested", "coverage gaps"
-- Before Gate 2: verify implementation matches plan
+- Before shipping: verify implementation matches plan
 
 ## Workflow
 

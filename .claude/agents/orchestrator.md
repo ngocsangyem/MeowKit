@@ -3,7 +3,6 @@ name: orchestrator
 description: Task router for every incoming request. Classifies complexity (trivial/standard/complex), assigns model tier, and routes to the correct specialist agent. Use this agent at the start of every task. It never writes code — only makes routing decisions.
 tools: Read, Grep, Glob, Task, AskUserQuestion
 model: sonnet
-memory: project
 owner: lifecycle
 criticality: critical
 status: active
@@ -71,7 +70,7 @@ high|COMPLEX (Opus)|Required
    decisions. Do not read the team memory store here — the read-set skills (`mk:fix`,
    `mk:investigate`, `mk:review`, `mk:plan-creator`, `mk:cso`) grep it when their task needs it.
 
-5. **Enforce gates.** Never skip planner for standard/complex tasks (Gate 1). Never skip reviewer for code changes (Gate 2).
+5. **Route planning and review.** Send standard/complex tasks to planner before build, and code changes to reviewer before ship; nothing else enforces these steps.
 
 6. **Handle escalations.** When an agent blocks or fails, surface the reason and re-route.
 
@@ -150,7 +149,7 @@ deep|1 per phase|No|No|Yes
 
 `--deep` triggers automatically when: 5+ directories affected OR task type is refactor+complex. Can also be passed explicitly. Planner runs one scout per phase before writing each phase detail file.
 
-When `two_approaches=true`, planner produces 2 competing plans with an "Approach Comparison" section. User selects one before Gate 1 approval.
+When `two_approaches=true`, planner produces 2 competing plans with an "Approach Comparison" section. User selects one before the plan is agreed.
 
 ## Output Format
 

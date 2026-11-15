@@ -65,7 +65,6 @@ Already covered by the allowlist in `docs/maintainer/docs-reference-contract.md`
 - `.claude/skills/scale-routing/SKILL.md:35` — `bug_fix/feature/refactor/security/devops/docs/review/intake` is a slash-separated task-type category list, not a path
 - `.claude/skills/agent-browser/references/video-recording.md:71` — `./docs/how-to-login.webm` is example user-project data in a CLI invocation example
 - `.claude/skills/jira-issue/references/issue-templates.md:177` — `jira-issue/docs/templates/` is part of an attribution-prose phrase about upstream JIRA-Assistant-Skills layout, not a load
-- `.claude/skills/lazy-agent-loader/SKILL.md:42` — `docs/documentation/changelog/readme` appears in a CSV row example, not a path
 - `code.claude.com/docs/en/hooks` references — external URL fragments (the http:// prefix was stripped by the grep filter on a few lines)
 
 ## Method

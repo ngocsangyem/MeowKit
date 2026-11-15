@@ -18,7 +18,7 @@ fn names() -> Vec<String> {
 }
 
 #[test]
-fn the_declared_surface_passes_at_both_scopes() {
+fn the_declared_surface_passes() {
     let config = values(&[
         (
             "$schema",
@@ -29,16 +29,13 @@ fn the_declared_surface_passes_at_both_scopes() {
         ("autobuild.mode", ConfigValue::Str("LEAN".into())),
         ("hooks.budget-tracker", ConfigValue::Bool(false)),
     ]);
-    for scope in [ConfigScope::ProjectConfig, ConfigScope::UserConfig] {
-        assert_eq!(check_shape(&config, &names(), scope), Ok(()));
-    }
+    assert_eq!(check_shape(&config, &names()), Ok(()));
 }
 
 #[test]
 fn a_non_string_schema_pointer_is_refused_in_zods_wording() {
     let config = values(&[("$schema", ConfigValue::Int(5))]);
-    let error = check_shape(&config, &names(), ConfigScope::ProjectConfig)
-        .expect_err("a number is not a pointer");
+    let error = check_shape(&config, &names()).expect_err("a number is not a pointer");
     assert_eq!(error.key, "$schema");
     // zod says `received number`, not `received 5`.
     assert_eq!(error.detail, "Expected string, received number");
@@ -47,8 +44,7 @@ fn a_non_string_schema_pointer_is_refused_in_zods_wording() {
 #[test]
 fn an_unknown_key_names_the_child_the_way_zod_does() {
     let config = values(&[("budget.cpa", ConfigValue::Int(1))]);
-    let error =
-        check_shape(&config, &names(), ConfigScope::ProjectConfig).expect_err("not a config key");
+    let error = check_shape(&config, &names()).expect_err("not a config key");
     assert_eq!(error.key, "budget.cpa");
     assert_eq!(error.detail, "Unrecognized key(s) in object: 'cpa'");
 }
@@ -56,14 +52,14 @@ fn an_unknown_key_names_the_child_the_way_zod_does() {
 #[test]
 fn a_wrong_leaf_type_is_refused() {
     let config = values(&[("tdd", ConfigValue::Int(1))]);
-    let error = check_shape(&config, &names(), ConfigScope::ProjectConfig).expect_err("not a bool");
+    let error = check_shape(&config, &names()).expect_err("not a bool");
     assert_eq!(error.detail, "Expected boolean, received number");
 }
 
 #[test]
 fn a_value_outside_an_enum_is_refused() {
     let config = values(&[("workflow.telemetry", ConfigValue::Str("loud".into()))]);
-    let error = check_shape(&config, &names(), ConfigScope::ProjectConfig).expect_err("not a mode");
+    let error = check_shape(&config, &names()).expect_err("not a mode");
     assert_eq!(
         error.detail,
         "Invalid enum value. Expected 'off' | 'community' | 'anonymous', received 'loud'"
@@ -71,22 +67,7 @@ fn a_value_outside_an_enum_is_refused() {
 }
 
 #[test]
-fn the_hatch_key_is_in_the_user_shape_only() {
-    let config = values(&[(USER_SCOPE_ONLY_KEY, ConfigValue::Bool(true))]);
-    assert_eq!(
-        check_shape(&config, &names(), ConfigScope::UserConfig),
-        Ok(())
-    );
-    let error = check_shape(&config, &names(), ConfigScope::ProjectConfig)
-        .expect_err("a committed file cannot downgrade Gate 1");
-    assert_eq!(
-        error.detail,
-        format!("Unrecognized key(s) in object: '{USER_SCOPE_ONLY_KEY}'")
-    );
-}
-
-#[test]
 fn an_observer_toggle_for_an_unregistered_hook_is_unknown() {
     let config = values(&[("hooks.not-a-hook", ConfigValue::Bool(true))]);
-    assert!(check_shape(&config, &names(), ConfigScope::ProjectConfig).is_err());
+    assert!(check_shape(&config, &names()).is_err());
 }

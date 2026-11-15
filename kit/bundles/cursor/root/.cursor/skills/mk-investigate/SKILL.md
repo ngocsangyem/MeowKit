@@ -68,7 +68,7 @@ Load **only when executing** the corresponding step — not upfront.
 ## Constraints
 
 - **Diagnostic only** — never edit source, tests, configuration, plans, or memory stores
-- **Report-only writes** — `Write` is allowed solely for `tasks/reports/**` and is hook-enforced
+- **Report-only writes** — `Write` is allowed solely for `tasks/reports/**`; this is a discipline the skill keeps, not something a hook checks
 - **3-strike rule** — if 3 hypotheses fail, STOP and escalate
 - **Evidence boundary** — label each claimed cause as confirmed or uncertain; do not imply remediation completed
 

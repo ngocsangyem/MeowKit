@@ -4,7 +4,6 @@ description: 'mk:confluence executor for mk:confluence-page. Page CRUD, versions
 tools: Bash, Read, Grep, Glob
 model: sonnet
 permissionMode: default
-memory: project
 color: blue
 owner: confluence
 criticality: medium

@@ -1,6 +1,6 @@
 # Step 4: Verdict
 
-Synthesize triaged findings into a 5-dimension verdict for Gate 2.
+Synthesize triaged findings into a 5-dimension verdict the user reads before shipping.
 
 ## Dimensions
 
@@ -37,25 +37,23 @@ and a suggested direction (the Phase 2 schema enforces this at `mewkit review co
 For a `mewkit review prepare` session, DO NOT hand-write the verdict decision. Write
 findings to `tasks/reviews/<id>/findings.json` (each: location, failureScenario,
 severity, confidence, suggested direction; add a `snippet` for an inline anchor), then
-run `mewkit review compose --session <id>`. Compose is the mechanical gate: it verifies
+run `mewkit review compose --session <id>`. Compose is the mechanical step: it verifies
 the immutable diff hash, re-runs coverage (refusing to emit a verdict on any gap),
 applies the deterministic cap table, resolves anchors by snippet, and writes the
 verdict proof bundle (`<id>-verdict.json`, embedding the coverage block + hash) plus a
 `SubmitPayload`. A `PASS` decision is emitted ONLY with complete, `session-observed`
-coverage; attested sessions cap at `PASS_WITH_RISK`. The composed decision is
-Gate-2-eligible only at `session-observed` — `gate2-check.cjs` re-validates the embedded
-coverage block for review-session verdicts.
+coverage; attested sessions cap at `PASS_WITH_RISK`, and the verdict says so.
 
 ## Verdict Rules
 
-- **Any FAIL dimension** → Overall FAIL → Gate 2 blocks
-- **All PASS** → Overall PASS → Gate 2 eligible
-- **Mix of PASS/WARN** → Overall WARN → Gate 2 eligible with acknowledgment
+- **Any FAIL dimension** → Overall FAIL → fix the findings before shipping
+- **All PASS** → Overall PASS → ready to ship
+- **Mix of PASS/WARN** → Overall WARN → ready to ship once the user has seen each WARN
 
 ## Presentation Format
 
 ```markdown
-## Gate 2 Review Verdict
+## Review Verdict
 
 **Overall:** [PASS|WARN|FAIL]
 
@@ -138,16 +136,16 @@ Side Effects Detected: Yes
 
 **Authoring rules:**
 - Emit ONLY when an existing-behavior break is the cause. New-code bugs go in the dimension table as normal CRITICAL/MAJOR findings.
-- Plaintext line only — NOT a markdown header (`## Side Effects Detected: Yes` will not be recognized by `validate-gate-2.cjs`).
+- Plaintext line only — NOT a markdown header (`## Side Effects Detected: Yes` reads as a section, not a signal).
 - Each bullet names the affected behavior or caller (e.g., `- POST /api/users no longer accepts trailing slashes — breaks 3 existing callers`).
 - Absence of the line = no signal. Backward-compatible.
 
-When this signal is present, the cook orchestrator MUST follow the "Regression Recovery Options" pattern in `.claude/skills/cook/references/review-cycle.md` (presents 2–4 options to the user; user selection recorded as a `## User Decision Addendum` block on the verdict file). `validate-gate-2.cjs` blocks Gate 2 until the addendum is present.
+When this signal is present, the cook orchestrator MUST follow the "Regression Recovery Options" pattern in `.claude/skills/cook/references/review-cycle.md`: present 2–4 options to the user and record the chosen one as a `## User Decision Addendum` block on the verdict file. Until that addendum exists the change is not ready to ship, and the review says so.
 
 ## Proof Bundle (machine-readable verdict)
 
-Alongside the markdown verdict, emit a Zod-validated JSON proof bundle so Gate 2 can
-be checked deterministically without parsing prose. Write it next to the markdown
+Alongside the markdown verdict, emit a Zod-validated JSON proof bundle so the verdict
+can be read by a tool without parsing prose. Write it next to the markdown
 verdict at `tasks/reviews/<slug>-verdict.json` (atomic write):
 
 ```json
@@ -167,12 +165,11 @@ verdict at `tasks/reviews/<slug>-verdict.json` (atomic write):
 Map the overall verdict to `decision`: Overall **PASS** → `PASS`; Overall **WARN** →
 `PASS_WITH_RISK`; Overall **FAIL** → `BLOCKED`. List all five dimensions.
 
-Then self-check the bundle: run `mewkit verdict-gate <slug>`. It exits 0 on
-`PASS`/`PASS_WITH_RISK` and non-zero on `BLOCKED`/invalid/missing. The markdown
-verdict remains the authoritative human narrative; the JSON is the machine gate
-input. The bundle stays under `tasks/` and is never injected into model context.
+The markdown verdict remains the authoritative human narrative; the JSON is the same
+verdict in a form a tool can read. The bundle stays under `tasks/` and is never
+injected into model context.
 
 ## After Verdict
 
-- **PASS/WARN:** Present to human for Gate 2 approval
-- **FAIL:** List required fixes, route back to developer agent
+- **PASS/WARN:** Present the verdict to the user, each WARN named, and say the change is ready to ship
+- **FAIL:** List the required fixes, say the change is not ready, and route back to the developer agent

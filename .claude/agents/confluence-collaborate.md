@@ -4,7 +4,6 @@ description: 'mk:confluence executor for mk:confluence-collaborate. Comments, la
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default
-memory: project
 color: cyan
 owner: confluence
 criticality: medium

@@ -4,39 +4,34 @@
 //! plan — a different noun entirely. This module is about the planning
 //! DOCUMENT under `tasks/plans/YYMMDD-name/`.
 //!
-//! Four subcommands, two of them read-only:
+//! Three subcommands, two of them read-only:
 //!
 //! | subcommand | effect |
 //! |---|---|
 //! | `status`  | progress across `plan.md` + its phase files |
 //! | `check`   | required sections for one phase, or `--structural` for the whole plan |
-//! | `approve` | stamp the Gate 1 approval receipt, optionally activating the task |
 //! | `archive` | complete every status and move the plan under `tasks/plans/archive/` |
 //!
 //! `status` and `check` are read-only BY CONSTRUCTION: [`parser`],
 //! [`frontmatter_scan`], [`phase_structure`], [`phase_frontmatter`],
 //! [`structure_check`] and [`render`] import no write API.
 //! The moment a CLI can edit a plan, the plan has two authors and the
-//! checkboxes stop meaning what the human meant by them. The mutating pair
-//! lives in [`approve`] and [`archive`], named so a reader can see which is
-//! which.
+//! checkboxes stop meaning what the human meant by them. The one mutating
+//! subcommand lives in [`archive`], named so a reader can see which is which.
 //!
 //! Every entry point returns an [`Output`] rather than printing: the CLI owns
 //! the streams, and a renderer that returns text is testable without a TTY.
-mod approve;
 mod archive;
 mod archive_writes;
 mod frontmatter_scan;
 mod parser;
 mod phase_frontmatter;
 mod phase_structure;
-mod receipt;
 mod render;
 mod structure_check;
 
 use std::path::{Path, PathBuf};
 
-pub use approve::{ApproveOptions, plan_approve};
 pub use archive::plan_archive;
 pub use parser::{
     PhaseChecklist, PhaseFile, PlanSummary, REQUIRED_PHASE_SECTIONS, list_phase_files,
@@ -45,11 +40,8 @@ pub use parser::{
 /// One phase file against the full template, for a caller holding the content
 /// already. [`check_plan_structure`] is the whole-directory entry point.
 pub use phase_structure::check_phase_file;
-pub use receipt::{
-    FRESH, NO_RECEIPT, Receipt, STALE, UNREADABLE, plan_body, plan_hash, stamp, verify,
-};
 /// The structural check `validate` also runs. It is public for that caller:
-/// one implementation of the Gate 1 structure rules, not two.
+/// one implementation of the plan structure rules, not two.
 pub use structure_check::{PlanStructureReport, check_plan_structure, render_plan_structure};
 
 /// What a `plan` subcommand produced: the two streams and the exit code.

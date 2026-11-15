@@ -4,7 +4,6 @@ description: 'mk:jira executor for mk:jira-fields. Field discovery and agile fie
 tools: Bash, Read, Grep, Glob
 model: haiku
 permissionMode: default
-memory: project
 color: red
 owner: jira
 criticality: medium

@@ -214,27 +214,29 @@
       "size": 2879
     },
     {
+      "path": ".cursor/hooks/completion-check.cjs",
+      "sha256": "febaa586dc09b04b72da4e753b7ca764ffe260a4df07e8082411b63d56049812",
+      "size": 1801
+    },
+    {
       "path": ".cursor/hooks/hook-runtime-config.json",
       "sha256": "fc44d188a9e11a5cea5a2ff9f1646ca142be98332a58e0d366870a2228beb7a2",
       "size": 44
     },
     {
-      "path": ".cursor/hooks/lib/approval-receipt.cjs",
-      "sha256": "352e397d83d829db4a8766749c1fd3a447eb9dd4f50112d12e7e4bf73c3de445",
-      "size": 6419,
-      "exec": true
+      "path": ".cursor/hooks/lib/changed-files.cjs",
+      "sha256": "205471efd3e43730de84f4da70b606ea7f24fa8f6a24187789ba84637f868309",
+      "size": 2176
     },
     {
-      "path": ".cursor/hooks/lib/check-contract-signed.cjs",
-      "sha256": "035875e3540bd4da2a4fab99f8ef7f390ab8c15e5909dbedf6ea32f7053dd51a",
-      "size": 5566,
-      "exec": true
+      "path": ".cursor/hooks/lib/core/completion-check.cjs",
+      "sha256": "9a4f22cc03e38ffdf6607f1326b57daf33e2dd22cb7e767bf98d069d24035fc9",
+      "size": 9546
     },
     {
-      "path": ".cursor/hooks/lib/core/plan-gate.cjs",
-      "sha256": "185dfd6a6f8fbdbd2999636f12908aaef5dee0124ba70ed883bd2b9b379e3a64",
-      "size": 5860,
-      "exec": true
+      "path": ".cursor/hooks/lib/core/pre-ship.cjs",
+      "sha256": "3ab13e63c652264eca6193794b51fe62f7847821b2f67c00a9acef495998c9b7",
+      "size": 1960
     },
     {
       "path": ".cursor/hooks/lib/core/privacy.cjs",
@@ -248,18 +250,6 @@
       "size": 3805
     },
     {
-      "path": ".cursor/hooks/lib/gate1-hatch.cjs",
-      "sha256": "e57cbd07cab1723cb2e885e2018685b7ba0f8a58b225b954bacf37f1fe05bd26",
-      "size": 5188,
-      "exec": true
-    },
-    {
-      "path": ".cursor/hooks/lib/gate1-path-rules.cjs",
-      "sha256": "0b277edf59db91b3cb87f2eb128515f9515370e599f8614a1d535987fe92598d",
-      "size": 3247,
-      "exec": true
-    },
-    {
       "path": ".cursor/hooks/lib/hook-runtime.cjs",
       "sha256": "329a0d1807ac83ce502712758e8371f533854046292cab20406fb6c2b221b7fb",
       "size": 3920,
@@ -271,10 +261,14 @@
       "size": 3763
     },
     {
-      "path": ".cursor/hooks/lib/plan-discovery.cjs",
-      "sha256": "794dcce027da3951e65ef7715a42478a3bf65c41c54fb8d600c70f66e3603492",
-      "size": 2298,
-      "exec": true
+      "path": ".cursor/hooks/lib/memory-store-lint.cjs",
+      "sha256": "ce178dc281bcfabd22aa150c5bf6358a1dab375acfb54982898ff62338c0c385",
+      "size": 4591
+    },
+    {
+      "path": ".cursor/hooks/lib/preship-checks.cjs",
+      "sha256": "cfe383d791376ec38a20cc53d8fced13aaa2183bd8d05c80e031c4be78ef7340",
+      "size": 8121
     },
     {
       "path": ".cursor/hooks/lib/privacy-read-policy.cjs",
@@ -298,6 +292,16 @@
       "size": 2334
     },
     {
+      "path": ".cursor/hooks/lib/ship-command.cjs",
+      "sha256": "8fd5bba89fa90259293df1b0b58c09721f12cbe9b109667ffe58518a97e000b9",
+      "size": 5098
+    },
+    {
+      "path": ".cursor/hooks/lib/ship-run-once.cjs",
+      "sha256": "28fc48ea0fd647150033eb7ef6b6a12abad3aa073d026990b35efa8d0cfeb5cf",
+      "size": 3411
+    },
+    {
       "path": ".cursor/hooks/lib/telemetry-writer.cjs",
       "sha256": "41f65b1a4e2490e8661d50202ce80156446215bcb31a23fcfc64c0a485cc737d",
       "size": 6132
@@ -313,15 +317,14 @@
       "size": 1121
     },
     {
-      "path": ".cursor/hooks/lib/validate-contract.cjs",
-      "sha256": "b79390c1b95b43ee7c8ea0463ef173dcc1b5d398706b280b824b30cf16ca64b5",
-      "size": 5049,
-      "exec": true
-    },
-    {
       "path": ".cursor/hooks/mcp-gate.cjs",
       "sha256": "5c6bf3d49d46777e9482b8a51990c9acb81d0cbaebc47722d3f7f309f4220556",
       "size": 869
+    },
+    {
+      "path": ".cursor/hooks/pre-ship.cjs",
+      "sha256": "2f5d0fef13e680276064219ebf14f0e9a33ee0e543585dae369c902f1469dab8",
+      "size": 2192
     },
     {
       "path": ".cursor/hooks/privacy-read-gate.cjs",
@@ -1276,12 +1279,6 @@
       "path": ".cursor/skills/mk-cook/scripts/validate-gate-1.sh",
       "sha256": "eeb76165925aba8c7695779aeecf82aed16729554fdb13fd93ffcb2be814e1fd",
       "size": 1427,
-      "exec": true
-    },
-    {
-      "path": ".cursor/skills/mk-cook/scripts/validate-gate-2.cjs",
-      "sha256": "c84880510db3526a00c65f649b0b0706ed748d0ed77ba737e4f9d518ecce3321",
-      "size": 3372,
       "exec": true
     },
     {
@@ -2375,19 +2372,9 @@
       "size": 3896
     },
     {
-      "path": ".cursor/skills/mk-jira-lifecycle/references/patterns/incident-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
-    },
-    {
       "path": ".cursor/skills/mk-jira-lifecycle/references/patterns/jsm-request-workflow.md",
       "sha256": "98f14dc639d48655db9ce527136fe18cdb4db0f283e6bd036ca9f06e1316e8f5",
       "size": 3630
-    },
-    {
-      "path": ".cursor/skills/mk-jira-lifecycle/references/patterns/jsm-request-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
     },
     {
       "path": ".cursor/skills/mk-jira-lifecycle/references/patterns/software-dev-workflow.md",
@@ -2395,19 +2382,9 @@
       "size": 3890
     },
     {
-      "path": ".cursor/skills/mk-jira-lifecycle/references/patterns/software-dev-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
-    },
-    {
       "path": ".cursor/skills/mk-jira-lifecycle/references/patterns/standard-workflow.md",
       "sha256": "31d50408849342b6c0b33e0e47a80dff466e4f831e1644c200f180c39dad6775",
       "size": 2510
-    },
-    {
-      "path": ".cursor/skills/mk-jira-lifecycle/references/patterns/standard-workflow.md.tmp",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0
     },
     {
       "path": ".cursor/skills/mk-jira-lifecycle/references/workflow-discovery.md",
@@ -2536,16 +2513,6 @@
       "path": ".cursor/skills/mk-jira/scripts/requirements.txt",
       "sha256": "215918877a0de0046f9f6ebd7dbcae9295d91aa21f202200156aec6017624fc9",
       "size": 204
-    },
-    {
-      "path": ".cursor/skills/mk-lazy-agent-loader/SKILL.md",
-      "sha256": "8017c12073e7b7ec046cd040d1c8984fb44939fad7338632cab2e453af6bc15b",
-      "size": 570
-    },
-    {
-      "path": ".cursor/skills/mk-lazy-agent-loader/references/loading-details.md",
-      "sha256": "80156159b20b974648f7281705618009a0266e15cc087bec6a4b6e1268b34d5a",
-      "size": 1677
     },
     {
       "path": ".cursor/skills/mk-lint-and-validate/SKILL.md",
@@ -3219,11 +3186,6 @@
       "size": 1477
     },
     {
-      "path": ".cursor/skills/mk-plan-creator/references/gate-1-approval.md",
-      "sha256": "cb71af2bf9923c52211308f3ee90d24e5a6470c3a1e5f6fb36192a5d93e02837",
-      "size": 3580
-    },
-    {
       "path": ".cursor/skills/mk-plan-creator/references/gotchas.md",
       "sha256": "05664a8508ac7a3c5843d8d2856e202a20359da3c647fdb1af2393421b0559f4",
       "size": 2859
@@ -3262,6 +3224,11 @@
       "path": ".cursor/skills/mk-plan-creator/references/plan-organization.md",
       "sha256": "968f7ccd03e06102dafc6d0805687167b104127dcaf54b20552c16d358d4898d",
       "size": 980
+    },
+    {
+      "path": ".cursor/skills/mk-plan-creator/references/plan-presentation.md",
+      "sha256": "72c545db992a83be5a01cec8d5da4a750c57df0591ad90db37ab701ab2179874",
+      "size": 3578
     },
     {
       "path": ".cursor/skills/mk-plan-creator/references/red-team-standalone.md",
@@ -4559,18 +4526,6 @@
       "path": ".cursor/skills/mk-sprint-contract/references/bdd-to-ac-mapping.md",
       "sha256": "89f3d566b813514e9d6679797eb7a03c97bc8969cace61ba197182973dcb457f",
       "size": 7034
-    },
-    {
-      "path": ".cursor/skills/mk-sprint-contract/scripts/check-contract-signed.cjs",
-      "sha256": "e40b8900ae32c786816a6295a7708d34b24584ebfb77793fd030885c7245297b",
-      "size": 5811,
-      "exec": true
-    },
-    {
-      "path": ".cursor/skills/mk-sprint-contract/scripts/validate-contract.cjs",
-      "sha256": "ea0784649f73f7aac8a0f1977df8a1a71c69f9e95487e282e3b43af51ab0b39f",
-      "size": 5357,
-      "exec": true
     },
     {
       "path": ".cursor/skills/mk-stitch/SKILL.md",

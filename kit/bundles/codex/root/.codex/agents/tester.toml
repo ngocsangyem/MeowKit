@@ -37,7 +37,7 @@ You own all test files: `__tests__/`, `*.test.ts`, `*.spec.ts`, `tests/`, and te
 ## Handoff
 
 - **Red phase complete** → recommend routing to **developer** for implementation
-- **Green phase pass** → recommend routing to **reviewer** for Gate 2
+- **Green phase pass** → recommend routing to **reviewer** for review
 - **Green phase fail** → recommend routing back to **developer** for self-healing
 - Always include: test file paths, pass/fail counts, coverage data
 

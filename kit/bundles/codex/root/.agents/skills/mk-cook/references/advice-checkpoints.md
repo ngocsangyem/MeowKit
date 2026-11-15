@@ -10,7 +10,7 @@ implements, and it holds the call protocol every checkpoint follows.
 
 | Stage | Fires at | Condition | Max |
 |---|---|---|---:|
-| GUIDE | after Gate 1, before Phase 3 Build | always, when the flag is on | 1 |
+| GUIDE | after the plan is agreed, before Phase 3 Build | always, when the flag is on | 1 |
 | RESCUE | Phase 3 | repeated failure, a `BLOCKED` subagent, or a high-risk / irreversible decision | 2 |
 | REVIEW | after Phase 3.5 Simplify + 3.6 Verify, **before** the Phase 4 reviewer | always, when the flag is on | 1 |
 | RECHECK | after corrections from a `RETURN_TO_EXECUTOR` | only after a return | 1 |
@@ -18,12 +18,12 @@ implements, and it holds the call protocol every checkpoint follows.
 Hard cap **5 calls per run**, charged as `--skill mk-cook`. Checkpoints are macro
 boundaries — never per tool call, per file, or per build-test-fix loop iteration.
 
-GUIDE fires AFTER Gate 1 on purpose: supervision reads an approved plan, it does not
-help produce the approval.
+GUIDE fires after the plan is settled on purpose: supervision reads a finished plan, it
+does not help write one.
 
 ## What each checkpoint asks
 
-- **GUIDE** — given this approved plan, what decides the build order and what proof will
+- **GUIDE** — given this agreed plan, what decides the build order and what proof will
   matter at review?
 - **RESCUE** — this keeps failing on this evidence; what does the evidence support, and
   what would disconfirm the current approach?
@@ -33,8 +33,8 @@ help produce the approval.
 
 ## What supervision does NOT touch here
 
-- **Gate 1 and Gate 2.** Both stay human. A directive is evidence read at the gate, never
-  the approval.
+- **The plan and the review verdict.** The plan is agreed with the user; the verdict is the
+  reviewer's. A directive is input to both, never a substitute for either.
 - **The reviewer's verdict.** `reviewer` owns Phase 4. Athena may find that the evidence
   and the verdict disagree and route work back; that is routing, not a verdict.
 - **Verification.** Phase 3.6 Verify and the review verdict are the proof. Supervision

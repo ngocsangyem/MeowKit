@@ -13,7 +13,6 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -119,23 +118,6 @@ describe("strict test-first mode keeps its own order", () => {
 		const { root } = fixture({ project: "tdd: false\n" });
 		const answer = isTddEnabled({ root, env: { MEOWKIT_TDD: "1" } });
 		expect(answer).toEqual({ enabled: true, source: "env" });
-	});
-
-	it("keeps the failing-test-first block on in that same cell", () => {
-		// The value being right is not the point: the point is that the gate that
-		// reads it still blocks. A reordering that only showed up here would be a
-		// silently relaxed enforcement mode.
-		const { root } = fixture({ project: "tdd: false\n" });
-		fs.mkdirSync(path.join(root, ".claude/hooks"), { recursive: true });
-		fs.cpSync(path.join(REPO_ROOT, ".claude/hooks/pre-implement.cjs"), path.join(root, ".claude/hooks/pre-implement.cjs"));
-		fs.cpSync(path.join(REPO_ROOT, ".claude/hooks/lib"), path.join(root, ".claude/hooks/lib"), { recursive: true });
-		const result = spawnSync(process.execPath, [path.join(root, ".claude/hooks/pre-implement.cjs"), "parser"], {
-			cwd: root,
-			env: { ...process.env, MEOWKIT_TDD: "1", CLAUDE_PROJECT_DIR: root },
-			encoding: "utf8",
-		});
-		expect(result.status).not.toBe(0);
-		expect(`${result.stderr}${result.stdout}`).toMatch(/TDD mode is ON/);
 	});
 
 	it("no longer consults the removed profile alias", () => {

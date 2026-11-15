@@ -20,13 +20,13 @@ When CSV returns `level=high`, the model tier MUST be COMPLEX (best available) r
 
 WHY: High-complexity domains carry risk where weaker-model savings are not worth the failure cost.
 
-## Rule 4: One-Shot Workflow Enables Gate 1 Bypass
+## Rule 4: One-Shot Workflow Skips the Plan
 
-When CSV returns `workflow=one-shot` AND the orchestrator confirms zero blast radius, Gate 1 (plan approval) may be bypassed — identical to `/mk:fix` with `complexity=simple` behavior.
+When CSV returns `workflow=one-shot` AND the orchestrator confirms zero blast radius, the work can proceed without a plan file — identical to `/mk:fix` with `complexity=simple` behavior.
 
 WHY: The CSV codifies safe fast-path domains.
 
-GUARD: Both conditions must be true (CSV says one-shot AND zero blast radius). If either is false, Gate 1 is required.
+GUARD: Both conditions must be true (CSV says one-shot AND zero blast radius). If either is false, write the plan and agree it with the user first.
 
 ## Rule 5: Users Can Extend the CSV
 
@@ -44,7 +44,7 @@ WHY: Dead-weight thesis — over-scaffolding degrades capable models.
 
 Override: `MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN` overrides auto-detection and is logged.
 
-GUARD: Density choice does NOT bypass any gate. Gate 1 (plan), Gate 2 (review verdict), and the active-verification HARD GATE on evaluator verdicts ALL still apply regardless of density mode.
+GUARD: Density choice changes scaffolding amount, not the work. The plan, the review verdict, and the active-verification requirement on evaluator verdicts all still apply regardless of density mode.
 
 ## Rule 7: Auto-Strict for High-Complexity Cook Runs
 

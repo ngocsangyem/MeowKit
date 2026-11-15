@@ -4,10 +4,10 @@ Mode-aware review handling for reviewer agent results.
 
 ## Autonomous Mode
 
-Auto mode auto-FIXES; it never auto-APPROVES. The loop terminates in a
-"ready for user approval" state — crossing Gate 2 or any ship boundary always
-requires explicit human approval (AGENTS.md Gates section). Score is
-advisory display only and never gates the decision.
+Auto mode auto-FIXES; it never decides to ship. The loop terminates in a
+"ready for the user to look at" state: shipping is the user's call, and the ship
+check (lint, related tests, type-check) runs on the commit itself. Score is
+advisory display only and never decides anything.
 
 ```
 cycle = 0
@@ -25,7 +25,7 @@ LOOP:
 
   4. ELSE (no critical remaining):
      → Log any warnings + evidence completeness
-     → PRESENT for user approval (do NOT self-approve, do NOT cross Gate 2/ship)
+     → PRESENT for user approval of the ship (do NOT self-approve, do NOT ship on your own)
 ```
 
 High-risk flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM,

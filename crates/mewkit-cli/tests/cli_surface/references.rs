@@ -14,7 +14,18 @@ use regex::Regex;
 
 use super::{Node, verbs};
 
-const SKIP_DIRS: &[&str] = &["node_modules", ".git", "dist", ".next", "worktrees", "logs"];
+/// Build output is not authored docs: it carries whatever the sources said when
+/// it was last built, so a stale bundle would report a command the docs have
+/// already stopped teaching. `.vercel` holds the landing site's built tree.
+const SKIP_DIRS: &[&str] = &[
+    "node_modules",
+    ".git",
+    "dist",
+    ".next",
+    ".vercel",
+    "worktrees",
+    "logs",
+];
 const EXTENSIONS: &[&str] = &[
     "md", "mdx", "cjs", "js", "mjs", "ts", "sh", "py", "json", "yml", "yaml", "txt", "vue",
 ];

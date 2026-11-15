@@ -29,10 +29,10 @@ Concurrent-write safety: writers MUST acquire flock(1) on this file before
 any read-modify-write cycle. YAML frontmatter append is non-atomic across
 shells; flock is the only mitigation.
 
-Validator: this file class has NO validator. Do not invoke
-`validate-contract.cjs` on this path — that script validates per-story
-sprint-CONTRACT files only and will fail (no contract_schema_version,
-no [AC-N] entries here by design).
+Schema: this file class has no validator. Its shape is this template;
+per-story sprint-CONTRACT files follow assets/contract-template.md instead
+and carry contract_schema_version plus [AC-N] entries, which this file has
+none of by design.
 -->
 
 # Sprint <N> — <goal>
