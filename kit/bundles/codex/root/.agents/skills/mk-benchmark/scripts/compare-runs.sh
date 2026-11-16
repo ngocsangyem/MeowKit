@@ -17,7 +17,7 @@ fi
 RUN_A="$1"
 RUN_B="$2"
 
-[ -n "$(git rev-parse --show-toplevel):-}" ] && cd "$(git rev-parse --show-toplevel)"
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"; [ -n "$ROOT_DIR" ] && cd "$ROOT_DIR"
 
 RESULTS_DIR=".codex/benchmarks/results"
 FILE_A="$RESULTS_DIR/${RUN_A}.json"

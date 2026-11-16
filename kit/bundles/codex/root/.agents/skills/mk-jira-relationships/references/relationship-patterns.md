@@ -140,7 +140,7 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh 
 
 ## Dependency Visualization
 
-> Before emitting any Mermaid block, Read `.agents/skills/mk-preview/references/mermaid-essentials.md`.
+> Before emitting any Mermaid block, apply the Mermaid rules SKILL.md loads for dependency graphs.
 
 ### Choosing the Right Format
 

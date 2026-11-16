@@ -1886,7 +1886,7 @@
       "title": "mk:jira-relationships",
       "description": "mk:jira leaf: issue links, blockers, dependencies, clone.",
       "sourcePath": "skills/jira-relationships/SKILL.md",
-      "sourceHash": "3e584e255828a526846d521e6acdac583049fa3b05003b622ac1de061f939b72",
+      "sourceHash": "7bf3e2ef560d048529133d41aad1eb825d0f501ac1b28babd00face705336f31",
       "aliases": [],
       "owner": "jira",
       "phase": "on-demand",

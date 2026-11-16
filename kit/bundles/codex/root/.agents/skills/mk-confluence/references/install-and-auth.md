@@ -27,7 +27,7 @@ Verify: `ls .meowkit/envs/confluence/bin/ | grep confluence-as`
 
 ## Binary name
 
-The CLI binary is `confluence-as`. Both upstream READMEs (`confluence-as` and `Confluence-Assistant-Skills`) document it as `confluence` — they are wrong. Empirical install (260510) is the ground truth. Re-verify on every version bump.
+The CLI binary is `confluence-as`. Both upstream READMEs (`confluence-as` and `Confluence-Assistant-Skills`) document it as `confluence` — they are wrong. Empirical install (260510) is the ground truth. If a CLI upgrade renames the binary, update this line.
 
 ## Cloud-only constraint
 

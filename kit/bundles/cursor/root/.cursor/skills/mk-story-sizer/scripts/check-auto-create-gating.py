@@ -75,7 +75,7 @@ DEFAULT_PATTERNS = (
 
 
 def _load_patterns(project_root: Path) -> tuple[str, ...]:
-    candidate = project_root / ".cursor/skills/story-sizer/references/injection-patterns.md"
+    candidate = project_root / ".cursor/skills/mk-story-sizer/references/injection-patterns.md"
     if not candidate.exists():
         return DEFAULT_PATTERNS
     patterns: list[str] = []

@@ -5,13 +5,13 @@
 # jira-as into .meowkit/envs/jira per skills-dependencies.ts.
 set -euo pipefail
 
-ROOT="$(git rev-parse --show-toplevel):-$(pwd)}"
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 JIRA_AS="$ROOT/.meowkit/envs/jira/bin/jira-as"
 ENV_FILE="$ROOT/.codex/.env"
 
 if [ ! -x "$JIRA_AS" ]; then
-  echo "[mk:jira] jira-as not installed at $JIRA_AS" >&2
-  echo "[mk:jira] Run: mewkit skill env jira    (installs from .agents/skills/jira/scripts/requirements.txt)" >&2
+  echo "[mk-jira] jira-as not installed at $JIRA_AS" >&2
+  echo "[mk-jira] Run: mewkit skill env jira    (installs from .agents/skills/mk-jira/scripts/requirements.txt)" >&2
   exit 127
 fi
 

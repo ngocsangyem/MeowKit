@@ -140,7 +140,7 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh relationships cl
 
 ## Dependency Visualization
 
-> Before emitting any Mermaid block, Read `.claude/skills/preview/references/mermaid-essentials.md`.
+> Before emitting any Mermaid block, apply the Mermaid rules SKILL.md loads for dependency graphs.
 
 ### Choosing the Right Format
 

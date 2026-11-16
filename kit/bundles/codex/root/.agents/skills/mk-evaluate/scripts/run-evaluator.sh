@@ -17,7 +17,7 @@ set -u
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 repo_root="$(cd "$script_dir/../../../.." && pwd)"
-rubric_loader="$repo_root/.agents/skills/rubric/scripts/load-rubric.sh"
+rubric_loader="$repo_root/.agents/skills/mk-rubric/scripts/load-rubric.sh"
 persona_file="$script_dir/../prompts/skeptic-persona.md"
 
 if [ ! -x "$rubric_loader" ]; then
@@ -134,7 +134,7 @@ delegate a sub-task (
   subagent_type="evaluator",
   description="Evaluate $target",
   prompt="
-    Read .agents/skills/evaluate/workflow.md and follow it.
+    Read .agents/skills/mk-evaluate/workflow.md and follow it.
 
     Target: $target
     target_type: $target_type
@@ -160,7 +160,7 @@ $composed_rubric
 
 After the evaluator returns, run:
 \`\`\`
-.agents/skills/evaluate/scripts/validate-verdict.sh tasks/reviews/{date}-{slug}-evalverdict.md
+.agents/skills/mk-evaluate/scripts/validate-verdict.sh tasks/reviews/{date}-{slug}-evalverdict.md
 \`\`\`
 
 If validator exits 0 → exit code matches verdict (PASS=0, WARN=1, FAIL=2).

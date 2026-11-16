@@ -42,7 +42,7 @@ done
 [ -n "${MEOWKIT_BUDGET_CAP:-}" ] && COST_CAP="$MEOWKIT_BUDGET_CAP"
 
 # Resolve project root
-[ -n "$(git rev-parse --show-toplevel):-}" ] && cd "$(git rev-parse --show-toplevel)"
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"; [ -n "$ROOT_DIR" ] && cd "$ROOT_DIR"
 
 BENCH_DIR=".meowkit/benchmarks"
 RESULTS_DIR="$BENCH_DIR/results"
@@ -128,7 +128,7 @@ echo "     - Capture the verdict, score, duration, cost"
 echo "     - Update the task entry in $RESULT_FILE"
 echo "     - Append a receipt to the ledger, then enforce the cap BEFORE the next task:"
 echo "         echo '{\"name\":\"<task>\",\"costUsd\":<cost>}' >> $LEDGER_FILE"
-echo "         bash .cursor/skills/benchmark/scripts/run-canary.sh check-cap $LEDGER_FILE $COST_CAP"
+echo "         bash .cursor/skills/mk-benchmark/scripts/run-canary.sh check-cap $LEDGER_FILE $COST_CAP"
 echo "       (exit 2 = cap reached — STOP the run; do not start further tasks)"
 echo "  2. After all tasks complete, set status='complete', compute summary"
 echo "  3. Append a benchmark_result trace record:"
