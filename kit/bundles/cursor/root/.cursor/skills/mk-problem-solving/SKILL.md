@@ -1,6 +1,6 @@
 ---
 name: "mk-problem-solving"
-description: "Use when stuck on approach, not debugging. Unstick via 7 techniques: simplification, collision-zone thinking, inversion, first principles, via negativa. For debugging use mk:sequential-thinking."
+description: "Unsticks a stalled approach via inversion and first principles. NOT for mk-investigate."
 ---
 
 # Problem-Solving — Strategic Unsticking

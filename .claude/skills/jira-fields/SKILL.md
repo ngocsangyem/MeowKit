@@ -1,6 +1,6 @@
 ---
 name: mk:jira-fields
-description: 'mk:jira leaf. Custom field discovery - field IDs, project scope, agile field config. NOT for mk:jira-issue.'
+description: "mk:jira leaf: custom field IDs and project field config."
 phase: on-demand
 source: local
 keywords:
@@ -9,7 +9,7 @@ keywords:
   - custom-fields
   - field-discovery
   - agile-field-config
-when_to_use: 'Find a Jira custom field ID or check which fields a project exposes.'
+when_to_use: "Find a custom field ID or a project's fields."
 user-invocable: true
 context: fork
 agent: jira-fields

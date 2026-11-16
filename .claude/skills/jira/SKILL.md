@@ -1,6 +1,6 @@
 ---
 name: mk:jira
-description: 'Jira routing hub. Picks the mk:jira-* leaf for a Jira intent and forwards it. NOT an executor.'
+description: "Jira routing hub: picks the matching mk:jira leaf. Not an executor."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - atlassian
   - mk-jira
   - ticket
-when_to_use: 'Jira work is wanted but the leaf is unclear; the hub body holds the routing table.'
+when_to_use: "Jira work wanted but the leaf is unclear."
 user-invocable: true
 owner: jira
 criticality: medium

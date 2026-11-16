@@ -1,6 +1,6 @@
 ---
 name: mk:help
-description: Scan plans, reviews, tests and git state and name the next workflow step. NOT for mk:status.
+description: "Names the next workflow step from plans, tests and git state."
 argument-hint: '[--verbose]'
 source: local
 allowed-tools:
@@ -15,7 +15,7 @@ keywords:
   - usage-guide
   - onboarding
   - catalog-listing
-when_to_use: Asked where am I or what to do next, or at a cold session start.
+when_to_use: "Asked 'what next?' or 'where am I?'."
 user-invocable: true
 owner: research
 criticality: medium

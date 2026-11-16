@@ -1,7 +1,7 @@
 ---
 name: mk:vue
 version: 1.0.0
-description: 'Everyday Vue 3 authoring: Composition API, composables, reactivity, Pinia, routing, forms. NOT for mk:vue-best-practices.'
+description: "Vue 3 authoring: Composition API, Pinia, routing, forms. NOT for mk:vue-best-practices."
 allowed-tools:
   - Read
   - Grep
@@ -19,7 +19,7 @@ keywords:
   - generic-components
   - vue-3-5
   - framework-specific
-when_to_use: Editing .vue files or wiring Vue state and data fetching.
+when_to_use: "Editing .vue files."
 user-invocable: true
 owner: utility
 criticality: medium

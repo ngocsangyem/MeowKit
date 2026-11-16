@@ -1,8 +1,8 @@
 ---
 name: mk:mermaidjs-v11
-description: Write inline Mermaid v11 diagram blocks — flowchart, sequence, class, ER, state, gantt. NOT for mk:tech-graph.
+description: "Writes inline Mermaid v11 diagrams. NOT for mk:tech-graph."
 user-invocable: true
-when_to_use: A diagram belongs inside a markdown file, README or code comment.
+when_to_use: "A diagram belongs in markdown or a README."
 keywords:
   - mermaid
   - mermaid-v11

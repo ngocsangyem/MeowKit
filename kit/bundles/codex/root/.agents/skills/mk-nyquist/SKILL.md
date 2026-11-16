@@ -1,6 +1,6 @@
 ---
 name: "mk-nyquist"
-description: "Maps test coverage to plan acceptance criteria and flags requirements with no tests. Use during Test/Review phases. NOT for running tests (mk:testing); NOT for structural review (mk:review)."
+description: "Maps plan acceptance criteria to tests, flags untested ones. NOT for mk-testing."
 ---
 
 # Nyquist — Test-to-Requirement Coverage Mapping

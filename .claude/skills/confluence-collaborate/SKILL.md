@@ -1,6 +1,6 @@
 ---
 name: mk:confluence-collaborate
-description: 'mk:confluence leaf. Comments, attachments, label CRUD, watchers on one page. NOT for mk:confluence-page.'
+description: "Confluence comments, attachments, labels on one page. NOT for mk:confluence-page."
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - page-watcher
   - footer-comment
   - inline-comment
-when_to_use: 'Comment on, attach to, or label a single Confluence page.'
+when_to_use: "Comment on or label one page."
 user-invocable: true
 context: fork
 agent: confluence-collaborate

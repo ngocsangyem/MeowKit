@@ -1,6 +1,6 @@
 ---
 name: mk:lint-and-validate
-description: Run linting, formatting and static analysis right after a code edit. NOT for mk:verify.
+description: "Runs lint, format and static analysis after an edit. NOT for mk:verify."
 allowed-tools: Read, Glob, Grep, Bash
 phase: on-demand
 trust_level: third-party
@@ -13,7 +13,7 @@ keywords:
   - type-check
   - quality-control
   - post-edit-check
-when_to_use: A file was just modified and needs a quick quality gate.
+when_to_use: "A file was just modified."
 user-invocable: true
 owner: testing
 criticality: medium

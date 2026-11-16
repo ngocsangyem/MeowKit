@@ -1,6 +1,6 @@
 ---
 name: "mk-angular"
-description: "Angular v20+ patterns: components, signals, services, forms, routing, HTTP, testing, SSR. Auto-activates on .ts files in Angular projects (angular.json detected)."
+description: "Angular v20+ patterns: components, signals, forms, SSR; use in angular.json projects."
 ---
 
 # Angular

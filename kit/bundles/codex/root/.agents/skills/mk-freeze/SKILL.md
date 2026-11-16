@@ -1,6 +1,6 @@
 ---
 name: "mk-freeze"
-description: "Session-scoped edit restriction: blocks Edit/Write outside an allowed path, to scope changes to one module or prevent unrelated fixes. NOT for blocking destructive shell commands (mk:careful)."
+description: "Blocks edits outside one allowed path; use to scope changes. NOT for mk-careful."
 ---
 
 # /freeze — Restrict Edits to a Directory

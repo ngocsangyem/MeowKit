@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-dev"
-description: "Generate dev artifacts from Jira tickets via jira-as: branch names, PR descriptions, parsed commits, PR-to-issue links. NOT running git/gh (mk:ship) or issue CRUD (mk:jira-issue)."
+description: "Makes branch names, PR bodies, commit links from a Jira ticket. NOT for mk-ship."
 ---
 
 # mk:jira-dev

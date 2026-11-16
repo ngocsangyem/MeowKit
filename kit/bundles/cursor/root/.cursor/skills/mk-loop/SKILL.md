@@ -1,6 +1,6 @@
 ---
 name: "mk-loop"
-description: "Autonomously improve one measurable metric via bounded, git-tracked iterations: one scoped change, verify, keep or revert. NOT for cleanup (mk:cook), known-cause bugs (mk:fix), or shipping (mk:ship)."
+description: "Improves one metric via bounded git-tracked trials; use to optimize coverage."
 ---
 
 # mk:loop — Bounded Optimization Loop

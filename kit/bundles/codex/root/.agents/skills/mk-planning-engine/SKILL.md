@@ -1,6 +1,6 @@
 ---
 name: "mk-planning-engine"
-description: "Analyzes ticket complexity and dependencies against the codebase before sprint planning. NOT for writing plans (mk:plan-creator); NOT for scope review (mk:plan-ceo-review)."
+description: "Scores ticket complexity and dependencies; use before sprint planning. NOT for mk-plan-creator."
 requires_runtime: ["python>=3.9"]
 ---
 

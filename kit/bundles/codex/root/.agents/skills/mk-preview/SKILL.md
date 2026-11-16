@@ -1,6 +1,6 @@
 ---
 name: "mk-preview"
-description: "Generate visual artifacts: explanations, diagrams, slides, diff views. NOT publish-grade diagrams (mk:tech-graph), live media gen (mk:multimodal), or browser QA (mk:qa)."
+description: "Renders code or a diff as an explainer, diagram or slides. NOT for mk-tech-graph."
 ---
 
 # mk:preview

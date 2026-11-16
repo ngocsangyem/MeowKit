@@ -2,7 +2,7 @@
 name: mk:plan-creator
 version: 1.6.3
 preamble-tier: 3
-description: Writes the multi-file implementation plan the user agrees before building, scaled to task size. NOT for mk:planning-engine.
+description: "Writes the multi-file implementation plan before building. NOT for mk:planning-engine."
 argument-hint: '[task description] [--fast | --hard | --deep | --parallel | --two | --product-level [--no-design] [--no-scout] | --spike --timebox <duration>] [--tdd] [--advice] OR [archive | red-team {path} | validate {path}]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - plan-handoff
   - scope-adaptive
   - design-evidence
-when_to_use: A non-trivial build is requested and no agreed plan directory exists.
+when_to_use: "A non-trivial build has no agreed plan."
 user-invocable: true
 meowkit:
   portability: provider-only

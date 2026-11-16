@@ -1,6 +1,6 @@
 ---
 name: "mk-react-patterns"
-description: "React/Next.js authoring, review, and optimization: components, routes, bundle size, re-renders, performance. Auto-activates on .tsx/.jsx files alongside mk:typescript in React projects."
+description: "Guides React and Next.js code: hooks, re-renders, bundle size; use on .tsx or .jsx."
 ---
 
 # React Patterns

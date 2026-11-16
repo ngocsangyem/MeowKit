@@ -1,13 +1,13 @@
 ---
 name: mk:development
-description: Write feature code to this project's standards and patterns; TDD is opt-in via --tdd. NOT for mk:cook.
+description: "Writes feature code to project standards; TDD via --tdd. NOT for mk:cook."
 keywords:
   - development
   - feature-implementation
   - tdd-optional
   - coding-standards
   - skill-loading
-when_to_use: Implementing code directly, outside an orchestrated phase pipeline.
+when_to_use: "Coding outside a phase pipeline."
 user-invocable: true
 owner: utility
 criticality: medium

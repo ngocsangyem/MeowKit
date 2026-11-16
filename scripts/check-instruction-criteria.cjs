@@ -40,6 +40,15 @@ const PINNED_SHA256 = 'e0b639506d83aff3e9040f3fdbfad35c016ee46ff701ad2f1daff04ce
  * load their root AGENTS.md, and Cursor also every `.mdc` rule marked `alwaysApply: true`.
  */
 const ALWAYS_ON_CEILING = { '.claude': 18191, 'kit/bundles/codex/root': 7676, 'kit/bundles/cursor/root': 6289 };
+/** Skill listing ceilings in chars; Codex is lower so a 128k-context session keeps whole descriptions. */
+const LISTING_CEILING = { '.claude': 16000, 'kit/bundles/codex/root': 12000, 'kit/bundles/cursor/root': 16000 };
+
+/** Listing chars summed over every skill in a tree. */
+function listingTotal(tree) {
+  const abs = path.resolve(REPO, tree);
+  return walk(abs).filter((f) => isSkill(path.relative(abs, f)))
+    .reduce((n, f) => n + listingChars(fs.readFileSync(f, 'utf8'), kindOf(tree)), 0);
+}
 
 function expand(trees) {
   const out = [];
@@ -129,6 +138,10 @@ function check(tree) {
   const ceiling = ALWAYS_ON_CEILING[tree];
   if (ceiling !== undefined && alwaysOn > ceiling) {
     findings.push({ file: tree, line: 0, criterion: 'A8', text: `always-on text is ${alwaysOn} B, above the ${ceiling} B ceiling` });
+  }
+  const listed = listingTotal(tree);
+  if (LISTING_CEILING[tree] !== undefined && listed > LISTING_CEILING[tree]) {
+    findings.push({ file: tree, line: 0, criterion: 'listing', text: `skill listing is ${listed} chars, above the ${LISTING_CEILING[tree]} ceiling` });
   }
   if (kindOf(tree) === 'claude') {
     const sha = crypto.createHash('sha256').update(pinnedText(path.resolve(REPO, tree))).digest('hex');

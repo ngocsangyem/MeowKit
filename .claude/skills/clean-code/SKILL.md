@@ -1,6 +1,6 @@
 ---
 name: mk:clean-code
-description: Apply KISS, DRY and YAGNI while code is being written, and in ad-hoc quality passes. NOT for mk:simplify.
+description: "Applies KISS, DRY and YAGNI while writing code. NOT for mk:simplify."
 allowed-tools: Read, Write, Edit
 version: 2
 priority: CRITICAL
@@ -15,7 +15,7 @@ keywords:
   - yagni
   - authoring-quality
   - ad-hoc-review
-when_to_use: Authoring new code that should stay concise, or an informal quality read.
+when_to_use: "Authoring new code that should stay concise."
 user-invocable: true
 owner: utility
 criticality: medium

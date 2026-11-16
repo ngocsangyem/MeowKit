@@ -1,6 +1,6 @@
 ---
 name: "mk-multimodal"
-description: "Process images/video/audio/PDFs via Gemini API; generate images/video/speech/music; convert docs to Markdown. Multi-provider fallback. Use for analyze/transcribe/generate/convert on media files."
+description: "Analyses and generates images, video, audio, PDFs; use to transcribe or describe."
 requires_runtime: ["python>=3.9"]
 ---
 

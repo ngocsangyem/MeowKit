@@ -1,6 +1,6 @@
 ---
 name: "mk-vue"
-description: "Vue 3 authoring/review: components, composables, reactivity, Pinia, Pinia Colada, file routing, forms. Composition API + script setup. Auto-activates on .vue files. Deep review: mk:vue-best-practices."
+description: "Guides Vue 3 code: Composition API, Pinia, routing; use when editing .vue files."
 ---
 
 # Vue 3

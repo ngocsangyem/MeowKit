@@ -1,6 +1,6 @@
 ---
 name: "mk-verify"
-description: "Unified verification: build → lint → test → type-check → coverage. Use for 'is it green' / 'run all checks'; auto-called by mk:cook. NOT for lint only (mk:lint-and-validate)."
+description: "Runs build, lint, test, type-check and coverage in one pass; use for 'is it green'."
 disable-model-invocation: true
 ---
 

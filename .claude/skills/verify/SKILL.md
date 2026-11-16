@@ -1,6 +1,6 @@
 ---
 name: mk:verify
-description: 'One unified pass: build, lint, test, type-check, coverage. NOT for mk:lint-and-validate.'
+description: "One pass of build, lint, test, type-check, coverage. NOT for mk:lint-and-validate."
 version: 1.0.0
 argument-hint: "[--full] [--coverage-threshold N] [--skip-build] [--skip-coverage]"
 source: local
@@ -15,7 +15,7 @@ keywords:
   - coverage
   - unified-verification
   - pre-ship
-when_to_use: Asked whether everything is green, or a build just finished.
+when_to_use: "Is everything green?"
 user-invocable: true
 owner: lifecycle
 criticality: high

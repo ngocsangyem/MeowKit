@@ -1,6 +1,6 @@
 ---
 name: "mk-ship"
-description: "Ship workflow: prepare stages/commits locally; release pushes + opens a PR; publish handles issues + versioning. Use for 'ship', 'push', 'create a PR'. Official (→main) and beta (→dev) modes."
+description: "Ships reviewed code: commit, push, open a PR, release. NOT for mk-review."
 disable-model-invocation: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: "mk-orchestrate"
-description: "Coordinate staged or parallel jobs across coding-agent runtimes and subagents: routes by capability/risk, isolates writers in worktrees, arbitrates results. NOT for a single-agent task (mk:cook)."
+description: "Splits a job across agent runtimes and subagents in worktrees. NOT for mk-cook."
 ---
 
 # Orchestrate

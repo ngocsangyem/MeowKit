@@ -1,6 +1,6 @@
 ---
 name: mk:jira-jsm
-description: 'mk:jira leaf. Service desks, requests, queues, SLAs, customers, approvals. NOT for mk:jira-admin.'
+description: "mk:jira leaf: Service Management desks, requests, queues, SLAs. NOT for mk:jira-admin."
 phase: on-demand
 source: local
 keywords:
@@ -12,7 +12,7 @@ keywords:
   - jira-customer
   - jira-queue
   - jira-approval
-when_to_use: 'A Jira Service Management request, queue, SLA or approval.'
+when_to_use: "A JSM request, queue or SLA."
 user-invocable: true
 context: fork
 agent: jira-jsm

@@ -1,6 +1,6 @@
 ---
 name: "mk-context-audit"
-description: "Read-only audit of .codex/ structural overhead: 'remove X save Y tokens' vs the context window. NOT for cost tracking (budget skill); NOT for runtime read/compact decisions (mk:context-engineering)."
+description: "Read-only audit of .codex/ overhead, ranked by tokens saved. NOT for mk-context-engineering."
 ---
 
 # the context-audit skill — Context Window Structural Audit

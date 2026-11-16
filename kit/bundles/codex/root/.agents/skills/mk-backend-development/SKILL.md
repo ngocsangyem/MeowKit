@@ -1,6 +1,6 @@
 ---
 name: "mk-backend-development"
-description: "Design and implement backend changes end to end: endpoints, handlers, services, integrations, webhooks, jobs, authenticated access. Routes contracts to api-design-principles, schema to database."
+description: "Implements backend endpoints, services, webhooks, jobs; contracts go to mk-api-design-principles."
 ---
 
 # Backend Development

@@ -1,6 +1,6 @@
 ---
 name: mk:context-engineering
-description: Runtime context decisions — read more, stop, ask, assume, delegate, compact — over a pattern index. NOT for mk:context-audit.
+description: "Runtime context calls: ask, delegate, compact. NOT for mk:context-audit."
 keywords:
   - context-engineering
   - context-budget
@@ -13,7 +13,7 @@ keywords:
   - triage
   - just-in-time
   - sub-agent
-when_to_use: Context nears budget mid-task, or choosing compact vs clear vs a sub-agent.
+when_to_use: "Context nears budget mid-task."
 user-invocable: true
 phase: on-demand
 trust_level: kit-authored

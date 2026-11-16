@@ -1,6 +1,6 @@
 ---
 name: "mk-api-design-principles"
-description: "Design and review durable REST, GraphQL, RPC, or event API contracts: shape, compatibility, pagination, error semantics. Discovers existing consumers first. Not implementation, schema, or release."
+description: "Designs and reviews REST, GraphQL, event API contracts. NOT for mk-backend-development."
 ---
 
 # API Design Principles

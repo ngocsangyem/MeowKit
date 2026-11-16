@@ -1,6 +1,6 @@
 ---
 name: "mk-resolving-merge-conflicts"
-description: "Resolves an in-progress git merge/rebase conflict: reads conflict state, recovers each side's intent, resolves hunks, runs checks. NOT for the ship pipeline (mk:ship); NOT for bug debugging (mk:fix)."
+description: "Resolves a merge or rebase conflict hunk by hunk; use when git shows unmerged paths."
 ---
 
 # Resolving Merge Conflicts

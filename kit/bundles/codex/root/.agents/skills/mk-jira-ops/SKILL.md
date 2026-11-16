@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-ops"
-description: "JIRA-side cache + project-context discovery via jira-as, diagnostic-only, no Atlassian state changes. NOT issue CRUD or project admin (mk:jira-admin)."
+description: "Inspects or clears the Jira cache; discovers project defaults."
 ---
 
 # mk:jira-ops

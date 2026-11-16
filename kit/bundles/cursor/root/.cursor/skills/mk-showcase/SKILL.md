@@ -1,6 +1,6 @@
 ---
 name: "mk-showcase"
-description: "Create a self-contained polished HTML showcase page for a topic/artifacts; mission + paths given explicitly, never auto-scans repo. Writes to assets/showcase/<mission>/. Screenshots need Puppeteer."
+description: "Builds a standalone HTML showcase page from a mission and given paths."
 ---
 
 # mk:showcase

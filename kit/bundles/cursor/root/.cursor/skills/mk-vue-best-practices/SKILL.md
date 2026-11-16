@@ -1,6 +1,6 @@
 ---
 name: "mk-vue-best-practices"
-description: "Deep Vue 3 best-practices review and authoring workflow: built-in components (Teleport, Suspense, KeepAlive, Transition), animations, slots, directives, render fns, perf pass. Complements mk:vue."
+description: "Deep Vue 3 review: built-ins, animation, slots, performance. NOT for mk-vue."
 ---
 
 # Vue 3 Best Practices

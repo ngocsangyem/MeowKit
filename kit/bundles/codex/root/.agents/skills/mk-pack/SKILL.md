@@ -1,6 +1,6 @@
 ---
 name: "mk-pack"
-description: "Pack an EXTERNAL repository into one AI-friendly file (markdown/xml/json) for third-party analysis, security audits, or handoff. Do NOT use for the current project — it's already read lazily."
+description: "Packs an external repo into one file for an LLM or audit. NOT for mk-scout."
 ---
 
 <!-- SECURITY ANCHOR

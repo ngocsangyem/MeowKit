@@ -1,6 +1,6 @@
 ---
 name: mk:worktree
-description: 'Full git worktree lifecycle for agent isolation: create, merge with conflict detection, prune. NOT for mk:team-config.'
+description: "Git worktree lifecycle for agent isolation: create, merge, prune. NOT for mk:team-config."
 argument-hint: '[create|merge|cleanup|list|status|prune] [agent-name]'
 source: local
 keywords:
@@ -14,7 +14,7 @@ keywords:
   - worktree-cleanup
   - worktree-status
   - worktree-health
-when_to_use: Parallel agents need isolated branches, or their results must be merged back.
+when_to_use: "Parallel agents need isolated branches."
 user-invocable: false
 owner: git
 criticality: medium

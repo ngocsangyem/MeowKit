@@ -1,6 +1,6 @@
 ---
 name: "mk-sprint-contract"
-description: "Negotiates a file-based sprint contract between generator and evaluator before code is written: turns a spec into testable acceptance criteria with rubric tie-ins."
+description: "Negotiates generator and evaluator acceptance criteria before code."
 ---
 
 # mk:sprint-contract — File-Based Sprint Contract Protocol

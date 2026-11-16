@@ -1,6 +1,6 @@
 ---
 name: "mk-workflow-orchestrator"
-description: "Auto-invoked 7-phase workflow for complex-feature intent; fasttrack mode for pre-approved specs. NOT for explicit single tasks (mk:cook), green-field builds (mk:autobuild), or simple fixes (mk:fix)."
+description: "Routes complex-feature intent through the 7-phase workflow; auto-invoked."
 ---
 
 <!-- Split for progressive disclosure (checklist #11, #14): 463 → ~75 lines -->

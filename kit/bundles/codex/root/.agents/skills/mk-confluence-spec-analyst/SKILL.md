@@ -1,6 +1,6 @@
 ---
 name: "mk-confluence-spec-analyst"
-description: "Read-only spec analysis on a Confluence page (+children): requirements, acceptance criteria, gaps, user stories report. NOT page CRUD (mk:confluence-page) or ticket scoring (mk:planning-engine)."
+description: "Reports requirements, acceptance criteria, gaps in a Confluence spec. NOT for mk-confluence-page."
 ---
 
 # mk:confluence-spec-analyst

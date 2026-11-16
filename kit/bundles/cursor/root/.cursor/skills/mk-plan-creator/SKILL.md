@@ -1,6 +1,6 @@
 ---
 name: "mk-plan-creator"
-description: "Structured multi-file implementation plans before build; scope-aware, agreed with the user. NOT for ticket sizing (mk:planning-engine) or plan CEO-review (mk:plan-ceo-review)."
+description: "Writes the implementation plan before building. NOT for mk-planning-engine."
 disable-model-invocation: true
 ---
 

@@ -24,7 +24,7 @@ assert_match() {
 
 # Routing lives in the description line the host lists, so each boundary is
 # checked there, on whichever side of the pair carries it.
-assert_match "runtime bugs route to fix" '^description:.*remediation of bugs' "$SKILL"
+assert_match "runtime bugs route to fix" '^description:.*fixes for bugs' "$SKILL"
 assert_match "investigation-only work routes to investigate" '^description:.*NOT for mk:investigate' "$SKILL"
 assert_match "investigate hands fixes back to fix" '^description:.*not an edit.*NOT for mk:fix' "$INVESTIGATE"
 assert_match "compile errors route to build-fix" '^description:.*compile.*NOT for mk:fix' "$BUILD_FIX"

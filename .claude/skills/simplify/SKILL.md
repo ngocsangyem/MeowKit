@@ -1,6 +1,6 @@
 ---
 name: mk:simplify
-description: 'Behavior-preserving reduction of freshly written code: dead code, needless abstraction. NOT for mk:clean-code.'
+description: "Simplifies fresh code without changing behavior. NOT for mk:clean-code."
 argument-hint: '[file_or_directory]'
 source: local
 allowed-tools:
@@ -16,7 +16,7 @@ keywords:
   - refactor
   - reduce-complexity
   - yagni-pass
-when_to_use: The build is green and the diff should shrink before review.
+when_to_use: "Build is green; shrink the diff first."
 user-invocable: true
 owner: docs
 criticality: medium

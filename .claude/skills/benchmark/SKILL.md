@@ -2,7 +2,7 @@
 name: mk:benchmark
 version: 1.0.0
 preamble-tier: 3
-description: Experimental/manual harness canary procedure. It records benchmark manifests and scores but does not provide a fully automated runner.
+description: "Manual harness canary recording benchmark scores."
 argument-hint: '[run | compare <a> <b>] [--full]'
 allowed-tools:
   - Bash
@@ -19,7 +19,7 @@ keywords:
   - measure-harness
   - dead-weight-audit
   - ground-truth
-when_to_use: Experimental/manual use when measuring harness changes against ground truth. NOT for production performance benchmarking.
+when_to_use: "Experimental. NOT for production perf."
 user-invocable: true
 owner: testing
 criticality: medium

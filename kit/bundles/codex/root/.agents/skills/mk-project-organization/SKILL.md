@@ -1,6 +1,6 @@
 ---
 name: "mk-project-organization"
-description: "Correct file paths, project layout, and naming conventions. Two modes: advisory (return a path) and organize (restructure)."
+description: "Picks the path and name for a new file; use when it has no obvious home."
 ---
 
 # Project Organization

@@ -1,6 +1,6 @@
 ---
 name: "mk-autobuild"
-description: "Runs autonomous multi-hour green-field builds: planner, contract, generator/evaluator loop, scaffolding density per model tier. NOT for scoped tasks (mk:cook); NOT for scaffolding only (mk:bootstrap)."
+description: "Builds a whole green-field product unattended, loop of planner and evaluator. NOT for mk-cook."
 ---
 
 <!-- Lifecycle canonical source: this bundle's step files (step-00..step-06) — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->

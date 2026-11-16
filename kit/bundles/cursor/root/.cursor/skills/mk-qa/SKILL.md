@@ -1,6 +1,6 @@
 ---
 name: "mk-qa"
-description: "Systematically QA-tests a web app and fixes bugs: test, then iteratively fix, re-verify, commit each fix. Tiers: Quick, Standard, Exhaustive. Produces before/after health scores and fix evidence."
+description: "QA-tests a running web app, fixes each bug, re-verifies. NOT for mk-qa-manual."
 ---
 
 # /qa: Test → Fix → Verify

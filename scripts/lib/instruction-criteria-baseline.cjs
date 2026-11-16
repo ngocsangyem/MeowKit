@@ -1,11 +1,11 @@
 'use strict';
 // instruction-criteria-baseline.cjs — growth-only checking. A baseline records, per criterion
 // and file, how many findings existed when it was written; a later run fails only where a
-// file has more. The always-on ceiling and the pinned-text hash are never baselined.
+// file has more. The always-on and listing ceilings and the pinned-text hash are never baselined.
 
 const fs = require('node:fs');
 
-const NEVER_BASELINED = new Set(['A8', 'pinned']);
+const NEVER_BASELINED = new Set(['A8', 'listing', 'pinned']);
 
 /** A line that carries `criteria-allow: A14` (or a comma list) waives that criterion there. */
 function allowed(text, finding) {

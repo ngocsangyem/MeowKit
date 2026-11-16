@@ -1,6 +1,6 @@
 ---
 name: "mk-prompt-enhancer"
-description: "Refine a draft prompt before sending to a coding agent: decomposes goal/context/constraints, flags ambiguity, emits a model-agnostic rewrite. NOT for prompts from scratch (mk:brainstorming)."
+description: "Rewrites a draft agent prompt into goal, context and constraints before sending."
 requires_runtime: ["python>=3.9"]
 ---
 

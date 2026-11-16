@@ -1,6 +1,6 @@
 ---
 name: "mk-careful"
-description: "Session-scoped guardrails warning before rm -rf, DROP TABLE, force-push, git reset --hard, kubectl delete, etc; user can override. NOT for scoping edits to a directory (mk:freeze)."
+description: "Warns before destructive commands (rm -rf, DROP TABLE, force-push). NOT for mk-freeze."
 ---
 
 # /careful — Destructive Command Guardrails

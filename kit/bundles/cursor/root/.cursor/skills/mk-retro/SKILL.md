@@ -1,6 +1,6 @@
 ---
 name: "mk-retro"
-description: "Weekly engineering retrospective from commit history, work patterns, and code-quality metrics, with trend tracking and per-person breakdown. NOT for per-session reflection (mk:memory / Phase 6)."
+description: "Engineering retrospective from commit history; use at week or sprint end."
 ---
 
 # the retro skill — Weekly Engineering Retrospective

@@ -1,6 +1,6 @@
 ---
 name: "mk-story-sizer"
-description: "Pre-ticket Fibonacci sizing for pasted stories; advisory by default, writes a Sizing Report. Opt-in auto-create adds a confirm gate. NOT for single-ticket sizing (mk:jira-estimator)."
+description: "Fibonacci-sizes pasted stories before tickets exist. NOT for mk-jira-estimator."
 requires_runtime: ["python>=3.9"]
 ---
 

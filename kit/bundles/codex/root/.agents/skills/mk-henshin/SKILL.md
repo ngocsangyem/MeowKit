@@ -1,6 +1,6 @@
 ---
 name: "mk-henshin"
-description: "Convert existing code into agent-consumable CLI/MCP server + companion skill. Use for 'agentize', 'expose as MCP', 'wrap as CLI'. NOT new code from scratch (mk:bootstrap) or review (mk:review)."
+description: "Turns code into a CLI or MCP server plus skill; use to expose as MCP or wrap as CLI."
 ---
 
 <!-- SECURITY ANCHOR

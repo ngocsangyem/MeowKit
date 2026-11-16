@@ -1,6 +1,6 @@
 ---
 name: "mk-fix"
-description: "Diagnoses and fixes bugs, type/lint errors, CI failures, and runtime errors, root-cause first. NOT for investigation without a fix (mk:investigate) or build-only compile errors (mk:build-fix)."
+description: "Fixes bugs, type and lint errors, CI failures, root-cause first. NOT for mk-investigate."
 disable-model-invocation: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: "mk-office-hours"
-description: "YC Office Hours-style validation for a new idea before code exists: tests demand (Startup mode) or develops an unvalidated idea (Builder mode). For reviewing an existing plan use mk:plan-ceo-review."
+description: "YC-style check that a new idea is worth building. NOT for mk-plan-ceo-review."
 ---
 
 # YC Office Hours

@@ -1,6 +1,6 @@
 ---
 name: "mk-devops"
-description: "Plan and implement infrastructure, container, CI/CD, deployment-safety, observability, and rollback changes. Does not read dotenv files or approve/release deployments."
+description: "Containers, IaC, CI/CD, observability, rollback safety; use for pipeline or infra edits."
 ---
 
 # DevOps

@@ -1,6 +1,6 @@
 ---
 name: "mk-review-pr"
-description: "Reviews a GitHub PR with a shallow correctness/security/breaking/AI-slop checklist and emits a verdict; optionally posts via gh. NOT for own-diff audit (mk:review); NOT for replying (mk:respond-pr)."
+description: "Checklist review of someone else's GitHub PR. NOT for mk-review."
 ---
 
 # Review a GitHub PR

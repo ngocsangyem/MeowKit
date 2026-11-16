@@ -1,6 +1,6 @@
 ---
 name: "rule-advice-supervision"
-description: "Contract governing the --advice flag: supervision checkpoints, caps, packets, dossier, receipts, and the boundary that keeps counsel from approving anything. Load only when --advice is present."
+description: "Contract for the --advice flag: supervision checkpoints, caps and packets; counsel never approves. Load only when --advice is present."
 ---
 
 # Advice Supervision (`--advice`)

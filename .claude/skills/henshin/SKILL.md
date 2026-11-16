@@ -1,6 +1,6 @@
 ---
 name: mk:henshin
-description: Turn existing code into agent surfaces — an npm CLI, an MCP server over stdio, SSE or HTTP, and a companion skill. NOT for mk:skill-creator.
+description: "Turns existing code into a CLI, MCP server and companion skill."
 argument-hint: '[feature-or-module] [--both|--mcp|--cli] [--auto|--ask] [--lean]'
 phase: on-demand
 trust_level: kit-authored
@@ -14,7 +14,7 @@ keywords:
   - wrap-as-tool
   - expose-feature
   - npm-publish
-when_to_use: Asked to expose code as MCP, wrap it as a CLI or make it LLM-accessible.
+when_to_use: "Asked to expose code as MCP or wrap as CLI."
 user-invocable: true
 owner: research
 criticality: medium

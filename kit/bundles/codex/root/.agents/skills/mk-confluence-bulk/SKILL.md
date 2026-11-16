@@ -1,6 +1,6 @@
 ---
 name: "mk-confluence-bulk"
-description: "Bulk Confluence ops (10+ pages): bulk-label/move/delete via confluence-as; dry-run mandatory. NOT single-page (mk:confluence-page) or comments/attachments (mk:confluence-collaborate)."
+description: "Bulk Confluence label, move, delete on 10+ pages. NOT for mk-confluence-page."
 ---
 
 # mk:confluence-bulk

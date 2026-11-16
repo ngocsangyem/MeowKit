@@ -1,6 +1,6 @@
 ---
 name: "mk-confluence-page"
-description: "Confluence page CRUD via confluence-as: create/show/update/delete, hierarchy, copy. NOT bulk (mk:confluence-bulk), spec analysis (mk:confluence-spec-analyst), or comments (mk:confluence-collaborate)."
+description: "Confluence page CRUD, copy, hierarchy. NOT for mk-confluence-collaborate."
 ---
 
 # mk:confluence-page

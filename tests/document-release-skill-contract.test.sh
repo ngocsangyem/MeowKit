@@ -12,7 +12,7 @@ assert_match() {
 
 assert_match "post-ship timing" 'Post-ship documentation update' "$SKILL"
 assert_match "runs after mk:ship prepares change, before PR merges" 'Runs after .*mk:ship.* prepares the change and before the PR merges' "$SKILL"
-assert_match "updates README/ARCHITECTURE/CONTRIBUTING/CLAUDE.md" '^description:.*README, architecture, contributing, CLAUDE\.md' "$SKILL"
+assert_match "syncs README, architecture and changelog after a release" '^description:.*README, architecture, changelog after a release' "$SKILL"
 assert_match "NOT for initial doc creation (routes to mk:docs-init)" '^description:.*NOT for mk:docs-init' "$SKILL"
 
 echo

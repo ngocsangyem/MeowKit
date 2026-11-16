@@ -1,7 +1,7 @@
 ---
 name: mk:docs-init
 version: 1.0.0
-description: Generate a project's first docs/ set from codebase analysis. NOT for mk:document-release.
+description: "Generates a project's first docs/ set from the code. NOT for mk:document-release."
 allowed-tools:
   - Bash
   - Read
@@ -18,7 +18,7 @@ keywords:
   - docs-scaffolding
   - new-project-docs
   - codebase-analysis
-when_to_use: The docs/ directory is missing or empty and needs a baseline set.
+when_to_use: "docs/ is missing or empty."
 user-invocable: true
 owner: docs
 criticality: medium

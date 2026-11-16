@@ -1,6 +1,6 @@
 ---
 name: mk:breakdown
-description: Turn a spec, PRD or epic into sized user stories plus a codebase-aware tech report. NOT for mk:planning-engine.
+description: "Turns a spec, PRD or epic into sized user stories. NOT for mk:planning-engine."
 argument-hint: <source> [--source confluence|jira|github|linear|paste] [--project <KEY>]
 source: local
 trust_level: kit-authored
@@ -17,7 +17,7 @@ keywords:
   - ticket-creation
   - tech-breakdown
   - requirements-decomposition
-when_to_use: A Confluence page, epic, issue or pasted PRD needs stories before planning.
+when_to_use: "A PRD or epic needs stories before planning."
 user-invocable: true
 owner: jira
 criticality: medium

@@ -1,6 +1,6 @@
 ---
 name: "mk-brainstorming"
-description: "Generate or compare multiple technical approaches for one validated decision. NOT for product discovery or refining an existing plan."
+description: "Compares technical approaches for one validated decision. NOT for mk-office-hours."
 ---
 
 # Brainstorming

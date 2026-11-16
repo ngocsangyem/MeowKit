@@ -1,6 +1,6 @@
 ---
 name: "mk-rubric"
-description: "Loads, lists, composes, or validates graded evaluation rubrics: PASS/WARN/FAIL grading with weighted criteria and balanced anchor examples for evaluator-style review."
+description: "Loads, composes and validates weighted PASS/WARN/FAIL rubrics for graders."
 ---
 
 # Rubric Library API

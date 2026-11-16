@@ -1,6 +1,6 @@
 ---
 name: mk:jira-relationships
-description: 'mk:jira leaf. Issue links, blockers, dependencies, clone, bulk-link. NOT for mk:jira-agile.'
+description: "mk:jira leaf: issue links, blockers, dependencies, clone."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - jira-blocker
   - jira-clone
   - jira-dependency
-when_to_use: 'Link two Jira issues, or ask what blocks a given issue.'
+when_to_use: "Link two issues or ask what blocks one."
 user-invocable: true
 context: fork
 agent: jira-relationships

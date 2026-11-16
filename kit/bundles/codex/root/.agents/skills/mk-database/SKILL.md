@@ -1,6 +1,6 @@
 ---
 name: "mk-database"
-description: "Design and safely evolve data models, schemas, migrations, queries, indexes, and ORM data-access boundaries. Discover the existing engine and migration source before proposing syntax."
+description: "Data models, schema, migration, queries, indexes; use to change a schema or fix a slow query."
 ---
 
 # Database

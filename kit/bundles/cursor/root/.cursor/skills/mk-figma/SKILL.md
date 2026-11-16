@@ -1,6 +1,6 @@
 ---
 name: "mk-figma"
-description: "Read-first Figma gateway via Figma MCP: analyze designs, implement 1-3 screens, extract tokens, produce Evidence Packet. Advanced ops gated on explicit intent. Use for 'figma', 'design tokens'."
+description: "Figma gateway: reads designs, extracts design tokens, builds 1-3 screens. NOT for mk-stitch."
 requires_runtime: ["python>=3.9"]
 ---
 

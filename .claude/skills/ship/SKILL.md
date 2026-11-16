@@ -2,7 +2,7 @@
 name: mk:ship
 preamble-tier: 3
 version: 1.1.0
-description: Commit, push, PR and release scoping for reviewed code, official or beta. NOT for mk:review.
+description: "Ships reviewed code: commit, push, PR, release. NOT for mk:review."
 argument-hint: '[prepare|release|publish] [official|beta] [--skip-tests] [--dry-run] [--advice]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - branch-push
   - deploy-pipeline
   - pre-landing-review
-when_to_use: The review verdict passed and the change must land or be released.
+when_to_use: "Review passed; change must land."
 user-invocable: true
 owner: lifecycle
 criticality: high

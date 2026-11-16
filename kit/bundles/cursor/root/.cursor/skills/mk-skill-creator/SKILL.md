@@ -1,6 +1,6 @@
 ---
 name: "mk-skill-creator"
-description: "Creates new skills with proper structure, compliance checks, and registration. Enforces mk: prefix, sub-agents.md structure, and context-engineering principles. Use to scaffold a new skill."
+description: "Scaffolds and registers a new skill with compliance checks."
 requires_runtime: ["python>=3.9"]
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: "mk-qa-manual"
-description: "Spec-driven manual QA and Playwright E2E generation: navigates apps like a human tester, producing reports or .spec.ts files. Prompts for credentials. NOT for autonomous flows (mk:agent-browser)."
+description: "Runs manual QA and writes Playwright .spec.ts from a spec. NOT for mk-qa."
 ---
 
 <!-- Design decisions:

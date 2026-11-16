@@ -1,6 +1,6 @@
 ---
 name: "mk-confluence-collaborate"
-description: "Confluence comments, attachments, labels, watchers via confluence-as. Inline-vs-footer safety enforced. NOT page CRUD (mk:confluence-page) or bulk ops (mk:confluence-bulk)."
+description: "Confluence comments, attachments, labels on one page. NOT for mk-confluence-page."
 ---
 
 # mk:confluence-collaborate

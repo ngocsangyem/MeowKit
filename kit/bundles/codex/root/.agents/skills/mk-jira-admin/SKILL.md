@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-admin"
-description: "JIRA project/user/group/scheme/automation admin via jira-as. Requires admin role; destructive ops need 2-step confirm. NOT per-issue ops (mk:jira-issue/lifecycle) or JSM admin (mk:jira-jsm)."
+description: "Jira project, user, group, scheme admin; use to create a project. NOT for mk-jira-jsm."
 ---
 
 # mk:jira-admin

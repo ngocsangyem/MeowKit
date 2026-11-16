@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-agile"
-description: "JIRA agile via jira-as: epics, sprints, backlog, ranking, story points, velocity. Board ID != project key. NOT issue CRUD (mk:jira-issue) or time tracking (mk:jira-time)."
+description: "Jira epics, sprints, backlog, ranking, points; use to move items between sprints."
 ---
 
 # mk:jira-agile

@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-time"
-description: "JIRA time tracking via jira-as: log work, worklogs, estimates, reports, bulk-log. Edit/delete confirms first (data loss). NOT sprint capacity (mk:jira-agile)."
+description: "Jira worklogs, estimates, time reports; use to log hours on a ticket."
 ---
 
 # mk:jira-time

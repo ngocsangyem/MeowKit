@@ -1,6 +1,6 @@
 ---
 name: "mk-grill"
-description: "Relentlessly interview the user about THEIR plan, one question at a time, until shared understanding. Checkpoints answers so progress survives a reset. Do NOT use to propose solutions."
+description: "Grills the user on their plan one question at a time; use to stress-test it. NOT for mk-advise."
 ---
 
 # Grill

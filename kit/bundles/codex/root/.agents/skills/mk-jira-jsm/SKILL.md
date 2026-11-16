@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-jsm"
-description: "JIRA Service Management via jira-as: service desks, requests, customers, orgs, queues, SLAs, approvals. Requires JSM tenant + agent role. NOT core issue ops (mk:jira-issue) or admin (mk:jira-admin)."
+description: "Jira Service Management desks, requests, queues, SLAs. NOT for mk-jira-admin."
 ---
 
 # mk:jira-jsm

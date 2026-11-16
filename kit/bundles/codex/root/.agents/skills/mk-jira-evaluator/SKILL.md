@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-evaluator"
-description: "Evaluate Jira ticket complexity and inconsistencies via jira-evaluator agent, read-only. NOT estimation (mk:jira-estimator) or full RCA (mk:jira-analyst)."
+description: "Scores one Jira ticket for complexity and inconsistencies, read-only."
 ---
 
 # mk:jira-evaluator

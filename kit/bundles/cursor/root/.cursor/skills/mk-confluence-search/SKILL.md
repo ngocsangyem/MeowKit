@@ -1,6 +1,6 @@
 ---
 name: "mk-confluence-search"
-description: "Confluence CQL search, space list, saved filters, export via confluence-as; CQL injection-safe. NOT single-page CRUD (mk:confluence-page) or bulk writes (mk:confluence-bulk)."
+description: "Confluence CQL search, space listing, export. NOT for mk-confluence-page."
 ---
 
 # mk:confluence-search

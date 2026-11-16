@@ -1,6 +1,6 @@
 ---
 name: "mk-elicit"
-description: "Structured second-pass reasoning after a review or plan verdict: pre-mortem, inversion, red team, Socratic lens, etc. NOT for initial review (mk:review) or new plans (mk:plan-creator)."
+description: "Second-pass reasoning on a verdict: pre-mortem, red team. NOT for mk-review."
 ---
 
 # Elicitation — Structured Second-Pass Reasoning

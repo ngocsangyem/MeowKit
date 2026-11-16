@@ -1,6 +1,6 @@
 ---
 name: "mk-lint-and-validate"
-description: "Linting and static analysis after code edits. Triggers on lint, format, check, validate, types. NOT for full build verification (mk:verify) or test coverage (mk:testing)."
+description: "Runs lint, format, static analysis after an edit. NOT for mk-verify."
 ---
 
 # Lint and Validate Skill

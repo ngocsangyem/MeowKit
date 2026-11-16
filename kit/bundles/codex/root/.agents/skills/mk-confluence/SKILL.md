@@ -1,6 +1,6 @@
 ---
 name: "mk-confluence"
-description: "Routes Confluence Cloud tasks to the right mk:confluence-* leaf skill. Use for 'confluence', 'wiki page', 'spec page', or ambiguous intent. NOT an executor -- forks to a leaf skill."
+description: "Routes Confluence and wiki tasks to the right mk-confluence-* leaf; does not execute."
 requires_runtime: ["python>=3.9"]
 ---
 

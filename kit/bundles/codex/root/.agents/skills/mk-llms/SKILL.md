@@ -1,6 +1,6 @@
 ---
 name: "mk-llms"
-description: "Generate llms.txt files from project docs per the llmstxt.org spec, for AI-friendly documentation indexes and discoverability. Use to create or update llms.txt for AI assistants."
+description: "Generates llms.txt from project docs; use to make a project AI-discoverable."
 requires_runtime: ["python>=3.9"]
 ---
 

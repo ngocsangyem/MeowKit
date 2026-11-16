@@ -1,6 +1,6 @@
 ---
 name: "mk-memory"
-description: "Plain-markdown team memory: two committed files for non-derivable decisions and gotchas. Use to record a lesson or prune stale entries. NOT for retrospectives (mk:retro)."
+description: "Appends or prunes team memory; use to remember a lesson. NOT for mk-retro."
 ---
 
 # Memory — Record and Prune

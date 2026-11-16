@@ -1,6 +1,6 @@
 ---
 name: "mk-review"
-description: "Multi-pass structural code review with adversarial personas. Input: branch diff (default), PR #123, commit, --pending. Use for 'review this PR/diff'. NOT for behavioral verification (mk:evaluate)."
+description: "Multi-pass adversarial review of a diff, PR or commit. NOT for mk-evaluate."
 disable-model-invocation: true
 ---
 

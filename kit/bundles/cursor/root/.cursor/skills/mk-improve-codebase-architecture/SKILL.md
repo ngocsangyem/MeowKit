@@ -1,6 +1,6 @@
 ---
 name: "mk-improve-codebase-architecture"
-description: "Surfaces architectural friction and proposes deepening refactors (shallow to deep modules). Renders via mk:preview. NOT for debate (mk:party); NOT for plan critique (mk:plan-ceo-review)."
+description: "Finds shallow modules, proposes deepening refactors. NOT for mk-arch."
 ---
 
 # mk:improve-codebase-architecture

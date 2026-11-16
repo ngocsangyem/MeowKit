@@ -1,6 +1,6 @@
 ---
 name: "mk-agent-browser"
-description: "Browser automation CLI for agents: navigate, click/fill, screenshot, extract data, test apps, Electron/Slack, cloud browsers. NOT for the user's real Chrome profile/cookies (mk:chrome-profile)."
+description: "Drives a browser from the CLI: click, fill, screenshot. NOT for mk-chrome-profile."
 ---
 
 # agent-browser

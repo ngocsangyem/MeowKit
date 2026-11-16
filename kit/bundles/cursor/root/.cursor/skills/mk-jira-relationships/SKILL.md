@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-relationships"
-description: "Manage JIRA issue relationships via jira-as: link, unlink, blockers, dependencies, clone, bulk-link. NOT sprint/epic relationships (mk:jira-agile)."
+description: "Jira issue links, blockers, dependencies, clone; use to link issues."
 ---
 
 # mk:jira-relationships

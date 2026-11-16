@@ -1,6 +1,6 @@
 ---
 name: "mk-context-engineering"
-description: "Runtime router for context decisions: read-more/stop/ask/assume/delegate, minimal read-set, compaction timing. Model: Write/Select/Compress/Isolate. NOT for agent-tree overhead audit (context-audit)."
+description: "Runtime context decisions: read more, ask, delegate, compact. NOT for mk-context-audit."
 ---
 
 # mk:context-engineering — Runtime Context Router

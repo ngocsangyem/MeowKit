@@ -1,6 +1,6 @@
 ---
 name: mk:confluence-search
-description: 'mk:confluence leaf. CQL search, space listing, saved filters, export. NOT for mk:confluence-page.'
+description: "Confluence CQL search, space listing, export. NOT for mk:confluence-page."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - confluence-filter
   - confluence-export
   - confluence-space-list
-when_to_use: 'Find Confluence pages by CQL, space, label or author.'
+when_to_use: "Find pages by CQL, space or label."
 user-invocable: true
 context: fork
 agent: confluence-search

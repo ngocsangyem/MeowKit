@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-analyst"
-description: "Read-only full Jira ticket analysis incl. media + linked issues via jira-analyst agent; produces comment-ready findings. NOT complexity scoring (mk:jira-evaluator) or estimation (mk:jira-estimator)."
+description: "Reads one Jira ticket with comments, links, media; use for full context or RCA."
 ---
 
 # mk:jira-analyst

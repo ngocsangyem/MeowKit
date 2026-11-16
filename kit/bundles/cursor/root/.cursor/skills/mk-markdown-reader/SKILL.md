@@ -1,6 +1,6 @@
 ---
 name: "mk-markdown-reader"
-description: "Serve a markdown file/directory as a calm, book-like reader via a local HTTP server (127.0.0.1 only); good for long-form docs like RFCs and plans. Supports Mermaid, dark/light mode, and a nav sidebar."
+description: "Serves markdown as a book-like local reader; use for long RFCs and plans."
 ---
 
 # mk:markdown-reader

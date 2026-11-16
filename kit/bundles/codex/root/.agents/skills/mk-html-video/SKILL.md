@@ -1,6 +1,6 @@
 ---
 name: "mk-html-video"
-description: "Render an HTML/CSS/JS template to local MP4 via headless Chromium (Playwright) + ffmpeg. NOT live browser recording, screen recording, or AI video gen (mk:multimodal)."
+description: "Renders an HTML template to MP4 via Playwright and ffmpeg. NOT for mk-multimodal."
 ---
 
 # HTML → MP4 Render Pipeline

@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-bulk"
-description: "Bulk JIRA ops (10+ issues): transition/assign/priority/clone/delete via jira-as; dry-run mandatory. NOT single-issue ops (mk:jira-issue, mk:jira-lifecycle)."
+description: "Bulk Jira changes on 10+ issues, dry-run first. NOT for mk-jira-issue."
 ---
 
 # mk:jira-bulk

@@ -1,6 +1,6 @@
 ---
 name: "mk-intake"
-description: "Ticket/PRD intake: product-area classification, completeness scoring, RCA, technical assessment. Works with Jira, Linear, GitHub, or manual paste. Use to analyze or triage a ticket."
+description: "Scores a ticket or PRD for completeness and root cause; use to triage. NOT for mk-breakdown."
 ---
 
 # mk:intake — Ticket & PRD Intake Analysis

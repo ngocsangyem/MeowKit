@@ -1,7 +1,7 @@
 ---
 name: mk:sequential-thinking
 version: 1.0.0
-description: Forces explicit step-by-step hypothesis-and-evidence reasoning before acting. NOT for mk:problem-solving.
+description: "Step-by-step hypothesis-and-evidence reasoning before acting. NOT for mk:problem-solving."
 allowed-tools:
   - Read
   - Grep
@@ -15,7 +15,7 @@ keywords:
   - evidence-based
   - incremental-analysis
   - chain-of-thought
-when_to_use: Analysis runs several steps deep and a guessed conclusion would be costly.
+when_to_use: "Multi-step analysis; guessing is costly."
 user-invocable: true
 owner: research
 criticality: medium

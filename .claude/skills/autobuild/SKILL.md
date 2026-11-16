@@ -2,7 +2,7 @@
 name: mk:autobuild
 version: 1.0.0
 preamble-tier: 3
-description: Autonomous multi-hour green-field product build — planner, contract, generator and evaluator in a loop. NOT for mk:cook.
+description: "Builds a green-field product unattended. NOT for mk:cook."
 argument-hint: '[task description] [--tier auto|full|lean|minimal] [--max-iter N] [--budget USD] [--tdd] [--advice]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - generator-evaluator
   - harness-contract
   - adaptive-density
-when_to_use: A whole product is specified from scratch and should build unattended.
+when_to_use: "A full product spec should build unattended."
 user-invocable: true
 meowkit:
   portability: provider-only

@@ -1,6 +1,6 @@
 ---
 name: "mk-context-audit"
-description: "Read-only audit of the project's agent-tree structural overhead vs the context window. NOT for cost tracking (budget skill); NOT for read/compact decisions (mk:context-engineering)."
+description: "Read-only audit of agent-tree overhead, ranked by tokens saved. NOT for mk-context-engineering."
 ---
 
 # the context-audit skill — Context Window Structural Audit

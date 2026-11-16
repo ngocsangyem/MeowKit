@@ -1,6 +1,6 @@
 ---
 name: "mk-advise"
-description: "Turn a raw idea into ONE honest recommendation: interview one question at a time until confirmed, then give a verdict with trade-offs and a checklist. Not for options or debate."
+description: "Gives ONE recommendation after a one-question interview. NOT for mk-party."
 ---
 
 # Advise

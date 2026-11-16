@@ -1,6 +1,6 @@
 ---
 name: "mk-ghpm"
-description: "GitHub project management via gh CLI: issues, Projects v2 boards, labels, milestones, handoff summaries. NOT for code review (mk:review-pr), PR creation, or git ops (mk:resolving-merge-conflicts)."
+description: "GitHub issues, Projects v2 boards, milestones via gh. NOT for mk-review-pr."
 ---
 
 # GitHub Project Management

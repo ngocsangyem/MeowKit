@@ -1,7 +1,7 @@
 ---
 name: mk:ask-me
 version: 1.0.0
-description: Answer factual questions about this project — code, architecture, conventions — with file:line citations. NOT for mk:investigate.
+description: "Answers factual project questions with file:line citations. NOT for mk:investigate."
 argument-hint: '[question] [--depth quick|standard|deep] [--save-to <path>]'
 allowed-tools:
   - Read
@@ -16,7 +16,7 @@ keywords:
   - cited-answer
   - project-question
   - architecture-explanation
-when_to_use: Asked how something works here, or whether a claim holds in this repo.
+when_to_use: "Asked how something works here."
 user-invocable: true
 owner: research
 criticality: medium

@@ -1,6 +1,6 @@
 ---
 name: "mk-team-config"
-description: "Set up a parallel agent team for COMPLEX tasks: creates worktree structure, an ownership map, and an initialized task queue. Use when a task is decomposed into parallel subtasks."
+description: "Sets up a parallel agent team: worktrees, ownership map, task queue."
 ---
 
 # Team Configuration

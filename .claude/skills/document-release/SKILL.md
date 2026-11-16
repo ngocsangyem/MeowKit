@@ -2,7 +2,7 @@
 name: mk:document-release
 preamble-tier: 2
 version: 1.0.0
-description: Post-ship docs sync — README, architecture, contributing, CLAUDE.md, changelog voice, TODO cleanup. NOT for mk:docs-init.
+description: "Syncs README, architecture, changelog after a release. NOT for mk:docs-init."
 allowed-tools:
   - Bash
   - Read
@@ -18,7 +18,7 @@ keywords:
   - changelog
   - readme-update
   - sync-documentation
-when_to_use: Work has shipped and its pull request has not merged yet.
+when_to_use: "Shipped, pull request not yet merged."
 user-invocable: true
 owner: docs
 criticality: medium

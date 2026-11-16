@@ -1,6 +1,6 @@
 ---
 name: "mk-stitch"
-description: "Generate novel UI from a text prompt via Stitch AI; exports Tailwind/HTML + DESIGN.md for mk:frontend-design handoff. NOT implementing existing designs -- use mk:figma or mk:frontend-design."
+description: "Generates a new UI design from a prompt via Stitch AI. NOT for mk-figma."
 ---
 
 # Stitch — AI Design Generation

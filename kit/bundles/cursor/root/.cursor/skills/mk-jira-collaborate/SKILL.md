@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-collaborate"
-description: "JIRA comments, attachments, watchers, notify via jira-as. Internal-vs-public comment safety enforced. NOT issue CRUD (mk:jira-issue) or issue links (mk:jira-relationships)."
+description: "Jira comments, attachments, watchers; use to comment on an issue."
 ---
 
 # mk:jira-collaborate

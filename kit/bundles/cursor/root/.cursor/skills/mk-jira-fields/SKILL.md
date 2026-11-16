@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-fields"
-description: "JIRA custom field discovery + configuration via jira-as. Create/configure-agile need admin. NOT setting per-issue field values (mk:jira-issue update)."
+description: "Finds Jira custom field IDs and project field config; use to look up a field."
 ---
 
 # mk:jira-fields

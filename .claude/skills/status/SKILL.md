@@ -1,6 +1,6 @@
 ---
 name: mk:status
-description: 'Evidence-based delivery status for the active plan: done, blocked, changed since last report. NOT for mk:help.'
+description: "Evidence-based status of the active plan: done, blocked, changed. NOT for mk:help."
 argument-hint: '[plan-dir | plan-slug]'
 source: local
 trust_level: kit-authored
@@ -17,7 +17,7 @@ keywords:
   - plan-status
   - blocked-items
   - stakeholder-update
-when_to_use: Asked where we are, or a stakeholder update is due.
+when_to_use: "Asked where we are."
 user-invocable: true
 owner: lifecycle
 criticality: medium

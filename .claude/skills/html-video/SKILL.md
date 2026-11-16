@@ -1,6 +1,6 @@
 ---
 name: mk:html-video
-description: Render a local HTML, CSS and JS template to MP4 by capturing frames with Playwright and encoding via ffmpeg. NOT for mk:multimodal.
+description: "Renders an HTML/CSS/JS template to MP4 via Playwright and ffmpeg."
 keywords:
   - html-to-video
   - mp4-export
@@ -10,7 +10,7 @@ keywords:
   - ffmpeg-encode
   - frame-capture
   - html-canvas
-when_to_use: Asked to export a web animation or template to an MP4 file.
+when_to_use: "Asked to export a web animation to MP4."
 user-invocable: true
 owner: utility
 criticality: low

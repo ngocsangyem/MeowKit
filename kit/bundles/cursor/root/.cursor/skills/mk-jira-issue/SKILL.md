@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-issue"
-description: "JIRA issue CRUD via jira-as. NOT lifecycle (mk:jira-lifecycle), comments (mk:jira-collaborate), bulk (mk:jira-bulk), links (mk:jira-relationships), or time/sprint (mk:jira-time/agile)."
+description: "Create, read, update or delete one Jira issue. NOT for mk-jira-bulk."
 ---
 
 # mk:jira-issue

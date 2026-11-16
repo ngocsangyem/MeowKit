@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-search"
-description: "JIRA search + filter management via jira-as; JQL injection-safe. NOT single-issue CRUD (mk:jira-issue) or bulk writes (mk:jira-bulk)."
+description: "JQL search and saved filters for Jira; use to find issues. NOT for mk-jira-bulk."
 ---
 
 # mk:jira-search

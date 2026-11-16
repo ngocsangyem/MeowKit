@@ -1,6 +1,6 @@
 ---
 name: mk:jira-estimator
-description: 'mk:jira leaf. Heuristic story-point estimate for one ticket, read-only. NOT for mk:story-sizer.'
+description: "mk:jira leaf: read-only story points for one ticket. NOT for mk:story-sizer."
 phase: on-demand
 source: local
 keywords:
@@ -9,7 +9,7 @@ keywords:
   - story-points
   - fibonacci-estimation
   - ticket-estimation
-when_to_use: 'Ask for story points on one Jira ticket that already exists.'
+when_to_use: "Ask for story points on one existing ticket."
 user-invocable: true
 context: fork
 agent: jira-estimator

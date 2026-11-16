@@ -1,6 +1,6 @@
 ---
 name: mk:docs-finder
-description: Retrieve current library, framework and API docs through Context7 and Context Hub with fallback. NOT for mk:web-to-markdown.
+description: "Fetches current library and API docs via Context7. NOT for mk:web-to-markdown."
 version: 1.0.0
 argument-hint: '[library-name] [topic]'
 phase: on-demand
@@ -13,7 +13,7 @@ keywords:
   - api-reference
   - framework-docs
   - mcp-fallback
-when_to_use: An API signature or library behaviour must be checked, never recalled.
+when_to_use: "An API signature must be checked, not recalled."
 user-invocable: true
 meowkit:
   portability: provider-only

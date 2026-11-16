@@ -1,6 +1,6 @@
 ---
 name: "mk-trace-analyze"
-description: "Analyzes harness trace logs to surface recurring failure patterns and suggest harness improvements. Scatter-gather across last N runs with a mandatory HITL gate before any change is applied."
+description: "Mines harness trace logs for recurring failures, behind a human gate."
 ---
 
 # mk:trace-analyze — Scatter-Gather Trace Analysis

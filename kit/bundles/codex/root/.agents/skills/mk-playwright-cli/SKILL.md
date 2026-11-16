@@ -1,6 +1,6 @@
 ---
 name: "mk-playwright-cli"
-description: "Session-persistent browser automation via Playwright CLI: form filling, screenshots, data extraction, multi-step flows. NOT for autonomous flows (mk:agent-browser) or .spec.ts E2E code (mk:qa-manual)."
+description: "Scripted browser control via Playwright CLI. NOT for mk-agent-browser."
 ---
 
 # Browser Automation with playwright-cli

@@ -1,6 +1,6 @@
 ---
 name: "mk-testing"
-description: "Writing tests, running validation, and (TDD mode) red-green-refactor. Active in Test + Build phases. NOT for coverage-gap mapping (mk:nyquist) or sprint contracts (mk:sprint-contract)."
+description: "Writes and runs tests, with red-green-refactor in TDD mode. NOT for mk-nyquist."
 ---
 
 # Testing Toolkit

@@ -1,6 +1,6 @@
 ---
 name: mk:jira-search
-description: 'mk:jira leaf. JQL search, query building, saved filters, result export. NOT for mk:jira-bulk.'
+description: "mk:jira leaf: JQL search, saved filters, export. NOT for mk:jira-bulk."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - jql-query
   - jira-filter
   - jira-export
-when_to_use: 'Find Jira issues matching criteria, or manage a saved JQL filter.'
+when_to_use: "Find Jira issues by criteria."
 user-invocable: true
 context: fork
 agent: jira-search

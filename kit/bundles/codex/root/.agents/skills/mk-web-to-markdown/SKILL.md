@@ -1,6 +1,6 @@
 ---
 name: "mk-web-to-markdown"
-description: "Fetch a URL and return clean markdown, for arbitrary external pages (blog, RFC, GitHub issue, vendor doc) not covered by mk:docs-finder. Static-only by default; opt-in JS rendering available."
+description: "Fetches one URL as clean markdown; use for blogs, RFCs, issues."
 requires_runtime: ["python>=3.9"]
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: "mk-docs-finder"
-description: "Retrieve current library, framework, and API docs via Context7, Context Hub, and web fallback. Use whenever docs are needed for a library, SDK, or internal spec instead of stale training data."
+description: "Fetches current library and API docs via Context7; use instead of stale memory."
 ---
 
 <!-- SECURITY ANCHOR

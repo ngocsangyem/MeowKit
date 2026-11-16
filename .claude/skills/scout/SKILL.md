@@ -1,6 +1,6 @@
 ---
 name: mk:scout
-description: Parallel subagent sweep of the repository returning a file map and architecture fingerprint. NOT for mk:research.
+description: "Finds where things live: parallel repo sweep, file map. NOT for mk:research."
 source: local
 keywords:
   - scout
@@ -9,7 +9,7 @@ keywords:
   - file-mapping
   - architecture-fingerprint
   - routing-suggestions
-when_to_use: Starting work in unfamiliar directories and need to know where things live.
+when_to_use: "Unfamiliar directories."
 user-invocable: true
 meowkit:
   portability: provider-only

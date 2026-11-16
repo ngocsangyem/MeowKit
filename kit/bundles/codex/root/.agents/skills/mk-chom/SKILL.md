@@ -1,6 +1,6 @@
 ---
 name: "mk-chom"
-description: "Copies or adapts features from external repos/apps into this project. Triggers on 'copy this from', 'replicate'. NOT for packing this project (mk:pack); NOT for URL fetches (mk:web-to-markdown)."
+description: "Copies or ports a feature from an external repo or app. NOT for mk-web-to-markdown."
 ---
 
 <!-- SECURITY ANCHOR

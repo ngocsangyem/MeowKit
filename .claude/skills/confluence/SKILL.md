@@ -1,6 +1,6 @@
 ---
 name: mk:confluence
-description: 'Confluence Cloud routing hub. Picks the mk:confluence-* leaf and forwards it. NOT an executor.'
+description: "Confluence Cloud router to the mk:confluence-* leaf. NOT an executor."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - atlassian-wiki
   - wiki
   - spec-page
-when_to_use: 'Confluence or wiki work is wanted but the leaf is unclear; the hub body routes.'
+when_to_use: "Confluence work with an unclear leaf."
 user-invocable: true
 owner: confluence
 criticality: medium

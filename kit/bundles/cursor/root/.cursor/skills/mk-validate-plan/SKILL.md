@@ -1,6 +1,6 @@
 ---
 name: "mk-validate-plan"
-description: "Validates an agreed plan across 8 dimensions before build — incomplete acceptance criteria, missing dependencies, unresolved risks. Use once the plan is agreed, before Test."
+description: "Checks an agreed plan across 8 dimensions for gaps; use before building."
 disable-model-invocation: true
 ---
 

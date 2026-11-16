@@ -1,6 +1,6 @@
 ---
 name: "mk-vue-testing-best-practices"
-description: "Vue 3 testing best-practices review: Vitest + Vue Test Utils for components, composables, Pinia, Router, async/Suspense, forms, a11y, plus Playwright E2E strategy. Advisory only."
+description: "Advises on Vue 3 test design: Vitest, Test Utils, Pinia, Playwright."
 ---
 
 # Vue Testing Best Practices

@@ -1,6 +1,6 @@
 ---
 name: mk:memory
-description: Append or prune non-derivable decisions and gotchas in the two committed .meowkit/memory files. NOT for mk:retro.
+description: "Appends or prunes decisions and gotchas in team memory. NOT for mk:retro."
 keywords:
   - memory
   - decisions
@@ -9,7 +9,7 @@ keywords:
   - prune
   - persistence
   - team-knowledge
-when_to_use: A human asks to remember a lesson, or stale entries need removing.
+when_to_use: "Asked to remember a lesson or prune entries."
 user-invocable: true
 owner: memory
 criticality: high

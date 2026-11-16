@@ -1,6 +1,6 @@
 ---
 name: mk:respond-pr
-description: Triages received PR comments against the code, then accepts, pushes back or replies in-thread. NOT for mk:review-pr.
+description: "Triages received PR comments, then accepts, pushes back or replies. NOT for mk:review-pr."
 source: local
 version: 0.1.0
 argument-hint: '<#PR | URL> [--reply]'
@@ -11,7 +11,7 @@ keywords:
   - pull-request
   - triage
   - github-threads
-when_to_use: A reviewer left comments that need answering rather than a review given.
+when_to_use: "Reviewer comments need answering."
 user-invocable: true
 owner: lifecycle
 criticality: medium

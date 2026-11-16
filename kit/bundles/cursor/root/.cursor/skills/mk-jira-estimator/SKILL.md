@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-estimator"
-description: "Heuristic read-only story-point estimation for one Jira ticket via jira-estimator agent. NOT complexity analysis (mk:jira-evaluator) or full RCA (mk:jira-analyst)."
+description: "Read-only story-point estimate for one Jira ticket. NOT for mk-story-sizer."
 ---
 
 # mk:jira-estimator

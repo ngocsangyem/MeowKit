@@ -1,6 +1,6 @@
 ---
 name: "mk-bootstrap"
-description: "Bootstraps a new project end to end: research, design, plan, scaffold, implement, docs. Explicit invocation only. NOT for autonomous builds (mk:autobuild); NOT for existing-repo work (mk:cook)."
+description: "Scaffolds a new project from idea to running code. NOT for mk-autobuild."
 ---
 
 # Bootstrap

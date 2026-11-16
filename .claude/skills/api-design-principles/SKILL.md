@@ -1,6 +1,6 @@
 ---
 name: mk:api-design-principles
-description: Design and review REST, GraphQL, RPC and event contracts — endpoints, schemas, versioning, pagination, error semantics. NOT for mk:backend-development.
+description: "Designs and reviews REST, GraphQL, event API contracts. NOT for mk:backend-development."
 version: 1.0.0
 argument-hint: '[contract or review] [--rest|--graphql|--rpc|--event]'
 source: local
@@ -20,7 +20,7 @@ keywords:
   - error-semantics
   - deprecation
   - consumer-discovery
-when_to_use: Shaping or reviewing an API contract before any handler is written.
+when_to_use: "Shaping an API contract before handlers."
 user-invocable: true
 owner: portability
 criticality: high

@@ -1,6 +1,6 @@
 ---
 name: "mk-development"
-description: "Implementing features or writing code. TDD is opt-in via --tdd / MEOWKIT_TDD=1. Provides code patterns, skill loading, and coding standards."
+description: "Writes feature code to project standards; TDD via --tdd. NOT for mk-cook."
 ---
 
 # Development Toolkit

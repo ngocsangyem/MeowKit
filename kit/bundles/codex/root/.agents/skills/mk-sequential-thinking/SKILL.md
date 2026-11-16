@@ -1,6 +1,6 @@
 ---
 name: "mk-sequential-thinking"
-description: "Structured step-by-step reasoning before acting, to avoid guessing. For complex debugging, multi-step analysis, hypothesis checks. NOT for being stuck on approach (mk:problem-solving)."
+description: "Step-by-step reasoning before acting; use for deep debugging. NOT for mk-problem-solving."
 ---
 
 # Sequential Thinking

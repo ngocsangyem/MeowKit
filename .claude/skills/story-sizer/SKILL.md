@@ -1,6 +1,6 @@
 ---
 name: mk:story-sizer
-description: 'mk:jira family. Fibonacci-sizes a pasted batch of stories before tickets exist. NOT for mk:jira-estimator.'
+description: "Fibonacci-sizes pasted stories before Jira tickets exist. NOT for mk:jira-estimator."
 argument-hint: '--paste [--scout] [--story <id>] | --paste --auto-create --project <KEY> [--epic <KEY>]'
 phase: on-demand
 source: local
@@ -13,7 +13,7 @@ keywords:
   - split-recommendation
   - auto-create-gated
   - estimate
-when_to_use: 'Size a batch of draft user stories that have no Jira tickets yet.'
+when_to_use: "Draft stories need sizing."
 user-invocable: true
 context: fork
 agent: story-sizer

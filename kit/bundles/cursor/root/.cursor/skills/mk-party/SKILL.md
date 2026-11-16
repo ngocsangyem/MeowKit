@@ -1,6 +1,6 @@
 ---
 name: "mk-party"
-description: "Multi-agent collaboration bringing 2-4 perspectives into one discussion for architecture decisions and trade-off analysis. Use for 'should we X or Y', design review, or debate before deciding."
+description: "Runs a 2-4 agent round-table on a trade-off; use for 'X or Y'. NOT for mk-brainstorming."
 ---
 
 # Party Mode — Multi-Agent Collaboration

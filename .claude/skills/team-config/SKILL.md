@@ -1,6 +1,6 @@
 ---
 name: mk:team-config
-description: 'Sets up a parallel agent team: worktrees, ownership map, task queue. NOT for mk:worktree.'
+description: "Sets up a parallel agent team: worktrees, ownership map, queue. NOT for mk:worktree."
 argument-hint: '"task description" --agents N'
 source: local
 allowed-tools:
@@ -14,7 +14,7 @@ keywords:
   - ownership-map
   - parallel-team-init
   - task-queue-init
-when_to_use: Auto-invoked when a complex task is split into parallel subtasks.
+when_to_use: "Auto-invoked on parallel subtasks."
 user-invocable: false
 owner: git
 criticality: medium

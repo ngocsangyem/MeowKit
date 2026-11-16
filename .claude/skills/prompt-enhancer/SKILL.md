@@ -2,7 +2,7 @@
 name: mk:prompt-enhancer
 version: 1.3.1
 argument-hint: '[prompt text] [--analyze] [--score] [--deep] [--save-to <path>]'
-description: Rewrites a draft agent prompt into goal, context, constraints and acceptance criteria. NOT for mk:elicit.
+description: "Rewrites a draft agent prompt into goal, context, constraints. NOT for mk:elicit."
 source: local
 allowed-tools:
   - Read
@@ -22,7 +22,7 @@ keywords:
   - prompt-evaluation
   - prompt-scoring
   - deep-prompt-mode
-when_to_use: User pastes a prompt they are about to send and wants it sharpened.
+when_to_use: "User pastes a prompt to sharpen."
 user-invocable: true
 preamble-tier: 2
 phase: on-demand

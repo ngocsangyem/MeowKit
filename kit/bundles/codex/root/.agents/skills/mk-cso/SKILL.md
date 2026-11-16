@@ -1,6 +1,6 @@
 ---
 name: "mk-cso"
-description: "Chief Security Officer mode: infrastructure-first audit of secrets, dependency supply chain, CI/CD, LLM/AI security, OWASP Top 10, STRIDE, active verification. Daily/comprehensive, trend tracking."
+description: "Security audit of secrets, dependencies, CI/CD, OWASP, STRIDE; use for threat models."
 ---
 
 # the cso skill — Chief Security Officer Audit (v2)

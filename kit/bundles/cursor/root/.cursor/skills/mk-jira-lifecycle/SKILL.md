@@ -1,6 +1,6 @@
 ---
 name: "mk-jira-lifecycle"
-description: "Drive JIRA workflow lifecycle via jira-as: transition, assign, resolve, reopen, versions, components. NOT issue CRUD (mk:jira-issue) or bulk transitions (mk:jira-bulk)."
+description: "Jira transition, assign, resolve, reopen on one issue. NOT for mk-jira-bulk."
 ---
 
 # mk:jira-lifecycle

@@ -1,6 +1,6 @@
 ---
 name: mk:cook
-description: Single-task implementation pipeline — plan, test, build, review — with shipping left explicit. NOT for mk:autobuild.
+description: "Implements one feature or plan end to end. NOT for mk:autobuild."
 source: local
 version: 1.0.0
 argument-hint: '[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test|--tdd|--verify|--strict|--no-strict|--advice]'
@@ -11,7 +11,7 @@ keywords:
   - feature-build
   - seven-phase
   - single-task
-when_to_use: One scoped feature, fix or approved plan to execute end to end.
+when_to_use: "One scoped feature or approved plan."
 user-invocable: true
 owner: lifecycle
 criticality: critical

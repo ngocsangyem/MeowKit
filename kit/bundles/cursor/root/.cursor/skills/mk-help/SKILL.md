@@ -1,6 +1,6 @@
 ---
 name: "mk-help"
-description: "Workflow navigator: scans project state (plans, reviews, tests, git) and recommends the next pipeline step. Use for 'what next?' or 'where am I?'. NOT for complexity routing (mk:scale-routing)."
+description: "Names the next workflow step from plans, tests, git; use for 'what next?'. NOT for mk-status."
 ---
 
 # Navigation Help

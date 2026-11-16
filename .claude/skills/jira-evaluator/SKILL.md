@@ -1,6 +1,6 @@
 ---
 name: mk:jira-evaluator
-description: 'mk:jira leaf. Score one ticket for complexity and inconsistencies, read-only. NOT for mk:jira-estimator.'
+description: "mk:jira leaf: scores one ticket's complexity and inconsistencies."
 phase: on-demand
 source: local
 keywords:
@@ -9,7 +9,7 @@ keywords:
   - ticket-evaluation
   - complexity-analysis
   - ticket-quality
-when_to_use: 'Ask how complex or how self-contradictory a single Jira ticket is.'
+when_to_use: "Ask how complex or contradictory a ticket is."
 user-invocable: true
 context: fork
 agent: jira-evaluator
