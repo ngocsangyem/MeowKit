@@ -1,4 +1,4 @@
-Basics live in `mk:vue` references/components.md and references/reactivity-performance.md — this covers SFC structure, scoped-style performance, and template-safety topics beyond them.
+Basics live in `mk-vue` references/components.md and references/reactivity-performance.md — this covers SFC structure, scoped-style performance, and template-safety topics beyond them.
 
 ## Contents
 

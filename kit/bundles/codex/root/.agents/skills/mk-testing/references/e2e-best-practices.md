@@ -4,7 +4,7 @@ Standards for writing reliable, maintainable end-to-end tests.
 
 ## Tool Preference
 
-1. **Agent Browser** (first choice) — use for exploratory QA and visual verification via `mk:agent-browser`
+1. **Agent Browser** (first choice) — use for exploratory QA and visual verification via `mk-agent-browser`
 2. **Playwright** (second choice) — use for automated regression suites requiring code-level control
 3. **Puppeteer** (last resort) — use only if Playwright is unavailable in the project
 

@@ -49,7 +49,7 @@ Also check `TODOS.md` and `git log` for prior fixes in same area.
 ## Phase 4: Diagnostic Report & Handoff
 
 Write the report to `tasks/reports/**` and hand off remediation only after the
-cause is confirmed. `mk:fix` implements observed defects; `mk:build-fix` owns
+cause is confirmed. `mk-fix` implements observed defects; `mk-build-fix` owns
 compile/build failures. If the cause remains uncertain, state that clearly and
 ask for the next diagnostic step.
 
@@ -61,7 +61,7 @@ Root cause:      [confirmed cause or explicit uncertainty]
 Ranked causes:   [most likely → least likely]
 Evidence:        [logs, traces, reproduction result]
 Blast radius:    [affected callers, modules, behaviors]
-Next owner:      [mk:fix | mk:build-fix | user]
+Next owner:      [mk-fix | mk-build-fix | user]
 Related:         [TODOS.md items, prior bugs in same area]
 Status:          DONE | DONE_WITH_CONCERNS | BLOCKED
 ════════════════════════════════════════

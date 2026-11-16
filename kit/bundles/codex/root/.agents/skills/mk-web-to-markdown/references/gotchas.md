@@ -1,4 +1,4 @@
-# mk:web-to-markdown — Gotchas
+# mk-web-to-markdown — Gotchas
 
 Concrete edge cases and operational surprises. Each entry explains why it matters and how to mitigate it.
 
@@ -91,6 +91,6 @@ TTL auto-cleanup is deferred to v2 (`setup cleanup command`). Add the cache dire
 
 ## Gotcha: Cross-skill delegation requires explicit opt-in flag
 
-**Why it matters:** Any skill other than a direct user invocation must pass `--wtm-accept-risk` when delegating to `mk:web-to-markdown`. Without this flag, the skill refuses with `ERROR: cross-skill delegation requires --wtm-accept-risk flag`. This prevents implicit invocation from skills that haven't consciously acknowledged the injection risk of fetching arbitrary URLs.
+**Why it matters:** Any skill other than a direct user invocation must pass `--wtm-accept-risk` when delegating to `mk-web-to-markdown`. Without this flag, the skill refuses with `ERROR: cross-skill delegation requires --wtm-accept-risk flag`. This prevents implicit invocation from skills that haven't consciously acknowledged the injection risk of fetching arbitrary URLs.
 
 **Mitigation:** Always pass `--wtm-accept-risk` (or `wtm_accept_risk=True` in Python) when delegating from another skill. This flag is a conscious trust-boundary crossing — the caller acknowledges that the target URL may contain prompt injection and that the skill's defenses are best-effort. See `references/security.md` for full flag semantics.

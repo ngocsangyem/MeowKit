@@ -3,7 +3,7 @@ name: "mk-confluence-page"
 description: "Confluence page CRUD, copy, hierarchy. NOT for mk-confluence-collaborate."
 ---
 
-# mk:confluence-page
+# mk-confluence-page
 
 Forks to the `confluence-page` agent. The skill body is the task brief — the host runtime injects this content into the forked agent.
 
@@ -32,7 +32,7 @@ Forks to the `confluence-page` agent. The skill body is the task brief — the h
   - `references/page-templates.md` — RFC / Runbook / Decision Record skeletons
   - `references/field-formats.md` — storage / view / export_view / ADF distinctions
   - `references/version-restore-guide.md` — version operations + restore semantics
-- Peer leaves: `mk:confluence-search` (CQL search + space list), `mk:confluence-collaborate` (comments / attachments / labels), `mk:confluence-bulk` (10+ pages), `mk:confluence-spec-analyst` (spec analysis)
+- Peer leaves: `mk-confluence-search` (CQL search + space list), `mk-confluence-collaborate` (comments / attachments / labels), `mk-confluence-bulk` (10+ pages), `mk-confluence-spec-analyst` (spec analysis)
 
 ## Gotchas
 

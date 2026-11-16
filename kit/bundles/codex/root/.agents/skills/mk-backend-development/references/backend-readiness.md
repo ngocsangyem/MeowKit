@@ -41,21 +41,21 @@ broker:
 State what the surrounding system actually guarantees. When the guarantee is unknown, that
 sentence is the deliverable. Do not design a broker, retry policy, or dead-letter path into
 a repository that has none — that is a proposal for the user, and an operational change
-owned by `mk:devops`.
+owned by `mk-devops`.
 
 ## Auth and tenancy
 
 - Name the authorization requirement for each operation: who may perform it, on which
   records, and what an unauthorized caller observes.
 - For multi-tenant data, state where the tenant boundary is enforced and what happens to a
-  request that crosses it. Hand the data-side isolation question to `mk:database`.
+  request that crosses it. Hand the data-side isolation question to `mk-database`.
 - Do not choose the authentication mechanism, hashing scheme, or token format here, and do
   not certify that the result is secure. State the requirement; the security workflow owns
   the verdict.
 
 ## Data access boundary
 
-The service states what data it needs and what invariant must hold. `mk:database` owns the
+The service states what data it needs and what invariant must hold. `mk-database` owns the
 schema, the query, the index, and the migration. If this change requires generic SQL or a
 migration, that is the handoff — not a task to complete here.
 
@@ -68,7 +68,7 @@ Change what is observable only as far as the change requires. Add the signal tha
 someone diagnose this specific failure, reuse the existing logging and metric conventions,
 and never log a credential, token, or personal record.
 
-Choosing the platform, dashboards, alerts, or retention is `mk:devops` work.
+Choosing the platform, dashboards, alerts, or retention is `mk-devops` work.
 
 ## Evidence to record
 

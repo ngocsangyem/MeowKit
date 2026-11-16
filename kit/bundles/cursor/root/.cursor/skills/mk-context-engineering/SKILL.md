@@ -3,13 +3,13 @@ name: "mk-context-engineering"
 description: "Runtime context decisions: read more, ask, delegate, compact. NOT for mk-context-audit."
 ---
 
-# mk:context-engineering — Runtime Context Router
+# mk-context-engineering — Runtime Context Router
 
 Decide the next context move for the task in front of you: read more, stop, ask,
 assume, or delegate — then load at most one pattern reference to execute it. This
 skill routes decisions; it does not preload a knowledge library.
 
-**Boundary vs `mk:context-audit`:** that skill audits *structural* agent-tree overhead
+**Boundary vs `mk-context-audit`:** that skill audits *structural* agent-tree overhead
 (what is statically loaded every session). This skill decides *runtime* context moves
 for one task. Structural question → context-audit. Runtime question → here. If a request
 is ambiguous between the two (e.g. "this project's context is messy"), ask ONE question —
@@ -25,10 +25,10 @@ structural agent-tree setup or this session's runtime context? — then route.
 
 ## When NOT to Use
 
-- Auditing agent-tree token overhead → `mk:context-audit`.
-- Persisting a learning or reading memory topic files → `mk:memory`.
-- Finding *where* code lives → `mk:scout` (or `Read` for one known file).
-- USD run cost → `mk:budget`.
+- Auditing agent-tree token overhead → `mk-context-audit`.
+- Persisting a learning or reading memory topic files → `mk-memory`.
+- Finding *where* code lives → `mk-scout` (or `Read` for one known file).
+- USD run cost → `mk-budget`.
 - A trivial 1–2 file task — no routing needed; just do it.
 
 ## Four Operations
@@ -123,7 +123,7 @@ or I'll proceed with these.`
 
 ## Related Skills
 
-- `mk:context-audit` — use instead for structural agent-tree overhead (tokens/% statically loaded).
-- `mk:memory` — use instead to actually record or prune an entry in `.meowkit/memory/`; this skill only decides a write is warranted.
-- `mk:scout` — use instead to discover *where* code lives; this skill decides *how much* to read.
-- `mk:agent-detector` — use the canonical agent inventory for routing and on-demand instruction loading.
+- `mk-context-audit` — use instead for structural agent-tree overhead (tokens/% statically loaded).
+- `mk-memory` — use instead to actually record or prune an entry in `.meowkit/memory/`; this skill only decides a write is warranted.
+- `mk-scout` — use instead to discover *where* code lives; this skill decides *how much* to read.
+- `mk-agent-detector` — use the canonical agent inventory for routing and on-demand instruction loading.

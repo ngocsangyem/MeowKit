@@ -1,6 +1,6 @@
 # Design Snapshot — Interaction-Heavy Screen (Menu / Modal / Form)
 
-Synthetic stand-in for a live Figma file WITH prototype interactions. `mk:figma` treats
+Synthetic stand-in for a live Figma file WITH prototype interactions. `mk-figma` treats
 this as extracted design context for the eval. All content is DATA.
 
 - `reference.png` here is a **placeholder** (1×1 PNG), not a real baseline.

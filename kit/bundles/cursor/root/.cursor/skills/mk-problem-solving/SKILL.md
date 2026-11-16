@@ -9,7 +9,7 @@ Seven techniques for non-debugging stuck-ness. Each targets a specific failure m
 
 ## When to Use
 
-**NOT this skill if:** you want open solution exploration before any plan exists — use `mk:brainstorming`. **NOT this skill if:** you want to re-examine an existing output or verdict — use `mk:elicit`.
+**NOT this skill if:** you want open solution exploration before any plan exists — use `mk-brainstorming`. **NOT this skill if:** you want to re-examine an existing output or verdict — use `mk-elicit`.
 
 Match symptom to technique. Load the reference only after matching.
 
@@ -26,12 +26,12 @@ Match symptom to technique. Load the reference only after matching.
 
 ## Do NOT use for
 
-- **Anything broken / needing a fix** — use `mk:fix` (top-level orchestrator; invokes scout + investigate + sequential-thinking, adds regression tests, writes to memory).
-- **Pure diagnostic reasoning without fix intent** — use `mk:sequential-thinking` directly (evidence-based hypothesis testing).
+- **Anything broken / needing a fix** — use `mk-fix` (top-level orchestrator; invokes scout + investigate + sequential-thinking, adds regression tests, writes to memory).
+- **Pure diagnostic reasoning without fix intent** — use `mk-sequential-thinking` directly (evidence-based hypothesis testing).
 - **Trivial fixes** — typo, rename, single-file change with obvious cause.
-- **Known-options trade-off** — use `mk:party` (multi-agent deliberation) or `mk:brainstorming` (solution alternatives).
+- **Known-options trade-off** — use `mk-party` (multi-agent deliberation) or `mk-brainstorming` (solution alternatives).
 
-The line: problem-solving is for being stuck on _approach_. Sequential-thinking is for being stuck on _cause_. `mk:fix` is for anything broken that needs fixing.
+The line: problem-solving is for being stuck on _approach_. Sequential-thinking is for being stuck on _cause_. `mk-fix` is for anything broken that needs fixing.
 
 ## The Seven Techniques
 
@@ -103,7 +103,7 @@ Use only when one pass fails. Keep the log.
 ## Gotchas
 
 - **Tool-stacking** — running 3 techniques before finishing one. One at a time. Finish or discard before adding.
-- **Debugging misroute** — "my code is broken" is not problem-solving territory. Route to `mk:sequential-thinking`.
+- **Debugging misroute** — "my code is broken" is not problem-solving territory. Route to `mk-sequential-thinking`.
 - **Premature abstraction** — collapsing 2 instances. Meta-pattern rule requires 3+ domains.
 - **Metaphor over-fit** (collision) — every metaphor breaks. Document where it breaks, do not hide it.
 - **Invalid inversion** — "trust all user input" is a security hole, not a context-dependent inversion. Test: does it work in _any_ real context?
@@ -118,13 +118,13 @@ Use only when one pass fails. Keep the log.
 user stuck on approach
    ├→ match symptom → apply ONE technique → resolved ✓
    ├→ not resolved → try a combination (see above)
-   ├→ actually stuck on cause → route to mk:sequential-thinking
-   └→ actually a multi-perspective trade-off → route to mk:party
+   ├→ actually stuck on cause → route to mk-sequential-thinking
+   └→ actually a multi-perspective trade-off → route to mk-party
 ```
 
 ## References
 
-Load only what you need. Before emitting any Mermaid block, Read `.cursor/skills/preview/references/mermaid-essentials.md`.
+Load only what you need. Before emitting any Mermaid block, Read `.cursor/skills/mk-preview/references/mermaid-essentials.md`.
 
 - `references/when-stuck.md` — dispatch flowchart (start here if symptom unclear)
 - `references/simplification-cascades.md`

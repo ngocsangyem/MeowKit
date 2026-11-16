@@ -20,11 +20,11 @@ For **Deep complexity** tasks, Phase 1 uses multi-perspective deliberation:
 | 1     | Plan                    | planner → architect  | Requirements, technical design                        | **Agree w/ user**|
 | 2     | Test (RED if `--tdd`)   | tester               | Failing tests in TDD mode; tests on-request otherwise | Auto / Skipped   |
 | 3     | Build                   | developer            | Implementation (GREEN in TDD mode)                    | Auto             |
-| 3.5   | Simplify                | mk:simplify          | Simplified code with behavior preserved                | Auto             |
-| 3.6   | Verify                  | mk:verify            | Clean build, lint, typecheck, test, and coverage       | Auto             |
+| 3.5   | Simplify                | mk-simplify          | Simplified code with behavior preserved                | Auto             |
+| 3.6   | Verify                  | mk-verify            | Clean build, lint, typecheck, test, and coverage       | Auto             |
 | 4     | Review                  | reviewer + security  | Quality/security audit, verdict                       | **Read verdict** |
 | 5     | Ship                    | shipper + git-manager| Commit, PR, deploy                                    | Auto             |
-| 6     | Reflect                 | analyst + documenter + mk:memory | Cost/pattern analysis, docs sync, gotcha/decision if non-derivable | Auto             |
+| 6     | Reflect                 | analyst + documenter + mk-memory | Cost/pattern analysis, docs sync, gotcha/decision if non-derivable | Auto             |
 
 ## Phase Transition Rules
 

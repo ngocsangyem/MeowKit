@@ -1,6 +1,6 @@
 # Angular Tooling
 
-> Part of mk:angular skill. Read when: working with tooling.
+> Part of mk-angular skill. Read when: working with tooling.
 > Source: analogjs/angular-skills/angular-tooling (MIT)
 
 ## Contents
@@ -10,7 +10,6 @@
 - [ANGULAR VERSION ASSUMPTIONS](#angular-version-assumptions)
 - [GOTCHAS AND ANTI-PATTERNS](#gotchas-and-anti-patterns)
 - [COMPLETE FILE LISTING](#complete-file-listing)
-
 
 ## Core Patterns
 

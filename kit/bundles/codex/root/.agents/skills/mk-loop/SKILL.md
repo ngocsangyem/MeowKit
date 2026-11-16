@@ -3,7 +3,7 @@ name: "mk-loop"
 description: "Improves one metric via bounded git-tracked trials; use to optimize coverage."
 ---
 
-# mk:loop — Bounded Optimization Loop
+# mk-loop — Bounded Optimization Loop
 
 > Scope + mechanical metric + fast verify = bounded, git-tracked, boundary-gated improvement.
 
@@ -27,13 +27,13 @@ never ships.
 
 | Situation | Better tool |
 | --- | --- |
-| Subjective goal ("make it cleaner", "make it nicer") | `mk:cook` |
-| Known root-cause bug to fix once | `mk:fix` / `mk:investigate` |
-| Grade a running build against behavior/rubric | `mk:evaluate` |
-| Green-field product build (generator⇄evaluator) | `mk:autobuild` |
-| Structural review of a diff | `mk:review` |
-| Open a PR / ship | `mk:ship` |
-| No mechanical metric exists | `mk:cook --interactive` |
+| Subjective goal ("make it cleaner", "make it nicer") | `mk-cook` |
+| Known root-cause bug to fix once | `mk-fix` / `mk-investigate` |
+| Grade a running build against behavior/rubric | `mk-evaluate` |
+| Green-field product build (generator⇄evaluator) | `mk-autobuild` |
+| Structural review of a diff | `mk-review` |
+| Open a PR / ship | `mk-ship` |
+| No mechanical metric exists | `mk-cook --interactive` |
 
 ## Configuration
 
@@ -51,7 +51,7 @@ Noise/Min-Delta semantics live in [`references/config-and-metrics.md`](reference
 ## Hard Gates
 
 Four human stops via `stop and ask the user in chat`. Gates sit at **boundaries only**, never per
-iteration (per-iteration approval would make this `mk:cook` with a metric).
+iteration (per-iteration approval would make this `mk-cook` with a metric).
 
 | Gate | When | Choice presented |
 | --- | --- | --- |
@@ -75,7 +75,7 @@ Full spec: [`references/loop-protocol.md`](references/loop-protocol.md).
 
 ## Phase Anchor
 
-**Phase: on-demand.** `mk:loop` is a meta-level execution skill, **not tied** to a
+**Phase: on-demand.** `mk-loop` is a meta-level execution skill, **not tied** to a
 single workflow phase — it is user-invoked and runs as a leaf executor. It does not
 auto-fire from the 7-phase pipeline and calls no orchestration skill.
 
@@ -90,24 +90,24 @@ auto-fire from the 7-phase pipeline and calls no orchestration skill.
   across an edit. Files outside `Scope` are isolated (read-warn, edit-blocked → Gate D).
 - **Memory of record is git + the TSV tail**, not full diff history — long runs read the
   best SHA + recent rows, not every diff.
-- **Skill Rule of Two:** `mk:loop` processes untrusted input (Verify output) and changes
+- **Skill Rule of Two:** `mk-loop` processes untrusted input (Verify output) and changes
   state (commits) = 2 of 3. The third leg — accessing sensitive data — MUST stay false:
   `Scope` must not match secret paths, and secret-reading Verify commands are refused. See
   [`references/safety-screen.md`](references/safety-screen.md).
 
 ## Handoff
 
-`mk:loop` is a leaf executor: user-invoked, suggests downstream skills, never called by
+`mk-loop` is a leaf executor: user-invoked, suggests downstream skills, never called by
 orchestration skills.
 
 | Direction | Skill | Relationship |
 | --- | --- | --- |
-| Upstream | `mk:plan-creator` / `mk:brainstorming` | supply the metric + scope to optimize |
-| Upstream | `mk:scout` | discover `Scope` globs |
-| Guard suggestion | `mk:verify` | a sensible regression guard for code projects (user supplies the command) |
-| Downstream | `mk:review` | structural review of kept commits |
-| Downstream | `mk:evaluate` | optional behavioral check AFTER the loop ends (not per-iteration) |
-| Downstream | `mk:ship` | PR — manual, never auto-chained |
+| Upstream | `mk-plan-creator` / `mk-brainstorming` | supply the metric + scope to optimize |
+| Upstream | `mk-scout` | discover `Scope` globs |
+| Guard suggestion | `mk-verify` | a sensible regression guard for code projects (user supplies the command) |
+| Downstream | `mk-review` | structural review of kept commits |
+| Downstream | `mk-evaluate` | optional behavioral check AFTER the loop ends (not per-iteration) |
+| Downstream | `mk-ship` | PR — manual, never auto-chained |
 
 ## Stop Conditions
 
@@ -139,7 +139,7 @@ On completion the loop writes to `tasks/reports/loop-{YYMMDD-HHMM}-{slug}/`:
   "delta": "<signed number>",
   "kept_commits": ["<sha>", "..."],
   "status": "completed|capped|stuck|plateau|interrupted",
-  "suggested_next": ["mk:verify", "mk:review", "mk:ship"],
+  "suggested_next": ["mk-verify", "mk-review", "mk-ship"],
   "report_dir": "tasks/reports/loop-<...>"
 }
 ```

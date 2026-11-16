@@ -1,6 +1,6 @@
 # Tool Integration Guide
 
-Connect mk:intake to your task management tool. Five options — pick the one that matches your stack.
+Connect mk-intake to your task management tool. Five options — pick the one that matches your stack.
 
 ## Contents
 
@@ -12,10 +12,9 @@ Connect mk:intake to your task management tool. Five options — pick the one th
 - [Verification](#verification)
 - [Fallback Behavior](#fallback-behavior)
 
-
 ## Option 1: Atlassian (Jira)
 
-**Recommended for Jira users — uses the `jira-as` CLI via the `mk:jira` skill family.**
+**Recommended for Jira users — uses the `jira-as` CLI via the `mk-jira` skill family.**
 
 Setup:
 ```bash
@@ -27,13 +26,13 @@ cp .codex/.env.example .codex/.env
 # Edit MEOW_JIRA_API_TOKEN, MEOW_JIRA_EMAIL, MEOW_JIRA_SITE_URL
 ```
 
-After setup, fetch a ticket via the `mk:jira-issue` leaf:
+After setup, fetch a ticket via the `mk-jira-issue` leaf:
 ```
 the intake skill
 > Fetch PROJ-123 from Jira
 ```
 
-`mk:intake` triages the ticket; structured execution is delegated to the `mk:jira-*` family. See `.agents/skills/jira/references/install-and-auth.md` for full setup details.
+`mk-intake` triages the ticket; structured execution is delegated to the `mk-jira-*` family. See `.agents/skills/mk-jira/references/install-and-auth.md` for full setup details.
 
 ## Option 2: Linear
 
@@ -94,7 +93,7 @@ Wrap your tool's REST API as a custom MCP server.
 
 ```bash
 # Template: create a custom MCP that exposes read/write/search
-# mk:intake works with any MCP that provides:
+# mk-intake works with any MCP that provides:
 #   - read: fetch ticket by ID
 #   - write: post comment or update status
 #   - search: find related tickets (optional)
@@ -103,7 +102,7 @@ Wrap your tool's REST API as a custom MCP server.
 # See: https://modelcontextprotocol.io/quickstart/server
 ```
 
-mk:intake uses only standard MCP tool calls — it does not hardcode any vendor's API.
+mk-intake uses only standard MCP tool calls — it does not hardcode any vendor's API.
 
 ## Verification
 
@@ -115,5 +114,5 @@ codex mcp test <name>   # verify connectivity
 
 ## Fallback Behavior
 
-If no MCP is available, mk:intake automatically falls back to manual paste (Option 4).
+If no MCP is available, mk-intake automatically falls back to manual paste (Option 4).
 No configuration needed — the skill detects MCP availability at runtime.

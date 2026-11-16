@@ -7,27 +7,27 @@ description: "Generates the first docs/ set from the code. NOT for mk-document-r
 
 Generate initial project documentation from codebase analysis.
 
-**Scope:** Creates `docs/` from scratch. For updating existing docs → `mk:document-release`.
+**Scope:** Creates `docs/` from scratch. For updating existing docs → `mk-document-release`.
 
-> Also run `mk:project-context` to generate the agent-constitution file (`docs/project-context.md`). `mk:docs-init` generates the full documentation suite; `mk:project-context` generates only the constitution.
+> Also run `mk-project-context` to generate the agent-constitution file (`docs/project-context.md`). `mk-docs-init` generates the full documentation suite; `mk-project-context` generates only the constitution.
 
 ## When to Use
 
 - Project has no `docs/` directory
 - `docs/` exists but is empty or has only stubs
 - User asks to "initialize docs", "create documentation", "generate docs"
-- After `mk:bootstrap` completes (new project needs docs)
+- After `mk-bootstrap` completes (new project needs docs)
 
-Do NOT invoke when: docs already exist and need updating (use `mk:document-release`).
+Do NOT invoke when: docs already exist and need updating (use `mk-document-release`).
 
 ## Process
 
 1. **Check existing state** — does `docs/` exist? Are files already populated?
-   - If populated docs exist → suggest `mk:document-release` instead, stop.
-2. **Scout codebase** — activate `mk:scout` to analyze project structure.
+   - If populated docs exist → suggest `mk-document-release` instead, stop.
+2. **Scout codebase** — activate `mk-scout` to analyze project structure.
    Skip: `.codex/`, `.git/`, `node_modules/`, `__pycache__/`, `dist/`, `build/`
 3. **Merge findings** — consolidate scout reports into context for doc generation
-4. **Generate docs** — spawn `documenter` sub-task via Task tool with scout context.
+4. **Generate docs** — delegate to the `documenter` agent with the scout context.
    Output files (adapt to what the project actually has):
    - `README.md` — project overview (≤300 lines)
    - `docs/project-overview.md` — what this project is, who it's for
@@ -46,23 +46,23 @@ Do NOT invoke when: docs already exist and need updating (use `mk:document-relea
 
 - **Hallucinating architecture**: generating docs about code that doesn't exist → always scout FIRST, generate from findings only
 - **Over-documenting small projects**: creating 7 docs for a 50-line script → check project size; small projects get README + codebase-summary only
-- **Stale on first run**: docs describe initial state but drift immediately → tell user to run `mk:document-release` after each feature ship
+- **Stale on first run**: docs describe initial state but drift immediately → tell user to run `mk-document-release` after each feature ship
 
 Full list: `references/gotchas.md`
 
 ## Workflow Integration
 
-Runs after `mk:bootstrap` or on any existing project without docs.
+Runs after `mk-bootstrap` or on any existing project without docs.
 
 ```
-mk:bootstrap → mk:docs-init → mk:plan-creator (first feature)
+mk-bootstrap → mk-docs-init → mk-plan-creator (first feature)
 ```
 
-Also invoked standalone: `mk:docs-init` on existing undocumented project.
+Also invoked standalone: `mk-docs-init` on existing undocumented project.
 
 ## Handoff Protocol
 
 On completion:
 
 - Print generated files list + line counts
-- "Docs initialized. Run `mk:document-release` after shipping features to keep them in sync."
+- "Docs initialized. Run `mk-document-release` after shipping features to keep them in sync."

@@ -1,6 +1,6 @@
 # Safety Framework — 4-Tier Risk Model
 
-All mk:jira operations are classified into one of four tiers. Tier determines the confirmation requirement before execution.
+All mk-jira operations are classified into one of four tiers. Tier determines the confirmation requirement before execution.
 
 ## Contents
 
@@ -17,7 +17,6 @@ All mk:jira operations are classified into one of four tiers. Tier determines th
 - [Partial Failure Behavior](#partial-failure-behavior)
 - [Recovery Procedures](#recovery-procedures)
 - [Never Bypass Safety](#never-bypass-safety)
-
 
 ---
 
@@ -78,7 +77,7 @@ WHY: Field updates can disrupt team workflows if done accidentally. Showing the 
 
 Operations: Delete issue, bulk update multiple issues, close/complete sprint, delete sprint, bulk transition, bulk reassign.
 
-Confirmation: Mandatory. mk:jira implements dry-run by reading the issue/sprint first, displaying what will be affected, then executing after explicit approval. MCP tools do not have native dry-run — mk:jira orchestrates this.
+Confirmation: Mandatory. mk-jira implements dry-run by reading the issue/sprint first, displaying what will be affected, then executing after explicit approval. MCP tools do not have native dry-run — mk-jira orchestrates this.
 
 **Dry-run output:**
 ```
@@ -115,7 +114,7 @@ When in doubt, classify upward (use the higher tier).
 ### Tier 3 — Diff confirmation
 
 ```
-[mk:jira] About to update {ISSUE_KEY}:
+[mk-jira] About to update {ISSUE_KEY}:
 {FIELD}: {OLD_VALUE} → {NEW_VALUE}
 ...
 
@@ -127,7 +126,7 @@ User must type `y` or `yes`. Any other input cancels.
 ### Tier 4 — Explicit confirmation
 
 ```
-[mk:jira] HIGH RISK OPERATION
+[mk-jira] HIGH RISK OPERATION
 {OPERATION_DESCRIPTION}
 
 DRY RUN RESULTS:

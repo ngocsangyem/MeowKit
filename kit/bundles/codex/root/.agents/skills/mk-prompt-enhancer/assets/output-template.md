@@ -1,4 +1,4 @@
-<!-- Filled by mk:prompt-enhancer. Templates are mode-aware:
+<!-- Filled by mk-prompt-enhancer. Templates are mode-aware:
        (none)              → Template A: Enhanced Prompt only
        --analyze           → Template B: full analysis + rewrite (4 sections)
        --analyze --score   → Template C: full analysis + Score + rewrite

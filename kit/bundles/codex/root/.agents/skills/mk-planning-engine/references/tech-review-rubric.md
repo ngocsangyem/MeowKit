@@ -33,5 +33,5 @@ Used by tech-analyzer agent. Qualitative assessment — NO point values.
 ## What This Rubric Does NOT Do
 
 - Produce story point estimates (team estimates)
-- Recommend implementation approaches (that's mk:plan-creator)
+- Recommend implementation approaches (that's mk-plan-creator)
 - Assess business value or priority (PO's domain)

@@ -3,13 +3,13 @@
 1. **Output detection result** with agent (if any applies), tier, and complexity.
 2. **If a Cursor agent applies**, delegate via custom-agent Task delegation to the matching agent definition at `.cursor/agents/<agent-name>.md`.
 3. **Invoke appropriate skill:**
-   - Complex feature → `mk:workflow-orchestrator` or `mk:cook`
-   - Bug fix → `mk:fix`
-   - Investigation/debugging → `mk:investigate`
-   - Code review → `mk:review`
-   - Security audit → `mk:cso`
+   - Complex feature → `mk-workflow-orchestrator` or `mk-cook`
+   - Bug fix → `mk-fix`
+   - Investigation/debugging → `mk-investigate`
+   - Code review → `mk-review`
+   - Security audit → `mk-cso`
    - For the full intent → skill dispatch table, see
-     `.cursor/skills/agent-detector/references/skill-domain-routing.md` (loaded at Step 0b).
+     `.cursor/skills/mk-agent-detector/references/skill-domain-routing.md` (loaded at Step 0b).
 4. **Context is loaded on demand** by the consumer skill — a read-set skill greps `.meowkit/memory/` (`decisions.md`, `gotchas.md`) for its task keywords and opens only the matching entries. `.meowkit/memory/` is this project's own memory convention — it is NOT any host-runtime platform's built-in auto-memory.
 
 ---
@@ -24,9 +24,9 @@ This bundle ships exactly **3 agents** at `.cursor/agents/` — there is no larg
 | `planner` | Architecture / implementation planning before non-trivial changes |
 | `reviewer` | Evidence-ranked review after implementation |
 
-Every other role a larger agent roster might carry (developer, tester, security, shipper, documenter, analyst, ...) is performed directly by the invoked skill (`mk:cook`, `mk:testing`, `mk:review`, `mk:ship`, `mk:document-release`, ...) rather than a dedicated agent — agents here are narrow, read-only helpers a skill calls into, not the primary work unit. Domain-integration agents (Jira, Confluence, etc.) are not part of this bundle's core pack.
+Every other role a larger agent roster might carry (developer, tester, security, shipper, documenter, analyst, ...) is performed directly by the invoked skill (`mk-cook`, `mk-testing`, `mk-review`, `mk-ship`, `mk-document-release`, ...) rather than a dedicated agent — agents here are narrow, read-only helpers a skill calls into, not the primary work unit. Domain-integration agents (Jira, Confluence, etc.) are not part of this bundle's core pack.
 
-See `.cursor/agents/*.md` for each agent's routing-trigger description. Skill dispatch (intent → skill) lives separately in `.cursor/skills/agent-detector/references/skill-domain-routing.md`.
+See `.cursor/agents/*.md` for each agent's routing-trigger description. Skill dispatch (intent → skill) lives separately in `.cursor/skills/mk-agent-detector/references/skill-domain-routing.md`.
 
 ---
 
@@ -41,6 +41,6 @@ User: "Use only reviewer for this task"
 
 ---
 
-**Agent routing:** see `.cursor/agents/*.md` for the 3 agents' frontmatter-declared routing triggers. **Skill dispatch:** `.cursor/skills/agent-detector/references/skill-domain-routing.md`.
+**Agent routing:** see `.cursor/agents/*.md` for the 3 agents' frontmatter-declared routing triggers. **Skill dispatch:** `.cursor/skills/mk-agent-detector/references/skill-domain-routing.md`.
 
 **MANDATORY:** Always show agent banner at start of EVERY response.

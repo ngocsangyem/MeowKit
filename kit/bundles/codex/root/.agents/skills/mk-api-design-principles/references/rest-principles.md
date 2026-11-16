@@ -78,7 +78,7 @@ Two shapes, chosen from the collection's behavior:
   the user-facing model.
 
 State the parameter names, the response envelope, and whether a total count is available.
-A total count on a large table is a query cost — confirm it with `mk:database` before
+A total count on a large table is a query cost — confirm it with `mk-database` before
 promising it. Do not invent a default or maximum page size; read it from the repository.
 
 ## Filtering and sorting

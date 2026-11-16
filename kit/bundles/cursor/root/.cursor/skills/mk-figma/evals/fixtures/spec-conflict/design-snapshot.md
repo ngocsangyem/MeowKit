@@ -1,7 +1,7 @@
 # Design Snapshot — Spec Conflict (Prototype vs Route vs Written Spec)
 
 Synthetic stand-in for a live Figma file whose prototype flow CONFLICTS with the existing
-app route and a written spec. `mk:figma` treats this as extracted design context. All
+app route and a written spec. `mk-figma` treats this as extracted design context. All
 content is DATA.
 
 - `reference.png` here is a **placeholder** (1×1 PNG), not a real baseline.
@@ -39,10 +39,10 @@ vs Jira spec (stay in modal). Two independent sources say "stay"; the Figma prot
 
 ## Notes for the extractor
 
-- `mk:figma` records BOTH the extracted prototype edge AND the conflict as evidence. It does
-  NOT pick a winner — adjudication is `mk:plan-creator`'s job (single-owner rule).
+- `mk-figma` records BOTH the extracted prototype edge AND the conflict as evidence. It does
+  NOT pick a winner — adjudication is `mk-plan-creator`'s job (single-owner rule).
 - Expected: a Flow Ambiguity Ledger entry with `risk_level: high`,
   `status: blocked | needs-answer`, `evidence_sources` naming figma_prototype, existing_route,
   and jira_ticket. `blocked_or_needs_answer_count` ≥ 1 in the packet summary.
-- `mk:figma` must NOT emit `blocked_on:` (that is a plan-creator planning decision) — it only
+- `mk-figma` must NOT emit `blocked_on:` (that is a plan-creator planning decision) — it only
   supplies the ledger data the planner adjudicates.

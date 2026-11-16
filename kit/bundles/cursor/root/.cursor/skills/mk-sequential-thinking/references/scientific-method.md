@@ -80,4 +80,4 @@ Bug: 5% of users see stale data. 4 hypotheses: (1) cache not invalidating, (2) r
 
 ## Bridge to sequential-thinking
 
-Scientific Method formalizes what `mk:sequential-thinking` does informally. Use this reference when investigation rigor matters: production incidents, user-facing bugs, A/B experimentation. The hypothesis table in `hypothesis-testing.md` is the experimental log; this reference is the discipline behind filling it out.
+Scientific Method formalizes what `mk-sequential-thinking` does informally. Use this reference when investigation rigor matters: production incidents, user-facing bugs, A/B experimentation. The hypothesis table in `hypothesis-testing.md` is the experimental log; this reference is the discipline behind filling it out.

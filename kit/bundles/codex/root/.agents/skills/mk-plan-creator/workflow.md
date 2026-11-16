@@ -72,8 +72,8 @@ Step 1: Research (hard/deep/parallel/two only)
     └── Reports saved to {plan-dir}/research/
          ↓
 Step 2: Codebase Analysis (hard/deep/parallel/two only)
-    ├── hard: mk:scout on 2-3 relevant dirs
-    ├── deep: mk:scout on max 5 roots → compact scope map, tests, contracts, uncertainty
+    ├── hard: mk-scout on 2-3 relevant dirs
+    ├── deep: mk-scout on max 5 roots → compact scope map, tests, contracts, uncertainty
     └── Read project-context.md + docs/
          ↓
 Step 3: Draft Plan
@@ -123,7 +123,7 @@ Step 7: Present the plan
     └── stop and ask the user in chat (Approve | Modify | Reject)
          ↓
 Step 8: Hydrate Tasks
-    ├── TaskCreate per phase with addBlockedBy chain
+    ├── Create one tracked task per phase, each blocked-by its predecessor
     ├── Critical-step sub-tasks for [CRITICAL]/[HIGH] todo items
     └── Create .plan-state.json checkpoint
          ↓
@@ -132,20 +132,20 @@ Step 9: Post-Plan Handoff
     ├── Build mode-pruned option set (cap 4)
     ├── stop and ask the user in chat: Cook | Validate | Red-team | End (fast)
     │   OR Cook | End (hard / deep / parallel / two)
-    │   OR Hand off to mk:autobuild | End (product-level)
+    │   OR Hand off to mk-autobuild | End (product-level)
     ├── Write handoff.next + decided_at to plan.md frontmatter
     └── Print suggested command + Context Reminder → STOP
 ```
 
 ## Mode Notes
 
-- `--deep` requires `--hard` internally (full research pipeline + bounded phase scouting after step-03). It does not choose an architecture; if the approach is unclear, route to `mk:brainstorming` before planning.
+- `--deep` requires `--hard` internally (full research pipeline + bounded phase scouting after step-03). It does not choose an architecture; if the approach is unclear, route to `mk-brainstorming` before planning.
 - `--parallel` and `--two` both require `--hard` internally (full research pipeline runs).
 - `--parallel`: step-03 adds ownership matrix; step-08 uses parallel group hydration.
 - `--two`: step-03 produces 2 approach files (no plan.md yet); step-04 asks user to select before step-05.
 - `selected_approach` is only set in `two` mode; all other modes leave it unset.
-- `--product-level`: step-03 → step-03a (spec only, no phase files). step-03a runs a LIGHT codebase scout on non-empty repos via an ALLOWLIST of `README*`/`docs/`/`brand/`/`tasks/plans/` (BLOCKLIST: `src/`, source files, schemas) — output is injected as agent working memory only, never written to `plan.md`. Hands off to `mk:autobuild` once the spec is agreed, NOT directly to developer. Auto-detected by step-00 on green-field "build a X app" prompts; explicit flag bypasses detection. Optional: `--no-design` skips design sub-task, `--no-scout` skips codebase scout.
-- `--spike`: time-boxed investigation. Skips step-01 (research), step-02 (codebase analysis), step-05 (red team), step-06 (validation interview). step-03 uses `assets/spike-plan-template.md` with two phases (investigate + findings — NO test/ship). Requires `--timebox <duration>`. Incompatible with `--product-level` and `mk:autobuild` FULL. Run via `mk:cook` or `mk:plan-creator --fast`.
+- `--product-level`: step-03 → step-03a (spec only, no phase files). step-03a runs a LIGHT codebase scout on non-empty repos via an ALLOWLIST of `README*`/`docs/`/`brand/`/`tasks/plans/` (BLOCKLIST: `src/`, source files, schemas) — output is injected as agent working memory only, never written to `plan.md`. Hands off to `mk-autobuild` once the spec is agreed, NOT directly to developer. Auto-detected by step-00 on green-field "build a X app" prompts; explicit flag bypasses detection. Optional: `--no-design` skips design sub-task, `--no-scout` skips codebase scout.
+- `--spike`: time-boxed investigation. Skips step-01 (research), step-02 (codebase analysis), step-05 (red team), step-06 (validation interview). step-03 uses `assets/spike-plan-template.md` with two phases (investigate + findings — NO test/ship). Requires `--timebox <duration>`. Incompatible with `--product-level` and `mk-autobuild` FULL. Run via `mk-cook` or `mk-plan-creator --fast`.
 
 ## Next
 

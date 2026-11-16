@@ -86,7 +86,7 @@ Rules:
 - One row per distinct capability
 - Story format: "As a {role}, I want {action} so that {benefit}"
 - Complexity is a signal for the human — never an estimate; never anchored
-- Suggested fields are hints — `mk:jira-estimator` does the real work
+- Suggested fields are hints — `mk-jira-estimator` does the real work
 
 ## Calibration Notes
 

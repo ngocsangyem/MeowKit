@@ -1,5 +1,5 @@
 #!/bin/sh
-# validate-gate-1.sh — Check plan.md has required sections for Gate 1 approval
+# validate-gate-1.sh — Check plan.md has required sections before the plan is agreed
 # Usage: sh validate-gate-1.sh <path-to-plan.md>
 # Exit 0 = GATE_1_READY, Exit 1 = GATE_1_BLOCKED
 

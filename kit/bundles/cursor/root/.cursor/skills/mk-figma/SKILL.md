@@ -4,7 +4,7 @@ description: "Figma gateway: reads designs, extracts design tokens, builds 1-3 s
 requires_runtime: ["python>=3.9"]
 ---
 
-# mk:figma — Figma Design Analysis & Implementation
+# mk-figma — Figma Design Analysis & Implementation
 
 Consolidated read-first Figma gateway: design analysis, Figma-to-code (optimized for 1–3 screens),
 and design token extraction, with a screenshot fallback when MCP is unavailable. Advanced workflows
@@ -35,7 +35,7 @@ Before any operation:
 
 1. Verify the Figma MCP server responds using its cheapest read tool (see
    `references/mcp-setup-and-tool-selection.md` for the connectivity check).
-2. If MCP unavailable → fallback: ask the user to export a PNG, then use `mk:multimodal` or Codex Read.
+2. If MCP unavailable → fallback: ask the user to export a PNG, then use `mk-multimodal` or Codex Read.
 3. If MCP available → proceed with Figma MCP tools.
 
 Report when falling back: "Install Figma MCP for full design context: `codex mcp add figma`"
@@ -64,7 +64,7 @@ Implement mode.
 
 ### Mode 1: Analyze (Phase 1 — Plan)
 
-**When:** Ticket or task contains a Figma URL. Used by mk:intake and mk:review.
+**When:** Ticket or task contains a Figma URL. Used by mk-intake and mk-review.
 
 ```
 Input:  Figma URL + optional node ID
@@ -82,11 +82,11 @@ Steps:
 
 MCP tools: `get_design_context`, `get_metadata`, `get_screenshot`
 
-Handoff: design context report → mk:intake (ticket summary) or mk:review (compliance check input).
+Handoff: design context report → mk-intake (ticket summary) or mk-review (compliance check input).
 
 ### Mode 2: Implement (Phase 3 — Build)
 
-**When:** Feature requires UI from a Figma spec. Used by mk:cook and mk:frontend-design.
+**When:** Feature requires UI from a Figma spec. Used by mk-cook and mk-frontend-design.
 
 ```
 Input:  Figma URL + target framework/design system
@@ -102,11 +102,11 @@ targeted child fetches.
 
 MCP tools: `get_design_context`, `get_metadata`, `get_screenshot`, asset downloads
 
-Handoff: generated code → mk:cook (Phase 3 Build GREEN).
+Handoff: generated code → mk-cook (Phase 3 Build GREEN).
 
 ### Mode 3: Tokens (Phase 1 — Plan)
 
-**When:** Design system setup or token file generation needed. Used by mk:ui-design-system.
+**When:** Design system setup or token file generation needed. Used by mk-ui-design-system.
 
 ```
 Input:  Figma file URL (design system file)
@@ -117,7 +117,7 @@ Load `references/design-token-extraction.md` for extraction patterns and variabl
 
 MCP tools: `search_design_system`, variable inspection, style inspection
 
-Handoff: token file → mk:ui-design-system.
+Handoff: token file → mk-ui-design-system.
 
 ## Advanced Workflows (gated)
 
@@ -131,7 +131,7 @@ Loaded ONLY on explicit user intent plus confirmed prerequisites (see Capability
 
 ## Out of Scope
 
-Default `mk:figma` does NOT:
+Default `mk-figma` does NOT:
 
 - Create new Figma/FigJam files.
 - Mutate the Figma canvas by default (only via the gated write path).
@@ -150,7 +150,7 @@ Default `mk:figma` does NOT:
 |---------|----------|
 | Invalid Figma URL | Stop, report invalid URL, ask user to verify |
 | Prototype (`/proto/`) URL | Ask user for the `/design/` or `/file/` editor URL |
-| MCP unavailable | Fallback to PNG export + mk:multimodal |
+| MCP unavailable | Fallback to PNG export + mk-multimodal |
 | Oversized/truncated context | `get_metadata`, then fetch children individually |
 | Rate limit hit | Retry with exponential backoff (1s → 2s → 4s); batch ≤15 nodes |
 | Node not found | Verify the target page is active before retry |
@@ -177,11 +177,11 @@ gate passes; a failed gate stops with an ask-the-user, never a partial attempt.
 
 | Skill          | Connection | Trigger |
 |---|---|---|
-| mk:intake | Auto-detect Figma URL in ticket → analyze mode | Figma URL in ticket |
-| mk:cook | UI implementation from Figma → implement mode | "implement this design" |
-| mk:frontend-design | Design spec extraction → implement mode | Figma link present |
-| mk:ui-design-system | Design system setup → tokens mode | "extract design tokens" |
-| mk:review | Design compliance check → analyze mode | Review with Figma spec |
+| mk-intake | Auto-detect Figma URL in ticket → analyze mode | Figma URL in ticket |
+| mk-cook | UI implementation from Figma → implement mode | "implement this design" |
+| mk-frontend-design | Design spec extraction → implement mode | Figma link present |
+| mk-ui-design-system | Design system setup → tokens mode | "extract design tokens" |
+| mk-review | Design compliance check → analyze mode | Review with Figma spec |
 
 ## Gotchas
 

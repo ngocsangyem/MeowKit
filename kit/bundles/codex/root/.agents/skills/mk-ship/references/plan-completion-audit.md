@@ -143,4 +143,4 @@ Plan-level verification is not run automatically during `the ship skill`. If the
 **If verification section exists:** Output a single-line reminder after ship completes:
 > "Plan contains verification steps. Run `the qa skill` after deploy to validate them against a running dev server."
 
-Rationale: automatic plan verification requires a reliable dev-server detection + browser orchestration path. Ship is not the right place for that — `mk:qa` owns it. Ship's job is to get the PR out; QA runs against the deployed build.
+Rationale: automatic plan verification requires a reliable dev-server detection + browser orchestration path. Ship is not the right place for that — `mk-qa` owns it. Ship's job is to get the PR out; QA runs against the deployed build.

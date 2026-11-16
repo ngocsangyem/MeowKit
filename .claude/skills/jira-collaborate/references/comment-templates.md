@@ -2,6 +2,12 @@
 
 Copy-paste ready templates for common collaboration scenarios.
 
+## Contents
+
+- [Comment Templates](#comment-templates)
+- [Script Command Templates](#script-command-templates)
+- [File Naming Templates](#file-naming-templates)
+
 ---
 
 ## Comment Templates

@@ -18,14 +18,13 @@ All modes share these phases with mode-specific variations.
   - [The verdict](#the-verdict)
 - [Phase 4.5: Verify (Browser) — only if `--verify` or `--strict` flag](#phase-45-verify-browser-only-if---verify-or---strict-flag)
   - [--verify [LIGHT]: Light Browser Check](#verify-light-light-browser-check)
-  - [--strict [HEAVY]: Full Evaluator (mk:evaluate)](#strict-heavy-full-evaluator-meowevaluate)
+  - [--strict [HEAVY]: Full Evaluator (mk-evaluate)](#strict-heavy-full-evaluator-meowevaluate)
 - [Phase 5: Ship (explicit request only)](#phase-5-ship-explicit-request-only)
 - [Phase 6: Reflect (on explicit close request)](#phase-6-reflect-on-explicit-close-request)
 - [Mode Flow Summary](#mode-flow-summary)
 - [Validation](#validation)
 
-
-**Task Tool Fallback:** `TaskCreate`/`TaskUpdate`/`TaskGet`/`TaskList` are CLI-only — unavailable in GUI editor extensions. If they error, use `TodoWrite` for progress tracking. Plan files remain source of truth.
+**Task Tracking Fallback:** tracked-task creation/update/list may be CLI-only — unavailable in some GUI editor extensions. If unavailable, use a plain to-do list for progress tracking. Plan files remain source of truth.
 
 ## Phase 0: Orient
 
@@ -40,7 +39,7 @@ All modes share these phases with mode-specific variations.
    - Autonomous (`auto` / autobuild): an "Ask first" item → **defer** — skip the action, log the deferred decision to the plan.md Agent State, proceed with the safe default; deferred decisions surface at the next existing touchpoint (the review verdict / autobuild run-report). NEVER raise an ad-hoc blocking prompt mid-autonomous-run.
    - Block **absent** (short plans — the common case): default to "proceed on reversible in-scope changes; the ship check still runs." Do NOT error, do NOT over-ask.
    - This block is advisory and never relaxes a security rule; its "Never" tier only points at them.
-6. `TaskCreate` for each workflow phase (with `addBlockedBy` chain)
+6. Create a tracked task for each workflow phase, with each phase blocked-by its predecessor
 
 **Output:** `Phase 0: Orient — Mode [X], Tier [Y], [N] prior learnings loaded`
 
@@ -49,22 +48,22 @@ All modes share these phases with mode-specific variations.
 **Interactive/Auto:**
 
 - Spawn `researcher` agents in parallel for external knowledge
-- Use `mk:scout` for codebase exploration
-- Invoke `mk:plan-creator` with research context
+- Use `mk-scout` for codebase exploration
+- Invoke `mk-plan-creator` with research context
 - Create `tasks/plans/YYMMDD-name/plan.md` + `phase-XX-*.md` files
 
 **Fast:**
 
-- Skip research. Use `mk:scout` only → `mk:plan-creator --fast`
+- Skip research. Use `mk-scout` only → `mk-plan-creator --fast`
 - Plan is lighter but still required
 
 **Parallel:**
 
-- Use `mk:plan-creator --parallel` for dependency graph + file ownership matrix
+- Use `mk-plan-creator --parallel` for dependency graph + file ownership matrix
 
 ### plan-creator mode flags (v2.3.1)
 
-Valid flags to pass to `mk:plan-creator`:
+Valid flags to pass to `mk-plan-creator`:
 
 | Flag | Effect |
 |------|--------|
@@ -109,9 +108,9 @@ Write failing tests BEFORE implementation. TDD enforcement per the TDD rules. Ph
 (Labels canonical in `intent-detection.md` Mode Behaviors table.)
 
 1. Read plan's acceptance criteria and success criteria
-2. Spawn `tester` sub-task via `mk:testing`:
+2. Spawn `tester` sub-task via `mk-testing`:
    ```
-   delegate a sub-task (subagent_type="tester", prompt="Write failing tests for [plan-path] acceptance criteria. Tests must RUN (no syntax errors) and FAIL (not pass). Use mk:testing red-green-refactor reference.", description="Write failing tests")
+   delegate a sub-task (agent="tester", prompt="Write failing tests for [plan-path] acceptance criteria. Tests must RUN (no syntax errors) and FAIL (not pass). Use mk-testing red-green-refactor reference.", description="Write failing tests")
    ```
 3. Verify: tests run AND fail (compilation errors do NOT count as failing tests)
 4. If tests accidentally pass → wrong tests, rewrite
@@ -131,24 +130,24 @@ Implement code until all tests pass. TDD: implement ONLY enough to make tests pa
 **Pre-check (TDD mode only):** TDD mode is ON when
 
 - the `MEOWKIT_TDD=1` env var is set (CI / shell rc), OR
-- the `.meowkit/state/tdd-mode` sentinel file contains `on` (written by slash command `--tdd`)
+- the `.meowkit/state/tdd-mode` sentinel file contains `on` (written when `--tdd` is detected)
 
 When ON, confirm at the start of this phase that the Phase 2 tests exist and fail before
 writing implementation code; if they already pass, they do not describe the change — go
 back to Phase 2. When OFF (default), start implementing from the plan.
 
-Note: this is a once-per-phase check, not a per-file one.
+Note: this is a phase-start check, not a per-file-write one.
 
-1. **TaskList first** — check for existing tasks (may be hydrated by planning skill)
-2. If tasks exist → pick them up. If not → `TaskCreate` from plan phases with priority + metadata
-3. `TaskUpdate` → mark tasks `in_progress` immediately when starting
+1. **List existing tasks first** — check for tasks already hydrated by the planning skill
+2. If tasks exist → pick them up. If not → create a tracked task per plan phase with priority + metadata
+3. Update each task's status to `in_progress` immediately when starting
 4. Execute phase tasks sequentially (or parallel in parallel mode)
 5. Run type checking after each file modification
 6. If tests fail after implementation:
    - Self-heal up to 3 attempts (each attempt tries a DIFFERENT approach)
-   - After 3 failures → spawn `researcher` sub-task via `mk:investigate`:
+   - After 3 failures → spawn `researcher` sub-task via `mk-investigate`:
      ```
-     delegate a sub-task (subagent_type="researcher", prompt="Analyze test failures using mk:investigate + mk:sequential-thinking: [output]. Root cause analysis.", description="Debug test failures")
+     delegate a sub-task (agent="researcher", prompt="Analyze test failures using mk-investigate + mk-sequential-thinking: [output]. Root cause analysis.", description="Debug test failures")
      ```
    - After analysis report → fix and retry
    - After 3 more failures → STOP, escalate to user with: failing output, attempted fixes, suspected root cause
@@ -157,17 +156,17 @@ Note: this is a once-per-phase check, not a per-file one.
 
 - Spawn multiple `developer` agents with file ownership boundaries
 - Each agent gets distinct files — no overlap
-- `TaskUpdate` to assign + track per agent
+- Update each task's assignment + status per agent
 - Wait for parallel group to complete before next group
 
 **Output:** `Phase 3: Build GREEN — [N] files modified, [X/Y] tests pass`
 
 ## Phase 3.5: Simplify (MANDATORY — do not skip)
 
-After tests are green, run `mk:simplify` before any review. This is mandatory.
+After tests are green, run `mk-simplify` before any review. This is mandatory.
 
 ```
-delegate a sub-task (subagent_type="developer", prompt="Run the simplify skill on the Phase 3 output. Reduce complexity without breaking tests. All tests must still pass after simplification.", description="Simplify before review")
+delegate a sub-task (agent="developer", prompt="Run the simplify skill on the Phase 3 output. Reduce complexity without breaking tests. All tests must still pass after simplification.", description="Simplify before review")
 ```
 
 **Why mandatory:** Reviewers catch logic errors better on simplified code. Submitting complex code to review creates review noise that obscures real issues. Simplify once, review once — cleaner than review-fix-simplify cycles.
@@ -194,7 +193,7 @@ If `red-team-findings.md` exists, load its contents and pass as additional conte
 Spawn `reviewer` sub-task:
 
 ```
-delegate a sub-task (subagent_type="reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY. [If red-team-findings.md loaded]: Also cross-reference the attached plan-level adversarial findings against the implementation — note which findings were addressed and which remain open.", description="Code review")
+delegate a sub-task (agent="reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY. [If red-team-findings.md loaded]: Also cross-reference the attached plan-level adversarial findings against the implementation — note which findings were addressed and which remain open.", description="Code review")
 ```
 
 See `review-cycle.md` for interactive vs auto handling.
@@ -252,10 +251,10 @@ run summary.
 
 6. **Cleanup:** Kill dev server background process.
 
-### --strict [HEAVY]: Full Evaluator (mk:evaluate)
+### --strict [HEAVY]: Full Evaluator (mk-evaluate)
 
-**Fires when:** `--strict` flag present OR `mk:scale-routing` returned `level=high` at Phase 0.
-**Supersedes:** `--verify` (strict includes active verification via mk:evaluate step-02/03).
+**Fires when:** `--strict` flag present OR `mk-scale-routing` returned `level=high` at Phase 0.
+**Supersedes:** `--verify` (strict includes active verification via mk-evaluate step-02/03).
 
 1. **Log trigger reason:**
    - If explicit: `"--strict flag detected, invoking full evaluator"`
@@ -264,14 +263,14 @@ run summary.
 2. **Spawn evaluator sub-task:**
    ```
    delegate a sub-task (
-     subagent_type="evaluator",
+     agent="evaluator",
      prompt="Run the evaluate skill on this build.
        Target: {project_root_path}
        Rubric preset: {auto-detect from package.json}
        Context: Cook session for '{task}'. Code-reviewer PASS. Tester PASS.
        Changed files: {changed_files_list}
        Run the full 5-step workflow. Return PASS/WARN/FAIL + verdict file path.",
-     description="Strict evaluation — mk:evaluate"
+     description="Strict evaluation — mk-evaluate"
    )
    ```
 
@@ -290,7 +289,7 @@ requests shipping; a PASS verdict is not a request to ship.
 Spawn `shipper` (which orchestrates pre-ship checks + invokes `git-manager` for commit/PR + CI verification + rollback docs):
 
 ```
-delegate a sub-task (subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.cjs (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk:ship skill.", description="Ship + PR")
+delegate a sub-task (agent="shipper", prompt="Ship changes: 1) Run pre-ship.cjs (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk-ship skill.", description="Ship + PR")
 ```
 
 Note: `shipper` is the orchestrator — it invokes `git-manager` internally for raw git operations (commit, push). Cook never spawns `git-manager` directly; that is shipper's responsibility. See SKILL.md Required sub-task table.
@@ -306,10 +305,10 @@ Three mandatory sub-task in parallel:
 
 1. **Plan sync-back:**
 
-   Sync-back algorithm authority: `.agents/skills/plan-creator/references/task-management.md` (Sync-Back Algorithm).
+   Sync-back algorithm authority: `.agents/skills/mk-plan-creator/references/task-management.md` (Sync-Back Algorithm).
 
    ```
-delegate a sub-task (subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .agents/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
+delegate a sub-task (agent="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .agents/skills/mk-plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
    ```
 
    If sync-back leaves every non-abandoned phase todo checked, archive the plan with `mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `the ship skill`.
@@ -317,10 +316,10 @@ delegate a sub-task (subagent_type="planner", prompt="Run full sync-back for [pl
 2. **Docs update:**
 
    ```
-   delegate a sub-task (subagent_type="documenter", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
+   delegate a sub-task (agent="documenter", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
    ```
 
-3. `TaskUpdate` → mark all session tasks complete after sync-back
+3. Mark all session tasks complete after sync-back
 
 ### Per-Phase Checkpoint (MANDATORY — fires after EACH completed plan phase, before the next-phase transition)
 
@@ -328,7 +327,7 @@ On a long multi-phase or auto-mode run, the external-memory write after each com
 
 After each completed plan phase — and BEFORE the auto-mode "loop to Phase 2 for next phase" transition below — you MUST update the two durable, recomputable surfaces:
 
-1. **Phase-file checkboxes** — flip that phase's `[ ]` → `[x]` items via the Sync-Back Algorithm in `.agents/skills/plan-creator/references/task-management.md` (same status enum: `pending | in_progress | completed`).
+1. **Phase-file checkboxes** — flip that phase's `[ ]` → `[x]` items via the Sync-Back Algorithm in `.agents/skills/mk-plan-creator/references/task-management.md` (same status enum: `pending | in_progress | completed`).
 2. **plan.md** — update the Phases-table status column and the Agent State block for that phase.
 
 Do NOT hand-write `.plan-state.json` mid-run. It is a DERIVED cache: written once at hydration and regenerated from the checkboxes at the final sync-back (this Phase 6, last pass through the loop). A mid-run JSON edit drifts from the checkbox source of truth, which is the authority.
@@ -348,11 +347,11 @@ Cook populates ONE `workflow-evidence.json` from outputs that ALREADY exist acro
 
 | Phase | Existing output → evidence fields |
 |---|---|
-| 0 Orient | `mode`, tier, `risk.matchedFlags` (from the risk checklist / `mk:agent-detector`) |
+| 0 Orient | `mode`, tier, `risk.matchedFlags` (from the risk checklist / `mk-agent-detector`) |
 | 1 Plan | `planPath`, `cookContract` (the 5 exact requirements), plan-structure check result |
 | 3 Build | changed-files summary |
 | 3.5 Simplify | simplify status |
-| 3.6 Verify (`mk:verify`) | `verification.commands`, `verification.overall` |
+| 3.6 Verify (`mk-verify`) | `verification.commands`, `verification.overall` |
 | 4 Review | `review.verdictPath`, `review.status`, `review.sideEffectsDetected` |
 | 4.5 Verify | `--verify`/`--strict` run state only — RECORD result; does not change advisory vs blocking semantics |
 | 5 Ship | ship pre-flight status |

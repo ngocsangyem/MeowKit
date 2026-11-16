@@ -140,7 +140,7 @@ These sections are ONLY added when `--tdd` flag is set or `MEOWKIT_TDD=1` env va
 
 ### 3c''. Design Evidence Packet Consumption (Conditional)
 
-If a design evidence packet path (e.g. `figma-evidence-packet/v1` from `mk:figma`) is present
+If a design evidence packet path (e.g. `figma-evidence-packet/v1` from `mk-figma`) is present
 in the invocation, intake packet, or task description: read
 `references/design-evidence-consumption.md` and apply it while drafting. Do NOT call the
 design source's tools (e.g. Figma MCP) or re-parse raw design JSON — consume packet fields.
@@ -208,7 +208,7 @@ After writing all phase files (section 3c), follow `references/deep-mode.md` and
 
 1. For each phase file, read its `## Related Code Files` section
 2. Cross-check those paths against the step-02 deep scope map; if the phase paths are guesses, record uncertainty instead of widening the scan
-3. Invoke `mk:scout` on each directory set (max 3 tool calls per phase, max 7 phases)
+3. Invoke `mk-scout` on each directory set (max 3 tool calls per phase, max 7 phases)
 4. Inject scout results into the phase file:
    - Add `## Deep Phase Map` with **File Inventory**, **Test Gap Matrix**, **Interface Checklist**, and **Dependency Map**
 5. Print: `"Deep scan: {N} phases scouted, {M} files inventoried"`

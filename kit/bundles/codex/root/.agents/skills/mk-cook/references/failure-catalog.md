@@ -35,6 +35,6 @@ Observable patterns that indicate you're off-track:
 
 ## Phase 0 / Phase 1 Failures
 
-- **Skipped scout summary** — plan was drafted before the user saw the codebase context. Recovery: pause, run `mk:scout`, present the 3–6 bullet summary, then resume Phase 1.
+- **Skipped scout summary** — plan was drafted before the user saw the codebase context. Recovery: pause, run `mk-scout`, present the 3–6 bullet summary, then resume Phase 1.
 - **Vague clarifying questions** — options like "Add the feature" instead of "Add to `src/api/users.ts` (matches existing pattern) or new `src/api/profile.ts`". Recovery: re-ask with scout-grounded options that cite file paths.
 - **Scout-first / exact-requirements contracts run on plan-path input** — agent misidentified a plan-path invocation as a natural-language task (e.g., `cook "implement feature X described in plan.md"`). Recovery: detect input via path-glob (matches `plan.md` or `phase-*.md`); if matched, skip both contracts and load the plan directly.

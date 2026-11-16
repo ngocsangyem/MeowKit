@@ -28,10 +28,10 @@ Meta skill — not tied to a specific Phase. Invoked on-demand for skill develop
 
 ```bash
 # Scaffold a new skill (creates directory + template SKILL.md)
-node .cursor/scripts/skill-python.cjs .cursor/skills/skill-creator/scripts/init-skill.py mk:my-feature --path .cursor/skills
+node .cursor/scripts/skill-python.cjs .cursor/skills/mk-skill-creator/scripts/init-skill.py mk-my-feature --path .cursor/skills
 
 # Validate an existing skill against compliance checklist
-node .cursor/scripts/skill-python.cjs .cursor/skills/skill-creator/scripts/validate-skill.py .cursor/skills/my-feature
+node .cursor/scripts/skill-python.cjs .cursor/skills/mk-skill-creator/scripts/validate-skill.py .cursor/skills/mk-my-feature
 ```
 
 ## Process
@@ -40,7 +40,7 @@ node .cursor/scripts/skill-python.cjs .cursor/skills/skill-creator/scripts/valid
 2. **Scaffold** — run `init-skill.py` to create directory + template SKILL.md with TODO markers
 3. **Fill content** — Codex completes each TODO section in the generated template
 4. **Add references/** — if skill body would exceed ~100 lines, split into references
-5. **Security boundaries** — load `mk:skill-template-secure` template for trust model if needed
+5. **Security boundaries** — load `mk-skill-template-secure` template for trust model if needed
 6. **Validate** — run `validate-skill.py` to check compliance (8-point checklist)
 7. **Fix failures** — if validation score < 7/8, fix failing items
 8. **Register** — add row to `SKILLS_ATTRIBUTION.md`
@@ -91,7 +91,7 @@ After generating, check:
 - [ ] Failure handling covers identified failure modes
 - [ ] SKILL.md ≤ 500 lines (per the skill-authoring rules Rule 3; overflow → references/ or step files)
 - [ ] `## Gotchas` section present (per Rule 1 — mandatory, placeholder acceptable day-1)
-- [ ] No conflict with existing `.cursor/skills/rule-`
+- [ ] No conflict with existing `.cursor/skills/mk-rule-`
 
 **Score:** X/8 — PASS (≥7) / FAIL (<7)
 

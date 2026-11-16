@@ -6,7 +6,7 @@ description: "Scripted browser control via Playwright CLI. NOT for mk-agent-brow
 # Browser Automation with playwright-cli
 
 > **Use playwright-cli when:** DOM interaction, navigation, data extraction, or generating reusable `.spec.ts` E2E test code.
-> **Use `mk:agent-browser` instead when:** session persistence (auth flows, MFA, cookie import) is required.
+> **Use `mk-agent-browser` instead when:** session persistence (auth flows, MFA, cookie import) is required.
 
 ## Quick Start
 

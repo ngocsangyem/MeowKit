@@ -47,7 +47,7 @@ If ticket contains the delimiter string, use nonce: `===TICKET_DATA_START_<4-cha
 
 ## JQL Escaping
 
-All user-derived terms in JQL: `bash .cursor/skills/jira/scripts/jql-sanitize.sh '<term>'`
+All user-derived terms in JQL: `bash .cursor/skills/mk-jira/scripts/jql-sanitize.sh '<term>'`
 
 ## JQL Zero Results
 

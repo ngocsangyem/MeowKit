@@ -45,8 +45,8 @@ If 3+ fix attempts fail, STOP and question the architecture — discuss with use
 
 For moderate/complex bugs:
 
-1. Run `mk:investigate` to confirm root cause. A supplied diagnostic report is evidence to validate and extend, never a substitute for investigation.
-2. If fix affects > 2 files → write a plan with `mk:plan-creator "bug fix: {symptom and affected area}"`
+1. Run `mk-investigate` to confirm root cause. A supplied diagnostic report is evidence to validate and extend, never a substitute for investigation.
+2. If fix affects > 2 files → write a plan with `mk-plan-creator "bug fix: {symptom and affected area}"`
 3. Agree the plan with the user before changing code
 
 Skip: `--quick` mode (single file, clear cause).
@@ -61,7 +61,7 @@ Run `grep -rilE "<kw1|kw2|kw3>" .meowkit/memory/` (`decisions.md`, `gotchas.md`)
 
 ## Step 1 — Scout (MANDATORY — never skip)
 
-Activate `mk:scout` to map affected codebase BEFORE any diagnosis:
+Activate `mk-scout` to map affected codebase BEFORE any diagnosis:
 
 - Affected files, dependencies, related tests, recent changes (`git log`)
 - Quick mode: minimal scout (affected file + direct deps only)
@@ -76,8 +76,8 @@ Activate `mk:scout` to map affected codebase BEFORE any diagnosis:
 
 Then choose the evidence path that matches the profile:
 
-1. **Quick** — validate the supplied known cause against the error and affected code directly. Do not delegate to `mk:investigate`; if the cause is no longer clear, escalate to standard before editing.
-2. **Standard/Deep** — use **mk:investigate** to collect and validate symptoms, traces, and reproduction steps, then **mk:sequential-thinking** to generate hypotheses from evidence, test each, eliminate, and conclude. A supplied diagnostic report is evidence to validate and extend, never a bypass.
+1. **Quick** — validate the supplied known cause against the error and affected code directly. Do not delegate to `mk-investigate`; if the cause is no longer clear, escalate to standard before editing.
+2. **Standard/Deep** — use **mk-investigate** to collect and validate symptoms, traces, and reproduction steps, then **mk-sequential-thinking** to generate hypotheses from evidence, test each, eliminate, and conclude. A supplied diagnostic report is evidence to validate and extend, never a bypass.
 
 Load `references/diagnosis-protocol.md` for the 5-phase protocol: Observe → Hypothesize → Test → Trace → Escalate.
 
@@ -103,7 +103,7 @@ exact compiler/lint error · file · direct cause · command-before · command-a
 
 If any field cannot be filled, return to Step 2 and gather more evidence. Intermittent failures may use bounded probabilistic evidence; a documented unknown is valid only for the uncertainty record, never as a substitute for the root cause.
 
-**Write evidence (init):** standard/deep runs emit `workflow-evidence.json` with `skill: mk:fix`, `mode`, `task`, `planPath` (if the fix escalated to a plan), `phase`, `risk`, and `fixDiagnosis`. Quick runs keep evidence in the response only.
+**Write evidence (init):** standard/deep runs emit `workflow-evidence.json` with `skill: mk-fix`, `mode`, `task`, `planPath` (if the fix escalated to a plan), `phase`, `risk`, and `fixDiagnosis`. Quick runs keep evidence in the response only.
 
 ## Step 3 — Complexity Assessment
 
@@ -139,7 +139,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 1. Report: confidence, root cause, changes, files, prevention measures.
 
-2. **Append one memory entry only when the lesson is non-derivable** from the code, the diff, or `git log` — append to `.meowkit/memory/gotchas.md` through `mewkit note`, in the store format (`mk:memory`):
+2. **Append one memory entry only when the lesson is non-derivable** from the code, the diff, or `git log` — append to `.meowkit/memory/gotchas.md` through `mewkit note`, in the store format (`mk-memory`):
 
    ```bash
    mewkit note gotchas <<'EOF'
@@ -180,12 +180,12 @@ Contract: the workflow-evidence conventions. The index records pointers + summar
 
 ## Skill Activation
 
-**Always:** `mk:scout` (Step 1) + direct diagnosis (Step 2). **Standard/Deep:** `mk:investigate` + `mk:sequential-thinking` for the full evidence chain. A supplied diagnostic report informs investigation; it never bypasses it.
-**Conditional:** `mk:brainstorming` (complex, multiple approaches) | `mk:docs-finder` (unfamiliar APIs)
+**Always:** `mk-scout` (Step 1) + direct diagnosis (Step 2). **Standard/Deep:** `mk-investigate` + `mk-sequential-thinking` for the full evidence chain. A supplied diagnostic report informs investigation; it never bypasses it.
+**Conditional:** `mk-brainstorming` (complex, multiple approaches) | `mk-docs-finder` (unfamiliar APIs)
 
 ## Gotchas
 
-- **Guessing root causes**: "I think it's X" without evidence → use mk:sequential-thinking to generate + test hypotheses from evidence
+- **Guessing root causes**: "I think it's X" without evidence → use mk-sequential-thinking to generate + test hypotheses from evidence
 - **Fixing symptoms**: test passes but underlying issue remains → always trace backward: symptom → cause → ROOT cause
 - **Skipping scout**: fixing without codebase context → mandatory scout maps what you're touching
 - **Missing required regression test**: bug resurfaces next sprint → follow the TDD rules and record any allowed omission rationale

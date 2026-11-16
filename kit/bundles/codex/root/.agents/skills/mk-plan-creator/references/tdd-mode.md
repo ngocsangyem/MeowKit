@@ -1,6 +1,6 @@
 # TDD Mode
 
-`--tdd` is a composable flag, not a planning mode. It adds a regression-first structure to the selected mode and must survive handoff into `mk:cook`.
+`--tdd` is a composable flag, not a planning mode. It adds a regression-first structure to the selected mode and must survive handoff into `mk-cook`.
 
 ## Use When
 

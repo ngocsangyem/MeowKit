@@ -22,12 +22,12 @@ Plan agreed with the user
     ↓
 Orchestrator identifies parallel opportunity
     ↓
-mk:team-config
+mk-team-config
     ├── 1. Parse plan for independent subtasks
     ├── 2. Generate ownership map (which agent owns which files)
     ├── 3. Validate zero overlap between ownerships
-    ├── 4. Create git worktrees via mk:worktree
-    └── 5. Create task-queue.json via mk:task-queue
+    ├── 4. Create git worktrees via mk-worktree
+    └── 5. Create task-queue.json via mk-task-queue
     ↓
 Parallel agents start claiming tasks
 ```
@@ -53,7 +53,7 @@ See `templates/ownership-map-template.md` for the format agents use to declare f
 ## Gotchas
 
 - **Overlapping ownership kills parallelism** — if two subtasks need the same file, they can't be parallel. Restructure the decomposition or handle the shared file in a sequential pre-step
-- **Worktree naming with special characters** — skill names with `:` (e.g., `mk:review`) need quoting in shell paths
+- **Worktree naming with special characters** — skill names with `:` (e.g., `mk-review`) need quoting in shell paths
 - **Stale worktrees from crashed sessions** — run `git worktree list` to check for orphaned worktrees before creating new ones
 - **Integration test is mandatory** — after merging all worktrees, the full test suite MUST pass. Don't skip this
 
@@ -61,5 +61,5 @@ See `templates/ownership-map-template.md` for the format agents use to declare f
 
 After all parallel agents complete and integration test passes:
 1. Merge all worktree branches to feature branch
-2. Remove worktrees via `mk:worktree cleanup`
+2. Remove worktrees via `mk-worktree cleanup`
 3. Archive `.meowkit/state/task-queue.json`

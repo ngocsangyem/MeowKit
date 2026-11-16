@@ -51,7 +51,7 @@ Do NOT show a token budget menu or depth selector to users unless they:
 - Ask about depth options ("can you be more detailed?")
 - Ask about the token budget system explicitly
 
-The detection runs silently. The banner output from `mk:agent-detector` shows complexity and model tier — budget level is an internal parameter, not a user-facing concept.
+The detection runs silently. The banner output from `mk-agent-detector` shows complexity and model tier — budget level is an internal parameter, not a user-facing concept.
 
 ## Integration with Detection Banner
 

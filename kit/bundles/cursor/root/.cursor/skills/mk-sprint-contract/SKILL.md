@@ -3,11 +3,11 @@ name: "mk-sprint-contract"
 description: "Negotiates generator and evaluator acceptance criteria before code."
 ---
 
-# mk:sprint-contract — File-Based Sprint Contract Protocol
+# mk-sprint-contract — File-Based Sprint Contract Protocol
 
 Negotiation protocol between generator and evaluator. Produces a signed contract file at `tasks/contracts/{date}-{slug}-sprint-{N}.md` before the generator writes any source code, so both agents are grading the same scope. The contract is a shared document, not a checkpoint: no hook blocks an edit while it is unsigned.
 
-> For single-task plan validation (cook flow), use `mk:validate-plan` instead. `mk:sprint-contract` is for product-level specs feeding into `mk:autobuild` only.
+> For single-task plan validation (cook flow), use `mk-validate-plan` instead. `mk-sprint-contract` is for product-level specs feeding into `mk-autobuild` only.
 
 ## When to Use
 
@@ -37,7 +37,7 @@ Skip when:
 ### `propose` (generator)
 
 1. Read active product spec from newest `tasks/plans/*/plan.md`
-2. Load rubric preset via `mk:rubric/scripts/load-rubric.sh --preset {preset}`
+2. Load rubric preset via `mk-rubric/scripts/load-rubric.sh --preset {preset}`
 3. Determine sprint `N`: max of existing `tasks/contracts/*-{slug}-sprint-*.md` + 1, default 1
 4. Copy `assets/contract-template.md` → `tasks/contracts/{YYMMDD-HHMM}-{slug}-sprint-{N}.md`
 5. Populate: 5–15 ACs in Given/When/Then form, each bound to one preset rubric, each with a Verification line. Every preset rubric should have ≥1 AC binding
@@ -80,13 +80,13 @@ Sprint-LEVEL goal management. Writes to `tasks/contracts/sprint-state-{date}-spr
 
 | Action | Form | Effect |
 |---|---|---|
-| `set` | `mk:sprint-contract sprint-goal set "<text>" --sprint N` | Writes `sprint_goal:` (≤120 chars) to `tasks/contracts/sprint-state-{YYMMDD}-sprint-{N}.md`. Creates the file from `assets/sprint-state-template.md` if absent |
-| `show` | `mk:sprint-contract sprint-goal show --sprint N` | Prints current `sprint_goal:` from the newest sprint-state file matching `--sprint N` |
-| `align` | `mk:sprint-contract sprint-goal align --plan <path>` | Renders alignment between plan goal (frontmatter `goal:` or first H1) and sprint goal. Advisory — never blocks |
+| `set` | `mk-sprint-contract sprint-goal set "<text>" --sprint N` | Writes `sprint_goal:` (≤120 chars) to `tasks/contracts/sprint-state-{YYMMDD}-sprint-{N}.md`. Creates the file from `assets/sprint-state-template.md` if absent |
+| `show` | `mk-sprint-contract sprint-goal show --sprint N` | Prints current `sprint_goal:` from the newest sprint-state file matching `--sprint N` |
+| `align` | `mk-sprint-contract sprint-goal align --plan <path>` | Renders alignment between plan goal (frontmatter `goal:` or first H1) and sprint goal. Advisory — never blocks |
 
 **Concurrent-write safety:** `sprint-goal set` MUST acquire `flock` on the sprint-state file before any read-modify-write. YAML frontmatter append is non-atomic across shells; lock is the only mitigation. Release on completion or error.
 
-**Schema scope:** `assets/contract-template.md` is the schema for sprint-CONTRACT files only. Sprint-STATE files follow `assets/sprint-state-template.md`; their YAML is parsed inline by consuming skills (this skill, `mk:agent-detector` Step 0b, `mk:jira-agile`).
+**Schema scope:** `assets/contract-template.md` is the schema for sprint-CONTRACT files only. Sprint-STATE files follow `assets/sprint-state-template.md`; their YAML is parsed inline by consuming skills (this skill, `mk-agent-detector` Step 0b, `mk-jira-agile`).
 
 **Why this lives here:** `tasks/contracts/` already belongs to this skill; co-locating `sprint-goal` avoids creating a sibling skill that duplicates path discipline.
 

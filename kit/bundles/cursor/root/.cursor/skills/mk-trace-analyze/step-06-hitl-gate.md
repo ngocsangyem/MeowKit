@@ -68,7 +68,7 @@ See rejected.md (with reasons).
 
 ## Next Action
 {If A > 0}: Generate a follow-up plan via:
-  mk:plan-creator --hard "Apply trace-analyzer suggestions from {analysis_dir}"
+  mk-plan-creator --hard "Apply trace-analyzer suggestions from {analysis_dir}"
 
 {If A == 0}: No actionable changes from this analysis. Re-analyze after more harness runs.
 ```
@@ -79,9 +79,9 @@ If ≥1 suggestion approved AND user opts in via a final stop and ask the user i
 
 ```
 stop and ask the user in chat(
-  question: "{A} suggestion(s) approved. Generate a follow-up plan now via mk:plan-creator?",
+  question: "{A} suggestion(s) approved. Generate a follow-up plan now via mk-plan-creator?",
   options: [
-    { label: "Yes — generate plan", description: "Spawn mk:plan-creator --hard with the approved suggestions" },
+    { label: "Yes — generate plan", description: "Spawn mk-plan-creator --hard with the approved suggestions" },
     { label: "No — defer", description: "I'll generate the plan manually later" }
   ]
 )

@@ -44,8 +44,8 @@ Supplied `first-principles.md` and `via-negativa.md` as strategic-unsticking tec
 ### Changed
 
 - **Tone:** compressed from academic (cc-thinking) to terse imperative style. Cut templates over 20 lines; cut "Feynman's wisdom" / "Taleb's wisdom" narrative sections.
-- **Cross-references:** legacy command references were rewritten to current `mk:` skill references. `systematic-debugging` / "debugging skill" references rewritten to `mk:sequential-thinking` or `mk:fix` as appropriate.
-- **Boundary pointer:** explicit reroute to `mk:fix` (for bug-fix intent) and `mk:sequential-thinking` (for pure diagnostic reasoning), added to SKILL.md and `when-stuck.md`.
+- **Cross-references:** legacy command references were rewritten to current `mk:` skill references. `systematic-debugging` / "debugging skill" references rewritten to `mk-sequential-thinking` or `mk-fix` as appropriate.
+- **Boundary pointer:** explicit reroute to `mk-fix` (for bug-fix intent) and `mk-sequential-thinking` (for pure diagnostic reasoning), added to SKILL.md and `when-stuck.md`.
 - **Bridge lines:** each technique references its nearest sibling to reduce "which one do I use" friction.
 - **Gotchas section:** added in SKILL.md (non-obvious failure modes per technique) per `lessons-build-skill.md`.
 - **File budget:** each reference kept under 150 lines. Sources that ran 300–640 lines (cc-thinking first-principles, via-negativa) compressed to 70–100 lines.
@@ -61,7 +61,7 @@ Full audit of all 39 cc-thinking-skills conducted 2026-04-19. Report:
 - `thinking-triz` — if contradiction-resolution moments aren't served by Collision-Zone + Inversion
 - `thinking-theory-of-constraints` — if bottleneck-framing adds precision beyond general performance work
 
-The 3 diagnostic cc-thinking skills (`thinking-five-whys-plus`, `thinking-scientific-method`, `thinking-kepner-tregoe`) were moved to `mk:sequential-thinking/references/` instead — they fit the evidence-based diagnosis axis, not the strategic-unsticking axis of this skill.
+The 3 diagnostic cc-thinking skills (`thinking-five-whys-plus`, `thinking-scientific-method`, `thinking-kepner-tregoe`) were moved to `mk-sequential-thinking/references/` instead — they fit the evidence-based diagnosis axis, not the strategic-unsticking axis of this skill.
 
 ## License
 

@@ -1,13 +1,13 @@
 # Architecture-Review Recipe
 
-> Loaded by `mk:prompt-enhancer` only when the input is an architecture-review
+> Loaded by `mk-prompt-enhancer` only when the input is an architecture-review
 > request AND `--analyze --deep` is active. This is a **recipe**, not a flag —
 > it reshapes the rewritten prompt's sections. It adds no new context reads
 > beyond the existing `--deep` allow-list.
 
 > **Role boundary (hard).** This recipe rewrites a draft prompt so that it ASKS
 > for an architecture review. It does **not** perform the review, produce
-> findings, score the design, or write an ADR. Producing findings is `mk:review`;
+> findings, score the design, or write an ADR. Producing findings is `mk-review`;
 > ADRs are the `architect` agent. If the skill ever emits a finding, severity
 > verdict, or recommendation of its own, that is a role-confusion bug
 > (guarded by `eval/canary-11-architecture-review.md`).
@@ -32,7 +32,7 @@ All of:
   with nothing attached → refuse/redirect per `SKILL.md`, same as any no-target input.
 
 If the request is to *design* or *plan* rather than to *review*, this is not the
-recipe — redirect (`mk:plan-creator` / `architect`).
+recipe — redirect (`mk-plan-creator` / `architect`).
 
 ## How it reshapes the kernel
 
@@ -63,7 +63,7 @@ Use the optional architecture OUTPUT FORMAT block in `assets/output-template.md`
 - Emit any finding, severity, trade-off, or recommendation of its own — it only
   rewrites the prompt that requests them.
 - Read beyond the `--deep` allow-list, or inline code bodies.
-- Add a flag, a new output section, or a handoff that auto-invokes `mk:review`.
+- Add a flag, a new output section, or a handoff that auto-invokes `mk-review`.
   A handoff *suggestion* line (final line, analyze modes) is allowed and
   recommended; auto-invocation is not.
 - Convert a "design this" / "plan this" request into a review — preserve the

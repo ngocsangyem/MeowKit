@@ -6,13 +6,13 @@ When to activate each skill and agent during fix workflows.
 
 | Skill/Agent | Reason |
 |-------------|--------|
-| `mk:investigate` | Core to all fix workflows — find root cause first |
+| `mk-investigate` | Core to all fix workflows — find root cause first |
 
 ## Conditional Activation
 
 | Skill/Agent | Activate When |
 |-------------|---------------|
-| `mk:scout` | Codebase exploration needed, multiple areas affected |
+| `mk-scout` | Codebase exploration needed, multiple areas affected |
 | brainstormer agent | Multiple valid approaches, architecture decision needed |
 | researcher agent | External docs needed, latest best practices |
 

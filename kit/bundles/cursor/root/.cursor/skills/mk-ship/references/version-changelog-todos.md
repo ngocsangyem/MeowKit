@@ -57,7 +57,7 @@
 
 Cross-reference the project's TODOS.md against the changes being shipped. Mark completed items automatically; prompt only if the file is missing or disorganized.
 
-Read `.cursor/skills/review/TODOS-format.md` for the canonical format reference.
+Read `.cursor/skills/mk-review/TODOS-format.md` for the canonical format reference.
 
 **1. Check if TODOS.md exists** in the repository root.
 

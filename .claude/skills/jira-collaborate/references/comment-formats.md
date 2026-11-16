@@ -2,6 +2,15 @@
 
 Advanced reference for comment formatting options.
 
+## Contents
+
+- [Input Formats](#input-formats)
+- [Plain Text (default)](#plain-text-default)
+- [Markdown](#markdown)
+- [ADF (Advanced)](#adf-advanced)
+- [ADF Conversion (handled by jira-as)](#adf-conversion-handled-by-jira-as)
+- [See Also](#see-also)
+
 ---
 
 ## Input Formats

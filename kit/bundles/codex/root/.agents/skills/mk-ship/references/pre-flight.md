@@ -50,14 +50,14 @@ If --dry-run             → print mode + plan for each step, then stop
 
 ## Step 0.8: Unified Verification
 
-Before any pre-flight checks, run `mk:verify` to confirm everything is green.
+Before any pre-flight checks, run `mk-verify` to confirm everything is green.
 
-If `mk:verify` returns FAIL:
+If `mk-verify` returns FAIL:
 - Display the failing step and errors
 - **Abort ship** with message: "Verification failed — fix issues before shipping. Run `the verify skill` to re-check."
 - Do not proceed to Step 1
 
-If `mk:verify` returns PASS: continue to Step 0.9.
+If `mk-verify` returns PASS: continue to Step 0.9.
 
 > Skip this step only if `--skip-verify` flag is passed explicitly by the user.
 
@@ -65,11 +65,11 @@ If `mk:verify` returns PASS: continue to Step 0.9.
 
 ## Step 0.9: Read workflow evidence (if present)
 
-`mk:verify` (Step 0.8) stays the abort authority — this step runs AFTER it and only READS. Evidence augments proof; it **never approves** and **never overrides** `mk:verify`. A FAIL from verify still aborts regardless of what evidence says.
+`mk-verify` (Step 0.8) stays the abort authority — this step runs AFTER it and only READS. Evidence augments proof; it **never approves** and **never overrides** `mk-verify`. A FAIL from verify still aborts regardless of what evidence says.
 
 1. Look for `workflow-evidence.json` at the planned path `tasks/plans/<plan>/reports/evidence/` first, then the standalone path `.meowkit/state/evidence/<slug>/`.
 2. **If absent** (older runs, `--quick` fixes): proceed exactly as today — no new hard dependency. Do not block on a missing file.
-3. **If present:** report `approvals.ship`, `review.verdictPath` + `review.status`, `verification.overall`, and `risk.requiresHumanApproval`. Call out what is missing — no verdict, a FAIL dimension, an unacknowledged high-risk item — and say the change is not ready. Evidence cannot turn a `mk:verify` FAIL into a pass, and it is never the user's decision to ship.
+3. **If present:** report `approvals.ship`, `review.verdictPath` + `review.status`, `verification.overall`, and `risk.requiresHumanApproval`. Call out what is missing — no verdict, a FAIL dimension, an unacknowledged high-risk item — and say the change is not ready. Evidence cannot turn a `mk-verify` FAIL into a pass, and it is never the user's decision to ship.
 
 Contract: the workflow-evidence conventions.
 

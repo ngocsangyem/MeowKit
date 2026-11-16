@@ -22,15 +22,15 @@ After the verdict file is read at the start of the workflow:
 1. **Early-return guard (preserves zero-cost for non-Agile sessions):** if verdict frontmatter has no `jira_tickets:` field OR the field is an empty array → SKIP the entire DoD block. ONE frontmatter read; no stop and ask the user in chat calls; no further branching. Proceed directly to ship
 2. **If verdict has `jira_tickets:` non-empty AND verdict status is PASS/WARN:**
    - Per `agile-story-gates.md` 2 — three opt-in actions via stop and ask the user in chat (each cancel-safe, each Jira-offline-safe):
-     1. **Verdict→Jira comment.** "Post the review verdict summary to PROJ-123 as a comment? [Y/n/edit]" → `mk:jira-collaborate add comment KEY=PROJ-123` with verdict's Summary + Risks. Set verdict frontmatter `posted_to_jira: true|deferred`
-     2. **Status transition.** "Transition PROJ-123 to Done? [Y/n/skip]" → `mk:jira-lifecycle transition KEY=PROJ-123 to=Done`. Set `transitioned_to_done: true|deferred`
-     3. **Business AC checkbox.** Source priority: (a) Jira AC field via `mk:jira-issue get`; (b) **fallback to plan.md `## Acceptance Criteria`** if Jira read fails or AC field is empty. Y/n per item before allowing the rest of the ship pipeline
+     1. **Verdict→Jira comment.** "Post the review verdict summary to PROJ-123 as a comment? [Y/n/edit]" → `mk-jira-collaborate add comment KEY=PROJ-123` with verdict's Summary + Risks. Set verdict frontmatter `posted_to_jira: true|deferred`
+     2. **Status transition.** "Transition PROJ-123 to Done? [Y/n/skip]" → `mk-jira-lifecycle transition KEY=PROJ-123 to=Done`. Set `transitioned_to_done: true|deferred`
+     3. **Business AC checkbox.** Source priority: (a) Jira AC field via `mk-jira-issue get`; (b) **fallback to plan.md `## Acceptance Criteria`** if Jira read fails or AC field is empty. Y/n per item before allowing the rest of the ship pipeline
 3. Honor each user answer; update verdict frontmatter accordingly (`bool|deferred` per offline fallback)
 4. Proceed with the rest of the ship pipeline (or abort if user explicitly cancels)
 
-**Cost analysis:** for non-Agile sessions, the only added cost is reading the verdict frontmatter (which `mk:ship` already does to read PASS/WARN/FAIL). The `jira_tickets:` field check is a single grep on already-loaded data. Effectively zero added cost.
+**Cost analysis:** for non-Agile sessions, the only added cost is reading the verdict frontmatter (which `mk-ship` already does to read PASS/WARN/FAIL). The `jira_tickets:` field check is a single grep on already-loaded data. Effectively zero added cost.
 
-**Coverage of `mk:cook` pipeline:** `mk:cook` invokes `mk:ship` for Phase 5 (per `mk:cook` Step 5 delegation), so this single insertion covers BOTH direct `mk:ship` invocation AND the `mk:cook` → `mk:ship` chain. No separate insertion needed in `mk:cook`.
+**Coverage of `mk-cook` pipeline:** `mk-cook` invokes `mk-ship` for Phase 5 (per `mk-cook` Step 5 delegation), so this single insertion covers BOTH direct `mk-ship` invocation AND the `mk-cook` → `mk-ship` chain. No separate insertion needed in `mk-cook`.
 
 ## Arguments
 
@@ -70,7 +70,7 @@ Report exactly one classification and one short evidence line in the final summa
 
 **Prepare (default)** — Initialize, inspect selected changes, check review readiness, run scoped verification, and present the exact files proposed for staging. Ask before including uncommitted changes and again before creating a local commit. If `--dry-run`, output this plan and stop.
 
-**Review** — Run structural + design review, resolve PR comments. Adversarial review belongs to `mk:review`; ship does not re-run it. See `references/pre-landing-review.md`
+**Review** — Run structural + design review, resolve PR comments. Adversarial review belongs to `mk-review`; ship does not re-run it. See `references/pre-landing-review.md`
 
 **Release (explicit)** — After `prepare` and an explicit request, push the branch and create or update its PR. Run document-release before merge so documentation lands in the same PR.
 
@@ -145,9 +145,9 @@ flag is present).
 - `references/version-changelog-todos.md` — Version bump (Step 4), CHANGELOG (Step 5), TODOS.md (Step 5.5)
 - `references/commit-push-pr.md` — Issue linking, commit (Step 6), verification gate (Step 6.5), push (Step 7), PR creation/edit (Step 8), document-release (Step 8.5), ship metrics (Step 8.75)
 - `references/rules.md` — Important rules and constraints
-- `references/rollback-protocol.md` — Rollback steps and procedures (migrated from mk:shipping)
-- `references/ship-pipeline.md` — Full ship pipeline stages and gate definitions (migrated from mk:shipping)
-- `references/canary-deploy.md` — Canary deployment strategy and traffic splitting (migrated from mk:shipping)
+- `references/rollback-protocol.md` — Rollback steps and procedures (migrated from mk-shipping)
+- `references/ship-pipeline.md` — Full ship pipeline stages and gate definitions (migrated from mk-shipping)
+- `references/canary-deploy.md` — Canary deployment strategy and traffic splitting (migrated from mk-shipping)
 - `references/advice-checkpoints.md` — `--advice` checkpoint boundaries, caps, and what supervision may not touch
 
 ## Hooks
@@ -164,4 +164,4 @@ flag is present).
 
 - **Version bump conflicts in monorepo**: Multiple packages bump the same version file → Use per-package VERSION files; bump only the package being shipped
 - **CI passing locally but failing remotely**: Local env has different Node version or env vars → Always verify CI status after push; don't merge on local-only results
-- **Inline lite design check runs only on frontend diffs**: The pre-landing review block calls `workflow-diff-scope`. If `SCOPE_FRONTEND=false` the design check skips silently. If true, it reads `mk:review/design-checklist.md` and applies the 6-category pattern scan. Findings join the Fix-First flow (AUTO-FIX vs ASK vs visual-only).
+- **Inline lite design check runs only on frontend diffs**: The pre-landing review block calls `workflow-diff-scope`. If `SCOPE_FRONTEND=false` the design check skips silently. If true, it reads `mk-review/design-checklist.md` and applies the 6-category pattern scan. Findings join the Fix-First flow (AUTO-FIX vs ASK vs visual-only).

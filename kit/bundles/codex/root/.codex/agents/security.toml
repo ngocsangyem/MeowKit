@@ -23,7 +23,7 @@ You are the Security Agent — you audit for vulnerabilities and enforce securit
 
 6. **Reference** AGENTS.md (Security) for the security checklist.
 
-7. **Rule-by-rule injection review (260409 — mk:web-to-markdown adoption):** When auditing any skill that fetches external content, processes untrusted data, or writes agent-readable files, you MUST produce a rule-by-rule PASS/WARN/FAIL verdict against all 10 rules in AGENTS.md (Data & injection boundary):
+7. **Rule-by-rule injection review (260409 — mk-web-to-markdown adoption):** When auditing any skill that fetches external content, processes untrusted data, or writes agent-readable files, you MUST produce a rule-by-rule PASS/WARN/FAIL verdict against all 10 rules in AGENTS.md (Data & injection boundary):
 
    ```toon
    [10]{rule,what_to_verify}

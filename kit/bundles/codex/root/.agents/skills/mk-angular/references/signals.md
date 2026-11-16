@@ -1,13 +1,12 @@
 # Angular Signals
 
-> Part of mk:angular skill. Read when: working with signals.
+> Part of mk-angular skill. Read when: working with signals.
 > Source: analogjs/angular-skills/angular-signals (MIT)
 
 ## Contents
 
 - [Core Patterns](#core-patterns)
 - [Advanced Patterns](#advanced-patterns)
-
 
 ## Core Patterns
 

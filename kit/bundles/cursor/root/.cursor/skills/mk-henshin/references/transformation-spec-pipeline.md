@@ -1,6 +1,6 @@
 # Transformation Spec Pipeline
 
-Use this reference for `mk:henshin` after selecting one requested surface. It turns
+Use this reference for `mk-henshin` after selecting one requested surface. It turns
 existing code into a reviewed Transformation Spec; it does not implement code.
 
 ## Contents
@@ -124,7 +124,7 @@ status there, and scrub secrets before writing.
 
 ## Handoff and boundaries
 
-henshin stops after the spec. It may call `mk:scout` and the researcher during
+henshin stops after the spec. It may call `mk-scout` and the researcher during
 analysis, but it does not invoke `the plan-creator skill`, `the cook skill`,
 `the skill-creator skill`, or `the party skill` mid-flow.
 

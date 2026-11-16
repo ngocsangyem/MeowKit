@@ -2,7 +2,7 @@
 
 > **Gate — load ONLY on explicit user intent** to generate design-system rules or discuss library-build
 > architecture. Output is ADVISORY rule text only. This reference performs NO Figma writes; full library
-> execution stays out of scope for `mk:figma`.
+> execution stays out of scope for `mk-figma`.
 
 ## Contents
 
@@ -35,14 +35,14 @@ execute here (a 20–100+ call workflow). If the toolkit ever supports it, these
 
 ## Part C — Future split criteria
 
-Split `mk:figma` into a specialist skill only when ALL conditions for a candidate hold. Business
+Split `mk-figma` into a specialist skill only when ALL conditions for a candidate hold. Business
 decision — the product owner makes the final call; an audit alone never triggers a split.
 
 | Candidate | Split only when | Distinct because |
 |---|---|---|
-| `mk:figma-code-connect` | Repeated real user demand AND users hold eligible plans/seats (Org/Enterprise + Dev/Full); the gated reference proves insufficient (activation confusion or context bloat observed) | Entitlement model + codebase-mapping workflow |
-| `mk:figma-write` | the toolkit decides canvas mutation is a first-class product capability, with checkpoint/state infrastructure; write requests recur in practice | Blast radius (mutates design files) |
-| `mk:figma-library` | Long-running (20–100+ call) builds with state ledger/recovery are supported; real demand exists | Long-run state, cleanup, checkpoints |
+| `mk-figma-code-connect` | Repeated real user demand AND users hold eligible plans/seats (Org/Enterprise + Dev/Full); the gated reference proves insufficient (activation confusion or context bloat observed) | Entitlement model + codebase-mapping workflow |
+| `mk-figma-write` | the toolkit decides canvas mutation is a first-class product capability, with checkpoint/state infrastructure; write requests recur in practice | Blast radius (mutates design files) |
+| `mk-figma-library` | Long-running (20–100+ call) builds with state ledger/recovery are supported; real demand exists | Long-run state, cleanup, checkpoints |
 
 Never split: blank-file creation (too narrow), design-system-rules generation (stays a reference),
-implement-design (the core of `mk:figma`).
+implement-design (the core of `mk-figma`).

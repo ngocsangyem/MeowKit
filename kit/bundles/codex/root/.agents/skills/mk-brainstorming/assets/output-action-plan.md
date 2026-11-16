@@ -1,6 +1,6 @@
 ## Brainstorm → Plan Handoff
 
-Use this packet as compact pre-research input for `mk:plan-creator`. Do not pass the raw brainstorm transcript.
+Use this packet as compact pre-research input for `mk-plan-creator`. Do not pass the raw brainstorm transcript.
 
 ```yaml
 problem: "[confirmed problem]"
@@ -29,8 +29,8 @@ report_path: "tasks/reports/[report-name].md"
 
 ## Handoff Rules
 
-- Ask the user before invoking or recommending `mk:plan-creator`.
-- `mk:plan-creator` still owns requirements completeness, phase files, validation, and plan approval.
-- `mk:cook` receives nothing directly from brainstorming; it starts from an approved plan.
+- Ask the user before invoking or recommending `mk-plan-creator`.
+- `mk-plan-creator` still owns requirements completeness, phase files, validation, and plan approval.
+- `mk-cook` receives nothing directly from brainstorming; it starts from an approved plan.
 - Leave `touchpoints` empty when scout was skipped.
 - Never include secrets, raw logs, or sensitive file contents.

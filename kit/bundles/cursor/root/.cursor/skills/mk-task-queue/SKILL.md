@@ -72,7 +72,7 @@ Before any file write, check if the file matches the agent's declared ownership.
 ## Team Coordination
 
 Team-mode coordination rules (file ownership, commit discipline, completion messages) live
-in `.cursor/skills/team-config/references/team-coordination.md`, loaded by `mk:team-config`
+in `.cursor/skills/mk-team-config/references/team-coordination.md`, loaded by `mk-team-config`
 on team activation.
 
 ## Gotchas

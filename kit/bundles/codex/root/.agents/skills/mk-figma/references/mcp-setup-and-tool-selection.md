@@ -52,5 +52,5 @@ live server list before qualifying.
 MCP absent or unresponsive:
 
 1. Ask the user to export the target frame/screen as a PNG from Figma.
-2. Analyze the PNG via `mk:multimodal` (or Codex Read for simple cases).
+2. Analyze the PNG via `mk-multimodal` (or Codex Read for simple cases).
 3. Note reduced fidelity: exact spacing/variables are unavailable from a raster image; treat values as approximate.

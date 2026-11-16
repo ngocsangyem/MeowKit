@@ -4,7 +4,7 @@ description: "Fibonacci-sizes pasted stories before tickets exist. NOT for mk-ji
 requires_runtime: ["python>=3.9"]
 ---
 
-# mk:story-sizer
+# mk-story-sizer
 
 Forks to the `story-sizer` agent (system prompt at `.codex/agents/story-sizer.md`). v1 ships paste-mode only: the user provides a markdown block of stories, the agent applies heuristics, and a Story Sizing Report is written to `tasks/reports/story-sizing-{YYMMDD}-{slug}.md`. No Jira side effects in default mode.
 
@@ -43,17 +43,17 @@ End-to-end default flow + `--scout` extract-or-prompt pattern + filtering rules:
 
 ## Auto-create (opt-in)
 
-`--auto-create --project <KEY> [--epic <KEY>]` runs 5 pre-flight checks (NO_ACS, Rule-1 injection, length cap, duplicate suspect via `mk:jira-search`, source-hash mismatch). If all pass, a markdown dry-run table renders + a single `stop and ask the user in chat` gate decides ship-or-abort. Gating rules: `references/auto-create-gating.md`. Rule-1 inventory copy: `references/injection-patterns.md`. Gating check: `scripts/check-auto-create-gating.py`.
+`--auto-create --project <KEY> [--epic <KEY>]` runs 5 pre-flight checks (NO_ACS, Rule-1 injection, length cap, duplicate suspect via `mk-jira-search`, source-hash mismatch). If all pass, a markdown dry-run table renders + a single `stop and ask the user in chat` gate decides ship-or-abort. Gating rules: `references/auto-create-gating.md`. Rule-1 inventory copy: `references/injection-patterns.md`. Gating check: `scripts/check-auto-create-gating.py`.
 
 ## See also
 
 - Agent: `../../agents/story-sizer.md`
-- Peer intelligence: `mk:jira-evaluator` (post-ticket complexity), `mk:jira-estimator` (post-ticket estimation), `mk:planning-engine` (sprint capacity)
-- Peer execution (delegated): `mk:jira-issue` (create), `mk:jira-collaborate` (audit comment via `--internal`)
+- Peer intelligence: `mk-jira-evaluator` (post-ticket complexity), `mk-jira-estimator` (post-ticket estimation), `mk-planning-engine` (sprint capacity)
+- Peer execution (delegated): `mk-jira-issue` (create), `mk-jira-collaborate` (audit comment via `--internal`)
 - Shared: `../jira/references/estimation-guide.md` (Fibonacci heuristic conventions)
 
 ## Gotchas
 
 - The `source_hash` recorded in the report header is the SHA-256 of the _exact_ paste body. If you edit the paste locally between sizing and `--auto-create`, the source-consistency check will ABORT — re-paste the modified body and re-run `--paste` to regenerate the report.
 - `--scout` does not auto-invoke `the scout skill`. Run `the scout skill` first when you want codebase signals; otherwise the report carries `[NO_CODEBASE_CONTEXT]`.
-- DoR advisory only appears when `mk:agent-detector` loaded the agile story gates rule for the current session.
+- DoR advisory only appears when `mk-agent-detector` loaded the agile story gates rule for the current session.

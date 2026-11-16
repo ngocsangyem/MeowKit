@@ -2,6 +2,17 @@
 
 **Read time:** 5 minutes
 
+## Contents
+
+- [Syntax](#syntax)
+- [Available Commands](#available-commands)
+- [Combining Commands](#combining-commands)
+- [Requirements](#requirements)
+- [Workflow Examples](#workflow-examples)
+- [Common Mistakes](#common-mistakes)
+- [Troubleshooting](#troubleshooting)
+- [Next Steps](#next-steps)
+
 Smart Commits allow you to perform JIRA actions directly from commit messages.
 
 ## Syntax

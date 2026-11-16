@@ -11,8 +11,8 @@ No spec file — agent explores the app and discovers flows.
 ## Execution
 
 ```
-Step 1: mk:playwright-cli goto https://app.example.com
-Step 2: mk:playwright-cli snapshot → discover page structure
+Step 1: mk-playwright-cli goto https://app.example.com
+Step 2: mk-playwright-cli snapshot → discover page structure
 
 Discovered flows:
   1. Navigation: Home → Products → Product Detail

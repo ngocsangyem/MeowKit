@@ -3,7 +3,7 @@ name: "mk-jira-time"
 description: "Jira worklogs, estimates, time reports; use to log hours on a ticket."
 ---
 
-# mk:jira-time
+# mk-jira-time
 
 Forks to the `jira-time` agent. Duration format: `30m`, `2h`, `1d 4h`. The agent confirms before any worklog `update` / `delete` — those are effectively irreversible.
 
@@ -30,7 +30,7 @@ Forks to the `jira-time` agent. Duration format: `30m`, `2h`, `1d 4h`. The agent
   - `references/time-format-quick-ref.md` — duration syntax (15m, 2h, 1d 4h, 1w)
   - `references/jql-snippets.md` — copy-paste time-related JQL (worklog by user/date)
   - `references/estimation-guide.md` — story-point vs time estimation tradeoffs
-- Peer leaves: `mk:jira-search` (JQL for worklog filters), `mk:jira-agile` (sprint capacity uses time data), `mk:jira-bulk` (bulk-log)
+- Peer leaves: `mk-jira-search` (JQL for worklog filters), `mk-jira-agile` (sprint capacity uses time data), `mk-jira-bulk` (bulk-log)
 
 ## Gotchas
 

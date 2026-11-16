@@ -10,7 +10,7 @@ Optional: Context (if root cause is known), Solution Options (if multiple fix st
 1. Investigate → 2. Test (regression test — RED enforcement only with `--tdd` / `MEOWKIT_TDD=1`) → 3. Fix → 4. Review → 5. Ship
 
 ## Agent Sequence
-- **TDD mode (`--tdd`):** investigator (mk:investigate) → tester → developer → reviewer → shipper
+- **TDD mode (`--tdd`):** investigator (mk-investigate) → tester → developer → reviewer → shipper
 - **Default mode:** investigator → developer → reviewer → shipper. A regression test is recommended but not gated; tester may be inserted on-request.
 
 ## Checkpoints

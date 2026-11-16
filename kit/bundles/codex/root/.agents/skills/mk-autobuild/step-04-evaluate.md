@@ -1,6 +1,6 @@
 # Step 4: Evaluate
 
-Spawn the `evaluator` sub-task via `mk:evaluate` to actively verify the build against the rubric library. Returns a graded verdict (`PASS | WARN | FAIL`) with concrete runtime evidence.
+Spawn the `evaluator` sub-task via `mk-evaluate` to actively verify the build against the rubric library. Returns a graded verdict (`PASS | WARN | FAIL`) with concrete runtime evidence.
 
 ## Instructions
 
@@ -9,7 +9,7 @@ Spawn the `evaluator` sub-task via `mk:evaluate` to actively verify the build ag
 The evaluator needs a runnable target. Two cases:
 
 1. **Generator started a dev server in step-03** — `handoff_path` should record the URL or how to start it. Read it from the handoff file.
-2. **Generator built a path-style target (no live URL)** — pass the project path to `mk:evaluate`, which will boot it (step-02 of mk:evaluate workflow).
+2. **Generator built a path-style target (no live URL)** — pass the project path to `mk-evaluate`, which will boot it (step-02 of mk-evaluate workflow).
 
 ```bash
 # Read target hint from handoff
@@ -32,13 +32,13 @@ Use the same preset that the contract was bound to (from step-02). If the contra
 
 ```
 delegate a sub-task (
-  subagent_type="evaluator",
+  agent="evaluator",
   description="Evaluate iteration $iteration of $slug",
   prompt="
     Read your agent constitution at .codex/agents/evaluator.md.
     Follow the Active Verifier Loop section (the post-build active-verifier role; full verifier-loop integration is still pending).
 
-    Use mk:evaluate skill — read its workflow.md and follow steps 1–5.
+    Use mk-evaluate skill — read its workflow.md and follow steps 1–5.
 
     Inputs:
     - Target: $target
@@ -132,8 +132,8 @@ case "$tier" in
 esac
 step_cost_usd=$(awk -v s="$elapsed_seconds" -v r="$rate" 'BEGIN { printf "%.2f", (s/60.0)*r }')
 
-MEOWKIT_RUN_ID="$run_id" .agents/skills/autobuild/scripts/budget-tracker.sh add "$step_cost_usd" "step-04-iter-${iteration}"
-MEOWKIT_RUN_ID="$run_id" .agents/skills/autobuild/scripts/budget-tracker.sh check
+MEOWKIT_RUN_ID="$run_id" .agents/skills/mk-autobuild/scripts/budget-tracker.sh add "$step_cost_usd" "step-04-iter-${iteration}"
+MEOWKIT_RUN_ID="$run_id" .agents/skills/mk-autobuild/scripts/budget-tracker.sh check
 ```
 
 ## Output

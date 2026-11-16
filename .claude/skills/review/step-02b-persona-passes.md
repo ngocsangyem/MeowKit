@@ -51,7 +51,7 @@ This respects the max-3-agent rule (Phase A is already done; Phase B runs 2 at a
 For each selected persona:
 1. Load persona prompt from `prompts/personas/{persona-name}.md`
 2. Load skeptic anchor from `prompts/skeptic-anchor.md`
-3. Spawn a subagent with this context:
+3. Once both are loaded, spawn a subagent with this context:
 
 ```
 # Adversarial Review: {Persona Name}

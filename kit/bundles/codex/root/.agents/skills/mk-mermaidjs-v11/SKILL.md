@@ -105,7 +105,7 @@ Load `references/examples.md` for:
 | JavaScript integration | [references/integration.md](references/integration.md) |
 | Common patterns | [references/examples.md](references/examples.md) |
 
-For rendered SVG layout review, load `mk:tech-graph` and follow its SVG-layout route.
+For rendered SVG layout review, load `mk-tech-graph` and follow its SVG-layout route.
 
 ## Gotchas
 
@@ -113,4 +113,4 @@ For rendered SVG layout review, load `mk:tech-graph` and follow its SVG-layout r
 - The `securityLevel: "strict"` setting strips HTML from labels — use plain text in node labels when security mode is on.
 - `mmdc` requires Node 18+; skip the CLI section if the project's Node version is older.
 - Inline frontmatter config (the `---` block inside a code fence) is a v10.7+ feature; older renderers silently drop it and render the `---` as content.
-- External `@import` in `<style>` breaks `rsvg-convert` — embed fonts inline if you later export via `mk:tech-graph`.
+- External `@import` in `<style>` breaks `rsvg-convert` — embed fonts inline if you later export via `mk-tech-graph`.

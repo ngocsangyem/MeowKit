@@ -8,10 +8,10 @@ Pick the autobuild scaffolding density (`MINIMAL`, `FULL`, `LEAN`) based on the 
 
 1. **`--tier` flag** (explicit): map `auto → run scale-routing`, `minimal → MINIMAL`, `full → FULL`, `lean → LEAN`
 2. **`MEOWKIT_AUTOBUILD_MODE` env var:** if set, overrides everything below. Log the override in step-06 audit trail.
-3. **`density-select.sh`** (or invoke `mk:scale-routing` directly): emits the density token based on detected model + tier.
+3. **`density-select.sh`** (or invoke `mk-scale-routing` directly): emits the density token based on detected model + tier.
 
 ```bash
-density=$(.agents/skills/autobuild/scripts/density-select.sh)
+density=$(.agents/skills/mk-autobuild/scripts/density-select.sh)
 ```
 
 The script returns one of: `MINIMAL`, `FULL`, `LEAN`. See `references/adaptive-density-matrix.md` for the full decision table.
@@ -73,13 +73,13 @@ started: {ISO-8601 timestamp}
 
 | density | Step-01 plan mode | Step-02 contract | Iteration loop |
 |---|---|---|---|
-| `MINIMAL` | `mk:plan-creator --fast` | SKIP | SKIP — invoke `mk:cook` instead and return |
-| `FULL` | `mk:plan-creator --product-level` | REQUIRED | 1–3 rounds |
-| `LEAN` | `mk:plan-creator --product-level` | OPTIONAL (skip if < 5 ACs needed) | 0–1 rounds |
+| `MINIMAL` | `mk-plan-creator --fast` | SKIP | SKIP — invoke `mk-cook` instead and return |
+| `FULL` | `mk-plan-creator --product-level` | REQUIRED | 1–3 rounds |
+| `LEAN` | `mk-plan-creator --product-level` | OPTIONAL (skip if < 5 ACs needed) | 0–1 rounds |
 
 `--deep` remains a plan-creator/cook planning mode. It is not an autobuild density and cannot be forced through `MEOWKIT_AUTOBUILD_MODE`.
 
-**MINIMAL short-circuit:** if density resolves to MINIMAL, the autobuild workflow immediately delegates to `mk:cook` and exits — no contract, no iteration loop, no autobuild scaffolding. The run report still gets written to record the decision.
+**MINIMAL short-circuit:** if density resolves to MINIMAL, the autobuild workflow immediately delegates to `mk-cook` and exits — no contract, no iteration loop, no autobuild scaffolding. The run report still gets written to record the decision.
 
 ## Output
 

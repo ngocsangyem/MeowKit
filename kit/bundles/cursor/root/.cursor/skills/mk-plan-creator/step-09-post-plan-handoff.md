@@ -6,7 +6,7 @@ Deterministic handoff after task hydration. Presents mode-pruned options via `st
 
 - `planning_mode` (from step-00)
 - `tdd_mode` (from step-00)
-- `matched_flags` (from `mk:agent-detector` Phase 0; may be unset when plan-creator invoked directly)
+- `matched_flags` (from `mk-agent-detector` Phase 0; may be unset when plan-creator invoked directly)
 - `plan_dir` (from step-03)
 
 ## Instructions
@@ -17,7 +17,7 @@ If `matched_flags` is unset OR empty AND `planning_mode` is `fast` or `spike`, p
 
 ```
 `matched_flags` is unset — plan-creator was invoked directly rather than
-through `mk:agent-detector` routing. Using default mode recommendation.
+through `mk-agent-detector` routing. Using default mode recommendation.
 For risk-tiered routing, invoke via `the cook skill` or `the fix skill`.
 ```
 
@@ -45,7 +45,7 @@ Option set is mode-pruned. First option is `(Recommended)`. stop and ask the use
 | fast | yes | Red-team, Validate, Cook, End |
 | fast | no | Cook, Validate, Red-team, End |
 | hard / deep / parallel / two | (n/a — both prior gates ran) | Cook, End |
-| product-level | (n/a) | Hand off to mk:autobuild, End |
+| product-level | (n/a) | Hand off to mk-autobuild, End |
 | spike | (n/a) | Cook, End |
 
 ### 9d. Present stop and ask the user in chat
@@ -96,7 +96,7 @@ Print exactly one line matching the selection:
 | Cook (fast + TDD) | `Run: the cook skill --auto {absolute-path-to-plan.md} --tdd` |
 | Validate | `Run: the plan skill validate {absolute-path-to-plan.md}` |
 | Red-team | `Run: the plan skill red-team {absolute-path-to-plan.md}` |
-| Hand off to mk:autobuild | `Run: the autobuild skill {absolute-path-to-plan.md}` |
+| Hand off to mk-autobuild | `Run: the autobuild skill {absolute-path-to-plan.md}` |
 | End | (no command line — print "Plan complete. No next command queued.") |
 
 If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.meowkit/state/tdd-mode` surviving a fresh session.

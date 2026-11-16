@@ -13,7 +13,6 @@ Custom fields vary per project and Jira instance. Use this methodology to discov
 - [Quick Reference: Field Discovery Commands](#quick-reference-field-discovery-commands)
 - [Tip: Cache Field IDs Per Project](#tip-cache-field-ids-per-project)
 
-
 ---
 
 ## Step 1: List All Fields
@@ -21,7 +20,7 @@ Custom fields vary per project and Jira instance. Use this methodology to discov
 Via the `jira-as` wrapper:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields list
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields list
 ```
 
 Returns all system and custom fields. Custom fields have IDs like `customfield_10016`.

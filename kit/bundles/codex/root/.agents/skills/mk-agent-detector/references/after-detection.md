@@ -2,18 +2,15 @@
 
 1. **Output detection result** with agent, model, and complexity
 2. **Load agent instructions** from `.codex/agents/[agent-name].md`
-3. **Use detected model** when spawning Agent tool:
-   ```
-   Agent(subagent_type="[agent]", model="[detected-model]", ...)
-   ```
+3. **Carry the detected tier** in the delegation prompt; the agent's own `.codex/agents/*.toml` pins its model.
 4. **Invoke appropriate skill:**
-   - Complex feature → `mk:workflow-orchestrator` or `mk:cook`
-   - Bug fix → `mk:fix`
-   - Investigation/debugging → `mk:investigate`
-   - Code review → `mk:review`
-   - Security audit → `mk:cso`
+   - Complex feature → `mk-workflow-orchestrator` or `mk-cook`
+   - Bug fix → `mk-fix`
+   - Investigation/debugging → `mk-investigate`
+   - Code review → `mk-review`
+   - Security audit → `mk-cso`
    - For the full intent → skill dispatch table, see
-     `.agents/skills/agent-detector/references/skill-domain-routing.md` (loaded at Step 0b).
+     `.agents/skills/mk-agent-detector/references/skill-domain-routing.md` (loaded at Step 0b).
 5. **Context is loaded on demand** by the consumer skill — a read-set skill greps `.meowkit/memory/` (`decisions.md`, `gotchas.md`) for its task keywords and opens only the matching entries. `.meowkit/memory/` is a project convention — it is NOT the host-runtime platform auto-memory at `~/.codex/projects/<project>/memory/`.
 
 ---
@@ -35,9 +32,9 @@ domain_agents[2]{family,count,list}:
   Confluence,5,confluence-page/confluence-search/confluence-spec-analyst/confluence-bulk/confluence-collaborate
 ```
 
-Total: 17 core + 21 domain = 38 agents. Core agents are routed by the orchestrator via the agent-routing table; domain agents are routed by their hub skill (`mk:jira` / `mk:confluence`) — the orchestrator does NOT score them directly.
+Total: 17 core + 21 domain = 38 agents. Core agents are routed by the orchestrator via the agent-routing table; domain agents are routed by their hub skill (`mk-jira` / `mk-confluence`) — the orchestrator does NOT score them directly.
 
-See the agent-routing conventions for the full agent table. Skill dispatch (intent → skill) lives separately in `.agents/skills/agent-detector/references/skill-domain-routing.md`.
+See the agent-routing conventions for the full agent table. Skill dispatch (intent → skill) lives separately in `.agents/skills/mk-agent-detector/references/skill-domain-routing.md`.
 
 ---
 
@@ -53,6 +50,6 @@ User: "Use only tester for this task"
 
 ---
 
-**Agent routing:** the agent-routing conventions (canonical agent table) and `.codex/agents/orchestrator.md` (orchestrator agent definition). **Skill dispatch:** `.agents/skills/agent-detector/references/skill-domain-routing.md`.
+**Agent routing:** the agent-routing conventions (canonical agent table) and `.codex/agents/orchestrator.md` (orchestrator agent definition). **Skill dispatch:** `.agents/skills/mk-agent-detector/references/skill-domain-routing.md`.
 
 **MANDATORY:** Always show agent banner at start of EVERY response.

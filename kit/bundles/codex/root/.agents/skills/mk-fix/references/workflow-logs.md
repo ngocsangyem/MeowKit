@@ -16,7 +16,7 @@ For issues discovered through log analysis (server logs, application logs, error
 
 ### Step 3: Trace to Root Cause
 - Follow stack traces to source files
-- Use `mk:investigate` for systematic debugging
+- Use `mk-investigate` for systematic debugging
 - Check for: race conditions, resource exhaustion, external service failures
 
 ### Step 4: Fix

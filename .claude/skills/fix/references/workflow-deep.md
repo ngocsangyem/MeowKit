@@ -2,6 +2,22 @@
 
 Full pipeline with research, brainstorming, and planning for complex issues.
 
+## Contents
+
+- [Steps](#steps)
+- [Step 1: Scout, Debug & Parallel Investigation](#step-1-scout-debug--parallel-investigation)
+- [Step 2: Research (parallel with Step 1)](#step-2-research-parallel-with-step-1)
+- [Step 3: Brainstorm](#step-3-brainstorm)
+- [Step 4: Plan](#step-4-plan)
+- [Step 5: Implement](#step-5-implement)
+- [Step 6: Test](#step-6-test)
+- [Step 7: Review](#step-7-review)
+- [Step 8: Finalize](#step-8-finalize)
+- [Advice Checkpoints (`--advice` only)](#advice-checkpoints---advice-only)
+- [Checkpoints](#checkpoints)
+- [Call](#call)
+- [After the call](#after-the-call)
+
 ## Steps
 
 ### Step 1: Scout, Debug & Parallel Investigation

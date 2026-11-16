@@ -142,7 +142,7 @@ Then: `agent-browser tab <matching-index>`
 
 ### Step 7 — Proceed with automation
 
-Use `mk:agent-browser` commands normally. The profiled Chrome provides existing cookies,
+Use `mk-agent-browser` commands normally. The profiled Chrome provides existing cookies,
 extensions, and logged-in sessions.
 
 ```bash

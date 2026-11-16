@@ -2,6 +2,16 @@
 
 Strategic guidance for managing complex issue relationships in JIRA.
 
+## Contents
+
+- [Blocker Chain Analysis](#blocker-chain-analysis)
+- [Managing Circular Dependencies](#managing-circular-dependencies)
+- [Cross-Project Linking](#cross-project-linking)
+- [Issue Cloning Strategies](#issue-cloning-strategies)
+- [Dependency Visualization](#dependency-visualization)
+- [Link Hygiene](#link-hygiene)
+- [JQL for Dependency Tracking](#jql-for-dependency-tracking)
+
 ---
 
 ## Blocker Chain Analysis

@@ -14,8 +14,7 @@ Rules for choosing what to expose and how to shape it when wrapping code for CLI
 - [Output shape (JSON)](#output-shape-json)
 - [Gotchas](#gotchas)
 
-
-Load this reference during Phase 3 (Agentize Map) of `mk:henshin`.
+Load this reference during Phase 3 (Agentize Map) of `mk-henshin`.
 
 ## Select capabilities
 

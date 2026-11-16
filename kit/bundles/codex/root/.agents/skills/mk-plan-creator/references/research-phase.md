@@ -3,7 +3,7 @@
 When to research: unfamiliar tech, multiple approaches possible, architectural decisions.
 
 ## Process
-1. **Scout first** — spawn `mk:scout` to map relevant directories
+1. **Scout first** — spawn `mk-scout` to map relevant directories
 2. **Research in parallel** — spawn 1-2 researcher sub-task on specific topics
 3. **Save reports** — each report goes to `tasks/plans/YYMMDD-name/reports/`
 

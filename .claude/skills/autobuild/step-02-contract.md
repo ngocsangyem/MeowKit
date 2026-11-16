@@ -38,7 +38,7 @@ Set `contract_path=null` and proceed to step-03.
 When density is `FULL` or `LEAN` with sufficient ACs:
 
 ```
-Task(
+Agent(
   subagent_type="developer",
   description="Propose sprint 1 contract for $slug",
   prompt="
@@ -61,7 +61,7 @@ Task(
 Then dispatch the evaluator for review:
 
 ```
-Task(
+Agent(
   subagent_type="evaluator",
   description="Review proposed contract for $slug",
   prompt="

@@ -7,7 +7,7 @@ description: "Simplifies new code without changing behavior; use when the build 
 
 Runs after implementation, before review. Reduces complexity while preserving behavior.
 
-> For ad-hoc quality review outside the current implementation diff, use `mk:clean-code`. `mk:simplify` is behavior-preserving and scoped to the current diff only.
+> For ad-hoc quality review outside the current implementation diff, use `mk-clean-code`. `mk-simplify` is behavior-preserving and scoped to the current diff only.
 
 ## Iron Rule
 
@@ -54,7 +54,7 @@ Runs after implementation, before review. Reduces complexity while preserving be
 ## Pipeline Position
 
 ```
-Phase 2 (Test — RED if `--tdd`) → Phase 3 (Build) → [mk:simplify] → Phase 4 (Review)
+Phase 2 (Test — RED if `--tdd`) → Phase 3 (Build) → [mk-simplify] → Phase 4 (Review)
 ```
 
 Simplification happens AFTER tests pass but BEFORE review. Reviewer sees the simplified code.

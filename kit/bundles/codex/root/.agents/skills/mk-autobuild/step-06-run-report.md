@@ -9,7 +9,7 @@ Finalize the audit trail at `tasks/autobuild-runs/{run_id}/run.md`. Print a user
 Before finalizing the run report, delegate to `project-manager` (background):
 
 ```
-Delegate to the project-manager agent:
+Unless MEOWKIT_PM_AUTO=off, delegate to the project-manager agent:
 "Generate delivery status for plan at $plan_dir. Write report to
 $plan_dir/status-reports/$(date +%y%m%d)-status.md.
 Load template from .agents/skills/mk-autobuild/assets/pm-status-template.md.

@@ -11,7 +11,7 @@ Documentation workflow that ensures every documentation file in the project is a
 ## Modes
 
 - **Standalone invocation** (`the document-release skill`): full doc sync + optional VERSION bump. Use before merging a PR or to reconcile docs with the prepared change.
-- **Called from `mk:ship release`**: doc sync only; VERSION bump remains an explicit `publish` action.
+- **Called from `mk-ship release`**: doc sync only; VERSION bump remains an explicit `publish` action.
 
 ## Skill wiring
 
@@ -21,7 +21,7 @@ Documentation workflow that ensures every documentation file in the project is a
 
 Doc updates follow shipped code — planning is implicit:
 1. Read the diff/changelog to understand what shipped
-2. If doc restructure (new sections, architecture changes) → invoke `mk:plan-creator`
+2. If doc restructure (new sections, architecture changes) → invoke `mk-plan-creator`
 
 Skip: Post-ship doc sync (default mode) — scope is defined by the diff.
 
@@ -66,7 +66,7 @@ Skip: Post-ship doc sync (default mode) — scope is defined by the diff.
 - `references/step8-version-bump.md` — VERSION bump decision flow
 - `references/step9-commit-and-output.md` — Commit, push, PR update, and health summary
 - `references/important-rules.md` — Core rules: read before edit, never clobber, be explicit
-- `references/general-documentation.md` — General documentation patterns and guidelines (migrated from mk:documentation)
+- `references/general-documentation.md` — General documentation patterns and guidelines (migrated from mk-documentation)
 
 ## Gotchas
 

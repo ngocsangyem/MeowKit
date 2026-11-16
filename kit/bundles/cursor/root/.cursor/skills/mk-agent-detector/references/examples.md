@@ -40,7 +40,7 @@ Detection Result:
   Agent: developer (PRIMARY, 95 pts)
   Tier: STANDARD
   Complexity: Standard
-  Skill: mk:fix
+  Skill: mk-fix
   Secondary: tester (35)
 ```
 

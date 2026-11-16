@@ -3,6 +3,13 @@
 Load this file only when the run was invoked with `--advice`. Without the flag there
 are zero supervision calls, no dossier, no receipt, and behavior is unchanged.
 
+## Contents
+
+- [Checkpoints](#checkpoints)
+- [What supervision does NOT touch here](#what-supervision-does-not-touch-here)
+- [Call](#call)
+- [After the call](#after-the-call)
+
 The contract this implements is
 `.claude/skills/advise/references/advice-supervision-rules.md`. Where the two disagree, the
 contract wins.

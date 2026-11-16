@@ -4,12 +4,21 @@ External-artifact adapter for plan-creator. Consolidates 2+ pre-existing upstrea
 artifacts into ONE packet before planning starts, so the draft step reads one
 traceable brief instead of N scattered reports.
 
+## Contents
+
+- [Purpose](#purpose)
+- [Activation](#activation)
+- [Schema](#schema)
+- [Quality Rules](#quality-rules)
+- [Output Location](#output-location)
+- [Not This Skill's Job](#not-this-skills-job)
+
 ## Purpose
 
 When a user invokes plan-creator, upstream analysis often already exists:
-`mk:office-hours` design docs, `mk:brainstorming` reports, `mk:planning-engine`
-assessments, `mk:confluence-spec-analyst` spec reports, `mk:intake` triage output,
-`mk:jira-analyst` findings, scout summaries, or spec documents the user supplies
+`mk-office-hours` design docs, `mk-brainstorming` reports, `mk-planning-engine`
+assessments, `mk-confluence-spec-analyst` spec reports, `mk-intake` triage output,
+`mk-jira-analyst` findings, scout summaries, or spec documents the user supplies
 directly. Without a packet, that context arrives as a raw list of file paths and
 the planner re-derives (or silently drops) what those artifacts already settled.
 
@@ -17,7 +26,7 @@ The packet is an ADAPTER for artifacts that exist BEFORE plan-creator runs. It i
 explicitly NOT for artifacts plan-creator generates itself — step-01 research
 reports and step-02 scout output are consumed directly by step-03, never routed
 through the packet. One pre-existing ticket with no other sources is single-ticket
-triage — that is `mk:intake`'s job, not this packet's.
+triage — that is `mk-intake`'s job, not this packet's.
 
 ## Activation
 
@@ -42,8 +51,8 @@ Six blocks, in this order. Target the whole packet at UNDER 120 lines.
 - Non-goals: {explicit exclusions found in sources}
 
 ## Routing
-- Recommended mode: {fast | hard | deep | parallel | two} (via mk:scale-routing)
-- Conflict: {if plan-creator's own heuristic disagrees with mk:scale-routing,
+- Recommended mode: {fast | hard | deep | parallel | two} (via mk-scale-routing)
+- Conflict: {if plan-creator's own heuristic disagrees with mk-scale-routing,
   record BOTH signals here — do not silently pick one}
 
 ## Requirements
@@ -80,9 +89,9 @@ Six blocks, in this order. Target the whole packet at UNDER 120 lines.
   - NO detailed implementation plan or step-by-step code instructions.
   - NO phase files — phase decomposition is step-03's job.
   - NO validation changes — the structural check does not know about packets.
-  - NO brainstorming — if the approach is unsettled, route to `mk:brainstorming`
+  - NO brainstorming — if the approach is unsettled, route to `mk-brainstorming`
     BEFORE planning; the packet only records what sources already settled.
-  - NO ticket complexity scoring — that is `mk:intake` / `mk:planning-engine`.
+  - NO ticket complexity scoring — that is `mk-intake` / `mk-planning-engine`.
 - Read large sources with `offset`/`limit` (files > 500 lines) per Tool Output
   Limits; summarize into the packet, never paste raw content.
 
@@ -96,9 +105,9 @@ Six blocks, in this order. Target the whole packet at UNDER 120 lines.
 
 | Task | Owner |
 |------|-------|
-| Single ticket/PRD triage, completeness scoring, RCA | `mk:intake` |
-| Ticket complexity + dependency mapping against the codebase | `mk:planning-engine` |
-| Exploring solution approaches, trade-off analysis | `mk:brainstorming` |
+| Single ticket/PRD triage, completeness scoring, RCA | `mk-intake` |
+| Ticket complexity + dependency mapping against the codebase | `mk-planning-engine` |
+| Exploring solution approaches, trade-off analysis | `mk-brainstorming` |
 | Plan structural validation | `mewkit plan check --structural` |
 
 If a request fits one of these rows, the packet does not absorb it — hand off.

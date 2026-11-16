@@ -2,6 +2,17 @@
 
 This document describes the format requirements for common JIRA fields when creating or updating issues.
 
+## Contents
+
+- [Quick Index](#quick-index)
+- [Atlassian Document Format (ADF)](#atlassian-document-format-adf)
+- [Standard Field Formats](#standard-field-formats)
+- [Custom Fields](#custom-fields)
+- [Finding Custom Field IDs](#finding-custom-field-ids)
+- [Validation Rules](#validation-rules)
+- [Markdown to ADF Conversion (handled by jira-as)](#markdown-to-adf-conversion-handled-by-jira-as)
+- [References](#references)
+
 ---
 
 ## Quick Index

@@ -47,4 +47,4 @@ Full list: `references/gotchas.md`
 
 ## Workflow Integration
 
-Auto-activates during Phase 3 (Build) when Angular project detected (angular.json or @angular/core in package.json). Loaded by `developer` agent alongside `mk:typescript`.
+Auto-activates during Phase 3 (Build) when Angular project detected (angular.json or @angular/core in package.json). Loaded by `developer` agent alongside `mk-typescript`.

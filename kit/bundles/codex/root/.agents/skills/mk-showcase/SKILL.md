@@ -3,7 +3,7 @@ name: "mk-showcase"
 description: "Builds a standalone HTML showcase page from a mission and given paths."
 ---
 
-# mk:showcase
+# mk-showcase
 
 Produces a self-contained, visually polished HTML page from a user-supplied mission
 and optional artifact paths. Content is written locally to `assets/showcase/<mission>/`.
@@ -31,7 +31,7 @@ Follow these steps strictly in order:
 2. **Load persisted preferences** (optional) — read user preferences from
    `${PLUGIN_DATA}/showcase/preferences.json`:
    ```bash
-   node .agents/skills/showcase/scripts/preferences.js get
+   node .agents/skills/mk-showcase/scripts/preferences.js get
    ```
    CLI flags override stored preferences for the current run.
 
@@ -43,7 +43,7 @@ Follow these steps strictly in order:
 4. **Write content** — produce `assets/showcase/<mission-slug>/content.md` with all
    content organized by section. Attach citation URLs as reference footnotes.
 
-5. **Generate HTML** — activate `mk:frontend-design` to create a self-contained HTML
+5. **Generate HTML** — activate `mk-frontend-design` to create a self-contained HTML
    file at `assets/showcase/<mission-slug>/index.html`:
    - Hero section: eye-catching, scroll-enticing design
    - Sections scroll smoothly top-to-bottom; each fits within the viewport
@@ -56,14 +56,14 @@ Follow these steps strictly in order:
 
 6. **Screenshots** (`--no-screenshots` skips this step entirely):
    ```bash
-   node .agents/skills/showcase/scripts/capture-sections.js \
+   node .agents/skills/mk-showcase/scripts/capture-sections.js \
      --url "file:///path/to/index.html" \
      --output-dir "assets/showcase/<mission-slug>/images" \
      --sections "#hero,#section-2,#section-3" \
      --ratios "horizontal,vertical,square" \
      --settle-delay 1500
    ```
-   Puppeteer must be installed (`npm install` in `.agents/skills/showcase/scripts/`).
+   Puppeteer must be installed (`npm install` in `.agents/skills/mk-showcase/scripts/`).
    If capture fails (Puppeteer absent, Chrome unavailable), report the error and the
    local HTML path — do NOT silently skip or mark the task complete.
 
@@ -95,16 +95,16 @@ assets/showcase/<mission-slug>/
 
 ```bash
 # Print resolved preferences
-node .agents/skills/showcase/scripts/preferences.js get
+node .agents/skills/mk-showcase/scripts/preferences.js get
 
 # Persist opt-outs
-node .agents/skills/showcase/scripts/preferences.js set --no-screenshots --no-publish
+node .agents/skills/mk-showcase/scripts/preferences.js set --no-screenshots --no-publish
 
 # Single-language mode
-node .agents/skills/showcase/scripts/preferences.js set --languages en
+node .agents/skills/mk-showcase/scripts/preferences.js set --languages en
 
 # Reset to defaults
-node .agents/skills/showcase/scripts/preferences.js reset
+node .agents/skills/mk-showcase/scripts/preferences.js reset
 ```
 
 State is written to `${PLUGIN_DATA}/showcase/preferences.json` (stable across
@@ -113,7 +113,7 @@ plugin upgrades). Override path for tests: `MK_SHOWCASE_PREFS_PATH` env var.
 ## Capture Script Options
 
 ```bash
-node .agents/skills/showcase/scripts/capture-sections.js \
+node .agents/skills/mk-showcase/scripts/capture-sections.js \
   --url         "file:///absolute/path/to/index.html"  # required
   --output-dir  "./images"                               # required
   --sections    "#hero,#about,#features"                # required; CSS selectors
@@ -128,7 +128,7 @@ node .agents/skills/showcase/scripts/capture-sections.js \
 
 **Install Puppeteer** (required for screenshots):
 ```bash
-cd .agents/skills/showcase/scripts && npm install
+cd .agents/skills/mk-showcase/scripts && npm install
 ```
 
 ## Security

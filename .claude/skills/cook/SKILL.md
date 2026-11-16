@@ -236,7 +236,7 @@ Concrete subagent name and HTTP tool depend on installed skill set; cook treats 
 
 During iterative build-test-fix cycles, follow `references/loop-safety-protocol.md` for checkpoint tracking, stall detection, and escalation triggers.
 
-See `references/subagent-patterns.md` for Task() invocation patterns.
+See `references/subagent-patterns.md` for Agent() invocation patterns.
 See `references/workflow-steps.md` for detailed per-phase instructions.
 See `references/review-cycle.md` for review gate logic.
 
@@ -291,6 +291,5 @@ Operational gotchas live here; pre-build failure modes and rationalizations live
 - **Code mode on stale plans**: Running old plan against changed codebase. Warn if plan.md is >14 days old
 - **Fast mode shallow test coverage**: Skipping research means tests capture plan-level intent, not edge cases. Document: "fast mode = TDD-flavored, coverage may be lower"
 - **Missing model tier declaration**: Expensive models on trivial tasks, cheap models on security-critical work. Always declare tier in Phase 0
-- **Subagent patterns using Agent() not Task()**: Task() enables tracking, blocking, and progress. Always use Task() for phases 2-6
 - **--strict cost surprise**: `--strict` spawns the full evaluator (`mk:evaluate`) — a [HEAVY] pass. Auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress, or `--verify` for the [LIGHT] check
 - **--strict vs --verify confusion**: `--verify` = light browser check (advisory). `--strict` = full evaluator with rubrics (FAIL blocks ship). `--strict` supersedes `--verify`

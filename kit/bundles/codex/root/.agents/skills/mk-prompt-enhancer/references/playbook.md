@@ -1,6 +1,6 @@
 # Improvement Playbook
 
-> Loaded by `mk:prompt-enhancer` during Step 3 (Improvement Mapping). One row per
+> Loaded by `mk-prompt-enhancer` during Step 3 (Improvement Mapping). One row per
 > detection item from `decomposition-checklist.md`. Every fix cites a source doc.
 >
 > **Framework:** universal kernel only — the authoritative rule lives in

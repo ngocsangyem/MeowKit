@@ -20,7 +20,7 @@ No gate — proceed automatically to Step 2.
 ## Step 2: Tech Stack
 
 1. Run `scripts/detect-stack.sh`
-2. If new project: use mk:brainstorming to evaluate options (quick mode)
+2. If new project: use mk-brainstorming to evaluate options (quick mode)
 3. Auto-select best option from research findings
 4. No gate — proceed automatically to Step 3.
 
@@ -40,13 +40,13 @@ If no frontend: skip to Step 4.
 **Pre-condition:** Research reports from Step 1 and design guidelines from Step 3 already exist.
 Plan-creator will detect these and skip its own discovery step (DRY — no duplicate research).
 
-**ACTION REQUIRED:** Activate mk:plan-creator skill NOW:
+**ACTION REQUIRED:** Activate mk-plan-creator skill NOW:
 
 ```
 the plan-creator skill [requirements summary] --auto
 ```
 
-mk:plan-creator will:
+mk-plan-creator will:
 - Detect existing research reports in `reports/` → skip discovery
 - Read `docs/design-guidelines.md` if exists → incorporate design decisions
 - Select workflow model (feature/bugfix/refactor/security)
@@ -72,8 +72,8 @@ Follow the plan's architecture + `references/scaffolding-principles.md`:
 
 **ACTION REQUIRED:** Load `references/shared-phases.md` and execute ALL phases:
 
-1. **Phase A:** Activate mk:cook skill: `the cook skill [plan-path] --auto`
-2. **Phase B:** Activate mk:docs-init for documentation
+1. **Phase A:** Activate mk-cook skill: `the cook skill [plan-path] --auto`
+2. **Phase B:** Activate mk-docs-init for documentation
 3. **Phase C:** Print final report and ask about commit
 
 **The bootstrap is NOT complete until all shared phases finish.**

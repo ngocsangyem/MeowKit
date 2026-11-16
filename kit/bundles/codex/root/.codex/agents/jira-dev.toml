@@ -1,5 +1,5 @@
 name = "jira-dev"
-description = "Generate developer artifacts from JIRA tickets via the jira-as CLI wrapper: branch names, PR descriptions, parsed commits, commit/PR-to-issue links. Routed by mk:jira-dev skill. NOT for executing git/gh commands (mk:ship); NOT for issue CRUD (jira-issue)."
+description = "Generate developer artifacts from JIRA tickets via the jira-as CLI wrapper: branch names, PR descriptions, parsed commits, commit/PR-to-issue links. Routed by mk-jira-dev skill. NOT for executing git/gh commands (mk-ship); NOT for issue CRUD (jira-issue)."
 model = "gpt-6.1-sol"
 model_reasoning_effort = "low"
 developer_instructions = """
@@ -18,7 +18,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 ## Pre-flight
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh <args>
 ```
 
 
@@ -40,9 +40,9 @@ Default jira-as output is `<type>/<KEY>-<kebab-summary>` (e.g. `feat/PROJ-123-ad
 
 Pipe into `gh pr create --title "$(jira-as ... | jq -r .title)" --body "$(jira-as ... | jq -r .body)"` for a one-shot flow.
 
-## Handoff — `mk:ship`
+## Handoff — `mk-ship`
 
-`mk:ship` may invoke `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh dev branch-name <KEY>` during its branch-creation step (documentation only — no automatic wiring exists today). If `mk:ship` is invoked with a Jira key context, it will surface the suggested branch name; the user accepts or overrides.
+`mk-ship` may invoke `bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh dev branch-name <KEY>` during its branch-creation step (documentation only — no automatic wiring exists today). If `mk-ship` is invoked with a Jira key context, it will surface the suggested branch name; the user accepts or overrides.
 
 ## Memory
 

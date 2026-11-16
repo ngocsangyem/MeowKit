@@ -36,10 +36,10 @@ Each action uses the best browser skill:
 
 | Action | Skill | Why |
 |--------|-------|-----|
-| DOM interaction (click, fill, type) | `mk:playwright-cli` | Generates Playwright code as side-effect |
-| Navigation + page load | `mk:playwright-cli` | goto + wait, code output |
-| Visual verification (screenshot) | `mk:agent-browser` | Annotated snapshots |
-| Auth flow (login, session, MFA) | `mk:agent-browser` | Session persistence, auth import |
+| DOM interaction (click, fill, type) | `mk-playwright-cli` | Generates Playwright code as side-effect |
+| Navigation + page load | `mk-playwright-cli` | goto + wait, code output |
+| Visual verification (screenshot) | `mk-agent-browser` | Annotated snapshots |
+| Auth flow (login, session, MFA) | `mk-agent-browser` | Session persistence, auth import |
 | Execute Playwright test | Script: `npx playwright test` | Deterministic |
 
 ## Authentication Protocol
@@ -50,14 +50,14 @@ Each action uses the best browser skill:
 2. **Show user:**
    ```
    ⚠️ Authentication required at: [current URL]
-   mk:qa-manual needs credentials to continue.
+   mk-qa-manual needs credentials to continue.
    Please provide:
    - Username/email: ___________
    - Password: ___________
    Type 'skip' to skip this flow or 'abort' to stop testing.
    ```
 3. **WAIT** for user input — do NOT proceed without it
-4. On credentials → fill form using `mk:playwright-cli`, continue flow
+4. On credentials → fill form using `mk-playwright-cli`, continue flow
 5. On 'skip' → mark flow SKIPPED, move to next
 6. On 'abort' → end session, output partial report
 

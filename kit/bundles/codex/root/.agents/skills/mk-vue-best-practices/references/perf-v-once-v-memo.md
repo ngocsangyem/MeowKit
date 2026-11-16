@@ -1,6 +1,6 @@
 # v-once and v-memo — Deep Guidance
 
-> The basics (what these directives do, syntax) are covered in `mk:vue` →
+> The basics (what these directives do, syntax) are covered in `mk-vue` →
 > `references/reactivity-performance.md`. This file adds the caveats, edge cases,
 > and patterns that matter in production.
 

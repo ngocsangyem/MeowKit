@@ -1,6 +1,6 @@
 # Task-Type Recipes
 
-> Loaded by `mk:prompt-enhancer` at Step 3 (Map) when the complexity classifier
+> Loaded by `mk-prompt-enhancer` at Step 3 (Map) when the complexity classifier
 > (`references/complexity-classifier.md`) matches a non-trivial type. Each recipe
 > reshapes the EMPHASIS of the universal kernel sections — it never adds a role,
 > never changes the kernel, and never performs the task the rewritten prompt asks
@@ -55,10 +55,10 @@ suggests, the user overrides.
 Every recipe reshapes a prompt that ASKS the downstream agent to do the work. The
 enhancer itself must NEVER:
 
-- emit a review finding, severity, or recommendation (that is `mk:review`);
-- perform research, retrieval, or fetch a source (that is the downstream agent / `mk:scout`);
+- emit a review finding, severity, or recommendation (that is `mk-review`);
+- perform research, retrieval, or fetch a source (that is the downstream agent / `mk-scout`);
 - assert a root cause for a bug (keep it a hypothesis to investigate);
-- produce a plan's phases as if executing them (that is `mk:plan-creator`);
+- produce a plan's phases as if executing them (that is `mk-plan-creator`);
 - write the design / code / copy the prompt requests.
 
 Guarded by recipe canaries (architecture-review + research role-boundary, and the

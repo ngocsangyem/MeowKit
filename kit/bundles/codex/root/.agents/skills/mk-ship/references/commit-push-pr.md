@@ -63,7 +63,7 @@ EOF
 
 **IRON LAW: NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE.**
 
-Before pushing, re-verify if code changed during Steps 4-6:
+Before pushing, run the checks again if code changed during Steps 4-6:
 
 1. **Test verification:** If ANY code changed after Step 3's test run (fixes from review findings, CHANGELOG edits don't count), re-run the test suite. Paste fresh output. Stale output from Step 3 is NOT acceptable.
 

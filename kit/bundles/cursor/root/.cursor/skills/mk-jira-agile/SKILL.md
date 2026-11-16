@@ -3,7 +3,7 @@ name: "mk-jira-agile"
 description: "Jira epics, sprints, backlog, ranking, points; use to move items between sprints."
 ---
 
-# mk:jira-agile
+# mk-jira-agile
 
 Forks to the `jira-agile` agent. Sprint operations require a numeric `--board-id`, not the project key. The agent resolves project name → board ID via `agile board list --name "..."` first.
 
@@ -40,7 +40,7 @@ If sprint-state contract is absent OR `status: closed` → skip the amendment ce
 ### `sprint close`
 
 1. Read `committed_tickets:` from newest active sprint-state
-2. Query each via `mk:jira-issue get KEY`
+2. Query each via `mk-jira-issue get KEY`
 3. For each non-terminal ticket (not Done/Cancelled/Won't-Do), `stop and ask the user in chat`: "PROJ-X is in {status}. Carry over to next sprint? Drop? Mark as not delivered?"
 4. Write closure summary: `status: closed`, `closed_at: <ts>`, `delivered: [...]`, `carried_over: [...]`
 5. Proceed with the underlying `jira-as agile sprint close` call
@@ -49,10 +49,10 @@ If sprint-state contract is absent OR `status: closed` → skip the amendment ce
 
 Two file classes share `tasks/contracts/`. Per-story sprint-CONTRACT files carry
 `contract_schema_version` and `### [AC-N]` entries and follow
-`mk:sprint-contract/assets/contract-template.md`. Sprint-STATE files at
+`mk-sprint-contract/assets/contract-template.md`. Sprint-STATE files at
 `sprint-state-{date}-sprint-{N}.md` follow `assets/sprint-state-template.md` instead and
 have none of those fields by design. Neither class has a validator: YAML is parsed inline
-by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`.
+by this skill, `mk-agent-detector`, and `mk-sprint-contract sprint-goal`.
 
 ### Wildcard-pattern collision safety verified
 
@@ -67,7 +67,7 @@ prefix and `-sprint-`. Reading either class by an explicit path is unambiguous.
 - Domain refs:
   - `references/sprint-operations.md` — board/sprint/velocity wrapper patterns
   - `references/agile-field-reference.md` — agile-specific field IDs (Sprint, Epic Link, Story Points)
-- Peer leaves: `mk:jira-fields` (`../jira-fields/references/agile-field-ids.md` is the canonical instance-discovery source), `mk:jira-time` (capacity = velocity ÷ team time), `mk:jira-relationships` (epic-children outside epic-link via issue links)
+- Peer leaves: `mk-jira-fields` (`../jira-fields/references/agile-field-ids.md` is the canonical instance-discovery source), `mk-jira-time` (capacity = velocity ÷ team time), `mk-jira-relationships` (epic-children outside epic-link via issue links)
 
 ## Gotchas
 

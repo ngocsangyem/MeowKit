@@ -15,11 +15,11 @@ source <(.codex/scripts/bin/workflow-diff-scope <base> 2>/dev/null)
 2. **Load design rubrics from the rubric library** (NOT the deleted `design-checklist.md`). The legacy `design-checklist.md` was removed in a prior cleanup; the design judgment surface now lives in `.codex/rubrics/design-quality.md` and `.codex/rubrics/originality.md`. Load both via:
 
    ```bash
-   .agents/skills/rubric/scripts/load-rubric.sh design-quality
-   .agents/skills/rubric/scripts/load-rubric.sh originality
+   .agents/skills/mk-rubric/scripts/load-rubric.sh design-quality
+   .agents/skills/mk-rubric/scripts/load-rubric.sh originality
    ```
 
-   **If the rubric library is not yet installed** (i.e., `.codex/rubrics/` does not exist), DO NOT silently skip — emit an explicit warning to the review verdict: `"WARN: design rubrics unavailable, design review degraded to mechanical-only. Install mk:rubric library."` and continue with mechanical CSS checks only. The previous silent-skip behavior masked a real evaluation gap (design review was disabled entirely without notice).
+   **If the rubric library is not yet installed** (i.e., `.codex/rubrics/` does not exist), DO NOT silently skip — emit an explicit warning to the review verdict: `"WARN: design rubrics unavailable, design review degraded to mechanical-only. Install mk-rubric library."` and continue with mechanical CSS checks only. The previous silent-skip behavior masked a real evaluation gap (design review was disabled entirely without notice).
 
 3. **Read each changed frontend file** (full file, not just diff hunks). Frontend files are identified by `.tsx`, `.jsx`, `.vue`, `.svelte`, `.css`, `.scss` extensions plus any path containing `components/`, `pages/`, `app/`, `views/`.
 

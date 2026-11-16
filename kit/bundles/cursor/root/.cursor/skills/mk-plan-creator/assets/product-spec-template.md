@@ -81,7 +81,7 @@ Each feature MUST have:
 <!-- Continue numbering 3, 4, 5... up to 20. -->
 
 ## Design Language
-<!-- Populated by mk:frontend-design and mk:ui-design-system sub-task calls (if frontend detected). -->
+<!-- Populated by mk-frontend-design and mk-ui-design-system sub-task calls (if frontend detected). -->
 
 **Tone:** [e.g., playful+minimal, brutalist-editorial, warm-clinical]
 **Palette direction:** [e.g., warm neutrals + one accent, monochrome + neon, earth tones]

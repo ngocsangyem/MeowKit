@@ -1,6 +1,6 @@
 # Hypothesis-Driven Investigation
 
-> Part of mk:sequential-thinking. Use during debugging and root cause analysis.
+> Part of mk-sequential-thinking. Use during debugging and root cause analysis.
 > Source: open-source upstream (MIT)
 
 ## Output Template

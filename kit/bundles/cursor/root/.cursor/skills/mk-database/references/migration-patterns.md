@@ -4,7 +4,7 @@ Changing a table that already holds data, and getting back when it goes wrong. C
 engine and the migration tool first — `SKILL.md` step 1.
 
 Nothing here is executed against a live database. Prepare the migration and hand execution to
-`mk:ship` or a human.
+`mk-ship` or a human.
 
 ## Contents
 
@@ -73,7 +73,7 @@ Do not write one just to satisfy a template: state that recovery is forward-only
 the corrective change would be.
 
 Where the data itself must survive a mistake, the backup or point-in-time-recovery capability
-is `mk:devops`'s to confirm — name the dependency rather than assuming it exists.
+is `mk-devops`'s to confirm — name the dependency rather than assuming it exists.
 
 ## Locking and runtime
 
@@ -125,4 +125,4 @@ asserting a change is online.
 | Unbounded update or delete | Whole-table modification, long lock | Bound it, batch it, or state that the whole table is the intent |
 | Schema and data change in one file | The lock and the backfill share a window | Separate files |
 | Cascading delete introduced or triggered | Silent bulk removal of child rows | Audit the graph before, treat as a data-loss review |
-| Running any of these against a live database | Unrecoverable in the wrong environment | Not done here — hand to `mk:ship` or a human |
+| Running any of these against a live database | Unrecoverable in the wrong environment | Not done here — hand to `mk-ship` or a human |

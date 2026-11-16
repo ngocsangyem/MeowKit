@@ -1,7 +1,7 @@
 # Stitch MCP Server Setup
 
 Optional: connect Stitch as an MCP server for native design context in Codex.
-The `mk:stitch` skill works without MCP (via the `npx tsx` scripts). MCP is opt-in.
+The `mk-stitch` skill works without MCP (via the `npx tsx` scripts). MCP is opt-in.
 
 Three options for connecting.
 

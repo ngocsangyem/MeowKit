@@ -27,7 +27,7 @@ Subtotal: {N}pt
 2. {ticket} — blocked by #1
 ...
 
-## Spec Context (mk:confluence-spec-analyst) — only if --spec was provided
+## Spec Context (mk-confluence-spec-analyst) — only if --spec was provided
 **Source:** {spec-report-path}
 **Page:** {page-title} ({page-id}) in {space-key}
 

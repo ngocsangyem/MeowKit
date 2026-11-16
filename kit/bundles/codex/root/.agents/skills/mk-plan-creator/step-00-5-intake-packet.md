@@ -30,7 +30,7 @@ Read `references/plan-intake-packet.md` and fill its 6-block schema:
 1. Read each artifact (respect Tool Output Limits: `offset`/`limit` for files
    > 500 lines); summarize into the packet, never paste raw content.
 2. Every load-bearing claim gets `from: <path>` or `[ASSUMPTION]`.
-3. For the Routing block, invoke `mk:scale-routing` on the task description. If
+3. For the Routing block, invoke `mk-scale-routing` on the task description. If
    its recommendation conflicts with the mode step-00 already selected, record
    BOTH signals in the packet's Routing block — do not change the mode here.
 4. Keep the packet under 120 lines.

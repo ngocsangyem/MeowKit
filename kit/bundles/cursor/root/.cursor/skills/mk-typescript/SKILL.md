@@ -20,7 +20,7 @@ Strict TypeScript patterns for type safety, null handling, and modern best pract
 
 **Explicit:** `the typescript skill [concern]`
 
-**Do NOT invoke for:** Vue-specific patterns (use mk:vue), visual design (use mk:frontend-design)
+**Do NOT invoke for:** Vue-specific patterns (use mk-vue), visual design (use mk-frontend-design)
 
 ## Workflow Integration
 

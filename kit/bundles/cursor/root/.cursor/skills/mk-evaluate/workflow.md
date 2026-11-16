@@ -1,4 +1,4 @@
-# mk:evaluate — Workflow
+# mk-evaluate — Workflow
 
 5-step workflow for behavioral active verification of a running build against rubric criteria.
 
@@ -12,7 +12,7 @@
 
 ## Steps
 
-1. `step-01-load-rubrics.md` — Compose rubric preset via `mk:rubric`, load skeptic persona, parse sprint contract if exists, build the criterion list (capped at 15)
+1. `step-01-load-rubrics.md` — Compose rubric preset via `mk-rubric`, load skeptic persona, parse sprint contract if exists, build the criterion list (capped at 15)
 2. `step-02-boot-app.md` — Start the build if a path was given; skip if already running at given URL; capture base URL + health check
 3. `step-03-probe-criteria.md` — For each criterion: pick the right probe technique, drive the build, capture evidence, write a finding line. Loop with re-anchored skeptic persona
 4. `step-04-grade-and-verdict.md` — Aggregate findings into per-rubric verdicts, compute weighted score, write verdict file, run `validate-verdict.sh`. Convert evidence-empty PASS → FAIL
@@ -41,7 +41,7 @@ target arg + preset arg
 Step 1: Load Rubrics
     ├── Detect target type (URL vs path vs binary)
     ├── Default preset by target type if not given
-    ├── mk:rubric compose <preset> → composed_rubrics
+    ├── mk-rubric compose <preset> → composed_rubrics
     ├── Read sprint contract if tasks/contracts/{slug}.md exists
     ├── Flatten criteria; cap at 15 (split if more)
     ├── Load skeptic-persona.md

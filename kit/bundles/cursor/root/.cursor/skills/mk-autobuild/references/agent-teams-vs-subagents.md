@@ -13,17 +13,16 @@ When the autobuild workflow should use file-based sub-task dispatches (default) 
 - [Defaults](#defaults)
 - [Risk Notes](#risk-notes)
 
-
 ## TL;DR
 
-**Default to sub-task (file-based, reproducible).** Agent Teams are an opt-in mode that runs the generator and evaluator as parallel worktree-isolated agents coordinating through `mk:team-config`'s file-based task queue, instead of one sub-task dispatch per step. There is no live inter-agent messaging primitive in this bundle — coordination is always via files (ownership map, task-queue claim records, handoff/verdict files).
+**Default to sub-task (file-based, reproducible).** Agent Teams are an opt-in mode that runs the generator and evaluator as parallel worktree-isolated agents coordinating through `mk-team-config`'s file-based task queue, instead of one sub-task dispatch per step. There is no live inter-agent messaging primitive in this bundle — coordination is always via files (ownership map, task-queue claim records, handoff/verdict files).
 
 For 95% of autobuild runs, sub-task are correct. Teams are appropriate when: (a) iteration loops run > 5 rounds in practice, (b) the per-step sub-task spin-up overhead dominates the loop, (c) the user explicitly opts in via `--teams` flag.
 
 ## sub-task (Default)
 
 **How they work:**
-- Each phase spawns a fresh sub-task via `delegate a sub-task (subagent_type=...)`
+- Each phase spawns a fresh sub-task via `delegate a sub-task (agent=...)`
 - Inputs are file paths (plan, contract, handoff, verdict) — no shared in-memory state
 - Outputs are files (handoff.md, verdict.md, run.md) — committed to git
 - sub-task context is isolated; no live coupling between generator and evaluator
@@ -43,7 +42,7 @@ For 95% of autobuild runs, sub-task are correct. Teams are appropriate when: (a)
 ## Agent Teams (Opt-in)
 
 **How they work:**
-- Generator and evaluator run as long-lived agents in separate git worktrees, set up by `mk:team-config`
+- Generator and evaluator run as long-lived agents in separate git worktrees, set up by `mk-team-config`
 - Coordination is file-based: an ownership map (who owns which files) plus `.meowkit/state/task-queue.json` as the claiming protocol — there is no live inter-agent messaging primitive
 - Each agent claims its next task from the queue rather than waiting for a fresh sub-task dispatch per step
 - File ownership matrix prevents concurrent edits to the same files
@@ -81,7 +80,7 @@ To opt in to Agent Teams for a autobuild run:
 the autobuild skill "build a kanban app" --teams
 ```
 
-The autobuild workflow then uses `mk:team-config` to spin up a generator + evaluator team, hands off the contract via shared task queue, and runs the iteration loop with live message passing.
+The autobuild workflow then uses `mk-team-config` to spin up a generator + evaluator team, hands off the contract via shared task queue, and runs the iteration loop with live message passing.
 
 To force sub-task mode (override any default that might switch):
 
@@ -93,7 +92,7 @@ Both flags are logged in the run report.
 
 ## File Ownership Matrix (Teams Mode Only)
 
-When teams mode is active, file ownership is enforced via `mk:team-config`'s ownership matrix. The evaluator owns:
+When teams mode is active, file ownership is enforced via `mk-team-config`'s ownership matrix. The evaluator owns:
 
 - `tasks/reviews/*-evalverdict.md` (its verdicts)
 - `tasks/reviews/*-evalverdict-evidence/` (its evidence)
@@ -108,8 +107,8 @@ Both can READ the contract at `tasks/contracts/*.md`. Neither can WRITE to it wi
 
 ## Defaults
 
-- `mk:autobuild` defaults to **sub-task** unless `--teams` flag is set
-- `mk:cook` (single-task) always uses sub-task — teams are not relevant for single-task pipelines
+- `mk-autobuild` defaults to **sub-task** unless `--teams` flag is set
+- `mk-cook` (single-task) always uses sub-task — teams are not relevant for single-task pipelines
 - The autobuild run report records which mode was used in the "Density Decision" section alongside the density choice
 
 ## Risk Notes

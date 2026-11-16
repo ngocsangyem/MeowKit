@@ -51,7 +51,7 @@ This respects the max-3-agent rule (Phase A is already done; Phase B runs 2 at a
 For each selected persona:
 1. Load persona prompt from `prompts/personas/{persona-name}.md`
 2. Load skeptic anchor from `prompts/skeptic-anchor.md`
-3. Spawn a sub-task with this context:
+3. Once both are loaded, spawn a sub-task with this context:
 
 ```
 # Adversarial Review: {Persona Name}
@@ -116,7 +116,7 @@ When reviewing plans (not code diffs), personas receive plan files instead of di
 - Replace `diff_content` with plan file contents (plan.md + relevant phase files)
 - Replace `base_findings_summary` with Phase A plan review findings
 - Same persona selection rules apply
-- Use `mk:party` as execution vehicle for plan-level adversarial review
+- Use `mk-party` as execution vehicle for plan-level adversarial review
 
 ## Next
 

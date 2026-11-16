@@ -1,6 +1,6 @@
 # Expected Plan Assertions — responsive-grid
 
-What a plan built by `mk:plan-creator` from this fixture's packet MUST contain. Binary
+What a plan built by `mk-plan-creator` from this fixture's packet MUST contain. Binary
 checks. Built FROM the packet path — no Figma MCP call.
 
 ## Assertions

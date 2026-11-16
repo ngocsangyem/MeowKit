@@ -3,7 +3,7 @@ name: "mk-jira-collaborate"
 description: "Jira comments, attachments, watchers; use to comment on an issue."
 ---
 
-# mk:jira-collaborate
+# mk-jira-collaborate
 
 Forks to the `jira-collaborate` agent. The agent confirms internal-vs-public for any comment that could be customer-facing (default `internal` if uncertain).
 
@@ -28,7 +28,7 @@ Forks to the `jira-collaborate` agent. The agent confirms internal-vs-public for
 - Domain refs:
   - `references/comment-templates.md` — copy-paste comment templates (progress, blocker, handoff, evidence)
   - `references/comment-formats.md` — text / markdown / ADF format reference
-- Peer leaves: `mk:jira-issue` (create-with-attachment), `mk:jira-jsm` (internal-vs-public on JSM tickets), `mk:jira-analyst` (post-analysis comment patterns)
+- Peer leaves: `mk-jira-issue` (create-with-attachment), `mk-jira-jsm` (internal-vs-public on JSM tickets), `mk-jira-analyst` (post-analysis comment patterns)
 
 ## Gotchas
 

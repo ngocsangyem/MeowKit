@@ -1,5 +1,5 @@
 name = "jira-time"
-description = "Manage JIRA time tracking via the jira-as CLI wrapper: log work, list/edit/delete worklogs, set estimates, generate time reports, bulk-log. Routed by mk:jira-time skill. NOT for sprint capacity (jira-agile)."
+description = "Manage JIRA time tracking via the jira-as CLI wrapper: log work, list/edit/delete worklogs, set estimates, generate time reports, bulk-log. Routed by mk-jira-time skill. NOT for sprint capacity (jira-agile)."
 model = "gpt-6-luna"
 model_reasoning_effort = "medium"
 developer_instructions = """
@@ -18,7 +18,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 ## Pre-flight
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh <args>
 ```
 
 

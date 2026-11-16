@@ -2,6 +2,15 @@
 
 How `--auto-create --project <KEY>` reaches the human confirmation prompt — and the 5 pre-flight checks that ABORT before the prompt is ever shown. **No actual Jira mutation in this phase.** Execution lives in `references/auto-create-execution.md`.
 
+## Contents
+
+- [Arg validation](#arg-validation)
+- [5 Auto-Abort Triggers (run in order)](#5-auto-abort-triggers-run-in-order)
+- [Dry-run Table](#dry-run-table)
+- [Single Confirmation Gate](#single-confirmation-gate)
+- [Dry-run-only Test Mode](#dry-run-only-test-mode)
+- [Defense in depth](#defense-in-depth)
+
 ## Arg validation
 
 ```text

@@ -3,7 +3,7 @@ name: "mk-preview"
 description: "Renders code or a diff as an explainer, diagram or slides. NOT for mk-tech-graph."
 ---
 
-# mk:preview
+# mk-preview
 
 Generates visual artifacts — markdown and self-contained HTML — for explaining code, drawing diagrams, building slide decks, and visualizing diffs.
 
@@ -123,9 +123,9 @@ Templates in `assets/` are out-of-band — they are not auto-Read; the agent rea
 
 ## Composes With
 
-- `mk:ui-design-system` — palette and typography selection (`assets/colors.csv` 160 rows, `assets/typography.csv` 73 rows). HTML modes vary palette per run.
-- `mk:frontend-design` — anti-slop forbidden patterns. Cited via `../frontend-design/references/anti-slop-directives.md`, not duplicated.
-- `mk:web-to-markdown` — for users who want to view a generated markdown file in a browser, no server bundled here.
+- `mk-ui-design-system` — palette and typography selection (`assets/colors.csv` 160 rows, `assets/typography.csv` 73 rows). HTML modes vary palette per run.
+- `mk-frontend-design` — anti-slop forbidden patterns. Cited via `../frontend-design/references/anti-slop-directives.md`, not duplicated.
+- `mk-web-to-markdown` — for users who want to view a generated markdown file in a browser, no server bundled here.
 
 ## Gotchas
 
@@ -146,5 +146,5 @@ Templates in `assets/` are out-of-band — they are not auto-Read; the agent rea
 
 ## Composes Into
 
-- `mk:cook` may invoke `--explain` to communicate a complex implementation phase
-- `mk:plan-ceo-review` CRITIQUES plans; it does not overlap this skill's generic explain/diagram/slides/diff output
+- `mk-cook` may invoke `--explain` to communicate a complex implementation phase
+- `mk-plan-ceo-review` CRITIQUES plans; it does not overlap this skill's generic explain/diagram/slides/diff output

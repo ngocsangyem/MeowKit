@@ -186,7 +186,7 @@ still exists in the current session.
 
 C1/C2/C3 and R0–R3 are the job-routing axes this file owns; they are separate
 from — and layered on top of — the toolkit's own TRIVIAL/STANDARD/COMPLEX
-model-tier policy (`mk:scale-routing` plus the model-selection rules).
+model-tier policy (`mk-scale-routing` plus the model-selection rules).
 When a job routes to an internal agent, that agent's underlying model tier is
 decided entirely by the toolkit's existing tier policy; this file only decides
 which agent is qualified and how isolated its write must be. Do not re-derive

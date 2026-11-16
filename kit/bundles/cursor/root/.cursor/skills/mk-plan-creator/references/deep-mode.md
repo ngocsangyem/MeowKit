@@ -12,8 +12,8 @@
 ## Avoid When
 
 - The task is a clear few-file change.
-- The approach is still undecided. Route to `mk:brainstorming` first.
-- The code location is unknown and the user has not named a feature area. Run `mk:scout` first.
+- The approach is still undecided. Route to `mk-brainstorming` first.
+- The code location is unknown and the user has not named a feature area. Run `mk-scout` first.
 - The work is a spike or throwaway prototype.
 
 ## Budget

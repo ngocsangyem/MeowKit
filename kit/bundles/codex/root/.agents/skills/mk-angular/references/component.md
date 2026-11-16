@@ -1,13 +1,12 @@
 # Angular Component
 
-> Part of mk:angular skill. Read when: working with component.
+> Part of mk-angular skill. Read when: working with component.
 > Source: analogjs/angular-skills/angular-component (MIT)
 
 ## Contents
 
 - [Core Patterns](#core-patterns)
 - [Advanced Patterns](#advanced-patterns)
-
 
 ## Core Patterns
 

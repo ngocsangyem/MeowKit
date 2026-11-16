@@ -1,6 +1,6 @@
 # Freeze Mechanics
 
-Technical details of how `mk:freeze` enforces directory boundaries.
+Technical details of how `mk-freeze` enforces directory boundaries.
 
 ## Path Resolution
 

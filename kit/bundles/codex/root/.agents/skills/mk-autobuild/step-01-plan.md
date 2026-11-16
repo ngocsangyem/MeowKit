@@ -1,6 +1,6 @@
 # Step 1: Plan (Product-Level)
 
-Invoke `mk:plan-creator` in product-level mode (Phase 1 of the autobuild workflow plan). Produces an ambitious user-story spec at `tasks/plans/{date}-{slug}/plan.md` with no implementation details.
+Invoke `mk-plan-creator` in product-level mode (Phase 1 of the autobuild workflow plan). Produces an ambitious user-story spec at `tasks/plans/{date}-{slug}/plan.md` with no implementation details.
 
 ## Instructions
 
@@ -14,14 +14,14 @@ Invoke `mk:plan-creator` in product-level mode (Phase 1 of the autobuild workflo
 
 ### 1b. Invoke the planner
 
-Use the Task tool to dispatch the `planner` agent (canonical subagent_type per `rules/`). The planner runs `mk:plan-creator` internally.
+Delegate to the `planner` agent. The planner runs `mk-plan-creator` internally.
 
 ```
 delegate a sub-task (
-  subagent_type="planner",
+  agent="planner",
   description="Product-level spec for $task_description",
   prompt="
-    Use mk:plan-creator with --product-level mode.
+    Use mk-plan-creator with --product-level mode.
 
     Task: $task_description
 
@@ -52,7 +52,7 @@ Persist `plan_dir` and `slug` for downstream steps.
 
 ### 1d. Check the plan landed
 
-The planner agrees the plan with the user before `mk:plan-creator` returns. If it reports the plan was rejected or reworked, halt the autobuild workflow and surface the user's feedback — do NOT proceed to step-02 on a plan the user did not want.
+The planner agrees the plan with the user before `mk-plan-creator` returns. If it reports the plan was rejected or reworked, halt the autobuild workflow and surface the user's feedback — do NOT proceed to step-02 on a plan the user did not want.
 
 ### 1e. Append to run report
 

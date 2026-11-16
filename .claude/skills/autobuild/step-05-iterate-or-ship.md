@@ -114,7 +114,7 @@ On `ship_with_warnings`, pass the acknowledged WARNs through so the release note
 what was accepted:
 
 ```
-Task(
+Agent(
   subagent_type="shipper",
   description="Ship $slug after the user chose to ship",
   prompt="
@@ -170,7 +170,7 @@ decision below is the human's.
 **PM foreground invocation (per `.claude/skills/cook/references/post-phase-delegation.md` Rule 5 — the only foreground PM call):**
 
 ```
-Delegate to the project-manager agent (foreground):
+Unless MEOWKIT_PM_AUTO=off, delegate to the project-manager agent (foreground):
 "Generate delivery status for plan at $plan_dir. Write report to
 $plan_dir/status-reports/$(date +%y%m%d)-status.md.
 Load template from .claude/skills/status/assets/pm-status-template.md."

@@ -19,13 +19,13 @@ Pinia Colada queries/mutations, Vue Router file-based routes, composables.
 
 **Deep best practices:** for a thorough best-practices **review/recommendations** pass or the
 full ordered workflow — built-in components (Teleport/Suspense/KeepAlive/Transition),
-animation techniques, optional features, and the performance pass — use `mk:vue-best-practices`.
+animation techniques, optional features, and the performance pass — use `mk-vue-best-practices`.
 This skill stays the everyday quick-reference.
 
-**Do NOT invoke for:** deep best-practices review/workflow (use `mk:vue-best-practices`),
-TypeScript fundamentals (use `mk:typescript`), React (use `mk:react-patterns`), Angular (use
-`mk:angular`), visual design (use `mk:frontend-design`), testing (use `mk:testing` / `mk:qa`;
-Vue test design/review → `mk:vue-testing-best-practices`).
+**Do NOT invoke for:** deep best-practices review/workflow (use `mk-vue-best-practices`),
+TypeScript fundamentals (use `mk-typescript`), React (use `mk-react-patterns`), Angular (use
+`mk-angular`), visual design (use `mk-frontend-design`), testing (use `mk-testing` / `mk-qa`;
+Vue test design/review → `mk-vue-testing-best-practices`).
 
 ## Core Rules (always apply)
 
@@ -120,4 +120,4 @@ Read one level deep from this file. Read multiple when a task spans topics.
 ## Workflow Integration
 
 Auto-activates during Build when a Vue project is detected (`.vue` files, `vue` in
-`package.json`). Loaded by the `developer` agent alongside `mk:typescript`.
+`package.json`). Loaded by the `developer` agent alongside `mk-typescript`.

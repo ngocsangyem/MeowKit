@@ -156,7 +156,7 @@ assume:
 
 When OS enforcement is weaker than the requested risk tier, use a stronger
 external boundary or block the route. A worktree prevents edit collisions but
-is not an OS sandbox — delegate the worktree lifecycle itself to `mk:worktree`
+is not an OS sandbox — delegate the worktree lifecycle itself to `mk-worktree`
 (create, merge, cleanup) rather than reimplementing it per candidate.
 
 ## Support States
@@ -189,7 +189,7 @@ Before dispatch, confirm:
 - runtime and model or agent were observed live;
 - cwd and writable roots match the job;
 - approval and tool controls meet the assigned risk tier;
-- parallel writers are isolated in separate worktrees (via `mk:worktree`) and
+- parallel writers are isolated in separate worktrees (via `mk-worktree`) and
   own disjoint files, per the parallel-execution rules;
 - destructive or external actions have explicit user approval and rollback,
   recorded per the intervention-recording invariant in AGENTS.md;

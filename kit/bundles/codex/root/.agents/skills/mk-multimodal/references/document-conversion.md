@@ -15,15 +15,15 @@
 
 ```bash
 # Single file
-node .codex/scripts/skill-python.cjs .agents/skills/multimodal/scripts/document_converter.py \
+node .codex/scripts/skill-python.cjs .agents/skills/mk-multimodal/scripts/document_converter.py \
   --files report.pdf --output ./docs/
 
 # Batch conversion
-node .codex/scripts/skill-python.cjs .agents/skills/multimodal/scripts/document_converter.py \
+node .codex/scripts/skill-python.cjs .agents/skills/mk-multimodal/scripts/document_converter.py \
   --files a.pdf b.docx c.xlsx --output ./output/ --verbose
 
 # Custom prompt
-node .codex/scripts/skill-python.cjs .agents/skills/multimodal/scripts/document_converter.py \
+node .codex/scripts/skill-python.cjs .agents/skills/mk-multimodal/scripts/document_converter.py \
   --files invoice.pdf --prompt "Extract all line items as a Markdown table"
 ```
 

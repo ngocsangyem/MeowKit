@@ -1,7 +1,7 @@
 # Figma → Code Implementation Workflow
 
 7-step process for pixel-perfect implementation from Figma designs.
-Load this file only when mk:figma is in **implement** mode.
+Load this file only when mk-figma is in **implement** mode.
 
 ## Contents
 
@@ -123,7 +123,7 @@ If visual parity fails: identify the delta, fix the specific property, re-valida
 
 Visual parity is NOT "done" for production-grade requests. When the caller wants
 production implementation, route through the validation handoff instead of claiming done at
-visual parity: Figma Evidence Packet → `mk:plan-creator` (scope, ACs, validation matrix) →
-`mk:agent-browser` (rendered evidence) → `mk:playwright-cli` / `mk:qa-manual` (deterministic
+visual parity: Figma Evidence Packet → `mk-plan-creator` (scope, ACs, validation matrix) →
+`mk-agent-browser` (rendered evidence) → `mk-playwright-cli` / `mk-qa-manual` (deterministic
 checks). This skill produces implementation-ready evidence and starter code, not standalone
 production proof.

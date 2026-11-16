@@ -106,7 +106,7 @@ Mark which columns hold personal data. State the retention rule and how deletion
 anonymization is executed — a retention policy with no mechanism is not a policy.
 
 Remember that copies propagate: backups, replicas, exports, caches, and search indexes. Note
-which ones exist; `mk:devops` owns them.
+which ones exist; `mk-devops` owns them.
 
 ## Constraints belong in the database
 

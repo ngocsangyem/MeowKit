@@ -22,7 +22,7 @@ No gate — merge findings and proceed IMMEDIATELY to Step 2.
 **Pre-condition:** Research reports and design guidelines from prior steps already exist.
 Plan-creator will detect these and skip its own discovery step (no duplicate research).
 
-**ACTION REQUIRED:** Activate mk:plan-creator skill NOW:
+**ACTION REQUIRED:** Activate mk-plan-creator skill NOW:
 
 ```
 the plan-creator skill [requirements summary] --fast
@@ -47,8 +47,8 @@ The plan defines WHAT gets scaffolded in Step 3.
 
 **ACTION REQUIRED:** Load `references/shared-phases.md` and execute ALL phases:
 
-1. **Phase A:** Activate mk:cook skill: `the cook skill [plan-path] --auto`
-2. **Phase B:** Activate mk:docs-init for documentation
+1. **Phase A:** Activate mk-cook skill: `the cook skill [plan-path] --auto`
+2. **Phase B:** Activate mk-docs-init for documentation
 3. **Phase C:** Print final report
 
 ## Step 5: Auto-commit

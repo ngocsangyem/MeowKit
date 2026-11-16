@@ -2,6 +2,21 @@
 
 Reference guide for "magic numbers" and constants used in JIRA administration.
 
+## Contents
+
+- [Common Custom Field IDs](#common-custom-field-ids)
+- [Notification Event IDs](#notification-event-ids)
+- [Permission Keys (Complete List)](#permission-keys-complete-list)
+- [Holder Types Reference](#holder-types-reference)
+- [Status Categories](#status-categories)
+- [Project Types](#project-types)
+- [Project Templates](#project-templates)
+- [Issue Type Hierarchy Levels](#issue-type-hierarchy-levels)
+- [Notification Recipient Types](#notification-recipient-types)
+- [Common API Endpoints Reference](#common-api-endpoints-reference)
+- [Finding Your Instance's Constants](#finding-your-instances-constants)
+- [Notes](#notes)
+
 ---
 
 ## Common Custom Field IDs
@@ -22,13 +37,13 @@ Reference guide for "magic numbers" and constants used in JIRA administration.
 
 ```bash
 # View project configuration with field IDs
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh ops discover-project PROJ
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh ops discover-project PROJ
 
 # Use jira-fields skill for comprehensive discovery
-python .cursor/skills/jira-fields/scripts/list_fields.py --custom-only
+python .cursor/skills/mk-jira-fields/scripts/list_fields.py --custom-only
 
 # Get specific field details
-python .cursor/skills/jira-fields/scripts/get_field.py customfield_10016
+python .cursor/skills/mk-jira-fields/scripts/get_field.py customfield_10016
 ```
 
 ---
@@ -59,10 +74,10 @@ python .cursor/skills/jira-fields/scripts/get_field.py customfield_10016
 
 ```bash
 # Add notification using event name (preferred)
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh admin notification add 10000 --event "Issue created" --notify Reporter
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh admin notification add 10000 --event "Issue created" --notify Reporter
 
 # Add notification using event ID (when name doesn't match)
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh admin notification add 10000 --event-id 1 --notify Reporter
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh admin notification add 10000 --event-id 1 --notify Reporter
 ```
 
 ---
@@ -248,19 +263,19 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh adm
 
 ```bash
 # Discover custom field IDs
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh ops discover-project PROJ
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh ops discover-project PROJ
 
 # List all statuses with IDs
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh admin status list --output json
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh admin status list --output json
 
 # List all permissions
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh admin permission list
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh admin permission list
 
 # List all issue types with IDs
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh admin issue-type list --format json
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh admin issue-type list --format json
 
 # Get notification event IDs
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh admin notification-scheme get 10000 --output json
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh admin notification-scheme get 10000 --output json
 ```
 
 ---

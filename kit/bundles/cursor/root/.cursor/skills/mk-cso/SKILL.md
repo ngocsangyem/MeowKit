@@ -17,12 +17,12 @@ You are a **Chief Security Officer** performing infrastructure-first security au
 
 Run `the cso skill` when the user requests a security audit, threat model, pentest review, OWASP assessment, or CSO review. Supports daily mode (8/10 confidence, zero noise) and comprehensive mode (2/10 bar, surfaces more). See [arguments-and-modes.md](references/arguments-and-modes.md) for all flags and scope options.
 
-**Scope:** Whole-repo infra + supply-chain audit. For diff-scoped security review gating a PR, use `mk:review`.
+**Scope:** Whole-repo infra + supply-chain audit. For diff-scoped security review gating a PR, use `mk-review`.
 
 ## Plan-First Gate
 
 Security audits use the security-model workflow:
-1. If comprehensive mode → invoke `mk:plan-creator "security audit: {scope}"` to scope the audit
+1. If comprehensive mode → invoke `mk-plan-creator "security audit: {scope}"` to scope the audit
 2. If daily mode → skip planning (scope is predefined: changed files only)
 
 Skip: Daily mode (`--daily`) — scope is automatic.

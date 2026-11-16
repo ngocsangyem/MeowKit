@@ -7,22 +7,22 @@
    - From plan file: look for numbered steps, acceptance criteria, user flows
    - From URL: navigate the app, identify key user paths (login, dashboard, CRUD)
 3. **For each flow:**
-   a. Navigate to start URL using `mk:playwright-cli goto`
-   b. Snapshot the page: `mk:playwright-cli snapshot`
+   a. Navigate to start URL using `mk-playwright-cli goto`
+   b. Snapshot the page: `mk-playwright-cli snapshot`
    c. For each step in the flow:
       - Execute action using routing table (click/fill → playwright-cli, screenshot → agent-browser)
       - On auth encounter: execute Authentication Protocol (STOP → prompt → wait)
       - After action: re-snapshot to verify result
       - Compare actual result to expected outcome from spec
       - On PASS: record step as passed, continue
-      - On FAIL: capture evidence (screenshot via `mk:agent-browser screenshot`), record failure, continue
+      - On FAIL: capture evidence (screenshot via `mk-agent-browser screenshot`), record failure, continue
    d. After all steps: summarize flow result (PASS/FAIL/SKIPPED)
 4. **Aggregate** — compile all flow results into QA Report template
 
 ## Use Case B — E2E Code Generation
 
 1. **Run Use Case A** — execute the flow like a manual tester
-2. **Record interactions** — as each action executes via `mk:playwright-cli`, capture the generated Playwright TypeScript code (playwright-cli outputs this automatically)
+2. **Record interactions** — as each action executes via `mk-playwright-cli`, capture the generated Playwright TypeScript code (playwright-cli outputs this automatically)
 3. **Map interactions to Playwright actions:**
 
    | User action | Playwright code |

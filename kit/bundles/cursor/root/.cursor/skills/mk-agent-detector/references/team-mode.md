@@ -58,8 +58,8 @@ When team mode is NOT selected (most tasks), output:
 ```toon
 handoff[3]{mode,action,target}:
   single agent,Execute directly in current session,N/A
-  sub-task,Use Task tool with subagent_type,delegate a sub-task (subagent_type="architect")
-  team,Hand off to workflow-orchestrator for parallel startup,workflow-orchestrator -> TeamCreate -> parallel Task calls
+  sub-task,Hand off to the named agent,delegate a sub-task (agent="architect")
+  team,Hand off to workflow-orchestrator for parallel startup,workflow-orchestrator -> parallel sub-tasks
 ```
 
 **Team handoff:** Agent detector does NOT create the team. It returns the detection result with `Mode: team` and `Team Composition`. The **workflow-orchestrator** handles the actual parallel startup sequence: create the team, record a tracked task per member, then spawn the parallel agents.

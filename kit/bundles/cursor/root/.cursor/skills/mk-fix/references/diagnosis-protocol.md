@@ -16,7 +16,7 @@ This becomes the baseline for Step 5 verification.
 
 ## Phase 1: Observe (What is actually happening?)
 
-For Standard/Deep, use `mk:investigate`:
+For Standard/Deep, use `mk-investigate`:
 
 - What is the exact error message?
 - Where does it occur? (file, line, function)
@@ -26,7 +26,7 @@ For Standard/Deep, use `mk:investigate`:
 
 ## Phase 2: Hypothesize (Why might this happen?)
 
-Activate `mk:sequential-thinking`:
+Activate `mk-sequential-thinking`:
 
 - Generate minimum 2 hypotheses from evidence
 - For each: what would CONFIRM it? What would REFUTE it?
@@ -47,7 +47,7 @@ Spawn parallel Explore sub-task (max 3):
 
 ## Phase 4: Trace (Follow the root cause chain)
 
-For Standard/Deep, use `mk:investigate` (root-cause-tracing):
+For Standard/Deep, use `mk-investigate` (root-cause-tracing):
 
 ```
 Symptom → Immediate cause → Contributing factor → ROOT CAUSE

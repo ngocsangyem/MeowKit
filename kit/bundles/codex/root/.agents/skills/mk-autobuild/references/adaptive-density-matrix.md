@@ -6,7 +6,7 @@ The full decision table for autobuild scaffolding density (`MINIMAL`, `FULL`, `L
 
 | Model Tier | Model ID Pattern | Density | Planner | Contract | Iteration Loop | Context Reset | Rubric Rigor |
 |---|---|---|---|---|---|---|---|
-| **TRIVIAL** | `*haiku*` | `MINIMAL` | Skip (use plan-creator `--fast`) | Skip | Skip | Skip | Skip — invokes `mk:cook` instead |
+| **TRIVIAL** | `*haiku*` | `MINIMAL` | Skip (use plan-creator `--fast`) | Skip | Skip | Skip | Skip — invokes `mk-cook` instead |
 | **STANDARD** | `*sonnet*` | `FULL` | `--product-level` | Required | 1–3 rounds | Optional | Full preset |
 | **COMPLEX** | `opus-4-5`, other Opus | `FULL` | `--product-level` | Required | 2–3 rounds | **Required** | Full preset |
 | **COMPLEX** | `opus-4-6`, `opus-4-7`+ | **`LEAN`** | `--product-level` | **Optional** (skip if <5 ACs) | 0–1 rounds | **Skip** (auto-compact) | Full preset |
@@ -15,7 +15,7 @@ The full decision table for autobuild scaffolding density (`MINIMAL`, `FULL`, `L
 
 ### TRIVIAL → MINIMAL
 
-Haiku is fast and cheap but limited in reasoning depth. Running the full harness on a Haiku-powered build wastes scaffolding effort because the model can't drive a multi-hour iteration loop productively. **Short-circuit:** the harness step-00 detects MINIMAL and immediately delegates to `mk:cook` (the standard single-task pipeline), which is appropriately scoped for Haiku's strengths.
+Haiku is fast and cheap but limited in reasoning depth. Running the full harness on a Haiku-powered build wastes scaffolding effort because the model can't drive a multi-hour iteration loop productively. **Short-circuit:** the harness step-00 detects MINIMAL and immediately delegates to `mk-cook` (the standard single-task pipeline), which is appropriately scoped for Haiku's strengths.
 
 ### STANDARD → FULL
 
@@ -61,7 +61,7 @@ The chosen density and its source are logged in the run report's "Density Decisi
 
 Per the "dead-weight thesis," every model upgrade is an opportunity to test whether existing scaffolding is still load-bearing. When a new model tier rolls out (Sonnet 4.6, Opus 4.7, Haiku 5.x):
 
-1. Re-run the calibration set (Phase 8 — `mk:benchmark`) with the new model on FULL density
+1. Re-run the calibration set (Phase 8 — `mk-benchmark`) with the new model on FULL density
 2. Re-run the same set on LEAN density
 3. If LEAN performance matches FULL within 5%, downgrade the tier's matrix entry from FULL to LEAN
 4. If LEAN performance exceeds FULL (faster, cheaper, equivalent quality), upgrade aggressively
@@ -82,6 +82,6 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 
 - the dead-weight-audit conventions — audit cadence, measurement, thresholds, never-prune list
 - the harness conventions Rule 7 — when the dead-weight audit must be re-run
-- `.agents/skills/scale-routing/SKILL.md` Output Schema v2.1 — `autobuild_density` field
-- `.agents/skills/benchmark/` — calibration replay automation
+- `.agents/skills/mk-scale-routing/SKILL.md` Output Schema v2.1 — `autobuild_density` field
+- `.agents/skills/mk-benchmark/` — calibration replay automation
 - Anthropic harness design article (Prithvi Rajasekaran, Labs) <!-- research-citation -->

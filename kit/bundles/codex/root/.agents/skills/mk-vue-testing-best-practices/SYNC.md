@@ -39,7 +39,7 @@ Authored for this toolkit. An upstream re-sync MUST NOT delete these:
 
 ## Adaptation Notes
 
-- Positioned as a **complement** to `mk:vue-best-practices`: that skill owns Vue _feature_
+- Positioned as a **complement** to `mk-vue-best-practices`: that skill owns Vue _feature_
   code review/authoring; this one owns Vue _test_ design + test-code review. Read-only tool
   set (`Read`/`Grep`/`Glob`) — it advises and reviews, never runs/generates/fixes tests.
 - Added the five pieces upstream lacked: non-responsibilities, workflow, validation rubric
@@ -53,7 +53,7 @@ Authored for this toolkit. An upstream re-sync MUST NOT delete these:
 
 There is **no automated directory-overwrite sync pipeline** in this repo (verified: no
 `sync` script, `.syncignore` or `mewkit sync` directory mirror exists). Re-syncing is a **manual diff-and-re-apply** process,
-identical to the sibling `mk:vue-best-practices` (`SOURCE.md`):
+identical to the sibling `mk-vue-best-practices` (`SOURCE.md`):
 
 1. Diff the 11 vendored-verbatim references above against the pinned upstream commit.
 2. Re-apply upstream changes to those 11 files; bump the pinned commit.

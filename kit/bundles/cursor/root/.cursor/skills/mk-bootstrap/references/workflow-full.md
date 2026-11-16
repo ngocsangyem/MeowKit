@@ -30,7 +30,7 @@ Spawn 2-4 researcher sub-task in parallel. Each report ≤150 lines.
 ## Step 3: Tech Stack + Design
 
 1. Run `scripts/detect-stack.sh` for existing project markers
-2. If new project: activate mk:brainstorming --depth deep to explore stack options
+2. If new project: activate mk-brainstorming --depth deep to explore stack options
 3. **Gate:** User approves tech stack selection
 
 If frontend work detected:
@@ -45,7 +45,7 @@ If frontend work detected:
 **Pre-condition:** Research reports and design guidelines from prior steps already exist.
 Plan-creator will detect these and skip its own discovery step (no duplicate research).
 
-**ACTION REQUIRED:** Activate mk:plan-creator skill NOW:
+**ACTION REQUIRED:** Activate mk-plan-creator skill NOW:
 
 ```
 the plan-creator skill [requirements summary] --hard
@@ -56,7 +56,7 @@ The plan defines architecture, modules, file structure — guides what gets scaf
 
 > **Comprehensive bootstrap tip:** For projects spanning 5+ directories, use `--deep` instead of `--hard`. `--deep` provides per-phase file inventory and dependency maps, and triggers automatically when that many root dirs are detected. Gives the generator clearer scope boundaries across complex module layouts.
 
-Optional: activate mk:plan-ceo-review on the plan for product-level review.
+Optional: activate mk-plan-ceo-review on the plan for product-level review.
 
 **Once the plan is agreed: proceed IMMEDIATELY to Step 5. Do NOT stop.**
 
@@ -74,8 +74,8 @@ Follow the plan's architecture + `references/scaffolding-principles.md`:
 
 **ACTION REQUIRED:** Load `references/shared-phases.md` and execute ALL phases:
 
-1. **Phase A:** Activate mk:cook skill: `the cook skill [plan-path]` (interactive mode)
-2. **Phase B:** Activate mk:docs-init for documentation
+1. **Phase A:** Activate mk-cook skill: `the cook skill [plan-path]` (interactive mode)
+2. **Phase B:** Activate mk-docs-init for documentation
 3. **Phase C:** Print final report and ask about commit
 
 **The bootstrap is NOT complete until all shared phases finish.**

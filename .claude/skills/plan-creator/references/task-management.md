@@ -1,5 +1,16 @@
 # Task Management & Hydration
 
+## Contents
+
+- [Plan → Task Bridge](#plan--task-bridge)
+- [Hydration Rules](#hydration-rules)
+- [Post-Hydration Integrity Checks](#post-hydration-integrity-checks)
+- [Cross-Session Resume](#cross-session-resume)
+- [Sync-Back (on completion)](#sync-back-on-completion)
+- [Sync-Back Protocol (Executed by Cook's Finalize Step)](#sync-back-protocol-executed-by-cooks-finalize-step)
+- [Status Producer/Consumer Matrix](#status-producerconsumer-matrix)
+- [Cook Handoff](#cook-handoff)
+
 ## Plan → Task Bridge
 
 Plans are persistent files; session tasks are scoped to the current session — they vanish when the session ends. Hydration bridges the two: read each `[ ]` from phase files, emit one `TaskCreate` per unchecked item. Sync-back closes the loop on completion: `[ ]` → `[x]` and frontmatter status update.

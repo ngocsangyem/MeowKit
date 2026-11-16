@@ -31,7 +31,7 @@ Required:
 - 5–15 ACs per sprint (validator warns at >20)
 
 The `contract_schema_version: 1.0.0` line MUST be the first frontmatter
-field — `mk:evaluate/step-01-load-rubrics.md` stub-guards on this marker
+field — `mk-evaluate/step-01-load-rubrics.md` stub-guards on this marker
 to distinguish a real Phase 4 contract from stale pre-Phase-4 files.
 -->
 

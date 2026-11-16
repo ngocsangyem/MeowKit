@@ -3,7 +3,7 @@ name: "mk-trace-analyze"
 description: "Mines harness trace logs for recurring failures, behind a human gate."
 ---
 
-# mk:trace-analyze — Scatter-Gather Trace Analysis
+# mk-trace-analyze — Scatter-Gather Trace Analysis
 
 Step-file workflow that ingests `.meowkit/telemetry/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel `researcher` sub-task, gathers cross-batch patterns, and gates suggestions through human review before any harness change is applied.
 
@@ -59,7 +59,7 @@ All under `plans/{date}-trace-analysis/` (created by step-01):
 - `suggestions.md` — approved suggestions only (written by step-06)
 - `rejected.md` — rejected suggestions with reasons (written by step-06)
 - `analysis.md` — final human-readable summary (written by step-06)
-- Optional: a draft follow-up plan generated from approved suggestions, ready for `mk:plan-creator --hard` (or `--deep` when trace findings span 5+ module areas — provides per-phase file inventory for multi-module remediation)
+- Optional: a draft follow-up plan generated from approved suggestions, ready for `mk-plan-creator --hard` (or `--deep` when trace findings span 5+ module areas — provides per-phase file inventory for multi-module remediation)
 
 ## Gotchas
 

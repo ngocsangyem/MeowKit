@@ -2,10 +2,24 @@
 
 Full pipeline for moderate complexity issues. Uses task tracking for phase coordination.
 
+## Contents
+
+- [Steps](#steps)
+- [Step 1: Scout, Debug & Investigate](#step-1-scout-debug--investigate)
+- [Step 2: Extend Scout Coverage](#step-2-extend-scout-coverage)
+- [Step 3: Implement Fix](#step-3-implement-fix)
+- [Step 4: Test](#step-4-test)
+- [Step 5: Review](#step-5-review)
+- [Step 6: Finalize](#step-6-finalize)
+- [Advice Checkpoints (`--advice` only)](#advice-checkpoints---advice-only)
+- [Checkpoints](#checkpoints)
+- [What each checkpoint asks](#what-each-checkpoint-asks)
+- [Boundaries](#boundaries)
+
 ## Steps
 
 ### Step 1: Scout, Debug & Investigate
-Run `mk:scout`, then activate `mk:investigate` and `mk:sequential-thinking`. Use a researcher only if external docs are needed.
+Run `mk-scout`, then activate `mk-investigate` and `mk-sequential-thinking`. Use a researcher only if external docs are needed.
 - Read error messages, logs, stack traces
 - Capture deterministic reproduction or bounded intermittent evidence
 - Trace backward to root cause
@@ -26,9 +40,7 @@ Fix the issue following debugging findings.
 
 **Parallel Verification** after implementation:
 ```
-Agent(subagent_type="Bash", prompt="Run typecheck")
-Agent(subagent_type="Bash", prompt="Run lint")
-Agent(subagent_type="Bash", prompt="Run build")
+Run typecheck, lint and build (in parallel where the host allows)
 ```
 
 **Output:** `Step 3: Implemented — [N] files, verified`

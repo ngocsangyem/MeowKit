@@ -72,7 +72,7 @@ Human-readable wrap-up:
 - Counts: kept / discarded / guard-failed / crashed / no-op
 - Kept-commit SHAs (note: user may interactively squash `*(loop):` commits)
 - Stop reason (goal reached / capped / stuck / plateau / interrupted)
-- Suggested next step (mk:verify / mk:review / mk:ship)
+- Suggested next step (mk-verify / mk-review / mk-ship)
 - Secrets masked throughout.
 
 ---
@@ -91,7 +91,7 @@ Machine-readable handoff for downstream skills:
   "delta": -101,
   "kept_commits": ["e4f5a6b", "9a0b1c2"],
   "status": "completed",
-  "suggested_next": ["mk:verify", "mk:review", "mk:ship"],
+  "suggested_next": ["mk-verify", "mk-review", "mk-ship"],
   "report_dir": "tasks/reports/loop-260530-2010-bundle-size"
 }
 ```
@@ -121,5 +121,5 @@ Holds resumable state and the concurrent-run lock:
 ```
 
 Framework dir → exempt from the persistent-state rule (no `${PLUGIN_DATA}`). A second
-`mk:loop` in the same session refuses to start while this file marks an active run; a stale
+`mk-loop` in the same session refuses to start while this file marks an active run; a stale
 lock from a different `session_id` is cleared on start. The file is removed at Stage 4.

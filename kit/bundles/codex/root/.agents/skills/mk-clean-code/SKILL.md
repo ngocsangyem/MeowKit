@@ -7,7 +7,7 @@ description: "Applies KISS, DRY and YAGNI while writing code. NOT for mk-simplif
 
 > Be **concise, direct, and solution-focused**.
 
-> For post-implementation complexity reduction within the current diff (Phase 3.5 workflow), use `mk:simplify`. `mk:clean-code` is for broader quality-standards enforcement at any phase.
+> For post-implementation complexity reduction within the current diff (Phase 3.5 workflow), use `mk-simplify`. `mk-clean-code` is for broader quality-standards enforcement at any phase.
 
 ## Core Principles
 

@@ -2,6 +2,12 @@
 
 Copy-paste ready templates for common collaboration scenarios.
 
+## Contents
+
+- [Comment Templates](#comment-templates)
+- [Script Command Templates](#script-command-templates)
+- [File Naming Templates](#file-naming-templates)
+
 ---
 
 ## Comment Templates
@@ -82,71 +88,71 @@ QUESTION: [Clear, specific question]
 
 ```bash
 # Plain text comment
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Comment text"
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Comment text"
 
 # Markdown comment
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "**Bold** text" --format markdown
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "**Bold** text" --format markdown
 
 # Internal comment (Administrators only)
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Secret info" --visibility-role Administrators
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Secret info" --visibility-role Administrators
 
 # Group-restricted comment
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Team info" --visibility-group team-name
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate comment add PROJ-123 --body "Team info" --visibility-group team-name
 ```
 
 ### Attachments
 
 ```bash
 # Upload file
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate attachment upload PROJ-123 --file report.pdf
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate attachment upload PROJ-123 --file report.pdf
 
 # List attachments
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --list
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --list
 
 # Download by name
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --name "screenshot.png"
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --name "screenshot.png"
 
 # Download all
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --all --output-dir ./downloads
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate attachment download PROJ-123 --all --output-dir ./downloads
 ```
 
 ### Watchers
 
 ```bash
 # Add watcher
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --add user@company.com
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate watcher PROJ-123 --add user@company.com
 
 # Remove watcher
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --remove user@company.com
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate watcher PROJ-123 --remove user@company.com
 
 # List watchers
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate watcher PROJ-123 --list
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate watcher PROJ-123 --list
 ```
 
 ### Notifications
 
 ```bash
 # Notify watchers
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --watchers --subject "Update" --body "Text"
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh admin notification send PROJ-123 --watchers --subject "Update" --body "Text"
 
 # Notify specific users (preview first)
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --users accountId1 --dry-run
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh admin notification send PROJ-123 --users accountId1 --dry-run
 
 # Notify assignee and reporter
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh admin notification send PROJ-123 --assignee --reporter --subject "Status needed"
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh admin notification send PROJ-123 --assignee --reporter --subject "Status needed"
 ```
 
 ### Activity
 
 ```bash
 # View activity table
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --format table
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate activity PROJ-123 --format table
 
 # Filter by status changes
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --filter status
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate activity PROJ-123 --filter status
 
 # Export to JSON
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh collaborate activity PROJ-123 --format json > history.json
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh collaborate activity PROJ-123 --format json > history.json
 ```
 
 ---

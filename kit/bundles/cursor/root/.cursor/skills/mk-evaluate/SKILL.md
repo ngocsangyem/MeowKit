@@ -4,7 +4,7 @@ description: "Exercises a running build via browser, curl or CLI, records rubric
 requires_runtime: ["python>=3.9"]
 ---
 
-# mk:evaluate — Experimental Behavioral Verification
+# mk-evaluate — Experimental Behavioral Verification
 
 Step-file workflow that drives a running build, probes each rubric criterion via active verification, and produces a graded verdict with runtime evidence. Owned by the `evaluator` agent (Phase 3+).
 
@@ -18,7 +18,7 @@ Activate when:
 
 Skip when:
 - The build has no runnable artifact (pure library, type-only package)
-- The task is structural code review only — use `mk:review` instead
+- The task is structural code review only — use `mk-review` instead
 - The task is `the fix skill` simple — overhead exceeds value
 
 ## Hard Constraints
@@ -53,9 +53,9 @@ See `step-04-grade-and-verdict.md` for the canonical schema. Frontmatter fields:
 
 ## Gotchas
 
-- **Don't grade source code** — that's `mk:review`'s job. If you find yourself reading `.tsx` files instead of clicking buttons, you've drifted into static review
+- **Don't grade source code** — that's `mk-review`'s job. If you find yourself reading `.tsx` files instead of clicking buttons, you've drifted into static review
 - **Don't trust test pass claims** — tests can pass against mocks while the real endpoint 500s. Run the build yourself
-- **Don't auto-load all 7 rubrics** — frontend-app preset is pruned to 4 (Phase 2 v2.0.0). Loading the others duplicates work mk:review/security-rules/qa already do
+- **Don't auto-load all 7 rubrics** — frontend-app preset is pruned to 4 (Phase 2 v2.0.0). Loading the others duplicates work mk-review/security-rules/qa already do
 - **Don't issue PASS without evidence** — the validator will reject it and convert to FAIL. Save yourself the round-trip
 - **Don't skip the skeptic persona reload** — leniency drift is the dominant evaluator failure mode (Anthropic harness research)
 

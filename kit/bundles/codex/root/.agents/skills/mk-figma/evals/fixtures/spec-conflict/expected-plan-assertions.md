@@ -1,6 +1,6 @@
 # Expected Plan Assertions — spec-conflict
 
-What a plan built by `mk:plan-creator` from this fixture's packet + flow ledger MUST
+What a plan built by `mk-plan-creator` from this fixture's packet + flow ledger MUST
 contain. Binary checks. Built FROM the packet — no Figma MCP call. This fixture proves the adjudication +
 phase-blocking path: block only affected phases (not the whole plan), and resolve source conflicts
 through a decision ledger with no silent winner.

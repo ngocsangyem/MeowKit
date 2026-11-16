@@ -112,8 +112,8 @@ Before committing to plan creation, classify the request:
 
 | Condition | Route |
 |---|---|
-| Relevant files/tests/contracts are unknown and no feature area is named | Run `mk:scout` first, then resume planning |
-| Architecture/tradeoff is undecided, or two credible approaches exist | Route to `mk:brainstorming` before planning |
+| Relevant files/tests/contracts are unknown and no feature area is named | Run `mk-scout` first, then resume planning |
+| Architecture/tradeoff is undecided, or two credible approaches exist | Route to `mk-brainstorming` before planning |
 | Touchpoints and approach are concrete enough to answer the 5-dimension contract | Continue planning directly |
 | Both approach and touchpoints are unclear | Refuse to draft implementation phases; ask for scout/brainstorm first |
 
@@ -169,7 +169,7 @@ Present via `stop and ask the user in chat`. Header: "Plan Mode". Question: "Thi
 
 1. **Reject incompatible combinations:**
    - `--spike` + `--product-level` → emit "spike incompatible with --product-level" → STOP
-   - `--spike` + harness FULL density invocation → emit "spike incompatible with harness FULL — use --fast or mk:cook" → STOP
+   - `--spike` + harness FULL density invocation → emit "spike incompatible with harness FULL — use --fast or mk-cook" → STOP
 2. **Require timebox.** If `--timebox <duration>` flag absent (and no `timebox:` in frontmatter) → emit "spike requires --timebox (e.g., --timebox 2d)" → STOP
 3. **Set planning_mode = spike.** Override any auto-detected mode
 4. **Set frontmatter additions for plan.md:**

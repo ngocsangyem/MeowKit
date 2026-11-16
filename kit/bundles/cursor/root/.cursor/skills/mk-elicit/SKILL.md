@@ -15,7 +15,7 @@ Surfaces insights that generic "make it better" requests miss.
 - After any agent output — when user wants a specific angle of analysis
 - When user says "dig deeper", "what am I missing", "challenge this"
 
-**NOT this skill if:** you have no existing artifact to re-examine — use `mk:brainstorming` for open exploration, or `mk:problem-solving` for approach-stuck situations.
+**NOT this skill if:** you have no existing artifact to re-examine — use `mk-brainstorming` for open exploration, or `mk-problem-solving` for approach-stuck situations.
 
 ## Reasoning Methods
 
@@ -78,7 +78,7 @@ When invoked without a method choice, suggest based on context:
 - [ ] [specific action items, if any]
 ```
 
-## Integration with mk:review
+## Integration with mk-review
 
 After the review verdict (step-04), the reviewer MAY offer elicitation:
 
@@ -98,7 +98,7 @@ It does NOT change the verdict (PASS/WARN/FAIL) — it adds depth.
 - **Socratic method loops indefinitely without a termination criterion** — "What evidence supports this claim?" applied recursively has no natural stopping point; without an explicit depth limit (e.g., stop at 3 levels of questioning or when no new claims emerge), the agent keeps decomposing until the context window fills; set a max depth before starting Socratic elicitation.
 - **Inversion only works reliably on binary decisions, not multi-option trade-offs** — "What would make this maximally wrong?" applied to a 3-option architectural choice produces a vague worst-case mix; inversion is sharp when the decision is yes/no (ship vs don't ship, add vs remove); for multi-option decisions, use Constraint Removal or Stakeholder Mapping instead.
 - **Pre-mortem degenerates to a generic worry list without a concrete ship date and scope** — "Assume this shipped and failed" requires a specific artifact (the plan, the feature, the migration) to be meaningful; if the target is vague ("our auth system"), the pre-mortem produces abstract risks ("scalability", "security") that don't map to actionable mitigations; always attach pre-mortem to a specific, scoped output.
-- **Elicitation output appended to the verdict file does NOT change the verdict** — users sometimes interpret a CRITICAL finding from Red Team elicitation as a re-graded review; the skill explicitly does not change verdicts; if the elicitation reveals a CRITICAL issue, the user must manually trigger a new `mk:review` pass to produce a revised verdict before proceeding to Phase 5.
+- **Elicitation output appended to the verdict file does NOT change the verdict** — users sometimes interpret a CRITICAL finding from Red Team elicitation as a re-graded review; the skill explicitly does not change verdicts; if the elicitation reveals a CRITICAL issue, the user must manually trigger a new `mk-review` pass to produce a revised verdict before proceeding to Phase 5.
 
 ## What This Skill Does NOT Do
 

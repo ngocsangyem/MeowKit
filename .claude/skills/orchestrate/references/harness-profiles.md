@@ -75,8 +75,8 @@ For `runtime: internal`, profile the current session's agent interface and live
 agent definitions instead of a binary. See
 [internal-routing.md](internal-routing.md).
 
-Unknown flags, aliases, or model identifiers are probe failures. Re-verify the
-candidate; never guess a replacement.
+Unknown flags, aliases, or model identifiers are probe failures. Probe the
+candidate again; never guess a replacement.
 
 ## Safety Evidence
 

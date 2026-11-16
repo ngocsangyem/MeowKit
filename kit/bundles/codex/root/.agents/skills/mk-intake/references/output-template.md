@@ -1,6 +1,6 @@
 # Output Template
 
-Fill-in-the-blank format for mk:intake analysis reports.
+Fill-in-the-blank format for mk-intake analysis reports.
 Replace all `[bracketed placeholders]` with actual values. Omit optional sections when not applicable.
 
 ## Contents
@@ -18,7 +18,6 @@ Replace all `[bracketed placeholders]` with actual values. Omit optional section
 - [Posting Back](#posting-back)
 - [Minimal Output (score < 40)](#minimal-output-score-40)
 - [Intake Analysis — [TICKET-ID]](#intake-analysis-ticket-id)
-
 
 ---
 
@@ -61,7 +60,7 @@ Missing:
 
 ### Technical Considerations
 
-- Affected files: [file paths from mk:scout scan]
+- Affected files: [file paths from mk-scout scan]
 - Test coverage: [covered | gap in X area]
 - Complexity estimate: [low | medium | high] — [brief justification]
 - Breaking change risk: [none | low | high] — [brief justification]
@@ -105,7 +104,7 @@ Causal chain:
 ---
 
 ### Jira Actions
-(Include only if the `mk:jira-*` family is available — jira-as installed + `.codex/.env` populated)
+(Include only if the `mk-jira-*` family is available — jira-as installed + `.codex/.env` populated)
 
 - [ ] Transition [TICKET-ID] to [state]
 - [ ] Link [TICKET-ID] [relationship] [TARGET-ID]

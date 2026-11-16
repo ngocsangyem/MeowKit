@@ -1,6 +1,6 @@
 # Deep Mode Scout
 
-> Loaded by `mk:prompt-enhancer` during Step 0 (Mode Selection) and Step 2.5
+> Loaded by `mk-prompt-enhancer` during Step 0 (Mode Selection) and Step 2.5
 > (Bounded Scout) — only when `--deep` is active. Default mode never reads this file.
 
 > **Allow-list changes require red-team review.** Re-confirm the skill stays at
@@ -16,7 +16,7 @@
 5. [Output Format](#output-format)
 6. [Determinism / Eval Pinning](#determinism--eval-pinning)
 7. [Fallback Policy](#fallback-policy)
-8. [`mk:scout` Invocation Contract](#mkscout-invocation-contract)
+8. [`mk-scout` Invocation Contract](#mkscout-invocation-contract)
 9. [Sensitive-data Audit (Failsafe)](#sensitive-data-audit-failsafe)
 
 ---
@@ -160,7 +160,7 @@ The Phase-5 eval rubric checks this matches the baseline ref. Mismatch →
 
 `docs/project-context.md` last-updated date is checked separately — if >90 days
 old, the footer carries an additional note: "context may be stale; re-run
-`mk:project-context`".
+`mk-project-context`".
 
 ---
 
@@ -182,9 +182,9 @@ default-deny posture is preserved.
 
 ---
 
-## `mk:scout` Invocation Contract
+## `mk-scout` Invocation Contract
 
-The enhancer calls `mk:scout` with:
+The enhancer calls `mk-scout` with:
 
 - The keyword set extracted from the input prompt (action verbs + nouns from the
   Goal/Context decomposition).
@@ -192,15 +192,15 @@ The enhancer calls `mk:scout` with:
 
 Then post-filters the result through this allow-list AND forbid-list.
 
-**`scripts/scout-context.py` is a bounded hint scanner, not a `mk:scout`
-replacement.** It is the fallback hint source used when a full `mk:scout`
+**`scripts/scout-context.py` is a bounded hint scanner, not a `mk-scout`
+replacement.** It is the fallback hint source used when a full `mk-scout`
 invocation is unavailable or over-budget; it performs the same
 allow/forbid-filtered, capped walk and inherits this file's allow-list,
-forbid-list, and hard caps. When `mk:scout` is available and within budget,
+forbid-list, and hard caps. When `mk-scout` is available and within budget,
 prefer it and post-filter its result through the same lists. Either path
 surfaces identifier-only hits — neither broadens the reach beyond the contract
 above. The enhancer remains a *consumer* of bounded discovery, never a broad
-codebase mapper (that is `mk:scout`'s own job).
+codebase mapper (that is `mk-scout`'s own job).
 
 ---
 

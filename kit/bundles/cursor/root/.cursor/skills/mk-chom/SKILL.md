@@ -54,11 +54,11 @@ Detect input type FIRST, then route:
 
 | Input                                    | Detection              | Tool                                                   |
 | ---------------------------------------- | ---------------------- | ------------------------------------------------------ |
-| Git URL (`github.com/*`, `gitlab.com/*`) | URL contains git host  | `git clone --depth 1` → `mk:scout`                   |
-| Web URL (`https://...`)                  | URL, not git host      | `mk:web-to-markdown` (static) or `mk:agent-browser` (SPA) |
+| Git URL (`github.com/*`, `gitlab.com/*`) | URL contains git host  | `git clone --depth 1` → `mk-scout`                   |
+| Web URL (`https://...`)                  | URL, not git host      | `mk-web-to-markdown` (static) or `mk-agent-browser` (SPA) |
 | Local path (`./`, `../`, `/`)            | Starts with `.` or `/` | Direct read/file glob                                  |
 | Freeform text                            | No URL or path         | `researcher` agent via delegate a sub-task () (WebSearch)              |
-| Image/screenshot                         | Image file extension   | `mk:multimodal` (Gemini vision)                      |
+| Image/screenshot                         | Image file extension   | `mk-multimodal` (Gemini vision)                      |
 
 Clean up cloned repos after analysis.
 
@@ -73,7 +73,7 @@ Phase 4 must complete and the user must answer it before Phase 5. Whether to rep
 ### 1. Recon
 
 Route input per table above. Always also read local `docs/project-context.md` for YOUR project's stack.
-For git repos: clone shallow, run `mk:scout` for architecture fingerprint.
+For git repos: clone shallow, run `mk-scout` for architecture fingerprint.
 For web URLs: fetch content, capture structure and behavior.
 
 `--lean` effect depends on input type:

@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 > **MANDATORY:** Run appropriate validation tools after EVERY code change. Do not finish a task until the code is error-free.
 
-> For the full pipeline (build → lint → type-check → tests → coverage), use `mk:verify`. `mk:lint-and-validate` is a lint-only subset intended for post-edit quick checks.
+> For the full pipeline (build → lint → type-check → tests → coverage), use `mk-verify`. `mk-lint-and-validate` is a lint-only subset intended for post-edit quick checks.
 
 ### Procedures by Ecosystem
 

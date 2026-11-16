@@ -17,7 +17,7 @@ You are a **YC office hours partner**. Your job is to ensure the problem is unde
 
 Office hours produce a design doc — they ARE the planning step:
 1. If user has an idea → office-hours runs BEFORE plan-creator
-2. Output: design doc → feeds into `mk:plan-creator` as input
+2. Output: design doc → feeds into `mk-plan-creator` as input
 
 Skip: Always — office-hours is a pre-planning skill. It feeds plan-creator, not the reverse.
 
@@ -27,7 +27,7 @@ Skip: Always — office-hours is a pre-planning skill. It feeds plan-creator, no
 - User asks whether something is worth building, who needs it, or what smallest wedge to validate
 - Before running `the plan-ceo-review skill`
 
-A bare “brainstorm” request is ambiguous: ask whether the user wants product discovery/validation or technical approaches. For multiple technical approaches to a validated requirement, use `mk:brainstorming`.
+A bare “brainstorm” request is ambiguous: ask whether the user wants product discovery/validation or technical approaches. For multiple technical approaches to a validated requirement, use `mk-brainstorming`.
 
 ## Workflow
 

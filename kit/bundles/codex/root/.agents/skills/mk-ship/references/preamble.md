@@ -13,7 +13,6 @@
 - [Plan Status Footer](#plan-status-footer)
 - [REVIEW REPORT](#review-report)
 
-
 ## Preamble (run first)
 
 ```bash
@@ -180,7 +179,7 @@ RECOMMENDATION: [what the user should do next]
 
 ## Plan Status Footer
 
-When you are in plan mode and about to call ExitPlanMode:
+When you are in plan mode and about to present the plan for approval:
 
 1. Check if the plan file already has a `## REVIEW REPORT` section.
 2. If it DOES — skip (a review skill already wrote a richer report).

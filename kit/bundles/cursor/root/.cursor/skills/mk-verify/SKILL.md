@@ -12,13 +12,13 @@ Produces a single PASS/FAIL verdict with per-step results.
 ## When to Use
 
 - After Phase 3 (Build GREEN) completes, before Phase 4 (Review)
-- Before creating a PR (`mk:ship` pre-flight)
+- Before creating a PR (`mk-ship` pre-flight)
 - Standalone: "is everything green?", "run all checks", "verify build"
 
 ## Phase Anchor
 
 **Phase: 3→4 transition (Build → Review)**
-**Handoff:** If PASS → proceed to `mk:review`. If FAIL → developer fixes, re-run verify.
+**Handoff:** If PASS → proceed to `mk-review`. If FAIL → developer fixes, re-run verify.
 
 ## Project Detection
 

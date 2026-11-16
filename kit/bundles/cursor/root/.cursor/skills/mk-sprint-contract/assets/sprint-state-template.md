@@ -19,9 +19,9 @@ Distinct from per-story `sprint-contract` (one per story per sprint).
 Path: tasks/contracts/sprint-state-{date}-sprint-{N}.md
 
 Owner skills:
-- mk:sprint-contract sprint-goal — writes sprint_goal, creates this file if absent
-- mk:jira-agile sprint add|remove — appends to amendments (with flock)
-- mk:jira-agile sprint close — writes status:closed, delivered, carried_over
+- mk-sprint-contract sprint-goal — writes sprint_goal, creates this file if absent
+- mk-jira-agile sprint add|remove — appends to amendments (with flock)
+- mk-jira-agile sprint close — writes status:closed, delivered, carried_over
 
 Rule body: agile sprint commitment (see project agile rules)
 
@@ -51,11 +51,11 @@ none of by design.
 
 ## Amendments
 
-<auto-populated by `mk:jira-agile sprint add|remove` post-start; mirrors `amendments:` frontmatter>
+<auto-populated by `mk-jira-agile sprint add|remove` post-start; mirrors `amendments:` frontmatter>
 
 ## Closure Summary
 
-<filled by `mk:jira-agile sprint close`>
+<filled by `mk-jira-agile sprint close`>
 
 - Delivered: ...
 - Carried over: ...

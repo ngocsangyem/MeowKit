@@ -5,6 +5,15 @@ design (it interviews like grill, weighs options like brainstorming, questions
 premises like office-hours), so the risk is that it becomes the catch-all that
 absorbs all four. These canaries are how that gets caught.
 
+## Contents
+
+- [The discriminator](#the-discriminator)
+- [Canaries](#canaries)
+- [Near-miss pairs](#near-miss-pairs)
+- [Known fence tensions](#known-fence-tensions)
+- [Reframing-gate canaries](#reframing-gate-canaries)
+- [Ownership canaries](#ownership-canaries)
+
 **Run this checklist** after editing `mk:advise`'s fences, or any neighbor's
 `when_to_use` / `description`. Manual: read each prompt, name the route it should
 take from the fences alone, compare against Expected. A miss means the fences are

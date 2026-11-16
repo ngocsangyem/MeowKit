@@ -60,7 +60,7 @@ On completion: what to pass, to whom, in what format.
 
 ## Step 5: Security Check
 
-If the skill processes untrusted input, load mk:skill-template-secure and verify:
+If the skill processes untrusted input, load mk-skill-template-secure and verify:
 - Rule of Two compliance (max 2 of: untrusted input, sensitive data, state change)
 - Trust model table (what's trusted vs untrusted)
 - Content processing rules

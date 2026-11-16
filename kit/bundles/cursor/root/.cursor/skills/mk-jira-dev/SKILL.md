@@ -3,7 +3,7 @@ name: "mk-jira-dev"
 description: "Makes branch names, PR bodies, commit links from a Jira ticket. NOT for mk-ship."
 ---
 
-# mk:jira-dev
+# mk-jira-dev
 
 Forks to the `jira-dev` agent. Pure artifact generation — the user reviews and runs the resulting `git`/`gh` commands.
 
@@ -23,7 +23,7 @@ Forks to the `jira-dev` agent. Pure artifact generation — the user reviews and
 
 ## Handoff
 
-`mk:ship` may invoke `bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh dev branch-name <KEY>` during its branch-creation step (documentation-only — no automatic wiring exists today). Users opt in by passing the Jira key context to `mk:ship`.
+`mk-ship` may invoke `bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh dev branch-name <KEY>` during its branch-creation step (documentation-only — no automatic wiring exists today). Users opt in by passing the Jira key context to `mk-ship`.
 
 ## See also
 
@@ -33,7 +33,7 @@ Forks to the `jira-dev` agent. Pure artifact generation — the user reviews and
   - `references/branch-naming.md` — convention reference (`<type>/<KEY>-<slug>`)
   - `references/smart-commits.md` — smart-commit syntax for closing/transitioning from commit messages
   - `references/commit-messages.md` — Atlassian-aware commit-message conventions
-- Peer leaves: `mk:ship` (consumes `dev branch-name` + `dev pr-description`), `mk:jira-issue` (issue must exist before branch creation), `mk:jira-lifecycle` (transitions via smart-commit footer)
+- Peer leaves: `mk-ship` (consumes `dev branch-name` + `dev pr-description`), `mk-jira-issue` (issue must exist before branch creation), `mk-jira-lifecycle` (transitions via smart-commit footer)
 
 ## Gotchas
 

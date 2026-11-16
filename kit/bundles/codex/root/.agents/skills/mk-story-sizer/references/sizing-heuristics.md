@@ -1,6 +1,18 @@
 # Sizing Heuristics
 
-Maps a `StoryRecord` to a Fibonacci point estimate, complexity verdict, inconsistency flags, optional split proposal, and (when the Agile rules are loaded) a DoR advisory. Reuses Fibonacci anchors from `.agents/skills/jira/references/estimation-guide.md` — DO NOT drift from that table.
+Maps a `StoryRecord` to a Fibonacci point estimate, complexity verdict, inconsistency flags, optional split proposal, and (when the Agile rules are loaded) a DoR advisory. Reuses Fibonacci anchors from `.agents/skills/mk-jira/references/estimation-guide.md` — DO NOT drift from that table.
+
+## Contents
+
+- [Inputs / Outputs](#inputs--outputs)
+- [Complexity Dimensions (deterministic scoring)](#complexity-dimensions-deterministic-scoring)
+- [Fibonacci Mapping](#fibonacci-mapping)
+- [Inconsistency Detection](#inconsistency-detection)
+- [Split Proposal](#split-proposal)
+- [DoR Advisory (conditional)](#dor-advisory-conditional)
+- [Determinism](#determinism)
+- [Refusal Path](#refusal-path)
+- [Cross-references](#cross-references)
 
 ## Inputs / Outputs
 
@@ -110,7 +122,7 @@ Splits are **advisory only**. The sized parent record stays in the report; the s
 
 ## DoR Advisory (conditional)
 
-If `agile_loaded == true` (i.e., the agile story gates rule was loaded by `mk:agent-detector`), emit a `DoRStatus`:
+If `agile_loaded == true` (i.e., the agile story gates rule was loaded by `mk-agent-detector`), emit a `DoRStatus`:
 
 ```text
 DoRStatus {
@@ -141,7 +153,7 @@ Inputs that refuse sizing (return `points: null`):
 
 ## Cross-references
 
-- Fibonacci anchors: `.agents/skills/jira/references/estimation-guide.md`
+- Fibonacci anchors: `.agents/skills/mk-jira/references/estimation-guide.md`
 - Trust boundary: `AGENTS.md` (Data & injection boundary) Rule 1 + Rule 11
 - Optional DoR rules: agile story gates (advisory, DoR-only)
-- Scout extraction (when `--scout` is passed): mirrors `mk:planning-engine` (see SKILL.md)
+- Scout extraction (when `--scout` is passed): mirrors `mk-planning-engine` (see SKILL.md)

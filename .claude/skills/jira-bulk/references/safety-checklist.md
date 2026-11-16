@@ -2,6 +2,15 @@
 
 Use this checklist before executing any bulk operation affecting >50 issues.
 
+## Contents
+
+- [Quick Checklist (Fast Track)](#quick-checklist-fast-track)
+- [Full Checklist](#full-checklist)
+- [Risk Assessment](#risk-assessment)
+- [Pre-Operation Commands](#pre-operation-commands)
+- [Rollback Plan Template](#rollback-plan-template)
+- [Related Documentation](#related-documentation)
+
 ---
 
 ## Quick Checklist (Fast Track)

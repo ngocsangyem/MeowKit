@@ -2,6 +2,15 @@
 
 Routes for upstream agent-browser skills that should not be missed:
 
+## Contents
+
+- [Dogfood / Exploratory QA](#dogfood--exploratory-qa)
+- [Electron Apps](#electron-apps)
+- [Slack](#slack)
+- [Vercel Sandbox](#vercel-sandbox)
+- [AWS Bedrock AgentCore](#aws-bedrock-agentcore)
+- [Selection Checklist](#selection-checklist)
+
 - `dogfood`
 - `electron`
 - `slack`

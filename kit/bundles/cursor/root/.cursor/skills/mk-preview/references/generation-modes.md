@@ -172,7 +172,7 @@ Legend:
 5. Report:
    - Absolute path of the generated file
    - One-line note on which directory was chosen (plan-scoped vs flat fallback)
-   - Suggested follow-up: open in editor, or `mk:web-to-markdown` to render in a browser
+   - Suggested follow-up: open in editor, or `mk-web-to-markdown` to render in a browser
 
 For `--ascii`: also print the ASCII diagram to stdout so the user sees it inline.
 

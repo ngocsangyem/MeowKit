@@ -2,6 +2,14 @@
 
 Complete reference for JIRA custom field types, their use cases, and selection guidance.
 
+## Contents
+
+- [Quick Selection Guide](#quick-selection-guide)
+- [Standard Field Types](#standard-field-types)
+- [Agile-Specific Fields](#agile-specific-fields)
+- [Field Type Decision Tree](#field-type-decision-tree)
+- [Technical Reference](#technical-reference)
+
 ---
 
 ## Quick Selection Guide
@@ -40,7 +48,7 @@ Complete reference for JIRA custom field types, their use cases, and selection g
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "External ID" --type text
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "External ID" --type text
 ```
 
 ---
@@ -62,7 +70,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Technical Notes" --type textarea
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Technical Notes" --type textarea
 ```
 
 ---
@@ -84,7 +92,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Effort Hours" --type number
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Effort Hours" --type number
 ```
 
 ---
@@ -106,7 +114,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Target Date" --type date
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Target Date" --type date
 ```
 
 ---
@@ -128,7 +136,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Deployment Time" --type datetime
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Deployment Time" --type datetime
 ```
 
 ---
@@ -150,7 +158,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Severity" --type select
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Severity" --type select
 ```
 
 **Note:** Configure options in JIRA admin after creation.
@@ -174,7 +182,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Target Platforms" --type multiselect
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Target Platforms" --type multiselect
 ```
 
 ---
@@ -196,7 +204,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Compliance" --type checkbox
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Compliance" --type checkbox
 ```
 
 ---
@@ -218,7 +226,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Approval" --type radio
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Approval" --type radio
 ```
 
 ---
@@ -240,7 +248,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Documentation" --type url
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Documentation" --type url
 ```
 
 ---
@@ -262,7 +270,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Approver" --type user
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Approver" --type user
 ```
 
 ---
@@ -284,7 +292,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fie
 
 **Create command:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields create --name "Tech Stack" --type labels
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields create --name "Tech Stack" --type labels
 ```
 
 ---
@@ -336,6 +344,6 @@ Is the value text?
 For Atlassian plugin identifiers used in API calls, jira-as fetches them at runtime:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh fields list --output json | jq '.[] | {id, name, schema}'
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh fields list --output json | jq '.[] | {id, name, schema}'
 ```
 

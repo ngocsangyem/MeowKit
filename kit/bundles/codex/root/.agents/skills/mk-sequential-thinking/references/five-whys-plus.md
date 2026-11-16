@@ -81,4 +81,4 @@ Root cause: index-migration tooling gap. Actionable ✓ Fundamental ✓.
 
 ## Bridge to sequential-thinking
 
-Use the `hypothesis-testing.md` template in `mk:sequential-thinking` to track the why-chain. Each "why" becomes a hypothesis row; "evidence" fills the Evidence column; counter-analysis drives the Revision section. Five-Whys-Plus is the discipline; sequential-thinking's template is the output.
+Use the `hypothesis-testing.md` template in `mk-sequential-thinking` to track the why-chain. Each "why" becomes a hypothesis row; "evidence" fills the Evidence column; counter-analysis drives the Revision section. Five-Whys-Plus is the discipline; sequential-thinking's template is the output.

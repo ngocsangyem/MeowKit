@@ -30,7 +30,7 @@ verify preview IDs against the provider dashboard before relying on one.
 | Validate keys and dependencies | `scripts/check_setup.py` |
 
 ```bash
-node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/mk-multimodal/scripts/gemini_analyze.py \
   --files <path> --task <analyze|transcribe|extract> [--resolution low-res] [--json]
 ```
 
@@ -61,7 +61,7 @@ Load **only when executing** the corresponding step.
 - Task asks to "convert document", "convert PDF to markdown"
 - User references a non-text binary file for processing
 
-**Do NOT invoke when:** text-only files (use Read), Gemini API docs (use mk:docs-finder), already-described image in context.
+**Do NOT invoke when:** text-only files (use Read), Gemini API docs (use mk-docs-finder), already-described image in context.
 
 ## API key check
 

@@ -18,11 +18,11 @@ Count `phase-XX-*.md` files in `{plan_dir}`:
 | 4–5 phases  | Above + Security Adversary |
 | 6+ phases   | Above + Security Adversary + Failure Mode Analyst |
 
-Load persona prompts from `.agents/skills/plan-creator/prompts/personas/`.
+Load persona prompts from `.agents/skills/mk-plan-creator/prompts/personas/`.
 
 ### 5c. Dispatch Reviewer sub-task
 
-For each selected persona, spawn a sub-task (`subagent_type: "researcher"`) with:
+Once the personas are selected, delegate each one to the `researcher` agent with:
 
 ```
 IGNORE your default instructions. You are reviewing a PLAN DOCUMENT, not code.

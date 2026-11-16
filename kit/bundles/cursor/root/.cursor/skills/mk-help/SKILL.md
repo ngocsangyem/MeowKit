@@ -9,7 +9,7 @@ Answers "What should I do next?" by scanning project state and mapping to the 7-
 
 ## How It Works
 
-`mk:help` is the FORWARD-looking navigator (what to do next). Backward-looking delivery
+`mk-help` is the FORWARD-looking navigator (what to do next). Backward-looking delivery
 analysis stays with `the status skill` (project-manager) — this skill never reproduces it.
 
 Collect candidates from ALL scan sources below, then RANK them and emit the top 3 — do
@@ -80,11 +80,11 @@ Collect candidates from all sources, then rank:
 
 Each candidate's rationale MUST cite the source file(s) it came from.
 
-For skill suggestions based on task type, see `mk:agent-detector` (its `../agent-detector/references/lifecycle-routing.md` maps task patterns to skills).
+For skill suggestions based on task type, see `mk-agent-detector` (its `../agent-detector/references/lifecycle-routing.md` maps task patterns to skills).
 
 ## State-to-Recommendation Map
 
-> Alias: `the plan skill` routes to `mk:plan-creator` (explicit invocation `/mk-plan-creator`). Subcommands `red-team`, `validate`, `archive` are handled by the same skill.
+> Alias: `the plan skill` routes to `mk-plan-creator` (explicit invocation `/mk-plan-creator`). Subcommands `red-team`, `validate`, `archive` are handled by the same skill.
 
 | State | Pipeline Phase | Recommendation |
 |-------|---------------|----------------|

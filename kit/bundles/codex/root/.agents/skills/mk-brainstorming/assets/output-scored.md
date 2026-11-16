@@ -75,7 +75,7 @@ Score each idea on all 4 criteria after the full set exists. See `references/sco
 **Why it wins:** [cite score, constraint fit, novelty, scout touchpoint, or rejected alternative]
 **Rejected alternative worth noting:** [IDEA] — [why it lost]
 **Primary risk:** [risk]
-**First planning question:** [question for mk:plan-creator]
+**First planning question:** [question for mk-plan-creator]
 
 ### Risk Note
 
@@ -115,6 +115,6 @@ report_path: "tasks/reports/[report-name].md"
 
 ### Next Steps
 
-- Create implementation plan from top idea → ask, then pass report path + handoff packet to `mk:plan-creator`
+- Create implementation plan from top idea → ask, then pass report path + handoff packet to `mk-plan-creator`
 - Drill deeper into a specific idea → "explore idea #N"
 - Re-score with different criteria → adjust `references/scoring-criteria.md` weights and re-run

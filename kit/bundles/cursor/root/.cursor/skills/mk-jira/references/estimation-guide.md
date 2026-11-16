@@ -35,7 +35,7 @@ Output: "Human estimation recommended" + reasons.
 
 ## JQL Escaping
 
-All user-derived terms: `bash .cursor/skills/jira/scripts/jql-sanitize.sh '<term>'`
+All user-derived terms: `bash .cursor/skills/mk-jira/scripts/jql-sanitize.sh '<term>'`
 
 ## JQL Error vs Zero Results
 

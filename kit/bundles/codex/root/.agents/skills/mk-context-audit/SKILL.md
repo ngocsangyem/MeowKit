@@ -46,9 +46,9 @@ The slash command runs the pipeline:
 
 ```bash
 SCAN_ROOT="${1:-$PWD}"
-bash .agents/skills/context-audit/scripts/inventory-context.sh "$SCAN_ROOT" \
-  | bash .agents/skills/context-audit/scripts/estimate-tokens.sh \
-  | bash .agents/skills/context-audit/scripts/format-audit-report.sh
+bash .agents/skills/mk-context-audit/scripts/inventory-context.sh "$SCAN_ROOT" \
+  | bash .agents/skills/mk-context-audit/scripts/estimate-tokens.sh \
+  | bash .agents/skills/mk-context-audit/scripts/format-audit-report.sh
 ```
 
 Output is markdown, printed to terminal. The skill does NOT write any files.

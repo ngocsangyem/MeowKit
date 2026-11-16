@@ -9,14 +9,14 @@ This enables suggesting the right skill — not just the right model tier.
 
 | Task Type | Signal Keywords / Patterns | Suggested Skill | Notes |
 |---|---|---|---|
-| **Bug Fix** | "bug", "error", "broken", "fails", "regression", steps-to-reproduce present | `mk:fix` or `mk:investigate` | Use `mk:investigate` when root cause is unknown |
-| **Feature** | "add", "implement", "build", "create", "new" | `mk:cook` | Default for greenfield work |
-| **Refactor** | "refactor", "clean up", "extract", "simplify", "rename" | `mk:cook --fast` | Behavior unchanged — structure only |
-| **Security** | "vulnerability", "CVE", "audit", "penetration", "secrets" | `mk:cso` | Forces COMPLEX tier — no downgrade |
-| **DevOps** | "deploy", "CI/CD", "pipeline", "docker", "kubernetes" | `mk:cook` | Infrastructure as code follows standard flow |
-| **Documentation** | "docs", "README", "changelog", "API docs" | `mk:docs-init` or `mk:document-release` | MICRO-TASK eligible — may skip the plan file |
-| **Review** | "review", "PR", "pull request", "check" | `mk:review` | Adversarial 4-step review workflow |
-| **Intake** | "PRD", "ticket", "issue", "analyze ticket", "triage" | `mk:intake` | Phase 2 — not yet available in v1.x |
+| **Bug Fix** | "bug", "error", "broken", "fails", "regression", steps-to-reproduce present | `mk-fix` or `mk-investigate` | Use `mk-investigate` when root cause is unknown |
+| **Feature** | "add", "implement", "build", "create", "new" | `mk-cook` | Default for greenfield work |
+| **Refactor** | "refactor", "clean up", "extract", "simplify", "rename" | `mk-cook --fast` | Behavior unchanged — structure only |
+| **Security** | "vulnerability", "CVE", "audit", "penetration", "secrets" | `mk-cso` | Forces COMPLEX tier — no downgrade |
+| **DevOps** | "deploy", "CI/CD", "pipeline", "docker", "kubernetes" | `mk-cook` | Infrastructure as code follows standard flow |
+| **Documentation** | "docs", "README", "changelog", "API docs" | `mk-docs-init` or `mk-document-release` | MICRO-TASK eligible — may skip the plan file |
+| **Review** | "review", "PR", "pull request", "check" | `mk-review` | Adversarial 4-step review workflow |
+| **Intake** | "PRD", "ticket", "issue", "analyze ticket", "triage" | `mk-intake` | Phase 2 — not yet available in v1.x |
 
 ---
 
@@ -47,13 +47,13 @@ When task type is classified, scale-routing adds to its output:
 ```json
 {
   "task_type": "bug_fix",
-  "suggested_skill": "mk:fix",
+  "suggested_skill": "mk-fix",
   "confidence": "HIGH"
 }
 ```
 
 `suggested_skill` is a recommendation — the orchestrator may override based on task context.
-`task_type` is always set; `suggested_skill` defaults to `mk:cook` when no specific match.
+`task_type` is always set; `suggested_skill` defaults to `mk-cook` when no specific match.
 
 ---
 
@@ -61,9 +61,9 @@ When task type is classified, scale-routing adds to its output:
 
 | Task Description | task_type | suggested_skill | Reasoning |
 |---|---|---|---|
-| "Login button is broken on mobile" | bug_fix | mk:fix | "broken" + UI context |
-| "Add OAuth2 support" | feature | mk:cook | "add" dominant signal |
-| "Extract auth logic into service" | refactor | mk:cook --fast | "extract" + "service" |
-| "Audit session token storage" | security | mk:cso | "audit" + "token" = security |
-| "Update CHANGELOG for v2.1" | docs | mk:document-release | "changelog" = release docs |
-| "Review PR #342" | review | mk:review | explicit "review PR" |
+| "Login button is broken on mobile" | bug_fix | mk-fix | "broken" + UI context |
+| "Add OAuth2 support" | feature | mk-cook | "add" dominant signal |
+| "Extract auth logic into service" | refactor | mk-cook --fast | "extract" + "service" |
+| "Audit session token storage" | security | mk-cso | "audit" + "token" = security |
+| "Update CHANGELOG for v2.1" | docs | mk-document-release | "changelog" = release docs |
+| "Review PR #342" | review | mk-review | explicit "review PR" |

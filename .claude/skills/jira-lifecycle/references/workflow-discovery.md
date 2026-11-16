@@ -2,6 +2,18 @@
 
 The authoritative source for "what statuses + transitions exist in your Jira" is **your Jira instance**, not a hardcoded template. This file documents how the `mk:jira-*` family discovers, caches, and consumes that source.
 
+## Contents
+
+- [TL;DR](#tldr)
+- [Verified source primitives](#verified-source-primitives)
+- [Discovery flow](#discovery-flow)
+- [Cache file shape (admin path)](#cache-file-shape-admin-path)
+- [Cache freshness](#cache-freshness)
+- [Non-admin reality check](#non-admin-reality-check)
+- [Cross-skill consumers](#cross-skill-consumers)
+- [Educational concept patterns (NOT authoritative)](#educational-concept-patterns-not-authoritative)
+- [Open questions / known limits](#open-questions--known-limits)
+
 ## TL;DR
 
 ```bash

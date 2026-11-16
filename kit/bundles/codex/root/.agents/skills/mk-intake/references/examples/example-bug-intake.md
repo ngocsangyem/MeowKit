@@ -1,6 +1,6 @@
 # Example: Bug Ticket Intake
 
-Walkthrough of mk:intake processing a real bug ticket end-to-end.
+Walkthrough of mk-intake processing a real bug ticket end-to-end.
 
 ---
 
@@ -35,7 +35,7 @@ No injection patterns detected. Content treated as DATA.
 Design Context: Login page redirect. No error message visible. URL shows `/login?expired=true`.
 
 ### Step 4: Classify product area
-mk:scale-routing signals: "logged out", "auth", "session", "token"
+mk-scale-routing signals: "logged out", "auth", "session", "token"
 Result: `{domain: auth_session, level: high, workflow: enhanced, model_tier_override: COMPLEX}`
 
 ### Step 5: Evaluate completeness
@@ -57,13 +57,13 @@ Missing:
 - Acceptance Criteria: need binary pass/fail (e.g., "Users remain logged in for 7 days unless they log out")
 - Steps to Reproduce: need exact repro (log in → wait 24h → observe) with expected vs actual
 
-### Step 6: Scan codebase (mk:scout)
+### Step 6: Scan codebase (mk-scout)
 Related files found:
 - `src/auth/token-refresh.service.ts` — handles JWT refresh logic
 - `src/middleware/auth.guard.ts` — validates session on each request
 - `src/config/session.config.ts` — `SESSION_TTL = 86400` (24 hours — matches symptom)
 
-### Step 7: Root cause analysis (mk:investigate)
+### Step 7: Root cause analysis (mk-investigate)
 Method: 5 Whys (single failure mode, medium complexity)
 
 1. Why logged out after 24h? → Session token expires
@@ -117,4 +117,4 @@ Token refresh is event-driven (navigation-only). Idle users never trigger refres
 - Auth team lead (domain owner, 3 open auth tickets)
 ```
 
-**Handoff:** `mk:fix` (bug ticket, complexity: low)
+**Handoff:** `mk-fix` (bug ticket, complexity: low)

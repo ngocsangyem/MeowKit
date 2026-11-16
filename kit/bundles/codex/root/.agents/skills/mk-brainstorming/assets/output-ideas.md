@@ -75,7 +75,7 @@ These are subjective picks after the challenge pass, not formal scoring. For wei
 
 ### Ready-to-Plan Packet
 
-Use only if the user chooses one idea to plan. Do not invoke `mk:plan-creator` automatically.
+Use only if the user chooses one idea to plan. Do not invoke `mk-plan-creator` automatically.
 
 ```yaml
 problem: "[confirmed problem]"
@@ -97,6 +97,6 @@ report_path: "tasks/reports/[report-name].md"
 ### Next Steps
 
 - Drill deeper into a specific idea → "explore idea #N"
-- Ready to plan → ask before passing the packet to `mk:plan-creator`
+- Ready to plan → ask before passing the packet to `mk-plan-creator`
 - Need weighted scores → use `assets/output-scored.md` in the same deep run
-- Need product validation first → `mk:office-hours`
+- Need product validation first → `mk-office-hours`

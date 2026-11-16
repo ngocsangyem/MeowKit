@@ -2,6 +2,14 @@
 
 Complete reference for JIRA custom field types, their use cases, and selection guidance.
 
+## Contents
+
+- [Quick Selection Guide](#quick-selection-guide)
+- [Standard Field Types](#standard-field-types)
+- [Agile-Specific Fields](#agile-specific-fields)
+- [Field Type Decision Tree](#field-type-decision-tree)
+- [Technical Reference](#technical-reference)
+
 ---
 
 ## Quick Selection Guide

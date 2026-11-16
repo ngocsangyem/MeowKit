@@ -4,14 +4,14 @@ Classify your skill before writing it. Each type has different requirements.
 
 | Type | Description | Example | Key Pattern |
 |------|-------------|-----------------|-------------|
-| Library/API | Wrap external APIs, handle auth, manage versions | mk:docs-finder, mk:multimodal | Scripts for API calls, config for auth |
-| Verification | Check quality, validate, audit | mk:review, mk:cso, mk:lint-and-validate | Deterministic scripts, pass/fail output |
+| Library/API | Wrap external APIs, handle auth, manage versions | mk-docs-finder, mk-multimodal | Scripts for API calls, config for auth |
+| Verification | Check quality, validate, audit | mk-review, mk-cso, mk-lint-and-validate | Deterministic scripts, pass/fail output |
 | Data | Database, migrations, ETL | (none yet) | Schema refs, migration scripts |
-| Business Process | Multi-step workflows, approval chains | mk:cook, mk:ship, mk:workflow-orchestrator | Phase refs, state tracking |
-| Scaffolding | Generate templates, boilerplate | mk:skill-creator, mk:plan-creator | assets/ with templates |
-| Code Quality | Linting, formatting, style | mk:clean-code, mk:typescript | Rules refs, auto-fix scripts |
-| CI/CD | Build, deploy, release | mk:ship | Pipeline refs, env config |
-| Runbooks | Operational procedures, incident response | mk:investigate, mk:careful | Step-by-step with escape hatches |
+| Business Process | Multi-step workflows, approval chains | mk-cook, mk-ship, mk-workflow-orchestrator | Phase refs, state tracking |
+| Scaffolding | Generate templates, boilerplate | mk-skill-creator, mk-plan-creator | assets/ with templates |
+| Code Quality | Linting, formatting, style | mk-clean-code, mk-typescript | Rules refs, auto-fix scripts |
+| CI/CD | Build, deploy, release | mk-ship | Pipeline refs, env config |
+| Runbooks | Operational procedures, incident response | mk-investigate, mk-careful | Step-by-step with escape hatches |
 | Infrastructure | Cloud, containers, networking | (none yet) | Provider-specific refs, IaC patterns |
 
 ## Decision: "What type is my skill?"

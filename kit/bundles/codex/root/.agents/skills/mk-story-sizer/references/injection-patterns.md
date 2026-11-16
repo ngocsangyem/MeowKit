@@ -40,6 +40,6 @@ Auto-create writes user-paste content into the Jira `summary` and `description` 
 If a legitimate ticket needs a phrase containing one of these substrings, the user must:
 
 1. Reword the summary/description (typically the simplest path).
-2. OR ABORT auto-create and create the ticket manually via `mk:jira-issue create`, accepting the risk explicitly.
+2. OR ABORT auto-create and create the ticket manually via `mk-jira-issue create`, accepting the risk explicitly.
 
 There is NO `--force` flag, NO `--allow-pattern` flag — every pattern match aborts the batch by design.

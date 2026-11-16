@@ -11,19 +11,19 @@ description: "Routes complex-feature intent through the 7-phase workflow; auto-i
 
 **Priority:** CRITICAL — Use for complex feature implementations.
 
-> Only activates on session start for complex-feature intent. If `the cook skill` was explicitly invoked in this session, do not activate — `mk:cook` owns the pipeline. See AGENTS.md (Delegation & subagents)"Orchestrator Entry Point Rule".
+> Only activates on session start for complex-feature intent. If `the cook skill` was explicitly invoked in this session, do not activate — `mk-cook` owns the pipeline. See AGENTS.md (Delegation & subagents)"Orchestrator Entry Point Rule".
 
 ## Canonical Lifecycle
 
 `.codex/workflow.yaml` is the sole source for phase sequence, leads, and required outputs. This adapter must not restate phase details. For execution load `references/workflow-phases.md`, which renders that contract.
 
-On a non-trivial task, route to `mk:plan-creator` and agree the plan with the user before building. Fasttrack accepts only a spec the user has already settled. Phase 4 leaves a review verdict; read it before any explicit ship request.
+On a non-trivial task, route to `mk-plan-creator` and agree the plan with the user before building. Fasttrack accepts only a spec the user has already settled. Phase 4 leaves a review verdict; read it before any explicit ship request.
 
 ## When to Use
 
 **USE for:** New features, complex implementations, tasks >2 hours, multi-file changes, tasks requiring TDD.
 
-**DON'T use for:** Bug fixes → `mk:fix`, quick refactors → direct edit, config changes → direct edit, simple questions → just answer.
+**DON'T use for:** Bug fixes → `mk-fix`, quick refactors → direct edit, config changes → direct edit, simple questions → just answer.
 
 ## Pre-Execution Checklist
 
@@ -34,7 +34,7 @@ On a non-trivial task, route to `mk:plan-creator` and agree the plan with the us
 
 ## Process
 
-See the phase-contract conventions for input/output expectations per phase. (Loaded by `mk:agent-detector` Step 0b at session start.)
+See the phase-contract conventions for input/output expectations per phase. (Loaded by `mk-agent-detector` Step 0b at session start.)
 
 1. **Run pre-execution checklist** — select lead agent, show agent banner, verify complexity, challenge requirements.
 

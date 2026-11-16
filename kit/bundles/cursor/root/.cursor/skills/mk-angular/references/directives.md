@@ -1,13 +1,12 @@
 # Angular Directives
 
-> Part of mk:angular skill. Read when: working with directives.
+> Part of mk-angular skill. Read when: working with directives.
 > Source: analogjs/angular-skills/angular-directives (MIT)
 
 ## Contents
 
 - [Core Patterns](#core-patterns)
 - [Advanced Patterns](#advanced-patterns)
-
 
 ## Core Patterns
 

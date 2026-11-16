@@ -2,22 +2,22 @@
 
 ## Step 3.5: Pre-Landing Review
 
-Structural review is owned by `mk:review` — ship does not re-run the full adversarial pipeline. Ship's pre-landing check is a lightweight diff-based pass only.
+Structural review is owned by `mk-review` — ship does not re-run the full adversarial pipeline. Ship's pre-landing check is a lightweight diff-based pass only.
 
 1. Run `git diff origin/<base>` to get the full diff (scoped to feature changes against the freshly-fetched base branch).
 
-2. Apply the two-pass review via the prompts under `mk:review/prompts/` (blind-hunter for obvious issues, criteria-auditor for plan ACs). Load them JIT when needed.
+2. Apply the two-pass review via the prompts under `mk-review/prompts/` (blind-hunter for obvious issues, criteria-auditor for plan ACs). Load them JIT when needed.
 
-## Design Review (delegated to mk:review)
+## Design Review (delegated to mk-review)
 
-Design review is delegated to `mk:review/references/design-review.md` — rubric-based, diff-scoped. Ship does not re-implement it.
+Design review is delegated to `mk-review/references/design-review.md` — rubric-based, diff-scoped. Ship does not re-implement it.
 
-If the diff is frontend-only and no `mk:review` pass ran, load `mk:review/references/design-review.md` and follow the rubric pipeline there.
+If the diff is frontend-only and no `mk-review` pass ran, load `mk-review/references/design-review.md` and follow the rubric pipeline there.
 
 ## Classify findings
 
 4. **Classify each finding as AUTO-FIX or ASK** per the Fix-First Heuristic in
-   `mk:review/references/fix-first-review.md`. Critical findings lean toward ASK; informational lean toward AUTO-FIX.
+   `mk-review/references/fix-first-review.md`. Critical findings lean toward ASK; informational lean toward AUTO-FIX.
 
 5. **Auto-fix all AUTO-FIX items.** Apply each fix. Output one line per fix:
    `[AUTO-FIXED] [file:line] Problem → what you did`

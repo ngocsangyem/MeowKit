@@ -1,5 +1,16 @@
 # Task Management & Hydration
 
+## Contents
+
+- [Plan → Task Bridge](#plan--task-bridge)
+- [Hydration Rules](#hydration-rules)
+- [Post-Hydration Integrity Checks](#post-hydration-integrity-checks)
+- [Cross-Session Resume](#cross-session-resume)
+- [Sync-Back (on completion)](#sync-back-on-completion)
+- [Sync-Back Protocol (Executed by Cook's Finalize Step)](#sync-back-protocol-executed-by-cooks-finalize-step)
+- [Status Producer/Consumer Matrix](#status-producerconsumer-matrix)
+- [Cook Handoff](#cook-handoff)
+
 ## Plan → Task Bridge
 
 Plans are persistent files; session tasks are scoped to the current session — they vanish when the session ends. Hydration bridges the two: read each `[ ]` from phase files, create one tracked task per unchecked item. Sync-back closes the loop on completion: `[ ]` → `[x]` and frontmatter status update.
@@ -115,7 +126,7 @@ if new_status != current_status:
 **Invariants:**
 - `status: completed` requires `total > 0 AND checked == total`. Empty todo lists never auto-promote.
 - `failed` and `abandoned` are terminal — only a human edit moves out.
-- Auto-archive never waits for `mk:ship`; completed task checkboxes are the source of truth for plan completion.
+- Auto-archive never waits for `mk-ship`; completed task checkboxes are the source of truth for plan completion.
 - `active` is HUMAN-ONLY — sync-back never writes `active`. The algorithm produces `pending`, `in_progress`, or `completed`. If a human marks a phase `active`, sync-back may demote it to `pending` when no todos are checked. (Use `in_progress` instead — it survives sync-back as long as at least one todo is checked.)
 - Frontmatter is source of truth. The Overview block (`**Status:** ...`) is regenerated from frontmatter on every sync-back, NOT vice versa.
 - Idempotent: re-running sync-back on an unchanged file produces zero diff.
@@ -137,8 +148,8 @@ if new_status != current_status:
 
 ### Cross-Skill Notes
 
-- **`mk:plan-ceo-review`**: reads phase files for review; YAML frontmatter is informational and parsed by FAILSAFE_SCHEMA — safe to ignore for ceo-review's prose analysis.
-- **`mk:review` step-03b whole-plan-sweep**: gains a NEW drift surface — `dependencies: [N]` array. The sweep flags stale phase-number references when phases are renumbered/removed; this is informational, not blocking.
+- **`mk-plan-ceo-review`**: reads phase files for review; YAML frontmatter is informational and parsed by FAILSAFE_SCHEMA — safe to ignore for ceo-review's prose analysis.
+- **`mk-review` step-03b whole-plan-sweep**: gains a NEW drift surface — `dependencies: [N]` array. The sweep flags stale phase-number references when phases are renumbered/removed; this is informational, not blocking.
 
 **Cross-Session Resume (canonical source):**
 New session → read plan.md / phase-file `[ ]` checkboxes (and the phase frontmatter `status`, which the Sync-Back Algorithm derives from those checkboxes) → skip completed phases → re-hydrate only unchecked/pending phases as tasks. This matches `## Cross-Session Resume` above — there is ONE canonical resume source.

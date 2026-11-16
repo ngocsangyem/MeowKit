@@ -36,7 +36,7 @@ description: "Picks the agent and complexity tier at orient; runs first in a wor
    If any `Read` returns "file does not exist" or equivalent, **ABORT IMMEDIATELY** with the exact message:
 
    ```
-   SAFETY BASELINE INCOMPLETE: rule <name> not found at .cursor/skills/rule-<name>.md
+   SAFETY BASELINE INCOMPLETE: rule <name> not found at .cursor/skills/mk-rule-<name>.md
    Refusing to route any task. Restore the rule (git checkout / the installer) before retrying.
    ```
 
@@ -54,13 +54,13 @@ description: "Picks the agent and complexity tier at orient; runs first in a wor
    - the model-selection conventions — task-type → model-tier mapping
    - the scale-adaptive routing conventions — domain CSV → complexity routing
    - the risk checklist — 9 horizontal-risk flags
-   - `.cursor/skills/agent-detector/references/skill-domain-routing.md` — intent → skill dispatch table (used at hand-off, Step 5)
+   - `.cursor/skills/mk-agent-detector/references/skill-domain-routing.md` — intent → skill dispatch table (used at hand-off, Step 5)
 
    If any of the 5 rule `Read`s fails: ABORT with `PHASE-ZERO RULE MISSING: <name>` — same fail-fast semantics as Step 0. These rules drive the routing logic in steps 2–4; without them, detection silently degrades to keyword-only. The skill-domain-routing reference is advisory dispatch guidance (not a routing rule): if it is absent, log `skill-domain-routing reference absent; skill dispatch falls back to inline judgment` and continue — do NOT abort.
 
    **Agile context detection (additive — Agile-only load).** After the 5 phase-zero `Read`s succeed:
 
-   1. **PRE-FLIGHT.** Check that `.cursor/skills/rule-` directory exists. If absent → log `agile rules: rules-conditional/ not deployed; skipping load` and skip steps 2–4. (Defensive: filesystem may lag pruning-plan status doc.)
+   1. **PRE-FLIGHT.** Check that `.cursor/skills/mk-rule-` directory exists. If absent → log `agile rules: rules-conditional/ not deployed; skipping load` and skip steps 2–4. (Defensive: filesystem may lag pruning-plan status doc.)
    2. **Detect Agile context — OR-logic, any one match triggers load:**
       - glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
       - Active plan frontmatter has non-empty `jira_tickets:`
@@ -78,7 +78,7 @@ description: "Picks the agent and complexity tier at orient; runs first in a wor
 1. **Check cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
 2. **Score agents** -- analyze task content, extract keywords, check project context across all layers (0-4). See `references/multi-layer-detection.md`, `references/scoring-and-thresholds.md`
 3. **Select model + mode** -- map complexity to model tier, check team mode eligibility. See `references/model-selection.md`, `references/complexity-detection.md`, `references/team-mode.md`
-4. **Evaluate risk flags** -- read the risk checklist (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per the model-selection rules Rule 2 — regardless of `mk:scale-routing` outcome.
+4. **Evaluate risk flags** -- read the risk checklist (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per the model-selection rules Rule 2 — regardless of `mk-scale-routing` outcome.
 5. **Output + hand off** -- show detection banner (including `matched_flags` line if non-empty), load agent instructions, invoke skill. See `references/detection-process.md`, `references/after-detection.md`
 
 ## References

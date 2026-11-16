@@ -13,7 +13,6 @@ Detect user intent from input and route to appropriate workflow mode.
 - [Conflict Resolution](#conflict-resolution)
 - [Examples](#examples)
 
-
 ## Detection Algorithm
 
 ```
@@ -91,7 +90,7 @@ Modifier flags layer on TOP of the detected mode. They do not change the mode it
 | Flag | Effect | When It Fires | Relative cost† |
 |------|--------|---------------|----------------|
 | `--verify` | Light browser check after review passes | Phase 4.5 (between Review and Ship) | [LIGHT] |
-| `--strict` | Full evaluator (mk:evaluate) after review passes | Phase 4.5 (between Review and Ship) | [HEAVY] |
+| `--strict` | Full evaluator (mk-evaluate) after review passes | Phase 4.5 (between Review and Ship) | [HEAVY] |
 | `--no-strict` | Suppress auto-strict trigger from scale-routing | — | — |
 | `--tdd` | Write failing tests before implementation | Phase 2 (Test RED) | Varies |
 
@@ -102,7 +101,7 @@ Modifier flags layer on TOP of the detected mode. They do not change the mode it
 
 ### Auto-Strict Trigger
 
-When `mk:scale-routing` returns `level=high` at Phase 0 (Orient), `strict_flag` is automatically set to `true` — even without explicit `--strict` in input.
+When `mk-scale-routing` returns `level=high` at Phase 0 (Orient), `strict_flag` is automatically set to `true` — even without explicit `--strict` in input.
 
 **Rationale:** High-complexity domains (fintech, healthcare, IoT, gaming) have behavioral requirements that code review alone misses.
 

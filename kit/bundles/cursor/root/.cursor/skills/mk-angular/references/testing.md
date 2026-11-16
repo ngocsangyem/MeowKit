@@ -1,13 +1,12 @@
 # Angular Testing
 
-> Part of mk:angular skill. Read when: working with testing.
+> Part of mk-angular skill. Read when: working with testing.
 > Source: analogjs/angular-skills/angular-testing (MIT)
 
 ## Contents
 
 - [Core Patterns](#core-patterns)
 - [Advanced Patterns](#advanced-patterns)
-
 
 ## Core Patterns
 

@@ -1,6 +1,6 @@
 # Component Slots — Deep Reference
 
-Basic slot syntax → `mk:vue` references/components.md
+Basic slot syntax → `mk-vue` references/components.md
 
 **Trigger:** parent controls child content or layout, including scoped slots and slot props.
 

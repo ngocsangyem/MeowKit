@@ -112,7 +112,7 @@ try {
 } catch (error) {
   const err = error as { code?: string };
   if (err.code === "RATE_LIMITED") {
-    // Local tracker synced; fallback to mk:frontend-design
+    // Local tracker synced; fallback to mk-frontend-design
   }
 }
 ```

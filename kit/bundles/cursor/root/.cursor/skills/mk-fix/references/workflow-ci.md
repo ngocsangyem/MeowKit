@@ -23,7 +23,7 @@ For GitHub Actions, CI pipeline, and deployment failures.
 ### Step 4: Verify
 Run the full CI workflow locally before pushing:
 ```
-Agent("Bash", "Run the full test + build + lint pipeline locally")
+Run the full test + build + lint pipeline locally
 ```
 
 ### Step 5: Review & Commit

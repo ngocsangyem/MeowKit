@@ -6,7 +6,7 @@ description: "Triages build and type errors, then retries; not for runtime error
 # Build Fix — Universal Build Error Resolver
 
 Detects language from error output, loads the appropriate reference, classifies the error
-by fixability, applies the fix, and chains into `mk:verify` to confirm the build is green.
+by fixability, applies the fix, and chains into `mk-verify` to confirm the build is green.
 
 ## When to Use
 
@@ -18,7 +18,7 @@ by fixability, applies the fix, and chains into `mk:verify` to confirm the build
 ## Phase Anchor
 
 **Phase: 3 (Build GREEN)**
-**Handoff:** If `mk:verify` passes → proceed to Phase 4 (Review). If 3 attempts exhausted → escalate to user.
+**Handoff:** If `mk-verify` passes → proceed to Phase 4 (Review). If 3 attempts exhausted → escalate to user.
 
 ## Process
 
@@ -69,7 +69,7 @@ For report-only:
 
 ### Step 5: Verify Fix
 
-Run `mk:verify` (or the project's build command directly if verify not available).
+Run `mk-verify` (or the project's build command directly if verify not available).
 
 ### Step 6: Iterate (Max 3 Attempts)
 

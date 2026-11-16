@@ -1,4 +1,4 @@
-Basics live in `mk:vue` references/composables.md — this covers the deltas.
+Basics live in `mk-vue` references/composables.md — this covers the deltas.
 
 ## Contents
 

@@ -31,7 +31,7 @@ Use the same preset that the contract was bound to (from step-02). If the contra
 ### 4c. Dispatch the evaluator subagent
 
 ```
-Task(
+Agent(
   subagent_type="evaluator",
   description="Evaluate iteration $iteration of $slug",
   prompt="

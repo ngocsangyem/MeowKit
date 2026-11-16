@@ -2,6 +2,15 @@
 
 How `--auto-create --project <KEY>` reaches the human confirmation prompt — and the 5 pre-flight checks that ABORT before the prompt is ever shown. **No actual Jira mutation in this phase.** Execution lives in `references/auto-create-execution.md`.
 
+## Contents
+
+- [Arg validation](#arg-validation)
+- [5 Auto-Abort Triggers (run in order)](#5-auto-abort-triggers-run-in-order)
+- [Dry-run Table](#dry-run-table)
+- [Single Confirmation Gate](#single-confirmation-gate)
+- [Dry-run-only Test Mode](#dry-run-only-test-mode)
+- [Defense in depth](#defense-in-depth)
+
 ## Arg validation
 
 ```text
@@ -48,11 +57,11 @@ for record in records:
 
 The 5000-char description cap is intentionally below Atlassian's 32k limit so we never hit a partial-truncation surprise.
 
-### 4. Duplicate suspect (deterministic via mk:jira-search)
+### 4. Duplicate suspect (deterministic via mk-jira-search)
 
 ```text
 for record in records:
-    sanitized = bash .cursor/skills/jira/scripts/jql-sanitize.sh "<suggested_summary>"
+    sanitized = bash .cursor/skills/mk-jira/scripts/jql-sanitize.sh "<suggested_summary>"
     the jira-search skill query "project = <PROJECT> AND summary ~ \"<sanitized>\""
     if response has ANY match:
         ABORT batch with: "<suggested_summary> matches existing <JIRA-KEY>.

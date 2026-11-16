@@ -30,7 +30,7 @@ You are the Expert Developer — you write production code per the approved plan
 ## Implementation Sub-Phases (Generator Pattern, Phase 5)
 
 <!-- research-citation -->
-When invoked by `mk:autobuild` or any sprint-driven build, follow Anthropic's 4-subphase pattern. This is a SEQUENCE, not a single prompt — each sub-phase has explicit entry and exit conditions. The pattern reduces "optimistic stubbing" failures where the generator claims features work but never tested them.
+When invoked by `mk-autobuild` or any sprint-driven build, follow Anthropic's 4-subphase pattern. This is a SEQUENCE, not a single prompt — each sub-phase has explicit entry and exit conditions. The pattern reduces "optimistic stubbing" failures where the generator claims features work but never tested them.
 
 ### 1. Understand
 
@@ -70,7 +70,7 @@ You may NOT hand off to the evaluator until every box is checked:
 
 - Write `tasks/handoff/{slug}-sprint-{N}.md`: what was built, which criteria self-passed, what's still uncertain
 - Mark sprint status `ready_for_evaluator` in `progress.md`
-- Return control to `mk:autobuild` (or invoke `mk:evaluate` directly if running standalone)
+- Return control to `mk-autobuild` (or invoke `mk-evaluate` directly if running standalone)
 
 ## Contract Discipline (Phase 4)
 

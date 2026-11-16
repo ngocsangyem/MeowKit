@@ -3,7 +3,7 @@ name: "mk-confluence-collaborate"
 description: "Confluence comments, attachments, labels on one page. NOT for mk-confluence-page."
 ---
 
-# mk:confluence-collaborate
+# mk-confluence-collaborate
 
 Forks to the `confluence-collaborate` agent. The agent prefers footer comments over inline; asks before posting an inline comment.
 
@@ -31,12 +31,12 @@ Forks to the `confluence-collaborate` agent. The agent prefers footer comments o
 - Domain refs:
   - `references/comment-formats.md` — inline vs footer, markdown vs storage format
   - `references/attachment-conventions.md` — file size limits, allowed types, download paths
-- Peer leaves: `mk:confluence-page` (page CRUD; create-with-attachment), `mk:confluence-bulk` (bulk-label across 10+ pages), `mk:confluence-spec-analyst` (downloads attachments for image analysis)
+- Peer leaves: `mk-confluence-page` (page CRUD; create-with-attachment), `mk-confluence-bulk` (bulk-label across 10+ pages), `mk-confluence-spec-analyst` (downloads attachments for image analysis)
 
 ## Gotchas
 
 - `validate_file_path` in `confluence-as` rejects `..` traversal but delegates to opaque `assistant-skills-lib`. Don't trust delegation alone — the agent independently validates upload paths at the agent boundary too. [from research]
 - Confluence Cloud comments do NOT have a strict internal/public flag like Jira Service Management. Inline vs footer is the closest semantic boundary — agent prefers footer. [from jira-collaborate parallel pattern]
 - Inline comment requires an anchor selection. If the selection text doesn't match unique content on the page, the comment fails with a 400-class error.
-- Bulk-label across 10+ pages goes through `mk:confluence-bulk`, NOT this skill. Single-page label add/remove only here.
+- Bulk-label across 10+ pages goes through `mk-confluence-bulk`, NOT this skill. Single-page label add/remove only here.
 - Grow this list as new edge cases surface.

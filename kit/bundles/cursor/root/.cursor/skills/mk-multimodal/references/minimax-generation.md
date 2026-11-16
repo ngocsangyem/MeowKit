@@ -21,19 +21,19 @@
 
 ```bash
 # Image generation
-node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/minimax_generate.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/mk-multimodal/scripts/minimax_generate.py \
   --task generate-image --prompt "A futuristic city" --verbose
 
 # Video generation (Hailuo — async, 60-180s)
-node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/minimax_generate.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/mk-multimodal/scripts/minimax_generate.py \
   --task generate-video --prompt "A dancer in the rain" --verbose
 
 # Text-to-Speech
-node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/minimax_generate.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/mk-multimodal/scripts/minimax_generate.py \
   --task generate-speech --text "Hello, welcome to the project" --voice-id Wise_Woman
 
 # Music generation
-node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/minimax_generate.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/mk-multimodal/scripts/minimax_generate.py \
   --task generate-music --lyrics "Verse 1: Walking through the morning light..."
 ```
 

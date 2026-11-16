@@ -7,7 +7,7 @@ Required: Goal, Threat Model, Audit Scope, Security Checklist, Acceptance Criter
 Optional: Findings (filled during audit), Remediation Plan
 
 ## Phase Flow
-1. Plan scope → 2. Audit (mk:cso) → 4. Review findings → 5. Ship remediations
+1. Plan scope → 2. Audit (mk-cso) → 4. Review findings → 5. Ship remediations
 
 ## Agent Sequence
 planner → security (audit) → reviewer (verify remediations) → shipper

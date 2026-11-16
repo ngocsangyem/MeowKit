@@ -1,4 +1,4 @@
-# mk:trace-analyze — Workflow
+# mk-trace-analyze — Workflow
 
 6-step scatter-gather workflow for analyzing harness trace logs and producing human-reviewed improvement suggestions.
 
@@ -71,7 +71,7 @@ Step 6: HITL Gate
     ├── Approved → suggestions.md
     ├── Modified → user provides revised version → suggestions.md
     ├── Rejected → rejected.md (with reason)
-    └── If ≥1 approved → optionally generate follow-up plan via mk:plan-creator
+    └── If ≥1 approved → optionally generate follow-up plan via mk-plan-creator
 ```
 
 ## Mode Notes

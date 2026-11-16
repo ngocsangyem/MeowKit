@@ -2,7 +2,7 @@
 name: planning-reporter
 description: >-
   Analyzes multiple Jira tickets for sprint planning: dependency mapping,
-  grouping, sequencing, capacity analysis. Internal agent of mk:planning-engine.
+  grouping, sequencing, capacity analysis. Internal agent of mk-planning-engine.
 disallowedTools: Write, Edit
 model: inherit
 ---
@@ -16,7 +16,7 @@ Analyze multiple Jira tickets and produce a Planning Report for sprint planning 
 Receive from SKILL.md:
 - List of issue keys OR JQL query
 - Optional: --capacity N (sprint capacity in story points)
-- Optional: spec_report_path + extracted spec content (Requirements / AC / Gaps sections from a `mk:confluence-spec-analyst` report; SKILL.md performs the path validation + extraction before invoking)
+- Optional: spec_report_path + extracted spec content (Requirements / AC / Gaps sections from a `mk-confluence-spec-analyst` report; SKILL.md performs the path validation + extraction before invoking)
 
 ## Limits
 
@@ -88,7 +88,7 @@ Subtotal: {N}pt
 ## Sequencing
 {Dependency-ordered list}
 
-## Spec Context (mk:confluence-spec-analyst) — only if --spec was provided
+## Spec Context (mk-confluence-spec-analyst) — only if --spec was provided
 **Source:** {spec-report-path}
 **Page:** {page-title} ({page-id}) in {space-key}
 

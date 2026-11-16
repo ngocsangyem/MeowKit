@@ -30,7 +30,7 @@ The iteration counter lives in the run report frontmatter, NOT in session memory
 ### 3c. Dispatch the developer subagent
 
 ```
-Task(
+Agent(
   subagent_type="developer",
   description="Generator iteration $iteration for $slug",
   prompt="

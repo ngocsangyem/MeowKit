@@ -15,7 +15,6 @@ How to add high-quality PASS / FAIL anchor examples to a rubric without introduc
 - [Re-Calibration Per Model Upgrade](#re-calibration-per-model-upgrade)
 - [Adding a New Rubric — Checklist](#adding-a-new-rubric-checklist)
 
-
 ## Why Calibration Matters
 
 Anchor examples are the **highest-leverage** part of a rubric. The model uses them to ground its understanding of "what PASS looks like vs FAIL looks like." Bad anchors produce bad evaluators in subtle, hard-to-debug ways:
@@ -110,7 +109,7 @@ When a new model tier is rolled out (a new standard-tier or capable-tier release
 3. Verify the model's verdict matches the anchor's stated verdict
 4. If the model disagrees on >1 anchor, update the anchors (or downgrade the rubric's hard-fail threshold)
 
-The Phase 8 benchmark suite (`mk:benchmark`) automates this — run after every model rollout.
+The Phase 8 benchmark suite (`mk-benchmark`) automates this — run after every model rollout.
 
 ## Adding a New Rubric — Checklist
 

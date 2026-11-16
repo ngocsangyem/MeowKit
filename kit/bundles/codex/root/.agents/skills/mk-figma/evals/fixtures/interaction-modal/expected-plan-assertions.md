@@ -1,6 +1,6 @@
 # Expected Plan Assertions — interaction-modal
 
-What a plan built by `mk:plan-creator` from this fixture's packet + flow artifacts MUST
+What a plan built by `mk-plan-creator` from this fixture's packet + flow artifacts MUST
 contain. Binary checks. Built FROM the packet — no Figma MCP call.
 
 ## Assertions
@@ -16,8 +16,8 @@ contain. Binary checks. Built FROM the packet — no Figma MCP call.
 - [ ] Exactly the invite-flow phase carries `blocked_on:`; other phases (e.g. static
       members table) are NOT blocked.
 - [ ] The plan can still be agreed with the user (ambiguity is explicit) — the block is phase-scoped.
-- [ ] Browser-evidence task routed to `mk:agent-browser`; deterministic checks to
-      `mk:playwright-cli` / `mk:qa-manual` (not merged into one owner).
+- [ ] Browser-evidence task routed to `mk-agent-browser`; deterministic checks to
+      `mk-playwright-cli` / `mk-qa-manual` (not merged into one owner).
 
 ## Validation matrix (critical actions only)
 

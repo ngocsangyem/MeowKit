@@ -9,7 +9,7 @@ Discovery, composition, and validation for the rubric library at `.codex/rubrics
 
 > **Path convention:** Commands below assume cwd is `$(git rev-parse --show-toplevel)` (project root). Prefix paths with `"$(git rev-parse --show-toplevel)/"` when invoking from subdirectories.
 
-> **Consumed by `evaluator` agent + `mk:evaluate` skill (Phase 3, shipped 260408).** The dedicated `evaluator` sub-task (`.codex/agents/evaluator.md`) drives the running build via active verification and grades it against rubrics composed from this library. The `mk:evaluate` skill (`.agents/skills/evaluate/`) is the orchestration shell. This skill (`mk:rubric`) remains independently invokable via `the rubric skill <subcommand>` for manual rubric inspection, validation, or composition outside the evaluator workflow.
+> **Consumed by `evaluator` agent + `mk-evaluate` skill (Phase 3, shipped 260408).** The dedicated `evaluator` sub-task (`.codex/agents/evaluator.md`) drives the running build via active verification and grades it against rubrics composed from this library. The `mk-evaluate` skill (`.agents/skills/mk-evaluate/`) is the orchestration shell. This skill (`mk-rubric`) remains independently invokable via `the rubric skill <subcommand>` for manual rubric inspection, validation, or composition outside the evaluator workflow.
 
 ## When to Use
 
@@ -33,16 +33,16 @@ Activate when:
 
 ```bash
 # List all rubrics
-.agents/skills/rubric/scripts/load-rubric.sh --list
+.agents/skills/mk-rubric/scripts/load-rubric.sh --list
 
 # Load one rubric for the evaluator
-.agents/skills/rubric/scripts/load-rubric.sh design-quality
+.agents/skills/mk-rubric/scripts/load-rubric.sh design-quality
 
 # Compose a preset (returns all member rubrics + weight table)
-.agents/skills/rubric/scripts/load-rubric.sh --preset frontend-app
+.agents/skills/mk-rubric/scripts/load-rubric.sh --preset frontend-app
 
 # Validate every rubric file in the library
-.agents/skills/rubric/scripts/validate-rubric.sh
+.agents/skills/mk-rubric/scripts/validate-rubric.sh
 ```
 
 ## Output Schema
@@ -117,4 +117,4 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 ## Start
 
 For interactive use, run `scripts/load-rubric.sh --list` to discover available rubrics.
-For evaluator-internal use, the `evaluator` agent (via `mk:evaluate`) loads `compose <preset>` automatically based on the target type detected by `mk:evaluate/scripts/run-evaluator.sh`. Sprint-contract-based filtering is gated until Phase 4 ships (step-01 of mk:evaluate stub-guards on the `contract_schema_version:` marker).
+For evaluator-internal use, the `evaluator` agent (via `mk-evaluate`) loads `compose <preset>` automatically based on the target type detected by `mk-evaluate/scripts/run-evaluator.sh`. Sprint-contract-based filtering is gated until Phase 4 ships (step-01 of mk-evaluate stub-guards on the `contract_schema_version:` marker).

@@ -62,11 +62,11 @@ After CEO review is complete and all findings are written, print this EXACT bloc
 ```
 
 **STOP after printing this block.**
-Do NOT run mk:plan-ceo-review automatically.
+Do NOT run mk-plan-ceo-review automatically.
 Do NOT begin Phase 2.
 Human decides the next step.
 
 <!-- STOP HERE — CEO Review
      The user decides: run the cook skill to implement,
-     or run mk:review for engineering review.
+     or run mk-review for engineering review.
      Agent does not chain reviews automatically. -->

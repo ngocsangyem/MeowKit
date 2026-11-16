@@ -32,7 +32,7 @@ step to read once this one finishes — for the two ship-capable actions (`ship`
 sed -i.bak "s/^iterations:.*/iterations: $iteration/" "$run_dir/run.md" && rm "$run_dir/run.md.bak"
 
 # Check budget — bail early if breached
-if ! .cursor/skills/autobuild/scripts/budget-tracker.sh check >/dev/null 2>&1; then
+if ! .cursor/skills/mk-autobuild/scripts/budget-tracker.sh check >/dev/null 2>&1; then
   final_status=TIMED_OUT
   next_step="step-06-run-report.md"
 elif [ "$verdict" = "PASS" ]; then
@@ -85,7 +85,7 @@ stop and ask the user in chat(
              {if ship_with_warnings: 'Unresolved WARNs you would be accepting:' + contents of $run_dir/warns-iter-${iteration}.md}
              Ship?",
   options: [
-    { label: "Ship it", description: "{if ship_with_warnings: 'The WARNs above are accepted as-is. '}Dispatch the shipper (mk:review still runs for the structural audit)." },
+    { label: "Ship it", description: "{if ship_with_warnings: 'The WARNs above are accepted as-is. '}Dispatch the shipper (mk-review still runs for the structural audit)." },
     { label: "Iterate with feedback", description: "Not yet. Provide a reason; it becomes the feedback packet and re-enters step-03." },
     { label: "Abort", description: "Stop the autobuild workflow. No ship, no further iterations; the evidence stays for manual triage." }
   ]
@@ -107,7 +107,7 @@ what was accepted:
 
 ```
 delegate a sub-task (
-  subagent_type="shipper",
+  agent="shipper",
   description="Ship $slug after the user chose to ship",
   prompt="
     Read tasks/reviews/{slug}-evalverdict.md for the passing verdict.
@@ -119,12 +119,12 @@ delegate a sub-task (
     Acceptance criteria:
       - The user chose to ship at step-05 (recorded above) — the evaluator verdict is the
         evidence that was presented, not the decision itself
-      - mk:review run for structural audit (do NOT skip)
+      - mk-review run for structural audit (do NOT skip)
       - Conventional commit + PR created
       - If shipping with warnings: every acknowledged WARN from
         $run_dir/warns-iter-{N}.md is recorded in the release notes
     Constraints:
-      - Do NOT skip mk:review even though the evaluator passed
+      - Do NOT skip mk-review even though the evaluator passed
       - Do NOT modify source files; only release artifacts
   "
 )
@@ -150,7 +150,7 @@ When `next_action == escalate`, first surface current delivery state to the user
 **PM foreground invocation (per the post-phase-delegation conventions Rule 5 — the only foreground PM call):**
 
 ```
-Delegate to the project-manager agent (foreground):
+Unless MEOWKIT_PM_AUTO=off, delegate to the project-manager agent (foreground):
 "Generate delivery status for plan at $plan_dir. Write report to
 $plan_dir/status-reports/$(date +%y%m%d)-status.md.
 Load template from .cursor/skills/mk-autobuild/assets/pm-status-template.md."

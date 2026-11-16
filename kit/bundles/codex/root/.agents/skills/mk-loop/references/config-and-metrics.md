@@ -128,4 +128,4 @@ the whole run. 6. If output varies run-to-run, set `Noise: high`.
   noisy metric does not trigger a false plateau.
 - Warn if Verify takes > 30s and Noise is `high` (3 runs → >90s per iteration is impractical).
 - Environment pinning is the user's responsibility (fixed seeds, warm/cold caches consistent,
-  no competing CPU load, same input data). `mk:loop` cannot control the environment.
+  no competing CPU load, same input data). `mk-loop` cannot control the environment.

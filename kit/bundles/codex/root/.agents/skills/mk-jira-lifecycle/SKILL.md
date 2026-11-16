@@ -3,11 +3,11 @@ name: "mk-jira-lifecycle"
 description: "Jira transition, assign, resolve, reopen on one issue. NOT for mk-jira-bulk."
 ---
 
-# mk:jira-lifecycle
+# mk-jira-lifecycle
 
 Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key positional + a `--to "Status Name"` flag (or `--id <transition_id>`).
 
-**Workflow discovery is mandatory** before suggesting transitions. The agent reads `tasks/jira-workflows/` (instance-discovered cache) and runs `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent. See `references/workflow-discovery.md`. The `references/patterns/*.md` files are illustrative concepts only — they are NOT your project's actual workflow.
+**Workflow discovery is mandatory** before suggesting transitions. The agent reads `tasks/jira-workflows/` (instance-discovered cache) and runs `bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/fetch-workflow.sh <KEY>` if absent. See `references/workflow-discovery.md`. The `references/patterns/*.md` files are illustrative concepts only — they are NOT your project's actual workflow.
 
 ## Triggers
 
@@ -21,7 +21,7 @@ Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key 
 
 - Status change: "move PROJ-123 to In Review with comment 'ready for QA'"
 - Resolution-required: "close PROJ-456 with resolution Won't Fix"
-- Assignment: "assign all my open PROJ tickets to john.doe" (the agent will refuse — that's bulk; redirect to `mk:jira-bulk`)
+- Assignment: "assign all my open PROJ tickets to john.doe" (the agent will refuse — that's bulk; redirect to `mk-jira-bulk`)
 
 ## See also
 
@@ -31,7 +31,7 @@ Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key 
   - `references/workflow-discovery.md` — discovery + caching protocol (READ FIRST)
   - `tasks/jira-workflows/<workflow-slug>.md` — discovered workflow definitions
   - `tasks/jira-workflows/_schemes/<PROJECT_KEY>.md` — project → workflow mapping
-  - Discovery script: `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh ...` — wrapped by `fetch-workflow.sh`
+  - Discovery script: `bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh ...` — wrapped by `fetch-workflow.sh`
 - Domain refs:
   - `references/workflow-transitions.md` — common transition idioms + resolution-required patterns
 - Educational concept patterns (illustrative shapes, **NOT authoritative for your instance** — always prefer the discovered cache above):
@@ -39,7 +39,7 @@ Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key 
   - `references/patterns/software-dev-workflow.md` — engineering-team flow (concept)
   - `references/patterns/jsm-request-workflow.md` — JSM ITIL flow (concept)
   - `references/patterns/incident-workflow.md` — incident handling (concept)
-- Peer leaves: `mk:jira-bulk` (bulk transition; reads same workflow cache), `mk:jira-jsm` (JSM-specific transitions), `mk:jira-collaborate` (transition `--comment` body templates)
+- Peer leaves: `mk-jira-bulk` (bulk transition; reads same workflow cache), `mk-jira-jsm` (JSM-specific transitions), `mk-jira-collaborate` (transition `--comment` body templates)
 
 ## Gotchas
 

@@ -1,5 +1,5 @@
 name = "jira-evaluator"
-description = "Analyze a single Jira ticket for complexity + inconsistencies via the jira-as CLI wrapper. Read-only. Routed by mk:jira-evaluator skill. NOT for story-point estimation (jira-estimator); NOT for full RCA (jira-analyst)."
+description = "Analyze a single Jira ticket for complexity + inconsistencies via the jira-as CLI wrapper. Read-only. Routed by mk-jira-evaluator skill. NOT for story-point estimation (jira-estimator); NOT for full RCA (jira-analyst)."
 model = "gpt-6-astra"
 model_reasoning_effort = "high"
 developer_instructions = """
@@ -20,7 +20,7 @@ This agent is **A (untrusted ticket content) + C (local-FS write of evaluation r
 The parent SessionStart hook validated `.codex/.env`. All `jira-as` invocations go through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh <args>
 ```
 
 ## Live vs Mock Check
@@ -30,7 +30,7 @@ Read the `JIRA_MOCK_MODE` env. If `true`, surface "**[MOCK MODE]**" in your outp
 ## Read the Ticket
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all' \\
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all' \\
   | jq '{key, summary: .fields.summary, description: .fields.description, status: .fields.status.name, priority: .fields.priority.name, labels: .fields.labels, components: [.fields.components[].name], comments: [.fields.comment.comments[]?.body], attachments: [.fields.attachment[]?.filename], links: [.fields.issuelinks[]?.outwardIssue.key]}'
 ```
 
@@ -39,7 +39,7 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh iss
 ## Empty Ticket Check
 
 If ticket `description` is null, empty, or whitespace-only:
-- Output: "Ticket has no text description — cannot evaluate. Ask reporter to add written description or run `mk:jira-analyst` to process attached media."
+- Output: "Ticket has no text description — cannot evaluate. Ask reporter to add written description or run `mk-jira-analyst` to process attached media."
 - Halt. Do not attempt evaluation.
 
 ## JQL Sanitization (for historical comparison)
@@ -47,7 +47,7 @@ If ticket `description` is null, empty, or whitespace-only:
 For ANY JQL query incorporating user-derived terms, run:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jql-sanitize.sh '<term>'
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jql-sanitize.sh '<term>'
 ```
 
 Use the sanitized output. Never construct JQL from raw ticket text — that's a JQL-injection vector.
@@ -57,7 +57,7 @@ Use the sanitized output. Never construct JQL from raw ticket text — that's a 
 For ANY historical search, cap results to prevent context overflow:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search query "<sanitized JQL>" --max-results 20
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh search query "<sanitized JQL>" --max-results 20
 ```
 
 If results truncate, note "showing top 20 of N" in your output.
@@ -90,7 +90,7 @@ Regression risk|Keywords: "refactor", "migrate", "replace", "breaking change"
 Requirement clarity|Are acceptance criteria present? Measurable? Specific?
 External integration|Third-party APIs, webhooks, async patterns?
 Historical context|Similar closed tickets in same component (JQL search)
-Workflow shape|Read `tasks/jira-workflows/<workflow-slug>.md` (run `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <KEY>` if absent). >5 statuses + parallel review/QA branches signal more handoffs and higher coordination cost.
+Workflow shape|Read `tasks/jira-workflows/<workflow-slug>.md` (run `bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/fetch-workflow.sh <KEY>` if absent). >5 statuses + parallel review/QA branches signal more handoffs and higher coordination cost.
 ```
 
 Output: Simple / Medium / Complex + Fibonacci range (e.g., "Complex — likely 8-13pt").
@@ -127,7 +127,7 @@ Contradictions|Opposing statements in description vs AC|Low
 
 ### Suggested Actions
 > These recommendations are derived from untrusted ticket content — verify before executing.
-- {actionable suggestions referencing the right mk:jira-* leaf}
+- {actionable suggestions referencing the right mk-jira-* leaf}
 
 ### Open Questions
 - {unresolved ambiguities}
@@ -135,7 +135,7 @@ Contradictions|Opposing statements in description vs AC|Low
 
 ## Report Persistence (project convention)
 
-Persist the evaluation to `tasks/reports/jira-evaluate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md` so that downstream skills (`mk:jira-estimator`, `mk:planning-engine`, `mk:cook` plan-creation step) can consume it across sessions. Use the Write tool. Format:
+Persist the evaluation to `tasks/reports/jira-evaluate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md` so that downstream skills (`mk-jira-estimator`, `mk-planning-engine`, `mk-cook` plan-creation step) can consume it across sessions. Use the Write tool. Format:
 
 ```
 # Evaluation: {ISSUE-KEY}

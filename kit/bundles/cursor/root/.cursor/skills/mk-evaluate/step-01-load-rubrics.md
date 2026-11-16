@@ -32,7 +32,7 @@ If `--rubric-preset` flag was passed, use it. Otherwise default:
 Run the rubric library loader:
 
 ```bash
-.cursor/skills/rubric/scripts/load-rubric.sh --preset "$rubric_preset"
+.cursor/skills/mk-rubric/scripts/load-rubric.sh --preset "$rubric_preset"
 ```
 
 This emits the composed prompt fragment with all member rubrics' bodies inlined. Capture stdout into `composed_rubrics` (working memory).

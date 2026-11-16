@@ -3,7 +3,7 @@ name: "mk-confluence-search"
 description: "Confluence CQL search, space listing, export. NOT for mk-confluence-page."
 ---
 
-# mk:confluence-search
+# mk-confluence-search
 
 Forks to the `confluence-search` agent. CQL is positional on `search` (and on validate / build helpers); flags everywhere else. The agent enforces CQL sanitization for any user-derived term via `../confluence/scripts/cql-sanitize.sh`.
 
@@ -31,7 +31,7 @@ Forks to the `confluence-search` agent. CQL is positional on `search` (and on va
   - `references/cql-patterns.md` — canonical CQL templates (curated)
   - `references/cql-reference.md` — full CQL operator + function reference
   - `references/search-examples.md` — practical query examples per scenario
-- Peer leaves: `mk:confluence-bulk` (write-side bulk by CQL — same dry-run discipline), `mk:confluence-spec-analyst` (read-only deep analysis), `mk:confluence-page` (single-page CRUD)
+- Peer leaves: `mk-confluence-bulk` (write-side bulk by CQL — same dry-run discipline), `mk-confluence-spec-analyst` (read-only deep analysis), `mk-confluence-page` (single-page CRUD)
 
 ## Gotchas
 

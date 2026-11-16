@@ -1,4 +1,4 @@
-# mk:fix Gotchas
+# mk-fix Gotchas
 
 Common failure patterns when fixing bugs. Update this file when Codex produces wrong fix patterns.
 
@@ -6,7 +6,7 @@ Common failure patterns when fixing bugs. Update this file when Codex produces w
 
 ### Guessing Root Causes
 **Symptom:** "I think it's X" without evidence.
-**Fix:** Use `mk:sequential-thinking` to generate + test hypotheses from evidence. Never guess.
+**Fix:** Use `mk-sequential-thinking` to generate + test hypotheses from evidence. Never guess.
 
 ### Fixing Symptoms
 **Symptom:** Test passes but underlying issue remains.

@@ -2,6 +2,17 @@
 
 How to use checkpoints for reliable large-scale operations.
 
+## Contents
+
+- [When to Enable Checkpoints](#when-to-enable-checkpoints)
+- [How Checkpoints Work](#how-checkpoints-work)
+- [Usage](#usage)
+- [Storage Details](#storage-details)
+- [Cleanup](#cleanup)
+- [Combining with Batch Size](#combining-with-batch-size)
+- [Troubleshooting](#troubleshooting)
+- [Related Documentation](#related-documentation)
+
 ---
 
 ## When to Enable Checkpoints
@@ -47,7 +58,7 @@ Operation Start
 ### Enable Checkpointing
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh bulk transition \
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh bulk transition \
   --jql "project=PROJ" \
   --to "Done" \
   --enable-checkpoint
@@ -56,7 +67,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh bul
 ### List Pending Checkpoints
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh bulk transition --list-checkpoints
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh bulk transition --list-checkpoints
 ```
 
 Output:
@@ -69,7 +80,7 @@ Pending checkpoints:
 ### Resume an Interrupted Operation
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh bulk transition --resume transition-20251226-143022 --to "Done"
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh bulk transition --resume transition-20251226-143022 --to "Done"
 ```
 
 ---
@@ -113,7 +124,7 @@ rm ~/.jira-skills/checkpoints/*.json
 For optimal reliability on very large operations:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh bulk transition \
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh bulk transition \
   --jql "project=PROJ" \
   --to "Done" \
   --batch-size 200 \

@@ -16,7 +16,7 @@ Implementation entry adapter. `.codex/workflow.yaml` is the only lifecycle phase
 /cook tasks/plans/260329-feature/plan.md --auto
 ```
 
-Profiles: `quick`/`--fast` (inspect → edit → focused verify → summary), `standard` (plan if needed → implement → verify → review), `release` (standard + explicit `mk:ship` request), and `high-assurance` (`--tdd --strict`, with the plan and the review verdict walked through with the user). Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`.
+Profiles: `quick`/`--fast` (inspect → edit → focused verify → summary), `standard` (plan if needed → implement → verify → review), `release` (standard + explicit `mk-ship` request), and `high-assurance` (`--tdd --strict`, with the plan and the review verdict walked through with the user). Flags: `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`.
 
 Quick runs do not create a plan, report, memory entry, or ship action by default. They still stop if a risk flag or changed contract requires the standard profile.
 
@@ -66,7 +66,7 @@ Before starting work, read `references/failure-catalog.md` for common implementa
 
 See `references/intent-detection.md` for full detection logic.
 
-> **Green-field product build** (new kanban app, full SaaS from scratch, multi-sprint autonomous build)? Use `mk:autobuild` instead. Cook handles single features, fixes, and refactors; harness owns the generator↔evaluator loop and adaptive scaffolding density.
+> **Green-field product build** (new kanban app, full SaaS from scratch, multi-sprint autonomous build)? Use `mk-autobuild` instead. Cook handles single features, fixes, and refactors; harness owns the generator↔evaluator loop and adaptive scaffolding density.
 
 | Input Pattern                    | Mode        | Behavior                                      |
 | -------------------------------- | ----------- | --------------------------------------------- |
@@ -99,8 +99,8 @@ flowchart TD
     PP -->|changes asked for| C
     D --> E[Phase 2: Test - RED if --tdd, optional otherwise]
     E --> F[Phase 3: Build GREEN]
-    F --> S[mk:simplify — MANDATORY]
-    S --> V[mk:verify — MANDATORY]
+    F --> S[mk-simplify — MANDATORY]
+    S --> V[mk-verify — MANDATORY]
     V --> G2[Phase 4: Review]
     G2 -->|verdict PASS| BV{--verify or --strict?}
     BV -->|"--verify"| P45A["Phase 4.5 --verify advisory"]
@@ -135,7 +135,7 @@ In `--fast` mode the summary is **abbreviated** (1–3 bullets) but still presen
 
 ### Exact-Requirements Contract (Phase 1)
 
-`mk:plan-creator` MUST be able to answer all 5 dimensions in concrete sentences before returning a plan:
+`mk-plan-creator` MUST be able to answer all 5 dimensions in concrete sentences before returning a plan:
 
 1. **Expected output** — concrete artifact(s) the user will see (paths, behavior, endpoint, CLI flags)
 2. **Acceptance criteria** — specific inputs → outputs / edge cases
@@ -166,22 +166,22 @@ Phase 4 produces a review verdict in every mode; read it before shipping. If the
 
 | Phase         | sub-task                          | When                                     |
 | ------------- | --------------------------------- | ---------------------------------------- |
-| 0 Orient      | `mk:scout`                      | Codebase mapping                         |
-| 1 Plan        | `mk:plan-creator`, `researcher` | Research + planning                      |
-| 2 Test        | `tester` via `mk:testing`       | TDD mode (`--tdd`): **MUST** spawn — write failing tests. Default mode: optional (skip unless requested) |
+| 0 Orient      | `mk-scout`                      | Codebase mapping                         |
+| 1 Plan        | `mk-plan-creator`, `researcher` | Research + planning                      |
+| 2 Test        | `tester` via `mk-testing`       | TDD mode (`--tdd`): **MUST** spawn — write failing tests. Default mode: optional (skip unless requested) |
 | 3 Build GREEN | `developer`                       | Implementation                           |
-| 3 Build GREEN | `developer` via `mk:investigate` | Root-cause analysis when tests fail after 3 self-heal attempts |
-| 3.5 Simplify  | `developer` via `mk:simplify`   | **MANDATORY** after Phase 3 GREEN — run before verify  |
-| 3.6 Verify    | `mk:verify`                     | **MANDATORY** after simplify — unified build+lint+test+coverage check before Phase 4 |
-| 4 Review      | `reviewer` via `mk:review`      | **MUST** spawn — writes the review verdict |
+| 3 Build GREEN | `developer` via `mk-investigate` | Root-cause analysis when tests fail after 3 self-heal attempts |
+| 3.5 Simplify  | `developer` via `mk-simplify`   | **MANDATORY** after Phase 3 GREEN — run before verify  |
+| 3.6 Verify    | `mk-verify`                     | **MANDATORY** after simplify — unified build+lint+test+coverage check before Phase 4 |
+| 4 Review      | `reviewer` via `mk-review`      | **MUST** spawn — writes the review verdict |
 | 4.5 Verify    | `browser-automation sub-task` or `HTTP verification tool` | Only if `--verify` flag (light browser check) |
-| 4.5 Verify    | `evaluator` via `mk:evaluate`   | Only if `--strict` flag or auto-triggered     |
+| 4.5 Verify    | `evaluator` via `mk-evaluate`   | Only if `--strict` flag or auto-triggered     |
 
 Concrete sub-task name and HTTP tool depend on installed skill set; cook treats both as interfaces, not specific implementations.
-| 5 Ship        | `shipper` via `mk:ship`         | Only after an explicit ship request — runs full pre-ship pipeline (`git-manager` invoked inside shipper for commit + PR) |
+| 5 Ship        | `shipper` via `mk-ship`         | Only after an explicit ship request — runs full pre-ship pipeline (`git-manager` invoked inside shipper for commit + PR) |
 | 6 Reflect     | `analyst`                       | **MUST** spawn — cost + pattern analysis |
 | 6 Reflect     | `documenter`                      | **MUST** spawn — sync-back + docs        |
-| 6 Reflect     | `mk:memory`                       | Append one gotcha/decision only if non-derivable; usually nothing |
+| 6 Reflect     | `mk-memory`                       | Append one gotcha/decision only if non-derivable; usually nothing |
 
 During iterative build-test-fix cycles, follow `references/loop-safety-protocol.md` for checkpoint tracking, stall detection, and escalation triggers.
 
@@ -191,19 +191,19 @@ See `references/review-cycle.md` for review gate logic.
 
 ## Simplify Step (Mandatory)
 
-After Phase 3 (Build GREEN) completes, run `mk:simplify` to reduce complexity before Phase 4 (Review). This is mandatory — do not skip.
+After Phase 3 (Build GREEN) completes, run `mk-simplify` to reduce complexity before Phase 4 (Review). This is mandatory — do not skip.
 
 Rationale: Review quality improves when code is already simplified. Reviewers catch logic errors better when complexity is low. Running simplify after tests are green (but before review) ensures the reviewed code is the final, clean version.
 
 ## Verify Step (Mandatory)
 
-After `mk:simplify` completes, run `mk:verify` for a unified build→lint→type-check→test→coverage check. This confirms simplification didn't break anything and gives the reviewer a clean signal. By default `mk:verify` scopes lint and tests to the changed files (build and type-check stay whole-program); the complete whole-project run happens at ship time. Pass `--full` only when a full sweep is needed here.
+After `mk-simplify` completes, run `mk-verify` for a unified build→lint→type-check→test→coverage check. This confirms simplification didn't break anything and gives the reviewer a clean signal. By default `mk-verify` scopes lint and tests to the changed files (build and type-check stay whole-program); the complete whole-project run happens at ship time. Pass `--full` only when a full sweep is needed here.
 
-If `mk:verify` FAILS after simplify: send back to developer to fix, then re-run verify before proceeding to Phase 4. Do not skip verify or proceed to review with a failing verify result.
+If `mk-verify` FAILS after simplify: send back to developer to fix, then re-run verify before proceeding to Phase 4. Do not skip verify or proceed to review with a failing verify result.
 
 ## Status Report (After Review)
 
-After a review verdict of PASS, delegate to `project-manager` (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Stop after reporting completion; invoke `mk:ship` only when the user explicitly requests shipping. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
+After a review verdict of PASS, delegate to `project-manager` (background — include "Run in the background" in the prompt). Status report is co-located at `{plan-dir}/status-reports/{YYMMDD}-status.md`. Stop after reporting completion; invoke `mk-ship` only when the user explicitly requests shipping. Skipped automatically when `MEOWKIT_PM_AUTO=off`.
 
 ## Durable Task State (when an active task record exists)
 
@@ -234,7 +234,7 @@ flag is present).
 
 Operational gotchas live here; pre-build failure modes and rationalizations live in `references/failure-catalog.md`.
 
-- **Skipping mk:simplify before review**: Tests pass but code is still complex → run `the simplify skill` between Phase 3 and Phase 4 every time, no exceptions
+- **Skipping mk-simplify before review**: Tests pass but code is still complex → run `the simplify skill` between Phase 3 and Phase 4 every time, no exceptions
 - **Skipping the plan on "simple" features**: Features that seem simple grow during implementation. Write the plan file; cancel it if the work turns out to be trivial
 - **`--auto` hiding a bad review**: auto mode auto-fixes and runs through without pausing, so nobody reads the verdict as it is written. Read the review verdict and the workflow evidence index at the end of an auto run before you ship anything
 - **Context loss between phases**: Long multi-phase workflows exceed the context window — the external-memory write after each completed plan phase is the load-bearing action that lets a fresh session resume the correct phase. This is a mandatory step, not a habit: see the **Per-Phase Checkpoint** in `references/workflow-steps.md` (Phase 6) — flip the phase-file checkboxes and update plan.md Agent State before any next-phase transition
@@ -242,6 +242,5 @@ Operational gotchas live here; pre-build failure modes and rationalizations live
 - **Code mode on stale plans**: Running old plan against changed codebase. Warn if plan.md is >14 days old
 - **Fast mode shallow test coverage**: Skipping research means tests capture plan-level intent, not edge cases. Document: "fast mode = TDD-flavored, coverage may be lower"
 - **Missing model tier declaration**: Expensive models on trivial tasks, cheap models on security-critical work. Always declare tier in Phase 0
-- **sub-task patterns using Agent() not delegate a sub-task ()**: delegate a sub-task () enables tracking, blocking, and progress. Always use delegate a sub-task () for phases 2-6
-- **--strict cost surprise**: `--strict` spawns the full evaluator (`mk:evaluate`) — a [HEAVY] pass. Auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress, or `--verify` for the [LIGHT] check
+- **--strict cost surprise**: `--strict` spawns the full evaluator (`mk-evaluate`) — a [HEAVY] pass. Auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress, or `--verify` for the [LIGHT] check
 - **--strict vs --verify confusion**: `--verify` = light browser check (advisory). `--strict` = full evaluator with rubrics (FAIL blocks ship). `--strict` supersedes `--verify`

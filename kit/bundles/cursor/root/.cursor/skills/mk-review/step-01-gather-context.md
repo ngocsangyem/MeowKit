@@ -24,7 +24,7 @@ Determine whether this diff warrants the full adversarial review tier or a minim
 1. Count `file_count` (number of changed files in diff)
 2. Count `line_count` (total added + removed lines in diff)
 3. Check `security_file_touched` (from step 5 above)
-4. Check `domain_complexity` — if `mk:scale-routing` data is available, scan the diff file paths and plan description for domain keywords. Use the highest matching complexity level. If no match or scale-routing unavailable, set to `unknown`.
+4. Check `domain_complexity` — if `mk-scale-routing` data is available, scan the diff file paths and plan description for domain keywords. Use the highest matching complexity level. If no match or scale-routing unavailable, set to `unknown`.
 
 ### Decision
 

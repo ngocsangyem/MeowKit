@@ -1,6 +1,6 @@
 # Design Review Checklist (Lite)
 
-> Lite design review for `mk:review` + `mk:ship` pre-landing. Source-level pattern detection — not rendered-output audit. For full visual audit, use an external tool.
+> Lite design review for `mk-review` + `mk-ship` pre-landing. Source-level pattern detection — not rendered-output audit. For full visual audit, use an external tool.
 
 ## Instructions
 

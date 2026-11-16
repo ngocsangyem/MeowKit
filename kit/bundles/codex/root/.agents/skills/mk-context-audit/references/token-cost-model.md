@@ -1,6 +1,6 @@
 # Token Cost Model
 
-This document explains how `mk:context-audit` converts raw bytes into token
+This document explains how `mk-context-audit` converts raw bytes into token
 estimates and how it derives the structural-overhead percentage banners.
 
 ## Heuristic: chars / 4

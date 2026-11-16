@@ -67,8 +67,4 @@ Include in detection result:
 - **Reason:** API endpoint implementation
 ```
 
-When spawning Agent tool, use the detected model:
-
-```
-Agent(subagent_type="architect", model="sonnet", ...)
-```
+When delegating to a custom agent (`.codex/agents/*.toml`), carry the detected tier in the delegation prompt; the agent's `model` key sets the model, not the call.

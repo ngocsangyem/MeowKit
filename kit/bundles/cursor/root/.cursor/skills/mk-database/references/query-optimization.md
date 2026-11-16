@@ -106,7 +106,7 @@ Fix it at the access layer: fetch the related rows in one statement, or batch th
 the whole set. Which mechanism is right depends on the ORM and the engine; the invariant is
 that the number of round trips must not grow with the number of rows.
 
-`mk:backend-development` owns the call site; this skill owns whether the resulting access
+`mk-backend-development` owns the call site; this skill owns whether the resulting access
 path is sound.
 
 ## Pagination cost
@@ -117,7 +117,7 @@ correct while rows are inserted.
 
 Use offset where the collection is small and bounded, or where page numbers are part of the
 product. Use a seek where the collection grows. Note that changing an existing endpoint's
-pagination shape is a contract change owned by `mk:api-design-principles`.
+pagination shape is a contract change owned by `mk-api-design-principles`.
 
 A total count over a large filtered set is its own query cost. Confirm it is affordable
 before it is promised in a contract.
@@ -130,7 +130,7 @@ rather than as a pool error: callers wait for a slot until a timeout fires.
 Check for connections held open past their work — a transaction left open across an external
 call holds its slot for the whole call. Confirm the pool releases on every path, including
 error paths. Sizing the pool is an operational decision that depends on the deployment shape;
-`mk:devops` owns the runtime side of it.
+`mk-devops` owns the runtime side of it.
 
 ## Statistics
 

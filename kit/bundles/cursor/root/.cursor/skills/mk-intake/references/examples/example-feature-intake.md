@@ -1,6 +1,6 @@
 # Example: Feature PRD Intake
 
-Walkthrough of mk:intake processing a feature PRD end-to-end.
+Walkthrough of mk-intake processing a feature PRD end-to-end.
 
 ---
 
@@ -37,7 +37,7 @@ Processed via Codex Read tool (FFmpeg unavailable).
 Design Context: Dark background (#1a1a1a), white text, toggle in Settings > Appearance.
 
 ### Step 4: Classify product area
-mk:scale-routing signals: "theme", "dark mode", "UI", "settings", "CSS"
+mk-scale-routing signals: "theme", "dark mode", "UI", "settings", "CSS"
 Result: `{domain: frontend_ui, level: medium, workflow: standard, model_tier_override: STANDARD}`
 
 ### Step 5: Evaluate completeness
@@ -59,7 +59,7 @@ Missing:
 - Acceptance Criteria: define binary conditions (e.g., "Dark mode applies to all pages", "Setting persists after browser refresh", "OS preference detected on first visit")
 - Scope: out-of-scope not explicit (e.g., does this include email templates? admin panel?)
 
-### Step 6: Scan codebase (mk:scout)
+### Step 6: Scan codebase (mk-scout)
 Related files found:
 - `tailwind.config.ts` — `darkMode` key absent (not yet configured)
 - `src/components/layout/AppShell.vue` — root layout, ideal dark class injection point
@@ -120,4 +120,4 @@ Recommended before starting:
 - Frontend lead (UI domain owner, 2 open frontend tickets)
 ```
 
-**Handoff:** `mk:cook` (feature ticket, completeness: ready)
+**Handoff:** `mk-cook` (feature ticket, completeness: ready)

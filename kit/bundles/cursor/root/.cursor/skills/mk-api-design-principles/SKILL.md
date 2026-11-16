@@ -11,34 +11,34 @@ Durable interface contracts. Discover the existing contract before proposing a n
 
 | Owner | Owns | Does NOT own |
 |---|---|---|
-| `mk:api-design-principles` | Interface contract: resource/type/message shape, error and authorization *requirements*, compatibility and deprecation, consumer discovery | Implementation, persistence, security verdict, release |
-| `mk:backend-development` | End-to-end backend change: discovery, classification, service/handler/integration work | Contract authorship, schema/SQL, security verdict, deploy |
-| `mk:database` | Data invariants, schema, migration and recovery, query/index evidence, ORM boundary | API contract, authorization verdict, infrastructure execution |
-| `mk:devops` | Infrastructure-as-code, containers, CI, runtime config, deployment safety design, rollback, incident diagnosis | Deploy approval and execution, security verdict, code root-cause, schema semantics |
+| `mk-api-design-principles` | Interface contract: resource/type/message shape, error and authorization *requirements*, compatibility and deprecation, consumer discovery | Implementation, persistence, security verdict, release |
+| `mk-backend-development` | End-to-end backend change: discovery, classification, service/handler/integration work | Contract authorship, schema/SQL, security verdict, deploy |
+| `mk-database` | Data invariants, schema, migration and recovery, query/index evidence, ORM boundary | API contract, authorization verdict, infrastructure execution |
+| `mk-devops` | Infrastructure-as-code, containers, CI, runtime config, deployment safety design, rollback, incident diagnosis | Deploy approval and execution, security verdict, code root-cause, schema semantics |
 
 Routing rules — identical in all four skills:
 
-- **Contract-only API question → `mk:api-design-principles`**, even in the middle of a task
+- **Contract-only API question → `mk-api-design-principles`**, even in the middle of a task
   owned by another skill. "Contract" means what a consumer can observe: field set, error
   shape, status semantics, pagination, versioning. Extending an endpoint without changing
   any of those is not a contract change.
-- **End-to-end backend change → `mk:backend-development`**, which invokes the API skill only
+- **End-to-end backend change → `mk-backend-development`**, which invokes the API skill only
   when a new, public, or breaking contract is in scope.
 - **A message-based change (event, webhook, RPC) splits**: the message contract belongs to
-  `mk:api-design-principles`; the producer or consumer implementation belongs to
-  `mk:backend-development`.
-- **Schema, migration, query, index, or ORM work → `mk:database`.** No other skill writes a
+  `mk-api-design-principles`; the producer or consumer implementation belongs to
+  `mk-backend-development`.
+- **Schema, migration, query, index, or ORM work → `mk-database`.** No other skill writes a
   migration or generic SQL.
-- **Infrastructure, containers, delivery, or deployment safety → `mk:devops`.**
+- **Infrastructure, containers, delivery, or deployment safety → `mk-devops`.**
 - **An unscoped performance request is triaged by evidence, never by guess**:
-  `mk:backend-development` locates where the time actually goes, then hands a query or index
-  question to `mk:database` and a capacity or runtime question to `mk:devops`. No skill
+  `mk-backend-development` locates where the time actually goes, then hands a query or index
+  question to `mk-database` and a capacity or runtime question to `mk-devops`. No skill
   invents the target.
-- **Code root cause → `mk:investigate`.** `mk:devops` owns the operational picture — what
+- **Code root cause → `mk-investigate`.** `mk-devops` owns the operational picture — what
   changed, where it fails, which signal proves it — and hands the defect over.
 - **An auth-sensitive change**: the owning skill states the *requirement*; the security
   workflow owns the verdict.
-- **Any production effect → `mk:ship` or a human.**
+- **Any production effect → `mk-ship` or a human.**
 
 ## Workflow
 
@@ -53,7 +53,7 @@ Routing rules — identical in all four skills:
    concurrency, or pagination the use case actually needs.
 4. **Review with examples.** Walk success, invalid input, forbidden, conflict/not-found, and
    one evolution case. A contract with no failure example is unreviewed.
-5. **Hand off.** Implementation to `mk:backend-development`, persistence to `mk:database`,
+5. **Hand off.** Implementation to `mk-backend-development`, persistence to `mk-database`,
    security verdict to the security workflow, release to the release workflow.
 
 Load `references/rest-principles.md` for HTTP-specific detail, `references/graphql-principles.md`
@@ -118,7 +118,7 @@ Each default holds until its condition flips.
   them is itself a breaking change — document the target and migrate deliberately rather
   than emitting a third.
 - **Address GraphQL relationship-fetch cost before the schema ships** when a field fans out
-  per parent row. Hand the measurement and the fix to `mk:database`; batching is one
+  per parent row. Hand the measurement and the fix to `mk-database`; batching is one
   mechanism, not a mandate on every resolver.
 - **Status semantics carry meaning consumers depend on.** Changing the status or error code
   for an existing case is breaking even when the body is unchanged.

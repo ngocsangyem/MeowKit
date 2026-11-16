@@ -28,7 +28,7 @@ Fallback chain — try each step; move to next if step unavailable:
    → 60-80% token savings before analysis
 
 2. GEMINI_API_KEY set?
-   → Invoke mk:multimodal (Gemini) for vision analysis
+   → Invoke mk-multimodal (Gemini) for vision analysis
    → Extracts: layout, components, states, text (OCR), design intent
 
 3. Fallback (always available):

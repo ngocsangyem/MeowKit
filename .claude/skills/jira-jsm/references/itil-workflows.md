@@ -2,6 +2,17 @@
 
 **Quick Navigation**:
 
+## Contents
+
+- [Overview](#overview)
+- [Incident Management](#incident-management)
+- [Service Request Fulfillment](#service-request-fulfillment)
+- [Change Management](#change-management)
+- [Problem Management](#problem-management)
+- [SLA Configuration for ITIL](#sla-configuration-for-itil)
+- [Knowledge Base Integration](#knowledge-base-integration)
+- [Automation Patterns](#automation-patterns)
+
 ---
 
 Detailed ITIL process implementations using jira-jsm scripts.

@@ -27,7 +27,7 @@ This makes the effective weights for backend tasks: Goal 25, AC 25, Scope 15, Re
 
 | Score | Status | Action |
 |-------|--------|--------|
-| 80-100 | Ready | Proceed to mk:cook or mk:fix |
+| 80-100 | Ready | Proceed to mk-cook or mk-fix |
 | 60-79 | Minor clarification needed | List missing items, proceed with questions |
 | 40-59 | Significant gaps | Block until clarified — do not start implementation |
 | 0-39 | Insufficient | Return to author with specific missing items |

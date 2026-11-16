@@ -14,10 +14,10 @@ Activate when:
 - User runs `the plan skill [task]` or `the cook skill [task]`
 - Non-trivial task (> 2 files OR > 1h OR architectural decisions)
 - User supplies ≥2 upstream reports/specs (office-hours, brainstorming, planning-engine, confluence-spec, intake output…) → step-00.5 consolidates them into a Plan Intake Packet before planning (see `references/plan-intake-packet.md`)
-- User supplies a design evidence packet (e.g. from `mk:figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
+- User supplies a design evidence packet (e.g. from `mk-figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
 - Phase 3 needs a plan to build from
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
-- Existing-plan audit → `mk:validate-plan`; archive → lifecycle CLI.
+- Existing-plan audit → `mk-validate-plan`; archive → lifecycle CLI.
 - Hard/deep plan creation still runs its built-in red-team and validation interview before presenting the plan. These are design-quality steps, not standalone subcommands, and must never be routed away.
 - Compatibility aliases: `the plan skill archive` → [archive workflow](references/archive-workflow.md); `the plan skill red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `the plan skill validate {path}` → [standalone validation workflow](references/validate-standalone.md).
 
@@ -26,7 +26,7 @@ Standalone aliases route to their compatibility references; they do not replace 
 Skip when:
 
 - `the fix skill` with complexity=simple (the fix is the plan)
-- `mk:scale-routing` returns workflow=one-shot + zero blast radius
+- `mk-scale-routing` returns workflow=one-shot + zero blast radius
 
 ## Arguments
 
@@ -45,7 +45,7 @@ Skip when:
 
 - Requires `--timebox <duration>` (e.g., `--timebox 2d`, `--timebox 4h`); reject with "spike requires --timebox" if absent
 - Sets plan frontmatter `spike: true`, `timebox:`, and `findings_doc:` (default `tasks/plans/{slug}/findings.md`)
-- INCOMPATIBLE with `--product-level` and `mk:autobuild` FULL density (autobuild gate breaks). Reject combination "spike incompatible with autobuild FULL — use --fast or mk:cook"
+- INCOMPATIBLE with `--product-level` and `mk-autobuild` FULL density (autobuild gate breaks). Reject combination "spike incompatible with autobuild FULL — use --fast or mk-cook"
 - Advisory cap: warn if `story_points > 5` — likely two spikes, or spike + story
 
 **Composable flags:**
@@ -54,7 +54,7 @@ Skip when:
 
 ## Requirements Capture Contract
 
-Before producing a plan, plan-creator MUST be able to answer all 5 dimensions in concrete sentences (cook's exact-requirements contract — see `.agents/skills/cook/SKILL.md` "Exact-Requirements Contract (Phase 1)"):
+Before producing a plan, plan-creator MUST be able to answer all 5 dimensions in concrete sentences (cook's exact-requirements contract — see `.agents/skills/mk-cook/SKILL.md` "Exact-Requirements Contract (Phase 1)"):
 
 1. **Expected output** — concrete artifact(s) the user will see at the end (file paths, feature behavior, UI screen, API endpoint + payload, CLI command + flags).
 2. **Acceptance criteria** — specific behaviors / inputs → outputs / edge cases that MUST work to call it "done".
@@ -73,7 +73,7 @@ Before starting, read `references/failure-catalog.md` for common planning failur
 Execute via `workflow.md`. Step-file architecture — load one step at a time.
 Fast mode (`--fast`) uses `workflow-fast.md` (steps 00→03→04→07→08).
 
-**Agile DoR advisory (Phase 1 entry, conditional):** if the parsed plan frontmatter contains a non-empty `jira_tickets:` list AND `agile-story-gates.md` is loaded (Agile context active per `mk:agent-detector` Step 0b), run 1 of `agile-story-gates.md` for each ticket BEFORE generating phase files. Render the advisory checklist; never block — let the user decide. Skip silently when `jira_tickets:` is absent or the rule is not loaded.
+**Agile DoR advisory (Phase 1 entry, conditional):** if the parsed plan frontmatter contains a non-empty `jira_tickets:` list AND `agile-story-gates.md` is loaded (Agile context active per `mk-agent-detector` Step 0b), run 1 of `agile-story-gates.md` for each ticket BEFORE generating phase files. Render the advisory checklist; never block — let the user decide. Skip silently when `jira_tickets:` is absent or the rule is not loaded.
 
 ```
 Step 0: Scope Challenge → trivial (exit) | simple (fast) | complex (hard/deep)
@@ -111,8 +111,8 @@ tasks/plans/YYMMDD-name/
 - **Monolithic plan**: plan.md over 80 lines → move detail to phase files or research reports
 - **Research disconnected**: findings archived but not cited in plan → Step 3 MUST integrate research into Key Insights
 - **Over-planning trivial tasks**: 2-file config change gets full research → Step 0 scope gate exits early
-- **Skipping scout on unfamiliar codebases**: → always run mk:scout if codebase is new
-- **Using `--deep` to decide architecture**: deep maps a chosen approach; if the approach is unclear, route to `mk:brainstorming` first.
+- **Skipping scout on unfamiliar codebases**: → always run mk-scout if codebase is new
+- **Using `--deep` to decide architecture**: deep maps a chosen approach; if the approach is unclear, route to `mk-brainstorming` first.
 - **Dropping TDD at handoff**: when `tdd_mode=true`, step-09 MUST print cook with `--tdd`; sentinel/env state alone is not a cross-session contract.
 - **Post-Plan Handoff is deterministic**: step-09 fires `stop and ask the user in chat`; do NOT auto-invoke the chosen command. User must type it in a fresh session for clean context.
 - **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, autobuild, end}` fail the structural check.
@@ -145,7 +145,7 @@ flag is present).
 | `workflow-fast.md`                                 | Compact step sequence for `--fast` mode (00→03→04→07→08)                                                                                                                                                             |
 | `step-03a-product-spec.md`                         | Product-level spec drafter: user stories, features, design language. Replaces step-03 when `planning_mode = product-level`.                                                                                          |
 | `assets/product-spec-template.md`                  | Product spec template (Vision, Features, Design Language, AI Integration, Out-of-Scope)                                                                                                                              |
-| `assets/spike-plan-template.md`                    | Spike plan template (used when `planning_mode = spike`). Two phases: investigate + findings. Required frontmatter: `spike: true`, `timebox:`, `findings_doc:`. NOT compatible with `mk:autobuild` FULL.                |
+| `assets/spike-plan-template.md`                    | Spike plan template (used when `planning_mode = spike`). Two phases: investigate + findings. Required frontmatter: `spike: true`, `timebox:`, `findings_doc:`. NOT compatible with `mk-autobuild` FULL.                |
 | `references/anthropic-example-plan.md`             | RetroForge few-shot calibration example for product-level mode (ambition + feature density reference)                                                                                                                |
 | `step-00-5-intake-packet.md`                       | Conditional intake packet builder: consolidates ≥2 pre-existing external artifacts before research/drafting                                                                                                          |
 | `references/plan-intake-packet.md`                 | Plan Intake Packet contract: purpose, activation, 6-block schema, quality rules, boundaries                                                                                                                          |

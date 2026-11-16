@@ -39,11 +39,11 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 
 ```bash
 # Generate llms.txt (script does the heavy lifting)
-node .codex/scripts/skill-python.cjs .agents/skills/llms/scripts/generate-llms-txt.py \
+node .codex/scripts/skill-python.cjs .agents/skills/mk-llms/scripts/generate-llms-txt.py \
   --source ./docs [--output .] [--base-url https://example.com/docs] [--full]
 
 # Preview metadata first (Codex reviews before generating)
-node .codex/scripts/skill-python.cjs .agents/skills/llms/scripts/generate-llms-txt.py \
+node .codex/scripts/skill-python.cjs .agents/skills/mk-llms/scripts/generate-llms-txt.py \
   --source ./docs --json
 ```
 

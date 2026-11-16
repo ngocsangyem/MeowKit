@@ -25,7 +25,7 @@ Say: "Running the office-hours skill inline. Once the design doc is ready, I'll 
 the review right where we left off."
 
 Read the office-hours skill file from disk using the Read tool:
-`.agents/skills/office-hours/SKILL.md`
+`.agents/skills/mk-office-hours/SKILL.md`
 
 Follow it inline, **skipping these sections** (already handled by the parent skill):
 - Preamble (run first)
@@ -64,7 +64,7 @@ Options: A) Yes, run the office-hours skill now. B) No, keep going.
 If they keep going, proceed normally — no guilt, no re-asking.
 
 If they choose A: Read the office-hours skill file from disk:
-`.agents/skills/office-hours/SKILL.md`
+`.agents/skills/mk-office-hours/SKILL.md`
 
 Follow it inline, skipping these sections (already handled by parent skill):
 Preamble, stop and ask the user in chat Format, Completeness Principle, Search Before Building,
