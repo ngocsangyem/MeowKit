@@ -38,4 +38,4 @@ If output shows `UPGRADE_AVAILABLE <old> <new>`: follow the inline upgrade flow.
 
 If `LAKE_INTRO` is `no`: Introduce the Completeness Principle. Tell the user about the Boil the Lake principle, then offer to open the essay. Mark as seen with `touch .meowkit/state/.completeness-intro-seen`.
 
-If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: Ask the user about telemetry via stop and ask the user in chat (community vs anonymous vs off). Mark with `touch .meowkit/state/.telemetry-prompted`.
+If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: Ask the user about telemetry (community vs anonymous vs off). Mark with `touch .meowkit/state/.telemetry-prompted`.

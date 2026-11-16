@@ -1,6 +1,6 @@
 # Step 6: HITL Gate — Human Review of Each Suggestion
 
-Present each suggestion individually via `stop and ask the user in chat`. Approved suggestions land in `suggestions.md`. Modified suggestions get the user's revised version. Rejected suggestions land in `rejected.md` with the reason. **No auto-apply, ever.**
+Present each suggestion individually by asking the user. Approved suggestions land in `suggestions.md`. Modified suggestions get the user's revised version. Rejected suggestions land in `rejected.md` with the reason. **No auto-apply, ever.**
 
 ## Instructions
 
@@ -11,12 +11,12 @@ DRAFT="$analysis_dir/suggestions-draft.md"
 [ -f "$DRAFT" ] || { echo "BLOCKED: no suggestions-draft.md from step-05" >&2; exit 1; }
 ```
 
-### 6b. For each suggestion, present via stop and ask the user in chat
+### 6b. For each suggestion, present by asking the user
 
 The agent walks the YAML blocks in `suggestions-draft.md`. For each one:
 
 ```
-stop and ask the user in chat(
+ask_user(
   question: "Suggestion {N}/{total}: pattern '{pattern}' detected {occurrences} times across runs {affected_runs}.
 
   Proposed fix: {change_description}
@@ -35,14 +35,14 @@ stop and ask the user in chat(
 )
 ```
 
-**One suggestion per stop and ask the user in chat call.** No bulk-approve. No "approve all remaining."
+**One suggestion per user question.** No bulk-approve. No "approve all remaining."
 
 ### 6c. Process the user's selection
 
 | User selection | Action |
 |---|---|
 | Approve | Append the suggestion verbatim to `$analysis_dir/suggestions.md` |
-| Modify | Ask follow-up `stop and ask the user in chat` for the revised text; append revised version to `suggestions.md` |
+| Modify | Ask the user a follow-up for the revised text; append revised version to `suggestions.md` |
 | Reject | Ask follow-up for the reason; append `{pattern}: rejected — {reason}` to `$analysis_dir/rejected.md` |
 
 ### 6d. After the loop
@@ -75,10 +75,10 @@ See rejected.md (with reasons).
 
 ### 6e. Optional: Generate the follow-up plan draft
 
-If ≥1 suggestion approved AND user opts in via a final stop and ask the user in chat:
+If ≥1 suggestion approved AND user opts in via a final ask the user:
 
 ```
-stop and ask the user in chat(
+ask_user(
   question: "{A} suggestion(s) approved. Generate a follow-up plan now via mk-plan-creator?",
   options: [
     { label: "Yes — generate plan", description: "Spawn mk-plan-creator --hard with the approved suggestions" },

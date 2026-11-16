@@ -28,7 +28,7 @@ rm -f tasks/plans/*/*-$BRANCH-ceo-handoff-*.md 2>/dev/null || true
 
 After producing the Completion Summary above, persist the review result.
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes review metadata to
+**Plan-mode exception — run this even in plan mode:** This command writes review metadata to
 `.meowkit/telemetry/` (not project files). The skill preamble
 already writes to `.meowkit/state/sessions/` and `.meowkit/telemetry/` — this is
 the same pattern. The review dashboard depends on this data. Skipping this
@@ -146,7 +146,7 @@ Below the table, add these lines (omit any that are empty/not applicable):
 
 ### Write to the plan file
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
+**Plan-mode exception — run this even in plan mode:** This writes to the plan file, which is the one
 file you are allowed to edit in plan mode. The plan file review report is part of the
 plan's living status.
 
@@ -170,14 +170,14 @@ After displaying the Review Readiness Dashboard, recommend the next review(s) ba
 
 **If both are needed, recommend eng review first** (required gate), then design review.
 
-Use stop and ask the user in chat to present the next step. Include only applicable options:
+Ask the user to present the next step. Include only applicable options:
 - **A)** Run the plan-ceo-review skill next (required gate)
 - **B)** Run /plan-design-review next (only if UI scope detected)
 - **C)** Skip — I'll handle reviews manually
 
 ## docs/designs/ Promotion (EXPANSION and SELECTIVE EXPANSION only)
 
-At the end of the review, if the vision produced a compelling feature direction, offer to promote the CEO plan to the project repo. stop and ask the user in chat:
+At the end of the review, if the vision produced a compelling feature direction, offer to promote the CEO plan to the project repo. Ask the user:
 
 "The vision from this review produced {N} accepted scope expansions. Want to promote it to a design doc in the repo?"
 - **A)** Promote to `docs/designs/{FEATURE}.md` (committed to repo, visible to the team)

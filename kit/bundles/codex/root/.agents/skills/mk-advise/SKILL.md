@@ -125,7 +125,7 @@ building has stopped advising, and the user never approved the build.
 
 ## Execution
 
-Default: the isolated `advisor` agent (see `.codex/agents/advisor.md`), which
+Default: the isolated `advisor` agent (see `.codex/agents/advisor.toml`), which
 runs on the Fable 5 advisory profile.
 
 The harness has **no sub-task pause/resume** (the orchestration rules → Rejected

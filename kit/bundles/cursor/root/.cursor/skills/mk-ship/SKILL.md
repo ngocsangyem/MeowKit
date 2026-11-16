@@ -20,9 +20,9 @@ Operates in **Phase 5 (Ship)** of the project's workflow. Invoked by the `shippe
 
 After the verdict file is read at the start of the workflow:
 
-1. **Early-return guard (preserves zero-cost for non-Agile sessions):** if verdict frontmatter has no `jira_tickets:` field OR the field is an empty array → SKIP the entire DoD block. ONE frontmatter read; no stop and ask the user in chat calls; no further branching. Proceed directly to ship
+1. **Early-return guard (preserves zero-cost for non-Agile sessions):** if verdict frontmatter has no `jira_tickets:` field OR the field is an empty array → SKIP the entire DoD block. ONE frontmatter read; no user questions; no further branching. Proceed directly to ship
 2. **If verdict has `jira_tickets:` non-empty AND verdict status is PASS/WARN:**
-   - Per `agile-story-gates.md` 2 — three opt-in actions via stop and ask the user in chat (each cancel-safe, each Jira-offline-safe):
+   - Per `agile-story-gates.md` 2 — three opt-in actions by asking the user (each cancel-safe, each Jira-offline-safe):
      1. **Verdict→Jira comment.** "Post the review verdict summary to PROJ-123 as a comment? [Y/n/edit]" → `mk-jira-collaborate add comment KEY=PROJ-123` with verdict's Summary + Risks. Set verdict frontmatter `posted_to_jira: true|deferred`
      2. **Status transition.** "Transition PROJ-123 to Done? [Y/n/skip]" → `mk-jira-lifecycle transition KEY=PROJ-123 to=Done`. Set `transitioned_to_done: true|deferred`
      3. **Business AC checkbox.** Source priority: (a) Jira AC field via `mk-jira-issue get`; (b) **fallback to plan.md `## Acceptance Criteria`** if Jira read fails or AC field is empty. Y/n per item before allowing the rest of the ship pipeline
@@ -100,7 +100,7 @@ After pipeline completes, output this summary:
 - On target branch already → abort
 - Merge conflicts that can't be auto-resolved → stop, show conflicts
 - Test failures (in-branch) → stop, show failures
-- Critical review issues → stop and ask the user in chat per issue
+- Critical review issues → ask the user per issue
 - Coverage below gate → stop
 - Plan gaps detected → stop
 
@@ -134,7 +134,7 @@ flag is present).
 
 ## References
 
-- `references/preamble.md` — Session init, stop and ask the user in chat format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Plan Status Footer
+- `references/preamble.md` — Session init, user question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Plan Status Footer
 - `references/pre-flight.md` — Base branch detection (Step 0), pre-flight checks (Step 1), Review Readiness Dashboard
 - `references/distribution-pipeline.md` — Distribution pipeline check (Step 1.5)
 - `references/merge-and-test-bootstrap.md` — Merge base branch (Step 2), test framework bootstrap (Step 2.5)

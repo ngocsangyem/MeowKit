@@ -79,7 +79,7 @@ matrix with source answer, proposed answer, and risk if wrong. Include selected
 surface, capability cut list, credentials, transport/deployment when MCP applies,
 package name, license, and ownership.
 
-For `--ask`, use concrete `stop and ask the user in chat` options for each decision. For `--auto`,
+For `--ask`, use concrete question options for each decision. For `--auto`,
 record technical proposals with one-line rationales but still ask the user for the
 business decisions. No flag bypasses approval before the spec is emitted.
 

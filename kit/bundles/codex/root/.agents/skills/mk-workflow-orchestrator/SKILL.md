@@ -7,7 +7,7 @@ description: "Routes complex-feature intent through the 7-phase workflow; auto-i
 
 # Workflow Orchestrator
 
-<!-- Canonical source: .codex/workflow.yaml -->
+<!-- Canonical source: references/workflow-phases.md (no separate workflow.yaml ships in this bundle) -->
 
 **Priority:** CRITICAL — Use for complex feature implementations.
 
@@ -15,7 +15,7 @@ description: "Routes complex-feature intent through the 7-phase workflow; auto-i
 
 ## Canonical Lifecycle
 
-`.codex/workflow.yaml` is the sole source for phase sequence, leads, and required outputs. This adapter must not restate phase details. For execution load `references/workflow-phases.md`, which renders that contract.
+`references/workflow-phases.md` is the sole source for phase sequence, leads, and required outputs. This adapter must not restate phase details — load that reference for execution.
 
 On a non-trivial task, route to `mk-plan-creator` and agree the plan with the user before building. Fasttrack accepts only a spec the user has already settled. Phase 4 leaves a review verdict; read it before any explicit ship request.
 
@@ -40,7 +40,7 @@ See the phase-contract conventions for input/output expectations per phase. (Loa
 
 2. **Detect workflow mode** — check for `fasttrack:` prefix or Agent Teams trigger; if present load `references/fasttrack-and-teams.md`. Otherwise proceed with standard 7-phase flow.
 
-3. **Execute the canonical lifecycle** — load `references/workflow-phases.md` and follow `.codex/workflow.yaml`; do not duplicate or override its phase ordering, TDD rules, or required outputs.
+3. **Execute the canonical lifecycle** — load `references/workflow-phases.md` and follow it directly; do not duplicate or override its phase ordering, TDD rules, or required outputs.
 
 4. **At each phase boundary** — check token budget (warn at 75%, handoff at 90%). Show what comes next before continuing. Save state via `workflow:handoff` if context is near limit. Also delegate to `project-manager` after each phase transition per the post-phase-delegation conventions Rule 1 (background, non-blocking — include "Run in the background" in the prompt). Skipped when `MEOWKIT_PM_AUTO=off`.
 

@@ -94,7 +94,7 @@ Step 5: Iterate or Ship
     ├── PASS → ask the user about shipping → on a yes route to shipper, set final_status=PASS, go to step-06
     ├── WARN + iteration < max_iter → loop to step-3 with feedback
     ├── FAIL + iteration < max_iter → loop to step-3 with feedback
-    ├── iteration == max_iter → escalate to human via stop and ask the user in chat
+    ├── iteration == max_iter → escalate to human by asking the user
     └── budget breach OR 6h timeout → halt, set final_status=TIMED_OUT
          ↓
 Step 6: Run Report

@@ -57,16 +57,13 @@
       ".claude/skills/confluence/references/install-and-auth.md": 1,
       ".claude/skills/figma/references/official-docs-evidence.md": 1,
       ".claude/skills/figma/references/prototype-flow-artifacts.md": 1,
-      ".claude/skills/qa/SKILL.md": 2,
       ".claude/skills/status/SKILL.md": 1,
       "kit/bundles/codex/root/.agents/skills/mk-confluence/references/install-and-auth.md": 1,
       "kit/bundles/codex/root/.agents/skills/mk-figma/references/official-docs-evidence.md": 1,
       "kit/bundles/codex/root/.agents/skills/mk-figma/references/prototype-flow-artifacts.md": 1,
-      "kit/bundles/codex/root/.agents/skills/mk-qa/SKILL.md": 2,
       "kit/bundles/cursor/root/.cursor/skills/mk-confluence/references/install-and-auth.md": 1,
       "kit/bundles/cursor/root/.cursor/skills/mk-figma/references/official-docs-evidence.md": 1,
-      "kit/bundles/cursor/root/.cursor/skills/mk-figma/references/prototype-flow-artifacts.md": 1,
-      "kit/bundles/cursor/root/.cursor/skills/mk-qa/SKILL.md": 2
+      "kit/bundles/cursor/root/.cursor/skills/mk-figma/references/prototype-flow-artifacts.md": 1
     }
   }
 }

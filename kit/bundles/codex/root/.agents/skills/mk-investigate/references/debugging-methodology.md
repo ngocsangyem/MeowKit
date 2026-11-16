@@ -13,7 +13,7 @@ Fixing symptoms creates whack-a-mole debugging. Find the root cause, then fix it
 
 ## Phase 1: Root Cause Investigation
 
-1. **Collect symptoms:** Read error messages, stack traces, reproduction steps. Ask ONE question at a time via stop and ask the user in chat if context is missing.
+1. **Collect symptoms:** Read error messages, stack traces, reproduction steps. Ask ONE question at a time by asking the user if context is missing.
 2. **Read the code:** Trace the code path from symptom back to potential causes. Use Grep to find all references, Read to understand logic.
 3. **Check recent changes:** `git log --oneline -20 -- <affected-files>` — regression means root cause is in the diff.
 4. **Reproduce:** Can you trigger the bug deterministically? If not, gather more evidence.
@@ -39,7 +39,7 @@ Also check `TODOS.md` and `git log` for prior fixes in same area.
 
 1. **Confirm:** Use existing logs, traces, read-only diagnostics, or an already available reproducer to test the suspected root cause.
 2. **If wrong:** Sanitize error and search. Return to Phase 1. Do not guess.
-3. **3-strike rule:** If 3 hypotheses fail, STOP. stop and ask the user in chat with options: continue, escalate, or instrument.
+3. **3-strike rule:** If 3 hypotheses fail, STOP. Ask the user with options: continue, escalate, or instrument.
 
 **Red flags:**
 - "Quick fix for now" — there is no "for now"

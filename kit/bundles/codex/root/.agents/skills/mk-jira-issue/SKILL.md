@@ -5,7 +5,7 @@ description: "Create, read, update or delete one Jira issue. NOT for mk-jira-bul
 
 # mk-jira-issue
 
-Forks to the `jira-issue` agent (system prompt at `.codex/agents/jira-issue.md`). The skill body is the task brief — the host runtime injects this content into the forked agent.
+Forks to the `jira-issue` agent (system prompt at `.codex/agents/jira-issue.toml`). The skill body is the task brief — the host runtime injects this content into the forked agent.
 
 ## Triggers
 

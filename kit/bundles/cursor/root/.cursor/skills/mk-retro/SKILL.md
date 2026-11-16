@@ -32,7 +32,7 @@ Skip: Always — retros don't require pre-planning.
 2. **Gather + compute** — fetch origin, run git commands, compute metrics (summary, leaderboard, backlog, skills, eureka). See `references/data-gathering.md`, `references/metrics-computation.md`
 3. **Analyze** — per-person breakdown (praise + growth), time patterns, trends, streaks. See `references/team-analysis.md`, `references/trends-history.md`
 4. **Output** — save snapshot to `tasks/reports/retros/`, write narrative with tweetable summary. See `references/narrative-output.md`, `references/telemetry.md`
-5. **Action-item ceremony** (Agile-context-only — gated by `agile-feedback-cycle.md` 1 when loaded) — parse narrative for `## 3 Things to Improve` and `## 3 Habits for Next Week`; surface stop and ask the user in chat per item with options `Create Jira story now` | `Add to plan TODO` | `Document as no-action` | `Defer to next retro`. On `Create Jira story now` → `mk-jira-issue create` with body pre-filled, REQUIRES user review. On `Document as no-action` → append to `tasks/reports/retros/{date}-decisions.md` with reason. The retro is not "complete" until every surfaced action has a disposition. **Skip entirely when Agile context is not active** (rule not loaded; this step becomes inert).
+5. **Action-item ceremony** (Agile-context-only — gated by `agile-feedback-cycle.md` 1 when loaded) — parse narrative for `## 3 Things to Improve` and `## 3 Habits for Next Week`; surface ask the user per item with options `Create Jira story now` | `Add to plan TODO` | `Document as no-action` | `Defer to next retro`. On `Create Jira story now` → `mk-jira-issue create` with body pre-filled, REQUIRES user review. On `Document as no-action` → append to `tasks/reports/retros/{date}-decisions.md` with reason. The retro is not "complete" until every surfaced action has a disposition. **Skip entirely when Agile context is not active** (rule not loaded; this step becomes inert).
 
 For **compare mode**: See `references/compare-mode.md`
 For **global mode** (`/retro global`): Skip steps 3-9, follow `references/global-retro.md` instead.
@@ -41,7 +41,7 @@ For **global mode** (`/retro global`): Skip steps 3-9, follow `references/global
 
 These apply across all skills:
 
-- **stop and ask the user in chat format**: See `references/ask-user-question-format.md`
+- **User question format**: See `references/ask-user-question-format.md`
 - **Completeness Principle**: See `references/completeness-principle.md`
 - **Repo Ownership Mode**: See `references/repo-ownership-mode.md`
 - **Search Before Building**: See `references/search-before-building.md`
@@ -57,7 +57,7 @@ See `references/tone-and-rules.md`
 | File                                       | Contents                                                             |
 | ------------------------------------------ | -------------------------------------------------------------------- |
 | `references/preamble.md`                   | Session initialization, upgrade checks, lake intro, telemetry prompt |
-| `references/ask-user-question-format.md`   | Standard stop and ask the user in chat structure (5 rules)                         |
+| `references/ask-user-question-format.md`   | Standard ask the user structure (5 rules)                         |
 | `references/completeness-principle.md`     | Boil the Lake principle, effort estimation tables                    |
 | `references/repo-ownership-mode.md`        | Solo vs collaborative repo behavior                                  |
 | `references/search-before-building.md`     | Three layers of knowledge, eureka moments                            |

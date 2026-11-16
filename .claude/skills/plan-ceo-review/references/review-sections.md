@@ -85,7 +85,7 @@ For every new method, service, or codepath that can fail, fill in this table:
   RecordNotFound               | Y         | Return nil, log warning | "Not found" message
 ```
 Rules for this section:
-* Catch-all error handling (`rescue StandardError`, `catch (Exception e)`, `except Exception`) is ALWAYS a smell. Name the specific exceptions.
+* Catch-all error handling (`rescue StandardError`, `catch (Exception e)`, `except Exception`) is a smell. Name the specific exceptions.
 * Catching an error with only a generic log message is insufficient. Log the full context: what was being attempted, with what arguments, for what user/request.
 * Every rescued error must either: retry with backoff, degrade gracefully with a user-visible message, or re-raise with added context. "Swallow and continue" is almost never acceptable.
 * For each GAP (unrescued error that should be rescued): specify the rescue action and what the user should see.

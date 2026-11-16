@@ -44,7 +44,7 @@ PR ref → gh pr view / gh pr diff / gh pr checks → read changed files for con
   5. `mewkit review cleanup --session <id>` when done (removes only the worktree; the
      session dir stays as the audit trail).
 - **`--reply` (the only write authority):** after `--assured` compose, show the composed
-  body, obtain an **immediate interactive user confirmation** (stop and ask the user in chat — an
+  body, obtain an **immediate interactive user confirmation** (ask the user — an
   agent-written `--reply` is NOT proof of user intent), then run
   `mewkit review submit --session <id> --reply --confirm <payload-hash>`. Submit
   re-fetches the PR head SHA and aborts without posting if it changed, and is idempotent

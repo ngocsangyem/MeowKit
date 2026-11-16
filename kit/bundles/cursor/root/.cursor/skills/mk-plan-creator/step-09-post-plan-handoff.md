@@ -1,6 +1,6 @@
 # Step 9: Post-Plan Handoff
 
-Deterministic handoff after task hydration. Presents mode-pruned options via `stop and ask the user in chat`, writes the chosen next-step to plan.md frontmatter, prints the suggested command, and STOPs without auto-invoking it.
+Deterministic handoff after task hydration. Presents mode-pruned options by asking the user, writes the chosen next-step to plan.md frontmatter, prints the suggested command, and STOPs without auto-invoking it.
 
 ## Inputs
 
@@ -13,7 +13,7 @@ Deterministic handoff after task hydration. Presents mode-pruned options via `st
 
 ### 9a. Defensive Fallback Advisory
 
-If `matched_flags` is unset OR empty AND `planning_mode` is `fast` or `spike`, print this advisory BEFORE the `stop and ask the user in chat`:
+If `matched_flags` is unset OR empty AND `planning_mode` is `fast` or `spike`, print this advisory BEFORE the user question:
 
 ```
 `matched_flags` is unset — plan-creator was invoked directly rather than
@@ -38,7 +38,7 @@ Conservative false-positives are accepted — the user has final say via the opt
 
 Compute the effective risk set: `risk_hit = (matched_flags ∪ re_scan_flags) ∩ {AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}`.
 
-Option set is mode-pruned. First option is `(Recommended)`. stop and ask the user in chat caps options at 4.
+Option set is mode-pruned. First option is `(Recommended)`. Ask the user caps options at 4.
 
 | Mode | risk_hit non-empty? | Options (first = Recommended) |
 |---|---|---|
@@ -48,7 +48,7 @@ Option set is mode-pruned. First option is `(Recommended)`. stop and ask the use
 | product-level | (n/a) | Hand off to mk-autobuild, End |
 | spike | (n/a) | Cook, End |
 
-### 9d. Present stop and ask the user in chat
+### 9d. Present ask the user
 
 Build the question payload using the option set above. Each option has `label` and `description` (≤120 chars). Labels are display-only — no shell-executable text.
 

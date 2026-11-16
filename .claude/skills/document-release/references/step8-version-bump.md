@@ -1,6 +1,6 @@
 # Step 8: VERSION Bump Question
 
-**CRITICAL — NEVER BUMP VERSION WITHOUT ASKING.**
+**Never bump the version without asking the user: a version number is a release decision.**
 
 1. **If VERSION does not exist:** Skip silently.
 

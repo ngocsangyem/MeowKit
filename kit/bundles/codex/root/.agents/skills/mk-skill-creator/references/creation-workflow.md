@@ -67,7 +67,7 @@ If the skill processes untrusted input, load mk-skill-template-secure and verify
 
 ## Step 6: Register
 
-Add to `.agents/skills/SKILLS_ATTRIBUTION.md`:
+Add to `SKILLS_ATTRIBUTION.md` in the skills folder (create it if missing):
 ```
 | mk:{name} | your org (original) | — | MIT | .agents/skills/{name}/ |
 ```
@@ -77,4 +77,4 @@ Add to `.agents/skills/SKILLS_ATTRIBUTION.md`:
 - Don't create skills that duplicate existing agent behavior
 - Don't create skills with vague triggers ("when appropriate")
 - Don't create skills over 200 lines without references/
-- Don't create skills that modify files outside .codex/
+- Don't create skills that modify files outside the project's skills tree

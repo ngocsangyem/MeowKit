@@ -14,7 +14,7 @@ The user passed `<target>` as a positional argument. Detect type:
 | Path ends in executable / has shebang | `cli-binary` | `./bin/mytool` |
 | Path is a directory containing `package.json` / `pyproject.toml` / etc. | `frontend-path` or `backend-path` | `./apps/web` |
 
-If ambiguous, ask the user via `stop and ask the user in chat`. Never guess.
+If ambiguous, ask the user. Never guess.
 
 ### 1b. Default rubric preset by target type
 

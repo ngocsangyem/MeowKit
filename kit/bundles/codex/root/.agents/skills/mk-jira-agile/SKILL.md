@@ -30,7 +30,7 @@ When `tasks/contracts/sprint-state-{date}-sprint-{N}.md` exists with `status: ac
 
 1. Read newest sprint-state file matching the active sprint
 2. **Acquire `flock` on the sprint-state file before any read-modify-write.** YAML frontmatter append is non-atomic across shells; lock is the only mitigation
-3. Per `agile-sprint-commitment.md` 2: `stop and ask the user in chat` "Reason for mid-sprint scope change?" — required free-text
+3. Per `agile-sprint-commitment.md` 2: ask the user "Reason for mid-sprint scope change?" — required free-text
 4. Append `{ ts: <ISO ts>, action: add|remove, ticket: KEY, reason: <text> }` to `amendments:` list
 5. Release lock
 6. Proceed with the underlying `jira-as agile sprint add|remove` call
@@ -41,7 +41,7 @@ If sprint-state contract is absent OR `status: closed` → skip the amendment ce
 
 1. Read `committed_tickets:` from newest active sprint-state
 2. Query each via `mk-jira-issue get KEY`
-3. For each non-terminal ticket (not Done/Cancelled/Won't-Do), `stop and ask the user in chat`: "PROJ-X is in {status}. Carry over to next sprint? Drop? Mark as not delivered?"
+3. For each non-terminal ticket (not Done/Cancelled/Won't-Do), ask the user: "PROJ-X is in {status}. Carry over to next sprint? Drop? Mark as not delivered?"
 4. Write closure summary: `status: closed`, `closed_at: <ts>`, `delivered: [...]`, `carried_over: [...]`
 5. Proceed with the underlying `jira-as agile sprint close` call
 

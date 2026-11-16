@@ -6,7 +6,7 @@ requires_runtime: ["python>=3.9"]
 
 # mk-story-sizer
 
-Forks to the `story-sizer` agent (system prompt at `.codex/agents/story-sizer.md`). v1 ships paste-mode only: the user provides a markdown block of stories, the agent applies heuristics, and a Story Sizing Report is written to `tasks/reports/story-sizing-{YYMMDD}-{slug}.md`. No Jira side effects in default mode.
+Forks to the `story-sizer` agent (system prompt at `.codex/agents/story-sizer.toml`). v1 ships paste-mode only: the user provides a markdown block of stories, the agent applies heuristics, and a Story Sizing Report is written to `tasks/reports/story-sizing-{YYMMDD}-{slug}.md`. No Jira side effects in default mode.
 
 ## Triggers
 
@@ -43,7 +43,7 @@ End-to-end default flow + `--scout` extract-or-prompt pattern + filtering rules:
 
 ## Auto-create (opt-in)
 
-`--auto-create --project <KEY> [--epic <KEY>]` runs 5 pre-flight checks (NO_ACS, Rule-1 injection, length cap, duplicate suspect via `mk-jira-search`, source-hash mismatch). If all pass, a markdown dry-run table renders + a single `stop and ask the user in chat` gate decides ship-or-abort. Gating rules: `references/auto-create-gating.md`. Rule-1 inventory copy: `references/injection-patterns.md`. Gating check: `scripts/check-auto-create-gating.py`.
+`--auto-create --project <KEY> [--epic <KEY>]` runs 5 pre-flight checks (NO_ACS, Rule-1 injection, length cap, duplicate suspect via `mk-jira-search`, source-hash mismatch). If all pass, a markdown dry-run table renders + a single user question gate decides ship-or-abort. Gating rules: `references/auto-create-gating.md`. Rule-1 inventory copy: `references/injection-patterns.md`. Gating check: `scripts/check-auto-create-gating.py`.
 
 ## See also
 

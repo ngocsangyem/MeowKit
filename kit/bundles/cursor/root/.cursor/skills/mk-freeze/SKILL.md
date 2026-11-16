@@ -15,7 +15,7 @@ echo '{"skill":"freeze","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basen
 
 ## Setup
 
-Ask the user which directory to restrict edits to. Use stop and ask the user in chat:
+Ask the user which directory to restrict edits to. Ask the user:
 
 - Question: "Which directory should I restrict edits to? Files outside this path will be blocked from editing."
 - Text input (not multiple choice) — the user types a path.

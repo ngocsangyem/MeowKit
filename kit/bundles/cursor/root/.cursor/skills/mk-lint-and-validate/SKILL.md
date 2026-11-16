@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Lint and Validate Skill
 
-> **MANDATORY:** Run appropriate validation tools after EVERY code change. Do not finish a task until the code is error-free.
+> Run the project's validation tools before calling a code change done. Do not finish a task with errors outstanding.
 
 > For the full pipeline (build → lint → type-check → tests → coverage), use `mk-verify`. `mk-lint-and-validate` is a lint-only subset intended for post-edit quick checks.
 

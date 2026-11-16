@@ -1,13 +1,13 @@
 # Skill: Deterministic Validation Scripts
 
-**Purpose:** Run real, deterministic checks that do not depend on LLM judgment. These scripts provide ground-truth validation for security, code quality, and correctness.
+**Purpose:** Run real, deterministic checks that do not depend on LLM judgment. These scripts provide ground-truth validation for security, code quality, and correctness — when a project provides them; the concrete script path is project-specific and not shipped by this bundle.
 
 ## Contents
 
 - [When to Use](#when-to-use)
 - [Available Scripts](#available-scripts)
-  - [`.codex/scripts/validate.py`](#codexscriptsvalidatepy)
-  - [`.codex/scripts/security-scan.py`](#codexscriptssecurity-scanpy)
+  - [`validate.py`](#validatepy)
+  - [`security-scan.py`](#security-scanpy)
 - [Why Deterministic Validation Matters](#why-deterministic-validation-matters)
 - [How to Extend](#how-to-extend)
 - [Integration with Workflow](#integration-with-workflow)
@@ -25,9 +25,9 @@ Also run on-demand whenever you want to verify code quality without relying on s
 
 ## Available Scripts
 
-### `.codex/scripts/validate.py`
+### `validate.py`
 
-General validation script that checks code quality and correctness.
+General validation script that checks code quality and correctness (if this project provides one — path varies by project).
 
 **What it checks:**
 - Type errors (runs the type checker for the project's language)
@@ -39,16 +39,16 @@ General validation script that checks code quality and correctness.
 
 **How to run:**
 ```bash
-.meowkit/envs/testing/bin/python3 .codex/scripts/validate.py
+.meowkit/envs/testing/bin/python3 <path-to-validate.py>
 ```
 
 **Exit codes:**
 - `0` — all checks passed
 - `1` — one or more checks failed (details in output)
 
-### `.codex/scripts/security-scan.py`
+### `security-scan.py`
 
-Security-focused validation. See `review/security-checklist.md` for the full list of checks.
+Security-focused validation (if this project provides one — path varies by project). See `review/security-checklist.md` for the full list of checks.
 
 **What it checks:**
 - No secrets in code (API keys, tokens, passwords)
@@ -60,7 +60,7 @@ Security-focused validation. See `review/security-checklist.md` for the full lis
 
 **How to run:**
 ```bash
-.meowkit/envs/testing/bin/python3 .codex/scripts/security-scan.py
+.meowkit/envs/testing/bin/python3 <path-to-security-scan.py>
 ```
 
 **Exit codes:**

@@ -34,7 +34,7 @@ delegate a sub-task (
   agent="developer",
   description="Generator iteration $iteration for $slug",
   prompt="
-    Read your agent constitution at .codex/agents/developer.md.
+    Read your agent constitution at .codex/agents/developer.toml.
     Follow the Implementation Sub-Phases section (Phase 5 generator pattern):
       1. Understand
       2. Design Direction

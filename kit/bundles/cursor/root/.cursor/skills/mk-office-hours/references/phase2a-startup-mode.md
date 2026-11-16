@@ -85,7 +85,7 @@ These examples show the difference between soft exploration and rigorous diagnos
 
 ## The Six Forcing Questions
 
-Ask these questions **ONE AT A TIME** via stop and ask the user in chat. Push on each one until the answer is specific, evidence-based, and uncomfortable. Comfort means the founder hasn't gone deep enough.
+Ask these questions **ONE AT A TIME** by asking the user. Push on each one until the answer is specific, evidence-based, and uncomfortable. Comfort means the founder hasn't gone deep enough.
 
 **Smart routing based on product stage — you don't always need all six:**
 - Pre-product -> Q1, Q2, Q3

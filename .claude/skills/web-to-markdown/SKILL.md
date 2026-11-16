@@ -27,8 +27,8 @@ SKILL METADATA (non-native frontmatter — ignored by the host runtime, used by 
 These fields live in a comment because the host runtime's supported frontmatter schema
 (verified 260409) only includes: name, description, argument-hint, disable-model-invocation,
 user-invocable, allowed-tools, model, effort, context, agent, hooks, paths, shell.
-Everything else is silently ignored. The CLI parses optional_system_deps from
-this comment block (see lib/system-deps-registry.ts — parseOptionalSystemDepsFromSkillMd).
+Everything else is silently ignored. `mewkit setup` reads optional_system_deps from
+this comment block and installs only keys its built-in registry knows.
 -->
 
 <!-- SECURITY ANCHOR

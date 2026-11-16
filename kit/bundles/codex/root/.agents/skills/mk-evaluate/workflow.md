@@ -7,8 +7,8 @@
 - NEVER load multiple step files simultaneously
 - ALWAYS read entire step file before execution
 - NEVER skip steps — each step produces artifacts the next step needs
-- ALWAYS halt at the active-verification gate (no PASS without evidence)
-- ALWAYS reload `prompts/skeptic-persona.md` at session start (re-anchor before each criterion)
+- Halt at the active-verification check: no PASS without evidence
+- Reload `prompts/skeptic-persona.md` at session start (re-anchor before each criterion)
 
 ## Steps
 

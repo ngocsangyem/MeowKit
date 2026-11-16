@@ -21,5 +21,32 @@ fi
 printf -- '---\nname: mk:demo\n---\nOptional: `.claude/mcp.json`.\n' > "$seed/.claude/skills/demo/SKILL.md"
 if bash "$CHECK" "$seed" >/dev/null 2>&1; then echo "PASS: an optional runtime file is exempt"; else echo "FAIL: optional path flagged"; fail=1; fi
 
+mkdir -p "$seed/.claude/skills/demo/references"
+printf 'See `.claude/skills/review/gone-format.md`.\n' > "$seed/.claude/skills/demo/references/notes.md"
+if out=$(bash "$CHECK" "$seed" 2>&1); then
+  echo "FAIL: a dead path in a reference passed"; fail=1
+elif grep -q "DEAD_PATH: .claude/skills/demo/references/notes.md -> .claude/skills/review/gone-format.md" <<<"$out"; then
+  echo "PASS: a dead path in a reference fails the check"
+else
+  echo "FAIL: the reference dead path was not named: $out"; fail=1
+fi
+rm "$seed/.claude/skills/demo/references/notes.md"
+
+# A bundle path the bundle does not ship fails; a file the user creates at run time does not.
+bundle="$seed/kit/bundles/codex/root"
+mkdir -p "$bundle/.agents/skills/mk-demo/scripts"
+touch "$bundle/.agents/skills/mk-demo/scripts/run.sh"
+printf 'Run `.agents/skills/mk-demo/scripts/run.sh`; keys live in `.codex/.env`.\n' > "$bundle/.agents/skills/mk-demo/SKILL.md"
+if bash "$CHECK" "$seed" >/dev/null 2>&1; then echo "PASS: a shipped bundle path and a run-time file pass"; else echo "FAIL: valid bundle paths flagged"; fail=1; fi
+printf 'Run `.agents/skills/jira/scripts/jira-as.sh`.\n' > "$bundle/.agents/skills/mk-demo/SKILL.md"
+if out=$(bash "$CHECK" "$seed" 2>&1); then
+  echo "FAIL: a dead bundle path passed"; fail=1
+elif grep -q "DEAD_PATH: kit/bundles/codex/root/.agents/skills/mk-demo/SKILL.md -> .agents/skills/jira/scripts/jira-as.sh" <<<"$out"; then
+  echo "PASS: a dead bundle path fails the check"
+else
+  echo "FAIL: the bundle dead path was not named: $out"; fail=1
+fi
+rm -r "$seed/kit"
+
 if bash "$CHECK" "$REPO" >/dev/null 2>&1; then echo "PASS: the real tree is clean"; else echo "FAIL: the real tree has dead refs"; fail=1; fi
 exit $fail

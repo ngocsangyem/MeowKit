@@ -50,6 +50,6 @@ User: "Use only tester for this task"
 
 ---
 
-**Agent routing:** the agent-routing conventions (canonical agent table) and `.codex/agents/orchestrator.md` (orchestrator agent definition). **Skill dispatch:** `.agents/skills/mk-agent-detector/references/skill-domain-routing.md`.
+**Agent routing:** the agent-routing conventions (canonical agent table) and the custom agent files in `.codex/agents/*.toml`. **Skill dispatch:** `.agents/skills/mk-agent-detector/references/skill-domain-routing.md`.
 
 **MANDATORY:** Always show agent banner at start of EVERY response.

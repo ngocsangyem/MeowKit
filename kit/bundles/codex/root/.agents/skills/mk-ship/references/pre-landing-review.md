@@ -22,11 +22,11 @@ If the diff is frontend-only and no `mk-review` pass ran, load `mk-review/refere
 5. **Auto-fix all AUTO-FIX items.** Apply each fix. Output one line per fix:
    `[AUTO-FIXED] [file:line] Problem → what you did`
 
-6. **If ASK items remain,** present them in ONE stop and ask the user in chat:
+6. **If ASK items remain,** present them in ONE ask the user:
    - List each with number, severity, problem, recommended fix
    - Per-item options: A) Fix  B) Skip
    - Overall RECOMMENDATION
-   - If 3 or fewer ASK items, you may use individual stop and ask the user in chat calls instead
+   - If 3 or fewer ASK items, you may use individual user questions instead
 
 7. **After all fixes (auto + user-approved):**
    - If ANY fixes were applied: commit fixed files by name (`git add <fixed-files> && git commit -m "fix: pre-landing review fixes"`), then **STOP** and tell the user to run `the ship skill` again to re-test.
@@ -53,7 +53,7 @@ gh pr view --json reviewRequests,reviews,comments -q '.reviews[].body, .comments
 
 For each comment, classify and handle:
 
-**VALID & ACTIONABLE:** Use stop and ask the user in chat:
+**VALID & ACTIONABLE:** Ask the user:
 - Show the comment with file:line reference
 - Options: A) Fix now, B) Acknowledge and ship anyway, C) Dismiss as false positive
 - If fixed: commit with `git commit -m "fix: address review comment — <brief>"`, log to `.meowkit/telemetry/reviews.jsonl`

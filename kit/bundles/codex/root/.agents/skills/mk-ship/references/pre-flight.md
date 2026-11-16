@@ -42,7 +42,7 @@ If argument = "beta"     → target = auto-detect dev branch:
 If no argument           → infer from branch name:
   - feature/* hotfix/* bugfix/* fix/* → official (target main)
   - dev/* beta/* experiment/*         → beta (target dev)
-  - unclear                           → stop and ask the user in chat: "Ship to main (official) or dev (beta)?"
+  - unclear                           → ask the user: "Ship to main (official) or dev (beta)?"
 If --dry-run             → print mode + plan for each step, then stop
 ```
 
@@ -146,7 +146,7 @@ If the Eng Review is NOT "CLEAR":
 
    If an override exists, display the dashboard and note "Review gate previously accepted — continuing." Do NOT ask again.
 
-2. **If no override exists,** use stop and ask the user in chat:
+2. **If no override exists,** ask the user:
    - Show that Eng Review is missing or has open issues
    - RECOMMENDATION: Choose C if the change is obviously trivial (< 20 lines, typo fix, config-only); Choose B for larger changes
    - Options: A) Ship anyway B) Abort — run the review skill first C) Change is too small to need eng review

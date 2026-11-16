@@ -74,7 +74,7 @@ Which is correct: the plan, the codebase, or neither?
 
 FAILED claims rank above keyword-detected questions (they are higher-signal). Cap total interview questions at 5 regardless of source mix.
 
-### 6d. Present via stop and ask the user in chat
+### 6d. Present by asking the user
 
 Present each question with 2-4 concrete options (per format rules). Mark the recommended option.
 
@@ -91,7 +91,7 @@ Present each question with 2-4 concrete options (per format rules). Mark the rec
 }
 ```
 
-Group related questions (max 4 per stop and ask the user in chat call).
+Group related questions (max 4 per user question).
 
 ### 6e. Propagate Answers to Phase Files
 
@@ -135,7 +135,7 @@ Outputs:
 - `### Whole-Plan Consistency Sweep — <ISO>` block appended to each affected phase file's `## Validation Log` section (create section if missing); the orchestrator performs ONE Edit per phase file
 - plan.md frontmatter updated with `consistency_sweeps.validation: { reconciled, unresolved, ran_at }`
 
-If `unresolved > 0`, FIRE the W2 `stop and ask the user in chat` blocker (see decision tree in `references/whole-plan-sweep.md`). Do not present the plan in step-07 until the user selects one of:
+If `unresolved > 0`, FIRE the W2 user-question blocker (see decision tree in `references/whole-plan-sweep.md`). Do not present the plan in step-07 until the user selects one of:
 
 - "Apply pending edits and resolve now" — planner rewrites locally; recursion bounded at 2 attempts.
 - "Accept risk: proceed with unresolved contradictions (writes Risk rows + ## Validation Log)" — write a Risk Assessment row to each affected phase file referencing the deferred contradiction count; proceed.

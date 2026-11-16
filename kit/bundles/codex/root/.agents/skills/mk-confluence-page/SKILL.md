@@ -5,7 +5,7 @@ description: "Confluence page CRUD, copy, hierarchy. NOT for mk-confluence-colla
 
 # mk-confluence-page
 
-Forks to the `confluence-page` agent (system prompt at `.codex/agents/confluence-page.md`). The skill body is the task brief — the host runtime injects this content into the forked agent.
+Forks to the `confluence-page` agent (system prompt at `.codex/agents/confluence-page.toml`). The skill body is the task brief — the host runtime injects this content into the forked agent.
 
 ## Triggers
 

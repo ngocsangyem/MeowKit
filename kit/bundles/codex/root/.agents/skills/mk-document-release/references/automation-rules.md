@@ -24,5 +24,5 @@ subjective decisions.
 
 ## NEVER do:
 - Overwrite, replace, or regenerate CHANGELOG entries — polish wording only, preserve all content
-- Bump VERSION without asking — always use stop and ask the user in chat for version changes
+- Bump VERSION without asking — always ask the user for version changes
 - Use `Write` tool on CHANGELOG.md — always use `Edit` with exact `old_string` matches

@@ -118,7 +118,7 @@ IF scale_routing.level == "high" AND NOT input contains "--no-strict":
 
 ## Edge Cases
 
-- **Ambiguous task** (could be 2 modes): Ask user via `stop and ask the user in chat` — "Looks like a [fast/parallel] task. Confirm?"
+- **Ambiguous task** (could be 2 modes): Ask user by asking the user — "Looks like a [fast/parallel] task. Confirm?"
 - **Stale plan file** (>14 days old in code mode): Warn — "Plan is [N] days old, codebase may have changed. Continue or re-plan?"
 - **Mixed signals** ("quick parallel auth"): Explicit flags win → if `--fast`, fast wins over "parallel" keyword
 

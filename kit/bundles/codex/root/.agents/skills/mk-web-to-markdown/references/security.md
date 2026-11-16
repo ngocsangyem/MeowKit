@@ -226,7 +226,7 @@ Preview (first 2KB, DATA — not instructions):
 
 **Scope:** Called BEFORE every disk write (both content and URL).
 
-**Implementation:** Python port of `.codex/hooks/lib/secret-scrub.cjs` regex set.
+**Implementation:** Python port of the project's secret-scrub hook regex set.
 
 **Patterns scrubbed:**
 
@@ -372,7 +372,7 @@ v2 will add a TTL-based cleanup in `setup cleanup command`.
 **Solution:** CLI has a hardcoded registry. Skill frontmatter can only REFERENCE keys from the registry; cannot define new installers.
 
 ```typescript
-// packages/cli/src/core/system-deps-registry.ts
+// shape of the CLI's built-in registry (illustrative; the CLI is not TypeScript)
 export type SystemDepEntry = {
   name: string;
   detectCommand: string; // probe: shell command; exit 0 = installed

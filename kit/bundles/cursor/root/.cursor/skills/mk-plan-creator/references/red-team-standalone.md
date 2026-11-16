@@ -37,7 +37,7 @@ Follow the exact instructions in `step-05-red-team.md`, starting from section **
 - 5d: Collect and deduplicate findings
 - 5d.5: Cross-persona blind-spot aggregation (promote convergent observations to `cross-cutting` findings)
 - 5e: Agent adjudication
-- 5f: Present to user via stop and ask the user in chat
+- 5f: Present to user by asking the user
 - 5g: Apply accepted findings to phase files
 - 5h: Write full findings report to `{plan_dir}/red-team-findings.md` (includes Cross-Persona Blind Spot Pass section)
 - 5i: Write summary section to plan.md with cross-persona blind-spot count and link to findings file

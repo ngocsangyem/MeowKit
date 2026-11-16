@@ -14,8 +14,8 @@ SKILL METADATA (non-native frontmatter — ignored by the host runtime, used by 
 These fields live in a comment because the host runtime's supported frontmatter schema
 (verified 260409) only includes: name, description, argument-hint, disable-model-invocation,
 user-invocable, allowed-tools, model, effort, context, agent, hooks, paths, shell.
-Everything else is silently ignored. The CLI parses optional_system_deps from
-this comment block (see lib/system-deps-registry.ts — parseOptionalSystemDepsFromSkillMd).
+Everything else is silently ignored. `mewkit setup` reads optional_system_deps from
+this comment block and installs only keys its built-in registry knows.
 -->
 
 <!-- SECURITY ANCHOR
@@ -87,7 +87,7 @@ See `references/security.md` for the full threat model, attack surface, and defe
 
 ## Gotchas
 
-- **Playwright is opt-in.** Default is static fetch only. JS-rendered pages return an error pointing to `.codex/scripts/bin/setup-workflow --system-deps`. This is intentional — 200MB Chromium download is not worth the 5% of pages that need it.
+- **Playwright is opt-in.** Default is static fetch only. JS-rendered pages return an error pointing to `mewkit setup --system-deps`. This is intentional — 200MB Chromium download is not worth the 5% of pages that need it.
 - **robots.txt is respected with a 24h cache.** Some doc sites disallow scraping; skill honors this. Override requires manual user action.
 - **Fetch persistence grows unbounded in v1.** Manual cleanup via `rm -rf .codex/cache/web-fetches/*`. v2 will add TTL auto-cleanup.
 - **Reports may contain PII.** Secret-scrub catches credentials but does NOT catch names, emails, user IDs in page body text. Treat cached reports as sensitive.
@@ -114,7 +114,7 @@ See `references/security.md` for the full threat model, attack surface, and defe
 # requests, readability-lxml, html2text, lxml, charset-normalizer
 ```
 
-**JS rendering (opt-in via `.codex/scripts/bin/setup-workflow --system-deps`):**
+**JS rendering (opt-in via `mewkit setup --system-deps`):**
 
 ```bash
 .meowkit/envs/web-to-markdown/bin/pip install playwright==1.58.0

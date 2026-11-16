@@ -195,7 +195,7 @@ Full list: `references/gotchas.md` (update when Codex produces wrong fix pattern
 
 ## References
 
-- `references/mode-selection.md` — stop and ask the user in chat format
+- `references/mode-selection.md` — user question format
 - `references/diagnosis-protocol.md` — 5-phase structured diagnosis
 - `references/prevention-gate.md` — defense-in-depth + verification checklist
 - `references/complexity-assessment.md` — Simple/Moderate/Complex/Parallel

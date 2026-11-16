@@ -39,11 +39,7 @@ Reference guide for "magic numbers" and constants used in JIRA administration.
 # View project configuration with field IDs
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ops discover-project PROJ
 
-# Use jira-fields skill for comprehensive discovery
-python .claude/skills/jira-fields/scripts/list_fields.py --custom-only
-
-# Get specific field details
-python .claude/skills/jira-fields/scripts/get_field.py customfield_10016
+# Use the jira-fields skill for field discovery (custom fields, one field's details)
 ```
 
 ---

@@ -18,8 +18,8 @@ Connect mk-intake to your task management tool. Five options — pick the one th
 
 Setup:
 ```bash
-# Install jira-as into the workflow venv (auto-handled by .codex/scripts/bin/setup-workflow)
-.codex/scripts/bin/setup-workflow
+# Install jira-as into the workflow venv (auto-handled by mewkit setup)
+mewkit setup
 
 # Populate .codex/.env with the three MEOW_JIRA_* vars
 cp .codex/.env.example .codex/.env

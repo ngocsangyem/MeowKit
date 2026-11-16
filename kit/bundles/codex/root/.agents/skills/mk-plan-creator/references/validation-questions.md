@@ -68,7 +68,7 @@ Generate 3-5 critical questions from plan content before presenting the plan. Ru
 - Each question MUST have 2-4 concrete options (not open-ended)
 - Mark the recommended option with "(Recommended)" suffix
 - "Other" option is automatic — always appended, don't include explicitly
-- Group related questions (max 4 per stop and ask the user in chat call)
+- Group related questions (max 4 per user question)
 
 ## Recording Rules
 

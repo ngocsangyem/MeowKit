@@ -57,7 +57,7 @@ directly to step-07-gate.md.
 Run 4a and 4b semantic checks on BOTH `plan-approach-a.md` and `plan-approach-b.md`. Fix issues in each file independently. Then:
 
 1. Read the `## Goal` line from each approach file for the summary.
-2. Present via stop and ask the user in chat:
+2. Present by asking the user:
 
 ```json
 {

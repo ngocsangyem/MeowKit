@@ -35,7 +35,7 @@ delegate a sub-task (
   agent="evaluator",
   description="Evaluate iteration $iteration of $slug",
   prompt="
-    Read your agent constitution at .codex/agents/evaluator.md.
+    Read your agent constitution at .codex/agents/evaluator.toml.
     Follow the Active Verifier Loop section (the post-build active-verifier role; full verifier-loop integration is still pending).
 
     Use mk-evaluate skill — read its workflow.md and follow steps 1–5.

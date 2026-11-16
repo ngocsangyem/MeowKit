@@ -1,6 +1,6 @@
 # Step 8: VERSION Bump Question
 
-**CRITICAL — NEVER BUMP VERSION WITHOUT ASKING.**
+**Never bump the version without asking the user: a version number is a release decision.**
 
 1. **If VERSION does not exist:** Skip silently.
 
@@ -10,7 +10,7 @@
 git diff <base>...HEAD -- VERSION
 ```
 
-3. **If VERSION was NOT bumped:** Use stop and ask the user in chat:
+3. **If VERSION was NOT bumped:** Ask the user:
    - RECOMMENDATION: Choose C (Skip) because docs-only changes rarely warrant a version bump
    - A) Bump PATCH (X.Y.Z+1) — if doc changes ship alongside code changes
    - B) Bump MINOR (X.Y+1.0) — if this is a significant standalone release
@@ -25,7 +25,7 @@ git diff <base>...HEAD -- VERSION
       that are NOT mentioned in the CHANGELOG entry for the current version?
    c. **If the CHANGELOG entry covers everything:** Skip — output "VERSION: Already bumped to
       vX.Y.Z, covers all changes."
-   d. **If there are significant uncovered changes:** Use stop and ask the user in chat explaining what the
+   d. **If there are significant uncovered changes:** Ask the user, explaining what the
       current version covers vs what's new, and ask:
       - RECOMMENDATION: Choose A because the new changes warrant their own version
       - A) Bump to next patch (X.Y.Z+1) — give the new changes their own version

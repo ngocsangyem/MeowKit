@@ -118,7 +118,7 @@ Identify affected files, test coverage gaps, and implementation complexity.
 
 ### Step 8b: Jira enrichment
 
-If the `mk-jira-*` family is available (jira-as installed via `setup-workflow` + the project's `.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
+If the `mk-jira-*` family is available (jira-as installed via `mewkit setup` + the project's `.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
 Suggest `mk-jira-*` actions per `references/jira-handoff-protocol.md`.
 
 ### Step 9: Generate output

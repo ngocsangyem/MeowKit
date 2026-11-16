@@ -43,7 +43,7 @@ jira-as not installed (or .codex/.env not populated). Apply these changes manual
 - Assign to [username]
 - Set Fix Version to [version]
 
-Or run `.codex/scripts/bin/setup-workflow` then populate .codex/.env from .codex/.env.example to enable the mk-jira-* family.
+Or run `mewkit setup` then populate .codex/.env from .codex/.env.example to enable the mk-jira-* family.
 ```
 
 ## Safety Gate

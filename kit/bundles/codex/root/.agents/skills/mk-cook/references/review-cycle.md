@@ -16,7 +16,7 @@ LOOP:
      Warnings ([N]): SHOULD FIX — [list with file:line]
      Suggestions ([N]): NICE TO HAVE — [list]
 
-  3. stop and ask the user in chat (header: "Review"):
+  3. Ask the user (header: "Review"):
      IF critical_count > 0:
        - "Fix critical issues" → fix, re-run tester, cycle++, LOOP
        - "Fix all issues" → fix all, re-run tester, cycle++, LOOP
@@ -29,7 +29,7 @@ LOOP:
 
   4. IF cycle >= 3 AND user selects fix:
      → "3 review cycles completed. Final decision required."
-     → stop and ask the user in chat: "Continue with noted issues" / "Abort workflow"
+     → ask the user: "Continue with noted issues" / "Abort workflow"
 ```
 
 ## Auto-Handling Cycle

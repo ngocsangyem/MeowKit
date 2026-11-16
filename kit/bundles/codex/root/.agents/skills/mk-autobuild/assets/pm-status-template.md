@@ -60,4 +60,4 @@ Source: `.meowkit/telemetry/cost-log.json` (session_id filter: `{{session_id}}`)
 
 ---
 
-*Written by `project-manager` per `.agents/skills/mk-cook/references/post-phase-delegation.md`. Report lives alongside the plan; archive moves reports with the plan.*
+*Written by `project-manager` after a review verdict of PASS. Report lives alongside the plan; archive moves reports with the plan.*

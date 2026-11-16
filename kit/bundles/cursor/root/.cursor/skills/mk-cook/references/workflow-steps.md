@@ -35,7 +35,7 @@ All modes share these phases with mode-specific variations.
    - Rename/typo/format → TRIVIAL
 3. If mode=code: load plan path, parse phases
 4. **Autonomy Boundaries (advisory):** if the loaded plan.md has an `## Autonomy Boundaries` block (long-horizon plans only), read it once for the whole run and comply **mode-aware**:
-   - Interactive / `code` mode: an "Ask first" item → raise an immediate `stop and ask the user in chat` when that decision arises; "Always" items proceed without asking.
+   - Interactive / `code` mode: an "Ask first" item → raise an immediate user question when that decision arises; "Always" items proceed without asking.
    - Autonomous (`auto` / autobuild): an "Ask first" item → **defer** — skip the action, log the deferred decision to the plan.md Agent State, proceed with the safe default; deferred decisions surface at the next existing touchpoint (the review verdict / autobuild run-report). NEVER raise an ad-hoc blocking prompt mid-autonomous-run.
    - Block **absent** (short plans — the common case): default to "proceed on reversible in-scope changes; the ship check still runs." Do NOT error, do NOT over-ask.
    - This block is advisory and never relaxes a security rule; its "Never" tier only points at them.
@@ -85,7 +85,7 @@ path first — it reports which required sections are missing. A failing check m
 is not finished; fill the gaps rather than building from it. Nothing blocks the edit either
 way, so the check is information, not a stop.
 
-Then present the plan summary and `stop and ask the user in chat` (header: "Plan"):
+Then present the plan summary and ask the user (header: "Plan"):
 
 - "Looks right" → continue to Phase 2
 - "Revise plan" → revise based on feedback, re-present
@@ -205,7 +205,7 @@ Read it before shipping: a FAIL dimension or a security BLOCK is a reason to go 
 Phase 3, not a note to carry past the commit. No hook blocks the commit on the verdict —
 the reading is the control.
 
-Present the verdict. `stop and ask the user in chat` (header: "Review"):
+Present the verdict. Ask the user (header: "Review"):
 
 - If critical issues: "Fix critical" / "Fix all" / "Ship as is" / "Abort"
 - If no critical: "Continue" / "Fix warnings" / "Abort"

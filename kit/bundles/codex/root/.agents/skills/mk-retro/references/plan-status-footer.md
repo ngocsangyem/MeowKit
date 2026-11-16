@@ -28,6 +28,6 @@ Then write a `## REVIEW REPORT` section to the end of the plan file:
 **VERDICT:** NO REVIEWS YET — run `/autoplan` for full review pipeline, or individual reviews above.
 ```
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
+**Plan-mode exception — run this even in plan mode:** This writes to the plan file, which is the one
 file you are allowed to edit in plan mode. The plan file review report is part of the
 plan's living status.

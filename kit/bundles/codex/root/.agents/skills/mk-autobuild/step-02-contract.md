@@ -1,4 +1,4 @@
-<!-- Lifecycle canonical source: .codex/workflow.yaml — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
+<!-- Lifecycle canonical source: this bundle's step files (step-00..step-06) — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
 
 # Step 2: Sprint Contract (Conditional)
 
@@ -69,7 +69,7 @@ delegate a sub-task (
     Apply your Contract Reviewer Role (see evaluator.md).
     Append Round 1 (reviewer) entries to the Negotiation Log section.
     If clean, write 'Round 1 (reviewer): accepted'.
-    Hard cap: 2 rounds. Round 3 escalates to stop and ask the user in chat.
+    Hard cap: 2 rounds. Round 3 escalates to the user.
   "
 )
 ```

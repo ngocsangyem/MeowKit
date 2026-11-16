@@ -2,7 +2,7 @@
 
 Update when Codex hits new brainstorming edge cases. Highest-signal content in the skill — keep it sharp.
 
-- **Premature solutioning** — jumping to "how" before confirming "what". Force problem restatement first; do not generate ideas until the problem is confirmed via `stop and ask the user in chat`.
+- **Premature solutioning** — jumping to "how" before confirming "what". Force problem restatement first; do not generate ideas until the problem is confirmed by asking the user.
 - **Anchoring on first idea** — the first idea gets disproportionate attention in evaluation. Generate ALL ideas before scoring any; use `scoring-criteria.md` only after the full list is complete.
 - **Confusing brainstorming with planning** — producing implementation steps, file paths, or commands instead of ideas. Hard gate: no code, no file creation outside `tasks/reports/`, no implementation details.
 - **Context flooding** — generating 20+ ideas overwhelms context window. Max 8 ideas per run. If the problem needs more, run multiple focused sessions on sub-problems.

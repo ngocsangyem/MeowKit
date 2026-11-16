@@ -42,7 +42,7 @@ When adding anchor examples to a rubric, alternate PASS/FAIL by example number (
 
 ## Rule 6: Drift Check on Model Upgrade
 
-When a new model tier ships (Sonnet 4.6, Opus 4.7, Haiku 5.x), the rubric calibration set (`rubrics/calibration-set/`) MUST be replayed with the new model. Re-evaluator agreement with stored gold-standard verdicts must stay within 5% per rubric. If drift exceeds 5%, re-calibrate the anchors or downgrade the rubric's `hard_fail_threshold`.
+When a new model tier ships, the rubric calibration set (`rubrics/calibration-set/`) MUST be replayed with the new model. Re-evaluator agreement with stored gold-standard verdicts must stay within 5% per rubric. If drift exceeds 5%, re-calibrate the anchors or downgrade the rubric's `hard_fail_threshold`.
 
 **WHY:** Drift checks catch model-upgrade grading changes before production verdicts.
 

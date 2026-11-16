@@ -113,7 +113,7 @@ After producing the completion checklist:
 
 - **All DONE or CHANGED:** Pass. "Plan completion: PASS — all items addressed." Continue.
 - **Only PARTIAL items (no NOT DONE):** Continue with a note in the PR body. Not blocking.
-- **Any NOT DONE items:** Use stop and ask the user in chat:
+- **Any NOT DONE items:** Ask the user:
   - Show the completion checklist above
   - "{N} items from the plan are NOT DONE. These were part of the original plan but are missing from the implementation."
   - RECOMMENDATION: depends on item count and severity. If 1-2 minor items (docs, config), recommend B. If core functionality is missing, recommend A.

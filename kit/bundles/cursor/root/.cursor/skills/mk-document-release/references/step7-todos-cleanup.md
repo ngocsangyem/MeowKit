@@ -1,7 +1,6 @@
 # Step 7: TODOS.md Cleanup
 
-This is a second pass that complements `the ship skill`'s Step 5.5. Read `review/TODOS-format.md` (if
-available) for the canonical TODO item format.
+This is a second pass that complements `the ship skill`'s Step 5.5. TODO items use the format items under `## <Skill/Component>` headings, each with a `**Priority:**` field (P0–P4), and a `## Completed` section at the bottom.
 
 If TODOS.md does not exist, skip this step.
 
@@ -11,9 +10,9 @@ If TODOS.md does not exist, skip this step.
    evidence in the diff.
 
 2. **Items needing description updates:** If a TODO references files or components that were
-   significantly changed, its description may be stale. Use stop and ask the user in chat to confirm whether
+   significantly changed, its description may be stale. Ask the user to confirm whether
    the TODO should be updated, completed, or left as-is.
 
 3. **New deferred work:** Check the diff for `TODO`, `FIXME`, `HACK`, and `XXX` comments. For
    each one that represents meaningful deferred work (not a trivial inline note), use
-   stop and ask the user in chat to ask whether it should be captured in TODOS.md.
+   ask the user whether it should be captured in TODOS.md.

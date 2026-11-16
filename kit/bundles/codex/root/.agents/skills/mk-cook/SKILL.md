@@ -5,7 +5,7 @@ description: "Implements one feature or plan: plan, test, build, review. NOT for
 
 # Cook — Full Implementation Pipeline
 
-Implementation entry adapter. `.codex/workflow.yaml` is the only lifecycle phase-sequence authority; this skill selects a profile, invokes the relevant owners, and keeps the user in the loop at the plan and review points. TDD is opt-in via `--tdd`.
+Implementation entry adapter. `references/workflow-steps.md` is this bundle's lifecycle phase-sequence authority; this skill selects a profile, invokes the relevant owners, and keeps the user in the loop at the plan and review points. TDD is opt-in via `--tdd`.
 
 ## Usage
 
@@ -82,9 +82,9 @@ See `references/intent-detection.md` for full detection logic.
 
 ## Lifecycle Adapter
 
-<!-- Canonical source: .codex/workflow.yaml — this diagram renders the same lifecycle; -->
+<!-- Canonical source: references/workflow-steps.md — this diagram renders the same lifecycle; -->
 <!-- Workflow phase sequence: 0:Orient > 1:Plan > 2:Test > 3:Build > 3.5:Simplify > 3.6:Verify > 4:Review > 5:Ship > 6:Reflect -->
-<!-- the YAML is the machine-readable authority; this Mermaid diagram is the human-facing render. -->
+<!-- references/workflow-steps.md is the authoritative per-phase detail; this Mermaid diagram is the human-facing render. -->
 
 ```mermaid
 flowchart TD
@@ -117,7 +117,7 @@ flowchart TD
     H --> I
 ```
 
-The YAML specification is authoritative. This diagram is a convenience rendering only; phase details and transitions live in `.codex/workflow.yaml` and `references/workflow-steps.md`.
+This diagram is a convenience rendering only; phase details and transitions live in `references/workflow-steps.md`, the authoritative source.
 
 ### Scout-First Contract (Phase 0)
 

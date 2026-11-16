@@ -129,7 +129,7 @@ Selected agents (architecture row): `architect + developer + planner`.
 - Party mode is discussion-only — if an agent suggests code changes during party, redirect to the normal pipeline after the decision
 - Decision write is NOT optional — see "Memory Write" below
 - "decide" keyword ends the discussion immediately — don't use it in the topic itself (e.g., avoid "decide between REST and GraphQL")
-- `allowed-tools` is intentionally broad: shell access for `mewkit note decisions`, text/glob search for topic-keyword grounding against the codebase, file reads for `prompts/*.md` references, `stop and ask the user in chat` for the "decide" gate. Do not trim without measuring loss.
+- `allowed-tools` is intentionally broad: shell access for `mewkit note decisions`, text/glob search for topic-keyword grounding against the codebase, file reads for `prompts/*.md` references, a user question for the "decide" step. Do not trim without measuring loss.
 
 ## Decision Record Template (canonical)
 

@@ -77,7 +77,7 @@ Invoke `mk-preview --html --diagram` with the findings file as input. `mk-previe
 
 ### Step 4 — Select (the only human gate)
 
-After `mk-preview` returns the rendered path, ask via `stop and ask the user in chat` (header "Architecture Candidate"): "Which deepening would you like to explore?" — options drawn from the candidate titles plus "None".
+After `mk-preview` returns the rendered path, ask by asking the user (header "Architecture Candidate"): "Which deepening would you like to explore?" — options drawn from the candidate titles plus "None".
 
 This is the **single** mid-run human checkpoint. Everything else is autonomous; resilience comes from the state file (below), not from interrupting the user.
 

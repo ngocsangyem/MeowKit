@@ -5,7 +5,7 @@ This file is the canonical setup reference for `mk-jira` and the 16 `mk-jira-*` 
 ## Canonical install
 
 ```
-.codex/scripts/bin/setup-workflow
+mewkit setup
 ```
 
 This reads THIS skill's `scripts/requirements.txt` and nothing else, and installs into this skill's own environment. The jira-as binary lands at:
@@ -20,7 +20,7 @@ This reads THIS skill's `scripts/requirements.txt` and nothing else, and install
 .meowkit/envs/jira/bin/pip install jira-as 'jira-as[keyring]'
 ```
 
-Use only if `.codex/scripts/bin/setup-workflow` is unavailable. The wrapper resolves to the venv-local binary; do NOT rely on global PATH.
+Use only if `mewkit setup` is unavailable. The wrapper resolves to the venv-local binary; do NOT rely on global PATH.
 
 ## Authentication — three required env vars
 
@@ -38,7 +38,7 @@ The legacy `MEOW_*` prefix (vs. modern `MEOWKIT_*`) is a deliberate exception pe
 
 ## Hook validation
 
-A `SessionStart` hook (`.codex/hooks/handlers/jira-env-loader.cjs`) validates `.codex/.env` presence and the 3 keys. It does NOT export anything — each hook runs in its own subprocess, so propagation is impossible. The wrapper handles per-call sourcing/export.
+The `jira-as.sh` wrapper validates `.codex/.env` presence and the 3 keys on each call. It does NOT export anything — each invocation runs in its own subprocess, so propagation is impossible. The wrapper handles per-call sourcing/export.
 
 Status messages:
 - `[mk-jira] env OK` — all 3 keys present
@@ -78,6 +78,6 @@ Expected: prints version, exits 0. With env missing, errors with `:?` parameter-
 
 ## Troubleshooting
 
-- **`jira-as not installed at <path>`** — run `.codex/scripts/bin/setup-workflow` (or use the manual fallback).
+- **`jira-as not installed at <path>`** — run `mewkit setup` (or use the manual fallback).
 - **`MEOW_JIRA_API_TOKEN missing`** — copy `.codex/.env.example` to `.codex/.env` and fill the three vars.
 - **Wrapper works but hook says "missing"** — hook validates presence-only via grep; an empty value passes the grep but fails at the `:?` expansion. Set actual values.

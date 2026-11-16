@@ -63,7 +63,7 @@ Then:
 ## Core Loop (the signature mechanic)
 
 Run this loop. **Exactly ONE question per turn — never batch.** This is prose
-interrogation, deliberately NOT `stop and ask the user in chat` multi-question batching. One
+interrogation, deliberately NOT multi-question batching. One
 sharp question, wait, absorb, checkpoint, repeat.
 
 1. **Pick** the single highest-leverage unresolved branch — the one whose answer
@@ -188,7 +188,7 @@ plan) — not through grill editing the original.
 
 - **Batching questions** — the whole point is ONE question per turn. If you feel
   the urge to ask two, you have two turns, not one. Never reach for
-  `stop and ask the user in chat` (it isn't in `allowed-tools` for exactly this reason).
+  Ask the user (it isn't in `allowed-tools` for exactly this reason).
 - **Proposing instead of interrogating** — the moment you suggest the answer,
   you've drifted into `mk-brainstorming`. Ask about the user's choice; don't make it.
 - **Skipping the checkpoint** — "I'll write it all at the end" loses everything on

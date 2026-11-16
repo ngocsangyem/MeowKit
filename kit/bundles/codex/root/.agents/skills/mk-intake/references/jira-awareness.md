@@ -1,6 +1,6 @@
 # Jira Awareness — mk-intake Extension
 
-Loaded when the user has the `mk-jira-*` family available (i.e. `jira-as` installed via `.codex/scripts/bin/setup-workflow` and `.codex/.env` populated with `MEOW_JIRA_*`). When unavailable, skip this file entirely — mk-intake operates tool-agnostic.
+Loaded when the user has the `mk-jira-*` family available (i.e. `jira-as` installed via `mewkit setup` and `.codex/.env` populated with `MEOW_JIRA_*`). When unavailable, skip this file entirely — mk-intake operates tool-agnostic.
 
 ## Metadata Extraction
 

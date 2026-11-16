@@ -21,9 +21,9 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 5. `step-04-semantic-checks.md` — Semantic checks + structural validation (`mewkit plan check --structural`). Fast mode: skip validation, go to step-07.
 6. `step-05-red-team.md` — Plan red team (hard/deep/parallel/two only): 4-persona scaling, red-team-findings.md, sub-task dispatch, adjudication
 7. `step-06-validation-interview.md` — Validation interview (hard/deep/parallel/two only): 3-5 critical questions with detection keywords, section-mapped answer propagation
-8. `step-07-gate.md` — Self-check + present the plan: stop and ask the user in chat (Looks right | Modify | Reject)
+8. `step-07-gate.md` — Self-check + present the plan: Ask the user (Looks right | Modify | Reject)
 9. `step-08-hydrate-tasks.md` — Create session tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
-10. `step-09-post-plan-handoff.md` — Deterministic mode-pruned `stop and ask the user in chat`: Cook | Validate | Red-team | End. Writes `handoff.next` to plan.md frontmatter, prints suggested command, STOPs.
+10. `step-09-post-plan-handoff.md` — Deterministic mode-pruned user question: Cook | Validate | Red-team | End. Writes `handoff.next` to plan.md frontmatter, prints suggested command, STOPs.
 
 ## Variables Passed Between Steps
 
@@ -103,10 +103,10 @@ Step 5: Red Team (hard/deep/parallel/two only — skipped in fast)
     ├── Collect → deduplicate → sort by severity → cap at 15
     ├── Agent adjudicates each: Accept/Reject + rationale
     ├── Write red-team-findings.md (full detail)
-    ├── stop and ask the user in chat: Apply all / Review each / Reject all
+    ├── ask the user: Apply all / Review each / Reject all
     └── Gate W1: Whole-Plan Consistency Sweep (stage-then-apply)
          ├── Pass 1 reads N+2 files, stages Pending Sweep Edits
-         ├── If unresolved > 0 → stop and ask the user in chat (defer/resolve/skip)
+         ├── If unresolved > 0 → ask the user (defer/resolve/skip)
          └── Pass 2 applies edits + writes sweep block + frontmatter
          ↓
 Step 6: Validation Interview (hard/deep/parallel/two only — skipped in fast)
@@ -115,12 +115,12 @@ Step 6: Validation Interview (hard/deep/parallel/two only — skipped in fast)
     ├── Propagate answers to phase files via section mapping
     └── Gate W2: Whole-Plan Consistency Sweep (stage-then-apply)
          ├── Pass 1 reads N+2 files, stages Pending Sweep Edits
-         ├── If unresolved > 0 → stop and ask the user in chat (resolve/accept-risk/cancel)
+         ├── If unresolved > 0 → ask the user (resolve/accept-risk/cancel)
          └── Pass 2 applies edits + writes Validation Log + frontmatter
          ↓
 Step 7: Present the plan
     ├── Self-check: Completed / Skipped / Uncertain
-    └── stop and ask the user in chat (Approve | Modify | Reject)
+    └── ask the user (Approve | Modify | Reject)
          ↓
 Step 8: Hydrate Tasks
     ├── Create one tracked task per phase, each blocked-by its predecessor
@@ -130,7 +130,7 @@ Step 8: Hydrate Tasks
 Step 9: Post-Plan Handoff
     ├── Live risk re-scan over plan + phase files (advisory if new flag)
     ├── Build mode-pruned option set (cap 4)
-    ├── stop and ask the user in chat: Cook | Validate | Red-team | End (fast)
+    ├── ask the user: Cook | Validate | Red-team | End (fast)
     │   OR Cook | End (hard / deep / parallel / two)
     │   OR Hand off to mk-autobuild | End (product-level)
     ├── Write handoff.next + decided_at to plan.md frontmatter

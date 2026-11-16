@@ -44,7 +44,7 @@ Any row with RESCUED=N AND TEST=N AND USER SEES=Silent → **BLOCKER** (automati
 
 ## TODOS.md updates
 
-Present each potential TODO as its own individual AskUserQuestion. Never batch TODOs — one per question. Never silently skip this step. Follow the format in `.claude/skills/review/TODOS-format.md`.
+Present each potential TODO as its own individual AskUserQuestion. Never batch TODOs — one per question. Never silently skip this step. Use the TODOS.md format: items under `## <Skill/Component>` headings, each with a `**Priority:**` field (P0–P4), and a `## Completed` section at the bottom.
 
 For each TODO, describe:
 * **What:** One-line description of the work.

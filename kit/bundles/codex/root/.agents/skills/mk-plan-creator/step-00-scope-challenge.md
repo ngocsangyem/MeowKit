@@ -50,7 +50,7 @@ Ask these 3 questions (internally, don't need to ask user):
 
 **Override:** User can force mode via `--fast`, `--hard`, or `--deep` flag regardless of complexity.
 
-**Auto-detect `--deep`:** If complexity = complex AND (task affects 5+ directories OR workflow_model = refactor), suggest `--deep` via stop and ask the user in chat. User can accept or stay with `--hard`.
+**Auto-detect `--deep`:** If complexity = complex AND (task affects 5+ directories OR workflow_model = refactor), suggest `--deep` by asking the user. User can accept or stay with `--hard`.
 
 ### 0f. User Scope Input (Hard Mode Only)
 
@@ -58,7 +58,7 @@ Ask these 3 questions (internally, don't need to ask user):
 
 **Skip if:** `planning_mode = fast` or trivial.
 
-Present scope mode choice via `stop and ask the user in chat`. Header: "Scope Mode". Question: "How should I approach the scope for this plan?" Single-select. Options (recommended option first when one applies; otherwise leave neutral):
+Present scope mode choice by asking the user. Header: "Scope Mode". Question: "How should I approach the scope for this plan?" Single-select. Options (recommended option first when one applies; otherwise leave neutral):
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
@@ -85,7 +85,7 @@ After scope assessment, scan the task description for structural signals:
 | Task describes 3+ independent layers or modules (e.g., "DB layer", "API layer", "UI layer") | Suggest `--parallel` |
 | Task describes 2 alternatives or "X vs Y" framing (e.g., "monolith vs microservices") | Suggest `--two` |
 
-**If signal detected**, present via stop and ask the user in chat:
+**If signal detected**, present by asking the user:
 
 ```json
 {
@@ -137,7 +137,7 @@ Scan the original task description (case-insensitive) for **product-level intent
 **If a signal matches** AND no implementation context exists in the prompt
 (no file names, no class names, no "fix the X bug", no "refactor the Y module"):
 
-Present via `stop and ask the user in chat`. Header: "Plan Mode". Question: "This looks like a green-field product build. Should I produce a product-level spec (user stories, features, design language) or a traditional implementation plan?" Single-select.
+Present by asking the user. Header: "Plan Mode". Question: "This looks like a green-field product build. Should I produce a product-level spec (user stories, features, design language) or a traditional implementation plan?" Single-select.
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|

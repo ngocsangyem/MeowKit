@@ -69,7 +69,7 @@ delegate a sub-task (
     Apply your Contract Reviewer Role (see evaluator.md).
     Append Round 1 (reviewer) entries to the Negotiation Log section.
     If clean, write 'Round 1 (reviewer): accepted'.
-    Hard cap: 2 rounds. Round 3 escalates to stop and ask the user in chat.
+    Hard cap: 2 rounds. Round 3 escalates to the user.
   "
 )
 ```
