@@ -25,7 +25,7 @@ sed -i.bak "s/^iterations:.*/iterations: $iteration/" "$run_dir/run.md" && rm "$
 echo "Iteration: $iteration / $max_iter"
 ```
 
-The iteration counter lives in the run report frontmatter, NOT in session memory. This makes the autobuild workflow resumable: a killed run can be restarted with `the autobuild skill --resume {run_id}` and the orchestrator reads the last iteration from `$run_dir/run.md`.
+The iteration counter lives in the run report frontmatter, NOT in session memory. This makes the autobuild workflow resumable: a killed run can be restarted with `$mk-autobuild --resume {run_id}` and the orchestrator reads the last iteration from `$run_dir/run.md`.
 
 ### 3c. Dispatch the developer sub-task
 

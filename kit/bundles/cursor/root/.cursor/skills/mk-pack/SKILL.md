@@ -24,8 +24,8 @@ Pack a repository into a single AI-friendly file for handoff to external tools, 
 ## When NOT to Use
 
 - **Packing the current project to re-read in the same session.** `mk-scout` is the correct tool for inbound analysis — its Explore sub-task read files in **isolated contexts** and return distilled summaries, keeping raw content out of the main agent's context. Packing dumps raw content directly into the caller's context, which is the opposite of what you want for inbound analysis.
-- Replacing `the scout skill` for structured codebase exploration. Pack produces a flat dump; scout produces an architectural fingerprint.
-- Adopting external code into your project. Use `the chom skill` for replication workflows.
+- Replacing `/mk-scout` for structured codebase exploration. Pack produces a flat dump; scout produces an architectural fingerprint.
+- Adopting external code into your project. Use `/mk-chom` for replication workflows.
 
 **Exception:** `--compress` mode (Tree-sitter signature extraction) is a genuine win for "give me the API surface of library X" queries — it produces a small, signature-only artifact that scout cannot reproduce. See Quick Start example.
 
@@ -87,6 +87,6 @@ Load only when needed:
 
 ## Workflow Position
 
-**Typically follows:** `the scout skill` (when you need a portable snapshot after exploration)
+**Typically follows:** `/mk-scout` (when you need a portable snapshot after exploration)
 **Typically precedes:** handoff to external tools, reviewers, or other LLMs
-**Related:** `the chom skill` (replication workflow — may reference pack in a future integration)
+**Related:** `/mk-chom` (replication workflow — may reference pack in a future integration)

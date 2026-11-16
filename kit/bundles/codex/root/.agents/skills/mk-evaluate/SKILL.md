@@ -11,7 +11,7 @@ Step-file workflow that drives a running build, probes each rubric criterion via
 ## When to Use
 
 Activate when:
-- User runs `the evaluate skill <target>` with a URL, file path, or running-app handle
+- User runs `$mk-evaluate <target>` with a URL, file path, or running-app handle
 - A generator iteration completes and the harness needs a graded verdict
 - After Phase 3 (build) and before Phase 5 (ship) for frontend/fullstack/CLI products
 - When asked to "grade the running app", "check the build behaviorally", or "verify against the spec"
@@ -19,7 +19,7 @@ Activate when:
 Skip when:
 - The build has no runnable artifact (pure library, type-only package)
 - The task is structural code review only — use `mk-review` instead
-- The task is `the fix skill` simple — overhead exceeds value
+- The task is `$mk-fix` simple — overhead exceeds value
 
 ## Hard Constraints
 
@@ -73,7 +73,7 @@ See `step-04-grade-and-verdict.md` for the canonical schema. Frontmatter fields:
 | `references/active-verification-patterns.md` | Catalog of probe techniques per target type |
 | `scripts/run-evaluator.sh` | sub-task spawn wrapper |
 | `scripts/validate-verdict.sh` | Verdict file validator (enforces evidence gate) |
-| `..the rubric skill/` | Rubric library + load/compose |
+| `../mk-rubric/` | Rubric library + load/compose |
 | `../../agents/evaluator.md` | The agent persona this skill orchestrates |
 
 ## Start

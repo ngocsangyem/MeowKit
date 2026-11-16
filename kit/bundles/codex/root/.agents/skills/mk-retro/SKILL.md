@@ -22,7 +22,7 @@ Skip: Always — retros don't require pre-planning.
 
 ## When to Use
 
-- User types `the retro skill` (with optional arguments: `24h`, `14d`, `30d`, `compare`, `global`)
+- User types `$mk-retro` (with optional arguments: `24h`, `14d`, `30d`, `compare`, `global`)
 - End of a work week or sprint
 - When asked "what did we ship" or "engineering retrospective"
 

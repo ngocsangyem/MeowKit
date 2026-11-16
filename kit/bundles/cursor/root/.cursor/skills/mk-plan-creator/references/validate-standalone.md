@@ -1,6 +1,6 @@
 # Validate Standalone Subcommand
 
-Subcommand: `the plan skill validate {plan_path}`
+Subcommand: `/mk-plan-creator validate {plan_path}`
 
 Run a validation interview on an existing plan without going through the full planning pipeline.
 
@@ -9,8 +9,8 @@ Run a validation interview on an existing plan without going through the full pl
 Activated when argument starts with `validate` followed by a path to a plan directory or plan.md file.
 
 Examples:
-- `the plan skill validate tasks/plans/260411-my-feature/`
-- `the plan skill validate tasks/plans/260411-my-feature/plan.md`
+- `/mk-plan-creator validate tasks/plans/260411-my-feature/`
+- `/mk-plan-creator validate tasks/plans/260411-my-feature/plan.md`
 
 ## Workflow
 

@@ -42,7 +42,7 @@ See `references/install-and-auth.md` for one-time setup (`mewkit setup` installs
 - `references/safety-framework.md` — 4-tier safety model
 - `references/evaluation-rubric.md` — used by `mk-jira-evaluator`
 - `references/estimation-guide.md` — used by `mk-jira-estimator`
-- `../jira-fields/references/field-discovery.md` — used by `mk-jira-fields` (moved from `jira/references/`)
+- `../mk-jira-fields/references/field-discovery.md` — used by `mk-jira-fields` (moved from `jira/references/`)
 
 ## Handoff
 

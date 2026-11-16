@@ -36,11 +36,11 @@ After the user selects the next-step option in step-09, MUST output with **actua
 
 | Plan mode | Cook command |
 |-----------|-------------|
-| (default) / --hard | `the cook skill {absolute-path}/plan.md` |
-| --auto | `the cook skill --auto {absolute-path}/plan.md` |
-| --fast | `the cook skill --auto {absolute-path}/plan.md` |
-| --parallel | `the cook skill --parallel {absolute-path}/plan.md` |
-| --deep | `the cook skill {absolute-path}/plan.md` |
+| (default) / --hard | `$mk-cook {absolute-path}/plan.md` |
+| --auto | `$mk-cook --auto {absolute-path}/plan.md` |
+| --fast | `$mk-cook --auto {absolute-path}/plan.md` |
+| --parallel | `$mk-cook --parallel {absolute-path}/plan.md` |
+| --deep | `$mk-cook {absolute-path}/plan.md` |
 
 Print this EXACT block (substitute actual path and flag):
 

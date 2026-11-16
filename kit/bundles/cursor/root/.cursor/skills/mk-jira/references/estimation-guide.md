@@ -45,7 +45,7 @@ All user-derived terms: `bash .cursor/skills/mk-jira/scripts/jql-sanitize.sh '<t
 ## Evaluate-First
 
 If evaluate output available in session, use its signals. Otherwise include:
-"Tip: run `the jira skill evaluate {ISSUE-KEY}` first for more informed estimation."
+"Tip: run `/mk-jira evaluate {ISSUE-KEY}` first for more informed estimation."
 
 ## Gotchas
 

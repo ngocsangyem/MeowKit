@@ -9,12 +9,12 @@ Discovery, composition, and validation for the project's rubric library.
 
 > **Path convention:** Commands below assume cwd is `$(git rev-parse --show-toplevel)` (project root). Prefix paths with `"$(git rev-parse --show-toplevel)/"` when invoking from subdirectories.
 
-> **Consumed by `evaluator` agent + `mk-evaluate` skill (Phase 3, shipped 260408).** The dedicated `evaluator` custom agent drives the running build via active verification and grades it against rubrics composed from this library. The `mk-evaluate` skill (`.agents/skills/mk-evaluate/`) is the orchestration shell. This skill (`mk-rubric`) remains independently invokable via `the rubric skill <subcommand>` for manual rubric inspection, validation, or composition outside the evaluator workflow.
+> **Consumed by `evaluator` agent + `mk-evaluate` skill (Phase 3, shipped 260408).** The dedicated `evaluator` custom agent drives the running build via active verification and grades it against rubrics composed from this library. The `mk-evaluate` skill (`.agents/skills/mk-evaluate/`) is the orchestration shell. This skill (`mk-rubric`) remains independently invokable via `$mk-rubric <subcommand>` for manual rubric inspection, validation, or composition outside the evaluator workflow.
 
 ## When to Use
 
 Activate when:
-- User runs `the rubric skill [subcommand]`
+- User runs `$mk-rubric [subcommand]`
 - An evaluator sub-task needs to load rubrics for grading
 - Sprint-contract negotiation references a rubric by path
 - CI validates rubric schema conformance after edits
@@ -112,7 +112,7 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 | `references/calibration-guide.md` | How to add few-shot examples (balanced + randomized) |
 | `../../rubrics/schema.md` | Canonical rubric format specification |
 | `../../agents/evaluator.md` | The agent that consumes composed rubrics during behavioral active verification (Phase 3, shipped) |
-| `..the evaluate skill/SKILL.md` | The orchestration shell that drives the evaluator + invokes this skill via `compose <preset>` (Phase 3, shipped) |
+| `../mk-evaluate/SKILL.md` | The orchestration shell that drives the evaluator + invokes this skill via `compose <preset>` (Phase 3, shipped) |
 
 ## Start
 

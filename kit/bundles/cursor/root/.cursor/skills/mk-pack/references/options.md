@@ -1,6 +1,6 @@
 # Pack — Options Reference
 
-Flags supported by `the pack skill`. Maps to `repomix` CLI flags where noted.
+Flags supported by `/mk-pack`. Maps to `repomix` CLI flags where noted.
 
 ## Source (positional, required)
 

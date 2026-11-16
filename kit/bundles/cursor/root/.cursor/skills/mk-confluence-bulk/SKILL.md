@@ -29,7 +29,7 @@ Skipping Step 1 is a hard violation. The agent will refuse if asked to skip.
 ## See also
 
 - Agent: `../../agents/confluence-bulk.md`
-- Shared: `../confluence/references/{install-and-auth,cli-idioms,safety-framework}.md` (Tier 4 enforcement lives in safety-framework.md)
+- Shared: `../mk-confluence/references/{install-and-auth,cli-idioms,safety-framework}.md` (Tier 4 enforcement lives in safety-framework.md)
 - Domain refs:
   - `references/safety-checklist.md` — pre-flight checklist for any bulk operation
   - `references/dry-run-protocol.md` — the 3-step ceremony in detail with example transcripts

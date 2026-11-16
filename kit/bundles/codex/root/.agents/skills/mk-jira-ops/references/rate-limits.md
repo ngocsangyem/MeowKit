@@ -61,4 +61,4 @@ results = batcher.execute_sync()
 
 - request batching (not adopted; see jira-as `--help` per verb for built-in batching support)
 - cache warming via `bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh ops cache-warm --project PROJ` (`mk-jira-ops`)
-- error handling (see exit-code map in `../jira/references/install-and-auth.md`)
+- error handling (see exit-code map in `../mk-jira/references/install-and-auth.md`)

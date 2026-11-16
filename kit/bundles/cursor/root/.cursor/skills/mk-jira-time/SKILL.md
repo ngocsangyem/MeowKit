@@ -24,7 +24,7 @@ Forks to the `jira-time` agent. Duration format: `30m`, `2h`, `1d 4h`. The agent
 ## See also
 
 - Agent: `../../agents/jira-time.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/time-tracking.md` — wrapper-flow patterns
   - `references/time-format-quick-ref.md` — duration syntax (15m, 2h, 1d 4h, 1w)

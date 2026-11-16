@@ -40,7 +40,7 @@ else:
     flag in report header: [NO_CODEBASE_CONTEXT]
 ```
 
-Story-sizer NEVER auto-invokes `the scout skill`. This preserves the trust boundary documented in `mk-planning-engine/SKILL.md` and avoids skill-to-skill invocation forbidden by the skill authoring rules.
+Story-sizer NEVER auto-invokes `/mk-scout`. This preserves the trust boundary documented in `mk-planning-engine/SKILL.md` and avoids skill-to-skill invocation forbidden by the skill authoring rules.
 
 ## Agile Detection
 

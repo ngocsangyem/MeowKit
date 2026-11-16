@@ -16,7 +16,7 @@ Create new skills with proper structure, compliance, and registration.
 - Converting external skill for adoption
 - Scaffolding a skill from a workflow pattern
 
-Explicit: `the skill-creator skill [name] [description]`
+Explicit: `$mk-skill-creator [name] [description]`
 
 ## Workflow Integration
 

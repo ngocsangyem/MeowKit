@@ -1,6 +1,6 @@
 # Step 7: TODOS.md Cleanup
 
-This is a second pass that complements `the ship skill`'s Step 5.5. TODO items use the format items under `## <Skill/Component>` headings, each with a `**Priority:**` field (P0–P4), and a `## Completed` section at the bottom.
+This is a second pass that complements `/mk-ship`'s Step 5.5. TODO items use the format items under `## <Skill/Component>` headings, each with a `**Priority:**` field (P0–P4), and a `## Completed` section at the bottom.
 
 If TODOS.md does not exist, skip this step.
 

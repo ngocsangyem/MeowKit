@@ -58,7 +58,7 @@ Follow the plan's architecture + `references/scaffolding-principles.md`:
 
 **ACTION REQUIRED:** Load `references/shared-phases.md` and execute with parallel flag:
 
-1. **Phase A:** Activate mk-cook skill: `the cook skill [plan-path] --parallel`
+1. **Phase A:** Activate mk-cook skill: `/mk-cook [plan-path] --parallel`
    Multiple `fullstack-developer` agents work on non-blocked phases concurrently.
    File ownership prevents concurrent edit conflicts.
 2. **Phase B:** Activate mk-docs-init for documentation

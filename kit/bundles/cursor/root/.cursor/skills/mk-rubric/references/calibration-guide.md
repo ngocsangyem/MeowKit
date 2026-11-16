@@ -60,7 +60,7 @@ If you need to add a 5th example, it can break the alternation, but examples 1-4
 **Why:** Synthetic examples ("imagine a kanban app where...") are a lossy proxy for real failure modes. Real reviews capture concrete artifacts: actual screenshots, actual error messages, actual code snippets the evaluator can pattern-match.
 
 **Practical sources:**
-1. `tasks/reviews/*-verdict.md` from prior `the review skill` runs
+1. `tasks/reviews/*-verdict.md` from prior `/mk-review` runs
 2. The Anthropic harness article appendix (RetroForge PASS, generic-SaaS-clone FAIL) <!-- research-citation -->
 3. The Anthropic Labs blog screenshots <!-- research-citation -->
 4. Anonymized internal QA failures

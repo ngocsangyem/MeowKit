@@ -85,7 +85,7 @@ duration: {duration_human}
 ## Resumability
 
 If this run was killed mid-flight:
-- Resume via `the autobuild skill --resume {run_id}`
+- Resume via `/mk-autobuild --resume {run_id}`
 - The orchestrator reads this file to find the last completed step
 - Steps are append-only; resume picks up at the next un-started step
 ```

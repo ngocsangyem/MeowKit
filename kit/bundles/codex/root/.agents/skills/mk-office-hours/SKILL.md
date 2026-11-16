@@ -25,7 +25,7 @@ Skip: Always — office-hours is a pre-planning skill. It feeds plan-creator, no
 
 - User describes a new product, feature, or side-project concept whose problem/value is unvalidated
 - User asks whether something is worth building, who needs it, or what smallest wedge to validate
-- Before running `the plan-ceo-review skill`
+- Before running `$mk-plan-ceo-review`
 
 A bare “brainstorm” request is ambiguous: ask whether the user wants product discovery/validation or technical approaches. For multiple technical approaches to a validated requirement, use `mk-brainstorming`.
 

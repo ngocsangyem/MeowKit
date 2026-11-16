@@ -235,7 +235,7 @@ flag is present).
 
 Operational gotchas live here; pre-build failure modes and rationalizations live in `references/failure-catalog.md`.
 
-- **Skipping mk-simplify before review**: Tests pass but code is still complex → run `the simplify skill` between Phase 3 and Phase 4 every time, no exceptions
+- **Skipping mk-simplify before review**: Tests pass but code is still complex → run `/mk-simplify` between Phase 3 and Phase 4 every time, no exceptions
 - **Skipping the plan on "simple" features**: Features that seem simple grow during implementation. Write the plan file; cancel it if the work turns out to be trivial
 - **`--auto` hiding a bad review**: auto mode auto-fixes and runs through without pausing, so nobody reads the verdict as it is written. Read the review verdict and the workflow evidence index at the end of an auto run before you ship anything
 - **Context loss between phases**: Long multi-phase workflows exceed the context window — the external-memory write after each completed plan phase is the load-bearing action that lets a fresh session resume the correct phase. This is a mandatory step, not a habit: see the **Per-Phase Checkpoint** in `references/workflow-steps.md` (Phase 6) — flip the phase-file checkboxes and update plan.md Agent State before any next-phase transition

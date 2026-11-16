@@ -23,7 +23,7 @@ No fix without confirmed root cause. 3-strike escalation if hypotheses fail.
 ## Context Reminder (MANDATORY)
 
 Once the plan is agreed, MUST print the cook command with absolute plan path.
-Default: `the cook skill {path}/plan.md`. Quick fixes skip planning entirely.
+Default: `/mk-cook {path}/plan.md`. Quick fixes skip planning entirely.
 
 > **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
 > Then run the cook command.

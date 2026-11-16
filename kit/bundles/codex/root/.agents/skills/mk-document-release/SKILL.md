@@ -5,11 +5,11 @@ description: "Syncs docs after a release: README, architecture, changelog. NOT f
 
 # Document Release: Post-Ship Documentation Update
 
-Documentation workflow that ensures every documentation file in the project is accurate, up to date, and written in a friendly, user-forward voice. Runs after `the ship skill` prepares the change and before the PR merges. Its audit is read-only; any commit, push, or PR update requires an explicit user decision.
+Documentation workflow that ensures every documentation file in the project is accurate, up to date, and written in a friendly, user-forward voice. Runs after `$mk-ship` prepares the change and before the PR merges. Its audit is read-only; any commit, push, or PR update requires an explicit user decision.
 
 ## Modes
 
-- **Standalone invocation** (`the document-release skill`): full doc sync + optional VERSION bump. Use before merging a PR or to reconcile docs with the prepared change.
+- **Standalone invocation** (`$mk-document-release`): full doc sync + optional VERSION bump. Use before merging a PR or to reconcile docs with the prepared change.
 - **Called from `mk-ship release`**: doc sync only; VERSION bump remains an explicit `publish` action.
 
 ## Skill wiring

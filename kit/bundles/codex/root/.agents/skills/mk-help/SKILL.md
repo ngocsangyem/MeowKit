@@ -10,7 +10,7 @@ Answers "What should I do next?" by scanning project state and mapping to the 7-
 ## How It Works
 
 `mk-help` is the FORWARD-looking navigator (what to do next). Backward-looking delivery
-analysis stays with `the status skill` (project-manager) — this skill never reproduces it.
+analysis stays with the project-manager agent — this skill never reproduces it.
 
 Collect candidates from ALL scan sources below, then RANK them and emit the top 3 — do
 NOT stop at the first hit. The rank-1 candidate equals what the old "stop at first
@@ -34,12 +34,12 @@ Check `tasks/reviews/` for verdict files with WARN or action items.
 
 ### 4. Uncommitted Changes
 Check `git status` for staged/unstaged changes.
-- Changes exist + review approved → "Ready to ship. Run `the ship skill` (Phase 5)"
+- Changes exist + review approved → "Ready to ship. Run `$mk-ship` (Phase 5)"
 - Changes exist, no review → "Changes detected but no review. Run reviewer first."
 
 ### 5. Clean State
 No plans, no reviews, no changes.
-- "Everything clean. Options: start a new task with planner, run `the retro skill`, or ask me anything."
+- "Everything clean. Options: start a new task with planner, run `$mk-retro`, or ask me anything."
 
 ## Additional Scan Sources (read after sources 1–5)
 
@@ -80,7 +80,7 @@ Collect candidates from all sources, then rank:
 
 Each candidate's rationale cites the source file(s) it came from, so the user can check it.
 
-For skill suggestions based on task type, see `mk-agent-detector` (its `../agent-detector/references/lifecycle-routing.md` maps task patterns to skills).
+For skill suggestions based on task type, see `mk-agent-detector` (its `../mk-agent-detector/references/lifecycle-routing.md` maps task patterns to skills).
 
 ## State-to-Recommendation Map
 
@@ -88,15 +88,15 @@ For skill suggestions based on task type, see `mk-agent-detector` (its `../agent
 
 | State | Pipeline Phase | Recommendation |
 |-------|---------------|----------------|
-| No plan | Phase 0 → 1 | "Start with `the plan skill` or describe your task" |
-| Existing plan — stress-test | Standalone subcommand | "`the plan skill red-team {path}` — adversarial review of existing plan" |
-| Existing plan — interview | Standalone subcommand | "`the plan skill validate {path}` — critical question interview on existing plan" |
-| Completed/cancelled plans | Housekeeping | "`the plan skill archive` — archive completed or cancelled plans" |
+| No plan | Phase 0 → 1 | "Start with `$mk-plan-creator` or describe your task" |
+| Existing plan — stress-test | Standalone subcommand | "`$mk-plan-creator red-team {path}` — adversarial review of existing plan" |
+| Existing plan — interview | Standalone subcommand | "`$mk-plan-creator validate {path}` — critical question interview on existing plan" |
+| Completed/cancelled plans | Housekeeping | "`$mk-plan-creator archive` — archive completed or cancelled plans" |
 | Plan agreed, no tests | Phase 2 (TDD mode only) | "In TDD mode (`--tdd` / `MEOWKIT_TDD=1`): run tester agent — write failing tests (RED phase). In default mode: skip Phase 2; run developer directly" |
 | Tests written, failing | Phase 3 | "Run developer agent — implement to pass tests (GREEN)" |
-| Tests passing, no review | Phase 4 | "Run `the review skill` — adversarial code review" |
-| Review PASS/WARN | Phase 5 | "Run `the ship skill` — commit, PR, deploy" |
-| Shipped | Phase 6 | "Run documenter — update docs, then `the retro skill`" |
+| Tests passing, no review | Phase 4 | "Run `$mk-review` — adversarial code review" |
+| Review PASS/WARN | Phase 5 | "Run `$mk-ship` — commit, PR, deploy" |
+| Shipped | Phase 6 | "Run documenter — update docs, then `$mk-retro`" |
 | Paused workflow | Resume | "Resume [skill] at step [N]" |
 | Mixed state | Clarify | "Multiple items in progress. Which to focus on?" |
 
@@ -104,12 +104,12 @@ For skill suggestions based on task type, see `mk-agent-detector` (its `../agent
 
 | Situation | Skill | When to suggest |
 |-----------|-------|----------------|
-| Operations, triage, case management, escalation protocols, billing workflows | `the decision-framework skill` | User asks "how should we handle X cases" or is designing any case-routing system |
-| "Is everything green?", pre-review check, post-implementation validation | `the verify skill` | After implementation completes, before review, or when user wants a quick health check |
-| API contract design or review — interface shape, error semantics, compatibility, pagination | `the api-design-principles skill` | User is authoring or reviewing what an API promises, not how it runs |
-| Backend change end to end — handler, service, integration, webhook, job | `the backend-development skill` | User is changing backend behavior and needs contract, data, and auth owners coordinated |
-| Schema, migration, query, index, or ORM data-access boundary | `the database skill` | User is modelling, evolving, or querying data |
-| Infrastructure, containers, CI/CD, deployment safety, rollback | `the devops skill` | User is changing how the system is built, configured, or delivered |
+| Operations, triage, case management, escalation protocols, billing workflows | `$mk-decision-framework` | User asks "how should we handle X cases" or is designing any case-routing system |
+| "Is everything green?", pre-review check, post-implementation validation | `$mk-verify` | After implementation completes, before review, or when user wants a quick health check |
+| API contract design or review — interface shape, error semantics, compatibility, pagination | `$mk-api-design-principles` | User is authoring or reviewing what an API promises, not how it runs |
+| Backend change end to end — handler, service, integration, webhook, job | `$mk-backend-development` | User is changing backend behavior and needs contract, data, and auth owners coordinated |
+| Schema, migration, query, index, or ORM data-access boundary | `$mk-database` | User is modelling, evolving, or querying data |
+| Infrastructure, containers, CI/CD, deployment safety, rollback | `$mk-devops` | User is changing how the system is built, configured, or delivered |
 
 ## Fast Paths (surface these prominently)
 
@@ -117,11 +117,11 @@ Not every task needs the full 7-phase pipeline. Mention these when relevant:
 
 | Situation | Fast Path | What it skips |
 |-----------|-----------|---------------|
-| Simple bug fix, typo, rename, config tweak | `the fix skill` | the plan file — the scope is the plan |
+| Simple bug fix, typo, rename, config tweak | `$mk-fix` | the plan file — the scope is the plan |
 | Task flagged as `one-shot` by scale-routing | no plan file | the plan file — zero blast radius confirmed |
 | Rapid iteration / spike work | `MEOWKIT_HOOK_PROFILE=fast` | post-write scan, pre-ship, pre-task-check, TDD check |
 
-**Quick fix?** Use `the fix skill` — no separate plan file for simple changes.
+**Quick fix?** Use `$mk-fix` — no separate plan file for simple changes.
 
 **Small config change?** Scale-routing may skip the plan file when blast radius is zero.
 
@@ -138,7 +138,7 @@ Set `MEOWKIT_HOOK_PROFILE=strict` to enable ALL hooks including post-session cap
 - `.meowkit/state/checkpoints/` does not exist until runtime — its absence is normal, not an error; skip silently
 - `budget-state.json` is missing at session start — treat budget figures as advisory; never source model tier from it (use `detected-model.json`)
 - Prefer the machine-readable `*-verdict.json` over the `.md` prose verdict; a verdict is blocked when `decision === "BLOCKED"` (never a top-level `"FAIL"`)
-- This is the forward-looking navigator — backward-looking delivery status stays with `the status skill`; do not duplicate it here
+- This is the forward-looking navigator — backward-looking delivery status stays with the project-manager agent; do not duplicate it here
 
 ## Output Format
 

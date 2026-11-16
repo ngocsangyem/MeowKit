@@ -11,7 +11,7 @@ description: "Routes complex-feature intent through the 7-phase workflow; auto-i
 
 **Priority:** CRITICAL — Use for complex feature implementations.
 
-> Only activates on session start for complex-feature intent. If `the cook skill` was explicitly invoked in this session, do not activate — `mk-cook` owns the pipeline. See AGENTS.md (Delegation & subagents)"Orchestrator Entry Point Rule".
+> Only activates on session start for complex-feature intent. If `$mk-cook` was explicitly invoked in this session, do not activate — `mk-cook` owns the pipeline. See AGENTS.md (Delegation & subagents)"Orchestrator Entry Point Rule".
 
 ## Canonical Lifecycle
 

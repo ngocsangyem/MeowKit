@@ -22,7 +22,7 @@ Forks to the `jira-analyst` agent. Read-only. The agent has Write tool privilege
 ## See also
 
 - Agent: `../../agents/jira-analyst.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Peer intelligence: `mk-jira-evaluator` (complexity signals), `mk-jira-estimator` (point estimate)
 - Peer execution: `mk-jira-issue` (read ticket fields incl. attachments), `mk-jira-collaborate` (post analysis as comment — see `mk-jira-collaborate/references/comment-templates.md`)
 - Output: report at `tasks/reports/jira-analyze-*.md` consumable by `mk-planning-engine` and downstream skills.

@@ -27,7 +27,7 @@ Forks to the `jira-fields` agent. Most reads are open; `fields create` and `fiel
 ## See also
 
 - Agent: `../../agents/jira-fields.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/field-discovery.md` — discovery methodology
   - `references/agile-field-ids.md` — typical agile field IDs (Sprint, Story Points, Epic Link)

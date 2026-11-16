@@ -24,7 +24,7 @@ Forks to the `jira-issue` agent. The skill body is the task brief — the host r
 ## See also
 
 - Agent: `../../agents/jira-issue.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/issue-templates.md` — canonical templates (Bug/Story/Epic/Task) + body markdown
   - `references/field-formats.md` — ADF, user assignment, custom-field formats

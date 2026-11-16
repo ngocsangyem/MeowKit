@@ -18,7 +18,7 @@ If `matched_flags` is unset OR empty AND `planning_mode` is `fast` or `spike`, p
 ```
 `matched_flags` is unset — plan-creator was invoked directly rather than
 through `mk-agent-detector` routing. Using default mode recommendation.
-For risk-tiered routing, invoke via `the cook skill` or `the fix skill`.
+For risk-tiered routing, invoke via `$mk-cook` or `$mk-fix`.
 ```
 
 ### 9b. Live Risk Re-Scan
@@ -59,8 +59,8 @@ Build the question payload using the option set above. Each option has `label` a
     "header": "Next Step",
     "options": [
       { "label": "Cook (Recommended)", "description": "Run the cook skill to implement the plan" },
-      { "label": "Validate", "description": "Run the plan skill validate for a critical-questions interview" },
-      { "label": "Red-team", "description": "Run the plan skill red-team for adversarial review" },
+      { "label": "Validate", "description": "Run `$mk-plan-creator validate` for a critical-questions interview" },
+      { "label": "Red-team", "description": "Run `$mk-plan-creator red-team` for adversarial review" },
       { "label": "End", "description": "Stop here — review plan before deciding" }
     ],
     "multiSelect": false
@@ -88,15 +88,15 @@ Print exactly one line matching the selection:
 
 | Selection | Output line |
 |---|---|
-| Cook | `Run: the cook skill {absolute-path-to-plan.md}` |
-| Cook with TDD | `Run: the cook skill {absolute-path-to-plan.md} --tdd` |
-| Cook (parallel mode) | `Run: the cook skill --parallel {absolute-path-to-plan.md}` |
-| Cook (parallel + TDD) | `Run: the cook skill --parallel {absolute-path-to-plan.md} --tdd` |
-| Cook (fast mode) | `Run: the cook skill --auto {absolute-path-to-plan.md}` |
-| Cook (fast + TDD) | `Run: the cook skill --auto {absolute-path-to-plan.md} --tdd` |
-| Validate | `Run: the plan skill validate {absolute-path-to-plan.md}` |
-| Red-team | `Run: the plan skill red-team {absolute-path-to-plan.md}` |
-| Hand off to mk-autobuild | `Run: the autobuild skill {absolute-path-to-plan.md}` |
+| Cook | `Run: $mk-cook {absolute-path-to-plan.md}` |
+| Cook with TDD | `Run: $mk-cook {absolute-path-to-plan.md} --tdd` |
+| Cook (parallel mode) | `Run: $mk-cook --parallel {absolute-path-to-plan.md}` |
+| Cook (parallel + TDD) | `Run: $mk-cook --parallel {absolute-path-to-plan.md} --tdd` |
+| Cook (fast mode) | `Run: $mk-cook --auto {absolute-path-to-plan.md}` |
+| Cook (fast + TDD) | `Run: $mk-cook --auto {absolute-path-to-plan.md} --tdd` |
+| Validate | `Run: $mk-plan-creator validate {absolute-path-to-plan.md}` |
+| Red-team | `Run: $mk-plan-creator red-team {absolute-path-to-plan.md}` |
+| Hand off to mk-autobuild | `Run: $mk-autobuild {absolute-path-to-plan.md}` |
 | End | (no command line — print "Plan complete. No next command queued.") |
 
 If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.meowkit/state/tdd-mode` surviving a fresh session.

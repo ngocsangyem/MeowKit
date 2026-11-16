@@ -12,7 +12,7 @@ Negotiation protocol between generator and evaluator. Produces a signed contract
 ## When to Use
 
 Activate when:
-- User runs `the sprint-contract skill <action> [task-slug]`
+- User runs `$mk-sprint-contract <action> [task-slug]`
 - Harness (Phase 5) needs to negotiate a sprint before invoking the generator
 - Generator agent needs to read a signed contract before starting implementation
 - A previously signed contract needs amendment due to mid-build scope discovery
@@ -20,7 +20,7 @@ Activate when:
 Skip when:
 - `MEOWKIT_AUTOBUILD_MODE=LEAN` (adaptive density: the most capable tier self-derives criteria from the product spec)
 - The plan is `--fast` mode (overhead exceeds value)
-- The task is `the fix skill simple` (one small fix needs no sprint-level scope negotiation)
+- The task is `$mk-fix simple` (one small fix needs no sprint-level scope negotiation)
 
 ## Subcommands
 
@@ -129,8 +129,8 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 | `references/bdd-to-ac-mapping.md` | How Gherkin scenarios map to acceptance criteria |
 | `../../agents/developer.md` | Generator agent — owns `propose` and `amend` actions |
 | `../../agents/evaluator.md` | Evaluator agent — owns `review` action; also Phase 3 active-verification consumer |
-| `..the rubric skill/` | Rubric library — provides composed presets the contract binds to |
-| `..the evaluate skill/` | Evaluator skill — reads signed contract via `step-01-load-rubrics.md` |
+| `../mk-rubric/` | Rubric library — provides composed presets the contract binds to |
+| `../mk-evaluate/` | Evaluator skill — reads signed contract via `step-01-load-rubrics.md` |
 
 ## Related Rules
 
@@ -138,5 +138,5 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 
 ## Start
 
-For interactive use, run `the sprint-contract skill propose <task-slug>` to begin negotiation.
+For interactive use, run `$mk-sprint-contract propose <task-slug>` to begin negotiation.
 For harness-driven use (Phase 5), the harness skill invokes propose → review → amend → sign automatically as a substep between Phase 2 (test red) and Phase 3 (build green).

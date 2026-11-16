@@ -11,7 +11,7 @@ Production-grade UI/UX design with anti-AI-slop enforcement. Covers aesthetics, 
 
 **Auto-activate on:** Design tasks, UI component styling, "make it look good", "improve the design", "fix the UI", "design review", design system work, CSS/styling changes
 
-**Explicit:** `the frontend-design skill [concern]`
+**Explicit:** `$mk-frontend-design [concern]`
 
 **Do NOT invoke for:** Vue patterns (use mk-vue), TypeScript (use mk-typescript), backend code, API integration
 

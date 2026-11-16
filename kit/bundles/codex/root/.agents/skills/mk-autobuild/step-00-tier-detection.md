@@ -89,6 +89,6 @@ started: {ISO-8601 timestamp}
 
 ## Next
 
-If `density == MINIMAL` → invoke `the cook skill "$task_description"` and proceed to step-06 (run report).
+If `density == MINIMAL` → invoke `$mk-cook "$task_description"` and proceed to step-06 (run report).
 
 Otherwise → read and follow `step-01-plan.md`.

@@ -40,7 +40,7 @@ This is the **load-bearing finding** of Anthropic's harness research. Opus 4.6 w
 Density resolves via this priority order:
 
 1. **`MEOWKIT_AUTOBUILD_MODE` env var** (highest) — `MINIMAL`, `FULL`, or `LEAN`
-2. **`--tier` flag on `the autobuild skill`** — `auto`, `minimal`, `full`, `lean`
+2. **`--tier` flag on `$mk-autobuild`** — `auto`, `minimal`, `full`, `lean`
 3. **`density-select.sh` auto-detection** from model env vars (lowest)
 
 The auto-detection step tries these env vars in order and uses the first set:
@@ -50,7 +50,7 @@ The auto-detection step tries these env vars in order and uses the first set:
 3. `ANTHROPIC_MODEL` (`Anthropic` SDK)
 4. (none) → defaults to `STANDARD` tier → `FULL` density (safe fallback)
 
-**Known limitation:** On Codex, the model id env var is not always exported to sub-task contexts. Users running `the autobuild skill` on Opus 4.6 who want LEAN mode should either:
+**Known limitation:** On Codex, the model id env var is not always exported to sub-task contexts. Users running `$mk-autobuild` on Opus 4.6 who want LEAN mode should either:
 - Set `export MEOWKIT_MODEL_HINT=opus-4-6` once in their shell, OR
 - Pass `--tier lean` explicitly on the autobuild invocation, OR
 - Set `export MEOWKIT_AUTOBUILD_MODE=LEAN` for the session

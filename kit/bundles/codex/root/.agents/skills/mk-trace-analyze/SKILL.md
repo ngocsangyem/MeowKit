@@ -21,7 +21,7 @@ Use the CLI for fast deterministic recall; use this skill's scatter-gather when 
 ## When to Use
 
 Activate when:
-- User runs `the trace-analyze skill [--runs N]` (default N=20)
+- User runs `$mk-trace-analyze [--runs N]` (default N=20)
 - After 3+ consecutive harness failures on the same task
 - Quarterly schedule for the dead-weight audit
 
@@ -81,7 +81,7 @@ All under `plans/{date}-trace-analysis/` (created by step-01):
 | `step-06-hitl-gate.md` | Ask the user per suggestion |
 | `references/trace-schema.md` | JSONL record schema spec |
 | `references/error-taxonomy.md` | Catalog of known failure patterns |
-| `../../../memory/trace-log.jsonl` | Append-only trace store |
+| `../../../mk-memory/trace-log.jsonl` | Append-only trace store |
 | `../../hooks/append-trace.cjs` | Trace writer |
 
 ## Start

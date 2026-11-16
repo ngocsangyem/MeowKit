@@ -13,4 +13,4 @@ These rules apply across all steps of the the ship skill workflow. They are hard
 - **Every PR comment reply includes evidence** (inline diff, code references). Never post vague replies.
 - **Never push without fresh verification evidence.** If code changed after Step 3 tests, re-run before pushing.
 - **Step 3.4 generates coverage tests.** They must pass before committing. Never commit failing tests.
-- **The goal is: user says `the ship skill`, next thing they see is the review + PR URL + auto-synced docs.**
+- **The goal is: user says `$mk-ship`, next thing they see is the review + PR URL + auto-synced docs.**

@@ -38,20 +38,20 @@ Recommended default: `--explain` or `--html --explain`.
 
 ### Markdown Generation
 
-- `the preview skill --explain <topic>` — visual explanation (ASCII + Mermaid + concepts)
-- `the preview skill --diagram <topic>` — focused diagram (ASCII + Mermaid)
-- `the preview skill --slides <topic>` — presentation slides (one concept per slide)
-- `the preview skill --ascii <topic>` — ASCII-only diagram (terminal-friendly)
+- `/mk-preview --explain <topic>` — visual explanation (ASCII + Mermaid + concepts)
+- `/mk-preview --diagram <topic>` — focused diagram (ASCII + Mermaid)
+- `/mk-preview --slides <topic>` — presentation slides (one concept per slide)
+- `/mk-preview --ascii <topic>` — ASCII-only diagram (terminal-friendly)
 
 ### HTML Generation
 
-- `the preview skill --html --explain <topic>` — self-contained HTML explanation
-- `the preview skill --html --diagram <topic>` — HTML diagram with zoom/pan
-- `the preview skill --html --slides <topic>` — magazine-quality slide deck
+- `/mk-preview --html --explain <topic>` — self-contained HTML explanation
+- `/mk-preview --html --diagram <topic>` — HTML diagram with zoom/pan
+- `/mk-preview --html --slides <topic>` — magazine-quality slide deck
 
 ### Analytical Modes
 
-- `the preview skill --html --diff [ref]` — visualize a git diff. Default `ref` = `main`. Accepts branch, commit, range, PR number.
+- `/mk-preview --html --diff [ref]` — visualize a git diff. Default `ref` = `main`. Accepts branch, commit, range, PR number.
 
 `--ascii` does not combine with `--html` (terminal-only by design).
 
@@ -114,17 +114,17 @@ Every mode reads its references BEFORE writing the output file.
 | `--diagram`            | `references/generation-modes.md`, `references/mermaid-essentials.md`                                                           | —                                                             |
 | `--slides`             | `references/generation-modes.md`, `references/mermaid-essentials.md`                                                           | —                                                             |
 | `--ascii`              | `references/generation-modes.md`                                                                                               | —                                                             |
-| `--html --explain`     | `references/html-design-rules.md`, `../frontend-design/references/anti-slop-directives.md`                                     | template `assets/architecture.html`                           |
-| `--html --diagram`     | `references/html-design-rules.md`, `references/mermaid-essentials.md`, `../frontend-design/references/anti-slop-directives.md` | template `assets/mermaid-flowchart.html`                      |
-| `--html --slides`      | `references/html-design-rules.md`, `../frontend-design/references/anti-slop-directives.md`                                     | template `assets/slide-deck.html`                             |
-| `--html --diff`        | `references/html-design-rules.md`, `references/analytical-modes.md`, `../frontend-design/references/anti-slop-directives.md`   | template `assets/data-table.html`, `assets/architecture.html` |
+| `--html --explain`     | `references/html-design-rules.md`, `../mk-frontend-design/references/anti-slop-directives.md`                                     | template `assets/architecture.html`                           |
+| `--html --diagram`     | `references/html-design-rules.md`, `references/mermaid-essentials.md`, `../mk-frontend-design/references/anti-slop-directives.md` | template `assets/mermaid-flowchart.html`                      |
+| `--html --slides`      | `references/html-design-rules.md`, `../mk-frontend-design/references/anti-slop-directives.md`                                     | template `assets/slide-deck.html`                             |
+| `--html --diff`        | `references/html-design-rules.md`, `references/analytical-modes.md`, `../mk-frontend-design/references/anti-slop-directives.md`   | template `assets/data-table.html`, `assets/architecture.html` |
 
 Templates in `assets/` are out-of-band — they are not auto-Read; the agent reads the template only when generating the matching mode.
 
 ## Composes With
 
 - `mk-ui-design-system` — palette and typography selection (`assets/colors.csv` 160 rows, `assets/typography.csv` 73 rows). HTML modes vary palette per run.
-- `mk-frontend-design` — anti-slop forbidden patterns. Cited via `../frontend-design/references/anti-slop-directives.md`, not duplicated.
+- `mk-frontend-design` — anti-slop forbidden patterns. Cited via `../mk-frontend-design/references/anti-slop-directives.md`, not duplicated.
 - `mk-web-to-markdown` — for users who want to view a generated markdown file in a browser, no server bundled here.
 
 ## Gotchas

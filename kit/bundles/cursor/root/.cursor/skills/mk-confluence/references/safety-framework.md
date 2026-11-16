@@ -58,7 +58,7 @@ If the impacted_count differs by > 5% between dry-run and execute, surface as a 
 | Wrapper exits 2 | Credentials in `.mcp.json` instead of `.env` | Move `MEOW_CONFLUENCE_*` vars to `.env`; chmod 0600 |
 | Wrapper exits 3 | Non-Cloud site URL | Use MCP escape hatch per `install-and-auth.md` |
 | Wrapper exits 4 | Network / DNS / page not found | Retry once; check VPN; verify page-id |
-| Wrapper exits 5 | 401 / 403 — token rotated or permission missing | Re-run `the confluence-setup skill`; verify user has Confluence access to space |
+| Wrapper exits 5 | 401 / 403 — token rotated or permission missing | Re-run the guided setup in `/mk-confluence`; verify user has Confluence access to space |
 | Wrapper exits 127 | Binary not installed | Run `mewkit setup` |
 | JSON parse error | Wrapper stdout filter missed an edge case | File issue; fall back to passthrough; tighten filter |
 | CQL sanitizer rejects valid query | False positive in regex | File issue with example; tune sanitizer (v2) |

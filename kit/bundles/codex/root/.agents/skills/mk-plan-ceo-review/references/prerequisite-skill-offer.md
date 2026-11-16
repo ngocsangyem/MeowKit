@@ -7,7 +7,7 @@ skill before proceeding.
 
 Say to the user by asking the user:
 
-> "No design doc found for this branch. `the office-hours skill` produces a structured problem
+> "No design doc found for this branch. `$mk-office-hours` produces a structured problem
 > statement, premise challenge, and explored alternatives — it gives this review much
 > sharper input to work with. Takes about 10 minutes. The design doc is per-feature,
 > not per-product — it captures the thinking behind this specific change."
@@ -54,7 +54,7 @@ If none was produced (user may have cancelled), proceed with standard review.
 
 During Step 0A (Premise Challenge), if the user can't
 articulate the problem, keeps changing the problem statement, answers with "I'm not
-sure," or is clearly exploring rather than reviewing — offer `the office-hours skill`:
+sure," or is clearly exploring rather than reviewing — offer `$mk-office-hours`:
 
 > "It sounds like you're still figuring out what to build — that's totally fine, but
 > that's what the office-hours skill is designed for. Want to run the office-hours skill right now?

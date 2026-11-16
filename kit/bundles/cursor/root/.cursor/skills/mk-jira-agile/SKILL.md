@@ -63,11 +63,11 @@ prefix and `-sprint-`. Reading either class by an explicit path is unambiguous.
 ## See also
 
 - Agent: `../../agents/jira-agile.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/sprint-operations.md` — board/sprint/velocity wrapper patterns
   - `references/agile-field-reference.md` — agile-specific field IDs (Sprint, Epic Link, Story Points)
-- Peer leaves: `mk-jira-fields` (`../jira-fields/references/agile-field-ids.md` is the canonical instance-discovery source), `mk-jira-time` (capacity = velocity ÷ team time), `mk-jira-relationships` (epic-children outside epic-link via issue links)
+- Peer leaves: `mk-jira-fields` (`../mk-jira-fields/references/agile-field-ids.md` is the canonical instance-discovery source), `mk-jira-time` (capacity = velocity ÷ team time), `mk-jira-relationships` (epic-children outside epic-link via issue links)
 
 ## Gotchas
 

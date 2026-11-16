@@ -111,7 +111,7 @@ Step 6: Run Report
 
 ## Resume
 
-If a run is killed mid-flight, resume via `the autobuild skill --resume {run_id}`. The orchestrator reads `run.md` to find the last completed step and continues from there. Run reports are append-only — no step is re-executed.
+If a run is killed mid-flight, resume via `/mk-autobuild --resume {run_id}`. The orchestrator reads `run.md` to find the last completed step and continues from there. Run reports are append-only — no step is re-executed.
 
 ## Next
 

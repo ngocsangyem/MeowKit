@@ -182,7 +182,7 @@ A failed write is never silent: print one line — `⚠ memory write skipped: <r
 ## Integration
 
 Party mode is opt-in:
-- User invokes `the party skill "topic"`
+- User invokes `$mk-party "topic"`
 - Orchestrator may suggest it for COMPLEX architectural decisions
 - Never auto-triggered without user consent
 - Does not replace or bypass any gates

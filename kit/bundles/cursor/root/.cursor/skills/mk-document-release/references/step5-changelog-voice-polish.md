@@ -10,7 +10,7 @@ preserved them. This skill must NEVER do that.
 **Rules:**
 1. Read the entire CHANGELOG.md first. Understand what is already there.
 2. Only modify wording within existing entries. Never delete, reorder, or replace entries.
-3. Never regenerate a CHANGELOG entry from scratch. The entry was written by `the ship skill` from the
+3. Never regenerate a CHANGELOG entry from scratch. The entry was written by `/mk-ship` from the
    actual diff and commit history. It is the source of truth. You are polishing prose, not
    rewriting history.
 4. If an entry looks wrong or incomplete, ask the user — do NOT silently fix it.

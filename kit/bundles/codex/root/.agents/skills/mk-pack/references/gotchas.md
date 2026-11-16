@@ -48,10 +48,10 @@ Known failure modes and their fixes.
 
 ### "BLOCKED: refusing to pack the current repo"
 
-**Cause:** You invoked `the pack skill .` or a local path that resolves to the same git root as your working directory.
+**Cause:** You invoked `$mk-pack .` or a local path that resolves to the same git root as your working directory.
 **Reason:** Packing your own repo and reading it back burns context the host runtime already streams lazily. See `SKILL.md` "When NOT to Use."
 **Fixes:**
-- For inbound context: use `the scout skill` instead.
+- For inbound context: use `$mk-scout` instead.
 - For deliberate external export: pass `--self` to override.
 
 ### Self-pack guard missed a local path outside the repo
@@ -96,7 +96,7 @@ Known failure modes and their fixes.
 **Cause:** Very large repo or slow clone (repomix shallow-clones remotes).
 **Fixes:**
 - Scope down with `--include` (e.g., `"src/**"`).
-- Pack locally instead: `git clone --depth 1 ...` then `the pack skill <local-path>`.
+- Pack locally instead: `git clone --depth 1 ...` then `$mk-pack <local-path>`.
 
 ### Output file > 10MB
 

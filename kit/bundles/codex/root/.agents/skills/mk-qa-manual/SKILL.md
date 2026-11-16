@@ -21,10 +21,10 @@ Orchestrates browser skills to act like a human tester: navigate, interact, veri
 **Trigger:** "test this flow", "QA this page", "generate E2E tests", "test login flow", "manual testing", "write Playwright tests for"
 
 **Explicit:**
-- `the qa-manual skill tasks/plans/260315-auth-flow.md --report` → manual QA report
-- `the qa-manual skill tasks/plans/260315-checkout.md --generate` → Playwright .spec.ts
-- `the qa-manual skill https://app.example.com` → explore and test from URL
-- `the qa-manual skill [spec]` → auto-detect use case from spec content
+- `$mk-qa-manual tasks/plans/260315-auth-flow.md --report` → manual QA report
+- `$mk-qa-manual tasks/plans/260315-checkout.md --generate` → Playwright .spec.ts
+- `$mk-qa-manual https://app.example.com` → explore and test from URL
+- `$mk-qa-manual [spec]` → auto-detect use case from spec content
 
 ## Workflow Integration
 

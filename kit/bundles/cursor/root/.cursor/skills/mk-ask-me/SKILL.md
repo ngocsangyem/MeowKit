@@ -35,7 +35,7 @@ about the current project only.
 - "what constraints apply before touching X"
 - "explain X with sources / citations"
 
-**Explicit:** `the ask-me skill [question] [--depth quick|standard|deep] [--save-to <path>]`
+**Explicit:** `/mk-ask-me [question] [--depth quick|standard|deep] [--save-to <path>]`
 
 **Do NOT invoke when:** the request matches any Redirect First row, asks to
 change code, or is a pure general-knowledge question (answer those directly,

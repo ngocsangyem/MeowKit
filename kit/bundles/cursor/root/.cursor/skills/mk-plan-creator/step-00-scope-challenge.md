@@ -43,7 +43,7 @@ Ask these 3 questions (internally, don't need to ask user):
 
 | Complexity | Planning Mode | What Happens |
 |------------|--------------|-------------|
-| trivial | EXIT | Print: "Task is trivial. Use `the fix skill`." → STOP |
+| trivial | EXIT | Print: "Task is trivial. Use `/mk-fix`." → STOP |
 | simple | fast | Skip research + codebase analysis. Go to step-03. |
 | complex | hard | Full pipeline: research → analysis → plan + phases → red team → validation |
 | complex + 5+ dirs OR refactor+complex | deep | Hard pipeline + per-phase scouting after step-03 drafts phase files |
@@ -157,7 +157,7 @@ Present by asking the user. Header: "Plan Mode". Question: "This looks like a gr
 - Task description contains a file path (e.g., `src/auth.ts`)
 - Task description names an existing module/class (e.g., `UserService`)
 - Task description starts with `fix`, `refactor`, `update`, `migrate`, `bump`
-- `task_complexity = trivial` (use `the fix skill` instead)
+- `task_complexity = trivial` (use `/mk-fix` instead)
 
 **Note:** `planning_mode = product-level` skips the EXPANSION/HOLD/REDUCTION scope question (it is product-level by definition — ambition is the default).
 

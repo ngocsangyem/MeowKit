@@ -262,5 +262,5 @@ Before falling back to git diff heuristics, check for richer test plan sources:
    eval "$(workflow-slug 2>/dev/null)"
    ls -t .meowkit/telemetry/*/*-test-plan-*.md 2>/dev/null | head -1
    ```
-2. **Conversation context:** Check if a prior `the plan-ceo-review skill` or `the plan-ceo-review skill` produced test plan output in this conversation
+2. **Conversation context:** Check if a prior `/mk-plan-ceo-review` or `/mk-plan-ceo-review` produced test plan output in this conversation
 3. **Use whichever source is richer.** Fall back to git diff analysis only if neither is available.

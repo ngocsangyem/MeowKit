@@ -21,7 +21,7 @@ Forks to the `confluence-spec-analyst` agent. Read-only at the Confluence side �
 ## See also
 
 - Agent: `../../agents/confluence-spec-analyst.md`
-- Shared: `../confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/spec-analysis-patterns.md` — gap-detection heuristics + weasel-word inventory
   - `references/report-template.md` — the Spec Research Report skeleton

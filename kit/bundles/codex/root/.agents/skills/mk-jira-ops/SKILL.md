@@ -30,7 +30,7 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh 
 ## See also
 
 - Agent: `../../agents/jira-ops.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/rate-limits.md` — Atlassian rate-limit ceilings + back-off behaviour
 - Peer leaves: any leaf hitting Atlassian-side throttling first lands here for diagnosis. `mk-jira-bulk` is the most common trigger for cache-warm + rate-limit awareness.

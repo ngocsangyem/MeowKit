@@ -23,7 +23,7 @@ Phase 2 is **OPT-IN.** With `--tdd` / `MEOWKIT_TDD=1`, write the failing tests f
 ## Context Reminder (MANDATORY)
 
 Once the plan is agreed, MUST print the cook command with absolute plan path.
-Default: `the cook skill {path}/plan.md`. With --fast: `the cook skill --auto {path}/plan.md`
+Default: `/mk-cook {path}/plan.md`. With --fast: `/mk-cook --auto {path}/plan.md`
 
 > **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
 > Then run the cook command.

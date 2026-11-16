@@ -18,7 +18,7 @@ Strict TypeScript patterns for type safety, null handling, and modern best pract
 
 **Auto-activate on:** `.ts`, `.tsx`, `.js`, `.jsx` files, type errors, ESLint issues, "fix types", "add types", "TypeScript help"
 
-**Explicit:** `the typescript skill [concern]`
+**Explicit:** `/mk-typescript [concern]`
 
 **Do NOT invoke for:** Vue-specific patterns (use mk-vue), visual design (use mk-frontend-design)
 

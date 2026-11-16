@@ -28,7 +28,7 @@ Forks to the `jira-dev` agent. Pure artifact generation — the user reviews and
 ## See also
 
 - Agent: `../../agents/jira-dev.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/branch-naming.md` — convention reference (`<type>/<KEY>-<slug>`)
   - `references/smart-commits.md` — smart-commit syntax for closing/transitioning from commit messages

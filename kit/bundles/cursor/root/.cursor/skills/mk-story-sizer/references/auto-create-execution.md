@@ -14,7 +14,7 @@ Per-ticket two-call sequence invoked AFTER the single batch confirmation gate in
 
 ## Field Whitelist (v1)
 
-Allowed flags on `the jira-issue skill create`:
+Allowed flags on `/mk-jira-issue create`:
 
 - `--project <KEY>` (REQUIRED)
 - `--type <Type>` (defaults to `Story`)

@@ -40,7 +40,7 @@ echo "Freeze boundary set: $FREEZE_DIR"
 ```
 
 Tell the user: "Edits are now restricted to `<path>/`. Any Edit or Write
-outside this directory will be blocked. To change the boundary, run `the freeze skill`
+outside this directory will be blocked. To change the boundary, run `/mk-freeze`
 again. Freeze persists for the session — end the session or start a new one to clear it."
 
 ## How it works
@@ -50,7 +50,7 @@ See [references/freeze-mechanics.md](references/freeze-mechanics.md) for technic
 ## Guardrails
 
 - **Edit/Write path guard**: Blocks writes outside the frozen directory path — enforced by this project's configured hooks when present
-- Activated by `the freeze skill <path>`. Deactivated when session ends.
+- Activated by `/mk-freeze <path>`. Deactivated when session ends.
 - Bash commands are NOT restricted — freeze only guards edit and write operations
 
 ## Gotchas

@@ -24,7 +24,7 @@ Forks to the `jira-collaborate` agent. The agent confirms internal-vs-public for
 ## See also
 
 - Agent: `../../agents/jira-collaborate.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/comment-templates.md` — copy-paste comment templates (progress, blocker, handoff, evidence)
   - `references/comment-formats.md` — text / markdown / ADF format reference

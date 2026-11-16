@@ -15,6 +15,8 @@ const TOKENS = JSON.parse(fs.readFileSync(path.join(__dirname, 'host-foreign-tok
 // Also catches the slash form (`/mk:x`) and a bracketed placeholder (`mk:[skill]`).
 const BUNDLE_COLON_NAME = /(?<![/\w])\/?mk:(?:\[[a-z-]+\]|[a-z][a-z0-9-]*)/g;
 const CLAUDE_HYPHEN_INVOCATION = /(?<![\w/.-])[/$]mk-[a-z][a-z0-9-]*/g;
+/** A command span holding a sentence ("`the cook skill --auto`") or a sibling path ("`..the x skill/`"). */
+const BUNDLE_PROSE_INVOCATION = /`(?:Run: |\.\.)?the [a-z0-9-]+ skill\b/g;
 
 /** Standing re-check wording that makes current models over-verify. */
 const REVERIFY = /\b(double-check|re-verify|verify again|re-check your)\b/gi;
@@ -53,7 +55,10 @@ function hostForeign(text, kind) {
 /** A10: a skill reference in the other runtime's name form. */
 function skillNameForm(text, kind) {
   if (kind === 'claude') return each(text, CLAUDE_HYPHEN_INVOCATION, 'A10', 'bundle-form skill invocation (use mk:x)');
-  return each(text, BUNDLE_COLON_NAME, 'A10', 'Claude Code skill name (use mk-x)');
+  return [
+    ...each(text, BUNDLE_COLON_NAME, 'A10', 'Claude Code skill name (use mk-x)'),
+    ...each(text, BUNDLE_PROSE_INVOCATION, 'A10', 'skill name as prose inside a command (use $mk-x or /mk-x)'),
+  ];
 }
 
 /** The `model` an agent file pins, with its line, or null when the file is not an agent. */

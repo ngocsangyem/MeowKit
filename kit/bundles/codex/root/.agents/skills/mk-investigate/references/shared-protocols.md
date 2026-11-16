@@ -155,7 +155,7 @@ Then write a `## REVIEW REPORT` section to the end of the plan file:
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
-| CEO Review | `the plan-ceo-review skill` | Scope & strategy | 0 | — | — |
+| CEO Review | `$mk-plan-ceo-review` | Scope & strategy | 0 | — | — |
 | Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
 
 **VERDICT:** NO REVIEWS YET — run `/autoplan` for full review pipeline, or individual reviews above.

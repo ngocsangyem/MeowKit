@@ -158,5 +158,5 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh 
 ## See Also
 
 - `comment-templates.md` — copy-paste comment templates
-- `../jira/references/cli-idioms.md` — verified `--format` / `--body` patterns
+- `../mk-jira/references/cli-idioms.md` — verified `--format` / `--body` patterns
 - [ADF Specification](https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/) - Official docs

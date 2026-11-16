@@ -16,7 +16,7 @@ Canonical tree for `--both` mode (Node / TypeScript). Adapt paths for other ecos
 - [Gotchas](#gotchas)
 
 
-Load during Phase 5 (Transformation Spec) so the plan captures the exact tree `the cook skill` will scaffold.
+Load during Phase 5 (Transformation Spec) so the plan captures the exact tree `$mk-cook` will scaffold.
 
 ## `--both` tree
 

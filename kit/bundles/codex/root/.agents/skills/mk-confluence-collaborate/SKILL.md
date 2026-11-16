@@ -27,7 +27,7 @@ Forks to the `confluence-collaborate` agent. The agent prefers footer comments o
 ## See also
 
 - Agent: `../../agents/confluence-collaborate.md`
-- Shared: `../confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/comment-formats.md` — inline vs footer, markdown vs storage format
   - `references/attachment-conventions.md` — file size limits, allowed types, download paths

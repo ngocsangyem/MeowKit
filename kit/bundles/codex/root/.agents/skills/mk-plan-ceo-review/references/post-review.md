@@ -131,7 +131,7 @@ Produce this markdown table:
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
-| CEO Review | `the plan-ceo-review skill` | Scope & strategy | {runs} | {status} | {findings} |
+| CEO Review | `$mk-plan-ceo-review` | Scope & strategy | {runs} | {status} | {findings} |
 | Outside Voice | Codex adversarial sub-task | Independent 2nd opinion | {runs} | {status} | {findings} |
 | Design Review | `/plan-design-review` | UI/UX gaps | {runs} | {status} | {findings} |
 ```

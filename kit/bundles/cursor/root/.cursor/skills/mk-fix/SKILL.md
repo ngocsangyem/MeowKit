@@ -157,7 +157,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
      another site could hit the same trap.
    - **Scrub secrets / tokens / PII before writing.** `mewkit note` lints the entry and exits non-zero without writing or echoing the match, but it rejects rather than redacts — you are responsible for what you pipe in. Vulnerability detail stays in the `cso` report and the review verdict, never in memory.
    - A failed write is never silent: print one line — `⚠ memory write skipped: <reason>` — and continue.
-   - Quick runs never write memory. Skip when `the fix skill --no-capture` was passed or the lesson is derivable from code/git.
+   - Quick runs never write memory. Skip when `/mk-fix --no-capture` was passed or the lesson is derivable from code/git.
 
 3. **Delegate to `project-manager`** (Moderate/Complex/Parallel ONLY) per the post-phase-delegation conventions Rule 1 (background — include "Run in the background" in the prompt). Skip for Simple complexity — a simple fix has no plan to track. Also skipped when `MEOWKIT_PM_AUTO=off`.
 
@@ -165,7 +165,7 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 
 5. Ask user about commit.
 
-6. **Fix summary report (standalone runs only):** Inside `the cook skill`, SKIP — cook's Phase 6 owns the reporting. For a standalone `the fix skill` of Standard/Complex/Parallel complexity, write a short, durable fix summary (NEVER raw `workflow-evidence.json`) to `tasks/reports/fix-<YYMMDD-HHMM>-<slug>.md` with only: symptom, root cause, files changed, verification result, recurrence/friction note, and links to the evidence path. Skip entirely for Simple complexity or when `--no-capture` was passed.
+6. **Fix summary report (standalone runs only):** Inside `/mk-cook`, SKIP — cook's Phase 6 owns the reporting. For a standalone `/mk-fix` of Standard/Complex/Parallel complexity, write a short, durable fix summary (NEVER raw `workflow-evidence.json`) to `tasks/reports/fix-<YYMMDD-HHMM>-<slug>.md` with only: symptom, root cause, files changed, verification result, recurrence/friction note, and links to the evidence path. Skip entirely for Simple complexity or when `--no-capture` was passed.
 
 ## Workflow Evidence Index
 
@@ -177,7 +177,7 @@ Contract: the workflow-evidence conventions. The index records pointers + summar
 
 **Re-read before presenting:** check the index against the shape table in the workflow-evidence conventions before the commit prompt (Step 6 item 5), and fill any missing field — nothing validates it for you. A high-risk flag (`risk.requiresHumanApproval`) means asking the user explicitly before finalize, regardless of mode.
 
-**Evidence ≠ memory:** the evidence file is one-run proof; `.meowkit/memory/gotchas.md` is the durable lesson store. Keep them separate — standalone `the fix skill` owns its evidence write; inside `the cook skill` the pipeline (Phase 6) owns the evidence write, so do NOT double-write. Scrub secrets / tokens / PII and store pointers/summaries only — never raw command logs.
+**Evidence ≠ memory:** the evidence file is one-run proof; `.meowkit/memory/gotchas.md` is the durable lesson store. Keep them separate — standalone `/mk-fix` owns its evidence write; inside `/mk-cook` the pipeline (Phase 6) owns the evidence write, so do NOT double-write. Scrub secrets / tokens / PII and store pointers/summaries only — never raw command logs.
 
 ## Skill Activation
 

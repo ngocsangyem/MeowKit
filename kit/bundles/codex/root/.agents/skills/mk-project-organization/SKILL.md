@@ -14,7 +14,7 @@ Standardize file locations, naming conventions, and directory structure for proj
 - Enforcing naming conventions across the project
 - Other skills need to know where to save output (advisory mode)
 
-Explicit: `the project-organization skill [targets]`
+Explicit: `$mk-project-organization [targets]`
 
 ## Workflow Integration
 

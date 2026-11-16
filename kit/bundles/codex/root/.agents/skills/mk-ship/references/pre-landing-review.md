@@ -29,7 +29,7 @@ If the diff is frontend-only and no `mk-review` pass ran, load `mk-review/refere
    - If 3 or fewer ASK items, you may use individual user questions instead
 
 7. **After all fixes (auto + user-approved):**
-   - If ANY fixes were applied: commit fixed files by name (`git add <fixed-files> && git commit -m "fix: pre-landing review fixes"`), then **STOP** and tell the user to run `the ship skill` again to re-test.
+   - If ANY fixes were applied: commit fixed files by name (`git add <fixed-files> && git commit -m "fix: pre-landing review fixes"`), then **STOP** and tell the user to run `$mk-ship` again to re-test.
    - If no fixes applied (all ASK items skipped, or no issues found): continue to Step 4.
 
 8. Output summary: `Pre-Landing Review: N issues — M auto-fixed, K asked (J fixed, L skipped)`

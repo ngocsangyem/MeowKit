@@ -5,7 +5,7 @@ description: "JQL search and saved filters for Jira; use to find issues. NOT for
 
 # mk-jira-search
 
-Forks to the `jira-search` agent. JQL is positional on `search query` and `search validate`; flags everywhere else. The agent enforces JQL sanitization for any user-derived term via `../jira/scripts/jql-sanitize.sh`.
+Forks to the `jira-search` agent. JQL is positional on `search query` and `search validate`; flags everywhere else. The agent enforces JQL sanitization for any user-derived term via `../mk-jira/scripts/jql-sanitize.sh`.
 
 ## Triggers
 
@@ -24,7 +24,7 @@ Forks to the `jira-search` agent. JQL is positional on `search query` and `searc
 ## See also
 
 - Agent: `../../agents/jira-search.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/jql-patterns.md` — canonical JQL templates (curated)
   - `references/jql-reference.md` — full JQL operator + function reference

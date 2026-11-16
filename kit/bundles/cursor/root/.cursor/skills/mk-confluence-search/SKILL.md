@@ -5,7 +5,7 @@ description: "Confluence CQL search, space listing, export. NOT for mk-confluenc
 
 # mk-confluence-search
 
-Forks to the `confluence-search` agent. CQL is positional on `search` (and on validate / build helpers); flags everywhere else. The agent enforces CQL sanitization for any user-derived term via `../confluence/scripts/cql-sanitize.sh`.
+Forks to the `confluence-search` agent. CQL is positional on `search` (and on validate / build helpers); flags everywhere else. The agent enforces CQL sanitization for any user-derived term via `../mk-confluence/scripts/cql-sanitize.sh`.
 
 ## Triggers
 
@@ -26,7 +26,7 @@ Forks to the `confluence-search` agent. CQL is positional on `search` (and on va
 ## See also
 
 - Agent: `../../agents/confluence-search.md`
-- Shared: `../confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/cql-patterns.md` — canonical CQL templates (curated)
   - `references/cql-reference.md` — full CQL operator + function reference

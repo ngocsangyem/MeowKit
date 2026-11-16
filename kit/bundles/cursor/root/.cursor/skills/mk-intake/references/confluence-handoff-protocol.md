@@ -12,7 +12,7 @@ Pattern-match against Atlassian Cloud URL grammar
     No match (raw input) → require "from confluence" phrase + numeric token
         ↓
 Pre-flight check: MEOW_CONFLUENCE_* env vars present?
-    NO  → "Confluence not configured. Run the confluence-setup skill. Exiting."
+    NO  → "Confluence not configured. Run `/mk-confluence` for guided setup. Exiting."
     YES → continue
         ↓
 Confirm with user: fetch page-id {N}? [Y/n]
@@ -48,7 +48,7 @@ When user input lacks a URL but contains a numeric token (3+ digits), intake rec
 
 ## When Intake Triggers Spec-Analyst (it doesn't, in v1)
 
-intake does NOT programmatically invoke spec-analyst. The intake report's Suggested Actions section recommends running `the confluence-spec-analyst skill <page-id>` as a follow-up. This preserves the toolkit's "user orchestrates skills" boundary.
+intake does NOT programmatically invoke spec-analyst. The intake report's Suggested Actions section recommends running `/mk-confluence-spec-analyst <page-id>` as a follow-up. This preserves the toolkit's "user orchestrates skills" boundary.
 
 ## How the Spec Report Flows Back
 
@@ -74,7 +74,7 @@ If the user runs spec-analyst after intake, the resulting report is then suitabl
 | Page restricted (wrapper exit 5) | User lacks read permission; cannot proceed; recommend asking page owner for access |
 | Cloud-only gate triggered (exit 3) | Site URL is non-Cloud; recommend MCP escape hatch per `mk-confluence` install reference |
 | Network failure | Retry once; if persistent, exit cleanly with error |
-| Spec-analyst absent | Suggested Actions still recommends `the confluence-spec-analyst skill` — installation gap is user's to resolve |
+| Spec-analyst absent | Suggested Actions still recommends `/mk-confluence-spec-analyst` — installation gap is user's to resolve |
 
 ## What mk-intake Does NOT Do
 

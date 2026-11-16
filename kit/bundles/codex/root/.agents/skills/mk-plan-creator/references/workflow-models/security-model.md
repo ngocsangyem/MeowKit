@@ -22,7 +22,7 @@ Always COMPLEX — uses best available model regardless of file count.
 ## Context Reminder (MANDATORY)
 
 Once the plan is agreed, MUST print the cook command with absolute plan path.
-Always: `the cook skill {path}/plan.md` (interactive, never --auto for security).
+Always: `$mk-cook {path}/plan.md` (interactive, never --auto for security).
 
 > **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
 > Then run the cook command.

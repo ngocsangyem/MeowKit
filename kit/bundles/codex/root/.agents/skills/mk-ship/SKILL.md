@@ -5,7 +5,7 @@ description: "Ships reviewed code: commit, push, open a PR, release. NOT for mk-
 
 # Ship Workflow
 
-Bare `the ship skill` defaults to `prepare`: inspect and stage the selected changes, then ask before creating a local commit. `release` requires explicit user direction and may push/create a PR. `publish` requires explicit user direction and may manage issues or versions. Never include uncommitted changes without an explicit confirmation.
+Bare `$mk-ship` defaults to `prepare`: inspect and stage the selected changes, then ask before creating a local commit. `release` requires explicit user direction and may push/create a PR. `publish` requires explicit user direction and may manage issues or versions. Never include uncommitted changes without an explicit confirmation.
 
 ## Skill wiring
 
@@ -45,7 +45,7 @@ After the verdict file is read at the start of the workflow:
 
 ## When to Use
 
-Use bare `the ship skill` to prepare a local commit. Use `the ship skill release` to push/create a PR, or `the ship skill publish` for version/issue actions; each external scope requires explicit user direction.
+Use bare `$mk-ship` to prepare a local commit. Use `$mk-ship release` to push/create a PR, or `$mk-ship publish` for version/issue actions; each external scope requires explicit user direction.
 
 ## Plan-First Gate
 

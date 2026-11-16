@@ -1,6 +1,6 @@
 # Document Release — Automation Rules
 
-You are running the `/document-release` workflow. This runs **after `the ship skill`** (code committed, PR
+You are running the `/document-release` workflow. This runs **after `/mk-ship`** (code committed, PR
 exists or about to exist) but **before the PR merges**. Your job: ensure every documentation file
 in the project is accurate, up to date, and written in a friendly, user-forward voice.
 

@@ -10,7 +10,7 @@ Load this protocol when any of the following are true:
 - Code touches authentication or authorization (session management, JWT, RBAC, OAuth)
 - Code is security-critical (crypto, secrets handling, rate limiting, input sanitization)
 - Code exposes a new public API endpoint or webhook receiver
-- User invokes `the review skill --iterative` explicitly
+- User invokes `/mk-review --iterative` explicitly
 
 For all other diffs, the standard single-pass review (step-02 → step-03 → step-04) is sufficient.
 

@@ -133,11 +133,11 @@ After producing the completion checklist:
 
 ## Step 3.47: Plan Verification (manual follow-up)
 
-Plan-level verification is not run automatically during `the ship skill`. If the plan has a verification section, remind the user:
+Plan-level verification is not run automatically during `/mk-ship`. If the plan has a verification section, remind the user:
 
 **If no verification section found in the plan file from Step 3.45:** Skip silently.
 
 **If verification section exists:** Output a single-line reminder after ship completes:
-> "Plan contains verification steps. Run `the qa skill` after deploy to validate them against a running dev server."
+> "Plan contains verification steps. Run `/mk-qa` after deploy to validate them against a running dev server."
 
 Rationale: automatic plan verification requires a reliable dev-server detection + browser orchestration path. Ship is not the right place for that — `mk-qa` owns it. Ship's job is to get the PR out; QA runs against the deployed build.

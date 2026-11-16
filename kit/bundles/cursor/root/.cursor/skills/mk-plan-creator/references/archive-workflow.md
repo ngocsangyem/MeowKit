@@ -1,6 +1,6 @@
 # Archive Workflow
 
-Subcommand: `the plan skill archive`. Manages plan lifecycle by archiving completed/cancelled plans.
+Subcommand: `/mk-plan-creator archive`. Manages plan lifecycle by archiving completed/cancelled plans.
 
 ## Contents
 
@@ -18,7 +18,7 @@ Subcommand: `the plan skill archive`. Manages plan lifecycle by archiving comple
 
 ## Trigger
 
-Activated when argument is `archive` (e.g., `the plan skill archive`).
+Activated when argument is `archive` (e.g., `/mk-plan-creator archive`).
 
 ## Workflow
 
@@ -99,6 +99,6 @@ Ask if user wants to commit the archival changes.
 ## Rules
 
 - NEVER touch plans with status `draft`, `in-progress`, or `pending`
-- The manual `the plan skill archive` subcommand never archives without user confirmation. Completion-driven lifecycle archiving is separate and runs only after every plan todo is checked.
+- The manual `/mk-plan-creator archive` subcommand never archives without user confirmation. Completion-driven lifecycle archiving is separate and runs only after every plan todo is checked.
 - `mewkit plan archive` creates `tasks/plans/archive/` if absent and fails closed if the destination already exists
 - Journal capture is optional — respect user choice

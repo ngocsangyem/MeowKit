@@ -10,7 +10,7 @@ Surfaces insights that generic "make it better" requests miss.
 
 ## When to Use
 
-- After `the review skill` verdict — deepen analysis before shipping
+- After `/mk-review` verdict — deepen analysis before shipping
 - After plan creation — stress-test assumptions before building
 - After any agent output — when user wants a specific angle of analysis
 - When user says "dig deeper", "what am I missing", "challenge this"

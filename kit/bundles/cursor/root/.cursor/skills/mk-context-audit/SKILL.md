@@ -33,8 +33,8 @@ Three concrete triggers:
 
 | Concern                         | Mechanism                                                | Unit          |
 | ------------------------------- | -------------------------------------------------------- | ------------- |
-| Monetary cost                   | `the budget skill` + `../autobuild/scripts/budget-tracker.sh`  | USD           |
-| Window utilization (this skill) | `the context-audit skill` + `scripts/inventory-context.sh`      | tokens / %    |
+| Monetary cost                   | `mewkit budget` + `../mk-autobuild/scripts/budget-tracker.sh`  | USD           |
+| Window utilization (this skill) | `/mk-context-audit` + `scripts/inventory-context.sh`      | tokens / %    |
 
 The three concerns are deliberately separate. This skill measures only what
 is **statically loaded** into every session — the always-on bundle. Conversation
@@ -88,7 +88,7 @@ Steps:
 ... (sorted by token impact, descending)
 
 ## How to Act
-- Cost: see `the budget skill`
+- Cost: see `mewkit budget`
 - Runtime trim: an agent file costs tokens only when that agent is spawned; archive agent files that are never used
 ```
 
@@ -105,7 +105,7 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 - **No env vars introduced.** Window size is hard-coded 200K; override deferred
   until a real 1M-context use case appears.
 - **Discovery:** via `keywords:` frontmatter and a cross-reference from
-  `the budget skill`. There is no separate routing rule.
+  `mewkit budget`. There is no separate routing rule.
 
 ## Gotchas
 

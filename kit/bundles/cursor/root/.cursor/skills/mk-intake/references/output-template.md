@@ -111,7 +111,7 @@ Causal chain:
 - [ ] Assign to [pic-username]
 - [ ] Set [field] to [value]
 
-Run: `the jira skill` to execute these actions
+Run: `/mk-jira` to execute these actions
 ```
 
 ---

@@ -54,7 +54,7 @@ Before any pre-flight checks, run `mk-verify` to confirm everything is green.
 
 If `mk-verify` returns FAIL:
 - Display the failing step and errors
-- **Abort ship** with message: "Verification failed — fix issues before shipping. Run `the verify skill` to re-check."
+- **Abort ship** with message: "Verification failed — fix issues before shipping. Run `/mk-verify` to re-check."
 - Do not proceed to Step 1
 
 If `mk-verify` returns PASS: continue to Step 0.9.
@@ -153,7 +153,7 @@ If the Eng Review is NOT "CLEAR":
    - If CEO Review is missing, mention as informational ("CEO Review not run — recommended for product changes") but do NOT block
    - For Design Review: run `source <(workflow-diff-scope <base> 2>/dev/null)`. If `SCOPE_FRONTEND=true` and no `ship-design-check` entry exists in the dashboard, mention: "Design Review not run — this PR changes frontend code. The inline lite design check runs automatically during pre-landing review." Still never block.
 
-3. **If the user chooses A or C,** persist the decision so future `the ship skill` runs on this branch skip the gate:
+3. **If the user chooses A or C,** persist the decision so future `/mk-ship` runs on this branch skip the gate:
    ```bash
    eval "$(workflow-slug 2>/dev/null)"
    echo '{"skill":"ship-review-override","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","decision":"USER_CHOICE"}' >> .meowkit/telemetry/$BRANCH-reviews.jsonl

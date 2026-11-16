@@ -12,7 +12,7 @@ Public surface: classify → inspect → capture missing decisions → draft →
 
 Activate when:
 
-- User runs `the plan skill [task]` or `the cook skill [task]`
+- User runs `/mk-plan-creator [task]` or `/mk-cook [task]`
 - Non-trivial task (> 2 files OR > 1h OR architectural decisions)
 - User supplies ≥2 upstream reports/specs (office-hours, brainstorming, planning-engine, confluence-spec, intake output…) → step-00.5 consolidates them into a Plan Intake Packet before planning (see `references/plan-intake-packet.md`)
 - User supplies a design evidence packet (e.g. from `mk-figma`) → plan consumes it (viewport/state ACs, critical-action validation matrix, phase `blocked_on:` for high-risk flow ambiguity), never re-analyzes the design source (see `references/design-evidence-consumption.md`)
@@ -20,13 +20,13 @@ Activate when:
 - Green-field product build ("build a kanban app", "create a SaaS dashboard", "make a retro game maker") → step-00 auto-detects and offers `--product-level`
 - Existing-plan audit → `mk-validate-plan`; archive → lifecycle CLI.
 - Hard/deep plan creation still runs its built-in red-team and validation interview before presenting the plan. These are design-quality steps, not standalone subcommands, and must never be routed away.
-- Compatibility aliases: `the plan skill archive` → [archive workflow](references/archive-workflow.md); `the plan skill red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `the plan skill validate {path}` → [standalone validation workflow](references/validate-standalone.md).
+- Compatibility aliases: `/mk-plan-creator archive` → [archive workflow](references/archive-workflow.md); `/mk-plan-creator red-team {path}` → [standalone red-team workflow](references/red-team-standalone.md); `/mk-plan-creator validate {path}` → [standalone validation workflow](references/validate-standalone.md).
 
 Standalone aliases route to their compatibility references; they do not replace hard/deep red-team or validation.
 
 Skip when:
 
-- `the fix skill` with complexity=simple (the fix is the plan)
+- `/mk-fix` with complexity=simple (the fix is the plan)
 - `mk-scale-routing` returns workflow=one-shot + zero blast radius
 
 ## Arguments

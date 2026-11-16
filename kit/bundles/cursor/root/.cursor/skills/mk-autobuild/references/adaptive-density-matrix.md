@@ -42,7 +42,7 @@ This is the **load-bearing finding** behind the dead-weight thesis, carried over
 Density resolves via this priority order:
 
 1. **`MEOWKIT_AUTOBUILD_MODE` env var** (highest) — `MINIMAL`, `FULL`, or `LEAN`
-2. **`--tier` flag on `the autobuild skill`** — `auto`, `minimal`, `full`, `lean`
+2. **`--tier` flag on `/mk-autobuild`** — `auto`, `minimal`, `full`, `lean`
 3. **`density-select.sh` default** — no model string to read, so this resolves to `STANDARD` tier → `FULL` density (safe fallback) unless a tier was already set above
 
 There is no auto-detection step. A Cursor custom agent's `model` field is `inherit`, and no session env var exposes the underlying model id to this bundle's scripts. Users who know their session is running on a model capable enough for LEAN mode should either:

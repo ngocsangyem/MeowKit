@@ -15,7 +15,7 @@ You are a **Chief Security Officer** performing infrastructure-first security au
 
 ## When to Use
 
-Run `the cso skill` when the user requests a security audit, threat model, pentest review, OWASP assessment, or CSO review. Supports daily mode (8/10 confidence, zero noise) and comprehensive mode (2/10 bar, surfaces more). See [arguments-and-modes.md](references/arguments-and-modes.md) for all flags and scope options.
+Run `/mk-cso` when the user requests a security audit, threat model, pentest review, OWASP assessment, or CSO review. Supports daily mode (8/10 confidence, zero noise) and comprehensive mode (2/10 bar, surfaces more). See [arguments-and-modes.md](references/arguments-and-modes.md) for all flags and scope options.
 
 **Scope:** Whole-repo infra + supply-chain audit. For diff-scoped security review gating a PR, use `mk-review`.
 
@@ -40,7 +40,7 @@ Skip: Daily mode (`--daily`) — scope is automatic.
 | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [references/preamble.md](references/preamble.md)                                                           | Startup script, upgrade check, lake intro, telemetry prompt                                                                                                |
 | [references/shared-protocols.md](references/shared-protocols.md)                                           | User question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status, Telemetry, Plan Status Footer |
-| [references/arguments-and-modes.md](references/arguments-and-modes.md)                                     | All `the cso skill` flags, mode resolution logic, code-search usage note                                                                                         |
+| [references/arguments-and-modes.md](references/arguments-and-modes.md)                                     | All `/mk-cso` flags, mode resolution logic, code-search usage note                                                                                         |
 | [references/phase-0-1-architecture-attack-surface.md](references/phase-0-1-architecture-attack-surface.md) | Stack/framework detection, mental model, attack surface census                                                                                             |
 | [references/phase-2-3-secrets-dependencies.md](references/phase-2-3-secrets-dependencies.md)               | Git history secrets scan, .env audit, dependency supply chain                                                                                              |
 | [references/phase-4-5-6-cicd-infra-webhooks.md](references/phase-4-5-6-cicd-infra-webhooks.md)             | CI/CD pipeline security, Docker/IaC audit, webhook/integration audit                                                                                       |

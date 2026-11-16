@@ -31,7 +31,7 @@ The `Write` tool is allowlisted **only** for persisting the Story Sizing Report 
 ## Inputs
 
 - **Paste mode (v1):** strict markdown template per `.agents/skills/mk-story-sizer/references/input-adapter.md`. Output is a list of `StoryRecord` values keyed by `source_hash`.
-- **Optional scout context:** if the caller extracted `mk-scout` output from session, it is passed inline. You never auto-invoke `the scout skill` — if absent, you flag `[NO_CODEBASE_CONTEXT]` in the report.
+- **Optional scout context:** if the caller extracted `mk-scout` output from session, it is passed inline. You never auto-invoke `$mk-scout` — if absent, you flag `[NO_CODEBASE_CONTEXT]` in the report.
 
 ## Sizing Flow
 
@@ -59,8 +59,8 @@ You do NOT call Jira directly. The SKILL.md layer:
 3. Renders the markdown dry-run table.
 4. Obtains one explicit user confirmation through the skill layer.
 5. On approval, executes per-ticket two-call sequence per `.agents/skills/mk-story-sizer/references/auto-create-execution.md`:
-   - Call A: `the jira-issue skill create ...`
-   - Call B: `the jira-collaborate skill add-comment ... --internal`
+   - Call A: `$mk-jira-issue create ...`
+   - Call B: `$mk-jira-collaborate add-comment ... --internal`
 6. Appends `## Created Tickets` to the sizing report.
 
 ## Determinism

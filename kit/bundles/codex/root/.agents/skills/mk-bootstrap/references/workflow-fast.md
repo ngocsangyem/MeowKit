@@ -47,7 +47,7 @@ The plan defines WHAT gets scaffolded in Step 3.
 
 **ACTION REQUIRED:** Load `references/shared-phases.md` and execute ALL phases:
 
-1. **Phase A:** Activate mk-cook skill: `the cook skill [plan-path] --auto`
+1. **Phase A:** Activate mk-cook skill: `$mk-cook [plan-path] --auto`
 2. **Phase B:** Activate mk-docs-init for documentation
 3. **Phase C:** Print final report
 

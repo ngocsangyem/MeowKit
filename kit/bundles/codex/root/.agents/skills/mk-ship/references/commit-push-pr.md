@@ -198,7 +198,7 @@ gh pr edit "$EXISTING_PR" --title "<type>: <summary>" --body "<same body as abov
 ## Step 8.5: Offer /document-release
 
 After the PR is created, report whether the diff appears to affect project documentation
-and offer `the document-release skill`. Do not invoke it automatically. Documentation edits,
+and offer `$mk-document-release`. Do not invoke it automatically. Documentation edits,
 commits, and pushes require the user's explicit request and the confirmations defined by
 the document-release workflow.
 
@@ -206,7 +206,7 @@ the document-release workflow.
 
 ## Step 8.75: Persist ship metrics
 
-Log coverage and plan completion data so `the retro skill` can track trends:
+Log coverage and plan completion data so `$mk-retro` can track trends:
 
 ```bash
 eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/telemetry

@@ -72,10 +72,10 @@ If unable to complete review:
 
 For comprehensive pre-landing review (including adversarial analysis, scope drift, design review, test coverage), invoke the `mk-review` skill:
 
-- **Branch diff (default):** `the review skill` — reviews current branch against base
-- **PR review:** `the review skill #123` — fetches and reviews specific PR diff
-- **Commit review:** `the review skill abc1234` — reviews specific commit
-- **Pending changes:** `the review skill --pending` — reviews uncommitted changes
+- **Branch diff (default):** `$mk-review` — reviews current branch against base
+- **PR review:** `$mk-review #123` — fetches and reviews specific PR diff
+- **Commit review:** `$mk-review abc1234` — reviews specific commit
+- **Pending changes:** `$mk-review --pending` — reviews uncommitted changes
 
 The skill produces a structured verdict (PASS / WARN / FAIL). A FAIL verdict means the change should be fixed before Phase 5 (Ship); no hook blocks shipping on it, so say so plainly in the verdict.
 

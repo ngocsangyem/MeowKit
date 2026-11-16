@@ -27,7 +27,7 @@ Forks to the `confluence-page` agent (system prompt at `.codex/agents/confluence
 ## See also
 
 - Agent: `../../agents/confluence-page.md`
-- Shared: `../confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/page-templates.md` — RFC / Runbook / Decision Record skeletons
   - `references/field-formats.md` — storage / view / export_view / ADF distinctions

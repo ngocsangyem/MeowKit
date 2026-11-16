@@ -22,7 +22,7 @@ Must be behavior-preserving. All existing tests must pass after every intermedia
 ## Context Reminder (MANDATORY)
 
 Once the plan is agreed, MUST print the cook command with absolute plan path.
-Default: `the cook skill {path}/plan.md`. Incremental phases — cook handles each.
+Default: `$mk-cook {path}/plan.md`. Incremental phases — cook handles each.
 
 > **Best Practice:** Run `/clear` before implementing to reduce planning-context carryover.
 > Then run the cook command.

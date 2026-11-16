@@ -23,14 +23,14 @@ The name returned by `git config user.name` is **"you"** — the person reading 
 
 ## Arguments
 
-- `the retro skill` — default: last 7 days
-- `the retro skill 24h` — last 24 hours
-- `the retro skill 14d` — last 14 days
-- `the retro skill 30d` — last 30 days
-- `the retro skill compare` — compare current window vs prior same-length window
-- `the retro skill compare 14d` — compare with explicit window
-- `the retro skill global` — cross-project retro across all AI coding tools (7d default)
-- `the retro skill global 14d` — cross-project retro with explicit window
+- `/mk-retro` — default: last 7 days
+- `/mk-retro 24h` — last 24 hours
+- `/mk-retro 14d` — last 14 days
+- `/mk-retro 30d` — last 30 days
+- `/mk-retro compare` — compare current window vs prior same-length window
+- `/mk-retro compare 14d` — compare with explicit window
+- `/mk-retro global` — cross-project retro across all AI coding tools (7d default)
+- `/mk-retro global 14d` — cross-project retro with explicit window
 
 Parse the argument to determine the time window. Default to 7 days if no argument given. All times should be reported in the user's **local timezone** (use the system default — do NOT set `TZ`).
 

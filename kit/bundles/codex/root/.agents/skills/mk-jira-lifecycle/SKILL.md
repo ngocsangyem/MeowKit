@@ -26,7 +26,7 @@ Forks to the `jira-lifecycle` agent. `lifecycle transition` takes the issue key 
 ## See also
 
 - Agent: `../../agents/jira-lifecycle.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - **Authoritative source for THIS project's workflow** (discovered, not templated):
   - `references/workflow-discovery.md` — discovery + caching protocol (READ FIRST)
   - `tasks/jira-workflows/<workflow-slug>.md` — discovered workflow definitions

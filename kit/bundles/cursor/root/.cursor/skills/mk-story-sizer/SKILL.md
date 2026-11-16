@@ -20,8 +20,8 @@ Forks to the `story-sizer` custom agent. v1 ships paste-mode only: the user prov
 
 | Mode        | Invocation                                                             | Side effects                                                              |
 | ----------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Default     | `the story-sizer skill --paste [--scout] [--story <id>]`                     | Writes Story Sizing Report only. No Jira calls.                           |
-| Auto-create | `the story-sizer skill --paste --auto-create --project <KEY> [--epic <KEY>]` | After dry-run + single confirmation, delegates ticket creation per story. |
+| Default     | `/mk-story-sizer --paste [--scout] [--story <id>]`                     | Writes Story Sizing Report only. No Jira calls.                           |
+| Auto-create | `/mk-story-sizer --paste --auto-create --project <KEY> [--epic <KEY>]` | After dry-run + single confirmation, delegates ticket creation per story. |
 
 ## Input
 
@@ -39,7 +39,7 @@ Per-story suggested create commands obey the v1 field whitelist: `--project`, `-
 
 ## Orchestration
 
-End-to-end default flow + `--scout` extract-or-prompt pattern + filtering rules: `references/orchestration.md`. Story-sizer NEVER auto-invokes `the scout skill` — it extracts existing session output or prompts the user to run scout first.
+End-to-end default flow + `--scout` extract-or-prompt pattern + filtering rules: `references/orchestration.md`. Story-sizer NEVER auto-invokes `/mk-scout` — it extracts existing session output or prompts the user to run scout first.
 
 ## Auto-create (opt-in)
 
@@ -50,10 +50,10 @@ End-to-end default flow + `--scout` extract-or-prompt pattern + filtering rules:
 - Agent: `../../agents/story-sizer.md`
 - Peer intelligence: `mk-jira-evaluator` (post-ticket complexity), `mk-jira-estimator` (post-ticket estimation), `mk-planning-engine` (sprint capacity)
 - Peer execution (delegated): `mk-jira-issue` (create), `mk-jira-collaborate` (audit comment via `--internal`)
-- Shared: `../jira/references/estimation-guide.md` (Fibonacci heuristic conventions)
+- Shared: `../mk-jira/references/estimation-guide.md` (Fibonacci heuristic conventions)
 
 ## Gotchas
 
 - The `source_hash` recorded in the report header is the SHA-256 of the _exact_ paste body. If you edit the paste locally between sizing and `--auto-create`, the source-consistency check will ABORT — re-paste the modified body and re-run `--paste` to regenerate the report.
-- `--scout` does not auto-invoke `the scout skill`. Run `the scout skill` first when you want codebase signals; otherwise the report carries `[NO_CODEBASE_CONTEXT]`.
+- `--scout` does not auto-invoke `/mk-scout`. Run `/mk-scout` first when you want codebase signals; otherwise the report carries `[NO_CODEBASE_CONTEXT]`.
 - DoR advisory only appears when `mk-agent-detector` loaded the agile story gates rule for the current session.

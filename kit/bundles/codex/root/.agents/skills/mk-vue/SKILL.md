@@ -15,7 +15,7 @@ Colada, file-based routing, and performance. Single entrypoint routing to focuse
 **Auto-activate on:** `.vue` files, Vue 3 Composition API, `<script setup>`, Pinia stores,
 Pinia Colada queries/mutations, Vue Router file-based routes, composables.
 
-**Explicit:** `the vue skill [concern]`
+**Explicit:** `$mk-vue [concern]`
 
 **Deep best practices:** for a thorough best-practices **review/recommendations** pass or the
 full ordered workflow — built-in components (Teleport/Suspense/KeepAlive/Transition),

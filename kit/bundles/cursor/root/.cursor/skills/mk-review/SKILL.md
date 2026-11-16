@@ -82,9 +82,9 @@ Assigned reviewers MUST read their diff/brief/scout artifacts through `mewkit re
 
 - User asks to "review this PR", "code review", "pre-landing review", or "check my diff"
 - User is about to merge or land code changes (proactive suggestion)
-- Before running `the ship skill`, so problems surface while they are still cheap to fix
-- **For complex changes (3+ files):** Run `the scout skill` first to identify edge cases before review
-- **After verdict:** Optionally run `the elicit skill` for structured second-pass reasoning on findings
+- Before running `/mk-ship`, so problems surface while they are still cheap to fix
+- **For complex changes (3+ files):** Run `/mk-scout` first to identify edge cases before review
+- **After verdict:** Optionally run `/mk-elicit` for structured second-pass reasoning on findings
 
 **Scope:** The security dimension here is diff-scoped to the branch. For whole-repo security audit (infra, supply chain, secrets archaeology), use `mk-cso`.
 
@@ -148,7 +148,7 @@ Side Effects Detected: Yes
 - <bullet list of detected effects, one per line>
 ```
 
-This signal is the review's loudest finding. Surface it to the user and do not call the change ready to ship until a `## User Decision Addendum` block is appended to the verdict recording the recovery option the user chose. See cook `../cook/references/review-cycle.md` "Regression Recovery Options" for the addendum format and the four standard recovery options.
+This signal is the review's loudest finding. Surface it to the user and do not call the change ready to ship until a `## User Decision Addendum` block is appended to the verdict recording the recovery option the user chose. See cook `../mk-cook/references/review-cycle.md` "Regression Recovery Options" for the addendum format and the four standard recovery options.
 
 **Backward-compat (CRITICAL):** absence of the `Side Effects Detected` field means "nothing detected", not "something hidden". Verdicts that pre-date this contract read unchanged. The signal is positive-presence-only — never negative-absence.
 
@@ -158,7 +158,7 @@ When a workflow evidence index exists for the run (`mk-cook` or standalone `mk-f
 
 ## Pre-Review Scouting (Recommended)
 
-For changes touching 3+ files, run `the scout skill` BEFORE starting review:
+For changes touching 3+ files, run `/mk-scout` BEFORE starting review:
 1. Scout identifies affected dependents, data flow risks, async races, state mutations
 2. Scout output feeds into Step 1 (Gather Context) as additional context
 3. Makes the review more targeted — reviewers check scout-flagged areas first
@@ -167,7 +167,7 @@ This is recommended, not mandatory. Small diffs (1-2 files) skip scouting.
 
 ## Post-Verdict Elicitation (Optional)
 
-After the verdict is emitted, offer the user `the elicit skill` for deeper analysis:
+After the verdict is emitted, offer the user `/mk-elicit` for deeper analysis:
 
 ```
 Review complete. Verdict: [PASS|WARN|FAIL]

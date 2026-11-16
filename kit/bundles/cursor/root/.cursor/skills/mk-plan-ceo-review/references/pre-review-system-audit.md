@@ -21,7 +21,7 @@ DESIGN=$(ls -t tasks/plans/*/*-$BRANCH-design-*.md 2>/dev/null | head -1)
 [ -z "$DESIGN" ] && DESIGN=$(ls -t tasks/plans/*/*-design-*.md 2>/dev/null | head -1)
 [ -n "$DESIGN" ] && echo "Design doc found: $DESIGN" || echo "No design doc found"
 ```
-If a design doc exists (from `the office-hours skill`), read it. Use it as the source of truth for the problem statement, constraints, and chosen approach. If it has a `Supersedes:` field, note that this is a revised design.
+If a design doc exists (from `/mk-office-hours`), read it. Use it as the source of truth for the problem statement, constraints, and chosen approach. If it has a `Supersedes:` field, note that this is a revised design.
 
 ## Handoff Note Check
 
@@ -32,7 +32,7 @@ HANDOFF=$(ls -t tasks/plans/*/*-$BRANCH-ceo-handoff-*.md 2>/dev/null | head -1)
 ```
 If this block runs in a separate shell from the design doc check, recompute $SLUG and $BRANCH first using the same commands from that block.
 If a handoff note is found: read it. This contains system audit findings and discussion
-from a prior CEO review session that paused so the user could run `the office-hours skill`. Use it
+from a prior CEO review session that paused so the user could run `/mk-office-hours`. Use it
 as additional context alongside the design doc. The handoff note helps you avoid re-asking
 questions the user already answered. Do NOT skip any steps — run the full review, but use
 the handoff note to inform your analysis and avoid redundant questions.

@@ -77,7 +77,7 @@ For `plan`:
 
 ## Codebase Context Sources (orchestrated by SKILL.md)
 
-- `--scout` → SKILL.md invokes `the scout skill`, passes output inline to agent
+- `--scout` → SKILL.md invokes `$mk-scout`, passes output inline to agent
 - `--graph` → SKILL.md reads graph output from a graph-skill or user-supplied input, passes inline
 - `--spec <report-path>` → SKILL.md reads existing `mk-confluence-spec-analyst` report (user runs spec-analyst FIRST), extracts Requirements / AC / Gaps, passes inline. Validation failure → prompt user to run spec-analyst, exit. Read failure mid-flow → `[NO_SPEC_CONTEXT: <error>]` flag, continue without spec
 - None → ticket-only analysis with `[NO_CODEBASE_CONTEXT]` flag
@@ -132,8 +132,8 @@ mk-planning-engine/
 ## Upstream Context
 
 mk-planning-engine works best when:
-- Tickets have been evaluated (`the jira-evaluator skill KEY`) — complexity signals improve tech review
-- Tickets have been estimated (`the jira-estimator skill KEY`) — points enable capacity planning
+- Tickets have been evaluated (`$mk-jira-evaluator KEY`) — complexity signals improve tech review
+- Tickets have been estimated (`$mk-jira-estimator KEY`) — points enable capacity planning
 
 None of these are required. The skill degrades gracefully:
 - No evaluate output → tech-analyzer does its own lightweight assessment

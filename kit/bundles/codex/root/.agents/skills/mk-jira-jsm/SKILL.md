@@ -33,7 +33,7 @@ JSM-licensed tenant + agent or admin role. Insufficient permission → exit code
 ## See also
 
 - Agent: `../../agents/jira-jsm.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/decision-tree.md` — when to use `mk-jira-jsm` vs `mk-jira-{issue,lifecycle,collaborate}` etc.
   - `references/itil-workflows.md` — ITIL 4 process implementations (incident / service-request / problem / change management)

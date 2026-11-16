@@ -49,7 +49,7 @@ List flagged items with file locations. Present:
 > - [flagged item 1] at [location]
 > - [flagged item 2] at [location]
 >
-> Run `the plan skill` to amend, or proceed with known gaps."
+> Run `$mk-plan-creator` to amend, or proceed with known gaps."
 
 Ask the user: "Plan has [N] unfinished sections. How to proceed?"
 - **"Amend first"** → stop review, user returns to plan-creator

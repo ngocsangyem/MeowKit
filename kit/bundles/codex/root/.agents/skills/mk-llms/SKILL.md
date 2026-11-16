@@ -17,7 +17,7 @@ Generate [llms.txt](https://llmstxt.org/) files — LLM-friendly markdown indexe
 - Publishing docs site and want AI discoverability
 - After major documentation updates (Phase 6 Reflect)
 
-Explicit: `the llms skill [path] [--full]`
+Explicit: `$mk-llms [path] [--full]`
 
 ## Workflow Integration
 

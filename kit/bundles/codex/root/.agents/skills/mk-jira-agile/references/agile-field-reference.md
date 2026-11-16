@@ -71,4 +71,4 @@ If your instance uses different IDs, you can:
 
 ## See Also
 
-- [jira-fields SKILL.md](../../jira-fields/SKILL.md) - Field discovery tools
+- [jira-fields SKILL.md](../../mk-jira-fields/SKILL.md) - Field discovery tools

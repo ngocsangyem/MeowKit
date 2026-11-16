@@ -4,7 +4,7 @@ Before producing findings, run every candidate through this filter.
 
 **Two modes:**
 
-**Daily mode (default, `the cso skill`):** 8/10 confidence gate. Zero noise. Only report what you're sure about.
+**Daily mode (default, `$mk-cso`):** 8/10 confidence gate. Zero noise. Only report what you're sure about.
 - 9-10: Certain exploit path. Could write a PoC.
 - 8: Clear vulnerability pattern with known exploitation methods. Minimum bar.
 - Below 8: Do not report.

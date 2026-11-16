@@ -7,10 +7,10 @@ These phases run after planning completes, regardless of bootstrap mode.
 
 **ACTION REQUIRED:** Activate mk-cook skill NOW with the plan path:
 
-- Full mode → `the cook skill [plan-path]` (interactive, all gates)
-- Auto mode → `the cook skill [plan-path] --auto`
-- Fast mode → `the cook skill [plan-path] --auto`
-- Parallel mode → `the cook skill [plan-path] --parallel`
+- Full mode → `$mk-cook [plan-path]` (interactive, all gates)
+- Auto mode → `$mk-cook [plan-path] --auto`
+- Fast mode → `$mk-cook [plan-path] --auto`
+- Parallel mode → `$mk-cook [plan-path] --parallel`
 
 mk-cook handles: TDD, implementation, review cycle, fix-first resolution.
 

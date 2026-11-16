@@ -30,7 +30,7 @@ researcher only; it never skips scout or the approval gate.
 
 1. Read `docs/project-context.md` for stack, conventions, and anti-patterns.
 2. If `[feature-or-module]` is supplied, limit the scout to that subtree.
-3. Invoke `the scout skill` and extract its architecture fingerprint, entry points, and
+3. Invoke `/mk-scout` and extract its architecture fingerprint, entry points, and
    dependency graph.
 4. Unless `--lean` is set, invoke the `researcher` agent for ecosystem conventions,
    CLI/MCP patterns, and credential-resolution norms.
@@ -125,8 +125,8 @@ status there, and scrub secrets before writing.
 ## Handoff and boundaries
 
 henshin stops after the spec. It may call `mk-scout` and the researcher during
-analysis, but it does not invoke `the plan-creator skill`, `the cook skill`,
-`the skill-creator skill`, or `the party skill` mid-flow.
+analysis, but it does not invoke `/mk-plan-creator`, `/mk-cook`,
+`/mk-skill-creator`, or `/mk-party` mid-flow.
 
 ```text
 Transformation Spec ready.

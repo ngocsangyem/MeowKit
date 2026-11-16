@@ -21,9 +21,9 @@ Forks to the `jira-estimator` agent. Read-only heuristic estimation. If a prior 
 ## See also
 
 - Agent: `../../agents/jira-estimator.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework,estimation-guide}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework,estimation-guide}.md`
 - Domain refs (cross-link, lives under jira-time):
-  - `../jira-time/references/estimation-guide.md` — story-point vs hours-based estimation tradeoffs
+  - `../mk-jira-time/references/estimation-guide.md` — story-point vs hours-based estimation tradeoffs
 - Peer intelligence: `mk-jira-evaluator` (run first for complexity signals), `mk-jira-analyst` (full ticket synthesis)
 - Peer execution: `mk-jira-issue` (`update --custom-fields '{"customfield_10016": N}'` writes the estimate), `mk-jira-fields` (discover instance-specific story-points field ID), `mk-planning-engine` (capacity analysis)
 

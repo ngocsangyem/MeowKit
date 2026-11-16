@@ -16,7 +16,7 @@ again; Skip and Reorder changes require notification plus audit log.
 ## When to Use
 
 - Once the plan is agreed, before Phase 2 (Test)
-- When `the cook skill` detects a COMPLEX task (auto-suggested)
+- When `/mk-cook` detects a COMPLEX task (auto-suggested)
 - When user wants to stress-test a plan before committing to implementation
 - When user says "validate this plan", "check my plan", "is this plan complete"
 
@@ -88,7 +88,7 @@ sweep_failures:
 
 ## Integration with Cook Workflow
 
-In `the cook skill`, validation runs automatically for COMPLEX tasks:
+In `/mk-cook`, validation runs automatically for COMPLEX tasks:
 
 ```
 plan agreed → mk-validate-plan → Phase 2 (Test)

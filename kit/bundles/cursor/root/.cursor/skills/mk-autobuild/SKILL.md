@@ -14,12 +14,12 @@ Step-file workflow that runs the complete generator/evaluator harness pipeline a
 ## When to Use
 
 Activate when:
-- User runs `the autobuild skill "build a X"` (or any green-field product description)
+- User runs `/mk-autobuild "build a X"` (or any green-field product description)
 - Existing kit detection routes a green-field "build me an app" intent here instead of `mk-cook`
 - A multi-hour autonomous build is requested with no manual handholding
 
 Skip when:
-- The task is a single feature, bug fix, or refactor → use `the cook skill` instead
+- The task is a single feature, bug fix, or refactor → use `/mk-cook` instead
 - The task is a doc update → use the existing doc skills
 - The request is "explain X" or "review Y" → use the appropriate single-shot skill
 
@@ -107,7 +107,7 @@ ended: 2026-04-08T15:18:00Z
 - **Iteration loops are bounded.** Max 3 by default. After round 3, escalate — don't keep iterating blindly.
 - **Budget check is authoritative.** If `budget-tracker.sh` says block, the autobuild workflow halts even mid-iteration.
 - **Run reports are append-only.** Don't edit prior steps' entries — the report is the audit trail.
-- **Resumable.** If the autobuild workflow is killed mid-run, `the autobuild skill --resume {run-id}` picks up at the last completed step.
+- **Resumable.** If the autobuild workflow is killed mid-run, `/mk-autobuild --resume {run-id}` picks up at the last completed step.
 
 ## `--advice` (composable, off by default)
 
@@ -143,11 +143,11 @@ flag is present).
 | `references/agent-teams-vs-sub-task.md` | When to use teams vs file-based sub-task |
 | `scripts/density-select.sh` | Standalone density selector for scriptable use |
 | `scripts/budget-tracker.sh` | Cost-log reader; threshold warnings + hard block |
-| `../plan-creator/` | Planner stage (Step 1) — product-level planner |
-| `../sprint-contract/` | Contract stage (Step 2) — contract negotiation |
-| `../rubric/` | Rubric stage (Step 2/4) — rubric library |
-| `../evaluate/` | Evaluator stage (Step 4) — behavioral evaluator |
-| `../scale-routing/` | Tier + density emission |
+| `../mk-plan-creator/` | Planner stage (Step 1) — product-level planner |
+| `../mk-sprint-contract/` | Contract stage (Step 2) — contract negotiation |
+| `../mk-rubric/` | Rubric stage (Step 2/4) — rubric library |
+| `../mk-evaluate/` | Evaluator stage (Step 4) — behavioral evaluator |
+| `../mk-scale-routing/` | Tier + density emission |
 | `references/advice-checkpoints.md` | `--advice` checkpoint boundaries, caps, and what supervision may not touch |
 
 ## Start

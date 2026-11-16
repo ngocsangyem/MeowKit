@@ -19,7 +19,7 @@ detect, (scout if `--deep`), map, rewrite — grounded in 7 source docs
 - Want to see WHY a prompt was rewritten: append `--analyze`.
 - Want a numeric quality score on the original prompt: append `--score` (auto-promotes to `--analyze --score`).
 - For codebase-aware suggestions: append `--deep` (opt-in only).
-- Explicit: `the prompt-enhancer skill [--analyze] [--score] [--deep] [--save-to <path>] [text]`.
+- Explicit: `$mk-prompt-enhancer [--analyze] [--score] [--deep] [--save-to <path>] [text]`.
 - Architecture-review prompts: use the recipe in `references/architecture-review-mode.md` via `--analyze --deep` — it rewrites the prompt to ASK for a review; it never performs one (that is `mk-review`). Recipe is opt-in via those flags; default-mode output is unchanged.
 
 ## When NOT to use
