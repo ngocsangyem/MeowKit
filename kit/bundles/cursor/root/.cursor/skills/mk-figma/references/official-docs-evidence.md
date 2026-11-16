@@ -3,7 +3,7 @@
 Claim → official-doc source matrix. Every capability claim the skill makes must trace to a row here or
 to the strategy audit; unbacked behavior is labeled UNCERTAIN. Support file — load when auditing a claim.
 
-URLs verified at the audit date recorded below; re-verify on the next skill audit.
+URLs were checked on the audit date recorded below.
 
 ## Contents
 

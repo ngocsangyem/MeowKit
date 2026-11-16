@@ -63,7 +63,7 @@ not `completed`, `cancelled` or `archived`:
   I report on?", one option per plan labelled with its title and created date. Never pick the
   most recent one silently — an unrelated plan's report reads as this plan's status.
 
-## 2. Delegate to the project-manager agent
+## 2. Once the plan is resolved, delegate to the project-manager agent
 
 Invoke `project-manager` with the resolved plan directory:
 

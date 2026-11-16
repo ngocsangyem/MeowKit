@@ -7,7 +7,7 @@ How `--html --explain`, `--html --diagram`, `--html --slides` produce a single s
 - Required reads
 - Workflow — Think / Structure / Style / Deliver
 - Style presets (names only)
-- Theme toggle (MANDATORY)
+- Theme toggle (required)
 - Zoom and pan engine (for diagrams)
 - Slide engine (for slides)
 - CDN resources
@@ -21,8 +21,8 @@ How `--html --explain`, `--html --diagram`, `--html --slides` produce a single s
 
 Before generating any HTML output:
 
-- `mk:frontend-design/references/anti-slop-directives.md` — MANDATORY. The 6+ forbidden patterns.
-- `references/mermaid-essentials.md` — MANDATORY when the page contains a Mermaid block.
+- `mk:frontend-design/references/anti-slop-directives.md` — required. The 6+ forbidden patterns.
+- `references/mermaid-essentials.md` — required when the page contains a Mermaid block.
 
 These are CITED, not duplicated here. If `frontend-design`'s anti-slop list grows, this skill picks up the change automatically.
 
@@ -61,7 +61,7 @@ Pick one; agent fills in the actual CSS by combining the chosen palette + typogr
 
 The preset name is a directive to the agent; full CSS is composed at generation time using the rotation strategy below.
 
-## Theme toggle (MANDATORY)
+## Theme toggle (required)
 
 Every HTML artifact MUST include a fixed top-right toggle button with persistent localStorage state. The button is the first child of `<body>`.
 

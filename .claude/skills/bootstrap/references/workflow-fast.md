@@ -10,19 +10,19 @@ Auto: `git init && git add -A && git commit -m "chore: initial commit"`
 
 Spawn 6 researcher subagents in parallel (all ≤150 lines):
 
-**IMPORTANT:** Include save path in each researcher's prompt:
+Include the save path in each researcher's prompt:
 - "Research [topic]. Save report to tasks/reports/researcher-01-[topic-slug].md"- 2 researchers: validate idea + competition
 - 2 researchers: tech stack recommendation + best practices
 - 2 researchers: design patterns + architecture reference
 
 No gate — merge findings and proceed IMMEDIATELY to Step 2.
 
-## Step 2: Planning (MANDATORY — comes BEFORE scaffolding)
+## Step 2: Planning (before scaffolding)
 
 **Pre-condition:** Research reports and design guidelines from prior steps already exist.
 Plan-creator will detect these and skip its own discovery step (no duplicate research).
 
-**ACTION REQUIRED:** Activate mk:plan-creator skill NOW:
+Activate mk:plan-creator skill:
 
 ```
 /mk:plan-creator [requirements summary] --fast
@@ -36,16 +36,16 @@ The plan defines WHAT gets scaffolded in Step 3.
 ## Step 3: Scaffold Files (guided by plan)
 
 1. Auto-detect or select stack from research findings
-2. Follow the plan's architecture + `references/scaffolding-principles.md`
+2. Follow the plan's architecture and the scaffolding principles
 3. Generate all: config → source → tests (progressive but no user confirmation)
 4. Validate with `scripts/validate-bootstrap.sh`
 5. Save config.json
 
 **After scaffold validates: proceed IMMEDIATELY to Step 4. Do NOT stop.**
 
-## Step 4: Implementation → Docs (MANDATORY)
+## Step 4: Implementation → Docs
 
-**ACTION REQUIRED:** Load `references/shared-phases.md` and execute ALL phases:
+Then run the shared phases (implementation → docs → final report) in order:
 
 1. **Phase A:** Activate mk:cook skill: `/mk:cook [plan-path] --auto`
 2. **Phase B:** Activate mk:docs-init for documentation

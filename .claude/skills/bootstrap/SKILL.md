@@ -62,7 +62,7 @@ Parse first flag from arguments:
 - `--parallel` → load `references/workflow-parallel.md`
 - default → load `references/workflow-auto.md`
 
-Each workflow file defines the exact steps for that mode. After plan + scaffold, all modes load `references/shared-phases.md` for implementation → docs → final report.
+Each workflow file defines the exact steps for that mode. Load `references/scaffolding-principles.md` with it for the scaffold step, and `references/shared-phases.md` for implementation → docs → final report after plan + scaffold.
 
 ## Planning BEFORE Scaffolding
 

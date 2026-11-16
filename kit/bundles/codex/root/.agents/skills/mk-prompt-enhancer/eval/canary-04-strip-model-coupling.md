@@ -45,7 +45,7 @@ Reasoning: high
 ### Improvement Suggestions
 
 - Strip ALL XML tags; replace with plain markdown `CONTEXT:` / `CONSTRAINTS:` / etc.
-- Remove "think step by step" line (Codex Opus 4.5+ self-calibrates; on Codex it's noise).
+- Remove "think step by step" line (capable-tier models self-calibrate; on Codex it's noise).
 - Remove "Reasoning: high" line (Gemini-only token; ignored on other models).
 - Add ACCEPTANCE CRITERIA per playbook #4.
 - Add OUTPUT FORMAT per playbook #5 (auto-suggest MEDIUM freedom level for a feature add).

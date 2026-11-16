@@ -181,7 +181,7 @@ For profiling, video, diffing, iOS, HAR, batch, dashboard, and JS eval patterns,
 
 ## Specialized Workflow Router
 
-Do not skip upstream specialized skills. For these intents, read [references/specialized-workflows.md](references/specialized-workflows.md) before acting:
+Do not skip upstream specialized skills. For these intents, read [references/specialized-workflows.md](references/specialized-workflows.md) before acting (for exploratory QA also [references/dogfood-issue-taxonomy.md](references/dogfood-issue-taxonomy.md); for Slack also [references/slack-workflows.md](references/slack-workflows.md)):
 
 | Intent | Upstream skill covered | Trigger examples |
 |---|---|---|

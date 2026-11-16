@@ -18,7 +18,7 @@ Continue until 100% clear on: what the project does, who uses it, key features, 
 
 Spawn 2-4 researcher sub-task in parallel. Each report ≤150 lines.
 
-**IMPORTANT:** Include save path in each researcher's prompt:
+Include the save path in each researcher's prompt:
 - "Research [topic]. Save report to tasks/reports/researcher-01-[topic-slug].md"- Researcher 1: Validate the idea — does this already exist? Competition?
 - Researcher 2: Tech stack options — what frameworks/libraries fit?
 - Researcher 3+: Domain-specific research (only if needed — auth, payments, etc.)
@@ -40,12 +40,12 @@ If frontend work detected:
 
 **After ALL gates pass: proceed IMMEDIATELY to Step 4. Do NOT stop.**
 
-## Step 4: Planning (MANDATORY — comes BEFORE scaffolding)
+## Step 4: Planning (before scaffolding)
 
 **Pre-condition:** Research reports and design guidelines from prior steps already exist.
 Plan-creator will detect these and skip its own discovery step (no duplicate research).
 
-**ACTION REQUIRED:** Activate mk-plan-creator skill NOW:
+Activate mk-plan-creator skill:
 
 ```
 the plan-creator skill [requirements summary] --hard
@@ -62,7 +62,7 @@ Optional: activate mk-plan-ceo-review on the plan for product-level review.
 
 ## Step 5: Scaffold Files (guided by plan)
 
-Follow the plan's architecture + `references/scaffolding-principles.md`:
+Follow the plan's architecture and the scaffolding principles:
 1. Generate directory tree matching plan's file structure → print → user confirms
 2. Config files → source scaffolds → test scaffolds (progressive)
 3. Validate with `scripts/validate-bootstrap.sh`
@@ -70,9 +70,9 @@ Follow the plan's architecture + `references/scaffolding-principles.md`:
 
 **After scaffold validates: proceed IMMEDIATELY to Step 6. Do NOT stop.**
 
-## Step 6: Implementation → Docs (MANDATORY)
+## Step 6: Implementation → Docs
 
-**ACTION REQUIRED:** Load `references/shared-phases.md` and execute ALL phases:
+Then run the shared phases (implementation → docs → final report) in order:
 
 1. **Phase A:** Activate mk-cook skill: `/mk-cook [plan-path]` (interactive mode)
 2. **Phase B:** Activate mk-docs-init for documentation

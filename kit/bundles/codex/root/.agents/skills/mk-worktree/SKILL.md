@@ -146,11 +146,11 @@ node .agents/skills/mk-worktree/scripts/worktree.cjs review-pr-cleanup --sweep -
 ## Safety Rules
 
 - NEVER create worktrees on `main` or `master` — only on feature branches
-- ALWAYS cleanup worktrees after merge (don't leave stale worktrees)
+- Clean up worktrees after merge — stale ones keep their branches checked out
 - NEVER force-delete a worktree with uncommitted changes — commit or stash first
 - NEVER force-push from a worktree — it affects the shared `.git`
-- ALWAYS check `.worktrees/` is in `.gitignore` before creating the first worktree
-- ALWAYS release `mk-task-queue` task ownership before calling cleanup
+- Check `.worktrees/` is in `.gitignore` before creating the first worktree
+- Release `mk-task-queue` task ownership before calling cleanup, or the task stays claimed
 
 ## Integration
 
