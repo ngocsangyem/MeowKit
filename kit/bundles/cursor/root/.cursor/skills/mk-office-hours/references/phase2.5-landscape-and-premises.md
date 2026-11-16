@@ -1,3 +1,10 @@
+## Contents
+
+- [Phase 2.5: Related Design Discovery](#phase-25-related-design-discovery)
+- [Phase 2.75: Landscape Awareness](#phase-275-landscape-awareness)
+- [Phase 3: Premise Challenge](#phase-3-premise-challenge)
+- [Phase 3.5: Adversarial Second Opinion (optional)](#phase-35-adversarial-second-opinion-optional)
+
 # Phase 2.5: Related Design Discovery
 
 After the user states the problem (first question in Phase 2A or 2B), search existing design docs for keyword overlap.

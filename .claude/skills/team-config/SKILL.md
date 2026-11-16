@@ -74,7 +74,7 @@ See `templates/ownership-map-template.md` for the format agents use to declare f
 - **Overlapping ownership kills parallelism** — if two subtasks need the same file, they can't be parallel. Restructure the decomposition or handle the shared file in a sequential pre-step
 - **Worktree naming with special characters** — skill names with `:` (e.g., `mk:review`) need quoting in shell paths
 - **Stale worktrees from crashed sessions** — run `git worktree list` to check for orphaned worktrees before creating new ones
-- **Integration test is mandatory** — after merging all worktrees, the full test suite MUST pass. Don't skip this
+- **Run the full test suite after merging all worktrees** — each worktree passed alone, so a failure here is the first sign of a conflict between them.
 
 ## Teardown
 

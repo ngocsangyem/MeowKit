@@ -15,7 +15,7 @@ Structured step-by-step reasoning with hypothesis generation, elimination, and r
 - Architecture decisions with multiple trade-offs
 - Any situation where "I think it's X" needs evidence before acting
 
-**Do NOT use for:** trivial fixes (typo, lint), single-file changes with obvious cause.
+**Do not use for:** trivial fixes (typo, lint), single-file changes with obvious cause.
 
 ## Process
 

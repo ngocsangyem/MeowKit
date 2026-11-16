@@ -42,7 +42,7 @@ history, tool output, and active edits live elsewhere.
 
 ## Workflow
 
-The slash command runs the pipeline:
+The skill runs the pipeline:
 
 ```bash
 SCAN_ROOT="${1:-$PWD}"

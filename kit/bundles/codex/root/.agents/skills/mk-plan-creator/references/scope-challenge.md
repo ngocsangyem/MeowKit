@@ -32,7 +32,7 @@ During scope challenge, if the task domain matches, suggest the relevant skill:
 | Schema, migration, query, index, or ORM data-access boundary | `mk-database` — data invariants, safe evolution, query evidence |
 | Infrastructure, containers, CI/CD, deployment safety, rollback | `mk-devops` — infrastructure change safety and delivery |
 
-Surface the suggestion as: "This looks like an [ops/API design] task — consider activating `mk:[skill]` before planning."
+Surface the suggestion as: "This looks like an [ops/API design] task — consider activating `mk-[skill]` before planning."
 
 ## Output
 After scope challenge: state the chosen mode and proceed to research (if needed) or plan drafting.

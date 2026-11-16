@@ -45,7 +45,7 @@ Match symptom to technique. Load the reference only after matching.
 | Bloated system, remove > add, simplify by subtraction | Via Negativa             | `references/via-negativa.md`             |
 | Unsure which applies                                  | Dispatch flowchart       | `references/when-stuck.md`               |
 
-## Do NOT use for
+## Do not use for
 
 - **Anything broken / needing a fix** — use `mk:fix` (top-level orchestrator; invokes scout + investigate + sequential-thinking, adds regression tests, writes to memory).
 - **Pure diagnostic reasoning without fix intent** — use `mk:sequential-thinking` directly (evidence-based hypothesis testing).

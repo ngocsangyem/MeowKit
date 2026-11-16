@@ -1,6 +1,6 @@
-# Phase 4: Alternatives Generation (MANDATORY)
+# Phase 4: Alternatives Generation (required)
 
-Produce 2-3 distinct implementation approaches. This is NOT optional.
+Produce 2-3 distinct implementation approaches. Every run produces them, because one approach leaves the user nothing to compare.
 
 ## Contents
 
@@ -33,7 +33,7 @@ Rules:
 
 **RECOMMENDATION:** Choose [X] because [one-line reason].
 
-Present via AskUserQuestion. Do NOT proceed without user approval of the approach.
+Present via AskUserQuestion. Wait for the user to approve an approach before going on.
 
 ---
 

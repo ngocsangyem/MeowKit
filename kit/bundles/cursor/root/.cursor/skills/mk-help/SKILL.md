@@ -19,7 +19,7 @@ one-line rationale. This skill is read-only: it reads state, never writes it.
 
 ### 1. Paused Step-File Workflows
 Check `.meowkit/state/*-progress.json` for any in-progress step-file workflow.
-- Found → "Resume [skill] at step [N]. Run `/mk:[skill]` to continue."
+- Found → "Resume [skill] at step [N]. Use the `mk-[skill]` skill to continue."
 
 ### 2. In-Progress Plans
 Check `tasks/plans/` for plan files without matching review verdicts.
@@ -56,7 +56,7 @@ on a missing source.
 | 10 | `docs/development-roadmap.md` (when present; Type-1 allowlisted) | current phase / milestone progress | skip; tag `(CF-C5)` if relied on |
 
 **Model tier:** source the current tier from `.meowkit/state/detected-model.json` (written
-fresh at the start of the session). Do NOT source `model_tier` from `budget-state.json` — it has no
+fresh at the start of the session). Do not source `model_tier` from `budget-state.json` — it has no
 `created_at`/session marker and may carry a prior session's tier. Treat budget figures as
 advisory unless a current-session signal corroborates them.
 
@@ -78,7 +78,7 @@ Collect candidates from all sources, then rank:
    the rank-1 rationale (does not by itself create a rank).
 5. **Clean state** → the existing fallback table (start a task / retro / ask).
 
-Each candidate's rationale MUST cite the source file(s) it came from.
+Each candidate's rationale cites the source file(s) it came from, so the user can check it.
 
 For skill suggestions based on task type, see `mk-agent-detector` (its `../agent-detector/references/lifecycle-routing.md` maps task patterns to skills).
 

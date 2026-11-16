@@ -12,7 +12,8 @@ const { frontmatterValue, keyLine, tomlValue } = require('./instruction-criteria
 const TOKENS = JSON.parse(fs.readFileSync(path.join(__dirname, 'host-foreign-tokens.json'), 'utf8')).tokens;
 
 /** Skill references: bundles invoke `mk-x`; Claude Code names skills `mk:x`. */
-const BUNDLE_COLON_NAME = /(?<![/\w])mk:[a-z][a-z0-9-]*/g;
+// Also catches the slash form (`/mk:x`) and a bracketed placeholder (`mk:[skill]`).
+const BUNDLE_COLON_NAME = /(?<![/\w])\/?mk:(?:\[[a-z-]+\]|[a-z][a-z0-9-]*)/g;
 const CLAUDE_HYPHEN_INVOCATION = /(?<![\w/.-])[/$]mk-[a-z][a-z0-9-]*/g;
 
 /** Standing re-check wording that makes current models over-verify. */

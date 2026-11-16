@@ -21,7 +21,7 @@ Hypothesis → prediction → experiment → evidence → revise. The discipline
 
 ## Prediction Requirement
 
-Predictions MUST differentiate hypothesis-true from hypothesis-false. If both outcomes produce the same observation, the prediction is useless. The value of the experiment is in what it _could_ falsify.
+Predictions must differentiate hypothesis-true from hypothesis-false. If both outcomes produce the same observation, the prediction is useless. The value of the experiment is in what it _could_ falsify.
 
 ## Process
 
