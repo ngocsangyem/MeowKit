@@ -18,7 +18,7 @@ The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load 
 
 ## Install
 
-`mewkit setup` auto-installs from `.cursor/skills/mk-confluence/scripts/requirements.txt`:
+`mewkit skill env confluence` installs from `.cursor/skills/mk-confluence/scripts/requirements.txt`:
 
 - `confluence-assistant-skills==0.2.0` — distribution package; ships the `confluence-as` binary
 - `assistant-skills-lib==1.0.1` — transitive infra dep
@@ -43,7 +43,7 @@ The wrapper exits 3 if `MEOW_CONFLUENCE_SITE_URL` does not end in `.atlassian.ne
 | 1    | Sanitizer rejection (CQL) |
 | 2    | Plaintext credential fallback detected — move to `.env` |
 | 3    | Non-Cloud URL — Server/DC not supported |
-| 127  | `confluence-as` binary not installed — run `mewkit setup` |
+| 127  | `confluence-as` binary not installed — run `mewkit skill env confluence` |
 | 4-7  | confluence-as runtime errors (network, auth, validation, server) |
 | 130  | SIGINT |
 

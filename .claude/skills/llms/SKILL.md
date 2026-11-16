@@ -111,4 +111,4 @@ node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/generate-llm
 
 ## Gotchas
 
-- **Python venv required**: run `.claude/hooks/lib/setup-workflow` once from the project root before invoking this skill. Re-run after upgrading the toolkit.
+- **Python venv required**: run `mewkit skill env llms` once from the project root before invoking this skill. Re-run after upgrading the toolkit.

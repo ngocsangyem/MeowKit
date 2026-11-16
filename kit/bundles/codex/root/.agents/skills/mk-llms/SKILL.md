@@ -95,4 +95,4 @@ node .codex/scripts/skill-python.cjs .agents/skills/mk-llms/scripts/generate-llm
 
 ## Gotchas
 
-- **Python venv required**: run `mewkit setup` once from the project root before invoking this skill. Re-run after upgrading the toolkit.
+- **Python venv required**: run `mewkit skill env llms` once from the project root before invoking this skill. Re-run after upgrading the toolkit.

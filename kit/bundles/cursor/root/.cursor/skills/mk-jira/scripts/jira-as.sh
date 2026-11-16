@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Wraps the venv-local jira-as binary. Sources .env, translates
 # MEOW_JIRA_* → JIRA_* env, sets JIRA_OUTPUT=json default, then exec's.
-# Resolves to venv-local binary (NOT PATH) since `setup-workflow` installs
+# Resolves to venv-local binary (NOT PATH) since `mewkit skill env jira` installs
 # jira-as into .meowkit/envs/jira per skills-dependencies.ts.
 set -euo pipefail
 
@@ -11,7 +11,7 @@ ENV_FILE="$ROOT/.env"
 
 if [ ! -x "$JIRA_AS" ]; then
   echo "[mk:jira] jira-as not installed at $JIRA_AS" >&2
-  echo "[mk:jira] Run: setup-workflow    (auto-installs from .cursor/skills/jira/scripts/requirements.txt)" >&2
+  echo "[mk:jira] Run: mewkit skill env jira    (installs from .cursor/skills/jira/scripts/requirements.txt)" >&2
   exit 127
 fi
 

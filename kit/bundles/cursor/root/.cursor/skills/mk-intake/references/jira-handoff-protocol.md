@@ -43,7 +43,7 @@ jira-as not installed (or the project's .env not populated). Apply these changes
 - Assign to [username]
 - Set Fix Version to [version]
 
-Or run `mewkit setup` then populate .env from .env.example to enable the mk-jira-* family.
+Or run `mewkit skill env jira` then populate .env from .env.example to enable the mk-jira-* family.
 ```
 
 ## Safety Gate

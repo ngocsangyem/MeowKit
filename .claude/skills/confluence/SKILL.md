@@ -79,7 +79,7 @@ See `references/install-and-auth.md` for one-time setup (`mewkit skill env confl
 - `scripts/confluence-as.sh` — env-translating wrapper (`MEOW_CONFLUENCE_*` → `CONFLUENCE_*`, sets `CONFLUENCE_OUTPUT=json`, refuses settings.local.json fallback, gates non-Cloud URLs)
 - `scripts/cql-sanitize.sh` — CQL injection guard for user-derived input
 - `scripts/adf-to-md.sh` + `scripts/adf_to_md.py` — macro-aware ADF→Markdown walker (panel, decisionList/Item, taskList/Item, expand, mention, media, inlineCard preserved with explicit labels)
-- `scripts/requirements.txt` — pip dependency manifest auto-discovered by `.claude/hooks/lib/setup-workflow`
+- `scripts/requirements.txt` — pip dependency manifest read by `mewkit skill env confluence`
 - `scripts/smoke-live.sh` — manual live-creds smoke test
 - `references/install-and-auth.md` — env vars, setup, Cloud-only gate, escape hatch
 - `references/cli-idioms.md` — wrapper invocation patterns + safe-invocation rules + conversion-helper idioms

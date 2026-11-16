@@ -16,7 +16,7 @@ LOCAL_SETTINGS="$ROOT/.codex/settings.local.json"
 
 if [ ! -x "$CONFLUENCE_AS" ]; then
   echo "[mk:confluence] confluence-as not installed at $CONFLUENCE_AS" >&2
-  echo "[mk:confluence] Run: .codex/scripts/bin/setup-workflow    (auto-installs from .agents/skills/confluence/scripts/requirements.txt)" >&2
+  echo "[mk:confluence] Run: mewkit skill env confluence    (installs from .agents/skills/confluence/scripts/requirements.txt)" >&2
   exit 127
 fi
 

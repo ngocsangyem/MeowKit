@@ -16,7 +16,7 @@ LOCAL_SETTINGS="$ROOT/.mcp.json"
 
 if [ ! -x "$CONFLUENCE_AS" ]; then
   echo "[mk:confluence] confluence-as not installed at $CONFLUENCE_AS" >&2
-  echo "[mk:confluence] Run: setup-workflow    (auto-installs from .cursor/skills/confluence/scripts/requirements.txt)" >&2
+  echo "[mk:confluence] Run: mewkit skill env confluence    (installs from .cursor/skills/confluence/scripts/requirements.txt)" >&2
   exit 127
 fi
 
