@@ -58,7 +58,7 @@ Check `REPO_MODE` from the preamble output.
 
 **If REPO_MODE is `solo`:**
 
-Use stop and ask the user in chat:
+Ask the user:
 
 > These test failures appear pre-existing (not caused by your branch changes):
 >
@@ -73,7 +73,7 @@ Use stop and ask the user in chat:
 
 **If REPO_MODE is `collaborative` or `unknown`:**
 
-Use stop and ask the user in chat:
+Ask the user:
 
 > These test failures appear pre-existing (not caused by your branch changes):
 >
@@ -96,7 +96,7 @@ Use stop and ask the user in chat:
 - Continue with the workflow.
 
 **If "Add as P0 TODO":**
-- If `TODOS.md` exists, add the entry following the format in `review/TODOS-format.md` (or `.cursor/skills/review/TODOS-format.md`).
+- If `TODOS.md` exists, add the entry following the TODOS.md format (items under `## <Skill/Component>` headings, each with a `**Priority:**` field (P0–P4), and a `## Completed` section at the bottom).
 - If `TODOS.md` does not exist, create it with the standard header and add the entry.
 - Entry should include: title, the error output, which branch it was noticed on, and priority P0.
 - Continue with the workflow — treat the pre-existing failure as non-blocking.

@@ -3,7 +3,7 @@ name: confluence-spec-analyst
 description: 'mk:confluence executor for mk:confluence-spec-analyst. Spec report reading.'
 tools: Bash, Read, Grep, Glob, Write, Edit
 disallowedTools: Edit
-model: claude-opus-5
+model: opus
 permissionMode: default
 memory: project
 color: cyan

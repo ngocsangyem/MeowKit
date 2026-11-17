@@ -1,6 +1,6 @@
 ---
 name: "mk-qa-manual"
-description: "Spec-driven manual QA and Playwright E2E generation: navigates apps like a human tester, producing reports or .spec.ts files. Prompts for credentials. NOT for autonomous flows (mk:agent-browser)."
+description: "Runs manual QA and writes Playwright .spec.ts from a spec. NOT for mk-qa."
 ---
 
 <!-- Design decisions:
@@ -21,10 +21,10 @@ Orchestrates browser skills to act like a human tester: navigate, interact, veri
 **Trigger:** "test this flow", "QA this page", "generate E2E tests", "test login flow", "manual testing", "write Playwright tests for"
 
 **Explicit:**
-- `the qa-manual skill tasks/plans/260315-auth-flow.md --report` → manual QA report
-- `the qa-manual skill tasks/plans/260315-checkout.md --generate` → Playwright .spec.ts
-- `the qa-manual skill https://app.example.com` → explore and test from URL
-- `the qa-manual skill [spec]` → auto-detect use case from spec content
+- `/mk-qa-manual tasks/plans/260315-auth-flow.md --report` → manual QA report
+- `/mk-qa-manual tasks/plans/260315-checkout.md --generate` → Playwright .spec.ts
+- `/mk-qa-manual https://app.example.com` → explore and test from URL
+- `/mk-qa-manual [spec]` → auto-detect use case from spec content
 
 ## Workflow Integration
 
@@ -36,10 +36,10 @@ Each action uses the best browser skill:
 
 | Action | Skill | Why |
 |--------|-------|-----|
-| DOM interaction (click, fill, type) | `mk:playwright-cli` | Generates Playwright code as side-effect |
-| Navigation + page load | `mk:playwright-cli` | goto + wait, code output |
-| Visual verification (screenshot) | `mk:agent-browser` | Annotated snapshots |
-| Auth flow (login, session, MFA) | `mk:agent-browser` | Session persistence, auth import |
+| DOM interaction (click, fill, type) | `mk-playwright-cli` | Generates Playwright code as side-effect |
+| Navigation + page load | `mk-playwright-cli` | goto + wait, code output |
+| Visual verification (screenshot) | `mk-agent-browser` | Annotated snapshots |
+| Auth flow (login, session, MFA) | `mk-agent-browser` | Session persistence, auth import |
 | Execute Playwright test | Script: `npx playwright test` | Deterministic |
 
 ## Authentication Protocol
@@ -50,14 +50,14 @@ Each action uses the best browser skill:
 2. **Show user:**
    ```
    ⚠️ Authentication required at: [current URL]
-   mk:qa-manual needs credentials to continue.
+   mk-qa-manual needs credentials to continue.
    Please provide:
    - Username/email: ___________
    - Password: ___________
    Type 'skip' to skip this flow or 'abort' to stop testing.
    ```
 3. **WAIT** for user input — do NOT proceed without it
-4. On credentials → fill form using `mk:playwright-cli`, continue flow
+4. On credentials → fill form using `mk-playwright-cli`, continue flow
 5. On 'skip' → mark flow SKIPPED, move to next
 6. On 'abort' → end session, output partial report
 

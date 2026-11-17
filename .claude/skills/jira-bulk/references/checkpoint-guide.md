@@ -2,6 +2,17 @@
 
 How to use checkpoints for reliable large-scale operations.
 
+## Contents
+
+- [When to Enable Checkpoints](#when-to-enable-checkpoints)
+- [How Checkpoints Work](#how-checkpoints-work)
+- [Usage](#usage)
+- [Storage Details](#storage-details)
+- [Cleanup](#cleanup)
+- [Combining with Batch Size](#combining-with-batch-size)
+- [Troubleshooting](#troubleshooting)
+- [Related Documentation](#related-documentation)
+
 ---
 
 ## When to Enable Checkpoints

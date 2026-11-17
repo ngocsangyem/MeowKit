@@ -2,6 +2,18 @@
 
 Copy-paste JQL queries for common time tracking scenarios.
 
+## Contents
+
+- [Personal Time Queries](#personal-time-queries)
+- [Team Time Queries](#team-time-queries)
+- [Estimate Accuracy Queries](#estimate-accuracy-queries)
+- [Stale Work Detection](#stale-work-detection)
+- [Billable Tracking Queries](#billable-tracking-queries)
+- [Time Threshold Queries](#time-threshold-queries)
+- [Worklog Search Queries](#worklog-search-queries)
+- [Compliance Monitoring](#compliance-monitoring)
+- [Date-Based Queries](#date-based-queries)
+
 ---
 
 ## Personal Time Queries

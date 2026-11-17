@@ -1,13 +1,12 @@
 # Angular Ssr
 
-> Part of mk:angular skill. Read when: working with ssr.
+> Part of mk-angular skill. Read when: working with ssr.
 > Source: analogjs/angular-skills/angular-ssr (MIT)
 
 ## Contents
 
 - [Core Patterns](#core-patterns)
 - [Advanced Patterns](#advanced-patterns)
-
 
 ## Core Patterns
 

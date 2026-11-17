@@ -10,7 +10,7 @@ Auto: `git init && git add -A && git commit -m "chore: initial commit"` (no user
 
 Spawn 2-3 researcher sub-task in parallel. Each report ≤150 lines.
 
-**IMPORTANT:** Include save path in each researcher's prompt:
+Include the save path in each researcher's prompt:
 - "Research [topic]. Save report to tasks/reports/researcher-01-[topic-slug].md"- Researcher 1: Validation + competition scan
 - Researcher 2: Tech stack recommendation
 - Researcher 3: Design patterns for this domain (if applicable)
@@ -20,7 +20,7 @@ No gate — proceed automatically to Step 2.
 ## Step 2: Tech Stack
 
 1. Run `scripts/detect-stack.sh`
-2. If new project: use mk:brainstorming to evaluate options (quick mode)
+2. If new project: use mk-brainstorming to evaluate options (quick mode)
 3. Auto-select best option from research findings
 4. No gate — proceed automatically to Step 3.
 
@@ -35,18 +35,18 @@ If no frontend: skip to Step 4.
 
 **After design approval (or skip): proceed IMMEDIATELY to Step 4. Do NOT stop.**
 
-## Step 4: Planning (MANDATORY — comes BEFORE scaffolding)
+## Step 4: Planning (before scaffolding)
 
 **Pre-condition:** Research reports from Step 1 and design guidelines from Step 3 already exist.
 Plan-creator will detect these and skip its own discovery step (DRY — no duplicate research).
 
-**ACTION REQUIRED:** Activate mk:plan-creator skill NOW:
+Activate mk-plan-creator skill:
 
 ```
 the plan-creator skill [requirements summary] --auto
 ```
 
-mk:plan-creator will:
+mk-plan-creator will:
 - Detect existing research reports in `reports/` → skip discovery
 - Read `docs/design-guidelines.md` if exists → incorporate design decisions
 - Select workflow model (feature/bugfix/refactor/security)
@@ -60,7 +60,7 @@ The plan defines WHAT gets scaffolded in Step 5.
 
 ## Step 5: Scaffold Files (guided by plan)
 
-Follow the plan's architecture + `references/scaffolding-principles.md`:
+Follow the plan's architecture and the scaffolding principles:
 1. Generate directory tree matching plan's file structure → print → auto-confirm
 2. Config → source → tests (progressive)
 3. Validate with `scripts/validate-bootstrap.sh`
@@ -68,12 +68,12 @@ Follow the plan's architecture + `references/scaffolding-principles.md`:
 
 **After scaffold validates: proceed IMMEDIATELY to Step 6. Do NOT stop.**
 
-## Step 6: Implementation → Docs (MANDATORY)
+## Step 6: Implementation → Docs
 
-**ACTION REQUIRED:** Load `references/shared-phases.md` and execute ALL phases:
+Then run the shared phases (implementation → docs → final report) in order:
 
-1. **Phase A:** Activate mk:cook skill: `the cook skill [plan-path] --auto`
-2. **Phase B:** Activate mk:docs-init for documentation
+1. **Phase A:** Activate mk-cook skill: `$mk-cook [plan-path] --auto`
+2. **Phase B:** Activate mk-docs-init for documentation
 3. **Phase C:** Print final report and ask about commit
 
 **The bootstrap is NOT complete until all shared phases finish.**

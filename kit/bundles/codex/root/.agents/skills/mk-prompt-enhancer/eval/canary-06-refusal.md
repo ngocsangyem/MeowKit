@@ -25,7 +25,7 @@ Did you mean:
 - the brainstorming skill — generate options for a vague problem
 - the office-hours skill — explore whether to build something at all
 
-Re-run mk:prompt-enhancer with a draft prompt as input.
+Re-run mk-prompt-enhancer with a draft prompt as input.
 ```
 
 ### HARD-FAIL conditions

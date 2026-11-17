@@ -1,6 +1,6 @@
 ---
 name: mk:intake
-description: Classify and score an incoming ticket or PRD — product area, completeness, root cause, technical read. NOT for mk:breakdown.
+description: "Scores a ticket or PRD: area, completeness, root cause. NOT for mk:breakdown."
 phase: 0
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - completeness-scoring
   - triage
   - jira-linear-github
-when_to_use: A single Jira, Linear or GitHub item needs triage before anyone plans.
+when_to_use: "One Jira, Linear or GitHub item needs triage."
 user-invocable: true
 owner: research
 criticality: medium
@@ -135,7 +135,7 @@ Identify affected files, test coverage gaps, and implementation complexity.
 
 ### Step 8b: Jira enrichment
 
-If the `mk:jira-*` family is available (jira-as installed via `.claude/hooks/lib/setup-workflow` + `.meowkit/.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
+If the `mk:jira-*` family is available (jira-as installed via `mewkit skill env jira` + `.meowkit/.env` populated), load `references/jira-awareness.md` for metadata extraction and enhanced completeness scoring.
 Suggest `mk:jira-*` actions per `references/jira-handoff-protocol.md`.
 
 ### Step 9: Generate output

@@ -43,14 +43,14 @@ Ask these 3 questions (internally, don't need to ask user):
 
 | Complexity | Planning Mode | What Happens |
 |------------|--------------|-------------|
-| trivial | EXIT | Print: "Task is trivial. Use `the fix skill`." → STOP |
+| trivial | EXIT | Print: "Task is trivial. Use `$mk-fix`." → STOP |
 | simple | fast | Skip research + codebase analysis. Go to step-03. |
 | complex | hard | Full pipeline: research → analysis → plan + phases → red team → validation |
 | complex + 5+ dirs OR refactor+complex | deep | Hard pipeline + per-phase scouting after step-03 drafts phase files |
 
 **Override:** User can force mode via `--fast`, `--hard`, or `--deep` flag regardless of complexity.
 
-**Auto-detect `--deep`:** If complexity = complex AND (task affects 5+ directories OR workflow_model = refactor), suggest `--deep` via stop and ask the user in chat. User can accept or stay with `--hard`.
+**Auto-detect `--deep`:** If complexity = complex AND (task affects 5+ directories OR workflow_model = refactor), suggest `--deep` by asking the user. User can accept or stay with `--hard`.
 
 ### 0f. User Scope Input (Hard Mode Only)
 
@@ -58,7 +58,7 @@ Ask these 3 questions (internally, don't need to ask user):
 
 **Skip if:** `planning_mode = fast` or trivial.
 
-Present scope mode choice via `stop and ask the user in chat`. Header: "Scope Mode". Question: "How should I approach the scope for this plan?" Single-select. Options (recommended option first when one applies; otherwise leave neutral):
+Present scope mode choice by asking the user. Header: "Scope Mode". Question: "How should I approach the scope for this plan?" Single-select. Options (recommended option first when one applies; otherwise leave neutral):
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
@@ -85,7 +85,7 @@ After scope assessment, scan the task description for structural signals:
 | Task describes 3+ independent layers or modules (e.g., "DB layer", "API layer", "UI layer") | Suggest `--parallel` |
 | Task describes 2 alternatives or "X vs Y" framing (e.g., "monolith vs microservices") | Suggest `--two` |
 
-**If signal detected**, present via stop and ask the user in chat:
+**If signal detected**, present by asking the user:
 
 ```json
 {
@@ -112,8 +112,8 @@ Before committing to plan creation, classify the request:
 
 | Condition | Route |
 |---|---|
-| Relevant files/tests/contracts are unknown and no feature area is named | Run `mk:scout` first, then resume planning |
-| Architecture/tradeoff is undecided, or two credible approaches exist | Route to `mk:brainstorming` before planning |
+| Relevant files/tests/contracts are unknown and no feature area is named | Run `mk-scout` first, then resume planning |
+| Architecture/tradeoff is undecided, or two credible approaches exist | Route to `mk-brainstorming` before planning |
 | Touchpoints and approach are concrete enough to answer the 5-dimension contract | Continue planning directly |
 | Both approach and touchpoints are unclear | Refuse to draft implementation phases; ask for scout/brainstorm first |
 
@@ -137,7 +137,7 @@ Scan the original task description (case-insensitive) for **product-level intent
 **If a signal matches** AND no implementation context exists in the prompt
 (no file names, no class names, no "fix the X bug", no "refactor the Y module"):
 
-Present via `stop and ask the user in chat`. Header: "Plan Mode". Question: "This looks like a green-field product build. Should I produce a product-level spec (user stories, features, design language) or a traditional implementation plan?" Single-select.
+Present by asking the user. Header: "Plan Mode". Question: "This looks like a green-field product build. Should I produce a product-level spec (user stories, features, design language) or a traditional implementation plan?" Single-select.
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
@@ -157,7 +157,7 @@ Present via `stop and ask the user in chat`. Header: "Plan Mode". Question: "Thi
 - Task description contains a file path (e.g., `src/auth.ts`)
 - Task description names an existing module/class (e.g., `UserService`)
 - Task description starts with `fix`, `refactor`, `update`, `migrate`, `bump`
-- `task_complexity = trivial` (use `the fix skill` instead)
+- `task_complexity = trivial` (use `$mk-fix` instead)
 
 **Note:** `planning_mode = product-level` skips the EXPANSION/HOLD/REDUCTION scope question (it is product-level by definition — ambition is the default).
 
@@ -169,7 +169,7 @@ Present via `stop and ask the user in chat`. Header: "Plan Mode". Question: "Thi
 
 1. **Reject incompatible combinations:**
    - `--spike` + `--product-level` → emit "spike incompatible with --product-level" → STOP
-   - `--spike` + harness FULL density invocation → emit "spike incompatible with harness FULL — use --fast or mk:cook" → STOP
+   - `--spike` + harness FULL density invocation → emit "spike incompatible with harness FULL — use --fast or mk-cook" → STOP
 2. **Require timebox.** If `--timebox <duration>` flag absent (and no `timebox:` in frontmatter) → emit "spike requires --timebox (e.g., --timebox 2d)" → STOP
 3. **Set planning_mode = spike.** Override any auto-detected mode
 4. **Set frontmatter additions for plan.md:**

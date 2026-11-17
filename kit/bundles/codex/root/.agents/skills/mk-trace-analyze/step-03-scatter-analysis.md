@@ -12,15 +12,15 @@ Spawn up to 3 `researcher` sub-task in parallel, each analyzing one batch agains
 
 ### 3b. Spawn researcher sub-task in parallel
 
-For each batch (1 to `$batch_count`), dispatch a researcher via the Task tool. **Send ALL delegate a sub-task () calls in a single message** to actually parallelize:
+For each batch (1 to `$batch_count`), delegate the batch to the `researcher` agent. **Send all the delegations in a single message** to actually parallelize:
 
 ```
 delegate a sub-task (
-  subagent_type="researcher",
+  agent="researcher",
   description="Analyze trace batch {N} for error patterns",
   prompt="
     Read the error taxonomy at:
-      .agents/skills/trace-analyze/references/error-taxonomy.md
+      .agents/skills/mk-trace-analyze/references/error-taxonomy.md
 
     Read the batch records at:
       $analysis_dir/batch-{N}.jsonl

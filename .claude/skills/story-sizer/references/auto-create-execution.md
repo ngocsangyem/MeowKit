@@ -2,6 +2,16 @@
 
 Per-ticket two-call sequence invoked AFTER the single batch confirmation gate in Phase 6 returns `Yes`. **Re-enforces the v1 field whitelist** at call time (defense in depth even though Phase 6 already checked).
 
+## Contents
+
+- [Field Whitelist (v1)](#field-whitelist-v1)
+- [Two-Call Sequence (per story)](#two-call-sequence-per-story)
+- [Audit Comment Template](#audit-comment-template)
+- [Created Tickets Report Append](#created-tickets-report-append)
+- [Sequencing](#sequencing)
+- [Skill Rule of Two — call-time re-check](#skill-rule-of-two--call-time-re-check)
+- [What This File Does NOT Do](#what-this-file-does-not-do)
+
 ## Field Whitelist (v1)
 
 Allowed flags on `/mk:jira-issue create`:

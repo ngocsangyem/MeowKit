@@ -9,7 +9,7 @@ If yes: `git init && git add -A && git commit -m "chore: initial commit"`
 
 ## Step 1: Clarify Requirements
 
-Ask questions via stop and ask the user in chat — **one question at a time**, wait for answer before next.
+Ask questions by asking the user — **one question at a time**, wait for answer before next.
 Continue until 100% clear on: what the project does, who uses it, key features, constraints.
 
 **After clarity: proceed IMMEDIATELY to Step 2. Do NOT stop.**
@@ -18,7 +18,7 @@ Continue until 100% clear on: what the project does, who uses it, key features, 
 
 Spawn 2-4 researcher sub-task in parallel. Each report ≤150 lines.
 
-**IMPORTANT:** Include save path in each researcher's prompt:
+Include the save path in each researcher's prompt:
 - "Research [topic]. Save report to tasks/reports/researcher-01-[topic-slug].md"- Researcher 1: Validate the idea — does this already exist? Competition?
 - Researcher 2: Tech stack options — what frameworks/libraries fit?
 - Researcher 3+: Domain-specific research (only if needed — auth, payments, etc.)
@@ -30,7 +30,7 @@ Spawn 2-4 researcher sub-task in parallel. Each report ≤150 lines.
 ## Step 3: Tech Stack + Design
 
 1. Run `scripts/detect-stack.sh` for existing project markers
-2. If new project: activate mk:brainstorming --depth deep to explore stack options
+2. If new project: activate mk-brainstorming --depth deep to explore stack options
 3. **Gate:** User approves tech stack selection
 
 If frontend work detected:
@@ -40,12 +40,12 @@ If frontend work detected:
 
 **After ALL gates pass: proceed IMMEDIATELY to Step 4. Do NOT stop.**
 
-## Step 4: Planning (MANDATORY — comes BEFORE scaffolding)
+## Step 4: Planning (before scaffolding)
 
 **Pre-condition:** Research reports and design guidelines from prior steps already exist.
 Plan-creator will detect these and skip its own discovery step (no duplicate research).
 
-**ACTION REQUIRED:** Activate mk:plan-creator skill NOW:
+Activate mk-plan-creator skill:
 
 ```
 the plan-creator skill [requirements summary] --hard
@@ -56,13 +56,13 @@ The plan defines architecture, modules, file structure — guides what gets scaf
 
 > **Comprehensive bootstrap tip:** For projects spanning 5+ directories, use `--deep` instead of `--hard`. `--deep` provides per-phase file inventory and dependency maps, and triggers automatically when that many root dirs are detected. Gives the generator clearer scope boundaries across complex module layouts.
 
-Optional: activate mk:plan-ceo-review on the plan for product-level review.
+Optional: activate mk-plan-ceo-review on the plan for product-level review.
 
 **Once the plan is agreed: proceed IMMEDIATELY to Step 5. Do NOT stop.**
 
 ## Step 5: Scaffold Files (guided by plan)
 
-Follow the plan's architecture + `references/scaffolding-principles.md`:
+Follow the plan's architecture and the scaffolding principles:
 1. Generate directory tree matching plan's file structure → print → user confirms
 2. Config files → source scaffolds → test scaffolds (progressive)
 3. Validate with `scripts/validate-bootstrap.sh`
@@ -70,12 +70,12 @@ Follow the plan's architecture + `references/scaffolding-principles.md`:
 
 **After scaffold validates: proceed IMMEDIATELY to Step 6. Do NOT stop.**
 
-## Step 6: Implementation → Docs (MANDATORY)
+## Step 6: Implementation → Docs
 
-**ACTION REQUIRED:** Load `references/shared-phases.md` and execute ALL phases:
+Then run the shared phases (implementation → docs → final report) in order:
 
-1. **Phase A:** Activate mk:cook skill: `the cook skill [plan-path]` (interactive mode)
-2. **Phase B:** Activate mk:docs-init for documentation
+1. **Phase A:** Activate mk-cook skill: `$mk-cook [plan-path]` (interactive mode)
+2. **Phase B:** Activate mk-docs-init for documentation
 3. **Phase C:** Print final report and ask about commit
 
 **The bootstrap is NOT complete until all shared phases finish.**

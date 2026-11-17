@@ -1,6 +1,6 @@
 ---
 name: "mk-grill"
-description: "Relentlessly interview the user about THEIR plan, one question at a time, until shared understanding. Checkpoints answers so progress survives a reset. Do NOT use to propose solutions."
+description: "Grills the user on their plan one question at a time; use to stress-test it. NOT for mk-advise."
 ---
 
 # Grill
@@ -20,24 +20,24 @@ grill = "is this plan fully resolved?".
   "interrogate my plan / design".
 - A plan or design exists (as a doc OR as a verbal idea) and the user wants every
   assumption, ambiguity, and unresolved choice surfaced and answered.
-- Before handing a half-formed idea to `mk:skill-creator` or `mk:plan-creator` —
+- Before handing a half-formed idea to `mk-skill-creator` or `mk-plan-creator` —
   grill front-loads the tacit context so the build starts ~90% resolved, not 70%.
 
 ## When NOT to Use
 
 | Situation                                              | Use instead           |
 | ------------------------------------------------------ | --------------------- |
-| Propose / compare technical approaches                 | `mk:brainstorming`    |
-| "Is this worth building?" — product validation         | `mk:office-hours`     |
-| Codex should ANSWER questions about the repo          | `mk:ask-me`           |
-| One-shot review of an existing plan                    | `mk:plan-ceo-review`  |
-| Apply named reasoning lenses to existing findings      | `mk:elicit`           |
-| Constitution derived from the CODEBASE (not the human) | `mk:project-context`  |
+| Propose / compare technical approaches                 | `mk-brainstorming`    |
+| "Is this worth building?" — product validation         | `mk-office-hours`     |
+| Codex should ANSWER questions about the repo          | `mk-ask-me`           |
+| One-shot review of an existing plan                    | `mk-plan-ceo-review`  |
+| Apply named reasoning lenses to existing findings      | `mk-elicit`           |
+| Constitution derived from the CODEBASE (not the human) | `mk-project-context`  |
 
 ## Plan-First Boundary
 
 Grill produces a knowledge doc — it is a pre-planning elicitation step, the same
-class as `mk:office-hours` and `mk:brainstorming`, so it needs no plan of its own.
+class as `mk-office-hours` and `mk-brainstorming`, so it needs no plan of its own.
 It writes ONLY `docs/knowledge/<slug>.md`; it never writes code or implementation files.
 
 ## Entry — resolve the input
@@ -54,7 +54,7 @@ Then:
 
 - Compute `<slug>` — a short kebab-case name for the plan/design (e.g.
   `payment-retry-flow`). For path routing of the output file, follow
-  `mk:project-organization` (advisory mode): the canonical location is
+  `mk-project-organization` (advisory mode): the canonical location is
   `docs/knowledge/<slug>.md`.
 - Create `docs/knowledge/<slug>.md` from the Output Doc Template below (via
   `Write`). If it already exists, `Read` it and resume — append to the existing
@@ -63,7 +63,7 @@ Then:
 ## Core Loop (the signature mechanic)
 
 Run this loop. **Exactly ONE question per turn — never batch.** This is prose
-interrogation, deliberately NOT `stop and ask the user in chat` multi-question batching. One
+interrogation, deliberately NOT multi-question batching. One
 sharp question, wait, absorb, checkpoint, repeat.
 
 1. **Pick** the single highest-leverage unresolved branch — the one whose answer
@@ -135,11 +135,11 @@ forever. The user always holds the stop button.
 
 On confirmed wrap-up, present the three handoffs:
 
-1. **`mk:skill-creator`** — if the resolved design is a skill to build. Context is
+1. **`mk-skill-creator`** — if the resolved design is a skill to build. Context is
    front-loaded, so the build starts ~90% resolved.
-2. **`mk:plan-creator`** (or **`mk:brainstorming`** if approaches are still open) —
+2. **`mk-plan-creator`** (or **`mk-brainstorming`** if approaches are still open) —
    if it's a feature/system to plan or still needs solution exploration.
-3. **`mk:project-context`** — to merge the extracted human knowledge into the
+3. **`mk-project-context`** — to merge the extracted human knowledge into the
    project constitution.
 
 Offer all three; let the user pick. Grill itself does NOT auto-invoke the
@@ -149,7 +149,7 @@ downstream skill or generate its output — it only hands off.
 
 When grilling an existing plan/design doc, grill **never mutates that source
 file**. `docs/knowledge/<slug>.md` is the only output. Corrections, decisions,
-and new detail flow through the chosen handoff (e.g. `mk:plan-creator` updates the
+and new detail flow through the chosen handoff (e.g. `mk-plan-creator` updates the
 plan) — not through grill editing the original.
 
 ## Output Doc Template
@@ -188,9 +188,9 @@ plan) — not through grill editing the original.
 
 - **Batching questions** — the whole point is ONE question per turn. If you feel
   the urge to ask two, you have two turns, not one. Never reach for
-  `stop and ask the user in chat` (it isn't in `allowed-tools` for exactly this reason).
+  Ask the user (it isn't in `allowed-tools` for exactly this reason).
 - **Proposing instead of interrogating** — the moment you suggest the answer,
-  you've drifted into `mk:brainstorming`. Ask about the user's choice; don't make it.
+  you've drifted into `mk-brainstorming`. Ask about the user's choice; don't make it.
 - **Skipping the checkpoint** — "I'll write it all at the end" loses everything on
   a context reset. Write after every single answer; that's the survival mechanic.
 - **Papering over a gap** — a confident-sounding guess on something the user

@@ -63,7 +63,7 @@ Reject any artifact line containing a JWT, 32+ char hex, or AWS key prefix (`AKI
 ## Skill Rule of Two
 
 A skill must not satisfy all three of {process untrusted input · access sensitive data ·
-change state} at once. `mk:loop` satisfies two:
+change state} at once. `mk-loop` satisfies two:
 
 - **[A] Process untrusted input** — TRUE. Verify/Guard stdout is untrusted DATA.
 - **[B] Access sensitive data** — **MUST stay FALSE.**

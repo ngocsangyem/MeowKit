@@ -1,7 +1,7 @@
 ---
 name: mk:careful
 version: 0.1.0
-description: Session-scoped guardrails warning before destructive commands — rm -rf, DROP TABLE, force-push, reset --hard. NOT for mk:freeze.
+description: "Warns before rm -rf, DROP TABLE, force-push. NOT for mk:freeze."
 allowed-tools:
   - Bash
   - Read
@@ -20,7 +20,7 @@ keywords:
   - destructive-commands
   - prod-mode
   - guardrails
-when_to_use: Working against prod or a shared environment, or asked to be careful.
+when_to_use: "Working on prod or shared environments."
 user-invocable: true
 owner: research
 criticality: medium

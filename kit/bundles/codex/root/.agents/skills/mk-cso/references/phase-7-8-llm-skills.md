@@ -35,7 +35,7 @@ Use Grep to search all local skill SKILL.md files for suspicious patterns:
 - `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `env.`, `process.env` (credential access)
 - `IGNORE PREVIOUS`, `system override`, `disregard`, `forget your instructions` (prompt injection)
 
-**Tier 2 — global skills (requires permission):** Before scanning globally installed skills or user settings, use stop and ask the user in chat:
+**Tier 2 — global skills (requires permission):** Before scanning globally installed skills or user settings, ask the user:
 "Phase 8 can scan your globally installed AI coding agent skills and hooks for malicious patterns. This reads files outside the repo. Want to include this?"
 Options: A) Yes — scan global skills too  B) No — repo-local only
 

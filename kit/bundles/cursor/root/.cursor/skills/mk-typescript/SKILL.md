@@ -1,6 +1,6 @@
 ---
 name: "mk-typescript"
-description: "Use when writing TypeScript code, fixing type errors, or configuring strict type safety. Auto-activates on .ts/.tsx files. Covers null handling, utility types, and ESLint."
+description: "Guides TypeScript code and strict type fixes; use when editing .ts files."
 ---
 
 <!-- Improvements over source skills:
@@ -18,9 +18,9 @@ Strict TypeScript patterns for type safety, null handling, and modern best pract
 
 **Auto-activate on:** `.ts`, `.tsx`, `.js`, `.jsx` files, type errors, ESLint issues, "fix types", "add types", "TypeScript help"
 
-**Explicit:** `the typescript skill [concern]`
+**Explicit:** `/mk-typescript [concern]`
 
-**Do NOT invoke for:** Vue-specific patterns (use mk:vue), visual design (use mk:frontend-design)
+**Do NOT invoke for:** Vue-specific patterns (use mk-vue), visual design (use mk-frontend-design)
 
 ## Workflow Integration
 
@@ -37,9 +37,9 @@ Operates in **Phase 3 (Build GREEN)**. Output supports the `developer` agent.
 
 - **NEVER** use `any` — use `unknown` + type guards (security-rules.md)
 - **NEVER** use `type assertion` — use `unknown` + type guards (security-rules.md)
-- **NEVER** use implicit truthiness for null checks — use explicit `=== null || === undefined`
-- **ALWAYS** use strict TypeScript config: `strict: true`, `noUncheckedIndexedAccess: true`
-- **ALWAYS** use `type` imports: `import type { X } from 'y'`
+- Avoid implicit truthiness for null checks (it also catches `0` and `""`) — use explicit `=== null || === undefined`
+- Use a strict TypeScript config: `strict: true`, `noUncheckedIndexedAccess: true`
+- Use `type` imports: `import type { X } from 'y'`
 - **PREFER** named exports over default exports
 - **PREFER** discriminated unions over type assertions
 

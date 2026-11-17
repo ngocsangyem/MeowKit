@@ -11,6 +11,17 @@ adaptation_notes: >
 
 These rules apply when the agent spawns subagents or coordinates parallel work.
 
+## Contents
+
+- [Orchestrator Entry Point Rule](#orchestrator-entry-point-rule)
+- [Delegation Context](#delegation-context)
+- [Isolation Boundaries](#isolation-boundaries)
+- [Inner Harness Compatibility](#inner-harness-compatibility)
+- [Rejected Patterns](#rejected-patterns)
+- [File Ownership](#file-ownership)
+- [Sequential vs Parallel](#sequential-vs-parallel)
+- [Subagent Completion Handling](#subagent-completion-handling)
+
 ## Orchestrator Entry Point Rule
 
 Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). Arbitration to avoid duplicate gate enforcement:
@@ -70,7 +81,7 @@ Constraints: [what must NOT change]
 
 ### Use `mk:delegate` to Build the Prompt
 
-For non-trivial delegations, prefer `mk:delegate` to assemble the prompt from the template above. It asks for the 7 required fields, runs an injection-pattern guard on each user-provided field, and emits a ≤200-token prompt block for review before you paste into the Task tool. Compatible with all inner harnesses via `--silent` mode.
+For non-trivial delegations, prefer `mk:delegate` to assemble the prompt from the template above. It asks for the 7 required fields, runs an injection-pattern guard on each user-provided field, and emits a ≤200-token prompt block for review before you paste it into the Agent tool. Compatible with all inner harnesses via `--silent` mode.
 
 Distinct from `mk:team-config` — that one sets up parallel agents in isolated worktrees (Conductor pattern). Use `mk:delegate` to build ONE clean prompt; use `mk:team-config` to coordinate MANY agents on non-overlapping files.
 
@@ -94,7 +105,7 @@ The delegation template is inner-harness–agnostic. Inner harnesses vary along 
 
 | Capability | Question to answer per harness |
 |---|---|
-| Task / Agent tool surface | Does the harness expose a way to spawn a subagent? What is the call shape? |
+| Task / Agent tool surface | Can the harness start subagents at all? What is the call shape? |
 | Context auto-injection | Which root file (e.g. `CLAUDE.md`, `AGENTS.md`, `gemini.md`) does the harness inject into subagent context automatically, and what is its byte cap? |
 | SubagentStart hook | Is the hook surface available? On Claude Code, it IS and the old blanket "hooks fire inside subagents and infinite-loop" answer is withdrawn (verdict **adopt**, 2026-11-09 — see the Rejected Patterns note below). Other harnesses still vary, so the question stays. |
 
@@ -154,7 +165,7 @@ For COMPLEX tasks with independent subtasks:
 1. Use `mk:worktree` for git worktree isolation per agent
 2. Use `mk:task-queue` for task claiming and ownership enforcement
 3. Follow `references/parallel-execution-rules.md` for constraints (max 3 agents, integration test required)
-4. Gates (1 and 2) are NEVER parallelized — always sequential, always human-approved
+4. Agreeing the plan and reading the review verdict are never parallelized — each is one sequential step with the user
 
 ### Party Mode (Week 2 addition)
 

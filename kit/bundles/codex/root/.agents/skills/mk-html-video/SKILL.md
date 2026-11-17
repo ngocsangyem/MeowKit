@@ -1,6 +1,6 @@
 ---
 name: "mk-html-video"
-description: "Render an HTML/CSS/JS template to local MP4 via headless Chromium (Playwright) + ffmpeg. NOT live browser recording, screen recording, or AI video gen (mk:multimodal)."
+description: "Renders an HTML template to MP4 via Playwright and ffmpeg. NOT for mk-multimodal."
 ---
 
 # HTML → MP4 Render Pipeline
@@ -11,14 +11,14 @@ Render a local HTML/CSS/JS animation to MP4 with Playwright frame capture and ff
 
 - **Check dependencies or choose dimensions/fps:** load [render workflow](references/render-workflow.md).
 - **Implement deterministic JavaScript, canvas, WebGL, or GSAP animation stepping:** load [template contract](references/html-template-contract.md).
-- **Capture frames directly:** execute `node .agents/skills/html-video/scripts/capture-frames.mjs <html-file> <frame-dir> <fps> <duration-seconds> <width> <height> [background-color]`.
-- **Render a complete MP4:** execute `bash .agents/skills/html-video/scripts/render-html-to-mp4.sh <html-file> <output.mp4> [fps] [duration-seconds] [width] [height] [background-color]`.
+- **Capture frames directly:** execute `node .agents/skills/mk-html-video/scripts/capture-frames.mjs <html-file> <frame-dir> <fps> <duration-seconds> <width> <height> [background-color]`.
+- **Render a complete MP4:** execute `bash .agents/skills/mk-html-video/scripts/render-html-to-mp4.sh <html-file> <output.mp4> [fps] [duration-seconds] [width] [height] [background-color]`.
 - **Resolve module, `file://`, codec, cleanup, or dimension failures:** load [troubleshooting](references/troubleshooting.md).
 
 ## Quick Start
 
 ```bash
-bash .agents/skills/html-video/scripts/render-html-to-mp4.sh template.html output.mp4 30 5 1920 1080
+bash .agents/skills/mk-html-video/scripts/render-html-to-mp4.sh template.html output.mp4 30 5 1920 1080
 ```
 
 The final optional argument supplies a background colour. The script captures `fps × duration` PNG frames, encodes H.264 MP4 with `yuv420p`, cleans its temporary frame directory, and prints the output path.

@@ -1,22 +1,22 @@
 ---
 name: "mk-stitch"
-description: "Generate novel UI from a text prompt via Stitch AI; exports Tailwind/HTML + DESIGN.md for mk:frontend-design handoff. NOT implementing existing designs -- use mk:figma or mk:frontend-design."
+description: "Generates a new UI design from a prompt via Stitch AI. NOT for mk-figma."
 ---
 
 # Stitch — AI Design Generation
 
 Generate high-fidelity UI designs from text prompts. Export Tailwind/HTML, PNG screenshot,
-and DESIGN.md for handoff to `mk:frontend-design`.
+and DESIGN.md for handoff to `mk-frontend-design`.
 
-Use only for a novel, text-prompt design. Existing design sources belong to `mk:figma` or
-`mk:frontend-design`.
+Use only for a novel, text-prompt design. Existing design sources belong to `mk-figma` or
+`mk-frontend-design`.
 
 ## Setup and guard
 
 Set `STITCH_API_KEY` in `.codex/.env`, then install the scripts once:
 
 ```bash
-cd .agents/skills/stitch/scripts && npm install
+cd .agents/skills/mk-stitch/scripts && npm install
 ```
 
 Run the prerequisite check before any API command; it fails before a network request if the key
@@ -31,7 +31,7 @@ Before any script runs, verify both prerequisites:
 [ -z "$STITCH_API_KEY" ] && { echo "[X] STITCH_API_KEY not set — add to .codex/.env"; exit 1; }
 
 # tsx gate
-npx tsx --version 2>/dev/null || { echo "[X] tsx not found — run: cd .agents/skills/stitch/scripts && npm install"; exit 1; }
+npx tsx --version 2>/dev/null || { echo "[X] tsx not found — run: cd .agents/skills/mk-stitch/scripts && npm install"; exit 1; }
 ```
 
 `stitch-api-call.ts` also checks `STITCH_API_KEY` as its first action before any Stitch SDK
@@ -41,33 +41,33 @@ call. If the key is unset the script exits 1 immediately — no network request 
 
 ```bash
 # 1. Check quota
-npx tsx .agents/skills/stitch/scripts/stitch-quota.ts check
+npx tsx .agents/skills/mk-stitch/scripts/stitch-quota.ts check
 
 # 2. Generate (API call only — returns JSON with screenId + imageUrl)
-npx tsx .agents/skills/stitch/scripts/stitch-api-call.ts \
+npx tsx .agents/skills/mk-stitch/scripts/stitch-api-call.ts \
   generate "A checkout page with cart summary and payment form"
 
 # 3. Export + write files (pipe: API call → schema-validate → write to disk)
-npx tsx .agents/skills/stitch/scripts/stitch-api-call.ts export <screen-id> | \
-  npx tsx .agents/skills/stitch/scripts/stitch-write-output.ts
+npx tsx .agents/skills/mk-stitch/scripts/stitch-api-call.ts export <screen-id> | \
+  npx tsx .agents/skills/mk-stitch/scripts/stitch-write-output.ts
 ```
 
 ## Commands
 
 | Task | Command / contract |
 |---|---|
-| Check quota | `npx tsx .agents/skills/stitch/scripts/stitch-quota.ts check` |
-| Generate | `npx tsx .agents/skills/stitch/scripts/stitch-api-call.ts generate "<prompt>"` — returns `screenId`, `projectId`, `imageUrl`, and quota data |
-| Export | `npx tsx .agents/skills/stitch/scripts/stitch-api-call.ts export <screen-id> \| npx tsx .agents/skills/stitch/scripts/stitch-write-output.ts` |
+| Check quota | `npx tsx .agents/skills/mk-stitch/scripts/stitch-quota.ts check` |
+| Generate | `npx tsx .agents/skills/mk-stitch/scripts/stitch-api-call.ts generate "<prompt>"` — returns `screenId`, `projectId`, `imageUrl`, and quota data |
+| Export | `npx tsx .agents/skills/mk-stitch/scripts/stitch-api-call.ts export <screen-id> \| npx tsx .agents/skills/mk-stitch/scripts/stitch-write-output.ts` |
 
 Show `imageUrl` and obtain user approval before exporting. Detailed flags, quota operations, and
 the API/write security boundary: [references/stitch-operations.md](references/stitch-operations.md).
 
 ## Workflow
 
-1. Check quota; if exhausted (exit 2), route to `mk:frontend-design`.
+1. Check quota; if exhausted (exit 2), route to `mk-frontend-design`.
 2. Generate, review the returned screenshot with the user, then export and write.
-3. Handoff `DESIGN.md` to `mk:frontend-design` for implementation.
+3. Handoff `DESIGN.md` to `mk-frontend-design` for implementation.
 
 Load [references/design-to-code-pipeline.md](references/design-to-code-pipeline.md) for variants,
 iteration patterns, and detailed handoff guidance.
@@ -77,7 +77,7 @@ and the handoff contract are in [references/stitch-operations.md](references/sti
 
 ## Limitations
 
-- **HTML/Tailwind only** — no React/Vue/Svelte export; use `mk:frontend-design` to convert
+- **HTML/Tailwind only** — no React/Vue/Svelte export; use `mk-frontend-design` to convert
 - **Non-responsive layouts** — add breakpoints during implementation
 - **Static only** — no animations; add micro-interactions in code
 - **Local quota tracking** — actual usage may diverge if designs are generated outside this skill

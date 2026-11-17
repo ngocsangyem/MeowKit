@@ -35,7 +35,7 @@ Output: "Human estimation recommended" + reasons.
 
 ## JQL Escaping
 
-All user-derived terms: `bash .agents/skills/jira/scripts/jql-sanitize.sh '<term>'`
+All user-derived terms: `bash .agents/skills/mk-jira/scripts/jql-sanitize.sh '<term>'`
 
 ## JQL Error vs Zero Results
 
@@ -45,7 +45,7 @@ All user-derived terms: `bash .agents/skills/jira/scripts/jql-sanitize.sh '<term
 ## Evaluate-First
 
 If evaluate output available in session, use its signals. Otherwise include:
-"Tip: run `the jira skill evaluate {ISSUE-KEY}` first for more informed estimation."
+"Tip: run `$mk-jira evaluate {ISSUE-KEY}` first for more informed estimation."
 
 ## Gotchas
 

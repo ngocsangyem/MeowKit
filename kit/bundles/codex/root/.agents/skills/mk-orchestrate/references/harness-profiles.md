@@ -75,8 +75,8 @@ For `runtime: internal`, profile the current session's agent interface and live
 agent definitions instead of a binary. See
 [internal-routing.md](internal-routing.md).
 
-Unknown flags, aliases, or model identifiers are probe failures. Re-verify the
-candidate; never guess a replacement.
+Unknown flags, aliases, or model identifiers are probe failures. Probe the
+candidate again; never guess a replacement.
 
 ## Safety Evidence
 
@@ -90,7 +90,7 @@ Profile safety behavior by observed control, not product reputation.
   is not a sandbox.
 - **Isolation:** state whether the boundary is OS-enforced, containerized,
   worktree-only, prompt-only, or absent. Worktree lifecycle for isolated
-  writers is delegated to `mk:worktree`, not reimplemented per harness.
+  writers is delegated to `mk-worktree`, not reimplemented per harness.
 - **Timeout:** coordinator-owned process timeout is required for CLI jobs even
   when a native budget exists. Internal timeouts are accounting-only unless
   the current harness proves cancellation.
@@ -140,7 +140,7 @@ actually loads:
 2. confirm the relevant project/global instruction file and requested skill
    are present;
 3. name the concrete skill path and expected output in the job prompt — build
-   that prompt through `mk:delegate` so the required fields (task, files,
+   that prompt through `mk-delegate` so the required fields (task, files,
    acceptance criteria, ownership) stay consistent across runtimes;
 4. offer any needed toolkit install or refresh as a visible setup step;
 5. never install, update, authenticate, or mutate user configuration silently.

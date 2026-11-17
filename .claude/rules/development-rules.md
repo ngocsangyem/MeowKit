@@ -1,48 +1,43 @@
 # Development Rules
 
-These rules apply to all implementation work in projects using this workflow.
-
-Follow YAGNI, KISS, DRY — the smallest real change that satisfies the approved scope, within the code standards in `docs/`. Use `mk:docs-finder`, never training data, for API signatures.
+Follow YAGNI, KISS, DRY — the smallest real change that satisfies the agreed scope, within the code standards in `docs/`. Look up API signatures with `mk:docs-finder`, not from memory: APIs change between releases.
 
 ## File Management
 
-ALWAYS use kebab-case for file names with descriptive names (e.g. `user-authentication.service.ts`) — search tools must infer purpose from the name.
+Name files in kebab-case with a descriptive name (e.g. `user-authentication.service.ts`), so search tools can tell a file's purpose from its name.
 
-ALWAYS keep code files under 200 lines; split large files into focused modules by concern. The limit is a maintainability guard, not a license for indirection: do not split mechanically if it makes the system harder to understand.
+Keep code files under 200 lines; split a large file by concern. The limit guards maintainability; do not split mechanically when that makes the system harder to follow.
 
-NEVER create new "enhanced" or "v2" files. ALWAYS update existing files directly — duplicates obscure the canonical implementation.
+Update the existing file rather than creating an "enhanced" or "v2" copy: a duplicate hides which implementation is canonical.
 
 ## Code Quality
 
-ALWAYS run the compile/build command after creating or modifying a code file; zero compilation errors before proceeding. Defaults here: `cargo build`, `cargo test --workspace`, `npm run lint`, `npm test`; downstream, prefer the commands documented in that project's `README.md`, `CLAUDE.md` or `docs/`.
+After creating or modifying a code file, run the build or compile command and fix every error before moving on. Defaults here: `cargo build`, `cargo test --workspace`, `npm run lint`, `npm test`; in another project, use the commands its `README.md`, `CLAUDE.md` or `docs/` give.
 
-NEVER simulate, mock, or stub implementation code to pass tests or CI — mocks hide real integration failures. Implement real code and use test databases/services.
+Implement real code. Do not mock, stub or simulate implementation code to make tests or CI pass — that hides the integration failure the test exists to catch. Use test databases and services.
 
-NEVER finish a session with failing tests. Fix all failures before completing; escalate after 3 failed fix attempts.
+When tests exist, end the session with them passing. Fix the root cause: do not delete tests, weaken assertions or add fake data to get green. After three failed fix attempts, stop and tell the user.
 
-NEVER ignore failing tests, delete tests, weaken assertions, or introduce fake data solely to pass CI. Address the root cause, then re-run the relevant checks.
+Tests are optional in default mode and expected in strict mode (`MEOWKIT_TDD=1` / `--tdd`: write the failing test first; no hook checks the order); a zero-test repo is permitted and the reviewer may WARN on it. Policy: `.claude/skills/cook/references/tdd-rules.md`.
 
-Those two rules apply whenever tests exist. Tests are optional in default mode and expected in strict mode (`MEOWKIT_TDD=1` / `--tdd`: write the failing test first; no hook checks the order); a zero-test repo is permitted and the reviewer may WARN on it. Policy: `.claude/skills/cook/references/tdd-rules.md`.
+## Commits and Pushes
 
-## Pre-Commit Rules
+Before a commit: lint with zero errors; run the tests if the project has any (`pre-ship.cjs` skips them when `package.json` has no `"test"` script); stage no confidential file (`.env`, credentials, API keys).
 
-Before every commit: run linting (zero errors); run tests — all pass IF tests exist (`pre-ship.cjs` skips that check when `package.json` has no `"test"` script); stage no confidential file (`.env`, credentials, API keys).
+Use conventional commits (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`) with descriptive messages, committed often. Leave AI references out of commit messages.
 
-ALWAYS use conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
-NEVER include AI references in commit messages.
-NEVER push to main/master directly — use feature branches and PRs.
-NEVER force-push unless the user explicitly requests it.
-ALWAYS commit frequently with descriptive messages.
-ALWAYS pull before push to catch merge conflicts early.
+NEVER push to main/master directly: use a feature branch and a PR, so the change is reviewed. Pull before you push, so conflicts surface early.
+
+NEVER force-push unless the user asks for it: it rewrites history others may already have.
 
 ## Documentation Impact
 
-After completing implementation tasks, ALWAYS declare docs impact: `none` · `minor` (update existing docs) · `major` (new documentation required).
+After implementation, declare docs impact: `none` · `minor` (update existing docs) · `major` (new documentation required).
 
-When impact is `minor` or `major`, update the affected docs in the same PR: `docs/project-context.md` (the conventions, stack and anti-patterns every agent loads) plus whichever of `docs/project-overview.md`, `docs/architecture/system-architecture.md`, `docs/code-standards.md`, `docs/deployment-guide.md`, `docs/development-roadmap.md` and `docs/project-changelog.md` the project keeps — or its own documented layout. Prefer `mk:document-release` after shipping; `mk:docs-init` when a project has no docs.
+For `minor` or `major`, update the affected docs in the same PR: `docs/project-context.md` (the conventions, stack and anti-patterns every agent loads) plus whichever of `docs/project-overview.md`, `docs/architecture/system-architecture.md`, `docs/code-standards.md`, `docs/deployment-guide.md`, `docs/development-roadmap.md` and `docs/project-changelog.md` the project keeps — or its own documented layout. Prefer `mk:document-release` after shipping; `mk:docs-init` when a project has no docs.
 
 ## Tool Output Limits
 
-ALWAYS apply default output limits to prevent context bloat at source: `head_limit=50` for Glob; `head_limit=20` per Grep query; `offset` + `limit` on Read for files >500 lines; pipe verbose Bash commands through `head -100`. Raise a limit only when the task explicitly needs more.
+Tool output stays in context, so cap it at the source: `head_limit=50` for Glob; `head_limit=20` per Grep query; `offset` + `limit` on Read for files over 500 lines; pipe verbose Bash commands through `head -100`. Raise a limit only when the task needs more.
 
-Those caps bound a SINGLE call; observations also accumulate ACROSS turns. After a tool returns, summarize it to the relevant finding rather than retaining raw output — never discard silently, since raw output stays retrievable by re-running the tool.
+Output also accumulates across turns: after a tool returns, keep the finding, not the raw output; re-running the tool retrieves it.

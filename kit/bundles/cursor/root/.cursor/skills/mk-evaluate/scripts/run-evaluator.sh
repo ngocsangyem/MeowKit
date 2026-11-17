@@ -12,12 +12,12 @@
 #   5. Prints the dispatch instructions for the orchestrator
 #
 # It does NOT spawn the sub-task itself — that's the orchestrator's responsibility
-# (Task tool with subagent_type=evaluator). This script prepares the inputs.
+# (delegation to the evaluator agent). This script prepares the inputs.
 set -u
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 repo_root="$(cd "$script_dir/../../../.." && pwd)"
-rubric_loader="$repo_root/.cursor/skills/rubric/scripts/load-rubric.sh"
+rubric_loader="$repo_root/.cursor/skills/mk-rubric/scripts/load-rubric.sh"
 persona_file="$script_dir/../prompts/skeptic-persona.md"
 
 if [ ! -x "$rubric_loader" ]; then
@@ -131,10 +131,10 @@ The orchestrator should now spawn the evaluator sub-task with these inputs:
 
 \`\`\`
 delegate a sub-task (
-  subagent_type="evaluator",
+  agent="evaluator",
   description="Evaluate $target",
   prompt="
-    Read .cursor/skills/evaluate/workflow.md and follow it.
+    Read .cursor/skills/mk-evaluate/workflow.md and follow it.
 
     Target: $target
     target_type: $target_type
@@ -160,7 +160,7 @@ $composed_rubric
 
 After the evaluator returns, run:
 \`\`\`
-.cursor/skills/evaluate/scripts/validate-verdict.sh tasks/reviews/{date}-{slug}-evalverdict.md
+.cursor/skills/mk-evaluate/scripts/validate-verdict.sh tasks/reviews/{date}-{slug}-evalverdict.md
 \`\`\`
 
 If validator exits 0 → exit code matches verdict (PASS=0, WARN=1, FAIL=2).

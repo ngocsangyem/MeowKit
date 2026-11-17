@@ -1,6 +1,6 @@
 name = "jira-lifecycle"
-description = "Drive JIRA workflow lifecycle via the jira-as CLI wrapper: transition through statuses, assign/unassign, resolve/reopen, manage versions and components. Routed by mk:jira-lifecycle skill. NOT for issue CRUD (jira-issue); NOT for comments (jira-collaborate); NOT for bulk transitions (jira-bulk)."
-model = "gpt-5.6-terra"
+description = "Drive JIRA workflow lifecycle via the jira-as CLI wrapper: transition through statuses, assign/unassign, resolve/reopen, manage versions and components. Routed by mk-jira-lifecycle skill. NOT for issue CRUD (jira-issue); NOT for comments (jira-collaborate); NOT for bulk transitions (jira-bulk)."
+model = "gpt-6.1-sol"
 model_reasoning_effort = "high"
 developer_instructions = """
 # JIRA Lifecycle Agent
@@ -20,7 +20,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 All invocations through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh <args>
 ```
 
 
@@ -40,24 +40,24 @@ $(git rev-parse --show-toplevel)/tasks/jira-workflows/<workflow-slug>.md        
 If the cache is absent for the target ticket's project, run discovery once:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh PROJ-123
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/fetch-workflow.sh PROJ-123
 ```
 
-The script tries the admin path (`admin workflow for-issue`) first; falls back to non-admin per-state discovery and writes `_partial-<PROJECT>.md` (flagged INCOMPLETE) on 403. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md` for the full protocol + cache layout.
+The script tries the admin path (`admin workflow for-issue`) first; falls back to non-admin per-state discovery and writes `_partial-<PROJECT>.md` (flagged INCOMPLETE) on 403. See `.agents/skills/mk-jira-lifecycle/references/workflow-discovery.md` for the full protocol + cache layout.
 
 ### Live cache validation
 
 Before exec, sanity-check that cached transitions still match Jira:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh lifecycle transitions PROJ-123 --output json | jq -r '.[] | .id' | sort > /tmp/live-transitions
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh lifecycle transitions PROJ-123 --output json | jq -r '.[] | .id' | sort > /tmp/live-transitions
 ```
 
 Diff against cached IDs from `tasks/jira-workflows/<slug>.md`. If divergent, prompt the user to re-run `fetch-workflow.sh`.
 
 ### Educational patterns are NOT authoritative
 
-The files at `.agents/skills/jira-lifecycle/references/patterns/{standard,software-dev,jsm-request,incident}-workflow.md` describe **common shapes** for orientation. They are NOT this project's workflow. Always prefer the discovered cache.
+The files at `.agents/skills/mk-jira-lifecycle/references/patterns/{standard,software-dev,jsm-request,incident}-workflow.md` describe **common shapes** for orientation. They are NOT this project's workflow. Always prefer the discovered cache.
 
 ## Resolution-Required Transitions
 

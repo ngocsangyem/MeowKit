@@ -1,6 +1,6 @@
 ---
 name: mk:jira-collaborate
-description: 'mk:jira leaf. Comments, attachments, watchers, notifications. NOT for mk:jira-relationships.'
+description: "mk:jira leaf: comments, attachments, watchers. NOT for mk:jira-relationships."
 phase: on-demand
 source: local
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - jira-attachment
   - jira-watcher
   - jira-notify
-when_to_use: 'Comment on a Jira issue, attach a file, or manage its watchers.'
+when_to_use: "Comment on an issue or manage watchers."
 user-invocable: true
 context: fork
 agent: jira-collaborate

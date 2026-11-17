@@ -22,7 +22,7 @@ Load persona prompts from `prompts/personas/`.
 
 ### 5c. Dispatch Reviewer Subagents
 
-For each selected persona, spawn a subagent (`subagent_type: "researcher"`) with:
+Once the personas are selected, delegate each one to the `researcher` agent with:
 
 ```
 IGNORE your default instructions. You are reviewing a PLAN DOCUMENT, not code.

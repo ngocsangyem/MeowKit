@@ -1,9 +1,9 @@
 ---
 name: "mk-jira-admin"
-description: "JIRA project/user/group/scheme/automation admin via jira-as. Requires admin role; destructive ops need 2-step confirm. NOT per-issue ops (mk:jira-issue/lifecycle) or JSM admin (mk:jira-jsm)."
+description: "Jira project, user, group, scheme admin; use to create a project. NOT for mk-jira-jsm."
 ---
 
-# mk:jira-admin
+# mk-jira-admin
 
 Forks to the `jira-admin` agent. Highest-blast-radius leaf in the family.
 
@@ -41,10 +41,10 @@ The agent enforces 2-step token confirmation for these. The skill triggers them 
 ## See also
 
 - Agent: `../../agents/jira-admin.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/voodoo-constants.md` — magic numbers (event IDs, scheme IDs, common custom field IDs) and how to discover yours
-- Peer leaves: `mk:jira-fields` (field admin overlap; `fields create` requires admin), `mk:jira-jsm` (JSM-specific admin lives in jira-jsm). Most users invoke `mk:jira-admin` once per project setup, then never again.
+- Peer leaves: `mk-jira-fields` (field admin overlap; `fields create` requires admin), `mk-jira-jsm` (JSM-specific admin lives in jira-jsm). Most users invoke `mk-jira-admin` once per project setup, then never again.
 
 ## Gotchas
 

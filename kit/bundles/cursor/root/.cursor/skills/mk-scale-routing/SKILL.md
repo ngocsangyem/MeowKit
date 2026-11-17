@@ -1,6 +1,6 @@
 ---
 name: "mk-scale-routing"
-description: "Domain-aware complexity routing: scans the task for domain keywords, matches domain-complexity.csv, and returns complexity level, workflow intensity, and execution tier. Extends Phase 0 orchestration."
+description: "Maps task keywords to a complexity and execution tier; auto-used while tiering."
 requires_runtime: ["python>=3.9"]
 ---
 
@@ -54,7 +54,7 @@ Called automatically by orchestrator at Phase 0. Not invoked directly by users.
 
 ```
 Orchestrator Phase 0:
-  1. Run mk:scale-routing on task description
+  1. Run mk-scale-routing on task description
   2. If match found → use returned level/workflow/execution_tier
   3. If no match → fall back to manual classification
 ```
@@ -65,7 +65,7 @@ Users can add custom domains by editing `data/domain-complexity.csv`. Add a new 
 
 ## Gotchas
 
-- **Runtime dependency on `mk:autobuild/scripts/density-select.sh`** — if the autobuild workflow skill is removed or renamed, density selection breaks. The script is shared intentionally (single source of truth for density policy); treat it as load-bearing infrastructure, not a private harness internal.
+- **Runtime dependency on `mk-autobuild/scripts/density-select.sh`** — if the autobuild workflow skill is removed or renamed, density selection breaks. The script is shared intentionally (single source of truth for density policy); treat it as load-bearing infrastructure, not a private harness internal.
 - Multiple domains can match a single task (e.g., "fintech dashboard" matches both fintech and internal_tools) — use the HIGHEST complexity match
 - CSV keyword matching is case-insensitive but signal order matters — first match wins for domain name
 - Adding too many low-signal keywords (e.g., "data", "app") creates false positives — keep signals specific to the domain
@@ -87,7 +87,7 @@ New fields (v2.0):
 | Field | Values | Description |
 |---|---|---|
 | `task_type` | bug_fix, feature, refactor, security, devops, docs, review, intake | Classified task type |
-| `suggested_skill` | mk:fix, mk:cook, mk:cso, mk:review, mk:intake | Recommended skill for this task |
+| `suggested_skill` | mk-fix, mk-cook, mk-cso, mk-review, mk-intake | Recommended skill for this task |
 | `confidence` | HIGH, MEDIUM, LOW | Routing confidence from Layer 3 scoring |
 | `product_area` | string | Area name from `.cursor/product-areas.yaml` (omitted if no YAML) |
 
@@ -95,11 +95,11 @@ New fields (v2.1 — Phase 5 of harness plan, 260408):
 
 | Field | Values | Description |
 |---|---|---|
-| `autobuild_density` | `MINIMAL`, `FULL`, `LEAN` | Recommended scaffolding density for `mk:autobuild` runs (see Adaptive Density Policy below) |
+| `autobuild_density` | `MINIMAL`, `FULL`, `LEAN` | Recommended scaffolding density for `mk-autobuild` runs (see Adaptive Density Policy below) |
 
 ### Harness Density Selection (v2.1)
 
-Used by `mk:autobuild` to choose how much scaffolding to apply per run. The decision rules:
+Used by `mk-autobuild` to choose how much scaffolding to apply per run. The decision rules:
 
 | `level` | neutral baseline | `autobuild_density` |
 |---|---|---|
@@ -109,7 +109,7 @@ Used by `mk:autobuild` to choose how much scaffolding to apply per run. The deci
 
 **Override:** `MEOWKIT_AUTOBUILD_MODE=MINIMAL\|FULL\|LEAN` env var, when set, overrides the auto-detected value. The override is logged in the autobuild run report for audit.
 
-For scriptable density selection, callers may invoke `.cursor/skills/autobuild/scripts/density-select.sh` which echoes only the density token to stdout.
+For scriptable density selection, callers may invoke `.cursor/skills/mk-autobuild/scripts/density-select.sh` which echoes only the density token to stdout.
 
 ## Data File
 
@@ -123,4 +123,4 @@ For scriptable density selection, callers may invoke `.cursor/skills/autobuild/s
 
 ## Cross-Skill Dependencies
 
-- `.cursor/skills/autobuild/scripts/density-select.sh` — Echoes `autobuild_density` token to stdout; used by autobuild when scriptable density selection is needed
+- `.cursor/skills/mk-autobuild/scripts/density-select.sh` — Echoes `autobuild_density` token to stdout; used by autobuild when scriptable density selection is needed

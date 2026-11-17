@@ -1,6 +1,6 @@
 ---
 name: "mk-careful"
-description: "Session-scoped guardrails warning before rm -rf, DROP TABLE, force-push, git reset --hard, kubectl delete, etc; user can override. NOT for scoping edits to a directory (mk:freeze)."
+description: "Warns before destructive commands (rm -rf, DROP TABLE, force-push). NOT for mk-freeze."
 ---
 
 # /careful — Destructive Command Guardrails
@@ -29,9 +29,9 @@ To deactivate, end the conversation or start a new one. Guardrails are session-s
 ## Guardrails
 
 - **Bash command guard**: Warns before destructive commands (rm -rf, DROP TABLE, force-push, reset --hard, kubectl delete) — enforced by this project's configured hooks when present
-- Session-scoped — only active when `mk:careful` is invoked
+- Session-scoped — only active when `mk-careful` is invoked
 - User can override each warning individually
-- **Interaction with mk:investigate**: When careful is active during an investigation, destructive-Bash warnings still fire. Debugging commands that touch state require explicit user confirmation per warning — do not bypass.
+- **Interaction with mk-investigate**: When careful is active during an investigation, destructive-Bash warnings still fire. Debugging commands that touch state require explicit user confirmation per warning — do not bypass.
 
 ## Gotchas
 

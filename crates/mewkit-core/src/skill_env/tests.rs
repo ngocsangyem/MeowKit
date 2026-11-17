@@ -82,6 +82,60 @@ fn eligible_skills_declare_a_runtime_or_pin_packages() {
     assert_eq!(env_skills(tmp.path()), ["bin", "py"]);
 }
 
+fn write(root: &Path, rel: &str, body: &str) {
+    let path = root.join(rel);
+    fs::create_dir_all(path.parent().unwrap()).unwrap();
+    fs::write(path, body).unwrap();
+}
+
+#[test]
+fn codex_and_cursor_installs_are_found_under_their_mk_folders() {
+    let tmp = tempfile::tempdir().unwrap();
+    write(
+        tmp.path(),
+        ".agents/skills/mk-jira/scripts/requirements.txt",
+        "jira-as==1\n",
+    );
+    write(
+        tmp.path(),
+        ".cursor/skills/mk-conf/SKILL.md",
+        "---\nrequires_runtime: [python]\n---\n",
+    );
+    // A bundle folder without the `mk-` prefix is not a kit skill.
+    write(
+        tmp.path(),
+        ".agents/skills/other/requirements.txt",
+        "x==1\n",
+    );
+    assert_eq!(env_skills(tmp.path()), ["conf", "jira"]);
+    let req = read_skill_requirements(tmp.path(), "jira").unwrap();
+    assert_eq!(req.packages.len(), 1);
+    assert!(read_skill_runtime(tmp.path(), "conf").is_some());
+}
+
+#[test]
+fn the_claude_code_folder_wins_when_two_layouts_hold_a_skill() {
+    let tmp = tempfile::tempdir().unwrap();
+    skill(
+        tmp.path(),
+        "jira",
+        &[("scripts/requirements.txt", "a==1\nb==2\n")],
+    );
+    write(
+        tmp.path(),
+        ".agents/skills/mk-jira/scripts/requirements.txt",
+        "c==3\n",
+    );
+    assert_eq!(env_skills(tmp.path()), ["jira"]);
+    assert_eq!(
+        read_skill_requirements(tmp.path(), "jira")
+            .unwrap()
+            .packages
+            .len(),
+        2
+    );
+}
+
 #[test]
 fn requirement_lines_are_validated_by_base_name_only() {
     for ok in ["pillow>=10.0", "requests[socks]==2.0", "a.b-c_d", "x~=1.0"] {

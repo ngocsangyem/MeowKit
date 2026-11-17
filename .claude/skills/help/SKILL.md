@@ -1,6 +1,6 @@
 ---
 name: mk:help
-description: Scan plans, reviews, tests and git state and name the next workflow step. NOT for mk:status.
+description: "Names the next workflow step from plans, tests and git state."
 argument-hint: '[--verbose]'
 source: local
 allowed-tools:
@@ -15,7 +15,7 @@ keywords:
   - usage-guide
   - onboarding
   - catalog-listing
-when_to_use: Asked where am I or what to do next, or at a cold session start.
+when_to_use: "Asked 'what next?' or 'where am I?'."
 user-invocable: true
 owner: research
 criticality: medium
@@ -76,7 +76,7 @@ on a missing source.
 | 10 | `docs/development-roadmap.md` (when present; Type-1 allowlisted) | current phase / milestone progress | skip; tag `(CF-C5)` if relied on |
 
 **Model tier:** source the current tier from `.meowkit/state/detected-model.json` (written
-fresh at SessionStart). Do NOT source `model_tier` from `budget-state.json` — it has no
+fresh at SessionStart). Do not source `model_tier` from `budget-state.json` — it has no
 `created_at`/session marker and may carry a prior session's tier. Treat budget figures as
 advisory unless a current-session signal corroborates them.
 
@@ -98,7 +98,7 @@ Collect candidates from all sources, then rank:
    the rank-1 rationale (does not by itself create a rank).
 5. **Clean state** → the existing fallback table (start a task / retro / ask).
 
-Each candidate's rationale MUST cite the source file(s) it came from.
+Each candidate's rationale cites the source file(s) it came from, so the user can check it.
 
 For skill suggestions based on task type, see `mk:agent-detector` (its `../agent-detector/references/lifecycle-routing.md` maps task patterns to skills).
 

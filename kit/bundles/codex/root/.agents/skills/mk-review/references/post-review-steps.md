@@ -28,7 +28,7 @@ If no documentation files exist, skip this step silently.
 
 ## Step 5.8: Persist Eng Review result
 
-After all review passes complete, persist the final `the review skill` outcome so `the ship skill` can
+After all review passes complete, persist the final `$mk-review` outcome so `$mk-ship` can
 recognize that Eng Review was run on this branch.
 
 Run:

@@ -4,9 +4,9 @@
 
 ## Step-File Contract
 
-- One step at a time — NEVER load multiple step files at once.
+- One step at a time: load one step file, not several.
 - Read the ENTIRE step file before executing any instruction in it.
-- Complete the current step before reading the next — NEVER skip steps or optimize the sequence.
+- Complete the current step before reading the next; the steps depend on each other's output, so do not skip or reorder them.
 - Follow the step's instructions exactly — do not improvise, add steps, or deviate.
 - Persist intermediate state the next step needs: frontmatter variables, or `.meowkit/state/{skill}-progress.json` when it must survive a context reset.
 - A step file that chains to `references/*.md` opens with a `## Contents` ToC, so a partial read lands on navigation.
@@ -48,7 +48,7 @@ If `next_step` is unset, the agent follows the default linear progression (step-
 |---|---|---|---|
 | `task_description` | invoker | step-01 | Original natural-language task |
 | `density` | step-00 | step-01..05 | `MINIMAL`, `FULL`, `LEAN` |
-| `model_id` | step-00 | step-06 | e.g., `opus-4-6`, `sonnet-4-5` |
+| `model_id` | step-00 | step-06 | e.g., `claude-opus-5-5`, `claude-sonnet-5-5` |
 | `tier` | step-00 | step-06 | `TRIVIAL`, `STANDARD`, `COMPLEX` |
 | `run_id` | step-00 | all | `YYMMDD-HHMM-{slug}` |
 | `run_dir` | step-00 | all | `tasks/autobuild-runs/{run_id}/` |
@@ -116,7 +116,7 @@ Step 6: Run Report
 
 - **MINIMAL** (Haiku/trivial): Runs `mk:cook` instead of the full harness. No contract, no iteration loop. Cheapest path.
 - **FULL** (Sonnet/Opus 4.5): Standard pipeline. Contract required. 1–3 iteration rounds.
-- **LEAN** (Opus 4.6+): Single-session build. Contract optional. 0–1 iteration rounds. Trusts the model's adaptive reasoning.
+- **LEAN** (Opus 4.6+, Fable): Single-session build. Contract optional. 0–1 iteration rounds. Trusts the model's adaptive reasoning.
 
 ## Resume
 

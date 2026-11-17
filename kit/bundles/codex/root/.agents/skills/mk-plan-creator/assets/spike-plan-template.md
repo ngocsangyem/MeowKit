@@ -11,7 +11,7 @@ jira_tickets: []
 sprint_id: null
 tags: [spike, investigation]
 created: "<ISO ts>"
-createdBy: "mk:plan-creator"
+createdBy: "mk-plan-creator"
 source: skill
 ---
 
@@ -25,8 +25,8 @@ Investigate <X> and produce findings on <Y>. Output is a markdown document at `{
 
 ## Compatibility (per `agile-feedback-cycle.md` 2)
 
-- Run via `mk:cook` or `mk:plan-creator --fast`
-- **NEVER** run via `mk:autobuild` FULL — harness gate (Phase 2 red → Phase 3 green → Phase 4 review) breaks because spikes skip Phase 2 and Phase 5
+- Run via `mk-cook` or `mk-plan-creator --fast`
+- **NEVER** run via `mk-autobuild` FULL — harness gate (Phase 2 red → Phase 3 green → Phase 4 review) breaks because spikes skip Phase 2 and Phase 5
 
 ## Questions to Answer
 

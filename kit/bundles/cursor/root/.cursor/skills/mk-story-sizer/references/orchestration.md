@@ -1,6 +1,6 @@
 # Orchestration
 
-How `mk:story-sizer` wires the paste adapter, scorer, and writer into a single default-mode flow. SKILL.md keeps the routing terse; the operational detail lives here.
+How `mk-story-sizer` wires the paste adapter, scorer, and writer into a single default-mode flow. SKILL.md keeps the routing terse; the operational detail lives here.
 
 ## End-to-End Default Mode
 
@@ -9,7 +9,7 @@ the story-sizer skill --paste [--scout] [--story <id>] [--slug <slug>]
 
 1. Parse args at the skill orchestration layer.
 2. Resolve scout context per "Scout extraction" below.
-3. stop and ask the user in chat (or read stdin) for the paste body.
+3. Ask the user (or read stdin) for the paste body.
 4. Run scripts/parse-paste-stories.py < paste-body → {records, source_hash, errors}.
 5. Pre-flight validation:
    - All records flagged [NO_ACS] → ABORT with usage hint.
@@ -25,7 +25,7 @@ the story-sizer skill --paste [--scout] [--story <id>] [--slug <slug>]
 10. Print one-line summary + next steps.
 ```
 
-## Scout Extraction (mirrors mk:planning-engine)
+## Scout Extraction (mirrors mk-planning-engine)
 
 ```text
 if --scout flag set:
@@ -40,11 +40,11 @@ else:
     flag in report header: [NO_CODEBASE_CONTEXT]
 ```
 
-Story-sizer NEVER auto-invokes `the scout skill`. This preserves the trust boundary documented in `mk:planning-engine/SKILL.md` and avoids skill-to-skill invocation forbidden by the skill authoring rules.
+Story-sizer NEVER auto-invokes `/mk-scout`. This preserves the trust boundary documented in `mk-planning-engine/SKILL.md` and avoids skill-to-skill invocation forbidden by the skill authoring rules.
 
 ## Agile Detection
 
-`agile_loaded` is set to `true` only if `mk:agent-detector` reports that the agile story gates rule is loaded for the current session. The scorer then emits a `dor_status` block per record; when `false`, the field is omitted silently.
+`agile_loaded` is set to `true` only if `mk-agent-detector` reports that the agile story gates rule is loaded for the current session. The scorer then emits a `dor_status` block per record; when `false`, the field is omitted silently.
 
 ## Filtering with --story <id>
 
@@ -70,7 +70,7 @@ Auto-create mode (`--auto-create --project <KEY>`) extends this flow with:
 
 1. Pre-flight checks per `references/auto-create-gating.md`.
 2. Dry-run table render.
-3. Single batch-level `stop and ask the user in chat` gate.
+3. Single batch-level user question.
 4. Per-ticket two-call sequence per `references/auto-create-execution.md`.
 
 See those files for the safety design — none of it lives in this orchestration doc to keep default-mode reasoning narrow.

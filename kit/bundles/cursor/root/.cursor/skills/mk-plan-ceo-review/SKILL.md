@@ -1,6 +1,6 @@
 ---
 name: "mk-plan-ceo-review"
-description: "CEO/founder-mode plan review: rethink the problem, find the 10x product, challenge premises, expand scope. Four modes, dream-big to strip-to-essentials. Use to rethink ambition or scope."
+description: "Founder-mode critique of a plan's ambition and scope. NOT for mk-validate-plan."
 ---
 
 # Mega Plan Review Mode — CEO/Founder-Level Plan Review
@@ -37,7 +37,7 @@ Layer 0-1: Pre-Screen → Layer 3: Two-Lens Eval → Layer 4: Deep Sections → 
 - `references/pre-screen.md` — Layer 0-1: Placeholder scan (mode-aware), structural completeness, coverage mapping
 - `references/two-lens-evaluation.md` — Layer 3: Intent Alignment + Execution Credibility with PASS/FAIL anchors and verdict logic
 - `references/preamble.md` — Preamble bash script and startup logic
-- `references/shared-protocols.md` — stop and ask the user in chat format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Telemetry
+- `references/shared-protocols.md` — user question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Telemetry
 - `references/base-branch-detection.md` — Step 0: Detect base branch
 - `references/pre-review-system-audit.md` — System audit, design doc check, handoff notes, retrospective, frontend detection, taste calibration, landscape check
 - `references/prerequisite-skill-offer.md` — Office-hours prerequisite and mid-session detection
@@ -62,11 +62,11 @@ After CEO review is complete and all findings are written, print this EXACT bloc
 ```
 
 **STOP after printing this block.**
-Do NOT run mk:plan-ceo-review automatically.
+Do NOT run mk-plan-ceo-review automatically.
 Do NOT begin Phase 2.
 Human decides the next step.
 
 <!-- STOP HERE — CEO Review
      The user decides: run the cook skill to implement,
-     or run mk:review for engineering review.
+     or run mk-review for engineering review.
      Agent does not chain reviews automatically. -->

@@ -1,6 +1,6 @@
 ---
 name: mk:agent-browser
-description: Drive a browser from the CLI — navigate, click, fill, screenshot, extract, exercise a web app. NOT for mk:chrome-profile.
+description: "Drives a browser via CLI: click, fill, screenshot. NOT for mk:chrome-profile."
 allowed-tools: Bash(agent-browser:*), Bash(npx agent-browser:*)
 source: vercel-labs/agent-browser
 version: 0.2.0
@@ -16,7 +16,7 @@ keywords:
   - slack
   - vercel-sandbox
   - agentcore
-when_to_use: Automating or QA-ing a web app in a fresh tool-managed Chrome session.
+when_to_use: "Automating or QA-ing a web app."
 user-invocable: true
 owner: utility
 criticality: medium
@@ -181,7 +181,7 @@ For profiling, video, diffing, iOS, HAR, batch, dashboard, and JS eval patterns,
 
 ## Specialized Workflow Router
 
-Do not skip upstream specialized skills. For these intents, read [references/specialized-workflows.md](references/specialized-workflows.md) before acting:
+Do not skip upstream specialized skills. For these intents, read [references/specialized-workflows.md](references/specialized-workflows.md) before acting (for exploratory QA also [references/dogfood-issue-taxonomy.md](references/dogfood-issue-taxonomy.md); for Slack also [references/slack-workflows.md](references/slack-workflows.md)):
 
 | Intent | Upstream skill covered | Trigger examples |
 |---|---|---|

@@ -1,9 +1,9 @@
 ---
 name: "mk-jira-time"
-description: "JIRA time tracking via jira-as: log work, worklogs, estimates, reports, bulk-log. Edit/delete confirms first (data loss). NOT sprint capacity (mk:jira-agile)."
+description: "Jira worklogs, estimates, time reports; use to log hours on a ticket."
 ---
 
-# mk:jira-time
+# mk-jira-time
 
 Forks to the `jira-time` agent. Duration format: `30m`, `2h`, `1d 4h`. The agent confirms before any worklog `update` / `delete` — those are effectively irreversible.
 
@@ -24,13 +24,13 @@ Forks to the `jira-time` agent. Duration format: `30m`, `2h`, `1d 4h`. The agent
 ## See also
 
 - Agent: `../../agents/jira-time.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/time-tracking.md` — wrapper-flow patterns
   - `references/time-format-quick-ref.md` — duration syntax (15m, 2h, 1d 4h, 1w)
   - `references/jql-snippets.md` — copy-paste time-related JQL (worklog by user/date)
   - `references/estimation-guide.md` — story-point vs time estimation tradeoffs
-- Peer leaves: `mk:jira-search` (JQL for worklog filters), `mk:jira-agile` (sprint capacity uses time data), `mk:jira-bulk` (bulk-log)
+- Peer leaves: `mk-jira-search` (JQL for worklog filters), `mk-jira-agile` (sprint capacity uses time data), `mk-jira-bulk` (bulk-log)
 
 ## Gotchas
 

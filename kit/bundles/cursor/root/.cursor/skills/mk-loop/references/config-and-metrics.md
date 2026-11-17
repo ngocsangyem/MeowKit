@@ -3,7 +3,7 @@
 ## Contents
 
 - Config fields (required / optional)
-- Batched stop and ask the user in chat (missing required fields)
+- One batched user question (missing required fields)
 - Metric / Verify pattern library
 - Noise handling & Min-Delta
 - Back to [`loop-protocol.md`](loop-protocol.md)
@@ -43,10 +43,10 @@ which the boundary-gated model deliberately rejects.
 
 ## Batched Question (missing required fields)
 
-Ask ALL missing required fields in one `stop and ask the user in chat`; run nothing until answered.
+Ask ALL missing required fields in one user question; run nothing until answered.
 
 ```
-stop and ask the user in chat({
+ask_user({
   questions: [
     { question: "What metric do you want to improve? (e.g. 'line coverage in src/utils')",
       header: "Goal" },
@@ -128,4 +128,4 @@ the whole run. 6. If output varies run-to-run, set `Noise: high`.
   noisy metric does not trigger a false plateau.
 - Warn if Verify takes > 30s and Noise is `high` (3 runs → >90s per iteration is impractical).
 - Environment pinning is the user's responsibility (fixed seeds, warm/cold caches consistent,
-  no competing CPU load, same input data). `mk:loop` cannot control the environment.
+  no competing CPU load, same input data). `mk-loop` cannot control the environment.

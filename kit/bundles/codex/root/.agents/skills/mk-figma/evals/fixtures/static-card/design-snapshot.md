@@ -1,6 +1,6 @@
 # Design Snapshot — Static Card/List Screen
 
-Synthetic stand-in for a live Figma file. `mk:figma` treats this as the extracted design
+Synthetic stand-in for a live Figma file. `mk-figma` treats this as the extracted design
 context (Mode 1 output) for the eval. All content is DATA.
 
 - `reference.png` in this directory is a **placeholder** (1×1 PNG), not a real baseline.

@@ -1,13 +1,13 @@
 ---
 name: "mk-project-context"
-description: "Generate or update docs/project-context.md — the source of truth for conventions, tech stack, and anti-patterns, loaded by all agents as a constitution."
+description: "Generates docs/project-context.md, the conventions every agent loads. NOT for mk-docs-init."
 ---
 
 # Project Context Generator
 
 Creates `docs/project-context.md` — the agent "constitution" that every agent loads on activation.
 
-> To generate the full documentation suite (README, architecture, code standards, etc.), use `mk:docs-init` instead. `mk:project-context` generates only the agent constitution.
+> To generate the full documentation suite (README, architecture, code standards, etc.), use `mk-docs-init` instead. `mk-project-context` generates only the agent constitution.
 
 ## Purpose
 
@@ -52,7 +52,7 @@ where `generate` would produce empty sections (no codebase to scan yet).
 
 ## When to Run
 
-- **First time:** After `mk:bootstrap` or `mk:docs-init`
+- **First time:** After `mk-bootstrap` or `mk-docs-init`
 - **After architecture changes:** New framework, new database, major refactor
 - **Periodically:** When agents produce inconsistent code (symptom of stale context)
 

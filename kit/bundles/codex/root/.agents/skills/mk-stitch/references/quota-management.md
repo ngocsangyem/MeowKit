@@ -50,9 +50,9 @@ Stitch SDK has no programmatic quota-check endpoint. The skill tracks locally:
 When quota is exhausted:
 
 1. `stitch-quota.ts check` returns exit code 2
-2. Skill prints: "Daily quota exhausted. Use mk:frontend-design as fallback."
-3. Activate `mk:frontend-design` with the same design prompt
-4. `mk:frontend-design` generates components from the text description (no external API)
+2. Skill prints: "Daily quota exhausted. Use mk-frontend-design as fallback."
+3. Activate `mk-frontend-design` with the same design prompt
+4. `mk-frontend-design` generates components from the text description (no external API)
 5. Proceed with implementation using text-based spec
 
 ## Drift Warning
@@ -60,6 +60,6 @@ When quota is exhausted:
 Local tracking can drift if designs are generated outside this skill (Stitch web UI, other tools).
 If you hit `RATE_LIMITED` from the Stitch API despite the local tracker showing credits:
 
-1. Run `npx tsx .agents/skills/stitch/scripts/stitch-quota.ts reset`
+1. Run `npx tsx .agents/skills/mk-stitch/scripts/stitch-quota.ts reset`
 2. The Stitch API enforces the real limit — local tracker is advisory only
 3. On `RATE_LIMITED`, `stitch-api-call.ts` auto-syncs the tracker to `count = limit`

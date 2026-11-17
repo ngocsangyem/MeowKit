@@ -1,6 +1,6 @@
 ---
 name: "mk-sequential-thinking"
-description: "Structured step-by-step reasoning before acting, to avoid guessing. For complex debugging, multi-step analysis, hypothesis checks. NOT for being stuck on approach (mk:problem-solving)."
+description: "Step-by-step reasoning before acting; use for deep debugging. NOT for mk-problem-solving."
 ---
 
 # Sequential Thinking
@@ -11,11 +11,11 @@ Structured step-by-step reasoning with hypothesis generation, elimination, and r
 
 - Complex problem requiring multi-step reasoning
 - Debugging where root cause isn't obvious
-- When mk:fix invokes diagnosis (Phase 3)
+- When mk-fix invokes diagnosis (Phase 3)
 - Architecture decisions with multiple trade-offs
 - Any situation where "I think it's X" needs evidence before acting
 
-**Do NOT use for:** trivial fixes (typo, lint), single-file changes with obvious cause.
+**Do not use for:** trivial fixes (typo, lint), single-file changes with obvious cause.
 
 ## Process
 
@@ -77,7 +77,7 @@ Track and format thoughts deterministically:
 
 - `scripts/process-thought.js` — validate, track history, branches, revisions. Max 20 thoughts.
   `node scripts/process-thought.js --thought "..." --number N --total M --next true`
-  `node scripts/process-thought.js --summary` (context-efficient handoff to mk:fix)
+  `node scripts/process-thought.js --summary` (context-efficient handoff to mk-fix)
 - `scripts/format-thought.js` — format as box/simple/markdown/json
   `node scripts/format-thought.js --thought "..." --number N --total M --format json`
 
@@ -91,8 +91,8 @@ Full list: `references/gotchas.md`
 
 ## Workflow Integration
 
-Called by `mk:fix` during diagnosis (Step 2). Receives input from `mk:investigate` or direct observation. Output feeds into fix implementation.
+Called by `mk-fix` during diagnosis (Step 2). Receives input from `mk-investigate` or direct observation. Output feeds into fix implementation.
 
 ```
-mk:investigate → symptoms + traces → mk:sequential-thinking → root cause → mk:fix
+mk-investigate → symptoms + traces → mk-sequential-thinking → root cause → mk-fix
 ```

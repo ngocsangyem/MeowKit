@@ -1,6 +1,6 @@
 ---
 name: "mk-llms"
-description: "Generate llms.txt files from project docs per the llmstxt.org spec, for AI-friendly documentation indexes and discoverability. Use to create or update llms.txt for AI assistants."
+description: "Generates llms.txt from project docs; use to make a project AI-discoverable."
 requires_runtime: ["python>=3.9"]
 ---
 
@@ -17,7 +17,7 @@ Generate [llms.txt](https://llmstxt.org/) files — LLM-friendly markdown indexe
 - Publishing docs site and want AI discoverability
 - After major documentation updates (Phase 6 Reflect)
 
-Explicit: `the llms skill [path] [--full]`
+Explicit: `$mk-llms [path] [--full]`
 
 ## Workflow Integration
 
@@ -39,11 +39,11 @@ Operates in **Phase 6 (Reflect)** or on-demand. Output supports the `documenter`
 
 ```bash
 # Generate llms.txt (script does the heavy lifting)
-node .codex/scripts/skill-python.cjs .agents/skills/llms/scripts/generate-llms-txt.py \
+node .codex/scripts/skill-python.cjs .agents/skills/mk-llms/scripts/generate-llms-txt.py \
   --source ./docs [--output .] [--base-url https://example.com/docs] [--full]
 
 # Preview metadata first (Codex reviews before generating)
-node .codex/scripts/skill-python.cjs .agents/skills/llms/scripts/generate-llms-txt.py \
+node .codex/scripts/skill-python.cjs .agents/skills/mk-llms/scripts/generate-llms-txt.py \
   --source ./docs --json
 ```
 
@@ -95,4 +95,4 @@ node .codex/scripts/skill-python.cjs .agents/skills/llms/scripts/generate-llms-t
 
 ## Gotchas
 
-- **Python venv required**: run `.codex/scripts/bin/setup-workflow` once from the project root before invoking this skill. Re-run after upgrading the toolkit.
+- **Python venv required**: run `mewkit skill env llms` once from the project root before invoking this skill. Re-run after upgrading the toolkit.

@@ -1,4 +1,4 @@
-# mk:trace-analyze — Workflow
+# mk-trace-analyze — Workflow
 
 6-step scatter-gather workflow for analyzing harness trace logs and producing human-reviewed improvement suggestions.
 
@@ -18,7 +18,7 @@
 3. `step-03-scatter-analysis.md` — Spawn 3 researcher sub-task in parallel; each gets one batch + the error-taxonomy reference
 4. `step-04-gather-synthesis.md` — Main agent reads all 3 batch reports; computes cross-batch frequency counts; identifies recurring patterns
 5. `step-05-suggestions.md` — For each pattern with ≥3 occurrences, emit a structured suggestion (target, change, rationale, expected impact)
-6. `step-06-hitl-gate.md` — Present suggestions one at a time via stop and ask the user in chat (Approve/Modify/Reject); write approved items to a draft plan
+6. `step-06-hitl-gate.md` — Present suggestions one at a time by asking the user (Approve/Modify/Reject); write approved items to a draft plan
 
 ## Variables Passed Between Steps
 
@@ -67,11 +67,11 @@ Step 5: Suggestions
     └── Write to {analysis_dir}/suggestions-draft.md
          ↓
 Step 6: HITL Gate
-    ├── For each suggestion: stop and ask the user in chat [Approve / Modify / Reject]
+    ├── For each suggestion: Ask the user [Approve / Modify / Reject]
     ├── Approved → suggestions.md
     ├── Modified → user provides revised version → suggestions.md
     ├── Rejected → rejected.md (with reason)
-    └── If ≥1 approved → optionally generate follow-up plan via mk:plan-creator
+    └── If ≥1 approved → optionally generate follow-up plan via mk-plan-creator
 ```
 
 ## Mode Notes

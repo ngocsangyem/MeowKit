@@ -1,9 +1,9 @@
 ---
 name: "mk-preview"
-description: "Generate visual artifacts: explanations, diagrams, slides, diff views. NOT publish-grade diagrams (mk:tech-graph), live media gen (mk:multimodal), or browser QA (mk:qa)."
+description: "Renders code or a diff as an explainer, diagram or slides. NOT for mk-tech-graph."
 ---
 
-# mk:preview
+# mk-preview
 
 Generates visual artifacts — markdown and self-contained HTML — for explaining code, drawing diagrams, building slide decks, and visualizing diffs.
 
@@ -19,7 +19,7 @@ No live server. No Python. Pure markdown + HTML + bash file operations. Output w
 
 ## Default (No Arguments)
 
-If invoked with no arguments, present available operations via `stop and ask the user in chat`. Header: "Preview Operation". Question: "What would you like to do?".
+If invoked with no arguments, present available operations by asking the user. Header: "Preview Operation". Question: "What would you like to do?".
 
 | Operation              | Description                                           |
 | ---------------------- | ----------------------------------------------------- |
@@ -38,20 +38,20 @@ Recommended default: `--explain` or `--html --explain`.
 
 ### Markdown Generation
 
-- `the preview skill --explain <topic>` — visual explanation (ASCII + Mermaid + concepts)
-- `the preview skill --diagram <topic>` — focused diagram (ASCII + Mermaid)
-- `the preview skill --slides <topic>` — presentation slides (one concept per slide)
-- `the preview skill --ascii <topic>` — ASCII-only diagram (terminal-friendly)
+- `$mk-preview --explain <topic>` — visual explanation (ASCII + Mermaid + concepts)
+- `$mk-preview --diagram <topic>` — focused diagram (ASCII + Mermaid)
+- `$mk-preview --slides <topic>` — presentation slides (one concept per slide)
+- `$mk-preview --ascii <topic>` — ASCII-only diagram (terminal-friendly)
 
 ### HTML Generation
 
-- `the preview skill --html --explain <topic>` — self-contained HTML explanation
-- `the preview skill --html --diagram <topic>` — HTML diagram with zoom/pan
-- `the preview skill --html --slides <topic>` — magazine-quality slide deck
+- `$mk-preview --html --explain <topic>` — self-contained HTML explanation
+- `$mk-preview --html --diagram <topic>` — HTML diagram with zoom/pan
+- `$mk-preview --html --slides <topic>` — magazine-quality slide deck
 
 ### Analytical Modes
 
-- `the preview skill --html --diff [ref]` — visualize a git diff. Default `ref` = `main`. Accepts branch, commit, range, PR number.
+- `$mk-preview --html --diff [ref]` — visualize a git diff. Default `ref` = `main`. Accepts branch, commit, range, PR number.
 
 `--ascii` does not combine with `--html` (terminal-only by design).
 
@@ -62,7 +62,7 @@ Priority order:
 1. `--html` flag detected → set HTML output mode
 2. Generation flag detected (`--explain`, `--diagram`, `--slides`, `--ascii`) → load `references/generation-modes.md`
 3. HTML-only flag (`--diff`) → implies `--html`; load `references/analytical-modes.md`
-4. Topic missing → ask user via `stop and ask the user in chat`
+4. Topic missing → ask user by asking the user
 5. Topic present → continue
 
 **Topic-to-slug:**
@@ -114,18 +114,18 @@ Every mode reads its references BEFORE writing the output file.
 | `--diagram`            | `references/generation-modes.md`, `references/mermaid-essentials.md`                                                           | —                                                             |
 | `--slides`             | `references/generation-modes.md`, `references/mermaid-essentials.md`                                                           | —                                                             |
 | `--ascii`              | `references/generation-modes.md`                                                                                               | —                                                             |
-| `--html --explain`     | `references/html-design-rules.md`, `../frontend-design/references/anti-slop-directives.md`                                     | template `assets/architecture.html`                           |
-| `--html --diagram`     | `references/html-design-rules.md`, `references/mermaid-essentials.md`, `../frontend-design/references/anti-slop-directives.md` | template `assets/mermaid-flowchart.html`                      |
-| `--html --slides`      | `references/html-design-rules.md`, `../frontend-design/references/anti-slop-directives.md`                                     | template `assets/slide-deck.html`                             |
-| `--html --diff`        | `references/html-design-rules.md`, `references/analytical-modes.md`, `../frontend-design/references/anti-slop-directives.md`   | template `assets/data-table.html`, `assets/architecture.html` |
+| `--html --explain`     | `references/html-design-rules.md`, `../mk-frontend-design/references/anti-slop-directives.md`                                     | template `assets/architecture.html`                           |
+| `--html --diagram`     | `references/html-design-rules.md`, `references/mermaid-essentials.md`, `../mk-frontend-design/references/anti-slop-directives.md` | template `assets/mermaid-flowchart.html`                      |
+| `--html --slides`      | `references/html-design-rules.md`, `../mk-frontend-design/references/anti-slop-directives.md`                                     | template `assets/slide-deck.html`                             |
+| `--html --diff`        | `references/html-design-rules.md`, `references/analytical-modes.md`, `../mk-frontend-design/references/anti-slop-directives.md`   | template `assets/data-table.html`, `assets/architecture.html` |
 
 Templates in `assets/` are out-of-band — they are not auto-Read; the agent reads the template only when generating the matching mode.
 
 ## Composes With
 
-- `mk:ui-design-system` — palette and typography selection (`assets/colors.csv` 160 rows, `assets/typography.csv` 73 rows). HTML modes vary palette per run.
-- `mk:frontend-design` — anti-slop forbidden patterns. Cited via `../frontend-design/references/anti-slop-directives.md`, not duplicated.
-- `mk:web-to-markdown` — for users who want to view a generated markdown file in a browser, no server bundled here.
+- `mk-ui-design-system` — palette and typography selection (`assets/colors.csv` 160 rows, `assets/typography.csv` 73 rows). HTML modes vary palette per run.
+- `mk-frontend-design` — anti-slop forbidden patterns. Cited via `../mk-frontend-design/references/anti-slop-directives.md`, not duplicated.
+- `mk-web-to-markdown` — for users who want to view a generated markdown file in a browser, no server bundled here.
 
 ## Gotchas
 
@@ -146,5 +146,5 @@ Templates in `assets/` are out-of-band — they are not auto-Read; the agent rea
 
 ## Composes Into
 
-- `mk:cook` may invoke `--explain` to communicate a complex implementation phase
-- `mk:plan-ceo-review` CRITIQUES plans; it does not overlap this skill's generic explain/diagram/slides/diff output
+- `mk-cook` may invoke `--explain` to communicate a complex implementation phase
+- `mk-plan-ceo-review` CRITIQUES plans; it does not overlap this skill's generic explain/diagram/slides/diff output

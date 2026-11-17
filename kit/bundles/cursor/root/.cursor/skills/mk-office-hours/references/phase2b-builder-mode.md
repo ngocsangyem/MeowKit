@@ -18,7 +18,7 @@ Use this mode when the user is building for fun, learning, hacking on open sourc
 
 ## Questions (generative, not interrogative)
 
-Ask these **ONE AT A TIME** via stop and ask the user in chat. The goal is to brainstorm and sharpen the idea, not interrogate.
+Ask these **one at a time** by asking the user. The goal is to brainstorm and sharpen the idea, not interrogate.
 
 - **What's the coolest version of this?** What would make it genuinely delightful?
 - **Who would you show this to?** What would make them say "whoa"?

@@ -1,6 +1,6 @@
 ---
 name: mk:lint-and-validate
-description: Run linting, formatting and static analysis right after a code edit. NOT for mk:verify.
+description: "Runs lint, format and static analysis after an edit. NOT for mk:verify."
 allowed-tools: Read, Glob, Grep, Bash
 phase: on-demand
 trust_level: third-party
@@ -13,7 +13,7 @@ keywords:
   - type-check
   - quality-control
   - post-edit-check
-when_to_use: A file was just modified and needs a quick quality gate.
+when_to_use: "A file was just modified."
 user-invocable: true
 owner: testing
 criticality: medium
@@ -26,7 +26,7 @@ requires_runtime: [python>=3.9]
 
 > Script paths in this skill's other files (references, steps) are relative to this skill's directory, `${CLAUDE_SKILL_DIR}`. Prefix them with `${CLAUDE_SKILL_DIR}/` before running them; do not run them from the project root.
 
-> **MANDATORY:** Run appropriate validation tools after EVERY code change. Do not finish a task until the code is error-free.
+> Run the project's validation tools before calling a code change done. Do not finish a task with errors outstanding.
 
 > For the full pipeline (build → lint → type-check → tests → coverage), use `mk:verify`. `mk:lint-and-validate` is a lint-only subset intended for post-edit quick checks.
 

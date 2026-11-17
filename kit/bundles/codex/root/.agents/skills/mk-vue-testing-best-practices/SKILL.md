@@ -1,6 +1,6 @@
 ---
 name: "mk-vue-testing-best-practices"
-description: "Vue 3 testing best-practices review: Vitest + Vue Test Utils for components, composables, Pinia, Router, async/Suspense, forms, a11y, plus Playwright E2E strategy. Advisory only."
+description: "Advises on Vue 3 test design: Vitest, Test Utils, Pinia, Playwright."
 ---
 
 # Vue Testing Best Practices
@@ -10,51 +10,51 @@ components, composables, Pinia stores, Vue Router, async/Suspense, Teleport, for
 accessibility — and audits existing Vitest + Vue Test Utils tests for smells, gaps, and
 coverage risk. Read-only: it advises and reviews; it never runs, generates, or fixes tests.
 
-This skill is to `mk:testing` what `mk:vue-best-practices` is to `mk:vue` — a
+This skill is to `mk-testing` what `mk-vue-best-practices` is to `mk-vue` — a
 domain-specialized advisory that you invoke deliberately.
 
 ## When to Use
 
 **Invoke-only** — this skill does NOT auto-activate. Activate it for:
 
-- `the vue-testing-best-practices skill [test file or component]` (explicit).
+- `$mk-vue-testing-best-practices [test file or component]` (explicit).
 - "review my Vue tests", "how should I test this component/composable/store", "Vue test
   best practices", "Vitest or Jest for this Vue app?", "are my async component tests correct?".
 
 **Do NOT invoke for** (each routes to its owner):
 
-- Running tests / TDD red-green / non-Vue tests / generic Playwright runner protocol → `mk:testing`
-- Diff/PR structural review or test-_existence_ gap detection → `mk:review`
-- Coverage→requirement mapping → `mk:nyquist`
-- QA of a running app + bug fixes → `mk:qa`
-- Generating or running Playwright `.spec.ts` E2E → `mk:qa-manual`
-- Driving a live browser → `mk:agent-browser` / `mk:playwright-cli`
-- Writing Vue feature code → `mk:vue` / `mk:vue-best-practices`
+- Running tests / TDD red-green / non-Vue tests / generic Playwright runner protocol → `mk-testing`
+- Diff/PR structural review or test-_existence_ gap detection → `mk-review`
+- Coverage→requirement mapping → `mk-nyquist`
+- QA of a running app + bug fixes → `mk-qa`
+- Generating or running Playwright `.spec.ts` E2E → `mk-qa-manual`
+- Driving a live browser → `mk-agent-browser` / `mk-playwright-cli`
+- Writing Vue feature code → `mk-vue` / `mk-vue-best-practices`
 
 ## Invocation Decision Guide
 
 | You want to…                                                   | Use                                      |
 | -------------------------------------------------------------- | ---------------------------------------- |
-| Write/refactor Vue feature code                                | `mk:vue`                                 |
-| Review Vue _feature_ code / authoring workflow                 | `mk:vue-best-practices`                  |
+| Write/refactor Vue feature code                                | `mk-vue`                                 |
+| Review Vue _feature_ code / authoring workflow                 | `mk-vue-best-practices`                  |
 | **Design or review Vue _test_ code; choose test tooling**      | **this skill**                           |
-| Actually run tests / TDD loop / non-Vue tests                  | `mk:testing`                             |
-| Diff/PR review or "does a test exist for this change?"         | `mk:review`                              |
-| Map test coverage → requirements (which criteria are untested) | `mk:nyquist`                             |
-| "does the running site work? find + fix bugs"                  | `mk:qa`                                  |
-| Generate runnable Playwright E2E specs from a spec/URL         | `mk:qa-manual`                           |
-| Drive a real browser                                           | `mk:agent-browser` / `mk:playwright-cli` |
+| Actually run tests / TDD loop / non-Vue tests                  | `mk-testing`                             |
+| Diff/PR review or "does a test exist for this change?"         | `mk-review`                              |
+| Map test coverage → requirements (which criteria are untested) | `mk-nyquist`                             |
+| "does the running site work? find + fix bugs"                  | `mk-qa`                                  |
+| Generate runnable Playwright E2E specs from a spec/URL         | `mk-qa-manual`                           |
+| Drive a real browser                                           | `mk-agent-browser` / `mk-playwright-cli` |
 
-### Disambiguation vs mk:vue-best-practices
+### Disambiguation vs mk-vue-best-practices
 
 The seam is _authoring_ vs _test-setup_:
 
 - Review how a component **uses** Teleport (when to use it, the API, the fallback boundary)
-  → `mk:vue-best-practices`.
+  → `mk-vue-best-practices`.
 - Review how a **test** stubs Teleport (`teleport` stub, `attachTo: document.body`, querying
   portalled content) → **this skill**.
 
-Teleport/Suspense **authoring** (when to use, API, fallback) → `mk:vue-best-practices`;
+Teleport/Suspense **authoring** (when to use, API, fallback) → `mk-vue-best-practices`;
 Teleport/Suspense **test-setup** (stubs, `flushPromises`, `attachTo`, `mountSuspense`) →
 this skill.
 
@@ -104,21 +104,21 @@ tooling advice.
 
 | Request                               | Hand off to                              |
 | ------------------------------------- | ---------------------------------------- |
-| Execute / run tests, TDD loop         | `mk:testing`                             |
-| Generate runnable E2E `.spec.ts`      | `mk:qa-manual`                           |
-| Drive a live browser                  | `mk:agent-browser` / `mk:playwright-cli` |
-| Coverage→requirement map              | `mk:nyquist`                             |
-| QA a running app + fix bugs           | `mk:qa`                                  |
-| Diff/PR review or test-existence gaps | `mk:review`                              |
-| Root-cause a failing test/bug         | `mk:investigate`                         |
+| Execute / run tests, TDD loop         | `mk-testing`                             |
+| Generate runnable E2E `.spec.ts`      | `mk-qa-manual`                           |
+| Drive a live browser                  | `mk-agent-browser` / `mk-playwright-cli` |
+| Coverage→requirement map              | `mk-nyquist`                             |
+| QA a running app + fix bugs           | `mk-qa`                                  |
+| Diff/PR review or test-existence gaps | `mk-review`                              |
+| Root-cause a failing test/bug         | `mk-investigate`                         |
 
-**Escalation:** non-Vue test code → `mk:testing`; running-app bugs → `mk:qa`; root-cause
-debugging → `mk:investigate`; coverage map → `mk:nyquist`.
+**Escalation:** non-Vue test code → `mk-testing`; running-app bugs → `mk-qa`; root-cause
+debugging → `mk-investigate`; coverage map → `mk-nyquist`.
 
 ## Output Contract
 
 Emit a single **Vue Testing Review**. Omit any empty section rather than padding it. Do not
-restate Vue basics (defer to `mk:vue`), dump whole files, or recite generic testing theory.
+restate Vue basics (defer to `mk-vue`), dump whole files, or recite generic testing theory.
 
 1. **Verdict** — one line: `PASS` / `NEEDS-WORK` + a one-sentence why.
 2. **Test Smells** — one row each: `[severity] · file:line · smell · fix`. Severity vocab:
@@ -128,13 +128,13 @@ restate Vue basics (defer to `mk:vue`), dump whole files, or recite generic test
    a11y states.
 4. **Coverage Risks** — Vue-specific blind spots: Teleported content, Suspense fallback,
    store actions, router guards. Note: _existence-level_ diff coverage gaps are produced
-   automatically by `mk:review` `../review/references/test-coverage.md` during a full review — this
+   automatically by `mk-review` `../mk-review/references/test-coverage.md` during a full review — this
    section audits test _quality_, not existence.
 5. **Tooling Recommendations** — Vitest / runner (happy-dom vs Browser Mode) / library
    (`@vue/test-utils` vs `@testing-library/vue`) / Playwright-vs-Cypress choices, each with a
    one-line rationale.
-6. **Handoffs** — explicit next-skill pointers when applicable (execute → `mk:testing`,
-   E2E gen → `mk:qa-manual`, coverage map → `mk:nyquist`).
+6. **Handoffs** — explicit next-skill pointers when applicable (execute → `mk-testing`,
+   E2E gen → `mk-qa-manual`, coverage map → `mk-nyquist`).
 
 ### Worked example — design request
 
@@ -144,7 +144,7 @@ restate Vue basics (defer to `mk:vue`), dump whole files, or recite generic test
 Verdict: NEEDS-WORK — no Pinia provided, so the component will throw on mount.
 Tooling: Vitest + happy-dom; @vue/test-utils + createTestingPinia({ createSpy: vi.fn }).
 Missing Scenarios: loading state, fetch error, empty profile.
-Handoffs: write + run the suite → mk:testing.
+Handoffs: write + run the suite → mk-testing.
 ```
 
 ### Worked example — review request

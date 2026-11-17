@@ -42,7 +42,7 @@ Tier auto-selected from a count of files matching `phase-XX-*.md`. `verification
 
 sub-task are READ-ONLY. They do NOT write to phase files. The orchestrator collects verdicts and performs ONE Edit per phase file to write the `## Verification Log` section.
 
-Use `subagent_type=Explore` (read-only). One Agent call per role; all roles dispatched in parallel via a single message.
+Use one read-only search sub-task per role; dispatch all roles in parallel in a single message.
 
 ```
 Role: {role-name}

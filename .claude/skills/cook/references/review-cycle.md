@@ -3,6 +3,15 @@
 The review-fix cycle for Phase 4. The reviewer writes a verdict file in every mode; this
 page is how the findings get acted on before shipping.
 
+## Contents
+
+- [Interactive Cycle (max 3 cycles)](#interactive-cycle-max-3-cycles)
+- [Auto-Handling Cycle](#auto-handling-cycle)
+- [Returned Work (`--advice` runs only)](#returned-work---advice-runs-only)
+- [Regression Recovery Options](#regression-recovery-options)
+- [Critical Issues (Always Block)](#critical-issues-always-block)
+- [Output Formats](#output-formats)
+
 ## Interactive Cycle (max 3 cycles)
 
 ```

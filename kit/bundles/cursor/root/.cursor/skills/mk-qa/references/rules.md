@@ -17,7 +17,7 @@
 
 ## Additional Rules (qa-specific)
 
-13. **Clean working tree required.** If dirty, use stop and ask the user in chat to offer commit/stash/abort before proceeding.
+13. **Clean working tree required.** If dirty, ask the user to offer commit/stash/abort before proceeding.
 14. **One commit per fix.** Never bundle multiple fixes into one commit.
 15. **Only modify tests when generating regression tests in Phase 8e.5.** Never modify CI configuration. Never modify existing tests — only create new test files.
 16. **Revert on regression.** If a fix makes things worse, `git revert HEAD` immediately.

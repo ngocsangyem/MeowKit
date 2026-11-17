@@ -80,7 +80,7 @@ Rules:
 
 - No URL fetching. No file reading except the paste body the SKILL.md layer hands in.
 - No upstream-spec/intake awareness — v1 is paste-only.
-- No `blocks:` key parsing — v1 input format does not carry blocks metadata; the dev links manually via `mk:jira-relationships` after creation.
+- No `blocks:` key parsing — v1 input format does not carry blocks metadata; the dev links manually via `mk-jira-relationships` after creation.
 
 ## Caller Contract
 

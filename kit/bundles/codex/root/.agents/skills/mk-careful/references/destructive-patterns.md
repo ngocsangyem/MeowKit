@@ -1,7 +1,7 @@
 # Destructive Command Patterns
 
-> Patterns that trigger a warning in `mk:careful` mode.
-> Referenced by: `.agents/skills/careful/SKILL.md` and `.agents/skills/careful/bin/check-careful.cjs`
+> Patterns that trigger a warning in `mk-careful` mode.
+> Referenced by: `.agents/skills/mk-careful/SKILL.md` and `.agents/skills/mk-careful/bin/check-careful.cjs`
 > Update this file when new destructive patterns are discovered in production — and keep the hook in sync.
 >
 > **Implementation status:** `check-careful.cjs` enforces all CRITICAL and HIGH patterns listed below. Production auto-block is active: when `NODE_ENV`, `APP_ENV`, or `ENVIRONMENT` contains `production`/`prod`/`staging`, CRITICAL patterns return `permissionDecision: "block"` (no override) instead of `"ask"`.
@@ -23,7 +23,6 @@
   - [Override Mechanism](#override-mechanism)
 - [Environment-Aware Blocking](#environment-aware-blocking)
 - [Gotchas](#gotchas)
-
 
 ---
 
@@ -157,7 +156,7 @@ On detection of a production context, CRITICAL patterns return `permissionDecisi
 
 > Update this section when Codex hits new edge cases in practice.
 
-- **Shell aliases bypass detection**: if the user has `alias del='rm -rf'`, the hook sees `del` not `rm -rf` → false negative. Document project-specific dangerous aliases in `.agents/skills/rule-`.
+- **Shell aliases bypass detection**: if the user has `alias del='rm -rf'`, the hook sees `del` not `rm -rf` → false negative. Document project-specific dangerous aliases in `.agents/skills/mk-rule-`.
 
 - **Multi-line commands may not match**: a command split across lines as `rm -rf \` + `/data` may not match a single-line regex. The hook should join continuation lines before matching.
 

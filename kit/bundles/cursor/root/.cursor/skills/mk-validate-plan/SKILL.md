@@ -1,6 +1,6 @@
 ---
 name: "mk-validate-plan"
-description: "Validates an agreed plan across 8 dimensions before build — incomplete acceptance criteria, missing dependencies, unresolved risks. Use once the plan is agreed, before Test."
+description: "Checks an agreed plan across 8 dimensions for gaps; use before building."
 disable-model-invocation: true
 ---
 
@@ -11,12 +11,12 @@ Does not replace the conversation with the user, modify plans, or route edits it
 finds an Insert or Split mutation is needed, the planner performs it and presents the plan
 again; Skip and Reorder changes require notification plus audit log.
 
-> For green-field harness sprints (generator↔evaluator loop), use `mk:sprint-contract` instead. `mk:validate-plan` operates on plans from `mk:plan-creator` (cook flow only).
+> For green-field harness sprints (generator↔evaluator loop), use `mk-sprint-contract` instead. `mk-validate-plan` operates on plans from `mk-plan-creator` (cook flow only).
 
 ## When to Use
 
 - Once the plan is agreed, before Phase 2 (Test)
-- When `the cook skill` detects a COMPLEX task (auto-suggested)
+- When `/mk-cook` detects a COMPLEX task (auto-suggested)
 - When user wants to stress-test a plan before committing to implementation
 - When user says "validate this plan", "check my plan", "is this plan complete"
 
@@ -88,10 +88,10 @@ sweep_failures:
 
 ## Integration with Cook Workflow
 
-In `the cook skill`, validation runs automatically for COMPLEX tasks:
+In `/mk-cook`, validation runs automatically for COMPLEX tasks:
 
 ```
-plan agreed → mk:validate-plan → Phase 2 (Test)
+plan agreed → mk-validate-plan → Phase 2 (Test)
 ```
 
 For STANDARD tasks, validation is optional (user-triggered).
@@ -103,7 +103,7 @@ For TRIVIAL tasks, validation is skipped.
 
 ## Relationship to plan-creator v2.3.1
 
-Note: plan-creator's step-06 now includes an enhanced validation interview with detection keywords and section mapping. mk:validate-plan focuses on 8-dimension structural validation, which is complementary — not a replacement.
+Note: plan-creator's step-06 now includes an enhanced validation interview with detection keywords and section mapping. mk-validate-plan focuses on 8-dimension structural validation, which is complementary — not a replacement.
 
 ## What This Skill Does NOT Do
 

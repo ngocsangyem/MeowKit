@@ -1,6 +1,6 @@
 ---
 name: "mk-ui-design-system"
-description: "Design UI components/design systems, review visual design, check accessibility. Triggers: design system, color palette, font pairing, WCAG check. Data-driven: palettes, fonts, UX guidelines."
+description: "Designs UI components and design systems, audits WCAG; use for palettes and contrast."
 ---
 
 # UI Design System

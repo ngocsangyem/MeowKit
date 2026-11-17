@@ -1,12 +1,24 @@
 # Workflow Discovery & Caching Protocol
 
-The authoritative source for "what statuses + transitions exist in your Jira" is **your Jira instance**, not a hardcoded template. This file documents how the `mk:jira-*` family discovers, caches, and consumes that source.
+The authoritative source for "what statuses + transitions exist in your Jira" is **your Jira instance**, not a hardcoded template. This file documents how the `mk-jira-*` family discovers, caches, and consumes that source.
+
+## Contents
+
+- [TL;DR](#tldr)
+- [Verified source primitives](#verified-source-primitives)
+- [Discovery flow](#discovery-flow)
+- [Cache file shape (admin path)](#cache-file-shape-admin-path)
+- [Cache freshness](#cache-freshness)
+- [Non-admin reality check](#non-admin-reality-check)
+- [Cross-skill consumers](#cross-skill-consumers)
+- [Educational concept patterns (NOT authoritative)](#educational-concept-patterns-not-authoritative)
+- [Open questions / known limits](#open-questions--known-limits)
 
 ## TL;DR
 
 ```bash
 # Admin path (preferred): full graph
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/fetch-workflow.sh PROJ-123
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/fetch-workflow.sh PROJ-123
 
 # What it writes
 tasks/jira-workflows/_schemes/PROJ.md          # project → workflow mapping
@@ -83,13 +95,13 @@ The lifecycle agent's pre-flight runs:
 
 ```bash
 # Sanity-check: do the cached transitions still match what Jira returns?
-LIVE=$(bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh lifecycle transitions PROJ-123 --output json | jq -r '.[] | .id' | sort)
+LIVE=$(bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh lifecycle transitions PROJ-123 --output json | jq -r '.[] | .id' | sort)
 CACHED=$(grep '^| [0-9]' tasks/jira-workflows/<slug>.md | awk '{print $2}' | sort)
 
 # If LIVE ⊄ CACHED → cache is stale, re-fetch
 ```
 
-A mismatch surfaces as: "Cache may be stale (live transitions diverge). Re-fetch with `bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/fetch-workflow.sh PROJ-123`?"
+A mismatch surfaces as: "Cache may be stale (live transitions diverge). Re-fetch with `bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/fetch-workflow.sh PROJ-123`?"
 
 ### Manual invalidation
 
@@ -121,14 +133,14 @@ The lifecycle agent should:
 
 | Skill | Reads | Why |
 |---|---|---|
-| `mk:jira-lifecycle` (this) | full cache | Recommend `--to "Status Name"` or `--id <id>` accurately |
-| `mk:jira-bulk` | full cache | Dry-run output uses real status IDs |
-| `mk:planning-engine` | status categories | Group "blocked" / "in-progress" / "done" by category for capacity calc |
-| `mk:jira-evaluator` | status_count + transition_count | Workflow shape contributes to complexity signal |
+| `mk-jira-lifecycle` (this) | full cache | Recommend `--to "Status Name"` or `--id <id>` accurately |
+| `mk-jira-bulk` | full cache | Dry-run output uses real status IDs |
+| `mk-planning-engine` | status categories | Group "blocked" / "in-progress" / "done" by category for capacity calc |
+| `mk-jira-evaluator` | status_count + transition_count | Workflow shape contributes to complexity signal |
 
 ## Educational concept patterns (NOT authoritative)
 
-The files at `.cursor/skills/jira-lifecycle/references/patterns/` (`standard-workflow.md`, `software-dev-workflow.md`, `jsm-request-workflow.md`, `incident-workflow.md`) describe **common workflow shapes** for orientation. They are NOT your project's actual workflow.
+The files at `.cursor/skills/mk-jira-lifecycle/references/patterns/` (`standard-workflow.md`, `software-dev-workflow.md`, `jsm-request-workflow.md`, `incident-workflow.md`) describe **common workflow shapes** for orientation. They are NOT your project's actual workflow.
 
 If you find yourself asking "what statuses does this project use?" — read the cache first, run `fetch-workflow.sh` if absent. Do NOT default to the patterns/ files.
 

@@ -1,7 +1,7 @@
 ---
 name: mk:preview
 version: 1.0.0
-description: Renders code, architecture or a git diff as a markdown or standalone HTML explainer, diagram or deck. NOT for mk:tech-graph.
+description: "Renders code, architecture or a diff as explainer, diagram or deck. NOT for mk:tech-graph."
 allowed-tools:
   - Read
   - Write
@@ -19,7 +19,7 @@ keywords:
   - html-output
   - ascii-diagram
   - diff-visualization
-when_to_use: Asked to explain this visually, diagram it, or show the diff as slides.
+when_to_use: "Asked to explain visually or diagram."
 user-invocable: true
 preamble-tier: 2
 phase: on-demand

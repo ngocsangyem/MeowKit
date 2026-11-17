@@ -11,7 +11,6 @@ Load this reference during **Steps 2, 4, 5** of the scout process.
 - [Reading File Content (When Needed)](#reading-file-content-when-needed)
 - [Architecture Fingerprint Detection](#architecture-fingerprint-detection)
 
-
 ## Step 2 — Determine Scale
 
 Parse the user's prompt. Identify search targets (keywords, file types, patterns).
@@ -66,7 +65,7 @@ Spawn **all agents in a single message** for parallel execution:
 
 ```
 For each segment, spawn:
-  subagent_type: "Explore"
+  a read-only search sub-task
   prompt: |
     Scout {DIRECTORIES} for files related to: {SEARCH_TARGET}
 

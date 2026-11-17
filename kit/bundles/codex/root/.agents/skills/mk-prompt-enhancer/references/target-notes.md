@@ -1,6 +1,6 @@
 # Target-Specific Notes (annotation adapters)
 
-> Loaded by `mk:prompt-enhancer` ONLY when BOTH hold: `--analyze` is active AND
+> Loaded by `mk-prompt-enhancer` ONLY when BOTH hold: `--analyze` is active AND
 > the input explicitly names a target model or runtime ("for Codex", "for
 > Codex", "targeting Gemini", "Droid/Factory"). It renders one optional
 > **"Target-specific notes"** block after Section 3 of the analysis.

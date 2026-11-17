@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const rows = [
   ["brainstorming", "M", "Opt-in scenario runner", "not run in PR CI"],
-  ["cook", "D", "Cook gate contract tests", "passed earlier in this CI run", /run:\s+bash .claude\/skills\/cook\/scripts\/test-scripts\.sh/],
+  ["cook", "D", "Cook workflow contract tests", "passed earlier in this CI run", /run:\s+bash .claude\/skills\/cook\/scripts\/test-scripts\.sh/],
   ["fix", "D", "Fix skill contract tests", "passed earlier in this CI run", /run:\s+bash tests\/fix-skill-contract\.test\.sh/],
   ["docs-finder", "D", "Docs-finder offline tests", "passed earlier in this CI run", /run:\s+node .claude\/skills\/docs-finder\/scripts\/tests\/run-tests\.js/],
   ["figma", "D", "Validate Figma evidence packet fixtures", "passed earlier in this CI run", /node .claude\/hooks\/lib\/skill-python\.cjs .claude\/skills\/figma\/evals\/validate-evidence-packets\.py/],

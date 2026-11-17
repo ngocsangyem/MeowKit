@@ -1,7 +1,7 @@
 ---
 name: analyst
 description: Use for session-end cost tracking and pattern reporting. Invoked at workflow end or on demand for a budget report. Not for implementation or review verdicts.
-model: claude-sonnet-5
+model: composer-2.5[fast=true]
 readonly: false
 is_background: true
 ---

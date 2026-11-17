@@ -8,7 +8,7 @@ Different stuck-types need different techniques. Match symptom → technique. On
 YOU'RE STUCK
 │
 ├─ Code broken? Wrong behavior? Test failing?
-│  └─→ NOT HERE — route to mk:sequential-thinking (evidence-based diagnosis)
+│  └─→ NOT HERE — route to mk-sequential-thinking (evidence-based diagnosis)
 │
 ├─ Same thing implemented 5+ ways? Growing special cases?
 │  └─→ Simplification Cascades
@@ -43,7 +43,7 @@ YOU'RE STUCK
 | Scale uncertainty     | Edge cases unclear, prod behavior unknown    | scale-game                 |
 | Told "impossible"     | Industry convention as justification         | first-principles           |
 | Bloat / addition bias | Instinct to add, should be subtracting       | via-negativa               |
-| Code broken           | Wrong output, failing test                   | → mk:sequential-thinking |
+| Code broken           | Wrong output, failing test                   | → mk-sequential-thinking |
 
 ## Process
 
@@ -68,7 +68,7 @@ Fallback checks, in order:
 2. **Explain to someone else** — rubber-duck reveals hidden assumptions.
 3. **Simplify scope** — smaller version first.
 4. **Question constraints** — real or assumed?
-5. **Reroute** — if the block is "not enough evidence about cause," switch to `mk:sequential-thinking`. If it's a multi-perspective trade-off, switch to `mk:party`.
+5. **Reroute** — if the block is "not enough evidence about cause," switch to `mk-sequential-thinking`. If it's a multi-perspective trade-off, switch to `mk-party`.
 
 ## Remember
 

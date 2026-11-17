@@ -1,9 +1,9 @@
 ---
 name: "mk-jira-agile"
-description: "JIRA agile via jira-as: epics, sprints, backlog, ranking, story points, velocity. Board ID != project key. NOT issue CRUD (mk:jira-issue) or time tracking (mk:jira-time)."
+description: "Jira epics, sprints, backlog, ranking, points; use to move items between sprints."
 ---
 
-# mk:jira-agile
+# mk-jira-agile
 
 Forks to the `jira-agile` agent. Sprint operations require a numeric `--board-id`, not the project key. The agent resolves project name → board ID via `agile board list --name "..."` first.
 
@@ -30,7 +30,7 @@ When `tasks/contracts/sprint-state-{date}-sprint-{N}.md` exists with `status: ac
 
 1. Read newest sprint-state file matching the active sprint
 2. **Acquire `flock` on the sprint-state file before any read-modify-write.** YAML frontmatter append is non-atomic across shells; lock is the only mitigation
-3. Per `agile-sprint-commitment.md` 2: `stop and ask the user in chat` "Reason for mid-sprint scope change?" — required free-text
+3. Per `agile-sprint-commitment.md` 2: ask the user "Reason for mid-sprint scope change?" — required free-text
 4. Append `{ ts: <ISO ts>, action: add|remove, ticket: KEY, reason: <text> }` to `amendments:` list
 5. Release lock
 6. Proceed with the underlying `jira-as agile sprint add|remove` call
@@ -40,8 +40,8 @@ If sprint-state contract is absent OR `status: closed` → skip the amendment ce
 ### `sprint close`
 
 1. Read `committed_tickets:` from newest active sprint-state
-2. Query each via `mk:jira-issue get KEY`
-3. For each non-terminal ticket (not Done/Cancelled/Won't-Do), `stop and ask the user in chat`: "PROJ-X is in {status}. Carry over to next sprint? Drop? Mark as not delivered?"
+2. Query each via `mk-jira-issue get KEY`
+3. For each non-terminal ticket (not Done/Cancelled/Won't-Do), ask the user: "PROJ-X is in {status}. Carry over to next sprint? Drop? Mark as not delivered?"
 4. Write closure summary: `status: closed`, `closed_at: <ts>`, `delivered: [...]`, `carried_over: [...]`
 5. Proceed with the underlying `jira-as agile sprint close` call
 
@@ -49,10 +49,10 @@ If sprint-state contract is absent OR `status: closed` → skip the amendment ce
 
 Two file classes share `tasks/contracts/`. Per-story sprint-CONTRACT files carry
 `contract_schema_version` and `### [AC-N]` entries and follow
-`mk:sprint-contract/assets/contract-template.md`. Sprint-STATE files at
+`mk-sprint-contract/assets/contract-template.md`. Sprint-STATE files at
 `sprint-state-{date}-sprint-{N}.md` follow `assets/sprint-state-template.md` instead and
 have none of those fields by design. Neither class has a validator: YAML is parsed inline
-by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`.
+by this skill, `mk-agent-detector`, and `mk-sprint-contract sprint-goal`.
 
 ### Glob-collision safety verified
 
@@ -63,11 +63,11 @@ prefix and `-sprint-`. Reading either class by an explicit path is unambiguous.
 ## See also
 
 - Agent: `../../agents/jira-agile.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/sprint-operations.md` — board/sprint/velocity wrapper patterns
   - `references/agile-field-reference.md` — agile-specific field IDs (Sprint, Epic Link, Story Points)
-- Peer leaves: `mk:jira-fields` (`../jira-fields/references/agile-field-ids.md` is the canonical instance-discovery source), `mk:jira-time` (capacity = velocity ÷ team time), `mk:jira-relationships` (epic-children outside epic-link via issue links)
+- Peer leaves: `mk-jira-fields` (`../mk-jira-fields/references/agile-field-ids.md` is the canonical instance-discovery source), `mk-jira-time` (capacity = velocity ÷ team time), `mk-jira-relationships` (epic-children outside epic-link via issue links)
 
 ## Gotchas
 

@@ -8,7 +8,7 @@ The full decision table for autobuild scaffolding density (`MINIMAL`, `FULL`, `L
 
 | Tier | Selection Source | Density | Planner | Contract | Iteration Loop | Context Reset | Rubric Rigor |
 |---|---|---|---|---|---|---|---|
-| **TRIVIAL** | task-type default (quick/typo-level) | `MINIMAL` | Skip (use plan-creator `--fast`) | Skip | Skip | Skip | Skip — invokes `mk:cook` instead |
+| **TRIVIAL** | task-type default (quick/typo-level) | `MINIMAL` | Skip (use plan-creator `--fast`) | Skip | Skip | Skip | Skip — invokes `mk-cook` instead |
 | **STANDARD** | task-type default (most builds) | `FULL` | `--product-level` | Required | 1–3 rounds | Optional | Full preset |
 | **COMPLEX** | task-type default (architecture-heavy) | `FULL` | `--product-level` | Required | 2–3 rounds | **Required** | Full preset |
 | **COMPLEX** | explicit `--tier lean` / `MEOWKIT_AUTOBUILD_MODE=LEAN` | **`LEAN`** | `--product-level` | **Optional** (skip if <5 ACs) | 0–1 rounds | **Skip** (auto-compact) | Full preset |
@@ -17,7 +17,7 @@ The full decision table for autobuild scaffolding density (`MINIMAL`, `FULL`, `L
 
 ### TRIVIAL → MINIMAL
 
-A trivial task is fast and cheap to scope but doesn't benefit from a multi-hour build harness. Running the full harness on a trivial build wastes scaffolding effort. **Short-circuit:** the harness step-00 detects MINIMAL and immediately delegates to `mk:cook` (the standard single-task pipeline), which is appropriately scoped for trivial work.
+A trivial task is fast and cheap to scope but doesn't benefit from a multi-hour build harness. Running the full harness on a trivial build wastes scaffolding effort. **Short-circuit:** the harness step-00 detects MINIMAL and immediately delegates to `mk-cook` (the standard single-task pipeline), which is appropriately scoped for trivial work.
 
 ### STANDARD → FULL
 
@@ -42,7 +42,7 @@ This is the **load-bearing finding** behind the dead-weight thesis, carried over
 Density resolves via this priority order:
 
 1. **`MEOWKIT_AUTOBUILD_MODE` env var** (highest) — `MINIMAL`, `FULL`, or `LEAN`
-2. **`--tier` flag on `the autobuild skill`** — `auto`, `minimal`, `full`, `lean`
+2. **`--tier` flag on `/mk-autobuild`** — `auto`, `minimal`, `full`, `lean`
 3. **`density-select.sh` default** — no model string to read, so this resolves to `STANDARD` tier → `FULL` density (safe fallback) unless a tier was already set above
 
 There is no auto-detection step. A Cursor custom agent's `model` field is `inherit`, and no session env var exposes the underlying model id to this bundle's scripts. Users who know their session is running on a model capable enough for LEAN mode should either:
@@ -55,7 +55,7 @@ The chosen density and its source are logged in the run report's "Density Decisi
 
 Per the "dead-weight thesis," every model upgrade is an opportunity to test whether existing scaffolding is still load-bearing. When a materially more capable model becomes available in the IDE:
 
-1. Re-run the calibration set (Phase 8 — `mk:benchmark`) with `--tier full`
+1. Re-run the calibration set (Phase 8 — `mk-benchmark`) with `--tier full`
 2. Re-run the same set with `--tier lean`
 3. If LEAN performance matches FULL within 5%, note that the model is a good LEAN candidate for this project
 4. If LEAN performance exceeds FULL (faster, cheaper, equivalent quality), prefer LEAN going forward for that model
@@ -76,5 +76,5 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 
 - the dead-weight-audit conventions — audit cadence, measurement, thresholds, never-prune list
 - the harness conventions Rule 7 — when the dead-weight audit must be re-run
-- `.cursor/skills/scale-routing/SKILL.md` Output Schema v2.1 — `autobuild_density` field
-- `.cursor/skills/benchmark/` — calibration replay automation
+- `.cursor/skills/mk-scale-routing/SKILL.md` Output Schema v2.1 — `autobuild_density` field
+- `.cursor/skills/mk-benchmark/` — calibration replay automation

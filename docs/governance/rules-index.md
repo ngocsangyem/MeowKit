@@ -54,7 +54,7 @@ skill that owns it. Nothing was dropped: the enforcement text moved intact.
 | `docs-reference-contract.md` | `docs/maintainer/` (source repo only, not shipped) | maintainers, `mewkit validate` |
 | `step-file-rules.md` | inlined as `## Step-File Contract` in each step-filed skill's `workflow.md` | `mk:plan-creator`, `mk:review`, `mk:evaluate`, `mk:autobuild`, `mk:trace-analyze` |
 | `anti-rationalization.md` | merged into `.claude/rules/core-behaviors.md` | always-on |
-| `intervention-recording-rules.md` | merged into `.claude/rules/gate-rules.md` ("Recording Human Interventions") | always-on |
+| `intervention-recording-rules.md` | merged into `.claude/rules/meowkit-core.md` ("Recording Human Overrides") | always-on |
 
 The Tier-A/Tier-B sections of the pre-diet `agent-conduct.md` that are not A1/A3/B2 — A2
 (project context first), B1 (naming), B3 (context ordering), B4 (search before building),

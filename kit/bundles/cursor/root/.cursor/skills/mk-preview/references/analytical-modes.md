@@ -1,6 +1,6 @@
 # Analytical Modes
 
-How `--html --diff` produces a display-only HTML page. Critique (verdict, scope, recommendations) is owned by `mk:plan-ceo-review` and `mk:review`. This file describes diff RENDERING only.
+How `--html --diff` produces a display-only HTML page. Critique (verdict, scope, recommendations) is owned by `mk-plan-ceo-review` and `mk-review`. This file describes diff RENDERING only.
 
 ## Contents
 
@@ -15,11 +15,11 @@ How `--html --diff` produces a display-only HTML page. Critique (verdict, scope,
 
 | Concern | Owner | This skill |
 |---|---|---|
-| Plan structural critique | `mk:plan-ceo-review` | skip |
-| Code review verdict | `mk:review` | skip |
+| Plan structural critique | `mk-plan-ceo-review` | skip |
+| Code review verdict | `mk-review` | skip |
 | Diff visualization | `--html --diff` | own |
 
-`when_to_use` already says "NOT for plan critique (mk:plan-ceo-review)". This file enforces the boundary in implementation.
+`when_to_use` already says "NOT for plan critique (mk-plan-ceo-review)". This file enforces the boundary in implementation.
 
 ## --diff data-gathering
 

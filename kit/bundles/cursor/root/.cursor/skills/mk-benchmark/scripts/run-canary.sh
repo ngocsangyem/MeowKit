@@ -42,7 +42,7 @@ done
 [ -n "${MEOWKIT_BUDGET_CAP:-}" ] && COST_CAP="$MEOWKIT_BUDGET_CAP"
 
 # Resolve project root
-[ -n "$(git rev-parse --show-toplevel):-}" ] && cd "$(git rev-parse --show-toplevel)"
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"; [ -n "$ROOT_DIR" ] && cd "$ROOT_DIR"
 
 BENCH_DIR=".meowkit/benchmarks"
 RESULTS_DIR="$BENCH_DIR/results"
@@ -100,7 +100,7 @@ TASKS_JSON="$TASKS_JSON" \
 RUN_ID="$RUN_ID" \
 TIER="$TIER" \
 STARTED="$STARTED" \
-MODEL="${MEOWKIT_MODEL_HINT:-the project environment:-unknown}}" \
+MODEL="${MEOWKIT_MODEL_HINT:-unknown}" \
 COST_CAP="$COST_CAP" \
 RESULT_FILE="$RESULT_FILE" \
 node "$(dirname "$0")/lib/write-run-manifest.cjs"
@@ -112,7 +112,7 @@ echo ""
 # never finishes filling in per-task results. Links back to the manifest path so
 # mk:trace-analyze can correlate.
 if [ -x ".meowkit/hooks/append-trace.cjs" ]; then
-  RUN_MODEL="${MEOWKIT_MODEL_HINT:-the project environment:-unknown}}"
+  RUN_MODEL="${MEOWKIT_MODEL_HINT:-unknown}"
   node .meowkit/hooks/append-trace.cjs "benchmark_result" \
     "{\"run_id\":\"$RUN_ID\",\"tier\":\"$TIER\",\"model\":\"$RUN_MODEL\",\"manifest_path\":\"$RESULT_FILE\"}" 2>/dev/null || true
 fi
@@ -128,7 +128,7 @@ echo "     - Capture the verdict, score, duration, cost"
 echo "     - Update the task entry in $RESULT_FILE"
 echo "     - Append a receipt to the ledger, then enforce the cap BEFORE the next task:"
 echo "         echo '{\"name\":\"<task>\",\"costUsd\":<cost>}' >> $LEDGER_FILE"
-echo "         bash .cursor/skills/benchmark/scripts/run-canary.sh check-cap $LEDGER_FILE $COST_CAP"
+echo "         bash .cursor/skills/mk-benchmark/scripts/run-canary.sh check-cap $LEDGER_FILE $COST_CAP"
 echo "       (exit 2 = cap reached — STOP the run; do not start further tasks)"
 echo "  2. After all tasks complete, set status='complete', compute summary"
 echo "  3. Append a benchmark_result trace record:"

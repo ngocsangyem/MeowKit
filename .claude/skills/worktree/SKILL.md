@@ -1,6 +1,6 @@
 ---
 name: mk:worktree
-description: 'Full git worktree lifecycle for agent isolation: create, merge with conflict detection, prune. NOT for mk:team-config.'
+description: "Git worktree lifecycle for agent isolation: create, merge, prune. NOT for mk:team-config."
 argument-hint: '[create|merge|cleanup|list|status|prune] [agent-name]'
 source: local
 keywords:
@@ -14,7 +14,7 @@ keywords:
   - worktree-cleanup
   - worktree-status
   - worktree-health
-when_to_use: Parallel agents need isolated branches, or their results must be merged back.
+when_to_use: "Parallel agents need isolated branches."
 user-invocable: false
 owner: git
 criticality: medium
@@ -165,11 +165,11 @@ node ${CLAUDE_SKILL_DIR}/scripts/worktree.cjs review-pr-cleanup --sweep --dry-ru
 ## Safety Rules
 
 - NEVER create worktrees on `main` or `master` — only on feature branches
-- ALWAYS cleanup worktrees after merge (don't leave stale worktrees)
+- Clean up worktrees after merge — stale ones keep their branches checked out
 - NEVER force-delete a worktree with uncommitted changes — commit or stash first
 - NEVER force-push from a worktree — it affects the shared `.git`
-- ALWAYS check `.worktrees/` is in `.gitignore` before creating the first worktree
-- ALWAYS release `mk:task-queue` task ownership before calling cleanup
+- Check `.worktrees/` is in `.gitignore` before creating the first worktree
+- Release `mk:task-queue` task ownership before calling cleanup, or the task stays claimed
 
 ## Integration
 

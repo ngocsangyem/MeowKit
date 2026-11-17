@@ -50,7 +50,7 @@ Codex's structured review already ran in Step 3.5. Now run the Codex adversarial
 
 **Codex adversarial sub-task:** Dispatch a sub-task with the adversarial prompt (same prompt as medium tier). Findings are classified FIXABLE / INVESTIGATE per the medium-tier flow.
 
-If the Codex structured review flagged any `[P1]` findings, use stop and ask the user in chat:
+If the Codex structured review flagged any `[P1]` findings, ask the user:
 
 ```
 Codex review found N critical issues in the diff.

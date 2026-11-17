@@ -81,7 +81,7 @@ model, so internal jobs do not set `model`.
 
 `isolation: worktree` is required for parallel writers in one repository and
 for any write whose verified harness controls do not otherwise satisfy the
-assigned risk tier. Create and tear down that worktree through `mk:worktree`
+assigned risk tier. Create and tear down that worktree through `mk-worktree`
 (create → merge → cleanup) rather than ad hoc git commands — this keeps
 isolation lifecycle in one place instead of duplicated per job. Worktree
 isolation prevents edit collisions; it does not claim to be an
@@ -126,7 +126,7 @@ runtime that would execute it.
 - A failed job is not retried unless the user explicitly requests it.
 - Fallback selection reruns the full capability and risk gate for that runtime.
 - Every state transition is atomically persisted before the next dispatch.
-- For durable multi-session runs, claim jobs through `mk:task-queue` so two
+- For durable multi-session runs, claim jobs through `mk-task-queue` so two
   concurrent coordinators cannot claim the same job; `state.json` remains this
   run's own record regardless.
 

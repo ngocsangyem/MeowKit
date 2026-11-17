@@ -2,7 +2,7 @@
 name: mk:benchmark
 version: 1.0.0
 preamble-tier: 3
-description: Experimental/manual harness canary procedure. It records benchmark manifests and scores but does not provide a fully automated runner.
+description: "Manual harness canary recording benchmark scores."
 argument-hint: '[run | compare <a> <b>] [--full]'
 allowed-tools:
   - Bash
@@ -19,7 +19,7 @@ keywords:
   - measure-harness
   - dead-weight-audit
   - ground-truth
-when_to_use: Experimental/manual use when measuring harness changes against ground truth. NOT for production performance benchmarking.
+when_to_use: "Experimental. NOT for production perf."
 user-invocable: true
 owner: testing
 criticality: medium
@@ -133,7 +133,7 @@ Each benchmark run writes a JSON dump to `.claude/benchmarks/results/{run-id}.js
   "started": "2026-04-08T14:30:00Z",
   "ended": "2026-04-08T14:42:00Z",
   "harness_version": "3.0.0",
-  "model": "claude-opus-4-6",
+  "model": "claude-opus-5-5",
   "total_cost_usd": 4.20,
   "total_duration_seconds": 720,
   "tasks": [

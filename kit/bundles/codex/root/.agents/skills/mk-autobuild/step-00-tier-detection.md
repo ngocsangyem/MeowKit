@@ -6,31 +6,29 @@ Pick the autobuild scaffolding density (`MINIMAL`, `FULL`, `LEAN`) based on the 
 
 ### 0a. Resolve density (priority order)
 
-1. **`--tier` flag** (explicit): map `auto → run scale-routing`, `minimal → MINIMAL`, `full → FULL`, `lean → LEAN`
+1. **`--tier` flag** (explicit): map `auto → run scale-routing`, `minimal → MINIMAL`, `full → FULL`, `lean → LEAN`. Set `resolved_tier` to the matching TRIVIAL/STANDARD/COMPLEX value.
 2. **`MEOWKIT_AUTOBUILD_MODE` env var:** if set, overrides everything below. Log the override in step-06 audit trail.
-3. **`density-select.sh`** (or invoke `mk:scale-routing` directly): emits the density token based on detected model + tier.
+3. **`density-select.sh`** (or invoke `mk-scale-routing` directly): emits the density token. There is no model string to read (see 0b), so absent an explicit `--tier`/env override this resolves to the safe `STANDARD` → `FULL` fallback.
 
 ```bash
-density=$(.agents/skills/autobuild/scripts/density-select.sh)
+density=$(.agents/skills/mk-autobuild/scripts/density-select.sh)
 ```
 
 The script returns one of: `MINIMAL`, `FULL`, `LEAN`. See `references/adaptive-density-matrix.md` for the full decision table.
 
 ### 0b. Capture model + tier metadata
 
-For the run report. Use the same env var fallback chain as `density-select.sh` (POSIX parameter expansion, not echo trick):
+For the run report. Codex exposes no environment variable naming the session's model
+id to this bundle's scripts, so `model_id` is captured as a label, not detected:
 
 ```bash
-model_id="${MEOWKIT_MODEL_HINT:-the project environment:-the provider API key:-unknown}}}"
+model_id="${MEOWKIT_MODEL_HINT:-not detectable}"
 
-# Tier is derived from model independently — NOT aliased to density
-# (density and tier are not 1:1: FULL maps to BOTH STANDARD and COMPLEX)
-case "$model_id" in
-  *haiku*) tier="TRIVIAL" ;;
-  *sonnet*) tier="STANDARD" ;;
-  *opus*) tier="COMPLEX" ;;
-  *) tier="STANDARD" ;;  # safe fallback
-esac
+# Tier is NOT derived from a model string here (none is available). Tier comes
+# directly from whichever source won in 0a (--tier flag > MEOWKIT_AUTOBUILD_MODE >
+# density-select.sh's safe STANDARD fallback). Density and tier are not 1:1:
+# FULL maps to BOTH STANDARD and COMPLEX.
+tier="${resolved_tier:-STANDARD}"
 ```
 
 ### 0c. Create the run directory
@@ -63,8 +61,8 @@ started: {ISO-8601 timestamp}
 # Autobuild Run — {task_description}
 
 ## Density Decision
-- Detected tier: {tier}
-- Detected model: {model_id}
+- Tier: {tier}
+- Model: {model_id}
 - Density: {density}
 - Source: {scale-routing | env-override | --tier flag}
 ```
@@ -73,13 +71,13 @@ started: {ISO-8601 timestamp}
 
 | density | Step-01 plan mode | Step-02 contract | Iteration loop |
 |---|---|---|---|
-| `MINIMAL` | `mk:plan-creator --fast` | SKIP | SKIP — invoke `mk:cook` instead and return |
-| `FULL` | `mk:plan-creator --product-level` | REQUIRED | 1–3 rounds |
-| `LEAN` | `mk:plan-creator --product-level` | OPTIONAL (skip if < 5 ACs needed) | 0–1 rounds |
+| `MINIMAL` | `mk-plan-creator --fast` | SKIP | SKIP — invoke `mk-cook` instead and return |
+| `FULL` | `mk-plan-creator --product-level` | REQUIRED | 1–3 rounds |
+| `LEAN` | `mk-plan-creator --product-level` | OPTIONAL (skip if < 5 ACs needed) | 0–1 rounds |
 
 `--deep` remains a plan-creator/cook planning mode. It is not an autobuild density and cannot be forced through `MEOWKIT_AUTOBUILD_MODE`.
 
-**MINIMAL short-circuit:** if density resolves to MINIMAL, the autobuild workflow immediately delegates to `mk:cook` and exits — no contract, no iteration loop, no autobuild scaffolding. The run report still gets written to record the decision.
+**MINIMAL short-circuit:** if density resolves to MINIMAL, the autobuild workflow immediately delegates to `mk-cook` and exits — no contract, no iteration loop, no autobuild scaffolding. The run report still gets written to record the decision.
 
 ## Output
 
@@ -89,6 +87,6 @@ started: {ISO-8601 timestamp}
 
 ## Next
 
-If `density == MINIMAL` → invoke `the cook skill "$task_description"` and proceed to step-06 (run report).
+If `density == MINIMAL` → invoke `$mk-cook "$task_description"` and proceed to step-06 (run report).
 
 Otherwise → read and follow `step-01-plan.md`.

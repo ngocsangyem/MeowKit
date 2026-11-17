@@ -12,17 +12,17 @@ The upstream skill was vendored into this repo's bundled skills tree under a
 
 ## Adaptation notes
 
-- Positioned as a **complement** to `mk:vue`: foundation basics (reactivity, props/emits,
-  composable naming, Pinia/Pinia Colada/routing) are deferred to `mk:vue` references; this
-  skill carries the deltas and the topics `mk:vue` does not cover (built-in components,
+- Positioned as a **complement** to `mk-vue`: foundation basics (reactivity, props/emits,
+  composable naming, Pinia/Pinia Colada/routing) are deferred to `mk-vue` references; this
+  skill carries the deltas and the topics `mk-vue` does not cover (built-in components,
   animation techniques, optional features, performance pass) plus the ordered workflow and a
   review/recommendations mode.
 - Upstream per-file frontmatter (`title`/`impact`/`tags`) and verbose intros were dropped for
   house style; examples were rewritten in `<script setup lang="ts">` with arrow functions,
   `type` over `interface`, `export default` composables, and Tailwind for styling.
-- Upstream `state-management.md` was intentionally not ported — state is owned by `mk:vue`.
+- Upstream `state-management.md` was intentionally not ported — state is owned by `mk-vue`.
 - Reactivity primitive guidance (`shallowRef()` for primitives) was kept from upstream and
-  diverges from `mk:vue`'s `ref()`-for-primitives rule; the divergence is documented in
+  diverges from `mk-vue`'s `ref()`-for-primitives rule; the divergence is documented in
   `references/reactivity-advanced.md`.
 
 ## Re-sync guidance

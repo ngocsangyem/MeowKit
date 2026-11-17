@@ -2,6 +2,14 @@
 
 Use this guide to determine which skill to use for your task.
 
+## Contents
+
+- [Quick Decision](#quick-decision)
+- [Skill Compatibility Matrix](#skill-compatibility-matrix)
+- [Common Combinations](#common-combinations)
+- [NOT This Skill](#not-this-skill)
+- [When to Use jira-jsm](#when-to-use-jira-jsm)
+
 ---
 
 ## Quick Decision
@@ -33,10 +41,10 @@ Standard fields like priority, assignee, status, labels.
 
 ```bash
 # Find high-priority incidents
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search query "project=SD AND type=Incident AND priority=High"
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh search query "project=SD AND type=Incident AND priority=High"
 
 # Find SLA breaches
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh search query "project=SD AND 'Time to resolution' breached"
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh search query "project=SD AND 'Time to resolution' breached"
 ```
 
 ---

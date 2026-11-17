@@ -1,6 +1,6 @@
 # Archive Workflow
 
-Subcommand: `the plan skill archive`. Manages plan lifecycle by archiving completed/cancelled plans.
+Subcommand: `$mk-plan-creator archive`. Manages plan lifecycle by archiving completed/cancelled plans.
 
 ## Contents
 
@@ -18,7 +18,7 @@ Subcommand: `the plan skill archive`. Manages plan lifecycle by archiving comple
 
 ## Trigger
 
-Activated when argument is `archive` (e.g., `the plan skill archive`).
+Activated when argument is `archive` (e.g., `$mk-plan-creator archive`).
 
 ## Workflow
 
@@ -31,7 +31,7 @@ Read `tasks/plans/` directory. For each subdirectory:
 
 ### A2. Present Plan List
 
-Via `stop and ask the user in chat`. Header: "Archive Plans". Question (composed): print "Found {N} archivable plans:" followed by the `name | status | created | phases` table, then "Which plans to archive?". Single-select.
+Ask the user. Header: "Archive Plans". Question (composed): print "Found {N} archivable plans:" followed by the `name | status | created | phases` table, then "Which plans to archive?". Single-select.
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
@@ -40,12 +40,12 @@ Via `stop and ask the user in chat`. Header: "Archive Plans". Question (composed
 | Select specific plans | User wants per-plan control (e.g., active reviewer is mid-read on one) | Multi-select follow-up prompt per plan |
 | Cancel | User is exploring, not committing | Aborts without touching any plan |
 
-If "Select specific plans": present each plan as a multi-select `stop and ask the user in chat`.
+If "Select specific plans": present each plan as a multi-select user question.
 If "Cancel": STOP.
 
 ### A3. Journal Capture (Optional)
 
-For each selected plan, ask via `stop and ask the user in chat`. Header: "Journal Capture". Question: "Capture learnings from these plans to memory before archiving?" Single-select.
+For each selected plan, ask by asking the user. Header: "Journal Capture". Question: "Capture learnings from these plans to memory before archiving?" Single-select.
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
@@ -71,7 +71,7 @@ No secrets — `mewkit note` exits non-zero on a secret-shaped token and writes 
 
 ### A4. Archive Action
 
-Ask via `stop and ask the user in chat`. Header: "Archive Action". Question: "How to handle the archived plans?" Single-select.
+Ask by asking the user. Header: "Archive Action". Question: "How to handle the archived plans?" Single-select.
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
@@ -99,6 +99,6 @@ Ask if user wants to commit the archival changes.
 ## Rules
 
 - NEVER touch plans with status `draft`, `in-progress`, or `pending`
-- The manual `the plan skill archive` subcommand never archives without user confirmation. Completion-driven lifecycle archiving is separate and runs only after every plan todo is checked.
+- The manual `$mk-plan-creator archive` subcommand never archives without user confirmation. Completion-driven lifecycle archiving is separate and runs only after every plan todo is checked.
 - `mewkit plan archive` creates `tasks/plans/archive/` if absent and fails closed if the destination already exists
 - Journal capture is optional — respect user choice

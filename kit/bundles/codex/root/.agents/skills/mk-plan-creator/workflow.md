@@ -21,9 +21,9 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 5. `step-04-semantic-checks.md` — Semantic checks + structural validation (`mewkit plan check --structural`). Fast mode: skip validation, go to step-07.
 6. `step-05-red-team.md` — Plan red team (hard/deep/parallel/two only): 4-persona scaling, red-team-findings.md, sub-task dispatch, adjudication
 7. `step-06-validation-interview.md` — Validation interview (hard/deep/parallel/two only): 3-5 critical questions with detection keywords, section-mapped answer propagation
-8. `step-07-gate.md` — Self-check + present the plan: stop and ask the user in chat (Looks right | Modify | Reject)
+8. `step-07-gate.md` — Self-check + present the plan: Ask the user (Looks right | Modify | Reject)
 9. `step-08-hydrate-tasks.md` — Create session tasks from phase checkboxes + critical-step sub-tasks + checkpoint file
-10. `step-09-post-plan-handoff.md` — Deterministic mode-pruned `stop and ask the user in chat`: Cook | Validate | Red-team | End. Writes `handoff.next` to plan.md frontmatter, prints suggested command, STOPs.
+10. `step-09-post-plan-handoff.md` — Deterministic mode-pruned user question: Cook | Validate | Red-team | End. Writes `handoff.next` to plan.md frontmatter, prints suggested command, STOPs.
 
 ## Variables Passed Between Steps
 
@@ -72,8 +72,8 @@ Step 1: Research (hard/deep/parallel/two only)
     └── Reports saved to {plan-dir}/research/
          ↓
 Step 2: Codebase Analysis (hard/deep/parallel/two only)
-    ├── hard: mk:scout on 2-3 relevant dirs
-    ├── deep: mk:scout on max 5 roots → compact scope map, tests, contracts, uncertainty
+    ├── hard: mk-scout on 2-3 relevant dirs
+    ├── deep: mk-scout on max 5 roots → compact scope map, tests, contracts, uncertainty
     └── Read project-context.md + docs/
          ↓
 Step 3: Draft Plan
@@ -103,10 +103,10 @@ Step 5: Red Team (hard/deep/parallel/two only — skipped in fast)
     ├── Collect → deduplicate → sort by severity → cap at 15
     ├── Agent adjudicates each: Accept/Reject + rationale
     ├── Write red-team-findings.md (full detail)
-    ├── stop and ask the user in chat: Apply all / Review each / Reject all
+    ├── ask the user: Apply all / Review each / Reject all
     └── Gate W1: Whole-Plan Consistency Sweep (stage-then-apply)
          ├── Pass 1 reads N+2 files, stages Pending Sweep Edits
-         ├── If unresolved > 0 → stop and ask the user in chat (defer/resolve/skip)
+         ├── If unresolved > 0 → ask the user (defer/resolve/skip)
          └── Pass 2 applies edits + writes sweep block + frontmatter
          ↓
 Step 6: Validation Interview (hard/deep/parallel/two only — skipped in fast)
@@ -115,37 +115,37 @@ Step 6: Validation Interview (hard/deep/parallel/two only — skipped in fast)
     ├── Propagate answers to phase files via section mapping
     └── Gate W2: Whole-Plan Consistency Sweep (stage-then-apply)
          ├── Pass 1 reads N+2 files, stages Pending Sweep Edits
-         ├── If unresolved > 0 → stop and ask the user in chat (resolve/accept-risk/cancel)
+         ├── If unresolved > 0 → ask the user (resolve/accept-risk/cancel)
          └── Pass 2 applies edits + writes Validation Log + frontmatter
          ↓
 Step 7: Present the plan
     ├── Self-check: Completed / Skipped / Uncertain
-    └── stop and ask the user in chat (Approve | Modify | Reject)
+    └── ask the user (Approve | Modify | Reject)
          ↓
 Step 8: Hydrate Tasks
-    ├── TaskCreate per phase with addBlockedBy chain
+    ├── Create one tracked task per phase, each blocked-by its predecessor
     ├── Critical-step sub-tasks for [CRITICAL]/[HIGH] todo items
     └── Create .plan-state.json checkpoint
          ↓
 Step 9: Post-Plan Handoff
     ├── Live risk re-scan over plan + phase files (advisory if new flag)
     ├── Build mode-pruned option set (cap 4)
-    ├── stop and ask the user in chat: Cook | Validate | Red-team | End (fast)
+    ├── ask the user: Cook | Validate | Red-team | End (fast)
     │   OR Cook | End (hard / deep / parallel / two)
-    │   OR Hand off to mk:autobuild | End (product-level)
+    │   OR Hand off to mk-autobuild | End (product-level)
     ├── Write handoff.next + decided_at to plan.md frontmatter
     └── Print suggested command + Context Reminder → STOP
 ```
 
 ## Mode Notes
 
-- `--deep` requires `--hard` internally (full research pipeline + bounded phase scouting after step-03). It does not choose an architecture; if the approach is unclear, route to `mk:brainstorming` before planning.
+- `--deep` requires `--hard` internally (full research pipeline + bounded phase scouting after step-03). It does not choose an architecture; if the approach is unclear, route to `mk-brainstorming` before planning.
 - `--parallel` and `--two` both require `--hard` internally (full research pipeline runs).
 - `--parallel`: step-03 adds ownership matrix; step-08 uses parallel group hydration.
 - `--two`: step-03 produces 2 approach files (no plan.md yet); step-04 asks user to select before step-05.
 - `selected_approach` is only set in `two` mode; all other modes leave it unset.
-- `--product-level`: step-03 → step-03a (spec only, no phase files). step-03a runs a LIGHT codebase scout on non-empty repos via an ALLOWLIST of `README*`/`docs/`/`brand/`/`tasks/plans/` (BLOCKLIST: `src/`, source files, schemas) — output is injected as agent working memory only, never written to `plan.md`. Hands off to `mk:autobuild` once the spec is agreed, NOT directly to developer. Auto-detected by step-00 on green-field "build a X app" prompts; explicit flag bypasses detection. Optional: `--no-design` skips design sub-task, `--no-scout` skips codebase scout.
-- `--spike`: time-boxed investigation. Skips step-01 (research), step-02 (codebase analysis), step-05 (red team), step-06 (validation interview). step-03 uses `assets/spike-plan-template.md` with two phases (investigate + findings — NO test/ship). Requires `--timebox <duration>`. Incompatible with `--product-level` and `mk:autobuild` FULL. Run via `mk:cook` or `mk:plan-creator --fast`.
+- `--product-level`: step-03 → step-03a (spec only, no phase files). step-03a runs a LIGHT codebase scout on non-empty repos via an ALLOWLIST of `README*`/`docs/`/`brand/`/`tasks/plans/` (BLOCKLIST: `src/`, source files, schemas) — output is injected as agent working memory only, never written to `plan.md`. Hands off to `mk-autobuild` once the spec is agreed, NOT directly to developer. Auto-detected by step-00 on green-field "build a X app" prompts; explicit flag bypasses detection. Optional: `--no-design` skips design sub-task, `--no-scout` skips codebase scout.
+- `--spike`: time-boxed investigation. Skips step-01 (research), step-02 (codebase analysis), step-05 (red team), step-06 (validation interview). step-03 uses `assets/spike-plan-template.md` with two phases (investigate + findings — NO test/ship). Requires `--timebox <duration>`. Incompatible with `--product-level` and `mk-autobuild` FULL. Run via `mk-cook` or `mk-plan-creator --fast`.
 
 ## Next
 

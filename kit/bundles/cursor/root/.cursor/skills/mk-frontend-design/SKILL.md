@@ -1,6 +1,6 @@
 ---
 name: "mk-frontend-design"
-description: "Use when designing UI components, reviewing visual design, building design systems, or checking accessibility. Auto-activates on frontend design tasks and UI reviews."
+description: "Designs and reviews UI components, hierarchy, accessibility. NOT for mk-ui-design-system."
 ---
 
 # Frontend Design
@@ -11,9 +11,9 @@ Production-grade UI/UX design with anti-AI-slop enforcement. Covers aesthetics, 
 
 **Auto-activate on:** Design tasks, UI component styling, "make it look good", "improve the design", "fix the UI", "design review", design system work, CSS/styling changes
 
-**Explicit:** `the frontend-design skill [concern]`
+**Explicit:** `/mk-frontend-design [concern]`
 
-**Do NOT invoke for:** Vue patterns (use mk:vue), TypeScript (use mk:typescript), backend code, API integration
+**Do NOT invoke for:** Vue patterns (use mk-vue), TypeScript (use mk-typescript), backend code, API integration
 
 ## Workflow Integration
 
@@ -31,11 +31,11 @@ Every design output MUST pass these checks:
 
 | Category | Anti-Pattern (NEVER) | Do Instead |
 |----------|---------------------|------------|
-| **Typography** | System font stack only, single weight | 2-3 weights, intentional font pairing (use mk:ui-design-system/assets/typography.csv) |
+| **Typography** | System font stack only, single weight | 2-3 weights, intentional font pairing (use mk-ui-design-system/assets/typography.csv) |
 | **Typography** | All text same size/weight | Clear hierarchy: display → heading → body → caption |
 | **Typography** | Unexamined default font choice | Choose a typeface that matches project mood and legibility needs |
 | **Color** | Unchecked extreme contrast | Verify readable contrast and deliberate palette balance |
-| **Color** | Rainbow of unrelated colors | 1 primary + 1 accent + neutrals (use mk:ui-design-system/assets/colors.csv) |
+| **Color** | Rainbow of unrelated colors | 1 primary + 1 accent + neutrals (use mk-ui-design-system/assets/colors.csv) |
 | **Color** | Decorative treatment that obscures hierarchy | Use color and gradients only when they reinforce the content hierarchy |
 | **Layout** | Centered everything, card grid with equal spacing | Asymmetric layouts, intentional whitespace variation |
 | **Layout** | Default padding/margin everywhere | Design tokens: consistent spacing scale (4px base) |

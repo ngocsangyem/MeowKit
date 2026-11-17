@@ -2,7 +2,7 @@
 name: mk:grill
 preamble-tier: 3
 version: 1.0.0
-description: Interrogate the user about THEIR plan one question at a time until every branch resolves, checkpointing answers. NOT for mk:advise.
+description: "Grills the user on their own plan, one question at a time. NOT for mk:advise."
 allowed-tools:
   - Read
   - Grep
@@ -20,7 +20,7 @@ keywords:
   - plan-interrogation
   - tacit-knowledge
   - shared-understanding
-when_to_use: Asked to grill, interrogate or stress-test the user's own design.
+when_to_use: "Asked to grill or stress-test a design."
 user-invocable: true
 owner: research
 criticality: medium

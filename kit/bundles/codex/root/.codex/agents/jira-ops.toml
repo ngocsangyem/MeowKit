@@ -1,6 +1,6 @@
 name = "jira-ops"
-description = "Inspect JIRA-side cache + project context discovery via the jira-as CLI wrapper. Diagnostic surface: cache-status, cache-clear, discover-project. Routed by mk:jira-ops skill. NOT for issue CRUD; NOT for project admin (jira-admin)."
-model = "gpt-5.4-mini"
+description = "Inspect JIRA-side cache + project context discovery via the jira-as CLI wrapper. Diagnostic surface: cache-status, cache-clear, discover-project. Routed by mk-jira-ops skill. NOT for issue CRUD; NOT for project admin (jira-admin)."
+model = "gpt-6-luna"
 model_reasoning_effort = "low"
 developer_instructions = """
 # JIRA Ops Agent
@@ -18,7 +18,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 ## Pre-flight
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh <args>
 ```
 
 

@@ -4,7 +4,7 @@
 ## Contents
 
 - [Preamble (run first)](#preamble-run-first)
-- [stop and ask the user in chat Format](#askuserquestion-format)
+- [User Question Format](#user-question-format)
 - [Completeness Principle — Boil the Lake](#completeness-principle-boil-the-lake)
 - [Repo Ownership Mode — See Something, Say Something](#repo-ownership-mode-see-something-say-something)
 - [Search Before Building](#search-before-building)
@@ -12,7 +12,6 @@
   - [Escalation](#escalation)
 - [Plan Status Footer](#plan-status-footer)
 - [REVIEW REPORT](#review-report)
-
 
 ## Preamble (run first)
 
@@ -56,7 +55,7 @@ touch .meowkit/state/.completeness-intro-seen
 Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
 
 If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: After the lake intro is handled,
-ask the user about telemetry. Use stop and ask the user in chat:
+ask the user about telemetry. Ask the user:
 
 > Help improve this workflow! Community mode shares usage data (which skills you use, how long
 > they take, crash info) with a stable device ID so we can track trends and fix bugs faster.
@@ -69,7 +68,7 @@ Options:
 
 If A: run `.codex/scripts/bin/workflow-config set telemetry community`
 
-If B: ask a follow-up stop and ask the user in chat:
+If B: ask a follow-up user question:
 
 > How about anonymous mode? We just learn that *someone* used this workflow — no unique ID,
 > no way to connect sessions. Just a counter that helps us know if anyone's out there.
@@ -88,14 +87,14 @@ touch .meowkit/state/.telemetry-prompted
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 
-## stop and ask the user in chat Format
+## User Question Format
 
-**ALWAYS follow this structure for every stop and ask the user in chat call:**
+**Follow this structure for every user question:**
 1. **Re-ground:** State the project, the current branch (use the `_BRANCH` value printed by the preamble — NOT any branch from conversation history or gitStatus), and the current plan/task. (1-2 sentences)
 2. **Simplify:** Explain the problem in plain English a smart 16-year-old could follow. No raw function names, no internal jargon, no implementation details. Use concrete examples and analogies. Say what it DOES, not what it's called.
 3. **Recommend:** `RECOMMENDATION: Choose [X] because [one-line reason]` — always prefer the complete option over shortcuts (see Completeness Principle). Include `Completeness: X/10` for each option. Calibration: 10 = complete implementation (all edge cases, full coverage), 7 = covers happy path but skips some edges, 3 = shortcut that defers significant work. If both options are 8+, pick the higher; if one is ≤5, flag it.
 4. **Options:** Lettered options: `A) ... B) ... C) ...` — when an option involves effort, show both scales: `(human: ~X / CC: ~Y)`
-5. **One decision per question:** NEVER combine multiple independent decisions into a single stop and ask the user in chat. Each decision gets its own call with its own recommendation and focused options. Batching multiple stop and ask the user in chat calls in rapid succession is fine and often preferred. Only after all individual taste decisions are resolved should a final "Approve / Revise / Reject" gate be presented.
+5. **One decision per question:** Never combine multiple independent decisions into a single user question. Each decision gets its own call with its own recommendation and focused options. Batching multiple user questions in rapid succession is fine and often preferred. Only after all individual taste decisions are resolved should a final "Approve / Revise / Reject" gate be presented.
 
 Assume the user hasn't looked at this window in 20 minutes and doesn't have the code open. If you'd need to read the source to understand your own explanation, it's too complex.
 
@@ -131,7 +130,7 @@ AI-assisted coding makes the marginal cost of completeness near-zero. When you p
 `REPO_MODE` from the preamble tells you who owns issues in this repo:
 
 - **`solo`** — One person does 80%+ of the work. They own everything. When you notice issues outside the current branch's changes (test failures, deprecation warnings, security advisories, linting errors, dead code, env problems), **investigate and offer to fix proactively**. The solo dev is the only person who will fix it. Default to action.
-- **`collaborative`** — Multiple active contributors. When you notice issues outside the branch's changes, **flag them via stop and ask the user in chat** — it may be someone else's responsibility. Default to asking, not fixing.
+- **`collaborative`** — Multiple active contributors. When you notice issues outside the branch's changes, **flag them by asking the user** — it may be someone else's responsibility. Default to asking, not fixing.
 - **`unknown`** — Treat as collaborative (safer default — ask before fixing).
 
 **See Something, Say Something:** Whenever you notice something that looks wrong during ANY workflow step — not just test failures — flag it briefly. One sentence: what you noticed and its impact. In solo mode, follow up with "Want me to fix it?" In collaborative mode, just flag it and move on.
@@ -180,7 +179,7 @@ RECOMMENDATION: [what the user should do next]
 
 ## Plan Status Footer
 
-When you are in plan mode and about to call ExitPlanMode:
+When you are in plan mode and about to present the plan for approval:
 
 1. Check if the plan file already has a `## REVIEW REPORT` section.
 2. If it DOES — skip (a review skill already wrote a richer report).
@@ -202,12 +201,12 @@ Then write a `## REVIEW REPORT` section to the end of the plan file:
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
-| CEO Review | `the plan-ceo-review skill` | Scope & strategy | 0 | — | — |
-| Design Review | inline lite check during `the ship skill` pre-landing review | UI/UX gaps | 0 | — | — |
+| CEO Review | `$mk-plan-ceo-review` | Scope & strategy | 0 | — | — |
+| Design Review | inline lite check during `$mk-ship` pre-landing review | UI/UX gaps | 0 | — | — |
 
 **VERDICT:** NO REVIEWS YET — run `/autoplan` for full review pipeline, or individual reviews above.
 ```
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
+**Plan-mode exception — run this even in plan mode:** This writes to the plan file, which is the one
 file you are allowed to edit in plan mode. The plan file review report is part of the
 plan's living status.

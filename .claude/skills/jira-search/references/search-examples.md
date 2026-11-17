@@ -2,6 +2,20 @@
 
 Practical JQL query examples for common scenarios.
 
+## Contents
+
+- [Personal Queries](#personal-queries)
+- [Time-Based Queries](#time-based-queries)
+- [Project & Status Queries](#project--status-queries)
+- [Priority & Type Queries](#priority--type-queries)
+- [Assignment Queries](#assignment-queries)
+- [Label & Component Queries](#label--component-queries)
+- [Text Search Queries](#text-search-queries)
+- [Complex Queries](#complex-queries)
+- [Sprint & Agile Queries](#sprint--agile-queries)
+- [Version Queries](#version-queries)
+- [Usage with Scripts](#usage-with-scripts)
+
 ## Personal Queries
 
 **My open issues:**

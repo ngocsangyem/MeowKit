@@ -1,11 +1,11 @@
 ---
 name: "mk-qa"
-description: "Systematically QA-tests a web app and fixes bugs: test, then iteratively fix, re-verify, commit each fix. Tiers: Quick, Standard, Exhaustive. Produces before/after health scores and fix evidence."
+description: "QA-tests a running web app, fixes each bug, re-verifies. NOT for mk-qa-manual."
 ---
 
 # /qa: Test → Fix → Verify
 
-You are a QA engineer AND a bug-fix engineer. Test web applications like a real user — click everything, fill every form, check every state. When you find bugs, fix them in source code with atomic commits, then re-verify. Produce a structured report with before/after evidence.
+You are a QA engineer AND a bug-fix engineer. Test web applications like a real user — click everything, fill every form, check every state. When you find bugs, fix them in source code with atomic commits, then retest each fixed page. Produce a structured report with before/after evidence.
 
 ## Skill wiring
 
@@ -20,13 +20,13 @@ You are a QA engineer AND a bug-fix engineer. Test web applications like a real 
 
 ## When NOT to Use
 
-For one-off browser commands (single click, screenshot, state check), use `mk:agent-browser`. qa runs the full tiered lifecycle (Quick/Standard/Exhaustive) with before/after health scores and fix loops.
+For one-off browser commands (single click, screenshot, state check), use `mk-agent-browser`. qa runs the full tiered lifecycle (Quick/Standard/Exhaustive) with before/after health scores and fix loops.
 
 ## Plan-First Gate
 
 For systematic QA (Standard/Exhaustive tiers):
 1. Check for existing test plan in `tasks/plans/`
-2. If no plan → create minimal QA scope document via `mk:plan-creator`
+2. If no plan → create minimal QA scope document via `mk-plan-creator`
 
 Skip: Quick tier — designed for rapid smoke tests without planning.
 
@@ -40,11 +40,11 @@ Skip: Quick tier — designed for rapid smoke tests without planning.
 
 4. **Compute health score + triage** — Score all findings using health score rubric, sort by severity, filter by tier (Quick: critical/high only; Standard: + medium; Exhaustive: + cosmetic). Write top 3 issues. See `references/health-score.md`, `references/workflow-phases.md`
 
-5. **Fix + re-verify + report** — For each fixable issue in triage order: apply minimal fix, atomic commit, re-test the affected page. After all fixes, re-run QA on affected pages, compute final health score delta, warn on any regression. Write full report (local + project-scoped) with fix status and PR summary. Update TODOS.md: add deferred bugs, annotate fixed bugs. Log telemetry. See `references/workflow-phases.md`, `references/preamble.md`
+5. **Fix + retest + report** — For each fixable issue in triage order: apply minimal fix, atomic commit, re-test the affected page. After all fixes, re-run QA on affected pages, compute final health score delta, warn on any regression. Write full report (local + project-scoped) with fix status and PR summary. Update TODOS.md: add deferred bugs, annotate fixed bugs. Log telemetry. See `references/workflow-phases.md`, `references/preamble.md`
 
 ## References
 
-- `references/preamble.md` — Preamble, stop and ask the user in chat format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status, Telemetry, Plan Status Footer
+- `references/preamble.md` — Preamble, user question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status, Telemetry, Plan Status Footer
 - `references/setup.md` — Base branch detection, parameters, clean tree check, browse binary, test framework bootstrap, output directories, test plan context
 - `references/modes.md` — Diff-aware, Full, Quick, Regression mode details
 - `references/workflow-phases.md` — Phases 1-11 with full implementation details (authenticate, orient, explore, document, wrap up, triage, fix loop, final QA, report, TODOS)

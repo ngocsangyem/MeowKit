@@ -1,6 +1,6 @@
 ---
 name: "mk-database"
-description: "Design and safely evolve data models, schemas, migrations, queries, indexes, and ORM data-access boundaries. Discover the existing engine and migration source before proposing syntax."
+description: "Data models, schema, migration, queries, indexes; use to change a schema or fix a slow query."
 ---
 
 # Database
@@ -12,34 +12,34 @@ proposing anything.
 
 | Owner | Owns | Does NOT own |
 |---|---|---|
-| `mk:api-design-principles` | Interface contract: resource/type/message shape, error and authorization *requirements*, compatibility and deprecation, consumer discovery | Implementation, persistence, security verdict, release |
-| `mk:backend-development` | End-to-end backend change: discovery, classification, service/handler/integration work | Contract authorship, schema/SQL, security verdict, deploy |
-| `mk:database` | Data invariants, schema, migration and recovery, query/index evidence, ORM data-access boundary | API contract, authorization verdict, infrastructure execution |
-| `mk:devops` | Infrastructure-as-code, containers, CI, runtime config, deployment safety design, rollback, incident diagnosis | Deploy approval and execution, security verdict, code root-cause, schema semantics |
+| `mk-api-design-principles` | Interface contract: resource/type/message shape, error and authorization *requirements*, compatibility and deprecation, consumer discovery | Implementation, persistence, security verdict, release |
+| `mk-backend-development` | End-to-end backend change: discovery, classification, service/handler/integration work | Contract authorship, schema/SQL, security verdict, deploy |
+| `mk-database` | Data invariants, schema, migration and recovery, query/index evidence, ORM data-access boundary | API contract, authorization verdict, infrastructure execution |
+| `mk-devops` | Infrastructure-as-code, containers, CI, runtime config, deployment safety design, rollback, incident diagnosis | Deploy approval and execution, security verdict, code root-cause, schema semantics |
 
 Routing rules — identical in all four skills:
 
-- **Contract-only API question → `mk:api-design-principles`**, even in the middle of a task
+- **Contract-only API question → `mk-api-design-principles`**, even in the middle of a task
   owned by another skill. "Contract" means what a consumer can observe: field set, error
   shape, status semantics, pagination, versioning. Extending an endpoint without changing
   any of those is not a contract change.
-- **End-to-end backend change → `mk:backend-development`**, which invokes the API skill only
+- **End-to-end backend change → `mk-backend-development`**, which invokes the API skill only
   when a new, public, or breaking contract is in scope.
 - **A message-based change (event, webhook, RPC) splits**: the message contract belongs to
-  `mk:api-design-principles`; the producer or consumer implementation belongs to
-  `mk:backend-development`.
-- **Schema, migration, query, index, or ORM work → `mk:database`.** No other skill writes a
+  `mk-api-design-principles`; the producer or consumer implementation belongs to
+  `mk-backend-development`.
+- **Schema, migration, query, index, or ORM work → `mk-database`.** No other skill writes a
   migration or generic SQL.
-- **Infrastructure, containers, delivery, or deployment safety → `mk:devops`.**
+- **Infrastructure, containers, delivery, or deployment safety → `mk-devops`.**
 - **An unscoped performance request is triaged by evidence, never by guess**:
-  `mk:backend-development` locates where the time actually goes, then hands a query or index
-  question to `mk:database` and a capacity or runtime question to `mk:devops`. No skill
+  `mk-backend-development` locates where the time actually goes, then hands a query or index
+  question to `mk-database` and a capacity or runtime question to `mk-devops`. No skill
   invents the target.
-- **Code root cause → `mk:investigate`.** `mk:devops` owns the operational picture — what
+- **Code root cause → `mk-investigate`.** `mk-devops` owns the operational picture — what
   changed, where it fails, which signal proves it — and hands the defect over.
 - **An auth-sensitive change**: the owning skill states the *requirement*; the security
   workflow owns the verdict.
-- **Any production effect → `mk:ship` or a human.**
+- **Any production effect → `mk-ship` or a human.**
 
 ## Workflow
 
@@ -99,7 +99,7 @@ An expand → migrate/backfill → contract sequence fits most non-trivial chang
 table. Use it where it fits; say why when it does not.
 
 Never run a reset, drop, backfill, or migration against a live or production database.
-Prepare it and hand execution to `mk:ship` or a human.
+Prepare it and hand execution to `mk-ship` or a human.
 
 ### 6. Validate and hand off
 

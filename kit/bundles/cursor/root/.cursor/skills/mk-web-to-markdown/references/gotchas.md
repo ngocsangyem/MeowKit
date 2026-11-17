@@ -1,4 +1,4 @@
-# mk:web-to-markdown — Gotchas
+# mk-web-to-markdown — Gotchas
 
 Concrete edge cases and operational surprises. Each entry explains why it matters and how to mitigate it.
 
@@ -48,13 +48,13 @@ Concrete edge cases and operational surprises. Each entry explains why it matter
 
 **Why it matters:** Playwright rendering is triple-gated. ALL three must be true simultaneously:
 
-1. `playwright` package installed (via `setup-workflow --system-deps`, ~200MB download)
+1. `playwright` package installed (via `mewkit setup --system-deps`, ~200MB download)
 2. `MEOWKIT_WEB_FETCH_JS=1` environment variable set
 3. Per-call `js=True` argument passed to `fetch_as_markdown()`
 
 Missing any single gate silently falls back to static fetch. If static fetch returns thin content and all three gates are not met, the skill returns an error, not a Playwright result.
 
-**Mitigation:** Run `setup-workflow --system-deps` to install Playwright, then set `MEOWKIT_WEB_FETCH_JS=1` in your environment, and pass `js=True` at the call site. Verify all three before assuming JS rendering is active.
+**Mitigation:** Run `mewkit setup --system-deps` to install Playwright, then set `MEOWKIT_WEB_FETCH_JS=1` in your environment, and pass `js=True` at the call site. Verify all three before assuming JS rendering is active.
 
 ---
 
@@ -91,6 +91,6 @@ TTL auto-cleanup is deferred to v2 (`setup cleanup command`). Add the cache dire
 
 ## Gotcha: Cross-skill delegation requires explicit opt-in flag
 
-**Why it matters:** Any skill other than a direct user invocation must pass `--wtm-accept-risk` when delegating to `mk:web-to-markdown`. Without this flag, the skill refuses with `ERROR: cross-skill delegation requires --wtm-accept-risk flag`. This prevents implicit invocation from skills that haven't consciously acknowledged the injection risk of fetching arbitrary URLs.
+**Why it matters:** Any skill other than a direct user invocation must pass `--wtm-accept-risk` when delegating to `mk-web-to-markdown`. Without this flag, the skill refuses with `ERROR: cross-skill delegation requires --wtm-accept-risk flag`. This prevents implicit invocation from skills that haven't consciously acknowledged the injection risk of fetching arbitrary URLs.
 
 **Mitigation:** Always pass `--wtm-accept-risk` (or `wtm_accept_risk=True` in Python) when delegating from another skill. This flag is a conscious trust-boundary crossing — the caller acknowledges that the target URL may contain prompt injection and that the skill's defenses are best-effort. See `references/security.md` for full flag semantics.

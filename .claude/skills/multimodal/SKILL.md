@@ -1,6 +1,6 @@
 ---
 name: mk:multimodal
-description: Analyse and generate images, video, audio and PDFs via Gemini or MiniMax with fallback. NOT for mk:html-video.
+description: "Analyses and generates images, video, audio, PDFs. NOT for mk:html-video."
 version: 2.1.0
 argument-hint: '[file-path] [task]'
 phase: on-demand
@@ -30,7 +30,7 @@ keywords:
   - video
   - audio
   - minimax
-when_to_use: The task names a media file, or asks to transcribe, describe or generate one.
+when_to_use: "Asked to transcribe, describe or generate media."
 user-invocable: true
 allowed-tools:
   - Bash
@@ -127,7 +127,7 @@ Force a provider: `--provider gemini|minimax|openrouter`. Override chain order v
 
 ## Gotchas
 
-- **Python venv required**: if you get `python3: command not found` or import errors, run `.claude/hooks/lib/setup-workflow` once from the project root.
+- **Python venv required**: if you get `python3: command not found` or import errors, run `mewkit skill env multimodal` once from the project root.
 - **Audio >15 min**: Gemini truncates silently. Split first.
 - **PDF >100 pages**: Quality degrades. Process in 20-page chunks.
 - **Video cost**: ~263 tokens/sec at default resolution. Use `--verbose` for cost estimate.

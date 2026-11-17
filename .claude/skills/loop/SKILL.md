@@ -1,6 +1,6 @@
 ---
 name: mk:loop
-description: Iterate on one measurable scalar — modify, verify, keep or revert — in bounded git-tracked trials. NOT for mk:evaluate.
+description: "Iterates on one measurable metric in git-tracked trials. NOT for mk:evaluate."
 version: 1.0.0
 argument-hint: '[Goal: ...] [Scope: globs] [Metric: name] [Direction: higher|lower] [Verify: cmd] [Guard: cmd] [Iterations: N]'
 source: local
@@ -26,7 +26,7 @@ keywords:
   - keep-or-revert
   - bounded
   - regression-guard
-when_to_use: Asked to optimize coverage, bundle size or lint count until it improves.
+when_to_use: "Asked to optimize coverage or bundle size."
 user-invocable: true
 metadata:
   attribution: Loop pattern adapted from autoresearch by Udit Goenka (MIT); MeowKit-native gates, git policy, and artifacts.

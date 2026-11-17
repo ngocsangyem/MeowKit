@@ -54,7 +54,7 @@ Databases, volumes, buckets, disks, queues with retained messages, and certifica
 - Replacement of any of these is data loss until a restore is proven, not merely configured.
 - A change to retention, lifecycle, or versioning settings can delete data later, silently.
   Treat it as a data change, not a configuration change.
-- Schema semantics belong to `mk:database`. This skill owns whether the *resource* survives
+- Schema semantics belong to `mk-database`. This skill owns whether the *resource* survives
   the change; it does not own what is inside it.
 - Never run a production data operation as part of an infrastructure change.
 
@@ -81,7 +81,7 @@ absence from the tree proves nothing about the runtime.
 - **Define the post-deploy check** before the deploy: the specific signal that says it
   worked, and the one that says it did not.
 - **Never couple an irreversible data step to a deploy step.** If a migration must precede a
-  release, that ordering is a plan for a human, and the data half belongs to `mk:database`.
+  release, that ordering is a plan for a human, and the data half belongs to `mk-database`.
 
 ## Rollback and forward recovery
 
@@ -107,7 +107,7 @@ Operational diagnosis belongs here; the code defect does not.
 3. **Read the signals the system already emits.** Do not add instrumentation mid-incident
    unless nothing else can answer the question.
 4. **Separate the operational cause from the code cause.** "Errors started at the deploy" is
-   an operational finding. Why the code fails is `mk:investigate`'s question — hand it over
+   an operational finding. Why the code fails is `mk-investigate`'s question — hand it over
    with the evidence rather than guessing at it.
 5. **Recommend the safest reversal available**, then let a human perform it.
 

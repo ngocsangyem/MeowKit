@@ -1,6 +1,6 @@
 ---
 name: mk:jira-lifecycle
-description: 'mk:jira leaf. Transition, assign, resolve, reopen, versions, components. NOT for mk:jira-bulk.'
+description: "mk:jira leaf: transition, assign, resolve, reopen, versions. NOT for mk:jira-bulk."
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - jira-resolve
   - jira-version
   - jira-component
-when_to_use: 'Change one Jira issue status or assignee, or release a version.'
+when_to_use: "Change one issue's status or assignee."
 user-invocable: true
 context: fork
 agent: jira-lifecycle

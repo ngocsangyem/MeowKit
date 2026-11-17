@@ -32,7 +32,7 @@ Determine the skill name from the `name:` field in this file's YAML frontmatter.
 Determine the outcome from the workflow result (success if completed normally, error
 if it failed, abort if the user interrupted).
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
+**Plan-mode exception — run this even in plan mode:** This command writes telemetry to
 `.meowkit/telemetry/` (not project files). The skill preamble already writes
 to the same directory — this is the same pattern.
 Skipping this command loses session duration and outcome data.
@@ -57,7 +57,7 @@ never blocks the user.
 
 # Plan Status Footer
 
-When you are in plan mode and about to call ExitPlanMode:
+When you are in plan mode and about to present the plan for approval:
 
 1. Check if the plan file already has a `## REVIEW REPORT` section.
 2. If it DOES — skip (a review skill already wrote a richer report).
@@ -79,12 +79,12 @@ Then write a `## REVIEW REPORT` section to the end of the plan file:
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
-| CEO Review | `the plan-ceo-review skill` | Scope & strategy | 0 | — | — |
+| CEO Review | `$mk-plan-ceo-review` | Scope & strategy | 0 | — | — |
 | Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
 
 **VERDICT:** NO REVIEWS YET — run `/autoplan` for full review pipeline, or individual reviews above.
 ```
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
+**Plan-mode exception — run this even in plan mode:** This writes to the plan file, which is the one
 file you are allowed to edit in plan mode. The plan file review report is part of the
 plan's living status.

@@ -1,6 +1,6 @@
 ---
 name: "mk-worktree"
-description: "Manages git worktrees for parallel agent isolation: creates parallel/{name}-{timestamp} branches, merges with conflict detection. NOT for user feature branches (use git worktree directly)."
+description: "Manages git worktrees for agent isolation: create, merge, prune."
 ---
 
 # Git Worktree Manager
@@ -18,10 +18,10 @@ Pre-flight: get repo info, then create a parallel worktree.
 
 ```bash
 # Step 1: verify repo state
-node .agents/skills/worktree/scripts/worktree.cjs info --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs info --json
 
 # Step 2: create parallel agent worktree
-node .agents/skills/worktree/scripts/worktree.cjs create "{agent-name}" --orchestrated --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs create "{agent-name}" --orchestrated --json
 ```
 
 Before creating the first parallel worktree in a repo, verify `.worktrees/` is in `.gitignore`.
@@ -60,10 +60,10 @@ Skip PM delegation if `MEOWKIT_PM_AUTO=off` is set in environment.
 ### cleanup
 
 Before removing a worktree, ensure the parallel agent has released its task ownership
-in `mk:task-queue`. Then:
+in `mk-task-queue`. Then:
 
 ```bash
-node .agents/skills/worktree/scripts/worktree.cjs remove "{agent-name}" --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs remove "{agent-name}" --json
 ```
 
 Never cleanup a worktree with uncommitted changes — commit or stash first.
@@ -71,7 +71,7 @@ Never cleanup a worktree with uncommitted changes — commit or stash first.
 ### list
 
 ```bash
-node .agents/skills/worktree/scripts/worktree.cjs list --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs list --json
 ```
 
 ### status
@@ -79,7 +79,7 @@ node .agents/skills/worktree/scripts/worktree.cjs list --json
 Health audit of all active worktrees (ahead/behind divergence, dirty state):
 
 ```bash
-node .agents/skills/worktree/scripts/worktree.cjs status --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs status --json
 ```
 
 ### prune
@@ -88,9 +88,9 @@ Clean stale worktree metadata. Always dry-run first:
 
 ```bash
 # Safe first-pass
-node .agents/skills/worktree/scripts/worktree.cjs prune --dry-run --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs prune --dry-run --json
 # Execute if no surprises
-node .agents/skills/worktree/scripts/worktree.cjs prune --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs prune --json
 ```
 
 ### review-pr
@@ -104,9 +104,9 @@ session dir `tasks/reviews/<session>/manifest.json` (survives worktree removal) 
 
 ```bash
 # Preview only (no fetch, no worktree) — validates inputs, prints the manifest
-node .agents/skills/worktree/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --dry-run --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --dry-run --json
 # Create for real
-node .agents/skills/worktree/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs review-pr --pr 123 --remote origin --session <id> --json
 ```
 
 ### review-pr-cleanup
@@ -118,9 +118,9 @@ feature worktree). Force is allowed (review worktrees are legitimately dirty aft
 build/test); ownership, not cleanliness, is the guard.
 
 ```bash
-node .agents/skills/worktree/scripts/worktree.cjs review-pr-cleanup --manifest tasks/reviews/<id>/manifest.json --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs review-pr-cleanup --manifest tasks/reviews/<id>/manifest.json --json
 # Stale-session sweep — dry-run by default; --apply to execute
-node .agents/skills/worktree/scripts/worktree.cjs review-pr-cleanup --sweep --dry-run --json
+node .agents/skills/mk-worktree/scripts/worktree.cjs review-pr-cleanup --sweep --dry-run --json
 ```
 
 ## Gotchas
@@ -137,7 +137,7 @@ node .agents/skills/worktree/scripts/worktree.cjs review-pr-cleanup --sweep --dr
 - `.worktrees/` directory must be gitignored — add to `.gitignore` before first parallel run
 - Merge conflicts on `SKILL.md`/`AGENTS.md` are common in parallel runs — always stop
   and report to orchestrator, never auto-resolve
-- `mk:task-queue` ownership must be released before worktree cleanup, or the next agent
+- `mk-task-queue` ownership must be released before worktree cleanup, or the next agent
   cannot claim that task
 - Max 3 active worktrees at any time (the parallel-execution rules Rule 2) — `status`
   command shows current count
@@ -146,16 +146,16 @@ node .agents/skills/worktree/scripts/worktree.cjs review-pr-cleanup --sweep --dr
 ## Safety Rules
 
 - NEVER create worktrees on `main` or `master` — only on feature branches
-- ALWAYS cleanup worktrees after merge (don't leave stale worktrees)
+- Clean up worktrees after merge — stale ones keep their branches checked out
 - NEVER force-delete a worktree with uncommitted changes — commit or stash first
 - NEVER force-push from a worktree — it affects the shared `.git`
-- ALWAYS check `.worktrees/` is in `.gitignore` before creating the first worktree
-- ALWAYS release `mk:task-queue` task ownership before calling cleanup
+- Check `.worktrees/` is in `.gitignore` before creating the first worktree
+- Release `mk-task-queue` task ownership before calling cleanup, or the task stays claimed
 
 ## Integration
 
-- Called by orchestrator (`mk:cook`, `mk:workflow-orchestrator`) when decomposing COMPLEX tasks
-- Coordinates with `mk:task-queue` for task claiming and ownership enforcement during parallel runs
+- Called by orchestrator (`mk-cook`, `mk-workflow-orchestrator`) when decomposing COMPLEX tasks
+- Coordinates with `mk-task-queue` for task claiming and ownership enforcement during parallel runs
 - Delegates to `project-manager` after merge integration test passes
   (post-phase-delegation Rule 1, background mode)
 - Respects `MEOWKIT_PM_AUTO=off` — skip PM delegation when set

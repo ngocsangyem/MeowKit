@@ -4,6 +4,13 @@ Load this file only when the run was invoked with `--advice`. Without the flag t
 are zero supervision calls, no dossier, no receipt, and the step sequence is
 byte-identical to an unsupervised run.
 
+## Contents
+
+- [Checkpoints](#checkpoints)
+- [The user boundary — the thing most likely to go wrong here](#the-user-boundary--the-thing-most-likely-to-go-wrong-here)
+- [Call](#call)
+- [After the call](#after-the-call)
+
 The contract this implements is
 `.claude/skills/advise/references/advice-supervision-rules.md`. Where the two disagree, the
 contract wins.

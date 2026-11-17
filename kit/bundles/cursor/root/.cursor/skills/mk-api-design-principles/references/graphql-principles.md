@@ -19,10 +19,10 @@ consumer-proof rule live in `SKILL.md` and apply to every style.
 
 A GraphQL type describes what a consumer sees. It may span several tables, or expose a
 fraction of one. Mirroring the storage layout into the schema couples every future data
-change to a contract change — and hands `mk:database` a shape it did not choose.
+change to a contract change — and hands `mk-database` a shape it did not choose.
 
 Whenever a field's cost depends on the underlying store, name the field and hand the cost
-question to `mk:database`. Do not encode a storage decision in the schema.
+question to `mk-database`. Do not encode a storage decision in the schema.
 
 ## Naming and nullability
 
@@ -85,7 +85,7 @@ common default for a large ordered collection and is what most GraphQL clients e
 A simple list is acceptable for a bounded collection that cannot grow — say so explicitly,
 because converting a list field to a connection later is breaking.
 
-A total count is a query cost. Confirm it with `mk:database` before putting it in the schema.
+A total count is a query cost. Confirm it with `mk-database` before putting it in the schema.
 
 ## Relationship fetch cost
 
@@ -94,14 +94,14 @@ before the schema ships whether the field is exposed at all, and how it is fetch
 
 Batching per request is the usual mechanism, but it is a mechanism, not a contract rule.
 State the access pattern in the contract, hand measurement and the fetch strategy to
-`mk:database`, and do not mandate a specific library.
+`mk-database`, and do not mandate a specific library.
 
 ## Authorization in the contract
 
 State the authorization *requirement* per field or operation: who may read it, who may
 write it, and what the consumer observes when they may not. Whether that is enforced by
 schema directives or in resolvers is an implementation choice owned by
-`mk:backend-development`; the verdict on whether it is correct belongs to the security
+`mk-backend-development`; the verdict on whether it is correct belongs to the security
 workflow.
 
 ## What not to prescribe
@@ -109,6 +109,6 @@ workflow.
 - A specific batching, caching, or client library.
 - A query-complexity limit, depth limit, or cost value.
 - Whether introspection is enabled — that is a deployment posture question, not a contract
-  rule, and belongs to `mk:devops` and the security workflow.
+  rule, and belongs to `mk-devops` and the security workflow.
 - A file-upload transport.
 - A schema-registry or federation topology the repository does not already use.

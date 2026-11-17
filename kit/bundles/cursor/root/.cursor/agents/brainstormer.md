@@ -1,7 +1,7 @@
 ---
 name: brainstormer
-description: Use to brainstorm software solutions or debate a technical decision before implementation. Use proactively when a task has multiple viable approaches. Not for implementation or final decisions.
-model: claude-fable-5
+description: Use to brainstorm software solutions or debate a technical decision before implementation. Delegate when a decision has several viable approaches; skip it when the approach is settled. Not for implementation or final decisions.
+model: claude-opus-5[effort=high]
 readonly: true
 is_background: false
 ---

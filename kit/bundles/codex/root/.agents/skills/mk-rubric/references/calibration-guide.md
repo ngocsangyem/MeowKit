@@ -15,7 +15,6 @@ How to add high-quality PASS / FAIL anchor examples to a rubric without introduc
 - [Re-Calibration Per Model Upgrade](#re-calibration-per-model-upgrade)
 - [Adding a New Rubric — Checklist](#adding-a-new-rubric-checklist)
 
-
 ## Why Calibration Matters
 
 Anchor examples are the **highest-leverage** part of a rubric. The model uses them to ground its understanding of "what PASS looks like vs FAIL looks like." Bad anchors produce bad evaluators in subtle, hard-to-debug ways:
@@ -61,7 +60,7 @@ If you need to add a 5th example, it can break the alternation, but examples 1-4
 **Why:** Synthetic examples ("imagine a kanban app where...") are a lossy proxy for real failure modes. Real reviews capture concrete artifacts: actual screenshots, actual error messages, actual code snippets the evaluator can pattern-match.
 
 **Practical sources:**
-1. `tasks/reviews/*-verdict.md` from prior `the review skill` runs
+1. `tasks/reviews/*-verdict.md` from prior `$mk-review` runs
 2. The Anthropic harness article appendix (RetroForge PASS, generic-SaaS-clone FAIL) <!-- research-citation -->
 3. The Anthropic Labs blog screenshots <!-- research-citation -->
 4. Anonymized internal QA failures
@@ -110,7 +109,7 @@ When a new model tier is rolled out (Sonnet 4.6, Opus 4.7, etc.), re-run a calib
 3. Verify the model's verdict matches the anchor's stated verdict
 4. If the model disagrees on >1 anchor, update the anchors (or downgrade the rubric's hard-fail threshold)
 
-The Phase 8 benchmark suite (`mk:benchmark`) automates this — run after every model rollout.
+The Phase 8 benchmark suite (`mk-benchmark`) automates this — run after every model rollout.
 
 ## Adding a New Rubric — Checklist
 

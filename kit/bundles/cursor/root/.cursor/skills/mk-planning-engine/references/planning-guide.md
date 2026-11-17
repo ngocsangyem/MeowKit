@@ -49,7 +49,7 @@ Flag if total estimated points > capacity:
 ## Tickets Needing Human Decision
 
 Always separate these from auto-planned tickets:
-- Escalated by mk:jira estimator ("human estimation recommended")
+- Escalated by mk-jira estimator ("human estimation recommended")
 - Unestimated (no story points)
 - Flagged as [AMBIGUOUS] by spec analysis
 - Circular dependency participants

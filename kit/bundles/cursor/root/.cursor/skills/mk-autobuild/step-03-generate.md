@@ -25,13 +25,13 @@ sed -i.bak "s/^iterations:.*/iterations: $iteration/" "$run_dir/run.md" && rm "$
 echo "Iteration: $iteration / $max_iter"
 ```
 
-The iteration counter lives in the run report frontmatter, NOT in session memory. This makes the autobuild workflow resumable: a killed run can be restarted with `the autobuild skill --resume {run_id}` and the orchestrator reads the last iteration from `$run_dir/run.md`.
+The iteration counter lives in the run report frontmatter, NOT in session memory. This makes the autobuild workflow resumable: a killed run can be restarted with `/mk-autobuild --resume {run_id}` and the orchestrator reads the last iteration from `$run_dir/run.md`.
 
 ### 3c. Dispatch the developer sub-task
 
 ```
 delegate a sub-task (
-  subagent_type="developer",
+  agent="developer",
   description="Generator iteration $iteration for $slug",
   prompt="
     Act as the developer role: an implementer that turns a signed contract (or product
@@ -119,10 +119,10 @@ case "$tier" in
 esac
 step_cost_usd=$(awk -v s="$elapsed_seconds" -v r="$rate" 'BEGIN { printf "%.2f", (s/60.0)*r }')
 
-MEOWKIT_RUN_ID="$run_id" .cursor/skills/autobuild/scripts/budget-tracker.sh add "$step_cost_usd" "step-03-iter-${iteration}"
+MEOWKIT_RUN_ID="$run_id" .cursor/skills/mk-autobuild/scripts/budget-tracker.sh add "$step_cost_usd" "step-03-iter-${iteration}"
 
 # Check thresholds — exit code 0 ok, 1 warn, 2 hard block, 3 user cap
-if ! MEOWKIT_RUN_ID="$run_id" .cursor/skills/autobuild/scripts/budget-tracker.sh check; then
+if ! MEOWKIT_RUN_ID="$run_id" .cursor/skills/mk-autobuild/scripts/budget-tracker.sh check; then
   exit_code=$?
   if [ "$exit_code" -ge 2 ]; then
     final_status=TIMED_OUT

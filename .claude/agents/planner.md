@@ -2,7 +2,7 @@
 name: planner
 description: Product and engineering planning agent. Runs a two-lens review (product + engineering) on every task and produces a structured plan file before implementation begins. Use when starting any standard or complex task, before code is written. Not for implementation or review verdicts.
 tools: Read, Grep, Glob, Bash, Edit, Write
-model: claude-opus-5
+model: opus
 memory: project
 owner: lifecycle
 criticality: high

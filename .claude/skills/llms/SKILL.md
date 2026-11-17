@@ -1,6 +1,6 @@
 ---
 name: mk:llms
-description: Generate llms.txt indexes from project docs per the llmstxt.org spec. NOT for mk:docs-init.
+description: "Generates llms.txt from project docs per llmstxt.org."
 argument-hint: '[path] [--full] [--output path] [--url base]'
 source: local
 original_path: .claude/skills/llms/SKILL.md
@@ -11,7 +11,7 @@ keywords:
   - llm-friendly-docs
   - ai-discoverability
   - agentic-content
-when_to_use: Making a project discoverable to AI assistants through llms.txt.
+when_to_use: "Making a project discoverable to AI via llms.txt."
 user-invocable: true
 owner: docs
 criticality: medium
@@ -111,4 +111,4 @@ node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/generate-llm
 
 ## Gotchas
 
-- **Python venv required**: run `.claude/hooks/lib/setup-workflow` once from the project root before invoking this skill. Re-run after upgrading the toolkit.
+- **Python venv required**: run `mewkit skill env llms` once from the project root before invoking this skill. Re-run after upgrading the toolkit.

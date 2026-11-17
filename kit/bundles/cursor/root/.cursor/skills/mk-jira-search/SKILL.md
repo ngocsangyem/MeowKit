@@ -1,11 +1,11 @@
 ---
 name: "mk-jira-search"
-description: "JIRA search + filter management via jira-as; JQL injection-safe. NOT single-issue CRUD (mk:jira-issue) or bulk writes (mk:jira-bulk)."
+description: "JQL search and saved filters for Jira; use to find issues. NOT for mk-jira-bulk."
 ---
 
-# mk:jira-search
+# mk-jira-search
 
-Forks to the `jira-search` agent. JQL is positional on `search query` and `search validate`; flags everywhere else. The agent enforces JQL sanitization for any user-derived term via `../jira/scripts/jql-sanitize.sh`.
+Forks to the `jira-search` agent. JQL is positional on `search query` and `search validate`; flags everywhere else. The agent enforces JQL sanitization for any user-derived term via `../mk-jira/scripts/jql-sanitize.sh`.
 
 ## Triggers
 
@@ -24,12 +24,12 @@ Forks to the `jira-search` agent. JQL is positional on `search query` and `searc
 ## See also
 
 - Agent: `../../agents/jira-search.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/jql-patterns.md` — canonical JQL templates (curated)
   - `references/jql-reference.md` — full JQL operator + function reference
   - `references/search-examples.md` — practical query examples per scenario
-- Peer leaves: `mk:jira-bulk` (write-side bulk by JQL — same dry-run discipline), `mk:jira-time` (time-related JQL → see `mk:jira-time/references/jql-snippets.md`)
+- Peer leaves: `mk-jira-bulk` (write-side bulk by JQL — same dry-run discipline), `mk-jira-time` (time-related JQL → see `mk-jira-time/references/jql-snippets.md`)
 
 ## Gotchas
 

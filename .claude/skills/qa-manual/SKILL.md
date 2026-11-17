@@ -1,6 +1,6 @@
 ---
 name: mk:qa-manual
-description: Spec-driven manual test passes and generated Playwright .spec.ts files; always asks for credentials. NOT for mk:qa.
+description: "Manual test passes and Playwright specs from a spec. NOT for mk:qa."
 argument-hint: '[spec-path | url] [--report | --generate]'
 orchestrates:
   - mk:agent-browser
@@ -16,7 +16,7 @@ keywords:
   - playwright-e2e-gen
   - login-flow-test
   - exploratory-test
-when_to_use: A URL plus a spec needs human-style runs or committed E2E specs.
+when_to_use: "A URL plus a spec needs human-style runs."
 user-invocable: true
 owner: testing
 criticality: medium

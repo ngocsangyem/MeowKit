@@ -16,49 +16,49 @@ Analyze the files being touched in the current task. Use the following rules to 
 **Trigger:** Task touches `.ts` files in a NestJS context (files in `src/` with decorators like `@Module`, `@Controller`, `@Injectable`, or files in directories named `modules/`, `controllers/`, `services/`, `guards/`, `pipes/`, `dtos/`).
 
 **Load these references:**
-- `.agents/skills/development/references/code-patterns.md` (NestJS section)
-- `.agents/skills/review/references/adversarial-review.md`
-- `.agents/skills/testing/references/red-green-refactor.md`
-- `.agents/skills/document-release/references/general-documentation.md`
+- `.agents/skills/mk-development/references/code-patterns.md` (NestJS section)
+- `.agents/skills/mk-review/references/adversarial-review.md`
+- `.agents/skills/mk-testing/references/red-green-refactor.md`
+- `.agents/skills/mk-document-release/references/general-documentation.md`
 
 ### Rule 2: Vue Frontend
 **Trigger:** Task touches `.vue` files, or `.ts` files in a Vue context (files importing from `vue`, `pinia`, `vue-router`).
 
 **Load these references:**
-- `.agents/skills/development/references/code-patterns.md` (Vue 3 section)
-- `.agents/skills/testing/references/visual-qa.md`
-- `.agents/skills/testing/references/red-green-refactor.md`
+- `.agents/skills/mk-development/references/code-patterns.md` (Vue 3 section)
+- `.agents/skills/mk-testing/references/visual-qa.md`
+- `.agents/skills/mk-testing/references/red-green-refactor.md`
 
 ### Rule 3: Swift / iOS
 **Trigger:** Task touches `.swift` files, `*.xcodeproj`, `Package.swift`, or `*.xib`/`*.storyboard` files.
 
 **Load these references:**
-- `.agents/skills/development/references/code-patterns.md` (Swift section)
-- `.agents/skills/testing/references/red-green-refactor.md`
+- `.agents/skills/mk-development/references/code-patterns.md` (Swift section)
+- `.agents/skills/mk-testing/references/red-green-refactor.md`
 
 ### Rule 4: Database / Migrations
 **Trigger:** Task touches migration files, `.sql` files, or Supabase-related config (`supabase/`, RLS policies, database types).
 
 **Load these references:**
-- `.agents/skills/plan-creator/references/adr-generation.md` (schema changes deserve ADRs)
+- `.agents/skills/mk-plan-creator/references/adr-generation.md` (schema changes deserve ADRs)
 
 ### Rule 5: Planning / Architecture
 **Trigger:** Task is a planning request, design discussion, or architectural decision.
 
 **Load these references:**
-- `.agents/skills/plan-creator/references/scope-challenge.md`
-- `.agents/skills/plan-creator/references/adr-generation.md`
+- `.agents/skills/mk-plan-creator/references/scope-challenge.md`
+- `.agents/skills/mk-plan-creator/references/adr-generation.md`
 
 ### Rule 6: Shipping / Deployment
 **Trigger:** Task involves deploying, creating PRs, releasing, or rolling back.
 
 **Load these references:**
-- `.agents/skills/ship/SKILL.md` — unified ship pipeline (merge base, tests, review, PR)
+- `.agents/skills/mk-ship/SKILL.md` — unified ship pipeline (merge base, tests, review, PR)
 
 ## Always-Loaded References
 
 These are loaded for EVERY task regardless of domain:
-- `.agents/skills/development/references/tdd-enforcement.md` (enforces test-first)
+- `.agents/skills/mk-development/references/tdd-enforcement.md` (enforces test-first)
 
 ## Steps to Execute
 

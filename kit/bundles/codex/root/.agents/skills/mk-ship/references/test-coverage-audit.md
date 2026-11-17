@@ -118,7 +118,7 @@ When checking each branch, also determine whether a unit test or E2E/integration
 
 ### REGRESSION RULE (mandatory)
 
-**IRON RULE:** When the coverage audit identifies a REGRESSION — code that previously worked but the diff broke — a regression test is written immediately. No stop and ask the user in chat. No skipping. Regressions are the highest-priority test because they prove something broke.
+**IRON RULE:** When the coverage audit identifies a REGRESSION — code that previously worked but the diff broke — a regression test is written immediately. No user question. No skipping. Regressions are the highest-priority test because they prove something broke.
 
 A regression is when:
 - The diff modifies existing behavior (not new code)
@@ -207,7 +207,7 @@ Coverage line: `Test Coverage Audit: N new code paths. M covered (X%). K tests g
 
 ### Test Plan Artifact
 
-After producing the coverage diagram, write a test plan artifact so `the qa skill` can consume it:
+After producing the coverage diagram, write a test plan artifact so `$mk-qa` can consume it:
 
 ```bash
 eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p ".meowkit/telemetry/$SLUG"

@@ -1,6 +1,6 @@
 name = "jira-bulk"
-description = "Execute bulk JIRA operations on 10+ issues via the jira-as CLI wrapper: bulk transition, assign, set-priority, clone, delete. Dry-run is MANDATORY first. Routed by mk:jira-bulk skill. NOT for single-issue ops (jira-issue / jira-lifecycle); NOT for bulk-update by JQL field changes (jira-search bulk-update — same dry-run discipline)."
-model = "gpt-5.6-sol"
+description = "Execute bulk JIRA operations on 10+ issues via the jira-as CLI wrapper: bulk transition, assign, set-priority, clone, delete. Dry-run is MANDATORY first. Routed by mk-jira-bulk skill. NOT for single-issue ops (jira-issue / jira-lifecycle); NOT for bulk-update by JQL field changes (jira-search bulk-update — same dry-run discipline)."
+model = "gpt-6.1-sol"
 model_reasoning_effort = "high"
 developer_instructions = """
 # JIRA Bulk Agent
@@ -18,7 +18,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 ## Pre-flight
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh <args>
 ```
 
 
@@ -47,17 +47,17 @@ $(git rev-parse --show-toplevel)/tasks/jira-workflows/<workflow-slug>.md
 If absent for the target project, run discovery first:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <one-ticket-from-target-JQL>
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/fetch-workflow.sh <one-ticket-from-target-JQL>
 ```
 
-If only `_partial-<PROJ>.md` exists (non-admin discovery), warn the user that the target status may not be reachable from all source states in the JQL result set; recommend a smaller pilot batch first. See `.agents/skills/jira-lifecycle/references/workflow-discovery.md` for the full protocol.
+If only `_partial-<PROJ>.md` exists (non-admin discovery), warn the user that the target status may not be reachable from all source states in the JQL result set; recommend a smaller pilot batch first. See `.agents/skills/mk-jira-lifecycle/references/workflow-discovery.md` for the full protocol.
 
 ## JQL Sanitization
 
 If the bulk JQL incorporates user-derived terms, sanitize first:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jql-sanitize.sh '<term>'
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jql-sanitize.sh '<term>'
 ```
 
 Then build the JQL with the sanitized output. JQL injection at bulk scale = catastrophic blast radius.

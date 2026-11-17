@@ -46,7 +46,7 @@ The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load 
 
 ## Install
 
-`.claude/hooks/lib/setup-workflow` auto-installs from `scripts/requirements.txt`:
+`mewkit skill env confluence` installs from `scripts/requirements.txt`:
 
 - `confluence-assistant-skills==0.2.0` — distribution package; ships the `confluence-as` binary
 - `assistant-skills-lib==1.0.1` — transitive infra dep
@@ -55,7 +55,7 @@ Verify: `ls .meowkit/envs/confluence/bin/ | grep confluence-as`
 
 ## Binary name
 
-The CLI binary is `confluence-as`. Both upstream READMEs (`confluence-as` and `Confluence-Assistant-Skills`) document it as `confluence` — they are wrong. Empirical install (260510) is the ground truth. Re-verify on every version bump.
+The CLI binary is `confluence-as`. Both upstream READMEs (`confluence-as` and `Confluence-Assistant-Skills`) document it as `confluence` — they are wrong. Empirical install (260510) is the ground truth. If a CLI upgrade renames the binary, update this line.
 
 ## Cloud-only constraint
 
@@ -71,7 +71,7 @@ The wrapper exits 3 if `MEOW_CONFLUENCE_SITE_URL` does not end in `.atlassian.ne
 | 1    | Sanitizer rejection (CQL) |
 | 2    | Plaintext credential fallback detected — move to `.meowkit/.env` |
 | 3    | Non-Cloud URL — Server/DC not supported |
-| 127  | `confluence-as` binary not installed — run `.claude/hooks/lib/setup-workflow` |
+| 127  | `confluence-as` binary not installed — run `mewkit skill env confluence` |
 | 4-7  | confluence-as runtime errors (network, auth, validation, server) |
 | 130  | SIGINT |
 

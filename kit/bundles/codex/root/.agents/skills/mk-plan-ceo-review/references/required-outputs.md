@@ -44,7 +44,7 @@ Any row with RESCUED=N AND TEST=N AND USER SEES=Silent → **BLOCKER** (automati
 
 ## TODOS.md updates
 
-Present each potential TODO as its own individual stop and ask the user in chat. Never batch TODOs — one per question. Never silently skip this step. Follow the format in `.agents/skills/review/TODOS-format.md`.
+Present each potential TODO as its own question to the user in chat. Never batch TODOs — one per question. Never silently skip this step. Use the TODOS.md format: items under `## <Skill/Component>` headings, each with a `**Priority:**` field (P0–P4), and a `## Completed` section at the bottom.
 
 For each TODO, describe:
 * **What:** One-line description of the work.
@@ -67,7 +67,7 @@ For EXPANSION and SELECTIVE EXPANSION modes: expansion opportunities and delight
 
 ## Diagrams (mandatory, produce all that apply)
 
-> Before emitting any Mermaid block, Read `.agents/skills/preview/references/mermaid-essentials.md`.
+> Before emitting any Mermaid block, Read `.agents/skills/mk-preview/references/mermaid-essentials.md`.
 
 1. System architecture
 2. Data flow (including shadow paths)
@@ -119,7 +119,7 @@ List every ASCII diagram in files this plan touches. Still accurate?
 
 ## Unresolved Decisions
 
-If any stop and ask the user in chat goes unanswered, note it here. Never silently default.
+If any ask the user goes unanswered, note it here. Never silently default.
 
 ---
 

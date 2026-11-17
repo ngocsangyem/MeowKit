@@ -42,7 +42,7 @@ If argument = "beta"     → target = auto-detect dev branch:
 If no argument           → infer from branch name:
   - feature/* hotfix/* bugfix/* fix/* → official (target main)
   - dev/* beta/* experiment/*         → beta (target dev)
-  - unclear                           → stop and ask the user in chat: "Ship to main (official) or dev (beta)?"
+  - unclear                           → ask the user: "Ship to main (official) or dev (beta)?"
 If --dry-run             → print mode + plan for each step, then stop
 ```
 
@@ -50,14 +50,14 @@ If --dry-run             → print mode + plan for each step, then stop
 
 ## Step 0.8: Unified Verification
 
-Before any pre-flight checks, run `mk:verify` to confirm everything is green.
+Before any pre-flight checks, run `mk-verify` to confirm everything is green.
 
-If `mk:verify` returns FAIL:
+If `mk-verify` returns FAIL:
 - Display the failing step and errors
-- **Abort ship** with message: "Verification failed — fix issues before shipping. Run `the verify skill` to re-check."
+- **Abort ship** with message: "Verification failed — fix issues before shipping. Run `$mk-verify` to re-check."
 - Do not proceed to Step 1
 
-If `mk:verify` returns PASS: continue to Step 0.9.
+If `mk-verify` returns PASS: continue to Step 0.9.
 
 > Skip this step only if `--skip-verify` flag is passed explicitly by the user.
 
@@ -65,11 +65,11 @@ If `mk:verify` returns PASS: continue to Step 0.9.
 
 ## Step 0.9: Read workflow evidence (if present)
 
-`mk:verify` (Step 0.8) stays the abort authority — this step runs AFTER it and only READS. Evidence augments proof; it **never approves** and **never overrides** `mk:verify`. A FAIL from verify still aborts regardless of what evidence says.
+`mk-verify` (Step 0.8) stays the abort authority — this step runs AFTER it and only READS. Evidence augments proof; it **never approves** and **never overrides** `mk-verify`. A FAIL from verify still aborts regardless of what evidence says.
 
 1. Look for `workflow-evidence.json` at the planned path `tasks/plans/<plan>/reports/evidence/` first, then the standalone path `.meowkit/state/evidence/<slug>/`.
 2. **If absent** (older runs, `--quick` fixes): proceed exactly as today — no new hard dependency. Do not block on a missing file.
-3. **If present:** report `approvals.ship`, `review.verdictPath` + `review.status`, `verification.overall`, and `risk.requiresHumanApproval`. Call out what is missing — no verdict, a FAIL dimension, an unacknowledged high-risk item — and say the change is not ready. Evidence cannot turn a `mk:verify` FAIL into a pass, and it is never the user's decision to ship.
+3. **If present:** report `approvals.ship`, `review.verdictPath` + `review.status`, `verification.overall`, and `risk.requiresHumanApproval`. Call out what is missing — no verdict, a FAIL dimension, an unacknowledged high-risk item — and say the change is not ready. Evidence cannot turn a `mk-verify` FAIL into a pass, and it is never the user's decision to ship.
 
 Contract: the workflow-evidence conventions.
 
@@ -146,14 +146,14 @@ If the Eng Review is NOT "CLEAR":
 
    If an override exists, display the dashboard and note "Review gate previously accepted — continuing." Do NOT ask again.
 
-2. **If no override exists,** use stop and ask the user in chat:
+2. **If no override exists,** ask the user:
    - Show that Eng Review is missing or has open issues
    - RECOMMENDATION: Choose C if the change is obviously trivial (< 20 lines, typo fix, config-only); Choose B for larger changes
    - Options: A) Ship anyway B) Abort — run the review skill first C) Change is too small to need eng review
    - If CEO Review is missing, mention as informational ("CEO Review not run — recommended for product changes") but do NOT block
    - For Design Review: run `source <(.codex/scripts/bin/workflow-diff-scope <base> 2>/dev/null)`. If `SCOPE_FRONTEND=true` and no `ship-design-check` entry exists in the dashboard, mention: "Design Review not run — this PR changes frontend code. The inline lite design check runs automatically during pre-landing review." Still never block.
 
-3. **If the user chooses A or C,** persist the decision so future `the ship skill` runs on this branch skip the gate:
+3. **If the user chooses A or C,** persist the decision so future `$mk-ship` runs on this branch skip the gate:
    ```bash
    eval "$(.codex/scripts/bin/workflow-slug 2>/dev/null)"
    echo '{"skill":"ship-review-override","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","decision":"USER_CHOICE"}' >> .meowkit/telemetry/$BRANCH-reviews.jsonl

@@ -1,6 +1,6 @@
 # Freeze Mechanics
 
-Technical details of how `mk:freeze` enforces directory boundaries.
+Technical details of how `mk-freeze` enforces directory boundaries.
 
 ## Path Resolution
 
@@ -27,7 +27,8 @@ the entire session — the user does not need to re-specify the path on each inv
 
 ## Hook Enforcement
 
-The `check-freeze.cjs` script is registered as a `PreToolUse` hook on both `Edit` and `Write` tools.
+The `check-freeze.cjs` script runs as a pre-write guard on both edit and write operations,
+invoked by this project's configured hooks when present.
 
 On each invocation:
 1. Read `file_path` from the tool input JSON

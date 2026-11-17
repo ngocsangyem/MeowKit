@@ -80,7 +80,7 @@ Something must outlive the volatile window — a compaction, a handoff, or a new
 - **When:** durable knowledge must survive past this session, or compression would otherwise lose it.
 - **Triggers:** "external memory", "persistent notes", "across sessions".
 - **Produces:** an external memory file / store updated incrementally and read back at session start.
-- **Gotcha:** if the external store itself grows large it needs indexed search, not a flat read-in. Route the actual write to `mk:memory` — this skill only decides that a write is warranted.
+- **Gotcha:** if the external store itself grows large it needs indexed search, not a flat read-in. Route the actual write to `mk-memory` — this skill only decides that a write is warranted.
 
 ### scratchpad
 - **When:** a multi-step task (5-8+ turns) has intermediate decisions later steps depend on.

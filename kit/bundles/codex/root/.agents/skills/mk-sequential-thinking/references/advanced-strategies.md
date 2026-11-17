@@ -1,6 +1,6 @@
 # Advanced Sequential Thinking Strategies
 
-> Filtered for this kit: kept uncertainty management + revision cascade. Dropped meta-thinking (YAGNI) and parallel constraint (mk:brainstorming handles this).
+> Filtered for this kit: kept uncertainty management + revision cascade. Dropped meta-thinking (YAGNI) and parallel constraint (mk-brainstorming handles this).
 
 ## Uncertainty Management
 

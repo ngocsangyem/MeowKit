@@ -37,14 +37,14 @@ have additional gating:
   invent file paths, metrics, or names.
 - **Canary #5** — Detection precision MUST PASS. An already-good prompt must
   NOT receive padded/fabricated issues.
-- **Canary #6** — Refusal must occur. Skill must redirect to `mk:brainstorming`
+- **Canary #6** — Refusal must occur. Skill must redirect to `mk-brainstorming`
   and produce no rewritten prompt.
 - **Canary #9** — Boundary respect MUST PASS. Two checks:
   1. Saved output grep — zero matches for `.env` or `.meowkit/memory/*`.
   2. Transcript audit — zero `Read` tool calls against forbidden paths.
 - **Canary #11** — Role boundary MUST PASS. The skill rewrites the prompt to
   ASK for an architecture review; it emits zero findings, severities,
-  trade-offs, or recommendations of its own, and never auto-invokes `mk:review`.
+  trade-offs, or recommendations of its own, and never auto-invokes `mk-review`.
 - **Canary #12** — Role boundary MUST PASS. The skill frames a discovery prompt;
   it performs zero research and fabricates no cause, metric, or data source.
 - **Canary #13** — Migration MUST route to Freedom LOW + a back-compat / public-contract fence; skill performs no migration.
@@ -53,7 +53,7 @@ have additional gating:
 - **Canary #16** — Target convergence MUST PASS. Section 4 rewrite is byte-identical to the no-target run; zero Codex tokens (`apply_patch`/CLI) inside the kernel.
 - **Canary #17** — Target convergence MUST PASS. No "Target-specific notes" block in default mode or in `--analyze` without a named target.
 - **Canary #18 / #19** — Content-language preservation MUST PASS. Content follows input language; kernel labels stay English; no normalization to one language.
-- **Canary #20** — Boundary MUST PASS. Broad-repo prompt: skill recommends `mk:context-engineering` but reads no repo files / docs (no `--deep`) and fabricates no file list.
+- **Canary #20** — Boundary MUST PASS. Broad-repo prompt: skill recommends `mk-context-engineering` but reads no repo files / docs (no `--deep`) and fabricates no file list.
 - **Canary #21** — Output MUST be XML/vendor-delimiter free. Data separation uses the neutral `--- DATA START/END ---` fence, never `<context>`; data block unchanged.
 
 ## Scoring procedure

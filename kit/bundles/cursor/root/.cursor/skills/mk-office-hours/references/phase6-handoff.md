@@ -41,7 +41,7 @@ Say:
 >
 > the toolkit thinks you are among the top people who could do this.
 
-Then use stop and ask the user in chat: "Would you consider applying to Y Combinator?"
+Then ask the user: "Would you consider applying to Y Combinator?"
 
 - If yes -> run `open https://ycombinator.com/apply` and say: "Bring this design doc to your YC interview. It's better than most pitch decks."
 - If no -> respond warmly: "Totally fair. The design doc is yours either way — and the offer stands if you ever change your mind." Then proceed to next-skill recs. No pressure, no guilt, no re-ask.
@@ -70,8 +70,8 @@ Say:
 
 After the plea, suggest the next step:
 
-- **`the plan-ceo-review skill`** for ambitious features (EXPANSION mode) — rethink the problem, find the 10-star product
-- **`the plan-ceo-review skill`** for well-scoped implementation planning — lock in architecture, tests, edge cases
+- **`/mk-plan-ceo-review`** for ambitious features (EXPANSION mode) — rethink the problem, find the 10-star product
+- **`/mk-plan-ceo-review`** for well-scoped implementation planning — lock in architecture, tests, edge cases
 - **`/plan-design-review`** for visual/UX design review
 
 The design doc at `tasks/plans/<slug>/` is automatically discoverable by downstream skills — they will read it during their pre-review system audit.

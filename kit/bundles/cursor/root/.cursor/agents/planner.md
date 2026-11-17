@@ -2,7 +2,7 @@
 name: planner
 description: Use for architecture and implementation planning before non-trivial changes — scoping and approach selection. Use when the shape of a change is unsettled. Not for coding or review verdicts.
 model: claude-opus-5[effort=high]
-readonly: true
+readonly: false
 is_background: false
 ---
 
@@ -42,7 +42,7 @@ child. Planner never spawns another planner.
 
 ## What it does not do
 
-- Does not write implementation code, tests, or config (`readonly: true`).
+- Does not write implementation code, tests, or config; it writes only the plan files.
 - Does not approve its own plan — a human or the calling session confirms the plan
   before implementation starts.
 - Does not produce a review verdict — hand the finished change to `reviewer`.

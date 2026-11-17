@@ -20,7 +20,7 @@ Full option tables, JSON field docs, and usage examples for all 6 commands.
 Returns repo metadata used as a pre-flight check before creating worktrees.
 
 ```bash
-node .cursor/skills/worktree/scripts/worktree.cjs info --json
+node .cursor/skills/mk-worktree/scripts/worktree.cjs info --json
 ```
 
 ### JSON Output Fields
@@ -46,7 +46,7 @@ node .cursor/skills/worktree/scripts/worktree.cjs info --json
 Lists all registered worktrees.
 
 ```bash
-node .cursor/skills/worktree/scripts/worktree.cjs list --json
+node .cursor/skills/mk-worktree/scripts/worktree.cjs list --json
 ```
 
 ### JSON Output Fields
@@ -74,7 +74,7 @@ node .cursor/skills/worktree/scripts/worktree.cjs list --json
 Health audit of all worktrees including divergence from base branch.
 
 ```bash
-node .cursor/skills/worktree/scripts/worktree.cjs status --json
+node .cursor/skills/mk-worktree/scripts/worktree.cjs status --json
 ```
 
 ### JSON Output Fields
@@ -106,7 +106,7 @@ Creates a worktree. Two modes:
 ### Orchestrated mode (parallel agents)
 
 ```bash
-node .cursor/skills/worktree/scripts/worktree.cjs create "{agent-name}" --orchestrated [--dry-run] --json
+node .cursor/skills/mk-worktree/scripts/worktree.cjs create "{agent-name}" --orchestrated [--dry-run] --json
 ```
 
 Places worktree at `.worktrees/{agent-name}` on branch `parallel/{agent-name}-{timestamp}`.
@@ -115,9 +115,9 @@ Matches the parallel-execution rules Rule 3 exactly.
 ### Feature mode (standard)
 
 ```bash
-node .cursor/skills/worktree/scripts/worktree.cjs create "{feature}" --prefix feat [--dry-run] --json
+node .cursor/skills/mk-worktree/scripts/worktree.cjs create "{feature}" --prefix feat [--dry-run] --json
 # Monorepo:
-node .cursor/skills/worktree/scripts/worktree.cjs create "{project}" "{feature}" --prefix feat --json
+node .cursor/skills/mk-worktree/scripts/worktree.cjs create "{project}" "{feature}" --prefix feat --json
 ```
 
 ### Options
@@ -155,7 +155,7 @@ node .cursor/skills/worktree/scripts/worktree.cjs create "{project}" "{feature}"
 Removes a worktree and deletes its branch. Supports fuzzy matching by name, path, or branch.
 
 ```bash
-node .cursor/skills/worktree/scripts/worktree.cjs remove "{agent-name}" [--dry-run] --json
+node .cursor/skills/mk-worktree/scripts/worktree.cjs remove "{agent-name}" [--dry-run] --json
 ```
 
 **Match priority:** exact → prefix → contains (≥4 chars). Errors on 0 or >1 matches.
@@ -178,8 +178,8 @@ node .cursor/skills/worktree/scripts/worktree.cjs remove "{agent-name}" [--dry-r
 Removes stale worktree metadata from `.git/worktrees/`. Always dry-run first.
 
 ```bash
-node .cursor/skills/worktree/scripts/worktree.cjs prune --dry-run --json
-node .cursor/skills/worktree/scripts/worktree.cjs prune --json
+node .cursor/skills/mk-worktree/scripts/worktree.cjs prune --dry-run --json
+node .cursor/skills/mk-worktree/scripts/worktree.cjs prune --json
 ```
 
 ### JSON Output Fields

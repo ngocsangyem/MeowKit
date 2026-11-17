@@ -55,13 +55,12 @@ All of it comes from the project config at `.meowkit/config.yaml`.
 
 ## Output Format
 
-When a command fails, the hook emits a structured block to stdout (the host runtime picks this up and injects into the next turn):
+When a command fails, the hook exits 2 and writes this block to stderr. On Claude Code, that is the PostToolUse form shown to the model; plain stdout there reaches only the transcript:
 
 ```
 @@BUILD_VERIFY_ERROR@@
 file: src/foo.ts
-command: tsc --noEmit
-exit_code: 2
+The edit was saved, but the build check now fails on this file. Fix these errors before further edits, since later changes stack on a broken build.
 
 src/foo.ts:12:5 - error TS2322: Type 'string' is not assignable to type 'number'.
 

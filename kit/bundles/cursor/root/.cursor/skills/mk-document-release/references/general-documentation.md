@@ -1,6 +1,6 @@
 # General Documentation Reference
 
-Use `the document-release skill` for post-ship doc sync.
+Use `/mk-document-release` for post-ship doc sync.
 
 ## When to Use
 

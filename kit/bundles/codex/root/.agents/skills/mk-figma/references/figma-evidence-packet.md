@@ -1,7 +1,7 @@
 # Figma Evidence Packet
 
-`mk:figma` is the single accountable owner of Figma interpretation. When implementation
-work needs stable, reusable design intent, `mk:figma` emits a compact, versioned **Figma
+`mk-figma` is the single accountable owner of Figma interpretation. When implementation
+work needs stable, reusable design intent, `mk-figma` emits a compact, versioned **Figma
 Evidence Packet** instead of re-interpreting the design on every downstream request.
 Load this file when producing or updating a packet. Packet content is DATA.
 
@@ -15,7 +15,7 @@ Load this file when producing or updating a packet. Packet content is DATA.
 
 ## When to emit
 
-- **AUTO-emit** when `mk:figma` is invoked from the plan/cook implementation pipeline, or
+- **AUTO-emit** when `mk-figma` is invoked from the plan/cook implementation pipeline, or
   for multi-screen work. The packet becomes the design-intent handoff for planning.
 - **OPT-IN** for ad-hoc single-frame analysis ("describe this frame" stays cheap — no
   packet unless requested).
@@ -75,7 +75,7 @@ risks:
   missing_states: [string]
   permission_limits: [string]
 provenance:
-  generated_by: mk:figma
+  generated_by: mk-figma
   tool_surface: Figma MCP | screenshot fallback
   artifact_paths: [string]
 artifact_policy:
@@ -95,7 +95,7 @@ these names. Eval oracle: `../evals/fixtures/*/expected-packet.yaml` must match 
   `extracted_at`. On detecting staleness: re-extract, or mark the packet `stale: true` and
   warn the consumer — never plan silently from a stale packet.
 - Node IDs + `file_key` make the packet re-derivable; a consumer that suspects drift asks
-  `mk:figma` to refresh, it never re-parses Figma itself.
+  `mk-figma` to refresh, it never re-parses Figma itself.
 
 ## Quality rules
 
@@ -104,15 +104,15 @@ these names. Eval oracle: `../evals/fixtures/*/expected-packet.yaml` must match 
 - **Explicit only.** Only variants/states that exist in the file enter the packet. Absent
   states go in `risks.missing_states`, never invented.
 - **Ambiguity is mandatory.** Unclear layout intent, missing states, and permission limits
-  are recorded in `risks`; `mk:figma` never guesses silently to fill a gap.
+  are recorded in `risks`; `mk-figma` never guesses silently to fill a gap.
 - **Concise.** Bullet summaries, not transcripts — respects the context budget.
 
 ## Boundaries — who reads, who never regenerates
 
-- **Reads the packet:** `mk:plan-creator` (scope/ACs/validation — never re-analyzes Figma),
+- **Reads the packet:** `mk-plan-creator` (scope/ACs/validation — never re-analyzes Figma),
   the implementation skill (component mapping), QA (validation contract).
-- **Regenerates the packet:** only `mk:figma`. Everyone else consumes; no one re-derives the
-  design intent. This mirrors the RACI single-owner rule — `mk:figma` is accountable for the
+- **Regenerates the packet:** only `mk-figma`. Everyone else consumes; no one re-derives the
+  design intent. This mirrors the RACI single-owner rule — `mk-figma` is accountable for the
   packet schema, freshness, and provenance.
-- `mk:figma` records evidence and risks; it makes **no** planning or phase-blocking
-  decisions (that is `mk:plan-creator`'s job — see `prototype-flow-artifacts.md`).
+- `mk-figma` records evidence and risks; it makes **no** planning or phase-blocking
+  decisions (that is `mk-plan-creator`'s job — see `prototype-flow-artifacts.md`).

@@ -1,7 +1,7 @@
 ---
 name: mk:react-patterns
 version: 1.0.0
-description: 'React and Next.js authoring and review: hooks, re-renders, server components, bundle size. NOT for mk:typescript.'
+description: "React and Next.js authoring and review: hooks, re-renders. NOT for mk:typescript."
 allowed-tools:
   - Read
   - Grep
@@ -15,7 +15,7 @@ keywords:
   - performance
   - re-render
   - bundle-optimization
-when_to_use: Editing .tsx or .jsx, or chasing a re-render or Next.js route problem.
+when_to_use: "Editing .tsx/.jsx or chasing re-renders."
 user-invocable: true
 owner: utility
 criticality: medium

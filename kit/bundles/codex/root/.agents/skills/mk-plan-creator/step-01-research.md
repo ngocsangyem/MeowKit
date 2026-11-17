@@ -26,7 +26,7 @@ For each researcher, use this prompt template:
 Task: Investigate {specific aspect} for planning "{task description}"
 Budget: Max 5 tool calls. Be focused, not exhaustive.
 Output: Write findings to {plan-dir}/research/researcher-{N}-{topic}.md
-Use mk:docs-finder for any library/API lookups.
+Use mk-docs-finder for any library/API lookups.
 
 Format (max 150 lines):
   ## Summary (3-5 bullets)
@@ -48,7 +48,7 @@ Do NOT paste report content. Pass file paths to step-03.
 - Max 2 researchers (token budget)
 - Max 5 tool calls per researcher (prevents runaway exploration)
 - Reports must be ≤150 lines (condensed findings, not raw exploration)
-- Use `mk:docs-finder` for external docs (not raw WebSearch)
+- Use `mk-docs-finder` for external docs (not raw WebSearch)
 
 ## Output
 

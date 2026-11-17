@@ -1,6 +1,6 @@
 # Core Reasoning Patterns
 
-> Part of mk:sequential-thinking.
+> Part of mk-sequential-thinking.
 > Source: open-source upstream (MIT)
 
 ## Revision Pattern

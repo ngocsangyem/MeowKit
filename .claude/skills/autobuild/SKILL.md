@@ -2,7 +2,7 @@
 name: mk:autobuild
 version: 1.0.0
 preamble-tier: 3
-description: Autonomous multi-hour green-field product build — planner, contract, generator and evaluator in a loop. NOT for mk:cook.
+description: "Builds a green-field product unattended. NOT for mk:cook."
 argument-hint: '[task description] [--tier auto|full|lean|minimal] [--max-iter N] [--budget USD] [--tdd] [--advice]'
 allowed-tools:
   - Bash
@@ -21,7 +21,7 @@ keywords:
   - generator-evaluator
   - harness-contract
   - adaptive-density
-when_to_use: A whole product is specified from scratch and should build unattended.
+when_to_use: "A full product spec should build unattended."
 user-invocable: true
 meowkit:
   portability: provider-only
@@ -127,7 +127,7 @@ These rules left the always-on set; the harness owns them at the canonical cook 
 |---|---|---|---|---|---|
 | **MINIMAL** | TRIVIAL (Haiku) | Skip (use plan-creator --fast) | Skip | Skip | Skip |
 | **FULL** | STANDARD (Sonnet) / COMPLEX (Opus 4.5) | Required | Required | 1–3 rounds | Optional |
-| **LEAN** | COMPLEX (Opus 4.6+) | Required | Optional | 0–1 rounds | Skip (auto-compact) |
+| **LEAN** | COMPLEX (Opus 4.6+, Fable) | Required | Optional | 0–1 rounds | Skip (auto-compact) |
 
 ## Run Report Schema
 
@@ -137,7 +137,7 @@ Every run writes `tasks/autobuild-runs/YYMMDD-{slug}/run.md`:
 ---
 run_id: 260408-1450-build-todo
 density: LEAN
-model: opus-4-6
+model: claude-opus-5-5
 budget_cap: 50
 budget_spent: 12.40
 iterations: 1

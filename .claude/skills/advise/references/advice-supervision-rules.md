@@ -14,6 +14,23 @@ strategic supervision over one delivery run. Athena assesses the situation, make
 an evidence-backed operational recommendation, guides before work, rescues a
 blocked run, reviews finished work, and may return work for correction.
 
+## Contents
+
+- [1 — Activation](#1--activation)
+- [2 — Cadence](#2--cadence)
+- [3 — Input packet (the parent supplies)](#3--input-packet-the-parent-supplies)
+- [4 — Output packet (Athena returns)](#4--output-packet-athena-returns)
+- [5 — Continuity dossier](#5--continuity-dossier)
+- [6 — Correction cycle](#6--correction-cycle)
+- [6a — Composing with `--html`](#6a--composing-with---html)
+- [7 — Prohibitions](#7--prohibitions)
+- [8 — Receipt](#8--receipt)
+- [9 — Propagation](#9--propagation)
+- [10 — Fallback](#10--fallback)
+- [11 — Direct consult vs embedded supervision](#11--direct-consult-vs-embedded-supervision)
+- [12 — Model policy](#12--model-policy)
+- [Wiring status](#wiring-status)
+
 Supervision is **evidence the human reads**. It is never an approval, never a gate,
 never a substitute for verification.
 

@@ -1,6 +1,6 @@
 # Transformation Spec Pipeline
 
-Use this reference for `mk:henshin` after selecting one requested surface. It turns
+Use this reference for `mk-henshin` after selecting one requested surface. It turns
 existing code into a reviewed Transformation Spec; it does not implement code.
 
 ## Contents
@@ -30,7 +30,7 @@ researcher only; it never skips scout or the approval gate.
 
 1. Read `docs/project-context.md` for stack, conventions, and anti-patterns.
 2. If `[feature-or-module]` is supplied, limit the scout to that subtree.
-3. Invoke `the scout skill` and extract its architecture fingerprint, entry points, and
+3. Invoke `$mk-scout` and extract its architecture fingerprint, entry points, and
    dependency graph.
 4. Unless `--lean` is set, invoke the `researcher` agent for ecosystem conventions,
    CLI/MCP patterns, and credential-resolution norms.
@@ -79,7 +79,7 @@ matrix with source answer, proposed answer, and risk if wrong. Include selected
 surface, capability cut list, credentials, transport/deployment when MCP applies,
 package name, license, and ownership.
 
-For `--ask`, use concrete `stop and ask the user in chat` options for each decision. For `--auto`,
+For `--ask`, use concrete question options for each decision. For `--auto`,
 record technical proposals with one-line rationales but still ask the user for the
 business decisions. No flag bypasses approval before the spec is emitted.
 
@@ -124,9 +124,9 @@ status there, and scrub secrets before writing.
 
 ## Handoff and boundaries
 
-henshin stops after the spec. It may call `mk:scout` and the researcher during
-analysis, but it does not invoke `the plan-creator skill`, `the cook skill`,
-`the skill-creator skill`, or `the party skill` mid-flow.
+henshin stops after the spec. It may call `mk-scout` and the researcher during
+analysis, but it does not invoke `$mk-plan-creator`, `$mk-cook`,
+`$mk-skill-creator`, or `$mk-party` mid-flow.
 
 ```text
 Transformation Spec ready.

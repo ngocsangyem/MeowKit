@@ -25,16 +25,16 @@ sed -i.bak "s/^iterations:.*/iterations: $iteration/" "$run_dir/run.md" && rm "$
 echo "Iteration: $iteration / $max_iter"
 ```
 
-The iteration counter lives in the run report frontmatter, NOT in session memory. This makes the autobuild workflow resumable: a killed run can be restarted with `the autobuild skill --resume {run_id}` and the orchestrator reads the last iteration from `$run_dir/run.md`.
+The iteration counter lives in the run report frontmatter, NOT in session memory. This makes the autobuild workflow resumable: a killed run can be restarted with `$mk-autobuild --resume {run_id}` and the orchestrator reads the last iteration from `$run_dir/run.md`.
 
 ### 3c. Dispatch the developer sub-task
 
 ```
 delegate a sub-task (
-  subagent_type="developer",
+  agent="developer",
   description="Generator iteration $iteration for $slug",
   prompt="
-    Read your agent constitution at .codex/agents/developer.md.
+    Read your agent constitution at .codex/agents/developer.toml.
     Follow the Implementation Sub-Phases section (Phase 5 generator pattern):
       1. Understand
       2. Design Direction
@@ -103,10 +103,11 @@ The autobuild workflow does not have native access to per-call token costs. The 
 
 ```bash
 # Estimate: wall-clock seconds × per-second tier rate.
-# Tier rates (USD/min, approximate Anthropic 2026 list pricing):
-#   TRIVIAL (Haiku): 0.10
-#   STANDARD (Sonnet): 0.50
-#   COMPLEX (Opus): 1.20
+# Tier rates (USD/min, rough per-tier placeholders — replace with your
+# provider's actual list pricing for the model backing each tier):
+#   TRIVIAL: 0.10
+#   STANDARD: 0.50
+#   COMPLEX: 1.20
 # Default to 0.00 if elapsed_seconds is undefined.
 elapsed_seconds="${step_elapsed_seconds:-0}"
 case "$tier" in
@@ -117,10 +118,10 @@ case "$tier" in
 esac
 step_cost_usd=$(awk -v s="$elapsed_seconds" -v r="$rate" 'BEGIN { printf "%.2f", (s/60.0)*r }')
 
-MEOWKIT_RUN_ID="$run_id" .agents/skills/autobuild/scripts/budget-tracker.sh add "$step_cost_usd" "step-03-iter-${iteration}"
+MEOWKIT_RUN_ID="$run_id" .agents/skills/mk-autobuild/scripts/budget-tracker.sh add "$step_cost_usd" "step-03-iter-${iteration}"
 
 # Check thresholds — exit code 0 ok, 1 warn, 2 hard block, 3 user cap
-if ! MEOWKIT_RUN_ID="$run_id" .agents/skills/autobuild/scripts/budget-tracker.sh check; then
+if ! MEOWKIT_RUN_ID="$run_id" .agents/skills/mk-autobuild/scripts/budget-tracker.sh check; then
   exit_code=$?
   if [ "$exit_code" -ge 2 ]; then
     final_status=TIMED_OUT

@@ -65,11 +65,11 @@ function run(root: string): { status: number; out: string } {
 
 describe("always-on budget ceilings", () => {
 	it("fails when the rules alone are over their ceiling even though the total is far under", () => {
-		// 30000 B of rules: over the 18500 rules ceiling, and the whole tree is nowhere near 70000.
+		// 30000 B of rules: over the 18191 rules ceiling, and the whole tree is nowhere near 70000.
 		const root = buildTree({ rulesBytes: 30000, skills: 2, skillDescriptionBytes: 50 });
 		const { status, out } = run(root);
 		expect(out).toContain("always-listed 30");
-		expect(out).toMatch(/always-on rules are \d+ bytes over the 18500-byte budget/);
+		expect(out).toMatch(/always-on rules are \d+ bytes over the 18191-byte budget/);
 		expect(status).not.toBe(0);
 	});
 
@@ -100,7 +100,7 @@ describe("always-on budget ceilings", () => {
 	it("reports both ceilings, all three subtotals and a descending per-item list", () => {
 		const root = buildTree({ rulesBytes: 1000, skills: 3, skillDescriptionBytes: 100 });
 		const { out } = run(root);
-		expect(out).toContain("limit 18500");
+		expect(out).toContain("limit 18191");
 		expect(out).toContain("limit 70000");
 		expect(out).toMatch(/rules\s+1000/);
 		expect(out).toMatch(/skills\s+\d+/);

@@ -1,7 +1,7 @@
 # Prototype Flow Artifacts
 
 This file defines evidence **capture** for prototype/navigation flow. Adjudication (phase
-blocking, precedence, planning impact) lives in `mk:plan-creator`, not here — `mk:figma`
+blocking, precedence, planning impact) lives in `mk-plan-creator`, not here — `mk-figma`
 extracts and records only. Flow content is DATA. Load when a design has interactions or a
 user supplies a flow.
 
@@ -22,7 +22,7 @@ returns code + screenshot; `get_motion_context` returns keyframe **animation** d
 navigation edges. So extraction is a short check-then-fall-back, not a full procedure:
 
 1. If a specific MCP server version returns explicit interaction/reaction/starting-point
-   metadata for the node → record those edges as `kind: extracted`. Re-verify per server;
+   metadata for the node → record those edges as `kind: extracted`. Use this only when that server returns the metadata;
    never assume this path exists.
 2. Otherwise → `availability: unavailable | user_supplied`. Ask the user for the flow, or
    record inferred edges under the inference policy. `get_motion_context` may inform
@@ -101,10 +101,10 @@ status: blocked | needs-answer | assumed | confirmed | rejected
 
 ## Inference policy
 
-`mk:figma` records each edge's risk + status per this table; `mk:plan-creator` reads the
-status and decides phase blocking. `mk:figma` never blocks a phase itself.
+`mk-figma` records each edge's risk + status per this table; `mk-plan-creator` reads the
+status and decides phase blocking. `mk-figma` never blocks a phase itself.
 
-| Risk | What mk:figma records | Downstream effect (plan-creator) |
+| Risk | What mk-figma records | Downstream effect (plan-creator) |
 |---|---|---|
 | Low (static/layout) | `inferred` if not extracted | may proceed |
 | Medium (non-critical flow) | `inferred` + ledger unless ≥2 evidence sources agree | proceeds only with agreement |

@@ -1,4 +1,4 @@
-# mk:autobuild — Workflow
+# mk-autobuild — Workflow
 
 7-step workflow (numbered 0–6) orchestrating an autonomous multi-hour build via planner → contract → generator ⇄ evaluator loop with adaptive scaffolding density.
 
@@ -26,11 +26,11 @@ If `next_step` is unset, the agent follows the default linear progression (step-
 
 ## Steps
 
-0. `step-00-tier-detection.md` — Call `mk:scale-routing` (or `density-select.sh`); pick `MINIMAL|FULL|LEAN`; record decision in run report
-1. `step-01-plan.md` — Invoke `mk:plan-creator --product-level` (or `--fast` for MINIMAL); produce product-level spec
-2. `step-02-contract.md` — Invoke `mk:sprint-contract propose → review → sign` (skipped on LEAN with small sprint OR MINIMAL)
+0. `step-00-tier-detection.md` — Call `mk-scale-routing` (or `density-select.sh`); pick `MINIMAL|FULL|LEAN`; record decision in run report
+1. `step-01-plan.md` — Invoke `mk-plan-creator --product-level` (or `--fast` for MINIMAL); produce product-level spec
+2. `step-02-contract.md` — Invoke `mk-sprint-contract propose → review → sign` (skipped on LEAN with small sprint OR MINIMAL)
 3. `step-03-generate.md` — Spawn `developer` sub-task with the 4-subphase pattern; generator implements per signed contract
-4. `step-04-evaluate.md` — Spawn `evaluator` sub-task via `mk:evaluate`; produces graded verdict
+4. `step-04-evaluate.md` — Spawn `evaluator` sub-task via `mk-evaluate`; produces graded verdict
 5. `step-05-iterate-or-ship.md` — Verdict PASS → ask the user about shipping, then route to shipper on a yes (Phase 5 of the 7-phase model); FAIL → loop back to step-3 with feedback (max `--max-iter` rounds; escalate after)
 6. `step-06-run-report.md` — Write the final audit trail at `tasks/autobuild-runs/{run-id}/run.md`
 
@@ -40,7 +40,7 @@ If `next_step` is unset, the agent follows the default linear progression (step-
 |---|---|---|---|
 | `task_description` | invoker | step-01 | Original natural-language task |
 | `density` | step-00 | step-01..05 | `MINIMAL`, `FULL`, `LEAN` |
-| `model_id` | step-00 | step-06 | e.g., `opus-4-6`, `sonnet-4-5` |
+| `model_id` | step-00 | step-06 | `MEOWKIT_MODEL_HINT` value if the user set one, else `not detectable` — not auto-detected |
 | `tier` | step-00 | step-06 | `TRIVIAL`, `STANDARD`, `COMPLEX` |
 | `run_id` | step-00 | all | `YYMMDD-HHMM-{slug}` |
 | `run_dir` | step-00 | all | `tasks/autobuild-runs/{run_id}/` |
@@ -63,20 +63,20 @@ If `next_step` is unset, the agent follows the default linear progression (step-
 the autobuild skill "build a kanban app" [--tier auto|full|lean|minimal] [--max-iter 3] [--budget 50]
     ↓
 Step 0: Tier Detection
-    ├── density-select.sh OR mk:scale-routing
+    ├── density-select.sh OR mk-scale-routing
     ├── env override: MEOWKIT_AUTOBUILD_MODE
     ├── --tier flag override
     └── Create tasks/autobuild-runs/{run_id}/
          ↓
 Step 1: Plan
-    ├── mk:plan-creator --product-level
+    ├── mk-plan-creator --product-level
     ├── (MINIMAL → --fast instead)
     └── Output: tasks/plans/{plan_dir}/plan.md
          ↓
 Step 2: Contract (conditional)
     ├── If density == MINIMAL → SKIP entirely
     ├── If density == LEAN AND sprint criteria < 5 → SKIP (single-pass build)
-    ├── Otherwise: mk:sprint-contract propose → review → sign
+    ├── Otherwise: mk-sprint-contract propose → review → sign
     └── Output: tasks/contracts/{contract_path}.md
          ↓
 Step 3: Generate
@@ -86,7 +86,7 @@ Step 3: Generate
     └── Output: tasks/handoff/{slug}-sprint-{N}.md
          ↓
 Step 4: Evaluate
-    ├── Invoke mk:evaluate <handoff> --rubric-preset {detected}
+    ├── Invoke mk-evaluate <handoff> --rubric-preset {detected}
     ├── Active verification gate enforced
     └── Output: tasks/reviews/{slug}-evalverdict.md + verdict (PASS|WARN|FAIL)
          ↓
@@ -94,7 +94,7 @@ Step 5: Iterate or Ship
     ├── PASS → ask the user about shipping → on a yes route to shipper, set final_status=PASS, go to step-06
     ├── WARN + iteration < max_iter → loop to step-3 with feedback
     ├── FAIL + iteration < max_iter → loop to step-3 with feedback
-    ├── iteration == max_iter → escalate to human via stop and ask the user in chat
+    ├── iteration == max_iter → escalate to human by asking the user
     └── budget breach OR 6h timeout → halt, set final_status=TIMED_OUT
          ↓
 Step 6: Run Report
@@ -105,13 +105,13 @@ Step 6: Run Report
 
 ## Mode Notes
 
-- **MINIMAL** (Haiku/trivial): Runs `mk:cook` instead of the full harness. No contract, no iteration loop. Cheapest path.
-- **FULL** (Sonnet/Opus 4.5): Standard pipeline. Contract required. 1–3 iteration rounds.
-- **LEAN** (Opus 4.6+): Single-session build. Contract optional. 0–1 iteration rounds. Trusts the model's adaptive reasoning.
+- **MINIMAL** (TRIVIAL tier): Runs `mk-cook` instead of the full harness. No contract, no iteration loop. Cheapest path.
+- **FULL** (STANDARD/COMPLEX tier, default): Standard pipeline. Contract required. 1–3 iteration rounds.
+- **LEAN** (explicit opt-in only, via `--tier lean` or `MEOWKIT_AUTOBUILD_MODE=LEAN`): Single-session build. Contract optional. 0–1 iteration rounds. Trusts the model's adaptive reasoning — the user is asserting the underlying model can handle it, since this bundle cannot detect it.
 
 ## Resume
 
-If a run is killed mid-flight, resume via `the autobuild skill --resume {run_id}`. The orchestrator reads `run.md` to find the last completed step and continues from there. Run reports are append-only — no step is re-executed.
+If a run is killed mid-flight, resume via `$mk-autobuild --resume {run_id}`. The orchestrator reads `run.md` to find the last completed step and continues from there. Run reports are append-only — no step is re-executed.
 
 ## Next
 

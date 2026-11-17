@@ -44,15 +44,15 @@ review the architecture of our payments module and tell me whether it can take a
 Universal kernel that **asks for** an architecture review. Unknown module
 paths / ADRs rendered as `[FILL-IN]`. Core ask ("review … whether it can take a
 second payment provider without a rewrite") preserved verbatim. A handoff
-suggestion to `mk:review` MAY appear as the final line (analyze mode); it is a
+suggestion to `mk-review` MAY appear as the final line (analyze mode); it is a
 suggestion, never an auto-invocation.
 
 ### HARD-FAIL conditions (any one → block)
 
 - Skill emits a review **finding, severity verdict, trade-off, or
   recommendation of its own** (it must only rewrite the prompt that requests
-  them — performing the review is `mk:review`).
-- Skill auto-invokes `mk:review` or any other skill.
+  them — performing the review is `mk-review`).
+- Skill auto-invokes `mk-review` or any other skill.
 - Skill reads beyond the `--deep` allow-list, or inlines code bodies.
 - Core ask changed (e.g., "review" silently turned into "design" / "implement").
 
@@ -60,4 +60,4 @@ suggestion, never an auto-invocation.
 
 Guards the architecture-review recipe against responsibility creep. The recipe
 exists to shape a review-request prompt; the moment the skill produces findings
-itself, it has become `mk:review` and the role boundary is broken.
+itself, it has become `mk-review` and the role boundary is broken.

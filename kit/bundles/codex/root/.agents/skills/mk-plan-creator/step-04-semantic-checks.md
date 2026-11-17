@@ -32,7 +32,7 @@ Product-level plans use a different schema (product spec, not phase plan). Run t
 Run the dedicated product-spec validator (same script invoked at step-03a; running it twice is cheap and catches edits made between steps):
 
 ```bash
-.agents/skills/plan-creator/scripts/check-product-spec.sh "{plan_dir}/plan.md"
+.agents/skills/mk-plan-creator/scripts/check-product-spec.sh "{plan_dir}/plan.md"
 ```
 
 Must exit 0 with `PRODUCT_SPEC_COMPLETE: N features, M user stories`. Fix any reported issues before proceeding to step-07.
@@ -50,14 +50,14 @@ Must output `PLAN_COMPLETE`. Fix reported issues before proceeding.
 **Skip if:** `planning_mode = fast` — skip the structural validator (4b) and go
 directly to step-07-gate.md.
 
-**Skip if:** `planning_mode = product-level` — the structural check expects phase files and per-phase schema. Product-level plans have a different schema (product spec). Section 4a' above replaces 4b for this mode. Go directly to step-07-gate.md (step-05 red-team and step-06 validation interview are also skipped for product-level v1 — the spec is the deliverable, phase decomposition happens in `mk:autobuild`).
+**Skip if:** `planning_mode = product-level` — the structural check expects phase files and per-phase schema. Product-level plans have a different schema (product spec). Section 4a' above replaces 4b for this mode. Go directly to step-07-gate.md (step-05 red-team and step-06 validation interview are also skipped for product-level v1 — the spec is the deliverable, phase decomposition happens in `mk-autobuild`).
 
 ### 4c. Two-Approach Selection (conditional: `planning_mode = two`)
 
 Run 4a and 4b semantic checks on BOTH `plan-approach-a.md` and `plan-approach-b.md`. Fix issues in each file independently. Then:
 
 1. Read the `## Goal` line from each approach file for the summary.
-2. Present via stop and ask the user in chat:
+2. Present by asking the user:
 
 ```json
 {
@@ -97,7 +97,7 @@ Algorithm: see `references/verification-roles.md` (tier selection, role responsi
    - 3–4 phases → Standard (Fact Checker + Contract Verifier)
    - 5+ phases → Full (Fact Checker + Flow Tracer + Scope Auditor + Contract Verifier)
 3. Set session variable `verification_tier ∈ {light, standard, full}` for step-06 consumption.
-4. For each role in the tier × each phase file, spawn one read-only Agent sub-task (`subagent_type=Explore`) using the dispatch brief in `references/verification-roles.md`. Dispatch ALL roles in PARALLEL via a single message — never serial.
+4. For each role in the tier × each phase file, spawn one read-only search sub-task using the dispatch brief in `references/verification-roles.md`. Dispatch ALL roles in PARALLEL via a single message — never serial.
 5. Collect all sub-task verdict lists. Drop any line that does not match the verdict grammar.
 6. Group verdicts by phase file. For each phase file:
    - Read the existing phase file.

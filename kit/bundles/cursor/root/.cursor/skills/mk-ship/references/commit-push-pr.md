@@ -61,7 +61,7 @@ EOF
 
 **IRON LAW: NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE.**
 
-Before pushing, re-verify if code changed during Steps 4-6:
+Before pushing, run the checks again if code changed during Steps 4-6:
 
 1. **Test verification:** If ANY code changed after Step 3's test run (fixes from review findings, CHANGELOG edits don't count), re-run the test suite. Paste fresh output. Stale output from Step 3 is NOT acceptable.
 
@@ -196,7 +196,7 @@ gh pr edit "$EXISTING_PR" --title "<type>: <summary>" --body "<same body as abov
 ## Step 8.5: Offer /document-release
 
 After the PR is created, report whether the diff appears to affect project documentation
-and offer `the document-release skill`. Do not invoke it automatically. Documentation edits,
+and offer `/mk-document-release`. Do not invoke it automatically. Documentation edits,
 commits, and pushes require the user's explicit request and the confirmations defined by
 the document-release workflow.
 
@@ -204,7 +204,7 @@ the document-release workflow.
 
 ## Step 8.75: Persist ship metrics
 
-Log coverage and plan completion data so `the retro skill` can track trends:
+Log coverage and plan completion data so `/mk-retro` can track trends:
 
 ```bash
 eval "$(.cursor/scripts/bin/workflow-slug 2>/dev/null)" && mkdir -p .meowkit/telemetry

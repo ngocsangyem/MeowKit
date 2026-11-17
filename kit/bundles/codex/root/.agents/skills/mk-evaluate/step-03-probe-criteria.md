@@ -25,14 +25,14 @@ Read `references/active-verification-patterns.md` once at session start. For eac
 
 | Criterion type | Probe pattern | Tool |
 |---|---|---|
-| "Feature X works end-to-end" | UI flow: navigate → click → type → assert visible result | `mk:agent-browser` or `mk:playwright-cli` |
+| "Feature X works end-to-end" | UI flow: navigate → click → type → assert visible result | `mk-agent-browser` or `mk-playwright-cli` |
 | "API endpoint returns expected shape" | curl + jq assertion on response shape | `bash` |
-| "Form submission persists data" | UI flow + DB query (or follow-up GET) | `mk:agent-browser` + `bash` |
-| "Error states render gracefully" | Trigger error (bad input, network kill) → screenshot result | `mk:agent-browser` |
-| "Time-to-value ≤90s" | Navigate to landing → measure clicks/seconds to first value action | `mk:agent-browser` (timed) |
-| "No console errors on happy path" | Open page → exercise main flow → capture browser console log | `mk:agent-browser` (log capture) |
-| "Design language consistent across screens" | Screenshot every primary screen → compare visually for typography/color/spacing | `mk:agent-browser` (multi-screenshot) |
-| "Originality — non-generic copy" | Read hero copy + product name → pattern-match against `originality.md` anti-patterns (purple gradient, "modern way to", undraw illustrations) | `mk:agent-browser` + manual pattern-match |
+| "Form submission persists data" | UI flow + DB query (or follow-up GET) | `mk-agent-browser` + `bash` |
+| "Error states render gracefully" | Trigger error (bad input, network kill) → screenshot result | `mk-agent-browser` |
+| "Time-to-value ≤90s" | Navigate to landing → measure clicks/seconds to first value action | `mk-agent-browser` (timed) |
+| "No console errors on happy path" | Open page → exercise main flow → capture browser console log | `mk-agent-browser` (log capture) |
+| "Design language consistent across screens" | Screenshot every primary screen → compare visually for typography/color/spacing | `mk-agent-browser` (multi-screenshot) |
+| "Originality — non-generic copy" | Read hero copy + product name → pattern-match against `originality.md` anti-patterns (purple gradient, "modern way to", undraw illustrations) | `mk-agent-browser` + manual pattern-match |
 | "CLI exit codes correct" | Invoke binary with intentional bad input → check exit code | `bash` |
 | "CLI --help is comprehensive" | Run `binary --help` → capture stdout → check for examples + exit codes section | `bash` |
 

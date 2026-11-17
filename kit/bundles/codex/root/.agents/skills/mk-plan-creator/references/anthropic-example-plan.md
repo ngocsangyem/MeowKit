@@ -24,7 +24,6 @@ This is the **calibration reference** for product-level planning mode.
 - [Success Criteria (Product-Level)](#success-criteria-product-level)
 - [Handoff](#handoff)
 
-
 <!-- research-citation -->
 It comes from the appendix of Anthropic's harness-design article (Prithvi Rajasekaran, Labs)
 and demonstrates the ambition level, feature density, user-story specificity, and design-language
@@ -221,4 +220,4 @@ Hobbyists, design students, indie devs, and former arcade kids who want to make 
 
 ## Handoff
 
-Once the plan is agreed, hand off to `mk:autobuild`. It negotiates a sprint contract with the generator and runs the generator ⇄ evaluator loop until rubric scores pass.
+Once the plan is agreed, hand off to `mk-autobuild`. It negotiates a sprint contract with the generator and runs the generator ⇄ evaluator loop until rubric scores pass.

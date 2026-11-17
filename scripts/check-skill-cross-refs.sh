@@ -85,12 +85,13 @@ done < <(
 # Explicit `.claude/...` paths named by an entrypoint, an agent or a rule must exist, so a
 # deleted or moved kit file cannot stay quoted as live. Files a user or a session creates at
 # run time (MCP config, agent memory, product areas) are optional and exempt.
-OPTIONAL_PATHS=".claude/mcp.json .claude/.mcp.json .claude/product-areas.yaml"
+OPTIONAL_PATHS=".claude/mcp.json .claude/.mcp.json .claude/product-areas.yaml .claude/settings.local.json"
 while IFS= read -r file; do
   while IFS= read -r ref; do
     [ -z "$ref" ] && continue
     case " $OPTIONAL_PATHS " in *" $ref "*) continue ;; esac
-    case "$ref" in .claude/agent-memory/*|.claude/session-state/*|.claude/logs/*|.claude/cache/*) continue ;; esac
+    # `.claude/skills/foo/` is the placeholder in a "write here, not there" authoring example.
+    case "$ref" in .claude/agent-memory/*|.claude/session-state/*|.claude/logs/*|.claude/cache/*|.claude/skills/foo/*) continue ;; esac
     if [ ! -e "$ref" ]; then
       echo "DEAD_PATH: $file -> $ref" >&2
       PHANTOM=1
@@ -101,8 +102,31 @@ while IFS= read -r file; do
 done < <(
   find .claude/skills .claude/agents .claude/rules \
     \( -path '*/.*' -o -path '*/.venv/*' -o -path '*/node_modules/*' \) -prune -o \
-    -type f \( -name 'SKILL.md' -o -name 'step-*.md' -o -path '.claude/agents/*.md' -o -path '.claude/rules/*.md' \) -print 2>/dev/null
+    -type f \( -name 'SKILL.md' -o -name 'step-*.md' -o -path '*/references/*.md' -o -path '.claude/agents/*.md' -o -path '.claude/rules/*.md' \) -print 2>/dev/null
 )
+
+# The Codex and Cursor bundles name their own paths (`.agents/skills/mk-x/…`, `.codex/…`,
+# `.cursor/…`). Each must exist inside that bundle's root, because the installer copies the
+# bundle as laid out: a path to a file it does not ship is a command that fails after install.
+# Files a user or a session creates at run time are exempt. Only the kit source has bundles.
+for bundle in kit/bundles/codex/root kit/bundles/cursor/root; do
+  [ -d "$bundle" ] || continue
+  while IFS=$'\t' read -r file ref; do
+    [ -z "$ref" ] && continue
+    case "$ref" in
+      */cache/*|*/logs/*|*/agent-memory/*|*/state/*) continue ;;
+      *mcp.json|*settings.local.json|*product-areas.yaml|*.env|*.env.example) continue ;;
+    esac
+    if [ ! -e "$bundle/$ref" ]; then
+      echo "DEAD_PATH: $bundle/${file#./} -> $ref" >&2
+      PHANTOM=1
+    fi
+  done < <(
+    cd "$bundle" && find . \( -path '*/.venv/*' -o -path '*/node_modules/*' \) -prune -o \
+      -type f \( -name '*.md' -o -name '*.mdc' -o -name '*.toml' \) -print0 \
+      | xargs -0 perl -ne 'while (/(?:^|[\s`("\/])(\.(?:agents|codex|cursor)\/[A-Za-z0-9._\/-]+\.(?:mdc|md|cjs|sh|json|py|yaml|toml))(?![A-Za-z0-9])/g) { print "$ARGV\t$1\n" }'
+  )
+done
 
 if [ "$PHANTOM" -eq 0 ]; then
   echo "OK: all skill and local entrypoint refs resolve"

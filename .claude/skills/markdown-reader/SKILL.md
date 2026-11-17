@@ -1,6 +1,6 @@
 ---
 name: mk:markdown-reader
-description: Serve markdown files as a book-like reader on 127.0.0.1 with Mermaid and dark mode. NOT for mk:preview.
+description: "Serves markdown as a book-like local reader with Mermaid. NOT for mk:preview."
 user-invocable: true
 version: 1.0.0
 source: port
@@ -15,7 +15,7 @@ keywords:
   - mermaid
   - local-server
   - book-reader
-when_to_use: Long-form reading of an RFC, runbook, design doc or plan in a browser.
+when_to_use: "Long-form reading of an RFC or design doc."
 argument-hint: <file-or-directory> [--stop]
 owner: utility
 criticality: medium

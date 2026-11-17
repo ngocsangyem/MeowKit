@@ -22,7 +22,7 @@ returns code + screenshot; `get_motion_context` returns keyframe **animation** d
 navigation edges. So extraction is a short check-then-fall-back, not a full procedure:
 
 1. If a specific MCP server version returns explicit interaction/reaction/starting-point
-   metadata for the node → record those edges as `kind: extracted`. Re-verify per server;
+   metadata for the node → record those edges as `kind: extracted`. Use this only when that server returns the metadata;
    never assume this path exists.
 2. Otherwise → `availability: unavailable | user_supplied`. Ask the user for the flow, or
    record inferred edges under the inference policy. `get_motion_context` may inform

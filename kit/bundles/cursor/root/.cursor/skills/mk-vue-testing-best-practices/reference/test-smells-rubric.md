@@ -43,7 +43,7 @@ Omit rows that don't apply — do not pad.
 Flag these even when present tests pass: Teleported content, Suspense fallback branch, store
 *actions* (not just state), router navigation guards, watchers with async cleanup. For
 *existence-level* diff coverage gaps ("is there any test for this changed path?"), that is
-produced automatically by `mk:review`; this rubric audits the *quality* of tests that exist.
+produced automatically by `mk-review`; this rubric audits the *quality* of tests that exist.
 
 ## Reference
 - [Vue.js Testing Guide](https://vuejs.org/guide/scaling-up/testing)

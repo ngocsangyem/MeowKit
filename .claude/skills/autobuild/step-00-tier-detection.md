@@ -28,7 +28,7 @@ model_id="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}"
 case "$model_id" in
   *haiku*) tier="TRIVIAL" ;;
   *sonnet*) tier="STANDARD" ;;
-  *opus*) tier="COMPLEX" ;;
+  *opus*|*fable*) tier="COMPLEX" ;;
   *) tier="STANDARD" ;;  # safe fallback
 esac
 ```

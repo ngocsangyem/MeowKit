@@ -2,7 +2,7 @@
 
 **Use only when:** a component is heavy or rarely viewed and should be lazy-loaded to reduce the initial bundle. Do not use for every component — only those where the load cost justifies deferred parsing.
 
-> The basic `defineAsyncComponent` call is covered in `mk:vue` → `references/reactivity-performance.md`. This doc adds: Suspense pairing, lazy hydration strategies (Vue 3.5+), and `loading`/`error`/`delay`/`timeout` options.
+> The basic `defineAsyncComponent` call is covered in `mk-vue` → `references/reactivity-performance.md`. This doc adds: Suspense pairing, lazy hydration strategies (Vue 3.5+), and `loading`/`error`/`delay`/`timeout` options.
 
 ## Loading + error + delay + timeout options
 

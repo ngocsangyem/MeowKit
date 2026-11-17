@@ -75,7 +75,7 @@ Dispatch one subagent per job. The prompt must include:
   authority;
 - instruction to return the deliverable as the final message.
 
-Build this prompt with `mk:delegate` rather than composing it ad hoc — it
+Build this prompt with `mk-delegate` rather than composing it ad hoc — it
 assembles the task, file ownership, and acceptance-criteria fields the
 dispatch contract requires and keeps the shape consistent with every other
 in-session delegation.
@@ -84,7 +84,7 @@ Independent same-stage jobs may launch together up to `concurrency`, capped at
 3 concurrent internal agents per the parallel-execution rules regardless of
 what the spec requests — a ceiling that applies only to internal dispatch, not
 to external CLI runtimes. Parallel writing jobs require disjoint ownership and
-separate worktrees, created via `mk:worktree`. The prompt pins the agent to
+separate worktrees, created via `mk-worktree`. The prompt pins the agent to
 its worktree, but that remains prompt-level isolation; never treat it as an OS
 sandbox.
 
@@ -180,7 +180,7 @@ Resume uses `state.json` like other runtimes:
 - Multi-session teamwork and teammate messaging belong to a dedicated team
   workflow, not orchestrate.
 - A single uncomplicated scout rarely justifies orchestration overhead — a
-  direct `mk:scout` call is often enough.
+  direct `mk-scout` call is often enough.
 - Internal agents consume the current session's resources and permission
   posture.
 - Prompt-level worktree isolation prevents expected edit overlap but does not

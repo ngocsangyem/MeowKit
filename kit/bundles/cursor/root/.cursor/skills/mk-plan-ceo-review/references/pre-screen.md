@@ -49,9 +49,9 @@ List flagged items with file locations. Present:
 > - [flagged item 1] at [location]
 > - [flagged item 2] at [location]
 >
-> Run `the plan skill` to amend, or proceed with known gaps."
+> Run `/mk-plan-creator` to amend, or proceed with known gaps."
 
-stop and ask the user in chat: "Plan has [N] unfinished sections. How to proceed?"
+Ask the user: "Plan has [N] unfinished sections. How to proceed?"
 - **"Amend first"** → stop review, user returns to plan-creator
 - **"Proceed with gaps"** → continue to Layer 1, note gaps in final verdict
 
@@ -75,7 +75,7 @@ Check plan has required sections per plan-creator template:
 
 ### If Section Missing
 
-stop and ask the user in chat: "Plan is missing: [section list]. How to proceed?"
+Ask the user: "Plan is missing: [section list]. How to proceed?"
 - **"Amend (return to plan-creator)"** → stop review
 - **"Proceed anyway"** → continue, note gaps in final verdict
 
@@ -95,7 +95,7 @@ Read requirements from problem statement. Read tasks from plan phases. Check eac
 
 ### If Gaps Found
 
-Present coverage table to user. stop and ask the user in chat: "[N] requirements have no mapped tasks. How to proceed?"
+Present coverage table to user. Ask the user: "[N] requirements have no mapped tasks. How to proceed?"
 - **"Amend plan"** → stop review
 - **"Accept gaps"** → continue, note in final verdict
 
@@ -120,4 +120,4 @@ User invokes the plan-ceo-review skill [plan-path]
   → Verdict + handoff
 ```
 
-If any pre-screen layer surfaces issues, user decides: amend or proceed. Pre-screen NEVER blocks autonomously.
+If any pre-screen layer surfaces issues, user decides: amend or proceed. Pre-screen never blocks on its own; the user decides.

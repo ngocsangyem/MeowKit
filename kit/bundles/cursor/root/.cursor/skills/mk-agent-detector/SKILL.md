@@ -1,6 +1,6 @@
 ---
 name: "mk-agent-detector"
-description: "Detects the right agent and complexity tier at Phase 0 orient; runs first in every workflow. NOT for runtime agent routing inside a single skill."
+description: "Picks the agent and complexity tier at orient; runs first in a workflow."
 ---
 
 # Agent Detector
@@ -36,7 +36,7 @@ description: "Detects the right agent and complexity tier at Phase 0 orient; run
    If any `Read` returns "file does not exist" or equivalent, **ABORT IMMEDIATELY** with the exact message:
 
    ```
-   SAFETY BASELINE INCOMPLETE: rule <name> not found at .cursor/skills/rule-<name>.md
+   SAFETY BASELINE INCOMPLETE: rule <name> not found at .cursor/skills/mk-rule-<name>.md
    Refusing to route any task. Restore the rule (git checkout / the installer) before retrying.
    ```
 
@@ -54,13 +54,13 @@ description: "Detects the right agent and complexity tier at Phase 0 orient; run
    - the model-selection conventions — task-type → model-tier mapping
    - the scale-adaptive routing conventions — domain CSV → complexity routing
    - the risk checklist — 9 horizontal-risk flags
-   - `.cursor/skills/agent-detector/references/skill-domain-routing.md` — intent → skill dispatch table (used at hand-off, Step 5)
+   - `.cursor/skills/mk-agent-detector/references/skill-domain-routing.md` — intent → skill dispatch table (used at hand-off, Step 5)
 
    If any of the 5 rule `Read`s fails: ABORT with `PHASE-ZERO RULE MISSING: <name>` — same fail-fast semantics as Step 0. These rules drive the routing logic in steps 2–4; without them, detection silently degrades to keyword-only. The skill-domain-routing reference is advisory dispatch guidance (not a routing rule): if it is absent, log `skill-domain-routing reference absent; skill dispatch falls back to inline judgment` and continue — do NOT abort.
 
    **Agile context detection (additive — Agile-only load).** After the 5 phase-zero `Read`s succeed:
 
-   1. **PRE-FLIGHT.** Check that `.cursor/skills/rule-` directory exists. If absent → log `agile rules: rules-conditional/ not deployed; skipping load` and skip steps 2–4. (Defensive: filesystem may lag pruning-plan status doc.)
+   1. **PRE-FLIGHT.** Check that `.cursor/skills/mk-rule-` directory exists. If absent → log `agile rules: rules-conditional/ not deployed; skipping load` and skip steps 2–4. (Defensive: filesystem may lag pruning-plan status doc.)
    2. **Detect Agile context — OR-logic, any one match triggers load:**
       - glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result
       - Active plan frontmatter has non-empty `jira_tickets:`
@@ -78,7 +78,7 @@ description: "Detects the right agent and complexity tier at Phase 0 orient; run
 1. **Check cache** -- reuse cached result if same workflow and phase > 1. See `references/detection-process.md`
 2. **Score agents** -- analyze task content, extract keywords, check project context across all layers (0-4). See `references/multi-layer-detection.md`, `references/scoring-and-thresholds.md`
 3. **Select model + mode** -- map complexity to model tier, check team mode eligibility. See `references/model-selection.md`, `references/complexity-detection.md`, `references/team-mode.md`
-4. **Evaluate risk flags** -- read the risk checklist (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per the model-selection rules Rule 2 — regardless of `mk:scale-routing` outcome.
+4. **Evaluate risk flags** -- read the risk checklist (loaded in Step 0b). For each of the 9 flags (AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT, CROSS_PLATFORM, EXISTING_BEHAVIOR, WEAK_PROOF), evaluate whether the task description matches its trigger criteria. Emit `matched_flags: [<ID>, ...]` (default `[]`). If any flag in `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` matches, escalate the tier to COMPLEX per the model-selection rules Rule 2 — regardless of `mk-scale-routing` outcome.
 5. **Output + hand off** -- show detection banner (including `matched_flags` line if non-empty), load agent instructions, invoke skill. See `references/detection-process.md`, `references/after-detection.md`
 
 ## References
@@ -99,6 +99,6 @@ After complexity detection, check user depth signals per `references/token-budge
 
 ## Gotchas
 
-- **Misrouting trivial tasks to heavyweight agents**: Short messages that contain domain keywords (e.g., "fix the auth token") score high for complex agents even when the actual work is a one-line change. The detector favors keyword matches over scope signals. → If the banner shows an unexpected agent/model tier, override via `--quick` or use the explicit `the fix skill --quick` shorthand to force the right complexity level.
+- **Misrouting trivial tasks to heavyweight agents**: Short messages that contain domain keywords (e.g., "fix the auth token") score high for complex agents even when the actual work is a one-line change. The detector favors keyword matches over scope signals. → If the banner shows an unexpected agent/model tier, override via `--quick` or use the explicit `/mk-fix --quick` shorthand to force the right complexity level.
 - **Cache stale after context switch**: The detection cache reuses the result from the previous workflow phase, but when a conversation pivots mid-session (e.g., "actually, let's do X instead"), the cached detection is wrong for the new task. The detector doesn't invalidate on pivot signals. → Confirm the banner after any explicit task change; if the agent/model is wrong, start a new message explicitly describing the new task so Layer 0 re-detects from scratch.
 - **Multi-domain tasks picking the wrong primary agent**: Tasks spanning two domains (e.g., "add a security check to the payment UI") split scores across agents and the highest scorer wins, which may be wrong for the dominant concern. The tiebreaker is the first keyword match, not importance. → For cross-domain tasks, state the primary concern explicitly at the start of the message (e.g., "Security task: ...") so Layer 0 domain detection anchors to the right agent before keyword scoring runs.

@@ -1,6 +1,6 @@
 ---
 name: mk:status
-description: 'Evidence-based delivery status for the active plan: done, blocked, changed since last report. NOT for mk:help.'
+description: "Evidence-based status of the active plan: done, blocked, changed. NOT for mk:help."
 argument-hint: '[plan-dir | plan-slug]'
 source: local
 trust_level: kit-authored
@@ -17,7 +17,7 @@ keywords:
   - plan-status
   - blocked-items
   - stakeholder-update
-when_to_use: Asked where we are, or a stakeholder update is due.
+when_to_use: "Asked where we are."
 user-invocable: true
 owner: lifecycle
 criticality: medium
@@ -63,7 +63,7 @@ not `completed`, `cancelled` or `archived`:
   I report on?", one option per plan labelled with its title and created date. Never pick the
   most recent one silently — an unrelated plan's report reads as this plan's status.
 
-## 2. Delegate to the project-manager agent
+## 2. Once the plan is resolved, delegate to the project-manager agent
 
 Invoke `project-manager` with the resolved plan directory:
 

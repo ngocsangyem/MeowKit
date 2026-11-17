@@ -2,7 +2,7 @@
 name: mk:advise
 preamble-tier: 3
 version: 1.0.0
-description: Interview one question at a time, then deliver ONE verdict — do, don't, cheaper alternatives, trade-offs, ordered checklist, success metrics. NOT for mk:party.
+description: "Interviews one question at a time, then gives ONE verdict. NOT for mk:party."
 allowed-tools:
   - Read
   - Grep
@@ -19,7 +19,7 @@ keywords:
   - decision-support
   - verdict
   - trade-offs
-when_to_use: User wants one honest recommendation on a decision, not a list of options.
+when_to_use: "Wants one recommendation on a decision."
 user-invocable: true
 owner: research
 criticality: medium

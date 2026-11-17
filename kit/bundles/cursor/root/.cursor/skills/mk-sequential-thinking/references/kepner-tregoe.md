@@ -27,7 +27,6 @@ Four integrated processes for rigorous thinking when intuition isn't enough. Mos
 - [Gotchas](#gotchas)
 - [Bridge to sequential-thinking](#bridge-to-sequential-thinking)
 
-
 **Core principle:** Separate what you know from what you assume. Use structured comparison to reveal truth.
 
 ## The Four Processes
@@ -151,4 +150,4 @@ Before implementation: list potential problems. Rate Probability × Seriousness.
 
 ## Bridge to sequential-thinking
 
-The PA IS/IS-NOT matrix is a structured variant of the hypothesis table in `mk:sequential-thinking/hypothesis-testing.md`. Use this reference when the bug spans multiple systems, when the cause is contested across on-call shifts, or when a hand-waved root cause would cost real money. For simpler single-layer bugs, the standard hypothesis table suffices.
+The PA IS/IS-NOT matrix is a structured variant of the hypothesis table in `mk-sequential-thinking/hypothesis-testing.md`. Use this reference when the bug spans multiple systems, when the cause is contested across on-call shifts, or when a hand-waved root cause would cost real money. For simpler single-layer bugs, the standard hypothesis table suffices.

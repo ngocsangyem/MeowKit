@@ -72,8 +72,28 @@ pub fn env_usable(env_dir: &Path) -> bool {
     env_python_path(env_dir).exists()
 }
 
-pub(crate) fn skill_dir(project: &Path, skill: &str) -> PathBuf {
-    project.join(".claude").join("skills").join(skill)
+/// Where each runtime installs skills, and the prefix its folders carry:
+/// Claude Code keeps the bare name, Codex and Cursor install `mk-<skill>`.
+/// The environment is always `.meowkit/envs/<skill>`, whichever layout holds the skill.
+const SKILL_ROOTS: [(&str, &str); 3] = [(".claude", ""), (".agents", "mk-"), (".cursor", "mk-")];
+
+/// The installed folder of `skill`: the first layout that has it, in
+/// `SKILL_ROOTS` order, else the Claude Code path.
+pub fn skill_dir(project: &Path, skill: &str) -> PathBuf {
+    let candidates: Vec<PathBuf> = SKILL_ROOTS
+        .iter()
+        .map(|(root, prefix)| {
+            project
+                .join(root)
+                .join("skills")
+                .join(format!("{prefix}{skill}"))
+        })
+        .collect();
+    candidates
+        .iter()
+        .find(|dir| dir.is_dir())
+        .unwrap_or(&candidates[0])
+        .clone()
 }
 
 /// Sub-directory names of `dir`, sorted, hidden ones kept unless `skip_hidden`.
@@ -100,7 +120,17 @@ pub fn existing_envs(project: &Path) -> Vec<String> {
 /// interpreter or pins packages (some skills install a binary from their pins
 /// and never run a `.py` of their own).
 pub fn env_skills(project: &Path) -> Vec<String> {
-    dir_names(&project.join(".claude").join("skills"), true)
+    let mut names: Vec<String> = SKILL_ROOTS
+        .iter()
+        .flat_map(|(root, prefix)| {
+            dir_names(&project.join(root).join("skills"), true)
+                .into_iter()
+                .filter_map(move |name| name.strip_prefix(prefix).map(str::to_owned))
+        })
+        .collect();
+    names.sort();
+    names.dedup();
+    names
         .into_iter()
         .filter(|name| {
             read_skill_runtime(project, name).is_some()

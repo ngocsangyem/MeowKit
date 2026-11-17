@@ -13,7 +13,7 @@ How `--explain`, `--diagram`, `--slides`, `--ascii` produce a `.md` artifact in 
 - Step 3 — Write file and report
 - Notes on Mermaid emission
 
-Before emitting any code-fenced mermaid block, Read `references/mermaid-essentials.md`.
+Before emitting any code-fenced mermaid block, apply the Mermaid rules SKILL.md loads with this mode.
 
 ## Step 1 — Resolve output path
 
@@ -76,7 +76,7 @@ Output filename: `{topic-slug}.md`
 
 ## Detailed Flow
 
-[Mermaid sequenceDiagram or flowchart — read references/mermaid-essentials.md first]
+[Mermaid sequenceDiagram or flowchart — follow the Mermaid rules]
 
 ## Key Concepts
 
@@ -172,13 +172,13 @@ Legend:
 5. Report:
    - Absolute path of the generated file
    - One-line note on which directory was chosen (plan-scoped vs flat fallback)
-   - Suggested follow-up: open in editor, or `mk:web-to-markdown` to render in a browser
+   - Suggested follow-up: open in editor, or `mk-web-to-markdown` to render in a browser
 
 For `--ascii`: also print the ASCII diagram to stdout so the user sees it inline.
 
 ## Notes on Mermaid emission
 
-- Read `references/mermaid-essentials.md` BEFORE writing any mermaid block. Do not skip.
+- Apply the Mermaid rules before writing any mermaid block.
 - The `.node` class trap: page-level `.node` CSS leaks into Mermaid SVG. Use `.ve-card` for cards in any HTML mode that follows.
 - Layout direction: TD for hierarchies, LR for pipelines. ELK layout for 10+ nodes.
 - No screenshot / render verification loop — agents lack reliable image-render tools. Emit syntax-valid Mermaid and stop.

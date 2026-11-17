@@ -60,14 +60,14 @@ On completion: what to pass, to whom, in what format.
 
 ## Step 5: Security Check
 
-If the skill processes untrusted input, load mk:skill-template-secure and verify:
+If the skill processes untrusted input, load mk-skill-template-secure and verify:
 - Rule of Two compliance (max 2 of: untrusted input, sensitive data, state change)
 - Trust model table (what's trusted vs untrusted)
 - Content processing rules
 
 ## Step 6: Register
 
-Add to `.agents/skills/SKILLS_ATTRIBUTION.md`:
+Add to `SKILLS_ATTRIBUTION.md` in the skills folder (create it if missing):
 ```
 | mk:{name} | your org (original) | — | MIT | .agents/skills/{name}/ |
 ```
@@ -77,4 +77,4 @@ Add to `.agents/skills/SKILLS_ATTRIBUTION.md`:
 - Don't create skills that duplicate existing agent behavior
 - Don't create skills with vague triggers ("when appropriate")
 - Don't create skills over 200 lines without references/
-- Don't create skills that modify files outside .codex/
+- Don't create skills that modify files outside the project's skills tree

@@ -1,0 +1,17 @@
+{
+  "about": "Claude-Code-bound constructs that must not appear in text shipped to another runtime. Entries with \"rust\": true are mirrored in crates/mewkit-core/src/validate/denied_tokens.rs, and a Rust test fails when the two lists differ. \"hosts\" limits an entry to some bundle runtimes; an entry without it applies to every bundle. Patterns use JavaScript regex syntax.",
+  "tokens": [
+    { "label": "mk/meow slash command", "pattern": "/(?:mk|meow):[a-z]", "caseInsensitive": true, "rust": true },
+    { "label": "AskUserQuestion tool", "pattern": "\\bAskUserQuestion\\b", "caseInsensitive": false, "rust": true },
+    { "label": ".claude path", "pattern": "\\.claude/", "caseInsensitive": false, "rust": true },
+    { "label": "CLAUDE.md reference", "pattern": "\\bCLAUDE\\.md\\b", "caseInsensitive": false, "rust": true },
+    { "label": "Task( tool call", "pattern": "\\bTask\\(", "caseInsensitive": false, "rust": true },
+    { "label": "Claude env var", "pattern": "\\$\\{?CLAUDE_[A-Z0-9_]+", "caseInsensitive": false, "rust": true },
+    { "label": "Anthropic env var", "pattern": "\\$\\{?ANTHROPIC_[A-Z0-9_]+", "caseInsensitive": false, "rust": true },
+    { "label": "subagent_type parameter", "pattern": "\\bsubagent_type\\b", "caseInsensitive": false, "rust": true },
+    { "label": "TodoWrite tool", "pattern": "\\bTodoWrite\\b", "caseInsensitive": false, "rust": true },
+    { "label": "ExitPlanMode tool", "pattern": "\\bExitPlanMode\\b", "caseInsensitive": false, "rust": false },
+    { "label": "Skill tool", "pattern": "\\bSkill tool\\b", "caseInsensitive": false, "rust": false },
+    { "label": "Task tool", "pattern": "\\bTask tool\\b", "caseInsensitive": false, "rust": false, "hosts": ["codex"] }
+  ]
+}

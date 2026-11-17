@@ -81,7 +81,7 @@ When `--tdd` is detected, the skill writes `on` to `.meowkit/state/tdd-mode` BEF
 
 **TDD column key:** `RED-strict` = failing tests in Phase 2 before any implementation (only enforced when `--tdd` / `MEOWKIT_TDD=1`; otherwise Phase 2 is optional). `Plan-level` = tests reflect plan intent, no RED gate. `Skip` = no Phase 2.
 
-Gate 2: human approval mandatory in all modes — see `.claude/rules/gate-rules.md` for the full contract.
+Read the review verdict before shipping; no hook blocks a commit on it. The ship check is the one enforced ship-time control — see `.claude/rules/meowkit-core.md`.
 
 ## Smart intent detection
 

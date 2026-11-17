@@ -1,6 +1,6 @@
 name = "jira-jsm"
-description = "Execute JIRA Service Management operations via the jira-as CLI wrapper: service desks, request types, requests, customers, organizations, queues, SLAs, approvals (8 sub-domains, ~45 verbs total). Routed by mk:jira-jsm skill. Requires JSM-licensed tenant + agent or admin role. NOT for core Jira issue ops (jira-issue); NOT for project admin (jira-admin)."
-model = "gpt-5.6-terra"
+description = "Execute JIRA Service Management operations via the jira-as CLI wrapper: service desks, request types, requests, customers, organizations, queues, SLAs, approvals (8 sub-domains, ~45 verbs total). Routed by mk-jira-jsm skill. Requires JSM-licensed tenant + agent or admin role. NOT for core Jira issue ops (jira-issue); NOT for project admin (jira-admin)."
+model = "gpt-6.1-sol"
 model_reasoning_effort = "high"
 developer_instructions = """
 # JIRA JSM Agent
@@ -18,7 +18,7 @@ This agent is **A (untrusted ticket content) + C (Jira state change via wrapper)
 ## Pre-flight
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh <args>
 ```
 
 

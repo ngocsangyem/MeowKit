@@ -1,9 +1,9 @@
 ---
 name: "mk-jira-relationships"
-description: "Manage JIRA issue relationships via jira-as: link, unlink, blockers, dependencies, clone, bulk-link. NOT sprint/epic relationships (mk:jira-agile)."
+description: "Jira issue links, blockers, dependencies, clone; use to link issues."
 ---
 
-# mk:jira-relationships
+# mk-jira-relationships
 
 Forks to the `jira-relationships` agent. Link direction matters — `A blocks B` ≠ `B blocks A`. The agent confirms direction when ambiguous.
 
@@ -24,10 +24,11 @@ Forks to the `jira-relationships` agent. Link direction matters — `A blocks B`
 ## See also
 
 - Agent: `../../agents/jira-relationships.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared, when drawing a dependency graph: `../mk-preview/references/mermaid-essentials.md`
 - Domain refs:
   - `references/relationship-patterns.md` — blocker-chain analysis, sprint-planning patterns, dependency strategies
-- Peer leaves: `mk:jira-bulk` (bulk-link via JQL — dry-run first), `mk:jira-agile` (epic-issue is via `agile epic add`, NOT here), `mk:jira-search` (find candidate issues via JQL before linking)
+- Peer leaves: `mk-jira-bulk` (bulk-link via JQL — dry-run first), `mk-jira-agile` (epic-issue is via `agile epic add`, NOT here), `mk-jira-search` (find candidate issues via JQL before linking)
 
 ## Gotchas
 

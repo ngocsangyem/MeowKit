@@ -2,7 +2,7 @@
 name: mk:validate-plan
 version: 1.0.0
 preamble-tier: 3
-description: Checks an agreed plan across 8 dimensions for gaps before building starts. NOT for mk:plan-ceo-review.
+description: "Checks an agreed plan across 8 dimensions for gaps. NOT for mk:plan-ceo-review."
 allowed-tools:
   - Read
   - Grep
@@ -15,7 +15,7 @@ keywords:
   - plan-quality-check
   - acceptance-criteria-check
   - 8-dimension-validation
-when_to_use: The plan is agreed and should be stress-tested before any code.
+when_to_use: "Plan agreed; stress-test before code."
 user-invocable: true
 owner: lifecycle
 criticality: high

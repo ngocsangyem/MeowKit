@@ -1,6 +1,6 @@
 ---
 name: "mk-scout"
-description: "Fast parallel codebase scouting — searches many directories at once, returning a file map + architecture fingerprint. Use before planning or cross-dir work. NOT for deep single-file reads."
+description: "Finds where code lives via a parallel repo sweep and file map; use before planning."
 ---
 
 # Scout

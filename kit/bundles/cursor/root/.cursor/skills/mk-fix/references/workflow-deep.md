@@ -2,14 +2,30 @@
 
 Full pipeline with research, brainstorming, and planning for complex issues.
 
+## Contents
+
+- [Steps](#steps)
+- [Step 1: Scout, Debug & Parallel Investigation](#step-1-scout-debug--parallel-investigation)
+- [Step 2: Research (parallel with Step 1)](#step-2-research-parallel-with-step-1)
+- [Step 3: Brainstorm](#step-3-brainstorm)
+- [Step 4: Plan](#step-4-plan)
+- [Step 5: Implement](#step-5-implement)
+- [Step 6: Test](#step-6-test)
+- [Step 7: Review](#step-7-review)
+- [Step 8: Finalize](#step-8-finalize)
+- [Advice Checkpoints (`--advice` only)](#advice-checkpoints---advice-only)
+- [Checkpoints](#checkpoints)
+- [What each checkpoint asks](#what-each-checkpoint-asks)
+- [Boundaries](#boundaries)
+
 ## Steps
 
 ### Step 1: Scout, Debug & Parallel Investigation
-Run `mk:scout`, then activate `mk:investigate` and `mk:sequential-thinking`. Launch parallel exploration only for independent evidence paths:
+Run `mk-scout`, then activate `mk-investigate` and `mk-sequential-thinking`. Launch parallel exploration only for independent evidence paths:
 ```
-Agent("Explore", "Find error origin and trace")
-Agent("Explore", "Find affected components and dependencies")
-Agent("Explore", "Find similar patterns in codebase")
+read-only search sub-task: "Find error origin and trace"
+read-only search sub-task: "Find affected components and dependencies"
+read-only search sub-task: "Find similar patterns in codebase"
 ```
 
 **Output:** `Step 1: Root cause — [summary], system impact: [scope]`

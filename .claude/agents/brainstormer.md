@@ -1,9 +1,9 @@
 ---
 name: brainstormer
 subagent_type: advisory
-description: 'Use this agent when you need to brainstorm software solutions, evaluate architectural approaches, or debate technical decisions before implementation. Examples: "Should I use WebSockets or SSE for real-time?", "What''s the best approach for file uploads?", "Evaluate REST vs GraphQL for our API." Use proactively during Phase 1 (Plan) when the task involves significant technical decisions or multiple viable approaches. Not for implementation or final decisions.'
+description: 'Use this agent when you need to brainstorm software solutions, evaluate architectural approaches, or debate technical decisions before implementation. Examples: "Should I use WebSockets or SSE for real-time?", "What''s the best approach for file uploads?", "Evaluate REST vs GraphQL for our API." Delegate during planning when a decision has several viable approaches with real trade-offs; skip it when the approach is already settled. Not for implementation or final decisions.'
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
-model: claude-opus-5
+model: opus
 source: local
 owner: lifecycle
 criticality: medium

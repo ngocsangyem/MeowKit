@@ -5,9 +5,9 @@
 When the design doc check above prints "No design doc found," offer the prerequisite
 skill before proceeding.
 
-Say to the user via stop and ask the user in chat:
+Say to the user by asking the user:
 
-> "No design doc found for this branch. `the office-hours skill` produces a structured problem
+> "No design doc found for this branch. `/mk-office-hours` produces a structured problem
 > statement, premise challenge, and explored alternatives — it gives this review much
 > sharper input to work with. Takes about 10 minutes. The design doc is per-feature,
 > not per-product — it captures the thinking behind this specific change."
@@ -25,11 +25,11 @@ Say: "Running the office-hours skill inline. Once the design doc is ready, I'll 
 the review right where we left off."
 
 Read the office-hours skill file from disk using the Read tool:
-`.cursor/skills/office-hours/SKILL.md`
+`.cursor/skills/mk-office-hours/SKILL.md`
 
 Follow it inline, **skipping these sections** (already handled by the parent skill):
 - Preamble (run first)
-- stop and ask the user in chat Format
+- User question format
 - Completeness Principle — Boil the Lake
 - Search Before Building
 - Completion Status Protocol
@@ -54,7 +54,7 @@ If none was produced (user may have cancelled), proceed with standard review.
 
 During Step 0A (Premise Challenge), if the user can't
 articulate the problem, keeps changing the problem statement, answers with "I'm not
-sure," or is clearly exploring rather than reviewing — offer `the office-hours skill`:
+sure," or is clearly exploring rather than reviewing — offer `/mk-office-hours`:
 
 > "It sounds like you're still figuring out what to build — that's totally fine, but
 > that's what the office-hours skill is designed for. Want to run the office-hours skill right now?
@@ -64,10 +64,10 @@ Options: A) Yes, run the office-hours skill now. B) No, keep going.
 If they keep going, proceed normally — no guilt, no re-asking.
 
 If they choose A: Read the office-hours skill file from disk:
-`.cursor/skills/office-hours/SKILL.md`
+`.cursor/skills/mk-office-hours/SKILL.md`
 
 Follow it inline, skipping these sections (already handled by parent skill):
-Preamble, stop and ask the user in chat Format, Completeness Principle, Search Before Building,
+Preamble, user question format, Completeness Principle, Search Before Building,
 Completion Status Protocol, Telemetry.
 
 Note current Step 0A progress so you don't re-ask questions already answered.

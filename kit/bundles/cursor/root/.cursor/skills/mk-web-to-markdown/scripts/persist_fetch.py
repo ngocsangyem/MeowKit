@@ -229,7 +229,7 @@ def _post_write_audit(report_path: Path, url: str, manifest_entry: dict) -> str 
     except Exception as exc:
         # Fail-closed: a failed scan is suspicious (scanner crashed, unparseable
         # output, timeout). Log as WARN and treat as CRITICAL to quarantine.
-        _log_security(f"[WARN] [mk:web-to-markdown] Layer 8 audit errored: {exc} — treating as CRITICAL (url={scrub_url(url)})")
+        _log_security(f"[WARN] [mk-web-to-markdown] Layer 8 audit errored: {exc} — treating as CRITICAL (url={scrub_url(url)})")
         # Retroactive quarantine on audit failure
         content_sha = hashlib.sha256(report_path.read_bytes()).hexdigest()[:16] if report_path.exists() else "unknown"
         q_path = QUARANTINE_DIR / f"{content_sha}-audit-error.quarantined"
@@ -276,7 +276,7 @@ def _post_write_audit(report_path: Path, url: str, manifest_entry: dict) -> str 
 
     desc = criticals[0].description
     _log_security(
-        f"[CRITICAL] [mk:web-to-markdown] [Layer8] Post-write audit: {desc} "
+        f"[CRITICAL] [mk-web-to-markdown] [Layer8] Post-write audit: {desc} "
         f"→ retroactive quarantine {q_path} (url={scrub_url(url)})"
     )
     return (
@@ -368,7 +368,7 @@ def quarantine(url: str, raw_content: str | bytes, reason: str) -> str:
 
     clean_url = scrub_url(url)
     _log_security(
-        f"[CRITICAL] [mk:web-to-markdown] Injection detected → quarantined "
+        f"[CRITICAL] [mk-web-to-markdown] Injection detected → quarantined "
         f"at {q_path} — reason: {reason} (url={clean_url})"
     )
 

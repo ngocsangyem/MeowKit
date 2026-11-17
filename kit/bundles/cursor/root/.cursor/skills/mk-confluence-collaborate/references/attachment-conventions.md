@@ -62,7 +62,7 @@ Conventions for the agent when downloading attachments (e.g. for image analysis 
 Example flow:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/confluence-as.sh attachment download \
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-confluence/scripts/confluence-as.sh attachment download \
   --attachment-id 9876 --output /tmp/conf-attach-9876.png
 # ... use the file ...
 rm /tmp/conf-attach-9876.png

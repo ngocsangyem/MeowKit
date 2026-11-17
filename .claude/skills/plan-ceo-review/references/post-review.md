@@ -28,7 +28,7 @@ rm -f tasks/plans/*/*-$BRANCH-ceo-handoff-*.md 2>/dev/null || true
 
 After producing the Completion Summary above, persist the review result.
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes review metadata to
+**Plan-mode exception — run this even in plan mode:** This command writes review metadata to
 `.meowkit/telemetry/` (not project files). The skill preamble
 already writes to `.meowkit/state/sessions/` and `.meowkit/telemetry/` — this is
 the same pattern. The review dashboard depends on this data. Skipping this
@@ -146,7 +146,7 @@ Below the table, add these lines (omit any that are empty/not applicable):
 
 ### Write to the plan file
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
+**Plan-mode exception — run this even in plan mode:** This writes to the plan file, which is the one
 file you are allowed to edit in plan mode. The plan file review report is part of the
 plan's living status.
 

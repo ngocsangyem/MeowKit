@@ -16,7 +16,7 @@
 
 **Before running full detection, check if a cached result can be reused.**
 
-Cache file: `.codex/cache/agent-detection-cache.json`
+Cache file: `.meowkit/state/agent-detection-cache.json`
 
 ```toon
 cache_check[4]{condition,action}:
@@ -43,7 +43,7 @@ cache_check[4]{condition,action}:
 {
   "workflowId": "FEAT-123",
   "agent": "architect",
-  "model": "sonnet",
+  "tier": "STANDARD",
   "complexity": "Standard",
   "secondary": ["tester"],
   "teamMode": false,
@@ -91,7 +91,7 @@ Extracted:
 
 ```bash
 # 1. If context is insufficient:
-   -> Run mk:scout for codebase structure
+   -> Run mk-scout for codebase structure
    -> Read package.json, tsconfig.json, etc. directly
 
 # 2. For fresh codebase scan:

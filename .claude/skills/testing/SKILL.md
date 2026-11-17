@@ -1,13 +1,13 @@
 ---
 name: mk:testing
-description: Writes and runs tests, enforcing red-green-refactor when TDD mode is on. NOT for mk:nyquist.
+description: "Writes and runs tests; red-green-refactor in TDD mode. NOT for mk:nyquist."
 keywords:
   - testing
   - unit-tests
   - tdd-red-green
   - validation-scripts
   - phase-2-test
-when_to_use: Tests must be authored, or the suite run, for a change in progress.
+when_to_use: "Tests to write or run."
 user-invocable: true
 owner: testing
 criticality: medium

@@ -2,6 +2,15 @@
 
 Routes for upstream agent-browser skills that should not be missed:
 
+## Contents
+
+- [Dogfood / Exploratory QA](#dogfood--exploratory-qa)
+- [Electron Apps](#electron-apps)
+- [Slack](#slack)
+- [Vercel Sandbox](#vercel-sandbox)
+- [AWS Bedrock AgentCore](#aws-bedrock-agentcore)
+- [Selection Checklist](#selection-checklist)
+
 - `dogfood`
 - `electron`
 - `slack`
@@ -20,7 +29,7 @@ Workflow:
 2. Copy [../templates/dogfood-report-template.md](../templates/dogfood-report-template.md) into `dogfood-output/report.md`.
 3. Start a named session: `agent-browser --session <session> open <target-url>`.
 4. Authenticate only when needed. Save state if useful.
-5. Read [dogfood-issue-taxonomy.md](dogfood-issue-taxonomy.md).
+5. Calibrate findings against the issue taxonomy loaded with this file.
 6. Explore top-level navigation, forms, modals, empty/error/loading states, console, network failures.
 7. Document each issue immediately. Do not batch findings at the end.
 8. For interactive bugs, record repro video plus step screenshots. For static visible-on-load issues, one annotated screenshot is enough.
@@ -78,7 +87,7 @@ agent-browser open https://app.slack.com
 agent-browser snapshot -i
 ```
 
-Then read [slack-workflows.md](slack-workflows.md).
+Then follow the Slack task recipes loaded with this file.
 
 Rules:
 

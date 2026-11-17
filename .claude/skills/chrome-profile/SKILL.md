@@ -1,6 +1,6 @@
 ---
 name: mk:chrome-profile
-description: Attach browser automation to a named real Chrome profile over CDP, keeping its cookies and extensions. NOT for mk:agent-browser.
+description: "Attaches automation to a real Chrome profile via CDP. NOT for mk:agent-browser."
 keywords:
   - chrome-profile
   - chrome-user-profile
@@ -10,7 +10,7 @@ keywords:
   - devtools-protocol
   - profile-discovery
   - chrome-automation
-when_to_use: Automation must reuse the user's own Chrome login or extensions.
+when_to_use: "Needs the user's Chrome login or extensions."
 user-invocable: true
 owner: utility
 criticality: medium

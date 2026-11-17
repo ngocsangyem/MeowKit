@@ -11,19 +11,19 @@ first — do not re-scout areas the packet already covers with `from:` evidence.
 
 ### 2a. Scout Relevant Directories
 
-Invoke `mk:scout` on directories related to the task:
+Invoke `mk-scout` on directories related to the task:
 - **Standard (hard):** Identify 2-3 directories most likely to be affected
 - **Deep mode:** Follow `references/deep-mode.md`: scout max 5 roots and produce a compact scope map with roots, existing tests, public contracts, risky dependencies, and an uncertainty list
 - Scout produces: file map, architecture fingerprint, complexity estimate
 
-If `mk:scout` unavailable, manually Glob + Grep the relevant directories.
+If `mk-scout` unavailable, manually Glob + Grep the relevant directories.
 
 ### 2b. Read Project Context
 
 Read these files (in priority order). All should exist in a properly-configured kit
 project. If absent, note the gap and continue — do NOT silently skip without logging:
 1. `docs/project-context.md` — tech stack, conventions, anti-patterns
-   **REQUIRED:** If absent, print `WARNING: docs/project-context.md not found — run mk:project-context generate` before proceeding.
+   **REQUIRED:** If absent, print `WARNING: docs/project-context.md not found — run mk-project-context generate` before proceeding.
 2. `docs/architecture/system-architecture.md` — system structure
 3. `docs/code-standards.md` — coding conventions
 4. `.meowkit/memory/decisions.md` — prior decisions matching the task keywords (grep first; open only matching entries)

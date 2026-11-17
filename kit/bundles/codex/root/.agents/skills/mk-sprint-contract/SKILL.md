@@ -1,18 +1,18 @@
 ---
 name: "mk-sprint-contract"
-description: "Negotiates a file-based sprint contract between generator and evaluator before code is written: turns a spec into testable acceptance criteria with rubric tie-ins."
+description: "Negotiates generator and evaluator acceptance criteria before code."
 ---
 
-# mk:sprint-contract — File-Based Sprint Contract Protocol
+# mk-sprint-contract — File-Based Sprint Contract Protocol
 
 Negotiation protocol between generator and evaluator. Produces a signed contract file at `tasks/contracts/{date}-{slug}-sprint-{N}.md` before the generator writes any source code, so both agents are grading the same scope. The contract is a shared document, not a checkpoint: no hook blocks an edit while it is unsigned.
 
-> For single-task plan validation (cook flow), use `mk:validate-plan` instead. `mk:sprint-contract` is for product-level specs feeding into `mk:autobuild` only.
+> For single-task plan validation (cook flow), use `mk-validate-plan` instead. `mk-sprint-contract` is for product-level specs feeding into `mk-autobuild` only.
 
 ## When to Use
 
 Activate when:
-- User runs `the sprint-contract skill <action> [task-slug]`
+- User runs `$mk-sprint-contract <action> [task-slug]`
 - Harness (Phase 5) needs to negotiate a sprint before invoking the generator
 - Generator agent needs to read a signed contract before starting implementation
 - A previously signed contract needs amendment due to mid-build scope discovery
@@ -20,7 +20,7 @@ Activate when:
 Skip when:
 - `MEOWKIT_AUTOBUILD_MODE=LEAN` (adaptive density: the most capable tier self-derives criteria from the product spec)
 - The plan is `--fast` mode (overhead exceeds value)
-- The task is `the fix skill simple` (one small fix needs no sprint-level scope negotiation)
+- The task is `$mk-fix simple` (one small fix needs no sprint-level scope negotiation)
 
 ## Subcommands
 
@@ -37,7 +37,7 @@ Skip when:
 ### `propose` (generator)
 
 1. Read active product spec from newest `tasks/plans/*/plan.md`
-2. Load rubric preset via `mk:rubric/scripts/load-rubric.sh --preset {preset}`
+2. Load rubric preset via `mk-rubric/scripts/load-rubric.sh --preset {preset}`
 3. Determine sprint `N`: max of existing `tasks/contracts/*-{slug}-sprint-*.md` + 1, default 1
 4. Copy `assets/contract-template.md` → `tasks/contracts/{YYMMDD-HHMM}-{slug}-sprint-{N}.md`
 5. Populate: 5–15 ACs in Given/When/Then form, each bound to one preset rubric, each with a Verification line. Every preset rubric should have ≥1 AC binding
@@ -52,7 +52,7 @@ Skip when:
 3. For each weak AC, append `Round {N+1} (reviewer): AC-{NN} {clarification}` to Negotiation Log
 4. If clean, write `Round {N+1} (reviewer): accepted` and proceed to `sign`
 5. If clarifications added, increment `rounds` and signal generator to `amend`
-6. **HARD CAP: 2 negotiation rounds.** Round 3 escalates to human via stop and ask the user in chat
+6. **HARD CAP: 2 negotiation rounds.** Round 3 escalates to human by asking the user
 
 ### `amend` (generator)
 
@@ -80,13 +80,13 @@ Sprint-LEVEL goal management. Writes to `tasks/contracts/sprint-state-{date}-spr
 
 | Action | Form | Effect |
 |---|---|---|
-| `set` | `mk:sprint-contract sprint-goal set "<text>" --sprint N` | Writes `sprint_goal:` (≤120 chars) to `tasks/contracts/sprint-state-{YYMMDD}-sprint-{N}.md`. Creates the file from `assets/sprint-state-template.md` if absent |
-| `show` | `mk:sprint-contract sprint-goal show --sprint N` | Prints current `sprint_goal:` from the newest sprint-state file matching `--sprint N` |
-| `align` | `mk:sprint-contract sprint-goal align --plan <path>` | Renders alignment between plan goal (frontmatter `goal:` or first H1) and sprint goal. Advisory — never blocks |
+| `set` | `mk-sprint-contract sprint-goal set "<text>" --sprint N` | Writes `sprint_goal:` (≤120 chars) to `tasks/contracts/sprint-state-{YYMMDD}-sprint-{N}.md`. Creates the file from `assets/sprint-state-template.md` if absent |
+| `show` | `mk-sprint-contract sprint-goal show --sprint N` | Prints current `sprint_goal:` from the newest sprint-state file matching `--sprint N` |
+| `align` | `mk-sprint-contract sprint-goal align --plan <path>` | Renders alignment between plan goal (frontmatter `goal:` or first H1) and sprint goal. Advisory — never blocks |
 
 **Concurrent-write safety:** `sprint-goal set` MUST acquire `flock` on the sprint-state file before any read-modify-write. YAML frontmatter append is non-atomic across shells; lock is the only mitigation. Release on completion or error.
 
-**Schema scope:** `assets/contract-template.md` is the schema for sprint-CONTRACT files only. Sprint-STATE files follow `assets/sprint-state-template.md`; their YAML is parsed inline by consuming skills (this skill, `mk:agent-detector` Step 0b, `mk:jira-agile`).
+**Schema scope:** `assets/contract-template.md` is the schema for sprint-CONTRACT files only. Sprint-STATE files follow `assets/sprint-state-template.md`; their YAML is parsed inline by consuming skills (this skill, `mk-agent-detector` Step 0b, `mk-jira-agile`).
 
 **Why this lives here:** `tasks/contracts/` already belongs to this skill; co-locating `sprint-goal` avoids creating a sibling skill that duplicates path discipline.
 
@@ -129,8 +129,8 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 | `references/bdd-to-ac-mapping.md` | How Gherkin scenarios map to acceptance criteria |
 | `../../agents/developer.md` | Generator agent — owns `propose` and `amend` actions |
 | `../../agents/evaluator.md` | Evaluator agent — owns `review` action; also Phase 3 active-verification consumer |
-| `..the rubric skill/` | Rubric library — provides composed presets the contract binds to |
-| `..the evaluate skill/` | Evaluator skill — reads signed contract via `step-01-load-rubrics.md` |
+| `../mk-rubric/` | Rubric library — provides composed presets the contract binds to |
+| `../mk-evaluate/` | Evaluator skill — reads signed contract via `step-01-load-rubrics.md` |
 
 ## Related Rules
 
@@ -138,5 +138,5 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 
 ## Start
 
-For interactive use, run `the sprint-contract skill propose <task-slug>` to begin negotiation.
+For interactive use, run `$mk-sprint-contract propose <task-slug>` to begin negotiation.
 For harness-driven use (Phase 5), the harness skill invokes propose → review → amend → sign automatically as a substep between Phase 2 (test red) and Phase 3 (build green).

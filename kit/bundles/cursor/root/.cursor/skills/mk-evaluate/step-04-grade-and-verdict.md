@@ -32,7 +32,7 @@ Range: 0.0 to 1.0. Rounded to 2 decimals.
 
 ### 4c. Check hard-fail thresholds
 
-Per `mk:rubric` schema, each rubric has a `hard_fail_threshold` (`FAIL` or `WARN`). Iterate the per-rubric verdicts:
+Per `mk-rubric` schema, each rubric has a `hard_fail_threshold` (`FAIL` or `WARN`). Iterate the per-rubric verdicts:
 
 ```
 hard_fail_triggered = false
@@ -117,7 +117,7 @@ batches_total: {if multi-batch}
 This is where active verification is enforced. Run after writing the verdict file:
 
 ```bash
-.cursor/skills/evaluate/scripts/validate-verdict.sh "$verdict_file"
+.cursor/skills/mk-evaluate/scripts/validate-verdict.sh "$verdict_file"
 ```
 
 The validator checks (v2):

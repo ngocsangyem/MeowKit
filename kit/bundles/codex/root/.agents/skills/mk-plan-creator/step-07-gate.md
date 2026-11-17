@@ -14,9 +14,9 @@ State each category explicitly:
 
 ### 7b. Present the plan
 
-Load `references/plan-presentation.md` for the exact stop and ask the user in chat format and Context Reminder block.
+Load `references/plan-presentation.md` for the exact user question format and Context Reminder block.
 
-Present the plan via `stop and ask the user in chat`. Header: "Plan". Question text composes the self-check summary, plan path, phase count, and mode:
+Present the plan by asking the user. Header: "Plan". Question text composes the self-check summary, plan path, phase count, and mode:
 
 > Plan ready for review
 >

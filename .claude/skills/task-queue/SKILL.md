@@ -1,6 +1,6 @@
 ---
 name: mk:task-queue
-description: Shared task claiming with file-ownership enforcement for parallel agents. NOT for mk:team-config.
+description: "Shared task claiming with file-ownership enforcement for parallel agents."
 source: local
 keywords:
   - task-queue
@@ -8,7 +8,7 @@ keywords:
   - parallel-execution
   - claim-task
   - file-ownership
-when_to_use: Auto-invoked when several agents claim work. Not user-callable.
+when_to_use: "Auto-invoked when agents claim work."
 user-invocable: false
 owner: git
 criticality: medium

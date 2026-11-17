@@ -2,6 +2,14 @@
 
 Use this guide to determine which skill to use for your task.
 
+## Contents
+
+- [Quick Decision](#quick-decision)
+- [Skill Compatibility Matrix](#skill-compatibility-matrix)
+- [Common Combinations](#common-combinations)
+- [NOT This Skill](#not-this-skill)
+- [When to Use jira-jsm](#when-to-use-jira-jsm)
+
 ---
 
 ## Quick Decision

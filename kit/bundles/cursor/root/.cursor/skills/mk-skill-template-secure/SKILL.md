@@ -1,6 +1,6 @@
 ---
 name: "mk-skill-template-secure"
-description: "Secure skill template with prompt injection defenses. Copy this template when creating new skills."
+description: "Injection-hardened skill template, copied when scaffolding a new skill."
 ---
 
 <!-- SECURITY ANCHOR

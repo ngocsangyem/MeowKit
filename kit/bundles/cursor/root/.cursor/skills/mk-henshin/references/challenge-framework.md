@@ -1,6 +1,6 @@
 # Challenge Framework
 
-Used in Phase 4 (the user's decision) of `mk:henshin`. Pressure-tests assumptions, surfaces constraints, cuts scope. Phase 5 does not emit until these questions have answers.
+Used in Phase 4 (the user's decision) of `mk-henshin`. Pressure-tests assumptions, surfaces constraints, cuts scope. Phase 5 does not emit until these questions have answers.
 
 ## 7-question interview
 

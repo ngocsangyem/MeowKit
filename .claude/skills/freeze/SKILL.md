@@ -1,7 +1,7 @@
 ---
 name: mk:freeze
 version: 0.1.0
-description: Session-scoped edit restriction blocking Edit and Write outside one allowed path. NOT for mk:careful.
+description: "Blocks Edit and Write outside one allowed path. NOT for mk:careful."
 allowed-tools:
   - Bash
   - Read
@@ -27,7 +27,7 @@ keywords:
   - directory-restriction
   - session-scope
   - edit-lockdown
-when_to_use: Keeping a debugging session from touching code outside one folder.
+when_to_use: "Keep a debug session inside one folder."
 user-invocable: true
 owner: lifecycle
 criticality: medium

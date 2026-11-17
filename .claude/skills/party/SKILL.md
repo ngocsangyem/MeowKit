@@ -1,6 +1,6 @@
 ---
 name: mk:party
-description: Runs a 2-4 agent round-table on one architecture trade-off. NOT for mk:brainstorming.
+description: "Runs a 2-4 agent round-table on one trade-off. NOT for mk:brainstorming."
 argument-hint: '"topic to discuss" [--agents planner,architect,developer]'
 source: local
 allowed-tools:
@@ -15,7 +15,7 @@ keywords:
   - architecture-decision
   - trade-off-discussion
   - design-review
-when_to_use: User asks "should we do X or Y" and wants opposing expert views at once.
+when_to_use: "Asked 'should we do X or Y'."
 user-invocable: true
 owner: research
 criticality: medium

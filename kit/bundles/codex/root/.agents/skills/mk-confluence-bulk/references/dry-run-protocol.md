@@ -1,6 +1,6 @@
 # Dry-Run Protocol
 
-The 3-step ceremony for any `mk:confluence-bulk` Tier-4 op, with example transcripts.
+The 3-step ceremony for any `mk-confluence-bulk` Tier-4 op, with example transcripts.
 
 ## Contents
 
@@ -35,7 +35,7 @@ USER:    label every page in space DOCS older than 90 days as 'archive'
 AGENT:   Step 1 — running dry-run.
          (sanitizing CQL: "space = DOCS AND lastModified < now(\"-90d\")")
 
-         bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh \
+         bash $(git rev-parse --show-toplevel)/.agents/skills/mk-confluence/scripts/confluence-as.sh \
              bulk label add --cql 'space = DOCS AND lastModified < now("-90d")' \
              --label "archive" --dry-run --max-pages 100
 
@@ -55,7 +55,7 @@ USER:    LABEL 23 PAGES ARCHIVE
 
 AGENT:   Step 3 — executing.
 
-         bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh \
+         bash $(git rev-parse --show-toplevel)/.agents/skills/mk-confluence/scripts/confluence-as.sh \
              bulk label add --cql 'space = DOCS AND lastModified < now("-90d")' \
              --label "archive" --max-pages 100 --yes
 
@@ -78,7 +78,7 @@ AGENT:   This operation matches a high-blast-radius pattern (no time restriction
 
          Step 1 — running dry-run.
 
-         bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh \
+         bash $(git rev-parse --show-toplevel)/.agents/skills/mk-confluence/scripts/confluence-as.sh \
              bulk delete --cql 'space = TMP' --dry-run --max-pages 100
 
          Result:
@@ -98,7 +98,7 @@ USER:    DELETE 47 PAGES IN TMP
 
 AGENT:   Step 3 — executing.
 
-         bash $(git rev-parse --show-toplevel)/.agents/skills/confluence/scripts/confluence-as.sh \
+         bash $(git rev-parse --show-toplevel)/.agents/skills/mk-confluence/scripts/confluence-as.sh \
              bulk delete --cql 'space = TMP' --max-pages 100 --yes
 
          Result:

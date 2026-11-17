@@ -1,9 +1,9 @@
 ---
 name: "mk-jira-fields"
-description: "JIRA custom field discovery + configuration via jira-as. Create/configure-agile need admin. NOT setting per-issue field values (mk:jira-issue update)."
+description: "Finds Jira custom field IDs and project field config; use to look up a field."
 ---
 
-# mk:jira-fields
+# mk-jira-fields
 
 Forks to the `jira-fields` agent. Most reads are open; `fields create` and `fields configure-agile` require **Admin** role.
 
@@ -27,12 +27,12 @@ Forks to the `jira-fields` agent. Most reads are open; `fields create` and `fiel
 ## See also
 
 - Agent: `../../agents/jira-fields.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/field-discovery.md` — discovery methodology
   - `references/agile-field-ids.md` — typical agile field IDs (Sprint, Story Points, Epic Link)
   - `references/field-types-reference.md` — type-selection guide (text/select/multiselect/user/etc.)
-- Peer leaves: `mk:jira-issue` (sets field values per issue), `mk:jira-agile` (consumes agile field IDs), `mk:jira-admin` (`admin notification-scheme` etc. — broader admin surface)
+- Peer leaves: `mk-jira-issue` (sets field values per issue), `mk-jira-agile` (consumes agile field IDs), `mk-jira-admin` (`admin notification-scheme` etc. — broader admin surface)
 
 ## Gotchas
 

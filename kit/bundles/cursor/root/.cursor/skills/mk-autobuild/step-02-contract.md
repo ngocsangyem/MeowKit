@@ -3,7 +3,7 @@
 # Step 2: Sprint Contract (Conditional)
 
 <!-- autobuild pipeline steps are named Step 0–6 to avoid clashing with the 7 lifecycle phases. -->
-Negotiate a sprint contract via `mk:sprint-contract` (autobuild contract stage). Skipped on `MINIMAL` (already short-circuited) and on `LEAN` for small builds.
+Negotiate a sprint contract via `mk-sprint-contract` (autobuild contract stage). Skipped on `MINIMAL` (already short-circuited) and on `LEAN` for small builds.
 
 ## Instructions
 
@@ -39,13 +39,13 @@ When density is `FULL` or `LEAN` with sufficient ACs:
 
 ```
 delegate a sub-task (
-  subagent_type="developer",
+  agent="developer",
   description="Propose sprint 1 contract for $slug",
   prompt="
-    Use mk:sprint-contract propose action with task slug: $slug
+    Use mk-sprint-contract propose action with task slug: $slug
 
     Read the active product spec at $plan_dir/plan.md and the active rubric preset
-    via mk:rubric/scripts/load-rubric.sh --preset frontend-app (or backend-api / cli-tool / fullstack-product as appropriate to the task).
+    via mk-rubric/scripts/load-rubric.sh --preset frontend-app (or backend-api / cli-tool / fullstack-product as appropriate to the task).
 
     Draft 5–15 ACs in Given/When/Then form. Each must have a Verification line and a Rubric tie-in.
 
@@ -62,14 +62,14 @@ Then dispatch the evaluator for review:
 
 ```
 delegate a sub-task (
-  subagent_type="evaluator",
+  agent="evaluator",
   description="Review proposed contract for $slug",
   prompt="
     Read tasks/contracts/*-${slug}-sprint-1.md (newest).
     Apply your Contract Reviewer Role (see evaluator.md).
     Append Round 1 (reviewer) entries to the Negotiation Log section.
     If clean, write 'Round 1 (reviewer): accepted'.
-    Hard cap: 2 rounds. Round 3 escalates to stop and ask the user in chat.
+    Hard cap: 2 rounds. Round 3 escalates to the user.
   "
 )
 ```

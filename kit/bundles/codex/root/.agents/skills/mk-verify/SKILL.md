@@ -1,6 +1,6 @@
 ---
 name: "mk-verify"
-description: "Unified verification: build → lint → test → type-check → coverage. Use for 'is it green' / 'run all checks'; auto-called by mk:cook. NOT for lint only (mk:lint-and-validate)."
+description: "Runs build, lint, test, type-check and coverage in one pass; use for 'is it green'."
 ---
 
 # Verify — Unified Verification Loop
@@ -11,13 +11,13 @@ Produces a single PASS/FAIL verdict with per-step results.
 ## When to Use
 
 - After Phase 3 (Build GREEN) completes, before Phase 4 (Review)
-- Before creating a PR (`mk:ship` pre-flight)
+- Before creating a PR (`mk-ship` pre-flight)
 - Standalone: "is everything green?", "run all checks", "verify build"
 
 ## Phase Anchor
 
 **Phase: 3→4 transition (Build → Review)**
-**Handoff:** If PASS → proceed to `mk:review`. If FAIL → developer fixes, re-run verify.
+**Handoff:** If PASS → proceed to `mk-review`. If FAIL → developer fixes, re-run verify.
 
 ## Project Detection
 

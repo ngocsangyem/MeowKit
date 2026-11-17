@@ -1,6 +1,6 @@
 ---
 name: "mk-chrome-profile"
-description: "Target a specific Chrome profile for browser automation via CDP: discovers profiles, launches on a debug port, connects agent-browser. NOT for headless scraping without a profile (mk:agent-browser)."
+description: "Attaches automation to a real Chrome profile via CDP. NOT for mk-agent-browser."
 ---
 
 # Chrome Profile Targeting
@@ -142,7 +142,7 @@ Then: `agent-browser tab <matching-index>`
 
 ### Step 7 — Proceed with automation
 
-Use `mk:agent-browser` commands normally. The profiled Chrome provides existing cookies,
+Use `mk-agent-browser` commands normally. The profiled Chrome provides existing cookies,
 extensions, and logged-in sessions.
 
 ```bash

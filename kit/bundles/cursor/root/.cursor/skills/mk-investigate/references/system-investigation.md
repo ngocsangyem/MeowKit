@@ -49,8 +49,8 @@ gh run view <run-id> --log > /tmp/ci-logs.txt
 
 **For codebase understanding:**
 - Read `docs/codebase-summary.md` if exists and up-to-date (<2 days old)
-- Use `mk:scout` to find relevant files and map dependencies
-- Use `mk:docs-finder` skill for package/plugin documentation
+- Use `mk-scout` to find relevant files and map dependencies
+- Use `mk-docs-finder` skill for package/plugin documentation
 
 ## Step 3: Analysis Process
 

@@ -1,14 +1,14 @@
-# Jira Handoff Protocol — mk:intake → mk:jira-*
+# Jira Handoff Protocol — mk-intake → mk-jira-*
 
-Defines how mk:intake passes structured data to the `mk:jira-*` family for execution. Auto-execution is NOT in v1 scope — user reviews suggestions and runs commands manually.
+Defines how mk-intake passes structured data to the `mk-jira-*` family for execution. Auto-execution is NOT in v1 scope — user reviews suggestions and runs commands manually.
 
 ## Handoff Flow
 
 ```
-mk:intake completes analysis
+mk-intake completes analysis
         ↓
-mk:jira-* family available? (jira-as installed + the project's .env populated)
-    YES → suggest specific mk:jira-{leaf} commands (see Step 2a)
+mk-jira-* family available? (jira-as installed + the project's .env populated)
+    YES → suggest specific mk-jira-{leaf} commands (see Step 2a)
     NO  → output suggestions as plain text (see Step 2b)
         ↓
 User reviews suggestions
@@ -18,7 +18,7 @@ User invokes the jira- skill{leaf} commands manually (each leaf forks its agent)
 
 ## Step 2a — jira-as Available: Route to the Right Leaf
 
-Append to the intake report after `### Suggested Actions (mk:jira-*)`:
+Append to the intake report after `### Suggested Actions (mk-jira-*)`:
 
 ```
 Run these commands to apply the above actions (each forks the matching agent):
@@ -43,7 +43,7 @@ jira-as not installed (or the project's .env not populated). Apply these changes
 - Assign to [username]
 - Set Fix Version to [version]
 
-Or run `setup-workflow` then populate .env from .env.example to enable the mk:jira-* family.
+Or run `mewkit skill env jira` then populate .env from .env.example to enable the mk-jira-* family.
 ```
 
 ## Safety Gate
@@ -56,10 +56,10 @@ per `safety-framework.md`. These include:
 - Changing Sprint assignments that affect team capacity
 
 Low-risk operations (transition, assign, link, set field) may be batched and run in sequence
-after a single user confirmation: "Run all suggested mk:jira commands? [y/N]"
+after a single user confirmation: "Run all suggested mk-jira commands? [y/N]"
 
-## What mk:intake Does NOT Do
+## What mk-intake Does NOT Do
 
-- Does NOT auto-execute mk:jira commands without user review
-- Does NOT write back to Jira directly (that is mk:jira's responsibility)
+- Does NOT auto-execute mk-jira commands without user review
+- Does NOT write back to Jira directly (that is mk-jira's responsibility)
 - Does NOT fetch linked tickets for RCA — it surfaces link IDs only

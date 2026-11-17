@@ -1,20 +1,20 @@
 ---
 name: "mk-rubric"
-description: "Loads, lists, composes, or validates graded evaluation rubrics: PASS/WARN/FAIL grading with weighted criteria and balanced anchor examples for evaluator-style review."
+description: "Loads, composes and validates weighted PASS/WARN/FAIL rubrics for graders."
 ---
 
 # Rubric Library API
 
-Discovery, composition, and validation for the rubric library at `.codex/rubrics/`.
+Discovery, composition, and validation for the project's rubric library.
 
 > **Path convention:** Commands below assume cwd is `$(git rev-parse --show-toplevel)` (project root). Prefix paths with `"$(git rev-parse --show-toplevel)/"` when invoking from subdirectories.
 
-> **Consumed by `evaluator` agent + `mk:evaluate` skill (Phase 3, shipped 260408).** The dedicated `evaluator` sub-task (`.codex/agents/evaluator.md`) drives the running build via active verification and grades it against rubrics composed from this library. The `mk:evaluate` skill (`.agents/skills/evaluate/`) is the orchestration shell. This skill (`mk:rubric`) remains independently invokable via `the rubric skill <subcommand>` for manual rubric inspection, validation, or composition outside the evaluator workflow.
+> **Consumed by `evaluator` agent + `mk-evaluate` skill (Phase 3, shipped 260408).** The dedicated `evaluator` custom agent drives the running build via active verification and grades it against rubrics composed from this library. The `mk-evaluate` skill (`.agents/skills/mk-evaluate/`) is the orchestration shell. This skill (`mk-rubric`) remains independently invokable via `$mk-rubric <subcommand>` for manual rubric inspection, validation, or composition outside the evaluator workflow.
 
 ## When to Use
 
 Activate when:
-- User runs `the rubric skill [subcommand]`
+- User runs `$mk-rubric [subcommand]`
 - An evaluator sub-task needs to load rubrics for grading
 - Sprint-contract negotiation references a rubric by path
 - CI validates rubric schema conformance after edits
@@ -33,16 +33,16 @@ Activate when:
 
 ```bash
 # List all rubrics
-.agents/skills/rubric/scripts/load-rubric.sh --list
+.agents/skills/mk-rubric/scripts/load-rubric.sh --list
 
 # Load one rubric for the evaluator
-.agents/skills/rubric/scripts/load-rubric.sh design-quality
+.agents/skills/mk-rubric/scripts/load-rubric.sh design-quality
 
 # Compose a preset (returns all member rubrics + weight table)
-.agents/skills/rubric/scripts/load-rubric.sh --preset frontend-app
+.agents/skills/mk-rubric/scripts/load-rubric.sh --preset frontend-app
 
 # Validate every rubric file in the library
-.agents/skills/rubric/scripts/validate-rubric.sh
+.agents/skills/mk-rubric/scripts/validate-rubric.sh
 ```
 
 ## Output Schema
@@ -81,7 +81,7 @@ Activate when:
 
 ## Schema
 
-Rubrics MUST conform to `.codex/rubrics/schema.md`. The validator enforces:
+Rubrics MUST conform to the rubric library's `schema.md`. The validator enforces:
 - Required frontmatter fields (`name`, `version`, `weight_default`, `applies_to`, `hard_fail_threshold`)
 - Required sections in order
 - ≥1 PASS + ≥1 FAIL anchor example, balanced (±1)
@@ -98,7 +98,7 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 
 ## Gotchas
 
-- **Adding a new rubric:** drop a `.md` file into `.codex/rubrics/`, run `validate-rubric.sh`, register weight in any preset that should include it.
+- **Adding a new rubric:** drop a `.md` file into the rubric library, run `validate-rubric.sh`, register weight in any preset that should include it.
 - **Weight drift:** if you change a rubric's `weight_default`, all presets that reference it must be re-checked for sum=1.0.
 - **Anti-patterns are FIXED:** they trigger FAIL regardless of the surrounding criteria. Don't add subjective ones.
 - **Don't load all rubrics:** the evaluator should load only the relevant preset, not the whole library — context efficiency.
@@ -110,11 +110,11 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 | `scripts/load-rubric.sh` | Load + emit prompt fragment for one rubric or preset |
 | `scripts/validate-rubric.sh` | Schema conformance + weight-sum validator |
 | `references/calibration-guide.md` | How to add few-shot examples (balanced + randomized) |
-| `../../rubrics/schema.md` | Canonical rubric format specification |
-| `../../agents/evaluator.md` | The agent that consumes composed rubrics during behavioral active verification (Phase 3, shipped) |
-| `..the evaluate skill/SKILL.md` | The orchestration shell that drives the evaluator + invokes this skill via `compose <preset>` (Phase 3, shipped) |
+| `.codex/rubrics/schema.md` | Canonical rubric format specification |
+| `.codex/agents/evaluator.toml` | The agent that consumes composed rubrics during behavioral active verification (Phase 3, shipped) |
+| `../mk-evaluate/SKILL.md` | The orchestration shell that drives the evaluator + invokes this skill via `compose <preset>` (Phase 3, shipped) |
 
 ## Start
 
 For interactive use, run `scripts/load-rubric.sh --list` to discover available rubrics.
-For evaluator-internal use, the `evaluator` agent (via `mk:evaluate`) loads `compose <preset>` automatically based on the target type detected by `mk:evaluate/scripts/run-evaluator.sh`. Sprint-contract-based filtering is gated until Phase 4 ships (step-01 of mk:evaluate stub-guards on the `contract_schema_version:` marker).
+For evaluator-internal use, the `evaluator` agent (via `mk-evaluate`) loads `compose <preset>` automatically based on the target type detected by `mk-evaluate/scripts/run-evaluator.sh`. Sprint-contract-based filtering is gated until Phase 4 ships (step-01 of mk-evaluate stub-guards on the `contract_schema_version:` marker).

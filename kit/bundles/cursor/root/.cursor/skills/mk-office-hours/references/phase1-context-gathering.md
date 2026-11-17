@@ -17,7 +17,7 @@ eval "$(workflow-slug 2>/dev/null)"
 
 5. **Ask: what's your goal with this?** This is a real question, not a formality. The answer determines everything about how the session runs.
 
-   Via stop and ask the user in chat, ask:
+   Ask the user:
 
    > Before we dig in — what's your goal with this?
    >

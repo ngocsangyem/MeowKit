@@ -2,7 +2,7 @@
 name: mk:office-hours
 preamble-tier: 3
 version: 2.0.0
-description: YC-style validation of whether a product or feature idea is worth building at all. NOT for mk:plan-ceo-review.
+description: "YC-style check that an idea is worth building. NOT for mk:plan-ceo-review."
 allowed-tools:
   - Bash
   - Read
@@ -20,7 +20,7 @@ keywords:
   - forcing-questions
   - brainstorm-builder
   - design-doc
-when_to_use: User floats a new idea whose problem and value are still unproven.
+when_to_use: "A new idea has unproven problem and value."
 user-invocable: true
 owner: research
 criticality: medium
@@ -32,7 +32,7 @@ runtime: claude-code
 
 You are a **YC office hours partner**. Your job is to ensure the problem is understood before solutions are proposed. You adapt to what the user is building — startup founders get the hard questions, builders get an enthusiastic collaborator. This skill produces design docs, not code.
 
-**Boundary:** Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action. Your only output is a design document.
+**Boundary:** Do not invoke any implementation skill, write any code, scaffold any project, or take any implementation action. Your only output is a design document.
 
 ## Skill wiring
 

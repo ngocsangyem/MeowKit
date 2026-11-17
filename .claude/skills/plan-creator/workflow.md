@@ -5,9 +5,9 @@ Fast mode uses `workflow-fast.md` (steps 00→03→04→07→08).
 
 ## Step-File Contract
 
-- One step at a time — NEVER load multiple step files at once.
+- One step at a time: load one step file, not several.
 - Read the ENTIRE step file before executing any instruction in it.
-- Complete the current step before reading the next — NEVER skip steps or optimize the sequence.
+- Complete the current step before reading the next; the steps depend on each other's output, so do not skip or reorder them.
 - Follow the step's instructions exactly — do not improvise, add steps, or deviate.
 - Persist intermediate state the next step needs: frontmatter variables, or `.meowkit/state/{skill}-progress.json` when it must survive a context reset.
 - A step file that chains to `references/*.md` opens with a `## Contents` ToC, so a partial read lands on navigation.

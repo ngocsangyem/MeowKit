@@ -26,7 +26,7 @@ The index supports a future v2 `--spec <page-id>` convenience flag that auto-res
 
 ## Planning-Engine `--spec` Flag
 
-`mk:planning-engine plan --tickets PROJ-101,PROJ-102 --spec <report-path>` extends the planning pipeline with spec context.
+`mk-planning-engine plan --tickets PROJ-101,PROJ-102 --spec <report-path>` extends the planning pipeline with spec context.
 
 **User-orchestrated, two-step flow** — skill-to-skill invocation is forbidden in Toolkit:
 
@@ -43,7 +43,7 @@ What planning-engine does with `--spec`:
 1. Validates the path exists AND begins with `# Spec Research Report:` (frontmatter check rejects random markdown files)
 2. Extracts `## Requirements`, `## Acceptance Criteria`, `## Gaps & Ambiguities` sections
 3. Passes the extracted content to the planning-reporter agent as additional input
-4. Planning Report includes a new `## Spec Context (mk:confluence-spec-analyst)` section with:
+4. Planning Report includes a new `## Spec Context (mk-confluence-spec-analyst)` section with:
    - Pointer back to the spec report path
    - Key requirements (filtered to those relevant to the planning tickets)
    - Open spec gaps relevant to planning
@@ -53,7 +53,7 @@ If the path doesn't exist or isn't a spec-analyst report, planning-engine errors
 
 ## Intake Confluence-URL Detection
 
-`mk:intake` recognizes Confluence Cloud URLs as a 5th source (alongside Jira / Linear / GitHub / manual):
+`mk-intake` recognizes Confluence Cloud URLs as a 5th source (alongside Jira / Linear / GitHub / manual):
 
 ```
 https://*.atlassian.net/wiki/spaces/{KEY}/pages/{ID}/{slug}    -- canonical
@@ -67,8 +67,8 @@ intake fetches raw page content via the wrapper directly (`page get --page-id <i
 
 ## Boundary Rules
 
-- mk:confluence-spec-analyst produces REPORTS, not Jira tickets. Human runs `mk:jira-issue create` manually if desired.
-- Skills do NOT create plan dirs — that is `mk:plan-creator`'s responsibility.
+- mk-confluence-spec-analyst produces REPORTS, not Jira tickets. Human runs `mk-jira-issue create` manually if desired.
+- Skills do NOT create plan dirs — that is `mk-plan-creator`'s responsibility.
 - Reports land in `tasks/reports/` or active plan `research/` per existing convention.
 - No Confluence write-back (posting reports as Confluence pages) — out of scope.
 - `--with-commands` is opt-in; default report is suggestions-only, preserves "reports not automation" principle.

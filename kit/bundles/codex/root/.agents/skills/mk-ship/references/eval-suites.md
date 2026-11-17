@@ -36,7 +36,7 @@ Map runner → test file: `post_generation_eval_runner.rb` → `post_generation_
 
 **3. Run affected suites at `EVAL_JUDGE_TIER=full`:**
 
-`the ship skill` is a pre-merge gate, so always use full tier (Sonnet structural + Opus persona judges).
+`$mk-ship` is a pre-merge gate, so always use full tier (Sonnet structural + Opus persona judges).
 
 ```bash
 EVAL_JUDGE_TIER=full EVAL_VERBOSE=1 bin/test-lane --eval test/evals/<suite>_eval_test.rb 2>&1 | tee /tmp/ship_evals.txt
@@ -56,4 +56,4 @@ If multiple suites need to run, run them sequentially (each needs a test lane). 
 |------|------|----------------|------|
 | `fast` (Haiku) | Dev iteration, smoke tests | ~5s (14x faster) | ~$0.07/run |
 | `standard` (Sonnet) | Default dev, `bin/test-lane --eval` | ~17s (4x faster) | ~$0.37/run |
-| `full` (Opus persona) | **`the ship skill` and pre-merge** | ~72s (baseline) | ~$1.27/run |
+| `full` (Opus persona) | **`$mk-ship` and pre-merge** | ~72s (baseline) | ~$1.27/run |

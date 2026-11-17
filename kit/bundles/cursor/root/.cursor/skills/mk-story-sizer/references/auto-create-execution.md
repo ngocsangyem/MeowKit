@@ -2,9 +2,19 @@
 
 Per-ticket two-call sequence invoked AFTER the single batch confirmation gate in Phase 6 returns `Yes`. **Re-enforces the v1 field whitelist** at call time (defense in depth even though Phase 6 already checked).
 
+## Contents
+
+- [Field Whitelist (v1)](#field-whitelist-v1)
+- [Two-Call Sequence (per story)](#two-call-sequence-per-story)
+- [Audit Comment Template](#audit-comment-template)
+- [Created Tickets Report Append](#created-tickets-report-append)
+- [Sequencing](#sequencing)
+- [Skill Rule of Two — call-time re-check](#skill-rule-of-two--call-time-re-check)
+- [What This File Does NOT Do](#what-this-file-does-not-do)
+
 ## Field Whitelist (v1)
 
-Allowed flags on `the jira-issue skill create`:
+Allowed flags on `/mk-jira-issue create`:
 
 - `--project <KEY>` (REQUIRED)
 - `--type <Type>` (defaults to `Story`)
@@ -60,9 +70,9 @@ On Call-B error:
 Default template (rendered with the three placeholders below):
 
 ```text
-Initial sizing from mk:story-sizer: {{points}} points (heuristic).
+Initial sizing from mk-story-sizer: {{points}} points (heuristic).
 Source: {{report_path}} §{{story_id}}.
-Pending team refinement via mk:jira-estimator.
+Pending team refinement via mk-jira-estimator.
 ```
 
 Placeholders (NEVER include raw description text — PII safety):
@@ -131,6 +141,6 @@ These are belt-and-braces — Phase 6 already enforces them — but they live in
 
 ## What This File Does NOT Do
 
-- It does NOT execute Jira calls itself. The actual `bash`/`jira-as` invocations are delegated to the peer skills (`mk:jira-issue`, `mk:jira-collaborate`) by the SKILL.md orchestration layer.
-- It does NOT auto-link blocks relationships (deferred from v1; dev links via `mk:jira-relationships` post-create).
+- It does NOT execute Jira calls itself. The actual `bash`/`jira-as` invocations are delegated to the peer skills (`mk-jira-issue`, `mk-jira-collaborate`) by the SKILL.md orchestration layer.
+- It does NOT auto-link blocks relationships (deferred from v1; dev links via `mk-jira-relationships` post-create).
 - It does NOT assign the ticket, set priority, or place it in a sprint. Those are team-poker decisions that happen post-creation.

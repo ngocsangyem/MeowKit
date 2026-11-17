@@ -2,7 +2,7 @@
 name: mk:elicit
 version: 1.0.0
 preamble-tier: 3
-description: Re-examine an existing verdict through a named reasoning lens — pre-mortem, inversion, red team, Socratic. NOT for mk:review.
+description: "Second-pass review: pre-mortem, inversion, red team. NOT for mk:review."
 allowed-tools:
   - Read
   - Grep
@@ -17,7 +17,7 @@ keywords:
   - red-team-analysis
   - socratic
   - inversion
-when_to_use: A review or evaluation already exists and needs a deeper second pass.
+when_to_use: "A verdict exists and needs a deeper look."
 user-invocable: true
 owner: research
 criticality: medium

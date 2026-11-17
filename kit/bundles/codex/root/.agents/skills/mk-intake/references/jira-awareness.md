@@ -1,10 +1,10 @@
-# Jira Awareness — mk:intake Extension
+# Jira Awareness — mk-intake Extension
 
-Loaded when the user has the `mk:jira-*` family available (i.e. `jira-as` installed via `.codex/scripts/bin/setup-workflow` and `.codex/.env` populated with `MEOW_JIRA_*`). When unavailable, skip this file entirely — mk:intake operates tool-agnostic.
+Loaded when the user has the `mk-jira-*` family available (i.e. `jira-as` installed via `mewkit skill env jira` and `.codex/.env` populated with `MEOW_JIRA_*`). When unavailable, skip this file entirely — mk-intake operates tool-agnostic.
 
 ## Metadata Extraction
 
-Fetch the ticket via `mk:jira-issue` (or directly: `bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all'`). Extract these Jira-specific fields before scoring:
+Fetch the ticket via `mk-jira-issue` (or directly: `bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh issue get PROJ-123 --fields '*all'`). Extract these Jira-specific fields before scoring:
 
 | Field           | Where to find it         | Used for                        |
 | --------------- | ------------------------ | ------------------------------- |
@@ -35,10 +35,10 @@ Cap total Jira deductions at -10 to avoid over-penalizing a single incomplete ti
 
 ## Suggested Actions Output
 
-After analysis, append a `### Suggested Actions (mk:jira)` section to the report:
+After analysis, append a `### Suggested Actions (mk-jira)` section to the report:
 
 ```markdown
-### Suggested Actions (mk:jira)
+### Suggested Actions (mk-jira)
 
 - [ ] Evaluate complexity: the jira skill evaluate [TICKET-ID]
 - [ ] Estimate story points: the jira skill estimate [TICKET-ID]  ← only if no story points set

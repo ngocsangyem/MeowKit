@@ -2,7 +2,7 @@
 name: mk:review
 preamble-tier: 3
 version: 1.3.1
-description: Multi-pass adversarial structural review of a diff, PR or commit; writes the verdict a human reads before shipping. NOT for mk:evaluate.
+description: "Multi-pass adversarial review of a diff, PR or commit. NOT for mk:evaluate."
 argument-hint: '[#PR | COMMIT | --pending]'
 allowed-tools:
   - Bash
@@ -22,7 +22,7 @@ keywords:
   - verdict
   - pre-landing-review
   - adversarial-review
-when_to_use: Code is written and must be audited before it lands.
+when_to_use: "Code is written, audit before it lands."
 user-invocable: true
 owner: lifecycle
 criticality: high

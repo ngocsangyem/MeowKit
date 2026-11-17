@@ -1,6 +1,6 @@
 # Context-Engineering Safeguards
 
-> Loaded by `mk:prompt-enhancer` JIT — only when the input prompt shows
+> Loaded by `mk-prompt-enhancer` JIT — only when the input prompt shows
 > long-horizon signals (>5 turns referenced, NOTES.md / plan files mentioned,
 > ≥50KB of accumulated context, or the user explicitly asks about context-loss
 > resilience).
@@ -135,7 +135,7 @@ canary scenarios with expected outputs before broadening this prompt."
 ## 7. Context-engineering lazy gate
 
 When the input prompt signals a context-risk the rewrite alone cannot resolve,
-**RECOMMEND** `mk:context-engineering` — never auto-run it, never inline its
+**RECOMMEND** `mk-context-engineering` — never auto-run it, never inline its
 patterns. The enhancer stays a prompt refiner; deciding read-more / stop / ask /
 assume / delegate is that skill's job.
 
@@ -153,13 +153,13 @@ context risk, or pure copywriting / report formatting.
 When triggered, add ONE line — to Section 3 (analyze modes) or as a CONSTRAINTS
 note in the rewrite:
 
-> Context risk detected (`<which trigger>`). Consider `mk:context-engineering`
+> Context risk detected (`<which trigger>`). Consider `mk-context-engineering`
 > (intent → one `references/pattern-index.md` section, e.g. retrieval /
 > delegation / less-noise) to pick a minimal read-set before executing.
 
 The enhancer NAMES the intent; it does not load the pattern or read the codebase
 itself. This keeps the default rewrite read-free and preserves the boundary:
-`mk:prompt-enhancer` shapes the prompt; `mk:context-engineering` decides context
+`mk-prompt-enhancer` shapes the prompt; `mk-context-engineering` decides context
 moves.
 
 ---

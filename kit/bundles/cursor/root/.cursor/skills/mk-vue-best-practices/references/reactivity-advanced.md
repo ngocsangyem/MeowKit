@@ -1,4 +1,4 @@
-Basics live in `mk:vue` references/reactivity-performance.md — this covers the deltas.
+Basics live in `mk-vue` references/reactivity-performance.md — this covers the deltas.
 
 ## Contents
 
@@ -73,7 +73,7 @@ panel.data = { items: ['x'] } // ✅ triggers update (top-level key replaced)
 
 ## Divergence note
 
-> **Divergence:** this skill follows `shallowRef()` for primitives. `mk:vue` references/reactivity-performance.md states `ref()` for primitives. Both are accepted in this codebase; prefer the project's existing convention when one is established.
+> **Divergence:** this skill follows `shallowRef()` for primitives. `mk-vue` references/reactivity-performance.md states `ref()` for primitives. Both are accepted in this codebase; prefer the project's existing convention when one is established.
 
 ---
 

@@ -1,4 +1,4 @@
-# mk:confluence — Install & Auth
+# mk-confluence — Install & Auth
 
 One-time setup for the Confluence skill family. Cloud only.
 
@@ -18,7 +18,7 @@ The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load 
 
 ## Install
 
-`.codex/scripts/bin/setup-workflow` auto-installs from `.agents/skills/confluence/scripts/requirements.txt`:
+`mewkit skill env confluence` installs from `.agents/skills/mk-confluence/scripts/requirements.txt`:
 
 - `confluence-assistant-skills==0.2.0` — distribution package; ships the `confluence-as` binary
 - `assistant-skills-lib==1.0.1` — transitive infra dep
@@ -27,13 +27,13 @@ Verify: `ls .meowkit/envs/confluence/bin/ | grep confluence-as`
 
 ## Binary name
 
-The CLI binary is `confluence-as`. Both upstream READMEs (`confluence-as` and `Confluence-Assistant-Skills`) document it as `confluence` — they are wrong. Empirical install (260510) is the ground truth. Re-verify on every version bump.
+The CLI binary is `confluence-as`. Both upstream READMEs (`confluence-as` and `Confluence-Assistant-Skills`) document it as `confluence` — they are wrong. Empirical install (260510) is the ground truth. If a CLI upgrade renames the binary, update this line.
 
 ## Cloud-only constraint
 
 The wrapper exits 3 if `MEOW_CONFLUENCE_SITE_URL` does not end in `.atlassian.net`. Server / Data Center deployments are out of scope.
 
-**Escape hatch for Server/DC users:** install the MCP Atlassian server (`@sooperset/mcp-atlassian`) and call its Confluence tools directly via your host-runtime MCP config. The `mk:confluence-*` skills do NOT auto-fallback.
+**Escape hatch for Server/DC users:** install the MCP Atlassian server (`@sooperset/mcp-atlassian`) and call its Confluence tools directly via your host-runtime MCP config. The `mk-confluence-*` skills do NOT auto-fallback.
 
 ## Wrapper exit codes
 
@@ -43,7 +43,7 @@ The wrapper exits 3 if `MEOW_CONFLUENCE_SITE_URL` does not end in `.atlassian.ne
 | 1    | Sanitizer rejection (CQL) |
 | 2    | Plaintext credential fallback detected — move to `.codex/.env` |
 | 3    | Non-Cloud URL — Server/DC not supported |
-| 127  | `confluence-as` binary not installed — run `.codex/scripts/bin/setup-workflow` |
+| 127  | `confluence-as` binary not installed — run `mewkit skill env confluence` |
 | 4-7  | confluence-as runtime errors (network, auth, validation, server) |
 | 130  | SIGINT |
 
@@ -54,7 +54,7 @@ The wrapper has an optional `MEOW_CONFLUENCE_STDOUT_FILTER` knob:
 - `off` (default) — pass through raw output
 - `trim-tail` — strip the trailing line and validate JSON; use only after `smoke-live.sh` confirms the upstream `print_success` writes to stdout (not stderr)
 
-Run `bash .agents/skills/confluence/scripts/smoke-live.sh` once to determine which mode applies for your installed version.
+Run `bash .agents/skills/mk-confluence/scripts/smoke-live.sh` once to determine which mode applies for your installed version.
 
 ## Gotchas
 

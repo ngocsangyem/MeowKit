@@ -48,4 +48,4 @@ The `confluence-as` library converts internally; user-supplied markdown is norma
 
 ## See also
 
-- `confluence/references/cli-idioms.md#local-conversion-helpers` — `adf-to-md.sh` walker for read-side macro preservation (panel / decision / task-list / expand / mention / media / inlineCard surface as labelled markdown).
+- The local conversion helpers in the shared CLI idioms (loaded with this skill) — `adf-to-md.sh` walker for read-side macro preservation (panel / decision / task-list / expand / mention / media / inlineCard surface as labelled markdown).

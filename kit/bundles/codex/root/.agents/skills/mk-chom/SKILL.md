@@ -1,6 +1,6 @@
 ---
 name: "mk-chom"
-description: "Copies or adapts features from external repos/apps into this project. Triggers on 'copy this from', 'replicate'. NOT for packing this project (mk:pack); NOT for URL fetches (mk:web-to-markdown)."
+description: "Copies or ports a feature from an external repo or app. NOT for mk-web-to-markdown."
 ---
 
 <!-- SECURITY ANCHOR
@@ -54,11 +54,11 @@ Detect input type FIRST, then route:
 
 | Input                                    | Detection              | Tool                                                   |
 | ---------------------------------------- | ---------------------- | ------------------------------------------------------ |
-| Git URL (`github.com/*`, `gitlab.com/*`) | URL contains git host  | `git clone --depth 1` → `mk:scout`                   |
-| Web URL (`https://...`)                  | URL, not git host      | `mk:web-to-markdown` (static) or `mk:agent-browser` (SPA) |
+| Git URL (`github.com/*`, `gitlab.com/*`) | URL contains git host  | `git clone --depth 1` → `mk-scout`                   |
+| Web URL (`https://...`)                  | URL, not git host      | `mk-web-to-markdown` (static) or `mk-agent-browser` (SPA) |
 | Local path (`./`, `../`, `/`)            | Starts with `.` or `/` | Direct Read/Glob                                       |
 | Freeform text                            | No URL or path         | `researcher` agent via delegate a sub-task () (WebSearch)              |
-| Image/screenshot                         | Image file extension   | `mk:multimodal` (Gemini vision)                      |
+| Image/screenshot                         | Image file extension   | `mk-multimodal` (Gemini vision)                      |
 
 Clean up cloned repos after analysis.
 
@@ -73,7 +73,7 @@ Phase 4 must complete and the user must answer it before Phase 5. Whether to rep
 ### 1. Recon
 
 Route input per table above. Always also read local `docs/project-context.md` for YOUR project's stack.
-For git repos: clone shallow, run `mk:scout` for architecture fingerprint.
+For git repos: clone shallow, run `mk-scout` for architecture fingerprint.
 For web URLs: fetch content, capture structure and behavior.
 
 `--lean` effect depends on input type:
@@ -147,7 +147,7 @@ Same as Replication Spec but replace sections 2+5 with Head-to-Head table + Take
 
 ## Boundary Rules
 
-This skill emits handoff text. It does NOT invoke any other skill mid-flow — including `the plan-creator skill`, `the brainstorming skill`, `the cook skill`, `the sequential-thinking skill`.
+This skill emits handoff text. It does NOT invoke any other skill mid-flow — including `$mk-plan-creator`, `$mk-brainstorming`, `$mk-cook`, `$mk-sequential-thinking`.
 
 This is chom's design choice, not a a platform rule. Skills *can* reference other skills and the model may invoke them; chom opts out because mid-flow invocations of other orchestration skills (`plan-creator`, `brainstorming`, `cook`) would break phase ownership — each of those skills has its own multi-phase workflow that would interleave with chom's phase discipline. chom's job ends at Phase 6 Handoff; the user invokes the next skill.
 
@@ -166,8 +166,8 @@ The Phase 4 decision belongs to the user. No flag, including `--lean` or `--auto
 ## Gotchas
 
 - **chom never declares adaptation depth.** Pick `--copy`/`--improve`/`--port` explicitly if you want the analysis biased toward that intent. No-flag runs emit a Replication Spec without mode declaration.
-- **API-surface queries use `the pack skill --compress`**, not chom. If the question is "what's the public API of library X" rather than "should we replicate it," pack's Tree-sitter signature extraction is the right tool. chom is for replication decisions, not API exploration.
-- **3+ layers trigger sequential-thinking handoff**, not auto-invocation. Trace the flow via `the sequential-thinking skill`, then return to chom.
+- **API-surface queries use `$mk-pack --compress`**, not chom. If the question is "what's the public API of library X" rather than "should we replicate it," pack's Tree-sitter signature extraction is the right tool. chom is for replication decisions, not API exploration.
+- **3+ layers trigger sequential-thinking handoff**, not auto-invocation. Trace the flow via `$mk-sequential-thinking`, then return to chom.
 - **The Phase 4 decision applies in all modes**, including `--lean` and `--auto`. It is the user's call, never the run's.
 - **No local context = generic advice**: always read `docs/project-context.md` first. Without it, recommendations won't fit your stack.
 - **"Obvious" copies hide complexity**: auth flows, data models, API contracts — the challenge phase is NEVER skipped.

@@ -1,11 +1,11 @@
 ---
 name: "mk-confluence-page"
-description: "Confluence page CRUD via confluence-as: create/show/update/delete, hierarchy, copy. NOT bulk (mk:confluence-bulk), spec analysis (mk:confluence-spec-analyst), or comments (mk:confluence-collaborate)."
+description: "Confluence page CRUD, copy, hierarchy. NOT for mk-confluence-collaborate."
 ---
 
-# mk:confluence-page
+# mk-confluence-page
 
-Forks to the `confluence-page` agent (system prompt at `.codex/agents/confluence-page.md`). The skill body is the task brief — the host runtime injects this content into the forked agent.
+Forks to the `confluence-page` agent (system prompt at `.codex/agents/confluence-page.toml`). The skill body is the task brief — the host runtime injects this content into the forked agent.
 
 ## Triggers
 
@@ -27,12 +27,12 @@ Forks to the `confluence-page` agent (system prompt at `.codex/agents/confluence
 ## See also
 
 - Agent: `../../agents/confluence-page.md`
-- Shared: `../confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-confluence/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/page-templates.md` — RFC / Runbook / Decision Record skeletons
   - `references/field-formats.md` — storage / view / export_view / ADF distinctions
   - `references/version-restore-guide.md` — version operations + restore semantics
-- Peer leaves: `mk:confluence-search` (CQL search + space list), `mk:confluence-collaborate` (comments / attachments / labels), `mk:confluence-bulk` (10+ pages), `mk:confluence-spec-analyst` (spec analysis)
+- Peer leaves: `mk-confluence-search` (CQL search + space list), `mk-confluence-collaborate` (comments / attachments / labels), `mk-confluence-bulk` (10+ pages), `mk-confluence-spec-analyst` (spec analysis)
 
 ## Gotchas
 

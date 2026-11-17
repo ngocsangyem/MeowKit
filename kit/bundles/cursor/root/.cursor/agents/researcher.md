@@ -1,8 +1,8 @@
 ---
 name: researcher
-description: Use to research technical topics, evaluate libraries, or find documentation before a decision. Use proactively before implementing an unfamiliar tool or pattern. Not for implementation or verdicts.
-model: claude-sonnet-5
-readonly: true
+description: Use to research technical topics, evaluate libraries, or find documentation before a decision. Delegate before implementing an unfamiliar tool or pattern; skip it for a single doc lookup. Not for implementation or verdicts.
+model: composer-2.5[fast=true]
+readonly: false
 is_background: true
 ---
 

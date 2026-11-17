@@ -105,7 +105,7 @@ This is the first piece of evidence in the directory. The validate-verdict.sh en
 
 ## Security Considerations
 
-- **Never run untrusted apps without isolation.** If the target came from a third-party source, run inside a container or `mk:freeze`-restricted directory.
+- **Never run untrusted apps without isolation.** If the target came from a third-party source, run inside a container or `mk-freeze`-restricted directory.
 - **Localhost only** — block outbound network from probe by default per `injection-rules.md` Rule 5.
 - **Watch the build log for secrets** — if the startup output contains tokens or keys, scrub before saving.
 

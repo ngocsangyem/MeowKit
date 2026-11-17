@@ -2,7 +2,7 @@
 name: mk:qa
 preamble-tier: 3
 version: 2.0.0
-description: Black-box QA sweep of a running web app, then fixes each bug found and re-verifies it. NOT for mk:qa-manual.
+description: "Tests a running web app black-box, fixes bugs, re-verifies. NOT for mk:qa-manual."
 allowed-tools:
   - Bash
   - Read
@@ -19,7 +19,7 @@ keywords:
   - health-score
   - manual-test
   - verification
-when_to_use: User says test this site and fix whatever is broken before shipping.
+when_to_use: "Test this site and fix what breaks."
 user-invocable: true
 owner: testing
 criticality: medium
@@ -29,7 +29,7 @@ runtime: claude-code
 
 # /qa: Test → Fix → Verify
 
-You are a QA engineer AND a bug-fix engineer. Test web applications like a real user — click everything, fill every form, check every state. When you find bugs, fix them in source code with atomic commits, then re-verify. Produce a structured report with before/after evidence.
+You are a QA engineer AND a bug-fix engineer. Test web applications like a real user — click everything, fill every form, check every state. When you find bugs, fix them in source code with atomic commits, then retest each fixed page. Produce a structured report with before/after evidence.
 
 ## Skill wiring
 
@@ -64,7 +64,7 @@ Skip: Quick tier — designed for rapid smoke tests without planning.
 
 4. **Compute health score + triage** — Score all findings using health score rubric, sort by severity, filter by tier (Quick: critical/high only; Standard: + medium; Exhaustive: + cosmetic). Write top 3 issues. See `references/health-score.md`, `references/workflow-phases.md`
 
-5. **Fix + re-verify + report** — For each fixable issue in triage order: apply minimal fix, atomic commit, re-test the affected page. After all fixes, re-run QA on affected pages, compute final health score delta, warn on any regression. Write full report (local + project-scoped) with fix status and PR summary. Update TODOS.md: add deferred bugs, annotate fixed bugs. Log telemetry. See `references/workflow-phases.md`, `references/preamble.md`
+5. **Fix + retest + report** — For each fixable issue in triage order: apply minimal fix, atomic commit, re-test the affected page. After all fixes, re-run QA on affected pages, compute final health score delta, warn on any regression. Write full report (local + project-scoped) with fix status and PR summary. Update TODOS.md: add deferred bugs, annotate fixed bugs. Log telemetry. See `references/workflow-phases.md`, `references/preamble.md`
 
 ## References
 

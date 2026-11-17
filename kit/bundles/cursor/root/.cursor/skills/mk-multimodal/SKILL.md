@@ -1,6 +1,6 @@
 ---
 name: "mk-multimodal"
-description: "Process images/video/audio/PDFs via Gemini API; generate images/video/speech/music; convert docs to Markdown. Multi-provider fallback. Use for analyze/transcribe/generate/convert on media files."
+description: "Analyses and generates images, video, audio, PDFs; use to transcribe or describe."
 requires_runtime: ["python>=3.9"]
 ---
 
@@ -30,7 +30,7 @@ verify preview IDs against the provider dashboard before relying on one.
 | Validate keys and dependencies | `scripts/check_setup.py` |
 
 ```bash
-node .cursor/scripts/skill-python.cjs .cursor/skills/multimodal/scripts/gemini_analyze.py \
+node .cursor/scripts/skill-python.cjs .cursor/skills/mk-multimodal/scripts/gemini_analyze.py \
   --files <path> --task <analyze|transcribe|extract> [--resolution low-res] [--json]
 ```
 
@@ -61,7 +61,7 @@ Load **only when executing** the corresponding step.
 - Task asks to "convert document", "convert PDF to markdown"
 - User references a non-text binary file for processing
 
-**Do NOT invoke when:** text-only files (use Read), Gemini API docs (use mk:docs-finder), already-described image in context.
+**Do NOT invoke when:** text-only files (use Read), Gemini API docs (use mk-docs-finder), already-described image in context.
 
 ## API key check
 
@@ -85,7 +85,7 @@ Force a provider: `--provider gemini|minimax|openrouter`. Override chain order v
 
 ## Gotchas
 
-- **Python venv required**: if you get `python3: command not found` or import errors, run `setup-workflow` once from the project root.
+- **Python venv required**: if you get `python3: command not found` or import errors, run `mewkit skill env multimodal` once from the project root.
 - **Audio >15 min**: Gemini truncates silently. Split first.
 - **PDF >100 pages**: Quality degrades. Process in 20-page chunks.
 - **Video cost**: ~263 tokens/sec at default resolution. Use `--verbose` for cost estimate.

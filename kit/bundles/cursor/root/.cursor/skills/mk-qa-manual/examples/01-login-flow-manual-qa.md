@@ -19,11 +19,11 @@ Spec extract from plan:
 ## Execution
 
 ```
-Step 1: mk:playwright-cli goto https://app.example.com/login
-Step 2: mk:playwright-cli snapshot → finds @e1 [textbox "Email"]
+Step 1: mk-playwright-cli goto https://app.example.com/login
+Step 2: mk-playwright-cli snapshot → finds @e1 [textbox "Email"]
 Step 3: ⚠️ Authentication required at: https://app.example.com/login
 
-  mk:qa-manual needs credentials to continue.
+  mk-qa-manual needs credentials to continue.
   Please provide:
   - Email: ___________
   - Password: ___________
@@ -31,11 +31,11 @@ Step 3: ⚠️ Authentication required at: https://app.example.com/login
 
 User enters: user@example.com / ••••••••
 
-Step 4: mk:playwright-cli fill e1 "user@example.com"
-Step 5: mk:playwright-cli fill e2 [password]
-Step 6: mk:playwright-cli click e3 (Sign In button)
-Step 7: mk:playwright-cli snapshot → verify dashboard content
-Step 8: mk:agent-browser screenshot /tmp/dashboard-after-login.png
+Step 4: mk-playwright-cli fill e1 "user@example.com"
+Step 5: mk-playwright-cli fill e2 [password]
+Step 6: mk-playwright-cli click e3 (Sign In button)
+Step 7: mk-playwright-cli snapshot → verify dashboard content
+Step 8: mk-agent-browser screenshot /tmp/dashboard-after-login.png
 ```
 
 ## Output

@@ -1,4 +1,4 @@
-# mk:figma Eval Checklist
+# mk-figma Eval Checklist
 
 Behavioral evals for common Figma tasks. Run manually — there is no automated runner (best-practices
 note). Record baseline (pre-refactor) and post-change results; the delta is the acceptance evidence.
@@ -41,7 +41,7 @@ against the expected bullets, mark PASS/PARTIAL/FAIL. Record results in the plan
 - **Query:** A Figma URL with no Figma MCP server connected.
 - **Preconditions:** No Figma MCP.
 - **Expected behavior:**
-  - Offers PNG-export fallback + `mk:multimodal` (or Codex Read) path.
+  - Offers PNG-export fallback + `mk-multimodal` (or Codex Read) path.
   - No fabricated MCP tool calls; connectivity check uses a real cheapest-read probe.
   - Surfaces the `codex mcp add figma` suggestion without auto-installing.
 
@@ -97,14 +97,14 @@ Each has a `design-snapshot.md` (stands in for a live Figma file), `expected-pac
 Two-stage manual run per fixture:
 
 1. **Packet stage** — give the fixture's `design-snapshot.md` to a fresh agent with
-   `mk:figma` loaded; have it emit a Figma Evidence Packet; diff the field set against
+   `mk-figma` loaded; have it emit a Figma Evidence Packet; diff the field set against
    `expected-packet.yaml`.
-2. **Plan stage** — feed the emitted packet path to a fresh agent with `mk:plan-creator`
+2. **Plan stage** — feed the emitted packet path to a fresh agent with `mk-plan-creator`
    loaded; diff the plan against `expected-plan-assertions.md`.
 
 Record these binary fields for each:
 
-- correct skill picked (mk:figma for extraction, mk:plan-creator for planning)
+- correct skill picked (mk-figma for extraction, mk-plan-creator for planning)
 - NO raw Figma re-analysis inside plan-creator (zero Figma MCP calls at plan stage)
 - viewport/state acceptance criteria created
 - prototype-flow artifacts created when interactions exist
@@ -151,7 +151,7 @@ Record these binary fields for each:
 - **Expected behavior:**
   - Packet: `availability: extracted` (explicit navigate edge) but a high-risk
     `flow_ambiguity_ledger` row naming figma_prototype + existing_route + jira_ticket;
-    `mk:figma` sets NO `blocked_on:` (records evidence only).
+    `mk-figma` sets NO `blocked_on:` (records evidence only).
   - Plan: decision-ledger row cites all three sources; precedence outranks the prototype
     (spec + route say stay in modal); `blocked_on:` on exactly the invite-submit phase
     referencing ledger `F1`; `status:` enum unchanged; no silent winner.

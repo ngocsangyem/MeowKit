@@ -113,7 +113,7 @@ After producing the completion checklist:
 
 - **All DONE or CHANGED:** Pass. "Plan completion: PASS — all items addressed." Continue.
 - **Only PARTIAL items (no NOT DONE):** Continue with a note in the PR body. Not blocking.
-- **Any NOT DONE items:** Use stop and ask the user in chat:
+- **Any NOT DONE items:** Ask the user:
   - Show the completion checklist above
   - "{N} items from the plan are NOT DONE. These were part of the original plan but are missing from the implementation."
   - RECOMMENDATION: depends on item count and severity. If 1-2 minor items (docs, config), recommend B. If core functionality is missing, recommend A.
@@ -133,11 +133,11 @@ After producing the completion checklist:
 
 ## Step 3.47: Plan Verification (manual follow-up)
 
-Plan-level verification is not run automatically during `the ship skill`. If the plan has a verification section, remind the user:
+Plan-level verification is not run automatically during `/mk-ship`. If the plan has a verification section, remind the user:
 
 **If no verification section found in the plan file from Step 3.45:** Skip silently.
 
 **If verification section exists:** Output a single-line reminder after ship completes:
-> "Plan contains verification steps. Run `the qa skill` after deploy to validate them against a running dev server."
+> "Plan contains verification steps. Run `/mk-qa` after deploy to validate them against a running dev server."
 
-Rationale: automatic plan verification requires a reliable dev-server detection + browser orchestration path. Ship is not the right place for that — `mk:qa` owns it. Ship's job is to get the PR out; QA runs against the deployed build.
+Rationale: automatic plan verification requires a reliable dev-server detection + browser orchestration path. Ship is not the right place for that — `mk-qa` owns it. Ship's job is to get the PR out; QA runs against the deployed build.

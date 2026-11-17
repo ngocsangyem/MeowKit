@@ -9,7 +9,7 @@ Finalize the audit trail at `tasks/autobuild-runs/{run_id}/run.md`. Print a user
 Before finalizing the run report, delegate to `project-manager` (background):
 
 ```
-Delegate to the project-manager agent:
+Unless MEOWKIT_PM_AUTO=off, delegate to the project-manager agent:
 "Generate delivery status for plan at $plan_dir. Write report to
 $plan_dir/status-reports/$(date +%y%m%d)-status.md.
 Load template from .cursor/skills/mk-autobuild/assets/pm-status-template.md.
@@ -85,7 +85,7 @@ duration: {duration_human}
 ## Resumability
 
 If this run was killed mid-flight:
-- Resume via `the autobuild skill --resume {run_id}`
+- Resume via `/mk-autobuild --resume {run_id}`
 - The orchestrator reads this file to find the last completed step
 - Steps are append-only; resume picks up at the next un-started step
 ```

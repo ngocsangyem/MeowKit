@@ -91,12 +91,12 @@ function guardDecision(text: string): GuardDecision {
 }
 
 /**
- * The injection scanner reported its finding with a non-blocking failure exit.
- * Through the dispatcher that becomes 0, because an observer chain is fail-open
- * and one observer's advisory exit must not become the chain's. The finding
- * itself is unchanged and still compared whole.
+ * The injection scanner reported its finding as plain stdout, which Claude Code keeps in
+ * the transcript on PreToolUse and never shows the model. It now answers as
+ * `hookSpecificOutput.additionalContext`, exit 0. The recording is kept as the before-state
+ * and the new form is asserted against the same findings, rather than re-recorded.
  */
-const ADVISORY_EXIT_FIXTURES = new Set(['pretaskcheck-injection-blocked']);
+const MODEL_CONTEXT_FIXTURES = new Set(['pretaskcheck-injection-blocked']);
 
 const fixtures = loadFixtures();
 const inGroups = (f: Fixture, groups: string[]) => groups.includes(f.group);
@@ -106,7 +106,7 @@ function assertParity(fixture: Fixture) {
   const quotesSelf = SELF_PATH_FIXTURES.has(fixture.name);
   const actualStderr = quotesSelf ? selfPath(actual.stderr) : actual.stderr;
   const actualStdout = quotesSelf ? selfPath(actual.stdout) : actual.stdout;
-  const expectedExit = ADVISORY_EXIT_FIXTURES.has(fixture.name) ? 0 : fixture.expect.exit;
+  const expectedExit = fixture.expect.exit;
 
   expect(actual.exit, `exit code for ${fixture.name}`).toBe(expectedExit);
   expect(actual.marker, `marker for ${fixture.name}`).toBe(fixture.expect.marker);
@@ -156,7 +156,7 @@ describe('golden corpus is non-empty and self-describing', () => {
 });
 
 describe('every recorded fixture replays against the node tree', () => {
-  for (const fixture of fixtures.filter((f) => inGroups(f, PARITY_GROUPS))) {
+  for (const fixture of fixtures.filter((f) => inGroups(f, PARITY_GROUPS) && !MODEL_CONTEXT_FIXTURES.has(f.name))) {
     it(`${fixture.group} · ${fixture.name}`, () => assertParity(fixture));
   }
 });
@@ -177,6 +177,30 @@ describe('unreadable hook input blocks instead of passing silently', () => {
       expect(actual.stderr, `reason for ${fixture.name}`).toContain(
         fixture.name.includes('empty') ? 'empty' : 'not-json',
       );
+    });
+  }
+});
+
+describe('injection findings reach the model as additionalContext', () => {
+  const recorded = fixtures.filter((f) => MODEL_CONTEXT_FIXTURES.has(f.name));
+
+  it('keeps the before-state recording', () => {
+    expect(recorded).toHaveLength(1);
+    expect(recorded[0].expect.stdout).toContain('BLOCK');
+  });
+
+  for (const fixture of recorded) {
+    it(`${fixture.name} reports the same findings as host JSON, exit 0`, () => {
+      const actual = replay(fixture);
+      expect(actual.exit, `exit code for ${fixture.name}`).toBe(0);
+      const out = JSON.parse(actual.stdout) as { hookSpecificOutput: { hookEventName: string; additionalContext: string } };
+      expect(out.hookSpecificOutput.hookEventName).toBe('PreToolUse');
+      const context = out.hookSpecificOutput.additionalContext;
+      const findings = fixture.expect.stdout.split('\n').filter((l) => l.startsWith('BLOCK — ')).map((l) => l.slice(8));
+      expect(findings.length).toBeGreaterThan(0);
+      for (const finding of findings) expect(context).toContain(`- ${finding}`);
+      // The scanner does not stop the command, so its text must not claim it does.
+      expect(context).not.toMatch(/\bBLOCK\b|STOPPED/);
     });
   }
 });

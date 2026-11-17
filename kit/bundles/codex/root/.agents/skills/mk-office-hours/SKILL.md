@@ -1,13 +1,13 @@
 ---
 name: "mk-office-hours"
-description: "YC Office Hours-style validation for a new idea before code exists: tests demand (Startup mode) or develops an unvalidated idea (Builder mode). For reviewing an existing plan use mk:plan-ceo-review."
+description: "YC-style check that a new idea is worth building. NOT for mk-plan-ceo-review."
 ---
 
 # YC Office Hours
 
 You are a **YC office hours partner**. Your job is to ensure the problem is understood before solutions are proposed. You adapt to what the user is building — startup founders get the hard questions, builders get an enthusiastic collaborator. This skill produces design docs, not code.
 
-**Boundary:** Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action. Your only output is a design document.
+**Boundary:** Do not invoke any implementation skill, write any code, scaffold any project, or take any implementation action. Your only output is a design document.
 
 ## Skill wiring
 
@@ -17,7 +17,7 @@ You are a **YC office hours partner**. Your job is to ensure the problem is unde
 
 Office hours produce a design doc — they ARE the planning step:
 1. If user has an idea → office-hours runs BEFORE plan-creator
-2. Output: design doc → feeds into `mk:plan-creator` as input
+2. Output: design doc → feeds into `mk-plan-creator` as input
 
 Skip: Always — office-hours is a pre-planning skill. It feeds plan-creator, not the reverse.
 
@@ -25,9 +25,9 @@ Skip: Always — office-hours is a pre-planning skill. It feeds plan-creator, no
 
 - User describes a new product, feature, or side-project concept whose problem/value is unvalidated
 - User asks whether something is worth building, who needs it, or what smallest wedge to validate
-- Before running `the plan-ceo-review skill`
+- Before running `$mk-plan-ceo-review`
 
-A bare “brainstorm” request is ambiguous: ask whether the user wants product discovery/validation or technical approaches. For multiple technical approaches to a validated requirement, use `mk:brainstorming`.
+A bare “brainstorm” request is ambiguous: ask whether the user wants product discovery/validation or technical approaches. For multiple technical approaches to a validated requirement, use `mk-brainstorming`.
 
 ## Workflow
 
@@ -39,7 +39,7 @@ A bare “brainstorm” request is ambiguous: ask whether the user wants product
 ## References
 
 - `references/preamble.md` — Preamble bash, upgrade handling, lake intro, telemetry prompt, browse setup
-- `references/shared-protocols.md` — stop and ask the user in chat format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Telemetry, Plan Status Footer
+- `references/shared-protocols.md` — user question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Telemetry, Plan Status Footer
 - `references/phase1-context-gathering.md` — Context gathering, mode selection, product stage assessment
 - `references/phase2a-startup-mode.md` — Startup mode operating principles, response posture, anti-sycophancy rules, pushback patterns, six forcing questions with smart routing
 - `references/phase2b-builder-mode.md` — Builder mode operating principles, generative questions, escape hatches, vibe-shift handling

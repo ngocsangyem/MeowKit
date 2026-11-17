@@ -19,7 +19,7 @@ Apply each fix directly. For each one, output a one-line summary:
 
 ## Step 5c: Batch-ask about ASK items
 
-If there are ASK items remaining, present them in ONE stop and ask the user in chat:
+If there are ASK items remaining, present them in ONE ask the user:
 
 - List each item with a number, the severity label, the problem, and a recommended fix
 - For each item, provide options: A) Fix as recommended, B) Skip
@@ -40,7 +40,7 @@ I auto-fixed 5 issues. 2 need your input:
 RECOMMENDATION: Fix both — #1 is a real race condition, #2 prevents silent data corruption.
 ```
 
-If 3 or fewer ASK items, you may use individual stop and ask the user in chat calls instead of batching.
+If 3 or fewer ASK items, you may use individual user questions instead of batching.
 
 ## Step 5d: Apply user-approved fixes
 
@@ -64,6 +64,6 @@ If the PR has review comments from GitHub reviewers or CI bots:
 
 1. **VALID & ACTIONABLE comments:** Include in your findings — follow Fix-First flow (auto-fix if mechanical, batch into ASK if not). Log resolution to `.meowkit/telemetry/reviews.jsonl`.
 
-2. **FALSE POSITIVE comments:** Present each via stop and ask the user in chat with evidence for why it's incorrect. Options: A) Dismiss with explanation, B) Fix anyway, C) Ignore.
+2. **FALSE POSITIVE comments:** Present each by asking the user with evidence for why it's incorrect. Options: A) Dismiss with explanation, B) Fix anyway, C) Ignore.
 
 3. **ALREADY ADDRESSED comments:** Note what was done and the fixing commit SHA. Log to `.meowkit/telemetry/reviews.jsonl`.

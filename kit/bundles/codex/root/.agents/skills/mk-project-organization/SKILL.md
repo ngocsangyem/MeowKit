@@ -1,6 +1,6 @@
 ---
 name: "mk-project-organization"
-description: "Correct file paths, project layout, and naming conventions. Two modes: advisory (return a path) and organize (restructure)."
+description: "Picks the path and name for a new file; use when it has no obvious home."
 ---
 
 # Project Organization
@@ -14,7 +14,7 @@ Standardize file locations, naming conventions, and directory structure for proj
 - Enforcing naming conventions across the project
 - Other skills need to know where to save output (advisory mode)
 
-Explicit: `the project-organization skill [targets]`
+Explicit: `$mk-project-organization [targets]`
 
 ## Workflow Integration
 

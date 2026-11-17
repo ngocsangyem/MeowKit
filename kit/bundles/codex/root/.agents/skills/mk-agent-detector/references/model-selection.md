@@ -1,57 +1,58 @@
 # Model Selection
 
-**Auto-select model based on task complexity and agent type.**
+**Auto-select a tier based on task complexity and agent type.** Each tier maps to one model pin on this host; the pins live in the `model` key of each agent in `.codex/agents/*.toml`.
 
-## Model Mapping
+## Tier Mapping
 
 ```toon
-model_selection[3]{model,when_to_use,agents}:
-  haiku,Quick tasks/Simple queries/Orchestration,orchestrator/analyst
-  sonnet,Standard implementation/Coding/Testing/Bug fixes,developer/tester/reviewer/planner/researcher
-  opus,Architecture/Deep analysis/Security audits/Complex planning,architect/security (audits)/Any agent (architecture mode)
+tier_selection[3]{tier,pin,when_to_use,agents}:
+  TRIVIAL,gpt-6-luna,Quick tasks/Mechanical or report-only work,documenter/shipper/project-manager/explore/git-manager
+  STANDARD,gpt-6.1-sol,Implementation support/Research/Testing,analyst/tester/researcher/journal-writer
+  COMPLEX,gpt-6-astra,Design/Implementation/Review/Security/Complex planning,planner/architect/developer/reviewer/security/brainstormer
 ```
 
-## Complexity to Model
+## Complexity to Tier
 
 ```toon
-complexity_model[3]{complexity,default_model,override_to_opus}:
-  Quick,haiku,Never
-  Standard,sonnet,User asks for architecture/design
-  Deep,sonnet,Always consider opus for planning phase
+complexity_tier[3]{complexity,default_tier,override_to_complex}:
+  Quick,TRIVIAL,Never
+  Standard,STANDARD,User asks for architecture/design
+  Deep,STANDARD,Always consider COMPLEX for the planning phase
 ```
 
-## Task Type to Model
+## Task Type to Tier
 
 ```toon
-task_model[8]{task_type,model,reason}:
-  Typo fix / config change,haiku,Minimal reasoning needed
-  Bug fix / feature add,sonnet,Standard implementation
-  API endpoint / component,sonnet,Standard implementation
-  Test writing,sonnet,Requires code understanding
-  Code review,sonnet,Pattern matching + analysis
-  Architecture design,opus,Complex trade-off analysis
-  Security audit,opus,Deep vulnerability analysis
-  Refactoring / migration,opus,Cross-cutting impact analysis
+task_tier[8]{task_type,tier,reason}:
+  Typo fix / config change,TRIVIAL,Minimal reasoning needed
+  Bug fix / feature add,STANDARD,Standard implementation
+  API endpoint / component,STANDARD,Standard implementation
+  Test writing,STANDARD,Requires code understanding
+  Code review,STANDARD,Pattern matching + analysis
+  Architecture design,COMPLEX,Complex trade-off analysis
+  Security audit,COMPLEX,Deep vulnerability analysis
+  Refactoring / migration,COMPLEX,Cross-cutting impact analysis
 ```
 
-## Agent Default Models
+## Agent Default Tiers
+
+Each agent runs on its tier's pin (the `model` key of each agent in `.codex/agents/*.toml`). The pin does not change per task: the tier declared for a task picks which agent runs, not which model it uses.
 
 ```toon
-agent_models[14]{agent,default_model,opus_when}:
-  orchestrator,haiku,Never (routing only)
-  analyst,haiku,Never (cost tracking/pattern extraction)
-  planner,sonnet,Complex multi-phase planning
-  architect,sonnet,Schema design / migration planning / system architecture
-  developer,sonnet,Never (implementation focus)
-  tester,sonnet,Never
-  reviewer,sonnet,opus for security-critical reviews
-  security,sonnet,opus for full audits
-  shipper,sonnet,Never
-  documenter,sonnet,Never
-  researcher,sonnet,opus for deep technical research
-  brainstormer,sonnet,opus for architecture evaluation
-  journal-writer,haiku,Never (documentation only)
-  project-manager,haiku,Never (delivery status reporting only)
+agent_tiers[13]{agent,tier}:
+  analyst,STANDARD
+  planner,COMPLEX
+  architect,COMPLEX
+  developer,COMPLEX
+  tester,STANDARD
+  reviewer,COMPLEX
+  security,COMPLEX
+  shipper,TRIVIAL
+  documenter,TRIVIAL
+  researcher,STANDARD
+  brainstormer,COMPLEX
+  journal-writer,STANDARD
+  project-manager,TRIVIAL
 ```
 
 ## Model Selection Output
@@ -62,13 +63,9 @@ Include in detection result:
 ## Detection Result
 
 - **Agent:** architect
-- **Model:** sonnet
+- **Tier:** COMPLEX (pin: `gpt-6-astra`)
 - **Complexity:** Standard
 - **Reason:** API endpoint implementation
 ```
 
-When spawning Agent tool, use the detected model:
-
-```
-Agent(subagent_type="architect", model="sonnet", ...)
-```
+When delegating to the agent, leave the model unset so the agent's pin applies.

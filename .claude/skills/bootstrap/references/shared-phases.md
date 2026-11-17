@@ -1,11 +1,11 @@
 # Shared Phases (Post-Plan)
 
 These phases run after planning completes, regardless of bootstrap mode.
-**ALL phases are MANDATORY. Do NOT stop between phases.**
+Run the three phases in order without stopping between them: each one feeds the next.
 
-## Phase A: Implementation (MANDATORY)
+## Phase A: Implementation
 
-**ACTION REQUIRED:** Activate mk:cook skill NOW with the plan path:
+Activate mk:cook skill with the plan path:
 
 - Full mode → `/mk:cook [plan-path]` (interactive, all gates)
 - Auto mode → `/mk:cook [plan-path] --auto`
@@ -18,9 +18,9 @@ If frontend work: mk:cook uses `ui-ux-designer` subagent per `docs/design-guidel
 
 **After cook completes: proceed IMMEDIATELY to Phase B. Do NOT stop.**
 
-## Phase B: Documentation (MANDATORY)
+## Phase B: Documentation
 
-**ACTION REQUIRED:** Activate mk:docs-init skill NOW:
+Activate mk:docs-init skill:
 
 ```
 /mk:docs-init
@@ -33,7 +33,7 @@ mk:docs-init will:
 
 **After docs created: proceed IMMEDIATELY to Phase C. Do NOT stop.**
 
-## Phase C: Final Report (MANDATORY)
+## Phase C: Final Report
 
 Print summary:
 ```

@@ -2,6 +2,20 @@
 
 Full pipeline for moderate complexity issues. Uses task tracking for phase coordination.
 
+## Contents
+
+- [Steps](#steps)
+- [Step 1: Scout, Debug & Investigate](#step-1-scout-debug--investigate)
+- [Step 2: Extend Scout Coverage](#step-2-extend-scout-coverage)
+- [Step 3: Implement Fix](#step-3-implement-fix)
+- [Step 4: Test](#step-4-test)
+- [Step 5: Review](#step-5-review)
+- [Step 6: Finalize](#step-6-finalize)
+- [Advice Checkpoints (`--advice` only)](#advice-checkpoints---advice-only)
+- [Checkpoints](#checkpoints)
+- [Call](#call)
+- [After the call](#after-the-call)
+
 ## Steps
 
 ### Step 1: Scout, Debug & Investigate

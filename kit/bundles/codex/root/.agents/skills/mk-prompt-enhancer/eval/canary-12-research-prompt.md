@@ -58,4 +58,4 @@ preserved verbatim.
 Guards the research recipe's frame-only boundary. The skill reshapes a discovery
 prompt; it never investigates. The moment it answers "why" with an invented
 cause, it has fabricated and left its mandate (investigation belongs to the
-downstream agent / `mk:scout`).
+downstream agent / `mk-scout`).

@@ -120,4 +120,4 @@ User invokes /mk:plan-ceo-review [plan-path]
   → Verdict + handoff
 ```
 
-If any pre-screen layer surfaces issues, user decides: amend or proceed. Pre-screen NEVER blocks autonomously.
+If any pre-screen layer surfaces issues, user decides: amend or proceed. Pre-screen never blocks on its own; the user decides.

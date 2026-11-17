@@ -1,6 +1,6 @@
 # Bulk Op Safety Checklist
 
-Pre-flight checklist for any `mk:confluence-bulk` operation. The agent walks this list before invoking Step 1 (dry-run).
+Pre-flight checklist for any `mk-confluence-bulk` operation. The agent walks this list before invoking Step 1 (dry-run).
 
 ## Contents
 

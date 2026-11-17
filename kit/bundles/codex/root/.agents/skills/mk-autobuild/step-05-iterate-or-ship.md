@@ -12,7 +12,7 @@ Branch on the verdict from step-04. PASS → ship. WARN/FAIL with iterations rem
 | `WARN` | yes | yes | Loop to step-03 with feedback |
 | `WARN` | no | — | Ask the user about shipping (5c) with every WARN itemized. On yes: route to shipper, set `final_status=WARN`, go to step-06. On no: no ship |
 | `FAIL` | yes | yes | Loop to step-03 with feedback |
-| `FAIL` | no | — | `final_status=ESCALATED`, go to step-06 + escalate via stop and ask the user in chat (5e) |
+| `FAIL` | no | — | `final_status=ESCALATED`, go to step-06 + escalate by asking the user (5e) |
 | any | — | NO (budget breach) | `final_status=TIMED_OUT`, go to step-06 — no ship, no question |
 
 Both ship-capable rows (`PASS`, `WARN`-at-cap) route through the SAME ship question in 5c.
@@ -32,7 +32,7 @@ step to read once this one finishes — for the two ship-capable actions (`ship`
 sed -i.bak "s/^iterations:.*/iterations: $iteration/" "$run_dir/run.md" && rm "$run_dir/run.md.bak"
 
 # Check budget — bail early if breached
-if ! .agents/skills/autobuild/scripts/budget-tracker.sh check >/dev/null 2>&1; then
+if ! .agents/skills/mk-autobuild/scripts/budget-tracker.sh check >/dev/null 2>&1; then
   final_status=TIMED_OUT
   next_step="step-06-run-report.md"
 elif [ "$verdict" = "PASS" ]; then
@@ -79,13 +79,13 @@ awk '/^## Warnings/,/^## [^W]/' "$verdict_path" | sed '/^## /d;/^$/d' > "$run_di
 ```
 
 ```
-stop and ask the user in chat(
+ask_user(
   question: "Autobuild finished $slug with a {PASS | WARN-at-cap} verdict after $iteration iteration(s).
              Verdict: tasks/reviews/{slug}-evalverdict.md · Evidence: $run_dir/evidence/
              {if ship_with_warnings: 'Unresolved WARNs you would be accepting:' + contents of $run_dir/warns-iter-${iteration}.md}
              Ship?",
   options: [
-    { label: "Ship it", description: "{if ship_with_warnings: 'The WARNs above are accepted as-is. '}Dispatch the shipper (mk:review still runs for the structural audit)." },
+    { label: "Ship it", description: "{if ship_with_warnings: 'The WARNs above are accepted as-is. '}Dispatch the shipper (mk-review still runs for the structural audit)." },
     { label: "Iterate with feedback", description: "Not yet. Provide a reason; it becomes the feedback packet and re-enters step-03." },
     { label: "Abort", description: "Stop the autobuild workflow. No ship, no further iterations; the evidence stays for manual triage." }
   ]
@@ -107,7 +107,7 @@ what was accepted:
 
 ```
 delegate a sub-task (
-  subagent_type="shipper",
+  agent="shipper",
   description="Ship $slug after the user chose to ship",
   prompt="
     Read tasks/reviews/{slug}-evalverdict.md for the passing verdict.
@@ -115,16 +115,16 @@ delegate a sub-task (
 
     Work context: $(pwd)
     Files to modify: standard ship pipeline files (CHANGELOG, VERSION, git tags)
-    Files to read: tasks/reviews/*-evalverdict.md, tasks/handoff/*.md, .codex/agents/shipper.md
+    Files to read: tasks/reviews/*-evalverdict.md, tasks/handoff/*.md, .codex/agents/shipper.toml
     Acceptance criteria:
       - The user chose to ship at step-05 (recorded above) — the evaluator verdict is the
         evidence that was presented, not the decision itself
-      - mk:review run for structural audit (do NOT skip)
+      - mk-review run for structural audit (do NOT skip)
       - Conventional commit + PR created
       - If shipping with warnings: every acknowledged WARN from
         $run_dir/warns-iter-{N}.md is recorded in the release notes
     Constraints:
-      - Do NOT skip mk:review even though the evaluator passed
+      - Do NOT skip mk-review even though the evaluator passed
       - Do NOT modify source files; only release artifacts
   "
 )
@@ -145,12 +145,12 @@ The next session reads `step-03-generate.md` again. step-03 reads the iteration 
 
 ### 5e. Action: escalate (verdict was FAIL at iteration cap)
 
-When `next_action == escalate`, first surface current delivery state to the user (foreground), then present a 3-option choice via stop and ask the user in chat.
+When `next_action == escalate`, first surface current delivery state to the user (foreground), then present a 3-option choice by asking the user.
 
 **PM foreground invocation (per the post-phase-delegation conventions Rule 5 — the only foreground PM call):**
 
 ```
-Delegate to the project-manager agent (foreground):
+Unless MEOWKIT_PM_AUTO=off, delegate to the project-manager agent (foreground):
 "Generate delivery status for plan at $plan_dir. Write report to
 $plan_dir/status-reports/$(date +%y%m%d)-status.md.
 Load template from .agents/skills/mk-autobuild/assets/pm-status-template.md."
@@ -158,10 +158,10 @@ Load template from .agents/skills/mk-autobuild/assets/pm-status-template.md."
 
 Wait for PM to return the report path, then include the headline in the escalation question so the user sees current state before deciding. Skip the PM call entirely when `MEOWKIT_PM_AUTO=off`.
 
-Then present via stop and ask the user in chat BEFORE proceeding to step-06:
+Then present by asking the user BEFORE proceeding to step-06:
 
 ```
-stop and ask the user in chat(
+ask_user(
   question: "Autobuild reached max iterations ($max_iter) with FAIL verdict on $slug. How do you want to proceed?",
   options: [
     { label: "Continue with one more iteration", description: "Increase max_iter by 1 and re-enter step-03" },

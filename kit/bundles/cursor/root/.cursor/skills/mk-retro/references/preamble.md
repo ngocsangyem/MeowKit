@@ -41,7 +41,7 @@ touch .meowkit/state/.completeness-intro-seen
 Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
 
 If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: After the lake intro is handled,
-ask the user about telemetry. Use stop and ask the user in chat:
+ask the user about telemetry. Ask the user:
 
 > Help improve this workflow! Community mode shares usage data (which skills you use, how long
 > they take, crash info) with a stable device ID so we can track trends and fix bugs faster.
@@ -54,7 +54,7 @@ Options:
 
 If A: run `workflow-config set telemetry community`
 
-If B: ask a follow-up stop and ask the user in chat:
+If B: ask a follow-up user question:
 
 > How about anonymous mode? We just learn that *someone* used this workflow — no unique ID,
 > no way to connect sessions. Just a counter that helps us know if anyone's out there.
@@ -75,4 +75,4 @@ This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 
 ## Memory
 
-- **Writes memory:** at task end append ONE entry to `.meowkit/memory/gotchas.md` (or `decisions.md` for a decision) via `mewkit note gotchas` (entry on stdin, lint-checked and locked by the CLI — never a bare `Edit`), in the format defined by `mk:memory`, and only when the lesson is non-derivable from the code, the diff, or `git log`. Never write secrets or vulnerability detail. A failed write is not silent: print `⚠ memory write skipped: <reason>` and continue.
+- **Writes memory:** at task end append ONE entry to `.meowkit/memory/gotchas.md` (or `decisions.md` for a decision) via `mewkit note gotchas` (entry on stdin, lint-checked and locked by the CLI — never a bare `Edit`), in the format defined by `mk-memory`, and only when the lesson is non-derivable from the code, the diff, or `git log`. Never write secrets or vulnerability detail. A failed write is not silent: print `⚠ memory write skipped: <reason>` and continue.

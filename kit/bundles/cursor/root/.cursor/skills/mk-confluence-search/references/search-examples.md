@@ -21,7 +21,7 @@ creator = currentUser() AND space = ENG AND created >= now("-7d") ORDER BY creat
 
 **Wrapper invocation:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/confluence-as.sh search \
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-confluence/scripts/confluence-as.sh search \
   --cql 'creator = currentUser() AND space = ENG AND created >= now("-7d") ORDER BY created DESC' \
   --max-results 20
 ```
@@ -57,7 +57,7 @@ text ~ "rate limiting" AND space IN ("ENG", "OPS") ORDER BY lastModified DESC
 parent = 12345
 ```
 
-**Note:** for the full subtree, use `ancestor = 12345` instead. Prefer the `hierarchy children` / `hierarchy descendants` verbs (see `mk:confluence-page`) for hierarchy-specific reads — they return the structured tree rather than a flat list.
+**Note:** for the full subtree, use `ancestor = 12345` instead. Prefer the `hierarchy children` / `hierarchy descendants` verbs (see `mk-confluence-page`) for hierarchy-specific reads — they return the structured tree rather than a flat list.
 
 ## Example 5: Recently Updated RFCs
 
@@ -70,7 +70,7 @@ label = "rfc" AND lastModified >= now("-30d") ORDER BY lastModified DESC
 
 **Export to CSV for sharing:**
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/confluence/scripts/confluence-as.sh search export \
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-confluence/scripts/confluence-as.sh search export \
   --cql 'label = "rfc" AND lastModified >= now("-30d") ORDER BY lastModified DESC' \
   --output-file /tmp/recent-rfcs.csv \
   --format csv

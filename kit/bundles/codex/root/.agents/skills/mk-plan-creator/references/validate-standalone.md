@@ -1,6 +1,6 @@
 # Validate Standalone Subcommand
 
-Subcommand: `the plan skill validate {plan_path}`
+Subcommand: `$mk-plan-creator validate {plan_path}`
 
 Run a validation interview on an existing plan without going through the full planning pipeline.
 
@@ -9,8 +9,8 @@ Run a validation interview on an existing plan without going through the full pl
 Activated when argument starts with `validate` followed by a path to a plan directory or plan.md file.
 
 Examples:
-- `the plan skill validate tasks/plans/260411-my-feature/`
-- `the plan skill validate tasks/plans/260411-my-feature/plan.md`
+- `$mk-plan-creator validate tasks/plans/260411-my-feature/`
+- `$mk-plan-creator validate tasks/plans/260411-my-feature/plan.md`
 
 ## Workflow
 
@@ -35,7 +35,7 @@ Follow the exact instructions in `step-06-validation-interview.md`, starting fro
 - 6b: Generate 3-5 critical questions using `references/validation-questions.md` framework
   - Use detection keywords to identify relevant categories
   - If red-team findings exist, prioritize questions about flagged areas
-- 6c: Present each question via stop and ask the user in chat (2-4 options, mark recommended)
+- 6c: Present each question by asking the user (2-4 options, mark recommended)
 - 6d: Propagate answers to phase files via section mapping
 - 6e: Write Validation Log section to plan.md
 

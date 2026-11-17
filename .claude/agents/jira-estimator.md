@@ -2,7 +2,7 @@
 name: jira-estimator
 description: 'mk:jira executor for mk:jira-estimator. Heuristic story points, read-only.'
 tools: Bash, Read, Grep, Glob, Write, Edit
-model: claude-opus-5
+model: opus
 permissionMode: default
 memory: project
 color: orange

@@ -27,7 +27,7 @@ index below and route there rather than duplicating.
 | `defineProps` / `defineEmits`          | `components.md` (typed props/emits, destructure defaults) |
 | `defineModel`                          | `components.md` (options, modifiers, multiple models)     |
 | `defineSlots`                          | `components.md` (typed slots)                             |
-| `defineExpose`                         | `mk:vue-best-practices` › `component-data-flow-advanced.md` |
+| `defineExpose`                         | `mk-vue-best-practices` › `component-data-flow-advanced.md` |
 | `defineOptions`                        | this file                                                 |
 | `withDefaults`                         | this file                                                 |
 | `generic` (component type params)      | this file                                                 |
@@ -45,8 +45,8 @@ defineOptions({ name: 'UserCard' })
 ```
 
 > Use-case specifics are owned elsewhere: `inheritAttrs: false` for attribute fallthrough →
-> `mk:vue-best-practices` › `component-fallthrough-attrs.md`; `name` for `<KeepAlive>` include/exclude
-> matching → `mk:vue-best-practices` › `component-keep-alive.md`. This section documents only the
+> `mk-vue-best-practices` › `component-fallthrough-attrs.md`; `name` for `<KeepAlive>` include/exclude
+> matching → `mk-vue-best-practices` › `component-keep-alive.md`. This section documents only the
 > macro itself.
 
 ## withDefaults

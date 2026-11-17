@@ -16,7 +16,7 @@ use std::path::Path;
 use clap::Args;
 use mewkit_core::skill_env::{
     RUNTIME_KEY, ensure_env, env_skills, env_usable, envs_rel, existing_envs, install_pip_packages,
-    is_skill_dir_name, read_skill_requirements, read_skill_runtime, skill_env_dir,
+    is_skill_dir_name, read_skill_requirements, read_skill_runtime, skill_dir, skill_env_dir,
 };
 use mewkit_core::toolchain::find_python;
 
@@ -157,7 +157,7 @@ fn provision_env(project: &Path, skill: &str) -> u8 {
         eprintln!("Skills that need one: {}\n", or_none(&known));
         return FAILED;
     }
-    if !project.join(".claude").join("skills").join(skill).exists() {
+    if !skill_dir(project, skill).exists() {
         eprintln!("\nNo such skill: {skill}");
         eprintln!("Skills that need an environment: {}\n", or_none(&known));
         return FAILED;

@@ -1,6 +1,6 @@
 # Mode Routing
 
-> Loaded by `mk:prompt-enhancer` at Step 1 (Mode Select). Single source for
+> Loaded by `mk-prompt-enhancer` at Step 1 (Mode Select). Single source for
 > which mode emits what, what each mode reads, and the two layered recipes.
 > Authoritative rule owners are linked — this file routes, it does not restate.
 
@@ -38,8 +38,8 @@ reshaped prompt asks for.
 
 | Recipe | Layered on | What it reshapes | Hard boundary |
 |---|---|---|---|
-| **Architecture-review** | `--analyze --deep` + arch signal | `CONTEXT:` prioritizes ADRs / architecture docs / public interfaces / constraints; `ACCEPTANCE CRITERIA:` asks for findings (severity + evidence + decisions-needed); `OUTPUT FORMAT:` orders findings → trade-offs → recommendation | Rewrites the prompt to ASK for a review. Does **not** produce findings — that is `mk:review`. Full recipe: `references/architecture-review-mode.md` |
-| **Research** | any mode (prompt shape) | Grounding framing + attention-anchoring (long data first, ask last) + discovery acceptance criteria | Frames a discovery prompt only. Performs **no** research / retrieval itself — that is `mk:scout` / the downstream agent |
+| **Architecture-review** | `--analyze --deep` + arch signal | `CONTEXT:` prioritizes ADRs / architecture docs / public interfaces / constraints; `ACCEPTANCE CRITERIA:` asks for findings (severity + evidence + decisions-needed); `OUTPUT FORMAT:` orders findings → trade-offs → recommendation | Rewrites the prompt to ASK for a review. Does **not** produce findings — that is `mk-review`. Full recipe: `references/architecture-review-mode.md` |
+| **Research** | any mode (prompt shape) | Grounding framing + attention-anchoring (long data first, ask last) + discovery acceptance criteria | Frames a discovery prompt only. Performs **no** research / retrieval itself — that is `mk-scout` / the downstream agent |
 
 Both recipes are guarded by canaries (`eval/canary-11-architecture-review.md`,
 `eval/canary-12-research-prompt.md`) that fail on role confusion.

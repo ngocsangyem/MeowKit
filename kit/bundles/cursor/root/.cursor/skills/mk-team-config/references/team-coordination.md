@@ -1,6 +1,6 @@
 # Team Coordination
 
-> Loaded by `mk:team-config` when team mode activates. This is the team-only detail
+> Loaded by `mk-team-config` when team mode activates. This is the team-only detail
 > moved out of always-loaded the parallel-execution conventions (Rule 7) so it
 > costs zero context in standard single-session work. Standard sessions use
 > AGENTS.md (Delegation & subagents); these rules apply ONLY when a team/worktree

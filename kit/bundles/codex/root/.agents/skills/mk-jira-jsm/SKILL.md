@@ -1,9 +1,9 @@
 ---
 name: "mk-jira-jsm"
-description: "JIRA Service Management via jira-as: service desks, requests, customers, orgs, queues, SLAs, approvals. Requires JSM tenant + agent role. NOT core issue ops (mk:jira-issue) or admin (mk:jira-admin)."
+description: "Jira Service Management desks, requests, queues, SLAs. NOT for mk-jira-admin."
 ---
 
-# mk:jira-jsm
+# mk-jira-jsm
 
 Forks to the `jira-jsm` agent. Service Management (JSM) operations — service desks, requests, SLAs, customers, organizations, queues, approvals, request types.
 
@@ -33,11 +33,11 @@ JSM-licensed tenant + agent or admin role. Insufficient permission → exit code
 ## See also
 
 - Agent: `../../agents/jira-jsm.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
-  - `references/decision-tree.md` — when to use `mk:jira-jsm` vs `mk:jira-{issue,lifecycle,collaborate}` etc.
+  - `references/decision-tree.md` — when to use `mk-jira-jsm` vs `mk-jira-{issue,lifecycle,collaborate}` etc.
   - `references/itil-workflows.md` — ITIL 4 process implementations (incident / service-request / problem / change management)
-- Peer leaves: `mk:jira-collaborate` (internal-vs-public discipline applies on JSM tickets too), `mk:jira-lifecycle` (`patterns/jsm-request-workflow.md`), `mk:jira-admin` (request-type / queue config)
+- Peer leaves: `mk-jira-collaborate` (internal-vs-public discipline applies on JSM tickets too), `mk-jira-lifecycle` (`patterns/jsm-request-workflow.md`), `mk-jira-admin` (request-type / queue config)
 
 ## Gotchas
 

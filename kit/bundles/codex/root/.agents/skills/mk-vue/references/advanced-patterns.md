@@ -3,7 +3,7 @@
 Reactivity escape hatches and scope control for cases the everyday APIs do not cover. Reach for
 these deliberately — most components never need them. Foundation reactivity is in
 `reactivity-performance.md`; `shallowRef`/`shallowReactive` and provider `readonly()` are owned by
-`mk:vue-best-practices` (cross-linked below, not restated here).
+`mk-vue-best-practices` (cross-linked below, not restated here).
 
 ## Contents
 
@@ -109,7 +109,7 @@ const pushMany = (values: number[]): void => {
 }
 ```
 
-> When to choose `shallowRef` vs `ref` is owned by `mk:vue-best-practices` ›
+> When to choose `shallowRef` vs `ref` is owned by `mk-vue-best-practices` ›
 > `reactivity-advanced.md`. This is only the manual-trigger escape hatch.
 
 ---
@@ -156,4 +156,4 @@ config.retry.count++       // ✅ allowed — shallow only
 ```
 
 > Deep `readonly()` (full lock, used for provide/inject contracts) is shown in
-> `mk:vue-best-practices` › `component-data-flow-advanced.md`.
+> `mk-vue-best-practices` › `component-data-flow-advanced.md`.

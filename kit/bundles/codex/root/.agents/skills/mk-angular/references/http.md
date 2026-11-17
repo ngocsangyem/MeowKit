@@ -1,13 +1,12 @@
 # Angular Http
 
-> Part of mk:angular skill. Read when: working with http.
+> Part of mk-angular skill. Read when: working with http.
 > Source: analogjs/angular-skills/angular-http (MIT)
 
 ## Contents
 
 - [Core Patterns](#core-patterns)
 - [Advanced Patterns](#advanced-patterns)
-
 
 ## Core Patterns
 

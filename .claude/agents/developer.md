@@ -2,7 +2,7 @@
 name: developer
 description: 'Implementation agent that writes production code following approved plans. TDD is opt-in via --tdd / MEOWKIT_TDD=1: when enabled, never writes code until failing tests exist; when disabled (default), implements directly per the approved plan. Use in Phase 3. Self-heals up to 3 times on test failures. Not for unapproved planning or shipping.'
 tools: Read, Grep, Glob, Bash, Edit, Write
-model: claude-opus-5
+model: opus
 owner: lifecycle
 criticality: high
 status: active
@@ -85,7 +85,7 @@ The signed sprint contract is **immutable** during implementation. You may NOT s
 - **Amendments require re-sign.** If mid-build you discover an AC needs revision (it's unverifiable, contradictory, or incomplete), do NOT silently change behavior. Run `/mk:sprint-contract amend` to propose the change, get evaluator review, and re-sign. Append the change to the `## Amendments` section — never edit signed criteria in place.
 - **Do not exceed scope.** "While I'm here let me also fix X" is forbidden if X has no AC. File a follow-up plan instead.
 - **Respect the rubric tie-ins.** Each AC binds to a rubric — your implementation will be graded against that rubric in the active-verification step. If you can't satisfy the rubric anchor pattern, the AC will FAIL.
-- **LEAN mode exception.** When `MEOWKIT_AUTOBUILD_MODE=LEAN`, no contract is required (adaptive density policy for COMPLEX/Opus 4.6). You still implement against the product spec directly, but the contract step is skipped.
+- **LEAN mode exception.** When `MEOWKIT_AUTOBUILD_MODE=LEAN`, no contract is required (the adaptive density for COMPLEX models from Opus 4.6 on). You still implement against the product spec directly, but the contract step is skipped.
 
 ## Exclusive Ownership
 

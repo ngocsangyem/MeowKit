@@ -1,6 +1,6 @@
 ---
 name: mk:build-fix
-description: Triage compile and type errors — detect language, load fix patterns, retry the build. NOT for mk:fix.
+description: "Triages build, compile and type errors, then retries. NOT for mk:fix."
 version: 1.0.0
 argument-hint: '[error output or file path]'
 source: local
@@ -16,7 +16,7 @@ keywords:
   - build-failed
   - auto-retry
   - error-triage
-when_to_use: The build or compile step just failed with a type or syntax error.
+when_to_use: "The build just failed."
 user-invocable: true
 owner: testing
 criticality: medium

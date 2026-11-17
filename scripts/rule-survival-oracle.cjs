@@ -66,7 +66,7 @@ const a1Block = [
 const a1TableRows = [
 	"| **DONE** | Task completed successfully | Proceed to next step |",
 	"| **DONE_WITH_CONCERNS** | Completed but flagged doubts | If correctness concern → address before review. If tech debt → note, proceed. |",
-	"| **BLOCKED** | Cannot complete task | Assess blocker → provide more context / break task down / escalate to user. NEVER retry same approach. |",
+	"| **BLOCKED** | Cannot complete task | Assess blocker → provide more context / break task down / escalate to user. Do not retry the same approach. |",
 	"| **NEEDS_CONTEXT** | Missing information to proceed | Provide missing context → re-dispatch |",
 ].map((row) => ({ name: `agent-conduct A1 status-table row "${row.slice(0, 28)}…"`, needle: row }));
 
@@ -79,23 +79,29 @@ const coreBehaviorHeadings = [
 	"## 6. Verify, Don't Assume",
 ].map((heading) => ({ name: `core-behaviors heading "${heading}"`, needle: heading }));
 
-/** One phrase per MUST/NEVER/ALWAYS line of the uncompressed development-rules (15 lines). */
+/** The bodies of the two behaviors whose scope matters most: when to stop, and what counts as done. */
+const coreBehaviorBodies = [
+	"stop, name the specific confusion, present the tradeoff or the question, and wait for the answer",
+	"Call a task done only with evidence from a check that ran",
+].map((phrase) => ({ name: `core-behaviors body "${phrase.slice(0, 28)}…"`, needle: phrase }));
+
+/** One phrase per rule of development-rules: each rule must survive compression, in its plain wording. */
 const developmentPhrases = [
-	"ALWAYS use kebab-case",
-	"ALWAYS keep code files under 200 lines",
-	'NEVER create new "enhanced" or "v2" files',
-	"ALWAYS run the compile/build command",
-	"NEVER simulate, mock, or stub implementation code",
-	"NEVER finish a session with failing tests",
-	"NEVER ignore failing tests, delete tests, weaken assertions",
-	"ALWAYS use conventional commits",
-	"NEVER include AI references in commit messages",
+	"Name files in kebab-case",
+	"Keep code files under 200 lines; split a large file by concern",
+	'rather than creating an "enhanced" or "v2" copy',
+	"run the build or compile command and fix every error",
+	"Do not mock, stub or simulate implementation code",
+	"When tests exist, end the session with them passing",
+	"do not delete tests, weaken assertions or add fake data",
+	"Use conventional commits",
+	"Leave AI references out of commit messages",
 	"NEVER push to main/master directly",
-	"NEVER force-push unless the user explicitly requests it",
-	"ALWAYS commit frequently with descriptive messages",
-	"ALWAYS pull before push",
-	"ALWAYS declare docs impact",
-	"ALWAYS apply default output limits",
+	"NEVER force-push unless the user asks for it",
+	"descriptive messages, committed often",
+	"Pull before you push",
+	"declare docs impact",
+	"Tool output stays in context, so cap it at the source",
 ].map((phrase) => ({ name: `development-rules phrase "${phrase}"`, needle: phrase }));
 
 const ORACLE = [
@@ -106,6 +112,7 @@ const ORACLE = [
 	...a1Block,
 	...a1TableRows,
 	...coreBehaviorHeadings,
+	...coreBehaviorBodies,
 	...developmentPhrases,
 ];
 

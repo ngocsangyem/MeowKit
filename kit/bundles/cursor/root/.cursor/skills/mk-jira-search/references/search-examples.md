@@ -2,6 +2,20 @@
 
 Practical JQL query examples for common scenarios.
 
+## Contents
+
+- [Personal Queries](#personal-queries)
+- [Time-Based Queries](#time-based-queries)
+- [Project & Status Queries](#project--status-queries)
+- [Priority & Type Queries](#priority--type-queries)
+- [Assignment Queries](#assignment-queries)
+- [Label & Component Queries](#label--component-queries)
+- [Text Search Queries](#text-search-queries)
+- [Complex Queries](#complex-queries)
+- [Sprint & Agile Queries](#sprint--agile-queries)
+- [Version Queries](#version-queries)
+- [Usage with Scripts](#usage-with-scripts)
+
 ## Personal Queries
 
 **My open issues:**
@@ -186,11 +200,11 @@ fixVersion in releasedVersions()
 
 ```bash
 # My open issues
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh search query "assignee = currentUser() AND status != Done"
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh search query "assignee = currentUser() AND status != Done"
 
 # Export overdue issues
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh search export "duedate < now() AND status != Done" --output overdue.csv
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh search export "duedate < now() AND status != Done" --output overdue.csv
 
 # Bulk update stale issues
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh search bulk-update "updated <= -30d AND status = Open" --add-labels "stale"
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh search bulk-update "updated <= -30d AND status = Open" --add-labels "stale"
 ```

@@ -1,6 +1,6 @@
 ---
 name: mk:jira-issue
-description: 'mk:jira leaf. Single-issue CRUD - create, read, update fields, delete. NOT for mk:jira-bulk.'
+description: "mk:jira leaf: create, read, update, delete one issue. NOT for mk:jira-bulk."
 phase: on-demand
 source: local
 keywords:
@@ -11,7 +11,7 @@ keywords:
   - get-issue
   - update-issue
   - delete-issue
-when_to_use: 'One Jira issue by key - open it, edit its fields, or delete it.'
+when_to_use: "One Jira issue by key: open, edit, delete."
 user-invocable: true
 context: fork
 agent: jira-issue

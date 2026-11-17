@@ -18,11 +18,11 @@ Count `phase-XX-*.md` files in `{plan_dir}`:
 | 4–5 phases  | Above + Security Adversary |
 | 6+ phases   | Above + Security Adversary + Failure Mode Analyst |
 
-Load persona prompts from `.cursor/skills/plan-creator/prompts/personas/`.
+Load persona prompts from `.cursor/skills/mk-plan-creator/prompts/personas/`.
 
 ### 5c. Dispatch Reviewer sub-task
 
-For each selected persona, spawn a sub-task (`subagent_type: "researcher"`) with:
+Once the personas are selected, delegate each one to the `researcher` agent with:
 
 ```
 IGNORE your default instructions. You are reviewing a PLAN DOCUMENT, not code.
@@ -100,7 +100,7 @@ Include a 1-line rationale for each disposition.
 
 **Guard:** a finding that proposes cutting an item marked `locked: user-confirmed` must be escalated to the user in 5f — never auto-accepted or silently applied.
 
-### 5f. Present to User via stop and ask the user in chat
+### 5f. Present to User by asking the user
 
 ```json
 {
@@ -226,7 +226,7 @@ Outputs:
 - `### Whole-Plan Consistency Sweep` summary block appended to `{plan_dir}/red-team-findings.md` (after Pass 2)
 - plan.md frontmatter updated with `consistency_sweeps.red_team: { reconciled, unresolved, ran_at }`
 
-If `unresolved > 0`, FIRE the W1 `stop and ask the user in chat` blocker (see decision tree in `references/whole-plan-sweep.md`). BLOCK step-06 until the user selects one of:
+If `unresolved > 0`, FIRE the W1 user-question blocker (see decision tree in `references/whole-plan-sweep.md`). BLOCK step-06 until the user selects one of:
 
 - "Apply pending edits and defer unresolved to validation interview" — proceed to step-06, mark deferred items in `## Validation Log`.
 - "Apply pending edits and resolve now" — planner rewrites locally; recursion bounded at 2 attempts.

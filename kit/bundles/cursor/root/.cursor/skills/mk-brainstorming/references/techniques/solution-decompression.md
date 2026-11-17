@@ -6,7 +6,7 @@ Input arrives as a SOLUTION, not a problem: "build a notification system", "add 
 confession of a problem the user senses but has not articulated. Decompress before ideating.
 
 **NOT for:** "how could this FAIL?" failure-mode inversion → use `reverse.md`.
-**NOT for:** "is this worth building?" product validation → route to `mk:office-hours`.
+**NOT for:** "is this worth building?" product validation → route to `mk-office-hours`.
 
 Trigger test: can you name a problem the solution does NOT already encode? If yes, decompress.
 If the input is already a problem statement (no preselected solution), skip this technique.
@@ -26,7 +26,7 @@ person propose this? Use the solution as the research artifact, not the target.
 
 ## Fail-Closed Boundary
 If section 2/4 reveals the problem's VALUE is unvalidated (mostly vibes, one anecdote), STOP.
-Route to `mk:office-hours`. Do not grade evidence or run validation here.
+Route to `mk-office-hours`. Do not grade evidence or run validation here.
 
 ## After Decompression
 Pick the framing with the user (or recommend one), then resume normal exploration on that

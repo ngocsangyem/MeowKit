@@ -1,24 +1,24 @@
 # Step 9: Post-Plan Handoff
 
-Deterministic handoff after task hydration. Presents mode-pruned options via `stop and ask the user in chat`, writes the chosen next-step to plan.md frontmatter, prints the suggested command, and STOPs without auto-invoking it.
+Deterministic handoff after task hydration. Presents mode-pruned options by asking the user, writes the chosen next-step to plan.md frontmatter, prints the suggested command, and STOPs without auto-invoking it.
 
 ## Inputs
 
 - `planning_mode` (from step-00)
 - `tdd_mode` (from step-00)
-- `matched_flags` (from `mk:agent-detector` Phase 0; may be unset when plan-creator invoked directly)
+- `matched_flags` (from `mk-agent-detector` Phase 0; may be unset when plan-creator invoked directly)
 - `plan_dir` (from step-03)
 
 ## Instructions
 
 ### 9a. Defensive Fallback Advisory
 
-If `matched_flags` is unset OR empty AND `planning_mode` is `fast` or `spike`, print this advisory BEFORE the `stop and ask the user in chat`:
+If `matched_flags` is unset OR empty AND `planning_mode` is `fast` or `spike`, print this advisory BEFORE the user question:
 
 ```
 `matched_flags` is unset — plan-creator was invoked directly rather than
-through `mk:agent-detector` routing. Using default mode recommendation.
-For risk-tiered routing, invoke via `the cook skill` or `the fix skill`.
+through `mk-agent-detector` routing. Using default mode recommendation.
+For risk-tiered routing, invoke via `/mk-cook` or `/mk-fix`.
 ```
 
 ### 9b. Live Risk Re-Scan
@@ -38,17 +38,17 @@ Conservative false-positives are accepted — the user has final say via the opt
 
 Compute the effective risk set: `risk_hit = (matched_flags ∪ re_scan_flags) ∩ {AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}`.
 
-Option set is mode-pruned. First option is `(Recommended)`. stop and ask the user in chat caps options at 4.
+Option set is mode-pruned. First option is `(Recommended)`. Ask the user caps options at 4.
 
 | Mode | risk_hit non-empty? | Options (first = Recommended) |
 |---|---|---|
 | fast | yes | Red-team, Validate, Cook, End |
 | fast | no | Cook, Validate, Red-team, End |
 | hard / deep / parallel / two | (n/a — both prior gates ran) | Cook, End |
-| product-level | (n/a) | Hand off to mk:autobuild, End |
+| product-level | (n/a) | Hand off to mk-autobuild, End |
 | spike | (n/a) | Cook, End |
 
-### 9d. Present stop and ask the user in chat
+### 9d. Present ask the user
 
 Build the question payload using the option set above. Each option has `label` and `description` (≤120 chars). Labels are display-only — no shell-executable text.
 
@@ -59,8 +59,8 @@ Build the question payload using the option set above. Each option has `label` a
     "header": "Next Step",
     "options": [
       { "label": "Cook (Recommended)", "description": "Run the cook skill to implement the plan" },
-      { "label": "Validate", "description": "Run the plan skill validate for a critical-questions interview" },
-      { "label": "Red-team", "description": "Run the plan skill red-team for adversarial review" },
+      { "label": "Validate", "description": "Run `/mk-plan-creator validate` for a critical-questions interview" },
+      { "label": "Red-team", "description": "Run `/mk-plan-creator red-team` for adversarial review" },
       { "label": "End", "description": "Stop here — review plan before deciding" }
     ],
     "multiSelect": false
@@ -88,15 +88,15 @@ Print exactly one line matching the selection:
 
 | Selection | Output line |
 |---|---|
-| Cook | `Run: the cook skill {absolute-path-to-plan.md}` |
-| Cook with TDD | `Run: the cook skill {absolute-path-to-plan.md} --tdd` |
-| Cook (parallel mode) | `Run: the cook skill --parallel {absolute-path-to-plan.md}` |
-| Cook (parallel + TDD) | `Run: the cook skill --parallel {absolute-path-to-plan.md} --tdd` |
-| Cook (fast mode) | `Run: the cook skill --auto {absolute-path-to-plan.md}` |
-| Cook (fast + TDD) | `Run: the cook skill --auto {absolute-path-to-plan.md} --tdd` |
-| Validate | `Run: the plan skill validate {absolute-path-to-plan.md}` |
-| Red-team | `Run: the plan skill red-team {absolute-path-to-plan.md}` |
-| Hand off to mk:autobuild | `Run: the autobuild skill {absolute-path-to-plan.md}` |
+| Cook | `Run: /mk-cook {absolute-path-to-plan.md}` |
+| Cook with TDD | `Run: /mk-cook {absolute-path-to-plan.md} --tdd` |
+| Cook (parallel mode) | `Run: /mk-cook --parallel {absolute-path-to-plan.md}` |
+| Cook (parallel + TDD) | `Run: /mk-cook --parallel {absolute-path-to-plan.md} --tdd` |
+| Cook (fast mode) | `Run: /mk-cook --auto {absolute-path-to-plan.md}` |
+| Cook (fast + TDD) | `Run: /mk-cook --auto {absolute-path-to-plan.md} --tdd` |
+| Validate | `Run: /mk-plan-creator validate {absolute-path-to-plan.md}` |
+| Red-team | `Run: /mk-plan-creator red-team {absolute-path-to-plan.md}` |
+| Hand off to mk-autobuild | `Run: /mk-autobuild {absolute-path-to-plan.md}` |
 | End | (no command line — print "Plan complete. No next command queued.") |
 
 If `tdd_mode = true`, always use the matching TDD cook line above. Do not rely on `.meowkit/state/tdd-mode` surviving a fresh session.

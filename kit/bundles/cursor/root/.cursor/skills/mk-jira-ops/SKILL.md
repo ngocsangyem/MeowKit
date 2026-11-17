@@ -1,9 +1,9 @@
 ---
 name: "mk-jira-ops"
-description: "JIRA-side cache + project-context discovery via jira-as, diagnostic-only, no Atlassian state changes. NOT issue CRUD or project admin (mk:jira-admin)."
+description: "Inspects or clears the Jira cache; discovers project defaults."
 ---
 
-# mk:jira-ops
+# mk-jira-ops
 
 Forks to the `jira-ops` agent. Diagnostic surface only.
 
@@ -24,16 +24,16 @@ Forks to the `jira-ops` agent. Diagnostic surface only.
 `cache-warm` is intentionally NOT exposed as a primary trigger. If a user explicitly needs it, they can invoke directly:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh ops cache-warm --project PROJ
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh ops cache-warm --project PROJ
 ```
 
 ## See also
 
 - Agent: `../../agents/jira-ops.md`
-- Shared: `../jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
+- Shared: `../mk-jira/references/{install-and-auth,cli-idioms,safety-framework}.md`
 - Domain refs:
   - `references/rate-limits.md` — Atlassian rate-limit ceilings + back-off behaviour
-- Peer leaves: any leaf hitting Atlassian-side throttling first lands here for diagnosis. `mk:jira-bulk` is the most common trigger for cache-warm + rate-limit awareness.
+- Peer leaves: any leaf hitting Atlassian-side throttling first lands here for diagnosis. `mk-jira-bulk` is the most common trigger for cache-warm + rate-limit awareness.
 
 ## Gotchas
 

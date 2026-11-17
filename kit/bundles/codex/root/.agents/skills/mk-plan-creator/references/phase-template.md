@@ -62,7 +62,7 @@ dependencies: []
 
 ## Context Links
 
-- [Related report](../research/researcher-01-topic.md)
+- [Related report](../mk-research/researcher-01-topic.md)
 - [Related doc](<path-to-related-doc-in-your-project>)
 
 ## Overview

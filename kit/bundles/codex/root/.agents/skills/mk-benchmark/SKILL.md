@@ -1,18 +1,18 @@
 ---
 name: "mk-benchmark"
-description: "Experimental/manual harness canary procedure. It records benchmark manifests and scores but does not provide a fully automated runner."
+description: "Experimental manual harness canary recording benchmark scores; no automated runner."
 ---
 
-# mk:benchmark — Experimental Harness Canary Suite
+# mk-benchmark — Experimental Harness Canary Suite
 
 Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit consumes to make load-bearing decisions about each harness component.
 
 ## When to Use
 
 Activate when:
-- User runs `the benchmark skill run` (default = quick tier, 5 tasks, ≤$5)
-- User runs `the benchmark skill run --full` (quick tier + 1 heavy task, ≤$30)
-- User runs `the benchmark skill compare <run-id-a> <run-id-b>` (delta table)
+- User runs `$mk-benchmark run` (default = quick tier, 5 tasks, ≤$5)
+- User runs `$mk-benchmark run --full` (quick tier + 1 heavy task, ≤$30)
+- User runs `$mk-benchmark compare <run-id-a> <run-id-b>` (delta table)
 - Before applying a harness change (baseline)
 - After applying a harness change (verify delta)
 - During the dead-weight audit playbook (component enable/disable cycles)
@@ -25,7 +25,7 @@ Skip when:
 
 1. **Quick tier ≤$5 total cost.** Hard block if projected cost exceeds.
 2. **Full tier ≤$30 total cost.** Hard block if projected cost exceeds.
-3. **`--full` is opt-in.** The heavy task (`06-small-app-build`) requires explicit `--full` flag because it triggers `mk:autobuild` which can run for hours. Refuses to run without the flag.
+3. **`--full` is opt-in.** The heavy task (`06-small-app-build`) requires explicit `--full` flag because it triggers `mk-autobuild` which can run for hours. Refuses to run without the flag.
 4. **NOT a replacement for unit tests.** This is harness-level measurement only.
 5. **Results recorded in trace-log.jsonl** as `event=benchmark_result` records, tagged with `benchmark_version` + `harness_version` + `model_version`.
 
@@ -104,7 +104,7 @@ Each benchmark run writes a JSON dump to `.codex/benchmarks/results/{run-id}.jso
   "started": "2026-04-08T14:30:00Z",
   "ended": "2026-04-08T14:42:00Z",
   "harness_version": "3.0.0",
-  "model": "codex-opus-4-6",
+  "model": "<model-id>",
   "total_cost_usd": 4.20,
   "total_duration_seconds": 720,
   "tasks": [
@@ -135,9 +135,9 @@ of a repo are identical, or to snapshot tracked state over time.
 
 ```bash
 # single-repo snapshot
-bash .agents/skills/benchmark/scripts/git-index-audit.sh [repo-path]
+bash .agents/skills/mk-benchmark/scripts/git-index-audit.sh [repo-path]
 # comparison (adds local/remote-only counts + recursive diff status)
-bash .agents/skills/benchmark/scripts/git-index-audit.sh <local> <remote>
+bash .agents/skills/mk-benchmark/scripts/git-index-audit.sh <local> <remote>
 ```
 
 **Artifact location:** `.codex/benchmarks/audits/{YYMMDD-HHMMSS}-audit.json` — a SIBLING
@@ -159,10 +159,10 @@ the toolkit's, documented here and in the script header so future comparisons ar
 
 ## Gotchas
 
-- **`run-canary.sh` is an orchestrator-driven runner for the model-in-loop canary.** It writes a manifest with `PENDING` tasks then prints orchestrator instructions. The script CANNOT itself invoke `mk:autobuild` per task because each invocation requires a fresh sub-task context, which only an orchestrator agent can spawn — not a shell process. **The agent invoking this skill MUST follow the printed instructions to fill in each task's results.** Failure to do so leaves the manifest as a stub.
+- **`run-canary.sh` is an orchestrator-driven runner for the model-in-loop canary.** It writes a manifest with `PENDING` tasks then prints orchestrator instructions. The script CANNOT itself invoke `mk-autobuild` per task because each invocation requires a fresh sub-task context, which only an orchestrator agent can spawn — not a shell process. **The agent invoking this skill MUST follow the printed instructions to fill in each task's results.** Failure to do so leaves the manifest as a stub.
 - **The cost cap is now enforced (not just recorded).** After each task the orchestrator appends a `{costUsd,…}` receipt to the run's `.ledger.jsonl` and runs `run-canary.sh check-cap <ledger> <cap>`; exit 2 means the cap was reached and the run STOPS. Thresholds follow the harness rules Rule 6 (warn at $30, halt at the effective cap; `--budget N` / `MEOWKIT_BUDGET_CAP` override the tier cap). This mirrors the TypeScript cost-ledger the deferred live backends inherit.
 - **The cross-harness journey (J10) is not automated.** Its deterministic runner lived in the retired TypeScript CLI and was removed with it; CI still checks the journey specs' shape (`tests/journey-validation/check-journey-specs.py`). Run J10's migration → target validation → route/artifact/denied-token/side-effect checks by hand with `mewkit init --target <runtime>` and `mewkit validate --target <runtime>`.
-- **Circular dependency with `mk:autobuild`.** This skill invokes `mk:autobuild` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. The manual fallback: run individual canary specs via `the cook skill <spec.md>` and score by hand.
+- **Circular dependency with `mk-autobuild`.** This skill invokes `mk-autobuild` per task. If a harness bug is exactly what the dead-weight audit is trying to find, the audit can fail to even start. The manual fallback: run individual canary specs via `$mk-cook <spec.md>` and score by hand.
 - **Don't treat 100% pass as "harness is perfect."** Canary tasks are intentionally simple. Real-world failures live in the long tail; canary catches regressions, not all bugs.
 - **Don't skip `--full` for the dead-weight audit.** The audit needs the heavy task to detect issues that only manifest in real product builds.
 - **Don't compare runs across different model versions** without noting it in the delta table — model upgrade is a confounding variable.
@@ -172,14 +172,14 @@ the toolkit's, documented here and in the script header so future comparisons ar
 
 | File | Purpose |
 |---|---|
-| `scripts/run-canary.sh` | Emits a task manifest + a cost-ledger path; prints orchestrator instructions for the per-task harness runs. Does NOT invoke `mk:autobuild` directly (needs a fresh sub-task context only the orchestrator can spawn). `run-canary.sh check-cap <ledger> <cap>` enforces the Rule 6 cost cap between tasks (exit 2 = halt). |
+| `scripts/run-canary.sh` | Emits a task manifest + a cost-ledger path; prints orchestrator instructions for the per-task harness runs. Does NOT invoke `mk-autobuild` directly (needs a fresh sub-task context only the orchestrator can spawn). `run-canary.sh check-cap <ledger> <cap>` enforces the Rule 6 cost cap between tasks (exit 2 = halt). |
 | `scripts/compare-runs.sh` | Reads two prior run JSONs, emits delta table |
 | `../../benchmarks/README.md` | How to add new canary tasks |
 | `../../benchmarks/canary/` | Spec files |
 | `../../benchmarks/results/` | Per-run JSON dumps |
-| `../../memory/trace-log.jsonl` | Append-only trace store (benchmark results land here too) |
-| `..the autobuild skill/SKILL.md` | The harness skill that benchmark invokes per spec |
-| `..the trace-analyze skill/SKILL.md` | The consumer of benchmark results for the dead-weight audit |
+| `../../mk-memory/trace-log.jsonl` | Append-only trace store (benchmark results land here too) |
+| `../mk-autobuild/SKILL.md` | The harness skill that benchmark invokes per spec |
+| `../mk-trace-analyze/SKILL.md` | The consumer of benchmark results for the dead-weight audit |
 
 ## Start
 

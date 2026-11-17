@@ -26,7 +26,6 @@ All modes share these phases with mode-specific variations.
 - [Mode Flow Summary](#mode-flow-summary)
 - [Validation](#validation)
 
-
 **Task Tool Fallback:** `TaskCreate`/`TaskUpdate`/`TaskGet`/`TaskList` are CLI-only — unavailable in GUI editor extensions. If they error, use `TodoWrite` for progress tracking. Plan files remain source of truth.
 
 ## Phase 0: Orient
@@ -114,7 +113,7 @@ Write failing tests BEFORE implementation. TDD enforcement per `references/tdd-r
 1. Read plan's acceptance criteria and success criteria
 2. Spawn `tester` subagent via `mk:testing`:
    ```
-   Task(subagent_type="tester", prompt="Write failing tests for [plan-path] acceptance criteria. Tests must RUN (no syntax errors) and FAIL (not pass). Use mk:testing red-green-refactor reference.", description="Write failing tests")
+   Agent(subagent_type="tester", prompt="Write failing tests for [plan-path] acceptance criteria. Tests must RUN (no syntax errors) and FAIL (not pass). Use mk:testing red-green-refactor reference.", description="Write failing tests")
    ```
 3. Verify: tests run AND fail (compilation errors do NOT count as failing tests)
 4. If tests accidentally pass → wrong tests, rewrite
@@ -153,7 +152,7 @@ Note: this is a once-per-phase check, not a per-file one.
    - Self-heal up to 3 attempts (each attempt tries a DIFFERENT approach)
    - After 3 failures → spawn `researcher` subagent via `mk:investigate`:
      ```
-     Task(subagent_type="researcher", prompt="Analyze test failures using mk:investigate + mk:sequential-thinking: [output]. Root cause analysis.", description="Debug test failures")
+     Agent(subagent_type="researcher", prompt="Analyze test failures using mk:investigate + mk:sequential-thinking: [output]. Root cause analysis.", description="Debug test failures")
      ```
    - After analysis report → fix and retry
    - After 3 more failures → STOP, escalate to user with: failing output, attempted fixes, suspected root cause
@@ -172,7 +171,7 @@ Note: this is a once-per-phase check, not a per-file one.
 After tests are green, run `mk:simplify` before any review. This is mandatory.
 
 ```
-Task(subagent_type="developer", prompt="Run /mk:simplify on the Phase 3 output. Reduce complexity without breaking tests. All tests must still pass after simplification.", description="Simplify before review")
+Agent(subagent_type="developer", prompt="Run /mk:simplify on the Phase 3 output. Reduce complexity without breaking tests. All tests must still pass after simplification.", description="Simplify before review")
 ```
 
 **Why mandatory:** Reviewers catch logic errors better on simplified code. Submitting complex code to review creates review noise that obscures real issues. Simplify once, review once — cleaner than review-fix-simplify cycles.
@@ -199,7 +198,7 @@ If `red-team-findings.md` exists, load its contents and pass as additional conte
 Spawn `reviewer` subagent:
 
 ```
-Task(subagent_type="reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY. [If red-team-findings.md loaded]: Also cross-reference the attached plan-level adversarial findings against the implementation — note which findings were addressed and which remain open.", description="Code review")
+Agent(subagent_type="reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY. [If red-team-findings.md loaded]: Also cross-reference the attached plan-level adversarial findings against the implementation — note which findings were addressed and which remain open.", description="Code review")
 ```
 
 See `review-cycle.md` for interactive vs auto handling.
@@ -270,7 +269,7 @@ run summary.
 
 2. **Spawn evaluator subagent:**
    ```
-   Task(
+   Agent(
      subagent_type="evaluator",
      prompt="Run /mk:evaluate on this build.
        Target: {project_root_path}
@@ -297,7 +296,7 @@ requests shipping; a PASS verdict is not a request to ship.
 Spawn `shipper` (which orchestrates pre-ship checks + invokes `git-manager` for commit/PR + CI verification + rollback docs):
 
 ```
-Task(subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.cjs (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk:ship skill.", description="Ship + PR")
+Agent(subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.cjs (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk:ship skill.", description="Ship + PR")
 ```
 
 Note: `shipper` is the orchestrator — it invokes `git-manager` internally for raw git operations (commit, push). Cook never spawns `git-manager` directly; that is shipper's responsibility. See SKILL.md Required Subagents table.
@@ -316,7 +315,7 @@ Three mandatory subagents in parallel:
    Sync-back algorithm authority: `.claude/skills/plan-creator/references/task-management.md` (Sync-Back Algorithm).
 
    ```
-Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
+Agent(subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
    ```
 
    If sync-back leaves every non-abandoned phase todo checked, archive the plan with `mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `/mk:ship`.
@@ -324,7 +323,7 @@ Task(subagent_type="planner", prompt="Run full sync-back for [plan-path] using t
 2. **Docs update:**
 
    ```
-   Task(subagent_type="documenter", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
+   Agent(subagent_type="documenter", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
    ```
 
 3. `TaskUpdate` → mark all session tasks complete after sync-back
@@ -484,7 +483,7 @@ difference is that `auto` does not pause to discuss it.
 
 ## Validation
 
-- If Task() tool calls = 0 at end of workflow → INCOMPLETE
+- If Agent() tool calls = 0 at end of workflow → INCOMPLETE
 - All step outputs follow: `Phase [N]: [status] — [metrics]`
 - Once Phase 6 begins, run all required reflection steps before reporting it complete.
 - Per-phase checkpoint (phase-file checkboxes + plan.md Agent State) written for every completed plan phase before the next-phase transition

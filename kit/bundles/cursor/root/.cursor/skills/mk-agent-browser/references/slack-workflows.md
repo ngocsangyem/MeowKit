@@ -2,6 +2,17 @@
 
 Common browser-automation patterns for Slack. Use with `agent-browser`, not the Slack API.
 
+## Contents
+
+- [Start](#start)
+- [Check Unread Messages](#check-unread-messages)
+- [Search Conversations](#search-conversations)
+- [Navigate To A Channel](#navigate-to-a-channel)
+- [Extract Visible Workspace Data](#extract-visible-workspace-data)
+- [Send A Message](#send-a-message)
+- [Evidence Report](#evidence-report)
+- [Limitations](#limitations)
+
 ## Start
 
 Prefer an existing logged-in Slack browser session:

@@ -2,7 +2,7 @@
 # fetch-workflow.sh — discover a Jira workflow definition and cache it.
 #
 # Usage:
-#   bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/fetch-workflow.sh <ISSUE_KEY>
+#   bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/fetch-workflow.sh <ISSUE_KEY>
 #       Discovers the workflow for the (project, issue-type) of <ISSUE_KEY>
 #       via `admin workflow for-issue` (admin path). On 403 falls back to
 #       `lifecycle transitions <ISSUE_KEY>` (non-admin path; partial).
@@ -16,8 +16,8 @@
 
 set -euo pipefail
 
-ROOT="$(git rev-parse --show-toplevel):-$(pwd)}"
-WRAPPER="$ROOT/.agents/skills/jira/scripts/jira-as.sh"
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+WRAPPER="$ROOT/.agents/skills/mk-jira/scripts/jira-as.sh"
 CACHE_DIR="$ROOT/tasks/jira-workflows"
 SCHEMES_DIR="$CACHE_DIR/_schemes"
 NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -61,7 +61,7 @@ if [ $RC -eq 0 ] && [ -n "$WF_JSON" ]; then
   {
     echo "# Workflow: $WF_NAME"
     echo
-    echo "<!-- managed by .agents/skills/jira/scripts/fetch-workflow.sh — manual edits will be overwritten on re-fetch -->"
+    echo "<!-- managed by .agents/skills/mk-jira/scripts/fetch-workflow.sh — manual edits will be overwritten on re-fetch -->"
     echo
     echo "- **Source**: \`admin workflow for-issue $ISSUE_KEY\` (admin path)"
     echo "- **Fetched**: $NOW"

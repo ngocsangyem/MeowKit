@@ -33,7 +33,7 @@ An agent's `model:` frontmatter follows its tier in the table above. Pins are no
 
 | Agent tier | `model:` value | Agents |
 | --- | --- | --- |
-| COMPLEX (design, review, security, judgment) | `claude-opus-5` | architect, brainstormer, developer, evaluator, planner, reviewer, security, ui-ux-designer, confluence-spec-analyst, jira-analyst, jira-estimator, jira-evaluator |
+| COMPLEX (design, review, security, judgment) | `opus` | architect, brainstormer, developer, evaluator, planner, reviewer, security, ui-ux-designer, confluence-spec-analyst, jira-analyst, jira-estimator, jira-evaluator |
 | STANDARD (implementation support, research, multi-step integration work) | `sonnet` | analyst, journal-writer, orchestrator, researcher, tester, confluence-bulk, confluence-page, jira-admin, jira-bulk, jira-collaborate, jira-dev, jira-jsm, jira-lifecycle |
 | TRIVIAL (mechanical, single-call or report-only) | `haiku` | documenter, explore, git-manager, project-manager, shipper, story-sizer, confluence-collaborate, confluence-search, jira-agile, jira-fields, jira-issue, jira-ops, jira-relationships, jira-search, jira-time |
 | Strategy consult (one recommendation, no lifecycle phase) | `fable` | advisor, athena |

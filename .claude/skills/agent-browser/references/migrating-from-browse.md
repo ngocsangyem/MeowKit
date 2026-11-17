@@ -2,6 +2,14 @@
 
 This doc covers the verb-to-verb mapping, copy-paste recipes for capabilities `agent-browser` doesn't ship natively, and a runbook for the developer-machine handoff/auth flow.
 
+## Contents
+
+- [Verb-to-Verb Mapping](#verb-to-verb-mapping)
+- [Recipes](#recipes)
+- [Handoff / Resume Runbook (CAPTCHA, MFA)](#handoff--resume-runbook-captcha-mfa)
+- [Removed verbs and their replacements](#removed-verbs-and-their-replacements)
+- [Quick smoke test](#quick-smoke-test)
+
 > **Auth-state compatibility:** gstack's `cookie-import` JSON files are NOT compatible with `agent-browser`. Re-authenticate with `agent-browser auth save` or capture fresh state via `state save`. Do not attempt to convert legacy files.
 
 > **Sessions and credentials:** any recipe that uses `--session <name> --restore` writes session state (cookies, localStorage) under agent-browser's session store. To encrypt at rest, set `AGENT_BROWSER_ENCRYPTION_KEY` in your shell or CI secret store before invoking. Without the key the file is plaintext.

@@ -2,6 +2,18 @@
 
 Maps a `StoryRecord` to a Fibonacci point estimate, complexity verdict, inconsistency flags, optional split proposal, and (when the Agile rules are loaded) a DoR advisory. Reuses Fibonacci anchors from `.claude/skills/jira/references/estimation-guide.md` — DO NOT drift from that table.
 
+## Contents
+
+- [Inputs / Outputs](#inputs--outputs)
+- [Complexity Dimensions (deterministic scoring)](#complexity-dimensions-deterministic-scoring)
+- [Fibonacci Mapping](#fibonacci-mapping)
+- [Inconsistency Detection](#inconsistency-detection)
+- [Split Proposal](#split-proposal)
+- [DoR Advisory (conditional)](#dor-advisory-conditional)
+- [Determinism](#determinism)
+- [Refusal Path](#refusal-path)
+- [Cross-references](#cross-references)
+
 ## Inputs / Outputs
 
 ```text

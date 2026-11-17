@@ -2,7 +2,7 @@
 name: mk:nyquist
 version: 1.0.0
 preamble-tier: 3
-description: Maps plan acceptance criteria onto test files and reports which requirements have no test. NOT for mk:testing.
+description: "Maps plan acceptance criteria to tests; flags untested ones. NOT for mk:testing."
 allowed-tools:
   - Read
   - Grep
@@ -14,7 +14,7 @@ keywords:
   - requirement-mapping
   - coverage-gap
   - acceptance-criteria
-when_to_use: Asked whether the suite actually covers every acceptance criterion.
+when_to_use: "Asked if tests cover every criterion."
 user-invocable: true
 owner: research
 criticality: medium

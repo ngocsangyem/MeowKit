@@ -274,7 +274,7 @@ def append_to_report(result: dict, report_path: Optional[str]) -> None:
             "",
             f"Reason: {result.get('stopped_reason')}",
             "",
-            "Manual cleanup hint: `the jira-lifecycle skill delete <KEY>` per ticket above.",
+            "Manual cleanup hint: `$mk-jira-lifecycle delete <KEY>` per ticket above.",
         ]
     if result.get("comment_failures"):
         lines += ["", "## Comment Failures", ""]

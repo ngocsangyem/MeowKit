@@ -2,6 +2,19 @@
 
 These rules govern the periodic audit that keeps the harness pruned across model upgrades. The audit implements the "dead-weight thesis": every harness component encodes an assumption about what the model CANNOT do, and assumptions need stress-testing as models improve.
 
+## Contents
+
+- [Rule 1: When the Audit must Run](#rule-1-when-the-audit-must-run)
+- [Rule 2: The Audit Is Benchmark-Driven, Not Subjective](#rule-2-the-audit-is-benchmark-driven-not-subjective)
+- [Rule 3: Decision Thresholds](#rule-3-decision-thresholds)
+- [Rule 4: Components That never Prune](#rule-4-components-that-never-prune)
+- [Rule 5: Re-Audit Across Two Consecutive Model Versions Before Pruning](#rule-5-re-audit-across-two-consecutive-model-versions-before-pruning)
+- [Rule 6: Registry of Decisions](#rule-6-registry-of-decisions)
+- [Rule 7: Anti-Patterns](#rule-7-anti-patterns)
+- [Rule 8: Circular-Dependency Workaround](#rule-8-circular-dependency-workaround)
+- [On-Demand Recall Surfaces (deterministic, advisory)](#on-demand-recall-surfaces-deterministic-advisory)
+- [Applies To](#applies-to)
+
 ## Rule 1: When the Audit MUST Run
 
 The dead-weight audit MUST be run on any of the following triggers:

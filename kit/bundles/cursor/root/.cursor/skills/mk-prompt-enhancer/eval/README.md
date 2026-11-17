@@ -1,4 +1,4 @@
-# `mk:prompt-enhancer` Eval Suite
+# `mk-prompt-enhancer` Eval Suite
 
 > 21 canary cases: #1–#6 default mode, #7–#10 deep mode, #11–#12 recipe mode
 > (architecture-review, research), #13–#21 classifier / target-notes / language /
@@ -103,7 +103,7 @@ These canaries block rollout if they fail:
   `--analyze` without a named target).
 - **Canary #18 / #19** — language preservation (content follows input language;
   kernel labels stay English; no normalization).
-- **Canary #20** — context-gate boundary (recommends `mk:context-engineering`;
+- **Canary #20** — context-gate boundary (recommends `mk-context-engineering`;
   reads no repo/docs without `--deep`; no fabricated file list).
 - **Canary #21** — neutral data fence (no `<context>`/XML delimiter; data block unchanged).
 

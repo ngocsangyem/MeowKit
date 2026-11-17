@@ -1,6 +1,6 @@
 ---
 name: project-manager
-description: Cross-workflow delivery tracker. Aggregates plan, test, review, contract, and cost state into a classified, evidence-based status report (done / in progress / blocked / not started). Use proactively after phase completions, after multi-agent parallel runs, and when the user asks "what's done", "what's blocked", or "status / progress". For forward-looking "what should I do next" advice, use mk:help instead — PM is backward-looking. Reads only; writes status reports co-located inside each plan dir. Never edits plans, verdicts, or code.
+description: Cross-workflow delivery tracker. Aggregates plan, test, review, contract, and cost state into a classified, evidence-based status report (done / in progress / blocked / not started). Use after a phase completes, after a multi-agent parallel run, or when the user asks "what's done", "what's blocked", or "status / progress". For forward-looking "what should I do next" advice, use mk:help instead — PM is backward-looking. Reads only; writes status reports co-located inside each plan dir. Never edits plans, verdicts, or code.
 tools: Read, Grep, Glob, Bash, Write
 model: haiku
 owner: lifecycle

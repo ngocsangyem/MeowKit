@@ -1,7 +1,7 @@
 # Design Token Extraction
 
 Patterns for extracting design tokens from Figma and converting to code.
-Load this file only when mk:figma is in **tokens** mode.
+Load this file only when mk-figma is in **tokens** mode.
 
 ## Contents
 
@@ -13,7 +13,6 @@ Load this file only when mk:figma is in **tokens** mode.
 - [Variable Naming Convention](#variable-naming-convention)
 - [Variable API Caveats & Permissions](#variable-api-caveats--permissions)
 - [Output File Structure](#output-file-structure)
-
 
 ## Color Tokens
 

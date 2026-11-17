@@ -2,6 +2,17 @@
 
 Quick reference for JIRA Query Language syntax and common queries.
 
+## Contents
+
+- [Basic Syntax](#basic-syntax)
+- [Common Fields](#common-fields)
+- [Operators](#operators)
+- [Common Queries](#common-queries)
+- [Functions](#functions)
+- [Ordering](#ordering)
+- [Advanced Examples](#advanced-examples)
+- [See Also](#see-also)
+
 ## Basic Syntax
 
 ```

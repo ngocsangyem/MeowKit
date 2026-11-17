@@ -4,6 +4,15 @@ External-artifact adapter for plan-creator. Consolidates 2+ pre-existing upstrea
 artifacts into ONE packet before planning starts, so the draft step reads one
 traceable brief instead of N scattered reports.
 
+## Contents
+
+- [Purpose](#purpose)
+- [Activation](#activation)
+- [Schema](#schema)
+- [Quality Rules](#quality-rules)
+- [Output Location](#output-location)
+- [Not This Skill's Job](#not-this-skills-job)
+
 ## Purpose
 
 When a user invokes plan-creator, upstream analysis often already exists:

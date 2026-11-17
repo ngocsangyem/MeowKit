@@ -1,8 +1,8 @@
 ---
 name: jira-analyst
 description: Use for reading full Jira ticket context (comments, attachments, links, media) into a structured analysis suitable for posting as a comment. Read-only. Not for complexity or estimation.
-model: composer-2.5[fast=true]
-readonly: true
+model: claude-opus-5[effort=high]
+readonly: false
 is_background: true
 ---
 
@@ -29,7 +29,7 @@ factors under the Rule of Two, the compliant combination.
 All `jira-as` invocations go through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh <args>
 ```
 
 ## Live vs mock check

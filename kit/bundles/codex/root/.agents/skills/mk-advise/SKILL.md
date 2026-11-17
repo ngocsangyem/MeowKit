@@ -1,6 +1,6 @@
 ---
 name: "mk-advise"
-description: "Turn a raw idea into ONE honest recommendation: interview one question at a time until confirmed, then give a verdict with trade-offs and a checklist. Not for options or debate."
+description: "Gives ONE recommendation after a one-question interview. NOT for mk-party."
 ---
 
 # Advise
@@ -10,8 +10,8 @@ One question at a time until the problem is confirmed, then one honest verdict.
 ## What This Is (and what it is not)
 
 Advise sits between interrogation and implementation. It **interviews** like
-`mk:grill`, but grill deliberately stops before recommending anything — advise
-exists to recommend. It **weighs options** like `mk:brainstorming`, but
+`mk-grill`, but grill deliberately stops before recommending anything — advise
+exists to recommend. It **weighs options** like `mk-brainstorming`, but
 brainstorming enumerates alternatives for a problem you have already validated —
 advise starts before that, by questioning whether the problem is even the right
 one, and ends with a single pick rather than a menu.
@@ -25,11 +25,11 @@ and only then answer.
 
 | If the user wants… | Use | Not advise, because… |
 |---|---|---|
-| To be interrogated on their own plan, no answers given | `mk:grill` | Grill never recommends; advise exists to recommend |
-| Alternatives compared for a validated problem | `mk:brainstorming` | Advise questions the problem itself, and picks one option |
-| "Is this worth building at all?" | `mk:office-hours` | That is a product-existence question, upstream of advice |
-| Several perspectives to argue a trade-off | `mk:party` | Advise is one advisor giving one verdict |
-| A plan with phases | `mk:plan-creator` | Advice is not a plan; see Boundaries below |
+| To be interrogated on their own plan, no answers given | `mk-grill` | Grill never recommends; advise exists to recommend |
+| Alternatives compared for a validated problem | `mk-brainstorming` | Advise questions the problem itself, and picks one option |
+| "Is this worth building at all?" | `mk-office-hours` | That is a product-existence question, upstream of advice |
+| Several perspectives to argue a trade-off | `mk-party` | Advise is one advisor giving one verdict |
+| A plan with phases | `mk-plan-creator` | Advice is not a plan; see Boundaries below |
 
 Overlap is the failure mode this skill is most likely to cause. When two rows
 fit, prefer the neighbor — advise is the narrower tool, not the catch-all.
@@ -113,19 +113,19 @@ verdicts, and are often the most valuable ones.
 
 The packet **must not** contain, and this skill must never produce:
 
-- A plan phase graph — that is `mk:plan-creator`, after the user acts on advice
+- A plan phase graph — that is `mk-plan-creator`, after the user acts on advice
 - An ADR — that is the architect's artifact
 - A diff, patch, or source change
-- A review verdict — that is `mk:review`'s output, read by the user
+- A review verdict — that is `mk-review`'s output, read by the user
 - Any mutation of `.meowkit/memory/` decisions
 
-Advise **never auto-runs** `mk:plan-creator` or `mk:cook`. It ends with the
+Advise **never auto-runs** `mk-plan-creator` or `mk-cook`. It ends with the
 packet. If the user wants a plan next, they ask for one — an advisor that starts
 building has stopped advising, and the user never approved the build.
 
 ## Execution
 
-Default: the isolated `advisor` agent (see `.codex/agents/advisor.md`), which
+Default: the isolated `advisor` agent (see `.codex/agents/advisor.toml`), which
 runs on the Fable 5 advisory profile.
 
 The harness has **no sub-task pause/resume** (the orchestration rules → Rejected
@@ -184,7 +184,7 @@ Run the checklist there after any edit to this skill's fences or to a neighbor's
 - **Becoming brainstorming.** Ending with four options and no pick is a menu, not
   advice. Pick one and own it.
 - **Becoming a plan.** A checklist is ordered steps. A phase graph with owners
-  and dependencies is `mk:plan-creator`'s artifact — stop before it.
+  and dependencies is `mk-plan-creator`'s artifact — stop before it.
 - **Interviewing past usefulness.** When two answers in a row don't move the
   reframing, you are collecting, not learning. Present the reframing.
 - **Silent inline fallback.** Running inline without disclosing it sells

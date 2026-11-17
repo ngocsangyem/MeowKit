@@ -1,6 +1,6 @@
 ---
 name: "mk-backend-development"
-description: "Design and implement backend changes end to end: endpoints, handlers, services, integrations, webhooks, jobs, authenticated access. Routes contracts to api-design-principles, schema to database."
+description: "Implements backend endpoints, services, webhooks, jobs; contracts go to mk-api-design-principles."
 ---
 
 # Backend Development
@@ -11,34 +11,34 @@ Coordinates a backend change end to end. It routes; it does not absorb the speci
 
 | Owner | Owns | Does NOT own |
 |---|---|---|
-| `mk:api-design-principles` | Interface contract: resource/type/message shape, error and authorization *requirements*, compatibility and deprecation, consumer discovery | Implementation, persistence, security verdict, release |
-| `mk:backend-development` | End-to-end backend change: discovery, classification, service/handler/integration work, wiring the specialists together | Contract authorship, schema/SQL, security verdict, deploy |
-| `mk:database` | Data invariants, schema, migration and recovery, query/index evidence, ORM boundary | API contract, authorization verdict, infrastructure execution |
-| `mk:devops` | Infrastructure-as-code, containers, CI, runtime config, deployment safety design, rollback, incident diagnosis | Deploy approval and execution, security verdict, code root-cause, schema semantics |
+| `mk-api-design-principles` | Interface contract: resource/type/message shape, error and authorization *requirements*, compatibility and deprecation, consumer discovery | Implementation, persistence, security verdict, release |
+| `mk-backend-development` | End-to-end backend change: discovery, classification, service/handler/integration work, wiring the specialists together | Contract authorship, schema/SQL, security verdict, deploy |
+| `mk-database` | Data invariants, schema, migration and recovery, query/index evidence, ORM boundary | API contract, authorization verdict, infrastructure execution |
+| `mk-devops` | Infrastructure-as-code, containers, CI, runtime config, deployment safety design, rollback, incident diagnosis | Deploy approval and execution, security verdict, code root-cause, schema semantics |
 
 Routing rules — identical in all four skills:
 
-- **Contract-only API question → `mk:api-design-principles`**, even in the middle of a task
+- **Contract-only API question → `mk-api-design-principles`**, even in the middle of a task
   owned by another skill. "Contract" means what a consumer can observe: field set, error
   shape, status semantics, pagination, versioning. Extending an endpoint without changing
   any of those is not a contract change.
-- **End-to-end backend change → `mk:backend-development`**, which invokes the API skill only
+- **End-to-end backend change → `mk-backend-development`**, which invokes the API skill only
   when a new, public, or breaking contract is in scope.
 - **A message-based change (event, webhook, RPC) splits**: the message contract belongs to
-  `mk:api-design-principles`; the producer or consumer implementation belongs to
-  `mk:backend-development`.
-- **Schema, migration, query, index, or ORM work → `mk:database`.** No other skill writes a
+  `mk-api-design-principles`; the producer or consumer implementation belongs to
+  `mk-backend-development`.
+- **Schema, migration, query, index, or ORM work → `mk-database`.** No other skill writes a
   migration or generic SQL.
-- **Infrastructure, containers, delivery, or deployment safety → `mk:devops`.**
+- **Infrastructure, containers, delivery, or deployment safety → `mk-devops`.**
 - **An unscoped performance request is triaged by evidence, never by guess**:
-  `mk:backend-development` locates where the time actually goes, then hands a query or index
-  question to `mk:database` and a capacity or runtime question to `mk:devops`. No skill
+  `mk-backend-development` locates where the time actually goes, then hands a query or index
+  question to `mk-database` and a capacity or runtime question to `mk-devops`. No skill
   invents the target.
-- **Code root cause → `mk:investigate`.** `mk:devops` owns the operational picture — what
+- **Code root cause → `mk-investigate`.** `mk-devops` owns the operational picture — what
   changed, where it fails, which signal proves it — and hands the defect over.
 - **An auth-sensitive change**: the owning skill states the *requirement*; the security
   workflow owns the verdict.
-- **Any production effect → `mk:ship` or a human.**
+- **Any production effect → `mk-ship` or a human.**
 
 ## Workflow
 
@@ -56,12 +56,12 @@ set is a finding, not an assumption to fill in.
 
 | Class | Signal | Route |
 |---|---|---|
-| Contract-only | The change is what the interface promises, not what runs | `mk:api-design-principles`; stop here |
+| Contract-only | The change is what the interface promises, not what runs | `mk-api-design-principles`; stop here |
 | Service logic | Behavior inside an existing boundary; no contract or schema delta | Stay here |
-| Data | Reads or writes change shape, volume, or invariants | `mk:database` for the schema/query part |
+| Data | Reads or writes change shape, volume, or invariants | `mk-database` for the schema/query part |
 | Auth | Identity, permission, tenancy, or an audited action is touched | State the requirement; security workflow owns the verdict |
 | Async / event | Work leaves the request path — job, consumer, webhook, scheduled task | Stay here; see failure semantics below |
-| Production readiness | The question is operability, not behavior | `mk:devops` |
+| Production readiness | The question is operability, not behavior | `mk-devops` |
 
 Most real tasks are two or three of these. Handle each with its owner; keep the composition here.
 

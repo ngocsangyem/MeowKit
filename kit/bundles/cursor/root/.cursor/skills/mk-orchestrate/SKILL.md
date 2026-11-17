@@ -1,6 +1,6 @@
 ---
 name: "mk-orchestrate"
-description: "Coordinate staged or parallel jobs across coding-agent runtimes and subagents: routes by capability/risk, isolates writers in worktrees, arbitrates results. NOT for a single-agent task (mk:cook)."
+description: "Splits a job across agent runtimes and subagents in worktrees. NOT for mk-cook."
 ---
 
 # Orchestrate
@@ -54,7 +54,7 @@ contract mismatch.
 This skill composes with existing toolkit primitives instead of reimplementing
 them:
 
-- **Worktrees** — delegate lifecycle to `mk:worktree` (create → merge →
+- **Worktrees** — delegate lifecycle to `mk-worktree` (create → merge →
   cleanup). See Worktree Isolation below.
 - **In-session subagents** — internal jobs spawn the re-authored toolkit agent
   roster (planner, architect, brainstormer, researcher, developer, tester,
@@ -66,13 +66,13 @@ them:
   **max 3 concurrent internal agents**, zero file-ownership overlap, worktree
   isolation for writers. External CLI runtimes may exceed 3 but default
   conservative.
-- **Prompt building** — use `mk:delegate` to assemble each job's subagent prompt
+- **Prompt building** — use `mk-delegate` to assemble each job's subagent prompt
   from the delegation template (task + files + acceptance criteria + ownership).
-- **Task claiming** — for durable multi-session runs, `mk:task-queue` enforces
+- **Task claiming** — for durable multi-session runs, `mk-task-queue` enforces
   ownership; the run's `state.json` is the coordinator's own record.
 - **Tier bridge** — the capability tiers (C1/C2/C3) and risk tiers (R0–R3) in
   [model-routing.md](references/model-routing.md) are the job-routing axes;
-  `mk:scale-routing` + the model-selection rules remain the source for
+  `mk-scale-routing` + the model-selection rules remain the source for
   the toolkit's TRIVIAL/STANDARD/COMPLEX model-tier mapping when routing internal
   agents.
 
@@ -165,7 +165,7 @@ Orchestrate Progress:
 
 ### 5. Dispatch and capture
 
-- Create each required worktree (via `mk:worktree`) before dispatch and pin the
+- Create each required worktree (via `mk-worktree`) before dispatch and pin the
   job's cwd to it.
 - Start independent jobs together only up to `concurrency` (and the max-3
   internal-agent limit).
@@ -204,7 +204,7 @@ Orchestrate Progress:
 ## Worktree Isolation
 
 - Create one worktree per isolated job from the accepted base ref (via
-  `mk:worktree create`).
+  `mk-worktree create`).
 - Use a unique branch under the run namespace; set the job's cwd to that
   worktree.
 - Never share a worktree across jobs or reuse a failed attempt without an
@@ -213,7 +213,7 @@ Orchestrate Progress:
   sequence, or shared configuration — separate worktrees defer those conflicts,
   they do not resolve them.
 - Integration is coordinator-owned and happens only after the arbiter pass
-  (`mk:worktree merge` + integration test per the parallel-execution rules
+  (`mk-worktree merge` + integration test per the parallel-execution rules
   Rule 5). Summarize diffs first; merging is a separate reviewed step.
 - Remove only integrated or explicitly discarded worktrees. Preserve failed
   worktrees for diagnosis and list them in the report.

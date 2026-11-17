@@ -2,6 +2,22 @@
 
 These rules govern how new and existing `mk:*` skills are authored, audited, and persisted.
 
+## Contents
+
+- [Rule 1: Every Skill must Include a Gotchas Section](#rule-1-every-skill-must-include-a-gotchas-section)
+- [Rule 2: Persistent Skill State must Use ${CLAUDE_PLUGIN_DATA}](#rule-2-persistent-skill-state-must-use-claude_plugin_data)
+- [Rule 3: SKILL.md Body must Stay Under 500 Lines](#rule-3-skillmd-body-must-stay-under-500-lines)
+- [Rule 4: Every Skill must Carry keywords / when_to_use / user-invocable](#rule-4-every-skill-must-carry-keywords--when_to_use--user-invocable)
+- [Advisory Frontmatter Fields](#advisory-frontmatter-fields)
+- [Commands vs Skills (the kit ships one surface)](#commands-vs-skills-the-kit-ships-one-surface)
+- [Rule 5: Docs References Follow the Two-Tier Contract](#rule-5-docs-references-follow-the-two-tier-contract)
+- [Rule 6: Match Control to Risk](#rule-6-match-control-to-risk)
+- [Rule 7: Keep Generic Content Portable](#rule-7-keep-generic-content-portable)
+- [Rule 8: Preserve Contracted Workflow Choices](#rule-8-preserve-contracted-workflow-choices)
+- [Rule 9: Enforce Brand Prose Incrementally](#rule-9-enforce-brand-prose-incrementally)
+- [Rule 10: Reach the Skill's Own Files Without `.claude/`](#rule-10-reach-the-skills-own-files-without-claude)
+- [Applies to](#applies-to)
+
 ## Rule 1: Every Skill MUST Include a Gotchas Section
 
 Every `SKILL.md` MUST include a `## Gotchas` section. Empty is acceptable on day 1 (use placeholder `(none yet — grow from observed failures)`), but the section header itself is mandatory.

@@ -111,13 +111,7 @@ If a script fails — fix it, don't stop.
 
 ## Compaction Policy
 
-When Claude Code auto-compacts this session, ALWAYS preserve verbatim:
-
-- The full text of every numbered Rule in `.claude/rules/injection-rules.md` (especially Rule 11 — Skill Rule of Two — which is itself a rescue rule from a prior compaction regression)
-- The Subagent Status Protocol from `.claude/rules/agent-conduct.md` (A1)
-- The names of the 4 always-on safety/baseline rules: `security-rules.md`, `injection-rules.md`, `core-behaviors.md`, `development-rules.md`
-
-WHY: Compaction summarizes; safety rules cannot be summarized without losing enforcement specifics. Always preserve verbatim` block.
+What to preserve verbatim when Claude Code compacts a session is listed once, in `.claude/rules/meowkit-core.md` (Compaction Policy), which loads every session.
 
 ## Pointers (relocated content)
 

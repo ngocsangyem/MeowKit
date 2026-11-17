@@ -1,6 +1,6 @@
 ---
 name: "mk-angular"
-description: "Angular v20+ patterns: components, signals, services, forms, routing, HTTP, testing, SSR. Auto-activates on .ts files in Angular projects (angular.json detected)."
+description: "Angular v20+ patterns: components, signals, forms, SSR; use in angular.json projects."
 ---
 
 # Angular
@@ -47,4 +47,4 @@ Full list: `references/gotchas.md`
 
 ## Workflow Integration
 
-Auto-activates during Phase 3 (Build) when Angular project detected (angular.json or @angular/core in package.json). Loaded by `developer` agent alongside `mk:typescript`.
+Auto-activates during Phase 3 (Build) when Angular project detected (angular.json or @angular/core in package.json). Loaded by `developer` agent alongside `mk-typescript`.

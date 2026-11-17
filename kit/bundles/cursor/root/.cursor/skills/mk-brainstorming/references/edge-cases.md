@@ -4,7 +4,7 @@ Situations where the obvious brainstorming approach is wrong. Pattern adapted fr
 
 ## 1. The user says "just brainstorm" but the problem is actually invalidated
 
-The user wants to skip ahead to "how" but they haven't confirmed "what" or "why". The instinct is to comply with the request — resist it. Ask one targeted question to surface the unvalidated assumption. If the answer is unclear, redirect to `mk:office-hours` before continuing.
+The user wants to skip ahead to "how" but they haven't confirmed "what" or "why". The instinct is to comply with the request — resist it. Ask one targeted question to surface the unvalidated assumption. If the answer is unclear, redirect to `mk-office-hours` before continuing.
 
 ## 2. Three "approaches" turn out to be variations of the same idea
 
@@ -40,4 +40,4 @@ The codebase matters, so you run scout and paste a full report into the brainsto
 
 ## 10. The best handoff has no selected idea
 
-The report lists good options but avoids a recommendation. `mk:plan-creator` cannot turn that into phases without repeating discovery. If no idea wins, say "no clear winner" and ask for one tie-break criterion; otherwise emit the handoff packet.
+The report lists good options but avoids a recommendation. `mk-plan-creator` cannot turn that into phases without repeating discovery. If no idea wins, say "no clear winner" and ask for one tie-break criterion; otherwise emit the handoff packet.

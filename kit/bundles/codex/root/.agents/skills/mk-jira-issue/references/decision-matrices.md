@@ -2,6 +2,22 @@
 
 Quick reference tables for common JIRA issue management decisions.
 
+## Contents
+
+- [Issue Type Decision Matrix](#issue-type-decision-matrix)
+- [Story vs Task Decision](#story-vs-task-decision)
+- [Bug Severity Matrix](#bug-severity-matrix)
+- [Priority Definitions](#priority-definitions)
+- [Priority Decision Framework](#priority-decision-framework)
+- [Priority vs Severity (Bugs)](#priority-vs-severity-bugs)
+- [Labels vs Components vs Custom Fields](#labels-vs-components-vs-custom-fields)
+- [Field Selection Decision Tree](#field-selection-decision-tree)
+- [Epic Guidelines](#epic-guidelines)
+- [Common Anti-Patterns](#common-anti-patterns)
+- [Label Anti-Patterns](#label-anti-patterns)
+- [Quality Metrics Targets](#quality-metrics-targets)
+- [Summary Pattern Cheat Sheet](#summary-pattern-cheat-sheet)
+
 ---
 
 ## Issue Type Decision Matrix

@@ -1,11 +1,11 @@
 ---
 name: "mk-autobuild"
-description: "Runs autonomous multi-hour green-field builds: planner, contract, generator/evaluator loop, scaffolding density per model tier. NOT for scoped tasks (mk:cook); NOT for scaffolding only (mk:bootstrap)."
+description: "Builds a whole green-field product unattended, loop of planner and evaluator. NOT for mk-cook."
 ---
 
 <!-- Lifecycle canonical source: this bundle's step files (step-00..step-06) — autobuild steps are Step 0–6 (distinct from the 7 lifecycle phases) -->
 
-# mk:autobuild — Autonomous Multi-Hour Build Orchestration
+# mk-autobuild — Autonomous Multi-Hour Build Orchestration
 
 Step-file workflow that runs the complete generator/evaluator harness pipeline as an autonomous build. Handles green-field product builds (planner stage → contract stage → evaluator loop → ship decision) with adaptive scaffolding density based on detected model tier.
 <!-- Note: autobuild pipeline stages are numbered Step 0–6 (see Workflow section below). -->
@@ -14,23 +14,23 @@ Step-file workflow that runs the complete generator/evaluator harness pipeline a
 ## When to Use
 
 Activate when:
-- User runs `the autobuild skill "build a X"` (or any green-field product description)
-- Existing kit detection routes a green-field "build me an app" intent here instead of `mk:cook`
+- User runs `/mk-autobuild "build a X"` (or any green-field product description)
+- Existing kit detection routes a green-field "build me an app" intent here instead of `mk-cook`
 - A multi-hour autonomous build is requested with no manual handholding
 
 Skip when:
-- The task is a single feature, bug fix, or refactor → use `the cook skill` instead
+- The task is a single feature, bug fix, or refactor → use `/mk-cook` instead
 - The task is a doc update → use the existing doc skills
 - The request is "explain X" or "review Y" → use the appropriate single-shot skill
 
 ## Hard Constraints
 
-1. **Adaptive density** — picks scaffolding density via `mk:scale-routing` (or `density-select.sh`); honors `MEOWKIT_AUTOBUILD_MODE` env override
+1. **Adaptive density** — picks scaffolding density via `mk-scale-routing` (or `density-select.sh`); honors `MEOWKIT_AUTOBUILD_MODE` env override
 2. **Budget caps** — warns at $30 spent, requires explicit approval at $100, hard-blocks at user-set `--budget` value
 3. **6-hour wall-clock timeout** — hard limit per Anthropic's observed runs <!-- research-citation -->; checkpoints every step for resumability
 4. **Max 3 iteration rounds** between generator and evaluator before escalating to human (configurable via `--max-iter`)
 5. **Run report mandatory** — every autobuild run produces `tasks/autobuild-runs/YYMMDD-{slug}/run.md` with full audit trail
-6. **Coexists with `mk:cook`** — does not replace it; both plan with the user first and review the diff before shipping
+6. **Coexists with `mk-cook`** — does not replace it; both plan with the user first and review the diff before shipping
 7. **TDD opt-in (parallel to cook):** autobuild respects `--tdd` like other flows. Default: no RED phase. With `--tdd`: writes the `.meowkit/state/tdd-mode` sentinel and the developer waits on tester before each generator iteration. The evaluator's active-verification requirement (Rule 8 of the harness rules) is independent of TDD mode and always applies.
 
 ## Workflow
@@ -38,11 +38,11 @@ Skip when:
 Execute via `workflow.md`. Step-file architecture — load one step at a time.
 
 ```
-Step 0: Tier Detection      → call mk:scale-routing; pick density (MINIMAL|FULL|LEAN)
-Step 1: Plan                → invoke mk:plan-creator --product-level
-Step 2: Contract            → invoke mk:sprint-contract (skipped if LEAN + small)
+Step 0: Tier Detection      → call mk-scale-routing; pick density (MINIMAL|FULL|LEAN)
+Step 1: Plan                → invoke mk-plan-creator --product-level
+Step 2: Contract            → invoke mk-sprint-contract (skipped if LEAN + small)
 Step 3: Generate            → spawn developer sub-task w/ 4-subphase pattern
-Step 4: Evaluate            → invoke mk:evaluate
+Step 4: Evaluate            → invoke mk-evaluate
 Step 5: Iterate or Ship     → PASS → shipper; FAIL → loop to step-3 (max --max-iter)
 Step 6: Run Report          → write the audit trail
 ```
@@ -102,12 +102,12 @@ ended: 2026-04-08T15:18:00Z
 
 ## Gotchas
 
-- **Don't run on a non-green-field task.** Use `mk:cook` for single features, bug fixes, refactors. The autobuild workflow is for "build me an app" scope.
+- **Don't run on a non-green-field task.** Use `mk-cook` for single features, bug fixes, refactors. The autobuild workflow is for "build me an app" scope.
 - **Density override stays in scope.** `MEOWKIT_AUTOBUILD_MODE=LEAN` drops the sprint contract, not the review: still review the diff and write the verdict before shipping.
 - **Iteration loops are bounded.** Max 3 by default. After round 3, escalate — don't keep iterating blindly.
 - **Budget check is authoritative.** If `budget-tracker.sh` says block, the autobuild workflow halts even mid-iteration.
 - **Run reports are append-only.** Don't edit prior steps' entries — the report is the audit trail.
-- **Resumable.** If the autobuild workflow is killed mid-run, `the autobuild skill --resume {run-id}` picks up at the last completed step.
+- **Resumable.** If the autobuild workflow is killed mid-run, `/mk-autobuild --resume {run-id}` picks up at the last completed step.
 
 ## `--advice` (composable, off by default)
 
@@ -143,11 +143,11 @@ flag is present).
 | `references/agent-teams-vs-sub-task.md` | When to use teams vs file-based sub-task |
 | `scripts/density-select.sh` | Standalone density selector for scriptable use |
 | `scripts/budget-tracker.sh` | Cost-log reader; threshold warnings + hard block |
-| `../plan-creator/` | Planner stage (Step 1) — product-level planner |
-| `../sprint-contract/` | Contract stage (Step 2) — contract negotiation |
-| `../rubric/` | Rubric stage (Step 2/4) — rubric library |
-| `../evaluate/` | Evaluator stage (Step 4) — behavioral evaluator |
-| `../scale-routing/` | Tier + density emission |
+| `../mk-plan-creator/` | Planner stage (Step 1) — product-level planner |
+| `../mk-sprint-contract/` | Contract stage (Step 2) — contract negotiation |
+| `../mk-rubric/` | Rubric stage (Step 2/4) — rubric library |
+| `../mk-evaluate/` | Evaluator stage (Step 4) — behavioral evaluator |
+| `../mk-scale-routing/` | Tier + density emission |
 | `references/advice-checkpoints.md` | `--advice` checkpoint boundaries, caps, and what supervision may not touch |
 
 ## Start

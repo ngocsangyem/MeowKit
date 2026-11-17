@@ -9,7 +9,7 @@ Each fixture directory contains:
   live Figma file when no MCP/Figma access is available.
 - `reference.png` — exported baseline. **Placeholder in v1** (a 1×1 PNG). Visual-parity
   assertions are weak until a real baseline (or controlled Figma mirror) replaces it.
-- `expected-packet.yaml` — the Figma Evidence Packet fields `mk:figma` must emit for this
+- `expected-packet.yaml` — the Figma Evidence Packet fields `mk-figma` must emit for this
   fixture. This file is the **schema oracle**: the packet reference and later phases must
   match these field sets.
 - `expected-plan-assertions.md` — what a plan built from the packet must contain
@@ -34,6 +34,6 @@ All artifact paths use the toolkit `tasks/` convention:
 ## Running
 
 Manual evals — no automated runner. See `../../references/eval-checklist.md` scenarios
-E8–E11. For each: give the fixture's `design-snapshot.md` to a fresh agent with `mk:figma`
+E8–E11. For each: give the fixture's `design-snapshot.md` to a fresh agent with `mk-figma`
 loaded, have it emit a packet, then diff against `expected-packet.yaml`; feed the packet to
-`mk:plan-creator` and diff the plan against `expected-plan-assertions.md`.
+`mk-plan-creator` and diff the plan against `expected-plan-assertions.md`.

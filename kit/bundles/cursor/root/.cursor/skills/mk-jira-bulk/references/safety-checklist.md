@@ -2,6 +2,15 @@
 
 Use this checklist before executing any bulk operation affecting >50 issues.
 
+## Contents
+
+- [Quick Checklist (Fast Track)](#quick-checklist-fast-track)
+- [Full Checklist](#full-checklist)
+- [Risk Assessment](#risk-assessment)
+- [Pre-Operation Commands](#pre-operation-commands)
+- [Rollback Plan Template](#rollback-plan-template)
+- [Related Documentation](#related-documentation)
+
 ---
 
 ## Quick Checklist (Fast Track)
@@ -102,13 +111,13 @@ For operations affecting >200 issues or high-impact changes:
 # https://your-company.atlassian.net/issues/?jql=YOUR_QUERY
 
 # 2. Run dry-run
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh bulk transition --jql "YOUR_JQL" --to "STATUS" --dry-run
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh bulk transition --jql "YOUR_JQL" --to "STATUS" --dry-run
 
 # 3. Export current state
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh search query "YOUR_JQL" --fields key,status,assignee --format csv > before.csv
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh search query "YOUR_JQL" --fields key,status,assignee --format csv > before.csv
 
 # 4. Test small batch
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh bulk transition --jql "YOUR_JQL ORDER BY created ASC" --to "STATUS" --max-issues 5
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh bulk transition --jql "YOUR_JQL ORDER BY created ASC" --to "STATUS" --max-issues 5
 ```
 
 ---
@@ -127,7 +136,7 @@ bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh bul
 - [ ] Saved JQL: [query]
 
 ### Rollback Procedure (if needed within 24h)
-1. Run: `bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh bulk transition --jql "project=PROJ AND status='Done' AND updated >= -1h" --to "In Progress"`
+1. Run: `bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh bulk transition --jql "project=PROJ AND status='Done' AND updated >= -1h" --to "In Progress"`
 2. Verify count matches original
 3. Spot-check 10 issues
 

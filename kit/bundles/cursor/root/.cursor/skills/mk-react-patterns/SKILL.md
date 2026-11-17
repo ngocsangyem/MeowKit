@@ -1,13 +1,13 @@
 ---
 name: "mk-react-patterns"
-description: "React/Next.js authoring, review, and optimization: components, routes, bundle size, re-renders, performance. Auto-activates on .tsx/.jsx files alongside mk:typescript in React projects."
+description: "Guides React and Next.js code: hooks, re-renders, bundle size; use on .tsx or .jsx."
 ---
 
 # React Patterns
 
 React and Next.js performance optimization — curated rules across priority categories drawn from framework docs and production practice.
 
-Complements `mk:typescript` (type safety) and `mk:vue` (Vue patterns). This skill covers React-specific performance patterns.
+Complements `mk-typescript` (type safety) and `mk-vue` (Vue patterns). This skill covers React-specific performance patterns.
 
 ## When to Use
 
@@ -44,4 +44,4 @@ Load the relevant reference when working in that area:
 
 ## Workflow Integration
 
-Auto-activates during Phase 3 (Build) when React/Next.js project detected. Loaded by `developer` agent alongside `mk:typescript`.
+Auto-activates during Phase 3 (Build) when React/Next.js project detected. Loaded by `developer` agent alongside `mk-typescript`.

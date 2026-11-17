@@ -157,7 +157,7 @@ If no marker file found:
 
 1. Check git history: `git log --oneline -5` — may reveal language from file extensions in commits
 2. Check file extensions in `src/` or `lib/` directory
-3. If still unclear: ask user with stop and ask the user in chat:
+3. If still unclear: ask user with ask the user:
    > "I couldn't detect your project type automatically. What commands should I use for:
    > - Build: ___
    > - Lint: ___

@@ -1,6 +1,6 @@
 ---
 name: "mk-cso"
-description: "Chief Security Officer mode: infrastructure-first audit of secrets, dependency supply chain, CI/CD, LLM/AI security, OWASP Top 10, STRIDE, active verification. Daily/comprehensive, trend tracking."
+description: "Security audit of secrets, dependencies, CI/CD, OWASP, STRIDE; use for threat models."
 ---
 
 # the cso skill — Chief Security Officer Audit (v2)
@@ -15,14 +15,14 @@ You are a **Chief Security Officer** performing infrastructure-first security au
 
 ## When to Use
 
-Run `the cso skill` when the user requests a security audit, threat model, pentest review, OWASP assessment, or CSO review. Supports daily mode (8/10 confidence, zero noise) and comprehensive mode (2/10 bar, surfaces more). See [arguments-and-modes.md](references/arguments-and-modes.md) for all flags and scope options.
+Run `$mk-cso` when the user requests a security audit, threat model, pentest review, OWASP assessment, or CSO review. Supports daily mode (8/10 confidence, zero noise) and comprehensive mode (2/10 bar, surfaces more). See [arguments-and-modes.md](references/arguments-and-modes.md) for all flags and scope options.
 
-**Scope:** Whole-repo infra + supply-chain audit. For diff-scoped security review gating a PR, use `mk:review`.
+**Scope:** Whole-repo infra + supply-chain audit. For diff-scoped security review gating a PR, use `mk-review`.
 
 ## Plan-First Gate
 
 Security audits use the security-model workflow:
-1. If comprehensive mode → invoke `mk:plan-creator "security audit: {scope}"` to scope the audit
+1. If comprehensive mode → invoke `mk-plan-creator "security audit: {scope}"` to scope the audit
 2. If daily mode → skip planning (scope is predefined: changed files only)
 
 Skip: Daily mode (`--daily`) — scope is automatic.
@@ -39,8 +39,8 @@ Skip: Daily mode (`--daily`) — scope is automatic.
 | File                                                                                                       | Contents                                                                                                                                                   |
 | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [references/preamble.md](references/preamble.md)                                                           | Startup script, upgrade check, lake intro, telemetry prompt                                                                                                |
-| [references/shared-protocols.md](references/shared-protocols.md)                                           | stop and ask the user in chat format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status, Telemetry, Plan Status Footer |
-| [references/arguments-and-modes.md](references/arguments-and-modes.md)                                     | All `the cso skill` flags, mode resolution logic, Grep tool usage note                                                                                         |
+| [references/shared-protocols.md](references/shared-protocols.md)                                           | User question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status, Telemetry, Plan Status Footer |
+| [references/arguments-and-modes.md](references/arguments-and-modes.md)                                     | All `$mk-cso` flags, mode resolution logic, Grep tool usage note                                                                                         |
 | [references/phase-0-1-architecture-attack-surface.md](references/phase-0-1-architecture-attack-surface.md) | Stack/framework detection, mental model, attack surface census                                                                                             |
 | [references/phase-2-3-secrets-dependencies.md](references/phase-2-3-secrets-dependencies.md)               | Git history secrets scan, .env audit, dependency supply chain                                                                                              |
 | [references/phase-4-5-6-cicd-infra-webhooks.md](references/phase-4-5-6-cicd-infra-webhooks.md)             | CI/CD pipeline security, Docker/IaC audit, webhook/integration audit                                                                                       |

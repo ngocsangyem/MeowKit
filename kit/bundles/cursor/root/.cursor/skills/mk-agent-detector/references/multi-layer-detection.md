@@ -77,7 +77,7 @@ intent_detection[9]{intent,keywords,primary,secondary}:
   Delivery Status,status/progress/what's done/what's blocked/delivery tracking,project-manager,-
 ```
 
-**Disambiguation from mk:help:** the Delivery Status intent is backward-looking ("what's done / blocked"). For forward-looking navigation ("what should I do next", "where am I", "help"), `mk:help` handles it instead — those keywords do NOT match this intent.
+**Disambiguation from mk-help:** the Delivery Status intent is backward-looking ("what's done / blocked"). For forward-looking navigation ("what should I do next", "where am I", "help"), `mk-help` handles it instead — those keywords do NOT match this intent.
 
 ## Layer 3: Project Context Detection
 

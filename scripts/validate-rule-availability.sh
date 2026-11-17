@@ -37,6 +37,9 @@ cd "$ROOT" || { echo "Cannot cd to $ROOT" >&2; exit 1; }
 # live when they were written, and editing a closed plan to keep this check green
 # would rewrite the record rather than fix a reference a reader would follow.
 #
+# `docs/plans/` and `docs/research/` are pruned for the same reason: finished plans move
+# there from `tasks/`, and research reports assess the kit as it stood when written.
+#
 # Two further prunes, same principle — the path is the record, not a reference:
 #   - `rule-destination-table.md` IS the old-path → new-path mapping for the context
 #     diet. Its first column names pre-diet paths on purpose; resolving them would
@@ -78,9 +81,10 @@ done
 # beside `.claude/rules/` now lives in `.claude/skills/agent-detector/references/`,
 # so it is outside this pattern by construction — historical references in
 # packages/docs/content/docs/changelog.mdx are excluded by the `EXISTING_PATHS` not including it.
-REFS=$(grep -rohE "${SWEEP_GLOBS[@]}" \
+REFS=$(grep -roHE "${SWEEP_GLOBS[@]}" \
   '\.claude/rules/[A-Za-z0-9_-]+\.md' \
-  "${EXISTING_PATHS[@]}" 2>/dev/null | sort -u)
+  "${EXISTING_PATHS[@]}" 2>/dev/null \
+  | grep -vE '^docs/(plans|research)/' | sed 's/^[^:]*://' | sort -u)
 REFS=$(printf '%s\n' "$REFS" | grep -vE '^\.claude/rules/(old|stale)\.md$' || true)
 
 if [ -z "$REFS" ]; then

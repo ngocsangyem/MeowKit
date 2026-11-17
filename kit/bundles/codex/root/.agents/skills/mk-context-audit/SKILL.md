@@ -1,6 +1,6 @@
 ---
 name: "mk-context-audit"
-description: "Read-only audit of .codex/ structural overhead: 'remove X save Y tokens' vs the context window. NOT for cost tracking (budget skill); NOT for runtime read/compact decisions (mk:context-engineering)."
+description: "Read-only audit of .codex/ overhead, ranked by tokens saved. NOT for mk-context-engineering."
 ---
 
 # the context-audit skill — Context Window Structural Audit
@@ -33,8 +33,8 @@ Three concrete triggers:
 
 | Concern                         | Mechanism                                                | Unit          |
 | ------------------------------- | -------------------------------------------------------- | ------------- |
-| Monetary cost                   | `the budget skill` + `../autobuild/scripts/budget-tracker.sh`  | USD           |
-| Window utilization (this skill) | `the context-audit skill` + `scripts/inventory-context.sh`      | tokens / %    |
+| Monetary cost                   | `mewkit budget` + `../mk-autobuild/scripts/budget-tracker.sh`  | USD           |
+| Window utilization (this skill) | `$mk-context-audit` + `scripts/inventory-context.sh`      | tokens / %    |
 
 The three concerns are deliberately separate. This skill measures only what
 is **statically loaded** into every session — the always-on bundle. Conversation
@@ -42,13 +42,13 @@ history, tool output, and active edits live elsewhere.
 
 ## Workflow
 
-The slash command runs the pipeline:
+The skill runs the pipeline:
 
 ```bash
 SCAN_ROOT="${1:-$PWD}"
-bash .agents/skills/context-audit/scripts/inventory-context.sh "$SCAN_ROOT" \
-  | bash .agents/skills/context-audit/scripts/estimate-tokens.sh \
-  | bash .agents/skills/context-audit/scripts/format-audit-report.sh
+bash .agents/skills/mk-context-audit/scripts/inventory-context.sh "$SCAN_ROOT" \
+  | bash .agents/skills/mk-context-audit/scripts/estimate-tokens.sh \
+  | bash .agents/skills/mk-context-audit/scripts/format-audit-report.sh
 ```
 
 Output is markdown, printed to terminal. The skill does NOT write any files.
@@ -88,7 +88,7 @@ Steps:
 ... (sorted by token impact, descending)
 
 ## How to Act
-- Cost: see `the budget skill`
+- Cost: see `mewkit budget`
 - Runtime trim: an agent file costs tokens only when that agent is spawned; archive agent files that are never used
 ```
 
@@ -105,7 +105,7 @@ banners — see `references/token-cost-model.md`. They are NOT linked to
 - **No env vars introduced.** Window size is hard-coded 200K; override deferred
   until a real 1M-context use case appears.
 - **Discovery:** via `keywords:` frontmatter and a cross-reference from
-  `the budget skill`. There is no separate routing rule.
+  `mewkit budget`. There is no separate routing rule.
 
 ## Gotchas
 

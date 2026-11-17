@@ -1,7 +1,7 @@
 ---
 name: mk:problem-solving
 version: 1.0.0
-description: Unsticks a stalled approach by inversion, first principles, subtraction and scale shifts. NOT for mk:investigate.
+description: "Unsticks a stalled approach via inversion, first principles. NOT for mk:investigate."
 allowed-tools:
   - Read
   - Grep
@@ -16,7 +16,7 @@ keywords:
   - approach-design
   - decomposition
   - analytical-thinking
-when_to_use: The implementation path keeps spiralling and no option feels workable.
+when_to_use: "The implementation path keeps spiralling."
 user-invocable: true
 owner: research
 criticality: medium
@@ -45,7 +45,7 @@ Match symptom to technique. Load the reference only after matching.
 | Bloated system, remove > add, simplify by subtraction | Via Negativa             | `references/via-negativa.md`             |
 | Unsure which applies                                  | Dispatch flowchart       | `references/when-stuck.md`               |
 
-## Do NOT use for
+## Do not use for
 
 - **Anything broken / needing a fix** — use `mk:fix` (top-level orchestrator; invokes scout + investigate + sequential-thinking, adds regression tests, writes to memory).
 - **Pure diagnostic reasoning without fix intent** — use `mk:sequential-thinking` directly (evidence-based hypothesis testing).

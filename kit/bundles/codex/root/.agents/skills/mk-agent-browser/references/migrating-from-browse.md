@@ -1,6 +1,14 @@
-# Migrating from the retired browser skill to `mk:agent-browser`
+# Migrating from the retired browser skill to `mk-agent-browser`
 
 This doc covers the verb-to-verb mapping, copy-paste recipes for capabilities `agent-browser` doesn't ship natively, and a runbook for the developer-machine handoff/auth flow.
+
+## Contents
+
+- [Verb-to-Verb Mapping](#verb-to-verb-mapping)
+- [Recipes](#recipes)
+- [Handoff / Resume Runbook (CAPTCHA, MFA)](#handoff--resume-runbook-captcha-mfa)
+- [Removed verbs and their replacements](#removed-verbs-and-their-replacements)
+- [Quick smoke test](#quick-smoke-test)
 
 > **Auth-state compatibility:** gstack's `cookie-import` JSON files are NOT compatible with `agent-browser`. Re-authenticate with `agent-browser auth save` or capture fresh state via `state save`. Do not attempt to convert legacy files.
 

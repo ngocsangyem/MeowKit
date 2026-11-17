@@ -1,7 +1,7 @@
 # Project Context
 
 > Auto-generated skeleton. Fill in each [TODO] section, then commit.
-> Re-run `mk:project-context generate` after your codebase has content to auto-derive these.
+> Re-run `mk-project-context generate` after your codebase has content to auto-derive these.
 
 ## 1. Project Overview
 

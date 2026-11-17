@@ -51,8 +51,8 @@ Use the project's lockfile-appropriate package manager (the rulekit default is `
 
 Do not restate testing workflow here — use the toolkit's testing skills:
 
-- `mk:testing` for writing/running tests and the red-green-refactor cycle.
-- `mk:qa` / `mk:qa-manual` for browser-driven QA like a real user.
+- `mk-testing` for writing/running tests and the red-green-refactor cycle.
+- `mk-qa` / `mk-qa-manual` for browser-driven QA like a real user.
 
 A dev server is typically already running with HMR; do not launch a duplicate one.
 
@@ -62,7 +62,7 @@ A dev server is typically already running with HMR; do not launch a duplicate on
 - Try the library's `llms.txt` first (e.g. `https://pinia-colada.esm.dev/llms.txt`,
   `https://router.vuejs.org/llms.txt`); follow links in its table of contents.
 - Verify examples and patterns from docs before using them.
-- The toolkit's retrieval path is `mk:docs-finder` (Context7 → Context Hub → web) — prefer it
+- The toolkit's retrieval path is `mk-docs-finder` (Context7 → Context Hub → web) — prefer it
   for any library/API lookup over relying on training data.
 
 ## Owned Elsewhere (pointers, not restated)

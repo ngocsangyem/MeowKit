@@ -1,6 +1,6 @@
-# Phase 4: Alternatives Generation (MANDATORY)
+# Phase 4: Alternatives Generation (required)
 
-Produce 2-3 distinct implementation approaches. This is NOT optional.
+Produce 2-3 distinct implementation approaches. Every run produces them, because one approach leaves the user nothing to compare.
 
 ## Contents
 
@@ -33,7 +33,7 @@ Rules:
 
 **RECOMMENDATION:** Choose [X] because [one-line reason].
 
-Present via stop and ask the user in chat. Do NOT proceed without user approval of the approach.
+Present by asking the user. Wait for the user to approve an approach before going on.
 
 ---
 
@@ -97,7 +97,7 @@ The screenshot file at `/tmp/workflow-sketch.png` can be referenced by downstrea
 
 **Step 6: Outside design voices** (optional)
 
-After the wireframe is approved, offer outside design perspectives via stop and ask the user in chat:
+After the wireframe is approved, offer outside design perspectives by asking the user:
 
 > "Want outside design perspectives on the chosen approach? Two Codex sub-task with fresh context can propose alternative visual theses and design directions."
 >

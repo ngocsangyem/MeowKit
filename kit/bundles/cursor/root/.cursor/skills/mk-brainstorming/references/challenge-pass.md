@@ -1,6 +1,6 @@
 # Challenge Pass
 
-Run once after generation and before recommendation. Keep it compact; this is not `mk:party`.
+Run once after generation and before recommendation. Keep it compact; this is not `mk-party`.
 
 ## Checks
 
@@ -16,7 +16,7 @@ Run once after generation and before recommendation. Keep it compact; this is no
 
 - Max 5 checks.
 - Max 1 regeneration pass.
-- Do not run `mk:party` automatically. Offer it only for high-stakes security, performance, UX, migration, or architecture trade-offs.
+- Do not run `mk-party` automatically. Offer it only for high-stakes security, performance, UX, migration, or architecture trade-offs.
 - If the top deep scores are within 2 points, ask for one tie-break criterion or state that there is no clear winner.
 
 ## Recommendation Evidence

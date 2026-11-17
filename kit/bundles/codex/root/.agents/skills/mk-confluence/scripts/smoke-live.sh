@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # smoke-live.sh — manual live-credentials smoke test.
-# Run after `.codex/scripts/bin/setup-workflow` + populating .codex/.env.
+# Run after `mewkit skill env confluence` + populating .codex/.env.
 # Verifies: wrapper resolves, env vars load, Cloud-only gate passes,
 # binary returns valid JSON, expected stdout-filter behavior.
 #

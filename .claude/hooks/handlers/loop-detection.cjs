@@ -1,5 +1,6 @@
 // loop-detection.cjs — PostToolUse handler: warn when same file edited too many times.
-// Advisory: the messages suggest a change of approach; no edit is refused.
+// Advisory: the reminder reaches the model as context (the dispatcher turns `context`
+// into the host's model-visible field) and suggests a change of approach; no edit is refused.
 // Ported from post-write-loop-detection.sh. Same logic:
 //   track per-file edit count, warn at 4, escalate at 8.
 //
@@ -38,28 +39,21 @@ module.exports = function loopDetection(ctx, state) {
   const count = counts[key];
   state.save('edit-counts', counts);
 
-  // Emit warnings
+  // Speak at the thresholds and every WARN_THRESHOLD edits after, not on every edit:
+  // one reminder per stretch is enough, and each one costs context.
+  const speaks = count === ESCALATE_THRESHOLD || (count >= WARN_THRESHOLD && count % WARN_THRESHOLD === 0);
+  if (!speaks) return '';
+
   if (count >= ESCALATE_THRESHOLD) {
-    return [
-      '@@LOOP_DETECT_ESCALATE@@',
-      `Max edit budget exceeded for ${filePath} (${count} edits this session).`,
-      'Advisory: consider re-planning. Repeated small variations to the same file usually indicate a flawed approach.',
-      'Re-read the plan/contract, challenge your assumptions, and consider a different strategy before the next edit.',
-      '@@END_LOOP_DETECT@@',
-      '',
-    ].join('\n');
+    return {
+      context: `${filePath} has now been edited ${count} times this session. Pause edits to it and re-plan: `
+        + 'list what each attempt changed and why it did not work, then choose a different approach '
+        + 'or ask the user. Repeated small variations on one file rarely converge.',
+    };
   }
-
-  if (count >= WARN_THRESHOLD) {
-    return [
-      '@@LOOP_DETECT_WARN@@',
-      `You have edited ${filePath} ${count} times this session.`,
-      'Consider reconsidering your approach — repeated small variations often indicate a flawed plan.',
-      'Re-read the plan/contract and challenge your assumptions before the next edit.',
-      '@@END_LOOP_DETECT@@',
-      '',
-    ].join('\n');
-  }
-
-  return '';
+  return {
+    context: `${filePath} has been edited ${count} times this session. Before the next edit, re-read `
+      + 'the plan and the latest failing output and check the assumption behind the last change, '
+      + 'since repeated small edits often mean the approach is wrong.',
+  };
 };

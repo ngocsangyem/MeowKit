@@ -1,6 +1,6 @@
 # Expected Plan Assertions — static-card
 
-What a plan built by `mk:plan-creator` from this fixture's packet MUST contain. Binary
+What a plan built by `mk-plan-creator` from this fixture's packet MUST contain. Binary
 checks. The plan is built FROM the packet path — no Figma MCP call.
 
 ## Assertions

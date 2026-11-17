@@ -2,6 +2,21 @@
 
 Reference guide for "magic numbers" and constants used in JIRA administration.
 
+## Contents
+
+- [Common Custom Field IDs](#common-custom-field-ids)
+- [Notification Event IDs](#notification-event-ids)
+- [Permission Keys (Complete List)](#permission-keys-complete-list)
+- [Holder Types Reference](#holder-types-reference)
+- [Status Categories](#status-categories)
+- [Project Types](#project-types)
+- [Project Templates](#project-templates)
+- [Issue Type Hierarchy Levels](#issue-type-hierarchy-levels)
+- [Notification Recipient Types](#notification-recipient-types)
+- [Common API Endpoints Reference](#common-api-endpoints-reference)
+- [Finding Your Instance's Constants](#finding-your-instances-constants)
+- [Notes](#notes)
+
 ---
 
 ## Common Custom Field IDs
@@ -24,11 +39,7 @@ Reference guide for "magic numbers" and constants used in JIRA administration.
 # View project configuration with field IDs
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ops discover-project PROJ
 
-# Use jira-fields skill for comprehensive discovery
-python .claude/skills/jira-fields/scripts/list_fields.py --custom-only
-
-# Get specific field details
-python .claude/skills/jira-fields/scripts/get_field.py customfield_10016
+# Use the jira-fields skill for field discovery (custom fields, one field's details)
 ```
 
 ---

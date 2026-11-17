@@ -2,7 +2,7 @@
 name: mk:brainstorming
 preamble-tier: 3
 version: 2.1.0
-description: Generate and compare several technical approaches to one already-validated decision. NOT for mk:office-hours.
+description: "Compares technical approaches for one decision. NOT for mk:office-hours."
 allowed-tools:
   - Read
   - Grep
@@ -16,7 +16,7 @@ keywords:
   - compare-approaches
   - trade-off-analysis
   - alternatives
-when_to_use: The problem is settled and the options are open — what are my choices for X.
+when_to_use: "Problem is settled, options are open."
 user-invocable: true
 owner: research
 criticality: medium

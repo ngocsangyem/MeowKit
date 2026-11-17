@@ -1,6 +1,6 @@
 ---
 name: mk:scale-routing
-description: Matches task keywords against the domain-complexity table and returns complexity and execution tier. NOT for mk:agent-detector.
+description: "Maps task keywords to a complexity tier. NOT for mk:agent-detector."
 triggers:
   - task classification
   - complexity routing
@@ -14,7 +14,7 @@ keywords:
   - complexity-routing
   - csv-routing
   - execution-tier
-when_to_use: Auto-invoked while tiering a task. Not user-callable.
+when_to_use: "Auto-invoked while tiering. Not user-callable."
 owner: portability
 criticality: medium
 status: active

@@ -6,13 +6,13 @@
 #   fetch:  bash adf-to-md.sh --page-id 12345
 
 set -euo pipefail
-ROOT="$(git rev-parse --show-toplevel):-$(pwd)}"
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 PY="$ROOT/.meowkit/envs/confluence/bin/python3"
-SCRIPT="$ROOT/.agents/skills/confluence/scripts/adf_to_md.py"
-WRAPPER="$ROOT/.agents/skills/confluence/scripts/confluence-as.sh"
+SCRIPT="$ROOT/.agents/skills/mk-confluence/scripts/adf_to_md.py"
+WRAPPER="$ROOT/.agents/skills/mk-confluence/scripts/confluence-as.sh"
 
 if [ ! -x "$PY" ]; then
-  echo "[adf-to-md] venv not found at $PY - run \`.codex/scripts/bin/setup-workflow\` first" >&2
+  echo "[adf-to-md] venv not found at $PY - run \`mewkit skill env confluence\` first" >&2
   exit 127
 fi
 

@@ -1,6 +1,6 @@
 ---
 name: mk:typescript
-description: 'TypeScript authoring and strict type-safety fixes: null handling, utility types, ESLint. NOT for mk:react-patterns.'
+description: "TypeScript authoring and strict type-safety fixes. NOT for mk:react-patterns."
 source: aura-frog
 original_skills:
   - typescript-expert
@@ -13,7 +13,7 @@ keywords:
   - null-handling
   - utility-types
   - ts-eslint
-when_to_use: Editing .ts files or clearing type errors outside a UI framework.
+when_to_use: "Editing .ts or fixing type errors."
 user-invocable: true
 owner: utility
 criticality: medium
@@ -55,9 +55,9 @@ Operates in **Phase 3 (Build GREEN)**. Output supports the `developer` agent.
 
 - **NEVER** use `any` — use `unknown` + type guards (security-rules.md)
 - **NEVER** use `type assertion` — use `unknown` + type guards (security-rules.md)
-- **NEVER** use implicit truthiness for null checks — use explicit `=== null || === undefined`
-- **ALWAYS** use strict TypeScript config: `strict: true`, `noUncheckedIndexedAccess: true`
-- **ALWAYS** use `type` imports: `import type { X } from 'y'`
+- Avoid implicit truthiness for null checks (it also catches `0` and `""`) — use explicit `=== null || === undefined`
+- Use a strict TypeScript config: `strict: true`, `noUncheckedIndexedAccess: true`
+- Use `type` imports: `import type { X } from 'y'`
 - **PREFER** named exports over default exports
 - **PREFER** discriminated unions over type assertions
 

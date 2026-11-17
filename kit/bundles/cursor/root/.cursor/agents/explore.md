@@ -1,6 +1,6 @@
 ---
 name: explore
-description: Fast, read-only agent for searching and analyzing codebases — locate code, trace how a feature works, build repo orientation. Use proactively before unfamiliar work. Not for planning or verdicts.
+description: Fast, read-only agent for searching and analyzing codebases — locate code, trace how a feature works, build repo orientation. Delegate for a wide search before unfamiliar work; skip it for a lookup a few tool calls settle. Not for planning or verdicts.
 model: composer-2.5[fast=true]
 readonly: true
 is_background: false

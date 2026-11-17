@@ -1,6 +1,6 @@
 # Error Taxonomy
 
-Catalog of known harness failure patterns. Used by `mk:trace-analyze` step-03 (scatter analysis) to classify trace findings into actionable categories. Seeded from LangChain published patterns + Anthropic harness research.
+Catalog of known harness failure patterns. Used by `mk-trace-analyze` step-03 (scatter analysis) to classify trace findings into actionable categories. Seeded from LangChain published patterns + Anthropic harness research.
 
 ## Contents
 
@@ -20,7 +20,6 @@ Catalog of known harness failure patterns. Used by `mk:trace-analyze` step-03 (s
   - [`context-anxiety-wrap` (LEGACY)](#context-anxiety-wrap-legacy)
 - [Suggestion Format](#suggestion-format)
 - [Adding New Patterns](#adding-new-patterns)
-
 
 ## Pattern Schema
 
@@ -107,14 +106,14 @@ Each entry has:
 
 ### `context-anxiety-wrap` (LEGACY)
 
-- **Trace signal:** Sonnet 4.5 `session_end` records with abnormally low duration AND no failure markers
-- **Threshold:** N/A — should not appear on Opus 4.6+
+- **Trace signal:** standard-tier `session_end` records with abnormally low duration AND no failure markers
+- **Threshold:** N/A — should not appear on the capable tier
 - **Root cause:** Model gets anxious about context limits, exits early.
-- **Mitigation:** Move to Opus 4.6+. This pattern is the main reason for the LEAN density mode.
+- **Mitigation:** Move to the capable tier. This pattern is the main reason for the LEAN density mode.
 
 ## Suggestion Format
 
-When `mk:trace-analyze` step-05 emits suggestions, each entry must include:
+When `mk-trace-analyze` step-05 emits suggestions, each entry must include:
 
 ```yaml
 - pattern: <pattern-name from this taxonomy>
@@ -139,4 +138,4 @@ Patterns evolve as new failure modes are discovered. To add a pattern:
 4. Document root cause (why this happens)
 5. Propose mitigation (which hook/rule/prompt to change)
 6. Add the entry to this file
-7. Re-run `mk:trace-analyze` with the new pattern in the taxonomy
+7. Re-run `mk-trace-analyze` with the new pattern in the taxonomy

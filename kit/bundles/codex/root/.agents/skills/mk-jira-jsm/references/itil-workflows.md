@@ -2,6 +2,17 @@
 
 **Quick Navigation**:
 
+## Contents
+
+- [Overview](#overview)
+- [Incident Management](#incident-management)
+- [Service Request Fulfillment](#service-request-fulfillment)
+- [Change Management](#change-management)
+- [Problem Management](#problem-management)
+- [SLA Configuration for ITIL](#sla-configuration-for-itil)
+- [Knowledge Base Integration](#knowledge-base-integration)
+- [Automation Patterns](#automation-patterns)
+
 ---
 
 Detailed ITIL process implementations using jira-jsm scripts.
@@ -37,7 +48,7 @@ Complete incident lifecycle from creation to resolution.
 
 ```bash
 # 1. Customer reports incident
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request create \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request create \
   --service-desk 1 \
   --request-type 10 \
   --summary "Cannot access shared drive" \
@@ -49,28 +60,28 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm
 # 2. Auto-assign via queue or manually assign (use jira-issue skill)
 
 # 3. Agent adds internal note
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request comment add SD-125 \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request comment add SD-125 \
   --body "Checking network connectivity" \
   --internal
 
 # 4. Add public update for customer
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request comment add SD-125 \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request comment add SD-125 \
   --body "Our team is investigating. Expected resolution: 2 hours"
 
 # 5. Link affected assets
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm asset link SD-125 --assets AST-789
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm asset link SD-125 --assets AST-789
 
 # 6. Monitor SLA
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm sla get SD-125
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm sla get SD-125
 
 # 7. Suggest knowledge base articles
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm kb suggest SD-125
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm kb suggest SD-125
 
 # 8. Transition to resolved
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request transition SD-125 --status Resolved
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request transition SD-125 --status Resolved
 
 # 9. Verify SLA compliance
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm sla breach-list SD-125
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm sla breach-list SD-125
 ```
 
 ### Priority Matrix
@@ -98,7 +109,7 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm
 
 ```bash
 # 1. Create service request (new laptop)
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request create \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request create \
   --service-desk 1 \
   --request-type 11 \
   --summary "New laptop for new hire" \
@@ -107,27 +118,27 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm
 # Output: Created SD-130
 
 # 2. Request requires approval
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm approval list SD-130
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm approval list SD-130
 
 # 3. Manager approves
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm approval approve SD-130 \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm approval approve SD-130 \
   --comment "Approved. Standard MacBook Pro configuration."
 
 # 4. Procurement team adds participants
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request participant add SD-130 --users "procurement@example.com"
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request participant add SD-130 --users "procurement@example.com"
 
 # 5. Create asset when laptop received
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm asset create \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm asset create \
   --object-schema 1 \
   --object-type Laptop \
   --name "MacBook Pro - Jane Smith" \
   --attributes '{"Serial": "C02XY456FVH7", "Owner": "jane.smith@example.com"}'
 
 # 6. Link asset to request
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm asset link SD-130 --assets AST-200
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm asset link SD-130 --assets AST-200
 
 # 7. Complete request
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request transition SD-130 --status Completed
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request transition SD-130 --status Completed
 ```
 
 ---
@@ -152,7 +163,7 @@ Request -> Risk Assessment -> Approval -> Scheduled -> Implemented -> Review -> 
 
 ```bash
 # 1. Submit change request
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request create \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request create \
   --service-desk 1 \
   --request-type 12 \
   --summary "Database upgrade to PostgreSQL 15" \
@@ -162,32 +173,32 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm
 # Output: Created SD-140
 
 # 2. Add CAB (Change Advisory Board) as participants
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request participant add SD-140 \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request participant add SD-140 \
   --users "cab-manager@example.com,tech-lead@example.com,ops-manager@example.com"
 
 # 3. Monitor approval status
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm approval list SD-140
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm approval list SD-140
 
 # List pending approvals for CAB members
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm approval list --pending --service-desk 1
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm approval list --pending --service-desk 1
 
 # 4. CAB members approve
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm approval approve SD-140 --comment "Approved. Risk assessment completed."
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm approval approve SD-140 --comment "Approved. Risk assessment completed."
 
 # 5. Link affected assets
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm asset find-affected SD-140
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm asset link SD-140 --assets AST-300,AST-301
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm asset find-affected SD-140
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm asset link SD-140 --assets AST-300,AST-301
 
 # 6. Implement change
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request transition SD-140 --status "In Progress"
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request transition SD-140 --status "In Progress"
 
 # 7. Add implementation notes
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request comment add SD-140 \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request comment add SD-140 \
   --body "## Implementation Log\n- 02:00: Backup completed\n- 02:15: Upgrade started" \
   --internal
 
 # 8. Complete change
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request transition SD-140 --status Completed
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request transition SD-140 --status Completed
 ```
 
 ### Risk Assessment
@@ -244,7 +255,7 @@ Problem SD-200
 
 ```bash
 # 1. Create problem record from recurring incidents
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request create \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request create \
   --service-desk 1 \
   --request-type 13 \
   --summary "Root Cause: Intermittent network outages Building A" \
@@ -253,15 +264,15 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm
 # 2. Link related incidents (use jira-relationships skill)
 
 # 3. Add analysis notes
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request comment add SD-145 \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request comment add SD-145 \
   --body "## Analysis\nSwitch in closet 3A showing packet loss" \
   --internal
 
 # 4. Find affected assets
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm asset find-affected SD-145
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm asset find-affected SD-145
 
 # 5. Create change request for permanent fix
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request create \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request create \
   --service-desk 1 \
   --request-type 12 \
   --summary "Replace network switch Building A closet 3A" \
@@ -270,7 +281,7 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm
 # 6. Link problem to change (use jira-relationships skill)
 
 # 7. Close problem after change implemented
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request transition SD-145 --status Closed
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request transition SD-145 --status Closed
 ```
 
 ---
@@ -301,13 +312,13 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm
 
 ```bash
 # Check SLA status for request
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm sla get SD-123
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm sla get SD-123
 
 # Check for breaches across service desk
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm sla breach-list --service-desk 1
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm sla breach-list --service-desk 1
 
 # Generate SLA compliance report
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm sla report --service-desk 1 \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm sla report --service-desk 1 \
   --start-date 2025-01-01 \
   --end-date 2025-01-31
 ```
@@ -329,13 +340,13 @@ bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm
 
 ```bash
 # Search for existing articles
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm kb search --query "VPN setup" --service-desk 1
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm kb search --query "VPN setup" --service-desk 1
 
 # Get AI-powered suggestions for request
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm kb suggest SD-123
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm kb suggest SD-123
 
 # Add KB link to request comment
-bash $(git rev-parse --show-toplevel)/.agents/skills/jira/scripts/jira-as.sh jsm request comment add SD-123 \
+bash $(git rev-parse --show-toplevel)/.agents/skills/mk-jira/scripts/jira-as.sh jsm request comment add SD-123 \
   --body "Please follow this guide: [VPN Setup Guide](https://kb.company.com/vpn-setup)"
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: "mk-resolving-merge-conflicts"
-description: "Resolves an in-progress git merge/rebase conflict: reads conflict state, recovers each side's intent, resolves hunks, runs checks. NOT for the ship pipeline (mk:ship); NOT for bug debugging (mk:fix)."
+description: "Resolves a merge or rebase conflict hunk by hunk; use when git shows unmerged paths."
 ---
 
 # Resolving Merge Conflicts
@@ -22,11 +22,11 @@ description: "Resolves an in-progress git merge/rebase conflict: reads conflict 
 - User says "resolve the conflicts", "fix the rebase", "finish the merge"
 
 **Do NOT use when:** no operation is in progress (nothing to resolve), or the request is
-to start a merge/ship from scratch (use `mk:ship`).
+to start a merge/ship from scratch (use `mk-ship`).
 
 ## Workflow Integration
 
-**Phase: on-demand.** Most often fires inside Phase 5 (Ship) when `mk:ship` merges the
+**Phase: on-demand.** Most often fires inside Phase 5 (Ship) when `mk-ship` merges the
 base branch and hits conflicts. Hands control back once the working tree is clean and
 checks pass.
 
@@ -150,7 +150,7 @@ handing off.
 
 ## Handoff Protocol
 
-On a clean tree with green checks → return to `mk:ship` (if mid-ship) or `mk:verify` to
+On a clean tree with green checks → return to `mk-ship` (if mid-ship) or `mk-verify` to
 confirm the full build is green before continuing.
 
 ## Gotchas

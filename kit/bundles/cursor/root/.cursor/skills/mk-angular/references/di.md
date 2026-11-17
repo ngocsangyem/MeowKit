@@ -1,13 +1,12 @@
 # Angular Di
 
-> Part of mk:angular skill. Read when: working with di.
+> Part of mk-angular skill. Read when: working with di.
 > Source: analogjs/angular-skills/angular-di (MIT)
 
 ## Contents
 
 - [Core Patterns](#core-patterns)
 - [Advanced Patterns](#advanced-patterns)
-
 
 ## Core Patterns
 

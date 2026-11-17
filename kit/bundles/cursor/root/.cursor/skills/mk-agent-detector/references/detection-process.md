@@ -91,7 +91,7 @@ Extracted:
 
 ```bash
 # 1. If context is insufficient:
-   -> Run mk:scout for codebase structure
+   -> Run mk-scout for codebase structure
    -> Read package.json, tsconfig.json, etc. directly
 
 # 2. For fresh codebase scan:

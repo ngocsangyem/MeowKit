@@ -126,6 +126,7 @@ const EXEMPT = [
 		why: "published rules index carries the moved-rules table",
 	},
 	{ match: "tasks/", why: "plans, contracts and reports record the paths that were live when written" },
+	{ match: "docs/plans/", why: "finished plans moved out of tasks/ keep the paths that were live when written" },
 	{
 		match: "docs/architecture/adr/260511-agile-scrum-conditional-rule-layer.md",
 		why: "dated decision record — its header already says the paths below are the ones that existed then",

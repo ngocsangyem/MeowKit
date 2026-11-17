@@ -140,7 +140,7 @@ Side Effects Detected: Yes
 - Each bullet names the affected behavior or caller (e.g., `- POST /api/users no longer accepts trailing slashes — breaks 3 existing callers`).
 - Absence of the line = no signal. Backward-compatible.
 
-When this signal is present, the cook orchestrator MUST follow the "Regression Recovery Options" pattern in `.agents/skills/cook/references/review-cycle.md`: present 2–4 options to the user and record the chosen one as a `## User Decision Addendum` block on the verdict file. Until that addendum exists the change is not ready to ship, and the review says so.
+When this signal is present, the cook orchestrator MUST follow the "Regression Recovery Options" pattern in `.agents/skills/mk-cook/references/review-cycle.md`: present 2–4 options to the user and record the chosen one as a `## User Decision Addendum` block on the verdict file. Until that addendum exists the change is not ready to ship, and the review says so.
 
 ## Proof Bundle (machine-readable verdict)
 

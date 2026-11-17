@@ -1,9 +1,9 @@
 ---
 name: "mk-trace-analyze"
-description: "Analyzes harness trace logs to surface recurring failure patterns and suggest harness improvements. Scatter-gather across last N runs with a mandatory HITL gate before any change is applied."
+description: "Mines harness trace logs for recurring failures, behind a human gate."
 ---
 
-# mk:trace-analyze — Scatter-Gather Trace Analysis
+# mk-trace-analyze — Scatter-Gather Trace Analysis
 
 Step-file workflow that ingests `.meowkit/telemetry/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel `researcher` sub-task, gathers cross-batch patterns, and gates suggestions through human review before any harness change is applied.
 
@@ -21,7 +21,7 @@ Use the CLI for fast deterministic recall; use this skill's scatter-gather when 
 ## When to Use
 
 Activate when:
-- User runs `the trace-analyze skill [--runs N]` (default N=20)
+- User runs `$mk-trace-analyze [--runs N]` (default N=20)
 - After 3+ consecutive harness failures on the same task
 - Quarterly schedule for the dead-weight audit
 
@@ -47,7 +47,7 @@ Step 2: Partition       → split by run_id into batches (max 3)
 Step 3: Scatter         → spawn 3 researcher sub-task in parallel
 Step 4: Gather          → main agent synthesizes cross-batch patterns
 Step 5: Suggestions     → emit structured fix proposals
-Step 6: HITL Gate       → stop and ask the user in chat per suggestion → write approved items to plan
+Step 6: HITL Gate       → ask the user per suggestion → write approved items to plan
 ```
 
 ## Output
@@ -59,7 +59,7 @@ All under `plans/{date}-trace-analysis/` (created by step-01):
 - `suggestions.md` — approved suggestions only (written by step-06)
 - `rejected.md` — rejected suggestions with reasons (written by step-06)
 - `analysis.md` — final human-readable summary (written by step-06)
-- Optional: a draft follow-up plan generated from approved suggestions, ready for `mk:plan-creator --hard` (or `--deep` when trace findings span 5+ module areas — provides per-phase file inventory for multi-module remediation)
+- Optional: a draft follow-up plan generated from approved suggestions, ready for `mk-plan-creator --hard` (or `--deep` when trace findings span 5+ module areas — provides per-phase file inventory for multi-module remediation)
 
 ## Gotchas
 
@@ -78,10 +78,10 @@ All under `plans/{date}-trace-analysis/` (created by step-01):
 | `step-03-scatter-analysis.md` | Spawn 3 parallel researcher sub-task |
 | `step-04-gather-synthesis.md` | Main agent synthesizes cross-batch patterns |
 | `step-05-suggestions.md` | Emit structured fix proposals from error-taxonomy |
-| `step-06-hitl-gate.md` | stop and ask the user in chat per suggestion |
+| `step-06-hitl-gate.md` | Ask the user per suggestion |
 | `references/trace-schema.md` | JSONL record schema spec |
 | `references/error-taxonomy.md` | Catalog of known failure patterns |
-| `../../../memory/trace-log.jsonl` | Append-only trace store |
+| `../../../mk-memory/trace-log.jsonl` | Append-only trace store |
 | `../../hooks/append-trace.cjs` | Trace writer |
 
 ## Start

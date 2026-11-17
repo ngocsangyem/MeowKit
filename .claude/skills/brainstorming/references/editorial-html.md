@@ -2,6 +2,18 @@
 
 Use this reference only when `mk:brainstorming --html` is requested. Author one additional `.html` file next to the markdown brainstorm report, inline (do NOT route through `mk:preview`). The HTML must be self-contained: inline CSS and JavaScript in one file, no build step, no network requirement for layout (web fonts are optional; system fallbacks must work offline).
 
+## Contents
+
+- [Design Philosophy](#design-philosophy)
+- [Color Tokens](#color-tokens)
+- [Typography](#typography)
+- [Layout](#layout)
+- [Required Report Sections](#required-report-sections)
+- [Components](#components)
+- [Motion](#motion)
+- [Do / Don't](#do--dont)
+- [Minimum Section Template](#minimum-section-template)
+
 Source style: long-form editorial / investor-memo / printed-magazine aesthetic.
 
 ## Design Philosophy

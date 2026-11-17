@@ -1,9 +1,9 @@
 ---
 name: "mk-confluence-bulk"
-description: "Bulk Confluence ops (10+ pages): bulk-label/move/delete via confluence-as; dry-run mandatory. NOT single-page (mk:confluence-page) or comments/attachments (mk:confluence-collaborate)."
+description: "Bulk Confluence label, move, delete on 10+ pages. NOT for mk-confluence-page."
 ---
 
-# mk:confluence-bulk
+# mk-confluence-bulk
 
 Forks to the `confluence-bulk` agent. The agent enforces a hard 3-step ceremony at runtime — dry-run → confirm → execute.
 
@@ -29,11 +29,11 @@ Skipping Step 1 is a hard violation. The agent will refuse if asked to skip.
 ## See also
 
 - Agent: `../../agents/confluence-bulk.md`
-- Shared: `../confluence/references/{install-and-auth,cli-idioms,safety-framework}.md` (Tier 4 enforcement lives in safety-framework.md)
+- Shared: `../mk-confluence/references/{install-and-auth,cli-idioms,safety-framework}.md` (Tier 4 enforcement lives in safety-framework.md)
 - Domain refs:
   - `references/safety-checklist.md` — pre-flight checklist for any bulk operation
   - `references/dry-run-protocol.md` — the 3-step ceremony in detail with example transcripts
-- Peer leaves: `mk:confluence-search` (CQL author + read-side overlap; same sanitizer), `mk:confluence-page` (single-page ops), `mk:confluence-collaborate` (comments / attachments at single-page scope)
+- Peer leaves: `mk-confluence-search` (CQL author + read-side overlap; same sanitizer), `mk-confluence-page` (single-page ops), `mk-confluence-collaborate` (comments / attachments at single-page scope)
 
 ## Gotchas
 

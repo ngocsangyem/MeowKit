@@ -1,13 +1,13 @@
 ---
 name: "mk-brainstorming"
-description: "Generate or compare multiple technical approaches for one validated decision. NOT for product discovery or refining an existing plan."
+description: "Compares technical approaches for one validated decision. NOT for mk-office-hours."
 ---
 
 # Brainstorming
 
 Use for generating or comparing multiple technical approaches to one validated decision.
 
-**Boundary:** `mk:office-hours` answers “should we build this?”; this skill answers “how should we build it?” A bare “brainstorm” request is ambiguous: ask whether the user wants product discovery/validation or technical approaches. Do not route from that word alone.
+**Boundary:** `mk-office-hours` answers “should we build this?”; this skill answers “how should we build it?” A bare “brainstorm” request is ambiguous: ask whether the user wants product discovery/validation or technical approaches. Do not route from that word alone.
 
 ## Profiles
 
@@ -18,10 +18,10 @@ Use for generating or comparing multiple technical approaches to one validated d
 
 | Situation | Route |
 | --- | --- |
-| New product, feature, or side-project value is unvalidated | `mk:office-hours` |
-| Observed failure or root-cause work | `mk:investigate` |
-| Existing plan, verdict, or brainstorm needs critique | `mk:plan-ceo-review` or `mk:elicit` |
-| Generic Q&A or a single implementation detail | answer directly or use `mk:docs-finder` |
+| New product, feature, or side-project value is unvalidated | `mk-office-hours` |
+| Observed failure or root-cause work | `mk-investigate` |
+| Existing plan, verdict, or brainstorm needs critique | `mk-plan-ceo-review` or `mk-elicit` |
+| Generic Q&A or a single implementation detail | answer directly or use `mk-docs-finder` |
 
 ## Defaults
 

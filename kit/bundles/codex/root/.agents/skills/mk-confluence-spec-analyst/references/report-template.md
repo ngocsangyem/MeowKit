@@ -17,7 +17,7 @@ The skeleton the agent fills in. Slot placeholders are in `{braces}`.
 **Space:** {space-key}
 **Author:** {page-author}
 **Last modified:** {timestamp}
-**Generated:** {now} by mk:confluence-spec-analyst
+**Generated:** {now} by mk-confluence-spec-analyst
 **Active plan:** {plan-dir or "none"}
 **Children analyzed:** {count, or "none"}
 **Images analyzed:** {count, or "[NO_MULTIMODAL]"}
@@ -77,18 +77,18 @@ The skeleton the agent fills in. Slot placeholders are in `{braces}`.
 - **{filename}**: ...
 
 {Or one of:}
-- `[NO_MULTIMODAL]` — install mk:multimodal to analyze {N} embedded images
+- `[NO_MULTIMODAL]` — install mk-multimodal to analyze {N} embedded images
 - `[MULTIMODAL_AVAILABLE_BUT_FAILED: <error>]` — text-only analysis below
 - (omitted entirely if no images on page)
 
 ## Suggested Commands (only if --with-commands flag present)
 
 ```
-mk:jira-issue create --project PROJ --type Story --summary "..." --description "..." --priority Medium
-mk:jira-issue create --project PROJ --type Task --summary "..." --priority Low
+mk-jira-issue create --project PROJ --type Story --summary "..." --description "..." --priority Medium
+mk-jira-issue create --project PROJ --type Task --summary "..." --priority Low
 ```
 
-> Review carefully before running. Each command is a single mk:jira-issue create invocation
+> Review carefully before running. Each command is a single mk-jira-issue create invocation
 > for one suggested user story. Run manually — these are NOT auto-executed.
 
 ## Open Questions

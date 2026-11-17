@@ -1,6 +1,6 @@
 # Prompt Complexity Classifier
 
-> Loaded by `mk:prompt-enhancer` during Step 1 (Decompose) as a lens on the
+> Loaded by `mk-prompt-enhancer` during Step 1 (Decompose) as a lens on the
 > INPUT prompt. It picks the enhancement strategy, the expected output length,
 > and whether the rewrite should frame a research/discovery step — BEFORE the
 > rewrite is built. It is model-agnostic: no step here emits vendor tokens.

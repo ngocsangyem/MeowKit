@@ -4,6 +4,17 @@ After completing a workflow phase, orchestration skills delegate to the
 `project-manager` agent for delivery-status reporting. This rule defines
 fire points, skip conditions, and invocation form.
 
+## Contents
+
+- [Rule 1: Orchestration Skills must Delegate Post-Phase](#rule-1-orchestration-skills-must-delegate-post-phase)
+- [Rule 2: Invocation Form](#rule-2-invocation-form)
+- [Rule 3: Skip Conditions](#rule-3-skip-conditions)
+- [Rule 4: Orchestrator Disambiguation](#rule-4-orchestrator-disambiguation)
+- [Rule 5: Harness Foreground Exception](#rule-5-harness-foreground-exception)
+- [Rule 6: Opt-Out Honored Everywhere](#rule-6-opt-out-honored-everywhere)
+- [Rule 7: No Hook Dispatch](#rule-7-no-hook-dispatch)
+- [Applies To](#applies-to)
+
 [CONTEXTUAL] — applies only when an orchestration skill is active.
 
 ## Rule 1: Orchestration Skills MUST Delegate Post-Phase

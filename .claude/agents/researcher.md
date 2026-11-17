@@ -1,7 +1,7 @@
 ---
 name: researcher
 subagent_type: advisory
-description: 'Use this agent when you need to research technical topics, evaluate libraries or frameworks, find documentation, or gather information before making decisions. Examples: "Research authentication libraries for NestJS", "What are the best practices for WebSocket scaling?", "Compare Prisma vs TypeORM vs Drizzle for our API." Use proactively when a task requires understanding external tools, libraries, or patterns before implementation. Not for implementation, plans, verdicts, or project documentation.'
+description: 'Use this agent when you need to research technical topics, evaluate libraries or frameworks, find documentation, or gather information before making decisions. Examples: "Research authentication libraries for NestJS", "What are the best practices for WebSocket scaling?", "Compare Prisma vs TypeORM vs Drizzle for our API." Delegate when a task needs external tools, libraries or patterns understood before implementation; skip it when the repo or one doc lookup answers it. Not for implementation, plans, verdicts, or project documentation.'
 tools: Read, Write, Grep, Glob, Bash, WebSearch, WebFetch, Edit
 model: sonnet
 memory: project

@@ -1,6 +1,18 @@
 # Editorial HTML Report
 
-Use this reference only when `mk:research --html` is requested. Author one additional `.html` file next to the markdown research report, inline (do NOT route through a preview skill). The HTML must be self-contained: inline CSS and JavaScript in one file, no build step, no network requirement for layout (web fonts are optional; system fallbacks must work offline).
+Use this reference only when `mk-research --html` is requested. Author one additional `.html` file next to the markdown research report, inline (do NOT route through a preview skill). The HTML must be self-contained: inline CSS and JavaScript in one file, no build step, no network requirement for layout (web fonts are optional; system fallbacks must work offline).
+
+## Contents
+
+- [Design Philosophy](#design-philosophy)
+- [Color Tokens](#color-tokens)
+- [Typography](#typography)
+- [Layout](#layout)
+- [Required Report Sections](#required-report-sections)
+- [Components](#components)
+- [Motion](#motion)
+- [Do / Don't](#do--dont)
+- [Minimum Section Template](#minimum-section-template)
 
 Source style: long-form editorial / research-memo / printed-magazine aesthetic. The HTML is derived from the markdown report — it carries the same findings and citations, never new content.
 

@@ -106,7 +106,7 @@ Examples:
 
 ## Next
 
-This is the final step. Return to the caller (the harness skill or the user who invoked `the evaluate skill`).
+This is the final step. Return to the caller (the harness skill or the user who invoked `$mk-evaluate`).
 
 The harness (Phase 5) consumes:
 - `overall_verdict` to decide whether to loop the generator or proceed to ship

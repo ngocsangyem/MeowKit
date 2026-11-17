@@ -4,24 +4,24 @@ Patterns for launching multiple sub-task in parallel.
 
 ## Parallel Scouting (Explore)
 
-Launch multiple Explore sub-task when needing to find related files across areas:
+Launch several read-only search sub-tasks when needing to find related files across areas:
 
 ```
-Agent(subagent_type="Explore", prompt="Find auth files in src/", description="Scout auth")
-Agent(subagent_type="Explore", prompt="Find API routes for users", description="Scout API")
-Agent(subagent_type="Explore", prompt="Find test files for auth", description="Scout tests")
+read-only search sub-task: "Find auth files in src/"
+read-only search sub-task: "Find API routes for users"
+read-only search sub-task: "Find test files for auth"
 ```
 
 Spawn ALL in a single message for parallel execution.
 
 ## Parallel Verification (Bash)
 
-Launch multiple Bash sub-task to verify implementation:
+Launch several command sub-tasks to verify implementation:
 
 ```
-Agent(subagent_type="Bash", prompt="Run typecheck", description="Verify types")
-Agent(subagent_type="Bash", prompt="Run lint", description="Verify lint")
-Agent(subagent_type="Bash", prompt="Run build", description="Verify build")
+sub-task: "Run typecheck"
+sub-task: "Run lint"
+sub-task: "Run build"
 ```
 
 ## When to Use Parallel
@@ -36,7 +36,7 @@ Agent(subagent_type="Bash", prompt="Run build", description="Verify build")
 
 ## Resource Limits
 
-- Max 6 parallel agents (per mk:scout convention)
+- Max 6 parallel agents (per mk-scout convention)
 - Each sub-task has ~200K token context
 - Keep prompts concise — avoid context bloat
 - Spawn all in single message, not sequentially

@@ -1,8 +1,8 @@
 # Mode Selection
 
-Use `stop and ask the user in chat` at start of fixing workflow.
+Ask the user at start of fixing workflow.
 
-## stop and ask the user in chat Format
+## User Question Format
 
 ```json
 {

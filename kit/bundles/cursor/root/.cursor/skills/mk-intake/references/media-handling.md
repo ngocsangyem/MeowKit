@@ -28,7 +28,7 @@ Fallback chain — try each step; move to next if step unavailable:
    → 60-80% token savings before analysis
 
 2. GEMINI_API_KEY set?
-   → Invoke mk:multimodal (Gemini) for vision analysis
+   → Invoke mk-multimodal (Gemini) for vision analysis
    → Extracts: layout, components, states, text (OCR), design intent
 
 3. Fallback (always available):
@@ -51,7 +51,7 @@ Fallback chain — try each step; move to next if step unavailable:
    → Report to user: "Video attachment detected. FFmpeg required for frame
      extraction but is not installed. Cannot analyze video content."
    → Suggest: "Install FFmpeg: brew install ffmpeg (macOS) or
-     setup-workflow --system-deps"
+     mewkit setup --system-deps"
    → Continue intake without video content; note gap in output
 ```
 

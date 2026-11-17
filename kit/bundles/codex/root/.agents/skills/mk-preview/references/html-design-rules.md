@@ -7,7 +7,7 @@ How `--html --explain`, `--html --diagram`, `--html --slides` produce a single s
 - Required reads
 - Workflow — Think / Structure / Style / Deliver
 - Style presets (names only)
-- Theme toggle (MANDATORY)
+- Theme toggle (required)
 - Zoom and pan engine (for diagrams)
 - Slide engine (for slides)
 - CDN resources
@@ -21,8 +21,8 @@ How `--html --explain`, `--html --diagram`, `--html --slides` produce a single s
 
 Before generating any HTML output:
 
-- `mk:frontend-design/references/anti-slop-directives.md` — MANDATORY. The 6+ forbidden patterns.
-- `references/mermaid-essentials.md` — MANDATORY when the page contains a Mermaid block.
+- `mk-frontend-design/references/anti-slop-directives.md` — required. The 6+ forbidden patterns.
+- `references/mermaid-essentials.md` — required when the page contains a Mermaid block.
 
 These are CITED, not duplicated here. If `frontend-design`'s anti-slop list grows, this skill picks up the change automatically.
 
@@ -38,7 +38,7 @@ These are CITED, not duplicated here. If `frontend-design`'s anti-slop list grow
 
 **Structure.** Pick a section sequence: hero → context → cards / diagram → details → summary. Plan depth tiers (hero / elevated / default / recessed).
 
-**Style.** Pick a font pairing and palette from `mk:ui-design-system` CSVs. Vary from previous outputs (see "Style preset rotation").
+**Style.** Pick a font pairing and palette from `mk-ui-design-system` CSVs. Vary from previous outputs (see "Style preset rotation").
 
 **Deliver.** Single self-contained `.html`:
 
@@ -50,7 +50,7 @@ These are CITED, not duplicated here. If `frontend-design`'s anti-slop list grow
 
 ## Style presets (names only)
 
-Pick one; agent fills in the actual CSS by combining the chosen palette + typography from `mk:ui-design-system`.
+Pick one; agent fills in the actual CSS by combining the chosen palette + typography from `mk-ui-design-system`.
 
 | Preset | Mood | When to use |
 |---|---|---|
@@ -61,7 +61,7 @@ Pick one; agent fills in the actual CSS by combining the chosen palette + typogr
 
 The preset name is a directive to the agent; full CSS is composed at generation time using the rotation strategy below.
 
-## Theme toggle (MANDATORY)
+## Theme toggle (required)
 
 Every HTML artifact MUST include a fixed top-right toggle button with persistent localStorage state. The button is the first child of `<body>`.
 
@@ -270,13 +270,13 @@ Pin all versions; do not load `latest`.
 |---|---|---|
 | Mermaid v11 | `https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs` | Use `<script type="module">` |
 | Chart.js v4 | `https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js` | Optional; only for KPI charts |
-| Google Fonts | `https://fonts.googleapis.com/css2?family=...&display=swap` | Pair from `mk:ui-design-system/assets/typography.csv` |
+| Google Fonts | `https://fonts.googleapis.com/css2?family=...&display=swap` | Pair from `mk-ui-design-system/assets/typography.csv` |
 
 When Mermaid releases v12, bump this URL AND `references/mermaid-essentials.md` → "Pinned version" in the same commit.
 
 ## Anti-slop quick checklist
 
-Full rules in `mk:frontend-design/references/anti-slop-directives.md`. Quick gut check:
+Full rules in `mk-frontend-design/references/anti-slop-directives.md`. Quick gut check:
 
 - No Inter, Roboto, or system-ui alone for body font
 - No indigo/violet (`#8b5cf6`, `#7c3aed`) as accent

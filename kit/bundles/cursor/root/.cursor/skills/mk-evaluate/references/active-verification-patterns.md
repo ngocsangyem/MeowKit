@@ -26,20 +26,19 @@ Catalog of probe techniques the evaluator uses to drive a running build per crit
   - [Pattern X3 — Network failure simulation](#pattern-x3-network-failure-simulation)
 - [Probe Hygiene Rules](#probe-hygiene-rules)
 
-
 **Core principle:** active verification means **driving the artifact**, not reading the source code. Every probe in this catalog produces a concrete artifact (screenshot, response capture, transcript) that lands in the evidence directory.
 
 ---
 
 ## Frontend Probes (browser-driven)
 
-Tools: `mk:agent-browser`, `mk:playwright-cli`. Pick by complexity:
+Tools: `mk-agent-browser`, `mk-playwright-cli`. Pick by complexity:
 
 | Need | Tool | Why |
 |---|---|---|
-| Quick screenshot + check element exists | `mk:agent-browser` | Open + snapshot + screenshot in 3 commands |
-| Multi-step user flow (click, type, navigate, assert) | `mk:agent-browser` | Built for AI-driven flows |
-| Scripted regression flows | `mk:playwright-cli` | Replayable, deterministic |
+| Quick screenshot + check element exists | `mk-agent-browser` | Open + snapshot + screenshot in 3 commands |
+| Multi-step user flow (click, type, navigate, assert) | `mk-agent-browser` | Built for AI-driven flows |
+| Scripted regression flows | `mk-playwright-cli` | Replayable, deterministic |
 
 ### Pattern F1 — Happy path flow
 

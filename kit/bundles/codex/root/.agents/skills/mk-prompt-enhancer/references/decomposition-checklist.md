@@ -1,6 +1,6 @@
 # Decomposition Checklist
 
-> Loaded by `mk:prompt-enhancer` during Steps 1 (Decomposition) and 2 (Weakness Detection).
+> Loaded by `mk-prompt-enhancer` during Steps 1 (Decomposition) and 2 (Weakness Detection).
 
 ## Contents
 

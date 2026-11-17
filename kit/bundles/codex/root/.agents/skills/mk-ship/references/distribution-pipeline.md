@@ -13,7 +13,7 @@ service with existing deployment — verify that a distribution pipeline exists.
    ls .github/workflows/ 2>/dev/null | grep -iE 'release|publish|dist'
    ```
 
-3. **If no release pipeline exists and a new artifact was added:** Use stop and ask the user in chat:
+3. **If no release pipeline exists and a new artifact was added:** Ask the user:
    - "This PR adds a new binary/tool but there's no CI/CD pipeline to build and publish it.
      Users won't be able to download the artifact after merge."
    - A) Add a release workflow now (GitHub Actions cross-platform build + GitHub Releases)

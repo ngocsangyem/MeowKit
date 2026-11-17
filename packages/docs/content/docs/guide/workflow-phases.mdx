@@ -65,7 +65,7 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 - Optional pre-review: `mk:scout` for edge case detection
 - Optional post-verdict: `mk:elicit` for deeper analysis on WARN dimensions
 
-**Gate 2:** Human approval required in all modes — see `.claude/rules/gate-rules.md`. FAIL blocks Phase 5.
+**Review before shipping:** read the verdict before Phase 5; no hook blocks a commit on it. The one enforced ship-time control is the ship check — see `.claude/rules/meowkit-core.md`.
 
 **Regression-recovery pattern (v2.9.10+):** when the reviewer surfaces a regression in EXISTING behavior (verdict appends `Side Effects Detected: Yes` plus bullet effects), cook STOPs the iteration loop and presents 2–4 typed options to the user — revert + re-plan / keep + update dependents / compatibility shim / accept the regression. User selection is recorded as a `## User Decision Addendum` block on the verdict file. `validate-gate-2.cjs` blocks Gate 2 until the addendum is present (positive-presence-only — absence of the field is never a block).
 

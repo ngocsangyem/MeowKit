@@ -1,6 +1,6 @@
 ---
 name: mk:web-to-markdown
-description: Fetches one arbitrary URL and returns clean markdown. NOT for mk:docs-finder.
+description: "Fetches one URL and returns clean markdown. NOT for mk:docs-finder."
 argument-hint: <url> [--wtm-accept-risk] [--wtm-approve]
 keywords:
   - web-to-markdown
@@ -8,7 +8,7 @@ keywords:
   - page-to-markdown
   - external-page
   - one-shot-fetch
-when_to_use: A blog post, RFC or GitHub issue link must be read as text.
+when_to_use: "Read a blog, RFC or issue link as text."
 user-invocable: true
 owner: docs
 criticality: medium
@@ -27,8 +27,8 @@ SKILL METADATA (non-native frontmatter — ignored by the host runtime, used by 
 These fields live in a comment because the host runtime's supported frontmatter schema
 (verified 260409) only includes: name, description, argument-hint, disable-model-invocation,
 user-invocable, allowed-tools, model, effort, context, agent, hooks, paths, shell.
-Everything else is silently ignored. The CLI parses optional_system_deps from
-this comment block (see lib/system-deps-registry.ts — parseOptionalSystemDepsFromSkillMd).
+Everything else is silently ignored. `mewkit skill env web-to-markdown` reads optional_system_deps from
+this comment block and installs only keys its built-in registry knows.
 -->
 
 <!-- SECURITY ANCHOR

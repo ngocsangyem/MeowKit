@@ -1,8 +1,8 @@
 ---
 name: jira-evaluator
 description: Use for analyzing a single Jira ticket's complexity and inconsistencies via the jira-as CLI wrapper. Read-only. Not for story-point estimation or full root-cause analysis.
-model: composer-2.5[fast=true]
-readonly: true
+model: claude-opus-5[effort=high]
+readonly: false
 is_background: true
 ---
 
@@ -28,7 +28,7 @@ factors under the Rule of Two, the compliant combination.
 All `jira-as` invocations go through:
 
 ```bash
-bash $(git rev-parse --show-toplevel)/.cursor/skills/jira/scripts/jira-as.sh <args>
+bash $(git rev-parse --show-toplevel)/.cursor/skills/mk-jira/scripts/jira-as.sh <args>
 ```
 
 ## Live vs mock check

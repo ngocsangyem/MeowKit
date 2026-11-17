@@ -1,6 +1,6 @@
 ---
 name: mk:review-pr
-description: Single-pass checklist review of someone else's GitHub PR, optionally posted via gh. NOT for mk:review.
+description: "Checklist review of someone else's GitHub PR. NOT for mk:review."
 source: local
 version: 0.1.0
 argument-hint: '<#PR | URL> [--reply]'
@@ -11,7 +11,7 @@ keywords:
   - gh-pr
   - verdict
   - github-review
-when_to_use: Asked to review a teammate's or outside contributor's pull request.
+when_to_use: "Asked to review a teammate's pull request."
 user-invocable: true
 owner: lifecycle
 criticality: medium
