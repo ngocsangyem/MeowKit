@@ -33,14 +33,14 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 - For COMPLEX tasks (5+ files): bead decomposition — atomic, independently committable work units
 - **Exact-requirements contract (v2.9.10+):** in `mk:cook`, plan-creator MUST answer 5 dimensions in concrete sentences before returning a plan — expected output, acceptance criteria, scope boundary, non-negotiable constraints, touchpoints (files from scout). Clarifying-question options MUST cite scout findings (file paths); abstract options are a failure mode. Skipped on plan-path input.
 
-**Gate 1:** Human approval required. `gate-enforcement.cjs` blocks all file writes until plan is approved. In non-auto modes `validate-gate-1.sh` runs as an advisory preflight (surfaces structural-check failures to the user; user retains override). In `--auto` mode it remains blocking.
+**Agree the plan before building:** for a non-trivial task (more than two files or about 30 minutes), agree the plan with the user before Phase 3. Planning is a practice, not a gate: no hook blocks an edit on a missing plan. See [Enforcement & Security](/core-concepts/gates).
 
 ## Phase 2 — Test
 
 **Agent:** tester
 **Deliverable:** Tests (failing in TDD mode; optional otherwise)
 
-- **TDD mode** (`--tdd` / `MEOWKIT_TDD=1`): failing tests first. `pre-implement.cjs` blocks if no failing test exists. `--tdd` is a flag, not a planning mode; it composes with the selected plan-creator mode.
+- **TDD mode** (`--tdd` / `MEOWKIT_TDD=1`): failing tests first. No hook checks the order. `--tdd` is a flag, not a planning mode; it composes with the selected plan-creator mode.
 - **Default mode:** Phase 2 is optional. Tester invoked on-request.
 - `mk:nyquist` verifies test-to-requirement coverage at end of phase.
 - Security pre-check always runs.
@@ -65,11 +65,11 @@ This page expands each phase with agent details, deliverables, and hook enforcem
 - Optional pre-review: `mk:scout` for edge case detection
 - Optional post-verdict: `mk:elicit` for deeper analysis on WARN dimensions
 
-**Review before shipping:** read the verdict before Phase 5; no hook blocks a commit on it. The one enforced ship-time control is the ship check — see `.claude/rules/meowkit-core.md`.
+**Review before shipping:** review is a practice, not a gate. Read the verdict before Phase 5; no hook blocks a commit on it. The one enforced ship-time control is the ship check — see [Enforcement & Security](/core-concepts/gates).
 
-**Regression-recovery pattern (v2.9.10+):** when the reviewer surfaces a regression in EXISTING behavior (verdict appends `Side Effects Detected: Yes` plus bullet effects), cook STOPs the iteration loop and presents 2–4 typed options to the user — revert + re-plan / keep + update dependents / compatibility shim / accept the regression. User selection is recorded as a `## User Decision Addendum` block on the verdict file. `validate-gate-2.cjs` blocks Gate 2 until the addendum is present (positive-presence-only — absence of the field is never a block).
+**Regression-recovery pattern (v2.9.10+):** when the reviewer surfaces a regression in EXISTING behavior (verdict appends `Side Effects Detected: Yes` plus bullet effects), cook STOPs the iteration loop and presents 2–4 typed options to the user — revert + re-plan / keep + update dependents / compatibility shim / accept the regression. User selection is recorded as a `## User Decision Addendum` block on the verdict file, so a later reader sees the decision. A verdict that reports a side effect without the addendum is incomplete; no hook checks for it.
 
-**Workflow evidence index (v2.9.13+):** `mk:cook` and `mk:fix` populate one `workflow-evidence.json` per run — a traceable index of task, risk flags, diagnosis/contract, verification, verdict path, and approvals. It mirrors `validate-gate-1.sh` / `validate-gate-2.cjs` (the gate scripts stay authoritative) and **never approves anything**; the validator `validate-workflow-evidence.cjs` checks completeness before Gate 2 is presented, and the contract loads on demand from `.claude/skills/advise/references/workflow-evidence-rules.md`. `mk:fix --auto` no longer self-approves from a review score — it stops at *ready for user approval*.
+**Workflow evidence index (v2.9.13+):** `mk:cook` and `mk:fix` populate one `workflow-evidence.json` per run — a traceable index of task, risk flags, diagnosis/contract, verification, verdict path, and approvals. It records what happened and **never approves anything**: evidence can say "ready to ship", never "shipping approved". There is no validator; the skill that writes the index owns its shape, and the contract loads on demand from `.claude/skills/advise/references/workflow-evidence-rules.md`. `mk:fix --auto` does not self-approve from a review score — it stops at *ready for user approval*.
 
 **Optional flags** (cook only):
 - `--verify` `[LIGHT]`: light browser/artifact check, **advisory** (no back-edge to Phase 3 — FAIL is reported but does not block ship)
@@ -82,7 +82,7 @@ Concrete cost of `[LIGHT]` vs `[HEAVY]` depends on the inner harness, model tier
 **Agent:** shipper
 **Deliverable:** PR URL + rollback documentation
 
-- `pre-ship.cjs`: full test + lint + typecheck
+- Ship check (`pre-ship`): on `git commit`, `git push`, `git merge` and `gh pr create|merge` it runs lint on the changed files, their related tests and a type-check, and refuses the command when one fails — the one enforced ship-time control
 - Pre-flight reads the workflow evidence index when present (after `mk:verify`, which keeps abort authority) — augments proof, never overrides a verify FAIL (v2.9.13+)
 - Conventional commit (auto-generated)
 - PR — never push to main directly
@@ -108,9 +108,11 @@ Concrete cost of `[LIGHT]` vs `[HEAVY]` depends on the inner harness, model tier
 | Parallel | COMPLEX with independent subtasks | Up to 3 agents in isolated git worktrees |
 | Party | Architecture decisions | 2-4 agents deliberate, forced synthesis |
 
-## Plan-first gate pattern
+## Plan-first pattern
 
-| Skill | Gate behavior | Skip condition |
+Each skill checks for a plan itself, as part of its workflow; no hook enforces it.
+
+| Skill | Plan behavior | Skip condition |
 |-------|-------------|----------------|
 | `mk:cook` | Create plan if missing | Plan path arg, `--fast` |
 | `mk:fix` | Plan if > 2 files | `--quick` |
@@ -123,4 +125,4 @@ Skills that skip: `mk:investigate` and `mk:office-hours` (produce planning input
 ## Next steps
 
 - [Build a feature](/guides/build-a-feature) — the full cook pipeline
-- [How gates work](/core-concepts/gates) — enforcement details
+- [Enforcement & Security](/core-concepts/gates) — what is enforced, and the ship check
