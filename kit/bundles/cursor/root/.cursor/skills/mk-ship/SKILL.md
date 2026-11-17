@@ -48,14 +48,15 @@ After the verdict file is read at the start of the workflow:
 
 Use bare `/mk-ship` to prepare a local commit. Use `/mk-ship release` to push/create a PR, or `/mk-ship publish` for version/issue actions; each external scope requires explicit user direction.
 
-## Plan-First Gate
+## Plan First (practice, not a block)
 
-Shipping requires an approved plan or review verdict:
+Shipping needs no plan or review verdict, and nothing blocks on a missing one:
 
-1. Check `tasks/plans/` for approved plan covering this change
-2. If no plan exists and change is non-trivial → block and suggest planning first
+1. Check `tasks/plans/` for a plan covering this change
+2. If no plan exists and the change is non-trivial → say so and suggest planning first, then continue if the user wants to ship anyway
 
-Skip: Hotfixes explicitly approved by human via PR comment.
+The one enforced control is the `pre-ship` ship check: on `git commit`, `git push`, `git merge` and `gh pr create|merge` it runs lint on the changed files, their related tests and a type-check, and refuses the command when one fails.
+
 
 ## Deploy Applicability
 
