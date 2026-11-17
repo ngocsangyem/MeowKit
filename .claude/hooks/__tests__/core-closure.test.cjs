@@ -85,3 +85,10 @@ test('every shell in a bundle resolves each local require to a file in that bund
     }
   }
 });
+
+test('the helper set is exactly what the workflow-* skill helpers load', () => {
+  const entries = closure.helpers.filter((f) => f.startsWith('workflow-') && !f.endsWith('.cjs'));
+  const loaded = new Set();
+  for (const entry of entries) for (const file of graph(path.join(LIB, entry)).lib) loaded.add(file);
+  assert.deepEqual([...loaded].sort(), [...closure.helpers].sort(), 'update core-closure.json `helpers`');
+});

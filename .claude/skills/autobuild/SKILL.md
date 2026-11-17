@@ -127,7 +127,7 @@ These rules left the always-on set; the harness owns them at the canonical cook 
 |---|---|---|---|---|---|
 | **MINIMAL** | TRIVIAL (Haiku) | Skip (use plan-creator --fast) | Skip | Skip | Skip |
 | **FULL** | STANDARD (Sonnet) / COMPLEX (Opus 4.5) | Required | Required | 1–3 rounds | Optional |
-| **LEAN** | COMPLEX (Opus 4.6+) | Required | Optional | 0–1 rounds | Skip (auto-compact) |
+| **LEAN** | COMPLEX (Opus 4.6+, Fable) | Required | Optional | 0–1 rounds | Skip (auto-compact) |
 
 ## Run Report Schema
 
@@ -137,7 +137,7 @@ Every run writes `tasks/autobuild-runs/YYMMDD-{slug}/run.md`:
 ---
 run_id: 260408-1450-build-todo
 density: LEAN
-model: opus-4-6
+model: claude-opus-5-5
 budget_cap: 50
 budget_spent: 12.40
 iterations: 1

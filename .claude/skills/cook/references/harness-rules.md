@@ -27,7 +27,7 @@ Per the adaptive density policy (`.claude/skills/autobuild/references/adaptive-d
 
 - `MINIMAL` (Haiku) — contract skipped (harness short-circuits to `mk:cook`)
 - `FULL` (Sonnet, Opus 4.5) — write and sign the contract before any source-code edit; no hook checks it, so the discipline is the harness's own
-- `LEAN` (Opus 4.6+) — contract OPTIONAL; skip if estimated ACs < 5
+- `LEAN` (Opus 4.6 and later, Fable) — contract OPTIONAL; skip if estimated ACs < 5
 
 **WHY:** Contracts prevent silent substitution on intermediate tiers but add dead weight on trivial/capable tiers.
 

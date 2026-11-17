@@ -1,17 +1,14 @@
 # Model Selection
 
-**Auto-select a complexity tier based on task type and agent role.** Cursor's own
-`model` field on an agent is `inherit` — this bundle does not pin agents to a
-concrete model ID, so tiering here selects a REASONING BUDGET (how much scoping,
-research, and review depth to apply), not a model swap.
+**Auto-select a tier based on task complexity and agent type.** Each tier maps to one model pin on this host; the pins live in the `model:` frontmatter of each agent in `.cursor/agents/`.
 
 ## Tier Mapping
 
 ```toon
-tier_selection[3]{tier,when_to_use,agents}:
-  TRIVIAL,Quick tasks/Simple queries/Orchestration,orchestrator/analyst
-  STANDARD,Standard implementation/Coding/Testing/Bug fixes,developer/tester/reviewer/planner/researcher
-  COMPLEX,Architecture/Deep analysis/Security audits/Complex planning,architect/security (audits)/Any agent (architecture mode)
+tier_selection[3]{tier,pin,when_to_use,agents}:
+  TRIVIAL,composer-2.5[fast=true],Quick tasks/Mechanical or report-only work,documenter/shipper/project-manager/explore/git-manager
+  STANDARD,composer-2.5[fast=true],Implementation support/Research/Testing,analyst/tester/researcher/journal-writer
+  COMPLEX,claude-opus-5[effort=high],Design/Implementation/Review/Security/Complex planning,planner/architect/developer/reviewer/security/brainstormer
 ```
 
 ## Complexity to Tier
@@ -39,25 +36,26 @@ task_tier[8]{task_type,tier,reason}:
 
 ## Agent Default Tiers
 
+Each agent runs on its tier's pin (the `model:` frontmatter of each agent in `.cursor/agents/`). The pin does not change per task: the tier declared for a task picks which agent runs, not which model it uses.
+
 ```toon
-agent_tiers[14]{agent,default_tier,complex_when}:
-  orchestrator,TRIVIAL,Never (routing only)
-  analyst,TRIVIAL,Never (cost tracking/pattern extraction)
-  planner,STANDARD,Complex multi-phase planning
-  architect,STANDARD,Schema design / migration planning / system architecture
-  developer,STANDARD,Never (implementation focus)
-  tester,STANDARD,Never
-  reviewer,STANDARD,COMPLEX for security-critical reviews
-  security,STANDARD,COMPLEX for full audits
-  shipper,STANDARD,Never
-  documenter,STANDARD,Never
-  researcher,STANDARD,COMPLEX for deep technical research
-  brainstormer,STANDARD,COMPLEX for architecture evaluation
-  journal-writer,TRIVIAL,Never (documentation only)
-  project-manager,TRIVIAL,Never (delivery status reporting only)
+agent_tiers[13]{agent,tier}:
+  analyst,STANDARD
+  planner,COMPLEX
+  architect,COMPLEX
+  developer,COMPLEX
+  tester,STANDARD
+  reviewer,COMPLEX
+  security,COMPLEX
+  shipper,TRIVIAL
+  documenter,TRIVIAL
+  researcher,STANDARD
+  brainstormer,COMPLEX
+  journal-writer,STANDARD
+  project-manager,TRIVIAL
 ```
 
-## Tier Selection Output
+## Model Selection Output
 
 Include in detection result:
 
@@ -65,12 +63,9 @@ Include in detection result:
 ## Detection Result
 
 - **Agent:** architect
-- **Tier:** STANDARD
+- **Tier:** COMPLEX (pin: `claude-opus-5[effort=high]`)
 - **Complexity:** Standard
 - **Reason:** API endpoint implementation
 ```
 
-When delegating to a custom agent (Task-tool delegation to a `.cursor/agents/*.md`
-agent), carry the detected tier in the delegation prompt so the agent scopes its own
-depth accordingly — Cursor has no per-call model override; the agent's frontmatter
-`model: inherit` is fixed.
+When delegating to the agent, leave the model unset so the agent's pin applies.

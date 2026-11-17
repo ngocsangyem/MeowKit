@@ -12,7 +12,7 @@
 #   5. Prints the dispatch instructions for the orchestrator
 #
 # It does NOT spawn the sub-task itself — that's the orchestrator's responsibility
-# (Task tool with subagent_type=evaluator). This script prepares the inputs.
+# (delegation to the evaluator agent). This script prepares the inputs.
 set -u
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
@@ -131,7 +131,7 @@ The orchestrator should now spawn the evaluator sub-task with these inputs:
 
 \`\`\`
 delegate a sub-task (
-  subagent_type="evaluator",
+  agent="evaluator",
   description="Evaluate $target",
   prompt="
     Read .cursor/skills/mk-evaluate/workflow.md and follow it.

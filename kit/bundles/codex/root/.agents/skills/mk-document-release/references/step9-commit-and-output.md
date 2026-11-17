@@ -12,8 +12,6 @@ committing.
 ```bash
 git commit -m "$(cat <<'EOF'
 docs: update project documentation for vX.Y.Z.W
-
-Co-Authored-By: Codex Opus 4.6 <noreply@anthropic.com>
 EOF
 )"
 ```

@@ -46,13 +46,11 @@
 5. Compose each commit message:
    - First line: `<type>: <summary>` (type = feat/fix/chore/refactor/docs)
    - Body: brief description of what this commit contains
-   - Only the **final commit** (VERSION + CHANGELOG) gets the version tag and co-author trailer:
+   - Only the **final commit** (VERSION + CHANGELOG) gets the version tag, plus the co-author trailer the host's attribution settings ask for, if any:
 
 ```bash
 git commit -m "$(cat <<'EOF'
 chore: bump version and changelog (vX.Y.Z.W)
-
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 EOF
 )"
 ```

@@ -110,8 +110,8 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 | `scripts/load-rubric.sh` | Load + emit prompt fragment for one rubric or preset |
 | `scripts/validate-rubric.sh` | Schema conformance + weight-sum validator |
 | `references/calibration-guide.md` | How to add few-shot examples (balanced + randomized) |
-| `../../rubrics/schema.md` | Canonical rubric format specification |
-| `../../agents/evaluator.md` | The agent that consumes composed rubrics during behavioral active verification (Phase 3, shipped) |
+| `.codex/rubrics/schema.md` | Canonical rubric format specification |
+| `.codex/agents/evaluator.toml` | The agent that consumes composed rubrics during behavioral active verification (Phase 3, shipped) |
 | `../mk-evaluate/SKILL.md` | The orchestration shell that drives the evaluator + invokes this skill via `compose <preset>` (Phase 3, shipped) |
 
 ## Start

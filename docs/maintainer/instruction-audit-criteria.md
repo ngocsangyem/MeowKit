@@ -86,9 +86,36 @@ reads 6,356 B where the gate-removal table read 4,688 B; the text did not change
 Before this change, `mk-planning-engine/SKILL.md` in both bundles called `Agent(subagent_type: …)`;
 those two lines were reworded so installed-Codex validation stays green with the new token.
 
-### After
+### After (2026-11-17, integration branch on `08cc9a55` plus the bundle-parity change)
 
-Recorded when the model-fit audit closes.
+| Tree | Text files | Always-on bytes | Gate phrases | Emphatic tokens | Emphatic outside pinned rules | Skills | Listing chars | A9 | A10 | A11 | A12 | A13 | A14 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| .claude | 912 | 18191 | 0 | 521 | 510 | 127 | 14150 | 0 | 0 | 0 | 16 | 0 | 0 |
+| kit/bundles/codex/root | 863 | 7676 | 0 | 447 | 447 | 124 | 9784 | 0 | 0 | 0 | 5 | 0 | 0 |
+| kit/bundles/cursor/root | 867 | 6289 | 0 | 416 | 416 | 123 | 9653 | 0 | 0 | 0 | 5 | 0 | 0 |
+
+What moved:
+
+- **Host-foreign syntax (A9, A10):** 63 → 0 and 2,038 → 0 on Codex, 57 → 0 and 1,915 → 0 on
+  Cursor. No bundle file names `TodoWrite` or calls `subagent_type`; the one remaining
+  `subagent_type` is a field of Cursor's own hook payload, read by `subagent-lifecycle.cjs`.
+- **Model pins (A13):** 41 → 0 on Codex. Every agent pin has a current row in `model-pins.md`.
+- **Emphatic tokens:** 627 → 521, 515 → 447 and 482 → 416. Both bundles grew 14 text files and a
+  few emphatic tokens on the last day, when they began shipping the rubric library.
+- **Listing chars:** 22,368 → 14,150, 22,482 → 9,784 and 22,272 → 9,653, each under its ceiling.
+- **Always-on bytes:** 18,244 → 18,191, 7,745 → 7,676 and 6,356 → 6,289.
+- **A12** (16 / 5 / 5) and the emphatic counts are judgement, not failures; the baseline holds
+  them and a file fails only when it grows.
+- **Hook channels:** every handler whose text is meant for the model uses a channel its host
+  documents as model-visible (`hook-output-channels.md`, documented, not probed).
+- **Bundle parity:** `check-bundle-parity.cjs` reports 166 accepted differences and none
+  unlisted, counted per bundle. Of those, 70 are outline drift recorded for porting and 32 are
+  the Cursor agents' earlier third-person rewrite. The other 64 are host-specific skills,
+  agents and files, and 48 of those are Claude Code reference files the bundles name in prose
+  but do not ship.
+
+Not measured: whether the rewritten text changes model behaviour. The live routing and
+with/without evals were not run.
 
 ## Gate removal: before and after
 

@@ -15,6 +15,10 @@ const TIER_DENSITY = { TRIVIAL: 'MINIMAL', STANDARD: 'FULL', COMPLEX: 'FULL' };
 
 /** Exact or prefix ids (a date suffix such as -20251001 still matches). */
 const MODEL_TIERS = {
+  'claude-fable-5': 'COMPLEX',
+  'claude-opus-5': 'COMPLEX',
+  'claude-sonnet-5': 'STANDARD',
+  'claude-haiku-5': 'TRIVIAL',
   'claude-opus-4-7': 'COMPLEX',
   'claude-opus-4-6': 'COMPLEX',
   'claude-opus-4-5': 'COMPLEX',
@@ -26,11 +30,14 @@ const MODEL_TIERS = {
   'claude-haiku-4': 'TRIVIAL',
 };
 
-/** COMPLEX model ids (or id fragments) that get LEAN density. */
-const LEAN_MODELS = ['opus-4-6', 'opus-4.6', 'opus-4-7', 'opus-4.7'];
+/**
+ * COMPLEX model ids (or id fragments) that get LEAN density: Opus 4.6 and every later
+ * Opus or Fable, which hold a long build in one session with auto-compaction.
+ */
+const LEAN_MODELS = ['opus-4-6', 'opus-4.6', 'opus-4-7', 'opus-4.7', 'opus-5', 'fable'];
 
 /** Family keyword → tier, for ids the table does not name. */
-const FAMILY_TIERS = [['opus', 'COMPLEX'], ['sonnet', 'STANDARD'], ['haiku', 'TRIVIAL']];
+const FAMILY_TIERS = [['fable', 'COMPLEX'], ['opus', 'COMPLEX'], ['sonnet', 'STANDARD'], ['haiku', 'TRIVIAL']];
 
 function densityFor(tier, id) {
   if (tier === 'COMPLEX' && LEAN_MODELS.some((m) => id.includes(m))) return 'LEAN';

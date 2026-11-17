@@ -7,13 +7,11 @@ committing.
 **Commit:**
 
 1. Stage modified documentation files by name (never `git add -A` or `git add .`).
-2. Create a single commit:
+2. Create a single commit, adding the co-author trailer the host's attribution settings ask for, if any:
 
 ```bash
 git commit -m "$(cat <<'EOF'
 docs: update project documentation for vX.Y.Z.W
-
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 EOF
 )"
 ```

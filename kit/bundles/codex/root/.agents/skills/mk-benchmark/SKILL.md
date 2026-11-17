@@ -104,7 +104,7 @@ Each benchmark run writes a JSON dump to `.codex/benchmarks/results/{run-id}.jso
   "started": "2026-04-08T14:30:00Z",
   "ended": "2026-04-08T14:42:00Z",
   "harness_version": "3.0.0",
-  "model": "codex-opus-4-6",
+  "model": "<model-id>",
   "total_cost_usd": 4.20,
   "total_duration_seconds": 720,
   "tasks": [

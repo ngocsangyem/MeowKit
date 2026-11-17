@@ -10,7 +10,7 @@
 # Decision rules (per Phase 5 of harness plan):
 #   tier == TRIVIAL                                            → MINIMAL
 #   tier == STANDARD                                           → FULL
-#   tier == COMPLEX + model contains opus-4-6/4.6/4-7          → LEAN
+#   tier == COMPLEX + model is Opus 4.6+ or Fable            → LEAN
 #   tier == COMPLEX + other model                              → FULL
 #
 # Override:
@@ -86,7 +86,7 @@ if [ -z "$tier" ] || [ "$tier" = "auto" ]; then
     *haiku*)
       tier="TRIVIAL"
       ;;
-    *opus-4-6*|*opus-4.6*|*opus-4-7*|*opus-4.7*)
+    *opus-4-6*|*opus-4.6*|*opus-4-7*|*opus-4.7*|*opus-5*|*fable*)
       tier="COMPLEX"
       ;;
     *opus*)
@@ -123,7 +123,7 @@ case "$tier" in
     ;;
   COMPLEX)
     case "$model" in
-      *opus-4-6*|*opus-4.6*|*opus-4-7*|*opus-4.7*)
+      *opus-4-6*|*opus-4.6*|*opus-4-7*|*opus-4.7*|*opus-5*|*fable*)
         echo "LEAN"
         ;;
       *)

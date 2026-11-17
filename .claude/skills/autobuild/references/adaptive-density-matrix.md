@@ -8,8 +8,8 @@ The full decision table for autobuild scaffolding density (`MINIMAL`, `FULL`, `L
 |---|---|---|---|---|---|---|---|
 | **TRIVIAL** | `*haiku*` | `MINIMAL` | Skip (use plan-creator `--fast`) | Skip | Skip | Skip | Skip — invokes `mk:cook` instead |
 | **STANDARD** | `*sonnet*` | `FULL` | `--product-level` | Required | 1–3 rounds | Optional | Full preset |
-| **COMPLEX** | `opus-4-5`, other Opus | `FULL` | `--product-level` | Required | 2–3 rounds | **Required** | Full preset |
-| **COMPLEX** | `opus-4-6`, `opus-4-7`+ | **`LEAN`** | `--product-level` | **Optional** (skip if <5 ACs) | 0–1 rounds | **Skip** (auto-compact) | Full preset |
+| **COMPLEX** | `opus-4-5` and older Opus | `FULL` | `--product-level` | Required | 2–3 rounds | **Required** | Full preset |
+| **COMPLEX** | `opus-4-6`, `opus-4-7`, `opus-5*`, `fable*` | **`LEAN`** | `--product-level` | **Optional** (skip if <5 ACs) | 0–1 rounds | **Skip** (auto-compact) | Full preset |
 
 ## Per-Cell Rationale
 
@@ -25,9 +25,11 @@ Sonnet has good reasoning but benefits from explicit scaffolding to stay coheren
 
 Opus 4.5 is more capable than Sonnet but still benefits from autobuild scaffolding for autonomous multi-hour builds. **Why:** the failure mode at this tier shifts from coherence to ambition — Opus 4.5 will under-scope without an explicit contract demanding ambitious AC coverage. Context resets are required because the model's working memory degrades over long sessions.
 
-### COMPLEX (Opus 4.6+) → LEAN
+### COMPLEX (Opus 4.6+, Fable) → LEAN
 
 This is the **load-bearing finding** of Anthropic's harness research. Opus 4.6 with auto-compaction + 1M context can self-derive contract criteria from a product spec, drives its own active verification, and **degrades when forced through the full harness** because the scaffolding adds noise the model is already handling internally.
+
+Opus 5 and Fable 5 take LEAN by the same rule: each is newer than Opus 4.6 and keeps its auto-compaction. Neither has been replayed against the calibration set yet (see below), so `MEOWKIT_AUTOBUILD_MODE=FULL` is the fallback if a LEAN run under-delivers.
 
 **Concrete LEAN deltas vs FULL:**
 - **Contract: optional.** Skip if estimated ACs < 5. The model can draft + verify its own implicit contract from the product spec.
@@ -50,8 +52,8 @@ The auto-detection step tries these env vars in order and uses the first set:
 3. `ANTHROPIC_MODEL` (`Anthropic` SDK)
 4. (none) → defaults to `STANDARD` tier → `FULL` density (safe fallback)
 
-**Known limitation:** On Claude Code, the model id env var is not always exported to subagent contexts. Users running `/mk:autobuild` on Opus 4.6 who want LEAN mode should either:
-- Set `export MEOWKIT_MODEL_HINT=opus-4-6` once in their shell, OR
+**Known limitation:** On Claude Code, the model id env var is not always exported to subagent contexts. Users running `/mk:autobuild` on a LEAN model who want LEAN mode should either:
+- Set `export MEOWKIT_MODEL_HINT=<model id>` (for example `claude-opus-5-5`) once in their shell, OR
 - Pass `--tier lean` explicitly on the autobuild invocation, OR
 - Set `export MEOWKIT_AUTOBUILD_MODE=LEAN` for the session
 
@@ -59,7 +61,7 @@ The chosen density and its source are logged in the run report's "Density Decisi
 
 ## When the Matrix Will Need Updating
 
-Per the "dead-weight thesis," every model upgrade is an opportunity to test whether existing scaffolding is still load-bearing. When a new model tier rolls out (Sonnet 4.6, Opus 4.7, Haiku 5.x):
+Per the "dead-weight thesis," every model upgrade is an opportunity to test whether existing scaffolding is still load-bearing. When a new model tier rolls out:
 
 1. Re-run the calibration set (Phase 8 — `mk:benchmark`, available only in this repository) with the new model on FULL density
 2. Re-run the same set on LEAN density
@@ -73,9 +75,9 @@ The matrix is **not** static. It encodes the current best understanding of "wher
 
 | Anti-pattern | Why it's wrong |
 |---|---|
-| Hardcoding LEAN for all Opus models | Opus 4.5 still benefits from FULL — only 4.6+ has the auto-compaction + 1M context that justifies LEAN |
+| Hardcoding LEAN for all Opus models | Opus 4.5 and older still benefit from FULL — only 4.6 and later have the auto-compaction that justifies LEAN |
 | Setting MEOWKIT_AUTOBUILD_MODE=LEAN to "save time" on Sonnet | Sonnet without scaffolding produces worse output AND wastes more time on rework |
-| Forcing FULL on Opus 4.6 because "more is safer" | False — over-scaffolding capable models adds noise. Anthropic's measured finding <!-- research-citation --> |
+| Forcing FULL on a LEAN model because "more is safer" | False — over-scaffolding capable models adds noise. Anthropic's measured finding <!-- research-citation --> |
 | Skipping the calibration replay after a model upgrade | The whole policy depends on measured performance per tier; skipping is how the matrix becomes dead weight itself |
 
 ## See Also

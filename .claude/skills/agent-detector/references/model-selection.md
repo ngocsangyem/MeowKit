@@ -6,9 +6,9 @@
 
 ```toon
 model_selection[3]{model,when_to_use,agents}:
-  haiku,Quick tasks/Simple queries/Orchestration,orchestrator/analyst
-  sonnet,Standard implementation/Coding/Testing/Bug fixes,developer/tester/reviewer/planner/researcher
-  opus,Architecture/Deep analysis/Security audits/Complex planning,architect/security (audits)/Any agent (architecture mode)
+  haiku,Quick tasks/Mechanical or report-only work,documenter/shipper/project-manager/explore/git-manager
+  sonnet,Implementation support/Research/Testing,analyst/tester/researcher/journal-writer/orchestrator
+  opus,Design/Implementation/Review/Security/Complex planning,planner/architect/developer/reviewer/security/brainstormer
 ```
 
 ## Complexity to Model
@@ -36,22 +36,24 @@ task_model[8]{task_type,model,reason}:
 
 ## Agent Default Models
 
+Each agent runs on its `model:` pin, which follows the agent's tier in `model-selection-rules.md` (Agent `model:` Pins). The pin does not change per task: the tier declared for a task picks which agent runs, not which model it uses.
+
 ```toon
-agent_models[14]{agent,default_model,opus_when}:
-  orchestrator,haiku,Never (routing only)
-  analyst,haiku,Never (cost tracking/pattern extraction)
-  planner,sonnet,Complex multi-phase planning
-  architect,sonnet,Schema design / migration planning / system architecture
-  developer,sonnet,Never (implementation focus)
-  tester,sonnet,Never
-  reviewer,sonnet,opus for security-critical reviews
-  security,sonnet,opus for full audits
-  shipper,sonnet,Never
-  documenter,sonnet,Never
-  researcher,sonnet,opus for deep technical research
-  brainstormer,sonnet,opus for architecture evaluation
-  journal-writer,haiku,Never (documentation only)
-  project-manager,haiku,Never (delivery status reporting only)
+agent_models[14]{agent,pin,tier}:
+  orchestrator,sonnet,STANDARD
+  analyst,sonnet,STANDARD
+  planner,opus,COMPLEX
+  architect,opus,COMPLEX
+  developer,opus,COMPLEX
+  tester,sonnet,STANDARD
+  reviewer,opus,COMPLEX
+  security,opus,COMPLEX
+  shipper,haiku,TRIVIAL
+  documenter,haiku,TRIVIAL
+  researcher,sonnet,STANDARD
+  brainstormer,opus,COMPLEX
+  journal-writer,sonnet,STANDARD
+  project-manager,haiku,TRIVIAL
 ```
 
 ## Model Selection Output
@@ -62,13 +64,13 @@ Include in detection result:
 ## Detection Result
 
 - **Agent:** architect
-- **Model:** sonnet
+- **Model:** opus (the agent's pin)
 - **Complexity:** Standard
 - **Reason:** API endpoint implementation
 ```
 
-When spawning Agent tool, use the detected model:
+When spawning the agent, leave `model` unset so the agent's pin applies:
 
 ```
-Agent(subagent_type="architect", model="sonnet", ...)
+Agent(subagent_type="architect", ...)
 ```

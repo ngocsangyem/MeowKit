@@ -1,23 +1,27 @@
 #!/usr/bin/env bash
 # density-select.sh — Echoes the autobuild scaffolding density token (MINIMAL|FULL|LEAN)
-# based on detected model + tier. Used by mk:autobuild step-00 and any caller that
-# needs scriptable density resolution.
+# based on an explicit tier. Used by mk:autobuild step-00 and any caller that needs
+# scriptable density resolution.
 #
-# Usage:  density-select.sh [--tier auto|trivial|standard|complex] [--model <model-id>]
+# Usage:  density-select.sh [--tier auto|trivial|standard|complex]
 # Exit:   0 always (token to stdout); 2 on usage error
 # Reqs:   Bash 3.2+. POSIX shell features only.
 #
-# Decision rules (per Phase 5 of harness plan):
-#   tier == TRIVIAL                                            → MINIMAL
-#   tier == STANDARD                                           → FULL
-#   tier == COMPLEX + model contains opus-4-6/4.6/4-7          → LEAN
-#   tier == COMPLEX + other model                              → FULL
+# Codex note: Codex exposes no environment variable naming the session's model id to
+# this script, so density can NEVER be auto-detected from a model string here. Tier
+# must come from an explicit source (flag or env var); absent one, this script falls
+# back to the safe STANDARD -> FULL default. LEAN is reachable ONLY via explicit opt-in.
+#
+# Decision rules:
+#   tier == TRIVIAL                     -> MINIMAL
+#   tier == STANDARD                    -> FULL
+#   tier == COMPLEX (no explicit LEAN)  -> FULL
+#   MEOWKIT_AUTOBUILD_MODE=LEAN (explicit opt-in, any tier) -> LEAN
 #
 # Override:
 #   MEOWKIT_AUTOBUILD_MODE=MINIMAL|FULL|LEAN  (env var, highest priority)
 #   --tier flag                              (cli, second priority)
-#   --model flag                             (cli, supplements tier)
-#   auto-detection from the project environment env var (fallback)
+#   (no override)                            -> STANDARD tier -> FULL density
 set -u
 
 # 1. Highest priority: MEOWKIT_AUTOBUILD_MODE env override
@@ -36,23 +40,14 @@ fi
 
 # 2. Parse args
 tier=""
-# Model id auto-detection — try multiple env var names since Codex's
-# canonical env var name has changed across versions and may not be set in all
-# sub-task contexts. Order: explicit MEOWKIT_MODEL_HINT > the project environment > ANTHROPIC_MODEL > empty.
-# (Closes red-team C3 — previously read only the project environment which may not be exported.)
-model="${MEOWKIT_MODEL_HINT:-the project environment:-the provider API key:-}}}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --tier)
       tier="$2"
       shift 2
       ;;
-    --model)
-      model="$2"
-      shift 2
-      ;;
     -h|--help)
-      sed -n '2,17p' "$0"
+      sed -n '2,25p' "$0"
       exit 0
       ;;
     *)
@@ -62,26 +57,10 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# 3. Tier auto-detection (if not provided via flag)
+# 3. No auto-detection is possible (no model-id signal available). Default to the
+#    safe middle tier unless the caller passed an explicit --tier.
 if [ -z "$tier" ] || [ "$tier" = "auto" ]; then
-  case "$model" in
-    *haiku*)
-      tier="TRIVIAL"
-      ;;
-    *opus-4-6*|*opus-4.6*|*opus-4-7*|*opus-4.7*)
-      tier="COMPLEX"
-      ;;
-    *opus*)
-      tier="COMPLEX"
-      ;;
-    *sonnet*)
-      tier="STANDARD"
-      ;;
-    *)
-      # Unknown model — default to STANDARD (safest middle)
-      tier="STANDARD"
-      ;;
-  esac
+  tier="STANDARD"
 fi
 
 # Normalize tier value
@@ -95,23 +74,15 @@ case "$tier" in
     ;;
 esac
 
-# 4. Apply decision rules
+# 4. Apply decision rules. LEAN is never derived here — it only arrives via the
+#    MEOWKIT_AUTOBUILD_MODE branch above, since it requires an explicit user assertion
+#    that the underlying model can handle reduced scaffolding.
 case "$tier" in
   TRIVIAL)
     echo "MINIMAL"
     ;;
-  STANDARD)
+  STANDARD|COMPLEX)
     echo "FULL"
-    ;;
-  COMPLEX)
-    case "$model" in
-      *opus-4-6*|*opus-4.6*|*opus-4-7*|*opus-4.7*)
-        echo "LEAN"
-        ;;
-      *)
-        echo "FULL"
-        ;;
-    esac
     ;;
 esac
 

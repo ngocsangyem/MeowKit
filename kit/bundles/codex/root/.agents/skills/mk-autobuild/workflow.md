@@ -40,7 +40,7 @@ If `next_step` is unset, the agent follows the default linear progression (step-
 |---|---|---|---|
 | `task_description` | invoker | step-01 | Original natural-language task |
 | `density` | step-00 | step-01..05 | `MINIMAL`, `FULL`, `LEAN` |
-| `model_id` | step-00 | step-06 | e.g., `opus-4-6`, `sonnet-4-5` |
+| `model_id` | step-00 | step-06 | `MEOWKIT_MODEL_HINT` value if the user set one, else `not detectable` — not auto-detected |
 | `tier` | step-00 | step-06 | `TRIVIAL`, `STANDARD`, `COMPLEX` |
 | `run_id` | step-00 | all | `YYMMDD-HHMM-{slug}` |
 | `run_dir` | step-00 | all | `tasks/autobuild-runs/{run_id}/` |
@@ -105,9 +105,9 @@ Step 6: Run Report
 
 ## Mode Notes
 
-- **MINIMAL** (Haiku/trivial): Runs `mk-cook` instead of the full harness. No contract, no iteration loop. Cheapest path.
-- **FULL** (Sonnet/Opus 4.5): Standard pipeline. Contract required. 1–3 iteration rounds.
-- **LEAN** (Opus 4.6+): Single-session build. Contract optional. 0–1 iteration rounds. Trusts the model's adaptive reasoning.
+- **MINIMAL** (TRIVIAL tier): Runs `mk-cook` instead of the full harness. No contract, no iteration loop. Cheapest path.
+- **FULL** (STANDARD/COMPLEX tier, default): Standard pipeline. Contract required. 1–3 iteration rounds.
+- **LEAN** (explicit opt-in only, via `--tier lean` or `MEOWKIT_AUTOBUILD_MODE=LEAN`): Single-session build. Contract optional. 0–1 iteration rounds. Trusts the model's adaptive reasoning — the user is asserting the underlying model can handle it, since this bundle cannot detect it.
 
 ## Resume
 

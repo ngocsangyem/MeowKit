@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "Every .claude/hooks/lib file each shared safety behaviour loads, relative to .claude/hooks/lib. `lib` is the require closure of the behaviour's Claude Code shell; `spawned` are lib scripts it runs as child processes. `bundled` is what a non-Claude runtime's hook tree carries (the two safety behaviours, the runtime adapter, and the dependency-free completion-check core the Codex and Cursor stop hooks require): the runtime shells there require exactly these files, copied byte for byte by scripts/sync-hook-core.cjs. Checked by .claude/hooks/__tests__/core-closure.test.cjs.",
+  "description": "Every .claude/hooks/lib file each shared safety behaviour loads, relative to .claude/hooks/lib. `lib` is the require closure of the behaviour's Claude Code shell; `spawned` are lib scripts it runs as child processes. `bundled` is what a non-Claude runtime's hook tree carries (the two safety behaviours, the runtime adapter, and the dependency-free completion-check core the Codex and Cursor stop hooks require): the runtime shells there require exactly these files, copied byte for byte by scripts/sync-hook-core.cjs. Checked by .claude/hooks/__tests__/core-closure.test.cjs. `helpers` are the workflow-* scripts skill preambles run and the files they require; each bundle carries a byte-for-byte copy of them in every `helperBinDirs` entry, where its skills call them.",
   "behaviours": {
     "privacy": {
       "shell": "privacy-block.cjs",
@@ -41,5 +41,23 @@
   "bundleLibDirs": [
     "kit/bundles/codex/root/.codex/hooks/lib",
     "kit/bundles/cursor/root/.cursor/hooks/lib"
+  ],
+  "helpers": [
+    "config-keys.cjs",
+    "config-rules.cjs",
+    "handler-registry.cjs",
+    "meowkit-paths.cjs",
+    "read-config.cjs",
+    "workflow-config",
+    "workflow-config-core.cjs",
+    "workflow-diff-scope",
+    "workflow-repo-mode",
+    "workflow-review-log",
+    "workflow-slug",
+    "yaml-subset.cjs"
+  ],
+  "helperBinDirs": [
+    "kit/bundles/codex/root/.codex/scripts/bin",
+    "kit/bundles/cursor/root/.cursor/scripts/bin"
   ]
 }

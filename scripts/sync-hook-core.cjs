@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 'use strict';
-// sync-hook-core.cjs — copy the shared safety-hook core into each non-Claude hook bundle.
+// sync-hook-core.cjs — copy the shared safety-hook core and the workflow-* skill helpers into
+// each non-Claude bundle.
 //
 // The Codex and Cursor bundles are installed on their own, without `.claude/`, so their
 // shells cannot require the canonical library in place. They carry a byte-for-byte copy of the
-// files `.claude/hooks/core-closure.json` lists under `bundled`, in the same layout, so one
+// files `.claude/hooks/core-closure.json` lists under `bundled` (and `helpers`, into `helperBinDirs`), so one
 // edit to the canonical file is one edit everywhere once this has run.
 //
 //   node scripts/sync-hook-core.cjs           write the copies
@@ -21,14 +22,22 @@ const CLOSURE = path.join(ROOT, '.claude/hooks/core-closure.json');
 function bundleCopies(root = ROOT) {
   const closure = JSON.parse(fs.readFileSync(path.join(root, '.claude/hooks/core-closure.json'), 'utf8'));
   const out = [];
-  for (const dir of closure.bundleLibDirs) {
-    for (const file of closure.bundled) {
-      const source = fs.readFileSync(path.join(root, '.claude/hooks/lib', file));
-      const target = path.join(root, dir, file);
-      let state = 'same';
-      if (!fs.existsSync(target)) state = 'missing';
-      else if (!fs.readFileSync(target).equals(source)) state = 'differs';
-      out.push({ dir, file, state, source, target });
+  // The hook core lands in each bundle's hooks/lib; the workflow-* helpers its skills run
+  // land in scripts/bin, flat, so their `./x.cjs` requires resolve beside them.
+  const sets = [
+    [closure.bundleLibDirs, closure.bundled],
+    [closure.helperBinDirs || [], closure.helpers || []],
+  ];
+  for (const [dirs, files] of sets) {
+    for (const dir of dirs) {
+      for (const file of files) {
+        const source = fs.readFileSync(path.join(root, '.claude/hooks/lib', file));
+        const target = path.join(root, dir, file);
+        let state = 'same';
+        if (!fs.existsSync(target)) state = 'missing';
+        else if (!fs.readFileSync(target).equals(source)) state = 'differs';
+        out.push({ dir, file, state, source, target });
+      }
     }
   }
   return out;

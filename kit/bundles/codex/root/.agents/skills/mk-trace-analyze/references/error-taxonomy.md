@@ -106,10 +106,10 @@ Each entry has:
 
 ### `context-anxiety-wrap` (LEGACY)
 
-- **Trace signal:** Sonnet 4.5 `session_end` records with abnormally low duration AND no failure markers
-- **Threshold:** N/A — should not appear on Opus 4.6+
+- **Trace signal:** standard-tier `session_end` records with abnormally low duration AND no failure markers
+- **Threshold:** N/A — should not appear on the capable tier
 - **Root cause:** Model gets anxious about context limits, exits early.
-- **Mitigation:** Move to Opus 4.6+. This pattern is the main reason for the LEAN density mode.
+- **Mitigation:** Move to the capable tier. This pattern is the main reason for the LEAN density mode.
 
 ## Suggestion Format
 

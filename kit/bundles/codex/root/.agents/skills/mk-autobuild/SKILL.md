@@ -51,9 +51,11 @@ Step 6: Run Report          → write the audit trail
 
 | Mode | Tier | Planner | Contract | Iteration Loop | Context Reset |
 |---|---|---|---|---|---|
-| **MINIMAL** | TRIVIAL (Haiku) | Skip (use plan-creator --fast) | Skip | Skip | Skip |
-| **FULL** | STANDARD (Sonnet) / COMPLEX (Opus 4.5) | Required | Required | 1–3 rounds | Optional |
-| **LEAN** | COMPLEX (Opus 4.6+) | Required | Optional | 0–1 rounds | Skip (auto-compact) |
+| **MINIMAL** | TRIVIAL | Skip (use plan-creator --fast) | Skip | Skip | Skip |
+| **FULL** | STANDARD / COMPLEX (default) | Required | Required | 1–3 rounds | Optional |
+| **LEAN** | COMPLEX, explicitly opted in | Required | Optional | 0–1 rounds | Skip (auto-compact) |
+
+Codex exposes no environment variable naming the session's model to this skill's shell, so density never self-selects LEAN. LEAN is reachable only via an explicit `--tier lean` flag or `MEOWKIT_AUTOBUILD_MODE=LEAN`; see `references/adaptive-density-matrix.md` for the full rationale and override sources.
 
 ## Run Report Schema
 
@@ -63,7 +65,7 @@ Every run writes `tasks/autobuild-runs/YYMMDD-{slug}/run.md`:
 ---
 run_id: 260408-1450-build-todo
 density: LEAN
-model: opus-4-6
+model: not detectable (tier set via --tier lean)
 budget_cap: 50
 budget_spent: 12.40
 iterations: 1
@@ -75,8 +77,8 @@ ended: 2026-04-08T15:18:00Z
 # Autobuild Run — {task description}
 
 ## Density Decision
-- Detected tier: {tier}
-- Detected model: {model-id}
+- Tier: {tier}
+- Model: {model-hint if the user set MEOWKIT_MODEL_HINT, else "not detectable"}
 - Density: {MINIMAL|FULL|LEAN}
 - Source: scale-routing | env-override | --tier flag
 

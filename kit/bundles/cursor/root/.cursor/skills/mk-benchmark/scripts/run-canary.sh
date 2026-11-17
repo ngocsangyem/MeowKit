@@ -100,7 +100,7 @@ TASKS_JSON="$TASKS_JSON" \
 RUN_ID="$RUN_ID" \
 TIER="$TIER" \
 STARTED="$STARTED" \
-MODEL="${MEOWKIT_MODEL_HINT:-the project environment:-unknown}}" \
+MODEL="${MEOWKIT_MODEL_HINT:-unknown}" \
 COST_CAP="$COST_CAP" \
 RESULT_FILE="$RESULT_FILE" \
 node "$(dirname "$0")/lib/write-run-manifest.cjs"
@@ -112,7 +112,7 @@ echo ""
 # never finishes filling in per-task results. Links back to the manifest path so
 # mk:trace-analyze can correlate.
 if [ -x ".meowkit/hooks/append-trace.cjs" ]; then
-  RUN_MODEL="${MEOWKIT_MODEL_HINT:-the project environment:-unknown}}"
+  RUN_MODEL="${MEOWKIT_MODEL_HINT:-unknown}"
   node .meowkit/hooks/append-trace.cjs "benchmark_result" \
     "{\"run_id\":\"$RUN_ID\",\"tier\":\"$TIER\",\"model\":\"$RUN_MODEL\",\"manifest_path\":\"$RESULT_FILE\"}" 2>/dev/null || true
 fi
