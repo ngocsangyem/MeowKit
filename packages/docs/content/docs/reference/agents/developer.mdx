@@ -35,7 +35,7 @@ The developer operates at Phase 3 (Build). It is the only agent that writes prod
 
 ## When to Use
 
-- After **Gate 1 passes** — the developer only starts when an approved plan exists.
+- After the **plan is agreed** — the developer starts from an agreed plan.
 - In **TDD mode** — after the tester confirms failing tests exist (red phase).
 - In **default mode** — after the planner produces an approved plan.
 - During **harness-driven builds** — follows the 4-subphase generator pattern (Understand → Design Direction → Implement → Verify).
@@ -43,7 +43,7 @@ The developer operates at Phase 3 (Build). It is the only agent that writes prod
 ## Key Capabilities
 
 - **Plan-driven implementation** — reads the approved plan and signed sprint contract before writing any code. In harness mode, also reads the sprint contract's acceptance criteria as the scope boundary.
-- **TDD gate detection** — checks environment variables and sentinel files to determine TDD mode. In TDD mode, invokes the pre-implement gate hook before the first source-code edit.
+- **TDD mode detection** — checks environment variables and sentinel files to determine TDD mode. In TDD mode, it confirms a failing test exists before the first source-code edit.
 - **Type-safe coding** — enforces no `any` types and no unsafe casts. Follows existing codebase patterns; new patterns require an ADR from the architect.
 - **Self-healing** — on test failures, attempts fixes up to 3 times, each with a different approach. After 3 failures, escalates with detailed failure report.
 - **Bead processing** — for Complex tasks with bead decomposition, processes beads sequentially by dependency order, commits per bead, and tracks progress for resume-on-interruption.
@@ -51,7 +51,7 @@ The developer operates at Phase 3 (Build). It is the only agent that writes prod
 
 ## Behavioral Checklist
 
-- [x] Reads approved plan and sprint contract before starting — never implements without Gate 1
+- [x] Reads approved plan and sprint contract before starting — does not start non-trivial work without an agreed plan
 - [x] In TDD mode: confirms failing tests exist before writing code
 - [x] Writes type-safe code with no `any` types or unsafe casts
 - [x] Follows existing codebase patterns — new patterns require an ADR
@@ -65,7 +65,7 @@ The developer operates at Phase 3 (Build). It is the only agent that writes prod
 | Scenario | What the developer does |
 |---|---|
 | Standard feature implementation | Reads plan, implements code per acceptance criteria, commits per criterion, hands off to tester/reviewer |
-| TDD feature development | Confirms failing tests exist, invokes gate hook, implements to make tests pass (green phase) |
+| TDD feature development | Confirms failing tests exist, implements to make tests pass (green phase) |
 | Harness-driven product build | Follows 4-subphase generator pattern: Understand → Design Direction → Implement → Verify |
 | Complex bead-decomposed task | Processes beads sequentially, commits per bead, tracks progress for resume-on-interruption |
 | Test failure self-healing | Attempts 3 different fix approaches. If all fail, escalates with detailed failure report |
@@ -97,6 +97,6 @@ The developer turns plans into production code, but never operates in a vacuum. 
 
 - **[planner](/reference/agents/planner)** — provides the approved plan that the developer implements
 - **[tester](/reference/agents/tester)** — provides failing tests (TDD) or receives implementation for green-phase verification
-- **[reviewer](/reference/agents/reviewer)** — reviews the implementation for Gate 2 approval
+- **[reviewer](/reference/agents/reviewer)** — reviews the implementation and writes the verdict
 - **[architect](/reference/agents/architect)** — provides ADRs that constrain architectural decisions
 - **[evaluator](/reference/agents/evaluator)** — grades the running build against rubrics in harness mode

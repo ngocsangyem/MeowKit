@@ -75,7 +75,7 @@ Bug → Mode Select → Check Memory → Scout (MANDATORY) → Diagnose
 
 ## Step 0 — Mode selection
 
-If no mode flag: `AskUserQuestion` (Autonomous / Human-in-the-loop / Quick). Autonomous auto-fixes blocking issues up to the cycle limit, then stops at *ready for user approval* — it never self-approves and never crosses Gate 2 or a ship boundary. Score is advisory display only.
+If no mode flag: `AskUserQuestion` (Autonomous / Human-in-the-loop / Quick). Autonomous auto-fixes blocking issues up to the cycle limit, then stops at *ready for user approval* — it never self-approves and never crosses a ship boundary. Score is advisory display only.
 
 ## Step 0.5 — Check fix memory
 
@@ -120,14 +120,14 @@ If verify fails: loop to Step 2. After 3 failures → STOP, question architectur
 3. Delegate to `project-manager` (Moderate/Complex only, background)
 4. `documenter` agent → update docs
 
-## Hard gates
+## Hard rules
 
 - No fix before scout + diagnose complete (Steps 1-2)
 - Confidence below "medium" blocks the fix
 - 3 failed attempts stops the pipeline — question the architecture
 - Symptom fixes are failure — find the cause first through structured analysis, never guessing
 
-## Plan-first gate
+## Plan first
 
 For moderate/complex bugs: run `mk:investigate` to confirm root cause. If fix affects > 2 files → `mk:plan-creator --type bugfix`. Skip: `--quick` mode (single file, clear cause).
 

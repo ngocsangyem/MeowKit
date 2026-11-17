@@ -23,7 +23,7 @@ Sets up the infrastructure for parallel agent execution. Called by the orchestra
 - **COMPLEX tasks only** (orchestrator enforces this)
 - When a plan identifies independent subtasks that can run in parallel
 - **Max 3 parallel agents** (from `parallel-execution-rules.md`)
-- **NOT for:** sequential tasks, tasks sharing the same files, gate phases (never parallelized)
+- **NOT for:** sequential tasks, tasks sharing the same files, planning and review phases (never parallelized)
 
 ## Core Capabilities
 
@@ -37,7 +37,7 @@ Sets up the infrastructure for parallel agent execution. Called by the orchestra
 
 ```mermaid
 flowchart TD
-    A["Plan approved (Gate 1)"]
+    A["Plan agreed"]
     B["Orchestrator identifies parallel opportunity"]
     C["<b>mk:team-config</b>"]
     C1["1. Parse plan for independent subtasks"]
@@ -75,6 +75,6 @@ Decompose the approved plan for the payment module: 1) API endpoints (src/api/pa
 - **Overlapping ownership kills parallelism.** If two subtasks need the same file, restructure or handle the shared file sequentially first.
 - **Integration test is mandatory.** After merging all worktrees, the full test suite must pass. Never skip this.
 - **Check for stale worktrees.** Run `git worktree list` before creating new ones to catch orphaned worktrees from crashed sessions.
-- **Gates are never parallelized.** Gate 1 and Gate 2 always run sequentially — parallel mode applies only to Phase 3 (Build).
+- **Planning and review are never parallelized.** They run sequentially — parallel mode applies only to Phase 3 (Build).
 
 > **Canonical source:** `.claude/skills/team-config/SKILL.md`

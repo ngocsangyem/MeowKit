@@ -1,6 +1,6 @@
 ---
 title: "planner"
-description: "Planning agent — runs dual product and engineering lens reviews, produces structured plans, and enforces Gate 1 before any code is written."
+description: "Planning agent — runs dual product and engineering lens reviews, produces structured plans, and agrees the plan with you before code is written."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -21,7 +21,7 @@ The planner is your strategic thinker. Before a single line of code is written, 
 
 > *"No code without a plan. The planner challenges assumptions before the first line is written."*
 
-The planner operates at Phase 1 (Plan) and enforces Gate 1 — the hard stop that prevents implementation from starting without an approved plan. It owns the `tasks/plans/` directory exclusively. No other agent creates, modifies, or deletes plan files.
+The planner operates at Phase 1 (Plan) and agrees each non-trivial plan with you before building starts. Nothing blocks an edit without a plan; the planner's job is to make one first. It owns the `tasks/plans/` directory exclusively. No other agent creates, modifies, or deletes plan files.
 
 ## Key Facts
 
@@ -31,7 +31,7 @@ The planner operates at Phase 1 (Plan) and enforces Gate 1 — the hard stop tha
 | **Phase** | 1 (Plan) |
 | **Auto-activates** | Standard and Complex tasks |
 | **Owns** | `tasks/plans/` |
-| **Never does** | Write code, write tests, skip Gate 1, implement without approval |
+| **Never does** | Write code, write tests, skip planning for non-trivial work |
 
 ## When to Use
 
@@ -61,7 +61,7 @@ The planner is skipped for Trivial tasks (typos, renames, formatting) where a pl
 - [x] Challenges premises — asks whether the requirement addresses the root cause or just a symptom
 - [x] Evaluates both product and engineering dimensions before producing a plan
 - [x] Produces plan artifacts at `tasks/plans/YYMMDD-name/`
-- [x] Enforces Gate 1 — no implementation agent starts without an approved plan
+- [x] Proposes the plan and agrees it with the user before any implementation agent starts
 - [x] Estimates effort and flags risks before work begins
 - [x] Rejects unclear tasks with specific clarification requests
 - [x] Routes product-level plans to `mk:autobuild` — never directly to the developer
@@ -94,6 +94,6 @@ The planner prevents the most expensive kind of engineering mistake: building th
 
 - **[orchestrator](/reference/agents/orchestrator)** — routes tasks to the planner based on complexity classification
 - **[architect](/reference/agents/architect)** — receives handoff from the planner when architectural decisions are needed
-- **[developer](/reference/agents/developer)** — implements the approved plan after Gate 1
+- **[developer](/reference/agents/developer)** — implements the approved plan after the plan is agreed
 - **[tester](/reference/agents/tester)** — writes tests based on the plan's acceptance criteria (inserted before developer in TDD mode)
 - **[brainstormer](/reference/agents/brainstormer)** — works alongside the planner during Phase 1 to evaluate competing solutions

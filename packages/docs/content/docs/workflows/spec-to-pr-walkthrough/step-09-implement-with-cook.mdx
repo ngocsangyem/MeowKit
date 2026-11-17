@@ -1,6 +1,6 @@
 ---
 title: "Step 9 — Implement with /mk:cook"
-description: "The 7-phase pipeline phase by phase — orient, plan, test, build, review, ship, reflect — with Gate 2 at Phase 4 and every phase observable."
+description: "The 7-phase pipeline phase by phase — orient, plan, test, build, review, ship, reflect — with the review verdict at Phase 4 and every phase observable."
 ---
 
 You've chosen AUTH-201 for this sprint. Time to build.
@@ -22,7 +22,7 @@ Optional flags: `--tdd` (failing test first), `--fast` (skip Phase 1 research). 
 <Callout title="Phase 1 behavior" type="info">
 
 - **Plan-path entry (AUTH-201, AUTH-202):** Phase 1 is SKIPPED. Cook reads the approved plan from Step 8 and goes straight to Phase 2 / Phase 3.
-- **Natural-language entry (AUTH-203):** Phase 1 runs inline — `mk:plan-creator` produces the plan and Gate 1 fires inside the cook invocation.
+- **Natural-language entry (AUTH-203):** Phase 1 runs inline — `mk:plan-creator` produces the plan and you agree it inside the cook invocation.
 </Callout>
 
 ## What happens behind the scenes — the 7 phases
@@ -67,18 +67,18 @@ Natural-language entry (AUTH-203, TRIVIAL):
   Writes a one-paragraph plan; phases collapsed
 ```
 
-<Callout title="GATE 1 — Where it fires" type="error">
+<Callout title="Where the plan is agreed" type="info">
 
-- **For tickets that went through Step 8** (AUTH-201, AUTH-202): Gate 1 already fired at Step 8 standalone. Cook treats the existing plan as approved (sources approval from the plan file's approval line).
-- **For tickets that skipped Step 8** (TRIVIAL — AUTH-203): Gate 1 fires here, inside cook's Phase 1. `gate-enforcement.cjs` still blocks Phase 3 if no approval line exists.
+- **For tickets that went through Step 8** (AUTH-201, AUTH-202): the plan was already agreed at Step 8 standalone. Cook uses the existing plan.
+- **For tickets that skipped Step 8** (TRIVIAL — AUTH-203): you agree the plan here, inside cook's Phase 1. No hook blocks Phase 3 without one.
 
-Gate 1 is non-bypassable in both paths.
+In both paths the plan is a practice, not a gate.
 
 </Callout>
 
 ### Phase 2 — Test (only if `--tdd`)
 
-In default mode, this phase is a no-op. With `--tdd`, the `tester` agent writes failing tests targeting each AC **before** any implementation runs. The `pre-implement.cjs` hook then verifies the RED state.
+In default mode, this phase is a no-op. With `--tdd`, the `tester` agent writes failing tests targeting each AC **before** any implementation runs. The RED state is a workflow rule, not a hook check.
 
 ### Phase 3 — Build
 
@@ -112,9 +112,9 @@ Grades 5 dimensions:
 Writes: tasks/reviews/260511-auth-201-verdict.md
 ```
 
-<Callout title="GATE 2 — Human approval required" type="error">
+<Callout title="Review verdict" type="info">
 
-Verdict has 1 WARN. You decide: ship with the WARN documented, or add the missing test first. **Any FAIL** blocks Phase 5 unconditionally.
+Verdict has 1 WARN. You decide: ship with the WARN documented, or add the missing test first. **Any FAIL** means fixing that dimension before Phase 5. No hook enforces it; the ship check still runs lint, related tests and type-check.
 
 </Callout>
 
@@ -142,7 +142,7 @@ Source: PR #402
 
 # .meowkit/memory/gotchas.md
 ## First OAuth provider shipped without a token-refresh test   <!-- 2026-11-01 -->
-Why: the reviewer caught it at Gate 2; the happy path passed without it
+Why: the reviewer caught it at review; the happy path passed without it
 Apply when: adding any OAuth provider
 Source: tasks/reviews/261101-auth-201-verdict.md
 ```

@@ -60,19 +60,19 @@ Bootstrap a new full-stack SaaS application with a React frontend, Express API, 
 | Argument | Type | Description |
 |----------|------|-------------|
 | `requirements` | string | Required. Natural language description of what to build |
-| `--full` | flag | Maximum user control, gates at every step |
-| `--fast` | flag | No user gates, maximum speed, auto-commit |
+| `--full` | flag | Maximum user control, you confirm at every step |
+| `--fast` | flag | No confirmation steps, maximum speed, auto-commit |
 | `--parallel` | flag | Parallel implementation for independent components |
-| (default) | - | Auto mode: balanced, design gate only |
+| (default) | - | Auto mode: balanced, design confirmation only |
 
 ## Modes
 
 | Mode | Flag | Research | Design | Plan Flag | Cook Flag | Git |
 |------|------|----------|--------|-----------|-----------|-----|
 | **Auto** | (default) | Parallel researchers | UI/UX if frontend | `--auto` | `--auto` | Auto init |
-| **Full** | `--full` | Parallel researchers, gate | UI/UX if frontend, gate | `--hard` | (interactive) | Ask user |
-| **Fast** | `--fast` | 6 parallel batch, no gate | Skip | `--fast` | `--auto` | Auto init + commit |
-| **Parallel** | `--parallel` | Parallel researchers, no gate | UI/UX if frontend, gate | `--parallel` | `--parallel` | Auto init |
+| **Full** | `--full` | Parallel researchers, you confirm | UI/UX if frontend, you confirm | `--hard` | (interactive) | Ask user |
+| **Fast** | `--fast` | 6 parallel batch, no confirmation | Skip | `--fast` | `--auto` | Auto init + commit |
+| **Parallel** | `--parallel` | Parallel researchers, no confirmation | UI/UX if frontend, you confirm | `--parallel` | `--parallel` | Auto init |
 
 ## Workflow
 
@@ -166,34 +166,34 @@ Extend from this minimum based on config.json features (docker, CI, database).
 
 ### Auto (default)
 
-Balanced mode. Research + design gate. Good for most projects.
+Balanced mode. Research, then you confirm the design. Good for most projects.
 
 1. Git init (auto)
 2. Research: 2-3 parallel researcher subagents
 3. Tech stack: auto-detect or auto-select from research
-4. Design: `ui-ux-designer` if frontend, gate: user approves
+4. Design: `ui-ux-designer` if frontend, you approve the design
 5. Plan: `mk:plan-creator --auto`
 6. Scaffold: guided by plan, auto-confirm
 7. Shared phases: cook -> docs -> final report
 
 ### Full (`--full`)
 
-Maximum user control. Gates at every major step. For critical projects.
+Maximum user control. You confirm at every major step. For critical projects.
 
 1. Git init: ask user
 2. Clarify requirements: one question at a time, 100% clarity
-3. Research: 2-4 parallel researchers, gate: user approves summary
-4. Tech stack + design: gate for each
-5. Plan: `mk:plan-creator --hard` with Gate 1 approval. Optional: `mk:plan-ceo-review`
+3. Research: 2-4 parallel researchers, you approve the summary
+4. Tech stack + design: you confirm each
+5. Plan: `mk:plan-creator --hard` and you agree the plan before building. Optional: `mk:plan-ceo-review`
 6. Scaffold: user confirms tree, progressive generation
 7. Shared phases: cook (interactive) -> docs -> final report
 
 ### Fast (`--fast`)
 
-No user gates. Maximum speed. For prototypes and hackathons.
+No confirmation steps. Maximum speed. For prototypes and hackathons.
 
 1. Git init (auto)
-2. Combined research + stack: 6 parallel researchers, no gate
+2. Combined research + stack: 6 parallel researchers, no confirmation
 3. Plan: `mk:plan-creator --fast`, auto-creates without approval
 4. Scaffold: progressive, no user confirmation
 5. Shared phases: cook (auto) -> docs -> final report
@@ -201,11 +201,11 @@ No user gates. Maximum speed. For prototypes and hackathons.
 
 ### Parallel (`--parallel`)
 
-Design gate only. Parallel implementation for independent components. For large projects.
+Design confirmation only. Parallel implementation for independent components. For large projects.
 
 1. Git init (auto)
-2. Research: 2 parallel researchers, no gate
-3. Tech stack + design: gate for both
+2. Research: 2 parallel researchers, no confirmation
+3. Tech stack + design: you confirm both
 4. Plan: `mk:plan-creator --parallel` with file ownership matrix, dependency graph
 5. Scaffold: guided by plan, progressive
 6. Shared phases: cook (parallel, multiple developer agents), docs, final report

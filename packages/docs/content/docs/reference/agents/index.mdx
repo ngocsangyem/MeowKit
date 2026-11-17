@@ -12,14 +12,14 @@ Pipeline agents that execute sequentially through phases 0-6.
 | Agent | Phase | Role | Auto-activates |
 |-------|-------|------|---------------|
 | [orchestrator](/reference/agents/orchestrator) | 0 | Task router, complexity classification, model tier assignment | Every task |
-| [planner](/reference/agents/planner) | 1 | Scope-adaptive planning, Gate 1, bead decomposition | Standard/complex tasks |
+| [planner](/reference/agents/planner) | 1 | Scope-adaptive planning, plan agreed with you, bead decomposition | Standard/complex tasks |
 | [architect](/reference/agents/architect) | 1 | ADRs, system design | Complex tasks |
 | [tester](/reference/agents/tester) | 2 | Test writing (TDD red/green/refactor) | After planning |
 | [security](/reference/agents/security) | 2, 4 | Security audit, BLOCK verdicts | Auth/payment changes |
 | [developer](/reference/agents/developer) | 3 | Implementation, bead processing | After tester |
 | [evaluator](/reference/agents/evaluator) | 3, 4 | Behavioral verification, rubric grading | Harness pipeline, `mk:evaluate` |
-| [reviewer](/reference/agents/reviewer) | 4 | 5-dimension structural audit, Gate 2 | After developer |
-| [shipper](/reference/agents/shipper) | 5 | Deploy pipeline, PR creation | After Gate 2 |
+| [reviewer](/reference/agents/reviewer) | 4 | 5-dimension structural audit, verdict | After developer |
+| [shipper](/reference/agents/shipper) | 5 | Deploy pipeline, PR creation | After review |
 | [documenter](/reference/agents/documenter) | 6 | Living docs, changelogs | After ship |
 | [analyst](/reference/agents/analyst) | 0, 6 | Cost tracking, pattern analysis | Session start/end |
 | [project-manager](/reference/agents/project-manager) | on-demand | Cross-workflow delivery tracking, status reports | On request via `/mk:status` |

@@ -1,12 +1,12 @@
 ---
 title: "Rules Index"
-description: "The 7 always-on MeowKit rules, where the other 19 moved, and how each is enforced."
+description: "The 6 always-on MeowKit rules, where the others moved, and how each is enforced."
 sourceOfTruth: "docs/governance/rules-index.md"
-lastVerified: "2026-11-02"
+lastVerified: "2026-11-17"
 ---
 
-The always-on set is exactly 7 files under `.claude/rules/`. Claude Code auto-loads that
-directory every session, so those 7 are the only rules that cost context unconditionally.
+The always-on set is exactly 6 files under `.claude/rules/`. Claude Code auto-loads that
+directory every session, so those 6 are the only rules that cost context unconditionally.
 Every other rule moved next to the skill that loads it and reaches context just in time.
 
 No kit-owned root `CLAUDE.md` ships. A project may keep its own `CLAUDE.md`; it is
@@ -14,21 +14,20 @@ project-owned, never installed or refreshed by MeowKit.
 
 Source file: `docs/governance/rules-index.md`
 
-## Always-On Rules (7)
+## Always-On Rules (6)
 
 | Rule | Purpose | Applies to |
 |------|---------|-----------|
-| `meowkit-core.md` | Role, the 7-phase workflow, the two gates in brief, the DATA/INSTRUCTIONS boundary, the memory contract, the compaction policy | All modes, all phases |
+| `meowkit-core.md` | Role, the 7-phase workflow, the ship check in brief, the DATA/INSTRUCTIONS boundary, the memory contract, the compaction policy | All modes, all phases |
 | `security-rules.md` | Block hardcoded secrets, `any` types, SQL interpolation, XSS and the rest of the blocked-pattern table | All modes, all phases |
 | `injection-rules.md` | Prompt-injection defense: DATA vs INSTRUCTIONS boundary; Rule 11 = Skill Rule of Two | All modes, all phases |
-| `gate-rules.md` | Gate 1 and Gate 2 hard stops, the Gate Authority Invariant, Recording Human Interventions | Phases 1, 4 |
 | `core-behaviors.md` | 6 mandatory operating behaviors + the Anti-Rationalization table | All modes, all phases |
 | `development-rules.md` | YAGNI/KISS/DRY, file management, code quality, pre-commit, git safety, docs impact, tool-output limits | Implementation, commit |
 | `agent-conduct.md` | A1 subagent status protocol, A3 eureka documentation, B2 response structure | All agent responses |
 
-`mewkit validate` checks all 7 for presence — a missing file silently drops enforcement.
+`mewkit validate` checks all 6 for presence — a missing file silently drops enforcement.
 
-Rules are not the only thing a session carries before any skill runs: every skill's `name`, `description` and `when_to_use`, and every agent's `name` and `description`, are listed too. `scripts/check-always-on-budget.cjs` holds both under a byte ceiling: the rules alone at 25,600 B, and rules plus that metadata at 70,000 B. Today they measure 25,417 B and 59,426 B. The script exits non-zero when either ceiling is exceeded, so a rule or description that grows has to pay for itself.
+Rules are not the only thing a session carries before any skill runs: every skill's `name`, `description` and `when_to_use`, and every agent's `name` and `description`, are listed too. `scripts/check-always-on-budget.cjs` holds both under a byte ceiling: the rules alone at 18,191 B, and rules plus that metadata at 70,000 B. Today they measure 18,191 B and 43,794 B. The script exits non-zero when either ceiling is exceeded, so a rule or description that grows has to pay for itself.
 
 ## Moved Rules — Where They Live Now
 
@@ -66,11 +65,11 @@ Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sp
 
 | Rule | Purpose | Loaded by |
 |------|---------|-----------|
-| `agile-story-gates.md` | Definition of Ready (Phase 1 entry), Definition of Done (Gate 2 PASS), traceability frontmatter contract | `mk:agent-detector` Step 0b (Agile context) |
+| `agile-story-gates.md` | Definition of Ready (Phase 1 entry), Definition of Done (review verdict PASS), traceability frontmatter contract | `mk:agent-detector` Step 0b (Agile context) |
 | `agile-sprint-commitment.md` | Sprint goal persistence, mid-sprint amendment ceremony, sprint close hygiene | `mk:agent-detector` Step 0b (Agile context) |
 | `agile-feedback-cycle.md` | Retro action-item ceremony, spike governance (timebox + findings doc) | `mk:agent-detector` Step 0b (Agile context) |
 
-These rules live at `.claude/skills/agent-detector/references/agile-*.md`. They wire into existing skills (`mk:plan-creator`, `mk:sprint-contract`, `mk:retro`, `mk:jira-agile`, `mk:ship`, `project-manager` agent) — no new agents, no new hooks, no new gates.
+These rules live at `.claude/skills/agent-detector/references/agile-*.md`. They wire into existing skills (`mk:plan-creator`, `mk:sprint-contract`, `mk:retro`, `mk:jira-agile`, `mk:ship`, `project-manager` agent) — no new agents, no new hooks.
 
 ## Loading Priority
 
@@ -79,13 +78,12 @@ stronger override:
 
 1. `security-rules.md` — NEVER override
 2. `injection-rules.md` — NEVER override
-3. `gate-rules.md` — NEVER override (except `/mk:fix` simple)
-4. `core-behaviors.md` — always apply (6 behaviors + anti-rationalization)
-5. `meowkit-core.md` — always apply (workflow, gates in brief, memory, compaction policy)
-6. `agent-conduct.md` — always apply
-7. `development-rules.md` — always apply
+3. `core-behaviors.md` — always apply (6 behaviors + anti-rationalization)
+4. `meowkit-core.md` — always apply (workflow, ship check, memory, compaction policy)
+5. `agent-conduct.md` — always apply
+6. `development-rules.md` — always apply
 
-Just-in-time rules apply when their owning skill loads them, and only there. `harness-rules.md` and `rubric-rules.md` never override a gate; `tdd-rules.md` applies only when `MEOWKIT_TDD=1` / `--tdd`; `context-budget-rules.md` is advisory and never a gate.
+Just-in-time rules apply when their owning skill loads them, and only there. `harness-rules.md` and `rubric-rules.md` never override the ship check; `tdd-rules.md` applies only when `MEOWKIT_TDD=1` / `--tdd`; `context-budget-rules.md` is advisory and never enforced.
 
 ## Enforcement Mechanism Matrix
 
@@ -95,15 +93,14 @@ Just-in-time rules apply when their owning skill loads them, and only there. `ha
 |------|-----------|-----------|-----------|
 | `security-rules.md` | Behavioral | NEVER | Human override only |
 | `injection-rules.md` | Behavioral | NEVER | Human override only |
-| `gate-rules.md` | Hook | NEVER | `/mk:fix` simple; scale-routing one-shot |
 | `core-behaviors.md` | Behavioral | No | — |
 | `meowkit-core.md` | Behavioral + Script (always-on byte budget) | No | — |
 | `agent-conduct.md` | Behavioral | No | A1/A3 preserve rationale; B2 compressed |
 | `development-rules.md` | Behavioral | No | — |
-| `harness-rules.md` | Behavioral + Hook (`gate-enforcement.cjs`, `validate-verdict.sh`) | NEVER override gates | Density modes adjust scaffolding, not gate semantics |
+| `harness-rules.md` | Behavioral + Script (`validate-verdict.sh`) | Density never lowers the quality bar | Density modes adjust scaffolding, not the checks |
 | `rubric-rules.md` | Behavioral + Script (`validate-rubric.sh`) | NEVER override hard-fail propagation | Custom rubrics addable; semantics fixed |
 | `tdd-rules.md` | Behavioral | Yes | Default OFF; opt in via `--tdd` / `MEOWKIT_TDD=1` |
-| `context-budget-rules.md` | Behavioral | N/A | Advisory read-budget; never a gate |
+| `context-budget-rules.md` | Behavioral | N/A | Advisory read-budget |
 | `orchestration-rules.md` | Behavioral | N/A | Contextual |
 | `model-selection-rules.md` | Behavioral | No | Domain override via CSV |
 | `scale-adaptive-rules.md` | Behavioral + Data | No | CSV user-extensible |
@@ -123,7 +120,7 @@ Just-in-time rules apply when their owning skill loads them, and only there. `ha
 | Hook | Event | Purpose |
 |------|-------|---------|
 | `privacy-block.cjs` | PreToolUse | Block reads of `.env`, `*.key`, credentials |
-| `gate-enforcement.cjs` | PreToolUse | Block source code writes before Gate 1 |
+| `pre-ship.cjs` | PreToolUse | Ship check (lint, related tests, type-check) on commit, push, merge and PR commands |
 | `project-context-loader.cjs` | SessionStart | Auto-load `project-context.md` |
 
 Rules define _why_. Hooks enforce _what_.
@@ -136,14 +133,14 @@ Discipline rules for the autonomous multi-hour build pipeline (`mk:autobuild`) a
 |---|------|-------|
 | 1 | Planner Stays Product-Level | Planner emits user stories, not file paths |
 | 2 | Generator ≠ Evaluator | Self-evaluation forbidden — fresh-context evaluator only |
-| 3 | Sprint Contract Required in FULL Density | Contract gate before source edits (FULL mode) |
+| 3 | Sprint Contract Required in FULL Density | Contract signed before source edits (FULL mode, no hook checks it) |
 | 4 | Iteration Cap = 3 Rounds | After 3 gen/eval rounds, escalate to human |
 | 5 | Adaptive Density by scale-routing + Model String | MINIMAL/FULL/LEAN selected per tier |
 | 6 | Budget Thresholds — $30 warn, $100 hard, user cap | Multi-tier budget guardrail |
 | 7 | Dead-Weight Audit on Model Upgrade | Re-run audit playbook per new model tier |
-| 8 | Active Verification Is a HARD GATE | Evaluator drives build via browser/curl/CLI |
+| 8 | Active Verification Is Required | Evaluator drives build via browser/curl/CLI |
 | 9 | Skeptic Persona Reloaded Per Criterion | Prevent leniency drift across criteria |
-| 10 | No Density Override Bypasses Gates | Density ≠ gate bypass |
+| 10 | No Density Override Lowers the Quality Bar | Density changes scaffolding, not the bar |
 
 Source: `.claude/skills/cook/references/harness-rules.md`. Applies to Phase 3 (Build) + Phase 4 (Review) when harness pipeline is active.
 
@@ -156,7 +153,7 @@ Domain-complexity routing rules that drive Phase 0 classification and harness de
 | 1 | CSV Match Overrides Manual Classification | Domain keyword match overrides orchestrator judgment |
 | 2 | No Match Falls Back Gracefully | Unknown domain → manual classification per the model-selection rules |
 | 3 | High Complexity Forces COMPLEX Tier | `level=high` → COMPLEX, no exceptions |
-| 4 | One-Shot Workflow Enables Gate 1 Bypass | `workflow=one-shot` + zero blast radius → skip Gate 1 |
+| 4 | One-Shot Workflow Skips the Plan | `workflow=one-shot` + zero blast radius → no plan file needed |
 | 5 | Users Can Extend the CSV | `domain-complexity.csv` is user-editable |
 | 6 | Adaptive Density Emission | scale-routing also emits `autobuild_density` for harness consumers |
 | 7 | **Auto-Strict for High-Complexity Cook Runs** | `level=high` during `/mk:cook` → auto-enables `--strict` at Phase 4.5; suppressible via `--no-strict`; fires ONLY in mk:cook |

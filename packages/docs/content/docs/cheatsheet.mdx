@@ -25,7 +25,7 @@ Run `mewkit --help` for the full list.
 |---------|-------|-------------|
 | `/mk:agent-detector [task]` | 0 | Entry point — classifies and routes to right agent |
 | `/mk:breakdown <source>` | pre-1 | Spec/PRD → user stories + optional Jira tickets + tech breakdown — stops before plan |
-| `/mk:plan-creator [feature]` | 1 | Premise challenge + two-lens plan + Gate 1 |
+| `/mk:plan-creator [feature]` | 1 | Premise challenge + two-lens plan, agreed with you |
 | `/mk:cook [feature]` | 1→5 | Full pipeline: plan → test → build → review → ship |
 | `/mk:fix [bug]` | varies | Auto-detect complexity, route to fix strategy |
 | `/mk:review` | 4 | Multi-pass code review + adversarial analysis |
@@ -65,29 +65,29 @@ Run `mewkit --help` for the full list.
 | security | Auth/payments/security changes | 2,4 | BLOCK/PASS verdict |
 | developer | After planner (TDD off) or tester (TDD on) | 3 | Implementation |
 | reviewer | After implementation | 4 | 5-dimension verdict |
-| shipper | After Gate 2 | 5 | PR + rollback docs |
+| shipper | After review | 5 | PR + rollback docs |
 | documenter | After ship | 6 | Updated docs + changelog |
 | analyst | Session start/end | 0,6 | Cost report + patterns |
 | journal-writer | On failure/escalation | 6 | Root cause documentation |
 
 ## Workflow Phases
 
-| Phase | Name | Gate? | What happens |
+| Phase | Name | Check | What happens |
 |-------|------|-------|-------------|
 | 0 | Orient | — | Read memory, load skills, route model tier |
-| 1 | Plan | ✋ Gate 1 | Challenge premises, create plan, human approval |
+| 1 | Plan | — | Challenge premises, write the plan, agree it with you |
 | 2 | Test | — | Write failing tests first (TDD mode `--tdd`/`MEOWKIT_TDD=1`); optional otherwise |
 | 3 | Build | — | Implement per plan; in TDD mode, until tests pass |
-| 4 | Review | ✋ Gate 2 | 5-dimension audit, human approval |
-| 5 | Ship | — | Commit, PR, CI verify, rollback docs |
+| 4 | Review | — | 5-dimension audit, written verdict |
+| 5 | Ship | Ship check | Lint, related tests and type-check on commit/push/merge/PR; then commit, PR, CI verify, rollback docs |
 | 6 | Reflect | — | Update docs, memory, retrospective |
 
 ## Execution Modes
 
-| Mode | When | Agents | Gate behavior |
+| Mode | When | Agents | Ordering |
 |------|------|--------|---------------|
-| Sequential (default) | All tasks | 1 per phase | Full gates |
-| Parallel | COMPLEX + independent subtasks | Up to 3, worktree isolation | Gates always sequential |
+| Sequential (default) | All tasks | 1 per phase | Every phase |
+| Parallel | COMPLEX + independent subtasks | Up to 3, worktree isolation | Phases stay sequential |
 | Party | Architecture decisions | 2-4 deliberation agents | No code, synthesis only |
 
 ## Model Routing
@@ -102,11 +102,11 @@ Run `mewkit --help` for the full list.
 
 ## Modes
 
-| Mode | Gates | Security | Use for |
+| Mode | Review | Security | Use for |
 |------|-------|---------|---------|
-| default | Both | Full | Most work |
-| strict | Both (no WARN) | Every file | Production, auth, payments |
-| fast | Gate 1 only | BLOCK only | Prototypes |
+| default | Full verdict | Full | Most work |
+| strict | Full verdict (no WARN) | Every file | Production, auth, payments |
+| fast | Light | BLOCK only | Prototypes |
 | architect | N/A | N/A | Design-only sessions |
 | audit | N/A | Comprehensive | Security reviews |
 
@@ -117,10 +117,8 @@ Run `mewkit --help` for the full list.
 | post-write.cjs | PostToolUse | Security scan on Edit/Write | Yes |
 | post-session.cjs | Stop | Capture session to memory | No |
 | pre-task-check.cjs | PreToolUse Bash | Injection pattern detection, reported to the model | No |
-| pre-implement.cjs | Skill-invoked | TDD gate — opt-in via `--tdd` / `MEOWKIT_TDD=1`; no-op otherwise | Only when TDD enabled |
-| pre-ship.cjs | Skill-invoked | Test + lint + typecheck | Yes |
+| pre-ship.cjs | PreToolUse Bash | Ship check: lint, related tests and type-check before commit, push, merge, PR | Yes |
 | privacy-block.cjs | PreToolUse | Block .env / *.key / credential reads | Yes |
-| gate-enforcement.cjs | PreToolUse | Block source writes before Gate 1 approval | Yes |
 | project-context-loader.cjs | SessionStart | Auto-load project-context.md into context | No |
 
 ## Key Skills
@@ -189,7 +187,7 @@ Source of truth for the file's key surface: `crates/mewkit-core/schemas/config-v
 
 | Key | Values | Effect |
 |-----|--------|--------|
-| `autobuild.mode` | `MINIMAL` \| `FULL` \| `LEAN` | Override auto-detected scaffolding density. Never bypasses a gate |
+| `autobuild.mode` | `MINIMAL` \| `FULL` \| `LEAN` | Override auto-detected scaffolding density. Never bypasses a safety hook |
 | `budget.warn` | e.g. `30` | USD warn threshold (prints warning, continues) |
 | `budget.block` | e.g. `100` | USD hard-block threshold (halts the run, sets `final_status=TIMED_OUT`) |
 | `budget.cap` | e.g. `50` | User-set cap; overrides `budget.block` (can be lower OR higher) |
@@ -198,7 +196,7 @@ Source of truth for the file's key surface: `crates/mewkit-core/schemas/config-v
 
 | Key | Values | Effect |
 |-----|--------|--------|
-| `tdd` | `true` \| `false` | `true` = strict red-green-refactor (`pre-implement.cjs` enforces failing-test-first); default `false`. `MEOWKIT_TDD=1` in the environment is a supported override and wins over the file |
+| `tdd` | `true` \| `false` | `true` = strict red-green-refactor (write the failing test first; no hook checks the order); default `false`. `MEOWKIT_TDD=1` in the environment is a supported override and wins over the file |
 | `buildVerify.timeoutMs` | milliseconds | Per-command timeout for the build-verify hook |
 | `projectContext.maxBytes` | bytes (default `12288`) | `project-context.md` size warn threshold; `0` disables |
 | `workflow.telemetry` | `on` \| `off` | Workflow telemetry preference |
@@ -211,8 +209,8 @@ observer's own file base name — `build-verify`, `loop-detection`,
 `pre-completion-check`, `tdd-flag-detector`, `learning-observer`, `budget-tracker`
 and the rest of the 21 in `.claude/hooks/handlers.json`.
 
-Safety hooks cannot be disabled from any config: `gate-enforcement`, `privacy-block`,
-`pre-ship`, `gate2-check`, `check-careful`, `check-freeze` and `check-report-path` are
+Safety hooks cannot be disabled from any config: `privacy-block`,
+`pre-ship`, `check-careful`, `check-freeze` and `check-report-path` are
 rejected with a validation error, and the hook keeps blocking.
 
 ### Environment
@@ -222,7 +220,6 @@ rejected with a validation error, and the hook keeps blocking.
 | `MEOWKIT_TDD` | `0` \| `1` | Supported override of `tdd`, at the top of the precedence chain |
 | `MEOWKIT_HOOK_PROFILE` | `standard` \| `fast` \| `strict` | Hook profile selector, read by `pre-ship.cjs`. Legacy alias `MEOW_HOOK_PROFILE` still accepted; new name wins if both set. No config key — a safety entrypoint reads it, and those read no config file |
 | `MEOWKIT_MODEL_HINT` | e.g. `opus-4-6` | Tell the harness which model is running (enables LEAN auto-detect) |
-| `MEOWKIT_GATE1_PRESENCE_ONLY` | `1` | Downgrades Gate 1 to a plan-presence check. Every use is logged |
 
 ### Precedence reminder
 

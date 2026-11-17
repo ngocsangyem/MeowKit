@@ -97,7 +97,7 @@ The skill detects a JS/TS project with pnpm, runs `pnpm run build` (PASS, 4.2s),
 
 ## Pro Tips
 
-- **Run before `mk:review`** -- the verify step is the Phase 3->4 transition gate; PASS is required before review
+- **Run before `mk:review`** -- the verify step is the Phase 3->4 transition check; PASS is expected before review
 - **Auto-called by `mk:cook`** -- you rarely need to invoke it directly during the full development workflow
 - **If tests fail intermittently**, the skill auto-retries once before marking FAIL
 - **For monorepos**, the skill runs from root by default; if root scripts are missing, it asks which workspace to verify

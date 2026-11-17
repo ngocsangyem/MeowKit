@@ -86,6 +86,5 @@ If sprint-state contract is absent OR `status: closed`, the amendment ceremony i
 
 ### Validator scope (sprint-state vs sprint-contract)
 
-- `mk:sprint-contract/scripts/validate-contract.cjs` validates per-story sprint-CONTRACT files only
-- Sprint-STATE files have NO validator — YAML parsed inline by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`
-- Do not invoke `validate-contract.cjs` on a sprint-state path; it WILL fail (sprint-state lacks contract schema fields by design)
+- Neither sprint-CONTRACT nor sprint-STATE files have a validator script
+- Sprint-STATE YAML is parsed inline by this skill, `mk:agent-detector`, and `mk:sprint-contract sprint-goal`

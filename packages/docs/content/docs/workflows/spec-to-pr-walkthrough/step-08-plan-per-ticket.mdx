@@ -1,15 +1,15 @@
 ---
 title: "Step 8 — Plan per ticket with /mk:plan-creator"
-description: "Running plan-creator standalone moves Gate 1 to sprint kickoff instead of burying it inside each developer's cook run. Tier-aware, not blanket policy."
+description: "Running plan-creator standalone moves plan agreement to sprint kickoff instead of burying it inside each developer's cook run. Tier-aware, not blanket policy."
 ---
 
-Now that the tech review exists for each ticket, run `mk:plan-creator` **per ticket** to produce a durable, file-based implementation plan that goes through Gate 1 _before_ any code is generated. This is what an engineering manager wants: Gate 1 visibility at sprint kickoff, not buried inside each developer's cook run.
+Now that the tech review exists for each ticket, run `mk:plan-creator` **per ticket** to produce a durable, file-based implementation plan that you agree _before_ any code is generated. This is what an engineering manager wants: plan visibility at sprint kickoff, not buried inside each developer's cook run.
 
 <Callout title="Why split this from /mk:cook" type="info">
 
 `mk:cook` already runs `mk:plan-creator` at its own Phase 1. But running it standalone first has three measurable wins:
 
-1. **Earlier Gate 1.** Catching "this needs a security review" or "this hides a migration" at plan stage costs minutes. Catching it at Gate 2 costs hours of generated code thrown out.
+1. **Earlier plan agreement.** Catching "this needs a security review" or "this hides a migration" at plan stage costs minutes. Catching it at review costs hours of generated code thrown out.
 2. **Sprint-level plan portfolio.** With per-ticket plans materialized in `tasks/plans/`, the tech lead can read every plan side-by-side at sprint kickoff. Shared-file ownership conflicts surfaced by Step 7's `mk:planning-engine plan --spec` become actionable at this stage.
 3. **Plan persistence across context resets.** A standalone plan-creator artifact survives session death; a Phase-1-inside-cook plan is bundled with that one cook invocation.
 
@@ -54,7 +54,7 @@ The tier comes from `mk:agent-detector`'s Phase 0 output during Step 7's `mk:pla
 | Plan emission                          | Writes `tasks/plans/YYMMDD-<slug>/plan.md` (≤80 lines overview) + `phase-XX-*.md` per implementation phase                                                                                                                                                                                                                                                                                                                                   |
 | Tech Review handoff (manual)           | `mk:plan-creator` has **no auto-discovery** of Step 7's report. You reference the path during plan-creator's Validation Interview (Step 6 of its own workflow) or paste excerpts when asked about technical approach. The dev is responsible for citing it in `plan.md`'s Key Insights — plan-creator's "Research disconnected" gotcha (line 109 of its SKILL.md) only governs plan-creator's _own_ researcher outputs, not external reports |
 | Where the Step 7 report stays          | `tasks/reports/<filename>.md` — planning-engine wrote it there because no plan dir existed at Step 7 (per `planning-engine/SKILL.md` lines 81-83). It is **not** copied or moved into `tasks/plans/<slug>/research/`                                                                                                                                                                                                                         |
-| Gate 1                                 | The skill emits the plan for human review. `gate-enforcement.cjs` will block any downstream cook code mode if the plan file has no approval line.                                                                                                                                                                                                                                                                                             |
+| Plan agreement                         | The skill emits the plan for you to review and agree. Nothing blocks a downstream cook run on a missing agreement.                                                                                                                                                                                                                                                                                             |
 
 ## What you have after Step 8
 
@@ -89,9 +89,9 @@ There is no automatic copy or symlink between them. If you want the Tech Review 
 
 </Callout>
 
-<Callout title="GATE 1 — happens HERE in this workflow" type="error">
+<Callout title="Plan agreement happens HERE in this workflow" type="info">
 
-When plan-creator runs standalone, Gate 1 fires at Step 8 (not inside Step 9's cook). The tech lead approves every sprint plan in one sitting. When `/mk:cook <plan-path>` runs at Step 9, it sees an approved plan and goes straight to Phase 2 / Phase 3.
+When plan-creator runs standalone, you agree the plan at Step 8 (not inside Step 9's cook). The tech lead reviews every sprint plan in one sitting. When `/mk:cook <plan-path>` runs at Step 9, it sees an agreed plan and goes straight to Phase 2 / Phase 3.
 
 </Callout>
 
@@ -100,7 +100,7 @@ When plan-creator runs standalone, Gate 1 fires at Step 8 (not inside Step 9's c
 | Risk                                                                                             | Mitigation                                                                                                                                                                                 |
 | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Plan staleness** — `mk:cook` SKILL.md warns: plans >14 days old trigger a re-validation prompt | Pick up tickets within 14 days of sprint kickoff; for slipped sprints, re-run `mk:plan-creator` on stale tickets before cook                                                               |
-| **Overplanning** — devs treat the plan as gospel and `/mk:cook --auto` without re-reading        | Gate 1 is still hook-enforced regardless; the policy should be that devs re-read the plan when picking up a ticket                                                                         |
+| **Overplanning** — devs treat the plan as gospel and `/mk:cook --auto` without re-reading        | No hook checks this; the policy should be that devs re-read the plan when picking up a ticket                                                                         |
 | **Tier mis-classification** — TRIVIAL ticket gets a full plan                                    | Trust `mk:agent-detector`'s tier; if a STANDARD ticket gets plan-created and reveals 0 phases of substance, that's a signal to demote it to TRIVIAL and skip the standalone plan next time |
 
 ---

@@ -11,7 +11,7 @@ description: "MeowKit's design principles — why the harness matters more than 
 
 With the same model, the same task, and the same compute budget — just by changing the environment design — performance increases by 64% ([SWE-agent, NeurIPS 2024](https://arxiv.org/abs/2405.15793)). The model is not the bottleneck. The environment is.
 
-MeowKit applies the **harness²** concept: Claude Code is already a harness (context compaction, tools, sessions). MeowKit adds another harness layer on top — structured workflows, quality gates, memory, multi-agent coordination, and hook-based automation. Harness on harness = compound reliability.
+MeowKit applies the **harness²** concept: Claude Code is already a harness (context compaction, tools, sessions). MeowKit adds another harness layer on top — structured workflows, a ship check, memory, multi-agent coordination, and hook-based automation. Harness on harness = compound reliability.
 
 > *"The model is what thinks. The harness is what it thinks about. Getting that distinction right is the entire game."*
 
@@ -21,19 +21,19 @@ For the full architectural breakdown, see [How MeowKit Works](/core-concepts/how
 
 ### 1. Every Mistake → a Permanent Fix
 
-When an agent makes an error, don't pray for better behavior next time. Build a hook, rule, or gate so it **never** makes that mistake again. This is the steering loop: observe failure → add sensor → add guide → verify fix holds.
+When an agent makes an error, don't pray for better behavior next time. Build a hook or rule so it **never** makes that mistake again. This is the steering loop: observe failure → add sensor → add guide → verify fix holds.
 
 `build-verify.cjs` exists because agents introduced syntax errors that cascaded for 10+ steps. `loop-detection.cjs` exists because agents edited the same file 20+ times without progress. Each handler is a crystallized lesson.
 
-### 2. Gates Are Discipline, Not Suggestions
+### 2. Enforce What Can Be Checked
 
-Gate 1 (plan approved) and Gate 2 (review approved) require explicit human sign-off. No `--skip-gates` flag exists by design. No agent can self-approve. No mode bypasses them.
+Planning and review are practices, not gates. For non-trivial work the agent writes a plan and agrees it with you, and the reviewer writes a verdict, but nothing blocks an edit or a commit on either.
 
-`gate-enforcement.cjs` is a PreToolUse hook that **blocks file writes** before Gate 1 passes. This is preventive enforcement — the agent literally cannot edit source files until a plan is approved. Behavioral rules say "don't write code before planning." Hooks say "you can't."
+The ship check is the one enforced ship-time control. `pre-ship.cjs` is a PreToolUse hook that runs lint on the changed files, their related tests and a type-check on `git commit`, `git push`, `git merge` and `gh pr create|merge`, and refuses the command when one fails. Behavioral rules say "don't ship broken code." The hook says "you can't."
 
 ### 3. Security Is Architecture, Not Afterthought
 
-Security operates in three layers: behavioral rules (`security-rules.md`, `injection-rules.md`), preventive hooks (`gate-enforcement.cjs`, `privacy-block.cjs`), and observational hooks (`post-write.cjs`, `build-verify.cjs`).
+Security operates in three layers: behavioral rules (`security-rules.md`, `injection-rules.md`), preventive hooks (`pre-ship.cjs`, `privacy-block.cjs`), and observational hooks (`post-write.cjs`, `build-verify.cjs`).
 
 **Critical design decision:** Security hooks are **never** routed through the dispatcher. They remain independent bash entries in `settings.json`. If `dispatch.cjs` crashes, security hooks still fire. SPOF protection is non-negotiable.
 
@@ -67,7 +67,7 @@ This principle applies at different scales:
 
 ### 7. TDD Is Opt-In
 
-TDD enforcement moved from default-on to opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. When enabled, failing tests must exist before implementation — the `pre-implement.cjs` hook blocks code without corresponding failing tests. In default mode, tests are recommended but not gated.
+TDD enforcement moved from default-on to opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. When enabled, failing tests are written before implementation (no hook checks the order). In default mode, tests are recommended but not gated.
 
 Why optional: strict TDD added friction for spike work, tooling, and prototypes. Production-quality work should still enable `--tdd`.
 
@@ -93,7 +93,7 @@ The same principle applies to the hook system: `handlers.json` routes events to 
 
 | We chose | Over | Because |
 |----------|------|---------|
-| Human gates (slower) | Auto-approve (faster) | Agent self-approval produces leniency drift |
+| Plan agreed with the human (slower) | Plan self-approved (faster) | Agent self-approval produces leniency drift |
 | Behavioral output limits | Hook-based truncation | Hooks can't replace tool output (PostToolUse appends only) |
 | Independent security hooks | Unified dispatcher | SPOF protection outweighs DRY |
 | Opt-in TDD | Mandatory TDD | Friction for spikes > value for prototypes |

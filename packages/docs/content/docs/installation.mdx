@@ -184,7 +184,7 @@ If a project still runs the npm CLI, read [Moving from the npm CLI](/migration/f
 | Hooks not executable | Run `chmod +x .claude/hooks/*` |
 | Python scripts fail | Ensure Python 3.9+ is in PATH |
 | Claude Code doesn't load `.claude/rules/` | Restart the Claude Code session; `mewkit validate` confirms all 7 always-on rules are present |
-| The agent refuses to edit any file | Gate 1 is unapproved, which is the gate working. See [When a gate blocks you](/core-concepts/gates#when-a-gate-blocks-you) |
+| The agent refuses to edit any file | Nothing in MeowKit blocks edits on a missing plan, so check the host's permission prompt. A refused commit means the ship check failed; see [When a check blocks you](/core-concepts/gates#when-a-check-blocks-you) |
 | `doctor` reports hooks not executable after a fresh clone | Run `chmod +x .claude/hooks/*`; permissions do not survive some archive formats |
 | A hook fails to start | Check that Node.js 24+ is on your PATH. The hooks run on Node even though the binary does not |
 

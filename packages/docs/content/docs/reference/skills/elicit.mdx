@@ -25,8 +25,8 @@ Structured second-pass reasoning that re-examines an existing output (review ver
 
 ## When to Use
 
-- After `/mk:review` verdict -- deepen analysis before Gate 2
-- After plan creation -- stress-test assumptions before Gate 1
+- After `/mk:review` verdict -- deepen analysis before you ship
+- After plan creation -- stress-test assumptions before building
 - After any agent output when user wants a specific angle of analysis
 - When user says "dig deeper", "what am I missing", "challenge this"
 
@@ -145,5 +145,5 @@ Elicitation output appends to the verdict file as a supplementary section. It do
 - **Pre-mortem needs a concrete ship date and scope** to avoid degenerating into a generic worry list. Attach it to a specific, scoped output (the plan, the feature, the migration).
 - **Inversion only works reliably on binary decisions** -- yes/no (ship vs don't ship, add vs remove). For multi-option trade-offs, use Constraint Removal or Stakeholder Mapping instead.
 - **Set a max depth before Socratic elicitation** -- "What evidence supports this claim?" has no natural stopping point. Stop at 3 levels of questioning or when no new claims emerge.
-- **Elicitation does not change gate decisions** -- a CRITICAL finding from Red Team does not automatically trigger Gate 2 re-evaluation. You must manually run a new `mk:review` pass.
-- **What this skill does NOT do:** replace the review, change verdicts or gate decisions, generate code, or run automatically (always user-triggered).
+- **Elicitation does not change review verdicts** -- a CRITICAL finding from Red Team does not automatically re-open the review. You must manually run a new `mk:review` pass.
+- **What this skill does NOT do:** replace the review, change review verdicts, generate code, or run automatically (always user-triggered).

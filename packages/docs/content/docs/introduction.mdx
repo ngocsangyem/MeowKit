@@ -5,7 +5,7 @@ description: "What MeowKit is in one page, and where to go next depending on wha
 
 MeowKit is an AI agent toolkit for Claude Code. It installs a `.claude/` directory that Claude Code reads at session start, and that directory holds specialist agents, domain skills, lifecycle hooks, security rules, and a memory system.
 
-The effect is that your coding assistant plans before it writes, gets a human to approve that plan, reviews its own work through adversarial reviewers, and gets a second human approval before anything ships. Those two approvals are hard gates, and no flag skips them.
+The effect is that your coding assistant plans before it writes, agrees that plan with you, reviews its own work through adversarial reviewers, and runs a ship check (lint, related tests, type-check) before any commit, push, merge or PR. The ship check refuses the command when it fails; planning and review are practices, not gates.
 
 <Callout title="See what's new" type="info">
 

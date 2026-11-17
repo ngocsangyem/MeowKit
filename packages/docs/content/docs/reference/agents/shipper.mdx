@@ -14,13 +14,13 @@ description: "Deployment pipeline agent — executes the full ship sequence from
 
 {/* GENERATED:reference-facts END */}
 
-The shipper is your deployment specialist. Once Gate 2 passes, the shipper takes over to execute the full ship sequence — running pre-ship checks, creating conventional commits, opening pull requests on feature branches, verifying CI, and documenting rollback procedures. It never commits directly to main.
+The shipper is your deployment specialist. Once the reviewer has issued a PASS or WARN verdict, the shipper takes over to execute the full ship sequence — running pre-ship checks, creating conventional commits, opening pull requests on feature branches, verifying CI, and documenting rollback procedures. It never commits directly to main.
 
 ## Cognitive Framing
 
 > *"Ship safely. Never commit to main. Every deployment has a rollback plan."*
 
-The shipper operates at Phase 5 (Ship) and only activates after Gate 2 (review approval). It is deliberately the simplest agent in the pipeline — its job is to execute a well-defined checklist, not to make judgments about code quality. That judgment has already been made by the reviewer and evaluator.
+The shipper operates at Phase 5 (Ship) and activates after the reviewer's verdict. It is deliberately the simplest agent in the pipeline — its job is to execute a well-defined checklist, not to make judgments about code quality. That judgment has already been made by the reviewer and evaluator.
 
 ## Key Facts
 
@@ -28,12 +28,12 @@ The shipper operates at Phase 5 (Ship) and only activates after Gate 2 (review a
 |---|---|
 | **Type** | Core |
 | **Phase** | 5 (Ship) |
-| **Auto-activates** | After Gate 2 passes |
+| **Auto-activates** | After a PASS or WARN review verdict |
 | **Never does** | Commit to main/master, ship without a passing review, skip pre-ship checks, skip rollback docs, force-push to shared branches |
 
 ## When to Use
 
-- After **Gate 2 passes** — the shipper activates automatically when the reviewer issues a PASS or WARN verdict.
+- After a **PASS or WARN review verdict** — the shipper activates automatically when the reviewer issues a PASS or WARN verdict.
 - When you are ready to **create a PR** and push changes.
 - When you need a **conventional commit** with the correct prefix.
 - When deploying to production and need **canary deployment support** with gradual rollout.
@@ -55,7 +55,7 @@ The shipper operates at Phase 5 (Ship) and only activates after Gate 2 (review a
 - [x] Opens pull request with descriptive title and body
 - [x] Verifies CI passes on the PR
 - [x] Documents rollback procedure for every ship
-- [x] Never ships without a passing review verdict (Gate 2)
+- [x] Does not ship without a PASS or WARN review verdict (a practice; no hook checks the verdict)
 - [x] Never force-pushes to shared branches
 
 ## Common Use Cases
@@ -83,7 +83,7 @@ The shipper is deliberately simple and procedural. Its value comes from rigorous
 
 ## Related Agents
 
-- **[reviewer](/reference/agents/reviewer)** — provides Gate 2 approval that triggers the shipper
+- **[reviewer](/reference/agents/reviewer)** — provides the verdict that hands off to the shipper
 - **[developer](/reference/agents/developer)** — receives routing when pre-ship checks or CI fail
 - **[documenter](/reference/agents/documenter)** — receives handoff after successful ship to update documentation
 - **[tester](/reference/agents/tester)** — receives routing when test failures block the ship

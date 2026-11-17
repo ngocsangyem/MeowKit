@@ -3,14 +3,14 @@ title: "How It Works"
 description: "The three mechanisms that enforce discipline (rules, hooks, and skills) and how agents compose skills across the workflow."
 ---
 
-MeowKit is a **harness²**: Claude Code is already a harness (tools, context, subagents); MeowKit adds a second harness layer on top: workflows, gates, memory, and hook-based automation. It shapes AI behavior through three mechanisms, none of which is an executable runtime. They are conventions that Claude Code reads and acts on.
+MeowKit is a **harness²**: Claude Code is already a harness (tools, context, subagents); MeowKit adds a second harness layer on top: workflows, a ship check, memory, and hook-based automation. It shapes AI behavior through three mechanisms, none of which is an executable runtime. They are conventions that Claude Code reads and acts on.
 
 ## The three mechanisms
 
 | Mechanism | What it is | Example |
 |-----------|-----------|---------|
-| **Rules** | Behavioral instructions loaded every session | "Never write code before a plan is approved" (`gate-rules.md`) |
-| **Hooks** | Preventive scripts that block unsafe actions | Shell hook blocks file writes until Gate 1 passes |
+| **Rules** | Behavioral instructions loaded every session | "Never hardcode secrets in source" (`security-rules.md`) |
+| **Hooks** | Preventive scripts that block unsafe actions | Shell hook refuses a commit whose lint, tests or type-check fail |
 | **Skills** | Domain expertise loaded on demand | `mk:fix` loads bug-fixing patterns only when you report a bug |
 
 ## The seven-layer taxonomy
@@ -19,9 +19,9 @@ The harness isolates different kinds of reasoning into discrete layers, so no si
 
 | Layer | Owner | What it does |
 |-------|-------|-------------|
-| L1: Builder | Human | Approve plans (Gate 1), approve reviews (Gate 2) |
+| L1: Builder | Human | Agree plans, read review verdicts |
 | L2: Planner | `mk:plan-creator` | Decompose requests into product-level specs: user stories, not file names |
-| L3: Cook | `/mk:cook` workflow | Drives the task through [the seven phases](/core-concepts/workflow) and their two gates |
+| L3: Cook | `/mk:cook` workflow | Drives the task through [the seven phases](/core-concepts/workflow) |
 | L4: Native Tasks | `dispatch.cjs` + handlers | Build-verify, budget tracking, checkpoints, immediate capture |
 | L5: Teams | `/mk:scout`, `/mk:party` | Parallel agents with worktree isolation and a context firewall |
 | L6: Skills | The skill library | Just-in-time activation, loaded only when the task domain matches |
@@ -37,12 +37,12 @@ Rules define the WHY. Hooks enforce the WHAT. A rule says "don't write code befo
 
 Shell and Node.js scripts triggered by Claude Code lifecycle events: SessionStart, PreToolUse, PostToolUse, Stop, UserPromptSubmit. They intercept tool calls before they execute:
 
-- `gate-enforcement.cjs` blocks file writes before Gate 1 approval
+- `pre-ship.cjs` refuses a commit, push, merge or PR when lint, related tests or the type-check fail
 - `privacy-block.cjs` blocks reads of `.env`, SSH keys, and credentials
 - `post-write.cjs` security-scans every written file
-- `pre-completion-check.cjs` blocks session end without verification evidence
+- `pre-completion-check.cjs` (opt-in) blocks session end without verification evidence
 
-Critical design: security hooks (`gate-enforcement.cjs`, `privacy-block.cjs`) are never routed through the dispatcher. If `dispatch.cjs` crashes, security hooks still fire, so there is no single point of failure.
+Critical design: security hooks (`pre-ship.cjs`, `privacy-block.cjs`) are never routed through the dispatcher. If `dispatch.cjs` crashes, security hooks still fire, so there is no single point of failure.
 
 Under the hooks, a Node.js dispatch system (`dispatch.cjs` + `handlers.json`) runs infrastructure handlers: model detection, budget tracking, build verification, loop detection, and checkpoint management. These fire automatically; agents don't invoke them.
 
@@ -117,8 +117,8 @@ entry when the lesson is non-derivable. There is no capture hook: a human asks f
 remembered and the agent writes it.
 
 **Boundary:** memory content is DATA (`injection-rules.md` Rule 3). It never overrides a rule,
-grants a permission, or bypasses a gate. Secrets and security findings never enter the store; those
-stay in `mk:cso` reports and Gate 2 verdicts. Because the store ships in the PR diff, git review
+grants a permission, or bypasses a check. Secrets and security findings never enter the store; those
+stay in `mk:cso` reports and review verdicts. Because the store ships in the PR diff, git review
 plus `mewkit validate --memory` (size cap, injection patterns, secret patterns) is the gate.
 
 See [Memory System](/guide/memory-system) for the entry format and the full read/write sets.
@@ -142,6 +142,6 @@ flowchart TD
 ## Next steps
 
 - [Understand the workflow phases](/core-concepts/workflow)
-- [How gates enforce discipline](/core-concepts/gates)
+- [What MeowKit enforces](/core-concepts/gates)
 - [Adaptive density by model tier](/guide/adaptive-density)
 - [Memory system in depth](/guide/memory-system)
