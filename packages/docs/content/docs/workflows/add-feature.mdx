@@ -29,7 +29,7 @@ The [mk:cook](/reference/skills/cook) skill detects your intent from the input:
 
 | Your input | Detected mode | What happens |
 |------------|--------------|--------------|
-| Natural language task | Interactive (default) | Full pipeline with both gates |
+| Natural language task | Interactive (default) | Full pipeline: you agree the plan and read the verdict |
 | Path to existing plan | Plan execution | Skips planning, starts at Phase 2 |
 | `--fast` flag | Fast mode | Skips Phase 1 planning |
 | `--parallel` flag | Parallel mode | Spawns agents for independent components |
@@ -56,7 +56,7 @@ Users need to add products, adjust quantities, and proceed to checkout.
 - Cart summary component with total calculation
 ```
 
-**Gate 1:** Review the plan. Type `approve` to continue, or provide feedback.
+Review the plan and agree it with the agent, or give feedback, before building starts.
 
 ### Step 4: Testing (Phase 2 — opt-in)
 
@@ -70,9 +70,9 @@ Tester: "Writing tests for cart store and components..."
   Ready for implementation.
 ```
 
-The `pre-implement.cjs` hook blocks the **developer** from writing code until these tests exist (in TDD mode).
+In TDD mode the developer writes code only after these tests exist (a workflow rule, not a hook).
 
-**Default mode (TDD off):** Phase 2 is skipped — the developer goes directly to implementation. The tester may be invoked on-request (e.g., `/mk:testing` after implementation) or for plan-coverage reasons. `pre-implement.cjs` is a no-op.
+**Default mode (TDD off):** Phase 2 is skipped — the developer goes directly to implementation. The tester may be invoked on-request (e.g., `/mk:testing` after implementation) or for plan-coverage reasons.
 
 ### Step 5: Implementation (Phase 3)
 
@@ -103,7 +103,7 @@ Verdict: PASS WITH NOTES
 Suggestion: Debounce rapid quantity changes to reduce store updates
 ```
 
-**Gate 2:** Review the verdict. Type `approve` to ship.
+Read the verdict before you ship. Nothing blocks a commit on it, but a FAIL means fixing the dimension first.
 
 ### Step 7: Ship (Phase 5)
 

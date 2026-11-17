@@ -20,12 +20,12 @@ MeowKit's 7-phase workflow is a loop: gather context, act, verify, repeat. Produ
 
 ## Right-size every task first
 
-The cheapest productivity win is not running the full pipeline when you don't need it. MeowKit already routes for you — use the escape hatches it codifies instead of fighting the gates:
+The cheapest productivity win is not running the full pipeline when you don't need it. MeowKit already routes for you — use the escape hatches it codifies instead of fighting the process:
 
 - **Trivial edits** (rename, typo, format) are classified TRIVIAL and routed to the cheapest model. Don't invoke `/mk:cook` for a one-line change.
-- **Simple bug fixes**: `/mk:fix` with `complexity=simple` bypasses Gate 1 by design — the fix *is* the plan.
-- **One-shot domains**: when scale-routing returns `workflow=one-shot` with zero blast radius, Gate 1 may be bypassed. Extend `domain-complexity.csv` with your project's safe fast-path domains so routing keeps matching reality.
-- **Everything else** goes through the plan gate. Fighting it costs more than a 30-second plan.
+- **Simple bug fixes**: `/mk:fix` with `complexity=simple` skips a separate plan by design — the fix *is* the plan.
+- **One-shot domains**: when scale-routing returns `workflow=one-shot` with zero blast radius, a separate plan may be skipped. Extend `domain-complexity.csv` with your project's safe fast-path domains so routing keeps matching reality.
+- **Everything else** gets a plan agreed first. Skipping it costs more than a 30-second plan.
 
 ## Hand off the stop condition with `/goal`
 
@@ -86,7 +86,7 @@ Three rules keep the store useful:
 - **Only non-derivable lessons.** If the next session could get the same answer from the code, the
   git log, the plan or the ADR, do not write it. A store of derivable facts is noise.
 - **No secrets, no vulnerability detail.** The store is committed and read back as DATA. Security
-  findings stay in `mk:cso` reports and Gate 2 verdicts. `mewkit validate --memory` enforces this
+  findings stay in `mk:cso` reports and review verdicts. `mewkit validate --memory` enforces this
   mechanically, alongside a 300-line cap per file.
 - **Prune on a schedule.** `/mk:memory --prune` proposes removing entries whose `Source` no longer
   exists and entries older than 180 days with no recent hit. You approve each removal. A store full
@@ -127,6 +127,6 @@ None of these steps is large. The point is that each one feeds the next session:
 ## Related
 
 - [Memory System](/guide/memory-system) — capture paths, JSON-first stores, pruning
-- [Workflow Phases](/core-concepts/workflow) — where gates and verification sit
+- [Workflow Phases](/core-concepts/workflow) — where planning, review and verification sit
 - [Trace & Benchmark](/guide/trace-and-benchmark) — friction recall and measured audits
 - [Model Routing](/guide/model-routing) — tier classification and escalation

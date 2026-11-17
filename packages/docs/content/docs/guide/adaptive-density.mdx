@@ -75,16 +75,16 @@ export MEOWKIT_AUTOBUILD_MODE=LEAN
 
 When the fallback fires, the run report records `Source: auto-fallback (no model env var detected)` so you can identify the issue.
 
-## Density Does Not Bypass Gates
+## Density Does Not Lower the Bar
 
 `MEOWKIT_AUTOBUILD_MODE=LEAN` adjusts scaffolding — it does NOT lower the quality bar or skip enforcement.
 
-These gates apply regardless of density mode:
+These apply regardless of density mode:
 
-1. **Gate 1** — approved plan required before Phase 3 begins
-2. **Gate 2** — review verdict required before Phase 5 begins
-3. **Contract gate** — if a contract exists, generator must read it before writing source code
-4. **Active-verification hard gate** — evaluator must drive the running build; static-only PASS is auto-converted to FAIL
+1. **Ship check** — lint, related tests and type-check run before a commit, push, merge or PR
+2. **Plan and review** — the plan is agreed before Phase 3 and the reviewer writes a verdict; these are practices, not blocking gates
+3. **Contract** — if a contract exists, generator must read it before writing source code
+4. **Active verification** — evaluator must drive the running build; static-only PASS is auto-converted to FAIL
 
 Rule 10 in `.claude/skills/cook/references/harness-rules.md`: density decides HOW MUCH scaffolding the model needs. It does not lower the bar itself.
 
@@ -110,4 +110,4 @@ Full playbook: `docs/dead-weight-audit.md`.
 - [/reference/skills/autobuild](/reference/skills/autobuild) — autobuild skill spec
 - [/reference/skills/scale-routing](/reference/skills/scale-routing) — density emission
 - [/guide/trace-and-benchmark](/guide/trace-and-benchmark) — dead-weight audit measurement infrastructure
-- [/reference/rules-index#harness-rules](/reference/rules-index#harness-rules) — Rule 5 (density), Rule 7 (dead-weight audit), Rule 10 (no gate bypass)
+- [/reference/rules-index#harness-rules](/reference/rules-index#harness-rules) — Rule 5 (density), Rule 7 (dead-weight audit), Rule 10 (density never lowers the bar)

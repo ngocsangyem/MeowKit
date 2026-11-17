@@ -46,7 +46,7 @@ Autonomous build pipeline for green-field products. Runs planner → contract �
 /mk:autobuild build a kanban board --advice               # Strategic supervision
 ```
 
-`--advice` is opt-in strategic supervision for one run by the [athena](/reference/agents/athena) agent: direction at the plan/contract boundary, rescue on a plateau or scope drift, and an independent read of the terminal evaluator verdict before the Gate 2 question — up to 5 calls. Checkpoints are macro boundaries, so a five-round build makes no more calls than a one-round build. It approves nothing: Gate 2 stays human, and the evaluator keeps its verdict and its active-verification hard gate.
+`--advice` is opt-in strategic supervision for one run by the [athena](/reference/agents/athena) agent: direction at the plan/contract boundary, rescue on a plateau or scope drift, and an independent read of the terminal evaluator verdict before the review question — up to 5 calls. Checkpoints are macro boundaries, so a five-round build makes no more calls than a one-round build. It approves nothing: the review decision stays yours, and the evaluator keeps its verdict and its active-verification hard gate.
 
 ## Example Prompt
 
@@ -74,7 +74,7 @@ Build a kanban board with drag-and-drop, swim lanes, and real-time collaboration
 | FULL | Sonnet, Opus 4.5 | Required | Required | 1-3 rounds | Optional |
 | LEAN | Opus 4.6+ | Required | Optional | 0-1 rounds | Skip (auto-compact) |
 
-Override: `--tier` flag or `MEOWKIT_AUTOBUILD_MODE`. Density never bypasses gates.
+Override: `--tier` flag or `MEOWKIT_AUTOBUILD_MODE`. Density never skips simplify or verify.
 
 ## Hard constraints
 

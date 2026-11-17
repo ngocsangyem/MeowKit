@@ -66,8 +66,8 @@ Modes change the planning pipeline. Pick one.
 | Mode | What it does | Use when | Do not use when | Context impact |
 |---|---|---|---|---|
 | default | Lets plan-creator classify complexity and route to fast or hard behavior | You trust the scope classifier and the task is ordinary | You need a specific workflow guarantee | Variable |
-| `--fast` | Skips research, codebase analysis, red-team, and validation interview; writes a compact `plan.md` | Small, clear changes that still need Gate 1 | Multi-file refactors, security work, unclear scope | Low |
-| `--hard` | Full planning pipeline with research, codebase analysis, phase files, semantic checks, red-team, validation, Gate 1, hydration, handoff | Normal complex features, bug fixes, refactors, security work | Tiny edits or time-boxed investigation | Medium to high |
+| `--fast` | Skips research, codebase analysis, red-team, and validation interview; writes a compact `plan.md` | Small, clear changes that still need an agreed plan | Multi-file refactors, security work, unclear scope | Low |
+| `--hard` | Full planning pipeline with research, codebase analysis, phase files, semantic checks, red-team, validation, plan agreement, hydration, handoff | Normal complex features, bug fixes, refactors, security work | Tiny edits or time-boxed investigation | Medium to high |
 | `--deep` | Hard pipeline plus bounded scope map and per-phase Deep Phase Map | Broad refactors, 5+ directories, hidden dependencies, shared contracts | Small fixes, undecided architecture, vague feature area | High, bounded |
 | `--parallel` | Hard pipeline plus ownership matrix and parallel group hydration | Independent phases can be assigned without file overlap | Shared-file refactors or unclear dependencies | High |
 | `--two` | Drafts two approach files and a trade-off matrix before selecting one | Two specific approaches are both credible | You have not narrowed the problem enough to name the two approaches | High |
@@ -82,7 +82,7 @@ Default mode keeps friction low, but it gives less explicit control over plannin
 
 ### `--fast`
 
-`--fast` produces a small plan. It skips research, broad codebase analysis, red-team, and validation interview. It still runs semantic checks and still stops at Gate 1.
+`--fast` produces a small plan. It skips research, broad codebase analysis, red-team, and validation interview. It still runs semantic checks and still stops for you to agree the plan.
 
 Use it for a focused change where extra analysis would mostly add noise.
 
@@ -90,7 +90,7 @@ Avoid it when the work touches contracts, migrations, auth, payment flows, backg
 
 ### `--hard`
 
-`--hard` is the normal full workflow. It runs research, codebase analysis, phase generation, semantic checks, red-team, validation interview, Gate 1, task hydration, and deterministic handoff.
+`--hard` is the normal full workflow. It runs research, codebase analysis, phase generation, semantic checks, red-team, validation interview, plan agreement, task hydration, and deterministic handoff.
 
 Use it when you need a real implementation plan but do not need per-phase deep mapping.
 
@@ -178,7 +178,7 @@ Avoid `--tdd` for greenfield prototypes or work where there is no stable behavio
 
 ## Planning depth and cost
 
-Planning depth is the amount of context and verification the planner loads before Gate 1.
+Planning depth is the amount of context and verification the planner loads before you agree the plan.
 
 | Depth | MeowKit shape | Best for | Cost |
 |---|---|---|---|

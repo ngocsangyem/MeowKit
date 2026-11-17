@@ -11,7 +11,7 @@ AI agents lose context between sessions. A task file is a **self-contained state
 Key benefits:
 - **Resumability** — Agent State section tracks progress across context resets
 - **Scope control** — Explicit in/out scope prevents feature creep
-- **Quality gates** — Binary acceptance criteria prevent premature completion
+- **Quality checks** — Binary acceptance criteria prevent premature completion
 - **Audit trail** — Every decision recorded in the file itself
 
 ## When to create a task file
@@ -30,10 +30,10 @@ draft → in-progress → blocked → review → done
 
 | Status | Meaning |
 |--------|---------|
-| `draft` | Template filled, awaiting Gate 1 approval |
+| `draft` | Template filled, awaiting your agreement |
 | `in-progress` | Implementation underway |
 | `blocked` | Waiting on dependency or decision |
-| `review` | Implementation complete, awaiting Gate 2 |
+| `review` | Implementation complete, awaiting review |
 | `done` | All acceptance criteria verified |
 
 ## Directory structure
@@ -68,7 +68,7 @@ tasks/plans/260328-add-auth/
 └── phase-02-implement.md
 ```
 
-Plan-creator validates plans via `mewkit plan check --structural` before Gate 1 approval.
+Plan-creator validates plans via `mewkit plan check --structural` before you agree the plan.
 
 ## Agent State section
 

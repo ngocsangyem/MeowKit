@@ -59,17 +59,17 @@ MeowKit will:
 1. Route to the **planner** agent
 2. Challenge your premises (do you really need JWT?)
 3. Create a structured plan at `tasks/plans/YYMMDD-auth/plan.md`
-4. Ask for your approval (**Gate 1**)
+4. Agree the plan with you before building
 
 ## Step 5: See the full pipeline
 
-Once you approve the plan, try the full cook pipeline:
+Once you are happy with the plan, try the full cook pipeline:
 
 ```
 /mk:cook
 ```
 
-This runs the complete workflow. Each phase activates the appropriate agent, and you will meet both hard gates along the way. See [Workflow Phases](/core-concepts/workflow) for what each one does.
+This runs the complete workflow. Each phase activates the appropriate agent, and the ship check runs lint, related tests and a type-check before any commit, push or PR. See [Workflow Phases](/core-concepts/workflow) for what each one does.
 
 ## Step 6: Explore more commands
 
@@ -87,9 +87,9 @@ When you ran `/mk:plan-creator`, MeowKit:
 
 1. **Phase 0 (Orient):** Read relevant topic files on-demand for past patterns, assigned model tier
 2. **Phase 1 (Plan):** Planner agent created a structured plan with product + engineering lens
-3. **Gate 1:** Waited for your explicit approval before proceeding
+3. **Agreement:** Proposed the plan for you to agree before building
 
-No code was written until you approved. That's MeowKit's discipline.
+Nothing blocks an edit without a plan; writing and agreeing it first is the practice, because a wrong plan costs more than the conversation.
 
 ## Next steps
 

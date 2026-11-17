@@ -11,7 +11,7 @@ description: "Step-by-step guide to building features with /mk:cook, from plan t
 /mk:cook add user authentication with JWT
 ```
 
-That's it. MeowKit detects your intent, creates a plan, and walks through each phase. You approve at two checkpoints (Gate 1 and Gate 2).
+That's it. MeowKit detects your intent, creates a plan, and walks through each phase. You agree the plan and read the review verdict; neither is an enforced gate.
 
 ## Common workflows
 
@@ -29,7 +29,7 @@ MeowKit classifies the task, selects the right model tier, and creates a plan. Y
 /mk:cook tasks/plans/260501-pagination/plan.md
 ```
 
-Skips the planning phase. The plan must already be approved (Gate 1).
+Skips the planning phase. The plan should already be agreed with you.
 
 ### With TDD
 
@@ -60,10 +60,10 @@ Spawns up to 3 agents in isolated git worktrees for independent subtasks. Use wh
 | Phase | What you see | What you do |
 |-------|-------------|------------|
 | 0. Orient | Task classified, model tier declared | Nothing, it is automatic |
-| 1. Plan | Plan created with acceptance criteria | **Approve the plan** (Gate 1) |
+| 1. Plan | Plan created with acceptance criteria | **Agree the plan** |
 | 2. Test | Tests written from acceptance criteria | Review test coverage |
 | 3. Build | Implementation proceeds | Watch for self-healing attempts |
-| 4. Review | 5-dimension audit with verdict | **Approve the review** (Gate 2) |
+| 4. Review | 5-dimension audit with verdict | **Read the verdict** |
 | 5. Ship | PR created, CI triggered | Merge when CI passes |
 | 6. Reflect | Patterns captured to memory | Nothing, it is automatic |
 
@@ -81,7 +81,7 @@ Spawns up to 3 agents in isolated git worktrees for independent subtasks. Use wh
 ## Gotchas
 
 - **Simple features grow.** Always let MeowKit create a plan. A "simple" feature that touches three files needs one.
-- **Gate 2 is never auto-approved.** The `--auto` flag fixes issues but still requires your review approval.
+- **`--auto` does not replace your read of the verdict.** The flag fixes issues, but you still decide whether to ship.
 - **Long sessions lose context.** The plan's Agent State section auto-updates, so read it if you resume mid-build.
 
 ## When it goes wrong

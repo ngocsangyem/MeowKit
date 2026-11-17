@@ -92,8 +92,8 @@ Dispositions are stage-specific:
 | GUIDE, RESCUE | `CONTINUE_WITH_DIRECTIVE`, `ESCALATE_TO_HUMAN`, `BLOCKED_MISSING_EVIDENCE` |
 | REVIEW, RECHECK | `READY_FOR_EXISTING_GATE`, `RETURN_TO_EXECUTOR`, `ESCALATE_TO_HUMAN`, `BLOCKED_MISSING_EVIDENCE` |
 
-`READY_FOR_EXISTING_GATE` names the next step — the normal reviewer or gate. It
-never means the gate is cleared.
+`READY_FOR_EXISTING_GATE` names the next step, the normal reviewer. It never
+means the review is passed.
 
 ## Continuity
 
@@ -105,24 +105,23 @@ carries only run identity, stage, locked-decision pointers, the latest directive
 correction count, receipt pointers and the next safe action. Historical receipts may
 sit below it but are never auto-loaded.
 
-The dossier cannot carry progress, verification, gate, approval, verdict or status
-fields — a candidate that does is refused, so continuity can never become a second
+The dossier cannot carry progress, verification, approval, verdict or status
+fields; a candidate that does is refused, so continuity can never become a second
 task truth.
 
-## No Gate Authority
+## No Approval Authority
 
-A directive is evidence a human reads at a gate — the same class as a passing test
-suite or an evaluator verdict — never the approval itself. Athena cannot clear or
-advance Gate 1, Gate 2, a security review, CI, a merge, a deploy, or any business
-decision.
+A directive is evidence a human reads — the same class as a passing test suite or
+an evaluator verdict — never the approval itself. Athena cannot approve a plan, a
+review, a security review, CI, a merge, a deploy, or any business decision.
 
 Supervision is also not verification. Verification stays with tests, review verdicts
 and validators, and a receipt recording a directive is never proof that anything
 works.
 
 It does not delay a human stop either: `mk:fix` stops for the user after three
-failed attempts on its own schedule, whatever was advised at two, and the Gate 1 and
-Gate 2 questions fire on theirs.
+failed attempts on its own schedule, whatever was advised at two, and the plan and
+review questions to the user fire on theirs.
 
 ## Artifacts and Boundaries
 

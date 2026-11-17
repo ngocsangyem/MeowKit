@@ -46,7 +46,7 @@ Findings from all three are triaged into a single verdict.
 | PASS WITH NOTES | Non-blocking suggestions | Proceed to ship, suggestions noted |
 | FAIL | Critical findings | Back to developer, must fix before re-review |
 
-A FAIL on any single dimension blocks shipping (Gate 2). There is no averaging.
+A FAIL on any single dimension means fixing it before shipping. There is no averaging, though no hook blocks a commit on the verdict.
 
 ## Optional: deeper review
 
@@ -78,4 +78,4 @@ After the verdict, `/mk:elicit` pushes deeper on WARN dimensions using 8 structu
 
 - [Ship safely](/guides/ship-safely): the deployment pipeline
 - [Build a feature](/guides/build-a-feature): the full workflow with review
-- [Gates & security](/core-concepts/gates): how Gate 2 enforces review
+- [Gates & security](/core-concepts/gates): what MeowKit enforces and what stays a practice

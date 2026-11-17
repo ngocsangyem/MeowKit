@@ -1,16 +1,16 @@
 ---
 title: "Workflow Phases"
-description: "The canonical 7-phase pipeline: what each phase produces, which gates stop it, and where the exceptions are."
+description: "The canonical 7-phase pipeline: what each phase produces, which check applies, and where the exceptions are."
 sourceOfTruth: ".claude/skills/cook/references/phase-contracts.md"
-lastVerified: "2026-07-26"
+lastVerified: "2026-11-17"
 ---
 
-Every non-trivial task flows through MeowKit's 7-phase pipeline. Two phases have hard gates requiring explicit human approval. No phase can be skipped.
+Every non-trivial task flows through MeowKit's 7-phase pipeline. Planning and review are practices, not gates: nothing blocks an edit on a missing plan or a commit on a missing verdict. The ship check is the one enforced control. No phase can be skipped.
 
 ```
-Phase 0: Orient → Phase 1: Plan → [GATE 1] → Phase 2: Test
-→ Phase 3: Build → Phase 4: Review → [GATE 2]
-→ Phase 5: Ship → Phase 6: Reflect
+Phase 0: Orient → Phase 1: Plan → Phase 2: Test
+→ Phase 3: Build → Phase 4: Review
+→ Phase 5: Ship [ship check] → Phase 6: Reflect
 ```
 
 ## The words this page uses
@@ -20,10 +20,10 @@ Five terms do most of the work, and they are not interchangeable:
 | Term | What it means |
 |---|---|
 | **Phase** | One of the seven numbered steps above. Every task passes through all of them. |
-| **Stage** | A step *inside* a phase. Simplify and Verify sit inside Build. No gate, no approval. |
-| **Gate** | A hard stop needing a human. There are exactly two: the plan, and the review verdict. |
-| **Mode** | How the phases execute: sequential, parallel, or party. Modes change the shape of the work, never the gates. |
-| **Exception** | A documented case where a phase is skipped. Exceptions exist for Gate 1; there are none for Gate 2. |
+| **Stage** | A step *inside* a phase. Simplify and Verify sit inside Build. No plan or verdict of its own. |
+| **Ship check** | The one enforced control: lint, related tests and a type-check before a commit, push, merge or PR. |
+| **Mode** | How the phases execute: sequential, parallel, or party. Modes change the shape of the work, never the ship check. |
+| **Exception** | A documented case where a phase is skipped. A one-line fix needs no separate plan. |
 
 ## Why phases exist
 
@@ -67,14 +67,14 @@ Before it returns a plan it must answer five things in concrete sentences: expec
 
 Supporting skills: `mk:plan-creator` runs the full nine-step flow with modes `--fast`, `--hard`, `--deep`, `--parallel`, `--two`, `--product-level`, and `--spike --timebox <duration>` (see [Plan Creator Modes and Flags](/core-concepts/plan-creator-modes-and-flags)); `mk:plan-ceo-review` adds a product and engineering lens; `mk:validate-plan` runs an eight-dimension check on COMPLEX tasks.
 
-**Gate 1: you approve the plan.** No code can be written until you do, because `gate-enforcement.cjs` blocks file writes outright. In non-auto modes `validate-gate-1.sh` runs as an advisory preflight and surfaces structural failures without taking the decision from you; in `--auto` mode it blocks.
+**Agree the plan with you.** For a change of more than two files or a few hours, the agent proposes the plan and agrees it with you before building. Nothing blocks an edit without one; the plan is the practice that keeps a wrong plan cheap.
 
 ## Phase 2: Test
 
 **Agent:** tester
 **Produces:** tests, failing ones in TDD mode and optional otherwise
 
-With `--tdd` or `MEOWKIT_TDD=1`, failing tests must exist before implementation and `pre-implement.cjs` blocks code that has none. `--tdd` is a flag rather than a planning mode, so it composes with whichever plan-creator mode you chose. In default mode this phase is optional and the tester runs on request.
+With `--tdd` or `MEOWKIT_TDD=1`, failing tests must exist before implementation and the developer writes the failing test first (no hook checks the order). `--tdd` is a flag rather than a planning mode, so it composes with whichever plan-creator mode you chose. In default mode this phase is optional and the tester runs on request.
 
 `mk:nyquist` checks test-to-requirement coverage at the end of the phase. The security pre-check runs either way.
 
@@ -92,7 +92,7 @@ Two stages then run inside this phase before Review can start. Both are mandator
 | 3.5 Simplify | `mk:simplify` | The reviewer should read the code you intend to keep, not the first version that passed |
 | 3.6 Verify | `mk:verify` | Build, lint, types, tests, and coverage in one pass. Review starting from a broken signal is review of nothing |
 
-They are stages rather than phases because they carry no gate and produce no approval; they are the last two things Build does.
+They are stages rather than phases because they carry no plan or verdict of their own; they are the last two things Build does.
 
 ## Phase 4: Review
 
@@ -103,19 +103,19 @@ A five-dimension audit (architecture, types, tests, security, performance) endin
 
 Two optional flags change what "reviewed" means:
 
-- `--verify` adds a light browser or artifact check. It is **advisory**, so a FAIL is reported but does not block the ship.
+- `--verify` adds a light browser or artifact check. It is **advisory**, so a FAIL is reported but does not change the outcome.
 - `--strict` runs the full evaluator. It is **blocking**, so a FAIL sends the work back to Phase 3, up to two evaluator rounds.
 
 Which one costs more depends on your harness, model tier, and target surface; treat the difference as ordering, not a price.
 
-**Gate 2: you approve the verdict.** This holds in every mode. A FAIL blocks Phase 5 entirely.
+**The verdict is a record, not a gate.** A FAIL tells you what to fix before shipping; nothing blocks a commit on a missing or failing verdict.
 
 ## Phase 5: Ship
 
 **Agent:** shipper
 **Produces:** a PR URL and rollback documentation
 
-`pre-ship.cjs` runs the full test, lint, and typecheck pass. The shipper writes a conventional commit and opens a PR, never a push to main, then confirms CI passes. Where a workflow evidence index exists it is read as extra proof; `mk:verify` keeps the authority to abort, and evidence never overrides a verify FAIL.
+The ship check (`pre-ship.cjs`) runs lint on the changed files, their related tests and a type-check on `git commit`, `git push`, `git merge` and `gh pr create|merge`, and refuses the command when one fails. The shipper writes a conventional commit and opens a PR, never a push to main, then confirms CI passes.
 
 ## Phase 6: Reflect
 
@@ -136,36 +136,36 @@ Two things happen on a fixed schedule rather than at your request. After each co
 
 ## Where the pipeline stops and asks you
 
-Beyond the two gates, one situation halts the loop on purpose.
+One situation halts the loop on purpose.
 
-When the reviewer finds that the change broke behavior that already worked, it appends `Side Effects Detected: Yes` and the specific effects to the verdict. The pipeline then stops and offers you a choice: revert and re-plan, keep the change and update whatever depended on the old behavior, add a compatibility shim, or accept the regression as intended. Your answer is recorded on the verdict as a `## User Decision Addendum`, and `validate-gate-2.cjs` holds Gate 2 until it is there.
+When the reviewer finds that the change broke behavior that already worked, it appends `Side Effects Detected: Yes` and the specific effects to the verdict. The pipeline then stops and offers you a choice: revert and re-plan, keep the change and update whatever depended on the old behavior, add a compatibility shim, or accept the regression as intended. Your answer is recorded on the verdict as a `## User Decision Addendum`.
 
-A related mechanism is the workflow evidence index: one `workflow-evidence.json` per run, tracing task, risk flags, diagnosis, verification, verdict, and approvals. It mirrors the gate scripts, which stay authoritative, and it **approves nothing**. `mk:fix --auto` does not self-approve from a review score either; it stops at ready-for-your-approval.
+`mk:fix --auto` does not self-approve from a review score; it stops at ready-for-your-approval.
 
-## Which skills require a plan first
+## Which skills expect a plan first
 
-| Skill | Gate behavior | Skip condition |
+| Skill | Plan behavior | Skip condition |
 |-------|-------------|----------------|
 | `mk:cook` | Create plan if missing | Plan path argument, `--fast` |
 | `mk:fix` | Plan if more than 2 files | `--quick` |
-| `mk:ship` | Require approved plan | Hotfix with human approval |
+| `mk:ship` | Expect an agreed plan | Hotfix with human approval |
 | `mk:cso` | Scope audit via plan | `--daily` |
 | `mk:review` | Read plan for context | PR diff reviews |
 
 Three skills skip the pattern entirely. `mk:investigate` and `mk:office-hours` produce the input a plan is made from, so they run before one exists; `mk:retro` reads data and implements nothing.
 
-## Gates enforced by hooks
+## Checks enforced by hooks
 
 MeowKit uses shell hooks to turn behavioral rules into prevention. The action is blocked before it executes:
 
 | Hook | Event | What it blocks |
 |------|-------|---------------|
-| `gate-enforcement.cjs` | PreToolUse (Edit\|Write) | Source code writes before Gate 1 approval |
+| `pre-ship.cjs` | PreToolUse (Bash) | A commit, push, merge or PR whose lint, related tests or type-check fail |
 | `privacy-block.cjs` | PreToolUse (Read) | `.env`, `*.key`, credential file reads |
-| `pre-completion-check.cjs` | Stop | Session end without verification evidence |
+| `pre-completion-check.cjs` (opt-in) | Stop | Session end without verification evidence |
 
 ## Next steps
 
 - [Build a feature end-to-end](/guides/build-a-feature)
 - [How agents and skills work together](/core-concepts/how-it-works)
-- [Understand the gates](/core-concepts/gates)
+- [Understand enforcement](/core-concepts/gates)

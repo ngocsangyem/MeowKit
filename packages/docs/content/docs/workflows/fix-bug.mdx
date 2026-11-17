@@ -27,7 +27,7 @@ The [mk:fix](/reference/skills/fix) skill classifies the bug:
 
 | Classification | Example | Pipeline |
 |---------------|---------|---------|
-| **Quick** | Typo, config error, lint failure | Direct fix → test → ship (Gate 1 skipped) |
+| **Quick** | Typo, config error, lint failure | Direct fix → test → ship (no plan) |
 | **Standard** | Logic bug in one module | Investigate → fix → test → review → ship |
 | **Deep** | Cross-module race condition | Full investigation with parallel exploration |
 
@@ -98,7 +98,7 @@ Test now **passes**. All other tests still pass (no regressions).
 
 ### Step 7: Ship
 
-Since this is a Standard bug fix, Gate 1 is skipped (the fix IS the plan). Gate 2 still applies:
+Since this is a Standard bug fix, no separate plan is written (the fix IS the plan). The reviewer still writes a verdict:
 
 ```
 ✓ Review: PASS (minimal diff, regression test included)

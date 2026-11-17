@@ -154,7 +154,7 @@ For the top 5 findings, presents via AskUserQuestion with options: Fix now (spec
 ## Workflow
 
 1. **Initialize** -- run preamble, parse arguments (mode, scope, diff)
-2. **Plan-first gate** -- comprehensive mode invokes `mk:plan-creator --type security`; daily mode skips
+2. **Plan first** -- comprehensive mode invokes `mk:plan-creator --type security`; daily mode skips
 3. **Reconnaissance** -- architecture + attack surface (Phases 0-1)
 4. **Core audit** -- secrets + dependencies + CI/CD + infra + webhooks + LLM + skills (Phases 2-8)
 5. **Assessment** -- OWASP Top 10 + STRIDE + data classification (Phases 9-11)

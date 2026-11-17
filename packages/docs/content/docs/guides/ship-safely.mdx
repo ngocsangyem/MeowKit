@@ -16,7 +16,7 @@ MeowKit runs the full pre-ship checklist: test → lint → typecheck → commit
 ## What happens
 
 ```
-Phase 4 review approved (Gate 2)
+Phase 4 review verdict written
   → pre-ship.cjs: full test + lint + typecheck
   → git-manager: stage changes, conventional commit
   → shipper: push branch, create PR
@@ -67,10 +67,10 @@ The scope and description come from the approved plan. No manual commit message 
 ```bash
 /mk:fix "critical payment bug" --quick
 # After fix verified:
-/mk:ship  # Hotfix: requires human approval but skips some checks
+/mk:ship  # Hotfix: skips some non-critical checks
 ```
 
-Hotfixes still require Gate 2 approval but may skip non-critical checks. Document the reason in the PR description.
+Hotfixes still get a review verdict and the ship check, but may skip non-critical checks. Document the reason in the PR description.
 
 ## Memory capture
 
@@ -104,4 +104,4 @@ The store is committed, so the entry ships in the same PR and is reviewed with t
 
 - [Build a feature](/guides/build-a-feature): the full pipeline ending with ship
 - [Review code](/guides/review-code): the review phase before shipping
-- [Gates & security](/core-concepts/gates): how Gate 2 protects shipping
+- [Gates & security](/core-concepts/gates): the ship check and what it enforces

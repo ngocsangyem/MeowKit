@@ -11,7 +11,7 @@ MeowKit didn't emerge from a vacuum. It was inspired by and builds upon ideas fr
 - **[Gstack](https://github.com/garrytan/gstack)** — a comprehensive skill collection featuring headless browser automation, QA testing, and the ethos of "search before building" that shaped MeowKit's research-first approach.
 - **[Aura-frog](https://github.com/nguyenthienthanh/aura-frog)** — an autonomous agent framework whose multi-agent coordination patterns and self-healing concepts influenced MeowKit's agent architecture and escalation protocols.
 
-MeowKit takes these foundations and adds **enforced discipline** — hard gates that block, opt-in strict TDD, and security scanning baked into every workflow. The goal isn't to replace these projects but to push the idea further: what happens when best practices aren't suggestions but requirements?
+MeowKit takes these foundations and adds **discipline** — a plan and a review for non-trivial work, a ship check that blocks failing code, opt-in strict TDD, and security scanning baked into every workflow. The goal isn't to replace these projects but to push the idea further: what happens when the checks that can be enforced are enforced?
 
 ## The problem with unstructured AI coding
 
@@ -27,9 +27,9 @@ This works for toy projects. For production code, it creates a whack-a-mole cycl
 
 ## MeowKit's thesis
 
-> AI agents need enforced discipline — hard gates, security scanning, and human approval — to ship production-quality code. Strict red-first TDD is opt-in: turn it on with `--tdd` or `MEOWKIT_TDD=1`. High-risk work passes the planning, review, and security gates either way.
+> AI agents need discipline — a plan you agree, a review verdict, security scanning, and a ship check — to ship production-quality code. Strict red-first TDD is opt-in: turn it on with `--tdd` or `MEOWKIT_TDD=1`. High-risk work gets the planning, review, and security passes either way.
 
-The key word is **enforced**. Not "recommended." Not "best practice." Enforced through hooks that block, gates that require approval, and rules that cannot be overridden.
+What is enforced is enforced by hooks that block: the ship check before a commit, push, merge or PR, and the privacy block on credential reads. Planning and review are practices, backed by rules that cannot be overridden.
 
 ## Before and after
 
@@ -73,7 +73,7 @@ Every step is visible. Every claim is verified. The fix is tested, reviewed, and
 
 | Decision                      | Why                                                                    |
 | ----------------------------- | ---------------------------------------------------------------------- |
-| **Two hard gates**            | The cost of a bad ship > the cost of a 30-second approval              |
+| **Ship check**                | A failing lint, test or type-check is cheaper to stop at commit than after merge |
 | **TDD opt-in**                | Strict failing-test-first when `--tdd` is set; otherwise tests are recommended but not gated. Spike work stays fast; production builds opt in for discipline. |
 | **Zero external deps**        | No API keys, no services, no runtime installs — works offline          |
 | **Exclusive file ownership**  | Each agent owns specific files — no merge conflicts                    |

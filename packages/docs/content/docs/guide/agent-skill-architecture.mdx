@@ -92,7 +92,7 @@ flowchart TD
     T[Task] --> P0[Phase 0: Orient]
     P0 --> S0[agent-detector\nscout]
 
-    P0 --> P1[Phase 1: Plan ✋ Gate 1]
+    P0 --> P1[Phase 1: Plan]
     P1 --> S1[plan-creator\noffice-hours\nplan-ceo-review\n\nvalidate-plan]
 
     P1 --> P2[Phase 2: Test - RED if --tdd]
@@ -101,7 +101,7 @@ flowchart TD
     P2 --> P3[Phase 3: Build]
     P3 --> S3[development\ntypescript / vue\nclean-code\ndocs-finder]
 
-    P3 --> P4[Phase 4: Review ✋ Gate 2]
+    P3 --> P4[Phase 4: Review]
     P4 --> S4[review\nelicit\nscout\ncso\nvulnerability-scanner]
 
     P4 --> P45{--verify\nor --strict?}
@@ -114,26 +114,26 @@ flowchart TD
     P6 --> S6[documentation\nmemory ⭐\nllms]
 ```
 
-## Plan-First Gate Pattern
+## Plan-First Pattern
 
-Most skills enforce a plan-first gate: before doing significant work they check that an approved plan exists.
+Most skills follow a plan-first practice: before doing significant work they check that an agreed plan exists. Nothing blocks the work if it does not.
 
 ```mermaid
 flowchart TD
     A["Task arrives"] --> B{"Plan exists?"}
     B -->|No| C["Create plan"]
-    C --> D["GATE 1 — human approval"]
-    D -->|Approved| E["Proceed with implementation"]
+    C --> D["Agree the plan with the human"]
+    D -->|Agreed| E["Proceed with implementation"]
     B -->|Yes| E
 ```
 
-Skills that enforce this gate:
+Skills that follow this pattern:
 
-| Skill                    | Gate behavior            | Skip condition               |
+| Skill                    | Plan behavior            | Skip condition               |
 | ------------------------ | ------------------------ | ---------------------------- |
 | mk:cook                  | Create plan if missing   | Plan path arg, `--fast` mode |
 | mk:fix                   | Plan if > 2 files        | `--quick` mode               |
-| mk:ship                  | Require approved plan    | Hotfix with human approval   |
+| mk:ship                  | Expect an agreed plan    | Hotfix with human approval   |
 | mk:cso                   | Scope audit via plan     | `--daily` mode               |
 | mk:qa                    | Create QA scope doc      | Quick tier                   |
 | mk:review                | Read plan for context    | PR diff reviews              |
@@ -143,7 +143,7 @@ Skills that enforce this gate:
 | mk:retro                 | Data-driven, no plan     | Always skips                 |
 | mk:document-release      | Scope from diff          | Post-ship sync               |
 
-<Callout title="Why some skills skip the gate" type="info">
+<Callout title="Why some skills skip the pattern" type="info">
 
 `mk:investigate` and `mk:office-hours` produce planning input — they run before a plan exists by design. `mk:retro` is data-driven and has no implementation output to scope.
 
@@ -151,7 +151,7 @@ Skills that enforce this gate:
 
 ### Orchestrator Entry Point Rule (v2.5.0)
 
-Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). `.claude/skills/cook/references/orchestration-rules.md` "Orchestrator Entry Point Rule" declares arbitration to prevent duplicate Gate 1 enforcement (relocated from `CLAUDE.md` in v2.7.5):
+Two orchestrators exist — `mk:cook` (explicit invocation, single-task pipeline) and `mk:workflow-orchestrator` (auto-invoked on complex-feature intent). `.claude/skills/cook/references/orchestration-rules.md` "Orchestrator Entry Point Rule" decides which one runs, so the two never run the same phase loop twice (relocated from `CLAUDE.md` in v2.7.5):
 
 - **Explicit `/mk:cook` invocation** → `mk:cook` owns the pipeline. `mk:workflow-orchestrator` does NOT activate for the rest of the session.
 - **Session start, complex-feature intent** → `mk:workflow-orchestrator` activates via `autoInvoke`. Defers to `mk:cook` for single-task requests.
@@ -202,7 +202,7 @@ skills/mk:review/
 | Skill             | Steps     | What each step does                                                                             |
 | ----------------- | --------- | ----------------------------------------------------------------------------------------------- |
 | `mk:review`       | 4         | Blind review → Edge cases → Criteria audit → Triage                                             |
-| `mk:plan-creator` | 9 (00–08) | Scope → Research → Codebase → Draft → Semantic checks → Red-team → Interview → Gate 1 → Hydrate |
+| `mk:plan-creator` | 9 (00–08) | Scope → Research → Codebase → Draft → Semantic checks → Red-team → Interview → Agree → Hydrate |
 
 `mk:plan-creator` also has a fast-mode path (`workflow-fast.md`) that runs steps 00→03→04→07→08, skipping research, codebase analysis, red-team, and the validation interview.
 

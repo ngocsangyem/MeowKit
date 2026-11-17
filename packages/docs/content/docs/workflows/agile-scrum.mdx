@@ -28,7 +28,7 @@ non-Agile sessions pay nothing for it.
 The toolkit ships a thin Agile governance layer covering:
 
 - **Definition of Ready (DoR)** — Phase 1 entry advisory: AC text, estimate, sprint linkage, recent evaluator report, no open blockers
-- **Definition of Done (DoD)** — Gate 2 PASS extension: post verdict to Jira, transition status, business AC checkbox
+- **Definition of Done (DoD)** — review-verdict PASS extension: post verdict to Jira, transition status, business AC checkbox
 - **Sprint goal persistence** — file-based contract surviving across sessions
 - **Mid-sprint amendment ceremony** — log scope changes transparently, never silently
 - **Sprint close hygiene** — disposition prompt for non-terminal commits + closure summary
@@ -81,7 +81,7 @@ jira_tickets: [PROJ-123, PROJ-124]
 sprint_id: 42
 ```
 
-Now `mk:plan-creator` will run the DoR advisory at Phase 1 entry, and `mk:ship` will surface DoD prompts at Gate 2 PASS.
+Now `mk:plan-creator` will run the DoR advisory at Phase 1 entry, and `mk:ship` will surface DoD prompts when the review verdict is PASS.
 
 ## Per-Sprint Ceremonies
 
@@ -112,11 +112,11 @@ If the sprint is already active, the skill:
 
 The append IS the commitment. No re-sign ceremony for non-harness work.
 
-### Definition of Done (Gate 2 PASS)
+### Definition of Done (review verdict PASS)
 
 When `/mk:ship` runs and the verdict has non-empty `jira_tickets:`, three opt-in actions surface:
 
-1. **Verdict→Jira comment.** "Post the Gate 2 verdict to PROJ-123 as a comment? [Y/n/edit]"
+1. **Verdict→Jira comment.** "Post the review verdict to PROJ-123 as a comment? [Y/n/edit]"
 2. **Status transition.** "Transition PROJ-123 to Done? [Y/n/skip]"
 3. **Business AC checkbox.** Source priority: (a) Jira AC field; (b) **fallback to plan.md `## Acceptance Criteria`** if Jira read fails
 
@@ -181,7 +181,7 @@ At spike completion: "Convert findings to delivery story? [Yes — extract AC | 
 - **Reports-not-automation** preserved — every action surfaces a prompt; no silent ticket creation
 - **Sprint-state contracts** at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Leading `sprint-state-` prefix prevents glob collision with the existing contract validator
 - **Concurrent-write safety** — writers acquire `flock` before any read-modify-write cycle on sprint-state files; YAML frontmatter append is non-atomic across shells
-- **Validator scope** — `validate-contract.cjs` validates per-story sprint-CONTRACT files only; sprint-STATE files have NO validator (YAML parsed inline by consuming skills)
+- **Validator scope** — neither sprint-CONTRACT nor sprint-STATE files have a validator script; consuming skills parse the YAML inline
 
 ## Out of Scope
 

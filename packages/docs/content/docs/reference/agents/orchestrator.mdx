@@ -54,8 +54,8 @@ You typically do not interact with the orchestrator directly. It runs behind the
 - [x] Classifies complexity before any work begins
 - [x] Assigns model tier based on complexity — never downgrades mid-task
 - [x] Detects TDD mode from environment variables and sentinel files
-- [x] Enforces Gate 1 (plan required) for Standard and Complex tasks
-- [x] Enforces Gate 2 (review required) for all code changes
+- [x] Routes Standard and Complex tasks to the planner so a plan is agreed before building
+- [x] Routes code changes to the reviewer for a verdict before shipping
 - [x] Reads memory files at session start for prior learnings and budget context
 - [x] Asks one targeted clarifying question when task is ambiguous — never guesses
 - [x] Routes to `mk:autobuild` for green-field product builds instead of the standard pipeline

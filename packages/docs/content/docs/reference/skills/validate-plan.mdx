@@ -15,10 +15,10 @@ description: "mk:validate-plan"
 {/* GENERATED:reference-facts END */}
 
 ## What This Skill Does
-Validates a plan file against 8 dimensions to catch gaps before implementation begins. Does NOT replace Gate 1 (human approval) -- supplements it with systematic, automated checks. Every dimension has binary pass criteria; nothing is subjective.
+Validates a plan file against 8 dimensions to catch gaps before implementation begins. Does NOT replace agreeing the plan with the user -- supplements it with systematic, automated checks. Every dimension has binary pass criteria; nothing is subjective.
 
 ## When to Use
-- After Gate 1 approval, before Phase 2 (Test)
+- After the plan is agreed, before Phase 2 (Test)
 - When `/mk:cook` detects a COMPLEX task (auto-suggested)
 - User says "validate this plan", "check my plan", "is this plan complete"
 - Before committing to implementation, to stress-test plan quality
@@ -51,7 +51,7 @@ No CLI arguments. Takes the plan file path from conversation context (typically 
 ## Usage
 Auto-triggered by cook workflow for COMPLEX tasks:
 ```
-Gate 1 (plan approved) -> mk:validate-plan -> Phase 2 (Test)
+Plan agreed -> mk:validate-plan -> Phase 2 (Test)
 ```
 
 Manual invocation:
@@ -65,7 +65,7 @@ Manual invocation:
 The skill will: load the plan file, score all 8 dimensions, run the consistency sweep across phase files, and output a validation report showing pass/fail per dimension with specific findings.
 
 ## Common Use Cases
-- Gate check between plan approval and implementation
+- Check between plan agreement and implementation
 - Catching missing acceptance criteria before building tests
 - Identifying unlisted dependencies that would block implementation
 - Surfacing security oversights in user-data features

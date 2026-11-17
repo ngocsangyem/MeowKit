@@ -1,6 +1,6 @@
 ---
 title: "mk:workflow-orchestrator"
-description: "Auto-invoked 7-phase workflow coordinator for complex features — phase routing, token budget management, gate enforcement, fast-track mode."
+description: "Auto-invoked 7-phase workflow coordinator for complex features — phase routing, token budget management, the ship check, fast-track mode."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -16,7 +16,7 @@ description: "Auto-invoked 7-phase workflow coordinator for complex features —
 
 ## What This Skill Does
 
-The central workflow coordinator. Auto-invoked when a session starts with complex-feature intent. Routes through [the seven phases](/core-concepts/workflow), managing gate enforcement, token budgets, agent team composition, and state persistence. Defers to `mk:cook` for single-task invocations.
+The central workflow coordinator. Auto-invoked when a session starts with complex-feature intent. Routes through [the seven phases](/core-concepts/workflow), managing the ship check, token budgets, agent team composition, and state persistence. Defers to `mk:cook` for single-task invocations.
 
 ## When to Use
 
@@ -27,7 +27,7 @@ The central workflow coordinator. Auto-invoked when a session starts with comple
 ## Core Capabilities
 
 - **Phase routing:** each phase dispatched to its owning skill — agent-detector and scale-routing at Orient, plan-creator at Plan, testing at Test, developer plus the mandatory simplify and verify stages at Build, review, ship, and memory after. The phase sequence itself is on [Workflow Phases](/core-concepts/workflow).
-- **Gate enforcement:** Gate 1 after Phase 1 (plan approval), Gate 2 after Phase 4 (review verdict)
+- **Plan and review:** agree the plan with the user after Phase 1 and produce a review verdict after Phase 4; nothing blocks on either, and the ship check runs on commit, push, merge and PR
 - **Token budget:** warns at 75%, handoff at 85%, forces context reset at 90%. Target ≤30K per workflow.
 - **State persistence:** `workflow:handoff` / `workflow:resume` / `workflow:status` commands for cross-session continuity
 - **Agent Teams:** parallel agent execution per phase with file ownership boundaries and task claim pattern
@@ -45,11 +45,11 @@ The central workflow coordinator. Auto-invoked when a session starts with comple
 
 1. **Pre-execution checklist** — run agent-detector, load memory, show agent banner, verify complexity, challenge requirements
 2. **Phase 0: Orient** — detect task agent, complexity tier, model selection
-3. **Phase 1: Plan** — route to plan-creator, enforce Gate 1
+3. **Phase 1: Plan** — route to plan-creator, agree the plan with the user
 4. **Phase 2: Test** — if TDD active, write failing tests
-5. **Phase 3: Build** — developer implements, plan-first gate enforced
+5. **Phase 3: Build** — developer implements against the agreed plan
 6. **Phase 3.5: Simplify** — mandatory simplification pass before review
-7. **Phase 4: Review** — reviewer verdict, enforce Gate 2
+7. **Phase 4: Review** — reviewer writes the verdict
 8. **Phase 5: Ship** — shipper creates PR, pushes branch
 9. **Phase 6: Reflect** — documenter syncs docs; a non-derivable lesson goes to the team store
 

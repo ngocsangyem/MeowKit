@@ -174,15 +174,15 @@ Skills that can activate in any phase.
 | `mk:chom` | Code chomping — extract relevant code sections for context |
 | `mk:pack` | Package code for portable context injection |
 
-## Plan-first gate
+## Plan first
 
-Most pipeline skills enforce a plan-first gate. Skills that skip planning either produce planning input or are data-driven.
+Most pipeline skills write or read a plan first. Nothing blocks an edit without one. Skills that skip planning either produce planning input or are data-driven.
 
-| Skill | Gate behavior | Skip condition |
+| Skill | Plan behavior | Skip condition |
 |-------|-------------|----------------|
 | `mk:cook` | Create plan if missing | Plan path arg, `--fast` mode |
 | `mk:fix` | Plan if > 2 files | `--quick` mode |
-| `mk:ship` | Require approved plan | Hotfix with human approval |
+| `mk:ship` | Cross-reference plan items against the diff | No plan for the change |
 | `mk:cso` | Scope audit via plan | `--daily` mode |
 | `mk:review` | Read plan for context | PR diff reviews |
 

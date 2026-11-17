@@ -3,9 +3,9 @@ title: "Autobuild Architecture"
 description: "The /mk:autobuild autonomous build pipeline — generator/evaluator split, sprint contract, iteration loop, adaptive density."
 ---
 
-> **See also:** [How MeowKit Works](/core-concepts/how-it-works) — the always-on harness (rules, hooks, skills, gates, memory). · [Autonomous Build](/guides/autonomous-build) — the how-to walkthrough.
+> **See also:** [How MeowKit Works](/core-concepts/how-it-works) — the always-on harness (rules, hooks, skills, ship check, memory). · [Autonomous Build](/guides/autonomous-build) — the how-to walkthrough.
 
-`/mk:autobuild` is the autonomous build pipeline for green-field products. This page covers **that pipeline's** architecture — the four roles, the flow, and the design decisions. For the always-on harness that underlies every session (rules, hooks, skills, gates, memory), see [How MeowKit Works](/core-concepts/how-it-works). For a step-by-step walkthrough, see the [how-to guide](/guides/autonomous-build).
+`/mk:autobuild` is the autonomous build pipeline for green-field products. This page covers **that pipeline's** architecture — the four roles, the flow, and the design decisions. For the always-on harness that underlies every session (rules, hooks, skills, ship check, memory), see [How MeowKit Works](/core-concepts/how-it-works). For a step-by-step walkthrough, see the [how-to guide](/guides/autonomous-build).
 
 ## Why this exists
 
@@ -47,7 +47,7 @@ A signed agreement on what "done" means — testable acceptance criteria negotia
 
 Capped at 3 rounds by default (`--max-iter N` to override). After round 3, the human makes the call: ship as-is, retry with guidance, or abandon. Budget guardrails ($30 warn / $100 block) fire independently of round count.
 
-## Active verification — hard gate
+## Active verification — required
 
 The evaluator MUST drive the running build. Browser navigation, curl against endpoints, CLI invocation. PASS verdicts with empty `evidence/` directory are auto-converted to FAIL. This is the only mitigation marked NEVER PRUNE in the dead-weight audit registry.
 

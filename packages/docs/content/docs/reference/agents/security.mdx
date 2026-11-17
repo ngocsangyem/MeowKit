@@ -21,7 +21,7 @@ The security agent is your last line of defense against shipping vulnerabilities
 
 > *"Security is not a feature — it is a constraint. The security agent ensures vulnerabilities are caught before they reach production."*
 
-The security agent operates at Phase 2 (pre-implementation audit) and Phase 4 (review audit). It auto-activates on any change touching auth, payments, user data, API endpoints, or encryption. Its BLOCK verdict is the strongest enforcement mechanism in MeowKit — once issued, the pipeline halts until the finding is resolved and a re-audit passes.
+The security agent operates at Phase 2 (pre-implementation audit) and Phase 4 (review audit). It auto-activates on any change touching auth, payments, user data, API endpoints, or encryption. Its BLOCK verdict is the strongest enforcement mechanism in MeowKit — once issued, the finding should be resolved and a re-audit pass before the change ships.
 
 ## Key Facts
 

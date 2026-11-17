@@ -22,7 +22,7 @@ Performs a multi-pass adversarial code review using a step-file architecture. Th
 
 - User asks to "review this PR", "code review", "pre-landing review", "check my diff"
 - User is about to merge or land code changes (proactive suggestion)
-- Before running `mk:ship` to ensure quality gate passes
+- Before running `mk:ship` to ensure review passes
 - **NOT** for behavioral verification against a running build -- use `mk:evaluate`
 - **NOT** for post-implementation simplification -- use `mk:simplify`
 - **NOT** for whole-repo security audit (infra, supply chain, secrets archaeology) -- use `mk:cso`
@@ -65,7 +65,7 @@ If total findings across all reviewers = 0, triggers ONE re-analysis with "look 
 | Security | No security findings | MINOR security notes | Any CRITICAL security issue |
 | Coverage | All ACs covered + tested | Partial AC coverage | Missing AC implementation |
 
-**Verdict rules:** Any FAIL -> Overall FAIL -> Gate 2 blocks. All PASS -> PASS. Mix PASS/WARN -> WARN.
+**Verdict rules:** Any FAIL -> Overall FAIL. All PASS -> PASS. Mix PASS/WARN -> WARN.
 
 ### Side-Effect Signal (additive, positive-presence-only)
 
@@ -76,9 +76,9 @@ Side Effects Detected: Yes
 - <one-line bullet per detected effect>
 ```
 
-`validate-gate-2.cjs` recognizes this signal and blocks Gate 2 UNTIL a `## User Decision Addendum` block (containing `User selected:` + `Resumption point:`) is appended. See `mk:cook/references/review-cycle.md` "Regression Recovery Options" for the 4 standard recovery options the cook orchestrator presents.
+The cook orchestrator reads this signal and asks you how to proceed; your choice is recorded as a `## User Decision Addendum` block (containing `User selected:` + `Resumption point:`) appended to the verdict. See `mk:cook/references/review-cycle.md` "Regression Recovery Options" for the 4 standard recovery options the cook orchestrator presents.
 
-**Backward-compat (CRITICAL):** absence of the `Side Effects Detected` field is NOT a block signal. Existing verdicts that pre-date this contract continue to validate unchanged. The new signal is positive-presence-only — never negative-absence.
+**Backward-compat (CRITICAL):** absence of the `Side Effects Detected` field is NOT a signal. Existing verdicts that pre-date this contract are read unchanged. The new signal is positive-presence-only — never negative-absence.
 
 ### Artifact Verification (Full Scope Only)
 
@@ -108,7 +108,7 @@ workflow.md -> step-01 -> step-02 (Phase A) -> step-02b (Phase B, full only) -> 
 3. **step-02b-persona-passes** -- Phase B (full scope only): Dispatch adversarial persona subagents informed by Phase A findings, 2-at-a-time batching.
 4. **step-03-triage** -- Forced-finding check (zero -> re-analyze once). Categorize findings as `current-change` or `incidental`. Dedup Phase A + Phase B.
 5. **step-03b-whole-plan-sweep** -- Cross-file drift detection after edits (skipped if no active plan).
-6. **step-04-verdict** -- 5-dimension verdict + artifact verification. Present for Gate 2 approval.
+6. **step-04-verdict** -- 5-dimension verdict + artifact verification. Present the verdict to the user.
 
 ## Usage
 
@@ -123,7 +123,7 @@ workflow.md -> step-01 -> step-02 (Phase A) -> step-02b (Phase B, full only) -> 
 
 > "I just finished the auth refactor. Can you review it before I merge? /mk:review"
 
-If the diff is >3 files (>50 lines, security-relevant auth files): scope = full. Phase A runs 3 reviewers in parallel (Blind Hunter catches a missing null check, Edge Case Hunter finds an edge case on expired tokens, Criteria Auditor confirms all acceptance criteria are covered). Phase B dispatches Security Adversary (finds token stored in localStorage) and Failure Mode Analyst (finds race condition in refresh token flow). Triage deduplicates, categorizes, and the verdict: Security = FAIL (CRITICAL token storage issue). Gate 2 blocks.
+If the diff is >3 files (>50 lines, security-relevant auth files): scope = full. Phase A runs 3 reviewers in parallel (Blind Hunter catches a missing null check, Edge Case Hunter finds an edge case on expired tokens, Criteria Auditor confirms all acceptance criteria are covered). Phase B dispatches Security Adversary (finds token stored in localStorage) and Failure Mode Analyst (finds race condition in refresh token flow). Triage deduplicates, categorizes, and the verdict: Security = FAIL (CRITICAL token storage issue). The overall verdict is FAIL.
 
 ## Common Use Cases
 
@@ -137,7 +137,7 @@ If the diff is >3 files (>50 lines, security-relevant auth files): scope = full.
 
 - **Run `mk:scout` first for 3+ file changes** -- scout identifies cross-file risks that blind review misses; makes the review more targeted
 - **The scope gate is automatic** -- small diffs skip the full adversarial pipeline; you don't need to choose
-- **FAIL verdict blocks `mk:ship`** -- this is enforced by Gate 2; fix issues and re-review before shipping
+- **A FAIL verdict means do not ship** -- nothing blocks the command, but the ship check still runs lint, related tests and a type-check; fix issues and re-review before shipping
 - **Artifact verification catches stubs** -- Level 2 scan finds TODO comments, empty catch blocks, placeholder strings that might ship accidentally
 - **Review failure catalog** lists common rationalizations to avoid (e.g., "AI-generated code is probably fine" -- it needs MORE scrutiny)
 - **Design checklist fires only on frontend diffs** -- backend-only PRs skip visual anti-pattern detection silently

@@ -1,6 +1,6 @@
 ---
 title: "reviewer"
-description: "5-dimension structural code review — enforces Gate 2 with written verdicts. Adversarial review with parallel reviewers."
+description: "5-dimension structural code review — writes the review verdict. Adversarial review with parallel reviewers."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,13 +15,13 @@ description: "5-dimension structural code review — enforces Gate 2 with writte
 
 {/* GENERATED:reference-facts END */}
 
-The reviewer is your quality gatekeeper for code. It performs thorough structural reviews across five dimensions and enforces Gate 2 — the hard stop that prevents code from shipping without a passing review verdict. Every finding must be actionable, every WARN must be justified, and rubber-stamping is mechanically prevented.
+The reviewer is your quality gatekeeper for code. It performs thorough structural reviews across five dimensions and writes the verdict that says whether the change is ready to ship. No hook blocks a commit on the verdict; the ship check only runs lint, related tests and a type-check. Every finding must be actionable, every WARN must be justified, and rubber-stamping is mechanically prevented.
 
 ## Cognitive Framing
 
-> *"Every dimension must be genuinely evaluated. Rubber-stamping is rejected. FAIL blocks shipping."*
+> *"Every dimension must be genuinely evaluated. Rubber-stamping is rejected. FAIL means do not ship."*
 
-The reviewer operates at Phase 4 (Review). It produces a structured verdict file that determines whether code can proceed to Phase 5 (Ship). The reviewer uses a multi-pass adversarial architecture — parallel base reviewers catch different classes of issues, followed by adversarial persona passes that go deeper on findings.
+The reviewer operates at Phase 4 (Review). It produces a structured verdict file that says whether code should proceed to Phase 5 (Ship). The reviewer uses a multi-pass adversarial architecture — parallel base reviewers catch different classes of issues, followed by adversarial persona passes that go deeper on findings.
 
 ## Key Facts
 
@@ -108,5 +108,5 @@ The reviewer ensures that no code ships without genuine quality verification acr
 - **[developer](/reference/agents/developer)** — receives FAIL verdict with required changes; re-submits for re-review
 - **[evaluator](/reference/agents/evaluator)** — complements the reviewer by verifying runtime behavior (reviewer = code quality, evaluator = product behavior)
 - **[security](/reference/agents/security)** — security BLOCK verdict automatically fails the Security dimension
-- **[shipper](/reference/agents/shipper)** — receives handoff after PASS or WARN verdict (Gate 2)
+- **[shipper](/reference/agents/shipper)** — receives handoff after PASS or WARN verdict
 - **[tester](/reference/agents/tester)** — coverage adequacy check informs the Coverage dimension

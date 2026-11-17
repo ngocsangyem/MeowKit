@@ -71,13 +71,13 @@ Security always wins in task-type classification. The active provider adapter ap
 
 ### Routing Logic
 
-| Level | Execution Tier | Gate 1 | Workflow |
+| Level | Execution Tier | Separate plan | Workflow |
 |-------|-----------|--------|----------|
-| low | minimal | Bypass eligible (one-shot) | Minimal |
+| low | minimal | Not needed (one-shot) | Minimal |
 | medium | standard | Required | Standard phases |
 | high | high-assurance | Required | Full phases + security |
 
-One-shot bypass requires BOTH CSV match AND orchestrator zero-blast-radius confirmation.
+Skipping the plan requires BOTH CSV match AND orchestrator zero-blast-radius confirmation.
 
 ### Product Area Configuration (Optional)
 
