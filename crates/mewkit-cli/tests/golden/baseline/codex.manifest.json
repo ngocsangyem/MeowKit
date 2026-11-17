@@ -5350,9 +5350,139 @@
       "exec": true
     },
     {
+      "path": ".codex/rubrics/RUBRICS_INDEX.md",
+      "sha256": "6840475a9b9e879bb51e353293098b7e4cd63d7874cd6a4bde377f075595de96",
+      "size": 4466
+    },
+    {
+      "path": ".codex/rubrics/calibration-set/README.md",
+      "sha256": "6d77e453dbd255c432256ae234982e2d34ab07f48cf10f43388565cc9b8fea53",
+      "size": 3029
+    },
+    {
+      "path": ".codex/rubrics/code-quality.md",
+      "sha256": "ebc50596eef8e6b279731af7ba38f2595244c883fb46263841fe080e07292394",
+      "size": 2702
+    },
+    {
+      "path": ".codex/rubrics/composition-presets/backend-api.md",
+      "sha256": "0c307409b7f9ad0976d08c58d6c1adfb15d171b23ce77088e82ca15f9702dacf",
+      "size": 1123
+    },
+    {
+      "path": ".codex/rubrics/composition-presets/cli-tool.md",
+      "sha256": "e4eba56f9edc0b97f43068244598cbc5fa4edc76e5c47cea1e301c88c65a0c56",
+      "size": 1712
+    },
+    {
+      "path": ".codex/rubrics/composition-presets/frontend-app.md",
+      "sha256": "bf6eef6ab7b2f5c3373d387bb368f375a984988e502bbe596379536a72f2c325",
+      "size": 3136
+    },
+    {
+      "path": ".codex/rubrics/composition-presets/fullstack-product.md",
+      "sha256": "d07b3e6b997b0df624c532f11eed1ca16c25403c0420dcb235639782e4ccadb2",
+      "size": 1948
+    },
+    {
+      "path": ".codex/rubrics/craft.md",
+      "sha256": "1f557b45f85bf2c74663dc52c1a90593678d6fefd9e75fe491e36e13c00261aa",
+      "size": 3022
+    },
+    {
+      "path": ".codex/rubrics/design-quality.md",
+      "sha256": "a6a21bb8fe595fc57b88795b30cbaacba9014c66049675180f12d01fa9b530bd",
+      "size": 3297
+    },
+    {
+      "path": ".codex/rubrics/functionality.md",
+      "sha256": "4db5a69a0ae3e3a43ccf8b0fbdc0025eeaaf4294ca5f61a6e9b59ed4d2080016",
+      "size": 2627
+    },
+    {
+      "path": ".codex/rubrics/originality.md",
+      "sha256": "119ca6336b856e67365fb72336afc27109c2a7619ce3513cea16b9210e025e3a",
+      "size": 3298
+    },
+    {
+      "path": ".codex/rubrics/product-depth.md",
+      "sha256": "4228c96ea9288026e991b8fdc6b03226173f3f2b5cb98db0928af9e62a3735b3",
+      "size": 2673
+    },
+    {
+      "path": ".codex/rubrics/schema.md",
+      "sha256": "d8c1254ac1cb67c6eb4b68abe3326d16f0f8f1b8fce76afb212b561aa49107e8",
+      "size": 3827
+    },
+    {
+      "path": ".codex/rubrics/ux-usability.md",
+      "sha256": "72b0fa265c8dfdc2fec352de27a2010d23c88e67cb82df558630914d165bb33e",
+      "size": 2876
+    },
+    {
       "path": ".codex/rules/default.rules",
       "sha256": "ae251c46b941c397372f841e542919575d643c91f1bc1fe169d860906a9f1e6a",
       "size": 1424
+    },
+    {
+      "path": ".codex/scripts/bin/config-keys.cjs",
+      "sha256": "bd32db24a839cf2ace31408ecfe6b505559fd2e8bfffa482280d70b7d10169ff",
+      "size": 3954
+    },
+    {
+      "path": ".codex/scripts/bin/config-rules.cjs",
+      "sha256": "80f7114c196dafc9cf3d4858f4c960d039131d0cbe6d77454cc57ee3fd0f7953",
+      "size": 4529
+    },
+    {
+      "path": ".codex/scripts/bin/handler-registry.cjs",
+      "sha256": "f571827c64bdb4bf9f583d246cff85efe7342015984e2ec39fa94031f1546c01",
+      "size": 4818
+    },
+    {
+      "path": ".codex/scripts/bin/meowkit-paths.cjs",
+      "sha256": "53d5ea65cc620d0671a3656a4411a1dc51e271d6341890c88185c8b7014f3aee",
+      "size": 3398
+    },
+    {
+      "path": ".codex/scripts/bin/read-config.cjs",
+      "sha256": "e82c89107ee44a2768598c3b392da3d6dc992a65693bd6cf55ee417c97faa7dd",
+      "size": 5005
+    },
+    {
+      "path": ".codex/scripts/bin/workflow-config",
+      "sha256": "b12268836a8876f7aca8e473ca2ed812999b441397551f7e78e1feca87b7ccc3",
+      "size": 3579
+    },
+    {
+      "path": ".codex/scripts/bin/workflow-config-core.cjs",
+      "sha256": "d9e273bd0acb3735b9e99fe44d864dabf5a3068b22b858bf9dc32a1ef864d078",
+      "size": 6352
+    },
+    {
+      "path": ".codex/scripts/bin/workflow-diff-scope",
+      "sha256": "3432e223be728241abaca701df63762d952e9e8f7df451fd062ebafd64469196",
+      "size": 2328
+    },
+    {
+      "path": ".codex/scripts/bin/workflow-repo-mode",
+      "sha256": "02ef2db74aa0d9b9c9ed3101944afba339a500e8a1090559521014e8f4ddfdc0",
+      "size": 2221
+    },
+    {
+      "path": ".codex/scripts/bin/workflow-review-log",
+      "sha256": "7f174d87a3fd7091482bb0aa384005c6dcd36ddb161a30edc2f0baa426e79113",
+      "size": 1012
+    },
+    {
+      "path": ".codex/scripts/bin/workflow-slug",
+      "sha256": "e79912592791af8e1e110641bf7361556781d7006d8681e084037d1b03437236",
+      "size": 1980
+    },
+    {
+      "path": ".codex/scripts/bin/yaml-subset.cjs",
+      "sha256": "e09f5a159d4029c308d670e84e52172b86a3d5546f58d795890a948d6ffa2dc6",
+      "size": 8322
     },
     {
       "path": ".codex/scripts/skill-python.cjs",
