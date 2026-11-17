@@ -36,7 +36,7 @@ task_model[8]{task_type,model,reason}:
 
 ## Agent Default Models
 
-Each agent runs on its `model:` pin, which follows the agent's tier in `model-selection-rules.md` (Agent `model:` Pins). The pin does not change per task: the tier declared for a task picks which agent runs, not which model it uses.
+Each agent runs on its `model:` pin, which follows the agent's tier in `references/model-selection-rules.md` (Agent `model:` Pins). The pin does not change per task: the tier declared for a task picks which agent runs, not which model it uses.
 
 ```toon
 agent_models[14]{agent,pin,tier}:
