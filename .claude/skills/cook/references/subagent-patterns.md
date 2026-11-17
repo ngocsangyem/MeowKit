@@ -18,7 +18,7 @@ Standard Agent() invocation patterns for cook workflow phases.
 
 ## Agent Tool Pattern
 
-Use your inner harness's delegation surface to spawn subagents (the `Agent` tool on Claude Code). The example shape below assumes that surface — substitute the equivalent on your harness; keep the same fields (subagent type, prompt, description) regardless of name.
+Use your inner harness's delegation surface to spawn subagents. On Claude Code, that is the `Agent` tool. The example shape below assumes that surface — substitute the equivalent on your harness; keep the same fields (subagent type, prompt, description) regardless of name.
 
 ```
 Agent(subagent_type="[type]", prompt="[task description]", description="[brief]")

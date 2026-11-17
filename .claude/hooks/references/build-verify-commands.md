@@ -55,7 +55,7 @@ All of it comes from the project config at `.meowkit/config.yaml`.
 
 ## Output Format
 
-When a command fails, the hook exits 2 and writes this block to stderr, the PostToolUse form Claude Code shows to the model (plain stdout there reaches only the transcript):
+When a command fails, the hook exits 2 and writes this block to stderr. On Claude Code, that is the PostToolUse form shown to the model; plain stdout there reaches only the transcript:
 
 ```
 @@BUILD_VERIFY_ERROR@@
