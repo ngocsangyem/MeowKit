@@ -38,8 +38,6 @@ export default defineConfig({
 			"plugin/**",
 			// Sibling session checkouts: separate revisions, not this tree's suites.
 			".claude/worktrees/**",
-			"kit/bundles/codex/root/**",
-			"kit/bundles/cursor/root/**",
 			"kit/overlays/**",
 		],
 	},

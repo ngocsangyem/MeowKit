@@ -27,7 +27,7 @@ const path = require("node:path");
 const data = require("./dangling-rule-refs-data.cjs");
 
 const PREFIXED_RE = new RegExp(`rules(?:-conditional)?/(${data.MOVED.map((m) => m.name).join("|")})\\.md`);
-const BUNDLE_PREFIXES = ["kit/bundles/", "kit/overlays/"];
+const OVERLAY_PREFIX = "kit/overlays/";
 
 /** Repo-relative POSIX path of every readable text file under the scan roots. */
 function collectFiles(root) {
@@ -59,7 +59,7 @@ function exemptionFor(rel) {
 
 /** (b) applies to shipped prose: `.claude/` and the mirrored provider bundles. */
 function isShippedProse(rel) {
-	return rel.startsWith(".claude/") || BUNDLE_PREFIXES.some((prefix) => rel.startsWith(prefix));
+	return rel.startsWith(".claude/") || rel.startsWith(OVERLAY_PREFIX);
 }
 
 /**

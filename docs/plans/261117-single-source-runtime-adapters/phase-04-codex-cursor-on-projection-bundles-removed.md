@@ -1,6 +1,6 @@
 # Phase 4 — Codex and Cursor emitters on projection; bundles removed
 
-**Priority:** high · **Status:** in progress · **Effort:** 4d · **Depends on:** 2, 3
+**Priority:** high · **Status:** done 2026-11-18, except the decision note (see below) · **Effort:** 4d · **Depends on:** 2, 3
 
 ## Overview
 
@@ -31,8 +31,8 @@ The Codex and Cursor emitters stop copying a bundle and build their `Plan` from 
 
 - [x] Codex emitter on projection
 - [x] Cursor emitter on projection
-- [ ] Checks run on projected trees in CI
-- [ ] Bundles and parity tooling removed
+- [x] Checks run on projected trees in CI
+- [x] Bundles and parity tooling removed
 - [ ] Decision recorded
 
 ## Success criteria
@@ -60,8 +60,18 @@ Not what the phase text assumed:
 - `mk-delegate` joined `core`, `mk-arch` `development`, `mk-breakdown` `product` and `mk-status` `operations` in both catalogs (maintainer, 2026-11-18). The catalogs' budget figures were stale and are recomputed from the projected descriptions.
 - The bundles shipped `mk-benchmark` and three skills' `eval/` folders, which the kit's ship set excludes. With one source they no longer install on Codex and Cursor.
 
-Left for the rest of this phase:
+Second half, same day:
 
-- `kit/bundles/<runtime>/root` still holds the hand-ported skills and agents. Nothing installs them; `projection_matches_bundles.rs`, `check-instruction-criteria.cjs`, `check-bundle-parity.cjs`, `check-skill-cross-refs.sh` and `skill-routing-keywords.test.ts` still read them. Those checks move to an installed tree, then the folder and the parity tooling go.
-- The overlays hold byte copies of 10 hook libraries, 12 helpers and 10 rubrics that `.claude/` also has (`sync-hook-core.cjs` keeps them equal), and `.codex/rubrics` beside the projected `mk-rubric/rubrics`. Deriving them belongs with the hook work in Phase 5.
-- Kit contract version bump; the decision note through `mewkit note decisions`.
+- `scripts/lib/installed-tree.cjs` copies the ship set to a temp kit and runs `mewkit init --target <runtime>` from it. `check-instruction-criteria.cjs` (trees `installed:codex`, `installed:cursor`), `check-skill-cross-refs.sh` and `skill-routing-keywords.test.ts` read that tree. They need the built binary (`$MEWKIT`, else `target/debug/mewkit`) and refuse one older than `crates/`.
+- Reading the installed tree found what the bundle-based checks could not: two helpers the text runs and no install shipped (`injection-audit.cjs`, `secret-scrub.cjs`; now in `core-closure.json` and copied to both overlays), a Cursor line naming the Codex hook file (one overlay line), and two source lines naming Claude Code-only files (reworded).
+- `kit/bundles/`, `check-bundle-parity.cjs`, `lib/bundle-parity-outline.cjs`, `bundle-parity-allow.json`, `tests/bundle-parity.test.ts` and the bundle comparison test are deleted. `tests/projects_whole_kit.rs` keeps the whole-kit projection check.
+- Kit contract 2; the binary reads exactly 2.
+
+Still open:
+
+- `mewkit validate --target cursor` says "Not a cursor target" on a project this installer wrote: it detects an install by the npm CLI's ledger (`.meowkit/state/cursor-ledger.json`) and checks for a root `AGENTS.md`, neither of which a `mewkit init --target cursor` writes. The behaviour is pinned by the recorded npm comparison (`npm_behaviour/validate_target_cases.rs`), so changing it is a listed divergence to decide, not a fix made here. The success criterion "validate passes for Cursor" is not met.
+- The decision note through `mewkit note decisions` is not written: `.meowkit/memory/decisions.md` does not exist yet, and creating it in the kit repository is the maintainer's call.
+- Always-on ceilings are now measured on the installed form (7734 B Codex, 6316 B Cursor): the same text as 7676 B and 6289 B plus block markers and the rule header.
+- The overlays hold byte copies of hook libraries, helpers and rubrics that `.claude/` also has (`sync-hook-core.cjs` keeps them equal), and `.codex/rubrics` beside the projected `mk-rubric/rubrics`. Deriving them belongs with the hook work in Phase 5.
+- A Codex install prints about 136 `note:` lines (Claude Code tokens inside script code, paths created at run time). Not measured against the bundles.
+- `research/measure-source-vs-codex-bundle.py` reads the deleted bundle and no longer runs; it is kept as the record of how the Phase 3 figures were made.

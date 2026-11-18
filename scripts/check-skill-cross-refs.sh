@@ -4,7 +4,7 @@
 # relative to the SKILL.md or step file that names them. Skills are the kit's only
 # routable surface, so a mk:* token resolves against the skill inventory or fails.
 #
-# Usage: bash scripts/check-skill-cross-refs.sh [project-root]
+# Usage: bash scripts/check-skill-cross-refs.sh [project-root [installed-tree ...]]
 # Exit:  0 if clean; 1 if any phantom ref found.
 
 set -uo pipefail
@@ -105,30 +105,43 @@ done < <(
     -type f \( -name 'SKILL.md' -o -name 'step-*.md' -o -path '*/references/*.md' -o -path '.claude/agents/*.md' -o -path '.claude/rules/*.md' \) -print 2>/dev/null
 )
 
-# The Codex and Cursor bundles name their own paths (`.agents/skills/mk-x/…`, `.codex/…`,
-# `.cursor/…`). Each must exist inside that bundle's root, because the installer copies the
-# bundle as laid out: a path to a file it does not ship is a command that fails after install.
-# Files a user or a session creates at run time are exempt. Only the kit source has bundles.
-# Hooks, helpers and rules are installed from the runtime's overlay, so a path may resolve there.
-for bundle in kit/bundles/codex/root kit/bundles/cursor/root; do
-  [ -d "$bundle" ] || continue
-  overlay="kit/overlays/$(basename "$(dirname "$bundle")")/files"
+# An installed Codex or Cursor tree names its own paths (`.agents/skills/mk-x/…`, `.codex/…`,
+# `.cursor/…`). Each must exist in that tree: a path to a file the install does not write is
+# a command that fails for the user. Exempt: files a user or a session creates at run time,
+# the example path the authoring rules warn against, and the audit rules the text marks as
+# kept in the kit's own repository.
+# With no tree named, the kit source installs each runtime into a temp directory and checks that.
+shift || true
+if [ "$#" -gt 0 ]; then
+  for tree in "$@"; do INSTALLED+=("$(basename "$tree")=$tree"); done
+elif [ -d kit/overlays ] && [ -f scripts/lib/installed-tree.cjs ]; then
+  for runtime in codex cursor; do
+    tree=$(node scripts/lib/installed-tree.cjs "$runtime") || { echo "ERROR: no installed $runtime tree to check" >&2; exit 1; }
+    INSTALLED+=("$runtime=$tree")
+    BUILT+=("$tree")
+  done
+fi
+for entry in ${INSTALLED[@]+"${INSTALLED[@]}"}; do
+  label="${entry%%=*}"
+  tree="${entry#*=}"
   while IFS=$'\t' read -r file ref; do
     [ -z "$ref" ] && continue
     case "$ref" in
       */cache/*|*/logs/*|*/agent-memory/*|*/state/*) continue ;;
       *mcp.json|*settings.local.json|*product-areas.yaml|*.env|*.env.example) continue ;;
+      */skills/foo/*|*/SKILLS_ATTRIBUTION.md|*/benchmark/references/dead-weight-audit-rules.md) continue ;;
     esac
-    if [ ! -e "$bundle/$ref" ] && [ ! -e "$overlay/$ref" ]; then
-      echo "DEAD_PATH: $bundle/${file#./} -> $ref" >&2
+    if [ ! -e "$tree/$ref" ]; then
+      echo "DEAD_PATH: installed $label: ${file#./} -> $ref" >&2
       PHANTOM=1
     fi
   done < <(
-    cd "$bundle" && find . \( -path '*/.venv/*' -o -path '*/node_modules/*' \) -prune -o \
+    cd "$tree" && find . \( -path '*/.venv/*' -o -path '*/node_modules/*' \) -prune -o \
       -type f \( -name '*.md' -o -name '*.mdc' -o -name '*.toml' \) -print0 \
       | xargs -0 perl -ne 'while (/(?:^|[\s`("\/])(\.(?:agents|codex|cursor)\/[A-Za-z0-9._\/-]+\.(?:mdc|md|cjs|sh|json|py|yaml|toml))(?![A-Za-z0-9])/g) { print "$ARGV\t$1\n" }'
   )
 done
+for tree in ${BUILT[@]+"${BUILT[@]}"}; do rm -r "$tree"; done
 
 if [ "$PHANTOM" -eq 0 ]; then
   echo "OK: all skill and local entrypoint refs resolve"

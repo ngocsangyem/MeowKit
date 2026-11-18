@@ -231,3 +231,9 @@ model_id="${MEOWKIT_MODEL_HINT:-unknown}"
 path = ".cursor/skills/mk-ship/references/commit-push-pr.md"
 find = "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
 with = "🤖 Generated with Cursor"
+
+# Cursor's read gate has its own file name.
+[[replace]]
+path = ".cursor/skills/mk-web-to-markdown/references/security.md"
+find = "`.cursor/hooks/privacy-block.cjs`"
+with = "`.cursor/hooks/privacy-read-gate.cjs`"

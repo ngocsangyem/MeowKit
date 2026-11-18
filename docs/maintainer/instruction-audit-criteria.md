@@ -1,11 +1,11 @@
 # Instruction audit criteria
 
-The criteria every rule, agent, skill and bundle instruction file is held to now that MeowKit
+The criteria every rule, agent, skill and installed instruction file is held to now that MeowKit
 has no plan-approval or review-approval gate, and the model-fit checks for current models on
 Claude Code, Codex and Cursor. The mechanical subset is checked by
-`node scripts/check-instruction-criteria.cjs`, which CI runs on `.claude`,
-`kit/bundles/codex/root` and `kit/bundles/cursor/root` against
-`scripts/instruction-criteria-baseline.json`; the rest is reviewed by hand against this page.
+`node scripts/check-instruction-criteria.cjs`, which CI runs on `.claude` and on what `mewkit init`
+installs for Codex and Cursor (`installed:codex`, `installed:cursor`; the script installs each into a
+temp directory with the built binary) against `scripts/instruction-criteria-baseline.json`; the rest is reviewed by hand against this page.
 
 ## Criteria
 
@@ -113,6 +113,24 @@ What moved:
   the Cursor agents' earlier third-person rewrite. The other 64 are host-specific skills,
   agents and files, and 48 of those are Claude Code reference files the bundles name in prose
   but do not ship.
+
+### After projection replaced the bundles (2026-11-18)
+
+Codex and Cursor are no longer hand-ported trees: the rows are measured on an install from the
+kit's ship set, so "bundle" in the criteria above now reads "installed tree".
+
+| Tree | Text files | Always-on bytes | Gate phrases | Emphatic tokens | Emphatic outside pinned rules | Skills | Listing chars | A9 | A10 | A11 | A12 | A13 | A14 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| .claude | 913 | 18191 | 0 | 521 | 510 | 127 | 14150 | 0 | 0 | 0 | 16 | 0 | 0 |
+| installed:codex | 878 | 7734 | 0 | 486 | 486 | 127 | 9578 | 0 | 0 | 0 | 16 | 0 | 0 |
+| installed:cursor | 882 | 6316 | 0 | 484 | 484 | 126 | 9445 | 0 | 0 | 0 | 16 | 0 | 0 |
+
+- **Always-on bytes** are the same text as before in its installed form: 7676 B plus the 58 B of
+  block markers in `AGENTS.md` on Codex, 6289 B plus the 27 B rule header on Cursor.
+- **A12** rises from 5 to 16 on each runtime because the installed text is now the source text,
+  which carries the same 16 baselined findings.
+- **Skills** rise by the four the bundles never ported and fall by `mk-benchmark`, which the ship
+  set leaves out. `.claude` counts the working tree, which includes it.
 
 Not measured: whether the rewritten text changes model behaviour. The live routing and
 with/without evals were not run.

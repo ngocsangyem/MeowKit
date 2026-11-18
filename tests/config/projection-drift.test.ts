@@ -1,14 +1,12 @@
-// What `mewkit migrate codex` and `mewkit migrate cursor` lay down cannot
-// instruct an agent to read a variable the kit deleted.
+// What a Codex or Cursor install lays down cannot instruct an agent to read a
+// variable the kit deleted.
 //
-// The provider projections under `kit/bundles/` are mirrors of
-// `.claude/`, and nothing regenerates them: no generator produces that tree, so
-// it is maintained by hand. The environment-name scan excludes it — were it in
-// scope, a mirror's own copy of a name would keep that name in the universe for
-// ever — which makes it the one door a deletion can leak through unseen. So a
-// dropped name is held to the same retention list here as everywhere else: a
-// `.claude/` edit that is not mirrored fails loudly instead of shipping stale
-// prose to whichever provider a user migrated to.
+// Skills and agents are projected from `.claude/`, which the environment-name
+// scan covers. The files under `kit/overlays/` are written by hand for one
+// runtime and are outside that scan — were they in scope, an overlay's own copy
+// of a name would keep that name in the universe for ever — which makes them the
+// one door a deletion can leak through unseen. So a dropped name is held to the
+// same retention list here as everywhere else.
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
@@ -19,7 +17,7 @@ const require_ = createRequire(import.meta.url);
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 const TABLE_REL = "env-name-classification.json";
-const PROJECTION_DIRS = ["kit/bundles", "kit/overlays"];
+const PROJECTION_DIRS = ["kit/overlays"];
 
 interface Table {
 	names: { name: string; class: string }[];
@@ -55,10 +53,11 @@ describe("the provider projections carry no deleted environment variable", () =>
 
 	it("has a tree to check, dropped names to check for, and a working probe", () => {
 		expect(table.names.filter((r) => r.class === "drop").length).toBeGreaterThan(0);
-		// A positive control: a name the table says survives here must be found by
-		// the same call the check below relies on, so a zero result there is
-		// evidence of absence rather than of a broken or mis-rooted grep.
-		expect(retainedHere.length, "no dropped name is retained in the projections").toBeGreaterThan(0);
+		// A positive control: a name the kit keeps must be found by the same call
+		// the check below relies on, so a zero result there is evidence of absence
+		// rather than of a broken or mis-rooted grep.
+		const kept = table.names.filter((r) => r.class !== "drop");
+		expect(kept.some((r) => projectionFiles(r.name).length > 0), "the probe finds no kept name either").toBe(true);
 		for (const name of retainedHere) expect(projectionFiles(name).length, name).toBeGreaterThan(0);
 	});
 

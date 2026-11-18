@@ -191,13 +191,13 @@ describe("baseline", () => {
 
 describe("the real trees", () => {
 	it("count Cursor rules marked alwaysApply as always-on", () => {
-		const files = alwaysOnFiles("kit/overlays/cursor/files").map((f) => path.basename(f));
+		const files = alwaysOnFiles("installed:cursor").map((f) => path.basename(f));
 		expect(files).toContain("runtime-invariants.mdc");
 		expect(files).not.toContain("domain-planning.mdc");
 	});
 
 	it("sum the Cursor always-on bytes to the A8 ceiling", () => {
-		const bytes = alwaysOnFiles("kit/overlays/cursor/files").reduce((n, f) => n + fs.statSync(f).size, 0);
+		const bytes = alwaysOnFiles("installed:cursor").reduce((n, f) => n + fs.statSync(f).size, 0);
 		expect(bytes).toBeLessThanOrEqual(6356);
 	});
 

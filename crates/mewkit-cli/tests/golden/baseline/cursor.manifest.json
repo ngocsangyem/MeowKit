@@ -472,6 +472,21 @@
       "size": 4818
     },
     {
+      "path": ".cursor/scripts/bin/injection-audit-core.cjs",
+      "sha256": "d42ed479e55bff1a50853d60ca13b0e3aa0531b28cf6dd2728e5bb2a811e2bdb",
+      "size": 6124
+    },
+    {
+      "path": ".cursor/scripts/bin/injection-audit-patterns.cjs",
+      "sha256": "6a27b301f5ed075a3ab702bfe62c54dded7f8b1e341db19004f51aeae29f70be",
+      "size": 4350
+    },
+    {
+      "path": ".cursor/scripts/bin/injection-audit.cjs",
+      "sha256": "5d377a986e765f832507f39a37e6685cc4742c4ce4ddd2eb3a641663d88013cd",
+      "size": 4532
+    },
+    {
       "path": ".cursor/scripts/bin/meowkit-paths.cjs",
       "sha256": "53d5ea65cc620d0671a3656a4411a1dc51e271d6341890c88185c8b7014f3aee",
       "size": 3398
@@ -480,6 +495,11 @@
       "path": ".cursor/scripts/bin/read-config.cjs",
       "sha256": "e82c89107ee44a2768598c3b392da3d6dc992a65693bd6cf55ee417c97faa7dd",
       "size": 5005
+    },
+    {
+      "path": ".cursor/scripts/bin/secret-scrub.cjs",
+      "sha256": "0a15aafc621a85d71bf3b2d7649b3f23e53a6732f639c9a0474b9a60c1a437af",
+      "size": 2093
     },
     {
       "path": ".cursor/scripts/bin/workflow-config",

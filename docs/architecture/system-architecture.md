@@ -49,18 +49,29 @@ The release ships ONE full kit zip; install size is controlled at install time, 
 
 ## Install Targets (Codex, Cursor)
 
-Codex and Cursor are **both hand-authored bundles** — nothing converts `.claude/` at
-install time. The `mewkit migrate` verb and its converter pipeline are removed.
+Codex and Cursor content is **projected from `.claude/` at install time**, plus a small
+per-runtime overlay. There is no stored Codex or Cursor copy of the kit. The `mewkit migrate`
+verb and its converter pipeline are removed.
 
-- **Bundle shape** — `kit/bundles/{codex,cursor}/`: a provider-native tree (`root/`) plus
-  `catalog/` install packs (`skill-packs.json`; Cursor also carries `mcp-profiles.json`).
-  Codex surfaces: `AGENTS.md`, `.codex/config.toml`, `.codex/rules/`, `.codex/agents/`,
-  `.codex/hooks.json` + `.codex/hooks/`, `.codex/scripts/`, `.agents/skills/`. Cursor
-  surfaces: `AGENTS.md` (installed as the always-applied rule
-  `.cursor/rules/meowkit-core.mdc`) and `.cursor/{rules,agents,skills,hooks}`. Neither has a
-  command surface.
+- **Projection** — `crates/mewkit-adapters/src/projected_kit.rs` reads the kit's `.claude/`
+  skills and agents and rewrites them for the runtime (`crates/mewkit-adapters/src/projection/`):
+  skill names and invocations, paths, host words, helper paths anchored at the project root,
+  and agents as Codex `.toml` or as Cursor Markdown carrying only the frontmatter keys Cursor
+  documents. It then adds the runtime's overlay.
+- **Overlay shape** — `kit/overlays/{codex,cursor}/`: `overlay.toml` (frontmatter keys per
+  skill or agent, `omit` for files the runtime does not get, `[[replace]]` lines for text
+  that belongs to one runtime), `files/` installed as they are (hooks and their libraries,
+  `hooks.json`, Codex `config.toml` and `rules/default.rules`, Cursor `.mdc` rules,
+  `AGENTS.md`, rubrics, `scripts/bin` helpers) and `catalog/` install packs
+  (`skill-packs.json`; Cursor also carries `mcp-profiles.json`).
+- **Installed surfaces** — Codex: an `AGENTS.md` block, `.codex/config.toml`,
+  `.codex/rules/`, `.codex/agents/`, `.codex/hooks.json` + `.codex/hooks/`,
+  `.codex/scripts/`, `.agents/skills/`. Cursor: `.cursor/{rules,agents,skills,hooks}`, with
+  the overlay's `AGENTS.md` installed as the always-applied rule
+  `.cursor/rules/meowkit-core.mdc`. Neither has a command surface.
 - **Install** — `mewkit init --target codex|cursor` runs that runtime's emitter
-  (`crates/mewkit-adapters/src/{codex,cursor}/`). Files map 1:1 onto the project, except
+  (`crates/mewkit-adapters/src/{codex,cursor}/`), which builds its plan from the projected
+  kit. Files map 1:1 onto the project, except
   the ones a user may own too: Codex merges a marked block into `AGENTS.md`, hook handlers
   into `.codex/hooks.json` and keys into `.codex/config.toml`; Cursor merges
   `.cursor/hooks.json` handler by handler. Each is recorded so uninstall takes out only what
@@ -68,9 +79,20 @@ install time. The `mewkit migrate` verb and its converter pipeline are removed.
   reported, never silently overwritten.
 - **Upgrade** — `mewkit upgrade` refreshes the runtimes it finds an ownership index for. A
   runtime the npm CLI installed is adopted only by an explicit `init --target <tool>`.
-- **Authoring cost** — new `.claude/` content reaches Codex or Cursor only by
-  hand-authoring the matching provider-native file(s) in **both** bundles; see
-  `RELEASING.md` step 1e. Neither target picks up kit changes automatically.
+- **Authoring cost** — a `.claude/` skill or agent reaches Codex and Cursor with no second
+  edit. Still written per runtime and by hand: hooks, Cursor rules, the always-on
+  `AGENTS.md` text, and pack membership in each `catalog/skill-packs.json`. The hook
+  libraries listed in `.claude/hooks/core-closure.json` are copied into both overlays by
+  `scripts/sync-hook-core.cjs`. See `RELEASING.md`.
+- **Placement** — `crates/mewkit-adapters/src/placement_resolver.rs` (data in
+  `crates/mewkit-adapters/src/surface_table.json`, described in
+  [`docs/maintainer/runtime-surface-table.md`](../maintainer/runtime-surface-table.md))
+  computes, for the set of runtimes sharing a project, which roots to write so each runtime
+  loads each kind of content once. Emitters receive it in `EmitRequest.placement` but do
+  not act on it yet. `Runtime` also names Grok, Pi and OMP, which have no emitter.
+- **Kit contract** — the kit declares contract 2 (`.claude/kit-contract.json`) and
+  `crates/mewkit-core/src/kit/contract.rs` accepts exactly 2, so an older binary refuses
+  this kit and asks for `self-update`.
 
 ## The `mewkit` binary and the two release streams
 

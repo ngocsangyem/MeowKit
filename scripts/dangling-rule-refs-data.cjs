@@ -86,7 +86,6 @@ const RETIRED_PATHS = [
  */
 const ROOTS = [
 	{ kind: "dir", path: ".claude" },
-	{ kind: "dir", path: "kit/bundles" },
 	{ kind: "dir", path: "kit/overlays" },
 	{ kind: "dir", path: "docs" },
 	{ kind: "dir", path: "packages/docs/content" },

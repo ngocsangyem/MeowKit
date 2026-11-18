@@ -62,7 +62,7 @@ not lost. Tests: `tests/hooks/model-context-channel.test.ts`.
 Guards registered outside the dispatcher (`privacy-block`, `pre-ship`, write guards) answer with
 the host's permission decision; their channel is the decision itself.
 
-## Codex hooks (`kit/bundles/codex/root/.codex/hooks.json`)
+## Codex hooks (`kit/overlays/codex/files/.codex/hooks.json`)
 
 | Hook | Event | Audience | Channel |
 |---|---|---|---|
@@ -71,7 +71,7 @@ the host's permission decision; their channel is the decision itself.
 | `completion-check` | SessionStart, PostToolUse Bash | state | session baseline, evidence |
 | `completion-check` | Stop (opt-in) | model | `decision: "block"` + `reason`; a notice is `systemMessage` (user) |
 
-## Cursor hooks (`kit/bundles/cursor/root/.cursor/hooks.json`)
+## Cursor hooks (`kit/overlays/cursor/files/.cursor/hooks.json`)
 
 | Hook | Event | Audience | Channel |
 |---|---|---|---|

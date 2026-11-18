@@ -47,14 +47,14 @@ function kitMeowkitTargets() {
  * be derived, and its catalogs. They sit outside `.claude/` on purpose: a Claude
  * Code install copies `.claude/` whole, and must not lay down Codex or Cursor files.
  */
-const CODEX_BUNDLE = "kit/overlays/codex";
-const CURSOR_BUNDLE = "kit/overlays/cursor";
+const CODEX_OVERLAY = "kit/overlays/codex";
+const CURSOR_OVERLAY = "kit/overlays/cursor";
 // Cursor alone ships the MCP profile catalog `init --mcp-profiles` merges from.
-const RUNTIME_BUNDLE_TARGETS = [CODEX_BUNDLE, CURSOR_BUNDLE].flatMap((b) => [
+const RUNTIME_OVERLAY_TARGETS = [CODEX_OVERLAY, CURSOR_OVERLAY].flatMap((b) => [
 	`${b}/overlay.toml`,
 	`${b}/files`,
 	`${b}/catalog/skill-packs.json`,
-]).concat(`${CURSOR_BUNDLE}/catalog/mcp-profiles.json`);
+]).concat(`${CURSOR_OVERLAY}/catalog/mcp-profiles.json`);
 
 /**
  * The archive roots a published kit is built from, in a fixed order.
@@ -77,7 +77,7 @@ const RUNTIME_BUNDLE_TARGETS = [CODEX_BUNDLE, CURSOR_BUNDLE].flatMap((b) => [
  * Every writer under it creates the directory it needs on first write, and a
  * gate reads an absent directory as "no plan" — the same block, never an error.
  */
-const ARCHIVE_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets(), ...RUNTIME_BUNDLE_TARGETS];
+const ARCHIVE_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets(), ...RUNTIME_OVERLAY_TARGETS];
 
 /**
  * Roots that must exist, or the build is publishing an incomplete kit.
@@ -85,7 +85,7 @@ const ARCHIVE_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTarget
  * Every shipped `.meowkit/` file is critical: the installer skips a member the
  * release lacks without a word, so a missing one is only ever caught here.
  */
-const CRITICAL_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets(), ...RUNTIME_BUNDLE_TARGETS];
+const CRITICAL_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets(), ...RUNTIME_OVERLAY_TARGETS];
 
 /** Read the exclusion patterns. Throws rather than defaulting to "exclude nothing". */
 function shipSetExclusions(projectRoot) {
@@ -192,8 +192,8 @@ function zipExcludeArgs(patterns) {
 
 module.exports = {
 	ARCHIVE_TARGETS,
-	CODEX_BUNDLE,
-	CURSOR_BUNDLE,
+	CODEX_OVERLAY,
+	CURSOR_OVERLAY,
 	CRITICAL_TARGETS,
 	KIT_MEOWKIT_FILES,
 	excludeMatcher,

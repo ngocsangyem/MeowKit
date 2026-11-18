@@ -18,7 +18,7 @@ fn versions_lists_installed_and_cached_kits_offline() {
     let doc = json(&out);
     assert_eq!(doc["installed"], serde_json::json!([]));
     assert!(doc["available"].is_null(), "--offline asks nothing");
-    assert_eq!(doc["kitContract"]["min"], 1);
+    assert_eq!(doc["kitContract"]["min"], 2);
 
     let scratch = tempfile::tempdir().unwrap();
     let (zip, sha) = archive(scratch.path());

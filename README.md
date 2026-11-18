@@ -73,7 +73,7 @@ Installs the `mk` plugin from the MeowKit marketplace. Skills (`/mk:*`), agents 
 
 > **Codex support is an experimental projection.** On Claude Code and Codex the ship check and the credential guard run as hooks; Codex runs a new or changed hook only after the user reviews it, and the rest of the Codex projection is advisory. What each runtime enforces: `docs/core/enforcement-matrix.md`. Run `mewkit providers codex --lifecycle` to see exactly what is enforced vs advisory.
 >
-> **Codex and Cursor get an authored bundle, not a conversion.** `mewkit init --target codex|cursor` copies a hand-maintained native bundle shipped in the kit; nothing is converted from `.claude/` at install time. The bundles are checked structurally (artifact set, denied tokens, install idempotency) in CI. That is evidence of structural parity, not of identical behavior across hosts.
+> **Codex and Cursor are projected from the one authored kit.** `mewkit init --target codex|cursor` rewrites the skills and agents under `.claude/` into the form that runtime loads (names, paths, tool words) and adds that runtime's overlay from `kit/overlays/`: hooks, rules and the always-on text, which cannot be derived. CI checks the installed result (instruction criteria, references that resolve, denied tokens, install idempotency). That is evidence the installed files are well formed, not of identical behavior across hosts.
 >
 > **Validate a generated Codex project** with `mewkit validate --target codex <dir>` — a read-only post-install gate that checks the config/hook wiring, that hook wrappers exist + are executable + carry the deny contract, that agent TOMLs parse, and that installed skills declare a supported runtime and carry no host-bound tool tokens. `mewkit doctor --providers` run inside a Codex project recognizes it and points at this command.
 
@@ -183,7 +183,7 @@ meowkit/
 │   └── settings.json
 ├── .meowkit/memory/          Team store: decisions.md + gotchas.md (committed)
 ├── crates/                   The mewkit CLI (Rust)
-├── kit/bundles/              Authored Codex and Cursor bundles
+├── kit/overlays/             What only Codex or Cursor needs: hooks, rules, catalogs
 ├── packages/
 │   └── landing/              Landing page (meowkit.dev, Nuxt + Tailwind v4)
 ├── scripts/                  Release automation
