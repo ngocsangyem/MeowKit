@@ -57,11 +57,11 @@ Done:
 Not what the phase text assumed:
 
 - The pack catalog cannot be derived from `.meowkit/pack-manifest.json`: Claude Code packs (`lifecycle-core`, `testing`, …) and the Codex and Cursor packs (`core`, `development`, …) are different groupings. Each overlay keeps its catalog.
+- `mk-delegate` joined `core`, `mk-arch` `development`, `mk-breakdown` `product` and `mk-status` `operations` in both catalogs (maintainer, 2026-11-18). The catalogs' budget figures were stale and are recomputed from the projected descriptions.
 - The bundles shipped `mk-benchmark` and three skills' `eval/` folders, which the kit's ship set excludes. With one source they no longer install on Codex and Cursor.
 
 Left for the rest of this phase:
 
 - `kit/bundles/<runtime>/root` still holds the hand-ported skills and agents. Nothing installs them; `projection_matches_bundles.rs`, `check-instruction-criteria.cjs`, `check-bundle-parity.cjs`, `check-skill-cross-refs.sh` and `skill-routing-keywords.test.ts` still read them. Those checks move to an installed tree, then the folder and the parity tooling go.
 - The overlays hold byte copies of 10 hook libraries, 12 helpers and 10 rubrics that `.claude/` also has (`sync-hook-core.cjs` keeps them equal), and `.codex/rubrics` beside the projected `mk-rubric/rubrics`. Deriving them belongs with the hook work in Phase 5.
-- `mk-arch`, `mk-breakdown`, `mk-delegate` and `mk-status` are in no Codex or Cursor pack.
 - Kit contract version bump; the decision note through `mewkit note decisions`.

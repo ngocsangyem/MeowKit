@@ -1,6 +1,6 @@
 {
 	"_description": "Codex bundle skill-pack catalog. Each shipped skill maps to exactly one pack. `core` installs by default; other packs are explicit (--packs) or --all. Budget: default-install (core) name+description <= budgetChars.",
-	"verified": "2026-07-23",
+	"verified": "2026-11-18",
 	"budgetChars": 8000,
 	"defaultPack": "core",
 	"packs": {
@@ -11,6 +11,7 @@
 				"mk-agent-detector",
 				"mk-brainstorming",
 				"mk-cook",
+				"mk-delegate",
 				"mk-development",
 				"mk-docs-init",
 				"mk-document-release",
@@ -41,6 +42,7 @@
 			"skills": [
 				"mk-angular",
 				"mk-api-design-principles",
+				"mk-arch",
 				"mk-autobuild",
 				"mk-backend-development",
 				"mk-bootstrap",
@@ -86,6 +88,7 @@
 			"skills": [
 				"mk-advise",
 				"mk-ask-me",
+				"mk-breakdown",
 				"mk-decision-framework",
 				"mk-elicit",
 				"mk-ghpm",
@@ -117,6 +120,7 @@
 				"mk-prompt-enhancer",
 				"mk-scale-routing",
 				"mk-session-continuation",
+				"mk-status",
 				"mk-task-queue",
 				"mk-team-config",
 				"mk-web-to-markdown",
@@ -171,13 +175,13 @@
 		}
 	},
 	"budgetReport": {
-		"core": 7913,
-		"development": 4140,
-		"review": 4862,
-		"product": 5790,
-		"operations": 8381,
-		"integrations": 9039,
-		"media": 2808,
-		"total": 45250
+		"core": 2378,
+		"development": 2014,
+		"review": 1115,
+		"product": 1138,
+		"operations": 1752,
+		"integrations": 2255,
+		"media": 721,
+		"total": 11373
 	}
 }
