@@ -109,15 +109,17 @@ done < <(
 # `.cursor/…`). Each must exist inside that bundle's root, because the installer copies the
 # bundle as laid out: a path to a file it does not ship is a command that fails after install.
 # Files a user or a session creates at run time are exempt. Only the kit source has bundles.
+# Hooks, helpers and rules are installed from the runtime's overlay, so a path may resolve there.
 for bundle in kit/bundles/codex/root kit/bundles/cursor/root; do
   [ -d "$bundle" ] || continue
+  overlay="kit/overlays/$(basename "$(dirname "$bundle")")/files"
   while IFS=$'\t' read -r file ref; do
     [ -z "$ref" ] && continue
     case "$ref" in
       */cache/*|*/logs/*|*/agent-memory/*|*/state/*) continue ;;
       *mcp.json|*settings.local.json|*product-areas.yaml|*.env|*.env.example) continue ;;
     esac
-    if [ ! -e "$bundle/$ref" ]; then
+    if [ ! -e "$bundle/$ref" ] && [ ! -e "$overlay/$ref" ]; then
       echo "DEAD_PATH: $bundle/${file#./} -> $ref" >&2
       PHANTOM=1
     fi

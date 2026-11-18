@@ -19,7 +19,7 @@ const require_ = createRequire(import.meta.url);
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 const TABLE_REL = "env-name-classification.json";
-const PROJECTIONS_REL = "kit/bundles";
+const PROJECTION_DIRS = ["kit/bundles", "kit/overlays"];
 
 interface Table {
 	names: { name: string; class: string }[];
@@ -30,7 +30,7 @@ const table = require_(join(REPO_ROOT, TABLE_REL)) as Table;
 
 /** Every projection file naming `name` as a whole word. */
 function projectionFiles(name: string): string[] {
-	const result = spawnSync("grep", ["-rlwE", name, PROJECTIONS_REL, "--binary-files=without-match"], {
+	const result = spawnSync("grep", ["-rlwE", name, ...PROJECTION_DIRS, "--binary-files=without-match"], {
 		cwd: REPO_ROOT,
 		encoding: "utf8",
 	});
@@ -50,7 +50,7 @@ function retainedIn(name: string): string[] {
 describe("the provider projections carry no deleted environment variable", () => {
 	/** Dropped names the table retains specifically inside the projections tree. */
 	const retainedHere = Object.entries(table.retainedDropOccurrences)
-		.filter(([key, value]) => key !== "comment" && typeof value !== "string" && value.in.some((a) => a.includes(PROJECTIONS_REL)))
+		.filter(([key, value]) => key !== "comment" && typeof value !== "string" && value.in.some((a) => PROJECTION_DIRS.some((dir) => a.includes(dir))))
 		.map(([key]) => key);
 
 	it("has a tree to check, dropped names to check for, and a working probe", () => {

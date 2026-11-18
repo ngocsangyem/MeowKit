@@ -4,13 +4,13 @@
 //! `mewkit-core` and listed in [`registry`].
 #![forbid(unsafe_code)]
 
-pub mod bundle;
 pub mod claude_code;
 pub mod codex;
 pub mod contract;
 pub mod cursor;
 mod kit_files;
 pub mod placement_resolver;
+pub mod projected_kit;
 pub mod projection;
 pub mod registry;
 mod report_gate;

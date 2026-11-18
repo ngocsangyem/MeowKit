@@ -21,13 +21,13 @@ const HOSTS = {
     skills: 'kit/bundles/codex/root/.agents/skills',
     agents: 'kit/bundles/codex/root/.codex/agents',
     agentExt: '.toml',
-    relocated: { 'rubric/rubrics/': 'kit/bundles/codex/root/.codex/rubrics/' },
+    relocated: { 'rubric/rubrics/': 'kit/overlays/codex/files/.codex/rubrics/' },
   },
   cursor: {
     skills: 'kit/bundles/cursor/root/.cursor/skills',
     agents: 'kit/bundles/cursor/root/.cursor/agents',
     agentExt: '.md',
-    relocated: { 'rubric/rubrics/': 'kit/bundles/cursor/root/.cursor/rubrics/' },
+    relocated: { 'rubric/rubrics/': 'kit/overlays/cursor/files/.cursor/rubrics/' },
   },
 };
 

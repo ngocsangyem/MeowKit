@@ -369,8 +369,9 @@ fn whole_kit(bundle: &Bundle) {
         bundle.runtime
     );
     assert!(skills > 100 && agents > 30);
-    // Every projected agent and skill header is well formed.
-    for (path, bytes) in &tree {
+    // Every projected agent and skill header is well formed; a file the
+    // overlay supplies whole is written by hand and has its own form.
+    for (path, bytes) in tree.iter().filter(|(p, _)| !overlay.files.contains_key(*p)) {
         let text = String::from_utf8_lossy(bytes);
         if path.ends_with(".toml") {
             let parsed = text.parse::<toml_edit::DocumentMut>();

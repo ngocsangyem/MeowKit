@@ -14,9 +14,9 @@ use std::path::{Path, PathBuf};
 
 use cli_surface::references::scan;
 
-/// Only the shipped kit and its Codex and Cursor bundles: `docs/` carries history naming
+/// Only the shipped kit and its Codex and Cursor overlays: `docs/` carries history naming
 /// verbs that existed at the time.
-const TREES: &[&str] = &[".claude", "kit/bundles"];
+const TREES: &[&str] = &[".claude", "kit/overlays"];
 
 fn repo_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")

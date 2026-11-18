@@ -1,8 +1,8 @@
 //! Codex emitter.
 //!
-//! Codex content comes from the authored bundle the kit carries (maintainer
-//! decision 2026-11-11: the bundle is the Codex overlay; nothing is projected
-//! from `.claude/`). Files map 1:1 onto the project, with three exceptions the
+//! Codex content is the kit's `.claude/` tree projected for Codex, plus the
+//! Codex overlay for what cannot be derived (hooks, command policy, the
+//! always-on text). Files map 1:1 onto the project, with three exceptions the
 //! user may own as well: `AGENTS.md` gets a marked block, `.codex/hooks.json`
 //! gets hook handlers and `.codex/config.toml` gets keys, each recorded so
 //! uninstall takes out only what the kit added. Global scope: see [`global`].
@@ -12,19 +12,18 @@ mod shared;
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use crate::bundle::{Bundle, Spec};
 use crate::contract::{
     EmitError, EmitRequest, Emitter, Op, OwnershipIndex, Plan, RelPath, Runtime, Scope, ScopeKind,
 };
-use crate::kit_files::{self, rel};
+use crate::kit_files::rel;
+use crate::projected_kit::{ProjectedKit, Spec};
 use crate::{report_gate, scope, strip};
 
-/// The authored Codex bundle in the kit.
-pub const BUNDLE: Spec = Spec {
+/// Where the kit keeps what only Codex needs.
+pub const SOURCE: Spec = Spec {
     runtime: "Codex",
-    dir: "kit/bundles/codex",
-    legacy_dir: "packages/mewkit/src/migrate/modules/codex",
-    skills: ".agents/skills/",
+    overlay: "kit/overlays/codex",
+    target: &crate::projection::target::CODEX,
 };
 pub use shared::{AGENTS_MD, AGENTS_MD_BUDGET, BLOCK_ID, CONFIG_TOML, HOOKS_JSON};
 
@@ -70,53 +69,51 @@ impl Emitter for Codex {
         } else {
             AGENTS_MD
         };
-        let anchor = |p: &str, quoted: bool| match global {
-            None => format!(".agents/skills/{p}"),
-            Some(scope) => {
-                let path = RelPath::new(&format!(".agents/skills/{p}")).expect("kit path");
-                global::quote_in(&scope.resolve(&path), cfg!(windows), quoted)
-            }
+        let kit = ProjectedKit::open(&req.kit.dir, &SOURCE)?;
+        let chosen = kit.select(req.packs, req.disabled)?;
+        // Projection anchors a skill's helper commands at the project root,
+        // where a global install has no skills: those take the absolute path.
+        let absolute = |path: &str, quoted: bool| {
+            let path = RelPath::new(path).expect("kit path");
+            global::quote_in(&req.scope.resolve(&path), cfg!(windows), quoted)
         };
-        let bundle = Bundle::open(&req.kit.dir, &BUNDLE)?;
-        let chosen = bundle.select(req.packs, req.disabled)?;
         let mut skill_files: BTreeMap<&str, BTreeSet<String>> = BTreeMap::new();
-        for f in &bundle.files {
-            if let Some(s) = bundle.skill_of(&f.rel) {
-                let inner = &f.rel[".agents/skills/".len() + s.len() + 1..];
-                skill_files.entry(s).or_default().insert(inner.to_owned());
+        if global.is_some() {
+            for f in &kit.files {
+                if let Some(s) = kit.skill_of(&f.rel) {
+                    skill_files.entry(s).or_default().insert(f.rel.clone());
+                }
             }
         }
 
         let mut ops = Vec::new();
-        for f in &bundle.files {
+        for f in &kit.files {
+            let text = || {
+                String::from_utf8(f.bytes.clone())
+                    .map_err(|_| EmitError::Kit(format!("{} is not UTF-8", f.rel)))
+            };
             match f.rel.as_str() {
-                AGENTS_MD => ops.push(shared::agents_md(
-                    &kit_files::read_text(&f.abs)?,
-                    agents_md,
-                )?),
-                HOOKS_JSON => {
-                    ops.extend(shared::hooks_json(&kit_files::read_text(&f.abs)?, global)?)
-                }
+                AGENTS_MD => ops.push(shared::agents_md(&text()?, agents_md)?),
+                HOOKS_JSON => ops.extend(shared::hooks_json(&text()?, global)?),
                 // Project settings (`project_doc_max_bytes`); a global install leaves the user's config alone.
                 CONFIG_TOML if global.is_some() => {}
-                CONFIG_TOML => ops.push(shared::config_toml(&kit_files::read_text(&f.abs)?)?),
+                CONFIG_TOML => ops.push(shared::config_toml(&text()?)?),
                 path => {
-                    let skill = bundle.skill_of(path);
+                    let skill = kit.skill_of(path);
                     if skill.is_some_and(|s| !chosen.contains(s)) {
                         continue;
                     }
-                    let mut bytes = kit_files::read(&f.abs)?;
-                    if let Some(s) = skill
+                    let mut bytes = f.bytes.clone();
+                    if let Some(files) = skill.and_then(|s| skill_files.get(s))
                         && let Ok(text) = std::str::from_utf8(&bytes)
-                        && let Some(anchored) =
-                            rewrite::root_anchor(text, s, &skill_files[s], &anchor)
+                        && let Some(anchored) = rewrite::root_anchor(text, files, &absolute)
                     {
                         bytes = anchored.into_bytes();
                     }
                     ops.push(Op::WriteFile {
                         path: rel(path)?,
                         bytes,
-                        mode: kit_files::mode(&f.abs),
+                        mode: f.mode,
                     });
                 }
             }
@@ -126,10 +123,10 @@ impl Emitter for Codex {
             ops,
             ..Plan::default()
         };
-        let have = bundle.skills();
+        let have = kit.skills();
         for missing in chosen.iter().filter(|s| !have.contains(s.as_str())) {
             plan.notices.push(format!(
-                "skill pack lists {missing}, which the Codex bundle does not ship"
+                "skill pack lists {missing}, which the kit does not ship for Codex"
             ));
         }
         if global.is_none() {

@@ -10,8 +10,9 @@
 //   node scripts/check-instruction-criteria.cjs --metrics [tree ...]  print the metrics table
 //   node scripts/check-instruction-criteria.cjs --emphatic [tree ...] emphatic tokens per file
 //
-// A tree is `.claude` or a bundle root such as `kit/bundles/codex/root`; `kit/bundles`
-// expands to both bundle roots. With no tree, all three are checked.
+// A tree is `.claude`, a bundle root such as `kit/bundles/codex/root` (the skills and agents)
+// or an overlay such as `kit/overlays/codex/files` (the always-on text and rules); `kit/bundles`
+// expands to both bundle roots. With no tree, all five are checked.
 // Criteria and their scope: docs/maintainer/instruction-audit-criteria.md.
 
 const crypto = require('node:crypto');
@@ -24,7 +25,8 @@ const { frontmatterValue } = require('./lib/instruction-criteria-frontmatter.cjs
 const { allowed, looseEntries, overBaseline, readBaseline, writeBaseline } = require('./lib/instruction-criteria-baseline.cjs');
 
 const REPO = path.resolve(__dirname, '..');
-const DEFAULT_TREES = ['.claude', 'kit/bundles/codex/root', 'kit/bundles/cursor/root'];
+const OVERLAY_TREES = ['kit/overlays/codex/files', 'kit/overlays/cursor/files'];
+const DEFAULT_TREES = ['.claude', 'kit/bundles/codex/root', 'kit/bundles/cursor/root', ...OVERLAY_TREES];
 const TEXT_EXT = new Set(['.md', '.mdc', '.toml']);
 const SKIP_DIRS = new Set(['node_modules', '__tests__', '.venv']);
 /** Host state at the top of a tree; a skill folder of the same name deeper down is still checked. */
@@ -36,10 +38,10 @@ const CRITERIA = ['A1', 'A2', 'A5', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14'];
 const PINNED_SHA256 = 'e0b639506d83aff3e9040f3fdbfad35c016ee46ff701ad2f1daff04ced2461fa';
 
 /**
- * Always-on bytes per tree may only shrink. Claude Code loads every rule file; the bundles
- * load their root AGENTS.md, and Cursor also every `.mdc` rule marked `alwaysApply: true`.
+ * Always-on bytes per tree may only shrink. Claude Code loads every rule file; the other runtimes
+ * load the root AGENTS.md of their overlay, and Cursor also every `.mdc` rule marked `alwaysApply: true`.
  */
-const ALWAYS_ON_CEILING = { '.claude': 18191, 'kit/bundles/codex/root': 7676, 'kit/bundles/cursor/root': 6289 };
+const ALWAYS_ON_CEILING = { '.claude': 18191, 'kit/overlays/codex/files': 7676, 'kit/overlays/cursor/files': 6289 };
 /** Skill listing ceilings in chars; Codex is lower so a 128k-context session keeps whole descriptions. */
 const LISTING_CEILING = { '.claude': 16000, 'kit/bundles/codex/root': 12000, 'kit/bundles/cursor/root': 16000 };
 

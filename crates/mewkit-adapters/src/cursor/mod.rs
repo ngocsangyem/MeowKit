@@ -1,9 +1,9 @@
 //! Cursor emitter.
 //!
-//! Cursor content comes from the authored bundle the kit carries (maintainer
-//! decision 2026-11-11: the bundle is the Cursor overlay, as for Codex).
-//! Files map 1:1 onto `.cursor/`, except:
-//! - the bundle's `AGENTS.md` becomes the always-applied rule
+//! Cursor content is the kit's `.claude/` tree projected for Cursor, plus the
+//! Cursor overlay for what cannot be derived (hooks, rules, the always-on
+//! text). Files map 1:1 onto `.cursor/`, except:
+//! - the overlay's `AGENTS.md` becomes the always-applied rule
 //!   `.cursor/rules/meowkit-core.mdc`: the project's `AGENTS.md` is left to
 //!   the user and to the Codex install;
 //! - `.cursor/hooks.json` is merged handler by handler, every blocking
@@ -17,24 +17,23 @@
 pub(crate) mod frontmatter;
 mod hooks;
 
-use crate::bundle::{Bundle, Spec};
 use crate::contract::{
     EmitError, EmitRequest, Emitter, Op, OwnershipIndex, Plan, RelPath, Runtime, Scope, ScopeKind,
 };
-use crate::kit_files::{self, rel};
+use crate::kit_files::rel;
+use crate::projected_kit::{ProjectedKit, Spec};
 use crate::{report_gate, scope, strip};
 use mewkit_core::plan::HookLayout;
 
 pub use hooks::{BLOCKING, HOOKS_JSON};
 
-/// The authored Cursor bundle in the kit.
-pub const BUNDLE: Spec = Spec {
+/// Where the kit keeps what only Cursor needs.
+pub const SOURCE: Spec = Spec {
     runtime: "Cursor",
-    dir: "kit/bundles/cursor",
-    legacy_dir: "packages/mewkit/src/migrate/modules/cursor",
-    skills: ".cursor/skills/",
+    overlay: "kit/overlays/cursor",
+    target: &crate::projection::target::CURSOR,
 };
-/// Where the bundle's `AGENTS.md` guidance is installed.
+/// Where the overlay's `AGENTS.md` guidance is installed.
 pub const CORE_RULE: &str = ".cursor/rules/meowkit-core.mdc";
 /// Subagent frontmatter keys Cursor documents.
 pub const AGENT_KEYS: &[&str] = &["name", "description", "model", "readonly", "is_background"];
@@ -73,34 +72,36 @@ impl Emitter for Cursor {
     fn prepare(&self, req: &EmitRequest<'_>) -> Result<Plan, EmitError> {
         let global = req.scope.kind == ScopeKind::Global;
         let mut rules_left_out = 0;
-        let bundle = Bundle::open(&req.kit.dir, &BUNDLE)?;
-        let chosen = bundle.select(req.packs, req.disabled)?;
+        let kit = ProjectedKit::open(&req.kit.dir, &SOURCE)?;
+        let chosen = kit.select(req.packs, req.disabled)?;
         let mut plan = Plan::default();
-        for f in &bundle.files {
+        for f in &kit.files {
             let path = f.rel.as_str();
+            let text = || {
+                String::from_utf8(f.bytes.clone())
+                    .map_err(|_| EmitError::Kit(format!("{path} is not UTF-8")))
+            };
             let (path, bytes) = match path {
                 "AGENTS.md" | CORE_RULE if global => continue,
                 p if global && p.starts_with(".cursor/rules/") => {
                     rules_left_out += 1;
                     continue;
                 }
-                "AGENTS.md" => (CORE_RULE, core_rule(&kit_files::read_text(&f.abs)?)),
+                "AGENTS.md" => (CORE_RULE, core_rule(&text()?)),
                 HOOKS_JSON => {
-                    plan.ops
-                        .extend(hooks::ops(&kit_files::read_text(&f.abs)?, global)?);
+                    plan.ops.extend(hooks::ops(&text()?, global)?);
                     continue;
                 }
                 CORE_RULE => {
                     return Err(EmitError::Kit(format!(
-                        "the Cursor bundle ships {CORE_RULE}, which its AGENTS.md is installed as"
+                        "the Cursor overlay ships {CORE_RULE}, which its AGENTS.md is installed as"
                     )));
                 }
-                // The project README is the only `.meowkit/` file the bundle
+                // The project README is the only `.meowkit/` file the overlay
                 // ships; a global install has no `.meowkit` to put it in.
                 p if global && p.starts_with(".meowkit/") => continue,
                 p if p.starts_with(".cursor/agents/") && p.ends_with(".md") => {
-                    let (text, dropped) =
-                        frontmatter::keep_keys(&kit_files::read_text(&f.abs)?, AGENT_KEYS);
+                    let (text, dropped) = frontmatter::keep_keys(&text()?, AGENT_KEYS);
                     for key in dropped {
                         plan.notices.push(format!(
                             "{p}: frontmatter `{key}` is not a Cursor agent field; left out"
@@ -108,12 +109,12 @@ impl Emitter for Cursor {
                     }
                     (p, text)
                 }
-                p if bundle.skill_of(p).is_some_and(|s| !chosen.contains(s)) => continue,
+                p if kit.skill_of(p).is_some_and(|s| !chosen.contains(s)) => continue,
                 p => {
                     plan.ops.push(Op::WriteFile {
                         path: rel(p)?,
-                        bytes: kit_files::read(&f.abs)?,
-                        mode: kit_files::mode(&f.abs),
+                        bytes: f.bytes.clone(),
+                        mode: f.mode,
                     });
                     continue;
                 }
@@ -126,10 +127,10 @@ impl Emitter for Cursor {
         }
         check_rules(&plan)?;
 
-        let have = bundle.skills();
+        let have = kit.skills();
         for missing in chosen.iter().filter(|s| !have.contains(s.as_str())) {
             plan.notices.push(format!(
-                "skill pack lists {missing}, which the Cursor bundle does not ship"
+                "skill pack lists {missing}, which the kit does not ship for Cursor"
             ));
         }
         if global {
@@ -155,7 +156,7 @@ impl Emitter for Cursor {
     }
 }
 
-/// The bundle's `AGENTS.md` as a rule Cursor applies in every session.
+/// The overlay's `AGENTS.md` as a rule Cursor applies in every session.
 fn core_rule(agents_md: &str) -> String {
     format!("---\nalwaysApply: true\n---\n\n{}\n", agents_md.trim_end())
 }

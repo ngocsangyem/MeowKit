@@ -42,17 +42,17 @@ function kitMeowkitTargets() {
 }
 
 /**
- * The Codex and Cursor bundles the npm CLI installs today. The `mewkit` binary installs
- * both runtimes from the kit artifact, so the kit carries each bundle at its
- * source path rather than a second copy that would drift from it. They sit
- * outside `.claude/` on purpose: a Claude Code install copies `.claude/` whole,
- * and must not lay down Codex or Cursor files.
+ * What only Codex or Cursor needs. The `mewkit` binary projects `.claude/` for
+ * each runtime at install and adds that runtime's overlay: the files that cannot
+ * be derived, and its catalogs. They sit outside `.claude/` on purpose: a Claude
+ * Code install copies `.claude/` whole, and must not lay down Codex or Cursor files.
  */
-const CODEX_BUNDLE = "kit/bundles/codex";
-const CURSOR_BUNDLE = "kit/bundles/cursor";
+const CODEX_BUNDLE = "kit/overlays/codex";
+const CURSOR_BUNDLE = "kit/overlays/cursor";
 // Cursor alone ships the MCP profile catalog `init --mcp-profiles` merges from.
 const RUNTIME_BUNDLE_TARGETS = [CODEX_BUNDLE, CURSOR_BUNDLE].flatMap((b) => [
-	`${b}/root`,
+	`${b}/overlay.toml`,
+	`${b}/files`,
 	`${b}/catalog/skill-packs.json`,
 ]).concat(`${CURSOR_BUNDLE}/catalog/mcp-profiles.json`);
 

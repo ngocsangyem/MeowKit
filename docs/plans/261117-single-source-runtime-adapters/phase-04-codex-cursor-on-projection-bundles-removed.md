@@ -1,6 +1,6 @@
 # Phase 4 — Codex and Cursor emitters on projection; bundles removed
 
-**Priority:** high · **Status:** not started · **Effort:** 4d · **Depends on:** 2, 3
+**Priority:** high · **Status:** in progress · **Effort:** 4d · **Depends on:** 2, 3
 
 ## Overview
 
@@ -29,8 +29,8 @@ The Codex and Cursor emitters stop copying a bundle and build their `Plan` from 
 
 ## Todo
 
-- [ ] Codex emitter on projection
-- [ ] Cursor emitter on projection
+- [x] Codex emitter on projection
+- [x] Cursor emitter on projection
 - [ ] Checks run on projected trees in CI
 - [ ] Bundles and parity tooling removed
 - [ ] Decision recorded
@@ -43,3 +43,25 @@ The Codex and Cursor emitters stop copying a bundle and build their `Plan` from 
 ## Risks
 
 - The release zip shrinks by two trees and an older binary cannot read it → the kit contract version bump makes an old binary refuse with the upgrade message.
+
+## Progress (2026-11-18)
+
+Done:
+
+- Both emitters build their plan from `projected_kit.rs`: `.claude/` projected for the runtime plus `kit/overlays/<runtime>/`. `bundle.rs` is gone.
+- The 115 bundle files projection does not produce moved to the overlays unchanged: hook scripts and their libraries, `hooks.json`, `config.toml`, `default.rules`, the Cursor `.mdc` rules, `AGENTS.md`, rubrics, `scripts/bin`, the Codex `rule-advice-supervision` skill, and both catalogs (`catalog/skill-packs.json`, Cursor `catalog/mcp-profiles.json`).
+- Codex at global scope: projection writes helper commands from the project root; the emitter turns those into absolute paths, as before.
+- Baseline manifests and `DIVERGENCES.md` updated: 41 rows removed and 48 added per runtime.
+- The kit ship set, hook closure, guard replays and scans read the overlays.
+
+Not what the phase text assumed:
+
+- The pack catalog cannot be derived from `.meowkit/pack-manifest.json`: Claude Code packs (`lifecycle-core`, `testing`, …) and the Codex and Cursor packs (`core`, `development`, …) are different groupings. Each overlay keeps its catalog.
+- The bundles shipped `mk-benchmark` and three skills' `eval/` folders, which the kit's ship set excludes. With one source they no longer install on Codex and Cursor.
+
+Left for the rest of this phase:
+
+- `kit/bundles/<runtime>/root` still holds the hand-ported skills and agents. Nothing installs them; `projection_matches_bundles.rs`, `check-instruction-criteria.cjs`, `check-bundle-parity.cjs`, `check-skill-cross-refs.sh` and `skill-routing-keywords.test.ts` still read them. Those checks move to an installed tree, then the folder and the parity tooling go.
+- The overlays hold byte copies of 10 hook libraries, 12 helpers and 10 rubrics that `.claude/` also has (`sync-hook-core.cjs` keeps them equal), and `.codex/rubrics` beside the projected `mk-rubric/rubrics`. Deriving them belongs with the hook work in Phase 5.
+- `mk-arch`, `mk-breakdown`, `mk-delegate` and `mk-status` are in no Codex or Cursor pack.
+- Kit contract version bump; the decision note through `mewkit note decisions`.

@@ -66,7 +66,6 @@
 			"description": "Quality, security, and evaluation skills (audits, rubrics, coverage, PR review) beyond the core review step.",
 			"dependsOn": ["core"],
 			"skills": [
-				"mk-benchmark",
 				"mk-context-audit",
 				"mk-context-engineering",
 				"mk-cso",

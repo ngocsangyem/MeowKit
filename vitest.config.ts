@@ -40,6 +40,7 @@ export default defineConfig({
 			".claude/worktrees/**",
 			"kit/bundles/codex/root/**",
 			"kit/bundles/cursor/root/**",
+			"kit/overlays/**",
 		],
 	},
 });

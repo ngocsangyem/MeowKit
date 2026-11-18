@@ -528,9 +528,19 @@
       "size": 8516
     },
     {
+      "path": ".cursor/skills/mk-advise/references/advice-supervision-rules.md",
+      "sha256": "a71b1814f54f9ddaf26559447153c2de39e9808aa9eb3a1fb76378496c1ac76e",
+      "size": 24417
+    },
+    {
       "path": ".cursor/skills/mk-advise/references/routing-canaries.md",
       "sha256": "3f3f505b4f9c384848d3fa7dc7305e7867fd6766d75a5bad79424dc9e2fdeaaa",
       "size": 7182
+    },
+    {
+      "path": ".cursor/skills/mk-advise/references/workflow-evidence-rules.md",
+      "sha256": "3ba148e8d1a44717d99b97aacc6cc334e64e96795001b8078a7e1c5a4ca62d8d",
+      "size": 4472
     },
     {
       "path": ".cursor/skills/mk-agent-browser/SKILL.md",
@@ -646,9 +656,34 @@
       "size": 2358
     },
     {
+      "path": ".cursor/skills/mk-agent-detector/references/agent-routing.md",
+      "sha256": "5e0534e02075a3fab24ad3a7a40335cde359d8036c5150d953a34bc088cf030d",
+      "size": 3854
+    },
+    {
+      "path": ".cursor/skills/mk-agent-detector/references/agile-feedback-cycle.md",
+      "sha256": "309ec9fc3108468f75d70f5d083a5dd409347c62a239de07c78c0ffc67cae441",
+      "size": 2316
+    },
+    {
+      "path": ".cursor/skills/mk-agent-detector/references/agile-sprint-commitment.md",
+      "sha256": "7b9ca64f309f72143e69185a755c889eece8ffea84710f373c9b13a2e77057b9",
+      "size": 2654
+    },
+    {
+      "path": ".cursor/skills/mk-agent-detector/references/agile-story-gates.md",
+      "sha256": "96d3e16e485c1030e2898dab6587dd003be53221eb46316434d0a7169715856d",
+      "size": 2311
+    },
+    {
       "path": ".cursor/skills/mk-agent-detector/references/complexity-detection.md",
       "sha256": "a1ad49dc8d89846d7a8f858d5c07fcfce5e91fcfed72286aecd3567dd5b1c609",
       "size": 1221
+    },
+    {
+      "path": ".cursor/skills/mk-agent-detector/references/context-budget-rules.md",
+      "sha256": "b912e9fe0b87d154a8ad22047abf38bcdb774ffe1d32f14056928b1a01296ac2",
+      "size": 3991
     },
     {
       "path": ".cursor/skills/mk-agent-detector/references/detection-process.md",
@@ -666,6 +701,11 @@
       "size": 5869
     },
     {
+      "path": ".cursor/skills/mk-agent-detector/references/model-selection-rules.md",
+      "sha256": "5245e4edd6cec49517996bbec9a41fe3305011072bac00c08592020c7bf70a1f",
+      "size": 6075
+    },
+    {
       "path": ".cursor/skills/mk-agent-detector/references/model-selection.md",
       "sha256": "5bab06ca60608b4124eb1db15d00ca61518faaa3844bdc68225728c2aabbf3f0",
       "size": 2731
@@ -674,6 +714,16 @@
       "path": ".cursor/skills/mk-agent-detector/references/multi-layer-detection.md",
       "sha256": "75cdc7fc30fbe5ac806b3cb381879d803b68a38e1feae27981599a3574bcfc5b",
       "size": 4436
+    },
+    {
+      "path": ".cursor/skills/mk-agent-detector/references/risk-checklist.md",
+      "sha256": "be5045092bd224853948f71d7f82b00442955eddc94d83ef942e6b40f72559a7",
+      "size": 3982
+    },
+    {
+      "path": ".cursor/skills/mk-agent-detector/references/scale-adaptive-rules.md",
+      "sha256": "0856ba409d0c124a0a1970a79b6cc8866dd1e92e1bb64bfdc9625fd5e2788579",
+      "size": 3003
     },
     {
       "path": ".cursor/skills/mk-agent-detector/references/scoring-and-thresholds.md",
@@ -771,6 +821,11 @@
       "size": 4896
     },
     {
+      "path": ".cursor/skills/mk-arch/SKILL.md",
+      "sha256": "a8458fc3a9e2ba5d945a1d59f096b9be94ea1d512fed5d392ecca095d60496aa",
+      "size": 3335
+    },
+    {
       "path": ".cursor/skills/mk-ask-me/SKILL.md",
       "sha256": "ee80454d51992585acd49275fa47350e2eb061c0a3314a92240c87683715e834",
       "size": 4732
@@ -789,11 +844,6 @@
       "path": ".cursor/skills/mk-autobuild/SKILL.md",
       "sha256": "0c5c8d1d32def38cd99dcc587ff339331816cfbd83d84f4afd2ca7706575f5e1",
       "size": 8128
-    },
-    {
-      "path": ".cursor/skills/mk-autobuild/assets/pm-status-template.md",
-      "sha256": "8f347c3d078d289a7e03019bf3152497af9efe82cf236a00510769e5cb4da0f0",
-      "size": 1786
     },
     {
       "path": ".cursor/skills/mk-autobuild/references/adaptive-density-matrix.md",
@@ -873,53 +923,6 @@
       "size": 3707
     },
     {
-      "path": ".cursor/skills/mk-benchmark/SKILL.md",
-      "sha256": "6e3b281a67c76d18c6fe8a8123c55bc141e3bba224468f5cf3ab11b1eb4c23b6",
-      "size": 9407
-    },
-    {
-      "path": ".cursor/skills/mk-benchmark/scripts/compare-runs.sh",
-      "sha256": "907c5df8b64ed0d3ad6a8fec8398bc014bd7ac3722610411e12808a5dd9b782c",
-      "size": 1283,
-      "exec": true
-    },
-    {
-      "path": ".cursor/skills/mk-benchmark/scripts/git-index-audit.sh",
-      "sha256": "580e24a83b5c167de800de95a06730c11eeb9adbfcb75943118f0644be1cf797",
-      "size": 4156,
-      "exec": true
-    },
-    {
-      "path": ".cursor/skills/mk-benchmark/scripts/lib/check-cost-cap.cjs",
-      "sha256": "dfb704bbf5a0c347665eba5f49722ae4d7be24205878023699b73c7642de2ea7",
-      "size": 1207,
-      "exec": true
-    },
-    {
-      "path": ".cursor/skills/mk-benchmark/scripts/lib/render-run-delta.cjs",
-      "sha256": "267bf62fbb0786231b90d32b5660c8bb45179c9058cbceddc18bb83e1304fe63",
-      "size": 2709,
-      "exec": true
-    },
-    {
-      "path": ".cursor/skills/mk-benchmark/scripts/lib/write-audit-artifact.cjs",
-      "sha256": "e47cd73bb52553c29322e676921bf3802d6af5cde52b51019fa5ffd7c342ef98",
-      "size": 1377,
-      "exec": true
-    },
-    {
-      "path": ".cursor/skills/mk-benchmark/scripts/lib/write-run-manifest.cjs",
-      "sha256": "3bb1469e1fee1bd94d1cf6872d194956c4141f1555b0b2ce92fddcfcb626cc3a",
-      "size": 755,
-      "exec": true
-    },
-    {
-      "path": ".cursor/skills/mk-benchmark/scripts/run-canary.sh",
-      "sha256": "9666440f6dd3beb920109cccd6d7f694b3362e393da201c72fcaf903b4f15bb3",
-      "size": 6586,
-      "exec": true
-    },
-    {
       "path": ".cursor/skills/mk-bootstrap/SKILL.md",
       "sha256": "dd7ed9fb2e1df664d1098f9f6eb821c32ccb5d087e4265df76a5dc091ee211a9",
       "size": 3000
@@ -995,21 +998,6 @@
       "path": ".cursor/skills/mk-brainstorming/assets/output-scored.md",
       "sha256": "91c03c70e573658eff060cdf5dbe8c62ff2e884a8e651d2adf391410a30a9253",
       "size": 4605
-    },
-    {
-      "path": ".cursor/skills/mk-brainstorming/eval/README.md",
-      "sha256": "b17281bd582a5c6d7180ff6885af0b7018460c80b2601d911e10f1e8c98c4f96",
-      "size": 2149
-    },
-    {
-      "path": ".cursor/skills/mk-brainstorming/eval/run-scenarios.cjs",
-      "sha256": "5f36e9fb21edc1d33e7ec8cc9053e26aeb681ea2fe77c04c365c991cc96a514d",
-      "size": 4085
-    },
-    {
-      "path": ".cursor/skills/mk-brainstorming/eval/scenario-manifest.cjs",
-      "sha256": "2af961489479e7867093c73d23ca512c2b5c8e8b8bca3a6ed81f0202351f0bb1",
-      "size": 1589
     },
     {
       "path": ".cursor/skills/mk-brainstorming/references/advice-checkpoints.md",
@@ -1097,6 +1085,11 @@
       "size": 2894
     },
     {
+      "path": ".cursor/skills/mk-breakdown/SKILL.md",
+      "sha256": "29305ea309d9013eacb06158cf39dfff5e1c2e22baaf5e4e6053f5079b66ddfe",
+      "size": 2721
+    },
+    {
       "path": ".cursor/skills/mk-build-fix/SKILL.md",
       "sha256": "ae0de744673e18f672a761ba057d5d46cd1374b1d37f1c77e00e0775c1bf24aa",
       "size": 5805
@@ -1126,6 +1119,11 @@
       "sha256": "c4b021f0e8000a7ec56dcd95b46d51942a28a5ce2d2684c32c5edb7ccb4b4283",
       "size": 10562,
       "exec": true
+    },
+    {
+      "path": ".cursor/skills/mk-careful/references/destructive-command-patterns.cjs",
+      "sha256": "f2a7a44a956fc183a0b013d5f785016d17fcefcf9fe11638e5c55d790775f208",
+      "size": 5894
     },
     {
       "path": ".cursor/skills/mk-careful/references/destructive-patterns.md",
@@ -1370,9 +1368,19 @@
       "size": 2396
     },
     {
+      "path": ".cursor/skills/mk-cook/references/agent-conduct-extended.md",
+      "sha256": "550e2f3767bae0b0bffc7ab1dc87e1af3eb9d015ff71bb0d392c75f2640ae047",
+      "size": 4633
+    },
+    {
       "path": ".cursor/skills/mk-cook/references/failure-catalog.md",
       "sha256": "f8b7391b7c4b2d9979d3c77c22ef1e636a1edbfa9f1728eb210b6b8b8ec2f054",
       "size": 2921
+    },
+    {
+      "path": ".cursor/skills/mk-cook/references/harness-rules.md",
+      "sha256": "ce9be7d8f7f04ddd3ace2fed5df5f87955769e8ceccc8b6620b0af6266fd92b4",
+      "size": 5822
     },
     {
       "path": ".cursor/skills/mk-cook/references/intent-detection.md",
@@ -1385,6 +1393,26 @@
       "size": 2752
     },
     {
+      "path": ".cursor/skills/mk-cook/references/orchestration-rules.md",
+      "sha256": "78d128642c1e4e9053a003d35fba3e950837cbf31da3f01def47172831e87418",
+      "size": 10857
+    },
+    {
+      "path": ".cursor/skills/mk-cook/references/parallel-execution-rules.md",
+      "sha256": "bcf4d45d6df77fe0e79508e42bf61bd9b457b9168daaf3e24c3698942152aac8",
+      "size": 4042
+    },
+    {
+      "path": ".cursor/skills/mk-cook/references/phase-contracts.md",
+      "sha256": "bb57be9767e39afb9449b0ff77361a4546babd00c1ce92338c08975f037a18cf",
+      "size": 2754
+    },
+    {
+      "path": ".cursor/skills/mk-cook/references/post-phase-delegation.md",
+      "sha256": "1b09a0d63da45f6f677bba4d4a6e85bc8bb51b336961c7cec9d2d0c3034fa2b8",
+      "size": 5167
+    },
+    {
       "path": ".cursor/skills/mk-cook/references/review-cycle.md",
       "sha256": "bbe205bbb8570619d7b0d6b6b417d1142db711db89d1a02c0bc22d4365c20997",
       "size": 4369
@@ -1393,6 +1421,16 @@
       "path": ".cursor/skills/mk-cook/references/subagent-patterns.md",
       "sha256": "a6b1cbe9d9ed88f4f06e5f9e0ecf4c68010df65e0819e047b54041a5f87d1657",
       "size": 9097
+    },
+    {
+      "path": ".cursor/skills/mk-cook/references/task-state-emission.md",
+      "sha256": "41dbaa0f22817dfcdc48de3d8fc58a0f4486daee8aaabbaadb76b0a65d0aa5be",
+      "size": 3290
+    },
+    {
+      "path": ".cursor/skills/mk-cook/references/tdd-rules.md",
+      "sha256": "257f741ef8d97c3ad794b4165d43f2d41e36fc703f7edb621834abc161e32eaa",
+      "size": 4392
     },
     {
       "path": ".cursor/skills/mk-cook/references/workflow-steps.md",
@@ -1530,6 +1568,11 @@
       "path": ".cursor/skills/mk-decision-framework/references/weighted-scoring-guide.md",
       "sha256": "3e01a26e6ca1c5dee5753d7783baf3b53dc703c5cb16c61e6057f2c6a75d1d91",
       "size": 3557
+    },
+    {
+      "path": ".cursor/skills/mk-delegate/SKILL.md",
+      "sha256": "f3c4b694b2df0267dd0f18116427fdf815a0280437f3bb2cbb6bc837f738439a",
+      "size": 4261
     },
     {
       "path": ".cursor/skills/mk-development/SKILL.md",
@@ -1994,6 +2037,11 @@
       "size": 5436
     },
     {
+      "path": ".cursor/skills/mk-figma/scripts/requirements.txt",
+      "sha256": "8b1bd7a4167067ce6c548abe5941d105c36998442a9d31c4c662613bd8a76743",
+      "size": 390
+    },
+    {
       "path": ".cursor/skills/mk-fix/SKILL.md",
       "sha256": "500f33ad86f59b5911f1973dcaf8668985db2b761082a1bfbedb55432efdc7a0",
       "size": 15540
@@ -2140,6 +2188,11 @@
       "size": 10791
     },
     {
+      "path": ".cursor/skills/mk-help/references/cli.md",
+      "sha256": "65feb152f7547dad1ddc2d711cc1a672d756f675a9502bbf4632f446cd7c2c70",
+      "size": 22798
+    },
+    {
       "path": ".cursor/skills/mk-henshin/SKILL.md",
       "sha256": "d9137ebeb26481ba4d9dab7f9a15e5bd6613b1528ad9a3651f587c807573cc9e",
       "size": 3147
@@ -2213,6 +2266,11 @@
       "path": ".cursor/skills/mk-improve-codebase-architecture/references/deep-module-design.md",
       "sha256": "368264b8918ce68caa72f1869a966e0c29195a32b8129c7fc85dbd661d8f60ee",
       "size": 5703
+    },
+    {
+      "path": ".cursor/skills/mk-improve-codebase-architecture/references/system-design-consultation.md",
+      "sha256": "478b73f125d7880536723b04bb30fb04376309e6eea6cb768c287c42e87eec4c",
+      "size": 2367
     },
     {
       "path": ".cursor/skills/mk-intake/SKILL.md",
@@ -2517,6 +2575,11 @@
       "size": 2510
     },
     {
+      "path": ".cursor/skills/mk-jira-lifecycle/references/workflow-cache-layout.md",
+      "sha256": "f3b0328062ec247c711ef7bcb6609327f39b118b9d2356ad49ca30d941cd5ae6",
+      "size": 5128
+    },
+    {
       "path": ".cursor/skills/mk-jira-lifecycle/references/workflow-discovery.md",
       "sha256": "bef2b519a1305efa97c9168963ffed0d1592b7f24c49208be5b9f8fe652f2074",
       "size": 6230
@@ -2653,6 +2716,16 @@
       "path": ".cursor/skills/mk-lint-and-validate/references/linter-commands.md",
       "sha256": "37cc32582cf5c5a3903758d2418cf9945f3e64d4cadc7a37784c219af67bbf3f",
       "size": 2916
+    },
+    {
+      "path": ".cursor/skills/mk-lint-and-validate/scripts/security-scan.py",
+      "sha256": "e60d466b9dcdfa71cdcc01afaf427a433aa1087a5ba59efc7fb5f41997556658",
+      "size": 4093
+    },
+    {
+      "path": ".cursor/skills/mk-lint-and-validate/scripts/validate.py",
+      "sha256": "8d772f48d20d87662b7530de516d860a0f2103d5a1a96dddbb5b6cb657c93415",
+      "size": 10782
     },
     {
       "path": ".cursor/skills/mk-llms/SKILL.md",
@@ -3236,6 +3309,11 @@
       "size": 1304
     },
     {
+      "path": ".cursor/skills/mk-plan-creator/assets/plan-phase.md",
+      "sha256": "2a85c805ff8bd2927646a4fc41a2ca78d4698b2db261ace5ddb9370968af36a5",
+      "size": 1705
+    },
+    {
       "path": ".cursor/skills/mk-plan-creator/assets/plan-quick.md",
       "sha256": "3b6ce254e833f5ebde268c59f2077fea8237694c9724cb13d0ec805e16d48f0b",
       "size": 919
@@ -3742,136 +3820,6 @@
       "size": 7844
     },
     {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/README.md",
-      "sha256": "21f5dea2b7b9a9c8002b5415c7fd4fa8050c9ad2b22135cf84947b66f297b4b8",
-      "size": 6417
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/baseline-results.md",
-      "sha256": "b788ab89cb446fafef074b8bf39699418efdab42b1c446e165dfa617b48f9d42",
-      "size": 3983
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-01-vague-only.md",
-      "sha256": "1a178ee681ee2be55119042b984c90436a0e982907a0c264198fb836a71b2ab0",
-      "size": 1021
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-02-one-line-spec.md",
-      "sha256": "722eefad1e6efdc91ad509b852fa9b16004a4a228a5ce1ab3da0a3213e7f0539",
-      "size": 1104
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-03-long-unstructured.md",
-      "sha256": "22cd200a7801134280ba5ed9c83d747bdc20f371beef7193c28837dd6fce547d",
-      "size": 2191
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-04-strip-model-coupling.md",
-      "sha256": "b6ae3730849befb295d84981e51933d975565c1d4320841c7124c8a78e2f2ed4",
-      "size": 2274
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-05-already-good.md",
-      "sha256": "c51211c54b7fcfcacb058356f36fc377740634b51d09072b87e05c4928e93457",
-      "size": 1458
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-06-refusal.md",
-      "sha256": "06cb3697cdb7149cb37523de29c307941e0d424edcc1b4c5f47af19b65ec2952",
-      "size": 1145
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-07-deep-happy-path.md",
-      "sha256": "ae48f1cf2ac45ac529e281891cc2b327139371e979068bfa2d91666e01af15a0",
-      "size": 1422
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-08-deep-no-codebase.md",
-      "sha256": "32bb38c8b2f5653ddef4826ea5e844a6e47f81dcad651cfe88b7b295cb790d51",
-      "size": 1039
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-09-deep-boundary.md",
-      "sha256": "d0b205ac0052f88dda6341a086d03a0e4765afe9e59426f1f31668a4daf74c7b",
-      "size": 1935
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-10-default-vs-deep.md",
-      "sha256": "d298295e06b208661d23b430318d83904cc6165f8eca2a0acf4cfae96f61b748",
-      "size": 1619
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-11-architecture-review.md",
-      "sha256": "fd080e04c85c227d1d3d646c4513990f05e61906870090b6d84bd8bc80183902",
-      "size": 2656
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-12-research-prompt.md",
-      "sha256": "1c64a8c7aadbf7d07d30c5360a924513c022090efc8c0a6a5c169d00d0c3bdbd",
-      "size": 2326
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-13-migration.md",
-      "sha256": "cb58cef8a588defdc29e7d929f57e421ab948b2d6344b4a73cacafe56b43fe32",
-      "size": 1657
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-14-planning-no-implementation.md",
-      "sha256": "6af2976b2a8d6cc2220abbe14dfec4e92332347ee51a62dbd61a2fdfa34a065d",
-      "size": 1569
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-15-debugging-hypothesis.md",
-      "sha256": "e97e6be6506bff2c560076ce8930b6a85b60f5d5ca492069b0429390650d1f90",
-      "size": 1666
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-16-target-notes-codex.md",
-      "sha256": "6e0c912b3109f3669f104acf22fbda2b1a6ec75154042a3eeab2b84e607716b7",
-      "size": 1771
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-17-target-notes-silent.md",
-      "sha256": "4a273d5df1a19b461a56e3cfd5bdae2bcd770314f868bde8b9f2ec1b1729f886",
-      "size": 1252
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-18-vietnamese.md",
-      "sha256": "fc9de57c6717c901fa92476580782e70a0e5956457a561abd51ff69c119a46df",
-      "size": 1450
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-19-mixed-language.md",
-      "sha256": "770b897c2ceb834be29911ce8de8d5a71e3de109532fc8319bfa7f05552588f3",
-      "size": 1361
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-20-context-gate.md",
-      "sha256": "b0bba0e0e25e98caae671aa9a51d235821aebe1ef54840ccde5f21e9d4f76f3d",
-      "size": 1845
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-21-data-fence.md",
-      "sha256": "6c721026bc5d93474387f0a75449c566caae0dc2e7988e2bb4239d87e1178b5e",
-      "size": 1747
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/canary-run-manifest.cjs",
-      "sha256": "e8d219313143e809c2a0d091b70295ada9b49231e3376c9d2f1ae1fafe34567e",
-      "size": 450
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/rubric.md",
-      "sha256": "ebc69b323ab98c73469c873ee2b0ff6f66d95df5b96838864e445afa434cf391",
-      "size": 4856
-    },
-    {
-      "path": ".cursor/skills/mk-prompt-enhancer/eval/run-canaries.cjs",
-      "sha256": "1d61883376ddeba562d2e4e39fcec2106807785f6fa847aa37b94252531a5402",
-      "size": 9760
-    },
-    {
       "path": ".cursor/skills/mk-prompt-enhancer/eval/run-canaries.test.cjs",
       "sha256": "132b1fb5d0c90b451e67dc10c2b572e81ba658b35fbd76893db3ec5be7df81dd",
       "size": 2835
@@ -4313,6 +4261,81 @@
       "size": 6439
     },
     {
+      "path": ".cursor/skills/mk-rubric/references/rubric-rules.md",
+      "sha256": "cd004bb9b5d22be4f7dc5a3abb7ca8ecbe9699870ba3a478d516da97941775cc",
+      "size": 4180
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/RUBRICS_INDEX.md",
+      "sha256": "e26b121806e73d268db8156185068962220da85ec6ab6d09b02e291fa858d722",
+      "size": 4497
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/calibration-set/README.md",
+      "sha256": "12bdf0f6575743de64cfddc0335ab5377c139122387dcd01e8b96123ca073fd1",
+      "size": 3027
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/code-quality.md",
+      "sha256": "9d18c28afcb25f3b5d2d8c11265d20ffd293f2a0dcc07f82bb7edce0e50dc29a",
+      "size": 2709
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/composition-presets/backend-api.md",
+      "sha256": "0c307409b7f9ad0976d08c58d6c1adfb15d171b23ce77088e82ca15f9702dacf",
+      "size": 1123
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/composition-presets/cli-tool.md",
+      "sha256": "e4eba56f9edc0b97f43068244598cbc5fa4edc76e5c47cea1e301c88c65a0c56",
+      "size": 1712
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/composition-presets/frontend-app.md",
+      "sha256": "d0dc1920864351968074c0310bd01f9f990dc2df8fb132e105d521e8e2a3b0d8",
+      "size": 3113
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/composition-presets/fullstack-product.md",
+      "sha256": "d07b3e6b997b0df624c532f11eed1ca16c25403c0420dcb235639782e4ccadb2",
+      "size": 1948
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/craft.md",
+      "sha256": "1f557b45f85bf2c74663dc52c1a90593678d6fefd9e75fe491e36e13c00261aa",
+      "size": 3022
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/design-quality.md",
+      "sha256": "a6a21bb8fe595fc57b88795b30cbaacba9014c66049675180f12d01fa9b530bd",
+      "size": 3297
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/functionality.md",
+      "sha256": "4db5a69a0ae3e3a43ccf8b0fbdc0025eeaaf4294ca5f61a6e9b59ed4d2080016",
+      "size": 2627
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/originality.md",
+      "sha256": "119ca6336b856e67365fb72336afc27109c2a7619ce3513cea16b9210e025e3a",
+      "size": 3298
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/product-depth.md",
+      "sha256": "4228c96ea9288026e991b8fdc6b03226173f3f2b5cb98db0928af9e62a3735b3",
+      "size": 2673
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/schema.md",
+      "sha256": "8e70b34f52caf0f69568273a25caa81856af6d4fa08f6bb00bfa91c980aad086",
+      "size": 3852
+    },
+    {
+      "path": ".cursor/skills/mk-rubric/rubrics/ux-usability.md",
+      "sha256": "72b0fa265c8dfdc2fec352de27a2010d23c88e67cb82df558630914d165bb33e",
+      "size": 2876
+    },
+    {
       "path": ".cursor/skills/mk-rubric/scripts/load-rubric.sh",
       "sha256": "059cc9971b1dda6f23c19421d685f9bf396f8b7fc02bf6600228a54378998385",
       "size": 5311,
@@ -4333,21 +4356,6 @@
       "path": ".cursor/skills/mk-scale-routing/data/domain-complexity.csv",
       "sha256": "d0313346423858a82622973919a81441f5a93deedc78bbb3ebefe7974fc03f8f",
       "size": 1772
-    },
-    {
-      "path": ".cursor/skills/mk-scale-routing/eval/classify.py",
-      "sha256": "3a652c84d7affd79df041fbdb2da8dbfa8bdea6885f47189f1c78d7684949955",
-      "size": 3066
-    },
-    {
-      "path": ".cursor/skills/mk-scale-routing/eval/routing-cases.jsonl",
-      "sha256": "7fa575d95db48c7d1a5f73788671398f80a2b9c682f7d0e30b349b4fc8925891",
-      "size": 4260
-    },
-    {
-      "path": ".cursor/skills/mk-scale-routing/eval/run-routing-eval.py",
-      "sha256": "3e8a484d9f5ae7ec23a81706bbb54bea037719857a26f434af9a55fbbbf125e1",
-      "size": 2474
     },
     {
       "path": ".cursor/skills/mk-scale-routing/references/multi-layer-detection.md",
@@ -4613,6 +4621,11 @@
       "size": 2393
     },
     {
+      "path": ".cursor/skills/mk-skill-creator/references/skill-authoring-rules.md",
+      "sha256": "6db2c458cc5c4d1fa49840f6684a2ded4052e844337be0180b21ad651a8b6916",
+      "size": 16070
+    },
+    {
       "path": ".cursor/skills/mk-skill-creator/references/skill-types.md",
       "sha256": "d8d297be77e67d766b96997b35231278c34fed20c5025dbc8508635c19ec3179",
       "size": 1826
@@ -4656,6 +4669,16 @@
       "path": ".cursor/skills/mk-sprint-contract/references/bdd-to-ac-mapping.md",
       "sha256": "89f3d566b813514e9d6679797eb7a03c97bc8969cace61ba197182973dcb457f",
       "size": 7034
+    },
+    {
+      "path": ".cursor/skills/mk-status/SKILL.md",
+      "sha256": "62581a1fd81f6f3105215989d0f3707a26d416c360195d338ea7e9385bc320dd",
+      "size": 3690
+    },
+    {
+      "path": ".cursor/skills/mk-status/assets/pm-status-template.md",
+      "sha256": "8f347c3d078d289a7e03019bf3152497af9efe82cf236a00510769e5cb4da0f0",
+      "size": 1786
     },
     {
       "path": ".cursor/skills/mk-stitch/SKILL.md",
@@ -5533,6 +5556,11 @@
       "path": ".cursor/skills/mk-workflow-orchestrator/references/workflow-phases.md",
       "sha256": "e930a805b478e575a51a0731b4982ff753406be2e78e7a6abc41634bffba478e",
       "size": 4376
+    },
+    {
+      "path": ".cursor/skills/mk-workflow-orchestrator/workflow.yaml",
+      "sha256": "57af56300172522014cda08595f2ac7c71304768fd6dbb414dcee7e85ae332ca",
+      "size": 3505
     },
     {
       "path": ".cursor/skills/mk-worktree/SKILL.md",

@@ -89,7 +89,7 @@ describe("check-bundle-parity", () => {
 		for (const [bundle, host] of [[CODEX, ".agents"], [CURSOR, ".cursor"]]) {
 			write(root, `${bundle}/${host}/skills/mk-rubric/.keep.md`, "");
 		}
-		write(root, `${CODEX}/.codex/rubrics/craft.md`, "# Craft\n");
+		write(root, "kit/overlays/codex/files/.codex/rubrics/craft.md", "# Craft\n");
 		const keys = differences(root).map((d) => d.key);
 		expect(keys).not.toContain("codex:file-missing:rubric/rubrics/craft.md");
 		expect(keys).toContain("cursor:file-missing:rubric/rubrics/craft.md");
