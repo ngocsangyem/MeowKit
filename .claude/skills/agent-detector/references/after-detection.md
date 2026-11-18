@@ -50,6 +50,6 @@ User: "Use only tester for this task"
 
 ---
 
-**Agent routing:** `references/agent-routing.md` (canonical agent table) and `.claude/agents/orchestrator.md` (orchestrator agent definition). **Skill dispatch:** `references/skill-domain-routing.md`.
+**Agent routing:** `references/agent-routing.md` (canonical agent table), which the orchestrator agent applies where the runtime loads one. **Skill dispatch:** `references/skill-domain-routing.md`.
 
 **MANDATORY:** Always show agent banner at start of EVERY response.
