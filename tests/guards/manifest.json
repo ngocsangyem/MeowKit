@@ -1,6 +1,6 @@
 {
   "counts": {
-    "guard": 48,
+    "guard": 50,
     "expectedFail": 0
   },
   "guard": [
@@ -9,10 +9,12 @@
     "cc: every registered PreToolUse guard has a case",
     "cc: privacy allows a Read of a source file",
     "cc: privacy blocks a Read of .env",
+    "cc: privacy blocks a Read of .env sent with camelCase keys",
     "cc: privacy blocks on unreadable hook input",
     "cc: privacy blocks when its library crashes",
     "cc: privacy decides the shared corpus: new names, traversal, case, symlink, near misses",
     "cc: ship check allows a clean commit",
+    "cc: ship check blocks a commit sent with camelCase keys",
     "cc: ship check blocks a commit that stages a lint error",
     "cc: ship check blocks a commit whose related test fails",
     "cc: ship check sees: gh pr create --fill",

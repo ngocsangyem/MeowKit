@@ -3,6 +3,7 @@
 // Normalizes file_path in tool_input if present.
 
 const path = require('path');
+const { canonicalPayload } = require('./core/hook-payload.cjs');
 
 function normalizeFilePath(filePath, cwd) {
   if (!filePath) return filePath;
@@ -17,7 +18,7 @@ function parseStdin() {
     process.stdin.on('data', (chunk) => { data += chunk; });
     process.stdin.on('end', () => {
       try {
-        const parsed = JSON.parse(data || '{}');
+        const parsed = canonicalPayload(JSON.parse(data || '{}'));
         // Normalize file_path if present
         if (parsed.tool_input && parsed.tool_input.file_path) {
           parsed.tool_input.file_path = normalizeFilePath(
@@ -70,6 +71,7 @@ function readHookInput(stream = process.stdin) {
       }
       // A JSON scalar or array carries no tool payload and cannot be read as one.
       if (data === null || typeof data !== 'object' || Array.isArray(data)) return fail('not-an-object');
+      data = canonicalPayload(data);
       const toolInput = (data.tool_input && typeof data.tool_input === 'object') ? data.tool_input : {};
       return resolve({
         ok: true,

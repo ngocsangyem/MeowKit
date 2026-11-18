@@ -1,6 +1,6 @@
 # Phase 5 — Hooks and always-on text placed once
 
-**Priority:** high · **Status:** not started · **Effort:** 4d · **Depends on:** 2, 4
+**Priority:** high · **Status:** in progress · **Effort:** 4d · **Depends on:** 2, 4
 
 ## Overview
 
@@ -31,7 +31,7 @@ Hooks and always-on instructions are the two kinds where duplication changes beh
 
 ## Todo
 
-- [ ] Normaliser and replay cases
+- [x] Normaliser and replay cases
 - [ ] Hook home by set for three runtimes
 - [ ] One always-on block, AGENTS.md cap checked
 - [ ] Trust notes
@@ -49,3 +49,9 @@ Hooks and always-on instructions are the two kinds where duplication changes beh
 ## Security
 
 - `privacy-block` decisions are unchanged; only where the hook is registered changes. A runtime with no blocking channel for a guard is listed as not covered in the enforcement matrix.
+
+## Progress (2026-11-18)
+
+- `.claude/hooks/lib/core/hook-payload.cjs` folds the camelCase keys Grok documents (`toolInput`, `toolName`, `sessionId`, `hookEventName`, `workspaceRoot`) onto the snake_case ones every hook here reads; `parse-stdin.cjs` applies it for guards and observers. Before it, the privacy guard read a camelCase payload as an empty one and allowed the call. Two replay cases cover the privacy guard and the ship check with camelCase keys.
+- Not covered, because nothing documents it: the keys inside Grok's `toolInput` (assumed `filePath` or `file_path`; checklist C5) and the tool names its matchers use.
+- Only the Claude Code tree needed it: Codex and Cursor shells have their own readers and receive their own runtime's payload.

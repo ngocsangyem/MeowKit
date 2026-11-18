@@ -5,6 +5,7 @@
     "privacy": {
       "shell": "privacy-block.cjs",
       "lib": [
+        "core/hook-payload.cjs",
         "core/privacy.cjs",
         "parse-stdin.cjs",
         "project-root.cjs"
@@ -15,6 +16,7 @@
       "shell": "pre-ship.cjs",
       "lib": [
         "changed-files.cjs",
+        "core/hook-payload.cjs",
         "core/pre-ship.cjs",
         "memory-store-lint.cjs",
         "parse-stdin.cjs",

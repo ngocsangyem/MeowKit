@@ -24,6 +24,25 @@ describe("claude-code guards (.claude/settings.json)", () => {
 		expect(read(fx, ".env").blocked).toBe(true);
 	});
 
+	// A runtime that imports `.claude/settings.json` may send its own key spelling.
+	const camelRead = (fx: ReturnType<typeof makeFixture>, file: string) =>
+		fireEvent(fx, RT, "PreToolUse", { cwd: undefined, workspaceRoot: fx.dir, hookEventName: "preToolUse", toolName: "Read", toolInput: { filePath: path.join(fx.dir, file) } }, { toolName: "Read" });
+
+	guardCase("cc: privacy blocks a Read of .env sent with camelCase keys", () => {
+		const fx = makeFixture([RT]);
+		fx.write(".env", "TOKEN=placeholder\n");
+		expect(camelRead(fx, ".env").blocked).toBe(true);
+		expect(camelRead(fx, "src/add.cjs").blocked).toBe(false);
+	});
+
+	guardCase("cc: ship check blocks a commit sent with camelCase keys", () => {
+		const fx = makeShipFixture([RT]);
+		stageLintError(fx);
+		const r = fireEvent(fx, RT, "PreToolUse", { hookEventName: "preToolUse", toolName: "Bash", toolInput: { command: "git commit -m x" } }, { toolName: "Bash" });
+		expect(r.blocked).toBe(true);
+		expect(runCount(fx, "lint")).toBeGreaterThan(0);
+	});
+
 	guardCase("cc: privacy allows a Read of a source file", () => {
 		expect(read(makeFixture([RT]), "src/add.cjs").blocked).toBe(false);
 	});
