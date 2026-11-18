@@ -62,26 +62,34 @@ verb and its converter pipeline are removed.
   skill or agent, `omit` for files the runtime does not get, `[[replace]]` lines for text
   that belongs to one runtime), `files/` installed as they are (hooks and their libraries,
   `hooks.json`, Codex `config.toml` and `rules/default.rules`, Cursor `.mdc` rules,
-  `AGENTS.md`, rubrics, `scripts/bin` helpers) and `catalog/` install packs
-  (`skill-packs.json`; Cursor also carries `mcp-profiles.json`).
+  rubrics, `scripts/bin` helpers) and `catalog/` install packs
+  (`skill-packs.json`; Cursor also carries `mcp-profiles.json`). The always-on text for every
+  runtime that reads the project's `AGENTS.md` is one file, `kit/overlays/shared/AGENTS.md`.
+  Claude Code does not use it: it keeps `.claude/rules/`, and `CLAUDE.md` does not import
+  `AGENTS.md`.
 - **Installed surfaces** — Codex: an `AGENTS.md` block, `.codex/config.toml`,
   `.codex/rules/`, `.codex/agents/`, `.codex/hooks.json` + `.codex/hooks/`,
-  `.codex/scripts/`, `.agents/skills/`. Cursor: `.cursor/{rules,agents,skills,hooks}`, with
-  the overlay's `AGENTS.md` installed as the always-applied rule
-  `.cursor/rules/meowkit-core.mdc`. Neither has a command surface.
+  `.codex/scripts/`, `.agents/skills/`. Cursor: `.cursor/{rules,agents,skills,hooks}` and,
+  in project scope only, the same `AGENTS.md` block (a global Cursor install writes no
+  `AGENTS.md`); `.cursor/rules/runtime-invariants.mdc` (always applied) holds only
+  Cursor-specific text. Neither has a command surface.
 - **Install** — `mewkit init --target codex|cursor` runs that runtime's emitter
   (`crates/mewkit-adapters/src/{codex,cursor}/`), which builds its plan from the projected
   kit. Files map 1:1 onto the project, except
-  the ones a user may own too: Codex merges a marked block into `AGENTS.md`, hook handlers
-  into `.codex/hooks.json` and keys into `.codex/config.toml`; Cursor merges
-  `.cursor/hooks.json` handler by handler. Each is recorded so uninstall takes out only what
-  the kit added. A second run converges to zero drift; a user-edited kit file is kept and
+  the ones a user may own too: Codex and Cursor both merge the shared text into `AGENTS.md`
+  as the marked block `meowkit` (`crates/mewkit-adapters/src/agents_block.rs`), so a project
+  with both runtimes carries it once; Codex merges hook handlers into `.codex/hooks.json` and
+  keys into `.codex/config.toml`; Cursor merges `.cursor/hooks.json` handler by handler. Each
+  is recorded so uninstall takes out only what the kit added; `mewkit uninstall --target`
+  for one runtime leaves the `meowkit` block while another installed runtime's ownership
+  index still records it. A second run converges to zero drift; a user-edited kit file is kept and
   reported, never silently overwritten.
 - **Upgrade** — `mewkit upgrade` refreshes the runtimes it finds an ownership index for. A
   runtime the npm CLI installed is adopted only by an explicit `init --target <tool>`.
 - **Authoring cost** — a `.claude/` skill or agent reaches Codex and Cursor with no second
-  edit. Still written per runtime and by hand: hooks, Cursor rules, the always-on
-  `AGENTS.md` text, and pack membership in each `catalog/skill-packs.json`. The hook
+  edit. Still written by hand: the always-on `AGENTS.md` text (once, shared by Codex and
+  Cursor) and, per runtime, hooks, Cursor rules and pack membership in each
+  `catalog/skill-packs.json`. The hook
   libraries listed in `.claude/hooks/core-closure.json` are copied into both overlays by
   `scripts/sync-hook-core.cjs`. See `RELEASING.md`.
 - **Placement** — `crates/mewkit-adapters/src/placement_resolver.rs` (data in

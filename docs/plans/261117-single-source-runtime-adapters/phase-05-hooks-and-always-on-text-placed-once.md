@@ -10,7 +10,7 @@ Hooks and always-on instructions are the two kinds where duplication changes beh
 
 - **Hook home by set (changed 2026-11-18, maintainer):** every runtime keeps its own hook file in every set, and the ship check's run-once marker stays. A runtime never takes its guards only from an import its user can switch off. The earlier wording ("Claude Code present → its hooks live only in `.claude/settings.json`") is withdrawn. Codex always its own `.codex/hooks.json`. Pi and OMP → one extension each (Phase 6).
 - **Payload:** `hooks/lib/core` reads `tool_input` and `toolInput`, and the event-name forms of each runtime, behind one normaliser with replay cases per runtime.
-- **Always-on text:** one authored block. Root `AGENTS.md` carries it for Codex, Cursor, Grok, Pi, OMP; `CLAUDE.md` imports it (`@AGENTS.md`) and adds Claude Code-only lines; `.cursor/rules`, `.grok/rules`, `.omp/rules` receive only text that is not in `AGENTS.md`. The placement decides whether `.claude/rules` is written when Grok is in the set.
+- **Always-on text (changed 2026-11-18, maintainer):** Claude Code keeps `.claude/rules`; one authored block, `kit/overlays/shared/AGENTS.md`, is the text for every other runtime. Root `AGENTS.md` carries it for Codex, Cursor, Grok, Pi, OMP; `.cursor/rules`, `.grok/rules`, `.omp/rules` receive only text that is not in `AGENTS.md`. The earlier wording (`CLAUDE.md` imports `@AGENTS.md`) is withdrawn. The placement decides whether `.claude/rules` is written when Grok is in the set.
 - `AGENTS.md` stays under 32,768 B, measured in CI on the projected file.
 - Hook files stay `.cjs` and outside any `pre/` or `post/` directory, which OMP executes.
 - Every install prints the trust step each runtime needs.
@@ -33,13 +33,13 @@ Hooks and always-on instructions are the two kinds where duplication changes beh
 
 - [x] Normaliser and replay cases
 - [x] Hook home by set for three runtimes (own file always; resolver rule and test)
-- [ ] One always-on block, AGENTS.md cap checked
-- [ ] Trust notes
+- [x] One always-on block, AGENTS.md cap checked (Codex, Cursor; the other three with their emitters)
+- [x] Trust notes (Claude Code, Codex, Cursor)
 
 ## Success criteria
 
 - Guard replay: each overlapping pair runs each guard decision once.
-- Always-on bytes per runtime are at or below today's.
+- Always-on bytes per runtime are at or below today's. **Changed for Cursor installed alone:** 10,641 B against 6,316 B, accepted by the maintainer on 2026-11-19 (see "Always-on block, done" below).
 
 ## Risks
 
@@ -79,3 +79,35 @@ Claude Code loads `.claude/rules/*.md` (18,191 B). Codex and Cursor load a conde
 ### Decided 2026-11-18
 
 Hook home: option (b). The resolver refuses a hook source that a user-level switch can turn off (`placement_resolver.rs`, test `no_runtime_takes_its_guards_from_an_import_the_user_can_switch_off`), so Cursor beside Claude Code, Grok beside Claude Code and Grok beside Cursor each keep their own file and are listed as double loads on `docs/maintainer/runtime-surface-table.md`. The three emitters already write their own hook file in every set, so no emitter changed. The always-on choice is still open.
+
+## Always-on block, done 2026-11-18 (option a)
+
+- Source: `kit/overlays/shared/AGENTS.md` (7,629 B), the former Codex text with the four passages that named Codex reworded. `ProjectedKit::open` adds it to every projected kit as `AGENTS.md` and refuses an overlay that ships its own.
+- Codex and Cursor merge it as the `meowkit` block of the project's `AGENTS.md` (`agents_block.rs`). Both record the block; the second merge changes nothing. `uninstall` of one runtime leaves the block while another installed runtime records it (`keep_shared_blocks`), tested in `lifecycle.rs`.
+- Cursor no longer installs `.cursor/rules/meowkit-core.mdc`; `runtime-invariants.mdc` (2,954 B) holds capability routing, discovery, the nesting contract, state ledgers and "rules are advisory". A test fails when an always-applied Cursor rule repeats a heading of the block.
+- Every `AGENTS.md (<section>)` a projected skill can cite has a heading in the block (test in `projects_whole_kit.rs`). Before, nine such citations pointed at nothing on Cursor.
+- `AGENTS.md` above 32,768 B is a finding of `check-instruction-criteria.cjs` on any installed tree, and the emitter refuses a block over that size.
+
+| Always-on bytes | Before | After |
+|---|---|---|
+| Claude Code | 18,191 | 18,191 |
+| Codex alone | 7,734 | 7,687 |
+| Cursor alone | 6,316 | 10,641 |
+| Cursor beside Codex (it reads both) | 14,050 | 10,641 |
+
+This reverses the 2026-11-11 decision that Cursor writes nothing at `AGENTS.md`; the ADR carries a dated amendment.
+
+Open:
+- Cursor alone is 4,325 B above its old figure. Its old text left the blocked-pattern list, the core behaviors, the status protocol and the development rules out of always-on text; meeting 6,316 B would have needed the shared block cut to about 3.3 KB. Accepted by the maintainer on 2026-11-19; the ceiling is 10,641 B.
+- A file that holds nothing but the block is recorded as created by whichever install merges into it, so the last runtime to leave removes it (`exec/decide.rs`, tested in `lifecycle.rs`).
+- Beside Claude Code, Claude Code reads `AGENTS.md` only when the project has no `CLAUDE.md` (listed as unsettled on the surface page); nothing was changed for that.
+
+## Trust notes, done 2026-11-18
+
+| Runtime | `init` prints | `doctor` row | Source |
+|---|---|---|---|
+| Claude Code | asks to trust the folder on first interactive start | `claude-code trust`: states the step; the accepted state is not read | https://code.claude.com/docs/en/permissions#project-allow-rules-and-workspace-trust |
+| Codex | hooks and config are read only after the project is trusted (already there) | `codex trust`: reads `config.toml` (already there) | — |
+| Cursor | project hooks run only in a trusted workspace | `cursor trust`: states the step; the state is not readable | https://cursor.com/docs/agent/hooks |
+
+Per the Claude Code page, hooks in a settings file also run in `claude -p`, which shows no trust dialog.

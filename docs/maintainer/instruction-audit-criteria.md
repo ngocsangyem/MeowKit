@@ -135,6 +135,30 @@ kit's ship set, so "bundle" in the criteria above now reads "installed tree".
 Not measured: whether the rewritten text changes model behaviour. The live routing and
 with/without evals were not run.
 
+### After one shared always-on block (2026-11-18)
+
+Codex and Cursor now merge the same text, `kit/overlays/shared/AGENTS.md`, as the `meowkit`
+block of the project's `AGENTS.md`. Claude Code keeps `.claude/rules/`.
+
+| Tree | Always-on bytes before | After | What is counted |
+|---|---|---|---|
+| .claude | 18191 | 18191 | `.claude/rules/*.md`, unchanged |
+| installed:codex | 7734 | 7687 | `AGENTS.md`: the 7629 B block and its markers |
+| installed:cursor | 6316 | 10641 | `AGENTS.md` (7687 B) and `.cursor/rules/runtime-invariants.mdc` (2954 B) |
+| Codex and Cursor in one project, as Cursor reads it | 14050 | 10641 | before: Codex's `AGENTS.md` and both Cursor rules |
+
+- **Cursor alone rises by 4325 B.** Its earlier text was shorter because it left the
+  blocked-pattern list, the six core behaviors, the subagent status protocol and the development
+  rules out of always-on text; skills cited them as `AGENTS.md (<section>)` all the same, and
+  those citations now resolve.
+- `.cursor/rules/meowkit-core.mdc` is no longer installed. `runtime-invariants.mdc` keeps what
+  only Cursor needs: capability routing, discovery, the nesting contract, state ledgers and the
+  note that rules are advisory.
+- The A8 ceiling for Cursor is 10641 B, and `AGENTS.md` above 32768 B is an A8 finding on any
+  installed tree.
+
+Not measured: whether the shared text changes model behaviour on Cursor.
+
 ## Gate removal: before and after
 
 Measured with `node scripts/check-instruction-criteria.cjs --metrics` over every `.md` and

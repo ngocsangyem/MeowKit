@@ -152,8 +152,8 @@ Only the items in the table below need a hand edit, per runtime.
 | --- | --- |
 | New skill | Add `mk-<name>` to a pack in `kit/overlays/codex/catalog/skill-packs.json` **and** `kit/overlays/cursor/catalog/skill-packs.json`. A skill in no pack installs only when no pack list is given. Keep `core` under `budgetChars`. |
 | Hook or hook helper | Write the file under `kit/overlays/<runtime>/files/` (Codex: `.codex/hooks.json`, `.codex/hooks/**`; Cursor: `.cursor/hooks.json`, `.cursor/hooks/**`). Shared hook libraries are copies of `.claude/hooks/lib/` made by `node scripts/sync-hook-core.cjs`; run it after editing them. |
-| Cursor rule | `kit/overlays/cursor/files/.cursor/rules/<name>.mdc`. Codex has no rule files: `.claude/rules/*` reach it as sections of `AGENTS.md`. |
-| Always-on text | `kit/overlays/<runtime>/files/AGENTS.md`. Cursor installs it as `.cursor/rules/meowkit-core.mdc`. |
+| Cursor rule | `kit/overlays/cursor/files/.cursor/rules/<name>.mdc`, holding only what the shared `AGENTS.md` block does not say. Codex has no rule files: `.claude/rules/*` reach it as sections of `AGENTS.md`. |
+| Always-on text | `kit/overlays/shared/AGENTS.md`: one text, merged as the `meowkit` block of the project's `AGENTS.md` by every runtime that reads that file (Codex, Cursor). Name no runtime folder in it. Claude Code keeps `.claude/rules/`. What only Cursor needs in every session goes in `kit/overlays/cursor/files/.cursor/rules/runtime-invariants.mdc`. |
 | Text that belongs to one runtime | `[[replace]]` in `kit/overlays/<runtime>/overlay.toml` (`path`, `find`, `with`). The `find` text must occur exactly once in the projected file, or the build fails. |
 | Frontmatter key for one runtime | `[skill.<name>]` or `[agent.<name>]` table in that runtime's `overlay.toml`. |
 | Installed path a runtime does not take | `omit` in that runtime's `overlay.toml`. |
@@ -177,7 +177,7 @@ Do not write `mk-` names into `.claude/` by hand.
 | --- | --- | --- |
 | `skills/<name>/` | `.agents/skills/mk-<name>/SKILL.md` | `.cursor/skills/mk-<name>/SKILL.md` |
 | `agents/<name>.md` | `.codex/agents/<name>.toml` (`name`, `description`, `developer_instructions`, model and effort) | `.cursor/agents/<name>.md` (frontmatter `name`, `description`, `model`, `readonly`, `is_background`) |
-| `rules/*` | Summarised as sections of `AGENTS.md`. Native `.codex/rules/default.rules` is a Starlark **command policy** from the overlay | Not projected. Written by hand as `.cursor/rules/<name>.mdc` in the overlay; each rule declares one activation class (`alwaysApply: true` is reserved for `runtime-invariants.mdc`) |
+| `rules/*` | Summarised as sections of the shared `AGENTS.md` block. Native `.codex/rules/default.rules` is a Starlark **command policy** from the overlay | The same `AGENTS.md` block. Cursor-only rules are written by hand as `.cursor/rules/<name>.mdc` in the overlay; each rule declares one activation class (`alwaysApply: true` is reserved for `runtime-invariants.mdc`) |
 | `settings.json` hooks | Hand-written in the overlay: `.codex/hooks.json` + `.codex/hooks/` | Hand-written in the overlay: `.cursor/hooks.json` + `.cursor/hooks/` |
 | memory | `.meowkit/memory/` (provider-neutral, never `.claude/memory/`) | `.meowkit/memory/` |
 

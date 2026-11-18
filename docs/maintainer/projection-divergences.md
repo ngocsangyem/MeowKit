@@ -97,7 +97,7 @@ After these, `node scripts/check-instruction-criteria.cjs <projected tree>` repo
 | 12 | Skill files that are not Markdown | Their own rules, paths only | Done, see "Scripts" below |
 | 13 | Cursor wording for tools: `Grep` → "grep" or "search", `Glob` → "file-glob" (42 lines) | Keep the source | No change |
 | 14 | The pull-request trailer `[Claude Code](https://claude.com/claude-code)` in `ship/references/commit-push-pr.md` | One overlay line per runtime | Done: `[[replace]]` in each overlay writes "Generated with Codex" and "Generated with Cursor", with no link (the bundles' `https://codex.com/codex` is not a real address) |
-| 15 | Cursor rule references and helper paths | Wait for the always-on placement | Open until Phase 5 |
+| 15 | Cursor rule references and helper paths | Wait for the always-on placement | Rule references done 2026-11-18: Cursor reads the shared `AGENTS.md` block, which has a heading for every `AGENTS.md (<section>)` a skill cites (test `every_rule_section_a_skill_can_cite_is_in_the_shared_block`). Helper paths still open |
 
 ### Scripts
 
@@ -151,6 +151,6 @@ More defects in the bundles, in scripts:
 
 | # | Difference | Waits for |
 |---|---|---|
-| 15 | Cursor rule references and helper paths | The always-on placement (Phase 5) |
+| 15 | Cursor helper paths: a kit helper called by bare name, with nothing putting `.cursor/scripts/bin` on `PATH` | A decision on how a skill names a helper on Cursor |
 | — | The five helpers and the eval core the bundles do not ship (table above) | The emitter's file list (Phase 4) |
 | — | Skill names in messages scripts print | A rule limited to string output, if the messages matter on other runtimes |

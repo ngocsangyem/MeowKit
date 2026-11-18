@@ -218,7 +218,17 @@ agent, so there is no consumer. Adding them is Ask-first.
   the authored bundle (`packages/mewkit/src/migrate/modules/cursor/root`), shipped in the kit at
   that path. It writes nothing at the project's `AGENTS.md` (left to the user and to the Codex
   install): the bundle's `AGENTS.md` becomes the always-applied rule
-  `.cursor/rules/meowkit-core.mdc`. `.cursor/hooks.json` is merged flat, and every handler on an
+  `.cursor/rules/meowkit-core.mdc`. *Amended 2026-11-18 (maintainer decision):* the
+  `AGENTS.md` part of this is replaced. The always-on text for every runtime that reads the
+  project's `AGENTS.md` is one authored file, `kit/overlays/shared/AGENTS.md`; the Codex and
+  Cursor emitters both merge it as the marked block `meowkit` in the project's `AGENTS.md`
+  (project scope only for Cursor; a global Cursor install writes neither), and Cursor no
+  longer installs `meowkit-core.mdc` — `.cursor/rules/runtime-invariants.mdc` keeps only
+  Cursor-only text. Why: one block is read once by every runtime that reads `AGENTS.md`,
+  instead of two per-runtime texts drifting apart, and skills cite `AGENTS.md (<section>)`
+  while Cursor's own text had no such headings. Uninstalling one runtime leaves the block
+  while another installed runtime still records it. Claude Code is unchanged: it keeps
+  `.claude/rules/`. `.cursor/hooks.json` is merged flat, and every handler on an
   event that can deny (`preToolUse`, `subagentStart`, `before*`) is installed with
   `failClosed: true`, overriding the bundle where it says `false`: a crashed gate must block.
   Agents keep only the five frontmatter keys Cursor documents; a rule whose frontmatter yields
