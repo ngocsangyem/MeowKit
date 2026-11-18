@@ -674,6 +674,7 @@ name = "mewkit-adapters"
 version = "0.1.0"
 dependencies = [
  "mewkit-core",
+ "serde",
  "serde_json",
  "tempfile",
  "thiserror",

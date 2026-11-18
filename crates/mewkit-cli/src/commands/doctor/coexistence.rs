@@ -72,6 +72,25 @@ pub fn trees(runtime: Runtime, scope: ScopeKind) -> Trees {
             rules: ".cursor/rules",
             instructions: "",
         },
+        Runtime::Grok => Trees {
+            agents: ".grok/agents",
+            skills: ".grok/skills",
+            rules: ".grok/rules",
+            instructions: "AGENTS.md",
+        },
+        // Pi has no subagents and no rule folder.
+        Runtime::Pi => Trees {
+            agents: "",
+            skills: ".agents/skills",
+            rules: "",
+            instructions: "AGENTS.md",
+        },
+        Runtime::Omp => Trees {
+            agents: ".omp/agents",
+            skills: ".agents/skills",
+            rules: ".omp/rules",
+            instructions: "AGENTS.md",
+        },
     }
 }
 

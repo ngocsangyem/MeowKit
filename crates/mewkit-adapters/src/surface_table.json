@@ -1,0 +1,532 @@
+{
+  "collected": "2026-11-18",
+  "neutral_roots": [
+    ".agents/skills",
+    "AGENTS.md"
+  ],
+  "runtimes": [
+    {
+      "name": "claude-code",
+      "checked": "vendor pages read 2026-11-18; Claude Code 2.1.322 installed",
+      "kinds": {
+        "skills": {
+          "roots": [
+            {
+              "root": ".claude/skills",
+              "write": true,
+              "source": "https://code.claude.com/docs/en/skills#choose-where-skills-load"
+            }
+          ]
+        },
+        "agents": {
+          "roots": [
+            {
+              "root": ".claude/agents",
+              "write": true,
+              "source": "https://code.claude.com/docs/en/sub-agents#choose-the-subagent-scope"
+            }
+          ]
+        },
+        "always-on": {
+          "roots": [
+            {
+              "root": ".claude/rules",
+              "write": true,
+              "source": "https://code.claude.com/docs/en/memory#organize-rules-with-claude-rules"
+            },
+            {
+              "root": "CLAUDE.md",
+              "source": "https://code.claude.com/docs/en/memory#choose-where-to-put-claude-md-files"
+            },
+            {
+              "root": "AGENTS.md",
+              "unsure": "read only when no CLAUDE.md or CLAUDE.local.md is in the working directory or above (default mode, from 2.1.277)",
+              "source": "https://code.claude.com/docs/en/memory#agents-md"
+            }
+          ],
+          "note": "The mode that reads both files is a user or managed setting; a project settings file cannot set it (https://code.claude.com/docs/en/memory#choose-which-instruction-files-load)."
+        },
+        "hooks": {
+          "roots": [
+            {
+              "root": ".claude/settings.json",
+              "write": true,
+              "source": "https://code.claude.com/docs/en/hooks#hook-locations"
+            }
+          ],
+          "note": "The same handler in two settings files runs once (https://code.claude.com/docs/en/hooks#hook-handler-fields)."
+        },
+        "mcp": {
+          "roots": [
+            {
+              "root": ".mcp.json",
+              "write": true,
+              "source": "https://code.claude.com/docs/en/mcp#project-scope"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "codex",
+      "checked": "vendor pages read 2026-11-18; Codex CLI 0.167.0 probed 2026-11-17",
+      "kinds": {
+        "skills": {
+          "roots": [
+            {
+              "root": ".agents/skills",
+              "write": true,
+              "source": "https://learn.chatgpt.com/docs/build-skills#where-to-save-skills"
+            },
+            {
+              "root": ".codex/skills",
+              "source": "docs/maintainer/host-probe-log.md row X1"
+            }
+          ],
+          "note": "Two skills with one name are both listed (docs/maintainer/host-probe-log.md row X2)."
+        },
+        "agents": {
+          "roots": [
+            {
+              "root": ".codex/agents",
+              "write": true,
+              "source": "https://learn.chatgpt.com/docs/agent-configuration/subagents#custom-agents"
+            }
+          ],
+          "note": "Two agents with one name: not settled (docs/maintainer/host-probe-log.md row X3, checklist C1)."
+        },
+        "always-on": {
+          "roots": [
+            {
+              "root": "AGENTS.md",
+              "write": true,
+              "source": "https://learn.chatgpt.com/docs/agent-configuration/agents-md"
+            }
+          ],
+          "note": "At most one file per directory, 32 KiB in all. `.codex/rules` is command policy, not instructions (https://learn.chatgpt.com/docs/agent-configuration/rules)."
+        },
+        "hooks": {
+          "roots": [
+            {
+              "root": ".codex/hooks.json",
+              "write": true,
+              "source": "https://learn.chatgpt.com/docs/hooks"
+            }
+          ]
+        },
+        "mcp": {
+          "roots": [
+            {
+              "root": ".codex/config.toml",
+              "write": true,
+              "source": "https://developers.openai.com/codex/mcp#connect-codex-to-an-mcp-server"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "cursor",
+      "checked": "vendor pages read 2026-11-18; Cursor Agent 2026.07.23-e383d2b installed",
+      "kinds": {
+        "skills": {
+          "roots": [
+            {
+              "root": ".cursor/skills",
+              "write": true,
+              "source": "https://cursor.com/docs/skills#skill-directories"
+            },
+            {
+              "root": ".agents/skills",
+              "write": true,
+              "source": "https://cursor.com/docs/skills#skill-directories"
+            },
+            {
+              "root": ".claude/skills",
+              "source": "https://cursor.com/docs/skills#skill-directories"
+            },
+            {
+              "root": ".codex/skills",
+              "source": "https://cursor.com/docs/skills#skill-directories"
+            }
+          ],
+          "note": "The same name in two folders is not documented and could not be listed without a model turn (docs/maintainer/host-probe-log.md row X8, checklist C2). Whether the Third-Party Imports setting governs skills is not stated."
+        },
+        "agents": {
+          "pick": "first",
+          "roots": [
+            {
+              "root": ".cursor/agents",
+              "write": true,
+              "source": "https://cursor.com/docs/subagents#file-locations"
+            },
+            {
+              "root": ".claude/agents",
+              "source": "https://cursor.com/docs/subagents#file-locations"
+            },
+            {
+              "root": ".codex/agents",
+              "source": "https://cursor.com/docs/subagents#file-locations"
+            }
+          ],
+          "note": "`.cursor/` wins a name clash; `.claude/` against `.codex/` is not ranked."
+        },
+        "always-on": {
+          "roots": [
+            {
+              "root": ".cursor/rules",
+              "write": true,
+              "source": "https://cursor.com/docs/rules#rule-file-structure"
+            },
+            {
+              "root": "AGENTS.md",
+              "write": true,
+              "source": "https://cursor.com/docs/rules#agents-md"
+            },
+            {
+              "root": "CLAUDE.md",
+              "source": "https://cursor.com/docs/cli/using#rules"
+            }
+          ],
+          "note": "`CLAUDE.md` is read by the CLI at the project root; the editor page does not mention it. Only `.mdc` files in `.cursor/rules` load."
+        },
+        "hooks": {
+          "roots": [
+            {
+              "root": ".cursor/hooks.json",
+              "write": true,
+              "source": "https://cursor.com/docs/hooks"
+            },
+            {
+              "root": ".claude/settings.json",
+              "switch": {
+                "scope": "user",
+                "set": "Cursor Settings > Agents > Third-Party Imports: \"Include Third-Party Plugins, Skills, and Other Configs\" off"
+              },
+              "source": "https://cursor.com/docs/reference/third-party-hooks#requirements"
+            }
+          ],
+          "note": "All matching hooks from every source run (https://cursor.com/docs/reference/third-party-hooks#priority-order). `.claude/settings.local.json` is read too."
+        },
+        "mcp": {
+          "roots": [
+            {
+              "root": ".cursor/mcp.json",
+              "write": true,
+              "source": "https://cursor.com/docs/mcp#using-mcp-json"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "grok",
+      "checked": "vendor pages read 2026-11-18 (pages dated July to October 2026); not installed, nothing probed",
+      "kinds": {
+        "skills": {
+          "roots": [
+            {
+              "root": ".grok/skills",
+              "write": true,
+              "source": "https://docs.x.ai/build/features/skills-plugins-marketplaces"
+            },
+            {
+              "root": ".claude/skills",
+              "unsure": "the vendor page says these are read and names no path; checklist C3",
+              "switch": {
+                "scope": "user",
+                "set": "`GROK_CLAUDE_SKILLS_ENABLED=false` or `[compat.claude] skills = false` in `~/.grok/config.toml`"
+              },
+              "source": "https://docs.x.ai/build/features/skills-plugins-marketplaces"
+            },
+            {
+              "root": ".cursor/skills",
+              "unsure": "the vendor page says these are read and names no path; checklist C3",
+              "switch": {
+                "scope": "user",
+                "set": "`GROK_CURSOR_SKILLS_ENABLED=false` or `[compat.cursor] skills = false` in `~/.grok/config.toml`"
+              },
+              "source": "https://docs.x.ai/build/settings/reference"
+            }
+          ],
+          "note": "A project `.agents/skills` is not mentioned; the user-level `~/.agents/skills` is. The same name in two folders is not documented."
+        },
+        "agents": {
+          "roots": [
+            {
+              "root": ".grok/agents",
+              "write": true,
+              "source": "https://docs.x.ai/build/features/subagents"
+            },
+            {
+              "root": ".claude/agents",
+              "unsure": "the vendor page says these are read and names no path; checklist C3",
+              "source": "https://docs.x.ai/build/features/skills-plugins-marketplaces"
+            },
+            {
+              "root": ".cursor/agents",
+              "unsure": "the vendor page says these are read and names no path; checklist C3",
+              "switch": {
+                "scope": "user",
+                "set": "`GROK_CURSOR_AGENTS_ENABLED=false`"
+              },
+              "source": "https://docs.x.ai/build/settings/reference"
+            }
+          ],
+          "note": "File format and fields are not documented on the page read (checklist C3)."
+        },
+        "always-on": {
+          "roots": [
+            {
+              "root": "AGENTS.md",
+              "write": true,
+              "source": "https://docs.x.ai/build/features/project-rules"
+            },
+            {
+              "root": ".grok/rules",
+              "write": true,
+              "source": "https://docs.x.ai/build/features/project-rules"
+            },
+            {
+              "root": "CLAUDE.md",
+              "source": "https://docs.x.ai/build/features/project-rules"
+            },
+            {
+              "root": ".claude/rules",
+              "switch": {
+                "scope": "user",
+                "set": "`GROK_CLAUDE_RULES_ENABLED=false`"
+              },
+              "source": "https://docs.x.ai/build/features/project-rules"
+            },
+            {
+              "root": ".cursor/rules",
+              "switch": {
+                "scope": "user",
+                "set": "`GROK_CURSOR_RULES_ENABLED=false`"
+              },
+              "source": "https://docs.x.ai/build/features/project-rules"
+            }
+          ],
+          "note": "Every file found is loaded in full. Whether `.mdc` frontmatter is parsed is not stated (checklist C4)."
+        },
+        "hooks": {
+          "roots": [
+            {
+              "root": ".grok/hooks",
+              "write": true,
+              "source": "https://docs.x.ai/build/features/hooks"
+            },
+            {
+              "root": ".claude/settings.json",
+              "switch": {
+                "scope": "user",
+                "set": "`GROK_CLAUDE_HOOKS_ENABLED=false`"
+              },
+              "source": "https://docs.x.ai/build/features/hooks"
+            },
+            {
+              "root": ".cursor/hooks.json",
+              "switch": {
+                "scope": "user",
+                "set": "`GROK_CURSOR_HOOKS_ENABLED=false`"
+              },
+              "source": "https://docs.x.ai/build/features/hooks"
+            }
+          ],
+          "note": "Hooks fail open; only PreToolUse blocks; the default timeout is 5 s. Project config cannot hold the compatibility switches (https://docs.x.ai/build/settings)."
+        },
+        "mcp": {
+          "roots": [
+            {
+              "root": ".grok/config.toml",
+              "write": true,
+              "source": "https://docs.x.ai/build/features/mcp-servers"
+            },
+            {
+              "root": ".mcp.json",
+              "switch": {
+                "scope": "user",
+                "set": "`[compat.claude] mcps = false` in `~/.grok/config.toml`"
+              },
+              "source": "https://docs.x.ai/build/features/mcp-servers"
+            },
+            {
+              "root": ".cursor/mcp.json",
+              "switch": {
+                "scope": "user",
+                "set": "`[compat.cursor] mcps = false` in `~/.grok/config.toml`"
+              },
+              "source": "https://docs.x.ai/build/features/mcp-servers"
+            }
+          ],
+          "note": "The imported files merge below `config.toml`; one server defined in two of them is not documented."
+        }
+      }
+    },
+    {
+      "name": "pi",
+      "checked": "docs on the default branch read 2026-11-18, package 1.5.2; not installed, nothing probed",
+      "kinds": {
+        "skills": {
+          "roots": [
+            {
+              "root": ".agents/skills",
+              "write": true,
+              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/skills.md"
+            },
+            {
+              "root": ".pi/skills",
+              "write": true,
+              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/configuration.md"
+            }
+          ],
+          "note": "A name collision keeps the first skill discovered and warns; the folder order is not stated. Both folders need project trust (https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/security.md)."
+        },
+        "always-on": {
+          "roots": [
+            {
+              "root": "AGENTS.md",
+              "write": true,
+              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/configuration.md"
+            },
+            {
+              "root": "CLAUDE.md",
+              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/configuration.md"
+            }
+          ],
+          "note": "Parent directories are walked. `AGENTS.md` against `CLAUDE.md` in one directory is not ranked in the docs."
+        },
+        "hooks": {
+          "roots": [
+            {
+              "root": ".pi/extensions",
+              "write": true,
+              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/extensions.md"
+            }
+          ],
+          "note": "No hook file: an extension blocks a call from `pi.on(\"tool_call\")`."
+        },
+        "mcp": {
+          "roots": [
+            {
+              "root": ".pi/mcp.json",
+              "write": true,
+              "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/mcp.md"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "omp",
+      "checked": "source read and probed 2026-11-17, OMP 18.13.3",
+      "kinds": {
+        "skills": {
+          "roots": [
+            {
+              "root": ".agents/skills",
+              "write": true,
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/agents.ts:30; docs/maintainer/host-probe-log.md row X5"
+            },
+            {
+              "root": ".omp/skills",
+              "write": true,
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/builtin.ts:316"
+            },
+            {
+              "root": ".claude/skills",
+              "switch": {
+                "scope": "project",
+                "set": "`.omp/config.yml` `disabledProviders: [claude]`"
+              },
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/claude.ts:210; docs/maintainer/host-probe-log.md row X6"
+            },
+            {
+              "root": ".codex/skills",
+              "switch": {
+                "scope": "project",
+                "set": "`.omp/config.yml` `disabledProviders: [codex]`"
+              },
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/codex.ts:268; docs/maintainer/host-probe-log.md row X6"
+            }
+          ],
+          "note": "Copies that differ all stay listed, under a provider prefix (docs/maintainer/host-probe-log.md row X4). Turning a provider off turns off everything it imports, not skills alone."
+        },
+        "agents": {
+          "roots": [
+            {
+              "root": ".omp/agents",
+              "write": true,
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/task/discovery.ts:119"
+            }
+          ]
+        },
+        "always-on": {
+          "roots": [
+            {
+              "root": "AGENTS.md",
+              "write": true,
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/agents-md.ts:13"
+            },
+            {
+              "root": ".omp/rules",
+              "write": true,
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/builtin.ts:407"
+            },
+            {
+              "root": "CLAUDE.md",
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/claude-md.ts:13"
+            },
+            {
+              "root": ".cursor/rules",
+              "switch": {
+                "scope": "project",
+                "set": "`.omp/config.yml` `disabledProviders: [cursor]`"
+              },
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/cursor.ts:118"
+            },
+            {
+              "root": ".agents/rules",
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/agents.ts:202"
+            }
+          ],
+          "note": "One context file per directory depth; the provider with the higher priority shadows the other (@oh-my-pi/pi-coding-agent 18.13.3 src/capability/context-file.ts:36)."
+        },
+        "hooks": {
+          "roots": [
+            {
+              "root": ".omp/hooks",
+              "write": true,
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/builtin.ts:720"
+            }
+          ],
+          "note": "Also runs modules under `.claude/hooks/{pre,post}` and `.codex/hooks` (@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/claude.ts:383, codex.ts:406), so kit hook scripts stay outside those folders."
+        },
+        "mcp": {
+          "pick": "first",
+          "roots": [
+            {
+              "root": ".omp/mcp.json",
+              "write": true,
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/builtin.ts:238"
+            },
+            {
+              "root": ".codex/config.toml",
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/codex.ts:109"
+            },
+            {
+              "root": ".cursor/mcp.json",
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/cursor.ts:85"
+            },
+            {
+              "root": ".mcp.json",
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/mcp-json.ts:171"
+            }
+          ],
+          "note": "Servers are keyed by name; the provider with the higher priority wins (@oh-my-pi/pi-coding-agent 18.13.3 src/capability/mcp.ts:112)."
+        }
+      }
+    }
+  ]
+}

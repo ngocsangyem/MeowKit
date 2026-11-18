@@ -10,11 +10,14 @@ pub mod codex;
 pub mod contract;
 pub mod cursor;
 mod kit_files;
+pub mod placement_resolver;
 pub mod projection;
 pub mod registry;
 mod report_gate;
 mod scope;
 mod strip;
+pub mod surface_doc;
+pub mod surface_table;
 
 pub use contract::{EmitError, EmitRequest, Emitter, Runtime, Scope, ScopeKind};
 pub use registry::{emitter, registry};

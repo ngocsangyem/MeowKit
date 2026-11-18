@@ -56,3 +56,18 @@ Bundle-only content with no `.claude/` source, to carry in overlays: Cursor `dom
 ## 5. Probed 2026-11-17
 
 Rows X1–X9 in `docs/maintainer/host-probe-log.md`. Settled: OMP items 4 and its dedupe and switch (X4–X7); Codex skill roots and dedupe (X1, X2). Still open, on `docs/maintainer/runtime-probe-checklist.md`: Codex duplicate agents (C1), Cursor skill dedupe (C2), every Grok item (C3–C5), OMP foreign settings keys (C7). Grok and Pi are not installed on the maintainer machine.
+
+## 6. Re-read 2026-11-18 for the surface table
+
+Vendor pages read again, each cell with its page; the table in `crates/mewkit-adapters/src/surface_table.json` holds the result and supersedes §1 where they differ.
+
+| Runtime | §1 said | The pages say |
+|---|---|---|
+| Grok | loads Claude skills, agents, rules, hooks, MCP | also scans Cursor skills and Cursor agent definitions (`GROK_CURSOR_SKILLS_ENABLED`, `GROK_CURSOR_AGENTS_ENABLED`); no path is named for any imported skill or agent folder |
+| Grok | toggles `GROK_CLAUDE_HOOKS_ENABLED`, `GROK_CURSOR_MCPS_ENABLED` | ten variables, one per vendor and kind, and `[compat.claude]` / `[compat.cursor]` tables; project config holds MCP servers, plugins and permission rules only, so none of these can be set by an install |
+| Pi | one context file per directory, `AGENTS.override.md` > `AGENTS.md` > `CLAUDE.md` | the override replaces the other two in its own directory; `AGENTS.md` against `CLAUDE.md` is not ranked |
+| Pi | skill dedupe by realpath | not stated; a name collision keeps the first skill discovered and warns, and the folder order is not stated |
+| Claude Code | `AGENTS.md` only when no `CLAUDE.md` | confirmed, from 2.1.277; the mode that reads both is a user or managed setting that a project settings file cannot set |
+| Cursor | "Third-Party Imports" covers the imports | documented for hooks only; whether it governs skills and agents is not stated, and it is an application setting |
+
+The Pi repository now lives at `earendil-works/pi`; the `badlogic/pi-mono` raw URLs still resolve (package 1.5.2).

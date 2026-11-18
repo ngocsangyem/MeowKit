@@ -31,6 +31,9 @@ pub(super) fn hook_file(runtime: Runtime) -> &'static str {
         Runtime::ClaudeCode => ".claude/settings.json",
         Runtime::Codex => ".codex/hooks.json",
         Runtime::Cursor => ".cursor/hooks.json",
+        Runtime::Grok => ".grok/hooks",
+        Runtime::Pi => ".pi/extensions",
+        Runtime::Omp => ".omp/hooks",
     }
 }
 

@@ -27,7 +27,10 @@ use std::collections::BTreeMap;
 
 use clap::Args;
 use mewkit_adapters::contract::{Kit, Op, OwnershipIndex, Plan, RelPath, Runtime, written_hashes};
-use mewkit_adapters::{EmitRequest, Emitter, emitter};
+use mewkit_adapters::placement_resolver::resolve;
+use mewkit_adapters::registry::emitted;
+use mewkit_adapters::surface_table::table;
+use mewkit_adapters::{EmitRequest, Emitter, ScopeKind, emitter};
 use mewkit_core::exec::{ExecOptions, execute};
 
 use crate::failure::Failure;
@@ -68,10 +71,12 @@ pub fn parse_targets(list: &[String]) -> Result<Vec<Runtime>, Failure> {
     let mut out = Vec::new();
     for name in list.iter().flat_map(|l| l.split(',')).map(str::trim) {
         if name == "all" {
-            return Ok(Runtime::ALL.to_vec());
+            return Ok(emitted());
         }
-        let r = Runtime::from_name(name).ok_or_else(|| {
-            let known: Vec<_> = Runtime::ALL.iter().map(|r| r.name()).collect();
+        // A runtime the surface table knows but no emitter installs yet is not a target.
+        let installable = Runtime::from_name(name).filter(|r| emitter(*r).is_some());
+        let r = installable.ok_or_else(|| {
+            let known: Vec<_> = emitted().iter().map(|r| r.name()).collect();
             Failure::usage(format!(
                 "unknown target '{name}' (known: {})",
                 known.join(", ")
@@ -95,9 +100,30 @@ pub fn prepare(
     kit: &Kit,
     packs: &[String],
 ) -> Result<Plan, Failure> {
+    prepare_among(place, e, kit, packs, &[])
+}
+
+/// As [`prepare`], when `joining` are being installed in the same run: the
+/// placement covers them as well as what is installed here already.
+pub fn prepare_among(
+    place: &Place,
+    e: &dyn Emitter,
+    kit: &Kit,
+    packs: &[String],
+    joining: &[Runtime],
+) -> Result<Plan, Failure> {
     let other = place
         .other()
         .and_then(|p| p.index(e.target()).ok().flatten());
+    let placement = match place.scope.kind {
+        ScopeKind::Project => {
+            let mut set = place.installed()?;
+            set.push(e.target());
+            set.extend_from_slice(joining);
+            Some(resolve(table(), &set))
+        }
+        ScopeKind::Global => None,
+    };
     Ok(e.prepare(&EmitRequest {
         kit,
         scope: &place.scope,
@@ -105,6 +131,7 @@ pub fn prepare(
         disabled: &[],
         fresh: false,
         other_scope: other.as_ref(),
+        placement: placement.as_ref(),
     })?)
 }
 

@@ -226,6 +226,7 @@ fn a_privacy_hook_owned_at_the_other_scope_is_reported() {
     let owned = project.index();
     let req = EmitRequest {
         other_scope: Some(&owned),
+        placement: None,
         ..request(&kit, &home.scope, &[], &[])
     };
     let plan = Codex.prepare(&req).unwrap();

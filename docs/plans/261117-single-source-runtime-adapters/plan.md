@@ -33,7 +33,7 @@ blocks: []
 | # | Phase | Status | Effort | Depends On |
 |---|-------|--------|--------|------------|
 | 1 | [Probe what the docs leave open](phase-01-probe-open-runtime-behaviour.md) | Done by inspection; checklist C1–C7 open | 1d | — |
-| 2 | [Runtime surface table and placement resolver](phase-02-runtime-surface-table-and-placement-resolver.md) | Not started | 3d | 1 |
+| 2 | [Runtime surface table and placement resolver](phase-02-runtime-surface-table-and-placement-resolver.md) | Done: table with sources, resolver, 63-set test, rendered page; emitters receive the placement and do not read it yet (Phase 4). Three double loads no placement removes are listed in `docs/maintainer/runtime-surface-table.md` | 3d | 1 |
 | 3 | [Projection engine, checked against the bundles](phase-03-projection-engine-checked-against-bundles.md) | In progress: skills, scripts, frontmatter, agents and overlays project for Codex and Cursor; criteria A9, A10, A11, A13 clean on both projected trees; divergence rows 1–14 decided; row 15, Cursor `.mdc` rules and rubrics wait for Phase 5 | 5d | — |
 | 4 | [Codex and Cursor emitters on projection; bundles removed](phase-04-codex-cursor-on-projection-bundles-removed.md) | Not started | 4d | 2, 3 |
 | 5 | [Hooks and always-on text placed once](phase-05-hooks-and-always-on-text-placed-once.md) | Not started | 4d | 2, 4 |

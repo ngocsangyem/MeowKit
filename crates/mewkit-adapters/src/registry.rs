@@ -4,7 +4,7 @@ use crate::contract::{Emitter, Runtime};
 /// Runtimes whose emitter has not been written yet. Each emitter added to
 /// [`registry`] must be removed from here; the test below keeps the two
 /// lists covering every [`Runtime`] exactly once.
-pub const NOT_YET_EMITTED: &[Runtime] = &[];
+pub const NOT_YET_EMITTED: &[Runtime] = &[Runtime::Grok, Runtime::Pi, Runtime::Omp];
 
 pub fn registry() -> &'static [&'static dyn Emitter] {
     &[
@@ -12,6 +12,11 @@ pub fn registry() -> &'static [&'static dyn Emitter] {
         &crate::codex::Codex,
         &crate::cursor::Cursor,
     ]
+}
+
+/// The runtimes that can be installed today, in registry order.
+pub fn emitted() -> Vec<Runtime> {
+    registry().iter().map(|e| e.target()).collect()
 }
 
 /// The emitter for `runtime`, if it has one yet.

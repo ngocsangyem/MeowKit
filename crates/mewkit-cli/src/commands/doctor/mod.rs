@@ -117,7 +117,7 @@ pub fn run(args: &DoctorArgs) -> Result<u8, Failure> {
         return provenance::run(extras::project_root().as_deref(), args.explain);
     }
     let targets: Vec<Runtime> = if args.target.is_empty() {
-        Runtime::ALL.to_vec()
+        mewkit_adapters::registry::emitted()
     } else {
         parse_targets(&args.target)?
     };

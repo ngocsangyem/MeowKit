@@ -25,6 +25,8 @@ pub fn record(place: &Place, runtime: Runtime) -> Result<Option<Adopted>, Failur
         Runtime::ClaudeCode => adopt::ts_metadata(root),
         Runtime::Codex => adopt::ts_ledger(root, "codex"),
         Runtime::Cursor => adopt::ts_ledger(root, "cursor"),
+        // The npm CLI never installed these.
+        Runtime::Grok | Runtime::Pi | Runtime::Omp => return Ok(None),
     };
     found.map_err(|e| Failure::failed(format!("{e}; fix or remove it, then run again")))
 }
@@ -36,6 +38,7 @@ pub fn has_record(place: &Place, runtime: Runtime) -> bool {
         Runtime::ClaudeCode => &[".meowkit/metadata.json", ".claude/metadata.json"],
         Runtime::Codex => &[".meowkit/state/codex-ledger.json"],
         Runtime::Cursor => &[".meowkit/state/cursor-ledger.json"],
+        Runtime::Grok | Runtime::Pi | Runtime::Omp => &[],
     };
     place.scope.kind == ScopeKind::Project && files.iter().any(|f| root.join(f).is_file())
 }

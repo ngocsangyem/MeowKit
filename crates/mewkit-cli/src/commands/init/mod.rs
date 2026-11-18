@@ -10,7 +10,7 @@ use mewkit_core::exec::ExecOptions;
 
 use self::choose::Delivery;
 use super::{
-    Common, Job, drop_retired, emitter_for, parse_targets, prepare, run_jobs, stamp,
+    Common, Job, drop_retired, emitter_for, parse_targets, prepare_among, run_jobs, stamp,
     unconfirmed_force,
 };
 use crate::adopt;
@@ -121,7 +121,7 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
     let mut mcp_notes = Vec::new();
 
     let mut jobs = Vec::new();
-    for runtime in targets {
+    for &runtime in &targets {
         let e = emitter_for(runtime)?;
         let (packs, trims) = match runtime {
             Runtime::ClaudeCode => {
@@ -133,7 +133,7 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
             }
             _ => (skill_packs.clone(), false),
         };
-        let mut plan = prepare(&place, e, &kit, &packs)?;
+        let mut plan = prepare_among(&place, e, &kit, &packs, &targets)?;
         if runtime == Runtime::ClaudeCode && delivery == Delivery::Plugin {
             plan.ops.push(plugin_manifest(&kit.version)?);
         }

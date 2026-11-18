@@ -48,6 +48,7 @@ pub fn request<'a>(
         disabled,
         fresh: false,
         other_scope: None,
+        placement: None,
     }
 }
 
