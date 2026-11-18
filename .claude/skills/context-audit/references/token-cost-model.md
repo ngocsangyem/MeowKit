@@ -8,7 +8,7 @@ estimates and how it derives the structural-overhead percentage banners.
 Every counted byte is divided by 4 to estimate tokens. This is the same
 heuristic encoded in:
 
-- `.claude/hooks/handlers/budget-tracker.cjs` (cost-tracking path)
+- the `budget-tracker.cjs` hook handler (cost-tracking path)
 
 The audit script inlines the heuristic rather than calling into the hook
 because it is a single expression, and mirroring it keeps the script zero-dep.

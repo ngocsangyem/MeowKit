@@ -26,7 +26,7 @@
       "title": "analyst",
       "description": "Cost and learning analysis agent that tracks token usage, generates cost reports, and extracts patterns from sessions. Invoked on session end only by its owning workflow, or on demand via the `mewkit budget` verb. Not for implementation, planning, or review decisions.",
       "sourcePath": "agents/analyst.md",
-      "sourceHash": "6c00aad47fc6a656bbfd20d1b9f7a7e387502a6f3e779d5eeb9feeec50f37a1b",
+      "sourceHash": "45687db54a38891e70fe8838ba649bec5125e541d51f1794ac55e687f9f34a91",
       "aliases": [],
       "owner": "docs",
       "phase": null,
@@ -35,7 +35,6 @@
       "risk": "medium",
       "dependencies": [],
       "output": [
-        ".claude/hooks/handlers/post-session.cjs",
         ".claude/skills/agent-detector/references/model-selection-rules.md",
         ".meowkit/telemetry/cost-log.json"
       ],
