@@ -55,3 +55,23 @@ Hooks and always-on instructions are the two kinds where duplication changes beh
 - `.claude/hooks/lib/core/hook-payload.cjs` folds the camelCase keys Grok documents (`toolInput`, `toolName`, `sessionId`, `hookEventName`, `workspaceRoot`) onto the snake_case ones every hook here reads; `parse-stdin.cjs` applies it for guards and observers. Before it, the privacy guard read a camelCase payload as an empty one and allowed the call. Two replay cases cover the privacy guard and the ship check with camelCase keys.
 - Not covered, because nothing documents it: the keys inside Grok's `toolInput` (assumed `filePath` or `file_path`; checklist C5) and the tool names its matchers use.
 - Only the Claude Code tree needed it: Codex and Cursor shells have their own readers and receive their own runtime's payload.
+
+## Two decisions before the next steps (asked 2026-11-18)
+
+### Hook home when Cursor shares a project with Claude Code
+
+What Cursor runs there today: every hook in `.claude/settings.json` (import on by default, a user setting; an imported hook that crashes lets the call through) and every entry of `.cursor/hooks.json`.
+
+| Cursor entry | Same decision from `.claude/settings.json`? | Proposed |
+|---|---|---|
+| `privacy-read-gate` (beforeReadFile), `shell-gate`, `tool-gate`, all fail-closed | Partly (`privacy-block` on Read and Bash), but imported hooks fail open | Keep native: a crashed gate must block (maintainer, 2026-11-11) |
+| `mcp-gate` | No | Keep native |
+| `pre-ship` (beforeShellExecution) | Yes: same core, already deduped by the run-once marker | **Open: see below** |
+| `completion-check`, `stop-followup` (opt-in) | Documented mapping of `Stop`, not probed | Keep native; duplicate turn prompt possible when opted in |
+| `session-context`, `telemetry-observers`, `subagent-lifecycle` | Different output | Keep native |
+
+The requirement above says the ship check lives only in `.claude/settings.json` when Claude Code is present. That removes a duplicate the marker already neutralises, and adds a failure: with Cursor's import switched off, Cursor has no ship check at all, silently. Options: (a) as written, drop Cursor's `pre-ship` entry beside Claude Code; (b) keep both and the marker, and make the resolver never rely on an import a user can switch off for hooks, which turns the pair into a listed double load.
+
+### The one always-on block
+
+Claude Code loads `.claude/rules/*.md` (18,191 B). Codex and Cursor load a condensed text written by hand for the bundles (7,676 B and 6,289 B, now in the overlays). "One authored block" needs one of them to become the source: (a) keep `.claude/rules` for Claude Code and treat the condensed text as the block for every other runtime, authored once and shared by Codex, Cursor, Grok, Pi and OMP; (b) make the condensed text the block everywhere and have `CLAUDE.md` import it, which shrinks what Claude Code loads and moves the pinned blocked-pattern table and injection rules; (c) project `.claude/rules` in full to `AGENTS.md`, which more than doubles the other runtimes' always-on bytes and breaks "always-on bytes ≤ today's".
