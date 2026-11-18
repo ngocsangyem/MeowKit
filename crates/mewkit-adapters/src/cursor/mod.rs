@@ -3,20 +3,21 @@
 //! Cursor content is the kit's `.claude/` tree projected for Cursor, plus the
 //! Cursor overlay for what cannot be derived (hooks, rules, the always-on
 //! text). Files map 1:1 onto `.cursor/`, except:
-//! - the overlay's `AGENTS.md` becomes the always-applied rule
-//!   `.cursor/rules/meowkit-core.mdc`: the project's `AGENTS.md` is left to
-//!   the user and to the Codex install;
+//! - the always-on text every runtime shares is a marked block in the
+//!   project's `AGENTS.md`, which Cursor reads; `.cursor/rules/` holds only
+//!   what that block does not say;
 //! - `.cursor/hooks.json` is merged handler by handler, every blocking
 //!   handler with `failClosed: true`;
 //! - agents keep only the frontmatter keys Cursor documents;
 //! - every rule must carry frontmatter that yields exactly one rule type.
 //!
 //! A global install writes `~/.cursor/` the same way, minus what Cursor has
-//! no user-level file for (rules, the core rule), and registers only the
+//! no user-level file for (rules, the shared block), and registers only the
 //! privacy read gate and the session context.
 pub(crate) mod frontmatter;
 mod hooks;
 
+use crate::agents_block::{self, AGENTS_MD};
 use crate::contract::{
     EmitError, EmitRequest, Emitter, Op, OwnershipIndex, Plan, RelPath, Runtime, Scope, ScopeKind,
 };
@@ -33,8 +34,6 @@ pub const SOURCE: Spec = Spec {
     overlay: "kit/overlays/cursor",
     target: &crate::projection::target::CURSOR,
 };
-/// Where the overlay's `AGENTS.md` guidance is installed.
-pub const CORE_RULE: &str = ".cursor/rules/meowkit-core.mdc";
 /// Subagent frontmatter keys Cursor documents.
 pub const AGENT_KEYS: &[&str] = &["name", "description", "model", "readonly", "is_background"];
 /// Claude Code-only names that mean nothing to Cursor.
@@ -60,7 +59,7 @@ impl Emitter for Cursor {
     fn roots(&self, scope: &Scope) -> Vec<RelPath> {
         // `.meowkit` holds the bundle's README, which a project install keeps.
         let roots: &[&str] = match scope.kind {
-            ScopeKind::Project => &[".cursor", ".meowkit"],
+            ScopeKind::Project => &[".cursor", ".meowkit", AGENTS_MD],
             ScopeKind::Global => &[".cursor"],
         };
         roots
@@ -82,20 +81,18 @@ impl Emitter for Cursor {
                     .map_err(|_| EmitError::Kit(format!("{path} is not UTF-8")))
             };
             let (path, bytes) = match path {
-                "AGENTS.md" | CORE_RULE if global => continue,
+                AGENTS_MD if global => continue,
                 p if global && p.starts_with(".cursor/rules/") => {
                     rules_left_out += 1;
                     continue;
                 }
-                "AGENTS.md" => (CORE_RULE, core_rule(&text()?)),
+                AGENTS_MD => {
+                    plan.ops.push(agents_block::merge(&text()?, AGENTS_MD)?);
+                    continue;
+                }
                 HOOKS_JSON => {
                     plan.ops.extend(hooks::ops(&text()?, global)?);
                     continue;
-                }
-                CORE_RULE => {
-                    return Err(EmitError::Kit(format!(
-                        "the Cursor overlay ships {CORE_RULE}, which its AGENTS.md is installed as"
-                    )));
                 }
                 // The project README is the only `.meowkit/` file the overlay
                 // ships; a global install has no `.meowkit` to put it in.
@@ -133,9 +130,16 @@ impl Emitter for Cursor {
                 "skill pack lists {missing}, which the kit does not ship for Cursor"
             ));
         }
+        if !global {
+            // https://cursor.com/docs/agent/hooks: "Project hooks run in any trusted workspace".
+            plan.notices.push(
+                "Cursor runs .cursor/hooks.json only in a workspace you have trusted in Cursor"
+                    .into(),
+            );
+        }
         if global {
             plan.notices.push(format!(
-                "Cursor reads no rules from ~/.cursor: the core rule and {rules_left_out} other rules apply only where MeowKit is installed in the project"
+                "Cursor reads no rules from ~/.cursor: the AGENTS.md block and {rules_left_out} rules apply only where MeowKit is installed in the project"
             ));
         }
         if req.scope.resolve(&rel(".claude/skills")?).is_dir() {
@@ -154,11 +158,6 @@ impl Emitter for Cursor {
             (f == HOOKS_JSON).then_some(HookLayout::Flat)
         })
     }
-}
-
-/// The overlay's `AGENTS.md` as a rule Cursor applies in every session.
-fn core_rule(agents_md: &str) -> String {
-    format!("---\nalwaysApply: true\n---\n\n{}\n", agents_md.trim_end())
 }
 
 /// Every `.mdc` the plan writes yields exactly one rule type.

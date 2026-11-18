@@ -7,7 +7,7 @@ use std::collections::BTreeSet;
 use mewkit_adapters::Emitter;
 use mewkit_adapters::codex::Codex;
 use mewkit_adapters::contract::{Op, Plan};
-use mewkit_adapters::cursor::{AGENT_KEYS, BLOCKING, CORE_RULE, Cursor, HOOKS_JSON};
+use mewkit_adapters::cursor::{AGENT_KEYS, BLOCKING, Cursor, HOOKS_JSON};
 use serde_json::Value;
 use support::{Project, kit, request, sha_tree};
 
@@ -32,9 +32,10 @@ fn installs_into_a_project_and_strips_back_byte_for_byte() {
     );
     assert_eq!(pre.len(), 4, "three kit handlers beside it");
     assert!(
-        p.read(CORE_RULE)
-            .starts_with("---\nalwaysApply: true\n---\n")
+        p.read("AGENTS.md")
+            .contains("<!-- mewkit:begin meowkit -->")
     );
+    assert!(!p.root().join(".cursor/rules/meowkit-core.mdc").exists());
 
     let strip = Cursor.plan_strip(&p.scope, &p.index()).unwrap();
     let report = p.execute(&strip, &kit);
@@ -76,7 +77,7 @@ fn every_blocking_hook_fails_closed() {
 }
 
 #[test]
-fn codex_then_cursor_share_a_project_and_only_codex_touches_agents_md() {
+fn codex_and_cursor_share_one_always_on_block_until_the_last_of_them_leaves() {
     let kit = kit();
     let codex = Project::new(Codex);
     let user_agents = "# Mine\n\nKeep it short.\n";
@@ -89,20 +90,28 @@ fn codex_then_cursor_share_a_project_and_only_codex_touches_agents_md() {
             .unwrap(),
         &kit,
     );
+    let alone = codex.read("AGENTS.md");
     let plan = Cursor
         .prepare(&request(&kit, &cursor.scope, &[], &[]))
         .unwrap();
-    assert!(
-        plan.ops.iter().all(|o| o.path().as_str() != "AGENTS.md"),
-        "Cursor plans nothing on AGENTS.md"
-    );
     cursor.execute(&plan, &kit);
 
-    let agents = codex.read("AGENTS.md");
-    assert!(agents.starts_with(user_agents), "user text unchanged");
-    assert_eq!(agents.matches("<!-- mewkit:begin meowkit -->").count(), 1);
+    assert_eq!(
+        codex.read("AGENTS.md"),
+        alone,
+        "the same block, written once"
+    );
+    assert!(alone.starts_with(user_agents), "user text unchanged");
+    assert_eq!(alone.matches("<!-- mewkit:begin meowkit -->").count(), 1);
     assert!(codex.index().sections["AGENTS.md"].contains_key("meowkit"));
-    assert!(!cursor.index().sections.contains_key("AGENTS.md"));
+    assert!(cursor.index().sections["AGENTS.md"].contains_key("meowkit"));
+    // Cursor's always-applied rules repeat none of the block's sections.
+    let block: Vec<&str> = alone.lines().filter(|l| l.starts_with("## ")).collect();
+    for (path, text) in texts(&plan).filter(|(p, _)| p.starts_with(".cursor/rules/")) {
+        for heading in text.lines().filter(|l| l.starts_with("## ")) {
+            assert!(!block.contains(&heading), "{path} repeats {heading}");
+        }
+    }
 }
 
 #[test]
@@ -113,7 +122,8 @@ fn rules_and_agents_carry_only_what_cursor_reads() {
     let rules: Vec<&str> = written(&plan)
         .filter(|w| w.starts_with(".cursor/rules/"))
         .collect();
-    assert!(rules.contains(&CORE_RULE) && rules.len() >= 6, "{rules:?}");
+    assert!(rules.len() >= 5, "{rules:?}");
+    assert!(plan.ops.iter().any(|o| o.path().as_str() == "AGENTS.md"));
     let mut agents = 0;
     for (path, text) in texts(&plan).filter(|(p, _)| p.starts_with(".cursor/agents/")) {
         agents += 1;
@@ -149,7 +159,7 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
     let ours: BTreeSet<&str> = written(&plan).collect();
     // DIVERGENCES.md: skill tests are not in the kit; the npm CLI's install
     // metadata and ledger under .meowkit/ are replaced by the ownership index;
-    // hooks.json is merged; AGENTS.md is installed as the core rule.
+    // hooks.json and the AGENTS.md block are merged.
     let only_ts: Vec<_> = ts
         .difference(&ours)
         .filter(|p| {
@@ -161,7 +171,7 @@ fn matches_the_npm_cli_baseline_except_listed_divergences() {
         })
         .collect();
     assert!(only_ts.is_empty(), "missing vs TS: {only_ts:?}");
-    let only_ours: Vec<_> = ours.difference(&ts).filter(|p| **p != CORE_RULE).collect();
+    let only_ours: Vec<_> = ours.difference(&ts).collect();
     assert!(only_ours.is_empty(), "extra vs TS: {only_ours:?}");
 }
 

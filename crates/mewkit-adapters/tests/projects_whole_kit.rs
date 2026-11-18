@@ -55,3 +55,25 @@ fn the_whole_kit_projects_for_codex() {
 fn the_whole_kit_projects_for_cursor() {
     whole_kit("cursor", &CURSOR);
 }
+
+/// Projected skills cite a rule file as "AGENTS.md (<section>)": each section
+/// they can name is a heading of the block every runtime shares.
+#[test]
+fn every_rule_section_a_skill_can_cite_is_in_the_shared_block() {
+    let block = String::from_utf8(mewkit_adapters::agents_block::read(&repo()).unwrap()).unwrap();
+    let headings: Vec<&str> = block
+        .lines()
+        .filter(|l| l.starts_with('#'))
+        .map(|l| l.trim_start_matches('#').trim())
+        .collect();
+    for target in [&CODEX, &CURSOR] {
+        for (file, section) in target.rule_sections {
+            assert!(
+                headings.iter().any(|h| h.starts_with(section)),
+                "{}: {file} is cited as {section:?}, which the block has no heading for",
+                target.host_name
+            );
+        }
+    }
+    assert!(block.len() <= mewkit_adapters::agents_block::BUDGET);
+}

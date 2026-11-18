@@ -17,8 +17,23 @@ const COVERAGE: &str = ".claude/hooks/hook-coverage.json";
 
 pub fn checks(place: &Place, runtime: Runtime, index: &OwnershipIndex) -> Vec<Check> {
     let mut out = vec![scripts(place, runtime)];
-    if runtime == Runtime::Codex && place.scope.kind == ScopeKind::Project {
-        out.push(super::codex_trust::check(&place.scope.root));
+    if place.scope.kind == ScopeKind::Project {
+        match runtime {
+            Runtime::Codex => out.push(super::codex_trust::check(&place.scope.root)),
+            // https://code.claude.com/docs/en/permissions#project-allow-rules-and-workspace-trust
+            Runtime::ClaudeCode => out.push(Check::new(
+                "claude-code trust",
+                Status::Ok,
+                "Claude Code asks to trust this folder on its first interactive start here; whether you accepted is not read here",
+            )),
+            // https://cursor.com/docs/agent/hooks
+            Runtime::Cursor => out.push(Check::new(
+                "cursor trust",
+                Status::Ok,
+                "Cursor runs project hooks only in a trusted workspace; whether this one is trusted is not readable here",
+            )),
+            _ => {}
+        }
     }
     if runtime != Runtime::ClaudeCode {
         out.push(coverage(place, runtime, index));

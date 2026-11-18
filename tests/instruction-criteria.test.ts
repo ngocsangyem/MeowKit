@@ -198,7 +198,7 @@ describe("the real trees", () => {
 
 	it("sum the Cursor always-on bytes to the A8 ceiling", () => {
 		const bytes = alwaysOnFiles("installed:cursor").reduce((n, f) => n + fs.statSync(f).size, 0);
-		expect(bytes).toBeLessThanOrEqual(6356);
+		expect(bytes).toBeLessThanOrEqual(10641);
 	});
 
 	it("reject a baseline flag with no file", () => {

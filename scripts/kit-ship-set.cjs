@@ -49,12 +49,14 @@ function kitMeowkitTargets() {
  */
 const CODEX_OVERLAY = "kit/overlays/codex";
 const CURSOR_OVERLAY = "kit/overlays/cursor";
+// The always-on text every runtime that reads `AGENTS.md` gets, authored once.
+const SHARED_ALWAYS_ON = "kit/overlays/shared/AGENTS.md";
 // Cursor alone ships the MCP profile catalog `init --mcp-profiles` merges from.
 const RUNTIME_OVERLAY_TARGETS = [CODEX_OVERLAY, CURSOR_OVERLAY].flatMap((b) => [
 	`${b}/overlay.toml`,
 	`${b}/files`,
 	`${b}/catalog/skill-packs.json`,
-]).concat(`${CURSOR_OVERLAY}/catalog/mcp-profiles.json`);
+]).concat(`${CURSOR_OVERLAY}/catalog/mcp-profiles.json`, SHARED_ALWAYS_ON);
 
 /**
  * The archive roots a published kit is built from, in a fixed order.

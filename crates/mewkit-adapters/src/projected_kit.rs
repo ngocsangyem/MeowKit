@@ -6,6 +6,7 @@ use std::path::Path;
 
 use serde_json::Value;
 
+use crate::agents_block;
 use crate::contract::EmitError;
 use crate::kit_files;
 use crate::projection::{Overlay, Target, project_tree};
@@ -60,7 +61,15 @@ impl ProjectedKit {
         let overlay = Overlay::read(&overlay_dir)?;
         let target = spec.target;
         let skills = format!("{}/", target.skills_root);
-        let tree = project_tree(&claude, &overlay, target)?;
+        let mut tree = project_tree(&claude, &overlay, target)?;
+        if tree.contains_key(agents_block::AGENTS_MD) {
+            return Err(EmitError::Kit(format!(
+                "the {} overlay ships its own AGENTS.md; the always-on text is {}",
+                spec.runtime,
+                agents_block::SOURCE
+            )));
+        }
+        tree.insert(agents_block::AGENTS_MD.into(), agents_block::read(kit_dir)?);
         let files = tree
             .into_iter()
             .map(|(rel, bytes)| {

@@ -51,6 +51,41 @@ fn init_then_uninstall_keeps_user_text_hooks_and_edits() {
 }
 
 #[test]
+fn the_shared_block_stays_until_the_last_runtime_that_reads_it_leaves() {
+    let env = TempHome::new();
+    let p = env.project();
+    write(&p, "AGENTS.md", USER_AGENTS);
+    let out = env.with_kit(&["init", "--target", "codex,cursor"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    let both = read(&p, "AGENTS.md");
+    assert_eq!(both.matches("<!-- mewkit:begin meowkit -->").count(), 1);
+
+    let out = env.with_kit(&["uninstall", "--target", "codex", "--yes"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert!(text(&out).contains("block stays"), "{}", text(&out));
+    assert_eq!(read(&p, "AGENTS.md"), both, "Cursor still reads the block");
+    assert!(!p.join(".codex").exists());
+
+    let out = env.with_kit(&["uninstall", "--target", "cursor", "--yes"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert_eq!(read(&p, "AGENTS.md"), USER_AGENTS);
+}
+
+#[test]
+fn a_shared_block_file_the_kit_created_goes_with_the_last_runtime() {
+    let env = TempHome::new();
+    let p = env.project();
+    assert_eq!(code(&env.with_kit(&["init", "--target", "codex"])), 0);
+    assert_eq!(code(&env.with_kit(&["init", "--target", "cursor"])), 0);
+    let out = env.with_kit(&["uninstall", "--target", "codex", "--yes"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert!(p.join("AGENTS.md").is_file());
+    let out = env.with_kit(&["uninstall", "--target", "cursor", "--yes"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert!(sha_tree(&p).is_empty(), "{:?}", sha_tree(&p));
+}
+
+#[test]
 fn a_second_uninstall_has_nothing_to_do() {
     let env = TempHome::new();
     assert_eq!(code(&env.with_kit(&["init", "--target", "codex"])), 0);

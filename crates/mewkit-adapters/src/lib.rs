@@ -4,6 +4,7 @@
 //! `mewkit-core` and listed in [`registry`].
 #![forbid(unsafe_code)]
 
+pub mod agents_block;
 pub mod claude_code;
 pub mod codex;
 pub mod contract;

@@ -39,11 +39,14 @@ const CRITERIA = ['A1', 'A2', 'A5', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14'];
 const PINNED_SHA256 = 'e0b639506d83aff3e9040f3fdbfad35c016ee46ff701ad2f1daff04ced2461fa';
 
 /**
- * Always-on bytes per tree may only shrink. Claude Code loads every rule file; Codex loads
- * the installed root AGENTS.md (the kit's block and its markers), and Cursor every installed
- * `.mdc` rule marked `alwaysApply: true`.
+ * Always-on bytes per tree may only shrink. Claude Code loads every rule file; Codex and
+ * Cursor load the installed root AGENTS.md (the kit's shared block and its markers), and
+ * Cursor also every installed `.mdc` rule marked `alwaysApply: true`. The Cursor figure rose
+ * from 6316 when Cursor took the shared block in place of a shorter text of its own.
  */
-const ALWAYS_ON_CEILING = { '.claude': 18191, 'installed:codex': 7734, 'installed:cursor': 6316 };
+const ALWAYS_ON_CEILING = { '.claude': 18191, 'installed:codex': 7687, 'installed:cursor': 10641 };
+/** Codex stops reading project guidance past this many bytes (`project_doc_max_bytes`). */
+const AGENTS_MD_CAP = 32768;
 /** Skill listing ceilings in chars; Codex is lower so a 128k-context session keeps whole descriptions. */
 const LISTING_CEILING = { '.claude': 16000, 'installed:codex': 12000, 'installed:cursor': 16000 };
 
@@ -142,6 +145,10 @@ function check(tree) {
   const ceiling = ALWAYS_ON_CEILING[tree];
   if (ceiling !== undefined && alwaysOn > ceiling) {
     findings.push({ file: tree, line: 0, criterion: 'A8', text: `always-on text is ${alwaysOn} B, above the ${ceiling} B ceiling` });
+  }
+  const agentsMd = path.join(dirOf(tree), 'AGENTS.md');
+  if (kindOf(tree) !== 'claude' && fs.existsSync(agentsMd) && fs.statSync(agentsMd).size > AGENTS_MD_CAP) {
+    findings.push({ file: tree, line: 0, criterion: 'A8', text: `AGENTS.md is ${fs.statSync(agentsMd).size} B, above the ${AGENTS_MD_CAP} B a runtime reads` });
   }
   const listed = listingTotal(tree);
   if (LISTING_CEILING[tree] !== undefined && listed > LISTING_CEILING[tree]) {
