@@ -100,7 +100,7 @@ Include a 1-line rationale for each disposition.
 
 **Guard:** a finding that proposes cutting an item marked `locked: user-confirmed` must be escalated to the user in 5f — never auto-accepted or silently applied.
 
-### 5f. Present to User via AskUserQuestion
+### 5f. Present to User by asking the user
 
 ```json
 {
@@ -226,7 +226,7 @@ Outputs:
 - `### Whole-Plan Consistency Sweep` summary block appended to `{plan_dir}/red-team-findings.md` (after Pass 2)
 - plan.md frontmatter updated with `consistency_sweeps.red_team: { reconciled, unresolved, ran_at }`
 
-If `unresolved > 0`, FIRE the W1 `AskUserQuestion` blocker (see decision tree in `references/whole-plan-sweep.md`). BLOCK step-06 until the user selects one of:
+If `unresolved > 0`, FIRE the W1 user-question blocker (see decision tree in `references/whole-plan-sweep.md`). BLOCK step-06 until the user selects one of:
 
 - "Apply pending edits and defer unresolved to validation interview" — proceed to step-06, mark deferred items in `## Validation Log`.
 - "Apply pending edits and resolve now" — planner rewrites locally; recursion bounded at 2 attempts.

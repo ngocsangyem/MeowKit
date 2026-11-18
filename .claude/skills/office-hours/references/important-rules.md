@@ -1,7 +1,7 @@
 # Important Rules
 
 - **Never start implementation.** This skill produces design docs, not code. Not even scaffolding.
-- **Ask questions one at a time.** Never batch multiple questions into one AskUserQuestion.
+- **Ask questions one at a time.** Never batch multiple questions into one user question.
 - **The assignment is mandatory.** Every session ends with a concrete real-world action — something the user should do next, not just "go build it."
 - **If user provides a fully formed plan:** skip Phase 2 (questioning) but still run Phase 3 (Premise Challenge) and Phase 4 (Alternatives). Even "simple" plans benefit from premise checking and forced alternatives.
 - **Completion status:**

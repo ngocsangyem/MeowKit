@@ -66,7 +66,7 @@ Spawn **all agents in a single message** for parallel execution:
 
 ```
 For each segment, spawn:
-  subagent_type: "Explore"
+  a read-only search subagent
   prompt: |
     Scout {DIRECTORIES} for files related to: {SEARCH_TARGET}
 

@@ -98,7 +98,7 @@ If `docs/design-guidelines.md` doesn't exist:
 
 If design requirements unclear:
 
-- Ask via AskUserQuestion — one question at a time
+- Ask the user — one question at a time
 - Key questions: target audience, style direction (minimal/bold/playful), existing brand colors, reference sites
 
 If `mk:multimodal` not available (no image generation):

@@ -16,7 +16,7 @@ grep -li "<keyword1>\|<keyword2>\|<keyword3>" tasks/plans/*/*-design-*.md 2>/dev
 
 If matches found, read the matching design docs and surface them:
 - "FYI: Related design found — '{title}' by {user} on {date} (branch: {branch}). Key overlap: {1-line summary of relevant section}."
-- Ask via AskUserQuestion: "Should we build on this prior design or start fresh?"
+- Ask by asking the user: "Should we build on this prior design or start fresh?"
 
 This enables cross-team discovery — multiple users exploring the same project will see each other's design docs in `tasks/plans/<slug>/`.
 
@@ -30,7 +30,7 @@ Read ETHOS.md for the full Search Before Building framework (three layers, eurek
 
 After understanding the problem through questioning, search for what the world thinks. This is NOT competitive research (that's /design-consultation's job). This is understanding conventional wisdom so you can evaluate where it's wrong.
 
-**Privacy gate:** Before searching, use AskUserQuestion: "I'd like to search for what the world thinks about this space to inform our discussion. This sends generalized category terms (not your specific idea) to a search provider. OK to proceed?"
+**Privacy gate:** Before searching, ask the user: "I'd like to search for what the world thinks about this space to inform our discussion. This sends generalized category terms (not your specific idea) to a search provider. OK to proceed?"
 Options: A) Yes, search away  B) Skip — keep this session private
 If B: skip this phase entirely and proceed to Phase 3. Use only in-distribution knowledge.
 
@@ -79,13 +79,13 @@ PREMISES:
 3. [statement] — agree/disagree?
 ```
 
-Use AskUserQuestion to confirm. If the user disagrees with a premise, revise understanding and loop back.
+Ask the user to confirm. If the user disagrees with a premise, revise understanding and loop back.
 
 ---
 
 # Phase 3.5: Adversarial Second Opinion (optional)
 
-Use AskUserQuestion:
+Ask the user:
 
 > Want a second opinion? A Claude adversarial subagent will independently review your problem statement, key answers, premises, and any landscape findings from this session. It hasn't seen this conversation — it gets a structured summary. Takes 1-2 minutes.
 > A) Yes, get a second opinion
@@ -125,7 +125,7 @@ SECOND OPINION (Claude subagent):
    - Where they disagree and why
    - Whether the subagent's challenged premise changes the recommendation
 
-5. **Premise revision check:** If the subagent challenged an agreed premise, use AskUserQuestion:
+5. **Premise revision check:** If the subagent challenged an agreed premise, ask the user:
 
 > The second opinion challenged premise #{N}: "{premise text}". Their argument: "{reasoning}".
 > A) Revise this premise based on the feedback

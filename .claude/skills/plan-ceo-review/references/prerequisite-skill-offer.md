@@ -5,7 +5,7 @@
 When the design doc check above prints "No design doc found," offer the prerequisite
 skill before proceeding.
 
-Say to the user via AskUserQuestion:
+Say to the user by asking the user:
 
 > "No design doc found for this branch. `/mk:office-hours` produces a structured problem
 > statement, premise challenge, and explored alternatives — it gives this review much
@@ -29,7 +29,7 @@ Read the office-hours skill file from disk using the Read tool:
 
 Follow it inline, **skipping these sections** (already handled by the parent skill):
 - Preamble (run first)
-- AskUserQuestion Format
+- User question format
 - Completeness Principle — Boil the Lake
 - Search Before Building
 - Completion Status Protocol
@@ -67,7 +67,7 @@ If they choose A: Read the office-hours skill file from disk:
 `.claude/skills/office-hours/SKILL.md`
 
 Follow it inline, skipping these sections (already handled by parent skill):
-Preamble, AskUserQuestion Format, Completeness Principle, Search Before Building,
+Preamble, user question format, Completeness Principle, Search Before Building,
 Completion Status Protocol, Telemetry.
 
 Note current Step 0A progress so you don't re-ask questions already answered.

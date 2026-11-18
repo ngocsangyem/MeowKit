@@ -34,7 +34,7 @@ DoR PROJ-123:  ✓ AC  ✗ estimate  ⚠ evaluator 22d old  ✓ no blockers
 
 **Triggers:** review verdict written PASS/WARN.
 
-Three opt-in actions via AskUserQuestion. Every step Jira-offline-safe:
+Three opt-in actions, each asked of the user. Every step Jira-offline-safe:
 
 1. **Verdict→Jira comment.** "Post verdict to PROJ-123? [Y/n/edit]" → `mk:jira-collaborate add comment` (Summary + Risks). Set `posted_to_jira: true`. Offline → `deferred`, never block
 2. **Status transition.** "Transition PROJ-123 to Done? [Y/n/skip]" → `mk:jira-lifecycle transition`. Offline → `transitioned_to_done: deferred`

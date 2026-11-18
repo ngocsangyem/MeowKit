@@ -76,7 +76,7 @@ Step 2: Partition       → split by run_id into batches (max 3)
 Step 3: Scatter         → spawn 3 researcher subagents in parallel
 Step 4: Gather          → main agent synthesizes cross-batch patterns
 Step 5: Suggestions     → emit structured fix proposals
-Step 6: HITL Gate       → AskUserQuestion per suggestion → write approved items to plan
+Step 6: HITL Gate       → ask the user per suggestion → write approved items to plan
 ```
 
 ## Output
@@ -107,7 +107,7 @@ All under `plans/{date}-trace-analysis/` (created by step-01):
 | `step-03-scatter-analysis.md` | Spawn 3 parallel researcher subagents |
 | `step-04-gather-synthesis.md` | Main agent synthesizes cross-batch patterns |
 | `step-05-suggestions.md` | Emit structured fix proposals from error-taxonomy |
-| `step-06-hitl-gate.md` | AskUserQuestion per suggestion |
+| `step-06-hitl-gate.md` | Ask the user per suggestion |
 | `references/trace-schema.md` | JSONL record schema spec |
 | `references/error-taxonomy.md` | Catalog of known failure patterns |
 | `../../../memory/trace-log.jsonl` | Append-only trace store |

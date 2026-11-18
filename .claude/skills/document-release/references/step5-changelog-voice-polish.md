@@ -13,7 +13,7 @@ preserved them. This skill must NEVER do that.
 3. Never regenerate a CHANGELOG entry from scratch. The entry was written by `/mk:ship` from the
    actual diff and commit history. It is the source of truth. You are polishing prose, not
    rewriting history.
-4. If an entry looks wrong or incomplete, use AskUserQuestion — do NOT silently fix it.
+4. If an entry looks wrong or incomplete, ask the user — do NOT silently fix it.
 5. Use Edit tool with exact `old_string` matches — never use Write to overwrite CHANGELOG.md.
 
 **If CHANGELOG was not modified in this branch:** skip this step.
@@ -26,4 +26,4 @@ preserved them. This skill must NEVER do that.
 - "You can now..." not "Refactored the..."
 - Flag and rewrite any entry that reads like a commit message.
 - Internal/contributor changes belong in a separate "### For contributors" subsection.
-- Auto-fix minor voice adjustments. Use AskUserQuestion if a rewrite would alter meaning.
+- Auto-fix minor voice adjustments. Ask the user if a rewrite would alter meaning.

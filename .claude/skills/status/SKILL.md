@@ -59,7 +59,7 @@ not `completed`, `cancelled` or `archived`:
 - **0 results** → print `No active plan. Run mk:plan-creator to create one.` and stop. Write no
   file: a status report about no plan is a file that says nothing.
 - **1 result** → use it.
-- **2+ results** → ask with `AskUserQuestion`, header "Active plan", question "Which plan should
+- **2+ results** → ask the user, header "Active plan", question "Which plan should
   I report on?", one option per plan labelled with its title and created date. Never pick the
   most recent one silently — an unrelated plan's report reads as this plan's status.
 

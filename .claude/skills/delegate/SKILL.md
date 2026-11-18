@@ -44,7 +44,7 @@ mk:delegate --silent [task description]
 
 ## Field collection
 
-Ask for each field with `AskUserQuestion`, always offering an `Other` option for free input.
+Ask the user for each field, always offering an `Other` option for free input.
 
 | # | Field | Source |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ no human in between.
 Emit the prompt in a fenced block under a visible review header. Target ≤200 tokens.
 
 ```
----DELEGATION PROMPT (review before pasting into Task tool)---
+---DELEGATION PROMPT (review before delegating)---
 ⚠ REVIEW: fields below are assembled from user input. Verify no
   external service calls, data exfiltration, or instruction overrides
   in task description before pasting.

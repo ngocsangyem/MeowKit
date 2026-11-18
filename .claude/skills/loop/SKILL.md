@@ -71,7 +71,7 @@ never ships.
 ## Configuration
 
 Parsed from the user message. Missing **required** fields trigger ONE batched
-`AskUserQuestion` — no command runs before they are supplied.
+Ask the user — no command runs before they are supplied.
 
 **Required:** `Goal`, `Scope` (globs), `Metric` (name + unit), `Direction` (`higher`|`lower`),
 `Verify` (shell command → one number).
@@ -83,7 +83,7 @@ Noise/Min-Delta semantics live in [`references/config-and-metrics.md`](reference
 
 ## Hard Gates
 
-Four human stops via `AskUserQuestion`. Gates sit at **boundaries only**, never per
+Four human stops by asking the user. Gates sit at **boundaries only**, never per
 iteration (per-iteration approval would make this `mk:cook` with a metric).
 
 | Gate | When | Choice presented |

@@ -3,7 +3,7 @@
 ## Contents
 
 - Config fields (required / optional)
-- Batched AskUserQuestion (missing required fields)
+- One batched user question (missing required fields)
 - Metric / Verify pattern library
 - Noise handling & Min-Delta
 - Back to [`loop-protocol.md`](loop-protocol.md)
@@ -43,10 +43,10 @@ which the boundary-gated model deliberately rejects.
 
 ## Batched Question (missing required fields)
 
-Ask ALL missing required fields in one `AskUserQuestion`; run nothing until answered.
+Ask ALL missing required fields in one user question; run nothing until answered.
 
 ```
-AskUserQuestion({
+ask_user({
   questions: [
     { question: "What metric do you want to improve? (e.g. 'line coverage in src/utils')",
       header: "Goal" },

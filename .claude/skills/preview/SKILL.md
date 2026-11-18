@@ -47,7 +47,7 @@ No live server. No Python. Pure markdown + HTML + bash file operations. Output w
 
 ## Default (No Arguments)
 
-If invoked with no arguments, present available operations via `AskUserQuestion`. Header: "Preview Operation". Question: "What would you like to do?".
+If invoked with no arguments, present available operations by asking the user. Header: "Preview Operation". Question: "What would you like to do?".
 
 | Operation              | Description                                           |
 | ---------------------- | ----------------------------------------------------- |
@@ -90,7 +90,7 @@ Priority order:
 1. `--html` flag detected → set HTML output mode
 2. Generation flag detected (`--explain`, `--diagram`, `--slides`, `--ascii`) → load `references/generation-modes.md`
 3. HTML-only flag (`--diff`) → implies `--html`; load `references/analytical-modes.md`
-4. Topic missing → ask user via `AskUserQuestion`
+4. Topic missing → ask user by asking the user
 5. Topic present → continue
 
 **Topic-to-slug:**

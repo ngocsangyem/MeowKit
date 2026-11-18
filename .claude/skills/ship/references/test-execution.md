@@ -58,7 +58,7 @@ Check `REPO_MODE` from the preamble output.
 
 **If REPO_MODE is `solo`:**
 
-Use AskUserQuestion:
+Ask the user:
 
 > These test failures appear pre-existing (not caused by your branch changes):
 >
@@ -73,7 +73,7 @@ Use AskUserQuestion:
 
 **If REPO_MODE is `collaborative` or `unknown`:**
 
-Use AskUserQuestion:
+Ask the user:
 
 > These test failures appear pre-existing (not caused by your branch changes):
 >

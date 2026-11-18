@@ -113,7 +113,7 @@ Constraints that apply when the inner harness's behavior is unknown or differs f
 
 - Do NOT assume rule files are auto-loaded into subagent context. If the inner harness has a small auto-injection cap (e.g. a 32 KB `AGENTS.md`), delegated prompts must stay lean.
 - Pass required rules content EXPLICITLY in the Task prompt if the inner harness will not inject it.
-- Use `mk:delegate --silent` when interactive prompts via `AskUserQuestion` are not supported by the inner harness — the silent path emits the template without the wizard.
+- Use `mk:delegate --silent` when the inner harness cannot ask the user interactively — the silent path emits the template without the wizard.
 
 ## Rejected Patterns
 

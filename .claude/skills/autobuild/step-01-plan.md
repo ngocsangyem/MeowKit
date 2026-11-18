@@ -14,11 +14,11 @@ Invoke `mk:plan-creator` in product-level mode (Phase 1 of the autobuild workflo
 
 ### 1b. Invoke the planner
 
-Use the Agent tool to dispatch the `planner` agent (canonical subagent_type per `rules/`). The planner runs `mk:plan-creator` internally.
+Delegate to the `planner` agent. The planner runs `mk:plan-creator` internally.
 
 ```
 Agent(
-  subagent_type="planner",
+  agent="planner",
   description="Product-level spec for $task_description",
   prompt="
     Use mk:plan-creator with --product-level mode.

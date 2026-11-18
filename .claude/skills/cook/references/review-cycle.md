@@ -25,7 +25,7 @@ LOOP:
      Warnings ([N]): SHOULD FIX — [list with file:line]
      Suggestions ([N]): NICE TO HAVE — [list]
 
-  3. AskUserQuestion (header: "Review"):
+  3. Ask the user (header: "Review"):
      IF critical_count > 0:
        - "Fix critical issues" → fix, re-run tester, cycle++, LOOP
        - "Fix all issues" → fix all, re-run tester, cycle++, LOOP
@@ -38,7 +38,7 @@ LOOP:
 
   4. IF cycle >= 3 AND user selects fix:
      → "3 review cycles completed. Final decision required."
-     → AskUserQuestion: "Continue with noted issues" / "Abort workflow"
+     → ask the user: "Continue with noted issues" / "Abort workflow"
 ```
 
 ## Auto-Handling Cycle
@@ -75,7 +75,7 @@ does not enter this cycle as one. It fires BEFORE the reviewer is spawned:
    whoever owns that artifact. Never to Athena, which cannot edit anything.
 2. The owner addresses each correction or records why it is rejected.
 3. Supersede the stale evidence and re-run the normal checks
-   (`workflow-steps.md` → Advice Checkpoints). Phase 3.6 Verify runs again before the
+   (`advice-checkpoints.md`). Phase 3.6 Verify runs again before the
    reviewer, because its previous output describes code that no longer exists.
 4. RECHECK once. A second unresolved return escalates to a human — there is no third
    opinion, and the reviewer's own verdict is what Phase 4 produces either way.

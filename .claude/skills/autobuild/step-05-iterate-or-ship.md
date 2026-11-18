@@ -12,7 +12,7 @@ Branch on the verdict from step-04. PASS → ship. WARN/FAIL with iterations rem
 | `WARN` | yes | yes | Loop to step-03 with feedback |
 | `WARN` | no | — | Ask the user about shipping (5c) with every WARN itemized. On yes: route to shipper, set `final_status=WARN`, go to step-06. On no: no ship |
 | `FAIL` | yes | yes | Loop to step-03 with feedback |
-| `FAIL` | no | — | `final_status=ESCALATED`, go to step-06 + escalate via AskUserQuestion (5e) |
+| `FAIL` | no | — | `final_status=ESCALATED`, go to step-06 + escalate by asking the user (5e) |
 | any | — | NO (budget breach) | `final_status=TIMED_OUT`, go to step-06 — no ship, no question |
 
 Both ship-capable rows (`PASS`, `WARN`-at-cap) route through the SAME ship question in 5c.
@@ -73,7 +73,7 @@ because the verdict put in front of the user must describe the code that exists.
 correct next step. Athena's read is a second piece of evidence beside the evaluator's verdict;
 it is not a decision.
 
-**First, ask via AskUserQuestion. Do not dispatch the shipper before the user answers.**
+**First, ask the user. Do not dispatch the shipper before the user answers.**
 
 Surface the verdict and its evidence so the user decides on what the evaluator actually
 found — not on the fact that it returned a grade.
@@ -87,7 +87,7 @@ awk '/^## Warnings/,/^## [^W]/' "$verdict_path" | sed '/^## /d;/^$/d' > "$run_di
 ```
 
 ```
-AskUserQuestion(
+ask_user(
   question: "Autobuild finished $slug with a {PASS | WARN-at-cap} verdict after $iteration iteration(s).
              Verdict: tasks/reviews/{slug}-evalverdict.md · Evidence: $run_dir/evidence/
              {if ship_with_warnings: 'Unresolved WARNs you would be accepting:' + contents of $run_dir/warns-iter-${iteration}.md}
@@ -115,7 +115,7 @@ what was accepted:
 
 ```
 Agent(
-  subagent_type="shipper",
+  agent="shipper",
   description="Ship $slug after the user chose to ship",
   prompt="
     Read tasks/reviews/{slug}-evalverdict.md for the passing verdict.
@@ -161,7 +161,7 @@ the correction re-enters step-03 and consumes an `--max-iter` round like any oth
 
 ### 5e. Action: escalate (verdict was FAIL at iteration cap)
 
-When `next_action == escalate`, first surface current delivery state to the user (foreground), then present a 3-option choice via AskUserQuestion.
+When `next_action == escalate`, first surface current delivery state to the user (foreground), then present a 3-option choice by asking the user.
 
 This escalation fires on its own schedule. A `--advice` rescue earlier in the loop
 neither delays it nor substitutes for it, and Athena is not consulted here — the
@@ -178,10 +178,10 @@ Load template from .claude/skills/status/assets/pm-status-template.md."
 
 Wait for PM to return the report path, then include the headline in the escalation question so the user sees current state before deciding. Skip the PM call entirely when `MEOWKIT_PM_AUTO=off`.
 
-Then present via AskUserQuestion BEFORE proceeding to step-06:
+Then present by asking the user BEFORE proceeding to step-06:
 
 ```
-AskUserQuestion(
+ask_user(
   question: "Autobuild reached max iterations ($max_iter) with FAIL verdict on $slug. How do you want to proceed?",
   options: [
     { label: "Continue with one more iteration", description: "Increase max_iter by 1 and re-enter step-03" },

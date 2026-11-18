@@ -33,7 +33,7 @@ Rules:
 
 **RECOMMENDATION:** Choose [X] because [one-line reason].
 
-Present via AskUserQuestion. Wait for the user to approve an approach before going on.
+Present by asking the user. Wait for the user to approve an approach before going on.
 
 ---
 
@@ -97,7 +97,7 @@ The screenshot file at `/tmp/workflow-sketch.png` can be referenced by downstrea
 
 **Step 6: Outside design voices** (optional)
 
-After the wireframe is approved, offer outside design perspectives via AskUserQuestion:
+After the wireframe is approved, offer outside design perspectives by asking the user:
 
 > "Want outside design perspectives on the chosen approach? Two Claude subagents with fresh context can propose alternative visual theses and design directions."
 >

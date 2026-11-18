@@ -51,7 +51,7 @@ List flagged items with file locations. Present:
 >
 > Run `/mk:plan-creator` to amend, or proceed with known gaps."
 
-AskUserQuestion: "Plan has [N] unfinished sections. How to proceed?"
+Ask the user: "Plan has [N] unfinished sections. How to proceed?"
 - **"Amend first"** → stop review, user returns to plan-creator
 - **"Proceed with gaps"** → continue to Layer 1, note gaps in final verdict
 
@@ -75,7 +75,7 @@ Check plan has required sections per plan-creator template:
 
 ### If Section Missing
 
-AskUserQuestion: "Plan is missing: [section list]. How to proceed?"
+Ask the user: "Plan is missing: [section list]. How to proceed?"
 - **"Amend (return to plan-creator)"** → stop review
 - **"Proceed anyway"** → continue, note gaps in final verdict
 
@@ -86,7 +86,7 @@ AskUserQuestion: "Plan is missing: [section list]. How to proceed?"
 Read requirements from problem statement. Read tasks from plan phases. Check each requirement maps to ≥1 task. Report as table:
 
 ```markdown
-| Requirement | Mapped Task(s) | Status |
+| Requirement | Mapped delegate a subagent (s) | Status |
 |-------------|---------------|--------|
 | User can reset password | Phase 2, Step 3 | ✅ COVERED |
 | Email notification sent | — | ❌ GAP |
@@ -95,7 +95,7 @@ Read requirements from problem statement. Read tasks from plan phases. Check eac
 
 ### If Gaps Found
 
-Present coverage table to user. AskUserQuestion: "[N] requirements have no mapped tasks. How to proceed?"
+Present coverage table to user. Ask the user: "[N] requirements have no mapped tasks. How to proceed?"
 - **"Amend plan"** → stop review
 - **"Accept gaps"** → continue, note in final verdict
 

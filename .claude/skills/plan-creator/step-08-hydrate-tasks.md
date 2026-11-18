@@ -10,12 +10,12 @@ Skip task hydration if:
 - Less than 3 phases (overhead exceeds benefit)
 - Task tools unavailable (GUI editor extensions) — plan files are the source of truth
 
-Skipping hydration skips only the TaskCreate calls (8b/8c). The §8d checkpoint
+Skipping hydration skips only the task-creation steps (8b/8c). The §8d checkpoint
 (`.plan-state.json`) still runs regardless.
 
 ### 8b. Create Tasks from Phases
 
-For each phase in plan.md, create one TaskCreate. For the metadata schema (5 required fields), see `references/task-management.md` "Hydration Pattern Details > Metadata Template" — single source of truth.
+For each phase in plan.md, create one tracked task. For the metadata schema (5 required fields), see `references/task-management.md` "Hydration Pattern Details > Metadata Template" — single source of truth.
 
 ### 8c. Set Dependencies + Critical-Step Tasks
 
@@ -100,7 +100,7 @@ Run the three checks defined in `references/task-management.md` "Post-Hydration 
 
 1. Cycle check — walk `addBlockedBy` chains; assert no node reaches itself
 2. Count-match check — sum of unchecked `[ ]` across all `phase-XX-*.md` files MUST equal session tasks created (phase tasks + critical-step sub-tasks)
-3. Metadata-completeness check — every `TaskCreate` call carries all 5 required fields (`phase`, `priority`, `effort`, `planDir`, `phaseFile`)
+3. Metadata-completeness check — every created task carries all 5 required fields (`phase`, `priority`, `effort`, `planDir`, `phaseFile`)
 
 **All-pass** → continue to Output and emit the success-log line.
 

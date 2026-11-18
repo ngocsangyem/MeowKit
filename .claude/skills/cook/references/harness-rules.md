@@ -33,7 +33,7 @@ Per the adaptive density policy (`.claude/skills/autobuild/references/adaptive-d
 
 ## Rule 4: Iteration Cap = 3 Rounds Before Escalation
 
-The harness iteration loop (generator ⇄ evaluator) is capped at 3 rounds by default (configurable via `--max-iter`). After round 3, the harness escalates to a human via `AskUserQuestion`.
+The harness iteration loop (generator ⇄ evaluator) is capped at 3 rounds by default (configurable via `--max-iter`). After round 3, the harness escalates to a human by asking the user.
 
 **WHY:** Non-convergence after 3 rounds usually needs human judgment, not more budget.
 

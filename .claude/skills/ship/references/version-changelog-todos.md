@@ -61,7 +61,7 @@ Format: items under `## <Skill/Component>` headings, each with a `**Priority:**`
 
 **1. Check if TODOS.md exists** in the repository root.
 
-**If TODOS.md does not exist:** Use AskUserQuestion:
+**If TODOS.md does not exist:** Ask the user:
 
 - Message: "This workflow recommends maintaining a TODOS.md organized by skill/component, then priority (P0 at top through P4, then Completed at bottom). Would you like to create one?"
 - Options: A) Create it now, B) Skip for now
@@ -76,7 +76,7 @@ Read TODOS.md and verify it follows the recommended structure:
 - Each item has `**Priority:**` field with P0-P4 value
 - A `## Completed` section at the bottom
 
-**If disorganized** (missing priority fields, no component groupings, no Completed section): Use AskUserQuestion:
+**If disorganized** (missing priority fields, no component groupings, no Completed section): Ask the user:
 
 - Message: "TODOS.md doesn't follow the recommended structure (skill/component groupings, P0-P4 priority, Completed section). Would you like to reorganize it?"
 - Options: A) Reorganize now (recommended), B) Leave as-is

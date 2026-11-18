@@ -9,7 +9,7 @@ If yes: `git init && git add -A && git commit -m "chore: initial commit"`
 
 ## Step 1: Clarify Requirements
 
-Ask questions via AskUserQuestion — **one question at a time**, wait for answer before next.
+Ask questions by asking the user — **one question at a time**, wait for answer before next.
 Continue until 100% clear on: what the project does, who uses it, key features, constraints.
 
 **After clarity: proceed IMMEDIATELY to Step 2. Do NOT stop.**

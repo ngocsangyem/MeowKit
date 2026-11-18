@@ -24,7 +24,7 @@ trust_level: HIGH
 **Triggers:** `mk:jira-agile sprint add KEY` or `sprint remove KEY` AFTER sprint started (status: `active`).
 
 - **Harness FULL:** `mk:sprint-contract amend` — generator+evaluator both re-sign. Existing canonical ceremony, no change
-- **Non-harness LEAN/MINIMAL:** Append to sprint-state `amendments:`. AskUserQuestion: "Reason for mid-sprint scope change?" — required free-text. Append IS the commitment
+- **Non-harness LEAN/MINIMAL:** Append to sprint-state `amendments:`. Ask the user: "Reason for mid-sprint scope change?" — required free-text. Append IS the commitment
 
 **Concurrent-write safety:** consuming skill MUST `flock` the sprint-state file before any read-modify-write. YAML append is non-atomic across shells.
 

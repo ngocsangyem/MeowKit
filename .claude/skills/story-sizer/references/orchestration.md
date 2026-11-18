@@ -9,7 +9,7 @@ How `mk:story-sizer` wires the paste adapter, scorer, and writer into a single d
 
 1. Parse args at the skill orchestration layer.
 2. Resolve scout context per "Scout extraction" below.
-3. AskUserQuestion (or read stdin) for the paste body.
+3. Ask the user (or read stdin) for the paste body.
 4. Run scripts/parse-paste-stories.py < paste-body → {records, source_hash, errors}.
 5. Pre-flight validation:
    - All records flagged [NO_ACS] → ABORT with usage hint.
@@ -70,7 +70,7 @@ Auto-create mode (`--auto-create --project <KEY>`) extends this flow with:
 
 1. Pre-flight checks per `references/auto-create-gating.md`.
 2. Dry-run table render.
-3. Single batch-level `AskUserQuestion` gate.
+3. Single batch-level user question.
 4. Per-ticket two-call sequence per `references/auto-create-execution.md`.
 
 See those files for the safety design — none of it lives in this orchestration doc to keep default-mode reasoning narrow.

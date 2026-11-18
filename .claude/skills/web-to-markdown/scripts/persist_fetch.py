@@ -176,7 +176,7 @@ def _atomic_write(dest: Path, content_bytes: bytes) -> None:
 # Layer 8: post-write re-scan through the audit scanner
 # ---------------------------------------------------------------------------
 
-AUDIT_CLI = PROJECT_ROOT / ".claude" / "hooks" / "lib" / "injection-audit.cjs"
+AUDIT_CLI = PROJECT_ROOT / ".claude/hooks/lib/injection-audit.cjs"
 
 
 class _Finding:

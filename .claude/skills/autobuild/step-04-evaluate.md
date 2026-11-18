@@ -32,7 +32,7 @@ Use the same preset that the contract was bound to (from step-02). If the contra
 
 ```
 Agent(
-  subagent_type="evaluator",
+  agent="evaluator",
   description="Evaluate iteration $iteration of $slug",
   prompt="
     Read your agent constitution at .claude/agents/evaluator.md.

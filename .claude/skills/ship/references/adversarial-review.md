@@ -50,7 +50,7 @@ Claude's structured review already ran in Step 3.5. Now run the Claude adversari
 
 **Claude adversarial subagent:** Dispatch a subagent with the adversarial prompt (same prompt as medium tier). Findings are classified FIXABLE / INVESTIGATE per the medium-tier flow.
 
-If the Claude structured review flagged any `[P1]` findings, use AskUserQuestion:
+If the Codex structured review flagged any `[P1]` findings, ask the user:
 
 ```
 Claude review found N critical issues in the diff.

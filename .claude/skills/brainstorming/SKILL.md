@@ -56,11 +56,6 @@ Use at least two alternatives. Quick returns 2-4; deep generates 3-8 and never m
 
 ## Deep Workflow
 
-**`--advice` (optional, deep only):** when the flag is present, GUIDE fires after
-step 1's frame and REVIEW after step 4's challenge pass, capped at 4 calls per run.
-Athena supplies decision criteria and reads the chosen direction; it never generates
-the option set, chooses for the user, or adds a gate. Without the flag there are zero
-calls and no state. See `references/advice-checkpoints.md`.
 
 1. Confirm the decision, binding constraint, success criterion, and excluded scope. Ask at most three focused questions when needed.
 2. If 3+ independently shippable concerns are bundled, ask to choose one. Use a compact scout summary only when current codebase touchpoints change the decision.
@@ -68,10 +63,24 @@ calls and no state. See `references/advice-checkpoints.md`.
 4. Run one anti-bias pivot, then the challenge pass in `references/challenge-pass.md` before recommending.
 5. Load scoring only for deep scoring. Write a report, HTML output, or handoff only when requested or needed by an active plan.
 
+## `--advice` (composable, off by default)
+
+Opt-in strategic supervision for one run, **deep workflow only**. GUIDE fires after the
+frame and before generation, REVIEW after the challenge pass and before the
+recommendation reaches the user; hard cap 4.
+
+Athena supplies decision criteria and reads the chosen direction. It never generates the
+option set, scores it, chooses for the user, or adds a gate.
+
+Without the flag there are zero calls and no state is written.
+
+Checkpoints: `references/advice-checkpoints.md`. Contract: `.claude/skills/advise/references/advice-supervision-rules.md` (load only when the
+flag is present).
+
 ## References
 
 - `references/context-budget.md` — deep clarification, count, pivot, and challenge limits
 - `references/techniques/` — choose one technique for a deep run
 - `references/challenge-pass.md` and `references/scoring-criteria.md` — deep convergence only
 - `references/editorial-html.md` — HTML only for a requested report
-- `references/advice-checkpoints.md` — deep `--advice` checkpoints; load only when the flag is present
+- `references/advice-checkpoints.md` — `--advice` checkpoint boundaries, caps, and what supervision may not touch

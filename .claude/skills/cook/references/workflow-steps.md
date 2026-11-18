@@ -21,12 +21,11 @@ All modes share these phases with mode-specific variations.
   - [--strict [HEAVY]: Full Evaluator (mk:evaluate)](#strict-heavy-full-evaluator-meowevaluate)
 - [Phase 5: Ship (explicit request only)](#phase-5-ship-explicit-request-only)
 - [Phase 6: Reflect (on explicit close request)](#phase-6-reflect-on-explicit-close-request)
-- [Advice Checkpoints (`--advice` only)](#advice-checkpoints---advice-only)
 - [Workflow Evidence Index (traceability only)](#workflow-evidence-index-traceability-only)
 - [Mode Flow Summary](#mode-flow-summary)
 - [Validation](#validation)
 
-**Task Tool Fallback:** `TaskCreate`/`TaskUpdate`/`TaskGet`/`TaskList` are CLI-only — unavailable in GUI editor extensions. If they error, use `TodoWrite` for progress tracking. Plan files remain source of truth.
+**Task Tracking Fallback:** tracked-task creation/update/list may be CLI-only — unavailable in some GUI editor extensions. If unavailable, use a plain to-do list for progress tracking. Plan files remain source of truth.
 
 ## Phase 0: Orient
 
@@ -38,11 +37,11 @@ All modes share these phases with mode-specific variations.
    - Rename/typo/format → TRIVIAL
 3. If mode=code: load plan path, parse phases
 4. **Autonomy Boundaries (advisory):** if the loaded plan.md has an `## Autonomy Boundaries` block (long-horizon plans only), read it once for the whole run and comply **mode-aware**:
-   - Interactive / `code` mode: an "Ask first" item → raise an immediate `AskUserQuestion` when that decision arises; "Always" items proceed without asking.
+   - Interactive / `code` mode: an "Ask first" item → raise an immediate user question when that decision arises; "Always" items proceed without asking.
    - Autonomous (`auto` / autobuild): an "Ask first" item → **defer** — skip the action, log the deferred decision to the plan.md Agent State, proceed with the safe default; deferred decisions surface at the next existing touchpoint (the review verdict / autobuild run-report). NEVER raise an ad-hoc blocking prompt mid-autonomous-run.
    - Block **absent** (short plans — the common case): default to "proceed on reversible in-scope changes; the ship check still runs." Do NOT error, do NOT over-ask.
    - This block is advisory and never relaxes a security rule; its "Never" tier only points at them.
-6. `TaskCreate` for each workflow phase (with `addBlockedBy` chain)
+6. Create a tracked task for each workflow phase, with each phase blocked-by its predecessor
 
 **Output:** `Phase 0: Orient — Mode [X], Tier [Y], [N] prior learnings loaded`
 
@@ -88,7 +87,7 @@ first — it reports which required sections are missing. A failing check means 
 not finished; fill the gaps rather than building from it. Nothing blocks the edit either
 way, so the check is information, not a stop.
 
-Then present the plan summary and ask the user with `AskUserQuestion` (header: "Plan"):
+Then present the plan summary and ask the user (header: "Plan"):
 
 - "Looks right" → continue to Phase 2
 - "Revise plan" → revise based on feedback, re-present
@@ -113,7 +112,7 @@ Write failing tests BEFORE implementation. TDD enforcement per `references/tdd-r
 1. Read plan's acceptance criteria and success criteria
 2. Spawn `tester` subagent via `mk:testing`:
    ```
-   Agent(subagent_type="tester", prompt="Write failing tests for [plan-path] acceptance criteria. Tests must RUN (no syntax errors) and FAIL (not pass). Use mk:testing red-green-refactor reference.", description="Write failing tests")
+   delegate a subagent (agent="tester", prompt="Write failing tests for [plan-path] acceptance criteria. Tests must RUN (no syntax errors) and FAIL (not pass). Use mk:testing red-green-refactor reference.", description="Write failing tests")
    ```
 3. Verify: tests run AND fail (compilation errors do NOT count as failing tests)
 4. If tests accidentally pass → wrong tests, rewrite
@@ -141,18 +140,18 @@ When ON, confirm at the start of this phase that the Phase 2 tests exist and fai
 writing implementation code; if they already pass, they do not describe the change — go
 back to Phase 2. When OFF (default), start implementing from the plan.
 
-Note: this is a once-per-phase check, not a per-file one.
+Note: this is a phase-start check, not a per-file-write one.
 
-1. **TaskList first** — check for existing tasks (may be hydrated by planning skill)
-2. If tasks exist → pick them up. If not → `TaskCreate` from plan phases with priority + metadata
-3. `TaskUpdate` → mark tasks `in_progress` immediately when starting
+1. **List existing tasks first** — check for tasks already hydrated by the planning skill
+2. If tasks exist → pick them up. If not → create a tracked task per plan phase with priority + metadata
+3. Update each task's status to `in_progress` immediately when starting
 4. Execute phase tasks sequentially (or parallel in parallel mode)
 5. Run type checking after each file modification
 6. If tests fail after implementation:
    - Self-heal up to 3 attempts (each attempt tries a DIFFERENT approach)
    - After 3 failures → spawn `researcher` subagent via `mk:investigate`:
      ```
-     Agent(subagent_type="researcher", prompt="Analyze test failures using mk:investigate + mk:sequential-thinking: [output]. Root cause analysis.", description="Debug test failures")
+     delegate a subagent (agent="researcher", prompt="Analyze test failures using mk:investigate + mk:sequential-thinking: [output]. Root cause analysis.", description="Debug test failures")
      ```
    - After analysis report → fix and retry
    - After 3 more failures → STOP, escalate to user with: failing output, attempted fixes, suspected root cause
@@ -161,7 +160,7 @@ Note: this is a once-per-phase check, not a per-file one.
 
 - Spawn multiple `developer` agents with file ownership boundaries
 - Each agent gets distinct files — no overlap
-- `TaskUpdate` to assign + track per agent
+- Update each task's assignment + status per agent
 - Wait for parallel group to complete before next group
 
 **Output:** `Phase 3: Build GREEN — [N] files modified, [X/Y] tests pass`
@@ -171,7 +170,7 @@ Note: this is a once-per-phase check, not a per-file one.
 After tests are green, run `mk:simplify` before any review. This is mandatory.
 
 ```
-Agent(subagent_type="developer", prompt="Run /mk:simplify on the Phase 3 output. Reduce complexity without breaking tests. All tests must still pass after simplification.", description="Simplify before review")
+delegate a subagent (agent="developer", prompt="Run the simplify skill on the Phase 3 output. Reduce complexity without breaking tests. All tests must still pass after simplification.", description="Simplify before review")
 ```
 
 **Why mandatory:** Reviewers catch logic errors better on simplified code. Submitting complex code to review creates review noise that obscures real issues. Simplify once, review once — cleaner than review-fix-simplify cycles.
@@ -198,7 +197,7 @@ If `red-team-findings.md` exists, load its contents and pass as additional conte
 Spawn `reviewer` subagent:
 
 ```
-Agent(subagent_type="reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY. [If red-team-findings.md loaded]: Also cross-reference the attached plan-level adversarial findings against the implementation — note which findings were addressed and which remain open.", description="Code review")
+delegate a subagent (agent="reviewer", prompt="Review changes for [phase]. Return: score (X/10), critical_count, warnings list, suggestions list. Check: security, performance, YAGNI/KISS/DRY. [If red-team-findings.md loaded]: Also cross-reference the attached plan-level adversarial findings against the implementation — note which findings were addressed and which remain open.", description="Code review")
 ```
 
 See `review-cycle.md` for interactive vs auto handling.
@@ -210,7 +209,7 @@ Read it before shipping: a FAIL dimension or a security BLOCK is a reason to go 
 Phase 3, not a note to carry past the commit. No hook blocks the commit on the verdict —
 the reading is the control.
 
-Present the verdict. Use `AskUserQuestion` (header: "Review"):
+Present the verdict. Ask the user (header: "Review"):
 
 - If critical issues: "Fix critical" / "Fix all" / "Ship as is" / "Abort"
 - If no critical: "Continue" / "Fix warnings" / "Abort"
@@ -270,7 +269,7 @@ run summary.
 2. **Spawn evaluator subagent:**
    ```
    Agent(
-     subagent_type="evaluator",
+     agent="evaluator",
      prompt="Run /mk:evaluate on this build.
        Target: {project_root_path}
        Rubric preset: {auto-detect from package.json}
@@ -296,7 +295,7 @@ requests shipping; a PASS verdict is not a request to ship.
 Spawn `shipper` (which orchestrates pre-ship checks + invokes `git-manager` for commit/PR + CI verification + rollback docs):
 
 ```
-Agent(subagent_type="shipper", prompt="Ship changes: 1) Run pre-ship.cjs (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk:ship skill.", description="Ship + PR")
+delegate a subagent (agent="shipper", prompt="Ship changes: 1) Run pre-ship.cjs (test+lint+typecheck), 2) Conventional commit, 3) Create PR if on feature branch, 4) Verify CI passes, 5) Document rollback steps. Use mk:ship skill.", description="Ship + PR")
 ```
 
 Note: `shipper` is the orchestrator — it invokes `git-manager` internally for raw git operations (commit, push). Cook never spawns `git-manager` directly; that is shipper's responsibility. See SKILL.md Required Subagents table.
@@ -315,7 +314,7 @@ Three mandatory subagents in parallel:
    Sync-back algorithm authority: `.claude/skills/plan-creator/references/task-management.md` (Sync-Back Algorithm).
 
    ```
-Agent(subagent_type="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
+delegate a subagent (agent="planner", prompt="Run full sync-back for [plan-path] using the Sync-Back Algorithm in .claude/skills/plan-creator/references/task-management.md. Report unresolved mappings if any todo cannot be matched to a phase.", description="Plan sync-back")
    ```
 
    If sync-back leaves every non-abandoned phase todo checked, archive the plan with `mewkit plan archive {plan-dir}` — it stamps `status: completed` across plan.md + every phase file (and `.plan-state.json`), then moves the whole plan directory to `tasks/plans/archive/{plan-name}/`. Do this in Phase 6; do not wait for `/mk:ship`.
@@ -323,10 +322,10 @@ Agent(subagent_type="planner", prompt="Run full sync-back for [plan-path] using 
 2. **Docs update:**
 
    ```
-   Agent(subagent_type="documenter", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
+   delegate a subagent (agent="documenter", prompt="Evaluate docs impact for changes in [files]. Update docs/ if needed. State: Docs impact: [none|minor|major]", description="Update docs")
    ```
 
-3. `TaskUpdate` → mark all session tasks complete after sync-back
+3. Mark all session tasks complete after sync-back
 
 ### Per-Phase Checkpoint (MANDATORY — fires after EACH completed plan phase, before the next-phase transition)
 
@@ -345,92 +344,6 @@ Idempotent: re-running this checkpoint on an unchanged phase produces zero diff 
 **Others:** Ask user before continuing to next phase.
 
 **Output:** `Phase 6: Reflect — sync-back done, docs [impact]`
-
-## Advice Checkpoints (`--advice` only)
-
-Skip this whole section unless the run was invoked with `--advice`. Without the flag
-there are zero supervision calls, no dossier, no receipt, and behavior is unchanged.
-
-On the first checkpoint of a run, read
-`.claude/skills/advise/references/advice-supervision-rules.md` — it is the contract this
-section implements.
-
-| Stage | Fires at | Condition | Max |
-|---|---|---|---:|
-| GUIDE | after the plan is agreed, before Phase 3 Build | always, when the flag is on | 1 |
-| RESCUE | Phase 3 | repeated failure, a `BLOCKED` subagent, or a high-risk / irreversible decision | 2 |
-| REVIEW | after Phase 3.5 Simplify + 3.6 Verify, **before** the Phase 4 reviewer | always, when the flag is on | 1 |
-| RECHECK | after corrections from a `RETURN_TO_EXECUTOR` | only after a return | 1 |
-
-Hard cap **5 calls per run**. Checkpoints are macro boundaries — never per tool call,
-per file, or per build-test-fix loop iteration. GUIDE fires after the plan is settled on
-purpose: supervision reads a finished plan, it does not help write one.
-
-### Call
-
-```
-mewkit advice begin --run <supervisionRunId> --skill mk:cook \
-  --stage GUIDE|RESCUE|REVIEW|RECHECK --checkpoint <checkpointId>
-```
-
-This enforces the cap, stage legality and idempotency, and writes the pending marker
-that makes a crash resumable. A refusal is final for that checkpoint: continue
-unsupervised, or escalate when the refusal says to. Re-running the same
-`--checkpoint` returns the recorded result and spends no slot.
-
-Then delegate with the packet inline (a fork inherits no conversation):
-
-```
-Agent(subagent_type="athena",
-      description="advice: <checkpoint name>",
-      prompt="<packet: runId, skill, stage, checkpointId, mission, lockedDecisions,
-               currentState, workerSummary, evidenceRefs (≤5, with provenance),
-               priorDirective, question, riskAndReversibility>")
-```
-
-Serialized cap 12 KiB — pass pointers, never payloads. Spawned workers receive a
-task-specific directive only: never the flag, never the dossier, never the run id.
-
-Validate the packet before sending it — the caps, pointer budget, provenance
-requirement and secret scan are enforced by this command, not by writing the packet
-carefully:
-
-```
-mewkit advice validate-packet --evidence <packet.json> --packet-kind input
-```
-
-Validate the returned packet the same way with `--packet-kind output` before
-acting on it or summarizing it into a receipt.
-
-### After the call
-
-```
-mewkit advice commit --run <runId> --checkpoint <checkpointId> \
-  --disposition <returned disposition> --outcome adopted|rejected|deferred \
-  --reason "<one line, required even when adopted>" \
-  --directive "<summary>" --next "<next safe action>" \
-  [--correction "<change>" ...] [--evidence-pointer <path> ...]
-```
-
-Route on the disposition:
-
-- `CONTINUE_WITH_DIRECTIVE` — proceed into Build; the directive is input, not instruction.
-- `READY_FOR_EXISTING_GATE` — run the Phase 4 reviewer. The verdict is still the reviewer's to write.
-- `RETURN_TO_EXECUTOR` — route corrections to the current owner, then supersede the
-  stale evidence:
-  `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence tasks/plans/<plan>/reports/evidence/workflow-evidence.json --correction-kind source|scope`.
-  Re-run Phase 3.6 Verify before Phase 4 — the previous Verify output describes code
-  that no longer exists. A `scope` correction also sends the plan back to the user,
-  because a plan change needs an agreement Athena cannot give.
-- `ESCALATE_TO_HUMAN` — stop and ask the user.
-- `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
-
-A second unresolved return escalates to a human; there is no third opinion.
-
-If the runtime cannot delegate to `athena`, print exactly
-`advice checkpoint unavailable in this runtime: <reason>` and continue unsupervised.
-**Never write a packet inline and present it as Athena's** — a recommendation written
-by the agent that is stuck is not an independent check.
 
 ## Workflow Evidence Index (traceability only)
 

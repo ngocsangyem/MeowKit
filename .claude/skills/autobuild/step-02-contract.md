@@ -39,7 +39,7 @@ When density is `FULL` or `LEAN` with sufficient ACs:
 
 ```
 Agent(
-  subagent_type="developer",
+  agent="developer",
   description="Propose sprint 1 contract for $slug",
   prompt="
     Use mk:sprint-contract propose action with task slug: $slug
@@ -62,14 +62,14 @@ Then dispatch the evaluator for review:
 
 ```
 Agent(
-  subagent_type="evaluator",
+  agent="evaluator",
   description="Review proposed contract for $slug",
   prompt="
     Read tasks/contracts/*-${slug}-sprint-1.md (newest).
     Apply your Contract Reviewer Role (see evaluator.md).
     Append Round 1 (reviewer) entries to the Negotiation Log section.
     If clean, write 'Round 1 (reviewer): accepted'.
-    Hard cap: 2 rounds. Round 3 escalates to AskUserQuestion.
+    Hard cap: 2 rounds. Round 3 escalates to the user.
   "
 )
 ```

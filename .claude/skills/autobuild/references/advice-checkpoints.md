@@ -1,18 +1,19 @@
-# Advice Checkpoints (`--advice` only)
+# `--advice` checkpoints — `mk:autobuild`
 
-Load this file only when the run was invoked with `--advice`. Without the flag there
-are zero supervision calls, no dossier, no receipt, and behavior is unchanged.
+Skip this file unless the run was invoked with `--advice`. Without the flag there are
+zero supervision calls, no state and no receipt, and nothing here loads.
+
+On the first checkpoint of a run, read the supervision contract this skill's `SKILL.md`
+names under `--advice`. This file implements it, and it holds the call protocol every
+checkpoint follows.
 
 ## Contents
 
 - [Checkpoints](#checkpoints)
+- [What each checkpoint asks](#what-each-checkpoint-asks)
 - [What supervision does NOT touch here](#what-supervision-does-not-touch-here)
-- [Call](#call)
-- [After the call](#after-the-call)
-
-The contract this implements is
-`.claude/skills/advise/references/advice-supervision-rules.md`. Where the two disagree, the
-contract wins.
+- [Routing in this skill](#routing-in-this-skill)
+- [Fallback](#fallback)
 
 ## Checkpoints
 
@@ -20,12 +21,12 @@ contract wins.
 |---|---|---|---:|
 | GUIDE | end of step-02, after the contract decision, **before** step-03 Generate | always, when the flag is on | 1 |
 | RESCUE | step-05, on the loop path | plateau or scope drift — see below | 2 |
-| REVIEW | step-05 §5c, after the terminal evaluator verdict, **before** the ship question | always, when the flag is on | 1 |
+| REVIEW | step-05, after the terminal evaluator verdict, **before** the ship question | always, when the flag is on | 1 |
 | RECHECK | after corrections from a `RETURN_TO_EXECUTOR` | only after a return | 1 |
 
-Hard cap **5 calls per run**. Checkpoints are macro boundaries — never per generated
-artifact, per file, or per evaluator iteration. A five-round build makes the same number
-of calls as a one-round build.
+Hard cap **5 calls per run**, charged as `--skill mk:autobuild`. Checkpoints are macro
+boundaries — never per generated artifact, per file, or per evaluator iteration. A
+five-round build makes the same number of calls as a one-round build.
 
 GUIDE fires at the end of step-02 rather than after step-01 on purpose: the contract
 decision is part of what it advises on, including a deliberate LEAN skip. Supervising
@@ -43,71 +44,30 @@ producing movement:
 A first FAIL with concrete, actionable iteration feedback is the loop working. Calling
 RESCUE there spends a slot on a step that was already going to succeed.
 
+## What each checkpoint asks
+
+- **GUIDE** — given this plan and contract, what should the generator optimize for and
+  what evidence will the evaluator need?
+- **RESCUE** — the loop has stopped moving; what changes, and what would show it worked?
+- **REVIEW** — does the evaluator's evidence actually cover the contract, or does it go
+  back?
+- **RECHECK** — were the corrections addressed and proven?
+
 ## What supervision does NOT touch here
 
-- **The iteration cap.** `--max-iter` (default 3) and the §5e escalation fire on their
-  own schedule. A rescue directive never buys another round and never delays the
-  escalation prompt.
-- **The budget tracker.** A BLOCK from `budget-tracker.sh` halts the run immediately,
-  supervised or not. Athena does not weigh in on whether to keep spending.
-- **The 6-hour timeout.**
-- **The ship question at §5c.** Athena's REVIEW is evidence presented alongside the
-  evaluator verdict. Both are things the user reads; neither is the decision.
-- **The evaluator's verdict.** `evaluator` owns PASS/WARN/FAIL and the
-  active-verification requirement. Athena may find that the evidence and the verdict
-  disagree and return the work — it may not regrade it.
+- **The iteration cap.** `--max-iter` (default 3) and its escalation fire on their own
+  schedule. A rescue directive never buys another round and never delays the prompt.
+- **The budget tracker.** A budget BLOCK halts the run immediately, supervised or not.
+- **The run timeout.**
+- **The ship question.** Athena's REVIEW is evidence presented alongside the evaluator
+  verdict. Both are things the user reads; neither is the decision.
+- **The evaluator's verdict** and its active-verification requirement. `evaluator` owns
+  PASS/WARN/FAIL. Athena may find that evidence and verdict disagree and route work back;
+  that is routing, not a verdict.
 
-## Call
+## Routing in this skill
 
-```
-mewkit advice begin --run <supervisionRunId> --skill mk:autobuild \
-  --stage GUIDE|RESCUE|REVIEW|RECHECK --checkpoint <checkpointId>
-```
-
-This enforces the cap, stage legality and idempotency, and writes the pending marker
-that makes a crash resumable — which matters more here than anywhere else, because an
-autobuild run is expected to survive context resets and `--resume`. Re-running the same
-`--checkpoint` returns the recorded result and spends no slot.
-
-Record `supervisionRunId` in the run report frontmatter next to `next_step`, for the
-same reason `next_step` lives there: a resumed run that cannot find its run id would
-start a fresh budget.
-
-Validate the packet before sending it:
-
-```
-mewkit advice validate-packet --evidence <packet.json> --packet-kind input
-```
-
-Then delegate with the packet inline (a fork inherits no conversation):
-
-```
-Agent(subagent_type="athena",
-      description="advice: <checkpoint name>",
-      prompt="<packet: runId, skill, stage, checkpointId, mission, lockedDecisions,
-               currentState, workerSummary, evidenceRefs (≤5, with provenance),
-               priorDirective, question, riskAndReversibility>")
-```
-
-Serialized cap 12 KiB — pass pointers, never payloads. The plan, the signed contract,
-the handoff and the verdict are all files: pass their paths. The generator and evaluator
-subagents receive a task-specific directive only — never the flag, never the dossier,
-never the run id.
-
-Validate the returned packet the same way with `--packet-kind output` before acting on
-it or summarizing it into a receipt.
-
-## After the call
-
-```
-mewkit advice commit --run <runId> --checkpoint <checkpointId> \
-  --disposition <returned disposition> --outcome adopted|rejected|deferred \
-  --reason "<one line, required even when adopted>" \
-  --directive "<summary>" --next "<next safe action>" \
-  [--correction "<change>" ...] [--evidence-pointer <path> ...]
-```
-
-Route on the disposition:
+The call protocol defines the dispositions; here is what each one means for this skill.
 
 - `CONTINUE_WITH_DIRECTIVE` — proceed into step-03; the directive is input to the
   generator's brief, not a replacement for the signed contract.
@@ -127,7 +87,23 @@ A second unresolved return escalates to a human; there is no third opinion.
 Record the checkpoint in the step's run-report section, next to the ship-decision line, so
 the audit trail shows what was advised and what the user decided — in that order.
 
+Serialized cap 12 KiB — pass pointers, never payloads. The plan, the signed contract,
+the handoff and the verdict are all files: pass their paths. The generator and evaluator
+subagents receive a task-specific directive only — never the flag, never the dossier,
+never the run id.
+
+Record `supervisionRunId` in the run report frontmatter next to `next_step`, for the
+same reason `next_step` lives there: a resumed run that cannot find its run id would
+start a fresh budget.
+
+## Fallback
+
 If the runtime cannot delegate to `athena`, print exactly
-`advice checkpoint unavailable in this runtime: <reason>` and continue unsupervised.
-**Never write a packet inline and present it as Athena's** — a recommendation written
-by the agent that is stuck is not an independent check.
+
+```
+advice checkpoint unavailable in this runtime: <reason>
+```
+
+and continue unsupervised. Never write a packet inline and present it as the agent's —
+a recommendation written by the agent that is stuck is not an independent check, and a
+receipt produced that way records supervision that never happened.

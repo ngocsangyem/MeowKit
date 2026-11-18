@@ -40,8 +40,7 @@
       "*:file-missing:skill-creator/references/skill-authoring-rules.md"
     ],
     "Bundle-only files with no Claude Code counterpart": [
-      "*:file-extra:autobuild/assets/pm-status-template.md",
-      "*:file-extra:cook/references/advice-checkpoints.md"
+      "*:file-extra:autobuild/assets/pm-status-template.md"
     ],
     "The Cursor agents were rewritten before this audit (2026-11-09) in the third person with an input-contract section, so their outline is their own": [
       "cursor:outline:agents/advisor",
@@ -81,30 +80,21 @@
       "*:outline:agent-detector/references/model-selection.md",
       "*:outline:autobuild/SKILL.md",
       "*:outline:autobuild/references/adaptive-density-matrix.md",
-      "*:outline:autobuild/references/advice-checkpoints.md",
       "*:outline:autobuild/step-02-contract.md",
       "*:outline:autobuild/step-06-run-report.md",
       "*:outline:autobuild/workflow.md",
-      "*:outline:brainstorming/SKILL.md",
-      "*:outline:brainstorming/references/advice-checkpoints.md",
       "*:outline:confluence/references/install-and-auth.md",
       "*:outline:cook/SKILL.md",
       "*:outline:cook/references/review-cycle.md",
       "*:outline:cook/references/subagent-patterns.md",
-      "*:outline:cook/references/workflow-steps.md",
       "*:outline:evaluate/workflow.md",
-      "*:outline:fix/references/workflow-deep.md",
-      "*:outline:fix/references/workflow-standard.md",
       "*:outline:improve-codebase-architecture/SKILL.md",
       "*:outline:memory/SKILL.md",
-      "*:outline:plan-creator/SKILL.md",
-      "*:outline:plan-creator/references/advice-checkpoints.md",
       "*:outline:plan-creator/step-05-red-team.md",
       "*:outline:plan-creator/workflow.md",
       "*:outline:qa/references/setup.md",
       "*:outline:review/workflow.md",
       "*:outline:ship/SKILL.md",
-      "*:outline:ship/references/advice-checkpoints.md",
       "*:outline:ship/references/merge-and-test-bootstrap.md",
       "*:outline:testing/references/validation-scripts.md",
       "*:outline:trace-analyze/workflow.md",
@@ -117,6 +107,15 @@
       "cursor:outline:prompt-enhancer/eval/baseline-results.md",
       "cursor:outline:stitch/references/stitch-mcp-setup.md",
       "cursor:outline:web-to-markdown/references/security.md"
+    ],
+    "The source keeps each skill's disposition routing under `--advice`; the Codex and Cursor bundles dropped it when they moved the call protocol into one file": [
+      "*:outline:autobuild/references/advice-checkpoints.md",
+      "*:outline:brainstorming/references/advice-checkpoints.md",
+      "*:outline:cook/references/advice-checkpoints.md",
+      "*:outline:fix/references/workflow-deep.md",
+      "*:outline:fix/references/workflow-standard.md",
+      "*:outline:plan-creator/references/advice-checkpoints.md",
+      "*:outline:ship/references/advice-checkpoints.md"
     ]
   }
 }

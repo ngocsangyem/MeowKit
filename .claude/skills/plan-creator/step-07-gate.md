@@ -19,9 +19,9 @@ State each category explicitly:
 
 ### 7b. Present the plan
 
-Load `references/plan-presentation.md` for the exact AskUserQuestion format and Context Reminder block.
+Load `references/plan-presentation.md` for the exact user question format and Context Reminder block.
 
-Present the plan via `AskUserQuestion`. Header: "Plan". Question text composes the self-check summary, plan path, phase count, and mode:
+Present the plan by asking the user. Header: "Plan". Question text composes the self-check summary, plan path, phase count, and mode:
 
 > Plan ready for review
 >

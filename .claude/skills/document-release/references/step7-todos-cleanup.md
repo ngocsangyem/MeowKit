@@ -10,9 +10,9 @@ If TODOS.md does not exist, skip this step.
    evidence in the diff.
 
 2. **Items needing description updates:** If a TODO references files or components that were
-   significantly changed, its description may be stale. Use AskUserQuestion to confirm whether
+   significantly changed, its description may be stale. Ask the user to confirm whether
    the TODO should be updated, completed, or left as-is.
 
 3. **New deferred work:** Check the diff for `TODO`, `FIXME`, `HACK`, and `XXX` comments. For
    each one that represents meaningful deferred work (not a trivial inline note), use
-   AskUserQuestion to ask whether it should be captured in TODOS.md.
+   ask the user whether it should be captured in TODOS.md.
