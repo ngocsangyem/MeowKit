@@ -1534,6 +1534,11 @@
       "size": 19781
     },
     {
+      "path": ".claude/skills/cook/references/advice-checkpoints.md",
+      "sha256": "42728bf527790219a3ef7341566db5478d948237a99378fb0019bb692148fe5d",
+      "size": 3668
+    },
+    {
       "path": ".claude/skills/cook/references/agent-conduct-extended.md",
       "sha256": "1c140a2e58f4ecf8d730aab9a9e5635836e5e7de725e082fc239c8fc2b911741",
       "size": 4626
