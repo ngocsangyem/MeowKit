@@ -1,0 +1,157 @@
+# Codex keys and passages the authored kit cannot be projected into.
+# Format: crates/mewkit-adapters/src/projection/overlay.rs.
+
+# The main session routes work on this runtime; it loads no orchestrator agent.
+omit = [".codex/agents/orchestrator.toml"]
+
+# Reasoning effort and the sandbox mode are Codex settings with no authored
+# counterpart: an authored agent names a model tier and a tool list.
+
+[agent.advisor]
+model_reasoning_effort = "high"
+
+[agent.analyst]
+model_reasoning_effort = "medium"
+
+[agent.architect]
+model_reasoning_effort = "high"
+
+[agent.athena]
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+
+[agent.brainstormer]
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+
+[agent.confluence-bulk]
+model_reasoning_effort = "high"
+
+[agent.confluence-collaborate]
+model_reasoning_effort = "medium"
+
+[agent.confluence-page]
+model_reasoning_effort = "high"
+
+[agent.confluence-search]
+model_reasoning_effort = "medium"
+
+[agent.confluence-spec-analyst]
+model_reasoning_effort = "high"
+
+[agent.developer]
+model_reasoning_effort = "medium"
+
+[agent.documenter]
+model_reasoning_effort = "medium"
+
+[agent.evaluator]
+model_reasoning_effort = "high"
+
+[agent.explore]
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+
+[agent.git-manager]
+model_reasoning_effort = "medium"
+
+[agent.jira-admin]
+model_reasoning_effort = "high"
+
+[agent.jira-agile]
+model_reasoning_effort = "medium"
+
+[agent.jira-analyst]
+model_reasoning_effort = "high"
+
+[agent.jira-bulk]
+model_reasoning_effort = "high"
+
+[agent.jira-collaborate]
+model_reasoning_effort = "medium"
+
+[agent.jira-dev]
+model_reasoning_effort = "low"
+
+[agent.jira-estimator]
+model_reasoning_effort = "high"
+
+[agent.jira-evaluator]
+model_reasoning_effort = "high"
+
+[agent.jira-fields]
+model_reasoning_effort = "medium"
+
+[agent.jira-issue]
+model_reasoning_effort = "medium"
+
+[agent.jira-jsm]
+model_reasoning_effort = "high"
+
+[agent.jira-lifecycle]
+model_reasoning_effort = "high"
+
+[agent.jira-ops]
+model_reasoning_effort = "low"
+
+[agent.jira-relationships]
+model_reasoning_effort = "low"
+
+[agent.jira-search]
+model_reasoning_effort = "medium"
+
+[agent.jira-time]
+model_reasoning_effort = "medium"
+
+[agent.journal-writer]
+model_reasoning_effort = "medium"
+
+[agent.planner]
+model_reasoning_effort = "high"
+
+[agent.project-manager]
+model_reasoning_effort = "medium"
+
+[agent.researcher]
+model_reasoning_effort = "medium"
+
+[agent.reviewer]
+model_reasoning_effort = "high"
+
+[agent.security]
+model_reasoning_effort = "high"
+
+[agent.shipper]
+model_reasoning_effort = "medium"
+
+[agent.story-sizer]
+model_reasoning_effort = "medium"
+
+[agent.tester]
+model_reasoning_effort = "medium"
+
+[agent.ui-ux-designer]
+model_reasoning_effort = "high"
+
+# The kit reads no Codex environment variable for the session's model, so the
+# autobuild run report records the user's hint, not a detected id.
+[[replace]]
+path = ".agents/skills/mk-autobuild/step-00-tier-detection.md"
+find = '''
+For the run report. Use the same env var fallback chain as `density-select.sh` (POSIX parameter expansion, not echo trick):
+
+```bash
+model_id="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}"
+'''
+with = '''
+For the run report. No Codex environment variable names the session's model here, so `model_id` is the hint the user set, not a detected id; without a hint `density-select.sh` takes the `STANDARD` tier:
+
+```bash
+model_id="${MEOWKIT_MODEL_HINT:-unknown}"
+'''
+
+# The pull-request trailer names the product that wrote the request.
+[[replace]]
+path = ".agents/skills/mk-ship/references/commit-push-pr.md"
+find = "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+with = "🤖 Generated with Codex"

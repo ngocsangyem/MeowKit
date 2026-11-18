@@ -10,6 +10,7 @@ pub mod codex;
 pub mod contract;
 pub mod cursor;
 mod kit_files;
+pub mod projection;
 pub mod registry;
 mod report_gate;
 mod scope;

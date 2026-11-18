@@ -14,7 +14,7 @@
 //! A global install writes `~/.cursor/` the same way, minus what Cursor has
 //! no user-level file for (rules, the core rule), and registers only the
 //! privacy read gate and the session context.
-mod frontmatter;
+pub(crate) mod frontmatter;
 mod hooks;
 
 use crate::bundle::{Bundle, Spec};

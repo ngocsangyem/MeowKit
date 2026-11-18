@@ -1,0 +1,233 @@
+# Cursor keys the authored kit cannot be projected into.
+# Format: crates/mewkit-adapters/src/projection/overlay.rs.
+
+# The main session routes work on this runtime; it loads no orchestrator agent.
+omit = [".cursor/agents/orchestrator.md"]
+
+# Cursor loads a skill with `disable-model-invocation` only when the user names it.
+
+[skill.cook]
+disable-model-invocation = true
+
+[skill.docs-init]
+disable-model-invocation = true
+
+[skill.document-release]
+disable-model-invocation = true
+
+[skill.fix]
+disable-model-invocation = true
+
+[skill.lint-and-validate]
+disable-model-invocation = true
+
+[skill.plan-creator]
+disable-model-invocation = true
+
+[skill.review]
+disable-model-invocation = true
+
+[skill.ship]
+disable-model-invocation = true
+
+[skill.simplify]
+disable-model-invocation = true
+
+[skill.testing]
+disable-model-invocation = true
+
+[skill.validate-plan]
+disable-model-invocation = true
+
+[skill.verify]
+disable-model-invocation = true
+
+# Whether a Cursor subagent may write and whether it runs in the background
+# have no authored counterpart.
+
+[agent.advisor]
+readonly = false
+is_background = false
+
+[agent.analyst]
+readonly = false
+is_background = true
+
+[agent.architect]
+readonly = false
+is_background = false
+
+[agent.athena]
+readonly = true
+is_background = false
+
+[agent.brainstormer]
+readonly = true
+is_background = false
+
+[agent.confluence-bulk]
+readonly = false
+is_background = false
+
+[agent.confluence-collaborate]
+readonly = false
+is_background = false
+
+[agent.confluence-page]
+readonly = false
+is_background = false
+
+[agent.confluence-search]
+readonly = false
+is_background = false
+
+[agent.confluence-spec-analyst]
+readonly = false
+is_background = true
+
+[agent.developer]
+readonly = false
+is_background = false
+
+[agent.documenter]
+readonly = false
+is_background = true
+
+[agent.evaluator]
+readonly = false
+is_background = false
+
+[agent.explore]
+readonly = true
+is_background = false
+
+[agent.git-manager]
+readonly = false
+is_background = false
+
+[agent.jira-admin]
+readonly = false
+is_background = false
+
+[agent.jira-agile]
+readonly = false
+is_background = false
+
+[agent.jira-analyst]
+readonly = false
+is_background = true
+
+[agent.jira-bulk]
+readonly = false
+is_background = false
+
+[agent.jira-collaborate]
+readonly = false
+is_background = false
+
+[agent.jira-dev]
+readonly = false
+is_background = false
+
+[agent.jira-estimator]
+readonly = false
+is_background = true
+
+[agent.jira-evaluator]
+readonly = false
+is_background = true
+
+[agent.jira-fields]
+readonly = false
+is_background = false
+
+[agent.jira-issue]
+readonly = false
+is_background = false
+
+[agent.jira-jsm]
+readonly = false
+is_background = false
+
+[agent.jira-lifecycle]
+readonly = false
+is_background = false
+
+[agent.jira-ops]
+readonly = false
+is_background = false
+
+[agent.jira-relationships]
+readonly = false
+is_background = false
+
+[agent.jira-search]
+readonly = false
+is_background = false
+
+[agent.jira-time]
+readonly = false
+is_background = false
+
+[agent.journal-writer]
+readonly = false
+is_background = true
+
+[agent.planner]
+readonly = false
+is_background = false
+
+[agent.project-manager]
+readonly = false
+is_background = true
+
+[agent.researcher]
+readonly = false
+is_background = true
+
+[agent.reviewer]
+readonly = false
+is_background = false
+
+[agent.security]
+readonly = false
+is_background = false
+
+[agent.shipper]
+readonly = false
+is_background = false
+
+[agent.story-sizer]
+readonly = false
+is_background = true
+
+[agent.tester]
+readonly = false
+is_background = false
+
+[agent.ui-ux-designer]
+readonly = false
+is_background = false
+
+# The kit reads no Cursor environment variable for the session's model, so the
+# autobuild run report records the user's hint, not a detected id.
+[[replace]]
+path = ".cursor/skills/mk-autobuild/step-00-tier-detection.md"
+find = '''
+For the run report. Use the same env var fallback chain as `density-select.sh` (POSIX parameter expansion, not echo trick):
+
+```bash
+model_id="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}"
+'''
+with = '''
+For the run report. No Cursor environment variable names the session's model here, so `model_id` is the hint the user set, not a detected id; without a hint `density-select.sh` takes the `STANDARD` tier:
+
+```bash
+model_id="${MEOWKIT_MODEL_HINT:-unknown}"
+'''
+
+# The pull-request trailer names the product that wrote the request.
+[[replace]]
+path = ".cursor/skills/mk-ship/references/commit-push-pr.md"
+find = "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+with = "🤖 Generated with Cursor"
