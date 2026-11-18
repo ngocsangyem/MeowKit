@@ -103,7 +103,10 @@ fn placements(table: &SurfaceTable, out: &mut String) {
         "\n## Where the kit writes\n\n\
          The resolver tries every combination of writable roots and keeps the one with, in order: \
          the fewest certain double loads, the fewest runtimes reading another runtime's wording, \
-         the fewest possible double loads, the fewest roots. One runtime, each pair, and all six:\n\n\
+         the fewest possible double loads, the fewest roots. Hooks are the exception: a runtime \
+         always gets its own hook file, never only an import its user can switch off, because \
+         with the switch off it would run no guard and say nothing. One runtime, each pair, and \
+         all six:\n\n\
          | Set | Skills | Agents | Always-on | Hooks | MCP |\n|---|---|---|---|---|---|\n",
     );
     let shown = |set: &Vec<Runtime>| set.len() <= 2 || set.len() == Runtime::ALL.len();

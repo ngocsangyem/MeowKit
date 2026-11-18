@@ -173,7 +173,14 @@ fn views(
         if surface.pick == Pick::First {
             loaded.truncate(1);
         }
-        let (rank, source) = *loaded.iter().find(|(_, read)| read.unsure.is_none())?;
+        // A guard must not come from a read the user can switch off: with the
+        // switch off the runtime would run no guard at all, and say nothing.
+        let dependable = |read: &Read| {
+            let user = |s: &crate::surface_table::Switch| s.scope == SwitchScope::User;
+            read.unsure.is_none()
+                && !(kind == Kind::Hooks && read.switch.as_ref().is_some_and(user))
+        };
+        let (rank, source) = *loaded.iter().find(|(_, read)| dependable(read))?;
         let mut view = View {
             source: source.root.clone(),
             ..View::default()

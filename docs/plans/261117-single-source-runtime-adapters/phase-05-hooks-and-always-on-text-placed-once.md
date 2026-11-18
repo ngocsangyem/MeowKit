@@ -8,7 +8,7 @@ Hooks and always-on instructions are the two kinds where duplication changes beh
 
 ## Requirements
 
-- **Hook home by set:** Claude Code present → its hooks live only in `.claude/settings.json`, and Cursor and Grok get entries only for decisions that file cannot give them. No Claude Code, Cursor present → `.cursor/hooks.json`. Grok alone → `.grok/hooks/`. Codex always its own `.codex/hooks.json`. Pi and OMP → one extension each (Phase 6).
+- **Hook home by set (changed 2026-11-18, maintainer):** every runtime keeps its own hook file in every set, and the ship check's run-once marker stays. A runtime never takes its guards only from an import its user can switch off. The earlier wording ("Claude Code present → its hooks live only in `.claude/settings.json`") is withdrawn. Codex always its own `.codex/hooks.json`. Pi and OMP → one extension each (Phase 6).
 - **Payload:** `hooks/lib/core` reads `tool_input` and `toolInput`, and the event-name forms of each runtime, behind one normaliser with replay cases per runtime.
 - **Always-on text:** one authored block. Root `AGENTS.md` carries it for Codex, Cursor, Grok, Pi, OMP; `CLAUDE.md` imports it (`@AGENTS.md`) and adds Claude Code-only lines; `.cursor/rules`, `.grok/rules`, `.omp/rules` receive only text that is not in `AGENTS.md`. The placement decides whether `.claude/rules` is written when Grok is in the set.
 - `AGENTS.md` stays under 32,768 B, measured in CI on the projected file.
@@ -32,7 +32,7 @@ Hooks and always-on instructions are the two kinds where duplication changes beh
 ## Todo
 
 - [x] Normaliser and replay cases
-- [ ] Hook home by set for three runtimes
+- [x] Hook home by set for three runtimes (own file always; resolver rule and test)
 - [ ] One always-on block, AGENTS.md cap checked
 - [ ] Trust notes
 
@@ -75,3 +75,7 @@ The requirement above says the ship check lives only in `.claude/settings.json` 
 ### The one always-on block
 
 Claude Code loads `.claude/rules/*.md` (18,191 B). Codex and Cursor load a condensed text written by hand for the bundles (7,676 B and 6,289 B, now in the overlays). "One authored block" needs one of them to become the source: (a) keep `.claude/rules` for Claude Code and treat the condensed text as the block for every other runtime, authored once and shared by Codex, Cursor, Grok, Pi and OMP; (b) make the condensed text the block everywhere and have `CLAUDE.md` import it, which shrinks what Claude Code loads and moves the pinned blocked-pattern table and injection rules; (c) project `.claude/rules` in full to `AGENTS.md`, which more than doubles the other runtimes' always-on bytes and breaks "always-on bytes ≤ today's".
+
+### Decided 2026-11-18
+
+Hook home: option (b). The resolver refuses a hook source that a user-level switch can turn off (`placement_resolver.rs`, test `no_runtime_takes_its_guards_from_an_import_the_user_can_switch_off`), so Cursor beside Claude Code, Grok beside Claude Code and Grok beside Cursor each keep their own file and are listed as double loads on `docs/maintainer/runtime-surface-table.md`. The three emitters already write their own hook file in every set, so no emitter changed. The always-on choice is still open.

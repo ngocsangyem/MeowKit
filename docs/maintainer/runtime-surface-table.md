@@ -143,7 +143,7 @@ Checked: source read and probed 2026-11-17, OMP 18.13.3.
 
 ## Where the kit writes
 
-The resolver tries every combination of writable roots and keeps the one with, in order: the fewest certain double loads, the fewest runtimes reading another runtime's wording, the fewest possible double loads, the fewest roots. One runtime, each pair, and all six:
+The resolver tries every combination of writable roots and keeps the one with, in order: the fewest certain double loads, the fewest runtimes reading another runtime's wording, the fewest possible double loads, the fewest roots. Hooks are the exception: a runtime always gets its own hook file, never only an import its user can switch off, because with the switch off it would run no guard and say nothing. One runtime, each pair, and all six:
 
 | Set | Skills | Agents | Always-on | Hooks | MCP |
 |---|---|---|---|---|---|
@@ -154,11 +154,11 @@ The resolver tries every combination of writable roots and keeps the one with, i
 | pi | `.agents/skills` | none | `AGENTS.md` | `.pi/extensions` | `.pi/mcp.json` |
 | omp | `.agents/skills` | `.omp/agents` | `AGENTS.md` | `.omp/hooks` | `.omp/mcp.json` |
 | claude-code + codex | `.claude/skills`, `.agents/skills` | `.claude/agents`, `.codex/agents` | `.claude/rules`, `AGENTS.md` | `.claude/settings.json`, `.codex/hooks.json` | `.mcp.json`, `.codex/config.toml` |
-| claude-code + cursor | `.claude/skills` | `.claude/agents`, `.cursor/agents` | `.claude/rules`, `.cursor/rules` | `.claude/settings.json` | `.mcp.json`, `.cursor/mcp.json` |
+| claude-code + cursor | `.claude/skills` | `.claude/agents`, `.cursor/agents` | `.claude/rules`, `.cursor/rules` | `.claude/settings.json`, `.cursor/hooks.json` | `.mcp.json`, `.cursor/mcp.json` |
 | codex + cursor | `.agents/skills` | `.codex/agents`, `.cursor/agents` | `AGENTS.md` | `.codex/hooks.json`, `.cursor/hooks.json` | `.codex/config.toml`, `.cursor/mcp.json` |
-| claude-code + grok | `.claude/skills`, `.grok/skills` | `.claude/agents`, `.grok/agents` | `.claude/rules` | `.claude/settings.json` | `.mcp.json` |
+| claude-code + grok | `.claude/skills`, `.grok/skills` | `.claude/agents`, `.grok/agents` | `.claude/rules` | `.claude/settings.json`, `.grok/hooks` | `.mcp.json` |
 | codex + grok | `.agents/skills`, `.grok/skills` | `.codex/agents`, `.grok/agents` | `AGENTS.md` | `.codex/hooks.json`, `.grok/hooks` | `.codex/config.toml`, `.grok/config.toml` |
-| cursor + grok | `.agents/skills`, `.grok/skills` | `.cursor/agents`, `.grok/agents` | `AGENTS.md` | `.cursor/hooks.json` | `.cursor/mcp.json` |
+| cursor + grok | `.agents/skills`, `.grok/skills` | `.cursor/agents`, `.grok/agents` | `AGENTS.md` | `.cursor/hooks.json`, `.grok/hooks` | `.cursor/mcp.json` |
 | claude-code + pi | `.claude/skills`, `.agents/skills` | `.claude/agents` | `.claude/rules`, `AGENTS.md` | `.claude/settings.json`, `.pi/extensions` | `.mcp.json`, `.pi/mcp.json` |
 | codex + pi | `.agents/skills` | `.codex/agents` | `AGENTS.md` | `.codex/hooks.json`, `.pi/extensions` | `.codex/config.toml`, `.pi/mcp.json` |
 | cursor + pi | `.agents/skills` | `.cursor/agents` | `AGENTS.md` | `.cursor/hooks.json`, `.pi/extensions` | `.cursor/mcp.json`, `.pi/mcp.json` |
@@ -168,7 +168,7 @@ The resolver tries every combination of writable roots and keeps the one with, i
 | cursor + omp | `.agents/skills` | `.cursor/agents`, `.omp/agents` | `AGENTS.md` | `.cursor/hooks.json`, `.omp/hooks` | `.cursor/mcp.json` |
 | grok + omp | `.grok/skills`, `.agents/skills` | `.grok/agents`, `.omp/agents` | `AGENTS.md` | `.grok/hooks`, `.omp/hooks` | `.grok/config.toml`, `.omp/mcp.json` |
 | pi + omp | `.agents/skills` | `.omp/agents` | `AGENTS.md` | `.pi/extensions`, `.omp/hooks` | `.pi/mcp.json`, `.omp/mcp.json` |
-| claude-code + codex + cursor + grok + pi + omp | `.claude/skills`, `.agents/skills`, `.grok/skills` | `.claude/agents`, `.codex/agents`, `.cursor/agents`, `.grok/agents`, `.omp/agents` | `.claude/rules`, `AGENTS.md` | `.claude/settings.json`, `.codex/hooks.json`, `.pi/extensions`, `.omp/hooks` | `.mcp.json`, `.codex/config.toml`, `.cursor/mcp.json`, `.pi/mcp.json` |
+| claude-code + codex + cursor + grok + pi + omp | `.claude/skills`, `.agents/skills`, `.grok/skills` | `.claude/agents`, `.codex/agents`, `.cursor/agents`, `.grok/agents`, `.omp/agents` | `.claude/rules`, `AGENTS.md` | `.claude/settings.json`, `.codex/hooks.json`, `.cursor/hooks.json`, `.grok/hooks`, `.pi/extensions`, `.omp/hooks` | `.mcp.json`, `.codex/config.toml`, `.cursor/mcp.json`, `.pi/mcp.json` |
 
 ## Double loads no placement removes
 
@@ -178,6 +178,9 @@ The runtime loads the content from two written roots in every placement of these
 |---|---|---|---|---|
 | skills | cursor | `.claude/skills` | claude-code + codex + cursor | none documented |
 | always-on | grok | `.claude/rules` | claude-code + codex + grok; claude-code + cursor + grok; claude-code + grok + pi | `GROK_CLAUDE_RULES_ENABLED=false` |
+| hooks | cursor | `.claude/settings.json` | claude-code + cursor | Cursor Settings > Agents > Third-Party Imports: "Include Third-Party Plugins, Skills, and Other Configs" off |
+| hooks | grok | `.claude/settings.json` | claude-code + grok | `GROK_CLAUDE_HOOKS_ENABLED=false` |
+| hooks | grok | `.cursor/hooks.json` | cursor + grok | `GROK_CURSOR_HOOKS_ENABLED=false` |
 | mcp | grok | `.cursor/mcp.json` | claude-code + cursor + grok | `[compat.cursor] mcps = false` in `~/.grok/config.toml` |
 
 ## Reads that are not settled
