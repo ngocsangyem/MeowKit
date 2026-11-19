@@ -18,3 +18,6 @@ crates/mewkit-cli/tests/npm_behaviour/fixtures/plan-approvable/tasks/plans/26111
 
 # The launcher template is written into installs as it is, on every OS.
 crates/mewkit-adapters/src/claude_code/launcher.cjs.tmpl text eol=lf
+
+# A Rust test compares this rendered page byte for byte on every OS.
+docs/maintainer/runtime-surface-table.md text eol=lf
