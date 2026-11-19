@@ -53,15 +53,15 @@ blocks: []
 
 ## Acceptance Criteria
 
-- [ ] For each of the 63 non-empty runtime subsets, the resolver test asserts that every runtime sees each skill name, hook decision, always-on rule block and MCP server exactly once (from the surface table).
+- [ ] For each of the 63 non-empty runtime subsets, the resolver test asserts that every runtime sees each skill name, hook decision, always-on rule block and MCP server exactly once (from the surface table). Checked 2026-11-20, not met as written: the test covers the 63 sets and asserts one written source per runtime, and it lists six double loads no placement removes and four reads the vendors leave open (`placement_resolver_tests.rs`).
 - [x] `test ! -e kit/bundles && test ! -e scripts/check-bundle-parity.cjs && test ! -e scripts/bundle-parity-allow.json`.
-- [ ] Projected Codex and Cursor trees differ from the last committed bundles only by entries in `docs/maintainer/projection-divergences.md`, each with a reason.
-- [ ] `node scripts/check-instruction-criteria.cjs` passes on the projected tree of every runtime (A9 host-foreign tokens, A10 name form, A13 pins).
-- [ ] `mewkit validate --target <runtime>` exists and passes for all six; `mewkit doctor` reports any path a second runtime also loads.
-- [ ] Projected `AGENTS.md` ≤ 32,768 B; always-on bytes per runtime ≤ today's figures.
+- [ ] Projected Codex and Cursor trees differ from the last committed bundles only by entries in `docs/maintainer/projection-divergences.md`, each with a reason. Checked 2026-11-20: cannot be run again, the bundles are deleted; the list was taken before that and still has three rows marked open.
+- [x] `node scripts/check-instruction-criteria.cjs` passes on the projected tree of every runtime (A9 host-foreign tokens, A10 name form, A13 pins). Checked 2026-11-20: no findings over `.claude` and the five installed trees.
+- [x] `mewkit validate --target <runtime>` exists and passes for all six; `mewkit doctor` reports any path a second runtime also loads. Checked 2026-11-20 on a six-runtime install: exit 0 for codex, cursor, grok, pi and omp; Claude Code is plain `mewkit validate` (there is no `--target claude-code`).
+- [ ] Projected `AGENTS.md` ≤ 32,768 B; always-on bytes per runtime ≤ today's figures. Checked 2026-11-20: `AGENTS.md` is 7,687 B; Claude Code is unchanged and Codex is lower, but Cursor went from 6,316 B to 10,641 B when it took the shared block.
 - [x] `init` → `init` with one more target → `uninstall` of one target leaves a tree equal to a fresh `init` of the remaining set (lifecycle test).
-- [ ] `npm test`, `npx vitest run tests/guards`, `cargo test --workspace --locked`, `mewkit validate` exit 0.
-- [ ] Every row added to `docs/maintainer/host-probe-log.md` is marked `probed` with command, version and date, or `documented, not probed` with its URL.
+- [x] `npm test`, `npx vitest run tests/guards`, `cargo test --workspace --locked`, `mewkit validate` exit 0. Checked 2026-11-20: 578 of 578, 53 of 53, 53 result lines with none failed, 34 passed.
+- [ ] Every row added to `docs/maintainer/host-probe-log.md` is marked `probed` with command, version and date, or `documented, not probed` with its URL. Checked 2026-11-20, not met: X3 is `inconclusive`, X7 and X13 `read from source`, X8 and X9 `unknown`.
 
 ## Constraints
 
