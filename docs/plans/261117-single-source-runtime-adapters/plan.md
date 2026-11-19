@@ -38,7 +38,7 @@ blocks: []
 | 4 | [Codex and Cursor emitters on projection; bundles removed](phase-04-codex-cursor-on-projection-bundles-removed.md) | Done: both emitters install from projection plus overlays; `kit/bundles/` and the parity tooling are deleted; the checks read an installed tree; kit contract 2. The decision note is not written | 4d | 2, 3 |
 | 5 | [Hooks and always-on text placed once](phase-05-hooks-and-always-on-text-placed-once.md) | Done for Claude Code, Codex and Cursor; the other three with their emitters | 4d | 2, 4 |
 | 6 | [Grok, Pi and OMP emitters](phase-06-grok-pi-omp-emitters.md) | Done at project scope: six emitters; Codex, Pi and OMP share `.agents/` (neutral folder `.agents/meowkit/`, maintainer 2026-11-19). No Grok agent definitions (format undocumented); Pi and Grok not probed | 6d | 4, 5 |
-| 7 | [Set changes, doctor overlap check, close-out](phase-07-set-changes-doctor-overlap-close-out.md) | Not started | 3d | 6 |
+| 7 | [Set changes, doctor overlap check, close-out](phase-07-set-changes-doctor-overlap-close-out.md) | Done: 30 pairs and the full set equal a fresh install; doctor lists double loads and fails on an unrecorded kit copy; published docs and changelog updated | 3d | 6 |
 
 ## Decisions (confirmed by the maintainer 2026-11-17, as recommended)
 
@@ -59,7 +59,7 @@ blocks: []
 - [ ] `node scripts/check-instruction-criteria.cjs` passes on the projected tree of every runtime (A9 host-foreign tokens, A10 name form, A13 pins).
 - [ ] `mewkit validate --target <runtime>` exists and passes for all six; `mewkit doctor` reports any path a second runtime also loads.
 - [ ] Projected `AGENTS.md` ≤ 32,768 B; always-on bytes per runtime ≤ today's figures.
-- [ ] `init` → `init` with one more target → `uninstall` of one target leaves a tree equal to a fresh `init` of the remaining set (lifecycle test).
+- [x] `init` → `init` with one more target → `uninstall` of one target leaves a tree equal to a fresh `init` of the remaining set (lifecycle test).
 - [ ] `npm test`, `npx vitest run tests/guards`, `cargo test --workspace --locked`, `mewkit validate` exit 0.
 - [ ] Every row added to `docs/maintainer/host-probe-log.md` is marked `probed` with command, version and date, or `documented, not probed` with its URL.
 
