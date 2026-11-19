@@ -214,6 +214,10 @@ fn rewrite_for_those_staying(
             );
             continue;
         };
+        eprintln!(
+            "note: {} stays and what it installs depends on the runtimes beside it, so it is planned again for the set that remains",
+            runtime.name()
+        );
         let mut hashes = hashes_of(place, e, kit, &packs).unwrap_or_default();
         let mut plan = prepare_without(place, e, kit, &packs, leaving)?;
         hashes.extend(written_hashes(&plan));

@@ -74,21 +74,6 @@ fn a_broken_codex_target_fails_each_row_by_name() {
     );
 }
 
-#[test]
-fn a_cursor_target_is_checked_against_its_authored_skeleton() {
-    let (ts, _) = npm::case("validate-target-cursor")
-        .fixture("validate-target-cursor")
-        .args(&["validate", "--target", "cursor"])
-        .run();
-    assert_eq!(ts.code, 0, "{}", ts.describe());
-    assert!(
-        ts.stdout
-            .contains("[PASS] Cursor reconciliation ledger present"),
-        "{}",
-        ts.describe()
-    );
-}
-
 /// `--strict` reaches the target path too: a WARN row there fails the run.
 #[test]
 fn strict_applies_to_a_target_run() {

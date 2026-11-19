@@ -292,8 +292,62 @@ fn a_project_installed_for_two_runtimes_loads_one_of_them_twice() {
     let cross = "coexistence: cross-runtime load";
     assert_eq!(status(&found, cross), "warn", "{found:#?}");
     let said = detail(&found, cross);
-    assert!(said.contains("claude-code (project)"), "{said}");
-    assert!(said.contains("hook scripts"), "{said}");
+    assert!(said.contains("cursor: "), "{said}");
+    assert!(said.contains("skills also from .claude/skills"), "{said}");
+    assert!(
+        said.contains("hooks also from .claude/settings.json"),
+        "{said}"
+    );
+    assert_eq!(status(&found, "kit copies: unrecorded"), "ok", "{found:#?}");
+}
+
+/// All six runtimes installed cleanly is not a failure: what loads twice is
+/// reported with the setting that stops it, OMP's import of `.claude/` is
+/// switched off by the install and so is not listed, and a name the user put
+/// under two roots is information. A copy of a kit skill that no install
+/// recorded, under a second root a runtime reads, fails the run.
+#[test]
+fn an_unrecorded_copy_of_a_kit_skill_fails_and_a_clean_full_set_does_not() {
+    let env = installed("all");
+    let project = env.project();
+    skill(&project, ".agents/skills/mine", "mine", 4);
+    skill(&project, ".pi/skills/mine", "mine", 4);
+    let found = rows(&env.mewkit(&["doctor", "--json"]));
+    assert_shape(&found);
+    let cross = "coexistence: cross-runtime load";
+    let said = detail(&found, cross);
+    assert_eq!(status(&found, cross), "warn", "{said}");
+    assert!(said.contains("GROK_CLAUDE_HOOKS_ENABLED=false"), "{said}");
+    assert!(!said.contains("omp: "), "{said}");
+    assert!(said.contains("one name under two roots"), "{said}");
+    assert!(said.contains("mine (skills)"), "{said}");
+    assert_eq!(status(&found, "kit copies: unrecorded"), "ok", "{found:#?}");
+
+    // A second root that is a link to the first shows the same skills, not copies.
+    #[cfg(unix)]
+    {
+        std::fs::remove_dir_all(project.join(".pi/skills")).expect("remove");
+        std::os::unix::fs::symlink("../.agents/skills", project.join(".pi/skills")).expect("link");
+        let found = rows(&env.mewkit(&["doctor", "--json"]));
+        assert_eq!(status(&found, "kit copies: unrecorded"), "ok", "{found:#?}");
+        std::fs::remove_file(project.join(".pi/skills")).expect("unlink");
+    }
+
+    let copy = std::fs::read_to_string(project.join(".agents/skills/mk-cook/SKILL.md"))
+        .expect("an installed skill");
+    write(&project, ".pi/skills/mk-cook/SKILL.md", &copy);
+    let out = env.mewkit(&["doctor", "--json"]);
+    assert_eq!(code(&out), 1, "{}", text(&out));
+    let found: Vec<Value> = serde_json::from_slice::<Value>(&out.stdout)
+        .expect("json")
+        .as_array()
+        .expect("rows")
+        .clone();
+    assert_eq!(status(&found, "kit copies: unrecorded"), "fail");
+    assert!(
+        detail(&found, "kit copies: unrecorded").contains(".pi/skills/mk-cook"),
+        "{found:#?}"
+    );
 }
 
 /// No home directory is one scope fewer to read, not a failure; and a guard file

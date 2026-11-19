@@ -44,7 +44,11 @@ pub fn check(dir: &Path) -> Vec<CheckResult> {
     }];
     rows.push(hook_file(dir));
     rows.push(hook_runtime(dir));
-    rows.push(skills(dir));
+    rows.push(super::target_helpers::skills_named_after_folder(
+        "Grok",
+        dir,
+        ".grok/skills",
+    ));
     rows
 }
 
@@ -146,52 +150,4 @@ fn hook_runtime(dir: &Path) -> CheckResult {
         ),
         Err(why) => row(name, Status::Fail, why),
     }
-}
-
-/// A skill is a folder holding a `SKILL.md` that starts with frontmatter and
-/// whose `name`, when given, is the folder's name.
-fn skills(dir: &Path) -> CheckResult {
-    let name = "Grok skills each have a SKILL.md named after their folder";
-    let root = dir.join(".grok").join("skills");
-    let mut count = 0;
-    for folder in super::dir_order::sorted_names(&root) {
-        let folder_path = root.join(&folder);
-        if !folder_path.is_dir() {
-            continue;
-        }
-        let Ok(text) = std::fs::read_to_string(folder_path.join("SKILL.md")) else {
-            return row(
-                name,
-                Status::Fail,
-                format!(".grok/skills/{folder}: no readable SKILL.md"),
-            );
-        };
-        let Some(frontmatter) = text
-            .strip_prefix("---\n")
-            .and_then(|rest| rest.split_once("\n---"))
-            .map(|(head, _)| head)
-        else {
-            return row(
-                name,
-                Status::Fail,
-                format!(".grok/skills/{folder}/SKILL.md: no frontmatter"),
-            );
-        };
-        let declared = frontmatter
-            .lines()
-            .find_map(|line| line.strip_prefix("name:"))
-            .map(|value| value.trim().trim_matches(['"', '\'']));
-        if declared.is_some_and(|declared| declared != folder) {
-            return row(
-                name,
-                Status::Fail,
-                format!(".grok/skills/{folder}/SKILL.md: `name` is not `{folder}`"),
-            );
-        }
-        count += 1;
-    }
-    if count == 0 {
-        return row(name, Status::Fail, "no skill under .grok/skills".into());
-    }
-    row(name, Status::Pass, format!("{count} skills"))
 }

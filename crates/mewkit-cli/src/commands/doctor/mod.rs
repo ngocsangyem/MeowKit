@@ -8,7 +8,9 @@
 //! loading a second runtime's tree — plus the two rows that can go non-green
 //! without anything being broken: a check weakened by config or environment,
 //! and a guard file that no longer matches what was installed. Those rows are
-//! `ok` or `warn` and never `fail`, so they change no exit code.
+//! `ok` or `warn` and never `fail`, so they change no exit code. One row about
+//! shared trees does fail: a copy of a kit skill or agent that no install here
+//! recorded, under a second root an installed runtime reads.
 mod adopt;
 mod codex_trust;
 mod coexistence;
@@ -23,6 +25,8 @@ mod hooks;
 mod host_config;
 mod installs;
 mod integrity;
+mod overlap;
+mod overlap_survey;
 mod provenance;
 mod toolchain;
 mod weakened;
@@ -134,6 +138,7 @@ pub fn run(args: &DoctorArgs) -> Result<u8, Failure> {
     let mut checks = toolchain::checks();
     checks.extend(installs::checks(&place, other.as_ref(), &targets));
     checks.extend(coexistence::checks(&scopes, &targets));
+    checks.extend(overlap::checks(&scopes, &targets));
     checks.push(weakened::check(&scopes));
     checks.push(integrity::check(&scopes, &targets));
     let root = extras::project_root();

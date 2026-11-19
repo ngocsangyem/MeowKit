@@ -1,9 +1,9 @@
 //! Where MeowKit shares a host with something else.
 //!
-//! Four of these rows look outward — at agent names, hook registrations,
-//! always-on instruction files and the skill listing every installed toolkit
-//! draws on — and one looks at the kit colliding with itself, because a host
-//! that also loads another runtime's tree runs two copies of the same install.
+//! These rows look outward — at agent names, hook registrations, always-on
+//! instruction files and the skill listing every installed toolkit draws on.
+//! The kit colliding with itself, in a host that also loads another runtime's
+//! tree, is `overlap.rs`.
 //!
 //! All of them are `ok` or `warn` and never `fail`. Nothing reported here is a
 //! broken install, and no command fixes it: another toolkit on the same machine
@@ -19,12 +19,10 @@ use mewkit_adapters::contract::{RelPath, Runtime};
 use super::coexistence_hooks;
 use super::coexistence_scan as scan;
 use super::coexistence_sources;
-use super::hooks;
 use super::{Check, Status};
 use crate::place::Place;
 
 const AGENTS: &str = "coexistence: agent names";
-const CROSS: &str = "coexistence: cross-runtime load";
 
 /// Where a host looks for the files it loads without being asked. The hook file
 /// for each runtime is [`hooks::hook_file`]; these are the rest.
@@ -105,7 +103,6 @@ pub fn checks(places: &[&Place], targets: &[Runtime]) -> Vec<Check> {
         coexistence_hooks::foreign(places, targets),
         coexistence_sources::instruction_files(places, targets),
         coexistence_sources::skill_listing(places, targets),
-        cross_runtime(places, targets),
     ]
 }
 
@@ -160,60 +157,6 @@ fn agent_names(places: &[&Place], targets: &[Runtime]) -> Check {
              directory's, and `.cursor/` over a tree Cursor borrows), which this row repeats \
              from their documentation and does not verify here{cap}",
             shared.join("; ")
-        ),
-    )
-}
-
-/// Cursor reads the other runtimes' trees as well as its own, so one project
-/// carrying the kit for Cursor and for Claude Code or Codex runs two copies of
-/// the same install: both hook sets fire and every skill and agent appears
-/// twice. The foreign-hook row cannot see that, because the kit owns both
-/// sides of it.
-fn cross_runtime(places: &[&Place], targets: &[Runtime]) -> Check {
-    let mut doubled: Vec<String> = Vec::new();
-    if !targets.contains(&Runtime::Cursor) {
-        return Check::new(
-            CROSS,
-            Status::Ok,
-            "cursor is not among the runtimes checked, and no other host loads a second tree",
-        );
-    }
-    for place in places {
-        if installed(place, Runtime::Cursor).is_none() {
-            continue;
-        }
-        for borrowed in [Runtime::ClaudeCode, Runtime::Codex] {
-            if !targets.contains(&borrowed) || installed(place, borrowed).is_none() {
-                continue;
-            }
-            let tree = trees(borrowed, place.scope.kind);
-            let hook_scripts = hooks::hook_doc(place, borrowed)
-                .map(|(_, doc)| hooks::registered(&doc).len())
-                .unwrap_or_default();
-            doubled.push(format!(
-                "{} ({}): {hook_scripts} hook scripts, {} skills, {} agents",
-                borrowed.name(),
-                place.label(),
-                scan::dirs(&at(place, tree.skills)).len(),
-                scan::files(&at(place, tree.agents)).len(),
-            ));
-        }
-    }
-    if doubled.is_empty() {
-        return Check::new(
-            CROSS,
-            Status::Ok,
-            "no runtime's tree is loaded by a second host here",
-        );
-    }
-    Check::new(
-        CROSS,
-        Status::Warn,
-        format!(
-            "Cursor also loads another runtime's tree while \"Include Third-Party Plugins, \
-             Skills, and Other Configs\" is on, which is its default, so this install loads \
-             twice in Cursor — {}; every matching hook runs and `.cursor/` wins a name clash",
-            doubled.join("; ")
         ),
     )
 }
