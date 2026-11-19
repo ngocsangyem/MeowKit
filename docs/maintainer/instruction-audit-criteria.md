@@ -4,7 +4,7 @@ The criteria every rule, agent, skill and installed instruction file is held to 
 has no plan-approval or review-approval gate, and the model-fit checks for current models on
 Claude Code, Codex and Cursor. The mechanical subset is checked by
 `node scripts/check-instruction-criteria.cjs`, which CI runs on `.claude` and on what `mewkit init`
-installs for Codex and Cursor (`installed:codex`, `installed:cursor`; the script installs each into a
+installs for each other runtime (`installed:codex`, `installed:cursor`, `installed:grok`, `installed:pi`, `installed:omp`; the script installs each into a
 temp directory with the built binary) against `scripts/instruction-criteria-baseline.json`; the rest is reviewed by hand against this page.
 
 ## Criteria
