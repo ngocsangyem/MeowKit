@@ -3,7 +3,7 @@
 // host-foreign tool syntax, the skill-reference name form, agent model pins, and standing
 // re-verify or unconditional delegate lines. Criteria text: docs/maintainer/instruction-audit-criteria.md.
 //
-// `kind` is 'claude' for `.claude`, otherwise the bundle runtime ('codex' or 'cursor').
+// `kind` is 'claude' for `.claude`, otherwise the runtime the tree is installed for ('codex', 'cursor', 'grok', 'pi' or 'omp').
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -28,7 +28,7 @@ const NEGATION = /\b(never|don't|do not|must not|should not|no need to)\b/i;
 
 /** Statuses in docs/maintainer/model-pins.md that an agent may not pin. */
 const BAD_PIN_STATUS = new Set(['retired', 'deprecated', 'not listed']);
-const RUNTIME = { claude: 'claude-code', codex: 'codex', cursor: 'cursor' };
+const RUNTIME = { claude: 'claude-code', codex: 'codex', cursor: 'cursor', grok: 'grok', pi: 'pi', omp: 'omp' };
 
 function lineOf(text, index) {
   return text.slice(0, index).split('\n').length;

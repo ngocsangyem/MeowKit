@@ -42,21 +42,24 @@ function kitMeowkitTargets() {
 }
 
 /**
- * What only Codex or Cursor needs. The `mewkit` binary projects `.claude/` for
+ * What only Codex, Cursor or Grok needs. The `mewkit` binary projects `.claude/` for
  * each runtime at install and adds that runtime's overlay: the files that cannot
  * be derived, and its catalogs. They sit outside `.claude/` on purpose: a Claude
- * Code install copies `.claude/` whole, and must not lay down Codex or Cursor files.
+ * Code install copies `.claude/` whole, and must not lay down another runtime's files.
  */
 const CODEX_OVERLAY = "kit/overlays/codex";
 const CURSOR_OVERLAY = "kit/overlays/cursor";
+const GROK_OVERLAY = "kit/overlays/grok";
 // The always-on text every runtime that reads `AGENTS.md` gets, authored once.
 const SHARED_ALWAYS_ON = "kit/overlays/shared/AGENTS.md";
 // Cursor alone ships the MCP profile catalog `init --mcp-profiles` merges from.
-const RUNTIME_OVERLAY_TARGETS = [CODEX_OVERLAY, CURSOR_OVERLAY].flatMap((b) => [
+// Codex, Pi and OMP share `.agents/`; Pi and OMP add only their guard module.
+const AGENTS_OVERLAY = "kit/overlays/agents";
+const RUNTIME_OVERLAY_TARGETS = [CODEX_OVERLAY, CURSOR_OVERLAY, GROK_OVERLAY, AGENTS_OVERLAY].flatMap((b) => [
 	`${b}/overlay.toml`,
 	`${b}/files`,
 	`${b}/catalog/skill-packs.json`,
-]).concat(`${CURSOR_OVERLAY}/catalog/mcp-profiles.json`, SHARED_ALWAYS_ON);
+]).concat(`${CURSOR_OVERLAY}/catalog/mcp-profiles.json`, "kit/overlays/pi/files", "kit/overlays/omp/files", SHARED_ALWAYS_ON);
 
 /**
  * The archive roots a published kit is built from, in a fixed order.

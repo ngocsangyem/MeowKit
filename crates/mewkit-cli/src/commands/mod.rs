@@ -68,10 +68,23 @@ pub fn unconfirmed_force(command: &str, force: bool, yes: bool) -> bool {
 
 /// `claude-code,codex` (or `all`) as runtimes, in the order given.
 pub fn parse_targets(list: &[String]) -> Result<Vec<Runtime>, Failure> {
+    parse_targets_at(list, None)
+}
+
+/// As [`parse_targets`], where `all` means every runtime that installs at
+/// `scope`. A runtime named outright is kept, so its emitter says why it
+/// cannot install there.
+pub fn parse_targets_at(
+    list: &[String],
+    scope: Option<ScopeKind>,
+) -> Result<Vec<Runtime>, Failure> {
     let mut out = Vec::new();
     for name in list.iter().flat_map(|l| l.split(',')).map(str::trim) {
         if name == "all" {
-            return Ok(emitted());
+            let fits = |r: &Runtime| {
+                scope.is_none_or(|kind| emitter(*r).is_some_and(|e| e.supports(kind)))
+            };
+            return Ok(emitted().into_iter().filter(fits).collect());
         }
         // A runtime the surface table knows but no emitter installs yet is not a target.
         let installable = Runtime::from_name(name).filter(|r| emitter(*r).is_some());
@@ -112,6 +125,29 @@ pub fn prepare_among(
     packs: &[String],
     joining: &[Runtime],
 ) -> Result<Plan, Failure> {
+    prepare_for(place, e, kit, packs, joining, &[])
+}
+
+/// As [`prepare`], when `leaving` are being uninstalled in the same run: the
+/// placement is for the runtimes that stay.
+pub fn prepare_without(
+    place: &Place,
+    e: &dyn Emitter,
+    kit: &Kit,
+    packs: &[String],
+    leaving: &[Runtime],
+) -> Result<Plan, Failure> {
+    prepare_for(place, e, kit, packs, &[], leaving)
+}
+
+fn prepare_for(
+    place: &Place,
+    e: &dyn Emitter,
+    kit: &Kit,
+    packs: &[String],
+    joining: &[Runtime],
+    leaving: &[Runtime],
+) -> Result<Plan, Failure> {
     let other = place
         .other()
         .and_then(|p| p.index(e.target()).ok().flatten());
@@ -120,6 +156,7 @@ pub fn prepare_among(
             let mut set = place.installed()?;
             set.push(e.target());
             set.extend_from_slice(joining);
+            set.retain(|r| !leaving.contains(r));
             Some(resolve(table(), &set))
         }
         ScopeKind::Global => None,
@@ -229,4 +266,24 @@ pub fn drop_retired(
         }
     }
     Ok(queued)
+}
+
+/// The runtimes among `installed` whose files depend on `changing` being here
+/// or not, `changing` itself left out. Codex, Pi and OMP write one `.agents/`
+/// tree in wording that depends on which of them are installed, and OMP
+/// switches off its import of `.claude/` only beside Claude Code.
+pub fn depends_on(changing: &[Runtime], installed: &[Runtime], scope: ScopeKind) -> Vec<Runtime> {
+    let sharers = mewkit_adapters::agents_tree::WRITERS;
+    let depends = |r: &Runtime| {
+        (sharers.contains(r) && changing.iter().any(|c| sharers.contains(c)))
+            || (*r == Runtime::Omp && changing.contains(&Runtime::ClaudeCode))
+    };
+    if scope != ScopeKind::Project {
+        return Vec::new();
+    }
+    installed
+        .iter()
+        .copied()
+        .filter(|r| !changing.contains(r) && depends(r))
+        .collect()
 }

@@ -111,6 +111,11 @@ pub fn written_hashes(plan: &Plan) -> std::collections::BTreeMap<String, String>
 
 pub trait Emitter: Sync {
     fn target(&self) -> Runtime;
+    /// Whether this runtime can be installed at `scope`. Most install into a
+    /// project and into the home directory.
+    fn supports(&self, _scope: ScopeKind) -> bool {
+        true
+    }
     /// The only paths this emitter's plans may touch, relative to the scope root.
     /// On the emitter, not the plan, so uninstall and doctor can ask too.
     fn roots(&self, scope: &Scope) -> Vec<RelPath>;

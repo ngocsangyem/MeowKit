@@ -17,7 +17,7 @@ use crate::contract::{
 };
 use crate::kit_files::rel;
 use crate::projected_kit::{ProjectedKit, Spec};
-use crate::{report_gate, scope, strip};
+use crate::{agents_tree, report_gate, scope, strip};
 
 /// Where the kit keeps what only Codex needs.
 pub const SOURCE: Spec = Spec {
@@ -40,7 +40,7 @@ pub const DENIED: &[&str] = &[
     "TaskList",
     "TodoWrite",
 ];
-const INSTALLED_PREFIXES: &[&str] = &[".agents/skills/", ".codex/"];
+const INSTALLED_PREFIXES: &[&str] = &[".agents/", ".codex/"];
 
 pub struct Codex;
 
@@ -51,7 +51,7 @@ impl Emitter for Codex {
 
     fn roots(&self, scope: &Scope) -> Vec<RelPath> {
         match scope.kind {
-            ScopeKind::Project => [".agents/skills", ".codex", AGENTS_MD]
+            ScopeKind::Project => [".agents/skills", agents_tree::KIT_DIR, ".codex", AGENTS_MD]
                 .iter()
                 .map(|r| RelPath::new(r).expect("static root"))
                 .collect(),
@@ -69,6 +69,9 @@ impl Emitter for Codex {
         } else {
             AGENTS_MD
         };
+        // Beside Pi or OMP the `.agents/` tree is written in the wording all of
+        // them follow; Codex's own text stays for what only Codex loads.
+        let shared = global.is_none() && agents_tree::is_shared(req.placement);
         let kit = ProjectedKit::open(&req.kit.dir, &SOURCE)?;
         let chosen = kit.select(req.packs, req.disabled)?;
         // Projection anchors a skill's helper commands at the project root,
@@ -98,6 +101,7 @@ impl Emitter for Codex {
                 // Project settings (`project_doc_max_bytes`); a global install leaves the user's config alone.
                 CONFIG_TOML if global.is_some() => {}
                 CONFIG_TOML => ops.push(shared::config_toml(&text()?)?),
+                path if shared && path.starts_with(".agents/") => {}
                 path => {
                     let skill = kit.skill_of(path);
                     if skill.is_some_and(|s| !chosen.contains(s)) {
@@ -123,6 +127,14 @@ impl Emitter for Codex {
             ops,
             ..Plan::default()
         };
+        if shared {
+            let tree = agents_tree::plan(req, &agents_tree::SHARED)?;
+            let files = |op: &Op| !matches!(op, Op::MergeBlock { .. });
+            plan.ops.extend(tree.ops.into_iter().filter(files));
+            plan.notices.push(
+                "Codex shares .agents/skills with another runtime installed here, so the skills are written without Codex's $ form: name a skill to run it".into(),
+            );
+        }
         let have = kit.skills();
         for missing in chosen.iter().filter(|s| !have.contains(s.as_str())) {
             plan.notices.push(format!(

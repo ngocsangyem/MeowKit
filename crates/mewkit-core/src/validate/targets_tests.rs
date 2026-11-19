@@ -51,3 +51,40 @@ fn an_empty_codex_tree_fails_the_rows_it_cannot_satisfy() {
     // invented, because a target without them is valid.
     assert!(!names.iter().any(|name| name.contains("agent TOMLs")));
 }
+
+#[test]
+fn a_grok_tree_is_detected_by_its_hook_runtime_config_and_fails_what_is_missing() {
+    let dir = tempfile::tempdir().expect("a temp dir");
+    std::fs::create_dir_all(dir.path().join(".grok/skills/mine")).expect("create a skill folder");
+    assert!(
+        !detects_target("grok", dir.path()),
+        "a .grok/ the user made is not an install"
+    );
+    let hooks = dir.path().join(".grok/meowkit/hooks");
+    std::fs::create_dir_all(&hooks).expect("create the hook scripts folder");
+    std::fs::write(
+        hooks.join("hook-runtime-config.json"),
+        "{ \"schemaVersion\": 1, \"runtime\": \"grok\" }\n",
+    )
+    .expect("write the runtime config");
+    assert!(detects_target("grok", dir.path()));
+
+    std::fs::create_dir_all(dir.path().join(".grok/hooks")).expect("create the hooks folder");
+    std::fs::write(
+        dir.path().join(".grok/hooks/meowkit.json"),
+        r#"{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"x","timeout":5}]}]}}"#,
+    )
+    .expect("write the hook file");
+    let rows = check_target("grok", dir.path());
+    let status: Vec<Status> = rows.iter().map(|row| row.status).collect();
+    assert_eq!(
+        status,
+        [Status::Fail, Status::Fail, Status::Pass, Status::Fail],
+        "{rows:?}"
+    );
+    assert!(
+        rows[1].detail.contains("cannot block"),
+        "{}",
+        rows[1].detail
+    );
+}

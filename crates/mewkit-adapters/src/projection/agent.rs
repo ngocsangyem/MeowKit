@@ -12,8 +12,9 @@ use crate::cursor::frontmatter::fields;
 struct Authored {
     name: String,
     description: String,
-    /// The id the target pins for the authored model tier.
-    model: &'static str,
+    /// The id the target pins for the authored model tier; `None` on a
+    /// target that pins no models.
+    model: Option<&'static str>,
     prompt: String,
 }
 
@@ -33,12 +34,12 @@ fn authored(
             .ok_or_else(|| bad(format!("no `{key}`")))
     };
     let tier = get("model")?;
-    let model = target
-        .model_pins
-        .iter()
-        .find(|(t, _)| *t == tier)
-        .map(|(_, id)| *id)
-        .ok_or_else(|| bad(format!("model `{tier}` has no pin for this runtime")))?;
+    let pin = target.model_pins.iter().find(|(t, _)| *t == tier);
+    let model = match pin {
+        Some((_, id)) => Some(*id),
+        None if target.model_pins.is_empty() => None,
+        None => return Err(bad(format!("model `{tier}` has no pin for this runtime"))),
+    };
     let name = get("name")?;
     // The name is the file name and is written unquoted.
     if file.strip_suffix(".md") != Some(name) {
@@ -92,7 +93,9 @@ pub fn codex_agent(
     let agent = authored(file, source, skills, target)?;
     let mut out = format!("name = {}\n", quoted(&agent.name));
     out.push_str(&format!("description = {}\n", quoted(&agent.description)));
-    out.push_str(&format!("model = {}\n", quoted(agent.model)));
+    if let Some(model) = agent.model {
+        out.push_str(&format!("model = {}\n", quoted(model)));
+    }
     for (key, value) in extra {
         out.push_str(&format!("{key} = {value}\n"));
     }
@@ -132,7 +135,9 @@ pub fn markdown_agent(
     let agent = authored(file, source, skills, target)?;
     let mut out = format!("---\nname: {}\n", agent.name);
     out.push_str(&format!("description: {}\n", quoted(&agent.description)));
-    out.push_str(&format!("model: {}\n", agent.model));
+    if let Some(model) = agent.model {
+        out.push_str(&format!("model: {model}\n"));
+    }
     for (key, value) in extra {
         out.push_str(&format!("{key}: {value}\n"));
     }
@@ -176,6 +181,15 @@ mod tests {
         assert!(md.starts_with(
             "---\nname: tester\ndescription: \"Writes tests. Use after mk-cook.\"\n\
              model: composer-2.5[fast=true]\nreadonly: true\n---\n\nYou are the Tester."
+        ));
+    }
+
+    #[test]
+    fn a_target_that_pins_no_models_writes_no_model() {
+        let grok = crate::projection::target::GROK;
+        let md = markdown_agent("tester.md", TESTER, &BTreeSet::new(), &grok, &[], Ok).unwrap();
+        assert!(md.starts_with(
+            "---\nname: tester\ndescription: \"Writes tests. Use after mk-cook.\"\n---\n\nYou are the Tester."
         ));
     }
 

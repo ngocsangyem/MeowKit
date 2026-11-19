@@ -105,8 +105,8 @@ done < <(
     -type f \( -name 'SKILL.md' -o -name 'step-*.md' -o -path '*/references/*.md' -o -path '.claude/agents/*.md' -o -path '.claude/rules/*.md' \) -print 2>/dev/null
 )
 
-# An installed Codex or Cursor tree names its own paths (`.agents/skills/mk-x/…`, `.codex/…`,
-# `.cursor/…`). Each must exist in that tree: a path to a file the install does not write is
+# An installed tree of another runtime names its own paths (`.agents/skills/mk-x/…`, `.codex/…`,
+# `.cursor/…`, `.grok/…`, `.pi/…`, `.omp/…`). Each must exist in that tree: a path to a file the install does not write is
 # a command that fails for the user. Exempt: files a user or a session creates at run time,
 # the example path the authoring rules warn against, and the audit rules the text marks as
 # kept in the kit's own repository.
@@ -115,7 +115,7 @@ shift || true
 if [ "$#" -gt 0 ]; then
   for tree in "$@"; do INSTALLED+=("$(basename "$tree")=$tree"); done
 elif [ -d kit/overlays ] && [ -f scripts/lib/installed-tree.cjs ]; then
-  for runtime in codex cursor; do
+  for runtime in codex cursor grok pi omp; do
     tree=$(node scripts/lib/installed-tree.cjs "$runtime") || { echo "ERROR: no installed $runtime tree to check" >&2; exit 1; }
     INSTALLED+=("$runtime=$tree")
     BUILT+=("$tree")
@@ -138,7 +138,7 @@ for entry in ${INSTALLED[@]+"${INSTALLED[@]}"}; do
   done < <(
     cd "$tree" && find . \( -path '*/.venv/*' -o -path '*/node_modules/*' \) -prune -o \
       -type f \( -name '*.md' -o -name '*.mdc' -o -name '*.toml' \) -print0 \
-      | xargs -0 perl -ne 'while (/(?:^|[\s`("\/])(\.(?:agents|codex|cursor)\/[A-Za-z0-9._\/-]+\.(?:mdc|md|cjs|sh|json|py|yaml|toml))(?![A-Za-z0-9])/g) { print "$ARGV\t$1\n" }'
+      | xargs -0 perl -ne 'while (/(?:^|[\s`("\/])(\.(?:agents|codex|cursor|grok|pi|omp)\/[A-Za-z0-9._\/-]+\.(?:mdc|md|cjs|sh|json|py|yaml|toml))(?![A-Za-z0-9])/g) { print "$ARGV\t$1\n" }'
   )
 done
 for tree in ${BUILT[@]+"${BUILT[@]}"}; do rm -r "$tree"; done

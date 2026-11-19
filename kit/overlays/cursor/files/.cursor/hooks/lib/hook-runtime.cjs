@@ -7,7 +7,7 @@
 //
 // The runtime is named by `hook-runtime-config.json` beside the hooks, written by whatever
 // lays the tree down. The canonical `.claude/hooks` has none and is Claude Code. An emitted
-// Codex or Cursor tree must have one: a shell there asks with `{ emitted: true }`, and a
+// tree for another runtime must have one: a shell there asks with `{ emitted: true }`, and a
 // missing or unknown config comes back null, which that shell turns into a block.
 
 const fs = require('node:fs');
@@ -23,6 +23,9 @@ const NON_SOURCE_TREES = {
   'claude-code': [],
   codex: ['.codex', '.agents', '.meowkit'],
   cursor: ['.cursor', '.meowkit'],
+  grok: ['.grok', '.meowkit'],
+  // The tree Codex, Pi and OMP share; each of them may be the one installed.
+  agents: ['.agents', '.codex', '.pi', '.omp', '.meowkit'],
 };
 
 /** The runtime the hooks in `hooksDir` serve, or null when it cannot be trusted. */

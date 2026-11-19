@@ -10,9 +10,9 @@
 //   node scripts/check-instruction-criteria.cjs --metrics [tree ...]  print the metrics table
 //   node scripts/check-instruction-criteria.cjs --emphatic [tree ...] emphatic tokens per file
 //
-// A tree is `.claude`, a directory, or `installed:codex` / `installed:cursor`: what
+// A tree is `.claude`, a directory, or `installed:<runtime>` (codex, cursor, grok, pi, omp): what
 // `mewkit init` writes for that runtime from this checkout (scripts/lib/installed-tree.cjs,
-// which needs the mewkit binary). With no tree, all three are checked.
+// which needs the mewkit binary). With no tree, `.claude` and all five are checked.
 // Criteria and their scope: docs/maintainer/instruction-audit-criteria.md.
 
 const crypto = require('node:crypto');
@@ -27,7 +27,7 @@ const { installedTree } = require('./lib/installed-tree.cjs');
 
 const REPO = path.resolve(__dirname, '..');
 const INSTALLED = 'installed:';
-const DEFAULT_TREES = ['.claude', 'installed:codex', 'installed:cursor'];
+const DEFAULT_TREES = ['.claude', 'installed:codex', 'installed:cursor', 'installed:grok', 'installed:pi', 'installed:omp'];
 const TEXT_EXT = new Set(['.md', '.mdc', '.toml']);
 const SKIP_DIRS = new Set(['node_modules', '__tests__', '.venv']);
 /** Host state at the top of a tree; a skill folder of the same name deeper down is still checked. */
@@ -39,16 +39,16 @@ const CRITERIA = ['A1', 'A2', 'A5', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14'];
 const PINNED_SHA256 = 'e0b639506d83aff3e9040f3fdbfad35c016ee46ff701ad2f1daff04ced2461fa';
 
 /**
- * Always-on bytes per tree may only shrink. Claude Code loads every rule file; Codex and
- * Cursor load the installed root AGENTS.md (the kit's shared block and its markers), and
+ * Always-on bytes per tree may only shrink. Claude Code loads every rule file; every other
+ * runtime loads the installed root AGENTS.md (the kit's shared block and its markers), and
  * Cursor also every installed `.mdc` rule marked `alwaysApply: true`. The Cursor figure rose
  * from 6316 when Cursor took the shared block in place of a shorter text of its own.
  */
-const ALWAYS_ON_CEILING = { '.claude': 18191, 'installed:codex': 7687, 'installed:cursor': 10641 };
+const ALWAYS_ON_CEILING = { '.claude': 18191, 'installed:codex': 7687, 'installed:cursor': 10641, 'installed:grok': 7687, 'installed:pi': 7687, 'installed:omp': 7687 };
 /** Codex stops reading project guidance past this many bytes (`project_doc_max_bytes`). */
 const AGENTS_MD_CAP = 32768;
 /** Skill listing ceilings in chars; Codex is lower so a 128k-context session keeps whole descriptions. */
-const LISTING_CEILING = { '.claude': 16000, 'installed:codex': 12000, 'installed:cursor': 16000 };
+const LISTING_CEILING = { '.claude': 16000, 'installed:codex': 12000, 'installed:cursor': 16000, 'installed:grok': 12000, 'installed:pi': 12000, 'installed:omp': 12000 };
 
 /** Where a tree's files are. */
 function dirOf(tree) {

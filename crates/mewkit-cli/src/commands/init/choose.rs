@@ -57,13 +57,16 @@ pub fn pick_targets(yes: bool, installed_here: bool) -> Result<(Vec<Runtime>, bo
         (Runtime::ClaudeCode, "installs .claude/"),
         (Runtime::Codex, "installs .agents/skills and .codex/"),
         (Runtime::Cursor, "installs .cursor/"),
+        (Runtime::Grok, "installs .grok/"),
+        (Runtime::Pi, "installs .agents/ and .pi/"),
+        (Runtime::Omp, "installs .agents/ and .omp/"),
     ]
     .into_iter()
     .map(|(r, hint)| Choice::plain(r.name()).with_hint(hint))
     .collect();
     let ask = Ask::new(
         "Select the toolkits to set up",
-        Flag::with_value("--target", "claude-code|codex|cursor"),
+        Flag::with_value("--target", "claude-code|codex|cursor|grok|pi|omp"),
     );
     let picked = default_prompt().multi_select(&ask, &choices)?;
     let runtimes: Vec<Runtime> = picked

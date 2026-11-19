@@ -18,9 +18,9 @@ Install the kit into this project, or your home with --global
 Usage: mewkit init [OPTIONS]
 
 Options:
-      --target <TARGETS>      Runtimes to install for: claude-code, codex, cursor (comma-separated) or all. Omitted: Claude Code with --yes or in a project that has `.claude/`, otherwise a picker
+      --target <TARGETS>      Runtimes to install for: claude-code, codex, cursor, grok, pi, omp (comma-separated) or all. Omitted: Claude Code with --yes or in a project that has `.claude/`, otherwise a picker
       --profile <PROFILE>     Claude Code: install a subset (core, developer, product, atlassian, security, research, or full). Re-running with a narrower profile removes what the narrower profile no longer includes, unless you edited it
-      --skill-packs <PACKS>   Codex and Cursor: comma-separated skill packs, or `all`. Omitted installs every skill; an empty value installs the default pack only
+      --skill-packs <PACKS>   Every runtime but Claude Code: comma-separated skill packs, or `all`. Omitted installs every skill; an empty value installs the default pack only
       --delivery <SHAPE>      Claude Code only: `native` (the host's own directory) or `plugin` (the same content plus a plugin manifest)
       --mcp-profiles <NAMES>  Cursor: MCP profile names, or `all`, to merge into .cursor/mcp.json. Without it no MCP config is written
       --allow-cloud-mcp       Cursor: second opt-in for applying an MCP profile to a project that has a git remote (Cursor Cloud Agents run no local MCP hooks)

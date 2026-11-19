@@ -5,11 +5,15 @@
 #![forbid(unsafe_code)]
 
 pub mod agents_block;
+pub mod agents_tree;
 pub mod claude_code;
 pub mod codex;
 pub mod contract;
 pub mod cursor;
+pub mod grok;
 mod kit_files;
+pub mod omp;
+pub mod pi;
 pub mod placement_resolver;
 pub mod projected_kit;
 pub mod projection;

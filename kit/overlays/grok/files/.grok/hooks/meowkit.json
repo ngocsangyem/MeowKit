@@ -1,0 +1,25 @@
+{
+	"hooks": {
+		"PreToolUse": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node \"$GROK_WORKSPACE_ROOT/.grok/meowkit/hooks/privacy-block.cjs\"",
+						"timeout": 10
+					}
+				]
+			},
+			{
+				"matcher": "Bash",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "node \"$GROK_WORKSPACE_ROOT/.grok/meowkit/hooks/pre-ship.cjs\"",
+						"timeout": 300
+					}
+				]
+			}
+		]
+	}
+}

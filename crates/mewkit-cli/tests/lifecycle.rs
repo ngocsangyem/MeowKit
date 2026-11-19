@@ -86,6 +86,69 @@ fn a_shared_block_file_the_kit_created_goes_with_the_last_runtime() {
 }
 
 #[test]
+fn adding_then_removing_a_runtime_that_shares_the_skills_root_leaves_a_fresh_install() {
+    let env = TempHome::new();
+    let p = env.project();
+    assert_eq!(code(&env.with_kit(&["init", "--target", "codex"])), 0);
+    let alone = sha_tree(&p);
+
+    let out = env.with_kit(&["init", "--target", "omp"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert!(
+        text(&out).contains("codex is installed here and what it installs depends"),
+        "{}",
+        text(&out)
+    );
+    assert!(p.join(".agents/meowkit/hooks/guard.cjs").is_file());
+    let skill = std::fs::read_to_string(p.join(".agents/skills/mk-cook/SKILL.md")).unwrap();
+    assert!(
+        !skill.contains("$mk-"),
+        "the shared wording has no Codex form"
+    );
+
+    let out = env.with_kit(&["uninstall", "--target", "omp", "--yes"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    let kit_files = |tree: &std::collections::BTreeMap<std::path::PathBuf, String>| {
+        tree.iter()
+            .filter(|(path, _)| !path.starts_with(".meowkit"))
+            .map(|(path, sha)| (path.clone(), sha.clone()))
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(kit_files(&sha_tree(&p)), kit_files(&alone));
+
+    let out = env.with_kit(&["uninstall", "--target", "codex", "--yes"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert!(
+        kit_files(&sha_tree(&p)).is_empty(),
+        "{:?}",
+        kit_files(&sha_tree(&p))
+    );
+}
+
+#[test]
+fn omp_switches_the_claude_import_off_only_while_claude_code_is_installed() {
+    let env = TempHome::new();
+    let p = env.project();
+    let config = p.join(".omp/config.yml");
+    assert_eq!(code(&env.with_kit(&["init", "--target", "omp"])), 0);
+    assert!(
+        !config.exists(),
+        "nothing to switch off beside no other runtime"
+    );
+
+    let out = env.with_kit(&["init", "--target", "claude-code"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert_eq!(
+        std::fs::read_to_string(&config).unwrap(),
+        "disabledProviders: [claude]\n"
+    );
+
+    let out = env.with_kit(&["uninstall", "--target", "claude-code", "--yes"]);
+    assert_eq!(code(&out), 0, "{}", text(&out));
+    assert!(!config.exists(), "{}", text(&out));
+}
+
+#[test]
 fn a_second_uninstall_has_nothing_to_do() {
     let env = TempHome::new();
     assert_eq!(code(&env.with_kit(&["init", "--target", "codex"])), 0);

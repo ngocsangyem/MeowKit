@@ -42,7 +42,9 @@
   ],
   "bundleLibDirs": [
     "kit/overlays/codex/files/.codex/hooks/lib",
-    "kit/overlays/cursor/files/.cursor/hooks/lib"
+    "kit/overlays/cursor/files/.cursor/hooks/lib",
+    "kit/overlays/grok/files/.grok/meowkit/hooks/lib",
+    "kit/overlays/agents/files/.agents/meowkit/hooks/lib"
   ],
   "helpers": [
     "config-keys.cjs",
@@ -64,6 +66,8 @@
   ],
   "helperBinDirs": [
     "kit/overlays/codex/files/.codex/scripts/bin",
-    "kit/overlays/cursor/files/.cursor/scripts/bin"
+    "kit/overlays/cursor/files/.cursor/scripts/bin",
+    "kit/overlays/grok/files/.grok/meowkit/scripts/bin",
+    "kit/overlays/agents/files/.agents/meowkit/scripts/bin"
   ]
 }

@@ -221,7 +221,7 @@
     },
     {
       "name": "grok",
-      "checked": "vendor pages read 2026-11-18 (pages dated July to October 2026); not installed, nothing probed",
+      "checked": "vendor pages read 2026-11-18, hooks and subagents pages again 2026-11-19 (pages dated July to October 2026); not installed, nothing probed",
       "kinds": {
         "skills": {
           "roots": [
@@ -273,7 +273,7 @@
               "source": "https://docs.x.ai/build/settings/reference"
             }
           ],
-          "note": "File format and fields are not documented on the page read (checklist C3)."
+          "note": "The page names the folder and no file format or field (read 2026-11-19), so the kit writes no agent definition there; agent prompts go to `.grok/meowkit/agents/`, which Grok does not load (checklist C3)."
         },
         "always-on": {
           "roots": [
@@ -366,7 +366,7 @@
     },
     {
       "name": "pi",
-      "checked": "docs on the default branch read 2026-11-18, package 1.5.2; not installed, nothing probed",
+      "checked": "docs on the default branch read 2026-11-18 and 2026-11-19, package 1.5.2; not installed, nothing probed",
       "kinds": {
         "skills": {
           "roots": [

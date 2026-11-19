@@ -1,0 +1,34 @@
+# Passages the authored kit cannot be projected into for the skills root that
+# Codex, Pi and OMP share. Format: crates/mewkit-adapters/src/projection/overlay.rs.
+
+# The main session routes work on these runtimes; none loads an orchestrator agent.
+omit = [".agents/meowkit/agents/orchestrator.md"]
+
+# The kit reads no environment variable for the session's model on these
+# runtimes, so the autobuild run report records the user's hint, not a detected id.
+[[replace]]
+path = ".agents/skills/mk-autobuild/step-00-tier-detection.md"
+find = '''
+For the run report. Use the same env var fallback chain as `density-select.sh` (POSIX parameter expansion, not echo trick):
+
+```bash
+model_id="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}"
+'''
+with = '''
+For the run report. No environment variable names the session's model here, so `model_id` is the hint the user set, not a detected id; without a hint `density-select.sh` takes the `STANDARD` tier:
+
+```bash
+model_id="${MEOWKIT_MODEL_HINT:-unknown}"
+'''
+
+# The pull-request trailer names no product: several runtimes read this file.
+[[replace]]
+path = ".agents/skills/mk-ship/references/commit-push-pr.md"
+find = "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+with = "🤖 Generated with a coding agent"
+
+# The two guards are one script in this tree.
+[[replace]]
+path = ".agents/skills/mk-web-to-markdown/references/security.md"
+find = "`.agents/meowkit/hooks/privacy-block.cjs`"
+with = "`.agents/meowkit/hooks/guard.cjs`"

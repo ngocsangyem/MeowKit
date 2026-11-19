@@ -1,14 +1,15 @@
 //! Reading kit script paths out of hook file entries: commands are split into
 //! words outside quotes, `args` entries are whole paths, and the project root's
-//! spellings (`$CLAUDE_PROJECT_DIR`, `git rev-parse`, `%CLAUDE_PROJECT_DIR%`)
-//! become one.
+//! spellings (`$CLAUDE_PROJECT_DIR`, `git rev-parse`, `%CLAUDE_PROJECT_DIR%`,
+//! `$GROK_WORKSPACE_ROOT`) become one.
 
 /// How kit hook commands name the project root; each becomes [`ROOT`].
-const ROOT_FORMS: [&str; 4] = [
+const ROOT_FORMS: [&str; 5] = [
     "$(git rev-parse --show-toplevel)/",
     "${CLAUDE_PROJECT_DIR}/",
     "$CLAUDE_PROJECT_DIR/",
     "%CLAUDE_PROJECT_DIR%/",
+    "$GROK_WORKSPACE_ROOT/",
 ];
 pub const ROOT: &str = "$ROOT/";
 
@@ -76,6 +77,10 @@ mod tests {
 
     #[test]
     fn finds_kit_hook_scripts_in_commands() {
+        assert_eq!(
+            kit_scripts(r#"node "$GROK_WORKSPACE_ROOT/.grok/meowkit/hooks/pre-ship.cjs""#),
+            ["$ROOT/.grok/meowkit/hooks/pre-ship.cjs"]
+        );
         assert_eq!(
             kit_scripts(r#"node "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-ship.cjs" --x"#),
             ["$ROOT/.claude/hooks/pre-ship.cjs"]

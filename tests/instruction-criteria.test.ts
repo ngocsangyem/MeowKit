@@ -217,5 +217,6 @@ describe("the real trees", () => {
 		);
 		expect(run.stdout).toContain("No findings.");
 		expect(run.status).toBe(0);
-	});
+		// One install per runtime other than Claude Code, five in all.
+	}, 120_000);
 });

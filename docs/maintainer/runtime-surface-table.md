@@ -69,7 +69,7 @@ Checked: vendor pages read 2026-11-18; Cursor Agent 2026.07.23-e383d2b installed
 
 ### grok
 
-Checked: vendor pages read 2026-11-18 (pages dated July to October 2026); not installed, nothing probed.
+Checked: vendor pages read 2026-11-18, hooks and subagents pages again 2026-11-19 (pages dated July to October 2026); not installed, nothing probed.
 
 | Kind | Root | Kit writes | Unsure | Switch | Source |
 |---|---|---|---|---|---|
@@ -92,14 +92,14 @@ Checked: vendor pages read 2026-11-18 (pages dated July to October 2026); not in
 | mcp | `.cursor/mcp.json` |  |  | user: `[compat.cursor] mcps = false` in `~/.grok/config.toml` | https://docs.x.ai/build/features/mcp-servers |
 
 - skills: A project `.agents/skills` is not mentioned; the user-level `~/.agents/skills` is. The same name in two folders is not documented.
-- agents: File format and fields are not documented on the page read (checklist C3).
+- agents: The page names the folder and no file format or field (read 2026-11-19), so the kit writes no agent definition there; agent prompts go to `.grok/meowkit/agents/`, which Grok does not load (checklist C3).
 - always-on: Every file found is loaded in full. Whether `.mdc` frontmatter is parsed is not stated (checklist C4).
 - hooks: Hooks fail open; only PreToolUse blocks; the default timeout is 5 s. Project config cannot hold the compatibility switches (https://docs.x.ai/build/settings).
 - mcp: The imported files merge below `config.toml`; one server defined in two of them is not documented.
 
 ### pi
 
-Checked: docs on the default branch read 2026-11-18, package 1.5.2; not installed, nothing probed.
+Checked: docs on the default branch read 2026-11-18 and 2026-11-19, package 1.5.2; not installed, nothing probed.
 
 | Kind | Root | Kit writes | Unsure | Switch | Source |
 |---|---|---|---|---|---|

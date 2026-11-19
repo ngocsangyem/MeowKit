@@ -1,0 +1,58 @@
+#!/usr/bin/env node
+'use strict';
+// workflow-diff-scope — say which kinds of file a branch changed.
+//
+// Usage: eval "$(workflow-diff-scope main)" → sets the SCOPE_* variables
+//
+// Every variable is always printed, true or false, so a caller can read one
+// without first testing whether it was set: an unset variable and a false one
+// are the same thing to `[ "$SCOPE_TESTS" = true ]`, and only one of them is a
+// real answer. The merge-base form is tried first and a plain diff second, so a
+// base ref with no common ancestor still produces a scope instead of nothing.
+
+const { spawnSync } = require('node:child_process');
+
+const base = process.argv[2] || 'main';
+
+/** The changed-file list, or an empty list when neither diff form resolves. */
+function changedFiles() {
+  for (const range of [`${base}...HEAD`, base]) {
+    const result = spawnSync('git', ['diff', range, '--name-only'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    if (result.status === 0 && typeof result.stdout === 'string') {
+      return result.stdout.split('\n').filter((line) => line !== '');
+    }
+  }
+  return [];
+}
+
+/**
+ * Scope classes in precedence order — the first match claims the file.
+ *
+ * Order is load-bearing and matches the shell `case` it replaces: a `.tsx`
+ * component counts as frontend rather than backend, and a `.ts` test counts as
+ * a test rather than backend.
+ */
+const CLASSES = [
+  ['FRONTEND', /\.(css|scss|less|tsx|jsx|vue|svelte|html)$/],
+  ['FRONTEND', /^(tailwind|postcss)\.config\.|\/components\/|^styles\//],
+  ['TESTS', /\.(test|spec)\.|_(test|spec)\.|^(test|tests|__tests__)\//],
+  ['DOCS', /\.md$/],
+  ['CONFIG', /^package\.json$|\.lock$|\.ya?ml$|^\.github\/|^requirements\.txt$|^go\.mod$/],
+  ['BACKEND', /\.(rb|py|go|rs|java|php|ts|js)$/],
+];
+
+// PROMPTS has no classifier and is reported false: the variable is part of the
+// contract the callers read, and dropping it would break a caller that tests it.
+const scopes = { FRONTEND: false, BACKEND: false, PROMPTS: false, TESTS: false, DOCS: false, CONFIG: false };
+
+for (const file of changedFiles()) {
+  const hit = CLASSES.find(([, pattern]) => pattern.test(file));
+  if (hit) scopes[hit[0]] = true;
+}
+
+for (const [name, value] of Object.entries(scopes)) {
+  process.stdout.write(`SCOPE_${name}=${value}\n`);
+}
