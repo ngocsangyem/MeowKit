@@ -89,8 +89,9 @@ test('every shell in a bundle resolves each local require to a file in that bund
   }
 });
 
-// Helpers skill and agent text runs by path, besides the workflow-* ones.
-const RUN_BY_PATH = ['injection-audit.cjs', 'secret-scrub.cjs'];
+// Helpers skill and agent text runs by path, besides the workflow-* ones, and the
+// stdin reader the careful, freeze and investigate guard scripts require.
+const RUN_BY_PATH = ['injection-audit.cjs', 'secret-scrub.cjs', 'parse-stdin.cjs'];
 
 test('the helper set is exactly what the skill helpers load', () => {
   const workflow = closure.helpers.filter((f) => f.startsWith('workflow-') && !f.endsWith('.cjs'));

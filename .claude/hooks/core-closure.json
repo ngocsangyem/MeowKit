@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "Every .claude/hooks/lib file each shared safety behaviour loads, relative to .claude/hooks/lib. `lib` is the require closure of the behaviour's Claude Code shell; `spawned` are lib scripts it runs as child processes. `bundled` is what a non-Claude runtime's hook tree carries (the two safety behaviours, the runtime adapter, and the dependency-free completion-check core the Codex and Cursor stop hooks require): the runtime shells there require exactly these files, copied byte for byte by scripts/sync-hook-core.cjs. Checked by .claude/hooks/__tests__/core-closure.test.cjs. `helpers` are the workflow-* scripts skill preambles run and the files they require; each bundle carries a byte-for-byte copy of them in every `helperBinDirs` entry, where its skills call them.",
+  "description": "Every .claude/hooks/lib file each shared safety behaviour loads, relative to .claude/hooks/lib. `lib` is the require closure of the behaviour's Claude Code shell; `spawned` are lib scripts it runs as child processes. `bundled` is what a non-Claude runtime's hook tree carries (the two safety behaviours, the runtime adapter, and the dependency-free completion-check core the Codex and Cursor stop hooks require): the runtime shells there require exactly these files, copied byte for byte by scripts/sync-hook-core.cjs. Checked by .claude/hooks/__tests__/core-closure.test.cjs. `helpers` are the workflow-* scripts skill preambles run, the stdin reader the skill guard scripts require, and the files those require; each bundle carries a byte-for-byte copy of them in every `helperBinDirs` entry, where its skills call them.",
   "behaviours": {
     "privacy": {
       "shell": "privacy-block.cjs",
@@ -49,11 +49,13 @@
   "helpers": [
     "config-keys.cjs",
     "config-rules.cjs",
+    "core/hook-payload.cjs",
     "handler-registry.cjs",
     "injection-audit-core.cjs",
     "injection-audit-patterns.cjs",
     "injection-audit.cjs",
     "meowkit-paths.cjs",
+    "parse-stdin.cjs",
     "read-config.cjs",
     "secret-scrub.cjs",
     "workflow-config",

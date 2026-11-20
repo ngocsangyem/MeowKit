@@ -115,7 +115,7 @@ Parse the output. Match entries by `skill` field for real skills (`plan-ceo-revi
 
 **Review tiers:**
 
-- **Eng Review (required by default):** The only review the ship step asks about. Covers architecture, code quality, tests, performance. Can be opted out of per project with `workflow-config set skip_eng_review true`, which records the choice in `.meowkit/state/` rather than in the committed config (the "don't bother me" setting).
+- **Eng Review (required by default):** The only review the ship step asks about. Covers architecture, code quality, tests, performance. Can be opted out of per project with `.claude/hooks/lib/workflow-config set skip_eng_review true`, which records the choice in `.meowkit/state/` rather than in the committed config (the "don't bother me" setting).
 - **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
 - **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
 - **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get Claude adversarial subagent. Large diffs (200+) get 2 passes: Claude structured (from pre-landing review) + Claude adversarial subagent. No configuration needed.

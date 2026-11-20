@@ -5457,6 +5457,11 @@
       "size": 4529
     },
     {
+      "path": ".codex/scripts/bin/core/hook-payload.cjs",
+      "sha256": "6fe4af50785b60745aa0b0a9eb3ae27453000fa9287fd400f7374fc8ff95d81a",
+      "size": 2249
+    },
+    {
       "path": ".codex/scripts/bin/handler-registry.cjs",
       "sha256": "f571827c64bdb4bf9f583d246cff85efe7342015984e2ec39fa94031f1546c01",
       "size": 4818
@@ -5480,6 +5485,11 @@
       "path": ".codex/scripts/bin/meowkit-paths.cjs",
       "sha256": "53d5ea65cc620d0671a3656a4411a1dc51e271d6341890c88185c8b7014f3aee",
       "size": 3398
+    },
+    {
+      "path": ".codex/scripts/bin/parse-stdin.cjs",
+      "sha256": "647adf07f29d4e7ff490617328c32868f8b9fdb04f6742ceac0a96e626ac4124",
+      "size": 3730
     },
     {
       "path": ".codex/scripts/bin/read-config.cjs",
