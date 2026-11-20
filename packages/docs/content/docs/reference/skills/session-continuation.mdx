@@ -32,14 +32,14 @@ workflow:list              list saved workflows
 
 ## Where state lives
 
-Saved workflows are in `.claude/logs/workflows/`. The active plan is read from `.meowkit/state/active-plan.json` or found by scanning `tasks/plans/`. Nothing is carried between sessions in the environment.
+Saved workflows are in `.meowkit/logs/workflows/`. The active plan is read from `.meowkit/state/active-plan.json` or found by scanning `tasks/plans/`. Nothing is carried between sessions in the environment.
 
 ## Steps
 
 1. Detect the trigger: context limit, user command or session end.
 2. For a handoff, follow `references/handoff-flow.md` to save the state and write a summary.
 3. For a resume, follow `references/resume-and-state.md` to load the state, restore it and continue.
-4. For a list, show the workflows saved in `.claude/logs/workflows/`.
+4. For a list, show the workflows saved in `.meowkit/logs/workflows/`.
 
 ## Gotchas
 

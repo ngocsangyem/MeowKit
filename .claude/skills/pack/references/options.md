@@ -17,9 +17,9 @@ Local paths MUST be outside the current git root unless `--self` is passed.
 | Flag | Default | Maps to | Notes |
 |------|---------|---------|-------|
 | `--style <type>` | `markdown` | `--style` | `markdown`, `xml`, `json`, `plain` |
-| `--output <path>` | auto-generated | `-o` | Override `.claude/packs/...` default |
+| `--output <path>` | auto-generated | `-o` | Override `.meowkit/packs/...` default |
 
-Auto-generated output path: `.claude/packs/{YYYYMMDD-HHMM}-{slug}.{ext}` where slug is derived from the source (last URL segment or local dir basename).
+Auto-generated output path: `.meowkit/packs/{YYYYMMDD-HHMM}-{slug}.{ext}` where slug is derived from the source (last URL segment or local dir basename).
 
 ## File Selection
 

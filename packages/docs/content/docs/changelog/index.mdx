@@ -19,6 +19,15 @@ A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-n
 
 - The `careful`, `freeze` and `investigate` guard scripts start on Codex, Cursor, Grok, Pi and OMP. They load a stdin reader from the runtime's `scripts/bin/`, which the kit did not install there.
 - Ten command hints in skill references named `workflow-config` without its path, so the command they showed could not be run as written. They now give the path.
+- Installed text on Codex, Cursor, Grok, Pi and OMP named about 55 paths per runtime that the install does not have, such as a rules folder or a hook script that exists only on Claude Code. The sources are reworded and none is left; a test holds every runtime's install to that.
+- `mk:web-to-markdown` finds the project root by the `.meowkit/` folder. It looked for files only a Claude Code project has, and fell back to the working directory elsewhere.
+- Skills that named `.claude/mcp.json.example`, `.claude/.mcp.json` or `.claude/plans/` now name the files that exist: `.meowkit/mcp.json.example`, the runtime's own MCP config and `tasks/plans/`.
+
+### Migration Notes
+
+- `mk:scale-routing` reads product areas from `.meowkit/product-areas.yaml`. Move a `.claude/product-areas.yaml` there, and add `!product-areas.yaml` to `.meowkit/.gitignore` to commit it.
+- `mk:pack` writes to `.meowkit/packs/` and `mk:session-continuation` keeps workflow state in `.meowkit/logs/workflows/`. Both used a folder under `.claude/`; move saved workflow state across if you need to resume one.
+- The plan lookup in `mk:review` and `mk:ship` searches `tasks/plans/` only. It no longer looks in `.claude/plans/` or your home directory.
 
 ### Improvements
 

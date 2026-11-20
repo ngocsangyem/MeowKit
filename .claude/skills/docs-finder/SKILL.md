@@ -144,7 +144,7 @@ MCP servers are optional. Skill degrades gracefully:
 - **Context Hub**: `npx chub` → curated docs, no install
 - **Neither**: falls back to llms.txt direct fetch + WebSearch
 
-Config: `.mcp.json` — MCP server endpoints. Copy from `.claude/mcp.json.example`.
+Config: `.mcp.json` — MCP server endpoints. Copy from `.meowkit/mcp.json.example`.
 
 ## Failure Handling
 

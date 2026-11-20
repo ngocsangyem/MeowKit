@@ -2,7 +2,7 @@
 // completion-check.cjs — the opt-in end-of-turn check for edits left unverified.
 //
 // Shared by the Claude Code observer and Stop handler and by the Codex and Cursor stop hooks
-// (copied byte for byte by scripts/sync-hook-core.cjs), so the rule is the same everywhere:
+// (copied byte for byte by the kit's sync script), so the rule is the same everywhere:
 //
 //   1. After a shell command that names a test, build, lint or type-check runner passes, the
 //      observer stores a digest of the working tree.

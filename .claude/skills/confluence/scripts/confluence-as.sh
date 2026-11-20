@@ -24,8 +24,8 @@ fi
 
 # Refuse plaintext credential fallback in settings.local.json (security override of upstream default)
 if [ -f "$LOCAL_SETTINGS" ] && grep -q "CONFLUENCE_API_TOKEN" "$LOCAL_SETTINGS" 2>/dev/null; then
-  echo "[mk:confluence] credentials must live in .claude/.env, not .claude/settings.local.json" >&2
-  echo "[mk:confluence] Move CONFLUENCE_* vars to .claude/.env (chmod 0600 recommended), then retry." >&2
+  echo "[mk:confluence] credentials must live in .meowkit/.env, not in settings.local.json" >&2
+  echo "[mk:confluence] Move them to .meowkit/.env as MEOW_CONFLUENCE_* (chmod 0600 recommended), then retry." >&2
   exit 2
 fi
 

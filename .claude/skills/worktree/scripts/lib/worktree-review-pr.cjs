@@ -18,7 +18,7 @@
  * before use as defense-in-depth. Do not reintroduce the shared string-based
  * `git()` helper on any path that carries manifest/back-reference data.
  *
- * Canonical schema: crates/mewkit-core/src/schema/review_manifest.rs (ReviewManifest).
+ * Canonical schema: `ReviewManifest` in the `mewkit` CLI.
  * This CommonJS module cannot import it and nothing checks the two against each
  * other, so a change to either side must be made to the other by hand.
  */

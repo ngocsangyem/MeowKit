@@ -61,5 +61,5 @@ The export is HTML and Tailwind only, with no React, Vue or Svelte. Layouts are 
 ## Gotchas
 
 - If you hit `RATE_LIMITED` while the tracker shows credits, run `stitch-quota.ts reset`. Quota limits and paid tiers change, so read `references/quota-management.md` before deciding on quota.
-- The optional MCP setup stores the API key in `.claude/.mcp.json`. Do not commit it. The kit's `.gitignore` covers it.
+- The optional MCP setup goes in your runtime's MCP config (`.mcp.json` at the project root on Claude Code). Reference the key as `${STITCH_API_KEY}` there and never paste the raw key into the file.
 - `stitch-write-output.ts` accepts only Google CDN domains. If Stitch changes domains, update `ALLOWED_CDN_SUFFIXES` in that script.

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "What each Claude Code hook behaviour becomes on the other runtimes. `ported` runs the same shared decision; `equivalent` is a runtime-native hook covering the same need differently; `not-ported` has no counterpart, with the reason. Every safety behaviour and every handler in handlers.json appears once. Checked by .claude/hooks/__tests__/hook-coverage.test.cjs.",
+  "description": "What each Claude Code hook behaviour becomes on the other runtimes. `ported` runs the same shared decision; `equivalent` is a runtime-native hook covering the same need differently; `not-ported` has no counterpart, with the reason. Every safety behaviour and every handler in handlers.json appears once. Checked by the tests in the kit's source repository.",
   "statuses": ["ported", "equivalent", "not-ported"],
   "safety": {
     "privacy": {

@@ -16,7 +16,7 @@ Simplest setup. No Google Cloud dependency.
 3. Click "Generate New Key"
 4. Copy the `sk_...` key
 
-### 2. Add to `.claude/.mcp.json`
+### 2. Add to your MCP config (`.mcp.json` at the project root on Claude Code)
 
 ```json
 {
@@ -33,7 +33,7 @@ Simplest setup. No Google Cloud dependency.
 ```
 
 Use `${STITCH_API_KEY}` (env-var reference) — never paste the raw key into config.
-`.claude/.mcp.json` is covered by the kit's `.gitignore`; do not commit it.
+With the env-var reference the file holds no secret. A file with a raw key in it must not be committed.
 
 ### 3. Verify
 
@@ -55,7 +55,7 @@ gcloud config set project YOUR_PROJECT_ID
 gcloud beta services mcp enable stitch.googleapis.com
 ```
 
-### 2. Add to `.claude/.mcp.json`
+### 2. Add to your MCP config (`.mcp.json` at the project root on Claude Code)
 
 ```json
 {
@@ -90,7 +90,7 @@ npx stitch-mcp-auto
 
 ## MCP Config Location
 
-For Claude Code CLI (per-project): `.claude/.mcp.json` in the project root.
+For Claude Code CLI (per-project): `.mcp.json` in the project root.
 
 For Claude Desktop: `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS).
 

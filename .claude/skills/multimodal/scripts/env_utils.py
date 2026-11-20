@@ -28,7 +28,8 @@ def _find_meowkit_dir(start: Path) -> Optional[Path]:
 
 
 def load_env_files():
-    """Load .env files. Priority: shell exports > skill .env > .meowkit/.env > .claude/.env.
+    """Load .env files. Priority: shell exports > skill .env > .meowkit/.env > the env file an
+    older install kept in the runtime folder.
 
     Uses override=False so shell exports always win and the first file to set a var wins.
 

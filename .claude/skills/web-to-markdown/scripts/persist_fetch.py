@@ -37,16 +37,12 @@ from scripts.secret_scrub import scrub_content, scrub_url
 def _find_project_root() -> Path:
     """Walk up from this file to find the project root.
 
-    Previous logic searched for .claude/ directory, but skill subdirs also
-    contain .claude/, causing resolution to stop at the skill dir instead of
-    the actual project root. Uses multiple sentinels for robustness:
-    - CLAUDE.md — created by Claude Code and the installer
-    - .claude/settings.json — always exists at project root, never in skill subdirs
+    The root is the nearest folder above this file that holds `.meowkit/`,
+    which every install of the kit creates whichever runtime it is for. A
+    runtime folder is no use as the mark: skill folders can hold one too.
     """
     for parent in Path(__file__).resolve().parents:
-        if (parent / "CLAUDE.md").exists():
-            return parent
-        if (parent / ".claude" / "settings.json").exists():
+        if (parent / ".meowkit").is_dir():
             return parent
     return Path.cwd()
 
@@ -58,7 +54,7 @@ PROJECT_ROOT = _find_project_root()
 CACHE_ROOT = PROJECT_ROOT / ".meowkit" / "cache" / "web-fetches"
 QUARANTINE_DIR = CACHE_ROOT / "quarantine"
 MANIFEST_PATH = CACHE_ROOT / "index.jsonl"
-# Canonical destination named by `.claude/rules/meowkit-core.md` (Recording Human Overrides): the
+# Canonical destination named by the kit's core rule (Recording Human Overrides): the
 # telemetry class, NOT `.meowkit/memory/`. `_log_security` appends the finding description
 # — a description of the attacker payload — plus the quarantine path. The memory store is
 # committed and grep-read back as DATA by the read-set skills, so logging a quarantine

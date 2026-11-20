@@ -72,17 +72,6 @@ Threshold: Tier 1 ≥ 40, Tier 2 = 30-39.
 All skills had the following changes (no content modifications):
 
 - Attribution frontmatter prepended (name, source, author, original_path, task_sizes, meowkit_tier)
-- Path references updated: `.agent/` → `.claude/`, `.claude/skills/gstack/` → `.claude/skills/`
+- Path references updated to this kit's layout
 
 No instruction content was rewritten in any skill.
-
-## Duplicates Resolved
-
-Skills that overlap with existing skills (in .claude/skills/planning/, testing/, review/, shipping/, etc.) were included because the sourced versions are more comprehensive. The originals remain in their subdirectories and serve as simplified fallbacks.
-
-| Concept        | original              | Sourced skill                              | Resolution                                                                 |
-| -------------- | ----------------------------- | ------------------------------------------ | -------------------------------------------------------------------------- |
-| Ship pipeline  | shipping/ship-pipeline.md     | ship/SKILL.md (gstack)                     | Both kept — gstack version is comprehensive, toolkit version is simplified |
-| Code review    | review/structural-audit.md    | review/SKILL.md (gstack)                   | Both kept — different scope                                                |
-| Security audit | review/security-checklist.md  | cso/SKILL.md (gstack)                      | Both kept — different scope                                                |
-| TDD            | testing/red-green-refactor.md | workflow-orchestrator/SKILL.md (aura-frog) | Both kept — different granularity                                          |

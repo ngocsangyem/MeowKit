@@ -63,7 +63,7 @@ with open(LOG_PATH, "a") as f:
     f.write(entry)
 ```
 
-Append to `${CLAUDE_PLUGIN_DATA}/foo/log.json`, not `.claude/skills/foo/log.json`.
+Append to `${CLAUDE_PLUGIN_DATA}/<skill>/log.json`, not to a file inside the skill's own folder.
 
 ## Rule 3: SKILL.md Body MUST Stay Under 500 Lines
 
@@ -155,10 +155,10 @@ A skill that creates, binds, or selects external runtime resources MUST honor th
 
 ## Commands vs Skills (the kit ships one surface)
 
-**The kit authors skills and nothing else.** There is no `.claude/commands/` directory in the kit:
+**The kit authors skills and nothing else.** The kit has no commands directory:
 a job the kit exposes to a user is a skill under `.claude/skills/<name>/SKILL.md`, invoked as
 `mk:<name>`. Every `mk:<name>` reference in kit prose therefore resolves against the skill
-inventory or it is a phantom — `scripts/check-skill-cross-refs.sh` is the enforcement, and it has
+inventory or it is a phantom. The kit's CI checks every one against that inventory, and there is
 no second inventory to fall back on.
 
 Why one surface: a slash command and a same-named skill are two descriptions of one behavior, and
@@ -255,8 +255,8 @@ once so the agent knows the directory they resolve against. Rules, agents, hooks
 other skills keep the canonical `.claude/<surface>/…` form, which installers map per
 runtime. Every host-runtime tool name a skill mentions is listed in
 the kit's `kit-capabilities.json`. A line describing
-another project's layout may carry `portable-ignore`. `node scripts/check-skills-portable.cjs`
-enforces this in the release gate and CI.
+another project's layout may carry `portable-ignore`. The kit's release check and CI
+enforce this.
 
 ## Applies to
 

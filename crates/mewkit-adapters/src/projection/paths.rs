@@ -46,9 +46,16 @@ pub fn agent_files(text: &str, target: &Target) -> String {
 
 /// `.claude/rules/<file>.md` -> the section of the target's context file that
 /// carries that rule, code quotes dropped. A file with no listed section is left.
+/// The folder named alone becomes the context file, which is where the target
+/// keeps the kit's rules.
 pub fn rule_files(text: &str, target: &Target) -> String {
     replace_each(text, ".claude/rules/", |before, after| {
         let stem = run(after, |c| c.is_ascii_lowercase() || c == '-');
+        // A placeholder (`<name>.md`, `*.md`) names no file to map.
+        let placeholder = after.starts_with(['<', '{', '*', '$']);
+        if stem.is_empty() && !placeholder {
+            return Some(Hit::new(target.context_file.to_owned()));
+        }
         let rest = after[stem.len()..].strip_prefix(".md")?;
         let file = &after[..stem.len() + ".md".len()];
         let (_, section) = target.rule_sections.iter().find(|(f, _)| *f == file)?;
@@ -117,8 +124,11 @@ mod tests {
             rule_files(src, &CODEX),
             "per AGENTS.md (Data & injection boundary) Rule 3; \
              AGENTS.md (Security); `cat AGENTS.md (Core behaviors)`; \
-             `.claude/rules/other.md`; .claude/rules/"
+             `.claude/rules/other.md`; AGENTS.md"
         );
+        // A placeholder names no file, so it is left for the path map.
+        let kept = "at .claude/rules/<name>.md";
+        assert_eq!(rule_files(kept, &CODEX), kept);
     }
 
     #[test]

@@ -237,3 +237,10 @@ with = "🤖 Generated with Cursor"
 path = ".cursor/skills/mk-web-to-markdown/references/security.md"
 find = "`.cursor/hooks/privacy-block.cjs`"
 with = "`.cursor/hooks/privacy-read-gate.cjs`"
+
+# The lifecycle line this runtime always loads is in the kit's block of `AGENTS.md`;
+# it has no rule file of its own for it.
+[[replace]]
+path = ".cursor/skills/mk-workflow-orchestrator/workflow.yaml"
+find = "  - path: .cursor/rules/meowkit-core.md"
+with = "  - path: AGENTS.md"

@@ -155,3 +155,10 @@ model_id="${MEOWKIT_MODEL_HINT:-unknown}"
 path = ".agents/skills/mk-ship/references/commit-push-pr.md"
 find = "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
 with = "🤖 Generated with Codex"
+
+# The lifecycle line this runtime always loads is in the kit's block of `AGENTS.md`;
+# it has no rule file of its own for it.
+[[replace]]
+path = ".agents/skills/mk-workflow-orchestrator/workflow.yaml"
+find = "  - path: .codex/rules/meowkit-core.md"
+with = "  - path: AGENTS.md"

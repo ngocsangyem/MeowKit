@@ -49,13 +49,13 @@ If the impacted_count differs by > 5% between dry-run and execute, surface as a 
 - Any user-derived input flowing to `--page-id` MUST be numeric-validated: `[[ "$id" =~ ^[0-9]+$ ]]`
 - Any user-derived input flowing to `--space-key` MUST match `^[A-Z][A-Z0-9_]+$`
 - File paths for `--upload` MUST be under `$CLAUDE_PROJECT_DIR` or an explicitly allowlisted `/tmp/conf-*` prefix. Reject `..` traversal even though `confluence-as` also validates.
-- The wrapper rejects credentials in `.claude/settings.local.json` and any non-Cloud site URL.
+- The wrapper rejects credentials in a host `settings.local.json` and any non-Cloud site URL.
 
 ## Failure Modes
 
 | Symptom | Likely cause | Remediation |
 |---|---|---|
-| Wrapper exits 2 | Credentials in `.claude/settings.local.json` instead of `.meowkit/.env` | Move `MEOW_CONFLUENCE_*` vars to `.meowkit/.env`; chmod 0600 |
+| Wrapper exits 2 | Credentials in a host `settings.local.json` instead of `.meowkit/.env` | Move `MEOW_CONFLUENCE_*` vars to `.meowkit/.env`; chmod 0600 |
 | Wrapper exits 3 | Non-Cloud site URL | Use MCP escape hatch per `install-and-auth.md` |
 | Wrapper exits 4 | Network / DNS / page not found | Retry once; check VPN; verify page-id |
 | Wrapper exits 5 | 401 / 403 — token rotated or permission missing | Re-run the guided setup in `mk:confluence`; verify user has Confluence access to space |

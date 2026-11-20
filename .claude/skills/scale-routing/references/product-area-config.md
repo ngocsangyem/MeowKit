@@ -1,12 +1,12 @@
 # Product Area Configuration Reference
 
-Optional team-specific routing enhancement via `.claude/product-areas.yaml`.
+Optional team-specific routing enhancement via `.meowkit/product-areas.yaml`.
 When the file does not exist, scale-routing operates in CSV-only mode — no degradation.
 
 ## Contents
 
 - [When to Use](#when-to-use)
-- [Creating `.claude/product-areas.yaml`](#creating-claudeproduct-areasyaml)
+- [Creating `.meowkit/product-areas.yaml`](#creating-meowkitproduct-areasyaml)
 - [Schema](#schema)
 - [How scale-routing Loads It](#how-scale-routing-loads-it)
 - [Output When YAML Present](#output-when-yaml-present)
@@ -26,15 +26,17 @@ Without this file, scale-routing works identically to v1.0. It is purely additiv
 
 ---
 
-## Creating `.claude/product-areas.yaml`
+## Creating `.meowkit/product-areas.yaml`
 
-Place the file at the root of your project's `.claude/` directory:
+Place the file in your project's `.meowkit/` directory, which every runtime shares:
 
 ```
 your-project/
-└── .claude/
+└── .meowkit/
     └── product-areas.yaml
 ```
+
+`.meowkit/.gitignore` ignores everything it does not list. To commit the file for the team, add the line `!product-areas.yaml` there.
 
 ---
 
@@ -80,7 +82,7 @@ areas:
 
 ## How scale-routing Loads It
 
-1. Check if `.claude/product-areas.yaml` exists in the project root
+1. Check if `.meowkit/product-areas.yaml` exists in the project root
 2. If found → parse areas, merge keywords with CSV domain signals
 3. If a task matches a product area's paths or keywords → set `product_area` in output
 4. If `pic` defined → include PIC suggestion in output

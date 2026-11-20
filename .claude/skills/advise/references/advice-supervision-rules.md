@@ -476,4 +476,4 @@ A corrupt dossier is refused, never read as a fresh run — otherwise breaking t
 file that counts the calls would be the cheapest way to buy unlimited ones.
 
 Wrapping a new skill requires a registry row in the same change
-(`.claude/skills/benchmark/references/dead-weight-audit-rules.md` Rule 6 — this repository only).
+(Rule 6 of the dead-weight audit rules, which the maintainers keep in the kit's source repository).

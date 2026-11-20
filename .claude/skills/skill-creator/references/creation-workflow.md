@@ -67,7 +67,7 @@ If the skill processes untrusted input, load mk:skill-template-secure and verify
 
 ## Step 6: Register
 
-Add to `.claude/skills/SKILLS_ATTRIBUTION.md`:
+Add a row to `SKILLS_ATTRIBUTION.md` in the skills folder, when the kit you are working in keeps one:
 ```
 | mk:{name} | your org (original) | — | MIT | .claude/skills/{name}/ |
 ```
