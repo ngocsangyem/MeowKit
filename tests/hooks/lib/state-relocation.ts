@@ -7,21 +7,21 @@
 // quotes its own filename, and the only other deviation from whole-stream parity
 // in the suite.
 
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from "node:fs";
+import path from "node:path";
 
 /** Recorded prefix → the class that prefix's content lives in now. */
 const STATE_RELOCATIONS: Array<[string, string]> = [
-  ['.claude/session-state/', '.meowkit/state/'],
-  ['session-state/', '.meowkit/state/'],
-  ['.claude/hooks/.logs/', '.meowkit/telemetry/'],
+	[".claude/session-state/", ".meowkit/state/"],
+	["session-state/", ".meowkit/state/"],
+	[".claude/hooks/.logs/", ".meowkit/telemetry/"],
 ];
 
 const relocate = (rel: string): string => {
-  for (const [from, to] of STATE_RELOCATIONS) {
-    if (rel.startsWith(from)) return `${to}${rel.slice(from.length)}`;
-  }
-  return rel;
+	for (const [from, to] of STATE_RELOCATIONS) {
+		if (rel.startsWith(from)) return `${to}${rel.slice(from.length)}`;
+	}
+	return rel;
 };
 
 /**
@@ -36,14 +36,14 @@ const relocate = (rel: string): string => {
  * current hook looks for it, and nothing about the recorded expectation changes.
  */
 export function migrateSeededState(projectDir: string): void {
-  for (const [from, to] of STATE_RELOCATIONS) {
-    const src = path.join(projectDir, from);
-    if (!fs.existsSync(src)) continue;
-    const target = path.join(projectDir, to);
-    fs.mkdirSync(target, { recursive: true });
-    fs.cpSync(src, target, { recursive: true, force: false, errorOnExist: false });
-    fs.rmSync(src, { recursive: true, force: true });
-  }
+	for (const [from, to] of STATE_RELOCATIONS) {
+		const src = path.join(projectDir, from);
+		if (!fs.existsSync(src)) continue;
+		const target = path.join(projectDir, to);
+		fs.mkdirSync(target, { recursive: true });
+		fs.cpSync(src, target, { recursive: true, force: false, errorOnExist: false });
+		fs.rmSync(src, { recursive: true, force: true });
+	}
 }
 
 /**
@@ -55,9 +55,9 @@ export function migrateSeededState(projectDir: string): void {
  * than passing on the old file.
  */
 export function sideEffectContent(projectDir: string, rel: string): string | null {
-  const current = relocate(rel);
-  const read = (p: string) => (fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null);
-  if (current === rel) return read(path.join(projectDir, rel));
-  if (fs.existsSync(path.join(projectDir, rel))) return `[write landed at the pre-move path ${rel}]`;
-  return read(path.join(projectDir, current));
+	const current = relocate(rel);
+	const read = (p: string) => (fs.existsSync(p) ? fs.readFileSync(p, "utf8") : null);
+	if (current === rel) return read(path.join(projectDir, rel));
+	if (fs.existsSync(path.join(projectDir, rel))) return `[write landed at the pre-move path ${rel}]`;
+	return read(path.join(projectDir, current));
 }

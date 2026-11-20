@@ -4,7 +4,7 @@ All notable changes to MeowKit are documented here.
 
 See [website changelog](https://docs.meowkit.dev/changelog)
 
-## Unreleased
+## 3.0.0 (2026-11-20)
 
 ### Breaking: no approval gates
 
@@ -17,13 +17,13 @@ See [website changelog](https://docs.meowkit.dev/changelog)
 - **Cursor:** the kill switch is environment-only (`MEWKIT_CURSOR_HOOKS_KILL_SWITCH=1`); the flag file no longer disables anything, and the credential read gate ignores the switch.
 - **Completion check, opt-in on all three runtimes.** With `hooks.pre-completion-check: true`, a turn that ends with files changed since the last passing test, build, lint or type-check run is continued, twice at most. Off by default; advisory evidence, not proof.
 - **Build feedback reaches the model.** A failed compile or lint after an edit is reported on the channel Claude Code shows to the model, not only in the transcript.
-- What each runtime enforces: `docs/core/enforcement-matrix.md`.
+- What each runtime enforces: https://docs.meowkit.dev/core-concepts/enforcement.
 
 ### Six runtimes from one source
 
 - **`mewkit init --target` accepts six runtimes:** `claude-code`, `codex`, `cursor`, `grok`, `pi`, `omp`, or `all`. `all` at project scope installs all six. Grok, Pi and OMP install at project scope only; `--global --target all` installs Claude Code, Codex and Cursor. `mewkit validate --target` accepts `codex`, `cursor`, `grok`, `pi` and `omp`.
 - **The hand-written Codex and Cursor bundles are removed.** `kit/bundles/` and `scripts/check-bundle-parity.cjs` (with `scripts/bundle-parity-allow.json`) are deleted. Every runtime other than Claude Code is projected from the authored `.claude/` tree plus a small per-runtime overlay in `kit/overlays/<runtime>/`.
-- **Grok, Pi and OMP are installable.** Grok gets skills in `.grok/skills`, the hook file `.grok/hooks/meowkit.json`, and always-on text in `AGENTS.md`; it gets no agent definitions, because Grok documents no file format for them. Pi gets skills in `.agents/skills`, one extension `.pi/extensions/meowkit.ts`, and `AGENTS.md`; it gets no agents. OMP gets skills in `.agents/skills`, the kit's agents in `.omp/agents/`, the hook module `.omp/hooks/pre/meowkit.ts`, and `AGENTS.md`. Their enforcement is documented by the vendors and has not yet been run in a live session: see `docs/core/enforcement-matrix.md`.
+- **Grok, Pi and OMP are installable.** Grok gets skills in `.grok/skills`, the hook file `.grok/hooks/meowkit.json`, and always-on text in `AGENTS.md`; it gets no agent definitions, because Grok documents no file format for them. Pi gets skills in `.agents/skills`, one extension `.pi/extensions/meowkit.ts`, and `AGENTS.md`; it gets no agents. OMP gets skills in `.agents/skills`, the kit's agents in `.omp/agents/`, the hook module `.omp/hooks/pre/meowkit.ts`, and `AGENTS.md`. Their enforcement is documented by the vendors and has not yet been run in a live session: see https://docs.meowkit.dev/core-concepts/enforcement.
 - **One shared `.agents/` tree.** Codex, Pi and OMP read `.agents/skills`. When more than one of them is installed, they write the same runtime-neutral skill text there and keep helpers, rubrics and the guard script in `.agents/meowkit/`. Alone, each keeps its own invocation form (Codex `$mk-x`; Pi and OMP `/skill:mk-x`).
 - **Set changes re-plan the install.** `init`, `uninstall` and `upgrade` re-plan each installed runtime whose files depend on the set being added, removed or upgraded. Adding a runtime and then removing it leaves the same tree as a fresh install of the runtimes that stay.
 - **`doctor` reports overlap between runtimes.** `coexistence: cross-runtime load` now lists, for each installed runtime, the kit skills, agents and hooks it loads from more than one root, with the vendor setting that stops the second load where one is documented; it is `ok` or `warn`. `kit copies: unrecorded` fails (exit 1) when a copy of a kit skill or agent that no install recorded sits under a second root an installed runtime reads, for example `.pi/skills/mk-cook` beside `.agents/skills/mk-cook`.
@@ -31,9 +31,9 @@ See [website changelog](https://docs.meowkit.dev/changelog)
 
 ### Model fit on Claude Code, Codex and Cursor
 
-- **Agents are pinned by tier to current models.** Each agent's model follows its Claude Code tier, and the Codex and Cursor agent files derive from that table: haiku → Codex `gpt-6-luna`, Cursor `composer-2.5[fast=true]`; sonnet → `gpt-6.1-sol`, `composer-2.5[fast=true]`; opus → `gpt-6-astra`, `claude-opus-5[effort=high]`; fable → `gpt-6-astra`, `claude-fable-5`. Thirteen Codex agents pinned a retired id. The table and its sources: `docs/maintainer/model-pins.md`.
+- **Agents are pinned by tier to current models.** Each agent's model follows its Claude Code tier, and the Codex and Cursor agent files derive from that table: haiku → Codex `gpt-6-luna`, Cursor `composer-2.5[fast=true]`; sonnet → `gpt-6.1-sol`, `composer-2.5[fast=true]`; opus → `gpt-6-astra`, `claude-opus-5[effort=high]`; fable → `gpt-6-astra`, `claude-fable-5`. Thirteen Codex agents pinned a retired id. The table and its sources: `scripts/lib/model-pins.md`.
 - **Always-on rules and skill bodies give reasons instead of shouted absolutes**, keeping NEVER on force-push and pushing to main and on the security rules. Standing "delegate" and "re-verify" lines are conditioned.
-- **Hook advice reaches the model on Claude Code.** Observers that printed plain stdout on tool events (loop detection, pre-task check, post-write warnings) now send `additionalContext`. Every handler's channel on each runtime: `docs/maintainer/hook-output-channels.md`.
+- **Hook advice reaches the model on Claude Code.** Observers that printed plain stdout on tool events (loop detection, pre-task check, post-write warnings) now send `additionalContext`. Every handler's channel on each runtime: https://docs.meowkit.dev/reference/hooks.
 - **Skill listings fit each runtime's ceiling** (16k Claude Code, 12k Codex, 16k Cursor), with the words a user types for the job first.
 - **The projected text speaks its host's language.** Codex text invokes skills as `$mk-x` and Cursor as `/mk-x`; Claude Code tool syntax is gone from both. Installed scripts resolve the project root and their `mk-` skill folders, so the Jira, Confluence and benchmark wrappers work after install.
 - **The installs ship what their skills call.** The `workflow-*` helpers the skill preambles run install beside each runtime's skills (`.codex/scripts/bin/`, `.cursor/scripts/bin/`), or in `.agents/meowkit/` when Codex, Pi or OMP share `.agents/skills`, copied byte for byte by `scripts/sync-hook-core.cjs`. The rubric library installs under `.codex/rubrics/` and `.cursor/rubrics/`, which is where `mk-rubric` and the evaluator's score check look.

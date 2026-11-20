@@ -9,18 +9,18 @@
 // Nothing here spawns a shell or an interpreter. The entrypoint is this node
 // binary running a `.cjs` file, which is the whole claim being tested.
 
-import { spawnSync } from 'node:child_process';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
+import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 
 const require_ = createRequire(import.meta.url);
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-export const REPO_ROOT = path.resolve(HERE, '../../..');
-export const GOLDEN_DIR = path.join(REPO_ROOT, 'tests/ports/golden');
+export const REPO_ROOT = path.resolve(HERE, "../../..");
+export const GOLDEN_DIR = path.join(REPO_ROOT, "tests/ports/golden");
 
 /**
  * The kit directories a port under test reaches into. `.claude/hooks/lib` is
@@ -28,9 +28,10 @@ export const GOLDEN_DIR = path.join(REPO_ROOT, 'tests/ports/golden');
  * reader and the key rules are one implementation, and a second copy under
  * `scripts/` would be a second answer to "what does this config say".
  */
-const TREE = ['.claude/hooks/lib', '.claude/hooks/handlers.json'];
+const TREE = [".claude/hooks/lib", ".claude/hooks/handlers.json"];
 
-export type Invocation = { kind: 'scan-dir'; args: string[] } | { kind: 'scan-one'; target: string } | { kind: 'config'; args: string[] };
+export type Invocation =
+	{ kind: "scan-dir"; args: string[] } | { kind: "scan-one"; target: string } | { kind: "config"; args: string[] };
 
 export interface Fixture {
 	name: string;
@@ -49,21 +50,21 @@ interface CorpusCase {
 }
 
 const CASE_MODULES = [
-	'port-corpus-cases-injection-audit',
-	'port-corpus-cases-injection-audit-paths',
-	'port-corpus-cases-workflow-config',
+	"port-corpus-cases-injection-audit",
+	"port-corpus-cases-injection-audit-paths",
+	"port-corpus-cases-workflow-config",
 ];
 
 function isCorpusCase(value: unknown): value is CorpusCase {
-	if (typeof value !== 'object' || value === null) return false;
+	if (typeof value !== "object" || value === null) return false;
 	const v = value as Record<string, unknown>;
-	return typeof v.name === 'string' && typeof v.setup === 'function';
+	return typeof v.name === "string" && typeof v.setup === "function";
 }
 
 function loadCases(): CorpusCase[] {
 	const out: CorpusCase[] = [];
 	for (const mod of CASE_MODULES) {
-		const loaded: unknown = require_(path.join(REPO_ROOT, 'scripts/lib', `${mod}.cjs`));
+		const loaded: unknown = require_(path.join(REPO_ROOT, "scripts/lib", `${mod}.cjs`));
 		if (!Array.isArray(loaded)) throw new Error(`${mod}.cjs did not export an array of cases`);
 		for (const entry of loaded) {
 			if (!isCorpusCase(entry)) throw new Error(`${mod}.cjs exported an entry with no name or setup`);
@@ -84,9 +85,9 @@ function caseFor(name: string): CorpusCase {
 export function loadFixtures(): Fixture[] {
 	return fs
 		.readdirSync(GOLDEN_DIR)
-		.filter((f) => f.endsWith('.json') && f !== 'index.json')
+		.filter((f) => f.endsWith(".json") && f !== "index.json")
 		.sort()
-		.map((f) => JSON.parse(fs.readFileSync(path.join(GOLDEN_DIR, f), 'utf8')) as Fixture);
+		.map((f) => JSON.parse(fs.readFileSync(path.join(GOLDEN_DIR, f), "utf8")) as Fixture);
 }
 
 /**
@@ -98,27 +99,28 @@ export function loadFixtures(): Fixture[] {
  * absolute path, so node itself still starts.
  */
 function replayEnv(home: string, emptyBin: string): Record<string, string> {
-	const mod: unknown = require_(path.join(REPO_ROOT, 'scripts/lib/hook-corpus-env.cjs'));
+	const mod: unknown = require_(path.join(REPO_ROOT, "scripts/lib/hook-corpus-env.cjs"));
 	const fn = (mod as Record<string, unknown>).pinnedEnv;
-	if (typeof fn !== 'function') throw new Error('hook-corpus-env.cjs exports no pinnedEnv');
+	if (typeof fn !== "function") throw new Error("hook-corpus-env.cjs exports no pinnedEnv");
 	const base = (fn as (h: string) => Record<string, string>)(home);
 	return { ...base, PATH: emptyBin };
 }
 
 /** Map an abstract invocation onto the node implementation. */
 function commandFor(projectDir: string, invocation: Invocation): string[] {
-	if (invocation.kind === 'config') return [path.join(projectDir, '.claude/hooks/lib/workflow-config'), ...invocation.args];
-	const auditor = path.join(projectDir, '.claude/hooks/lib/injection-audit.cjs');
-	if (invocation.kind === 'scan-dir') return [auditor, ...invocation.args];
-	return [auditor, '--file', invocation.target];
+	if (invocation.kind === "config")
+		return [path.join(projectDir, ".claude/hooks/lib/workflow-config"), ...invocation.args];
+	const auditor = path.join(projectDir, ".claude/hooks/lib/injection-audit.cjs");
+	if (invocation.kind === "scan-dir") return [auditor, ...invocation.args];
+	return [auditor, "--file", invocation.target];
 }
 
 function applyNormalizers(text: string, names: string[], ctx: { projectDir: string; home: string }): string {
 	let out = text;
 	for (const name of names) {
-		if (name === 'tmpdir') out = out.split(ctx.projectDir).join('{{TMP}}');
-		else if (name === 'homedir') out = out.split(ctx.home).join('{{HOME}}');
-		else if (name === 'logStamp') out = out.replace(/\d{6}-\d{6}/g, '{{STAMP}}');
+		if (name === "tmpdir") out = out.split(ctx.projectDir).join("{{TMP}}");
+		else if (name === "homedir") out = out.split(ctx.home).join("{{HOME}}");
+		else if (name === "logStamp") out = out.replace(/\d{6}-\d{6}/g, "{{STAMP}}");
 		else throw new Error(`unknown normalizer: ${name}`);
 	}
 	return out;
@@ -140,10 +142,10 @@ export interface Replayed {
  * the recorded paths would have to take the new one on trust.
  */
 export function replay(fixture: Fixture, extraPaths: readonly string[] = []): Replayed {
-	const caseRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'mk-portreplay-'));
-	const projectDir = path.join(caseRoot, 'project');
-	const home = path.join(projectDir, 'home');
-	const emptyBin = path.join(caseRoot, 'empty-bin');
+	const caseRoot = fs.mkdtempSync(path.join(os.tmpdir(), "mk-portreplay-"));
+	const projectDir = path.join(caseRoot, "project");
+	const home = path.join(projectDir, "home");
+	const emptyBin = path.join(caseRoot, "empty-bin");
 	fs.mkdirSync(home, { recursive: true });
 	fs.mkdirSync(emptyBin, { recursive: true });
 	for (const rel of TREE) {
@@ -157,17 +159,17 @@ export function replay(fixture: Fixture, extraPaths: readonly string[] = []): Re
 	const [script, ...args] = commandFor(projectDir, fixture.invocation);
 	const result = spawnSync(process.execPath, [script, ...args], {
 		cwd: projectDir,
-		input: '',
+		input: "",
 		env: replayEnv(home, emptyBin),
-		encoding: 'utf8',
+		encoding: "utf8",
 		maxBuffer: 32 * 1024 * 1024,
 	});
 
-	const norm = (v: string | null) => applyNormalizers(v ?? '', fixture.normalizers, ctx);
+	const norm = (v: string | null) => applyNormalizers(v ?? "", fixture.normalizers, ctx);
 	const sideEffects: Record<string, string | null> = {};
 	for (const rel of [...Object.keys(fixture.sideEffects), ...extraPaths]) {
 		try {
-			sideEffects[rel] = norm(fs.readFileSync(path.join(projectDir, rel), 'utf8'));
+			sideEffects[rel] = norm(fs.readFileSync(path.join(projectDir, rel), "utf8"));
 		} catch {
 			sideEffects[rel] = null;
 		}

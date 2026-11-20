@@ -29,9 +29,16 @@ interface RegistryEntry {
 }
 
 const registry = require_(path.join(REPO_ROOT, ".claude/hooks/handlers.json")) as { handlers: RegistryEntry[] };
-const { loadRegistry, selectHandlers, validate } = require_(path.join(REPO_ROOT, ".claude/hooks/lib/handler-registry.cjs")) as {
+const { loadRegistry, selectHandlers, validate } = require_(
+	path.join(REPO_ROOT, ".claude/hooks/lib/handler-registry.cjs"),
+) as {
 	loadRegistry: (root: string) => RegistryEntry[];
-	selectHandlers: (entries: RegistryEntry[], event: string, matcher: string, options: { root: string }) => RegistryEntry[];
+	selectHandlers: (
+		entries: RegistryEntry[],
+		event: string,
+		matcher: string,
+		options: { root: string },
+	) => RegistryEntry[];
 	validate: (handlers: unknown[]) => { errors: string[] };
 };
 
@@ -54,7 +61,11 @@ function selectedEverywhere(root: string): RegistryEntry[] {
 	const entries = loadRegistry(root);
 	const out: RegistryEntry[] = [];
 	for (const entry of entries) {
-		const picked = selectHandlers(entries, entry.event, entry.matcher ?? "", { root, env: {}, home: "/nonexistent-home" } as never);
+		const picked = selectHandlers(entries, entry.event, entry.matcher ?? "", {
+			root,
+			env: {},
+			home: "/nonexistent-home",
+		} as never);
 		for (const p of picked) if (!out.includes(p)) out.push(p);
 	}
 	return out;
@@ -95,7 +106,10 @@ describe("each observer toggle removes its observer from the dispatcher's select
 		it(`hooks.${key}: false`, () => {
 			const root = project(`hooks:\n  ${key}: false\n`);
 			const selected = selectedEverywhere(root);
-			expect(selected.some((e) => e.toggleKey === key), `${key} was still selected`).toBe(false);
+			expect(
+				selected.some((e) => e.toggleKey === key),
+				`${key} was still selected`,
+			).toBe(false);
 			// Every other registration is untouched: a toggle that switched off more
 			// than it named would be worse than one that switched off nothing.
 			const expected = registry.handlers.filter((h) => h.toggleKey !== key).length;
@@ -120,18 +134,35 @@ describe("each observer toggle removes its observer from the dispatcher's select
 		fs.mkdirSync(path.join(root, ".claude/hooks/handlers"), { recursive: true });
 		fs.cpSync(path.join(REPO_ROOT, ".claude/hooks/dispatch.cjs"), path.join(root, ".claude/hooks/dispatch.cjs"));
 		fs.cpSync(path.join(REPO_ROOT, ".claude/hooks/lib"), path.join(root, ".claude/hooks/lib"), { recursive: true });
-		fs.writeFileSync(path.join(root, ".claude/hooks/handlers/post-write.cjs"), "'use strict';\nmodule.exports = () => 'post-write-ran\\n';\n");
+		fs.writeFileSync(
+			path.join(root, ".claude/hooks/handlers/post-write.cjs"),
+			"'use strict';\nmodule.exports = () => 'post-write-ran\\n';\n",
+		);
 		fs.writeFileSync(
 			path.join(root, ".claude/hooks/handlers.json"),
-			JSON.stringify({ schema: 2, handlers: [{ event: "PostToolUse", matcher: "Edit|Write", handler: "./handlers/post-write.cjs", toggleKey: "post-write" }] }),
+			JSON.stringify({
+				schema: 2,
+				handlers: [
+					{
+						event: "PostToolUse",
+						matcher: "Edit|Write",
+						handler: "./handlers/post-write.cjs",
+						toggleKey: "post-write",
+					},
+				],
+			}),
 		);
 
 		const run = (): string => {
-			const result = spawnSync(process.execPath, [path.join(root, ".claude/hooks/dispatch.cjs"), "PostToolUse", "Edit|Write"], {
-				input: JSON.stringify({ tool_input: { file_path: path.join(root, "src/a.ts") } }),
-				env: { ...process.env, CLAUDE_PROJECT_DIR: root, HOME: root },
-				encoding: "utf8",
-			});
+			const result = spawnSync(
+				process.execPath,
+				[path.join(root, ".claude/hooks/dispatch.cjs"), "PostToolUse", "Edit|Write"],
+				{
+					input: JSON.stringify({ tool_input: { file_path: path.join(root, "src/a.ts") } }),
+					env: { ...process.env, CLAUDE_PROJECT_DIR: root, HOME: root },
+					encoding: "utf8",
+				},
+			);
 			return result.stdout;
 		};
 

@@ -22,7 +22,13 @@ export function fireShell(fx: Fixture, runtime: Runtime, command: string) {
 	if (runtime === "cursor") {
 		return fireEvent(fx, runtime, "beforeShellExecution", { hook_event_name: "beforeShellExecution", command });
 	}
-	return fireEvent(fx, runtime, "PreToolUse", { hook_event_name: "PreToolUse", tool_name: "Bash", tool_input: { command } }, { toolName: "Bash" });
+	return fireEvent(
+		fx,
+		runtime,
+		"PreToolUse",
+		{ hook_event_name: "PreToolUse", tool_name: "Bash", tool_input: { command } },
+		{ toolName: "Bash" },
+	);
 }
 
 /** A fixture ready for ship cases: a git alias so `git ci` is a ship form to resolve. */
@@ -46,7 +52,14 @@ export function stageFailingTest(fx: Fixture): void {
 
 /** Switch the fixture to a test runner with no related-test mode, committed so the tree stays clean. */
 export function useRunnerWithoutRelatedTests(fx: Fixture): void {
-	fx.write("package.json", JSON.stringify({ name: "guards-fixture", private: true, scripts: { lint: "node scripts/lint.cjs", test: "node --test" } }, null, 2));
+	fx.write(
+		"package.json",
+		JSON.stringify(
+			{ name: "guards-fixture", private: true, scripts: { lint: "node scripts/lint.cjs", test: "node --test" } },
+			null,
+			2,
+		),
+	);
 	fx.git("commit", "-qam", "runner without related-test mode");
 }
 
@@ -56,14 +69,30 @@ export function shipOutput(r: { results: { stdout: string; stderr: string }[] })
 }
 
 /** The six ship forms the literal trigger did not see (research claim R1-4). */
-export const SHIP_EVASIONS = ["git  commit -m x", "git -C . commit -m x", "git -c x=y commit -m x", "git ci -m x", "gh pr create --fill", "gh pr merge 1"];
+export const SHIP_EVASIONS = [
+	"git  commit -m x",
+	"git -C . commit -m x",
+	"git -c x=y commit -m x",
+	"git ci -m x",
+	"gh pr create --fill",
+	"gh pr merge 1",
+];
 
 /**
  * One privacy corpus decided identically on every runtime: the names the guard must refuse
  * (new names, traversal, case, a symlink to a credential file) and the near misses it must
  * allow. `notes-link.txt` is written as a symlink to `.env` by `writePrivacyCorpus`.
  */
-export const PRIVACY_REFUSED = [".env", ".envrc", ".npmrc", "id_rsa", ".kube/config", "src/../.env", ".ENV", "notes-link.txt"];
+export const PRIVACY_REFUSED = [
+	".env",
+	".envrc",
+	".npmrc",
+	"id_rsa",
+	".kube/config",
+	"src/../.env",
+	".ENV",
+	"notes-link.txt",
+];
 export const PRIVACY_ALLOWED = ["secretary.ts", ".env.example", "src/add.cjs", "id_rsa.pub"];
 
 export function writePrivacyCorpus(fx: Fixture): void {

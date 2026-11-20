@@ -13,13 +13,7 @@ import { fileURLToPath } from "node:url";
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /** The trees that hold committed callers of the CLI. */
-const TREES = [
-	path.join(".claude", "hooks"),
-	path.join(".claude", "scripts"),
-	"scripts",
-	"tests",
-	".github",
-];
+const TREES = [path.join(".claude", "hooks"), path.join(".claude", "scripts"), "scripts", "tests", ".github"];
 
 const SKIP_DIRS = new Set(["node_modules", "dist", "worktrees", "logs", ".git"]);
 const EXTENSIONS = new Set([".cjs", ".js", ".mjs", ".ts", ".sh", ".yml", ".yaml", ".py"]);
