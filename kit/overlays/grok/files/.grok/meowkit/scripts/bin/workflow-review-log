@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+'use strict';
+// workflow-review-log — append one review result to the project's telemetry log.
+//
+// Usage: workflow-review-log '{"skill":"...","timestamp":"...","status":"..."}'
+//
+// The destination comes from the one state resolver the hooks and the CLI share,
+// so a project whose telemetry home moves does not leave this writer behind
+// writing to the old one. The argument is appended verbatim: validating the JSON
+// here would mean a malformed line is DISCARDED instead of recorded, and a
+// review result that silently never lands is worse than one that lands ugly.
+
+const fs = require('node:fs');
+const path = require('node:path');
+
+const { telemetryDir } = require('./meowkit-paths.cjs');
+
+const entry = process.argv[2];
+if (entry === undefined) {
+  process.stderr.write("Usage: workflow-review-log '<json object>'\n");
+  process.exit(1);
+}
+
+const dir = telemetryDir();
+fs.mkdirSync(dir, { recursive: true });
+fs.appendFileSync(path.join(dir, 'reviews.jsonl'), `${entry}\n`);

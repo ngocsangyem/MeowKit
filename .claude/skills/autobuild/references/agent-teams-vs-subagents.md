@@ -23,7 +23,7 @@ For 95% of autobuild runs, subagents are correct. Teams are appropriate when: (a
 ## Subagents (Default)
 
 **How they work:**
-- Each phase spawns a fresh subagent via `Task(subagent_type=...)`
+- Each phase spawns a fresh subagent via `delegate a subagent (agent=...)`
 - Inputs are file paths (plan, contract, handoff, verdict) — no shared in-memory state
 - Outputs are files (handoff.md, verdict.md, run.md) — committed to git
 - Subagent context is isolated; no live coupling between generator and evaluator

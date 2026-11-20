@@ -67,15 +67,6 @@ Concrete cost depends on the inner harness, model tier, and target surface; trea
 
 **`--verify` is advisory** (the run continues either way). **`--strict` is blocking inside this skill**: an evaluator FAIL routes the work back to Phase 3 instead of reporting completion.
 
-**`--advice`** (composable, off by default) — opt-in strategic supervision for one
-run. At named checkpoints (GUIDE once the plan is agreed, RESCUE on a stall or contradiction,
-REVIEW after Verify and before the reviewer, RECHECK after a correction; hard cap 5)
-the `athena` agent assesses the situation, recommends an operational path inside the
-locked scope, and may return the work for correction. It never approves: the plan and
-the review verdict stay with the user and the reviewer, and supervision counts as no
-verification. Without the flag there are zero calls and no state is written.
-Checkpoints: `references/workflow-steps.md` → Advice Checkpoints. Contract:
-`.claude/skills/advise/references/advice-supervision-rules.md` (load only when the flag is present).
 
 ## TDD mode (`--tdd` flag)
 
@@ -258,7 +249,23 @@ After a review verdict of PASS, delegate to `project-manager` per `references/po
 
 ## Durable Task State (when an active task record exists)
 
-When this run drives an **active durable task** (a `tasks/active/<id>.json` exists), emit status/step at phase transitions and record each acted-on `mewkit capabilities resolve` outcome (`selected|skipped|unavailable|unsupported`) via `mewkit task-state update` — per `references/task-state-emission.md`. Advisory + best-effort: a failed or unavailable command is surfaced but never blocks the pipeline, and one-off work with no record emits nothing.
+When this run drives an **active durable task** (a `tasks/active/<id>.json` exists), emit status/step at phase transitions and record each acted-on `mewkit capabilities resolve` outcome (`selected|skipped|unavailable|unsupported`) via `mewkit task-state update`. Advisory + best-effort: a failed or unavailable command is surfaced but never blocks the pipeline, and one-off work with no record emits nothing.
+
+## `--advice` (composable, off by default)
+
+Opt-in strategic supervision for one run. At named checkpoints — GUIDE once the plan is
+agreed, RESCUE on a stall or contradiction, REVIEW after Verify and before the reviewer,
+RECHECK after a correction; hard cap 5 — the `athena` agent assesses the situation,
+recommends an operational path inside the locked scope, and may return the work for
+correction.
+
+It never approves: the plan and the review verdict stay with the user and the reviewer, and
+supervision counts as no verification.
+
+Without the flag there are zero calls and no state is written.
+
+Checkpoints: `references/advice-checkpoints.md`. Contract: `.claude/skills/advise/references/advice-supervision-rules.md` (load only when the
+flag is present).
 
 ## Related Rules
 

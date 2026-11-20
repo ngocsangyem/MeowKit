@@ -1,8 +1,8 @@
 //! Reading what `init` was asked for: which runtimes, which on-disk shape,
 //! which packs. Every refusal here happens before anything is fetched or
 //! written, and names the value and what would have been valid.
-use mewkit_adapters::bundle::{ALL_PACKS, DEFAULT_ONLY};
 use mewkit_adapters::contract::Runtime;
+use mewkit_adapters::projected_kit::{ALL_PACKS, DEFAULT_ONLY};
 use mewkit_core::kit::Kit;
 use mewkit_core::validate::{BASE_PACK, flatten_profile, has_pack_manifest, load_pack_manifest};
 
@@ -55,15 +55,18 @@ pub fn pick_targets(yes: bool, installed_here: bool) -> Result<(Vec<Runtime>, bo
     }
     let choices: Vec<Choice> = [
         (Runtime::ClaudeCode, "installs .claude/"),
-        (Runtime::Codex, "installs the authored Codex bundle"),
-        (Runtime::Cursor, "installs the authored Cursor bundle"),
+        (Runtime::Codex, "installs .agents/skills and .codex/"),
+        (Runtime::Cursor, "installs .cursor/"),
+        (Runtime::Grok, "installs .grok/"),
+        (Runtime::Pi, "installs .agents/ and .pi/"),
+        (Runtime::Omp, "installs .agents/ and .omp/"),
     ]
     .into_iter()
     .map(|(r, hint)| Choice::plain(r.name()).with_hint(hint))
     .collect();
     let ask = Ask::new(
         "Select the toolkits to set up",
-        Flag::with_value("--target", "claude-code|codex|cursor"),
+        Flag::with_value("--target", "claude-code|codex|cursor|grok|pi|omp"),
     );
     let picked = default_prompt().multi_select(&ask, &choices)?;
     let runtimes: Vec<Runtime> = picked

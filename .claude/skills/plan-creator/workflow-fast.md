@@ -52,7 +52,7 @@ Step 4: Semantic Checks
     └── Semantic checks only — no structural validation, no red team
          ↓
 Step 7: Present the plan
-    └── Self-check → AskUserQuestion (Approve | Modify | Reject)
+    └── Self-check → ask the user (Approve | Modify | Reject)
          ↓
 Step 8: Hydrate Tasks
     └── Session tasks + .plan-state.json → cook command → STOP

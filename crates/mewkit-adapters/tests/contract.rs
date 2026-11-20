@@ -86,6 +86,7 @@ fn a_stub_emitter_installs_and_strips_through_the_executor() {
         disabled: &[],
         fresh: false,
         other_scope: None,
+        placement: None,
     };
     let plan = Stub.prepare(&req).unwrap();
     let mut index = OwnershipIndex::new(&kit.version, "1", kit.origin);

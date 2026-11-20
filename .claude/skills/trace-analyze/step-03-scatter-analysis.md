@@ -12,11 +12,11 @@ Spawn up to 3 `researcher` subagents in parallel, each analyzing one batch again
 
 ### 3b. Spawn researcher subagents in parallel
 
-For each batch (1 to `$batch_count`), dispatch a researcher via the Agent tool. **Send ALL Agent() calls in a single message** to actually parallelize:
+For each batch (1 to `$batch_count`), delegate the batch to the `researcher` agent. **Send all the delegations in a single message** to actually parallelize:
 
 ```
 Agent(
-  subagent_type="researcher",
+  agent="researcher",
   description="Analyze trace batch {N} for error patterns",
   prompt="
     Read the error taxonomy at:

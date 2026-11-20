@@ -57,7 +57,7 @@ directly to step-07-gate.md.
 Run 4a and 4b semantic checks on BOTH `plan-approach-a.md` and `plan-approach-b.md`. Fix issues in each file independently. Then:
 
 1. Read the `## Goal` line from each approach file for the summary.
-2. Present via AskUserQuestion:
+2. Present by asking the user:
 
 ```json
 {
@@ -97,7 +97,7 @@ Algorithm: see `references/verification-roles.md` (tier selection, role responsi
    - 3–4 phases → Standard (Fact Checker + Contract Verifier)
    - 5+ phases → Full (Fact Checker + Flow Tracer + Scope Auditor + Contract Verifier)
 3. Set session variable `verification_tier ∈ {light, standard, full}` for step-06 consumption.
-4. For each role in the tier × each phase file, spawn one read-only Agent subagent (`subagent_type=Explore`) using the dispatch brief in `references/verification-roles.md`. Dispatch ALL roles in PARALLEL via a single message — never serial.
+4. For each role in the tier × each phase file, spawn one read-only search subagent using the dispatch brief in `references/verification-roles.md`. Dispatch ALL roles in PARALLEL via a single message — never serial.
 5. Collect all subagent verdict lists. Drop any line that does not match the verdict grammar.
 6. Group verdicts by phase file. For each phase file:
    - Read the existing phase file.

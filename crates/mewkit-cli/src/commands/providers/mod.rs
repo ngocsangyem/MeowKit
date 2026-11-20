@@ -14,7 +14,7 @@ use clap::Args;
 use mewkit_adapters::contract::{Kit, Op, Plan};
 use serde_json::{Value, json};
 
-use super::{emitter_for, parse_targets, prepare};
+use super::{emitter_for, parse_targets_at, prepare};
 use crate::failure::{Failure, OK};
 use crate::kit_args::KitArgs;
 use crate::place::Place;
@@ -50,9 +50,9 @@ pub fn run(args: &ProvidersArgs) -> Result<u8, Failure> {
     let mut wanted = args.target.clone();
     wanted.extend(args.provider.clone());
     let targets = if wanted.is_empty() {
-        parse_targets(&["all".into()])?
+        parse_targets_at(&["all".into()], Some(place.scope.kind))?
     } else {
-        parse_targets(&wanted)?
+        parse_targets_at(&wanted, Some(place.scope.kind))?
     };
     let kit = resolve(&args.kit, &place)?;
     let mut rows = Vec::new();

@@ -51,11 +51,14 @@ for (const [name, entry] of Object.entries(closure.behaviours)) {
   });
 }
 
+// How the Claude Code shells read stdin; each other runtime's shells have a reader of their own.
+const CLAUDE_CODE_READER = ['parse-stdin.cjs', 'core/hook-payload.cjs'];
+
 test('the bundled set is the shared behaviours plus the runtime adapter, nothing else', () => {
   // The completion-check core requires only node built-ins; the Codex and Cursor stop hooks load it.
   const shared = new Set(['hook-runtime.cjs', 'core/completion-check.cjs']);
   for (const name of ['privacy', 'pre-ship']) {
-    for (const file of closure.behaviours[name].lib) if (file !== 'parse-stdin.cjs') shared.add(file);
+    for (const file of closure.behaviours[name].lib) if (!CLAUDE_CODE_READER.includes(file)) shared.add(file);
   }
   for (const file of graph(path.join(LIB, 'hook-runtime.cjs')).lib) shared.add(file);
   assert.deepEqual([...closure.bundled].sort(), [...shared].sort());
@@ -86,8 +89,12 @@ test('every shell in a bundle resolves each local require to a file in that bund
   }
 });
 
-test('the helper set is exactly what the workflow-* skill helpers load', () => {
-  const entries = closure.helpers.filter((f) => f.startsWith('workflow-') && !f.endsWith('.cjs'));
+// Helpers skill and agent text runs by path, besides the workflow-* ones.
+const RUN_BY_PATH = ['injection-audit.cjs', 'secret-scrub.cjs'];
+
+test('the helper set is exactly what the skill helpers load', () => {
+  const workflow = closure.helpers.filter((f) => f.startsWith('workflow-') && !f.endsWith('.cjs'));
+  const entries = [...workflow, ...RUN_BY_PATH];
   const loaded = new Set();
   for (const entry of entries) for (const file of graph(path.join(LIB, entry)).lib) loaded.add(file);
   assert.deepEqual([...loaded].sort(), [...closure.helpers].sort(), 'update core-closure.json `helpers`');

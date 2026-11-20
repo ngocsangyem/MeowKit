@@ -27,7 +27,10 @@ use std::collections::BTreeMap;
 
 use clap::Args;
 use mewkit_adapters::contract::{Kit, Op, OwnershipIndex, Plan, RelPath, Runtime, written_hashes};
-use mewkit_adapters::{EmitRequest, Emitter, emitter};
+use mewkit_adapters::placement_resolver::resolve;
+use mewkit_adapters::registry::emitted;
+use mewkit_adapters::surface_table::table;
+use mewkit_adapters::{EmitRequest, Emitter, ScopeKind, emitter};
 use mewkit_core::exec::{ExecOptions, execute};
 
 use crate::failure::Failure;
@@ -65,13 +68,28 @@ pub fn unconfirmed_force(command: &str, force: bool, yes: bool) -> bool {
 
 /// `claude-code,codex` (or `all`) as runtimes, in the order given.
 pub fn parse_targets(list: &[String]) -> Result<Vec<Runtime>, Failure> {
+    parse_targets_at(list, None)
+}
+
+/// As [`parse_targets`], where `all` means every runtime that installs at
+/// `scope`. A runtime named outright is kept, so its emitter says why it
+/// cannot install there.
+pub fn parse_targets_at(
+    list: &[String],
+    scope: Option<ScopeKind>,
+) -> Result<Vec<Runtime>, Failure> {
     let mut out = Vec::new();
     for name in list.iter().flat_map(|l| l.split(',')).map(str::trim) {
         if name == "all" {
-            return Ok(Runtime::ALL.to_vec());
+            let fits = |r: &Runtime| {
+                scope.is_none_or(|kind| emitter(*r).is_some_and(|e| e.supports(kind)))
+            };
+            return Ok(emitted().into_iter().filter(fits).collect());
         }
-        let r = Runtime::from_name(name).ok_or_else(|| {
-            let known: Vec<_> = Runtime::ALL.iter().map(|r| r.name()).collect();
+        // A runtime the surface table knows but no emitter installs yet is not a target.
+        let installable = Runtime::from_name(name).filter(|r| emitter(*r).is_some());
+        let r = installable.ok_or_else(|| {
+            let known: Vec<_> = emitted().iter().map(|r| r.name()).collect();
             Failure::usage(format!(
                 "unknown target '{name}' (known: {})",
                 known.join(", ")
@@ -95,9 +113,54 @@ pub fn prepare(
     kit: &Kit,
     packs: &[String],
 ) -> Result<Plan, Failure> {
+    prepare_among(place, e, kit, packs, &[])
+}
+
+/// As [`prepare`], when `joining` are being installed in the same run: the
+/// placement covers them as well as what is installed here already.
+pub fn prepare_among(
+    place: &Place,
+    e: &dyn Emitter,
+    kit: &Kit,
+    packs: &[String],
+    joining: &[Runtime],
+) -> Result<Plan, Failure> {
+    prepare_for(place, e, kit, packs, joining, &[])
+}
+
+/// As [`prepare`], when `leaving` are being uninstalled in the same run: the
+/// placement is for the runtimes that stay.
+pub fn prepare_without(
+    place: &Place,
+    e: &dyn Emitter,
+    kit: &Kit,
+    packs: &[String],
+    leaving: &[Runtime],
+) -> Result<Plan, Failure> {
+    prepare_for(place, e, kit, packs, &[], leaving)
+}
+
+fn prepare_for(
+    place: &Place,
+    e: &dyn Emitter,
+    kit: &Kit,
+    packs: &[String],
+    joining: &[Runtime],
+    leaving: &[Runtime],
+) -> Result<Plan, Failure> {
     let other = place
         .other()
         .and_then(|p| p.index(e.target()).ok().flatten());
+    let placement = match place.scope.kind {
+        ScopeKind::Project => {
+            let mut set = place.installed()?;
+            set.push(e.target());
+            set.extend_from_slice(joining);
+            set.retain(|r| !leaving.contains(r));
+            Some(resolve(table(), &set))
+        }
+        ScopeKind::Global => None,
+    };
     Ok(e.prepare(&EmitRequest {
         kit,
         scope: &place.scope,
@@ -105,6 +168,7 @@ pub fn prepare(
         disabled: &[],
         fresh: false,
         other_scope: other.as_ref(),
+        placement: placement.as_ref(),
     })?)
 }
 
@@ -202,4 +266,24 @@ pub fn drop_retired(
         }
     }
     Ok(queued)
+}
+
+/// The runtimes among `installed` whose files depend on `changing` being here
+/// or not, `changing` itself left out. Codex, Pi and OMP write one `.agents/`
+/// tree in wording that depends on which of them are installed, and OMP
+/// switches off its import of `.claude/` only beside Claude Code.
+pub fn depends_on(changing: &[Runtime], installed: &[Runtime], scope: ScopeKind) -> Vec<Runtime> {
+    let sharers = mewkit_adapters::agents_tree::WRITERS;
+    let depends = |r: &Runtime| {
+        (sharers.contains(r) && changing.iter().any(|c| sharers.contains(c)))
+            || (*r == Runtime::Omp && changing.contains(&Runtime::ClaudeCode))
+    };
+    if scope != ScopeKind::Project {
+        return Vec::new();
+    }
+    installed
+        .iter()
+        .copied()
+        .filter(|r| !changing.contains(r) && depends(r))
+        .collect()
 }

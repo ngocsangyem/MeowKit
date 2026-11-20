@@ -15,7 +15,7 @@ use serde_json::json;
 use zip::write::SimpleFileOptions;
 
 const CONTRACT: &str =
-    r#"{"kitContract":1,"requires":{"mewkitMin":"0.1.0"},"kitVersion":"2.16.0"}"#;
+    r#"{"kitContract":2,"requires":{"mewkitMin":"0.1.0"},"kitVersion":"2.16.0"}"#;
 
 #[derive(Default)]
 struct FakeHttp {
@@ -218,11 +218,11 @@ fn unsafe_members_are_refused_before_the_cache_sees_them() {
 fn a_kit_outside_the_contract_range_is_refused() {
     for (contract, needle) in [
         (
-            r#"{"kitContract":2,"requires":{"mewkitMin":"0.1.0"},"kitVersion":"3.0.0"}"#,
-            "kit contract 2",
+            r#"{"kitContract":3,"requires":{"mewkitMin":"0.1.0"},"kitVersion":"3.0.0"}"#,
+            "kit contract 3",
         ),
         (
-            r#"{"kitContract":1,"requires":{"mewkitMin":"0.9.0"},"kitVersion":"3.0.0"}"#,
+            r#"{"kitContract":2,"requires":{"mewkitMin":"0.9.0"},"kitVersion":"3.0.0"}"#,
             "needs mewkit ≥ 0.9.0",
         ),
     ] {

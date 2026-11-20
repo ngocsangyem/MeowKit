@@ -50,7 +50,7 @@ Do NOT invoke when: docs already exist and need updating (use `mk:document-relea
 2. **Scout codebase** — activate `mk:scout` to analyze project structure.
    Skip: `.claude/`, `.git/`, `node_modules/`, `__pycache__/`, `dist/`, `build/`
 3. **Merge findings** — consolidate scout reports into context for doc generation
-4. **Generate docs** — spawn `documenter` subagent via Task tool with scout context.
+4. **Generate docs** — delegate to the `documenter` agent with the scout context.
    Output files (adapt to what the project actually has):
    - `README.md` — project overview (≤300 lines)
    - `docs/project-overview.md` — what this project is, who it's for

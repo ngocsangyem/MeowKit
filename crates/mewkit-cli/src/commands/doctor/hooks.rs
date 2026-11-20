@@ -17,8 +17,36 @@ const COVERAGE: &str = ".claude/hooks/hook-coverage.json";
 
 pub fn checks(place: &Place, runtime: Runtime, index: &OwnershipIndex) -> Vec<Check> {
     let mut out = vec![scripts(place, runtime)];
-    if runtime == Runtime::Codex && place.scope.kind == ScopeKind::Project {
-        out.push(super::codex_trust::check(&place.scope.root));
+    if place.scope.kind == ScopeKind::Project {
+        match runtime {
+            Runtime::Codex => out.push(super::codex_trust::check(&place.scope.root)),
+            // https://code.claude.com/docs/en/permissions#project-allow-rules-and-workspace-trust
+            Runtime::ClaudeCode => out.push(Check::new(
+                "claude-code trust",
+                Status::Ok,
+                "Claude Code asks to trust this folder on its first interactive start here; whether you accepted is not read here",
+            )),
+            // https://cursor.com/docs/agent/hooks
+            Runtime::Cursor => out.push(Check::new(
+                "cursor trust",
+                Status::Ok,
+                "Cursor runs project hooks only in a trusted workspace; whether this one is trusted is not readable here",
+            )),
+            // https://docs.x.ai/build/features/hooks
+            Runtime::Grok => out.push(Check::new(
+                "grok trust",
+                Status::Ok,
+                "Grok runs project hooks only after /hooks-trust or a start with --trust; whether this project is trusted is not read here",
+            )),
+            // https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/security.md
+            Runtime::Pi => out.push(Check::new(
+                "pi trust",
+                Status::Ok,
+                "Pi loads .pi/extensions and the project's .agents/skills only in a project you trusted (/trust); whether this one is trusted is not read here",
+            )),
+            // OMP has no trust step: its hook module runs from the first session.
+            Runtime::Omp => {}
+        }
     }
     if runtime != Runtime::ClaudeCode {
         out.push(coverage(place, runtime, index));
@@ -31,6 +59,9 @@ pub(super) fn hook_file(runtime: Runtime) -> &'static str {
         Runtime::ClaudeCode => ".claude/settings.json",
         Runtime::Codex => ".codex/hooks.json",
         Runtime::Cursor => ".cursor/hooks.json",
+        Runtime::Grok => ".grok/hooks/meowkit.json",
+        Runtime::Pi => ".pi/extensions/meowkit.ts",
+        Runtime::Omp => ".omp/hooks/pre/meowkit.ts",
     }
 }
 
@@ -87,6 +118,33 @@ pub(super) fn base_dir<'a>(place: &'a Place, runtime: Runtime, file: &'a Path) -
 fn scripts(place: &Place, runtime: Runtime) -> Check {
     let name = format!("{} hooks ({})", runtime.name(), place.label());
     let file = hook_path(place, runtime);
+    // Pi and OMP run code, not a hook file: the module and the guard it runs.
+    if matches!(runtime, Runtime::Pi | Runtime::Omp) {
+        let guard = place
+            .scope
+            .resolve(&RelPath::new(mewkit_adapters::agents_tree::GUARD).expect("static path"));
+        let missing: Vec<String> = [&file, &guard]
+            .iter()
+            .filter(|path| !path.is_file())
+            .map(|path| path.display().to_string())
+            .collect();
+        return if missing.is_empty() {
+            Check::new(
+                name,
+                Status::Ok,
+                "the guard module and its script are found",
+            )
+        } else {
+            Check::new(
+                name,
+                Status::Fail,
+                format!(
+                    "missing: {}; `mewkit upgrade --force` restores them",
+                    missing.join(", ")
+                ),
+            )
+        };
+    }
     let text = match config_text(&file) {
         ConfigRead::Text(text) => text,
         // Absent and unusable are one answer here — a named pipe or a file

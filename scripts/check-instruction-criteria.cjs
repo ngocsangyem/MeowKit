@@ -10,8 +10,9 @@
 //   node scripts/check-instruction-criteria.cjs --metrics [tree ...]  print the metrics table
 //   node scripts/check-instruction-criteria.cjs --emphatic [tree ...] emphatic tokens per file
 //
-// A tree is `.claude` or a bundle root such as `kit/bundles/codex/root`; `kit/bundles`
-// expands to both bundle roots. With no tree, all three are checked.
+// A tree is `.claude`, a directory, or `installed:<runtime>` (codex, cursor, grok, pi, omp): what
+// `mewkit init` writes for that runtime from this checkout (scripts/lib/installed-tree.cjs,
+// which needs the mewkit binary). With no tree, `.claude` and all five are checked.
 // Criteria and their scope: docs/maintainer/instruction-audit-criteria.md.
 
 const crypto = require('node:crypto');
@@ -22,9 +23,11 @@ const { checkHostFile, readPins } = require('./lib/instruction-criteria-host-rul
 const { checkSkillFile, listingChars, isSkill } = require('./lib/instruction-criteria-skill-rules.cjs');
 const { frontmatterValue } = require('./lib/instruction-criteria-frontmatter.cjs');
 const { allowed, looseEntries, overBaseline, readBaseline, writeBaseline } = require('./lib/instruction-criteria-baseline.cjs');
+const { installedTree } = require('./lib/installed-tree.cjs');
 
 const REPO = path.resolve(__dirname, '..');
-const DEFAULT_TREES = ['.claude', 'kit/bundles/codex/root', 'kit/bundles/cursor/root'];
+const INSTALLED = 'installed:';
+const DEFAULT_TREES = ['.claude', 'installed:codex', 'installed:cursor', 'installed:grok', 'installed:pi', 'installed:omp'];
 const TEXT_EXT = new Set(['.md', '.mdc', '.toml']);
 const SKIP_DIRS = new Set(['node_modules', '__tests__', '.venv']);
 /** Host state at the top of a tree; a skill folder of the same name deeper down is still checked. */
@@ -36,32 +39,36 @@ const CRITERIA = ['A1', 'A2', 'A5', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14'];
 const PINNED_SHA256 = 'e0b639506d83aff3e9040f3fdbfad35c016ee46ff701ad2f1daff04ced2461fa';
 
 /**
- * Always-on bytes per tree may only shrink. Claude Code loads every rule file; the bundles
- * load their root AGENTS.md, and Cursor also every `.mdc` rule marked `alwaysApply: true`.
+ * Always-on bytes per tree may only shrink. Claude Code loads every rule file; every other
+ * runtime loads the installed root AGENTS.md (the kit's shared block and its markers), and
+ * Cursor also every installed `.mdc` rule marked `alwaysApply: true`. The Cursor figure rose
+ * from 6316 when Cursor took the shared block in place of a shorter text of its own.
  */
-const ALWAYS_ON_CEILING = { '.claude': 18191, 'kit/bundles/codex/root': 7676, 'kit/bundles/cursor/root': 6289 };
+const ALWAYS_ON_CEILING = { '.claude': 18191, 'installed:codex': 7687, 'installed:cursor': 10641, 'installed:grok': 7687, 'installed:pi': 7687, 'installed:omp': 7687 };
+/** Codex stops reading project guidance past this many bytes (`project_doc_max_bytes`). */
+const AGENTS_MD_CAP = 32768;
 /** Skill listing ceilings in chars; Codex is lower so a 128k-context session keeps whole descriptions. */
-const LISTING_CEILING = { '.claude': 16000, 'kit/bundles/codex/root': 12000, 'kit/bundles/cursor/root': 16000 };
+const LISTING_CEILING = { '.claude': 16000, 'installed:codex': 12000, 'installed:cursor': 16000, 'installed:grok': 12000, 'installed:pi': 12000, 'installed:omp': 12000 };
+
+/** Where a tree's files are. */
+function dirOf(tree) {
+  return tree.startsWith(INSTALLED) ? installedTree(tree.slice(INSTALLED.length)) : path.resolve(REPO, tree);
+}
 
 /** Listing chars summed over every skill in a tree. */
 function listingTotal(tree) {
-  const abs = path.resolve(REPO, tree);
+  const abs = dirOf(tree);
   return walk(abs).filter((f) => isSkill(path.relative(abs, f)))
     .reduce((n, f) => n + listingChars(fs.readFileSync(f, 'utf8'), kindOf(tree)), 0);
 }
 
 function expand(trees) {
-  const out = [];
-  for (const t of trees.length ? trees : DEFAULT_TREES) {
-    const norm = t.replace(/\/+$/, '');
-    if (norm === 'kit/bundles') out.push('kit/bundles/codex/root', 'kit/bundles/cursor/root');
-    else out.push(norm);
-  }
-  return out;
+  return (trees.length ? trees : DEFAULT_TREES).map((t) => (t.startsWith(INSTALLED) ? t : t.replace(/\/+$/, '')));
 }
 
-/** 'claude' for a `.claude` tree, else the bundle runtime named in the path. */
+/** 'claude' for a `.claude` tree, else the runtime the tree is installed or laid out for. */
 function kindOf(tree) {
+  if (tree.startsWith(INSTALLED)) return tree.slice(INSTALLED.length);
   const parts = tree.split(/[\\/]+/);
   if (parts[parts.length - 1] === '.claude') return 'claude';
   return parts.includes('cursor') || fs.existsSync(path.resolve(REPO, tree, '.cursor')) ? 'cursor' : 'codex';
@@ -80,7 +87,7 @@ function walk(dir, out = [], top = true) {
 }
 
 function alwaysOnFiles(tree) {
-  const abs = path.resolve(REPO, tree);
+  const abs = dirOf(tree);
   if (kindOf(tree) === 'claude') {
     const rules = path.join(abs, 'rules');
     return fs.readdirSync(rules).filter((f) => f.endsWith('.md')).map((f) => path.join(rules, f));
@@ -97,7 +104,7 @@ function alwaysOnFiles(tree) {
 }
 
 function findingsOf(tree, pins = readPins(PINS_FILE)) {
-  const abs = path.resolve(REPO, tree);
+  const abs = dirOf(tree);
   const ctx = { kind: kindOf(tree), pins };
   const findings = [];
   for (const f of walk(abs)) {
@@ -110,7 +117,7 @@ function findingsOf(tree, pins = readPins(PINS_FILE)) {
 }
 
 function measure(tree) {
-  const abs = path.resolve(REPO, tree);
+  const abs = dirOf(tree);
   const files = walk(abs);
   const pinned = PINNED_SECTIONS.map((p) => path.join(abs, p.file));
   const m = { tree, files: files.length, gate: 0, emphatic: 0, emphaticOutsidePinned: 0, skills: 0, listing: 0 };
@@ -139,12 +146,16 @@ function check(tree) {
   if (ceiling !== undefined && alwaysOn > ceiling) {
     findings.push({ file: tree, line: 0, criterion: 'A8', text: `always-on text is ${alwaysOn} B, above the ${ceiling} B ceiling` });
   }
+  const agentsMd = path.join(dirOf(tree), 'AGENTS.md');
+  if (kindOf(tree) !== 'claude' && fs.existsSync(agentsMd) && fs.statSync(agentsMd).size > AGENTS_MD_CAP) {
+    findings.push({ file: tree, line: 0, criterion: 'A8', text: `AGENTS.md is ${fs.statSync(agentsMd).size} B, above the ${AGENTS_MD_CAP} B a runtime reads` });
+  }
   const listed = listingTotal(tree);
   if (LISTING_CEILING[tree] !== undefined && listed > LISTING_CEILING[tree]) {
     findings.push({ file: tree, line: 0, criterion: 'listing', text: `skill listing is ${listed} chars, above the ${LISTING_CEILING[tree]} ceiling` });
   }
   if (kindOf(tree) === 'claude') {
-    const sha = crypto.createHash('sha256').update(pinnedText(path.resolve(REPO, tree))).digest('hex');
+    const sha = crypto.createHash('sha256').update(pinnedText(dirOf(tree))).digest('hex');
     if (sha !== PINNED_SHA256) findings.push({ file: tree, line: 0, criterion: 'pinned', text: 'the blocked-pattern table or the numbered injection rules changed' });
   }
   return findings;
@@ -163,7 +174,7 @@ function printMetrics(trees) {
 
 function printEmphatic(trees) {
   for (const t of trees) {
-    const abs = path.resolve(REPO, t);
+    const abs = dirOf(t);
     const rows = walk(abs).map((f) => [emphaticCount(fs.readFileSync(f, 'utf8')), path.join(t, path.relative(abs, f))]);
     for (const [n, f] of rows.filter(([n]) => n > 0).sort((a, b) => b[0] - a[0])) console.log(`${n}\t${f}`);
   }

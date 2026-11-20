@@ -5,6 +5,7 @@
     "privacy": {
       "shell": "privacy-block.cjs",
       "lib": [
+        "core/hook-payload.cjs",
         "core/privacy.cjs",
         "parse-stdin.cjs",
         "project-root.cjs"
@@ -15,6 +16,7 @@
       "shell": "pre-ship.cjs",
       "lib": [
         "changed-files.cjs",
+        "core/hook-payload.cjs",
         "core/pre-ship.cjs",
         "memory-store-lint.cjs",
         "parse-stdin.cjs",
@@ -39,15 +41,21 @@
     "ship-run-once.cjs"
   ],
   "bundleLibDirs": [
-    "kit/bundles/codex/root/.codex/hooks/lib",
-    "kit/bundles/cursor/root/.cursor/hooks/lib"
+    "kit/overlays/codex/files/.codex/hooks/lib",
+    "kit/overlays/cursor/files/.cursor/hooks/lib",
+    "kit/overlays/grok/files/.grok/meowkit/hooks/lib",
+    "kit/overlays/agents/files/.agents/meowkit/hooks/lib"
   ],
   "helpers": [
     "config-keys.cjs",
     "config-rules.cjs",
     "handler-registry.cjs",
+    "injection-audit-core.cjs",
+    "injection-audit-patterns.cjs",
+    "injection-audit.cjs",
     "meowkit-paths.cjs",
     "read-config.cjs",
+    "secret-scrub.cjs",
     "workflow-config",
     "workflow-config-core.cjs",
     "workflow-diff-scope",
@@ -57,7 +65,9 @@
     "yaml-subset.cjs"
   ],
   "helperBinDirs": [
-    "kit/bundles/codex/root/.codex/scripts/bin",
-    "kit/bundles/cursor/root/.cursor/scripts/bin"
+    "kit/overlays/codex/files/.codex/scripts/bin",
+    "kit/overlays/cursor/files/.cursor/scripts/bin",
+    "kit/overlays/grok/files/.grok/meowkit/scripts/bin",
+    "kit/overlays/agents/files/.agents/meowkit/scripts/bin"
   ]
 }

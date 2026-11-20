@@ -109,12 +109,19 @@ pub(super) fn decide(
         Op::MergeBlock { id, content, .. } => {
             let merged =
                 markdown_block::merge(&text()?, id, content).map_err(|e| merge_err(&path, e))?;
+            // A file holding nothing but this block was created for it by
+            // another install that merges the same block; whichever of them
+            // strips it last removes the file.
+            let before = text()?;
+            let only_this_block = current.is_some()
+                && markdown_block::strip(&before, id)
+                    .is_ok_and(|rest| rest.trim().is_empty() && rest != before);
             let section = Section {
                 format: Format::Markdown,
                 key: vec![],
                 names: vec![],
                 created: 0,
-                file_created: keep_created(sections, id, current.is_none()),
+                file_created: only_this_block || keep_created(sections, id, current.is_none()),
             };
             (
                 write_if_changed(&current, merged, None),
@@ -352,6 +359,9 @@ fn write_if_changed(current: &Option<Vec<u8>>, new: String, mode: Option<u32>) -
 fn strip_action(current: &Option<Vec<u8>>, stripped: String, sec: &Section, empty: &str) -> Action {
     if sec.file_created && (stripped.is_empty() || stripped == empty) {
         Action::Remove
+    } else if current.is_none() && stripped.is_empty() {
+        // Already gone: another install that shared the file removed it.
+        Action::Unchanged
     } else {
         write_if_changed(current, stripped, None)
     }

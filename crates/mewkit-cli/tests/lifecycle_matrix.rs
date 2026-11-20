@@ -202,6 +202,9 @@ cells! {
     claude_code_in_a_project: "claude-code" at Project;
     codex_in_a_project: "codex" at Project;
     cursor_in_a_project: "cursor" at Project;
+    grok_in_a_project: "grok" at Project;
+    pi_in_a_project: "pi" at Project;
+    omp_in_a_project: "omp" at Project;
     claude_code_globally: "claude-code" at Global;
     codex_globally: "codex" at Global;
     cursor_globally: "cursor" at Global;

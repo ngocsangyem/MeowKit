@@ -24,7 +24,7 @@ railroad keystrokes.
 STAGE 0  Parse config
          Goal / Scope / Metric / Direction / Verify (+ optional Guard / Iterations /
          Noise / Min-Delta / Stop-At). Missing required field → ONE batched
-         AskUserQuestion (template in config-and-metrics.md). No command runs yet.
+         ask the user (template in config-and-metrics.md). No command runs yet.
 
 STAGE 1  Preconditions
          - Git repo? (git rev-parse --git-dir)
@@ -35,7 +35,7 @@ STAGE 1  Preconditions
          - Dry-run Verify ONCE → must print a single number. Not a number → STOP + ask.
 
 ─ GATE A (HARD) ─ Present parsed config + safety-screen result + git state (branch,
-                  clean) + iteration cap. AskUserQuestion: Approve / Edit config / Cancel.
+                  clean) + iteration cap. Ask the user: Approve / Edit config / Cancel.
                   NO file edit happens before Approve.
 
 STAGE 2  Baseline
@@ -78,7 +78,7 @@ in this shipped reference.
 
 ## The Four Hard Gates
 
-Every gate is a human `AskUserQuestion`. The inner iteration loop (Stage 3) is the only
+Every gate is a question to a human. The inner iteration loop (Stage 3) is the only
 autonomous region.
 
 ### Gate A — Entry (the injection / scope firewall)
@@ -86,7 +86,7 @@ autonomous region.
 Present, then ask:
 
 ```
-AskUserQuestion({
+ask_user({
   questions: [{
     question: "Approve this optimization loop?\n
       Goal: <goal>\n

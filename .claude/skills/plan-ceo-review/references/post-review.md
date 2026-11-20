@@ -170,14 +170,14 @@ After displaying the Review Readiness Dashboard, recommend the next review(s) ba
 
 **If both are needed, recommend eng review first** (required gate), then design review.
 
-Use AskUserQuestion to present the next step. Include only applicable options:
+Ask the user to present the next step. Include only applicable options:
 - **A)** Run /mk:plan-ceo-review next (required gate)
 - **B)** Run /plan-design-review next (only if UI scope detected)
 - **C)** Skip — I'll handle reviews manually
 
 ## docs/designs/ Promotion (EXPANSION and SELECTIVE EXPANSION only)
 
-At the end of the review, if the vision produced a compelling feature direction, offer to promote the CEO plan to the project repo. AskUserQuestion:
+At the end of the review, if the vision produced a compelling feature direction, offer to promote the CEO plan to the project repo. Ask the user:
 
 "The vision from this review produced {N} accepted scope expansions. Want to promote it to a design doc in the repo?"
 - **A)** Promote to `docs/designs/{FEATURE}.md` (committed to repo, visible to the team)

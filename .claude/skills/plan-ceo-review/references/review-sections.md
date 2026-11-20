@@ -60,7 +60,7 @@ Evaluate and diagram:
 **SELECTIVE EXPANSION:** If any accepted cherry-picks from Step 0D affect the architecture, evaluate their architectural fit here. Flag any that create coupling concerns or don't integrate cleanly — this is a chance to revisit the decision with new information.
 
 Required ASCII diagram: full system architecture showing new components and their relationships to existing ones.
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Section 2: Error & Rescue Map
 
@@ -90,7 +90,7 @@ Rules for this section:
 * Every rescued error must either: retry with backoff, degrade gracefully with a user-visible message, or re-raise with added context. "Swallow and continue" is almost never acceptable.
 * For each GAP (unrescued error that should be rescued): specify the rescue action and what the user should see.
 * For LLM/AI service calls specifically: what happens when the response is malformed? When it's empty? When it hallucinates invalid JSON? When the model returns a refusal? Each of these is a distinct failure mode.
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Section 3: Security & Threat Model
 
@@ -106,7 +106,7 @@ Evaluate:
 * Audit logging. For sensitive operations: is there an audit trail?
 
 For each finding: threat, likelihood (High/Med/Low), impact (High/Med/Low), and whether the plan mitigates it.
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Section 4: Data Flow & Interaction Edge Cases
 
@@ -143,7 +143,7 @@ For each node: what happens on each shadow path? Is it tested?
                        | Queue backs up 2 hours | ?        |
 ```
 Flag any unhandled edge case as a gap. For each gap, specify the fix.
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Section 5: Code Quality Review
 
@@ -156,7 +156,7 @@ Evaluate:
 * Over-engineering check. Any new abstraction solving a problem that doesn't exist yet?
 * Under-engineering check. Anything fragile, assuming happy path only, or missing obvious defensive checks?
 * Cyclomatic complexity. Flag any new method that branches more than 5 times. Propose a refactor.
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Section 6: Test Review
 
@@ -197,7 +197,7 @@ Flakiness risk: Flag any test depending on time, randomness, external services, 
 Load/stress test requirements: For any new codepath called frequently or processing significant data.
 
 For LLM/prompt changes: Check CLAUDE.md for the "Prompt/LLM changes" file patterns. If this plan touches ANY of those patterns, state which eval suites must be run, which cases should be added, and what baselines to compare against.
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Section 7: Performance Review
 
@@ -209,7 +209,7 @@ Evaluate:
 * Background job sizing. For every new job: worst-case payload, runtime, retry behavior?
 * Slow paths. Top 3 slowest new codepaths and estimated p99 latency.
 * Connection pool pressure. New DB connections, Redis connections, HTTP connections?
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Section 8: Observability & Debuggability Review
 
@@ -226,7 +226,7 @@ Evaluate:
 
 **EXPANSION and SELECTIVE EXPANSION addition:**
 * What observability would make this feature a joy to operate? (For SELECTIVE EXPANSION, include observability for any accepted cherry-picks.)
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Section 9: Deployment & Rollout Review
 
@@ -242,7 +242,7 @@ Evaluate:
 
 **EXPANSION and SELECTIVE EXPANSION addition:**
 * What deploy infrastructure would make shipping this feature routine? (For SELECTIVE EXPANSION, assess whether accepted cherry-picks change the deployment risk profile.)
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Section 10: Long-Term Trajectory Review
 
@@ -258,7 +258,7 @@ Evaluate:
 * What comes after this ships? Phase 2? Phase 3? Does the architecture support that trajectory?
 * Platform potential. Does this create capabilities other features can leverage?
 * (SELECTIVE EXPANSION only) Retrospective: Were the right cherry-picks accepted? Did any rejected expansions turn out to be load-bearing for the accepted ones?
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Section 11: Design & UX Review (skip if no UI scope detected)
 
@@ -281,7 +281,7 @@ Evaluate:
 Required ASCII diagram: user flow showing screens/states and transitions.
 
 If this plan has significant UI scope, recommend: "Consider running /plan-design-review for a deep design review of this plan before implementation."
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
+**STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Post-Implementation Design Audit (if UI scope detected)
 
@@ -289,11 +289,11 @@ After implementation, run `/design-review` on the live site to catch visual issu
 
 ## CRITICAL RULE — How to ask questions
 
-Follow the AskUserQuestion format from the shared protocols. Additional rules for plan reviews:
-* **One issue = one AskUserQuestion call.** Never combine multiple issues into one question.
+Follow the user question format from the shared protocols. Additional rules for plan reviews:
+* **One issue = one user question.** Never combine multiple issues into one question.
 * Describe the problem concretely, with file and line references.
 * Present 2-3 options, including "do nothing" where reasonable.
 * For each option: effort, risk, and maintenance burden in one line.
 * **Map the reasoning to my engineering preferences above.** One sentence connecting your recommendation to a specific preference.
 * Label with issue NUMBER + option LETTER (e.g., "3A", "3B").
-* **Escape hatch:** If a section has no issues, say so and move on. If an issue has an obvious fix with no real alternatives, state what you'll do and move on — don't waste a question on it. Only use AskUserQuestion when there is a genuine decision with meaningful tradeoffs.
+* **Escape hatch:** If a section has no issues, say so and move on. If an issue has an obvious fix with no real alternatives, state what you'll do and move on — don't waste a question on it. Only ask the user when there is a genuine decision with meaningful tradeoffs.

@@ -5,33 +5,33 @@
 ## Model Mapping
 
 ```toon
-model_selection[3]{model,when_to_use,agents}:
-  haiku,Quick tasks/Mechanical or report-only work,documenter/shipper/project-manager/explore/git-manager
-  sonnet,Implementation support/Research/Testing,analyst/tester/researcher/journal-writer/orchestrator
-  opus,Design/Implementation/Review/Security/Complex planning,planner/architect/developer/reviewer/security/brainstormer
+tier_selection[3]{tier,pin,when_to_use,agents}:
+  TRIVIAL,haiku,Quick tasks/Mechanical or report-only work,documenter/shipper/project-manager/explore/git-manager
+  STANDARD,sonnet,Implementation support/Research/Testing,analyst/tester/researcher/journal-writer/orchestrator
+  COMPLEX,opus,Design/Implementation/Review/Security/Complex planning,planner/architect/developer/reviewer/security/brainstormer
 ```
 
 ## Complexity to Model
 
 ```toon
-complexity_model[3]{complexity,default_model,override_to_opus}:
-  Quick,haiku,Never
-  Standard,sonnet,User asks for architecture/design
-  Deep,sonnet,Always consider opus for planning phase
+complexity_tier[3]{complexity,default_tier,override_to_complex}:
+  Quick,TRIVIAL,Never
+  Standard,STANDARD,User asks for architecture/design
+  Deep,STANDARD,Always consider COMPLEX for the planning phase
 ```
 
 ## Task Type to Model
 
 ```toon
-task_model[8]{task_type,model,reason}:
-  Typo fix / config change,haiku,Minimal reasoning needed
-  Bug fix / feature add,sonnet,Standard implementation
-  API endpoint / component,sonnet,Standard implementation
-  Test writing,sonnet,Requires code understanding
-  Code review,sonnet,Pattern matching + analysis
-  Architecture design,opus,Complex trade-off analysis
-  Security audit,opus,Deep vulnerability analysis
-  Refactoring / migration,opus,Cross-cutting impact analysis
+task_tier[8]{task_type,tier,reason}:
+  Typo fix / config change,TRIVIAL,Minimal reasoning needed
+  Bug fix / feature add,STANDARD,Standard implementation
+  API endpoint / component,STANDARD,Standard implementation
+  Test writing,STANDARD,Requires code understanding
+  Code review,STANDARD,Pattern matching + analysis
+  Architecture design,COMPLEX,Complex trade-off analysis
+  Security audit,COMPLEX,Deep vulnerability analysis
+  Refactoring / migration,COMPLEX,Cross-cutting impact analysis
 ```
 
 ## Agent Default Models
@@ -64,13 +64,9 @@ Include in detection result:
 ## Detection Result
 
 - **Agent:** architect
-- **Model:** opus (the agent's pin)
+- **Tier:** COMPLEX (pin: `opus`)
 - **Complexity:** Standard
 - **Reason:** API endpoint implementation
 ```
 
-When spawning the agent, leave `model` unset so the agent's pin applies:
-
-```
-Agent(subagent_type="architect", ...)
-```
+When delegating to the agent, leave the model unset so the agent's pin applies.

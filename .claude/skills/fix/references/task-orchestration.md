@@ -1,6 +1,8 @@
 # Task Orchestration
 
-Tracking fix workflows with host-runtime task tools.
+Tracking fix workflows with the host runtime's tracked-task capability, when available (an
+interface — not a specific tool name; fall back to a plain to-do list or the plan file itself
+when unavailable).
 
 ## When to Use Tasks
 
@@ -13,48 +15,35 @@ Tracking fix workflows with host-runtime task tools.
 
 ## Standard Workflow Tasks
 
-Create all tasks upfront, then work through them:
+Create all tasks upfront, then work through them in dependency order:
 
-```
-T1 = TaskCreate(subject="Debug & investigate")
-T2 = TaskCreate(subject="Scout related code")
-T3 = TaskCreate(subject="Implement fix", addBlockedBy=[T1, T2])
-T4 = TaskCreate(subject="Run tests", addBlockedBy=[T3])
-T5 = TaskCreate(subject="Code review", addBlockedBy=[T4])
-T6 = TaskCreate(subject="Finalize", addBlockedBy=[T5])
-```
+1. Debug & investigate
+2. Scout related code
+3. Implement fix (blocked by 1, 2)
+4. Run tests (blocked by 3)
+5. Code review (blocked by 4)
+6. Finalize (blocked by 5)
 
 ## Deep Workflow Tasks
 
 Steps 1+2 run in parallel (debug + research simultaneously):
 
-```
-T1 = TaskCreate(subject="Debug & investigate")
-T2 = TaskCreate(subject="Research solutions")
-T3 = TaskCreate(subject="Brainstorm approaches", addBlockedBy=[T1, T2])
-T4 = TaskCreate(subject="Create plan", addBlockedBy=[T3])
-T5 = TaskCreate(subject="Implement fix", addBlockedBy=[T4])
-T6 = TaskCreate(subject="Run tests", addBlockedBy=[T5])
-T7 = TaskCreate(subject="Code review", addBlockedBy=[T6])
-T8 = TaskCreate(subject="Finalize", addBlockedBy=[T7])
-```
+1. Debug & investigate
+2. Research solutions
+3. Brainstorm approaches (blocked by 1, 2)
+4. Create plan (blocked by 3)
+5. Implement fix (blocked by 4)
+6. Run tests (blocked by 5)
+7. Code review (blocked by 6)
+8. Finalize (blocked by 7)
 
 ## Parallel Issue Coordination
 
-For 2+ independent issues, create separate task trees:
+For 2+ independent issues, create separate task trees that converge on a shared final task:
 
-```
-// Issue A
-T_A1 = TaskCreate(subject="[Issue A] Debug")
-T_A2 = TaskCreate(subject="[Issue A] Fix", addBlockedBy=[T_A1])
-
-// Issue B
-T_B1 = TaskCreate(subject="[Issue B] Debug")
-T_B2 = TaskCreate(subject="[Issue B] Fix", addBlockedBy=[T_B1])
-
-// Shared final
-T_final = TaskCreate(subject="Integration verify", addBlockedBy=[T_A2, T_B2])
-```
+- Issue A: 1) Debug → 2) Fix (blocked by 1)
+- Issue B: 1) Debug → 2) Fix (blocked by 1)
+- Shared final: Integration verify (blocked by both issues' Fix tasks)
 
 ## Rules
 

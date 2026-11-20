@@ -17,10 +17,14 @@ const handlersFile = JSON.parse(fs.readFileSync(path.join(HOOKS, 'handlers.json'
 const handlers = Array.isArray(handlersFile) ? handlersFile : handlersFile.handlers;
 const closure = JSON.parse(fs.readFileSync(path.join(HOOKS, 'core-closure.json'), 'utf8'));
 
-const RUNTIMES = ['codex', 'cursor'];
+const RUNTIMES = ['codex', 'cursor', 'grok', 'pi', 'omp'];
 const BUNDLE_ROOT = {
-  codex: 'kit/bundles/codex/root',
-  cursor: 'kit/bundles/cursor/root',
+  codex: 'kit/overlays/codex/files',
+  cursor: 'kit/overlays/cursor/files',
+  grok: 'kit/overlays/grok/files',
+  // Pi and OMP run the guard in the tree they share with Codex.
+  pi: 'kit/overlays/agents/files',
+  omp: 'kit/overlays/agents/files',
 };
 
 test('every handler in handlers.json has exactly one coverage row', () => {

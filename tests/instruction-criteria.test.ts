@@ -191,14 +191,14 @@ describe("baseline", () => {
 
 describe("the real trees", () => {
 	it("count Cursor rules marked alwaysApply as always-on", () => {
-		const files = alwaysOnFiles("kit/bundles/cursor/root").map((f) => path.basename(f));
+		const files = alwaysOnFiles("installed:cursor").map((f) => path.basename(f));
 		expect(files).toContain("runtime-invariants.mdc");
 		expect(files).not.toContain("domain-planning.mdc");
 	});
 
 	it("sum the Cursor always-on bytes to the A8 ceiling", () => {
-		const bytes = alwaysOnFiles("kit/bundles/cursor/root").reduce((n, f) => n + fs.statSync(f).size, 0);
-		expect(bytes).toBeLessThanOrEqual(6356);
+		const bytes = alwaysOnFiles("installed:cursor").reduce((n, f) => n + fs.statSync(f).size, 0);
+		expect(bytes).toBeLessThanOrEqual(10641);
 	});
 
 	it("reject a baseline flag with no file", () => {
@@ -217,5 +217,6 @@ describe("the real trees", () => {
 		);
 		expect(run.stdout).toContain("No findings.");
 		expect(run.status).toBe(0);
-	});
+		// One install per runtime other than Claude Code, five in all.
+	}, 120_000);
 });

@@ -75,7 +75,7 @@ Detect input type FIRST, then route:
 | Git URL (`github.com/*`, `gitlab.com/*`) | URL contains git host  | `git clone --depth 1` → `mk:scout`                   |
 | Web URL (`https://...`)                  | URL, not git host      | `mk:web-to-markdown` (static) or `mk:agent-browser` (SPA) |
 | Local path (`./`, `../`, `/`)            | Starts with `.` or `/` | Direct Read/Glob                                       |
-| Freeform text                            | No URL or path         | `researcher` agent via Task() (WebSearch)              |
+| Freeform text                            | No URL or path         | `researcher` agent via delegate a subagent () (WebSearch)              |
 | Image/screenshot                         | Image file extension   | `mk:multimodal` (Gemini vision)                      |
 
 Clean up cloned repos after analysis.

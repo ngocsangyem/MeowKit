@@ -76,7 +76,7 @@ Skip when:
 3. For each weak AC, append `Round {N+1} (reviewer): AC-{NN} {clarification}` to Negotiation Log
 4. If clean, write `Round {N+1} (reviewer): accepted` and proceed to `sign`
 5. If clarifications added, increment `rounds` and signal generator to `amend`
-6. **HARD CAP: 2 negotiation rounds.** Round 3 escalates to human via AskUserQuestion
+6. **HARD CAP: 2 negotiation rounds.** Round 3 escalates to human by asking the user
 
 ### `amend` (generator)
 

@@ -1,11 +1,11 @@
 # Instruction audit criteria
 
-The criteria every rule, agent, skill and bundle instruction file is held to now that MeowKit
+The criteria every rule, agent, skill and installed instruction file is held to now that MeowKit
 has no plan-approval or review-approval gate, and the model-fit checks for current models on
 Claude Code, Codex and Cursor. The mechanical subset is checked by
-`node scripts/check-instruction-criteria.cjs`, which CI runs on `.claude`,
-`kit/bundles/codex/root` and `kit/bundles/cursor/root` against
-`scripts/instruction-criteria-baseline.json`; the rest is reviewed by hand against this page.
+`node scripts/check-instruction-criteria.cjs`, which CI runs on `.claude` and on what `mewkit init`
+installs for each other runtime (`installed:codex`, `installed:cursor`, `installed:grok`, `installed:pi`, `installed:omp`; the script installs each into a
+temp directory with the built binary) against `scripts/instruction-criteria-baseline.json`; the rest is reviewed by hand against this page.
 
 ## Criteria
 
@@ -114,8 +114,50 @@ What moved:
   agents and files, and 48 of those are Claude Code reference files the bundles name in prose
   but do not ship.
 
+### After projection replaced the bundles (2026-11-18)
+
+Codex and Cursor are no longer hand-ported trees: the rows are measured on an install from the
+kit's ship set, so "bundle" in the criteria above now reads "installed tree".
+
+| Tree | Text files | Always-on bytes | Gate phrases | Emphatic tokens | Emphatic outside pinned rules | Skills | Listing chars | A9 | A10 | A11 | A12 | A13 | A14 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| .claude | 913 | 18191 | 0 | 521 | 510 | 127 | 14150 | 0 | 0 | 0 | 16 | 0 | 0 |
+| installed:codex | 878 | 7734 | 0 | 486 | 486 | 127 | 9578 | 0 | 0 | 0 | 16 | 0 | 0 |
+| installed:cursor | 882 | 6316 | 0 | 484 | 484 | 126 | 9445 | 0 | 0 | 0 | 16 | 0 | 0 |
+
+- **Always-on bytes** are the same text as before in its installed form: 7676 B plus the 58 B of
+  block markers in `AGENTS.md` on Codex, 6289 B plus the 27 B rule header on Cursor.
+- **A12** rises from 5 to 16 on each runtime because the installed text is now the source text,
+  which carries the same 16 baselined findings.
+- **Skills** rise by the four the bundles never ported and fall by `mk-benchmark`, which the ship
+  set leaves out. `.claude` counts the working tree, which includes it.
+
 Not measured: whether the rewritten text changes model behaviour. The live routing and
 with/without evals were not run.
+
+### After one shared always-on block (2026-11-18)
+
+Codex and Cursor now merge the same text, `kit/overlays/shared/AGENTS.md`, as the `meowkit`
+block of the project's `AGENTS.md`. Claude Code keeps `.claude/rules/`.
+
+| Tree | Always-on bytes before | After | What is counted |
+|---|---|---|---|
+| .claude | 18191 | 18191 | `.claude/rules/*.md`, unchanged |
+| installed:codex | 7734 | 7687 | `AGENTS.md`: the 7629 B block and its markers |
+| installed:cursor | 6316 | 10641 | `AGENTS.md` (7687 B) and `.cursor/rules/runtime-invariants.mdc` (2954 B) |
+| Codex and Cursor in one project, as Cursor reads it | 14050 | 10641 | before: Codex's `AGENTS.md` and both Cursor rules |
+
+- **Cursor alone rises by 4325 B.** Its earlier text was shorter because it left the
+  blocked-pattern list, the six core behaviors, the subagent status protocol and the development
+  rules out of always-on text; skills cited them as `AGENTS.md (<section>)` all the same, and
+  those citations now resolve.
+- `.cursor/rules/meowkit-core.mdc` is no longer installed. `runtime-invariants.mdc` keeps what
+  only Cursor needs: capability routing, discovery, the nesting contract, state ledgers and the
+  note that rules are advisory.
+- The A8 ceiling for Cursor is 10641 B, and `AGENTS.md` above 32768 B is an A8 finding on any
+  installed tree.
+
+Not measured: whether the shared text changes model behaviour on Cursor.
 
 ## Gate removal: before and after
 

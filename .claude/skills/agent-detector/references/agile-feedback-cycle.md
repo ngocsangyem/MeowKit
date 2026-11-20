@@ -14,7 +14,7 @@ trust_level: MED
 **Triggers:** `mk:retro` completes step 4 (narrative written).
 
 1. Parse narrative for `## 3 Things to Improve` and `## 3 Habits for Next Week` (per `mk:retro/references/narrative-output.md`). Best-effort keyword match
-2. ≥1 item → per-item AskUserQuestion. 0 items → freeform: "List action items, one per line. Empty = no action."
+2. ≥1 item → ask the user per item. 0 items → freeform: "List action items, one per line. Empty = no action."
 3. Per-item options: `Create Jira story now` | `Add to plan TODO` | `No-action` | `Defer`
 4. `Create Jira story now` → `mk:jira-issue create` body pre-filled — REQUIRES user review
 5. `No-action` → record the disposition in the retro report under `tasks/reports/retros/`

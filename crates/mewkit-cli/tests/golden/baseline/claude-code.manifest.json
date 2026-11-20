@@ -409,6 +409,11 @@
       "size": 9546
     },
     {
+      "path": ".claude/hooks/lib/core/hook-payload.cjs",
+      "sha256": "6fe4af50785b60745aa0b0a9eb3ae27453000fa9287fd400f7374fc8ff95d81a",
+      "size": 2249
+    },
+    {
       "path": ".claude/hooks/lib/core/pre-ship.cjs",
       "sha256": "71a03ca67215692c1a626ff26579a093aa98625339d7fa87a65cec25a192dc22",
       "size": 2575,
@@ -1532,6 +1537,11 @@
       "path": ".claude/skills/cook/SKILL.md",
       "sha256": "98e77442451e8108ecf963ea23ecc7c605bd3e38bcae3542a4092135541f270f",
       "size": 19781
+    },
+    {
+      "path": ".claude/skills/cook/references/advice-checkpoints.md",
+      "sha256": "42728bf527790219a3ef7341566db5478d948237a99378fb0019bb692148fe5d",
+      "size": 3668
     },
     {
       "path": ".claude/skills/cook/references/agent-conduct-extended.md",

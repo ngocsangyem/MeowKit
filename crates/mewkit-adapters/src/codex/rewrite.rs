@@ -1,21 +1,20 @@
-//! Root-anchored script commands for Codex skills.
+//! Helper commands in Codex skills at global scope.
 //!
 //! Codex runs a skill's commands from the project root, not the skill
-//! directory (probe (a), 2026-11-10), so `node scripts/x.cjs` in skill `s`
-//! would miss. A command whose script exists in the skill is rewritten to
-//! `node .agents/skills/s/scripts/x.cjs` (a global install: the absolute
-//! path); anything else is left as written.
+//! directory (probe (a), 2026-11-10), so projection writes them from the
+//! project root: `node .agents/skills/s/scripts/x.cjs`. A global install has
+//! no skills under the project, so a command whose script the skill ships is
+//! rewritten to the script's absolute path; anything else is left as written.
 use std::collections::BTreeSet;
 
 const INTERPRETERS: &[&str] = &["node", "python3", "python", "bash", "sh"];
 
-/// Rewrite `text` from skill `skill`; `has` answers whether a skill-relative
-/// path exists in that skill, and `anchor` turns `<skill>/<path>` into the text
-/// to write, told whether the source already opened a double quote around
-/// it. Returns `None` when nothing changed.
+/// Rewrite the commands in `text`; `has` holds the installed paths of the
+/// skill's files, and `anchor` turns one into the text to write, told whether
+/// the source already opened a double quote around it. Returns `None` when
+/// nothing changed.
 pub fn root_anchor(
     text: &str,
-    skill: &str,
     has: &BTreeSet<String>,
     anchor: &dyn Fn(&str, bool) -> String,
 ) -> Option<String> {
@@ -24,10 +23,7 @@ pub fn root_anchor(
     let mut rest = text;
     while let Some((at, path_start, path)) = next_command(rest, has) {
         out.push_str(&rest[..path_start]);
-        out.push_str(&anchor(
-            &format!("{skill}/{path}"),
-            rest[..path_start].ends_with('"'),
-        ));
+        out.push_str(&anchor(path, rest[..path_start].ends_with('"')));
         changed = true;
         let consumed =
             path_start + path.len() + usize::from(rest[path_start..].starts_with("./")) * 2;
@@ -93,54 +89,46 @@ mod tests {
         paths.iter().map(|s| (*s).to_owned()).collect()
     }
 
-    fn project(p: &str, _quoted: bool) -> String {
-        format!(".agents/skills/{p}")
+    /// The absolute path under a home directory with a space in it.
+    fn home(p: &str, quoted: bool) -> String {
+        let w = format!("/h o/{p}");
+        if quoted { w } else { format!("\"{w}\"") }
     }
 
     #[test]
     fn rewrites_commands_whose_script_the_skill_ships() {
-        let h = has(&["scripts/a.js", "bin/c.cjs", "scripts/p.py"]);
+        let h = has(&[
+            ".agents/skills/mk-s/scripts/a.js",
+            ".agents/skills/mk-s/bin/c.cjs",
+        ]);
         assert_eq!(
-            root_anchor("then run node scripts/a.js.", "mk-s", &h, &project).unwrap(),
-            "then run node .agents/skills/mk-s/scripts/a.js."
+            root_anchor("then run node .agents/skills/mk-s/scripts/a.js.", &h, &home).unwrap(),
+            "then run node \"/h o/.agents/skills/mk-s/scripts/a.js\"."
         );
-        let text =
-            "run `node scripts/a.js --x` then `node ./bin/c.cjs`\npython3 \"scripts/p.py\" ok";
-        let want = concat!(
-            "run `node .agents/skills/mk-s/scripts/a.js --x` then `node .agents/skills/mk-s/bin/c.cjs`\n",
-            "python3 \".agents/skills/mk-s/scripts/p.py\" ok",
-        );
-        assert_eq!(root_anchor(text, "mk-s", &h, &project).unwrap(), want);
+        let text = "run `node .agents/skills/mk-s/scripts/a.js --x` then `node ./.agents/skills/mk-s/bin/c.cjs`";
+        let want = "run `node \"/h o/.agents/skills/mk-s/scripts/a.js\" --x` then `node \"/h o/.agents/skills/mk-s/bin/c.cjs\"`";
+        assert_eq!(root_anchor(text, &h, &home).unwrap(), want);
     }
 
     #[test]
-    fn leaves_unknown_and_already_anchored_paths_alone() {
-        let h = has(&["scripts/a.js"]);
+    fn leaves_unknown_paths_and_other_words_alone() {
+        let h = has(&[".agents/skills/mk-s/scripts/a.js"]);
         for text in [
-            "node scripts/missing.js",
-            "node .agents/skills/mk-s/scripts/a.js",
-            "nodes scripts/a.js",
-            "npm run node scripts/x",
+            "node .agents/skills/mk-s/scripts/missing.js",
+            "node scripts/a.js",
+            "nodes .agents/skills/mk-s/scripts/a.js",
             "no commands here",
         ] {
-            assert_eq!(root_anchor(text, "mk-s", &h, &project), None, "{text}");
+            assert_eq!(root_anchor(text, &h, &home), None, "{text}");
         }
     }
 
     #[test]
     fn an_already_quoted_path_is_not_quoted_twice() {
-        let h = has(&["scripts/p.py"]);
-        let abs = |p: &str, quoted: bool| {
-            let w = format!("/h o/{p}");
-            if quoted { w } else { format!("\"{w}\"") }
-        };
+        let h = has(&[".agents/skills/mk-s/scripts/p.py"]);
         assert_eq!(
-            root_anchor("python3 \"scripts/p.py\" ok", "mk-s", &h, &abs).unwrap(),
-            "python3 \"/h o/mk-s/scripts/p.py\" ok"
-        );
-        assert_eq!(
-            root_anchor("python3 scripts/p.py", "mk-s", &h, &abs).unwrap(),
-            "python3 \"/h o/mk-s/scripts/p.py\""
+            root_anchor("python3 \".agents/skills/mk-s/scripts/p.py\" ok", &h, &home).unwrap(),
+            "python3 \"/h o/.agents/skills/mk-s/scripts/p.py\" ok"
         );
     }
 }

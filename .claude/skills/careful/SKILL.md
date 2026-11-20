@@ -53,7 +53,7 @@ To deactivate, end the conversation or start a new one. Hooks are session-scoped
 
 ## Hooks
 
-- **PreToolUse on Bash**: Warns before destructive commands (rm -rf, DROP TABLE, force-push, reset --hard, kubectl delete)
+- **Bash command guard**: Warns before destructive commands (rm -rf, DROP TABLE, force-push, reset --hard, kubectl delete) — enforced by this project's configured hooks when present
 - Session-scoped — only active when `mk:careful` is invoked
 - User can override each warning individually
 - **Interaction with mk:investigate**: When careful is active during an investigation, destructive-Bash warnings still fire. Debugging commands that touch state require explicit user confirmation per warning — do not bypass.

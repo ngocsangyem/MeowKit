@@ -47,30 +47,136 @@ The release ships ONE full kit zip; install size is controlled at install time, 
 - **Pack-aware `upgrade`**: a partial install upgrades only its packs; removed packs stay removed.
 - **Guardrails**: `mewkit validate --packs` (manifest coherence, completeness, the exact-path safety invariant) and `mewkit budget context --profile <p> [--fail-over N]` (loadable-context estimator) — both wired into CI.
 
-## Install Targets (Codex, Cursor)
+## Install Targets (Codex, Cursor, Grok, Pi, OMP)
 
-Codex and Cursor are **both hand-authored bundles** — nothing converts `.claude/` at
-install time. The `mewkit migrate` verb and its converter pipeline are removed.
+Codex, Cursor, Grok, Pi and OMP content is **projected from `.claude/` at install time**, plus a
+small overlay. There is no stored copy of the kit for any of them. The `mewkit migrate` verb and
+its converter pipeline are removed.
 
-- **Bundle shape** — `kit/bundles/{codex,cursor}/`: a provider-native tree (`root/`) plus
-  `catalog/` install packs (`skill-packs.json`; Cursor also carries `mcp-profiles.json`).
-  Codex surfaces: `AGENTS.md`, `.codex/config.toml`, `.codex/rules/`, `.codex/agents/`,
-  `.codex/hooks.json` + `.codex/hooks/`, `.codex/scripts/`, `.agents/skills/`. Cursor
-  surfaces: `AGENTS.md` (installed as the always-applied rule
-  `.cursor/rules/meowkit-core.mdc`) and `.cursor/{rules,agents,skills,hooks}`. Neither has a
-  command surface.
-- **Install** — `mewkit init --target codex|cursor` runs that runtime's emitter
-  (`crates/mewkit-adapters/src/{codex,cursor}/`). Files map 1:1 onto the project, except
-  the ones a user may own too: Codex merges a marked block into `AGENTS.md`, hook handlers
-  into `.codex/hooks.json` and keys into `.codex/config.toml`; Cursor merges
-  `.cursor/hooks.json` handler by handler. Each is recorded so uninstall takes out only what
-  the kit added. A second run converges to zero drift; a user-edited kit file is kept and
-  reported, never silently overwritten.
+- **Projection** — `crates/mewkit-adapters/src/projected_kit.rs` reads the kit's `.claude/`
+  skills and agents and rewrites them for the runtime (`crates/mewkit-adapters/src/projection/`):
+  skill names and invocations, paths, host words, helper paths anchored at the project root,
+  and agents as Codex `.toml`, as Cursor Markdown carrying only the frontmatter keys Cursor
+  documents, or as plain prompt files with `name` and `description` and no model (Grok, and
+  the shared `.agents/` tree below). It then adds the runtime's overlay.
+- **Overlay shape** — `kit/overlays/{codex,cursor,grok}/`: `overlay.toml` (frontmatter keys per
+  skill or agent, `omit` for files the runtime does not get, `[[replace]]` lines for text
+  that belongs to one runtime), `files/` installed as they are (hooks and their libraries,
+  `hooks.json` (Grok: `.grok/hooks/meowkit.json`), Codex `config.toml` and
+  `rules/default.rules`, Cursor `.mdc` rules,
+  rubrics, `scripts/bin` helpers) and `catalog/` install packs
+  (`skill-packs.json`; Cursor also carries `mcp-profiles.json`). The shared `.agents/` tree has
+  its own overlay, `kit/overlays/agents/` (`overlay.toml`, `catalog/skill-packs.json`, and in
+  `files/` the guard script, its hook libraries, rubrics and helpers); `kit/overlays/pi/` and
+  `kit/overlays/omp/` hold only `files/` with the runtime's own hook file. The always-on text
+  for every runtime that reads the project's `AGENTS.md` is one file,
+  `kit/overlays/shared/AGENTS.md`. Claude Code does not use it: it keeps `.claude/rules/`, and
+  `CLAUDE.md` does not import `AGENTS.md`.
+- **The shared `.agents/` tree** — Codex, Pi and OMP all read skills from `.agents/skills`, so
+  each of their emitters installs one tree (`crates/mewkit-adapters/src/agents_tree.rs`):
+  skills in `.agents/skills`, and in `.agents/meowkit/` the files skill text names by path
+  (helper scripts, rubrics, agent prompts as plain files) and one guard script,
+  `.agents/meowkit/hooks/guard.cjs`. The wording depends on the set installed in the project.
+  Alone, a runtime writes its own: Codex as before, with its helpers under `.codex/`; Pi and
+  OMP with `/skill:mk-<name>` invocations. With two or more of the three, every one of them
+  writes the same neutral wording (skills named in prose, "this runtime", paths under
+  `.agents/meowkit/`), byte for byte, and Codex's installed files are written again in that
+  wording when a second sharer arrives. Cursor reading `.agents/skills` beside its own
+  `.cursor/skills` does not count as a sharer and does not change the wording.
+- **Installed surfaces** — Codex: an `AGENTS.md` block, `.codex/config.toml`,
+  `.codex/rules/`, `.codex/agents/`, `.codex/hooks.json` + `.codex/hooks/`,
+  `.codex/scripts/`, `.agents/skills/` (plus `.agents/meowkit/` when it shares the tree).
+  Cursor: `.cursor/{rules,agents,skills,hooks}` and,
+  in project scope only, the same `AGENTS.md` block (a global Cursor install writes no
+  `AGENTS.md`); `.cursor/rules/runtime-invariants.mdc` (always applied) holds only
+  Cursor-specific text. Grok (project scope only): skills in `.grok/skills/mk-*`, one kit
+  hook file `.grok/hooks/meowkit.json`, the same `AGENTS.md` block, and everything Grok does
+  not load itself (hook scripts, helper scripts, rubrics, agent prompts) under
+  `.grok/meowkit/`. No Grok agent definition is written: the vendor page
+  (https://docs.x.ai/build/features/subagents) names `.grok/agents/` but no file format, so
+  the agent prompts sit in `.grok/meowkit/agents/` as files a skill reads. Pi (project scope
+  only): the shared tree, the same `AGENTS.md` block and one extension,
+  `.pi/extensions/meowkit.ts`; no agents, since Pi has no subagents (the install notice says a
+  skill that hands work to an agent runs it in the main session). OMP (project scope only):
+  the shared tree, the same `AGENTS.md` block, the hook module `.omp/hooks/pre/meowkit.ts`,
+  `.omp/agents/*.md` (below) and, only when Claude Code is in the set, `.omp/config.yml`
+  with `disabledProviders: [claude]`, so OMP does not list a second copy of each skill from
+  `.claude/`; that switch turns off everything OMP imports from `.claude/`, not skills alone,
+  and the install notice says so. None of these runtimes gets a command surface.
+- **OMP agents** — one `.omp/agents/<name>.md` per agent prompt, with `name`, `description`
+  and a `tools` list holding only OMP built-in tool names (mapping in
+  `crates/mewkit-adapters/src/omp/agents.rs`). OMP uses `tools` as the allow-list and keeps an
+  unknown name as written, where it matches nothing, so authored tools with no built-in are
+  left out and named in the install summary. No `model` is written: OMP treats it as optional
+  and no tier mapping is documented.
+- **Install** — `mewkit init --target codex|cursor|grok|pi|omp` runs that runtime's emitter
+  (`crates/mewkit-adapters/src/{codex,cursor,grok,pi,omp}/`), which builds its plan from the
+  projected kit. Files map 1:1 onto the project, except
+  the ones a user may own too: Codex, Cursor, Grok, Pi and OMP all merge the shared text into
+  `AGENTS.md` as the marked block `meowkit` (`crates/mewkit-adapters/src/agents_block.rs`), so
+  a project with several of them carries it once; Codex merges hook handlers into `.codex/hooks.json` and
+  keys into `.codex/config.toml`; Cursor merges `.cursor/hooks.json` handler by handler. Grok
+  merges nothing into a hook file: it loads every `*.json` in `.grok/hooks/`, so the kit
+  writes its own `meowkit.json` whole and the user's hooks stay in their own files. Pi and OMP
+  merge nothing either: each loads the kit's module as its own file. OMP's `.omp/config.yml`
+  is a whole file; one the user already has is left alone and the notice asks for the line.
+  Each merge is recorded so uninstall takes out only what the kit added. A second run
+  converges to zero drift; a user-edited kit file is kept and reported, never silently
+  overwritten.
+- **Overlapping installs** — two installs can own the same block or the same file. The
+  `meowkit` block in `AGENTS.md`: `mewkit uninstall --target` for one runtime leaves it while
+  another installed runtime's ownership index still records it. A whole file in the shared
+  `.agents/` tree: the executor records a file whose bytes already match the plan as owned
+  without rewriting it, so each sharer's index lists it; `uninstall` keeps a file a staying
+  install also owns (it leaves only the leaving install's record) and then plans each staying
+  sharer again for the set that remains, so its files return to the wording it would have
+  been installed with and a later uninstall recognises them. That re-plan needs the kit the
+  staying install came from; without it the files keep the shared wording and a notice names
+  `mewkit upgrade --target <runtime>`. In the other direction, `init` plans an installed sharer
+  again, first, when a newcomer shares the tree with it, so both write the shared wording.
+  `init codex` → `init omp` → `uninstall omp` leaves the tree of a fresh `init codex`
+  (`crates/mewkit-cli/tests/lifecycle.rs`).
+- **Grok hooks** — `.grok/hooks/meowkit.json` registers two handlers, both on `PreToolUse`,
+  the only Grok event whose output can block: the privacy guard on every tool call and the
+  ship check on `Bash`. A Grok hook stopped at its
+  timeout lets the call through (https://docs.x.ai/build/features/hooks), so on Grok neither
+  guard fails closed.
+- **Pi and OMP hooks** — the Pi extension and the OMP hook module both run
+  `.agents/meowkit/hooks/guard.cjs` (the privacy decision on every tool call, the ship check on
+  a shell command) through `pi.exec`, and block the call on any answer but an allow. The
+  completion check is not ported to either. Pi loads `.pi/extensions` and the project's
+  `.agents/skills` only in a project the user has trusted (install notice and a `pi trust`
+  doctor row); OMP has no trust step, so its hook module runs from the first session, which
+  the install output states. Nothing about Pi has been probed on a running Pi; its surfaces
+  follow the vendor documentation (`docs/maintainer/host-probe-log.md`, X12). OMP's forms were
+  read from its source, and OMP 18.13.3 was observed listing each `mk-*` skill once in a
+  project holding all six installs (X13, X14).
+- **Validation** — `mewkit validate --target grok|pi|omp` checks the installed tree of that
+  runtime.
+- **Scope support** — `Emitter::supports(ScopeKind)` (default: every scope) says where a
+  runtime can be installed. Grok, Pi and OMP support project scope only: `--target all` at
+  global scope leaves them out (it covers six runtimes in a project and Claude Code, Codex and
+  Cursor globally), and a named `--global --target grok|pi|omp` is refused by the emitter.
 - **Upgrade** — `mewkit upgrade` refreshes the runtimes it finds an ownership index for. A
   runtime the npm CLI installed is adopted only by an explicit `init --target <tool>`.
-- **Authoring cost** — new `.claude/` content reaches Codex or Cursor only by
-  hand-authoring the matching provider-native file(s) in **both** bundles; see
-  `RELEASING.md` step 1e. Neither target picks up kit changes automatically.
+- **Authoring cost** — a `.claude/` skill or agent reaches Codex, Cursor, Grok, Pi and OMP with
+  no second edit. Still written by hand: the always-on `AGENTS.md` text (once, shared by every
+  runtime but Claude Code) and, per overlay, hooks, Cursor rules and pack membership in each
+  `catalog/skill-packs.json`. The hook
+  libraries listed in `.claude/hooks/core-closure.json` are copied into each overlay that
+  carries hook scripts by `scripts/sync-hook-core.cjs`. See `RELEASING.md`.
+- **Placement** — `crates/mewkit-adapters/src/placement_resolver.rs` (data in
+  `crates/mewkit-adapters/src/surface_table.json`, described in
+  [`docs/maintainer/runtime-surface-table.md`](../maintainer/runtime-surface-table.md))
+  computes, for the set of runtimes sharing a project, which roots to write so each runtime
+  loads each kind of content once. Emitters receive it in `EmitRequest.placement`. The Codex,
+  Pi and OMP emitters act on it: it decides whether the `.agents/` tree takes the shared
+  wording, Pi and OMP turn its list of foreign folders they also read into install notices,
+  and OMP writes `.omp/config.yml` from its switches. Every `Runtime` has an emitter
+  (`registry::NOT_YET_EMITTED` is empty).
+- **Kit contract** — the kit declares contract 2 (`.claude/kit-contract.json`) and
+  `crates/mewkit-core/src/kit/contract.rs` accepts exactly 2, so an older binary refuses
+  this kit and asks for `self-update`.
 
 ## The `mewkit` binary and the two release streams
 
@@ -97,12 +203,14 @@ pre-rename name still runs for one release with a notice). It replaced the npm
 - **Hooks** — the kit's hooks stay Node scripts. They reach the CLI through the committed
   launcher `.meowkit/bin/mewkit` (via `.claude/runtime.json`), which runs the binary.
 - **Adapter contract** (ADR [`261110-rust-adapter-contract.md`](adr/261110-rust-adapter-contract.md)):
-  one emitter per runtime in `crates/mewkit-adapters` (`claude_code`, `codex`, `cursor`) turns
-  the kit into a `Plan` of owned-data ops; `crates/mewkit-core` executes every plan through one
+  one emitter per runtime in `crates/mewkit-adapters` (`claude_code`, `codex`, `cursor`, `grok`,
+  `pi`, `omp`; six registered) turns the kit into a `Plan` of owned-data ops (Codex, Pi and OMP
+  build the shared `.agents/` tree through `agents_tree`); `crates/mewkit-core` executes every plan through one
   journal with backups, dry-run and an ownership index per runtime and scope. Cursor here is an
   emitter like the others, not a converter.
 - **Scopes:** project (state in `.meowkit/`) and global (home directory, state in
-  `~/.mewkit/state/`), honouring `CLAUDE_CONFIG_DIR` and `CODEX_HOME`.
+  `~/.mewkit/state/`), honouring `CLAUDE_CONFIG_DIR` and `CODEX_HOME`. Grok, Pi and OMP have no
+  global scope (see Scope support above).
 - **Two release streams** (ADR [`261110-two-release-streams.md`](adr/261110-two-release-streams.md)):
   the kit ships on `v*` tags as `meowkit-release.zip`; the binary ships on `mewkit-v*` tags as
   six `mewkit-*.tar.gz` archives with `binary-manifest.json`, never as GitHub's latest
@@ -111,7 +219,10 @@ pre-rename name still runs for one release with a notice). It replaced the npm
   Neither stream is signed. npm CLIs ≤2.3.1 still prefer a signed kit artifact against an
   empty keyring, so releases must never carry one (`RELEASING.md`).
 - **Proof:** `crates/mewkit-cli/tests/lifecycle_matrix.rs` runs install → doctor → edit →
-  upgrade → uninstall for each runtime at both scopes.
+  upgrade → uninstall for Claude Code, Codex and Cursor at both scopes and for Grok, Pi and OMP at project
+  scope. Their plans are also tested in `crates/mewkit-adapters/tests/` (`emit_grok.rs` for
+  Grok, `emit_agents_tree.rs` for the shared tree), and the set changes of the shared tree in
+  `crates/mewkit-cli/tests/lifecycle.rs`.
 
 ## Team memory store
 

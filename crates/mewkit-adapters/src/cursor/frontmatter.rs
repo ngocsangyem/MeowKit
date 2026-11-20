@@ -57,20 +57,77 @@ fn pairs(front: &str) -> Vec<(&str, String)> {
     out
 }
 
-/// A YAML scalar as plain text: trailing ` #` comment and one level of
-/// quotes removed; `''`, `""` and `[]` read as empty.
+/// A YAML scalar as plain text: a trailing ` #` comment dropped, a quoted
+/// value unquoted with its escapes read; `''`, `""` and `[]` read as empty.
 fn scalar(raw: &str) -> String {
     let v = raw.trim();
     let v = match v.chars().next() {
         // A quoted value ends at its closing quote; anything after is a comment.
-        Some(q @ ('"' | '\'')) => v[1..].split(q).next().unwrap_or(""),
-        _ => v.split(" #").next().unwrap_or(v).trim_end(),
+        Some('\'') => single_quoted(&v[1..]),
+        Some('"') => double_quoted(&v[1..]),
+        _ => v.split(" #").next().unwrap_or(v).trim_end().to_owned(),
     };
-    if v == "[]" {
-        String::new()
-    } else {
-        v.to_owned()
+    if v == "[]" { String::new() } else { v }
+}
+
+/// The text of a single-quoted scalar, opening quote already taken: `''` is
+/// a quote, a lone `'` closes.
+fn single_quoted(rest: &str) -> String {
+    let mut out = String::new();
+    let mut chars = rest.chars().peekable();
+    while let Some(c) = chars.next() {
+        match c {
+            '\'' if chars.peek() == Some(&'\'') => {
+                chars.next();
+                out.push('\'');
+            }
+            '\'' => break,
+            c => out.push(c),
+        }
     }
+    out
+}
+
+/// The text of a double-quoted scalar, opening quote already taken.
+fn double_quoted(rest: &str) -> String {
+    let mut out = String::new();
+    let mut chars = rest.chars();
+    while let Some(c) = chars.next() {
+        match c {
+            '"' => break,
+            '\\' => match chars.next() {
+                Some('n') => out.push('\n'),
+                Some('t') => out.push('\t'),
+                Some('r') => out.push('\r'),
+                Some(kind @ ('x' | 'u' | 'U')) => {
+                    let digits = match kind {
+                        'x' => 2,
+                        'u' => 4,
+                        _ => 8,
+                    };
+                    let hex: String = chars.by_ref().take(digits).collect();
+                    let decoded = u32::from_str_radix(&hex, 16).ok().and_then(char::from_u32);
+                    out.push(decoded.unwrap_or(char::REPLACEMENT_CHARACTER));
+                }
+                Some(escaped) => out.push(escaped),
+                None => break,
+            },
+            c => out.push(c),
+        }
+    }
+    out
+}
+
+/// The top-level frontmatter pairs of `text` and the body after the closing
+/// fence; `None` when `text` has no frontmatter.
+pub(crate) fn fields(text: &str) -> Option<(Vec<(String, String)>, String)> {
+    let text = normalize(text);
+    let (front, body) = split(&text)?;
+    let pairs = pairs(front)
+        .into_iter()
+        .map(|(key, value)| (key.to_owned(), value))
+        .collect();
+    Some((pairs, body.to_owned()))
 }
 
 /// How Cursor applies a rule, decided by its frontmatter.
@@ -171,6 +228,26 @@ mod tests {
         assert!(kind("globs: a/**\ndescription: x\n").is_err());
         assert!(kind("alwaysApply: yes\n").is_err());
         assert!(rule_type("r.mdc", "no frontmatter\n").is_err());
+    }
+
+    #[test]
+    fn quoted_scalars_read_their_escapes() {
+        let (pairs, body) = fields(
+            "---\na: 'the user''s \"own\" words' # note\nb: \"say \\\"hi\\\" # not a comment\"\nc: plain # note\n---\nbody\n",
+        )
+        .unwrap();
+        let values: Vec<&str> = pairs.iter().map(|(_, v)| v.as_str()).collect();
+        assert_eq!(
+            values,
+            [
+                "the user's \"own\" words",
+                "say \"hi\" # not a comment",
+                "plain"
+            ]
+        );
+        assert_eq!(body, "body\n");
+        let (pairs, _) = fields("---\na: \"caf\\u00e9\\x21\"\n---\n").unwrap();
+        assert_eq!(pairs[0].1, "caf\u{e9}!");
     }
 
     #[test]

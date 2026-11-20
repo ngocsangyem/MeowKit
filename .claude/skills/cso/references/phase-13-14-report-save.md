@@ -60,7 +60,7 @@ Match findings across reports using the `fingerprint` field (sha256 of category 
 
 **Protection file check:** Check if the project has a `.gitleaks.toml` or `.secretlintrc`. If none exists, recommend creating one.
 
-**Remediation Roadmap:** For the top 5 findings, present via AskUserQuestion:
+**Remediation Roadmap:** For the top 5 findings, present by asking the user:
 1. Context: The vulnerability, its severity, exploitation scenario
 2. RECOMMENDATION: Choose [X] because [reason]
 3. Options:

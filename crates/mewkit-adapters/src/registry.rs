@@ -11,7 +11,15 @@ pub fn registry() -> &'static [&'static dyn Emitter] {
         &crate::claude_code::ClaudeCode,
         &crate::codex::Codex,
         &crate::cursor::Cursor,
+        &crate::grok::Grok,
+        &crate::pi::Pi,
+        &crate::omp::Omp,
     ]
+}
+
+/// The runtimes that can be installed today, in registry order.
+pub fn emitted() -> Vec<Runtime> {
+    registry().iter().map(|e| e.target()).collect()
 }
 
 /// The emitter for `runtime`, if it has one yet.

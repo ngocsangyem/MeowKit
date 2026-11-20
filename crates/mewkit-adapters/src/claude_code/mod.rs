@@ -78,6 +78,10 @@ impl Emitter for ClaudeCode {
         if global.is_none() {
             kit_dir::push_shared(req, &mut plan)?;
             launcher::push(req, &mut plan)?;
+            // https://code.claude.com/docs/en/permissions#project-allow-rules-and-workspace-trust
+            plan.notices.push(
+                "Claude Code asks you to trust this folder the first time you start it here".into(),
+            );
         }
         plan.notices.extend(scope::privacy_elsewhere(req, SETTINGS));
         Ok(plan)

@@ -254,7 +254,7 @@ never in other files and never as a shell variable. Other files (references, ste
 once so the agent knows the directory they resolve against. Rules, agents, hooks and
 other skills keep the canonical `.claude/<surface>/…` form, which installers map per
 runtime. Every host-runtime tool name a skill mentions is listed in
-`.claude/kit-capabilities.json`. A line describing
+the kit's `kit-capabilities.json`. A line describing
 another project's layout may carry `portable-ignore`. `node scripts/check-skills-portable.cjs`
 enforces this in the release gate and CI.
 

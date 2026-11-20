@@ -1,0 +1,28 @@
+# Grok keys and passages the authored kit cannot be projected into.
+# Format: crates/mewkit-adapters/src/projection/overlay.rs.
+
+# The main session routes work on this runtime; it loads no orchestrator agent.
+omit = [".grok/meowkit/agents/orchestrator.md"]
+
+# The kit reads no Grok environment variable for the session's model, so the
+# autobuild run report records the user's hint, not a detected id.
+[[replace]]
+path = ".grok/skills/mk-autobuild/step-00-tier-detection.md"
+find = '''
+For the run report. Use the same env var fallback chain as `density-select.sh` (POSIX parameter expansion, not echo trick):
+
+```bash
+model_id="${MEOWKIT_MODEL_HINT:-${CLAUDE_MODEL:-${ANTHROPIC_MODEL:-unknown}}}"
+'''
+with = '''
+For the run report. No Grok environment variable names the session's model here, so `model_id` is the hint the user set, not a detected id; without a hint `density-select.sh` takes the `STANDARD` tier:
+
+```bash
+model_id="${MEOWKIT_MODEL_HINT:-unknown}"
+'''
+
+# The pull-request trailer names the product that wrote the request.
+[[replace]]
+path = ".grok/skills/mk-ship/references/commit-push-pr.md"
+find = "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+with = "🤖 Generated with Grok"

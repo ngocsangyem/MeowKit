@@ -58,7 +58,7 @@ When team mode is NOT selected (most tasks), output:
 ```toon
 handoff[3]{mode,action,target}:
   single agent,Execute directly in current session,N/A
-  subagent,Use the Agent tool with subagent_type,Agent(subagent_type="architect")
+  subagent,Hand off to the named agent,delegate a subagent (agent="architect")
   team,Hand off to workflow-orchestrator for parallel startup,workflow-orchestrator -> TeamCreate -> parallel Task calls
 ```
 

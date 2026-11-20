@@ -2,7 +2,7 @@
 
 ## Step 7 — Present the plan to the user
 
-Print a summary, then use `AskUserQuestion` for structured approval:
+Print a summary, then ask the user for structured approval:
 
 ```
 PLAN READY FOR REVIEW
@@ -14,7 +14,7 @@ Files affected: [count or list]
 Validation: PLAN_COMPLETE
 ```
 
-**ACTION REQUIRED:** Use `AskUserQuestion`. Header: "Plan". Question: "Plan is ready. How would you like to proceed?" Single-select.
+**ACTION REQUIRED:** Ask the user. Header: "Plan". Question: "Plan is ready. How would you like to proceed?" Single-select.
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|

@@ -47,7 +47,7 @@ echo '{"skill":"freeze","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basen
 
 ## Setup
 
-Ask the user which directory to restrict edits to. Use AskUserQuestion:
+Ask the user which directory to restrict edits to. Ask the user:
 
 - Question: "Which directory should I restrict edits to? Files outside this path will be blocked from editing."
 - Text input (not multiple choice) — the user types a path.
@@ -81,7 +81,7 @@ See [references/freeze-mechanics.md](references/freeze-mechanics.md) for technic
 
 ## Hooks
 
-- **PreToolUse on Edit/Write**: Blocks writes outside the frozen directory path
+- **Edit/Write path guard**: Blocks writes outside the frozen directory path — enforced by this project's configured hooks when present
 - Activated by `/mk:freeze <path>`. Deactivated when session ends.
 - Bash commands are NOT restricted — freeze only guards Edit and Write tools
 

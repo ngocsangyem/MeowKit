@@ -228,7 +228,7 @@ Full list: `references/gotchas.md` (update when Claude produces wrong fix patter
 
 ## References
 
-- `references/mode-selection.md` — AskUserQuestion format
+- `references/mode-selection.md` — user question format
 - `references/diagnosis-protocol.md` — 5-phase structured diagnosis
 - `references/prevention-gate.md` — defense-in-depth + verification checklist
 - `references/complexity-assessment.md` — Simple/Moderate/Complex/Parallel

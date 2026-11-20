@@ -9,8 +9,8 @@ use mewkit_core::exec::ExecOptions;
 
 use super::upgrade_query::{self, Query};
 use super::{
-    Common, Job, drop_retired, emitter_for, hashes_of, parse_targets, prepare, run_jobs, stamp,
-    unconfirmed_force,
+    Common, Job, depends_on, drop_retired, emitter_for, hashes_of, parse_targets, prepare,
+    run_jobs, stamp, unconfirmed_force,
 };
 use crate::failure::{Failure, PENDING};
 use crate::kit_args::{KitArgs, installed_kit};
@@ -89,6 +89,16 @@ pub fn run(args: &UpgradeArgs) -> Result<u8, Failure> {
             args.common.json,
         ));
     }
+    // A runtime that shares files with one being upgraded is upgraded with it,
+    // or its record of those files would describe bytes that are gone.
+    let mut targets = targets;
+    for runtime in depends_on(&targets, &installed, place.scope.kind) {
+        eprintln!(
+            "note: {} shares files with a runtime being upgraded, so it is upgraded too",
+            runtime.name()
+        );
+        targets.push(runtime);
+    }
     let kit = args.kit.resolve(&place)?;
     for n in &kit.notices {
         eprintln!("note: {n}");
@@ -151,6 +161,9 @@ fn unmanaged_hint(place: &Place) -> String {
         (".claude", Runtime::ClaudeCode),
         (".codex", Runtime::Codex),
         (".cursor", Runtime::Cursor),
+        (".grok", Runtime::Grok),
+        (".pi", Runtime::Pi),
+        (".omp", Runtime::Omp),
     ] {
         if crate::adopt::has_record(place, runtime) {
             npm.push(runtime.name());

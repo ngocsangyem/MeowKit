@@ -9,7 +9,7 @@ use super::select::Version;
 
 pub const CONTRACT_FILE: &str = ".claude/kit-contract.json";
 /// The kit contract versions this binary understands.
-pub const SUPPORTED: RangeInclusive<u64> = 1..=1;
+pub const SUPPORTED: RangeInclusive<u64> = 2..=2;
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -107,20 +107,25 @@ mod tests {
 
     #[test]
     fn in_range_and_old_enough_passes() {
-        assert!(check(&c(1, "0.1.0"), "0.1.0").is_ok());
-        assert!(check(&c(1, "0.1.0"), "1.2.3").is_ok());
+        assert!(check(&c(2, "0.1.0"), "0.1.0").is_ok());
+        assert!(check(&c(2, "0.1.0"), "1.2.3").is_ok());
     }
 
     #[test]
     fn out_of_range_or_too_new_is_refused_by_name() {
-        let e = check(&c(2, "0.1.0"), "0.1.0").unwrap_err().to_string();
+        let e = check(&c(3, "0.1.0"), "0.1.0").unwrap_err().to_string();
         assert!(
-            e.contains("kit contract 2") && e.contains("self-update"),
+            e.contains("kit contract 3") && e.contains("self-update"),
             "{e}"
         );
-        assert!(check(&c(0, "0.1.0"), "0.1.0").is_err());
-        let e = check(&c(1, "0.2.0"), "0.1.0").unwrap_err().to_string();
+        // A kit laid out for the bundle-copying installer is too old to read.
+        let e = check(&c(1, "0.1.0"), "0.1.0").unwrap_err().to_string();
+        assert!(
+            e.contains("kit contract 1") && e.contains("newer kit"),
+            "{e}"
+        );
+        let e = check(&c(2, "0.2.0"), "0.1.0").unwrap_err().to_string();
         assert!(e.contains("kit 2.16.0 needs mewkit ≥ 0.2.0"), "{e}");
-        assert!(check(&c(1, "latest"), "0.1.0").is_err());
+        assert!(check(&c(2, "latest"), "0.1.0").is_err());
     }
 }

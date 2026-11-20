@@ -15,17 +15,17 @@ Full pipeline with research, brainstorming, and planning for complex issues.
 - [Step 8: Finalize](#step-8-finalize)
 - [Advice Checkpoints (`--advice` only)](#advice-checkpoints---advice-only)
 - [Checkpoints](#checkpoints)
-- [Call](#call)
-- [After the call](#after-the-call)
+- [What each checkpoint asks](#what-each-checkpoint-asks)
+- [Boundaries](#boundaries)
 
 ## Steps
 
 ### Step 1: Scout, Debug & Parallel Investigation
 Run `mk:scout`, then activate `mk:investigate` and `mk:sequential-thinking`. Launch parallel exploration only for independent evidence paths:
 ```
-Agent("Explore", "Find error origin and trace")
-Agent("Explore", "Find affected components and dependencies")
-Agent("Explore", "Find similar patterns in codebase")
+read-only search subagent: "Find error origin and trace"
+read-only search subagent: "Find affected components and dependencies"
+read-only search subagent: "Find similar patterns in codebase"
 ```
 
 **Output:** `Step 1: Root cause — [summary], system impact: [scope]`
@@ -80,12 +80,12 @@ Use reviewer agent. See `references/review-cycle.md`.
 
 ## Advice Checkpoints (`--advice` only)
 
-Skip this whole section unless the run was invoked with `--advice`. Without the
-flag there are zero advisory calls and nothing here loads.
+Skip this whole section unless the run was invoked with `--advice`. Without the flag
+there are zero supervision calls and nothing here loads.
 
-On the first checkpoint of a run, read
-`.claude/skills/advise/references/advice-supervision-rules.md` — it is the contract this
-section implements.
+On the first checkpoint of a run, read the supervision contract this skill's `SKILL.md`
+names under `--advice`. This section implements it, and it holds the call protocol every
+checkpoint follows.
 
 ### Checkpoints
 
@@ -96,75 +96,32 @@ section implements.
 | REVIEW | Step 6→7 boundary, after Verify and before the normal review | always, when the flag is on | 1 |
 | RECHECK | after corrections from a `RETURN_TO_EXECUTOR` | only after a return | 1 |
 
-Hard cap **5 calls per run**. Checkpoints are macro boundaries — never per tool
-call, per loop iteration, or per phase of the plan.
+Hard cap **5 calls per run**, charged as `--skill mk:fix`. Checkpoints are macro
+boundaries — never per tool call, per loop iteration, or per file.
 
-The RESCUE trigger does not replace or postpone the three-failed-attempt human
-STOP in `SKILL.md`. That stop fires on its own schedule whether or not supervision
-was taken at two failures.
+The RESCUE trigger does not replace or postpone the three-failed-attempt human STOP in
+`SKILL.md`. That stop fires on its own schedule whether or not supervision was taken at
+two failures.
 
-Athena is not a substitute for Step 3 brainstorming or Step 4 planning: it assesses
-a decision the pipeline is already facing and recommends one operational path inside
-the locked scope. It never authors a plan or a phase graph, and it never agrees the
-Step 4 plan on the user's behalf.
+### What each checkpoint asks
 
-### Call
+- **GUIDE** — given this root cause, which fix path carries the least risk, and what
+  proof would show it worked?
+- **RESCUE** — two approaches failed on this evidence; what does the evidence actually
+  support, and what would disconfirm the current hypothesis?
+- **REVIEW** — does the evidence cover the reported bug and its regression, or does this
+  go back?
+- **RECHECK** — were the corrections addressed and proven?
 
-Open the checkpoint first — this is what enforces the cap, the stage legality and
-idempotency, and writes the pending marker that makes a crash resumable:
+### Boundaries
 
-```
-mewkit advice begin --run <supervisionRunId> --skill mk:fix \
-  --stage GUIDE|RESCUE|REVIEW|RECHECK --checkpoint <checkpointId>
-```
+**Supervision is evidence, not authority.** It cannot agree the Step 4 plan, clear the
+Step 7 review, or stand in for either — and it is never counted as verification.
+Verification stays with Step 6 tests and the Step 7 review verdict.
 
-A refusal is final for that checkpoint: continue unsupervised, or escalate when the
-refusal says to. Re-running the same `--checkpoint` returns the recorded result and
-spends no slot.
+### Routing in this skill
 
-Then delegate, with the packet inline (a fork inherits no conversation):
-
-```
-Agent(subagent_type="athena",
-      description="advice: <checkpoint name>",
-      prompt="<the packet below, inline>")
-```
-
-Packet fields — `runId`, `skill`, `stage`, `checkpointId`, `mission`,
-`lockedDecisions`, `currentState`, `workerSummary`, `evidenceRefs` (≤5 pointers,
-each with provenance), `priorDirective`, `question`, `riskAndReversibility`.
-Serialized cap 12 KiB; pass pointers, never payloads. Locked decisions and the exact
-question appear at both the start and the end.
-
-Validate the packet before sending it — the caps, pointer budget, provenance
-requirement and secret scan are enforced by this command, not by writing the packet
-carefully:
-
-```
-mewkit advice validate-packet --evidence <packet.json> --packet-kind input
-```
-
-Validate the returned packet the same way with `--packet-kind output` before
-acting on it or summarizing it into a receipt.
-
-### After the call
-
-Render the returned packet to the user, then commit it:
-
-```
-mewkit advice commit --run <runId> --checkpoint <checkpointId> \
-  --disposition <returned disposition> --outcome adopted|rejected|deferred \
-  --reason "<one line, required even when adopted>" \
-  --directive "<summary>" --next "<next safe action>" \
-  [--correction "<change>" ...] [--evidence-pointer <path> ...]
-```
-
-`commit` writes the receipt to `tasks/reports/{YYMMDD}-{slug}-advice-{n}.md`, records
-the call against the cap, and refuses a disposition that is illegal for the stage.
-`disposition` is Athena's routing signal; `--outcome` is what this pipeline decided
-to do with it — a rejected directive is a legitimate, recordable outcome.
-
-Route on the disposition:
+The call protocol defines the dispositions; here is what each one means for this skill.
 
 - `CONTINUE_WITH_DIRECTIVE` — proceed; the directive is input, not instruction.
 - `READY_FOR_EXISTING_GATE` — run the normal Step 7 review. The gate is NOT cleared.
@@ -175,17 +132,17 @@ Route on the disposition:
 - `ESCALATE_TO_HUMAN` — stop at the existing human touchpoint.
 - `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
 
-If an active durable task record exists, point at the receipt:
-`mewkit task-state update <id> --evidence-ref <receipt path>`. With no active record,
-keep the file and skip this step — never invent a record.
-
-A failed receipt write prints a one-line notice and the run continues; it never
-blocks and is never skipped silently.
-
-**Supervision is evidence, not authority.** It cannot agree the Step 4 plan, clear the
-Step 7 review, or stand in for either — and it is never counted as verification.
-Verification stays with Step 6 tests and the Step 7 review verdict.
-
 If the runtime cannot delegate to `athena`, print exactly
-`advice checkpoint unavailable in this runtime: <reason>` and continue
-unsupervised. Never write a counsel packet inline and present it as Athena's.
+
+```
+advice checkpoint unavailable in this runtime: <reason>
+```
+
+and continue unsupervised. Never write a packet inline and present it as the agent's —
+that is not an independent check, and a receipt produced that way records supervision
+that never happened.
+
+Athena is not a substitute for Step 3 brainstorming or Step 4 planning: it assesses
+a decision the pipeline is already facing and recommends one operational path inside
+the locked scope. It never authors a plan or a phase graph, and it never agrees the
+Step 4 plan on the user's behalf.

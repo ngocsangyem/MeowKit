@@ -84,7 +84,7 @@ impl Place {
     /// The runtimes installed here, in registry order.
     pub fn installed(&self) -> Result<Vec<Runtime>, Failure> {
         let mut out = Vec::new();
-        for r in Runtime::ALL {
+        for r in mewkit_adapters::registry::emitted() {
             if self.index(r)?.is_some() {
                 out.push(r);
             }

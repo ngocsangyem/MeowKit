@@ -18,7 +18,7 @@ fn versions_lists_installed_and_cached_kits_offline() {
     let doc = json(&out);
     assert_eq!(doc["installed"], serde_json::json!([]));
     assert!(doc["available"].is_null(), "--offline asks nothing");
-    assert_eq!(doc["kitContract"]["min"], 1);
+    assert_eq!(doc["kitContract"]["min"], 2);
 
     let scratch = tempfile::tempdir().unwrap();
     let (zip, sha) = archive(scratch.path());
@@ -49,7 +49,7 @@ fn providers_reports_each_runtime_projection() {
     assert_eq!(code(&out), 0, "{}", text(&out));
     let rows = json(&out);
     let rows = rows.as_array().unwrap();
-    assert_eq!(rows.len(), 3);
+    assert_eq!(rows.len(), 6);
     for r in rows {
         assert!(r["files"].as_u64().unwrap() > 0, "{r}");
         assert!(r["skills"].as_u64().unwrap() > 0, "{r}");

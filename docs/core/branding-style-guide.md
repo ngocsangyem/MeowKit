@@ -13,7 +13,7 @@ Brand prose belongs at the **repo level**, not inside the runtime markdown:
 - `docs/branding-*`
 - `assets/**`
 
-Brand does **not** belong in `.claude/` markdown body text. The Codex and Cursor bundles are authored from it with target-aware names; neutral source terms keep that rewrite mechanical.
+Brand does **not** belong in `.claude/` markdown body text. Every other runtime's files are projected from it with target-aware names; neutral source terms keep that rewrite mechanical.
 
 ## Allowed in runtime markdown text
 
@@ -59,7 +59,7 @@ The lint and the migrate converter both honor these markers.
 
 ## Why these rules
 
-When `.claude/` content is carried into the authored Codex and Cursor bundles, brand prose is rewritten into the target's display name. For that rewrite to produce clean output:
+When `.claude/` content is projected for another runtime, brand prose is rewritten into the target's display name. For that rewrite to produce clean output:
 
 1. Source must use neutral terms — the rewrite cannot substitute words that are not there.
 2. Identifiers stay verbatim — they are routed per target by path rules, not by string substitution.

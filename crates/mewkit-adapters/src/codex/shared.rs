@@ -7,30 +7,11 @@ use crate::contract::{EmitError, Format, Op, Scope};
 use crate::kit_files::rel;
 use mewkit_core::plan::{Handler, HookLayout};
 
-pub const AGENTS_MD: &str = "AGENTS.md";
+pub use crate::agents_block::{
+    AGENTS_MD, BLOCK_ID, BUDGET as AGENTS_MD_BUDGET, merge as agents_md,
+};
 pub const HOOKS_JSON: &str = ".codex/hooks.json";
 pub const CONFIG_TOML: &str = ".codex/config.toml";
-/// Marked-block id of the kit's guidance in the project's `AGENTS.md`.
-pub const BLOCK_ID: &str = "meowkit";
-/// Codex's default `project_doc_max_bytes`: guidance past it is never read.
-pub const AGENTS_MD_BUDGET: usize = 32 * 1024;
-
-/// The kit's `AGENTS.md` text as a managed block in `path`. Over budget
-/// fails: a truncated block would drop the safety summary without saying so.
-pub fn agents_md(text: &str, path: &str) -> Result<Op, EmitError> {
-    if text.len() > AGENTS_MD_BUDGET {
-        return Err(EmitError::Kit(format!(
-            "Codex AGENTS.md guidance is {} bytes, over the {AGENTS_MD_BUDGET}-byte budget",
-            text.len()
-        )));
-    }
-    Ok(Op::MergeBlock {
-        path: rel(path)?,
-        id: BLOCK_ID.into(),
-        content: text.trim_end().to_owned(),
-    })
-}
-
 /// One `MergeHooks` per event in the bundle's `hooks.json`; a global install
 /// keeps only the handlers [`global::keeps`], anchored at absolute paths.
 pub fn hooks_json(text: &str, global: Option<&Scope>) -> Result<Vec<Op>, EmitError> {

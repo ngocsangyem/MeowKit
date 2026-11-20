@@ -35,7 +35,7 @@ Follow the exact instructions in `step-06-validation-interview.md`, starting fro
 - 6b: Generate 3-5 critical questions using `references/validation-questions.md` framework
   - Use detection keywords to identify relevant categories
   - If red-team findings exist, prioritize questions about flagged areas
-- 6c: Present each question via AskUserQuestion (2-4 options, mark recommended)
+- 6c: Present each question by asking the user (2-4 options, mark recommended)
 - 6d: Propagate answers to phase files via section mapping
 - 6e: Write Validation Log section to plan.md
 

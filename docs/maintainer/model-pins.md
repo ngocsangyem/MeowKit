@@ -22,6 +22,11 @@ Chosen 2026-11-15.
 | opus | `opus` | `gpt-6-astra` | `claude-opus-5[effort=high]` |
 | fable | `fable` | `gpt-6-astra` | `claude-fable-5` |
 
+Grok has no column: its documentation names no model per tier and no agent file format
+(https://docs.x.ai/build/features/subagents, read 2026-11-19), so the agent prompts installed
+for Grok carry no `model`. Pi has no subagents. OMP agents are written without `model`, which
+OMP treats as optional (`src/discovery/helpers.ts`, 18.13.3), so they run on the session's model.
+
 On Codex, Enterprise and Edu admins must enable `gpt-6-luna` before it can run.
 
 ## Pins

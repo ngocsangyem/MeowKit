@@ -64,7 +64,7 @@ fn a_kit_contract_beyond_the_binary_fails_the_release() {
     );
 
     set_contract(&kit, |c| {
-        c["kitContract"] = 1.into();
+        c["kitContract"] = 2.into();
         c["requires"]["mewkitMin"] = "999.0.0".into();
     });
     let out = gate(&kit);

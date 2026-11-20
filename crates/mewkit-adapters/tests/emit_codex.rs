@@ -5,7 +5,7 @@ mod support;
 use std::collections::BTreeSet;
 
 use mewkit_adapters::Emitter;
-use mewkit_adapters::codex::{AGENTS_MD_BUDGET, BUNDLE, Codex};
+use mewkit_adapters::codex::{AGENTS_MD_BUDGET, Codex, SOURCE};
 use mewkit_adapters::contract::{Op, Plan};
 use serde_json::Value;
 use support::{Project, kit, request, sha_tree};
@@ -192,8 +192,8 @@ fn packs_select_the_default_pack_and_its_dependencies() {
     let all = Codex.prepare(&request(&kit, &p.scope, &[], &[])).unwrap();
     assert!(written(&all).count() > written(&plan).count());
     assert!(
-        BUNDLE
-            .base(&kit.dir)
+        kit.dir
+            .join(SOURCE.overlay)
             .join("catalog/skill-packs.json")
             .is_file()
     );

@@ -1,19 +1,11 @@
-# Advice Checkpoints (`--advice` only)
+# `--advice` checkpoints — `mk:plan-creator`
 
-Load this file only when the run was invoked with `--advice`. Without the flag there
-are zero supervision calls, no dossier, no receipt, and the step sequence is
-byte-identical to an unsupervised run.
+Skip this file unless the run was invoked with `--advice`. Without the flag there are
+zero supervision calls, no state and no receipt, and nothing here loads.
 
-## Contents
-
-- [Checkpoints](#checkpoints)
-- [The user boundary — the thing most likely to go wrong here](#the-user-boundary--the-thing-most-likely-to-go-wrong-here)
-- [Call](#call)
-- [After the call](#after-the-call)
-
-The contract this implements is
-`.claude/skills/advise/references/advice-supervision-rules.md`. Where the two disagree, the
-contract wins.
+On the first checkpoint of a run, read the supervision contract this skill's `SKILL.md`
+names under `--advice`. This file implements it, and it holds the call protocol every
+checkpoint follows.
 
 ## Checkpoints
 
@@ -24,71 +16,35 @@ contract wins.
 | REVIEW | after `step-06-validation-interview`, **before** `step-07-gate` | always, when the flag is on | 1 |
 | RECHECK | after corrections from a `RETURN_TO_EXECUTOR` | only after a return | 1 |
 
-Hard cap **4 calls per run**. Checkpoints are macro boundaries — never per step, per
-phase file, or per red-team finding.
+Hard cap **4 calls per run**, charged as `--skill mk:plan-creator`. Checkpoints are
+macro boundaries — never per step, per phase file, or per red-team finding.
 
 GUIDE fires after the scope challenge because that is where the scope stops moving;
-supervising a scope that is still being negotiated advises on a plan that will not
-exist. REVIEW fires before the presentation step, never inside it.
+supervising a scope still being negotiated advises on a plan that will not exist. REVIEW
+fires before the gate step, never inside it.
 
-## The user boundary — the thing most likely to go wrong here
+## What each checkpoint asks
 
-**Athena does not settle the plan with the user, and a REVIEW checkpoint is not a
-substitute for that conversation.**
+- **GUIDE** — given this settled scope, what must the research and the phase breakdown
+  actually resolve?
+- **RESCUE** — the red team left a contradiction; which direction does the evidence
+  support?
+- **REVIEW** — does this plan's evidence cover its own acceptance criteria before it
+  reaches the gate?
+- **RECHECK** — were the corrections addressed?
 
-`step-07-gate` is unchanged: the user reads the plan and says whether it is right. A
-`READY_FOR_EXISTING_GATE` disposition means "the plan is in a state where presenting it
-is the correct next step" — nothing more. Skipping the presentation, or citing Athena's
-directive instead of the user's answer, replaces the one judgement the step exists for.
+## What supervision does NOT touch here
 
-Athena also does not write the plan. `RETURN_TO_EXECUTOR` routes corrections back to
-the **planner**, which edits the plan and re-runs the normal checks; the corrected
-plan then goes to the user the ordinary way.
+- **The plan itself.** Athena writes no plan file and edits no phase file. It reads and
+  may return the plan to the planner.
+- **The conversation with the user.** It stays the user's. A REVIEW directive is input to
+  it, never a substitute for it.
+- **A scope correction** means the plan the user saw no longer describes the work: present
+  it again. An in-scope correction keeps it and invalidates downstream evidence.
 
-If the correction changes scope rather than wording, the plan the user saw no longer
-describes the work, so present it again rather than carrying the earlier answer forward.
+## Routing in this skill
 
-## Call
-
-```
-mewkit advice begin --run <supervisionRunId> --skill mk:plan-creator \
-  --stage GUIDE|RESCUE|REVIEW|RECHECK --checkpoint <checkpointId>
-```
-
-This enforces the cap, stage legality and idempotency, and writes the pending marker
-that makes a crash resumable. A refusal is final for that checkpoint: continue
-unsupervised, or escalate when the refusal says to.
-
-Validate the packet before sending it:
-
-```
-mewkit advice validate-packet --evidence <packet.json> --packet-kind input
-```
-
-Then delegate with the packet inline (a fork inherits no conversation):
-
-```
-Agent(subagent_type="athena",
-      description="advice: <checkpoint name>",
-      prompt="<packet: runId, skill, stage, checkpointId, mission, lockedDecisions,
-               currentState, workerSummary, evidenceRefs (≤5, with provenance),
-               priorDirective, question, riskAndReversibility>")
-```
-
-Serialized cap 12 KiB — pass the plan path and the red-team report as pointers, never
-the plan body.
-
-## After the call
-
-```
-mewkit advice commit --run <runId> --checkpoint <checkpointId> \
-  --disposition <returned disposition> --outcome adopted|rejected|deferred \
-  --reason "<one line, required even when adopted>" \
-  --directive "<summary>" --next "<next safe action>" \
-  [--correction "<change>" ...] [--evidence-pointer <path> ...]
-```
-
-Route on the disposition:
+The call protocol defines the dispositions; here is what each one means for this skill.
 
 - `CONTINUE_WITH_DIRECTIVE` — continue the step sequence; the directive is input to
   planning, not a replacement for a step.
@@ -104,6 +60,22 @@ Only `supervisionRunId` crosses an approved handoff to a following skill. Spawne
 workers (researcher, red-team) receive a task-specific directive — never the flag,
 never the dossier.
 
+Serialized cap 12 KiB — pass the plan path and the red-team report as pointers, never
+the plan body.
+
+`step-07-gate` is unchanged: the user reads the plan and says whether it is right. A
+`READY_FOR_EXISTING_GATE` disposition means "the plan is in a state where presenting it
+is the correct next step" — nothing more. Skipping the presentation, or citing Athena's
+directive instead of the user's answer, replaces the one judgement the step exists for.
+
+## Fallback
+
 If the runtime cannot delegate to `athena`, print exactly
-`advice checkpoint unavailable in this runtime: <reason>` and continue unsupervised.
-**Never write a packet inline and present it as Athena's.**
+
+```
+advice checkpoint unavailable in this runtime: <reason>
+```
+
+and continue unsupervised. Never write a packet inline and present it as the agent's —
+a recommendation written by the agent that is stuck is not an independent check, and a
+receipt produced that way records supervision that never happened.

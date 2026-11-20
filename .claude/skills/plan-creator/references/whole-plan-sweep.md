@@ -81,7 +81,7 @@ OUTPUT: { reconciled: int, unresolved: int, ran_at: ISO-8601 }
 
 === DECISION CHECK ===
 
-5. If unresolved > 0 → fire AskUserQuestion blocker (see tree below).
+5. If unresolved > 0 → fire ask the user blocker (see tree below).
    The block list is in-memory PLUS staged in red-team-findings.md —
    no edits have landed in phase files yet.
 
@@ -129,7 +129,7 @@ Post-staging, no edits applied yet. Pass 2 runs only if the user picks an "Apply
 W1 unresolved > 0?                          W2 unresolved > 0?
        │                                            │
        ▼                                            ▼
-AskUserQuestion:                          AskUserQuestion:
+Ask the user:                          Ask the user:
 - Apply pending edits + defer            - Apply pending edits + accept
   unresolved to validation interview       risk (writes Risk rows + ## Validation Log)
 - Apply pending edits + resolve now      - Apply pending edits + resolve now
@@ -142,7 +142,7 @@ If the user picks "Skip sweep" or "Cancel", Pass 2 does NOT execute; the "Pendin
 
 ## Recursion bound
 
-Session state tracks `w1_resolve_attempts` and `w2_resolve_attempts` (int, initialized to 0). When the user picks "resolve now", the counter increments. At ≥2 attempts, the "resolve now" option is REMOVED from the AskUserQuestion option set with an advisory:
+Session state tracks `w1_resolve_attempts` and `w2_resolve_attempts` (int, initialized to 0). When the user picks "resolve now", the counter increments. At ≥2 attempts, the "resolve now" option is REMOVED from the user question option set with an advisory:
 
 > Two resolution attempts complete. Remaining contradictions will be recorded as Risk rows. Continue?
 

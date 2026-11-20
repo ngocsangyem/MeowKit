@@ -32,21 +32,22 @@ else
 fi
 rm "$seed/.claude/skills/demo/references/notes.md"
 
-# A bundle path the bundle does not ship fails; a file the user creates at run time does not.
-bundle="$seed/kit/bundles/codex/root"
-mkdir -p "$bundle/.agents/skills/mk-demo/scripts"
-touch "$bundle/.agents/skills/mk-demo/scripts/run.sh"
-printf 'Run `.agents/skills/mk-demo/scripts/run.sh`; keys live in `.codex/.env`.\n' > "$bundle/.agents/skills/mk-demo/SKILL.md"
-if bash "$CHECK" "$seed" >/dev/null 2>&1; then echo "PASS: a shipped bundle path and a run-time file pass"; else echo "FAIL: valid bundle paths flagged"; fail=1; fi
-printf 'Run `.agents/skills/jira/scripts/jira-as.sh`.\n' > "$bundle/.agents/skills/mk-demo/SKILL.md"
-if out=$(bash "$CHECK" "$seed" 2>&1); then
-  echo "FAIL: a dead bundle path passed"; fail=1
-elif grep -q "DEAD_PATH: kit/bundles/codex/root/.agents/skills/mk-demo/SKILL.md -> .agents/skills/jira/scripts/jira-as.sh" <<<"$out"; then
-  echo "PASS: a dead bundle path fails the check"
+# In an installed tree, a path the install does not write fails; a file the user creates at
+# run time does not.
+installed="$seed/installed-codex"
+mkdir -p "$installed/.agents/skills/mk-demo/scripts"
+touch "$installed/.agents/skills/mk-demo/scripts/run.sh"
+printf 'Run `.agents/skills/mk-demo/scripts/run.sh`; keys live in `.codex/.env`.\n' > "$installed/.agents/skills/mk-demo/SKILL.md"
+if bash "$CHECK" "$seed" "$installed" >/dev/null 2>&1; then echo "PASS: an installed path and a run-time file pass"; else echo "FAIL: valid installed paths flagged"; fail=1; fi
+printf 'Run `.agents/skills/jira/scripts/jira-as.sh`.\n' > "$installed/.agents/skills/mk-demo/SKILL.md"
+if out=$(bash "$CHECK" "$seed" "$installed" 2>&1); then
+  echo "FAIL: a dead installed path passed"; fail=1
+elif grep -q "DEAD_PATH: installed installed-codex: .agents/skills/mk-demo/SKILL.md -> .agents/skills/jira/scripts/jira-as.sh" <<<"$out"; then
+  echo "PASS: a dead installed path fails the check"
 else
-  echo "FAIL: the bundle dead path was not named: $out"; fail=1
+  echo "FAIL: the installed dead path was not named: $out"; fail=1
 fi
-rm -r "$seed/kit"
+rm -r "$installed"
 
 if bash "$CHECK" "$REPO" >/dev/null 2>&1; then echo "PASS: the real tree is clean"; else echo "FAIL: the real tree has dead refs"; fail=1; fi
 exit $fail

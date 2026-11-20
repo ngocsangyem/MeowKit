@@ -1,4 +1,4 @@
-// Codex guards, replayed from kit/bundles/codex/root/.codex/hooks.json: privacy on Bash
+// Codex guards, replayed from kit/overlays/codex/files/.codex/hooks.json: privacy on Bash
 // and the ship check.
 import path from "node:path";
 import { describe, expect } from "vitest";

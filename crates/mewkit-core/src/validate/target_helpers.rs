@@ -132,3 +132,51 @@ pub fn reference_graph_rows(dir: &Path) -> Vec<CheckResult> {
         )
     }]
 }
+
+/// A skill is a folder holding a `SKILL.md` that starts with frontmatter and
+/// whose `name`, when given, is the folder's name.
+pub fn skills_named_after_folder(label: &str, dir: &Path, rel: &str) -> CheckResult {
+    let name = &format!("{label} skills each have a SKILL.md named after their folder");
+    let root = dir.join(rel);
+    let mut count = 0;
+    for folder in super::dir_order::sorted_names(&root) {
+        let folder_path = root.join(&folder);
+        if !folder_path.is_dir() {
+            continue;
+        }
+        let Ok(text) = std::fs::read_to_string(folder_path.join("SKILL.md")) else {
+            return row(
+                name,
+                Status::Fail,
+                format!("{rel}/{folder}: no readable SKILL.md"),
+            );
+        };
+        let Some(frontmatter) = text
+            .strip_prefix("---\n")
+            .and_then(|rest| rest.split_once("\n---"))
+            .map(|(head, _)| head)
+        else {
+            return row(
+                name,
+                Status::Fail,
+                format!("{rel}/{folder}/SKILL.md: no frontmatter"),
+            );
+        };
+        let declared = frontmatter
+            .lines()
+            .find_map(|line| line.strip_prefix("name:"))
+            .map(|value| value.trim().trim_matches(['"', '\'']));
+        if declared.is_some_and(|declared| declared != folder) {
+            return row(
+                name,
+                Status::Fail,
+                format!("{rel}/{folder}/SKILL.md: `name` is not `{folder}`"),
+            );
+        }
+        count += 1;
+    }
+    if count == 0 {
+        return row(name, Status::Fail, format!("no skill under {rel}"));
+    }
+    row(name, Status::Pass, format!("{count} skills"))
+}

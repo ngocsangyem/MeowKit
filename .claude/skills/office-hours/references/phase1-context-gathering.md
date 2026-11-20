@@ -17,7 +17,7 @@ eval "$(.claude/hooks/lib/workflow-slug 2>/dev/null)"
 
 5. **Ask: what's your goal with this?** This is a real question, not a formality. The answer determines everything about how the session runs.
 
-   Via AskUserQuestion, ask:
+   Ask the user:
 
    > Before we dig in — what's your goal with this?
    >

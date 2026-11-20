@@ -54,8 +54,8 @@ pub const GATES: [GateHook; 3] = [
     },
     GateHook {
         runtime: "codex",
-        kit_file: "kit/bundles/codex/root/.codex/hooks/gate-enforcement.cjs",
-        kit_registration: "kit/bundles/codex/root/.codex/hooks.json",
+        kit_file: "kit/overlays/codex/files/.codex/hooks/gate-enforcement.cjs",
+        kit_registration: "kit/overlays/codex/files/.codex/hooks.json",
         event: "PreToolUse",
         matcher: Some("Edit|Write"),
         command: "node \"$(git rev-parse --show-toplevel)/.codex/hooks/gate-enforcement.cjs\"",
@@ -64,8 +64,8 @@ pub const GATES: [GateHook; 3] = [
     },
     GateHook {
         runtime: "cursor",
-        kit_file: "kit/bundles/cursor/root/.cursor/hooks/gate-enforcement.cjs",
-        kit_registration: "kit/bundles/cursor/root/.cursor/hooks.json",
+        kit_file: "kit/overlays/cursor/files/.cursor/hooks/gate-enforcement.cjs",
+        kit_registration: "kit/overlays/cursor/files/.cursor/hooks.json",
         event: "afterFileEdit",
         matcher: None,
         command: "node .cursor/hooks/gate-enforcement.cjs",

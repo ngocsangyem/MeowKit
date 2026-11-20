@@ -55,7 +55,7 @@ Generate `trade-off-matrix.md` in `{plan-dir}/`:
 ```
 
 ## Selection Flow (step-04)
-After semantic checks pass on BOTH approach files, present via AskUserQuestion:
+After semantic checks pass on BOTH approach files, present by asking the user:
 
 ```json
 {

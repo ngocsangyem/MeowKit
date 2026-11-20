@@ -4,7 +4,7 @@ After all review sections are complete, dispatch a Claude adversarial subagent f
 
 ## Offer the outside voice
 
-Use AskUserQuestion:
+Ask the user:
 
 > "All review sections are complete. Want an outside voice? A Claude subagent with fresh context can give a brutally honest, independent challenge of this plan — logical gaps, feasibility risks, and blind spots. Takes about 2 minutes."
 >
@@ -50,7 +50,7 @@ CROSS-PASS TENSION:
   [Topic]: Review said X. Outside voice says Y. [Your assessment of who's right.]
 ```
 
-For each substantive tension point, auto-propose as a TODO via AskUserQuestion:
+For each substantive tension point, auto-propose as a TODO by asking the user:
 
 > "Cross-pass disagreement on [topic]. The review found [X] but the outside voice argues [Y]. Worth investigating further?"
 

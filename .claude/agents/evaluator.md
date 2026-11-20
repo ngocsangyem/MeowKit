@@ -155,7 +155,7 @@ Append a line to the contract's `## Negotiation Log` section:
 
 Be specific. "AC-04 needs more detail" is useless. "AC-04 says 'user can drag clips' — specify which mouse buttons, modifier keys, and what happens when clips overlap on drop" is actionable.
 
-**Hard cap: 2 negotiation rounds.** If after 2 rounds the contract still has ACs you can't accept, escalate to human via AskUserQuestion. Do not negotiate indefinitely — convergence in 2 rounds means the parties understand each other; failure to converge means a human needs to break the tie.
+**Hard cap: 2 negotiation rounds.** If after 2 rounds the contract still has ACs you can't accept, escalate to the human by asking the user. Do not negotiate indefinitely — convergence in 2 rounds means the parties understand each other; failure to converge means a human needs to break the tie.
 
 **You also sign.** When the contract is acceptable, run the `sign` action: `git add` + `git commit -m "contract: evaluator signs sprint {N} for {slug}"`. Capture the SHA into the contract's `evaluator_signed:` frontmatter field. After both you and the generator sign, the sprint's build starts against these criteria.
 

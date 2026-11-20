@@ -65,7 +65,7 @@ End-to-end default flow + `--scout` extract-or-prompt pattern + filtering rules:
 
 ## Auto-create (opt-in)
 
-`--auto-create --project <KEY> [--epic <KEY>]` runs 5 pre-flight checks (NO_ACS, Rule-1 injection, length cap, duplicate suspect via `mk:jira-search`, source-hash mismatch). If all pass, a markdown dry-run table renders + a single `AskUserQuestion` gate decides ship-or-abort. Gating rules: `references/auto-create-gating.md`. Rule-1 inventory copy: `references/injection-patterns.md`. Gating check: `scripts/check-auto-create-gating.py`.
+`--auto-create --project <KEY> [--epic <KEY>]` runs 5 pre-flight checks (NO_ACS, Rule-1 injection, length cap, duplicate suspect via `mk:jira-search`, source-hash mismatch). If all pass, a markdown dry-run table renders + a single user question gate decides ship-or-abort. Gating rules: `references/auto-create-gating.md`. Rule-1 inventory copy: `references/injection-patterns.md`. Gating check: `scripts/check-auto-create-gating.py`.
 
 ## See also
 

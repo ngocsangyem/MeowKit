@@ -32,8 +32,8 @@ Rules:
 
 ### Step 4: Parallel Verify
 ```
-Agent("Bash", "Run typecheck: npx tsc --noEmit")
-Agent("Bash", "Run lint: npm run lint")
+npx tsc --noEmit
+npm run lint
 ```
 
 ### Step 5: Complete

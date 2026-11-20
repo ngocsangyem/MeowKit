@@ -7,7 +7,7 @@ CLI, with `mk` as a short alias).
 ## Architecture
 
 ```
-Source of truth (.claude/, kit/bundles/)
+Source of truth (.claude/, kit/overlays/)
     ↓
 prepare-release-assets.cjs → dist/meowkit-release.zip + dist/checksums.txt
     ↓
@@ -22,9 +22,11 @@ rust-release.yml on tag mewkit-vX.Y.Z → six archives, binary-manifest.json, ch
 GitHub Release (never "latest") + PR that re-pins install.sh / install.ps1   binary stream
 ```
 
-**One distribution, one source.** `.claude/` and the hand-authored Codex and Cursor bundles in
-`kit/bundles/` are the source. The release zip carries both (`scripts/kit-ship-set.cjs` lists what
-ships), and `mewkit init` unpacks them. Nothing is converted at install time.
+**One distribution, one source.** `.claude/` is the source for skills, agents, rules and hooks. The
+per-runtime overlays in `kit/overlays/<runtime>/` hold what one runtime needs that `.claude/` cannot
+express. The release zip carries both (`scripts/kit-ship-set.cjs` lists what ships). At install time
+`mewkit init --target codex|cursor` projects the `.claude/` skills and agents into that runtime's
+layout and adds its overlay. Nothing is hand-ported per release.
 
 **Key insight:** the `mewkit` binary downloads `meowkit-release.zip` from GitHub Releases at runtime.
 A release without that zip asset is invisible to it, so the binary skips it.
@@ -36,7 +38,7 @@ synchronized:
 
 | Version field | What it versions |
 | --- | --- |
-| root `package.json` → `version` | The **kit**: `.claude/` and `kit/bundles/` content |
+| root `package.json` → `version` | The **kit**: `.claude/` and `kit/overlays/` content |
 | root `Cargo.toml` → `[workspace.package]` `version` | The **binary** (`mewkit`, alias `mk`): the installer, validator and lifecycle CLI |
 
 Read the current numbers from those files, never from this page. A version pasted into prose is
@@ -49,7 +51,7 @@ kit release for every binary bugfix.
 
 Bump each **only** for its own change:
 
-- Kit content changed (`.claude/`, `kit/bundles/`, rules, skills, agents) → bump the **root** version.
+- Kit content changed (`.claude/`, `kit/overlays/`, rules, skills, agents) → bump the **root** version.
 - Binary code changed (`crates/`) → bump the **workspace** version.
 - Both changed → bump both, independently, in the same release. Not to the same number.
 
@@ -140,87 +142,89 @@ npm run build -w packages/docs
 
 Must complete with no errors. Chunk size warnings are normal.
 
-#### 1d. Author the Codex and Cursor native bundles (when `.claude/` content changes)
+#### 1d. Update the Codex and Cursor overlays (when `.claude/` content changes)
 
-**Both Codex and Cursor ship HAND-AUTHORED native bundles.** There is no converter. A new `.claude/`
-skill, agent, rule or hook does not reach them automatically. Author the matching native file(s) in
-**both** bundles, or the two targets silently drift from `.claude/`.
+`mewkit init --target codex|cursor` projects the `.claude/` skills and agents into each runtime's
+layout at install time. A new or changed skill or agent reaches both runtimes with no second edit.
+Only the items in the table below need a hand edit, per runtime.
 
-**Bundle roots and their managed surfaces** (one manifest entry per top-level surface):
+| Change | Edit |
+| --- | --- |
+| New skill | Add `mk-<name>` to a pack in `kit/overlays/codex/catalog/skill-packs.json` **and** `kit/overlays/cursor/catalog/skill-packs.json`. A skill in no pack installs only when no pack list is given. Keep `core` under `budgetChars`. |
+| Hook or hook helper | Write the file under `kit/overlays/<runtime>/files/` (Codex: `.codex/hooks.json`, `.codex/hooks/**`; Cursor: `.cursor/hooks.json`, `.cursor/hooks/**`). Shared hook libraries are copies of `.claude/hooks/lib/` made by `node scripts/sync-hook-core.cjs`; run it after editing them. |
+| Cursor rule | `kit/overlays/cursor/files/.cursor/rules/<name>.mdc`, holding only what the shared `AGENTS.md` block does not say. Codex has no rule files: `.claude/rules/*` reach it as sections of `AGENTS.md`. |
+| Always-on text | `kit/overlays/shared/AGENTS.md`: one text, merged as the `meowkit` block of the project's `AGENTS.md` by every runtime that reads that file (Codex, Cursor). Name no runtime folder in it. Claude Code keeps `.claude/rules/`. What only Cursor needs in every session goes in `kit/overlays/cursor/files/.cursor/rules/runtime-invariants.mdc`. |
+| Text that belongs to one runtime | `[[replace]]` in `kit/overlays/<runtime>/overlay.toml` (`path`, `find`, `with`). The `find` text must occur exactly once in the projected file, or the build fails. |
+| Frontmatter key for one runtime | `[skill.<name>]` or `[agent.<name>]` table in that runtime's `overlay.toml`. |
+| Installed path a runtime does not take | `omit` in that runtime's `overlay.toml`. |
+| Cursor MCP profile | `kit/overlays/cursor/catalog/mcp-profiles.json`. Merged by `init --mcp-profiles`; without the flag no MCP config is written. |
 
-| Provider | Bundle dir | Top-level surfaces |
-| --- | --- | --- |
-| Codex | `kit/bundles/codex/` | `AGENTS.md`, `.codex/config.toml`, `.codex/agents`, `.codex/rules/default.rules`, `.codex/hooks.json`, `.codex/hooks/*.cjs`, `.agents/skills` |
-| Cursor | `kit/bundles/cursor/` | `AGENTS.md`, `.meowkit/README.md`, `.cursor/agents`, `.cursor/rules`, `.cursor/skills`, `.cursor/hooks.json`, `.cursor/hooks` |
+**Keep `.claude/` wording runtime-neutral.** Projection rewrites paths, tool words and skill names,
+but a line that only makes sense on Claude Code must be reworded in the `.claude/` source. Use an
+overlay `[[replace]]` only for text that belongs to one runtime.
 
-Author under `kit/bundles/<provider>/root/`. The tree is shipped verbatim in the release zip.
+**Skill naming.** Skills are `.claude/skills/<name>/` with `name: mk:<name>`. Projection installs them
+as `mk-<name>` for both runtimes (`skill_prefix` in `crates/mewkit-adapters/src/projection/target.rs`).
+Do not write `mk-` names into `.claude/` by hand.
 
-**The skills directories differ ON PURPOSE.** Codex installs `.agents/skills/`, Cursor installs
-`.cursor/skills/`. Both are documented load paths for their own runtime. Do NOT "unify" them: when
-both bundles shared one directory, the manifest's single directory-level entry made whichever
-provider installed second treat the tree as a conflict and silently skip every skill.
+**The skills directories differ ON PURPOSE.** Codex reads `.agents/skills/`, Cursor reads
+`.cursor/skills/`. Each is the only skills root its runtime reads (`skills_root` in
+`crates/mewkit-adapters/src/projection/target.rs`). Do NOT "unify" them.
 
-**Surface mapping: author these shapes by hand:**
+**What projection produces** (reference only; these files are generated, do not author them by hand):
 
-| `.claude/` surface | Codex native | Cursor native |
+| `.claude/` surface | Codex | Cursor |
 | --- | --- | --- |
 | `skills/<name>/` | `.agents/skills/mk-<name>/SKILL.md` | `.cursor/skills/mk-<name>/SKILL.md` |
-| `agents/<name>.md` | `.codex/agents/<name>.toml` — `name`, `description`, `developer_instructions`, `model_reasoning_effort` | `.cursor/agents/<name>.md` — frontmatter is exactly `name`, `description`, `model`, `readonly`, `is_background` |
-| `rules/*` | guidance goes in `AGENTS.md` or a skill — native `.codex/rules/*.rules` are Starlark **command policies**, not markdown guidance | `.cursor/rules/<name>.mdc` — frontmatter is exactly `description`, `globs`, `alwaysApply`; every rule declares one activation class (`alwaysApply: true` is reserved for `runtime-invariants.mdc`) |
-| `settings.json` hooks | `.codex/hooks.json` + `.codex/hooks/*.cjs` | `.cursor/hooks.json` + `.cursor/hooks/*.cjs` |
+| `agents/<name>.md` | `.codex/agents/<name>.toml` (`name`, `description`, `developer_instructions`, model and effort) | `.cursor/agents/<name>.md` (frontmatter `name`, `description`, `model`, `readonly`, `is_background`) |
+| `rules/*` | Summarised as sections of the shared `AGENTS.md` block. Native `.codex/rules/default.rules` is a Starlark **command policy** from the overlay | The same `AGENTS.md` block. Cursor-only rules are written by hand as `.cursor/rules/<name>.mdc` in the overlay; each rule declares one activation class (`alwaysApply: true` is reserved for `runtime-invariants.mdc`) |
+| `settings.json` hooks | Hand-written in the overlay: `.codex/hooks.json` + `.codex/hooks/` | Hand-written in the overlay: `.cursor/hooks.json` + `.cursor/hooks/` |
 | memory | `.meowkit/memory/` (provider-neutral, never `.claude/memory/`) | `.meowkit/memory/` |
 
-Index files (`agents/AGENTS_INDEX.md`, `SKILLS_INDEX.md`) are NOT agents. Do not author agent files
-for them.
-
-**Skill naming contract (BOTH bundles):** the skill directory MUST be `mk-<name>` and the `name:` in
-its `SKILL.md` MUST equal that directory name. Cursor requires the match; a mismatch is a defect.
-Add the same `mk-<name>` to the right pack in each bundle's catalog.
+Index files (`agents/AGENTS_INDEX.md`, `SKILLS_INDEX.md`) are catalogs, not agents.
 
 **Model assignment when adding an agent:**
 
-- **Claude Code**: set `model:` in the agent's frontmatter by class: advisory → `fable`; deep
-  (planning, review, security, architecture, design, evidence synthesis) → `claude-opus-5`; standard
-  judgement → `sonnet`; bounded or wrapper work → `haiku`. An exact model id must be registered as a
-  named profile in the model taxonomy (`crates/mewkit-core/src/validate/agent_registry_rows.rs`), or
-  `mewkit validate --agents` rejects it. Per-agent table:
+- **Claude Code** (the source): set `model:` in `.claude/agents/<name>.md` by class: advisory →
+  `fable`; deep (planning, review, security, architecture, design, evidence synthesis) →
+  `claude-opus-5`; standard judgement → `sonnet`; bounded or wrapper work → `haiku`. An exact model id
+  must be registered as a named profile in `crates/mewkit-core/src/validate/agent_registry_rows.rs`,
+  or `mewkit validate --agents` rejects it. Per-agent table:
   `packages/docs/content/docs/guide/claude-agent-models.mdx`.
-- **Codex**: set `model_reasoning_effort` by the agent's class: deep or advisory roles (planning,
-  review, security, architecture, advisory) → `high`; everything else → `medium`. `xhigh` is NOT
-  used. Codex auto-loads agents; no `config.toml` wiring is needed. Model ids are never hardcoded.
-- **Cursor**: set a concrete Cursor model id per the shipped tier mapping: `claude-fable-5`
-  (advisory), `claude-opus-5[effort=high]` (deep: planning, review, security), `claude-sonnet-5`
-  (standard), `composer-2.5[fast=true]` (mechanical and jira/confluence). Valid values are `inherit`
-  or `id[option=value]`; the suffix form (`-thinking-high`) is NOT valid. The lint whitelists the
-  approved ids; add there first if you introduce one.
-
-**Catalog wiring (a new skill is invisible to a provider until it is in a pack):**
-
-| File | When |
-| --- | --- |
-| `kit/bundles/codex/catalog/skill-packs.json` | new skill → add `mk-<name>` to a pack; keep `core` under `budgetChars` |
-| `kit/bundles/cursor/catalog/skill-packs.json` | same, for the Cursor bundle |
-| `kit/bundles/cursor/catalog/mcp-profiles.json` | MCP profiles that `init --mcp-profiles` merges. Cursor only; without the flag no MCP config is written |
+- **Codex and Cursor**: the model id and reasoning effort come from projection (`model_pins` in
+  `crates/mewkit-adapters/src/projection/target.rs`). The tier mapping and the approved ids are in
+  `docs/maintainer/model-pins.md`. Add a new id there first, then to the mapping, if you introduce one.
+  Do not hardcode a runtime model id in `.claude/`.
 
 **Always check the official docs FIRST**, because these formats change:
 
 - Codex: [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents) · [rules](https://learn.chatgpt.com/docs/agent-configuration/rules) · [AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md) · [hooks](https://learn.chatgpt.com/docs/hooks) · [skills](https://learn.chatgpt.com/docs/build-skills) · [config](https://learn.chatgpt.com/docs/config-file/config-basic)
 - Cursor: [subagents](https://cursor.com/docs/agent/subagents) · [rules](https://cursor.com/docs/context/rules) · [skills](https://cursor.com/docs/context/skills) · [models](https://cursor.com/docs/models-and-pricing)
 
-**Neutralize host-isms by hand:** zero Claude or product self-references. `CLAUDE.md` → `AGENTS.md`,
-`CLAUDE_PROJECT_DIR` → `$(git rev-parse --show-toplevel)` (Codex) or the Cursor equivalent,
-`.claude/memory/` → `.meowkit/memory/`, Claude tool names and hook event names → the target's own
-vocabulary, product wording → "the toolkit" / "the harness". The Cursor denylist also bans `.codex/`
-paths, bare model-tier words outside the agent `model:` field, and `settings.json`.
+**Host words.** Projection rewrites host paths, tool names and hook event names for each runtime
+(`crates/mewkit-adapters/src/projection/`). Any host-specific text it cannot rewrite goes in the
+`.claude/` source as runtime-neutral wording, or in an overlay `[[replace]]` if it belongs to one
+runtime. Product self-references stay out of `.claude/` (step 1f). The per-host denylist is
+`scripts/lib/host-foreign-tokens.json`, which `scripts/check-instruction-criteria.cjs` enforces on
+the installed tree.
 
 **Verify (from the repo root):**
 
 ```bash
-# bundle and docs-reference drift, then pack-catalog coherence
-cargo test -p mewkit-core --locked --test bless_docs_manifest
-mewkit validate --packs
+cargo build -p mewkit-cli --locked
 
-# brand-prose lint on the authored files (CI runs it in diff mode and blocks)
+# installed-tree checks: each runtime is installed into a temp directory with the built binary
+node scripts/check-instruction-criteria.cjs --baseline scripts/instruction-criteria-baseline.json
+bash scripts/check-skill-cross-refs.sh
+
+# hook-core copies match .claude/hooks/lib/ (exits 1 on drift)
+node scripts/sync-hook-core.cjs --check
+
+# pack-catalog coherence, then docs-reference drift
+mewkit validate --packs
+cargo test -p mewkit-core --locked --test bless_docs_manifest
+
+# brand-prose lint on the authored files
 LINT_MODE=diff bash scripts/lint-brand-prose.sh
 ```
 
@@ -429,7 +433,7 @@ node scripts/prepare-release-assets.cjs "<version>"
 This creates:
 
 - `release-manifest.json`: SHA-256 checksums for all files
-- `dist/meowkit-release.zip`: the release package (`.claude/` and `kit/bundles/` content plus manifests; no root `CLAUDE.md`, no `tasks/`); it carries `.claude/kit-contract.json`
+- `dist/meowkit-release.zip`: the release package (`.claude/`, the `kit/overlays/` files and catalogs, and manifests; no root `CLAUDE.md`, no `tasks/`); it carries `.claude/kit-contract.json`
 - `dist/checksums.txt`: `<sha256>  meowkit-release.zip`, in `sha256sum -c` format
 
 > **Note:** This script does NOT write `.claude/metadata.json`. The `mewkit` binary writes it on
@@ -539,11 +543,11 @@ Copy this checklist for each release:
 - [ ] Binary changed? (step 3 `git diff`). If yes: `[workspace.package] version` bumped, `Cargo.lock` committed, step 10 planned. If no: step 10 skipped
 - [ ] Memory contract changed? (step 1e): docs, rule and `Migration Notes` updated, `mewkit validate --memory` green
 
-### Build and bundles
+### Build and overlays
 
 - [ ] Step 4 commands pass (cargo fmt, clippy, test, `npm test`, lint, hook tests, `npm run release:check`)
-- [ ] Codex AND Cursor bundles authored when `.claude/` changed (step 1d), new skills in both `catalog/skill-packs.json` files
-- [ ] `mewkit validate --packs` and `bless_docs_manifest` green; multi-provider smoke passes in both orders
+- [ ] Codex AND Cursor overlays updated where step 1d needs a hand edit; new skills in both `kit/overlays/*/catalog/skill-packs.json` files
+- [ ] Step 1d verify commands pass (installed-tree checks, `sync-hook-core.cjs --check`, `mewkit validate --packs`, `bless_docs_manifest`); multi-provider smoke passes in both orders
 
 ### Release
 
@@ -656,7 +660,8 @@ For binary changes, use the SemVer table in step 3.
 | `scripts/prepare-release-assets.cjs`    | Build the release manifest + `dist/meowkit-release.zip` + `dist/checksums.txt`   |
 | `scripts/verify-release-assets.cjs`     | Check `dist/` before upload: contract in the zip, checksum, no signed-artifact asset |
 | `scripts/generate-release-manifest.cjs` | Generate SHA-256 checksums for all release files                                |
-| `scripts/kit-ship-set.cjs`              | The files a kit ships, including `kit/bundles/{codex,cursor}/`                  |
+| `scripts/kit-ship-set.cjs`              | The files a kit ships: `.claude/`, plus `kit/overlays/{codex,cursor}/` (`overlay.toml`, `files/`, catalogs) |
+| `scripts/sync-hook-core.cjs`            | Copies the shared hook libraries from `.claude/hooks/lib/` into the overlays; `--check` exits 1 on drift |
 | `scripts/sync-versions.cjs`             | Check or stamp the kit version into the derived surfaces, incl. `.claude/kit-contract.json`; records the binary version read from `Cargo.toml` |
 | `scripts/lib/cli-version.cjs`           | Reads the binary version from `[workspace.package]` in the root `Cargo.toml`    |
 | `scripts/release/build-binary-manifest.mjs` | Binary stream: `binary-manifest.json` + `checksums.txt` from the six archives (run by `rust-release.yml`) |
@@ -788,12 +793,12 @@ gh release upload v<version> dist/meowkit-release.zip dist/checksums.txt --clobb
 
 ### A Codex or Cursor install is missing a skill or rule after editing `.claude/`
 
-**Cause:** Both authored bundles (`kit/bundles/codex/`, `kit/bundles/cursor/`) are hand-maintained. A new `.claude/` surface does not appear in either until it is authored there. There is no porter for either provider.
+**Cause:** A skill that is in no pack in `kit/overlays/<runtime>/catalog/skill-packs.json` is skipped by a pack-limited install. A Cursor rule exists only in `.claude/rules/` and was never written as a `.mdc` in the Cursor overlay. A hook edit in `.claude/hooks/` does not reach the overlay until it is copied.
 
-**Fix:** Author the native file(s) under `kit/bundles/codex/root/` **and** `kit/bundles/cursor/root/`, add the skill as `mk-<name>` to a pack in each bundle's `catalog/skill-packs.json`, then run `mewkit validate --packs` and the multi-provider smoke in step 1d.
+**Fix:** Add the skill as `mk-<name>` to a pack in both `kit/overlays/codex/catalog/skill-packs.json` and `kit/overlays/cursor/catalog/skill-packs.json`. Write a Cursor rule under `kit/overlays/cursor/files/.cursor/rules/`. Run `node scripts/sync-hook-core.cjs` for hook libraries. Then run the verify commands and the multi-provider smoke in step 1d.
 
 ### Cursor installed no skills at all in a multi-provider project
 
-**Cause:** The manifest tracks each skills tree as ONE directory-level entry. If both bundles are pointed at the same directory, whichever provider installs second sees the tree as a single conflicting directory and skips every skill (`existing file(s) differ from the bundle and were left untouched`).
+**Cause:** Skills were written into a directory another runtime owns. Codex owns `.agents/skills/` and Cursor owns `.cursor/skills/` (`skills_root` in `crates/mewkit-adapters/src/projection/target.rs`).
 
-**Fix:** Keep the trees separate. Codex owns `.agents/skills/`, Cursor owns `.cursor/skills/`. Both are documented load paths for their runtime; do not "unify" them. Re-run the multi-provider smoke in step 1d, in both install orders.
+**Fix:** Keep the trees separate. Both are documented load paths for their runtime; do not "unify" them. Re-run the multi-provider smoke in step 1d, in both install orders.

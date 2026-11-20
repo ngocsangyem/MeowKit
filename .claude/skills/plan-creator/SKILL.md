@@ -112,7 +112,6 @@ Skip when:
 **Composable flags:**
 
 - `--tdd` — add tests-first phase sections and preserve strict TDD in the cook handoff. See `references/tdd-mode.md`.
-- `--advice` — opt-in strategic supervision for one planning run, capped at 4 calls: GUIDE after the scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before the plan is presented, RECHECK after a correction. Athena reads the plan and can return it to the planner; it never writes the plan and never settles it with the user. Without the flag there are zero calls and no state. See `references/advice-checkpoints.md`.
 
 ## Requirements Capture Contract
 
@@ -146,9 +145,9 @@ Step 3: Draft Plan → plan.md (≤80 lines) + phase-XX files (12-section templa
 Step 4: Semantic Checks → goal/ACs/constraints + structural validation
 Step 5: Red Team (hard/deep/parallel/two only) → 4-persona scaling, red-team-findings.md, adjudication
 Step 6: Validation Interview (hard/deep/parallel/two only) → 3-5 critical questions with detection keywords, propagate answers
-Step 7: Present plan → self-check + AskUserQuestion (Looks right | Modify | Reject)
+Step 7: Present plan → self-check + ask the user (Looks right | Modify | Reject)
 Step 8: Hydrate Tasks → phase checkboxes → session tasks
-Step 9: Post-Plan Handoff → mode-pruned AskUserQuestion (cook|validate|red-team|end) → write `handoff.next` to plan.md → STOP
+Step 9: Post-Plan Handoff → mode-pruned ask the user (cook|validate|red-team|end) → write `handoff.next` to plan.md → STOP
 ```
 
 ## Output Structure
@@ -176,7 +175,7 @@ tasks/plans/YYMMDD-name/
 - **Skipping scout on unfamiliar codebases**: → always run mk:scout if codebase is new
 - **Using `--deep` to decide architecture**: deep maps a chosen approach; if the approach is unclear, route to `mk:brainstorming` first.
 - **Dropping TDD at handoff**: when `tdd_mode=true`, step-09 MUST print cook with `--tdd`; sentinel/env state alone is not a cross-session contract.
-- **Post-Plan Handoff is deterministic**: step-09 fires `AskUserQuestion`; do NOT auto-invoke the chosen command. User must type it in a fresh session for clean context.
+- **Post-Plan Handoff is deterministic**: step-09 asks the user; do NOT auto-invoke the chosen command. User must type it in a fresh session for clean context.
 - **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, autobuild, end}` fail the structural check.
 - **Whole-Plan Consistency Gates W1 / W2 fire after red-team and validation interview**: stage-then-apply algorithm — no edits land until the user resolves any unresolved contradictions. See `references/whole-plan-sweep.md`.
 - **`consistency_sweeps` frontmatter is optional**: legacy plans without it still validate as `PLAN_COMPLETE`.
@@ -184,6 +183,20 @@ tasks/plans/YYMMDD-name/
 - **`.plan-state.json` v1.2 schema is additive**: consumers MUST treat unknown keys (`verification_tier`, `consistency_sweeps_passed`) as optional and default-empty. v1.1 readers ignore them silently.
 - **Post-hydration integrity-check failure is a hard stop**: cycle / count-mismatch / missing-metadata failures print an explicit diff and STOP — do NOT auto-recover or silently continue. Human resolution required before step-09. See `references/task-management.md` "Post-Hydration Integrity Checks".
 - **Re-analyzing a design source that already has a packet duplicates interpretation**: when a design evidence packet path is present, cite the packet — do NOT call the design source's tools or re-parse its raw JSON. See `references/design-evidence-consumption.md`.
+
+## `--advice` (composable, off by default)
+
+Opt-in strategic supervision for one planning run, capped at 4 calls: GUIDE after the
+scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before the gate
+step, RECHECK after a correction.
+
+Athena reads the plan and can return it to the planner. It never writes the plan and never
+settles it with the user.
+
+Without the flag there are zero calls and no state is written.
+
+Checkpoints: `references/advice-checkpoints.md`. Contract: `.claude/skills/advise/references/advice-supervision-rules.md` (load only when the
+flag is present).
 
 ## References
 
@@ -200,8 +213,8 @@ tasks/plans/YYMMDD-name/
 | `references/design-evidence-consumption.md`        | Consuming a design evidence packet (e.g. Figma): do/don't, adjudication precedence, decision-ledger, flow→validation-matrix, `blocked_on:` phase blocking. Never re-analyzes the design source.                        |
 | `step-05-red-team.md`                              | Red team review: persona scaling, subagent dispatch, adjudication                                                                                                                                                    |
 | `step-06-validation-interview.md`                  | Critical question generation and answer propagation                                                                                                                                                                  |
-| `step-07-gate.md`                                  | Self-check and the AskUserQuestion that presents the plan                                                                                                                                                            |
-| `step-09-post-plan-handoff.md`                     | Deterministic post-plan handoff: mode-pruned `AskUserQuestion` (cook \| validate \| red-team \| autobuild \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
+| `step-07-gate.md`                                  | Self-check and the question that presents the plan to the user                                                                                                                                                                     |
+| `step-09-post-plan-handoff.md`                     | Deterministic post-plan handoff: mode-pruned user question (cook \| validate \| red-team \| autobuild \| end), live risk re-scan, writes `handoff.next` to plan.md frontmatter, prints command + STOPs.        |
 | `references/whole-plan-sweep.md`                   | Whole-Plan Consistency Sweep algorithm (checks W1 + W2). Stage-then-apply: read-only Pass 1 stages Pending Sweep Edits; decision check blocks on unresolved contradictions; write Pass 2 applies edits and logs.   |
 | `references/deep-mode.md`                          | Deep mode contract: when to use/avoid, scout budgets, phase-map appendix, context rules.                                                                                                                             |
 | `references/tdd-mode.md`                           | TDD flag contract: phase sections, optional frontmatter, cook handoff propagation, RED-task hydration.                                                                                                                |
@@ -220,7 +233,7 @@ tasks/plans/YYMMDD-name/
 | `references/plan-organization.md`                  | Directory structure, naming, size rules                                                                                                                                                                              |
 | `references/output-standards.md`                   | YAML frontmatter, required sections                                                                                                                                                                                  |
 | `references/validation-questions.md`               | Critical question categories for interview                                                                                                                                                                           |
-| `references/plan-presentation.md`                  | AskUserQuestion that presents the plan + Context Reminder                                                                                                                                                            |
+| `references/plan-presentation.md`                  | the question that presents the plan + Context Reminder                                                                                                                                                                             |
 | `references/task-management.md`                    | Hydration, cross-session resume, sync-back                                                                                                                                                                           |
 | `references/solution-evaluation.md`                | Trade-off scoring criteria                                                                                                                                                                                           |
 | `references/gotchas.md`                            | Full gotchas list                                                                                                                                                                                                    |
@@ -233,6 +246,8 @@ tasks/plans/YYMMDD-name/
 | `references/workflow-models/bugfix-model.md`       | Workflow template for bug fix tasks (loaded JIT by step-00)                                                                                                                                                          |
 | `references/workflow-models/refactor-model.md`     | Workflow template for refactor tasks (loaded JIT by step-00)                                                                                                                                                         |
 | `references/workflow-models/security-model.md`     | Workflow template for security tasks (loaded JIT by step-00)                                                                                                                                                         |
+
+| `references/advice-checkpoints.md` | `--advice` checkpoint boundaries, caps, and what supervision may not touch |
 
 ## Known Exceptions
 

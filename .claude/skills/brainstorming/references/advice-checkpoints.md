@@ -1,30 +1,11 @@
-# Advice Checkpoints (`--advice` only)
+# `--advice` checkpoints — `mk:brainstorming`
 
-Load this file only when the run was invoked with `--advice`. Without the flag there
-are zero supervision calls, no dossier, no receipt, and behavior is unchanged.
+Skip this file unless the run was invoked with `--advice`. Without the flag there are
+zero supervision calls, no state and no receipt, and nothing here loads.
 
-## Contents
-
-- [Deep runs only](#deep-runs-only)
-- [Checkpoints](#checkpoints)
-- [Role boundary — read this before wiring anything](#role-boundary--read-this-before-wiring-anything)
-- [Call](#call)
-- [After the call](#after-the-call)
-
-The contract this implements is
-`.claude/skills/advise/references/advice-supervision-rules.md`. Where the two disagree, the
-contract wins.
-
-## Deep runs only
-
-`--advice` applies to the **deep** workflow. The quick profile restates the decision,
-gives 2-4 options and returns inline — it creates no scout, report, plan, or memory
-entry, and supervising three inline steps is noise rather than safety. Passing
-`--advice` with `--depth quick` prints one line and continues unsupervised:
-
-```
-advice: --advice applies to deep runs; continuing unsupervised
-```
+On the first checkpoint of a run, read the supervision contract this skill's `SKILL.md`
+names under `--advice`. This file implements it, and it holds the call protocol every
+checkpoint follows.
 
 ## Checkpoints
 
@@ -35,65 +16,34 @@ advice: --advice applies to deep runs; continuing unsupervised
 | REVIEW | after the challenge pass, **before** presenting the recommendation to the user | always, when the flag is on | 1 |
 | RECHECK | after corrections from a `RETURN_TO_EXECUTOR` | only after a return | 1 |
 
-Hard cap **4 calls per run**. Checkpoints are macro boundaries — never per option,
-per technique, or per scoring pass.
+Hard cap **4 calls per run**, charged as `--skill mk:brainstorming`. Checkpoints are
+macro boundaries — never per option, per technique, or per scoring pass.
+
+**Deep workflow only.** The quick profile answers inline in three steps and creates no
+scout, report, plan or memory entry; supervising that is noise rather than safety.
 
 GUIDE fires **after** the frame and **before** generation on purpose: it supplies the
-decision criteria and risk lens the generation should span, which is worthless once
-the options already exist.
+decision criteria and risk lens the generation should span, which is worthless once the
+options already exist.
 
-## Role boundary — read this before wiring anything
+## What each checkpoint asks
 
-The brainstormer generates the option set. Athena does **not**:
+- **GUIDE** — what criteria and risk lens should the option set span, and what would make
+  an option disqualifying?
+- **RESCUE** — the constraints and the evidence disagree; which one is wrong?
+- **REVIEW** — does the recommended direction survive its own challenge pass, or does it
+  go back?
+- **RECHECK** — were the corrections addressed?
 
-- It does not generate a second set of approaches. If it wants an option that is
-  missing, it names the gap; this skill generates it.
-- It does not choose for the user. It recommends one direction **inside the
-  user-approved scope**, and that recommendation is evidence the user reads.
-- It never adds a stop. Brainstorming has none, and supervision does not create one.
+## What supervision does NOT touch here
 
-A run where Athena replaces the option set has failed, even if the answer was good.
+- **The option set.** Athena never generates approaches, scores them, or chooses for the
+  user. It supplies criteria and reads the result.
+- **The user's decision.** This skill adds no gate, and supervision creates none.
 
-## Call
+## Routing in this skill
 
-```
-mewkit advice begin --run <supervisionRunId> --skill mk:brainstorming \
-  --stage GUIDE|RESCUE|REVIEW|RECHECK --checkpoint <checkpointId>
-```
-
-This enforces the cap, stage legality and idempotency, and writes the pending marker
-that makes a crash resumable. A refusal is final for that checkpoint: continue
-unsupervised, or escalate when the refusal says to.
-
-Validate the packet before sending it:
-
-```
-mewkit advice validate-packet --evidence <packet.json> --packet-kind input
-```
-
-Then delegate with the packet inline (a fork inherits no conversation):
-
-```
-Agent(subagent_type="athena",
-      description="advice: <checkpoint name>",
-      prompt="<packet: runId, skill, stage, checkpointId, mission, lockedDecisions,
-               currentState, workerSummary, evidenceRefs (≤5, with provenance),
-               priorDirective, question, riskAndReversibility>")
-```
-
-Serialized cap 12 KiB — pass pointers, never payloads.
-
-## After the call
-
-```
-mewkit advice commit --run <runId> --checkpoint <checkpointId> \
-  --disposition <returned disposition> --outcome adopted|rejected|deferred \
-  --reason "<one line, required even when adopted>" \
-  --directive "<summary>" --next "<next safe action>" \
-  [--correction "<change>" ...] [--evidence-pointer <path> ...]
-```
-
-Route on the disposition:
+The call protocol defines the dispositions; here is what each one means for this skill.
 
 - `CONTINUE_WITH_DIRECTIVE` — proceed; the directive is input to the generation, not a
   replacement for it.
@@ -107,7 +57,23 @@ Route on the disposition:
 
 A second unresolved return escalates to a human; there is no third opinion.
 
+`--advice` applies to the **deep** workflow. The quick profile restates the decision,
+gives 2-4 options and returns inline — it creates no scout, report, plan, or memory
+entry, and supervising three inline steps is noise rather than safety. Passing
+`--advice` with `--depth quick` prints one line and continues unsupervised:
+
+```
+advice: --advice applies to deep runs; continuing unsupervised
+```
+
+## Fallback
+
 If the runtime cannot delegate to `athena`, print exactly
-`advice checkpoint unavailable in this runtime: <reason>` and continue unsupervised.
-**Never write a packet inline and present it as Athena's** — a recommendation written
-by the agent that is stuck is not an independent check.
+
+```
+advice checkpoint unavailable in this runtime: <reason>
+```
+
+and continue unsupervised. Never write a packet inline and present it as the agent's —
+a recommendation written by the agent that is stuck is not an independent check, and a
+receipt produced that way records supervision that never happened.

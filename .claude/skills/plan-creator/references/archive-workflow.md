@@ -31,7 +31,7 @@ Read `tasks/plans/` directory. For each subdirectory:
 
 ### A2. Present Plan List
 
-Via `AskUserQuestion`. Header: "Archive Plans". Question (composed): print "Found {N} archivable plans:" followed by the `name | status | created | phases` table, then "Which plans to archive?". Single-select.
+Ask the user. Header: "Archive Plans". Question (composed): print "Found {N} archivable plans:" followed by the `name | status | created | phases` table, then "Which plans to archive?". Single-select.
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
@@ -40,12 +40,12 @@ Via `AskUserQuestion`. Header: "Archive Plans". Question (composed): print "Foun
 | Select specific plans | User wants per-plan control (e.g., active reviewer is mid-read on one) | Multi-select follow-up prompt per plan |
 | Cancel | User is exploring, not committing | Aborts without touching any plan |
 
-If "Select specific plans": present each plan as a multi-select `AskUserQuestion`.
+If "Select specific plans": present each plan as a multi-select user question.
 If "Cancel": STOP.
 
 ### A3. Journal Capture (Optional)
 
-For each selected plan, ask via `AskUserQuestion`. Header: "Journal Capture". Question: "Capture learnings from these plans to memory before archiving?" Single-select.
+For each selected plan, ask by asking the user. Header: "Journal Capture". Question: "Capture learnings from these plans to memory before archiving?" Single-select.
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|
@@ -72,7 +72,7 @@ write fails, print `⚠ memory write skipped: <reason>` — do not skip silently
 
 ### A4. Archive Action
 
-Ask via `AskUserQuestion`. Header: "Archive Action". Question: "How to handle the archived plans?" Single-select.
+Ask by asking the user. Header: "Archive Action". Question: "How to handle the archived plans?" Single-select.
 
 | Option | Recommend When | Why |
 |--------|----------------|-----|

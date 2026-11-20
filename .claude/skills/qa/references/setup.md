@@ -65,7 +65,7 @@ branch name wherever the instructions say "the base branch."
 git status --porcelain
 ```
 
-If the output is non-empty (working tree is dirty), **STOP** and use AskUserQuestion:
+If the output is non-empty (working tree is dirty), **STOP** and ask the user:
 
 "Your working tree has uncommitted changes. /mk:qa needs a clean tree so each bug fix gets its own atomic commit."
 
@@ -124,7 +124,7 @@ Store conventions as prose context for use in Phase 8e.5 or Step 3.4. **Skip the
 
 **If BOOTSTRAP_DECLINED** appears: Print "Test bootstrap previously declined — skipping." **Skip the rest of bootstrap.**
 
-**If NO runtime detected** (no config files found): Use AskUserQuestion:
+**If NO runtime detected** (no config files found): Ask the user:
 "I couldn't detect your project's language. What runtime are you using?"
 Options: A) Node.js/TypeScript B) Ruby/Rails C) Python D) Go E) Rust F) PHP G) Elixir H) This project doesn't need tests.
 If user picks H → write `.meowkit/state/no-test-bootstrap` and continue without tests.
@@ -152,7 +152,7 @@ If WebSearch is unavailable, use this built-in knowledge table:
 
 ### B3. Framework selection
 
-Use AskUserQuestion:
+Ask the user:
 "I detected this is a [Runtime/Framework] project with no test framework. I researched current best practices. Here are the options:
 A) [Primary] — [rationale]. Includes: [packages]. Supports: unit, integration, smoke, e2e
 B) [Alternative] — [rationale]. Includes: [packages]

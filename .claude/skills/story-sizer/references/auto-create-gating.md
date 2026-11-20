@@ -17,7 +17,7 @@ How `--auto-create --project <KEY>` reaches the human confirmation prompt — an
 --auto-create                     REQUIRES --project <KEY>      (else REJECT with usage message)
 --project <KEY>                   shape: ^[A-Z][A-Z0-9_]+$        (else REJECT)
 --epic <KEY>                      optional. shape: ^[A-Z][A-Z0-9_]+-\d+$
---dry-run-only                    optional test-mode flag. Stops AFTER table render, BEFORE AskUserQuestion.
+--dry-run-only                    optional test-mode flag. Stops AFTER table render, BEFORE ask the user.
 ```
 
 Unknown flags REJECT the run.
@@ -105,7 +105,7 @@ Columns:
 
 ## Single Confirmation Gate
 
-After the table, exactly ONE `AskUserQuestion`:
+After the table, exactly ONE user question:
 
 ```text
 Confirm batch creation? (You are about to create <N> tickets in <PROJECT>.)
@@ -123,7 +123,7 @@ When `--dry-run-only` is set:
 
 1. Run all five checks.
 2. Render the table.
-3. STOP — do NOT call `AskUserQuestion`.
+3. STOP — do NOT ask the user.
 4. Print the rendered table to stdout.
 5. Exit code 0 (or non-zero if any check ABORTed).
 

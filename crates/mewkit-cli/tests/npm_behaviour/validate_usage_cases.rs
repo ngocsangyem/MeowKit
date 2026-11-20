@@ -47,10 +47,20 @@ fn target_and_portable_are_mutually_exclusive() {
 /// An unknown provider names the ones that exist, so the user can correct it.
 #[test]
 fn an_unknown_target_lists_the_known_ones() {
-    let (ts, _) = npm::case("validate-target-unknown")
+    let (ts, rust) = npm::case("validate-target-unknown")
         .fixture("validate-flat-copy")
         .args(&["validate", "--target", "emacs"])
+        .redact(
+            ", grok, pi, omp",
+            "",
+            "the grok, pi and omp profiles were added after the npm CLI was retired",
+        )
         .run();
+    assert!(
+        rust.stderr.contains("codex, cursor, grok, pi, omp."),
+        "{}",
+        rust.describe()
+    );
     assert_eq!(ts.code, 2, "{}", ts.describe());
     assert!(
         ts.stderr

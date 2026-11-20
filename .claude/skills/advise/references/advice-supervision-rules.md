@@ -29,6 +29,7 @@ blocked run, reviews finished work, and may return work for correction.
 - [10 — Fallback](#10--fallback)
 - [11 — Direct consult vs embedded supervision](#11--direct-consult-vs-embedded-supervision)
 - [12 — Model policy](#12--model-policy)
+- [The call protocol](#the-call-protocol)
 - [Wiring status](#wiring-status)
 
 Supervision is **evidence the human reads**. It is never an approval, never a gate,
@@ -375,6 +376,65 @@ none. A caller that needs an auditable directive must run a supervised checkpoin
 advisory tier declared in the **provider adapter file** for the runtime in use. No
 model name or id belongs in this contract or in any skill body
 (`.claude/skills/skill-creator/references/skill-authoring-rules.md` Rule 7).
+
+## The call protocol
+
+Identical at every checkpoint of every wrapped skill, so it lives here once. A wrapper
+declares only WHERE its checkpoints fire and WHAT question each asks.
+
+**1. Open the checkpoint.** This is what enforces the cap, stage legality and idempotency,
+and writes the pending marker that makes a crash resumable:
+
+```
+mewkit advice begin --run <supervisionRunId> --skill mk:<skill> \
+  --stage GUIDE|RESCUE|REVIEW|RECHECK --checkpoint <checkpointId>
+```
+
+`mk:ship` additionally passes `--release-stage prepare|release|publish`; every other skill
+is refused if it passes one. A refusal is final for that checkpoint: continue unsupervised,
+or escalate when the refusal says to. Re-running the same `--checkpoint` returns the
+recorded result and spends no slot.
+
+**2. Validate the packet, then delegate.** The caps, pointer budget, provenance requirement
+and secret scan are enforced by the command, not by writing the packet carefully:
+
+```
+mewkit advice validate-packet --evidence <packet.json> --packet-kind input
+```
+
+Then delegate to the `athena` agent by name, with the packet inline — a fresh subagent
+inherits no conversation. Validate the returned packet the same way with
+`--packet-kind output` before acting on it or summarizing it into a receipt.
+
+**3. Commit the result.** Render the returned packet to the user, then:
+
+```
+mewkit advice commit --run <runId> --checkpoint <checkpointId> \
+  --disposition <returned disposition> --outcome adopted|rejected|deferred \
+  --reason "<one line, required even when adopted>" \
+  --directive "<summary>" --next "<next safe action>" \
+  [--correction "<change>" ...] [--evidence-pointer <path> ...]
+```
+
+`commit` writes the receipt, records the call against the cap, and refuses a disposition
+that is illegal for the stage. `disposition` is Athena's routing signal; `--outcome` is
+what the wrapper decided to do with it — a rejected directive is a legitimate, recordable
+outcome.
+
+**4. Route on the disposition.**
+
+- `CONTINUE_WITH_DIRECTIVE` — proceed; the directive is input, not instruction.
+- `READY_FOR_EXISTING_GATE` — run the skill's normal next gate or review. It is NOT cleared.
+- `RETURN_TO_EXECUTOR` — apply the corrections, then supersede the stale evidence:
+  `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence <workflow-evidence.json> --correction-kind source|scope`.
+  Re-run the skill's verification before its review. `scope` also returns the plan to the
+  user for agreement.
+- `ESCALATE_TO_HUMAN` — stop at the existing human touchpoint.
+- `BLOCKED_MISSING_EVIDENCE` — supply the named evidence or continue unsupervised.
+
+If an active durable task record exists, point at the receipt with
+`mewkit task-state update <id> --evidence-ref <receipt path>`. With no active record, keep
+the file and skip this step — never invent a record.
 
 ## Wiring status
 

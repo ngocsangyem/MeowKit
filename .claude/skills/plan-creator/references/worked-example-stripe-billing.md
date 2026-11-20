@@ -81,7 +81,7 @@ A complete plan showing the expected detail level for a 7-phase implementation i
 **Agent:** orchestrator  
 **Time budget:** 15 minutes
 
-- Grep `.meowkit/memory/` for "billing", "stripe", "webhook" and open only the matching entries
+- Search `.meowkit/memory/` for "billing", "stripe", "webhook" and open only the matching entries
 - Run `mk:scout` on `src/billing/` — confirm directory doesn't exist yet
 - Run `mk:scale-routing` — confirm domain=fintech, level=high, model=COMPLEX
 - Declare: `Task complexity: COMPLEX → Opus`

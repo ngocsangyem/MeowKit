@@ -1,0 +1,53 @@
+---
+alwaysApply: true
+---
+
+<!-- Always Apply: what only Cursor needs in every session. The rules every runtime shares
+(data boundary, blocked patterns, core behaviors, status protocol, memory) are the kit's
+block in the project's `AGENTS.md`, which Cursor also reads; nothing here repeats them. -->
+
+# Cursor runtime invariants
+
+## Capability routing
+
+This project's specialized surfaces select themselves by description, path, or explicit
+mention — there is no central dispatcher to call. Use this table to route an intent to
+the surface that owns it:
+
+| Intent | Surface | How it activates |
+| --- | --- | --- |
+| Locate code, trace how something works, fast repo orientation | `explore` agent | Auto-routed from its description, or `/explore` |
+| Scope an approach before writing code; architecture/implementation planning | `planner` agent | Auto-routed from its description, or `/planner` |
+| Review a finished change before it ships | `reviewer` agent | Auto-routed ("use proactively after implementation"), or `/reviewer` |
+| Reusable multi-step procedure (a "how-to" with scripts/references) | a skill under `.cursor/skills/mk-*` | Auto-surfaced by description/path match, or `/mk-<name>` |
+| Command-like, explicit-only procedure (no implicit trigger) | an `mk-*` skill with `disable-model-invocation: true` | Only via explicit `/mk-<name>` |
+| Standing project-wide invariant | the kit's block in `AGENTS.md`, and this Always-Apply rule | Always in context |
+| Situational guidance (planning, security, testing, ...) | an Agent-Requested or Auto-Attached rule under `.cursor/rules/domain-*.mdc` | Model-matched by description, or auto-attached by file path |
+
+A hub skill that does not perform a procedure itself names the agent to invoke next in its
+body; Cursor has no "skill calls agent" primitive.
+
+## Discovery
+
+Invoke an agent with `/agent-name`, a skill with `/mk-<skill-name>`, and a rule that is
+not always-on with `@rule-name`. Otherwise an agent's `description`
+and a rule's `description`/`globs` are the only routing signals, so write them as triggers
+("Use when...", "use proactively..."), not generic labels.
+
+## Nesting contract
+
+An agent may spawn at most one further child level; a spawned child must never spawn a
+child of its own. Keep hub→leaf delegation to exactly one hop for this reason — a hub
+that dispatches to a leaf agent, which then tries to spawn another agent, will fail.
+
+## State ledgers
+
+Do not hand-edit `.meowkit/state/*.json` (reconcile ledgers). They are reconciler-owned
+— edit the project instead and let the next install/reconcile pass update the ledger.
+
+## Rules are advisory
+
+Everything under `.cursor/rules/` (including this file) is advisory context for the
+model — it shapes judgment, it does not enforce anything by itself. Real enforcement
+is hooks (fail-closed for security-critical checks), the sandbox, and permission
+prompts. A passing rule-read is not proof a security check ran.

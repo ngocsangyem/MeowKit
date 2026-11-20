@@ -1,4 +1,4 @@
-// Cursor guards, replayed from kit/bundles/cursor/root/.cursor/hooks.json: read, shell, MCP
+// Cursor guards, replayed from kit/overlays/cursor/files/.cursor/hooks.json: read, shell, MCP
 // and tool gates with the kill switch off and on, the ship check, and a project carrying
 // both the Claude Code and Cursor kits.
 import path from "node:path";

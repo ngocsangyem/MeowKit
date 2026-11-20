@@ -46,9 +46,7 @@ describe("ship set completeness", () => {
 			".claude/skills/jira-lifecycle/references/workflow-cache-layout.md",
 		]) {
 			expect(shipped).toContain(template);
-			// One copy inside the kit tree. The hand-authored provider bundles under
-			// `kit/bundles/` carry their own mirrors by design
-			// and are not kit content, so they are outside this claim.
+			// One copy inside the kit tree; other runtimes get theirs by projection.
 			const name = template.split("/").pop();
 			expect(tracked.filter((path) => path.startsWith(".claude/") && path.endsWith(`/${name}`))).toEqual([template]);
 		}

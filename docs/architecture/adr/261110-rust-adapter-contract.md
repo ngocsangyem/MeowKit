@@ -47,6 +47,12 @@ trait Emitter: Sync {
 puts removal on the same contract as installation, so uninstall is not a second code path of
 exported per-runtime planner functions.
 
+*Amended 2026-11-19:* the trait gains `fn supports(&self, scope: ScopeKind) -> bool`, default
+`true`. A runtime that can be installed at one scope only says so here instead of the command
+layer branching on its name: `--target all` skips an emitter that does not support the
+requested scope, and the emitter's own `prepare` refuses that scope when it is named. Grok is
+the first such emitter (project scope only); Pi and OMP, added the same day, are the others.
+
 `Plan { ops, notices, dropped_hooks, narrowed_hooks, unsupported }` — owned data, no borrows,
 `Send`-able, inspectable, snapshot-testable without touching a filesystem. `Plan` and `Op` are
 defined in `mewkit-core::plan` (the executor consumes them, and `mewkit-adapters` depends on
@@ -117,8 +123,11 @@ because there is nothing to keep in sync.
 ### Registry
 
 `registry() -> &'static [&'static dyn Emitter]`, written out explicitly — no `init()`-time
-registration, no inventory macro. A test asserts exactly one emitter per `Runtime` variant, so a
-new runtime fails the suite rather than going silently missing.
+registration, no inventory macro. A test asserts that every `Runtime` variant has exactly one
+emitter or one entry in `NOT_YET_EMITTED`, so a new runtime fails the suite rather than going
+silently missing. *Amended 2026-11-19:* emitters are registered for all six `Runtime` variants (Claude Code,
+Codex, Cursor, Grok, Pi, OMP), and `NOT_YET_EMITTED` is empty. The test still holds a new
+variant to the same rule.
 
 ### Delete authority
 
@@ -138,6 +147,32 @@ records what a merge contributed to a user-owned file — `format`, container `k
 `names`, how many containers it `created`, and whether it created the file — so a strip removes
 exactly that and deletes the file only if the kit created it and it is now empty. A binary
 refuses an index whose `schema_version` exceeds its own.
+
+*Amended 2026-11-19 (maintainer decision): files owned by several installs.* Codex, Pi and OMP
+all read skills from `.agents/skills`, so each of their emitters installs one `.agents/` tree
+(`mewkit-adapters::agents_tree`): skills, and under `.agents/meowkit/` helper scripts, rubrics,
+agent prompts and one guard script. Alone, a runtime writes its own wording; with two or more
+of the three in a project, each writes the same neutral wording byte for byte, and an
+installed sharer is planned again (first, by `init`) when a newcomer arrives. The schema is
+unchanged; what changes is how a path can sit in several indexes:
+
+- The executor records a `WriteFile` whose target already holds the plan's bytes as owned,
+  without rewriting it (the bytes match, so no backup or pre-image is needed). Each sharer's
+  index therefore lists the file with the same hash.
+- `uninstall` of one runtime drops a `RemoveFile` for a path a staying install's index also
+  lists: the file stays, and only the leaving index loses the entry (a notice counts the
+  files kept). The `meowkit` block in `AGENTS.md` was already handled this way.
+- `uninstall` then plans each staying sharer again for the set that remains, so its files
+  return to the wording it would have been installed with alone and its index matches them.
+  This needs the kit that install came from; when it is not available the files keep the
+  shared wording and a notice names `mewkit upgrade --target <runtime>`.
+
+The delete rule above is untouched: a file leaves only as **clean**, and only with the last
+index that lists it. Cost: a second sharer
+arriving rewrites the first one's files in the neutral wording, and a sharer's own wording
+comes back on removal only if its kit is still at hand. `init codex` → `init omp` →
+`uninstall omp` leaving the tree of a fresh `init codex` is a test in
+`crates/mewkit-cli/tests/lifecycle.rs`.
 
 Classification mirrors the npm CLI's classes: **clean** (bytes match the recorded hash **and**
 the kit's bytes — the only deletable class), **modified**, **missing**, **orphan**, **protected**
@@ -218,7 +253,18 @@ agent, so there is no consumer. Adding them is Ask-first.
   the authored bundle (`packages/mewkit/src/migrate/modules/cursor/root`), shipped in the kit at
   that path. It writes nothing at the project's `AGENTS.md` (left to the user and to the Codex
   install): the bundle's `AGENTS.md` becomes the always-applied rule
-  `.cursor/rules/meowkit-core.mdc`. `.cursor/hooks.json` is merged flat, and every handler on an
+  `.cursor/rules/meowkit-core.mdc`. *Amended 2026-11-18 (maintainer decision):* the
+  `AGENTS.md` part of this is replaced. The always-on text for every runtime that reads the
+  project's `AGENTS.md` is one authored file, `kit/overlays/shared/AGENTS.md`; the Codex and
+  Cursor emitters both merge it as the marked block `meowkit` in the project's `AGENTS.md`
+  (project scope only for Cursor; a global Cursor install writes neither; the Grok, Pi and
+  OMP emitters, added 2026-11-19, merge the same block), and Cursor no
+  longer installs `meowkit-core.mdc` — `.cursor/rules/runtime-invariants.mdc` keeps only
+  Cursor-only text. Why: one block is read once by every runtime that reads `AGENTS.md`,
+  instead of two per-runtime texts drifting apart, and skills cite `AGENTS.md (<section>)`
+  while Cursor's own text had no such headings. Uninstalling one runtime leaves the block
+  while another installed runtime still records it. Claude Code is unchanged: it keeps
+  `.claude/rules/`. `.cursor/hooks.json` is merged flat, and every handler on an
   event that can deny (`preToolUse`, `subagentStart`, `before*`) is installed with
   `failClosed: true`, overriding the bundle where it says `false`: a crashed gate must block.
   Agents keep only the five frontmatter keys Cursor documents; a rule whose frontmatter yields

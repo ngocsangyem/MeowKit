@@ -48,6 +48,7 @@ pub fn request<'a>(
         disabled,
         fresh: false,
         other_scope: None,
+        placement: None,
     }
 }
 
@@ -208,11 +209,7 @@ const ARCHIVE_ROOTS: &[&str] = &[
     ".meowkit/harness-inventory.json",
     ".meowkit/mcp.json.example",
     ".meowkit/pack-manifest.json",
-    "kit/bundles/cursor/catalog/mcp-profiles.json",
-    "kit/bundles/codex/root",
-    "kit/bundles/codex/catalog/skill-packs.json",
-    "kit/bundles/cursor/root",
-    "kit/bundles/cursor/catalog/skill-packs.json",
+    "kit/overlays",
 ];
 
 fn build_kit() -> PathBuf {

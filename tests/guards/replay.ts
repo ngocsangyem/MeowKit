@@ -20,8 +20,8 @@ export const REPO_ROOT = path.resolve(__dirname, "../..");
 /** Where each runtime's hook tree comes from, and the file that registers its hooks. */
 const SOURCES: Record<Runtime, { tree: string; dest: string; registration: string; extra: string[] }> = {
 	"claude-code": { tree: ".claude/hooks", dest: ".claude/hooks", registration: ".claude/settings.json", extra: [".claude/settings.json"] },
-	codex: { tree: "kit/bundles/codex/root/.codex", dest: ".codex", registration: ".codex/hooks.json", extra: [] },
-	cursor: { tree: "kit/bundles/cursor/root/.cursor", dest: ".cursor", registration: ".cursor/hooks.json", extra: [] },
+	codex: { tree: "kit/overlays/codex/files/.codex", dest: ".codex", registration: ".codex/hooks.json", extra: [] },
+	cursor: { tree: "kit/overlays/cursor/files/.cursor", dest: ".cursor", registration: ".cursor/hooks.json", extra: [] },
 };
 
 export interface Hook {

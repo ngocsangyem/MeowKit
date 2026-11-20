@@ -40,7 +40,7 @@ ALWAYS:
 
   2. Display findings to user
 
-  3. AskUserQuestion:
+  3. Ask the user:
      IF critical_count > 0:
        - "Fix critical issues"
        - "Fix all issues"

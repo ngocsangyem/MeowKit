@@ -26,7 +26,7 @@ hooks cannot invoke the Agent tool (verified).
 | Skill                          | Fire point                                                 | Mode        |
 | ------------------------------ | ---------------------------------------------------------- | ----------- |
 | `mk:cook`                    | After a review verdict of PASS, before Phase 5 ship        | background  |
-| `mk:autobuild`                 | Step 5 pre-escalation (before AskUserQuestion on iter cap) | **foreground** |
+| `mk:autobuild`                 | Step 5 pre-escalation (before asking the user on iter cap) | **foreground** |
 | `mk:autobuild`                 | Step 6 final run report                                    | background  |
 | `mk:workflow-orchestrator`   | After each phase transition (post-SubagentStop)            | background  |
 | `mk:fix`                     | Complex path only, after Phase 4 verdict                   | background  |
@@ -79,7 +79,7 @@ WHY: Orchestrator mutual exclusion also prevents duplicate PM reports.
 Step 5 pre-escalation is the ONLY foreground PM invocation.
 
 Rationale: when `mk:autobuild` iteration cap is reached, the user is
-about to decide ship vs abort via AskUserQuestion. Current delivery
+about to be asked to ship or abort. Current delivery
 state must surface BEFORE the question, not after.
 
 All other fires are background — PM is a reporter, not a blocker.

@@ -2,10 +2,7 @@
 
 1. **Output detection result** with agent, model, and complexity
 2. **Load agent instructions** from `.claude/agents/[agent-name].md`
-3. **Use detected model** when spawning Agent tool:
-   ```
-   Agent(subagent_type="[agent]", model="[detected-model]", ...)
-   ```
+3. **Use the detected model** when delegating to the agent, where the runtime lets a delegation name one; elsewhere the agent's own file pins its model.
 4. **Invoke appropriate skill:**
    - Complex feature → `mk:workflow-orchestrator` or `mk:cook`
    - Bug fix → `mk:fix`
@@ -53,6 +50,6 @@ User: "Use only tester for this task"
 
 ---
 
-**Agent routing:** `references/agent-routing.md` (canonical agent table) and `.claude/agents/orchestrator.md` (orchestrator agent definition). **Skill dispatch:** `references/skill-domain-routing.md`.
+**Agent routing:** `references/agent-routing.md` (canonical agent table), which the orchestrator agent applies where the runtime loads one. **Skill dispatch:** `references/skill-domain-routing.md`.
 
 **MANDATORY:** Always show agent banner at start of EVERY response.

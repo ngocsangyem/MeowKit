@@ -3,31 +3,41 @@ title: "Portability"
 description: "Install MeowKit for Codex or Cursor, keep those installs current, and see what each tool supports."
 ---
 
-MeowKit is authored for Claude Code. Codex and Cursor each get a maintained bundle that is written by hand for that tool. You install a bundle with `mewkit init --target`. The `.claude/` kit is not converted.
+MeowKit is authored for Claude Code. The `.claude/` tree is the one authored copy of the kit. Codex, Cursor, Grok, Pi and OMP each get the files they read, projected from that tree plus a small overlay for the runtime's hooks and config. You install a runtime with `mewkit init --target`.
 
-## Install for Codex or Cursor
+## Install for another runtime
 
 ```bash
 mewkit init --target codex
 mewkit init --target cursor
+mewkit init --target grok
+mewkit init --target pi
+mewkit init --target omp
 ```
 
-`--target` skips the toolkit picker and creates one toolkit. Each bundle is a set of files for that tool, plus `AGENTS.md`, which both tools read as the project instruction file.
+`--target` skips the toolkit picker and creates the runtimes you name. Each install writes the runtime's skills, agents, always-on text and hooks, plus `AGENTS.md` where the runtime reads it.
 
-| Tool | What the bundle installs |
+| Runtime | What the install writes |
 | --- | --- |
-| Codex | `AGENTS.md`, agents as `.codex/agents/*.toml`, skills as `.agents/skills/*/SKILL.md`, hooks in `.codex/hooks.json`, and `.codex/config.toml` |
+| Codex | `AGENTS.md`, agents as `.codex/agents/*.toml`, skills under `.agents/skills/`, hooks in `.codex/hooks.json`, and `.codex/config.toml` |
 | Cursor | `AGENTS.md`, agents as `.cursor/agents/*.md`, skills under `.cursor/skills/`, rules as `.cursor/rules/*.mdc`, and hooks in `.cursor/hooks.json` |
+| Grok | Skills under `.grok/skills/`, the hook file `.grok/hooks/meowkit.json` with its helpers under `.grok/meowkit/`, and `AGENTS.md` |
+| Pi | Skills under `.agents/skills/`, one extension `.pi/extensions/meowkit.ts`, and `AGENTS.md` |
+| OMP | Skills under `.agents/skills/`, agents as `.omp/agents/*.md`, the hook module `.omp/hooks/pre/meowkit.ts`, and `AGENTS.md` |
 
-A `--target` install does not need a `.claude/` directory. Cursor also accepts `--mcp-profiles <name>` to merge MCP profiles into `.cursor/mcp.json`. Applying a profile to a repository with a git remote also needs `--allow-cloud-mcp`.
+Codex, Pi and OMP read the same `.agents/skills/` folder. When more than one of them is installed, they all get the same runtime-neutral skill text there. Alone, each gets its own invocation form: Codex calls a skill as `$mk-x`, and Pi and OMP as `/skill:mk-x`.
+
+Grok, Pi and OMP install into a project only. `--global` covers Claude Code, Codex and Cursor. A `--target` install does not need a `.claude/` directory. Cursor also accepts `--mcp-profiles <name>` to merge MCP profiles into `.cursor/mcp.json`. Applying a profile to a repository with a git remote also needs `--allow-cloud-mcp`.
 
 `--dry-run` prints what would be written without writing it.
 
 ## Keep an install current
 
-`mewkit upgrade` refreshes each installed bundle from the ledger that the install wrote. If the project also has `.claude/`, the upgrade updates that too, so the installs move together.
+`mewkit upgrade` refreshes each installed runtime from the ledger that its install wrote. If the project also has `.claude/`, the upgrade updates that too, so the installs move together.
 
-Some projects still carry a `.cursor/` or `.codex/` directory from the retired `migrate` command. Those directories have no ledger. `upgrade` leaves them alone and prints a notice. To switch to the maintained bundle, run:
+Adding or removing a runtime with `init` or `uninstall` re-plans the runtimes already installed whose files depend on the set. Adding a runtime and then removing it leaves the same tree as a fresh install of the runtimes that stay.
+
+Some projects still carry a `.cursor/` or `.codex/` directory from the retired `migrate` command. Those directories have no ledger. `upgrade` leaves them alone and prints a notice. To switch to the projected install, run:
 
 ```bash
 mewkit init --target cursor    # or: mewkit init --target codex
@@ -35,21 +45,26 @@ mewkit init --target cursor    # or: mewkit init --target codex
 
 ## Legacy memory
 
-Neither bundle imports the memory store that older releases kept under `.claude/`. If you still need content from it, copy the parts you need into `.meowkit/memory/`.
+No runtime install imports the memory store that older releases kept under `.claude/`. If you still need content from it, copy the parts you need into `.meowkit/memory/`.
 
 ## What each tool supports
 
-The table shows what each bundle ships. ✓ included · — not included.
+The table shows what each runtime's install writes. ✓ included · — not included.
 
 | Tool | Agents | Skills | Rules | Hooks | Config |
 | --- | :---: | :---: | :---: | :---: | :---: |
-| Cursor | ✓ | ✓ | ✓ | ✓ | MCP profiles |
 | Codex | ✓ | ✓ | `AGENTS.md` | ✓ | ✓ |
+| Cursor | ✓ | ✓ | ✓ | ✓ | MCP profiles |
+| Grok | — | ✓ | `AGENTS.md` | ✓ | — |
+| Pi | — | ✓ | `AGENTS.md` | ✓ | — |
+| OMP | ✓ | ✓ | `AGENTS.md` | ✓ | — |
 
 **Notes:**
 
-- The bundles ship the toolkit's own agents, skills and hooks. Your custom agents, commands and hooks in `.claude/` are not converted. Port them by hand.
-- Codex agents are written as TOML. Each agent file sets `model_reasoning_effort`, and leaves `model` unset because Codex model ids depend on the deployment. Pin a model by editing the agent file or through a Codex config profile.
+- The installs ship the kit's own agents, skills and hooks. Your custom agents, commands and hooks in `.claude/` are not projected. Port them by hand.
+- Codex agents are written as TOML and each pins a model by its tier. Change a pin by editing the agent file or through a Codex config profile.
+- Grok documents no file format for agents, so the kit writes none. Pi has no subagents, so it has no agents either.
+- Grok and Pi load project hooks only after the project is trusted: `/hooks-trust` or a start with `--trust` for Grok, `/trust` for Pi. OMP has no trust step. The [enforcement matrix](https://github.com/ngocsangyem/MeowKit/blob/main/docs/core/enforcement-matrix.md) lists what each runtime enforces. The Grok, Pi and OMP entries have not yet been run in a live session.
 
 ## providers
 

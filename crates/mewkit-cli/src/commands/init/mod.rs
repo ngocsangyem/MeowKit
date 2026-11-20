@@ -5,13 +5,13 @@ mod mcp;
 
 use clap::Args;
 use mewkit_adapters::claude_code::plugin_manifest;
-use mewkit_adapters::contract::{OwnershipIndex, Runtime, written_hashes};
+use mewkit_adapters::contract::{OwnershipIndex, Runtime, ScopeKind, written_hashes};
 use mewkit_core::exec::ExecOptions;
 
 use self::choose::Delivery;
 use super::{
-    Common, Job, drop_retired, emitter_for, parse_targets, prepare, run_jobs, stamp,
-    unconfirmed_force,
+    Common, Job, depends_on, drop_retired, emitter_for, parse_targets_at, prepare_among, run_jobs,
+    stamp, unconfirmed_force,
 };
 use crate::adopt;
 use crate::failure::{FAILED, Failure};
@@ -21,7 +21,7 @@ use crate::place::Place;
 
 #[derive(Args, Debug)]
 pub struct InitArgs {
-    /// Runtimes to install for: claude-code, codex, cursor (comma-separated)
+    /// Runtimes to install for: claude-code, codex, cursor, grok, pi, omp (comma-separated)
     /// or all. Omitted: Claude Code with --yes or in a project that has
     /// `.claude/`, otherwise a picker.
     #[arg(long, value_name = "TARGETS")]
@@ -32,7 +32,7 @@ pub struct InitArgs {
     /// edited it.
     #[arg(long, value_name = "PROFILE")]
     pub profile: Option<String>,
-    /// Codex and Cursor: comma-separated skill packs, or `all`. Omitted
+    /// Every runtime but Claude Code: comma-separated skill packs, or `all`. Omitted
     /// installs every skill; an empty value installs the default pack only.
     #[arg(long, value_name = "PACKS")]
     pub skill_packs: Option<String>,
@@ -69,7 +69,12 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
     let named = if args.target.is_empty() {
         Vec::new()
     } else {
-        parse_targets(&args.target)?
+        let scope = if args.common.global {
+            ScopeKind::Global
+        } else {
+            ScopeKind::Project
+        };
+        parse_targets_at(&args.target, Some(scope))?
     };
     // Checked first so a refused combination writes (and fetches) nothing.
     let for_delivery = if named.is_empty() {
@@ -120,10 +125,27 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
     let skill_packs = choose::skill_packs(args.skill_packs.as_deref());
     let mut mcp_notes = Vec::new();
 
+    // Codex, Pi and OMP write one `.agents/` tree between them, in wording
+    // that depends on which of them are here. One that is installed already is
+    // planned again, first, so its files are in the wording the newcomer writes.
+    let rejoining = depends_on(&targets, &place.installed()?, place.scope.kind);
+    for runtime in &rejoining {
+        eprintln!(
+            "note: {} is installed here and what it installs depends on the runtimes beside it, so it is planned again for the new set",
+            runtime.name()
+        );
+    }
+    let order: Vec<Runtime> = rejoining.iter().chain(&targets).copied().collect();
+
     let mut jobs = Vec::new();
-    for runtime in targets {
+    for &runtime in &order {
         let e = emitter_for(runtime)?;
         let (packs, trims) = match runtime {
+            // As it was installed: this run's flags are for the runtimes it names.
+            _ if rejoining.contains(&runtime) => {
+                let packs = place.index(runtime)?.map(|i| i.packs).unwrap_or_default();
+                (packs, false)
+            }
             Runtime::ClaudeCode => {
                 let (packs, notice) =
                     choose::profile_packs(&kit, profile.as_deref()).map_err(Failure::failed)?;
@@ -133,7 +155,7 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
             }
             _ => (skill_packs.clone(), false),
         };
-        let mut plan = prepare(&place, e, &kit, &packs)?;
+        let mut plan = prepare_among(&place, e, &kit, &packs, &targets)?;
         if runtime == Runtime::ClaudeCode && delivery == Delivery::Plugin {
             plan.ops.push(plugin_manifest(&kit.version)?);
         }

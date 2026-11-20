@@ -7,7 +7,7 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 
 use mewkit_adapters::contract::{Format, Kit, Op, RelPath};
-use mewkit_adapters::cursor::BUNDLE;
+use mewkit_adapters::cursor::SOURCE;
 use mewkit_core::mcp_profiles::{self, Catalog, Selection};
 
 use crate::prompt::{Ask, Choice, Flag, PromptError, default_prompt};
@@ -51,8 +51,8 @@ pub fn plan(kit: &Kit, root: &Path, req: &Request<'_>) -> Outcome {
         }
         return out;
     }
-    let bundle = BUNDLE.base(&kit.dir);
-    let catalog = match mcp_profiles::load(&bundle) {
+    let overlay = kit.dir.join(SOURCE.overlay);
+    let catalog = match mcp_profiles::load(&overlay) {
         Ok(c) => c,
         Err(e) => {
             out.notes.push(skipped(&e));
@@ -68,9 +68,8 @@ pub fn plan(kit: &Kit, root: &Path, req: &Request<'_>) -> Outcome {
         return out;
     }
     let Some(catalog) = catalog else {
-        out.notes.push(skipped(
-            "no mcp-profiles.json catalog shipped in this bundle",
-        ));
+        out.notes
+            .push(skipped("no mcp-profiles.json catalog shipped in this kit"));
         return out;
     };
     let chosen = match catalog.resolve(&selection) {

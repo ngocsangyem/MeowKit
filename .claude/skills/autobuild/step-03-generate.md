@@ -31,7 +31,7 @@ The iteration counter lives in the run report frontmatter, NOT in session memory
 
 ```
 Agent(
-  subagent_type="developer",
+  agent="developer",
   description="Generator iteration $iteration for $slug",
   prompt="
     Read your agent constitution at .claude/agents/developer.md.
@@ -103,10 +103,11 @@ The autobuild workflow does not have native access to per-call token costs. The 
 
 ```bash
 # Estimate: wall-clock seconds × per-second tier rate.
-# Tier rates (USD/min, approximate Anthropic 2026 list pricing):
-#   TRIVIAL (Haiku): 0.10
-#   STANDARD (Sonnet): 0.50
-#   COMPLEX (Opus): 1.20
+# Tier rates (USD/min, rough per-tier placeholders — replace with your
+# provider's actual list pricing for the model backing each tier):
+#   TRIVIAL: 0.10
+#   STANDARD: 0.50
+#   COMPLEX: 1.20
 # Default to 0.00 if elapsed_seconds is undefined.
 elapsed_seconds="${step_elapsed_seconds:-0}"
 case "$tier" in

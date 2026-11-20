@@ -48,16 +48,19 @@ From the project directory:
 mewkit init
 ```
 
-Without flags, `init` asks which runtimes to set up: Claude Code, Codex and Cursor. Claude Code is preselected. Codex and Cursor each get their own authored bundle. Nothing is converted from `.claude/`, and a Codex-only or Cursor-only project does not need `.claude/`. In a project that already has `.claude/`, `init` refreshes it and skips the picker.
+Without flags, `init` asks which runtimes to set up. The choices are Claude Code, Codex, Cursor, Grok, Pi and OMP; tick one or more. Each runtime gets the files it reads. Those files are projected from the one authored tree in `.claude/`, plus a small overlay for that runtime's hooks and config, so no runtime keeps a hand-written copy of the kit. An install for a runtime other than Claude Code does not write `.claude/`. In a project that already has `.claude/`, `init` refreshes it and skips the picker.
 
 ### Flags
 
 | Command | Effect |
 |---------|--------|
 | `mewkit init --target claude-code` | Claude Code only, no picker |
-| `mewkit init --target codex` | Codex bundle only |
-| `mewkit init --target cursor` | Cursor bundle only |
-| `mewkit init --target all` | All three runtimes |
+| `mewkit init --target codex` | Codex only |
+| `mewkit init --target cursor` | Cursor only |
+| `mewkit init --target grok` | Grok only (project scope) |
+| `mewkit init --target pi` | Pi only (project scope) |
+| `mewkit init --target omp` | OMP only (project scope) |
+| `mewkit init --target all` | All six runtimes at project scope. With `--global`, Claude Code, Codex and Cursor |
 | `mewkit init --profile core` | Claude Code: install a subset (`core`, `developer`, `product`, `atlassian`, `security`, `research`, `full`) |
 | `mewkit init --yes` | Take every default and ask nothing |
 | `mewkit init --dry-run` | Show what would change and change nothing |
@@ -78,7 +81,7 @@ mewkit init --target claude-code --delivery plugin  # plus .claude-plugin/plugin
 
 Both deliveries carry the same content. `plugin` adds the manifest Claude Code reads to load the kit as a plugin. MeowKit is not published to a plugin marketplace.
 
-`--delivery` applies to `claude-code` only. Codex and Cursor each have one shape, so passing `--delivery` with either is refused.
+`--delivery` applies to `claude-code` only. Codex, Cursor, Grok, Pi and OMP each have one shape, so `--delivery` is refused when Claude Code is not among the runtimes being installed.
 
 ### Install from a downloaded zip
 

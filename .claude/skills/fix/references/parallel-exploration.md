@@ -7,9 +7,9 @@ Patterns for launching multiple subagents in parallel.
 Launch multiple Explore subagents when needing to find related files across areas:
 
 ```
-Agent(subagent_type="Explore", prompt="Find auth files in src/", description="Scout auth")
-Agent(subagent_type="Explore", prompt="Find API routes for users", description="Scout API")
-Agent(subagent_type="Explore", prompt="Find test files for auth", description="Scout tests")
+read-only search subagent: "Find auth files in src/"
+read-only search subagent: "Find API routes for users"
+read-only search subagent: "Find test files for auth"
 ```
 
 Spawn ALL in a single message for parallel execution.
@@ -19,9 +19,9 @@ Spawn ALL in a single message for parallel execution.
 Launch multiple Bash subagents to verify implementation:
 
 ```
-Agent(subagent_type="Bash", prompt="Run typecheck", description="Verify types")
-Agent(subagent_type="Bash", prompt="Run lint", description="Verify lint")
-Agent(subagent_type="Bash", prompt="Run build", description="Verify build")
+subagent: "Run typecheck"
+subagent: "Run lint"
+subagent: "Run build"
 ```
 
 ## When to Use Parallel

@@ -16,10 +16,20 @@ pub enum Runtime {
     ClaudeCode,
     Codex,
     Cursor,
+    Grok,
+    Pi,
+    Omp,
 }
 
 impl Runtime {
-    pub const ALL: [Runtime; 3] = [Runtime::ClaudeCode, Runtime::Codex, Runtime::Cursor];
+    pub const ALL: [Runtime; 6] = [
+        Runtime::ClaudeCode,
+        Runtime::Codex,
+        Runtime::Cursor,
+        Runtime::Grok,
+        Runtime::Pi,
+        Runtime::Omp,
+    ];
 
     /// The `--target` name.
     pub fn name(self) -> &'static str {
@@ -27,6 +37,9 @@ impl Runtime {
             Runtime::ClaudeCode => "claude-code",
             Runtime::Codex => "codex",
             Runtime::Cursor => "cursor",
+            Runtime::Grok => "grok",
+            Runtime::Pi => "pi",
+            Runtime::Omp => "omp",
         }
     }
 
@@ -65,6 +78,9 @@ pub struct EmitRequest<'a> {
     pub fresh: bool,
     /// This runtime's ownership index at the other scope, if it has one.
     pub other_scope: Option<&'a OwnershipIndex>,
+    /// Where each kind of content goes for the runtimes sharing this project,
+    /// or `None` at global scope, which the surface table does not cover.
+    pub placement: Option<&'a crate::placement_resolver::Placement>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -95,6 +111,11 @@ pub fn written_hashes(plan: &Plan) -> std::collections::BTreeMap<String, String>
 
 pub trait Emitter: Sync {
     fn target(&self) -> Runtime;
+    /// Whether this runtime can be installed at `scope`. Most install into a
+    /// project and into the home directory.
+    fn supports(&self, _scope: ScopeKind) -> bool {
+        true
+    }
     /// The only paths this emitter's plans may touch, relative to the scope root.
     /// On the emitter, not the plan, so uninstall and doctor can ask too.
     fn roots(&self, scope: &Scope) -> Vec<RelPath>;

@@ -1,8 +1,8 @@
 # Mode Selection
 
-Use `AskUserQuestion` at start of fixing workflow.
+Ask the user at start of fixing workflow.
 
-## AskUserQuestion Format
+## User Question Format
 
 ```json
 {

@@ -1,7 +1,6 @@
 //! `mewkit versions`: which kits are installed, cached and available,
 //! and which kit contract this binary accepts.
 use clap::Args;
-use mewkit_adapters::contract::Runtime;
 use mewkit_core::kit::http::UreqHttp;
 use mewkit_core::kit::{self, contract};
 use serde_json::{Value, json};
@@ -31,7 +30,7 @@ pub fn run(args: &VersionsArgs) -> Result<u8, Failure> {
     let mut notes = Vec::new();
     // Installs at both scopes: the other one is shown when it resolves.
     for p in std::iter::once(Place::new(args.global)?).chain(place.other()) {
-        for r in Runtime::ALL {
+        for r in mewkit_adapters::registry::emitted() {
             let index = match p.index(r) {
                 Ok(i) => i,
                 Err(e) => {

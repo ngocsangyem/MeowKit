@@ -1,5 +1,5 @@
 {
-  "kitContract": 1,
+  "kitContract": 2,
   "requires": {
     "mewkitMin": "0.1.0"
   },

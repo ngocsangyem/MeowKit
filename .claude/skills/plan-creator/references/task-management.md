@@ -13,18 +13,18 @@
 
 ## Plan → Task Bridge
 
-Plans are persistent files; session tasks are scoped to the current session — they vanish when the session ends. Hydration bridges the two: read each `[ ]` from phase files, emit one `TaskCreate` per unchecked item. Sync-back closes the loop on completion: `[ ]` → `[x]` and frontmatter status update.
+Plans are persistent files; session tasks are scoped to the current session — they vanish when the session ends. Hydration bridges the two: read each `[ ]` from phase files, create one tracked task per unchecked item. Sync-back closes the loop on completion: `[ ]` → `[x]` and frontmatter status update.
 
-**Tool availability:** `TaskCreate` / `TaskUpdate` / `TaskGet` / `TaskList` are CLI-only — they may be unavailable in non-TTY agentic host environments (e.g., GUI editor extensions). If these tools error, fall back to `TodoWrite`. Plan files remain the source of truth; hydration is an optimization, not a requirement.
+**Tool availability:** tracked-task creation/update/list/get may be CLI-only — unavailable in some non-TTY agentic host environments (e.g., GUI editor extensions). If unavailable, fall back to a plain to-do list. Plan files remain the source of truth; hydration is an optimization, not a requirement.
 
 ## Hydration Rules
-- Create TaskCreate per phase with `addBlockedBy` chain
+- Create one tracked task per phase, each blocked-by its predecessor
 - Skip if < 3 phases (overhead exceeds benefit)
 - Each task: subject, description, phase metadata
 
 ### Hydration Pattern Details
 
-**Metadata Template** — every `TaskCreate` MUST include these 5 fields:
+**Metadata Template** — every created task MUST include these 5 fields:
 
 ```
 metadata: {
@@ -39,10 +39,10 @@ metadata: {
 **Critical-Step Sub-Tasks** — scan each phase's `## Todo List` for items prefixed `[CRITICAL]` or `[HIGH]`. Per match, create a sub-task:
 
 ```
-TaskCreate:
+task:
   subject: "Phase {N} — {step description}"
   metadata: { step: true, critical: true, riskLevel: "high", phaseFile: "..." }
-  addBlockedBy: [parent phase task ID]
+  blockedBy: [parent phase task ID]
 ```
 
 Only marked items become sub-tasks. Most todos stay at phase level.
@@ -61,7 +61,7 @@ After hydration completes, run three checks. Any failure is a hard STOP — do N
 
 1. **Cycle check** — walk every task's `addBlockedBy` chain; assert no node reaches itself. Cycles indicate malformed dependency declarations (e.g., Phase X declares Y as a dep AND Phase Y declares X).
 2. **Count-match check** — sum of unchecked `[ ]` items across all `phase-XX-*.md` files MUST equal the number of session tasks created (phase tasks + critical-step sub-tasks). Drift indicates a phase file changed between scaffolding and hydration, or a `[CRITICAL]` token was added without a sub-task.
-3. **Metadata-completeness check** — every `TaskCreate` call has all 5 required fields (`phase`, `priority`, `effort`, `planDir`, `phaseFile`). Missing fields break cross-session resume.
+3. **Metadata-completeness check** — every created task has all 5 required fields (`phase`, `priority`, `effort`, `planDir`, `phaseFile`). Missing fields break cross-session resume.
 
 **Success log (on all-pass):**
 
@@ -73,7 +73,7 @@ After hydration completes, run three checks. Any failure is a hard STOP — do N
 
 ```
 ✗ Integrity check failed: expected N tasks, found M
-   Missing: phase-XX-foo.md (or specific TaskCreate call missing field "phaseFile")
+   Missing: phase-XX-foo.md (or a specific created task missing field "phaseFile")
    Required: human resolution before proceeding.
 ```
 
@@ -86,7 +86,7 @@ New session → read plan.md → check `[ ]` items → re-hydrate unchecked item
 Already `[x]` items → skip.
 
 ## Sync-Back (on completion)
-1. Mark session tasks complete via `TaskUpdate`
+1. Mark session tasks complete
 2. Update phase files: `[ ]` → `[x]` for completed items
 3. Update plan.md status table
 4. If every non-abandoned phase todo is checked and at least one todo exists, archive the plan with `mewkit plan archive {plan-dir}` (stamps `status: completed` across plan.md + phase files + `.plan-state.json`, then moves the directory to `tasks/plans/archive/{plan-name}/`)
