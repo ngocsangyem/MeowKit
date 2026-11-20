@@ -4,9 +4,9 @@ useReveal()
 
 const siteUrl = 'https://meowkit.dev'
 // nuxt-seo-utils auto-appends "| MeowKit" — keep this title without the brand prefix
-const title = 'Enforced Discipline for AI Coding Agents'
-const ogTitle = 'MeowKit — Enforced Discipline for AI Coding Agents'
-const description = 'Hard gates, TDD, security scanning, and human approval — so your AI agent ships production-quality code, not untested prototypes.'
+const title = 'A Workflow Kit for AI Coding Agents'
+const ogTitle = 'MeowKit: A Workflow Kit for AI Coding Agents'
+const description = 'A kit of agents, skills, rules and hooks for AI coding agents. It installs on six runtimes, writes plans and review verdicts you read, and refuses a commit when lint, related tests or the type-check fail.'
 
 // Core SEO meta — nuxt-seo-utils propagates site defaults from nuxt.config
 useSeoMeta({
@@ -20,7 +20,7 @@ useSeoMeta({
   ogImage: `${siteUrl}/meow-og.png`,
   ogImageWidth: 1200,
   ogImageHeight: 630,
-  ogImageAlt: 'MeowKit — Enforced Discipline for AI Coding Agents',
+  ogImageAlt: 'MeowKit: A Workflow Kit for AI Coding Agents',
   twitterCard: 'summary_large_image',
   twitterTitle: ogTitle,
   twitterDescription: description,
@@ -63,12 +63,14 @@ useHead({
             license: 'https://opensource.org/licenses/MIT',
             datePublished: '2025-01-01',
             dateModified: new Date().toISOString().split('T')[0],
-            keywords: 'AI coding agent, TDD, security, Claude Code, developer tools, harness, workflow',
+            keywords: 'AI coding agent, Claude Code, Codex, Cursor, Grok, Pi, OMP, developer tools, workflow',
             featureList: [
-              'Two-gate approval workflow',
-              'TDD enforcement',
-              '4-layer security scanning',
-              '129 skills, 42 agents',
+              'Seven-phase workflow: plan, build, verify, review, ship',
+              'Ship check: lint, related tests and type-check before a commit',
+              'Credential-file guard',
+              'Opt-in TDD',
+              'Installs on six runtimes',
+              '127 skills, 42 agents',
               'MIT licensed',
             ],
           },
@@ -81,7 +83,7 @@ useHead({
                 name: 'What is MeowKit?',
                 acceptedAnswer: {
                   '@type': 'Answer',
-                  text: 'MeowKit is an AI agent toolkit for Claude Code. It installs a .claude/ directory that enforces a structured 7-phase workflow with hard gates, TDD, security scanning, and human approval — so your AI agent ships production-quality code, not untested prototypes.',
+                  text: 'MeowKit is a kit of agents, skills, rules and hooks for AI coding agents. One authored kit installs on Claude Code, Codex, Cursor, Grok, Pi and OMP with mewkit init. It gives the agent a seven-phase workflow, and one hook refuses a commit or push when lint, the related tests or the type-check fail.',
                 },
               },
               {
@@ -89,15 +91,15 @@ useHead({
                 name: 'How does the 7-phase workflow work?',
                 acceptedAnswer: {
                   '@type': 'Answer',
-                  text: 'Every task follows the same enforced sequence: Orient → Plan [Gate 1] → Test → Build → Review [Gate 2] → Ship → Reflect. Two hard gates block shipping unreviewed or untested code — no bypasses, no self-approval.',
+                  text: 'Every task follows the same sequence: Orient, Plan, Test, Build (with Simplify and Verify), Review, Ship, Reflect. For a non-trivial task the agent writes a plan and agrees it with you before building, and the reviewer writes a verdict across five dimensions. Both are practices; no hook blocks an edit or a commit on a missing plan or verdict.',
                 },
               },
               {
                 '@type': 'Question',
-                name: 'What are the two hard gates?',
+                name: 'What does MeowKit enforce?',
                 acceptedAnswer: {
                   '@type': 'Answer',
-                  text: 'Gate 1 requires an approved plan before any code is written. Gate 2 requires a passing review verdict before shipping. Both must be cleared by a human — AI agents cannot self-approve.',
+                  text: 'One check is enforced by a hook: the ship check. On git commit, git push, git merge and gh pr create or merge, it runs lint on the changed files, the tests related to them and a type-check, and refuses the command when one fails. A credential guard also blocks reads of .env, key and credential files. Test results, review verdicts and advice are evidence for you to read; none of them approves anything.',
                 },
               },
               {
@@ -110,10 +112,10 @@ useHead({
               },
               {
                 '@type': 'Question',
-                name: 'What is the 4-layer security scanning in MeowKit?',
+                name: 'How does MeowKit handle security?',
                 acceptedAnswer: {
                   '@type': 'Answer',
-                  text: 'MeowKit enforces prompt injection defense across input, instruction, context, and output layers. Untrusted content is treated as data — never instructions. It also blocks hardcoded secrets, SQL injection patterns, and other OWASP Top 10 vulnerabilities.',
+                  text: 'A credential guard blocks reads of .env, key and credential files; how far it reaches differs by runtime, and the docs list each one. The rules treat file content, tool output and memory as data and never as instructions, and tell the agent not to write hardcoded secrets or string-built SQL. Those rules are instructions to the agent, not a scanner.',
                 },
               },
             ],

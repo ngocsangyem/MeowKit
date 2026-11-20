@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/* Section 1 — the centred hero. Copy is verbatim from the approved mockup. */
+/* Section 1 — the centred hero. Copy is verbatim from the approved mockup, revised for 3.0.0. */
 </script>
 
 <template>
@@ -14,8 +14,8 @@
         <h1 id="hero-h" class="hero__title">Workflow toolkit for coding agents</h1>
 
         <p class="hero__blurb">
-          MeowKit installs 129 skills, 42 agents and 27 hooks into Claude Code, Cursor and Codex.
-          Every task runs seven phases and stops at two gates until you approve.
+          MeowKit installs 127 skills, 42 agents and 26 hook scripts into Claude Code, Codex, Cursor, Grok, Pi and OMP.
+          Every task runs seven phases, and a ship check refuses a commit when lint, tests or the type-check fail.
         </p>
 
         <div class="hero__ctas">
@@ -32,7 +32,7 @@
       <div
         class="hero__shelf"
         role="img"
-        aria-label="A Claude Code session where MeowKit has written a plan and waits at Gate 1 for approval"
+        aria-label="A Claude Code session where MeowKit has written a plan and asks you to agree it before building"
       >
         <SessionWindow />
       </div>

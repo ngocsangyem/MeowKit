@@ -1,11 +1,14 @@
 <script setup lang="ts">
-/* Feature picture 4: the three install targets around the kit.
+/* Feature picture 4: the six install targets around the kit.
  * Names are set as plain text — no third-party logo is reproduced here. */
 const CENTRE = { x: 50, y: 56 }
 const spokes = [
-  { label: 'Claude Code', x: 68, y: 18 },
-  { label: 'Codex', x: 18, y: 86 },
-  { label: 'Cursor', x: 82, y: 88 },
+  { label: 'Claude Code', x: 26, y: 14 },
+  { label: 'Codex', x: 76, y: 14 },
+  { label: 'Cursor', x: 10, y: 56 },
+  { label: 'Grok', x: 90, y: 56 },
+  { label: 'Pi', x: 26, y: 90 },
+  { label: 'OMP', x: 76, y: 90 },
 ]
 </script>
 

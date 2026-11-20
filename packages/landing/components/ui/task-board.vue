@@ -6,12 +6,12 @@ const rows: Row[] = [
   { ini: 'DV', tone: 1, who: 'developer', sub: 'Webhook rate limit · 5 files', st: 'Verified', state: 'done', age: '2m' },
   { ini: 'PL', tone: 3, who: 'planner', sub: 'Invoice export · 3 phases', st: 'Building', state: '', age: '6m' },
   { ini: 'TS', tone: 4, who: 'tester', sub: 'Session expiry · 14 tests', st: 'Planned', state: '', age: '11m' },
-  { ini: 'RV', tone: 2, who: 'reviewer', sub: 'Retry queue · Gate 2', st: 'Needs you', state: 'you', age: '18m' },
+  { ini: 'RV', tone: 2, who: 'reviewer', sub: 'Retry queue · verdict', st: 'Needs you', state: 'you', age: '18m' },
   { ini: 'SC', tone: 5, who: 'security', sub: 'Token rotation · no blocks', st: 'Verified', state: 'done', age: '24m' },
   { ini: 'SH', tone: 3, who: 'shipper', sub: 'Audit log · pull request open', st: 'Verified', state: 'done', age: '31m' },
   { ini: 'DV', tone: 1, who: 'developer', sub: 'CSV import · 2 files', st: 'Verified', state: 'done', age: '44m' },
   { ini: 'DC', tone: 4, who: 'documenter', sub: 'Changelog sync · 1 file', st: 'Verified', state: 'done', age: '52m' },
-  { ini: 'RV', tone: 2, who: 'reviewer', sub: 'Search filters · Gate 2', st: 'Verified', state: 'done', age: '1h' },
+  { ini: 'RV', tone: 2, who: 'reviewer', sub: 'Search filters · verdict', st: 'Verified', state: 'done', age: '1h' },
   { ini: 'PL', tone: 3, who: 'planner', sub: 'Billing webhooks · 4 phases', st: 'Verified', state: 'done', age: '2h' },
 ]
 
@@ -33,7 +33,7 @@ const folders = ['Plans', 'Reviews']
     <div class="tb__body">
       <nav class="tb__side">
         <span class="tb__nav is-on">Active<em>6</em></span>
-        <span class="tb__nav">Gated<em>2</em></span>
+        <span class="tb__nav">Needs you<em>2</em></span>
         <span class="tb__nav">Shipped</span>
         <span class="tb__label">Folders</span>
         <span v-for="f in folders" :key="f" class="tb__nav"><i class="tb__hash">#</i>{{ f }}</span>

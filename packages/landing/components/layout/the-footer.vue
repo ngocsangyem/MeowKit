@@ -12,7 +12,7 @@ const columns = [
   ] },
   { title: 'Docs', links: [
     { label: 'Quick start', href: 'https://docs.meowkit.dev/' },
-    { label: 'Gate rules', href: 'https://docs.meowkit.dev/' },
+    { label: 'How enforcement works', href: 'https://docs.meowkit.dev/core-concepts/enforcement' },
   ] },
   { title: 'Source', links: [
     { label: 'GitHub', href: 'https://github.com/ngocsangyem/MeowKit' },
