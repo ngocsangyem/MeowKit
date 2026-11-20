@@ -86,7 +86,7 @@ Sources 6 to 10 are skipped silently when absent. A review is blocked when `deci
 
 ## Fast paths
 
-A simple fix, typo, rename or config tweak goes to `/mk:fix`, where the scope is the plan. A task flagged `one-shot` by scale-routing needs no plan file. `MEOWKIT_HOOK_PROFILE=fast` skips non-critical hooks for rapid iteration, and `strict` enables all hooks including post-session capture. The fast profile does not turn off the ship check (`docs/core/enforcement-matrix.md`).
+A simple fix, typo, rename or config tweak goes to `/mk:fix`, where the scope is the plan. A task flagged `one-shot` by scale-routing needs no plan file. `MEOWKIT_HOOK_PROFILE=fast` skips non-critical hooks for rapid iteration, and `strict` enables all hooks including post-session capture. The fast profile does not turn off the ship check (see [Enforcement & Security](/core-concepts/enforcement)).
 
 ## Gotchas
 

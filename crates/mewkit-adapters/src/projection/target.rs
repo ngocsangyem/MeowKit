@@ -1,6 +1,5 @@
 //! Per-runtime projection settings. Every value is what that runtime's
-//! documentation or installed layout names; see
-//! `docs/maintainer/host-probe-log.md` for the rows behind them.
+//! documentation or installed layout names.
 use super::{Invocation, Target};
 
 /// Codex as the only reader of `.agents/skills`.
@@ -40,7 +39,7 @@ pub const CODEX: Target = Target {
         ),
         (".claude/hooks/lib/", ".codex/scripts/bin/"),
     ],
-    // The tier mapping in `docs/maintainer/model-pins.md`.
+    // The tier mapping in `scripts/lib/model-pins.md`.
     model_pins: &[
         ("haiku", "gpt-6-luna"),
         ("sonnet", "gpt-6.1-sol"),

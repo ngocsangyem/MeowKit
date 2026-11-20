@@ -4,6 +4,6 @@
   "stderr": "",
   "files": {
     ".claude/skills/cook/SKILL.md": "---\nname: mk:cook\ndescription: Build a feature.\n---\n\nLater docs/future-thing.md.\n",
-    "docs/maintainer/docs-reference-contract.md": "# Docs reference contract\n\n<!-- ALLOWLIST-START -->\ndocs/project-context.md\n<!-- ALLOWLIST-END -->\n\n<!-- RESERVED-START -->\ndocs/future-thing.md\n<!-- RESERVED-END -->\n"
+    "scripts/docs-reference-contract.md": "# Docs reference contract\n\n<!-- ALLOWLIST-START -->\ndocs/project-context.md\n<!-- ALLOWLIST-END -->\n\n<!-- RESERVED-START -->\ndocs/future-thing.md\n<!-- RESERVED-END -->\n"
   }
 }

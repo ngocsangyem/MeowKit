@@ -1,7 +1,7 @@
 'use strict';
 // instruction-criteria-host-rules.cjs — criteria that depend on which runtime a tree ships to:
 // host-foreign tool syntax, the skill-reference name form, agent model pins, and standing
-// re-verify or unconditional delegate lines. Criteria text: docs/maintainer/instruction-audit-criteria.md.
+// re-verify or unconditional delegate lines.
 //
 // `kind` is 'claude' for `.claude`, otherwise the runtime the tree is installed for ('codex', 'cursor', 'grok', 'pi' or 'omp').
 
@@ -26,7 +26,7 @@ const CONDITION = /\b(when|if|unless|only|after|before|once)\b/i;
 /** A line that forbids delegating is not a delegate instruction. */
 const NEGATION = /\b(never|don't|do not|must not|should not|no need to)\b/i;
 
-/** Statuses in docs/maintainer/model-pins.md that an agent may not pin. */
+/** Statuses in scripts/lib/model-pins.md that an agent may not pin. */
 const BAD_PIN_STATUS = new Set(['retired', 'deprecated', 'not listed']);
 const RUNTIME = { claude: 'claude-code', codex: 'codex', cursor: 'cursor', grok: 'grok', pi: 'pi', omp: 'omp' };
 
@@ -78,7 +78,7 @@ function modelPin(rel, text, kind, pins) {
   if (!model || !pins) return [];
   const status = pins.get(`${RUNTIME[kind]}:${model.id}`);
   if (status && !BAD_PIN_STATUS.has(status)) return [];
-  const why = status ? `pinned model is ${status}` : 'pinned model is not in docs/maintainer/model-pins.md';
+  const why = status ? `pinned model is ${status}` : 'pinned model is not in scripts/lib/model-pins.md';
   return [{ criterion: 'A13', line: model.line, text: `${why}: ${model.id}` }];
 }
 

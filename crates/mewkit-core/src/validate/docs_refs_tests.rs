@@ -22,9 +22,9 @@ docs/future-thing.md
 
 fn project_with_contract(skill_body: &str) -> tempfile::TempDir {
     let dir = tempfile::tempdir().expect("a temp dir");
-    let maintainer = dir.path().join("docs").join("maintainer");
-    fs::create_dir_all(&maintainer).expect("create the docs dir");
-    fs::write(maintainer.join("docs-reference-contract.md"), CONTRACT).expect("write the contract");
+    let scripts = dir.path().join("scripts");
+    fs::create_dir_all(&scripts).expect("create the scripts dir");
+    fs::write(scripts.join("docs-reference-contract.md"), CONTRACT).expect("write the contract");
     let skill = dir.path().join(".claude").join("skills").join("cook");
     fs::create_dir_all(&skill).expect("create the skill dir");
     fs::write(skill.join("SKILL.md"), skill_body).expect("write the skill");

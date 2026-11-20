@@ -13,7 +13,6 @@
 // A tree is `.claude`, a directory, or `installed:<runtime>` (codex, cursor, grok, pi, omp): what
 // `mewkit init` writes for that runtime from this checkout (scripts/lib/installed-tree.cjs,
 // which needs the mewkit binary). With no tree, `.claude` and all five are checked.
-// Criteria and their scope: docs/maintainer/instruction-audit-criteria.md.
 
 const crypto = require('node:crypto');
 const fs = require('node:fs');
@@ -32,7 +31,7 @@ const TEXT_EXT = new Set(['.md', '.mdc', '.toml']);
 const SKIP_DIRS = new Set(['node_modules', '__tests__', '.venv']);
 /** Host state at the top of a tree; a skill folder of the same name deeper down is still checked. */
 const SKIP_TOP_DIRS = new Set(['worktrees', 'logs', 'cache', 'session-state', 'agent-memory', 'memory']);
-const PINS_FILE = path.join(REPO, 'docs/maintainer/model-pins.md');
+const PINS_FILE = path.join(REPO, 'scripts/lib/model-pins.md');
 const CRITERIA = ['A1', 'A2', 'A5', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14'];
 
 /** sha256 of the blocked-pattern table plus the numbered injection rules (must not change). */

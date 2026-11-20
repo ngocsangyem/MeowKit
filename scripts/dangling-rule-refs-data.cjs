@@ -57,7 +57,7 @@ const MOVED = [
 		citedByName: true,
 	},
 	{ name: "capability-bootstrap", to: ".claude/hooks/references/capability-bootstrap.md" },
-	{ name: "docs-reference-contract", to: "docs/maintainer/docs-reference-contract.md", shipped: false },
+	{ name: "docs-reference-contract", to: "scripts/docs-reference-contract.md", shipped: false },
 	{ name: "step-file-rules", to: null, inlined: true },
 	{ name: "anti-rationalization", to: null, inlined: true },
 	{ name: "intervention-recording-rules", to: null, inlined: true },
@@ -112,25 +112,16 @@ const PRUNED_SEGMENTS = ["__tests__", "__fixtures__", "node_modules", "dist", ".
 
 /**
  * Exhaustive exemptions. Each records WHY the file is allowed to name an old path.
- * `docs/maintainer/deletions-note` is not needed: the root `deletions.json` and
- * `release-manifest.json` are outside the scan roots by design, because the upgrade
- * cleanup works by the deletion list NAMING the old paths.
+ * The root `deletions.json` and `release-manifest.json` are outside the scan roots by
+ * design, because the upgrade cleanup works by the deletion list NAMING the old paths.
  */
 const EXEMPT = [
 	{ match: "packages/docs/content/docs/changelog/", why: "changelog history — must not be rewritten" },
-	{ match: "docs/archive/", why: "archived record — must not be rewritten" },
-	{ match: "docs/maintainer/rule-destination-table.md", why: "the destination table maps old path → new path" },
-	{ match: "docs/governance/rules-index.md", why: "rules index carries the moved-rules table" },
 	{
 		match: "packages/docs/content/docs/reference/rules-index.mdx",
 		why: "published rules index carries the moved-rules table",
 	},
 	{ match: "tasks/", why: "plans, contracts and reports record the paths that were live when written" },
-	{ match: "docs/plans/", why: "finished plans moved out of tasks/ keep the paths that were live when written" },
-	{
-		match: "docs/architecture/adr/260511-agile-scrum-conditional-rule-layer.md",
-		why: "dated decision record — its header already says the paths below are the ones that existed then",
-	},
 ];
 
 /** The 5 step-filed skills whose workflow.md carries the inlined step-file contract. */

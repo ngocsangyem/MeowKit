@@ -140,7 +140,7 @@ Each `lib/core` module is a pure decision. It reads the project tree, never touc
 
 ## Runtime parity
 
-The other runtimes do not run every Claude Code hook. `.claude/hooks/hook-coverage.json` records what each safety behaviour and each handler becomes on Codex, Cursor, Grok, Pi and OMP, and a test checks that each one appears there. The [enforcement matrix](https://github.com/ngocsangyem/MeowKit/blob/main/docs/core/enforcement-matrix.md) lists what each runtime enforces and what has not been run live. The Grok, Pi and OMP entries follow the vendors' documentation and have not been run in a live session.
+The other runtimes do not run every Claude Code hook. `.claude/hooks/hook-coverage.json` records what each safety behaviour and each handler becomes on Codex, Cursor, Grok, Pi and OMP, and a test checks that each one appears there. The [Enforcement & Security](/core-concepts/enforcement) page lists what each runtime enforces and what has not been run live. The Grok, Pi and OMP entries follow the vendors' documentation and have not been run in a live session.
 
 | Behavior | Claude Code | Codex | Cursor | Grok | Pi | OMP |
 | --- | --- | --- | --- | --- | --- | --- |

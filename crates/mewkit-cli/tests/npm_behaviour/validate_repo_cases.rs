@@ -144,8 +144,7 @@ fn the_docs_reference_check_matches_against_the_real_contract() {
     );
     assert!(
         npm::repo_root()
-            .join("docs")
-            .join("maintainer")
+            .join("scripts")
             .join("docs-reference-contract.md")
             .exists(),
         "this case stops meaning anything once the contract moves"
