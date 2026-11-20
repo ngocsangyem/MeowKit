@@ -104,6 +104,11 @@ pub struct Read {
 pub struct KindSurface {
     #[serde(default)]
     pub pick: Pick,
+    /// The kit writes every writable root of this runtime in every set, even
+    /// where the runtime also reads a root another runtime writes. Two such
+    /// roots of one runtime hold different text and are not copies.
+    #[serde(default)]
+    pub own: bool,
     /// The runtime's precedence where `pick` is first; otherwise the order in
     /// which the kit prefers to write.
     pub roots: Vec<Read>,
@@ -150,7 +155,11 @@ impl SurfaceTable {
             for (kind, surface) in &runtime.kinds {
                 let at = format!("{} {}", runtime.name, kind.name());
                 let roots = &surface.roots;
-                if !roots.is_empty() && !roots.iter().any(|r| r.write) {
+                // Every runtime gets skills, guards and the always-on text. Agents
+                // and MCP servers may be left to the runtime where the kit has
+                // nothing it can write for them.
+                let required = matches!(kind, Kind::Skills | Kind::Hooks | Kind::AlwaysOn);
+                if required && !roots.is_empty() && !roots.iter().any(|r| r.write) {
                     return Err(format!("{at}: no root the kit may write"));
                 }
                 if surface.pick == Pick::First && roots.iter().any(|r| r.unsure.is_some()) {

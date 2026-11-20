@@ -97,7 +97,7 @@ After these, `node scripts/check-instruction-criteria.cjs <projected tree>` repo
 | 12 | Skill files that are not Markdown | Their own rules, paths only | Done, see "Scripts" below |
 | 13 | Cursor wording for tools: `Grep` → "grep" or "search", `Glob` → "file-glob" (42 lines) | Keep the source | No change |
 | 14 | The pull-request trailer `[Claude Code](https://claude.com/claude-code)` in `ship/references/commit-push-pr.md` | One overlay line per runtime | Done: `[[replace]]` in each overlay writes "Generated with Codex" and "Generated with Cursor", with no link (the bundles' `https://codex.com/codex` is not a real address) |
-| 15 | Cursor rule references and helper paths | Wait for the always-on placement | Rule references done 2026-11-18: Cursor reads the shared `AGENTS.md` block, which has a heading for every `AGENTS.md (<section>)` a skill cites (test `every_rule_section_a_skill_can_cite_is_in_the_shared_block`). Helper paths still open |
+| 15 | Cursor rule references and helper paths | Wait for the always-on placement | Rule references done 2026-11-18: Cursor reads the shared `AGENTS.md` block, which has a heading for every `AGENTS.md (<section>)` a skill cites (test `every_rule_section_a_skill_can_cite_is_in_the_shared_block`). Helper paths settled 2026-11-20: the source names a helper by path (`.claude/hooks/lib/workflow-config …`), which projection points at each runtime's `scripts/bin/`; the ten command hints that named one bare were given the path |
 
 ### Scripts
 
@@ -147,10 +147,13 @@ More defects in the bundles, in scripts:
 | `mk-story-sizer/scripts/check-auto-create-gating.py`, `mk-web-to-markdown/scripts/persist_fetch.py` | Point at `.codex/scripts/injection-audit.cjs`, a file the bundle does not ship |
 | `mk-context-audit` scripts | Field and function names renamed with the host word (`codex_md_chain`) |
 
-### Open
+### Closed on 2026-11-20
 
-| # | Difference | Waits for |
+Nothing is open. The three rows that were:
+
+| # | Difference | How it closed |
 |---|---|---|
-| 15 | Cursor helper paths: a kit helper called by bare name, with nothing putting `.cursor/scripts/bin` on `PATH` | A decision on how a skill names a helper on Cursor |
-| — | The five helpers and the eval core the bundles do not ship (table above) | The emitter's file list (Phase 4) |
-| — | Skill names in messages scripts print | A rule limited to string output, if the messages matter on other runtimes |
+| 15 | Cursor helper paths: a kit helper called by bare name, with nothing putting `.cursor/scripts/bin` on `PATH` | The bundle wording is not followed. The source names every helper it runs by path under `.claude/hooks/lib/`, and the path rule rewrites that to the runtime's `scripts/bin/`. Ten command hints in skill references named `workflow-config` bare, on Claude Code too; they now carry the path. The three bare mentions left name the helper in prose and are followed by the command |
+| — | The helpers and the eval core the bundles did not ship | Every helper path the projected text names exists after an install: 1,342 references under `.codex`, `.cursor`, `.grok`, `.omp`, `.pi` and `.agents` in a six-runtime install, none missing (2026-11-20). `parse-stdin.cjs` and the `core/hook-payload.cjs` it loads were the last ones absent; `scripts/sync-hook-core.cjs` now copies them to each `scripts/bin/`, and the `careful`, `freeze` and `investigate` guard scripts run from the projected trees. `.claude/eval/track-m-adapter-core.cjs` is not shipped and not needed: the two eval runners that load it are under `eval/`, which the ship set leaves out |
+| — | Skill names in messages scripts print | Kept as authored, by the maintainer's decision of 2026-11-18 that scripts get path rules only. A name rule would also rewrite patterns (the defect below), so these 22 lines show the Claude Code form (`/mk:jira-issue create`) on other runtimes |
+

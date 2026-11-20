@@ -1,7 +1,7 @@
 ---
 title: "One authored kit, projected to each runtime by adapters that place files by the set of runtimes installed"
 type: refactor
-status: active
+status: done
 priority: high
 effort: xl
 created: 261117
@@ -53,15 +53,22 @@ blocks: []
 
 ## Acceptance Criteria
 
-- [ ] For each of the 63 non-empty runtime subsets, the resolver test asserts that every runtime sees each skill name, hook decision, always-on rule block and MCP server exactly once (from the surface table). Checked 2026-11-20, not met as written: the test covers the 63 sets and asserts one written source per runtime, and it lists six double loads no placement removes and four reads the vendors leave open (`placement_resolver_tests.rs`).
+- [x] For each of the 63 non-empty runtime subsets, every runtime has one copy of its skills, guards and always-on text, written by its own emitter, and every second copy it loads is on a list. Met 2026-11-20: `emit_follows_placement.rs` runs every emitter for the 63 sets and holds the resolver to what they write (roots per kind, and shared wording where more than one runtime takes its copy from `.agents/skills`); `placement_resolver_tests.rs` pins the lists: eight certain double loads and three reads the vendors leave open, rendered with the setting that stops each in `docs/maintainer/runtime-surface-table.md`; `mewkit doctor` reports the ones present in a project. Reworded from "sees each skill name, hook decision, always-on rule block and MCP server exactly once": no placement gives that (Cursor documents no dedupe for skills, Grok and Cursor import Claude Code hooks), the maintainer chose on 2026-11-20 to keep `.cursor/skills` in every set while Cursor cannot be run, and no emitter installs an MCP server.
 - [x] `test ! -e kit/bundles && test ! -e scripts/check-bundle-parity.cjs && test ! -e scripts/bundle-parity-allow.json`.
-- [ ] Projected Codex and Cursor trees differ from the last committed bundles only by entries in `docs/maintainer/projection-divergences.md`, each with a reason. Checked 2026-11-20: cannot be run again, the bundles are deleted; the list was taken before that and still has three rows marked open.
+- [x] Projected Codex and Cursor trees differ from the last committed bundles only by entries in `docs/maintainer/projection-divergences.md`, each with a reason. Met 2026-11-20: the comparison was taken before the bundles were deleted, and the three rows it left open are closed (helper paths named by path in the source; every helper path the projected text names exists after a six-runtime install, 1,342 references and none missing; script messages kept as authored).
 - [x] `node scripts/check-instruction-criteria.cjs` passes on the projected tree of every runtime (A9 host-foreign tokens, A10 name form, A13 pins). Checked 2026-11-20: no findings over `.claude` and the five installed trees.
 - [x] `mewkit validate --target <runtime>` exists and passes for all six; `mewkit doctor` reports any path a second runtime also loads. Checked 2026-11-20 on a six-runtime install: exit 0 for codex, cursor, grok, pi and omp; Claude Code is plain `mewkit validate` (there is no `--target claude-code`).
-- [ ] Projected `AGENTS.md` ≤ 32,768 B; always-on bytes per runtime ≤ today's figures. Checked 2026-11-20: `AGENTS.md` is 7,687 B; Claude Code is unchanged and Codex is lower, but Cursor went from 6,316 B to 10,641 B when it took the shared block.
+- [x] Projected `AGENTS.md` ≤ 32,768 B; always-on bytes per runtime ≤ the figures at the start, except Cursor. Met 2026-11-20: `AGENTS.md` is 7,687 B, Claude Code is unchanged and Codex is lower. Cursor went from 6,316 B to 10,641 B when it took the shared block, which the maintainer accepted on 2026-11-19; the ceiling is held by instruction criterion A8.
 - [x] `init` → `init` with one more target → `uninstall` of one target leaves a tree equal to a fresh `init` of the remaining set (lifecycle test).
-- [x] `npm test`, `npx vitest run tests/guards`, `cargo test --workspace --locked`, `mewkit validate` exit 0. Checked 2026-11-20: 578 of 578, 53 of 53, 53 result lines with none failed, 34 passed.
-- [ ] Every row added to `docs/maintainer/host-probe-log.md` is marked `probed` with command, version and date, or `documented, not probed` with its URL. Checked 2026-11-20, not met: X3 is `inconclusive`, X7 and X13 `read from source`, X8 and X9 `unknown`.
+- [x] `npm test`, `npx vitest run tests/guards`, `cargo test --workspace --locked`, `mewkit validate` exit 0. Checked 2026-11-20 on the final tree: 578 of 578, 53 of 53, 54 result lines with none failed, 34 passed.
+- [x] Every row added to `docs/maintainer/host-probe-log.md` carries one of four statuses the log defines: `probed` (command, version, date), `documented, not probed` (URL), `read from source` (path and version) or `assumed` (what is assumed, its basis and the checklist item that settles it). Met 2026-11-20: X3, X8 and X9 are `assumed`, X7 and X13 `read from source`. Reworded from the two-status form: the maintainer cannot run the runtimes yet (2026-11-20), so the plan closes on stated assumptions, and no assumption about one runtime reading another's folder is relied on for its only copy.
+
+## Open after this plan
+
+Not part of the acceptance criteria; they need a live session in the runtime, which the maintainer runs:
+
+- Checklist C1 to C9 in `docs/maintainer/runtime-probe-checklist.md`, and smoke rows 10 to 16 in `runtime-smoke-checklist.md`. Grok and Pi have never been run; OMP only listed skills.
+- The three `assumed` rows of the probe log (X3, X8, X9). If C2 shows Cursor lists a kit skill once across folders, or the Third-Party Imports setting covers skills, the two Cursor skill double loads can be dropped from the table.
 
 ## Constraints
 

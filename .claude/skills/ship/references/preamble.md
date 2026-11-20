@@ -60,7 +60,7 @@ ask the user about telemetry. Ask the user:
 > Help improve this workflow! Community mode shares usage data (which skills you use, how long
 > they take, crash info) with a stable device ID so we can track trends and fix bugs faster.
 > No code, file paths, or repo names are ever sent.
-> Change anytime with `workflow-config set telemetry off`.
+> Change anytime with `.claude/hooks/lib/workflow-config set telemetry off`.
 
 Options:
 - A) Help improve the workflow! (recommended)

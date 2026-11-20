@@ -13,6 +13,17 @@ Fresh install: [install the `mewkit` binary](/installation#install-the-cli), the
 
 A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-npx-mewkit).
 
+## Unreleased
+
+### Bug Fixes
+
+- The `careful`, `freeze` and `investigate` guard scripts start on Codex, Cursor, Grok, Pi and OMP. They load a stdin reader from the runtime's `scripts/bin/`, which the kit did not install there.
+- Ten command hints in skill references named `workflow-config` without its path, so the command they showed could not be run as written. They now give the path.
+
+### Improvements
+
+- The runtime surface table matches what the installer writes in all 63 runtime sets, and a test holds it there. It lists eight cases where a runtime loads kit content twice and three the vendors leave open, each with the setting that stops it. Nothing the installer writes changed.
+
 ## 3.0.0 (2026-11-20)
 
 Version 3 replaces the npm CLI with one native binary, installs the kit on six runtimes from a single authored tree, and removes the approval gates. Read the Removals and Migration Notes before you upgrade a 2.x project.
