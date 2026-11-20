@@ -24,6 +24,10 @@ die() { printf 'mewkit install: error: %s\n' "$1" >&2; exit 1; }
 # The pinned archive for a channel and target: "version url sha256 size".
 pin() {
 	case "$1:$2" in
+		stable:x86_64-unknown-linux-musl) echo "0.1.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.1.0/mewkit-0.1.0-x86_64-unknown-linux-musl.tar.gz 48d89338fe7647d590e0e6337510b6d204f099930bf52440b83d02570fc702f1 4867069" ;;
+		stable:aarch64-unknown-linux-musl) echo "0.1.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.1.0/mewkit-0.1.0-aarch64-unknown-linux-musl.tar.gz fa328390157479c14071c4fc44e1160b1da5f880cb7729004ae11f21501c457d 4411440" ;;
+		stable:x86_64-apple-darwin) echo "0.1.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.1.0/mewkit-0.1.0-x86_64-apple-darwin.tar.gz 69acf21eaf9178dca7d731a6a3d5f2a4ea64623089af6bf38bbf8b7ba10ddfd9 4609755" ;;
+		stable:aarch64-apple-darwin) echo "0.1.0 https://github.com/ngocsangyem/MeowKit/releases/download/mewkit-v0.1.0/mewkit-0.1.0-aarch64-apple-darwin.tar.gz 3cc77b42d77af921ae085cc2eb188b2d1ebb849dde8e8fa3bf69cb3fcaea4ef6 4217536" ;;
 		*) return 1 ;;
 	esac
 }
