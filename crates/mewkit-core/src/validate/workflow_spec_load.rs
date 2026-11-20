@@ -86,22 +86,6 @@ pub fn load_workflow_spec(project_root: &Path) -> Result<CanonicalSpec, Workflow
         }
     }
 
-    for gate in raw
-        .get("gates")
-        .and_then(Value::as_array)
-        .unwrap_or(&Vec::new())
-    {
-        let (Some(id), Some(output)) = (
-            gate.get("id").and_then(Value::as_str),
-            gate.get("required_output").and_then(Value::as_str),
-        ) else {
-            continue;
-        };
-        spec.gate_output.push((id.to_string(), output.to_string()));
-        if let Some(dir) = output_dir_of(output) {
-            spec.output_dirs.insert(dir);
-        }
-    }
     for phase in phases {
         for glob in phase
             .get("required_outputs")

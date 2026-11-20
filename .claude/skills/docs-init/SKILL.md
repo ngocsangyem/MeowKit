@@ -63,7 +63,7 @@ Do NOT invoke when: docs already exist and need updating (use `mk:document-relea
 5. **Size check** — run `wc -l docs/*.md | sort -rn`. Flag files >800 lines.
 6. **Report** — print generated files list with line counts.
 
-**Hard gate:** Do NOT write code or implementation. Only documentation.
+**Hard rule:** Do NOT write code or implementation. Only documentation.
 
 ## Gotchas
 

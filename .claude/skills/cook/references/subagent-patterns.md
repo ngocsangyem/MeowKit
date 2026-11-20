@@ -80,7 +80,7 @@ delegate a subagent (agent="tester", prompt="Write failing tests for [plan-path]
 ```
 Expected return: test count, all FAIL status, file paths.
 
-**Scope (tester):** pass plan-file path, acceptance criteria, success-criteria list, target test directory. Do NOT pass implementation code (RED gate); do NOT pass session conversation; tester edits test files ONLY.
+**Scope (tester):** pass plan-file path, acceptance criteria, success-criteria list, target test directory. Do NOT pass implementation code (RED phase); do NOT pass session conversation; tester edits test files ONLY.
 
 **Default mode (TDD off)** — Phase 2 is OPTIONAL. Skip the tester invocation unless the user explicitly requests tests or unless plan acceptance criteria require coverage. The orchestrator routes Phase 1 → Phase 3 directly when TDD mode is off.
 

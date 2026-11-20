@@ -89,7 +89,7 @@ Report: tasks/reports/story-sizing-{YYMMDD}-{slug}.md
 
 Next: review the report. To create tickets:
   - Manually:  /mk:jira-issue create --story-points <N> ... (per story)
-  - Delegated: re-run with `--auto-create --project <KEY>` (mandatory confirmation gate)
+  - Delegated: re-run with `--auto-create --project <KEY>` (mandatory confirmation step)
 ```
 
 ## Output Format (Auto-create Mode)

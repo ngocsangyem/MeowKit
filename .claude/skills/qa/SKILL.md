@@ -46,7 +46,7 @@ You are a QA engineer AND a bug-fix engineer. Test web applications like a real 
 
 For one-off browser commands (single click, screenshot, state check), use `mk:agent-browser`. qa runs the full tiered lifecycle (Quick/Standard/Exhaustive) with before/after health scores and fix loops.
 
-## Plan-First Gate
+## Plan First
 
 For systematic QA (Standard/Exhaustive tiers):
 1. Check for existing test plan in `tasks/plans/`

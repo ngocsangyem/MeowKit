@@ -47,7 +47,7 @@ Do NOT invoke when: project already has source code, or you only need kit setup 
 
 ## Modes
 
-| Mode | Flag | Gates | Research | Design | Plan flag | Cook flag |
+| Mode | Flag | Approvals | Research | Design | Plan flag | Cook flag |
 |------|------|-------|----------|--------|-----------|-----------|
 | **Auto** | (default) | Design only | Parallel researchers | UI/UX if frontend | `--auto` | `--auto` |
 | **Full** | `--full` | Every step | Parallel researchers | UI/UX if frontend | `--hard` | (interactive) |

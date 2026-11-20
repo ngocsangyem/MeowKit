@@ -6,8 +6,8 @@ Describe how MeowKit’s ecosystem integrates Claude Code runtime artifacts (tra
 
 ## Mental model
 
-- **Rules** define invariants for prompt engineering, safety, gating, file ownership, and phase contracts.
-- **Hooks** enforce safety and approval gates outside the model prompt.
+- **Rules** define invariants for prompt engineering, safety, file ownership, and phase contracts.
+- **Hooks** enforce safety and the ship check outside the model prompt.
 - **Skills** are the operational surface that actually performs work, while obeying rule constraints.
 - **Artifacts** (JSONL transcripts, plan markdown, todo state, overlay snapshots) are the primary “data plane” between model execution and visualization/verification.
 
@@ -20,8 +20,8 @@ Describe how MeowKit’s ecosystem integrates Claude Code runtime artifacts (tra
 Key characteristics:
 
 - 7-phase workflow contract
-- hard gates + approval requirements
-- expected evidence + verification artifacts (gated by Phase 4 evaluator + review verdict)
+- plan and review as practices, with a ship check
+- expected evidence + verification artifacts (produced by the Phase 4 evaluator and the review verdict)
 
 ### 2) Hook orchestration config
 

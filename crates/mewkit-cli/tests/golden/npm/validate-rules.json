@@ -1,6 +1,6 @@
 {
   "exit_code": 0,
-  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nRules\n  [WARN] Routing-table breadth: rules/skill-routing.md\n         An intent→skill routing table (≥8 mk: rows) lives in always-loaded rules/skill-routing.md. Move skill-dispatch tables into a skill reference loaded on demand (see agent-detector references/skill-domain-routing.md).\n\n0 passed, 1 warnings\n",
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the guards actually block.\n\nFound: <project>/.claude\n\nRules\n  [WARN] Routing-table breadth: rules/skill-routing.md\n         An intent→skill routing table (≥8 mk: rows) lives in always-loaded rules/skill-routing.md. Move skill-dispatch tables into a skill reference loaded on demand (see agent-detector references/skill-domain-routing.md).\n\n0 passed, 1 warnings\n",
   "stderr": "",
   "files": {
     ".claude/agents/developer.md": "---\nname: developer\ndescription: Writes production code.\n---\n\nProse.\n",

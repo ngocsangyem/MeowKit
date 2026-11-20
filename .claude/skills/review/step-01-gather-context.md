@@ -38,7 +38,7 @@ Otherwise, set `review_scope = minimal`.
 
 ### Document
 
-Print: `Scope gate: {minimal|full} — files:{N}, lines:{N}, security:{yes|no}, domain:{level}`
+Print: `Scope check: {minimal|full} — files:{N}, lines:{N}, security:{yes|no}, domain:{level}`
 
 ## Output
 

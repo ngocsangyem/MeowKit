@@ -1620,12 +1620,6 @@
       "exec": true
     },
     {
-      "path": ".claude/skills/cook/scripts/validate-gate-1.sh",
-      "sha256": "eeb76165925aba8c7695779aeecf82aed16729554fdb13fd93ffcb2be814e1fd",
-      "size": 1427,
-      "exec": true
-    },
-    {
       "path": ".claude/skills/cso/SKILL.md",
       "sha256": "11829912f010004ad7a1f4fa2d871ac70755c57bbfbd2ec8757170e4061c3e25",
       "size": 7324
@@ -7342,12 +7336,6 @@
       "path": ".meowkit/cache/.claude/skills/cook/scripts/test-scripts.sh",
       "sha256": "44f1f5a459d1ebcb84048a5ecf7f52d9ee27f0eb6c7a8c6be4f8d6ec62f559eb",
       "size": 5325,
-      "exec": true
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/cook/scripts/validate-gate-1.sh",
-      "sha256": "eeb76165925aba8c7695779aeecf82aed16729554fdb13fd93ffcb2be814e1fd",
-      "size": 1427,
       "exec": true
     },
     {

@@ -115,11 +115,11 @@ Parse the output. Match entries by `skill` field for real skills (`plan-ceo-revi
 
 **Review tiers:**
 
-- **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be opted out of per project with `workflow-config set skip_eng_review true`, which records the choice in `.meowkit/state/` rather than in the committed config (the "don't bother me" setting).
+- **Eng Review (required by default):** The only review the ship step asks about. Covers architecture, code quality, tests, performance. Can be opted out of per project with `workflow-config set skip_eng_review true`, which records the choice in `.meowkit/state/` rather than in the committed config (the "don't bother me" setting).
 - **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
 - **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
 - **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get Claude adversarial subagent. Large diffs (200+) get 2 passes: Claude structured (from pre-landing review) + Claude adversarial subagent. No configuration needed.
-- **Outside Voice (optional):** Independent plan review via Claude adversarial subagent. Offered after all review sections complete in /mk:plan-ceo-review. Never gates shipping.
+- **Outside Voice (optional):** Independent plan review via Claude adversarial subagent. Offered after all review sections complete in /mk:plan-ceo-review. Never required for shipping.
 
 **Verdict logic:**
 
@@ -144,7 +144,7 @@ If the Eng Review is NOT "CLEAR":
    grep '"skill":"ship-review-override"' .meowkit/telemetry/$BRANCH-reviews.jsonl 2>/dev/null || echo "NO_OVERRIDE"
    ```
 
-   If an override exists, display the dashboard and note "Review gate previously accepted — continuing." Do NOT ask again.
+   If an override exists, display the dashboard and note "Review previously accepted — continuing." Do NOT ask again.
 
 2. **If no override exists,** ask the user:
    - Show that Eng Review is missing or has open issues
@@ -153,7 +153,7 @@ If the Eng Review is NOT "CLEAR":
    - If CEO Review is missing, mention as informational ("CEO Review not run — recommended for product changes") but do NOT block
    - For Design Review: run `source <(.claude/hooks/lib/workflow-diff-scope <base> 2>/dev/null)`. If `SCOPE_FRONTEND=true` and no `ship-design-check` entry exists in the dashboard, mention: "Design Review not run — this PR changes frontend code. The inline lite design check runs automatically during pre-landing review." Still never block.
 
-3. **If the user chooses A or C,** persist the decision so future `/mk:ship` runs on this branch skip the gate:
+3. **If the user chooses A or C,** persist the decision so future `/mk:ship` runs on this branch skip this question:
    ```bash
    eval "$(.claude/hooks/lib/workflow-slug 2>/dev/null)"
    echo '{"skill":"ship-review-override","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","decision":"USER_CHOICE"}' >> .meowkit/telemetry/$BRANCH-reviews.jsonl

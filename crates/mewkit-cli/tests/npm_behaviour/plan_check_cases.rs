@@ -1,6 +1,6 @@
 //! `plan check` against both CLIs, with and without `--structural`.
 //!
-//! `--structural` is the check the planning flow runs BEFORE presenting Gate 1,
+//! `--structural` is the check the planning flow runs BEFORE presenting the plan,
 //! and callers match on the `PLAN_COMPLETE` / `PLAN_INCOMPLETE` marker rather
 //! than on the exit code alone — so the marker line is part of the contract.
 use crate::npm;

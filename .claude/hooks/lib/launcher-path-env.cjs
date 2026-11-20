@@ -20,7 +20,7 @@
 //   * No CLAUDE_ENV_FILE, or a write that fails, means the bare form is unavailable — which
 //     is reported with a next action rather than left to fail later inside a tool call. The
 //     hook path does not depend on this: hooks reach the CLI through the runtime descriptor,
-//     so orientation, Gate 1 and Gate 2 behave identically with or without it.
+//     so orientation and the ship check behave identically with or without it.
 //
 // Windows PowerShell is a non-target by construction: the host does not pass PowerShell a
 // variable whose value contains a path separator, so there the hint is the whole answer.

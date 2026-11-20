@@ -65,15 +65,15 @@ cd ${CLAUDE_SKILL_DIR}/scripts && npm install
 Run the prerequisite check before any API command; it fails before a network request if the key
 or `tsx` is unavailable. Full setup, optional variables, and MCP setup: [references/stitch-setup.md](references/stitch-setup.md).
 
-## Fail-Closed Gate
+## Fail-Closed Check
 
 Before any script runs, verify both prerequisites:
 
 ```bash
-# Key gate
+# Key check
 [ -z "$STITCH_API_KEY" ] && { echo "[X] STITCH_API_KEY not set — add it to the project env file"; exit 1; }
 
-# tsx gate
+# tsx check
 npx tsx --version 2>/dev/null || { echo "[X] tsx not found — run: cd ${CLAUDE_SKILL_DIR}/scripts && npm install"; exit 1; }
 ```
 

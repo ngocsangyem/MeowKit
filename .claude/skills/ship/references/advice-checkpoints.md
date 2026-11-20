@@ -43,13 +43,13 @@ RESCUE is for a stop the pipeline cannot resolve on its own:
   radii.
 
 It is **not** for the ordinary blocking stops. Being on the target branch, a failing test
-with a clear owner, or coverage below the gate all have defined behavior already.
+with a clear owner, or coverage below the threshold all have defined behavior already.
 Consulting on them replaces a deterministic stop with a conversation.
 
 ### Why REVIEW waits for terminal CI
 
 A pending pipeline has no outcome to review, and a red one has a defined route: the
-existing verification gate and its repair-or-stop path. Athena cannot clear red CI, wave
+existing verification step and its repair-or-stop path. Athena cannot clear red CI, wave
 it through, or shorten the wait.
 
 ## What each checkpoint asks

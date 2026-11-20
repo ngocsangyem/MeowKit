@@ -105,7 +105,7 @@ pub fn run(args: &ValidateArgs) -> Result<u8, Failure> {
 
     println!("Validating .claude/ project structure...");
     println!(
-        "Scope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block."
+        "Scope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the guards actually block."
     );
     println!();
 

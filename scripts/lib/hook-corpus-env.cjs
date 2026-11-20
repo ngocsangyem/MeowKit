@@ -110,10 +110,8 @@ const NORMALIZERS = {
   homedir: (text, ctx) => text.split(ctx.home).join('{{HOME}}'),
   // `date -u +%Y-%m-%dT%H:%M:%SZ` — wall clock.
   isoTimestamp: (text) => text.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/g, '{{TS}}'),
-  // `date -u +%Y-%m-%d` — the approval receipt's stamp date.
+  // `date -u +%Y-%m-%d` — a stamp date.
   isoDate: (text) => text.replace(/\d{4}-\d{2}-\d{2}/g, '{{DATE}}'),
-  // Process id, used in temp file names by approval-receipt.cjs.
-  pid: (text) => text.replace(/\.approval\.\d+/g, '.approval.{{PID}}'),
 };
 
 function applyNormalizers(text, names, ctx) {

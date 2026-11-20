@@ -8,7 +8,7 @@
 //! - **bulk content** — a payload pasted where a pointer belongs. Quoting one
 //!   dialogue line as evidence is legitimate, so repeat-count patterns get a
 //!   small tolerance while a single diff header fails immediately.
-//! - **authority language** — counsel routes work; it never clears a gate. One
+//! - **authority language** — counsel routes work; it never clears an approval. One
 //!   detector, shared by every writer: two detectors for one rule drift, and the
 //!   weaker one becomes the de-facto contract.
 //!

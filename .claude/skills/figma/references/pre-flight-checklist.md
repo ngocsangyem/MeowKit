@@ -24,7 +24,7 @@ Canvas-write block only for those workflows. STOP on any failure in the applicab
 - [ ] 14. **Interaction states documented or asked** — states derived from explicit variants or user
   confirmation, never guessed from prototype flows
 
-## Canvas-write additions (gated)
+## Canvas-write additions (conditional)
 
 Only inside the `canvas-write-boundaries.md` workflow.
 

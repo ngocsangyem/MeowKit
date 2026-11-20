@@ -24,9 +24,10 @@ fn receipt() -> Receipt {
 #[test]
 fn the_record_says_what_it_is_not() {
     let rendered = render_receipt(&receipt());
-    assert!(rendered.contains(
-        "This is a record of supervision, NEVER verification and never a gate approval."
-    ));
+    assert!(
+        rendered
+            .contains("This is a record of supervision, NEVER verification and never an approval.")
+    );
 }
 
 #[test]

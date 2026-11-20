@@ -1,6 +1,6 @@
 # TDD Enforcement Rules
 
-**TDD enforcement is OPT-IN.** Default mode: tests are recommended but not gated (the rules in "When TDD is disabled" apply). Strict mode: enable via `--tdd` flag on commands OR `export MEOWKIT_TDD=1` (the rules in "When TDD is enabled" apply).
+**TDD enforcement is OPT-IN.** Default mode: tests are recommended but not required (the rules in "When TDD is disabled" apply). Strict mode: enable via `--tdd` flag on commands OR `export MEOWKIT_TDD=1` (the rules in "When TDD is enabled" apply).
 
 Why optional: strict TDD adds friction for spikes/tooling/prototypes; production-quality work should still enable `--tdd`.
 

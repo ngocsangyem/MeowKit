@@ -21,7 +21,7 @@ macro boundaries — never per step, per phase file, or per red-team finding.
 
 GUIDE fires after the scope challenge because that is where the scope stops moving;
 supervising a scope still being negotiated advises on a plan that will not exist. REVIEW
-fires before the gate step, never inside it.
+fires before the plan is agreed, never inside that step.
 
 ## What each checkpoint asks
 
@@ -30,7 +30,7 @@ fires before the gate step, never inside it.
 - **RESCUE** — the red team left a contradiction; which direction does the evidence
   support?
 - **REVIEW** — does this plan's evidence cover its own acceptance criteria before it
-  reaches the gate?
+  reaches the user?
 - **RECHECK** — were the corrections addressed?
 
 ## What supervision does NOT touch here

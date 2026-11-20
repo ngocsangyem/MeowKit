@@ -8,12 +8,12 @@ Every project file belongs to one of these categories:
 |----------|------|---------|
 | Source code | `src/` or project root | Application code |
 | Documentation | `docs/` | Human + AI readable docs, guides, specs |
-| Tasks | `tasks/` | Plans, reviews, templates |
+| Tasks | `tasks/` | Plans, reviews, reports |
 | Tests | `tests/` or `__tests__/` | Test suites |
 | Scripts | `scripts/` or the owning skill's `scripts/` | Build, deploy, utility scripts |
 | Assets | `assets/{type}/` | Media, branding, designs |
 | Config | Root or `.config/` | Dotfiles, config files |
-| Kit     | `.claude/` | Agent toolkit (skills, agents, rules, hooks, memory) |
+| Kit     | `.claude/` | Agent toolkit (skills, agents, rules, hooks) |
 
 ### Kit-Specific Paths
 
@@ -23,15 +23,13 @@ Every project file belongs to one of these categories:
 ├── skills/          mk: prefixed skills
 ├── rules/           Enforcement rules
 ├── hooks/           Lifecycle hooks
-├── memory/          Cross-session persistence under `.meowkit/memory/`
 ├── scripts/         Validation scripts
 │   └── bin/         Shell utilities
 └── settings.json    Hook registrations
 
 tasks/
-├── templates/       Plan templates
 ├── plans/           Active/completed plans
-│   └── YYMMDD-name.md
+│   └── YYMMDD-name/     plan.md + phase-XX-*.md
 └── reviews/         Review verdicts
     └── YYMMDD-name-verdict.md
 ```

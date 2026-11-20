@@ -58,7 +58,7 @@ Symptom → Immediate cause → Contributing factor → ROOT CAUSE
 ### Output — Root-Cause Proof Checkpoint (six fields)
 
 The pre-diagnosis capture (lines above) and this trace feed a single proof
-checkpoint that gates Step 4 (Fix) in `SKILL.md` Step 2.5. Phase 4 MUST emit
+checkpoint that precedes Step 4 (Fix) in `SKILL.md` Step 2.5. Phase 4 MUST emit
 all six fields before implementation begins:
 
 1. **Exact symptom** — copy-pasted, not paraphrased (from Pre-Diagnosis #1-3).

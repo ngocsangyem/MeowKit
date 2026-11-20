@@ -4,7 +4,7 @@
 ## Contents
 
 - [Step 6: Commit (bisectable chunks)](#step-6-commit-bisectable-chunks)
-- [Step 6.5: Verification Gate](#step-65-verification-gate)
+- [Step 6.5: Verification](#step-65-verification)
 - [Step 7: Push](#step-7-push)
 - [Step 7.5: Link Issues](#step-75-link-issues)
 - [Step 8: Create PR](#step-8-create-pr)
@@ -57,7 +57,7 @@ EOF
 
 ---
 
-## Step 6.5: Verification Gate
+## Step 6.5: Verification
 
 **IRON LAW: NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE.**
 

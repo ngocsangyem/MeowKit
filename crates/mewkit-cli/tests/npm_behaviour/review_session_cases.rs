@@ -2,7 +2,7 @@
 //!
 //! These stages touch no network at all: they read a prepared session and
 //! write the evidence, the coverage report and the proof bundle. The bundle is
-//! what a human reads at Gate 2, so the file-tree comparison — which includes
+//! what a human reads when reviewing, so the file-tree comparison — which includes
 //! `s1-verdict.json` byte for byte — is the point of the compose cases.
 use crate::npm;
 

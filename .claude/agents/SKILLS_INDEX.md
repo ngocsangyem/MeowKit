@@ -65,7 +65,7 @@ Centralized registry of all skills. Updated: 2026-07-03 (v2.13.2).
 `mk:project-organization`|developer|development|monolithic
 `mk:bootstrap`|developer|development|monolithic
 `mk:verify`|developer|development|monolithic
-`mk:loop`|developer|development|monolithic (references; bounded git-tracked metric-optimization loop, boundary-gated, leaf executor — calls no orchestration skill)
+`mk:loop`|developer|development|monolithic (references; bounded git-tracked metric-optimization loop, boundary-confirmed, leaf executor — calls no orchestration skill)
 `mk:build-fix`|developer|development|monolithic
 `mk:api-design-principles`|architect|development|monolithic
 `mk:backend-development`|developer|development|monolithic
@@ -140,7 +140,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:evaluate`|evaluator|review|**step-file** (v1.0.0: 5 steps — load-rubrics → boot-app → probe-criteria → grade-and-verdict → feedback-to-generator. Active verification: validate-verdict.sh rejects PASS verdicts with empty evidence/. Skeptic persona enforced on every criterion grading.)
 `mk:sprint-contract`|developer (propose/amend) + evaluator (review)|planning|monolithic (v1.0.0, 130 lines: propose/review/amend/sign actions inline. Phase 4 file-based contract negotiation between generator and evaluator before source edits; no hook checks the signature.)
 `mk:autobuild`|orchestrator (planner/developer/evaluator/shipper agents dispatched per step)|orchestration|**step-file** (v1.0.0: 7 steps — tier-detection → plan → contract → generate → evaluate → iterate-or-ship → run-report. Adaptive density MINIMAL/FULL/LEAN. Budget tracker with $30 warn / $100 block. 6h hard timeout. Resumable via --resume.)
-`mk:trace-analyze`|researcher (3 parallel) + main agent synthesis|analysis|**step-file** (v1.0.0: 6 steps — ingest → partition → scatter → gather → suggestions → HITL gate. Reads `.meowkit/telemetry/trace-log.jsonl`, finds patterns via error-taxonomy, mandatory HITL approval. Anti-overfit threshold ≥3 occurrences.)
+`mk:trace-analyze`|researcher (3 parallel) + main agent synthesis|analysis|**step-file** (v1.0.0: 6 steps — ingest → partition → scatter → gather → suggestions → HITL approval step. Reads `.meowkit/telemetry/trace-log.jsonl`, finds patterns via error-taxonomy, mandatory HITL approval. Anti-overfit threshold ≥3 occurrences.)
 `mk:benchmark`|orchestrator (invokes mk:autobuild per spec)|measurement|monolithic (v1.0.0: run/compare subcommands. Quick tier 5 tasks ≤$5; full tier 6 tasks ≤$30. Records to `.claude/benchmarks/results/{run-id}.json` + trace-log.jsonl. Backs the dead-weight audit with measured deltas. Maintainer-only: runs from the MeowKit repository and is not part of an installed kit.)
 `mk:elicit`|reviewer|review|monolithic
 `mk:review-pr`|reviewer|review|monolithic (v0.1.0: single shallow correctness/security/breaking/AI-slop pass on a GitHub PR → Summary/Risk/Findings/Verdict. Default prints; --reply posts via gh pr review. Read-only on code. Shallow lane vs mk:review's deep review engine.)
@@ -212,7 +212,7 @@ Hub skills route to leaf agents via the `mk:jira` and `mk:confluence` hubs. Each
 `mk:web-to-markdown`|any agent|Fetch arbitrary URLs as clean markdown — use when URL is not covered by mk:docs-finder. Static-only by default; Playwright opt-in via `.claude/hooks/lib/setup-workflow --system-deps`.
 `mk:henshin`|any agent|Planning front door for wrapping existing code as agent-consumable surfaces (CLI + MCP + companion skill). Produces a Transformation Spec; hands off to `mk:plan-creator` → `mk:cook`. Adapted from external agentization patterns.
 `mk:preview`|any agent|Generate visual artifacts — markdown or self-contained HTML — for explanations, diagrams, slide decks, and git diffs. Display only; NOT for plan critique (mk:plan-ceo-review) or media generation (mk:multimodal).
-`mk:story-sizer`|story-sizer|Pre-ticket Fibonacci sizing of paste-mode user stories. Default writes a Story Sizing Report. Opt-in `--auto-create` delegates to `mk:jira-issue` + `mk:jira-collaborate` with a single batch confirmation gate.
+`mk:story-sizer`|story-sizer|Pre-ticket Fibonacci sizing of paste-mode user stories. Default writes a Story Sizing Report. Opt-in `--auto-create` delegates to `mk:jira-issue` + `mk:jira-collaborate` with a single batch confirmation step.
 `mk:chom`|researcher|Copy-cat / replicate features from external systems, repos, or ideas into the current project
 `mk:pack`|developer|Pack an external repository into a single AI-friendly file for third-party analysis or handoff to external LLMs
 `mk:resolving-merge-conflicts`|git-manager|Resolve an in-progress git merge/rebase conflict — read state, recover each side's intent, resolve hunks, run checks, finish the merge/rebase. Most often during ship; always resolves (never --abort); NOT the full ship pipeline (see mk:ship)

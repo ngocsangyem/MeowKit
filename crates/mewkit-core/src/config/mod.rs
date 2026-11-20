@@ -14,7 +14,7 @@
 //!    one value, together parsing the subset into a flat `path -> scalar` map or
 //!    refusing the file by line.
 //! 2. [`config_rules`] refuses a file that parses but says something a committed
-//!    file must not say — a secret, an absolute path, a protected hook, a gate.
+//!    file must not say — a secret, an absolute path, a protected hook, a `gates.*` key.
 //! 3. [`shape_check`] re-refuses the file against the declared key surface,
 //!    independently of the rules — the deliberate redundancy `load-config.ts`
 //!    keeps so that a shape the rules let through is not applied.

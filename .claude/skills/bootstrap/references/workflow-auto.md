@@ -1,6 +1,6 @@
 # Workflow: Auto (default)
 
-Balanced mode. Research runs automatically, design gate only. Good for most projects.
+Balanced mode. Research runs automatically, design approval only. Good for most projects.
 
 ## Step 0: Git Init
 
@@ -15,21 +15,21 @@ Include the save path in each researcher's prompt:
 - Researcher 2: Tech stack recommendation
 - Researcher 3: Design patterns for this domain (if applicable)
 
-No gate — proceed automatically to Step 2.
+No approval step — proceed automatically to Step 2.
 
 ## Step 2: Tech Stack
 
 1. Run `scripts/detect-stack.sh`
 2. If new project: use mk:brainstorming to evaluate options (quick mode)
 3. Auto-select best option from research findings
-4. No gate — proceed automatically to Step 3.
+4. No approval step — proceed automatically to Step 3.
 
 ## Step 3: Design
 
 If frontend work detected:
 1. Spawn `ui-ux-designer` subagent for design guidelines
 2. Save to `docs/design-guidelines.md`
-3. **Gate:** User approves design direction
+3. **Approval step:** User approves design direction
 
 If no frontend: skip to Step 4.
 

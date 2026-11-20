@@ -3,14 +3,14 @@
 //!
 //! The required roster is rebuilt from `impact-map.json`, never read from the
 //! persisted `roster.json`: a roster on disk is a file the acting session can
-//! edit, and a gate that trusts it can be satisfied by deleting rows.
+//! edit, and a check that trusts it can be satisfied by deleting rows.
 //!
 //! ## Honesty invariant
 //!
 //! `evidence.jsonl` and `hook-evidence.jsonl` are session-directory files the
 //! acting session can also write. `session-observed` proves the corroboration
 //! was RECORDED, not that it is unforgeable — it is anti-accidental, and it
-//! never establishes independent-reviewer provenance. The gate stays a human
+//! never establishes independent-reviewer provenance. The approval stays a human
 //! decision; this report is evidence a human reads, not authority.
 use std::path::Path;
 

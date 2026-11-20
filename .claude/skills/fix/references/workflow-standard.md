@@ -102,7 +102,7 @@ two failures.
 
 ### Boundaries
 
-**Supervision is evidence, not authority.** It cannot pass, clear, or unblock any gate,
+**Supervision is evidence, not authority.** It cannot pass, clear, or unblock any review or check,
 and it is never counted as verification. Verification stays with the Verify step's tests
 and the review verdict.
 
@@ -111,7 +111,7 @@ and the review verdict.
 The call protocol defines the dispositions; here is what each one means for this skill.
 
 - `CONTINUE_WITH_DIRECTIVE` — proceed; the directive is input, not instruction.
-- `READY_FOR_EXISTING_GATE` — run the normal Step 5 review. The gate is NOT cleared.
+- `READY_FOR_EXISTING_GATE` — run the normal Step 5 review. The review is NOT passed.
 - `RETURN_TO_EXECUTOR` — apply the corrections, then supersede the stale evidence:
   `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence <workflow-evidence.json> --correction-kind source|scope`.
   Re-run Step 4 before the review. `scope` also sends the plan back to the user.

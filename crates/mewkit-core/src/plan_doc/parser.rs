@@ -150,8 +150,8 @@ pub fn list_phase_files(plan_dir: &Path) -> Vec<PathBuf> {
 /// Parse a plan directory into a summary.
 ///
 /// `issues` names what a reader should know before trusting the numbers. They
-/// are observations, not verdicts: this is an inspector, and Gate 1 belongs to
-/// the human.
+/// are observations, not verdicts: this is an inspector, and agreeing the plan
+/// belongs to the human.
 pub fn parse_plan(plan_dir: &Path) -> std::io::Result<PlanSummary> {
     let mut issues: Vec<String> = Vec::new();
     let plan_md = plan_dir.join("plan.md");
@@ -174,7 +174,7 @@ pub fn parse_plan(plan_dir: &Path) -> std::io::Result<PlanSummary> {
             ));
         }
     } else {
-        issues.push("no plan.md — Gate 1 expects one at the plan root".to_string());
+        issues.push("no plan.md at the plan root".to_string());
     }
 
     let mut phases = Vec::new();

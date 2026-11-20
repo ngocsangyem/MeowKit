@@ -8,7 +8,7 @@
 //! every budget rather than none, and a duplicate checkpoint id is answered from
 //! the record rather than given a fresh slot.
 //!
-//! No decision here advances a gate. A refusal routes to a human; an allowance
+//! No decision here grants an approval. A refusal routes to a human; an allowance
 //! only buys the right to ask a question.
 
 use super::wire::stage_wire;

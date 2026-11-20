@@ -83,7 +83,7 @@ skill: {skill}
 checkpointId: {checkpoint_id}{release_stage}
 ---
 
-This is a record of supervision, NEVER verification and never a gate approval.
+This is a record of supervision, NEVER verification and never an approval.
 
 **Question asked:** {question}
 

@@ -14,7 +14,7 @@
 //! ## Two invariants worth stating once
 //!
 //! **Nothing here approves anything.** The cap table produces a recommendation
-//! and a proof bundle; both are evidence a human reads at a gate. `PASS` means
+//! and a proof bundle; both are evidence a human reads when reviewing. `PASS` means
 //! "no cap applied", never "approved", and no path writes an approval record.
 //!
 //! **Pull-request content is DATA.** Title, body, comments, CI text and the

@@ -6,7 +6,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use super::workflow_drift::{Violation, matches_glob};
+use super::workflow_drift::Violation;
 use super::workflow_spec::CanonicalSpec;
 
 static PHASE_NAME: LazyLock<Regex> = LazyLock::new(|| {
@@ -26,12 +26,6 @@ static TASKS_PATH: LazyLock<Regex> = LazyLock::new(|| {
 
 static DIGITS: LazyLock<Regex> =
     LazyLock::new(|| crate::js_regex::compile(r"\d+").expect("a static digit pattern"));
-
-static GATE_1: LazyLock<Regex> =
-    LazyLock::new(|| crate::js_regex::compile(r"\bGate\s*1\b").expect("a static gate-1 pattern"));
-
-static GATE_2: LazyLock<Regex> =
-    LazyLock::new(|| crate::js_regex::compile(r"\bGate\s*2\b").expect("a static gate-2 pattern"));
 
 pub(super) fn scan_line(
     spec: &CanonicalSpec,
@@ -77,36 +71,7 @@ pub(super) fn scan_line(
         }
     }
 
-    // 3. An output glob bound to the wrong gate — only when a SINGLE gate is on
-    //    the line, because a line naming both is a legitimate summary.
-    let has_gate_1 = GATE_1.is_match(text);
-    let has_gate_2 = GATE_2.is_match(text);
-    if let Some(review_output) = spec.gate("gate_2")
-        && has_gate_1
-        && !has_gate_2
-        && matches_glob(text, review_output)
-    {
-        violations.push(Violation {
-            file: rel_path.to_string(),
-            line: line_no,
-            found: format!("Gate 1 referencing {review_output}"),
-            expected: format!("Gate 2 owns {review_output}"),
-        });
-    }
-    if let Some(plan_output) = spec.gate("gate_1")
-        && has_gate_2
-        && !has_gate_1
-        && matches_glob(text, plan_output)
-    {
-        violations.push(Violation {
-            file: rel_path.to_string(),
-            line: line_no,
-            found: format!("Gate 2 referencing {plan_output}"),
-            expected: format!("Gate 1 owns {plan_output}"),
-        });
-    }
-
-    // 4. `applies_to` must enumerate every integer phase id.
+    // 3. `applies_to` must enumerate every integer phase id.
     if let Some(capture) = APPLIES_TO.captures(text) {
         let listed = capture.get(1).map(|m| m.as_str()).unwrap_or_default();
         let present: Vec<i64> = DIGITS

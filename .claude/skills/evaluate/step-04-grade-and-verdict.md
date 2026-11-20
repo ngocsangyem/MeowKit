@@ -1,6 +1,6 @@
 # Step 4: Grade and Write Verdict
 
-Aggregate findings into per-rubric verdicts, compute the weighted score, write the verdict file at the canonical path, and run `validate-verdict.sh` to enforce the active-verification gate.
+Aggregate findings into per-rubric verdicts, compute the weighted score, write the verdict file at the canonical path, and run `validate-verdict.sh` to enforce the active-verification requirement.
 
 ## Instructions
 
@@ -152,7 +152,7 @@ The validator appends a stamp section to the verdict file:
 - verdict_accepted: true
 ```
 
-This proves the verdict survived the active-verification gate.
+This proves the verdict survived the active-verification requirement.
 
 ## Multi-Batch Merge
 

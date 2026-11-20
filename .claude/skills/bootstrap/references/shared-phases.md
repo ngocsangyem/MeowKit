@@ -7,7 +7,7 @@ Run the three phases in order without stopping between them: each one feeds the 
 
 Activate mk:cook skill with the plan path:
 
-- Full mode → `/mk:cook [plan-path]` (interactive, all gates)
+- Full mode → `/mk:cook [plan-path]` (interactive, all approval steps)
 - Auto mode → `/mk:cook [plan-path] --auto`
 - Fast mode → `/mk:cook [plan-path] --auto`
 - Parallel mode → `/mk:cook [plan-path] --parallel`

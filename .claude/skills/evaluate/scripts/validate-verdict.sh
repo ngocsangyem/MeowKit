@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# validate-verdict.sh — Enforces the active-verification HARD GATE on evaluator verdict files.
+# validate-verdict.sh — Enforces the active-verification requirement on evaluator verdict files.
 # Usage:  validate-verdict.sh <path-to-evalverdict.md>
 # Exit:   0 if valid, 1 if FAIL (with diagnostics on stderr), 2 on usage error
 # Reqs:   Bash 3.2+. Tested macOS BSD + GNU coreutils.
@@ -35,8 +35,7 @@ get_field() {
 }
 
 # 1. Required frontmatter fields. `evaluator` (identity: agent/session/date) is required
-#    as of validator v2 — anti-accidental provenance (not claimed unforgeable; consistent
-#    with Gate 2's authority note). A verdict with no evaluator identity is rejected.
+#    as of validator v2 — anti-accidental provenance (not claimed unforgeable; #    with the review verdict's authority note). A verdict with no evaluator identity is rejected.
 for field in "task" "evaluator_run" "rubric_preset" "overall" "weighted_score" "hard_fail_triggered" "evaluator"; do
   if [ -z "$(get_field "$field")" ]; then
     echo "VERDICT_INVALID: missing required frontmatter field: $field" >&2
@@ -61,11 +60,11 @@ evidence_dir="$verdict_dir/${verdict_base}-evidence"
 
 if [ ! -d "$evidence_dir" ]; then
   echo "FAIL: evidence directory does not exist: $evidence_dir" >&2
-  echo "       (active-verification gate per Phase 3 spec — every verdict needs an evidence/ directory)" >&2
+  echo "       (active-verification requirement per Phase 3 spec — every verdict needs an evidence/ directory)" >&2
   fail=1
 fi
 
-# 3. Evidence directory must be non-empty (HARD GATE).
+# 3. Evidence directory must be non-empty (required).
 if [ -d "$evidence_dir" ]; then
   evidence_count=$(find "$evidence_dir" -type f | wc -l | tr -d ' ')
   if [ "$evidence_count" -eq 0 ]; then
@@ -80,12 +79,12 @@ fi
 # 4. PASS/WARN verdict requires at least 1 evidence file. Convert to FAIL if violated.
 if [ "$overall" = "PASS" ] || [ "$overall" = "WARN" ]; then
   if [ "$evidence_count" -eq 0 ]; then
-    echo "FAIL: $overall verdict with empty evidence — converting to FAIL per active-verification gate" >&2
+    echo "FAIL: $overall verdict with empty evidence — converting to FAIL per the active-verification requirement" >&2
     fail=1
   fi
 fi
 
-# 5. PER-RUBRIC HARD GATE — every rubric whose hard_fail_threshold is FAIL
+# 5. PER-RUBRIC REQUIREMENT — every rubric whose hard_fail_threshold is FAIL
 #    must have at least one cited evidence file when its verdict is PASS or WARN.
 #    This generalizes the previous functionality-only check to ALL hard-fail rubrics
 #    (closes red-team C2 — frontend-app preset has 4 hard-fail rubrics, not just functionality).
@@ -164,7 +163,7 @@ PY=".meowkit/envs/evaluate/bin/python3"
 recompute_script="$(dirname "$0")/recompute-score.py"
 recomputed_ran=0
 if [ -z "$PY" ]; then
-  # python3 is a hard dependency of the recompute gate. No interpreter ⇒ cannot verify the
+  # python3 is a hard dependency of the recompute check. No interpreter ⇒ cannot verify the
   # score is honest ⇒ fail closed rather than accept an unverifiable PASS/WARN.
   if [ "$overall" = "PASS" ] || [ "$overall" = "WARN" ]; then
     echo "VERDICT_INVALID: python3 not found — cannot recompute the weighted score for a $overall verdict" >&2

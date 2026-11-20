@@ -106,7 +106,7 @@ only the silent background fires described in
 - `{YYMMDD}-status.md` means a same-day re-run overwrites (idempotent) while multi-day history
   accumulates in the plan's `status-reports/` directory.
 - Reports travel with the plan: archiving a plan archives its reports.
-- Status is a report, never an approval. A green headline clears no gate.
+- Status is a report, never an approval. A green headline approves nothing.
 
 ## Related
 

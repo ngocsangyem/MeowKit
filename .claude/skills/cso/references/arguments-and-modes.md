@@ -6,7 +6,7 @@ When the user types `/mk:cso`, run this skill.
 
 ## Arguments
 
-- `/mk:cso` — full daily audit (all phases, 8/10 confidence gate)
+- `/mk:cso` — full daily audit (all phases, 8/10 confidence threshold)
 - `/cso --comprehensive` — monthly deep scan (all phases, 2/10 bar — surfaces more)
 - `/cso --infra` — infrastructure-only (Phases 0-6, 12-14)
 - `/cso --code` — code-only (Phases 0-1, 7, 9-11, 12-14)
@@ -18,8 +18,8 @@ When the user types `/mk:cso`, run this skill.
 
 ## Mode Resolution
 
-1. If no flags → run ALL phases 0-14, daily mode (8/10 confidence gate).
-2. If `--comprehensive` → run ALL phases 0-14, comprehensive mode (2/10 confidence gate). Combinable with scope flags.
+1. If no flags → run ALL phases 0-14, daily mode (8/10 confidence threshold).
+2. If `--comprehensive` → run ALL phases 0-14, comprehensive mode (2/10 confidence threshold). Combinable with scope flags.
 3. Scope flags (`--infra`, `--code`, `--skills`, `--supply-chain`, `--owasp`, `--scope`) are **mutually exclusive**. If multiple scope flags are passed, **error immediately**: "Error: --infra and --code are mutually exclusive. Pick one scope flag, or run `/mk:cso` with no flags for a full audit." Do NOT silently pick one — security tooling must never ignore user intent.
 4. `--diff` is combinable with ANY scope flag AND with `--comprehensive`.
 5. When `--diff` is active, each phase constrains scanning to files/configs changed on the current branch vs the base branch. For git history scanning (Phase 2), `--diff` limits to commits on the current branch only.

@@ -45,7 +45,7 @@ Run `/mk:cso` when the user requests a security audit, threat model, pentest rev
 
 **Scope:** Whole-repo infra + supply-chain audit. For diff-scoped security review gating a PR, use `mk:review`.
 
-## Plan-First Gate
+## Plan First
 
 Security audits use the security-model workflow:
 1. If comprehensive mode → invoke `mk:plan-creator "security audit: {scope}"` to scope the audit
@@ -72,7 +72,7 @@ Skip: Daily mode (`--daily`) — scope is automatic.
 | [references/phase-4-5-6-cicd-infra-webhooks.md](references/phase-4-5-6-cicd-infra-webhooks.md)             | CI/CD pipeline security, Docker/IaC audit, webhook/integration audit                                                                                       |
 | [references/phase-7-8-llm-skills.md](references/phase-7-8-llm-skills.md)                                   | LLM/AI security checks, skill supply chain scanning                                                                                                        |
 | [references/phase-9-10-11-owasp-stride-data.md](references/phase-9-10-11-owasp-stride-data.md)             | OWASP Top 10 (A01-A10), STRIDE threat model, data classification                                                                                           |
-| [references/phase-12-fp-filtering.md](references/phase-12-fp-filtering.md)                                 | Confidence gates, the false-positive filter set, active verification, variant analysis, parallel verification                                              |
+| [references/phase-12-fp-filtering.md](references/phase-12-fp-filtering.md)                                 | Confidence thresholds, the false-positive filter set, active verification, variant analysis, parallel verification                                              |
 | [references/phase-13-14-report-save.md](references/phase-13-14-report-save.md)                             | Findings report format, trend tracking, incident response playbooks, remediation roadmap, JSON schema, important rules, disclaimer                         |
 
 ## Hooks

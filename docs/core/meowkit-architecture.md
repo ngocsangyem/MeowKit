@@ -9,7 +9,7 @@
 ## 1. System Overview
 
 MeowKit is a prompt-engineering framework that extends Claude Code with structured
-workflows, quality gates, memory persistence, and 127 domain skills. It operates
+workflows, quality checks, memory persistence, and 127 domain skills. It operates
 through three mechanisms:
 
 1. **Rules** (`.claude/rules/*.md`) — behavioral instructions loaded every session;
@@ -251,7 +251,7 @@ it fires again per teammate message, so no handler is registered yet.
 
 ## 5. Enforcement
 
-MeowKit has no plan-approval or review-approval gate. What each runtime enforces, and the
+Planning and review are practices: no hook checks a plan approval or a review verdict. What each runtime enforces, and the
 states in which installed hooks do not run, is in `docs/core/enforcement-matrix.md`.
 
 | Control             | Trigger                                     | Mechanism                                                                    |
@@ -347,10 +347,10 @@ Source: `.claude/skills/autobuild/references/adaptive-density-matrix.md` (canoni
 | Density                 | Model        | Contract                           | Iterations | Override                       |
 | ----------------------- | ------------ | ---------------------------------- | ---------- | ------------------------------ |
 | MINIMAL (Haiku)         | Cheapest     | Skip — short-circuits to mk:cook | Skip       | `MEOWKIT_AUTOBUILD_MODE=MINIMAL` |
-| FULL (Sonnet, Opus 4.5) | Default/Best | Required (gate-enforced)           | 1–3 rounds | `MEOWKIT_AUTOBUILD_MODE=FULL`    |
+| FULL (Sonnet, Opus 4.5) | Default/Best | Required (signed before code)     | 1–3 rounds | `MEOWKIT_AUTOBUILD_MODE=FULL`    |
 | LEAN (Opus 4.6+)        | Best         | Optional (skip if ACs < 5)         | 0–1 rounds | `MEOWKIT_AUTOBUILD_MODE=LEAN`    |
 
-Density override adjusts scaffolding only — **never bypasses gates**
+Density override adjusts scaffolding only — **never lowers the quality bar**
 (`harness-rules.md` Rule 10).
 
 ---

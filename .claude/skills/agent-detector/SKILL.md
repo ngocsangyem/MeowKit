@@ -115,7 +115,7 @@ default_enabled: true
 - `references/scoring-and-thresholds.md` -- Scoring weights, agent thresholds, QA activation rules
 - `references/detection-process.md` -- Step-by-step process (cache, Steps 0-5, banner format)
 - `references/examples.md` -- Seven worked examples covering common detection scenarios
-- `references/team-mode.md` -- Team mode gate, composition rules, output format, handoff
+- `references/team-mode.md` -- Team mode checks, composition rules, output format, handoff
 - `references/after-detection.md` -- Post-detection actions, available agents, manual override
 
 ## Token Budget

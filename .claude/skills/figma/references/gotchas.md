@@ -114,7 +114,7 @@ intended for screen display.
 
 # Canvas-write gotchas
 
-These apply ONLY inside the `canvas-write-boundaries.md` workflow (gated `use_figma` mutation). The
+These apply ONLY inside the `canvas-write-boundaries.md` workflow (conditional `use_figma` mutation). The
 read/analyze path does not load them.
 
 ## W1. Fills/Strokes Are Read-Only Arrays

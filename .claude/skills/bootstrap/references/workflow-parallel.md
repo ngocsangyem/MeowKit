@@ -1,6 +1,6 @@
 # Workflow: Parallel (--parallel)
 
-Design gate only. Parallel implementation for independent components. Good for large projects.
+Design approval only. Parallel implementation for independent components. Good for large projects.
 
 ## Step 0: Git Init
 
@@ -15,15 +15,15 @@ Spawn max 2 researcher subagents in parallel (≤150 lines each).
 Include the save path in each researcher's prompt:
 - "Research [topic]. Save report to tasks/reports/researcher-01-[topic-slug].md"
 
-No gate — proceed IMMEDIATELY to Step 2.
+No approval step — proceed IMMEDIATELY to Step 2.
 
 ## Step 2: Tech Stack + Design
 
 1. Run `scripts/detect-stack.sh` or auto-select from research
 2. If frontend: spawn `ui-ux-designer` for design guidelines
-3. **Gate:** User approves tech stack + design direction
+3. **Approval step:** User approves tech stack + design direction
 
-**After gate passes: proceed IMMEDIATELY to Step 3. Do NOT stop.**
+**After approval: proceed IMMEDIATELY to Step 3. Do NOT stop.**
 
 ## Step 3: Parallel Planning (before scaffolding)
 

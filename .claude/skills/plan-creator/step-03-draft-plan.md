@@ -73,7 +73,7 @@ This block is **advisory** and carries only the **extra latitude specific to THI
 ```markdown
 ## Autonomy Boundaries
 
-Baseline rules (security, gates, tests, naming, scope, budget) always apply; below is only the extra per-task latitude for this plan.
+Baseline rules (security, ship check, tests, naming, scope, budget) always apply; below is only the extra per-task latitude for this plan.
 
 - **Always (autonomous):** {reversible, in-scope choices the executor may make without asking — e.g. "pick the internal helper name", "choose the test fixture layout"}
 - **Ask first:** {reversible-but-significant choices to surface before acting — e.g. "swap the charting lib", "change the public API response shape", "add a new top-level route"}

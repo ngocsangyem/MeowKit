@@ -1,8 +1,8 @@
 //! The machine-readable review verdict — the companion to the human
 //! `tasks/reviews/<slug>-verdict.md`.
 //!
-//! Gate authority note: this type RECORDS a decision a review reached. It is
-//! evidence a human reads at Gate 2 and never the approval itself, so nothing
+//! Authority note: this type RECORDS a decision a review reached. It is
+//! evidence a human reads when reviewing and never the approval itself, so nothing
 //! here derives "may ship" from anything but an explicit `BLOCKED` check the
 //! caller performs.
 //!
@@ -88,12 +88,12 @@ impl Verdict {
     }
 
     /// Whether this verdict's own decision blocks a ship. It answers ONLY the
-    /// decision field — the gate still belongs to the human who reads it.
+    /// decision field — the approval still belongs to the human who reads it.
     pub fn decision_blocks(&self) -> bool {
         self.decision == VerdictDecision::Blocked
     }
 
-    /// Dimension names carrying `FAIL`. A non-empty list is what the Gate 2
+    /// Dimension names carrying `FAIL`. A non-empty list is what the review
     /// paperwork check reports; it does not decide anything by itself.
     pub fn failed_dimensions(&self) -> Vec<&str> {
         self.dimensions

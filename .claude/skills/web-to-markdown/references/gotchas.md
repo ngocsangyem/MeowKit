@@ -46,13 +46,13 @@ Concrete edge cases and operational surprises. Each entry explains why it matter
 
 ## Gotcha: JS rendering requires three independent conditions
 
-**Why it matters:** Playwright rendering is triple-gated. ALL three must be true simultaneously:
+**Why it matters:** Playwright rendering needs three conditions. ALL three must be true simultaneously:
 
 1. `playwright` package installed (via `.claude/hooks/lib/setup-workflow --system-deps`, ~200MB download)
 2. `MEOWKIT_WEB_FETCH_JS=1` environment variable set
 3. Per-call `js=True` argument passed to `fetch_as_markdown()`
 
-Missing any single gate silently falls back to static fetch. If static fetch returns thin content and all three gates are not met, the skill returns an error, not a Playwright result.
+Missing any single condition silently falls back to static fetch. If static fetch returns thin content and all three conditions are not met, the skill returns an error, not a Playwright result.
 
 **Mitigation:** Run `.claude/hooks/lib/setup-workflow --system-deps` to install Playwright, then set `MEOWKIT_WEB_FETCH_JS=1` in your environment, and pass `js=True` at the call site. Verify all three before assuming JS rendering is active.
 

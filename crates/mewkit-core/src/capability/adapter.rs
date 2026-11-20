@@ -71,7 +71,7 @@ impl AdapterView {
             "storageBoundary": STORAGE_BOUNDARY,
             "summary": {
                 "supportState": support_state,
-                "enforcement": {"gate1": level, "gate2": level, "secretProtection": level},
+                "enforcement": {"secretProtection": level},
                 "gatesProven": self.lifecycle[1].1.gate,
             },
         })

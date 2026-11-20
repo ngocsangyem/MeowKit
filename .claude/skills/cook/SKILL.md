@@ -229,7 +229,7 @@ During iterative build-test-fix cycles, follow `references/loop-safety-protocol.
 
 See `references/subagent-patterns.md` for Agent() invocation patterns.
 See `references/workflow-steps.md` for detailed per-phase instructions.
-See `references/review-cycle.md` for review gate logic.
+See `references/review-cycle.md` for review cycle logic.
 
 ## Simplify Step (Mandatory)
 

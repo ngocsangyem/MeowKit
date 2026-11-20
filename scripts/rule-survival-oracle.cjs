@@ -51,7 +51,7 @@ const securityEnforcement = [
 	},
 ];
 
-/** What stays true after the approval gates were removed: the ship check and its scope. */
+/** What stays true now that planning and review are practices: the ship check and its scope. */
 const shipCheck = [
 	["ship check runs on ship commands", "the `pre-ship` hook runs lint on the changed files, the tests related to them and a type-check"],
 	["ship check says when tests did not run", "it runs lint and type-check only and says so"],

@@ -27,7 +27,6 @@ Rules derived from in-repo governance and enforcement sources (.claude/rules/*, 
 | Runtime session state   | `.meowkit/state/`                                                          | `session-state/` (project root), `.claude/session-state/`           |
 | Session markers         | `.meowkit/state/` for TDD sentinels, workflow evidence, and plan intake    | any provider-scoped `session-state/` directory for those artifacts  |
 | Skill references        | `.claude/skills/*/references/*.md`                                    | `domain/file.md` (short form)                                       |
-| Gate validation scripts | `.claude/skills/cook/scripts/validate-gate-*.sh`                      | `scripts/validate-gate-*.sh`                                        |
 
 **Rule:** When referencing any file in a skill or agent, use the FULL path from project root. Never use shortened or assumed paths. Before merging, grep for the path in all consuming files.
 
@@ -212,7 +211,7 @@ Phase 0: Orient → Phase 1: Plan → Phase 2: Test RED
 → Phase 3: Build → Phase 4: Review → Phase 5: Ship → Phase 6: Reflect
 ```
 
-Planning and review are practices with no gate: the plan is agreed with the user before Phase 3 and the diff is reviewed before Phase 5, but no hook blocks either step. The ship check is the one enforced ship-time control (`docs/core/enforcement-matrix.md`).
+Planning and review are practices that no hook enforces: the plan is agreed with the user before Phase 3 and the diff is reviewed before Phase 5, but no hook blocks either step. The ship check is the one enforced ship-time control (`docs/core/enforcement-matrix.md`).
 
 **Rule:** Never use a 5-phase model. If you see one, fix it. The workflow-orchestrator was migrated from 5-phase to 7-phase in the audit.
 
@@ -274,7 +273,7 @@ Skills read the store with `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` and write
 - Every referenced file MUST exist. grep for paths before merging.
 - Use `mk:` prefix in skill names. Never use `ck:` prefix (that's ClaudeKit).
 - Reference paths must use full `.claude/skills/*/references/*` form, not short `domain/file.md` form.
-- Match instruction precision and deterministic gates to the step's risk. Do not require fixed reporting, memory, or ideation ceremony for trivial work.
+- Match instruction precision and deterministic checks to the step's risk. Do not require fixed reporting, memory, or ideation ceremony for trivial work.
 - Keep generic skill bodies, references, and templates portable. Provider-specific tools, models, limits, and style steering belong in a provider adapter or projection.
 - When a caller and a supported command disagree, migrate the caller to the supported contract; do not invent an unimplemented flag. Use `tasks/reports/` for canonical reports paths.
 - Brand-prose checks block violations in changed files; untouched legacy violations remain warnings until a separately approved clean-baseline change.

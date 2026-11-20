@@ -20,7 +20,7 @@ For all other diffs, the standard single-pass review (step-02 → step-03 → st
 
 ### Pass 1: Full Adversarial Review
 
-Execute the complete standard review workflow (step-01 through step-04) with all adversarial personas active regardless of diff size. The scope gate in step-01 is overridden — full review runs unconditionally.
+Execute the complete standard review workflow (step-01 through step-04) with all adversarial personas active regardless of diff size. The scope check in step-01 is overridden — full review runs unconditionally.
 
 Output: full findings list with severity ratings. Do NOT issue a verdict yet.
 

@@ -30,7 +30,7 @@
   - [Integration tests](#integration-tests)
 - [8. Incident response](#8-incident-response)
 - [9. Out of scope (v1)](#9-out-of-scope-v1)
-- [10a. Three-layer JS gate (security property)](#10a-three-layer-js-gate-security-property)
+- [10a. Three-layer JS switch (security property)](#10a-three-layer-js-switch-security-property)
 
 ## 1. Threat model
 
@@ -453,7 +453,7 @@ Must cover, at minimum:
 - Persistence writer: slug generation (with query strings, fragments, Punycode, long paths), atomic `.tmp→mv`, `fcntl.flock` on manifest, concurrent-write test
 - DATA boundary wrap: round-trip content with backticks survives without escape break
 - Quarantine flow: injection hit → quarantine file written with 0400 perms, manifest entry has `status: injection_stop`, security-log has entry, NO regular report file, NO preview in return value
-- Cross-skill delegation gate: without `--wtm-accept-risk` → ERROR; with flag → proceed
+- Cross-skill delegation check: without `--wtm-accept-risk` → ERROR; with flag → proceed
 
 ### Smoke tests
 
@@ -491,19 +491,19 @@ If the post-write re-scan (Layer 8) catches a pattern that Layer 5 missed:
 
 ---
 
-## 10a. Three-layer JS gate (security property)
+## 10a. Three-layer JS switch (security property)
 
 Playwright rendering is a significant attack-surface expansion: it executes JavaScript, loads subresources, and renders dynamic content that the static HTTP path never processes. To prevent accidental Playwright invocation, three independent conditions must ALL be true before any JS rendering occurs:
 
-| Gate     | Condition                                     | Why it matters                                                                                                           |
+| Switch   | Condition                                     | Why it matters                                                                                                           |
 | -------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Gate (a) | `playwright` Python package importable        | Prevents invocation if Playwright was never installed — install is explicit, ~200MB, user-visible                        |
-| Gate (b) | `MEOWKIT_WEB_FETCH_JS=1` environment variable | Process-level opt-in; default is 0 (off). Prevents JS rendering in environments where it was not explicitly enabled      |
-| Gate (c) | `js=True` per-call argument                   | Call-site opt-in; each fetch must explicitly request JS rendering. Prevents accidental upgrade from static to Playwright |
+| (a)      | `playwright` Python package importable        | Prevents invocation if Playwright was never installed — install is explicit, ~200MB, user-visible                        |
+| (b)      | `MEOWKIT_WEB_FETCH_JS=1` environment variable | Process-level opt-in; default is 0 (off). Prevents JS rendering in environments where it was not explicitly enabled      |
+| (c)      | `js=True` per-call argument                   | Call-site opt-in; each fetch must explicitly request JS rendering. Prevents accidental upgrade from static to Playwright |
 
-**Implementation:** `_js_gate_open()` in `fetch_as_markdown.py` checks (a) + (b). Gate (c) is the `js` parameter passed to `fetch_as_markdown()`. Playwright fetch only executes when all three gates are open.
+**Implementation:** `_js_gate_open()` in `fetch_as_markdown.py` checks (a) + (b). (c) is the `js` parameter passed to `fetch_as_markdown()`. Playwright fetch only executes when all three conditions hold.
 
-**Security implication:** An attacker who controls a URL cannot force Playwright execution. Even if static fetch returns thin content and falls through, Playwright only fires if all three gates are explicitly set by a human or trusted orchestrator.
+**Security implication:** An attacker who controls a URL cannot force Playwright execution. Even if static fetch returns thin content and falls through, Playwright only fires if all three conditions are explicitly set by a human or trusted orchestrator.
 
 **Playwright-specific SSRF guard:** Route interception (`page.route("**/*", _route_handler)`) re-validates every document-level navigation via `safe_url` (Layer 2). Subresources are not intercepted (overhead vs benefit tradeoff documented in `_playwright_fetch`).
 

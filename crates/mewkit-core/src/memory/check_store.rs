@@ -2,7 +2,7 @@
 //!
 //! Port of `core/check-memory-store.ts`. v3 memory is plain markdown under
 //! `.meowkit/memory/`, committed and reviewed in the PR diff. There is no index,
-//! no schema and no approve gate, so this lint plus the PR diff are the guard. It
+//! no schema and no approval step, so this lint plus the PR diff are the guard. It
 //! enforces four properties, all load-bearing:
 //!
 //! 1. SIZE — a file over [`MEMORY_FILE_MAX_LINES`] lines, or over the byte cap,

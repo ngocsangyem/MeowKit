@@ -25,7 +25,7 @@ The orchestrator agent MUST declare the tier before any task begins.
 
 Source: prompt-crafting-for-different-models.md — Model Selection Strategy table
 
-> Note: TRIVIAL (cosmetic: rename, typo, format) is distinct from MICRO-TASK (non-production logic <30 lines). MICRO-TASK is only relevant when TDD is enabled (`MEOWKIT_TDD=1` / `--tdd`) — it exempts non-production code from the RED-phase requirement. In default mode (TDD off), the exemption is moot since no RED gate exists. See .claude/skills/cook/references/tdd-rules.md.
+> Note: TRIVIAL (cosmetic: rename, typo, format) is distinct from MICRO-TASK (non-production logic <30 lines). MICRO-TASK is only relevant when TDD is enabled (`MEOWKIT_TDD=1` / `--tdd`) — it exempts non-production code from the RED-phase requirement. In default mode (TDD off), the exemption is moot since no RED requirement exists. See .claude/skills/cook/references/tdd-rules.md.
 
 ## Agent `model:` Pins
 

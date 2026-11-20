@@ -2,10 +2,10 @@
 
 Categorize findings to separate signal from noise. Only current-change findings block shipping.
 
-## Coverage Gate (assured PR mode only)
+## Coverage Check (assured PR mode only)
 
 When this review runs against a `mewkit review prepare` session (assured PR mode),
-run the coverage gate BEFORE composing the verdict:
+run the coverage check BEFORE composing the verdict:
 
 ```bash
 mewkit review coverage --session <session-id> --json

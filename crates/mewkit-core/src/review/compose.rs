@@ -1,4 +1,4 @@
-//! `review compose` — the MECHANICAL coverage→verdict gate.
+//! `review compose` — the MECHANICAL coverage→verdict step.
 //!
 //! In order: verify the captured diff still hashes to what the manifest
 //! recorded, re-run coverage and HARD-REFUSE on any gap, validate every
@@ -8,7 +8,7 @@
 //! A `PASS` is therefore impossible without complete, session-observed
 //! coverage — and that coupling lives here, in code, not only in the prose of
 //! a step file. What it produces is still EVIDENCE: the bundle is what a human
-//! reads at the gate, and no path in this file records an approval.
+//! reads when reviewing, and no path in this file records an approval.
 use std::path::Path;
 use std::sync::LazyLock;
 

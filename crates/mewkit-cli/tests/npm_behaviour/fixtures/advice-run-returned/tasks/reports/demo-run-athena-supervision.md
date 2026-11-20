@@ -13,7 +13,7 @@ escalatedToHuman: false
 
 # Supervision run demo-run
 
-This is supervision continuity, NEVER verification and never a gate approval.
+This is supervision continuity, NEVER verification and never an approval.
 
 **Latest directive:** return it
 **Next safe action:** re-run verify

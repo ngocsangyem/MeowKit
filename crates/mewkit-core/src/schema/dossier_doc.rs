@@ -106,7 +106,7 @@ escalatedToHuman: {escalated}
 
 # Supervision run {raw_run_id}
 
-This is supervision continuity, NEVER verification and never a gate approval.
+This is supervision continuity, NEVER verification and never an approval.
 
 **Latest directive:** {directive_line}
 **Next safe action:** {next_action_line}

@@ -22,7 +22,7 @@ export STITCH_API_KEY="sk_..."  # From https://stitch.withgoogle.com/settings/ap
 ```
 
 The SDK auto-reads `STITCH_API_KEY` from environment. No explicit config needed.
-The key gate in `stitch-api-call.ts` checks this var before any SDK method is called.
+The key check in `stitch-api-call.ts` checks this var before any SDK method is called.
 
 ## Core API
 

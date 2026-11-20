@@ -1,6 +1,6 @@
 {
   "exit_code": 0,
-  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nRules\n  [PASS] Routing-table breadth\n\n1 passed\n",
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the guards actually block.\n\nFound: <project>/.claude\n\nRules\n  [PASS] Routing-table breadth\n\n1 passed\n",
   "stderr": "",
   "files": {
     ".claude/agents/developer.md": "---\nname: developer\ndescription: Writes production code.\n---\n\nProse.\n",

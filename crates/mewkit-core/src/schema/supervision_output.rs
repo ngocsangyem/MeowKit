@@ -2,7 +2,7 @@
 //!
 //! The outbound half of the boundary is held to the same bars as the inbound
 //! one plus one more: it may not speak with AUTHORITY. Counsel is evidence a
-//! human reads at a gate, never the approval itself, so approval language is
+//! human reads when reviewing, never the approval itself, so approval language is
 //! refused here however it is worded.
 //!
 //! The supervisor also OPENS the files it was pointed at, so its own prose can

@@ -1,6 +1,6 @@
 {
   "exit_code": 0,
-  "stdout": "261112-not-here\n  plan:   <project>/tasks/plans/261112-not-here\n  status: (no status)\n\n  Overall  ──────────────────── — (0/0 boxes)\n  Progress is what the plan's checkboxes say, not a verification of the work.\n\n  Observations (2)\n    • no plan.md — Gate 1 expects one at the plan root\n    • no phase-XX-*.md files found\n",
+  "stdout": "261112-not-here\n  plan:   <project>/tasks/plans/261112-not-here\n  status: (no status)\n\n  Overall  ──────────────────── — (0/0 boxes)\n  Progress is what the plan's checkboxes say, not a verification of the work.\n\n  Observations (2)\n    • no plan.md at the plan root\n    • no phase-XX-*.md files found\n",
   "stderr": "",
   "files": {
     "tasks/plans/261112-demo-plan/phase-01-setup.md": "---\nphase: 1\ntitle: Setup\nstatus: pending\npriority: high\neffort: S\ndependencies: [bootstrap, toolchain]\n---\n\n## Context Links\n\nThe plan overview.\n\n## Overview\n\nSet the project up.\n\n## Key Insights\n\nNothing surprising yet.\n\n## Requirements\n\nA toolchain.\n\n## Architecture\n\nOne crate.\n\n## Related Code Files\n\n- src/main.rs\n\n## Implementation Steps\n\n1. Install the toolchain.\n\n## Todo List\n\n- [x] Install the toolchain\n- [ ] Prove it builds\n\n## Success Criteria\n\nIt builds.\n\n## Risk Assessment\n\nThe toolchain may be absent.\n\n## Security Considerations\n\nNothing is downloaded.\n\n## Next Steps\n\nPhase 2.\n",

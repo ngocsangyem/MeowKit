@@ -4,6 +4,6 @@
   "stderr": "",
   "files": {
     "README.md": "A project with no task tree yet.\n",
-    "tasks/active/261114-fix-null-session-crash.bug.md": "---\ntitle: \"Fix null session crash\"\ntype: bug-fix\nstatus: draft\nphase: 1\npriority: high\neffort: medium\ncreated: 2026-11-14\nbranch: bug/fix-null-session-crash\nagent: \"\"\n---\n\n# Fix null session crash\n\n<!-- Fill in sections from the template -->\n\n## Agent State\n\nCurrent phase: 1 — Planning\nLast action: Task file created\nNext action: Get Gate 1 approval before writing any tests or code\nBlockers: none\nDecisions made: none yet\n"
+    "tasks/active/261114-fix-null-session-crash.bug.md": "---\ntitle: \"Fix null session crash\"\ntype: bug-fix\nstatus: draft\nphase: 1\npriority: high\neffort: medium\ncreated: 2026-11-14\nbranch: bug/fix-null-session-crash\nagent: \"\"\n---\n\n# Fix null session crash\n\n<!-- Fill in sections from the template -->\n\n## Agent State\n\nCurrent phase: 1 — Planning\nLast action: Task file created\nNext action: Agree the plan with the user before writing any tests or code\nBlockers: none\nDecisions made: none yet\n"
   }
 }

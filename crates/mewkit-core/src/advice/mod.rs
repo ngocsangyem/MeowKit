@@ -5,10 +5,10 @@
 //! where a skill body cannot talk its way past them.
 //!
 //! **Nothing here approves anything.** `begin` may refuse a call and `commit`
-//! may refuse a disposition, but no path advances a gate, no artifact carries an
+//! may refuse a disposition, but no path grants an approval, no artifact carries an
 //! approval field, and a disposition is recorded verbatim alongside the parent's
-//! own outcome. `READY_FOR_EXISTING_GATE` means the normal reviewer or gate is
-//! the correct NEXT step — never that one is cleared. The dossier schema refuses
+//! own outcome. `READY_FOR_EXISTING_GATE` means the normal reviewer or ship check
+//! is the correct NEXT step — never that one is cleared. The dossier schema refuses
 //! `approval`, `approved`, `gate1`, `gate2`, `verdict` and `status` outright, so
 //! "the dossier says approved" is unwritable rather than merely discouraged.
 //!

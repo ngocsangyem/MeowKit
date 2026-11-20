@@ -120,7 +120,7 @@ Append `## Validation Log` section to plan.md (or update existing). Follow recor
 **Impact:** {which phase sections were updated}
 ```
 
-### 6g. Whole-Plan Consistency Sweep (Gate W2)
+### 6g. Whole-Plan Consistency Sweep (Sweep W2)
 
 After answer propagation has edited phase files (6e) and the Validation Log has been written (6f), the planner agent MUST run a Whole-Plan Consistency Sweep before handing off to step-07.
 

@@ -81,6 +81,6 @@ pub(super) fn run(project_root: &Path, args: &AdviceArgs) -> Result<(), AdviceEr
     if !dossier.receipt_pointers.is_empty() {
         println!("  receipts: {}", dossier.receipt_pointers.join(", "));
     }
-    println!("  supervision continuity — never verification, never a gate approval.");
+    println!("  supervision continuity — never verification, never an approval.");
     Ok(())
 }

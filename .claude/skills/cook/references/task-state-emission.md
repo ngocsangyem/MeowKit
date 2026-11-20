@@ -38,7 +38,7 @@ Plans remain the human source of truth; the record JOINS a plan by path, never r
 ## Rule 3: Advisory, Best-Effort, Never Blocking
 
 Emission is advisory. A failed write is surfaced (the CLI exits non-zero) but MUST NOT block
-the workflow — there is no Stop-gate on task-state. If the installed `mewkit` CLI does not
+the workflow — there is no blocking check on task-state. If the installed `mewkit` CLI does not
 provide `task-state` (an older consumer CLI predating this command), skip silently: treat the
 missing command as "no durable record this run", not as a task failure.
 

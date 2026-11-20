@@ -171,15 +171,15 @@ tasks/plans/YYMMDD-name/
 - **ACs can't be verified**: "code is clean" gives the reviewer nothing to check → every AC must reference a command/file check
 - **Monolithic plan**: plan.md over 80 lines → move detail to phase files or research reports
 - **Research disconnected**: findings archived but not cited in plan → Step 3 MUST integrate research into Key Insights
-- **Over-planning trivial tasks**: 2-file config change gets full research → Step 0 scope gate exits early
+- **Over-planning trivial tasks**: 2-file config change gets full research → Step 0 scope check exits early
 - **Skipping scout on unfamiliar codebases**: → always run mk:scout if codebase is new
 - **Using `--deep` to decide architecture**: deep maps a chosen approach; if the approach is unclear, route to `mk:brainstorming` first.
 - **Dropping TDD at handoff**: when `tdd_mode=true`, step-09 MUST print cook with `--tdd`; sentinel/env state alone is not a cross-session contract.
 - **Post-Plan Handoff is deterministic**: step-09 asks the user; do NOT auto-invoke the chosen command. User must type it in a fresh session for clean context.
 - **`handoff.next` enum is validated**: values outside `{cook, validate, red-team, autobuild, end}` fail the structural check.
-- **Whole-Plan Consistency Gates W1 / W2 fire after red-team and validation interview**: stage-then-apply algorithm — no edits land until the user resolves any unresolved contradictions. See `references/whole-plan-sweep.md`.
+- **Whole-Plan Consistency Sweeps W1 / W2 fire after red-team and validation interview**: stage-then-apply algorithm — no edits land until the user resolves any unresolved contradictions. See `references/whole-plan-sweep.md`.
 - **`consistency_sweeps` frontmatter is optional**: legacy plans without it still validate as `PLAN_COMPLETE`.
-- **Sweep recursion is bounded**: "resolve now" caps at 2 attempts per gate; further unresolved items convert to Risk rows.
+- **Sweep recursion is bounded**: "resolve now" caps at 2 attempts per sweep; further unresolved items convert to Risk rows.
 - **`.plan-state.json` v1.2 schema is additive**: consumers MUST treat unknown keys (`verification_tier`, `consistency_sweeps_passed`) as optional and default-empty. v1.1 readers ignore them silently.
 - **Post-hydration integrity-check failure is a hard stop**: cycle / count-mismatch / missing-metadata failures print an explicit diff and STOP — do NOT auto-recover or silently continue. Human resolution required before step-09. See `references/task-management.md` "Post-Hydration Integrity Checks".
 - **Re-analyzing a design source that already has a packet duplicates interpretation**: when a design evidence packet path is present, cite the packet — do NOT call the design source's tools or re-parse its raw JSON. See `references/design-evidence-consumption.md`.
@@ -187,7 +187,7 @@ tasks/plans/YYMMDD-name/
 ## `--advice` (composable, off by default)
 
 Opt-in strategic supervision for one planning run, capped at 4 calls: GUIDE after the
-scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before the gate
+scope challenge, RESCUE on an unresolved red-team contradiction, REVIEW before the plan is agreed
 step, RECHECK after a correction.
 
 Athena reads the plan and can return it to the planner. It never writes the plan and never

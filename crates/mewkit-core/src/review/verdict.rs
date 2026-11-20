@@ -3,7 +3,7 @@
 //! No model judgment reaches this layer, and nothing here records a human
 //! approval. The composed decision is a pure function of what the session can
 //! prove, and the strongest thing it can produce is a recommendation the human
-//! reads at the gate — `PASS`/`APPROVE` here means "nothing capped it", never
+//! reads when reviewing — `PASS`/`APPROVE` here means "nothing capped it", never
 //! "a review was approved".
 //!
 //! There is no decision-level `WARN`: residual risk maps to `PASS_WITH_RISK`,
@@ -70,7 +70,7 @@ pub struct ComputedVerdict {
     pub decision: Decision,
     pub event: ReviewEvent,
     /// Why the outcome was capped — disclosed in the verdict body rather than
-    /// swallowed, so the human at the gate sees what the session could not do.
+    /// swallowed, so the human reviewing sees what the session could not do.
     pub reasons: Vec<String>,
 }
 

@@ -1,6 +1,6 @@
 {
   "exit_code": 0,
-  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nInventory\n  [PASS] Index counts & completeness\n\nAgents\n  [PASS] Agent conformance\n\n2 passed\n",
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the guards actually block.\n\nFound: <project>/.claude\n\nInventory\n  [PASS] Index counts & completeness\n\nAgents\n  [PASS] Agent conformance\n\n2 passed\n",
   "stderr": "",
   "files": {
     ".claude/agents/AGENTS_INDEX.md": "# Agents\n\n[1]{agent_file\n\ndeveloper\n\n<!-- GENERATED:agent-views START -->\n**Agent registry views (generated):** 1 core/support direct-only; 0 domain hub-only; 0 intelligence direct-only; 0 intelligence direct-and-harness; 0 internal harness.\n<!-- GENERATED:agent-views END -->\n",

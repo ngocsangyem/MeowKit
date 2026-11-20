@@ -64,9 +64,9 @@ fn node_available() -> bool {
 /// Every fixture committed at review time. A fixture may be ADDED without
 /// touching this number; losing one is a corpus regression.
 ///
-/// Lowered from 58 when the plan gate and the review-verdict gate were removed:
+/// Lowered from 58 when the plan approval and the review-verdict approval were removed:
 /// the three fixtures that rejected `gate1PresenceOnly`, the user-scope-only
-/// rule and the two protected gate hooks describe keys and hooks that no longer
+/// rule and the two protected approval hooks describe keys and hooks that no longer
 /// exist, so they could not be kept.
 const EXPECTED_FIXTURES: usize = 55;
 

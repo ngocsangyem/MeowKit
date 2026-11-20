@@ -1,6 +1,6 @@
 {
   "exit_code": 1,
-  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nDocs\n  [FAIL] Docs references on Type-1 allowlist\n         Scanned 13 files — 1 error(s), 1 warning(s)\n         skills/cook/SKILL.md:7: docs/maintainer/secret-plan.md\n\n0 passed, 1 failed\n",
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the guards actually block.\n\nFound: <project>/.claude\n\nDocs\n  [FAIL] Docs references on Type-1 allowlist\n         Scanned 13 files — 1 error(s), 1 warning(s)\n         skills/cook/SKILL.md:7: docs/maintainer/secret-plan.md\n\n0 passed, 1 failed\n",
   "stderr": "",
   "files": {
     ".claude/agents/developer.md": "---\nname: developer\ndescription: Writes production code.\n---\n\nProse.\n",

@@ -102,7 +102,7 @@ Options:
       --providers         Also report what each provider adapter can enforce
       --state             Also report the state taxonomy
       --explain           `provenance`: name the files behind each count
-      --hard-gates        Live-probe the hard gates (plan, privacy, injection, ship) in a scratch project
+      --hard-gates        Live-probe the hard guards (privacy, injection, ship) in a scratch project
       --adopt             Rebuild the npm CLI's ownership baseline from the local kit cache, or refuse
       --target <TARGETS>  Only these runtimes (comma-separated); default: all
       --global            Check your home directory's installs first instead of this project's

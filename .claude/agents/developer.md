@@ -79,7 +79,7 @@ You may NOT hand off to the evaluator until every box is checked:
 
 ## Contract Discipline (Phase 4)
 
-The signed sprint contract is **immutable** during implementation. You may NOT silently expand or shrink scope.
+The signed sprint contract is **immutable** during implementation. You may NOT silently expand or shrink scope. This is your discipline; no hook checks it.
 
 - **Stay inside the contract.** Every code edit must trace to a signed AC. If you find yourself implementing something that has no AC, STOP — either you're building out-of-scope OR the contract is incomplete and needs an amendment.
 - **Amendments require re-sign.** If mid-build you discover an AC needs revision (it's unverifiable, contradictory, or incomplete), do NOT silently change behavior. Run `/mk:sprint-contract amend` to propose the change, get evaluator review, and re-sign. Append the change to the `## Amendments` section — never edit signed criteria in place.

@@ -62,7 +62,7 @@ ALWAYS:
 Same as Autonomous but:
 - Only 1 auto-fix cycle before escalate
 - Focus: correctness, security, no regressions
-- Still terminates in "ready for user approval" — score never gates; no self-approve
+- Still terminates in "ready for user approval" — score never blocks; no self-approve
 
 ## Critical Issues (Always Block)
 

@@ -4,7 +4,7 @@
   "stderr": "Refused: RETURN_TO_EXECUTOR requires at least one required correction\n",
   "files": {
     "tasks/plans/demo/reports/evidence/review-artifact.json": "{ \"review\": { \"status\": \"approved\" }, \"hash\": \"pinned\" }\n",
-    "tasks/plans/demo/reports/evidence/workflow-evidence.json": "{\n  \"plan\": \"261113-demo\",\n  \"evidenceRevision\": 2,\n  \"verification\": { \"evidenceRevision\": 2, \"status\": \"valid\" },\n  \"review\": { \"evidenceRevision\": 2, \"status\": \"valid\" },\n  \"approvals\": { \"gate1\": \"approved\", \"gate2\": \"approved\", \"gate1Revision\": 1 }\n}\n",
-    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nstage: \"REVIEW\"\nlockedDecisionPointers: []\ncorrectionCount: 0\nreceiptPointers: []\ncheckpoint: { checkpointId: \"cp-1\", stage: \"REVIEW\", state: \"pending\" }\nhistory: []\nescalatedToHuman: false\n---\n\n# Supervision run demo-run\n\nThis is supervision continuity, NEVER verification and never a gate approval.\n\n**Latest directive:** (none yet)\n**Next safe action:** (none recorded)\n"
+    "tasks/plans/demo/reports/evidence/workflow-evidence.json": "{\n  \"plan\": \"261113-demo\",\n  \"evidenceRevision\": 2,\n  \"verification\": { \"evidenceRevision\": 2, \"status\": \"valid\" },\n  \"review\": { \"evidenceRevision\": 2, \"status\": \"valid\" }\n}\n",
+    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nstage: \"REVIEW\"\nlockedDecisionPointers: []\ncorrectionCount: 0\nreceiptPointers: []\ncheckpoint: { checkpointId: \"cp-1\", stage: \"REVIEW\", state: \"pending\" }\nhistory: []\nescalatedToHuman: false\n---\n\n# Supervision run demo-run\n\nThis is supervision continuity, NEVER verification and never an approval.\n\n**Latest directive:** (none yet)\n**Next safe action:** (none recorded)\n"
   }
 }

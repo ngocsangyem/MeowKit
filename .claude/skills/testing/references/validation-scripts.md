@@ -16,7 +16,7 @@
 ## When to Use
 
 Run validation scripts at two mandatory points:
-1. **Phase 4 (Review Gate)** — before a change is approved for shipping
+1. **Phase 4 (Review)** — before a change is approved for shipping
 2. **Pre-Ship** — immediately before creating a PR or deploying
 
 Also run on-demand whenever you want to verify code quality without relying on subjective assessment.
@@ -120,7 +120,7 @@ To add a new security check, follow the same pattern in `security-scan.py`.
 ```
 [Development] → [Unit Tests] → [Validation Scripts] → [Review] → [Security Scan] → [Ship]
                                       ↑                                    ↑
-                                  Phase 4 gate                       Pre-ship gate
+                                  Phase 4 run                        Pre-ship run
 ```
 
-Both gates must pass with exit code `0` before proceeding. No exceptions.
+Both runs must pass with exit code `0` before proceeding. No exceptions.

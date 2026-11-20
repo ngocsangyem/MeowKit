@@ -57,7 +57,7 @@ fn a_committed_checkpoint_records_what_the_parent_did_not_only_what_came_back() 
 
 #[test]
 fn nothing_written_here_records_an_approval() {
-    // The standing Gate Authority check over a real checkpoint's artifacts: the
+    // The standing authority check over a real checkpoint's artifacts: the
     // disposition that most reads like clearance says the opposite in print.
     let (dossier_path, receipt_path) = (dossier("demo-run"), receipt("demo-run", 1));
     let (ts, _) = commit(
@@ -76,7 +76,7 @@ fn nothing_written_here_records_an_approval() {
     assert_eq!(ts.code, 0, "{}", ts.describe());
     assert!(
         ts.stdout
-            .contains("the normal reviewer/gate is the next step — this does NOT clear it."),
+            .contains("the normal review or ship check is the next step — this does NOT clear it."),
         "{}",
         ts.stdout
     );

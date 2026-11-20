@@ -9,7 +9,7 @@ existing code into a reviewed Transformation Spec; it does not implement code.
 - [Recon](#recon)
 - [Inventory](#inventory)
 - [Agentize map](#agentize-map)
-- [Challenge: human approval gate](#challenge-human-approval-gate)
+- [Challenge: human approval step](#challenge-human-approval-step)
 - [Transformation spec](#transformation-spec)
 - [Handoff and boundaries](#handoff-and-boundaries)
 - [Recovery guidance](#recovery-guidance)
@@ -24,7 +24,7 @@ not permission to design both: ask whether the user wants a CLI or MCP surface.
 `--auto` may record technical recommendations but never resolves package name,
 license, ownership, deployment preference, capability selection, or credentials
 without human approval. `--ask` asks the challenge questions. `--lean` skips the
-researcher only; it never skips scout or the approval gate.
+researcher only; it never skips scout or the approval step.
 
 ## Recon
 
@@ -72,7 +72,7 @@ Use the routed credential-resolution reference whenever credentials are involved
 companion skill is not an automatic third surface for a single CLI/MCP request; add
 one only when its workflow guidance is part of the approved scope.
 
-## Challenge: human approval gate
+## Challenge: human approval step
 
 Use the routed challenge-framework reference. Present at least seven decisions as a
 matrix with source answer, proposed answer, and risk if wrong. Include selected

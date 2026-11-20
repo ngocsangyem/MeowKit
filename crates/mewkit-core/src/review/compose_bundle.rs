@@ -1,9 +1,9 @@
-//! The artifacts `compose` leaves behind: the Gate 2 proof bundle, the review
+//! The artifacts `compose` leaves behind: the review proof bundle, the review
 //! body, and the inline anchors pinned into it.
 //!
 //! Separated from the stage that DECIDES because these are a rendering
 //! contract: every byte here is compared against the npm CLI's output and read
-//! by the Gate 2 coverage validator, so a change to a key name or a field
+//! by the review coverage validator, so a change to a key name or a field
 //! order is a change to an interface, not to formatting.
 use serde_json::{Map, Value, json};
 
@@ -94,9 +94,9 @@ pub fn body_line(verdict: &ComputedVerdict) -> String {
     }
 }
 
-/// The Gate 2 proof bundle. It embeds the coverage report AND a hash of it, so
+/// The review proof bundle. It embeds the coverage report AND a hash of it, so
 /// a later edit of the embedded report is detectable — evidence a human reads
-/// at the gate, never an approval.
+/// when reviewing, never an approval.
 pub fn proof_bundle(
     session: &str,
     manifest: &Value,

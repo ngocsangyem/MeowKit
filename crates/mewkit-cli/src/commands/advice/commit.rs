@@ -164,7 +164,7 @@ fn commit_to_dossier(
     Ok(())
 }
 
-/// What the disposition means for the workflow. None of these clears a gate,
+/// What the disposition means for the workflow. None of these clears an approval,
 /// and the one that reads most like clearance says so explicitly.
 fn announce(
     project_root: &Path,
@@ -174,7 +174,9 @@ fn announce(
     match disposition {
         Disposition::ReturnToExecutor => evidence_correction::apply(project_root, args),
         Disposition::ReadyForExistingGate => {
-            println!("  the normal reviewer/gate is the next step — this does NOT clear it.");
+            println!(
+                "  the normal review or ship check is the next step — this does NOT clear it."
+            );
             Ok(())
         }
         Disposition::EscalateToHuman => {

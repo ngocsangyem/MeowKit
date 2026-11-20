@@ -150,7 +150,7 @@ Task(
 $composed_rubric
     --- END COMPOSED RUBRIC ---
 
-    HARD GATE: every verdict must pass validate-verdict.sh.
+    REQUIRED: every verdict must pass validate-verdict.sh.
     Empty evidence directory → automatic FAIL conversion.
   "
 )

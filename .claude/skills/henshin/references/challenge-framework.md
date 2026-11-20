@@ -83,6 +83,6 @@ Emit a Rejection Report with which condition tripped and a concrete refactor rec
 
 - **"Why agentize this?" is the most-skipped question and the most-predictive.** If the answer is fuzzy, the spec will be fuzzy and the resulting tools will be noise. Push for a concrete user outcome before continuing.
 - **Ambiguous read/write classification kills MCP safety.** Any capability whose side effects are "mostly read, but sometimes writes when X" must be split into two tools (read-only + mutating variant). MCP clients decide confirmation semantics based on the classification.
-- **Business decisions leak into `--auto` mode.** Package name, license, ownership are business decisions; even in `--auto`, always gate on human input. Auto-picked names cause `npm publish` failures or legal disputes; auto-picked licenses cause compliance gaps.
+- **Business decisions leak into `--auto` mode.** Package name, license, ownership are business decisions; even in `--auto`, always ask the user. Auto-picked names cause `npm publish` failures or legal disputes; auto-picked licenses cause compliance gaps.
 - **Red flag count is not additive across categories.** 3 architectural red flags is a deeper problem than 3 design red flags. Weight architectural reds higher when deciding to recommend refactor.
 - **Stop conditions are not soft warnings.** When one trips, the right answer is "abort + Rejection Report", not "warn and proceed". The skill's job is to produce a good spec or no spec, never a bad spec.

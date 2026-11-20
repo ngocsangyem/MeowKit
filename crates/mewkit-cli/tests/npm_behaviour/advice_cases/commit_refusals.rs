@@ -1,7 +1,7 @@
 //! What `advice commit` refuses, and what it still leaves behind when it does.
 //!
 //! A refusal here is never an approval in disguise: `commit` can decline to
-//! RECORD a disposition, and no path it takes advances a gate.
+//! RECORD a disposition, and no path it takes grants an approval.
 use super::fixtures::{OPEN, REVIEW_OPEN, SHIP};
 use super::{Run, advice, receipt};
 

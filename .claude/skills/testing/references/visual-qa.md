@@ -134,4 +134,4 @@ Create a report at `qa/reports/visual-qa-[date].md`:
 
 ## Automation
 
-For CI integration, add visual QA as a pipeline step that runs after integration tests and before the ship gate. Store baseline screenshots in version control and update them deliberately when UI changes are intentional.
+For CI integration, add visual QA as a pipeline step that runs after integration tests and before the ship check. Store baseline screenshots in version control and update them deliberately when UI changes are intentional.

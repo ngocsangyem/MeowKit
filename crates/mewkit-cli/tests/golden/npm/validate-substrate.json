@@ -1,6 +1,6 @@
 {
   "exit_code": 1,
-  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nSubstrate\n  [FAIL] Substrate view present\n         Missing .claude/harness-substrate.md (run `MEWKIT_BLESS=1 cargo test -p mewkit-core --test bless_substrate_view`)\n  [FAIL] Substrate coverage\n         1 substrate issue(s)\n\n0 passed, 2 failed\n",
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the guards actually block.\n\nFound: <project>/.claude\n\nSubstrate\n  [FAIL] Substrate view present\n         Missing .claude/harness-substrate.md (run `MEWKIT_BLESS=1 cargo test -p mewkit-core --test bless_substrate_view`)\n  [FAIL] Substrate coverage\n         1 substrate issue(s)\n\n0 passed, 2 failed\n",
   "stderr": "",
   "files": {
     ".claude/agents/AGENTS_INDEX.md": "# Agents\n\n[1]{agent_file\n\ndeveloper\n\n<!-- GENERATED:agent-views START -->\n**Agent registry views (generated):** 1 core/support direct-only; 0 domain hub-only; 0 intelligence direct-only; 0 intelligence direct-and-harness; 0 internal harness.\n<!-- GENERATED:agent-views END -->\n",

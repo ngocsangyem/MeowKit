@@ -24,46 +24,33 @@ fn an_index_written_before_revisions_existed_reads_as_revision_one() {
 }
 
 #[test]
-fn a_source_correction_supersedes_evidence_and_demotes_gate_two_only() {
+fn a_source_correction_supersedes_evidence_and_leaves_the_scope_revision() {
     let before = index(json!({
         "evidenceRevision": 2,
         "verification": { "evidenceRevision": 2, "status": "valid" },
-        "review": { "evidenceRevision": 2, "status": "valid" },
-        "approvals": { "gate1": "approved", "gate2": "approved" }
+        "review": { "evidenceRevision": 2, "status": "valid" }
     }));
     let after = apply_correction(&before, CorrectionKind::Source);
     assert_eq!(after["evidenceRevision"], json!(3));
     assert_eq!(after["scopeRevision"], json!(0));
     assert_eq!(after["verification"]["status"], json!("superseded"));
     assert_eq!(after["review"]["status"], json!("superseded"));
-    assert_eq!(after["approvals"]["gate2"], json!("required"));
-    assert_eq!(
-        after["approvals"]["gate1"],
-        json!("approved"),
-        "an in-scope fix does not move what Gate 1 approved"
-    );
 }
 
 #[test]
-fn a_scope_correction_also_returns_gate_one_to_required() {
-    let before = index(json!({
-        "approvals": { "gate1": "approved", "gate2": "approved" }
-    }));
-    let after = apply_correction(&before, CorrectionKind::Scope);
+fn a_scope_correction_moves_the_scope_revision_too() {
+    let after = apply_correction(&index(json!({})), CorrectionKind::Scope);
     assert_eq!(after["evidenceRevision"], json!(2));
     assert_eq!(after["scopeRevision"], json!(2));
-    assert_eq!(after["approvals"]["gate1"], json!("required"));
 }
 
 #[test]
-fn a_correction_can_invalidate_an_approval_and_never_grants_one() {
-    // The only writes this makes to `approvals` are approved → required. There
-    // is no path in the other direction, in either correction kind.
+fn a_key_the_correction_does_not_own_is_left_as_it_was() {
+    // An index written by an older kit can carry keys this one never writes.
+    let before = index(json!({ "approvals": { "gate1": "approved" } }));
     for kind in [CorrectionKind::Source, CorrectionKind::Scope] {
-        let before = index(json!({ "approvals": { "gate1": "required", "gate2": "required" } }));
         let after = apply_correction(&before, kind);
-        assert_eq!(after["approvals"]["gate1"], json!("required"));
-        assert_eq!(after["approvals"]["gate2"], json!("required"));
+        assert_eq!(after["approvals"], before["approvals"]);
     }
 }
 
@@ -79,8 +66,7 @@ fn unrelated_fields_keep_their_place_in_the_file() {
             "notes",
             "scopeRevision",
             "verification",
-            "review",
-            "approvals"
+            "review"
         ]
     );
 }

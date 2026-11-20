@@ -74,7 +74,7 @@ Use a lowercase-hyphenated `<slug>` derived from the diagram description and cre
 rsvg-convert -w 1920 <slug>.svg -o <slug>.png
 ```
 
-## Dependency Gate
+## Dependency Check
 
 ```bash
 command -v rsvg-convert >/dev/null 2>&1

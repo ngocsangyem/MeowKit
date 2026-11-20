@@ -99,6 +99,6 @@ mk:arch impact [change description]
 
 ## Safety notes
 
-- An ADR is documentation, not authority: recording a decision never approves a gate.
+- An ADR is documentation, not authority: recording a decision never approves a plan or a review.
 - `docs/architecture/adr/` is append-mostly. A superseded decision stays in the tree with its
   status changed, so the record of what was believed at the time survives.

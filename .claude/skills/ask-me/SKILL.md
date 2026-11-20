@@ -109,7 +109,7 @@ handling.
 ## Workflow Integration
 
 **On-demand** — no single phase anchor; usable at any point from Phase 0
-(orient) through Phase 6 (reflect). Does not gate or feed any phase artifact.
+(orient) through Phase 6 (reflect). Does not block or feed any phase artifact.
 
 ## Handoff Protocol
 

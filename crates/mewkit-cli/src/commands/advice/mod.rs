@@ -9,7 +9,7 @@
 //! way past them.
 //!
 //! Nothing here approves anything. `begin` may refuse a call and `commit` may
-//! refuse a disposition, but no path advances a gate, and the disposition is
+//! refuse a disposition, but no path grants an approval, and the disposition is
 //! recorded verbatim beside the parent's own outcome.
 use std::path::Path;
 
