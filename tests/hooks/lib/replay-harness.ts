@@ -9,50 +9,50 @@
 // shell one, and no step spawns a shell: the entrypoint is this node binary
 // running a `.cjs` file.
 
-import { spawnSync } from 'node:child_process';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
+import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
-import { REPO_ROOT, caseFor, loadPinnedEnv } from './corpus-cases';
-import { dispatchedHandler, nodeEntrypoint, prepareDispatch } from './dispatch-replay';
-import { migrateSeededState, sideEffectContent } from './state-relocation';
+import { REPO_ROOT, caseFor, loadPinnedEnv } from "./corpus-cases";
+import { dispatchedHandler, nodeEntrypoint, prepareDispatch } from "./dispatch-replay";
+import { migrateSeededState, sideEffectContent } from "./state-relocation";
 
 export { REPO_ROOT, nodeEntrypoint };
-export const GOLDEN_DIR = path.join(REPO_ROOT, 'tests/hooks/golden');
+export const GOLDEN_DIR = path.join(REPO_ROOT, "tests/hooks/golden");
 
 const pinnedEnv = loadPinnedEnv();
 
 export interface Fixture {
-  name: string;
-  group: string;
-  entrypoint: string;
-  args: string[];
-  stdin: string | null;
-  env: Record<string, string>;
-  setup: string;
-  setupDescription: string;
-  normalizers: string[];
-  expect: { exit: number; signal: string | null; marker: string | null; stdout: string; stderr: string };
-  sideEffects?: Record<string, string | null>;
+	name: string;
+	group: string;
+	entrypoint: string;
+	args: string[];
+	stdin: string | null;
+	env: Record<string, string>;
+	setup: string;
+	setupDescription: string;
+	normalizers: string[];
+	expect: { exit: number; signal: string | null; marker: string | null; stdout: string; stderr: string };
+	sideEffects?: Record<string, string | null>;
 }
 
 export function loadFixtures(): Fixture[] {
-  return fs
-    .readdirSync(GOLDEN_DIR)
-    .filter((f) => f.endsWith('.json') && f !== 'index.json')
-    .sort()
-    .map((f) => JSON.parse(fs.readFileSync(path.join(GOLDEN_DIR, f), 'utf8')) as Fixture);
+	return fs
+		.readdirSync(GOLDEN_DIR)
+		.filter((f) => f.endsWith(".json") && f !== "index.json")
+		.sort()
+		.map((f) => JSON.parse(fs.readFileSync(path.join(GOLDEN_DIR, f), "utf8")) as Fixture);
 }
 
 /** The kit directories a hook under test may reach into. */
 const TREE = [
-  '.claude/hooks',
-  '.claude/skills/careful',
-  '.claude/skills/freeze',
-  '.claude/skills/investigate',
-  '.claude/skills/sprint-contract',
-  '.claude/skills/cook/scripts',
+	".claude/hooks",
+	".claude/skills/careful",
+	".claude/skills/freeze",
+	".claude/skills/investigate",
+	".claude/skills/sprint-contract",
+	".claude/skills/cook/scripts",
 ];
 
 /**
@@ -62,37 +62,37 @@ const TREE = [
  * machine's accumulated logs and a side-effect assertion would compare against
  * history instead of against what the run produced.
  */
-const RUNTIME_STATE = ['.logs', 'session-state', '.venv'];
+const RUNTIME_STATE = [".logs", "session-state", ".venv"];
 
 function copyTree(projectDir: string) {
-  for (const rel of TREE) {
-    const src = path.join(REPO_ROOT, rel);
-    if (!fs.existsSync(src)) continue;
-    fs.cpSync(src, path.join(projectDir, rel), {
-      recursive: true,
-      filter: (from) => !RUNTIME_STATE.includes(path.basename(from)),
-    });
-  }
+	for (const rel of TREE) {
+		const src = path.join(REPO_ROOT, rel);
+		if (!fs.existsSync(src)) continue;
+		fs.cpSync(src, path.join(projectDir, rel), {
+			recursive: true,
+			filter: (from) => !RUNTIME_STATE.includes(path.basename(from)),
+		});
+	}
 }
 
-const resolvePlaceholders = (value: string, projectDir: string) => value.split('{{TMP}}').join(projectDir);
+const resolvePlaceholders = (value: string, projectDir: string) => value.split("{{TMP}}").join(projectDir);
 
 // Stdin is a JSON document, so the directory goes in as a JSON string body. A
 // Windows path dropped in raw (`D:\a\…`) is an invalid escape, the payload no
 // longer parses, and every hook replays as if it had no input at all.
 const jsonEscaped = (projectDir: string) => JSON.stringify(projectDir).slice(1, -1);
-const resolveStdin = (value: string, projectDir: string) => value.split('{{TMP}}').join(jsonEscaped(projectDir));
+const resolveStdin = (value: string, projectDir: string) => value.split("{{TMP}}").join(jsonEscaped(projectDir));
 
 export interface ReplayResult {
-  exit: number;
-  stdout: string;
-  stderr: string;
-  marker: string | null;
-  sideEffects: Record<string, string | null>;
-  projectDir: string;
+	exit: number;
+	stdout: string;
+	stderr: string;
+	marker: string | null;
+	sideEffects: Record<string, string | null>;
+	projectDir: string;
 }
 
-const MARKERS = ['@@GATE_BLOCK@@', '@@CONTRACT_GATE_BLOCK@@', '@@PRIVACY_BLOCK@@'];
+const MARKERS = ["@@GATE_BLOCK@@", "@@CONTRACT_GATE_BLOCK@@", "@@PRIVACY_BLOCK@@"];
 
 /**
  * Normalizers, by the names a fixture records. `tmpdir` is the only one the
@@ -100,17 +100,15 @@ const MARKERS = ['@@GATE_BLOCK@@', '@@CONTRACT_GATE_BLOCK@@', '@@PRIVACY_BLOCK@@
  * wall clock.
  */
 export const NORMALIZERS: Record<string, (text: string, projectDir: string) => string> = {
-  tmpdir: (text, projectDir) => {
-    const folded = text.split(jsonEscaped(projectDir)).join('{{TMP}}').split(projectDir).join('{{TMP}}');
-    // Fixtures were recorded with `/`; a Windows hook joins the same path with `\`.
-    return process.platform === 'win32'
-      ? folded.replace(/\{\{TMP\}\}[^\s'"]*/g, (p) => p.replace(/\\/g, '/'))
-      : folded;
-  },
-  isoTimestamp: (text) => text.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/g, '{{TS}}'),
-  homedir: (text, projectDir) => text.split(path.join(projectDir, 'home')).join('{{HOME}}'),
-  isoDate: (text) => text.replace(/\d{4}-\d{2}-\d{2}/g, '{{DATE}}'),
-  pid: (text) => text.replace(/\.approval\.\d+/g, '.approval.{{PID}}'),
+	tmpdir: (text, projectDir) => {
+		const folded = text.split(jsonEscaped(projectDir)).join("{{TMP}}").split(projectDir).join("{{TMP}}");
+		// Fixtures were recorded with `/`; a Windows hook joins the same path with `\`.
+		return process.platform === "win32" ? folded.replace(/\{\{TMP\}\}[^\s'"]*/g, (p) => p.replace(/\\/g, "/")) : folded;
+	},
+	isoTimestamp: (text) => text.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/g, "{{TS}}"),
+	homedir: (text, projectDir) => text.split(path.join(projectDir, "home")).join("{{HOME}}"),
+	isoDate: (text) => text.replace(/\d{4}-\d{2}-\d{2}/g, "{{DATE}}"),
+	pid: (text) => text.replace(/\.approval\.\d+/g, ".approval.{{PID}}"),
 };
 
 /**
@@ -123,7 +121,7 @@ export const NORMALIZERS: Record<string, (text: string, projectDir: string) => s
  * identical. One substitution, applied only to the fixtures listed in the suite,
  * never corpus-wide.
  */
-export const selfPath = (text: string) => text.replace(/([\w./-]+)\.cjs\b/g, '$1.sh');
+export const selfPath = (text: string) => text.replace(/([\w./-]+)\.cjs\b/g, "$1.sh");
 
 /**
  * `seed` runs after the fixture's own setup and before the hook is launched, so
@@ -131,64 +129,64 @@ export const selfPath = (text: string) => text.replace(/([\w./-]+)\.cjs\b/g, '$1
  * say — without a second copy of the recipe the recorder used.
  */
 export interface ReplayOptions {
-  seed?: (projectDir: string, home: string) => void;
+	seed?: (projectDir: string, home: string) => void;
 }
 
 export function replay(fixture: Fixture, options: ReplayOptions = {}): ReplayResult {
-  const testCase = caseFor(fixture.name);
-  const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mk-hook-replay-'));
-  copyTree(projectDir);
-  const home = path.join(projectDir, 'home');
-  fs.mkdirSync(home, { recursive: true });
-  testCase.setup({ projectDir, home, ext: '.cjs' });
-  options.seed?.(projectDir, home);
-  migrateSeededState(projectDir);
+	const testCase = caseFor(fixture.name);
+	const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), "mk-hook-replay-"));
+	copyTree(projectDir);
+	const home = path.join(projectDir, "home");
+	fs.mkdirSync(home, { recursive: true });
+	testCase.setup({ projectDir, home, ext: ".cjs" });
+	options.seed?.(projectDir, home);
+	migrateSeededState(projectDir);
 
-  const env: Record<string, string> = {};
-  for (const [k, v] of Object.entries(fixture.env)) {
-    const resolved = resolvePlaceholders(v, projectDir);
-    // A MEOWKIT_CLI stub stays a shebang script: the hook hands a node script
-    // to node itself on Windows, which is the path a real launcher takes.
-    env[k] = resolved;
-  }
+	const env: Record<string, string> = {};
+	for (const [k, v] of Object.entries(fixture.env)) {
+		const resolved = resolvePlaceholders(v, projectDir);
+		// A MEOWKIT_CLI stub stays a shebang script: the hook hands a node script
+		// to node itself on Windows, which is the path a real launcher takes.
+		env[k] = resolved;
+	}
 
-  // An observer is no longer a file the host launches, so it is replayed the
-  // way it now runs: through the dispatcher, over a registry narrowed to the one
-  // entry under test.
-  const dispatched = dispatchedHandler(fixture.group);
-  const invocation = dispatched
-    ? prepareDispatch(projectDir, dispatched)
-    : { script: path.join(projectDir, nodeEntrypoint(fixture.entrypoint)), args: [] };
+	// An observer is no longer a file the host launches, so it is replayed the
+	// way it now runs: through the dispatcher, over a registry narrowed to the one
+	// entry under test.
+	const dispatched = dispatchedHandler(fixture.group);
+	const invocation = dispatched
+		? prepareDispatch(projectDir, dispatched)
+		: { script: path.join(projectDir, nodeEntrypoint(fixture.entrypoint)), args: [] };
 
-  const r = spawnSync(process.execPath, [
-    invocation.script,
-    ...invocation.args,
-    ...fixture.args.map((a) => resolvePlaceholders(a, projectDir)),
-  ], {
-    cwd: projectDir,
-    input: fixture.stdin === null ? '' : resolveStdin(fixture.stdin, projectDir),
-    env: { ...pinnedEnv(home), ...env },
-    encoding: 'utf8',
-    maxBuffer: 32 * 1024 * 1024,
-  });
+	const r = spawnSync(
+		process.execPath,
+		[invocation.script, ...invocation.args, ...fixture.args.map((a) => resolvePlaceholders(a, projectDir))],
+		{
+			cwd: projectDir,
+			input: fixture.stdin === null ? "" : resolveStdin(fixture.stdin, projectDir),
+			env: { ...pinnedEnv(home), ...env },
+			encoding: "utf8",
+			maxBuffer: 32 * 1024 * 1024,
+		},
+	);
 
-  const norm = (text: string) =>
-    fixture.normalizers.reduce((acc, name) => NORMALIZERS[name](acc, projectDir), text ?? '');
+	const norm = (text: string) =>
+		fixture.normalizers.reduce((acc, name) => NORMALIZERS[name](acc, projectDir), text ?? "");
 
-  const sideEffects: Record<string, string | null> = {};
-  for (const rel of Object.keys(fixture.sideEffects ?? {})) {
-    const content = sideEffectContent(projectDir, rel);
-    sideEffects[rel] = content === null ? null : norm(content);
-  }
+	const sideEffects: Record<string, string | null> = {};
+	for (const rel of Object.keys(fixture.sideEffects ?? {})) {
+		const content = sideEffectContent(projectDir, rel);
+		sideEffects[rel] = content === null ? null : norm(content);
+	}
 
-  const stdout = norm(r.stdout ?? '');
-  const stderr = norm(r.stderr ?? '');
-  return {
-    exit: r.status ?? -1,
-    stdout,
-    stderr,
-    marker: MARKERS.find((m) => `${stdout}\n${stderr}`.includes(m)) ?? null,
-    sideEffects,
-    projectDir,
-  };
+	const stdout = norm(r.stdout ?? "");
+	const stderr = norm(r.stderr ?? "");
+	return {
+		exit: r.status ?? -1,
+		stdout,
+		stderr,
+		marker: MARKERS.find((m) => `${stdout}\n${stderr}`.includes(m)) ?? null,
+		sideEffects,
+		projectDir,
+	};
 }

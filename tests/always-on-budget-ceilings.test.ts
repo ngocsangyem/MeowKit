@@ -30,10 +30,7 @@ function buildTree(options: TreeOptions): string {
 	const root = fs.mkdtempSync(path.join(os.tmpdir(), "always-on-budget-"));
 	fs.mkdirSync(path.join(root, ".claude", "rules"), { recursive: true });
 	fs.mkdirSync(path.join(root, ".meowkit"), { recursive: true });
-	fs.writeFileSync(
-		path.join(root, ".meowkit", "pack-manifest.json"),
-		JSON.stringify({ base: { exclude: [] } }),
-	);
+	fs.writeFileSync(path.join(root, ".meowkit", "pack-manifest.json"), JSON.stringify({ base: { exclude: [] } }));
 	fs.writeFileSync(path.join(root, ".claude", "rules", "one.md"), "r".repeat(options.rulesBytes));
 	for (let i = 0; i < options.skills; i += 1) {
 		const dir = path.join(root, ".claude", "skills", `probe-${i}`);

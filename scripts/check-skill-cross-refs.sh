@@ -85,7 +85,7 @@ done < <(
 # Explicit `.claude/...` paths named by an entrypoint, an agent or a rule must exist, so a
 # deleted or moved kit file cannot stay quoted as live. Files a user or a session creates at
 # run time (MCP config, agent memory, product areas) are optional and exempt.
-OPTIONAL_PATHS=".claude/mcp.json .claude/.mcp.json .claude/product-areas.yaml .claude/settings.local.json"
+OPTIONAL_PATHS=".claude/mcp.json .claude/.mcp.json .meowkit/product-areas.yaml .claude/settings.local.json"
 while IFS= read -r file; do
   while IFS= read -r ref; do
     [ -z "$ref" ] && continue

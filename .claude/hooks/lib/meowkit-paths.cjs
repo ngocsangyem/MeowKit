@@ -1,6 +1,6 @@
 // meowkit-paths.cjs — one resolver for the runtime-neutral `.meowkit/` state taxonomy.
 //
-// Mirrors crates/mewkit-core/src/state_paths.rs so hooks and the CLI
+// Mirrors the state path resolver in the `mewkit` CLI so hooks and the CLI
 // agree on where state lives:
 //   memory/     the team store (decisions.md, gotchas.md)
 //   telemetry/  append logs (cost-log, trace-log, skill-usage, reviews)

@@ -67,7 +67,11 @@ describe("exposing the launcher on PATH", () => {
 		const root = project();
 		const file = envFile(root);
 		const dir = path.dirname(containedLauncher(root) as string);
-		const note = exposeLauncherOnPath({ projectRoot: root, envFile: file, path: [dir, "/usr/bin"].join(path.delimiter) });
+		const note = exposeLauncherOnPath({
+			projectRoot: root,
+			envFile: file,
+			path: [dir, "/usr/bin"].join(path.delimiter),
+		});
 		expect(note).toBe("");
 		expect(fs.readFileSync(file, "utf-8")).toBe("");
 	});
@@ -94,51 +98,57 @@ describe("exposing the launcher on PATH", () => {
 
 	// Both shell-evaluation cases need a POSIX `/bin/sh`, and Windows also forbids `"` in a
 	// directory name, so they run where the env file is actually sourced by sh.
-	it.skipIf(process.platform === "win32")("writes shell metacharacters in a directory name literally, never as code", () => {
-		// A project directory name is attacker-influenced often enough (a clone named from a
-		// hostile URL, an archive unpacked into a crafted path) that it has to be treated as
-		// data. Inside double quotes a shell would run the `$(…)` and the backticks here.
-		const base = fs.mkdtempSync(path.join(tmpdir(), "mk-pathenv-hostile-"));
-		const root = path.join(base, 'ev$(touch PWNED)il "quoted" `id` dir');
-		fs.mkdirSync(path.join(root, ".meowkit", "bin"), { recursive: true });
-		fs.writeFileSync(path.join(root, ".meowkit", "bin", "mewkit"), "#!/usr/bin/env node\n", "utf-8");
-		const file = envFile(base);
+	it.skipIf(process.platform === "win32")(
+		"writes shell metacharacters in a directory name literally, never as code",
+		() => {
+			// A project directory name is attacker-influenced often enough (a clone named from a
+			// hostile URL, an archive unpacked into a crafted path) that it has to be treated as
+			// data. Inside double quotes a shell would run the `$(…)` and the backticks here.
+			const base = fs.mkdtempSync(path.join(tmpdir(), "mk-pathenv-hostile-"));
+			const root = path.join(base, 'ev$(touch PWNED)il "quoted" `id` dir');
+			fs.mkdirSync(path.join(root, ".meowkit", "bin"), { recursive: true });
+			fs.writeFileSync(path.join(root, ".meowkit", "bin", "mewkit"), "#!/usr/bin/env node\n", "utf-8");
+			const file = envFile(base);
 
-		expect(exposeLauncherOnPath({ projectRoot: root, envFile: file, path: "/usr/bin" })).toBe("");
+			expect(exposeLauncherOnPath({ projectRoot: root, envFile: file, path: "/usr/bin" })).toBe("");
 
-		const written = fs.readFileSync(file, "utf-8");
-		const launcherDir = path.dirname(fs.realpathSync(path.join(root, ".meowkit", "bin", "mewkit")));
-		// The value the shell would end up with is the directory, byte for byte.
-		expect(pathValue(file).split(path.delimiter)[0]).toBe(launcherDir);
-		// And the dangerous forms are inside single quotes, where they are literal.
-		expect(written).toMatch(/^export PATH='/m);
-		expect(written).not.toMatch(/^export PATH="/m);
+			const written = fs.readFileSync(file, "utf-8");
+			const launcherDir = path.dirname(fs.realpathSync(path.join(root, ".meowkit", "bin", "mewkit")));
+			// The value the shell would end up with is the directory, byte for byte.
+			expect(pathValue(file).split(path.delimiter)[0]).toBe(launcherDir);
+			// And the dangerous forms are inside single quotes, where they are literal.
+			expect(written).toMatch(/^export PATH='/m);
+			expect(written).not.toMatch(/^export PATH="/m);
 
-		// Proof rather than inspection: let a real shell evaluate the line and print the result.
-		const evaluated = execFileSync("/bin/sh", ["-c", `. ${JSON.stringify(file)}; printf %s "$PATH"`], {
-			cwd: base,
-			encoding: "utf-8",
-		});
-		expect(evaluated.split(path.delimiter)[0]).toBe(launcherDir);
-		expect(fs.existsSync(path.join(base, "PWNED"))).toBe(false);
-		expect(fs.existsSync(path.join(root, "PWNED"))).toBe(false);
-	});
+			// Proof rather than inspection: let a real shell evaluate the line and print the result.
+			const evaluated = execFileSync("/bin/sh", ["-c", `. ${JSON.stringify(file)}; printf %s "$PATH"`], {
+				cwd: base,
+				encoding: "utf-8",
+			});
+			expect(evaluated.split(path.delimiter)[0]).toBe(launcherDir);
+			expect(fs.existsSync(path.join(base, "PWNED"))).toBe(false);
+			expect(fs.existsSync(path.join(root, "PWNED"))).toBe(false);
+		},
+	);
 
-	it.skipIf(process.platform === "win32")("escapes a single quote in a directory name, the one byte single quotes cannot hold", () => {
-		const base = fs.mkdtempSync(path.join(tmpdir(), "mk-pathenv-quote-"));
-		const root = path.join(base, "it's a dir");
-		fs.mkdirSync(path.join(root, ".meowkit", "bin"), { recursive: true });
-		fs.writeFileSync(path.join(root, ".meowkit", "bin", "mewkit"), "#!/usr/bin/env node\n", "utf-8");
-		const file = envFile(base);
+	it.skipIf(process.platform === "win32")(
+		"escapes a single quote in a directory name, the one byte single quotes cannot hold",
+		() => {
+			const base = fs.mkdtempSync(path.join(tmpdir(), "mk-pathenv-quote-"));
+			const root = path.join(base, "it's a dir");
+			fs.mkdirSync(path.join(root, ".meowkit", "bin"), { recursive: true });
+			fs.writeFileSync(path.join(root, ".meowkit", "bin", "mewkit"), "#!/usr/bin/env node\n", "utf-8");
+			const file = envFile(base);
 
-		expect(exposeLauncherOnPath({ projectRoot: root, envFile: file, path: "/usr/bin" })).toBe("");
-		const launcherDir = path.dirname(fs.realpathSync(path.join(root, ".meowkit", "bin", "mewkit")));
-		const evaluated = execFileSync("/bin/sh", ["-c", `. ${JSON.stringify(file)}; printf %s "$PATH"`], {
-			cwd: base,
-			encoding: "utf-8",
-		});
-		expect(evaluated.split(path.delimiter)[0]).toBe(launcherDir);
-	});
+			expect(exposeLauncherOnPath({ projectRoot: root, envFile: file, path: "/usr/bin" })).toBe("");
+			const launcherDir = path.dirname(fs.realpathSync(path.join(root, ".meowkit", "bin", "mewkit")));
+			const evaluated = execFileSync("/bin/sh", ["-c", `. ${JSON.stringify(file)}; printf %s "$PATH"`], {
+				cwd: base,
+				encoding: "utf-8",
+			});
+			expect(evaluated.split(path.delimiter)[0]).toBe(launcherDir);
+		},
+	);
 
 	it("refuses rather than writes when a PATH entry carries a newline", () => {
 		const root = project();

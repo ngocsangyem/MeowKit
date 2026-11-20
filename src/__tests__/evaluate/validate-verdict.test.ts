@@ -34,7 +34,12 @@ const FM = [
 ].join("\n");
 
 const RUBRICS = ["product-depth", "functionality", "design-quality", "originality"] as const;
-const WEIGHTS: Record<string, string> = { "product-depth": "0.30", functionality: "0.30", "design-quality": "0.20", originality: "0.20" };
+const WEIGHTS: Record<string, string> = {
+	"product-depth": "0.30",
+	functionality: "0.30",
+	"design-quality": "0.20",
+	originality: "0.20",
+};
 
 /** Build a verdict body whose per-rubric section carries the given verdicts + an evidence citation. */
 function body(verdicts: Record<string, "PASS" | "WARN" | "FAIL">): string {
@@ -47,7 +52,12 @@ function body(verdicts: Record<string, "PASS" | "WARN" | "FAIL">): string {
 }
 
 /** Write a verdict + evidence dir; return the verdict path. `fm` overrides the default frontmatter. */
-function writeVerdict(name: string, fm: string, bodyText: string, evidence = "captured transcript, no console errors\n"): string {
+function writeVerdict(
+	name: string,
+	fm: string,
+	bodyText: string,
+	evidence = "captured transcript, no console errors\n",
+): string {
 	tmp = tmp ?? fs.mkdtempSync(path.join(os.tmpdir(), "verdict-"));
 	const evDir = path.join(tmp, `${name}-evalverdict-evidence`);
 	fs.mkdirSync(evDir, { recursive: true });
@@ -65,7 +75,11 @@ function run(vpath: string) {
 
 describe("validate-verdict.sh (v2 — recompute + provenance)", () => {
 	it("accepts a valid verdict (all rubrics PASS, score follows) — exit 0", () => {
-		const v = writeVerdict("valid", FM, body({ "product-depth": "PASS", functionality: "PASS", "design-quality": "PASS", originality: "PASS" }));
+		const v = writeVerdict(
+			"valid",
+			FM,
+			body({ "product-depth": "PASS", functionality: "PASS", "design-quality": "PASS", originality: "PASS" }),
+		);
 		const r = run(v);
 		expect(r.status, r.out).toBe(0);
 		expect(r.out).toMatch(/VERDICT_VALID/);
@@ -74,7 +88,10 @@ describe("validate-verdict.sh (v2 — recompute + provenance)", () => {
 	it("REJECTS the committed audit forged fixture (PASS + weighted_score 0.01) — exit 1, forever", () => {
 		// Load the PERMANENT committed fixture, not a generated one, so the audit's exact shape
 		// stays a durable regression guard.
-		const fixture = fs.readFileSync(path.join(REPO_ROOT, "src/__tests__/evaluate/fixtures/forged-evalverdict.md"), "utf8");
+		const fixture = fs.readFileSync(
+			path.join(REPO_ROOT, "src/__tests__/evaluate/fixtures/forged-evalverdict.md"),
+			"utf8",
+		);
 		tmp = fs.mkdtempSync(path.join(os.tmpdir(), "verdict-"));
 		const evDir = path.join(tmp, "forged-evalverdict-evidence");
 		fs.mkdirSync(evDir, { recursive: true });
@@ -90,18 +107,24 @@ describe("validate-verdict.sh (v2 — recompute + provenance)", () => {
 	it("rejects a score deviating >0.01 from the recomputed value, printing both — exit 1", () => {
 		// All PASS ⇒ recompute 1.0; declare 0.50 ⇒ mismatch.
 		const fm = FM.replace("weighted_score: 1.0", "weighted_score: 0.50");
-		const v = writeVerdict("dev", fm, body({ "product-depth": "PASS", functionality: "PASS", "design-quality": "PASS", originality: "PASS" }));
+		const v = writeVerdict(
+			"dev",
+			fm,
+			body({ "product-depth": "PASS", functionality: "PASS", "design-quality": "PASS", originality: "PASS" }),
+		);
 		const r = run(v);
 		expect(r.status).toBe(1);
 		expect(r.out).toMatch(/declared 0.5.*recomputed 1|recomputed 1.*declared 0.5/);
 	});
 
 	it("rejects missing rubric coverage — exit 1", () => {
-		const partial = ["## Per-Rubric Results",
+		const partial = [
+			"## Per-Rubric Results",
 			"### product-depth (weight 0.30, hard_fail FAIL) — PASS",
 			"- **Evidence:** `EVID/transcript.txt`",
 			"### functionality (weight 0.30, hard_fail FAIL) — PASS",
-			"- **Evidence:** `EVID/transcript.txt`"].join("\n");
+			"- **Evidence:** `EVID/transcript.txt`",
+		].join("\n");
 		const v = writeVerdict("cov", FM, partial);
 		const r = run(v);
 		expect(r.status).toBe(1);
@@ -111,15 +134,25 @@ describe("validate-verdict.sh (v2 — recompute + provenance)", () => {
 	it("enforces hard-fail propagation: a FAIL rubric with overall PASS is rejected — exit 1", () => {
 		// functionality FAIL ⇒ hard_fail ⇒ expected overall FAIL; declaring PASS is inconsistent.
 		const fm = FM.replace("weighted_score: 1.0", "weighted_score: 0.70");
-		const v = writeVerdict("hf", fm, body({ "product-depth": "PASS", functionality: "FAIL", "design-quality": "PASS", originality: "PASS" }));
+		const v = writeVerdict(
+			"hf",
+			fm,
+			body({ "product-depth": "PASS", functionality: "FAIL", "design-quality": "PASS", originality: "PASS" }),
+		);
 		const r = run(v);
 		expect(r.status).toBe(1);
 		expect(r.out).toMatch(/overall mismatch|hard.fail/i);
 	});
 
 	it("rejects a verdict with no evaluator identity — exit 1", () => {
-		const noEval = FM.split("\n").filter((l) => !l.startsWith("evaluator:")).join("\n");
-		const v = writeVerdict("noid", noEval, body({ "product-depth": "PASS", functionality: "PASS", "design-quality": "PASS", originality: "PASS" }));
+		const noEval = FM.split("\n")
+			.filter((l) => !l.startsWith("evaluator:"))
+			.join("\n");
+		const v = writeVerdict(
+			"noid",
+			noEval,
+			body({ "product-depth": "PASS", functionality: "PASS", "design-quality": "PASS", originality: "PASS" }),
+		);
 		const r = run(v);
 		expect(r.status).toBe(1);
 		expect(r.out).toMatch(/missing required frontmatter field: evaluator/);
@@ -128,11 +161,18 @@ describe("validate-verdict.sh (v2 — recompute + provenance)", () => {
 	it("FAILS CLOSED for a PASS verdict when recompute-score.py is absent (no false score_recomputed stamp)", () => {
 		// Simulate a partial install / mirror drift: validate-verdict.sh present, recompute script
 		// NOT beside it. A PASS must be blocked, not accepted-and-falsely-stamped.
-		const v = writeVerdict("noscript", FM, body({ "product-depth": "PASS", functionality: "PASS", "design-quality": "PASS", originality: "PASS" }));
+		const v = writeVerdict(
+			"noscript",
+			FM,
+			body({ "product-depth": "PASS", functionality: "PASS", "design-quality": "PASS", originality: "PASS" }),
+		);
 		const scriptsDir = path.join(tmp as string, "scripts");
 		fs.mkdirSync(scriptsDir, { recursive: true });
 		fs.copyFileSync(VALIDATOR, path.join(scriptsDir, "validate-verdict.sh")); // no recompute-score.py alongside
-		const r = spawnSync("bash", [path.join(scriptsDir, "validate-verdict.sh"), v], { cwd: REPO_ROOT, encoding: "utf8" });
+		const r = spawnSync("bash", [path.join(scriptsDir, "validate-verdict.sh"), v], {
+			cwd: REPO_ROOT,
+			encoding: "utf8",
+		});
 		const out = `${r.stdout ?? ""}\n${r.stderr ?? ""}`;
 		expect(r.status, out).toBe(1);
 		expect(out).toMatch(/recompute-score\.py not found/);
@@ -144,7 +184,12 @@ describe("validate-verdict.sh (v2 — recompute + provenance)", () => {
 		// it does NOT judge whether each verdict is honest. An all-PASS verdict with junk-content
 		// (but valid-type) evidence passes recompute — catching that is the skeptic-evaluator's job.
 		// This test locks the KNOWN limitation so a future behavior change is deliberate, not silent.
-		const v = writeVerdict("selfconsistent", FM, body({ "product-depth": "PASS", functionality: "PASS", "design-quality": "PASS", originality: "PASS" }), "no real verification happened here\n");
+		const v = writeVerdict(
+			"selfconsistent",
+			FM,
+			body({ "product-depth": "PASS", functionality: "PASS", "design-quality": "PASS", originality: "PASS" }),
+			"no real verification happened here\n",
+		);
 		const r = run(v);
 		expect(r.status, r.out).toBe(0);
 	});

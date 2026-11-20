@@ -32,7 +32,10 @@ function projectionFiles(name: string): string[] {
 		cwd: REPO_ROOT,
 		encoding: "utf8",
 	});
-	return (result.stdout ?? "").split("\n").map((s) => s.trim()).filter((s) => s !== "");
+	return (result.stdout ?? "")
+		.split("\n")
+		.map((s) => s.trim())
+		.filter((s) => s !== "");
 }
 
 /** Where the table says a dropped name may still appear, if anywhere. */
@@ -48,7 +51,12 @@ function retainedIn(name: string): string[] {
 describe("the provider projections carry no deleted environment variable", () => {
 	/** Dropped names the table retains specifically inside the projections tree. */
 	const retainedHere = Object.entries(table.retainedDropOccurrences)
-		.filter(([key, value]) => key !== "comment" && typeof value !== "string" && value.in.some((a) => PROJECTION_DIRS.some((dir) => a.includes(dir))))
+		.filter(
+			([key, value]) =>
+				key !== "comment" &&
+				typeof value !== "string" &&
+				value.in.some((a) => PROJECTION_DIRS.some((dir) => a.includes(dir))),
+		)
 		.map(([key]) => key);
 
 	it("has a tree to check, dropped names to check for, and a working probe", () => {
@@ -57,7 +65,10 @@ describe("the provider projections carry no deleted environment variable", () =>
 		// the check below relies on, so a zero result there is evidence of absence
 		// rather than of a broken or mis-rooted grep.
 		const kept = table.names.filter((r) => r.class !== "drop");
-		expect(kept.some((r) => projectionFiles(r.name).length > 0), "the probe finds no kept name either").toBe(true);
+		expect(
+			kept.some((r) => projectionFiles(r.name).length > 0),
+			"the probe finds no kept name either",
+		).toBe(true);
 		for (const name of retainedHere) expect(projectionFiles(name).length, name).toBeGreaterThan(0);
 	});
 

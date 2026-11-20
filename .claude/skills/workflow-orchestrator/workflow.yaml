@@ -90,9 +90,8 @@ contract_substep:
 # Paths are relative to the MeowKit project root (the parent of .claude/),
 # which is the working directory the validate command runs from.
 # Each file must contain a "Canonical source: workflow.yaml" pointer.
-# The kit-owned root CLAUDE.md is no longer shipped (v3 context diet); the always-on
-# `.claude/rules/meowkit-core.md` carries the lifecycle line in its place and takes over as
-# the always-loaded lifecycle source.
+# The always-on core rule carries the lifecycle line and is the always-loaded
+# lifecycle source.
 sources:
   - path: .claude/rules/meowkit-core.md
     lifecycle_render: true

@@ -2,7 +2,8 @@
 
 /**
  * Environment variable loader for mk:docs-finder skill
- * Priority: process.env > skill/.env > skills/.env > .meowkit/.env > .claude/.env
+ * Priority: process.env > skill/.env > skills/.env > .meowkit/.env > the env file an older
+ * install kept in the runtime folder
  */
 
 const fs = require('fs');

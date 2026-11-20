@@ -111,7 +111,7 @@ separate and internal — hook-fire telemetry, kept uncompressed so it stays gre
 
 ## Drift checks
 
-`scripts/check-hook-registration.sh` catches drift in both directions plus the registry:
+A registration check in the kit's source repository catches drift in both directions plus the registry:
 a hook on disk that nothing registers, a registration with no file, and a registry entry
 with no file. `mewkit doctor --hard-gates` probes the write guards behaviourally and
 reports a leftover shell hook as a finding.

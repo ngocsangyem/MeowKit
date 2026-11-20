@@ -73,9 +73,14 @@ fn references<'a>(line: &'a str, prefixes: &[&str]) -> Vec<&'a str> {
     out
 }
 
+/// Host files a user owns, which the kit may name without installing them.
+/// Cursor's MCP config: https://cursor.com/docs/mcp#using-mcp-json
+const USER_FILES: [&str; 1] = [".cursor/mcp.json"];
+
 fn resolves(reference: &str, written: &BTreeSet<&str>) -> bool {
     let r = reference.trim_end_matches('/');
-    written.contains(r)
+    USER_FILES.contains(&r)
+        || written.contains(r)
         || written
             .range(format!("{r}/").as_str()..)
             .next()

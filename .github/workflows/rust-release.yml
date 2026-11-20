@@ -103,7 +103,8 @@ jobs:
           case "$TARGET" in *linux-musl) export "CC_${TARGET//-/_}=musl-gcc" ;; esac
           cargo build --release --locked --target "$TARGET" -p mewkit-cli
           if [[ "$TARGET" == *linux-musl ]]; then
-            file "target/$TARGET/release/mewkit" | tee /dev/stderr | grep -q 'statically linked' \
+            # `file` reports a static PIE, which x86_64 musl builds are, as "static-pie linked".
+            file "target/$TARGET/release/mewkit" | tee /dev/stderr | grep -Eq 'statically linked|static-pie linked' \
               || { echo "::error::the musl binary is not statically linked"; exit 1; }
           fi
 

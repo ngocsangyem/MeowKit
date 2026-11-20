@@ -23,7 +23,7 @@ Catalog of all evaluation rubrics and composition presets used by the `evaluator
 
 | Preset | Loads | Excludes | Use Case |
 |---|---|---|---|
-| `frontend-app` (v2.0.0) | product-depth, functionality, design-quality, originality (4 distinctive rubrics) | code-quality, craft, ux-usability — overlap mk:review/security-rules/qa health-score; opt-in only | Browser-rendered apps (SPA, MPA, framework apps) |
+| `frontend-app` (v2.0.0) | product-depth, functionality, design-quality, originality (4 distinctive rubrics) | code-quality, craft, ux-usability — overlap `mk:review`, the security rules and `mk:qa` health-score; opt-in only | Browser-rendered apps (SPA, MPA, framework apps) |
 | `backend-api` | product-depth, functionality, code-quality | design-quality, originality, craft, ux-usability (no visual surface) | Headless APIs, services, workers (no UI) |
 | `cli-tool` | functionality, product-depth, code-quality, ux-usability | design-quality, originality, craft (CLI has no visual surface; craft folded into ux-usability) | CLI binaries, npm CLIs, shell utilities |
 | `fullstack-product` | All 7 rubrics, ux-usability weighted 3x higher | — | End-to-end product builds (UI + backend + persistence) |

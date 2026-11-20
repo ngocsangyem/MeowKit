@@ -47,7 +47,7 @@ Meta skill — not tied to a specific Phase. Invoked on-demand for skill develop
 node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/init-skill.py mk:my-feature --path .claude/skills
 
 # Validate an existing skill against compliance checklist
-node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/validate-skill.py .claude/skills/my-feature
+node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/validate-skill.py .claude/skills/<skill-name>
 ```
 
 ## Process

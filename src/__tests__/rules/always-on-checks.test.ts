@@ -43,10 +43,7 @@ function makeAlwaysOnTree(): string {
 	const rules = path.join(temp, ".claude", "rules");
 	fs.mkdirSync(rules, { recursive: true });
 	fs.mkdirSync(path.join(temp, ".meowkit"), { recursive: true });
-	fs.writeFileSync(
-		path.join(temp, ".meowkit", "pack-manifest.json"),
-		JSON.stringify({ base: { exclude: [] } }),
-	);
+	fs.writeFileSync(path.join(temp, ".meowkit", "pack-manifest.json"), JSON.stringify({ base: { exclude: [] } }));
 	for (const name of ALWAYS_ON_RULES) {
 		fs.copyFileSync(path.join(REPO_ROOT, ".claude", "rules", name), path.join(rules, name));
 	}

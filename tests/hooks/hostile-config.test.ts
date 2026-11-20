@@ -82,7 +82,6 @@ describe("no committed file can weaken a guard", () => {
 		});
 		expect(result.stderr).toContain("@@PRIVACY_BLOCK@@");
 	});
-
 });
 
 /**

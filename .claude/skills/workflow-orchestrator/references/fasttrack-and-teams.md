@@ -58,7 +58,7 @@ If Agent Teams not enabled: sequential execution with standard subagent behavior
 ## State Management
 
 ```
-workflow:handoff  → Saves to .claude/logs/workflows/[workflow-id]/
+workflow:handoff  → Saves to .meowkit/logs/workflows/[workflow-id]/
 workflow:resume <id> → Loads saved state, continues from last phase
 workflow:status   → Shows current phase, completed phases, pending tasks
 ```

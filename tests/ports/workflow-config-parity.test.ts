@@ -37,25 +37,24 @@
 // preference becomes durable, so stderr is compared for the `get`/`has`/usage
 // fixtures and asserted by content for `set`.
 
+import { describe, expect, it } from "vitest";
 
-import { describe, expect, it } from 'vitest';
+import { loadFixtures, replay } from "./lib/port-replay-harness";
 
-import { loadFixtures, replay } from './lib/port-replay-harness';
+const LEGACY_REL = ".claude/meowkit.config.json";
+const STATE_REL = ".meowkit/state/workflow-state.json";
 
-const LEGACY_REL = '.claude/meowkit.config.json';
-const STATE_REL = '.meowkit/state/workflow-state.json';
-
-const fixtures = loadFixtures().filter((f) => f.group === 'workflow-config');
+const fixtures = loadFixtures().filter((f) => f.group === "workflow-config");
 
 /** Divergence 3 — the one fixture whose decision changed. */
-const CREATES_STATE = 'config-set-no-config';
+const CREATES_STATE = "config-set-no-config";
 
-const isSet = (args: readonly string[]): boolean => args[0] === 'set';
+const isSet = (args: readonly string[]): boolean => args[0] === "set";
 
-describe('workflow-config — recorded parity', () => {
-	it('covers get, has and set', () => {
-		for (const sub of ['get', 'has', 'set']) {
-			expect(fixtures.some((f) => f.invocation.kind === 'config' && f.invocation.args[0] === sub)).toBe(true);
+describe("workflow-config — recorded parity", () => {
+	it("covers get, has and set", () => {
+		for (const sub of ["get", "has", "set"]) {
+			expect(fixtures.some((f) => f.invocation.kind === "config" && f.invocation.args[0] === sub)).toBe(true);
 		}
 	});
 
@@ -63,7 +62,7 @@ describe('workflow-config — recorded parity', () => {
 		it(`${fixture.name} — ${fixture.setupDescription}`, () => {
 			const got = replay(fixture, [STATE_REL]);
 			const expected = fixture.expect;
-			const args = fixture.invocation.kind === 'config' ? fixture.invocation.args : [];
+			const args = fixture.invocation.kind === "config" ? fixture.invocation.args : [];
 
 			expect(got.stdout).toBe(expected.stdout);
 			expect(got.exit).toBe(fixture.name === CREATES_STATE ? 0 : expected.exit);
@@ -73,9 +72,9 @@ describe('workflow-config — recorded parity', () => {
 				// Divergence 2: the write target is named, and the message points
 				// at the committed file a durable choice belongs in.
 				expect(got.stderr).toContain(STATE_REL);
-				expect(got.stderr).toContain('session state');
-				expect(got.stderr).toContain('.meowkit/config.yaml');
-				expect(got.stderr).not.toContain('at Object.<anonymous>');
+				expect(got.stderr).toContain("session state");
+				expect(got.stderr).toContain(".meowkit/config.yaml");
+				expect(got.stderr).not.toContain("at Object.<anonymous>");
 			} else {
 				expect(got.stderr).toBe(expected.stderr);
 			}
@@ -83,11 +82,11 @@ describe('workflow-config — recorded parity', () => {
 			// Divergence 1: the recorded path is dead, and the state file carries
 			// what the recording carried.
 			expect(got.sideEffects[LEGACY_REL]).toBe(null);
-			const recorded = expected.stdout === '' ? null : expected.stdout;
+			const recorded = expected.stdout === "" ? null : expected.stdout;
 			if (isSet(args)) {
-				const state: unknown = JSON.parse(got.sideEffects[STATE_REL] ?? 'null');
+				const state: unknown = JSON.parse(got.sideEffects[STATE_REL] ?? "null");
 				expect(state).not.toBe(null);
-				expect(got.sideEffects[STATE_REL]?.endsWith('\n')).toBe(false);
+				expect(got.sideEffects[STATE_REL]?.endsWith("\n")).toBe(false);
 				expect(got.sideEffects[STATE_REL]).toContain('\n  "');
 			} else if (recorded !== null && fixture.sideEffects[LEGACY_REL] !== null) {
 				// A get/has fixture must leave its source untouched: a reader
@@ -97,16 +96,16 @@ describe('workflow-config — recorded parity', () => {
 		});
 	}
 
-	it('the set fixtures write the values, types and nesting the recording holds', () => {
-		for (const fixture of fixtures.filter((f) => f.invocation.kind === 'config' && isSet(f.invocation.args))) {
+	it("the set fixtures write the values, types and nesting the recording holds", () => {
+		for (const fixture of fixtures.filter((f) => f.invocation.kind === "config" && isSet(f.invocation.args))) {
 			const got = replay(fixture, [STATE_REL]);
-			const state = JSON.parse(got.sideEffects[STATE_REL] ?? 'null') as Record<string, unknown>;
-			const args = fixture.invocation.kind === 'config' ? fixture.invocation.args : [];
+			const state = JSON.parse(got.sideEffects[STATE_REL] ?? "null") as Record<string, unknown>;
+			const args = fixture.invocation.kind === "config" ? fixture.invocation.args : [];
 			const [, key, raw] = args;
 			const recordedFile = fixture.sideEffects[LEGACY_REL];
 			if (recordedFile === null || recordedFile === undefined) {
 				// The fresh-project leg: only the key just set is there.
-				expect(state).toEqual({ [key as string]: raw === 'true' ? true : raw });
+				expect(state).toEqual({ [key as string]: raw === "true" ? true : raw });
 				continue;
 			}
 			const recorded = JSON.parse(recordedFile) as Record<string, unknown>;

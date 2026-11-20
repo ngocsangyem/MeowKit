@@ -2,7 +2,17 @@
 // and the ship check.
 import path from "node:path";
 import { describe, expect } from "vitest";
-import { fireShell, guardCase, makeShipFixture, shipOutput, stageFailingTest, stageLintError, useRunnerWithoutRelatedTests, privacyMismatches, writePrivacyCorpus } from "./cases";
+import {
+	fireShell,
+	guardCase,
+	makeShipFixture,
+	shipOutput,
+	stageFailingTest,
+	stageLintError,
+	useRunnerWithoutRelatedTests,
+	privacyMismatches,
+	writePrivacyCorpus,
+} from "./cases";
 import { fireEvent, makeFixture, registeredHooks, runCount, runHook, scriptOf } from "./replay";
 
 const RT = "codex" as const;
@@ -10,7 +20,8 @@ const RT = "codex" as const;
 describe("codex guards (.codex/hooks.json)", () => {
 	guardCase("codex: every registered PreToolUse guard has a case", () => {
 		const covered = [".codex/hooks/privacy-block.cjs", ".codex/hooks/pre-ship.cjs"];
-		for (const h of registeredHooks(RT).filter((h) => h.event === "PreToolUse")) expect(covered, `no guard case covers ${scriptOf(h)}`).toContain(scriptOf(h));
+		for (const h of registeredHooks(RT).filter((h) => h.event === "PreToolUse"))
+			expect(covered, `no guard case covers ${scriptOf(h)}`).toContain(scriptOf(h));
 	});
 
 	guardCase("codex: privacy blocks a command that reads .env", () => {
@@ -35,7 +46,17 @@ describe("codex guards (.codex/hooks.json)", () => {
 
 	guardCase("codex: a source Write with no plan is allowed by every registered hook", () => {
 		const fx = makeFixture([RT]);
-		const r = fireEvent(fx, RT, "PreToolUse", { hook_event_name: "PreToolUse", tool_name: "Write", tool_input: { file_path: path.join(fx.dir, "src/new.cjs"), content: "module.exports = 1;\n" } }, { toolName: "Write" });
+		const r = fireEvent(
+			fx,
+			RT,
+			"PreToolUse",
+			{
+				hook_event_name: "PreToolUse",
+				tool_name: "Write",
+				tool_input: { file_path: path.join(fx.dir, "src/new.cjs"), content: "module.exports = 1;\n" },
+			},
+			{ toolName: "Write" },
+		);
 		expect(r.blocked).toBe(false);
 	});
 
@@ -64,8 +85,15 @@ describe("codex guards (.codex/hooks.json)", () => {
 	guardCase("codex: completion check, when on, continues a turn with unverified edits until a check passes", () => {
 		const fx = makeFixture([RT]);
 		fx.write(".meowkit/config.yaml", "hooks:\n  pre-completion-check: true\n");
-		const ev = (event: string, extra: Record<string, unknown> = {}) => fireEvent(fx, RT, event, { hook_event_name: event, session_id: "s1", ...extra }, { toolName: "Bash" });
-		const stopDecision = () => JSON.parse(ev("Stop").results.map((r) => r.stdout).join("").trim() || "{}") as { decision?: string };
+		const ev = (event: string, extra: Record<string, unknown> = {}) =>
+			fireEvent(fx, RT, event, { hook_event_name: event, session_id: "s1", ...extra }, { toolName: "Bash" });
+		const stopDecision = () =>
+			JSON.parse(
+				ev("Stop")
+					.results.map((r) => r.stdout)
+					.join("")
+					.trim() || "{}",
+			) as { decision?: string };
 		ev("SessionStart");
 		fx.write("src/add.cjs", "module.exports = (a, b) => b + a;\n");
 		expect(stopDecision().decision).toBe("block");

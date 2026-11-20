@@ -2,17 +2,42 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect } from "vitest";
-import { expectedFail, fireShell, guardCase, makeShipFixture, SHIP_EVASIONS, shipOutput, stageFailingTest, stageLintError, useRunnerWithoutRelatedTests, privacyMismatches, writePrivacyCorpus } from "./cases";
+import {
+	expectedFail,
+	fireShell,
+	guardCase,
+	makeShipFixture,
+	SHIP_EVASIONS,
+	shipOutput,
+	stageFailingTest,
+	stageLintError,
+	useRunnerWithoutRelatedTests,
+	privacyMismatches,
+	writePrivacyCorpus,
+} from "./cases";
 import { fireEvent, makeFixture, registeredHooks, runCount, runHook, scriptOf } from "./replay";
 
 const RT = "claude-code" as const;
-const privacyHook = () => registeredHooks(RT).find((h) => h.event === "PreToolUse" && h.matcher === "Read" && scriptOf(h).endsWith("privacy-block.cjs"))!;
+const privacyHook = () =>
+	registeredHooks(RT).find(
+		(h) => h.event === "PreToolUse" && h.matcher === "Read" && scriptOf(h).endsWith("privacy-block.cjs"),
+	)!;
 const read = (fx: ReturnType<typeof makeFixture>, file: string) =>
-	fireEvent(fx, RT, "PreToolUse", { hook_event_name: "PreToolUse", tool_name: "Read", tool_input: { file_path: path.join(fx.dir, file) } }, { toolName: "Read" });
+	fireEvent(
+		fx,
+		RT,
+		"PreToolUse",
+		{ hook_event_name: "PreToolUse", tool_name: "Read", tool_input: { file_path: path.join(fx.dir, file) } },
+		{ toolName: "Read" },
+	);
 
 describe("claude-code guards (.claude/settings.json)", () => {
 	guardCase("cc: every registered PreToolUse guard has a case", () => {
-		const guards = new Set(registeredHooks(RT).filter((h) => h.event === "PreToolUse").map(scriptOf));
+		const guards = new Set(
+			registeredHooks(RT)
+				.filter((h) => h.event === "PreToolUse")
+				.map(scriptOf),
+		);
 		guards.delete(".claude/hooks/dispatch.cjs"); // observers only; covered by tests/hooks
 		const covered = [".claude/hooks/privacy-block.cjs", ".claude/hooks/pre-ship.cjs"];
 		for (const g of guards) expect(covered, `no guard case covers ${g}`).toContain(g);
@@ -26,7 +51,19 @@ describe("claude-code guards (.claude/settings.json)", () => {
 
 	// A runtime that imports `.claude/settings.json` may send its own key spelling.
 	const camelRead = (fx: ReturnType<typeof makeFixture>, file: string) =>
-		fireEvent(fx, RT, "PreToolUse", { cwd: undefined, workspaceRoot: fx.dir, hookEventName: "preToolUse", toolName: "Read", toolInput: { filePath: path.join(fx.dir, file) } }, { toolName: "Read" });
+		fireEvent(
+			fx,
+			RT,
+			"PreToolUse",
+			{
+				cwd: undefined,
+				workspaceRoot: fx.dir,
+				hookEventName: "preToolUse",
+				toolName: "Read",
+				toolInput: { filePath: path.join(fx.dir, file) },
+			},
+			{ toolName: "Read" },
+		);
 
 	guardCase("cc: privacy blocks a Read of .env sent with camelCase keys", () => {
 		const fx = makeFixture([RT]);
@@ -38,7 +75,13 @@ describe("claude-code guards (.claude/settings.json)", () => {
 	guardCase("cc: ship check blocks a commit sent with camelCase keys", () => {
 		const fx = makeShipFixture([RT]);
 		stageLintError(fx);
-		const r = fireEvent(fx, RT, "PreToolUse", { hookEventName: "preToolUse", toolName: "Bash", toolInput: { command: "git commit -m x" } }, { toolName: "Bash" });
+		const r = fireEvent(
+			fx,
+			RT,
+			"PreToolUse",
+			{ hookEventName: "preToolUse", toolName: "Bash", toolInput: { command: "git commit -m x" } },
+			{ toolName: "Bash" },
+		);
 		expect(r.blocked).toBe(true);
 		expect(runCount(fx, "lint")).toBeGreaterThan(0);
 	});
@@ -66,7 +109,17 @@ describe("claude-code guards (.claude/settings.json)", () => {
 
 	guardCase("cc: a source Write with no plan is allowed by every registered hook", () => {
 		const fx = makeFixture([RT]);
-		const r = fireEvent(fx, RT, "PreToolUse", { hook_event_name: "PreToolUse", tool_name: "Write", tool_input: { file_path: path.join(fx.dir, "src/new.cjs"), content: "module.exports = 1;\n" } }, { toolName: "Write" });
+		const r = fireEvent(
+			fx,
+			RT,
+			"PreToolUse",
+			{
+				hook_event_name: "PreToolUse",
+				tool_name: "Write",
+				tool_input: { file_path: path.join(fx.dir, "src/new.cjs"), content: "module.exports = 1;\n" },
+			},
+			{ toolName: "Write" },
+		);
 		expect(r.blocked).toBe(false);
 	});
 

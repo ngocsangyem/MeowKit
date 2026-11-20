@@ -58,7 +58,7 @@ default_enabled: true
    If any `Read` returns "file does not exist" or equivalent, **ABORT IMMEDIATELY** with the exact message:
 
    ```
-   SAFETY BASELINE INCOMPLETE: rule <name> not found at .claude/rules/<name>.md
+   SAFETY BASELINE INCOMPLETE: rule <name> not found among the always-on rules
    Refusing to route any task. Restore the rule (git checkout / the installer) before retrying.
    ```
 

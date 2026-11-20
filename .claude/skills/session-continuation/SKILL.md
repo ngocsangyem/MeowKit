@@ -39,7 +39,7 @@ Manage workflow state across sessions with handoff and resume.
 
 ## Plan State
 
-Saved workflow state lives in `.claude/logs/workflows/`; the active plan is resolved
+Saved workflow state lives in `.meowkit/logs/workflows/`; the active plan is resolved
 from `.meowkit/state/active-plan.json` or by scanning `tasks/plans/`. Nothing is carried
 between sessions in the environment.
 
@@ -48,7 +48,7 @@ between sessions in the environment.
 1. **Detect trigger** — token limit, user command, or session ending
 2. **If handoff** — load `references/handoff-flow.md`, execute save + summary
 3. **If resume** — load `references/resume-and-state.md`, execute load + restore + continue
-4. **If list** — show all saved workflows from `.claude/logs/workflows/`
+4. **If list** — show all saved workflows from `.meowkit/logs/workflows/`
 
 ## References
 

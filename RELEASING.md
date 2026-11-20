@@ -107,13 +107,13 @@ Check and update these pages if the release affects them:
 
 | Page                                | Update when                                      |
 | ----------------------------------- | ------------------------------------------------ |
-| `guide/memory-system.md`            | Memory schema, capture, or consolidation changes |
-| `guide/workflow-phases.md`          | Phase behavior changes (new steps, hook changes) |
-| `guide/agent-skill-architecture.md` | New skills, agents, or Mermaid diagram changes   |
-| `guide/model-routing.md`            | Model tier or routing changes                    |
-| `guide/{claude,codex,cursor}-agent-models.md` | An agent's pinned model changes, or an agent is added/removed |
-| `reference/agents/*.md`             | Agent capability changes                         |
-| `reference/skills/*.md`             | Skill behavior or schema changes                 |
+| `guide/memory-system.mdx`           | Memory schema, capture, or consolidation changes |
+| `core-concepts/workflow.mdx`        | Phase behavior changes (new steps, hook changes) |
+| `guide/agent-skill-architecture.mdx` | New skills, agents, or Mermaid diagram changes  |
+| `guide/model-routing.mdx`           | Model tier or routing changes                    |
+| `guide/agent-models.mdx`            | An agent's pinned model changes, or an agent is added/removed |
+| `reference/agents/*.mdx`            | Agent capability changes                         |
+| `reference/skills/*.mdx`            | Skill behavior or schema changes                 |
 
 #### 1b. Update agent and skill routing (when new agents/skills land)
 
@@ -190,7 +190,7 @@ Index files (`agents/AGENTS_INDEX.md`, `SKILLS_INDEX.md`) are catalogs, not agen
   `claude-opus-5`; standard judgement → `sonnet`; bounded or wrapper work → `haiku`. An exact model id
   must be registered as a named profile in `crates/mewkit-core/src/validate/agent_registry_rows.rs`,
   or `mewkit validate --agents` rejects it. Per-agent table:
-  `packages/docs/content/docs/guide/claude-agent-models.mdx`.
+  `packages/docs/content/docs/guide/agent-models.mdx`.
 - **Codex and Cursor**: the model id and reasoning effort come from projection (`model_pins` in
   `crates/mewkit-adapters/src/projection/target.rs`). The tier mapping and the approved ids are in
   `scripts/lib/model-pins.md`. Add a new id there first, then to the mapping, if you introduce one.

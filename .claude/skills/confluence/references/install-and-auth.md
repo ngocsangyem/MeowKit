@@ -42,7 +42,7 @@ MEOW_CONFLUENCE_API_TOKEN=your-api-token
 
 Get an API token at https://id.atlassian.com/manage-profile/security/api-tokens (Atlassian Cloud login required).
 
-The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load credentials from `.claude/settings.local.json` even if present (security override of upstream default behavior).
+The wrapper translates these to `CONFLUENCE_*` at exec time and refuses to load credentials from a host `settings.local.json` even if present (security override of upstream default behavior).
 
 ## Install
 

@@ -134,7 +134,7 @@ Requires Playwright MCP server. Configure in `.mcp.json`:
 ```json
 { "playwright": { "command": "npx", "args": ["@playwright/mcp@latest"] } }
 ```
-Copy from `.claude/mcp.json.example` if not configured.
+Copy from `.meowkit/mcp.json.example` if not configured.
 If global binary unavailable: `npx playwright-cli <command>`
 
 ## Gotchas

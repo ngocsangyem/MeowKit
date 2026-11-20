@@ -57,7 +57,7 @@ The harness budget tracker (`mk:autobuild/scripts/budget-tracker.sh`) enforces t
 
 ## Rule 7: Dead-Weight Audit Mandatory on Model Upgrade
 
-Every harness component encodes an assumption about what the model CANNOT do. When a new model tier ships, the dead-weight audit MUST be run to verify each component is still load-bearing. The audit's cadence, measurement procedure, decision thresholds, and never-prune list are in `.claude/skills/benchmark/references/dead-weight-audit-rules.md` (this repository only — an installed kit does not carry it, and the audit is a maintainer procedure).
+Every harness component encodes an assumption about what the model CANNOT do. When a new model tier ships, the dead-weight audit MUST be run to verify each component is still load-bearing. The audit's cadence, measurement procedure, decision thresholds, and never-prune list are in the dead-weight audit rules the maintainers keep in the kit's source repository (an installed kit does not carry them, and the audit is a maintainer procedure).
 
 **WHY:** Model upgrades can turn useful scaffolding into dead weight.
 

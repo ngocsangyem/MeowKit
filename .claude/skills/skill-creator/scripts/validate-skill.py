@@ -6,7 +6,7 @@ so Claude only sees the pass/fail summary and fixes what failed.
 
 Usage:
   python3 validate-skill.py <skill-directory>
-  python3 validate-skill.py .claude/skills/my-feature
+  python3 validate-skill.py .claude/skills/<skill-name>
 
 Adapted from open-source upstream (MIT).
 """

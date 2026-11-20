@@ -32,7 +32,7 @@ To pick the task agent and tier at orient time, use `mk:agent-detector`. This sk
 3. Check project context: files present, directory structure, recent git changes.
 4. Score confidence per domain: HIGH at 70 or more, MEDIUM from 40 to 69, LOW below 40.
 5. Map the signals to a task type (`references/task-type-classification.md`).
-6. If `.claude/product-areas.yaml` exists, merge its area keywords and paths (`references/product-area-config.md`).
+6. If `.meowkit/product-areas.yaml` exists, merge its area keywords and paths (`references/product-area-config.md`).
 7. With no match, return `unknown` and leave classification to the orchestrator.
 
 ## Output
