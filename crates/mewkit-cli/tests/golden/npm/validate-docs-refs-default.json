@@ -18,6 +18,6 @@
     ".claude/skills/cook/SKILL.md": "---\nname: mk:cook\ndescription: Build a feature.\n---\n\nRead docs/project-context.md first.\nThen docs/maintainer/secret-plan.md.\nLater docs/future-thing.md.\n",
     ".git/HEAD": "ref: refs/heads/main\n",
     ".meowkit/memory/decisions.md": "## A kebab-case file name is what search tools read  <!-- 2026-11-01 -->\n\nWhy: a long name beats a short one when a tool greps for purpose.\nApply when: naming any new file.\nSource: a review of three renamed modules.\n",
-    "docs/maintainer/docs-reference-contract.md": "# Docs reference contract\n\n<!-- ALLOWLIST-START -->\ndocs/project-context.md\n<!-- ALLOWLIST-END -->\n\n<!-- RESERVED-START -->\ndocs/future-thing.md\n<!-- RESERVED-END -->\n"
+    "scripts/docs-reference-contract.md": "# Docs reference contract\n\n<!-- ALLOWLIST-START -->\ndocs/project-context.md\n<!-- ALLOWLIST-END -->\n\n<!-- RESERVED-START -->\ndocs/future-thing.md\n<!-- RESERVED-END -->\n"
   }
 }

@@ -2,7 +2,7 @@
 // instruction-criteria-skill-rules.cjs — criteria on skill files: the listing text a host
 // shows the model (description fitness) and progressive disclosure (body length, contents
 // lists on long references, references one level deep).
-// Criteria text: docs/maintainer/instruction-audit-criteria.md.
+//
 
 const { frontmatterValue, keyLine } = require('./instruction-criteria-frontmatter.cjs');
 

@@ -1,6 +1,6 @@
 'use strict';
-// instruction-criteria-rules.cjs — the mechanical half of the instruction audit criteria
-// (docs/maintainer/instruction-audit-criteria.md). Each check takes one file's text and
+// instruction-criteria-rules.cjs — the mechanical half of the instruction audit criteria.
+// Each check takes one file's text and
 // returns findings; the CLI in scripts/check-instruction-criteria.cjs walks the trees.
 //
 // Only what a pattern can decide lives here. Criteria that need judgement (A3 emphasis,

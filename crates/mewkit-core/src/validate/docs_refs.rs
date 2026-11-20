@@ -39,7 +39,7 @@ const SCANNED_EXTENSIONS: [&str; 5] = ["md", "sh", "py", "cjs", "js"];
 /// a `docs/` path inside a test file is fixture data that nothing resolves.
 const SKIPPED_DIRS: [&str; 5] = ["node_modules", ".venv", "tests", "__tests__", "__pycache__"];
 
-pub const CONTRACT_REL_PATH: &str = "docs/maintainer/docs-reference-contract.md";
+pub const CONTRACT_REL_PATH: &str = "scripts/docs-reference-contract.md";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum RefLevel {

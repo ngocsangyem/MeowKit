@@ -84,10 +84,10 @@
             },
             {
               "root": ".codex/skills",
-              "source": "docs/maintainer/host-probe-log.md row X1"
+              "source": "maintainer probe log (2026-11-17) row X1"
             }
           ],
-          "note": "Two skills with one name are both listed (docs/maintainer/host-probe-log.md row X2)."
+          "note": "Two skills with one name are both listed (maintainer probe log (2026-11-17) row X2)."
         },
         "agents": {
           "own": true,
@@ -98,7 +98,7 @@
               "source": "https://learn.chatgpt.com/docs/agent-configuration/subagents#custom-agents"
             }
           ],
-          "note": "Two agents with one name: not settled (docs/maintainer/host-probe-log.md row X3, checklist C1)."
+          "note": "Two agents with one name: not settled (maintainer probe log (2026-11-17) row X3)."
         },
         "always-on": {
           "own": true,
@@ -156,7 +156,7 @@
               "source": "https://cursor.com/docs/skills#skill-directories"
             }
           ],
-          "note": "The same name in two folders is not documented and could not be listed without a model turn (docs/maintainer/host-probe-log.md row X8, checklist C2). Whether the Third-Party Imports setting governs skills is not stated. The kit writes `.cursor/skills` in every set: Cursor's reads of the other folders are documented and not probed, and a copy of its own keeps it supplied if one of them is not read. Beside a runtime that writes `.agents/skills` or `.claude/skills`, Cursor therefore lists each kit skill twice."
+          "note": "The same name in two folders is not documented and could not be listed without a model turn (maintainer probe log (2026-11-17) row X8). Whether the Third-Party Imports setting governs skills is not stated. The kit writes `.cursor/skills` in every set: Cursor's reads of the other folders are documented and not probed, and a copy of its own keeps it supplied if one of them is not read. Beside a runtime that writes `.agents/skills` or `.claude/skills`, Cursor therefore lists each kit skill twice."
         },
         "agents": {
           "pick": "first",
@@ -241,7 +241,7 @@
             },
             {
               "root": ".claude/skills",
-              "unsure": "the vendor page says these are read and names no path; checklist C3",
+              "unsure": "the vendor page says these are read and names no path; not run in a live session yet",
               "switch": {
                 "scope": "user",
                 "set": "`GROK_CLAUDE_SKILLS_ENABLED=false` or `[compat.claude] skills = false` in `~/.grok/config.toml`"
@@ -250,7 +250,7 @@
             },
             {
               "root": ".cursor/skills",
-              "unsure": "the vendor page says these are read and names no path; checklist C3",
+              "unsure": "the vendor page says these are read and names no path; not run in a live session yet",
               "switch": {
                 "scope": "user",
                 "set": "`GROK_CURSOR_SKILLS_ENABLED=false` or `[compat.cursor] skills = false` in `~/.grok/config.toml`"
@@ -268,12 +268,12 @@
             },
             {
               "root": ".claude/agents",
-              "unsure": "the vendor page says these are read and names no path; checklist C3",
+              "unsure": "the vendor page says these are read and names no path; not run in a live session yet",
               "source": "https://docs.x.ai/build/features/skills-plugins-marketplaces"
             },
             {
               "root": ".cursor/agents",
-              "unsure": "the vendor page says these are read and names no path; checklist C3",
+              "unsure": "the vendor page says these are read and names no path; not run in a live session yet",
               "switch": {
                 "scope": "user",
                 "set": "`GROK_CURSOR_AGENTS_ENABLED=false`"
@@ -281,7 +281,7 @@
               "source": "https://docs.x.ai/build/settings/reference"
             }
           ],
-          "note": "The page names the folder and no file format or field (read 2026-11-19), so the kit writes no agent definition there; agent prompts go to `.grok/meowkit/agents/`, which Grok does not load (checklist C3)."
+          "note": "The page names the folder and no file format or field (read 2026-11-19), so the kit writes no agent definition there; agent prompts go to `.grok/meowkit/agents/`, which Grok does not load."
         },
         "always-on": {
           "own": true,
@@ -316,7 +316,7 @@
               "source": "https://docs.x.ai/build/features/project-rules"
             }
           ],
-          "note": "Every file found is loaded in full. Whether `.mdc` frontmatter is parsed is not stated (checklist C4). The kit writes its always-on block to `AGENTS.md` only, and `.grok/rules` stays empty."
+          "note": "Every file found is loaded in full. Whether `.mdc` frontmatter is parsed is not stated. The kit writes its always-on block to `AGENTS.md` only, and `.grok/rules` stays empty."
         },
         "hooks": {
           "roots": [
@@ -437,7 +437,7 @@
             {
               "root": ".agents/skills",
               "write": true,
-              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/agents.ts:30; docs/maintainer/host-probe-log.md row X5"
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/agents.ts:30; maintainer probe log (2026-11-17) row X5"
             },
             {
               "root": ".omp/skills",
@@ -449,7 +449,7 @@
                 "scope": "project",
                 "set": "`.omp/config.yml` `disabledProviders: [claude]`"
               },
-              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/claude.ts:210; docs/maintainer/host-probe-log.md row X6"
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/claude.ts:210; maintainer probe log (2026-11-17) row X6"
             },
             {
               "root": ".codex/skills",
@@ -457,10 +457,10 @@
                 "scope": "project",
                 "set": "`.omp/config.yml` `disabledProviders: [codex]`"
               },
-              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/codex.ts:268; docs/maintainer/host-probe-log.md row X6"
+              "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/codex.ts:268; maintainer probe log (2026-11-17) row X6"
             }
           ],
-          "note": "The kit writes `.agents/skills` only, so OMP shares one copy with Codex and Pi and `.omp/skills` stays empty (maintainer, 2026-11-19). Copies that differ all stay listed, under a provider prefix (docs/maintainer/host-probe-log.md row X4). Turning a provider off turns off everything it imports, not skills alone."
+          "note": "The kit writes `.agents/skills` only, so OMP shares one copy with Codex and Pi and `.omp/skills` stays empty (maintainer, 2026-11-19). Copies that differ all stay listed, under a provider prefix (maintainer probe log (2026-11-17) row X4). Turning a provider off turns off everything it imports, not skills alone."
         },
         "agents": {
           "own": true,

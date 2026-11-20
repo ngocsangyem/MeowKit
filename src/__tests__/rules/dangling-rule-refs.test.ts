@@ -57,14 +57,13 @@ function makeCleanTree(): string {
 	write(
 		temp,
 		path.join(".claude", "skills", "loader", "SKILL.md"),
-		[...DESTINATIONS.map((d) => `Load \`.claude/${d}\`.`), "Reads `docs/maintainer/docs-reference-contract.md`."].join(
+		[...DESTINATIONS.map((d) => `Load \`.claude/${d}\`.`), "Reads `scripts/docs-reference-contract.md`."].join("\n") +
 			"\n",
-		) + "\n",
 	);
 	for (const skill of STEP_FILE_SKILLS) {
 		write(temp, path.join(".claude", "skills", skill, "workflow.md"), "## Step-File Contract\n\n- JIT load.\n");
 	}
-	write(temp, "docs/maintainer/docs-reference-contract.md", "# contract\n");
+	write(temp, "scripts/docs-reference-contract.md", "# contract\n");
 	return temp;
 }
 
@@ -93,9 +92,8 @@ describe("check-dangling-rule-refs", () => {
 		expect(result.output).toContain("(a) old rule path: rules/tdd-rules.md");
 	});
 
-	it("(a) exempts the destination table and tasks/, which record old paths on purpose", () => {
+	it("(a) exempts tasks/, which records old paths on purpose", () => {
 		const root = makeCleanTree();
-		write(root, path.join("docs", "maintainer", "rule-destination-table.md"), "`rules/tdd-rules.md` moved.\n");
 		write(root, path.join("tasks", "plans", "old", "plan.md"), "`rules/tdd-rules.md` is loaded.\n");
 		expect(run(root).status).toBe(0);
 	});

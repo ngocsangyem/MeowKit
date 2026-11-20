@@ -32,7 +32,7 @@ Phase 0 Orient → Phase 1 Plan → Phase 2 Test (RED if --tdd, else optional)
 
 Planning and review are practices: no hook blocks an edit on a missing plan or a commit on a missing review verdict (`tasks/reviews/*-verdict.md`).
 
-The one enforced ship-time control is the ship check: on `git commit`, `git push`, `git merge` and `gh pr create|merge`, `pre-ship` runs lint on the changed files, their related tests and a type-check, and refuses the command when one fails. What is enforced on each runtime: `docs/core/enforcement-matrix.md`.
+The one enforced ship-time control is the ship check: on `git commit`, `git push`, `git merge` and `gh pr create|merge`, `pre-ship` runs lint on the changed files, their related tests and a type-check, and refuses the command when one fails. What is enforced on each runtime: `packages/docs/content/docs/core-concepts/enforcement.mdx`.
 
 ## Model Routing
 
@@ -79,7 +79,7 @@ Team memory is two committed markdown files: `.meowkit/memory/decisions.md` (why
 
 **Write:** `mewkit note <decisions|gotchas>` with the entry on stdin. `mk:fix`, `mk:review`, `mk:retro`, the architect agent and `mk:memory` append to either file; `mk:party` and `mk:plan-creator archive` append to `decisions.md` only. Any agent may add one EUREKA entry to `gotchas.md` (`agent-conduct.md` A3).
 
-**Protection:** `mewkit validate --memory` (CI and the pre-ship hook) and PR review. `/mk:memory --prune` proposes removals; a human approves each one. Full model: `docs/core/memory-system.md`.
+**Protection:** `mewkit validate --memory` (CI and the pre-ship hook) and PR review. `/mk:memory --prune` proposes removals; a human approves each one. Full model: `packages/docs/content/docs/guide/memory-system.mdx`.
 
 Trace friction is not memory: record it with `mewkit trace --friction "<note>"` and query it with `mewkit trace score|audit|propose`. Responsibility coverage is checked by `mewkit validate --substrate`.
 
@@ -124,7 +124,6 @@ What to preserve verbatim when Claude Code compacts a session is listed once, in
 - **Commands vs Skills:** `.claude/skills/skill-creator/references/skill-authoring-rules.md`
 - **Skill Rule of Two:** `.claude/rules/injection-rules.md` Rule 11
 - **Advisory skill frontmatter fields** (`preamble-tier`, `phase`, `trust_level`, `injection_risk`): `.claude/skills/skill-creator/references/skill-authoring-rules.md`
-- **Docs reference contract** (which `docs/*` paths may appear in `.claude/`): `docs/maintainer/docs-reference-contract.md` — enforced by `mewkit validate`
 
 ## Docs Retrieval
 

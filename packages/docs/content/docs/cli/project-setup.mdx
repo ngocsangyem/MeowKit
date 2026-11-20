@@ -22,7 +22,7 @@ mewkit init --target codex --dry-run
 
 `--target` takes `claude-code`, `codex`, `cursor`, `grok`, `pi`, `omp`, a comma-separated list of them, or `all`. Without `--target`, a terminal shows a picker with Claude Code preselected. With no terminal, `--yes` or an existing `.claude/` means Claude Code, and otherwise the command exits 2 and names `--target`. An unrecognized `--target` is refused by name.
 
-Grok, Pi and OMP install at project scope only, so `--global` covers Claude Code, Codex and Cursor. The Grok, Pi and OMP guards follow the vendors' documentation and have not been run in a live session ([enforcement matrix](https://github.com/ngocsangyem/MeowKit/blob/main/docs/core/enforcement-matrix.md)).
+Grok, Pi and OMP install at project scope only, so `--global` covers Claude Code, Codex and Cursor. The Grok, Pi and OMP guards follow the vendors' documentation and have not been run in a live session ([Enforcement & Security](/core-concepts/enforcement) page).
 
 | Flag | Runtime | Effect |
 | --- | --- | --- |

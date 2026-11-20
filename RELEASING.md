@@ -193,7 +193,7 @@ Index files (`agents/AGENTS_INDEX.md`, `SKILLS_INDEX.md`) are catalogs, not agen
   `packages/docs/content/docs/guide/claude-agent-models.mdx`.
 - **Codex and Cursor**: the model id and reasoning effort come from projection (`model_pins` in
   `crates/mewkit-adapters/src/projection/target.rs`). The tier mapping and the approved ids are in
-  `docs/maintainer/model-pins.md`. Add a new id there first, then to the mapping, if you introduce one.
+  `scripts/lib/model-pins.md`. Add a new id there first, then to the mapping, if you introduce one.
   Do not hardcode a runtime model id in `.claude/`.
 
 **Always check the official docs FIRST**, because these formats change:
@@ -252,9 +252,8 @@ The team store is two committed files, `.meowkit/memory/decisions.md` and `gotch
 the entry format, the read or write sets, `mewkit note`, or the `validate --memory` lint must update,
 in the same PR:
 
-- `docs/core/memory-system.md` and `packages/docs/content/docs/guide/memory-system.mdx`
+- `packages/docs/content/docs/guide/memory-system.mdx`
 - the `.claude/rules/meowkit-core.md` Memory section, and the `mk:memory` skill
-- `docs/governance/dead-weight-audit-registry.md`, when a harness component is added or removed
 
 A format change affects existing stores, so record it in the CHANGELOG `Migration Notes` with the
 exact new entry format or command.
@@ -562,7 +561,7 @@ Copy this checklist for each release:
 Three things ship. Only two are released.
 
 - **Kit**: `scripts/release.sh <version> "<title>"` tags `v<version>` and publishes `meowkit-release.zip` + `checksums.txt` to the GitHub Release. The zip carries `.claude/kit-contract.json`: `kitContract` (format version), `requires.mewkitMin` (oldest binary that can read this kit) and `kitVersion` (stamped from root `package.json` by `sync-versions.cjs`).
-- **Binary**: the native `mewkit` CLI (alias `mk`) is released from this repo under its own `mewkit-v<version>` tags with no `.zip` asset, so kit consumers never mistake it for a kit. It fetches the kit zip and checks it against `checksums.txt`. See [Binary release stream](#binary-release-stream) and ADR `docs/architecture/adr/261110-two-release-streams.md`.
+- **Binary**: the native `mewkit` CLI (alias `mk`) is released from this repo under its own `mewkit-v<version>` tags with no `.zip` asset, so kit consumers never mistake it for a kit. It fetches the kit zip and checks it against `checksums.txt`. See [Binary release stream](#binary-release-stream).
 - **npm package (`mewkit`)**: retired. It is no longer released. See [Retiring the npm package](#retiring-the-npm-package).
 
 **Trust model: checksums only.** MeowKit is open source and releases carry no signatures. `checksums.txt` is fetched from the same release as the zip, so it detects corruption and partial downloads, not a tampered release. Trust rests on GitHub, TLS and who can push tags.

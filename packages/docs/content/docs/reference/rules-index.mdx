@@ -1,11 +1,11 @@
 ---
 title: "Rules Index"
 description: "The 6 always-on MeowKit rules, where the other rules load from, and how each is enforced."
-sourceOfTruth: "docs/governance/rules-index.md"
+sourceOfTruth: ".claude/rules/meowkit-core.md"
 lastVerified: "2026-11-20"
 ---
 
-`.claude/rules/` holds exactly 6 files. Claude Code loads that directory every session, so these are the only rules that cost context unconditionally. Every other rule sits in the `references/` folder of the skill that loads it and reaches context only when that skill runs. The source index is `docs/governance/rules-index.md`.
+`.claude/rules/` holds exactly 6 files. Claude Code loads that directory every session, so these are the only rules that cost context unconditionally. Every other rule sits in the `references/` folder of the skill that loads it and reaches context only when that skill runs.
 
 MeowKit ships no root `CLAUDE.md`. A project may keep its own; the kit never installs or refreshes it.
 
@@ -46,7 +46,6 @@ Priority, highest first: `security-rules.md` and `injection-rules.md` are never 
 | `rubric-rules.md` | `.claude/skills/rubric/references/` | `mk:rubric`, evaluator agent |
 | `skill-authoring-rules.md` | `.claude/skills/skill-creator/references/` | `mk:skill-creator`, skill audits |
 | `dead-weight-audit-rules.md` | `.claude/skills/benchmark/references/` (maintainer-only, not in the shipped kit) | `mk:benchmark` |
-| `docs-reference-contract.md` | `docs/maintainer/` (source repository only) | Maintainers, `mewkit validate` |
 | `step-file-rules.md` | Inlined as `## Step-File Contract` in each step-filed skill's `workflow.md` | `mk:plan-creator`, `mk:review`, `mk:evaluate`, `mk:autobuild`, `mk:trace-analyze` |
 | `anti-rationalization.md` | Merged into `core-behaviors.md` | Always on |
 | `intervention-recording-rules.md` | Merged into `meowkit-core.md` | Always on |

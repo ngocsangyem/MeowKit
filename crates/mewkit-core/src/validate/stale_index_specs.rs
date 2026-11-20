@@ -57,20 +57,5 @@ pub(super) fn count_specs(repo_root: &Path) -> Vec<CountSpec> {
             pattern: r"(\d+)\s+node hook",
             actual: counts.hooks.len(),
         },
-        // The UNDATED overview prose only. The dated "Component Inventory"
-        // table below it is a historical snapshot and is intentionally not
-        // count-generated — bumping it would falsify the audit record.
-        CountSpec {
-            source: "docs/core/meowkit-architecture.md",
-            label: "arch overview skills",
-            pattern: r"(\d+)\s+domain skills",
-            actual: counts.skills.len(),
-        },
-        CountSpec {
-            source: "docs/core/meowkit-architecture.md",
-            label: "arch overview rules",
-            pattern: r"(\d+)\s+rule files",
-            actual: counts.rules.len(),
-        },
     ]
 }

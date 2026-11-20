@@ -1,7 +1,7 @@
 ---
 title: "Enforcement & Security"
 description: "What MeowKit enforces with hooks on each of the six runtimes, what it leaves to the workflow, and its four-layer security model."
-sourceOfTruth: "docs/core/enforcement-matrix.md"
+sourceOfTruth: ".claude/hooks/hook-coverage.json"
 lastVerified: "2026-11-20"
 ---
 
@@ -25,7 +25,7 @@ Push, merge and force-push are approved through your host's own permission promp
 
 ## What each runtime enforces
 
-An Enforced cell means a registered hook refuses the action. Advisory means an instruction asks for it and nothing checks. The full matrix, with the hook behind each cell, is the [enforcement matrix](https://github.com/ngocsangyem/MeowKit/blob/main/docs/core/enforcement-matrix.md).
+An Enforced cell means a registered hook refuses the action. Advisory means an instruction asks for it and nothing checks. `.claude/hooks/hook-coverage.json` in the kit records what each safety behaviour becomes on each runtime.
 
 | Control | Claude Code | Codex | Cursor | Grok | Pi | OMP |
 |---|---|---|---|---|---|---|
