@@ -1,106 +1,90 @@
 ---
 title: "Architecture Decisions"
-description: "Evaluate architectural tradeoffs and document decisions with ADRs."
+description: "Evaluate architectural trade-offs and record the decision as an ADR."
 ---
 
-> Evaluate tradeoffs with evidence and document decisions as Architecture Decision Records.
+This playbook helps you decide an architectural question with evidence and record the decision as an Architecture Decision Record (ADR).
 
-**Best for:** Schema changes, new services, API design, infrastructure decisions  
-**Time estimate:** 30-60 minutes  
-**Skills used:** [mk:office-hours](/reference/skills/office-hours) (brainstorming), [mk:plan-ceo-review](/reference/skills/plan-ceo-review)  
-**Agents involved:** architect (ADR generation), brainstormer (approach evaluation), researcher (tech research)
+**Best for:** Schema changes, new services, API design, infrastructure decisions
+**Time estimate:** 30 to 60 minutes
+**Skills used:** [mk:party](/reference/skills/party), [mk:brainstorming](/reference/skills/brainstorming), [mk:arch](/reference/skills/arch), [mk:plan-ceo-review](/reference/skills/plan-ceo-review) (optional)
+**Agents involved:** architect (ADRs), brainstormer (approaches), researcher (technology research)
 
 ## Overview
 
-When a task involves database schema, API contracts, service boundaries, or infrastructure changes, the **orchestrator** inserts the **architect** agent. The architect evaluates tradeoffs using evidence (not opinion), generates ADRs, and enforces existing architectural patterns.
+For work that touches a database schema, API contracts, service boundaries or infrastructure, the **architect** agent weighs the trade-offs with evidence, writes the ADR and reads the existing ADRs so new work stays consistent with them. For a high-stakes decision, run `mk:party` first.
 
-For high-stakes architectural decisions, use **Party Mode** to get multi-agent deliberation before writing a single line of code.
-
-## Step-by-step guide
-
-### Step 0: Party Mode deliberation (recommended for major decisions)
+## Step 1: Deliberate with `mk:party` (for major decisions)
 
 ```
 /mk:party "Should we use GraphQL or REST for the public API?"
 ```
 
-Party Mode spawns 2-4 deliberation agents that independently analyze the question, then synthesize their findings into a single recommendation. No code is written during a party — the output is a decision brief that feeds into the ADR.
+`mk:party` picks 2 to 4 agent personas from the topic (for an architecture topic: architect, developer and planner), runs a few rounds of discussion and returns a synthesis. The personas are played inside your session; they are not separate agent runs. No code is written. The output is a decision brief that feeds the ADR.
 
 ```
-Party Mode — "GraphQL vs REST"
-  Agent A (performance lens): REST wins — GraphQL query complexity unpredictable at scale
-  Agent B (DX lens): GraphQL wins — eliminates over-fetching for mobile clients
-  Agent C (migration lens): tRPC wins — no overhead, full type safety, TS-only project
-  -----------------------------------------------------
-  Synthesis: tRPC for internal APIs, REST for external. GraphQL deferred.
+Party Mode: "GraphQL vs REST"
+  performance lens: REST, GraphQL query cost is hard to predict at scale
+  developer-experience lens: GraphQL, no over-fetching for mobile clients
+  migration lens: tRPC, if the whole project is TypeScript
+  Synthesis: tRPC for internal APIs, REST for external, GraphQL deferred
 ```
 
-Use `/mk:party` when:
-- Two reasonable engineers would disagree on the approach
-- The decision has long-term architectural consequences
-- The cost of the wrong choice exceeds 2 days of rework
+Use it when two reasonable engineers would disagree, when the decision has long-term consequences, or when a wrong choice would cost more than two days of rework.
 
-### Step 1: Brainstorm approaches (optional, skip if using Party Mode)
+## Step 2: Compare approaches (skip if you ran a party)
 
-```
-"Should we use GraphQL or REST for our API?"
-```
-
-The **brainstormer** agent evaluates 2-3+ approaches:
+Ask the question in plain words, or use `mk:brainstorming`. The **brainstormer** agent compares two or three approaches:
 
 | Approach | Pros | Cons | Choose when |
-|----------|------|------|-------------|
-| REST | Simple, cacheable, well-understood | Over/under-fetching | CRUD-heavy, simple data |
-| GraphQL | Flexible queries, typed schema | Complex, caching harder | Mobile clients, complex relationships |
-| tRPC | End-to-end type safety, zero overhead | TypeScript-only | Full-stack TS, internal APIs |
+|---|---|---|---|
+| REST | Simple, cacheable, well understood | Over- and under-fetching | CRUD-heavy, simple data |
+| GraphQL | Flexible queries, typed schema | Complex, harder caching | Mobile clients, rich relationships |
+| tRPC | End-to-end type safety, no codegen | TypeScript only | Full-stack TypeScript, internal APIs |
 
-### Step 2: Research if needed
+## Step 3: Research what you do not know
 
-The **researcher** agent (using Haiku for cost efficiency) fans out queries to official docs, GitHub repos, and community resources:
+The **researcher** agent queries official documentation, repositories and community sources, grades them and marks what is established, emerging or experimental. See [Researching Libraries](/workflows/research).
+
+## Step 4: Write the ADR
 
 ```
-Researcher findings:
-  GraphQL: Established, but Apollo overhead concerns (bundle +45KB)
-  tRPC: Emerging, excellent DX for TypeScript teams
-  Confidence: HIGH (well-documented ecosystem)
+/mk:arch new "Use tRPC for internal API"
 ```
 
-### Step 3: Create the ADR
-
-The **architect** agent (using Opus for complex reasoning) produces an ADR:
+`mk:arch` assigns the next number, gathers the context, constraints and options (it asks if any are missing) and has the **architect** agent write the body: Status, Context, Decision, Consequences and Alternatives Considered. The file is `docs/architecture/adr/YYMMDD-title.md`, with status Proposed until you review it. Other `mk:arch` commands are `list`, `review [number]` and `impact [change description]`, which checks a proposed change against the decisions already taken.
 
 ```markdown
-# 0005: Use tRPC for Internal API
+# 0005 - Use tRPC for internal API
 
-Status: Accepted
+## Status
+Accepted
 
 ## Context
-We need a typed API layer for our TypeScript monorepo.
+We need a typed API layer for a TypeScript monorepo.
 
 ## Decision
-Use tRPC for internal services. REST for external/public APIs.
+Use tRPC for internal services and REST for external APIs.
 
 ## Consequences
-- [+] End-to-end type safety without code generation
-- [+] Zero runtime overhead (compile-time only)
-- [-] Locks us into TypeScript for all API consumers
-- [~] External APIs still use REST (no migration needed)
+- Positive: end-to-end type safety without code generation
+- Negative: ties every internal API consumer to TypeScript
 ```
 
-Saved to `docs/architecture/0005-use-trpc-for-internal-api.md`.
+If a decision's reason cannot be derived from the code or the ADR, the architect also appends an entry to `.meowkit/memory/decisions.md`.
 
-### Step 4: Engineering review
+## Step 5: Challenge the plan (optional)
 
 ```
 /mk:plan-ceo-review
 ```
 
-The [mk:plan-ceo-review](/reference/skills/plan-ceo-review) skill validates: data flow correctness, edge cases, test strategy, and performance implications of the architectural decision.
+[mk:plan-ceo-review](/reference/skills/plan-ceo-review) critiques a plan's ambition and scope from a founder's view, in four modes (Expansion, Selective Expansion, Hold Scope, Reduction). Use it when you want the scope questioned, not the ADR checked.
 
-## How the architect enforces patterns
+## How the architect keeps patterns consistent
 
-The **architect** reads existing ADRs before reviewing new code. If implementation introduces patterns that conflict with accepted ADRs, it flags the violation and requires either: updating the implementation to match, or creating a new ADR that supersedes the old one.
+The architect reads existing ADRs from `docs/architecture/adr/` before it reviews new work. If an implementation conflicts with an accepted ADR, the fix is either to change the implementation or to write a new ADR that supersedes the old one.
 
-## Next workflow
+## Next
 
-→ [Frontend Development](/workflows/frontend) — build frontend with Vue/TS patterns
+[Frontend Development](/workflows/frontend) covers frontend work with the UI/UX standards.

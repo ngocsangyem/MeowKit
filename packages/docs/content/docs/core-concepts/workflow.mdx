@@ -1,33 +1,23 @@
 ---
 title: "Workflow Phases"
-description: "The canonical 7-phase pipeline: what each phase produces, which check applies, and where the exceptions are."
+description: "The seven phases of the MeowKit pipeline: what each produces, which agent runs it, and where the ship check applies."
 sourceOfTruth: ".claude/skills/cook/references/phase-contracts.md"
-lastVerified: "2026-11-17"
+lastVerified: "2026-11-20"
 ---
 
-Every non-trivial task flows through MeowKit's 7-phase pipeline. Planning and review are practices, not gates: nothing blocks an edit on a missing plan or a commit on a missing verdict. The ship check is the one enforced control. No phase can be skipped.
+Every non-trivial task goes through MeowKit's seven phases. Planning and review are practices: no hook blocks an edit on a missing plan or a commit on a missing verdict. The ship check is the one control a hook enforces.
 
 ```
 Phase 0: Orient → Phase 1: Plan → Phase 2: Test
-→ Phase 3: Build → Phase 4: Review
+→ Phase 3: Build (3.5 Simplify, 3.6 Verify) → Phase 4: Review
 → Phase 5: Ship [ship check] → Phase 6: Reflect
 ```
 
-## The words this page uses
-
-Five terms do most of the work, and they are not interchangeable:
-
-| Term | What it means |
-|---|---|
-| **Phase** | One of the seven numbered steps above. Every task passes through all of them. |
-| **Stage** | A step *inside* a phase. Simplify and Verify sit inside Build. No plan or verdict of its own. |
-| **Ship check** | The one enforced control: lint, related tests and a type-check before a commit, push, merge or PR. |
-| **Mode** | How the phases execute: sequential, parallel, or party. Modes change the shape of the work, never the ship check. |
-| **Exception** | A documented case where a phase is skipped. A one-line fix needs no separate plan. |
+The [Glossary](/glossary) defines phase, stage, ship check, execution mode and exception. In short, a stage is a step inside a phase (Simplify and Verify sit inside Build), and an exception is a documented case where a phase is skipped, such as a one-line fix that needs no separate plan.
 
 ## Why phases exist
 
-Without structure, AI agents skip testing, self-approve their work, and ship directly to main. Each phase is a deliberate checkpoint that prevents a specific failure mode:
+Without structure, agents skip testing, approve their own work and ship straight to main. Each phase prevents one failure:
 
 | Phase | Prevents |
 |-------|----------|
@@ -41,25 +31,23 @@ Without structure, AI agents skip testing, self-approve their work, and ship dir
 
 ## Phase 0: Orient
 
-**Agents:** orchestrator, analyst
-**Produces:** model tier assignment, execution mode, loaded context, a scout summary
+Agents: orchestrator, analyst. Produces: model tier assignment, execution mode, loaded context, a scout summary.
 
-The orchestrator reads the task description, determines complexity (Trivial / Standard / Complex), assigns the model tier, and loads relevant memory. Domain-based routing forces COMPLEX tier for high-risk domains such as fintech and healthcare. No code is touched.
+The orchestrator reads the task description, picks the complexity (Trivial, Standard or Complex), assigns the model tier and loads relevant memory. Domain-based routing forces the COMPLEX tier for high-risk domains such as fintech and healthcare. No code is touched.
 
-It also:
+Orient also:
 
 - reads `docs/project-context.md`, the agent constitution, injected by `project-context-loader.cjs`
-- loads memory topic files on demand. Consumer skills do this at task start; there is no auto-injection
+- greps `.meowkit/memory/` for matching entries. The skills that read memory do this at task start, and nothing is injected
 - runs `mk:scale-routing` for domain-based classification and prints a cost estimate
-- presents a 3–6 bullet codebase summary before asking you anything: project type, language, framework, relevant modules, current patterns, in-flight plans, public APIs and schemas. Skipped when the input is already a plan file.
+- presents a 3 to 6 bullet codebase summary before asking you anything: project type, language, framework, relevant modules, current patterns, in-flight plans, public APIs and schemas. Skipped when the input is already a plan file.
 - surfaces the capability resolver, so the agent can map an intent to a skill with `mewkit capabilities resolve --intent "…"` instead of guessing. Only generic functional language is injected, never the capability manifest itself.
 
 `/mk:help` reads plans, reviews, tests, and git to work out where the pipeline is and what comes next.
 
 ## Phase 1: Plan
 
-**Agent:** planner
-**Produces:** `tasks/plans/YYMMDD-name/plan.md`
+Agent: planner. Produces: `tasks/plans/YYMMDD-name/plan.md`.
 
 The planner writes a plan with goal, acceptance criteria, constraints, and scope. For tasks touching five or more files it also decomposes the work into beads: atomic units that can each be committed on their own.
 
@@ -67,64 +55,65 @@ Before it returns a plan it must answer five things in concrete sentences: expec
 
 Supporting skills: `mk:plan-creator` runs the full nine-step flow with modes `--fast`, `--hard`, `--deep`, `--parallel`, `--two`, `--product-level`, and `--spike --timebox <duration>` (see [Plan Creator Modes and Flags](/core-concepts/plan-creator-modes-and-flags)); `mk:plan-ceo-review` adds a product and engineering lens; `mk:validate-plan` runs an eight-dimension check on COMPLEX tasks.
 
-**Agree the plan with you.** For a change of more than two files or a few hours, the agent proposes the plan and agrees it with you before building. Nothing blocks an edit without one; the plan is the practice that keeps a wrong plan cheap.
+For a change of more than two files or about 30 minutes, the agent proposes the plan and agrees it with you before building. Nothing blocks an edit without one. The agreement is what keeps a wrong plan cheap.
 
 ## Phase 2: Test
 
-**Agent:** tester
-**Produces:** tests, failing ones in TDD mode and optional otherwise
+Agent: tester. Produces: tests, failing ones in TDD mode and optional otherwise.
 
-With `--tdd` or `MEOWKIT_TDD=1`, failing tests must exist before implementation and the developer writes the failing test first (no hook checks the order). `--tdd` is a flag rather than a planning mode, so it composes with whichever plan-creator mode you chose. In default mode this phase is optional and the tester runs on request.
+TDD is off by default. Turn it on with any of these:
+
+- `--tdd` on a command: `/mk:cook --tdd "build payment processor"`, `/mk:fix --tdd "..."` or `/mk:testing --tdd`. The flag writes a sentinel at `.meowkit/state/tdd-mode`, which hooks and agents read for the rest of the session.
+- `export MEOWKIT_TDD=1` in your shell or CI. It overrides the flag and the config.
+- `tdd: true` in `.meowkit/config.yaml`.
+
+With TDD on, failing tests must exist before implementation, and the developer writes the failing test first. No hook checks the order. `--tdd` is a flag and not a planning mode, so it composes with whichever plan-creator mode you chose. `--tdd` and `--no-test` cannot be combined. With TDD off, this phase is optional and the tester runs on request. Security rules, injection defense and the tester's rules against shrinking tests or substituting mocks apply in both modes. Tests must pass before a commit if tests exist.
 
 `mk:nyquist` checks test-to-requirement coverage at the end of the phase. The security pre-check runs either way.
 
 ## Phase 3: Build
 
-**Agent:** developer
-**Produces:** a passing, simplified, verified implementation
+Agent: developer. Produces: a passing, simplified, verified implementation.
 
-The developer implements against the approved plan. On test failure it self-heals up to three times, each attempt taking a different approach, then escalates to you. `post-write.cjs` security-scans every file write. Bead-decomposed tasks commit after each bead and resume from the last uncommitted one. Autonomous runs at FULL density require a signed sprint contract before any source write.
+The developer implements against the agreed plan. On test failure it self-heals up to three times, each attempt taking a different approach, then escalates to you. `post-write.cjs` security-scans every file write. Bead-decomposed tasks commit after each bead and resume from the last uncommitted one. In autobuild runs the developer reads the sprint contract before editing source. At LEAN density the contract is skipped, and no hook checks it.
 
 Two stages then run inside this phase before Review can start. Both are mandatory:
 
 | Stage | Skill | Why it is not optional |
 |---|---|---|
-| 3.5 Simplify | `mk:simplify` | The reviewer should read the code you intend to keep, not the first version that passed |
-| 3.6 Verify | `mk:verify` | Build, lint, types, tests, and coverage in one pass. Review starting from a broken signal is review of nothing |
+| 3.5 Simplify | `mk:simplify` | The reviewer reads the code you intend to keep, not the first version that passed |
+| 3.6 Verify | `mk:verify` | Build, lint, types, tests and coverage in one pass. A review that starts from a broken build reviews nothing |
 
-They are stages rather than phases because they carry no plan or verdict of their own; they are the last two things Build does.
+They are stages because they carry no plan or verdict of their own. They are the last two things Build does.
 
 ## Phase 4: Review
 
-**Agent:** reviewer
-**Produces:** `tasks/reviews/YYMMDD-name-verdict.md`
+Agent: reviewer. Produces: `tasks/reviews/YYMMDD-name-verdict.md`.
 
 A five-dimension audit (architecture, types, tests, security, performance) ending in PASS, PASS WITH NOTES, or FAIL. `mk:scout` can run first to surface edge cases; `mk:elicit` can run after to dig into WARN dimensions.
 
 Two optional flags change what "reviewed" means:
 
-- `--verify` adds a light browser or artifact check. It is **advisory**, so a FAIL is reported but does not change the outcome.
-- `--strict` runs the full evaluator. It is **blocking**, so a FAIL sends the work back to Phase 3, up to two evaluator rounds.
+- `--verify` adds a light browser or artifact check. It is advisory: a FAIL is reported and does not change the outcome.
+- `--strict` runs the full evaluator. A FAIL sends the work back to Phase 3, for up to two evaluator rounds.
 
-Which one costs more depends on your harness, model tier, and target surface; treat the difference as ordering, not a price.
+`--strict` costs more than `--verify`. By how much depends on your harness, model tier and target surface.
 
-**The verdict is a record, not a gate.** A FAIL tells you what to fix before shipping; nothing blocks a commit on a missing or failing verdict.
+The verdict is a record. A FAIL tells you what to fix before shipping, and nothing blocks a commit on a missing or failing verdict.
 
 ## Phase 5: Ship
 
-**Agent:** shipper
-**Produces:** a PR URL and rollback documentation
+Agent: shipper. Produces: a PR URL and rollback documentation.
 
-The ship check (`pre-ship.cjs`) runs lint on the changed files, their related tests and a type-check on `git commit`, `git push`, `git merge` and `gh pr create|merge`, and refuses the command when one fails. The shipper writes a conventional commit and opens a PR, never a push to main, then confirms CI passes.
+The ship check (`pre-ship.cjs`) runs lint on the changed files, their related tests and a type-check on `git commit`, `git push`, `git merge` and `gh pr create|merge`, and refuses the command when one fails. The shipper writes a conventional commit, opens a PR (never a push to main) and confirms CI passes. [Enforcement & Security](/core-concepts/enforcement) lists what the check does on each runtime.
 
 ## Phase 6: Reflect
 
-**Agents:** documenter, analyst
-**Produces:** updated memory and documentation
+Agents: documenter, analyst. Produces: updated memory and documentation.
 
 Non-derivable lessons are appended to `.meowkit/memory/decisions.md` or `gotchas.md` with `mewkit note`, affected docs are synced, and the task is closed.
 
-Two things happen on a fixed schedule rather than at your request. After each completed plan phase, the phase-file checkboxes and the plan's Agent State are updated before any transition, so a fresh session resumes at the right phase. And once every non-abandoned phase todo is checked the plan auto-completes and archives, without waiting for a ship.
+Two things happen without a request. After each completed plan phase, the phase-file checkboxes and the plan's Agent State are updated before any transition, so a fresh session resumes at the right phase. And once every non-abandoned phase todo is checked, the plan completes and archives without waiting for a ship.
 
 ## Execution modes
 
@@ -134,13 +123,11 @@ Two things happen on a fixed schedule rather than at your request. After each co
 | Parallel | Complex tasks with independent subtasks | Up to 3 agents in isolated git worktrees |
 | Party | Architecture decisions, trade-off analysis | 2-4 agents deliberate, forced synthesis |
 
-## Where the pipeline stops and asks you
+## When the pipeline stops and asks you
 
-One situation halts the loop on purpose.
+If the reviewer finds that the change broke behavior that already worked, it appends `Side Effects Detected: Yes` and the specific effects to the verdict. The pipeline then stops and offers you a choice: revert and re-plan, keep the change and update whatever depended on the old behavior, add a compatibility shim, or accept the regression as intended. Your answer is recorded on the verdict as a `## User Decision Addendum`.
 
-When the reviewer finds that the change broke behavior that already worked, it appends `Side Effects Detected: Yes` and the specific effects to the verdict. The pipeline then stops and offers you a choice: revert and re-plan, keep the change and update whatever depended on the old behavior, add a compatibility shim, or accept the regression as intended. Your answer is recorded on the verdict as a `## User Decision Addendum`.
-
-`mk:fix --auto` does not self-approve from a review score; it stops at ready-for-your-approval.
+`mk:fix --auto` does not approve itself from a review score. It stops and waits for you.
 
 ## Which skills expect a plan first
 
@@ -148,24 +135,14 @@ When the reviewer finds that the change broke behavior that already worked, it a
 |-------|-------------|----------------|
 | `mk:cook` | Create plan if missing | Plan path argument, `--fast` |
 | `mk:fix` | Plan if more than 2 files | `--quick` |
-| `mk:ship` | Expect an agreed plan | Hotfix with human approval |
+| `mk:ship` | Expect an agreed plan | Hotfix you have confirmed |
 | `mk:cso` | Scope audit via plan | `--daily` |
 | `mk:review` | Read plan for context | PR diff reviews |
 
 Three skills skip the pattern entirely. `mk:investigate` and `mk:office-hours` produce the input a plan is made from, so they run before one exists; `mk:retro` reads data and implements nothing.
 
-## Checks enforced by hooks
-
-MeowKit uses shell hooks to turn behavioral rules into prevention. The action is blocked before it executes:
-
-| Hook | Event | What it blocks |
-|------|-------|---------------|
-| `pre-ship.cjs` | PreToolUse (Bash) | A commit, push, merge or PR whose lint, related tests or type-check fail |
-| `privacy-block.cjs` | PreToolUse (Read) | `.env`, `*.key`, credential file reads |
-| `pre-completion-check.cjs` (opt-in) | Stop | Session end without verification evidence |
-
 ## Next steps
 
 - [Build a feature end-to-end](/guides/build-a-feature)
 - [How agents and skills work together](/core-concepts/how-it-works)
-- [Understand enforcement](/core-concepts/gates)
+- [Enforcement & Security](/core-concepts/enforcement): the ship check and what each runtime enforces

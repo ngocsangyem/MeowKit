@@ -1,6 +1,6 @@
 ---
 title: "mk:jira-dev"
-description: "Generate developer artifacts from Jira tickets: branch names, PR descriptions, parsed commits, link commits/PRs."
+description: "Generates branch names, PR titles and bodies, and commit links from a Jira ticket. You review and run the resulting git or gh commands."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,51 +15,43 @@ description: "Generate developer artifacts from Jira tickets: branch names, PR d
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Forks the `jira-dev` agent to generate developer-side artifacts from a Jira ticket — branch names, PR descriptions, commit parsing, smart-commit linking. Pure artifact generation; the user reviews and runs the resulting `git`/`gh` commands.
+mk:jira-dev forks the `jira-dev` agent ([agent page](/reference/agents/jira-dev)) to produce developer-side artifacts from a ticket: branch names, PR descriptions, commit parsing for issue keys, and commit or PR links. It generates artifacts only. The skill is not enabled by default.
 
-## When to Use
+## When to use it
 
-- **Triggers:** "branch name for PROJ-123", "PR description for PROJ-123", "parse commits for issue keys", "link this PR to PROJ-123"
-- **NOT for:** executing git operations directly (use `mk:ship`) · issue CRUD ([`mk:jira-issue`](/reference/skills/jira-issue)).
+Use it for "branch name for PROJ-123", "PR description for PROJ-123", "parse commits in main..HEAD for issue keys", "link this commit to PROJ-123" or a "Closes PROJ-123" footer.
 
-## Verified Wrapper Invocations
+| Need | Use instead |
+|---|---|
+| Run git operations | `mk:ship` |
+| Issue create, read, update, delete | [`mk:jira-issue`](/reference/skills/jira-issue) |
 
-| Operation | Tier | Invocation |
-|---|---|---|
-| Branch name | 1 | `... dev branch-name PROJ-123` |
-| PR description | 1 | `... dev pr-description PROJ-123` |
-| Parse commits for keys | 1 | `... dev parse-commits --range main..HEAD` |
-| Link commit | 2 | `... dev link-commit PROJ-123 --sha <SHA>` |
-| Link PR | 2 | `... dev link-pr PROJ-123 --pr-url https://github.com/.../pull/N` |
-| Get issue commits | 1 | `... dev get-commits PROJ-123` |
+The issue must exist before a branch is named. [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle) handles transitions that a smart-commit footer triggers.
 
-## Branch-Name Convention
+## Branch names
 
-Default jira-as output: `<type>/<KEY>-<kebab-summary>` (e.g. `feat/PROJ-123-add-login-rate-limiting`). Slug capped ~50 chars.
+The default output is `<type>/<KEY>-<kebab-summary>`, for example `feat/PROJ-123-add-login-rate-limiting`, with the summary capped at about 50 characters.
 
-## PR-Description Convention
+```bash
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh dev branch-name PROJ-123
+```
 
-`pr-description` synthesizes:
+`references/branch-naming.md` lists the options `--auto-prefix`, `--prefix <name>` and `--output git`.
 
-- Ticket summary → PR title
-- Ticket description excerpt → PR body
-- Acceptance criteria → checklist
-- "Closes PROJ-123" footer (Atlassian smart-commit format)
+## PR descriptions
 
-Pipe into `gh pr create` for one-shot flow.
+The ticket summary becomes the PR title and an excerpt of the description becomes the body. Acceptance criteria become a checklist, and a "Closes PROJ-123" footer (Atlassian smart-commit format) is added. The output can be piped to `gh pr create`.
 
-## Domain References
+## Handoff to mk:ship
 
-- `references/branch-naming.md` — convention reference
-- `references/smart-commits.md` — smart-commit syntax (close / transition from commit messages)
-- `references/commit-messages.md` — Atlassian-aware commit-message conventions
+`mk:ship` can call `dev branch-name <KEY>` when it creates a branch. This is documented only, with no automatic wiring. You opt in by giving `mk:ship` the Jira key.
 
-## Peer Leaves
+## References
 
-`mk:ship` (consumes `dev branch-name` + `dev pr-description` — handoff documented, no auto-wire) · `mk:jira-issue` (issue must exist before branch creation) · `mk:jira-lifecycle` (transitions via smart-commit footer)
-
-## Agent
-
-[`jira-dev`](/reference/agents/jira-dev) — A + C, NOT B.
+| File | Content |
+|---|---|
+| `references/branch-naming.md` | Branch naming convention |
+| `references/smart-commits.md` | Syntax for closing or transitioning from commit messages |
+| `references/commit-messages.md` | Atlassian-aware commit message conventions |

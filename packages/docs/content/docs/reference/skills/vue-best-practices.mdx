@@ -1,6 +1,6 @@
 ---
 title: "mk:vue-best-practices"
-description: "Deep Vue 3 best-practices review, recommendations, and the full ordered authoring workflow — built-in components (Teleport, Suspense, KeepAlive, Transition, TransitionGroup), animation techniques, slots, fallthrough attrs, custom directives, async components, render functions, plugins, and the post-functionality performance pass. Invoke-only; complements mk:vue."
+description: "Invoke-only Vue 3 workflow and reviewer for built-in components, animation, optional features and performance."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,85 +14,46 @@ description: "Deep Vue 3 best-practices review, recommendations, and the full or
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-The deliberate, invoke-only companion to `mk:vue`. Where `mk:vue` is the everyday
-Composition API quick-reference that auto-activates on `.vue` files, this skill is
-the **opinionated authoring workflow plus a best-practices reviewer** you invoke on
-purpose — for a non-trivial Vue feature, or to review existing Vue code against a
-rubric.
+`mk:vue-best-practices` extends `mk:vue` with an ordered best-practices workflow and a review mode. It does not activate on `.vue` files by itself. Call it with `/mk:vue-best-practices [concern]`, or ask to review Vue code or recommend improvements. It is worth the cost for a non-trivial feature that uses built-in components, animation, optional features or a performance pass.
 
-It does not restate the basics. Foundation topics (reactivity, props/emits,
-composable naming, Pinia / Pinia Colada / routing) stay owned by `mk:vue`; this skill
-carries the **deltas** and the topics `mk:vue` does not cover: built-in components,
-animation techniques, less-common features, and the performance pass.
+It does not repeat the basics (reactivity, props, emits, composable naming, Pinia, routing). Those stay in `mk:vue` references. State management is owned by `mk:vue`.
 
-## When to Use
+## When not to use it
 
-- `/mk:vue-best-practices [concern]` (explicit).
-- "review my Vue code", "Vue best practices", "recommend Vue improvements".
-- A non-trivial Vue feature where the full ordered workflow earns its cost — built-in
-  components, animations, optional features, and a measured performance pass.
-
-## When NOT to Use
-
-| Need | Use this instead |
+| Need | Use |
 |---|---|
-| Everyday Vue authoring quick-reference | `mk:vue` |
-| Design or review Vue **test** code | `mk:vue-testing-best-practices` |
-| Generic diff/PR structural review | `mk:review` |
-| TypeScript fundamentals | `mk:typescript` |
-| React / Angular | `mk:react-patterns` / `mk:angular` |
+| Everyday Vue authoring | `mk:vue` |
+| Diff or PR review | `mk:review` |
+| TypeScript, React, Angular | `mk:typescript`, `mk:react-patterns`, `mk:angular` |
 | Visual design | `mk:frontend-design` |
+| Vue test design or review | `mk:vue-testing-best-practices` |
 
-## Usage
+## Workflow
 
-```bash
-# Review existing Vue code against the best-practices rubric
-/mk:vue-best-practices src/features/checkout
+1. Confirm the architecture. The default is Vue 3 with the Composition API and `<script setup lang="ts">`. For a larger feature, sketch a component map first: each component's responsibility, its props and emits, and the folder layout.
+2. Apply the deltas: `reactivity-advanced`, `component-data-flow-advanced`, `sfc-structure-and-templates` and `composables-organization`.
+3. Load optional features only when the requirement exists.
+4. Make a performance pass after behaviour is correct, and measure with Vue DevTools first.
+5. Self-check: behaviour matches requirements, reactivity is minimal, templates are safe, components are focused, data-flow contracts are typed, and optional features appear only where needed.
 
-# Follow the ordered workflow for a non-trivial feature
-/mk:vue-best-practices build a multi-step wizard with transitions
-```
+All files are in `references/`.
 
-**Argument hint:** `[concern | path | feature description]`
+| Topic | Files |
+|---|---|
+| Built-in components | `component-slots`, `component-fallthrough-attrs`, `component-keep-alive`, `component-teleport`, `component-suspense`, `component-transition`, `component-transition-group` |
+| Animation | `animation-class-based`, `animation-state-driven` |
+| Less common features | `custom-directives`, `async-components`, `render-functions`, `plugins` |
+| Performance | `perf-virtualize-large-lists`, `perf-v-once-v-memo`, `perf-avoid-abstraction-in-lists`, `perf-updated-hook` |
 
-## Ordered Workflow
+This skill owns Teleport and Suspense authoring. Test setup for them belongs to `mk:vue-testing-best-practices`.
 
-Followed in order unless you ask otherwise:
+## Review mode
 
-1. **Confirm architecture** — Vue 3 + Composition API + `<script setup lang="ts">`;
-   sketch a brief component map for non-trivial features.
-2. **Apply foundation deltas** — reactivity beyond the basics (`shallowRef`,
-   computed purity, async cleanup), advanced data flow (`provide`/`inject` with
-   `InjectionKey`, imperative refs), SFC structure and template safety, composable
-   organization.
-3. **Optional features — load only when the requirement exists** — built-in
-   components (slots, fallthrough attrs, KeepAlive, Teleport, Suspense, Transition,
-   TransitionGroup), animation techniques, custom directives, async components,
-   render functions, plugins.
-4. **Performance pass — after behavior is correct** — virtualize large lists,
-   `v-once`/`v-memo`, avoid over-abstraction in hot paths, the `updated` hook.
-   Measure with Vue DevTools first.
-5. **Final self-check** — a short rubric over the four steps above.
+For a review, walk the self-check against the target code and list findings as `[severity: high|med|low] · path:line · issue · fix`. Each finding cites a best practice from this skill or from `mk:vue`. Basics go to `mk:vue`, and structural and security findings go to `mk:review` and the project's security rules. The review ends with one line: ready, changes recommended or changes required.
 
-## Review & Recommendations Mode
+## Gotchas
 
-When asked to review, the skill walks the final self-check as a rubric and emits a
-structured findings list — one row per finding:
-
-```
-[severity: high|med|low] · path:line · issue · fix
-```
-
-Each finding is grounded in a specific best practice. Foundation-basics findings are
-deferred to `mk:vue`; non-Vue structural/security findings to `mk:review` and the
-project security rules. The output ends with a one-line verdict:
-ready / changes recommended / changes required.
-
-## Relationship to the Vue Skills
-
-- `mk:vue` — everyday Composition API quick-reference (auto-activates on `.vue`).
-- **`mk:vue-best-practices`** — this skill: deep review + ordered workflow for
-  feature code.
-- `mk:vue-testing-best-practices` — the test-design and test-code counterpart.
+- The skill keeps `shallowRef()` for primitives from its upstream source, which differs from the `ref()` rule in `mk:vue`. `references/reactivity-advanced.md` documents the difference.
+- `SOURCE.md` records the upstream repository and pinned commit for re-syncing.

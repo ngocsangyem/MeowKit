@@ -1,6 +1,6 @@
 ---
 title: "mk:task-queue"
-description: "Task claiming and ownership tracking for parallel agent execution — agents claim tasks from a shared queue with file ownership enforcement."
+description: "Internal skill that tracks task claims and file ownership while agents work in parallel."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,56 +14,43 @@ description: "Task claiming and ownership tracking for parallel agent execution 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Manages task assignment and file ownership during parallel agent execution. Tracks tasks in `.meowkit/state/task-queue.json` with a claiming protocol that prevents file conflicts between agents.
+`mk:task-queue` records tasks and who owns which files during parallel execution. It is not user-invocable. The orchestrator creates the queue when it splits work, and parallel agents claim tasks through it.
 
-## When to Use
+For team-mode coordination rules, see `.claude/skills/team-config/references/team-coordination.md`, which `mk:team-config` loads.
 
-- **Parallel execution phases** where multiple agents work simultaneously on different files
-- **Automatically invoked** by `mk:team-config` when setting up parallel agent teams
-- **NOT for:** single-agent tasks, sequential workflows, tasks without file ownership boundaries
+## The queue
 
-## Core Capabilities
+The queue is `.meowkit/state/task-queue.json`. Each task has an `id`, `description`, `owner`, `status`, `ownership` (file globs) and `blocked_by`.
 
-- **Task lifecycle:** pending → claimed → in_progress → completed (or blocked)
-- **Claiming protocol:** lowest-ID task where status=pending AND all blocked_by tasks are completed
-- **Ownership enforcement:** each task declares file globs; agents can only write to owned files; overlapping claims are rejected
-- **Race condition prevention:** orchestrator is the sole claim serializer — agents request through it, never self-claim
-- **Audit trail:** completed tasks remain in queue until the parallel phase ends
-
-## Workflow
-
-1. Orchestrator creates `.meowkit/state/task-queue.json` with tasks and ownership globs
-2. Agent requests next available task from orchestrator
-3. Orchestrator checks for ownership conflicts with other in_progress tasks
-4. If no conflict: assigns task, sets status=in_progress, records owner
-5. Agent completes task, sets status=completed
-6. After all tasks complete, orchestrator runs integration test, then cleans up
-
-## Usage
-
-```bash
-# Invoked automatically by mk:team-config during parallel setup
-# Not typically called directly
+```json
+{ "id": 1, "description": "Implement API endpoints", "owner": null,
+  "status": "pending", "ownership": ["src/api/*"], "blocked_by": [] }
 ```
 
-## Example Prompt
+A task moves from `pending` to `claimed` to `in_progress` to `completed`, or to `blocked` when a dependency is not met.
 
-```
-Set up parallel task queue: 3 tasks — API endpoints (src/api/*), UI components (src/components/*), tests (tests/*). No overlapping ownership.
-```
+## Claiming
 
-## Common Use Cases
+1. An agent asks the orchestrator for the next task.
+2. The queue returns the lowest-ID task that is `pending` and whose `blocked_by` tasks are all completed.
+3. The agent declares its ownership globs.
+4. If they overlap an `in_progress` task, the claim is rejected and the conflict goes to the orchestrator.
+5. Otherwise the task is assigned and set to `in_progress`.
 
-- Parallel agent execution during harness builds
-- Multi-file feature implementation with clear file boundaries
-- Coordinated refactoring across independent modules
+## Ownership
 
-## Pro Tips
+| Action | File | Result |
+|---|---|---|
+| Read | Any | Allowed |
+| Write or edit | Owned | Allowed |
+| Write or edit | Not owned | Stop and report an ownership violation |
+| Write or edit | Overlapping | Stop and report the conflict to the orchestrator |
 
-- **Ownership globs must not overlap.** `src/api/*` and `src/api/auth/*` overlap — the more specific glob must be in the same task.
-- **Queue is ephemeral.** Lives in `.meowkit/state/`, cleared on new session. For persistent task tracking, use the plan's task system instead.
-- **Agents never self-claim.** Always request through the orchestrator to prevent race conditions on parallel reads of `task-queue.json`.
+## Gotchas
 
-> **Canonical source:** `.claude/skills/task-queue/SKILL.md`
+- Two agents reading the file at once can claim the same task. The orchestrator is the only one who serialises claims.
+- `src/api/*` and `src/api/auth/*` overlap. Keep the narrower glob in the same task.
+- The orchestrator creates the file before dispatching. If it is missing, agents stop and report rather than creating it.
+- Completed tasks stay in the queue as a record until the parallel phase ends. The queue is ephemeral and recreated per run.

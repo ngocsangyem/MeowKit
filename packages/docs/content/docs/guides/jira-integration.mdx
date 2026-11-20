@@ -3,17 +3,17 @@ title: "Jira Integration"
 description: "Install and authenticate Jira access once, understand what the skills are allowed to do, and find the right one for a task."
 ---
 
-MeowKit talks to Jira through the `jira-as` CLI, not through your browser session and not through a hosted service. Everything below is the one-time setup, what the integration will and will not do without asking, and how to find the skill you want.
+MeowKit talks to Jira through the `jira-as` CLI, not through your browser session or a hosted service. This page covers the one-time setup, the rules for writes, and how to find the skill you want.
 
 ## Set it up
 
-Install the CLI. Every `mk:jira-*` skill uses it, and there is no global install:
+Install the CLI into the `jira` skill's own environment. Every `mk:jira-*` skill uses it, and there is no global install:
 
 ```bash
-mewkit setup
+mewkit skill env jira
 ```
 
-That puts `jira-as` in the `jira` skill's environment under `.meowkit/envs/jira/bin/`. Then put three values in `.meowkit/.env`, which is gitignored:
+That puts `jira-as` at `.meowkit/envs/jira/bin/jira-as`. Then put three values in `.meowkit/.env`, which is gitignored:
 
 | Variable | What it is |
 |---|---|
@@ -21,18 +21,18 @@ That puts `jira-as` in the `jira` skill's environment under `.meowkit/envs/jira/
 | `MEOW_JIRA_EMAIL` | The Atlassian account that token belongs to |
 | `MEOW_JIRA_SITE_URL` | Your site, for example `https://your-company.atlassian.net` |
 
-Start a session. The `jira-env-loader.cjs` hook checks the file and prints either `[mk:jira] env OK` or `[mk:jira] <KEY> missing`, so you find out at session start rather than mid-task. The wrapper translates `MEOW_JIRA_*` into the native `JIRA_*` variables per call, which is why your shell never needs them.
+Start a session. The `jira-env-loader.cjs` hook checks the file and prints `[mk:jira] env OK`, or names the missing key, so you find out at session start rather than mid-task. The wrapper translates `MEOW_JIRA_*` into the native `JIRA_*` variables for each call, so your shell never needs them.
 
 The full variable list is in [Configuration](/reference/configuration#jira).
 
-## What it will and will not do on its own
+## Rules for writes
 
-Read operations run without ceremony. Writes are where the rules are:
+Read operations run without ceremony. Writes follow these rules:
 
-- **Bulk operations require a dry run first.** Anything touching ten or more issues shows you what it would do before it does it. This is not a flag you can skip.
-- **Nothing auto-falls-back.** If `jira-as` cannot run, the router does not silently switch transport. It stops and tells you.
-- **The router never executes.** `mk:jira` picks a skill and hands off; execution always happens in a leaf skill with its own agent and its own file ownership.
-- **Your token scope is the real boundary.** MeowKit cannot do anything in Jira your API token cannot do, so a read-only token makes the whole integration read-only.
+- **Bulk operations run a dry run first.** Anything touching ten or more issues shows you the plan before it changes anything.
+- **No automatic fallback.** If `jira-as` cannot run, the router stops and tells you. It does not switch transport.
+- **The router never executes.** `mk:jira` picks a skill and hands off. A leaf skill with its own agent does the work.
+- **Your token scope is the limit.** MeowKit can do nothing in Jira that your API token cannot, so a read-only token makes the integration read-only.
 
 If your tenant needs mTLS, or you run multiple Atlassian profiles, `jira-as` will not work. In that case the leaves accept Atlassian MCP as an alternative transport:
 
@@ -40,11 +40,11 @@ If your tenant needs mTLS, or you run multiple Atlassian profiles, `jira-as` wil
 claude mcp add --transport http atlassian https://mcp.atlassian.com/v1/mcp
 ```
 
-You invoke the leaf with that transport explicitly. Again, there is no automatic fallback.
+You invoke the leaf with that transport explicitly.
 
 ## Find the right skill
 
-Ask for what you want and `mk:jira` routes you. If you already know where you are going, invoke the skill directly:
+Ask for what you want and `mk:jira` routes you, or invoke the skill directly:
 
 | What you want to do | Skill |
 |---|---|
@@ -67,13 +67,13 @@ Ask for what you want and `mk:jira` routes you. If you already know where you ar
 
 ## When it goes wrong
 
-**`[mk:jira] MEOW_JIRA_SITE_URL missing` at session start.** The variable is absent or `.meowkit/.env` is not where the loader expects. Check the file exists at the project root, not in `.claude/`.
+**`[mk:jira] MEOW_JIRA_SITE_URL missing` at session start.** The variable is absent or `.meowkit/.env` is not where the loader looks. Check that the file is at `.meowkit/.env`.
 
 **Authentication fails with all three variables set.** Atlassian API tokens are tied to the account that created them. Confirm `MEOW_JIRA_EMAIL` is that account, not a shared or admin address.
 
-**A transition is rejected as invalid.** Jira workflows differ per project, and a status that exists in one may not be reachable from the current one in another. `mk:jira-ops` discovers and caches the real workflow for the project into `tasks/jira-workflows/`; run it first and the valid transitions become visible.
+**A transition is rejected as invalid.** Jira workflows differ per project, and a status that exists in one may not be reachable from the current one in another. The jira skills fetch the project's real workflow and cache it in `tasks/jira-workflows/`, so check the cached file for the transitions that are valid.
 
-**Everything reads fine but nothing writes.** Almost always token scope. Check what the token's account can do in the Jira UI; the integration cannot exceed it.
+**Everything reads fine but nothing writes.** Usually token scope. Check what the token's account can do in the Jira UI.
 
 ## Next steps
 

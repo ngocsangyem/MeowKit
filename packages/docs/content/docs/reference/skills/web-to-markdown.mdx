@@ -1,6 +1,6 @@
 ---
 title: "mk:web-to-markdown"
-description: "Fetch arbitrary URLs and return clean markdown with 8-layer injection defense. For external pages (blogs, RFCs, GitHub issues, vendor docs) not covered by curated indexes. Static-only by default with opt-in JS rendering."
+description: "Fetches one URL and returns clean markdown, with SSRF protection and prompt-injection scanning."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,37 +14,54 @@ description: "Fetch arbitrary URLs and return clean markdown with 8-layer inject
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Fetches arbitrary web pages and returns clean markdown wrapped in a DATA boundary fence. Built with an 8-layer security architecture: SSRF guard, URL validation, size cap, DATA wrapping, 6-pass injection scanner, HARD_STOP on injection, secret scrubbing, and post-write audit. Static HTTP fetch by default; opt-in Playwright/Chromium rendering for JS-heavy pages.
+`mk:web-to-markdown` fetches an arbitrary external page, such as a blog post, RFC or issue, and returns clean markdown. The fetched text is treated as data and is scanned for injection before it is returned. It fires when you give a URL in chat, and other skills such as `mk:intake` can delegate to it.
 
-## When to Use
+## When not to use it
 
-- User provides a URL in chat: "summarize https://example.com/blog"
-- Agent needs an external page not in curated docs indexes
-- External references during research, investigation, planning
-- Cross-skill delegation from `mk:research`, `mk:intake`, etc. (with `--wtm-accept-risk`)
+| Need | Use |
+|---|---|
+| Library or framework documentation | `mk:docs-finder` |
+| Interactive browser testing | `mk:agent-browser` |
+| Playwright test automation | `mk:playwright-cli` |
+| Sensitive or internal URLs | The host runtime's built-in `WebFetch` |
 
-**NOT for:** library/framework docs (use `mk:docs-finder`), interactive browser testing (use `mk:agent-browser`), Playwright test automation (use `mk:playwright-cli`), fetching sensitive/internal URLs (use Anthropic-proxied WebFetch).
+## Usage
 
-## Core Capabilities
+```
+<url> [--wtm-accept-risk] [--wtm-approve]
+```
 
-| Capability | Detail |
-|-----------|--------|
-| Static HTTP fetch | Default; handles HTML -> cleaned markdown |
-| JS rendering | Opt-in triple-gate: Playwright installed + `MEOWKIT_WEB_FETCH_JS=1` + per-call `js=True` |
-| Injection defense | 8 layers: SSRF guard -> URL validation -> size cap -> DATA wrap -> 6-pass scanner -> HARD_STOP -> secret scrub -> post-write audit |
-| Size cap | 10MB default, configurable via `MEOWKIT_WEB_FETCH_MAX_BYTES`, hard ceiling 100MB |
-| robots.txt | Respected with 24h cache; disable with `MEOWKIT_WEB_FETCH_RESPECT_ROBOTS=0` |
-| Rate limiting | 2000ms between calls to same host (in-memory, per-process) |
-| Quarantine | Injection-stopped content quarantined with 0400 perms, read-blocked by hook |
+| Flag | Effect |
+|---|---|
+| (none) | A direct fetch for a URL you gave. |
+| `--wtm-accept-risk` | Required when another skill delegates a fetch. Without it the call fails with `ERROR: cross-skill delegation requires --wtm-accept-risk flag`. |
+| `--wtm-approve` | Used with `mk:docs-finder` to skip its Context7, Context Hub and WebSearch tiers and fetch the URL directly. |
 
-## Invocation Patterns
+## Protections
 
-### 1. Direct user invocation (no flag required)
-URL in user input = explicit consent. No flag needed:
+- Only `http` and `https` are allowed. Private, loopback and link-local addresses are blocked, and redirects are re-checked.
+- Responses are capped at 10 MB.
+- Every return is wrapped as data, including previews.
+- The injection scanner checks more than 50 patterns plus encodings (base64, ROT13, Unicode, zero-width characters) and warns on context flooding. A hit stops the fetch and quarantines the content. No flag overrides it, and you inspect the quarantine file yourself.
+- Secrets are scrubbed from the content and the URL before anything is written to disk, and the written file is scanned again with `injection-audit.cjs`.
+- The `privacy-block.cjs` hook enforces the SSRF rules and blocks reads of the cache and manifest.
 
-## Example Prompt
+`references/security.md` has the full threat model.
 
-> /mk:web-to-markdown
-> Fetch https://example.com/blog/postgres-query-optimization and return clean markdown. I need the content for a research doc I'm writing — make sure injection defenses are active since this is an external URL.
+## Setup
+
+```bash
+mewkit skill env web-to-markdown
+```
+
+This installs the packages in `scripts/requirements.txt`. JavaScript rendering is optional. It needs Playwright and Chromium (about 200 MB) installed, `MEOWKIT_WEB_FETCH_JS=1` set, and `js=True` passed in the call. All three must be in place.
+
+## Gotchas
+
+- Without Playwright, JavaScript-rendered pages return an error that points to `.claude/hooks/lib/setup-workflow --system-deps`.
+- `robots.txt` is respected with a 24 hour cache. Overriding it needs a manual action from you.
+- Fetched reports are kept under `.meowkit/cache/web-fetches/` and are not cleaned up automatically. Remove them with `rm -rf .meowkit/cache/web-fetches/*`.
+- The secret scrub does not catch names, emails or user IDs in page text. Treat cached reports as sensitive.
+- File names are hashed. Search through the manifest `index.jsonl`, which sits behind the privacy block.

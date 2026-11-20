@@ -3,32 +3,30 @@ title: "Workflows Overview"
 description: "Pick a playbook by what you are starting from: a Jira ticket, a spec, a PRD, a design file, or nothing at all."
 ---
 
-A workflow is an end-to-end playbook for a scenario that has its own starting material. If you just want to build, fix, review, or ship something, you want a [guide](/guides/build-a-feature) instead. Those are shorter, and there is one per task.
+A workflow is a playbook for a scenario that has its own starting material. To build, fix, review or ship something in code you already have, use a [guide](/guides/build-a-feature) instead. There is one guide per task and each is shorter.
 
 ## Start from what you have
 
 | What is in front of you | What you want out of it | Playbook |
 |---|---|---|
-| A Jira ticket | A merged PR | [Ticket to Code](/workflows/ticket-to-code) |
-| A Jira ticket | To know whether it is ready to work on, and how big | [Ticket Evaluation](/workflows/ticket-evaluation) |
-| A ticket with screenshots, video, or a Figma link | Implementation that matches the design | [Ticket with Media](/workflows/ticket-with-media) |
+| A Jira ticket | A PR ready to merge | [Ticket to Code](/workflows/ticket-to-code) |
+| A Jira ticket | To know whether it is ready to work on, and how big it is | [Ticket Evaluation](/workflows/ticket-evaluation) |
+| A ticket with screenshots, video, a PDF or a Figma link | Implementation that matches the attachments | [Ticket with Media](/workflows/ticket-with-media) |
 | A Confluence spec | A planned sprint | [Spec to Sprint](/workflows/spec-to-sprint) |
-| A Confluence spec | A merged PR, with every step explained | [Spec to PR: Behind the Scenes](/workflows/spec-to-pr-walkthrough) |
+| A Confluence spec | A PR, with every step explained | [Spec to PR: Behind the Scenes](/workflows/spec-to-pr-walkthrough) |
 | A PRD or a pile of incoming requests | Analysed, triaged, estimated work | [PRD Intake](/workflows/prd-intake) |
 | A sprint and a team | Sprint goal, DoR/DoD, retro actions, spike governance | [Agile / Scrum](/workflows/agile-scrum) |
 | Commit history | A retrospective people will read | [Sprint Retrospective](/workflows/retrospective) |
-| An empty directory | A working MeowKit project | [Starting a New Project](/workflows/new-project) |
+| An empty directory | A project with MeowKit installed and a first plan | [Quick Start](/quick-start) |
 | Somebody else's undocumented codebase | Enough understanding to change it safely | [Maintaining Old Projects](/workflows/maintenance) |
-
-If the input to your task is "the code I already have", you are almost certainly looking for a guide rather than a workflow.
 
 ## Scenario notes
 
-Shorter pages for work that has no special starting material: the approach, and which skills to reach for.
+Shorter pages for work with no special starting material: the approach, and which skills to use.
 
 | Scenario | Page |
 |---|---|
-| Assess security across OWASP, STRIDE, supply chain, platform | [Security Audit](/workflows/security-audit) |
+| Assess security across OWASP, STRIDE, supply chain and platform rules | [Security Audit](/workflows/security-audit) |
 | Write unit and E2E tests | [Writing Tests](/workflows/writing-tests) |
 | Manual QA and generating Playwright specs | [QA Testing](/workflows/qa-testing) |
 | Decide an architectural trade-off and record it | [Architecture Decisions](/workflows/architecture) |
@@ -37,8 +35,6 @@ Shorter pages for work that has no special starting material: the approach, and 
 | Keep project documentation in step with the code | [Documentation](/workflows/documentation) |
 | Evaluate a library or approach before committing | [Researching Libraries](/workflows/research) |
 
-## The everyday tasks
+## Everyday tasks
 
-These moved to guides, because they are things you do rather than playbooks you follow:
-
-[Build a feature](/guides/build-a-feature) · [Fix a bug](/guides/fix-a-bug) · [Review code](/guides/review-code) · [Ship safely](/guides/ship-safely) · [Autonomous build](/guides/autonomous-build)
+These are guides: [Build a feature](/guides/build-a-feature), [Fix a bug](/guides/fix-a-bug), [Review code](/guides/review-code), [Ship safely](/guides/ship-safely) and [Autonomous build](/guides/autonomous-build).

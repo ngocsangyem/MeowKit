@@ -1,79 +1,25 @@
 ---
-title: "Agents Reference"
-description: "The complete agent roster: core pipeline, support, Jira, and Confluence agents, with type, role, phase, and activation conditions."
+title: "Agents reference"
+description: "The 42 MeowKit agents, grouped by role, with the status block every agent returns."
 ---
 
-MeowKit's agents fall into four categories: core pipeline agents, support agents, Jira integration agents, and Confluence Cloud integration agents. Each owns a specific phase or concern, and no two agents modify the same file type. The sections below are the roster; a count here would only go stale against it.
+MeowKit has 42 agents in `.claude/agents/`. Each owns one phase or one kind of file, and no two agents write the same file type. Each agent page lists its model, tools, when to use it and what it hands off. Per-runtime model pins are on [Agent models](/guide/agent-models).
 
-## Core Agents
+## Groups
 
-Pipeline agents that execute sequentially through phases 0-6.
+| Group | Agents |
+|---|---|
+| Pipeline (phases 0 to 6) | [orchestrator](/reference/agents/orchestrator), [planner](/reference/agents/planner), [architect](/reference/agents/architect), [tester](/reference/agents/tester), [security](/reference/agents/security), [developer](/reference/agents/developer), [evaluator](/reference/agents/evaluator), [reviewer](/reference/agents/reviewer), [shipper](/reference/agents/shipper), [documenter](/reference/agents/documenter), [analyst](/reference/agents/analyst), [journal-writer](/reference/agents/journal-writer) |
+| Support | [brainstormer](/reference/agents/brainstormer), [researcher](/reference/agents/researcher), [explore](/reference/agents/explore), [ui-ux-designer](/reference/agents/ui-ux-designer), [git-manager](/reference/agents/git-manager), [project-manager](/reference/agents/project-manager) |
+| Advisory | [advisor](/reference/agents/advisor), [athena](/reference/agents/athena) |
+| Jira (through `jira-as`) | [jira-issue](/reference/agents/jira-issue), [jira-search](/reference/agents/jira-search), [jira-lifecycle](/reference/agents/jira-lifecycle), [jira-collaborate](/reference/agents/jira-collaborate), [jira-relationships](/reference/agents/jira-relationships), [jira-time](/reference/agents/jira-time), [jira-agile](/reference/agents/jira-agile), [jira-fields](/reference/agents/jira-fields), [jira-bulk](/reference/agents/jira-bulk), [jira-jsm](/reference/agents/jira-jsm), [jira-admin](/reference/agents/jira-admin), [jira-dev](/reference/agents/jira-dev), [jira-ops](/reference/agents/jira-ops), [jira-evaluator](/reference/agents/jira-evaluator), [jira-estimator](/reference/agents/jira-estimator), [jira-analyst](/reference/agents/jira-analyst), [story-sizer](/reference/agents/story-sizer) |
+| Confluence Cloud (through `confluence-as`) | [confluence-page](/reference/agents/confluence-page), [confluence-search](/reference/agents/confluence-search), [confluence-spec-analyst](/reference/agents/confluence-spec-analyst), [confluence-bulk](/reference/agents/confluence-bulk), [confluence-collaborate](/reference/agents/confluence-collaborate) |
 
-| Agent | Phase | Role | Auto-activates |
-|-------|-------|------|---------------|
-| [orchestrator](/reference/agents/orchestrator) | 0 | Task router, complexity classification, model tier assignment | Every task |
-| [planner](/reference/agents/planner) | 1 | Scope-adaptive planning, plan agreed with you, bead decomposition | Standard/complex tasks |
-| [architect](/reference/agents/architect) | 1 | ADRs, system design | Complex tasks |
-| [tester](/reference/agents/tester) | 2 | Test writing (TDD red/green/refactor) | After planning |
-| [security](/reference/agents/security) | 2, 4 | Security audit, BLOCK verdicts | Auth/payment changes |
-| [developer](/reference/agents/developer) | 3 | Implementation, bead processing | After tester |
-| [evaluator](/reference/agents/evaluator) | 3, 4 | Behavioral verification, rubric grading | Harness pipeline, `mk:evaluate` |
-| [reviewer](/reference/agents/reviewer) | 4 | 5-dimension structural audit, verdict | After developer |
-| [shipper](/reference/agents/shipper) | 5 | Deploy pipeline, PR creation | After review |
-| [documenter](/reference/agents/documenter) | 6 | Living docs, changelogs | After ship |
-| [analyst](/reference/agents/analyst) | 0, 6 | Cost tracking, pattern analysis | Session start/end |
-| [project-manager](/reference/agents/project-manager) | on-demand | Cross-workflow delivery tracking, status reports | On request via `/mk:status` |
+The Jira and Confluence agents each pair with the skill of the same name (`mk:jira-issue`, `mk:confluence-page` and so on).
 
-## Support Agents
+## Status block
 
-Invoked on-demand by core agents or explicitly by the user.
-
-| Agent | Phase | Role | Subagent type |
-|-------|-------|------|--------------|
-| [brainstormer](/reference/agents/brainstormer) | 1 | Trade-off analysis, solution exploration | advisory |
-| [researcher](/reference/agents/researcher) | 0, 1, 4 | Technology research, library evaluation | advisory |
-| [ui-ux-designer](/reference/agents/ui-ux-designer) | 3 | UI design, accessibility, design systems | advisory |
-| [git-manager](/reference/agents/git-manager) | 5, any | Git operations, conventional commits | utility |
-| [journal-writer](/reference/agents/journal-writer) | 6 | Failure documentation, root cause analysis | escalation |
-
-## Jira Agents
-
-Domain agents for Jira integration via the `jira-as` CLI wrapper. All share a 4-tier safety model and follow the Rule of Two.
-
-| Agent | Role | Safety highlight |
-|-------|------|-----------------|
-| [jira-issue](/reference/agents/jira-issue) | Single-issue CRUD (create, read, update, delete) | 4-tier graduated confirmation |
-| [jira-search](/reference/agents/jira-search) | JQL queries, filter management, result export | Mandatory JQL sanitization |
-| [jira-lifecycle](/reference/agents/jira-lifecycle) | Transitions, assignments, versions, components | Workflow discovery before transitions |
-| [jira-collaborate](/reference/agents/jira-collaborate) | Comments, attachments, watchers, notifications | Internal-vs-public comment gate |
-| [jira-relationships](/reference/agents/jira-relationships) | Issue links, blockers, dependencies, clones | Semantic link type enforcement |
-| [jira-time](/reference/agents/jira-time) | Work logging, estimates, time reports | Confirm before worklog edits/deletes |
-| [jira-agile](/reference/agents/jira-agile) | Sprints, epics, backlog, story points, velocity | Board ID ≠ Project Key validation |
-| [jira-fields](/reference/agents/jira-fields) | Custom field discovery and caching | Read-only by default; admin for config |
-| [jira-bulk](/reference/agents/jira-bulk) | Bulk transition, assign, priority, clone, delete | Mandatory dry-run for all operations |
-| [jira-jsm](/reference/agents/jira-jsm) | Service desks, requests, SLAs, approvals | JSM license + agent role required |
-| [jira-admin](/reference/agents/jira-admin) | Projects, users, groups, schemes, automation | 2-step token confirmation for deletes |
-| [jira-dev](/reference/agents/jira-dev) | Branch names, PR descriptions, commit links | Read-only, output generation only |
-| [jira-ops](/reference/agents/jira-ops) | Cache management, connectivity, project context | Diagnostic-only, no Jira state changes |
-| [jira-evaluator](/reference/agents/jira-evaluator) | Ticket complexity scoring (8 dimensions) | Read-only analysis |
-| [jira-estimator](/reference/agents/jira-estimator) | Story point estimation with reasoning | Read-only, never sets points |
-| [jira-analyst](/reference/agents/jira-analyst) | Full context analysis with media and linked issues | Read-only, processes attachments |
-
-## Confluence Agents
-
-Domain agents for Confluence Cloud integration via the `confluence-as` CLI wrapper. Cloud-only (the wrapper exits 3 on non-`*.atlassian.net` URLs); follow the Rule of Two.
-
-| Agent | Role | Safety highlight |
-|-------|------|-----------------|
-| [confluence-page](/reference/agents/confluence-page) | Single-page CRUD + hierarchy + version + copy/move | 4-tier graduated confirmation; ADF-round-trip warning on macro-heavy bodies |
-| [confluence-search](/reference/agents/confluence-search) | CQL queries, validation, space listing, saved filters, export | Mandatory CQL sanitization for any user-derived term |
-| [confluence-spec-analyst](/reference/agents/confluence-spec-analyst) | Read-only deep spec analysis with macro-aware ADF fetch + persisted Spec Research Report | Read-only at Confluence side; `[UNHANDLED_NODE]` keys-only metadata blocks injection |
-| [confluence-bulk](/reference/agents/confluence-bulk) | Bulk-label / bulk-move / bulk-delete on 10+ pages | Mandatory 3-step dry-run + typed-token confirmation |
-| [confluence-collaborate](/reference/agents/confluence-collaborate) | Comments, attachments, labels, watchers per page | Footer-default for comments; path-traversal guard on uploads |
-
-## Agent communication
-
-All subagents report structured status on completion:
+Every agent ends its response with this block, and the controller decides its next step from it. The rule is in `.claude/rules/agent-conduct.md`.
 
 ```
 **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
@@ -81,25 +27,11 @@ All subagents report structured status on completion:
 **Concerns/Blockers:** [if applicable]
 ```
 
-## File ownership
-
-No two agents modify the same file type. Conflicts escalate to human.
-
-| File type | Owned by |
-|-----------|----------|
-| `src/`, `lib/`, `app/` | developer |
-| `tasks/plans/` | planner |
-| `tasks/reviews/` | reviewer |
-| `docs/` | documenter |
-| `.meowkit/memory/` (team store, written via `mewkit note`) | write-set skills and agents |
-| `.meowkit/telemetry/` (cost log, trace log) | analyst, documenter |
-
 ## See also
 
 - [How agents and skills work together](/core-concepts/how-it-works)
-- [Workflow phases](/core-concepts/workflow)
+- [Workflow](/core-concepts/workflow)
 - [Skills reference](/reference/skills)
-- [Agent definitions on disk](https://github.com/ngocsangyem/MeowKit/tree/main/.claude/agents) — canonical source
 
 {/* GENERATED:reference-index START */}
 
@@ -112,7 +44,7 @@ _Generated from `.claude/`. Every agent on disk appears here; the sections above
 | [`advisor`](/reference/agents/advisor) | Isolated advisory executor for mk:advise. Interviews one question at a time, confirms a reframing of the user's problem, then delivers a single honest recommendation packet. Invoked ONLY by mk:advise — never routed to directly by the orchestrator, and never as a lifecycle phase owner. Examples: "What should I do about our slow build?", "Advise me on splitting this service.", "Am I approaching this migration right?" |
 | [`analyst`](/reference/agents/analyst) | Cost and learning analysis agent that tracks token usage, generates cost reports, and extracts patterns from sessions. Invoked on session end only by its owning workflow, or on demand via the `mewkit budget` verb. Not for implementation, planning, or review decisions. |
 | [`architect`](/reference/agents/architect) | System design specialist for architectural tradeoff evaluation and ADR generation. Use when tasks touch database schema, new service boundaries, auth systems, API contracts, or infrastructure. Also use for any task classified as complex by the orchestrator. Not for implementation or routine planning. |
-| [`athena`](/reference/agents/athena) | Strategic intelligence and lifecycle supervision. At --advice checkpoints, Athena supervises ONE delivery run across GUIDE, RESCUE, REVIEW and RECHECK. Where a runtime exposes it, direct Athena is a stateless strategy consult for trade-offs, judgement and a recommended operational decision. It returns evidence-backed assessment, recommendation and directive, may return work to its executor for correction, but holds no gate authority, writes nothing, and never interviews the user. Examples: "which architecture trade-off should we choose within this approved scope?", "two fix approaches failed on an evidenced root cause — what next?", "verification passed; does the evidence actually cover the acceptance criteria?" |
+| [`athena`](/reference/agents/athena) | Strategic intelligence and lifecycle supervision. At --advice checkpoints, Athena supervises ONE delivery run across GUIDE, RESCUE, REVIEW and RECHECK. Where a runtime exposes it, direct Athena is a stateless strategy consult for trade-offs, judgement and a recommended operational decision. It returns evidence-backed assessment, recommendation and directive, may return work to its executor for correction, but approves nothing, writes nothing, and never interviews the user. Examples: "which architecture trade-off should we choose within this approved scope?", "two fix approaches failed on an evidenced root cause — what next?", "verification passed; does the evidence actually cover the acceptance criteria?" |
 | [`brainstormer`](/reference/agents/brainstormer) | Use this agent when you need to brainstorm software solutions, evaluate architectural approaches, or debate technical decisions before implementation. Examples: "Should I use WebSockets or SSE for real-time?", "What's the best approach for file uploads?", "Evaluate REST vs GraphQL for our API." Delegate during planning when a decision has several viable approaches with real trade-offs; skip it when the approach is already settled. Not for implementation or final decisions. |
 | [`confluence-bulk`](/reference/agents/confluence-bulk) | mk:confluence executor for mk:confluence-bulk. Sweeps over 10+ pages, dry-run first. |
 | [`confluence-collaborate`](/reference/agents/confluence-collaborate) | mk:confluence executor for mk:confluence-collaborate. Comments, labels, watchers. |
@@ -146,7 +78,7 @@ _Generated from `.claude/`. Every agent on disk appears here; the sections above
 | [`project-manager`](/reference/agents/project-manager) | Cross-workflow delivery tracker. Aggregates plan, test, review, contract, and cost state into a classified, evidence-based status report (done / in progress / blocked / not started). Use after a phase completes, after a multi-agent parallel run, or when the user asks "what's done", "what's blocked", or "status / progress". For forward-looking "what should I do next" advice, use mk:help instead — PM is backward-looking. Reads only; writes status reports co-located inside each plan dir. Never edits plans, verdicts, or code. |
 | [`researcher`](/reference/agents/researcher) | Use this agent when you need to research technical topics, evaluate libraries or frameworks, find documentation, or gather information before making decisions. Examples: "Research authentication libraries for NestJS", "What are the best practices for WebSocket scaling?", "Compare Prisma vs TypeORM vs Drizzle for our API." Delegate when a task needs external tools, libraries or patterns understood before implementation; skip it when the repo or one doc lookup answers it. Not for implementation, plans, verdicts, or project documentation. |
 | [`reviewer`](/reference/agents/reviewer) | Structural code review agent that performs deep 5-dimension reviews and writes the review verdict the change should pass before it ships. Use in Phase 4 after developer completes implementation and tester confirms green phase. Not for runtime-evaluation or security verdicts. |
-| [`security`](/reference/agents/security) | Risk-triggered deep security audit specialist for Phase 2 (pre-implementation) and Phase 4 (review). Issues BLOCK verdicts that halt the pipeline for critical vulnerabilities. Auto-activates on changes touching auth, payments, user data, API endpoints, encryption, or another flagged risk surface; the deterministic post-write scan runs on every write in all modes. Not for general structural review verdicts. |
+| [`security`](/reference/agents/security) | Risk-triggered deep security audit specialist for Phase 2 (pre-implementation) and Phase 4 (review). Issues BLOCK verdicts for critical vulnerabilities. Auto-activates on changes touching auth, payments, user data, API endpoints, encryption, or another flagged risk surface; the deterministic post-write scan runs on every write in all modes. Not for general structural review verdicts. |
 | [`shipper`](/reference/agents/shipper) | Deployment pipeline agent that executes the full ship sequence: pre-ship checks, conventional commit, feature branch + PR, CI verification, and rollback documentation. Use in Phase 5 after review. Never commits directly to main. Not for implementation or review approval. |
 | [`story-sizer`](/reference/agents/story-sizer) | mk:jira family executor for mk:story-sizer. Fibonacci sizing of pasted stories. |
 | [`tester`](/reference/agents/tester) | Test-writing agent. In TDD mode (--tdd / MEOWKIT_TDD=1), writes failing tests before implementation (red phase) and verifies they pass after (green phase). In default mode (TDD off), writes tests when invoked but does not block the developer. Use in Phase 2 and after implementation. Anti-rationalization rules (no test minimization, no mock substitution) apply in BOTH modes. |

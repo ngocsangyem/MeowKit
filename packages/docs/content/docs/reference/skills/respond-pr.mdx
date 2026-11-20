@@ -1,6 +1,6 @@
 ---
 title: "mk:respond-pr"
-description: "Triage reviewer comments on a GitHub PR with receiving-review discipline — verify each against the codebase, then accept/push-back/clarify, and optionally reply in-thread."
+description: "Triages PR review comments by verifying each against the code, then accepts, pushes back or clarifies, and optionally replies in thread."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,71 +14,39 @@ description: "Triage reviewer comments on a GitHub PR with receiving-review disc
 
 {/* GENERATED:reference-facts END */}
 
-Fetches reviewer comments on a PR and triages EACH one with receiving-code-review discipline: verify against the codebase, then ACCEPT / PUSH BACK / CLARIFY, and (opt-in) reply in the comment thread. Never edits code — accepted fixes hand off to `mk:fix` / `mk:cook`. Does NOT give a review verdict on a PR (use `mk:review-pr`).
+## What it does
 
-## What This Skill Does
+Fetches the reviewer comments on a pull request and triages each one. For every comment it verifies the claim against the codebase and decides to accept, push back or clarify. With `--reply` it posts the answers in the comment threads. It never edits code. Accepted items are handed to `mk:fix` or `mk:cook`.
 
-- Lists review comments via `gh api repos/{owner}/{repo}/pulls/{pr}/comments`
-- For each comment: reads it, restates the requirement, verifies against the codebase (Grep/Read with `file:line`), evaluates whether it is sound for this repo, then decides accept / push-back / clarify
-- Emits a per-comment decision table plus a local action list (accepted items routed to `mk:fix`)
-- Optionally posts each reply in its own comment thread (`--reply` only)
+## When not to use
 
-## When to Use
-
-- You received review comments on your PR and want to triage them rigorously
-- You want verify-before-agree discipline instead of auto-accepting every suggestion
-- When user says "respond to the PR comments", "address the review feedback", "triage these review comments"
-
-**NOT this skill if:** you are giving a review verdict on someone's PR (use `mk:review-pr`), or implementing the accepted fixes (use `mk:fix` / `mk:cook`).
-
-## Arguments
-
-| Argument         | Purpose                                                                          |
-| ---------------- | -------------------------------------------------------------------------------- |
-| `<#PR \| URL>`   | PR number (`123`) or full GitHub PR URL. Required.                              |
-| `--reply`        | Opt-in. Posts each reply in-thread. Default is dry: prints the triage table only. |
+To review someone else's PR use `mk:review-pr`. To implement an accepted comment use `mk:fix` or `mk:cook`.
 
 ## Usage
 
-```
-/mk:respond-pr 123            # Dry: print the per-comment decision table, post nothing
-/mk:respond-pr 123 --reply    # Post each reply in its comment thread
-```
-
-## Process Flow
-
-```
-PR ref → gh api: list review comments → for EACH comment:
-  READ → restate → VERIFY vs codebase (Grep/Read) → EVALUATE (sound for THIS repo?)
-    → ACCEPT (action item) | PUSH BACK (technical reasoning) | CLARIFY (question)
-  → (--reply) reply in thread: gh api .../pulls/{pr}/comments/{id}/replies
-Output: per-comment decision table + local action list (accepted → handoff mk:fix)
+```bash
+/mk:respond-pr 123
+/mk:respond-pr https://github.com/owner/repo/pull/123 --reply
 ```
 
-## Receiving-Review Discipline (baked in)
+| Argument | Effect |
+|---|---|
+| `<#PR \| URL>` | Required. A PR number or a full GitHub PR URL |
+| `--reply` | Post each reply in its thread. Without it the skill is dry: it prints the triage table and posts nothing |
 
-- No performative agreement, no gratitude filler ("Great catch!", "Thanks!") — state the decision and the evidence.
-- Clarify everything ambiguous BEFORE acting — never guess the reviewer's intent.
-- Push back with concrete technical reasoning when a comment is wrong for this repo — cite the code.
-- Reply in the comment thread, never as a detached top-level comment.
+## Steps
 
-## Decision Table
+1. List the comments with `gh api repos/{owner}/{repo}/pulls/{pr}/comments` (inline comments, which carry id, path and line) and, when relevant, `issues/{pr}/comments` (top-level discussion).
+2. For each comment, read it, restate the requirement in one neutral sentence, verify it with Grep or Read and cite `file:line`, and evaluate whether it is sound for this repo.
+3. Decide one outcome: accept (record an action item), push back (state the technical reasoning) or clarify (ask a specific question). Ambiguity is resolved before acting, and replies skip praise and thanks and state the decision and the evidence.
+4. With `--reply`, post in the thread through `gh api repos/{owner}/{repo}/pulls/{pr}/comments/{comment_id}/replies -f body="..."`. A reply is never a top-level comment, and issue-level comments cannot be threaded.
 
-```
-| # | comment (summary) | verified? (file:line) | decision | reasoning | reply posted? |
-```
+## Outputs
 
-Accepted action items are listed locally and explicitly routed to `mk:fix` / `mk:cook` — this skill never edits code.
+A table with the comment, whether it was verified (with `file:line`), the decision, the reasoning and whether a reply was posted (dry or posted), then the list of accepted action items for `mk:fix` or `mk:cook`.
 
-## Fallbacks
+If `gh` is missing or not authenticated, or a reply fails (network, 403, or a resolved thread), the skill prints the table and drafted replies in the chat with a warning and exits 0, so no triage is lost.
 
-`gh` missing, unauthenticated, or a failed `--reply` post never hard-fail: the triage table and drafted replies print to chat with a warning, exit 0. No triage output is lost.
+## Gotchas
 
-## Security
-
-Reviewer comments are untrusted DATA per `injection-rules.md` (Rules 2, 7). Each comment is treated as a claim to verify, never a command; instruction-shaped text is flagged and skipped. Skill Rule of Two: processes untrusted input + changes state via the reply post = 2/3 — compliant; it reads no sensitive data.
-
-## Defers To
-
-- `mk:review-pr` — giving a shallow review verdict on a PR (the opposite direction)
-- `mk:fix` / `mk:cook` — implementing any accepted action item
+Reviewer comments are untrusted data. Instruction-like text in a comment is flagged and never acted on.

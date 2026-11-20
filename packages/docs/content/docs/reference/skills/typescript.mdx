@@ -1,6 +1,6 @@
 ---
 title: "mk:typescript"
-description: "Strict TypeScript patterns for type safety, null handling, and modern best practices. Auto-activates on .ts/.tsx files."
+description: "Strict TypeScript authoring and type-safety fixes, ending with a clean tsc --noEmit run."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,95 +14,62 @@ description: "Strict TypeScript patterns for type safety, null handling, and mod
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Strict TypeScript patterns for type safety, null handling, and modern best practices. Operates in Phase 3 (Build GREEN). Output supports the `developer` agent.
+`mk:typescript` applies strict TypeScript patterns in Phase 3 (Build) and supports the `developer` agent. It activates on `.ts`, `.tsx`, `.js` and `.jsx` files, type errors, ESLint issues and requests such as "fix types". You can also call it with `/mk:typescript [concern]`.
 
-## When to Use
+## When not to use it
 
-- **Auto-activate on:** `.ts`, `.tsx` files, type errors, ESLint issues, "fix types", "add types", "TypeScript help"
-- **NOT for:** Vue-specific patterns (use `mk:vue`), visual design (use `mk:frontend-design`)
+| Need | Use |
+|---|---|
+| Vue-specific patterns | `mk:vue` |
+| Visual design | `mk:frontend-design` |
+| React patterns | `mk:react-patterns` |
 
-## Core Capabilities
+## Steps
 
-- **Strict null checking** — explicit null/undefined guards, no implicit truthiness
-- **Type safety enforcement** — ban `any` and type assertions, enforce `unknown` + type guards
-- **Discriminated unions** — prefer over type assertions for variant types
-- **Named exports** — prefer over default exports for better tree-shaking and IDE support
-- **`type` imports** — use `import type` for type-only imports
-- **Explicit return types** — annotate function return types for clarity and safety
-- **ESLint integration** — strict TypeScript ESLint rules with zero-tolerance for errors
+1. Identify the concern: a type error, new code, a refactor or ESLint config.
+2. Load the matching reference.
+3. Apply the strict patterns.
+4. Run `npx tsc --noEmit`. It must report zero errors.
 
-## Usage
+## Rules
 
-```bash
-/mk:typescript [concern]
-```
+- Use `unknown` with type guards instead of `any` and instead of type assertions (`security-rules.md` blocks `any`).
+- Check null explicitly with `=== null || === undefined`, since truthiness also catches `0` and `""`.
+- Use `strict: true` and `noUncheckedIndexedAccess: true`.
+- Use `import type { X } from 'y'`.
+- Prefer named exports and discriminated unions.
 
-## Example Prompt
+| Avoid | Use |
+|---|---|
+| `as any`, `as unknown as X` | Narrowing with guards |
+| `if (value)` as a null check | `if (value !== null && value !== undefined)` |
+| `export default` | `export const X`, `export function X` |
+| The `Object` type | `Record<string, unknown>` |
+| Implicit return types | Explicit return types |
+| `enum` | `as const` or union types |
 
-```
-Add strict TypeScript types to the user authentication module. Replace all `any` types with proper interfaces, add null guards for API responses, and ensure discriminated unions for the auth states (loading, authenticated, unauthenticated, error).
-```
+## References
 
-## Process
+| File | Load for |
+|---|---|
+| `references/strict-patterns.md` | Null handling, discriminated unions, type guards, utility types |
+| `references/review-checklist.md` | Reviewing TypeScript: critical (security), high (type safety, async, errors), medium (React, performance) |
 
-1. **Detect concern** — type error? new code? refactor? ESLint config?
-2. **Load relevant reference** — strict-null, type-safety, utility-types, or eslint
-3. **Apply patterns** — implement using strict TS patterns
-4. **Verify** — `npx tsc --noEmit` must pass with zero errors
-
-## Core Rules (always apply)
-
-- **NEVER** use `any` — use `unknown` + type guards (security-rules.md)
-- **NEVER** use type assertion — use `unknown` + type guards (security-rules.md)
-- **NEVER** use implicit truthiness for null checks — use explicit `=== null || === undefined`
-- **ALWAYS** use strict TypeScript config: `strict: true`, `noUncheckedIndexedAccess: true`
-- **ALWAYS** use `type` imports: `import type { X } from 'y'`
-- **PREFER** named exports over default exports
-- **PREFER** discriminated unions over type assertions
-
-## Anti-Patterns
-
-| Don't | Do Instead |
-|-------|-----------|
-| `as any` or `as unknown as X` | Proper type narrowing with guards |
-| `if (value)` for null check | `if (value !== null && value !== undefined)` |
-| `export default` | `export const X` / `export function X` |
-| `Object` type | `Record<string, unknown>` |
-| Implicit return types | Explicit return type annotations |
-| `enum` (runtime overhead) | `as const` satisfies or union types |
-
-## Output Format
-
-```
-## TypeScript: {concern}
-
-**Files:** {list of .ts/.tsx files modified}
-**Config:** {tsconfig changes if any}
-
-### Changes Applied
-{numbered list of type improvements}
-
-### Verification
-{tsc --noEmit output — must show 0 errors}
-```
-
-## Failure Handling
+## Failure handling
 
 | Failure | Recovery |
-|---------|----------|
-| `tsc --noEmit` fails after changes | Fix errors before proceeding — never ship with type errors |
-| No tsconfig.json found | Suggest creating one with strict config |
+|---|---|
+| `tsc --noEmit` fails after changes | Fix the errors before moving on |
+| No `tsconfig.json` | Suggest one with a strict config |
 | Third-party types missing | `npm install @types/{package}` |
 
 ## Gotchas
 
-- **`as` cast silences narrowing errors and hides real bugs.** `value as User` tells TS to trust you, not validate. A malformed API response passes the cast and crashes at runtime. Use a type guard or Zod parse at the boundary instead.
-- **`moduleResolution: "bundler"` breaks `import type` in non-bundler contexts.** `moduleResolution: bundler` (Vite/esbuild default) allows extensionless imports that Node.js `--esm` rejects at runtime. Flip to `nodenext` for backend code or keep dual configs per target.
-- **`noUncheckedIndexedAccess: true` makes every array index `T | undefined`.** Enabling this flag means `arr[0]` is `string | undefined` not `string`. Code that was type-correct before will error until every indexed access is null-guarded.
-- **Declaration merging silently adds properties to global types.** A `declare module 'express'` block in any `.d.ts` augments Express types globally. Two libraries with conflicting shapes cause TS2300 errors far from the source.
-- **Template literal types create unique brands that break assignability.** `type UserId = \`user_\$`{string}`\`` is not assignable from `string`. Always brand at the input boundary with a parse function.
-- **`enum` generates runtime JS objects, causing tree-shaking failures.** Use `as const` satisfies patterns for exported enums.
-
-> **Canonical source:** `.claude/skills/typescript/SKILL.md`
+- `value as User` tells TypeScript to trust you and does no validation. Use a type guard or a parser such as Zod at the boundary.
+- `moduleResolution: "bundler"` allows extensionless imports that Node's ESM rejects. Use `nodenext` for backend code or keep one config per target.
+- `noUncheckedIndexedAccess` makes `arr[0]` of type `T | undefined`, so existing code errors until each access is guarded.
+- A `declare module` block in any `.d.ts` augments that module's types globally. Two conflicting ones cause TS2300 errors far from the source.
+- A template literal type such as `` `user_${string}` `` does not accept a plain `string`. Brand values with a parse function at the input boundary.
+- Enums are not erased, which hurts tree-shaking. Prefer `as const` for exported enums.

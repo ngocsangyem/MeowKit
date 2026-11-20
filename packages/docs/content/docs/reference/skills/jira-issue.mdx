@@ -1,6 +1,6 @@
 ---
 title: "mk:jira-issue"
-description: "JIRA issue CRUD via the jira-as wrapper. Forks the jira-issue agent."
+description: "Creates, reads, updates or deletes one Jira issue by key."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,37 +15,41 @@ description: "JIRA issue CRUD via the jira-as wrapper. Forks the jira-issue agen
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Forks the `jira-issue` agent to handle single-issue CRUD: create / get / update / delete. Backed by `jira-as` CLI through the env-translating wrapper.
+mk:jira-issue forks the `jira-issue` agent ([agent page](/reference/agents/jira-issue)), which runs `jira-as issue` commands through the env-translating wrapper `jira/scripts/jira-as.sh`. The skill is not enabled by default.
 
-## When to Use
+## When to use it
 
-- **Triggers:** "create bug/task/story", "show me PROJ-123", "get/view issue", "update PROJ-123", "delete PROJ-123"
-- **NOT for:** state transitions ([`mk:jira-lifecycle`](/reference/skills/jira-lifecycle)), comments / attachments ([`mk:jira-collaborate`](/reference/skills/jira-collaborate)), bulk ops ≥10 issues ([`mk:jira-bulk`](/reference/skills/jira-bulk)), issue links ([`mk:jira-relationships`](/reference/skills/jira-relationships)), time logging ([`mk:jira-time`](/reference/skills/jira-time)), sprint / epic ([`mk:jira-agile`](/reference/skills/jira-agile)).
+Use it for "create a Bug in PROJ", "show me PROJ-123", "update PROJ-123 priority to High" or "delete PROJ-123".
 
-## Verified CLI Idioms
+| Need | Use instead |
+|---|---|
+| State transitions | [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle) |
+| Comments and attachments | [`mk:jira-collaborate`](/reference/skills/jira-collaborate) |
+| 10 or more issues | [`mk:jira-bulk`](/reference/skills/jira-bulk) |
+| Issue links | [`mk:jira-relationships`](/reference/skills/jira-relationships) |
+| Time logging | [`mk:jira-time`](/reference/skills/jira-time) |
+| Sprints and epics | [`mk:jira-agile`](/reference/skills/jira-agile) |
 
-| Operation | Tier | Wrapper invocation |
+[`mk:jira-fields`](/reference/skills/jira-fields) supplies custom field IDs.
+
+## Commands
+
+| Operation | Safety tier | Command |
 |---|---|---|
-| Get | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue get PROJ-123` |
-| Create | 2 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh issue create --project PROJ --type Bug --summary "..."` |
-| Create from template | 2 | `... issue create --project PROJ --template bug --summary "..."` |
-| Update | 3 | `... issue update PROJ-123 --summary "..." --priority High` |
-| Delete | 4 | `... issue delete PROJ-123` (omit `--force` unless after dry-run review) |
+| Get | 1 | `jira-as.sh issue get PROJ-123` |
+| Create | 2 | `jira-as.sh issue create --project PROJ --type Bug --summary "..."` |
+| Create from template | 2 | `jira-as.sh issue create --project PROJ --template bug --summary "..."` |
+| Update | 3 | `jira-as.sh issue update PROJ-123 --summary "..." --priority High` |
+| Delete | 4 | `jira-as.sh issue delete PROJ-123` |
 
-`--project` is a flag (not positional). Run `--help` per verb for the authoritative flag list.
+`--project` and `--summary` are flags on create. Use `--force` on delete only after reviewing a dry run. `references/cli-idioms.md` under `jira/` lists the verified syntax, and `--help` on each verb gives the full flag list.
 
-## Domain References
+## References
 
-- `references/issue-templates.md` — canonical Bug / Story / Epic / Task templates + body markdown
-- `references/field-formats.md` — ADF, user assignment, custom-field formats (531 lines, adopted from upstream)
-- `references/decision-matrices.md` — issue-type / priority / template decision tables
-
-## Peer Leaves
-
-`mk:jira-fields` (custom field IDs) · `mk:jira-lifecycle` (post-create transitions) · `mk:jira-collaborate` (comments / attachments) · `mk:jira-relationships` (linking)
-
-## Agent
-
-[`jira-issue`](/reference/agents/jira-issue) — A + C, NOT B (Skill Rule of Two: 2/3 compliant).
+| File | Content |
+|---|---|
+| `references/issue-templates.md` | Bug, Story, Epic and Task templates with body markdown |
+| `references/field-formats.md` | ADF, user assignment and custom field formats |
+| `references/decision-matrices.md` | Issue type, priority and template decision tables |

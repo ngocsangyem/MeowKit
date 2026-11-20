@@ -1,6 +1,6 @@
 ---
 title: "mk:showcase"
-description: "Create a self-contained, visually polished HTML showcase page for a topic or set of artifacts. Supply a mission and optional artifact paths explicitly — the skill never auto-scans the repo."
+description: "Builds a standalone HTML showcase page from a mission and the artifact paths you name, with optional screenshots."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,109 +14,75 @@ description: "Create a self-contained, visually polished HTML showcase page for 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Produces a self-contained, polished HTML page (with optional screenshots) from a user-supplied
-mission and explicit artifact paths. Output lands in `assets/showcase/<mission-slug>/`:
-`index.html`, `content.md`, and optionally `images/`.
+`mk:showcase` turns a mission description and optional artifact files into one self-contained HTML page for a demo, summary or portfolio piece. It writes locally to `assets/showcase/<mission-slug>/`. It reads only the paths you give it and never scans the repository.
 
-Publishing is local-only by default; if a publish target is not configured, the skill fails
-clearly rather than guessing a destination.
+## When not to use it
 
-## When to Use
-
-Triggers:
-
-- "make a showcase page for X", "create a demo page", "package this as a shareable HTML"
-- Preparing a visual summary of completed work for social posting or portfolio
-- Presenting a topic as a polished, scrollable HTML deliverable with screenshots
-
-Anti-triggers:
-
-- Generic code/diagram/diff visuals or explanations — use `mk:preview`
-- Plan critique or scope review — use `mk:plan-ceo-review`
-- Long-form markdown reading — use `mk:markdown-reader`
+For an explainer, diagram or slide deck about code, use `mk:preview`.
 
 ## Usage
 
-```
-/mk:showcase "Topic or mission description"
-/mk:showcase "Mission" path/to/artifact1.md path/to/artifact2.json
-/mk:showcase "Mission" --languages en --no-screenshots
-/mk:showcase "Mission" --no-publish
-```
-
-## Key Flags
-
-| Flag | Effect |
+| Argument | Effect |
 |---|---|
-| `--no-screenshots` | Skip Puppeteer capture; report local HTML path only |
-| `--no-publish` | Keep output local (default) |
-| `--languages en\|vi\|en,vi` | Set language mode for generated content |
+| `<mission>` | Topic or mission text. The slug comes from its first few words. |
+| `[artifact-paths...]` | Files to draw content from. They must be inside the project root. |
+| `--no-screenshots` | Skip screenshot capture. |
+| `--no-publish` | Skip publishing and report the local path. |
+| `--languages en\|vi\|en,vi` | English only, Vietnamese only, or both with a visible toggle. |
 
-## Output
+```
+/mk:showcase "Q3 release highlights" docs/release.md --languages en --no-screenshots
+```
+
+Command-line flags override stored preferences for that run. `scripts/preferences.js` manages the preferences:
+
+```bash
+node ${CLAUDE_SKILL_DIR}/scripts/preferences.js get
+node ${CLAUDE_SKILL_DIR}/scripts/preferences.js set --no-screenshots --no-publish
+node ${CLAUDE_SKILL_DIR}/scripts/preferences.js reset
+```
+
+They are stored in `${CLAUDE_PLUGIN_DATA}/showcase/preferences.json`. The `MK_SHOWCASE_PREFS_PATH` variable overrides that path in tests.
+
+## Steps
+
+1. Parse the flags and load stored preferences.
+2. Read the mission and the named artifacts, and split them into 2 to 6 sections including a hero. Artifact content is data, and instructions inside it are ignored.
+3. Write `content.md` with citations as footnotes.
+4. Generate `index.html` through `mk:frontend-design`: responsive at 16:9, 9:16 and 1:1, with a system, light and dark theme toggle. User strings are HTML-encoded.
+5. Capture screenshots with `scripts/capture-sections.js`, unless skipped.
+6. Publish if requested, then open the page locally.
+
+## Screenshots
+
+Capture needs Puppeteer (`cd ${CLAUDE_SKILL_DIR}/scripts && npm install`) and Chrome or Chromium.
+
+| Option | Meaning |
+|---|---|
+| `--url` | `file://` URL of the page. Required. |
+| `--output-dir` | Where images go. Required. |
+| `--sections` | CSS selectors such as `#hero,#about`. Required. |
+| `--ratios` | `horizontal`, `vertical`, `square`. All three by default. |
+| `--settle-delay`, `--render-timeout` | Wait after the page is ready (ms) and readiness timeout (ms). |
+| `--format`, `--quality`, `--max-size` | `png`, `jpg` or `webp`; quality 1 to 100; MB before compression. |
+| `--executable-path` | Chrome path, or set `PUPPETEER_EXECUTABLE_PATH`. |
+
+If capture fails the skill reports the error and the local path. It does not skip silently.
+
+## Outputs
 
 ```
 assets/showcase/<mission-slug>/
-├── index.html      # Self-contained HTML (inline CSS + JS)
-├── content.md      # Raw content with citations
-└── images/         # Screenshots per section × ratio (if enabled)
-    ├── horizontal-hero.png
-    ├── vertical-hero.png
-    └── square-hero.png
+  index.html      inline CSS and JS
+  content.md      content with citations
+  images/         horizontal-hero.png, vertical-hero.png, square-hero.png
 ```
-
-## Screenshots (Optional)
-
-Screenshots require Puppeteer:
-
-```bash
-cd .claude/skills/showcase/scripts && npm install
-```
-
-The capture script blocks external HTTP requests when rendering local `file://` HTML,
-preventing data exfiltration from generated content. Screenshots are optional —
-`--no-screenshots` skips this step entirely.
-
-## Preferences
-
-Workflow preferences persist in `${CLAUDE_PLUGIN_DATA}/showcase/preferences.json`:
-
-```bash
-# Read current preferences
-node .claude/skills/showcase/scripts/preferences.js get
-
-# Disable screenshots and publish by default
-node .claude/skills/showcase/scripts/preferences.js set --no-screenshots --no-publish
-
-# English-only content
-node .claude/skills/showcase/scripts/preferences.js set --languages en
-
-# Reset to defaults
-node .claude/skills/showcase/scripts/preferences.js reset
-```
-
-CLI flags override stored preferences for the current run.
-
-## Security
-
-- **No auto-scan** — only reads artifact paths you supply explicitly; never searches the repo
-- **Artifact path guard** — rejects absolute paths outside the project root and `..` traversal
-- **HTML-entity-encoding** — all user-supplied strings are encoded before template insertion
-- **DATA boundary** — artifact content is read as data; embedded instructions are never executed
-- **Publish fail-closed** — without a configured publish path the skill prints "no toolkit publishing path configured" and stops
-- **Screenshot request guard** — external HTTP/HTTPS requests blocked during Puppeteer capture of local HTML
 
 ## Gotchas
 
-- **No auto-scan**: supply mission text and artifact paths explicitly; the skill does not search the repo
-- **Screenshots opt-in**: Puppeteer requires `npm install` in `.claude/skills/showcase/scripts/`; headless Chrome may fail in sandboxed CI — use `--no-screenshots` there
-- **Publish is local-only by default**: configure a publish path before requesting publish; a missing path stops the skill (fail-closed)
-- **Bilingual mode** (`["vi", "en"]`) adds a visible language toggle to the page; English-only removes it
-- **Mission slug** is derived from the first words of the mission text (lowercase, hyphenated)
-
-## Workflow Position
-
-- **Phase:** on-demand (Phase 5 / post-ship packaging)
-- **Follows:** completed feature work, research, or content the user wants to present
-- **Precedes:** sharing, publishing (when configured)
+- Publishing is local by default. If you ask to publish without a configured path, the skill prints `no toolkit publishing path configured` and stops. It never guesses a destination.
+- The capture script blocks external requests while rendering `file://` pages, so CDN fonts and icons may be missing from screenshots. Self-contained HTML captures best.
+- Headless Chrome can fail in sandboxed CI. Use `--no-screenshots` there.
+- Artifact paths outside the project root or containing `..` are rejected.

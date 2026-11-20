@@ -1,197 +1,218 @@
 ---
-title: "Skills Reference"
-description: "Complete skill index — all skills organized by workflow phase with brief descriptions."
+title: "Skills reference"
+description: "Every MeowKit skill grouped by where it fits in the workflow, with one line each and a link to its page."
 ---
 
-MeowKit ships skills using the `mk:` namespace. Each skill loads on demand — agents activate only skills relevant to their phase. Detailed procedures live in `references/` within each skill directory and load only when needed.
+Skills use the `mk:` namespace and load on demand. Each skill's procedure lives in its own `references/` folder and loads only when needed. This page groups the skills by workflow phase. The table at the bottom lists every skill with its frontmatter description.
 
-## Phase 0 — Orient
+## Phase 0, orient
 
-Skills for task classification, context loading, and agent routing.
+| Skill | Use it to |
+|---|---|
+| [`mk:agent-detector`](/reference/skills/agent-detector) | Pick the task agent and complexity tier |
+| [`mk:scale-routing`](/reference/skills/scale-routing) | Map task keywords to a complexity tier |
+| [`mk:scout`](/reference/skills/scout) | Find where things live in the repo |
+| [`mk:project-context`](/reference/skills/project-context) | Generate `docs/project-context.md` |
+| [`mk:ask-me`](/reference/skills/ask-me) | Answer a factual project question with citations |
+| [`mk:intake`](/reference/skills/intake) | Score a ticket or PRD |
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:agent-detector` | Auto-detect agent, complexity, and model tier per message |
-| `mk:scout` | Parallel codebase exploration via Explore subagents |
-| `mk:scale-routing` | Domain-based complexity classification (CSV-driven) |
-| `mk:project-context` | Generate/update `docs/project-context.md` from codebase |
+## Phase 1, plan
 
-## Phase 1 — Plan
+| Skill | Use it to |
+|---|---|
+| [`mk:plan-creator`](/reference/skills/plan-creator) | Write the implementation plan |
+| [`mk:validate-plan`](/reference/skills/validate-plan) | Check an agreed plan across 8 dimensions |
+| [`mk:plan-ceo-review`](/reference/skills/plan-ceo-review) | Critique a plan's ambition and scope |
+| [`mk:office-hours`](/reference/skills/office-hours) | Check that an idea is worth building |
+| [`mk:brainstorming`](/reference/skills/brainstorming) | Compare approaches for one decision |
+| [`mk:advise`](/reference/skills/advise) | Get one verdict after a short interview |
+| [`mk:grill`](/reference/skills/grill) | Be questioned on your own plan |
+| [`mk:research`](/reference/skills/research) | Research a decision from multiple sources |
+| [`mk:prompt-enhancer`](/reference/skills/prompt-enhancer) | Rewrite a draft agent prompt |
+| [`mk:decision-framework`](/reference/skills/decision-framework) | Build a triage and escalation framework |
+| [`mk:arch`](/reference/skills/arch) | Manage architecture decision records |
+| [`mk:breakdown`](/reference/skills/breakdown) | Turn a spec or epic into sized stories |
+| [`mk:planning-engine`](/reference/skills/planning-engine) | Score ticket complexity and dependencies |
+| [`mk:story-sizer`](/reference/skills/story-sizer) | Size pasted stories with Fibonacci points |
 
-Skills for planning, research, and ideation.
+## Phase 2, test and security
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:plan-creator` | Auto-select plan template by task scope. 9-step workflow (00-08) |
-| `mk:validate-plan` | 8-dimension plan quality check before Phase 2 |
-| `mk:plan-ceo-review` | CEO-mode plan review (product lens + engineering lens) |
-| `mk:office-hours` | YC-style brainstorming (startup + builder modes) |
-| `mk:brainstorming` | Structured ideation with challenge pass, convergence checks, scoring, and compact plan-creator handoff |
-| `mk:prompt-enhancer` | Refine a draft user prompt — default emits only the rewrite; `--analyze`, `--score`, `--deep`, and recipe routing cover diagnostics, scoring, bounded context hints, architecture-review prompts, and research prompts |
-| `mk:decision-framework` | Triage, escalation, and case management for architecture decisions |
-| `mk:api-design-principles` | Durable REST, GraphQL, RPC, and event API contracts |
+| Skill | Use it to |
+|---|---|
+| [`mk:testing`](/reference/skills/testing) | Write and run tests |
+| [`mk:nyquist`](/reference/skills/nyquist) | Map acceptance criteria to tests |
+| [`mk:lint-and-validate`](/reference/skills/lint-and-validate) | Run lint and static analysis after an edit |
+| [`mk:cso`](/reference/skills/cso) | Audit security |
+| [`mk:vulnerability-scanner`](/reference/skills/vulnerability-scanner) | Analyze OWASP and supply-chain vulnerabilities |
 
-## Phase 2 — Test
+## Phase 3, build
 
-Skills for test writing, quality gates, and security scanning.
-
-| Skill | What it does |
-|-------|-------------|
-| `mk:testing` | Red-green-refactor TDD workflow, validation, visual QA |
-| `mk:nyquist` | Test-to-requirement coverage mapping |
-| `mk:lint-and-validate` | Auto-run linters and type checks |
-| `mk:cso` | Chief Security Officer — infrastructure-first audit |
-| `mk:vulnerability-scanner` | OWASP 2025 code-level scanning |
-| `mk:skill-template-secure` | Secure template for skills handling untrusted input |
-
-## Phase 3 — Build
-
-Skills for implementation, debugging, and domain-specific patterns.
-
-| Skill | What it does |
-|-------|-------------|
-| `mk:cook` | End-to-end feature pipeline: plan → test → build → review → ship |
-| `mk:autobuild` | Autonomous green-field build pipeline with generator/evaluator loop |
-| `mk:development` | Code patterns, TDD discipline, skill loading reference |
-| `mk:fix` | Structured bug investigation with auto-complexity detection |
-| `mk:investigate` | Systematic 5-phase root cause debugging |
-| `mk:sequential-thinking` | Hypothesis-driven reasoning for root cause analysis |
-| `mk:problem-solving` | Strategic unsticking — 7 techniques for "stuck on approach" |
-| `mk:simplify` | Mandatory over-engineering removal pass after build |
-| `mk:verify` | Unified build→lint→test→type-check→coverage verification |
-| `mk:build-fix` | Build error triage with language detection and fix references |
-| `mk:sprint-contract` | Negotiate testable acceptance criteria before generator touches code |
-| `mk:clean-code` | Pragmatic coding standards (SRP, DRY, KISS) |
-| `mk:bootstrap` | Application scaffold for any stack with progressive generation |
+| Skill | Use it to |
+|---|---|
+| [`mk:cook`](/reference/skills/cook) | Build one feature or plan end to end |
+| [`mk:autobuild`](/reference/skills/autobuild) | Build a green-field product unattended |
+| [`mk:bootstrap`](/reference/skills/bootstrap) | Scaffold a new project |
+| [`mk:development`](/reference/skills/development) | Write feature code to project standards |
+| [`mk:clean-code`](/reference/skills/clean-code) | Apply KISS, DRY and YAGNI while writing |
+| [`mk:fix`](/reference/skills/fix) | Fix a bug at its root cause |
+| [`mk:investigate`](/reference/skills/investigate) | Find a root cause and report it |
+| [`mk:build-fix`](/reference/skills/build-fix) | Triage build and type errors |
+| [`mk:sequential-thinking`](/reference/skills/sequential-thinking) | Reason step by step before acting |
+| [`mk:problem-solving`](/reference/skills/problem-solving) | Unstick a stalled approach |
+| [`mk:simplify`](/reference/skills/simplify) | Simplify fresh code |
+| [`mk:verify`](/reference/skills/verify) | Run build, lint, test, type-check and coverage once |
+| [`mk:sprint-contract`](/reference/skills/sprint-contract) | Agree acceptance criteria before code |
+| [`mk:resolving-merge-conflicts`](/reference/skills/resolving-merge-conflicts) | Resolve a merge or rebase conflict |
+| [`mk:improve-codebase-architecture`](/reference/skills/improve-codebase-architecture) | Find shallow modules and propose refactors |
+| [`mk:loop`](/reference/skills/loop) | Iterate on one measurable metric |
 
 ### Frontend
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:typescript` | Strict TS: null handling, type guards, utility types |
-| `mk:vue` | Vue 3 Composition API, Pinia, reactivity |
-| `mk:angular` | Angular v20+ patterns — components, signals, DI, forms, routing, SSR |
-| `mk:react-patterns` | React/Next.js performance — 45+ rules from Vercel Engineering |
-| `mk:frontend-design` | UI/UX with anti-AI-slop enforcement |
-| `mk:ui-design-system` | Design intelligence: styles, WCAG 2.1 AA, palettes, checklists |
+| Skill | Use it to |
+|---|---|
+| [`mk:typescript`](/reference/skills/typescript) | Write TypeScript and fix type safety |
+| [`mk:vue`](/reference/skills/vue) | Write Vue 3 |
+| [`mk:vue-best-practices`](/reference/skills/vue-best-practices) | Review Vue 3 code in depth |
+| [`mk:vue-testing-best-practices`](/reference/skills/vue-testing-best-practices) | Design Vue 3 tests |
+| [`mk:angular`](/reference/skills/angular) | Write Angular v20 and later |
+| [`mk:react-patterns`](/reference/skills/react-patterns) | Write and review React and Next.js |
+| [`mk:frontend-design`](/reference/skills/frontend-design) | Design and review UI components |
+| [`mk:ui-design-system`](/reference/skills/ui-design-system) | Design component systems and audit WCAG |
+| [`mk:stitch`](/reference/skills/stitch) | Generate a UI design from a prompt |
 
-### Backend & Data
+### Backend and data
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:database` | Data invariants, schema, safe migrations, query and index evidence |
-| `mk:api-design-principles` | Durable API contracts: shape, error semantics, compatibility, pagination |
-| `mk:backend-development` | End-to-end backend changes: handlers, services, integrations, jobs |
-| `mk:devops` | Infrastructure, containers, CI/CD, deployment safety, rollback |
+| Skill | Use it to |
+|---|---|
+| [`mk:api-design-principles`](/reference/skills/api-design-principles) | Design REST, GraphQL and event contracts |
+| [`mk:backend-development`](/reference/skills/backend-development) | Change endpoints, services and jobs |
+| [`mk:database`](/reference/skills/database) | Work on schema, migrations and queries |
+| [`mk:devops`](/reference/skills/devops) | Change containers, CI/CD and infrastructure |
 
-## Phase 4 — Review
+## Phase 4, review
 
-Skills for code review, security audit, and elicitation.
+| Skill | Use it to |
+|---|---|
+| [`mk:review`](/reference/skills/review) | Review a diff, PR or commit |
+| [`mk:review-pr`](/reference/skills/review-pr) | Review someone else's GitHub PR |
+| [`mk:respond-pr`](/reference/skills/respond-pr) | Triage and answer comments on your PR |
+| [`mk:elicit`](/reference/skills/elicit) | Re-examine a verdict or plan with a named method |
+| [`mk:evaluate`](/reference/skills/evaluate) | Grade a running build by behavior |
+| [`mk:rubric`](/reference/skills/rubric) | Load and compose rubric presets |
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:review` | Multi-pass adversarial code review with parallel reviewers |
-| `mk:elicit` | Structured second-pass reasoning via 8 methods (pre-mortem, red team, Socratic) |
-| `mk:evaluate` | Behavioral active-verification grader with rubric presets |
-| `mk:rubric` | Load, validate, and compose rubric presets for evaluator grading |
+## Phase 5, ship
 
-## Phase 5 — Ship
+| Skill | Use it to |
+|---|---|
+| [`mk:ship`](/reference/skills/ship) | Commit, push, open a PR and release |
+| [`mk:worktree`](/reference/skills/worktree) | Create, merge and prune git worktrees |
 
-Skills for deployment and release management.
+## Phase 6, reflect
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:ship` | Ship pipeline: test → review → commit → PR |
-| `mk:worktree` | Git worktree isolation for parallel agent sessions |
+| Skill | Use it to |
+|---|---|
+| [`mk:document-release`](/reference/skills/document-release) | Sync docs with a prepared release |
+| [`mk:docs-init`](/reference/skills/docs-init) | Generate a project's first docs |
+| [`mk:retro`](/reference/skills/retro) | Run a retrospective from commit history |
+| [`mk:memory`](/reference/skills/memory) | Append or prune team memory |
 
-## Phase 6 — Reflect
+## Any phase
 
-Skills for documentation, retrospectives, and the team memory store.
+| Skill | Use it to |
+|---|---|
+| [`mk:help`](/reference/skills/help) | Name the next workflow step |
+| [`mk:status`](/reference/skills/status) | Report the status of the active plan |
+| [`mk:docs-finder`](/reference/skills/docs-finder) | Fetch current library docs |
+| [`mk:careful`](/reference/skills/careful) | Warn before destructive commands |
+| [`mk:freeze`](/reference/skills/freeze) | Limit edits to one directory |
+| [`mk:session-continuation`](/reference/skills/session-continuation) | Save and restore workflow progress |
+| [`mk:context-audit`](/reference/skills/context-audit) | Audit `.claude/` token overhead |
+| [`mk:context-engineering`](/reference/skills/context-engineering) | Manage context during a run |
+| [`mk:multimodal`](/reference/skills/multimodal) | Analyze and generate images, video, audio, PDFs |
+| [`mk:web-to-markdown`](/reference/skills/web-to-markdown) | Turn one URL into markdown |
+| [`mk:llms`](/reference/skills/llms) | Generate `llms.txt` |
+| [`mk:henshin`](/reference/skills/henshin) | Plan a CLI or MCP wrapper for existing code |
+| [`mk:chom`](/reference/skills/chom) | Port a feature from an external repo |
+| [`mk:pack`](/reference/skills/pack) | Pack an external repo into one file |
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:memory` | Session capture, pattern extraction, cost tracking |
-| `mk:retro` | Sprint retrospective with commit analysis and trend tracking |
-| `mk:document-release` | Post-ship doc sync — cross-reference diff against docs |
-| `mk:docs-init` | Generate initial docs from codebase analysis |
+### Browser and QA
 
-## Cross-Phase Skills
+| Skill | Use it to |
+|---|---|
+| [`mk:agent-browser`](/reference/skills/agent-browser) | Drive a browser from the CLI |
+| [`mk:chrome-profile`](/reference/skills/chrome-profile) | Attach to a real Chrome profile |
+| [`mk:playwright-cli`](/reference/skills/playwright-cli) | Script a browser with Playwright |
+| [`mk:qa`](/reference/skills/qa) | Test a running web app and fix bugs |
+| [`mk:qa-manual`](/reference/skills/qa-manual) | Run manual passes and write Playwright specs |
 
-Skills that can activate in any phase.
+### Diagrams and visuals
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:docs-finder` | Library/project docs via Context7 + Context Hub |
-| `mk:help` | Navigation assistant — scans project state, recommends next pipeline step |
-| `mk:careful` | Warn before `rm -rf`, `DROP TABLE`, force-push |
-| `mk:freeze` | Restrict edits to one directory during debugging |
-| `mk:multimodal` | Image/video/audio/PDF analysis via Gemini API |
-| `mk:agent-browser` | Chrome/CDP with session persistence and auth |
-| `mk:chrome-profile` | Connect browser automation to a named local Chrome profile |
-| `mk:web-to-markdown` | Convert web pages to markdown for context injection |
-| `mk:llms` | Generate llms.txt per llmstxt.org spec |
-| `mk:session-continuation` | Save/resume workflow state across sessions |
-| `mk:henshin` | Wrap existing code as agent-consumable surfaces (CLI + MCP + skill) |
-| `mk:intake` | Ticket analysis, completeness scoring, product area detection |
-| `mk:task-queue` | Queue management for multi-task sessions |
+| Skill | Use it to |
+|---|---|
+| [`mk:preview`](/reference/skills/preview) | Render code, architecture or a diff visually |
+| [`mk:tech-graph`](/reference/skills/tech-graph) | Render SVG or PNG architecture diagrams |
+| [`mk:mermaidjs-v11`](/reference/skills/mermaidjs-v11) | Write inline Mermaid v11 diagrams |
+| [`mk:markdown-reader`](/reference/skills/markdown-reader) | Read markdown in a local book-style reader |
+| [`mk:showcase`](/reference/skills/showcase) | Build a standalone HTML showcase page |
+| [`mk:html-video`](/reference/skills/html-video) | Render an HTML animation to MP4 |
 
-### QA & Browser
+### Jira
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:qa` | Systematic QA with bug fixing and health scores |
-| `mk:qa-manual` | Spec-driven manual QA + Playwright E2E code generation |
-| `mk:playwright-cli` | Playwright MCP with code generation |
-| `mk:ghpm` | GitHub Issues, Projects v2, labels, milestones, and handoff summaries |
-| `mk:html-video` | Deterministically render local HTML animation into MP4 |
+| Skill | Use it to |
+|---|---|
+| [`mk:jira`](/reference/skills/jira) | Route to the right Jira skill |
+| [`mk:jira-issue`](/reference/skills/jira-issue) | Create, read, update or delete one issue |
+| [`mk:jira-search`](/reference/skills/jira-search) | Search with JQL and export results |
+| [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle) | Transition, assign, resolve and manage versions |
+| [`mk:jira-bulk`](/reference/skills/jira-bulk) | Change 10 or more issues at once |
+| [`mk:jira-agile`](/reference/skills/jira-agile) | Work with epics, sprints and the backlog |
+| [`mk:jira-collaborate`](/reference/skills/jira-collaborate) | Comment, attach and manage watchers |
+| [`mk:jira-relationships`](/reference/skills/jira-relationships) | Link, block and clone issues |
+| [`mk:jira-time`](/reference/skills/jira-time) | Log work and report time |
+| [`mk:jira-fields`](/reference/skills/jira-fields) | Find custom field IDs |
+| [`mk:jira-dev`](/reference/skills/jira-dev) | Derive branch names and PR bodies from a ticket |
+| [`mk:jira-analyst`](/reference/skills/jira-analyst) | Read one ticket with its comments and media |
+| [`mk:jira-estimator`](/reference/skills/jira-estimator) | Estimate story points for a ticket |
+| [`mk:jira-evaluator`](/reference/skills/jira-evaluator) | Score a ticket's complexity |
+| [`mk:jira-admin`](/reference/skills/jira-admin) | Administer projects, users and schemes |
+| [`mk:jira-jsm`](/reference/skills/jira-jsm) | Work with Service Management requests and SLAs |
+| [`mk:jira-ops`](/reference/skills/jira-ops) | Manage the Jira cache and discover projects |
 
-### External Integrations
+### Confluence and other services
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:jira` | Routing hub for the 16-leaf Jira family backed by the `jira-as` CLI |
-| `mk:confluence` | Routing hub for the 5-leaf Confluence Cloud family (page CRUD, CQL search, spec analysis with macro-aware ADF fetch, bulk ops, collaboration) backed by the `confluence-as` CLI |
-| `mk:figma` | Figma design analysis + implementation via Figma MCP. 3 modes: analyze, implement, tokens |
+| Skill | Use it to |
+|---|---|
+| [`mk:confluence`](/reference/skills/confluence) | Route to the right Confluence skill |
+| [`mk:confluence-page`](/reference/skills/confluence-page) | Create, edit, copy or move a page |
+| [`mk:confluence-search`](/reference/skills/confluence-search) | Search with CQL and export |
+| [`mk:confluence-collaborate`](/reference/skills/confluence-collaborate) | Comment, attach and label one page |
+| [`mk:confluence-bulk`](/reference/skills/confluence-bulk) | Change 10 or more pages at once |
+| [`mk:confluence-spec-analyst`](/reference/skills/confluence-spec-analyst) | Report requirements and gaps in a spec |
+| [`mk:figma`](/reference/skills/figma) | Read Figma designs and extract tokens |
+| [`mk:ghpm`](/reference/skills/ghpm) | Manage GitHub issues and Projects v2 |
 
-### Infrastructure
+### Kit and agent tooling
 
-| Skill | What it does |
-|-------|-------------|
-| `mk:skill-creator` | Scaffold, validate, and register new skills |
-| `mk:project-organization` | File naming and directory structure standards |
-| `mk:team-config` | Team-level MeowKit configuration |
-
-### Special-Purpose
-
-| Skill | What it does |
-|-------|-------------|
-| `mk:party` | Multi-agent deliberation for architecture decisions (2-4 agents, forced synthesis) |
-| `mk:workflow-orchestrator` | Auto-invoked 7-phase orchestrator for complex-feature intent |
-| `mk:orchestrate` | Staged/parallel jobs across live-verified coding-agent runtimes and in-session subagents, with arbiter review |
-| `mk:benchmark` | Canary suite for dead-weight audit measurement — maintainer-only, not in an installed kit |
-| `mk:trace-analyze` | Scatter-gather analysis of harness trace logs |
-| `mk:planning-engine` | Codebase-aware tech breakdown and sprint planning analysis |
-| `mk:chom` | Code chomping — extract relevant code sections for context |
-| `mk:pack` | Package code for portable context injection |
-
-## Plan first
-
-Most pipeline skills write or read a plan first. Nothing blocks an edit without one. Skills that skip planning either produce planning input or are data-driven.
-
-| Skill | Plan behavior | Skip condition |
-|-------|-------------|----------------|
-| `mk:cook` | Create plan if missing | Plan path arg, `--fast` mode |
-| `mk:fix` | Plan if > 2 files | `--quick` mode |
-| `mk:ship` | Cross-reference plan items against the diff | No plan for the change |
-| `mk:cso` | Scope audit via plan | `--daily` mode |
-| `mk:review` | Read plan for context | PR diff reviews |
+| Skill | Use it to |
+|---|---|
+| [`mk:skill-creator`](/reference/skills/skill-creator) | Scaffold and register a skill |
+| [`mk:skill-template-secure`](/reference/skills/skill-template-secure) | Start from an injection-hardened skill template |
+| [`mk:project-organization`](/reference/skills/project-organization) | Pick the path and name for a new file |
+| [`mk:team-config`](/reference/skills/team-config) | Set up a parallel agent team |
+| [`mk:task-queue`](/reference/skills/task-queue) | Claim shared tasks with file ownership |
+| [`mk:delegate`](/reference/skills/delegate) | Build a context-isolated subagent prompt |
+| [`mk:party`](/reference/skills/party) | Run a 2 to 4 agent round-table on one trade-off |
+| [`mk:orchestrate`](/reference/skills/orchestrate) | Split a job across agent CLIs and subagents |
+| [`mk:workflow-orchestrator`](/reference/skills/workflow-orchestrator) | Route complex-feature intent through the workflow |
+| [`mk:trace-analyze`](/reference/skills/trace-analyze) | Mine harness traces for recurring failures |
+| [`mk:benchmark`](/reference/skills/benchmark) | Maintainer-only canary suite, not in an installed kit |
 
 ## See also
 
 - [How agents and skills work together](/core-concepts/how-it-works)
-- [Workflow phases](/core-concepts/workflow)
+- [Workflow](/core-concepts/workflow)
 - [Agents reference](/reference/agents)
-- [Skill definitions on disk](https://github.com/ngocsangyem/MeowKit/tree/main/.claude/skills) — canonical source (SKILL.md files)
+- [Skill definitions on disk](https://github.com/ngocsangyem/MeowKit/tree/main/.claude/skills)
 
 {/* GENERATED:reference-index START */}
 
@@ -316,7 +337,7 @@ _Generated from `.claude/`. Every skill on disk appears here; the sections above
 | [`mk:team-config`](/reference/skills/team-config) | Sets up a parallel agent team: worktrees, ownership map, queue. NOT for mk:worktree. |
 | [`mk:tech-graph`](/reference/skills/tech-graph) | Renders publish-grade SVG/PNG diagrams: architecture, flow, ER. NOT for mk:preview. |
 | [`mk:testing`](/reference/skills/testing) | Writes and runs tests; red-green-refactor in TDD mode. NOT for mk:nyquist. |
-| [`mk:trace-analyze`](/reference/skills/trace-analyze) | Mines harness trace logs for recurring failures, behind a human gate. NOT for mk:retro. |
+| [`mk:trace-analyze`](/reference/skills/trace-analyze) | Mines harness trace logs for recurring failures, with a human approval step. NOT for mk:retro. |
 | [`mk:typescript`](/reference/skills/typescript) | TypeScript authoring and strict type-safety fixes. NOT for mk:react-patterns. |
 | [`mk:ui-design-system`](/reference/skills/ui-design-system) | Designs UI components and design systems; audits WCAG. NOT for mk:frontend-design. |
 | [`mk:validate-plan`](/reference/skills/validate-plan) | Checks an agreed plan across 8 dimensions for gaps. NOT for mk:plan-ceo-review. |

@@ -1,6 +1,6 @@
 ---
-title: "Step 6 — Refine and estimate"
-description: "mk:jira-evaluator grades ACs, complexity and contradictions; mk:jira-estimator chains off it to suggest story points with an uncertainty annotation. Both are read-only."
+title: "Step 6: Refine and estimate"
+description: "mk:jira-evaluator rates a ticket's complexity and flags inconsistencies. mk:jira-estimator suggests story points and reads the evaluator's report when one exists. Neither changes Jira."
 ---
 
 ## Prompt
@@ -10,45 +10,31 @@ description: "mk:jira-evaluator grades ACs, complexity and contradictions; mk:ji
 /mk:jira-estimator AUTH-201
 ```
 
-## What happens behind the scenes
+## What happens
 
-`mk:jira-evaluator` (read-only):
+`mk:jira-evaluator` reads the ticket with its comments, attachments and links, and compares it with similar closed tickets found by a capped JQL search.
 
-| Check                 | Output                                                  |
-| --------------------- | ------------------------------------------------------- |
-| AC presence           | `present` / `missing` / `vague` per AC                  |
-| Complexity dimensions | Code volume, integration count, novelty, risk           |
-| Inconsistencies       | Description ↔ AC contradictions, AC ↔ AC contradictions |
-| Verdict               | `simple` / `standard` / `complex`                       |
+| Output | Content |
+| --- | --- |
+| Complexity | Simple, Medium or Complex, with a likely Fibonacci range |
+| Confidence | High, Medium or Low |
+| Signals | Scope, dependencies, regression risk, requirement clarity, external integration and historical precedent |
+| Issues detected | Missing acceptance criteria, vague wording, scope creep, missing dependency links and contradictions |
+| Report | `tasks/reports/jira-evaluate-{YYMMDD}-{HHMM}-{KEY}.md` |
 
-`mk:jira-estimator` (read-only, chains off evaluator):
+`mk:jira-estimator` reads that report if it exists and writes `tasks/reports/jira-estimate-{YYMMDD}-{HHMM}-{KEY}.md`.
 
-| Input                                  | Output                                                                                                                                        |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Evaluator complexity + inconsistencies | Suggested story points (1, 2, 3, 5, 8, 13)                                                                                                    |
-| Uncertainty annotation                 | If evaluator flagged inconsistencies, estimator says e.g. "**5 ± 3** — AC2 wording is ambiguous; estimate halves if redirect target is fixed" |
+| Output | Content |
+| --- | --- |
+| Suggested points | One number with a range |
+| Confidence and reasoning | Why that number |
+| Escalation | A recommendation for human estimation when the range spans more than one Fibonacci step, there is no precedent, the ticket names technology absent from the codebase, or the description is too vague |
+| Apply command | A `jira-as issue update --custom-fields` command you can run to write the points. The skill does not run it. |
 
-<Callout title="Estimates are signals, not commitments" type="warn">
+Both skills write only a local report. The estimator checks the instance's Story Points field ID before it suggests a write, because it differs between Jira instances.
 
-Both skills emit suggestions only. The **team** still does planning poker. The AI provides numbers + reasoning; the humans negotiate.
-
-</Callout>
-
-## Sample output
-
-```
-AUTH-201 evaluator
-  ACs: 3 present, 0 missing, 1 vague (AC2 "lands on /dashboard" — which dashboard?)
-  Complexity: standard
-  Inconsistencies: none
-  Verdict: simple
-
-AUTH-201 estimator
-  Suggested: 3 points
-  Uncertainty: ±1 (AC2 wording)
-  Drivers: 1 new OAuth provider, 1 callback route, session middleware untouched
-```
+Both give suggestions. The team still estimates together and decides the points.
 
 ---
 
-Previous: [Step 5 — Group into an epic and rank](/workflows/spec-to-pr-walkthrough/step-05-epic-and-rank) · Next: [Step 7 — Tech review against your codebase](/workflows/spec-to-pr-walkthrough/step-07-tech-review) · [All steps](/workflows/spec-to-pr-walkthrough)
+Previous: [Step 5: Group into an epic and rank](/workflows/spec-to-pr-walkthrough/step-05-epic-and-rank) · Next: [Step 7: Tech review against your codebase](/workflows/spec-to-pr-walkthrough/step-07-tech-review) · [All steps](/workflows/spec-to-pr-walkthrough)

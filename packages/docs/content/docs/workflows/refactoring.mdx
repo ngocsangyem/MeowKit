@@ -1,87 +1,74 @@
 ---
 title: "Refactoring"
-description: "Safely refactor code with test coverage verification and architectural review."
+description: "Refactor code with a passing test baseline, a plan that states what stays fixed, and an architecture-focused review."
 ---
 
-> Improve code structure while guaranteeing nothing breaks.
+A refactor changes structure and adds no behavior, so the existing tests should pass before the change and after it without being edited.
 
-**Best for:** Code improvement, tech debt reduction  
-**Time estimate:** 15-45 minutes  
-**Skills used:** [mk:cook](/reference/skills/cook), [mk:scout](/reference/skills/scout), [mk:review](/reference/skills/review)  
-**Agents involved:** planner, tester, developer, reviewer, architect (if pattern changes)
+**Best for:** Code improvement, tech debt reduction
+**Time estimate:** 15 to 45 minutes
+**Skills used:** [mk:scout](/reference/skills/scout), [mk:plan-creator](/reference/skills/plan-creator), [mk:cook](/reference/skills/cook), [mk:review](/reference/skills/review)
+**Agents involved:** planner, tester, developer, reviewer, architect (if a pattern changes)
 
-## Overview
-
-Refactoring with MeowKit follows the TDD refactor phase: existing tests must pass before AND after changes. The key difference from feature work is that **no new behavior is added** — tests should pass without modification.
-
-## Step-by-step guide
-
-### Step 1: Scout the code to understand current structure
+## Step 1: Scout the current structure
 
 ```
 /mk:scout payment module
 ```
 
-The [mk:scout](/reference/skills/scout) skill spawns parallel Explore agents to map the module:
-- File structure and dependencies
-- Architecture fingerprint (patterns used)
-- Complexity estimate (files × lines)
-- Entry points
+[mk:scout](/reference/skills/scout) maps the module with parallel Explore agents: files and dependencies, the patterns in use, entry points and a size estimate.
 
-### Step 2: Plan the refactor
+## Step 2: Plan the refactor
 
 ```
-/mk:plan-creator refactor payment module — extract service layer from controllers
+/mk:plan-creator refactor payment module: extract a service layer from the controllers
 ```
 
-The **planner** creates a plan. For refactoring, the plan focuses on:
-- **What changes:** Which files move/split/rename
-- **What doesn't change:** External API contracts, test behavior
-- **Risk flags:** Files with many dependents, shared utilities
+The **planner** writes the plan under `tasks/plans/YYMMDD-name/`. For a refactor it should state what moves, splits or is renamed, what must not change (external API contracts, test behavior) and which files carry risk (many dependents, shared utilities). Agree the plan before building. If the refactor introduces a new pattern, such as moving from MVC to a service layer, the **architect** agent records the decision in an ADR (see [Architecture Decisions](/workflows/architecture)).
 
-If the refactoring introduces new patterns (e.g., switching from MVC to service layer), the **architect** agent inserts to create an ADR documenting the decision.
+## Step 3: Record the baseline
 
-### Step 3: Verify existing tests pass
-
-The **tester** runs the full suite BEFORE any changes:
+Run the full test suite before any change and note the result:
 
 ```
-Tester: All 87 tests passing. This is our baseline.
-        Any failure after refactoring indicates a regression.
+87 tests passing. Any failure after the refactor is a regression.
 ```
 
-### Step 4: Refactor with TDD safety net
-
-The **developer** refactors following the plan. After each change:
-- Tests run automatically
-- Any regression immediately flagged
-- Self-healing: developer adjusts approach (up to 3 attempts)
+## Step 4: Refactor in small steps
 
 ```
-Developer: Moving payment logic to src/services/payment.service.ts
-  Tests: 87/87 still passing ✓
-Developer: Updating controllers to use service
-  Tests: 85/87 passing ✗ — 2 integration tests need import update
-  Self-heal attempt 1: Update test imports
-  Tests: 87/87 passing ✓
+/mk:cook tasks/plans/<plan-dir>/plan.md
 ```
 
-### Step 5: Review focuses on architecture fit
+The **developer** follows the plan and runs the tests after each change. When a test fails, it adjusts the approach, up to three attempts:
 
-The **reviewer** pays special attention to:
-- **Architecture fit:** Does the refactoring improve or worsen the pattern?
-- **No behavior changes:** Tests should pass WITHOUT modification
-- **Performance:** No N+1 queries or unnecessary re-renders introduced
+```
+Move payment logic to src/services/payment.service.ts   87/87 passing
+Update controllers to use the service                   85/87 passing: two integration tests import the old path
+Update the test imports                                 87/87 passing
+```
 
-## What MeowKit prevents during refactoring
+The `post-write.cjs` hook scans every file write for security patterns while this runs.
 
-| Risk | How MeowKit prevents it |
-|------|------------------------|
-| Breaking existing behavior | TDD: tests must pass before AND after |
-| Scope creep | Plan defines what changes and what doesn't |
-| Unreviewed pattern changes | Architect reviews new patterns, creates ADR |
-| Accidental security regression | `post-write.cjs` scans every file write |
+## Step 5: Review
 
-## Next workflow
+`/mk:review` checks five dimensions. For a refactor, look at:
 
-→ [Writing Tests](/workflows/writing-tests) — add test coverage to untested code
+- Architecture fit: does the change improve the pattern or make it worse?
+- Behavior: tests should pass without being modified.
+- Performance: no new N+1 queries or unnecessary re-renders.
+
+Read the verdict before you ship with `/mk:ship`; the ship check then runs lint, related tests and a type-check at commit time.
+
+## What keeps a refactor safe
+
+| Risk | What helps |
+|---|---|
+| Breaking behavior | The test baseline before and after, run by the tester and developer |
+| Scope creep | The plan lists what changes and what does not |
+| Unreviewed pattern change | The architect records new patterns in an ADR |
+| Security regression | `post-write.cjs` scans each file write |
+
+## Next
+
+[Writing Tests](/workflows/writing-tests) covers adding coverage to untested code.

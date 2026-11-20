@@ -1,152 +1,90 @@
 ---
-title: "Step 9 — Implement with /mk:cook"
-description: "The 7-phase pipeline phase by phase — orient, plan, test, build, review, ship, reflect — with the review verdict at Phase 4 and every phase observable."
+title: "Step 9: Implement with /mk:cook"
+description: "The cook pipeline phase by phase: orient, plan, test, build, simplify, verify, review, ship and reflect. You read the review verdict before shipping, and the ship check runs at commit, push and PR."
 ---
 
-You've chosen AUTH-201 for this sprint. Time to build.
+You picked AUTH-201 for this sprint. Time to build.
 
 ## Prompt
 
 ```bash
-# AUTH-201 has a plan from Step 8 — call cook in "code mode" with the plan path.
-# cook skips its own Phase 1 (plan-creator) because the plan is already approved.
+# AUTH-201 has a plan from Step 8. Pass the plan path ("code mode").
+# Cook skips its own Phase 1 and builds from the plan you agreed.
 /mk:cook tasks/plans/260511-auth-201-google-oauth/plan.md
 
-# AUTH-203 (TRIVIAL — skipped Step 8) — pass a natural-language task.
-# cook runs the full pipeline including Phase 1 inline.
+# AUTH-203 is trivial and skipped Step 8. Pass a task description.
+# Cook runs Phase 1 itself and you agree the plan there.
 /mk:cook implement AUTH-203
 ```
 
-Optional flags: `--tdd` (failing test first), `--fast` (skip Phase 1 research). For this walkthrough we run the default pipeline for AUTH-201.
+Useful flags: `--tdd` (failing tests first), `--fast` (skip research, still plan), `--auto` (run without pausing), `--verify` (light browser check) and `--strict` (full evaluator).
 
-<Callout title="Phase 1 behavior" type="info">
+| Entry | Phase 1 |
+| --- | --- |
+| Plan path (AUTH-201, AUTH-202) | Skipped. Cook loads the plan from Step 8. |
+| Task description (AUTH-203) | Cook runs `mk:plan-creator` for the task and you agree the plan before Phase 2. |
 
-- **Plan-path entry (AUTH-201, AUTH-202):** Phase 1 is SKIPPED. Cook reads the approved plan from Step 8 and goes straight to Phase 2 / Phase 3.
-- **Natural-language entry (AUTH-203):** Phase 1 runs inline — `mk:plan-creator` produces the plan and you agree it inside the cook invocation.
-</Callout>
+Nothing blocks Phase 3 when the plan is missing. Writing the plan and agreeing it first is the workflow. Cook skips it only when you say so and Phase 0 found no risk flags, and it notes the skip in the run summary.
 
-## What happens behind the scenes — the 7 phases
+## Phases
 
-This is where the most happens per command. Each phase is observable.
+### Phase 0: Orient
 
-### Phase 0 — Orient
+`mk:agent-detector` runs first. It confirms the six always-on rules in `.claude/rules/`, loads `docs/project-context.md` when it exists, and classifies the task. `mk:scale-routing` matches the task against its domain table. The `risk-checklist` reference marks flags such as `AUTH` for login, session and OAuth terms. Cook then states the tier as `Task complexity: [TRIVIAL|STANDARD|COMPLEX] → [model]`.
 
-```
-mk:agent-detector reads:
-  - AUTH-201 description + ACs (via mk:jira-issue)
-  - The Tech Review Report from Step 7 (if present in tasks/reports/)
-mk:scale-routing scans for vertical-domain CSV match
-  → "OAuth" matches auth domain → level=high → tier override: COMPLEX
-mk:risk-checklist flags:
-  → AUTH (login/session keywords) → matched_flags: ["AUTH"]
-```
+Any flag in `AUTH`, `AUTHZ`, `DATA_MODEL`, `AUDIT_SEC` or `EXT_SYSTEM` forces the COMPLEX tier regardless of how small the task looks (`model-selection-rules.md`, Rule 2). AUTH-201 is a login feature, so it is COMPLEX. If scale-routing returns `level=high`, cook also turns on `--strict` unless you pass `--no-strict`.
 
-<Callout title="AUTH flag is a hard escalator" type="error">
+### Phase 1: Plan
 
-Per `model-selection-rules.md` Rule 2, any `matched_flags` ∈ `{AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM}` forces COMPLEX tier — **regardless** of how simple the task looks. This is non-negotiable.
+Skipped in code mode. Otherwise cook runs `mk:scout` and `mk:plan-creator`, then asks you to agree the plan (`Looks right`, `Revise plan` or `Abort`).
 
-</Callout>
+### Phase 2: Test
 
-Output:
+Optional by default. With `--tdd` or `MEOWKIT_TDD=1`, the `tester` agent writes failing tests for each acceptance criterion first, and Phase 3 starts only after they run and fail.
 
-```
-Task complexity: COMPLEX → using Opus
-matched_flags: ["AUTH"]
-Routed to: planner → developer → security → reviewer → shipper
-```
+### Phase 3: Build
 
-### Phase 1 — Plan
+The `developer` agent works through the plan's phase files, runs type checks after each file change and retries up to three times with different approaches when tests fail. After three failures it calls `mk:investigate` for a root-cause report. After three more it stops and reports to you.
 
-```
-Plan-path entry (AUTH-201): SKIPPED
-  cook detects an existing plan.md → enters code mode
-  → no plan-creator invocation, no re-research
+### Phase 3.5 and 3.6: Simplify and verify
 
-Natural-language entry (AUTH-203, TRIVIAL):
-  mk:plan-creator runs inline in --fast mode
-  Writes a one-paragraph plan; phases collapsed
-```
+`mk:simplify` reduces complexity once tests pass. `mk:verify` then runs build, lint, type-check, tests and coverage, scoped to the changed files. Both run before review.
 
-<Callout title="Where the plan is agreed" type="info">
+### Phase 4: Review
 
-- **For tickets that went through Step 8** (AUTH-201, AUTH-202): the plan was already agreed at Step 8 standalone. Cook uses the existing plan.
-- **For tickets that skipped Step 8** (TRIVIAL — AUTH-203): you agree the plan here, inside cook's Phase 1. No hook blocks Phase 3 without one.
+`mk:review` runs the `reviewer` agent and writes `tasks/reviews/YYMMDD-name-verdict.md`. The verdict grades five dimensions:
 
-In both paths the plan is a practice, not a gate.
+| Dimension | What it covers |
+| --- | --- |
+| Correctness | Bugs against the acceptance criteria |
+| Maintainability | Readability and conventions |
+| Performance | Regressions |
+| Security | Findings in the diff |
+| Coverage | Whether every AC is implemented and tested |
 
-</Callout>
+Each is PASS, WARN or FAIL. Any FAIL makes the overall verdict FAIL, and a mix of PASS and WARN gives WARN.
 
-### Phase 2 — Test (only if `--tdd`)
+You read the verdict before shipping. A FAIL is advice to fix that dimension and review again, and a WARN means you decide whether to ship as is or fix it first. No hook blocks the commit on the verdict. The ship check at commit time still runs lint, related tests and type-check.
 
-In default mode, this phase is a no-op. With `--tdd`, the `tester` agent writes failing tests targeting each AC **before** any implementation runs. The RED state is a workflow rule, not a hook check.
+### Phase 5: Ship
 
-### Phase 3 — Build
+Cook stops after the verdict. A PASS is not a request to ship. When you ask, the `shipper` agent runs the pre-ship checks, commits with a conventional message, opens a PR and notes how to roll back.
 
-```
-developer agent reads phase-01-service-skeleton.md
-Edits:
-  - src/auth/oauth-google.service.ts (new, ~110 LOC)
-  - src/auth/oauth.controller.ts     (+route, +10 LOC)
-  - src/auth/auth.module.ts          (register service)
-Commits incrementally with conventional-commit messages.
-mk:verify runs after each commit:
-  - npm run build  → 0 errors
-  - npm run lint   → 0 warnings
-  - npm test       → 18 passed
-```
+`mk:jira-dev` produces the Jira-aware pieces. It only generates artifacts, and you run the resulting `git` and `gh` commands. Ask it for a branch name such as `feature/AUTH-201-google-oauth` and for a PR body that references the ticket. `mk:jira-lifecycle` then moves the ticket, for example to "In Review". Check your project's status names first, because `mk:jira-lifecycle` reads them from the discovered workflow in `tasks/jira-workflows/`.
 
-### Phase 4 — Review
+On commit, push and `gh pr create`, the `pre-ship` hook runs lint on changed files, related tests and a type-check, and refuses the command when one fails. This is the one enforced control. See [the ship check](/core-concepts/enforcement#the-ship-check).
 
-```
-mk:review forks the reviewer agent in fresh context.
-Reads:
-  - the diff
-  - tasks/plans/.../plan.md (to check scope discipline)
-  - .meowkit/memory/gotchas.md (past learnings)
-Grades 5 dimensions:
-  Functionality: PASS — all 3 ACs met
-  Security:      PASS — uses httpOnly cookie, no token in localStorage
-  Code quality:  PASS
-  Tests:         WARN — no integration test for token refresh path
-  Docs:          PASS — README updated
-Writes: tasks/reviews/260511-auth-201-verdict.md
-```
+### Phase 6: Reflect
 
-<Callout title="Review verdict" type="info">
-
-Verdict has 1 WARN. You decide: ship with the WARN documented, or add the missing test first. **Any FAIL** means fixing that dimension before Phase 5. No hook enforces it; the ship check still runs lint, related tests and type-check.
-
-</Callout>
-
-### Phase 5 — Ship
-
-```
-mk:jira-dev branch-name AUTH-201
-  → "feat/auth-201-google-oauth"
-mk:jira-dev pr-description AUTH-201
-  → PR body with "Closes AUTH-201", AC checklist, screenshot placeholder
-git checkout -b feat/auth-201-google-oauth
-git push -u origin HEAD
-gh pr create --title "feat(auth): Sign in with Google" --body "..."
-mk:jira-lifecycle transition AUTH-201 "In Review"
-```
-
-### Phase 6 — Reflect
+Cook runs this on an explicit close request, not automatically. It syncs the plan's checkboxes, evaluates docs impact with the `documenter` agent, and archives the plan with `mewkit plan archive` when every phase is done. `mk:memory` adds an entry only when the lesson cannot be read from the code, so most runs add nothing. Entries go in with `mewkit note decisions` or `mewkit note gotchas`, with the entry on stdin, in this shape:
 
 ```md
-# .meowkit/memory/decisions.md
-## OAuth provider plugins follow the GitHubOAuthService shape   <!-- 2026-11-01 -->
-Why: a second provider needed the same token lifecycle; diverging shapes duplicated refresh logic
-Apply when: adding a third OAuth provider
-Source: PR #402
-
-# .meowkit/memory/gotchas.md
-## First OAuth provider shipped without a token-refresh test   <!-- 2026-11-01 -->
-Why: the reviewer caught it at review; the happy path passed without it
+## First OAuth provider shipped without a token-refresh test  <!-- 2026-05-14 -->
+Why: the reviewer caught it; the happy path passed without it
 Apply when: adding any OAuth provider
-Source: tasks/reviews/261101-auth-201-verdict.md
+Source: tasks/reviews/260514-auth-201-verdict.md
 ```
 
 ---
 
-Previous: [Step 8 — Plan per ticket](/workflows/spec-to-pr-walkthrough/step-08-plan-per-ticket) · Next: [Step 10 — After merge: close the loop](/workflows/spec-to-pr-walkthrough/step-10-close-the-loop) · [All steps](/workflows/spec-to-pr-walkthrough)
+Previous: [Step 8: Plan per ticket](/workflows/spec-to-pr-walkthrough/step-08-plan-per-ticket) · Next: [Step 10: After merge, close the loop](/workflows/spec-to-pr-walkthrough/step-10-close-the-loop) · [All steps](/workflows/spec-to-pr-walkthrough)

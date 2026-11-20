@@ -87,6 +87,9 @@ for (const abs of files) {
       if (NON_MDX_ROUTES.has(target)) continue;
       if (NON_MDX_PREFIXES.some((p) => target.startsWith(p))) continue;
       if (retired.has(target)) {
+        // A released changelog line is a record and is never edited, so it may keep a link to
+        // a page retired later; the redirect serves it.
+        if (rel.includes("/changelog/")) continue;
         broken.push({ file: rel, line: i + 1, target: raw, why: `retired — link ${retired.get(target)} instead` });
         continue;
       }

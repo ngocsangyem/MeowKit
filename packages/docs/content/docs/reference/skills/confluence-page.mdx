@@ -1,6 +1,6 @@
 ---
 title: "mk:confluence-page"
-description: "Confluence page CRUD via the confluence-as wrapper. Forks the confluence-page agent."
+description: "Creates, reads, updates, deletes, copies and moves single Confluence pages, and walks hierarchy and versions, through the confluence-page agent."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,39 +15,43 @@ description: "Confluence page CRUD via the confluence-as wrapper. Forks the conf
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:confluence-page` forks the `confluence-page` agent for operations on one Confluence page: create, get, update, delete, hierarchy (children, ancestors, descendants), version list and restore, copy and move. It calls `confluence-as` through the wrapper script `.claude/skills/confluence/scripts/confluence-as.sh`.
 
-Forks the `confluence-page` agent to handle single-page operations: create / get / update / delete, hierarchy traversal (children / ancestors / descendants), version list / restore, copy / move. Backed by `confluence-as` CLI through the env-translating wrapper.
+## When not to use it
 
-## When to Use
+| If you need | Use |
+|---|---|
+| Changes across 10 or more pages | [`mk:confluence-bulk`](/reference/skills/confluence-bulk) |
+| Spec analysis | [`mk:confluence-spec-analyst`](/reference/skills/confluence-spec-analyst) |
+| Comments, attachments, labels, watchers | [`mk:confluence-collaborate`](/reference/skills/confluence-collaborate) |
+| CQL search or listing spaces | [`mk:confluence-search`](/reference/skills/confluence-search) |
 
-- **Triggers:** "create page in SPACE", "show me page 12345", "update title of page 12345", "delete page 12345", "page hierarchy under 12345", "copy page 12345 to SPACE"
-- **NOT for:** bulk ops on ≥10 pages ([`mk:confluence-bulk`](/reference/skills/confluence-bulk)), spec analysis ([`mk:confluence-spec-analyst`](/reference/skills/confluence-spec-analyst)), comments / attachments / labels ([`mk:confluence-collaborate`](/reference/skills/confluence-collaborate)).
+## Usage
 
-## Verified CLI Idioms
+Ask in plain words: "create a page in ENG titled 'Q3 Roadmap' with body from /tmp/draft.md", "create an RFC page in ENG from the rfc template", "show me page 12345 in storage format", "set title to 'Q3 Roadmap (final)' on page 12345", "list children of page 12345 with depth 2", "copy page 12345 to SPACE".
 
-| Operation | Tier | Wrapper invocation |
+| Operation | Safety tier | Wrapper form |
 |---|---|---|
-| Get | 1 | `bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh page get --page-id 12345` |
-| Create | 2 | `... page create --space-key ENG --title "..." --content "..."` |
-| Create from template | 2 | `... page create --space-key ENG --template rfc --title "..."` |
-| Update | 3 | `... page update --page-id 12345 --title "..."` (agent shows current → proposed diff) |
-| Delete | 4 | `... page delete --page-id 12345` (only after dry-run review) |
-| Children | 1 | `... hierarchy children --page-id 12345 --depth 2` |
-| Version restore | 3 | `... version restore --page-id 12345 --version <n>` (creates a NEW version atop head) |
+| Get | 1 | `page get --page-id 12345` |
+| Create | 2 | `page create --space-key ENG --title "..." --content "..."` |
+| Create from template | 2 | `page create --space-key ENG --template rfc --title "..."` |
+| Update | 3 | `page update --page-id 12345 --title "..."` (shows current against proposed) |
+| Delete | 4 | `page delete`, after a dry-run review |
+| Children | 1 | `hierarchy children --page-id 12345 --depth 2` |
+| Version restore | 3 | `version restore --page-id 12345 --version <n>` |
 
-`--space-key` and `--page-id` are flags. Run `--help` per verb for the authoritative flag list.
+Run `--help` on a verb for its flags. Tiers are defined in `../confluence/references/safety-framework.md`.
 
-## Domain References
+References: `references/page-templates.md` (RFC, runbook and decision record skeletons), `references/field-formats.md` (`storage`, `view`, `export_view`, `atlas_doc_format` and round-trip caveats) and `references/version-restore-guide.md`.
 
-- `references/page-templates.md` — RFC / Runbook / Decision Record skeletons
-- `references/field-formats.md` — `storage` / `view` / `export_view` / `atlas_doc_format` distinctions, ADF round-trip caveats, and a cross-link to the macro-aware walker for read-side macro preservation
-- `references/version-restore-guide.md` — version operations + restore semantics
+## Gotchas
 
-## Peer Leaves
-
-[`mk:confluence-search`](/reference/skills/confluence-search) (CQL search + space list) · [`mk:confluence-collaborate`](/reference/skills/confluence-collaborate) (comments / attachments / labels) · [`mk:confluence-bulk`](/reference/skills/confluence-bulk) (10+ pages) · [`mk:confluence-spec-analyst`](/reference/skills/confluence-spec-analyst) (spec analysis)
+- Use the wrapper, not raw `confluence-as` output. JSON is guaranteed only after the wrapper's filter.
+- The CLI retries POST, so a create on a flaky network can produce duplicates. Before retrying a failed `page create`, list pages with the same title in the space.
+- ADF round trips are lossy for panel, expand, mention, emoji, media, decision and task-list nodes. Updating a page that has them can flatten them, and the agent warns first.
+- XHTML parsing in the CLI is regex based and can fail silently on malformed or deeply nested storage format. Prefer Markdown through `--content` for new pages.
+- `version restore` adds a new version on top of the head. It is not an in-place rollback, and it restores only the body, not title, labels or parent.
 
 ## Agent
 
-[`confluence-page`](/reference/agents/confluence-page) — A + C, NOT B (Skill Rule of Two: 2/3 compliant).
+[`confluence-page`](/reference/agents/confluence-page) takes untrusted page content and changes state, within the Skill Rule of Two.

@@ -22,7 +22,7 @@ const REPO_ROOT = join(HERE, "..", "..", "..");
 // declaration mandatory from then on.
 const REQUIRE_SOURCE_OF_TRUTH = new Set([
   "core-concepts/workflow.mdx",
-  "core-concepts/gates.mdx",
+  "core-concepts/enforcement.mdx",
   "reference/configuration.mdx",
   "reference/hooks.mdx",
   "reference/rules-index.mdx",

@@ -1,6 +1,6 @@
 ---
 title: "mk:html-video"
-description: "Render a local HTML, CSS, and JavaScript animation as an MP4 using Playwright frame capture and ffmpeg."
+description: "Renders a local HTML, CSS and JavaScript animation to an H.264 MP4 by capturing frames with Playwright and encoding them with ffmpeg."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,31 +14,45 @@ description: "Render a local HTML, CSS, and JavaScript animation as an MP4 using
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Captures deterministic frames from a local HTML animation with Playwright and encodes them to an
-H.264 MP4 with ffmpeg. It is designed for authored web animation, canvas, WebGL, and GSAP output.
+mk:html-video captures `fps × duration` PNG frames from a local HTML file, encodes them to an MP4 with `yuv420p` compatibility, removes its temporary frame directory on success or failure and prints the output path. It suits authored web animation, canvas, WebGL and GSAP output. It is not enabled by default (`default_enabled: false`) and needs Playwright and ffmpeg.
 
-## When to Use
+## When to use it
 
-- Export a local HTML animation as MP4.
-- Produce a video from a deterministic web template.
-
-Do not use it for live browser recording, desktop capture, or AI-generated video.
-
-## Prerequisites
-
-Install `@playwright/test`, the Playwright Chromium browser, and `ffmpeg`. The bundled renderer
-captures `fps × duration` PNG frames, writes an MP4 with `yuv420p` compatibility, and removes its
-temporary frame directory on success or failure.
+Use it to export a local HTML animation as MP4 or to produce a video from a deterministic web template. It is not for live browser recording, screen capture or AI video generation.
 
 ## Usage
 
 ```bash
-bash .claude/skills/html-video/scripts/render-html-to-mp4.sh template.html output.mp4 30 5 1920 1080
+bash ${CLAUDE_SKILL_DIR}/scripts/render-html-to-mp4.sh template.html output.mp4 30 5 1920 1080
 ```
 
-Use even width and height values. For fast deterministic animation, expose a `window.onFrame`
-hook in the template.
+| Argument | Meaning |
+|---|---|
+| `<html-file>` | The template to render |
+| `<output.mp4>` | Output path |
+| `[fps]`, `[duration-seconds]` | Frame rate and length |
+| `[width]`, `[height]` | Viewport size. Use even values. |
+| `[background-color]` | Optional |
 
-See the canonical [`mk:html-video` skill](https://github.com/ngocsangyem/MeowKit/tree/main/.claude/skills/html-video) for the capture contract and troubleshooting.
+To capture frames only, run `node ${CLAUDE_SKILL_DIR}/scripts/capture-frames.mjs <html-file> <frame-dir> <fps> <duration-seconds> <width> <height> [background-color]`.
+
+## Steps
+
+1. Check that ffmpeg and Playwright are installed. Install Chromium only if it is missing and you approve.
+2. Pick an even width and height.
+3. Expose a `window.onFrame` hook in the template for fast deterministic stepping. Without it, capture runs in real time.
+4. Render, then check the MP4 with the `ffprobe` command in `references/render-workflow.md`.
+
+## References
+
+| File | Load for |
+|---|---|
+| `references/render-workflow.md` | Dependency checks, dimensions, fps |
+| `references/html-template-contract.md` | Deterministic JavaScript, canvas, WebGL, GSAP stepping |
+| `references/troubleshooting.md` | Module, `file://`, codec, cleanup and dimension failures |
+
+## Gotchas
+
+This is a skill, not an npm package. Run its bundled scripts directly.

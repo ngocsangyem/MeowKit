@@ -1,6 +1,6 @@
 ---
 title: "mk:api-design-principles"
-description: "Durable REST, GraphQL, RPC, and event API contracts — interface shape, error and authorization semantics, compatibility, deprecation, and pagination."
+description: "Designs and reviews API contracts (REST, GraphQL, RPC, events) by finding the existing consumers and conventions first."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,73 +14,59 @@ description: "Durable REST, GraphQL, RPC, and event API contracts — interface 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:api-design-principles` authors and reviews what an API promises consumers: shape, error and authorization requirements, compatibility, deprecation and pagination. It finds the existing consumers and conventions before recommending anything, so an extension matches the API it extends. Use it before handlers are written, or to review a contract.
 
-Authors and reviews the contract an API promises: interface shape, error and authorization
-semantics, compatibility, deprecation, and pagination. It discovers the existing consumers
-and conventions before recommending anything, so an extension matches the API it extends
-instead of the convention the author happens to prefer.
+## When not to use it
 
-It owns the contract only. Implementation, persistence, the security verdict, and release
-each belong to a different owner.
-
-## When to Use
-
-- Designing a new public or shared API contract
-- Reviewing an existing contract for consistency, compatibility, or error semantics
-- Deciding whether a change is additive or breaking, and how to deprecate
-- Choosing an interface style on greenfield work, from evidence rather than habit
-- **NOT for:** implementing the handler (`mk:backend-development`), schema or query work
-  (`mk:database`), infrastructure and release (`mk:devops`), or the security verdict
-
-## Ownership Boundary
-
-| Owner | Owns |
+| If you need | Use |
 |---|---|
-| `mk:api-design-principles` | Interface contract, error/authorization requirements, compatibility, consumer discovery |
-| `mk:backend-development` | The end-to-end backend change that implements it |
-| `mk:database` | Data invariants, schema, migrations, query and index evidence |
-| `mk:devops` | Infrastructure, delivery, deployment safety, rollback |
+| The handler or service implemented | `mk:backend-development` |
+| Schema, migration, query or index work | `mk:database` |
+| Infrastructure, delivery or rollback | `mk:devops` |
+| A security verdict | the security workflow (`mk:cso`) |
 
-A contract-only question stays here even in the middle of a backend task. A backend task
-loads this skill only when a new, public, or breaking contract is in scope.
+A contract-only question stays here even in the middle of a backend task. A backend task loads this skill only when a new, public or breaking contract is in scope. A message-based change splits: the message contract is here, the producer or consumer code is `mk:backend-development`.
 
-## Arguments
+## Usage
 
-`[contract or review] [--rest|--graphql|--rpc|--event]`
+```bash
+/mk:api-design-principles [contract or review] [--rest|--graphql|--rpc|--event]
+```
 
-## Workflow
-
-1. **Discover** — existing consumers, contract surface, versioning scheme, error envelope,
-   pagination shape, and contract tests
-2. **Classify the interface** — preserve the discovered style; on greenfield, justify the
-   choice from client shape, query flexibility, streaming need, and consumer ownership
-3. **Model the contract** — shape, authorization requirement, validation and error
-   semantics, and only the idempotency, concurrency, or pagination the use case needs
-4. **Review with examples** — success, invalid, forbidden, conflict/not-found, and evolution
-5. **Hand off** — implementation, persistence, security verdict, release
-
-## References
-
-| File | Load when |
+| Flag | Meaning |
 |---|---|
-| `references/rest-principles.md` | The contract is HTTP-shaped |
-| `references/graphql-principles.md` | The contract is a GraphQL schema |
+| `--rest` | HTTP contract. Loads `references/rest-principles.md` |
+| `--graphql` | GraphQL schema. Loads `references/graphql-principles.md` |
+| `--rpc`, `--event` | Message contract. Loads neither reference |
 
-An RPC, event, or webhook contract loads neither — the same discipline applies in message
-terms, described in the skill body.
+## What it does
+
+1. Discover: existing consumers, contract surface, versioning scheme, error envelope, pagination shape and contract tests.
+2. Classify: keep the discovered style. On greenfield work, choose from client shape, query flexibility, streaming need and consumer ownership, and say why.
+3. Model: shape, authorization requirement, validation and error semantics, and only the idempotency, concurrency or pagination the use case needs.
+4. Review with examples: success, invalid input, forbidden, conflict or not found, and one evolution case. A contract with no failure example is unreviewed.
+5. Hand off: implementation, persistence, security verdict and release go to their owners.
+
+## Compatibility rules
+
+| Case | Rule |
+|---|---|
+| Additive (optional field, new operation) | Safe, no version bump |
+| Breaking | Anything a current consumer can observe: removed or renamed field, narrowed type, changed default, tighter validation, changed status or error code, changed pagination shape |
+| Before breaking | Name every consumer found. An unknown consumer set is itself a finding |
+| Removal | Deprecate first, keep the old shape working, signal to consumers, remove after migration is evidenced |
+| Versioning | Follow the discovered scheme |
+
+Page sizes, rate limits, cache policies and sunset windows are read from the repository or asked for, never invented.
 
 ## Output
 
-A compact contract decision record: discovered evidence, consumer set and stability class,
-style rationale, contract delta, error/authorization/compatibility semantics, validation
-proof, and handoffs.
+A compact contract decision record: discovered evidence, consumer set and stability class, style rationale, contract delta, error, authorization and compatibility semantics, the reviewed examples, and hand-offs.
 
-## Pro Tips
+## Gotchas
 
-- **Consistency with the shipped contract beats any convention.** A "correct" endpoint that
-  disagrees with its neighbours is the defect.
-- **Breaking is anything a current consumer can observe** — including a tightened validation
-  rule or a changed status code, not just a removed field.
-- **Do not invent a page size, rate limit, or sunset window.** Read it from the repository,
-  or ask.
+- Consistency with the shipped contract beats any convention. Plural nouns, shallow nesting and cursor pagination are defaults that yield to what the API already does.
+- Two error envelopes already shipped means converging them is a breaking change. Document the target instead of adding a third.
+- An error body must not leak stack traces, driver errors, file paths or host details.
+- A GraphQL field that fans out per parent row needs its fetch cost addressed before the schema ships. The fix goes to `mk:database`.
+- With no broker in the repository, the skill says the capability is absent and does not design a queue or retry path.

@@ -9,48 +9,99 @@ description: "MeowKit release history and changes."
 mewkit upgrade
 ```
 
-Fresh install: [install the `mewkit` binary](/installation#install-the-cli), then `mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`.
+Fresh install: [install the `mewkit` binary](/installation#install-the-cli), then `mewkit init`. See [Releasing](https://github.com/ngocsangyem/MeowKit/blob/main/RELEASING.md) for the full release process. Section schema: each version uses only the relevant sections from `Highlights`, `New Skills`, `New Agents`, `New Commands`, `CLI`, `Features`, `Improvements`, `Removals`, `Bug Fixes`, `Beta`, `Migration Notes`.
 
 A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-npx-mewkit).
 
-## Unreleased
+## 3.0.0 (2026-11-20)
+
+Version 3 replaces the npm CLI with one native binary, installs the kit on six runtimes from a single authored tree, and removes the approval gates. Read the Removals and Migration Notes before you upgrade a 2.x project.
 
 ### Highlights
 
-The kit is now a lean tree: `.claude/` ships agents, hooks, rules, skills, `settings.json`, `statusline.cjs`, `kit-contract.json` and `kit-capabilities.json`, and everything the kit writes at runtime lives under `.meowkit/`. Kit releases carry a checksum file, the safety hooks share one core across Claude Code, Codex and Cursor, and the CLI is now one native binary, `mewkit`, with `mk` as a short alias; the npm package is retired. The docs and landing page also move to a new Prompt + Cursor identity.
+- `mewkit` is a native binary, with `mk` as a short alias. The npm package is retired.
+- One authored kit installs on Claude Code, Codex, Cursor, Grok, Pi and OMP. The files each runtime loads are projected from `.claude/` at install time.
+- The plan-approval and review-approval gates are gone. Planning and review stay in the workflow as practices. The one check a hook still enforces at ship time is the ship check, which now runs on Claude Code, Codex and Cursor.
+- The kit is a lean tree. `.claude/` ships agents, hooks, rules, skills, `settings.json`, `statusline.cjs`, `kit-contract.json` and `kit-capabilities.json`. Everything the kit writes at runtime lives under `.meowkit/`.
+- Agents are pinned to current models on Claude Code, Codex and Cursor.
+- The docs and the landing page use a new identity, Prompt + Cursor.
 
 ### Features
 
-- `mewkit` is now a native binary that installs, upgrades, removes and checks the kit for Claude Code, Codex and Cursor, in a project or with `--global`. It writes each runtime's own file format instead of converting `.claude/`, and it adopts a runtime the npm CLI installed. See [Project Setup](/cli/project-setup).
-- Kit releases publish a `checksums.txt` and a `.claude/kit-contract.json` (contract version, minimum installer, kit version). `mewkit` checks the kit zip against them before it writes anything.
-- Codex gets native `PreToolUse` safety hooks: a privacy guard on Bash commands that touch `.env*`, key or credential files, and a Gate 1 guard that denies source edits without an approved plan. Codex and Cursor Gate 1 now require the approval receipt and a signed contract, the same as Claude Code. `.claude/hooks/hook-coverage.json` records which hook behaviours each runtime carries.
-- The plan gate, privacy and pre-ship decisions moved into `hooks/lib/core`, one copy shared by the three runtimes. A guard that cannot resolve a trusted project root denies instead of allowing.
+**Six runtimes from one source**
+
+- `mewkit init --target` accepts `claude-code`, `codex`, `cursor`, `grok`, `pi`, `omp` or `all`. At project scope, `all` installs all six. Grok, Pi and OMP install at project scope only, so `--global --target all` installs Claude Code, Codex and Cursor. See [Portability](/cli/portability).
+- Every runtime other than Claude Code is projected from the authored `.claude/` tree plus a small overlay in `kit/overlays/<runtime>/`. The overlay holds what cannot be derived: hooks, rules and the always-on text. The hand-written Codex and Cursor bundles are removed.
+- Grok gets skills in `.grok/skills`, the hook file `.grok/hooks/meowkit.json` and always-on text in `AGENTS.md`. It gets no agent definitions, because Grok documents no file format for them.
+- Pi gets skills in `.agents/skills`, one extension at `.pi/extensions/meowkit.ts` and `AGENTS.md`. Pi has no subagents, so it gets no agents.
+- OMP gets skills in `.agents/skills`, the kit's agents in `.omp/agents/`, the hook module `.omp/hooks/pre/meowkit.ts` and `AGENTS.md`.
+- Grok, Pi and OMP enforcement follows the vendors' documentation and has not yet been run in a live session. [Enforcement & Security](/core-concepts/enforcement) lists what each runtime enforces.
+- Codex, Pi and OMP all read `.agents/skills`. When more than one of them is installed, they share one copy of the skills in runtime-neutral wording and keep helpers, rubrics and the guard script in `.agents/meowkit/`. Installed alone, each keeps its own invocation form: `$mk-x` on Codex, `/skill:mk-x` on Pi and OMP.
+- `init`, `uninstall` and `upgrade` plan again for every installed runtime whose files depend on the set that is changing. Adding a runtime and then removing it leaves the same tree as a fresh install of the runtimes that stay.
+
+**The ship check and the hooks**
+
+- On `git commit`, `git push`, `git merge` and `gh pr create|merge`, the ship check runs lint on the changed files, the tests related to them and a type-check, and refuses the command when one fails. It ignores `MEOWKIT_HOOK_PROFILE=fast`. When the test runner cannot name related tests, it runs lint and type-check only and says that tests did not run.
+- On Codex the ship check is a new hook in `.codex/hooks.json`. Codex also gets a privacy guard on Bash commands that touch `.env*`, key or credential files.
+- The privacy, ship-check and completion-check decisions live in `hooks/lib/core`, one copy that every runtime's hooks share. A guard that cannot resolve a trusted project root denies the action.
+- `.claude/hooks/hook-coverage.json` records which hook behaviours each runtime carries.
+- A completion check is available as an opt-in on Claude Code, Codex and Cursor. With `hooks.pre-completion-check: true`, a turn that ends with files changed since the last passing test, build, lint or type-check run is continued, twice at most. It is off by default, and what it reports is advisory.
+- On Claude Code, a failed compile or lint after an edit is reported on the channel the model sees, and so is the advice from the observers that used to print plain stdout (loop detection, the pre-task check, post-write warnings).
+
+**Kit releases**
+
+- A kit release is a zip with a `checksums.txt` and a `.claude/kit-contract.json` (contract version, minimum installer, kit version). `mewkit` checks the zip against them before it writes anything.
 - Skills reach their own files by skill-relative paths, so they run on runtimes other than Claude Code. CI checks this.
 
 ### CLI
 
+- `mewkit` installs, upgrades, removes and checks the kit in a project or, with `--global`, in your home directory. It adopts a runtime the npm CLI installed. See [Project Setup](/cli/project-setup).
+- Every command of the npm CLI runs in the native binary with the same output, exit codes and written files. One difference: bare `mewkit orient` records its `orient_run` trace, where the npm CLI recorded only on `--record`. Pass `--no-record` to skip it, as the SessionStart hook does.
 - `mewkit init` writes a committed launcher at `.meowkit/bin/mewkit`, and a SessionStart hook puts it on the agent's `PATH`, so bare `mewkit ...` resolves in a fresh clone.
-- An unknown command or subcommand exits 2 and lists the valid choices. Every subcommand answers `--help`, and the CLI manual is generated from the command catalogue.
-- Every command of the npm CLI now runs in the native binary with the same output, exit codes and written files, held to the npm CLI's behaviour as recorded before that CLI was deleted. `mk` is the same binary under a shorter name, and the pre-rename name runs for one release with a notice. One difference: bare `mewkit orient` records its `orient_run` trace (pass `--no-record` to skip it, as the SessionStart hook does), where the npm CLI recorded only on `--record`.
-- `mewkit self-update` replaces the binary after checking the release's `binary-manifest.json`, SHA-256 and size. The CLI reference moves the preview binary's page into [Project Setup](/cli/project-setup) and generates its flag tables from the binary's own `--help`.
+- `mewkit self-update` replaces the binary after checking the release's `binary-manifest.json`, SHA-256 and size.
+- An unknown command or subcommand exits 2 and lists the valid choices. Every subcommand answers `--help`.
+- `mewkit validate --target` accepts `codex`, `cursor`, `grok`, `pi` and `omp`. For Cursor it checks what this installer writes: the hook file and its scripts, the hook runtime config, the `.mdc` rules and the skills.
+- `mewkit doctor` has two new rows. `coexistence: cross-runtime load` lists, for each installed runtime, the kit skills, agents and hooks it loads from more than one root, with the vendor setting that stops the second load where one is documented. `kit copies: unrecorded` fails with exit 1 when a copy of a kit skill or agent that no install recorded sits under a second root an installed runtime reads, for example `.pi/skills/mk-cook` beside `.agents/skills/mk-cook`.
+- `mewkit skill env <skill>` finds Codex and Cursor installs. A skill that needs Python names this command when its environment is missing.
 
 ### Improvements
 
-- Session state, caches and the hook log resolve through one `.meowkit` path resolver. Installs made before the move still read the old locations.
+- Each agent's model follows its Claude Code tier, and the Codex and Cursor agent files derive from the same table. Thirteen Codex agents had pinned a retired model id. See [Agent Models](/guide/agent-models).
+- Autobuild treats Opus 5 and Fable 5 as COMPLEX with LEAN density on Claude Code. On Codex and Cursor nothing names the session's model to the script, so LEAN is opt-in.
+- Always-on rules and skill bodies give reasons where they used to shout absolutes. NEVER stays on force-push, on pushing to main and in the security rules.
+- Skill listings fit each runtime's ceiling (16k on Claude Code, 12k on Codex, 16k on Cursor), with the words a user types for the job first.
+- Projected text uses its host's own words. Codex text invokes skills as `$mk-x` and Cursor as `/mk-x`, and Claude Code tool syntax is gone from both.
+- Each install ships what its skills call: the `workflow-*` helpers and the rubric library install beside that runtime's skills, or in `.agents/meowkit/` when Codex, Pi or OMP share `.agents/skills`.
 - Always-listed context (rules plus skill and agent metadata) is held under 70,000 B by `scripts/check-always-on-budget.cjs`, down from 113,798 B to 59,426 B. See [Rules Index](/reference/rules-index).
+- Session state, caches and the hook log resolve through one `.meowkit` path resolver. Installs made before the move still read the old locations.
 - Node.js 24 is the one declared minimum.
-- New identity: an ink `>` chevron beside a blue cat-eared cursor, one family of muted blues, with `assets/design-tokens.json` as the single token source.
+- New identity: an ink `>` chevron beside a blue cat-eared cursor and one family of muted blues, with `assets/design-tokens.json` as the single token source. The landing page is rebuilt in it.
 
 ### Removals
 
-- The `mewkit` npm package is retired: `npx mewkit` gets no new fixes or kit support. Install the native binary instead; [Moving from the npm CLI](/migration/from-npx-mewkit) covers an existing project. The binary's `--offline` uses the newest kit in its own cache.
-- Modes are gone, and the kit no longer ships a scripts or commands folder under `.claude`. Their content moved into skills, `hooks/lib` and repository scripts.
-- The kit no longer ships task templates or scaffolds `tasks/`. `mewkit task new` writes inline frontmatter and uses a template only if your project keeps one.
-- The CLI commands `context`, `explain-support` and `status` are removed. `inventory` and `docs-manifest` moved to repository scripts outside the published package.
-- The `mewkit visual-plan` command and the `mk:visual-plan` skill are removed, with `plan.html` export and the local studio. Use `mk:preview` for explainers, diagrams and diffs, or `mk:tech-graph` for standalone diagram files. The old skill page redirects to [mk:preview](/reference/skills/preview).
-- `mk:plan-creator --html` is removed. Plans are no longer rendered as HTML.
-- `mewkit migrate` is removed, along with `init --migrate` and `init --migrate-global` and the migrate-only flags. Install Codex or Cursor with `mewkit init --target codex` or `mewkit init --target cursor`. `mewkit upgrade` refreshes an install made that way. A `.cursor/` or `.codex/` directory left by the old converter is not refreshed, and upgrade prints a notice to run `mewkit init --target <tool>`. Legacy `.claude/memory/` is not imported; copy what you need into `.meowkit/memory/`. The `.mcp.json` merge into Codex `config.toml [mcp_servers]` (`--include-mcp`) is gone too; add MCP servers to `.codex/config.toml` by hand. The migration guide is replaced by [Portability](/cli/portability).
-- The signed kit artifact engine is removed: signatures, trusted keys, quarantine and the artifact cache. The npm CLI's `init --offline` and `upgrade --offline` went with it. A kit release is a zip with a `checksums.txt`.
+- The approval gates. An agent can edit source with no approved plan and commit with no review verdict; no hook checks either. Removed with them: the verbs `mewkit plan approve`, `mewkit validate --gates` and `mewkit verdict-gate`; the hooks `gate-enforcement.cjs` and `pre-implement.cjs`; the approval-receipt, contract-signature, plan-discovery and Gate 2 libraries; the sprint-contract scripts; `validate-gate-2.cjs`; and `.claude/rules/gate-rules.md`. `mewkit doctor --hard-gates` keeps its name and probes the guards that remain.
+- The `gate1PresenceOnly` setting in `~/.meowkit/config.yaml` and `MEOWKIT_GATE1_PRESENCE_ONLY`.
+- The `mewkit` npm package. `npx mewkit` gets no new fixes or kit support. The binary's `--offline` uses the newest kit in its own cache.
+- `kit/bundles/`, the hand-written Codex and Cursor trees, with `scripts/check-bundle-parity.cjs` and `scripts/bundle-parity-allow.json`.
+- Modes, and the scripts and commands folders under `.claude`. Their content moved into skills, `hooks/lib` and repository scripts.
+- Task templates and the scaffolded `tasks/` folder. `mewkit task new` writes inline frontmatter and uses a template only if your project keeps one.
+- The CLI commands `context`, `explain-support` and `status`. `inventory` and `docs-manifest` moved to repository scripts outside the published package.
+- `mewkit visual-plan` and the `mk:visual-plan` skill, with `plan.html` export and the local studio. Use `mk:preview` for explainers, diagrams and diffs, or `mk:tech-graph` for standalone diagram files. `mk:plan-creator --html` is removed too.
+- `mewkit migrate`, `init --migrate`, `init --migrate-global` and the migrate-only flags, including the `.mcp.json` merge into Codex `config.toml` (`--include-mcp`).
+- The signed kit artifact engine: signatures, trusted keys, quarantine and the artifact cache.
+
+### Migration Notes
+
+- A project on the npm CLI: follow [Moving from the npm CLI](/migration/from-npx-mewkit).
+- A user config that still has `gate1PresenceOnly` is reported as invalid by `mewkit doctor`. Delete the line.
+- `mewkit upgrade` removes the registrations and files of the removed gate hooks.
+- Codex runs a new or changed hook only after you review it. After you upgrade, review the hooks once, or the ship check stays inactive.
+- On Cursor the kill switch is environment-only (`MEWKIT_CURSOR_HOOKS_KILL_SWITCH=1`). The flag file no longer disables anything, and the credential read guard ignores the switch.
+- A `.cursor/` or `.codex/` directory left by the old converter is not refreshed. `mewkit upgrade` prints a notice to run `mewkit init --target <tool>`.
+- Legacy `.claude/memory/` is not imported. Copy what you need into `.meowkit/memory/`.
+- Add MCP servers to `.codex/config.toml` by hand.
+- Autobuild on Opus 5.5 or Fable 5.2 runs LEAN: the contract is optional and there is at most one iteration round. Set `MEOWKIT_AUTOBUILD_MODE=FULL` to keep the previous scaffolding. Neither model has been replayed against the calibration set yet.
+- On Codex, an Enterprise or Edu admin must enable `gpt-6-luna` before agents pinned to it can run. `athena`, `brainstormer` and `explore` run in Codex's read-only sandbox.
 
 ## 2.15.0 (2026-07-27) — Strategic Supervision & the Portable Backend Surface
 

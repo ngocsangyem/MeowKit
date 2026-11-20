@@ -3,17 +3,17 @@ title: "CLI Reference"
 description: "The mewkit command line, grouped by what you are trying to do."
 ---
 
-MeowKit has one CLI: the native `mewkit` binary, with `mk` as a short alias. `mk doctor` and `mewkit doctor` run the same binary, and this reference writes the long form. [Installation](/installation#install-the-cli) shows how to get it. Run project commands from the project root.
+MeowKit has one CLI, the native `mewkit` binary, with `mk` as a short alias. `mk doctor` and `mewkit doctor` run the same binary; this reference uses the long form. [Installation](/installation#install-the-cli) shows how to get it. Run project commands from the project root.
 
 ## Find a command
 
 | You want to | Page |
 |---|---|
 | Install, upgrade, remove or check the kit; configure a project | [Project Setup](/cli/project-setup) |
-| Write a plan, create a task, see where a task stands, record a supervised run | [Planning and Tasks](/cli/planning) |
+| Create a task, check a plan, see where work stands, record a supervised run | [Planning and Tasks](/cli/planning) |
 | Review a pull request across several sittings | [Review](/cli/review) |
 | Lint the memory store | [Memory](/cli/knowledge) |
-| Install the kit for Codex or Cursor, or see what each tool supports | [Portability](/cli/portability) |
+| Install the kit for Codex, Cursor, Grok, Pi or OMP, or see what each tool supports | [Portability](/cli/portability) |
 | See what a session cost, check the context budget, read a trace | [Cost and Telemetry](/cli/telemetry) |
 
 ## Get started
@@ -35,27 +35,32 @@ mewkit task new --type feature "Add user authentication"
 
 ## Runtimes and scopes
 
-`init` installs the kit with one emitter per runtime, so each runtime gets files in its own format instead of a converted copy of `.claude/`.
+`init` writes each runtime's files in the format that runtime reads. The runtimes other than Claude Code are projected from `.claude/` plus a small overlay for their hooks and config.
 
 | Runtime | `--target` | Project install | `--global` install |
 | --- | --- | --- | --- |
 | Claude Code | `claude-code` | `.claude/` | `~/.claude/` (or `CLAUDE_CONFIG_DIR`) |
 | Codex | `codex` | `.codex/`, `.agents/skills/`, a block in `AGENTS.md` | `~/.codex/` (or `CODEX_HOME`), `~/.agents/skills/` |
 | Cursor | `cursor` | `.cursor/` | `~/.cursor/` |
+| Grok | `grok` | `.grok/`, `AGENTS.md` | not available |
+| Pi | `pi` | `.pi/`, `.agents/skills/`, `AGENTS.md` | not available |
+| OMP | `omp` | `.omp/`, `.agents/skills/`, `AGENTS.md` | not available |
 
-`--target` takes a comma-separated list or `all`. mewkit's own state (ownership indexes, lock, kit cache) lives in `.meowkit/` for a project and `~/.mewkit/state/` for a global install. Files you already had are merged, never replaced: hook files handler by handler, Markdown by a marked block, JSON and TOML by key. The ownership index for each runtime sits at `.meowkit/state/ownership/<runtime>.json` (`~/.mewkit/state/ownership/<runtime>.json` globally); `upgrade` and `uninstall` act only on what it records.
+`--target` takes a comma-separated list or `all`. Where a runtime's skills, agents and rules go depends on which runtimes are installed together, because some runtimes also read each other's folders. The [runtime surface table](https://github.com/ngocsangyem/MeowKit/blob/main/docs/maintainer/runtime-surface-table.md) lists the placement for each set. [Portability](/cli/portability) lists what each install writes.
+
+The CLI keeps its own state (ownership indexes, lock, kit cache) in `.meowkit/` for a project and in `~/.mewkit/state/` for a global install. Files you already had are merged, not replaced: hook files handler by handler, Markdown by a marked block, JSON and TOML by key. The ownership index for each runtime sits at `.meowkit/state/ownership/<runtime>.json` (`~/.mewkit/state/ownership/<runtime>.json` globally). `upgrade` and `uninstall` act only on what it records.
 
 ## How hooks reach `mewkit`
 
 For Claude Code at project scope, `init` writes a small launcher at `.meowkit/bin/mewkit` and commits it, with a `.claude/runtime.json` that points the hooks at it.
 
-- The launcher is a resolver, not a copy of the CLI. It runs the `mewkit` binary (or `mk`) when it is on `PATH`, in `MEWKIT_INSTALL_DIR` or in `~/.local/bin` and reports a compatible version. A project whose kit the retired npm CLI installed keeps running the copy in its own `node_modules` until you move it ([Moving from the npm CLI](/migration/from-npx-mewkit)).
-- The launcher never reaches the network. If no CLI is available it says so, names `mewkit doctor` and exits 127, rather than fetching mid-session.
-- Hooks do not depend on your shell: they execute the launcher through `.claude/runtime.json`, which is re-validated on every read and refuses any executable outside the project.
-- The SessionStart hook puts the launcher's directory first on `PATH`, so plain `mewkit …` works in the agent's shell. That directory contains only `mewkit`, so nothing else on your `PATH` changes. On Windows PowerShell the bare form is unavailable and the hook prints the `mewkit doctor` hint instead.
+- The launcher resolves the CLI and runs it. It runs the `mewkit` binary (or `mk`) when one is on `PATH`, in `MEWKIT_INSTALL_DIR` or in `~/.local/bin` and reports a compatible version. A project whose kit the retired npm CLI installed keeps running the copy in its own `node_modules` until you move it ([Moving from the npm CLI](/migration/from-npx-mewkit)).
+- The launcher makes no network request. When no CLI is available it says so, names `mewkit doctor` and exits 127.
+- Hooks do not depend on your shell. They run the launcher through `.claude/runtime.json`, which is re-validated on every read and refuses any executable outside the project.
+- The SessionStart hook puts the launcher's directory first on `PATH`, so plain `mewkit` commands work in the agent's shell. That directory contains only `mewkit`, so nothing else on your `PATH` changes. On Windows PowerShell the bare form is unavailable and the hook prints the `mewkit doctor` hint instead.
 - A teammate who clones the repository gets the launcher with it. They still need the binary on their machine.
 
-The binary itself needs no Node.js. The kit's hooks are Node scripts and need **Node.js 24+**; `mewkit doctor` fails below it and names the version it found.
+The binary needs no Node.js. The kit's hooks are Node scripts and need Node.js 24 or later; `mewkit doctor` fails below it and names the version it found.
 
 ## Exit codes and help
 
@@ -68,11 +73,11 @@ The binary itself needs no Node.js. The kit's hooks are Node scripts and need **
 | `6` | `init`, `upgrade` or `uninstall` kept files you edited; `--force` replaces or removes them |
 | `127` | The committed launcher found no CLI to run |
 
-A code `2` names what was wrong and what you could have typed. `mewkit <command> <subcommand> --help` prints that subcommand's own usage and runs nothing at all; `mewkit <command> --help` does the same for the command.
+A code `2` names what was wrong and what you could have typed. `mewkit <command> --help` and `mewkit <command> <subcommand> --help` print usage and run nothing.
 
 ## Every flag
 
-The tables below are generated from the binary's own `--help`, so they cannot drift from what the CLI accepts. The family pages above carry the worked examples and the failure recovery; this is the lookup.
+The tables below are generated from the binary's own `--help`. The family pages above carry the worked examples and failure recovery.
 
 {/* GENERATED:cli-flags START */}
 
@@ -157,7 +162,7 @@ Subcommands: `provenance`.
 | `--providers` | Also report what each provider adapter can enforce |
 | `--state` | Also report the state taxonomy |
 | `--explain` | `provenance`: name the files behind each count |
-| `--hard-gates` | Live-probe the hard gates (plan, privacy, injection, ship) in a scratch project |
+| `--hard-gates` | Live-probe the hard guards (privacy, injection, ship) in a scratch project |
 | `--adopt` | Rebuild the npm CLI's ownership baseline from the local kit cache, or refuse |
 | `--target` `<TARGETS>` | Only these runtimes (comma-separated); default: all |
 | `--global` | Check your home directory's installs first instead of this project's |

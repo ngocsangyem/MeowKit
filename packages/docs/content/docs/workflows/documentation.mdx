@@ -1,60 +1,60 @@
 ---
 title: "Documentation"
-description: "Generate and maintain project documentation with diff-aware syncing and changelog generation."
+description: "Update project docs after a release, create a first docs set, and generate llms.txt."
 ---
 
-> Keep project docs accurate and current with automated diff-aware syncing.
+This playbook keeps project documentation in step with the code.
 
-**Best for:** Post-feature updates, new project setup, changelog generation  
-**Time estimate:** 10-20 minutes  
-**Skills used:** [mk:document-release](/reference/skills/document-release), [mk:llms](/reference/skills/llms)  
+**Best for:** Post-feature updates, new project setup, changelog polish
+**Time estimate:** 10 to 20 minutes
+**Skills used:** [mk:document-release](/reference/skills/document-release), [mk:docs-init](/reference/skills/docs-init), [mk:llms](/reference/skills/llms)
 **Agents involved:** documenter
 
 ## Overview
 
-MeowKit's **documenter** agent keeps project docs in sync with the codebase. It owns `docs/` (except `docs/architecture/` and `docs/journal/`) and uses two key skills: `mk:document-release` for diff-aware updates after shipping, and `mk:llms` for generating AI-discoverable documentation indexes.
+The **documenter** agent owns `docs/`, except `docs/architecture/` (the architect's) and `docs/journal/` (the journal-writer's). It uses `mk:document-release` for updates after shipping, `mk:docs-init` for a first docs set and `mk:llms` for an `llms.txt` index.
 
 ## After shipping a feature
 
-Documentation syncs automatically as Step 8.5 of `/mk:ship`. The [mk:document-release](/reference/skills/document-release) skill:
-
-1. Reads the git diff since the last release
-2. Cross-references against all project docs (README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, TODOS)
-3. Updates sections affected by the changes
-4. Polishes CHANGELOG voice and categorization (Added/Changed/Fixed/Removed)
-5. Cleans up completed TODOS
-
-If you need to trigger it manually:
+After a PR is created, `mk:ship` reports whether the diff seems to affect documentation and offers `/mk:document-release`. It does not run it by itself. To run it:
 
 ```bash
-/mk:document-release          # diff-aware update based on recent changes
+/mk:document-release
 ```
+
+[mk:document-release](/reference/skills/document-release):
+
+1. Reads the diff and changelog for what shipped.
+2. Cross-references README, architecture, contributing and agent docs.
+3. Applies clear factual updates directly and asks before narrative changes.
+4. Polishes the CHANGELOG voice (imperative mood), without overwriting entries.
+5. Cleans up TODOS: marks completed items and captures deferred work.
 
 ## Starting a new project
 
 ```bash
-/mk:docs-init          # scans codebase, generates doc skeleton
+/mk:docs-init
 ```
 
-The **documenter** creates initial versions of: README, API reference, architecture overview, and contributing guide.
+[mk:docs-init](/reference/skills/docs-init) scans the codebase and generates the first docs set from what it finds, such as `README.md` and `docs/architecture/system-architecture.md`. A small project gets a README and a codebase summary only.
 
 ## Generating llms.txt
 
 ```bash
-/mk:llms --source ./docs --base-url https://docs.example.com
+/mk:llms ./docs --url https://docs.example.com
 ```
 
-The [mk:llms](/reference/skills/llms) skill generates `llms.txt` (AI-discoverable documentation index following the [llmstxt.org](https://llmstxt.org) spec). A Python script handles scanning, title extraction, and categorization — Claude only reviews the output.
+[mk:llms](/reference/skills/llms) generates `llms.txt`, an index for AI tools that follows [llmstxt.org](https://llmstxt.org). `--full` also writes `llms-full.txt` with inline content, and `--output` sets the location. A Python script does the scanning, title extraction and categorizing, and Claude reviews the output.
 
-## What the documenter agent does and doesn't do
+## What the documenter does
 
-| Does | Doesn't |
-|------|---------|
-| Updates docs/ when code changes | Write in docs/architecture/ (architect owns that) |
-| Generates changelogs from conventional commits | Write in docs/journal/ (journal-writer owns that) |
-| Flags documentation gaps | Modify source code or tests |
-| Verifies docs match implementation | Generate placeholder content |
+| Does | Does not |
+|---|---|
+| Update `docs/` when code changes | Write in `docs/architecture/` (the architect owns it) |
+| Generate changelogs from conventional commits | Write in `docs/journal/` (the journal-writer owns it) |
+| Flag documentation gaps | Change source code or tests |
+| Check docs against the implementation | Generate placeholder content |
 
-## Next workflow
+## Next
 
-→ [Sprint Retrospective](/workflows/retrospective) — analyze what was shipped
+[Sprint Retrospective](/workflows/retrospective) covers analysing what shipped.

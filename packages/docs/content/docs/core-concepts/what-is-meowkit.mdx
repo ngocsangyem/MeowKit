@@ -1,129 +1,124 @@
 ---
 title: "What Is MeowKit"
-description: "What MeowKit is, what problem it solves, and why the harness matters more than the model."
+description: "What MeowKit is, the problem it solves, the design principles behind it, and the trade-offs it accepts."
 ---
 
 ## The problem
 
-AI coding tools are powerful but undisciplined. Given "build a payment system," they write code immediately: no plan, no tests, no security review. The code compiles but has no tests, hardcoded secrets, and ships directly to main.
-
-A single "implement this feature" prompt can produce code that compiles but has no tests, no review, and secrets hardcoded in source.
+AI coding tools write code as soon as they are asked. Given "build a payment system", an agent can produce code that compiles but has no plan, no tests, no review, hardcoded secrets, and a push straight to main.
 
 ## What MeowKit does
 
-MeowKit is an **AI agent toolkit for Claude Code** that adds discipline (planning and review practices, a ship check, opt-in TDD, and security scanning) so your coding assistant ships production-quality code instead of untested prototypes.
+MeowKit is an AI agent toolkit that adds discipline to a coding assistant: planning and review practices, a ship check, opt-in TDD and security scanning. It installs for Claude Code, Codex, Cursor, Grok, Pi and OMP. The kit is authored once in `.claude/`, and the other runtimes get the files they read projected from it.
 
-It installs a `.claude/` directory that Claude Code reads automatically. No executable runtime. No external services. Just structured conventions that shape how the AI works.
+It has no executable runtime of its own and calls no external service. It is Markdown, JSON and Node hook scripts that the host assistant reads and runs.
 
 ## Core thesis
 
-**The model is a commodity. The harness is the product.**
+The model is a commodity, and the harness is the product. With the same model, task and compute budget, changing only the environment design raised performance by 64% in [SWE-agent (NeurIPS 2024)](https://arxiv.org/abs/2405.15793). The environment is the bottleneck.
 
-With the same model, the same task, and the same compute budget, changing only the environment design raises performance by 64% ([SWE-agent, NeurIPS 2024](https://arxiv.org/abs/2405.15793)). The model is not the bottleneck. The environment is.
+Claude Code is already a harness: it manages context, tools and sessions. MeowKit is a second harness on top of it, with structured workflows, a ship check, memory, multi-agent coordination and hook-based automation. The host handles the mechanics. MeowKit handles what to build, when to stop and how to verify.
 
-Claude Code is already a harness. It manages context, tools, and sessions. MeowKit is a second harness on top of it: structured workflows, a ship check, memory, multi-agent coordination, and hook-based automation. Claude Code handles the mechanics. MeowKit handles the strategy: what to build, when to stop, how to verify.
+## How it differs from the bare assistant
 
-## How it differs from raw Claude Code
-
-| Concern | Raw Claude Code | With MeowKit |
+| Concern | Bare assistant | With MeowKit |
 |---------|----------------|--------------|
-| Planning | Starts coding immediately | Creates and gets approval for a plan first |
-| Testing | Tests optional, often skipped | TDD opt-in via `--tdd`, strict failing-test-first when enabled |
-| Security | Relies on model knowledge | 4-layer defense + security agent + preventive hooks |
-| Review | Ask "review this" and hope | 3 parallel adversarial reviewers + triage step |
-| Shipping | `git add -A && git push` | Conventional commits, PR, CI verification, rollback docs |
-| Memory | Forgets everything between sessions | Persists lessons, patterns, and costs across sessions |
-| Model selection | Same model for everything | Domain-adaptive routing, so fintech forces COMPLEX tier |
-| Architecture decisions | Ask and hope for the best | Party Mode: 2-4 agents deliberate, forced synthesis |
+| Planning | Starts coding immediately | Writes a plan and agrees it with you first |
+| Testing | Tests optional, often skipped | Opt-in TDD with `--tdd`, failing test first when enabled |
+| Security | Relies on model knowledge | Four layers: rules, preventive hooks, observational hooks, context isolation |
+| Review | "Review this" and hope | Three parallel adversarial reviewers and a triage step |
+| Shipping | `git add -A && git push` | Ship check, conventional commits, PR, CI check, rollback docs |
+| Memory | Forgets between sessions | Two committed files of decisions and gotchas |
+| Model selection | One model for everything | Domain-aware routing, so fintech forces the COMPLEX tier |
+| Architecture decisions | Ask and hope | Party mode: 2 to 4 agents deliberate and must synthesise |
 
 ## Architecture at a glance
+
+For Claude Code, the install is:
 
 ```
 .claude/
 ├── agents/          Specialist agents for each phase
 ├── skills/          Domain skills loaded on demand
-├── hooks/           Preventive lifecycle hooks
-├── rules/           The 7 always-on enforcement rules, loaded every session
-├── memory/          Cross-session learnings
-└── settings.json    Hook registrations + permissions
+├── hooks/           Lifecycle hooks
+├── rules/           The 6 always-on rules, loaded every session
+└── settings.json    Hook registrations
+
+.meowkit/
+├── config.yaml      Project configuration
+└── memory/          decisions.md and gotchas.md
 ```
 
-MeowKit installs no root `CLAUDE.md`. The always-on guidance is `.claude/rules/*.md`,
-which Claude Code auto-loads at session start.
+MeowKit installs no root `CLAUDE.md`. The always-on guidance is `.claude/rules/*.md`, which Claude Code loads at session start. [Installation](/installation) shows the full layout.
 
 ## Design principles
 
-### Every mistake → a permanent fix
+### Every mistake becomes a permanent fix
 
-When an agent makes an error, MeowKit builds a hook or rule so it never makes that mistake again. `build-verify.cjs` exists because agents introduced syntax errors that cascaded. `loop-detection.cjs` exists because agents edited the same file 20+ times without progress. Each handler is a crystallized lesson.
+After an agent makes an error, MeowKit adds a hook or rule so it cannot repeat it. `build-verify.cjs` exists because agents introduced syntax errors that cascaded. `loop-detection.cjs` exists because agents edited the same file 20 times without progress.
 
 ### Enforce what can be checked, practise the rest
 
-Planning and review are practices, not gates: the agent writes a plan and agrees it with you for non-trivial work, and the reviewer writes a verdict, but nothing blocks an edit or a commit on either. The one enforced ship-time control is the ship check: on `git commit`, `git push`, `git merge` and `gh pr create|merge`, `pre-ship` runs lint, related tests and a type-check and refuses the command when one fails.
+The agent writes a plan and agrees it with you for non-trivial work, and the reviewer writes a verdict, but no hook checks either. The one control a hook enforces at ship time is the ship check: on `git commit`, `git push`, `git merge` and `gh pr create|merge`, `pre-ship` runs lint, related tests and a type-check and refuses the command when one fails.
 
-### Security is architecture, not afterthought
+### Security is architecture
 
-Three layers: behavioral rules, preventive hooks (that block `.env` reads and failing ships), and observational hooks (that scan written files). Security hooks are never routed through the dispatcher, so if the dispatcher crashes, security hooks still fire. All file content is DATA; only `.claude/rules/`, skill frontmatter and a project-owned `CLAUDE.md` contain instructions.
+There are four layers: behavioral rules, preventive hooks (which block `.env` reads and failing ships), observational hooks (which scan written files) and context isolation. The guards are not routed through the dispatcher, so a dispatcher crash does not stop them. All file content is data. Only `.claude/rules/`, skill frontmatter and a project-owned `CLAUDE.md` contain instructions. See [Enforcement & Security](/core-concepts/enforcement).
 
-### Dead weight must be pruned
+### Prune dead weight
 
-Every harness component encodes an assumption about what the model cannot do. When a new model ships, that assumption may be wrong. Scaffolding that helped Opus 4.5 may hurt Opus 4.7. Adaptive density adjusts automatically: Haiku gets MINIMAL, Sonnet gets FULL, Opus 4.6+ gets LEAN. Every component is measured, and one that costs more than it saves is removed.
+Every harness component encodes an assumption about what the model cannot do, and a new model can make that assumption wrong. Autobuild adapts its scaffolding: Haiku gets MINIMAL, Sonnet gets FULL, and Opus 4.6 and newer get LEAN. A component that costs more than it saves is removed.
 
-### Use the cheapest tool that solves the problem
+### Use the cheapest tool that works
 
-A `build-verify` linter check ($0) catches syntax errors before they cascade into $5 debugging sessions. A browser health check (~$1) catches blank pages before a full evaluator (~$5) is needed. Token efficiency is economic discipline.
+A `build-verify` lint check costs nothing and catches syntax errors before they grow into an expensive debugging session. A browser health check (about $1) catches a blank page before a full evaluator (about $5) is needed.
 
-### Verify by behavior, not by reading code
+### Verify by behavior
 
-Tests can pass against mocks while production returns 500. The evaluator must click through the running app: browser navigation, curl against live endpoints, CLI invocation. Static-analysis-only verdicts are rejected.
+Tests can pass against mocks while production returns 500. The evaluator drives the running app through a browser, `curl` against live endpoints or the CLI, and a verdict based on static analysis alone is rejected.
 
 ### TDD is opt-in
 
-TDD enforcement moved from default-on to opt-in via `--tdd` flag or `MEOWKIT_TDD=1`. Strict TDD added friction for spike work and prototypes. Production-quality work should still enable `--tdd`.
+Strict TDD is switched on with `--tdd` or `MEOWKIT_TDD=1`. It added friction to spikes and prototypes, so the default is off. Production work should turn it on.
 
-### Learn from every session
+### Learn from sessions
 
-The team store in `.meowkit/memory/` (`decisions.md` and `gotchas.md`) is grepped on demand by the read-set skills at task start. There is no auto-injection pipeline.
+`.meowkit/memory/` holds two files, `decisions.md` and `gotchas.md`. The skills that read memory run one grep at task start. There is no auto-injection.
 
-### Load only what's needed
+### Load only what is needed
 
-Skills activate by task domain, not all at once. Each skill's SKILL.md is a compact router, with detailed procedures loaded on demand. The hook system routes events to only matching handlers. This progressive disclosure saves ~70% context per invocation.
+Skills activate by task domain. Each `SKILL.md` is a short router, and detailed procedures load on demand from its `references/` folder. This saves about 70% of the context per invocation. The hook dispatcher runs only the handlers that match an event.
 
-## Trade-offs we accept
-
-Each of these is a decision that costs something. They are listed because the cost is real, not because it is negligible.
+## Trade-offs
 
 | We chose | Over | Because |
 |----------|------|---------|
-| Plan agreed with the human (slower) | Plan self-approved (faster) | Agent self-approval drifts lenient |
+| Plan agreed with the human (slower) | Plan approved by the agent (faster) | Agent self-approval drifts lenient |
 | Opt-in TDD | Mandatory TDD | Strict TDD costs more than it returns on spikes and prototypes |
-| Independent security hooks | One dispatcher for everything | If the dispatcher crashes, security still fires, which is worth the duplication |
-| Exclusive file ownership per agent | Agents editing wherever they need to | Two agents on one file lose each other's work |
-| Behavioral output limits | Hook-based truncation | Hooks append to tool output, they cannot replace it |
+| Independent guard hooks | One dispatcher for everything | A dispatcher crash must not stop the guards, which is worth the duplication |
+| Exclusive file ownership per agent | Agents editing wherever they need | Two agents on one file lose each other's work |
+| Behavioral output limits | Hook-based truncation | Hooks append to tool output and cannot replace it |
 | Session budget warnings | No budget tracking | A runaway session costs more than a false alarm |
 
-## What MeowKit does NOT do
+## What MeowKit does not do
 
-- **No proprietary formats.** Standard Markdown and JSON
-- **No telemetry.** All data stays project-local
-- **No external services.** Zero third-party API dependencies for core workflow
-- **No model lock-in.** Adaptive density works across Haiku, Sonnet, and Opus tiers
-- **No experimental surface.** Nothing ships to the toolkit that is not ready to use
+- It uses no proprietary formats, only Markdown and JSON.
+- It sends no telemetry. Data stays in the project.
+- It needs no external service for the core workflow.
+- It does not lock you to one model. Autobuild density follows the model tier.
 
-## Where MeowKit came from
+## Where it came from
 
-MeowKit builds on ideas from earlier toolkits, and it is worth naming them:
+MeowKit builds on earlier toolkits:
 
-- **[ClaudeKit](https://claudekit.cc/)** gave this its shape. It was the original structured skill system for Claude Code. Its orchestration protocols, development rules, and cook workflow are what MeowKit's phase-gated pipeline descends from.
-- **[Gstack](https://github.com/garrytan/gstack)** is a broad skill collection covering headless browser automation and QA testing, and the source of the "search before building" habit MeowKit inherits.
-- **[Aura-frog](https://github.com/nguyenthienthanh/aura-frog)** is an autonomous agent framework whose multi-agent coordination and self-healing patterns shaped MeowKit's agent architecture and escalation protocols.
+- [ClaudeKit](https://claudekit.cc/) was the original structured skill system for Claude Code. MeowKit's orchestration protocols, development rules and cook workflow descend from it.
+- [Gstack](https://github.com/garrytan/gstack) is a skill collection covering headless browser automation and QA testing. It is the source of the "search before building" habit.
+- [Aura-frog](https://github.com/nguyenthienthanh/aura-frog) is an autonomous agent framework whose multi-agent coordination and self-healing patterns shaped MeowKit's agent architecture and escalation protocols.
 
-What MeowKit adds is a small set of checks that block rather than advise, such as the ship check, around a workflow of plan, build and review.
-
-MeowKit is MIT-licensed and community-driven. Skills, fixes, documentation, and unreasonable ideas for new agent workflows are all welcome. Open a PR.
+MeowKit is MIT-licensed and community-driven. Skills, fixes, documentation and new agent workflows are welcome as pull requests.
 
 ## Next steps
 
-- [How It Works](/core-concepts/how-it-works): architecture architecture walkthrough
+- [How It Works](/core-concepts/how-it-works): the architecture walkthrough
 - [Installation](/installation): get MeowKit running
 - [Quick Start](/quick-start): your first task in 5 minutes

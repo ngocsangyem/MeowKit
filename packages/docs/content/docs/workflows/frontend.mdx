@@ -1,67 +1,70 @@
 ---
 title: "Frontend Development"
-description: "Build frontend features with Vue 3, TypeScript, and UI/UX design standards."
+description: "Build frontend features with the Vue, TypeScript and UI/UX skills."
 ---
 
-> Vue 3 Composition API, strict TypeScript, and production-grade design — all enforced automatically.
+Three skills carry the frontend conventions, and each activates on the files or task it covers.
 
-**Best for:** UI features, component development, styling  
-**Time estimate:** 15-60 minutes  
-**Skills used:** [mk:vue](/reference/skills/vue), [mk:typescript](/reference/skills/typescript), [mk:frontend-design](/reference/skills/frontend-design)  
+**Best for:** UI features, component development, styling
+**Time estimate:** 15 to 60 minutes
+**Skills used:** [mk:vue](/reference/skills/vue), [mk:typescript](/reference/skills/typescript), [mk:frontend-design](/reference/skills/frontend-design)
 **Agents involved:** developer, tester, reviewer
 
-## Overview
+## Which skill activates
 
-MeowKit has three specialized frontend skills that auto-activate based on file types:
-- **mk:vue** — activates on `.vue` files → enforces Composition API, Pinia, `<script setup>`
-- **mk:typescript** — activates on `.ts`/`.tsx` files → enforces strict null checks, type guards
-- **mk:frontend-design** — activates on design/styling tasks → enforces anti-AI-slop checklist
+| Skill | Activates on | Covers |
+|---|---|---|
+| `mk:vue` | `.vue` files, Composition API, Pinia | `<script setup lang="ts">`, Pinia, routing, forms |
+| `mk:typescript` | `.ts`, `.tsx`, `.js`, `.jsx` files and type errors | Strict null handling, type guards, type-safety fixes |
+| `mk:frontend-design` | Design and styling tasks | Typography, color, layout, accessibility, the anti-slop checklist |
 
-## Building a Vue component
+The skills apply these as defaults. Where the repository already has a convention, that one wins.
 
-When you create or modify a `.vue` file, [mk:vue](/reference/skills/vue) enforces:
+## Vue components
 
-| Rule | Enforcement |
-|------|------------|
-| `<script setup lang="ts">` always | Options API (`data()`, `methods:`) blocked |
-| `definePropsT()` with TypeScript interfaces | Runtime validation objects blocked |
-| `storeToRefs()` for Pinia destructuring | Direct store state destructuring blocked |
-| No `v-html` with user content | XSS vector (MeowKit security rule) |
-| `ref()` for primitives | `reactive()` only for complex objects |
-| PascalCase components, kebab-case files | MeowKit `agent-conduct.md` B1 enforced |
+With `mk:vue`, the defaults are:
 
-## TypeScript patterns
+| Default | Detail |
+|---|---|
+| `<script setup lang="ts">` only | No Options API and no `defineComponent()` wrapper |
+| `type` over `interface` | For object and prop shapes |
+| `ref()` for primitives | `reactive()` only for complex objects, `computed()` for derived state |
+| `storeToRefs()` | Required when destructuring Pinia state; methods are destructured directly |
+| No `v-html` with user content | It is an XSS vector, and `security-rules.md` blocks it |
+| PascalCase components, kebab-case files | `UserProfile` in `user-profile.vue`; composables are `useX` |
+| Named exports | Composables use `export default` |
+| Tailwind classes | No manual CSS and no hard-coded colors |
 
-When editing `.ts` files, [mk:typescript](/reference/skills/typescript) enforces:
+## TypeScript
+
+With `mk:typescript`:
 
 | Rule | Example |
-|------|---------|
-| No `any` type | Use `unknown` + type guards |
-| No implicit truthiness | `if (user !== null)` not `if (user)` |
-| `import type` for type-only | `import type { User } from './types'` |
-| Named exports over default | `export const X` not `export default` |
-| Discriminated unions for results | `{ ok: true; data: T } \| { ok: false; error: string }` |
+|---|---|
+| No `any` | Use `unknown` with type guards |
+| No type assertions | Narrow with a guard instead of `as` |
+| No implicit truthiness for null checks | `user !== null`, not `if (user)` |
+| Type-only imports | `import type { User } from './types'` |
+| Named exports over default | `export const X` |
+| Discriminated unions | `{ ok: true; data: T } \| { ok: false; error: string }` |
 
 ## Design quality
 
-Before delivering any UI, [mk:frontend-design](/reference/skills/frontend-design) runs the **anti-AI-slop checklist**:
+Before delivering UI, `mk:frontend-design` runs its anti-slop checklist. Examples from it:
 
-| Check | Fail condition | Fix |
-|-------|---------------|-----|
-| Typography | All text same size | Add hierarchy: display → heading → body → caption |
-| Color | Pure #000 on #fff | Soften: #111827 on #fafafa |
-| Layout | Centered everything | Intentional asymmetry, whitespace variation |
-| Spacing | Same padding everywhere | Use 4px-base scale consistently |
-| Accessibility | Contrast \< 4.5:1 | Adjust colors to meet WCAG AA |
+| Check | Fails when | Do instead |
+|---|---|---|
+| Typography | All text has one size and weight | Set a hierarchy: display, heading, body, caption |
+| Color | Unrelated colors, or contrast that was never checked | One primary, one accent and neutrals, with readable contrast |
+| Layout | Everything centered, equal card grids | Asymmetry and varied whitespace |
+| Spacing | Default padding everywhere | A consistent scale on a 4px base |
+| Content | Lorem ipsum or "John Doe" in the final output | Realistic content |
+| Accessibility | Contrast below 4.5:1 | Meet WCAG 2.1 AA |
 
-## The review dimension
+## Review
 
-The **reviewer** agent checks a **performance** dimension specific to frontend:
-- No unnecessary re-renders
-- No unbounded data fetches
-- No blocking in async
-- Components lazy-loaded where appropriate
+The **reviewer** agent's performance dimension covers frontend concerns: unnecessary re-renders, unbounded data fetches and blocking calls in async code.
 
-## Next workflow
+## Next
 
-→ [Researching Libraries](/workflows/research) — evaluate tech options before building
+[Researching Libraries](/workflows/research) covers evaluating options before you build.

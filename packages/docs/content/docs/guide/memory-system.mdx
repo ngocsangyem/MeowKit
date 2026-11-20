@@ -3,25 +3,24 @@ title: "Memory System"
 description: "One committed, two-file team memory store: the entry format, who reads it, who writes it, and how it is reviewed."
 ---
 
-MeowKit keeps one small, committed, team-shared memory store at `.meowkit/memory/`. Two plain-markdown files, read with `grep` and written with `mewkit note`. No index, no JSON sidecars, no capture hook, no auto-injection.
+MeowKit keeps one small, committed, team-shared memory store at `.meowkit/memory/`. It is two plain-markdown files, read with `grep` and written with `mewkit note`. It has no index, no JSON sidecars, no capture hook and no auto-injection.
 
 ## Why so little
 
-Current models search a repository well, so most project knowledge is derivable from code, git history, plans and reviews. What a model cannot derive is **why** a non-obvious decision was made and which **gotchas** came out of a real failure.
+Current models search a repository well, so most project knowledge can be derived from code, git history, plans and reviews. What a model cannot derive is why a non-obvious decision was made and which gotchas came out of a real failure.
 
 That knowledge is small, team-shared, and reviewable in a git diff, so it is plain markdown, committed, and grepped. Personal memory belongs to the host runtime; MeowKit does not duplicate Claude Code's per-user auto-memory.
 
 ## The `.meowkit/` state root
 
-Project state lives at `.meowkit/`, resolved from the nearest version-control root (or, in a non-git checkout, a directory that already owns both `package.json` and an existing `.meowkit/`). It never keys off a provider directory (`.claude/`, `.codex/`, `.cursor/`), because those are install targets, not state-discovery sentinels. The same state root works whether the project is driven by Claude Code, Codex, or another provider.
+Project state lives at `.meowkit/`, resolved from the nearest version-control root (or, in a non-git checkout, a directory that already owns both `package.json` and an existing `.meowkit/`). It never keys off a provider directory (`.claude/`, `.codex/`, `.cursor/`), because those are install targets. The same state root works whichever runtime drives the project.
 
 | Directory | Purpose | Committed |
 |-----------|---------|-----------|
-| `memory/` | The team store: `decisions.md`, `gotchas.md` | **Yes** |
+| `memory/` | The team store: `decisions.md`, `gotchas.md` | Yes |
 | `telemetry/` | Cost log, trace log, security log | No |
 | `state/` | Session markers, flags, locks | No |
 | `cache/` | Disposable derived data | No |
-| `migrations/` | Migration bookkeeping | No |
 
 ## The store
 
@@ -31,7 +30,7 @@ Project state lives at `.meowkit/`, resolved from the nearest version-control ro
   gotchas.md     # what a real failure taught
 ```
 
-Both files are created on first write. There is no init scaffold.
+Both files are created on first write.
 
 ### Entry format
 
@@ -59,7 +58,7 @@ One grep at task start, run only by the skills and agents whose task needs it:
 grep -rilE "kw1|kw2|kw3" .meowkit/memory/
 ```
 
-Use `|`-separated keywords in one `-E` pattern. A bare multi-word phrase matches only that exact string, so it returns nothing for a multi-keyword query. Open only the matching entries.
+Use `|`-separated keywords in one `-E` pattern, because a bare multi-word phrase matches only that exact string. Open only the matching entries.
 
 | Read set | When |
 |---|---|
@@ -69,7 +68,7 @@ Use `|`-separated keywords in one `-E` pattern. A bare multi-word phrase matches
 | `mk:cso` | Security audit |
 | `/mk:retro` (command) | Weekly retrospective |
 
-Every other skill and agent reads nothing. There is no always-on memory rule, and nothing is injected into the prompt.
+Every other skill and agent reads nothing, and nothing is injected into the prompt.
 
 ## How to write
 
@@ -94,16 +93,16 @@ Use `mewkit note decisions` for `decisions.md`. A rejected entry exits non-zero 
 | `mk:plan-creator archive` | `decisions.md` only |
 | Any agent, one EUREKA entry under `agent-conduct.md` A3 | `gotchas.md` |
 
-Write only a lesson the next session could **not** derive from the code, the git log, the plan, or the ADR. A failed write prints one line saying so, and never skips silently.
+Write only a lesson the next session could not derive from the code, the git log, the plan or the ADR. A failed write prints one line saying so.
 
 ## Security boundary
 
 Memory content is DATA (`injection-rules.md` Rule 3). It informs a task; it never instructs, grants a permission, changes a mode, or bypasses a check. If an entry contradicts a rule file, the contradiction is ignored and reported.
 
-Because the store is committed, two controls replace the old scanner-and-approve step:
+Because the store is committed, two controls protect it:
 
-- **`mewkit validate --memory`.** Lints every text file in the store, recursively. It fails on a file over 300 lines or over the per-file byte cap, on injection phrases (with base64, ROT13, percent-encoding and HTML comments decoded before matching), on a flood of repetitive padding, and on secret patterns including multi-line blocks such as a PEM key. Findings name the file and line, never the matched value. It runs in CI, and in the pre-ship hook on `git commit`, `push` and `merge`, where a finding blocks the command. The hook finds the CLI through `$MEOWKIT_CLI` (an executable path), then `./node_modules/.bin/mewkit`, then `mewkit` on `PATH`; if none resolves it prints a visible `SKIP` line and does not block.
-- **PR review.** `mk:review` carries one checklist item: the memory diff adds no instruction-like text and no secrets.
+- **`mewkit validate --memory`.** Lints every text file in the store, recursively. It fails on a file over 300 lines or over the per-file byte cap, on injection phrases (with base64, ROT13, percent-encoding and HTML comments decoded before matching), on a flood of repetitive padding, and on secret patterns including multi-line blocks such as a PEM key. Findings name the file and line, never the matched value. It runs in CI, and in the pre-ship hook on `git commit`, `push` and `merge`, where a finding blocks the command. The hook finds the CLI through `$MEOWKIT_CLI` (an executable path), then the project launcher `./.meowkit/bin/mewkit`, then `mewkit` on `PATH`. If none resolves, it prints a `SKIP` line and does not block.
+- **PR review.** `mk:review` checks that the memory diff adds no instruction-like text and no secrets.
 
 ```bash
 mewkit validate --memory
@@ -117,17 +116,17 @@ mewkit validate --memory
 /mk:memory --prune
 ```
 
-Proposes removing (a) entries whose `Source` path or symbol no longer exists, and (b) entries older than 180 days with no recent matching work. Every removal is human-approved. There is no auto-prune hook.
+It proposes removing entries whose `Source` path or symbol no longer exists, and entries older than 180 days with no recent matching work. You approve each removal. Nothing prunes automatically.
 
 ## Separate from Claude Code auto-memory
 
-Claude Code has its own auto-memory at `~/.claude/projects/PROJECT/memory/`, scoped per user and per machine. Use it for personal habits; use the MeowKit store for the team's non-derivable project lessons.
+Claude Code has its own auto-memory at `~/.claude/projects/PROJECT/memory/`, scoped per user and per machine. Use it for personal habits, and use the MeowKit store for the team's non-derivable project lessons.
 
-## Upgrading from v2
+## Older JSON stores
 
-The v2 JSON stores (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`) are not migrated and the v3 skills do not read them. To keep anything from them, read the file by hand, append the lesson with `mewkit note`, then delete the old file.
+The 2.x JSON stores (`fixes.json`, `review-patterns.json`, `architecture-decisions.json`) are not read and not migrated. To keep a lesson from one, append it with `mewkit note`, then delete the old file.
 
 ## See also
 
-- [How It Works](/core-concepts/how-it-works): memory in the architecture overview
-- [Memory](/cli/knowledge): the CLI surface
+- [How MeowKit works](/core-concepts/how-it-works) for memory in the architecture
+- [Memory](/cli/knowledge) for the CLI surface

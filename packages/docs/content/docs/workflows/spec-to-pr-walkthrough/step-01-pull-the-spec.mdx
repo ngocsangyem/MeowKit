@@ -1,6 +1,6 @@
 ---
-title: "Step 1 — Pull the spec out of Confluence"
-description: "mk:confluence-spec-analyst forks an agent, reads the Confluence page and its children, and writes a Spec Research Report locally — never back to Confluence."
+title: "Step 1: Pull the spec out of Confluence"
+description: "mk:confluence-spec-analyst forks an agent, reads the Confluence page and its children, and writes a Spec Research Report to the local repository. It never writes to Confluence."
 ---
 
 ## Prompt
@@ -9,7 +9,7 @@ description: "mk:confluence-spec-analyst forks an agent, reads the Confluence pa
 /mk:confluence-spec-analyst analyze 12345 --include-children 1
 ```
 
-Or, conversationally:
+Or in plain language:
 
 ```
 Analyze the spec at https://acme.atlassian.net/wiki/spaces/ENG/pages/12345
@@ -17,73 +17,40 @@ Pull child pages 1 level deep. I want requirements, acceptance criteria,
 and any gaps or ambiguities flagged.
 ```
 
-## What happens behind the scenes
+Options: `--no-images` skips image analysis, and `--with-commands` appends suggested `mk:jira-issue create` commands to the report. Without `--with-commands` the report holds suggestions only.
 
-| Layer               | Action                                                                                                                                                                                  |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Router              | `mk:confluence` recognizes "spec analysis" intent → forwards to `confluence-spec-analyst` leaf                                                                                          |
-| Skill frontmatter   | `agent: confluence-spec-analyst` + `context: fork` — spawns the agent in a fresh context window                                                                                         |
-| CLI wrapper         | `confluence-as get-page 12345 --include-children 1` runs via the venv-installed binary                                                                                                  |
-| Multimodal sub-call | If the page embeds images/PDFs, `mk:multimodal` is invoked to describe each one and feed findings back into the report. Absent → `[NO_MULTIMODAL]` flag, analysis continues without it. |
-| Children cap        | Hard ceiling of 10 children. Default depth 1. Both require explicit raise.                                                                                                              |
-| Output              | Spec Research Report written locally (NOT to Confluence)                                                                                                                                |
+## What happens
 
-<Callout title="Why context: fork" type="info">
+| Layer | Action |
+| --- | --- |
+| Router | `mk:confluence` maps a spec-analysis request to the `mk:confluence-spec-analyst` leaf. |
+| Fork | The skill sets `context: fork` and `agent: confluence-spec-analyst`, so the agent runs in a fresh context window. Spec text, gap heuristics and the weasel-word inventory stay out of your main session. |
+| Fetch | The agent reads the page through the `confluence-as` wrapper and converts the body to markdown. It then reads child pages. `--include-children` defaults to 1 and has a hard cap of 10. The agent definition also caps children at 5 for Cloud rate limits. |
+| Images | If the page embeds images, `mk:multimodal` describes them. Without that skill the report carries `[NO_MULTIMODAL]` and the analysis continues. |
+| Output | A report under `tasks/reports/confluence-spec-{YYMMDD}-{HHMM}-{title-slug}.md`, or in the active plan's `research/` folder. A row is appended to `tasks/reports/.confluence-spec-index.tsv`. |
 
-The spec-analyst agent forks because spec analysis pollutes context with weasel-word inventory, gap-detection heuristics, and full page text. Fork isolates that bulk so your main session stays lean for planning + coding.
+The agent has the Write tool only to save the report locally. Page content is treated as data, so instructions inside a spec are flagged in the report and not followed.
 
-</Callout>
+## What the report contains
 
-## What the artifact looks like
+The report starts with `# Spec Research Report: {page title}`. `mk:planning-engine --spec` checks for that heading in Step 7. The sections are:
 
-```markdown
-# Spec Research Report — Q3 Auth Refresh
+- TL;DR
+- Requirements, split into functional (`REQ-F-n`), non-functional (`REQ-NF-n`) and optional (`REQ-O-n`)
+- Acceptance Criteria (`AC-n`)
+- Constraints and assumptions
+- Gaps and Ambiguities, a table with types such as `missing-info`, `missing-units`, `weasel-word` and `requirement-conflict`
+- Suggested User Stories, with a complexity signal and suggested Jira fields
+- Image and Diagram Findings
+- Suggested Commands, only with `--with-commands`
+- Open Questions
 
-> Source: https://acme.atlassian.net/wiki/spaces/ENG/pages/12345 (hash: a3f8...)
-> Generated: 2026-05-11 01:08
-
-## Requirements
-
-- R1. Users can log in with Google OAuth
-- R2. Sessions expire after 24h of inactivity
-- R3. Existing email/password accounts continue to work [LINKED-AC: existing]
-
-## Acceptance Criteria
-
-- AC1. Clicking "Sign in with Google" redirects to Google consent
-- AC2. After consent, user lands on /dashboard with a session cookie set
-- AC3. After 24h idle, next request → 401 + redirect to /login
-- AC4. Email/password login flow is unchanged
-
-## Gaps / Ambiguities
-
-- [MISSING] What scopes do we request from Google? (email only? + profile?)
-- [VAGUE] "Sessions expire after 24h" — sliding window or hard expiry?
-- [AMBIGUOUS] R3 doesn't say whether OAuth-only users can later add a password
-
-## Suggested User Stories
-
-- Story A: "As a returning user I can sign in with my Google account"
-  - Maps to: R1, R2, AC1, AC2
-- Story B: "As an active user my session stays alive while I work"
-  - Maps to: R2, AC3
-- Story C: "Existing email/password users see no behavior change"
-  - Maps to: R3, AC4
-
-## Image / Diagram Findings
-
-- Figure 1 (figma-frame "Sign-in v3"): button placement bottom-right, 16px gap
-  from form fields, primary color #4285F4 (Google brand)
-```
+The report ends with a SHA-256 hash of the fetched page. Running the skill again on that page writes a fresh report, and the hash shows whether the page changed.
 
 ## Decision point
 
-<Callout title="Human gate (no agent crosses this)" type="warn">
-
-The report lists `[MISSING]`, `[VAGUE]`, `[AMBIGUOUS]` flags. **You** decide which need to be resolved before tickets exist. The agent will not guess on your behalf — this is enforced by `core-behaviors.md` Rule 2 (_Manage Confusion Actively_).
-
-</Callout>
+You decide which gaps must be resolved before tickets exist. The agent does not fill gaps with guesses. When the spec is unclear, `.claude/rules/core-behaviors.md` has the agent stop and name the confusion instead of picking an interpretation.
 
 ---
 
-Next: [Step 2 — Send open questions back to the PM](/workflows/spec-to-pr-walkthrough/step-02-open-questions) · [All steps](/workflows/spec-to-pr-walkthrough)
+Next: [Step 2: Send open questions back to the PM](/workflows/spec-to-pr-walkthrough/step-02-open-questions) · [All steps](/workflows/spec-to-pr-walkthrough)

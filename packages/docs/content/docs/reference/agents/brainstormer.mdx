@@ -1,6 +1,6 @@
 ---
 title: "brainstormer"
-description: "Trade-off analysis agent — evaluates competing solutions with structured pros/cons analysis and synthesizes recommendations for planning."
+description: "Read-only advisory agent that compares approaches and trade-offs before a plan is written."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,85 +14,26 @@ description: "Trade-off analysis agent — evaluates competing solutions with st
 
 {/* GENERATED:reference-facts END */}
 
-The brainstormer is your thinking partner for technical decisions. When there are multiple ways to solve a problem, the brainstormer evaluates each approach with structured pros/cons analysis, identifies risks, and provides a clear recommendation — all without touching any code.
+The brainstormer evaluates technical approaches during planning. It questions whether the stated problem is the real one, compares at least two or three options, and recommends one with its reasoning. It modifies no files and does not decide.
 
-## Cognitive Framing
+It runs on `opus`. Tools: `Read`, `Grep`, `Glob`, `Bash`, `WebSearch`, `WebFetch`. Per-runtime model pins are on [Agent models](/guide/agent-models).
 
-> *"Explore all options before committing to one. Good decisions come from comparing alternatives, not from defaulting to the first idea."*
+## When to use
 
-The brainstormer operates at Phase 1 (Plan) as an advisory subagent. It works alongside the planner to provide trade-off analysis before implementation decisions are locked in. It never writes code or modifies files — its output is analysis, recommendations, and open questions that inform the planning phase.
+Use it in Phase 1 when a decision has several viable approaches with real trade-offs, for example WebSockets or SSE, or REST or GraphQL. Skip it when the approach is settled. For a recommendation on a decision you are still framing, use `/mk:advise` ([advisor](/reference/agents/advisor)).
 
-## Key Facts
+## What it returns
 
-| | |
-|---|---|
-| **Type** | Support (advisory subagent) |
-| **Phase** | 1 (Plan) |
-| **Auto-activates** | On Complex tasks or explicit invocation |
-| **Never does** | Write code, modify files, make implementation decisions, ship changes |
+1. Problem reframe.
+2. Each approach with how it works, pros, cons and when to choose it.
+3. A recommendation with its reasoning and second-order effects.
+4. Open questions.
+5. Risks.
 
-## When to Use
+Its output feeds the Technical Approach section of the plan that [planner](/reference/agents/planner) writes. It writes no plan files and no ADRs ([architect](/reference/agents/architect) writes those).
 
-- When there are **multiple viable approaches** to solving a problem and you need a structured comparison.
-- When the orchestrator classifies a task as **Complex** and routes it through the full planning pipeline.
-- When the planner requests **trade-off analysis** for a specific technical decision.
-- When a user asks **"should we do X or Y?"** — the brainstormer provides structured evaluation of both options.
-- Via `/mk:office-hours` for YC-style brainstorming in startup or builder modes.
+## Limits
 
-## Key Capabilities
+It implements nothing and writes no production, test or config files. A human approves the direction. It does not recommend an approach that bypasses the ship check or the privacy guard.
 
-- **Problem reframing** — challenges the original problem statement and explores whether it addresses the root cause.
-- **Multi-approach evaluation** — evaluates multiple solutions with documented pros, cons, and risk factors.
-- **Structured recommendations** — produces a clear recommendation with reasoning, not just a list of options.
-- **Open question identification** — flags unknowns that need resolution before a decision can be made.
-- **Risk assessment** — identifies technical, operational, and business risks for each approach.
-
-## Behavioral Checklist
-
-- [x] Reframes the problem before evaluating solutions
-- [x] Evaluates at least two approaches for every trade-off analysis
-- [x] Documents pros, cons, and risks for each approach
-- [x] Provides a clear recommendation with reasoning
-- [x] Identifies open questions that need resolution
-- [x] Never writes code or modifies files — advisory only
-- [x] Never makes implementation decisions — only recommends
-
-## Common Use Cases
-
-| Scenario | What the brainstormer does |
-|---|---|
-| "REST vs GraphQL for our API?" | Evaluates both approaches with project-specific pros/cons, recommends based on use case and team expertise |
-| "Monolith or microservices?" | Reframes the problem, evaluates tradeoffs (complexity, deployment, team size), identifies risks for each |
-| "Which state management library?" | Compares options based on project needs, community support, learning curve, and long-term maintenance |
-| "Should we build or buy this feature?" | Evaluates build cost, buy cost, customization needs, and vendor lock-in risks |
-
-## Output Structure
-
-The brainstormer produces structured analysis with these sections:
-
-1. **Problem Reframe** — restated problem, potentially challenging the original framing
-2. **Approaches** — each approach evaluated with pros, cons, and risk factors
-3. **Recommendation** — clear recommendation with reasoning
-4. **Open Questions** — unknowns that need answers before finalizing the decision
-5. **Risks** — identified risks and proposed mitigation strategies
-
-## Pro Tips
-
-### Challenge the Problem, Not Just the Solutions
-
-The most valuable output of a brainstorming session is often the problem reframe. If you ask "REST or GraphQL?" the brainstormer might first ask "do you actually need an API at this point, or would direct database access simplify your architecture?" This challenge of premises prevents optimizing for the wrong problem.
-
-### Use the Brainstormer Before the Planner Locks In
-
-The brainstormer is most valuable when invoked early — before the planner commits to a specific approach. Once a plan is agreed, changing the fundamental approach is expensive. The brainstormer's trade-off analysis is designed to prevent premature commitment to a suboptimal approach.
-
-## Key Takeaway
-
-The brainstormer ensures that technical decisions are made by comparing alternatives rather than defaulting to the first idea. By providing structured trade-off analysis with clear recommendations, it prevents the "we never considered other options" regret that often surfaces during implementation.
-
-## Related Agents
-
-- **[planner](/reference/agents/planner)** — receives the brainstormer's recommendations and incorporates them into the plan
-- **[architect](/reference/agents/architect)** — handles architectural decisions after the brainstormer identifies trade-offs
-- **[researcher](/reference/agents/researcher)** — provides technical research that feeds into the brainstormer's analysis
-- **[orchestrator](/reference/agents/orchestrator)** — routes Complex tasks to the brainstormer during Phase 1
+It loads `docs/project-context.md`, the task description, the codebase structure and existing ADRs in `docs/architecture/` before it starts.

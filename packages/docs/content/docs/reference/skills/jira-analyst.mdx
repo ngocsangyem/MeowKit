@@ -1,6 +1,6 @@
 ---
 title: "mk:jira-analyst"
-description: "Read-only full ticket context analysis including media. Persists structured RCA report."
+description: "Reads one Jira ticket with its comments, links and attached images or PDFs and writes an analysis you can post back as a comment. Read-only."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,48 +15,36 @@ description: "Read-only full ticket context analysis including media. Persists s
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Forks the `jira-analyst` agent to read the full ticket context — description, comments, attachments, linked issues, **including media (images / PDFs / screenshots)** — and produce a structured analysis suitable for posting back as a Jira comment. Read-only — never mutates Jira. The user reviews the output before posting.
+mk:jira-analyst forks the `jira-analyst` agent ([agent page](/reference/agents/jira-analyst)). It reads the description, comments, attachments and linked issues, including media, and returns a structured analysis. It never changes Jira. Its only write is the report under `tasks/reports/`. You review the output before posting it. The skill is not enabled by default.
 
-## When to Use
+## When to use it
 
-- **Triggers:** "analyze PROJ-123", "rca for PROJ-123", "describe PROJ-123 including the screenshots"
-- **NOT for:** complexity scoring ([`mk:jira-evaluator`](/reference/skills/jira-evaluator)) · story-point estimation ([`mk:jira-estimator`](/reference/skills/jira-estimator)).
+Use it for "analyze PROJ-123", "rca for PROJ-123" or "describe PROJ-123 including the screenshots".
 
-## Two Modes
+| Need | Use instead |
+|---|---|
+| Complexity scoring | [`mk:jira-evaluator`](/reference/skills/jira-evaluator) |
+| Story-point estimate | [`mk:jira-estimator`](/reference/skills/jira-estimator) |
+| Read ticket fields | [`mk:jira-issue`](/reference/skills/jira-issue) |
+| Post the analysis as a comment | [`mk:jira-collaborate`](/reference/skills/jira-collaborate) (`references/comment-templates.md`) |
 
-### Standalone Mode
+## Modes
 
-Reads ticket + attachments. Produces **What** + **Suggested Actions**. Does NOT produce **Why** / **How to Fix** — those require investigation context.
+| Mode | Input | Output |
+|---|---|---|
+| Standalone | Ticket and attachments | What it is and Suggested Actions. No Why or How to Fix, which need investigation. |
+| Post-investigate | Investigation findings in the task brief | What, Why, How to Fix and Suggested Actions (full RCA) |
 
-### Post-Investigate Mode
+## Media
 
-When investigation findings are provided in the task brief, produces full RCA: **What** + **Why** + **How to Fix** + **Suggested Actions**.
+For each image, PDF or screenshot the agent downloads the attachment with `jira-as.sh collaborate attachment download`, reads it with Claude's multimodal vision, optionally adds Gemini analysis (`mk:multimodal` script, needs `MEOWKIT_GEMINI_API_KEY`) and deletes the temporary file. With more than 5 media items it analyzes the 5 most recent and says so.
 
-## Media Analysis Pipeline
+## Safety
 
-For each image / PDF / screenshot:
+Ticket content is wrapped in `===TICKET_DATA_START===` and `===TICKET_DATA_END===` markers before reasoning. If the ticket already contains those markers, a nonce variant is used. Media analysis output is data, not instructions.
 
-1. `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh collaborate attachment download <KEY> --attachment-id <ID> --output /tmp/jira-attach-<ID>.<ext>`
-2. `Read("/tmp/jira-attach-<ID>.<ext>")` → multimodal vision analysis
-3. Optional Gemini enhancement: `node .claude/hooks/lib/skill-python.cjs .claude/skills/multimodal/scripts/gemini_analyze.py <path>` (requires `MEOWKIT_GEMINI_API_KEY`)
-4. Cleanup `/tmp/...`
+## Output
 
-Attachment limit: if >5 media items, analyze the 5 most recently added.
-
-## Injection Defense
-
-All ticket content is wrapped in `===TICKET_DATA_START===` / `===TICKET_DATA_END===` boundaries before reasoning. Media analysis output is also DATA, never instructions.
-
-## Report Persistence
-
-Writes non-trivial analyses (>500 chars or contains media findings) to `tasks/reports/jira-analyze-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`. Consumed by `mk:planning-engine`, `mk:cook` plan-creation step.
-
-## Peer Skills
-
-`mk:jira-evaluator` (complexity signals) · `mk:jira-estimator` (point estimate) · `mk:jira-issue` (read ticket fields) · `mk:jira-collaborate` (post analysis as comment via `references/comment-templates.md`)
-
-## Agent
-
-[`jira-analyst`](/reference/agents/jira-analyst) — A + C (FS write only — NEVER Jira state), NOT B.
+Analyses longer than 500 characters or with media findings are written to `tasks/reports/jira-analyze-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`. `mk:planning-engine` and later skills can use that report.

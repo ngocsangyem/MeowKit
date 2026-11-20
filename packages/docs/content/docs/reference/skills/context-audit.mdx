@@ -1,6 +1,6 @@
 ---
 title: "mk:context-audit"
-description: "Read-only audit of .claude/ structural overhead — reports prioritized 'remove X save Y tokens' recommendations against the model context window."
+description: "Read-only audit of how much of the context window the always-on .claude setup uses, with a ranked list of what to trim."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,22 +15,24 @@ description: "Read-only audit of .claude/ structural overhead — reports priori
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:context-audit` walks `.claude/` and reports how much of the model context window your always-on setup takes. It prints a ranked "remove X, save Y tokens" report to the terminal and changes no files. It measures only what is loaded statically into every session, not conversation history, tool output or active edits.
 
-Walks `.claude/` and tells you how much of the model context window your always-on setup is using. Prints a prioritized "remove X save Y tokens" report to the terminal. Read-only — no files are modified.
+## When to use it
 
-## When to Use
+| Moment | Why |
+|---|---|
+| Before adding an agent, skill or rule | Check that structural overhead is under 25 percent |
+| Sessions feel slow, off-topic or over-compacted | Check whether overhead has passed 10 percent |
+| Quarterly or after a model upgrade | Check the always-on bundle still earns its place, alongside the dead-weight audit (`.claude/skills/cook/references/harness-rules.md` Rule 7) |
 
-- **Before adding a new agent, skill, or rule** — confirm you are below the 25% structural-overhead threshold.
-- **When sessions feel slow or off-topic** — check if structural overhead has grown past 10%.
-- **Quarterly health check** — confirm the always-on bundle still pays its keep, paired with the dead-weight audit in `harness-rules.md` Rule 7.
+## When not to use it
 
-## Boundaries
+| Concern | Use |
+|---|---|
+| Runtime decisions about this session (what to read, when to compact) | `mk:context-engineering` |
+| Cost in USD | `mewkit budget` |
 
-| Concern              | Use this instead                                         |
-|----------------------|----------------------------------------------------------|
-| USD cost tracking    | `mewkit budget`                                              |
-| Window utilization   | **`/mk:context-audit`** (this skill)                      |
+`mewkit validate --substrate` shows the same artifacts grouped by the responsibility they serve, which helps check a trim before removing something.
 
 ## Usage
 
@@ -39,39 +41,31 @@ Walks `.claude/` and tells you how much of the model context window your always-
 /mk:context-audit <scan-root>
 ```
 
-`<scan-root>` defaults to the current working directory.
+`<scan-root>` defaults to the current directory.
 
-## Workflow
+## What it does
 
-1. **Inventory** — walks `.claude/` and emits byte / line counts per category (CLAUDE.md chain, agents, skills, rules, commands, MCP) as JSON.
-2. **Estimate** — enriches the inventory with token estimates (chars/4 heuristic) and computes `structural_overhead_pct` against a 200K window.
-3. **Format** — emits a 5-section markdown report: header, summary table, top consumers, recommendations, footer.
-4. **Banner** — Healthy (`< 10%`), Watch (`10–25%`), or Action (`≥ 25%`).
+1. `scripts/inventory-context.sh` counts bytes and lines per category (CLAUDE.md chain, agents, skills, rules, commands, MCP) and emits JSON.
+2. `scripts/estimate-tokens.sh` adds token estimates (characters divided by 4) and computes `structural_overhead_pct` against a fixed 200K window.
+3. `scripts/format-audit-report.sh` prints a markdown report.
+4. The report banner is Healthy below 10 percent, Watch from 10 to 25 percent, and Action at 25 percent or more.
+
+The thresholds are defined in `references/token-cost-model.md`. They are not tied to the `budget.*` config keys, which are USD amounts.
 
 ## Output
 
 ```
-# Context Audit — <scan_root>
-*Scanned at <timestamp> · model window 200K tokens · banner: <Healthy|Watch|Action>*
+# Context Audit: <scan_root>
+Scanned at <timestamp>, model window 200K tokens, banner: <Healthy|Watch|Action>
 
-## Summary
-| Category | Components | Bytes | Tokens | % of Window |
-
-## Top Consumers
-1. <component> ~<tokens> (<path>)
-
-## Recommendations
-1. <priority finding> — saves ~<tokens>
-
-## How to Act
-- Cost: see `mewkit budget`
-- Runtime trim: an agent file costs tokens only when that agent is spawned; archive unused ones
+## Summary          Category, components, bytes, tokens, percent of window
+## Top Consumers    Top 10 components with path and tokens
+## Recommendations  Findings sorted by token impact, each with tokens saved
+## How to Act       Cost: mewkit budget. An agent file costs tokens only when that agent is spawned, so archive agents you never use
 ```
 
-## Pro Tips
+## Notes
 
-- **Pair with `mewkit budget`** — context-audit reports tokens (window utilization), `mewkit budget` reports USD (monetary cost). They answer different questions.
-- **Run after model upgrades** — components that were load-bearing on Opus 4.5 may be dead weight on Opus 4.7. The audit gives you the data; `harness-rules.md` Rule 7 is the playbook for acting on it.
-- **No env vars** — window size is hard-coded 200K. Override is deferred until a real 1M-context use case appears.
-
-> **Canonical source:** `.claude/skills/context-audit/SKILL.md`
+- The window size is fixed at 200K and there are no environment variables.
+- The skill reads `.claude/`, `.mcp.json` and `.meowkit/telemetry/cost-log.json` and writes nothing.
+- `SCAN_ROOT` is untrusted input. Paths are canonicalised with `realpath` and never executed.

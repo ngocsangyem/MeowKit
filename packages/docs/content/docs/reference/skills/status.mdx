@@ -1,6 +1,6 @@
 ---
 title: "mk:status"
-description: "Backward-looking delivery status for the active plan — resolve the plan, then have the project-manager agent write a dated, evidence-based report into the plan directory."
+description: "Writes an evidence-based status report for the active plan, with what is done, blocked and changed."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,28 +14,34 @@ description: "Backward-looking delivery status for the active plan — resolve t
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Resolves which plan is meant — from an argument, a slug, or the set of active plans — then invokes the `project-manager` agent in the foreground to write `{plan-dir}/status-reports/{YYMMDD}-status.md` and prints the path plus the report's headline.
+`mk:status` is the foreground way to run the `project-manager` agent. It writes a classified status report to `{plan-dir}/status-reports/{YYMMDD}-status.md` from the plan, review verdicts, the cost log and the git log, and compares against earlier reports to show the change. Use it for an on-demand "where are we" question or when more than one plan is active.
 
-## When to Use
+A status report is a report, not an approval.
 
-- "Where are we", "what is done", "what is blocked", or a stakeholder update
-- The background auto-fire policy does not apply, or more than one active plan needs disambiguating
+## When not to use it
 
-**NOT for:** "what should I do next" advice (`mk:help`, which is forward-looking); sprint capacity or ticket planning (`mk:planning-engine`).
+To ask what to do next, use `mk:help`. Status looks backward.
 
-## Plan Resolution
+## Usage
 
-| Input | Behavior |
-|---|---|
-| A path | Used directly |
-| A slug | Resolved against `tasks/plans/*{slug}*` |
-| Nothing, 0 active plans | Prints that there is no active plan and writes no file |
-| Nothing, 1 active plan | Uses it |
-| Nothing, 2+ active plans | Asks which one — never picks the most recent silently |
+```
+mk:status
+mk:status <plan-dir>
+mk:status <plan-slug>
+```
 
-## Pro Tips
+## Steps
 
-- Same-day re-runs overwrite; multi-day history accumulates in the plan's `status-reports/` directory, and archiving a plan archives its reports.
-- Status is a report, never an approval. A green headline clears no gate.
+1. Resolve the plan. A path is used directly and a slug is matched with `ls -d tasks/plans/*{slug}*`. A slug with no match prints `Plan not found: {arg}` and stops.
+2. With no argument, the skill takes plans in `tasks/plans/*/plan.md` whose `status` is not `completed`, `cancelled` or `archived`. None prints `No active plan` and writes nothing. One is used. With several, it asks which plan to report on and never picks the most recent silently.
+3. Delegate to `project-manager` in the foreground, with the template `assets/pm-status-template.md`. It creates `status-reports/` if needed.
+4. Print the absolute path of the report and its headline, for example `4 of 7 tasks done, 2 blocked, at-risk`.
+
+## Notes
+
+- The report name carries the date, so a same-day rerun overwrites and earlier days accumulate in the plan's `status-reports/` folder.
+- Reports travel with the plan when it is archived.
+- `MEOWKIT_PM_AUTO` controls only the silent background runs described in `.claude/skills/cook/references/post-phase-delegation.md`. It never suppresses an explicit `mk:status`.
+- The agent has no background mode. To run it asynchronously, ask the agent directly and say so.

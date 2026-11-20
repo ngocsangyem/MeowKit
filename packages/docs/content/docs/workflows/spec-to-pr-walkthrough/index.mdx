@@ -1,17 +1,33 @@
 ---
 title: "Spec → PR: Behind the Scenes"
-description: "A guided walkthrough showing what each MeowKit skill actually does as you take a Confluence spec all the way to a merged PR — prompts, agent handoffs, gates, and report shapes."
+description: "A ten-step walkthrough of taking a Confluence spec to a merged PR with MeowKit, showing the prompt, the skills, the artifact written and the decision you make at each step."
 ---
 
-> A guided tour through the full developer loop. Each step shows the **prompt you type**, **which skills fire**, **which agent forks**, **what artifact gets written**, and **which gate decides whether you proceed**.
+This walkthrough follows one spec through Confluence, Jira and your codebase. Each step page shows the prompt you type, the skills that run, the artifact written and the decision that is yours. It is written for developers who want to know why the workflow has this shape and not only which commands to run.
 
-**Best for:** Developers who want to understand _why_ the workflow is shaped this way — not just the commands.
-**Time estimate:** First read 20 min · Real run 1-4 hours depending on ticket size
-**Skills used:** [mk:confluence-spec-analyst](/reference/skills/confluence-spec-analyst), [mk:confluence-collaborate](/reference/skills/confluence-collaborate), [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-agile](/reference/skills/jira-agile), [mk:jira-relationships](/reference/skills/jira-relationships), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-estimator](/reference/skills/jira-estimator), [mk:planning-engine](/reference/skills/planning-engine), [mk:agent-detector](/reference/skills/agent-detector), [mk:scale-routing](/reference/skills/scale-routing), [mk:plan-creator](/reference/skills/plan-creator), [mk:cook](/reference/skills/cook), [mk:review](/reference/skills/review), [mk:ship](/reference/skills/ship), [mk:jira-dev](/reference/skills/jira-dev), [mk:jira-lifecycle](/reference/skills/jira-lifecycle), [mk:memory](/reference/skills/memory)
+A first read takes about 20 minutes. A real run takes one to four hours, depending on ticket size. For the commands only, [Ticket to Code](/workflows/ticket-to-code) covers the second half.
 
-## Quick path
+## Before you start
 
-This page is a 20-minute read that explains every step. The steps themselves are:
+Jira access needs the `jira-as` CLI and three variables in `.meowkit/.env`. [Jira Integration](/guides/jira-integration) covers the install, the token and what to check when authentication fails. Confluence uses the same token and setup. [Confluence Integration](/guides/confluence-integration) covers the Cloud-only limit if you are on Server or Data Center.
+
+## The ten steps
+
+<Cards>
+  <Card title="Step 1: Pull the spec out of Confluence" href="/workflows/spec-to-pr-walkthrough/step-01-pull-the-spec" description="mk:confluence-spec-analyst writes a Spec Research Report locally." />
+  <Card title="Step 2: Send open questions back to the PM" href="/workflows/spec-to-pr-walkthrough/step-02-open-questions" description="Footer comments carry ambiguities back to Confluence, and the walkthrough pauses." />
+  <Card title="Step 3: Tech feasibility breakdown" href="/workflows/spec-to-pr-walkthrough/step-03-tech-feasibility" description="A read-only scan with mk:scout and mk:docs-finder before any ticket exists." />
+  <Card title="Step 3.5: Story sizing" href="/workflows/spec-to-pr-walkthrough/step-03-5-story-sizing" description="mk:story-sizer sizes each story. Advisory by default." />
+  <Card title="Step 4: Create the Jira tickets" href="/workflows/spec-to-pr-walkthrough/step-04-create-tickets" description="One command per issue, with the spec URL in the description." />
+  <Card title="Step 5: Group into an epic and rank" href="/workflows/spec-to-pr-walkthrough/step-05-epic-and-rank" description="Epic, rank and blocking links, all declared by you." />
+  <Card title="Step 6: Refine and estimate" href="/workflows/spec-to-pr-walkthrough/step-06-refine-and-estimate" description="The evaluator rates complexity and the estimator suggests points." />
+  <Card title="Step 7: Tech review against your codebase" href="/workflows/spec-to-pr-walkthrough/step-07-tech-review" description="mk:planning-engine reviews each ticket and plans the sprint." />
+  <Card title="Step 8: Plan per ticket" href="/workflows/spec-to-pr-walkthrough/step-08-plan-per-ticket" description="mk:plan-creator writes a plan per ticket, in a mode that fits its size and risk." />
+  <Card title="Step 9: Implement with /mk:cook" href="/workflows/spec-to-pr-walkthrough/step-09-implement-with-cook" description="The cook pipeline from orient to reflect, with the review verdict at Phase 4." />
+  <Card title="Step 10: After merge, close the loop" href="/workflows/spec-to-pr-walkthrough/step-10-close-the-loop" description="Transition the ticket and comment back on the spec page." />
+</Cards>
+
+The quick path, one command per stage:
 
 ```bash
 /mk:confluence-spec-analyst analyze 12345 --include-children 1
@@ -21,163 +37,77 @@ This page is a 20-minute read that explains every step. The steps themselves are
 /mk:ship
 ```
 
-**You end up with** a Confluence spec turned into merged PRs, with each handoff visible.
-**If you only want the commands**, [Ticket to Code](/workflows/ticket-to-code) is the short
-version of the second half.
+## How the steps connect
 
-## Prerequisites
-
-Jira access needs the `jira-as` CLI and three variables in `.meowkit/.env`. [Jira Integration](/guides/jira-integration) covers the install, the token, what the skills will and will not do on their own, and what to check when authentication fails.
-
-This walkthrough also reads Confluence. The same token and the same setup command cover it — see [Confluence Integration](/guides/confluence-integration), which is worth reading for the Cloud-only boundary if you are on Server or Data Center.
-
-## The Principle
-
-> **Every skill emits an artifact. Every decision point is a human one. No automation crosses the spec → ticket → code boundaries.**
-
-This page exists because the seam between Confluence, Jira, and your codebase is where most workflows leak. MeowKit's design is to make every seam **observable** — you can see what each skill produced before deciding whether to advance.
-
-## The Flow
+Every skill writes an artifact, and you read it before the next step. The paths below mark where each one lands.
 
 ```mermaid
 flowchart TD
-    A[Step 1: Confluence spec] -->|mk:confluence-spec-analyst| B["Spec Research Report<br/>tasks/reports/"]
-    B -->|human review| C{Step 2:<br/>Gaps?}
-    C -->|yes| D[mk:confluence-collaborate<br/>footer comment to PM]
-    D --> A
-    C -->|no| S["Step 3: pre-ticket feasibility scan<br/>mk:scout + mk:docs-finder<br/>(human cross-reads spec vs codebase)"]
-    S --> Z["Step 3.5: mk:story-sizer<br/>Fibonacci sizing per story<br/>(default: advisory)"]
-    Z --> E[Step 4: mk:jira-issue create with --story-points from 3.5<br/>per validated requirement]
-    E --> F["PROJ-1001..N tickets"]
-    F -->|Step 5: mk:jira-agile + mk:jira-relationships| G[Epic + ranking + blocks links]
-    G -->|Step 6: mk:jira-evaluator + mk:jira-estimator| H["Refinement + tier signal<br/>TRIVIAL / STANDARD / COMPLEX"]
-    H -->|Step 7: mk:planning-engine<br/>review --scout + plan --tickets --spec| I["Tech Review + Planning Reports<br/>tasks/reports/<br/>NOT copied into plan dir"]
-    I -->|Step 8: mk:plan-creator per ticket<br/>--hard COMPLEX / --fast STANDARD / skip TRIVIAL<br/>dev cites Step 7 report manually| P["Approved plans<br/>tasks/plans/&lt;slug&gt;/plan.md<br/><b>GATE 1 fires HERE</b><br/>(STANDARD + COMPLEX)"]
-    P -->|Step 9: /mk:cook &lt;plan-path&gt;<br/>code mode — Phase 1 skipped| J["7-phase pipeline<br/>Phase 0 orient → 3 build → 4 review<br/><b>GATE 2 at Phase 4</b>"]
-    H -.->|TRIVIAL fast-path:<br/>/mk:cook 'implement TICKET'<br/>Phase 1 runs inline, GATE 1 fires inside cook| J
-    J -->|Step 9 P5: mk:ship + mk:jira-dev + mk:jira-lifecycle| K[PR opened<br/>ticket → In Review]
-    J -->|Step 9 P6: mk:memory| L[".meowkit/memory/<br/>gotchas / decisions"]
-    K --> M["Step 10: post-merge close-loop<br/>jira-lifecycle → Done<br/>+ Confluence footer comment<br/>linking back to spec page"]
+    A["Step 1: spec report<br/>tasks/reports/"] --> B{"Step 2: gaps?"}
+    B -->|yes| C["Footer comment to the PM"]
+    C --> A
+    B -->|no| D["Step 3 and 3.5: feasibility and sizing"]
+    D --> E["Step 4 to 6: tickets, epic, estimates"]
+    E --> F["Step 7: tech review and planning report<br/>tasks/reports/"]
+    F --> G["Step 8: plans<br/>tasks/plans/&lt;slug&gt;/"]
+    G --> H["Step 9: /mk:cook &lt;plan-path&gt;"]
+    E -.->|"trivial ticket"| H
+    H --> I["PR opened, review verdict in tasks/reviews/"]
+    I --> J["Step 10: ticket Done, footer comment on the spec"]
 ```
 
-<Callout title="Reading the diagram" type="info">
+A trivial ticket skips Steps 7 and 8. You hand cook a task description, and cook writes and agrees the plan in its own Phase 1.
 
-- **Solid arrows** are the default STANDARD / COMPLEX path: Step 3 feasibility scan → Step 8 plan-creator (plan agreed with you) → Step 9 cook in code mode (Phase 1 skipped).
-- **Dashed arrow** is the TRIVIAL fast-path: skip Steps 7 and 8 entirely, hand cook a natural-language task. Cook's Phase 1 runs inline; you agree the plan and read the review verdict inside the cook invocation.
-- **Artifact locations are explicit**: `tasks/reports/` for spec + tech review (no plan exists yet), `tasks/plans/<slug>/` for plan-creator's output. No automatic copy or symlink between them.
-- **No approval gates**: planning and review are practices. You agree the plan (Step 8 standalone or cook Phase 1) and read the review verdict (cook Phase 4). Only the [ship check](/core-concepts/gates#the-ship-check) is enforced, at commit, push, merge and PR.
-</Callout>
+Planning and review are practices in this workflow. You agree each plan and read each review verdict, and no hook blocks an edit or a commit when you skip either. The one enforced control is the [ship check](/core-concepts/enforcement#the-ship-check), which runs at commit, push, merge and PR.
 
-Each arrow is a place where you read an artifact and decide.
+Reports from Steps 1 to 7 stay in `tasks/reports/`, and plans from Step 8 go to `tasks/plans/<slug>/`. Nothing copies one into the other.
 
-## The ten steps
-
-<Cards>
-  <Card title="Step 1 — Pull the spec out of Confluence" href="/workflows/spec-to-pr-walkthrough/step-01-pull-the-spec" description="mk:confluence-spec-analyst forks an agent and writes a Spec Research Report locally." />
-  <Card title="Step 2 — Send open questions back to the PM" href="/workflows/spec-to-pr-walkthrough/step-02-open-questions" description="Footer comments carry ambiguities back to Confluence. The workflow pauses here." />
-  <Card title="Step 3 — Tech feasibility breakdown" href="/workflows/spec-to-pr-walkthrough/step-03-tech-feasibility" description="Read-only pre-ticket scan with mk:scout + mk:docs-finder, before anything gets estimated." />
-  <Card title="Step 3.5 — Story sizing" href="/workflows/spec-to-pr-walkthrough/step-03-5-story-sizing" description="mk:story-sizer gives Fibonacci sizes per story — advisory by default." />
-  <Card title="Step 4 — Create the Jira tickets" href="/workflows/spec-to-pr-walkthrough/step-04-create-tickets" description="One verb, one issue. The Confluence URL in the description is the only sync mechanism." />
-  <Card title="Step 5 — Group into an epic and rank" href="/workflows/spec-to-pr-walkthrough/step-05-epic-and-rank" description="Epic-add, rank, and blocks links — all dev-declared, never inferred." />
-  <Card title="Step 6 — Refine and estimate" href="/workflows/spec-to-pr-walkthrough/step-06-refine-and-estimate" description="Evaluator grades ACs and complexity; estimator suggests points with uncertainty." />
-  <Card title="Step 7 — Tech review against your codebase" href="/workflows/spec-to-pr-walkthrough/step-07-tech-review" description="mk:planning-engine finally has ticket keys — per-ticket review and sprint-level plan." />
-  <Card title="Step 8 — Plan per ticket" href="/workflows/spec-to-pr-walkthrough/step-08-plan-per-ticket" description="Standalone mk:plan-creator moves plan agreement to sprint kickoff. Tier-aware, not blanket." />
-  <Card title="Step 9 — Implement with /mk:cook" href="/workflows/spec-to-pr-walkthrough/step-09-implement-with-cook" description="The 7-phase pipeline, phase by phase, with the review verdict at Phase 4." />
-  <Card title="Step 10 — After merge: close the loop" href="/workflows/spec-to-pr-walkthrough/step-10-close-the-loop" description="The only place the workflow writes back to Confluence." />
-</Cards>
-
-## What flows between systems
+## What crosses between systems
 
 ```mermaid
 flowchart LR
-    CONF["<b>Confluence</b><br/>Spec page<br/>Footer comments"]
-    JIRA["<b>Jira</b><br/>Ticket descriptions<br/>Spec analyst report"]
-    CODE["<b>Codebase / Git</b><br/>feat/auth-201-...<br/>PR #142"]
+    CONF["Confluence<br/>spec page, footer comments"]
+    JIRA["Jira<br/>tickets"]
+    CODE["Codebase and Git<br/>branch, PR"]
 
-    CONF -->|"spec URL, copied verbatim<br/>into the ticket description"| JIRA
-    JIRA -->|"Jira keys +<br/>branch names"| CODE
-    CODE -.->|"'Closes AUTH-201'<br/>in the PR body"| JIRA
-    JIRA -.->|"ambiguities, as open<br/>questions (footer comment)"| CONF
-    CODE -.->|"ship summary<br/>(footer comment)"| CONF
+    CONF -->|"spec URL in the ticket description"| JIRA
+    JIRA -->|"ticket keys, branch names"| CODE
+    CODE -.->|"PR body names the ticket"| JIRA
+    JIRA -.->|"open questions (footer comment)"| CONF
+    CODE -.->|"ship summary (footer comment)"| CONF
 ```
 
-Solid arrows carry work forward; dashed arrows are the write-backs that close the loop.
+Solid arrows carry work forward. Dashed arrows write back to a system you already used.
 
-Three systems, three artifacts crossing each seam. No more, no less.
+## Decisions that are yours
 
-## Skill catalog used in this walkthrough
+| Decision | When |
+| --- | --- |
+| Which spec gaps to resolve before ticketing | After Step 1 |
+| Feasibility, and which stories to defer | After Step 3 |
+| Which stories to file, and whether to batch-create | After Step 3.5 |
+| Ranking and dependencies | Step 5 |
+| Story-point estimate | After Step 6, as a team |
+| Plan mode per ticket, and agreeing each plan | Step 8, or cook's Phase 1 for trivial tickets |
+| Whether to ship with WARN dimensions | After the Phase 4 verdict |
 
-| Phase     | Skill                                                                           | Read/Write                          | Notes                                                                       |
-| --------- | ------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
-| Step 1    | `mk:confluence-spec-analyst`                                                    | read Confluence, write local report | Forks agent; multimodal optional                                            |
-| Step 1    | `mk:multimodal` _(opt)_                                                         | read media                          | Image/PDF findings in the report                                            |
-| Step 2    | `mk:confluence-collaborate`                                                     | write Confluence                    | Footer comments for open questions                                          |
-| Step 3    | `mk:scout`                                                                      | read codebase                       | Pre-ticket fingerprint (cached for Step 7)                                  |
-| Step 3    | `mk:docs-finder` _(opt)_                                                        | read external docs                  | Current third-party API/library docs                                        |
-| Step 3.5  | `mk:story-sizer --paste --scout`                                                | read all                            | Per-story Fibonacci sizing + suggested create commands (v1: paste-only)     |
-| Step 3.5  | `mk:story-sizer --paste --auto-create --project KEY` _(opt-in)_                 | delegated write Jira                | Batch ticket creation with dry-run + single confirmation gate               |
-| Step 4    | `mk:jira-issue`                                                                 | write Jira                          | One verb per ticket, no bulk                                                |
-| Step 4    | `mk:jira-fields` _(opt)_                                                        | read Jira                           | Resolves custom required fields                                             |
-| Step 5    | `mk:jira-agile`                                                                 | write Jira                          | Epic-add + rank                                                             |
-| Step 5    | `mk:jira-relationships`                                                         | write Jira                          | Blocks / depends-on links                                                   |
-| Step 6    | `mk:jira-evaluator`                                                             | read Jira                           | Complexity + inconsistencies                                                |
-| Step 6    | `mk:jira-estimator`                                                             | read Jira                           | Story-point suggestion                                                      |
-| Step 7    | `mk:planning-engine review TICKET --scout`                                      | read all                            | Per-ticket Tech Review Report                                               |
-| Step 7    | `mk:planning-engine plan --tickets ... --spec REPORT --scout`                   | read all                            | Sprint-level Planning Report with Spec Context section                      |
-| Step 8    | `mk:plan-creator --hard` _(COMPLEX)_ / `--fast` _(STANDARD)_ / _skip (TRIVIAL)_ | write plan files                    | Standalone plan per ticket; durable plan artifacts                         |
-| Step 9 P0 | `mk:agent-detector` + `mk:scale-routing`                                        | read                                | Tier + matched_flags                                                        |
-| Step 9 P1 | `mk:plan-creator`                                                               | write plan files                    | **SKIPPED** in code mode (plan from Step 8) — runs only for TRIVIAL tickets |
-| Step 9 P2 | `mk:testing` _(`--tdd`)_                                                        | write tests                         | RED-phase check (TDD mode)                                                 |
-| Step 9 P3 | `mk:cook` inner build                                                           | write code                          | Incremental commits                                                         |
-| Step 9 P4 | `mk:review`                                                                     | write verdict                       | Verdict written                                                            |
-| Step 9 P5 | `mk:ship` + `mk:jira-dev` + `mk:jira-lifecycle`                                 | write git + Jira                    | Branch, PR, transition                                                      |
-| Step 9 P6 | `mk:memory`                                                                     | write via `mewkit note` to `.meowkit/memory/`             | Cross-session continuity                                                    |
-| Step 10   | `mk:jira-lifecycle` + `mk:jira-collaborate` + `mk:confluence-collaborate`       | write Jira + Confluence             | Close the loop                                                              |
+## When the situation differs
 
-## Human decision points
-
-Every point where automation stops and a human decides. None is a hook-enforced gate.
-
-| Decision                                                                               | Where                                                                             | Who decides                  |
-| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------- |
-| Resolve spec ambiguities                                                               | After Step 1                                                                      | Dev + PM                     |
-| Feasibility / defer decision per suggested story                                       | After Step 3                                                                      | Dev                          |
-| Decide which stories to file from sizing report                                        | After Step 3.5                                                                    | Dev                          |
-| Batch auto-create confirmation                                                         | Step 3.5 with `--auto-create`                                                     | Dev (single AskUserQuestion) |
-| Which suggestions become tickets                                                       | Step 4                                                                            | Dev                          |
-| Story-point estimate                                                                   | After Step 6                                                                      | Team (planning poker)        |
-| Ticket ranking + dependencies                                                          | Step 5                                                                            | Dev / tech lead              |
-| Tier-aware plan-creator decision (skip TRIVIAL / `--fast` STANDARD / `--hard` COMPLEX) | Start of Step 8                                                                   | Dev / tech lead              |
-| Agree the plan                                                                         | Step 8 standalone (STANDARD/COMPLEX), OR inside `/mk:cook` Phase 1 (TRIVIAL only) | Dev                          |
-| Read the review verdict                                                                | Phase 4 of `/mk:cook` (Step 9)                                                    | Dev                          |
-| Ship despite WARN dimensions                                                           | After the verdict                                                                    | Dev                          |
-
-## Common deviations
-
-| Situation                                     | Skip to                                                                              |
-| --------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Spec is already a Jira ticket (no Confluence) | Step 6 — straight to evaluation                                                      |
-| Tickets exist but no spec analysis was done   | Step 6; consider asking the PO to back-fill ACs                                      |
-| Bug, not a feature                            | Use [Fix a Bug](/guides/fix-a-bug); spec-analyst doesn't apply                   |
-| Hotfix (one-shot, zero blast radius)          | `/mk:fix` skips the separate plan per `scale-adaptive-rules.md` Rule 4                       |
-| Green-field product build                     | [Autonomous Build](/guides/autonomous-build) (`/mk:autobuild`) — different pipeline |
-
-## When things go sideways
-
-| Situation                               | What to do                                                                                                                                        |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Spec changed mid-sprint                 | Re-run `/mk:confluence-spec-analyst` — the report includes a source-page hash so you can see what changed                                         |
-| Estimate was way off                    | Update points via `/mk:jira-agile set-story-points`; the team retro picks this up                                                                 |
-| Plan not agreed at Step 8               | Edit `tasks/plans/<slug>/phase-*.md` directly, re-prompt `/mk:plan-creator` (or just re-agree) before invoking `/mk:cook <plan-path>` at Step 9 |
-| Plan went stale (>14 days since Step 8) | `mk:cook` will warn on stale plan in code mode — re-run `/mk:plan-creator` on that ticket before cook                                             |
-| Review verdict FAIL                     | Fix the failing dimension, re-run `/mk:review` before shipping.                                                                                   |
-| Two tickets want the same file          | `mk:planning-engine` flagged this in Step 7 — sequence them, don't parallelize                                                                    |
+| Situation | What to do |
+| --- | --- |
+| The spec is already a Jira ticket | Start at Step 6. |
+| Tickets exist but nobody analyzed a spec | Start at Step 6 and ask the product owner to fill in acceptance criteria. |
+| The work is a bug | Use [Fix a Bug](/guides/fix-a-bug). The spec analyst does not apply. |
+| A one-shot hotfix with no blast radius | `/mk:fix` skips the separate plan, as `scale-adaptive-rules.md` Rule 4 describes. |
+| A green-field product | Use [Autonomous Build](/guides/autonomous-build) with `/mk:autobuild`. |
+| The spec changed mid-sprint | Run `/mk:confluence-spec-analyst` again. The report ends with a page hash, which shows whether the page changed. |
+| An estimate was far off | Update the points through `mk:jira-agile` and raise it at the retro. |
+| A plan is more than 14 days old | Cook warns about it. Run `mk:plan-creator` again before cooking. |
+| The review verdict is FAIL | Fix the failing dimension and run `/mk:review` again before shipping. |
 
 ## Related
 
-- [Spec to Sprint Planning](/workflows/spec-to-sprint) — planner-focused upstream of this page
-- [Ticket to Code](/workflows/ticket-to-code) — developer-focused; the per-ticket cycle this page nests inside
-- [Agile / Scrum Workflow](/workflows/agile-scrum) — sprint-level rituals that bracket this loop
-- [Autonomous Build](/guides/autonomous-build) — `/mk:autobuild` for green-field builds
-- [Review Code](/guides/review-code) — deep-dive on review
-- [Ship Safely](/guides/ship-safely) — deep-dive on Phase 5
+- [Spec to Sprint Planning](/workflows/spec-to-sprint) covers the planner side of Steps 1 to 7.
+- [Ticket to Code](/workflows/ticket-to-code) covers the per-ticket cycle that Step 9 sits inside.
+- [Agile / Scrum Workflow](/workflows/agile-scrum) covers the sprint rituals around this loop.
+- [Review Code](/guides/review-code) and [Ship Safely](/guides/ship-safely) cover Phases 4 and 5 in depth.

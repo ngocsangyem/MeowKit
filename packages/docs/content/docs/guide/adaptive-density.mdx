@@ -1,113 +1,80 @@
 ---
 title: "Adaptive Density"
-description: "How the harness scales scaffolding to model capability — the dead-weight thesis and four density tiers."
+description: "How /mk:autobuild scales its scaffolding to the model: the dead-weight thesis, the three density modes and how the mode is chosen."
 ---
 
-## The Dead-Weight Thesis
+Every harness component assumes something the model cannot do. A sprint contract assumes the model cannot derive testable criteria on its own. A context reset assumes working memory degrades over a long session. An iteration loop assumes one pass misses issues. The assumptions were right for the models of their day, and models improve.
 
-Every harness component encodes an assumption about what the model **cannot** do. A sprint contract assumes the model can't self-derive testable criteria. A context reset assumes working memory degrades over long sessions. An iteration loop assumes a single pass misses issues. These assumptions were correct for the models that existed when each component was added.
+A capable model forced through scaffolding built for a weaker one gets friction instead of help. Anthropic's harness research found that the full harness on Opus 4.6 gave worse output than a leaner configuration. Adaptive density picks the amount of scaffolding that fits the model.
 
-Models improve. Assumptions age. When a capable model (Opus 4.6+ with 1M context + auto-compaction) is forced through scaffolding designed for a less capable model, the scaffolding stops helping and starts adding noise. Anthropic measured this directly: full harness on Opus 4.6 **degrades** output compared to a leaner config. The model is already handling internally what the scaffolding was built to compensate for — so the scaffolding becomes friction.
+## The modes
 
-Adaptive density operationalizes this finding. The harness checks the model tier and selects the right amount of scaffolding — no more, no less.
+`.claude/skills/autobuild/references/adaptive-density-matrix.md` holds the full matrix with the rationale for each cell. This is the short form.
 
-## The Four Tiers
+| Mode | Model | Planner | Contract | Iteration | Context reset | Rubric |
+|---|---|---|---|---|---|---|
+| MINIMAL | Haiku | Skipped, runs `mk:cook` | Skipped | Skipped | Skipped | Skipped |
+| FULL | Sonnet | Product-level | Required | 1 to 3 rounds | Optional | Full |
+| FULL | Opus 4.5 and older | Product-level | Required | 2 to 3 rounds | Required | Full |
+| LEAN | Opus 4.6, 4.7, Opus 5, Fable | Product-level | Optional (skip under 5 criteria) | 0 to 1 rounds | Skipped | Full |
 
-This is a simplified view. The canonical decision matrix with per-cell rationale lives at `.claude/skills/autobuild/references/adaptive-density-matrix.md`.
+MINIMAL hands the task to `mk:cook`, because Haiku cannot drive a multi-hour iteration loop usefully. FULL keeps the contract to stop silent feature substitution and keeps the loop to catch self-praise. LEAN builds in one session, because these models can draft their own criteria and auto-compaction handles long contexts. Forcing a context reset on them breaks their reasoning continuity. Rubric rigor is the same in every mode except MINIMAL.
 
-| Tier | Model | Density | Planner | Contract | Iteration | Context Reset | Rubric |
-|---|---|---|---|---|---|---|---|
-| TRIVIAL | Haiku | MINIMAL | Skip (use `mk:cook`) | Skip | Skip | Skip | Skip |
-| STANDARD | Sonnet | FULL | Product-level | Required | 1–3 rounds | Optional | Full |
-| COMPLEX | Opus 4.5 | FULL | Product-level | Required | 2–3 rounds | Required | Full |
-| COMPLEX | Opus 4.6+ | LEAN | Product-level | Optional | 0–1 round | Skip | Full |
+Opus 5 and Fable take LEAN by the same rule as Opus 4.6, but neither has been replayed against the calibration set. Set `MEOWKIT_AUTOBUILD_MODE=FULL` if a LEAN run under-delivers.
 
-**MINIMAL (Haiku):** the harness short-circuits immediately to `mk:cook`. Haiku can execute focused tasks but can't drive a multi-hour iteration loop productively. The scaffolding overhead would exceed the value.
+## How the mode is chosen
 
-**FULL (Sonnet, Opus 4.5):** full pipeline with everything on. Contract required to prevent silent feature substitution. Context resets required for Opus 4.5 because working memory degrades over long sessions. Sonnet benefits from up to 3 iteration rounds.
+`mk:scale-routing` recommends a density from task complexity, and the autobuild step resolves the final one:
 
-**LEAN (Opus 4.6+):** the load-bearing finding from Anthropic's research. Single-session build is the default; one iteration round is the recovery option. Contract is optional — skip it when fewer than 5 acceptance criteria are needed. No context reset — auto-compaction handles long-context degradation, and forcing a subagent context reset breaks the model's reasoning continuity.
+1. `MEOWKIT_AUTOBUILD_MODE` (`MINIMAL`, `FULL` or `LEAN`) or the `--tier` flag on `/mk:autobuild` (`auto`, `minimal`, `full`, `lean`). Either one overrides detection.
+2. The `model-detector.cjs` SessionStart handler, which reads the `model` field of the SessionStart input and writes the tier and density to `.meowkit/state/detected-model.json`. The `autobuild.mode` setting, when set to a valid density, overrides what the handler detected.
+3. `MEOWKIT_MODEL_HINT`, used when the host sends no model.
+4. With no signal at all, STANDARD tier and FULL density. Detection never picks LEAN by accident.
 
-**Rubric rigor is unchanged across all non-MINIMAL tiers.** LEAN does not lower the quality bar. It lowers the scaffolding needed to clear the bar.
+The handler maps model ids with one shared table (`.claude/hooks/lib/density-lookup.cjs`):
 
-## How It's Selected
+| Model id contains | Tier | Density |
+|---|---|---|
+| `fable`, `opus-4-6`, `opus-4-7`, `opus-5` | COMPLEX | LEAN |
+| other `opus` ids, such as `opus-4-5` | COMPLEX | FULL |
+| `sonnet` | STANDARD | FULL |
+| `haiku` | TRIVIAL | MINIMAL |
 
-`mk:scale-routing` emits a provider-neutral `autobuild_density` recommendation from task complexity. For Claude Code harness builds, the adapter resolves the final density from the model tier and model string. The adapter resolution order:
-
-1. `MEOWKIT_AUTOBUILD_MODE` env var (highest priority) — `MINIMAL`, `FULL`, or `LEAN`
-2. `--tier` flag on `/mk:autobuild` — `auto`, `minimal`, `full`, `lean`
-3. `model-detector.cjs` (SessionStart handler, v2.3.0) — reads the `model` field from SessionStart stdin JSON and writes the detected tier + density to `.meowkit/state/detected-model.json`
-4. `MEOWKIT_MODEL_HINT` env var — fallback when stdin `model` field is absent
-5. (none) → defaults to STANDARD tier → FULL density (safe fallback)
-
-The chosen density and its resolution source are logged in the harness run report's "Density Decision" section so you can always audit what fired.
-
-See [model-detector handler](/guide/middleware-layer#node-js-handler-modules-v2-3-0) for handler details.
-
-## Auto-Detection (v2.3.0)
-
-As of v2.3.0, `model-detector.cjs` reads the `model` field directly from Claude Code's SessionStart stdin JSON — **`MEOWKIT_MODEL_HINT` is no longer required** for Opus 4.6+ users. The handler automatically maps model IDs to tiers:
-
-| Model string prefix | Tier | Density |
-|---------------------|------|---------|
-| `claude-opus-4-6*` | COMPLEX | LEAN |
-| `claude-opus-4-5*`, `claude-opus-4*` | COMPLEX | FULL |
-| `claude-sonnet-*` | STANDARD | FULL |
-| `claude-haiku-*` | TRIVIAL | MINIMAL |
-
-`MEOWKIT_MODEL_HINT` remains as a fallback — use it if your Claude Code version does not emit the `model` field in SessionStart stdin, or if you want to force a specific tier:
+To set a tier by hand:
 
 ```bash
 export MEOWKIT_MODEL_HINT=opus-4-6
-```
-
-Or pass the flag per-run:
-
-```bash
 /mk:autobuild "build a kanban app" --tier lean
-```
-
-Or force it session-wide:
-
-```bash
 export MEOWKIT_AUTOBUILD_MODE=LEAN
 ```
 
-When the fallback fires, the run report records `Source: auto-fallback (no model env var detected)` so you can identify the issue.
+The run report's "Density Decision" section records the density and where it came from. When the fallback fired it reads `Source: auto-fallback (no model env var detected)`.
 
-## Density Does Not Lower the Bar
+## Density does not lower the bar
 
-`MEOWKIT_AUTOBUILD_MODE=LEAN` adjusts scaffolding — it does NOT lower the quality bar or skip enforcement.
+`MEOWKIT_AUTOBUILD_MODE=LEAN` changes how much scaffolding runs. These apply in every mode:
 
-These apply regardless of density mode:
+1. The ship check runs lint, related tests and a type-check before a commit, push, merge or PR.
+2. The plan is agreed before the build and the reviewer writes a verdict. Both are practices, and no hook blocks on them.
+3. A sprint contract that exists is read by the developer before source edits. No hook checks it.
+4. The evaluator drives the running build. A PASS with no evidence is converted to FAIL.
 
-1. **Ship check** — lint, related tests and type-check run before a commit, push, merge or PR
-2. **Plan and review** — the plan is agreed before Phase 3 and the reviewer writes a verdict; these are practices, not blocking gates
-3. **Contract** — if a contract exists, generator must read it before writing source code
-4. **Active verification** — evaluator must drive the running build; static-only PASS is auto-converted to FAIL
+## Dead-weight audit
 
-Rule 10 in `.claude/skills/cook/references/harness-rules.md`: density decides HOW MUCH scaffolding the model needs. It does not lower the bar itself.
+On a major model upgrade, maintainers measure each harness component by running the benchmark canary suite with the component on and off. This runs from the source repository, because the published kit does not carry `mk:benchmark`.
 
-## Dead-Weight Audit
+| Delta (baseline minus disabled) | Decision |
+|---|---|
+| 0 or below | Prune candidate |
+| Above 0 and below 0.02 | Watch, revisit next cycle |
+| 0.02 or above | Keep, with the delta recorded as evidence |
 
-On every major model upgrade, run the dead-weight audit playbook. It measures each harness component's actual impact with the new model by comparing benchmark scores with the component enabled vs disabled.
-
-- **Delta ≤ 0:** component is no longer load-bearing → PRUNE candidate
-- **0 \< Delta \< 0.02:** borderline → WATCH, revisit next cycle
-- **Delta ≥ 0.02:** load-bearing → KEEP with evidence
-
-The audit exists because "this component helped Opus 4.5" is not evidence it helps Opus 4.6. Every model upgrade is an opportunity to test assumptions.
-
-Full playbook: `docs/dead-weight-audit.md`.
-
-## Canonical Source
-
-`.claude/skills/autobuild/references/adaptive-density-matrix.md` is the single source of truth. This page embeds a simplified 4-row view; the canonical matrix includes per-cell rationale and anti-patterns.
+A component must show a delta under 1 point across two consecutive model versions before it is pruned. Security rules, the evaluator's active verification and the ship check are never pruned. See [Trace and benchmark](/guide/trace-and-benchmark).
 
 ## Related
 
-- [/guide/harness-architecture](/guide/harness-architecture) — full pipeline context
-- [/reference/skills/autobuild](/reference/skills/autobuild) — autobuild skill spec
-- [/reference/skills/scale-routing](/reference/skills/scale-routing) — density emission
-- [/guide/trace-and-benchmark](/guide/trace-and-benchmark) — dead-weight audit measurement infrastructure
-- [/reference/rules-index#harness-rules](/reference/rules-index#harness-rules) — Rule 5 (density), Rule 7 (dead-weight audit), Rule 10 (density never lowers the bar)
+- [Autonomous build](/guides/autonomous-build) for the full pipeline
+- [Model routing](/guide/model-routing) for session tiers by task complexity
+- [Trace and benchmark](/guide/trace-and-benchmark) for the audit tooling
+- [Skill: autobuild](/reference/skills/autobuild) and [skill: scale-routing](/reference/skills/scale-routing)
+- [Rules index](/reference/rules-index#harness-rules) for the harness rules

@@ -1,6 +1,6 @@
 ---
 title: "mk:brainstorming"
-description: "Compare technical approaches for one validated decision"
+description: "Compares technically distinct approaches for one validated decision and recommends one, without writing implementation code."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,25 +14,18 @@ description: "Compare technical approaches for one validated decision"
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:brainstorming` compares ways to build something once you know it should be built. It answers "how should we build this?". `mk:office-hours` answers "should we build this?". Use it for trade-offs before choosing an architecture or strategy, or to explore failure modes before planning. It never writes implementation code.
 
-`mk:brainstorming` compares technically distinct ways to solve one validated problem. It is for the decision “how should we build this?”, while `mk:office-hours` owns “should we build this?”. It never writes implementation code.
+A bare "brainstorm" request is ambiguous, so the skill asks whether you want product validation or technical approaches instead of guessing.
 
-## When to Use
+## When not to use it
 
-- You need multiple technical approaches for a validated requirement.
-- You need trade-offs before choosing an architecture or strategy.
-- You need to explore failure modes or constraints before planning.
-
-For product discovery or whether an idea is worth building, use `mk:office-hours`. For a bug's root cause, use `mk:investigate`. For critique of an existing plan, use `mk:plan-ceo-review` or `mk:elicit`.
-
-A bare “brainstorm” request is ambiguous. The skill asks whether the user needs product validation or technical approaches instead of guessing from that word.
-
-## Profiles
-
-- `--depth quick` (default): restates the decision, gives 2-4 technical options and a recommendation inline, then stops. It creates no report, plan, memory entry, or handoff.
-- `--depth deep`: generates 3-8 approaches, runs one anti-bias pivot and challenge pass, and can score or report findings when requested or needed by an active plan.
-- `--advice` (deep only): opt-in strategic supervision by the [athena](/reference/agents/athena) agent — it supplies the decision criteria before generation and reads the chosen direction after the challenge pass, up to 4 calls. It never generates the option set, scores it, chooses for the user, or adds a gate. The quick profile creates no artifact to supervise, so the flag does not apply there.
+| Situation | Use |
+|---|---|
+| Value of a product, feature or side project is unvalidated | `mk:office-hours` |
+| Observed failure or root cause | `mk:investigate` |
+| Critique of an existing plan, verdict or brainstorm | `mk:plan-ceo-review` or `mk:elicit` |
+| One implementation detail or generic Q&A | answer directly, or `mk:docs-finder` |
 
 ## Usage
 
@@ -40,3 +33,23 @@ A bare “brainstorm” request is ambiguous. The skill asks whether the user ne
 /mk:brainstorming "Compare technical approaches for real-time notifications"
 /mk:brainstorming --depth deep "Choose an architecture for audit retention"
 ```
+
+| Flag | Meaning |
+|---|---|
+| `--depth quick` (default) | Restates the decision, gives 2 to 4 distinct options and one recommendation inline, then stops. A missing fact becomes a stated assumption. No report, plan, scoring, challenge pass or hand-off |
+| `--depth deep` | 3 to 8 approaches (never more than 8), one anti-bias pivot, a challenge pass, optional scoring. A report, HTML output or hand-off is written only when requested or needed by an active plan |
+| `--advice` | Deep only. Strategic supervision by the [athena](/reference/agents/athena) agent, up to 4 calls |
+
+## Deep workflow
+
+1. Confirm the decision, binding constraint, success criterion and excluded scope, asking at most three focused questions.
+2. If three or more independently shippable concerns are bundled, ask which one to take. Add a compact scout summary only when codebase touchpoints change the decision.
+3. Load one technique from `references/techniques/` and generate approaches without scoring them.
+4. Run one anti-bias pivot, then the challenge pass in `references/challenge-pass.md`, before recommending.
+5. Load `references/scoring-criteria.md` only for deep scoring.
+
+With `--advice`, athena supplies decision criteria after the frame and before generation, and reads the chosen direction after the challenge pass. It does not generate or score options and does not choose for you. Checkpoints are in `references/advice-checkpoints.md`. The quick profile creates nothing to supervise, so the flag does not apply there.
+
+## Other references
+
+`references/context-budget.md` sets the deep clarification, count, pivot and challenge limits. `references/editorial-html.md` applies only to a requested HTML report.

@@ -1,6 +1,6 @@
 # Phase 3 — Projection engine, checked against the bundles
 
-**Priority:** high · **Status:** in progress · **Effort:** 5d · **Depends on:** — (parallel with 1–2)
+**Priority:** high · **Status:** done 2026-11-20, except three open divergence rows (helper paths on Cursor, helpers the bundles did not ship, skill names in script messages) · **Effort:** 5d · **Depends on:** — (parallel with 1–2)
 
 ## Overview
 

@@ -1,6 +1,6 @@
 ---
 title: "mk:delegate"
-description: "Build one context-isolated subagent prompt — injection-guarded fields, no session history — and emit it for review instead of invoking the Task tool."
+description: "Builds a ready-to-paste, context-isolated prompt for one subagent, with an injection check on every field."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,26 +14,57 @@ description: "Build one context-isolated subagent prompt — injection-guarded f
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:delegate` assembles the delegation template from `.claude/skills/cook/references/orchestration-rules.md` into a prompt block you can review. It does not start the subagent. It prints the prompt so you see exactly what the subagent will receive. Use it when one bounded job goes to one subagent and the prompt must carry no session history.
 
-Assembles the delegation template into a reviewable prompt block: task, work context, plan reference, files to modify, files to read, acceptance criteria and constraints. It emits the prompt rather than invoking the Task tool, so a human sees exactly what the subagent will receive.
+## When not to use it
 
-## When to Use
+| If you need | Use |
+|---|---|
+| A parallel agent team in isolated worktrees | `mk:team-config` |
+| Staged jobs coordinated across runtimes | `mk:orchestrate` |
 
-- One bounded job is being handed to one subagent
-- The prompt must carry no session history and no orchestrator reasoning
+## Usage
 
-**NOT for:** launching a parallel agent team in worktrees (`mk:team-config`); coordinating staged jobs across runtimes (`mk:orchestrate`).
+```bash
+mk:delegate [task description]
+mk:delegate --silent [task description]
+```
 
-## Isolation Guarantee
+The skill asks for each field and always offers an Other option for free input.
 
-The emitted prompt carries no session history, no prior conversation, no project instruction file content, and no orchestrator reasoning chain. The subagent starts with the listed fields and nothing else.
+| Field | Source |
+|---|---|
+| Task | The argument, or asked |
+| Work context | The git root of the files being changed, detected, and you can override it |
+| Plan reference | Detected from the active-plan pointer, and you can override it |
+| Files to modify | Asked, as glob patterns |
+| Files to read for context | Asked, as specific paths |
+| Acceptance criteria | Asked, binary pass or fail only |
+| Constraints | Asked: what must not change |
 
-## Injection Guard
+When the work context differs from the current directory, every path in the prompt uses the work-context root, because a subagent given the wrong root writes into the wrong project.
 
-Every field is user-supplied text, so each one is scanned for the override patterns in `injection-rules.md` Rule 1 before assembly. On a match the run stops, names the offending field, and asks for a revision — it never silently sanitizes and emits.
+`--silent` skips the questions, reads the fields from one structured argument and prints the prompt at once. It is for hosts with no interactive question tool.
 
-## Pro Tips
+## Injection check
 
-- `--silent` skips the interactive questions for hosts with no interactive question tool. The injection guard still runs and exits non-zero on a match.
-- When the work context differs from the current directory, every path in the prompt uses the work-context root.
+Every field is text a person supplied, so each is scanned before assembly for the override patterns in `.claude/rules/injection-rules.md` Rule 1: "ignore previous instructions", "you are now", "new system prompt", "disregard your rules", "pretend you are", "act as if" and "forget your rules". On a match the run stops, names the field and asks you to revise it. It never cleans the text silently. In `--silent` mode a match exits non-zero and writes the warning to stderr.
+
+## Output
+
+A fenced block under a review header, aimed at 200 tokens or fewer:
+
+```
+---DELEGATION PROMPT (review before delegating)---
+Task: {task}
+Work context: {work_context}
+Plan: {plan_path or "none"}
+Files to modify: {globs}
+Files to read for context: {paths}
+Acceptance criteria:
+  - {criterion}
+Constraints: {constraints or "none"}
+---END DELEGATION PROMPT---
+```
+
+The prompt carries no session history, no prior conversation, no project instruction file content and no orchestrator reasoning. The subagent starts with these fields and nothing else.

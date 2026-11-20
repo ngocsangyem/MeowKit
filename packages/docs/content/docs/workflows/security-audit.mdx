@@ -1,88 +1,73 @@
 ---
 title: "Security Audit"
-description: "Run a comprehensive security audit with OWASP, STRIDE, supply chain, and platform-specific scanning."
+description: "Run a security audit with OWASP, STRIDE, supply chain and platform-specific checks."
 ---
 
-> Infrastructure-first security assessment covering secrets, dependencies, CI/CD, and code patterns.
+This playbook audits a codebase starting from infrastructure (secrets, dependencies, CI/CD) and then code patterns.
 
-**Best for:** Before releases, after incidents, onboarding new codebases  
-**Time estimate:** 15-30 minutes  
-**Skills used:** [mk:cso](/reference/skills/cso), [mk:vulnerability-scanner](/reference/skills/vulnerability-scanner)  
-**Agents involved:** security (auto-inserts on auth/payments)
+**Best for:** Before releases, after incidents, onboarding a new codebase
+**Time estimate:** 15 to 30 minutes
+**Skills used:** [mk:cso](/reference/skills/cso), [mk:vulnerability-scanner](/reference/skills/vulnerability-scanner)
+**Agents involved:** security (joins automatically on auth, payments and similar risk surfaces)
 
-## Overview
+## Two levels of scanning
 
-MeowKit offers two levels of security scanning. The **vulnerability-scanner** does code-level pattern matching (OWASP Top 10, secret detection). The **CSO** skill goes deeper — it starts with infrastructure (secrets archaeology, dependency supply chain, CI/CD pipeline), then layers on OWASP + STRIDE threat modeling.
+`mk:vulnerability-scanner` does code-level analysis: OWASP Top 10 and supply-chain checks. `mk:cso` is the fuller audit. It starts with secrets, dependencies and the CI/CD pipeline, then adds OWASP and STRIDE threat modeling.
 
-## Step-by-step guide
-
-### Step 1: Choose your scan depth
+## Step 1: Choose the depth
 
 ```bash
-# Quick code-level scan
-/mk:vulnerability-scanner
-
-# Full CSO audit — daily mode (high confidence, zero noise)
-/mk:cso
-
-# Deep scan — comprehensive mode (lower threshold, more findings)
-/mk:cso comprehensive
-
-# Scan specific directory
-/mk:cso src/api/
+/mk:vulnerability-scanner         # code-level scan
+/mk:cso                           # daily mode: all phases, 8/10 confidence threshold, little noise
+/mk:cso --comprehensive           # monthly deep scan: 2/10 bar, surfaces more
+/mk:cso --scope auth              # focused audit of one domain
+/mk:cso --diff                    # only what changed on this branch
 ```
 
-### Step 2: Understand the 14-phase CSO audit
+`--infra`, `--code`, `--skills`, `--supply-chain` and `--owasp` limit the audit to one area; at most one of them can be used at a time, and each combines with `--diff`.
 
-| Phase | What it checks | Agent/Tool |
-|-------|---------------|-----------|
-| 0-1 | Architecture + attack surface mapping | security agent reads codebase structure |
-| 2-3 | Secrets archaeology + dependency supply chain | Grep patterns + `npm audit` / `pip audit` |
-| 4-6 | CI/CD pipelines + infrastructure + webhooks | Checks workflow files, Docker configs |
-| 7-8 | LLM/AI security + skill supply chain | Scans for prompt injection vectors |
-| 9-11 | OWASP Top 10 + STRIDE threat model + data flow | Full threat analysis |
-| 12 | False positive filtering | Eliminates noise before reporting |
-| 13-14 | Report generation + save | Structured findings with remediation |
+## Step 2: What the audit covers
 
-### Step 3: Review findings
+| Phase | What it checks |
+|---|---|
+| 0 and 1 | Stack detection, architecture and attack surface |
+| 2 and 3 | Secrets in git history and `.env` files, dependency supply chain |
+| 4 to 6 | CI/CD pipelines, Docker and infrastructure as code, webhooks |
+| 7 and 8 | LLM and AI security, skill supply chain |
+| 9 to 11 | OWASP Top 10, STRIDE threat model, data classification |
+| 12 | False-positive filtering |
+| 13 and 14 | Report and saved JSON, with remediation roadmap |
 
-Each finding includes: **What** (vulnerability), **Where** (file:line), **Why** (root cause), **Impact** (business risk), **How to fix** (specific remediation).
+Phases 0, 1, 12, 13 and 14 always run.
+
+## Step 3: Read the findings
+
+Each finding states the vulnerability, the file and line, the root cause, the impact and a specific fix:
 
 ```
 CRITICAL: Hardcoded AWS key in src/config/aws.ts:12
-  Pattern: AKIA[0-9A-Z]{16}
-  Impact: Full AWS account access if leaked
-  Fix: Move to environment variable, rotate the exposed key immediately
+  Impact: full AWS account access if leaked
+  Fix: move it to an environment variable and rotate the exposed key
 
-HIGH: SQL query uses string interpolation in src/api/users.ts:45
-  Pattern: `SELECT * FROM users WHERE id = '${userId}'`
-  Fix: Use parameterized query: db.query('SELECT * FROM users WHERE id = $1', [userId])
+HIGH: SQL query built with string interpolation in src/api/users.ts:45
+  Fix: use a parameterized query
 ```
 
-### Step 4: Platform-specific checks
+## Step 4: Platform rules
 
-The **security** agent applies platform-specific rules automatically:
+The patterns in `.claude/rules/security-rules.md` are blocked when new code is written and flagged as warnings when existing code is reviewed. Examples:
 
-| Platform | Key checks |
-|----------|-----------|
-| **NestJS** | Auth guards on all endpoints, class-validator for input, parameterized queries |
-| **Vue** | No `v-html` with user input (XSS), CSRF tokens, no localStorage for auth |
-| **Swift** | Keychain for credentials, certificate pinning, ATS compliance |
-| **Supabase** | RLS on all tables, service key never on client |
+| Platform | Checks |
+|---|---|
+| NestJS | Auth guards on every route, `ConfigService` instead of raw `process.env` |
+| Vue | No `v-html` with user content, no `localStorage` for auth tokens |
+| Swift | Keychain instead of `UserDefaults` for sensitive data, default certificate validation |
+| Supabase and PostgreSQL | Row Level Security enabled, `service_role` key only on the server |
 
-### What happens with BLOCK verdicts
+## BLOCK verdicts
 
-If the **security** agent finds a CRITICAL vulnerability, it issues a BLOCK verdict:
+If the **security** agent finds a critical vulnerability, it issues a BLOCK verdict and states the findings and the required fix. Under the agent's rules, no other agent clears a BLOCK: after you fix the issue, the security agent audits again and only then lifts it. A BLOCK is a verdict in the workflow, not a hook. The ship check at commit and push time covers lint, related tests and type-check only.
 
-```
-Security verdict: BLOCK
-  CRITICAL: Hardcoded API key (src/config/aws.ts:12)
-  Pipeline halted — must remediate before shipping.
-  Only the security agent can clear this BLOCK after re-audit.
-```
+## Next
 
-No other agent can override a security BLOCK. Fix the issue, then request re-audit.
-
-## Next workflow
-
-→ [Refactoring](/workflows/refactoring) — safely improve existing code
+[Refactoring](/workflows/refactoring) covers safely improving existing code.

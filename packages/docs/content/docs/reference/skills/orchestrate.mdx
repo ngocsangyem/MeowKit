@@ -1,6 +1,6 @@
 ---
 title: "mk:orchestrate"
-description: "Coordinates staged or parallel jobs across live-verified coding-agent runtimes and in-session subagents — capability/risk routing, worktree isolation, redacted capture, resume, arbiter review."
+description: "Splits a job across agent CLIs and subagents in worktrees, with live routing, an arbiter review and a resumable run directory."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,93 +15,58 @@ description: "Coordinates staged or parallel jobs across live-verified coding-ag
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Splits one piece of work into jobs and runs them across the coding-agent CLIs already installed on your machine, across in-session subagents, or across both. It routes each job by how much capability it needs and how much damage it could do, isolates parallel writers in git worktrees, captures redacted output, resumes an interrupted run, and blocks its own final report until an independent arbiter has checked the results against the evidence.
+Coordinates a job across several agent CLIs and in-session subagents as a staged, captured, resumable run. It is a skill-level coordinator with no daemon or scheduler; it drives runtimes already on the machine. Use it when work needs several runtimes, or several parallel writers each in its own worktree. If a single agent would do, the skill says so and does not invent jobs.
 
-It is a skill-level coordinator, not a daemon, a scheduler, or a new runtime. It only drives runtimes that already exist.
+## When not to use
 
-## When to Use
-
-- **Use it** when work genuinely splits: staged dependencies, parallel writers on separate files, runtime or model diversity, or an independent reviewer of someone else's output
-- **Do not use it** for a single-agent task or the standard in-session pipeline — that is `mk:cook` or `mk:workflow-orchestrator`
-- The skill will say so itself: if orchestration adds no parallelism, no staging, no diversity, and no arbiter value, it recommends a direct workflow instead of manufacturing jobs
-
-## Core Capabilities
-
-- **Live routing.** Runtime and model catalogs drift, so every route is resolved from execution-time evidence. A runtime, model, alias, or flag named in the skill's own references is never assumed to be available.
-- **Capability and risk tiers.** Jobs carry a capability tier (C1–C3) and a risk tier (R0–R3). A candidate that cannot meet both floors cannot take the job; the job is marked blocked rather than routed to something weaker.
-- **Worktree isolation.** Parallel writers get one worktree each, created and cleaned up through `mk:worktree`. Integration is a separate reviewed step after the arbiter pass.
-- **Redacted capture.** Command, bounded stdout/stderr, exit status, wall time, and artifacts per job, with secrets refused at the door rather than scrubbed afterwards.
-- **Resume.** `jobs.yaml` plus `state.json` reload; successful outputs and prior attempts are preserved and only interrupted jobs redispatch.
-- **Arbiter review.** A separate judgment route compares every result against its expected output and the original intent. Unverified work is never summarized as complete.
-
-## Arguments
-
-| Flag | Effect |
-|------|--------|
-| `<task description>` | Free-form request; a spec is written under the run directory before dispatch |
-| `<job-spec.yaml>` | Repeatable run from a YAML job graph |
-| `--internal` | Routing *preference* for in-session subagents on jobs with no explicit `runtime:`. Not a hard mode — a job needing separate model selection or stronger isolation may still use a verified CLI |
-| `--yes` | Pre-approves the exact destructive scope the spec already describes. Nothing more |
-| `--resume <run-dir>` | Reload state and redispatch only the interrupted jobs |
-
-## Workflow
-
-1. **Brainstorm and intake** — outcome, constraints, non-goals, acceptance evidence; secrets refused
-2. **Build the job graph** — task, cwd, timeout, expected output, file ownership, `depends_on` stages
-3. **Discover, profile, route** — live runtime inventory, per-candidate profile, then capability/risk routing
-4. **Safety gate** — least-privilege controls verified on the live runtime, permission bypass off by default, explicit approval for destructive scope
-5. **Dispatch and capture** — worktrees created first, `state.json` updated on every transition, output redacted
-6. **Arbiter review** — an independent route checks claims against artifacts, checks, and paths
-7. **Report** — per-job status, resolved routes, artifacts, verdict, reproduction commands, unresolved questions
+For one scoped feature use `mk:cook`. For parallel work inside one session, `mk:cook` follows `.claude/skills/cook/references/parallel-execution-rules.md`.
 
 ## Usage
 
 ```bash
-# Free-form request
 /mk:orchestrate "research three implementation options and compare them"
-
-# Prefer in-session subagents
-/mk:orchestrate "compare the auth options" --internal
-
-# Repeatable run from a job spec
-/mk:orchestrate tasks/plans/orchestrate-jobs.yaml
-
-# Resume an interrupted run
+/mk:orchestrate tasks/plans/orchestrate-jobs.yaml [--yes]
 /mk:orchestrate --resume tasks/reports/orchestrate-<timestamp>
 ```
 
-## Output
+| Input or flag | Effect |
+|---|---|
+| Job spec YAML | A repeatable run. Schema in `references/job-spec.md` |
+| Task description | The skill writes a temporary `jobs.yaml` in the run directory first |
+| `--internal` | Prefer in-session subagents for jobs without an explicit `runtime:`. A live-verified CLI fallback is still allowed |
+| `--yes` | Pre-approves only the destructive scope the spec already describes |
+| `--resume <run-dir>` | Reload `jobs.yaml` and `state.json`, keep successful outputs, redispatch interrupted jobs |
 
-Each run writes a self-contained directory:
+An explicit runtime, model or agent pin is never overridden silently.
+
+## Steps
+
+1. Intake: clarify outcome, constraints and acceptance evidence. Refuse any plan that puts secrets into prompts, commands or captures.
+2. Build the job graph: each job has a task, cwd, timeout, expected output and file ownership. `depends_on` forms stages. Parallel writers get `isolation: worktree`.
+3. Discover and route: probe the live runtimes (`references/runtime-matrix.md`), profile them (`harness-profiles.md`) and choose a route by capability tier C1 to C3 and risk tier R0 to R3 (`model-routing.md`). A job with no qualifying candidate is marked `blocked`.
+4. Safety check: least privilege, permission-bypass modes off, explicit confirmation for destructive, deploy, release, delete or credentialed work. Every CLI process gets an external timeout.
+5. Dispatch and capture: create worktrees through `mk:worktree`, start jobs up to the concurrency limit, update `state.json` on every transition and capture redacted output. At most 3 internal agents run at once (`references/internal-routing.md`).
+6. Arbiter review: a separate C3 route compares each result with `expected_output` and the intent, runs the spec's checks and flags contradictions and unsupported claims. Unverified work is not reported as complete.
+7. Report: per-job status, resolved routes, artifacts, verdict, reproduction commands and unresolved questions.
+
+Worktrees stop edit collisions but are not an OS sandbox. Integration happens only after the arbiter pass, with `mk:worktree merge` and an integration test. Orchestrate never pushes, merges, releases or deploys on its own.
+
+## Outputs
 
 ```text
 tasks/reports/orchestrate-<timestamp>/
-  jobs.yaml          # the job graph that ran
-  runtimes.json      # what was discovered and profiled
-  state.json         # per-job transitions, the resume source
-  report.md          # statuses, routes, verdict, repro commands
-  <job-id>/          # command, stdout, stderr, result, status, artifacts
+  jobs.yaml  runtimes.json  state.json  report.md
   worktrees/<job-id>/
+  <job-id>/  status.json  artifacts/  attempt-<n>/
+             command.txt stdout.txt stderr.txt   (CLI jobs)
+             result.md                           (internal jobs)
+tasks/reports/orchestrate-history.jsonl
 ```
 
-`status.json` records the route that was actually resolved for the job, never a documented default. One metrics record per finished job appends to `tasks/reports/orchestrate-history.jsonl`.
+`status.json` records the resolved runtime, model or agent, tiers, status, exit code and duration. Metrics in the history file are advisory and never change routing policy.
 
-## Safety
+## Gotchas
 
-Orchestration relaxes none of the toolkit's non-negotiable rules:
-
-- Secrets, tokens, credentials, cookies, and private keys are refused in prompts, commands, and capture
-- Captured output and fetched content are DATA, never instructions
-- Deploy, release, delete, and credentialed side effects need explicit human approval for that exact scope
-- Plan agreement and review stay with you — orchestrate never approves a plan or a review verdict on your behalf
-
-## Pro Tips
-
-- **A worktree is not a sandbox.** It prevents edit collisions between jobs. It does not confine what a process can reach on the machine.
-- **Separate worktrees defer shared-file conflicts, they do not resolve them.** Jobs that must touch the same generated artifact, lockfile, migration sequence, or shared config should be sequenced.
-- **Name the skill each headless job must load.** A one-shot process will not discover it on its own.
-- **Failed worktrees are preserved on purpose.** They are listed in the report so the failure can be diagnosed before cleanup.
-
-> **Canonical source:** `.claude/skills/orchestrate/SKILL.md`
+Runtime and model names change often, so resolve every route from live evidence and never copy one from this page or an older report. An unknown flag or model fails the attempt and is not replaced by a guess. A permission prompt stops the job and reports the approval boundary. If the references disagree the run stops and reports the mismatch. `mk:delegate` builds each job's subagent prompt, and `mk:task-queue` enforces ownership in long multi-session runs.

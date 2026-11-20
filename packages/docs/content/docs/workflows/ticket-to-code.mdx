@@ -3,231 +3,117 @@ title: "Ticket to Code"
 description: "Developer workflow from receiving a Jira ticket through understanding, planning, implementing, and shipping."
 ---
 
-> You received a Jira ticket. Now what? Understand it, plan the work, implement, review, and ship.
+You picked up a Jira ticket. This playbook goes from reading it to a PR and an updated ticket, one command per step.
 
-**Best for:** Developers picking up tickets from sprint backlog
-**Time estimate:** Varies by ticket complexity
-**Skills used:** [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-analyst](/reference/skills/jira-analyst), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-estimator](/reference/skills/jira-estimator), [mk:jira-lifecycle](/reference/skills/jira-lifecycle), [mk:jira-collaborate](/reference/skills/jira-collaborate), [mk:jira-relationships](/reference/skills/jira-relationships), [mk:planning-engine](/reference/skills/planning-engine), [mk:scout](/reference/skills/scout), [mk:plan-creator](/reference/skills/plan-creator), [mk:cook](/reference/skills/cook), [mk:review](/reference/skills/review), [mk:ship](/reference/skills/ship)
+**Best for:** Developers picking up tickets from the sprint backlog
+**Time estimate:** Varies with the ticket
+**Skills used:** [mk:jira-analyst](/reference/skills/jira-analyst), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-lifecycle](/reference/skills/jira-lifecycle), [mk:jira-collaborate](/reference/skills/jira-collaborate), [mk:jira-relationships](/reference/skills/jira-relationships), [mk:planning-engine](/reference/skills/planning-engine), [mk:scout](/reference/skills/scout), [mk:plan-creator](/reference/skills/plan-creator), [mk:cook](/reference/skills/cook), [mk:review](/reference/skills/review), [mk:ship](/reference/skills/ship)
 
 ## Quick path
 
 ```bash
 /mk:jira-analyst AUTH-201                       # read the ticket and its attachments
 /mk:jira-evaluator AUTH-201                     # is it ready to work on?
-/mk:jira-lifecycle transition AUTH-201 "In Progress"
-/mk:cook AUTH-201                               # plan, build, review
-/mk:ship                                        # commit, PR, CI
+/mk:jira-lifecycle transition AUTH-201 --to "In Progress"
+/mk:plan-creator implement OAuth2 login per AUTH-201   # plan, agree it with the agent
+/mk:cook tasks/plans/<plan-dir>/plan.md         # build and review
+/mk:ship                                        # prepare the commit; `/mk:ship release` opens the PR
 ```
 
-**You end up with** a merged-ready PR and the ticket moved to its next status.
-**The machinery** is the seven-phase pipeline, explained once on [Workflow Phases](/core-concepts/workflow).
+You end up with a PR and a ticket moved to its next status. The phases behind `mk:cook` are explained on [Workflow](/core-concepts/workflow).
 
 ## Prerequisites
 
-Jira access needs the `jira-as` CLI and three variables in `.meowkit/.env`. [Jira Integration](/guides/jira-integration) covers the install, the token, what the skills will and will not do on their own, and what to check when authentication fails.
+Jira access needs the `jira-as` CLI and three variables in `.meowkit/.env`. [Jira Integration](/guides/jira-integration) covers the install, the token and what to check when authentication fails.
 
-## The Flow
-
-```
-Receive ticket → Understand → Plan → Implement → Review → Ship → Update ticket
-```
-
-Every step is a separate command. You decide when to move forward.
-
-## Step-by-step
-
-### Step 1: Understand the ticket
-
-Read the ticket and assess what's needed:
+## Step 1: Understand the ticket
 
 ```bash
-# Read full ticket details (description, AC, comments, attachments, links)
-/mk:jira-analyst AUTH-201
-
-# Evaluate complexity (if not already done in sprint planning)
-/mk:jira-evaluator AUTH-201
-
-# Check story points / estimation
-/mk:jira-estimator AUTH-201
+/mk:jira-analyst AUTH-201      # description, acceptance criteria, comments, attachments, links
+/mk:jira-evaluator AUTH-201    # complexity and gaps
+/mk:jira-estimator AUTH-201    # story point suggestion
 ```
 
-**What you get:** Analysis report with gaps flagged, complexity assessment, story point suggestion.
+The evaluator flags `[MISSING]` and `[AMBIGUOUS]` items. If the ticket is unclear, ask the product owner before you continue. [Ticket Evaluation](/workflows/ticket-evaluation) explains the output. If the ticket has screenshots, video or a Figma link, see [Ticket with Media](/workflows/ticket-with-media).
 
-**If the ticket is unclear:**
-- Check `[MISSING]` and `[AMBIGUOUS]` flags in the evaluator output
-- Ask the PO to clarify before proceeding
-- Update the ticket: `/mk:jira-issue update AUTH-201 --set description="..."`
-
-### Step 2: Review against codebase
-
-Understand what code needs to change:
+## Step 2: Check the ticket against the code
 
 ```bash
-# Scout the codebase first
 /mk:scout
-
-# Tech review: ticket vs codebase
 /mk:planning-engine review AUTH-201 --scout
 ```
 
-**What you get:** Tech Review Report — affected files, feasibility rating, dependencies, risks, complexity signals.
+The Tech Review Report lists affected files, a feasibility rating, dependencies and risks. `mk:planning-engine` asks you to run scout first when you pass `--scout`.
 
-**If the ticket is a bug:**
+For a bug, run `/mk:investigate` and paste the ticket description and repro steps into the prompt. It works on your local codebase and does not read Jira.
+
+## Step 3: Move the ticket to In Progress
 
 ```bash
-# Investigate the root cause (works on local codebase —
-# paste the ticket description and repro steps when prompted)
-/mk:investigate
+/mk:jira-lifecycle transition AUTH-201 --to "In Progress"
 ```
 
-Note: `mk:investigate` operates on your local codebase, not directly on Jira. Copy the bug description and reproduction steps from the analyst output into the investigation prompt.
+`mk:jira-lifecycle` reads your project's workflow before it suggests transitions. If the ticket is already Done or Closed, check which transitions exist; you may need your team's reopen process.
 
-### Step 3: Transition ticket
-
-Move the ticket to "In Progress":
+## Step 4: Plan
 
 ```bash
-/mk:jira-lifecycle transition AUTH-201 "In Progress"
+/mk:plan-creator implement OAuth2 login per AUTH-201
 ```
 
-If the transition requires fields (e.g., resolution), `mk:jira-lifecycle` will prompt you.
+The plan goes under `tasks/plans/YYMMDD-name/`. Read it and agree it before building. For a small, clear fix, skip the plan and run `/mk:fix` with the ticket text.
 
-**If the ticket is already in a terminal state** (Done, Deployed, Closed): you may need to reopen it first. Check available transitions — if none exist for "In Progress", ask your team lead about the reopen workflow.
-
-### Step 4: Plan the implementation
+## Step 5: Implement and review
 
 ```bash
-# Create an implementation plan
-/mk:plan-creator
-```
+/mk:cook tasks/plans/<plan-dir>/plan.md
+# or, for a quick job
+/mk:cook "Implement OAuth2 login per AUTH-201" --fast
 
-This produces a plan with phases, file changes, and acceptance criteria. Agree the plan with the agent before it starts coding.
-
-**For simple fixes:**
-
-```bash
-# Quick fix — skip the full planning cycle
-/mk:fix AUTH-201
-```
-
-### Step 5: Implement
-
-```bash
-# Execute the plan
-/mk:cook path/to/plan.md
-
-# Or for a quick implementation
-/mk:cook "Implement OAuth2 login per AUTH-201 requirements" --fast
-```
-
-### Step 6: Review
-
-```bash
-# Code review before shipping
 /mk:review
 ```
 
-The reviewer writes a verdict. Read it before you ship; nothing blocks shipping on it.
+`mk:review` writes a verdict. Read it before you ship; no hook blocks shipping on it.
 
-### Step 7: Ship
+## Step 6: Ship
 
 ```bash
-# Ship: merge main, test, commit, push, create PR
 /mk:ship
 ```
 
-### Step 8: Update ticket
+By default `mk:ship` prepares the commit and asks before it stages or commits. `/mk:ship release` pushes the branch and opens the PR. On every `git commit`, `git push` and `gh pr create`, the ship check runs lint on the changed files, their related tests and a type-check, and refuses the command if one fails. See [Ship Safely](/guides/ship-safely).
 
-After the PR is merged:
+## Step 7: Update the ticket
 
 ```bash
-# Transition to Done
-/mk:jira-lifecycle transition AUTH-201 "Done" --resolution Fixed
-
-# Add a comment with what was done
-/mk:jira-collaborate add-comment AUTH-201 "Implemented OAuth2 login. PR #42 merged."
-
-# Link to related tickets if needed
-/mk:jira-relationships link AUTH-201 relates-to AUTH-202
+/mk:jira-lifecycle transition AUTH-201 --to "Done" --resolution Fixed
+/mk:jira-collaborate add a comment to AUTH-201: "Implemented OAuth2 login. PR #42."
+/mk:jira-relationships link AUTH-201 as relates-to AUTH-202
 ```
 
-## By Ticket Type
+## Variations by ticket type
 
-### Bug Fix
+| Ticket | Command order |
+|---|---|
+| Bug | `mk:jira-analyst`, `mk:jira-evaluator`, transition, `mk:investigate` (paste repro steps), `mk:fix`, `mk:review`, `mk:ship`, transition to Done |
+| Story | `mk:jira-analyst`, `mk:planning-engine review --scout`, transition, `mk:plan-creator`, `mk:cook`, `mk:review`, `mk:ship`, transition to Done |
+| Technical task | `mk:jira-analyst`, transition, `mk:cook "..." --fast`, `mk:review`, `mk:ship`, transition to Done |
 
-```
-/mk:jira-analyst BUG-456                          → understand the bug
-/mk:jira-evaluator BUG-456                        → check for missing AC, gaps
-/mk:jira-lifecycle transition BUG-456 "In Progress"
-/mk:investigate                                    → find root cause (paste repro steps)
-/mk:fix                                            → fix based on investigation
-/mk:review                                         → code review
-/mk:ship                                           → ship the fix
-/mk:jira-lifecycle transition BUG-456 "Done" --resolution Fixed
-```
-
-### Feature (Story)
-
-```
-/mk:jira-analyst STORY-789                        → understand requirements
-/mk:planning-engine review STORY-789 --scout      → tech review
-/mk:jira-lifecycle transition STORY-789 "In Progress"
-/mk:plan-creator                                   → implementation plan
-/mk:cook plan.md                                   → implement
-/mk:review                                         → code review
-/mk:ship                                           → ship the feature
-/mk:jira-lifecycle transition STORY-789 "Done" --resolution Fixed
-```
-
-### Technical Task
-
-```
-/mk:jira-analyst TASK-101                         → understand scope
-/mk:jira-lifecycle transition TASK-101 "In Progress"
-/mk:cook "Implement TASK-101" --fast              → quick implementation
-/mk:review                                         → code review
-/mk:ship                                           → ship
-/mk:jira-lifecycle transition TASK-101 "Done" --resolution Done
-```
-
-## When Things Go Wrong
+## When something goes wrong
 
 | Situation | What to do |
 |---|---|
-| Ticket AC is vague | `/mk:jira-evaluator` will flag `[MISSING]` — ask PO to clarify |
-| Ticket is too large | `/mk:jira-evaluator` will flag Complex (8-13pt) — ask to split |
-| Blocked by another ticket | `/mk:jira-relationships link AUTH-201 blocked-by AUTH-200` — work on something else |
-| Implementation harder than expected | Update estimate: run `/mk:jira-estimator` again, share findings with team |
-| Tests fail after implementation | `/mk:investigate` to find root cause, then `/mk:fix` |
-| PR review finds issues | Fix issues, re-run `/mk:review`, then `/mk:ship` |
+| Acceptance criteria are vague | The evaluator flags `[MISSING]`. Ask the product owner. |
+| The ticket is too large | The evaluator rates it Complex (8 to 13 points). Ask to split it. |
+| Blocked by another ticket | Link it with `mk:jira-relationships` (`blocked-by`) and work on something else. |
+| Harder than estimated | Run `mk:jira-estimator` again and share the result with the team. |
+| Tests fail after implementing | `/mk:investigate`, then `/mk:fix`. |
+| Review finds issues | Fix them, run `/mk:review` again, then `/mk:ship`. |
 
-## Skill Graph
-
-Common leaves you'll touch in this flow:
-
-```
-mk:jira-analyst       → ticket context (Step 1)
-mk:jira-evaluator     → complexity check (Step 1)
-mk:jira-estimator     → story points (Step 1)
-mk:jira-lifecycle     → transitions + assignment (Steps 3, 8)
-mk:jira-issue         → field updates (Step 1 clarifications)
-mk:jira-collaborate   → progress / completion comments (Step 8)
-mk:jira-relationships → blockers + related links (Step 8)
-
-Power user — additional leaves available:
-mk:jira-search        → find related issues by JQL
-mk:jira-time          → log work
-mk:jira-agile         → sprint / epic membership
-mk:jira-dev           → branch-name + PR-description generation
-```
-
-See the [`mk:jira` reference](/reference/skills/jira) for the full leaf catalog.
+Other `mk:jira` leaves that help here: `mk:jira-search` (related issues by JQL), `mk:jira-time` (log work), `mk:jira-agile` (sprint and epic membership) and `mk:jira-dev` (branch names and PR descriptions). The [`mk:jira` reference](/reference/skills/jira) lists them all.
 
 ## Related
 
-- [Tickets to Sprint Planning](/workflows/spec-to-sprint) — upstream: how tickets get created
-- [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) — pre-planning assessment
-- [Build a Feature](/guides/build-a-feature) — general feature workflow
-- [Fix a Bug](/guides/fix-a-bug) — bug-specific investigation
-- [Review Code](/guides/review-code) — review workflow details
-- [Ship Safely](/guides/ship-safely) — deploy pipeline details
+- [Spec to Sprint](/workflows/spec-to-sprint) for how tickets get created and planned
+- [Build a Feature](/guides/build-a-feature) and [Fix a Bug](/guides/fix-a-bug)
+- [Review Code](/guides/review-code) and [Ship Safely](/guides/ship-safely)

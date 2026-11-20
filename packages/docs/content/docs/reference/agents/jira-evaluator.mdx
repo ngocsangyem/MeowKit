@@ -1,6 +1,6 @@
 ---
 title: "jira-evaluator"
-description: "Jira ticket complexity evaluator — scores tickets across 8 dimensions for complexity, inconsistencies, and quality with read-only analysis."
+description: "Read-only Jira evaluator. Scores one ticket's complexity and finds inconsistencies in its description. Changes no Jira data."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,73 +15,20 @@ description: "Jira ticket complexity evaluator — scores tickets across 8 dimen
 
 {/* GENERATED:reference-facts END */}
 
-The jira-evaluator agent analyzes Jira tickets for complexity and quality. It scores tickets across 8 dimensions — scope, dependencies, ambiguity, technical risk, cross-team coordination, testing complexity, data sensitivity, and integration points — producing a structured complexity profile that helps teams understand what they are committing to.
+The jira-evaluator agent is the executor for `mk:jira-evaluator` and calls Jira through `.claude/skills/jira/scripts/jira-as.sh`.
 
-## Cognitive Framing
+It runs on `opus`. Tools: `Bash`, `Read`, `Grep`, `Glob`, `Write`, `Edit`. Per-runtime model pins are on [Agent models](/guide/agent-models).
 
-> *"Complexity hides in ambiguity. Surface it before the sprint starts, not after."*
+## When to use
 
-The jira-evaluator agent is a read-only analysis agent. It never modifies Jira state — it reads ticket data and produces structured findings about complexity, inconsistencies, and quality gaps. Its output informs sprint planning decisions but never makes them.
+Use it to ask how complex or contradictory a ticket is. For attached media use [jira-analyst](/reference/agents/jira-analyst).
 
-## Key Facts
+## What it checks
 
-| | |
-|---|---|
-| **Type** | Domain (Jira) |
-| **Phase** | On-demand |
-| **Model** | haiku |
-| **Color** | teal |
-| **Safety** | Read-only — never modifies Jira state |
-| **Never does** | Modify issues, estimate story points (jira-estimator), perform full RCA (jira-analyst) |
+Seven complexity signals: scope, dependencies, regression risk, requirement clarity, external integration, historical context (similar closed tickets, capped at the top 20) and workflow shape (read from `tasks/jira-workflows/<workflow-slug>.md`). The result is Simple, Medium or Complex with a Fibonacci range such as 8 to 13 points.
 
-## When to Use
+Five inconsistency checks: missing acceptance criteria, vague language ("should", "might"), scope creep (acceptance criteria wider than the description), missing dependencies (text says "blocked by" with no link) and contradictions.
 
-- When you need to **assess ticket complexity** before sprint planning.
-- When you want to **find inconsistencies** in ticket descriptions — contradictory acceptance criteria, missing edge cases.
-- When you need a **quality score** for ticket completeness.
-- When you want to **compare complexity** across tickets to prioritize sprint scope.
+It stops with a message if the description is empty. A failed history search is not treated as zero results, and a successful search with no matches lowers confidence one level. Ticket content is wrapped in data markers and JQL terms are sanitized. If `JIRA_MOCK_MODE` is `true` the output is labelled `[MOCK MODE]`.
 
-## Key Capabilities
-
-- **8-dimension complexity scoring** — evaluates scope, dependencies, ambiguity, technical risk, cross-team coordination, testing complexity, data sensitivity, and integration points.
-- **Inconsistency detection** — identifies contradictions between summary, description, and acceptance criteria.
-- **Quality assessment** — scores ticket completeness and highlights missing information.
-- **Structured output** — produces a complexity profile with per-dimension scores and an overall assessment.
-
-## Behavioral Checklist
-
-- [x] Evaluates all 8 complexity dimensions for every ticket
-- [x] Identifies inconsistencies between ticket fields
-- [x] Scores ticket quality and completeness
-- [x] Produces structured output with per-dimension breakdowns
-- [x] Never modifies Jira state — read-only analysis
-- [x] Never estimates story points — that belongs to jira-estimator
-
-## Common Use Cases
-
-| Scenario | What the agent does |
-|---|---|
-| "Evaluate PROJ-123 complexity" | Scores the ticket across 8 dimensions, highlights risks and ambiguities |
-| "Check ticket quality for PROJ-456" | Assesses completeness, identifies missing acceptance criteria or edge cases |
-| "Compare complexity of sprint candidates" | Evaluates multiple tickets to help prioritize sprint scope |
-| "Find inconsistencies in PROJ-789" | Checks for contradictions between summary, description, and criteria |
-
-## Pro Tips
-
-### Evaluate Before Sprint Commitment
-
-Running complexity evaluation before sprint planning reveals hidden complexity that would otherwise surface during implementation. A ticket that looks simple ("add a date picker") may score high on integration complexity if it requires timezone handling across multiple services.
-
-### Use Evaluator Output to Improve Tickets
-
-The evaluator's findings are actionable — inconsistencies and missing information can be addressed before development starts. Treat the evaluation as a ticket improvement tool, not just a scoring mechanism.
-
-## Key Takeaway
-
-The jira-evaluator agent surfaces hidden complexity before it becomes a sprint surprise. By scoring tickets across 8 dimensions and detecting inconsistencies, it gives teams the information needed to make realistic sprint commitments.
-
-## Related Agents
-
-- **[jira-estimator](/reference/agents/jira-estimator)** — estimates story points (uses evaluator findings as input)
-- **[jira-analyst](/reference/agents/jira-analyst)** — performs full root cause analysis with media support
-- **[jira-issue](/reference/agents/jira-issue)** — provides the ticket data that the evaluator analyzes
+The report goes to `tasks/reports/jira-evaluate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`, where [jira-estimator](/reference/agents/jira-estimator) and `mk:planning-engine` can use it.

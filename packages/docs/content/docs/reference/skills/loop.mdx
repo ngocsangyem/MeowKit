@@ -1,6 +1,6 @@
 ---
 title: "mk:loop"
-description: "Bounded, git-tracked optimization loop. Improve one scalar metric (coverage, bundle size, lint count, latency) by iterating: modify one scoped change, verify, keep or revert. Boundary-gated autonomy."
+description: "Improves one metric in bounded, git-tracked trials, keeping each change that improves the number and reverting the rest."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,59 +15,23 @@ description: "Bounded, git-tracked optimization loop. Improve one scalar metric 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Improves ONE scalar metric through bounded autonomous iterations: pick one atomic change -> commit -> verify -> keep if the number improved, otherwise `git revert`. Git history is the loop's memory; a TSV log, a summary, and a handoff JSON are the artifacts. Autonomy is **boundary-gated** -- one human approval before the loop starts, then hands-off iteration up to a hard cap, with hard re-gates on cap-reached, stuck/plateau, and scope-expansion. It never plans, never grades behavior, and never ships.
+Improves one number, such as coverage percent, bundle size, lint-error count or latency, in bounded, git-tracked trials. Each iteration makes one atomic change, commits it, runs your `Verify` command and keeps the commit if the number improved by at least `Min-Delta`; otherwise it runs `git revert`. Git history is the loop's memory. It never plans, never grades behaviour and never ships.
 
-## When to Use
+Use it when a fast (under 30 seconds) command prints a single number and you know which files may change.
 
-- An objective, fast (\<30s) `Verify` command prints a single number
-- A `Scope` of editable file globs is known
-- You want N git-tracked trials with automatic keep-on-improve, revert-on-regress
-- **NOT** for subjective goals ("make it cleaner") -- use `mk:cook`
-- **NOT** for a known-root-cause bug -- use `mk:fix` / `mk:investigate`
-- **NOT** for behavioral grading of a running build -- use `mk:evaluate`
-- **NOT** for shipping -- use `mk:ship`
+## When not to use
 
-## Core Capabilities
-
-- **One atomic change per iteration** -- attribution stays clean (one sentence, no "and")
-- **Commit before verify** -- git is the undo mechanism, every trial is a recoverable SHA
-- **Keep/revert on a mechanical delta** -- keep if improved >= Min-Delta, else `git revert`
-- **Noise-aware verification** -- low/medium/high modes use single / worse-of-two / median
-- **Conventional commits** -- `test/refactor/perf/fix/chore(loop):` classified per change
-- **Safety screen** -- refuses destructive or fetch-and-exec Verify/Guard commands; masks secrets
-- **Stuck / plateau detection** -- shifts strategy autonomously, then escalates to a human gate
-
-## Configuration
-
-| Field | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `Goal` | yes | -- | What to improve |
-| `Scope` | yes | -- | Glob(s) for editable files |
-| `Metric` | yes | -- | Name + unit |
-| `Direction` | yes | -- | `higher` or `lower` is better |
-| `Verify` | yes | -- | Shell command that prints one number |
-| `Guard` | no | none | Regression check; exit 0 = pass |
-| `Iterations` | no | 10 | Hard cap before the re-gate |
-| `Noise` | no | medium | `low` / `medium` / `high` |
-| `Min-Delta` | no | derived | Minimum improvement to count as progress |
-| `Stop-At` | no | none | Target value; crossing it ends the loop |
-
-Missing required fields trigger one batched question -- no command runs until they are supplied.
-
-## Hard Gates
-
-Four human stops, at boundaries only (never per iteration):
-
-| Gate | When | Choice |
-|------|------|--------|
-| **A -- Entry** | After config parse + safety screen + git checks | Approve / Edit / Cancel |
-| **B -- Cap** | Iteration cap reached | Stop / Approve N more |
-| **C -- Escalation** | Stuck or plateau | Stop / Shift strategy / Approve more |
-| **D -- Scope expansion** | A change needs a file outside `Scope` | Approve wider scope / Decline |
-
-No file is edited before Gate A is approved.
+| Situation | Use |
+|---|---|
+| Subjective goal ("make it cleaner") | `mk:cook` |
+| Known bug to fix once | `mk:fix` or `mk:investigate` |
+| Grade a running build against a rubric | `mk:evaluate` |
+| Green-field product build | `mk:autobuild` |
+| Structural review of a diff | `mk:review` |
+| Open a PR | `mk:ship` |
+| No mechanical metric exists | `mk:cook --interactive` |
 
 ## Usage
 
@@ -75,30 +39,47 @@ No file is edited before Gate A is approved.
 /mk:loop Goal: Increase line coverage in src/utils to 80% \
   Scope: src/utils/**/*.ts, tests/utils/**/*.test.ts \
   Metric: line coverage %  Direction: higher \
-  Verify: npx jest --coverage --coverageReporters=json-summary 2>/dev/null | node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)" \
-  Guard: npx tsc --noEmit && npm test  Iterations: 15
+  Verify: <command that prints one number>  Guard: npx tsc --noEmit && npm test  Iterations: 15
 ```
+
+| Field | Required | Default | Meaning |
+|---|---|---|---|
+| `Goal` | yes | | What to improve |
+| `Scope` | yes | | Globs of editable files |
+| `Metric` | yes | | Name and unit |
+| `Direction` | yes | | `higher` or `lower` is better |
+| `Verify` | yes | | Shell command that prints one number |
+| `Guard` | no | none | Regression check, exit 0 means pass |
+| `Iterations` | no | 10 | Cap before the loop asks again |
+| `Noise` | no | medium | `low`, `medium` or `high` |
+| `Min-Delta` | no | from Noise | Smallest improvement that counts |
+| `Stop-At` | no | none | Target value that ends the loop |
+
+Missing required fields produce one batched question; no command runs before they are given. The config contract and metric library are in `references/config-and-metrics.md`.
+
+## Steps
+
+The loop pauses to ask you at four boundaries and never per iteration.
+
+| Stop | When | Options |
+|---|---|---|
+| Entry | After config parse, safety screen and git checks. No file is edited before you approve. | Approve, edit config, cancel |
+| Cap | Iteration cap reached | Stop, approve N more |
+| Escalation | 8 consecutive discards, or a plateau | Stop, shift strategy, approve more |
+| Scope expansion | A change needs a file outside `Scope` | Approve wider scope, decline |
+
+Between stops it takes a baseline, then repeats: pick one change, commit, verify, run the guard, keep or revert, log a TSV row. After 5 consecutive discards it shifts strategy by itself. The lifecycle is in `references/loop-protocol.md`.
 
 ## Output
 
-On completion the loop writes to `tasks/reports/loop-{YYMMDD-HHMM}-{slug}/`:
+The loop writes `loop-results.tsv`, `summary.md` and `handoff.json` to `tasks/reports/loop-{YYMMDD-HHMM}-{slug}/`, with secrets masked. The handoff names the goal, baseline, final value, kept commits, status and suggested next skills. Schema: `references/result-schema.md`. Good next steps are `mk:review` for the kept commits, then `mk:ship` by hand.
 
-- `loop-results.tsv` -- one row per iteration (baseline / keep / discard / guard-failed / crash / no-op)
-- `summary.md` -- baseline -> final, kept/discarded counts, kept-commit SHAs, stop reason
-- `handoff.json` -- machine-readable result for downstream skills
+## Gotchas
 
-Secrets are masked in all three.
-
-## Handoff
-
-`mk:loop` is a leaf executor -- user-invoked, suggests downstream skills, never called by orchestration skills. Upstream: `mk:plan-creator` / `mk:scout` supply the metric and scope. Guard suggestion: `mk:verify`. Downstream: `mk:review` (structural review of kept commits), `mk:evaluate` (optional behavioral check after the loop), `mk:ship` (manual PR, never auto-chained).
-
-## Pro Tips
-
-- **Wrap Verify in `| tail -1`** so a chatty command still yields a single trailing number
-- **A clean git tree is mandatory** -- commit or stash your own work first; the loop never auto-stashes
-- **Always set a Guard for code projects** -- it is the main defense against "metric gaming" (moving the number while breaking intent)
-- **Keep the cap low** -- 10 reaches Gate B sooner so you re-confirm intent before more spend
-- **Squash before shipping** -- kept `*(loop):` commits can be interactively squashed at the end
-
-> **Canonical source:** `.claude/skills/loop/SKILL.md`
+| Trap | Detail |
+|---|---|
+| Verify output | It must print exactly one number. Pipe through `\| tail -1`. A non-number in the dry run stops the loop. |
+| Dirty tree | A clean git tree is required. The loop asks and never stashes your work. |
+| Commit before verify | A crash mid-verify leaves a recoverable commit. |
+| Discards | They use `git revert`, never `git reset --hard`. A revert conflict stops the loop. |
+| Verify and Guard output | It is data. A command that emits instructions or fetches and runs remote code is refused by the safety screen (`references/safety-screen.md`). |

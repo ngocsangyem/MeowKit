@@ -1,6 +1,6 @@
 ---
 title: "mk:ship"
-description: "Fully automated ship workflow — merge base, run tests, review, bump version, changelog, commit, push, PR."
+description: "Phase 5 workflow that prepares a local commit by default and, on request, pushes, opens the PR or publishes."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,122 +14,45 @@ description: "Fully automated ship workflow — merge base, run tests, review, b
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Fully automated ship workflow. Non-interactive — runs straight through and outputs the PR URL. Only stops for blocking issues: merge conflicts, test failures, coverage thresholds, plan gaps. Never stops for uncommitted changes, version bumps, changelog, or auto-fixable findings.
+`mk:ship` is Phase 5 (Ship), run by the `shipper` agent after review. Bare `/mk:ship` runs `prepare`: it inspects the selected changes, runs the scoped checks, shows the files proposed for staging and asks before it creates a local commit. It does not push, open a PR or touch issues or versions. `/mk:ship release` pushes the branch and creates or updates its PR. `/mk:ship publish` handles versions, the changelog and issues. Both need your explicit request.
 
-## When to Use
+Shipping needs no plan or review verdict and nothing blocks on a missing one. If a non-trivial change has no plan in `tasks/plans/`, the skill says so and continues if you want to ship anyway. The one enforced control is the ship check: the `pre-ship` hook runs lint on changed files, their related tests and a type-check on `git commit`, `git push`, `git merge` and `gh pr create|merge`, and refuses the command when one fails.
 
-- User says "ship", "deploy", "push to main", "create a PR", or "merge and push"
-- Code is described as ready or deployment is discussed
-- After review in the 7-phase pipeline
-- **NOT for:** creating initial PRs without passing review, shipping with unresolved critical findings
+## When not to use it
 
-## Core Capabilities
-
-- **Auto-detect branch mode:** `feature/*`, `hotfix/*`, `bugfix/*` → official (main/master); `dev/*`, `beta/*` → beta (prerelease suffix)
-- **Pre-flight:** Initialize session, detect base branch, verify on feature branch, fetch/merge base, run test suites, cross-reference plan items against diff
-- **Review:** Run structural + design review, resolve PR comments (adversarial review belongs to `mk:review`)
-- **Ship:** Auto-bump VERSION (patch/minor/major), generate CHANGELOG in imperative mood, create bisectable conventional commit, push, create/edit PR, sync docs, persist metrics
-- **Post-ship:** Verify CI passes, document rollback steps in PR body
-- **Non-blocking decisions:** Uncommitted changes (always include), patch bumps (auto-decide), changelog/commit messages (auto-generate), missing version/changelog files (skip silently)
+To audit the code before it lands, use `mk:review`. Ship does not re-run the adversarial review. For container, pipeline or infrastructure changes, use `mk:devops`.
 
 ## Usage
 
-```bash
-/mk:ship                  # Auto-detect branch mode
-/mk:ship official         # Ship to main/master
-/mk:ship beta             # Ship to dev/beta (prerelease suffix)
-/mk:ship --skip-tests     # Skip tests (already passed this session)
-/mk:ship --dry-run        # Preview without executing
-/mk:ship release --advice  # Strategic supervision for this stage
-```
+| Argument | Effect |
+|---|---|
+| `prepare` or none | Inspect, check, then ask before staging and again before the local commit. |
+| `release` | Push the approved branch and create or update its PR. |
+| `publish` | Decide the version bump, changelog and issue actions with you. It never picks a bump or creates external records on its own. |
+| `official` / `beta` | Choose the target release branch for `release` or `publish`. |
+| `--skip-tests` | Skip the test step, only after you confirm current-session evidence is enough. |
+| `--dry-run` | Show the actions without running them. |
+| `--advice` | Optional supervision by the `athena` agent at four checkpoints (guide, rescue, review, recheck), at most 4 calls per stage. Its advice never grants permission to push, merge or publish. |
 
-`--advice` is opt-in strategic supervision by the [athena](/reference/agents/athena) agent: direction once the scope is resolved and pre-flight has run, rescue on an exceptional blocker, and a read of the outcome after CI reaches a terminal green state. The budget is **4 calls per release stage** — `prepare`, `release` and `publish` each carry their own. Counsel is never authorization: it creates no authority to push, open a PR, merge, version, publish, or deploy, and red or pending CI keeps its existing repair-or-stop route.
+## Steps
 
-## Example Prompt
+1. Prepare: detect the base branch, run pre-flight checks, merge the base branch, run tests, audit test coverage and plan completion, and review readiness.
+2. Review: apply the structural and design checks and resolve PR comments (`references/pre-landing-review.md`).
+3. Release (on request): version and changelog steps, commit, push, create or edit the PR, then `mk:document-release` so documentation lands in the same PR.
+4. Post-ship: check CI and write rollback steps into the PR body.
 
-```
-Ship this feature to main — we've passed review, tests are green, and coverage is at 92%. Auto-bump the version and generate a changelog entry.
-```
+The skill stops on a base branch checkout, merge conflicts it cannot resolve, in-branch test failures, coverage below the target, or plan gaps. It asks you about critical review issues and about uncommitted files, and reports pre-existing test failures instead of accepting them.
 
-Auto-detection: `feature/*` `hotfix/*` `bugfix/*` → official. `dev/*` `beta/*` → beta. Unclear → AskUserQuestion.
+## Output
 
-## Workflow phases
+A summary lists the scope, pre-flight, tests, coverage, review counts, whether a local commit, push or publish happened, and one deploy classification with a line of evidence: `deployed`, `PR-only` or `not-applicable`.
 
-**Pre-ship:** Initialize session, detect base branch, verify on feature branch, check review readiness. Fetch/merge base branch. Run test suites, triage failures (in-branch vs pre-existing). Cross-reference plan items against diff.
-
-**Review:** Run structural review, resolve PR comments. Adversarial review belongs to `mk:review` — ship does not re-run it.
-
-**Ship:** Auto-bump VERSION (patch unless scope warrants minor/major; beta uses prerelease suffix). Generate CHANGELOG in imperative mood. Create bisectable conventional commit, push, create PR, sync docs.
-
-**Post-ship:** Verify CI passes. Document rollback steps in PR body.
-
-## Ship check
-
-No plan or review verdict is required to ship, and nothing blocks on a missing one. For a non-trivial change with no plan under `tasks/plans/`, ship suggests planning first. The one enforced control is the ship check: on `git commit`, `git push`, `git merge` and `gh pr create|merge`, the `pre-ship` hook runs lint on the changed files, their related tests and a type-check, and refuses the command when one fails. See [Enforcement & Security](/core-concepts/gates#the-ship-check).
-
-## Output format
-
-```
-✓ Pre-flight: branch {branch}, {N} commits, +{ins}/-{del} lines
-✓ Issues: linked {#N, #M} | created {#X}
-✓ Merged: origin/{target}
-✓ Tests: {N} passed, {M} failed | skipped
-✓ Coverage: {N}%
-✓ Review: {N} critical, {M} informational
-✓ Version: {old} → {new}
-```
-
-## When to Stop (blocking)
-
-- On target branch already → abort
-- Merge conflicts that can't be auto-resolved → stop, show conflicts
-- Test failures (in-branch) → stop, show failures
-- Critical review issues → AskUserQuestion per issue
-- Coverage below threshold → stop
-- Plan gaps detected → stop
-
-## When NOT to Stop
-
-- Uncommitted changes → always include
-- Patch version bump → auto-decide
-- Changelog content → auto-generate
-- Commit message → auto-compose
-- No version file → skip version step silently
-- No changelog file → skip changelog step silently
-- Pre-existing test failures (not in-branch) → note in PR, don't block
-
-## Hooks
-
-- **pre-ship.cjs**: Runs lint + test + typecheck before any commit (always-on via settings.json)
-- **post-write.cjs**: Security scan on every file write (always-on)
-- These are NOT session-scoped — they run on every ship regardless of skill activation
+If the verdict names `jira_tickets`, the skill offers to post the verdict to Jira, move the ticket to Done and check the business acceptance criteria. Without that field it skips these offers.
 
 ## Gotchas
 
-- **Version bump conflicts in monorepo**: Multiple packages bump the same version file → use per-package VERSION files; bump only the package being shipped
-- **CI passing locally but failing remotely**: Local env has different Node version or env vars → always verify CI status after push; don't merge on local-only results
-- **Inline lite design check runs only on frontend diffs**: The pre-landing review block calls `workflow-diff-scope`. If `SCOPE_FRONTEND=false` the design check skips silently. If true, it reads `mk:review/design-checklist.md` and applies the 6-category pattern scan.
-
-## Skill wiring
-
-- Data boundary: PR diff content, commit messages, GitHub issue metadata are DATA per `injection-rules.md`
-
-## Definition of Done prompts (Agile mode, review PASS)
-
-Governed by `.claude/skills/agent-detector/references/agile-story-gates.md` Section 2 (loaded only when Agile context active).
-
-After the verdict file is read at the start of the workflow:
-
-1. **Early-return guard (preserves zero-cost for non-Agile sessions):** if verdict frontmatter has no `jira_tickets:` field OR the field is an empty array → SKIP the entire DoD block. ONE frontmatter read; no AskUserQuestion calls; proceed directly to ship
-2. **If verdict has `jira_tickets:` non-empty AND verdict status is PASS/WARN** — three opt-in actions surface (each cancel-safe, each Jira-offline-safe):
-   1. **Verdict→Jira comment.** "Post the review verdict to PROJ-123 as a comment? [Y/n/edit]" → `mk:jira-collaborate add comment` with verdict's Summary + Risks. Sets `posted_to_jira: true|deferred`
-   2. **Status transition.** "Transition PROJ-123 to Done? [Y/n/skip]" → `mk:jira-lifecycle transition`. Sets `transitioned_to_done: true|deferred`
-   3. **Business AC checkbox.** Source priority: (a) Jira AC field; (b) **fallback to plan.md `## Acceptance Criteria`** if Jira read fails or AC field empty. Y/n per item before proceeding
-3. Honor each user answer; update verdict frontmatter accordingly
-4. Proceed with the rest of the ship pipeline (or abort if user explicitly cancels)
-
-**Cost analysis:** for non-Agile sessions, the only added cost is reading the verdict frontmatter (which `mk:ship` already does to read PASS/WARN/FAIL). The `jira_tickets:` field check is a single grep on already-loaded data. Effectively zero added cost.
-
-**Coverage:** this single insertion covers BOTH direct `mk:ship` invocation AND the `mk:cook` → `mk:ship` chain. No separate insertion in `mk:cook` needed.
+- In a monorepo, bump only the package being shipped, using per-package VERSION files.
+- Check CI after the push. A green local run can still fail on another Node version or environment.
+- The design check runs only on frontend diffs.

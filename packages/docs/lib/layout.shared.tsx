@@ -54,7 +54,6 @@ export function baseOptions(): BaseLayoutProps {
         text: 'Resources',
         items: [
           { text: 'Changelog', url: '/changelog' },
-          { text: 'Migration: TDD optional', url: '/migration/tdd-optional' },
           {
             text: 'GitHub Releases',
             url: 'https://github.com/ngocsangyem/MeowKit/releases',

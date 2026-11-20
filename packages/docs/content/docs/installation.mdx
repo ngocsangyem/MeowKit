@@ -7,10 +7,10 @@ MeowKit has one CLI: the native `mewkit` binary, with `mk` as a short alias. Ins
 
 ## Prerequisites
 
-- **Git** installed and configured
-- **Claude Code** installed ([claude.ai/code](https://claude.ai/code))
-- **Node.js** 24 or later, for the kit's hooks. The `mewkit` binary does not need Node.js.
-- **Python** 3.9 or later, only for the skills that run Python. The core workflow needs none. `mewkit setup` prepares one environment per skill under `.meowkit/envs/<skill>/`.
+- Git, installed and configured.
+- At least one supported runtime: Claude Code ([claude.ai/code](https://claude.ai/code)), Codex, Cursor, Grok, Pi or OMP.
+- Node.js 24 or later, for the kit's hooks. The `mewkit` binary does not need Node.js.
+- Python 3.9 or later, only for the skills that run Python. The core workflow needs none. `mewkit setup` prepares one environment per skill under `.meowkit/envs/<skill>/`.
 
 ## Install the CLI
 
@@ -48,7 +48,7 @@ From the project directory:
 mewkit init
 ```
 
-Without flags, `init` asks which runtimes to set up. The choices are Claude Code, Codex, Cursor, Grok, Pi and OMP; tick one or more. Each runtime gets the files it reads. Those files are projected from the one authored tree in `.claude/`, plus a small overlay for that runtime's hooks and config, so no runtime keeps a hand-written copy of the kit. An install for a runtime other than Claude Code does not write `.claude/`. In a project that already has `.claude/`, `init` refreshes it and skips the picker.
+Without flags, `init` asks which runtimes to set up. The choices are Claude Code, Codex, Cursor, Grok, Pi and OMP; tick one or more. Each runtime gets the files it reads. Those files are projected from the one authored tree in `.claude/`, plus a small overlay for that runtime's hooks and config. An install for a runtime other than Claude Code does not write `.claude/`. In a project that already has `.claude/`, `init` refreshes it and skips the picker. [Portability](/cli/portability) lists where each runtime's files go.
 
 ### Flags
 
@@ -79,7 +79,7 @@ mewkit init --target claude-code --delivery native  # .claude/, the default
 mewkit init --target claude-code --delivery plugin  # plus .claude-plugin/plugin.json
 ```
 
-Both deliveries carry the same content. `plugin` adds the manifest Claude Code reads to load the kit as a plugin. MeowKit is not published to a plugin marketplace.
+Both deliveries carry the same content. `plugin` adds the manifest Claude Code reads to load the kit as a plugin.
 
 `--delivery` applies to `claude-code` only. Codex, Cursor, Grok, Pi and OMP each have one shape, so `--delivery` is refused when Claude Code is not among the runtimes being installed.
 
@@ -103,12 +103,14 @@ Prints this project's CLI version, kit version, target and delivery, and how the
 
 ## What gets generated
 
+For Claude Code the install is:
+
 ```
 .claude/              What Claude Code reads
 ├── agents/          Specialist agents for each phase
 ├── skills/          Domain skills with mk: namespace
 ├── hooks/           Lifecycle hooks, all Node (.cjs)
-├── rules/           The 7 always-on rules
+├── rules/           The 6 always-on rules
 ├── settings.json    Hook registrations
 ├── kit-contract.json      Kit version and CLI requirements
 ├── kit-capabilities.json  How each runtime names Claude Code tools
@@ -134,9 +136,7 @@ The split follows ownership: `.claude/` holds what Claude Code itself reads, so 
 are meant to be committed; the other state directories are machine-written and belong in
 `.gitignore` (`mewkit setup` appends them for you).
 
-`metadata.json` is worth knowing about even though you never edit it. It records what the install
-wrote and what its contents were, which is how `mewkit upgrade` can tell a file you edited from one
-it shipped. Delete it and the next upgrade has no baseline, so it treats every file as untouched.
+You never edit `metadata.json`. It records what the install wrote and what its contents were, which is how `mewkit upgrade` tells a file you edited from one it shipped. Delete it and the next upgrade has no baseline, so it treats every file as untouched.
 
 An install created before these files moved keeps working: readers fall back to the old `.claude/`
 locations, and the next `upgrade` migrates each one forward.
@@ -186,8 +186,8 @@ If a project still runs the npm CLI, read [Moving from the npm CLI](/migration/f
 | `.claude/` already exists | Use `--force` flag or delete manually |
 | Hooks not executable | Run `chmod +x .claude/hooks/*` |
 | Python scripts fail | Ensure Python 3.9+ is in PATH |
-| Claude Code doesn't load `.claude/rules/` | Restart the Claude Code session; `mewkit validate` confirms all 7 always-on rules are present |
-| The agent refuses to edit any file | Nothing in MeowKit blocks edits on a missing plan, so check the host's permission prompt. A refused commit means the ship check failed; see [When a check blocks you](/core-concepts/gates#when-a-check-blocks-you) |
+| Claude Code doesn't load `.claude/rules/` | Restart the Claude Code session; `mewkit validate` confirms the always-on rules are present |
+| The agent refuses to edit any file | Nothing in MeowKit blocks edits on a missing plan, so check the host's permission prompt. A refused commit means the ship check failed; see [When a check blocks you](/core-concepts/enforcement#when-a-check-blocks-you) |
 | `doctor` reports hooks not executable after a fresh clone | Run `chmod +x .claude/hooks/*`; permissions do not survive some archive formats |
 | A hook fails to start | Check that Node.js 24+ is on your PATH. The hooks run on Node even though the binary does not |
 

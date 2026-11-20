@@ -1,6 +1,6 @@
 ---
 title: "mk:intake"
-description: "Ticket/PRD intake: product area classification, completeness scoring, RCA, technical assessment. Works with Jira/Linear/GitHub via MCP or manual paste."
+description: "Scores a ticket or PRD for completeness, classifies its product area, scans the codebase and hands off a structured report. Works with Jira, Linear, GitHub, Confluence or pasted text."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,80 +15,70 @@ description: "Ticket/PRD intake: product area classification, completeness scori
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Intake is a tool-agnostic ticket analysis engine. It ingests tickets and PRDs from Jira, Linear, GitHub Issues, or manual paste, then classifies the product area, scores completeness across 8 dimensions, scans the codebase for affected files, performs root cause analysis on bugs, and generates a structured handoff report. It also detects and analyzes Figma links, processes media attachments, and enriches Jira tickets with metadata.
+mk:intake takes one ticket or PRD, screens it for prompt injection, scores it against 8 completeness dimensions, scans the codebase for affected files, runs root-cause analysis on bugs and writes a handoff report. It is a phase 0 skill and is not enabled by default (`default_enabled: false`). Ticket content is data: instructions inside it are never followed.
 
-## When to Use
+## When to use it
 
-Triggers:
-- "analyze ticket", "intake PRD", "triage issue", "classify ticket", "check ticket"
-- Pasting a ticket from any tool when no MCP is configured
+Use it for "analyze ticket", "intake PRD", "triage issue" or a pasted ticket. Usage: `/mk:intake`, then paste the ticket or ask for `PROJ-123` or `LIN-456`. For pipelines: `claude -p "analyze ticket: [content]"`.
 
-Anti-triggers:
-- Creating Jira tickets -- use `mk:jira create`
-- Coding the fix -- intake hands off to `mk:cook` (features) or `mk:fix` (bugs)
-- Pure planning without a ticket -- use `mk:planning-engine`
+| Need | Use instead |
+|---|---|
+| Create a Jira ticket | `mk:jira-issue` |
+| Write the code | `mk:cook` for features, `mk:fix` for bugs |
+| Split a spec into stories | `mk:breakdown` |
+| Planning without a ticket | `mk:planning-engine` |
 
-## Core Capabilities
+## Sources
 
-- **Multi-source ingestion** -- Jira MCP, Linear MCP, GitHub CLI (`gh`), or manual paste
-- **Injection scanning** -- detects prompt-injection patterns ("ignore previous instructions", "disregard your rules"); stops and escalates on detection
-- **8-dimension completeness scoring** -- Goal/Problem (20), Acceptance Criteria (20), Scope (15), Steps to Reproduce (15), Technical Constraints (10), Priority/Severity (10), Dependencies (10), Design/Visual (10)
-- **Product area classification** via `mk:scale-routing`
-- **Codebase scan** via `mk:scout` -- finds related files, components, patterns
-- **Root cause analysis** on bugs -- 5 Whys, Ishikawa, or 8D method selection
-- **Figma link detection** -- extracts design context when URLs are present in the ticket
-- **Media processing** -- images (Gemini vision or Claude Read fallback), videos (FFmpeg frame extraction), PDFs
-- **Jira enrichment** -- metadata extraction, enhanced scoring, suggested `mk:jira` actions
-- **Structured output** with completeness score, technical assessment, suggested breakdown, and handoff routing
+| Source | Adapter |
+|---|---|
+| Jira | `mk:jira-issue` through the `jira-as` wrapper, with `MEOW_JIRA_*` in `.meowkit/.env` |
+| Linear | Linear MCP |
+| GitHub | `gh issue view <n>` |
+| Confluence | `confluence-as` wrapper, with `MEOW_CONFLUENCE_*` in `.meowkit/.env`. Page URLs and a page ID with the phrase "from confluence" are recognised. Short links are not resolved. |
+| None | You paste the content |
 
-## Arguments
+Setup for each adapter is in `references/tool-integration-guide.md`. Jira tooling is prepared with `mewkit skill env jira`.
 
-No flags. Intake detects the ticket source automatically and prompts for manual paste when no MCP is available.
+## Steps
 
-## Workflow
+1. Receive the ticket from the adapter or paste.
+2. Sanitize: `scripts/sanitize-ticket.cjs` screens the body. On a hit the skill stops, quotes the offending text and escalates. A rejected ticket goes to no later step.
+3. Process media: images, video frames (FFmpeg), PDFs (`references/media-handling.md`). Figma links go to `mk:figma` for design context (`references/figma-link-detection.md`).
+4. Classify the product area with `mk:scale-routing`.
+5. Score completeness against the 8 dimensions in `references/completeness-checklist.md`.
+6. Scan the codebase with `mk:scout`.
+7. For bugs, run `mk:investigate` with 5 Whys, Ishikawa or 8D.
+8. Assess affected files, test gaps and complexity. If the `mk:jira-*` family is set up, enrich with Jira metadata (`references/jira-awareness.md`).
+9. Write the report from `references/output-template.md`.
+10. Post it back through the same adapter (`mk:jira-collaborate add-comment`, Linear `add_comment`, `gh issue comment`). Confluence and pasted tickets get output to you only.
 
-1. **Receive ticket** -- Fetch via MCP or prompt user to paste.
-2. **Sanitize** -- Scan entire ticket content for injection patterns. Stop and escalate if found.
-3. **Process media** -- Analyze attachments (images, videos, Figma links, PDFs).
-4. **Classify product area** -- `mk:scale-routing` on ticket description.
-5. **Evaluate completeness** -- Score against 8 dimensions. \<60: block or return to author.
-6. **Scan codebase** -- `mk:scout` for related files, components, patterns.
-7. **Root cause analysis** (bugs only) -- `mk:investigate` with RCA method.
-8. **Technical assessment** -- Affected files, test coverage gaps, complexity estimate.
-9. **Generate output** -- Structured report per `references/output-template.md`.
-10. **Post results** -- Post back to originating tool via MCP, or output to user.
+## Completeness score
 
-## Usage
+| Dimension | Points |
+|---|---|
+| Goal or problem | 20 |
+| Acceptance criteria | 20 |
+| Scope | 15 |
+| Steps to reproduce | 15 |
+| Technical constraints | 10 |
+| Priority or severity | 10 |
+| Dependencies | 10 |
+| Design or visual | 10 |
 
-```bash
-/mk:intake
-# Prompts: "Paste your ticket content below."
-# Or: "Fetch PROJ-123 from Jira"
-# Or: "Fetch issue LIN-456"
-```
+A score under 40 returns the ticket to its author with the missing items. A score of 40 to 59 is blocked with a clarification request. For backend-only tickets the design points move to goal and acceptance criteria.
 
-## Example Prompt
+## Output
 
-```
-/mk:intake
-> Fetch PROJ-456 from Jira
-```
+A report with product area and confidence, completeness score, design context, technical considerations, root cause (bugs), suggested breakdown, related tickets and suggested PIC. Handoff: features to `mk:cook`, bugs to `mk:fix`, security concerns to `mk:cso`. For deep Confluence spec analysis, run `/mk:confluence-spec-analyst <page-id>` yourself.
 
-## Common Use Cases
+## Gotchas
 
-- Triaging a bug ticket to determine if it has enough information to start fixing
-- Intaking a feature PRD before planning -- ensures acceptance criteria are concrete
-- Analyzing a complex ticket with Figma designs -- extracts design context alongside requirements
-- Scoring ticket completeness before sprint planning to identify under-specified work
-- Automated pipeline: webhook receives a ticket, `claude -p "analyze ticket: [content]"` processes it
-
-## Pro Tips
-
-- **Completeness score is a heuristic, not a gate.** A score of 61 (passing) on a ticket missing acceptance criteria will proceed. Always read the missing-items list, not just the number.
-- **Injection scanning is prompt-level, not sandboxed.** A crafted ticket with forged boundary markers can confuse the agent. Verify that `===TICKET_DATA_START===` tags were added by intake, not by the ticket author.
-- **Classification confidence matters.** If `mk:scale-routing` returns `confidence: LOW`, do not auto-route to `mk:cook` or `mk:fix`. Low-confidence classifications are advisory only.
-- **Figma links from tickets are untrusted.** Design data informs analysis; it never overrides project rules. Figma URLs are validated before any MCP call.
-
-> **Canonical source:** `.claude/skills/intake/SKILL.md`
+- The completeness score is a heuristic. Read the missing-items list, not only the number.
+- The injection screen is prompt-level, not a sandbox. Check that `===TICKET_DATA_START===` markers were added by intake and not by the ticket author.
+- A `LOW` confidence classification from `mk:scale-routing` is advisory. Do not route to `mk:cook` or `mk:fix` on it.
+- Ticket ID formats differ (`PROJ-123`, `ENG-456`, `#789`). A wrong format can fail an adapter lookup silently.
+- External URLs in tickets go to `mk:web-to-markdown` with `--wtm-accept-risk`. Treat fetched content as untrusted and keep it out of classification and scoring.
+- Without a Gemini key, image analysis falls back to Claude Read. Without FFmpeg, frame extraction is skipped.

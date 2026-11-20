@@ -1,70 +1,55 @@
 ---
 title: "Sprint Retrospective"
-description: "Run a team-aware engineering retrospective with commit analysis and trend tracking."
+description: "Run a team-aware engineering retrospective from commit history, with a saved snapshot for trend tracking."
 ---
 
-> Analyze commits, work patterns, and code quality with persistent trend tracking.
+`mk:retro` reads your git history and writes a retrospective: what shipped, how the team worked and how it compares with earlier runs.
 
-**Best for:** End of sprint, weekly review  
-**Time estimate:** 10-15 minutes  
-**Skills used:** [mk:retro](/reference/skills/retro)  
-**Agents involved:** analyst (cost data), documenter (saves report)
+**Best for:** End of a sprint or week
+**Time estimate:** 10 to 15 minutes
+**Skills used:** [mk:retro](/reference/skills/retro)
 
-## Overview
-
-The [mk:retro](/reference/skills/retro) skill analyzes your git history to produce a structured retrospective. It's team-aware (breaks down per-person contributions) and tracks trends across runs to show improvement or regression.
-
-## Step-by-step guide
-
-### Step 1: Run the retrospective
+## Run it
 
 ```
 /mk:retro
 ```
 
-### Step 2: Review the analysis
+The default window is the last 7 days. The skill accepts `24h`, `14d`, `30d`, `compare` and `global`.
 
-The skill analyzes:
-- **Commits** by type (feat, fix, refactor, docs) and author
-- **Work patterns** — velocity, review turnaround, deploy frequency
-- **Code quality** — test coverage trends, security findings over time
-- **Per-person** — contributions, strengths, growth areas (with praise)
-- **Cost** — token usage from `.meowkit/telemetry/cost-log.json` via the **analyst** agent
+## What it analyzes
 
-### Step 3: Track trends
+- Commit counts and a percentage breakdown by conventional commit type (feat, fix, refactor, test, chore, docs).
+- Lines of code, test lines and a test ratio.
+- Per-person breakdowns for every contributor, each with specific praise anchored in commits and one growth suggestion. You get the deepest section.
+- Time patterns, session counts and hotspot files.
+- Weekly trends when the window is 14 days or longer, and commit streaks for the team and for you.
 
-Each retrospective is saved, so the next one compares:
-- Are we shipping more or fewer features?
-- Is review turnaround improving?
-- Are security findings decreasing?
-- Is cost per feature going up or down?
+## Trend tracking
 
-### How the analyst agent contributes
+Each run saves a JSON snapshot to `tasks/reports/retros/`, and the narrative goes there too. The next run loads earlier snapshots to compare. `compare` mode compares the current window with the previous one, and `global` mode runs the retro across repositories.
 
-The **analyst** provides cost and pattern data from `memory/`:
-- Token usage trends (are we using cheaper models when appropriate?)
-- Pattern frequency (recurring issues that should become rules)
-- Lessons learned that inform the retrospective's recommendations
+## Memory
 
-<Callout title="Sprint Data from Jira" type="info">
+`mk:retro` appends one entry to `.meowkit/memory/gotchas.md` (or `decisions.md` for a decision) through `mewkit note`, and only when the lesson cannot be read from the code, the diff or `git log`.
 
-If Atlassian MCP is available, mk:retro can pull sprint velocity and ticket metrics directly from Jira. Currently mk:retro uses git history only — Jira sprint data integration is planned for a future release.
+## Agile action items
 
-</Callout>
-
-### Step 4: Action-item ceremony (Agile mode)
-
-When an Agile context is active (sprint-state contract present, `MEOW_JIRA_SITE_URL` env, `jira_tickets:` in plans, or Jira-key prompt match), `mk:retro` parses the narrative for `## 3 Things to Improve` and `## 3 Habits for Next Week` and surfaces a per-item AskUserQuestion:
+In an Agile context (a sprint-state file, `MEOW_JIRA_SITE_URL`, `jira_tickets:` in plans, or a Jira key in the prompt), `mk:retro` also asks about each item under `## 3 Things to Improve` and `## 3 Habits for Next Week`:
 
 | Option | Effect |
-|--------|--------|
-| Create Jira story now | Invokes `mk:jira-issue create` with body pre-filled — REQUIRES user review before submit |
-| Add to plan TODO | Appends to active plan as a TODO item |
-| Document as no-action | Records the disposition in the retro report under `tasks/reports/retros/` |
+|---|---|
+| Create Jira story now | Runs `mk:jira-issue create` with the body pre-filled; you review before it submits |
+| Add to plan TODO | Appends to the active plan |
+| Document as no-action | Records the reason in `tasks/reports/retros/` |
 | Defer to next retro | Carries the item forward |
 
-The retro is not "complete" until every surfaced action has a disposition. NEVER auto-creates Jira stories — preserves the reports-not-automation principle. In non-Agile sessions this step is inert (the rule isn't loaded). Governed by `.claude/skills/agent-detector/references/agile-feedback-cycle.md`.
+The retro is complete when every item has a disposition. It never creates Jira stories on its own. Outside an Agile context this step does nothing. The rule is `agile-feedback-cycle.md`; [Agile / Scrum](/workflows/agile-scrum) covers the rest of the sprint ceremonies.
 
-## Next workflow
+## Sprint data
 
-→ [Architecture Decisions](/workflows/architecture) — document architectural choices
+`mk:retro` uses git history only. It does not read Jira sprint velocity or ticket metrics.
+
+## Next
+
+[Architecture Decisions](/workflows/architecture) covers recording architectural choices.

@@ -1,33 +1,30 @@
 ---
 title: "Writing Tests"
-description: "Write unit tests and E2E tests following TDD methodology."
+description: "Write unit tests test-first with --tdd, generate Playwright E2E tests, and audit coverage."
 ---
 
-> Add meaningful test coverage with TDD enforcement.
+This playbook adds test coverage in three ways: unit tests written first, E2E tests generated from a spec, and a coverage audit of a diff.
 
-**Best for:** Improving coverage, TDD practice  
-**Time estimate:** 10-30 minutes  
-**Skills used:** [mk:qa-manual](/reference/skills/qa-manual) (E2E), [mk:review](/reference/skills/review) (coverage audit)  
-**Agents involved:** tester, developer (if implementation needed)
+**Best for:** Improving coverage, TDD practice
+**Time estimate:** 10 to 30 minutes
+**Skills used:** [mk:testing](/reference/skills/testing), [mk:qa-manual](/reference/skills/qa-manual) (E2E), [mk:review](/reference/skills/review) (coverage audit)
+**Agents involved:** tester, developer
 
-## Overview
+## Is TDD on?
 
-MeowKit's TDD discipline is **opt-in via `--tdd` / `MEOWKIT_TDD=1`**. When enabled, tests must exist and fail BEFORE implementation. When disabled (default), tests are recommended but not gated — you may write them before, alongside, or after the code. This workflow covers both adding unit tests to existing code and generating E2E tests from user flows.
+TDD is opt-in, through `--tdd` or `MEOWKIT_TDD=1`. With it on, failing tests must exist before implementation. Without it, tests are recommended and you may write them before, alongside or after the code.
 
-## Unit tests (TDD mode — `--tdd`)
+## Unit tests, test-first (`--tdd`)
 
-### Step 1: Write failing tests first
-
-In TDD mode, the **tester** writes tests that define expected behavior:
+### Step 1: The tester writes failing tests
 
 ```
 /mk:cook add input validation to user registration --tdd
 ```
 
-The tester writes tests BEFORE the developer touches implementation:
+The **tester** writes tests that define the behavior, before the developer touches the implementation:
 
 ```typescript
-// tests/user-registration.test.ts (tester creates this)
 test('rejects email without @ symbol', () => {
   expect(validateEmail('invalid')).toBe(false);
 });
@@ -37,51 +34,42 @@ test('rejects password shorter than 8 characters', () => {
 });
 ```
 
-These tests **fail** — the validation functions don't exist yet.
+They fail because the validation functions do not exist yet.
 
-### Step 2: Developer implements to pass
+### Step 2: The developer makes them pass
 
-The **developer** writes the minimum code to make tests green.
+The **developer** writes the least code that turns the tests green.
 
 ### Step 3: Refactor
 
-Both tester and developer refine — tests still pass after each change.
+Tester and developer refine the code, and the tests stay green after each change.
 
 ## E2E tests (Playwright)
 
-### Step 1: Generate from spec
+### Step 1: Generate from a spec
 
 ```
-/mk:qa-manual tasks/plans/260327-checkout.md --generate
+/mk:qa-manual tasks/plans/260327-checkout/plan.md --generate
 ```
 
-The [mk:qa-manual](/reference/skills/qa-manual) skill:
-1. Navigates the app like a human tester
-2. Records every interaction as Playwright TypeScript code
-3. Detects test ID convention (`data-testid` or `data-cy`)
-4. Generates feature folder structure:
+[mk:qa-manual](/reference/skills/qa-manual) navigates the app like a human tester, records the interactions as Playwright TypeScript and detects whether the project uses `data-testid` or `data-cy`. It writes a feature folder:
 
 ```files
 tests/e2e/checkout-flow/
 ├── common/
-│   ├── checkoutSelectors.ts (all locators centralized)
-│   ├── checkoutAssertions.ts (reusable assertions)
-│   └── checkoutIntercepts.ts (API mocks)
-└── checkout-flow.spec.ts (one describe block)
+│   ├── checkoutFlowSelectors.ts
+│   ├── checkoutFlowAssertions.ts
+│   └── checkoutFlowIntercepts.ts
+└── checkout-flow.spec.ts
 ```
 
-### Step 2: Verify selectors exist
+Selectors, assertions and API mocks live in `common/`, and each spec file has one `test.describe` block.
 
-The skill greps the source to verify each `getByTestId()` actually exists:
+### Step 2: Check the selectors
 
-```bash
-grep -rn 'data-testid="checkout-btn"' src/ → Found ✓
-grep -rn 'data-testid="place-order"' src/ → Found ✓
-```
+Each `getByTestId()` selector is checked against the source with grep. A selector that is not found gets a warning comment and a fallback locator.
 
-Missing selectors get a warning comment and fallback locator.
-
-### Step 3: Run the generated tests
+### Step 3: Run the tests
 
 ```bash
 npx playwright test tests/e2e/checkout-flow/
@@ -89,12 +77,13 @@ npx playwright test tests/e2e/checkout-flow/
 
 ## Coverage audit
 
-The [mk:review](/reference/skills/review) skill includes a test coverage audit (Step 4.75) that:
-1. Traces code paths through your changes
-2. Maps user flows to test scenarios
-3. Identifies untested paths
-4. Auto-generates tests for gaps
+[mk:review](/reference/skills/review) includes a test coverage step (Step 4.75). It:
 
-## Next workflow
+1. Traces the code paths the diff changes.
+2. Maps user flows and error states to tests.
+3. Lists the paths that have no test.
+4. Generates tests for the gaps through the review's fix-first flow.
 
-→ [QA Testing](/workflows/qa-testing) — manual QA with structured reports
+## Next
+
+[QA Testing](/workflows/qa-testing) covers manual QA with structured reports.

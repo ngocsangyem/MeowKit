@@ -1,81 +1,70 @@
 ---
 title: "Fix a Bug"
-description: "Structured bug investigation with /mk:fix: root cause analysis, regression tests, and a memory entry."
+description: "Fix a bug with /mk:fix: find the root cause first, apply a minimal fix, verify it, and record a lesson when there is one."
 ---
 
-`/mk:fix` is MeowKit's debugging pipeline. Instead of immediately editing code, it forces structured investigation: find the root cause, write a regression test, apply the minimal fix. The approach adapts to bug complexity automatically.
-
-## Quick start
+`/mk:fix` is the debugging pipeline. It does not edit code first. It finds the root cause, fixes that cause with the smallest diff, and checks the fix against the failing behavior.
 
 ```bash
 /mk:fix login fails after 24 hours
 ```
 
-MeowKit auto-detects complexity and runs the appropriate workflow. A typo gets a quick fix. A race condition gets full investigation with parallel exploration.
+Without a mode flag it uses the standard profile. A typo or lint error can take the quick profile, and a cross-module race can take deep.
 
-## Choosing the right mode
+## Choose a mode
 
-| Bug type | Command | What happens |
-|----------|---------|-------------|
-| Typo, config, lint error | `/mk:fix "typo in README" --quick` | Direct fix, no investigation |
-| Logic bug, one module | `/mk:fix "session token not refreshed"` | Investigate → diagnose → fix → test |
-| Cross-module, intermittent | `/mk:fix "race condition in payment queue"` | Full investigation with parallel exploration |
-| Multi-file test failures | `/mk:fix "all failing tests in checkout" --parallel` | Parallel agents per issue |
+| Bug | Command | What happens |
+|---|---|---|
+| Typo, config or lint error with a known cause in two files or fewer | `/mk:fix "typo in README" --quick` | Minimal scout, compact root-cause proof, edit, before and after check |
+| Logic bug in one module | `/mk:fix "session token not refreshed"` | Scout, investigate, diagnose, fix, verify |
+| Cross-module or intermittent bug | `/mk:fix "race condition in payment queue"` | Standard plus a plan agreed with you when a contract or the architecture changes |
+| Several independent failures | `/mk:fix "failing tests in checkout" --parallel` | One `developer` agent per issue |
+| Bug on a sensitive path | `/mk:fix "payment timeout" --review` | Pauses at each step for you |
+| You want the regression test first | `/mk:fix "auth bypass" --tdd` | Writes the failing regression test before the fix |
 
-## What happens step by step
+`--auto` runs the standard profile without pausing for progress. It stops where a human decision is required and never approves for you.
 
-```
-Bug reported
-  → Step 0: Mode selection (quick / standard / deep)
-  → Step 0.5: Check memory — has this bug class been fixed before?
-  → Step 1: Scout — mandatory codebase exploration (mk:scout)
-  → Step 2: Diagnose — investigate + sequential-thinking for root cause
-  → Step 3: Complexity assessment
-  → Step 4: Fix — address ROOT cause, not symptoms
-  → Step 5: Verify — regression test (mandatory)
-  → Step 6: Write to memory — pattern captured for future bugs
-```
+## Steps
 
-## Hard stops
+1. **Mode selection.** Standard unless the quick profile's boundary is already proven.
+2. **Check memory** (standard and deep). One grep of `.meowkit/memory/` for the bug class. A matching gotcha becomes the first hypothesis.
+3. **Scout** with `mk:scout`. Mandatory, even in quick mode.
+4. **Diagnose.** Standard and deep use `mk:investigate`, then `mk:sequential-thinking` to test hypotheses against evidence. The output is a root cause with an evidence chain and a confidence level.
+5. **Root-cause proof.** Six fields must be filled before the fix: exact symptom, reproduction evidence, expected against actual, root cause with `file:line`, why it appears now, and blast radius.
+6. **Fix the root cause**, not the symptom.
+7. **Verify and prevent.** Re-run the commands that failed before, add a regression test, and consider guards such as input validation.
+8. **Finalize.** Report the confidence, cause, changes and files. Write one memory entry only when the lesson is one the next session could not derive from the code or git history.
 
-- **No fix before Steps 1-2 complete.** Scout and diagnose are mandatory.
-- **Confidence below "medium" blocks the fix.** More evidence is required.
-- **3 failed fix attempts stops the pipeline.** The architecture needs review, not a fourth attempt.
+## Stops
 
-## When to review mode
+- No fix before the scout and diagnose steps are done.
+- A confidence below medium means gathering more evidence first.
+- After three failed fix attempts the skill stops and questions the architecture with you. After an escalation like this, the `journal-writer` agent can record what was tried.
 
-```bash
-/mk:fix payment processing timeout --review
-```
+These are rules of the skill. No hook enforces them.
 
-Pauses for your approval at each step. Use when:
-- The bug is in a security-critical path
-- You want to validate the diagnosis before the fix
-- The fix has regulatory implications
+## What helps along the way
 
-## What runs without you asking
-
-| Concern | What handles it | What it buys you |
-|---------|-----------|-------------|
-| Root cause before fix | `mk:investigate` | You cannot patch the symptom by accident |
-| Scope control | `mk:freeze` | Unrelated code stays untouched |
-| Regression test | tester | Proof the bug existed *and* that the fix closes it |
-| Security scan | `post-write.cjs` | Every edited file is checked for new holes |
-| Minimal diff | developer | The root cause fixed in the fewest lines |
-| Evidence over assertion | reviewer | Verified with test output, not "should work" |
+| Concern | What covers it |
+|---|---|
+| Root cause before a fix | `mk:investigate` |
+| Keeping edits in scope | `mk:freeze` can lock edits to named directories while a debug session runs |
+| Proof the bug existed and the fix closes it | The regression test |
+| New security problems in edited files | `post-write.cjs` scans every file write |
+| Verified, not asserted | The reviewer checks test output |
 
 ## After the fix
 
-When a fix teaches something a future session could not derive, it appends one entry to `.meowkit/memory/gotchas.md`. Next time a similar bug appears, Step 0.5's grep finds the entry and fast-tracks diagnosis. After 3+ occurrences of the same bug class, promote the lesson to a `CLAUDE.md` rule.
+When the fix teaches something non-derivable, it goes into `.meowkit/memory/gotchas.md` through `mewkit note`. The next similar bug finds it in the memory check. A bug class that keeps coming back is a candidate for a rule in `CLAUDE.md`. Quick runs never write memory, and `--no-capture` skips the write.
 
 ## Don't use /mk:fix for
 
-- **New features** → use `/mk:cook`
-- **Architecture decisions** → use `/mk:party` or `/mk:plan-creator`
-- **"Why is this broken?" without fixing** → use `/mk:investigate`
+- New features. Use `/mk:cook`.
+- Architecture decisions. Use `/mk:party` or `/mk:plan-creator`.
+- Finding out why something is broken without fixing it. Use `/mk:investigate`.
 
 ## Next steps
 
-- [Debug effectively](/guides/debug-effectively): when to use fix vs investigate vs sequential-thinking
-- [Build a feature](/guides/build-a-feature): the full feature pipeline
-- [Understand the workflow](/core-concepts/workflow)
+- [Debug effectively](/guides/debug-effectively) for choosing between fix, investigate and sequential-thinking
+- [Build a feature](/guides/build-a-feature) for the feature pipeline
+- [The workflow](/core-concepts/workflow)

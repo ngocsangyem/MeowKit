@@ -1,6 +1,6 @@
 ---
 title: "mk:nyquist"
-description: "Test-to-requirement coverage mapping — reads plan acceptance criteria and test files, produces a coverage gap report showing which requirements have no tests."
+description: "Maps plan acceptance criteria to test files and lists criteria that no test covers. Read-only."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,43 +14,32 @@ description: "Test-to-requirement coverage mapping — reads plan acceptance cri
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Analyzes plan acceptance criteria against existing test files to identify coverage gaps — requirements in the plan with no corresponding test. Named after the Nyquist sampling theorem: sufficient test coverage prevents aliased (missed) requirements.
+Maps the acceptance criteria in a plan to test files and lists the criteria that have no matching test. It is read-only: it never writes tests, edits the plan or runs tests. It checks that a test exists, not that it is correct. Use it after the first tests are written (Phase 2), as part of review (Phase 4), or before shipping.
 
-This is a **read-only analysis** skill. It never modifies code or plans.
+## When not to use
 
-## When to Use
+To run tests use `mk:testing`. For structural code review use `mk:review`. The `tester` agent writes tests.
 
-- **Phase 2 (Test):** After tester writes initial tests — verify all acceptance criteria are covered before implementation.
-- **Phase 4 (Review):** As part of test coverage dimension — verify no gaps before shipping.
-- **Before review:** Verify implementation matches plan.
-- **Triggers:** "check test coverage", "are all requirements tested", "coverage gaps", "nyquist".
+## Usage
 
-**NOT for:** running tests (`mk:testing`), structural code review (`mk:review`), writing tests (tester agent's job).
+Ask in plain words: "are all requirements tested?", "check coverage gaps for the onboarding plan", or run `/mk:nyquist`.
 
-## Core Capabilities
+## Steps
 
-### 5-Step Workflow
+1. Read `tasks/plans/YYMMDD-name/plan.md` and extract the acceptance criteria.
+2. Find test files with the globs `**/*.test.*`, `**/*.spec.*` and `**/test_*.*`.
+3. Match each criterion to tests, then list criteria with no match as gaps.
+4. Write the report.
 
-1. **Load plan** — Read `tasks/plans/YYMMDD-name/plan.md`, extract all acceptance criteria.
-2. **Scan tests** — Glob for test files: `**/*.test.*`, `**/*.spec.*`, `**/test_*.*`.
-3. **Map criteria to tests** — For each acceptance criterion, search test strings for matching keywords.
-4. **Identify gaps** — Criteria with no matching test = coverage gap.
-5. **Produce report** — Structured output with mapping table and gap list.
-
-### Matching Strategy
-
-| Strategy | How it works |
+| Matching | How |
 |---|---|
-| **Keyword matching** | Extract key nouns/verbs from criteria, search in `describe`/`it`/`test` strings |
-| **File path matching** | If criterion mentions "auth", search in `**/auth*test*` |
-| **Fuzzy matching** | If exact match fails, check semantic equivalents (e.g., "login" ≈ "authenticate") |
-| **Manual override** | If no match found, ask user to confirm gap is real (not a naming mismatch) |
+| Keywords | Key nouns and verbs from the criterion against `describe`, `it` and `test` strings |
+| File path | A criterion about "auth" is searched in `**/auth*test*` |
+| Fuzzy | Equivalents such as "login" and "authenticate" |
+| Manual | With no match, it asks you to confirm the gap is real and not a naming mismatch |
 
-### Output Format
+## Output
 
-## Example Prompt
-
-> /mk:nyquist
-> Before we start building the user onboarding flow, check if all acceptance criteria from the plan have corresponding tests. Show me the coverage gap report — which requirements have no test at all and which have only partial coverage.
+A report headed `Nyquist Coverage Report: <plan name>` with a table of criterion, test file, test name and status (COVERED or GAP), a summary of total, covered and gap counts, details with a suggested test for each gap, and a recommendation of PASS or WARN.

@@ -1,33 +1,21 @@
 ---
-title: "Trace & Benchmark Meta-Loop"
-description: "How MeowKit improves itself — trace log, scatter-gather analysis, benchmark canary suite, and dead-weight audit."
+title: "Trace & Benchmark"
+description: "How MeowKit measures itself: the trace log, the mewkit trace commands, scatter-gather analysis, the benchmark canary suite and the dead-weight audit."
 ---
 
-## The Meta-Improvement Cycle
+Every harness component assumes something about what the model cannot do, and those assumptions age. The trace log and the benchmark suite give evidence from real runs, so a maintainer decides what to keep from measurements. Nothing in this loop changes the harness on its own. Trace content is data (see `injection-rules.md`), and every suggestion goes to you for a decision.
 
-Every harness component encodes an assumption. Assumptions age. The meta-loop is how MeowKit keeps the harness calibrated as models improve — replacing assumption-driven decisions with evidence from real runs.
-
-```mermaid
-flowchart TD
-    A[Harness runs] --> B[Hooks emit trace records\nappend-trace.cjs]
-    B --> C[.meowkit/telemetry/trace-log.jsonl]
-    C --> D[/mk:trace-analyze\nScatter-gather 3 researchers]
-    D --> E{HITL gate\nAskUserQuestion}
-    E -- Approved --> F[Apply harness changes]
-    E -- Rejected --> G[Rejected log]
-    F --> H[/mk:benchmark run\nCanary suite]
-    H --> I[Delta table\n/mk:benchmark compare]
-    I --> J[Dead-weight audit\ndocs/dead-weight-audit.md]
-    J --> A
+```
+hooks append records  →  .meowkit/telemetry/trace-log.jsonl
+  →  mewkit trace score | audit | propose        (deterministic, no subagents)
+  →  /mk:trace-analyze                           (scatter-gather, asks you per suggestion)
+  →  /mk:benchmark run | compare                 (maintainers, source repository)
+  →  dead-weight audit                           (maintainers)
 ```
 
-The loop is intentionally slow and human-gated. Trace content is DATA (per `injection-rules.md`). No suggestion from trace analysis is applied automatically — ever.
+## The trace log
 
-## Trace Log Format
-
-**Location:** `.meowkit/telemetry/trace-log.jsonl`
-
-Append-only JSONL. Every record has the same top-level envelope:
+`.meowkit/telemetry/trace-log.jsonl` is an append-only JSONL file. Every record has the same envelope:
 
 ```json
 {
@@ -38,137 +26,86 @@ Append-only JSONL. Every record has the same top-level envelope:
   "harness_version": "3.0.0",
   "model": "claude-sonnet-4-5",
   "density": "FULL",
-  "data": { ... event-specific payload ... }
+  "data": {}
 }
 ```
 
-**Record types emitted by hooks and harness steps:**
+Hooks and harness steps write records through `append-trace.cjs`. Event types written today include:
 
-| Event type | Emitter | When |
+| Event | Writer | When |
 |---|---|---|
-| `build_verify_result` | `build-verify.cjs` | Compile/lint failure on a file write |
-| `loop_warning` | `loop-detection.cjs` | Edit count hits threshold (N=4 or N=8) |
-| `pre_completion_block` | `pre-completion-check.cjs` | Session blocked for missing verification |
-| `session_end` | `post-session.cjs` | Session closes normally |
-| `eval_verdict` | `mk:evaluate` step | Evaluator emits PASS/WARN/FAIL with rubric scores |
-| `benchmark_result` | `mk:benchmark` | Canary suite run result |
+| `build_verify_result` | `build-verify.cjs` | A compile or lint failure after a file write |
+| `loop_warning` | `loop-detection.cjs` | A file reaches the edit-count thresholds (4 and 8) |
+| `session_end` | `post-session.cjs` | A session closes |
+| `orient_run` | `mewkit orient` | An orientation run, unless `--no-record` is passed |
+| `benchmark_result` | `mk:benchmark` | A canary suite run |
 
-**Append safety:** `append-trace.cjs` uses `flock` for atomic appends (falls back to a plain append on macOS where `flock(1)` is not in the base install). Payloads are secret-scrubbed via `lib/secret-scrub.cjs` before write. Records are never mutated after append.
+Writes happen under a file lock, and a record is dropped rather than blocking a hook. Payloads pass through `lib/secret-scrub.cjs` before they are written, so keys, tokens and credential strings are stripped. Records are never edited after they are appended.
 
-## Scatter-Gather Analysis
+When the file passes 50 MB, the next append rotates it to `trace-log.{YYMMDD-HHMMSS}.jsonl.gz` and starts a fresh log.
 
-`/mk:trace-analyze [--runs N]` (default N=20) is a step-file workflow:
+## Commands
 
-```mermaid
-flowchart LR
-    A[Step 1: Ingest\nlast N records] --> B[Step 2: Partition\nby run_id into ≤3 batches]
-    B --> C1[Researcher 1\nbatch A]
-    B --> C2[Researcher 2\nbatch B]
-    B --> C3[Researcher 3\nbatch C]
-    C1 --> D[Step 4: Gather\nmain agent synthesizes]
-    C2 --> D
-    C3 --> D
-    D --> E[Step 5: Suggestions\nstructured proposals]
-    E --> F[Step 6: HITL gate\nAskUserQuestion per suggestion]
-```
+| Command | What it does |
+|---|---|
+| `mewkit trace score [--id RUN]` | Trace-quality tier per run lane |
+| `mewkit trace audit` | Entropy, and counts of orphaned, stale, unverified-run and repeated-friction records |
+| `mewkit trace propose [--commit]` | Groups repeated friction (2 or more) and drift into advisory backlog items. Without `--commit` it only prints them |
+| `mewkit trace --friction "<note>" [--responsibility R] [--id RUN]` | Records a friction note |
 
-**Frequency threshold:** a pattern must appear in ≥3 records before becoming a suggestion. Single-occurrence anomalies are noise — the threshold prevents overfit to one bad run.
+Record friction when you correct the agent by hand. A note about a skill is best encoded in that skill's Gotchas section.
 
-**HITL gate is mandatory.** Each suggestion is presented individually via `AskUserQuestion`. Bulk-approve is not available. Trace content is DATA; suggestions derived from it are hypothesis, not ground truth.
+## Scatter-gather analysis
 
-**Output** (written to `plans/{date}-trace-analysis/`):
-- `findings.md` — patterns above threshold
-- `suggestions-draft.md` — proposals before human review
-- `suggestions.md` — approved only
-- `rejected.md` — rejected with reasons
-- `analysis.md` — final human-readable summary
+`/mk:trace-analyze [--runs N]` (default 20) is for patterns that need cross-run synthesis:
 
-**Skip conditions:** fewer than 3 trace records (insufficient signal), or last analysis ran within 24h with no new records.
+1. Ingest the last N records.
+2. Partition them by run into at most 3 batches.
+3. Scatter: three `researcher` subagents analyze one batch each.
+4. Gather: the main agent merges the cross-batch patterns.
+5. Draft structured suggestions.
+6. Ask you about each suggestion, one at a time. There is no bulk approve.
 
-## Benchmark Canary Suite
+A pattern needs 3 or more occurrences to become a suggestion, so one bad run does not drive a change. The skill is skipped when there are fewer than 3 records, or when the last analysis ran within 24 hours with no new records. Output goes to `plans/{date}-trace-analysis/`: `findings.md`, `suggestions-draft.md`, `suggestions.md` (approved only), `rejected.md` and `analysis.md`.
 
-`/mk:benchmark` provides the empirical signal that the dead-weight audit consumes. It is a
-**maintainer-only** procedure: the published kit withholds the skill and its spec corpus, so
-everything in this section runs from the source repository, not from an installed project.
+## Benchmark canary suite
 
-**Subcommands:**
+`/mk:benchmark` is a maintainer-only procedure. The published kit does not carry the skill or its specs, so it runs from the source repository, not from an installed project.
 
 | Command | Tasks | Cost cap | Purpose |
 |---|---|---|---|
-| `/mk:benchmark run` | 5 quick tasks | ≤ $5 | Regression check after a harness change |
-| `/mk:benchmark run --full` | 5 quick + 1 heavy | ≤ $30 | Full dead-weight audit cycle |
-| `/mk:benchmark compare A B` | — | Free | Delta table between two prior runs |
+| `/mk:benchmark run` | 5 quick tasks | $5 | Regression check after a harness change |
+| `/mk:benchmark run --full` | 5 quick tasks and 1 heavy task | $30 | Full dead-weight audit cycle |
+| `/mk:benchmark compare A B` | none | none | Delta table between two earlier runs |
 
-**Quick tier spec files** (`.claude/benchmarks/canary/quick/`): react-component, api-endpoint, bug-fix, refactor, tdd-feature. Each is a focused 1-sprint task runnable through `mk:cook`.
+The quick specs in `.claude/benchmarks/canary/quick/` are a React component, an API endpoint, a bug fix, a refactor and a TDD feature, each a one-sprint task run through `mk:cook`. The full tier adds `06-small-app-build-spec.md`, a product build through `mk:autobuild`, and runs only with `--full`.
 
-**Full tier** adds `06-small-app-build-spec.md` — a real product build that runs through `mk:autobuild`. Requires `--full` explicitly to prevent accidental cost burn.
+Results go to `.claude/benchmarks/results/{run-id}.json` and to the trace log as `benchmark_result` events, so `mk:trace-analyze` can correlate scores with run patterns.
 
-**Results** are written to `.claude/benchmarks/results/{run-id}.json` and appended to `trace-log.jsonl` as `benchmark_result` events — so trace-analyze can correlate benchmark scores with harness run patterns.
+## Dead-weight audit
 
-**Example delta table from `/mk:benchmark compare`:**
+The audit decides whether a harness component still earns its place. The rules are in `.claude/skills/benchmark/references/dead-weight-audit-rules.md`.
 
-```
-| Task                  | Baseline | Disabled | Δ      |
-|-----------------------|----------|----------|--------|
-| 01-react-component    | 0.92     | 0.88     | -0.04  |
-| 02-api-endpoint       | 0.85     | 0.91     | +0.06  |
-| 03-bug-fix            | 1.00     | 1.00     |  0.00  |
-| TOTAL                 | 0.89     | 0.91     | +0.02  |
-```
+1. List the components to test.
+2. Run `/mk:benchmark run --full` with the component on and record the run id.
+3. Disable the component, by environment flag or by commenting out a hook registration or a rule import.
+4. Run `/mk:benchmark run --full` again.
+5. Run `/mk:benchmark compare {baseline} {disabled}` and read `measured_delta`, which is the baseline average minus the disabled average.
+6. Decide, then re-enable the component.
 
-A positive Δ when a component is disabled means that component is hurting output — prune candidate.
+| Delta | Decision |
+|---|---|
+| 0 or below | Prune candidate |
+| Above 0 and below 0.02 | Watch, revisit next cycle |
+| 0.02 or above | Keep, with the delta recorded |
 
-## Dead-Weight Audit
+A component is pruned only after a delta under 1 point across two consecutive model versions. Security rules, the evaluator's active verification and the ship check are never pruned.
 
-The benchmark exists to serve the dead-weight audit. The 6-step playbook (from `docs/dead-weight-audit.md`):
-
-1. **List components** — refer to the Assumption Registry in the audit doc
-2. **Establish baseline** — `/mk:benchmark run --full` with the component enabled; capture run ID
-3. **Disable the component** — env var flag, comment out hook registration, or comment out rule import
-4. **Re-run** — `/mk:benchmark run --full` with component disabled; capture run ID
-5. **Compare** — `/mk:benchmark compare {baseline-run-id} {disabled-run-id}`; examine delta
-6. **Decide** based on `measured_delta = baseline_avg − disabled_avg`:
-   - **Delta ≤ 0** → PRUNE candidate (component not helping or actively hurting)
-   - **0 \< Delta \< 0.02** → WATCH (revisit next cycle)
-   - **Delta ≥ 0.02** → KEEP with evidence
-
-Re-enable disabled components before exiting — the audit is non-destructive by design.
-
-**When to run:** every major model release, quarterly regardless, when `mk:trace-analyze` surfaces a recurring no-value pattern, or when the harness "feels heavy."
-
-**Auto-detection caveat:** `post-session.cjs` tries to detect model changes via `MEOWKIT_MODEL_HINT` but Claude Code does not export `CLAUDE_MODEL` to hooks. Manual trigger is required unless `MEOWKIT_MODEL_HINT` is set.
-
-Full playbook: `docs/dead-weight-audit.md`.
-
-## Log Rotation
-
-When `trace-log.jsonl` exceeds **50MB**, `append-trace.cjs` rotates it:
-
-```
-.meowkit/telemetry/trace-log.jsonl              ← active log (reset to empty after rotation)
-.meowkit/telemetry/trace-log.{YYMMDD-HHMMSS}.jsonl.gz  ← compressed archive
-```
-
-Rotation is triggered on every append that finds the file over the size limit. No cron required.
-
-## Secret Scrubbing
-
-Every trace write passes through `lib/secret-scrub.cjs` before flushing to the log. The scrubber strips patterns that look like API keys, tokens, and credential strings.
-
-This is a hard requirement — trace records are often read by `mk:trace-analyze` researchers and included in plan outputs. A single secret in a trace record could propagate widely. The scrubber runs unconditionally; there is no bypass.
-
-## Canonical Sources
-
-- `.meowkit/telemetry/trace-log.jsonl` — append-only trace store
-- `.claude/hooks/append-trace.cjs` — trace writer (flock + scrub + rotation)
-- `docs/dead-weight-audit.md` — full 6-step audit playbook + assumption registry
-- `.claude/skills/trace-analyze/SKILL.md` — scatter-gather workflow spec
-- `.claude/skills/benchmark/SKILL.md` — canary suite spec
+Run the audit on each model release, quarterly, when `mk:trace-analyze` surfaces a recurring no-value pattern, and when the harness feels heavy. `post-session.cjs` tries to flag model changes through `MEOWKIT_MODEL_HINT`, so without that variable the audit has to be triggered by hand.
 
 ## Related
 
-- [/reference/skills/trace-analyze](/reference/skills/trace-analyze) — scatter-gather skill
-- [/reference/skills/benchmark](/reference/skills/benchmark) — canary benchmark skill
-- [/guide/middleware-layer](/guide/middleware-layer) — hooks that emit trace records
-- [/guide/harness-architecture](/guide/harness-architecture) — the pipeline being measured
-- [/guide/adaptive-density](/guide/adaptive-density) — density matrix updated by audit findings
+- [Skill: trace-analyze](/reference/skills/trace-analyze) and [skill: benchmark](/reference/skills/benchmark)
+- [Hooks](/reference/hooks) for the handlers that write records
+- [Autonomous build](/guides/autonomous-build) for the pipeline being measured
+- [Adaptive density](/guide/adaptive-density) for the matrix the audit updates

@@ -1,83 +1,68 @@
 ---
-title: "Step 7 — Tech review against your codebase"
-description: "Now that tickets have keys, mk:planning-engine runs per-ticket review and sprint-level planning, and --spec closes the loop back to the original Confluence analysis."
+title: "Step 7: Tech review against your codebase"
+description: "With ticket keys in hand, mk:planning-engine reviews each ticket and plans the sprint. --spec brings the Confluence analysis into the planning report."
 ---
 
-This is the deeper tech analysis the pre-ticket scan (Step 3) couldn't do. Now that tickets exist, `mk:planning-engine` has the keys it needs and runs in two modes:
+Step 3 could only scan the codebase. Now that tickets exist, `mk:planning-engine` has the keys it needs and runs in two modes.
 
-| Mode                                    | Command                                                                                                                     | Output                                                                                                                                                                                                                                                 |
-| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Per-ticket review**                   | `mk:planning-engine review AUTH-201 --scout`                                                                                | Tech Review Report — affected files, feasibility, dependencies, risks, complexity signals for one ticket                                                                                                                                               |
-| **Sprint-level plan with spec context** | `mk:planning-engine plan --tickets AUTH-201,AUTH-202,AUTH-203 --capacity 40 --scout --spec path/to/spec-research-report.md` | Planning Report — sprint goal candidate, dependency map, grouping, sequencing, capacity analysis, **plus** a `## Spec Context (mk:confluence-spec-analyst)` section that brings the upstream spec requirements / AC / gaps back into the planning view |
+| Mode | Command | Output |
+| --- | --- | --- |
+| Per-ticket review | `mk:planning-engine review AUTH-201 --scout` | Tech Review Report for one ticket |
+| Sprint plan with spec context | `mk:planning-engine plan --tickets AUTH-201,AUTH-202,AUTH-203 --capacity 40 --scout --spec <report-path>` | Planning Report: sprint goal candidate, dependency map, grouping, sequencing, capacity analysis and a `## Spec Context (mk:confluence-spec-analyst)` section |
+
+`review` also accepts `--graph` for third-party code graph context. The skill does not create tickets, assign work, set points or move tickets into sprints.
 
 ## Prompt
 
 ```bash
-# Per-ticket — run for each ticket entering the sprint
-/mk:scout                                            # only if not already cached from Step 3
+# Per ticket: run for each ticket entering the sprint
+/mk:scout                                            # skip if the Step 3 output is still in this session
 /mk:planning-engine review AUTH-201 --scout
 
-# Sprint-level — closes the spec → planning loop with the real --spec integration
+# Sprint level: ties the spec to the planning view
 /mk:planning-engine plan \
   --tickets AUTH-201,AUTH-202,AUTH-203 \
   --capacity 40 \
   --scout \
-  --spec tasks/reports/spec-research-260511-q3-auth-refresh.md
+  --spec tasks/reports/confluence-spec-260511-0108-q3-auth-refresh.md
 ```
 
-## What happens behind the scenes
+## What happens
 
-| Step                                                  | Action                                                                                                                                                                                                                                                                                               |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mk:scout`                                            | Reuses the cached fingerprint from Step 3 if available. If absent, rebuilds the architecture sketch.                                                                                                                                                                                                 |
-| `mk:planning-engine review TICKET --scout`            | Pulls the ticket via `mk:jira-issue`, cross-references ACs against scout output, emits a Tech Review Report per ticket. `[NO_CODEBASE_CONTEXT]` flag if scout was skipped.                                                                                                                           |
-| `mk:planning-engine plan --tickets ... --spec REPORT` | Validates the report path exists and starts with `# Spec Research Report:` (else prompts you to run `mk:confluence-spec-analyst` first and exits — no auto-invocation across skills). Extracts the report's Requirements / AC / Gaps sections and passes them inline to the planning-reporter agent. |
-| Spec context in output                                | The Planning Report gains a `## Spec Context (mk:confluence-spec-analyst)` section summarizing the upstream spec inputs the planning is based on. This is the _only_ place the original spec resurfaces in the planning pipeline.                                                                    |
-| Validation failure                                    | If the `--spec` path is wrong or the report header doesn't match, planning-engine prompts and exits. Read failure **mid-flow** → `[NO_SPEC_CONTEXT: <error>]` flag in the report; planning continues without spec context.                                                                           |
-| Where reports land                                    | `planning-engine` writes to `tasks/reports/` because no plan-dir exists yet (per its SKILL.md report-persistence rule: "Active plan's `research/` if exists, else `tasks/reports/`"). These files stay there — Step 8's plan-creator does **not** auto-copy them into the new plan-dir.              |
+| Piece | Action |
+| --- | --- |
+| Scout | Skills cannot call each other, so `--scout` uses scout output already in the session. If there is none, planning-engine asks you to run `/mk:scout` and exits. Without scout the report carries `[NO_CODEBASE_CONTEXT]`. |
+| `review` | Reads the ticket through `mk:jira-issue` (or `mk:jira-search`) and passes it, with the scout output, to the `tech-analyzer` agent. Ticket text is treated as data. |
+| `plan --spec` | Checks that the path exists and that the first line starts with `# Spec Research Report:`. If not, it asks you to run `mk:confluence-spec-analyst` first and exits. It never runs that skill itself. It then extracts Requirements, Acceptance Criteria and Gaps and passes them to the `planning-reporter` agent. |
+| Failures | A read error after validation adds `[NO_SPEC_CONTEXT: <error>]` to the report, and planning continues without spec context. Capacity analysis shows `[INCOMPLETE]` when more than 30% of tickets have no estimate. |
+| Where reports go | The active plan's `research/` folder if one exists, otherwise `tasks/reports/`. At this point no plan exists, so they land in `tasks/reports/`. Step 8 does not move them. |
 
-## Sample output (Tech Review Report)
+Ticket evaluation and estimation from [Step 6](/workflows/spec-to-pr-walkthrough/step-06-refine-and-estimate) improve the review and enable capacity analysis. Without them the review does its own lighter assessment and the planner skips capacity.
+
+## Tech Review Report sections
+
+The template has these sections: Ticket Summary, Codebase Context, Feasibility Assessment (rating Straightforward, Complex or Needs Spike, plus confidence), What, Why, How, Dependencies, Risks, Complexity Signals and Open Questions. The complexity signals are observations for the team and not an estimate.
+
+An abridged example:
 
 ```markdown
 # Tech Review: AUTH-201
 
-## Affected files
+## Codebase Context
+- Affected files: src/auth/oauth.controller.ts, src/auth/session.middleware.ts, src/auth/auth.module.ts
 
-- `src/auth/oauth-google.service.ts` (new)
-- `src/auth/oauth.controller.ts` (modify — add /google route)
-- `src/auth/session.middleware.ts` (read-only — verify sliding logic exists)
-- `src/auth/auth.module.ts` (modify — register new provider)
-
-## Feasibility: HIGH
-
-The OAuth abstraction in src/auth/oauth.controller.ts already supports a
-provider plugin pattern (see GitHubOAuthService). Adding Google is mostly
-a config + token-exchange addition.
+## Feasibility Assessment
+**Rating:** Straightforward
+**Confidence:** High
 
 ## Dependencies
-
-- AUTH-202 (sliding session) must land first — current middleware uses fixed 24h
-- AUTH-203 is independent — could parallelize
+- Blocked by: AUTH-202 (sliding session must land first; current middleware uses a fixed 24h expiry)
+- External: Google OAuth 2.0
 
 ## Risks
-
-- Google's PKCE requirement changed Q1 2026 — verify against current Google docs
-- Token refresh logic is not in the current middleware (deferred from AUTH-87)
-
-## Complexity signals
-
-- 1 new file (~120 LOC est.)
-- 2 modified files (<30 LOC each)
-- 0 schema changes
-- 0 cross-module touches outside src/auth/
+- Google's PKCE requirement changed; verify against current Google docs
 ```
-
-<Callout title="Why scout runs first" type="info">
-
-Without scout, planning-engine guesses at file paths from the ticket text. Scout grounds the analysis in actual project structure — the difference between "should work" and "here are the exact files."
-
-</Callout>
 
 ---
 
-Previous: [Step 6 — Refine and estimate](/workflows/spec-to-pr-walkthrough/step-06-refine-and-estimate) · Next: [Step 8 — Plan per ticket](/workflows/spec-to-pr-walkthrough/step-08-plan-per-ticket) · [All steps](/workflows/spec-to-pr-walkthrough)
+Previous: [Step 6: Refine and estimate](/workflows/spec-to-pr-walkthrough/step-06-refine-and-estimate) · Next: [Step 8: Plan per ticket](/workflows/spec-to-pr-walkthrough/step-08-plan-per-ticket) · [All steps](/workflows/spec-to-pr-walkthrough)

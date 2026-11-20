@@ -1,125 +1,114 @@
 ---
 title: "Planning and Tasks"
-description: "Create plans and task records, see where a task stands, and record the checkpoints of a supervised run."
+description: "Create task files, check and archive plans, see where work stands, and record the checkpoints of a supervised run."
 ---
 
-The commands behind plans and the durable task record. If you are asking "what am I supposed to be doing", `orient` answers it.
+These commands cover plans, task files and the durable task record. To find out where the current task stands and what comes next, run `mewkit orient`.
+
+## Plans and task files
+
+A plan is a directory under `tasks/plans/`, named `YYMMDD-name`. `plan.md` is the overview and stays under 80 lines. Each phase has its own `phase-XX-*.md`, and scout and research reports go in a `reports/` folder beside them. The kit does not create `tasks/` or ship task templates: `tasks/active/` is created the first time you run `task new`.
+
+```text
+tasks/plans/260328-add-auth/
+├── plan.md
+├── phase-01-setup.md
+├── phase-02-implement.md
+└── reports/
+    ├── scout-report.md
+    └── researcher-01-oauth.md
+```
+
+A task file is a Markdown document with frontmatter (goal, scope, constraints, acceptance criteria) that a later session can pick up without the earlier conversation. Write one for any change that touches more than two files or takes more than 30 minutes. A task file moves through these statuses:
+
+| Status | Meaning |
+| --- | --- |
+| `draft` | Created, not yet agreed |
+| `in-progress` | Work is underway |
+| `blocked` | Waiting on a dependency or a decision |
+| `review` | Work is done and awaits review |
+| `done` | All acceptance criteria are met |
 
 ## plan
 
-Plan lifecycle. `status` / `check` are read-only (the plan Markdown stays the sole authority); `archive` is the mutating subcommand and lives in its own module so the read-only path imports no write API.
+`status` and `check` read plans and change nothing. `archive` writes.
 
 ```bash
-mewkit plan status <plan-dir>       # checkbox progress across plan.md + phase files
-mewkit plan check <phase-file>      # required-section + checklist report for one phase
-mewkit plan archive <plan-dir>      # mark completed + move to tasks/plans/archive/
+mewkit plan status <plan-dir>       # checkbox progress across plan.md and the phase files
+mewkit plan check <phase-file>      # required-section report for one phase
+mewkit plan check --structural <plan.md-or-dir>   # plan.md and every sibling phase file against the full template
+mewkit plan archive <plan-dir>      # mark completed and move to tasks/plans/archive/
 mewkit plan archive <plan-dir> --dry-run
 ```
 
-`plan archive` finishes a plan in one step:
+`status` and `check` take `--json`. The plan-creator skill runs `plan check --structural` before you agree a plan.
 
-- Stamps `status: completed` in `plan.md` frontmatter, every `phase-*.md` frontmatter, and every `phases[*].status` in `.plan-state.json` (the plan-creator checkpoint).
-- Clears a dangling active-task pointer that still points at the plan.
-- Moves the whole directory into `tasks/plans/archive/<name>/` — fail-closed if the destination exists, no-op if already archived.
+`plan archive` finishes a plan in three steps:
 
-Agents run it automatically at the end of a completed plan (cook Phase 6). `--dry-run` previews with zero writes.
+1. It sets `status: completed` in the `plan.md` frontmatter, in every `phase-*.md` frontmatter, and for every `phases[*].status` in `.plan-state.json`.
+2. It clears an active-task pointer that still points at the plan.
+3. It moves the directory to `tasks/plans/archive/<name>/`. It refuses if that destination exists, and does nothing if the plan is already archived.
+
+`--dry-run` prints what would happen and writes nothing. The cook workflow runs `plan archive` at the end of a completed plan.
 
 ## task new
-
-Create a new task file. `task new` writes the frontmatter and body itself; if your project keeps its own `tasks/templates/<type>.md` (`feature-implementation.md`, `bug-fix.md`, `refactor.md` or `security-audit.md`), it uses that file instead. The kit ships none.
 
 ```bash
 mewkit task new --type <type> "description"
 ```
 
-**Arguments:**
-
-| Argument | Description |
-|----------|-------------|
-| description | Short description (used in filename and title) |
-
-**Flags:**
+`task new` creates `tasks/active/YYMMDD-<slug>.<type>.md` with frontmatter (status `draft`) and an Agent State section for resuming work. If your project keeps its own `tasks/templates/<type>.md` (`feature-implementation.md`, `bug-fix.md`, `refactor.md` or `security-audit.md`), the body comes from that file instead.
 
 | Flag | Description | Default |
-|------|-------------|---------|
+| --- | --- | --- |
 | `--type` | Task type: `feature`, `bug-fix`, `refactor`, `security` | `feature` |
-| `--priority` | Priority: `critical`, `high`, `medium`, `low` | `medium` |
-
-**Examples:**
+| `--priority` | Task priority | `medium` |
+| `--activate` | Also create the durable task record for the task (see `task-state`) | off |
 
 ```bash
 mewkit task new --type feature "Add user authentication"
-# Creates: tasks/active/260327-add-user-authentication.feature.md
+# creates tasks/active/260327-add-user-authentication.feature.md
 
 mewkit task new --type bug-fix --priority high "Fix login timeout"
-# Creates: tasks/active/260327-fix-login-timeout.bug.md
+# creates tasks/active/260327-fix-login-timeout.bug.md
 ```
-## task list
 
-List task files with status.
+## task list
 
 ```bash
 mewkit task list [--all] [--status <status>]
 ```
 
-**Flags:**
+`task list` shows each task file with its status, type, priority and path. It reads `tasks/active/` unless you pass `--all`, which scans all of `tasks/` (completed and backlog included). `--status` filters by `draft`, `in-progress`, `blocked`, `review` or `done`.
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `--all` | Include completed and backlog tasks | `false` |
-| `--status` | Filter by status: `draft`, `in-progress`, `blocked`, `review`, `done` | all |
+## task-state
 
-**Examples:**
-
-```bash
-mewkit task list
-# Lists active tasks only
-
-mewkit task list --all
-# Lists all tasks (active + completed + backlog)
-
-mewkit task list --status blocked
-# Lists only blocked tasks
-```
-
-## task-state show
-
-Reconstruct durable resume state from the task records under `tasks/active/` — files only, no network. Marks the record whose plan matches the active-plan pointer as current, and surfaces any incompatible/corrupt record as an issue rather than crashing.
+The durable task record is a JSON file per task under `tasks/active/`, plus a pointer to the current one. A new session reads it to resume.
 
 ```bash
 mewkit task-state show [--json]
-```
-## task-state update
-
-Atomically update a durable task record (created for planned / long-running work). Used by orchestration workflows to record status, the last completed step, the next action, and capability decisions so a fresh session can resume. Advisory — a failed write is surfaced but never blocks the workflow.
-
-```bash
-mewkit task-state update <id> [--status <active|blocked|done>] [--step "<what just finished>"] [--next "<next action>"] [--plan <path>] [--json]
+mewkit task-state update <task-id> [--status <active|blocked|done>] [--step "<what just finished>"] [--next "<next action>"] [--plan <path>]
 ```
 
-**Flags:**
-
-| Flag       | Description                                             | Default  |
-| ---------- | ------------------------------------------------------- | -------- |
-| `--status` | Task status: `active`, `blocked`, `done`                | `active` |
-| `--step`   | What just finished (the last completed step)            | —        |
-| `--next`   | The next action to take on resume                       | —        |
-| `--plan`   | Path to the plan this record joins                      | —        |
-
-**Examples:**
+`show` reads the records without a network call, marks the record whose plan matches the active-plan pointer as current, and reports a corrupt or incompatible record as an issue instead of failing. `update` changes one record atomically and needs the task id. It also takes `--blocker <text>`, `--verification <ref=result>`, `--evidence-ref <path>` and `--capability-decision <capId|decision|reason>`, each repeatable. Workflows call it to record progress; a failed write is reported and does not stop the workflow.
 
 ```bash
-mewkit task-state show
-# Lists active task records + the current-plan marker
-
 mewkit task-state update feat-auth --status active --step "wired login route" --next "add refresh-token test"
 ```
 
+## orient
+
+```bash
+mewkit orient [--json] [--no-record]
+```
+
+`orient` prints where the current task sits in the workflow and what the next action is. It reads plans, task records and git state. `--no-record` skips writing the advisory `orient_run` measurement, which leaves the run read-only.
+
 ## advice
 
-Records the checkpoints of an opt-in supervised run — the `--advice` flag on `mk:fix`, `mk:cook`, `mk:brainstorming`, `mk:plan-creator`, `mk:autobuild` and `mk:ship`. The workflow drives these commands; you rarely type them yourself. They exist as a CLI because the caps, the stage rules and the receipt have to be enforced somewhere the model cannot talk its way past.
+`advice` records the checkpoints of an opt-in supervised run, started with `--advice` on `mk:fix`, `mk:cook`, `mk:brainstorming`, `mk:plan-creator`, `mk:autobuild` or `mk:ship`. The workflow drives these commands and you rarely type them. They are a CLI so that the call caps, the stage rules and the receipt are enforced outside the model.
 
-**Supervision is evidence, not authority.** Nothing here clears a gate, and a recorded directive never counts as verification.
+Supervision is evidence, not approval. A recorded directive never counts as verification.
 
 ```bash
 mewkit advice begin --run <id> --skill <skill> --stage <stage> --checkpoint <id>
@@ -128,29 +117,23 @@ mewkit advice status --run <id>
 mewkit advice validate-packet --evidence <file.json> --packet-kind input|output|brief
 ```
 
-**Subcommands:**
+| Subcommand | What it enforces |
+| --- | --- |
+| `begin` | Per-stage and per-skill caps, stage legality, an idempotent `--checkpoint`, and the pending marker that lets a crashed run resume |
+| `commit` | Stage and disposition legality, receipt validation, the dossier write, and evidence supersession after a correction |
+| `status` | The resume view: current stage, calls used, latest directive, next safe action |
+| `validate-packet` | An input packet, an output packet or a direct-consult brief |
 
-| Subcommand        | What it enforces                                                                                                    |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `begin`           | Per-stage and per-skill caps, stage legality, idempotent `--checkpoint`, and the pending marker that makes a crash resumable |
-| `commit`          | Stage/disposition legality, receipt validation, the dossier write, and evidence supersession after a correction      |
-| `status`          | The resume view: current stage, calls used, latest directive, next safe action                                        |
-| `validate-packet` | An input packet, an output packet, or a direct-consult brief                                                          |
+`--release-stage` is required by `mk:ship` and refused by every other skill. Ship's budget is 4 calls per release stage (`prepare`, `release`, `publish`), so a run through all three has three separate budgets. The stage is fixed when the slot is claimed and `commit` inherits it.
 
-**Two flags worth understanding:**
-
-`--release-stage` is required by `mk:ship` and refused by every other skill. Ship's budget is 4 calls **per release stage**, so a run walking `prepare` → `release` → `publish` is three separate budgets. The stage is fixed when the slot is claimed and inherited by `commit`.
-
-`--correction-kind` decides what a returned correction invalidates: `source` marks downstream verification and review evidence superseded but keeps the plan agreement, while `scope` also marks the plan agreement `required` again — a plan whose scope moved needs to be agreed with the user again.
-
-**Examples:**
+`--correction-kind` decides what a returned correction invalidates. `source` marks downstream verification and review evidence as superseded and keeps the plan agreement. `scope` also marks the plan agreement as required again, because a plan whose scope moved needs to be agreed with the user again.
 
 ```bash
 # Open a checkpoint. Repeating the same --checkpoint returns the recorded
 # result and spends no slot, which is what makes resume safe.
 mewkit advice begin --run fix-260727-auth --skill mk:fix --stage GUIDE --checkpoint guide-1
 
-# Record what came back, and what you decided to do with it. --reason is
+# Record what came back and what you decided to do with it. --reason is
 # required even when you adopted the directive.
 mewkit advice commit --run fix-260727-auth --checkpoint guide-1 \
   --disposition CONTINUE_WITH_DIRECTIVE --outcome adopted \
@@ -171,15 +154,4 @@ mewkit advice begin --run ship-260727 --skill mk:ship --stage GUIDE \
 mewkit advice status --run fix-260727-auth
 ```
 
-**When it refuses:** a call past the cap, an illegal stage/disposition pair, a `--checkpoint` reused under a different stage, a corrupt dossier, or `--evidence` pointing anywhere but an existing `workflow-evidence.json` inside the project. A refusal is final for that checkpoint — continue unsupervised, or escalate when the refusal says to.
-
-## orient
-
-Print where the current task sits in the workflow, and what the next action is.
-
-```bash
-mewkit orient [--json] [--no-record]
-```
-
-Reads plans, reviews, tests, and git state rather than asking you. `--no-record` skips writing
-the result to the task record, which is what you want when you are only looking.
+`advice` refuses a call past the cap, an illegal stage and disposition pair, a `--checkpoint` reused under a different stage, a corrupt dossier, and an `--evidence` path that is not an existing `workflow-evidence.json` inside the project. A refusal is final for that checkpoint: continue unsupervised, or escalate when the refusal says to.

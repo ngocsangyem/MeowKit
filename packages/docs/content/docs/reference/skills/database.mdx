@@ -1,6 +1,6 @@
 ---
 title: "mk:database"
-description: "Database patterns — schema design, safe migrations, query optimization, and indexing. PostgreSQL primary; patterns apply to MySQL and SQLite."
+description: "Handles data model, schema, migration, query, index and ORM work, starting from the engine the repository already runs."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,70 +14,56 @@ description: "Database patterns — schema design, safe migrations, query optimi
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:database` owns the data layer: invariants, schema, safe evolution, query and index evidence, and the ORM data-access boundary. It finds the engine, migration tool and ORM the repository already uses before writing any syntax. There is no default engine, and if the repository does not say, the skill asks.
 
-Owns the data layer end to end: invariants, schema, safe evolution, and query/index evidence,
-plus the ORM data-access boundary. It discovers the engine, migration tool, and ORM the
-repository already runs before proposing any syntax — there is no default engine, and an
-answer written for the wrong one is wasted.
+## When not to use it
 
-## When to Use
-
-- Designing a data model, or changing a schema
-- Writing or reviewing a migration, backfill, or recovery path
-- Diagnosing a slow query or choosing an index from evidence
-- Shaping the ORM data-access boundary, or selecting a datastore on greenfield work
-- **NOT for:** API contracts (`mk:api-design-principles`), service or handler code
-  (`mk:backend-development`), infrastructure and deployment (`mk:devops`), or the security verdict
-
-## Ownership Boundary
-
-| Owner | Owns |
+| If you need | Use |
 |---|---|
-| `mk:database` | Data invariants, schema, migration and recovery, query/index evidence, ORM boundary |
-| `mk:api-design-principles` | The API contract — a table is not an API type |
-| `mk:backend-development` | The service change that consumes the data |
-| `mk:devops` | Provisioning, backups, replicas, and any production effect |
+| An API contract (a table is not an API type) | `mk:api-design-principles` |
+| Service or handler code that uses the data | `mk:backend-development` |
+| Provisioning, backups, replicas or any production effect | `mk:devops` |
+| A security verdict | the security workflow (`mk:cso`) |
 
-## Arguments
+## Usage
 
-`[model|migration|query|index|orm|store] [description]`
+```bash
+/mk:database [model|migration|query|index|orm|store] [description]
+```
 
-## Workflow
-
-1. **Discover the source of truth** — dependency manifest, schema, migration tool, ORM
-   config, query call sites, data tests, active plan. No engine stated means ask.
-2. **Classify** — model/schema, migration, query/index, or store and ORM selection
-3. **State invariants before syntax** — entity and lifecycle, identity and uniqueness,
-   tenancy and authorization boundary, retention and personal data, consistency need, known
-   access patterns, performance baseline; unknowns marked unknown
-4. **Design proportional to the evidence** — normalize or denormalize only with a stated
-   rationale; index from filter/join/order evidence weighed against write cost
-5. **Evolve safely** — compatibility with running code, locking behavior at this size,
-   backfill approach, verification signal, and a reverse migration *or* forward recovery
-6. **Validate and hand off** — on a disposable database with synthetic, non-personal fixtures
-
-## References
-
-| File | Load when |
+| Argument | Reference loaded |
 |---|---|
-| `references/schema-design.md` | Entities, keys, relationships, tenancy, constraints |
-| `references/migration-patterns.md` | Changing a table that holds data; backfills; recovery |
-| `references/query-optimization.md` | A slow query, or an index decision needing evidence |
+| `model` | `references/schema-design.md` (entities, keys, relationships, tenancy, constraints) |
+| `migration` | `references/migration-patterns.md` (changing a table with data, backfills, recovery) |
+| `query`, `index` | `references/query-optimization.md` |
+| `store`, `orm` | None. Handled in the skill itself, only for greenfield work or when you ask to change stores |
 
-## Security Constraint
+## What it does
 
-**Never build a query by string interpolation or template concatenation.** Use the parameter
-mechanism the driver or ORM provides. Never log, print, or copy personal data while
-investigating — a row that reproduces a bug can be described by its shape.
+1. Discover: dependency manifest, schema, migration directory and tool, ORM config, query call sites, data tests and the active plan. Record the engine, its version and whether an ORM owns the schema.
+2. Classify the work as model, migration, query or index, or store and ORM selection.
+3. State invariants before syntax: entity and lifecycle, identity and uniqueness, tenancy and authorization boundary, retention and personal data, consistency need, access patterns and performance baseline. Unknowns stay marked unknown, and an invariant no one can state is itself a finding.
+4. Design in proportion to the evidence. Normalise or denormalise only with a stated reason, and choose an index from filter, join and order evidence weighed against write cost. Follow the repository's naming, key and timestamp conventions.
+5. Evolve safely: compatibility with the running code, locking behaviour at this size on this engine, the backfill, the signal that proves it worked, and a reverse migration or a documented forward recovery. Expand, migrate, contract fits most changes on a live table.
+6. Validate on a disposable database with synthetic, non-personal fixtures, then hand off with the engine evidence, invariants, migration and recovery, query and index evidence, and what remains unproven.
 
-## Pro Tips
+The skill never runs a reset, drop, backfill or migration against a live database. It prepares the change and hands execution to `mk:ship` or a person.
 
-- **There is no default engine.** Every locking, index-type, and DDL claim below is
-  conditional on the one the repository actually runs.
-- **The analysing form of `EXPLAIN` executes the statement.** Never run it on a mutating
-  statement outside a transaction you will roll back.
-- **A reverse migration that silently discards data is worse than declaring the change
-  irreversible.** Say recovery is forward-only and name the corrective change.
-- **Pool exhaustion looks like a slow query, not a pool error.** Check for connections held
-  past their work before optimizing.
+For store and ORM choice, decide from the invariants and what the team can operate, since a second store adds a second operational burden. An ORM is the access boundary, not the data model, and the database should enforce the invariants it can.
+
+## Security
+
+Never build a query by string interpolation or template concatenation. Use the driver or ORM parameter mechanism. Never log, print or copy personal data while investigating. Describe a row by its shape.
+
+## Gotchas
+
+Each depends on the engine in use.
+
+- A `NOT NULL` column with no default can rewrite the table. On PostgreSQL before 12 it takes an exclusive lock. Add it nullable, backfill in batches, then add the constraint.
+- A plain index build blocks writes on PostgreSQL. The concurrent form cannot run in a transaction block and can leave an invalid index if it fails.
+- Cascading deletes remove child rows with no error. Audit cascading foreign keys before a bulk delete.
+- The analysing form of `EXPLAIN` runs the statement. Never use it on an `INSERT`, `UPDATE` or `DELETE` outside a transaction you will roll back.
+- Pool exhaustion looks like a slow query. Check for connections held past their work first.
+- Read-committed allows non-repeatable reads. Financial and inventory logic needs a stricter level chosen on purpose.
+- A reverse migration that silently discards data is worse than saying the change is forward-only and naming the corrective change.
+- SQLite serialises writers and rewrites tables for most `ALTER`s. That is rarely a reason to propose another engine.

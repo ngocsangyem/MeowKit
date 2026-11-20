@@ -3,11 +3,11 @@ title: "Design System"
 description: "How this documentation site looks, where the tokens live, and the rules to keep when you change it."
 ---
 
-This page is for people changing the docs site, not people using MeowKit. It says where each part of the design lives so you edit the real thing rather than a description of it.
+This page is for people changing the docs site. It says where each part of the design lives, so you edit the real file.
 
-The site runs on [Fumadocs](https://fumadocs.dev) on the Next.js App Router. Layout, sidebar, search, and the MDX component set come from `fumadocs-ui`. Everything below is what MeowKit changes on top.
+The site runs on [Fumadocs](https://fumadocs.dev) on the Next.js App Router. Layout, sidebar, search, and the MDX component set come from `fumadocs-ui`. MeowKit's changes sit on top of that.
 
-## Where the design actually lives
+## Where the design lives
 
 | What | File |
 |---|---|
@@ -21,32 +21,32 @@ The site runs on [Fumadocs](https://fumadocs.dev) on the Next.js App Router. Lay
 | MDX components available inside pages | `components/mdx.tsx`, `components/mdx/` |
 | Navigation order and section labels | `content/docs/**/meta.json` |
 
-The palette values come from `assets/design-tokens.json`. `app/global.css` maps those tokens onto Fumadocs colour slots (see the comment at the top of the light block). This page deliberately does not restate the values, because a second copy of a colour ramp is a copy that goes stale.
+The palette values come from `assets/design-tokens.json`. `app/global.css` maps those tokens onto Fumadocs colour slots (see the comment at the top of the light block). This page does not repeat the values, because a second copy of a colour ramp goes stale.
 
-The nav logo is the brand lockup from `assets/branding/`, copied into `public/` as `logo.svg` and `logo-dark.svg`. `lib/layout.shared.tsx` renders both and CSS shows the one that matches the theme. Edit the masters in `assets/branding/`, then copy them over, rather than editing the copies.
+The nav logo is the brand lockup from `assets/branding/`, copied into `public/` as `logo.svg` and `logo-dark.svg`. `lib/layout.shared.tsx` renders both and CSS shows the one that matches the theme. Edit the masters in `assets/branding/` and copy them over. Do not edit the copies.
 
 ## The system in one paragraph
 
-Mist paper, one blue signal accent, and a display/body/code type stack: Newsreader for display, Onest for body, the platform mono for code. Light is the primary theme, a cool paper ground carrying night ink, and dark inverts it to night carrying paper ink. Neutrals are blue-tinted slate rather than true grey, which keeps the light theme from reading as clinical white and the dark theme from reading as flat black. There is exactly one accent: dusk blue in light, sky blue in dark.
+The site uses mist paper, one blue accent, and a display, body and code type stack: Newsreader for display, Onest for body, the platform mono for code. Light is the primary theme, a cool paper ground carrying night ink, and dark inverts it to night carrying paper ink. Neutrals are blue-tinted slate rather than true grey. There is one accent: dusk blue in light and sky blue in dark.
 
-## Rules worth keeping
+## Rules to keep
 
-These are decisions, not defaults. Changing one is fine; changing one by accident is not.
+These are decisions. Change one on purpose.
 
-- **The accent is a signal, not a surface.** Blue marks links, active states, and focus rings. It does not fill sections. Once it fills things it stops meaning anything.
-- **No gradients.** Hierarchy comes from weight, spacing, and hairline rules.
-- **Three type families is the ceiling.** No fourth face. Emphasis is weight or accent, never italic headings.
-- **Motion is functional only.** Hover and focus transitions, opacity and border-colour and transform, 150–250ms. No reveal animations, no celebratory motion, no lift-and-glow on cards. Under reduced-motion, transitions collapse to a short opacity fade.
-- **Success is silent.** Nothing congratulates the reader.
-- **Components reference tokens.** An inline hex or `oklch()` in a component is the design system being bypassed.
+- The accent is a signal. Blue marks links, active states and focus rings, and does not fill sections.
+- There are no gradients. Hierarchy comes from weight, spacing and hairline rules.
+- Three type families is the ceiling. Emphasis is weight or accent, never italic headings.
+- Motion is functional: hover and focus transitions on opacity, border colour and transform. There are no reveal animations and no lift-and-glow on cards.
+- Success is silent. Nothing congratulates the reader.
+- Components reference tokens. An inline hex or `oklch()` value in a component bypasses the design system.
 
 ## Changing it
 
-Colour arrives as a whole palette, not as a list of values:
+Colour changes as a whole palette:
 
-1. **Re-map a role** by editing its `--color-fd-*` slot in the brand block in `app/global.css`. There is one such block for light and one for dark, and they are the only place in the site that re-declares a slot. Edit the slot, not the component that uses it.
-2. **Retheme wholesale** by replacing both blocks. Fumadocs' baseline values come from the `lib/default-colors.css` import above them; a preset such as `@import 'fumadocs-ui/css/ocean.css'` can take that import's place and set every slot for light and dark at once.
+1. Re-map a role by editing its `--color-fd-*` slot in the brand block in `app/global.css`. There is one such block for light and one for dark, and they are the only place in the site that re-declares a slot. Edit the slot, not the component that uses it.
+2. Retheme the whole site by replacing both blocks. Fumadocs' baseline values come from the `fumadocs-ui/css/lib/default-colors.css` import above them; a preset such as `@import 'fumadocs-ui/css/ocean.css'` can take that import's place and set every slot for light and dark at once.
 
-Keeping the override in one named block is what makes a Fumadocs upgrade safe: anything the release changes that is not one of those slot names lands as intended. Reaching past the slots to style a component directly is how a design system stops being one.
+Keeping the override in one named block keeps a Fumadocs upgrade safe: anything the release changes outside those slot names lands as intended. Style through the slots, not by targeting a component directly.
 
 Run `npm run dev` in `packages/docs` to see changes. `npm run build` is what CI runs.

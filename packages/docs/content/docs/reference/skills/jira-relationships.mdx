@@ -1,6 +1,6 @@
 ---
 title: "mk:jira-relationships"
-description: "Manage JIRA issue relationships: link, unlink, blockers, dependencies, clone, bulk-link."
+description: "Links issues, finds blockers and dependencies, clones issues and bulk-links through the jira-as wrapper."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,40 +15,33 @@ description: "Manage JIRA issue relationships: link, unlink, blockers, dependenc
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Forks the `jira-relationships` agent to manage issue-to-issue relationships — links, blockers, dependencies, clones, bulk-link.
+Manages links between issues: link, unlink, find blockers and dependencies, clone and bulk-link. It forks the `jira-relationships` agent. Direction matters, because `A blocks B` is not `B blocks A`, so the agent confirms direction when a request is ambiguous.
 
-## When to Use
+## When not to use
 
-- **Triggers:** "link PROJ-123 blocks PROJ-456", "what blocks PROJ-123", "what does PROJ-123 depend on", "clone PROJ-123", "unlink"
-- **NOT for:** sprint / epic relationships (use [`mk:jira-agile`](/reference/skills/jira-agile)).
+Epic membership and sprints belong to `mk:jira-agile` (an epic child is added with `agile epic add`). Use `mk:jira-search` to find candidate issues first, and `mk:jira-bulk` for other bulk changes.
 
-## Direction Matters
+## Usage
 
-Link direction is **not symmetric**: `A blocks B` ≠ `B blocks A`. The agent confirms direction when ambiguous.
+Ask in plain words: "link PROJ-123 blocks PROJ-456", "what blocks PROJ-123?", "clone PROJ-123 with new summary 'Follow-up'", "unlink PROJ-123 from PROJ-456".
 
-## Verified Wrapper Invocations
+| Operation | Command |
+|---|---|
+| Link | `jira-as.sh relationships link PROJ-123 --type blocks --to PROJ-456` |
+| Unlink | `jira-as.sh relationships unlink ...` |
+| Blockers | `jira-as.sh relationships get-blockers PROJ-123 [--recursive --depth N --output tree]` |
+| Dependencies | `jira-as.sh relationships get-dependencies PROJ-123 [--output mermaid\|dot]` |
+| Clone | `jira-as.sh relationships clone PROJ-123 [--to-project OTHER --include-links --include-subtasks]` |
+| Bulk link by JQL | `jira-as.sh relationships bulk-link ...` (the agent runs a dry run first) |
 
-| Operation | Tier | Invocation |
-|---|---|---|
-| Link | 2 | `... relationships link PROJ-123 --type blocks --to PROJ-456` |
-| Unlink | 3 | `... relationships unlink PROJ-123 --link-id <ID>` |
-| Get blockers | 1 | `... relationships get-blockers PROJ-123` |
-| Get dependencies | 1 | `... relationships get-dependencies PROJ-123` |
-| Clone | 2 | `... relationships clone PROJ-123 --summary "..."` |
-| Bulk-link by JQL | 3 | `... relationships bulk-link --jql "<JQL>" --type blocks --to PROJ-456 --dry-run` |
+`jira-as.sh` is `.claude/skills/jira/scripts/jira-as.sh`. The `jira-as` tool is not part of this repository, so check flags with `--help`. Common link types are `blocks`, `is blocked by`, `relates to`, `clones`, `duplicates` and `causes`; custom types can exist per project.
 
-`bulk-link` lives in the `relationships` group (verified at `relationships_cmds.py:1661`), NOT in the `bulk` group.
+## Outputs
 
-## Domain References
+The agent returns the link ID, source key, relationship, target key and URL. For bulk-link it returns the dry-run summary, the impacted count and the confirm command.
 
-- `references/relationship-patterns.md` — blocker-chain analysis, sprint-planning patterns, dependency strategies
+## Related
 
-## Peer Leaves
-
-`mk:jira-bulk` (bulk-link discipline; same dry-run rules) · `mk:jira-agile` (epic ↔ child via `agile epic add`) · `mk:jira-search` (JQL-based candidate discovery before linking)
-
-## Agent
-
-[`jira-relationships`](/reference/agents/jira-relationships) — A + C, NOT B.
+`references/relationship-patterns.md` covers blocker-chain analysis, sprint-planning patterns and dependency strategies. To draw a dependency graph, see `../preview/references/mermaid-essentials.md`. The agent is [`jira-relationships`](/reference/agents/jira-relationships).

@@ -1,57 +1,50 @@
 ---
 title: "Model Routing"
-description: "How MeowKit assigns the right AI model tier to each task — Trivial, Standard, or Complex."
+description: "How MeowKit assigns a model tier to each task: Trivial, Standard or Complex, and the rules that force a higher tier."
 ---
 
-The orchestrator classifies every task by complexity before work begins. `mk:scale-routing` emits provider-neutral complexity, workflow, and execution-tier signals; the active provider adapter maps those signals to its available models. The table below describes the Claude Code adapter.
+The orchestrator classifies every task by complexity before work begins and prints the result: `Task complexity: [TRIVIAL|STANDARD|COMPLEX] → using [model tier]`. `mk:scale-routing` emits provider-neutral complexity, workflow and execution-tier signals. The active provider adapter maps them to models. The table below is the Claude Code adapter (`.claude/skills/agent-detector/references/model-selection-rules.md`).
+
+This page covers the session model for a task. Which model each subagent runs on is a separate fixed assignment, covered in [Agent models](/guide/agent-models).
 
 ## Routing table
 
-| Complexity | Claude Code model | Examples |
-|---|---|---|
-| Trivial | Haiku | Rename, typo, format, version bump |
-| Standard | Sonnet | Feature (\<5 files), bug fix, test writing |
-| Complex | Opus | Architecture, security audit, auth, payments |
-
-## Per-agent routing (subagents)
-
-The table above governs the **session** model by task complexity. **Subagents** instead carry a fixed model assignment in their definition, and each provider expresses it natively:
-
-| Provider | Where | How |
-|---|---|---|
-| Claude Code | `.claude/agents/<name>.md` frontmatter | `model:` — a tier alias (`opus` / `sonnet` / `haiku`), a named profile pinning an exact id (`fable`, `claude-opus-5`), or `inherit`. See [Claude Agent Models](/guide/claude-agent-models) for the full per-agent table. |
-| Codex | `.codex/agents/<name>.toml` | `model` + `model_reasoning_effort` — a concrete Codex model id (e.g. `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.4-mini`) with its own effort (`low`/`medium`/`high`). See [Codex Agent Models](/guide/codex-agent-models) for the full per-agent table. |
-| Cursor | `.cursor/agents/<name>.md` frontmatter | `model:` — a concrete Cursor model id (e.g. `claude-opus-5[effort=high]`, `composer-2.5[fast=true]`) or `inherit`. See [Cursor Agent Models](/guide/cursor-agent-models) for the full per-agent table. |
-
-All three targets pin a model per agent rather than deriving one from the session tier: each agent gets the model its role actually needs, so bounded wrapper work does not run at top-tier cost. See [Claude Agent Models](/guide/claude-agent-models), [Codex Agent Models](/guide/codex-agent-models), and [Cursor Agent Models](/guide/cursor-agent-models) for the per-agent tables and for how to override a pin.
+| Task | Tier | Claude Code model | Examples |
+|---|---|---|---|
+| Quick edits | TRIVIAL | Haiku | Rename, typo, format, version bump, config change |
+| Feature implementation | STANDARD | Sonnet | Feature under 5 files, bug fix, tests, API endpoint, UI component |
+| Complex architecture | COMPLEX | Opus | System design, multi-module refactor, auth, payments, database schema |
+| Code review | COMPLEX | Opus | Structural audit, security review, architecture review |
+| Research and analysis | STANDARD or COMPLEX | Sonnet or Opus | Technical research, dependency analysis, profiling |
 
 ## Escalation rules
 
-- **Always Complex:** authentication, payment processing, database schema, security audit
-- **Never downgrade:** once assigned, a task stays at its tier for the session
-- **Code review always Complex:** structural audits need highest reasoning
-- **Domain override:** `mk:scale-routing` checks a CSV of domain keywords (fintech, healthcare → high-assurance); the Claude Code adapter maps high-assurance to COMPLEX.
+- **Security work is always COMPLEX.** This covers authentication and authorization, payment processing, credential handling, security audits and vulnerability fixes, and schema changes with CASCADE. It also covers data-loss migrations, external provider behavior changes, and removing or weakening validation.
+- **Risk flags escalate.** A Phase 0 risk flag of `AUTH`, `AUTHZ`, `DATA_MODEL`, `AUDIT_SEC` or `EXT_SYSTEM` forces COMPLEX even when no domain keyword matched.
+- **A task never moves down a tier.** Once assigned, a task keeps its tier for the session, because a downgrade mid-task loses reasoning context.
+- **A high-complexity domain overrides everything.** When `mk:scale-routing` matches a domain with `level=high`, the tier is COMPLEX whatever else the classification said.
 
-## Domain-based routing (Phase 0)
+## Domain matching
 
-Before manual classification, `mk:scale-routing` reads keywords from the task and matches against `domain-complexity.csv`:
+Before manual classification, `mk:scale-routing` matches keywords in the task against `.claude/skills/scale-routing/data/domain-complexity.csv`. Each row has a domain, its signal keywords, a level (`low`, `medium` or `high`), a workflow and suggested searches.
 
-| Domain | Keywords | Execution tier / Claude Code mapping |
-|--------|----------|--------|
-| fintech | payment, stripe, billing, invoice | high-assurance → COMPLEX |
-| healthcare | hipaa, phi, ehr, patient data | high-assurance → COMPLEX |
-| auth | oauth, jwt, session, credentials | high-assurance → COMPLEX |
-| docs | readme, changelog, comment | Allow one-shot |
-| config | env, .yaml, version bump | Allow one-shot |
+| Domain | Signals | Level | Workflow |
+|---|---|---|---|
+| fintech | banking, payment, trading, finance, money, investment | high | enhanced |
+| healthcare | medical, diagnostic, clinical, patient, hospital, health | high | enhanced |
+| government | government, civic, public, admin, regulation | high | enhanced |
+| e_commerce | shopping, cart, checkout, payment, products, store | medium | standard |
+| internal_tools | admin, dashboard, internal, backoffice, cms | low | standard |
+| docs | documentation, readme, changelog, wiki, guide | low | one-shot |
 
-The CSV is user-editable. Add rows for your project's domains. Scale-routing verdicts cannot be downgraded mid-task; each provider adapter then applies its own model policy.
+The file has more rows than these. You can add rows for your own project's domains. A domain verdict cannot be lowered mid-task.
 
-## Adaptive density
+## Density for autobuild
 
-For Claude Code harness builds, density auto-adjusts per model tier: Haiku → MINIMAL, Sonnet → FULL, Opus 4.6+ → LEAN. See [Adaptive Density](/guide/adaptive-density).
+For `/mk:autobuild` the model also decides how much scaffolding runs. See [Adaptive density](/guide/adaptive-density).
 
 ## See also
 
-- [Claude Agent Models](/guide/claude-agent-models) — per-agent pins in the Claude Code toolkit
-- [Adaptive Density](/guide/adaptive-density) — scaffolding by model capability
-- [Orchestrator agent](/reference/agents/orchestrator) — the routing agent
+- [Agent models](/guide/agent-models) for the model each agent runs on
+- [Adaptive density](/guide/adaptive-density) for scaffolding by model
+- [Orchestrator agent](/reference/agents/orchestrator)

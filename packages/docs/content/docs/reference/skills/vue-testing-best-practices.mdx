@@ -1,6 +1,6 @@
 ---
 title: "mk:vue-testing-best-practices"
-description: "Vue 3 testing best-practices review and recommendations — designing and auditing Vitest + Vue Test Utils tests for components, composables, Pinia stores, Vue Router, async/Suspense, Teleport, forms, and accessibility, plus Playwright E2E test-design strategy. Advisory/review only — recommends patterns and flags test smells; does not run tests. Complements mk:vue-best-practices."
+description: "Invoke-only, read-only advisor that designs and reviews Vue 3 tests built with Vitest, Vue Test Utils and Pinia."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,89 +14,65 @@ description: "Vue 3 testing best-practices review and recommendations — design
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-A Vue-specific **test-design advisor and test-code reviewer**. It recommends how to
-test Vue 3 components, composables, Pinia stores, Vue Router, async/Suspense,
-Teleport, forms, and accessibility — and audits existing Vitest + Vue Test Utils
-tests for smells, gaps, and coverage risk.
+`mk:vue-testing-best-practices` recommends how to test Vue 3 components, composables, Pinia stores, Vue Router, async components, Suspense, Teleport, forms and accessibility, and it audits existing Vitest and Vue Test Utils tests for smells and gaps. It never runs, generates or fixes tests. It does not activate on its own. Call `/mk:vue-testing-best-practices [test file or component]` or ask how to test a Vue component or review your Vue tests.
 
-It is read-only: it advises and reviews; it never runs, generates, or fixes tests.
-This skill is to `mk:testing` what `mk:vue-best-practices` is to `mk:vue` — a
-domain-specialized advisory you invoke deliberately.
+## When not to use it
 
-## When to Use
-
-- `/mk:vue-testing-best-practices [test file or component]` (explicit).
-- "review my Vue tests", "how should I test this component/composable/store".
-- "Vitest or Jest for this Vue app?", "are my async component tests correct?".
-
-## When NOT to Use
-
-| Need | Use this instead |
+| Need | Use |
 |---|---|
-| Actually run tests / TDD red-green / non-Vue tests | `mk:testing` |
-| Diff/PR review or test-**existence** gap detection | `mk:review` |
-| Map test coverage → requirements | `mk:nyquist` |
-| QA a running app + fix bugs | `mk:qa` |
-| Generate or run Playwright `.spec.ts` E2E | `mk:qa-manual` |
-| Drive a live browser | `mk:agent-browser` / `mk:playwright-cli` |
-| Write Vue feature code | `mk:vue` / `mk:vue-best-practices` |
+| Running tests, the TDD loop, non-Vue tests | `mk:testing` |
+| Diff review or checking whether a test exists | `mk:review` |
+| Mapping coverage to requirements | `mk:nyquist` |
+| QA of a running app, with bug fixes | `mk:qa` |
+| Generating runnable Playwright specs | `mk:qa-manual` |
+| Driving a live browser | `mk:agent-browser` or `mk:playwright-cli` |
+| Root cause of a failing test | `mk:investigate` |
+| Writing Vue feature code | `mk:vue` or `mk:vue-best-practices` |
 
-## Usage
+The split with `mk:vue-best-practices` is authoring against test setup. How a component uses Teleport or Suspense belongs there. How a test stubs or awaits them (`teleport` stub, `attachTo`, `flushPromises`) belongs here.
 
-```bash
-# Review an existing Vue test file
-/mk:vue-testing-best-practices tests/SearchBar.spec.ts
+## Steps
 
-# Ask how to design tests for a component
-/mk:vue-testing-best-practices how should I test this Pinia-backed UserProfile?
-```
+1. Take the intent and the test files, or the component, composable or store to design tests for.
+2. Classify the surface and load the matching reference from `reference/`.
+3. Evaluate against `reference/test-smells-rubric.md`: black-box or coupled to internals, async awaited, Pinia configured, Suspense and Teleport set up, snapshot policy, accessible queries, brittle locators.
+4. Find missing scenarios and Vue-specific coverage risks.
+5. Write the review.
 
-**Argument hint:** `[test file | component/composable/store | tooling question]`
+| Problem | Reference in `reference/` |
+|---|---|
+| Test setup for a Vue 3 project | `testing-vitest-recommended-for-vue` |
+| Tests break on refactors of internals | `testing-component-blackbox-approach` |
+| Flaky tests, DOM not updated | `testing-async-await-flushpromises` |
+| Composables using lifecycle hooks or `inject` | `testing-composables-helper-wrapper` |
+| `injection Symbol(pinia) not found` | `testing-pinia-store-setup` |
+| Async `setup()` will not render | `testing-suspense-async-components` |
+| Snapshot tests pass on broken behaviour | `testing-no-snapshot-only` |
+| Choosing an E2E framework | `testing-e2e-playwright-recommended` |
+| Computed styles or real DOM events | `testing-browser-vs-node-runners` |
+| `defineAsyncComponent` | `async-component-testing` |
+| Teleported content not found | `teleport-testing-complexity` |
+| Router and guards | `vue-router-testing` |
+| Forms | `form-testing` |
+| Accessibility | `accessibility-testing` |
+| Smell severity | `test-smells-rubric` |
 
-## Disambiguation vs mk:vue-best-practices
+## Output
 
-The seam is **authoring** vs **test-setup**:
+One Vue Testing Review. Empty sections are omitted.
 
-- How a component *uses* Teleport (when to use it, the API, the fallback boundary)
-  → `mk:vue-best-practices`.
-- How a *test* stubs Teleport (`teleport` stub, `attachTo: document.body`, querying
-  portalled content) → **this skill**.
+1. Verdict: `PASS` or `NEEDS-WORK` with one sentence of reason.
+2. Test smells: `[severity] · file:line · smell · fix`, with severity `critical`, `high`, `medium` or `low`.
+3. Missing scenarios: error, loading, edge and accessibility states.
+4. Coverage risks: Teleported content, Suspense fallback, store actions, router guards. This section judges test quality. Whether a test exists is `mk:review`'s job.
+5. Tooling recommendations: runner, test library, E2E framework, each with a reason.
+6. Handoffs to other skills.
 
-## Workflow
+## Gotchas
 
-A read-only advisory lifecycle — classify the surface, load the matching reference
-just-in-time, evaluate against the smell rubric, emit a bounded review:
-
-1. **Input** — intent plus the Vue test file(s) under review, or the
-   component/composable/store to design tests for.
-2. **Classify the surface** — component / composable / store / router / form /
-   async / Suspense / Teleport / E2E-design.
-3. **Evaluate** — blackbox vs implementation-coupled, async awaited
-   (`flushPromises`/`nextTick`), Pinia configured, Suspense/Teleport set up, snapshot
-   policy, accessibility queries, brittle locators.
-4. **Detect gaps** — missing error/async/edge/a11y scenarios and Vue-specific
-   coverage risks.
-5. **Recommend** — concrete pattern fixes, tooling advice, and handoff notes.
-
-## Output Contract
-
-A single **Vue Testing Review**, omitting empty sections:
-
-1. **Verdict** — `PASS` / `NEEDS-WORK` + a one-sentence why.
-2. **Test Smells** — `[severity] · file:line · smell · fix`.
-3. **Missing Scenarios** — untested behaviors (error, async/loading, edge, a11y).
-4. **Coverage Risks** — Vue-specific blind spots (Teleport, Suspense fallback, store
-   actions, router guards).
-5. **Tooling Recommendations** — Vitest / runner / library / Playwright-vs-Cypress,
-   each with a one-line rationale.
-6. **Handoffs** — execute → `mk:testing`, E2E generation → `mk:qa-manual`, coverage
-   map → `mk:nyquist`.
-
-## Relationship to the Vue Skills
-
-- `mk:vue` — everyday Composition API quick-reference.
-- `mk:vue-best-practices` — feature-code review + ordered authoring workflow.
-- **`mk:vue-testing-best-practices`** — this skill: the test-design and test-code
-  counterpart.
+- `await nextTick()` flushes DOM updates but not pending promises. After an API call use `flushPromises()`, sometimes twice.
+- A snapshot checks markup shape, not behaviour. Pair it with assertions on text, role or emitted events.
+- `injection Symbol(pinia) not found` means Pinia is missing. Use `createTestingPinia` for component tests and `setActivePinia(createPinia())` for store unit tests.
+- `<Teleport>` moves DOM out of the wrapper, so `wrapper.find()` misses it. Stub Teleport, or use `attachTo: document.body` and query the document.

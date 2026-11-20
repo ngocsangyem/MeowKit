@@ -1,11 +1,11 @@
 ---
 title: "Introduction"
-description: "What MeowKit is in one page, and where to go next depending on what you want to do."
+description: "What MeowKit is, and where to go next depending on what you want to do."
 ---
 
-MeowKit is an AI agent toolkit for Claude Code. It installs a `.claude/` directory that Claude Code reads at session start, and that directory holds specialist agents, domain skills, lifecycle hooks, security rules, and a memory system.
+MeowKit is an AI agent toolkit for coding assistants. It installs specialist agents, skills, lifecycle hooks, security rules and a small memory store into a project, for Claude Code, Codex, Cursor, Grok, Pi and OMP. The Claude Code files live in `.claude/`, and the other runtimes get the same kit projected into the folders they read.
 
-The effect is that your coding assistant plans before it writes, agrees that plan with you, reviews its own work through adversarial reviewers, and runs a ship check (lint, related tests, type-check) before any commit, push, merge or PR. The ship check refuses the command when it fails; planning and review are practices, not gates.
+With the kit installed, the assistant plans before it writes and agrees the plan with you. Its changes go to adversarial reviewers, and a ship check runs lint, related tests and a type-check before any commit, push, merge or PR. The ship check refuses the command when one of them fails. Planning and review are practices in the workflow, and no hook blocks an edit or a commit on them.
 
 <Callout title="See what's new" type="info">
 
@@ -17,7 +17,7 @@ The effect is that your coding assistant plans before it writes, agrees that pla
 
 | You want to | Read |
 |---|---|
-| Decide whether this is for you | [What Is MeowKit](/core-concepts/what-is-meowkit): the problem it solves, the trade-offs it makes, and what it deliberately does not do |
+| Decide whether this is for you | [What Is MeowKit](/core-concepts/what-is-meowkit): the problem it solves, the trade-offs it makes, and what it does not do |
 | Get it running | [Installation](/installation) |
 | Do something with it today | [Quick Start](/quick-start): your first task in about five minutes |
 | Understand it before changing it | [How It Works](/core-concepts/how-it-works) and [The Workflow](/core-concepts/workflow) |

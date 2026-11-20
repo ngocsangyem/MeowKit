@@ -1,6 +1,6 @@
 ---
 title: "mk:lint-and-validate"
-description: "Automatic linting and static analysis after code changes. Runs linter + type-check + shared validation scripts. MANDATORY after every code change."
+description: "Runs lint, format and static analysis after an edit. A lint-only subset of mk:verify for quick post-edit checks."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,79 +15,43 @@ description: "Automatic linting and static analysis after code changes. Runs lin
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Runs appropriate validation tools after code modifications to catch style violations, type errors, security issues, and code quality problems. **MANDATORY after EVERY code change** — no code is committed or reported as done without passing all checks.
+Runs the project's lint, format and static-analysis tools after you edit code, so errors surface before you call a change done. It is the lint-only subset of the pipeline. Use it for quick post-edit checks.
 
-For the full pipeline (build → lint → type-check → tests → coverage), use `mk:verify`. `mk:lint-and-validate` is the lint-only subset for post-edit quick checks.
+## When not to use
 
-## When to Use
+For the full pipeline (build, lint, type-check, tests, coverage) use `mk:verify`.
 
-After EVERY code change. The quality loop: Write/Edit → Run audit → Analyze → Fix & Repeat.
+## Usage
 
-**Triggers:** "lint", "format", "check", "validate", "types", "static analysis".
+Ask in plain words: "lint the changes I just made", "run type-check after refactoring the auth module". Script paths in the skill are relative to the skill directory, so prefix them with `.claude/skills/lint-and-validate/`.
 
-**NOT for:** full build verification (`mk:verify`), test coverage (`mk:testing`).
-
-## Core Capabilities
-
-### Commands by Ecosystem
-
-**Node.js / TypeScript:**
-
-| Step | Command | Notes |
+| Ecosystem | Step | Command |
 |---|---|---|
-| Lint | `npm run lint` | Project-configured ESLint |
-| Lint fix | `npx eslint "path" --fix` | Auto-fix fixable issues |
-| Types | `npx tsc --noEmit` | Type check without emitting |
-| Security | `npm audit --audit-level=high` | Skip low/moderate severity |
+| Node.js, TypeScript | Lint | `npm run lint` |
+| | Lint with fixes | `npx eslint "path" --fix` |
+| | Types | `npx tsc --noEmit` |
+| | Dependency audit | `npm audit --audit-level=high` |
+| Python | Lint | `ruff check "path" --fix` |
+| | Security | `bandit -r "path" -ll` |
+| | Types | `mypy "path"` |
 
-Config files: `.eslintrc`, `.eslintrc.json`, `.eslintrc.js`, `tsconfig.json`
+The skill also ships two scripts, `scripts/validate.py` (general validation) and `scripts/security-scan.py` (security patterns). Run them through `node .claude/hooks/lib/skill-python.cjs <script>`; if the Python environment is missing, `mewkit skill env lint-and-validate` creates it.
 
-**Python:**
+## Steps
 
-| Step | Command | Notes |
-|---|---|---|
-| Lint | `ruff check "path" --fix` | Fast, modern, replaces flake8 |
-| Security | `bandit -r "path" -ll` | Skip low-severity |
-| Types | `mypy "path"` | Static type analysis |
-
-Config files: `pyproject.toml`, `setup.cfg`, `.ruff.toml`
-
-### Shared Validation Scripts
-
-Scripts the skill owns, at `.claude/skills/lint-and-validate/scripts/`:
-
-| Script | Purpose | Command |
-|---|---|---|
-| `validate.py` | General code validation | `node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/validate.py` |
-| `security-scan.py` | Security pattern scanning | `node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/security-scan.py` |
-
-### Error Recovery
-
-| Error type | Action |
-|---|---|
-| Lint fails | Fix style/syntax immediately |
-| tsc fails | Correct type mismatches before continuing |
-| No tool configured | Check for `.eslintrc`, `tsconfig.json`, `pyproject.toml` — suggest creating one |
-| Script not found | Check `.claude/skills/lint-and-validate/scripts/` — may not be present in all projects |
+1. Edit the code.
+2. Run the audit, for example `npm run lint && npx tsc --noEmit`.
+3. Read the report and fix what failed. The skill's rule is that a change with failing checks is not reported as done.
+4. Repeat until clean. If no tool is configured, the skill looks for `.eslintrc`, `tsconfig.json` or `pyproject.toml` and suggests creating one.
 
 ## Gotchas
 
-- **ESLint flat config (`eslint.config.mjs`) and legacy `.eslintrc` are mutually exclusive** — ESLint 9 auto-detects flat config and silently ignores `.eslintrc.*` files. If a project has both, flat config wins and all legacy `extends` rules are dropped without error, making it look like rules pass when they were never loaded.
-- **`eslint --fix` on unstaged files destroys uncommitted work** — `--fix` writes changes directly to disk. Stage with `git add -p` before running, or use `--fix-dry-run` to preview.
-- **TypeScript ESLint parser version must match installed `typescript` version** — a TS upgrade without bumping `@typescript-eslint/parser` causes `Unexpected token` parse errors on new syntax even though `tsc` accepts it fine.
-- **`extends` order determines rule precedence (later wins)** — `['plugin:vue/recommended', 'prettier']` works; reversing to `['prettier', 'plugin:vue/recommended']` re-enables conflicting vue formatting rules.
-- **Prettier and ESLint format rules conflict when both run on the same file** — disable all formatting rules in ESLint (`eslint-config-prettier`) and let Prettier own formatting.
-
-## Example Prompts
-
-- "Lint the changes I just made"
-- "Run type-check after refactoring the auth module"
-- "Validate the code before I create a PR"
-
-## Pro Tips
-
-- Run `npm run lint && npx tsc --noEmit` as a single command — both must pass.
-- If a project is missing lint config, create one before proceeding. The skill will suggest this.
-- The gotchas section above covers the most common traps — read it before troubleshooting lint failures.
+| Trap | Detail |
+|---|---|
+| Flat config and `.eslintrc` | ESLint 9 uses `eslint.config.mjs` and silently ignores `.eslintrc.*` in the same folder, so legacy rules are never loaded. |
+| `eslint --fix` on unstaged files | It writes to disk and overwrites uncommitted edits. Stage with `git add -p` first or use `--fix-dry-run`. |
+| Parser version | After a TypeScript upgrade, bump `@typescript-eslint/parser`, or new syntax fails to parse while `tsc` accepts it. |
+| `extends` order | Later entries win. Put `prettier` last. |
+| Prettier and ESLint | Format rules in both fight each other. Disable ESLint formatting with `eslint-config-prettier`. |

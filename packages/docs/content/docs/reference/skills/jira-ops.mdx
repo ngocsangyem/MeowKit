@@ -1,6 +1,6 @@
 ---
 title: "mk:jira-ops"
-description: "JIRA-side cache + project-context discovery. Diagnostic surface only."
+description: "Inspects or clears the jira-as cache and discovers Jira project context. Diagnostic only, with no changes in Jira."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,43 +15,33 @@ description: "JIRA-side cache + project-context discovery. Diagnostic surface on
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Forks the `jira-ops` agent to inspect / reset the `jira-as` local cache and discover project context (default issue types, mandatory fields). Diagnostic-only — no Jira-side state changes.
+Inspects or clears the local cache of the `jira-as` wrapper and discovers project context such as the default issue type and mandatory fields. It forks the `jira-ops` agent and changes nothing in Jira. Reach for it when the wrapper shows stale field IDs or a renamed status still appears under its old name.
 
-## When to Use
+## When not to use
 
-- **Triggers:** "jira cache status", "clear jira cache", "discover project context for PROJ"
-- **NOT for:** issue CRUD · project admin ([`mk:jira-admin`](/reference/skills/jira-admin)).
+For issue create, read, update or delete use `mk:jira-issue`. For project administration use `mk:jira-admin`.
 
-## Verified Wrapper Invocations
+## Usage
 
-| Operation | Tier | Invocation |
-|---|---|---|
-| Cache status | 1 | `... ops cache-status` |
-| Cache clear | 1 | `... ops cache-clear` (clears jira-as local cache; does NOT touch Atlassian) |
-| Discover project | 1 | `... ops discover-project --project PROJ` |
+Ask in plain words: "jira cache status", "clear the jira cache, my admin renamed a status", "discover project context for PROJ".
 
-## When to Cache-Clear
+| Operation | Command |
+|---|---|
+| Cache status | `jira-as.sh ops cache-status` |
+| Clear the cache | `jira-as.sh ops cache-clear` |
+| Discover a project | `jira-as.sh ops discover-project --project PROJ` |
+| Warm the cache | `jira-as.sh ops cache-warm --project PROJ` |
 
-If the user reports stale field IDs after admin changes, wrong project context, or a renamed status that search still shows under the old name — clear the cache and re-run the failing op. Cache TTL is otherwise self-managing.
+`jira-as.sh` is `.claude/skills/jira/scripts/jira-as.sh`. `cache-warm` is not a trigger phrase of the skill; call it directly when needed. The `jira-as` tool is not part of this repository, so check unfamiliar flags with `--help`.
 
-## Power-User Note
+## Steps
 
-`cache-warm` is intentionally NOT exposed as a primary trigger. Power users invoke it directly:
+1. The agent runs the operation through the wrapper.
+2. For `cache-clear` it re-runs the failing operation afterwards. The cache otherwise expires on its own.
+3. It returns cache statistics, project metadata and a recommendation, or the items cleared and a suggested next operation.
 
-```bash
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh ops cache-warm --project PROJ
-```
+## Related
 
-## Domain References
-
-- `references/rate-limits.md` — Atlassian rate-limit ceilings + back-off behaviour
-
-## Peer Leaves
-
-`mk:jira-bulk` is the most common trigger for cache-warm + rate-limit awareness.
-
-## Agent
-
-[`jira-ops`](/reference/agents/jira-ops) — A + C, NOT B.
+`references/rate-limits.md` lists the Atlassian rate limits and back-off behaviour. A leaf that hits throttling, most often `mk:jira-bulk`, lands here for diagnosis. The agent is [`jira-ops`](/reference/agents/jira-ops).

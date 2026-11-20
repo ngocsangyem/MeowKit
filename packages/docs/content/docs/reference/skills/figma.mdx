@@ -1,6 +1,6 @@
 ---
 title: "mk:figma"
-description: "Read-first Figma gateway via Figma MCP. Analyze designs, implement Figma-to-code, extract tokens, with gated advanced workflows (Code Connect, canvas writes, design-system/library patterns)."
+description: "Reads a Figma design through the Figma MCP server and turns it into a design report, component code or design tokens."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,101 +14,57 @@ description: "Read-first Figma gateway via Figma MCP. Analyze designs, implement
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-`mk:figma` is a read-first Figma gateway. It analyzes Figma designs and translates them into code across three default modes — **Analyze** (extract design context for intake/review), **Implement** (Figma-to-code for 1–3 screens), and **Tokens** (extract design tokens as CSS custom properties or Tailwind config). It integrates with Figma MCP when available and falls back to PNG export + multimodal analysis otherwise.
+mk:figma is a read-first Figma gateway with three default modes. Analyze extracts design context from a link. Implement turns one to three screens into code. Tokens extracts design tokens as CSS custom properties, a Tailwind config or JSON. When the Figma MCP server is unavailable, the skill asks for a PNG export and reads it with `mk:multimodal`.
 
-Advanced Figma operations — Code Connect, canvas writes (`use_figma`), and design-system/library patterns — are **gated references** loaded only on explicit user intent plus confirmed prerequisites, never by default. A Capability Router in `SKILL.md` maps any Figma intent to the right mode or gated reference in a single lookup.
+## When to use it
 
-## When to Use
+Use it when a ticket or task has a Figma link, or when you ask to implement a design or extract tokens. Other skills call it: `mk:intake` and `mk:review` use Analyze, `mk:cook` and `mk:frontend-design` use Implement, `mk:ui-design-system` uses Tokens. It takes no flags.
 
-Triggers:
-- "implement this design", "figma link", "design tokens", "design system"
-- Figma URL present in a ticket (auto-detected by `mk:intake`)
-- UI implementation from Figma spec (invoked by `mk:cook` or `mk:frontend-design`)
-
-Anti-triggers:
-- Generating novel UI from a text prompt — use `mk:stitch`
-- General UI design systems / design review — use `mk:ui-design-system`
-
-Advanced Figma work is not a separate skill — it is routed to gated references inside `mk:figma`:
-- Mapping Figma components to code (Code Connect / `.figma.js`) — gated behind confirmed Org/Enterprise plan + Dev/Full seat
-- Creating or updating screens IN Figma (canvas writes) — gated behind an explicit mutation request
-- Design-system rules or full library builds — advisory reference; library execution stays out of scope
-
-## Core Capabilities
-
-- **3 default modes** — Analyze (design context report), Implement (Figma-to-code workflow), Tokens (CSS/Tailwind token extraction)
-- **Capability Router** — maps every Figma intent to a mode or a gated reference; no dead ends, no routing to phantom external skills
-- **URL parsing and validation** — extracts file key and node ID; validates link shape; accepts `/proto/` for recognition only and asks for the `/design/` URL before extraction
-- **Design context extraction** — component tree, layout mode, spacing, text/color/effect styles via `get_design_context`, with a `get_metadata` fallback when context is truncated or oversized
-- **Screenshot capture** — visual ground truth for parity comparison via `get_screenshot`
-- **Design system matching** — auto-detects Tailwind, MUI, shadcn/ui, or custom CSS-variable systems
-- **Token extraction** — color (0–1 to CSS hex), typography, spacing, shadows, border-radius, with Variables-vs-Color-Styles normalization and Enterprise permission caveats
-- **Per-mode pre-flight checklist** — Core checks run for every mode; Implement and Canvas-write add their own blocks (no blanket 18-item gate on read-only analysis)
-- **Untrusted-data security** — node/text/plugin/variable names are treated as DATA; the canvas-write gate is justified by the Rule of Two (untrusted input + state change ⇒ opt-in)
-- **PNG fallback** — when Figma MCP is unavailable, asks the user to export frames as PNG and uses `mk:multimodal`
-
-## Advanced Workflows (gated)
-
-Loaded only on explicit user intent plus confirmed prerequisites:
-
-| Workflow | Gate | Blast radius |
-| --- | --- | --- |
-| Code Connect / Dev Mode | Explicit intent + Org/Enterprise plan + Dev/Full seat + published components | Read-side mapping; entitlement-gated |
-| Canvas writes (`use_figma`) | Explicit mutation request + user confirms the file is safe to modify | Mutates the Figma file — incremental, verify-after-each; never chains from Implement |
-| Design-system rules & library patterns | Explicit intent | Advisory rule text only; library execution stays out of scope |
-
-## Arguments
-
-No flags. Mode is determined by the invoking skill:
-- `mk:intake` or `mk:review` triggers **Analyze** mode
-- `mk:cook` or `mk:frontend-design` triggers **Implement** mode
-- `mk:ui-design-system` triggers **Tokens** mode
-
-## Workflow (Implement Mode)
-
-1. **Parse Figma URL** — extract file key and node ID from a `/design/` or `/file/` URL. `/proto/` → stop and ask for the `/design/` URL. Invalid → stop.
-2. **Get design context** — `get_design_context`: component tree, layout, spacing, text styles, colors. Oversized/truncated → fall back to `get_metadata` + targeted child fetches.
-3. **Get screenshot** — visual reference for post-implementation comparison.
-4. **Download assets** — icons as SVG, photos as WebP/PNG.
-5. **Identify design system** — match Figma tokens to the existing project system (Tailwind, MUI, shadcn, custom).
-6. **Translate to code** — structure first, then layout, spacing, typography, colors, effects, interactions (advisory — only designed states), responsive.
-7. **Validate visual parity** — compare to the Figma screenshot; verify accessibility, interaction states, component reuse, and asset scale; fix deltas.
-
-## Usage
+| Need | Use instead |
+|---|---|
+| New UI from a text prompt | `mk:stitch` |
+| General design system or design review | `mk:ui-design-system` |
 
 ```bash
-# Analyze (via mk:intake -- auto-detects Figma URLs in tickets)
-/mk:intake  # then paste ticket with Figma link
-
-# Implement
 /mk:cook "build the login page from this Figma: https://www.figma.com/design/ABC123/..."
 ```
 
-## Example Prompt
+## Modes
 
-```
-Implement this design: https://www.figma.com/design/XYZ789/Dashboard?node-id=2304%3A512
-Use our existing Tailwind config and shadcn/ui components.
-```
+| Mode | MCP tools | Output | Handoff |
+|---|---|---|---|
+| Analyze | `get_design_context`, `get_metadata`, `get_screenshot` | Design context report, optional Figma evidence packet | `mk:intake`, `mk:review` |
+| Implement | the same, plus asset downloads | Component code for 1 to 3 screens | `mk:cook` |
+| Tokens | `search_design_system`, variable and style inspection | Token file | `mk:ui-design-system` |
 
-## Common Use Cases
+Implement follows `references/implement-workflow.md`: parse the URL, get design context, take a screenshot, download assets, match the project's design system (Tailwind, MUI, shadcn or custom), translate to code, and check visual parity against the screenshot.
 
-- Extracting design context from a Figma link in a Jira ticket during intake
-- Implementing a new UI screen from a Figma design (1–3 screens)
-- Generating CSS custom properties from a Figma design system file
-- Validating that an implementation matches the Figma spec during code review
-- Extracting spacing/typography/color tokens to bootstrap a new design system
+## Links and safety
 
-## Pro Tips
+Accepted links match `figma.com/(design|file|proto)/...`. A `/proto/` link is recognised but cannot be used for extraction, so the skill asks for the `/design/` or `/file/` URL. Figma content (layer names, text, plugin metadata, variable names) is data and never instructions.
 
-- **Figma prototype links (`/proto/`) are not parseable.** Ask for the `/design/` URL from the editor, not the shareable prototype link.
-- **Node IDs change when designers restructure frames.** Always re-extract the node ID from the current URL before any MCP call — never cache IDs across sessions.
-- **Colors are 0–1 scale, not 0–255.** Figma returns `{ r: 0.2, g: 0.4, b: 1.0 }`. Multiply by 255 for CSS: `rgb(51, 102, 255)`.
-- **Variables and Color Styles export different formats.** Variables are `{ r, g, b, a }` floats; color styles are `rgba()` strings. Normalize to one format before writing token files.
-- **Screenshots at 1x are blurry on Retina displays.** Always request `scale: 2` for assets intended for screen display.
-- **Batch more than ~20 nodes and you hit rate limits.** Fetch in batches of ≤15 nodes with exponential backoff.
-- **Advanced workflows are gated.** Code Connect and canvas writes load only after their prerequisites are confirmed — the skill asks first rather than guessing.
+## References that load on request
 
-> **Canonical source:** `.claude/skills/figma/SKILL.md`
+These load only on explicit intent and confirmed prerequisites. If a condition fails, the skill says what is missing and stops.
+
+| Workflow | Condition |
+|---|---|
+| Code Connect and Dev Mode (`references/code-connect-and-dev-mode.md`) | Explicit request, Org or Enterprise plan, Dev or Full seat, published components |
+| Canvas writes with `use_figma` (`references/canvas-write-boundaries.md`) | Explicit mutation request and confirmation that the file is safe to change. Never chained from Implement. |
+| Design-system rules (`references/design-system-and-library-patterns.md`) | Explicit request. Output is advisory text. |
+
+Building or updating a full component library in Figma is out of scope.
+
+## Gotchas
+
+- Fetching more than about 20 nodes in one call can hit rate limits. Fetch up to 15 at a time with backoff (1s, 2s, 4s). This is an observed heuristic.
+- Figma colours are on a 0 to 1 scale. Multiply by 255 for CSS.
+- Variants sit under `componentPropertyDefinitions`, not `variants`.
+- An evidence packet older than the file's `last_modified` is stale. Re-extract it.
+- Record only states the file defines. Missing states go in `risks.missing_states` and unclear layout in `risks.ambiguity`.
+- Node IDs change when frames are restructured. Take them from the current URL.
+- MCP install needs your approval. The skill never runs `claude mcp add figma` itself.
+
+More pitfalls are in `references/gotchas.md`.

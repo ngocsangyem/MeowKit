@@ -1,6 +1,6 @@
 ---
 title: "mk:careful"
-description: "Session-scoped safety guardrails for destructive commands with environment-aware blocking — warns or blocks rm -rf, DROP TABLE, force-push, git reset --hard, kubectl delete, terraform destroy, and more."
+description: "Warns before destructive Bash commands such as rm -rf, DROP TABLE and force-push, and blocks the critical ones in production."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,85 +14,50 @@ description: "Session-scoped safety guardrails for destructive commands with env
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:careful` adds a PreToolUse hook on every Bash call (`bin/check-careful.cjs`) that checks the command against a catalogue of destructive patterns and asks before it runs. Use it when touching production, debugging a live system or working in a shared environment, or when you say "careful mode" or "prod mode". The hook lasts for the session and ends with the conversation.
 
-Intercepts every Bash command via a PreToolUse hook (`bin/check-careful.cjs`) and checks it against a comprehensive catalog of destructive patterns. In development contexts, destructive commands trigger a warning the user can override. In production/staging contexts, CRITICAL patterns are **blocked with no override**. All overrides are logged to `.meowkit/telemetry/security-log.md` for audit trail.
+## When not to use it
 
-## When to Use
+To limit file edits to one directory, use `mk:freeze`.
 
-- Touching production, debugging live systems, working in shared environments
-- User asks "be careful", "safety mode", "prod mode", "careful mode"
-- Before running any infrastructure or database operations
+## Usage
 
-**NOT for:** scoping file edits to a directory (use `mk:freeze`).
-
-## Example Prompt
-
-```
-Enable careful mode before running the production database migration. I need to execute `prisma migrate deploy` on the prod cluster, but I want safety guardrails against accidental DROP TABLE or TRUNCATE commands.
+```bash
+/mk:careful
 ```
 
-## Core Capabilities
+## What it does
 
-### Pattern Categories Covered
+For each Bash command the hook returns allow (no match or a safe exception), ask (a match, which you can override) or block (a CRITICAL match in a production context). Matching looks at the command string only, so source code that mentions `rm -rf` in a comment does not trigger it.
 
-| Category | Examples | Count |
-|----------|---------|-------|
-| File System | `rm -rf`, `find -delete`, `shred`, `dd`, `chmod -R` | 6 patterns |
-| Database (SQL) | `DROP TABLE`, `DROP DATABASE`, `TRUNCATE`, `prisma migrate reset`, `rails db:drop` | 6 patterns |
-| Database (NoSQL) | `redis-cli FLUSHALL`, `mongosh db.dropDatabase()` | 3 patterns |
-| Git | `push --force`, `reset --hard`, `checkout .`, `clean -fd`, `filter-branch`, `rebase -i` | 6 patterns |
-| Kubernetes/Containers | `kubectl delete`, `docker rm -f`, `helm uninstall` | 4 patterns |
-| Cloud/Infra | `terraform destroy`, `aws s3 rm --recursive`, `gcloud ... delete` | 3 patterns |
+| Severity | Meaning | Behaviour |
+|---|---|---|
+| CRITICAL | Irreversible, possible data loss or production impact | Ask in development. Blocked with no override in production |
+| HIGH | Reversible but costly to recover | Ask everywhere |
+| MEDIUM | Dangerous in some contexts | Ask everywhere |
 
-### Severity Levels
+A context counts as production when `NODE_ENV`, `APP_ENV` or `ENVIRONMENT` contains `production`, `prod` or `staging`. The block message says an override needs a human to unset those variables.
 
-| Level | Meaning | Override? |
-|-------|---------|-----------|
-| CRITICAL | Irreversible, potential data loss or production impact | In dev: ask; **In prod: BLOCK (no override)** |
-| HIGH | Reversible but costly to recover | Ask in all environments |
-| MEDIUM | Dangerous in certain contexts | Ask in all environments |
+Each override is logged with the command in `.meowkit/telemetry/security-log.md`.
 
-### Production Auto-Block
+## Pattern categories
 
-When any of `NODE_ENV`, `APP_ENV`, or `ENVIRONMENT` contains `production`/`prod`/`staging`:
-- CRITICAL patterns return `permissionDecision: "block"` — cannot be overridden
-- HIGH and MEDIUM patterns still warn with override option
+| Category | Examples |
+|---|---|
+| File system | `rm -rf`, `find -delete`, `shred`, `dd`, `chmod -R` |
+| SQL | `DROP TABLE`, `DROP DATABASE`, `TRUNCATE`, `prisma migrate reset`, `rails db:drop` |
+| NoSQL and cache | `redis-cli FLUSHALL`, `db.dropDatabase()` |
+| Git | `push --force`, `reset --hard`, `checkout .`, `clean -fd`, `filter-branch`, `rebase -i` |
+| Containers | `kubectl delete`, `docker rm -f`, `helm uninstall` |
+| Cloud | `terraform destroy`, `aws s3 rm --recursive`, `gcloud ... delete` |
 
-## Workflow
+The full list is `references/destructive-patterns.md`, kept in step with the hook.
 
-1. **Invoke** — user runs `/mk:careful` or triggers it contextually
-2. **Hook activates** — `bin/check-careful.cjs` registers as PreToolUse on all Bash calls
-3. **Pattern matching** — every bash command string is checked against ~30 destructive patterns
-4. **Decision** — allow (no match or safe exception), ask (match in dev), or block (CRITICAL match in prod)
-5. **Audit** — all overrides logged with timestamp and command to `.meowkit/telemetry/security-log.md`
-6. **Deactivate** — end session or start new conversation; hooks are session-scoped
+Never warned: deleting build and dependency caches (`node_modules`, `.next`, `dist`, `build`, `.turbo`, `coverage`, `__pycache__`, `.cache`, `.gradle`, `target`, `vendor`, `Pods`, `.venv`, `venv`), removing stopped containers, and removing dangling images.
 
-## Safe Exceptions (Never Warned)
+## Gotchas
 
-Build and dependency caches that are safe to delete: `node_modules`, `.next`, `dist`, `build`, `.turbo`, `coverage`, `__pycache__`, `.cache`, `.gradle`, `target`, `vendor`, `Pods`, `.venv`/`venv`.
-
-Container housekeeping: `docker rm $(docker ps -aq)` (stopped containers only), `docker rmi $(docker images -f "dangling=true" -q)` (dangling images only).
-
-## Common Use Cases
-
-1. **Working on a production database** — `mk:careful` blocks `DROP TABLE`, `TRUNCATE`, `prisma migrate reset`
-2. **Infrastructure changes** — blocks `terraform destroy`, `kubectl delete namespace`, `aws s3 rm --recursive`
-3. **Git history rewrites** — warns on `push --force`, `reset --hard`, `filter-branch`
-4. **Debugging live systems** — warns before any destructive filesystem or database operation
-5. **Teaching/mentoring sessions** — prevents accidental damage in shared environments
-
-## Pro Tips
-
-- **Interaction with `mk:investigate`:** When careful is active during an investigation, destructive-Bash warnings still fire. Debugging commands that touch state require explicit user confirmation per warning — do not bypass.
-- Pattern matching is **command-scoped**, not content-scoped. Source code mentioning `rm -rf` in comments will not trigger.
-- Shell aliases (e.g., `alias del='rm -rf'`) can bypass detection — document project-specific dangerous aliases.
-- Multi-line commands with backslash continuations may not match single-line regex.
-- Run `git stash` before `git reset --hard` to prevent uncommitted work loss.
-- In production environments, CRITICAL patterns are fully blocked — use migration systems with rollback instead.
-
-### Notes
-
-- Hook script: `.claude/skills/careful/bin/check-careful.cjs`
-- Pattern reference: `.claude/skills/careful/references/destructive-patterns.md` (200+ lines)
-- Source: gstack
+- During `mk:investigate`, destructive-command warnings still fire. Each debugging command that touches state needs your confirmation.
+- A shell alias such as `alias del='rm -rf'` can slip past the match.
+- A multi-line command with backslash continuations may not match a single-line pattern.
+- Run `git stash` before `git reset --hard` to keep uncommitted work.

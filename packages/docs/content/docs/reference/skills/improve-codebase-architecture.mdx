@@ -1,6 +1,6 @@
 ---
 title: "mk:improve-codebase-architecture"
-description: "Review a codebase for deepening opportunities (shallow modules → deep), emit structured candidates for mk:preview to render, then grill a pick into a precise, type-safe patch. Analysis and patch emission only — no embedded rendering."
+description: "Finds shallow modules in a codebase and proposes deepening refactors, then emits type-safe patches for the one you choose."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,93 +15,51 @@ description: "Review a codebase for deepening opportunities (shallow modules →
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Surfaces architectural friction and proposes **deepening opportunities** — refactors that turn shallow modules into deep ones (small interface, large hidden implementation) for testability and AI-navigability. It owns three things only: **structural analysis**, **dependency mapping**, and **type-safe patch emission**. Every visual artifact — before/after diagrams, the candidate report, HTML — is delegated to `mk:preview`. The skill emits structured findings; `mk:preview` draws them.
+mk:improve-codebase-architecture looks for architectural friction and turns shallow modules (interface nearly as wide as the implementation) into deep ones (small interface, large hidden implementation). The aim is testability and easier navigation. The skill owns structural analysis, dependency mapping and type-safe patch emission. It writes no HTML or diagrams: it emits structured findings and `mk:preview` draws them. It runs only when invoked.
 
-Explicit invocation only — it never auto-activates.
+## When to use it
 
-## When to Use
+Use it when understanding one concept means reading many small modules, when pure functions were extracted only for testing while bugs hide in how they are called, or when you want reviewable refactor candidates before committing to one. Usage: `/mk:improve-codebase-architecture`.
 
-- A codebase has accumulated shallow modules — interfaces nearly as wide as their implementations
-- Understanding one concept requires bouncing between many small modules (no locality)
-- Pure functions were extracted only for testability, while real bugs hide in how they're called
-- You want a structured, reviewable set of refactor candidates before committing to one
-- **NOT for:** rendering diagrams/HTML (see `mk:preview`); architecture trade-off deliberation (see `mk:party`); plan critique/scope review (see `mk:plan-ceo-review`); behavior-preserving cleanup of a known target (see `mk:simplify`)
+| Need | Use instead |
+|---|---|
+| Record an architecture decision (ADR) | `mk:arch` |
+| Render diagrams or HTML | `mk:preview` |
+| Debate trade-offs | `mk:party` |
+| Critique a plan's scope | `mk:plan-ceo-review` |
+| Behaviour-preserving cleanup of a known target | `mk:simplify` |
 
-## Core Capabilities
+To design a system that has no code yet, the skill runs `references/system-design-consultation.md` instead: components and boundaries, an ASCII data flow, failure behaviour per integration, scalability concerns and a recommendation against a real alternative. It writes documentation only and no patch.
 
-- **Explore for friction** — drives `mk:scout` to walk the codebase organically, not by rigid heuristics
-- **Apply the deletion test** — would deleting a module concentrate complexity (it was shallow) or merely move it (it was load-bearing)?
-- **Map dependencies** — classify each candidate's dependencies (`in-process` / `local-substitutable` / `ports-and-adapters` / `mock`) to determine how the deepened module is tested across its seam
-- **Emit structured candidates** — one JSON object per candidate with before/after as *structural descriptors*, not pre-drawn diagrams
-- **Type-safe patch emission** — precise multi-line edits with no `any`, no generic casts, zero new suppressions
-- **Keep the domain model current** — new terms via `mk:project-context`; load-bearing rejections recorded as ADRs via the `architect` agent
+## Vocabulary
 
-## Architecture vocabulary
+Every suggestion uses a fixed glossary: module, interface, depth, seam, adapter, leverage, locality. It never substitutes "component", "service", "API" or "boundary". The deletion test asks whether deleting a module would concentrate complexity (it was shallow) or only move it (it was load-bearing). Definitions, the dependency categories (`in-process`, `local-substitutable`, `ports-and-adapters`, `mock`) and the replace-don't-layer test strategy are in `references/deep-module-design.md`.
 
-Every suggestion uses a fixed glossary — **module, interface, depth, seam, adapter, leverage, locality** — and never substitutes "component", "service", "API", or "boundary". Full definitions, the `dependency_category` taxonomy, and the replace-don't-layer testing strategy live in the skill's `references/deep-module-design.md`.
+## Steps
 
-## Usage
+1. Orient: read `docs/project-context.md` (if present) and ADRs under `docs/architecture/adr/` in the area. Decisions there are not re-argued.
+2. Analyze: `mk:scout` the code, apply the deletion test, and write candidates to `tasks/architecture-review/<run-id>-candidates.json`. No concrete interfaces yet.
+3. Visualize: hand the findings file to `mk:preview --html --diagram`.
+4. Select: ask you which candidate to explore, or none. This is the only mid-run question.
+5. Grill: `mk:grill` walks the chosen candidate's design. `mk:party` can optionally design the interface twice.
+6. Patch: emit exact multi-line `Edit` operations with no `any`, no generic casts and no new suppressions. Run the project's build or type-check after each patch.
+7. Sync: add new domain terms through `mk:project-context` and record load-bearing rejections as ADRs through the `architect` agent.
 
-```bash
-/mk:improve-codebase-architecture          # review the current codebase for deepening opportunities
-```
+## Findings
 
-## Example Prompt
+Each candidate is plain JSON with `id`, `title`, `files`, `problem`, `solution`, `wins`, `recommendation` (`Strong`, `Worth exploring` or `Speculative`), `dependency_category`, `before` and `after` structural descriptors, and `adr_conflict` (`null` or the ADR and why to reopen it).
 
-```
-This module feels shallow — there are five small files I have to read just to
-follow one order through intake. Review the architecture and show me what to deepen.
-```
-
-## Workflow phases
-
-1. **Orient** — read `docs/project-context.md` and any ADRs under `docs/architecture/adr/` in the area (decisions not to re-litigate).
-2. **Analyze** — `mk:scout` the codebase, apply the deletion test, write structured candidates to `tasks/architecture-review/<run-id>-candidates.json`. No concrete interfaces yet.
-3. **Visualize (delegated)** — hand the findings file to `mk:preview --html --diagram`; it owns the before/after cards, badges, and browser-open mechanics.
-4. **Select** — the single human gate: `AskUserQuestion` picks which candidate to explore (or none).
-5. **Grill** — `mk:grill` walks the chosen candidate's design tree; `mk:party` optionally designs the interface twice.
-6. **Patch** — emit precise multi-line edits, type-safe (no `any`, no generic casts); run the project's build/type-check after each.
-7. **Sync** — record new domain terms (`mk:project-context`) and load-bearing rejections as ADRs (`architect` agent).
-
-## Findings format
-
-Each candidate is plain data — no markup — for `mk:preview` to render:
-
-```json
-{
-  "id": "c1",
-  "title": "Collapse the Order intake pipeline",
-  "files": ["src/order/intake.ts", "src/order/validator.ts"],
-  "problem": "Order intake module is shallow — interface nearly matches implementation.",
-  "solution": "Absorb the validator and repo wrappers into one deep intake module.",
-  "wins": ["locality: bugs concentrate in one module", "leverage: one interface, N call sites"],
-  "recommendation": "Strong",
-  "dependency_category": "in-process",
-  "before": { "nodes": ["..."], "edges": [["..."]], "leaks": [["..."]] },
-  "after": { "deep_module": "OrderIntake", "absorbed": ["..."], "interface": ["intake(order)"] },
-  "adr_conflict": null
-}
-```
-
-A `<run-id>-state.json` tracks metrics (candidates found, selected, patches emitted, type-check status) so long-horizon runs resume from disk instead of re-asking.
+`tasks/architecture-review/<run-id>-state.json` tracks candidates found, selected, patches emitted and type-check status so a long run resumes from disk.
 
 ## Gotchas
 
-- **Vocabulary drift is the #1 failure** — sliding into "component/service/API/boundary". A non-glossary noun is a defect; re-anchor before writing each candidate.
-- **Do not re-implement `mk:preview`** — emitting a quick inline HTML report reintroduces duplication. Emit JSON, call `mk:preview`, stop.
-- **Patches are multi-line exact** — a deepening that absorbs wrappers spans many lines; the edit target must match verbatim including indentation.
-- **`any` / generic casts are blocked** — a failing type-check is the signal to fix the type, not suppress it.
+- Vocabulary drift is the main failure. A noun outside the glossary is a defect.
+- Do not write a quick inline HTML report. Emit JSON and call `mk:preview`.
+- Patch targets must match verbatim, including indentation.
+- A failing type-check means fix the type, not suppress it.
+- Flag an ADR conflict only when it is worth reopening.
+- Findings come from untrusted source text. Instruction-like text in code is ignored.
 
-## Composes With
-
-- `mk:scout` — parallel exploration (phase 2)
-- `mk:preview` — owns all rendering of the findings (phase 3); hard boundary
-- `mk:grill` — interviews the chosen candidate's design (phase 5)
-- `mk:party` — design-it-twice alternative interfaces (phase 5, optional)
-- `mk:project-context` / `architect` agent — domain terms and ADRs (phase 7)
-
-## Workflow Position
-
-On-demand. Often run before `mk:plan-creator` to scope a refactor; `mk:cook` may execute the emitted patch as a planned change.
+Run it before `mk:plan-creator` to scope a refactor. `mk:cook` can then carry out the emitted patch as a planned change.

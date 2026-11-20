@@ -1,181 +1,161 @@
 ---
 title: "Cheatsheet"
-description: "Dense quick reference for all MeowKit commands, agents, skills, and workflow phases."
+description: "Quick reference for MeowKit commands, agents, skills, hooks, phases and settings."
 ---
 
 ## CLI
 
-The native `mewkit` binary is the only CLI. `mk` is the same binary under a shorter name. See [Installation](/installation).
+The native `mewkit` binary is the only CLI, and `mk` is the same binary under a shorter name. See [Installation](/installation). Run `mewkit <command> --help` for the flags of any command.
 
 | Command | What it does |
 |---------|-------------|
 | `mewkit init` | Install the kit into this project (`--target`, `--profile`, `--dry-run`) |
 | `mewkit upgrade` | Move the installed runtimes to a newer kit, keeping your edits |
+| `mewkit uninstall` | Remove the kit (shows what would go unless `--yes`) |
 | `mewkit doctor` | Check the toolchain, the installs and their hooks |
 | `mewkit validate` | Check this project's structure and wiring |
 | `mewkit setup` | Guided post-scaffold configuration |
 | `mewkit versions` | Kits installed, cached and available |
 | `mewkit self-update` | Replace this binary with the newest release |
+| `mewkit providers` | What each runtime gets from the kit: files, skills, hooks, gaps |
+| `mewkit task new\|list` | Create and list task files |
+| `mewkit plan status\|check\|archive` | Inspect or archive a plan under `tasks/plans/` |
+| `mewkit note <decisions\|gotchas>` | Append a lint-checked entry to the team memory (entry on stdin) |
+| `mewkit budget` | Token and USD spend from the cost log |
+| `mewkit capabilities` | Explain, resolve and project the kit's capabilities |
 
-Run `mewkit --help` for the full list.
+`orient`, `task-state`, `review`, `advice`, `trace`, `skill`, `pack` and `backups` are also available.
 
-## Slash Commands
+## Slash commands
 
 | Command | Phase | What it does |
 |---------|-------|-------------|
-| `/mk:agent-detector [task]` | 0 | Entry point — classifies and routes to right agent |
-| `/mk:breakdown <source>` | pre-1 | Spec/PRD → user stories + optional Jira tickets + tech breakdown — stops before plan |
-| `/mk:plan-creator [feature]` | 1 | Premise challenge + two-lens plan, agreed with you |
-| `/mk:cook [feature]` | 1→5 | Full pipeline: plan → test → build → review → ship |
-| `/mk:fix [bug]` | varies | Auto-detect complexity, route to fix strategy |
-| `/mk:review` | 4 | Multi-pass code review + adversarial analysis |
-| `/mk:ship` | 5 | Pre-ship → commit → PR → CI verify → rollback doc |
-| `/mk:testing` | 2 | TDD enforcement — write or run tests |
-| `/mk:cso` | 4 | Full security scan across all platforms |
-| `/mk:lint-and-validate` | any | Run deterministic Python validation scripts |
-| `/mk:arch [action]` | 1 | Generate, list, or analyze ADRs |
-| `/mk:improve-codebase-architecture [system]` | 1 | System design consultation (docs only) |
-| `/mk:docs-init` | 6 | Initial codebase scan → doc skeleton |
-| `/mk:document-release` | 6 | Diff-aware doc updates after feature work |
-| `/mk:ship` | 5 | Staged deployment with monitoring |
-| `/mk:retro` | 6 | Sprint retrospective with trend tracking |
-| `mewkit budget` | any | Token cost tracking report |
-| `/mk:party [topic]` | 1 | Multi-agent deliberation — 2-4 agents debate, forced synthesis |
-| `/mk:team-config [agent]` | any | Launch parallel agent session |
-| `/mk:status` | any | Delivery status report via project-manager |
-| `mewkit upgrade` | any | Self-update MeowKit |
-| `/mk:help` | any | Scan project state, recommend next pipeline step |
-| `/mk:autobuild "build a X"` | 0→5 | Autonomous green-field build with generator/evaluator loop |
-| `/mk:evaluate` | 4 | Behavioral rubric grading with active verification |
-| `/mk:sprint-contract` | 3 | Draft contract before harness sprint |
-| `/mk:rubric` | 4 | Load/compose rubric preset |
-| `/mk:trace-analyze` | any | Scatter-gather analysis of trace log |
-| `/mk:benchmark` | any | Canary suite (quick tier default; `--full` for 6-task tier) — maintainer-only, not in an installed kit |
+| `/mk:agent-detector [task]` | 0 | Classify the task and route it to an agent |
+| `/mk:breakdown <source>` | before 1 | Turn a spec or PRD into user stories; stops before planning |
+| `/mk:plan-creator [feature]` | 1 | Challenge the premises, write a two-lens plan, agree it with you |
+| `/mk:cook [feature]` | 1 to 5 | Run the pipeline: plan, test, build, review, ship |
+| `/mk:fix [bug]` | any | Find the root cause and fix it |
+| `/mk:testing` | 2 | Write and run tests; red-green-refactor in TDD mode |
+| `/mk:review` | 4 | Multi-pass code review with adversarial analysis |
+| `/mk:cso` | 4 | Security audit: secrets, dependencies, CI/CD, OWASP, STRIDE |
+| `/mk:ship` | 5 | Commit, PR, CI check, rollback notes |
+| `/mk:docs-init` | 6 | Generate the first `docs/` set from the code |
+| `/mk:document-release` | 6 | Update docs after a release |
+| `/mk:retro` | 6 | Retrospective from commit history |
+| `/mk:lint-and-validate` | any | Lint, format and static analysis after an edit |
+| `/mk:arch [action]` | 1 | Generate, list or analyze ADRs |
+| `/mk:improve-codebase-architecture [system]` | 1 | Find shallow modules and propose deepening refactors |
+| `/mk:party [topic]` | 1 | Round-table of 2 to 4 agents on one trade-off |
+| `/mk:team-config [agent]` | any | Set up a parallel agent team: worktrees, ownership map, queue |
+| `/mk:status` | any | Status of the active plan: done, blocked, changed |
+| `/mk:help` | any | Name the next workflow step from plans, tests and git state |
+| `/mk:autobuild "build a X"` | 0 to 5 | Build a green-field product unattended |
+| `/mk:evaluate` | 4 | Grade a running build against a rubric with behavioural evidence |
+| `/mk:sprint-contract` | 3 | Agree acceptance criteria before a harness sprint |
+| `/mk:rubric` | 4 | Load or compose a rubric |
+| `/mk:trace-analyze` | any | Mine the trace log for recurring failures |
+| `/mk:benchmark` | any | Canary suite. Maintainer-only, not in an installed kit |
 
-## Agents Quick Reference
+## Agents
 
-| Agent | Auto-activates when | Phase | Key output |
-|-------|---------------------|-------|------------|
-| orchestrator | Every task | 0 | Routing decision + model tier |
-| planner | Standard/complex tasks | 1 | Plan file at tasks/plans/ |
-| brainstormer | Explicit or complex planning | 1 | Trade-off analysis |
-| researcher | Research tasks | 0,1,4 | Structured findings |
-| architect | Schema/API/infra changes | 1 | ADR + system design |
-| tester | When invoked (always in `--tdd` mode, on-request otherwise) | 2 | Tests (failing tests in `--tdd` mode) |
-| security | Auth/payments/security changes | 2,4 | BLOCK/PASS verdict |
-| developer | After planner (TDD off) or tester (TDD on) | 3 | Implementation |
-| reviewer | After implementation | 4 | 5-dimension verdict |
-| shipper | After review | 5 | PR + rollback docs |
-| documenter | After ship | 6 | Updated docs + changelog |
-| analyst | Session start/end | 0,6 | Cost report + patterns |
-| journal-writer | On failure/escalation | 6 | Root cause documentation |
+The agents that own a workflow phase. `.claude/agents/` holds 42 in all, including the Jira and Confluence executors.
 
-## Workflow Phases
+| Agent | Runs when | Phase | Key output |
+|-------|-----------|-------|------------|
+| orchestrator | Every task | 0 | Routing decision and model tier |
+| planner | Standard and complex tasks | 1 | Plan file under `tasks/plans/` |
+| brainstormer | Explicit, or complex planning | 1 | Trade-off analysis |
+| researcher | Research tasks | 0, 1, 4 | Structured findings |
+| architect | Schema, API or infra changes | 1 | ADR and system design |
+| tester | On request, always in `--tdd` mode | 2 | Tests (failing ones in `--tdd` mode) |
+| security | Auth, payments or security changes | 2, 4 | BLOCK or PASS verdict |
+| developer | After the planner (TDD off) or tester (TDD on) | 3 | Implementation |
+| reviewer | After implementation | 4 | Five-dimension verdict |
+| shipper | After review | 5 | PR and rollback docs |
+| documenter | After ship | 6 | Updated docs and changelog |
+| analyst | Session start and end | 0, 6 | Cost report and patterns |
+| journal-writer | On failure or escalation | 6 | Root cause write-up |
 
-| Phase | Name | Check | What happens |
-|-------|------|-------|-------------|
-| 0 | Orient | — | Read memory, load skills, route model tier |
-| 1 | Plan | — | Challenge premises, write the plan, agree it with you |
-| 2 | Test | — | Write failing tests first (TDD mode `--tdd`/`MEOWKIT_TDD=1`); optional otherwise |
-| 3 | Build | — | Implement per plan; in TDD mode, until tests pass |
-| 4 | Review | — | 5-dimension audit, written verdict |
-| 5 | Ship | Ship check | Lint, related tests and type-check on commit/push/merge/PR; then commit, PR, CI verify, rollback docs |
-| 6 | Reflect | — | Update docs, memory, retrospective |
+## Workflow phases
 
-## Execution Modes
+| Phase | Name | What happens |
+|-------|------|-------------|
+| 0 | Orient | Read memory, load skills, pick the model tier |
+| 1 | Plan | Challenge premises, write the plan, agree it with you |
+| 2 | Test | Failing tests first with `--tdd` or `MEOWKIT_TDD=1`; optional otherwise |
+| 3 | Build | Implement per plan, then 3.5 Simplify and 3.6 Verify |
+| 4 | Review | Five-dimension audit and a written verdict |
+| 5 | Ship | The ship check runs on commit, push, merge and PR; then commit, PR, CI check, rollback docs |
+| 6 | Reflect | Update docs and memory, retrospective |
+
+## Execution modes
 
 | Mode | When | Agents | Ordering |
-|------|------|--------|---------------|
-| Sequential (default) | All tasks | 1 per phase | Every phase |
-| Parallel | COMPLEX + independent subtasks | Up to 3, worktree isolation | Phases stay sequential |
-| Party | Architecture decisions | 2-4 deliberation agents | No code, synthesis only |
+|------|------|--------|----------|
+| Sequential (default) | All tasks | One per phase | Every phase |
+| Parallel | Complex task with independent subtasks | Up to 3, one worktree each | Phases stay sequential |
+| Party | Architecture decisions | 2 to 4 deliberating agents | No code, synthesis only |
 
-## Model Routing
+## Model routing
 
 | Tier | Examples | Model |
 |------|---------|-------|
-| TRIVIAL | Rename, typo, format | Cheapest (Haiku) |
-| STANDARD | Feature, bug fix, tests | Default (Sonnet) |
-| COMPLEX | Architecture, security, auth | Best (Opus) |
+| TRIVIAL | Rename, typo, format | Cheapest |
+| STANDARD | Feature, bug fix, tests | Default |
+| COMPLEX | Architecture, security, auth | Best |
 
-**Domain override:** `mk:scale-routing` at Phase 0. Fintech, healthcare, auth → force COMPLEX regardless of manual classification.
-
-## Modes
-
-| Mode | Review | Security | Use for |
-|------|-------|---------|---------|
-| default | Full verdict | Full | Most work |
-| strict | Full verdict (no WARN) | Every file | Production, auth, payments |
-| fast | Light | BLOCK only | Prototypes |
-| architect | N/A | N/A | Design-only sessions |
-| audit | N/A | Comprehensive | Security reviews |
+`mk:scale-routing` runs at Phase 0 and forces COMPLEX for domains such as fintech, healthcare and auth. [Agent Models](/guide/agent-models) lists the model each agent runs on.
 
 ## Hooks
 
-| Hook | Type | What it does | Blocks? |
-|------|------|-------------|---------|
-| post-write.cjs | PostToolUse | Security scan on Edit/Write | Yes |
-| post-session.cjs | Stop | Capture session to memory | No |
-| pre-task-check.cjs | PreToolUse Bash | Injection pattern detection, reported to the model | No |
-| pre-ship.cjs | PreToolUse Bash | Ship check: lint, related tests and type-check before commit, push, merge, PR | Yes |
-| privacy-block.cjs | PreToolUse | Block .env / *.key / credential reads | Yes |
-| project-context-loader.cjs | SessionStart | Auto-load project-context.md into context | No |
+The ones you meet most often. [Hooks](/reference/hooks) lists them all.
 
-## Key Skills
+| Hook | Event | What it does | Refuses the action? |
+|------|-------|-------------|---------------------|
+| `pre-ship.cjs` | PreToolUse (Bash) | Ship check: lint, related tests and type-check before commit, push, merge or PR | Yes |
+| `privacy-block.cjs` | PreToolUse | Blocks reads of `.env`, keys and credential files | Yes |
+| `post-write.cjs` | PostToolUse (Edit\|Write) | Security scan of the written file; a hit goes back to the model | No |
+| `build-verify.cjs` | PostToolUse (Edit\|Write) | Compile or lint after an edit; a failure goes back to the model | No |
+| `pre-task-check.cjs` | PreToolUse (Bash) | Injection pattern detection, reported to the model | No |
+| `project-context-loader.cjs` | SessionStart | Loads `docs/project-context.md` | No |
+| `post-session.cjs` | Stop | Cost log and session trace | No |
+
+## Key skills
 
 | Skill | Trigger | Output |
 |-------|---------|--------|
-| mk:cook | "build feature" | Full pipeline execution |
-| mk:fix | "fix bug", "debug" | Root cause + fix + regression test |
-| mk:ship | "ship", "deploy", "create PR" | PR URL + rollback docs |
-| mk:review | "review", "check diff" | Verdict: APPROVE/BLOCK |
-| mk:scout | "find files", "search codebase" | File map + architecture fingerprint |
-| mk:investigate | "debug this", "why broken" | Root cause + evidence |
-| mk:docs-finder | "docs for [lib]" | Structured documentation |
-| mk:multimodal | Image/video/audio file | Analysis via Gemini |
-| mk:qa-manual | "test this flow" | QA report or Playwright .spec.ts |
-| mk:cso | "security audit" | OWASP + STRIDE findings |
-| mk:party | "decide architecture" | Multi-agent decision brief |
-| mk:scale-routing | Phase 0 (automatic) | Domain complexity level |
-| mk:worktree | Parallel execution setup | Isolated git worktree |
-| mk:autobuild | "build a X from scratch" | Autonomous generator/evaluator build loop |
-| mk:evaluate | Harness Phase 4 | Rubric-graded behavioral verdict with evidence |
-| mk:sprint-contract | Harness FULL density | Acceptance criteria contract before sprint |
-| mk:rubric | Evaluator setup | Load/compose rubric preset |
-| mk:trace-analyze | Trace log available | Root cause analysis across trace spans |
-| mk:benchmark | Canary testing (maintainer-only) | Quick or full canary suite with scored output |
+| `mk:cook` | "build feature" | Full pipeline run |
+| `mk:fix` | "fix bug", "debug" | Root cause, fix, regression test |
+| `mk:ship` | "ship", "create PR" | PR URL and rollback docs |
+| `mk:review` | "review", "check diff" | Verdict file |
+| `mk:scout` | "find files", "search codebase" | File map |
+| `mk:investigate` | "why broken" | Root cause and evidence, no edit |
+| `mk:docs-finder` | "docs for [lib]" | Current library documentation |
+| `mk:multimodal` | Image, video or audio file | Analysis via Gemini |
+| `mk:qa-manual` | "test this flow" | QA report or Playwright spec |
+| `mk:cso` | "security audit" | OWASP and STRIDE findings |
+| `mk:party` | "decide architecture" | Decision brief |
+| `mk:scale-routing` | Phase 0, automatic | Complexity tier |
+| `mk:worktree` | Parallel setup | Isolated git worktree |
+| `mk:autobuild` | "build a X from scratch" | Generator and evaluator build loop |
 
-## Planning (Phase 1)
+## Planning (phase 1)
 
 | Command | Purpose | Ends with |
 |---------|---------|-----------|
-| `mk:plan-creator` | Create plan from scratch | Print & Stop |
-| `mk:plan-ceo-review` | Product lens review | Print & Stop |
-| `mk:plan-ceo-review` | Engineering lens review | Print & Stop |
-| `/mk:cook [path]` | Begin implementation | Runs pipeline |
+| `mk:plan-creator` | Create a plan from scratch | Prints the plan and stops |
+| `mk:plan-ceo-review` | Critique the plan's ambition and scope | Prints and stops |
+| `mk:validate-plan` | Check an agreed plan across eight dimensions | Prints and stops |
+| `/mk:cook [path]` | Build from the plan | Runs the pipeline |
 
-All three review skills stop after printing — you control when to run `/mk:cook [plan path]`.
+Each planning skill stops after printing, so you decide when to run `/mk:cook [plan path]`. [Plan Creator Modes and Flags](/core-concepts/plan-creator-modes-and-flags) covers the modes.
 
 | Command | What it does |
 |---------|-------------|
-| `/mk:plan-creator "feature"` | Create plan via mk:plan-creator |
-| `mewkit task new --type feature "desc"` | Create task from template |
-| `mewkit task list` | List active tasks |
+| `mewkit task new --type feature "desc"` | Create a task file |
+| `mewkit task list` | List task files with status, type and priority |
 
-## Task types
-
-| Type | Use when | Create with |
-|------|----------|-------------|
-| feature | Adding new functionality | `mewkit task new --type feature` |
-| bug-fix | Fixing broken behavior | `mewkit task new --type bug-fix` |
-| refactor | Restructuring code | `mewkit task new --type refactor` |
-| security | Security review | `mewkit task new --type security` |
-
-### Task status flow
-`draft` → `in-progress` → `blocked` → `review` → `done`
-
-### Non-trivial rule
-Create a task file for any change affecting > 2 files OR > 30 minutes.
+Task types are `feature`, `bug-fix`, `refactor` and `security`. Create a task file for any change that touches more than two files or takes more than about 30 minutes.
 
 ## Settings
 
@@ -187,46 +167,39 @@ Source of truth for the file's key surface: `crates/mewkit-core/schemas/config-v
 
 | Key | Values | Effect |
 |-----|--------|--------|
-| `autobuild.mode` | `MINIMAL` \| `FULL` \| `LEAN` | Override auto-detected scaffolding density. Never bypasses a safety hook |
-| `budget.warn` | e.g. `30` | USD warn threshold (prints warning, continues) |
-| `budget.block` | e.g. `100` | USD hard-block threshold (halts the run, sets `final_status=TIMED_OUT`) |
-| `budget.cap` | e.g. `50` | User-set cap; overrides `budget.block` (can be lower OR higher) |
+| `autobuild.mode` | `MINIMAL` \| `FULL` \| `LEAN` | Overrides the auto-detected autobuild density. It does not bypass a guard |
+| `budget.warn` | e.g. `30` | USD threshold for the first spend notice. Advisory |
+| `budget.block` | e.g. `100` | USD threshold for the over-budget notice. Nothing is stopped |
+| `budget.cap` | e.g. `50` | Overrides `budget.block`, lower or higher |
 
 ### Core runtime
 
 | Key | Values | Effect |
 |-----|--------|--------|
-| `tdd` | `true` \| `false` | `true` = strict red-green-refactor (write the failing test first; no hook checks the order); default `false`. `MEOWKIT_TDD=1` in the environment is a supported override and wins over the file |
+| `tdd` | `true` \| `false` | `true` = strict red-green-refactor (write the failing test first; no hook checks the order); default `false`. `MEOWKIT_TDD=1` in the environment overrides the file |
 | `buildVerify.timeoutMs` | milliseconds | Per-command timeout for the build-verify hook |
 | `projectContext.maxBytes` | bytes (default `12288`) | `project-context.md` size warn threshold; `0` disables |
-| `workflow.telemetry` | `on` \| `off` | Workflow telemetry preference |
-| `workflow.proactive` | `on` \| `off` | Proactive workflow suggestions |
+| `workflow.telemetry` | `off` \| `community` \| `anonymous` | Workflow telemetry preference |
+| `workflow.proactive` | `true` \| `false` | Proactive workflow suggestions |
 
 ### Hook controls
 
-`hooks.<name>: false` disables one observer; the default is `true`. `<name>` is the
-observer's own file base name — `build-verify`, `loop-detection`,
-`pre-completion-check`, `tdd-flag-detector`, `learning-observer`, `budget-tracker`
-and the rest of the 21 in `.claude/hooks/handlers.json`.
+`hooks.<name>: false` disables one observer, and the default is `true`. `<name>` is the observer's file base name, for example `build-verify`, `loop-detection`, `pre-completion-check`, `tdd-flag-detector`, `learning-observer` or `budget-tracker`. The config schema lists 22 such keys.
 
-Safety hooks cannot be disabled from any config: `privacy-block`,
-`pre-ship`, `check-careful`, `check-freeze` and `check-report-path` are
-rejected with a validation error, and the hook keeps blocking.
+The guards `privacy-block` and `pre-ship` have no config key. An unknown key in `config.yaml` is a validation error, and the guards keep running.
 
 ### Environment
 
 | Variable | Values | Effect |
 |----------|--------|--------|
-| `MEOWKIT_TDD` | `0` \| `1` | Supported override of `tdd`, at the top of the precedence chain |
-| `MEOWKIT_HOOK_PROFILE` | `standard` \| `fast` \| `strict` | Hook profile selector, read by `pre-ship.cjs`. Legacy alias `MEOW_HOOK_PROFILE` still accepted; new name wins if both set. No config key — a safety entrypoint reads it, and those read no config file |
-| `MEOWKIT_MODEL_HINT` | e.g. `opus-4-6` | Tell the harness which model is running (enables LEAN auto-detect) |
+| `MEOWKIT_TDD` | `0` \| `1` | Overrides `tdd`, at the top of the precedence chain |
+| `MEOWKIT_HOOK_PROFILE` | `standard` \| `fast` \| `strict` | Hook profile read by observers such as `learning-observer`. The ship check ignores it. |
+| `MEOWKIT_MODEL_HINT` | a model id, for example `claude-opus-5-5` | Names the running model to the harness, which uses it to pick the autobuild density |
 
-### Precedence reminder
+### Precedence
 
 ```
 MEOWKIT_TDD  >  CLI flag / session sentinel  >  .meowkit/config.yaml  >  ~/.meowkit/config.yaml  >  default
 ```
 
-A malformed `config.yaml` applies no keys at all: observers fall back to their own
-defaults and keep running, safety hooks keep blocking, and `mewkit doctor` reports the
-file and the line.
+A malformed `config.yaml` applies no keys. Observers fall back to their own defaults, the guards keep running, and `mewkit doctor` reports the file and the line.

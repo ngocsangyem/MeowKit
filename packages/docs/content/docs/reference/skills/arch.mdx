@@ -1,6 +1,6 @@
 ---
 title: "mk:arch"
-description: "Architecture Decision Record lifecycle — create, list, review and impact-analyse ADRs under docs/architecture/adr/."
+description: "Writes and maintains architecture decision records under docs/architecture/adr and checks a proposed change against them."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,29 +14,34 @@ description: "Architecture Decision Record lifecycle — create, list, review an
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:arch` owns the lifecycle of architecture decision records (ADRs): numbering, file layout, status changes and impact checks against decisions already taken. The `architect` agent writes the decision text. Reach for it when a non-obvious architectural choice needs a durable record, or when you want to know which decisions still hold.
 
-Owns the ADR lifecycle: assigns the next sequential number, delegates the decision body to the `architect` agent, writes `docs/architecture/adr/YYMMDD-title.md`, lists every ADR with its status, reviews an existing one, and analyses the architectural impact of a proposed change against the decisions already taken.
+## When not to use it
 
-## When to Use
-
-- A non-obvious architectural choice needs a durable record
-- Asking which decisions are still valid, superseded, or deprecated
-- Checking a proposed change against the ADRs it would touch
-
-**NOT for:** codebase deepening and boundary refactors (`mk:improve-codebase-architecture`); trade-off debate between options (`mk:party`).
-
-## Modes
-
-| Mode | Output |
+| If you need | Use |
 |---|---|
-| `new [title]` | A Proposed ADR at `docs/architecture/adr/YYMMDD-title.md`, printed for review |
-| `list` | Table of every ADR with status and superseding links |
-| `review [number]` | The ADR updated in place with a dated review note and, when warranted, a new status |
-| `impact [change]` | Affected components, affected ADRs, risk level, recommendation |
+| Boundary refactors and finding shallow modules | `mk:improve-codebase-architecture` |
+| A trade-off debated between options | `mk:party` |
 
-## Pro Tips
+## Usage
 
-- A `review` never rewrites the original Context or Decision text. An ADR records what was decided when it was decided; editing that history makes it describe a system it never approved.
-- An `impact` conflict is the finding. Report it as a conflict, not as "mostly aligned".
-- Recording a decision approves nothing — an ADR is documentation, never gate authority.
+```bash
+mk:arch new [title]
+mk:arch list
+mk:arch review [number]
+mk:arch impact [change description]
+```
+
+| Mode | What it does | Output |
+|---|---|---|
+| `new` | Scans existing ADRs for the next number, gathers context (decision, constraints, options) and asks if any is unknown, has `architect` write Title, Status (Proposed), Context, Decision, Consequences and Alternatives Considered | `docs/architecture/adr/YYMMDD-title.md` and a printed summary for review |
+| `list` | Prints one row per ADR with number, title and status, with superseding links resolved | A table |
+| `review` | Checks whether the decision is still valid, the context changed, or new alternatives exist. Updates the status when warranted (Proposed to Accepted, Accepted to Deprecated or Superseded by #N) | The ADR with dated review notes |
+| `impact` | Finds the components and boundaries a change touches, the ADRs that cover them, and whether each is consistent, extended or in conflict | Components, ADRs, risk level and a recommendation |
+
+## Gotchas
+
+- A review never rewrites the original Context or Decision text. The ADR records what was decided at the time.
+- A conflict found by `impact` is reported as a conflict, not softened to "mostly aligned".
+- A new ADR is Proposed until someone reviews it.
+- A superseded ADR stays in the tree with its status changed.

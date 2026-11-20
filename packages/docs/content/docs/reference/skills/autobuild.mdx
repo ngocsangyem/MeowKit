@@ -1,6 +1,6 @@
 ---
 title: "mk:autobuild"
-description: "Autonomous green-field build pipeline — planner, contract, generator/evaluator loop with adaptive density."
+description: "Builds a green-field product unattended through a plan, contract, generate and evaluate loop, with scaffolding sized to the model tier."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,75 +14,70 @@ description: "Autonomous green-field build pipeline — planner, contract, gener
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:autobuild` runs a step-file pipeline (plan, contract, generate, evaluate, iterate or ship, run report) for a green-field product. The amount of scaffolding is chosen from the model tier. Use it for "build me an app" requests that should run for hours without hand-holding.
 
-Autonomous build pipeline for green-field products. Runs planner → contract → generator ⇄ evaluator loop with scaffolding density auto-tuned to model tier. For single features, use `mk:cook`.
+## When not to use it
 
-## When to Use
-
-- Building a green-field product from scratch (kanban app, SaaS platform, retro game maker)
-- Multi-hour autonomous builds with no manual handholding
-- Any "build me an app" or "create a [product]" request
-- **NOT for:** single features, bug fixes, or refactors (use `mk:cook`), documentation updates, or explain/review requests
-
-## Core Capabilities
-
-- **Adaptive density:** Auto-selects MINIMAL / FULL / LEAN scaffolding based on model tier via `mk:scale-routing`, honors `MEOWKIT_AUTOBUILD_MODE` override
-- **Generator ⇄ evaluator loop:** Developer subagent builds, evaluator verifies against rubrics, iterates up to 3 rounds before escalating
-- **Budget enforcement:** Warns at $30, requires approval at $100, hard-blocks at user-set `--budget` value
-- **Run reports:** Every run produces a full audit trail at `tasks/autobuild-runs/YYMMDD-{slug}/run.md` including budget trail, per-step artifacts, and final verdict
-- **Resumability:** Checkpoints at every step — if killed mid-run, `--resume {run-id}` picks up at the last completed step
-- **TDD opt-in:** `--tdd` writes the `.meowkit/state/tdd-mode` sentinel; developer waits on tester before each generator iteration
+| If you need | Use |
+|---|---|
+| A single feature, bug fix or refactor | `mk:cook` |
+| A docs update, an explanation or a review | the matching single-shot skill |
 
 ## Usage
 
 ```bash
 /mk:autobuild build a kanban board with drag-and-drop
-/mk:autobuild build a todo app --tier full              # Force FULL density
-/mk:autobuild build a retro game maker --tier lean       # Force LEAN
+/mk:autobuild build a todo app --tier full
 /mk:autobuild build a markdown editor --budget 25 --max-iter 2
-/mk:autobuild --resume 260501-1450-build-kanban          # Resume interrupted run
-/mk:autobuild "build payment system" --tdd               # TDD enforcement
-/mk:autobuild build a kanban board --advice               # Strategic supervision
+/mk:autobuild --resume 260501-1450-build-kanban
+/mk:autobuild "build payment system" --tdd
+/mk:autobuild build a kanban board --advice
 ```
 
-`--advice` is opt-in strategic supervision for one run by the [athena](/reference/agents/athena) agent: direction at the plan/contract boundary, rescue on a plateau or scope drift, and an independent read of the terminal evaluator verdict before the review question — up to 5 calls. Checkpoints are macro boundaries, so a five-round build makes no more calls than a one-round build. It approves nothing: the review decision stays yours, and the evaluator keeps its verdict and its active-verification hard gate.
+| Flag | Meaning |
+|---|---|
+| `--tier auto\|full\|lean\|minimal` | Force a density. `MEOWKIT_AUTOBUILD_MODE` does the same through the environment |
+| `--max-iter N` | Generator and evaluator rounds before escalating. Default 3 |
+| `--budget USD` | Spend cap. The run stops at this value |
+| `--tdd` | Writes `.meowkit/state/tdd-mode`. The developer waits on the tester before each generator iteration |
+| `--advice` | Strategic supervision by the [athena](/reference/agents/athena) agent, off by default |
+| `--resume {run-id}` | Continue an interrupted run from the last completed step |
 
-## Example Prompt
-
-```
-Build a kanban board with drag-and-drop, swim lanes, and real-time collaboration. Support up to 10 concurrent users. Use a $50 budget cap and max 2 iteration rounds.
-```
-
-## Workflow (step-file — one step at a time)
+## Steps
 
 | Step | Action |
 |---|---|
-| 0 — Tier Detection | `mk:scale-routing` picks MINIMAL / FULL / LEAN; honors `MEOWKIT_AUTOBUILD_MODE` |
-| 1 — Plan | `mk:plan-creator --product-level` — user stories, not file paths |
-| 2 — Contract | `mk:sprint-contract` (FULL: required, LEAN: optional if ACs \< 5, MINIMAL: skip) |
-| 3 — Generate | Developer subagent with 4-subphase pattern (Understand → Design → Implement → Verify) |
-| 4 — Evaluate | `mk:evaluate` — active verification against rubrics |
-| 5 — Iterate or Ship | PASS → shipper; FAIL → loop to step 3 (max `--max-iter` rounds, default 3) |
-| 6 — Run Report | Append-only audit trail at `tasks/autobuild-runs/YYMMDD-{slug}/run.md` |
+| 0 Tier detection | `mk:scale-routing` picks MINIMAL, FULL or LEAN |
+| 1 Plan | `mk:plan-creator --product-level`, written as user stories rather than file paths |
+| 2 Contract | `mk:sprint-contract`: required for FULL, optional for LEAN, skipped for MINIMAL |
+| 3 Generate | A developer subagent works in four sub-phases: Understand, Design, Implement, Verify |
+| 4 Evaluate | `mk:evaluate` drives the running build against rubrics |
+| 5 Iterate or ship | PASS goes to the shipper. FAIL loops back to step 3 up to `--max-iter` rounds, then escalates to you |
+| 6 Run report | Appends the audit trail |
 
-## Density modes
+## Density
 
-| Mode | Model | Planner | Contract | Iterations | Context Reset |
-|---|---|---|---|---|---|
-| MINIMAL | Haiku | Skip (use `--fast`) | Skip | Skip | Skip |
-| FULL | Sonnet, Opus 4.5 | Required | Required | 1-3 rounds | Optional |
-| LEAN | Opus 4.6+ | Required | Optional | 0-1 rounds | Skip (auto-compact) |
+| Mode | Tier | Planner | Contract | Iterations |
+|---|---|---|---|---|
+| MINIMAL | TRIVIAL (Haiku) | Skipped (`--fast`) | Skipped | Skipped |
+| FULL | STANDARD (Sonnet), COMPLEX (Opus 4.5) | Required | Required | 1 to 3 rounds |
+| LEAN | COMPLEX (Opus 4.6 and later, Fable) | Required | Optional | 0 to 1 rounds |
 
-Override: `--tier` flag or `MEOWKIT_AUTOBUILD_MODE`. Density never skips simplify or verify.
+Density never skips the review of the diff or the verdict before shipping. The full matrix is `references/adaptive-density-matrix.md`.
 
-## Hard constraints
+## Limits
 
-- **Budget:** warns at $30 spent, requires explicit approval at $100, hard-blocks at user-set `--budget` value
-- **6-hour wall-clock timeout** — hard limit per Anthropic's observed runs; checkpoints every step for resumability
-- **Max 3 iteration rounds** between generator and evaluator before escalating to human
-- **Run report mandatory** — every run writes full audit trail
-- **TDD opt-in:** `--tdd` writes `.meowkit/state/tdd-mode` sentinel; developer waits on tester before each generator iteration
+| Limit | Value |
+|---|---|
+| Budget | Warns at $30 spent, asks for approval at $100, stops at `--budget` |
+| Wall clock | 6 hours, with a checkpoint at every step |
+| Iterations | 3 rounds by default, then escalates |
+
+If `budget-tracker.sh` says to stop, the run halts even mid-iteration.
+
+## `--advice`
+
+At macro checkpoints the athena agent gives direction at the plan and contract boundary, rescue on a plateau or scope drift, a read of the final evaluator verdict before the ship question, and a recheck after a correction. At most 5 calls per run, so a five-round build makes no more calls than a one-round build. Athena approves nothing: the ship decision stays yours and the evaluator keeps its own verdict. Checkpoints are in `references/advice-checkpoints.md`.
 
 ## Outputs
 
@@ -92,4 +87,11 @@ Override: `--tier` flag or `MEOWKIT_AUTOBUILD_MODE`. Density never skips simplif
 | Product plan | `tasks/plans/{plan-dir}/plan.md` |
 | Sprint contract | `tasks/contracts/{date}-{slug}-sprint-N.md` |
 | Evaluator verdict | `tasks/reviews/{slug}-evalverdict.md` |
-| Exit status | PASS \| WARN \| FAIL \| ESCALATED \| TIMED_OUT |
+
+The run report holds the density decision, per-step artifacts, the budget trail and the final status: PASS, WARN, FAIL, ESCALATED or TIMED_OUT. It is append-only.
+
+## Gotchas
+
+- Use `mk:cook` for anything smaller than a whole product.
+- After round 3 the run escalates instead of iterating further.
+- `MEOWKIT_AUTOBUILD_MODE=LEAN` drops the sprint contract, not the review.

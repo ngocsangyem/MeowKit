@@ -1,48 +1,43 @@
 ---
 title: "Rules Index"
-description: "The 6 always-on MeowKit rules, where the others moved, and how each is enforced."
+description: "The 6 always-on MeowKit rules, where the other rules load from, and how each is enforced."
 sourceOfTruth: "docs/governance/rules-index.md"
-lastVerified: "2026-11-17"
+lastVerified: "2026-11-20"
 ---
 
-The always-on set is exactly 6 files under `.claude/rules/`. Claude Code auto-loads that
-directory every session, so those 6 are the only rules that cost context unconditionally.
-Every other rule moved next to the skill that loads it and reaches context just in time.
+`.claude/rules/` holds exactly 6 files. Claude Code loads that directory every session, so these are the only rules that cost context unconditionally. Every other rule sits in the `references/` folder of the skill that loads it and reaches context only when that skill runs. The source index is `docs/governance/rules-index.md`.
 
-No kit-owned root `CLAUDE.md` ships. A project may keep its own `CLAUDE.md`; it is
-project-owned, never installed or refreshed by MeowKit.
+MeowKit ships no root `CLAUDE.md`. A project may keep its own; the kit never installs or refreshes it.
 
-Source file: `docs/governance/rules-index.md`
+## Always-on rules
 
-## Always-On Rules (6)
+| Rule | Purpose | Mechanism |
+| --- | --- | --- |
+| `meowkit-core.md` | Role, workflow, the ship check in brief, the boundary between data and instructions, the memory contract, the compaction policy | Instruction, plus a byte-budget script |
+| `security-rules.md` | Blocked patterns: hardcoded secrets, `any` types, SQL interpolation, `v-html` with user content and the rest of the table | Instruction. A human can override, and the override is documented |
+| `injection-rules.md` | Prompt-injection defense: the data and instructions boundary, and Rule 11 (the Skill Rule of Two) | Instruction. A human can override |
+| `core-behaviors.md` | Six operating behaviors and the anti-rationalization list | Instruction |
+| `development-rules.md` | YAGNI, KISS, DRY, file management, code quality, commits, docs impact, tool-output limits | Instruction |
+| `agent-conduct.md` | A1 subagent status protocol, A3 eureka documentation, B2 response structure | Instruction |
 
-| Rule | Purpose | Applies to |
-|------|---------|-----------|
-| `meowkit-core.md` | Role, the 7-phase workflow, the ship check in brief, the DATA/INSTRUCTIONS boundary, the memory contract, the compaction policy | All modes, all phases |
-| `security-rules.md` | Block hardcoded secrets, `any` types, SQL interpolation, XSS and the rest of the blocked-pattern table | All modes, all phases |
-| `injection-rules.md` | Prompt-injection defense: DATA vs INSTRUCTIONS boundary; Rule 11 = Skill Rule of Two | All modes, all phases |
-| `core-behaviors.md` | 6 mandatory operating behaviors + the Anti-Rationalization table | All modes, all phases |
-| `development-rules.md` | YAGNI/KISS/DRY, file management, code quality, pre-commit, git safety, docs impact, tool-output limits | Implementation, commit |
-| `agent-conduct.md` | A1 subagent status protocol, A3 eureka documentation, B2 response structure | All agent responses |
+`mewkit validate` checks that all 6 are present. A rule that is not a hook is an instruction the agent follows, and nothing checks it. The two hooks that refuse an action are `privacy-block.cjs`, which blocks reads of `.env`, keys and credentials, and `pre-ship.cjs`, which runs the ship check on commit, push, merge and PR commands. `project-context-loader.cjs` loads `project-context.md` at session start. [Hooks](/reference/hooks) describes them.
 
-`mewkit validate` checks all 6 for presence — a missing file silently drops enforcement.
+Rules are not the only text a session carries before any skill runs. Every skill's `name`, `description` and `when_to_use`, and every agent's `name` and `description`, are listed too. `scripts/check-always-on-budget.cjs` holds both under a byte ceiling: 18,191 B for the rules alone, and 70,000 B for the rules plus that metadata. They measure 18,191 B and 43,794 B today. The script exits non-zero when either ceiling is exceeded.
 
-Rules are not the only thing a session carries before any skill runs: every skill's `name`, `description` and `when_to_use`, and every agent's `name` and `description`, are listed too. `scripts/check-always-on-budget.cjs` holds both under a byte ceiling: the rules alone at 18,191 B, and rules plus that metadata at 70,000 B. Today they measure 18,191 B and 43,794 B. The script exits non-zero when either ceiling is exceeded, so a rule or description that grows has to pay for itself.
+Priority, highest first: `security-rules.md` and `injection-rules.md` are never overridden, then `core-behaviors.md`, `meowkit-core.md`, `agent-conduct.md` and `development-rules.md`. A rule loaded by a skill never overrides an always-on rule. `harness-rules.md` and `rubric-rules.md` never override the ship check, `tdd-rules.md` applies only with `MEOWKIT_TDD=1` or `--tdd`, and `context-budget-rules.md` is advisory.
 
-## Moved Rules — Where They Live Now
+## Where the other rules live
 
-Each rule below left `.claude/rules/` in the context diet. Nothing was dropped: the
-enforcement text moved intact and is loaded on demand by the skill that owns it.
-
-| Rule | New location | Loaded by |
-|------|--------------|-----------|
+| Rule | Location | Loaded by |
+| --- | --- | --- |
 | `harness-rules.md` | `.claude/skills/cook/references/` | `mk:cook`, `mk:autobuild` |
-| `tdd-rules.md` | `.claude/skills/cook/references/` | `mk:cook` (Phases 2–3), `mk:fix` |
+| `tdd-rules.md` | `.claude/skills/cook/references/` | `mk:cook` (Phases 2 and 3), `mk:fix` |
 | `phase-contracts.md` | `.claude/skills/cook/references/` | `mk:agent-detector` Step 0b |
-| `post-phase-delegation.md` | `.claude/skills/cook/references/` | orchestration skills |
+| `post-phase-delegation.md` | `.claude/skills/cook/references/` | Orchestration skills |
 | `task-state-emission.md` | `.claude/skills/cook/references/` | `mk:cook`, `mk:autobuild` |
 | `parallel-execution-rules.md` | `.claude/skills/cook/references/` | `mk:worktree`, `mk:team-config`, parallel runs |
-| `orchestration-rules.md` | `.claude/skills/cook/references/` | multi-agent workflows |
+| `orchestration-rules.md` | `.claude/skills/cook/references/` | Multi-agent workflows |
+| `agent-conduct-extended.md` | `.claude/skills/cook/references/` | Sections A2, B1, B3 to B6 of agent conduct |
 | `model-selection-rules.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector` Step 0b |
 | `scale-adaptive-rules.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector` Step 0b |
 | `risk-checklist.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector` Step 0b |
@@ -50,157 +45,82 @@ enforcement text moved intact and is loaded on demand by the skill that owns it.
 | `context-budget-rules.md` | `.claude/skills/agent-detector/references/` | `mk:agent-detector`, `mk:context-audit` |
 | `rubric-rules.md` | `.claude/skills/rubric/references/` | `mk:rubric`, evaluator agent |
 | `skill-authoring-rules.md` | `.claude/skills/skill-creator/references/` | `mk:skill-creator`, skill audits |
-| `dead-weight-audit-rules.md` | `.claude/skills/benchmark/references/` (maintainer-only — not in the shipped kit) | `mk:benchmark` |
-| `docs-reference-contract.md` | `docs/maintainer/` (source repo only, not shipped) | maintainers, `mewkit validate` |
-| `step-file-rules.md` | inlined as `## Step-File Contract` in each step-filed skill's `workflow.md` | `mk:plan-creator`, `mk:review`, `mk:evaluate`, `mk:autobuild`, `mk:trace-analyze` |
-| `anti-rationalization.md` | merged into `.claude/rules/core-behaviors.md` | always-on |
-| `intervention-recording-rules.md` | merged into `.claude/rules/meowkit-core.md` | always-on |
+| `dead-weight-audit-rules.md` | `.claude/skills/benchmark/references/` (maintainer-only, not in the shipped kit) | `mk:benchmark` |
+| `docs-reference-contract.md` | `docs/maintainer/` (source repository only) | Maintainers, `mewkit validate` |
+| `step-file-rules.md` | Inlined as `## Step-File Contract` in each step-filed skill's `workflow.md` | `mk:plan-creator`, `mk:review`, `mk:evaluate`, `mk:autobuild`, `mk:trace-analyze` |
+| `anti-rationalization.md` | Merged into `core-behaviors.md` | Always on |
+| `intervention-recording-rules.md` | Merged into `meowkit-core.md` | Always on |
 
-The pre-diet `agent-conduct.md` sections that are not A1/A3/B2 — A2, B1, B3, B4, B5, B6 —
-live verbatim in `.claude/skills/cook/references/agent-conduct-extended.md`.
+### Agile rules
 
-## Agile Conditional Rules
+`mk:agent-detector` Step 0b loads these three only in an Agile context: a sprint-state contract exists, the active plan has `jira_tickets:` in its frontmatter, `MEOW_JIRA_SITE_URL` is set, or the prompt contains a Jira key. Other sessions pay no context cost.
 
-Loaded by `mk:agent-detector` Step 0b ONLY when an Agile context is detected (sprint-state contract present, `jira_tickets:` in plan frontmatter, `MEOW_JIRA_SITE_URL` env var set, or Jira-key pattern in user prompt). Non-Agile sessions pay zero context cost.
+| Rule | Purpose |
+| --- | --- |
+| `agile-story-gates.md` | Definition of Ready (Phase 1 entry), Definition of Done (review verdict PASS), traceability frontmatter. Advisory |
+| `agile-sprint-commitment.md` | Sprint goal persistence, mid-sprint amendment, sprint close hygiene |
+| `agile-feedback-cycle.md` | Retro action items, spike governance (timebox and findings document) |
 
-| Rule | Purpose | Loaded by |
-|------|---------|-----------|
-| `agile-story-gates.md` | Definition of Ready (Phase 1 entry), Definition of Done (review verdict PASS), traceability frontmatter contract | `mk:agent-detector` Step 0b (Agile context) |
-| `agile-sprint-commitment.md` | Sprint goal persistence, mid-sprint amendment ceremony, sprint close hygiene | `mk:agent-detector` Step 0b (Agile context) |
-| `agile-feedback-cycle.md` | Retro action-item ceremony, spike governance (timebox + findings doc) | `mk:agent-detector` Step 0b (Agile context) |
-
-These rules live at `.claude/skills/agent-detector/references/agile-*.md`. They wire into existing skills (`mk:plan-creator`, `mk:sprint-contract`, `mk:retro`, `mk:jira-agile`, `mk:ship`, `project-manager` agent) — no new agents, no new hooks.
-
-## Loading Priority
-
-A just-in-time rule never overrides an always-on one. Within the always-on set, higher =
-stronger override:
-
-1. `security-rules.md` — NEVER override
-2. `injection-rules.md` — NEVER override
-3. `core-behaviors.md` — always apply (6 behaviors + anti-rationalization)
-4. `meowkit-core.md` — always apply (workflow, ship check, memory, compaction policy)
-5. `agent-conduct.md` — always apply
-6. `development-rules.md` — always apply
-
-Just-in-time rules apply when their owning skill loads them, and only there. `harness-rules.md` and `rubric-rules.md` never override the ship check; `tdd-rules.md` applies only when `MEOWKIT_TDD=1` / `--tdd`; `context-budget-rules.md` is advisory and never enforced.
-
-## Enforcement Mechanism Matrix
-
-`v1.1.0`
-
-| Rule | Mechanism | Override? | Exception |
-|------|-----------|-----------|-----------|
-| `security-rules.md` | Behavioral | NEVER | Human override only |
-| `injection-rules.md` | Behavioral | NEVER | Human override only |
-| `core-behaviors.md` | Behavioral | No | — |
-| `meowkit-core.md` | Behavioral + Script (always-on byte budget) | No | — |
-| `agent-conduct.md` | Behavioral | No | A1/A3 preserve rationale; B2 compressed |
-| `development-rules.md` | Behavioral | No | — |
-| `harness-rules.md` | Behavioral + Script (`validate-verdict.sh`) | Density never lowers the quality bar | Density modes adjust scaffolding, not the checks |
-| `rubric-rules.md` | Behavioral + Script (`validate-rubric.sh`) | NEVER override hard-fail propagation | Custom rubrics addable; semantics fixed |
-| `tdd-rules.md` | Behavioral | Yes | Default OFF; opt in via `--tdd` / `MEOWKIT_TDD=1` |
-| `context-budget-rules.md` | Behavioral | N/A | Advisory read-budget |
-| `orchestration-rules.md` | Behavioral | N/A | Contextual |
-| `model-selection-rules.md` | Behavioral | No | Domain override via CSV |
-| `scale-adaptive-rules.md` | Behavioral + Data | No | CSV user-extensible |
-| `risk-checklist.md` | Behavioral + Data | No | Flags route through the model-selection rules |
-| `step-file-rules.md` | Behavioral (inlined per workflow) | N/A | Step-file skills only |
-| `parallel-execution-rules.md` | Behavioral + Worktree | N/A | Contextual |
-| `skill-authoring-rules.md` | Behavioral + Script | No | MeowKit internal infra paths exempt from persistent-state rule |
-| `post-phase-delegation.md` | Behavioral | N/A | `MEOWKIT_PM_AUTO=off` disables silent fires |
-
-**Mechanism types:**
-- **Behavioral** — Agent follows rules via system prompt
-- **Hook** — Shell script intercepts tool calls before execution
-- **Data** — External file (CSV, JSON) drives decisions
-
-## Hook Enforcement
-
-| Hook | Event | Purpose |
-|------|-------|---------|
-| `privacy-block.cjs` | PreToolUse | Block reads of `.env`, `*.key`, credentials |
-| `pre-ship.cjs` | PreToolUse | Ship check (lint, related tests, type-check) on commit, push, merge and PR commands |
-| `project-context-loader.cjs` | SessionStart | Auto-load `project-context.md` |
-
-Rules define _why_. Hooks enforce _what_.
+They live in `.claude/skills/agent-detector/references/agile-*.md` and add no agents or hooks.
 
 ## harness-rules.md [#harness-rules]
 
-Discipline rules for the autonomous multi-hour build pipeline (`mk:autobuild`) and the generator/evaluator architecture.
+Discipline for the autonomous build pipeline (`mk:autobuild`) and the generator and evaluator split. It applies to Phase 3 (Build) and Phase 4 (Review) when the harness runs. Source: `.claude/skills/cook/references/harness-rules.md`.
 
-| # | Rule | Gloss |
-|---|------|-------|
-| 1 | Planner Stays Product-Level | Planner emits user stories, not file paths |
-| 2 | Generator ≠ Evaluator | Self-evaluation forbidden — fresh-context evaluator only |
-| 3 | Sprint Contract Required in FULL Density | Contract signed before source edits (FULL mode, no hook checks it) |
-| 4 | Iteration Cap = 3 Rounds | After 3 gen/eval rounds, escalate to human |
-| 5 | Adaptive Density by scale-routing + Model String | MINIMAL/FULL/LEAN selected per tier |
-| 6 | Budget Thresholds — $30 warn, $100 hard, user cap | Multi-tier budget guardrail |
-| 7 | Dead-Weight Audit on Model Upgrade | Re-run audit playbook per new model tier |
-| 8 | Active Verification Is Required | Evaluator drives build via browser/curl/CLI |
-| 9 | Skeptic Persona Reloaded Per Criterion | Prevent leniency drift across criteria |
-| 10 | No Density Override Lowers the Quality Bar | Density changes scaffolding, not the bar |
-
-Source: `.claude/skills/cook/references/harness-rules.md`. Applies to Phase 3 (Build) + Phase 4 (Review) when harness pipeline is active.
+| # | Rule | Summary |
+| --- | --- | --- |
+| 1 | Planner stays product-level | The planner emits user stories, not file paths |
+| 2 | Generator is not evaluator | No self-evaluation; a fresh-context evaluator grades |
+| 3 | Sprint contract by density | `FULL`: signed before source edits (no hook checks it). `LEAN`: optional. `MINIMAL`: skipped |
+| 4 | Iteration cap | After 3 generate and evaluate rounds, escalate to a human |
+| 5 | Adaptive density | `mk:scale-routing` and the model string select `MINIMAL`, `FULL` or `LEAN` |
+| 6 | Budget thresholds | $30 warns, $100 halts the run, and a user cap (`budget.cap` or `--budget`) overrides the halt |
+| 7 | Dead-weight audit | Re-run the audit playbook on each new model tier |
+| 8 | Active verification | The evaluator drives the build through a browser, curl or the CLI |
+| 9 | Skeptic persona | Reloaded per criterion to prevent leniency drift |
+| 10 | No density override lowers the bar | Density changes scaffolding, not the checks |
 
 ## scale-adaptive-rules.md [#scale-adaptive-rules]
 
-Domain-complexity routing rules that drive Phase 0 classification and harness density selection.
+Domain-complexity routing that drives Phase 0 classification and harness density. Source: `.claude/skills/agent-detector/references/scale-adaptive-rules.md`.
 
-| # | Rule | Gloss |
-|---|------|-------|
-| 1 | CSV Match Overrides Manual Classification | Domain keyword match overrides orchestrator judgment |
-| 2 | No Match Falls Back Gracefully | Unknown domain → manual classification per the model-selection rules |
-| 3 | High Complexity Forces COMPLEX Tier | `level=high` → COMPLEX, no exceptions |
-| 4 | One-Shot Workflow Skips the Plan | `workflow=one-shot` + zero blast radius → no plan file needed |
-| 5 | Users Can Extend the CSV | `domain-complexity.csv` is user-editable |
-| 6 | Adaptive Density Emission | scale-routing also emits `autobuild_density` for harness consumers |
-| 7 | **Auto-Strict for High-Complexity Cook Runs** | `level=high` during `/mk:cook` → auto-enables `--strict` at Phase 4.5; suppressible via `--no-strict`; fires ONLY in mk:cook |
-
-**Rule 7 detail:** When `mk:scale-routing` returns `level=high` during a `/mk:cook` run, cook auto-enables `--strict` mode (full `mk:evaluate`) at Phase 4.5 — unless the user explicitly passes `--no-strict`. This catches behavioral failures (e.g., a broken payment flow) that structural code review misses. Does NOT fire in `mk:fix`, `mk:autobuild`, or standalone `mk:review`.
-
-Source: `.claude/skills/agent-detector/references/scale-adaptive-rules.md`. Applies at Phase 0 (Orient) and Phase 4.5 (Verify).
+| # | Rule | Summary |
+| --- | --- | --- |
+| 1 | CSV match overrides manual classification | A domain keyword match beats the orchestrator's judgment |
+| 2 | No match falls back | An unknown domain is classified manually under the model-selection rules |
+| 3 | High complexity forces COMPLEX | `level=high` gives the COMPLEX tier |
+| 4 | One-shot workflow skips the plan | `workflow=one-shot` with zero blast radius needs no plan file |
+| 5 | Users can extend the CSV | `domain-complexity.csv` is user-editable |
+| 6 | Density emission | `mk:scale-routing` also emits `autobuild_density` |
+| 7 | Auto-strict for high complexity | `level=high` during `/mk:cook` turns on `--strict` (full `mk:evaluate`) at Phase 4.5 unless you pass `--no-strict`. It fires only in `mk:cook`, not in `mk:fix`, `mk:autobuild` or standalone `mk:review` |
 
 ## model-selection-rules.md [#model-selection-rules]
 
-Model tier routing rules for Phase 0 task classification.
-
-Key updates in v2.3.0:
-
-> **Rule 5 update (v2.3.0):** Auto-detection now uses `model-detector.cjs` SessionStart handler as the primary source. It reads the `model` field from SessionStart stdin and writes tier + density to `.meowkit/state/detected-model.json`. `MEOWKIT_MODEL_HINT` is fallback only — no longer required for Opus 4.6+ users.
-
-Source: `.claude/skills/agent-detector/references/model-selection-rules.md`. Applies at Phase 0 (Orient).
+Model tier routing for Phase 0 task classification. Detection reads the `model` field from SessionStart input through the `model-detector` handler and writes the tier and density to `.meowkit/state/detected-model.json`. `MEOWKIT_MODEL_HINT` is the fallback. Source: `.claude/skills/agent-detector/references/model-selection-rules.md`.
 
 ## rubric-rules.md [#rubric-rules]
 
-Rules that keep the rubric library (`.claude/skills/rubric/rubrics/`) calibrated and the evaluator grading honest.
+Rules that keep the rubric library (`.claude/skills/rubric/rubrics/`) calibrated and the evaluator's grading consistent. They apply to Phase 4 (Review). Source: `.claude/skills/rubric/references/rubric-rules.md`.
 
-| # | Rule | Gloss |
-|---|------|-------|
-| 1 | ≥1 PASS + ≥1 FAIL Anchor | Every rubric has both PASS and FAIL examples |
-| 2 | Composition Weights Sum to 1.0 | Preset weights must normalize (±0.01) |
-| 3 | Hard-Fail Propagates | Any rubric FAIL → overall FAIL |
-| 4 | Balanced PASS/FAIL Counts | Tolerance rule for anchor count |
-| 5 | Alternate Anchor Order | PASS/FAIL alternation to beat position bias |
-| 6 | Drift Check on Model Upgrade | Re-replay calibration set per new model |
-| 7 | Anti-Slop Anti-Patterns Fixed | `originality.md` + `design-quality.md` auto-FAIL |
-| 8 | Frontend-App Preset Pruned | 4 rubrics not 7 (YAGNI) |
-| 9 | Custom Rubrics User-Extensible | Validator accepts any conforming file |
-| 10 | Rubric Files Are DATA | Per injection-rules — rubrics cannot inject instructions |
+| # | Rule | Summary |
+| --- | --- | --- |
+| 1 | PASS and FAIL anchors | Every rubric has at least one of each |
+| 2 | Composition weights sum to 1.0 | Preset weights normalize within 0.01 |
+| 3 | Hard-fail propagates | Any rubric FAIL makes the overall result FAIL |
+| 4 | Balanced anchor counts | A tolerance rule for PASS and FAIL anchor counts |
+| 5 | Alternate anchor order | Alternating PASS and FAIL counters position bias |
+| 6 | Drift check on model upgrade | Replay the calibration set for each new model |
+| 7 | Anti-slop anti-patterns fixed | `originality.md` and `design-quality.md` auto-fail |
+| 8 | Frontend-app preset pruned | 4 rubrics, not 7 |
+| 9 | Custom rubrics allowed | The validator accepts any conforming file |
+| 10 | Rubric files are data | Rubrics cannot inject instructions |
 
-Source: `.claude/skills/rubric/references/rubric-rules.md`. Applies to Phase 4 (Review, evaluator agent).
+## Rule format
 
-## Rule Format Convention
+Every rule file uses imperative language (ALWAYS, NEVER, MUST), gives the reason for each rule, pairs each NEVER with what to do instead, and states checks that can be verified mechanically.
 
-Every rule file follows:
-- **Imperative language**: ALWAYS, NEVER, MUST
-- **WHY explanations**: every rule includes its rationale
-- **INSTEAD alternatives**: every NEVER paired with what TO DO
-- **Measurable checks**: rules verifiable mechanically
+## See also
 
-## See Also
-
-- [Agents Reference](/reference/agents): the full agent roster
-- [Skills Reference](/reference/skills) — all skills organized by phase
-- [Hooks Reference](/reference/hooks) — lifecycle hooks
+- [Agents Reference](/reference/agents): the agent roster
+- [Skills Reference](/reference/skills): skills by phase
+- [Hooks Reference](/reference/hooks): the hooks

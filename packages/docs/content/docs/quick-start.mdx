@@ -1,32 +1,38 @@
 ---
 title: "Quick Start"
-description: "Get from zero to your first MeowKit-managed task in 5 minutes."
+description: "Install MeowKit and run your first planned task in about five minutes."
 ---
 
-This guide gets you from zero to your first MeowKit-managed task in 5 minutes.
+This page takes you from an empty install to your first MeowKit task.
 
 ## Step 1: Install MeowKit
 
-Install the `mewkit` binary, then add the kit to your project:
+Install the `mewkit` binary, then add the kit to your project.
+
+macOS and Linux:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh   # macOS and Linux
-cd your-project
-mewkit init
+curl -fsSL https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.sh | sh
 ```
 
-On Windows, use `irm https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.ps1 | iex` in PowerShell.
+Windows (PowerShell):
 
-`mewkit init` walks you through a short set of prompts. Every one after the runtime picker is skippable. See [Installation](/installation) for the full list and the flags that skip them. Takes ~30 seconds.
+```powershell
+irm https://raw.githubusercontent.com/ngocsangyem/MeowKit/main/install.ps1 | iex
+```
 
-Pick the on-disk shape with `mewkit init --target claude-code --delivery plugin`, and check what landed with `mewkit versions`.
-
-After scaffolding completes, run setup and verify:
+Then, from your project:
 
 ```bash
+cd your-project
+mewkit init
 mewkit setup
 mewkit doctor
 ```
+
+`mewkit init` asks which runtimes to set up: Claude Code, Codex, Cursor, Grok, Pi or OMP. To skip the question, name them with `--target`, for example `mewkit init --target claude-code` or `mewkit init --target codex,cursor`. `--target all` installs all six at project scope. [Installation](/installation) lists every flag.
+
+`setup` prepares the skill environments and `doctor` checks the toolchain, the installs and their hooks. The rest of this page uses Claude Code.
 
 ## Step 2: Create your first task
 
@@ -34,9 +40,9 @@ mewkit doctor
 mewkit task new --type feature "Add user authentication with JWT"
 ```
 
-This writes a task file to `tasks/active/` with the fields for that task type already in its frontmatter. If your project keeps its own template, such as `tasks/templates/feature-implementation.md`, the command uses that instead. Open it and fill in the acceptance criteria. They are what the plan and the review are both measured against, so vague criteria produce a vague plan.
+This writes a task file to `tasks/active/` with the fields for that task type in its frontmatter. If your project keeps its own template, such as `tasks/templates/feature-implementation.md`, the command uses that instead. Open the file and fill in the acceptance criteria. The plan and the review are both measured against them, so vague criteria give a vague plan.
 
-## Step 3: Start a Claude Code session
+## Step 3: Start a session
 
 Open your terminal in the project directory and start Claude Code:
 
@@ -44,57 +50,40 @@ Open your terminal in the project directory and start Claude Code:
 claude
 ```
 
-Claude Code auto-loads `.claude/rules/`, the 7 always-on rules, plus MeowKit's agents and
-skills. MeowKit installs no root `CLAUDE.md`. If your project keeps one, it stays yours.
+Claude Code loads the six always-on rules in `.claude/rules/` and the kit's agents and skills. MeowKit installs no root `CLAUDE.md`. If your project keeps one, it stays yours.
 
-## Step 4: Run your first command
-
-Plan the task you just created:
+## Step 4: Plan the task
 
 ```
 /mk:plan-creator add user authentication with JWT
 ```
 
-MeowKit will:
-1. Route to the **planner** agent
-2. Challenge your premises (do you really need JWT?)
-3. Create a structured plan at `tasks/plans/YYMMDD-auth/plan.md`
-4. Agree the plan with you before building
+The planner agent challenges your premises (do you need JWT?), writes a plan at `tasks/plans/YYMMDD-auth/plan.md` with one file per phase, and proposes it to you. Nothing blocks an edit without a plan. Writing and agreeing it first is the practice, because a wrong plan costs more than the conversation.
 
-## Step 5: See the full pipeline
+## Step 5: Run the pipeline
 
-Once you are happy with the plan, try the full cook pipeline:
+Once the plan looks right, run:
 
 ```
 /mk:cook
 ```
 
-This runs the complete workflow. Each phase activates the appropriate agent, and the ship check runs lint, related tests and a type-check before any commit, push or PR. See [Workflow Phases](/core-concepts/workflow) for what each one does.
+`cook` runs the full workflow. Each phase uses the agent that owns it. Before any commit, push, merge or PR, the ship check runs lint, related tests and a type-check. [The Workflow](/core-concepts/workflow) describes each phase.
 
-## Step 6: Explore more commands
+## Step 6: Try other commands
 
 | Command | What it does |
 |---------|-------------|
 | `/mk:fix [bug]` | Investigate and fix a bug with root cause analysis |
 | `/mk:review` | Run a multi-pass code review with adversarial analysis |
-| `/mk:ship` | Full ship pipeline: test → review → commit → PR |
+| `/mk:ship` | Ship pipeline: test, review, commit, PR |
 | `/mk:scout [target]` | Parallel codebase exploration |
 | `/mk:retro` | Sprint retrospective with trend tracking |
 
-## What happened behind the scenes
-
-When you ran `/mk:plan-creator`, MeowKit:
-
-1. **Phase 0 (Orient):** Read relevant topic files on-demand for past patterns, assigned model tier
-2. **Phase 1 (Plan):** Planner agent created a structured plan with product + engineering lens
-3. **Agreement:** Proposed the plan for you to agree before building
-
-Nothing blocks an edit without a plan; writing and agreeing it first is the practice, because a wrong plan costs more than the conversation.
-
 ## Next steps
 
-- [Cheatsheet](/cheatsheet): quick reference for all commands
-- [Workflow Phases](/core-concepts/workflow): understand Phase 0-6
+- [Cheatsheet](/cheatsheet): quick reference for commands, agents and settings
+- [The Workflow](/core-concepts/workflow): phases 0 to 6
 - [Build a Feature](/guides/build-a-feature): the feature workflow end to end
 - [Fix a Bug](/guides/fix-a-bug): the bug workflow end to end
-- [Debug Effectively](/guides/debug-effectively): structured debugging guide
+- [Debug Effectively](/guides/debug-effectively): structured debugging

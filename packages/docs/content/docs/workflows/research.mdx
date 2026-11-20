@@ -1,67 +1,60 @@
 ---
 title: "Researching Libraries"
-description: "Evaluate libraries, frameworks, and technical approaches with structured findings."
+description: "Evaluate libraries, frameworks and technical approaches with source-graded findings."
 ---
 
-> Evaluate options with source-graded findings and confidence levels.
+This playbook compares options and fetches current documentation before you commit to a dependency.
 
-**Best for:** Choosing dependencies, evaluating frameworks, gathering docs  
-**Time estimate:** 15-30 minutes  
-**Skills used:** [mk:docs-finder](/reference/skills/docs-finder), [mk:scout](/reference/skills/scout)  
-**Agents involved:** researcher (Haiku model), brainstormer
+**Best for:** Choosing dependencies, evaluating frameworks, gathering docs
+**Time estimate:** 15 to 30 minutes
+**Skills used:** [mk:docs-finder](/reference/skills/docs-finder), [mk:scout](/reference/skills/scout)
+**Agents involved:** researcher, brainstormer
 
 ## Overview
 
-The **researcher** agent fans out queries to multiple sources (official docs, GitHub, community posts, Stack Overflow) and evaluates quality. The **brainstormer** agent compares approaches with pros/cons/tradeoffs. Both feed into the **planner** for informed decision-making.
+The **researcher** agent queries several sources at once (official documentation, GitHub repositories and issues, community posts, Stack Overflow, and patterns already in your codebase) and grades what it finds. The **brainstormer** agent compares the approaches with pros, cons and trade-offs. Both feed the **planner**.
 
-## Step-by-step guide
-
-### Step 1: Ask the research question
+## Step 1: Ask the question
 
 ```
 "Compare Prisma vs Drizzle for our PostgreSQL project"
 ```
 
-### Step 2: Researcher gathers findings
+## Step 2: The researcher gathers findings
 
-The **researcher** (running on Haiku for cost efficiency) evaluates sources:
+Sources are weighted by trust:
 
-| Source type | Trust level |
-|-------------|------------|
+| Source | Trust |
+|---|---|
 | Official documentation | Highest |
-| Well-maintained GitHub repos | High |
-| Recent blog posts (\<12 months) | Medium |
-| Stack Overflow answers | Low (must cross-reference) |
+| Maintained open-source repositories | High |
+| Recent posts (under 12 months, for fast-moving ecosystems) | Medium |
+| Stack Overflow answers | Low; cross-reference them |
+
+The findings mark each point as established, emerging or experimental, and state a confidence level:
 
 ```
-Researcher findings:
-  Prisma: Established (2019+), 37K GitHub stars, extensive docs
-    Strengths: Schema-first, great DX, auto-migrations
-    Weaknesses: Runtime overhead, limited raw SQL, heavy bundle
-
-  Drizzle: Emerging (2023+), 28K GitHub stars, growing fast
-    Strengths: Zero overhead, SQL-like syntax, lightweight
-    Weaknesses: Younger ecosystem, fewer guides
-
-  Confidence: HIGH (both well-documented)
+Prisma: established. Strengths: schema-first, migrations. Weaknesses: runtime overhead, limited raw SQL.
+Drizzle: newer. Strengths: SQL-like syntax, light. Weaknesses: smaller ecosystem.
+Confidence: high (both well documented)
 ```
 
-### Step 3: Brainstormer evaluates tradeoffs
+## Step 3: The brainstormer compares trade-offs
 
 ```
-Approach 1: Prisma — choose if team values DX and auto-migrations
-Approach 2: Drizzle — choose if team values performance and SQL familiarity
-Second-order: Prisma locks you into their schema format. Drizzle stays close to SQL.
+Prisma: choose it if the team values developer experience and generated migrations.
+Drizzle: choose it if the team values performance and SQL familiarity.
+Second-order effect: Prisma ties you to its schema format; Drizzle stays close to SQL.
 ```
 
-### Step 4: Find specific documentation
+## Step 4: Fetch the specific docs
 
 ```
 /mk:docs-finder drizzle PostgreSQL transactions
 ```
 
-The [mk:docs-finder](/reference/skills/docs-finder) skill fetches current docs via Context7 or Context Hub, avoiding stale training data.
+[mk:docs-finder](/reference/skills/docs-finder) fetches current documentation through Context7 or Context Hub, so you do not rely on training data for API signatures.
 
-## Next workflow
+## Next
 
-→ [Maintaining Old Projects](/workflows/maintenance) — work in unfamiliar codebases
+[Maintaining Old Projects](/workflows/maintenance) covers working in an unfamiliar codebase.

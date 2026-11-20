@@ -1,6 +1,6 @@
 ---
 title: "mk:jira-search"
-description: "JIRA search + saved-filter management via the jira-as wrapper."
+description: "Runs and validates JQL, exports results and manages saved filters through the jira-as wrapper."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,48 +15,35 @@ description: "JIRA search + saved-filter management via the jira-as wrapper."
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Forks the `jira-search` agent to run JQL queries, validate JQL, build queries from natural language, and manage saved filters. JQL is the only positional parameter on `search query` and `search validate`; everything else is flags.
+Runs JQL queries, validates JQL, builds queries from a description, exports results and manages saved filters. It forks the `jira-search` agent. JQL is positional on `search query` and `search validate`; everything else is a flag.
 
-## When to Use
+## When not to use
 
-- **Triggers:** "search jira", "find issues where X", "jql for ...", "export search results", "manage saved filters"
-- **NOT for:** single-issue CRUD ([`mk:jira-issue`](/reference/skills/jira-issue)), bulk write ops ([`mk:jira-bulk`](/reference/skills/jira-bulk)).
+Use `mk:jira-issue` for one issue by key and `mk:jira-bulk` for bulk writes. Time-related JQL snippets are in `mk:jira-time`.
 
-## JQL Sanitization (mandatory)
+## Usage
 
-Any user-derived term embedded in JQL **must** pass through:
+Ask in plain words: "find unresolved bugs in PROJ created in the last 7 days, top 20", "validate this jql: ...", "save a filter named 'My open bugs' with this jql: ...", "export the search to out.csv".
 
-```bash
-bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jql-sanitize.sh '<term>'
-```
+| Operation | Command |
+|---|---|
+| Query | `jira-as.sh search query "<JQL>" [--max-results N]` |
+| Validate | `jira-as.sh search validate "<JQL>"` |
+| Build from a description | `jira-as.sh search build` |
+| Export | `jira-as.sh search export "<JQL>"` |
+| Update by JQL | `jira-as.sh search bulk-update "<JQL>"` (dry run first) |
+| Saved filters | `jira-as.sh filter list`, `create`, `update`, `delete` |
 
-The sanitizer strips JQL operators / functions / special chars and quote-wraps the result. JQL injection is a real exfil class — never construct JQL from raw user input.
+`jira-as.sh` is `.claude/skills/jira/scripts/jira-as.sh`. The `jira-as` tool is not part of this repository, so check flags with `--help`.
 
-## Verified Wrapper Invocations
+## Steps
 
-| Operation | Tier | Invocation |
-|---|---|---|
-| Query | 1 | `... search query "<JQL>" --max-results 20` |
-| Validate JQL | 1 | `... search validate "<JQL>"` |
-| Build from NL | 1 | `... search build --description "tickets in progress for me"` |
-| Bulk update by JQL | 3 | `... search bulk-update "<JQL>" --field labels=urgent --dry-run` (always dry-run first) |
-| Export | 1 | `... search export "<JQL>" --output-file /tmp/out.csv --format csv` |
-| List filters | 1 | `... filter list` |
-| Create filter | 2 | `... filter create --name "..." --jql "<JQL>"` |
-| Delete filter | 4 | `... filter delete <FILTER_ID>` |
+1. Any user-derived term that goes into JQL passes through `.claude/skills/jira/scripts/jql-sanitize.sh`. It strips JQL operators, functions and special characters and quote-wraps the result. Raw user input is never concatenated into JQL, because that allows JQL injection.
+2. The agent runs the query. `search query` returns up to about 100 issues per call; larger sets are paged with `--start-at` and `--max-results`, and a truncated result says "showing first N of M".
+3. It returns the count and a list of key, summary and status. For `bulk-update` it returns the dry-run summary and the confirm command.
 
-## Domain References
+## Related
 
-- `references/jql-patterns.md` — curated canonical templates
-- `references/jql-reference.md` — full JQL operator + function reference
-- `references/search-examples.md` — practical scenarios
-
-## Peer Leaves
-
-`mk:jira-bulk` (write-side bulk discipline) · `mk:jira-time` (time-related JQL → `references/jql-snippets.md`)
-
-## Agent
-
-[`jira-search`](/reference/agents/jira-search) — A + C, NOT B.
+References in `references/`: `jql-patterns.md` (templates), `jql-reference.md` (operators and functions), `search-examples.md` (scenarios). The agent is [`jira-search`](/reference/agents/jira-search).
