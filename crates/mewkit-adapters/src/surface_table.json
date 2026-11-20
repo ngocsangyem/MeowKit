@@ -10,6 +10,7 @@
       "checked": "vendor pages read 2026-11-18; Claude Code 2.1.322 installed",
       "kinds": {
         "skills": {
+          "own": true,
           "roots": [
             {
               "root": ".claude/skills",
@@ -19,6 +20,7 @@
           ]
         },
         "agents": {
+          "own": true,
           "roots": [
             {
               "root": ".claude/agents",
@@ -28,6 +30,7 @@
           ]
         },
         "always-on": {
+          "own": true,
           "roots": [
             {
               "root": ".claude/rules",
@@ -72,6 +75,7 @@
       "checked": "vendor pages read 2026-11-18; Codex CLI 0.167.0 probed 2026-11-17",
       "kinds": {
         "skills": {
+          "own": true,
           "roots": [
             {
               "root": ".agents/skills",
@@ -86,6 +90,7 @@
           "note": "Two skills with one name are both listed (docs/maintainer/host-probe-log.md row X2)."
         },
         "agents": {
+          "own": true,
           "roots": [
             {
               "root": ".codex/agents",
@@ -96,6 +101,7 @@
           "note": "Two agents with one name: not settled (docs/maintainer/host-probe-log.md row X3, checklist C1)."
         },
         "always-on": {
+          "own": true,
           "roots": [
             {
               "root": "AGENTS.md",
@@ -130,6 +136,7 @@
       "checked": "vendor pages read 2026-11-18; Cursor Agent 2026.07.23-e383d2b installed",
       "kinds": {
         "skills": {
+          "own": true,
           "roots": [
             {
               "root": ".cursor/skills",
@@ -138,7 +145,6 @@
             },
             {
               "root": ".agents/skills",
-              "write": true,
               "source": "https://cursor.com/docs/skills#skill-directories"
             },
             {
@@ -150,10 +156,11 @@
               "source": "https://cursor.com/docs/skills#skill-directories"
             }
           ],
-          "note": "The same name in two folders is not documented and could not be listed without a model turn (docs/maintainer/host-probe-log.md row X8, checklist C2). Whether the Third-Party Imports setting governs skills is not stated."
+          "note": "The same name in two folders is not documented and could not be listed without a model turn (docs/maintainer/host-probe-log.md row X8, checklist C2). Whether the Third-Party Imports setting governs skills is not stated. The kit writes `.cursor/skills` in every set: Cursor's reads of the other folders are documented and not probed, and a copy of its own keeps it supplied if one of them is not read. Beside a runtime that writes `.agents/skills` or `.claude/skills`, Cursor therefore lists each kit skill twice."
         },
         "agents": {
           "pick": "first",
+          "own": true,
           "roots": [
             {
               "root": ".cursor/agents",
@@ -172,6 +179,7 @@
           "note": "`.cursor/` wins a name clash; `.claude/` against `.codex/` is not ranked."
         },
         "always-on": {
+          "own": true,
           "roots": [
             {
               "root": ".cursor/rules",
@@ -188,7 +196,7 @@
               "source": "https://cursor.com/docs/cli/using#rules"
             }
           ],
-          "note": "`CLAUDE.md` is read by the CLI at the project root; the editor page does not mention it. Only `.mdc` files in `.cursor/rules` load."
+          "note": "`CLAUDE.md` is read by the CLI at the project root; the editor page does not mention it. Only `.mdc` files in `.cursor/rules` load. The kit writes both: the always-on block in `AGENTS.md` and its `.mdc` rules in `.cursor/rules`. They hold different text, so Cursor does not load anything twice from the pair."
         },
         "hooks": {
           "roots": [
@@ -224,6 +232,7 @@
       "checked": "vendor pages read 2026-11-18, hooks and subagents pages again 2026-11-19 (pages dated July to October 2026); not installed, nothing probed",
       "kinds": {
         "skills": {
+          "own": true,
           "roots": [
             {
               "root": ".grok/skills",
@@ -255,7 +264,6 @@
           "roots": [
             {
               "root": ".grok/agents",
-              "write": true,
               "source": "https://docs.x.ai/build/features/subagents"
             },
             {
@@ -276,6 +284,7 @@
           "note": "The page names the folder and no file format or field (read 2026-11-19), so the kit writes no agent definition there; agent prompts go to `.grok/meowkit/agents/`, which Grok does not load (checklist C3)."
         },
         "always-on": {
+          "own": true,
           "roots": [
             {
               "root": "AGENTS.md",
@@ -284,7 +293,6 @@
             },
             {
               "root": ".grok/rules",
-              "write": true,
               "source": "https://docs.x.ai/build/features/project-rules"
             },
             {
@@ -308,7 +316,7 @@
               "source": "https://docs.x.ai/build/features/project-rules"
             }
           ],
-          "note": "Every file found is loaded in full. Whether `.mdc` frontmatter is parsed is not stated (checklist C4)."
+          "note": "Every file found is loaded in full. Whether `.mdc` frontmatter is parsed is not stated (checklist C4). The kit writes its always-on block to `AGENTS.md` only, and `.grok/rules` stays empty."
         },
         "hooks": {
           "roots": [
@@ -369,6 +377,7 @@
       "checked": "docs on the default branch read 2026-11-18 and 2026-11-19, package 1.5.2; not installed, nothing probed",
       "kinds": {
         "skills": {
+          "own": true,
           "roots": [
             {
               "root": ".agents/skills",
@@ -377,13 +386,13 @@
             },
             {
               "root": ".pi/skills",
-              "write": true,
               "source": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/configuration.md"
             }
           ],
-          "note": "A name collision keeps the first skill discovered and warns; the folder order is not stated. Both folders need project trust (https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/security.md)."
+          "note": "The kit writes `.agents/skills` only, so Pi shares one copy with Codex and OMP and `.pi/skills` stays empty (maintainer, 2026-11-19). A name collision keeps the first skill discovered and warns; the folder order is not stated. Both folders need project trust (https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/security.md)."
         },
         "always-on": {
+          "own": true,
           "roots": [
             {
               "root": "AGENTS.md",
@@ -423,6 +432,7 @@
       "checked": "source read and probed 2026-11-17, OMP 18.13.3",
       "kinds": {
         "skills": {
+          "own": true,
           "roots": [
             {
               "root": ".agents/skills",
@@ -431,7 +441,6 @@
             },
             {
               "root": ".omp/skills",
-              "write": true,
               "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/builtin.ts:316"
             },
             {
@@ -451,9 +460,10 @@
               "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/codex.ts:268; docs/maintainer/host-probe-log.md row X6"
             }
           ],
-          "note": "Copies that differ all stay listed, under a provider prefix (docs/maintainer/host-probe-log.md row X4). Turning a provider off turns off everything it imports, not skills alone."
+          "note": "The kit writes `.agents/skills` only, so OMP shares one copy with Codex and Pi and `.omp/skills` stays empty (maintainer, 2026-11-19). Copies that differ all stay listed, under a provider prefix (docs/maintainer/host-probe-log.md row X4). Turning a provider off turns off everything it imports, not skills alone."
         },
         "agents": {
+          "own": true,
           "roots": [
             {
               "root": ".omp/agents",
@@ -463,6 +473,7 @@
           ]
         },
         "always-on": {
+          "own": true,
           "roots": [
             {
               "root": "AGENTS.md",
@@ -471,7 +482,6 @@
             },
             {
               "root": ".omp/rules",
-              "write": true,
               "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/builtin.ts:407"
             },
             {
@@ -491,7 +501,7 @@
               "source": "@oh-my-pi/pi-coding-agent 18.13.3 src/discovery/agents.ts:202"
             }
           ],
-          "note": "One context file per directory depth; the provider with the higher priority shadows the other (@oh-my-pi/pi-coding-agent 18.13.3 src/capability/context-file.ts:36)."
+          "note": "One context file per directory depth; the provider with the higher priority shadows the other (@oh-my-pi/pi-coding-agent 18.13.3 src/capability/context-file.ts:36). The kit writes its always-on block to `AGENTS.md` only, and `.omp/rules` stays empty."
         },
         "hooks": {
           "roots": [

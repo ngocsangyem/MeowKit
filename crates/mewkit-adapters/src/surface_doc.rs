@@ -101,12 +101,15 @@ fn loads(table: &SurfaceTable, out: &mut String) {
 fn placements(table: &SurfaceTable, out: &mut String) {
     out.push_str(
         "\n## Where the kit writes\n\n\
-         The resolver tries every combination of writable roots and keeps the one with, in order: \
-         the fewest certain double loads, the fewest runtimes reading another runtime's wording, \
-         the fewest possible double loads, the fewest roots. Hooks are the exception: a runtime \
-         always gets its own hook file, never only an import its user can switch off, because \
-         with the switch off it would run no guard and say nothing. One runtime, each pair, and \
-         all six:\n\n\
+         Each emitter writes its runtime's own roots in every set, so a runtime has its copy \
+         whatever else is installed; a test runs every emitter for all 63 sets and holds this \
+         table to what they write. Where a choice is left, the resolver keeps the combination \
+         with, in order: the fewest certain double loads, the fewest runtimes reading another \
+         runtime's wording, the fewest possible double loads, the fewest roots. A runtime always \
+         gets its own hook file, never only an import its user can switch off, because with the \
+         switch off it would run no guard and say nothing. The MCP column is where each runtime \
+         reads servers from: no emitter installs one, and `mewkit setup` writes `.mcp.json`. \
+         One runtime, each pair, and all six:\n\n\
          | Set | Skills | Agents | Always-on | Hooks | MCP |\n|---|---|---|---|---|---|\n",
     );
     let shown = |set: &Vec<Runtime>| set.len() <= 2 || set.len() == Runtime::ALL.len();
@@ -147,8 +150,8 @@ fn leftovers(table: &SurfaceTable, out: &mut String) {
     for (certain, heading, intro) in [
         (
             true,
-            "Double loads no placement removes",
-            "The runtime loads the content from two written roots in every placement of these sets.",
+            "Double loads the kit's placement leaves",
+            "The runtime loads the content from two roots the kit writes in these sets. `mewkit doctor` reports the ones present in a project.",
         ),
         (
             false,

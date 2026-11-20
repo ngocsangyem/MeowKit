@@ -117,9 +117,11 @@ pub fn resolve(table: &SurfaceTable, set: &[Runtime]) -> Placement {
 }
 
 fn place(table: &SurfaceTable, set: &[Runtime], kind: Kind) -> KindPlacement {
+    // A runtime the kit writes nothing of this kind for has no copy to place.
     let surfaces: Vec<(Runtime, &KindSurface)> = set
         .iter()
         .filter_map(|&r| Some((r, table.surface(r, kind)?)))
+        .filter(|(_, surface)| surface.roots.iter().any(|read| read.write))
         .collect();
     let mut candidates: Vec<&str> = Vec::new();
     for read in surfaces.iter().flat_map(|(_, s)| &s.roots) {
@@ -173,6 +175,14 @@ fn views(
         if surface.pick == Pick::First {
             loaded.truncate(1);
         }
+        let own = |read: &Read| surface.own && read.write;
+        if surface
+            .roots
+            .iter()
+            .any(|read| own(read) && !written.contains(&read.root.as_str()))
+        {
+            return None;
+        }
         // A guard must not come from a read the user can switch off: with the
         // switch off the runtime would run no guard at all, and say nothing.
         let dependable = |read: &Read| {
@@ -186,7 +196,7 @@ fn views(
             ..View::default()
         };
         for (_, read) in loaded {
-            if read.root == source.root {
+            if read.root == source.root || own(read) {
                 continue;
             }
             let switch = read.switch.as_ref();
@@ -231,10 +241,26 @@ fn write(
     let owner = surfaces.iter().find(|(_, s)| lists(s, true))?.0;
     let readers: Vec<Runtime> = surfaces
         .iter()
-        .filter(|(r, s)| lists(s, false) && views.get(r).is_some_and(|v| loads(v, root)))
+        .filter(|(r, s)| {
+            // A root of its own that the kit always writes is loaded too.
+            let own = s.own && lists(s, true);
+            lists(s, false) && views.get(r).is_some_and(|v| own || loads(v, root))
+        })
         .map(|(r, _)| *r)
         .collect();
-    let dialect = match (table.home(kind, root), readers.as_slice()) {
+    // The wording follows the runtimes this root is the one copy for; one that
+    // reads it beside a copy of its own takes its wording from that copy.
+    let sourced: Vec<Runtime> = readers
+        .iter()
+        .copied()
+        .filter(|r| {
+            let own = surfaces
+                .iter()
+                .any(|(owner, s)| owner == r && s.own && lists(s, true));
+            own || views.get(r).is_some_and(|v| v.source == root)
+        })
+        .collect();
+    let dialect = match (table.home(kind, root), sourced.as_slice()) {
         (Some(home), _) => Dialect::Host(home),
         (None, [only]) => Dialect::Host(*only),
         (None, _) => Dialect::Shared,
