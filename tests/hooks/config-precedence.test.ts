@@ -75,16 +75,25 @@ describe("precedence is environment override, then flag, then project, then user
 
 	it("a flag outranks the project file", () => {
 		const { root, home } = fixture({ project: "tdd: false\n", user: "tdd: false\n" });
-		expect(configValue("tdd", false, { root, home, env: {}, flags: { tdd: true } })).toEqual({ value: true, level: "flag" });
+		expect(configValue("tdd", false, { root, home, env: {}, flags: { tdd: true } })).toEqual({
+			value: true,
+			level: "flag",
+		});
 	});
 
 	it("the supported environment override outranks all four", () => {
 		const { root, home } = fixture({ project: "tdd: false\n", user: "tdd: false\n" });
-		expect(configValue("tdd", false, { root, home, env: { MEOWKIT_TDD: "1" }, flags: { tdd: false } })).toEqual({ value: true, level: "env" });
+		expect(configValue("tdd", false, { root, home, env: { MEOWKIT_TDD: "1" }, flags: { tdd: false } })).toEqual({
+			value: true,
+			level: "env",
+		});
 	});
 
 	it("resolves autobuild.mode and a hook toggle at each level too", () => {
-		const { root, home } = fixture({ project: "autobuild:\n  mode: LEAN\n", user: "autobuild:\n  mode: FULL\nhooks:\n  post-write: false\n" });
+		const { root, home } = fixture({
+			project: "autobuild:\n  mode: LEAN\n",
+			user: "autobuild:\n  mode: FULL\nhooks:\n  post-write: false\n",
+		});
 		const { values, levels } = resolveConfig({ root, home, env: {} });
 		expect(values["autobuild.mode"]).toBe("LEAN");
 		expect(levels["autobuild.mode"]).toBe("project");
