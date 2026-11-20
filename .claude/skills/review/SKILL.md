@@ -58,7 +58,7 @@ After Phase A completes, separate persona subagents receive the diff AND a summa
 3. **Assumption Destroyer** — Implicit assumptions, unvalidated inputs, edge cases (high-domain only)
 4. **Scope Complexity Critic** — Over-engineering, YAGNI violations, scope creep (high-domain only)
 
-### Scope Gate
+### Scope Check
 
 Step-01 assesses diff complexity and sets `review_scope`:
 - **minimal** (≤3 files, ≤50 lines, no security files, domain≠high) → Blind Hunter only, no personas
@@ -77,7 +77,7 @@ workflow.md → step-01 → step-02 (Phase A) → step-02b (Phase B, full scope 
 **Prompts:** `prompts/blind-hunter.md`, `prompts/edge-case-hunter.md`, `prompts/criteria-auditor.md`
 **Personas:** `prompts/personas/security-adversary.md`, `prompts/personas/failure-mode-analyst.md`, `prompts/personas/assumption-destroyer.md`, `prompts/personas/scope-complexity-critic.md`
 
-## Plan-First Gate
+## Plan First
 
 Review requires context from a plan or diff:
 1. If reviewing a planned feature → read approved plan from `tasks/plans/`
@@ -120,7 +120,7 @@ Before starting, read `references/failure-catalog.md` for common review failure 
 
 Execute via `workflow.md`. Each step is a separate file loaded JIT:
 
-1. **step-01-gather-context** — Load diff, plan, ACs. **Scope gate** classifies diff as `minimal` or `full`. Domain complexity check via `mk:scale-routing`.
+1. **step-01-gather-context** — Load diff, plan, ACs. **Scope check** classifies diff as `minimal` or `full`. Domain complexity check via `mk:scale-routing`.
 2. **step-02-parallel-review (Phase A)** — Dispatch reviewers based on scope. Minimal = Blind Hunter only. Full = all 3 reviewers in parallel.
 3. **step-02b-persona-passes (Phase B)** — Full scope only. Dispatch adversarial persona subagents informed by Phase A findings. 2-at-a-time batching.
 4. **step-03-triage** — **Forced-finding check** (zero → re-analyze once). Categorize findings as `current-change` or `incidental`. Dedup Phase A + Phase B.

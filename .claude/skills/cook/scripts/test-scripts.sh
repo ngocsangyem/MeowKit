@@ -1,5 +1,5 @@
 #!/bin/sh
-# test-scripts.sh — Test the plan-structure check and cook's workflow contracts
+# test-scripts.sh — Test cook's workflow contracts
 # Usage: sh test-scripts.sh
 # Runs from the scripts/ directory
 
@@ -34,36 +34,6 @@ run_test() {
 # Create temp files for testing
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
-
-# --- Plan structure tests ---
-
-# Test 1: Valid plan with all sections
-cat > "$TMPDIR/valid-plan.md" << 'PLAN'
-# Plan: Test Feature
-## Problem
-Users cannot login.
-## Success Criteria
-- [ ] Login works
-- [ ] Tests pass
-## Technical Approach
-Implement OAuth2 flow.
-## Phases
-| # | Phase |
-|---|-------|
-| 1 | Auth  |
-PLAN
-run_test "Plan structure: valid plan" 0 sh "$SCRIPT_DIR/validate-gate-1.sh" "$TMPDIR/valid-plan.md"
-
-# Test 2: Plan missing success criteria
-cat > "$TMPDIR/incomplete-plan.md" << 'PLAN'
-# Plan: Incomplete
-## Problem
-Something is broken.
-PLAN
-run_test "Plan structure: missing sections" 1 sh "$SCRIPT_DIR/validate-gate-1.sh" "$TMPDIR/incomplete-plan.md"
-
-# Test 3: Non-existent file
-run_test "Plan structure: file not found" 1 sh "$SCRIPT_DIR/validate-gate-1.sh" "$TMPDIR/nonexistent.md"
 
 # --- Declarative workflow contracts ---
 

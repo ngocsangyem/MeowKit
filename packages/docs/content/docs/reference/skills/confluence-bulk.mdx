@@ -1,6 +1,6 @@
 ---
 title: "mk:confluence-bulk"
-description: "Bulk Confluence operations on 10+ pages via the confluence-as wrapper. Forks the confluence-bulk agent. Dry-run is mandatory."
+description: "Runs bulk label, move or delete operations on ten or more Confluence pages with a mandatory dry-run and confirmation."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,46 +15,44 @@ description: "Bulk Confluence operations on 10+ pages via the confluence-as wrap
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:confluence-bulk` forks the `confluence-bulk` agent to change many Confluence pages at once: bulk label, bulk move or bulk delete. The agent always runs a dry run first, then asks you to confirm, then executes. It refuses to skip the dry run.
 
-Forks the `confluence-bulk` agent to run bulk operations across many Confluence pages: bulk-label / bulk-move / bulk-delete. The agent enforces a hard 3-step ceremony at runtime — **dry-run → confirm → execute**. Skipping the dry-run step is a hard violation; the agent refuses if asked to skip.
+## When not to use it
 
-## When to Use
+| If you need | Use |
+|---|---|
+| One page | [`mk:confluence-page`](/reference/skills/confluence-page) |
+| Comments, attachments or watchers | [`mk:confluence-collaborate`](/reference/skills/confluence-collaborate) |
+| Finding the pages with CQL | [`mk:confluence-search`](/reference/skills/confluence-search) (same CQL sanitizer) |
 
-- **Triggers:** "bulk update N pages", "mass label", "delete every page matching CQL", "bulk-move pages from SPACE-A to SPACE-B"
-- **NOT for:** single-page ops ([`mk:confluence-page`](/reference/skills/confluence-page)), comment / attachment ops ([`mk:confluence-collaborate`](/reference/skills/confluence-collaborate)).
+## Usage
 
-## Mandatory Dry-Run Protocol
+Ask in plain words: "bulk update N pages", "mass label", "delete every page matching CQL", "bulk-move pages from SPACE-A to SPACE-B", "bulk-label every page in space ENG with 'archive'".
 
-```
-Step 1: invocation + --dry-run
-Step 2: agent shows would_* JSON keys + impacted-count + first 5 affected page titles
-Step 3: explicit user "yes" + typed confirmation token (e.g. "DELETE 47 PAGES")
-        → re-invoke without --dry-run, with --yes
-```
+## What it does
 
-If the impacted-count differs by >5% between dry-run and execute, the agent surfaces it as a concern in the Status block before proceeding.
+1. Runs the operation with `--dry-run`.
+2. Shows the `would_*` JSON keys, the impacted count and the first five page titles.
+3. Waits for an explicit "yes" and a typed confirmation token such as `DELETE 47 PAGES`.
+4. Runs it again without `--dry-run` and with `--yes`.
 
-## Verified CLI Idioms
+If the impacted count differs by more than 5 percent between the dry run and the execution, the agent reports it as a concern in its status block.
 
-| Operation | Tier | Wrapper invocation |
-|---|---|---|
-| Bulk-label (dry-run) | 4 | `... bulk label add --cql "$SAFE_CQL" --label archive --dry-run` |
-| Bulk-move (dry-run) | 4 | `... bulk move --cql "..." --target-parent-id 99999 --dry-run` |
-| Bulk-delete (dry-run) | 4 | `... bulk delete --cql "..." --dry-run` |
-| Re-invoke (after confirm) | 4 | `... bulk label add --cql "..." --label archive --yes` |
+| Operation | Dry-run form |
+|---|---|
+| Label | `bulk label add --cql "$SAFE_CQL" --label archive --dry-run` |
+| Move | `bulk move --cql "..." --target-parent-id 99999 --dry-run` |
+| Delete | `bulk delete --cql "..." --dry-run` |
 
-`--max-pages` defaults to 100; raising it requires explicit override + extra confirmation. `confluence-as` may impose its own server-side cap (~200 typical).
+All run through the `confluence-as` wrapper. `--max-pages` defaults to 100, and a higher value needs an explicit override and extra confirmation. `confluence-as` can apply its own cap, typically around 200.
 
-## Domain References
+Details are in `references/safety-checklist.md` (pre-flight checks) and `references/dry-run-protocol.md` (the ceremony with example transcripts). Safety tiers are in `../confluence/references/safety-framework.md`.
 
-- `references/safety-checklist.md` — pre-flight checklist for any bulk operation
-- `references/dry-run-protocol.md` — the 3-step ceremony in detail with example transcripts
+## Gotchas
 
-## Peer Leaves
-
-[`mk:confluence-search`](/reference/skills/confluence-search) (CQL author + read-side overlap; same sanitizer) · [`mk:confluence-page`](/reference/skills/confluence-page) (single-page ops) · [`mk:confluence-collaborate`](/reference/skills/confluence-collaborate) (single-page comments / attachments)
+- Bulk delete moves pages to the trash. Restoring needs the Confluence UI. There is no bulk restore.
+- Operations are not transactional. After a partial failure (rate limit, per-page permission error) the completed count is shown, and the fix is to re-run with `id NOT IN (<completed>)`.
 
 ## Agent
 
-[`confluence-bulk`](/reference/agents/confluence-bulk) — A + C (untrusted CQL input + HIGH-blast state change). NOT B (token stays in the wrapper). 2/3 — Rule of Two compliant; the dry-run ceremony is the load-bearing mitigation for blast radius.
+[`confluence-bulk`](/reference/agents/confluence-bulk) takes untrusted CQL input and makes a high-impact state change, so the dry-run ceremony is the safeguard for blast radius.

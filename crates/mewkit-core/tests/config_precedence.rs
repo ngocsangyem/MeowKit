@@ -208,7 +208,7 @@ fn one_key_reports_its_value_and_the_level_that_answered_it() {
 
 /// Two spellings, one symptom: a value a full parser resolves to a boolean and a
 /// hand reader keeps as text. Each had strict test-first mode reported ON by the
-/// CLI and enforced as OFF by the gate, with no error anywhere — so both are
+/// CLI and enforced as OFF by the hooks, with no error anywhere — so both are
 /// driven end to end through the resolver rather than through the grammar alone.
 #[test]
 fn a_spelling_the_gate_cannot_read_resolves_to_no_value_at_all() {

@@ -13,7 +13,7 @@ escalatedToHuman: false
 
 # Supervision run demo-run
 
-This is supervision continuity, NEVER verification and never a gate approval.
+This is supervision continuity, NEVER verification and never an approval.
 
 **Latest directive:** finish the migration first
 **Next safe action:** run the suite

@@ -1,14 +1,14 @@
 ---
 title: "Agile / Scrum Workflow"
-description: "Sprint goal, DoR/DoD, retro→action loop, and spike governance via the Agile conditional rule layer."
+description: "Sprint goal, DoR/DoD, retro action items and spike governance, loaded only when an Agile context is detected."
 ---
 
-> Lightweight Agile/Scrum governance that loads only when an Agile context is detected. Non-Agile sessions pay zero context cost.
+The kit has three conditional rule files for Scrum teams. They load only when a session looks Agile, so other sessions carry none of their cost. They add no agents and no hooks, and every prompt they raise is advisory.
 
-**Best for:** Teams running Jira-tracked sprints with the toolkit
-**Time estimate:** Per-sprint ceremonies; no setup beyond opt-in frontmatter
+**Best for:** Teams running Jira-tracked sprints with the kit
+**Time estimate:** Per-sprint ceremonies; no setup beyond the sprint-state file and plan frontmatter
 **Skills used:** [mk:plan-creator](/reference/skills/plan-creator), [mk:sprint-contract](/reference/skills/sprint-contract), [mk:retro](/reference/skills/retro), [mk:jira-agile](/reference/skills/jira-agile), [mk:ship](/reference/skills/ship), [mk:agent-detector](/reference/skills/agent-detector)
-**Rules:** `agile-story-gates.md`, `agile-sprint-commitment.md`, `agile-feedback-cycle.md` (in `.claude/skills/agent-detector/references/`)
+**Rules:** `agile-story-gates.md`, `agile-sprint-commitment.md` and `agile-feedback-cycle.md`, in `.claude/skills/agent-detector/references/`
 
 ## Quick path
 
@@ -19,46 +19,38 @@ description: "Sprint goal, DoR/DoD, retro→action loop, and spike governance vi
 /mk:retro                                                  # after
 ```
 
-**You end up with** sprint governance that loads only when an Agile context is detected;
-non-Agile sessions pay nothing for it.
-**The machinery** is three conditional rule files, not a skill you invoke.
+## What the rules cover
 
-## Overview
-
-The toolkit ships a thin Agile governance layer covering:
-
-- **Definition of Ready (DoR)** — Phase 1 entry advisory: AC text, estimate, sprint linkage, recent evaluator report, no open blockers
-- **Definition of Done (DoD)** — review-verdict PASS extension: post verdict to Jira, transition status, business AC checkbox
-- **Sprint goal persistence** — file-based contract surviving across sessions
-- **Mid-sprint amendment ceremony** — log scope changes transparently, never silently
-- **Sprint close hygiene** — disposition prompt for non-terminal commits + closure summary
-- **Retro action-item ceremony** — surfaced retro insights become tracked work or documented "no action" decisions
-- **Spike governance** — time-boxed investigations with findings doc; INCOMPATIBLE with `mk:autobuild` FULL
-
-No new agents, no new hooks, no new gates. Wires into existing skills.
+- Definition of Ready: a Phase 1 advisory on each Jira ticket a plan lists.
+- Definition of Done: three prompts when a review verdict is PASS or WARN.
+- Sprint goal: kept in a file, so it survives across sessions.
+- Mid-sprint amendments: scope changes are logged with a reason, not made silently.
+- Sprint close: a disposition prompt for each ticket that is not finished, and a closure summary.
+- Retro actions: each surfaced item becomes tracked work or a recorded "no action".
+- Spikes: time-boxed investigations with a findings document.
 
 ## Activation
 
-The 3 Agile rules load via `mk:agent-detector` Step 0b ONLY when an Agile context is detected. **OR-logic — any one match triggers load:**
+`mk:agent-detector` loads the three rules at orient time when any one of these is true:
 
 | Trigger | Detection |
-|---------|-----------|
-| Sprint-state contract present | Glob `tasks/contracts/sprint-state-*-sprint-*.md` returns ≥1 result |
-| Plan frontmatter | `jira_tickets:` non-empty in active plan |
-| Env var | `MEOW_JIRA_SITE_URL` set |
-| User prompt | Last user message matches `[A-Z]{2,10}-\d+` |
+|---|---|
+| Sprint-state file present | `tasks/contracts/sprint-state-*-sprint-*.md` matches at least one file |
+| Plan frontmatter | `jira_tickets:` is non-empty in the active plan |
+| Environment | `MEOW_JIRA_SITE_URL` is set |
+| Prompt | The last user message matches `[A-Z]{2,10}-\d+` |
 
-A pre-flight check verifies `references/agile-story-gates.md` exists beside the skill; if absent, the load is skipped silently.
+If `references/agile-story-gates.md` is missing beside the skill, the load is skipped silently.
 
-## Sprint Setup
+## Sprint setup
 
-### Step 1: Create the sprint-state contract
+### Create the sprint-state file
 
 ```bash
 /mk:sprint-contract sprint-goal set "Reduce p99 checkout latency below 800ms" --sprint 42
 ```
 
-Writes to `tasks/contracts/sprint-state-{YYMMDD}-sprint-42.md`:
+This writes `tasks/contracts/sprint-state-{YYMMDD}-sprint-42.md` (the goal is one line, 120 characters at most):
 
 ```yaml
 ---
@@ -72,30 +64,32 @@ status: active
 ---
 ```
 
-### Step 2: Create plans with Jira traceability
+`sprint-goal show --sprint 42` prints the goal, and `sprint-goal align --plan <path>` compares a plan's goal with it. Writers take a `flock` on the file before changing it.
 
-In your `tasks/plans/{slug}/plan.md` frontmatter:
+### Trace plans to Jira
+
+In `tasks/plans/{slug}/plan.md` frontmatter:
 
 ```yaml
 jira_tickets: [PROJ-123, PROJ-124]
 sprint_id: 42
 ```
 
-Now `mk:plan-creator` will run the DoR advisory at Phase 1 entry, and `mk:ship` will surface DoD prompts when the review verdict is PASS.
+`mk:plan-creator` then runs the Definition of Ready advisory, and `mk:ship` raises the Definition of Done prompts.
 
-## Per-Sprint Ceremonies
+## Per-sprint ceremonies
 
-### Definition of Ready (Phase 1 entry)
+### Definition of Ready
 
-When you run `/mk:plan-creator` on a plan that has `jira_tickets:`, the DoR advisory checks each ticket:
+On a plan with `jira_tickets:`, `/mk:plan-creator` checks each ticket for:
 
-1. AC text present
-2. Non-zero story-point estimate
-3. Sprint linkage if `sprint_id:` is present
-4. Recent (≤14d) `mk:jira-evaluator` report
-5. No open `is blocked by` link to a non-Done ticket
+1. Acceptance criteria text.
+2. A non-zero story point estimate.
+3. Sprint linkage, if `sprint_id:` is set.
+4. A `mk:jira-evaluator` report from the last 14 days.
+5. No open `is blocked by` link to a ticket that is not Done.
 
-Output is advisory only — never blocks. Surface gaps; you decide.
+The output lists the gaps and asks whether to proceed or fix them first. It never blocks.
 
 ### Mid-sprint scope change
 
@@ -103,26 +97,17 @@ Output is advisory only — never blocks. Surface gaps; you decide.
 /mk:jira-agile sprint add PROJ-125 --sprint 42
 ```
 
-If the sprint is already active, the skill:
+If the sprint is active, the skill locks the sprint-state file, asks for the reason for the change (free text, required), appends `{ ts, action, ticket, reason }` to `amendments:` and then makes the Jira call. In a harness FULL run, `mk:sprint-contract amend` is used instead.
 
-1. Acquires `flock` on the sprint-state file (concurrent-write safety)
-2. Prompts: "Reason for mid-sprint scope change?" — required free-text
-3. Appends `{ ts, action: add, ticket: PROJ-125, reason }` to `amendments:`
-4. Releases the lock and proceeds with the underlying Jira call
+### Definition of Done
 
-The append IS the commitment. No re-sign ceremony for non-harness work.
+Once the verdict has a non-empty `jira_tickets:` and a status of PASS or WARN, `/mk:ship` offers three actions, each cancel-safe and each with a Jira-offline fallback (`deferred`):
 
-### Definition of Done (review verdict PASS)
+1. Post the verdict summary to the ticket as a comment.
+2. Transition the ticket to Done.
+3. Confirm each business acceptance criterion, taken from the Jira AC field or, if that fails, from the plan's `## Acceptance Criteria`.
 
-When `/mk:ship` runs and the verdict has non-empty `jira_tickets:`, three opt-in actions surface:
-
-1. **Verdict→Jira comment.** "Post the review verdict to PROJ-123 as a comment? [Y/n/edit]"
-2. **Status transition.** "Transition PROJ-123 to Done? [Y/n/skip]"
-3. **Business AC checkbox.** Source priority: (a) Jira AC field; (b) **fallback to plan.md `## Acceptance Criteria`** if Jira read fails
-
-Each is cancel-safe. Each has a Jira-offline fallback (`posted_to_jira: deferred`, `transitioned_to_done: deferred`).
-
-For non-Agile sessions (verdict has no `jira_tickets:`), the entire DoD block is skipped via early-return guard. ONE frontmatter read; effectively zero added cost.
+Without `jira_tickets:` the whole block is skipped.
 
 ### Sprint close
 
@@ -130,72 +115,49 @@ For non-Agile sessions (verdict has no `jira_tickets:`), the entire DoD block is
 /mk:jira-agile sprint close --sprint 42
 ```
 
-The skill:
+The skill reads `committed_tickets:`, checks each ticket's status, asks what to do with each one that is not finished (carry over, drop, mark not delivered), and writes `status: closed`, `closed_at`, `delivered` and `carried_over` to the sprint-state file.
 
-1. Reads `committed_tickets:` from the sprint-state contract
-2. Queries each ticket's status via `mk:jira-issue get`
-3. For each non-terminal ticket: "PROJ-X is in `{status}`. Carry over? Drop? Mark not delivered?"
-4. Writes closure summary: `status: closed`, `closed_at`, `delivered: [...]`, `carried_over: [...]`
+### Retro action items
 
-### Retrospective with action-item ceremony
-
-```bash
-/mk:retro
-```
-
-After the narrative is written, when an Agile context is active, `mk:retro` parses `## 3 Things to Improve` and `## 3 Habits for Next Week` and surfaces a per-item AskUserQuestion:
+After `/mk:retro` writes its narrative in an Agile context, it asks about each item under `## 3 Things to Improve` and `## 3 Habits for Next Week`:
 
 | Option | Effect |
-|--------|--------|
-| Create Jira story now | `mk:jira-issue create` body pre-filled — REQUIRES user review |
-| Add to plan TODO | Append to active plan |
-| Document as no-action | Record the disposition in the retro report under `tasks/reports/retros/` |
-| Defer to next retro | Carry forward |
+|---|---|
+| Create Jira story now | `mk:jira-issue create` with the body pre-filled; you review before it submits |
+| Add to plan TODO | Appends to the active plan |
+| Document as no-action | Records the reason in `tasks/reports/retros/{date}-decisions.md` |
+| Defer to next retro | Carries the item forward |
 
-The retro is not "complete" until every action has a disposition.
+The retro is complete when every item has a disposition. See [Sprint Retrospective](/workflows/retrospective).
 
-### Spikes (time-boxed investigation)
+### Spikes
 
 ```bash
 /mk:plan-creator --spike --timebox 2d "Investigate JWT refresh strategy options"
 ```
 
-Generates a two-phase plan from `mk:plan-creator/assets/spike-plan-template.md`:
+`--spike` requires `--timebox`. It writes a two-phase plan from `assets/spike-plan-template.md`: investigate (inside the timebox) and document findings (up to 25 percent of the timebox). The frontmatter has `spike: true`, `timebox:` and `findings_doc:`. There is no test phase and no ship phase. Above 5 story points, the plan warns that it is probably two spikes.
 
-- **Phase 1 — Investigate** (within timebox)
-- **Phase 2 — Document Findings** (≤25% of timebox)
+<Callout title="Spikes and autobuild" type="warn">
 
-Frontmatter includes `spike: true`, `timebox: "2d"`, `findings_doc:`. NO test phase, NO ship phase.
-
-<Callout title="Harness incompatibility" type="warn">
-
-Spike plans are INCOMPATIBLE with `mk:autobuild` FULL density mode. Harness FULL requires Phase 2 (test red) → Phase 3 (build green) → Phase 4 (review) sequence with a sprint-contract gate. Spikes skip Phase 2/Phase 5; the harness flow breaks. Run via `mk:cook` or `mk:plan-creator --fast`.
+A spike plan skips the test and ship phases, so it does not fit `mk:autobuild` in FULL density, and `mk:plan-creator` rejects the combination. Run it through `mk:cook` or `mk:plan-creator --fast`.
 
 </Callout>
 
-At spike completion: "Convert findings to delivery story? [Yes — extract AC | No — research-only | Defer]"
+At the end of a spike you are asked whether to convert the findings into a delivery story, keep them as research only, or defer.
 
-## Architecture
+## Design
 
-- **Plan-as-source-of-truth** retained — Jira receives projections only (verdict comment, status transition); never authoritative
-- **Reports-not-automation** preserved — every action surfaces a prompt; no silent ticket creation
-- **Sprint-state contracts** at `tasks/contracts/sprint-state-{date}-sprint-{N}.md` — distinct from per-story sprint-CONTRACT files. Leading `sprint-state-` prefix prevents glob collision with the existing contract validator
-- **Concurrent-write safety** — writers acquire `flock` before any read-modify-write cycle on sprint-state files; YAML frontmatter append is non-atomic across shells
-- **Validator scope** — neither sprint-CONTRACT nor sprint-STATE files have a validator script; consuming skills parse the YAML inline
+- The plan is the source of truth. Jira receives projections (a verdict comment, a status change) and is never authoritative.
+- Every action surfaces a prompt. Nothing creates tickets silently.
+- Sprint-state files use a `sprint-state-` prefix, so they do not collide with per-story sprint contract files.
+- Sprint-state files have no validator script. The skills that read them parse the YAML.
 
-## Out of Scope
+Out of scope: WIP limits, async standup cadence, PO acceptance ceremony, velocity hygiene and two-way Jira sync.
 
-The following are deliberately NOT covered by this rule layer:
+## See also
 
-- WIP limits (team policy concern)
-- Async standup cadence (needs cron)
-- PO acceptance ceremony (human social)
-- Velocity hygiene (skill-level concern)
-- Bidirectional Jira sync (Jira is projection-only)
-
-## See Also
-
-- [Sprint Retrospective](/workflows/retrospective) — `mk:retro` deep dive
-- [Spec to Sprint Planning](/workflows/spec-to-sprint) — upstream planning workflow
-- [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) — DoR readiness checks per ticket
-- [Rules Index](/reference/rules-index) — full rule catalog
+- [Sprint Retrospective](/workflows/retrospective)
+- [Spec to Sprint](/workflows/spec-to-sprint) for planning
+- [Ticket Evaluation](/workflows/ticket-evaluation) for per-ticket readiness
+- [Rules Index](/reference/rules-index)

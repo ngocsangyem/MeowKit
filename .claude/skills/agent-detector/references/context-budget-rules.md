@@ -5,7 +5,7 @@ phase — just-in-time, not all-at-once. This rule is the **Context selection** 
 made explicit; it complements the context-ordering guidance in `agent-conduct.md` (B3, B6)
 rather than restating it.
 
-These budgets are **advisory** — a ceiling to plan reads against, never a hard gate. They
+These budgets are **advisory** — a ceiling to plan reads against, never a hard limit. They
 are pure text, readable by any inner harness with no hook.
 
 ## How to Read the Matrix

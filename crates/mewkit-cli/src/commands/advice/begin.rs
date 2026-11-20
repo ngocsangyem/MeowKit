@@ -190,6 +190,6 @@ fn open(
             .collect::<Vec<_>>()
             .join(", ")
     );
-    println!("  supervision is evidence — it clears no gate and counts as no verification.");
+    println!("  supervision is evidence — it clears no approval and counts as no verification.");
     Ok(())
 }

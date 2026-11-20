@@ -67,7 +67,7 @@ pub const REJECTED: &[(&str, &str)] = &[
 ];
 
 /// Fixture → the keys it applies. An accepted file is not merely accepted: the
-/// values are what the gate and the hooks then read, and a type read differently
+/// values are what the CLI and the hooks then read, and a type read differently
 /// on either side of the kit is the failure this corpus exists for.
 pub fn accepted() -> Vec<(&'static str, Vec<(&'static str, ConfigValue)>)> {
     vec![

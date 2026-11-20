@@ -14,7 +14,7 @@ supervision over one delivery run. Athena assesses the situation, makes an evide
 operational recommendation, guides before work, rescues a blocked run, reviews finished
 work, and may return work for correction.
 
-Supervision is **evidence a human reads**. It is never an approval, never a gate, never a
+Supervision is **evidence a human reads**. It is never an approval, never an approval step, never a
 substitute for verification.
 
 Athena is a workflow-level strategic intelligence agent with stronger reasoning and
@@ -121,15 +121,15 @@ Dispositions are **stage-specific**, and an illegal one is rejected before routi
 | GUIDE, RESCUE | `CONTINUE_WITH_DIRECTIVE`, `ESCALATE_TO_HUMAN`, `BLOCKED_MISSING_EVIDENCE` |
 | REVIEW, RECHECK | `READY_FOR_EXISTING_GATE`, `RETURN_TO_EXECUTOR`, `ESCALATE_TO_HUMAN`, `BLOCKED_MISSING_EVIDENCE` |
 
-`READY_FOR_EXISTING_GATE` means "the normal reviewer or gate is the correct next step". It
-**never** means the gate is cleared.
+`READY_FOR_EXISTING_GATE` means "the normal reviewer or review step is the correct next step". It
+**never** means the review is passed.
 
 - Output cap **600 words**. Volume is not rigor.
 - `requiredCorrections`: max 5, ordered, each independently verifiable and each naming its
   `proofRequired`. `RETURN_TO_EXECUTOR` requires at least one.
 - `decisionRecommendation` selects one operational path within the packet's locked scope
   and says why. It MUST escalate rather than override a locked business, security,
-  compliance or gate decision.
+  compliance or review decision.
 - No `approve`, `clear`, `merge`, `deploy` or equivalent authority language, in any
   wording. Say "the evidence supports X".
 
@@ -155,7 +155,7 @@ transcript, an auto-memory, or a new supervisor store.
   and next safe action.
 - Historical receipts may sit below the active summary but are **never auto-loaded**.
   Never append full model output.
-- The dossier **cannot** carry progress, verification, gate, approval, verdict or status
+- The dossier **cannot** carry progress, verification, approval, verdict or status
   fields. A candidate that does is refused, not stripped — silently dropping a field the
   caller believed it stored is worse than refusing.
 - Two-step checkpoint marker: `pending` written BEFORE the call, `committed` after the
@@ -197,7 +197,7 @@ creating it, so it is refused.
 `--advice` and `--html` are orthogonal. Neither implies the other, each is parsed
 independently, and combining them changes no activation, approval, validation, export or
 ownership. A run with both produces the same visual artifact, at the same path, validated
-by the same validator, approved by the same human at the same gate, and exported by the
+by the same validator, approved by the same human at the same approval step, and exported by the
 same owner as `--html` alone would for the same final Markdown.
 
 They meet only in the correction loop, because a supervised correction edits Markdown and
@@ -235,11 +235,10 @@ Athena MUST NOT:
   the model running it.
 - Spawn another Athena or any lifecycle agent.
 
-**Gate authority invariant:** automation executes BETWEEN gates and never supplies the
-authority OF a gate. An Athena directive is in exactly the same class as an evaluator
-verdict or a green test suite — evidence presented to a human at the gate, never the
-approval itself. Prose that lets supervision advance a gate, in any wording, is a
-violation.
+**Supervision is never authority.** An Athena directive is in exactly the same class as
+an evaluator verdict or a green test suite — evidence presented to the user, never the
+decision itself. Prose that lets supervision decide whether work ships, in any wording,
+is a violation.
 
 A directive is also **not verification**. Verification comes from tests, review verdicts
 and validators. Supervision never counts toward it.
@@ -263,7 +262,7 @@ skill: <skill and workflow>
 checkpointId: <named checkpoint>
 ---
 
-This is a record of supervision, NEVER verification and never a gate approval.
+This is a record of supervision, NEVER verification and never an approval.
 
 **Question asked:** …
 **Directive:** … (summary, not the full packet)
@@ -306,7 +305,7 @@ Where this runtime exposes direct delegation to the agent by name, that is a **s
 strategy consult**: Athena may assess a difficult situation, compare alternatives and make
 a recommended operational decision, but creates no run receipt, correction routing or cap
 accounting. It is NOT lifecycle supervision and must label itself accordingly. It escalates
-rather than changing a locked business, security, compliance or gate decision. Embedded
+rather than changing a locked business, security, compliance or review decision. Embedded
 supervision requires a valid `supervisionRunId`.
 
 A direct consult returns a **strategy brief**, which is a different shape from a checkpoint
@@ -392,7 +391,7 @@ outcome.
 **4. Route on the disposition.**
 
 - `CONTINUE_WITH_DIRECTIVE` — proceed; the directive is input, not instruction.
-- `READY_FOR_EXISTING_GATE` — run the skill's normal next gate or review. It is NOT cleared.
+- `READY_FOR_EXISTING_GATE` — run the skill's normal next review. It is NOT passed.
 - `RETURN_TO_EXECUTOR` — apply the corrections, then supersede the stale evidence:
   `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence <workflow-evidence.json> --correction-kind source|scope`.
   Re-run the skill's verification before its review. `scope` also returns the plan to the
@@ -448,5 +447,5 @@ counts the calls would be the cheapest way to buy unlimited ones.
 - Using a GUIDE disposition at REVIEW, or vice versa — the stage decides what is legal.
 - Emitting a `disposition` from a direct consult — that shape is a checkpoint result and a
   consult has no run to govern.
-- Reading `READY_FOR_EXISTING_GATE` as a cleared gate — it names the next step, nothing
+- Reading `READY_FOR_EXISTING_GATE` as a passed review — it names the next step, nothing
   more.

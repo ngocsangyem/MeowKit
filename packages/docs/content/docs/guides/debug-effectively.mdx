@@ -3,35 +3,35 @@ title: "Debug Effectively"
 description: "Decision guide: when to use mk:fix, mk:investigate, mk:sequential-thinking, or mk:problem-solving."
 ---
 
-Four skills handle debugging and problem-solving. Picking the wrong one wastes tokens and produces bad answers. This guide maps each to the right situation.
+Four skills handle debugging and problem-solving. This page maps each to the situation it fits, so you pick one.
 
 ## One decision matrix
 
-Match the strongest signal in your situation to ONE skill. Don't stack them.
+Match the strongest signal in your situation to one skill. Do not stack them.
 
 | Your situation | Skill | Why |
 |---------------|-------|-----|
-| Bug, error, test failure, or anything broken you want fixed | `/mk:fix` | Top-level orchestrator. Invokes scout + investigate + sequential-thinking internally. |
-| Pure diagnosis: "why is this broken?" without fixing yet | `/mk:investigate` | 5-phase root-cause debugging. Read-only until hypothesis confirmed. |
-| Competing hypotheses: "which of these is correct?" | `/mk:sequential-thinking` | Hypothesis table, evidence-based elimination. Works for architecture decisions too. |
-| Stuck on approach: "tried five ways, still feels wrong" | `/mk:problem-solving` | Strategic unsticking. 7 techniques. Not for debugging. |
+| Bug, error, test failure, or anything broken you want fixed | `/mk:fix` | Runs scout, investigate and sequential-thinking for you, then fixes. |
+| Pure diagnosis: "why is this broken?" without fixing yet | `/mk:investigate` | Root-cause debugging that ends in a diagnostic report, not an edit. |
+| Competing hypotheses: "which of these is correct?" | `/mk:sequential-thinking` | Hypothesis and evidence reasoning before acting. Works for architecture decisions too. |
+| Stuck on approach: "tried five ways, still feels wrong" | `/mk:problem-solving` | Seven techniques for a stalled approach. Not for debugging. |
 
-**Default when unsure:** anything that smells like "something is broken" → `/mk:fix`. It invokes the others internally.
+When unsure, and something is broken, use `/mk:fix`. It invokes the others.
 
 ## How they compose
 
-`/mk:fix` is the orchestrator. It calls `/mk:investigate` (collect evidence), which calls `/mk:sequential-thinking` (eliminate hypotheses). `/mk:problem-solving` stands apart: it is for strategic blocks, not bugs.
+`/mk:fix` calls `/mk:investigate` to collect evidence, and the standard and deep profiles then use `/mk:sequential-thinking` to eliminate hypotheses. `/mk:problem-solving` stands apart. It is for a stalled approach, not for bugs.
 
 ```
 Bug reported
-  → mk:fix (orchestrator)
+  → mk:fix
     → Step 1: mk:scout (mandatory codebase exploration)
     → Step 2: mk:investigate (collect symptoms, trace backward)
-        → Phase 3: mk:sequential-thinking (hypothesis table, evidence elimination)
-    → Step 3: Complexity assessment (quick / standard / deep)
-    → Step 4: Fix ROOT cause
-    → Step 5: Regression test (mandatory)
-    → Step 6: Write pattern to memory
+        → mk:sequential-thinking (hypotheses, evidence elimination)
+    → Step 3: Complexity assessment
+    → Step 4: Fix the root cause
+    → Step 5: Verify and add a regression test
+    → Step 6: Report, and write a memory entry if the lesson is non-derivable
 ```
 
 ## Common misroutes
@@ -39,33 +39,33 @@ Bug reported
 | Wrong | Right | Why |
 |-------|-------|-----|
 | `/mk:problem-solving` for a bug | `/mk:fix` | problem-solving is for approach, not cause |
-| `/mk:sequential-thinking` for a bug you want fixed | `/mk:fix` | fix already invokes sequential-thinking + adds scout + memory + verify |
-| `/mk:investigate` then separately `/mk:fix` | `/mk:fix` only | fix Step 2 already invokes investigate. Duplicate work. |
+| `/mk:sequential-thinking` for a bug you want fixed | `/mk:fix` | fix already uses sequential-thinking and adds scout, memory and verify |
+| `/mk:investigate` then separately `/mk:fix` | `/mk:fix` only | fix Step 2 already runs investigate, so this repeats work. |
 | `/mk:fix` for green-field design | `/mk:plan-creator` | fix is for broken things, not new design |
 
 ## Real scenarios
 
 **Test suite red after refactor:**
-→ `/mk:fix`. Scout maps the blast radius, investigate collects stack traces, sequential-thinking hypothesizes what changed.
+`/mk:fix`. Scout maps the blast radius, investigate collects stack traces, and sequential-thinking tests hypotheses about what changed.
 
 **Intermittent production bug, fixed twice, still recurring:**
-→ `/mk:fix` first. Reads memory for prior sessions on this bug class. If the pattern "adding X to fix Y" emerges, follow up with `/mk:problem-solving` (Via Negativa).
+`/mk:fix` first. It checks memory for earlier sessions on this bug class. If the pattern "adding X to fix Y" appears, follow up with `/mk:problem-solving` (Via Negativa).
 
 **"Why did deployment fail last night?" (CI is green now):**
-→ `/mk:investigate`. Pure diagnostic, since the deploy already succeeded on retry. Investigate produces a DEBUG REPORT; you decide if a fix is needed.
+`/mk:investigate`. It is a pure diagnosis, since the deploy already succeeded on retry. Investigate writes a diagnostic report and you decide whether a fix is needed.
 
 **Architecture trade-off with competing positions:**
-→ `/mk:sequential-thinking`. Not a bug but a reasoning task. Hypothesis table for "pick between known options with evidence."
+`/mk:sequential-thinking`. It is a reasoning task, not a bug: pick between known options with evidence.
 
 **Seven implementations, none feel right:**
-→ `/mk:problem-solving` → Simplification Cascades. "Same thing 5+ ways, growing special cases" is the trigger for this technique.
+`/mk:problem-solving` with Simplification Cascades. "Same thing 5+ ways, growing special cases" is the trigger for that technique.
 
 ## Anti-patterns
 
-- **Guessing root causes.** Let sequential-thinking enforce evidence
+- **Guessing root causes.** Let sequential-thinking hold you to evidence
 - **Fixing symptoms.** Trace backward to the root cause
 - **Skipping scout.** `/mk:fix` Step 1 is mandatory
-- **No regression test.** `/mk:fix` Step 5 blocks without one
+- **No regression test.** `/mk:fix` Step 5 treats a missing required test as incomplete
 - **Three or more failed attempts.** Stop and question the architecture
 
 ## Next steps

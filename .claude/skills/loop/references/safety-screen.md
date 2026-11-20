@@ -1,7 +1,7 @@
 # Safety Screen
 
 The load-bearing security reference. `Verify` runs every iteration, so a malicious or
-sloppy command compounds. Screen `Verify` and `Guard` at Stage 1, before Gate A shows them
+sloppy command compounds. Screen `Verify` and `Guard` at Stage 1, before Stop A shows them
 to the user.
 
 ## Contents

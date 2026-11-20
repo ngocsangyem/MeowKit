@@ -1,6 +1,6 @@
 ---
 title: "mk:sprint-contract"
-description: "Negotiates a file-based sprint contract between generator and evaluator before code is written — BDD acceptance criteria, rubric bindings, git-signed agreement."
+description: "File-based protocol in which the developer and evaluator agree on testable acceptance criteria and sign them in git before code is written."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,83 +14,61 @@ description: "Negotiates a file-based sprint contract between generator and eval
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Creates and negotiates a sprint contract — a signed agreement between the generator (developer agent) and evaluator (review agent) about what will be built, what acceptance criteria must pass, and how it will be evaluated. Uses a git-signed two-commit-per-agent protocol for cryptographic non-repudiation.
+`mk:sprint-contract` produces a contract at `tasks/contracts/{YYMMDD-HHMM}-{slug}-sprint-{N}.md` so the generator (the `developer` agent) and the evaluator grade the same scope. It is a shared document, not a checkpoint. The developer reads the signed contract before editing source, and no hook checks that or blocks an edit while the contract is unsigned.
 
-## When to Use
+It serves product-level specs that feed `mk:autobuild`.
 
-- Starting a harness-driven sprint build (required before code)
-- Complex features needing explicit scope boundaries
-- Multi-agent builds where ownership must be clear
-- **NOT for:** single-file changes, quick fixes, tasks without evaluation gates
+## When not to use it
 
-## Core Capabilities
-
-- **Contract template:** 10 frontmatter fields (status, parties, rubric_preset, scope_in, scope_out, ACs with assertions, negotiation_log, amendments, signatures)
-- **BDD translation:** 6 rules for converting user stories into Given/When/Then acceptance criteria with anti-pattern detection
-- **Git signing:** two-commit-per-agent protocol — each party commits their signature separately, SHA capture for non-repudiation
-- **Amendment protocol:** nullifies existing signatures on amend, append-only changes, re-signing required
-- **Signature discipline:** a placeholder signature (`null`, `pending`, empty) means that agent has not signed; no hook or script checks this for you
-- **Hard constraints:** max 2 negotiation rounds, max 15 ACs, LEAN mode bypass via `MEOWKIT_AUTOBUILD_MODE=LEAN`
-
-## Arguments
-
-| Flag | Effect |
-|------|--------|
-| `--propose` | Create a new contract from requirements |
-| `--review` | Review a proposed contract (evaluator role) |
-| `--amend` | Amend an existing contract (appends to negotiation log, nullifies signatures) |
-| `--sign` | Sign the contract (generator or evaluator) |
-| `sprint-goal set/show/align` | Sprint-LEVEL goal management (Agile mode — gated by `agile-sprint-commitment.md` Section 1) |
-
-### sprint-goal subcommand (Agile mode)
-
-Sprint-LEVEL goal contract — distinct from per-story sprint-CONTRACT files. Writes to `tasks/contracts/sprint-state-{date}-sprint-{N}.md` using `assets/sprint-state-template.md`.
-
-| Action | Form | Effect |
-|--------|------|--------|
-| `set` | `mk:sprint-contract sprint-goal set "<text>" --sprint N` | Writes `sprint_goal:` (≤120 chars) to sprint-state file. Creates the file if absent. Acquires `flock` for concurrent-write safety |
-| `show` | `mk:sprint-contract sprint-goal show --sprint N` | Prints current `sprint_goal:` |
-| `align` | `mk:sprint-contract sprint-goal align --plan <path>` | Renders alignment between plan goal and sprint goal. Advisory only |
-
-**Validator scope note:** neither sprint-CONTRACT nor sprint-STATE files have a validator script; consuming skills parse the YAML inline.
-
-## Workflow
-
-1. **Propose** — generator creates contract from requirements with ACs and rubric bindings
-2. **Review** — evaluator reviews, may request changes (max 2 rounds)
-3. **Negotiate** — amendments appended to negotiation log (append-only)
-4. **Sign** — generator signs (commit 1), evaluator signs (commit 2). Both SHAs recorded.
-5. **Build** — developer reads signed contract before writing code (read by the developer; no hook checks it)
+| Case | Use instead |
+|---|---|
+| Validating one task's plan in a cook flow | `mk:validate-plan` |
+| `MEOWKIT_AUTOBUILD_MODE=LEAN`, where the model derives criteria from the spec | skip the contract |
+| A `--fast` plan or a simple `/mk:fix` | skip the contract |
 
 ## Usage
 
-```bash
-/mk:sprint-contract --propose "build user authentication with OAuth"
-/mk:sprint-contract --review
-/mk:sprint-contract --amend "add rate limiting to scope"
-/mk:sprint-contract --sign
-/mk:sprint-contract --validate
+```
+/mk:sprint-contract propose <task-slug>
 ```
 
-## Example Prompt
+| Subcommand | Owner | Effect |
+|---|---|---|
+| `propose` | developer | Drafts the contract from the newest plan and a rubric preset. Status goes `draft` to `negotiating`. |
+| `review` | evaluator | Checks each criterion for testability, rubric fit and clear scope, and adds clarification requests. |
+| `amend` | developer | Revises the criteria in response and adds a round. |
+| `sign` | both | Each agent commits to the contract in git. Status becomes `signed`. |
+| `sprint-goal` | user | Sets, shows or aligns a sprint-level goal. |
 
-```
-Create a sprint contract for adding two-factor authentication to the login flow. Scope: TOTP generation, QR code setup, backup codes, and recovery flow. Out of scope: SMS-based 2FA, hardware key support.
-```
+The harness runs propose, review, amend and sign automatically between the test and build phases.
 
-## Common Use Cases
+## Steps
 
-- Harness-driven sprint builds
-- Complex features with multiple acceptance criteria
-- Multi-agent builds requiring clear ownership
-- Regulated environments requiring audit trails
+1. `propose` reads the newest `tasks/plans/*/plan.md`, loads a preset with `mk:rubric/scripts/load-rubric.sh --preset`, and copies `assets/contract-template.md`. It fills 5 to 15 criteria in Given/When/Then form, each bound to one rubric and given a verification line. Every rubric in the preset should have at least one criterion.
+2. `review` appends `Round N (reviewer)` notes to the negotiation log, or `accepted` when the contract is clean.
+3. `amend` addresses each note by replacing the criterion and appends `Round N (proposer)`.
+4. After two rounds the next round asks the user.
+5. `sign` takes two commits per agent. The first commits the file, the second records that commit's SHA in `generator_signed` or `evaluator_signed`. For the evaluator the second commit also sets `status: signed`. `git log --oneline` on the file is the audit trail.
 
-## Pro Tips
+A placeholder such as `null`, `pending`, `todo` or empty in a signature field means that agent has not signed. Nothing checks the field for you.
 
-- **Every AC must bind to a rubric criterion.** If a preset rubric is used, every criterion should have at least one AC binding.
-- **Assertion form is valid.** For criteria without preconditions, use explicit Assertion instead of Given/When/Then. Example: "Assertion: The user receives a JWT with a 15-minute expiry."
-- **Mid-build amendments require re-signing.** If scope changes during build, the amendment nullifies all signatures and both parties must re-sign.
+## Amending after signing
 
-> **Canonical source:** `.claude/skills/sprint-contract/SKILL.md`
+Set `status: amended` and null both signature fields first, then append `### Amendment N` under `## Amendments` and commit. Do not edit the signed criteria. Add a revised criterion or an override note. Both agents then sign again. Until they do, hold off on source edits.
+
+## Sprint goal
+
+| Action | Form | Effect |
+|---|---|---|
+| `set` | `sprint-goal set "<text>" --sprint N` | Writes `sprint_goal:` (120 characters or fewer) to `tasks/contracts/sprint-state-{YYMMDD}-sprint-{N}.md`, created from `assets/sprint-state-template.md`. It takes a `flock` first. |
+| `show` | `sprint-goal show --sprint N` | Prints the goal from the newest matching file. |
+| `align` | `sprint-goal align --plan <path>` | Compares the plan goal with the sprint goal. Advisory only. |
+
+## Gotchas
+
+- Do not edit signed criteria in place. Revise through the Amendments section.
+- Escalate to the user on round 3. Agents that fail to converge in two rounds will not in five.
+- Bind every criterion to one rubric in the active preset, or the evaluator has nothing to grade against.
+- Sign with real git commits. The fields hold SHAs, not "yes".

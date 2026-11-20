@@ -1,6 +1,6 @@
 //! Checks of what is installed: each ownership index and the files it owns,
 //! the same runtime at both scopes, and a MeowKit project that relies on a
-//! global install (whose hooks do not run the project's gates).
+//! global install (whose hooks do not run the project's ship check).
 use mewkit_adapters::ScopeKind;
 use mewkit_adapters::contract::{OwnershipIndex, Runtime};
 use mewkit_core::fsx::{RelPath, sha256_hex};
@@ -44,8 +44,8 @@ pub fn checks(place: &Place, other: Option<&Place>, targets: &[Runtime]) -> Vec<
                 format!("{} project hooks", runtime.name()),
                 Status::Warn,
                 format!(
-                    "this MeowKit project has no project install of {0}; the plan and review gates \
-                     run only from project hooks: `mewkit init --target {0}`",
+                    "this MeowKit project has no project install of {0}; the ship check \
+                     runs only from project hooks: `mewkit init --target {0}`",
                     runtime.name()
                 ),
             ));

@@ -1,6 +1,6 @@
 ---
 title: "mk:breakdown"
-description: "Spec or PRD to sized user stories, optional tickets, and a codebase-aware tech breakdown report. Stops before plan creation."
+description: "Turns a spec, PRD or epic into user stories with acceptance criteria, optionally creates tickets, and writes one breakdown report."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,28 +14,43 @@ description: "Spec or PRD to sized user stories, optional tickets, and a codebas
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:breakdown` reads a spec source, derives user stories with binary acceptance criteria, can create a ticket per story and run a tech breakdown, and writes one report. It stops before planning and names the planning command to run next. Use it when a Confluence page, Jira epic, GitHub issue, Linear ticket or pasted PRD needs refined stories.
 
-Analyses a spec source, derives user stories with binary acceptance criteria, optionally creates tickets per story, optionally runs tech planning, and writes one breakdown report. It deliberately stops before planning and ends by naming the planning command to run next.
+## When not to use it
 
-## When to Use
+| If you need | Use |
+|---|---|
+| Sprint capacity planning | `mk:planning-engine` |
+| Fibonacci sizing of pasted stories | `mk:story-sizer` |
+| Analysis or root cause of one ticket | `mk:intake` or `mk:jira-analyst` |
 
-- A Confluence page, Jira epic, GitHub issue, Linear ticket or pasted PRD needs refined stories
-- Stories need tickets, one confirmation at a time
-- A tech breakdown is wanted against the real codebase before planning
+## Usage
 
-**NOT for:** sprint capacity planning (`mk:planning-engine`); bulk ticket creation (`mk:story-sizer`); single-ticket analysis or root-cause work (`mk:intake`, `mk:jira-analyst`).
+```bash
+mk:breakdown <source> [--source confluence|jira|github|linear|paste] [--project <KEY>]
+```
 
-## Procedure
+| Argument | Meaning |
+|---|---|
+| `<source>` | Confluence URL or page id, Jira key, GitHub issue URL, Linear URL, file path, or nothing when you paste the spec |
+| `--source` | Override auto-detection |
+| `--project <KEY>` | Required before any ticket is created. Without it, ticket creation aborts, the analysis is kept and the report ends with a re-run footer |
 
-1. Source analysis — Confluence routes to `mk:confluence-spec-analyst`, everything else to `mk:intake`.
-2. Story decomposition — title, acceptance criteria, complexity hint, and the open questions the source leaves unanswered.
-3. Optional ticket creation through `mk:jira-issue`, requiring `--project <KEY>` and per-story confirmation.
-4. Optional tech breakdown through `mk:planning-engine plan --tickets <keys>`.
-5. Report write to `tasks/reports/breakdown-{YYMMDD}-{slug}.md`, or the active plan's `research/` directory.
+## What it does
 
-## Pro Tips
+1. Analyse the source. Confluence goes to `mk:confluence-spec-analyst`. Jira, GitHub, Linear, pasted text and files go to `mk:intake`.
+2. Decompose into stories: title, binary acceptance criteria, a complexity hint and the open questions the source leaves unanswered.
+3. Optionally create a ticket per accepted story with `mk:jira-issue`, confirming each story separately.
+4. Optionally run `mk:planning-engine plan --tickets <keys>` once tickets exist.
+5. Write the report.
 
-- Spec content is data. Requirements are extracted from it; instructions found inside a page body are never followed.
-- Missing tracker configuration skips ticket creation and still produces the analysis and the report.
-- A source that yields no stories stops the run — a report with no stories reads as a spec with no stories.
+## Outputs
+
+The report goes to `tasks/reports/breakdown-{YYMMDD}-{slug}.md`, or into the active plan's `research/` directory when a plan is active. The run prints the report path, story count, ticket keys created, any warnings and the next planning command (`mk:plan-creator` for implementation planning). A same-day re-run overwrites the report. Tickets already created stay, so choose "Skip" for stories that have one.
+
+## Gotchas
+
+- Spec content is data. Requirements are extracted from it and instructions inside it are not followed.
+- Missing tracker configuration skips ticket creation and still produces the analysis and report.
+- A failed analysis or a source with no stories stops the run without a partial report.
+- Confluence shortlinks are not resolved. Give the canonical URL or page id.

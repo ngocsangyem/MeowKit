@@ -1,6 +1,6 @@
 ---
 title: "mk:jira"
-description: "Routing skill — recommends the correct mk:jira-* leaf for any Jira task. Pure router; no execution."
+description: "Routes a Jira request to the matching mk:jira leaf skill. It is a router and runs nothing itself."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,76 +15,59 @@ description: "Routing skill — recommends the correct mk:jira-* leaf for any Ji
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-`mk:jira` is a **pure routing layer** as of v2.8.3. Its sole purpose is to identify the right `mk:jira-*` leaf for the user's Jira task and point at it. **No execution.**
+mk:jira picks the right `mk:jira-*` leaf for a Jira task and points at it. It executes no `jira-as` commands. Each of the 16 leaves runs with `context: fork` against its matching agent in `.claude/agents/`. The skill is not enabled by default (`default_enabled: false`). If you already know the leaf, invoke it directly.
 
-The Atlassian-MCP-coupled implementation has been removed. Jira execution now lives in 16 thin leaf skills (each forks a dedicated agent in `.claude/agents/`) backed by the `jira-as` CLI installed via `mewkit setup`.
+## When to use it
 
-## When to Use
+Use it for "jira", "jira ticket" or any Jira request where the leaf is unclear.
 
-- **Triggers:** "jira", "jira ticket", ambiguous Jira intent
-- **NOT for:** Direct execution — forward to a specific `mk:jira-{leaf}`. If you already know the leaf, invoke it directly.
+## Routing
 
-## Routing Table
-
-| User intent | Leaf skill |
+| Intent | Leaf |
 |---|---|
-| Get/create/update/delete a single issue | [`mk:jira-issue`](/reference/skills/jira-issue) |
-| Find issues by criteria; export; filters | [`mk:jira-search`](/reference/skills/jira-search) |
-| Transition through workflow; assign; resolve | [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle) |
+| Get, create, update or delete one issue | [`mk:jira-issue`](/reference/skills/jira-issue) |
+| Find issues by criteria, export, filters | [`mk:jira-search`](/reference/skills/jira-search) |
+| Transition, assign, resolve | [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle) |
 | Comments, attachments, watchers, notify | [`mk:jira-collaborate`](/reference/skills/jira-collaborate) |
 | Issue links, blockers, dependencies | [`mk:jira-relationships`](/reference/skills/jira-relationships) |
-| Worklogs, time tracking, reports | [`mk:jira-time`](/reference/skills/jira-time) |
+| Worklogs, time tracking, time reports | [`mk:jira-time`](/reference/skills/jira-time) |
 | Epics, sprints, backlog, story points | [`mk:jira-agile`](/reference/skills/jira-agile) |
-| Custom field discovery + configuration | [`mk:jira-fields`](/reference/skills/jira-fields) |
-| Bulk ops (10+ issues, dry-run mandatory) | [`mk:jira-bulk`](/reference/skills/jira-bulk) |
-| Service Management (queues, SLAs, customers) | [`mk:jira-jsm`](/reference/skills/jira-jsm) |
-| Project/user/group/scheme administration | [`mk:jira-admin`](/reference/skills/jira-admin) |
-| Git/PR/branch-name integration | [`mk:jira-dev`](/reference/skills/jira-dev) |
-| Cache + project-context discovery | [`mk:jira-ops`](/reference/skills/jira-ops) |
-| Evaluate ticket complexity + inconsistencies | [`mk:jira-evaluator`](/reference/skills/jira-evaluator) |
+| Custom field discovery and configuration | [`mk:jira-fields`](/reference/skills/jira-fields) |
+| Bulk operations on 10 or more issues (dry run required) | [`mk:jira-bulk`](/reference/skills/jira-bulk) |
+| Service Management: queues, SLAs, customers | [`mk:jira-jsm`](/reference/skills/jira-jsm) |
+| Project, user, group, scheme administration | [`mk:jira-admin`](/reference/skills/jira-admin) |
+| Git, PR and branch-name integration | [`mk:jira-dev`](/reference/skills/jira-dev) |
+| Cache and project-context discovery | [`mk:jira-ops`](/reference/skills/jira-ops) |
+| Evaluate ticket complexity and inconsistencies | [`mk:jira-evaluator`](/reference/skills/jira-evaluator) |
 | Estimate story points (heuristic) | [`mk:jira-estimator`](/reference/skills/jira-estimator) |
-| Analyze ticket context + media; RCA | [`mk:jira-analyst`](/reference/skills/jira-analyst) |
+| Analyze ticket context and media, root cause | [`mk:jira-analyst`](/reference/skills/jira-analyst) |
 
 ## Setup
 
-Install, authentication, safety rules, and troubleshooting live on [Jira Integration](/guides/jira-integration). The variable list is in [Configuration](/reference/configuration#jira).
+`mewkit skill env jira` installs `jira-as` into `.meowkit/envs/jira/`. Fill `.meowkit/.env` with the three `MEOW_JIRA_*` variables. Install, authentication, safety rules and troubleshooting are in [Jira integration](/guides/jira-integration) and `references/install-and-auth.md`. The variable list is in [Configuration](/reference/configuration#jira).
 
-Mechanically: the SessionStart hook `jira-env-loader.cjs` validates `.meowkit/.env` and emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing`; the wrapper `scripts/jira-as.sh` translates `MEOW_JIRA_*` -> native `JIRA_*` env per call.
-## Architecture
+The SessionStart handler `jira-env-loader.cjs` checks the environment, and `scripts/jira-as.sh` translates `MEOW_JIRA_*` into the native `JIRA_*` variables and sets `JIRA_OUTPUT=json`.
 
-The router recommends a leaf and never executes; each of the 16 leaves runs `context: fork` against its matching agent in `.claude/agents/`.
+## Shared resources
 
-```
-mk:jira (router, ≤80 lines)
-├── shared resources (used by all 16 leaves):
-│   ├── scripts/{jira-as.sh, jql-sanitize.sh, fetch-workflow.sh}
-│   ├── scripts/requirements.txt          pip deps installed by mewkit setup
-│   └── references/{install-and-auth, cli-idioms, safety-framework}.md
-└── 16 thin leaf skills
-    ├── 13 domain leaves (issue, search, lifecycle, collaborate, relationships,
-    │                     time, agile, fields, bulk, jsm, admin, dev, ops)
-    └── 3 intelligence leaves (evaluator, estimator, analyst)
-```
+| File | Purpose |
+|---|---|
+| `scripts/jira-as.sh` | Env-translating wrapper |
+| `scripts/jql-sanitize.sh` | JQL escaping for user-derived terms |
+| `scripts/requirements.txt` | pip dependencies read by `mewkit skill env jira` |
+| `references/install-and-auth.md` | Setup, exit codes, Data Center and mTLS notes |
+| `references/cli-idioms.md` | Verified `jira-as` syntax and `jq` projection rules |
+| `references/safety-framework.md` | The 4-tier safety model |
+| `references/evaluation-rubric.md` | Used by `mk:jira-evaluator` |
+| `references/estimation-guide.md` | Used by `mk:jira-estimator` |
 
-The discovered Jira workflow cache (new in 2.8.3) lands separately:
+## Handoffs
 
-```files
-tasks/jira-workflows/
-├── README.md
-├── _schemes/<PROJECT_KEY>.md — project → workflow-name mapping
-└── <workflow-slug>.md — full statuses + transitions per workflow
-```
-
-## Handoff
-
-- `mk:intake` → recommends the right `mk:jira-*` leaf based on triage
-- `mk:planning-engine` → consumes `mk:jira-evaluator` + `mk:jira-estimator` reports for capacity analysis
-- `mk:cook` Phase 3 → may invoke `mk:jira-issue` to create implementation tickets
-- `mk:ship` Phase 5 → may invoke `mk:jira-dev` for branch-name + PR description
+`mk:intake` recommends a leaf from triage. `mk:cook` may call `mk:jira-issue` to create implementation tickets. `mk:ship` may call `mk:jira-dev` for the branch name and PR body. `mk:planning-engine` uses `mk:jira-evaluator` and `mk:jira-estimator` output. `mk:confluence` is the matching router for Confluence.
 
 ## Gotchas
 
-- `mk:jira` itself never executes; if you find yourself thinking about `jira-as` commands inside this skill, you're in the wrong place — forward to a leaf.
-- **Escape hatch**: if `jira-as` is unusable (mTLS, multi-profile), invoke Atlassian MCP directly per `references/install-and-auth.md`. The router does NOT auto-fallback.
+- If you are thinking about `jira-as` commands inside this skill, forward to a leaf instead.
+- When `jira-as` is unusable (mTLS, multi-profile), the Atlassian MCP can be used directly as `references/install-and-auth.md` describes. The router does not fall back to it.

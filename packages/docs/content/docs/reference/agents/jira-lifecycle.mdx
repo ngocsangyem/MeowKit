@@ -1,6 +1,6 @@
 ---
 title: "jira-lifecycle"
-description: "Jira workflow lifecycle agent — drives transitions, assignments, resolution, and version/component management with workflow discovery."
+description: "Jira lifecycle agent. Handles transitions, assignment, resolution, versions and components."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,78 +14,22 @@ description: "Jira workflow lifecycle agent — drives transitions, assignments,
 
 {/* GENERATED:reference-facts END */}
 
-The jira-lifecycle agent drives Jira issues through their workflow — transitioning between statuses, assigning to team members, resolving, reopening, and managing versions and components. Before suggesting any transition, it discovers the actual workflow for the project rather than assuming standard status names.
+The jira-lifecycle agent is the executor for `mk:jira-lifecycle` and calls Jira through `.claude/skills/jira/scripts/jira-as.sh`.
 
-## Cognitive Framing
+It runs on `sonnet`. Tools: `Bash`, `Read`, `Grep`, `Glob`. Per-runtime model pins are on [Agent models](/guide/agent-models).
 
-> *"Workflows differ per Jira instance. Discover the real workflow before suggesting transitions."*
+## When to use
 
-The jira-lifecycle agent's most important discipline is workflow discovery. Status names and transition graphs vary significantly between Jira instances. Rather than assuming standard names like "To Do → In Progress → Done", the agent discovers the actual workflow for each project and caches it for future use.
+Use it to move an issue through its workflow, assign or resolve it, or manage versions and components.
 
-## Key Facts
+## Workflow discovery
 
-| | |
-|---|---|
-| **Type** | Domain (Jira) |
-| **Phase** | On-demand |
-| **Model** | haiku |
-| **Color** | yellow |
-| **Safety** | Tier 3 (modify), Tier 4 (version/component delete) |
-| **Never does** | Issue CRUD (jira-issue), add comments (jira-collaborate), bulk transitions (jira-bulk), assume workflow status names |
+Status names and transition graphs differ per Jira instance, so the agent reads the discovered cache before it suggests a transition: `tasks/jira-workflows/_schemes/<PROJECT_KEY>.md` (project to workflow) and `tasks/jira-workflows/<workflow-slug>.md` (statuses and transitions). If the cache is missing it runs discovery once. Discovery tries the admin path first and falls back to per-state discovery, writing a `_partial-<PROJECT>.md` marked incomplete when it gets a 403. Before executing it checks the cached transition IDs against Jira and asks you to rerun `fetch-workflow.sh` if they differ.
 
-## When to Use
+The files under `.claude/skills/jira-lifecycle/references/patterns/` show common workflow shapes for orientation. They are not your project's workflow. Protocol: `.claude/skills/jira-lifecycle/references/workflow-discovery.md`.
 
-- When you need to **transition an issue** to a different status (e.g., "In Progress" → "In Review").
-- When you need to **assign or unassign** an issue to a team member.
-- When you need to **resolve or reopen** an issue.
-- When you need to **manage versions** — create, release, or archive.
-- When you need to **manage components** — create, update, or archive.
+## Resolutions
 
-## Key Capabilities
+Many workflows need a `--resolution` for Done or Closed. If you leave it out, the agent asks which one. If `transition` fails on a required field, it names the field and offers options.
 
-- **Workflow discovery** — discovers the actual workflow for each project using `fetch-workflow.sh` and caches results. Falls back to per-state discovery on permission restrictions (403).
-- **Status transitions** — transitions by name (`--to "In Progress"`) or by ID (`--id 21`), with optional resolution and comment.
-- **Assignment management** — assigns, unassigns, and reassigns issues.
-- **Version management** — creates, releases, and archives project versions.
-- **Component management** — creates and manages project components.
-- **Cache validation** — validates cached workflow data against live Jira before execution.
-
-## Behavioral Checklist
-
-- [x] Discovers actual workflow before suggesting transitions — never assumes standard names
-- [x] Caches discovered workflows for future use
-- [x] Validates cached transitions against live Jira before execution
-- [x] Shows diff or runs `--dry-run` for all modify operations (Tier 3)
-- [x] Prefers archive over delete for versions and components (Tier 4)
-- [x] Never uses educational workflow patterns as authoritative — always prefers discovered cache
-
-## Common Use Cases
-
-| Scenario | What the agent does |
-|---|---|
-| "Move PROJ-123 to In Progress" | Discovers workflow, validates transition exists, executes with `--to "In Progress"` |
-| "Assign PROJ-123 to john.doe" | Runs assignment via `lifecycle assign` |
-| "Mark PROJ-123 as Done" | Transitions with `--to Done --resolution Fixed` |
-| "Create version v2.0.0" | Creates project version with `lifecycle version create` |
-| "Reopen PROJ-123" | Executes `lifecycle reopen` |
-
-## Pro Tips
-
-### Run Workflow Discovery Early
-
-The first transition request for a new project triggers workflow discovery, which adds latency. Running `fetch-workflow.sh` proactively for your key projects caches the workflows in advance, making subsequent transitions instant.
-
-### Prefer Archive Over Delete
-
-When removing versions or components, the agent always offers archive as the first option. Deleted versions and components cannot be recovered, but archived ones can be restored. Use delete only when archive is explicitly not desired.
-
-## Key Takeaway
-
-The jira-lifecycle agent prevents the most common transition error — using the wrong status name — by discovering the actual workflow before suggesting transitions. This discovery-first approach ensures that operations succeed on the first attempt regardless of how the Jira instance is configured.
-
-## Related Agents
-
-- **[jira-issue](/reference/agents/jira-issue)** — handles issue CRUD; jira-lifecycle handles state changes
-- **[jira-bulk](/reference/agents/jira-bulk)** — handles bulk transitions for 10+ issues
-- **[jira-collaborate](/reference/agents/jira-collaborate)** — handles comments added during transitions
-- **[jira-agile](/reference/agents/jira-agile)** — handles sprint and epic relationships
+It returns the issue key, new status, new assignee or resolution, URL and a suggested next step.

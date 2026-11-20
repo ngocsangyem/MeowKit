@@ -73,7 +73,7 @@ Installs the `mk` plugin from the MeowKit marketplace. Skills (`/mk:*`), agents 
 
 > **Codex support is an experimental projection.** On Claude Code and Codex the ship check and the credential guard run as hooks; Codex runs a new or changed hook only after the user reviews it, and the rest of the Codex projection is advisory. What each runtime enforces: `docs/core/enforcement-matrix.md`. Run `mewkit providers codex --lifecycle` to see exactly what is enforced vs advisory.
 >
-> **Codex and Cursor are projected from the one authored kit.** `mewkit init --target codex|cursor` rewrites the skills and agents under `.claude/` into the form that runtime loads (names, paths, tool words) and adds that runtime's overlay from `kit/overlays/`: hooks, rules and the always-on text, which cannot be derived. CI checks the installed result (instruction criteria, references that resolve, denied tokens, install idempotency). That is evidence the installed files are well formed, not of identical behavior across hosts.
+> **Every runtime other than Claude Code is projected from the one authored kit.** `mewkit init --target codex|cursor|grok|pi|omp` (or `all`) rewrites the skills and agents under `.claude/` into the form that runtime loads (names, paths, tool words) and adds that runtime's overlay from `kit/overlays/`: hooks, rules and the always-on text, which cannot be derived. Where the files go depends on which runtimes are installed together, because some read each other's folders. Grok, Pi and OMP install at project scope only, and their enforcement has not yet been run in a live session. CI checks the installed result (instruction criteria, references that resolve, denied tokens, install idempotency). That is evidence the installed files are well formed, not of identical behavior across hosts.
 >
 > **Validate a generated Codex project** with `mewkit validate --target codex <dir>` — a read-only post-install gate that checks the config/hook wiring, that hook wrappers exist + are executable + carry the deny contract, that agent TOMLs parse, and that installed skills declare a supported runtime and carry no host-bound tool tokens. `mewkit doctor --providers` run inside a Codex project recognizes it and points at this command.
 
@@ -115,8 +115,9 @@ mewkit doctor     # Verify environment
 
 Besides the toolchain and the installs at each scope, `doctor` reports where
 MeowKit shares a host with something else, and when a check is installed but not
-doing its job. These rows are `ok` or `warn` and never `fail`, so they change no
-exit code; add `--json` for the same rows as `{name, status, detail}`.
+doing its job. These rows are `ok` or `warn` and change no exit code, except
+`kit copies: unrecorded`, which fails; add `--json` for the same rows as
+`{name, status, detail}`.
 
 | Row | Warns when |
 | --- | --- |
@@ -124,7 +125,8 @@ exit code; add `--json` for the same rows as `{name, status, detail}`.
 | `coexistence: foreign hooks` | a hook this install does not own runs on an event it also uses. Named by executable only; arguments are not read. Every matching hook runs and a deny wins, so a foreign hook cannot override a MeowKit guard |
 | `coexistence: instruction files` | another always-on instruction source is present — a user-level instruction file, user rules, or the same rule file name at both scopes, where both copies load |
 | `coexistence: skill listing` | the skill names and descriptions every installed toolkit shares exceed the figure above which a host may start dropping descriptions. The row prints each source's count and characters so you can judge against your own context window |
-| `coexistence: cross-runtime load` | one project carries the kit for Cursor and for another runtime. Cursor also loads `.claude/` and `.codex/` by default, so both hook sets fire and every skill and agent appears twice |
+| `coexistence: cross-runtime load` | an installed runtime loads the kit's skills, agents or hooks from more than one root in this project, because it also reads another installed runtime's tree (Cursor, for one, also loads `.claude/` and `.agents/skills`). The row lists each second root with the vendor setting that stops the load, where one is documented; every matching hook runs once per copy |
+| `kit copies: unrecorded` | **fails** when a copy of a kit skill or agent that no install here recorded sits under a second root an installed runtime reads, for example `.pi/skills/mk-cook` beside `.agents/skills/mk-cook`. It loads beside the installed one and no upgrade or uninstall removes it; delete what the row lists |
 | `checks: weakened` | an observer is toggled off in a config file, `MEOWKIT_HOOK_PROFILE=fast` or the Cursor kill switch is set in the environment, or a host setting (`disableAllHooks`, `allowManagedHooksOnly`, the Codex hooks feature) stops kit hooks from running. The privacy block and the ship check cannot be switched off by config at all |
 | `guards: integrity` | an installed guard file no longer matches the bytes recorded at install, or a hook registration names a file that is not there |
 
@@ -142,7 +144,7 @@ write the files `guards: integrity` watches. It is a reference to merge by hand,
 not a file `mewkit init` installs.
 
 **What `doctor` cannot see.** It reads files, not hosts. It has no way to learn
-which version of Claude Code, Codex or Cursor you are running, so it does not
+which version of your host you are running, so it does not
 report whether your host is new enough for `privacy-block` to fail closed on a
 hook error — check your host's version yourself if that matters to you. It
 reads `allowManagedHooksOnly` and `allow_managed_hooks_only` only from the
@@ -183,7 +185,7 @@ meowkit/
 │   └── settings.json
 ├── .meowkit/memory/          Team store: decisions.md + gotchas.md (committed)
 ├── crates/                   The mewkit CLI (Rust)
-├── kit/overlays/             What only Codex or Cursor needs: hooks, rules, catalogs
+├── kit/overlays/             What one runtime needs and cannot be derived: hooks, rules, catalogs
 ├── packages/
 │   └── landing/              Landing page (meowkit.dev, Nuxt + Tailwind v4)
 ├── scripts/                  Release automation

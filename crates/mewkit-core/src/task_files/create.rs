@@ -125,7 +125,7 @@ fn template_body(task_type: TaskType, cwd: &Path, description: &str) -> String {
         None => format!(
             "\n# {description}\n\n<!-- Fill in sections from the template -->\n\n\
              ## Agent State\n\nCurrent phase: 1 — Planning\nLast action: Task file created\n\
-             Next action: Get Gate 1 approval before writing any tests or code\n\
+             Next action: Agree the plan with the user before writing any tests or code\n\
              Blockers: none\nDecisions made: none yet\n"
         ),
     }

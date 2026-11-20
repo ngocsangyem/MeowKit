@@ -1,6 +1,6 @@
 ---
 title: "mk:resolving-merge-conflicts"
-description: "Resolve an in-progress git merge or rebase conflict end to end — read state, recover each side's intent, resolve hunks, run checks, finish the merge/rebase."
+description: "Resolves a merge or rebase conflict hunk by hunk, preserving both sides' intent, and finishes only with your approval."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,65 +14,35 @@ description: "Resolve an in-progress git merge or rebase conflict end to end —
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Drives an **in-progress** git merge or rebase to a clean finish. It reads the conflict state, recovers the original intent behind each side from history and PRs, resolves every hunk (preserving both intents where compatible), runs the project's checks, and completes the merge or rebase with a commit. Two iron laws govern it: **always resolve — never `--abort`**, and **never invent new behavior**.
+Resolves a merge, rebase, cherry-pick or pull that stopped on conflicts, one hunk at a time. It keeps both sides' intent where the two are compatible and does not add features or refactor. Use it when `git status` shows unmerged paths or you say "resolve the conflicts" or "finish the rebase". It most often fires in Phase 5 (Ship) when `mk:ship` merges the base branch and hits conflicts.
 
-## When to Use
+## When not to use
 
-- `git status` shows `Unmerged paths` / "you have unmerged files"
-- A `git merge`, `git rebase`, `git cherry-pick`, or `git pull` stopped on conflicts
-- User says "resolve the conflicts", "fix this rebase", "finish the merge"
-- **NOT for:** the base-branch merge step of the full ship pipeline (see `mk:ship`); debugging a runtime bug or test failure unrelated to a conflict (see `mk:investigate` / `mk:fix`); starting a merge from scratch when nothing is in progress
-
-## Core Capabilities
-
-- **Detect operation type:** merge vs rebase (`.git/MERGE_HEAD` vs `rebase-merge`/`rebase-apply`) — the finish step differs
-- **Recover intent:** `git log --merge`, per-side history, and `gh pr`/`gh issue` lookups to understand *why* each side changed, not just the textual diff
-- **Resolve each hunk:** preserve both intents by default; on genuine incompatibility, pick the side matching the merge's stated goal and note the dropped intent; strip every conflict marker
-- **Run the project's checks:** discover then run typecheck → tests → format; fix anything the merge broke (marker-free code can still be semantically wrong)
-- **Finish:** commit (merge) or loop `git rebase --continue` until every replayed commit is applied
+If no operation is in progress, or the request is to start a merge or ship from scratch, use `mk:ship`.
 
 ## Usage
 
-```bash
-/mk:resolving-merge-conflicts          # resolve whatever merge/rebase is in progress
-```
+Run `/mk:resolving-merge-conflicts` while a merge or rebase is paused. There are no flags. Two rules always apply. Aborting (`git merge --abort`, `git rebase --abort`) needs your explicit direction, and so does completing the operation with a commit or `git rebase --continue`.
 
-## Example Prompt
+## Steps
 
-```
-I tried to rebase my branch onto main and it stopped with conflicts in three files.
-Resolve them and finish the rebase.
-```
+1. See the state. Find out whether a merge or a rebase is in progress (`.git/MERGE_HEAD`, `.git/rebase-merge`, `.git/rebase-apply`), list the files with `git diff --name-only --diff-filter=U` and read every conflicted file. During a rebase `ours` is the branch being rebased onto and `theirs` is your commit being replayed, the reverse of a merge.
+2. Find the intent behind each side with `git log --merge -p -- <file>`, and the merged PR and issue through `gh pr view` and `gh issue view`.
+3. Resolve each hunk. Combine both intents when they are compatible. When they are not, keep the side that matches the stated goal of the merge and note what was dropped. Remove every marker, check with `git grep -nE '^(<{7}|={7}|>{7})' -- <files>`, and `git add` each finished file. Do not take a whole side blindly with `-X ours` or `-X theirs`.
+4. Discover and run the project's checks (typecheck, tests, lint or format). A file with no markers can still be broken, for example when both sides renamed a function differently.
+5. Show the resolved files and check results and wait for your approval. For a merge, run `git add -A` then `git commit --no-edit`. For a rebase, run `git add -A` and `git rebase --continue`, and repeat from step 1 at each pause until `git status` reports it finished.
 
-## Workflow phases
+## Outputs
 
-1. **See the current state** — `git status`, `git diff --name-only --diff-filter=U`, detect merge vs rebase, read every conflicted hunk and which side each label marks.
-2. **Find the primary sources** — read commit messages, PR descriptions, and linked issues to recover each side's original intent.
-3. **Resolve each hunk** — preserve both intents where compatible; otherwise choose per the merge's goal and record the trade-off; remove all markers and stage each file.
-4. **Run the project's automated checks** — typecheck → tests → format; re-run until green.
-5. **Finish the merge/rebase** — stage and commit (merge), or `git rebase --continue` and repeat for each subsequent pause.
-
-## Output format
-
-```
-## Merge Conflict Resolution: {merge|rebase} of {source} into {target}
-
-**Conflicted files:** {n}
-**Resolution summary:**
-- {file}: {kept both | chose {side} because {merge goal} — dropped {discarded intent}}
-
-**Checks:** typecheck {pass/fail} · tests {pass/fail} · format {pass/fail}
-**Finished:** {commit sha | rebase complete}
-```
+A summary with the number of conflicted files, one line per file (kept both, or chose a side and what was dropped), the check results and the finish state. On a clean tree with green checks it hands back to `mk:ship` or `mk:verify`.
 
 ## Gotchas
 
-- **`ours`/`theirs` invert between merge and rebase** — during a rebase, `ours` is the upstream you are replaying onto, not your own work. Confirm direction before picking a side.
-- **Marker-free ≠ resolved** — code with no conflict markers can still be semantically broken when both sides edited the same logic differently. The step-4 checks are what prove the resolution.
-- **`git rebase --continue` pauses repeatedly** — one stop per conflicting commit. It is not done until `git status` says so.
-
-## Handoff Protocol
-
-On a clean tree with green checks → return to `mk:ship` (if mid-ship) or `mk:verify` to confirm the full build is green before continuing.
+| Situation | What to do |
+|---|---|
+| Unsure which intent should win | Show both intents and the merge goal and ask. Do not abort. |
+| Checks fail after markers are gone | The resolution is wrong. Reread both intents. |
+| A rebase keeps conflicting on the same lines | Consider `git rerere`. Never `--skip` a commit without approval. |
+| Binary file conflict | Confirm with you, then pick a version with `git checkout --ours` or `--theirs`. |

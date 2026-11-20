@@ -2,7 +2,7 @@
 //!
 //! The severity/confidence/decision vocabularies are CLOSED and match the
 //! verdict proof bundle, so a review's internal state and the artifact a human
-//! reads at Gate 2 cannot disagree about what "FAIL" or "PASS_WITH_RISK" means.
+//! reads when reviewing cannot disagree about what "FAIL" or "PASS_WITH_RISK" means.
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

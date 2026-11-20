@@ -1,7 +1,7 @@
 ---
 title: "One authored kit, projected to each runtime by adapters that place files by the set of runtimes installed"
 type: refactor
-status: approved
+status: active
 priority: high
 effort: xl
 created: 261117
@@ -34,7 +34,7 @@ blocks: []
 |---|-------|--------|--------|------------|
 | 1 | [Probe what the docs leave open](phase-01-probe-open-runtime-behaviour.md) | Done by inspection; checklist C1–C7 open | 1d | — |
 | 2 | [Runtime surface table and placement resolver](phase-02-runtime-surface-table-and-placement-resolver.md) | Done: table with sources, resolver, 63-set test, rendered page; emitters receive the placement and do not read it yet (Phase 4). Three double loads no placement removes are listed in `docs/maintainer/runtime-surface-table.md` | 3d | 1 |
-| 3 | [Projection engine, checked against the bundles](phase-03-projection-engine-checked-against-bundles.md) | In progress: skills, scripts, frontmatter, agents and overlays project for Codex and Cursor; criteria A9, A10, A11, A13 clean on both projected trees; divergence rows 1–14 decided; row 15, Cursor `.mdc` rules and rubrics wait for Phase 5 | 5d | — |
+| 3 | [Projection engine, checked against the bundles](phase-03-projection-engine-checked-against-bundles.md) | Done: the engine projects skills, scripts, frontmatter, agents and overlays, and all five projected runtimes install from it; instruction criteria clean on every installed tree (2026-11-20); divergence rows 1–14 decided. Three rows stay open in `docs/maintainer/projection-divergences.md`: Cursor helper paths (row 15), helpers the bundles did not ship, skill names in script messages | 5d | — |
 | 4 | [Codex and Cursor emitters on projection; bundles removed](phase-04-codex-cursor-on-projection-bundles-removed.md) | Done: both emitters install from projection plus overlays; `kit/bundles/` and the parity tooling are deleted; the checks read an installed tree; kit contract 2. The decision note is not written | 4d | 2, 3 |
 | 5 | [Hooks and always-on text placed once](phase-05-hooks-and-always-on-text-placed-once.md) | Done for Claude Code, Codex and Cursor; the other three with their emitters | 4d | 2, 4 |
 | 6 | [Grok, Pi and OMP emitters](phase-06-grok-pi-omp-emitters.md) | Done at project scope: six emitters; Codex, Pi and OMP share `.agents/` (neutral folder `.agents/meowkit/`, maintainer 2026-11-19). No Grok agent definitions (format undocumented); Pi and Grok not probed | 6d | 4, 5 |

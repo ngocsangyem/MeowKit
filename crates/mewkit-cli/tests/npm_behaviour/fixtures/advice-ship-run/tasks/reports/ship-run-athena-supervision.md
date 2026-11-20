@@ -13,7 +13,7 @@ escalatedToHuman: false
 
 # Supervision run ship-run
 
-This is supervision continuity, NEVER verification and never a gate approval.
+This is supervision continuity, NEVER verification and never an approval.
 
 **Latest directive:** (none yet)
 **Next safe action:** (none recorded)

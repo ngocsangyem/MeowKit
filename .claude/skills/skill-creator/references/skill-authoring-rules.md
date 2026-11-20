@@ -151,7 +151,7 @@ A skill that creates, binds, or selects external runtime resources MUST honor th
 1. **Fail closed on ambiguity.** When external-resource selection is ambiguous (multiple candidates, missing identifier), stop and ask — never guess a target.
 2. **Return stable machine-readable IDs.** For any created/bound runtime resource, surface a stable ID a downstream step can re-bind to, not a transient label.
 3. **Default-disabled without config.** External services are `default_enabled: false` unless all required env vars are present; the skill degrades gracefully (soft gate) when they are absent.
-4. **Optional artifact schema validation.** A skill that emits a gate/verdict artifact MAY declare schema validation for it.
+4. **Optional artifact schema validation.** A skill that emits a verdict artifact MAY declare schema validation for it.
 
 ## Commands vs Skills (the kit ships one surface)
 

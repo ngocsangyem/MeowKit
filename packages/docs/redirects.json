@@ -88,6 +88,42 @@
     {
       "from": "/cli/mewkit-next",
       "to": "/cli/project-setup"
+    },
+    {
+      "from": "/guide/claude-agent-models",
+      "to": "/guide/agent-models"
+    },
+    {
+      "from": "/guide/codex-agent-models",
+      "to": "/guide/agent-models"
+    },
+    {
+      "from": "/guide/cursor-agent-models",
+      "to": "/guide/agent-models"
+    },
+    {
+      "from": "/guide/harness-architecture",
+      "to": "/guides/autonomous-build"
+    },
+    {
+      "from": "/guide/middleware-layer",
+      "to": "/reference/hooks"
+    },
+    {
+      "from": "/guide/task-system",
+      "to": "/cli/planning"
+    },
+    {
+      "from": "/migration/tdd-optional",
+      "to": "/core-concepts/workflow"
+    },
+    {
+      "from": "/workflows/new-project",
+      "to": "/quick-start"
+    },
+    {
+      "from": "/core-concepts/gates",
+      "to": "/core-concepts/enforcement"
     }
   ]
 }

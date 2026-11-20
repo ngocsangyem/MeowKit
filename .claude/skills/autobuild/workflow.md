@@ -96,7 +96,7 @@ Step 3: Generate
          ↓
 Step 4: Evaluate
     ├── Invoke mk:evaluate <handoff> --rubric-preset {detected}
-    ├── Active verification gate enforced
+    ├── Active verification required (evidence checked by validate-verdict.sh)
     └── Output: tasks/reviews/{slug}-evalverdict.md + verdict (PASS|WARN|FAIL)
          ↓
 Step 5: Iterate or Ship

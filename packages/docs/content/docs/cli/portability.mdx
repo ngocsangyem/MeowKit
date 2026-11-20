@@ -1,9 +1,9 @@
 ---
 title: "Portability"
-description: "Install MeowKit for Codex or Cursor, keep those installs current, and see what each tool supports."
+description: "Install MeowKit for Codex, Cursor, Grok, Pi or OMP, keep those installs current, and see what each tool supports."
 ---
 
-MeowKit is authored for Claude Code. The `.claude/` tree is the one authored copy of the kit. Codex, Cursor, Grok, Pi and OMP each get the files they read, projected from that tree plus a small overlay for the runtime's hooks and config. You install a runtime with `mewkit init --target`.
+MeowKit is authored once, in `.claude/`. Codex, Cursor, Grok, Pi and OMP each get the files they read, projected from that tree plus a small overlay for the runtime's hooks and config. You install a runtime with `mewkit init --target`.
 
 ## Install for another runtime
 
@@ -15,7 +15,7 @@ mewkit init --target pi
 mewkit init --target omp
 ```
 
-`--target` skips the toolkit picker and creates the runtimes you name. Each install writes the runtime's skills, agents, always-on text and hooks, plus `AGENTS.md` where the runtime reads it.
+`--target` skips the picker and installs the runtimes you name, as a comma-separated list or `all`. Each install writes the runtime's skills, agents, always-on text and hooks, plus `AGENTS.md` where the runtime reads it.
 
 | Runtime | What the install writes |
 | --- | --- |
@@ -25,80 +25,80 @@ mewkit init --target omp
 | Pi | Skills under `.agents/skills/`, one extension `.pi/extensions/meowkit.ts`, and `AGENTS.md` |
 | OMP | Skills under `.agents/skills/`, agents as `.omp/agents/*.md`, the hook module `.omp/hooks/pre/meowkit.ts`, and `AGENTS.md` |
 
-Codex, Pi and OMP read the same `.agents/skills/` folder. When more than one of them is installed, they all get the same runtime-neutral skill text there. Alone, each gets its own invocation form: Codex calls a skill as `$mk-x`, and Pi and OMP as `/skill:mk-x`.
+Codex, Pi and OMP read the same `.agents/skills/` folder. When more than one of them is installed, they share one copy of the skills there, written in runtime-neutral text. Installed alone, each gets its own invocation form: Codex calls a skill as `$mk-x`, and Pi and OMP as `/skill:mk-x`. The [runtime surface table](https://github.com/ngocsangyem/MeowKit/blob/main/docs/maintainer/runtime-surface-table.md) lists where each combination of runtimes writes.
 
-Grok, Pi and OMP install into a project only. `--global` covers Claude Code, Codex and Cursor. A `--target` install does not need a `.claude/` directory. Cursor also accepts `--mcp-profiles <name>` to merge MCP profiles into `.cursor/mcp.json`. Applying a profile to a repository with a git remote also needs `--allow-cloud-mcp`.
+Grok, Pi and OMP install into a project only; `--global` covers Claude Code, Codex and Cursor. A `--target` install does not need a `.claude/` directory. `--skill-packs <packs>` limits which skills the non-Claude runtimes get. Cursor also accepts `--mcp-profiles <name>` to merge MCP profiles into `.cursor/mcp.json`, and a repository with a git remote also needs `--allow-cloud-mcp`.
 
 `--dry-run` prints what would be written without writing it.
 
 ## Keep an install current
 
-`mewkit upgrade` refreshes each installed runtime from the ledger that its install wrote. If the project also has `.claude/`, the upgrade updates that too, so the installs move together.
+`mewkit upgrade` refreshes each installed runtime from the ledger its install wrote. If the project also has `.claude/`, the upgrade updates that too, so the installs move together. `--target` limits it to some runtimes.
 
 Adding or removing a runtime with `init` or `uninstall` re-plans the runtimes already installed whose files depend on the set. Adding a runtime and then removing it leaves the same tree as a fresh install of the runtimes that stay.
 
-Some projects still carry a `.cursor/` or `.codex/` directory from the retired `migrate` command. Those directories have no ledger. `upgrade` leaves them alone and prints a notice. To switch to the projected install, run:
+A `.cursor/` or `.codex/` directory with no ledger, such as one left by the retired `migrate` command, is not touched by `upgrade`, which prints a notice instead. To switch to the projected install, run:
 
 ```bash
 mewkit init --target cursor    # or: mewkit init --target codex
 ```
 
+## Check an install
+
+`mewkit validate --target <codex|cursor|grok|pi|omp> [dir]` checks a generated install without changing it. See [validate](/cli/project-setup#validate).
+
+With more than one runtime installed, `mewkit doctor` reports two rows about overlap. `coexistence: cross-runtime load` warns when a runtime loads the kit from more than one root in the project, because it also reads another runtime's folders (Cursor also reads `.claude/` and `.agents/skills`). `kit copies: unrecorded` fails when a copy of a kit skill or agent that no install recorded sits under a second root a runtime reads, and names the copy to delete. [doctor](/cli/project-setup#doctor) has the full list of rows.
+
 ## Legacy memory
 
-No runtime install imports the memory store that older releases kept under `.claude/`. If you still need content from it, copy the parts you need into `.meowkit/memory/`.
+No runtime install imports the memory store that older releases kept under `.claude/`. To keep content from it, copy what you need into `.meowkit/memory/`.
 
 ## What each tool supports
 
-The table shows what each runtime's install writes. ✓ included · — not included.
+The table shows what each runtime's install writes.
 
 | Tool | Agents | Skills | Rules | Hooks | Config |
 | --- | :---: | :---: | :---: | :---: | :---: |
-| Codex | ✓ | ✓ | `AGENTS.md` | ✓ | ✓ |
-| Cursor | ✓ | ✓ | ✓ | ✓ | MCP profiles |
-| Grok | — | ✓ | `AGENTS.md` | ✓ | — |
-| Pi | — | ✓ | `AGENTS.md` | ✓ | — |
-| OMP | ✓ | ✓ | `AGENTS.md` | ✓ | — |
+| Codex | yes | yes | `AGENTS.md` | yes | yes |
+| Cursor | yes | yes | yes | yes | MCP profiles |
+| Grok | no | yes | `AGENTS.md` | yes | no |
+| Pi | no | yes | `AGENTS.md` | yes | no |
+| OMP | yes | yes | `AGENTS.md` | yes | no |
 
-**Notes:**
+Notes:
 
-- The installs ship the kit's own agents, skills and hooks. Your custom agents, commands and hooks in `.claude/` are not projected. Port them by hand.
-- Codex agents are written as TOML and each pins a model by its tier. Change a pin by editing the agent file or through a Codex config profile.
+- The installs ship the kit's own agents, skills and hooks. Your custom agents, commands and hooks in `.claude/` are not projected; port them by hand.
+- Codex and Cursor agents pin a model id by tier. OMP agents carry no `model`. [Agent Models](/guide/agent-models) lists the pins and how to change one.
 - Grok documents no file format for agents, so the kit writes none. Pi has no subagents, so it has no agents either.
 - Grok and Pi load project hooks only after the project is trusted: `/hooks-trust` or a start with `--trust` for Grok, `/trust` for Pi. OMP has no trust step. The [enforcement matrix](https://github.com/ngocsangyem/MeowKit/blob/main/docs/core/enforcement-matrix.md) lists what each runtime enforces. The Grok, Pi and OMP entries have not yet been run in a live session.
 
 ## providers
 
-Show provider support (level, role, surfaces). Pass a provider name to see one. With `--lifecycle`, show the capability-adapter view instead: the four support levels, repo-context acquisition tools, storage boundary, and the per-lifecycle-event matrix (which events a provider fires and which it can actually gate/deny on).
+`mewkit providers` shows what each runtime gets from the kit: support level, role and surfaces. Pass a runtime name to see one.
 
 ```bash
 mewkit providers [<provider>] [--json]
-mewkit providers --lifecycle              # event × provider matrix (proven-gate markers)
+mewkit providers --lifecycle              # event by provider matrix
 mewkit providers <provider> --lifecycle   # one provider: levels, acquisition, lifecycle, evidence
 ```
 
-| Flag          | Description                                                                                                   |
-| ------------- | ------------------------------------------------------------------------------------------------------------- |
-| `--lifecycle` | Capability-adapter view: support levels + acquisition + lifecycle-event support. A `gate` is claimed only where a runtime hook can deny/block (never for version-gated or observe-only events). |
-| `--json`      | Machine-readable output.                                                                                      |
+| Flag | Description |
+| --- | --- |
+| `--target <list>` | Runtimes to show, comma-separated |
+| `--global` | Show the home-directory projection instead of the project's |
+| `--lifecycle` | Show the capability-adapter view instead: the four support levels, how each runtime acquires repo context, the storage boundary, and which lifecycle events each runtime fires and can block. A block is claimed only where a runtime hook can deny the action, never for events that depend on the host version or observe-only events |
+| `--json` | Machine-readable output |
 
-Per-provider output also reports `--advice` supervision support. The harness and the direct
-strategy consult are tracked as **separate capabilities**: a runtime can expose one and not
-the other, so one proving out says nothing about the other. Each carries a state
-(`supported`, `degraded`, `unverified`, `unavailable`), what the state rests on, and what
-would move it up a rung.
-
-Structural evidence never produces a `supported` claim: the files existing is not the same
-as a runtime having done the thing. A capability leaves `unverified` only from a recorded
-live run. Codex additionally reports its mutation ban as `degraded (behavioral)`, because a
-Codex agent definition carries no per-agent tool field to enforce one. Claude Code and
-Cursor enforce theirs structurally.
+Per-provider output also reports `--advice` supervision support. The harness and the direct strategy consult are separate capabilities, so a runtime can expose one and not the other. Each carries a state (`supported`, `degraded`, `unverified` or `unavailable`), what the state rests on, and what would move it up. Files that exist are structural evidence only and never produce `supported`: a capability leaves `unverified` only from a recorded live run. Codex also reports its mutation ban as `degraded (behavioral)`, because a Codex agent definition has no per-agent tool field to enforce one. Claude Code and Cursor enforce theirs structurally.
 
 ## pack
 
-Manage optional capability packs layered over the base kit.
+`mewkit pack` manages optional capability packs layered over the base kit.
 
 ```bash
 mewkit pack list [--json]
-mewkit pack add <pack>… [--yes] [--beta]
-mewkit pack remove <pack>…
+mewkit pack add <pack>... [--yes] [--dry-run]
+mewkit pack remove <pack>...
 ```
+
+`--dry-run` prints the plan and writes and deletes nothing, and `--yes` skips the confirmation before deleting. `pack` takes the same kit-source flags as `init` (`--kit-version`, `--beta`, `--offline`, `--kit-archive`, `--kit-sha256`, `--allow-unverified-kit`).

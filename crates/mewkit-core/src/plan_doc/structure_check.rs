@@ -1,10 +1,10 @@
 //! Structural validation of a plan directory: `plan.md` plus every sibling
 //! `phase-*.md`. Port of `core/check-plan-structure.ts`.
 //!
-//! This is the check the planning flow runs before presenting Gate 1, which is
-//! why it lives in the CLI and not in a language the project may not have
-//! installed: a mandatory gate step that only works where an interpreter
-//! happens to exist is a gate that silently stops being mandatory.
+//! This is the check the planning flow runs before the plan is presented to the user,
+//! which is why it lives in the CLI and not in a language the project may not
+//! have installed: a mandatory step that only works where an interpreter
+//! happens to exist silently stops being mandatory.
 //!
 //! The verdict line is a stable marker — `PLAN_COMPLETE` or `PLAN_INCOMPLETE` —
 //! because callers match on it rather than on an exit code alone.

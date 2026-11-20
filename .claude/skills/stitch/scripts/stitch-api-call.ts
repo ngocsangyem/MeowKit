@@ -24,7 +24,7 @@ import path from "path";
 import os from "os";
 import { execSync } from "child_process";
 
-// ── Fail-closed key gate ──────────────────────────────────────────────────────
+// ── Fail-closed key check ──────────────────────────────────────────────────────
 // This check runs before any Stitch SDK method is called.
 // The SDK is imported above (module load) but makes no network calls at import time.
 if (!process.env.STITCH_API_KEY) {

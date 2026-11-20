@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Comprehensive deterministic validation — runs at Phase 4 review gate.
+"""Comprehensive deterministic validation — runs at Phase 4 review.
 
 Usage: python validate.py [directory]
 Requirements: Python 3.9+, no external dependencies.

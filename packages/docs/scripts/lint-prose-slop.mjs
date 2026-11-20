@@ -29,7 +29,7 @@ const HARD_TIER = new Set([
   "core-concepts/what-is-meowkit.mdx",
   "core-concepts/how-it-works.mdx",
   "core-concepts/workflow.mdx",
-  "core-concepts/gates.mdx",
+  "core-concepts/enforcement.mdx",
   "guides/build-a-feature.mdx",
   "guides/fix-a-bug.mdx",
   "guides/debug-effectively.mdx",

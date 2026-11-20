@@ -70,7 +70,7 @@ frame and before generation, REVIEW after the challenge pass and before the
 recommendation reaches the user; hard cap 4.
 
 Athena supplies decision criteria and reads the chosen direction. It never generates the
-option set, scores it, chooses for the user, or adds a gate.
+option set, scores it, chooses for the user, or adds an approval step.
 
 Without the flag there are zero calls and no state is written.
 

@@ -4,12 +4,12 @@ Before producing findings, run every candidate through this filter.
 
 **Two modes:**
 
-**Daily mode (default, `/mk:cso`):** 8/10 confidence gate. Zero noise. Only report what you're sure about.
+**Daily mode (default, `/mk:cso`):** 8/10 confidence threshold. Zero noise. Only report what you're sure about.
 - 9-10: Certain exploit path. Could write a PoC.
 - 8: Clear vulnerability pattern with known exploitation methods. Minimum bar.
 - Below 8: Do not report.
 
-**Comprehensive mode (`/cso --comprehensive`):** 2/10 confidence gate. Filter true noise only (test fixtures, documentation, placeholders) but include anything that MIGHT be a real issue. Flag these as `TENTATIVE` to distinguish from confirmed findings.
+**Comprehensive mode (`/cso --comprehensive`):** 2/10 confidence threshold. Filter true noise only (test fixtures, documentation, placeholders) but include anything that MIGHT be a real issue. Flag these as `TENTATIVE` to distinguish from confirmed findings.
 
 **Hard exclusions — automatically discard findings matching these:**
 
@@ -53,7 +53,7 @@ Before producing findings, run every candidate through this filter.
 
 **Active Verification:**
 
-For each finding that survives the confidence gate, attempt to PROVE it where safe:
+For each finding that survives the confidence threshold, attempt to PROVE it where safe:
 
 1. **Secrets:** Check if the pattern is a real key format (correct length, valid prefix). DO NOT test against live APIs.
 2. **Webhooks:** Trace handler code to verify whether signature verification exists anywhere in the middleware chain. Do NOT make HTTP requests.

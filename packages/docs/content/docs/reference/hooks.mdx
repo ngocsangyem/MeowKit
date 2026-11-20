@@ -1,121 +1,107 @@
 ---
 title: "Hooks"
-description: "MeowKit's lifecycle hooks — what they enforce, when they run."
+description: "The hooks the kit registers, what each one does, which can block, and how to switch observers off."
 sourceOfTruth: ".claude/settings.json"
-lastVerified: "2026-11-17"
+lastVerified: "2026-11-20"
 ---
 
-MeowKit uses lifecycle hooks for the few checks it enforces (the ship check, sensitive-file protection, the post-write scan) and for observers. Planning and review are not hooks; see [Enforcement & Security](/core-concepts/gates). Some hooks are registered in `.claude/settings.json` (automatic), others are invoked by skills.
+The kit ships 26 hook scripts, all Node `.cjs` modules: 4 entrypoints directly under `.claude/hooks/` and 22 observers under `.claude/hooks/handlers/`. Hooks enforce three things: the ship check, protection of sensitive files, and the post-write security scan. Everything else is an observer that records or reminds. Planning and review are workflow practices, not hooks; see [Enforcement and Security](/core-concepts/enforcement).
 
-## Registered hooks (automatic)
+## Two kinds of hook
 
-These run automatically via Claude Code's hook system:
+| Kind | Scripts | Registered | When it fails |
+| --- | --- | --- | --- |
+| Guards | `privacy-block.cjs`, `pre-ship.cjs` | Directly in `.claude/settings.json` | Closed: a crash, a syntax error or a missing library still blocks the call |
+| Observers | The 22 files in `handlers/` | Through `dispatch.cjs`, which reads `.claude/hooks/handlers.json` | Open: a handler that throws is reported and the others still run |
 
-| Hook                   | Type        | Trigger     | What it does                                                                              | Blocks?      |
-| ---------------------- | ----------- | ----------- | ----------------------------------------------------------------------------------------- | ------------ |
-| `post-write.cjs`        | PostToolUse | Edit, Write | Security scan: secrets, `any` type, SQL injection, XSS, destructive patterns              | Yes (exit 2) |
-| `learning-observer.cjs` | PostToolUse | Edit, Write | Detect churn patterns (file edited 3+ times); feeds into post-session retroactive capture | No           |
-| `post-session.cjs`      | Stop        | Session end | Record session data to `.meowkit/telemetry/`                                                 | No           |
-| `tdd-flag-detector.cjs`  | UserPromptSubmit | Prompt submit | Detects `--tdd` flag in user prompts, writes sentinel to `.meowkit/state/tdd-mode`      | No           |
-| `privacy-block.cjs`      | PreToolUse     | Read, Edit, Write, Bash | Blocks reads/writes of sensitive files (.env, keys, credentials, SSH) and SSRF-vulnerable web fetches | Yes (exit 2) |
-| `pre-ship.cjs`           | PreToolUse     | Bash         | Ship check on `git commit`, `git push`, `git merge` and `gh pr create\|merge`: lint on changed files, their related tests, and a type-check | Yes (exit 2) |
-| `project-context-loader.cjs` | SessionStart | Session start | Loads project context, directory listing, tool availability, package scripts, preferences, and agent readiness score | No           |
+`append-trace.cjs` is the fourth entrypoint. A skill runs it by path to append one record to `.meowkit/telemetry/trace-log.jsonl`. Records are scrubbed of secrets, written atomically through a lock, and the file rotates at 50 MB.
 
-## Skill-embedded hooks
+Only exit code 2 blocks a tool call. Any other exit is advisory, which is why the guards install their own top-level error handlers that exit 2 before any library loads.
 
-These are registered in SKILL.md frontmatter and run when those skills are active:
+## Guards
 
-| Hook               | Skill        | Trigger     | What it does                                      |
-| ------------------ | ------------ | ----------- | ------------------------------------------------- |
-| `check-freeze.cjs`  | mk:freeze  | Edit, Write | Block edits outside frozen directory              |
-| `check-careful.cjs` | mk:careful | Bash        | Warn on destructive commands (rm -rf, DROP TABLE) |
+| Hook | Event and matcher | What it does | Blocks |
+| --- | --- | --- | --- |
+| `privacy-block.cjs` | PreToolUse: Edit\|Write, Read, Bash | Refuses reads and writes of sensitive files (`.env`, keys, credentials, SSH) and unsafe web-fetch targets | Yes (exit 2) |
+| `pre-ship.cjs` | PreToolUse: Bash | The ship check on `git commit`, `git push`, `git merge` and `gh pr create\|merge`: team-memory lint, then lint on the changed files, their related tests and a type-check | Yes (exit 2) |
 
-## Skill-invoked scripts
+`privacy-block.cjs` also blocks when the hook itself fails (`onFailure: block`). `mewkit doctor --hard-gates` runs both guards, and the injection scanner, in a scratch project and reports which block.
 
-These run when specific skills call them:
+## Observers
 
-| Script              | Phase     | What it does                       | Blocks?                  |
-| ------------------- | --------- | ---------------------------------- | ------------------------ |
-| `pre-task-check.cjs` | Any       | Prompt injection pattern detection; findings reach the model as `additionalContext` | No (advisory) |
-| `append-trace.cjs`   | Any       | Append JSONL trace record to `.meowkit/telemetry/trace-log.jsonl` (secret-scrubbed, atomic, auto-rotates at 50MB) | No                       |
+`dispatch.cjs <Event> [Matcher]` is registered in `settings.json` for SessionStart, PreToolUse (Bash), PostToolUse (Edit|Write and Bash), Stop, UserPromptSubmit, PreCompact and PostToolUseFailure. `handlers.json` lists which handler runs on which event, and its `toggleKey` is the handler's file base name. If `handlers.json` is missing or a handler throws, `dispatch.cjs` exits 0.
 
-## Telemetry probes
+An observer with advice for the model returns it as `hookSpecificOutput.additionalContext`, which is the model-visible output on tool events. Two observers can fail a tool result: `build-verify` and `post-write` exit 2 with a block on stderr, and the edit is already saved when they do. The opt-in `pre-completion-check` answers with a block decision.
 
-These hooks are telemetry-only — they log event fires to verify Claude Code supports the corresponding hook event types. They never block and always exit 0. Replace with real handlers once event support is confirmed.
+| Observer | Event (matcher) | What it does |
+| --- | --- | --- |
+| `pre-task-check` | PreToolUse (Bash) | Reports prompt-injection patterns found in a command to the model as context. Advisory |
+| `build-verify` | PostToolUse (Edit\|Write) | Runs the compile or lint check for the file's language; results are cached by file content hash |
+| `loop-detection` | PostToolUse (Edit\|Write) | Counts edits per file and reminds the model at 4 edits, asks it to re-plan at 8, and repeats every 4 after. Never blocks |
+| `budget-tracker` | PostToolUse (Edit\|Write, Bash) | Estimates cost and prints a notice at the warn and block thresholds. The notices go to the user and stop nothing |
+| `auto-checkpoint` | PostToolUse (Edit\|Write) | Writes a checkpoint when a write touches `tasks/plans/`, `tasks/contracts/` or `tasks/reviews/` |
+| `learning-observer` | PostToolUse (Edit\|Write) | Keeps the per-file edit ledger `.meowkit/state/learning-observer.jsonl` |
+| `post-write` | PostToolUse (Edit\|Write) | Security scan of the file just written: secrets, `any` type, SQL injection, XSS, destructive patterns. A blocked pattern fails the tool result |
+| `review-evidence-tag` | PostToolUse (Bash) | When the session runs `mewkit review read --session`, records an event so `mewkit review coverage` can mark the read as seen by the session |
+| `verification-evidence` | SessionStart; PostToolUse (Bash) | Records the starting tree and the tree at each passing verification command, for the opt-in completion check. Does nothing unless that check is on |
+| `checkpoint-writer` | Stop | Writes a sequenced checkpoint with the git state |
+| `post-session` | Stop | Records cost and trace data to `.meowkit/telemetry/` |
+| `control-probe` | Stop | Logs a known-good fire, to tell an event the host does not support from a broken logger |
+| `pre-completion-check` | Stop | Opt-in. See below |
+| `model-detector` | SessionStart | Writes the detected model tier and density to `.meowkit/state/detected-model.json` and prints one status line |
+| `orientation-ritual` | SessionStart | On resume, clear or compact, runs `mewkit orient --no-record` and injects the result. When the CLI is unavailable it falls back to the last checkpoint and labels it as a fallback |
+| `project-context-loader` | SessionStart | Injects the project context and resets per-session state |
+| `jira-env-loader` | SessionStart | Reports whether the three `MEOW_JIRA_*` keys are present and never prints them. The only handler that reads `.meowkit/.env` |
+| `capability-bootstrap` | SessionStart | Emits the committed capability-resolution guidance; silent when the file is absent |
+| `safety-sentinel-inject` | UserPromptSubmit | Emits the cached-skip marker, or forces a safety-baseline re-read after compaction |
+| `tdd-flag-detector` | UserPromptSubmit | Detects `--tdd` in the prompt and writes the sentinel `.meowkit/state/tdd-mode` |
+| `precompact-probe` | PreCompact | Logs the event and appends a re-arm marker to `.meowkit/state/session-sentinels.jsonl`. Compaction drops the safety-baseline text but leaves the "verified" marker, so the marker makes the next turn re-read the baseline. Never blocks |
+| `posttoolfailure-probe` | PostToolUseFailure | Logs the event. Never blocks |
 
-| Probe                         | Event               | Purpose                                                                 |
-| ----------------------------- | ------------------- | ----------------------------------------------------------------------- |
-| `control-probe.cjs`            | Stop                | Control signal — confirms Stop event fires reliably, providing a baseline for comparing PreCompact/PostToolUseFailure probe fire rates |
-| `posttoolfailure-probe.cjs`    | PostToolUseFailure  | Logs PostToolUseFailure hook fires to verify CC supports the event      |
+### build-verify
 
-### `precompact-probe.cjs` — safety-baseline re-arm
+`build-verify` picks the check from the file extension: `ts` and `tsx` run `tsc --noEmit` and `eslint`, the JavaScript extensions (`js`, `jsx`, `mjs`, `cjs`) run `eslint`, `py` runs `ruff check` and `mypy`, `go` runs `go build ./...`, `rs` runs `cargo check`, and `rb` runs `ruby -c` and `rubocop`. On failure it exits 2 and writes a `@@BUILD_VERIFY_ERROR@@ ... @@END_BUILD_VERIFY@@` block to stderr, which Claude Code shows to the model. It skips `node_modules/`, virtualenvs, `vendor/`, `target/`, `dist/`, `build/`, `.next/`, `out/`, `tasks/`, `docs/`, `plans/`, `.claude/`, test files, and minified, map and lock files. The default timeout is 30 s (60 s for Rust, 20 s for Ruby, 15 s for JavaScript), and `buildVerify.timeoutMs` overrides it. It does nothing when `autobuild.mode` is `MINIMAL`.
 
-`precompact-probe.cjs` (PreCompact) is no longer telemetry-only. It still logs the event fire, then appends a re-arm marker to `.meowkit/state/session-sentinels.jsonl` for the active session. Compaction drops the safety-baseline rule text from context but leaves the per-session "verified" marker intact, so the re-arm marker invalidates that cached verification and the next turn re-reads the safety baseline. The cached-skip resumes only once a genuine re-read writes a newer verification. The hook never blocks (exit 0 on all paths) and no-ops when no session id is present.
+### pre-completion-check
 
-## Hook runtime profiling
+`pre-completion-check` runs on the Stop event and is off unless `hooks.pre-completion-check: true` is set. When on, a stop with files changed since the session's last passing test, build, lint or type-check run is answered with a `{"decision":"block","reason":"..."}` that Claude Code feeds back as the next turn. After two reminders the session ends with a notice. It is evidence of effort, not proof: a trivial passing command satisfies it.
 
-The `MEOWKIT_HOOK_PROFILE` environment variable controls which hooks are active. Set it in your `.env` file or shell before starting a Claude Code session.
+## Profiles
 
-| Profile    | Hooks Active                                                                | Use When                              |
-| ---------- | --------------------------------------------------------------------------- | ------------------------------------- |
-| `strict`   | All hooks                                                                   | COMPLEX tasks, security-critical work |
-| `standard` | All except `post-session.cjs`                                                | Default — everyday development        |
-| `fast`     | `privacy-block.cjs`, `pre-ship.cjs`, `project-context-loader.cjs` only | Rapid iteration, prototyping          |
+`MEOWKIT_HOOK_PROFILE` is read by three observers. Only `fast` changes behaviour; `standard` (the default) and `strict` run the same hooks.
 
-```bash
-# Set in .env or shell
-MEOWKIT_HOOK_PROFILE=fast
-```
+| Profile | Effect |
+| --- | --- |
+| `fast` | `learning-observer`, `post-session` and `pre-task-check` do nothing |
+| `standard`, `strict` | All hooks run |
 
-### Per-hook profile classification
+The guards ignore the profile. `privacy-block.cjs` and `pre-ship.cjs` run in every profile, and neither profile nor config can switch them off. `mewkit doctor` reports `MEOWKIT_HOOK_PROFILE=fast` in its `checks: weakened` row.
 
-| Hook                        | strict | standard | fast |
-| --------------------------- | :----: | :------: | :--: |
-| `privacy-block.cjs`          |   ✅   |    ✅    |  ✅  |
-| `project-context-loader.cjs` |   ✅   |    ✅    |  ✅  |
-| `post-write.cjs`             |   ✅   |    ✅    |  ❌  |
-| `pre-ship.cjs`               |   ✅   |    ✅    |  ✅  |
-| `pre-task-check.cjs`         |   ✅   |    ✅    |  ❌  |
-| `post-session.cjs`           |   ✅   |    ❌    |  ❌  |
-| `learning-observer.cjs`      |   ✅   |    ✅    |  ❌  |
+## Switching observers off
 
-<Callout title="Safety-critical hooks never skip" type="warn">
+Observer switches live in `.meowkit/config.yaml`. `hooks.<name>: false` turns one observer off, using the handler's file base name. The default is on, except `pre-completion-check`, which is off until set to `true`. The names `privacy-block`, `pre-ship`, `check-careful`, `check-freeze` and `check-report-path` are rejected in every config scope. [Configuration](/reference/configuration) lists every key.
 
-`privacy-block.cjs` and `pre-ship.cjs` are active in **all** profiles, including `fast`. They enforce sensitive file protection and the ship check, and profile selection cannot disable them.
+| Setting | Effect |
+| --- | --- |
+| `hooks.build-verify: false` | Skip `build-verify` |
+| `hooks.loop-detection: false` | Skip `loop-detection` |
+| `hooks.pre-completion-check: true` | Turn on `pre-completion-check` |
+| `autobuild.mode: MINIMAL` | Skip `build-verify` |
+| `MEOWKIT_HOOK_PROFILE=fast` | Skip `learning-observer`, `post-session` and `pre-task-check`; `pre-ship` still runs |
 
-</Callout>
+## Registration
 
-## Hook configuration
-
-Hooks are registered in `.claude/settings.json`:
+Every hook runs on Node. A registration is `command: node` plus an `args` list, so no shell parses the path. The registrations for the ship check and the dispatcher look like this:
 
 ```json
 {
   "hooks": {
-    "PostToolUse": [
+    "PreToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "Bash",
         "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/handlers/post-write.cjs \"$TOOL_INPUT_FILE_PATH\""
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/handlers/learning-observer.cjs \"$TOOL_INPUT_FILE_PATH\""
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          { "type": "command", "command": "node .claude/hooks/handlers/post-session.cjs" }
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-ship.cjs"], "timeout": 300 },
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs", "PreToolUse", "Bash"], "timeout": 10 }
         ]
       }
     ]
@@ -123,124 +109,55 @@ Hooks are registered in `.claude/settings.json`:
 }
 ```
 
-## JSON-on-stdin Convention
+Hooks read their input as JSON on stdin, through `lib/parse-stdin.cjs`. The write guards use its `readHookInput` form, which also reports why input was unreadable so the guard can refuse; observers receive the same payload from the dispatcher.
 
-All meowkit hooks read input as JSON on stdin (per [Claude Code hook docs](https://code.claude.com/docs/en/hooks)), parsed by the shared reader `lib/parse-stdin.cjs`. It returns `toolName`, `filePath`, `command`, `sessionId`, `eventName`, `transcriptPath` and the raw payload. Write guards use its `readHookInput` form, which also reports *why* input was unreadable so the guard can refuse rather than wave the call through; observers receive the same payload from the dispatcher. Hooks still honour a legacy `$1` positional argument for back-compat — both forms coexist safely.
+## Shared libraries
 
-## Shared Hook Libraries
+`.claude/hooks/lib/` holds Node modules that hooks `require()`. They are not hooks. The main ones:
 
-Node modules in `.claude/hooks/lib/`, loaded with `require()`. They are not hooks themselves.
+| Library | Purpose |
+| --- | --- |
+| `parse-stdin.cjs` | Parses the JSON on stdin and resolves a relative `tool_input.file_path` against the working directory |
+| `secret-scrub.cjs` | Redacts Anthropic, OpenAI, AWS, GitHub, GitLab, Slack, JWT and PEM secrets before a hook persists content |
+| `shared-state.cjs` | In-process state shared between handlers |
+| `checkpoint-utils.cjs` | Reads and writes checkpoint files |
+| `core/*.cjs` | The decisions the guards share across runtimes: `privacy.cjs`, `pre-ship.cjs` and `completion-check.cjs` |
 
-- `lib/parse-stdin.cjs` is the JSON-on-stdin parser. It reads all of stdin, parses it, and resolves a relative `tool_input.file_path` against the working directory.
-- `lib/secret-scrub.cjs` is the shared secret redaction. It covers Anthropic, OpenAI, AWS, GitHub, GitLab, Slack, JWT and PEM patterns, and hooks that persist content (`append-trace.cjs`) call it before writing.
+Each `lib/core` module is a pure decision. It reads the project tree, never touches stdin, stdout or the exit code, and returns `{ exit, stdout, stderr }`, where exit 2 is a block. Claude Code's guards wrap these modules, and the Codex, Cursor, Grok, Pi and OMP hook code calls the same decisions, so a change reaches every runtime that carries them.
 
-### `lib/core`
+## State files
 
-`lib/core/` holds the decisions that the write, read and shell guards share across runtimes: `privacy.cjs` (sensitive paths and unsafe fetch targets), `pre-ship.cjs` (the ship-boundary checks) and `completion-check.cjs` (the opt-in completion check). Each module is a pure decision. It reads the project tree but never touches stdin, stdout or the exit code, and returns `{ exit, stdout, stderr }`, where exit 2 is a block. Claude Code's `privacy-block.cjs` and `pre-ship.cjs` wrap these modules, and the Codex and Cursor hook files call the same code, so a change to a decision reaches every runtime that carries it.
+| File | Writer | Purpose |
+| --- | --- | --- |
+| `.meowkit/state/edit-counts.json` | `loop-detection` | Per-file edit counter, keyed `{session_id}:{realpath}` |
+| `.meowkit/state/build-verify-cache.json` | `build-verify` | File-content-hash cache for skipping unchanged files |
+| `.meowkit/state/learning-observer.jsonl` | `learning-observer` | Per-file edit ledger |
+| `.meowkit/state/tdd-mode` | `tdd-flag-detector` | Test-first sentinel |
+| `.meowkit/state/detected-model.json` | `model-detector` | Detected model tier and density |
+| `.meowkit/state/session-sentinels.jsonl` | `safety-sentinel-inject`, `precompact-probe` | Safety-baseline verification and re-arm markers |
+| `.meowkit/state/active-plan` | `mk:autobuild`, `mk:plan-creator` | Currently active plan slug |
+| `.meowkit/state/last-session-id` | `project-context-loader` | Session change detection |
 
-### Runtime parity
+## Runtime parity
 
-Codex and Cursor do not run every Claude Code hook. `.claude/hooks/hook-coverage.json` records what each safety behaviour and each handler becomes on the other two runtimes, and a test checks that every one appears there.
+The other runtimes do not run every Claude Code hook. `.claude/hooks/hook-coverage.json` records what each safety behaviour and each handler becomes on Codex, Cursor, Grok, Pi and OMP, and a test checks that each one appears there. The [enforcement matrix](https://github.com/ngocsangyem/MeowKit/blob/main/docs/core/enforcement-matrix.md) lists what each runtime enforces and what has not been run live. The Grok, Pi and OMP entries follow the vendors' documentation and have not been run in a live session.
 
-| Behavior | Claude Code | Codex | Cursor |
+| Behavior | Claude Code | Codex | Cursor | Grok | Pi | OMP |
+| --- | --- | --- | --- | --- | --- | --- |
+| Privacy block | `privacy-block.cjs` | Ported, Bash only: Codex has no file-read hook, so the decision runs on the shell command and the paths it names | Ported: `privacy-read-gate.cjs` on `beforeReadFile` | Ported: `privacy-block.cjs` on PreToolUse, every tool | Ported: `guard.cjs` through the extension's `tool_call` | Ported: `guard.cjs` through the hook module's `tool_call` |
+| Ship check | `pre-ship.cjs` | Ported: `pre-ship.cjs` on PreToolUse Bash | Ported: `pre-ship.cjs` on `beforeShellExecution` | Ported: `pre-ship.cjs` on PreToolUse Bash | Ported: inside `guard.cjs`, on a shell command | Ported: inside `guard.cjs`, on a shell command |
+| Session context | `project-context-loader` | Not ported: `AGENTS.md` carries the standing context | Equivalent: `session-context.cjs`, a short pointer to `.meowkit/` state | Not ported | Not ported | Not ported |
+
+Of the 22 observers, `hook-coverage.json` ports or maps only these off Claude Code:
+
+| Observer | Codex | Cursor | Grok, Pi, OMP |
 | --- | --- | --- | --- |
-| Privacy block | `privacy-block.cjs` | Ported, Bash only: Codex has no file-read hook, so the decision runs on the shell command and the paths it names | Ported: `privacy-read-gate.cjs` on `beforeReadFile` |
-| Ship check | `pre-ship.cjs` | Ported: `.codex/hooks/pre-ship.cjs` on `PreToolUse` Bash | Ported: `.cursor/hooks/pre-ship.cjs` on `beforeShellExecution` |
-| Session context | `project-context-loader.cjs` | Not ported: `AGENTS.md` carries the standing context | Equivalent: `session-context.cjs`, a short pointer to `.meowkit/` state |
+| `pre-completion-check` | Ported: `completion-check.cjs` on Stop | Ported: `stop-followup.cjs` sends the reason as a follow-up message | Not ported |
+| `verification-evidence` | Ported: `completion-check.cjs` on PostToolUse Bash | Ported: `completion-check.cjs` on `postToolUse` Shell | Not ported |
+| `learning-observer`, `post-session`, `precompact-probe`, `posttoolfailure-probe` | Not ported | Equivalent: `telemetry-observers.cjs` | Not ported |
+| `capability-bootstrap` | Equivalent: the text goes into `AGENTS.md` | Not ported | Not ported |
 
-Of the 21 handlers in `handlers.json`, most are Claude Code only. Cursor's `telemetry-observers.cjs` covers `learning-observer`, `post-session`, `precompact-probe` and `posttoolfailure-probe`, and its `stop-followup.cjs` stands in for `pre-completion-check` without blocking. Codex gets the `capability-bootstrap` text through `AGENTS.md` at migrate time.
-
-## Middleware Hooks
-
-### `build-verify` (handler)
-
-Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Classifies the written file by extension (`ts/tsx` → `tsc --noEmit\|eslint`; `js` → `eslint`; `py` → `ruff check\|mypy`; `go` → `go build ./...`; `rs` → `cargo check`; `rb` → `ruby -c\|rubocop`). On a failure it exits 2 and writes a `@@BUILD_VERIFY_ERROR@@ … @@END_BUILD_VERIFY@@` block to stderr, the PostToolUse form Claude Code shows to the model; the edit itself is already saved. Results cached by file content hash — unchanged files are skipped. Skips `node_modules/`, `vendor/`, `dist/`, `tasks/`, `docs/`, `.claude/`, test files, and map/lock files.
-
-- **Opt-out:** `hooks.build-verify: false`
-- **Timeout override:** `buildVerify.timeoutMs` (default 30s for TS; 35s hook registration timeout)
-- **Density:** runs in LEAN; skipped in MINIMAL (`autobuild.mode: MINIMAL`)
-- **Source:** `handlers/build-verify.cjs` (dispatched via `dispatch.cjs`)
-
-### `loop-detection` (handler)
-
-Fires on **PostToolUse Edit|Write** via `dispatch.cjs`. Counts per-file edits keyed `{session_id}:{realpath}` in `.meowkit/state/edit-counts.json`. Reminds the model at 4 edits, asks it to re-plan at 8, and repeats every 4 edits after, as `hookSpecificOutput.additionalContext` (the model-visible PostToolUse field). Never blocks.
-
-- **Opt-out:** `hooks.loop-detection: false`
-- **Timeout:** 3s
-- **Source:** `handlers/loop-detection.cjs` (dispatched via `dispatch.cjs`)
-
-### `pre-completion-check.cjs`
-
-Fires on the **Stop** event (not SubagentStop). Opt-in: it does nothing unless `hooks.pre-completion-check: true` is set. When on, a stop with files changed since the session's last passing test, build, lint or type-check run is answered with a `{"decision":"block","reason":"…"}` JSON that Claude Code feeds back as the next turn. After two reminders the session ends with a notice. This is evidence of effort, not proof: a trivial passing command satisfies it.
-
-- **Opt-in:** `hooks.pre-completion-check: true`
-- **Timeout:** 5s
-- **Source:** `.claude/hooks/handlers/pre-completion-check.cjs`
-
-## Node.js Dispatch System
-
-`dispatch.cjs` is a central Node.js dispatcher registered in `settings.json` alongside the write guards. It reads `handlers.json` at runtime and dispatches to handler modules sequentially for each event.
-
-**Usage in settings.json:**
-```
-node dispatch.cjs <EventName> [Matcher]
-```
-
-**Graceful degradation:** if `handlers.json` is missing or a handler throws, `dispatch.cjs` exits 0 — it never blocks Claude Code.
-
-**Security note:** `privacy-block.cjs` and `pre-ship.cjs` are intentionally outside the dispatcher. They stay as independent entries in `settings.json`.
-
-### Handler Modules
-
-| Handler | File | Event | Matcher | Stdin Fields Used | Output |
-|---------|------|-------|---------|-------------------|--------|
-| model-detector | `handlers/model-detector.cjs` | SessionStart | — | `model` | Writes `.meowkit/state/detected-model.json`; stdout model tier line |
-| orientation-ritual | `handlers/orientation-ritual.cjs` | SessionStart | — | — | Resumes from checkpoint if exists |
-| build-verify | `handlers/build-verify.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Runs compile/lint; cached by file hash |
-| loop-detection | `handlers/loop-detection.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Warns at 4 edits, escalates at 8 |
-| budget-tracker | `handlers/budget-tracker.cjs` | PostToolUse | Edit\|Write, Bash | `tool_input`, `tool_response` | Estimates cost; warns $30, blocks $100 |
-| auto-checkpoint | `handlers/auto-checkpoint.cjs` | PostToolUse | Edit\|Write | `tool_input.file_path` | Checkpoint every 20 calls |
-| checkpoint-writer | `handlers/checkpoint-writer.cjs` | Stop | — | — | Sequenced checkpoint with git state |
-| capability-bootstrap | `handlers/capability-bootstrap.cjs` | SessionStart | — | — | Emits the committed capability-resolution guidance; silent when the file is absent |
-| jira-env-loader | `handlers/jira-env-loader.cjs` | SessionStart | — | — | Reports whether the Jira credentials are present; never prints or exports them. The only handler that reads the project dotenv |
-| review-evidence-tag | `handlers/review-evidence-tag.cjs` | PostToolUse | Bash | `tool_input.command` | When the session runs `mewkit review read --session`, records a hook-side event so `mewkit review coverage` can mark the read as session-observed |
-| safety-sentinel-inject | `handlers/safety-sentinel-inject.cjs` | UserPromptSubmit | — | `prompt` | Emits the cached-skip marker, or forces a safety-baseline re-read after compaction |
-
-> **Note:** The memory auto-inject handlers and the prompt-prefix capture handler are all removed. Memory is read on demand by the read-set skills (one grep) and written by the write-set skills — there is no per-turn auto-injection and no hook capture.
-
-### Shared Libraries
-
-| Library | File | Purpose |
-|---------|------|---------|
-| parse-stdin | `lib/parse-stdin.cjs` | Parses Claude Code JSON-on-stdin once; `dispatch.cjs` passes result to all handlers |
-| core | `lib/core/*.cjs` | Privacy, pre-ship and completion-check decisions shared with the Codex and Cursor hooks |
-| shared-state | `lib/shared-state.cjs` | In-process state bag for cross-handler state sharing |
-| checkpoint-utils | `lib/checkpoint-utils.cjs` | Read/write checkpoint files; shared by orientation-ritual and checkpoint-writer |
-
-## State Files Table
-
-| File                                        | Writer                                           | Purpose                                                        |
-| ------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
-| `.meowkit/state/edit-counts.json`            | `handlers/loop-detection.cjs`                    | Per-file edit counter, keyed `{session_id}:{realpath}`         |
-| `.meowkit/state/build-verify-cache.json`     | `handlers/build-verify.cjs`                      | File-content-hash cache for skip-on-unchanged                  |
-| `.meowkit/state/learning-observer.jsonl`     | `learning-observer.cjs`                           | Churn pattern log                                              |
-| `.meowkit/state/active-plan`                 | `mk:autobuild`, `mk:plan-creator`              | Currently active plan slug                                      |
-| `.meowkit/state/last-session-id`             | `project-context-loader.cjs`                      | Session change detection                                       |
-
-## Bypasses
-
-Observer switches live in `.meowkit/config.yaml`. The two environment names below
-stay environment-only on purpose: `pre-ship.cjs` is a safety entrypoint and reads
-no config file, and the density override is read by the sprint-contract step.
-
-| Setting                             | Effect                                                                |
-| ----------------------------------- | --------------------------------------------------------------------- |
-| `hooks.build-verify: false`         | Skip `build-verify` handler                                            |
-| `hooks.loop-detection: false`       | Skip `loop-detection` handler                                          |
-| `hooks.pre-completion-check: true`  | Turn on `pre-completion-check.cjs` (off by default)                    |
-| `autobuild.mode: MINIMAL`           | Skip BuildVerify                                                      |
-| `MEOWKIT_HOOK_PROFILE=fast`         | Skip `post-session`, `learning-observer` (speed); `pre-ship` still runs          |
-| `MEOWKIT_AUTOBUILD_MODE=LEAN`       | Autobuild skips the sprint contract (no hook checks it)               |
+Every other observer is not ported to any runtime other than Claude Code. The `reason` for each is in `hook-coverage.json`.
 
 {/* GENERATED:reference-index START */}
 

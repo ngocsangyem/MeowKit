@@ -67,14 +67,14 @@ If 3+ fix attempts fail, STOP and question the architecture — discuss with use
 
 ## Arguments
 
-- `--auto` — Standard profile with automatic progress through diagnosis and verification. It stops at any required human gate and never self-approves.
+- `--auto` — Standard profile with automatic progress through diagnosis and verification. It stops at any step that needs the user's decision and never self-approves.
 - `--review` — Human-in-the-loop. Pause at each step.
 - `--quick` — Quick profile for a known cause and ≤2 files.
 - `--parallel` — Parallel `developer` agents per independent issue.
-- `--tdd` — Force regression test BEFORE the fix (writes the `.meowkit/state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not gated. Useful for security-sensitive fixes where you want to prove the bug first.
-- `--advice` — Opt-in strategic supervision for one run. At named checkpoints (`GUIDE → RESCUE* → REVIEW → RECHECK*`, hard cap 5) the workflow asks the `athena` agent to assess the situation, recommend an operational path inside the locked scope, and — after the work — review it against the evidence, with the power to return it for correction. Standard and deep profiles only. Supervision is evidence, never approval: it clears no gate, counts as no verification, and the three-failed-attempt human STOP below still fires on its own schedule. Without the flag, zero calls happen and no state is written. Contract: `.claude/skills/advise/references/advice-supervision-rules.md` (load it only when the flag is present).
+- `--tdd` — Force regression test BEFORE the fix (writes the `.meowkit/state/tdd-mode` sentinel). Without `--tdd`, regression tests are recommended but not required. Useful for security-sensitive fixes where you want to prove the bug first.
+- `--advice` — Opt-in strategic supervision for one run. At named checkpoints (`GUIDE → RESCUE* → REVIEW → RECHECK*`, hard cap 5) the workflow asks the `athena` agent to assess the situation, recommend an operational path inside the locked scope, and — after the work — review it against the evidence, with the power to return it for correction. Standard and deep profiles only. Supervision is evidence, never approval: it approves nothing, counts as no verification, and the three-failed-attempt human STOP below still fires on its own schedule. Without the flag, zero calls happen and no state is written. Contract: `.claude/skills/advise/references/advice-supervision-rules.md` (load it only when the flag is present).
 
-## Plan-First Gate
+## Plan First
 
 For moderate/complex bugs:
 

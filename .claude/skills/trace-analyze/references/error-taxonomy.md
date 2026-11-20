@@ -127,7 +127,7 @@ When `mk:trace-analyze` step-05 emits suggestions, each entry must include:
   suggested_file: <path to file that needs editing>
 ```
 
-The HITL gate at step-06 presents these suggestions one at a time for Approve / Modify / Reject.
+The HITL approval step at step-06 presents these suggestions one at a time for Approve / Modify / Reject.
 
 ## Adding New Patterns
 

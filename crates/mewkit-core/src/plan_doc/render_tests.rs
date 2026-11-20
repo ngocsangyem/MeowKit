@@ -1,5 +1,5 @@
 //! The progress block's arithmetic and padding. A bar that rounds differently
-//! is a visible difference on every Gate 1 presentation.
+//! is a visible difference on every plan presentation.
 use super::*;
 use crate::plan_doc::parser::{PhaseChecklist, PhaseFile, PlanSummary};
 

@@ -179,7 +179,7 @@ fn nothing_a_checkpoint_writes_can_carry_an_approval() {
     let rendered = std::fs::read_to_string(root.join("tasks/reports/run-1-athena-supervision.md"))
         .expect("the rendered record");
     assert!(
-        rendered.contains("NEVER verification and never a gate approval"),
+        rendered.contains("NEVER verification and never an approval"),
         "the artifact says what it is not"
     );
     for word in ["approval:", "approved:", "gate1:", "gate2:", "verdict:"] {

@@ -56,7 +56,7 @@ fn not_applicable_never_fails_the_build() {
 
 #[test]
 fn a_failure_fails_the_build_in_either_mode() {
-    let failed = vec![row("f", Status::Fail, Section::Gates)];
+    let failed = vec![row("f", Status::Fail, Section::Workflow)];
     assert_eq!(exit_code(&failed, false), 1);
     assert_eq!(exit_code(&failed, true), 1);
 }

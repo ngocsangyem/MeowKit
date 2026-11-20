@@ -1,6 +1,6 @@
-# Canvas-Write Boundaries (gated)
+# Canvas-Write Boundaries (conditional)
 
-> **Gate — load and run this workflow ONLY when ALL hold:**
+> **Load condition — load and run this workflow ONLY when ALL hold:**
 > 1. Explicit user request to MUTATE the Figma file (create/update/delete). Never inferred from an
 >    implement/analyze task.
 > 2. User confirms the target file is safe to modify.
@@ -10,8 +10,8 @@
 > If any condition is unconfirmed: tell the user what is missing and STOP.
 
 **Rule of Two rationale.** Default modes read untrusted Figma content without changing state (2 of 3 —
-acceptable). Canvas writes add state change on top of untrusted input, so they are opt-in behind this
-gate (per the toolkit's injection-rules Rule 11).
+acceptable). Canvas writes add state change on top of untrusted input, so they are opt-in behind these
+conditions (per the toolkit's injection-rules Rule 11).
 
 ## Contents
 

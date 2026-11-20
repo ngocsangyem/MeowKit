@@ -45,9 +45,9 @@ Invocation: `/mk:henshin [feature-or-module] [--both|--mcp|--cli] [--auto|--ask]
   (for example, “expose as MCP” → MCP; “publish as CLI” → CLI). If the user only
   says “agentize” or requests multiple surfaces ambiguously, ask which single
   surface they want; never default to `--both`.
-- `--auto` records technical choices, but still gates package name, license, and
+- `--auto` records technical choices, but still asks the user for package name, license, and
   ownership. `--ask` runs the decision interview. `--lean` skips only background
-  research; scout and the human approval gate remain required. Interaction remains
+  research; scout and the human approval step remain required. Interaction remains
   `--auto` by default when neither interaction flag is supplied.
 
 ## Intent-to-reference routes
@@ -58,7 +58,7 @@ Invocation: `/mk:henshin [feature-or-module] [--both|--mcp|--cli] [--auto|--ask]
 | Capability selection, workflow-shaped tools, tool/CLI contracts | `references/agent-centric-design.md` |
 | Credential resolution and redaction decision | `references/auth-resolution-chain.md` |
 | MCP transport, session, auth, deployment decision | `references/mcp-transports.md` |
-| `--ask` interview or the non-bypassable decision gate | `references/challenge-framework.md` |
+| `--ask` interview or the non-bypassable decision step | `references/challenge-framework.md` |
 | `--both` or a requested package tree | `references/monorepo-layout.md` |
 
 Load only references required by the selected surface and the current decision.
@@ -69,7 +69,7 @@ manual applies only when a multi-package layout is actually selected.
 
 Do not write source code or chain to implementation skills mid-flow. Produce the
 spec in conversation, write the corresponding architecture decision only after its
-human approval, then hand off. The hard gate on capability selection, credentials,
+human approval, then hand off. The hard stop on capability selection, credentials,
 package name, license, ownership, and deployment preference is never bypassed.
 
 If the target is empty, the core cannot be extracted, or it has fewer than five

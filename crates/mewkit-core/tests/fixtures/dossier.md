@@ -13,7 +13,7 @@ escalatedToHuman: false
 
 # Supervision run run-261112-090000-abcd
 
-This is supervision continuity, NEVER verification and never a gate approval.
+This is supervision continuity, NEVER verification and never an approval.
 
 **Latest directive:** port the memory scan before the verbs
 **Next safe action:** run the differential corpus

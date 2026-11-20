@@ -1,33 +1,28 @@
 ---
 title: "Review"
-description: "Run a resumable multi-pass review, and check a verdict."
+description: "Run a resumable multi-stage pull-request review."
 ---
 
-Review is a sequence of steps with a session id rather than one long command, so a review of a large change can be picked up where it stopped.
+`mewkit review` runs a pull-request review as six steps that share a session id, so a review of a large change can stop and resume across sittings. Nothing in it approves a change: `compose` produces a recommendation and a proof bundle for a person to read.
 
 ## review
 
-Drive a multi-pass pull-request review as a sequence of resumable steps, so a long review
-survives a lost session.
-
 ```bash
 mewkit review prepare <target> [--remote <name>] [--json]
-mewkit review read <target> --session <id> --as <persona>
+mewkit review read <path> --session <id> --as <reviewer>
 mewkit review coverage --session <id> [--json]
 mewkit review compose --session <id> [--json]
-mewkit review submit --session <id> [--reply] [--confirm <value>] [--json]
+mewkit review submit --session <id> [--reply] [--confirm <token>] [--json]
 mewkit review cleanup --session <id> [--json]
 ```
 
 | Subcommand | What it does |
 | --- | --- |
-| `prepare` | Fetch the target and open a review session |
-| `read` | Read the diff as one named persona |
-| `coverage` | Report which files and personas have been covered so far |
-| `compose` | Assemble the collected findings into a single review |
-| `submit` | Post the review; `--confirm` guards the irreversible step |
-| `cleanup` | Close the session and remove its working state |
+| `prepare` | Captures the diff of one pull request, bound to its commit SHA, in an isolated worktree, and opens a session. `<target>` is a PR URL, `owner/repo#n` or a number. The PR's title, body, comments and CI text are stored apart from the code as untrusted data |
+| `read` | Records a receipt that the named reviewer opened one assigned artifact |
+| `coverage` | Compares the roster of assigned artifacts with the receipts and reports what is still unread |
+| `compose` | Builds the review from the findings and applies the cap table. It refuses to run until coverage is complete |
+| `submit` | Posts the review to GitHub. This is the only GitHub write, and it needs `--reply` and the `--confirm` token that is bound to the composed payload |
+| `cleanup` | Closes the session and returns the worktree to the action recorded for it |
 
-Every subcommand after `prepare` takes the `--session` id that `prepare` returned. That id is
-the whole point: reviewing a large PR across several sittings does not restart from nothing.
-
+Every subcommand after `prepare` takes the `--session` id that `prepare` printed. `--json` prints JSON instead of a summary line.

@@ -1,100 +1,71 @@
 ---
 title: "Build a Feature"
-description: "Step-by-step guide to building features with /mk:cook, from plan to ship."
+description: "Build a feature with /mk:cook, from plan to PR: modes, what each phase does, and where you step in."
 ---
 
-`/mk:cook` is the primary workflow for building features. It runs the full 7-phase pipeline: you describe what you want, and MeowKit handles planning, testing, building, reviewing, and shipping.
-
-## Quick start
+`/mk:cook` is the main workflow for building a feature. You describe what you want, and it runs the phases from orientation to reflection: plan, optional tests, build, simplify, verify, review, ship.
 
 ```bash
 /mk:cook add user authentication with JWT
 ```
 
-That's it. MeowKit detects your intent, creates a plan, and walks through each phase. You agree the plan and read the review verdict; neither is an enforced gate.
+Cook classifies the task, declares a model tier and writes a plan under `tasks/plans/YYMMDD-name/`. You agree the plan before code is written, and you read the review verdict before you ship. Neither is enforced by a hook. They are the two points where the workflow asks for you.
 
-## Common workflows
-
-### From a natural language description
+## Modes
 
 ```bash
-/mk:cook add pagination to the user list API
+/mk:cook add pagination to the user list API          # default: plan, build, verify, review
+/mk:cook tasks/plans/260501-pagination/plan.md        # run an existing plan, no planning
+/mk:cook build payment processor --tdd                # failing tests first
+/mk:cook add login form --fast                        # skip research, keep a plan
+/mk:cook implement checkout system --parallel         # up to 3 agents in git worktrees
+/mk:cook update the README --no-test                  # skip the test phase
 ```
-
-MeowKit classifies the task, selects the right model tier, and creates a plan. You review and approve the plan before any code is written.
-
-### From an existing plan file
-
-```bash
-/mk:cook tasks/plans/260501-pagination/plan.md
-```
-
-Skips the planning phase. The plan should already be agreed with you.
-
-### With TDD
-
-```bash
-/mk:cook build payment processor --tdd
-```
-
-Failing tests are written before implementation. The developer cannot write code until tests exist and fail. Use `--tdd` for production-critical features.
-
-### Fast mode
-
-```bash
-/mk:cook add login form --fast
-```
-
-Skips research. The planner still creates a plan, but without deep codebase analysis. Good for well-understood features with clear scope.
-
-### Parallel mode
-
-```bash
-/mk:cook implement checkout system --parallel
-```
-
-Spawns up to 3 agents in isolated git worktrees for independent subtasks. Use when the plan has clearly independent components.
-
-## What happens at each phase
-
-| Phase | What you see | What you do |
-|-------|-------------|------------|
-| 0. Orient | Task classified, model tier declared | Nothing, it is automatic |
-| 1. Plan | Plan created with acceptance criteria | **Agree the plan** |
-| 2. Test | Tests written from acceptance criteria | Review test coverage |
-| 3. Build | Implementation proceeds | Watch for self-healing attempts |
-| 4. Review | 5-dimension audit with verdict | **Read the verdict** |
-| 5. Ship | PR created, CI triggered | Merge when CI passes |
-| 6. Reflect | Patterns captured to memory | Nothing, it is automatic |
-
-## Choosing the right mode
 
 | Situation | Mode |
-|-----------|------|
-| New feature, clear scope | Default: `/mk:cook "description"` |
-| Production-critical feature | `--tdd` for strict test-first discipline |
-| Well-understood feature | `--fast` to skip research |
-| Feature with independent parts | `--parallel` for parallel agents |
-| Feature from existing plan | Pass the plan path directly |
-| Docs-only change | `--no-test` to skip Phase 2 |
+|---|---|
+| New feature, clear scope | Default |
+| Production-critical feature | `--tdd` |
+| Well-understood feature | `--fast` |
+| Plan has independent parts | `--parallel` |
+| Plan already agreed | Pass the plan path |
+| Docs-only change | `--no-test` |
+
+`--tdd` (or `MEOWKIT_TDD=1`) is opt-in. In TDD mode the developer writes failing tests before implementation, and the tester owns the red phase. The order is a workflow rule, and no hook checks it. Without `--tdd`, Phase 2 is optional. `--no-test` combined with `--tdd` is invalid.
+
+Add `--verify` for a light browser check after review, or `--strict` for a full evaluator pass that sends a FAIL back to the build phase. Use `--strict` for security-critical or payment features.
+
+## What happens in each phase
+
+| Phase | What you see | What you do |
+|---|---|---|
+| 0. Orient | Task classified, model tier declared | Nothing |
+| 1. Plan | A plan with acceptance criteria | Agree the plan |
+| 2. Test | Tests from the acceptance criteria (red in TDD mode) | Check coverage |
+| 3. Build | Implementation, then simplify and verify (build, lint, tests, coverage) | Watch for self-healing attempts |
+| 4. Review | A five-dimension verdict | Read the verdict |
+| 5. Ship | A PR | Merge when CI passes |
+| 6. Reflect | Docs and plan synced, one memory entry if there is a lesson | Ask for it after you ship or close the run |
+
+Phase 6 does not run on its own after the verdict. It runs after shipping, or when you ask to close the run without shipping.
 
 ## Gotchas
 
-- **Simple features grow.** Always let MeowKit create a plan. A "simple" feature that touches three files needs one.
-- **`--auto` does not replace your read of the verdict.** The flag fixes issues, but you still decide whether to ship.
-- **Long sessions lose context.** The plan's Agent State section auto-updates, so read it if you resume mid-build.
+- A feature that looks simple and touches three files still needs a plan. Let cook write it.
+- `--auto` fixes issues and runs through without pausing, so no one reads the verdict as it is written. Read it before you ship.
+- Long builds lose context. After each plan phase, cook updates the Agent State block in `plan.md`, so read it when you resume.
 
 ## When it goes wrong
 
 | What you see | Why | What to do |
-|-------|-------|-----|
-| The plan is far broader than you meant | The description left the scope open | Narrow it: "cart for the product page", not "cart" |
-| Tests only cover the happy path | The tester read the acceptance criteria literally | Ask for the edge cases you care about: zero quantity, maximum quantity |
-| The developer self-heals three times, then escalates | The tests expect a different approach than the implementation took | Decide which is wrong, the plan or the tests, and fix that one rather than the symptom |
-| Review FAILs on security | Hardcoded values or an unsafe pattern | Fix the findings; the review re-runs automatically |
+|---|---|---|
+| The plan is far broader than you meant | The description left scope open | Narrow it: "cart for the product page", not "cart" |
+| Tests cover only the happy path | The tester read the criteria literally | Ask for the cases you care about, such as zero or maximum quantity |
+| The developer self-heals three times, then escalates | The tests and the implementation disagree | Decide whether the plan or the tests are wrong and fix that one |
+| Review FAILs on security | A hardcoded value or unsafe pattern | Fix the findings and re-run the review |
 
 ## Next steps
 
-- [Fix a bug](/guides/fix-a-bug): structured debugging with `/mk:fix`
-- [Autonomous builds](/guides/autonomous-build): green-field products with `/mk:autobuild`
-- [Understand the workflow](/core-concepts/workflow): the 7-phase pipeline in detail
+- [Fix a bug](/guides/fix-a-bug) for `/mk:fix`
+- [Autonomous builds](/guides/autonomous-build) for green-field products
+- [The workflow](/core-concepts/workflow) for the phases in detail

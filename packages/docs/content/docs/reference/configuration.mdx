@@ -1,45 +1,33 @@
 ---
 title: "Configuration"
-description: "All MeowKit configuration options across the always-on rules, settings.json, and config files."
+description: "Every MeowKit setting: the always-on rules, the project config file, hook registrations, the dotenv file and environment variables."
 sourceOfTruth: ".meowkit/.env.example"
-lastVerified: "2026-11-17"
+lastVerified: "2026-11-20"
 ---
 
-MeowKit is configured through several files:
+MeowKit reads settings from these places:
+
+| Place | Holds | Committed |
+| --- | --- | --- |
+| `.claude/rules/` | The six always-on rules | Yes |
+| `.meowkit/config.yaml` | Project settings: TDD, budget, density, hook switches | Yes |
+| `.claude/settings.json` | Hook registrations | Yes |
+| `.meowkit/.env` | API keys and personal overrides | No |
+| Shell environment | A few overrides and per-run values | No |
 
 ## .claude/rules/
 
-The 6 always-on rules Claude Code auto-loads at session start. `meowkit-core.md` carries the
-role, the 7-phase workflow, the ship check in brief, the DATA/INSTRUCTIONS boundary, the memory
-contract and the compaction policy; the other five are `security-rules.md`,
-`injection-rules.md`, `core-behaviors.md`, `development-rules.md` and
-`agent-conduct.md`. Everything else loads just in time from the owning skill's `references/`
-(see [Rules Index](/reference/rules-index)).
+`.claude/rules/` holds the six rules Claude Code loads at session start: `meowkit-core.md`, `security-rules.md`, `injection-rules.md`, `core-behaviors.md`, `development-rules.md` and `agent-conduct.md`. `meowkit-core.md` carries the role, the workflow, the ship check in brief, the boundary between data and instructions, the memory contract and the compaction policy. All other rules load from the `references/` folder of the skill that owns them ([Rules Index](/reference/rules-index) maps each one).
 
-MeowKit installs no root `CLAUDE.md`. A project may keep its own; it is project-owned and
-never installed, refreshed or overwritten by the kit.
-
-**Customize:** project-specific conventions belong in your own `CLAUDE.md` or in
-`docs/project-context.md`, not in the kit's rule files — `mewkit upgrade` refreshes those.
-**Do not modify:** security rules, the injection boundary.
+MeowKit installs no root `CLAUDE.md`. A project may keep its own, and the kit never installs, refreshes or overwrites it. Put project conventions in your own `CLAUDE.md` or in `docs/project-context.md`, because `mewkit upgrade` refreshes the kit's rule files. Do not edit the security and injection rules.
 
 ## .meowkit/config.yaml
 
-Project configuration. It sits in `.meowkit/` with the rest of the project's own state, rather
-than in a provider directory. `.claude/settings.json` stays under `.claude/` because Claude Code
-is what reads it. The kit ships `config.yaml` with every setting commented out, so the committed
-file lists only the choices your project makes. An unknown key is an error, and there is no
-`gates.` or `paths.` key, because a safety check is not a preference.
+The project config lives in `.meowkit/` with the project's other MeowKit state. The kit ships it with every setting commented out, so the committed file lists only the choices your project makes. The file has two levels of keys with boolean, whole-number or string values. An unknown key is an error, and there is no `gates.` or `paths.` key at any scope.
 
-Commit this file, and commit `memory/*.md` — the team memory store is reviewed in the PR diff.
-The other `.meowkit/` subdirectories (`telemetry/`, `state/`, `cache/`) are machine-written and
-belong in `.gitignore`.
+Resolution order for a key is: environment override (only `MEOWKIT_TDD`), then project config, then user config (`~/.meowkit/config.yaml`), then the default.
 
-`.meowkit/cache/` is the project's ONE cache of kit bytes: the kit content the install laid down.
-There is no second cache and nothing under `$HOME`. The cache's trust property is that it is untracked,
-so a pull request can neither introduce nor alter it, and `uninstall` and `doctor --adopt` depend on
-that. To install from a kit zip you already have, pass it to `mewkit init --kit-archive`
-(see [Installation](/installation)).
+Commit this file and `.meowkit/memory/*.md`, since the team memory store is reviewed in the PR diff. The other `.meowkit/` subdirectories (`telemetry/`, `state/`, `cache/`) are machine-written and stay out of git.
 
 ```yaml
 # .meowkit/config.yaml
@@ -53,188 +41,113 @@ hooks:
   build-verify: false   # switch one observer off
 ```
 
-A config that still has the old `features` block (`costTracking`, `memory`, `tdd`) is migrated:
-`features.costTracking` becomes `hooks.budget-tracker`, `features.memory` becomes
-`hooks.learning-observer`, and `features.tdd` becomes `tdd`.
+### Keys
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `tdd` | `false` | Strict test-first mode. `MEOWKIT_TDD` in the environment outranks it |
+| `autobuild.mode` | auto-detected | Scaffolding density for `mk:autobuild`: `MINIMAL`, `FULL` or `LEAN`. It sets scaffolding only. `LEAN` makes the sprint contract optional, and the ship check runs in every mode. `MEOWKIT_AUTOBUILD_MODE` in the environment is also read |
+| `budget.warn` | `30` | USD at which the first cost notice prints |
+| `budget.block` | `100` | USD at which the over-budget notice prints. Advisory: nothing is stopped |
+| `budget.cap` | none | Overrides `budget.block`, lower or higher |
+| `buildVerify.timeoutMs` | per language | Timeout for each `build-verify` command, in milliseconds |
+| `projectContext.maxBytes` | `12288` | Size above which the project-context file warns; `0` disables the warning |
+| `workflow.telemetry` | `off` | `off`, `community` or `anonymous` |
+| `workflow.proactive` | none | Whether skills volunteer suggestions |
+| `hooks.<name>` | `true` | `false` switches one observer off; see below |
+
+### Hook switches
+
+`hooks.<name>: false` turns one observer off. The name is the handler's file base name (`build-verify`, `loop-detection`, `post-write`, `learning-observer`, `tdd-flag-detector` and the rest of the 22 listed in [Hooks](/reference/hooks)). The default is `true`, except `hooks.pre-completion-check`, which is off until you set it to `true`. These names are rejected in every config scope, and their hooks keep running: `privacy-block`, `pre-ship`, `check-careful`, `check-freeze` and `check-report-path`.
 
 ### Model routing
 
-Model routing is **per agent**, not a central config block — mirroring how each coding
-agent selects its own model:
-
-- **Claude Code** — each `.claude/agents/*.md` declares a `model:` in frontmatter (`opus`, `sonnet`, `haiku`, `fable`, or `inherit`).
-- **Codex** — each authored agent TOML (`.codex/agents/*.toml`) carries `model_reasoning_effort`, derived from the source Claude tier (opus/fable → `xhigh`, sonnet → `high`, haiku → `medium`; `inherit` agents omit it and inherit Codex's default). `model` is left unset because Codex model ids are deployment-specific — pin one by editing the agent TOML or via a Codex [config profile](https://learn.chatgpt.com/docs/config-file/config-sample).
-
-There is no `modelRouting` config key. MeowKit never hardcodes target model IDs.
+Model routing is set per agent, not in a config block. Each `.claude/agents/*.md` declares a `model:` of `opus`, `sonnet`, `haiku`, `fable` or `inherit`. For Codex and Cursor, `mewkit init` writes a concrete model id for each tier into the agent file. Grok and OMP agent prompts carry no `model`, and Pi has no subagents. [Agent Models](/guide/agent-models) lists the mapping and how to change a pin. There is no `modelRouting` key.
 
 ## .claude/settings.json
 
-Hook registrations and permission allowlists. See [Hooks](/reference/hooks) for details.
+`settings.json` holds the hook registrations and the `CLAUDE_CODE_FORK_SUBAGENT=1` entry in its `env` block. That variable makes the `mk:jira-*` skills fork into their matching agents; leave it set. [Hooks](/reference/hooks) describes each registration. Every hook runs as `command: node` with an `args` list, so no shell parses the path.
 
-### Hook registrations
+## .meowkit/.env [#dotenv]
 
-Every hook runs on Node. Each registration is `command: node` plus an `args` list, so no shell parses the path:
+`.meowkit/.env` holds project-level secrets such as API keys, without touching your shell profile. No shell sources it and hooks do not load it. Only `jira-env-loader` (SessionStart) reads it, through `lib/load-dotenv.cjs`, and it only checks that the three `MEOW_JIRA_*` keys are present. The Jira wrapper script and the `mk:multimodal` Python scripts read the file themselves.
 
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          { "type": "command", "command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-ship.cjs"] }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          { "type": "command", "command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs", "PreToolUse", "Bash"] }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          { "type": "command", "command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/dispatch.cjs", "PostToolUse", "Edit|Write"] }
-        ]
-      }
-    ]
-  }
-}
-```
+A variable already in the environment wins: the loader adds only keys that are not set, so `export VAR=x` overrides `.env` for a session. It refuses keys that change how a process launches (`PATH`, `LD_PRELOAD`, `BASH_ENV` and similar).
 
-The guards (`privacy-block.cjs`, `pre-ship.cjs`) are registered
-directly, so a dispatcher failure cannot skip them. The observers go through `dispatch.cjs`,
-which `settings.json` registers for `SessionStart`, `PreToolUse` (Bash), `PostToolUse`
-(Edit|Write and Bash), `Stop`, `UserPromptSubmit`, `PreCompact` and `PostToolUseFailure`.
-`.claude/hooks/handlers.json` lists which handler runs on which event, and
-`post-write.cjs` (the security scan) is one of those handlers.
-
-### Environment variables
-
-See [Environment Variables](#environment-variables) below for the complete reference.
-
-## .meowkit/.env File [#dotenv]
-
-`.meowkit/.env` holds project-level secrets and overrides, such as API keys, without touching your shell profile. It is not loaded into every hook. Hooks run as separate Node processes and no shell sources the file. Only `jira-env-loader.cjs` (SessionStart) reads it, through `.claude/hooks/lib/load-dotenv.cjs`, and it only checks that the three `MEOW_JIRA_*` keys are present; it never prints or exports them. The Jira wrapper script and the `mk:multimodal` Python scripts each read the file themselves.
-
-**Precedence:** a variable already in the environment wins. The loader adds only keys that are not set, so `export VAR=x` overrides `.env` for a session. It also refuses keys that change how a process launches (`PATH`, `LD_PRELOAD`, `BASH_ENV` and similar).
-
-**Setup:**
 ```bash
 cp .meowkit/.env.example .meowkit/.env
-# Edit .meowkit/.env with your values
+# edit .meowkit/.env with your values
 ```
 
-**Security:** `.env` is gitignored by default. Never commit API keys. The `privacy-block.cjs` hook blocks Claude from reading `.env` files directly.
+`.env` is gitignored by default, and the `privacy-block.cjs` hook blocks the agent from reading it. `.meowkit/.env.example` lists every supported variable with a description.
 
-**Template:** See `.meowkit/.env.example` for all supported variables with descriptions.
+## Environment variables
 
-## Rules
+Set these in your shell profile or per session with `export`.
 
-`.claude/rules/` holds seven always-on files, listed in the first section of this page. They are
-all that loads at session start. The rest of what used to be rule files (harness, rubric, TDD,
-model selection, scale routing and so on) now lives in the `references/` folder of the skill that
-owns it and loads when that skill runs. [Rules Index](/reference/rules-index) maps each one.
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `MEOWKIT_TDD` | off | Strict test-first mode. Truthy values: `1`, `true`, `yes`, `on`, `enable`, `enabled` (any case). Falsy values: `0`, `false`, `no`, `off`, `disable`, `disabled`. An unrecognized value is ignored with a warning. It outranks `tdd` in the config and the `--tdd` prompt flag |
+| `MEOWKIT_MODEL_HINT` | none | Model id used for tier detection when SessionStart input has no `model` field. Needed only when `model-detector` reports "not detected" |
+| `MEOWKIT_HOOK_PROFILE` | `standard` | `fast` makes `learning-observer`, `post-session` and `pre-task-check` do nothing. `standard` and `strict` behave the same. The legacy alias `MEOW_HOOK_PROFILE` still works, and the new name wins when both are set |
+| `MEOWKIT_AUTOBUILD_MODE` | none | Density override for `mk:autobuild`: `MINIMAL`, `FULL` or `LEAN`. Also settable as `autobuild.mode` |
+| `MEOWKIT_RUN_ID` | none | A per-run id set by `mk:autobuild` and read by the trace log |
+| `MEOWKIT_PM_AUTO` | on | `off` stops the project-manager agent from running silently after a phase; `/mk:status` still works |
+| `MEOWKIT_SKIP_SAFETY_SENTINEL` | `on` | `off` makes every turn re-read the safety baseline instead of using the cached-verification marker |
+| `HOOK_SESSION_ID` | none | The session id that `mewkit budget --session` reads first, before `.meowkit/state/last-session-id` |
 
-## Environment Variables
-
-All `MEOWKIT_*` env vars. Set in your shell profile (`~/.zshrc`, `~/.bashrc`) or per-session via `export`.
-
-### Core
-
-| Variable | Default | Purpose | When to use |
-|----------|---------|---------|-------------|
-| `MEOWKIT_TDD` | `off` | Enable strict TDD enforcement (failing test first). Values: `1`, `true`, `on`, `enabled` | Production-quality code, payment/auth features. Opt-in — most users leave this off. |
-| `MEOWKIT_MODEL_HINT` | *(none)* | Fallback model ID for tier detection when SessionStart stdin lacks `model` field | Only if `model-detector.cjs` shows "not detected". Most users don't need this — stdin auto-detection is primary since v2.3.0. |
-| `MEOWKIT_HOOK_PROFILE` | `standard` | Hook execution profile. `standard` = normal, `fast` = skip non-critical hooks (post-session, learning-observer, pre-ship), `strict` = all hooks enabled. Legacy alias `MEOW_HOOK_PROFILE` still works; the new name wins when both are set | `fast` for rapid iteration/spike work. `strict` for production sessions needing the full hook chain. |
-| `CLAUDE_CODE_FORK_SUBAGENT` | `1` (set in `settings.json` `env` block by default since v2.8.3) | Enables Claude Code's `context: fork` semantics so the 16 `mk:jira-*` thin skills fork into their matching agents. | Leave default. Unset only when explicitly debugging fork-mode behavior. |
+The settings that older releases read from `MEOWKIT_*` variables (budget thresholds, hook switches, the project-context size, `MEOWKIT_GATE1_PRESENCE_ONLY` and others) are read from nowhere now. `mewkit doctor` reports any of those names still exported in your shell and names the config key that replaced it, when there is one.
 
 ### Jira
 
-The `mk:jira-*` family (router + 16 leaves added in v2.8.3) is driven by three `MEOW_JIRA_*` env vars in `.meowkit/.env` (gitignored). The wrapper script `.claude/skills/jira/scripts/jira-as.sh` translates them to `jira-as`'s native `JIRA_*` names per call.
+The `mk:jira-*` skills (a router and 16 leaves) use three variables in `.meowkit/.env`. The wrapper `.claude/skills/jira/scripts/jira-as.sh` translates them into the `JIRA_*` names that `jira-as` reads. They keep the `MEOW_` prefix on purpose.
 
-> **Naming exception**: these vars use the legacy `MEOW_*` prefix (one-off exception to the modern `MEOWKIT_*` convention) per migration directive. The upstream `JIRA-Assistant-Skills` README also mentions `JIRA_PROFILE` — that is a plugin-layer concern, NOT consumed by `jira-as` or `mk:jira`.
+| Variable | Purpose |
+| --- | --- |
+| `MEOW_JIRA_API_TOKEN` | Atlassian Cloud API token, from [id.atlassian.com](https://id.atlassian.com/manage-profile/security/api-tokens). Required |
+| `MEOW_JIRA_EMAIL` | Atlassian account email. Required |
+| `MEOW_JIRA_SITE_URL` | For example `https://your-company.atlassian.net`. Required |
+| `JIRA_OUTPUT` | Output format for `jira-as`; the wrapper sets `json`. Override per call with `JIRA_OUTPUT=text bash .claude/skills/jira/scripts/jira-as.sh ...` |
+| `JIRA_MOCK_MODE` | When `true`, agents mark their output `**[MOCK MODE]**` and the intelligence agents avoid live writes. For sandbox and CI use |
 
-| Variable | Default | Purpose | Where to set |
-|----------|---------|---------|--------------|
-| `MEOW_JIRA_API_TOKEN` | *(required)* | Atlassian Cloud API token. Get from [https://id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens). | `.meowkit/.env` |
-| `MEOW_JIRA_EMAIL` | *(required)* | Atlassian account email. | `.meowkit/.env` |
-| `MEOW_JIRA_SITE_URL` | *(required)* | e.g. `https://your-company.atlassian.net`. | `.meowkit/.env` |
-| `JIRA_OUTPUT` | `json` (set by wrapper) | Default output format for `jira-as`. | Override per-call: `JIRA_OUTPUT=text bash .claude/skills/jira/scripts/jira-as.sh ...` |
-| `JIRA_MOCK_MODE` | *(unset)* | When set to `true`, agents surface `**[MOCK MODE]**` in output headers; intelligence agents avoid live writes. | Sandbox / CI testing. |
-
-The SessionStart hook `jira-env-loader.cjs` validates `.meowkit/.env` presence + the 3 required keys. It emits `[mk:jira] env OK` / `[mk:jira] <KEY> missing` to the status line.
-
-**Setup (one-time):**
+At session start `jira-env-loader` prints `[mk:jira] env OK` or `[mk:jira] <KEY> missing`. To set up:
 
 ```bash
-mewkit setup               # auto-installs jira-as into .meowkit/envs/jira/
+mewkit setup               # installs jira-as into .meowkit/envs/jira/
 cp .meowkit/.env.example .meowkit/.env
 # edit MEOW_JIRA_API_TOKEN, MEOW_JIRA_EMAIL, MEOW_JIRA_SITE_URL
 ```
 
-### Harness (Autonomous Build Pipeline)
+### Media keys
 
-These are keys in `.meowkit/config.yaml`, not environment variables.
+`.meowkit/.env.example` also lists the keys and model overrides for `mk:multimodal` and `mk:stitch` (`MEOWKIT_GEMINI_API_KEY`, `MEOWKIT_MINIMAX_API_KEY`, `MEOWKIT_OPENROUTER_API_KEY`, `STITCH_API_KEY`, the `MEOWKIT_*_PROVIDER_CHAIN` and `MEOWKIT_*_MODEL` variables). Read the comments in that file before setting one.
 
-| Key | Default | Purpose | When to use |
-|-----|---------|---------|-------------|
-| `autobuild.mode` | *(auto-detected)* | Override scaffolding density: `MINIMAL` (Haiku), `FULL` (Sonnet/Opus 4.5), `LEAN` (Opus 4.6+) | When auto-detection picks wrong density. Density changes scaffolding only: `LEAN` skips the sprint contract, and the ship check still runs. |
-| `budget.warn` | `30` | USD threshold for budget warning message | Lower for cost-conscious sessions, higher for long research runs. |
-| `budget.block` | `100` | USD threshold for the over-budget notice | Advisory: the notice is printed and nothing is stopped. |
-| `budget.cap` | *(none)* | Overrides `budget.block` — can be lower OR higher | `budget.cap: 200` for intentional high-budget harness runs, `15` for tight budgets. |
+## Examples
 
-`MEOWKIT_RUN_ID` stays in the environment: it is a per-invocation handoff set by
-`mk:autobuild` step-00, which a committed file cannot carry.
+A production session with TDD and every hook:
 
-### Memory
-
-The team memory store is two committed markdown files at `.meowkit/memory/`. The read-set skills grep it when their task needs it; there is no per-turn auto-injection and no capture hook. Pruning is `/mk:memory --prune`, human-approved, with a fixed window and no setting. See [Memory System](/guide/memory-system) for details.
-
-### Hook Controls
-
-`hooks.<name>: false` in `.meowkit/config.yaml` disables one observer; the default is
-`true`, except `pre-completion-check`, which is off until set to `true`. The name is the observer's own file base name.
-
-| Key | Purpose | When to use |
-|-----|---------|-------------|
-| `hooks.build-verify` | Skip post-write compile/lint checks | Bulk file generation where per-file verification is too slow. |
-| `hooks.loop-detection` | Skip edit-count loop detection | Intentional multi-pass refactoring. |
-| `hooks.pre-completion-check` | Opt in to the completion check (off by default); set `true` to turn it on | You want a turn with unverified edits sent back before it ends. |
-| `hooks.tdd-flag-detector` | Disable `--tdd` detection in user prompts | `--tdd` in your prompt text triggers TDD unintentionally. |
-| `buildVerify.timeoutMs` | Per-command timeout for build-verify, in milliseconds | A slow build needs longer than the per-language default. |
-
-The safety names — `privacy-block`, `pre-ship`,
-`check-careful`, `check-freeze`, `check-report-path` — are rejected from
-every config scope with a validation error, and the hook keeps blocking.
-
-### Examples
-
-**Production session with TDD and strict hooks:**
 ```yaml
 # .meowkit/config.yaml
 tdd: true
 ```
-```bash
-export MEOWKIT_HOOK_PROFILE=strict
-```
 
-**Quick prototyping session:**
+A quick prototyping session:
+
 ```yaml
 # .meowkit/config.yaml
 hooks:
   build-verify: false
 ```
+
 ```bash
 export MEOWKIT_HOOK_PROFILE=fast
 ```
 
-**High-budget harness run on Opus 4.6:**
+A high-budget autobuild run:
+
 ```yaml
 # .meowkit/config.yaml
 budget:
   cap: 200
-# autobuild.mode is left unset — it auto-detects LEAN for Opus 4.6
+# autobuild.mode stays unset, so density follows the detected model
 ```

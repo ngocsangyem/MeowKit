@@ -1,6 +1,6 @@
-# Design-System Rules & Library Patterns (gated)
+# Design-System Rules & Library Patterns (conditional)
 
-> **Gate — load ONLY on explicit user intent** to generate design-system rules or discuss library-build
+> **Load condition — load ONLY on explicit user intent** to generate design-system rules or discuss library-build
 > architecture. Output is ADVISORY rule text only. This reference performs NO Figma writes; full library
 > execution stays out of scope for `mk:figma`.
 
@@ -40,7 +40,7 @@ decision — the product owner makes the final call; an audit alone never trigge
 
 | Candidate | Split only when | Distinct because |
 |---|---|---|
-| `mk:figma-code-connect` | Repeated real user demand AND users hold eligible plans/seats (Org/Enterprise + Dev/Full); the gated reference proves insufficient (activation confusion or context bloat observed) | Entitlement model + codebase-mapping workflow |
+| `mk:figma-code-connect` | Repeated real user demand AND users hold eligible plans/seats (Org/Enterprise + Dev/Full); the conditional reference proves insufficient (activation confusion or context bloat observed) | Entitlement model + codebase-mapping workflow |
 | `mk:figma-write` | the toolkit decides canvas mutation is a first-class product capability, with checkpoint/state infrastructure; write requests recur in practice | Blast radius (mutates design files) |
 | `mk:figma-library` | Long-running (20–100+ call) builds with state ledger/recovery are supported; real demand exists | Long-run state, cleanup, checkpoints |
 

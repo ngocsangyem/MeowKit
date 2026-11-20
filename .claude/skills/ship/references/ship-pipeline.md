@@ -48,7 +48,7 @@ node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts
 node .claude/hooks/lib/skill-python.cjs .claude/skills/lint-and-validate/scripts/security-scan.py
 ```
 
-**Gate:** If ANY command exits with a non-zero code, STOP. Fix the issue before proceeding.
+**Check:** If ANY command exits with a non-zero code, STOP. Fix the issue before proceeding.
 
 ### Step 2: Generate Conventional Commit Message
 

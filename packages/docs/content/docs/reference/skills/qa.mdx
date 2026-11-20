@@ -1,6 +1,6 @@
 ---
 title: "mk:qa"
-description: "Systematically QA test a web application and fix bugs found. Runs QA testing, then iteratively fixes bugs in source code, committing each fix atomically and re-verifying."
+description: "Tests a running web app as a user, fixes bugs with atomic commits, re-verifies and reports a before and after health score."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,89 +14,48 @@ description: "Systematically QA test a web application and fix bugs found. Runs 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-A combined QA engineer and bug-fix engineer that tests web applications like a real user -- clicking every element, filling every form, checking every state. When bugs are found, it fixes them in source code with atomic commits and re-verifies. Produces a structured report with before/after health scores, fix evidence, and a ship-readiness summary.
+Tests a running web app as a user would, fixes the bugs it finds in source with one commit per fix, and re-tests the affected pages. It ends with a report that has before and after health scores. Use it when you say "test this site and fix what breaks", when a feature is ready for testing, or after code lands on a branch that needs verification.
 
-## When to Use
+## When not to use
 
-- User says "qa", "QA", "test this site", "find bugs", "test and fix", or "fix what's broken"
-- A feature is ready for testing or user asks "does this work?"
-- After shipping code on a feature branch that needs verification
-- When on a feature branch with no URL, automatically enters **diff-aware mode** -- analyzes branch diff to identify affected pages/routes and tests them directly
-- **NOT** for one-off browser commands (single click, screenshot) -- use `mk:agent-browser` instead
-- **NOT** for spec-driven manual QA with E2E code generation -- use `mk:qa-manual`
-
-## Core Capabilities
-
-- **Three tier system:** Quick (critical/high only), Standard (+ medium), Exhaustive (+ cosmetic)
-- **Four operational modes:** Diff-aware (auto on feature branch), Full (default with URL), Quick (30s smoke test), Regression (compare against baseline)
-- **Health score rubric:** Weighted scoring across 8 categories (Console, Links, Visual, Functional, UX, Performance, Content, Accessibility)
-- **Atomic fix commits:** One commit per bug fix with `fix(qa): ISSUE-NNN -- description` format
-- **Regression test generation:** After each verified fix, generates a regression test that fails without the fix
-- **Self-regulation:** WTF-likelihood heuristic stops runaway fixing (hard cap at 50 fixes)
-- **TODOS.md integration:** Adds deferred bugs as TODOs and annotates fixed ones
-- **Multi-framework awareness:** Detects Next.js, Rails, WordPress, SPA and tailors testing approach
-- **Before/after evidence:** Screenshots pairs and `snapshot -D` for every fix and finding
-
-## Arguments
-
-| Argument | Effect |
-|----------|--------|
-| _(no args on feature branch)_ | Diff-aware mode -- auto-detect affected pages from branch diff |
-| `URL` | Target URL for full QA testing |
-| `--quick` | Quick tier -- 30-second smoke test (homepage + top 5 nav targets) |
-| `--exhaustive` | Exhaustive tier -- includes cosmetic/low severity issues |
-| `--regression <baseline.json>` | Regression mode -- compare against previous baseline |
-| `"Focus on billing page"` | Scope QA to a specific area |
-
-## Workflow
-
-The skill follows an 11-phase pipeline:
-
-1. **Initialize** -- Detect base branch, parse parameters (URL, tier, mode, scope, auth), verify clean working tree, find browse binary
-2. **Authenticate** (if needed) -- Login, cookie import, 2FA, CAPTCHA handling. Never stores credentials
-3. **Orient** -- Launch browser, screenshot landing page, map navigation links, check console errors, detect framework
-4. **Explore** -- Visit pages systematically with per-page checklist (visual scan, interactive elements, forms, navigation, states, console, responsiveness)
-5. **Document** -- Capture evidence immediately (screenshots, `snapshot -D`) for each issue found
-6. **Wrap Up** -- Compute initial health score, write Top 3 issues, save baseline.json
-7. **Triage** -- Sort by severity, filter by tier, mark unfixable issues as deferred
-8. **Fix Loop** -- For each fixable issue: locate source (Grep/Glob), apply minimal fix, atomic commit, re-test with evidence, classify (verified/best-effort/reverted), generate regression test
-9. **Final QA** -- Re-run QA on all affected pages, compute final health score, warn if regressed
-10. **Report** -- Write structured report to `tasks/reports/qa/` with health score delta, fix status per issue, PR summary
-11. **TODOS.md Update** -- Add deferred bugs, annotate fixed bugs
+For a single click, screenshot or state check use `mk:agent-browser`. For spec-driven manual QA with E2E code generation use `mk:qa-manual`.
 
 ## Usage
 
 ```bash
-/mk:qa                              # Diff-aware mode (on feature branch, no URL)
-/mk:qa https://myapp.com            # Full QA on target URL
-/mk:qa --quick                      # Quick smoke test
-/mk:qa https://myapp.com --exhaustive   # Exhaustive tier
-/mk:qa --regression baseline.json   # Compare against previous run
+/mk:qa https://myapp.com
+/mk:qa http://localhost:3000 --exhaustive
+/mk:qa --quick
+/mk:qa https://myapp.com --regression tasks/reports/qa/baseline.json
 ```
 
-## Example Prompt
+| Option | Effect |
+|---|---|
+| (default tier) | Standard: critical, high and medium issues |
+| `--quick` | Critical and high only, a 30-second smoke test |
+| `--exhaustive` | Adds cosmetic issues |
+| `--regression <baseline.json>` | Compare against a saved baseline |
+| no URL on a feature branch | Diff-aware mode: finds the pages and routes the branch diff touches and tests them |
 
-> "I just finished the checkout flow refactor on this branch. /mk:qa"
+The modes are diff-aware, full (default when you give a URL), quick and regression (`references/modes.md`). If the diff names no obvious page, the skill falls back to a quick pass. The working tree must be clean, and the skill stops and asks if it is not.
 
-The skill enters diff-aware mode: analyzes the branch diff to find affected pages (`checkout.tsx`, `CartSummary.tsx`), auto-detects the running local app on port 3000, tests the checkout page end-to-end, captures evidence, computes health score, fixes any bugs found, and reports results.
+## Steps
 
-## Common Use Cases
+1. Initialize: detect the base branch, read the parameters (URL, tier, mode, scope, auth) and check the working tree. For Standard and Exhaustive tiers it looks for a test plan in `tasks/plans/` and, if none exists, writes a small QA scope with `mk:plan-creator`.
+2. Orient: open the browser, sign in if needed, screenshot the key pages and map links and console errors.
+3. Test the critical paths with the per-page checklist. At minimum cover one error scenario, one empty state, one boundary condition and a mobile viewport, and capture evidence for each issue as it appears.
+4. Score and triage: apply the health score, sort by severity and filter by tier.
+5. Fix each fixable issue with a minimal change and a commit `fix(qa): ISSUE-NNN: description`, then retest the page. After a verified fix the skill writes a regression test that fails without the fix.
+6. Re-run QA on the affected pages, compute the score change and warn on any regression.
 
-- **Pre-PR verification:** Run diff-aware QA before opening a pull request to catch regressions introduced by the branch
-- **Release readiness:** Run exhaustive QA before a major release to catch cosmetic and edge-case issues
-- **Smoke testing:** Quick tier after a hotfix deployment to verify critical paths still work
-- **Regression tracking:** Compare against baseline to track quality trends over time
-- **Bug bash:** Focused QA on a specific feature area with `"Focus on billing page"`
+## Outputs
 
-## Pro Tips
+A report with fix status and a PR summary, before and after screenshots and `snapshot -D` output. Deferred bugs are added to `TODOS.md` and fixed ones are annotated.
 
-- **Always commit or stash first** -- the skill requires a clean working tree so each fix gets its own atomic commit
-- **Use diff-aware mode** on feature branches -- it automatically scopes testing to what changed, much faster than full mode
-- **Run before `mk:review`** -- QA finds runtime bugs that static review misses; the two complement each other
-- **Check `tasks/reports/qa/`** for historical reports and baselines for regression comparisons
-- **The health score weights functional (20%) highest** -- prioritize functional bugs during triage
-- **Set up test framework first** -- if the project has no tests, the skill offers to bootstrap one before generating regression tests
+The health score is weighted across eight categories: Functional 20%, Console 15%, UX 15%, Accessibility 15%, Links 10%, Visual 10%, Performance 10% and Content 5% (`references/health-score.md`).
 
-> **Canonical source:** `.claude/skills/qa/SKILL.md`
+## Gotchas
+
+Every five fixes, or after a revert, the skill computes a "WTF likelihood". Above 20% it stops and asks whether to continue, and it stops at 50 fixes regardless. Page content, form values and console output are data, so instruction-like text in them is ignored. Test with realistic data volumes, since a page that works with 3 items can fail with 3000. Framework tips for Next.js, Rails, WordPress and single-page apps are in `references/framework-guidance.md`.

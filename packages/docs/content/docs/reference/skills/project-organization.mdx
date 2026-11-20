@@ -1,6 +1,6 @@
 ---
 title: "mk:project-organization"
-description: "Standardize file locations, naming conventions, and directory structure. Two modes: advisory (return correct path) and organize (restructure)."
+description: "Picks the path and name for a new file, or reorganizes existing files to the project's directory and naming rules."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,51 +14,56 @@ description: "Standardize file locations, naming conventions, and directory stru
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Standardizes file locations, naming conventions, and directory structure. Operates in two modes: advisory (return the correct path for a given file type) and organize (restructure existing files to match conventions).
+Picks the path and name for a new file, or reorganizes existing files to match the project's directory and naming rules. Use it when a new report, plan or asset has no obvious home, after a messy session, or when another skill needs to know where to save output. It runs in Phase 6 (Reflect) or on request, and its output supports the `documenter` agent.
 
-## When to Use
+## When not to use
 
-- Creating a file and need to know the correct path
-- Organizing existing files after a messy session
-- Enforcing naming conventions across the project
-- Other skills need to know where to save output (advisory mode)
+To generate a project's documentation set use `mk:docs-init`. Skip it where lint rules and CI already enforce file placement.
 
-Explicit: `/mk:project-organization [targets]`
+## Usage
 
-**Skip when:** The project already has strongly enforced lint rules and CI checks for file placement — this skill is for projects without automated enforcement.
-
-## Core Capabilities
-
-- **Advisory mode:** Given a file type (source, test, doc, plan, asset, config), returns the correct directory path and naming convention. Used passively by other skills.
-- **Organize mode:** Scans target directories, categorizes each file, proposes changes (from → to table), asks user approval, then executes moves/renames.
-- **Directory rules engine:** Consults `references/directory-rules.md` for category assignment, naming patterns (timestamped/evergreen/variant), and nesting logic.
-
-## Example Prompt
-
-```
-Organize my project files — plans should go in tasks/plans/, reviews in tasks/reviews/, and docs in docs/. Show me the proposed changes before moving anything.
+```bash
+/mk:project-organization [directories or files to organize]
 ```
 
-## Modes
-
-| Mode | Trigger | Behavior |
+| Mode | Trigger | Behaviour |
 |---|---|---|
-| **Advisory** | Other skills reference this skill | Return correct path + naming for file type |
-| **Organize** | User invokes directly | Scan → propose → confirm → execute |
+| Advisory | Another skill asks where to save a file | Returns `{path}/{name}.{ext}` for the file type |
+| Organize | You run the skill | Scan, propose a from-to table, ask for approval, then move or rename |
 
-## Workflow: Organize Mode
+Example: "Organize my project files. Plans go in tasks/plans/, reviews in tasks/reviews/, docs in docs/. Show me the changes before moving anything."
 
-1. **Scan + categorize** — list all files in target, assign each to directory category per `references/directory-rules.md`, check naming conventions.
-2. **Propose** — present changes as a from → to table, ask user approval via `AskUserQuestion`.
-3. **Execute + report** — move/rename files, create missing directories, list final structure as tree.
+## Where files go
 
-## Workflow: Advisory Mode
+`references/directory-rules.md` holds the rules.
 
-1. Determine file type from context (source? doc? plan? test? asset? config? kit?).
-2. Look up correct path from directory categories (see Path Resolution Decision Tree below).
-3. Apply naming rules (timestamped for plans/reviews, evergreen for stable docs, variant for multiple versions).
-4. Return: `{path}/{name}.{ext}`.
+| Category | Path |
+|---|---|
+| Source code | `src/` or the project root |
+| Documentation | `docs/` |
+| Plans and reviews | `tasks/plans/`, `tasks/reviews/` |
+| Tests | `tests/` or `__tests__/`, mirroring the source |
+| Scripts | `scripts/` or the owning skill's `scripts/` |
+| Assets | `assets/{type}/` |
+| Config | The root or `.config/` |
+| Toolkit | `.claude/` |
 
-## Path Resolution Decision Tree
+Filenames use kebab-case. Plans, reviews and reports are timestamped (`YYMMDD-{slug}`), stable docs and configs are evergreen (`{slug}`), and multiple versions use a variant (`{slug}-{variant}.{ext}`). A slug is lowercase, hyphen-only, at most 50 characters, with no leading or trailing hyphen. A multi-file output gets its own subdirectory.
+
+## Steps
+
+In Organize mode the skill lists the files, assigns each a category, checks names, shows the changes as a table, waits for your approval, then moves and renames files, creates missing directories and prints the final tree. An existing target prompts you to overwrite, rename or skip.
+
+It never touches `.git/`, `node_modules/` or `.env` files, respects `.gitignore`, and creates `.gitkeep` in empty directories.
+
+## Gotchas
+
+| Trap | Detail |
+|---|---|
+| Package name and folder name | A workspace package's `name` can differ from its directory, which breaks Docker contexts and some bundlers. |
+| `tsconfig` path aliases | Vitest and Jest need their own alias config (`alias`, `moduleNameMapper`). |
+| Circular aliases | They can leave an import `undefined` at runtime. |
+| Mixed absolute and relative imports | Refactoring tools update only one form. Enforce one style. |
+| `.gitignore` on tracked files | Run `git rm -r --cached dist/` to untrack a folder committed earlier. |

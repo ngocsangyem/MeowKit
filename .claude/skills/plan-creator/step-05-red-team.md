@@ -211,7 +211,7 @@ Append a **summary section** to plan.md that links to the full report:
 
 If a `## Red Team Review` section already exists (from a previous session), append a new `### Session` subsection — don't overwrite. Similarly, if `red-team-findings.md` already exists, rename it to `red-team-findings-{YYMMDD-prev}.md` before writing the new one.
 
-### 5j. Whole-Plan Consistency Sweep (Gate W1)
+### 5j. Whole-Plan Consistency Sweep (Sweep W1)
 
 After accepted findings have been written into phase files (5g), the planner agent MUST run a Whole-Plan Consistency Sweep before handing off to step-06.
 

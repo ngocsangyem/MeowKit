@@ -76,11 +76,11 @@ Parse the output. Find the most recent entry for each skill (plan-ceo-review, pl
 ```
 
 **Review tiers:**
-- **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be opted out of per project with `workflow-config set skip_eng_review true`, which records the choice in `.meowkit/state/` rather than in the committed config (the "don't bother me" setting).
+- **Eng Review (required by default):** The only review the ship step asks about. Covers architecture, code quality, tests, performance. Can be opted out of per project with `workflow-config set skip_eng_review true`, which records the choice in `.meowkit/state/` rather than in the committed config (the "don't bother me" setting).
 - **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
 - **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
 - **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get one Claude adversarial pass. Large diffs (200+) get two Claude adversarial passes (attack-surface + failure-mode). No configuration needed.
-- **Outside Voice (optional):** Independent plan review from a Claude adversarial subagent with fresh context. Offered after all review sections complete in /mk:plan-ceo-review. Never gates shipping.
+- **Outside Voice (optional):** Independent plan review from a Claude adversarial subagent with fresh context. Offered after all review sections complete in /mk:plan-ceo-review. Never required for shipping.
 
 **Verdict logic:**
 - **CLEARED**: Eng Review has >= 1 entry within 7 days from either `review` or `plan-ceo-review` with status "clean" (or `skip_eng_review` is `true`)
@@ -164,14 +164,14 @@ plan's living status.
 
 After displaying the Review Readiness Dashboard, recommend the next review(s) based on what this CEO review discovered. Read the dashboard output to see which reviews have already been run and whether they are stale.
 
-**Recommend /mk:plan-ceo-review if eng review is not skipped globally** — check the dashboard output for `skip_eng_review`. If it is `true`, eng review is opted out — do not recommend it. Otherwise, eng review is the required shipping gate. If this CEO review expanded scope, changed architectural direction, or accepted scope expansions, emphasize that a fresh eng review is needed. If an eng review already exists in the dashboard but the commit hash shows it predates this CEO review, note that it may be stale and should be re-run.
+**Recommend /mk:plan-ceo-review if eng review is not skipped globally** — check the dashboard output for `skip_eng_review`. If it is `true`, eng review is opted out — do not recommend it. Otherwise, eng review is the review the ship step asks about. If this CEO review expanded scope, changed architectural direction, or accepted scope expansions, emphasize that a fresh eng review is needed. If an eng review already exists in the dashboard but the commit hash shows it predates this CEO review, note that it may be stale and should be re-run.
 
 **Recommend /plan-design-review if UI scope was detected** — specifically if Section 11 (Design & UX Review) was NOT skipped, or if accepted scope expansions included UI-facing features. If an existing design review is stale (commit hash drift), note that. In SCOPE REDUCTION mode, skip this recommendation — design review is unlikely relevant for scope cuts.
 
-**If both are needed, recommend eng review first** (required gate), then design review.
+**If both are needed, recommend eng review first** (required review), then design review.
 
 Ask the user to present the next step. Include only applicable options:
-- **A)** Run /mk:plan-ceo-review next (required gate)
+- **A)** Run /mk:plan-ceo-review next (required review)
 - **B)** Run /plan-design-review next (only if UI scope detected)
 - **C)** Skip — I'll handle reviews manually
 

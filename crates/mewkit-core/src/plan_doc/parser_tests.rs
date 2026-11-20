@@ -135,7 +135,7 @@ fn an_absent_plan_directory_summarises_what_is_missing() {
     assert_eq!(
         summary.issues,
         vec![
-            "no plan.md — Gate 1 expects one at the plan root",
+            "no plan.md at the plan root",
             "no phase-XX-*.md files found"
         ]
     );

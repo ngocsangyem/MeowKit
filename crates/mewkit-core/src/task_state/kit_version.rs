@@ -1,6 +1,6 @@
 //! The installed kit version a record carries as provenance.
 //!
-//! Best effort by design: this is PROVENANCE, never a gate. A project with no
+//! Best effort by design: this is PROVENANCE, never a check. A project with no
 //! install baseline, a baseline mid-write, or one this binary cannot parse all
 //! answer "unknown" (the empty string), and the record then keeps whatever
 //! version it already carried. Failing an update because the kit version could

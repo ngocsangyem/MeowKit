@@ -139,13 +139,13 @@ Not every task needs the full 7-phase pipeline. Mention these when relevant:
 |-----------|-----------|---------------|
 | Simple bug fix, typo, rename, config tweak | `/mk:fix` | the plan file — the scope is the plan |
 | Task flagged as `one-shot` by scale-routing | no plan file | the plan file — zero blast radius confirmed |
-| Rapid iteration / spike work | `MEOWKIT_HOOK_PROFILE=fast` | post-write scan, pre-ship, pre-task-check, TDD check |
+| Rapid iteration / spike work | `MEOWKIT_HOOK_PROFILE=fast` | pre-task-check, TDD check; the post-write scan and the ship check still run |
 
 **Quick fix?** Use `/mk:fix` — no separate plan file for simple changes.
 
 **Small config change?** Scale-routing may skip the plan file when blast radius is zero.
 
-**Hook profiles:** Set `MEOWKIT_HOOK_PROFILE=fast` for rapid iteration (skips non-critical hooks).
+**Hook profiles:** Set `MEOWKIT_HOOK_PROFILE=fast` for rapid iteration (skips non-critical hooks; the ship check and the post-write scan still run).
 Set `MEOWKIT_HOOK_PROFILE=strict` to enable ALL hooks including post-session capture.
 
 ## Gotchas

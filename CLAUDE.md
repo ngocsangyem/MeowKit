@@ -30,7 +30,7 @@ Phase 0 Orient → Phase 1 Plan → Phase 2 Test (RED if --tdd, else optional)
 
 ## Ship Check
 
-Planning and review are practices, not gates: no hook blocks an edit on a missing plan or a commit on a missing review verdict (`tasks/reviews/*-verdict.md`).
+Planning and review are practices: no hook blocks an edit on a missing plan or a commit on a missing review verdict (`tasks/reviews/*-verdict.md`).
 
 The one enforced ship-time control is the ship check: on `git commit`, `git push`, `git merge` and `gh pr create|merge`, `pre-ship` runs lint on the changed files, their related tests and a type-check, and refuses the command when one fails. What is enforced on each runtime: `docs/core/enforcement-matrix.md`.
 

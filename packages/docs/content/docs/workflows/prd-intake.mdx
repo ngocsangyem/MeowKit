@@ -1,42 +1,33 @@
 ---
 title: "PRD Intake Automation"
-description: "Analyze incoming PRDs/tickets with MeowKit as the AI engine, powered by the mk:jira leaf family."
+description: "Analyze incoming PRDs and tickets with mk:intake: product area, completeness score, root cause, codebase context and a structured comment."
 ---
 
-> Automated ticket analysis: product area classification, completeness scoring, root cause analysis, technical assessment, and structured recommendations — powered by MeowKit skills with the `mk:jira-*` leaf family.
+`mk:intake` analyses one ticket or PRD and returns a structured report. This page describes the pipeline and how to trigger it. The Jira leaves handle reading and writing the ticket.
 
 **Best for:** Team leads, engineering managers, DevOps teams
-**Time estimate:** ~2 min per ticket (automated)
-**Skills used:** [mk:intake](/reference/skills/intake), [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-lifecycle](/reference/skills/jira-lifecycle), [mk:jira-relationships](/reference/skills/jira-relationships), [mk:jira-collaborate](/reference/skills/jira-collaborate), [mk:scale-routing](/reference/skills/scale-routing), [mk:scout](/reference/skills/scout), [mk:investigate](/reference/skills/investigate), [mk:decision-framework](/reference/skills/decision-framework)
+**Time estimate:** About 2 minutes per ticket
+**Skills used:** [mk:intake](/reference/skills/intake), [mk:jira-issue](/reference/skills/jira-issue), [mk:jira-evaluator](/reference/skills/jira-evaluator), [mk:jira-lifecycle](/reference/skills/jira-lifecycle), [mk:jira-relationships](/reference/skills/jira-relationships), [mk:jira-collaborate](/reference/skills/jira-collaborate), [mk:scale-routing](/reference/skills/scale-routing), [mk:scout](/reference/skills/scout), [mk:investigate](/reference/skills/investigate)
 
 ## Quick path
 
 ```bash
 /mk:intake PRD-123          # classify area, score completeness, run RCA if it is a bug
 /mk:jira-evaluator PRD-123  # readiness
-/mk:jira-lifecycle transition PRD-123 "In Analysis"
+/mk:jira-lifecycle transition PRD-123 --to "In Analysis"
 ```
 
-**You end up with** a structured analysis posted back to the ticket as a comment.
-**Worth knowing** the analysis skills work on pasted text too, so you can try this before
-setting up Jira access at all.
-
-## Overview
-
-When a new PRD or ticket lands in Jira, MeowKit can analyze it automatically: classify the product area, score description completeness, run root cause analysis (for bugs), scan the codebase for technical context, and post structured results back as a Jira comment.
-
-MeowKit talks to Jira through the `mk:jira-*` leaf family, which uses the `jira-as` CLI under the hood. `mk:intake` orchestrates the analysis pipeline; the leaves handle Jira I/O.
+You end up with a structured analysis, posted back to the ticket as a comment once you accept it. The analysis also works on pasted text, so you can try it before setting up Jira.
 
 ## Prerequisites
 
-Jira access needs the `jira-as` CLI and three variables in `.meowkit/.env`. [Jira Integration](/guides/jira-integration) covers the install, the token, what the skills will and will not do on their own, and what to check when authentication fails.
+Jira access needs the `jira-as` CLI and three variables in `.meowkit/.env`; see [Jira Integration](/guides/jira-integration). Without them intake still runs on pasted text and skips the Jira steps. Linear (through its MCP server) and GitHub (through `gh`) work as sources too.
 
-### Define Product Areas
+### Product areas (optional)
 
-Create a YAML file mapping product areas to code paths and team ownership:
+To map tickets to code paths and owners, create `.claude/product-areas.yaml`. `mk:scale-routing` reads it during classification:
 
 ```yaml
-# .claude/product-areas.yaml
 areas:
   - name: Authentication
     paths: ["src/auth/**", "src/middleware/auth*"]
@@ -47,251 +38,96 @@ areas:
     paths: ["src/billing/**", "src/stripe/**"]
     keywords: ["payment", "invoice", "subscription", "charge"]
     pic: ["charlie"]
-
-  - name: API
-    paths: ["src/api/**", "src/routes/**"]
-    keywords: ["endpoint", "REST", "GraphQL", "route"]
-    pic: ["alice", "dave"]
 ```
 
-This feeds into `mk:scale-routing` for automatic product area detection.
+Without the file, classification uses keywords only and reports no owner.
 
-### Configure Trigger
+### Triggers
 
-Two options:
+- On demand: `/mk:intake PRD-123`.
+- Automated: a Jira Automation rule (issue created, type PRD) sends a webhook to your service, which calls `claude -p "analyze ticket: <content>"`.
 
-**Option A: Jira Automation (webhook → Claude)**
+## What intake does
 
-```
-Jira Automation Rule:
-  When: Issue created, type = PRD
-  Then: Send webhook to your service
-  Your service: calls `claude -p` with ticket content
-```
+| Step | What happens |
+|---|---|
+| Receive | Reads the ticket through `mk:jira-issue` (or Linear, GitHub, a Confluence page or pasted text). |
+| Sanitize | Checks the ticket text for injection patterns. A hit stops the run and reports the quote. |
+| Media | Analyzes screenshots, video, Figma links and PDFs. See [Ticket with Media](/workflows/ticket-with-media). |
+| Classify | `mk:scale-routing` matches the text against its domain table and `product-areas.yaml`. |
+| Completeness | Scores the ticket out of 100 against eight dimensions (below). |
+| Scan | `mk:scout` finds related files, components and patterns. |
+| Root cause | For bugs, `mk:investigate` runs an RCA (5 Whys, Ishikawa or 8D by complexity). |
+| Assess | Lists affected files, test gaps and implementation complexity. |
+| Jira enrichment | When the `mk:jira-*` leaves are available, adds Jira metadata and suggests leaf actions. |
+| Report and post | Builds the report and posts it through the source's adapter, for example `mk:jira-collaborate` for Jira. |
 
-**Option B: Manual / On-demand**
+### Completeness score
 
-```
-/mk:cook analyze PRD-123 using the intake workflow
-```
+| Dimension | Weight |
+|---|---|
+| Goal or problem statement | 20 |
+| Acceptance criteria | 20 |
+| Scope (in and out) | 15 |
+| Steps to reproduce (bugs) | 15 |
+| Technical constraints | 10 |
+| Priority or severity | 10 |
+| Dependencies | 10 |
+| Design or visual (UI tasks) | 10 |
 
-## Step-by-step Guide
+A missing dimension subtracts its weight from 100. For backend-only tasks the design weight moves to goal and acceptance criteria. A score of 80 or more is ready, 60 to 79 needs minor clarification, 40 to 59 should be clarified before work starts, and below 40 goes back to the author.
 
-<Callout title="Simplified with mk:intake (v2.0)" type="info">
-
-MeowKit v2.0 introduced `mk:intake` which orchestrates the entire intake workflow automatically. Instead of chaining skills manually, just run:
-
-```bash
-/mk:intake
-```
-The steps below describe what mk:intake does internally.
-</Callout>
-
-### Step 1: Fetch the ticket
-
-MeowKit reads the ticket via `mk:jira-issue`:
-
-```bash
-/mk:jira-issue get PRD-123
-```
-
-The leaf reads the description, acceptance criteria, comments, attachments, and linked issues via the `jira-as` wrapper. See [`mk:jira-issue`](/reference/skills/jira-issue) for the full read surface.
-
-### Step 1.5: Evaluate ticket complexity
-
-Optionally, assess ticket complexity before proceeding with full intake:
-
-```bash
-/mk:jira-evaluator PRD-123
-```
-
-This produces a qualitative complexity assessment (Simple/Medium/Complex), detects missing acceptance criteria, vague language, and unlinked dependencies. The evaluation feeds into estimation and sprint planning. See [Ticket Evaluation & Estimation](/workflows/ticket-evaluation) for details.
-
-<Callout title="Evaluator vs completeness scoring" type="info">
-
-`mk:jira-evaluator` assesses **implementation complexity** for estimation. `mk:plan-creator` scope challenge assesses **structural completeness** of the ticket description. They answer different questions — use both.
-
-</Callout>
-
-### Step 2: Classify product area (mk:scale-routing)
-
-MeowKit scans the ticket description for domain keywords and matches against `.claude/product-areas.yaml`:
-
-```
-Product area: Authentication
-Confidence: HIGH (keywords: "login", "session timeout", matched paths: src/auth/**)
-Suggested PIC: alice, bob
-```
-
-If multiple areas match, MeowKit reports all with confidence scores.
-
-### Step 3: Evaluate completeness (mk:plan-creator scope challenge)
-
-MeowKit checks the PRD against required sections:
-
-| Section                  | Status     | Notes                                        |
-| ------------------------ | ---------- | -------------------------------------------- |
-| Goal / Problem statement | ✅ Present | Clear: "Users get logged out after 24 hours" |
-| Acceptance criteria      | ❌ Missing | No pass/fail criteria defined                |
-| Scope (in/out)           | ⚠️ Partial | "In scope" listed, "out of scope" missing    |
-| Steps to reproduce       | ❌ Missing | Bug ticket with no repro steps               |
-| Technical constraints    | ✅ Present | "Must not break existing SSO flow"           |
-
-**Completeness score: 55/100**
-
-### Step 4: Scan codebase (mk:scout)
-
-MeowKit pulls latest code and scans for relevant files:
-
-```
-Related files:
-  src/auth/session-manager.ts (session timeout logic)
-  src/middleware/auth-guard.ts (token validation)
-  src/config/auth.ts (timeout configuration: 24h)
-  tests/auth/session.test.ts (existing test coverage)
-
-Technical considerations:
-  - Session timeout is hardcoded to 86400s in auth.ts:15
-  - Token refresh logic exists but only triggers on page navigation
-  - No background refresh mechanism for idle sessions
-```
-
-### Step 5: Root cause analysis (mk:investigate)
-
-For bug tickets, MeowKit runs structured RCA:
-
-```
-RCA Method: 5 Whys (single-event, simple causal chain)
-
-Why 1: Users get logged out → session token expires
-Why 2: Token expires → 24h timeout reached
-Why 3: Timeout reached → no refresh during idle period
-Why 4: No idle refresh → refresh only triggers on navigation
-Why 5: Navigation-only refresh → design gap (no background keep-alive)
-
-Root cause: Token refresh is tied to user navigation events.
-           Idle users (reading, in meetings) get no refresh.
-
-Suggested fix: Add background token refresh interval (e.g., every 20min)
-                OR extend timeout to 7 days with sliding expiration.
-```
-
-### Step 6: Generate structured output
-
-MeowKit posts a structured comment back to Jira via `mk:jira-collaborate`:
+### The report
 
 ```markdown
-## AI PRD Analysis — PRD-123
-
-### Product Area
-
-**Authentication** (confidence: HIGH)
-
-### Completeness Score: 55/100
-
-Missing:
-
-- ❌ Acceptance criteria (add pass/fail conditions)
-- ❌ Steps to reproduce (add exact repro steps)
-- ⚠️ Out-of-scope section (clarify boundaries)
-
+## Intake Analysis: PRD-123
+### Product Area: Authentication (confidence: HIGH)
+### Completeness: 55/100
+Missing: acceptance criteria, steps to reproduce, out-of-scope section
 ### Technical Considerations
-
-- Session timeout hardcoded at 24h (`src/config/auth.ts:15`)
-- Token refresh only triggers on navigation (no idle refresh)
-- Existing test coverage: `tests/auth/session.test.ts` (12 tests)
-
-### Root Cause (for bugs)
-
-Token refresh tied to navigation events. Idle users receive no refresh.
-
+- Session timeout hardcoded at 24h (src/config/auth.ts:15)
+- Token refresh only triggers on navigation
+### Root Cause (bugs only)
+Token refresh is tied to navigation events, so idle users get no refresh.
 ### Suggested Breakdown
-
-1. Add background refresh interval (src/auth/session-manager.ts)
-2. Update session config to support sliding expiration (src/config/auth.ts)
-3. Add integration test for idle session scenario
-
+1. Add a background refresh interval (src/auth/session-manager.ts)
+2. Support sliding expiration in the session config
+3. Add an integration test for an idle session
 ### Related Tickets
-
-- PRD-098: "Session management improvements" (similar scope)
-- BUG-045: "Intermittent logout" (possibly same root cause)
-
+- PRD-098 (similar scope), BUG-045 (possibly the same cause)
 ### Suggested PIC
-
-**alice** (Authentication domain owner, 3 open tickets)
-**bob** (Authentication domain, 5 open tickets — alice preferred for load balance)
+alice (Authentication owner)
 ```
 
-### Step 7: Auto-assign and transition
+Root cause appears for bugs only. Feature PRDs get the completeness score and a breakdown.
 
-If configured, MeowKit can:
+## Acting on the report
 
-- Assign the ticket to the suggested PIC via `mk:jira-lifecycle`
-- Transition status (e.g., "New" → "In Analysis") via `mk:jira-lifecycle`
-- Link related tickets via `mk:jira-relationships`
-
-<Callout title="Execute the suggested actions" type="info">
-
-After reviewing intake analysis, run the suggested Jira actions directly:
+Intake suggests transitions, links and an owner. You run them:
 
 ```bash
-/mk:jira-lifecycle transition PRD-123 "In Analysis"
-/mk:jira-relationships link PRD-123 blocks BUG-045
-/mk:jira-lifecycle assign PRD-123 alice
-```
-</Callout>
-
-## Skill Graph
-
-```mermaid
-flowchart LR
-    I["<b>mk:intake</b><br/>orchestrator"]
-    I --> A["mk:jira-issue — fetch ticket"]
-    I --> B["mk:scale-routing — product-area classification"]
-    I --> C["mk:plan-creator — completeness scoring (scope challenge)"]
-    I --> D["mk:scout — codebase context"]
-    I --> E["mk:investigate — RCA (bug tickets)"]
-    I --> F["mk:decision-framework — triage rules"]
-    I --> G["mk:jira-collaborate — post analysis comment"]
-    I --> H["mk:jira-lifecycle — transition + assign (Step 7)"]
-    I --> J["mk:jira-relationships — link related tickets (Step 7)"]
+/mk:jira-lifecycle transition PRD-123 --to "In Analysis"
+/mk:jira-relationships link PRD-123 as blocks BUG-045
+/mk:jira-lifecycle assign PRD-123 to alice
 ```
 
-## MeowKit Skills Used
+For readiness and size, continue with [Ticket Evaluation](/workflows/ticket-evaluation). When the ticket is ready, a feature goes to `mk:cook` and a bug to `mk:fix` (see [Ticket to Code](/workflows/ticket-to-code)); a security concern goes to `mk:cso`.
 
-| Step                      | Skill                                                           | What It Does                                                        |
-| ------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Ticket I/O                | [mk:jira-issue](/reference/skills/jira-issue)                 | Read issue + attachments + linked tickets via jira-as               |
-| Complexity assessment     | [mk:jira-evaluator](/reference/skills/jira-evaluator)         | Read-only complexity + inconsistency analysis                       |
-| Product area detection    | [mk:scale-routing](/reference/skills/scale-routing)           | Matches keywords against domain-complexity CSV / product-areas YAML |
-| Completeness evaluation   | [mk:plan-creator](/reference/skills/plan-creator)             | Scope challenge validates goal, criteria, constraints, scope        |
-| Codebase scanning         | [mk:scout](/reference/skills/scout)                           | Parallel file discovery + architecture fingerprint                  |
-| Root cause analysis       | [mk:investigate](/reference/skills/investigate)               | 4-phase investigation with RCA method selection                     |
-| Structured recommendation | [mk:decision-framework](/reference/skills/decision-framework) | Classify → rules → score → escalate                                 |
-| Comment posting           | [mk:jira-collaborate](/reference/skills/jira-collaborate)     | Post AI analysis as a Jira comment                                  |
-| Lifecycle (Step 7)        | [mk:jira-lifecycle](/reference/skills/jira-lifecycle)         | Transition + assign                                                 |
-| Linking (Step 7)          | [mk:jira-relationships](/reference/skills/jira-relationships) | Link blockers / related issues                                      |
+## What intake does not do
 
-## What MeowKit Does NOT Do
-
-Be honest about boundaries:
-
-- **Team roster management** — You maintain `.claude/product-areas.yaml`. MeowKit reads it.
-- **Workload balancing** — MeowKit reports open ticket count per PIC (via `mk:jira-search`). Your rules decide assignment.
-- **Jira workflow rules** — MeowKit suggests transitions. Your Jira automation enforces them.
-- **Duplicate detection** — MeowKit finds related tickets via keyword search. Exact dedup is your JQL.
+- Manage your team roster. You maintain `product-areas.yaml`.
+- Balance workload. It reports open ticket counts per owner, and your rules decide assignment.
+- Enforce Jira workflow rules. It suggests transitions and your Jira automation enforces them.
+- Deduplicate exactly. It finds related tickets by keyword; exact duplicates are a JQL job.
 
 ## Gotchas
 
-- **No `MEOW_JIRA_*` env = no Jira I/O**: The analysis skills work standalone (you can paste ticket text), but automated read/write requires the three env vars in `.meowkit/.env`.
-- **Product areas YAML must be maintained**: Stale domain mappings = wrong classification. Update when team structure changes.
-- **RCA only for bugs**: Feature PRDs get completeness scoring + breakdown, not root cause analysis.
-- **PIC suggestion ≠ assignment**: MeowKit suggests based on domain + load. Human confirms. Never auto-assign without review unless your team explicitly opts in.
-- **Rate limits**: If running on every Jira webhook, consider batching or filtering (e.g., only PRD type, only specific projects).
+- Without the three `MEOW_JIRA_*` variables there is no Jira reading or writing. Pasted text still works.
+- A stale `product-areas.yaml` gives wrong classification. Update it when the team changes.
+- The owner suggestion is a suggestion. Confirm it before assigning.
+- If a webhook runs intake on every ticket, filter by type and project to stay inside rate limits.
 
 ## Related
 
-- [Build a Feature](/guides/build-a-feature) — Full implementation workflow after intake
-- [Fix a Bug](/guides/fix-a-bug) — Bug-specific investigation workflow
-- [Review Code](/guides/review-code) — Review workflow for the fix
-- [mk:decision-framework](/reference/skills/decision-framework) — Decision architecture for triage
+- [Ticket with Media](/workflows/ticket-with-media) and [Ticket Evaluation](/workflows/ticket-evaluation)
+- [Build a Feature](/guides/build-a-feature), [Fix a Bug](/guides/fix-a-bug) and [Review Code](/guides/review-code) for what follows intake

@@ -35,7 +35,7 @@ const PROTECTED_HOOKS = Object.keys(PROTECTED_REASON);
  * rather than reporting an unknown key.
  */
 const STATE_ONLY_KEYS = {
-  skip_eng_review: 'it suppresses the review step that gates shipping, so it is a per-project choice rather than a committed one',
+  skip_eng_review: 'it suppresses the review step before shipping, so it is a per-project choice rather than a committed one',
 };
 
 /** Key prefixes that are rejected outright rather than being unknown keys. */

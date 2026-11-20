@@ -1,6 +1,6 @@
 ---
 title: "mk:team-config"
-description: "Set up parallel agent team for COMPLEX tasks — creates worktree structure, generates ownership map, initializes task queue."
+description: "Internal skill that sets up a parallel agent team with worktrees, an ownership map and a task queue."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,67 +14,39 @@ description: "Set up parallel agent team for COMPLEX tasks — creates worktree 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Sets up the infrastructure for parallel agent execution. Called by the orchestrator when a COMPLEX task is decomposed into independent subtasks. Creates isolated git worktrees, assigns file ownership globs per agent, and initializes the task queue.
+`mk:team-config` prepares the infrastructure for parallel agents. The orchestrator calls it when a complex task splits into independent subtasks. It is not user-invocable.
 
-## When to Use
+## When not to use it
 
-- **COMPLEX tasks only** (orchestrator enforces this)
-- When a plan identifies independent subtasks that can run in parallel
-- **Max 3 parallel agents** (from `parallel-execution-rules.md`)
-- **NOT for:** sequential tasks, tasks sharing the same files, planning and review phases (never parallelized)
+To create or clean up a single git worktree, use `mk:worktree`. Team Config calls it for each agent.
 
-## Core Capabilities
+## Setup
 
-- **Subtask decomposition:** parses the approved plan to identify independent subtasks
-- **Ownership map:** assigns file ownership globs per subtask, validates zero overlap
-- **Worktree creation:** creates one git worktree per parallel agent via `mk:worktree`
-- **Task queue init:** creates `.meowkit/state/task-queue.json` with claiming protocol via `mk:task-queue`
-- **Validation:** checks for overlapping ownership before dispatching agents
+1. Parse the agreed plan for independent subtasks.
+2. Generate an ownership map that gives each agent a set of file globs (`templates/ownership-map-template.md`).
+3. Check that no two ownerships overlap.
+4. Create one git worktree per agent through `mk:worktree`.
+5. Create `.meowkit/state/task-queue.json` through `mk:task-queue`.
 
-## Workflow
+Parallel agents then start claiming tasks.
 
-```mermaid
-flowchart TD
-    A["Plan agreed"]
-    B["Orchestrator identifies parallel opportunity"]
-    C["<b>mk:team-config</b>"]
-    C1["1. Parse plan for independent subtasks"]
-    C2["2. Generate ownership map"]
-    C3["3. Validate zero overlap between ownerships"]
-    C4["4. Create git worktrees via mk:worktree"]
-    C5["5. Create task-queue.json via mk:task-queue"]
-    D["Parallel agents start claiming tasks"]
+When team mode activates, the skill reads `references/team-coordination.md`: file ownership per task, no force-push, commits on the worktree branch, actionable completion messages and who owns the docs-impact check. Those rules load only on team activation.
 
-    A --> B --> C --> C1 --> C2 --> C3 --> C4 --> C5 --> D
-```
+## Constraints
 
-## Usage
+- At most 3 parallel agents, from `.claude/skills/cook/references/parallel-execution-rules.md`.
+- Only complex tasks qualify, and the orchestrator decides that.
+- All worktrees branch from the current feature branch HEAD.
 
-```bash
-# Invoked automatically by orchestrator for COMPLEX tasks
-# Not typically called directly
-/mk:team-config "build user dashboard with auth and analytics" --agents 3
-```
+## Teardown
 
-## Example Prompt
+After all agents finish and the integration test passes, merge the worktree branches into the feature branch, remove the worktrees with `mk:worktree cleanup` and archive `.meowkit/state/task-queue.json`.
 
-```
-Decompose the approved plan for the payment module: 1) API endpoints (src/api/payments/*), 2) UI forms (src/components/payments/*), 3) Integration tests (tests/payments/*). Set up parallel agents with zero file overlap.
-```
+## Gotchas
 
-## Common Use Cases
-
-- Harness-driven parallel builds with independent modules
-- Multi-service feature implementation (backend + frontend + tests)
-- Coordinated refactoring across non-overlapping code areas
-
-## Pro Tips
-
-- **Overlapping ownership kills parallelism.** If two subtasks need the same file, restructure or handle the shared file sequentially first.
-- **Integration test is mandatory.** After merging all worktrees, the full test suite must pass. Never skip this.
-- **Check for stale worktrees.** Run `git worktree list` before creating new ones to catch orphaned worktrees from crashed sessions.
-- **Planning and review are never parallelized.** They run sequentially — parallel mode applies only to Phase 3 (Build).
-
-> **Canonical source:** `.claude/skills/team-config/SKILL.md`
+- Two subtasks that need the same file cannot run in parallel. Restructure the split or handle the shared file in a sequential step first.
+- Skill names with a colon, such as `mk:review`, need quoting in shell paths.
+- Run `git worktree list` before creating new ones, to catch orphans from crashed sessions.
+- Run the full test suite after merging all worktrees. Each passed alone, so a failure here points to a conflict between them.

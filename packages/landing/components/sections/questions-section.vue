@@ -1,11 +1,11 @@
 <script setup lang="ts">
-/* Section 5 — the questions. Copy verbatim from the mockup; the answers are
+/* Section 5 — the questions. Revised for 3.0.0; the answers are
  * always open, so the section's height never jumps. */
 const faq = [
   { q: 'What does MeowKit cost?', a: 'Nothing. MeowKit is open source under the MIT licence.' },
-  { q: 'What does MeowKit add to a repository?', a: 'Two directories, .claude and .meowkit. The core workflow has no external dependencies.' },
-  { q: 'Does MeowKit work outside Claude Code?', a: 'Cursor and Codex are install targets. Codex support is experimental: gates there deter but do not block.' },
-  { q: 'Can MeowKit skip a gate?', a: 'Gate 1 has three listed exceptions, such as a simple fix. Gate 2 has none.' },
+  { q: 'What does MeowKit add to a repository?', a: 'Two directories on Claude Code, .claude and .meowkit. The other runtimes add their own files. The core workflow has no external dependencies.' },
+  { q: 'Does MeowKit work outside Claude Code?', a: 'Yes. One kit installs on Claude Code, Codex, Cursor, Grok, Pi and OMP with mewkit init --target. Grok, Pi and OMP install at project scope only, and their enforcement has not been run in a live session yet.' },
+  { q: 'Does MeowKit stop an edit or a commit?', a: 'Only the ship check does: lint, related tests and a type-check run on git commit, push, merge and gh pr create, and the command is refused when one fails. Planning and review are practices, so no hook blocks an edit without a plan or a commit without a review verdict.' },
   { q: 'Does MeowKit require tests first?', a: 'No. Test-first is opt-in with the --tdd flag; verification runs on every task either way.' },
   { q: 'Where does MeowKit keep its plans?', a: 'Under tasks/plans, one dated folder a task, with plan.md and a file for each phase.' },
 ]

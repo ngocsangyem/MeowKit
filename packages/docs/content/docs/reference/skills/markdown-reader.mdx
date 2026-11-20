@@ -1,6 +1,6 @@
 ---
 title: "mk:markdown-reader"
-description: "Serve any markdown file or directory as a calm, book-like reader via a local HTTP server (127.0.0.1 only). For long-form documents: RFCs, runbooks, design docs, plan files."
+description: "Serves markdown files as a book-like local reader with Mermaid diagrams and plan navigation."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,80 +14,44 @@ description: "Serve any markdown file or directory as a calm, book-like reader v
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Starts a local HTTP server on `127.0.0.1` (localhost) that renders markdown files with a
-calm, book-like reading experience in the browser. Pass a file or directory path; the server
-opens the browser and stays running until you call `--stop`.
+Serves markdown files as a book-like reader on `127.0.0.1` and opens them in the browser. Use it for long-form reading: plan phase files, RFCs, runbooks, design docs, reports and specs. A plan folder with `plan.md` and `phase-*.md` files gets a sidebar with status badges and Prev and Next buttons.
 
-Best for long-form content where comfortable in-browser reading matters: plan phase files,
-RFCs, runbooks, design docs, reports, specs.
+## When not to use
 
-## When to Use
-
-Triggers:
-
-- "open this plan in the browser", "view this markdown nicely", "read this runbook"
-- A plan directory with multiple phase files — navigation sidebar auto-generates
-- A long RFC or design doc that is uncomfortable to read in a terminal
-
-Anti-triggers:
-
-- Self-contained HTML artifacts from `mk:brainstorming --html` — those open directly in the browser, no server needed
-- Packaged showcase deliverables — use `mk:showcase`
-
-## Installation (Required Once)
-
-```bash
-cd .claude/skills/markdown-reader
-npm install
-```
-
-Dependencies: `marked`, `highlight.js`, `gray-matter`
+To render code, architecture or a diff as an explainer or diagram use `mk:preview`. For packaged deliverables use `mk:showcase`.
 
 ## Usage
 
+Install the dependencies once (`marked`, `highlight.js`, `gray-matter`). Without them the reader returns "Error 500: Error rendering markdown".
+
 ```bash
-# View a file (auto-opens browser)
+cd .claude/skills/markdown-reader && npm install
 node .claude/skills/markdown-reader/scripts/server.cjs --file ./tasks/plans/my-plan/plan.md
-
-# Browse a directory
 node .claude/skills/markdown-reader/scripts/server.cjs --dir ./tasks/plans
-
-# Stop all running instances
 node .claude/skills/markdown-reader/scripts/server.cjs --stop
 ```
 
-## Key Features
+| Flag | Effect |
+|---|---|
+| `--file <path>` | Open one markdown file |
+| `--dir <path>` | Browse a directory |
+| `--port <number>` | Initial port. The default is 3456, and it moves up to 3500 if busy |
+| `--no-open` | Do not open the browser |
+| `--foreground` | Keep the process attached, for task runners |
+| `--stop` | Stop all running instances |
 
-- **Novel-style reading** — warm cream background, serif headings, 720px content width
-- **Mermaid diagrams** — auto-renders fenced mermaid blocks; click to expand full-width
-- **Plan navigation** — auto-detects `plan.md` + `phase-*.md` structure; builds sidebar with status badges and Prev/Next buttons
-- **Directory browser** — clean file listing; markdown files link to viewer
-- **Dark mode** — toggle with `T` key; persists in localStorage
-- **Keyboard shortcuts** — `?` for cheatsheet, `←`/`→` for plan navigation, `S` for sidebar
+`--background` is a legacy flag. Flags, routes and state are in `references/reader-operations.md`, and features and shortcuts are in `references/reader-experience.md`.
 
-## Security
+## What you get
 
-- Server always binds `127.0.0.1` — served files are never LAN-reachable
-- All file paths validated against an allowed-directories list; traversal attempts return HTTP 403
-- PID files stored in `${CLAUDE_PLUGIN_DATA}/markdown-reader/` (not the skill directory)
+The reader has a 720px text column, light and dark themes, reading progress, syntax highlighting and Mermaid diagrams that expand on click. Shortcuts: `?` help, `T` theme, `S` sidebar, arrow keys for plan phases, `Esc`.
 
-## Persistent State
+## Safety and state
 
-PID files tracking running server instances are stored in
-`${CLAUDE_PLUGIN_DATA}/markdown-reader/` (falls back to `~/.cache/mewkit/markdown-reader/`
-when `CLAUDE_PLUGIN_DATA` is unset). This survives plugin upgrades.
+The server binds to `127.0.0.1` only, so files are not reachable from other devices. It checks every path against its allowed directories and answers path traversal with 403. Images must use paths relative to the markdown file. PID files live in `${CLAUDE_PLUGIN_DATA}/markdown-reader/`, or `~/.cache/mewkit/markdown-reader/` when that variable is unset.
 
 ## Gotchas
 
-- **Install first**: `npm install` must run from `.claude/skills/markdown-reader/` before first use
-- **Port conflicts**: server auto-increments 3456–3500; check `${CLAUDE_PLUGIN_DATA}/markdown-reader/` for stale `.pid` files if `--stop` doesn't clear them
-- **Not a dependency**: `mk:brainstorming --html` never starts or depends on this server
-- **Images in markdown**: paths must be relative to the markdown file; served via `/file/*` with path-safety validation
-
-## Workflow Position
-
-- **Phase:** on-demand
-- **Follows:** any skill that produces markdown content
-- **Stop lifecycle:** always call `--stop` when done reading; PID cleanup is automatic on SIGTERM/SIGINT
+Run `--stop` when you finish reading. If `--stop` does not clear an instance, look for stale `.pid` files in the state folder.

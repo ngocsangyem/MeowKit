@@ -1,6 +1,6 @@
 ---
 title: "mk:cook"
-description: "End-to-end feature pipeline — plan, test, build, review, ship. TDD is opt-in via --tdd."
+description: "Implements one feature, fix, refactor or existing plan through the full phase pipeline, from orient to reflect."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,129 +14,88 @@ description: "End-to-end feature pipeline — plan, test, build, review, ship. T
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:cook` is the main entry point for building one scoped thing: a feature, a fix, a refactor or an existing plan. It selects a profile, calls the skills and agents that own each phase and checks in with you at the plan and at the review. The phase sequence is defined in `.claude/skills/workflow-orchestrator/workflow.yaml` (see [Workflow](/core-concepts/workflow)). TDD is opt-in.
 
-Primary entry point for building features. Given a description or plan path, orchestrates the full 7-phase pipeline. TDD is opt-in via `--tdd`. For green-field product builds, use `mk:autobuild` instead.
+## When not to use it
 
-## When to Use
-
-- Building a feature, fix, or refactor scoped to a single task
-- Executing an existing implementation plan
-- Rapid iteration with `--fast` mode (skips research)
-- Parallel multi-feature builds with `--parallel`
-- **NOT for:** green-field product builds (use `mk:autobuild`), workflow orchestration (use `mk:workflow-orchestrator`)
-
-## Core Capabilities
-
-- **Full pipeline:** drives all seven phases, including the mandatory Simplify and Verify stages inside Build — see [Workflow Phases](/core-concepts/workflow)
-- **TDD mode:** Opt-in via `--tdd` — writes failing tests before implementation, enforces RED-GREEN-REFACTOR
-- **Smart intent detection:** Auto-routes to the correct mode based on input patterns (plan path, "fast", "parallel", "auto")
-- **Workflow modes:** interactive (default), auto, fast, parallel, no-test, code — with modifier flags `--verify`, `--strict`, `--no-strict`
-- **Required subagents:** Scout (Phase 0), plan-creator + researcher (Phase 1), tester (Phase 2, TDD only), developer (Phase 3), mk:simplify + mk:verify (post-build), reviewer (Phase 4), shipper via mk:ship (Phase 5 — shipper invokes git-manager internally), documenter (Phase 6); a memory entry only if the lesson is non-derivable
-- **Scout-First Contract (Phase 0):** before any clarifying question or plan generation, a 3–6 bullet codebase-context summary is surfaced to the user (project type/language/framework, relevant modules, current patterns, in-flight plans, public APIs/schemas). Skipped on `plan.md` / `phase-*.md` input.
-- **Exact-Requirements Contract (Phase 1):** `mk:plan-creator` MUST answer 5 dimensions in concrete sentences — expected output, acceptance criteria, scope boundary, non-negotiable constraints, touchpoints — before returning a plan. Clarifying-question options MUST cite scout findings (file paths). Skipped on plan-path input.
-- **Regression Recovery Options (Phase 4):** when the reviewer surfaces a regression in EXISTING behavior (verdict includes `Side Effects Detected: Yes`), cook STOPs the iteration loop and presents 2–4 typed options to the user (revert / keep + update dependents / compatibility shim / accept the regression). User selection recorded as a `## User Decision Addendum` block on the verdict file; a verdict that reports a side effect without it is incomplete. No hook checks for the addendum.
-- **Simplify + Verify:** Mandatory post-build steps — reduce complexity, then run unified build+lint+test+coverage before review
-- **Workflow evidence index:** populates ONE `tasks/plans/<plan>/reports/evidence/workflow-evidence.json` from existing Phase 0-6 outputs (risk flags, the 5 exact requirements, verification, verdict path, approvals). It is traceability only — it records what happened, **never approves**, carries no score, and has no validator: the skill that writes it owns its shape
+| If you need | Use |
+|---|---|
+| A green-field product built unattended | `mk:autobuild` |
+| Workflow orchestration itself | `mk:workflow-orchestrator` |
 
 ## Usage
 
 ```bash
-/mk:cook add user authentication with JWT       # Natural language
-/mk:cook tasks/plans/260501-auth/plan.md        # From existing plan
-/mk:cook build payment processor --tdd          # Strict TDD
-/mk:cook add login form --fast                  # Skip research
-/mk:cook implement checkout --parallel           # Parallel agents
-/mk:cook refactor payment module --auto          # Auto-fix, no pauses; read the verdict before shipping
-/mk:cook update readme --no-test                # Skip Phase 2
-/mk:cook "feature" --verify                      # Light browser check after review
-/mk:cook "feature" --strict                      # Full evaluator after review
-/mk:cook "feature" --interactive                 # Full interactive (default)
+/mk:cook add user authentication with JWT
+/mk:cook tasks/plans/260501-auth/plan.md
+/mk:cook build payment processor --tdd
+/mk:cook add login form --fast
+/mk:cook implement checkout --parallel
+/mk:cook refactor payment module --auto
+/mk:cook update readme --no-test
 ```
 
-## Example Prompt
-
-```
-Build a JWT-based authentication system for the API — login, registration, token refresh, and role-based access control. Run in TDD mode with a full review.
-```
-
-**Flags:** `--interactive` (default) | `--fast` | `--parallel` | `--auto` | `--no-test` | `--tdd` | `--verify` | `--strict` | `--no-strict`
-
-**Modifier flags:** `--verify` `[LIGHT]` (light browser/artifact check, advisory — no back-edge to Phase 3) | `--strict` `[HEAVY]` (full evaluator pass, FAIL blocks ship and routes back to Phase 3) | `--no-strict` (suppress auto-strict from scale-routing). `--strict` supersedes `--verify`. Concrete cost depends on the inner harness, model tier, and target surface; treat `[LIGHT]` vs `[HEAVY]` as relative ordering only.
-
-## TDD mode (`--tdd` flag)
-
-When `--tdd` is detected, the skill writes `on` to `.meowkit/state/tdd-mode` BEFORE any other workflow step. This sentinel is read by `tdd-flag-detector.cjs` and downstream agents; no hook blocks implementation on a missing failing test. `MEOWKIT_TDD=1` env var is highest-precedence opt-in. Without `--tdd`, Phase 2 is optional — the developer may implement directly per the plan.
-
-## Workflow modes
-
-| Mode | Research | TDD | Progression |
-|---|---|---|---|
-| interactive (default) | Yes | RED-strict | One at a time, checking in at the plan and the review |
-| auto | Yes | RED-strict | Continuous (auto-fix, no pauses) |
-| fast | Skip | Plan-level | One at a time |
-| parallel | Optional | RED-strict | Parallel groups |
-| no-test | Yes | Skip | One at a time |
-| code | Skip | RED-strict | Per plan |
-
-**TDD column key:** `RED-strict` = failing tests in Phase 2 before any implementation (only enforced when `--tdd` / `MEOWKIT_TDD=1`; otherwise Phase 2 is optional). `Plan-level` = tests reflect plan intent, no RED gate. `Skip` = no Phase 2.
-
-Planning and review are practices, not gates: Phase 4 writes a review verdict in every mode, and no hook blocks an edit on a missing plan or a commit on a missing verdict. Read the verdict before shipping. The one enforced ship-time control is the ship check (`pre-ship`): on `git commit`, `git push`, `git merge` and `gh pr create|merge` it runs lint on the changed files, their related tests and a type-check, and refuses the command when one fails — see [Enforcement & Security](/core-concepts/gates).
-
-## Smart intent detection
-
-| Input Pattern | Mode |
+| Flag | Meaning |
 |---|---|
-| Path to `plan.md` / `phase-*.md` | code — execute existing plan |
-| "fast", "quick" | fast — skip research |
-| "trust me", "auto" | auto — auto-fix, run through without pausing |
-| 3+ features or "parallel" | parallel — multi-agent |
-| "no test", "skip test" | no-test — skip Phase 2 |
-| Default | interactive — full workflow, checking in with the user at the plan and the review |
-| `--verify` | (modifier) — light browser check after review (Phase 4.5) |
-| `--strict` | (modifier) — full evaluator after review (Phase 4.5) |
-| `--no-strict` | (modifier) — suppress auto-strict from scale-routing |
-| `--advice` | (modifier) — opt-in strategic supervision by the [athena](/reference/agents/athena) agent: direction after the plan is agreed, rescue on a stall, an independent read after Verify and before the reviewer, and a correction it can send back. Up to 5 calls; approves nothing |
+| `--interactive` | Default. Full workflow, checking in at the plan and the review |
+| `--fast` | Skips research. Still writes a plan, shows a short scout summary and writes plan-level tests |
+| `--parallel` | Several agents on independent groups. Map the dependency graph first |
+| `--auto` | Auto-fixes and runs through without pausing |
+| `--no-test` | Skips Phase 2. Invalid together with `--tdd` |
+| `--tdd` | Writes `on` to `.meowkit/state/tdd-mode` first. Failing tests come before code. `MEOWKIT_TDD=1` does the same and takes precedence |
+| `--verify` | Light browser or artifact check after review (Phase 4.5). Advisory |
+| `--strict` | Full evaluator pass after review. An evaluator FAIL routes back to Phase 3. Supersedes `--verify`. Scale-routing can trigger it, and `--no-strict` suppresses that |
+| `--advice` | Supervision by the [athena](/reference/agents/athena) agent, up to 5 calls, approves nothing |
 
-## Required subagents
+A path to `plan.md` or `phase-*.md` runs in code mode. The words "fast" or "quick", "trust me" or "auto", "3 or more features" or "parallel", and "no test" pick the matching mode. Profiles are `quick`, `standard`, `release` (standard plus an explicit `mk:ship` request) and `high-assurance` (`--tdd --strict`). A quick run creates no plan, report or ship action, and moves to the standard profile if a risk flag or changed contract appears.
 
-| Phase | Subagent | Notes |
+| Mode | Research | Tests |
 |---|---|---|
-| 0 Orient | `mk:scout` | Codebase mapping |
-| 1 Plan | `mk:plan-creator`, `researcher` | Research + planning |
-| 2 Test | `tester` via `mk:testing` | TDD: MUST spawn. Default: optional |
-| 3 Build | `developer` | Implementation |
-| 3.5 Simplify | `developer` via `mk:simplify` | MANDATORY after Build GREEN |
-| 3.6 Verify | `mk:verify` | MANDATORY — build+lint+test+coverage before review |
-| 4 Review | `reviewer` via `mk:review` | MUST spawn — writes the review verdict |
+| interactive | Yes | Failing tests first when `--tdd` is on |
+| auto | Yes | Same |
+| fast | Skipped | Plan-level |
+| parallel | Optional | Same as interactive |
+| no-test | Yes | None |
+| code | Skipped | Same as interactive |
+
+Without `--tdd`, Phase 2 is optional and the developer may implement directly from the agreed plan. If a loaded plan contains TDD sections and the run is not in TDD mode, cook warns.
+
+## What it does
+
+| Phase | Owner | Notes |
+|---|---|---|
+| 0 Orient | `mk:scout` | Shows a 3 to 6 bullet codebase summary before any question or plan. Skipped for a plan path |
+| 1 Plan | `mk:plan-creator`, `researcher` | The plan must state expected output, acceptance criteria, scope boundary, constraints and touchpoints. Skipped for a plan path |
+| 2 Test | `tester` via `mk:testing` | Required with `--tdd`, optional otherwise |
+| 3 Build | `developer` | `mk:investigate` after 3 failed self-heal attempts |
+| 3.5 Simplify | `developer` via `mk:simplify` | Mandatory after Build |
+| 3.6 Verify | `mk:verify` | Mandatory. A failure goes back to the developer before review |
+| 4 Review | `reviewer` via `mk:review` | Writes the review verdict in every mode |
 | 4.5 Verify | `agent-browser` or `evaluator` via `mk:evaluate` | Only with `--verify` or `--strict` |
-| 5 Ship | `git-manager` via `mk:ship` | MUST spawn |
-| 6 Reflect | `documenter`; `mk:memory` only if a lesson is non-derivable | MUST spawn |
+| 5 Ship | `shipper` via `mk:ship` | Only on an explicit ship request |
+| 6 Reflect | `analyst`, `documenter`, `mk:memory` | A memory entry only for a lesson that cannot be derived from the code |
 
-## Simplify + Verify (mandatory after Build)
+Write the plan and agree it with you before implementation code. Skipping the plan is reasonable only if you say "just code it" and Phase 0 found no risk flags, and the run summary notes it. No hook enforces any of this. The only enforced ship-time control is the ship check (see [Enforcement and security](/core-concepts/enforcement)).
 
-After Phase 3 GREEN: run `mk:simplify` to reduce complexity before review. Then run `mk:verify` for unified build→lint→type-check→test→coverage. If verify FAILS: send back to developer, then re-run before Phase 4. Do not skip.
+When the reviewer reports a regression in existing behaviour (`Side Effects Detected: Yes`), cook stops the loop and offers 2 to 4 options: revert, keep and update dependents, add a compatibility shim, or accept the regression. Your choice is recorded as a `## User Decision Addendum` in the verdict file (`references/review-cycle.md`).
 
-## Anti-rationalization
+## Outputs
 
-| Thought | Reality |
+| Artifact | Location |
 |---|---|
-| "This is too simple to plan" | Simple tasks have hidden complexity. Plan takes 30 seconds. |
-| "I already know how to do this" | Knowing ≠ planning. Write it down. |
-| "Let me just start coding" | Undisciplined action wastes tokens. Plan first. |
-| "Tests can come after" | TDD mode: no. Default mode: yes. Choose mode explicitly. |
+| Plan | `tasks/plans/YYMMDD-name/` |
+| Review verdict | `tasks/reviews/` |
+| Workflow evidence index | `tasks/plans/<plan>/reports/evidence/workflow-evidence.json`, a record of what happened with no score |
+| Status report | `{plan-dir}/status-reports/{YYMMDD}-status.md`, written in the background by `project-manager` after a PASS verdict. Off with `MEOWKIT_PM_AUTO=off` |
+
+At each phase transition cook ticks the phase-file checkboxes and updates the plan's Agent State, so a fresh session can resume at the right phase.
 
 ## Gotchas
 
-- Skipping `mk:simplify` before review — mandatory between Phase 3 and Phase 4
-- `--auto` hiding a bad review — auto mode auto-fixes and runs through without pausing, so nobody reads the verdict as it is written. Read the verdict and the workflow evidence index before shipping
-- Context loss between phases — a mandatory per-phase checkpoint writes the phase-file checkboxes and plan.md Agent State before each next-phase transition; a fresh session reads them to resume the correct phase
-- Parallel mode deadlocks — map dependency graph before spawning
-- Code mode on stale plans — warn if plan >14 days old
-- Fast mode shallow coverage — skipping research means plan-level tests only
-- Missing model tier declaration — always declare in Phase 0
-- Forgetting to record a non-derivable lesson at Phase 6
-- `--strict` cost surprise — auto-triggered by scale-routing `level=high`. Use `--no-strict` to suppress
-- Skipping the plan on "simple" features — features that seem simple grow during implementation. Always create a plan file; cancel it if truly trivial
-- Subagent patterns using Agent() not Task() — Task() enables tracking, blocking, and progress. Always use Task() for phases 2-6
-- `--strict` vs `--verify` confusion — `--verify` = light browser check (advisory). `--strict` = full evaluator with rubrics (FAIL blocks ship). `--strict` supersedes `--verify`
+- `--auto` can hide a bad review. Read the verdict and the evidence index before shipping.
+- Run `mk:simplify` between Phase 3 and Phase 4 every time.
+- Do not skip the plan on a "simple" feature. Cancel it if the work really is trivial.
+- A code-mode run on a plan older than 14 days should start with a warning.
+- Fast mode produces plan-level tests with lower coverage.
+- Declare the model tier in Phase 0.
+- `--strict` is a heavy pass. Use `--no-strict` to suppress an automatic trigger or `--verify` for the light check.

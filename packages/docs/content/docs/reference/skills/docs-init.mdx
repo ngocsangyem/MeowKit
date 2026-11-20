@@ -1,6 +1,6 @@
 ---
 title: "mk:docs-init"
-description: "Generate initial project documentation from codebase analysis — creates docs/ from scratch. For new projects or empty docs directories."
+description: "Generates a project's first docs folder from a scout of the code. For a repository with no docs or only stubs."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,63 +15,48 @@ description: "Generate initial project documentation from codebase analysis — 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Generate initial project documentation from codebase analysis. Creates `docs/` from scratch by scouting the codebase and producing a full documentation suite tailored to the project type.
+mk:docs-init scouts the codebase with `mk:scout`, then hands the findings to the `documenter` agent, which writes the first documentation set. It generates only the files the project needs.
 
-## When to Use
+## When to use it
 
-- Project has no `docs/` directory
-- `docs/` exists but is empty or has only stubs
-- User asks to "initialize docs", "create documentation", "generate docs"
-- After `mk:bootstrap` completes (new project needs docs)
+Use it when `docs/` is missing, empty or holds only stubs, when you ask to initialize or generate docs, or after `mk:bootstrap`. Usage: `/mk:docs-init`.
 
-Explicit: `/mk:docs-init`
+| Need | Use instead |
+|---|---|
+| Update docs that already exist | `mk:document-release` |
+| Only the agent conventions file (`docs/project-context.md`) | `mk:project-context` |
 
-**Do NOT invoke when:** Docs already exist and need updating (use `mk:document-release`). If populated docs are detected, suggest `mk:document-release` instead and stop.
+If populated docs exist, the skill suggests `mk:document-release` and stops. Run `mk:project-context` as well when you want the conventions file, since docs-init does not write it.
 
-## Scope
+## Steps
 
-This skill creates `docs/` from scratch. For updating existing docs → `mk:document-release`.
+1. Check whether `docs/` exists and is populated.
+2. Scout the codebase with `mk:scout`, skipping `.claude/`, `.git/`, `node_modules/`, `__pycache__/`, `dist/` and `build/`.
+3. Merge the scout reports into one context.
+4. Delegate to the `documenter` agent to write the files below.
+5. Run `wc -l docs/*.md | sort -rn` and flag files over 800 lines.
+6. Print the generated files with line counts.
 
-**Also run `mk:project-context`** to generate the agent-constitution file (`docs/project-context.md`). `mk:docs-init` generates the full documentation suite; `mk:project-context` generates only the constitution.
+The skill writes documentation only, never code.
 
-## Core Capabilities
+## Output
 
-- **Scout-first generation:** Activates `mk:scout` to analyze project structure before generating any docs — prevents hallucination
-- **Adaptive output:** Generates only docs relevant to the project type (skips deployment guide for libraries, skips design guidelines for CLI tools)
-- **Size awareness:** Checks line counts and flags oversized files (>800 lines)
-- **Hard gate:** Never writes code or implementation — only documentation
+| File | Written |
+|---|---|
+| `README.md` (300 lines or fewer) | Always |
+| `docs/project-overview.md` | Always |
+| `docs/codebase-summary.md` | Always |
+| `docs/code-standards.md` | Always |
+| `docs/architecture/system-architecture.md` | Always |
+| `docs/deployment-guide.md` | When CI/CD or Docker config is found |
+| `docs/design-guidelines.md` | When frontend code is found |
 
-## Process
+## Gotchas
 
-1. **Check existing state** — does `docs/` exist? Are files already populated? If populated docs exist → suggest `mk:document-release` instead, stop.
-2. **Scout codebase** — activate `mk:scout` to analyze project structure. Skip: `.claude/`, `.git/`, `node_modules/`, `__pycache__/`, `dist/`, `build/`.
-3. **Merge findings** — consolidate scout reports into context for doc generation.
-4. **Generate docs** — spawn `documenter` subagent via Task tool with scout context.
-
-   Output files (adapt to what the project actually has):
-   - `README.md` — project overview (≤300 lines)
-   - `docs/project-overview.md` — what this project is, who it's for
-   - `docs/codebase-summary.md` — directory map, key modules, entry points
-   - `docs/code-standards.md` — conventions found in codebase
-   - `docs/system-architecture.md` — component diagram, data flow
-
-   Optional (generate only if relevant):
-   - `docs/deployment-guide.md` — if CI/CD or Docker config detected
-   - `docs/design-guidelines.md` — if frontend/UI code detected
-
-5. **Size check** — run `wc -l docs/*.md | sort -rn`. Flag files >800 lines.
-6. **Report** — print generated files list with line counts.
-
-**Hard gate:** Do NOT write code or implementation. Only documentation.
-
-## Example Prompt
-
-```
-Initialize documentation for this project. Scout the codebase and generate a full docs/ suite with project overview, codebase summary, code standards, and system architecture.
-```
-
-## Workflow Integration
-
-Runs after `mk:bootstrap` or on any existing project without docs:
+- Always scout first. Docs written without findings describe code that does not exist.
+- A project under 10 files gets `README.md` and `docs/codebase-summary.md` only.
+- `README.md` is for outside readers (setup, usage). `docs/project-overview.md` is for insiders (why it exists, design decisions).
+- List entry points in `docs/codebase-summary.md` under "Entry Points".
+- Docs drift after the first feature. Run `mk:document-release` after each ship.

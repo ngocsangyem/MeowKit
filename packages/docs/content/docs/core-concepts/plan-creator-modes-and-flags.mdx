@@ -1,27 +1,13 @@
 ---
 title: "Plan Creator Modes and Flags"
-description: "How to choose MeowKit plan-creator modes and flags by workflow risk, context cost, and execution impact."
+description: "How to choose plan-creator modes and flags by workflow risk, context cost and execution impact."
 ---
 
-MeowKit planning is risk control. Use the smallest planning surface that can answer the real engineering questions before code changes start.
+Planning controls risk. Use the smallest planning surface that answers the engineering questions before code changes start.
 
-The planner has two kinds of controls:
+`mk:plan-creator` takes modes and flags. A mode chooses the planning workflow, and a run has one mode. A flag modifies the selected workflow and composes with a mode when the skill supports it.
 
-- **Modes** choose the planning workflow. A run has one planning mode.
-- **Flags** modify the selected workflow. A flag can compose with a mode when the skill supports it.
-
-The important distinction: `--deep` is a mode. `--tdd` is a flag. Running `--deep` does not enable TDD. Running `--deep --tdd` enables both bounded deep planning and tests-first execution handoff.
-
-## Documentation outline
-
-This page uses a MeowKit-native structure:
-
-1. Pick by workflow risk, not by habit.
-2. Route context before planning: scout, brainstorm, then plan.
-3. Choose one planning mode.
-4. Add only the flags that change a real workflow constraint.
-5. Preserve isolation between planning, handoff, and execution.
-6. Avoid heavy modes when the scope does not justify them.
+`--deep` is a mode and `--tdd` is a flag. `--deep` does not enable TDD. `--deep --tdd` gives bounded deep planning and a tests-first handoff to cook.
 
 ## Start with the workflow risk
 
@@ -38,11 +24,11 @@ Ask what can go wrong if the plan is too light.
 | The work is an investigation with a deadline | `--spike --timebox <duration>` | Bound research and produce findings |
 | Existing behavior must not drift | add `--tdd` | Preserve behavior with tests-first sections and cook handoff |
 
-Do not turn on a heavier mode because it feels safer. Heavy planning adds tokens, state, and review surface. It pays off only when it prevents a likely failure.
+A heavier mode adds tokens, state and review surface. Use it when it prevents a likely failure.
 
 ## Route context before planning
 
-`mk:scout`, `mk:brainstorming`, and `mk:plan-creator` solve different problems.
+`mk:scout`, `mk:brainstorming` and `mk:plan-creator` do different jobs.
 
 | Tool | Belongs here | Use when | Output |
 |---|---|---|---|
@@ -57,7 +43,7 @@ Planning should pause when either the code map or the approach is unclear.
 - Unknown both: do not draft implementation phases yet.
 - Known area and known approach: plan directly.
 
-`--deep` can replace a separate scout only when the prompt already names the feature area and the intended approach. It is not a substitute for deciding the approach.
+`--deep` can replace a separate scout only when the prompt already names the feature area and the intended approach. It does not decide the approach for you.
 
 ## Choose one planning mode
 
@@ -67,7 +53,7 @@ Modes change the planning pipeline. Pick one.
 |---|---|---|---|---|
 | default | Lets plan-creator classify complexity and route to fast or hard behavior | You trust the scope classifier and the task is ordinary | You need a specific workflow guarantee | Variable |
 | `--fast` | Skips research, codebase analysis, red-team, and validation interview; writes a compact `plan.md` | Small, clear changes that still need an agreed plan | Multi-file refactors, security work, unclear scope | Low |
-| `--hard` | Full planning pipeline with research, codebase analysis, phase files, semantic checks, red-team, validation, plan agreement, hydration, handoff | Normal complex features, bug fixes, refactors, security work | Tiny edits or time-boxed investigation | Medium to high |
+| `--hard` | Full planning pipeline: research, codebase analysis, phase files, semantic checks, red-team, validation, plan agreement, hydration, handoff | Normal complex features, bug fixes, refactors, security work | Tiny edits or time-boxed investigation | Medium to high |
 | `--deep` | Hard pipeline plus bounded scope map and per-phase Deep Phase Map | Broad refactors, 5+ directories, hidden dependencies, shared contracts | Small fixes, undecided architecture, vague feature area | High, bounded |
 | `--parallel` | Hard pipeline plus ownership matrix and parallel group hydration | Independent phases can be assigned without file overlap | Shared-file refactors or unclear dependencies | High |
 | `--two` | Drafts two approach files and a trade-off matrix before selecting one | Two specific approaches are both credible | You have not narrowed the problem enough to name the two approaches | High |
@@ -78,7 +64,7 @@ Modes change the planning pipeline. Pick one.
 
 Default mode is useful when the request is concrete and you do not need to force a planning depth. Plan-creator classifies the task as trivial, simple, or complex. Trivial work exits. Simple work uses fast mode. Complex work uses hard mode unless a deeper mode is selected or suggested.
 
-Default mode keeps friction low, but it gives less explicit control over planning cost.
+Default mode adds little friction and gives less control over planning cost.
 
 ### `--fast`
 
@@ -110,7 +96,7 @@ Use `--deep` when execution would otherwise rediscover scope during implementati
 
 Avoid `--deep` when the approach is undecided. Run `mk:brainstorming` first. Avoid it for small fixes where the inventory costs more than the edit.
 
-`--deep` does not run an uncontrolled repository-wide scan. It records uncertainty instead of expanding forever.
+`--deep` does not scan the whole repository. It records uncertainty instead of expanding.
 
 ### `--parallel`
 
@@ -118,7 +104,7 @@ Avoid `--deep` when the approach is undecided. Run `mk:brainstorming` first. Avo
 
 Use it when phases can run independently with clear ownership.
 
-Avoid it when phases share the same files, depend on a migration not yet created, or require sequential learning. Parallelism without ownership clarity creates merge risk and duplicated context.
+Avoid it when phases share files, depend on a migration not yet created, or need sequential learning. Parallel work without clear ownership risks merge conflicts and duplicated context.
 
 ### `--two`
 
@@ -126,7 +112,7 @@ Avoid it when phases share the same files, depend on a migration not yet created
 
 Use it when you can name the competing approaches.
 
-Avoid it when the problem is still vague. Brainstorm first. `--two` compares concrete candidates; it does not discover the whole solution space.
+Avoid it when the problem is still vague. Brainstorm first. `--two` compares concrete candidates and does not search the solution space.
 
 ### `--product-level`
 
@@ -144,7 +130,7 @@ Avoid it for existing-code changes. If the task names files, modules, bugs, or r
 
 Use it when the next correct action is learning, not implementation.
 
-Avoid it when you already know the implementation path. A spike should end with findings, not shipped code.
+Avoid it when you already know the implementation path. A spike ends with findings, not shipped code.
 
 ## Add flags only when they change the workflow
 
@@ -159,9 +145,9 @@ Flags compose with a mode. They should carry a concrete workflow reason.
 
 ### `--tdd`
 
-`--tdd` is not a planning mode. It adds regression-first structure to the selected mode.
+`--tdd` adds regression-first structure to the selected mode.
 
-When enabled, phase files may include:
+With `--tdd`, phase files may include:
 
 - `tdd: true`
 - `regression_gate: "<command>"`
@@ -178,7 +164,7 @@ Avoid `--tdd` for greenfield prototypes or work where there is no stable behavio
 
 ## Planning depth and cost
 
-Planning depth is the amount of context and verification the planner loads before you agree the plan.
+Planning depth is how much context and verification the planner loads before you agree the plan.
 
 | Depth | MeowKit shape | Best for | Cost |
 |---|---|---|---|
@@ -188,11 +174,11 @@ Planning depth is the amount of context and verification the planner loads befor
 | Verification-oriented planning | any mode + `--tdd` | Refactors that must preserve behavior | Adds phase structure and execution constraints |
 | Parallel execution planning | `--parallel` | Independent work streams | Adds ownership state and coordination cost |
 
-More planning can improve quality, but only when it answers a question execution would otherwise guess. If the answer is already known, more planning is noise.
+More planning helps when it answers a question that execution would otherwise guess. If the answer is known, more planning adds noise.
 
 ## Context-engineering implications
 
-Plan-creator uses step files so only the active step needs to be loaded. That keeps planning maintainable, but heavier modes still create more state.
+Plan-creator uses step files, so only the active step is loaded. Heavier modes still create more state.
 
 | Mode or flag | Repository context loaded | Orchestration state created | Stale assumption risk |
 |---|---|---|---|
@@ -205,7 +191,7 @@ Plan-creator uses step files so only the active step needs to be loaded. That ke
 | `--spike` | Intentionally limited | Findings-oriented plan | Low if timebox is respected |
 | `--tdd` | No broad context by itself | TDD sections, RED tasks, regression gate | Low/medium if old bugs are mistaken for desired behavior |
 
-Context isolation matters most after heavy planning. Planning may contain research notes, scout output, risk review, and user decisions. Execution should restart from the plan path and phase file, not from the full planning conversation.
+After heavy planning, the conversation holds research notes, scout output, risk review and your decisions. Execution should restart from the plan path and phase file, not from that conversation.
 
 Use the handoff command that plan-creator prints. For TDD plans, keep `--tdd` in the cook invocation:
 
@@ -215,16 +201,14 @@ Use the handoff command that plan-creator prints. For TDD plans, keep `--tdd` in
 
 ## Execution lifecycle
 
-The lifecycle is intentionally staged.
-
 1. **Scout** finds files, tests, contracts, and dependencies. It is read-only.
 2. **Brainstorming** chooses the approach when trade-offs are unresolved.
 3. **Planning** turns the chosen approach into plan files, phase files, validation, and handoff.
-4. **Validation** checks plan structure, claims, risk, and unresolved questions before approval.
-5. **Handoff** records the next step and prints the command. It does not auto-run execution.
-6. **Cooking** reads the approved plan in a fresh execution context and implements it.
+4. **Validation** checks plan structure, claims, risk and unresolved questions before you agree the plan.
+5. **Handoff** records the next step and prints the command. It does not run execution.
+6. **Cooking** reads the agreed plan in a fresh execution context and implements it.
 
-Boundaries are part of the design:
+The stages keep to these boundaries:
 
 - Scout should not decide architecture.
 - Brainstorming should not write implementation code.
@@ -232,7 +216,7 @@ Boundaries are part of the design:
 - Handoff should stop before cooking.
 - Cook should read the plan and phase context, not the full planning conversation.
 
-Pause for confirmation when the plan changes scope, when a risk gate finds unresolved contradictions, or when the next step changes execution behavior.
+Pause for confirmation when the plan changes scope, when a risk check finds unresolved contradictions, or when the next step changes execution behavior.
 
 ## Usage matrix
 
@@ -302,24 +286,14 @@ Use both because the task has broad scope and existing behavior must stay stable
 
 | Anti-pattern | Why it fails | Better choice |
 |---|---|---|
-| Always using `--deep` | Creates excess context and stale inventory for small work | Use default or `--fast` |
+| Always using `--deep` | Loads excess context and a stale inventory for small work | Use default or `--fast` |
 | Adding `--tdd` to greenfield prototypes | No stable behavior exists to protect | Use normal tests after design stabilizes |
 | Planning before approach clarity | Produces confident phase files for a weak design | Run `mk:brainstorming` first |
 | Running recursive scout loops | Inflates context and delays decisions | One bounded scout pass, then record uncertainty |
 | Writing giant planning prompts | Pushes noise into every phase | State outcome, scope, constraints, touchpoints, tooling |
-| Skipping regression gates in risky refactors | Lets behavior drift after structural changes | Use `--tdd` and exact regression commands |
+| Skipping the regression command in risky refactors | Lets behavior drift after structural changes | Use `--tdd` and exact regression commands |
 | Combining modes that do not compose | Creates unclear orchestration semantics | Pick one mode, then add supported flags |
 | Treating product specs as implementation plans | Produces no concrete phase files for existing code | Use implementation planning for file-level work |
-
-## Migration notes
-
-If you used older wording around deep or TDD planning, update local docs and examples to these rules:
-
-- `--deep` means bounded phase-scoped planning, not an unlimited repository scan.
-- `--tdd` is opt-in and independent of planning mode.
-- `--deep --tdd` is valid because one is a mode and the other is a flag.
-- A TDD plan should hand off to cook with `--tdd`.
-- Scout and brainstorming happen before planning when context or approach is unclear.
 
 ## Related pages
 

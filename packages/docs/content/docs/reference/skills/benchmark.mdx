@@ -1,6 +1,6 @@
 ---
 title: "mk:benchmark"
-description: "Harness canary suite — measures harness performance against ground-truth tasks. Backs the dead-weight audit with measured deltas."
+description: "Maintainer-only canary suite that scores the MeowKit harness against a few ground-truth tasks and compares runs."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -16,57 +16,56 @@ description: "Harness canary suite — measures harness performance against grou
 
 <Callout title="Maintainer-only" type="warn">
 
-This skill measures **this repository's own** harness, so the published kit withholds it. An
-installed project has no `/mk:benchmark` — the page documents the maintainer procedure.
+This skill measures this repository's own harness, so the published kit withholds it and the `.claude/benchmarks/` corpus it reads. An installed project has no `/mk:benchmark`. The page describes the maintainer procedure.
 
 </Callout>
 
-## What This Skill Does
+`mk:benchmark` runs a small set of canary tasks through `mk:autobuild`, records a verdict, score, duration and cost per task, and compares runs. The dead-weight audit (`references/dead-weight-audit-rules.md`) uses the results to decide which harness components are load-bearing. Run it before a harness change to get a baseline and after it to see the delta.
 
-Measures harness performance against a small set of ground-truth tasks. Provides the empirical signal that the dead-weight audit (`docs/dead-weight-audit.md`) consumes to make load-bearing decisions about each harness component.
+## When not to use it
 
-## When to Use
+It does not replace unit tests and is not for the performance of a production system. Skip it when the harness was run end to end by hand within the last hour (use that data), or when the budget cap would be reached before the suite finishes (it records a partial result and alerts).
 
-| Invocation | Tier | Tasks | Cost Cap | Description |
-|---|---|---|---|---|
-| `/mk:benchmark run` | quick | 5 | ≤$5 | Runs the quick canary suite (default) |
-| `/mk:benchmark run --full` | full | 6 | ≤$30 | Quick tier + 1 heavy app-build task |
-| `/mk:benchmark compare A B` | — | — | free (reads cache) | Delta table between two prior runs |
+## Usage
 
-Activate before applying a harness change (baseline) and after (verify delta). Also used during the dead-weight audit playbook for component enable/disable cycles.
-
-**Skip when:** The harness has been run end-to-end manually within the **last hour** (use that data instead), or budget cap would be hit before the suite finishes.
-
-## Core Capabilities
-
-- **Run canary suite:** Executes spec files from `.claude/benchmarks/canary/quick/` (and `full/` with `--full`) via `mk:autobuild`, recording per-task verdicts, scores, duration, and cost.
-- **Compare runs:** Reads two prior run JSONs from `.claude/benchmarks/results/` and emits a markdown delta table showing per-task score and cost changes.
-- **Persist baselines:** After each completed run, appends a cost baseline to `.meowkit/telemetry/cost-log.json` and emits a `benchmark_result` event to `.meowkit/telemetry/trace-log.jsonl`.
-- **Git index audit:** `scripts/git-index-audit.sh` records a reproducible git tracked-state fingerprint as a JSON artifact in `.claude/benchmarks/audits/` (a sibling of `results/`, with a `type: audit` discriminator). Single-repo mode snapshots tracked-file/directory counts plus tracked-path and tracked-index SHA-256; two-arg mode adds local/remote-only counts and a recursive diff status.
-
-## Example Prompt
-
-```
-Run the benchmark canary suite to baseline current harness performance. Then compare the results against the last run to see the delta.
+```bash
+/mk:benchmark run
+/mk:benchmark run --full
+/mk:benchmark compare 260408-1430 260408-1530
 ```
 
-## Arguments
+| Command | Tasks | Cost cap |
+|---|---|---|
+| `run` | Quick tier, 5 tasks in `.claude/benchmarks/canary/quick/` | $5 |
+| `run --full` | Quick tier plus the heavy `06-small-app-build` task | $30 |
+| `compare <a> <b>` | Per-task score and cost delta between two prior runs | None, reads saved results |
 
-| Argument | Effect |
+`--full` is opt-in because the heavy task starts `mk:autobuild`, which can run for hours. The run refuses without the flag.
+
+## What it does
+
+1. `scripts/run-canary.sh` writes a manifest of pending tasks and a cost-ledger path, then prints instructions. A shell script cannot start `mk:autobuild` per task (each needs a fresh subagent context), so the invoking agent must follow the printed instructions and fill in each task result.
+2. After each task the agent appends a cost receipt to the run's `.ledger.jsonl` and runs `run-canary.sh check-cap <ledger> <cap>`. Exit code 2 means the cap was reached and the run stops. `--budget N` or `budget.cap` in `.meowkit/config.yaml` overrides the tier cap.
+3. `scripts/compare-runs.sh` reads two run files and prints the delta table.
+
+## Outputs
+
+| Artifact | Location |
 |---|---|
-| `run` (default) | Execute quick tier (5 tasks, under `.claude/benchmarks/canary/quick/`) |
-| `run --full` | Execute quick + heavy tier (6 tasks total, includes `.claude/benchmarks/canary/full/`) |
-| ``compare RUN-ID-A RUN-ID-B`` | Diff two prior run JSONs |
-| ``git-index-audit.sh [repo]`` | Single-repo tracked-state fingerprint → JSON artifact in `audits/` |
-| ``git-index-audit.sh <local> <remote>`` | Compare two checkouts (only-counts + recursive diff) |
+| Run results | `.claude/benchmarks/results/{run-id}.json` |
+| Trace event | `event=benchmark_result` in the trace log, tagged with benchmark, harness and model versions |
+| Cost baseline | Appended to `.meowkit/telemetry/cost-log.json` as `{run_id, date, tier, pass_rate, avg_score, total_cost_usd}` |
+| Git index audit | `.claude/benchmarks/audits/{YYMMDD-HHMMSS}-audit.json` |
 
-`--full` is strictly opt-in. The heavy task (`06-small-app-build`) triggers `mk:autobuild` which can run for hours — the script refuses without the flag to prevent accidental cost burn.
+## Git index audit
 
-## Hard Constraints
+`scripts/git-index-audit.sh [repo]` records a fingerprint of git's tracked state: file and directory counts, a SHA-256 of the sorted tracked paths and a SHA-256 of the sorted `git ls-files -s` output (which includes mode, blob hash and stage). With two arguments (`<local> <remote>`) it also reports local-only and remote-only counts and a recursive diff status. Audit files sit beside `results/`, not in it, and carry `"type": "audit"`. `MEOWKIT_AUDIT_OUT_DIR` overrides the output directory.
 
-1. **Quick tier ≤$5 total cost.** Hard block if projected cost exceeds.
-2. **Full tier ≤$30 total cost.** Hard block if projected cost exceeds.
-3. **Results recorded in trace-log.jsonl** as `event=benchmark_result` records, tagged with `benchmark_version` + `harness_version` + `model_version`.
-4. **NOT a replacement for unit tests.** Harness-level measurement only.
+## Gotchas
 
-## Tier Layout
+- A passing canary does not mean the harness is correct. The tasks are simple and catch regressions, not every bug.
+- Do not compare runs across model versions without saying so, because a model change confounds the delta.
+- Investigate a FAIL by hand and rerun only after a code change.
+- The audit needs the `--full` heavy task to catch problems that appear only in real product builds.
+- If a harness bug stops `mk:autobuild` from starting, run single specs with `/mk:cook <spec.md>` and score them by hand (Rule 8 in the audit rules).
+- The cross-harness journey J10 is not automated. Run it by hand with `mewkit init --target <runtime>` and `mewkit validate --target <runtime>`.

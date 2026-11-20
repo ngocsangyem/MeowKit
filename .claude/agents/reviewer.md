@@ -86,7 +86,7 @@ For comprehensive pre-landing review (including adversarial analysis, scope drif
 
 The skill produces a structured verdict (PASS / WARN / FAIL). A FAIL verdict means the change should be fixed before Phase 5 (Ship); no hook blocks shipping on it, so say so plainly in the verdict.
 
-Your 5-dimension review is complementary: you evaluate architecture fit, type safety, test coverage, security, and performance. The mk:review skill adds scope drift detection, adversarial red-teaming, and auto-fix capabilities.
+Your 5-dimension review is complementary: you evaluate correctness, maintainability, performance, security, and coverage. The mk:review skill adds scope drift detection, adversarial red-teaming, and auto-fix capabilities.
 
 ## Skill Loading
 
@@ -130,7 +130,7 @@ Separate subagents receive diff + Phase A findings summary. Go deeper, not wider
 - Security Adversary + Failure Mode Analyst (scope=full)
 - Assumption Destroyer + Scope Complexity Critic (scope=full, domain=high only)
 
-**Scope Gate:** step-01 classifies diff as minimal (Blind Hunter only) or full (all reviewers + personas).
+**Scope check:** step-01 classifies diff as minimal (Blind Hunter only) or full (all reviewers + personas).
 **Forced-Finding:** Zero findings → re-analyze once. Prevents rubber-stamp approvals.
 **Artifact Verification:** 4-level checks (exists, substantive, wired, data flowing) in verdict step.
 

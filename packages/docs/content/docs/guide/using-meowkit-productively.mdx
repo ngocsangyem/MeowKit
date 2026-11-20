@@ -1,78 +1,66 @@
 ---
 title: "Using MeowKit Productively"
-description: "Hand off pieces of the loop — verification, stop conditions, triggers — and keep the memory store fresh so every session starts smarter."
+description: "Hand off checks, stop conditions and triggers to the workflow, and keep the memory store current so each session starts with what the last one learned."
 ---
 
-MeowKit's 7-phase workflow is a loop: gather context, act, verify, repeat. Productivity is not about typing prompts faster — it is about **handing off pieces of that loop** so you stop being the bottleneck. This guide shows which piece to hand off, which MeowKit primitive to reach for, and how to keep the memory store fresh so every future session starts smarter than the last.
+The MeowKit workflow is a loop: gather context, act, verify, repeat. You get more from it by handing off parts of that loop than by typing prompts faster. This page lists which part to hand off, what to use for it, and how to keep memory useful.
 
 | You hand off | Use it when | Reach for |
-|--------------|-------------|-----------|
-| The check | You're exploring or deciding | `mk:verify`, `mk:evaluate`, `mk:review` |
-| The stop condition | You know what done looks like | `/goal` + `mk:verify`, `/mk:loop` |
-| The trigger | Work happens outside your session on its own schedule | `/loop`, `/schedule` (host runtime) |
-| The knowledge | A learning should outlive the session | `.meowkit/memory/`, `mewkit trace` |
+|---|---|---|
+| The check | You are exploring or deciding | `mk:verify`, `mk:evaluate`, `mk:review` |
+| The stop condition | You know what done looks like | `/goal` with `mk:verify`, `/mk:loop` |
+| The trigger | Work happens outside your session | `/loop`, `/schedule` (host runtime) |
+| The knowledge | A lesson should outlive the session | `.meowkit/memory/`, `mewkit trace` |
 
-<Callout title="Host runtime primitives" type="info">
+`/goal`, `/loop` and `/schedule` are loop primitives of the host runtime, in recent Claude Code releases. MeowKit supplies the deterministic checks and the recurring jobs that make them useful.
 
-`/goal`, `/loop`, and `/schedule` are loop primitives of the host runtime (recent Claude Code releases). MeowKit supplies the deterministic checks and recurring jobs that make them effective.
+## Size the task first
 
-</Callout>
+Do not run the full pipeline when you do not need it.
 
-## Right-size every task first
+- A trivial edit (rename, typo, format) is classified TRIVIAL and routed to the cheapest model. Do not invoke `/mk:cook` for a one-line change.
+- A bug with a known cause in two files or fewer can take `/mk:fix --quick`, which writes no plan.
+- When scale-routing returns `workflow=one-shot` and the blast radius is zero, a separate plan can be skipped. Add your project's safe fast-path domains to `domain-complexity.csv` so routing keeps matching your repository.
+- Everything else gets a plan agreed first, which costs less than reworking the wrong build.
 
-The cheapest productivity win is not running the full pipeline when you don't need it. MeowKit already routes for you — use the escape hatches it codifies instead of fighting the process:
+## Hand off the stop condition
 
-- **Trivial edits** (rename, typo, format) are classified TRIVIAL and routed to the cheapest model. Don't invoke `/mk:cook` for a one-line change.
-- **Simple bug fixes**: `/mk:fix` with `complexity=simple` skips a separate plan by design — the fix *is* the plan.
-- **One-shot domains**: when scale-routing returns `workflow=one-shot` with zero blast radius, a separate plan may be skipped. Extend `domain-complexity.csv` with your project's safe fast-path domains so routing keeps matching reality.
-- **Everything else** gets a plan agreed first. Skipping it costs more than a 30-second plan.
-
-## Hand off the stop condition with `/goal`
-
-Phase 3.6 (`mk:verify`) is a **deterministic** check — build, lint, typecheck, tests, coverage all pass or they don't. Deterministic criteria are exactly what goal-based loops need: an evaluator can check the condition without judgment calls, so the agent keeps iterating instead of declaring "good enough" early.
+Phase 3.6 (`mk:verify`) is a deterministic check: build, lint, type-check, tests and coverage pass or they do not. A goal loop can check that without judgment, so the agent keeps going instead of declaring "good enough".
 
 ```bash
-/goal run /mk:cook for the approved plan; do not stop until mk:verify
+/goal run /mk:cook for the agreed plan; do not stop until mk:verify
 passes with zero failures. Stop after 5 tries.
 ```
 
-Always set an explicit try cap. MeowKit's own autobuild pipeline caps its generator ⇄ evaluator loop at 3 rounds before escalating to a human — copy that discipline.
+Always set a try cap. Autobuild caps its generator and evaluator loop at 3 rounds before it asks you what to do. For a number such as coverage, bundle size or lint count, use `/mk:loop`. It runs bounded, git-tracked trials and keeps or reverts each change by the measured delta.
 
-For **scalar metrics** (coverage percentage, bundle size, lint count), use `/mk:loop` instead: it runs bounded, git-tracked iterations and keeps or reverts each change based on the measured delta.
+## Hand off the trigger
 
-## Hand off the trigger with `/loop`
-
-The workflow ends at Phase 5 with a PR pushed — but CI results and review comments arrive on the *external system's* schedule, not yours. Instead of polling GitHub yourself:
+The workflow ends at Phase 5 with a pushed PR, but CI results and review comments arrive on someone else's schedule. Instead of polling:
 
 ```bash
 /loop 15m check the open PR: address review comments with mk:respond-pr,
 fix failing CI. Stop when the PR is merged.
 ```
 
-`mk:respond-pr` triages each reviewer comment with verify-before-agree discipline, so the loop responds carefully instead of blindly accepting every suggestion.
+`mk:respond-pr` triages each reviewer comment and then accepts it, pushes back or replies, so the loop does not accept every suggestion blindly.
 
-## Schedule the maintenance you keep forgetting
+## Schedule recurring maintenance
 
-Several MeowKit maintenance jobs are documented as "quarterly" or "calendar reminder" — which in practice means *never*. They are mechanical, measurable, and perfect for `/schedule`:
+These jobs are mechanical and measurable, so `/schedule` suits them:
 
 | Job | Command | Cadence |
-|-----|---------|---------|
-| Memory prune (propose stale-entry removals) | `/mk:memory --prune` | Monthly |
-| Friction backlog review | `mewkit trace propose` | Weekly |
-| SKILL.md length audit (>500 lines) | check from skill-authoring rules | Quarterly |
-| Dead-weight audit (maintainers, from the source repo) | `/mk:benchmark run --full` + compare | Quarterly, and on every model upgrade |
+|---|---|---|
+| Propose stale memory entries for removal | `/mk:memory --prune` | Monthly |
+| Review the friction backlog | `mewkit trace propose` | Weekly |
+| Check that `SKILL.md` bodies stay under 500 lines | Rule 3 in the skill-authoring rules | Quarterly |
+| Dead-weight audit (maintainers, source repository) | `/mk:benchmark run --full` and compare | Each model upgrade and quarterly |
 
-<Callout title="Cloud environments" type="warn">
+Scheduled routines run in a cloud environment that does not inherit your local shell. Check that credentials such as Jira tokens and `MEOWKIT_*` variables are configured there first.
 
-Scheduled routines run in a cloud environment that does not inherit your local shell. Verify required credentials (Jira tokens, `MEOWKIT_*` variables) are configured there before moving a routine off your machine.
+## Write memory while you work
 
-</Callout>
-
-## Keep memory fresh — write the non-derivable lesson while you work
-
-The store is two committed files, `.meowkit/memory/decisions.md` and `gotchas.md`
-([full architecture](/guide/memory-system)). There is no capture hook and no prefix syntax: when a
-learning appears, say so, and the running skill appends the entry.
+The store is two committed files, `.meowkit/memory/decisions.md` and `gotchas.md` (see [Memory system](/guide/memory-system)). There is no capture hook and no prefix syntax. When you learn something, say so, and the running skill appends the entry.
 
 ```md
 ## Advisory lock, not row lock, for team reassignment   <!-- 2026-11-01 -->
@@ -81,52 +69,41 @@ Apply when: adding any concurrent write path to team membership
 Source: PR #412
 ```
 
-Three rules keep the store useful:
+- **Write only what the next session cannot derive** from the code, the git log, the plan or the ADR.
+- **No secrets and no vulnerability detail.** The store is committed and read back as data. Security findings stay in `mk:cso` reports and review verdicts. `mewkit validate --memory` checks this and a 300-line cap per file.
+- **Prune on a schedule.** `/mk:memory --prune` proposes removing entries whose `Source` no longer exists and entries older than 180 days with no recent match, and you approve each one. Agents read stale entries as current.
 
-- **Only non-derivable lessons.** If the next session could get the same answer from the code, the
-  git log, the plan or the ADR, do not write it. A store of derivable facts is noise.
-- **No secrets, no vulnerability detail.** The store is committed and read back as DATA. Security
-  findings stay in `mk:cso` reports and review verdicts. `mewkit validate --memory` enforces this
-  mechanically, alongside a 300-line cap per file.
-- **Prune on a schedule.** `/mk:memory --prune` proposes removing entries whose `Source` no longer
-  exists and entries older than 180 days with no recent hit. You approve each removal. A store full
-  of stale entries is worse than an empty one — agents read it as current truth.
-
-Reading is one grep, run only by the skills that need it (`mk:fix`, `mk:investigate`, `mk:review`,
-`mk:plan-creator`, `mk:cso`):
+Reading is one grep, run by `mk:fix`, `mk:investigate`, `mk:review`, `mk:plan-creator` and `mk:cso`:
 
 ```bash
 grep -rilE "payment|retry|idempotency" .meowkit/memory/
 ```
 
-If that keeps returning nothing for topics you know were decided, nobody is writing entries — the
-fix is the habit, not more tooling.
+If that keeps returning nothing for topics you know were decided, no entries are being written. The fix is the habit.
 
-## Turn friction into system improvements
+## Record friction
 
-When a loop stalls or you correct the agent by hand, don't stop at fixing the instance — record it:
+When a loop stalls or you correct the agent by hand, record it:
 
 ```bash
 mewkit trace --friction "evaluator passed a build with broken auth flow"
 ```
 
-`mewkit trace propose` groups repeated friction (2+ occurrences) into advisory backlog items. When a friction item traces back to one skill, the natural place to encode the fix is that skill's **Gotchas** section — it exists to grow one bullet per observed failure. One recorded friction note is worth more than three silent workarounds.
+`mewkit trace propose` groups friction that repeats (2 or more times) into advisory backlog items. When an item traces back to one skill, that skill's Gotchas section is the place to encode the fix.
 
-## The compounding cadence
+## Cadence
 
-| When | Do | Why |
-|------|----|-----|
-| During every task | Ask for the non-derivable lesson to be written down the moment you learn it | Mid-work capture beats end-of-session recall |
-| After every intervention | `mewkit trace --friction "<note>"` | Repeated friction becomes a backlog item automatically |
-| Weekly | Run `mewkit trace propose` | Repeated friction becomes a backlog item, and the harness improves |
-| Monthly | `/mk:memory --prune` | Stale memory misleads agents |
-| Quarterly / model upgrade | Dead-weight audit via `/mk:benchmark` (maintainers only) | Scaffolding that helped last model may slow this one |
-
-None of these steps is large. The point is that each one feeds the next session: a written-down decision becomes recalled context, and recorded friction becomes a harness fix. That is what "productive" means with an agent toolkit — not faster typing, but a system that gets smarter every week you use it.
+| When | Do |
+|---|---|
+| During a task | Ask for the non-derivable lesson to be written as soon as you learn it |
+| After you correct the agent | `mewkit trace --friction "<note>"` |
+| Weekly | `mewkit trace propose` |
+| Monthly | `/mk:memory --prune` |
+| Each model upgrade | Dead-weight audit with `/mk:benchmark` (maintainers) |
 
 ## Related
 
-- [Memory System](/guide/memory-system) — capture paths, JSON-first stores, pruning
-- [Workflow Phases](/core-concepts/workflow) — where planning, review and verification sit
-- [Trace & Benchmark](/guide/trace-and-benchmark) — friction recall and measured audits
-- [Model Routing](/guide/model-routing) — tier classification and escalation
+- [Memory system](/guide/memory-system) for the store, its format and its lint
+- [The workflow](/core-concepts/workflow) for where planning, review and verification sit
+- [Trace and benchmark](/guide/trace-and-benchmark) for friction recall and audits
+- [Model routing](/guide/model-routing) for tiers and escalation

@@ -15,7 +15,7 @@
 //!
 //! It proves the confirmation is bound to THIS exact payload. It cannot prove a
 //! human rather than the agent produced it — host-authenticated approval is the
-//! same unsolved problem as Gate 2's, and nothing here should be read as
+//! same unsolved problem as approving a verdict, and nothing here should be read as
 //! approval evidence. The re-fetch→post window is a documented small TOCTOU,
 //! narrowed rather than eliminated.
 use std::path::Path;

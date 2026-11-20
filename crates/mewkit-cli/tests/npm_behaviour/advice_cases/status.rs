@@ -17,7 +17,7 @@ fn status_reports_the_budget_and_says_what_it_is_not() {
     );
     assert!(
         ts.stdout
-            .contains("supervision continuity — never verification, never a gate approval.")
+            .contains("supervision continuity — never verification, never an approval.")
     );
 }
 

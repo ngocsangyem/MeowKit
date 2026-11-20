@@ -11,7 +11,7 @@
 - [Implementation Items](#implementation-items)
 - [Test Items](#test-items)
 - [Migration Items](#migration-items)
-  - [Gate Logic](#gate-logic)
+  - [Outcomes](#outcomes)
 - [Step 3.47: Plan Verification (manual follow-up)](#step-347-plan-verification-manual-follow-up)
 
 ## Step 3.45: Plan Completion Audit
@@ -110,7 +110,7 @@ COMPLETION: 4/7 DONE, 1 PARTIAL, 1 NOT DONE, 1 CHANGED
 ─────────────────────────────────
 ```
 
-### Gate Logic
+### Outcomes
 
 After producing the completion checklist:
 

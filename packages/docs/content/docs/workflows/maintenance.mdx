@@ -1,95 +1,64 @@
 ---
 title: "Maintaining Old Projects"
-description: "Navigate, understand, and fix issues in unfamiliar or legacy codebases."
+description: "Map an unfamiliar or legacy codebase, find the root cause of a problem, and fix it."
 ---
 
-> Orient yourself in unfamiliar code, then fix issues with full understanding.
+This playbook starts with understanding the code and only then changes it.
 
-**Best for:** Legacy codebases, inherited projects, unfamiliar code  
-**Time estimate:** 30-60 minutes  
-**Skills used:** [mk:scout](/reference/skills/scout), [mk:investigate](/reference/skills/investigate), [mk:fix](/reference/skills/fix)  
-**Agents involved:** orchestrator (orients), developer, tester, analyst (captures learnings)
+**Best for:** Legacy codebases, inherited projects, unfamiliar code
+**Time estimate:** 30 to 60 minutes
+**Skills used:** [mk:scout](/reference/skills/scout), [mk:investigate](/reference/skills/investigate), [mk:fix](/reference/skills/fix), [mk:freeze](/reference/skills/freeze)
+**Agents involved:** developer, tester, journal-writer
 
-## Overview
-
-When you open a codebase you've never seen before, MeowKit's first move is **orientation** — understanding the structure before touching anything. The **scout** maps the architecture, the **investigator** traces problems to root causes, and the **analyst** captures what you learn for next time.
-
-## Step-by-step guide
-
-### Step 1: Orient — understand the codebase
+## Step 1: Map the codebase
 
 ```
 /mk:scout project structure
 ```
 
-The [mk:scout](/reference/skills/scout) skill spawns 2-6 parallel Explore agents:
+[mk:scout](/reference/skills/scout) splits the project into segments, searches them with parallel Explore agents (up to six, one per directory or package), and returns a consolidated report of entry points, key directories and patterns. It runs on Claude Code only.
+
+## Step 2: Investigate the problem
 
 ```
-Scout Report:
-  Architecture: Express + TypeScript | Monolith | Jest tests
-  Entry points: src/index.ts, src/app.ts
-  Key directories:
-    src/api/ — 12 route files (REST endpoints)
-    src/services/ — 8 service modules
-    src/models/ — Sequelize models (PostgreSQL)
-    tests/ — 45 test files (62% coverage)
-  Patterns: MVC, service layer, repository pattern
-  Complexity: Medium (4,200 LOC across 58 files)
+/mk:investigate users report slow page loads on the dashboard
 ```
 
-### Step 2: Investigate the reported issue
+[mk:investigate](/reference/skills/investigate) collects symptoms, traces the failure to a root cause and writes a diagnostic report under `tasks/reports/`. It does not edit code. For a recurring or complex failure it picks an RCA method (5 Whys, Ishikawa, 8D) first.
+
+## Step 3: Fix with the cause in hand
 
 ```
-/mk:fix users report slow page loads on the dashboard
+/mk:fix tasks/reports/<diagnostic-report>.md
 ```
 
-The [mk:investigate](/reference/skills/investigate) skill traces the problem:
+[mk:fix](/reference/skills/fix) always scouts and diagnoses before it edits. It treats a supplied report as evidence to check, not as a replacement for its own diagnosis. It needs six things before it edits: the exact symptom, reproduction evidence, expected against actual behaviour, the root cause with `file:line`, why it happens now, and the blast radius. It then fixes the cause, runs a before and after check, and stops after three failed attempts.
 
-```
-Phase 1 — Symptoms: Dashboard loads in 8 seconds (should be <2s)
-Phase 2 — Trace: dashboard.controller.ts → dashboard.service.ts → 3 separate DB queries
-Phase 3 — Pattern match: N+1 query pattern — loading users, then loading orders per user
-Root cause: "Dashboard service makes N+1 queries. Each user triggers a separate order lookup."
-```
+To keep edits inside the affected module while you work, run [mk:freeze](/reference/skills/freeze) with that path. It blocks Edit and Write outside the allowed directory.
 
-### Step 3: Fix with understanding
+## Step 4: Record what you learned
 
-The **developer** applies the fix with MeowKit's constraints:
-- **mk:freeze** locks edits to `src/services/dashboard.service.ts`
-- Regression test written: `test('dashboard loads in under 2 seconds')`
-- Fix: Replace N+1 with a single JOIN query
-- All 45 existing tests still pass
+`mk:fix` appends one entry to `.meowkit/memory/gotchas.md`, through `mewkit note`, only when the lesson cannot be read from the code, the diff or `git log`. An entry looks like this:
 
-### Step 4: Capture learnings
-
-`mk:fix` appends one entry to `.meowkit/memory/gotchas.md`:
-
-```
-Project: legacy-dashboard
-Pattern: Dashboard has N+1 query patterns — check any service making
-         per-record DB calls. Repository pattern should use eager loading.
+```markdown
+## Dashboard service makes per-user order queries  <!-- 2026-11-20 -->
+Why: the repository layer loads orders one user at a time.
+Apply when: a service loops over records and calls the database in the loop.
+Source: tasks/reports/<diagnostic-report>.md
 ```
 
-Next time `mk:fix` runs, its task-start grep over `.meowkit/memory/` finds the entry and surfaces it.
+The next `mk:fix` or `mk:investigate` run greps `.meowkit/memory/` at the start and opens matching entries.
 
-### Step 5: Document what you found
+## Step 5: Write a journal entry for hard cases
 
-The **journal-writer** captures the investigation for future maintainers:
+For a failure that took several attempts, the **journal-writer** agent writes `docs/journal/YYMMDD-title.md`: what happened, what was tried, the root cause and how to prevent it.
 
-```
-docs/journal/260327-dashboard-n-plus-1-fix.md
-  What happened: Dashboard N+1 query causing 8s load times
-  Root cause: Per-user order lookup in loop
-  Fix: Single JOIN query
-  Prevention: Add query profiling to CI
-```
+## How this differs from feature work
 
-## What makes maintenance different
-
-| Concern | Normal workflow | Maintenance workflow |
-|---------|----------------|---------------------|
-| First step | Plan the feature | Scout the codebase |
-| Context | You know the code | You don't — scout maps it |
-| Memory | Fresh session | Read previous lessons first |
-| Scope | Defined by plan | Defined by freeze (lock to affected module) |
-| Output | Feature + tests | Fix + journal entry + lessons for next time |
+| Concern | Feature work | Maintenance |
+|---|---|---|
+| First step | Plan the feature | Map the codebase |
+| Context | You know the code | `mk:scout` builds it |
+| Memory | Read at task start | Read at task start, matters more here |
+| Scope | Set by the plan | Set by the diagnosis, optionally held by `mk:freeze` |
+| Output | Feature and tests | Fix, regression test, gotcha entry |

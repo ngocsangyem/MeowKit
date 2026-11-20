@@ -30,7 +30,7 @@ export default defineNuxtConfig({
   site: {
     url: 'https://meowkit.dev',
     name: 'MeowKit',
-    description: 'Hard gates, TDD, security scanning, and human approval — so your AI agent ships production-quality code, not untested prototypes.',
+    description: 'A kit of agents, skills, rules and hooks for AI coding agents. It installs on six runtimes, writes plans and review verdicts you read, and refuses a commit when lint, related tests or the type-check fail.',
     defaultLocale: 'en',
   },
 

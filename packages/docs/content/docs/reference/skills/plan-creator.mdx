@@ -1,6 +1,6 @@
 ---
 title: "mk:plan-creator"
-description: "Creates structured multi-file implementation plans before any code is written — scope detection, research, codebase analysis, semantic checks, red-teaming, validation interview."
+description: "Writes the multi-file implementation plan under tasks/plans before building, with modes from fast to deep and a handoff to cook."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,145 +14,73 @@ description: "Creates structured multi-file implementation plans before any code
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-The planning engine. Creates a complete implementation plan before any code is written. Uses a step-file architecture (one step loaded at a time to save context): scope challenge → *(conditional Plan Intake Packet)* → research → codebase analysis → draft → semantic checks → red-team → validation interview → plan agreement → hydrate.
+Writes the multi-file implementation plan before you build: an overview `plan.md` of at most 80 lines plus one `phase-XX-*.md` file per phase, saved under `tasks/plans/YYMMDD-name/`. The flow is classify, inspect, capture missing decisions, draft, validate and present the plan to you. Reach for it when a task is non-trivial (more than 2 files, more than an hour, or an architectural decision), when you give it two or more upstream reports, or when a green-field product build needs a spec. Planning is a practice here: the skill asks you to agree the plan, but no hook blocks an edit if you skip it.
 
-## When to Use
+## When not to use
 
-- **Plan first:** for any non-trivial task (>2 files or >30 min), write the plan and agree it with the user before code. Nothing blocks an edit without one
-- **Explicit invocation:** `/mk:plan-creator` or called by `mk:cook` / `mk:workflow-orchestrator`
-- **NOT for:** trivial single-file changes, quick fixes with `--quick` flag, tasks that have an existing approved plan
-
-## Core Capabilities
-
-- **Scope detection:** auto-detects product-level intent via regex patterns (feature requests, greenfield builds, spec documents) and presents scope mode (EXPANSION / HOLD / REDUCTION)
-- **Complexity routing:** 5 signals determine scope depth — file count, domain keywords, cross-cutting concerns, security surface, data model changes
-- **Plan Intake Packet (conditional):** when ≥2 pre-existing upstream artifacts are supplied, consolidates them into one traceable brief before drafting; 0–1 sources → clean skip, no behavior change
-- **Step-file loading:** 10 sequential step files loaded one at a time, each producing checkpointed output
-- **Research spawning:** up to 2 researcher agents with max 5 calls and ≤150 lines of context each
-- **Codebase analysis:** scout + project docs + existing plan scan for cross-plan dependency detection
-- **Bounded deep mode:** adds a compact scope map and per-phase Deep Phase Map (file inventory, test gaps, interfaces, dependencies) without repo-wide scans
-- **Two-approach mode:** for COMPLEX tasks, produces two alternative approaches with trade-off analysis
-- **Semantic checks:** validates plan against 6 dimensions (goal clarity, AC completeness, constraint realism, risk coverage, line count, product-level specifics)
-- **Red-teaming:** 4 adversarial personas selected by phase count, subagent-dispatched with anti-sycophancy IGNORE instruction
-- **Validation interview:** 5 question categories with detection keywords, 2-4 options each, recommended option marked
-- **Bead decomposition:** for tasks with 5+ files, breaks into atomic work units with dependency chains (beads → strands → ropes)
-- **Vertical-slice default:** decomposes feature-shaped tasks into end-to-end working slices (one runnable path per phase) instead of horizontal layers, with horizontal phases reserved for foundation layers and break-down triggers for oversized phases
-- **Conditional autonomy boundaries:** emits an advisory three-tier (Always / Ask-first / Never) autonomy block in plan.md for long-horizon plans only, tunable when you agree the plan and read mode-aware by `mk:cook`
-- **Hydration:** creates TaskCreate entries with dependency chains, parallelism groups, `.plan-state.json` checkpoint
-
-## Requirements Capture Contract
-
-Before producing a plan, plan-creator MUST answer all 5 dimensions in concrete sentences (cook's exact-requirements contract — see `.claude/skills/cook/SKILL.md` "Exact-Requirements Contract (Phase 1)"):
-
-1. **Expected output** — concrete artifact(s) the user will see at the end (file paths, feature behavior, UI screen, API endpoint + payload, CLI command + flags).
-2. **Acceptance criteria** — specific behaviors / inputs → outputs / edge cases that MUST work to call it "done".
-3. **Scope boundary** — what is explicitly OUT of scope this round.
-4. **Non-negotiable constraints** — stack, file locations, naming, backward compatibility, deadlines, performance.
-5. **Touchpoints** — which existing files/modules (from scout) will be modified or extended; which contracts must stay stable.
-
-Every clarifying question MUST cite scout findings (file paths). Abstract options ("Add the feature") without a file path are a failure mode — replace with options of the form "Add to `src/api/users.ts` (matches existing pattern)" or "Create new `src/api/profile.ts`".
-
-Skip when input is an existing plan path (`plan.md` / `phase-*.md`) — the plan already encodes scout output and the 5 dimensions.
-
-## Plan Intake Packet (conditional)
-
-When two or more upstream artifacts already exist — `mk:office-hours` design docs, `mk:brainstorming` reports, `mk:planning-engine` assessments, `mk:confluence-spec-analyst` specs, `mk:intake` triage output, `mk:jira-analyst` findings, or spec documents you supply directly — a conditional step (0.5) consolidates them into ONE Plan Intake Packet before drafting, so the plan reads one traceable brief instead of N scattered reports.
-
-- **Activation:** ≥2 external artifact paths in the invocation → build the packet. 0–1 sources → skip entirely, no planning behavior change (only an activation-log line is written).
-- **Adapter, not generator:** only for artifacts that exist *before* plan-creator runs. Its own step-01 research and step-02 scout output are consumed directly by the draft step, never routed through the packet. One lone ticket is single-ticket triage — that is `mk:intake`, not a packet.
-- **Six blocks, under 120 lines:** Request · Routing · Requirements · Evidence · Scope Shape · Handoff. Every load-bearing claim carries `from: <path>` or an `[ASSUMPTION]` tag; user-confirmed upstream decisions are LOCKED (red-team may challenge but must escalate, never silently cut).
-- **Output:** drafted to `.meowkit/state/plan-creator-intake-packet.md`, then moved to `{plan_dir}/research/plan-intake-packet.md` and cited like any research report. Its path flows to steps 01–03 via the `intake_packet_path` variable (`none` when fewer than 2 artifacts).
-- **NOT for:** single ticket/PRD triage (→ `mk:intake`), ticket complexity + dependency scoring (→ `mk:planning-engine`), or choosing an approach (→ `mk:brainstorming`). Route those; the packet only consolidates what those skills or you already produced.
-
-## Arguments
-
-| Flag | Effect |
-|------|--------|
-| `--feature` | Feature implementation plan (default) |
-| `--bugfix` | Bug fix plan |
-| `--refactor` | Refactoring plan |
-| `--security` | Security-focused plan |
-| `--product-level` | Product-level spec with design language, LIGHT scout with allowlist/blocklist |
-| `--deep` | Deep mode — bounded scope map + per-phase Deep Phase Map |
-| `--tdd` | TDD mode — adds regression-first phase sections and preserves `--tdd` in cook handoff |
-| `--parallel` | Parallel agent mode with ownership matrix |
-| `--two-approach` | Two-alternative design with trade-off comparison |
-| `--no-design` | Skip design language subagent (product-level only) |
-| `--no-scout` | Skip codebase scout (product-level only) |
-| `--spike --timebox <duration>` | Time-boxed investigation (Agile mode). Skips research, codebase analysis, red-team, validation interview. Uses `assets/spike-plan-template.md` (investigate + findings, no test/ship). Incompatible with `--product-level` and `mk:autobuild` FULL |
-| `--advice` | Opt-in strategic supervision for one planning run by the [athena](/reference/agents/athena) agent: direction after the scope challenge, rescue on an unresolved red-team contradiction, an independent read before you agree the plan. Up to 4 calls; it never writes the plan and never approves it |
-
-### Spike mode (Agile context)
-
-Governed by `.claude/skills/agent-detector/references/agile-feedback-cycle.md` Section 2 (loaded only when Agile context active).
-
-- Requires `--timebox <duration>` (e.g., `--timebox 2d`, `--timebox 4h`); rejected without it
-- Sets plan frontmatter `spike: true`, `timebox:`, `findings_doc:` (default `tasks/plans/{slug}/findings.md`)
-- Two phases only: investigate + document findings — NO test phase, NO ship phase
-- Story-points cap (advisory): warn if `story_points > 5`
-- INCOMPATIBLE with `mk:autobuild` FULL density (the autobuild contract step breaks); use `mk:cook` or `mk:plan-creator --fast`
-- At spike completion: prompt to convert findings to delivery story / close as research-only / defer
-
-### DoR advisory at Phase 1 entry (Agile context)
-
-If the plan frontmatter has non-empty `jira_tickets:`, `mk:plan-creator` runs the DoR advisory checklist (5 mechanical checks per ticket) BEFORE generating phase files. Advisory only — never blocks. Skip silently when `jira_tickets:` absent or rule not loaded. Governed by `agile-story-gates.md` Section 1.
-
-## Workflow (step files)
-
-| Step | Name | Key Output |
-|------|------|-----------|
-| 00 | Scope challenge | Planning mode, workflow model, scope mode, complexity tier |
-| 0.5 | Intake packet *(conditional: ≥2 external artifacts)* | Consolidated Plan Intake Packet, or clean skip |
-| 01 | Research | Researcher reports with source citations |
-| 02 | Codebase analysis | Scout findings, existing plan scan, cross-plan dependencies; deep mode emits compact scope map |
-| 03 | Draft (feature) / 03a (product-level) | plan.md with 12-section phase template + YAML frontmatter; optional Deep Phase Map / TDD sections |
-| 04 | Semantic checks | Validation report, two-approach selection (if applicable), Verification Roles dispatch (sub-step 4d — Light/Standard/Full tier by phase count) writes `## Verification Log` per phase file |
-| 05 | Red-team | 4-persona adversarial analysis, red-team-findings.md (7-field findings); Gate W1 Whole-Plan Consistency Sweep at exit |
-| 06 | Validation interview | 5-category questions with propagated answers; Gate W2 Whole-Plan Consistency Sweep at exit |
-| 07 | Plan agreement | Self-check (Completed/Skipped/Uncertain), AskUserQuestion; archive writes `decisions.md` |
-| 08 | Hydrate | TaskCreate with dependency chains, critical-step sub-tasks, `.plan-state.json` (v1.2) |
-| 09 | Post-plan handoff | Mode-pruned AskUserQuestion (cook / validate / red-team / autobuild / end), writes `handoff: { next, decided_at }` to plan.md frontmatter, prints command, STOPs |
-
-**Branching:** product-level mode uses step-03a instead of step-03. Fast mode and product-level mode skip steps 05-06 and the 4d Verification Roles sub-step.
-
-**Gates W1 / W2** stage edits before applying (read-only Pass 1 stages `### Pending Sweep Edits`; decision check blocks on unresolved contradictions via AskUserQuestion; Pass 2 applies and logs). Algorithm: `references/whole-plan-sweep.md`. Verification Roles algorithm + dispatch brief: `references/verification-roles.md`.
+| Situation | Use |
+|---|---|
+| Audit a plan that exists | `mk:validate-plan` |
+| Explore options before the approach is chosen | `mk:brainstorming` |
+| Trivial or single-file change, or a simple fix | Skip planning; `mk:fix` |
+| Build the plan | `mk:cook` or `mk:autobuild` |
 
 ## Usage
 
 ```bash
-/mk:plan-creator "add two-factor authentication to login"
-/mk:plan-creator --product-level "build a kanban board app"
-/mk:plan-creator --bugfix "fix race condition in payment processing"
-/mk:plan-creator --deep --two-approach "migrate from REST to GraphQL"
-/mk:plan-creator --tdd "implement rate limiting middleware"
-/mk:plan-creator --deep --tdd "refactor search indexing without changing ranking"
+/mk:plan-creator "add OAuth login" [--fast | --hard | --deep | --parallel | --two | --product-level | --spike --timebox 2d] [--tdd] [--advice]
+/mk:plan-creator archive
+/mk:plan-creator red-team tasks/plans/<plan>
+/mk:plan-creator validate tasks/plans/<plan>
 ```
 
-## Example Prompt
+| Flag | Mode and output |
+|---|---|
+| none | Picks a mode from the scope |
+| `--fast` | `plan.md` only, no research |
+| `--hard` | Two researchers, `plan.md` and phase files, full validation interview |
+| `--deep` | Hard plus a bounded phase map (file inventory, test gaps, interfaces, dependencies) |
+| `--parallel` | Hard plus an ownership matrix |
+| `--two` | Two approach files and a trade-off matrix |
+| `--product-level` | A product spec in `plan.md` only (user stories, features, design language); `--no-design` and `--no-scout` trim it |
+| `--spike` | Time-boxed investigation. Requires `--timebox <duration>` and is incompatible with `--product-level` and autobuild FULL density |
+| `--tdd` | Adds tests-first sections and carries `--tdd` into the cook handoff |
+| `--advice` | Up to four strategic checkpoints from the `athena` agent. It never writes or settles the plan |
+
+The long explanation of each mode is in [Plan creator modes and flags](/core-concepts/plan-creator-modes-and-flags). The `archive`, `red-team` and `validate` subcommands route to `references/archive-workflow.md`, `red-team-standalone.md` and `validate-standalone.md`. A hard or deep plan still runs its own red team and validation interview.
+
+## Steps
+
+Before drafting, the skill can state the expected output, acceptance criteria, scope boundary, constraints and touchpoints in concrete sentences. Each clarifying question cites file paths found by scout.
+
+| Step | What happens |
+|---|---|
+| 0 | Scope challenge: exit for trivial, fast for simple, hard or deep for complex |
+| 0.5 | If two or more upstream artifacts exist, consolidate them into an intake packet |
+| 1 and 2 | Research and codebase analysis (hard, deep, parallel, two) |
+| 3 | Draft `plan.md` and the phase files |
+| 4 | Semantic and structural checks |
+| 5 | Red team with up to four personas, recorded in `red-team-findings.md` |
+| 6 | Validation interview of three to five critical questions, with answers written back |
+| 7 | Present the plan: Looks right, Modify or Reject |
+| 8 | Turn phase checkboxes into session tasks |
+| 9 | Ask what next (`cook`, `validate`, `red-team`, `autobuild` or `end`), write `handoff.next` into `plan.md` and stop |
+
+After steps 5 and 6 a whole-plan consistency sweep stages edits and applies them only once you resolve any contradictions (`references/whole-plan-sweep.md`). If the plan carries a `jira_tickets:` list and the Agile rules are loaded, an advisory readiness checklist runs per ticket and never blocks. A design evidence packet, such as one from `mk:figma`, is cited and not re-analysed (`references/design-evidence-consumption.md`).
+
+## Outputs
 
 ```
-Plan the implementation of real-time collaborative editing for our document editor. Support up to 50 concurrent editors, operational transform for conflict resolution, and WebSocket-based sync. Must work with existing React frontend and Node.js backend.
+tasks/plans/YYMMDD-name/
+  plan.md           overview, 80 lines at most
+  research/         researcher reports (hard mode)
+  phase-01-name.md  12-section detail, 150 lines at most
 ```
 
-## Common Use Cases
+The skill never starts the next command. Type `/mk:cook <plan path>` yourself in a fresh session. With `tdd_mode` on, the printed cook command includes `--tdd`.
 
-- Feature implementation planning (most common)
-- Greenfield product builds (product-level mode)
-- Bug fix planning for complex issues (multi-file, race conditions)
-- Architecture migration planning (two-approach mode useful)
-- Security-focused planning with TDD enforcement
-- Multi-agent parallel build planning (bead decomposition + ownership matrix)
+## Gotchas
 
-## Pro Tips
-
-- **Product-level mode auto-detects.** The regex patterns catch phrases like "build a", "create an app", "from scratch" — you rarely need the `--product-level` flag explicitly.
-- **Step-05 and 06 are skipped in fast mode.** If you need adversarial review, don't use fast mode.
-- **Plan state persists.** `.plan-state.json` enables resumption if context is lost mid-planning.
-- **CEO review after the plan is agreed.** Consider running `mk:plan-ceo-review` on the approved plan for an additional quality layer.
-- **Deep maps known scope; it does not choose architecture.** If the approach is undecided, run `mk:brainstorming` before planning.
-- **TDD survives handoff.** Plans generated with `--tdd` print `/mk:cook ... --tdd`; cook warns if a TDD plan is run without the flag.
-- **Variables flow between steps.** 10 variables (planning_mode, task_complexity, workflow_model, scope_mode, research_reports, codebase_findings, plan_dir, red_team_findings, selected_approach, tdd_mode) pass between step files.
-
-> **Canonical source:** `.claude/skills/plan-creator/SKILL.md`
+Rewrite a goal that describes an activity ("Implement OAuth") as an outcome ("Users can log in with OAuth"). Every acceptance criterion needs a command or file check. Do not use `--deep` to choose an architecture, since deep maps a chosen approach. A failed integrity check after task hydration stops the run for a human to fix. The full list is in `references/gotchas.md`, and `references/failure-catalog.md` lists common planning failures.

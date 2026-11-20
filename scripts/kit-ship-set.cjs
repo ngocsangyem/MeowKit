@@ -80,7 +80,7 @@ const RUNTIME_OVERLAY_TARGETS = [CODEX_OVERLAY, CURSOR_OVERLAY, GROK_OVERLAY, AG
  * plans, contracts and verdicts, so archiving it made the kit carry empty
  * marker files and this repository's own working artifacts into every install.
  * Every writer under it creates the directory it needs on first write, and a
- * gate reads an absent directory as "no plan" — the same block, never an error.
+ * reader treats an absent directory as "no plan", never as an error.
  */
 const ARCHIVE_TARGETS = [".claude", "release-manifest.json", ...kitMeowkitTargets(), ...RUNTIME_OVERLAY_TARGETS];
 

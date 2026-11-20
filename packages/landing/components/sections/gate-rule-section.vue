@@ -3,9 +3,9 @@ import { computed, onMounted, ref } from 'vue'
 
 /* Section 3 — the statement. The sentence lights word by word as the section
  * crosses the viewport; the closing clause stays in the accent.
- * Copy verbatim from the mockup; the moment is written here, not borrowed. */
-const SENTENCE = 'Automation runs between the gates and never supplies the approval. A passing test, a reviewer score and a green build are evidence you read before'
-const CLOSER = 'you type yes.'
+ * The evidence rule; the moment is written here, not borrowed. */
+const SENTENCE = 'Automation produces evidence and never approval. A passing test, a review verdict and advice from an agent are things you read before'
+const CLOSER = 'you decide.'
 
 const words = SENTENCE.split(' ')
 const closerWords = CLOSER.split(' ')
@@ -24,9 +24,9 @@ const lit = computed(() => (live.value ? Math.round(progress.value * (total + 1)
 </script>
 
 <template>
-  <section ref="el" class="rule" id="rule" aria-label="The gate rule">
+  <section ref="el" class="rule" id="rule" aria-label="The evidence rule">
     <div class="mk-wrap">
-      <p class="mk-label rule__label">The gate rule</p>
+      <p class="mk-label rule__label">The evidence rule</p>
       <p class="rule__text">
         <!-- the sentence is read as one string by assistive tech; the spans are visual only -->
         <span class="mk-sr-only">{{ SENTENCE }} {{ CLOSER }}</span>

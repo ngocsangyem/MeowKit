@@ -3,10 +3,10 @@ title: "Memory"
 description: "The committed team memory store and how to lint it."
 ---
 
-The store is two committed, plain-markdown files: `.meowkit/memory/decisions.md` and `.meowkit/memory/gotchas.md`. Reads are one `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` at task start. Writes go through `mewkit note <decisions|gotchas>`, which lint-checks the entry on stdin and appends it under a file lock. See [Memory System](/guide/memory-system) for the entry format and the read and write sets.
+The store is two committed Markdown files: `.meowkit/memory/decisions.md` and `.meowkit/memory/gotchas.md`. A task reads them with one `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` at the start. `mewkit note <decisions|gotchas>` writes to them: it lint-checks the entry on stdin and appends it under a file lock. [Memory System](/guide/memory-system) describes the entry format and which skills read and write.
 
 ```bash
-mewkit validate --memory   # lint every file in the store (CI and pre-ship hook)
+mewkit validate --memory   # lint every file in the store (CI and the pre-ship hook)
 ```
 
-`validate --memory` enforces the per-file line and byte caps, the injection patterns (with decode passes), a flood check, and secret patterns. Pruning is the `/mk:memory --prune` skill flow, and every removal is human-approved.
+`validate --memory` enforces the per-file line and byte caps, the injection patterns (with decode passes), a flood check and secret patterns. Pruning is the `/mk:memory --prune` skill flow, and a person approves every removal.

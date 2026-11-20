@@ -1,6 +1,6 @@
 //! The supervision state machine's vocabularies.
 //!
-//! A disposition ROUTES work. None of them advances a gate, and the stage→
+//! A disposition ROUTES work. None of them grants an approval, and the stage→
 //! disposition table is what keeps that true: a forward-looking stage cannot
 //! report on finished work, and a backward-looking stage cannot hand out a
 //! "carry on" directive. Mixing them is how a review turns into tacit approval,

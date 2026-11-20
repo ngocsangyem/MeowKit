@@ -6,7 +6,7 @@ Governs iterative build-test-fix cycles. Prevents runaway loops, cost drift, and
 
 Verify all three before starting any iterative cycle:
 
-- [ ] **Quality gates active** — test suite runs and produces deterministic output (not flaky)
+- [ ] **Quality checks active** — test suite runs and produces deterministic output (not flaky)
 - [ ] **Rollback path exists** — know the last known-good state (git commit SHA or branch)
 - [ ] **Branch isolation** — working on a feature branch, not main/master
 

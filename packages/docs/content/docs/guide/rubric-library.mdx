@@ -1,15 +1,13 @@
 ---
 title: "Rubric Library"
-description: "How MeowKit grades builds — the 7 rubrics, composition presets, calibration discipline, and anti-slop anti-patterns."
+description: "How MeowKit grades builds: the 7 rubrics, composition presets, calibration rules and the fixed anti-patterns."
 ---
 
 ## What Rubrics Do
 
-Without rubrics, "is this build good?" is a vibes judgment. The evaluator agent would have no shared definition of "product-depth" or "design-quality" — and would drift toward leniency over a long session.
+Without rubrics, "is this build good?" is a judgment call, and the evaluator drifts toward leniency over a long session. A rubric turns one dimension, such as `functionality`, into graded terms. It states what PASS, WARN and FAIL look like with concrete anchor examples, and it has a default weight. The evaluator loads a composition preset for the project type, grades each rubric independently, and combines the weighted scores into an overall verdict.
 
-Rubrics turn subjective dimensions into **graded, weighted terms**. Each rubric defines a dimension (e.g., `functionality`), specifies what PASS / WARN / FAIL looks like with concrete anchor examples, and assigns a default weight. The evaluator loads a composition preset for the project type, grades each rubric independently, and the weighted scores combine into an overall verdict.
-
-If any single rubric hits a hard-fail threshold, the entire sprint verdict is FAIL — no soft averaging covers a broken happy path.
+If any single rubric reaches its hard-fail threshold, the sprint verdict is FAIL, so averaging cannot cover a broken happy path.
 
 ## Anatomy of a Rubric
 
@@ -24,9 +22,7 @@ Every file in `.claude/skills/rubric/rubrics/` follows `schema.md` and contains:
 | `## Anti-patterns` | Fixed list of auto-FAIL signatures (see below) |
 | `## Few-Shot Examples` | ≥1 PASS anchor + ≥1 FAIL anchor with reasoning |
 
-**Rule 1** (from `.claude/skills/rubric/references/rubric-rules.md`): every rubric must have at least one PASS and one FAIL anchor. A rubric with only PASS examples produces an evaluator that defaults to PASS. Balanced anchors force the model to discriminate.
-
-**Rule 5** — position bias: anchor examples alternate PASS/FAIL by number (Example 1 = PASS, Example 2 = FAIL, ...). Models attend more to recent context; alternating order eliminates the position-bias signal.
+Rule 1 of `.claude/skills/rubric/references/rubric-rules.md` requires at least one PASS and one FAIL anchor in every rubric. A rubric with only PASS examples produces an evaluator that defaults to PASS. Rule 5 alternates the anchors, so Example 1 is PASS, Example 2 is FAIL, and so on, which reduces recency bias.
 
 ## The 7 Core Rubrics
 
@@ -40,7 +36,7 @@ Every file in `.claude/skills/rubric/rubrics/` follows `schema.md` and contains:
 | `craft` | 0.05 | WARN | frontend, backend, fullstack, cli |
 | `ux-usability` | 0.05 | WARN | frontend, fullstack, cli |
 
-Total weights sum to 1.00 when all 7 are loaded (Rule 2 — weights must sum to 1.0 ± 0.01).
+Weights sum to 1.00 when all 7 are loaded. Rule 2 requires every preset to sum to 1.0, within 0.01.
 
 ## Composition Presets
 
@@ -51,45 +47,30 @@ Presets assemble rubric subsets appropriate for the project type. Files live at 
 | `frontend-app` (v2.0.0) | product-depth, functionality, design-quality, originality | code-quality, craft, ux-usability | SPAs, MPAs, framework apps |
 | `backend-api` | product-depth, functionality, code-quality | design-quality, originality, craft, ux-usability | Headless APIs, services, workers |
 | `cli-tool` | functionality, product-depth, code-quality, ux-usability | design-quality, originality, craft | CLI binaries, npm CLIs |
-| `fullstack-product` | All 7 rubrics (ux-usability weighted 3×) | — | End-to-end product builds |
+| `fullstack-product` | All 7 rubrics (ux-usability weighted 3×) | none | End-to-end product builds |
 
-**Why `frontend-app` loads only 4 rubrics, not 7.** A necessity audit (Phase 2) found that `code-quality`, `craft`, and `ux-usability` overlap existing MeowKit layers — `mk:review`'s 5-dimension verdict, `security-rules.md`, and `mk:qa`'s health score. Loading duplicate rubrics doubles evaluator work without doubling signal. YAGNI. The 3 excluded rubrics are opt-in via custom presets when you need them (Rule 8).
+`frontend-app` loads 4 rubrics because `code-quality`, `craft` and `ux-usability` overlap other MeowKit layers: the `mk:review` verdict, `security-rules.md` and the `mk:qa` health score. The three excluded rubrics are opt-in through a custom preset (Rule 8).
 
 ## PASS / WARN / FAIL Anchors
 
-Anchor examples are the highest-leverage part of a rubric. The evaluator reads them to ground its understanding of "what does a FAIL actually look like here?"
+Anchor examples show the evaluator what a FAIL actually looks like for that dimension. Rule 4 sets the balance:
 
-**Calibration discipline (Rule 4):**
-- Fewer than 4 total anchors: ±1 imbalance is acceptable (e.g., 2 PASS + 1 FAIL)
-- 4 or more anchors: exact PASS/FAIL parity required (2/2, 3/3, 4/4)
+- Fewer than 4 anchors: PASS and FAIL counts may differ by one, for example 2 PASS and 1 FAIL.
+- 4 or more anchors: the counts must be equal, such as 2 and 2 or 3 and 3.
 
-Research measured 40–60% positive bias inflation when evaluators saw only PASS examples. Balanced examples force discrimination.
-
-**Position bias (Rule 5):** always alternate PASS/FAIL by example number. If FAIL always appears last, "FAIL" becomes the contextually primed answer for ambiguous cases.
+`validate-rubric.sh` enforces both. The schema notes that balanced examples reduce positive bias by 40 to 60 percent in Anthropic's harness research.
 
 ## Hard-Fail Propagation
 
-Any rubric returning a verdict at or above its `hard_fail_threshold` fails the **entire sprint** — regardless of other rubrics' scores.
-
-Example: a build scores PASS on all rubrics but `functionality` returns FAIL. Weighted average might be 0.85 (which looks like a pass). Hard-fail semantics override the math: overall verdict is FAIL.
-
-This prevents the evaluator from rationalizing unshippable output through arithmetic. A broken happy path is a broken product.
-
-Rule 3: hard-fail propagates. Soft averages do not save weak dimensions.
+Under Rule 3, a rubric whose verdict reaches its `hard_fail_threshold` fails the whole sprint, whatever the other rubrics scored. A build can pass every rubric but `functionality`, have a weighted average of 0.85, and still be FAIL. Every rubric today uses `FAIL` as the threshold except `craft` and `ux-usability`, which use `WARN`, so a WARN on those two also fails the sprint.
 
 ## Calibration Set and Drift Check
 
-`.claude/skills/rubric/rubrics/calibration-set/` contains gold-standard verdicts — carefully labeled examples used to verify that the evaluator still grades consistently after a model upgrade.
-
-**Rule 6:** when a new model tier ships (Sonnet 4.6, Opus 4.7, Haiku 5.x), replay the calibration set with the new model. Re-evaluator agreement with stored gold verdicts must stay within **5% per rubric**. If drift exceeds 5%, recalibrate the anchors or adjust the `hard_fail_threshold`.
-
-Why this matters: anchor examples encode an assumption about how the model will interpret them. Model upgrades break that assumption silently. The drift check is the only mechanism that catches this before it affects production verdicts.
+`.claude/skills/rubric/rubrics/calibration-set/` is where gold-standard verdicts for the drift check live. Its README describes the procedure. Rule 6 says that when a new model tier ships, the set is replayed with the new model, and agreement with the stored verdicts must stay within 5 percent per rubric. If drift exceeds 5 percent, recalibrate the anchors or adjust the `hard_fail_threshold`.
 
 ## Anti-Slop Anti-Patterns
 
-`originality.md` and `design-quality.md` include fixed anti-pattern lists. These patterns auto-trigger FAIL regardless of how well the build scores on surrounding criteria (Rule 7). They are deterministic, not subjective.
-
-**From `originality.md` anti-patterns:**
+`originality.md` and `design-quality.md` include fixed anti-pattern lists. Under Rule 7, a match fails the criterion whatever the build scores elsewhere. The lists are fixed so grading does not depend on taste. Examples from `originality.md`:
 - Product name = literal feature description (`KanbanApp`, `NoteApp`, `ChatApp`)
 - Hero copy: "The modern way to `{feature}`" / "Beautifully simple `{noun}`" / "Built for teams"
 - unDraw / Storyset stock illustrations on empty states
@@ -97,35 +78,33 @@ Why this matters: anchor examples encode an assumption about how the model will 
 - Default or missing favicon
 - "Built with love by the `{ProductName}` team" footer
 
-These are the visual and textual signatures of AI slop — outputs that look like they could be any of 100 AI-generated SaaS apps. Encoding them as anti-patterns gives the evaluator a deterministic shortcut.
-
 ## Custom Rubrics
 
 Users can add their own rubric files to `.claude/skills/rubric/rubrics/` (Rule 9). Requirements:
 
 1. Conform to `schema.md`
-2. Run `validate-rubric.sh path/to/new-rubric.md` — enforces anchor balance, weight rules, and injection-safety checks
+2. Run `validate-rubric.sh path/to/new-rubric.md`, which checks anchor balance, weights and injection safety
 3. Reference the rubric from a composition preset (re-validate weight sum after adding)
 4. Add a row to `RUBRICS_INDEX.md`
 
 ## Rubric Files Are DATA
 
-Per `injection-rules.md`, rubric files are loaded as DATA by the evaluator — not instructions. The validator (`validate-rubric.sh`) rejects instruction-like patterns ("ignore previous instructions", "you are now") in rubric text (Rule 10).
+Per `injection-rules.md`, the evaluator loads rubric files as data, not instructions. Under Rule 10, `validate-rubric.sh` rejects instruction-like patterns such as "ignore previous instructions" in rubric text.
 
-A poisoned rubric could otherwise inject prompt overrides into the evaluator's context via the anchor-reasoning sections. The DATA boundary is non-negotiable.
+A poisoned rubric could otherwise inject prompt overrides through the anchor-reasoning sections.
 
-## Canonical Sources
+## Sources
 
-- `.claude/skills/rubric/rubrics/` — all rubric files and composition presets
-- `.claude/skills/rubric/rubrics/RUBRICS_INDEX.md` — catalog with weights, hard-fail thresholds, applicability
-- `.claude/skills/rubric/rubrics/schema.md` — canonical rubric format spec
-- `.claude/skills/rubric/references/rubric-rules.md` — the 10 rules governing rubric governance
+- `.claude/skills/rubric/rubrics/`: rubric files and composition presets
+- `.claude/skills/rubric/rubrics/RUBRICS_INDEX.md`: weights, hard-fail thresholds and applicability
+- `.claude/skills/rubric/rubrics/schema.md`: the rubric format
+- `.claude/skills/rubric/references/rubric-rules.md`: the 10 rubric rules
 
 ## Related
 
-- [/reference/skills/rubric](/reference/skills/rubric) — rubric skill (load/validate/compose)
-- [/reference/skills/evaluate](/reference/skills/evaluate) — evaluator skill (grades the build)
-- [/reference/agents/evaluator](/reference/agents/evaluator) — evaluator agent persona
-- [/guide/harness-architecture](/guide/harness-architecture) — how rubrics fit the pipeline
-- [/guide/trace-and-benchmark](/guide/trace-and-benchmark) — calibration replay automation
-- [/reference/rules-index#rubric-rules](/reference/rules-index#rubric-rules) — all 10 rubric rules
+- [Skill: rubric](/reference/skills/rubric) for load, validate and compose
+- [Skill: evaluate](/reference/skills/evaluate) for grading a build
+- [Agent: evaluator](/reference/agents/evaluator)
+- [Autonomous build](/guides/autonomous-build) for how rubrics fit the pipeline
+- [Trace and benchmark](/guide/trace-and-benchmark) for the benchmark suite
+- [Rules index](/reference/rules-index#rubric-rules) for all 10 rubric rules

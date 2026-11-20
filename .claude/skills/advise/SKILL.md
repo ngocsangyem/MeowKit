@@ -65,7 +65,7 @@ fit, prefer the neighbor — advise is the narrower tool, not the catch-all.
 
 ```
 Intake → Interview (1 question/turn, 2-6 turns)
-      → REFRAMING GATE (user confirms) → Advice packet → stop
+      → REFRAMING CONFIRMATION (user confirms) → Advice packet → stop
 ```
 
 ### 1. Intake
@@ -94,7 +94,7 @@ Stop asking when either is true:
 Ask the user to choose when the answer is a choice between concrete options;
 use plain prose when it is open-ended.
 
-### 3. The reframing gate (HARD)
+### 3. The reframing confirmation (required)
 
 **Do not emit a verdict until the user has confirmed the reframing.** Present it
 back and ask them to confirm or correct:
@@ -206,7 +206,7 @@ Run the checklist there after any edit to this skill's fences or to a neighbor's
 
 - **Answering the question as asked.** The user's framing is the thing under
   examination. If you skip to the answer you have skipped the value.
-- **Verdict before confirmation.** The gate is not a formality — an unconfirmed
+- **Verdict before confirmation.** The confirmation is not a formality — an unconfirmed
   reframing means the advice targets a problem that may not exist.
 - **Becoming brainstorming.** Ending with four options and no pick is a menu, not
   advice. Pick one and own it.

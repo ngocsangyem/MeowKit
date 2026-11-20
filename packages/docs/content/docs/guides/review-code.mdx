@@ -1,81 +1,74 @@
 ---
 title: "Review Code"
-description: "Multi-pass adversarial code review with /mk:review: five dimensions, parallel reviewers, and structured verdicts."
+description: "Review a diff, PR or commit with /mk:review: parallel reviewers, adversarial passes, and a five-dimension verdict."
 ---
 
-`/mk:review` runs a multi-pass adversarial code review. Three parallel reviewers examine your code independently, then findings are triaged into a single verdict. It's both a Phase 4 pipeline step and a standalone command.
-
-## Quick start
+`/mk:review` runs a multi-pass review of a change and writes one verdict. It is Phase 4 of the workflow and also a standalone command.
 
 ```bash
-# Review current branch diff
-/mk:review
-
-# Review a specific PR
-/mk:review #42
-
-# Review uncommitted changes
-/mk:review --pending
+/mk:review              # current branch diff against the base branch
+/mk:review #42          # a pull request
+/mk:review --pending    # staged and unstaged changes
+/mk:review abc1234      # a single commit
 ```
 
-## The 5 review dimensions
+For a PR, `mk:review` first runs `mewkit review prepare`. That creates a detached review worktree, captures one hash-pinned diff with the PR metadata and CI status, and writes an impact map. PR text is stored as data and never followed as instructions.
 
-| Dimension | What it checks |
-|-----------|---------------|
-| Architecture fit | Matches existing patterns? Respects ADRs? Accidental complexity? |
-| Type safety | No `any` types? No unsafe casts? Proper generics? |
-| Test coverage | Edge cases covered? Testing behavior, not implementation? |
-| Security | Passes `security-rules.md` checklist? Hardcoded secrets? |
-| Performance | No N+1 queries? No blocking async? No unbounded fetches? |
+## How the review runs
 
-## How parallel review works
+The first step gathers the diff, plan and acceptance criteria, then sets the review scope.
 
-Three reviewers run simultaneously to prevent anchoring bias:
+| Scope | When | Who reviews |
+|---|---|---|
+| minimal | 3 files or fewer, 50 lines or fewer, no security files, not a high-complexity domain | Blind Hunter only |
+| full | anything larger | All three base reviewers, then adversarial personas |
 
-1. **Blind Hunter.** Zero context review. Sees only the diff, not the plan or codebase.
-2. **Edge Case Hunter.** Boundary conditions. What happens on empty input, max values, null?
-3. **Criteria Auditor.** Acceptance criteria. Does the code satisfy every criterion in the plan?
+The three base reviewers run in parallel so they do not anchor on each other:
 
-Findings from all three are triaged into a single verdict.
+1. **Blind Hunter** sees only the diff, with no plan or spec.
+2. **Edge Case Hunter** traces boundaries, null paths and every branch.
+3. **Criteria Auditor** maps each acceptance criterion in the plan to the implementation.
 
-## Verdicts
+On a full-scope review, persona passes follow. They receive the diff and the base findings and go deeper: Security Adversary, Failure Mode Analyst, and, for high-complexity domains, Assumption Destroyer and Scope Complexity Critic. If all reviewers find nothing, the triage step re-analyzes once with a "look harder" prompt.
 
-| Verdict | Meaning | What happens |
-|---------|---------|-------------|
-| PASS | No blocking issues | Proceed to ship |
-| PASS WITH NOTES | Non-blocking suggestions | Proceed to ship, suggestions noted |
-| FAIL | Critical findings | Back to developer, must fix before re-review |
+Triage sorts findings into `current-change` and `incidental`, then the verdict step checks the code for stubs, orphaned exports and unwired code.
 
-A FAIL on any single dimension means fixing it before shipping. There is no averaging, though no hook blocks a commit on the verdict.
+## The verdict
 
-## Optional: deeper review
+| Dimension | PASS | WARN | FAIL |
+|---|---|---|---|
+| Correctness | No critical or major bugs | Minor bugs only | Any critical bug |
+| Maintainability | Clean, follows conventions | Style issues | Unreadable or breaks the architecture |
+| Performance | No regressions | Potential issues flagged | Proven regression |
+| Security | No findings | Minor notes | Any critical issue |
+| Coverage | Every criterion covered and tested | Partial coverage | A criterion is not implemented |
+
+Any FAIL makes the overall verdict FAIL, and an average never hides it. All PASS is ready to ship. A mix of PASS and WARN is ready once you have seen each WARN. The verdict is written under `tasks/reviews/`.
+
+A FAIL is advice: the change is not ready, and the findings say what to fix. No hook blocks a commit on it. In a PR review prepared with `mewkit review prepare`, subagent reads are attested without hook corroboration, so approval is capped at `PASS_WITH_RISK` and the verdict says so.
+
+If the diff changes existing behavior, the verdict carries a `Side Effects Detected` line. The change is not ready to ship until you have chosen a recovery option, which is recorded on the verdict.
+
+## Optional follow-ups
 
 ```bash
-# Lightweight browser check after review (~$1)
-/mk:cook "feature" --verify
-
-# Full evaluator with rubric grading (~$2-5)
-/mk:cook "feature" --strict
+/mk:cook "feature" --verify   # light browser check after review
+/mk:cook "feature" --strict   # full evaluator with rubric grading
+/mk:elicit                    # second pass on WARN dimensions
 ```
 
-`--verify` checks that pages load and have no console errors. `--strict` runs the full evaluator: it clicks through the app, grades against rubrics, and produces a scored verdict. Use `--strict` for security-critical or payment-related features.
+`--verify` checks that pages load without console errors. `--strict` clicks through the app and grades it against rubrics. `/mk:elicit` pushes on findings with structured methods such as pre-mortem and red team.
 
-## Optional: post-verdict elicitation
-
-After the verdict, `/mk:elicit` pushes deeper on WARN dimensions using 8 structured methods (pre-mortem, red team, Socratic questioning, etc.). Invoke it explicitly:
-
-```bash
-/mk:elicit
-```
+For changes of three or more files, run `/mk:scout` first so reviewers start from the affected dependents.
 
 ## Don't use /mk:review for
 
-- **Bug investigation** → use `/mk:fix`
-- **Security-only audit** → use `/mk:cso`
-- **Architecture decisions** → use `/mk:party`
+- Bug investigation. Use `/mk:fix`.
+- A whole-repository security audit. Use `/mk:cso`. The security dimension here covers the diff only.
+- Architecture decisions. Use `/mk:party`.
 
 ## Next steps
 
-- [Ship safely](/guides/ship-safely): the deployment pipeline
-- [Build a feature](/guides/build-a-feature): the full workflow with review
-- [Gates & security](/core-concepts/gates): what MeowKit enforces and what stays a practice
+- [Ship safely](/guides/ship-safely) for what comes after the verdict
+- [Build a feature](/guides/build-a-feature) for the workflow around review
+- [Enforcement and security](/core-concepts/enforcement) for what MeowKit enforces and what stays a practice

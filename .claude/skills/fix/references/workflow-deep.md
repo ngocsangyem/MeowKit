@@ -124,7 +124,7 @@ Verification stays with Step 6 tests and the Step 7 review verdict.
 The call protocol defines the dispositions; here is what each one means for this skill.
 
 - `CONTINUE_WITH_DIRECTIVE` — proceed; the directive is input, not instruction.
-- `READY_FOR_EXISTING_GATE` — run the normal Step 7 review. The gate is NOT cleared.
+- `READY_FOR_EXISTING_GATE` — run the normal Step 7 review. The review is NOT passed.
 - `RETURN_TO_EXECUTOR` — apply the corrections, then supersede the stale evidence:
   `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence <workflow-evidence.json> --correction-kind source|scope`.
   Re-run Step 6 before the review. A `scope` correction also sends the plan back to the

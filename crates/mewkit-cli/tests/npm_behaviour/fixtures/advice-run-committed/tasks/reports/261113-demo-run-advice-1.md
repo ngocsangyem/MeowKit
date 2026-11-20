@@ -11,7 +11,7 @@ skill: "mk:cook"
 checkpointId: "cp-1"
 ---
 
-This is a record of supervision, NEVER verification and never a gate approval.
+This is a record of supervision, NEVER verification and never an approval.
 
 **Question asked:** (not recorded)
 

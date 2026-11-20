@@ -1,6 +1,6 @@
 ---
 title: "mk:skill-creator"
-description: "Create new skills with proper structure, compliance checks, and registration. Enforces mk: prefix and context engineering principles."
+description: "Scaffolds a new mk: skill, checks it against an 8-point compliance list and registers it."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,42 +14,63 @@ description: "Create new skills with proper structure, compliance checks, and re
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Create new skills with proper structure, compliance, and registration. Enforces the `mk:` prefix, sub-agents.md structure, and Anthropic context engineering principles.
+`mk:skill-creator` creates a skill with the right structure. Python scripts scaffold the folder and validate it, and Claude fills in the content. Use it when you ask to create a skill, adopt an external one or turn a workflow into a skill. It is not tied to a workflow phase.
 
-## When to Use
+## When not to use it
 
-- User asks to "create a skill", "build a new skill", "make a skill for [X]"
-- Converting an external skill for adoption in MeowKit
-- Scaffolding a skill from a workflow pattern
-- Explicit: `/mk:skill-creator [`NAME`] [description]`
+For the trust model of a skill that handles untrusted input, use the `mk:skill-template-secure` template. Skill Creator loads it when needed.
 
-**Do NOT invoke:** When the user just wants to edit an existing skill's content — this is for creation and scaffolding only.
-
-## Core Capabilities
-
-- **Scaffolding:** `scripts/init-skill.py` creates directory + template SKILL.md with TODO markers
-- **Validation:** `scripts/validate-skill.py` checks compliance against 8-point checklist
-- **Content guidance:** References cover required sections, trigger-condition descriptions, gotcha writing, filesystem patterns, and 9-type taxonomy
-- **Registration:** Adds attribution row to `SKILLS_ATTRIBUTION.md`
-
-## Example Prompt
+## Usage
 
 ```
-Create a new skill called mk:database that generates PostgreSQL schema migrations from TypeScript entity definitions. It should validate schemas against naming conventions and produce a migration plan.
+/mk:skill-creator [skill-name] [description]
 ```
 
-## Process
+Run the scripts from the project root:
 
-1. **Gather intent** — what should the skill do? When should it trigger? What output format?
-2. **Scaffold** — run `init-skill.py mk:NAME --path .claude/skills` to create directory + template
-3. **Fill content** — Claude completes each TODO section in the generated template
-4. **Add references/** — if skill body would exceed ~500 lines, split into reference files
-5. **Security boundaries** — load `mk:skill-template-secure` for trust model if skill processes untrusted input
-6. **Validate** — run `validate-skill.py` to check 8-point compliance
-7. **Fix failures** — if score \< 7/8, fix failing items
-8. **Register** — add row to `SKILLS_ATTRIBUTION.md`
-9. **Report** — output creation summary with compliance details
+```bash
+node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/init-skill.py mk:my-feature --path .claude/skills
+node .claude/hooks/lib/skill-python.cjs ${CLAUDE_SKILL_DIR}/scripts/validate-skill.py .claude/skills/my-feature
+```
 
-## Scripts
+## Steps
+
+1. Read `references/skill-authoring-rules.md`. It holds the ten authoring rules, such as the mandatory `## Gotchas` section, `${CLAUDE_PLUGIN_DATA}` for persistent state and the 500-line cap.
+2. Gather the intent: what the skill does, when it triggers and what it outputs.
+3. Scaffold with `init-skill.py`, which creates the folder and a template `SKILL.md` with TODO markers.
+4. Fill each TODO. Move detail into `references/` when the body passes about 100 lines.
+5. Load `mk:skill-template-secure` if the skill needs a trust model.
+6. Validate with `validate-skill.py`. A score below 7 of 8 means fix the failing items first.
+7. Add a row to `SKILLS_ATTRIBUTION.md`.
+8. Report the directory, files, compliance score and registration.
+
+## Compliance checks
+
+| Check |
+|---|
+| The name has the `mk:` prefix |
+| A workflow phase (0 to 6) is stated |
+| A handoff names the next agent |
+| The output format is a template with placeholders |
+| Failure handling covers the known failure modes |
+| `SKILL.md` is 500 lines or fewer (step-file skills with a `workflow.md` pass automatically) |
+| A `## Gotchas` section exists (a placeholder is fine on day one) |
+| It does not conflict with `.claude/rules/` |
+
+## References
+
+| File | Content |
+|---|---|
+| `references/creation-workflow.md` | Section-by-section guidance |
+| `references/skill-types.md` | The 9-type taxonomy |
+| `references/good-vs-bad-examples.md` | Writing descriptions, gotchas and steps |
+| `references/filesystem-patterns.md` | When to use `scripts/`, `references/`, `assets/`, `lib/` and `config.json` |
+
+## Gotchas
+
+- The `## Gotchas` header is mandatory because `validate-skill.py` checks it. A day-one placeholder is allowed.
+- The line cap is 500.
+- State that must survive a plugin upgrade goes to `${CLAUDE_PLUGIN_DATA}`, not the skill folder. Framework paths such as `.meowkit/memory/` and `.meowkit/state/` are exempt.
+- A missing `mk:` prefix is added with a warning, and a duplicate name gets an alternative or an update to the existing skill.

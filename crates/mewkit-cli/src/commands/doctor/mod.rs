@@ -55,7 +55,7 @@ pub struct DoctorArgs {
     /// `provenance`: name the files behind each count.
     #[arg(long)]
     pub explain: bool,
-    /// Live-probe the hard gates (plan, privacy, injection, ship) in a scratch project.
+    /// Live-probe the hard guards (privacy, injection, ship) in a scratch project.
     #[arg(long)]
     pub hard_gates: bool,
     /// Rebuild the npm CLI's ownership baseline from the local kit cache, or refuse.

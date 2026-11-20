@@ -18,8 +18,8 @@ The sweep is run by the planner agent itself (not a subagent) so it never leaves
 
 ## Where it runs
 
-- Gate W1 — end of `step-05-red-team.md` (delta source: accepted findings)
-- Gate W2 — end of `step-06-validation-interview.md` (delta source: propagated answers)
+- Sweep W1 — end of `step-05-red-team.md` (delta source: accepted findings)
+- Sweep W2 — end of `step-06-validation-interview.md` (delta source: propagated answers)
 
 ## Algorithm (stage-then-apply)
 

@@ -134,7 +134,7 @@ After pipeline completes, output this summary:
 ✓ Scope: {prepare|release|publish}
 ✓ Pre-flight: branch {branch}, {N} commits, +{ins}/-{del} lines
 ✓ Tests: {N} passed, {M} failed | skipped
-✓ Coverage: {N}% ({pass|gate})
+✓ Coverage: {N}% ({pass|below threshold})
 ✓ Review: {N} critical, {M} informational
 ✓ Local commit: {created|declined|not requested}
 ✓ Release: {pushed|PR URL|not requested}
@@ -148,7 +148,7 @@ After pipeline completes, output this summary:
 - Merge conflicts that can't be auto-resolved → stop, show conflicts
 - Test failures (in-branch) → stop, show failures
 - Critical review issues → ask the user per issue
-- Coverage below gate → stop
+- Coverage below threshold → stop
 - Plan gaps detected → stop
 
 ## Explicit Confirmations
@@ -171,11 +171,11 @@ After pipeline completes, output this summary:
 - `references/plan-completion-audit.md` — Plan completion audit (Step 3.45), plan verification reminder (Step 3.47)
 - `references/pre-landing-review.md` — Pre-landing review (Step 3.5), design review, PR comment resolution (Step 3.75)
 - `references/version-changelog-todos.md` — Version bump (Step 4), CHANGELOG (Step 5), TODOS.md (Step 5.5)
-- `references/commit-push-pr.md` — Issue linking, commit (Step 6), verification gate (Step 6.5), push (Step 7), PR creation/edit (Step 8), document-release (Step 8.5), ship metrics (Step 8.75)
+- `references/commit-push-pr.md` — Issue linking, commit (Step 6), verification (Step 6.5), push (Step 7), PR creation/edit (Step 8), document-release (Step 8.5), ship metrics (Step 8.75)
 - `references/advice-checkpoints.md` — `--advice` checkpoint boundaries, the per-release-stage cap, and the counsel-is-not-authorization boundary
 - `references/rules.md` — Important rules and constraints
 - `references/rollback-protocol.md` — Rollback steps and procedures (migrated from mk:shipping)
-- `references/ship-pipeline.md` — Full ship pipeline stages and gate definitions (migrated from mk:shipping)
+- `references/ship-pipeline.md` — Full ship pipeline stages and stop rules (migrated from mk:shipping)
 - `references/canary-deploy.md` — Canary deployment strategy and traffic splitting (migrated from mk:shipping)
 
 ## Hooks

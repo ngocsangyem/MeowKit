@@ -97,8 +97,7 @@ function buildFixture(env, repoRoot) {
 	fs.mkdirSync(path.join(root, ".meowkit"), { recursive: true });
 
 	// The shared hook libraries, which some verbs resolve out of the project's own
-	// kit directory rather than the CLI package — `plan approve` reads the
-	// approval-receipt helper from there.
+	// kit directory rather than the CLI package.
 	if (repoRoot) {
 		fs.cpSync(path.join(repoRoot, ".claude", "hooks", "lib"), path.join(root, ".claude", "hooks", "lib"), {
 			recursive: true,
@@ -113,7 +112,7 @@ function buildFixture(env, repoRoot) {
 	fs.mkdirSync(path.join(root, "notes"), { recursive: true });
 	fs.writeFileSync(path.join(root, "notes", "planted.md"), PLANTED_CRITICAL);
 
-	// A passing Gate 2 proof bundle, so `verdict-gate` runs against a real verdict
+	// A passing review proof bundle, so `verdict-gate` runs against a real verdict
 	// rather than its own usage text.
 	const reviews = path.join(root, "tasks", "reviews");
 	fs.mkdirSync(reviews, { recursive: true });

@@ -1,4 +1,4 @@
-# Prevention Gate (Post-Fix)
+# Prevention Check (Post-Fix)
 
 > Run AFTER fix implementation, BEFORE marking complete.
 

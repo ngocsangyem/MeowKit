@@ -1,19 +1,18 @@
 <script setup lang="ts">
-/* Feature picture 1: Gate 1's conditions, two of five met. */
+/* Feature picture 1: the ship check, two of three passed. */
 const items = [
-  { label: 'Plan file exists', done: true },
-  { label: 'Problem is written down', done: true },
-  { label: 'Success criteria are measurable', done: false },
-  { label: 'You typed the approval', done: false },
-  { label: 'Receipt matches the plan hash', done: false },
+  { label: 'Lint on 5 changed files', done: true },
+  { label: 'Related tests: 23 passed', done: true },
+  { label: 'Type-check: 2 errors', done: false },
+  { label: 'git commit refused', done: false },
 ]
 </script>
 
 <template>
   <div class="cl" aria-hidden="true">
     <div class="cl__head">
-      <span class="cl__title">Gate 1</span>
-      <span class="cl__count">2 of 5</span>
+      <span class="cl__title">Ship check</span>
+      <span class="cl__count">2 of 3 passed</span>
     </div>
     <div class="cl__bar"><i /></div>
     <ul class="cl__list">
@@ -42,7 +41,7 @@ const items = [
 .cl__count { color: var(--mk-muted); }
 
 .cl__bar { height: 4px; margin: var(--mk-space-xs) 0 var(--mk-space-sm); border-radius: var(--mk-radius-button); background: var(--mk-haze); }
-.cl__bar i { display: block; width: 40%; height: 100%; border-radius: inherit; background: var(--mk-accent); }
+.cl__bar i { display: block; width: 67%; height: 100%; border-radius: inherit; background: var(--mk-accent); }
 
 .cl__list { display: grid; gap: var(--mk-space-xs); margin: 0; padding: 0; list-style: none; }
 .cl__item { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: var(--mk-space-xs); align-items: center; color: var(--mk-muted); }

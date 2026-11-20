@@ -1,6 +1,6 @@
 # Workflow: Fast (--fast)
 
-No user gates. Maximum speed. Skip design. Good for prototypes and hackathons.
+No user approval steps. Maximum speed. Skip design. Good for prototypes and hackathons.
 
 ## Step 0: Git Init
 
@@ -15,7 +15,7 @@ Include the save path in each researcher's prompt:
 - 2 researchers: tech stack recommendation + best practices
 - 2 researchers: design patterns + architecture reference
 
-No gate — merge findings and proceed IMMEDIATELY to Step 2.
+No approval step — merge findings and proceed IMMEDIATELY to Step 2.
 
 ## Step 2: Planning (before scaffolding)
 
@@ -28,7 +28,7 @@ Activate mk:plan-creator skill:
 /mk:plan-creator [requirements summary] --fast
 ```
 
-No gate — plan-creator in fast mode auto-creates plan without user approval.
+No approval step — plan-creator in fast mode auto-creates plan without user approval.
 The plan defines WHAT gets scaffolded in Step 3.
 
 **After plan created: proceed IMMEDIATELY to Step 3. Do NOT stop.**

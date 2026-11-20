@@ -57,7 +57,6 @@ pub enum Section {
     Portability,
     Docs,
     Workflow,
-    Gates,
     Ownership,
     Substrate,
     Packs,
@@ -72,13 +71,12 @@ pub enum Section {
 
 impl Section {
     /// Print order, mirroring the npm CLI's `SECTION_ORDER` key order.
-    pub const ORDER: [Section; 16] = [
+    pub const ORDER: [Section; 15] = [
         Section::Structure,
         Section::Hooks,
         Section::Portability,
         Section::Docs,
         Section::Workflow,
-        Section::Gates,
         Section::Ownership,
         Section::Substrate,
         Section::Packs,
@@ -98,7 +96,6 @@ impl Section {
             Section::Portability => "Portability",
             Section::Docs => "Docs",
             Section::Workflow => "Workflow",
-            Section::Gates => "Gates",
             Section::Ownership => "Ownership",
             Section::Substrate => "Substrate",
             Section::Packs => "Packs",

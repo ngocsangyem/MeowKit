@@ -13,7 +13,7 @@
 
 ## Rules
 
-- ALWAYS halt at the HITL gate (step-06) — no auto-apply
+- ALWAYS halt at the HITL approval step (step-06) — no auto-apply
 - ALWAYS parse JSON on node via `scripts/trace-records.cjs` (no `jq` dependency)
 - NEVER mutate trace records — append-only
 - Max 3 parallel researchers (per `.claude/skills/cook/references/parallel-execution-rules.md`)
@@ -74,7 +74,7 @@ Step 5: Suggestions
     ├── Emit structured suggestion (target, change, rationale, impact)
     └── Write to {analysis_dir}/suggestions-draft.md
          ↓
-Step 6: HITL Gate
+Step 6: HITL Approval
     ├── For each suggestion: Ask the user [Approve / Modify / Reject]
     ├── Approved → suggestions.md
     ├── Modified → user provides revised version → suggestions.md

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-/* Feature picture 2: what the write scanner reports. */
+/* Feature picture 2: what the credential guard reports. */
 const notes = [
-  { ini: 'SC', tone: 5, title: 'Write blocked', time: 'now', body: 'API key found in src/config.ts', btn: 'Open' },
-  { ini: 'RV', tone: 2, title: 'Query flagged', time: '4m', body: 'Template literal in orders.repo.ts', btn: '' },
-  { ini: '', tone: 0, title: '31 writes scanned', time: '12m', body: 'No blocked pattern in this task', btn: '' },
+  { ini: 'SC', tone: 5, title: 'Read blocked', time: 'now', body: '.env is a credential file', btn: 'Open' },
+  { ini: 'RV', tone: 2, title: 'Read blocked', time: '4m', body: 'deploy.pem is a key file', btn: '' },
+  { ini: '', tone: 0, title: '31 reads allowed', time: '12m', body: 'No credential file in this task', btn: '' },
 ]
 </script>
 

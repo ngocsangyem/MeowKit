@@ -8,16 +8,16 @@
       <div class="mk-grid wf__head">
         <h2 class="mk-col-5" id="workflow-h">The MeowKit workflow has seven phases</h2>
         <p class="mk-col-6 mk-col-start-7 wf__lede">
-          A task is planned, built, simplified, verified and reviewed in that order. The run stops
-          at Gate 1 before any source edit and at Gate 2 before any commit.
-          <a class="mk-link" href="https://docs.meowkit.dev/">Read the gate rules</a>
+          A task is planned, built, simplified, verified and reviewed in that order. The agent agrees
+          the plan with you before it builds, and the ship check runs before any commit.
+          <a class="mk-link" href="https://docs.meowkit.dev/core-concepts/enforcement">How enforcement works</a>
         </p>
       </div>
 
       <div
         class="wf__app mk-reveal"
         role="img"
-        aria-label="MeowKit task list beside one task's run: plan approved, build done, verify running, review and ship waiting"
+        aria-label="MeowKit task list beside one task's run: plan agreed, build done, verify running, review and ship waiting"
       >
         <div class="wf__pane wf__pane--list"><TaskBoard /></div>
         <div class="wf__pane wf__pane--open"><PipelineBoard /></div>

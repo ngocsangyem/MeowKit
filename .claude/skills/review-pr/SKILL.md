@@ -54,7 +54,7 @@ PR ref → gh pr view / gh pr diff / gh pr checks → read changed files for con
      `mewkit review read --session <id> --as <role> <path>` (so coverage is observable).
   3. `mewkit review coverage --session <id>` — STOP on any gap; it also reports the
      `evidenceLevel` (attested vs session-observed).
-  4. `mewkit review compose --session <id>` — the mechanical gate: verifies the diff
+  4. `mewkit review compose --session <id>` — the mechanical check: verifies the diff
      hash, re-runs coverage, applies the deterministic cap table, resolves inline
      anchors by snippet, and emits the verdict proof bundle + a `SubmitPayload`.
      **It cannot emit a PASS/Approve without complete, session-observed coverage.**

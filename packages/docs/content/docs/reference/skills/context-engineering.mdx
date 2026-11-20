@@ -1,6 +1,6 @@
 ---
 title: "mk:context-engineering"
-description: "Runtime router for context decisions — read-more / stop / ask / assume / delegate, pick a minimal read-set, and time compaction, routing to 25 context patterns one reference at a time."
+description: "Decides the next runtime context move (read more, stop, ask, assume, delegate) and loads one pattern section to carry it out."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,39 +15,27 @@ description: "Runtime router for context decisions — read-more / stop / ask / 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:context-engineering` decides the next context move for the task in front of you: read more, stop, ask, assume or delegate. It then loads at most one section of a pattern index to carry it out. It routes decisions and does not preload a knowledge library.
 
-Decides the next context move for the task in front of you — read more, stop, ask, assume, or delegate — then loads at most one pattern reference to execute it. It is a thin **router**, not a knowledge library: the 25 context-engineering patterns live in a lazy index and only the one relevant section is ever loaded, so the skill that manages context does not itself bloat context.
+## When to use it
 
-The whole surface reduces to four operations — **Write** (push durable state out of the window), **Select** (load the smallest high-signal set), **Compress** (summarize and restart when the window degrades), **Isolate** (give a sub-agent its own window).
+- Context is near its working ceiling and phases remain.
+- A long session is drifting or output quality is slipping.
+- You must pick the minimal read-set before a Plan, Build or Review task.
+- You are choosing between `/compact`, `/clear` and a sub-agent.
+- A known pattern applies (lost in the middle, RAG dump, few-shot drift) and you want to be routed to it.
 
-## When to Use
+## When not to use it
 
-- **Context is near its working ceiling and phases remain** — decide what to keep vs cut.
-- **A long session is drifting** or output quality is slipping.
-- **You must choose the minimal read-set** before a task (Plan / Build / Review).
-- **You are choosing** between `/compact`, `/clear`, and spawning a sub-agent.
-- **A known pattern applies** (lost-in-the-middle, RAG dump, few-shot drift) and you want the routing.
-
-## When NOT to Use
-
-- Auditing `.claude/` token overhead → `mk:context-audit`.
-- Persisting a learning or reading memory topic files → `mk:memory`.
-- Finding *where* code lives → `mk:scout` (or `Read` for one known file).
-- USD run cost → `mewkit budget`.
-- A trivial 1–2 file task — no routing needed; just do it.
-
-## Boundaries
-
-| Question | Use this instead |
-| --- | --- |
-| How much of `.claude/` is statically loaded? (structural) | `mk:context-audit` |
-| Actually read/write memory topic files | `mk:memory` |
+| Question | Use |
+|---|---|
+| How much of `.claude/` is loaded statically? | `mk:context-audit` |
+| Record or read a memory entry | `mk:memory` |
 | Where does code X live? | `mk:scout` |
-| What does a run cost in USD? | `mewkit budget` |
-| **What should I read / when do I stop, ask, compact, delegate? (runtime)** | **`mk:context-engineering`** (this skill) |
+| Run cost in USD | `mewkit budget` |
+| A trivial one or two file task | Just do it |
 
-One-line rule: a *structural* question about the always-on setup → `mk:context-audit`; a *runtime* question about this task → here. If a request is ambiguous ("this project's context is messy"), the skill asks one question — structural setup or this session's runtime context? — then routes.
+If a request could mean either ("this project's context is messy"), the skill asks one question: the `.claude/` setup or this session's runtime context.
 
 ## Usage
 
@@ -55,84 +43,68 @@ One-line rule: a *structural* question about the always-on setup → `mk:context
 /mk:context-engineering
 ```
 
-Then follow the triage checklist and emit the decision line.
+## What it does
 
-## How It Works
+The skill works through a five-step triage.
 
-A 5-step triage keeps each decision cheap:
-
-1. **Phase + tier** — which workflow phase, and low / standard / complex?
-2. **Context risk** — near ceiling? drifting? poisoned by a prior claim? key fact buried? (labeled heuristics, not measured)
-3. **Minimal read-set** — the smallest set for *this* step (honors the phase×tier read-budget where present).
-4. **Route** — load exactly ONE section of the pattern index matching the intent.
-5. **Apply + emit the output contract.**
-
-Every activated decision emits one line:
+1. Phase and tier: which workflow phase, and low, standard or complex.
+2. Context risk: near the ceiling, drifting, poisoned by an earlier claim, or a key fact buried. These are labelled heuristics (for example "compact around 60 to 70 percent of the window"), not measurements.
+3. Minimal read-set for this step, honouring the phase and tier budget in `.claude/skills/agent-detector/references/context-budget-rules.md` when present.
+4. Route: load exactly one section of `references/pattern-index.md`.
+5. Apply the move and print the decision line.
 
 ```
-Context decision: <read-more | stop | ask | assume | delegate> — <one-line reason>
+Context decision: <read-more | stop | ask | assume | delegate> - <one-line reason>
 ```
 
-For `assume`, it is followed by an `ASSUMPTIONS I'M MAKING` block so cheap-to-fix uncertainty is surfaced, not silently guessed.
+For `assume`, an `ASSUMPTIONS I'M MAKING` block follows.
 
-## Examples
+| Move | Use when |
+|---|---|
+| Read more | A retrieval trigger in the context-budget rules matches (schema or contract change, security surface, cross-cutting refactor, failed verification, resume) |
+| Stop | You can act, two reads in a row changed no decision, or the read ceiling is reached |
+| Ask | A fact you cannot grep, a spec and code that disagree, or a business or irreversible decision |
+| Assume | The uncertainty is cheap to fix |
+| Delegate | An independent sub-scope would bloat this window |
 
-**1. Context near full, phases remaining**
+## Four operations
 
-> "Context is nearly full and I still have 3 phases — what do I keep?"
+| Operation | Meaning |
+|---|---|
+| Write | Push durable state out of the window (memory file, scratchpad, hand-off brief) |
+| Select | Load the smallest high-signal set |
+| Compress | Summarise essential state and restart when the window degrades |
+| Isolate | Give a sub-agent its own window and take back a distilled result |
 
-```
-Context decision: compress — long session near budget with phases left; summarize essential state and re-ground before continuing
-→ loads pattern-index: degraded-session
-```
+## Pattern index
 
-**2. Choosing the minimal read-set before coding**
+Match the signal and load one section of `references/pattern-index.md`.
 
-> "What's the minimum I should read before implementing task X?"
+| Signal | Section |
+|---|---|
+| Too much loaded | `less-noise` |
+| Long session, output drifting | `degraded-session` |
+| State must survive compaction or a new session | `persistence` |
+| Split work across sub-agents | `delegation` |
+| RAG, index-first, grounding | `retrieval` |
+| Prompt ordering, trust levels, constraints | `prompt-structure` |
+| Few-shot, structured output, tool selection | `examples-tools` |
+| Images or video in context | `multimodal` |
+| Key fact ignored mid-context | `critical-position` |
+| A model-generated claim treated as true | `safety` |
 
-```
-Context decision: read-more — no read yet; select the smallest set for this Build step
-→ loads pattern-index: less-noise (select)
-```
+With no match, the skill says so and carries on with the four operations.
 
-**3. Compact vs clear vs sub-agent**
+## Host operations
 
-> "Should I /compact, /clear, or split this into a sub-agent?"
+| Situation | Move |
+|---|---|
+| Window long, task continues | `/compact` (costs latency, skip on small tasks) |
+| Switching to an unrelated task | `/clear`, after durable state is written out |
+| Independent sub-scope | Sub-agent |
 
-```
-Context decision: delegate — independent sub-scope would bloat this window
-→ answered by the Host-Runtime Operations table (no pattern load needed)
-```
+## Gotchas
 
-**4. A key fact is being ignored mid-context**
-
-> "Important info is buried in the middle of context and the model keeps skipping it."
-
-```
-Context decision: read-more — reorder, don't add; anchor the key fact at the recency-favored end
-→ loads pattern-index: critical-position
-```
-
-**5. Ambiguous — one disambiguation question**
-
-> "This project's context is messy."
-
-```
-Ask ONE question: do you mean the .claude/ structural setup (→ mk:context-audit) or this session's runtime context (→ this skill)?
-```
-
-## Pattern Index (routed, never all-loaded)
-
-Ten intents map 1:1 to a section of `references/pattern-index.md`; the skill loads one section per decision:
-
-`less-noise` · `degraded-session` · `persistence` · `delegation` · `retrieval` · `prompt-structure` · `examples-tools` · `multimodal` · `critical-position` · `safety`
-
-Each section summarizes its patterns (when to load / triggers / produces / gotcha) so the underlying research files never enter context.
-
-## Pro Tips
-
-- **Load one reference per decision, never several** — routing to many sections turns the router into "a dump with extra steps."
-- **Thresholds are labeled heuristics** (e.g. "compact around ~60–70% of the effective window") — act on them, but don't quote them as measured facts.
-- **Pairs with `mk:context-audit`** — that skill owns the structural overhead question; this one owns the runtime-decision question. Together they cover both halves of "context."
-
-> **Canonical source:** `.claude/skills/context-engineering/SKILL.md`
+- Load one reference section per decision. Loading several turns the router into a dump.
+- Compacting at about 50 percent is safe but wastes latency on small tasks. The thresholds are heuristics.
+- Never quote an API, number or config from memory when it can be read. An unverifiable fact is an ask or an explicit assume.

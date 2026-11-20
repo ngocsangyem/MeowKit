@@ -32,7 +32,7 @@ use commands::{
 #[command(
     name = "mewkit",
     version = mewkit_core::VERSION,
-    about = "Install and manage the MeowKit kit for Claude Code, Codex and Cursor.",
+    about = "Install and manage the MeowKit kit for Claude Code, Codex, Cursor, Grok, Pi and OMP.",
     arg_required_else_help = true
 )]
 struct Cli {

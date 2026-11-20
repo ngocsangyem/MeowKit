@@ -110,7 +110,7 @@ Step 5: Red Team (hard/deep/parallel/two only — skipped in fast)
     ├── Agent adjudicates each: Accept/Reject + rationale
     ├── Write red-team-findings.md (full detail)
     ├── ask the user: Apply all / Review each / Reject all
-    └── Gate W1: Whole-Plan Consistency Sweep (stage-then-apply)
+    └── Sweep W1: Whole-Plan Consistency Sweep (stage-then-apply)
          ├── Pass 1 reads N+2 files, stages Pending Sweep Edits
          ├── If unresolved > 0 → ask the user (defer/resolve/skip)
          └── Pass 2 applies edits + writes sweep block + frontmatter
@@ -119,7 +119,7 @@ Step 6: Validation Interview (hard/deep/parallel/two only — skipped in fast)
     ├── Generate 3-5 critical questions using detection keywords framework
     ├── Informed by red-team findings (step-05)
     ├── Propagate answers to phase files via section mapping
-    └── Gate W2: Whole-Plan Consistency Sweep (stage-then-apply)
+    └── Sweep W2: Whole-Plan Consistency Sweep (stage-then-apply)
          ├── Pass 1 reads N+2 files, stages Pending Sweep Edits
          ├── If unresolved > 0 → ask the user (resolve/accept-risk/cancel)
          └── Pass 2 applies edits + writes Validation Log + frontmatter

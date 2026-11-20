@@ -64,7 +64,7 @@ mod tests {
         }
     }
 
-    /// The plan gate's downgrade switch is a DROPPED name now, so a shell still
+    /// The old plan-approval downgrade switch is a DROPPED name now, so a shell still
     /// exporting it is told so rather than silently believing it still matters.
     #[test]
     fn the_plan_gate_downgrade_switch_reads_as_dropped() {

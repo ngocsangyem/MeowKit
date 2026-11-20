@@ -56,7 +56,7 @@ pub const PROTECTED_HOOKS: &[(&str, &str)] = &[
 /// rather than reporting an unknown key.
 pub const STATE_ONLY_KEYS: &[(&str, &str)] = &[(
     "skip_eng_review",
-    "it suppresses the review step that gates shipping, so it is a per-project choice rather than a committed one",
+    "it suppresses the review step before shipping, so it is a per-project choice rather than a committed one",
 )];
 
 pub use super::key_surface::{

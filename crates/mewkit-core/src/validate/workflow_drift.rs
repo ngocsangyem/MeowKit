@@ -30,26 +30,6 @@ pub struct Violation {
 static REFLECT: LazyLock<Regex> =
     LazyLock::new(|| crate::js_regex::compile(r"\bReflect\b").expect("a static reflect pattern"));
 
-/// A glob as a loose substring probe: regex metacharacters escaped, `*` → `.*`.
-fn glob_to_probe(glob: &str) -> String {
-    let mut out = String::with_capacity(glob.len() * 2);
-    for ch in glob.chars() {
-        match ch {
-            '.' | '+' | '?' | '^' | '$' | '{' | '}' | '(' | ')' | '|' | '[' | ']' | '\\' => {
-                out.push('\\');
-                out.push(ch);
-            }
-            '*' => out.push_str(".*"),
-            other => out.push(other),
-        }
-    }
-    out
-}
-
-pub(super) fn matches_glob(text: &str, glob: &str) -> bool {
-    Regex::new(&glob_to_probe(glob)).is_ok_and(|probe| probe.is_match(text))
-}
-
 /// Scan one prose file for tokens that contradict the spec.
 pub fn scan_for_violations(
     spec: &CanonicalSpec,

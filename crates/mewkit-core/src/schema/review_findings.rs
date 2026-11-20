@@ -2,7 +2,7 @@
 //! decision they add up to.
 //!
 //! The vocabularies are closed and identical to the verdict proof bundle, so a
-//! review's internal state and the artifact a human reads at Gate 2 cannot
+//! review's internal state and the artifact a human reads when reviewing cannot
 //! disagree about what `FAIL` or `PASS_WITH_RISK` means. There is deliberately
 //! no decision-level `WARN`: residual risk maps to `PASS_WITH_RISK`, so no
 //! verdict can be half-approved.

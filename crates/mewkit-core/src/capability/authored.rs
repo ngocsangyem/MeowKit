@@ -47,7 +47,7 @@ pub const AUTHORED_DETAILS: [AuthoredDetail; 6] = [
     },
     AuthoredDetail {
         id: "advice-supervision",
-        description: "Athena provides bounded strategic supervision at declared --advice checkpoints and a stateless direct strategy consult where a provider exposes it. Recommendations are evidence, never gate approval or verification.",
+        description: "Athena provides bounded strategic supervision at declared --advice checkpoints and a stateless direct strategy consult where a provider exposes it. Recommendations are evidence, never an approval or verification.",
         when_to_use: Some(
             "Use --advice for a bounded delivery run, or explicitly consult Athena for a stateless strategy brief when the situation needs trade-off analysis, judgement, or a recommended next decision.",
         ),

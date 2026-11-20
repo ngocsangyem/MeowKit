@@ -136,7 +136,7 @@ If `tasks/reports/` is not in `.gitignore`, note it in findings — security rep
 - **Zero noise is more important than zero misses.** A report with 3 real findings beats one with 3 real + 12 theoretical. Users stop reading noisy reports.
 - **No security theater.** Don't flag theoretical risks with no realistic exploit path.
 - **Severity calibration matters.** CRITICAL needs a realistic exploitation scenario.
-- **Confidence gate is absolute.** Daily mode: below 8/10 = do not report. Period.
+- **Confidence threshold is absolute.** Daily mode: below 8/10 = do not report. Period.
 - **Read-only.** Never modify code. Produce findings and recommendations only.
 - **Assume competent attackers.** Security through obscurity doesn't work.
 - **Check the obvious first.** Hardcoded credentials, missing auth, SQL injection are still the top real-world vectors.

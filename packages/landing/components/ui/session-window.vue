@@ -1,10 +1,10 @@
 <script setup lang="ts">
-/* The hero's picture: a coding-agent session stopped at Gate 1.
+/* The hero's picture: a coding-agent session that has written a plan and asks you to agree it.
  * Purely presentational — no props, no state; the steps arrive on a CSS stagger. */
 const phases = [
-  { n: '1', name: 'Plan', note: 'Waiting for your approval', on: true },
-  { n: '3', name: 'Build', note: 'Blocked until Gate 1', on: false },
-  { n: '4', name: 'Review', note: 'Gate 2 before ship', on: false },
+  { n: '1', name: 'Plan', note: 'Agree the plan with you', on: true },
+  { n: '3', name: 'Build', note: 'Starts once you agree', on: false },
+  { n: '4', name: 'Review', note: 'Verdict, five dimensions', on: false },
 ]
 </script>
 
@@ -14,7 +14,7 @@ const phases = [
       <span class="win__dots"><i /><i /><i /></span>
       <span class="win__title"><b>claude</b> · acme/api</span>
       <span class="win__spacer" />
-      <span class="win__gate">Gate 1 · plan</span>
+      <span class="win__gate">Plan written</span>
     </div>
 
     <div class="win__body">
@@ -30,12 +30,12 @@ const phases = [
         <div class="msg msg--me">/mk:cook add webhook rate limiting</div>
         <div class="tool step" style="--i: 1">Writing the plan to tasks/plans</div>
         <div class="msg msg--bot step" style="--i: 2">
-          The plan has 3 phases, 5 files and 4 acceptance criteria. Gate 1 is closed, so no source
-          file has been edited yet.
+          The plan has 3 phases, 5 files and 4 acceptance criteria. No source file has been
+          edited yet. Tell me if it fits.
           <small>plan.md · 78 lines</small>
         </div>
         <div class="acts step" style="--i: 3">
-          <span class="acts__go">Approve plan</span>
+          <span class="acts__go">Agree plan</span>
           <span class="acts__alt">Edit</span>
         </div>
       </div>

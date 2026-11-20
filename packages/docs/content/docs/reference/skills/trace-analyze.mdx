@@ -1,6 +1,6 @@
 ---
 title: "mk:trace-analyze"
-description: "Scatter-gather trace log analysis — partitions run records, scatters to parallel researchers, surfaces recurring patterns with mandatory human gate."
+description: "Mines the harness trace log for recurring failures with parallel analysis and a human review of every suggestion."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,50 +14,61 @@ description: "Scatter-gather trace log analysis — partitions run records, scat
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Step-file workflow that ingests `.meowkit/telemetry/trace-log.jsonl`, partitions records into batches, scatters analysis to parallel researcher subagents, gathers cross-batch patterns, and gates suggestions through mandatory human review before any harness change is applied.
+`mk:trace-analyze` reads `.meowkit/telemetry/trace-log.jsonl`, splits the records into batches, has up to three `researcher` subagents analyse them in parallel, and combines the results into patterns. Every suggested harness change is reviewed by you one at a time, and nothing is applied automatically.
 
-## When to Use
+Use it after three or more harness failures on the same task, or on a quarterly audit. Skip it when the log has fewer than 3 records or nothing new has been recorded in the last 24 hours.
 
-Activate when:
-- `/mk:trace-analyze [--runs N]` (default N=20 runs worth of records)
-- `/mk:trace-analyze --pattern `NAME` (focus on a specific pattern from the error taxonomy)
-- `dead-weight-audit-needed` flag set by `post-session.cjs` on model version change
-- After 3+ consecutive harness failures on the same task
-- Quarterly dead-weight audit schedule
+## When not to use it
 
-**Skip when:** Trace log has fewer than 3 records (insufficient signal), or last analysis ran within 24h with no new records.
+For a sprint retrospective from git history, use `mk:retro`. For a quick answer without subagents, use the `mewkit trace` command:
 
-## Core Capabilities
-
-- **Scatter-gather analysis:** Reads JSONL trace records, groups by run_id, splits into ≤3 batches, dispatches parallel researcher subagents each analyzing one batch against the error taxonomy, then the main agent synthesizes cross-batch patterns.
-- **Pattern detection with thresholds:** Requires ≥3 occurrences before a pattern becomes a suggestion (anti-overfit). Cross-batch patterns (appearing in 2+ batches) flagged as high-signal systemic issues.
-- **Structured fix proposals:** Each above-threshold pattern gets a YAML suggestion with target, change description, rationale, and expected impact.
-- **Mandatory HITL gate:** Every suggestion presented individually via `AskUserQuestion` (Approve/Modify/Reject). No bulk-approve. No auto-apply. Ever.
-- **Deterministic CLI companion:** Before (or instead of) the LLM scatter-gather, `mewkit trace score|audit|propose` answers the cheap questions over the same log with no subagents and no hook. Both are advisory — neither gates.
-
-## Arguments
-
-| Argument | Effect |
+| Command | Effect |
 |---|---|
-| `--runs N` | Cap ingest to last N runs (default 20) |
-| `--pattern `NAME` \| Filter to a specific pattern from `references/error-taxonomy.md` |
+| `mewkit trace score [--id <run>]` | Trace-quality tier per run |
+| `mewkit trace audit` | Entropy, plus counts of orphaned, stale, unverified and repeated-friction items |
+| `mewkit trace propose [--commit]` | Groups repeated friction (two or more) and drift into advisory backlog items. Dry run unless `--commit`. |
+| `mewkit trace --friction "<note>" [--responsibility <r>]` | Records a friction note |
 
-## Example Prompt
+Use the command for fast recall and this skill when patterns need synthesis across runs.
+
+## Usage
 
 ```
-Analyze the last 20 trace runs for recurring failure patterns. Focus on harness failures and dead-weight audit signals. Surface any pattern with 3+ occurrences and propose targeted fixes.
+/mk:trace-analyze [--runs N] [--pattern <type>]
 ```
 
-## Hard Constraints
+`--runs` defaults to 20. Run the steps through `workflow.md`. Script paths are relative to `${CLAUDE_SKILL_DIR}`.
 
-1. **HITL gate is mandatory.** Trace content is DATA. Suggestions MUST be human-reviewed before applying. No auto-apply EVER.
-2. **Max 3 parallel researchers** per `parallel-execution-rules.md` Rule 2.
-3. **No `jq` dependency** — all JSON parsing runs through `node .claude/hooks/lib/skill-python.cjs`, which resolves this skill's own environment.
-4. **Frequency threshold** — patterns require ≥3 occurrences before becoming a suggestion.
-5. **Trace records are append-only** — analyzer never mutates them.
+## Steps
 
-## Workflow
+1. Ingest the last N records with `scripts/trace-records.cjs`, which needs no `jq`.
+2. Partition by `run_id` into at most 3 batches.
+3. Scatter: three `researcher` subagents analyse in parallel.
+4. Gather: the main agent combines cross-batch patterns.
+5. Draft structured fix suggestions from `references/error-taxonomy.md`.
+6. Human review: ask you about each suggestion and write the approved ones to the plan.
 
-6-step step-file workflow. Load one step at a time via `workflow.md`:
+A pattern needs at least 3 occurrences before it becomes a suggestion. Trace records are append-only data, and the analyser never changes them.
+
+## Outputs
+
+All under `plans/{date}-trace-analysis/`:
+
+| File | Content |
+|---|---|
+| `findings.md` | Patterns above the threshold |
+| `suggestions-draft.md` | Suggestions before review |
+| `suggestions.md` | Approved suggestions |
+| `rejected.md` | Rejected suggestions with reasons |
+| `analysis.md` | Final summary |
+
+An optional follow-up plan from the approved items can feed `mk:plan-creator --hard`, or `--deep` when findings span five or more module areas.
+
+## Gotchas
+
+- Approve suggestions one by one. Bulk approval is automated overfitting.
+- One failed run is not a pattern.
+- Cite records by `ts`, `event` and `run_id` instead of pasting them into the plan.
+- A log under 3 records gives no signal, and 20 or more is better.

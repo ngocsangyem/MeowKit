@@ -1,6 +1,6 @@
 {
   "exit_code": 1,
-  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the gates actually block.\n\nFound: <project>/.claude\n\nPacks\n  [FAIL] Pack manifest installed\n         Missing pack-manifest.json (.meowkit/, or .claude/ on a pre-move install)\n\n0 passed, 1 failed\n",
+  "stdout": "Validating .claude/ project structure...\nScope: structure & wiring only. Run `mewkit doctor --hard-gates` to verify the guards actually block.\n\nFound: <project>/.claude\n\nPacks\n  [FAIL] Pack manifest installed\n         Missing pack-manifest.json (.meowkit/, or .claude/ on a pre-move install)\n\n0 passed, 1 failed\n",
   "stderr": "",
   "files": {
     ".claude/agents/AGENTS_INDEX.md": "# Agents\n\n[1]{agent_file\n\ndeveloper\n\n<!-- GENERATED:agent-views START -->\n**Agent registry views (generated):** 1 core/support direct-only; 0 domain hub-only; 0 intelligence direct-only; 0 intelligence direct-and-harness; 0 internal harness.\n<!-- GENERATED:agent-views END -->\n",

@@ -44,8 +44,8 @@ fn a_source_correction_supersedes_evidence_and_demotes_only_gate_two() {
         ts.stdout
     );
     assert!(
-        !ts.stdout.contains("Gate 1 returned to required"),
-        "an in-scope fix does not move what Gate 1 approved: {}",
+        !ts.stdout.contains("the scope revision moved too"),
+        "an in-scope fix does not move what the plan approval covered: {}",
         ts.stdout
     );
 }
@@ -59,13 +59,13 @@ fn a_scope_correction_also_returns_gate_one_to_required() {
     assert_eq!(ts.code, 0, "{}", ts.describe());
     assert!(
         ts.stdout
-            .contains("; Gate 1 returned to required (scope changed)."),
+            .contains("; the scope revision moved too (scope changed)."),
         "{}",
         ts.stdout
     );
     assert!(
         ts.stdout
-            .contains("superseded evidence cannot satisfy a later gate."),
+            .contains("superseded evidence cannot satisfy a later check."),
         "{}",
         ts.stdout
     );

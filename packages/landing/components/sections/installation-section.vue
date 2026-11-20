@@ -31,6 +31,7 @@ const { copied, copy } = useClipboard()
 
         <p class="mk-dim">.claude holds the skills, agents, rules and hooks.</p>
         <p class="mk-dim">.meowkit holds memory, state and config.</p>
+        <p class="mk-dim">Add <code>--target codex</code>, <code>cursor</code>, <code>grok</code>, <code>pi</code>, <code>omp</code> or <code>all</code> to choose runtimes.</p>
         <p><a class="mk-link" href="https://docs.meowkit.dev/">Read the quick start</a></p>
       </div>
 

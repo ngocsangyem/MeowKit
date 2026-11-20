@@ -1,4 +1,4 @@
-# Step 6: HITL Gate — Human Review of Each Suggestion
+# Step 6: HITL Approval — Human Review of Each Suggestion
 
 Present each suggestion individually by asking the user. Approved suggestions land in `suggestions.md`. Modified suggestions get the user's revised version. Rejected suggestions land in `rejected.md` with the reason. **No auto-apply, ever.**
 
@@ -89,9 +89,9 @@ ask_user(
 
 If yes: dispatch the planner agent with the approved suggestions as input.
 
-### 6f. NEVER skip the gate
+### 6f. NEVER skip the approval step
 
-The HITL gate is the load-bearing piece per the plan's anti-overfitting principle. If the agent thinks "this suggestion is obviously correct, let me skip the gate," that IS the failure mode the gate exists to prevent.
+The HITL approval step is the load-bearing piece per the plan's anti-overfitting principle. If the agent thinks "this suggestion is obviously correct, let me skip the approval step," that IS the failure mode the step exists to prevent.
 
 ## Output
 
@@ -99,7 +99,7 @@ The HITL gate is the load-bearing piece per the plan's anti-overfitting principl
 - `$analysis_dir/rejected.md` — rejected with reasons
 - `$analysis_dir/analysis.md` — final summary
 
-Print: `"HITL gate complete. {A} approved, {R} rejected, {M} modified. See {analysis_dir}/analysis.md"`
+Print: `"HITL approval complete. {A} approved, {R} rejected, {M} modified. See {analysis_dir}/analysis.md"`
 
 ## Status protocol
 

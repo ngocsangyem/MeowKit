@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/* Section 4 — what the hooks actually enforce. Copy verbatim from the mockup. */
+/* Section 4 — what the hooks actually enforce, and what they leave to you. */
 </script>
 
 <template>
@@ -7,20 +7,20 @@
     <div class="mk-wrap">
       <div class="mk-head fg__head">
         <h2 id="features-h">
-          Hooks enforce the rules. <span class="mk-dim">The agent cannot talk its way past them.</span>
+          Hooks run the checks. <span class="mk-dim">You read the results.</span>
         </h2>
       </div>
 
       <div class="mk-grid fg__grid">
         <article class="mk-card mk-col-6 mk-reveal">
-          <h3>Blocks edits without an approved plan</h3>
-          <p>A hook refuses every source edit until the plan carries an approval receipt, and again once the plan body changes.</p>
+          <h3>Checks the work before it ships</h3>
+          <p>On git commit, push, merge and gh pr create, a hook runs lint on the changed files, the tests related to them and a type-check. It refuses the command when one fails.</p>
           <div class="mk-stage fg__panel"><GateChecklist /></div>
         </article>
 
         <article class="mk-card mk-col-6 mk-reveal">
-          <h3>Scans every write for blocked patterns</h3>
-          <p>Hardcoded secrets, interpolated SQL and auth tokens in localStorage are stopped as the file is written.</p>
+          <h3>Guards credential files</h3>
+          <p>Reads of .env, key and credential files are refused. How many tools the guard covers differs by runtime.</p>
           <div class="mk-stage fg__panel fg__panel--low"><ScanNotices /></div>
         </article>
 
@@ -31,8 +31,8 @@
         </article>
 
         <article class="mk-card mk-col-6 mk-reveal">
-          <h3>Installs into three coding agents</h3>
-          <p>Claude Code gets real hook enforcement. Cursor and Codex get the same skills; on Codex the gates advise and do not block.</p>
+          <h3>Installs on six runtimes</h3>
+          <p>Claude Code, Codex, Cursor, Grok, Pi and OMP get the same kit. Grok, Pi and OMP install at project scope only, and their enforcement has not been run in a live session yet.</p>
           <div class="mk-stage fg__panel fg__panel--flat"><AgentsHub /></div>
         </article>
       </div>

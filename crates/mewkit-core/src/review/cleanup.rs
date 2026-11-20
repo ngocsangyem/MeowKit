@@ -12,7 +12,7 @@
 //! something, because nothing here can delete at all.
 //!
 //! The session directory — verdict, proof bundle, evidence — is kept on
-//! purpose. It is what a human reads at Gate 2, and it has to outlive the
+//! purpose. It is what a human reads when reviewing, and it has to outlive the
 //! worktree it describes.
 use std::path::{Path, PathBuf};
 

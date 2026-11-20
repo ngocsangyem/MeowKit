@@ -1,7 +1,7 @@
 # Instruction audit criteria
 
 The criteria every rule, agent, skill and installed instruction file is held to now that MeowKit
-has no plan-approval or review-approval gate, and the model-fit checks for current models on
+has no plan or review approval step, and the model-fit checks for current models on
 Claude Code, Codex and Cursor. The mechanical subset is checked by
 `node scripts/check-instruction-criteria.cjs`, which CI runs on `.claude` and on what `mewkit init`
 installs for each other runtime (`installed:codex`, `installed:cursor`, `installed:grok`, `installed:pi`, `installed:omp`; the script installs each into a
@@ -54,7 +54,7 @@ Each line cites a vendor page opened on 2026-11-15. Pages: [Anthropic skills bes
 | Skill body | Under 500 lines; references one level deep; a contents list on references over 100 lines ([Anthropic skills best practices]); no standing "use a subagent to verify" or re-check steps, which cause over-verification ([Prompting Claude Opus 5]); delegation states when ([Prompting Claude Fable 5.2]) | Same; say when and how much to use subagents ([OpenAI prompt guidance]) | Same; delegation through the Task tool, one nesting level ([Cursor subagents]) | A9, A10, A12, A14 |
 | Hook message | Reaches the model only on a channel the host shows it (stderr on exit 2, `additionalContext`); plain stdout on tool events is not shown | Same principle in Codex's hook form | Same principle in Cursor's hook form | review |
 
-## What replaces the gates
+## What replaces the approval steps
 
 - **Planning.** For a change of more than two files or a few hours, write the plan and agree
   it with the user before building. Nothing blocks an edit without one.
@@ -64,7 +64,7 @@ Each line cites a vendor page opened on 2026-11-15. Pages: [Anthropic skills bes
   related to the changed files and a type-check, and refuses the command when one fails. It is
   the one ship-time control, on all three runtimes.
 - **Irreversible actions.** Push, merge and force are approved through the host's own
-  permission prompt when the host is set to ask; MeowKit does not add a gate of its own.
+  permission prompt when the host is set to ask; MeowKit adds no check of its own.
 
 ## Model-fit audit: before and after
 

@@ -7,7 +7,7 @@ binary beta and before each stable binary release. A failed item reopens the cod
 that emits that runtime's files; it is not waived.
 
 The list covers a **project** install. A global install carries less: global Cursor registers
-only the privacy and session-context hooks, so the plan gate (item 8) does not apply there.
+only the privacy and session-context hooks, so the ship check (item 8) does not apply there.
 
 ## Setup (once per run)
 
@@ -28,13 +28,13 @@ Run each in a fresh session of that runtime, opened in the project.
 | # | Runtime | Do | Pass when |
 | ---: | --- | --- | --- |
 | 1 | Claude Code | Start a session | The session-start context (MeowKit orientation) is visible in the first turn |
-| 2 | Claude Code | Ask it to change `src/app.js` with no approved plan | The edit is blocked, and the message names the missing approved plan |
+| 2 | Claude Code | Stage a change to `src/app.js` that fails the project lint or type-check, then ask it to run `git commit` | The commit is refused by the ship check, and the message names the failing check |
 | 3 | Claude Code | Run a skill that runs a bundled script (e.g. `mk:docs-finder`) | The script runs from the skill's own directory without a "not found" |
-| 4 | Codex CLI | Start a session (approve the hooks when `/hooks` asks); ask which workflow rules apply here | It answers from the MeowKit block in `AGENTS.md` (gates, plan first). Codex gets no session-start hook; `AGENTS.md` carries its standing context |
-| 5 | Codex CLI | Ask it to change `src/app.js` with no approved plan | Blocked, with the reason |
+| 4 | Codex CLI | Start a session (approve the hooks when `/hooks` asks); ask which workflow rules apply here | It answers from the MeowKit block in `AGENTS.md` (plan first, the ship check). Codex gets no session-start hook; `AGENTS.md` carries its standing context |
+| 5 | Codex CLI | Stage a change to `src/app.js` that fails the project lint or type-check, then ask it to run `git commit` | The commit is refused, with the reason |
 | 6 | Codex CLI | Run a skill with a bundled script | The script runs |
 | 7 | Cursor | Open the project, start an agent chat | The `sessionStart` hook's short pointer to `.meowkit/` state is in context (not the full Claude Code orientation) |
-| 8 | Cursor | Ask it to change `src/app.js` with no approved plan | Blocked, with the reason |
+| 8 | Cursor | Stage a change to `src/app.js` that fails the project lint or type-check, then ask it to run `git commit` | The commit is refused, with the reason |
 | 9 | Cursor | Run a skill with a bundled script | The script runs |
 | 10 | Grok | Run `/hooks-trust`, then ask it to run `cat .env` | The call is denied with the privacy guard's reason (`.grok/hooks/meowkit.json`) |
 | 11 | Grok | `grok inspect --json` | Each `mk-*` skill is listed once, from `.grok/skills`; `meowkit.json` is the only kit hook file |

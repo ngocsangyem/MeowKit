@@ -39,7 +39,7 @@ options already exist.
 
 - **The option set.** Athena never generates approaches, scores them, or chooses for the
   user. It supplies criteria and reads the result.
-- **The user's decision.** This skill adds no gate, and supervision creates none.
+- **The user's decision.** This skill adds no approval step, and supervision creates none.
 
 ## Routing in this skill
 
@@ -48,7 +48,7 @@ The call protocol defines the dispositions; here is what each one means for this
 - `CONTINUE_WITH_DIRECTIVE` — proceed; the directive is input to the generation, not a
   replacement for it.
 - `READY_FOR_EXISTING_GATE` — present the recommendation to the user as normal. There
-  is no gate here to clear, and this does not become one.
+  is no approval step here to clear, and this does not become one.
 - `RETURN_TO_EXECUTOR` — this skill addresses each correction (usually a missing
   option, an unexamined constraint, or a trade-off asserted without evidence) or
   records why it is rejected, then RECHECK once.

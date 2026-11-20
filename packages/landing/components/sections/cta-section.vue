@@ -8,8 +8,8 @@
     <div class="mk-wrap">
       <div class="closer__row">
         <div class="closer__text">
-          <h2 id="close-h">Put two gates in front of your agent</h2>
-          <p class="mk-lead mk-dim">One command, two directories, MIT licensed.</p>
+          <h2 id="close-h">Put a ship check in front of your agent</h2>
+          <p class="mk-lead mk-dim">One binary, six runtimes, MIT licensed.</p>
         </div>
         <a class="mk-btn mk-btn--primary" href="#install">
           Install MeowKit

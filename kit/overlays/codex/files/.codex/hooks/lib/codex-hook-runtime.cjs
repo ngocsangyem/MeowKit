@@ -29,7 +29,7 @@ function realpathSafe(p) {
 
 /** Read + parse the hook's JSON payload from stdin. Returns null on empty,
  *  unreadable, or unparseable stdin — callers treat null as "cannot verify this
- *  payload" and fail open, since the `mewkit` CLI gate stays authoritative. */
+ *  payload" and fail open, since the `mewkit` CLI check stays authoritative. */
 function readPayload() {
 	let raw;
 	try {
@@ -95,12 +95,12 @@ function walkUpForMarker(start) {
  * aliases), which describe a plugin bundle, not the user's repository. The docs
  * are explicit that "Codex may be started from a subdirectory" and recommend
  * resolving from the git root, so this mirrors that recommendation rather than
- * trusting the payload `cwd`. Trusting `cwd` would make Gate 1 look for
- * `<subdir>/tasks/plans`, find nothing, and deny every source edit.
+ * trusting the payload `cwd`. Trusting `cwd` would make a guard look for
+ * `<subdir>/tasks/plans`, find nothing, and deny the edit.
  *
  * Order: git top level → nearest marker directory → the session cwd itself
  * (fail-safe: an unresolvable root leaves the caller's own default behavior,
- * which for the gate is "deny", intact).
+ * which for a guard is "deny", intact).
  */
 function projectRoot(cwd) {
 	const start = realpathSafe(cwd || process.cwd());

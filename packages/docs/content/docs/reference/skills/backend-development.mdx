@@ -1,6 +1,6 @@
 ---
 title: "mk:backend-development"
-description: "End-to-end backend changes — handlers, services, integrations, webhooks, and jobs — coordinating the contract, data, and auth owners without absorbing them."
+description: "Drives a backend change from discovery to validation and hands each specialist part to its owning skill."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,66 +14,42 @@ description: "End-to-end backend changes — handlers, services, integrations, w
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:backend-development` coordinates a backend change end to end: a handler, service, integration, webhook consumer or background job. It classifies what the change touches (contract, service logic, data, auth, async work, operability), handles the service part itself and routes the rest to the owning skill.
 
-Drives a backend change from discovery to validation, and routes each specialist part to its
-owner. It classifies what the change actually touches — contract, service logic, data, auth,
-async work, operability — then composes the result. It is a router with a workflow, not a
-framework catalogue.
+## When not to use it
 
-## When to Use
-
-- Adding or changing a handler, service, integration, webhook consumer, or background job
-- A backend change that spans contract, data, and auth and needs coordinating
-- Backend architecture questions about where a change belongs
-- **NOT for:** contract-only design or review (`mk:api-design-principles`), schema, query, or
-  migration work (`mk:database`), infrastructure and deployment (`mk:devops`), or the
-  security verdict
-
-## Ownership Boundary
-
-| Owner | Owns |
+| If you need | Use |
 |---|---|
-| `mk:backend-development` | The end-to-end change: discovery, classification, service and integration work, wiring the specialists together |
-| `mk:api-design-principles` | Contract authorship — loaded only for a new, public, or breaking contract |
-| `mk:database` | Schema, migrations, queries, indexes, ORM boundary — never written here |
-| `mk:devops` | Infrastructure, delivery, deployment safety |
+| Contract-only design or review | `mk:api-design-principles` |
+| Schema, migration, query or index work | `mk:database` |
+| Infrastructure, delivery or rollback | `mk:devops` |
+| A security verdict | the security workflow (`mk:cso`) |
+| The code root cause of a defect | `mk:investigate` |
 
-An internal change that alters no contract must not open a contract discussion.
+The contract skill is loaded only for a new, public or breaking contract. An internal change with no contract delta does not open a contract discussion. A message-based change splits: the contract is `mk:api-design-principles`, the producer or consumer code is here. An unscoped performance request is triaged by evidence first, then a query or index question goes to `mk:database` and a capacity question to `mk:devops`.
 
-## Arguments
+## Usage
 
-`[backend change]`
+```bash
+/mk:backend-development [backend change]
+```
 
-## Workflow
+## What it does
 
-1. **Discover** — active plan, affected module, callers, covering tests, local conventions;
-   name what was not found rather than assuming it
-2. **Classify** — contract-only, service logic, data, auth, async/event, or production
-   readiness; most tasks are two or three of these
-3. **Design the boundary** — which existing boundary this lives in and why it is not a new
-   one; failure semantics for every call that leaves the process
-4. **Implement** — in the owning flow, reusing local error types, validation, and test helpers
-5. **Validate proportional to risk** — narrowest covering test first, widening when a shared
-   contract, public boundary, or auth path was touched
-
-## References
-
-| File | Load when |
-|---|---|
-| `references/backend-readiness.md` | The change is public-facing, auth-sensitive, or otherwise high-risk |
+1. Discover: reads the active plan, the affected module, its callers, covering tests and local conventions. It names what it did not find instead of assuming.
+2. Classify: contract-only (route and stop), service logic (stay), data (`mk:database` for the schema or query part), auth (state the requirement, the security workflow owns the verdict), async or event (stay), production readiness (`mk:devops`). Most tasks are two or three of these.
+3. Design the boundary: say which existing boundary the change lives in and why it is not a new one. For every call that leaves the process, state the behaviour on timeout, partial success, retry and duplicate delivery.
+4. Implement: in the owning flow, reusing the local error types, validation, logging and test helpers.
+5. Validate in proportion to risk: the narrowest covering test first, wider when a shared contract, public boundary or auth path was touched. `references/backend-readiness.md` is loaded for public-facing or high-risk changes.
 
 ## Output
 
-No new report artifact. The existing workflow artifact gains the affected boundary, the
-contract delta (or "none"), the auth and data decisions, the failure semantics, the
-validation evidence, and the handoffs made.
+No new report. The workflow artifact already in use gains the affected boundary, the contract delta (or "none"), the auth and data decisions, the failure semantics, the validation evidence and the hand-offs.
 
-## Pro Tips
+## Gotchas
 
-- **Name no infrastructure the repository does not already run.** A queue, cache, broker, or
-  orchestrator is a proposal with an operational cost, not a default.
-- **Invent no number.** "Make it fast" means find the stated target, or ask what fast means
-  and what is slow now.
-- **A consumer retried at least once will be delivered twice.** Make the handler tolerate the
-  repeat, or say plainly that the guarantee is unknown.
+- Name no infrastructure the repository does not already run. A queue, cache, broker or orchestrator is a proposal for you to decide.
+- A new service is a deployment and an on-call surface, not a refactor.
+- Invent no number. With "make it fast", find the stated target or ask what is slow now.
+- A webhook or consumer retried at least once will be delivered twice. Make the handler tolerate it or say the guarantee is unknown.
+- An auth requirement is not an auth verdict. State who may do what and what an unauthorized caller sees, and do not certify the code as safe.

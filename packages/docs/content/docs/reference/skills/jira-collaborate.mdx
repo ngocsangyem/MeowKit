@@ -1,6 +1,6 @@
 ---
 title: "mk:jira-collaborate"
-description: "Manage JIRA collaboration: comments, attachments, watchers, notifications. Internal-vs-public comment safety enforced."
+description: "Manages comments, attachments, watchers and notifications on one Jira issue, and asks whether a comment is internal or public before posting."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,48 +15,31 @@ description: "Manage JIRA collaboration: comments, attachments, watchers, notifi
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Forks the `jira-collaborate` agent to manage the per-issue collaboration layer — comments, attachments, watchers, notifications. The agent confirms internal-vs-public for any comment that could be customer-facing.
+mk:jira-collaborate forks the `jira-collaborate` agent ([agent page](/reference/agents/jira-collaborate)) to run `jira-as collaborate` commands. Before posting any comment that could reach a customer, the agent asks whether it is internal (team only) or public (visible to all watchers), and defaults to internal when unsure. The skill is not enabled by default.
 
-## When to Use
+## When to use it
 
-- **Triggers:** "add comment to PROJ-123", "list comments on PROJ-123", "upload screenshot.png to PROJ-123", "watch PROJ-123", "notify watchers"
-- **NOT for:** issue CRUD ([`mk:jira-issue`](/reference/skills/jira-issue)), issue links ([`mk:jira-relationships`](/reference/skills/jira-relationships)), transitions ([`mk:jira-lifecycle`](/reference/skills/jira-lifecycle)).
+Use it for "add comment to PROJ-123", "list comments on PROJ-123", "upload screenshot.png to PROJ-123", "watch PROJ-123", "who watches PROJ-123?" or "notify PROJ-123 watchers".
 
-## Internal-vs-Public Safety
+| Need | Use instead |
+|---|---|
+| Create, read, update, delete an issue | [`mk:jira-issue`](/reference/skills/jira-issue) |
+| Issue links | [`mk:jira-relationships`](/reference/skills/jira-relationships) |
+| Transitions | [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle) |
 
-Atlassian Cloud distinguishes **internal** (team-only) vs **public** (visible to customers / external watchers) comments. JSM tickets surface this distinction explicitly. Before posting any customer-facing comment:
+For JSM tickets, [`mk:jira-jsm`](/reference/skills/jira-jsm) covers the internal and public distinction. [`mk:jira-analyst`](/reference/skills/jira-analyst) produces analyses to post as comments.
 
-> "Should this comment be `internal` (team-only) or `public` (visible to all watchers)?"
+## Comment format
 
-Default to `internal` if uncertain. Misposting an internal comment as public has reputational + privacy consequences.
+Markdown is accepted and converted to Atlassian Document Format on the server by `jira-as`. Prefer markdown for multi-line comments with code blocks. `references/comment-formats.md` covers text, markdown and ADF.
 
-## Verified Wrapper Invocations
+## References
 
-| Operation | Tier | Invocation |
-|---|---|---|
-| Comment add | 2 | `... collaborate comment add PROJ-123 --body "text"` |
-| Comment list | 1 | `... collaborate comment list PROJ-123` |
-| Comment delete | 4 | `... collaborate comment delete PROJ-123 --comment-id <ID>` (irreversible) |
-| Attachment upload | 2 | `... collaborate attachment upload PROJ-123 --file /path/to/file` |
-| Attachment download | 1 | `... collaborate attachment download PROJ-123 --attachment-id <ID> --output /tmp/...` |
-| Watcher add | 2 | `... collaborate watcher add PROJ-123 --user <username>` |
-| Notify | 2 | `... collaborate notify PROJ-123 --message "..."` |
+| File | Content |
+|---|---|
+| `references/comment-templates.md` | Templates for progress, blocker, handoff and evidence comments |
+| `references/comment-formats.md` | Text, markdown and ADF formats |
 
-## ADF Conversion
-
-Pass markdown to `--body` and `jira-as` handles ADF conversion server-side. For raw ADF, pass `--format adf` with a JSON ADF document.
-
-## Domain References
-
-- `references/comment-templates.md` — copy-paste comment templates (progress, blocker, handoff, evidence)
-- `references/comment-formats.md` — text / markdown / ADF format reference
-
-## Peer Leaves
-
-`mk:jira-issue` (create-with-attachment) · `mk:jira-jsm` (internal-vs-public on JSM tickets) · `mk:jira-analyst` (post-analysis comment patterns)
-
-## Agent
-
-[`jira-collaborate`](/reference/agents/jira-collaborate) — A + C, NOT B.
+Shared setup, CLI idioms and the safety model are in `../jira/references/`. Flags are in `jira-as collaborate --help`.

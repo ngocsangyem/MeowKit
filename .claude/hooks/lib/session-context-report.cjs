@@ -149,7 +149,7 @@ function locateCliOnPath(root, env) {
  * Say it once when the CLI is absent, and name the command that explains why.
  *
  * Without it the degradation is silent in exactly the situation where it matters:
- * a fresh clone runs every gate and guard correctly — none of them needs the CLI
+ * a fresh clone runs every guard correctly — none of them needs the CLI
  * — while the checks that DO call it skip, and nothing on screen connects the
  * skipped line to the missing install. The hint is emitted from the session-start
  * block, so it appears once per session rather than once per event.
@@ -159,7 +159,7 @@ function installBlock(root, env = process.env) {
   return [
     '## MeowKit CLI not available',
     'This project carries `.claude/` but no `mewkit` CLI (no committed launcher, no node_modules, nothing on PATH).',
-    'Gates, guards and observers all still run — none of them needs it — but the checks that call it skip instead.',
+    'Guards and observers all still run — none of them needs it — but the checks that call it skip instead.',
     'Install the `mewkit` binary (https://docs.meowkit.dev/installation), then run `mewkit doctor` to see what this clone is missing.',
   ];
 }

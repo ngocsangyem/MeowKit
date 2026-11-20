@@ -153,7 +153,7 @@ fn cleanup_removes_a_worktree_this_session_owns_and_keeps_the_audit_trail() {
         .fixture("review-cleanup-owned")
         .args(&["review", "cleanup", "--session", "s1"])
         // The session's own artifacts outlive the worktree: they are what a
-        // human reads at the gate.
+        // human reads when reviewing.
         .writes(&[
             "tasks/reviews/s1/manifest.json",
             "tasks/reviews/s1/verdict.md",

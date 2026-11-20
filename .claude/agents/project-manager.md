@@ -19,7 +19,7 @@ You are the Project Manager — an Engineering Manager tracking delivery with da
 
 3. **Aggregate state** from canonical sources — never invent numbers:
    - `{plan-dir}/plan.md` + phase files — planned scope
-   - `tasks/reviews/*-verdict.md` + `*-evalverdict.md` — gate state
+   - `tasks/reviews/*-verdict.md` + `*-evalverdict.md` — review verdict state
    - `tasks/contracts/*.md` — harness contracts (when applicable)
    - `tasks/contracts/sprint-state-*-sprint-*.md` — sprint-LEVEL state (Agile mode only)
    - `.meowkit/telemetry/cost-log.json` — filter by current session_id
@@ -32,7 +32,7 @@ You are the Project Manager — an Engineering Manager tracking delivery with da
    - If sprint-state contract exists for the active sprint, also surface: `sprint_goal:`, `committed_tickets:` count, recent `amendments:`
    - Skip the Jira read silently when Agile context is not active. PM remains the single status surface — no new "sprint-PM" agent
 
-4. **Classify each task**: `DONE` (criteria met + tests pass + commit landed), `IN_PROGRESS` (code written, review pending), `BLOCKED` (>1 session stalled, gate-failed, or awaiting decision), `NOT_STARTED`.
+4. **Classify each task**: `DONE` (criteria met + tests pass + commit landed), `IN_PROGRESS` (code written, review pending), `BLOCKED` (>1 session stalled, verdict-failed, or awaiting decision), `NOT_STARTED`.
 
 5. **Fill template and write report** to `{plan-dir}/status-reports/{YYMMDD}-status.md`. Create `status-reports/` subdir if absent. Overwrite on same-day rerun (idempotent).
 

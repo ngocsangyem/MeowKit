@@ -1,108 +1,84 @@
 ---
-title: "Step 8 — Plan per ticket with /mk:plan-creator"
-description: "Running plan-creator standalone moves plan agreement to sprint kickoff instead of burying it inside each developer's cook run. Tier-aware, not blanket policy."
+title: "Step 8: Plan per ticket with /mk:plan-creator"
+description: "Running mk:plan-creator on its own before coding lets the team agree each plan at sprint kickoff instead of inside each developer's cook run. The mode follows the ticket's size and risk."
 ---
 
-Now that the tech review exists for each ticket, run `mk:plan-creator` **per ticket** to produce a durable, file-based implementation plan that you agree _before_ any code is generated. This is what an engineering manager wants: plan visibility at sprint kickoff, not buried inside each developer's cook run.
+With a tech review for each ticket, run `mk:plan-creator` once per ticket. It writes a file-based plan that you read and agree with before any code is generated. The tech lead can then read every plan at sprint kickoff.
 
-<Callout title="Why split this from /mk:cook" type="info">
+## Why run it before /mk:cook
 
-`mk:cook` already runs `mk:plan-creator` at its own Phase 1. But running it standalone first has three measurable wins:
+`mk:cook` runs `mk:plan-creator` itself in Phase 1. Running it first has three effects:
 
-1. **Earlier plan agreement.** Catching "this needs a security review" or "this hides a migration" at plan stage costs minutes. Catching it at review costs hours of generated code thrown out.
-2. **Sprint-level plan portfolio.** With per-ticket plans materialized in `tasks/plans/`, the tech lead can read every plan side-by-side at sprint kickoff. Shared-file ownership conflicts surfaced by Step 7's `mk:planning-engine plan --spec` become actionable at this stage.
-3. **Plan persistence across context resets.** A standalone plan-creator artifact survives session death; a Phase-1-inside-cook plan is bundled with that one cook invocation.
+1. You find problems such as a missing security review or a hidden migration at plan time, which costs minutes. Finding them at review costs the code that was generated.
+2. Plans in `tasks/plans/` can be read side by side.
+3. A plan file survives a lost session. A Phase 1 plan inside cook belongs to that one run.
 
-`mk:cook` accepts a plan path as its argument (`mk:cook/SKILL.md` line 70 — "code mode") and **skips its own Phase 1** when invoked that way. No double-planning.
+Planning is a practice here. No hook blocks an edit or a commit when a plan is missing, so the agreement is something you do, and the plan file is the record.
 
-</Callout>
+`mk:cook` also accepts a plan path. In that "code mode" it skips Phase 1 and starts from the plan you agreed.
 
-## Tier-aware decision (not blanket policy)
+## Choosing the mode
 
-| Ticket tier (from `mk:agent-detector` at Step 7)                                            | Recommendation  | Plan-creator mode                                                               |
-| ------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------- |
-| **TRIVIAL** — rename, typo, single-file config                                              | **Skip** Step 8 | Plan-creator runs inline as `mk:cook` Phase 1 (cheaper than a separate session) |
-| **STANDARD** — feature \< 5 files, bug fix, API endpoint                                     | **Default**     | `mk:plan-creator --fast` per ticket                                             |
-| **COMPLEX** — auth, payments, data-model, any non-empty `matched_flags` from Step 7 Phase 0 | **Required**    | `mk:plan-creator --hard` per ticket                                             |
+| Ticket | Plan-creator mode |
+| --- | --- |
+| Trivial: rename, typo, single-file config | Skip this step. Plan-creator exits on trivial scope and points to `/mk:fix`. Cook can run the ticket from a task description. |
+| Standard: a feature under about 5 files, a bug fix, an API endpoint | `--fast`: no research, `plan.md` only |
+| Complex: auth, payments, data model, or any risk flag raised at Phase 0 | `--hard`: two researchers, `plan.md` plus phase files, a red-team pass and a validation interview |
 
-The tier comes from `mk:agent-detector`'s Phase 0 output during Step 7's `mk:planning-engine review`. You do not re-derive it.
+Plan-creator also picks a mode from the scope itself in its first step (trivial exits, simple runs fast, complex runs hard), and the flag overrides that choice. The `mk:agent-detector` risk flags work the same way. AUTH, AUTHZ, AUDIT_SEC and EXT_SYSTEM force the COMPLEX tier. DATA_MODEL and PUBLIC_CONTRACT force `mk:plan-creator --hard`. See [Step 9](/workflows/spec-to-pr-walkthrough/step-09-implement-with-cook) for Phase 0.
 
 ## Prompt
 
 ```bash
-# AUTH-201 was flagged COMPLEX in Step 7 (matched_flags: ["AUTH"])
+# AUTH-201 touches auth, so use the full pipeline
 /mk:plan-creator --hard
-# Plan-creator interview prompts; you paste:
-#   - The Tech Review Report path from Step 7 (tasks/reports/...)
-#   - Ticket: AUTH-201
-#   - Linked spec: tasks/reports/spec-research-260511-q3-auth-refresh.md
+# Give it the Tech Review Report path and the spec report path:
+#   tasks/reports/<tech-review-report>.md
+#   tasks/reports/confluence-spec-260511-0108-q3-auth-refresh.md
 
-# AUTH-202 was flagged STANDARD
+# AUTH-202 is a standard ticket
 /mk:plan-creator --fast
 
-# AUTH-203 was flagged TRIVIAL — skip Step 8 for this ticket;
-# `/mk:cook implement AUTH-203` at Step 9 will handle it inline.
+# AUTH-203 is trivial: skip this step and give the task to /mk:cook in Step 9
 ```
 
-## What happens behind the scenes
+## What happens
 
-| Layer                                  | Action                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Scope check                            | `step-00-scope-challenge.md` runs first; trivial scope exits early with a one-paragraph plan instead of a phase tree                                                                                                                                                                                                                                                                                                                         |
-| Research (in `--hard` / `--deep`)      | 2-3 researcher subagents spawned in parallel, each capped at 5 calls; reports written to `tasks/plans/<slug>/research/`                                                                                                                                                                                                                                                                                                                      |
-| DoR advisory (if Agile context active) | Plan-creator checks `agile-story-gates.md` if `jira_tickets:` frontmatter is set; renders a Definition-of-Ready checklist; **does not block** — you decide                                                                                                                                                                                                                                                                                   |
-| Plan emission                          | Writes `tasks/plans/YYMMDD-<slug>/plan.md` (≤80 lines overview) + `phase-XX-*.md` per implementation phase                                                                                                                                                                                                                                                                                                                                   |
-| Tech Review handoff (manual)           | `mk:plan-creator` has **no auto-discovery** of Step 7's report. You reference the path during plan-creator's Validation Interview (Step 6 of its own workflow) or paste excerpts when asked about technical approach. The dev is responsible for citing it in `plan.md`'s Key Insights — plan-creator's "Research disconnected" gotcha (line 109 of its SKILL.md) only governs plan-creator's _own_ researcher outputs, not external reports |
-| Where the Step 7 report stays          | `tasks/reports/<filename>.md` — planning-engine wrote it there because no plan dir existed at Step 7 (per `planning-engine/SKILL.md` lines 81-83). It is **not** copied or moved into `tasks/plans/<slug>/research/`                                                                                                                                                                                                                         |
-| Plan agreement                         | The skill emits the plan for you to review and agree. Nothing blocks a downstream cook run on a missing agreement.                                                                                                                                                                                                                                                                                             |
+| Layer | Action |
+| --- | --- |
+| Scope check | The first step reads team memory for matching entries, picks a workflow model (feature, bugfix, refactor or security) and sets the planning mode. |
+| Intake packet | If you pass two or more existing artifacts, such as the Tech Review Report and the spec report, plan-creator merges them into one intake packet at `research/plan-intake-packet.md` in the plan folder. With fewer than two paths, nothing changes. |
+| Research | With `--hard`, two researchers run in parallel, each limited to 5 tool calls, and write to `tasks/plans/<slug>/research/`. |
+| Definition of Ready | If the plan frontmatter has `jira_tickets:` and the Agile rules are loaded, plan-creator renders a Definition of Ready checklist. It is advisory and does not block. |
+| Plan files | `tasks/plans/YYMMDD-<slug>/plan.md` (overview, at most 80 lines) and, outside `--fast`, a `phase-XX-*.md` file per phase. |
+| Presenting the plan | Plan-creator shows the plan with a self-check of what was done, skipped and uncertain. You agree it or ask for changes. |
 
 ## What you have after Step 8
 
 ```
 tasks/
-├── reports/                                            ← from Step 7 (unchanged)
-│   ├── tech-review-260511-auth-201.md                  (mk:planning-engine review AUTH-201)
-│   ├── tech-review-260511-auth-202.md                  (mk:planning-engine review AUTH-202)
-│   ├── planning-260511-sprint.md                       (mk:planning-engine plan --tickets ... --spec)
-│   └── spec-research-260511-q3-auth-refresh.md         (from Step 1, mk:confluence-spec-analyst)
-└── plans/                                              ← new in Step 8
-    ├── 260511-auth-201-google-oauth/
+├── reports/                                     from Steps 1, 6 and 7, left where they were written
+│   ├── confluence-spec-260511-0108-q3-auth-refresh.md
+│   ├── jira-evaluate-260511-0930-AUTH-201.md
+│   └── ...                                      Tech Review and Planning Reports
+└── plans/
+    ├── 260511-auth-201-google-oauth/            --hard
     │   ├── plan.md
     │   ├── phase-01-service-skeleton.md
     │   ├── phase-02-controller-route.md
-    │   ├── phase-03-integration-tests.md
-    │   └── research/                                   ← plan-creator's own researchers (--hard mode)
-    │       ├── researcher-01-oauth-libraries.md
-    │       └── researcher-02-pkce-strategies.md
-    ├── 260511-auth-202-sliding-session/
-    │   ├── plan.md
-    │   └── phase-01-middleware-refactor.md
-    └── (AUTH-203 has no plan dir — TRIVIAL, will plan inline at Step 9)
+    │   └── research/                            researcher reports and the intake packet
+    └── 260511-auth-202-sliding-session/         --fast
+        └── plan.md
 ```
 
-<Callout title="Two distinct research artifacts — don't confuse them" type="warn">
+AUTH-203 has no plan folder. It is trivial and is handled in Step 9.
 
-- **`tasks/reports/tech-review-*.md`** — Step 7's output from `mk:planning-engine`. Stays where it was written. Cited by hand in `plan.md`.
-- **`tasks/plans/<slug>/research/`** — Step 8's plan-creator researchers (only in `--hard`/`--deep` modes). Different agents, different artifacts, different purpose.
+The reports from Steps 1 to 7 stay in `tasks/reports/`. Plan-creator does not copy them into the plan folder, but a report path given at invocation is read through the intake packet.
 
-There is no automatic copy or symlink between them. If you want the Tech Review summary visible in the plan, paste the relevant lines into `plan.md`'s Key Insights yourself during plan-creator's interview.
+## Staleness
 
-</Callout>
-
-<Callout title="Plan agreement happens HERE in this workflow" type="info">
-
-When plan-creator runs standalone, you agree the plan at Step 8 (not inside Step 9's cook). The tech lead reviews every sprint plan in one sitting. When `/mk:cook <plan-path>` runs at Step 9, it sees an agreed plan and goes straight to Phase 2 / Phase 3.
-
-</Callout>
-
-## Engineering manager caveats
-
-| Risk                                                                                             | Mitigation                                                                                                                                                                                 |
-| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Plan staleness** — `mk:cook` SKILL.md warns: plans >14 days old trigger a re-validation prompt | Pick up tickets within 14 days of sprint kickoff; for slipped sprints, re-run `mk:plan-creator` on stale tickets before cook                                                               |
-| **Overplanning** — devs treat the plan as gospel and `/mk:cook --auto` without re-reading        | No hook checks this; the policy should be that devs re-read the plan when picking up a ticket                                                                         |
-| **Tier mis-classification** — TRIVIAL ticket gets a full plan                                    | Trust `mk:agent-detector`'s tier; if a STANDARD ticket gets plan-created and reveals 0 phases of substance, that's a signal to demote it to TRIVIAL and skip the standalone plan next time |
+`mk:cook` warns when a plan is more than 14 days old, because the codebase may have changed. For a sprint that slips, run `mk:plan-creator` again on the stale tickets before cook. No hook checks that you re-read a plan, so re-read it when you pick up the ticket, especially before `/mk:cook --auto`.
 
 ---
 
-Previous: [Step 7 — Tech review against your codebase](/workflows/spec-to-pr-walkthrough/step-07-tech-review) · Next: [Step 9 — Implement with /mk:cook](/workflows/spec-to-pr-walkthrough/step-09-implement-with-cook) · [All steps](/workflows/spec-to-pr-walkthrough)
+Previous: [Step 7: Tech review against your codebase](/workflows/spec-to-pr-walkthrough/step-07-tech-review) · Next: [Step 9: Implement with /mk:cook](/workflows/spec-to-pr-walkthrough/step-09-implement-with-cook) · [All steps](/workflows/spec-to-pr-walkthrough)

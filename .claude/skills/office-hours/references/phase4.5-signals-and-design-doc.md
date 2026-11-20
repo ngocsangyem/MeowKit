@@ -231,7 +231,7 @@ further.
 
 If the subagent fails, times out, or is unavailable — skip the review loop entirely.
 Tell the user: "Spec review unavailable — presenting unreviewed doc." The document is
-already written to disk; the review is a quality bonus, not a gate.
+already written to disk; the review is a quality bonus, not a requirement.
 
 **Step 3: Report and persist metrics**
 

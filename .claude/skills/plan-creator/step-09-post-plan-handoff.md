@@ -44,7 +44,7 @@ Option set is mode-pruned. First option is `(Recommended)`. Ask the user caps op
 |---|---|---|
 | fast | yes | Red-team, Validate, Cook, End |
 | fast | no | Cook, Validate, Red-team, End |
-| hard / deep / parallel / two | (n/a — both prior gates ran) | Cook, End |
+| hard / deep / parallel / two | (n/a — both prior steps ran) | Cook, End |
 | product-level | (n/a) | Hand off to mk:autobuild, End |
 | spike | (n/a) | Cook, End |
 

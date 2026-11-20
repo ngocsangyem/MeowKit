@@ -3,11 +3,11 @@
 type Step = { name: string, cmd: string, time: string, state: 'done' | 'run' | 'queued' }
 
 const steps: Step[] = [
-  { name: 'Plan', cmd: 'Gate 1 approved', time: '2m 04s', state: 'done' },
+  { name: 'Plan', cmd: 'Plan agreed', time: '2m 04s', state: 'done' },
   { name: 'Build', cmd: '5 files edited', time: '3m 18s', state: 'done' },
   { name: 'Verify', cmd: 'npm test', time: '50s', state: 'run' },
   { name: 'Review', cmd: '5 dimensions', time: 'Queued', state: 'queued' },
-  { name: 'Ship', cmd: 'Waits for Gate 2', time: 'Queued', state: 'queued' },
+  { name: 'Ship', cmd: 'Ship check on commit', time: 'Queued', state: 'queued' },
 ]
 
 const log = [

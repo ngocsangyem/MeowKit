@@ -1,6 +1,6 @@
 //! `plan status` against both CLIs.
 //!
-//! The progress block is read by humans at Gate 1 and by the planning skills
+//! The progress block is read by humans reviewing a plan and by the planning skills
 //! that quote it, so the bar, the percentages and the observation list are the
 //! contract — not a stand-in for one.
 use crate::npm;

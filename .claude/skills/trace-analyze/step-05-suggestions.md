@@ -1,6 +1,6 @@
 # Step 5: Emit Structured Suggestions
 
-For each pattern that survived the threshold filter, look up its taxonomy entry and emit a structured fix proposal. Output is a draft only — step-06 HITL gate decides what lands.
+For each pattern that survived the threshold filter, look up its taxonomy entry and emit a structured fix proposal. Output is a draft only — step-06 HITL approval decides what lands.
 
 ## Instructions
 
@@ -47,7 +47,7 @@ For each above-threshold pattern, write a YAML-style suggestion entry:
 cat > "$analysis_dir/suggestions-draft.md" <<'EOF'
 # Trace Analysis — Suggestions Draft
 
-**STATUS:** DRAFT — not yet approved by user. Step-06 HITL gate determines what lands.
+**STATUS:** DRAFT — not yet approved by user. Step-06 HITL approval determines what lands.
 
 ## Suggestions
 
@@ -63,12 +63,12 @@ If more than 10 patterns survived: keep the top 10 by occurrence count. Document
 
 ### 5e. NEVER auto-apply
 
-This step writes a DRAFT only. The HITL gate at step-06 is the authoritative filter. Even if a suggestion looks obvious, do NOT edit any source file at this step. Edit happens after user approval, in a follow-up plan.
+This step writes a DRAFT only. The HITL approval at step-06 is the authoritative filter. Even if a suggestion looks obvious, do NOT edit any source file at this step. Edit happens after user approval, in a follow-up plan.
 
 ## Output
 
 - `$analysis_dir/suggestions-draft.md` — YAML block per suggestion
-- Print: `"Drafted {N} suggestions. Awaiting HITL gate at step-06."`
+- Print: `"Drafted {N} suggestions. Awaiting HITL approval at step-06."`
 
 ## Anti-rationalization
 

@@ -45,7 +45,6 @@ const RETAINED_SKILL_SCRIPTS = [
 	".claude/skills/context-audit/scripts/format-audit-report.sh",
 	".claude/skills/context-audit/scripts/inventory-context.sh",
 	".claude/skills/cook/scripts/test-scripts.sh",
-	".claude/skills/cook/scripts/validate-gate-1.sh",
 	".claude/skills/evaluate/scripts/recompute-score.py",
 	".claude/skills/evaluate/scripts/run-evaluator.sh",
 	".claude/skills/evaluate/scripts/validate-verdict.sh",

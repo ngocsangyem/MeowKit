@@ -51,7 +51,7 @@ Skip when:
 
 ## Hard Constraints
 
-1. **Active verification gate** — every verdict MUST include non-empty `evidence/` directory with at least one of: screenshot, HTTP response capture, CLI stdout+exit-code transcript. `validate-verdict.sh` rejects PASS verdicts with empty evidence and converts them to FAIL.
+1. **Active verification required** — every verdict MUST include non-empty `evidence/` directory with at least one of: screenshot, HTTP response capture, CLI stdout+exit-code transcript. `validate-verdict.sh` rejects PASS verdicts with empty evidence and converts them to FAIL.
 2. **Skeptic persona enforced** — load `prompts/skeptic-persona.md` at session start. Re-anchor before each criterion grading.
 3. **Max 15 criteria per session** — split into multiple sessions if rubric composition exceeds. Heuristic: context overflow risk above this threshold.
 4. **No source code edits** — evaluator owns `tasks/reviews/*-evalverdict.md` only. Never modifies source files.
@@ -100,7 +100,7 @@ See `step-04-grade-and-verdict.md` for the canonical schema. Frontmatter fields:
 | `prompts/skeptic-persona.md` | Persona prompt fragment (re-load every session) |
 | `references/active-verification-patterns.md` | Catalog of probe techniques per target type |
 | `scripts/run-evaluator.sh` | Subagent spawn wrapper |
-| `scripts/validate-verdict.sh` | Verdict file validator (enforces evidence gate) |
+| `scripts/validate-verdict.sh` | Verdict file validator (enforces the evidence requirement) |
 | `../mk:rubric/` | Rubric library + load/compose |
 | `../../agents/evaluator.md` | The agent persona this skill orchestrates |
 

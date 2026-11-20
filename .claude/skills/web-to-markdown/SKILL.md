@@ -46,7 +46,7 @@ Fetch arbitrary URLs and return clean markdown with injection defense.
 
 - User provides a URL in chat: `"summarize https://example.com/blog"` → skill fires automatically
 - Agent needs an arbitrary external page that is NOT in curated docs (use `mk:docs-finder` for libraries/frameworks)
-- External references during research, intake, investigation, or planning — with the `--wtm-accept-risk` delegation gate
+- External references during research, intake, investigation, or planning — with the `--wtm-accept-risk` delegation check
 
 ## When NOT to use
 
@@ -134,4 +134,4 @@ mewkit skill env web-to-markdown    # installs exactly scripts/requirements.txt
 .meowkit/envs/web-to-markdown/bin/playwright install chromium  # ~200MB one-time
 ```
 
-To enable JS rendering at runtime, set `MEOWKIT_WEB_FETCH_JS=1` before invoking the skill. All three gates must be open: Playwright installed, `MEOWKIT_WEB_FETCH_JS=1`, and `js=True` per-call argument. See `references/security.md` for the three-layer JS gate spec.
+To enable JS rendering at runtime, set `MEOWKIT_WEB_FETCH_JS=1` before invoking the skill. All three conditions must hold: Playwright installed, `MEOWKIT_WEB_FETCH_JS=1`, and `js=True` per-call argument. See `references/security.md` for the three-layer JS gate spec.

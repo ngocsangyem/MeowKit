@@ -1,6 +1,6 @@
 # Stitch Operations
 
-Run this gate before an API call:
+Run this check before an API call:
 
 ```bash
 [ -z "$STITCH_API_KEY" ] && { echo "[X] STITCH_API_KEY not set"; exit 1; }

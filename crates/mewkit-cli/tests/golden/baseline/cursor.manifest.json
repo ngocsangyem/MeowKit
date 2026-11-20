@@ -1464,12 +1464,6 @@
       "exec": true
     },
     {
-      "path": ".cursor/skills/mk-cook/scripts/validate-gate-1.sh",
-      "sha256": "eeb76165925aba8c7695779aeecf82aed16729554fdb13fd93ffcb2be814e1fd",
-      "size": 1427,
-      "exec": true
-    },
-    {
       "path": ".cursor/skills/mk-cso/SKILL.md",
       "sha256": "d8014a721bde11a9a29e9c295426660c37b7a55f94611d591e06b0ec99376c56",
       "size": 7000

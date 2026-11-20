@@ -1,0 +1,72 @@
+---
+title: "Agent Models"
+description: "Which model each MeowKit agent runs on in Claude Code, Codex and Cursor, how the tiers map between runtimes, and how to change a pin."
+---
+
+Every agent file in `.claude/agents/` has a `model:` field that names one of four tiers. The session model follows task complexity (see [Model Routing](/guide/model-routing)). A subagent runs on the model its own tier maps to, whatever the session uses.
+
+## Tiers by runtime
+
+`mewkit init` projects the agents to Codex and Cursor and replaces each tier with a concrete model id. The mapping is in `docs/maintainer/model-pins.md`, which also records the status of each id on the vendor's page.
+
+| Tier | Claude Code `model:` | Codex `model` | Cursor `model` | Used for |
+|---|---|---|---|---|
+| fable | `fable` | `gpt-6-astra` | `claude-fable-5` | Open-ended reframing and supervision |
+| opus | `opus` | `gpt-6-astra` | `claude-opus-5[effort=high]` | Planning, design, review, security, ticket analysis |
+| sonnet | `sonnet` | `gpt-6.1-sol` | `composer-2.5[fast=true]` | Multi-step work inside a clear workflow |
+| haiku | `haiku` | `gpt-6-luna` | `composer-2.5[fast=true]` | Procedural, template-led and wrapper-driven work |
+
+On Claude Code the four values are aliases. `opus`, `sonnet` and `haiku` resolve to the latest model of that tier the account can use, and `fable` resolves to Fable 5.2 unless `ANTHROPIC_DEFAULT_FABLE_MODEL` is set. On Codex, Enterprise and Edu admins must enable `gpt-6-luna` before it can run.
+
+`orchestrator` is not installed on Codex or Cursor. The main session routes the work there.
+
+Codex agents also carry a `model_reasoning_effort`, set per agent in `kit/overlays/codex/overlay.toml`. It is listed in the next section.
+
+## Agent assignments
+
+| Tier | Agents (Codex effort in brackets where it is not `medium`) |
+|---|---|
+| fable | `advisor` (high), `athena` (high) |
+| opus | `architect` (high), `brainstormer` (high), `evaluator` (high), `planner` (high), `reviewer` (high), `security` (high), `ui-ux-designer` (high), `developer`, `jira-analyst` (high), `jira-evaluator` (high), `jira-estimator` (high), `confluence-spec-analyst` (high) |
+| sonnet | `orchestrator`, `tester`, `researcher`, `analyst`, `journal-writer`, `jira-collaborate`, `jira-admin` (high), `jira-bulk` (high), `jira-jsm` (high), `jira-lifecycle` (high), `confluence-bulk` (high), `confluence-page` (high), `jira-dev` (low) |
+| haiku | `explore`, `project-manager`, `documenter`, `shipper`, `git-manager`, `story-sizer`, `jira-agile`, `jira-search`, `jira-issue`, `jira-fields`, `jira-time`, `confluence-collaborate`, `confluence-search`, `jira-ops` (low), `jira-relationships` (low) |
+
+Sources: the `model:` field of each `.claude/agents/<name>.md`, and the effort values in `kit/overlays/codex/overlay.toml`.
+
+Lowering a tier does not lower a check. Confirmation prompts, dry-run requirements, scope checks and wrapper validation do not depend on the model.
+
+## Grok, Pi and OMP
+
+- Grok: its documentation names no model per tier and no agent file format, so the agent prompts installed for Grok carry no `model`.
+- Pi: no subagents, so no agents are installed.
+- OMP: the agents are written without `model`, which OMP treats as optional, so they run on the session's model.
+
+## Change a pin
+
+On Claude Code, edit the `model:` field in the agent file. A value outside `inherit`, `opus`, `sonnet`, `haiku`, `fable` and `claude-opus-5` fails `mewkit validate --agents`. To pin another exact id, add it to `RESOLVABLE_MODELS` in `crates/mewkit-core/src/validate/agent_registry_rows.rs` first.
+
+```md title=".claude/agents/jira-issue.md"
+---
+name: jira-issue
+model: haiku   # inherit | opus | sonnet | haiku | fable | claude-opus-5
+---
+```
+
+On Codex, edit `model` and `model_reasoning_effort` in `.codex/agents/<name>.toml`. Leaving both out makes the agent use the session default.
+
+```toml title=".codex/agents/jira-issue.toml"
+name = "jira-issue"
+model = "gpt-6-luna"
+model_reasoning_effort = "medium"
+```
+
+On Cursor, edit `model:` in `.cursor/agents/<name>.md`. It takes `inherit` or a model id with optional bracketed options such as `[effort=high]` or `[fast=true]`.
+
+`mewkit upgrade` keeps files you edited unless you pass `--force`.
+
+Pinned ids must be available to your account. A model the account cannot run fails when the agent starts. Change the pin to an id the account can use, or to `inherit`.
+
+## See also
+
+- [Model Routing](/guide/model-routing) for session tiers by task complexity
+- [Portability](/cli/portability) for what each runtime installs

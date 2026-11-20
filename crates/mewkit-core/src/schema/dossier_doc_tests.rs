@@ -29,7 +29,7 @@ fn dossier() -> Dossier {
 #[test]
 fn states_in_the_artifact_that_it_is_not_verification() {
     assert!(
-        render_dossier(&dossier()).contains("NEVER verification and never a gate approval"),
+        render_dossier(&dossier()).contains("NEVER verification and never an approval"),
         "the not-verification line is part of the artifact"
     );
 }

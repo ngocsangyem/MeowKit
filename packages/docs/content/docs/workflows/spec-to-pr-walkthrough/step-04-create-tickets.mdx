@@ -1,9 +1,9 @@
 ---
-title: "Step 4 — Create the Jira tickets (your decision)"
-description: "One verb, one issue — no bulk creation. The Confluence URL carried in the description is the only sync mechanism between the spec and the tickets."
+title: "Step 4: Create the Jira tickets"
+description: "mk:jira-issue creates one issue per command. The Confluence URL in the description is the only link between the spec and the tickets."
 ---
 
-PM has replied. You now know: Google scopes = `email + profile`; expiry = sliding 24h; OAuth users can add a password later (separate ticket). The Step 3.5 Story Sizing Report has rough estimates per story — pick the size from the report and pass via `--story-points`. Alternatively, run `/mk:story-sizer --paste --auto-create --project AUTH` to delegate ticket creation behind the single confirmation gate.
+The PM has replied. You now know the Google scopes are `email` and `profile`, expiry is a sliding 24h window, and OAuth users can add a password later as a separate ticket. The Step 3.5 report has a size per story, so pass the one you choose with `--story-points`. Alternatively, `/mk:story-sizer --paste --auto-create --project AUTH` creates the tickets after one confirmation.
 
 ## Prompt
 
@@ -29,20 +29,16 @@ PM has replied. You now know: Google scopes = `email + profile`; expiry = slidin
   # ...
 ```
 
-## What happens behind the scenes
+## What happens
 
-| Layer            | Action                                                                                                            |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Field resolution | `mk:jira-fields` is auto-invoked if the project has custom required fields. Skill prompts you to fill them.       |
-| Issue creation   | `jira-as create` posts to `/rest/api/3/issue`                                                                     |
-| Audit            | Each created issue prints its key + URL. No bulk creation — one verb, one issue.                                  |
-| Spec link        | Description carries the Confluence URL verbatim. **This is the only sync mechanism** between Confluence and Jira. |
+| Layer | Action |
+| --- | --- |
+| Custom fields | If the project has required custom fields, `mk:jira-fields` finds them so you can fill them in. |
+| Create | `mk:jira-issue` forks to the `jira-issue` agent, which creates one issue through the `jira-as` wrapper. |
+| Result | Each created issue prints its key and URL. |
+| Spec link | The description carries the Confluence URL as written. Nothing else syncs the spec and the tickets. |
 
-<Callout title="Why no bulk creation from the spec report" type="info">
-
-The Spec Research Report supports `--with-commands` to emit suggested `mk:jira-issue create` blocks. Even then, you copy them by hand. The friction is intentional — it forces a human read-through before each ticket lands in someone's backlog.
-
-</Callout>
+`mk:jira-issue` handles one issue per call. The Spec Research Report offers `--with-commands`, which lists suggested `mk:jira-issue create` commands. You still run them yourself, so each ticket gets a read-through before it reaches a backlog.
 
 ## What you have now
 
@@ -54,4 +50,4 @@ AUTH-203  Task   "Preserve email/password login flow"    (To Do)
 
 ---
 
-Previous: [Step 3.5 — Story sizing](/workflows/spec-to-pr-walkthrough/step-03-5-story-sizing) · Next: [Step 5 — Group into an epic and rank](/workflows/spec-to-pr-walkthrough/step-05-epic-and-rank) · [All steps](/workflows/spec-to-pr-walkthrough)
+Previous: [Step 3.5: Story sizing](/workflows/spec-to-pr-walkthrough/step-03-5-story-sizing) · Next: [Step 5: Group into an epic and rank](/workflows/spec-to-pr-walkthrough/step-05-epic-and-rank) · [All steps](/workflows/spec-to-pr-walkthrough)

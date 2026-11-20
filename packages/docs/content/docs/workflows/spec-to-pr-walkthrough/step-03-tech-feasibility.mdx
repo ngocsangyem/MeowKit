@@ -1,75 +1,44 @@
 ---
-title: "Step 3 — Tech feasibility breakdown (pre-ticket)"
-description: "A read-only scan with mk:scout and mk:docs-finder that catches 'this needs a refactor first' or 'we already shipped this' before anything gets filed and estimated."
+title: "Step 3: Tech feasibility breakdown"
+description: "A read-only scan with mk:scout and mk:docs-finder that shows whether the spec needs a refactor first or already exists in the codebase, before anything is filed and estimated."
 ---
 
-Before tickets exist, do a **read-only feasibility pass** against the codebase. The goal is to catch "this can't be built without a refactor first" or "we already shipped this" _before_ tickets get filed and estimated.
+Before tickets exist, check the spec against the codebase. The aim is to find "this needs a refactor first" or "we already shipped this" before the team commits to an estimate.
 
-<Callout title="What MeowKit actually supports here" type="warn">
-
-Two skills run **before** any Jira ticket exists: `mk:scout` (codebase fingerprint) and `mk:docs-finder` (external API/library docs). That's it.
-
-`mk:planning-engine` — the deeper tech-review skill — **requires Jira ticket keys** (`review TICKET-KEY` or `plan --tickets KEY,KEY,...`). So MeowKit's auto-mapping of spec requirements to specific files happens in **Step 7**, _after_ tickets exist. Step 3 is the pre-ticket scan that fits between "what the PM wants" and "what we'll commit to build."
-
-Anything more automated than `mk:scout` + human cross-read at this stage would be speculative — there's no MeowKit skill that ingests a Spec Research Report and emits per-file impact without ticket keys.
-
-</Callout>
+Two skills run at this point. `mk:scout` maps the codebase and `mk:docs-finder` fetches current third-party docs. `mk:planning-engine` is the deeper tech-review skill, and it needs Jira ticket keys, so per-ticket review happens in [Step 7](/workflows/spec-to-pr-walkthrough/step-07-tech-review). No skill reads a Spec Research Report and lists impacted files without ticket keys, so the comparison in this step is yours.
 
 ## Prompt
 
 ```bash
 /mk:scout authentication oauth session
-# Cross-read the Spec Research Report against scout output. Then:
-/mk:docs-finder "Google OAuth 2.0 — current scopes + PKCE requirements"
+# Read the Spec Research Report next to the scout output. Then:
+/mk:docs-finder "Google OAuth 2.0 current scopes and PKCE requirements"
 ```
 
-## What happens behind the scenes
+## What happens
 
-| Layer                | Action                                                                                                                                                                                                                                                                                                                              | Skill            |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| Codebase fingerprint | Spawns parallel Explore subagents per directory segment; consolidates into a file map with architecture sketch, complexity estimates, and routing suggestions. Cached for downstream skills.                                                                                                                                        | `mk:scout`       |
-| External docs check  | For any third-party API/library named in the spec (OAuth providers, SDKs, etc.), pulls current docs via Context7 / Context Hub. Avoids planning against outdated training data.                                                                                                                                                     | `mk:docs-finder` |
-| Spec cross-read      | **You** read the Spec Research Report's `## Suggested User Stories` section next to the scout output, then decide whether the scope is feasible as-is, needs splitting, or hits an unblockable gap (e.g. "we don't have a session middleware yet"). | Human — no skill |
+| Action | Skill |
+| --- | --- |
+| Splits the repository into segments and searches them with parallel Explore subagents. The report has an architecture fingerprint, key directories, relevant files, patterns, a complexity estimate and a handoff note. | `mk:scout` |
+| Looks up current docs for any third-party API or library the spec names, using Context7 and Context Hub. | `mk:docs-finder` |
+| You read the report's `Suggested User Stories` section next to the scout output and decide whether each story is feasible as written, needs splitting, or hits a missing prerequisite. | You |
 
-## Sample output (scout, abridged)
+Scout does not save its report by default. It writes `.meowkit/cache/codebase-map.md` only when you ask it to, and it keeps just the fingerprint and key directories. Step 7 uses the scout output still in your session, or asks you to run scout again.
 
-```
-Architecture sketch
-  Stack: NestJS + Vue 3 + Postgres
-  Auth surface: src/auth/ — already has GitHubOAuthService (plugin pattern)
-  Session middleware: src/auth/session.middleware.ts — currently fixed 24h
-  Test runner: vitest
+## Example decisions
 
-Files relevant to spec keywords
-  src/auth/oauth.controller.ts          (provider plugin pattern entry)
-  src/auth/github-oauth.service.ts      (reference impl)
-  src/auth/session.middleware.ts        (fixed expiry — needs change)
-  src/users/users.module.ts             (no OAuth fields yet)
+After reading the report against the scout output, you might record something like this:
 
-Gaps detected
-  No PKCE helper exists in the codebase (would be new code for Google's 2026 req)
-```
-
-## Feasibility decisions you make here
-
-After cross-reading the Spec Research Report against the scout output:
-
-| Spec story                           | Feasibility                                                           | Decision                                                    |
-| ------------------------------------ | --------------------------------------------------------------------- | ----------------------------------------------------------- |
-| "Sign in with Google"                | HIGH — OAuth plugin pattern exists; just add a provider               | Create ticket as-is                                         |
-| "Sliding 24h session"                | MEDIUM — middleware exists but uses fixed expiry; needs refactor      | Create ticket; flag dependency before "Sign in with Google" |
-| "OAuth users can add password later" | LOW — users table has no OAuth-provider column; separate model change | Defer to a follow-up sprint; flag with PM                   |
-
-<Callout title="Why this step exists separately from Step 7" type="info">
-
-Step 7's `mk:planning-engine review` produces a per-ticket Tech Review Report — but it needs a ticket key. If a requirement is infeasible against the current codebase, you want to know **before** it becomes a ticket that the team gets pressured to commit to. This Step 3 scan is the only chance.
-
-</Callout>
+| Spec story | Feasibility | Decision |
+| --- | --- | --- |
+| "Sign in with Google" | High: an OAuth provider plugin pattern exists, so this adds a provider | Create the ticket as written |
+| "Sliding 24h session" | Medium: the middleware exists but uses a fixed expiry and needs a refactor | Create the ticket and flag the dependency on "Sign in with Google" |
+| "OAuth users can add password later" | Low: the users table has no OAuth provider column | Defer to a later sprint and raise it with the PM |
 
 ## What you carry forward
 
-A short, hand-written set of notes (kept in the Spec Research Report or a follow-up Confluence comment) that says, per suggested story: _feasibility level + any structural prerequisite_. These notes inform Step 4 (ticket creation) and resurface in Step 7 (per-ticket review) for confirmation.
+Keep a short note per suggested story with its feasibility level and any structural prerequisite. Put it in the Spec Research Report or in a follow-up Confluence comment. It feeds [Step 4](/workflows/spec-to-pr-walkthrough/step-04-create-tickets) and is checked again in Step 7.
 
 ---
 
-Previous: [Step 2 — Send open questions back to the PM](/workflows/spec-to-pr-walkthrough/step-02-open-questions) · Next: [Step 3.5 — Story sizing](/workflows/spec-to-pr-walkthrough/step-03-5-story-sizing) · [All steps](/workflows/spec-to-pr-walkthrough)
+Previous: [Step 2: Send open questions back to the PM](/workflows/spec-to-pr-walkthrough/step-02-open-questions) · Next: [Step 3.5: Story sizing](/workflows/spec-to-pr-walkthrough/step-03-5-story-sizing) · [All steps](/workflows/spec-to-pr-walkthrough)

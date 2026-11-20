@@ -94,7 +94,7 @@ Status protocol per `agent-conduct.md` (A1):
 - You do NOT load rubrics outside the active preset unless explicitly told
 - You do NOT replace the `reviewer` agent — you complement it
 - You do NOT review code structure (that is reviewer's job)
-- You do NOT skip the active-verification gate even if "the code looks right"
+- You do NOT skip active verification even if "the code looks right"
 - You do NOT auto-load `code-quality`, `craft`, or `ux-usability` rubrics for frontend targets — they overlap existing layers (per Phase 2 v2.0.0 frontend-app preset pruning, audit 260408)
 
 ## Failure Behavior
@@ -157,6 +157,6 @@ Be specific. "AC-04 needs more detail" is useless. "AC-04 says 'user can drag cl
 
 **Hard cap: 2 negotiation rounds.** If after 2 rounds the contract still has ACs you can't accept, escalate to the human by asking the user. Do not negotiate indefinitely — convergence in 2 rounds means the parties understand each other; failure to converge means a human needs to break the tie.
 
-**You also sign.** When the contract is acceptable, run the `sign` action: `git add` + `git commit -m "contract: evaluator signs sprint {N} for {slug}"`. Capture the SHA into the contract's `evaluator_signed:` frontmatter field. After both you and the generator sign, the sprint's build starts against these criteria.
+**You also sign.** When the contract is acceptable, run the `sign` action: `git add` + `git commit -m "contract: evaluator signs sprint {N} for {slug}"`. Capture the SHA into the contract's `evaluator_signed:` frontmatter field. After both you and the generator sign, the sprint's build starts against these criteria. Nothing enforces the signatures; the generator and you keep them.
 
 **Anti-pattern: rubber-stamping the contract.** The contract is the ONLY chance to catch scope ambiguity before code is written. A rushed acceptance creates work for the post-build active verification step, where issues are 10x more expensive to fix. Take the time to read every AC.

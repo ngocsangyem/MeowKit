@@ -1,32 +1,30 @@
 ---
-title: "Step 2 — Send open questions back to the PM"
-description: "Footer comments carry the spec's ambiguities back to Confluence. The workflow deliberately pauses here, before any ticket exists."
+title: "Step 2: Send open questions back to the PM"
+description: "A footer comment on the Confluence page carries the spec's ambiguities to the PM. The walkthrough pauses here, before any ticket exists."
 ---
 
 ## Prompt
 
 ```bash
-/mk:confluence-collaborate add-comment 12345 \
-  "Three open questions from spec analysis: (1) Google scopes? (2) Session expiry style — sliding or hard? (3) Can OAuth users add a password later?" \
-  --footer
+/mk:confluence-collaborate add a footer comment to page 12345: "Three open questions from spec analysis: (1) Google scopes? (2) Session expiry style, sliding or hard? (3) Can OAuth users add a password later?"
 ```
 
-## What happens behind the scenes
+## What happens
 
-| Layer            | Action                                                                                                     |
-| ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| Inline vs footer | Skill enforces `--footer` for open-question batches (inline comments are reserved for line-level feedback) |
-| API call         | `confluence-as add-comment --page 12345 --type footer --body "..."`                                        |
-| Notification     | PM gets a Confluence notification email; their reply lands as a comment thread                             |
-| Workflow         | **You stop here.** Tickets do not yet exist.                                                               |
+| Layer | Action |
+| --- | --- |
+| Comment type | `mk:confluence-collaborate` posts footer comments by default. Inline comments attach to a text selection, so the agent asks you before posting one. |
+| Format | Comment bodies are markdown, which the `confluence-as` wrapper converts. |
+| Notification | The PM gets a Confluence notification. Their reply appears as a comment thread on the page. |
+| Workflow | You stop here until the PM answers. |
 
-## Why the workflow pauses
+## Why the walkthrough pauses
 
-Resolving ambiguity **before** ticket creation prevents two failure modes:
+Settling the ambiguity before ticket creation avoids two problems:
 
-1. Tickets with vague ACs that estimator gives a falsely confident number on
-2. Code that ships matching one valid interpretation of an ambiguous spec, requiring rework when the other interpretation surfaces
+1. Tickets with vague acceptance criteria get estimates that look more certain than they are.
+2. Code ships for one reading of an ambiguous spec, and gets reworked when the other reading turns up.
 
 ---
 
-Previous: [Step 1 — Pull the spec out of Confluence](/workflows/spec-to-pr-walkthrough/step-01-pull-the-spec) · Next: [Step 3 — Tech feasibility breakdown](/workflows/spec-to-pr-walkthrough/step-03-tech-feasibility) · [All steps](/workflows/spec-to-pr-walkthrough)
+Previous: [Step 1: Pull the spec out of Confluence](/workflows/spec-to-pr-walkthrough/step-01-pull-the-spec) · Next: [Step 3: Tech feasibility breakdown](/workflows/spec-to-pr-walkthrough/step-03-tech-feasibility) · [All steps](/workflows/spec-to-pr-walkthrough)

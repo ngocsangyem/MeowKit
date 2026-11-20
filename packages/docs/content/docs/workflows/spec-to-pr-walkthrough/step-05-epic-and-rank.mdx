@@ -1,32 +1,30 @@
 ---
-title: "Step 5 — Group into an epic and rank"
-description: "Epic-add, backlog ranking, and blocks links. Every ordering decision here is dev-declared — the skill never reorders on its own judgment."
+title: "Step 5: Group into an epic and rank"
+description: "Add the tickets to an epic, rank the backlog and declare blocking links. You declare every ordering decision; the skills do not infer one."
 ---
 
 ## Prompt
 
 ```bash
-/mk:jira-agile epic-add AUTH-200 AUTH-201 AUTH-202 AUTH-203
-/mk:jira-agile rank AUTH-202 --before AUTH-201   # session expiry blocks the redirect
+/mk:jira-agile add AUTH-201, AUTH-202, AUTH-203 to epic AUTH-200
+/mk:jira-agile rank AUTH-202 before AUTH-201 in the backlog   # session expiry comes first
 /mk:jira-relationships link AUTH-201 blocks AUTH-203
 ```
 
-## What happens behind the scenes
+These skills take plain-language requests. Link direction matters, so `mk:jira-relationships` confirms it when the request is ambiguous.
 
-| Skill                   | Verb       | Effect                                                  |
-| ----------------------- | ---------- | ------------------------------------------------------- |
-| `mk:jira-agile`         | `epic-add` | Sets the epic-link custom field on each child issue     |
-| `mk:jira-agile`         | `rank`     | Calls `/rest/agile/1.0/issue/rank` to reorder backlog   |
-| `mk:jira-relationships` | `link`     | Creates a "blocks" issue link (visible on both tickets) |
+## What happens
+
+| Skill | Request | Effect |
+| --- | --- | --- |
+| `mk:jira-agile` | Add issues to an epic | Adds each issue to the epic. |
+| `mk:jira-agile` | Rank | Moves an issue before or after another in the backlog. |
+| `mk:jira-relationships` | Link | Creates an issue link such as `blocks`, visible on both tickets. |
 
 ## Decision point
 
-<Callout title="Ranking is dev-declared, not inferred" type="warn">
-
-The agent did not read "blocks" from the spec — you told it. The spec analyst can suggest dependencies in its report, but the actual ranking is always your call. The skill never reorders based on its own judgment.
-
-</Callout>
+You supply the dependencies and the order. The spec analyst can suggest dependencies in its report, but the skills do not read "blocks" from the spec and do not reorder the backlog on their own.
 
 ---
 
-Previous: [Step 4 — Create the Jira tickets](/workflows/spec-to-pr-walkthrough/step-04-create-tickets) · Next: [Step 6 — Refine and estimate](/workflows/spec-to-pr-walkthrough/step-06-refine-and-estimate) · [All steps](/workflows/spec-to-pr-walkthrough)
+Previous: [Step 4: Create the Jira tickets](/workflows/spec-to-pr-walkthrough/step-04-create-tickets) · Next: [Step 6: Refine and estimate](/workflows/spec-to-pr-walkthrough/step-06-refine-and-estimate) · [All steps](/workflows/spec-to-pr-walkthrough)

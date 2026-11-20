@@ -1,31 +1,41 @@
 ---
-title: "Step 3.5 — Story sizing"
-description: "mk:story-sizer gives each suggested story a Fibonacci size before any ticket exists — advisory by default, with opt-in batch creation behind one confirmation gate."
+title: "Step 3.5: Story sizing"
+description: "mk:story-sizer gives each suggested story a Fibonacci size before any ticket exists. It is advisory by default, with opt-in batch ticket creation after one confirmation."
 ---
 
-Spec analyst output gives you a list of suggested user stories. Tech feasibility (Step 3) tells you they are buildable. What you still don't know: **how big is each one?** Jira sizing skills require a ticket key, so they can't help yet. `mk:story-sizer` fills the gap — v1 paste-only, advisory by default, with opt-in `--auto-create` behind a single confirmation gate.
+The spec analyst gave you suggested stories and Step 3 showed they are buildable. You do not yet know how big each one is. The Jira sizing skills need a ticket key, so they cannot help yet. `mk:story-sizer` sizes stories from pasted text. It supports paste mode only.
 
 ## Prompt
 
-`/mk:story-sizer --paste [--scout]` (advisory) or `/mk:story-sizer --paste --auto-create --project AUTH --epic AUTH-100` (delegated). Paste template requires `story:` + `ac:` per block, separated by bare `---`. Optional `description:`. Full schema: [reference](/reference/skills/story-sizer).
+```bash
+# Advisory: writes a report, makes no Jira calls
+/mk:story-sizer --paste [--scout]
 
-## What happens behind the scenes
+# Delegated: creates the tickets after one confirmation
+/mk:story-sizer --paste --auto-create --project AUTH --epic AUTH-100
+```
 
-| Layer       | Action                                                                                                                                                                                                                                                                                                                                 |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Adapter     | Validates template, emits `StoryRecord` list with SHA-256 source-hash; surfaces `[NO_ACS]` / `[MALFORMED_INPUT]`                                                                                                                                                                                                                       |
-| Scoring     | 5 deterministic dimensions → Fibonacci 1/2/3/5/8/13 + uncertainty + complexity; plus inconsistency / split / DoR (Agile) / codebase signals (`--scout`)                                                                                                                                                                                |
-| Writer      | Renders `tasks/reports/story-sizing-{YYMMDD}-{slug}.md` with per-story sections, summary table, and suggested `mk:jira-issue create` block (v1 field whitelist)                                                                                                                                                                        |
-| Auto-create | 5 pre-flight checks (NO_ACS, Rule-1 injection, length cap, duplicate via `mk:jira-search`, source-hash); single batch `AskUserQuestion`; no skip-confirm. Per story: `mk:jira-issue create --story-points N` + `mk:jira-collaborate add-comment --internal`. Call A failure stops + cleanup hint; Call B failure logs WARN + continues |
+Each pasted block needs `story:` and an `ac:` list with at least one item. Blocks are separated by a line holding only `---`, and `description:` is optional. Unknown keys are rejected with `[MALFORMED_INPUT]`. The full template is in the [skill reference](/reference/skills/story-sizer).
 
-<Callout title="Advisory by default" type="warn">
+## What happens
 
-Default mode never calls Jira; suggested create blocks are text you copy in Step 4. `--auto-create` is the only mutating path; see [reference](/reference/skills/story-sizer) for full schema, gating rules, and `MEOWKIT_STORY_SIZER_COMMENT_TEMPLATE`.
+| Layer | Action |
+| --- | --- |
+| Parse | A script validates the template and builds one record per story. It records a SHA-256 hash of the whole paste. A story with no ACs gets `[NO_ACS]`. |
+| Score | Five dimensions score 0 to 3 each: AC count, integration breadth, novelty, code volume and cross-module breadth. The sum maps to 1, 2, 3, 5, 8 or 13 points with an uncertainty range. The same input always gives the same score. A score of 13 suggests a split. |
+| Signals | The report adds inconsistency and split flags, a Definition of Ready advisory when Agile rules are loaded, and codebase signals with `--scout`. |
+| Report | `tasks/reports/story-sizing-{YYMMDD}-{slug}.md` with a section per story, a summary table and suggested `mk:jira-issue create` commands. |
 
-</Callout>
+`--scout` does not run scout for you. If scout output is not in the session, the skill asks you to run `/mk:scout` first. Without it the report carries `[NO_CODEBASE_CONTEXT]`.
 
-Step 3.5 informs Step 4: create tickets with `--story-points <N>` chosen, or run `--auto-create` for delegated batch creation.
+## Auto-create
+
+`--auto-create` is the only path that changes Jira. It runs five pre-flight checks: missing ACs, injection patterns in the text, a length cap, a possible duplicate found with `mk:jira-search`, and a source-hash match. If they pass, it shows a dry-run table and asks one question to confirm or abort. Editing the paste between sizing and `--auto-create` changes the hash and aborts the run.
+
+For each story the skill runs `mk:jira-issue create --story-points N`, then `mk:jira-collaborate add-comment --internal` for an audit comment. If a create fails, the batch stops and prints a cleanup hint. If the comment fails, it logs a warning and continues. `MEOWKIT_STORY_SIZER_COMMENT_TEMPLATE` points to a custom comment template file.
+
+Advisory mode never calls Jira. You copy the suggested create commands into [Step 4](/workflows/spec-to-pr-walkthrough/step-04-create-tickets) and choose the `--story-points` value yourself.
 
 ---
 
-Previous: [Step 3 — Tech feasibility breakdown](/workflows/spec-to-pr-walkthrough/step-03-tech-feasibility) · Next: [Step 4 — Create the Jira tickets](/workflows/spec-to-pr-walkthrough/step-04-create-tickets) · [All steps](/workflows/spec-to-pr-walkthrough)
+Previous: [Step 3: Tech feasibility breakdown](/workflows/spec-to-pr-walkthrough/step-03-tech-feasibility) · Next: [Step 4: Create the Jira tickets](/workflows/spec-to-pr-walkthrough/step-04-create-tickets) · [All steps](/workflows/spec-to-pr-walkthrough)

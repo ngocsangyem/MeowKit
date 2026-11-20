@@ -1,6 +1,6 @@
 ---
 title: "jira-fields"
-description: "Jira custom field discovery agent — finds field IDs, lists custom fields, checks project field configurations, and configures agile fields."
+description: "Jira fields agent. Finds custom field IDs and configures agile fields for a project."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,74 +14,20 @@ description: "Jira custom field discovery agent — finds field IDs, lists custo
 
 {/* GENERATED:reference-facts END */}
 
-The jira-fields agent discovers and manages Jira custom fields. Custom field IDs vary per Jira instance — a field called "Story Points" might be `customfield_10016` in one instance and `customfield_10031` in another. The jira-fields agent finds these mappings and caches them so other agents can reference fields correctly.
+The jira-fields agent is the executor for `mk:jira-fields` and calls Jira through `.claude/skills/jira/scripts/jira-as.sh`.
 
-## Cognitive Framing
+It runs on `haiku`. Tools: `Bash`, `Read`, `Grep`, `Glob`. Per-runtime model pins are on [Agent models](/guide/agent-models).
 
-> *"Field IDs are instance-specific. Discover them once, cache them forever."*
+## When to use
 
-The jira-fields agent solves the fundamental problem that custom field IDs are opaque and instance-specific. Without field discovery, every agent that needs to read or write custom fields would have to guess or hard-code IDs. The jira-fields agent provides the authoritative mapping between human-readable field names and Jira internal IDs.
+Use it to find the ID of a custom field such as story points, sprint or epic link, or to check a project's field setup.
 
-## Key Facts
+## Permissions
 
-| | |
-|---|---|
-| **Type** | Domain (Jira) |
-| **Phase** | On-demand |
-| **Model** | haiku |
-| **Color** | gray |
-| **Safety** | Read operations open; create/configure-agile require admin |
-| **Never does** | Set per-issue field values (jira-issue update), manage schemes (jira-admin) |
+`fields list` and `check-project` are read-only. `fields create` and `configure-agile` need Jira Admin. Without it the wrapper exits with code 3, and the agent reports that and suggests handing the task to an admin.
 
-## When to Use
+## Field IDs
 
-- When you need the **field ID for a custom field** — "What is the field ID for Story Points?"
-- When you need to **list all custom fields** in the Jira instance.
-- When you need to **check field configuration** for a specific project.
-- When you need to **configure agile fields** for a board (requires admin).
+Custom fields look like `customfield_NNNNN`. Common defaults differ by instance, so verify them: story points `customfield_10016` (or `10004` in older setups), sprint `customfield_10020` or `10010`, epic link `10014`, epic name `10011`.
 
-## Key Capabilities
-
-- **Field ID discovery** — finds the internal ID for any custom field by name.
-- **Custom field listing** — lists all custom fields in the Jira instance with their IDs and types.
-- **Project field configuration** — checks which custom fields are available for a specific project.
-- **Agile field configuration** — configures agile-specific fields (story points, sprints) for boards (admin required).
-- **Field caching** — caches discovered field mappings in memory for future sessions.
-
-## Behavioral Checklist
-
-- [x] Discovers field IDs by name without requiring hard-coded mappings
-- [x] Caches discovered field mappings for future sessions
-- [x] Lists custom fields with their types and IDs
-- [x] Checks project-specific field availability
-- [x] Requires admin permissions for create and configure-agile operations
-- [x] Never sets per-issue field values — that belongs to jira-issue
-
-## Common Use Cases
-
-| Scenario | What the agent does |
-|---|---|
-| "Field ID for Story Points" | Discovers and returns the custom field ID (e.g., `customfield_10016`) |
-| "List custom fields" | Lists all custom fields with IDs, names, and types |
-| "Check fields for project PROJ" | Shows which custom fields are configured for the project |
-| "Configure agile fields for board 5" | Sets up story point and sprint fields for the board (admin required) |
-
-## Pro Tips
-
-### Discover Fields Before Scripting
-
-When building JQL queries or automation that reference custom fields, run field discovery first. Hard-coding field IDs makes scripts brittle — they break when migrated to a different Jira instance. Using discovered, cached IDs keeps scripts portable.
-
-### Cache Field IDs in Memory
-
-The jira-fields agent caches discovered field mappings in memory files. Other Jira agents reference these cached mappings rather than re-discovering fields for every operation, keeping cross-agent interactions fast.
-
-## Key Takeaway
-
-The jira-fields agent provides the authoritative mapping between human-readable field names and Jira's opaque internal IDs. By discovering and caching these mappings, it enables all other Jira agents to reference custom fields correctly without hard-coding instance-specific IDs.
-
-## Related Agents
-
-- **[jira-agile](/reference/agents/jira-agile)** — uses field IDs from jira-fields for story points and sprint fields
-- **[jira-issue](/reference/agents/jira-issue)** — uses field IDs when updating custom fields on issues
-- **[jira-search](/reference/agents/jira-search)** — uses field IDs in JQL queries for custom field filters
+It returns the field ID, name, type, scope (global or project) and an example `jira-as issue create --custom-fields '{...}'` call.

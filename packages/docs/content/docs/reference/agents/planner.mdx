@@ -1,6 +1,6 @@
 ---
 title: "planner"
-description: "Planning agent — runs dual product and engineering lens reviews, produces structured plans, and agrees the plan with you before code is written."
+description: "Phase 1 planning agent. Reviews a task through a product lens and an engineering lens and writes the plan under tasks/plans/."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,85 +15,48 @@ description: "Planning agent — runs dual product and engineering lens reviews,
 
 {/* GENERATED:reference-facts END */}
 
-The planner is your strategic thinker. Before a single line of code is written, the planner steps back and asks two fundamental questions: *"Is this the right thing to build?"* and *"Is this the right way to build it?"* It produces a structured plan that every downstream agent — developer, tester, reviewer — relies on as their source of truth.
+The planner decides whether the task is worth building and how, then writes the plan with `mk:plan-creator`. It owns `tasks/plans/` and no other agent creates or edits plan files.
 
-## Cognitive Framing
+It runs on `opus`. Tools: `Read`, `Grep`, `Glob`, `Bash`, `Edit`, `Write`. Per-runtime model pins are on [Agent models](/guide/agent-models).
 
-> *"No code without a plan. The planner challenges assumptions before the first line is written."*
+## When to use
 
-The planner operates at Phase 1 (Plan) and agrees each non-trivial plan with you before building starts. Nothing blocks an edit without a plan; the planner's job is to make one first. It owns the `tasks/plans/` directory exclusively. No other agent creates, modifies, or deletes plan files.
+It runs in Phase 1 for standard and complex tasks, before code is written. It is not used for implementation or review verdicts.
 
-## Key Facts
+## What it does
 
-| | |
+- Applies the product lens (is this the right thing, or a symptom?) and the engineering lens (alternatives, trade-offs, existing patterns).
+- Writes the plan through `mk:plan-creator` into `tasks/plans/YYMMDD-name/`: `plan.md` plus `phase-XX-name.md` files.
+- Presents the plan so you can confirm or change it before the build. Nothing blocks an edit without an agreed plan, so this step is the planner's job.
+- Estimates effort and flags risks. It sends unclear tasks back with specific questions, and states assumptions in the plan's Risk Flags when it cannot ask.
+- Loads team memory on demand with `grep -rilE` over `.meowkit/memory/` and opens only matching entries.
+
+## Planning modes
+
+| Flag | Output |
 |---|---|
-| **Type** | Core |
-| **Phase** | 1 (Plan) |
-| **Auto-activates** | Standard and Complex tasks |
-| **Owns** | `tasks/plans/` |
-| **Never does** | Write code, write tests, skip planning for non-trivial work |
+| `--fast` | One `plan.md` with goal, context, scope, constraints, approach and acceptance criteria. No researchers. |
+| `--hard` (default for complex work) | `plan.md` (80 lines or fewer) plus phase files. |
+| `--deep` | Hard mode plus one scout per phase. Triggers on 5 or more directories or a complex refactor. Also writes `red-team-findings.md`. |
+| `--parallel` | Two researchers on different aspects, merged before the plan is written. |
+| `--two` | Two competing plans with an Approach Comparison. You pick one. |
+| `--product-level` | A product spec for green-field builds (vision, features with user stories, design language, AI integration, out of scope). No phase files, file paths, class names or schemas. |
 
-## When to Use
+`--tdd` composes with these and adds test-first sections to each phase file. Subcommands are `red-team {path}`, `validate {path}` and `archive` on `/mk:plan-creator`.
 
-- At the **start of any Standard or Complex task** — the planner activates automatically after the orchestrator routes the task.
-- When you want to **challenge assumptions** about what should be built and how.
-- When you need a **structured breakdown** of a feature before implementation begins.
-- When a task requires **effort estimation and risk assessment** before committing resources.
+## Beads
 
-The planner is skipped for Trivial tasks (typos, renames, formatting) where a plan would add overhead without value.
+For a complex task touching 5 or more files, it splits the work into beads: atomic units, each with a name (`bead-NN-description`), file scope, binary acceptance criteria, a size of about 150 lines and dependencies. Beads fit one context window of about 70K tokens.
 
-## Key Capabilities
+## Hand-offs
 
-- **Dual-lens review** — evaluates every task through both a product lens (is this the right thing to build?) and an engineering lens (is this the right way to build it?).
-- **Six planning modes** — adapts planning depth to the task:
-  - **Fast** (`--fast`) — single plan file with goal, context, scope, constraints, approach, and acceptance criteria.
-  - **Hard** (`--hard`) — overview plan plus per-phase detail files with 12-section template.
-  - **Deep** (`--deep`) — hard mode plus per-phase scouting with researcher scouts injecting findings.
-  - **Parallel** (`--parallel`) — two researchers run simultaneously on different aspects, findings merged.
-  - **Two-approach** (`--two`) — produces two competing plans with comparison; user selects one.
-  - **Product-level** (`--product-level`) — product spec for green-field builds (vision, features, user stories). No file paths or class names.
-- **TDD integration** — composable `--tdd` flag injects test-first requirements into every phase file.
-- **Red-team validation** — `/mk:plan-creator red-team` runs 4-persona adversarial review against existing plans.
-- **Plan archival** — `/mk:plan-creator archive` moves completed plans to archive and cleans up stale files.
+- Architectural decisions go to [architect](/reference/agents/architect).
+- An implementation-ready plan goes to [developer](/reference/agents/developer). With TDD on, [tester](/reference/agents/tester) goes first.
+- A `product-level` plan goes to `mk:autobuild`, not to the developer.
+- Each hand-off includes the plan path, the recommended agent sequence and risk flags.
 
-## Behavioral Checklist
+For an external URL that `mk:docs-finder` cannot cover it delegates to `mk:web-to-markdown` with `--wtm-accept-risk`.
 
-- [x] Challenges premises — asks whether the requirement addresses the root cause or just a symptom
-- [x] Evaluates both product and engineering dimensions before producing a plan
-- [x] Produces plan artifacts at `tasks/plans/YYMMDD-name/`
-- [x] Proposes the plan and agrees it with the user before any implementation agent starts
-- [x] Estimates effort and flags risks before work begins
-- [x] Rejects unclear tasks with specific clarification requests
-- [x] Routes product-level plans to `mk:autobuild` — never directly to the developer
+## What it does not do
 
-## Common Use Cases
-
-| Scenario | What the planner does |
-|---|---|
-| "Add a search feature to the dashboard" | Produces a Standard plan with goal, acceptance criteria, scope boundaries, and implementation steps |
-| "Redesign the authentication system" | Produces a Deep plan with per-phase scouting, risk assessment, and recommends routing to the architect |
-| "Build a SaaS analytics dashboard" | Produces a Product-Level plan (vision, features, user stories) and routes to `mk:autobuild` |
-| "Should we refactor the API or add a new endpoint?" | Produces a Two-Approach plan with comparison table for user decision |
-| "Quick bug fix for the login form" | Produces a Fast plan — minimal overhead, direct to implementation |
-
-## Pro Tips
-
-### Match Planning Depth to Task Complexity
-
-Do not use `--deep` for a simple bug fix, and do not use `--fast` for an authentication redesign. The planning mode should match the risk and scope of the task. When in doubt, `--hard` (the default for complex tasks) provides a good balance.
-
-### Use Red-Team Validation for Critical Features
-
-For any plan involving auth, payments, or user data, run `/mk:plan-creator red-team` after drafting. The 4-persona adversarial review catches blind spots that a single-pass plan misses — a security adversary, failure mode analyst, assumption destroyer, and scope critic each review the plan independently.
-
-## Key Takeaway
-
-The planner prevents the most expensive kind of engineering mistake: building the wrong thing, or building the right thing the wrong way. Every minute spent in planning saves hours in implementation and rework.
-
-## Related Agents
-
-- **[orchestrator](/reference/agents/orchestrator)** — routes tasks to the planner based on complexity classification
-- **[architect](/reference/agents/architect)** — receives handoff from the planner when architectural decisions are needed
-- **[developer](/reference/agents/developer)** — implements the approved plan after the plan is agreed
-- **[tester](/reference/agents/tester)** — writes tests based on the plan's acceptance criteria (inserted before developer in TDD mode)
-- **[brainstormer](/reference/agents/brainstormer)** — works alongside the planner during Phase 1 to evaluate competing solutions
+It writes no code, tests or config, and does not approve its own plans.

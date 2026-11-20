@@ -1,6 +1,6 @@
 # Workflow: Full (--full)
 
-Maximum user control. Gates at every major step. Use for critical projects.
+Maximum user control. User approval at every major step. Use for critical projects.
 
 ## Step 0: Git Init
 
@@ -23,7 +23,7 @@ Include the save path in each researcher's prompt:
 - Researcher 2: Tech stack options — what frameworks/libraries fit?
 - Researcher 3+: Domain-specific research (only if needed — auth, payments, etc.)
 
-**Gate:** Present research summary. User approves before proceeding.
+**Approval step:** Present research summary. User approves before proceeding.
 
 **After approval: proceed IMMEDIATELY to Step 3. Do NOT stop.**
 
@@ -31,14 +31,14 @@ Include the save path in each researcher's prompt:
 
 1. Run `scripts/detect-stack.sh` for existing project markers
 2. If new project: activate mk:brainstorming --depth deep to explore stack options
-3. **Gate:** User approves tech stack selection
+3. **Approval step:** User approves tech stack selection
 
 If frontend work detected:
 4. Spawn `ui-ux-designer` subagent for design guidelines + wireframes
 5. Save to `docs/design-guidelines.md`
-6. **Gate:** User approves design direction
+6. **Approval step:** User approves design direction
 
-**After ALL gates pass: proceed IMMEDIATELY to Step 4. Do NOT stop.**
+**After ALL approvals: proceed IMMEDIATELY to Step 4. Do NOT stop.**
 
 ## Step 4: Planning (before scaffolding)
 

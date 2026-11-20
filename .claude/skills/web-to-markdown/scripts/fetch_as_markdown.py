@@ -18,7 +18,7 @@ Security layers (delegated to sub-modules):
     Layer 7  — secret_scrub inside persist_fetch (pre-write)
     Layer 8  — post-write re-scan through injection-audit.cjs inside persist_fetch
     Layer 1.5 — Playwright scheme reject (file://, chrome://, about:)
-    Layer 1.6 — Three-gate JS: playwright importable + MEOWKIT_WEB_FETCH_JS=1 + js=True
+    Layer 1.6 — Three-condition JS: playwright importable + MEOWKIT_WEB_FETCH_JS=1 + js=True
 
 Env vars:
     MEOWKIT_WEB_FETCH_PERSIST   on|off  (default on)
@@ -69,17 +69,17 @@ _PERSIST_ENABLED = os.environ.get("MEOWKIT_WEB_FETCH_PERSIST", "on").lower() != 
 
 
 def _js_gate_open() -> bool:
-    """Gates (a) playwright importable and (b) MEOWKIT_WEB_FETCH_JS=1."""
+    """Checks (a) playwright importable and (b) MEOWKIT_WEB_FETCH_JS=1."""
     return _PLAYWRIGHT_AVAILABLE and os.environ.get("MEOWKIT_WEB_FETCH_JS", "0").strip() == "1"
 
 
 # ---------------------------------------------------------------------------
-# Layer 1.6: Three-gate Playwright fetch
+# Layer 1.6: Three-condition Playwright fetch
 # ---------------------------------------------------------------------------
 
 def _playwright_fetch(url: str, wait_ms: int = 3000) -> tuple[str | None, int, str]:
     """
-    Headless Chromium fetch. Gate (c) — called only when js=True.
+    Headless Chromium fetch. Condition (c) — called only when js=True.
     C-2 hardening: route interception re-validates every document nav via safe_url (SSRF);
     page.content() capped at MEOWKIT_WEB_FETCH_MAX_BYTES; specific exceptions caught.
     Returns (html_or_None, http_status, content_type).
@@ -237,7 +237,7 @@ def fetch_as_markdown(
     Args:
         url:              Full URL including scheme (https://...)
         playwright_first: Skip static fetch; go straight to headless browser.
-        js:               Per-call JS gate — all three gates required for Playwright.
+        js:               Per-call JS opt-in — all three conditions required for Playwright.
         wtm_accept_risk:  Required for cross-skill delegation (not user:direct).
         caller:           Skill identifier logged in manifest (e.g. "mk:research").
         session_id:       Optional session ID for manifest grouping.
@@ -248,7 +248,7 @@ def fetch_as_markdown(
     if session_id is None:
         session_id = str(uuid.uuid4())[:8]
 
-    # Cross-skill delegation gate
+    # Cross-skill delegation check
     if caller != "user:direct" and not wtm_accept_risk:
         return (
             "ERROR: cross-skill delegation requires --wtm-accept-risk flag. "

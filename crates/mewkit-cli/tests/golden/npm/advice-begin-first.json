@@ -1,8 +1,8 @@
 {
   "exit_code": 0,
-  "stdout": "Checkpoint GUIDE/cp-1 opened (1 of 5 for mk:cook).\n  dossier: tasks/reports/demo-run-athena-supervision.md\n  legal dispositions: CONTINUE_WITH_DIRECTIVE, ESCALATE_TO_HUMAN, BLOCKED_MISSING_EVIDENCE\n  supervision is evidence — it clears no gate and counts as no verification.\n",
+  "stdout": "Checkpoint GUIDE/cp-1 opened (1 of 5 for mk:cook).\n  dossier: tasks/reports/demo-run-athena-supervision.md\n  legal dispositions: CONTINUE_WITH_DIRECTIVE, ESCALATE_TO_HUMAN, BLOCKED_MISSING_EVIDENCE\n  supervision is evidence — it clears no approval and counts as no verification.\n",
   "stderr": "",
   "files": {
-    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nstage: \"GUIDE\"\nlockedDecisionPointers: []\ncorrectionCount: 0\nreceiptPointers: []\ncheckpoint: { checkpointId: \"cp-1\", stage: \"GUIDE\", state: \"pending\" }\nhistory: []\nescalatedToHuman: false\n---\n\n# Supervision run demo-run\n\nThis is supervision continuity, NEVER verification and never a gate approval.\n\n**Latest directive:** (none yet)\n**Next safe action:** (none recorded)\n"
+    "tasks/reports/demo-run-athena-supervision.md": "---\nkind: athena-supervision-dossier\nrunId: \"demo-run\"\nskill: \"mk:cook\"\nstage: \"GUIDE\"\nlockedDecisionPointers: []\ncorrectionCount: 0\nreceiptPointers: []\ncheckpoint: { checkpointId: \"cp-1\", stage: \"GUIDE\", state: \"pending\" }\nhistory: []\nescalatedToHuman: false\n---\n\n# Supervision run demo-run\n\nThis is supervision continuity, NEVER verification and never an approval.\n\n**Latest directive:** (none yet)\n**Next safe action:** (none recorded)\n"
   }
 }

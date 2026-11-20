@@ -33,7 +33,7 @@ pub(super) fn apply(project_root: &Path, args: &AdviceArgs) -> Result<(), Advice
     let Some(evidence) = args.evidence.as_deref() else {
         println!(
             "  no --evidence path given: downstream evidence was NOT marked superseded.\n\
-             \x20 re-run Verify and review before any gate, or pass --evidence <workflow-evidence.json>."
+             \x20 re-run Verify and review before shipping, or pass --evidence <workflow-evidence.json>."
         );
         return Ok(());
     };
@@ -87,7 +87,7 @@ pub(super) fn apply(project_root: &Path, args: &AdviceArgs) -> Result<(), Advice
     let updated = apply_correction(&loaded, kind);
     write_json_atomic(&real, &updated).map_err(|e| AdviceError::Hard(e.to_string()))?;
     let scope_note = if kind == CorrectionKind::Scope {
-        "; Gate 1 returned to required (scope changed)"
+        "; the scope revision moved too (scope changed)"
     } else {
         ""
     };
@@ -95,6 +95,6 @@ pub(super) fn apply(project_root: &Path, args: &AdviceArgs) -> Result<(), Advice
         "  evidence revision → {}; verification and review marked superseded{scope_note}.",
         current_revision(&updated)
     );
-    println!("  re-run the normal checks; superseded evidence cannot satisfy a later gate.");
+    println!("  re-run the normal checks; superseded evidence cannot satisfy a later check.");
     Ok(())
 }

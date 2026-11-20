@@ -1,4 +1,4 @@
-//! The previous kit: the one that still carried the plan gate on all three
+//! The previous kit: the one that still carried the plan-approval hook on all three
 //! runtimes, built so a test can install from it and then upgrade off it.
 //!
 //! `upgrade` only REMOVES a file the new kit dropped when the bytes on disk
@@ -20,9 +20,9 @@ const PREVIOUS_VERSION: &str = "2.14.0";
 
 /// Enough of a hook to install and register; the tests never run it.
 const GATE_SCRIPT: &str =
-    "#!/usr/bin/env node\n'use strict';\n// the retired plan gate\nprocess.exit(0);\n";
+    "#!/usr/bin/env node\n'use strict';\n// the retired plan-approval hook\nprocess.exit(0);\n";
 
-/// What one runtime's plan gate looked like in the kit and in an install.
+/// What one runtime's plan-approval hook looked like in the kit and in an install.
 pub struct GateHook {
     pub runtime: &'static str,
     /// The hook script, kit-relative.

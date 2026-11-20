@@ -1,6 +1,6 @@
 ---
 title: "mk:fix"
-description: "Structured bug investigation — auto-complexity detection, root cause analysis, mandatory regression tests."
+description: "Finds the root cause of a bug, type error, lint failure or CI failure, then applies a minimal fix and verifies it with before and after checks."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,127 +14,73 @@ description: "Structured bug investigation — auto-complexity detection, root c
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Structured debugging pipeline. Instead of immediately editing code, it forces structured investigation: assess complexity, find root cause, write a regression test, apply the minimal fix. Auto-detects complexity — a typo gets a quick fix, a race condition gets full investigation.
+mk:fix scouts the affected code, diagnoses with evidence, proves the root cause, fixes that cause and re-runs the failing commands. The depth depends on the profile: a known one-file cause gets a short cycle, a race condition gets a full investigation.
 
-## When to Use
+## When to use it
 
-- Diagnosing and fixing bugs, type errors, lint failures, CI/CD issues, and runtime errors
-- Any defect remediation requiring root-cause-first investigation
-- Repeated bug patterns where fix memory can accelerate resolution
-- **NOT for:** investigation without a fix (use `mk:investigate`), build-only compilation errors (use `mk:build-fix`)
+Use it for any defect that should be fixed: bugs, type errors, lint failures, CI failures and runtime errors.
 
-## Core Capabilities
-
-- **Mandatory scout + diagnose:** Never fixes before understanding the codebase and confirming root cause with evidence
-- **Complexity auto-detection:** Classifies as Simple (single file), Moderate (multi-file), Complex (system-wide), or Parallel (2+ independent issues)
-- **Regression test enforcement:** Every fix must include a test that fails without the fix and passes with it
-- **Fix memory:** greps `.meowkit/memory/` for prior gotchas — repeated bugs become instant fixes
-- **Defense-in-depth:** After fixing, applies prevention measures: entry validation, business logic guards, error handling, type safety
-- **Workflow evidence index:** for standalone standard/complex fixes, writes `.meowkit/state/evidence/<slug>/workflow-evidence.json` indexing risk flags (from `risk-checklist.md`), the six root-cause fields, verification commands, and approvals. Traceability only — it **never approves**, carries no score, and is distinct from the durable team memory store. Validated before the approval prompt
-- **Mode selection:** `--auto` (default, auto-fixes then stops at *ready for user approval* — never self-approves), `--review` (human-in-the-loop), `--quick` (fast cycle), `--parallel` (per-issue agents), `--tdd` (regression test before fix)
+| Need | Use instead |
+|---|---|
+| Investigate without fixing | `mk:investigate` |
+| A build or compile error only | `mk:build-fix` |
 
 ## Usage
 
+`/mk:fix [issue|diagnostic-report-path] [flags]`
+
+| Flag | Effect |
+|---|---|
+| `--auto` | Standard profile with automatic progress through diagnosis and verification. Stops at any required human decision and never self-approves. |
+| `--review` | Pauses at each step for your approval. |
+| `--quick` | Quick profile for a known cause in two files or fewer. |
+| `--parallel` | One `developer` agent per independent issue. |
+| `--tdd` | Writes the regression test before the fix and the `.meowkit/state/tdd-mode` sentinel. Without it a regression test is recommended, not required. |
+| `--advice` | One run supervised by the `athena` agent at checkpoints (at most 5 calls). Standard and deep profiles only. It is evidence, never approval. |
+
 ```bash
-/mk:fix login fails after 24 hours --auto              # Autonomous (default) — auto-fixes, then stops at ready-for-approval
-/mk:fix login fails after 24 hours                     # Same as above (--auto is default)
-/mk:fix payment processing timeout --review            # Human-in-the-loop at each step
-/mk:fix TypeScript error in auth.ts --quick            # Fast cycle for trivial bugs
-/mk:fix all failing tests in checkout --parallel       # Parallel agents per issue
-/mk:fix "auth bypass" --tdd                            # Force regression test before fix
+/mk:fix login fails after 24 hours --auto
+/mk:fix payment processing timeout --review
+/mk:fix TypeScript error in auth.ts --quick
+/mk:fix all failing tests in checkout --parallel
+/mk:fix "auth bypass" --tdd
 ```
 
-## Example Prompt
+Without a mode flag the standard profile runs. A supplied diagnostic report is evidence to validate, never a substitute for investigation.
 
-```
-Login fails after 24 hours with a 401 error — the refresh token isn't being rotated properly. Diagnose the root cause, write a regression test, and apply a minimal fix.
-```
+## Profiles
 
-## Arguments
-
-| Flag | Behavior |
-|------|----------|
-| `--auto` | **Default.** Autonomous mode. Auto-fixes blocking issues up to the cycle limit, then stops at *ready for user approval*. Never self-approves; score is advisory display only. |
-| `--review` | Human-in-the-loop. Pause at each step for approval. |
-| `--quick` | Fast cycle for trivial bugs (single file, clear cause). Skips investigation. |
-| `--parallel` | Parallel `developer` agents per independent issue. |
-| `--tdd` | Force regression test BEFORE the fix. Writes the `tdd-mode` sentinel. |
-| `--advice` | Opt-in strategic supervision for one run. The [athena](/reference/agents/athena) agent sets direction before the first edit, unblocks a stalled run, reads the verified fix against its evidence before the normal review, and may return it for correction — up to 5 calls. Standard and deep profiles only; supervision clears no gate, counts as no verification, and never delays the three-failed-attempt human stop. Experimental: delegation is not yet verified on any runtime, and an unreachable agent prints an unavailable-checkpoint line and continues unsupervised. |
-
-## Process flow
-
-```
-Bug → Mode Select → Check Memory → Scout (MANDATORY) → Diagnose
-  → [investigate → sequential-thinking → root cause?]
-  → yes → Root-Cause Proof (6 fields, HARD GATE) → Complexity → Fix ROOT CAUSE → Verify+Prevent (MANDATORY)
-  → pass → Finalize + Write to Memory
-  → fail <3 → re-diagnose | fail 3+ → STOP
-```
-
-## Step 0 — Mode selection
-
-If no mode flag: `AskUserQuestion` (Autonomous / Human-in-the-loop / Quick). Autonomous auto-fixes blocking issues up to the cycle limit, then stops at *ready for user approval* — it never self-approves and never crosses a ship boundary. Score is advisory display only.
-
-## Step 0.5 — Check fix memory
-
-Run `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` with the symptom keywords, and open only the matching entries. Search for similar symptoms, error messages, or affected modules. If a matching fix pattern exists → use as starting hypothesis. If a matching success pattern exists → apply known fix approach directly. This turns repeated bugs into instant fixes.
-
-## Step 1 — Scout (MANDATORY)
-
-Activate `mk:scout` to map affected codebase: files, dependencies, related tests, recent changes (`git log`). Quick mode: minimal (affected file + direct deps). Standard/Deep: full scout. Never skip — without codebase context, diagnosis guesses instead of reasoning from evidence.
-
-## Step 2 — Diagnose (MANDATORY)
-
-Capture pre-fix state: exact error messages, failing test output, stack traces. Then structured diagnosis: `mk:investigate` collects symptoms, traces, reproduction steps. `mk:sequential-thinking` generates hypotheses from evidence, tests each, eliminates, concludes. Output: confirmed root cause with evidence chain + confidence level. **BLOCK:** if confidence \< medium → gather more evidence before fixing.
-
-**Step 2.5 — Root-cause proof checkpoint (HARD GATE).** Before any fix, all six fields must be populated: exact symptom, deterministic reproduction, expected vs actual, root cause with `file:line`, why now, blast radius. `--quick` uses a compact one-phrase-each form. Empty fields mean the diagnosis is unproven — return to Step 2.
-
-## Step 3 — Complexity assessment
-
-| Level | Indicators | Workflow |
+| Profile | When | What runs |
 |---|---|---|
-| Simple | Single file, clear error | Quick fix |
-| Moderate | Multi-file, multi-step root cause | Standard pipeline |
-| Complex | System-wide, architecture impact | Deep investigation |
-| Parallel | 2+ independent issues | Parallel agents per issue |
+| Quick | Known cause, two files or fewer | Minimal scout, compact root-cause proof, edit, before and after check, summary. No plan, report, memory entry or subagents by default. |
+| Standard (default) | Most bugs | Full evidence chain, root-cause proof, regression test, relevant suite, review. |
+| Deep | Contract or architecture changes | Standard plus a plan agreed with you. |
 
-## Step 4 — Fix implementation
+Complexity is classified as Simple, Moderate, Complex or Parallel (two or more independent issues) and routed to `references/workflow-quick.md`, `workflow-standard.md` or `workflow-deep.md`.
 
-Must address ROOT CAUSE from Step 2 — never symptoms only. Minimal changes, follow existing patterns. If fix deviates from diagnosis → re-diagnose first.
+## Steps
 
-## Step 5 — Verify + Prevent (MANDATORY)
+1. Check memory (standard and deep): `grep -rilE "kw1|kw2|kw3" .meowkit/memory/` and open matching entries. A matching gotcha becomes the first hypothesis.
+2. Scout with `mk:scout`: files, dependencies, tests, `git log`, and the risk flags from `agent-detector/references/risk-checklist.md`. This step is never skipped.
+3. Diagnose: capture the exact errors first. Quick validates the known cause directly. Standard and deep use `mk:investigate` and `mk:sequential-thinking`. If confidence is below medium, gather more evidence before fixing.
+4. Prove the root cause. Six fields must be filled before the fix: exact symptom, reproduction, expected versus actual, root cause with `file:line`, why now (or an explicit unknown), blast radius.
+5. Fix the root cause with minimal changes that follow existing patterns. A fix that departs from the diagnosis goes back to step 3.
+6. Verify and prevent: re-run the pre-fix commands, run the regression test, apply defense in depth (`references/prevention-gate.md`). After 3 failed attempts the skill stops and questions the architecture with you.
+7. Finalize: report confidence, root cause, changes and prevention; append a gotcha with `mewkit note gotchas` only when the lesson is not derivable from code or git; hand moderate and complex fixes to `project-manager` and `documenter`; ask about a commit.
 
-1. Re-run exact pre-fix commands — compare before/after
-2. Regression test: fails WITHOUT fix, passes WITH fix
-3. Defense-in-depth: consider entry validation, business logic guards, error handling, type safety
-4. **BLOCK:** no regression test = fix is incomplete
+For a fix touching more than two files, write a plan first with `mk:plan-creator`.
 
-If verify fails: loop to Step 2. After 3 failures → STOP, question architecture, discuss with user.
+## Output
 
-## Step 6 — Finalize + Learn
+Standard and deep runs write `.meowkit/state/evidence/<YYMMDD-HHMM-slug>/workflow-evidence.json` (or `tasks/plans/<plan>/reports/evidence/` when the fix escalated to a plan). It indexes risk flags, the six proof fields and verification commands. It approves nothing and carries no score. A standalone standard or complex fix also writes `tasks/reports/fix-<YYMMDD-HHMM>-<slug>.md`. `--no-capture` skips the report and memory entry.
 
-1. Report: confidence, root cause, changes, files, prevention measures
-2. Write to memory: when the lesson is non-derivable, append one entry with `mewkit note gotchas` (one-line lesson, Why, Apply when, Source)
-3. Delegate to `project-manager` (Moderate/Complex only, background)
-4. `documenter` agent → update docs
-
-## Hard rules
-
-- No fix before scout + diagnose complete (Steps 1-2)
-- Confidence below "medium" blocks the fix
-- 3 failed attempts stops the pipeline — question the architecture
-- Symptom fixes are failure — find the cause first through structured analysis, never guessing
-
-## Plan first
-
-For moderate/complex bugs: run `mk:investigate` to confirm root cause. If fix affects > 2 files → `mk:plan-creator --type bugfix`. Skip: `--quick` mode (single file, clear cause).
+If a risk flag such as AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC, EXT_SYSTEM, PUBLIC_CONTRACT or WEAK_PROOF matches, the skill asks you explicitly before finalizing, even in `--auto`.
 
 ## Gotchas
 
-- Guessing root causes — use `mk:sequential-thinking` to test hypotheses from evidence
-- Fixing symptoms — trace backward: symptom → cause → ROOT cause
-- Skipping scout — mandatory scout maps what you're touching
-- No regression test — bug resurfaces next sprint
-- 3+ failed attempts without stopping — STOP, question architecture
+- Do not guess a cause. Test hypotheses against evidence.
+- Trace from symptom to root cause. A passing test with the cause intact is a symptom fix.
+- A missing regression test leaves the fix incomplete unless the omission is recorded (lint, format or config-only changes).
+- More details are in `references/gotchas.md`.

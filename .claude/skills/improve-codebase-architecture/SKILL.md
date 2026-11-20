@@ -79,7 +79,7 @@ Architecture Review Progress:
 - [ ] Step 1: Orient — read constitution + ADRs
 - [ ] Step 2: Analyze — find candidates, apply deletion test, write findings JSON
 - [ ] Step 3: Visualize — hand findings to mk:preview (decoupled render)
-- [ ] Step 4: Select — single human gate (which candidate?)
+- [ ] Step 4: Select — single human decision (which candidate?)
 - [ ] Step 5: Grill — mk:grill the chosen candidate
 - [ ] Step 6: Patch — emit type-safe precise edits
 - [ ] Step 7: Sync — update domain model / record ADR
@@ -105,7 +105,7 @@ Apply the **deletion test** to every suspected-shallow module. Then write struct
 
 Invoke `mk:preview --html --diagram` with the findings file as input. `mk:preview` owns the before/after visualisation, the candidate cards, the badges, and the temp-file/browser-open mechanics. This skill passes data and stops. Do not duplicate the renderer.
 
-### Step 4 — Select (the only human gate)
+### Step 4 — Select (the only human decision)
 
 After `mk:preview` returns the rendered path, ask by asking the user (header "Architecture Candidate"): "Which deepening would you like to explore?" — options drawn from the candidate titles plus "None".
 

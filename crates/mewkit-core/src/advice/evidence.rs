@@ -5,14 +5,10 @@
 //! code that no longer exists. Binding evidence to a revision is what makes
 //! "this proof is out of date" expressible.
 //!
-//! Two revisions, because two approvals go stale at different moments:
+//! Two revisions, because two things go stale at different moments:
 //! `evidenceRevision` is bumped by ANY source correction, `scopeRevision` only
-//! when the plan or scope itself changed. One counter would force a fresh human
-//! plan approval after every ordinary fix, which trains people to click through
-//! the gate that matters.
-//!
-//! [`apply_correction`] can INVALIDATE an approval and never grants one: it
-//! demotes `approved` back to `required` and has no path in the other direction.
+//! when the plan or scope itself changed, so a reader can tell an ordinary fix
+//! from a change to what the plan covers.
 
 use std::path::Path;
 
@@ -89,21 +85,8 @@ fn object_at(index: &Map<String, Value>, key: &str) -> Map<String, Value> {
 }
 
 /// Advance the revision and mark downstream evidence superseded.
-///
-/// Gate 2 is demoted from `approved` back to `required` because the verdict it
-/// rests on is now stale; Gate 1 only for a scope correction, which is the one
-/// that moves what Gate 1 approved.
 pub fn apply_correction(index: &Map<String, Value>, kind: CorrectionKind) -> Map<String, Value> {
     let next = current_revision(index) + 1;
-    let mut approvals = object_at(index, "approvals");
-    if approvals.get("gate2").and_then(Value::as_str) == Some("approved") {
-        approvals.insert("gate2".into(), Value::String("required".into()));
-    }
-    if kind == CorrectionKind::Scope
-        && approvals.get("gate1").and_then(Value::as_str) == Some("approved")
-    {
-        approvals.insert("gate1".into(), Value::String("required".into()));
-    }
 
     let superseded = |mut record: Map<String, Value>| {
         record.insert("status".into(), Value::String("superseded".into()));
@@ -126,7 +109,6 @@ pub fn apply_correction(index: &Map<String, Value>, kind: CorrectionKind) -> Map
         superseded(object_at(index, "verification")),
     );
     out.insert("review".into(), superseded(object_at(index, "review")));
-    out.insert("approvals".into(), Value::Object(approvals));
     out
 }
 

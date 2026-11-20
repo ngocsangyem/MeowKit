@@ -1,6 +1,6 @@
 ---
 title: "jira-admin"
-description: "Jira administration agent — manages projects, users, groups, schemes, and automation across 11 sub-domains with admin-level permissions."
+description: "Jira administration agent. Manages projects, users, groups, schemes and automation through the jira-as wrapper."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,85 +14,22 @@ description: "Jira administration agent — manages projects, users, groups, sch
 
 {/* GENERATED:reference-facts END */}
 
-The jira-admin agent handles Jira instance administration — creating and configuring projects, managing users and groups, setting up permission and notification schemes, and configuring automation. It spans 11 sub-domains with approximately 65 operations, all requiring admin-level permissions. Destructive operations use a 2-step confirmation that requires typing the exact target identifier.
+This is the highest-impact agent in the Jira family. It is the executor for `mk:jira-admin` and calls Jira through `.claude/skills/jira/scripts/jira-as.sh`.
 
-## Cognitive Framing
+It runs on `sonnet`. Tools: `Bash`, `Read`, `Grep`, `Glob`. Per-runtime model pins are on [Agent models](/guide/agent-models).
 
-> *"Admin operations have the highest blast radius. Archive before delete. Confirm before destroy."*
+## When to use
 
-The jira-admin agent is the highest-blast-radius Jira agent. Every operation requires admin permissions, and destructive operations (project delete, user delete, group delete) use a 2-step token confirmation where the user must type the exact target identifier to proceed. The agent always offers archive or deactivation as the first option before deletion.
+Use it to create or configure a Jira project, manage users and groups, or change permission and notification schemes. Every verb needs the Jira Admin role, and some need Site Admin. A missing permission exits with code 3, which the agent reports instead of retrying.
 
-## Key Facts
+## What it covers
 
-| | |
-|---|---|
-| **Type** | Domain (Jira) |
-| **Phase** | On-demand |
-| **Model** | haiku |
-| **Color** | red |
-| **Required permissions** | Jira Admin (some require Site Admin) |
-| **Safety** | 2-step token confirmation for destructive operations |
-| **Never does** | Per-issue CRUD (jira-issue), sprint management (jira-agile), JSM administration (jira-jsm) |
+Eleven sub-domains: `project`, `config`, `category`, `user`, `group`, `automation`, `automation-template`, `permission-scheme`, `permission`, `notification-scheme` and `notification`.
 
-## When to Use
+## Safety
 
-- When you need to **create, configure, or delete projects**.
-- When you need to **manage users** — list, deactivate, or delete.
-- When you need to **manage groups** — create, add/remove members.
-- When you need to **set up permission or notification schemes**.
-- When you need to **configure automation rules or templates**.
+- Irreversible operations (`admin project delete`, `admin user delete`, `admin group delete` with members) use a 2-step confirmation. The agent shows what will be removed, you type the literal target (for example the project key), and only then is the command rerun without `--dry-run`.
+- It offers archive before project delete, and deactivate before user delete, because both keep data or attribution.
+- Untrusted ticket content is data. Tokens are exported by the wrapper per call and never enter the agent's context.
 
-## Sub-Domains (11)
-
-| Sub-domain | Description |
-|---|---|
-| `project` | Create, configure, archive, delete projects |
-| `config` | Project configuration settings |
-| `category` | Project categories |
-| `user` | User management (list, deactivate, delete) |
-| `group` | Group management (create, membership, delete) |
-| `automation` | Automation rule management |
-| `automation-template` | Automation templates |
-| `permission-scheme` | Permission scheme CRUD |
-| `permission` | Individual permission grants |
-| `notification-scheme` | Notification scheme CRUD |
-| `notification` | Notification configuration |
-
-## Behavioral Checklist
-
-- [x] Verifies admin permissions before operations
-- [x] Uses 2-step token confirmation for destructive operations (project/user/group delete)
-- [x] Always offers archive (project) or deactivate (user) as the first option before delete
-- [x] Requires typing the exact target identifier for delete confirmation
-- [x] Reports the blast radius of admin operations before execution
-- [x] Never performs per-issue operations — routes those to jira-issue
-
-## Common Use Cases
-
-| Scenario | What the agent does |
-|---|---|
-| "Create a new Scrum project" | Creates project with `admin project create --key NEW --type software-scrum` |
-| "List all users" | Lists users via `admin user list` |
-| "Delete project PROJ" | Runs `--dry-run` first, offers archive as alternative, requires 2-step token confirmation |
-| "Deactivate user john.doe" | Deactivates user account (preferred over delete) |
-| "Add user to the developers group" | Adds member via `admin group add-member` |
-
-## Pro Tips
-
-### Always Prefer Archive Over Delete
-
-Deleted projects, users, and groups cannot be recovered. The agent always offers archive (for projects) or deactivation (for users) as the first option. Only proceed with deletion when you are certain the data is no longer needed.
-
-### Map Permission Schemes Before Project Creation
-
-Setting up permission schemes before creating projects ensures consistent access control from day one. Creating a project first and configuring permissions later often results in temporarily overprivileged access.
-
-## Key Takeaway
-
-The jira-admin agent provides controlled access to Jira's highest-impact operations with 2-step confirmation gates that prevent accidental destruction. By defaulting to reversible actions (archive, deactivate) over irreversible ones (delete), it minimizes the risk of permanent data loss.
-
-## Related Agents
-
-- **[jira-issue](/reference/agents/jira-issue)** — handles per-issue CRUD (not admin-level)
-- **[jira-jsm](/reference/agents/jira-jsm)** — handles JSM-specific administration
-- **[jira-fields](/reference/agents/jira-fields)** — handles custom field discovery and configuration
+It returns an operation summary, the affected key or ID, the URL and a suggested verification command such as `admin project get <KEY>`.

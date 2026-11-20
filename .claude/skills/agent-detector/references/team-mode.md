@@ -4,7 +4,7 @@
 
 On Claude Code, team mode spawns multiple instances as **teammates** (persistent, peer-to-peer messaging, shared task list) instead of **subagents** (fire-and-forget, hub-spoke).
 
-## Complexity Gate (CRITICAL -- Token Savings)
+## Complexity Check (CRITICAL -- Token Savings)
 
 **Team mode is ONLY for Deep complexity + multi-domain tasks.** All other tasks use single-agent or subagent mode to save tokens.
 
@@ -19,7 +19,7 @@ team_decision[5]{condition,mode,reason}:
 
 **Token impact:** Team mode costs ~3x tokens (3 parallel context windows). Only justified when task requires parallel cross-domain work that would take 3x longer sequentially.
 
-**Gate checks (ALL must pass):**
+**Checks (ALL must pass):**
 1. `isAgentTeamsEnabled()` returns true
 2. Complexity = Deep
 3. 2+ domains score >=50 each

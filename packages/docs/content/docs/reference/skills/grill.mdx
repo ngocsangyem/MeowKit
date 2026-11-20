@@ -1,6 +1,6 @@
 ---
 title: "mk:grill"
-description: "Relentlessly interview the user about their own plan or design — one question at a time — resolving each branch of a decision tree until shared understanding. Claude is the interviewer; the user is the interviewee. Checkpoints every answer to docs/knowledge/<slug>.md so progress survives a context reset, flags unanswerable knowledge as gaps to chase, and ends by offering three handoffs. Read-only on the source doc."
+description: "Interviews you about a plan or design you already own, one question at a time, and records the answers in a knowledge document."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,135 +14,73 @@ description: "Relentlessly interview the user about their own plan or design —
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Turns the usual direction around: instead of Claude answering or proposing,
-**Claude interviews you** about a plan or design you already own — one question
-at a time — and drives every unresolved branch of the decision tree to a
-resolution. The output is a knowledge document that front-loads the tacit context
-a downstream build skill would otherwise have to guess at.
+mk:grill reverses the usual direction: Claude asks and you answer. It works through every unresolved branch of your plan until you share the same understanding, then writes the resolved context to `docs/knowledge/<slug>.md` so a build skill does not have to guess it. It never proposes the solution.
 
-It accepts either entry mode:
+It accepts a doc path (plan, design or spec), which it reads to seed the open branches, or a verbal idea, which starts an empty tree. It never edits the source doc.
 
-- **A doc path** — a plan / design / spec file. grill reads it and seeds the
-  decision tree from its open branches (unresolved choices, unjustified
-  decisions, TODOs, vague nouns, assumptions stated as fact). It never edits the
-  source.
-- **A verbal idea / topic** — grill seeds an empty tree and builds it through
-  questioning.
+## When to use it
 
-The signature mechanic is **exactly one question per turn** — deliberately not a
-batched multi-question prompt. One sharp question, your answer, an immediate
-checkpoint, then the tree is re-evaluated and the next highest-leverage branch is
-asked. Five questions or an hour are both valid lengths; depth, not count, is the
-target.
+Use it when you say "grill me", "stress-test this plan" or "interrogate my design", or before handing a half-formed idea to `mk:skill-creator` or `mk:plan-creator`.
 
-## When to Use
-
-- "Grill me on this plan"
-- "Stress-test my design / interrogate my plan"
-- "Get grilled on my design before I build it"
-- You have a half-formed plan or design and want every assumption, ambiguity, and
-  unresolved choice surfaced and answered before handing it to a build skill.
-
-## When NOT to Use
-
-| Need | Use this instead |
+| Need | Use instead |
 |---|---|
-| Propose / compare technical approaches | `mk:brainstorming` |
-| "Should we build this" — product validation | `mk:office-hours` |
-| Claude should ANSWER questions about the repo | `mk:ask-me` |
-| One-shot review of an existing plan | `mk:plan-ceo-review` |
-| Apply named reasoning lenses to existing findings | `mk:elicit` |
-| Multi-perspective architecture debate | `mk:party` |
-| Constitution derived from the CODEBASE (not the human) | `mk:project-context` |
-| Bug / error / root cause | `mk:investigate` |
+| Compare technical approaches | `mk:brainstorming` |
+| Decide whether to build at all | `mk:office-hours` |
+| Claude answers questions about the repo | `mk:ask-me` |
+| One-shot review of a plan | `mk:plan-ceo-review` |
+| Named reasoning lenses on existing findings | `mk:elicit` |
+| Conventions derived from the codebase | `mk:project-context` |
+| One recommendation on a decision | `mk:advise` |
 
 ## Usage
 
-```bash
-# Grill an existing plan/design doc (read-only on the source)
-/mk:grill tasks/plans/260613-1254-payment-retry/plan.md
+`/mk:grill [doc path | verbal idea or topic]`
 
-# Grill a verbal idea — no doc required
+```bash
+/mk:grill tasks/plans/260613-1254-payment-retry/plan.md
 /mk:grill I want to add a retry queue for failed payment webhooks
 ```
 
-**Argument hint:** `[doc path | verbal idea or topic]`
+## The loop
 
-The only output is `docs/knowledge/<slug>.md`, written and updated after every
-answer. The source doc, if any, is never modified.
+1. Pick the unresolved branch whose answer unblocks the most decisions.
+2. Ask exactly one specific question. No batching, no menus. The skill has no `AskUserQuestion` tool for this reason.
+3. Wait for your answer and restate it in one line.
+4. Write a checkpoint to `docs/knowledge/<slug>.md` before the next question.
+5. Re-evaluate the tree. A contradiction with an earlier answer is raised on the spot.
 
-## Core Loop
+Depth matters, not the count. Five questions or an hour are both valid.
 
-1. Pick the single highest-leverage unresolved branch.
-2. Ask exactly one specific, concrete question about it — no batching, no menus.
-3. Wait for your answer.
-4. Restate the answer in one line to confirm understanding.
-5. Checkpoint immediately to `docs/knowledge/<slug>.md` before asking the next
-   question.
-6. Re-evaluate the tree — the answer may close branches, open new ones, or expose
-   a contradiction with an earlier answer (surfaced on the spot).
-7. Repeat until termination conditions are met.
+## Gaps and wrap-up
 
-## Gap Flagging
+If you cannot answer or say you do not own it, the skill records an Open Gap with the question, why it is unresolved and who to ask. At each checkpoint it shows the remaining open branches. When they drain it proposes wrap-up and waits for you to confirm "done" or "keep going". It then offers three handoffs and does not invoke any itself.
 
-When you cannot answer, answer thinly, or say "I don't own that", grill does not
-paper over it. It records an **Open Gap** with the unresolved question, why it is
-unresolved, and **who to ask** — then tells you to go get the detail and drop it
-back into the knowledge doc. A flagged gap is a valid outcome, not a failure.
+| Handoff | When |
+|---|---|
+| `mk:skill-creator` | The resolved design is a skill |
+| `mk:plan-creator` (or `mk:brainstorming` if approaches are open) | A feature or system to plan |
+| `mk:project-context` | Merge the knowledge into the project conventions |
 
-## Hybrid Termination
+## Output
 
-At each checkpoint grill surfaces a readiness signal — the remaining open branches
-plus its judgment of whether high-leverage questions are exhausted. When branches
-drain, it **proposes wrap-up** and asks you to confirm "done" or "keep going". It
-never auto-terminates silently and never loops forever; you hold the stop button.
-
-On confirmed wrap-up it offers three handoffs:
-
-- `mk:skill-creator` — if the resolved design is a skill to build.
-- `mk:plan-creator` (or `mk:brainstorming` if approaches are still open) — if it is
-  a feature/system to plan.
-- `mk:project-context` — to merge the extracted human knowledge into the project
-  constitution.
-
-grill offers all three and lets you pick; it does not auto-invoke the downstream
-skill.
-
-## Output Format
-
-`docs/knowledge/<slug>.md`:
+`docs/knowledge/<slug>.md` is the only file written. If it exists, the skill resumes from it.
 
 ```markdown
 # Knowledge: <Plan/Design Title>
-
 **Source:** <doc path | "verbal idea">
 **Started:** <date>  ·  **Status:** in-progress | wrapped
-
 ## Decisions
-- **<branch>:** <answer> — <why>
-
 ## Q&A Log
-1. **Q:** <question>
-   **A:** <answer>
-
 ## Highlights
-- <insight>
-
 ## Open Branches
-- <branch>
-
 ## Open Gaps
-- **<question>** — <why unresolved> → ask: <who/source>
 ```
 
-## Safety Boundaries
+## Gotchas
 
-- **Read-only on the source.** The plan/design doc is never edited; corrections
-  flow through the chosen handoff. The only file grill writes is
-  `docs/knowledge/<slug>.md`.
-- **No `AskUserQuestion`.** The one-question-at-a-time loop is plain prose — batched
-  question prompts are deliberately excluded from the skill's tools.
-- **Never proposes the answer.** The moment a suggestion would replace a user
-  decision, that is `mk:brainstorming` territory; grill asks, it does not decide.
+- Two questions mean two turns.
+- Suggesting the answer turns the session into `mk:brainstorming`.
+- Writing the checkpoint at the end loses everything on a context reset. Write after every answer.
+- A guess on something you do not own is worse than a flagged gap.

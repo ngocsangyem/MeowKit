@@ -1,6 +1,6 @@
 ---
 title: "mk:jira-jsm"
-description: "JIRA Service Management: service desks, requests, customers, queues, SLAs, approvals. Requires JSM license."
+description: "Works with Jira Service Management: service desks, requests, request types, customers, organizations, queues, SLAs and approvals."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,58 +15,45 @@ description: "JIRA Service Management: service desks, requests, customers, queue
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Forks the `jira-jsm` agent to execute JIRA Service Management operations across 8 sub-domains (~45 verbs total). Requires JSM-licensed tenant + agent or admin role.
+mk:jira-jsm forks the `jira-jsm` agent ([agent page](/reference/agents/jira-jsm)) to run `jira-as jsm` commands across 8 sub-domains (about 45 verbs). It needs a JSM-licensed tenant and an agent or admin role. Insufficient permission returns exit code 3. The skill is not enabled by default.
 
-## When to Use
+## When to use it
 
-- **Triggers:** "create JSM request", "list service desks", "SLA status for KEY", "approve request", "list queue NAME"
-- **NOT for:** core Jira issue ops ([`mk:jira-issue`](/reference/skills/jira-issue)) · project admin ([`mk:jira-admin`](/reference/skills/jira-admin)).
+Use it for "create JSM request in service desk 'IT Support'", "list service desks", "SLA status for KEY-123", "approve request KEY-123" or "list queue 'Tier 1 Support'".
 
-## Required Permissions
+| Need | Use instead |
+|---|---|
+| Core Jira issue operations | [`mk:jira-issue`](/reference/skills/jira-issue) |
+| Project administration, request type and queue configuration | [`mk:jira-admin`](/reference/skills/jira-admin) |
 
-JSM-licensed tenant + agent or admin role. Insufficient permission → exit code 3.
+`references/decision-tree.md` covers when to use this skill instead of `mk:jira-issue`, `mk:jira-lifecycle` or `mk:jira-collaborate`.
 
-## Internal-vs-Public Comments (privacy)
-
-JSM tickets cross the customer boundary: an "internal" comment is team-only; a "public" comment is visible to the customer who raised the request. The agent confirms intent before posting any comment that could be customer-facing.
-
-## Sub-Domains (8)
+## Sub-domains
 
 | Sub-domain | Common verbs |
 |---|---|
 | `service-desk` | `list`, `get`, `info` |
 | `request-type` | `list`, `get`, `fields` |
-| `request` | `create`, `get`, `list`, `comment add/list`, `participant`, `transition` |
+| `request` | `create`, `get`, `list`, `comment add/list`, `participant add/remove`, `transition` |
 | `customer` | `list`, `create`, `get`, `add-to-org`, `remove-from-org` |
 | `organization` | `list`, `create`, `get`, `add-customer`, `list-customers` |
 | `queue` | `list`, `get`, `list-issues` |
 | `sla` | `get`, `list-policies`, `breach-list` |
 | `approval` | `list`, `approve`, `decline`, `get` |
 
-## Verified Wrapper Invocations (selection)
+`jira-as jsm <sub-domain> --help` is the authoritative flag list.
 
-| Operation | Tier | Invocation |
-|---|---|---|
-| List service desks | 1 | `... jsm service-desk list` |
-| List request types | 1 | `... jsm request-type list --service-desk-id <ID>` |
-| Create request | 2 | `... jsm request create --service-desk-id <ID> --request-type-id <ID> --summary "..."` |
-| Comment on request | 2 | `... jsm request comment add <KEY> --body "..." --visibility internal\|public` |
-| SLA status | 1 | `... jsm sla get <KEY>` |
-| Approve | 3 | `... jsm approval approve <APPROVAL_ID>` |
+## Internal and public comments
 
-For each verb, `--help` is the canonical reference.
+A JSM comment can be internal (team only) or public (visible to the customer who raised the request). The agent asks for confirmation before posting anything that could be customer-facing. `mk:jira-collaborate` applies the same rule.
 
-## Domain References
+## References
 
-- `references/decision-tree.md` — when to use `mk:jira-jsm` vs `mk:jira-{issue,lifecycle,collaborate}`
-- `references/itil-workflows.md` — ITIL 4 process implementations (incident / service request / problem / change)
+| File | Content |
+|---|---|
+| `references/decision-tree.md` | JSM skill versus the core Jira skills |
+| `references/itil-workflows.md` | ITIL 4 processes: incident, service request, problem, change |
 
-## Peer Leaves
-
-`mk:jira-collaborate` (internal-vs-public discipline shared) · `mk:jira-lifecycle` (`patterns/jsm-request-workflow.md`) · `mk:jira-admin` (request-type / queue config)
-
-## Agent
-
-[`jira-jsm`](/reference/agents/jira-jsm) — A + C, NOT B.
+For JSM transitions, `mk:jira-lifecycle` has `references/patterns/jsm-request-workflow.md`.

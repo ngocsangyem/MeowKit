@@ -1,6 +1,6 @@
 ---
 title: "mk:jira-bulk"
-description: "Bulk JIRA operations on 10+ issues. Dry-run is mandatory. Reads workflow cache."
+description: "Changes many Jira issues at once (transition, assign, clone, delete), always with a dry run first."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,54 +15,41 @@ description: "Bulk JIRA operations on 10+ issues. Dry-run is mandatory. Reads wo
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Forks the `jira-bulk` agent to execute bulk operations across many issues — transition, assign, set-priority, clone, delete. **Every bulk command MUST be invoked with `--dry-run` first**; the user reviews the `would_*` JSON keys before re-invoking without `--dry-run`.
+mk:jira-bulk forks the `jira-bulk` agent ([agent page](/reference/agents/jira-bulk)) to run `jira-as bulk` commands over a JQL result. Every bulk command runs with `--dry-run` first. The agent shows the `would_*` JSON keys and the impacted count, and only after your explicit yes does it run the command without `--dry-run` (or with `--force`). It refuses to skip the dry run. The skill is not enabled by default.
 
-## When to Use
+## When to use it
 
-- **Triggers:** "bulk update N issues", "mass transition", "transition 50+ issues to Done", "bulk-clone", "bulk-delete"
-- **NOT for:** single-issue ops ([`mk:jira-issue`](/reference/skills/jira-issue) / [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle)).
+Use it for "bulk update N issues", "mass transition", "transition 50+ issues to Done", "bulk-clone" or "bulk-delete".
 
-## MANDATORY Dry-Run Workflow
+| Need | Use instead |
+|---|---|
+| One issue | [`mk:jira-issue`](/reference/skills/jira-issue), [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle) |
+| Bulk link | [`mk:jira-relationships`](/reference/skills/jira-relationships) |
+| JQL authoring and `bulk-update` | [`mk:jira-search`](/reference/skills/jira-search), which uses the same dry-run rule |
 
+## Steps
+
+1. Run the command with `--dry-run`.
+2. The agent shows what would change and how many issues are affected.
+3. After your explicit yes, it re-runs without `--dry-run`.
+
+Example dry run:
+
+```bash
+bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh bulk transition --jql "<JQL>" --to "Done" --dry-run
 ```
-Step 1 (always):  invocation + --dry-run
-Step 2 (always):  show user would_transition / would_assign / would_delete + impacted-count
-Step 3 (only after explicit "yes"):  invocation without --dry-run (or with --force)
-```
 
-Skipping Step 1 is a hard violation — bulk operations are difficult or impossible to reverse. The agent will refuse if asked to skip the dry-run.
+JQL built from user-derived terms is sanitized first with `scripts/jql-sanitize.sh`. These are Tier 4 operations in the safety framework. Delete is irreversible and needs an extra confirmation.
 
-## Workflow Cache (REQUIRED for bulk transitions)
+## Workflow cache
 
-For any `bulk transition` op, the agent validates the target status against the discovered workflow cache:
+Before a `bulk transition` the agent checks the target status, or the transition ID for `--id`, against `tasks/jira-workflows/<workflow-slug>.md`. A mismatch is rejected before running. If the cache is absent, it runs `jira/scripts/fetch-workflow.sh <KEY>` first. A partial cache (`_partial-<PROJ>.md`, from non-admin discovery) leads to a recommendation for a smaller pilot batch. See `../jira-lifecycle/references/workflow-discovery.md`.
 
-```
-$CLAUDE_PROJECT_DIR/tasks/jira-workflows/<workflow-slug>.md
-```
+## References
 
-If absent, the agent runs `bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/fetch-workflow.sh <KEY>` first. Partial caches (`_partial-<PROJ>.md` from non-admin discovery) trigger a "smaller pilot batch" recommendation. See `mk:jira-lifecycle/references/workflow-discovery.md`.
-
-## Verified Wrapper Invocations
-
-| Operation | Tier | Invocation |
-|---|---|---|
-| Bulk transition | 4 | `... bulk transition --jql "<JQL>" --to "Done" --dry-run` |
-| Bulk assign | 4 | `... bulk assign --jql "<JQL>" --assignee john.doe --dry-run` |
-| Bulk set priority | 4 | `... bulk set-priority --jql "<JQL>" --priority High --dry-run` |
-| Bulk clone | 4 | `... bulk clone --jql "<JQL>" --target-project DEST --dry-run` |
-| Bulk delete | 4 | `... bulk delete --jql "<JQL>" --dry-run` (irreversible — extra confirm) |
-
-## Domain References
-
-- `references/safety-checklist.md` — pre-flight checklist for any bulk op >50 issues
-- `references/checkpoint-guide.md` — checkpoint + resume strategy for 500+ issue ops
-
-## Peer Leaves
-
-`mk:jira-search` (`bulk-update` lives there — same dry-run discipline) · `mk:jira-lifecycle` (single-issue transitions; same workflow cache) · `mk:jira-relationships` (`bulk-link` lives there)
-
-## Agent
-
-[`jira-bulk`](/reference/agents/jira-bulk) — A + C, NOT B.
+| File | Content |
+|---|---|
+| `references/safety-checklist.md` | Pre-flight checklist for any bulk operation over 50 issues |
+| `references/checkpoint-guide.md` | Checkpoint and resume for operations over 500 issues |

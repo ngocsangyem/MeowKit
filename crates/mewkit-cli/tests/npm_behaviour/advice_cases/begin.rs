@@ -26,8 +26,9 @@ fn a_first_checkpoint_opens_and_writes_the_pending_marker() {
         ts.stdout
     );
     assert!(
-        ts.stdout
-            .contains("supervision is evidence — it clears no gate and counts as no verification."),
+        ts.stdout.contains(
+            "supervision is evidence — it clears no approval and counts as no verification."
+        ),
         "the success line says what a checkpoint is not: {}",
         ts.stdout
     );

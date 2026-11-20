@@ -1,80 +1,75 @@
 ---
 title: "Ship Safely"
-description: "Deploy with /mk:ship: conventional commits, PR creation, CI verification, and rollback documentation."
+description: "Ship with /mk:ship: prepare a local commit, then push and open a PR when you ask, with the ship check running on every commit, push and merge."
 ---
 
-`/mk:ship` handles deployment. It runs tests, creates conventional commits, opens a PR, and verifies CI. It never pushes directly to main. It also documents rollback steps.
+`/mk:ship` is Phase 5 of the workflow. It checks the change, makes conventional commits, and opens a PR on a feature branch. It never pushes to main directly.
 
-## Quick start
+## Scopes
 
-```bash
-/mk:ship
-```
-
-MeowKit runs the full pre-ship checklist: test → lint → typecheck → commit → PR → CI verification. You review the PR and merge when CI passes.
-
-## What happens
-
-```
-Phase 4 review verdict written
-  → pre-ship.cjs: full test + lint + typecheck
-  → git-manager: stage changes, conventional commit
-  → shipper: push branch, create PR
-  → Wait for CI
-  → Document rollback steps
-  → Merge when CI passes
-```
-
-## Flags
+Bare `/mk:ship` only prepares. Anything that leaves your machine needs an explicit request.
 
 ```bash
-/mk:ship              # Standard ship pipeline
-/mk:ship --canary     # Staged deployment with monitoring
-/mk:ship --dry-run    # Preview without pushing or creating PR
+/mk:ship                    # prepare: inspect, run checks, ask before the local commit
+/mk:ship release            # push the branch, create or update the PR
+/mk:ship publish            # versioning, changelog and issue actions
+/mk:ship release beta       # target the dev branch instead of main
+/mk:ship --dry-run          # show the actions, run none of them
 ```
 
-## Official versus beta
+| Scope | What it does |
+|---|---|
+| `prepare` (default) | Inspects the selected changes, runs checks, shows the files proposed for staging, and asks before the local commit. No push, PR or version change. |
+| `release` | After you ask, pushes the branch and creates or updates the PR. Runs `mk:document-release` before merge so docs land in the same PR. |
+| `publish` | After you ask, decides the version and changelog with you and handles issue actions. It never picks a version bump on its own. |
 
-Where you are shipping changes what runs. A beta ship trades the adversarial review and the docs update for speed; an official ship does not.
+`official` targets the default branch (main or master). `beta` targets the dev branch and appends a prerelease suffix such as `-beta.1` to the version. With neither, a `feature/*`, `hotfix/*` or `fix/*` branch ships as official, a `dev/*` or `beta/*` branch ships as beta, and otherwise the skill asks. `--skip-tests` skips the test step only when you confirm current-session evidence is enough.
 
-| Mode | Target | Adversarial review | Version format | Docs update |
-|------|--------|-------------------|---------------|-------------|
-| `official` | main/master | Full, auto-scaled | `1.2.3` | Yes |
-| `beta` | dev/beta | Skipped | `1.2.3-beta.1` | Skipped |
-| `--dry-run` | nothing, preview only | Shows the plan | Shows the prediction | Shows what would change |
+## The ship check
 
-## Commit format
+On `git commit`, `git push`, `git merge` and `gh pr create|merge`, the `pre-ship` hook runs lint on the changed files, the tests related to them and a type-check. It refuses the command when one fails. This is the one control enforced at ship time. A missing plan or review verdict blocks nothing, and `mk:ship` says so when it sees either missing. See [Enforcement and security](/core-concepts/enforcement).
 
-Every ship produces a conventional commit:
+## What the pipeline does
 
-```
-feat(scope): description matching plan
+1. Pre-flight: detect the base branch, check you are not on it, and read the review status.
+2. Merge the base branch and run the tests, separating failures you caused from ones already there.
+3. Audit test coverage and the plan against the diff.
+4. Pre-landing review. Adversarial review belongs to `mk:review`, and ship does not repeat it.
+5. Version bump and changelog, when you asked for `publish`.
+6. Commit in conventional format, with the scope and description taken from the plan.
+7. Push and PR creation on `release`.
+8. Verify CI and document rollback steps in the PR body.
 
-Refs: #42
-```
+The final summary reports one deploy classification with a line of evidence: `deployed`, `PR-only` or `not-applicable`.
 
-The scope and description come from the approved plan. No manual commit message needed.
+## Stops
 
-## Safety rules
+The pipeline stops on any of these:
 
-- **Never pushes to main directly.** Always creates a PR.
-- **CI must pass before merging.** The shipper verifies CI status.
-- **Rollback docs required.** Every ship documents how to revert.
-- **Pre-ship hook runs first.** `pre-ship.cjs` blocks the ship if tests, lint, or typecheck fail.
+- You are already on the target branch.
+- Merge conflicts it cannot resolve.
+- Test failures on your branch.
+- Coverage below the threshold.
+- Plan gaps.
 
-## Hotfix exception
+Critical review findings are put to you one at a time. Pre-existing test failures are reported, and it asks whether to go on.
+
+## Hotfixes
 
 ```bash
 /mk:fix "critical payment bug" --quick
-# After fix verified:
-/mk:ship  # Hotfix: skips some non-critical checks
+/mk:ship
 ```
 
-Hotfixes still get a review verdict and the ship check, but may skip non-critical checks. Document the reason in the PR description.
+A hotfix still gets a review verdict and the ship check. Record the reason in the PR description if you skip a non-critical step.
 
-## Memory capture
+## Jira tickets
 
-Before shipping, ask for the non-derivable decisions and corrections to be written down. Each becomes one entry in `.meowkit/memory/`:
+If the review verdict lists `jira_tickets`, `mk:ship` offers three optional actions before it continues: post the verdict summary to the ticket, move the ticket to Done, and confirm each business acceptance criterion. Each one asks first, and each is skipped without cost when Jira is offline.
+
+## Memory
+
+Before you ship, ask for the non-derivable decisions and corrections to be written down. Each is one entry in `.meowkit/memory/`, written with `mewkit note`:
 
 ```md
 ## Connection pool, not per-request connection   <!-- 2026-11-01 -->
@@ -88,20 +83,18 @@ The store is committed, so the entry ships in the same PR and is reviewed with t
 ## When it goes wrong
 
 | What you see | Why | What to do |
-|-------|-------|-----|
-| Pre-ship checks fail | Tests, lint, or types are broken | Fix them first; the ship is correctly refusing |
-| Merge conflicts | The base branch moved | Resolve manually, then re-run |
-| CI fails on the PR but passed locally | Something differs in the CI environment | Read the CI logs; the difference is the bug |
-| `gh` not found | GitHub CLI is not installed | Install `gh`, or push and open the PR in the browser |
+|---|---|---|
+| The ship check refuses the command | Tests, lint or types are failing | Fix them, then retry |
+| Merge conflicts | The base branch moved | Resolve them, then re-run |
+| CI fails but passed locally | The CI environment differs (Node version, env vars) | Read the CI logs and fix the difference |
+| `gh` not found | GitHub CLI is not installed | Install `gh`, or push and open the PR in a browser |
 
 ## Don't use /mk:ship for
 
-- **Features still in development.** Complete the review pipeline first
-- **Experimental code.** Ship only reviewed, tested code
-- **Force pushes.** MeowKit never force-pushes
+- Features still in development. Finish the review first.
+- Force pushes. MeowKit force-pushes only when you ask for it.
 
 ## Next steps
 
-- [Build a feature](/guides/build-a-feature): the full pipeline ending with ship
-- [Review code](/guides/review-code): the review phase before shipping
-- [Gates & security](/core-concepts/gates): the ship check and what it enforces
+- [Build a feature](/guides/build-a-feature) for the full pipeline
+- [Review code](/guides/review-code) for the phase before shipping

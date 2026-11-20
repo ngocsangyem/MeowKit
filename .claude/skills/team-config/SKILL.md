@@ -66,7 +66,7 @@ See `templates/ownership-map-template.md` for the format agents use to declare f
 
 - Max 3 parallel agents (from `.claude/skills/cook/references/parallel-execution-rules.md`)
 - Only COMPLEX tasks qualify (orchestrator enforces this)
-- Gates (1 and 2) are never parallelized
+- Planning and review are never parallelized
 - All worktrees branch from current feature branch HEAD
 
 ## Gotchas

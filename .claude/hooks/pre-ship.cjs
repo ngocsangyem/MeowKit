@@ -15,7 +15,7 @@ const MARKER = '@@GATE_BLOCK@@';
 function failClosed(err) {
   try {
     process.stderr.write(`${MARKER}\nPre-ship guard could not run: ${err && err.message ? err.message : String(err)}\n`);
-    process.stderr.write('A ship with no enforceable gate is blocked, not waved through.\n');
+    process.stderr.write('A ship with no enforceable check is blocked, not waved through.\n');
   } catch {
     // Nothing left to report with; the exit code is the decision.
   }

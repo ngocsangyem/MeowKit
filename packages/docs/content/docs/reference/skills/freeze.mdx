@@ -1,6 +1,6 @@
 ---
 title: "mk:freeze"
-description: "Session-scoped edit restriction — blocks Edit and Write tools outside an allowed directory. Gate for preventing accidental scope creep during debugging or focused work."
+description: "Restricts the Edit and Write tools to one directory for the current session so edits stay inside the module you are working on."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,85 +14,42 @@ description: "Session-scoped edit restriction — blocks Edit and Write tools ou
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Locks all Edit and Write tool operations to a single directory for the current session. Any attempt to edit or write a file outside the allowed path is **denied** (not just warned). The freeze enforces intent boundaries — it prevents accidentally fixing unrelated code while working on a specific module. Bash commands (`sed`, `awk`, `cp`, `mv`) are NOT restricted.
+mk:freeze stores one directory as the session's edit boundary. A `PreToolUse` hook, `check-freeze.cjs`, runs on every Edit and Write and denies any `file_path` outside that directory. It is an intent guardrail, not a security boundary.
 
-## When to Use
+## When to use it
 
-- Debugging a specific module and want to prevent accidentally touching other code
-- User asks "freeze", "restrict edits", "only edit this folder", "lock down edits"
-- Working in a monorepo where one change could cascade into unrelated packages
+Use it when debugging or refactoring one module, working in a monorepo where a change could spill into other packages, or when you say "freeze", "only edit this folder" or "lock down edits". Usage: `/mk:freeze [PATH]`. Without a path the skill asks for one.
 
-**NOT for:** blocking destructive shell commands (use `mk:careful`).
+| Need | Use instead |
+|---|---|
+| Warn before destructive shell commands | `mk:careful` |
 
-## Core Capabilities
+The two combine: freeze stops stray edits and careful warns on destructive Bash commands.
 
-| Aspect | Behavior |
-|--------|---------|
-| Edit tool | Blocked outside freeze boundary |
-| Write tool | Blocked outside freeze boundary |
-| Bash tool | NOT restricted (can still `sed`, `awk`, `cp`, `mv` anywhere) |
-| Read tool | NOT restricted (can read any file) |
-| Glob/Grep | NOT restricted (can search anywhere) |
-| Scope | Session only — clears on conversation end or new session |
-| Override | None — denied operations cannot be overridden |
+## What it restricts
 
-## Arguments
+| Tool | Restricted |
+|---|---|
+| Edit, Write | Yes, denied outside the boundary |
+| Bash (`sed`, `awk`, `cp`, `mv`) | No |
+| Read, Glob, Grep | No |
 
-`/mk:freeze `PATH` — the directory to restrict edits to. If no path is given, the skill prompts via AskUserQuestion for a text input path.
+## Steps
 
-## Workflow
+1. You run `/mk:freeze` with a path, or give one when asked.
+2. The path is resolved to an absolute directory with a trailing slash. The slash stops `/src` from matching `/src-old`.
+3. The boundary is saved to `${CLAUDE_PLUGIN_DATA:-.meowkit/state}/freeze-dir.txt`.
+4. On each Edit or Write the hook compares `file_path` with the boundary and returns allow or deny, with a message naming the boundary.
 
-1. **User runs** `/mk:freeze` or `/mk:freeze `PATH`
-2. **If no path given:** AskUserQuestion prompts for directory (text input, not multiple choice)
-3. **Path resolution:**
-   ```bash
-   FREEZE_DIR=$(cd "<user-provided-path>" 2>/dev/null && pwd)
-   FREEZE_DIR="${FREEZE_DIR%/}/"   # trailing slash is CRITICAL
-   ```
-4. **State stored:** `${CLAUDE_PLUGIN_DATA:-.meowkit/state}/freeze-dir.txt`
-5. **Hook activates:** `bin/check-freeze.cjs` registered as PreToolUse on Edit and Write
-6. **Every Edit/Write:** hook reads `file_path` from tool input, compares against stored freeze boundary
-7. **Inside boundary:** `permissionDecision: "allow"`
-8. **Outside boundary:** `permissionDecision: "deny"` with message showing the freeze boundary
+## Ending a freeze
 
-## Trailing Slash Requirement
+The freeze lasts for the session. Running `/mk:freeze` with another path replaces the boundary. Deleting `freeze-dir.txt` clears it.
 
-The trailing `/` prevents false matches. Without it, freezing `/src` would also match `/src-old` or `/src-backup` on a prefix check. The trailing slash ensures `/src/` only matches files under `/src/`.
+## Gotchas
 
-## Symlink Warning
+- The hook checks the stated path, not a resolved symlink target. Avoid symlinks inside the frozen directory that point outside it.
+- Files outside the boundary, including shared test fixtures, cannot be edited. Move the boundary with `/mk:freeze`.
 
-The hook checks the **stated** `file_path`, not the resolved symlink target. If the Edit tool resolves symlinks internally, a file could be written outside the frozen directory despite having a path inside it. Avoid placing symlinks inside the frozen directory that point outside.
-
-## Deactivation
-
-Freeze deactivates when:
-- The conversation ends or a new session starts
-- A new freeze is set with a different path (overwrites state file)
-- User manually deletes `freeze-dir.txt`
-
-## Common Use Cases
-
-1. **Debugging a single service in a monorepo** — freeze to `packages/auth/`, prevent accidentally modifying `packages/api/`
-2. **Refactoring one module** — lock edits to `src/components/Dashboard/`
-3. **Pair programming** — restrict the AI to only the files the human partner is working on
-4. **Test-driven development** — freeze to `src/` and `tests/` to prevent fixture drift
-
-## Example Prompt
-
-> /mk:freeze packages/auth
-> I need to debug the auth module in our monorepo but keep accidentally editing files in packages/api. Lock me down to only the auth directory.
-
-## Pro Tips
-
-- Combine with `mk:careful` for full protection: freeze prevents accidental edits, careful prevents destructive bash commands
-- The freeze is an intent guardrail, **not a security boundary** — deliberate bash commands can still modify any file
-- Test fixture files within a frozen directory can't be updated — use `--exclude` patterns for test fixtures
-- The state file persists across messages within the same session; no need to re-specify
-
-### Notes
-
-- Hook script: `.claude/skills/freeze/bin/check-freeze.cjs`
-- Mechanics reference: `.claude/skills/freeze/references/freeze-mechanics.md`
-- Source: gstack
+The skill's mechanics are in `references/freeze-mechanics.md`.

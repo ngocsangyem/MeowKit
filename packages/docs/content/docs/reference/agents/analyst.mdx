@@ -1,6 +1,6 @@
 ---
 title: "analyst"
-description: "Cost tracking and pattern analysis agent — tracks token usage, extracts patterns, and maintains institutional memory across sessions."
+description: "Cost and pattern analysis agent. Keeps the session cost log and reports spend and recurring friction."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,77 +15,31 @@ description: "Cost tracking and pattern analysis agent — tracks token usage, e
 
 {/* GENERATED:reference-facts END */}
 
-The analyst is your institutional memory keeper. It tracks what every session costs, extracts patterns from recurring issues, and maintains a growing body of lessons learned. Over time, it identifies cost optimizations and proposes improvements to project configuration — always as recommendations, never applied automatically.
+The analyst is the last agent in the pipeline. It records what each session cost and reports where the spend and the friction are. It does not block the pipeline.
 
-## Cognitive Framing
+It runs on `sonnet`. Tools: `Read`, `Grep`, `Glob`, `Bash`, `Edit`, `Write`. Per-runtime model pins are on [Agent models](/guide/agent-models).
 
-> *"Track everything, learn from everything, auto-apply nothing."*
+## When to use
 
-The analyst operates at Phase 0 (session start — loads context) and Phase 6 (Reflect — records data). It is the terminal agent in the pipeline — after it completes, no further routing occurs. Its most important rule is that it proposes changes but never applies them automatically.
+It runs at session end through its owning workflow, or on demand through `mewkit budget`. It is not used for implementation, planning or review decisions.
 
-## Key Facts
+## What it does
 
-| | |
-|---|---|
-| **Type** | Core |
-| **Phase** | 0 (Orient), 6 (Reflect) |
-| **Auto-activates** | Session start and session end |
-| **Owns** | `.meowkit/telemetry/cost-log.json` |
-| **Never does** | Write code, auto-apply configuration changes |
+- Reads and appends `.meowkit/telemetry/cost-log.json`, a JSON array capped at the latest 1,000 entries. Each entry holds `date`, `session_id`, `model`, `cost_usd`, `tokens_in`, `tokens_out`, `cache_write_tokens` and `cache_read_tokens`. It appends only, keeps the file valid JSON, and records a placeholder when usage data is unavailable instead of inventing a number.
+- Reports spend by task, agent, model tier and time. It uses `mewkit trace audit` for drift and repeated friction (advisory and read-only).
+- Reports recurring patterns such as bug classes, repeated review findings and process friction. It does not write team memory; the write-set skills do that.
+- Proposes instruction-file updates every 10 sessions. It never applies them without human review.
+- Flags tasks that are consistently routed to a more expensive model tier than they need.
 
-## When to Use
+If the log is missing or corrupt it says which file and creates a fresh one rather than failing silently. It never overwrites data without confirming corruption, and never stores credentials or personal data in the log.
 
-- At **session start** — the analyst loads prior context from memory files automatically.
-- At **session end** — the analyst records session cost data, extracts patterns, and updates lessons learned.
-- When you want a **cost report** via `mewkit budget` — shows spending by task, agent, model tier, and time period.
-- When you want to understand **recurring patterns** across sessions.
+For an external URL it delegates to `mk:web-to-markdown` with `--wtm-accept-risk`. Without the flag that skill refuses the delegation.
 
-## Key Capabilities
+## What it does not do
 
-- **Token usage tracking** — records task name, model used, tokens consumed, estimated cost, and timestamp in `.meowkit/telemetry/cost-log.json` for every session.
-- **Cost reporting** — generates cost reports via `mewkit budget` showing spend breakdowns by task, agent, model tier, and time period. For cross-run aggregates it reads `cost-log.json` directly and uses `mewkit trace score|audit|propose` over the JSONL logs.
-- **Pattern extraction** — identifies recurring issues, common solutions, and frequently needed refactors from session data and reports them. It does not write the team store; durable lessons go through the write-set skills.
-- **Lessons learned** — proposes actionable lessons documenting what worked, what did not, and what to do differently. A write-set skill records an accepted lesson.
-- **Configuration recommendations** — proposes `CLAUDE.md` updates every 10 sessions based on accumulated patterns. These are always proposals for human review, never auto-applied.
-- **Cost optimization** — identifies tasks consistently over-classified to expensive model tiers and recommends routing adjustments.
+It does not change source, tests, docs, plans, reviews or deploy configs, and it does not delete history except when compacting with human approval.
 
-## Behavioral Checklist
+## Related
 
-- [x] Records token usage and cost data for every session
-- [x] Generates cost reports on `mewkit budget` request
-- [x] Extracts patterns from recurring issues across sessions
-- [x] Maintains lessons learned with actionable takeaways
-- [x] Proposes `CLAUDE.md` updates every 10 sessions — never auto-applies
-- [x] Identifies cost optimization opportunities
-- [x] Confirms pipeline complete as the terminal agent
-- [x] Never writes production code or test code
-
-## Common Use Cases
-
-| Scenario | What the analyst does |
-|---|---|
-| End of session | Records cost data, extracts patterns, updates lessons learned |
-| `mewkit budget` request | Generates cost report showing spend by task, agent, model tier, and time period |
-| Recurring test failures | Identifies the pattern across sessions and documents it for future reference |
-| Over-classified tasks | Detects that "simple config changes" are consistently routed as Complex and recommends adjustment |
-| Every 10th session | Proposes `CLAUDE.md` updates based on accumulated patterns for human review |
-
-## Pro Tips
-
-### Use Budget Reports to Catch Classification Drift
-
-If your cost reports show that a large percentage of tasks are classified as Complex (and using the most expensive models), it may indicate that the orchestrator's classification rules need adjustment. The analyst's cost optimization recommendations help identify where routing changes can reduce costs without sacrificing quality.
-
-### Review Lessons Learned Periodically
-
-The lessons recorded in `.meowkit/memory/gotchas.md` accumulate over time and become increasingly valuable. Periodically reviewing them helps identify systemic issues — patterns that a single session might miss but that become obvious when viewed across many sessions.
-
-## Key Takeaway
-
-The analyst builds institutional memory that makes every future session smarter. By tracking costs, extracting patterns, and maintaining lessons learned, it ensures that mistakes are not repeated and optimizations compound over time — all without ever making changes automatically.
-
-## Related Agents
-
-- **[documenter](/reference/agents/documenter)** — hands off to the analyst as the final step in the Phase 6 reflect sequence
-- **[orchestrator](/reference/agents/orchestrator)** — receives cost anomaly reports and routing adjustment recommendations
-- **[journal-writer](/reference/agents/journal-writer)** — journal entries feed into the analyst's pattern extraction
+- [orchestrator](/reference/agents/orchestrator): receives routing recommendations when costs look off.
+- [documenter](/reference/agents/documenter): also writes under `.meowkit/telemetry/`.

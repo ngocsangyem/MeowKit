@@ -32,7 +32,7 @@ blocked run, reviews finished work, and may return work for correction.
 - [The call protocol](#the-call-protocol)
 - [Wiring status](#wiring-status)
 
-Supervision is **evidence the human reads**. It is never an approval, never a gate,
+Supervision is **evidence the human reads**. It is never an approval, never an approval step,
 never a substitute for verification.
 
 Athena is a workflow-level strategic intelligence agent with stronger reasoning and
@@ -142,15 +142,15 @@ Dispositions are **stage-specific**, and an illegal one is rejected before routi
 | GUIDE, RESCUE | `CONTINUE_WITH_DIRECTIVE`, `ESCALATE_TO_HUMAN`, `BLOCKED_MISSING_EVIDENCE` |
 | REVIEW, RECHECK | `READY_FOR_EXISTING_GATE`, `RETURN_TO_EXECUTOR`, `ESCALATE_TO_HUMAN`, `BLOCKED_MISSING_EVIDENCE` |
 
-`READY_FOR_EXISTING_GATE` means "the normal reviewer/gate is the correct next
-step". It **never** means the gate is cleared.
+`READY_FOR_EXISTING_GATE` means "the normal reviewer or review step is the correct next
+step". It **never** means the review is passed.
 
 - Output cap **600 words**. Volume is not rigor.
 - `requiredCorrections`: max 5, ordered, each independently verifiable and each
   naming its `proofRequired`. `RETURN_TO_EXECUTOR` requires at least one.
 - `decisionRecommendation` selects one operational path within the packet's locked
   scope and says why. It MUST escalate rather than override a locked business,
-  security, compliance or gate decision.
+  security, compliance or review decision.
 - No `approve`, `clear`, `merge`, `deploy` or equivalent authority language, in any
   wording. Say "the evidence supports X".
 
@@ -227,7 +227,7 @@ and a correction supersedes recorded evidence rather than creating it, so it is 
 `--advice` and `--html` are orthogonal. Neither implies the other, each is parsed
 independently, and combining them changes no activation, approval, validation, export or
 ownership. A run with both produces the same visual artifact, at the same path, validated
-by the same validator, approved by the same human at the same gate, and exported by the
+by the same validator, approved by the same human at the same approval step, and exported by the
 same owner as `--html` alone would for the same final Markdown.
 
 They meet only in the correction loop, because a supervised correction edits Markdown and
@@ -285,7 +285,7 @@ skill: <skill and workflow>
 checkpointId: <named checkpoint>
 ---
 
-This is a record of supervision, NEVER verification and never a gate approval.
+This is a record of supervision, NEVER verification and never an approval.
 
 **Question asked:** …
 **Directive:** … (summary, not the full packet)
@@ -331,7 +331,7 @@ Where a runtime exposes direct mention of the agent, that is a **stateless strat
 consult**: Athena may assess a difficult situation, compare alternatives and make a
 recommended operational decision, but creates no run receipt, correction routing or
 cap accounting. It is NOT lifecycle supervision and must label itself accordingly.
-It escalates rather than changing a locked business, security, compliance or gate
+It escalates rather than changing a locked business, security, compliance or review
 decision. Embedded supervision requires a valid `supervisionRunId`.
 
 A direct consult returns a **strategy brief**, which is a different shape from a
@@ -424,7 +424,7 @@ outcome.
 **4. Route on the disposition.**
 
 - `CONTINUE_WITH_DIRECTIVE` — proceed; the directive is input, not instruction.
-- `READY_FOR_EXISTING_GATE` — run the skill's normal next gate or review. It is NOT cleared.
+- `READY_FOR_EXISTING_GATE` — run the skill's normal next review. It is NOT passed.
 - `RETURN_TO_EXECUTOR` — apply the corrections, then supersede the stale evidence:
   `mewkit advice commit … --disposition RETURN_TO_EXECUTOR --evidence <workflow-evidence.json> --correction-kind source|scope`.
   Re-run the skill's verification before its review. `scope` also returns the plan to the

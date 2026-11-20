@@ -19,7 +19,7 @@ Haiku is fast and cheap but limited in reasoning depth. Running the full harness
 
 ### STANDARD → FULL
 
-Sonnet has good reasoning but benefits from explicit scaffolding to stay coherent across multi-hour builds. **Why:** Sonnet's context window and reasoning depth need the contract gate to prevent silent feature substitution and the iteration loop to catch self-praise drift. This is the canonical "harness with everything on" mode.
+Sonnet has good reasoning but benefits from explicit scaffolding to stay coherent across multi-hour builds. **Why:** Sonnet's context window and reasoning depth need the contract step to prevent silent feature substitution and the iteration loop to catch self-praise drift. This is the canonical "harness with everything on" mode.
 
 ### COMPLEX (Opus 4.5 / older) → FULL
 

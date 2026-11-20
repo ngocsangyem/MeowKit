@@ -3,10 +3,10 @@
  * The command types itself on a CSS steps() animation and the caret blinks —
  * both are skipped wholesale under prefers-reduced-motion. */
 const steps = [
-  { path: '.claude/skills', n: '129 skills', t: '1.4s' },
+  { path: '.claude/skills', n: '127 skills', t: '1.4s' },
   { path: '.claude/agents', n: '42 agents', t: '310ms' },
-  { path: '.claude/hooks', n: '27 scripts', t: '204ms' },
-  { path: '.claude/rules', n: '7 rules', t: '38ms' },
+  { path: '.claude/hooks', n: '26 scripts', t: '204ms' },
+  { path: '.claude/rules', n: '6 rules', t: '38ms' },
 ]
 const summary = [
   { key: 'Directories', val: '2 added' },

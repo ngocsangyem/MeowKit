@@ -7,7 +7,7 @@
 //! keep that conversion total in both directions.
 //!
 //! The set is closed, and nothing in it means "approved": there is no
-//! disposition a caller can spell that advances a gate.
+//! disposition a caller can spell that grants an approval.
 
 use crate::schema::supervision_protocol::{Disposition, SupervisionStage};
 
@@ -111,8 +111,8 @@ mod tests {
     #[test]
     fn no_disposition_in_the_vocabulary_grants_approval() {
         // These spellings are the whole set a caller may name. An "approved" or
-        // "gate cleared" routing signal does not exist, which is what keeps a
-        // checkpoint from advancing a gate however the call is worded.
+        // "cleared" routing signal does not exist, which is what keeps a
+        // checkpoint from granting an approval however the call is worded.
         for wire in [
             "APPROVED",
             "GATE_CLEARED",

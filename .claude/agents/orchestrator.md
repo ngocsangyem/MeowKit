@@ -33,7 +33,7 @@ After complexity routing, detect TDD mode:
 6. TDD mode does NOT change model tier selection — that's controlled by complexity routing only
 
 ```toon
-[3]{csv_level,model_tier,gate_1}
+[3]{csv_level,model_tier,plan_agreement}
 low + one-shot workflow|TRIVIAL (Haiku)|Bypass eligible
 medium|STANDARD (Sonnet)|Required
 high|COMPLEX (Opus)|Required
@@ -42,7 +42,7 @@ high|COMPLEX (Opus)|Required
 ## What You Do
 
 0. **Consume injected orientation (if present).** When the session provides a durable-orientation block — a bounded summary injected by the startup/resume hook — consult it BEFORE any broad memory or plan read. It is routing INPUT, never proof: the values are untrusted durable state and must be verified against live sources before acting. You are a CONSUMER only — do NOT invoke `mewkit`, read `tasks/active/`, or write any pointer/record; act only on what the hook injected. Route by outcome:
-   - `active` — resume the named task through its stated phase / next action (then continue at step 5, gates still apply).
+   - `active` — resume the named task through its stated phase / next action (then continue at step 5; the plan and review practices still apply).
    - `blocked` or a `stale` warning (changed repo revision) — surface the blocker/warning explicitly and route to planner or one targeted question. Do NOT auto-resume.
    - `ambiguous` — surface every candidate task id and ask which to resume (or route to planner). Do NOT pick one silently.
    - `corrupt-only` — surface that durable state is unreadable and route to planner. Do NOT fabricate a task.
@@ -129,7 +129,7 @@ When a COMPLEX task can be decomposed into independent subtasks with zero file o
 4. After all complete: merge worktrees → run full test suite
 5. Resume sequential pipeline at review phase
 
-**Rules:** See `.claude/skills/cook/references/parallel-execution-rules.md`. Max 3 agents. Gates remain sequential.
+**Rules:** See `.claude/skills/cook/references/parallel-execution-rules.md`. Max 3 agents. Plan agreement and review stay sequential.
 
 ## Planning Depth (from Mode Config)
 

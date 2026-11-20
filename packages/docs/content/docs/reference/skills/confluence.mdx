@@ -1,6 +1,6 @@
 ---
 title: "mk:confluence"
-description: "Routing skill — recommends the correct mk:confluence-* leaf for any Confluence Cloud task. Pure router; no execution."
+description: "Routes a Confluence Cloud task to the right mk:confluence leaf skill. It does not run anything itself."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,71 +15,53 @@ description: "Routing skill — recommends the correct mk:confluence-* leaf for 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+`mk:confluence` is a routing skill. It picks the `mk:confluence-*` leaf that fits a Confluence Cloud task and points at it. The leaves do the work: each forks a dedicated agent from `.claude/agents/` and calls the `confluence-as` CLI through a wrapper script. If you already know the leaf, call it directly.
 
-`mk:confluence` is a **pure routing layer**. Its sole purpose is to identify the right `mk:confluence-*` leaf for the user's Confluence Cloud task and point at it. **No execution.**
+## Routing
 
-Confluence execution lives in 5 thin leaf skills (each forks a dedicated agent in `.claude/agents/`) backed by the `confluence-as` CLI installed via `mewkit setup`. The hub itself never invokes the wrapper.
-
-## When to Use
-
-- **Triggers:** "confluence", "wiki page", "spec page", ambiguous Confluence intent
-- **NOT for:** Direct execution — forward to a specific `mk:confluence-{leaf}`. If you already know the leaf, invoke it directly.
-
-## Routing Table
-
-| User intent | Leaf skill |
+| You want to | Leaf |
 |---|---|
-| Get/create/update/delete a single page or blog post; copy/move/version | [`mk:confluence-page`](/reference/skills/confluence-page) |
-| Search pages with CQL; list spaces; export results | [`mk:confluence-search`](/reference/skills/confluence-search) |
-| Deep spec analysis: requirements, gaps, suggested stories | [`mk:confluence-spec-analyst`](/reference/skills/confluence-spec-analyst) |
-| Bulk ops on 10+ pages (label, move, delete) — dry-run mandatory | [`mk:confluence-bulk`](/reference/skills/confluence-bulk) |
-| Comments, attachments, labels, watchers (collaboration surface) | [`mk:confluence-collaborate`](/reference/skills/confluence-collaborate) |
+| Get, create, update or delete one page or blog post, or copy, move or version it | [`mk:confluence-page`](/reference/skills/confluence-page) |
+| Search with CQL, list spaces, export results | [`mk:confluence-search`](/reference/skills/confluence-search) |
+| Analyse a spec for requirements, gaps and suggested stories | [`mk:confluence-spec-analyst`](/reference/skills/confluence-spec-analyst) |
+| Change 10 or more pages at once (label, move, delete), dry-run required | [`mk:confluence-bulk`](/reference/skills/confluence-bulk) |
+| Comments, attachments, labels, watchers | [`mk:confluence-collaborate`](/reference/skills/confluence-collaborate) |
 
-## Disambiguation
+How it decides:
 
-- Numeric token (likely page ID) + verb → match verb to leaf
-- Uppercase short token (likely space key) + read intent → `mk:confluence-search`
-- CQL syntax (`=`, `AND`, `OR`, `currentUser()`) → `mk:confluence-search`
-- 10+ items / `bulk` / `batch` / `mass` keyword → `mk:confluence-bulk`
-- Spec analysis intent (`requirements`, `acceptance criteria`, `analyze the spec`) → `mk:confluence-spec-analyst`
-- **Labels:** `mk:confluence-collaborate` owns label CRUD. Routing "label page X" → collaborate, NOT page.
-- **Comments / attachments / watchers:** always `mk:confluence-collaborate`, even if scoped to a single page.
-- Truly ambiguous → ask one clarifying question.
+- A skill name said outright routes at once.
+- A number plus a verb is a page ID, so the verb picks the leaf.
+- A short uppercase token with a read intent is a space key, so it goes to search. CQL syntax (`=`, `AND`, `OR`, `currentUser()`) also goes to search.
+- "bulk", "batch", "mass" or 10 or more items go to bulk.
+- "requirements", "acceptance criteria" or "analyze the spec" go to the spec analyst.
+- Labels, comments, attachments and watchers always go to collaborate, even on a single page.
+- If it is still unclear, the skill asks one question.
 
 ## Setup
 
-Install, authentication, the Cloud-only boundary, and troubleshooting live on [Confluence Integration](/guides/confluence-integration).
+Install, credentials, the Cloud-only limit and troubleshooting are on [Confluence Integration](/guides/confluence-integration). Setup is the one thing the hub does itself: `mewkit skill env confluence` installs `confluence-as` into `.meowkit/envs/confluence/` from `scripts/requirements.txt`, and the three `MEOW_CONFLUENCE_*` variables go in `.meowkit/.env`. `references/install-and-auth.md` walks through it and never echoes the token.
 
-Mechanically: the wrapper exits 3 on non-`*.atlassian.net` URLs, and the hub does NOT auto-fallback to the Atlassian MCP transport - the leaf is invoked with it explicitly.
+The wrapper exits 3 on a URL that is not `*.atlassian.net`. The hub does not fall back to the Atlassian MCP transport on its own.
 
-## Architecture
+## Shared resources
 
-The router recommends a leaf and never executes; each leaf runs `context: fork` against its matching agent in `.claude/agents/`.
+| File | Purpose |
+|---|---|
+| `scripts/confluence-as.sh` | Wrapper that maps `MEOW_CONFLUENCE_*` to `CONFLUENCE_*`, sets JSON output, refuses a settings.local.json fallback and blocks non-Cloud URLs |
+| `scripts/cql-sanitize.sh` | CQL injection guard for user-derived input |
+| `scripts/adf-to-md.sh`, `scripts/adf_to_md.py` | Macro-aware ADF to Markdown converter |
+| `scripts/requirements.txt` | Pip dependencies read by `mewkit skill env confluence` |
+| `scripts/smoke-live.sh` | Manual smoke test with live credentials |
+| `references/install-and-auth.md`, `cli-idioms.md`, `safety-framework.md` | Setup, invocation patterns, safety tiers |
 
-```
-mk:confluence (router, ≤80 lines)
-├── shared resources (used by all 5 leaves):
-│   ├── scripts/{confluence-as.sh, cql-sanitize.sh}
-│   ├── scripts/{adf-to-md.sh, adf_to_md.py}     macro-aware ADF→Markdown walker
-│   ├── scripts/requirements.txt                 pip deps installed by mewkit setup
-│   └── references/{install-and-auth, cli-idioms, safety-framework}.md
-└── 5 leaf skills
-    ├── confluence-page          single-page CRUD + hierarchy + version
-    ├── confluence-search        CQL search + space list + saved filters + export
-    ├── confluence-spec-analyst  deep spec analysis (read-only at Confluence side)
-    ├── confluence-bulk          bulk ops on 10+ pages with mandatory dry-run
-    └── confluence-collaborate   comments / attachments / labels / watchers
-```
+## Hand-offs
 
-## Handoff
-
-- `mk:planning-engine` accepts `--spec <report-path>` pointing at a `mk:confluence-spec-analyst` report; user runs spec-analyst FIRST, then passes the path.
-- `mk:intake` recognizes Confluence URLs (`*.atlassian.net/wiki/spaces/...`) and raw page IDs as a 5th source; fetches page content directly via the wrapper, recommends spec-analyst for deeper analysis.
-- No write-back from `mk:cook` — Confluence write paths are out of scope of the implementation pipeline.
+- `mk:planning-engine` accepts `--spec <report-path>` for a `mk:confluence-spec-analyst` report. Run the analyst first.
+- `mk:intake` takes a Confluence URL or page ID as a source and fetches the page through the wrapper. It does not start the spec analyst.
+- A spec analyst report pairs with `mk:jira-issue create` to turn stories into tickets. Review is manual.
+- `mk:cook` does not write back to Confluence.
 
 ## Gotchas
 
-- `mk:confluence` itself never executes; if you find yourself thinking about `confluence-as` commands inside this skill, you're in the wrong place — forward to a leaf.
-- Binary name is `confluence-as` (NOT `confluence` despite some upstream README docs). The wrapper handles this; leaves call the wrapper.
-- ADF round-trip is lossy on macros (panel / expand / mention / decision / task-list / media). For read-side macro preservation, `mk:confluence-spec-analyst` uses the macro-aware `adf-to-md.sh` walker.
+- The binary is `confluence-as`, not `confluence`. The wrapper handles it.
+- Converting ADF is lossy for macros (panel, expand, mention, decision, task list, media). The spec analyst uses the macro-aware converter to keep them on the read side.

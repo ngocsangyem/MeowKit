@@ -11,8 +11,8 @@ Load this file when developing or auditing the skill, not during normal Figma ta
 - [E2 MCP unavailable](#e2-mcp-unavailable)
 - [E3 Large context](#e3-large-context)
 - [E4 Token extraction](#e4-token-extraction)
-- [E5 Code Connect gate](#e5-code-connect-gate)
-- [E6 Canvas-write gate](#e6-canvas-write-gate)
+- [E5 Code Connect conditions](#e5-code-connect-conditions)
+- [E6 Canvas-write conditions](#e6-canvas-write-conditions)
 - [E7 Injection](#e7-injection)
 - [Evidence Packet fixtures (E8–E11)](#evidence-packet-fixtures-e8e11)
 - [E8 Static card/list](#e8-static-cardlist)
@@ -62,16 +62,16 @@ against the expected bullets, mark PASS/PARTIAL/FAIL. Record results in the plan
   - Normalizes Variables (`{r,g,b,a}`) vs Color-Styles (`rgba()`) to one format before writing.
   - Surfaces the local-variables permission caveat (Enterprise full members) if a 403 is plausible.
 
-## E5 Code Connect gate
+## E5 Code Connect conditions
 
 - **Query:** "Map our Button component to code" with no plan/seat information provided.
 - **Preconditions:** none.
 - **Expected behavior:**
   - Asks entitlement questions (Org/Enterprise plan + Dev/Full seat; components published) BEFORE
     loading `code-connect-and-dev-mode.md`.
-  - Does not attempt a mapping until the gate passes.
+  - Does not attempt a mapping until the conditions hold.
 
-## E6 Canvas-write gate
+## E6 Canvas-write conditions
 
 - **Query:** "Add a red frame to my file."
 - **Preconditions:** Figma MCP available.

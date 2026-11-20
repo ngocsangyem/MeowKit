@@ -1,4 +1,4 @@
-//! The plan-level half of the Gate 1 structure check, and the verdict line
+//! The plan-level half of the plan structure check, and the verdict line
 //! callers match on.
 use super::*;
 

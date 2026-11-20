@@ -14,7 +14,6 @@ phases:
     name: Orient
   - id: 1
     name: Plan
-    gate: gate_1
   - id: 3
     name: Build
     substeps:
@@ -26,11 +25,6 @@ phases:
   - id: 6
     name: Reflect
     leads: [retro, architect]
-gates:
-  - id: gate_1
-    required_output: "tasks/plans/*/plan.md"
-  - id: gate_2
-    required_output: "tasks/reviews/*-verdict.md"
 contract_substep:
   required_output: "tasks/contracts/*.md"
 sources:
@@ -135,22 +129,6 @@ fn a_singular_output_directory_is_the_realistic_typo() {
         found.iter().any(|entry| entry.contains("tasks/review/")),
         "{found:?}"
     );
-}
-
-#[test]
-fn an_output_glob_bound_to_the_wrong_gate_is_drift_unless_both_gates_are_named() {
-    let dir = project(&[(
-        "flow.md",
-        "Canonical source: workflow.yaml\n\nGate 1 needs tasks/reviews/x-verdict.md.\n",
-    )]);
-    let found = findings(dir.path(), "docs/flow.md", false);
-    assert_eq!(found.len(), 1, "{found:?}");
-
-    let summary = project(&[(
-        "flow.md",
-        "Canonical source: workflow.yaml\n\nGate 1 and Gate 2 own tasks/reviews/x-verdict.md between them.\n",
-    )]);
-    assert!(findings(summary.path(), "docs/flow.md", false).is_empty());
 }
 
 #[test]

@@ -1,6 +1,6 @@
-# Code Connect and Dev Mode (gated)
+# Code Connect and Dev Mode (conditional)
 
-> **Gate — load and run this workflow ONLY when ALL hold:**
+> **Load condition — load and run this workflow ONLY when ALL hold:**
 > 1. Explicit user intent to map Figma components to code (Code Connect / `.figma.js`).
 > 2. User confirms an Organization or Enterprise plan **and** a Dev or Full seat.
 > 3. Target components are published.

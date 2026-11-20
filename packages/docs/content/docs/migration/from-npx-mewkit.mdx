@@ -1,14 +1,11 @@
 ---
-title: "Moving from npx mewkit"
+title: "Moving from the npm CLI"
 description: "Move a project from the Node mewkit CLI (npx mewkit) to the native mewkit binary."
 ---
 
-> **The Node `mewkit` CLI is no longer maintained.** Its last published version is `mewkit@2.3.1`.
-> It still installs, but it gets no new fixes and no kit support. The native `mewkit` binary is the
-> only CLI now. Its short alias is `mk`.
+The Node `mewkit` CLI is no longer maintained. It gets no new fixes and no kit support. The native `mewkit` binary is the only CLI, and `mk` is its short alias.
 
-The project's kit does not change when you switch CLIs. `.claude/` and `.meowkit/` stay as they are,
-and `mewkit upgrade` moves them forward from there.
+The project's kit does not change when you switch CLIs. `.claude/` and `.meowkit/` stay as they are, and `mewkit upgrade` moves them forward from there.
 
 ## What changes
 
@@ -16,22 +13,22 @@ and `mewkit upgrade` moves them forward from there.
 |------------------|-----------------------|
 | `npx mewkit init` | `mewkit init` |
 | `npx mewkit <verb>` | `mewkit <verb>`, or `mk <verb>` |
-| Installed with `npm install -g mewkit` or as a project devDependency | Installed by `install.sh` (macOS, Linux) or `install.ps1` (Windows) |
+| `npm install -g mewkit` or a project devDependency | `install.sh` (macOS, Linux) or `install.ps1` (Windows) |
 | Node.js needed to run the CLI | Node.js needed only for the kit's hooks |
 | `npx mewkit upgrade` | `mewkit upgrade`; `mewkit self-update` updates the binary itself |
 
 ## Steps
 
-1. **Install the binary.** Follow [Installation](/installation#install-the-cli). Check that `mewkit --version` prints a version.
+1. Install the binary. Follow [Installation](/installation#install-the-cli), then check that `mewkit --version` prints a version.
 
-2. **Remove the npm package.** Run the command that matches how you installed it:
+2. Remove the npm package. Run the command that matches how you installed it:
 
    ```bash
    npm uninstall -g mewkit   # global install
    npm uninstall mewkit      # project devDependency, run in the project
    ```
 
-3. **Check each project.** From the project directory, run:
+3. Check each project. From the project directory, run:
 
    ```bash
    mewkit doctor
@@ -39,21 +36,19 @@ and `mewkit upgrade` moves them forward from there.
 
    `doctor` reports the toolchain, the installs in this project and their hooks. Fix anything it flags.
 
-4. **Update the commands you run.** Replace `npx mewkit` with `mewkit` (or `mk`) in your shell history,
-   `package.json` scripts, CI jobs and any team docs.
+4. Update the commands you run. Replace `npx mewkit` with `mewkit` (or `mk`) in your shell history, `package.json` scripts, CI jobs and team docs.
+
+5. Run `mewkit upgrade`. It moves the kit to the current release and removes the registrations and files of the hooks that 3.0.0 retired. If your `~/.meowkit/config.yaml` still has a `gate1PresenceOnly` line, `doctor` reports the file as invalid. Delete the line.
 
 ## What stays the same
 
-- **Your kit.** `.claude/`, `.meowkit/` and `.meowkit/config.yaml` keep working unchanged.
-- **Hooks.** Hooks look for `mewkit` on your PATH first. A project that still has the npm CLI in
-  `node_modules/.bin` keeps running it until you remove it.
-- **Memory and state.** `.meowkit/memory/`, plans and tasks are not touched by the switch.
+- Your kit. `.claude/`, `.meowkit/` and `.meowkit/config.yaml` keep working.
+- Hooks. They look for `mewkit` on your PATH first. A project that still has the npm CLI in `node_modules/.bin` keeps running that copy until you remove it.
+- Memory and state. `.meowkit/memory/` and your plans and tasks are not touched.
 
 ## Commands the binary does not have
 
-The binary covers the lifecycle verbs listed by `mewkit --help`. If a command you rely on is not
-in that list, it was not ported yet. Run it through `npx mewkit` for now; the npm package still works
-for every verb it had. Open an issue on the repository so the gap is tracked.
+The binary does not have `migrate`, `context`, `explain-support`, `status`, `visual-plan`, `plan approve` and `verdict-gate`. The [3.0.0 changelog](/changelog) lists what replaced them. For any other command, run `mewkit --help`.
 
 ## Next steps
 

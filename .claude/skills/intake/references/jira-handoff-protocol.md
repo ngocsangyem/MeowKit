@@ -46,7 +46,7 @@ jira-as not installed (or .meowkit/.env not populated). Apply these changes manu
 Or run `mewkit skill env jira` then populate .meowkit/.env from .meowkit/.env.example to enable the mk:jira-* family.
 ```
 
-## Safety Gate
+## Safety Check
 
 Medium and high-risk Jira operations require explicit user confirmation before execution,
 per `safety-framework.md`. These include:

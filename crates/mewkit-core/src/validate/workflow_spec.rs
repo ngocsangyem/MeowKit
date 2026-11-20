@@ -31,8 +31,6 @@ pub struct CanonicalSpec {
     pub name_by_id: Vec<(String, String)>,
     /// Integer phase ids an `applies_to:` list must fully enumerate.
     pub integer_phase_ids: Vec<i64>,
-    /// Gate id → its single required-output glob.
-    pub gate_output: Vec<(String, String)>,
     /// Canonical second path-segments under `tasks/`.
     pub output_dirs: BTreeSet<String>,
     /// Reflect-phase canonical leads.
@@ -54,13 +52,6 @@ impl CanonicalSpec {
             .iter()
             .find(|(_, value)| value == name)
             .map(|(id, _)| id.as_str())
-    }
-
-    pub fn gate(&self, id: &str) -> Option<&str> {
-        self.gate_output
-            .iter()
-            .find(|(key, _)| key == id)
-            .map(|(_, glob)| glob.as_str())
     }
 }
 

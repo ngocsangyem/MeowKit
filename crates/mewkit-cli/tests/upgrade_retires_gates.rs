@@ -1,4 +1,4 @@
-//! `upgrade` retires the plan gate on every runtime: the registration that
+//! `upgrade` retires the plan-approval hook on every runtime: the registration that
 //! reaches it and the file it reaches.
 //!
 //! The order matters more than either step. `prepare` emits the hook merge,

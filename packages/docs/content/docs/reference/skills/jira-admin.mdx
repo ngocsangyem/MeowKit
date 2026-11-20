@@ -1,6 +1,6 @@
 ---
 title: "mk:jira-admin"
-description: "JIRA project / user / group / scheme / automation administration. Requires admin. Highest blast radius."
+description: "Administers Jira projects, users, groups, permission and notification schemes and automation. It has the largest blast radius of the Jira skills."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -15,34 +15,22 @@ description: "JIRA project / user / group / scheme / automation administration. 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Forks the `jira-admin` agent to execute project / user / group / scheme / automation administration across 11 sub-domains (~65 verbs). Highest-blast-radius leaf in the family.
+mk:jira-admin forks the `jira-admin` agent ([agent page](/reference/agents/jira-admin)), which runs `jira-as admin` commands across 11 sub-domains (about 65 verbs). The skill is not enabled by default. It needs the Jira Admin role, and some verbs need Site Admin. Insufficient permission returns exit code 3.
 
-## When to Use
+## When to use it
 
-- **Triggers:** "create JIRA project", "list users", "delete user", "list permission schemes", "create group"
-- **NOT for:** per-issue ops ([`mk:jira-issue`](/reference/skills/jira-issue) / [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle)) · JSM admin ([`mk:jira-jsm`](/reference/skills/jira-jsm)).
+Use it for "create JIRA project", "list users", "delete user", "list permission schemes", "create group" or "enable automation rule X on PROJ".
 
-## Required Permissions
+| Need | Use instead |
+|---|---|
+| Per-issue operations | [`mk:jira-issue`](/reference/skills/jira-issue), [`mk:jira-lifecycle`](/reference/skills/jira-lifecycle) |
+| Service Management admin | [`mk:jira-jsm`](/reference/skills/jira-jsm) |
 
-Every verb requires Jira **Admin**. Some verbs require **Site Admin**. Insufficient permission → exit code 3.
+`mk:jira-fields` overlaps here: `fields create` needs admin. Most users run this skill once per project setup.
 
-## DESTRUCTIVE Operations (2-step token confirmation)
-
-For irreversible ops, the agent enforces:
-
-1. Show the user exactly what will be deleted
-2. Require the user to **type the literal target identifier** (e.g. project key `STAGING`)
-3. Only then re-invoke without `--dry-run`
-
-Irreversible ops:
-
-- `admin project delete` — IRREVERSIBLE; deletes all issues, attachments, history
-- `admin user delete` — IRREVERSIBLE (use `deactivate` instead when possible)
-- `admin group delete` (with members) — affects member access globally
-
-## Sub-Domains (11)
+## Sub-domains
 
 | Sub-domain | Common verbs |
 |---|---|
@@ -58,22 +46,14 @@ Irreversible ops:
 | `notification-scheme` | `list`, `get`, `create`, `update`, `delete`, `assign-to-project` |
 | `notification` | `list`, `add`, `remove` |
 
-## Recovery — Prefer Archive over Delete
+`jira-as admin <sub-domain> --help` is the authoritative flag list.
 
-For projects, the agent **always offers archive as the first choice** even when the user says "delete":
+## Destructive operations
 
-> "Delete is irreversible. Archive hides the project but preserves data. Most cleanup intents map to archive. Are you SURE you need delete?"
+These are irreversible or affect access globally: `admin project delete` (removes all issues, attachments and history), `admin user delete`, and `admin group delete` for a group with members. The agent shows what will be deleted and asks you to type the literal target (for example the project key `STAGING`) before it runs the command without `--dry-run`. It never runs them on its own.
 
-For users, **always offer deactivate** as the first choice — it disables the account but preserves attribution on existing issues.
+The agent offers archive first for projects and deactivate first for users, because those keep data and issue attribution.
 
-## Domain References
+## References
 
-- `references/voodoo-constants.md` — magic numbers (event IDs, scheme IDs, common custom field IDs) and how to discover yours
-
-## Peer Leaves
-
-`mk:jira-fields` (admin overlap; `fields create` requires admin) · `mk:jira-jsm` (JSM-specific admin lives there)
-
-## Agent
-
-[`jira-admin`](/reference/agents/jira-admin) — A + C, NOT B.
+`references/voodoo-constants.md` lists magic numbers (event IDs, scheme IDs, common custom field IDs) and how to discover yours. Shared setup, CLI idioms and the safety model are in `../jira/references/`.

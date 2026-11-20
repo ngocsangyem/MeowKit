@@ -1,6 +1,6 @@
 ---
 title: "mk:qa-manual"
-description: "Spec-driven manual QA testing and Playwright E2E code generation. Orchestrates browser skills to navigate apps like a human tester, producing structured test reports or production-ready .spec.ts files."
+description: "Runs manual test passes from a spec or URL and generates Playwright specs, always asking you for credentials."
 ---
 
 {/* GENERATED:reference-facts START */}
@@ -14,117 +14,46 @@ description: "Spec-driven manual QA testing and Playwright E2E code generation. 
 
 {/* GENERATED:reference-facts END */}
 
-## What This Skill Does
+## What it does
 
-Orchestrates browser skills (`mk:agent-browser`, `mk:playwright-cli`) to act like a human QA tester: navigate applications, interact with elements, verify outcomes, and produce structured reports. Supports two primary use cases: manual QA testing from a spec or URL (producing pass/fail reports), and E2E code generation (producing production-ready Playwright `.spec.ts` files with role-based locators). Always prompts the user for credentials -- never guesses or stores auth.
+Acts like a human tester by driving `mk:agent-browser` and `mk:playwright-cli`. It has two uses. From a spec or URL it runs a manual QA pass and writes a pass or fail report with evidence. It can also turn that pass into Playwright `.spec.ts` files. It runs in Phase 4 (Review) for reports and Phase 3 (Build) for generated tests.
 
-## When to Use
+## When not to use
 
-- "test this flow", "QA this page", "generate E2E tests", "test login flow", "manual testing", "write Playwright tests for"
-- Running a spec-driven QA pass from a plan file: `/mk:qa-manual tasks/plans/auth-flow.md --report`
-- Generating Playwright E2E tests: `/mk:qa-manual tasks/plans/checkout.md --generate`
-- Exploratory testing from a URL: `/mk:qa-manual https://app.example.com`
-- **NOT** for AI-autonomous flows -- use `mk:agent-browser`
-- **NOT** for automated fix-and-verify QA cycles -- use `mk:qa`
-
-## Core Capabilities
-
-- **Dynamic skill routing:** Each action uses the optimal browser skill (playwright-cli for DOM interaction, agent-browser for auth/screenshots)
-- **Role-based locators mandatory:** Uses `getByRole`, `getByLabel`, `getByText`, `getByTestId` -- never CSS selectors
-- **Authentication protocol:** Always prompts for credentials on auth encounter; supports login, MFA, cookie import
-- **Use Case A -- Manual QA Report:** Loads a spec, extracts test flows, navigates each, verifies outcomes, produces structured pass/fail report
-- **Use Case B -- E2E Code Generation:** Runs Use Case A first, records all interactions, generates `.spec.ts` with proper `common/` folder structure (selectors, assertions, intercepts)
-- **Test ID detection:** Auto-detects whether project uses `data-testid`, `data-cy`, or `data-test` conventions
-- **Selector verification:** Greps source to verify generated locators actually exist, falls back to `getByRole` if missing
-- **Production-ready output:** Structured folder layout with separate Selectors, Assertions, Intercepts, and Helpers files
-
-## Arguments
-
-| Argument | Effect |
-|----------|--------|
-| `SPEC-PATH` | Path to a plan/spec file in `tasks/plans/` |
-| `URL` | Direct URL to test (exploratory mode) |
-| `--report` | Produce a QA manual test report |
-| `--generate` | Generate Playwright `.spec.ts` E2E code |
-
-If no flag is provided, the skill auto-detects the use case from spec content.
-
-## Workflow
-
-### Use Case A -- Manual QA Report
-
-1. **Load spec** -- Read from `tasks/plans/` path, natural language description, or URL
-2. **Extract flows** -- Identify test flows with numbered steps and expected outcomes
-3. **For each flow:**
-   - Navigate to start URL via `mk:playwright-cli goto`
-   - Snapshot the page
-   - Execute each step using the routing table (playwright-cli for DOM interaction, agent-browser for screenshots)
-   - On auth encounter: STOP, prompt user for credentials, wait
-   - Compare actual result to expected outcome from spec
-   - Record PASS/FAIL/SKIPPED with evidence
-4. **Aggregate** -- Compile all flow results into structured QA Report template
-5. **Output** -- Complete report with flow results table, failed step details, skipped flows, and summary verdict
-
-### Use Case B -- E2E Code Generation
-
-1. **Run Use Case A** -- Execute full manual test pass
-2. **Record interactions** -- Capture Playwright TypeScript code from each playwright-cli action
-3. **Detect test ID convention** -- Check source for `data-testid` vs `data-cy` vs `data-test`
-4. **Generate feature folder:**
-   ```files
-   tests/e2e/{feature-name}/
-   ├── common/
-   │   ├── {featureName}Selectors.ts (all locators)
-   │   ├── {featureName}Assertions.ts (reusable assertions)
-   │   ├── {featureName}Intercepts.ts (API route mocks)
-   │   └── {featureName}Helpers.ts (shared setup, optional)
-   └── {feature-name}.spec.ts (one test.describe only)
-   ```
-5. **Verify selectors** -- Grep source for each `getByTestId('xxx')`; if missing, add warning + fallback
-6. **Validate** -- Run generated `.spec.ts` via `scripts/run-playwright.sh`
-
-### Authentication Protocol
-
-On encountering any login page, MFA prompt, or 401/403 response:
-1. **STOP** immediately -- do not guess or skip
-2. **Show user** the auth prompt with URL and request for credentials
-3. **WAIT** for user input (username/password, "skip", or "abort")
-4. On credentials received: fill form via playwright-cli, continue
-5. On "skip": mark flow as SKIPPED, move to next
-6. On "abort": end session, output partial report
-
-**Never** guesses credentials, uses hardcoded test credentials, proceeds past auth without input, or stores credentials in any file.
+For a fix-and-verify cycle that edits source use `mk:qa`. For autonomous AI-driven flows use `mk:agent-browser`.
 
 ## Usage
 
 ```bash
-/mk:qa-manual tasks/plans/260315-auth-flow.md --report     # Manual QA report from spec
-/mk:qa-manual tasks/plans/260315-checkout.md --generate    # Generate E2E tests from spec
-/mk:qa-manual https://app.example.com                       # Explore and test from URL
-/mk:qa-manual <spec-path>                                   # Auto-detect use case
+/mk:qa-manual tasks/plans/260315-auth-flow.md --report
+/mk:qa-manual tasks/plans/260315-checkout.md --generate
+/mk:qa-manual https://app.example.com
+/mk:qa-manual <spec>
 ```
 
-## Example Prompt
+`--report` writes a QA report and `--generate` writes Playwright code. With neither, the skill works out the use case from the spec.
 
-> "I need E2E tests for the new user registration flow. Here's the spec: tasks/plans/registration.md. /mk:qa-manual tasks/plans/registration.md --generate"
+| Action | Skill used |
+|---|---|
+| Click, fill, type, navigate | `mk:playwright-cli`, which also yields Playwright code |
+| Screenshots | `mk:agent-browser` |
+| Login, session, MFA | `mk:agent-browser` |
+| Run a generated test | `scripts/run-playwright.sh` (`npx playwright test`) |
 
-The skill loads the spec, extracts the registration flow (navigate to /signup, fill name/email/password, submit, verify welcome page), runs through it as a human tester via playwright-cli, records all interactions, detects the project uses `data-testid`, generates `registration.spec.ts` with proper selectors/assertions/intercepts files, verifies all locators exist in source, and validates the test passes.
+## Steps
 
-## Common Use Cases
+Use case A, manual QA: load the spec, extract the flows, walk each flow, check the outcomes and report. Use case B, code generation: run A, record the interactions and write the spec (`references/qa-process.md`, templates in `references/output-templates.md`).
 
-- **Spec-driven QA:** Read a plan file's acceptance criteria, test each one manually, produce pass/fail report with evidence
-- **Login flow testing:** Handle authentication flows with proper credential prompting (never hardcoded)
-- **Form validation testing:** Test empty states, invalid inputs, boundary conditions across all form fields
-- **E2E test bootstrapping:** Generate a full Playwright test suite from a spec, ready for CI integration
-- **Exploratory testing:** Navigate from a URL, discover interactive elements, test key user paths
+Generated tests go in `tests/e2e/{feature-name}/` with a `common/` folder holding `{featureName}Selectors.ts`, `{featureName}Assertions.ts` and `{featureName}Intercepts.ts`, and the spec in `tests/e2e/[flow-name].spec.ts`. The skill detects whether the project uses `data-testid`, `data-cy` or `data-test`, greps the source to confirm each locator exists, and falls back to `getByRole` with a warning comment when it does not. Locators are role-based (`getByRole`, `getByLabel`, `getByText`, `getByTestId`), never CSS selectors.
 
-## Pro Tips
+## Authentication
 
-- **Prepare credentials before running** -- the skill will stop and prompt, so have test credentials ready
-- **Use specs from `tasks/plans/`** for best results -- the skill parses acceptance criteria and numbered steps directly
-- **The routing table is automatic** -- you don't need to choose which browser skill to use; the orchestrator routes each action
-- **Generated E2E code follows a strict structure** -- one `test.describe` per file, all selectors in `common/`, arrange/act/assert pattern
-- **Check for existing test ID conventions** -- if the project uses `data-cy` (Cypress), the skill will configure Playwright's `testIdAttribute` accordingly
-- **For URL-only testing without a spec**, the skill auto-discovers flows by navigating and identifying interactive elements
+When the flow reaches a login page, MFA or a 401 or 403, the skill stops, shows the URL and asks you for credentials. You can also type `skip` to mark the flow SKIPPED or `abort` to end with a partial report. It never guesses credentials, uses hardcoded ones, continues without your input or stores them in a file.
 
-> **Canonical source:** `.claude/skills/qa-manual/SKILL.md`
+## Failures
+
+A page load timeout is retried twice and then reported. A missing element triggers a new snapshot and an alternate locator. A missing spec file prompts you for a path or URL. A failing Playwright run shows the error with a fix hint.
+
+## Gotchas
+
+Check that the deployed version matches what you expect before a run, because stale builds give misleading failures. Generated specs must read credentials from environment variables, never inline.
