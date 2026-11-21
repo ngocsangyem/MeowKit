@@ -121,7 +121,7 @@ If FAIL: fix failing items before registering.
 
 **Directory:** .claude/skills/{name}/
 **Files:** SKILL.md{, references/*.md}
-**Compliance:** {X}/7 — {PASS|FAIL}
+**Compliance:** {X}/8 — {PASS|FAIL}
 **Registered:** {yes|no — in SKILLS_ATTRIBUTION.md}
 
 ### Compliance Details
@@ -144,7 +144,7 @@ If FAIL: fix failing items before registering.
 
 ### Mandatory checklist before finalizing any skill
 
-- [ ] Description starts with "Use when..." (trigger condition)
+- [ ] Description states what the skill does in one sentence, with a `NOT for ...` clause when it sits in a confusion cluster; the trigger goes in `when_to_use`
 - [ ] Has `## Gotchas` section header (Rule 1 — placeholder acceptable day-1; grow over time)
 - [ ] SKILL.md is under 500 lines (Rule 3 — or decomposed via references/ / step files)
 - [ ] Steps are outcome-focused (no railroading)

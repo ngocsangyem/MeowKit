@@ -1,6 +1,6 @@
 # Mode Selection
 
-Ask the user at start of fixing workflow.
+Without a mode flag the default is standard (see `SKILL.md` Step 0). Ask the user only when the right mode is unclear, using the format below.
 
 ## User Question Format
 

@@ -70,7 +70,7 @@ Concrete cost depends on the inner harness, model tier, and target surface; trea
 
 ## TDD mode (`--tdd` flag)
 
-When `--tdd` is detected in the invocation, the cook skill MUST write `on` to `.meowkit/state/tdd-mode` via a Bash tool call BEFORE any other workflow step:
+When `--tdd` is in the prompt, the `tdd-flag-detector` hook (UserPromptSubmit) writes `on` to `.meowkit/state/tdd-mode`. On a host where that hook does not run, or if the sentinel is still absent, the cook skill MUST write it itself via a Bash tool call BEFORE any other workflow step:
 
 ```bash
 mkdir -p .meowkit/state && echo on > .meowkit/state/tdd-mode

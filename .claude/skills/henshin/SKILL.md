@@ -1,6 +1,6 @@
 ---
 name: mk:henshin
-description: "Turns existing code into a CLI, MCP server and companion skill."
+description: "Plans how existing code becomes a CLI, MCP server or companion skill; builds nothing. NOT for mk:cook."
 argument-hint: '[feature-or-module] [--both|--mcp|--cli] [--auto|--ask] [--lean]'
 phase: on-demand
 trust_level: kit-authored

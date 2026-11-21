@@ -113,7 +113,7 @@ next owner but must not implement a fix.
 ## Hooks
 
 - **Iron Law enforcement**: No fixes without confirmed root cause; `mk:fix` is the only remediation owner.
-- **Report-path hook**: the `PreToolUse:Write` hook fails closed unless the destination is under `tasks/reports/**`.
+- **Report-path rule**: writes stay under `tasks/reports/**` by the skill's own discipline; no `PreToolUse:Write` hook enforces it.
 - If root cause cannot be confirmed after 3 hypotheses, escalate to human
 - **Interaction with mk:careful**: If mk:careful is active, debugging commands that touch state will still prompt for confirmation. This is expected — do not bypass.
 

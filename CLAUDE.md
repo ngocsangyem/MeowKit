@@ -94,7 +94,7 @@ Key docs to maintain:
 
 - `docs/project-context.md` — agent constitution: tech stack, conventions, anti-patterns (loaded by ALL agents)
 - `docs/project-overview.md` — what this project is
-- `docs/system-architecture.md` — how it's structured
+- `docs/architecture/system-architecture.md` — how it's structured
 - `docs/code-standards.md` — conventions and patterns
 - `docs/deployment-guide.md` — how to ship
 
