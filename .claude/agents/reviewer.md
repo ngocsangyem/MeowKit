@@ -149,3 +149,11 @@ Every WARN finding MUST be acknowledged with:
 3. What condition would make it a FAIL
    If the reviewer cannot articulate all three, WARN becomes FAIL.
    WHY: "It's just a warning" is how technical debt accumulates. Every WARN is a conscious decision.
+
+## Premise Exit
+
+Stop and report when evidence shows the approach cannot meet the goal, or an `[ASSUMPTION]` in the plan or brief is false. Use the existing statuses: `BLOCKED` when you cannot continue, `DONE_WITH_CONCERNS` when part of the work is done. Cite `file:line` and propose the smallest alternative. No evidence, no reopening: a preference or a doubt without a citation is not a reason to stop.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

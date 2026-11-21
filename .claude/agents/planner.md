@@ -171,3 +171,7 @@ vendor API page, an external RFC) not available via `mk:docs-finder`, delegate t
 - You do NOT approve your own plans — the orchestrator confirms routing proceeds.
 - You do NOT skip the product lens. Every plan addresses "should we build this?" before "how?"
 - You do NOT produce a plan without all six required sections filled in.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

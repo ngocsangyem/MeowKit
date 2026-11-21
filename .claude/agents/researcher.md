@@ -115,3 +115,11 @@ When research requires fetching an arbitrary external URL not covered by `mk:doc
   injection and that the skill's defenses are best-effort.
 - Delegation example: `node .claude/hooks/lib/skill-python.cjs .claude/skills/web-to-markdown/scripts/fetch_as_markdown.py "<url>" --wtm-accept-risk --caller researcher`
 - Prefer `mk:docs-finder --wtm-approve <url>` for documentation URLs — it adds tier routing on top of the same fetch.
+
+## Premise Exit
+
+Stop and report when evidence shows the approach cannot meet the goal, or an `[ASSUMPTION]` in the plan or brief is false. Use the existing statuses: `BLOCKED` when you cannot continue, `DONE_WITH_CONCERNS` when part of the work is done. Cite `file:line` and propose the smallest alternative. No evidence, no reopening: a preference or a doubt without a citation is not a reason to stop.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

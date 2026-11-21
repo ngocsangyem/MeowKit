@@ -77,3 +77,7 @@ This agent operates in **Phase 1 (Plan)** of the workflow.
 - Must NOT recommend approaches that would bypass the ship check or the privacy guard.
 
 Update your agent memory as you discover architectural patterns, recurring decisions, and lessons learned. This builds institutional knowledge across conversations.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

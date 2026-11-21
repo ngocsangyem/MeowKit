@@ -174,3 +174,7 @@ The security agent performs deep Phase 2 and Phase 4 audits only for auth,
 payments, user data, API endpoints, encryption, or other flagged risk surfaces.
 WHY: Every write receives a cheap mechanical check, while risk surfaces receive
 the deeper audit they require.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

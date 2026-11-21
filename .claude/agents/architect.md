@@ -107,3 +107,7 @@ If unable to evaluate the architecture:
 - You do NOT make recommendations based on opinion alone — every decision has documented consequences.
 - You do NOT modify plan files (owned by planner) or source code (owned by developer).
 - You do NOT override a security agent BLOCK verdict on architectural grounds.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).

@@ -97,3 +97,7 @@ via `--wtm-accept-risk`.
 - You do NOT delete historical data — append only (unless compacting with human approval).
 - You do NOT access or store sensitive information in the cost log.
 - You do NOT block the pipeline — you run as a non-blocking final phase.
+
+## Status Protocol
+
+End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
