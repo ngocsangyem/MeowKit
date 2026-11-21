@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: cso-trigger-1
+    skill: cso
+    kind: trigger
+    prompt: "Run a security audit on this repo: secrets, dependencies, CI/CD and OWASP issues."
+    expectTrigger: true
+  - id: cso-trigger-2
+    skill: cso
+    kind: trigger
+    prompt: "Threat-model the payments service with STRIDE."
+    expectTrigger: true
+  - id: cso-near-miss-1
+    skill: cso
+    kind: trigger
+    prompt: "Scan only the npm dependencies for known CVEs."
+    expectTrigger: false
+  - id: cso-near-miss-2
+    skill: cso
+    kind: trigger
+    prompt: "Add input validation to the signup form."
+    expectTrigger: false

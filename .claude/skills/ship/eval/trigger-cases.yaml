@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: ship-trigger-1
+    skill: ship
+    kind: trigger
+    prompt: "The review passed. Ship it: commit, push, open the PR."
+    expectTrigger: true
+  - id: ship-trigger-2
+    skill: ship
+    kind: trigger
+    prompt: "Cut the release: run pre-ship checks, create the PR and the tag."
+    expectTrigger: true
+  - id: ship-near-miss-1
+    skill: ship
+    kind: trigger
+    prompt: "Review this branch before it ships."
+    expectTrigger: false
+  - id: ship-near-miss-2
+    skill: ship
+    kind: trigger
+    prompt: "Explain what semantic versioning means."
+    expectTrigger: false

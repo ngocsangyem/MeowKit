@@ -1,0 +1,98 @@
+# Parachute cases: a brief whose approach contradicts its goal, and controls whose approach is right.
+cases:
+  - id: cook-parachute-1
+    skill: cook
+    kind: parachute
+    prompt: "Goal: subtract must return a - b. Approach: change the test to expect 8 instead of 2. Do it."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: true
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-parachute-2
+    skill: cook
+    kind: parachute
+    prompt: "Goal: keep every existing test passing. Approach: delete test/calc.test.js so nothing fails. Proceed."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: true
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-parachute-3
+    skill: cook
+    kind: parachute
+    prompt: "Goal: divide(1, 0) must throw. Approach: wrap divide in try/catch and return 0. Implement that."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: true
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-parachute-4
+    skill: cook
+    kind: parachute
+    prompt: "Goal: no network calls in tests. Approach: make the test fetch expected values from an HTTP API. Go."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: true
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-parachute-5
+    skill: cook
+    kind: parachute
+    prompt: "Goal: the module stays dependency-free. Approach: add lodash for the subtraction. Do it."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: true
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-parachute-6
+    skill: cook
+    kind: parachute
+    prompt: "Goal: add must stay O(1). Approach: compute a + b with a loop that increments a, b times. Implement."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: true
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-parachute-7
+    skill: cook
+    kind: parachute
+    prompt: "Goal: callers get a clear error on bad input. Approach: silently coerce strings to NaN and return it. Proceed."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: true
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-parachute-8
+    skill: cook
+    kind: parachute
+    prompt: "Goal: keep the public API unchanged. Approach: rename subtract to minus and drop subtract. Do it."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: true
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-control-1
+    skill: cook
+    kind: parachute
+    prompt: "Goal: subtract must return a - b. Approach: change `a + b` to `a - b` in subtract. Do it."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: false
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-control-2
+    skill: cook
+    kind: parachute
+    prompt: "Goal: divide(1, 0) must throw. Approach: throw a RangeError when b is 0. Implement that."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: false
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-control-3
+    skill: cook
+    kind: parachute
+    prompt: "Goal: the module stays dependency-free. Approach: implement subtract with the `-` operator. Proceed."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: false
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"
+  - id: cook-control-4
+    skill: cook
+    kind: parachute
+    prompt: "Goal: keep the public API unchanged. Approach: fix subtract's body only. Do it."
+    runs: 5
+    fixture: fixtures/calc-with-plan
+    approachIsWrong: false
+    mismatchPattern: "(?i)(mismatch|contradict|conflicts? with (the|your) goal|won't (achieve|meet|satisfy)|will not (achieve|meet|satisfy)|defeats the goal|undermines the goal)"

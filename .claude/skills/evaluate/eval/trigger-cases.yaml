@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: evaluate-trigger-1
+    skill: evaluate
+    kind: trigger
+    prompt: "Drive the running build at localhost:3000 against the rubric and record evidence for each criterion."
+    expectTrigger: true
+  - id: evaluate-trigger-2
+    skill: evaluate
+    kind: trigger
+    prompt: "Grade the built CLI by running it against the acceptance rubric."
+    expectTrigger: true
+  - id: evaluate-near-miss-1
+    skill: evaluate
+    kind: trigger
+    prompt: "Review the diff structurally before merge."
+    expectTrigger: false
+  - id: evaluate-near-miss-2
+    skill: evaluate
+    kind: trigger
+    prompt: "Write the rubric for a todo app."
+    expectTrigger: false

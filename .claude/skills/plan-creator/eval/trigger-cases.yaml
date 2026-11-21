@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: plan-creator-trigger-1
+    skill: plan-creator
+    kind: trigger
+    prompt: "Write an implementation plan with phases for adding SSO login before we build anything."
+    expectTrigger: true
+  - id: plan-creator-trigger-2
+    skill: plan-creator
+    kind: trigger
+    prompt: "Before coding, plan the migration of our job queue from cron to a worker pool."
+    expectTrigger: true
+  - id: plan-creator-near-miss-1
+    skill: plan-creator
+    kind: trigger
+    prompt: "Fix the off-by-one error in src/pager.js."
+    expectTrigger: false
+  - id: plan-creator-near-miss-2
+    skill: plan-creator
+    kind: trigger
+    prompt: "Score the complexity of ticket PROJ-88 against the codebase."
+    expectTrigger: false

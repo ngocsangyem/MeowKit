@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: vue-trigger-1
+    skill: vue
+    kind: trigger
+    prompt: "Write a Vue 3 component with the Composition API and a Pinia store for the cart."
+    expectTrigger: true
+  - id: vue-trigger-2
+    skill: vue
+    kind: trigger
+    prompt: "Add a route and a form with validation to our Vue 3 app."
+    expectTrigger: true
+  - id: vue-near-miss-1
+    skill: vue
+    kind: trigger
+    prompt: "Review this Vue component for performance and best practices."
+    expectTrigger: false
+  - id: vue-near-miss-2
+    skill: vue
+    kind: trigger
+    prompt: "Write a React hook that debounces input."
+    expectTrigger: false

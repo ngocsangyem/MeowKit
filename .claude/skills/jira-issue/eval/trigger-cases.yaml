@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: jira-issue-trigger-1
+    skill: jira-issue
+    kind: trigger
+    prompt: "Create a Jira bug in project WEB titled 'Checkout button unresponsive on Safari'."
+    expectTrigger: true
+  - id: jira-issue-trigger-2
+    skill: jira-issue
+    kind: trigger
+    prompt: "Update the description of Jira issue WEB-311 and set its priority to High."
+    expectTrigger: true
+  - id: jira-issue-near-miss-1
+    skill: jira-issue
+    kind: trigger
+    prompt: "Transition 40 Jira issues in the sprint to Done in one sweep."
+    expectTrigger: false
+  - id: jira-issue-near-miss-2
+    skill: jira-issue
+    kind: trigger
+    prompt: "Search Jira for all open bugs assigned to me with JQL."
+    expectTrigger: false

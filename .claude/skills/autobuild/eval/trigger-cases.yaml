@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: autobuild-trigger-1
+    skill: autobuild
+    kind: trigger
+    prompt: "Build a complete kanban web app from this product spec, unattended, across sprints."
+    expectTrigger: true
+  - id: autobuild-trigger-2
+    skill: autobuild
+    kind: trigger
+    prompt: "Here is a full SaaS spec. Build the whole product from scratch without stopping."
+    expectTrigger: true
+  - id: autobuild-near-miss-1
+    skill: autobuild
+    kind: trigger
+    prompt: "Add one field to the existing user settings form."
+    expectTrigger: false
+  - id: autobuild-near-miss-2
+    skill: autobuild
+    kind: trigger
+    prompt: "Fix the broken import in src/index.ts."
+    expectTrigger: false

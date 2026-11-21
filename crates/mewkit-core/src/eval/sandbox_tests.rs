@@ -123,3 +123,25 @@ fn remove_skill_deletes_every_installed_copy_and_nothing_else() {
         assert!(root.path().join(kept).exists(), "{kept}");
     }
 }
+
+#[test]
+fn dir_workspace_matches_star_segments_and_reads_contents() {
+    use crate::fsx::RelPath;
+    let root = tempfile::tempdir().expect("tmp");
+    for (p, c) in [
+        ("tasks/plans/261122-flag/plan.md", "# Plan"),
+        ("tasks/plans/261122-flag/phase-01-x.md", "- [x] done"),
+        ("tasks/reports/debug-report.md", "root cause"),
+    ] {
+        let path = root.path().join(p);
+        fs::create_dir_all(path.parent().expect("parent")).expect("mkdir");
+        fs::write(path, c).expect("write");
+    }
+    let ws = DirWorkspace(root.path().to_path_buf());
+    let read = |p: &str| ws.read_matching(&RelPath::new(p).expect("rel"));
+    assert_eq!(read("tasks/plans/*/plan.md"), ["# Plan"]);
+    assert_eq!(read("tasks/plans/*/phase-*.md"), ["- [x] done"]);
+    assert_eq!(read("tasks/reports/*"), ["root cause"]);
+    assert!(read("tasks/plans/*/missing.md").is_empty());
+    assert!(read("tasks/*").is_empty(), "folders are not files");
+}

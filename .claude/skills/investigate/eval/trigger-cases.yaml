@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: investigate-trigger-1
+    skill: investigate
+    kind: trigger
+    prompt: "Why does the export job hang at 99%? Find the root cause and write a diagnostic report; don't edit code."
+    expectTrigger: true
+  - id: investigate-trigger-2
+    skill: investigate
+    kind: trigger
+    prompt: "Investigate why memory grows steadily in the worker process."
+    expectTrigger: true
+  - id: investigate-near-miss-1
+    skill: investigate
+    kind: trigger
+    prompt: "Fix the failing test in test/parser.test.js."
+    expectTrigger: false
+  - id: investigate-near-miss-2
+    skill: investigate
+    kind: trigger
+    prompt: "Add a dark-mode toggle to the settings page."
+    expectTrigger: false

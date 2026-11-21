@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: scale-routing-trigger-1
+    skill: scale-routing
+    kind: trigger
+    prompt: "Which complexity tier does a task like 'add payments with Stripe' map to?"
+    expectTrigger: true
+  - id: scale-routing-trigger-2
+    skill: scale-routing
+    kind: trigger
+    prompt: "Map these task keywords to a complexity tier: auth, migration, typo."
+    expectTrigger: true
+  - id: scale-routing-near-miss-1
+    skill: scale-routing
+    kind: trigger
+    prompt: "Route this task to the right agent and declare the tier at orient time."
+    expectTrigger: false
+  - id: scale-routing-near-miss-2
+    skill: scale-routing
+    kind: trigger
+    prompt: "Scale the Kubernetes deployment to 5 replicas."
+    expectTrigger: false

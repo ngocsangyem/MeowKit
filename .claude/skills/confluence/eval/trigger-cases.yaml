@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: confluence-trigger-1
+    skill: confluence
+    kind: trigger
+    prompt: "Do something with our Confluence space ENG; I'm not sure yet which page operation."
+    expectTrigger: true
+  - id: confluence-trigger-2
+    skill: confluence
+    kind: trigger
+    prompt: "Help with Confluence: find, edit or comment on pages as needed."
+    expectTrigger: true
+  - id: confluence-near-miss-1
+    skill: confluence
+    kind: trigger
+    prompt: "Create a Jira ticket for the outage."
+    expectTrigger: false
+  - id: confluence-near-miss-2
+    skill: confluence
+    kind: trigger
+    prompt: "Write a README for this repo."
+    expectTrigger: false

@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: agent-detector-trigger-1
+    skill: agent-detector
+    kind: trigger
+    prompt: "Starting a new task: classify it, pick the complexity tier and the agent that should own it: add OAuth login."
+    expectTrigger: true
+  - id: agent-detector-trigger-2
+    skill: agent-detector
+    kind: trigger
+    prompt: "Orient on this task and decide which agent and model tier handle it: migrate the DB schema."
+    expectTrigger: true
+  - id: agent-detector-near-miss-1
+    skill: agent-detector
+    kind: trigger
+    prompt: "What is 17 times 23?"
+    expectTrigger: false
+  - id: agent-detector-near-miss-2
+    skill: agent-detector
+    kind: trigger
+    prompt: "Format this JSON for me: {\"a\":1}."
+    expectTrigger: false

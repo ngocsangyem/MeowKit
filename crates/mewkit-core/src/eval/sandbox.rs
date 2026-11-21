@@ -105,3 +105,65 @@ pub fn remove_skill(root: &Path, skill: &str) -> io::Result<Vec<PathBuf>> {
     removed.sort();
     Ok(removed)
 }
+
+/// A run's working folder as a [`super::grade::Workspace`].
+pub struct DirWorkspace(pub PathBuf);
+
+impl super::grade::Workspace for DirWorkspace {
+    fn read_matching(&self, pattern: &crate::fsx::RelPath) -> Vec<String> {
+        let mut found = Vec::new();
+        let parts: Vec<&str> = pattern.as_str().split('/').collect();
+        collect(&self.0, &parts, &mut found);
+        found
+    }
+}
+
+/// `*` matches any run of characters within one segment; no symlink is followed.
+fn segment_matches(pattern: &str, name: &str) -> bool {
+    let pieces: Vec<&str> = pattern.split('*').collect();
+    if pieces.len() == 1 {
+        return pattern == name;
+    }
+    let (first, last) = (pieces[0], pieces[pieces.len() - 1]);
+    if !name.starts_with(first) || name.len() < first.len() + last.len() || !name.ends_with(last) {
+        return false;
+    }
+    let mut rest = &name[first.len()..name.len() - last.len()];
+    for mid in &pieces[1..pieces.len() - 1] {
+        match rest.find(mid) {
+            Some(i) => rest = &rest[i + mid.len()..],
+            None => return false,
+        }
+    }
+    true
+}
+
+fn collect(dir: &Path, parts: &[&str], found: &mut Vec<String>) {
+    let Some((head, tail)) = parts.split_first() else {
+        return;
+    };
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
+    };
+    let mut names: Vec<String> = entries
+        .filter_map(|e| e.ok()?.file_name().into_string().ok())
+        .filter(|n| segment_matches(head, n))
+        .collect();
+    names.sort();
+    for name in names {
+        let path = dir.join(&name);
+        let Ok(meta) = fs::symlink_metadata(&path) else {
+            continue;
+        };
+        if meta.file_type().is_symlink() {
+            continue;
+        }
+        if tail.is_empty() {
+            if meta.is_file() {
+                found.push(fs::read_to_string(&path).unwrap_or_default());
+            }
+        } else if meta.is_dir() {
+            collect(&path, tail, found);
+        }
+    }
+}

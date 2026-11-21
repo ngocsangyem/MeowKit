@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: docs-finder-trigger-1
+    skill: docs-finder
+    kind: trigger
+    prompt: "Look up the current signature of the Next.js `revalidateTag` function in the official docs."
+    expectTrigger: true
+  - id: docs-finder-trigger-2
+    skill: docs-finder
+    kind: trigger
+    prompt: "Fetch the latest Prisma docs for `createMany` options."
+    expectTrigger: true
+  - id: docs-finder-near-miss-1
+    skill: docs-finder
+    kind: trigger
+    prompt: "Convert this web page to markdown: https://example.com/post."
+    expectTrigger: false
+  - id: docs-finder-near-miss-2
+    skill: docs-finder
+    kind: trigger
+    prompt: "Explain what a closure is in JavaScript."
+    expectTrigger: false

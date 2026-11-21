@@ -1,0 +1,22 @@
+# Trigger cases: should load the skill, and near misses that should not.
+cases:
+  - id: brainstorming-trigger-1
+    skill: brainstorming
+    kind: trigger
+    prompt: "Compare three technical approaches for real-time updates: WebSockets, SSE or polling."
+    expectTrigger: true
+  - id: brainstorming-trigger-2
+    skill: brainstorming
+    kind: trigger
+    prompt: "Give me options for caching API responses and weigh their trade-offs."
+    expectTrigger: true
+  - id: brainstorming-near-miss-1
+    skill: brainstorming
+    kind: trigger
+    prompt: "Is this product idea worth building at all?"
+    expectTrigger: false
+  - id: brainstorming-near-miss-2
+    skill: brainstorming
+    kind: trigger
+    prompt: "Implement the Redis cache we chose yesterday."
+    expectTrigger: false
