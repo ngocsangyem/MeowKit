@@ -115,10 +115,11 @@ Each phase file MUST have these 12 sections (after the frontmatter block):
 2. **Overview** — priority, status, effort, description
 3. **Key Insights** — findings from research (cite source: `from: research/researcher-01-report.md`)
    - Traceability rule: `from:` applies to Key Insights, Risks, Requirements, and Constraints. Valid values: a path (intake packet / research report / scout output / external artifact) or the tag `[ASSUMPTION]`.
+   - An `[ASSUMPTION]` left unresolved records `Breaks if:` (the sign it is false) and `Then:` (the response).
 4. **Requirements** — functional + non-functional
 5. **Architecture** — design, data flow, component interaction
 6. **Related Code Files** — files to create, modify, read
-7. **Implementation Steps** — numbered, specific, file-referenced
+7. **Implementation Steps** — numbered, at contract level (behaviour, boundaries, invariants); add file-level detail only at `FULL` density (see `references/phase-template.md` Rules)
 8. **Todo List** — checkboxes for tracking
 9. **Success Criteria** — binary pass/fail checks
 10. **Risk Assessment** — table: risk, likelihood, impact, mitigation
@@ -166,8 +167,8 @@ Skip entirely when no packet path is present.
 - **Vertical feature slice** → own phase (one end-to-end path: its DB + API + UI together), NOT one phase per layer.
 - **Testing** → own phase only if substantial test work remains beyond each slice's own tests.
 - **Documentation** → own phase (if docs impact = major).
-- **Min 2 phases** in hard mode.
 - **Max 7 phases** (beyond that, decompose the task).
+- **Merge test:** merge two phases when neither can ship alone: neither leaves the system runnable or demoable without the other. One phase is a valid plan.
 
 **`--parallel` precedence:** when `planning_mode = parallel`, file-ownership grouping governs decomposition — a vertical slice spans DB + API + UI and overlaps other slices' files, which fights zero-overlap parallelism. Vertical-slice guidance applies to the DEFAULT / sequential decomposition; ownership-based grouping wins in parallel mode.
 
