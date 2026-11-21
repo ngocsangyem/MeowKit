@@ -96,10 +96,10 @@
 				"control-probe": {
 					"type": "boolean"
 				},
-				"jira-env-loader": {
+				"delegation-brief-check": {
 					"type": "boolean"
 				},
-				"delegation-brief-check": {
+				"jira-env-loader": {
 					"type": "boolean"
 				},
 				"learning-observer": {
