@@ -4,7 +4,10 @@
 //! ownership index → commit. Mutation paths, dry-run output and the backup set
 //! are all derived from the same decisions, so they cannot drift apart.
 mod decide;
+mod hook_record;
 mod interrupted;
+
+pub use hook_record::hook_sections;
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};

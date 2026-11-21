@@ -15,7 +15,7 @@ use super::{
     run_jobs, stamp,
 };
 use crate::failure::Failure;
-use crate::kit_args::{KitArgs, installed_kit};
+use crate::kit_args::{KitArgs, installed_kit_or_fetch};
 use crate::output;
 use crate::place::Place;
 
@@ -74,7 +74,7 @@ pub fn run(args: &UninstallArgs) -> Result<u8, Failure> {
         let e = emitter_for(runtime)?;
         let mut index = place.index(runtime)?.expect("listed as installed");
         let cached = if named.is_none() {
-            installed_kit(&place, &index)
+            installed_kit_or_fetch(&place, &index, args.kit.may_fetch())
         } else {
             None
         };
@@ -109,6 +109,7 @@ pub fn run(args: &UninstallArgs) -> Result<u8, Failure> {
         &leaving,
         &staying,
         named.as_ref(),
+        args.kit.may_fetch(),
     )?);
     let outcomes = run_jobs(
         &place,
@@ -197,6 +198,7 @@ fn rewrite_for_those_staying(
     leaving: &[Runtime],
     staying: &[(Runtime, OwnershipIndex)],
     named: Option<&Kit>,
+    may_fetch: bool,
 ) -> Result<Vec<Job>, Failure> {
     let mut jobs = Vec::new();
     let installed: Vec<Runtime> = staying.iter().map(|(r, _)| *r).collect();
@@ -205,7 +207,7 @@ fn rewrite_for_those_staying(
         let e = emitter_for(*runtime)?;
         let mut index = index.clone();
         let packs = index.packs.clone();
-        let cached = installed_kit(place, &index);
+        let cached = installed_kit_or_fetch(place, &index, may_fetch);
         let Some(kit) = named.or(cached.as_ref()) else {
             eprintln!(
                 "note: {0} depends on a runtime that is leaving; kit {1} is not available, so its files stay as they are. `mewkit upgrade --target {0}` writes them for the set that remains",

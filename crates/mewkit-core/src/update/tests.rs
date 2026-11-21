@@ -366,3 +366,27 @@ fn a_running_version_below_min_supported_is_withdrawn() {
     .unwrap();
     assert!(offer.withdrawn);
 }
+
+#[test]
+fn the_notice_names_a_newer_stable_binary_and_nothing_else() {
+    let rows = listing(&[
+        Release {
+            tag: "mewkit-v0.1.1".into(),
+            prerelease: false,
+        },
+        Release {
+            tag: "mewkit-v0.2.0-beta.1".into(),
+            prerelease: true,
+        },
+        Release {
+            tag: "v9.0.0".into(),
+            prerelease: false,
+        },
+    ]);
+    let http = Fake(HashMap::from([(RELEASES_URL.to_owned(), rows)]));
+    assert_eq!(newer_stable(&http, "0.1.0").as_deref(), Some("0.1.1"));
+    assert_eq!(newer_stable(&http, "0.1.1"), None, "the same version");
+    assert_eq!(newer_stable(&http, "0.2.0"), None, "a newer build");
+    // No listing (offline, rate-limited): no notice and no error.
+    assert_eq!(newer_stable(&Fake(HashMap::new()), "0.1.0"), None);
+}

@@ -58,4 +58,7 @@ pub const KIT_DIR_GITIGNORE: &str = "*
 !bin/mewkit
 !memory/
 !memory/*.md
+!state/
+!state/ownership/
+!state/ownership/*.json
 ";

@@ -37,6 +37,14 @@ For Claude Code at project scope, `init` also writes the committed launcher `.me
 
 If the retired npm `mewkit` CLI installed a runtime in this project, `init --target <runtime>` adopts it. The npm CLI's install record becomes the starting ownership index and kit files are refreshed. Files the kit no longer ships are removed when they still match what the record says was installed, and files you edited are kept. Adoption works at project scope only, and only when you ask for it with `init`. `upgrade` never adopts: on a runtime with an npm install record and no ownership index, it names the `init` command to run. [Moving from the npm CLI](/migration/from-npx-mewkit) walks through it.
 
+### An install whose record is gone
+
+The ownership index in `.meowkit/state/ownership/` records which files the kit wrote. The kit's `.meowkit/.gitignore` leaves that folder out of the ignore list, so commit it: a clone then knows what the kit installed. Kit 3.0.0 and earlier ignored it, so a clone of a project installed from one of them has the kit's files and no record.
+
+`init` handles that case from the kit release the files came from. A Claude Code install names its release in `.claude/kit-contract.json`; for any other runtime, name it with `--adopt-from <tag>`. A file that still holds what that release installed is taken as the kit's, so `init` updates it or removes it when the new kit dropped it. A file that differs is yours and is kept. Hook registrations that release added are recorded too, so one that points at a removed script is taken out.
+
+When `init` finds 20 or more kit paths holding other contents and cannot get the release to compare them with, it writes nothing and says so. Run it again with `--adopt-from <tag>`, or with `--force` to replace the files, each one backed up first. A release before 3.0.0 also needs `--allow-unverified-kit`.
+
 ## upgrade
 
 ```bash
@@ -46,7 +54,7 @@ mewkit upgrade --check
 mewkit upgrade --list
 ```
 
-`upgrade` moves the runtimes installed here to the newest kit, with the packs they were installed with. It takes the same kit-source flags as `init`. A file you edited after the kit wrote it is kept and named, and the command exits 6; `--force` replaces it. `--check` compares each installed runtime with the newest release (`--beta` for the prerelease channel) and `--list` shows the recent releases. Neither changes anything, and with `--offline` both read the kits in the cache instead of GitHub. `--no-cleanup` is accepted for scripts written for the npm CLI and does nothing, because a downloaded kit always stays in the cache.
+`upgrade` moves the runtimes installed here to the newest kit, with the packs they were installed with. It takes the same kit-source flags as `init`. A file you edited after the kit wrote it is kept and named, and the command exits 6; `--force` replaces it. `--check` compares each installed runtime with the newest release (`--beta` for the prerelease channel) and `--list` shows the recent releases. Neither changes anything, and with `--offline` both read the kits in the cache instead of GitHub. `upgrade` removes a file the new kit dropped only when it still holds what the installed kit wrote there, so it needs that kit. It reads it from the cache, and downloads the release again when the cache has lost it (a clone, another machine). With `--offline`, `--kit-archive` or an install that did not come from a published release, it downloads nothing, keeps the dropped files and says so. `--no-cleanup` is accepted for scripts written for the npm CLI and does nothing, because a downloaded kit always stays in the cache.
 
 ## uninstall
 
@@ -169,4 +177,4 @@ mewkit self-update
 mewkit self-update --channel beta
 ```
 
-`self-update` fetches the newest binary release's `binary-manifest.json`, refuses an older version, checks the archive's SHA-256 and size, and replaces the running binary. The previous binary stays beside it with an `.old` suffix. `--check` only reports, and exits 3 when an update exists. When the running version has been withdrawn, it says so.
+`self-update` fetches the newest binary release's `binary-manifest.json`, refuses an older version, checks the archive's SHA-256 and size, and replaces the running binary. The previous binary stays beside it with an `.old` suffix. `--check` only reports, and exits 3 when an update exists. `init` makes the same comparison against the newest stable release and, when this binary is older, ends with one line on stderr naming it; it is skipped with `--offline`, `--kit-archive` or `--kit-dir`, and stays silent when GitHub does not answer within 2 seconds. When the running version has been withdrawn, it says so.

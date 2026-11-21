@@ -34,7 +34,7 @@ The installer checks the archive's size and SHA-256 against the pins it carries,
 | `MEWKIT_VERSION` | Refuse to install unless the pinned version is the one you name |
 | `MEWKIT_CHANNEL=beta` | Install the newest prerelease instead of the newest stable release |
 
-Later updates come from `mewkit self-update`. It checks the release's `binary-manifest.json` and the archive's SHA-256 and size before it replaces the binary, and it keeps the previous binary beside it.
+Later updates come from `mewkit self-update`. When a newer `mewkit` is out, `init` ends with a one-line note that names it. It checks the release's `binary-manifest.json` and the archive's SHA-256 and size before it replaces the binary, and it keeps the previous binary beside it.
 
 <Callout type="info">
   The installer also places `mewkit-next` for one release, with a notice that the name has changed. Use `mewkit` or `mk` instead. If an existing `mk` on your PATH is not MeowKit, the installer leaves it alone and reports it.
@@ -125,7 +125,7 @@ For Claude Code the install is:
 ├── harness-inventory.json  Generated registry of .claude/ artifacts
 ├── memory/          decisions.md + gotchas.md, committed
 ├── telemetry/       Cost log, trace log
-├── state/           Session markers
+├── state/           Session markers; ownership/*.json is the install record, committed
 ├── envs/            One Python environment per skill, from `mewkit setup`
 ├── cache/           Derived caches, rebuildable
 └── mcp.json.example Optional MCP server config

@@ -23,9 +23,11 @@ const SHIPPED: [&str; 5] = [
 
 /// Deny everything under `.meowkit/`, then re-include what a team shares. A
 /// new machine-written class stays ignored until someone decides to share it,
-/// which fails in the safe direction: the local kit copy and the ownership
-/// index can never be committed by accident.
-pub const GITIGNORE: &str = "*\n!.gitignore\n!config.yaml\n!.env.example\n!mcp.json.example\n!bin/\n!bin/mewkit\n!memory/\n!memory/*.md\n";
+/// which fails in the safe direction: the local kit copy can never be
+/// committed by accident. The ownership index is shared: without it a clone
+/// cannot tell the kit's files from the user's, and an upgrade there would
+/// leave every file a newer kit dropped.
+pub const GITIGNORE: &str = "*\n!.gitignore\n!config.yaml\n!.env.example\n!mcp.json.example\n!bin/\n!bin/mewkit\n!memory/\n!memory/*.md\n!state/\n!state/ownership/\n!state/ownership/*.json\n";
 
 pub const PLUGIN_MANIFEST: &str = ".claude-plugin/plugin.json";
 

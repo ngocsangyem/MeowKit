@@ -5702,8 +5702,8 @@
     },
     {
       "path": ".meowkit/.gitignore",
-      "sha256": "96c18bd172c42d99cace76e59b4108008fa5b975f0065f5da6623fa1da46ee9d",
-      "size": 99
+      "sha256": "63bfa1eea0ba812388a27bdecbbb9a4d832b1312ba5d8da3e8adfe8b823539d9",
+      "size": 149
     },
     {
       "path": ".meowkit/bin/mewkit",

@@ -12,6 +12,7 @@ mod minimist_flags;
 mod output;
 mod place;
 mod prompt;
+mod rebuild;
 
 use std::process::ExitCode;
 

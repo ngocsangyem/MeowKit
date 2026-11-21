@@ -15,8 +15,15 @@ pub struct UreqHttp {
 
 impl Default for UreqHttp {
     fn default() -> Self {
+        Self::with_timeout(Duration::from_secs(300))
+    }
+}
+
+impl UreqHttp {
+    /// A client that gives up on a whole request after `timeout`.
+    pub fn with_timeout(timeout: Duration) -> Self {
         let config = ureq::Agent::config_builder()
-            .timeout_global(Some(Duration::from_secs(300)))
+            .timeout_global(Some(timeout))
             .https_only(true)
             .build();
         Self {

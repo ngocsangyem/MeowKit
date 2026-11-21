@@ -4,6 +4,6 @@
   "stderr": "",
   "files": {
     ".gitignore": "\n# MeowKit\n.env\n.env.local\nsession-state/\ntasks/reports/\n.claude/logs/\n\n",
-    ".meowkit/.gitignore": "*\n!.gitignore\n!config.yaml\n!.env.example\n!mcp.json.example\n!bin/\n!bin/mewkit\n!memory/\n!memory/*.md\n"
+    ".meowkit/.gitignore": "*\n!.gitignore\n!config.yaml\n!.env.example\n!mcp.json.example\n!bin/\n!bin/mewkit\n!memory/\n!memory/*.md\n!state/\n!state/ownership/\n!state/ownership/*.json\n"
   }
 }

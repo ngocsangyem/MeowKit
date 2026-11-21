@@ -2,6 +2,7 @@
 mod choose;
 mod guard;
 mod mcp;
+mod update_notice;
 
 use clap::Args;
 use mewkit_adapters::claude_code::plugin_manifest;
@@ -18,6 +19,7 @@ use crate::failure::{FAILED, Failure};
 use crate::kit_args::{KitArgs, contract_label};
 use crate::output;
 use crate::place::Place;
+use crate::rebuild;
 
 #[derive(Args, Debug)]
 pub struct InitArgs {
@@ -56,6 +58,11 @@ pub struct InitArgs {
     /// kit is still kept in the cache).
     #[arg(long)]
     pub dry_run: bool,
+    /// The kit release the files here came from (e.g. v3.0.0), when a project
+    /// has the kit's files and no install record. Files that still match that
+    /// release are taken as the kit's; the rest stay yours.
+    #[arg(long, value_name = "TAG")]
+    pub adopt_from: Option<String>,
     /// Answer every question with its default and do not ask any.
     #[arg(long, short = 'y')]
     pub yes: bool,
@@ -196,7 +203,37 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
                     }
                     index
                 }
-                None => OwnershipIndex::new(&kit.version, &contract_label(&kit), kit.origin),
+                None => {
+                    let rebuilt = rebuild::source_kit(
+                        &place,
+                        args.adopt_from.as_deref(),
+                        args.kit.allow_unverified_kit,
+                        args.kit.may_fetch(),
+                    )
+                    .and_then(|old| rebuild::from_release(&place, e, &old, &packs, &mut plan));
+                    match rebuilt {
+                        Some((index, installs)) => {
+                            // What that release installed corroborates removing
+                            // the files this kit no longer ships.
+                            drop_retired(&place, e, &index, &mut plan)?;
+                            for (p, h) in installs {
+                                hashes.entry(p).or_insert(h);
+                            }
+                            index
+                        }
+                        None => {
+                            let differing = rebuild::collisions(&place, &plan);
+                            if differing >= rebuild::MIXED_INSTALL_FLOOR && !args.common.force {
+                                return Err(Failure::failed(mixed_install(
+                                    runtime,
+                                    differing,
+                                    rebuild::recorded_version(&place).as_deref(),
+                                )));
+                            }
+                            OwnershipIndex::new(&kit.version, &contract_label(&kit), kit.origin)
+                        }
+                    }
+                }
             },
         };
         stamp_packs(&mut index, &kit, &packs, runtime);
@@ -218,6 +255,10 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
     )?;
     for note in mcp_notes {
         eprintln!("note: {note}");
+    }
+    // Only where this run was allowed to reach GitHub for its kit anyway.
+    if args.kit.may_fetch() {
+        update_notice::show();
     }
     if unconfirmed {
         return Ok(crate::failure::PENDING);
@@ -241,4 +282,27 @@ fn stamp_packs(
         packs.to_vec()
     };
     stamp(index, kit, &recorded);
+}
+
+/// Why an install over an older kit with no record is refused, and the ways on.
+fn mixed_install(runtime: Runtime, differing: usize, recorded: Option<&str>) -> String {
+    let name = runtime.name();
+    let from = match recorded {
+        Some(version) => format!(
+            "The files name kit {version}, which could not be fetched to compare them with; \
+             run this again online"
+        ),
+        None => format!(
+            "Name the kit release they came from and the files that still match it are taken as \
+             the kit's: `mewkit init --target {name} --adopt-from <tag>` (a release before 3.0.0 \
+             also needs --allow-unverified-kit)"
+        ),
+    };
+    format!(
+        "{differing} files the kit installs for {name} are already here with other contents, and \
+         nothing records who put them there. That is what an older kit looks like once its install \
+         record is gone, and installing over it would leave two kit versions mixed together, so \
+         nothing was written. {from}. Or replace them all, each one backed up first: \
+         `mewkit init --target {name} --force`."
+    )
 }

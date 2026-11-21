@@ -6,6 +6,6 @@
     ".gitignore": "\n# MeowKit\n.env\n.env.local\nsession-state/\ntasks/reports/\n.claude/logs/\n\n",
     ".mcp.json": "{\n  \"mcpServers\": {\n    \"context7\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@upstash/context7-mcp\", \"--api-key\", \"YOUR_API_KEY\"]\n    },\n    \"sequential-thinking\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-sequential-thinking\"]\n    },\n    \"playwright\": {\n      \"command\": \"npx\",\n      \"args\": [\"@playwright/mcp@latest\"]\n    }\n  }\n}\n",
     ".meowkit/.env": "# MeowKit Environment Variables\n# Never commit this file to git. Shell exports take precedence.\n\n# Gemini (recommended — analysis, image gen, video gen)\n# Get from: https://aistudio.google.com/apikey\nMEOWKIT_GEMINI_API_KEY=\n\n# MiniMax (optional — TTS, music, Hailuo video, image fallback)\n# Get from: https://platform.minimax.io/\n# MEOWKIT_MINIMAX_API_KEY=\n\n# OpenRouter (optional — image gen fallback)\n# Get from: https://openrouter.ai/keys\n# MEOWKIT_OPENROUTER_API_KEY=\n# MEOWKIT_OPENROUTER_FALLBACK_ENABLED=true\n\n",
-    ".meowkit/.gitignore": "*\n!.gitignore\n!config.yaml\n!.env.example\n!mcp.json.example\n!bin/\n!bin/mewkit\n!memory/\n!memory/*.md\n"
+    ".meowkit/.gitignore": "*\n!.gitignore\n!config.yaml\n!.env.example\n!mcp.json.example\n!bin/\n!bin/mewkit\n!memory/\n!memory/*.md\n!state/\n!state/ownership/\n!state/ownership/*.json\n"
   }
 }

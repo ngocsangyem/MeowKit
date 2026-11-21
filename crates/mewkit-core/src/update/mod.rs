@@ -98,6 +98,17 @@ pub fn check(http: &dyn Http, running: &str, channel: Channel) -> Result<Offer, 
     Ok(offer)
 }
 
+/// The newest stable binary release, when it is newer than `running`: what
+/// the one-line notice after `init` names. One listing request and no
+/// manifest, so it is cheap; any failure is `None`, because a notice is never
+/// worth failing or delaying a command over.
+pub fn newer_stable(http: &dyn Http, running: &str) -> Option<String> {
+    let listing = http.get(RELEASES_URL, MAX_LISTING_BYTES).ok()?;
+    let releases: Vec<Release> = serde_json::from_slice(&listing).ok()?;
+    let (latest, _) = newest(&releases, Channel::Stable).ok()?;
+    (manifest::version(&latest)? > manifest::version(running)?).then_some(latest)
+}
+
 /// Download the offered archive, verify it and replace `exe`. Returns where
 /// the previous binary was kept. Never moves to an older or equal version.
 pub fn apply(http: &dyn Http, offer: &Offer, exe: &Path) -> Result<PathBuf, KitError> {
