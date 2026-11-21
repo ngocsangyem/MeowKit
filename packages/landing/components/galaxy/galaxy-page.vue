@@ -6,12 +6,13 @@ import type { GalaxyNodeKind } from '~/composables/use-galaxy-data'
 // Shared body for the /galaxy and /demo routes — both page files render this component.
 useSeoMeta({
   title: 'Galaxy — MeowKit',
-  description: 'An animated satellite map of how MeowKit skills, agents, commands, and hooks orbit each other.',
+  description: 'An animated satellite map of how MeowKit skills, agents, and hooks orbit each other.',
 })
 
 const { map, status, error } = useGalaxyData()
 const selected = ref<GalaxyInstance | null>(null)
 
+// The kit ships no slash commands today, so a zero count hides the commands row and legend entry.
 const statRows = computed(() => {
   if (!map.value) return []
   const s = map.value.stats
@@ -21,15 +22,14 @@ const statRows = computed(() => {
     { label: 'commands', value: s.commands },
     { label: 'hooks', value: s.hooks },
     { label: 'edges', value: s.edges },
-  ]
+  ].filter(row => row.label !== 'commands' || row.value > 0)
 })
 
-const legend: { kind: GalaxyNodeKind, label: string }[] = [
-  { kind: 'skill', label: 'skill' },
-  { kind: 'agent', label: 'agent' },
-  { kind: 'command', label: 'command' },
-  { kind: 'hook', label: 'hook' },
-]
+const legend = computed<{ kind: GalaxyNodeKind, label: string }[]>(() =>
+  (['skill', 'agent', 'command', 'hook'] as const)
+    .filter(kind => kind !== 'command' || (map.value?.stats.commands ?? 0) > 0)
+    .map(kind => ({ kind, label: kind })),
+)
 
 const planetLabels = computed(() =>
   Object.fromEntries((map.value?.planets ?? []).map(p => [p.id, p.label])),

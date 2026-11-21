@@ -2,27 +2,27 @@
 const clusters = [
   {
     title: 'Enforcement',
-    lede: 'Hard stops the agent cannot talk its way past.',
+    lede: 'What a hook enforces, and what the workflow asks of the agent.',
     items: [
       {
-        title: 'Two Hard Gates',
+        title: 'Ship Check',
         detail:
-          'No code ships without an approved plan (Gate 1) and a passing review (Gate 2). The agent cannot self-approve.',
+          'On commit, push, merge and PR, a hook runs lint on the changed files, their related tests and a type-check, and refuses the command when one fails.',
       },
       {
-        title: '4-Layer Security',
+        title: 'Credential Guard',
         detail:
-          'Prompt injection defense across input boundary, instruction anchoring, context isolation, and output validation.',
+          'A hook blocks reads of .env files, keys and credential files before the agent sees them, on all six runtimes.',
       },
       {
-        title: 'Hook-Based Enforcement',
+        title: 'Plan and Review',
         detail:
-          'Shell hooks block sensitive file reads and source writes before they happen — not after the agent has rationalized past the rule. Rules define why; hooks enforce what.',
+          'The agent writes a plan and agrees it with you before building, and puts its diff through review before shipping. These are practices in the workflow; no hook blocks an edit on them.',
       },
       {
         title: 'Adversarial Review',
         detail:
-          'Three parallel reviewers — Blind Hunter, Edge Case Hunter, Criteria Auditor — catch 2-3x more bugs than single-pass review.',
+          'Parallel reviewers each take one lens (scope, failure modes, security, assumptions) and report against the diff before a verdict.',
       },
     ],
   },
@@ -41,9 +41,9 @@ const clusters = [
           'From docs retrieval to multimodal analysis, code review to QA testing. Step-file architecture loads skills on demand, keeping context tight.',
       },
       {
-        title: 'Cross-Session Memory',
+        title: 'Team Memory',
         detail:
-          'Lessons, patterns, and costs persist across sessions. After 10 sessions, the analyst proposes CLAUDE.md improvements.',
+          'Two committed files, decisions.md and gotchas.md, record why a choice was made and what a failure taught. Agents read them with grep at the start of a task.',
       },
       {
         title: 'Scale-Adaptive Intelligence',
@@ -64,7 +64,7 @@ const clusters = [
       {
         title: 'Structured Task System',
         detail:
-          'Template-driven task files help agents resume work without losing context. Five template types with acceptance criteria, constraints, and live agent state tracking.',
+          'Template-driven task files help agents resume work without losing context. Four task types (feature, bug fix, refactor, security) with acceptance criteria, constraints, and live agent state tracking.',
       },
       {
         title: 'Party Mode',

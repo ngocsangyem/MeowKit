@@ -11,7 +11,7 @@ export function GET() {
   });
   const body = `# MeowKit Documentation
 
-> AI agent toolkit for Claude Code — skills, agents, and a structured workflow with hard gates, TDD, security scanning, and scale-adaptive routing.
+> AI agent toolkit for Claude Code, Codex, Cursor, Grok, Pi and OMP: skills, agents, a planned and reviewed workflow, a ship check that refuses failing commits, and a credential read guard.
 
 ## Pages
 

@@ -28,8 +28,9 @@ export default function HomePage() {
             Enforced discipline for AI coding agents
           </p>
           <p className="max-w-[56ch] text-fd-muted-foreground">
-            Hard gates, TDD, security scanning, and human approval — so your AI
-            agent ships production-quality code, not untested prototypes.
+            A planned, reviewed workflow and a ship check that refuses a commit
+            whose lint, tests or type-check fail, on Claude Code, Codex, Cursor,
+            Grok, Pi and OMP.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
