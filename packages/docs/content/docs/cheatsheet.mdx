@@ -117,6 +117,7 @@ The ones you meet most often. [Hooks](/reference/hooks) lists them all.
 | `post-write.cjs` | PostToolUse (Edit\|Write) | Security scan of the written file; a hit goes back to the model | No |
 | `build-verify.cjs` | PostToolUse (Edit\|Write) | Compile or lint after an edit; a failure goes back to the model | No |
 | `pre-task-check.cjs` | PreToolUse (Bash) | Injection pattern detection, reported to the model | No |
+| `delegation-brief-check.cjs` | PreToolUse (Task\|Agent) | Notes a subagent brief with no `Goal:` or `Return:` label, reported to the model | No |
 | `project-context-loader.cjs` | SessionStart | Loads `docs/project-context.md` | No |
 | `post-session.cjs` | Stop | Cost log and session trace | No |
 
@@ -184,7 +185,7 @@ Source of truth for the file's key surface: `crates/mewkit-core/schemas/config-v
 
 ### Hook controls
 
-`hooks.<name>: false` disables one observer, and the default is `true`. `<name>` is the observer's file base name, for example `build-verify`, `loop-detection`, `pre-completion-check`, `tdd-flag-detector`, `learning-observer` or `budget-tracker`. The config schema lists 22 such keys.
+`hooks.<name>: false` disables one observer, and the default is `true`. `<name>` is the observer's file base name, for example `build-verify`, `loop-detection`, `pre-completion-check`, `tdd-flag-detector`, `learning-observer` or `budget-tracker`. The config schema lists 23 such keys.
 
 The guards `privacy-block` and `pre-ship` have no config key. An unknown key in `config.yaml` is a validation error, and the guards keep running.
 

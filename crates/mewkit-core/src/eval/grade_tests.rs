@@ -16,7 +16,14 @@ fn load(s: &str) -> Event {
 }
 
 fn tool(s: &str) -> Event {
-    Event::Tool(s.into())
+    tool_with(s, "")
+}
+
+fn tool_with(name: &str, input: &str) -> Event {
+    Event::Tool {
+        name: name.into(),
+        input: input.into(),
+    }
 }
 
 /// An in-memory workspace: exact paths only, which is all these tests need.
@@ -219,4 +226,32 @@ fn model_graded_is_left_to_the_judge_unless_another_assertion_fails() {
         Verdict::NeedsJudge
     );
     assert_eq!(grade_run(&c, &t(vec![], ""), &no_files), Verdict::Fail);
+}
+
+#[test]
+fn tool_input_matches_checks_the_input_of_the_named_tool() {
+    let t = t(
+        vec![
+            tool_with("Bash", r#"{"command":"Goal: x"}"#),
+            tool_with("Agent", r#"{"prompt":"Goal: fix\nReturn: summary"}"#),
+        ],
+        "",
+    );
+    let ws = Files(vec![]);
+    let hit = |tool: &str, pattern: &str| {
+        grade::grade_assertion(
+            &Assertion::ToolInputMatches {
+                tool: tool.into(),
+                pattern: pattern.into(),
+            },
+            &t,
+            &ws,
+        )
+    };
+    assert_eq!(hit("Agent", r"Goal:.*Return:"), Verdict::Pass);
+    // Either spelling names the subagent tool.
+    assert_eq!(hit("Task", r"Goal:.*Return:"), Verdict::Pass);
+    // Another tool's input does not count, and a mismatch fails.
+    assert_eq!(hit("Bash", r"Return:"), Verdict::Fail);
+    assert_eq!(hit("Edit", r"Goal"), Verdict::Fail);
 }

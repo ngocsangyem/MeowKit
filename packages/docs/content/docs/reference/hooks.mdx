@@ -5,7 +5,7 @@ sourceOfTruth: ".claude/settings.json"
 lastVerified: "2026-11-20"
 ---
 
-The kit ships 26 hook scripts, all Node `.cjs` modules: 4 entrypoints directly under `.claude/hooks/` and 22 observers under `.claude/hooks/handlers/`. Hooks enforce three things: the ship check, protection of sensitive files, and the post-write security scan. Everything else is an observer that records or reminds. Planning and review are workflow practices, not hooks; see [Enforcement and Security](/core-concepts/enforcement).
+The kit ships 27 hook scripts, all Node `.cjs` modules: 4 entrypoints directly under `.claude/hooks/` and 23 observers under `.claude/hooks/handlers/`. Hooks enforce three things: the ship check, protection of sensitive files, and the post-write security scan. Everything else is an observer that records or reminds. Planning and review are workflow practices, not hooks; see [Enforcement and Security](/core-concepts/enforcement).
 
 ## Two kinds of hook
 
@@ -36,6 +36,7 @@ An observer with advice for the model returns it as `hookSpecificOutput.addition
 | Observer | Event (matcher) | What it does |
 | --- | --- | --- |
 | `pre-task-check` | PreToolUse (Bash) | Reports prompt-injection patterns found in a command to the model as context. Advisory |
+| `delegation-brief-check` | PreToolUse (Task\|Agent) | Notes to the model when a subagent brief has no `Goal:` or `Return:` label, and records one `delegation_brief_check` trace event with two booleans. Never blocks and never repeats the brief |
 | `build-verify` | PostToolUse (Edit\|Write) | Runs the compile or lint check for the file's language; results are cached by file content hash |
 | `loop-detection` | PostToolUse (Edit\|Write) | Counts edits per file and reminds the model at 4 edits, asks it to re-plan at 8, and repeats every 4 after. Never blocks |
 | `budget-tracker` | PostToolUse (Edit\|Write, Bash) | Estimates cost and prints a notice at the warn and block thresholds. The notices go to the user and stop nothing |
@@ -148,7 +149,7 @@ The other runtimes do not run every Claude Code hook. `.claude/hooks/hook-covera
 | Ship check | `pre-ship.cjs` | Ported: `pre-ship.cjs` on PreToolUse Bash | Ported: `pre-ship.cjs` on `beforeShellExecution` | Ported: `pre-ship.cjs` on PreToolUse Bash | Ported: inside `guard.cjs`, on a shell command | Ported: inside `guard.cjs`, on a shell command |
 | Session context | `project-context-loader` | Not ported: `AGENTS.md` carries the standing context | Equivalent: `session-context.cjs`, a short pointer to `.meowkit/` state | Not ported | Not ported | Not ported |
 
-Of the 22 observers, `hook-coverage.json` ports or maps only these off Claude Code:
+Of the 23 observers, `hook-coverage.json` ports or maps only these off Claude Code:
 
 | Observer | Codex | Cursor | Grok, Pi, OMP |
 | --- | --- | --- | --- |

@@ -29,7 +29,7 @@ fn claude_other_tools_are_tool_events() {
     let out = r#"{"type":"assistant","message":{"content":[{"type":"text","text":"hi"},{"type":"tool_use","name":"Bash","input":{"command":"ls"}}]}}
 {"type":"result","is_error":false,"result":"none"}"#;
     let t = parse(Runtime::ClaudeCode, out).expect("parses");
-    assert_eq!(t.events, vec![Event::Tool("Bash".into())]);
+    assert_eq!(t.events, vec![tool("Bash", r#"{"command":"ls"}"#)]);
 }
 
 #[test]
@@ -59,9 +59,9 @@ fn codex_plain_command_is_a_shell_tool_and_installed_names_normalise() {
     assert_eq!(
         t.events,
         vec![
-            Event::Tool("shell".into()),
+            tool("shell", "rg -n colour ."),
             Event::SkillLoad("cook".into()),
-            Event::Tool("file_change".into())
+            tool("file_change", "")
         ]
     );
 }
@@ -116,7 +116,7 @@ fn claude_subagent_tool_calls_are_not_main_agent_events() {
 {"type":"assistant","parent_tool_use_id":null,"message":{"content":[{"type":"tool_use","name":"Bash","input":{}}]}}
 {"type":"result","subtype":"success","is_error":false,"result":"ok"}"#;
     let t = parse(Runtime::ClaudeCode, out).expect("parses");
-    assert_eq!(t.events, vec![Event::Tool("Bash".into())]);
+    assert_eq!(t.events, vec![tool("Bash", "{}")]);
 }
 
 #[test]
@@ -133,8 +133,15 @@ fn codex_commands_that_only_mention_a_skill_path_are_not_loads() {
         ("cat .agents/skills/cook/SKILL.md", 1),
     ] {
         let t = parse(Runtime::Codex, &item(cmd, exit)).expect("parses");
-        assert_eq!(t.events, vec![Event::Tool("shell".into())], "{cmd}");
+        assert_eq!(t.events, vec![tool("shell", cmd)], "{cmd}");
     }
     let t = parse(Runtime::Codex, &item("cat 'skills/cook/SKILL.md'", 0)).expect("parses");
     assert_eq!(t.events, vec![Event::SkillLoad("cook".into())]);
+}
+
+fn tool(name: &str, input: &str) -> Event {
+    Event::Tool {
+        name: name.into(),
+        input: input.into(),
+    }
 }
