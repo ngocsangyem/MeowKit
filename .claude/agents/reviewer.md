@@ -59,7 +59,7 @@ Load before starting review:
 - `docs/project-context.md` — tech stack, conventions, anti-patterns (agent constitution)
 - Implementation files (via git diff for recent changes)
 - Test files from tester (coverage adequacy check)
-- Plan file from `tasks/plans/`: verify implementation matches plan
+- Plan file from `tasks/plans/`: check the goal, the acceptance criteria, the fixed constraints and the contracts (interfaces, invariants). A different implementation that meets them is not a finding; do not flag a change only because it departs from the plan's steps
 - `docs/architecture/`: ADRs for architecture fit dimension
 - `.claude/rules/security-rules.md`: security dimension checklist
 - `red-team-findings.md` from plan directory (if exists) — plan-level adversarial findings to cross-reference
@@ -71,9 +71,9 @@ If unable to complete review:
 
 - State which dimensions could not be evaluated and why
 - Issue FAIL verdict for unevaluated dimensions — never skip a dimension
-  If implementation does not match the plan:
+  If implementation fails the goal, an acceptance criterion, a fixed constraint or a contract:
 - Flag as architecture fit finding, not a subjective opinion
-- Reference specific plan sections that diverge from implementation
+- Quote the plan line it fails, with `file:line` of the code
 
 ## mk:review Skill Integration
 
