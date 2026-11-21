@@ -28,7 +28,7 @@ Reference for `.meowkit/telemetry/trace-log.jsonl` records. Append-only JSONL wr
 | `cost_sample` | `budget-tracker.sh` | `{step: str, usd: float, cumulative_usd: float}` |
 | `session_end` | `post-session.cjs` | `{duration_seconds: int, total_cost_usd: float, error_count: int}` |
 | `dead_weight_audit_needed` | `post-session.cjs` (model change) | `{old_model: str, new_model: str}` |
-| `benchmark_result` | `mk:benchmark/scripts/run-canary.sh`, this repository only (inline at manifest write — see C2 fix 260408) | `{run_id: str, tier: str, model: str, manifest_path: str}` |
+| `benchmark_result` | the `mk:benchmark` canary script, this repository only (inline at manifest write — see C2 fix 260408) | `{run_id: str, tier: str, model: str, manifest_path: str}` |
 
 ## Trace Ownership (Phase 8 P23)
 
@@ -97,4 +97,4 @@ The current schema is `1.0`. Future schema bumps:
 - **MINOR (1.1)**: add optional fields → consumers must default-handle missing fields
 - **MAJOR (2.0)**: rename or remove fields → consumers must filter by `schema_version`
 
-`mk:trace-analyze/step-01-ingest.md` filters records by `schema_version` and warns on unknown versions.
+`step-01-ingest.md` filters records by `schema_version` and warns on unknown versions.

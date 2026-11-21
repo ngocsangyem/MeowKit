@@ -134,7 +134,7 @@ Separate subagents receive diff + Phase A findings summary. Go deeper, not wider
 **Forced-Finding:** Zero findings → re-analyze once. Prevents rubber-stamp approvals.
 **Artifact Verification:** 4-level checks (exists, substantive, wired, data flowing) in verdict step.
 
-Workflow: `mk:review/workflow.md` → step-01 → step-02 (Phase A) → step-02b (Phase B) → step-03 (triage) → step-04 (verdict).
+Workflow: `.claude/skills/review/workflow.md` → step-01 → step-02 (Phase A) → step-02b (Phase B) → step-03 (triage) → step-04 (verdict).
 
 Post-review triage categorizes findings as `current-change` (blocks shipping) vs `incidental` (logged to backlog). Phase A + Phase B findings are merged and deduplicated.
 

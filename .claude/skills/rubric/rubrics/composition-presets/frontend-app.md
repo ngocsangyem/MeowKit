@@ -34,7 +34,7 @@ The 4 retained rubrics each close a verified gap:
 |---|---|
 | `product-depth` | Solo agent under-scoping. `mk:review` Criteria Auditor accepts stubs and silent feature substitutions. |
 | `functionality` | Active verification. `mk:verify` runs build/lint/test/coverage but never executes the artifact (no curl, no browser). |
-| `design-quality` | AI slop. `mk:review/references/design-review.md` was silently disabled by a deleted-file dependency until the 260408 fix. |
+| `design-quality` | AI slop. `.claude/skills/review/references/design-review.md` was silently disabled by a deleted-file dependency until the 260408 fix. |
 | `originality` | AI slop, generic copy, stock illustrations. No existing layer evaluates visual originality at all. |
 
 ## Excluded Rubrics (still in library, opt-in only)

@@ -4515,11 +4515,6 @@
       "size": 11271
     },
     {
-      "path": ".cursor/skills/mk-ship/references/adversarial-review.md",
-      "sha256": "1ee054f7ef18fe98f5f663cef215e16ec63ce9425026d1be3deb2a99556e680d",
-      "size": 4910
-    },
-    {
       "path": ".cursor/skills/mk-ship/references/advice-checkpoints.md",
       "sha256": "4e35b9daec65d596372fb23f69f82fd802745a895fa90cff774c3d4ceb0640d5",
       "size": 3565

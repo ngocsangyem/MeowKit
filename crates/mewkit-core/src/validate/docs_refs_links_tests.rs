@@ -113,10 +113,12 @@ fn a_backticked_skill_local_path_must_exist_under_the_skill() {
 }
 
 #[test]
-fn rows_are_advisory_and_pass_when_clean() {
+fn rows_take_the_given_severity_and_pass_when_clean() {
     let dirty = kit(&cook("`/nope`"));
-    let rows = check_skill_link_rows(&dirty.path().join(".claude"), Status::Warn);
+    let rows = check_skill_link_rows(&dirty.path().join(".claude"), Status::Fail);
     assert_eq!(rows.len(), 4);
+    assert!(rows.iter().any(|r| r.status == Status::Fail));
+    let rows = check_skill_link_rows(&dirty.path().join(".claude"), Status::Warn);
     assert!(rows.iter().any(|r| r.status == Status::Warn));
     let clean = kit(&cook("nothing"));
     let rows = check_skill_link_rows(&clean.path().join(".claude"), Status::Warn);

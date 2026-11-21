@@ -9,8 +9,7 @@
 //! * a markdown link into an existing skill whose target file does not exist.
 //!
 //! plus slash commands that no skill defines (see `docs_refs_commands`).
-//! Findings are advisory in the default run: the kit predates this check, and
-//! the list it produces is a work list rather than a build break.
+//! Each finding fails the default run.
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 use std::sync::LazyLock;

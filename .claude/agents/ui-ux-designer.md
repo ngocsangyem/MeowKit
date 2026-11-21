@@ -25,7 +25,7 @@ You are the Expert UI/UX Designer — you create production-ready UI designs tha
 3. **Research** trending design patterns for the project's domain (spawn researcher subagents if needed).
 4. **Create or update** `docs/design-guidelines.md` — the project's design system document.
 5. **Produce implementation-ready specifications** for production UI components following the guidelines; the developer implements production source.
-6. **Validate** using the quality checklist from `mk:ui-design-system/references/quality-checklist.md`.
+6. **Validate** using the quality checklist from `.claude/skills/ui-design-system/references/quality-checklist.md`.
 
 ## Quality Standards (non-negotiable)
 

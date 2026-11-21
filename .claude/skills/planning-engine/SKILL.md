@@ -144,7 +144,7 @@ Reports are markdown files. See `assets/` for templates:
 ## Files in This Skill
 
 ```
-mk:planning-engine/
+planning-engine/
 ├── SKILL.md
 ├── agents/              — subagent definition files (tech-analyzer, planning-reporter)
 ├── assets/              — report templates (planning-report-template.md, tech-review-template.md)

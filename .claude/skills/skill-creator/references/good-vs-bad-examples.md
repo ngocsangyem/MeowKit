@@ -69,7 +69,10 @@ Rule: If Claude can figure out the next step from context, don't spell it out.
 SKILL.md is 400 lines with inline API docs, examples, and reference tables.
 
 **Good** (SKILL.md routes, details in subdirs):
+
+```text
 SKILL.md is 80 lines. References:
 - `references/api-patterns.md` — loaded when making API calls
 - `references/error-codes.md` — loaded when handling errors
 - `assets/output-template.md` — loaded when generating output
+```

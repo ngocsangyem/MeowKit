@@ -151,7 +151,7 @@ Templates in `assets/` are out-of-band — they are not auto-Read; the agent rea
 
 ## Composes With
 
-- `mk:ui-design-system` — palette and typography selection (`assets/colors.csv` 160 rows, `assets/typography.csv` 73 rows). HTML modes vary palette per run.
+- `mk:ui-design-system` — palette and typography selection (160 palette rows, 73 typography rows). HTML modes vary palette per run.
 - `mk:frontend-design` — anti-slop forbidden patterns. Cited via `../frontend-design/references/anti-slop-directives.md`, not duplicated.
 - `mk:web-to-markdown` — for users who want to view a generated markdown file in a browser, no server bundled here.
 

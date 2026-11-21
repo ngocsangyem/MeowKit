@@ -209,8 +209,8 @@ the toolkit's, documented here and in the script header so future comparisons ar
 | `../../benchmarks/canary/` | Spec files |
 | `../../benchmarks/results/` | Per-run JSON dumps |
 | `../../memory/trace-log.jsonl` | Append-only trace store (benchmark results land here too) |
-| `../mk:autobuild/SKILL.md` | The harness skill that benchmark invokes per spec |
-| `../mk:trace-analyze/SKILL.md` | The consumer of benchmark results for the dead-weight audit |
+| `../autobuild/SKILL.md` | The harness skill that benchmark invokes per spec |
+| `../trace-analyze/SKILL.md` | The consumer of benchmark results for the dead-weight audit |
 
 ## Start
 

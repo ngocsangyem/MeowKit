@@ -95,7 +95,7 @@ Load **only when executing** the corresponding step — not upfront.
 | Performance issues | `references/performance-diagnostics.md` | Quantify → layer isolation → bottleneck |
 | Post-fix validation | `references/reporting-standards.md` | Enhanced DEBUG REPORT with timeline + recommendations |
 | Test pollution | Run `scripts/find-polluter.sh <file> <test-pattern>` | Bisection to find which test creates unwanted state |
-| Defense-in-depth | See `mk:fix/references/prevention-gate.md` | 4-layer validation (DRY — shared with mk:fix) |
+| Defense-in-depth | See `.claude/skills/fix/references/prevention-gate.md` | 4-layer validation (DRY — shared with mk:fix) |
 
 ## Constraints
 

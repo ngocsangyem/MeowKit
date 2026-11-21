@@ -262,7 +262,7 @@ Evaluate:
 
 ## Section 11: Design & UX Review (skip if no UI scope detected)
 
-The CEO calling in the designer. Not a pixel-level audit — that's /plan-design-review and /design-review. This is ensuring the plan has design intentionality.
+The CEO calling in the designer. Not a pixel-level audit — that's /mk:frontend-design and /mk:review. This is ensuring the plan has design intentionality.
 
 Evaluate:
 * Information architecture — what does the user see first, second, third?
@@ -280,12 +280,12 @@ Evaluate:
 
 Required ASCII diagram: user flow showing screens/states and transitions.
 
-If this plan has significant UI scope, recommend: "Consider running /plan-design-review for a deep design review of this plan before implementation."
+If this plan has significant UI scope, recommend: "Consider running /mk:frontend-design for a deep design review of this plan before implementation."
 **STOP.** Ask the user once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
 ## Post-Implementation Design Audit (if UI scope detected)
 
-After implementation, run `/design-review` on the live site to catch visual issues that can only be evaluated with rendered output.
+After implementation, run `/mk:review` on the live site to catch visual issues that can only be evaluated with rendered output.
 
 ## CRITICAL RULE — How to ask questions
 

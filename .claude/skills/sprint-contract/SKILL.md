@@ -61,7 +61,7 @@ Skip when:
 ### `propose` (generator)
 
 1. Read active product spec from newest `tasks/plans/*/plan.md`
-2. Load rubric preset via `mk:rubric/scripts/load-rubric.sh --preset {preset}`
+2. Load rubric preset via `.claude/skills/rubric/scripts/load-rubric.sh --preset {preset}`
 3. Determine sprint `N`: max of existing `tasks/contracts/*-{slug}-sprint-*.md` + 1, default 1
 4. Copy `assets/contract-template.md` → `tasks/contracts/{YYMMDD-HHMM}-{slug}-sprint-{N}.md`
 5. Populate: 5–15 ACs in Given/When/Then form, each bound to one preset rubric, each with a Verification line. Every preset rubric should have ≥1 AC binding
@@ -153,8 +153,8 @@ When `MEOWKIT_AUTOBUILD_MODE=LEAN`:
 | `references/bdd-to-ac-mapping.md` | How Gherkin scenarios map to acceptance criteria |
 | `../../agents/developer.md` | Generator agent — owns `propose` and `amend` actions |
 | `../../agents/evaluator.md` | Evaluator agent — owns `review` action; also Phase 3 active-verification consumer |
-| `../mk:rubric/` | Rubric library — provides composed presets the contract binds to |
-| `../mk:evaluate/` | Evaluator skill — reads signed contract via `step-01-load-rubrics.md` |
+| `../rubric/` | Rubric library — provides composed presets the contract binds to |
+| `../evaluate/` | Evaluator skill — reads signed contract via `step-01-load-rubrics.md` |
 
 ## Related Rules
 

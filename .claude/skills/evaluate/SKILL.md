@@ -101,7 +101,7 @@ See `step-04-grade-and-verdict.md` for the canonical schema. Frontmatter fields:
 | `references/active-verification-patterns.md` | Catalog of probe techniques per target type |
 | `scripts/run-evaluator.sh` | Subagent spawn wrapper |
 | `scripts/validate-verdict.sh` | Verdict file validator (enforces the evidence requirement) |
-| `../mk:rubric/` | Rubric library + load/compose |
+| `../rubric/` | Rubric library + load/compose |
 | `../../agents/evaluator.md` | The agent persona this skill orchestrates |
 
 ## Start

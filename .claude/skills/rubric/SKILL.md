@@ -134,9 +134,9 @@ Few-shot anchor examples MUST be added per the rules in `references/calibration-
 | `references/calibration-guide.md` | How to add few-shot examples (balanced + randomized) |
 | `rubrics/schema.md` | Canonical rubric format specification |
 | `../../agents/evaluator.md` | The agent that consumes composed rubrics during behavioral active verification (Phase 3, shipped) |
-| `../mk:evaluate/SKILL.md` | The orchestration shell that drives the evaluator + invokes this skill via `compose <preset>` (Phase 3, shipped) |
+| `../evaluate/SKILL.md` | The orchestration shell that drives the evaluator + invokes this skill via `compose <preset>` (Phase 3, shipped) |
 
 ## Start
 
 For interactive use, run `scripts/load-rubric.sh --list` to discover available rubrics.
-For evaluator-internal use, the `evaluator` agent (via `mk:evaluate`) loads `compose <preset>` automatically based on the target type detected by `mk:evaluate/scripts/run-evaluator.sh`. Sprint-contract-based filtering is gated until Phase 4 ships (step-01 of mk:evaluate stub-guards on the `contract_schema_version:` marker).
+For evaluator-internal use, the `evaluator` agent (via `mk:evaluate`) loads `compose <preset>` automatically based on the target type detected by `.claude/skills/evaluate/scripts/run-evaluator.sh`. Sprint-contract-based filtering is gated until Phase 4 ships (step-01 of mk:evaluate stub-guards on the `contract_schema_version:` marker).

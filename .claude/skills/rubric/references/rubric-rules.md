@@ -4,7 +4,7 @@ These rules govern the rubric library at `rubrics/` and the calibration discipli
 
 ## Rule 1: Every Rubric Must Have ≥1 PASS + ≥1 FAIL Anchor
 
-Every file in `rubrics/*.md` MUST include at least one PASS example and at least one FAIL example in its `## Few-Shot Examples` section. Enforced mechanically by `mk:rubric/scripts/validate-rubric.sh`.
+Every file in `rubrics/*.md` MUST include at least one PASS example and at least one FAIL example in its `## Few-Shot Examples` section. Enforced mechanically by `scripts/validate-rubric.sh` in this skill.
 
 **WHY:** Balanced anchors ground PASS vs FAIL and prevent default-pass or over-rejection bias.
 

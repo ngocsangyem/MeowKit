@@ -19,7 +19,7 @@ Wall clock: < 1 min (manual run)
 | canary-03-long-unstructured | PASS | #7/#8/#9 found; wall split to CONTEXT + 3 canonical edge cases + fences |
 | canary-04-strip-model-coupling | PASS | no XML / "think step by step" / "Reasoning:" in output; core ask verbatim |
 | canary-05-already-good | PASS | 0 padded issues; near-identical return + confirmation note |
-| canary-06-refusal | PASS | refused + redirected to mk:brainstorming/office-hours; no rewrite |
+| canary-06-refusal | PASS | refused + redirected to mk:brainstorming or mk:office-hours; no rewrite |
 | canary-11-architecture-review | PASS | rewrite ASKS for review; 0 findings/severities emitted; core ask verbatim |
 | canary-12-research-prompt | PASS | frames discovery prompt; 0 research performed; no fabricated cause/metric |
 

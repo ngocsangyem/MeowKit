@@ -13,7 +13,7 @@ trust_level: HIGH
 
 **Triggers:** `mk:sprint-contract sprint-goal` invoked OR `mk:planning-engine` produces a goal candidate the user accepts.
 
-1. Goal lives in `tasks/contracts/sprint-state-{date}-sprint-{N}.md` `sprint_goal:` (template: `mk:sprint-contract/assets/sprint-state-template.md`). One-line, ≤120 chars
+1. Goal lives in `tasks/contracts/sprint-state-{date}-sprint-{N}.md` `sprint_goal:` (template: `.claude/skills/sprint-contract/assets/sprint-state-template.md`). One-line, ≤120 chars
 2. `mk:agent-detector` Step 0b reads newest active sprint-state, surfaces `sprint_goal:` in orient banner
 3. `mk:plan-creator` Phase 1 advisory: "Does this plan serve sprint goal '{goal}'?"
 
