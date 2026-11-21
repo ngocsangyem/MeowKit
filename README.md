@@ -199,7 +199,7 @@ meowkit/
 │   ├── docs/                 Documentation site (docs.meowkit.dev, Fumadocs)
 │   └── landing/              Landing page (meowkit.dev, Nuxt + Tailwind v4)
 ├── scripts/                  Release and validation scripts
-├── install.sh, install.ps1   Binary installers, pinned to one mewkit release
+├── install.sh, install.ps1   Binary installers, pinned to one binary release
 ├── CLAUDE.md                 Maintainer guide for this repo (not shipped to projects)
 └── .github/workflows/        ci.yml (kit and docs), rust-ci.yml, rust-release.yml (binary release)
 ```
