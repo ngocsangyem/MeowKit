@@ -8,8 +8,8 @@
 <h1 align="center">MeowKit</h1>
 
 <p align="center">
-  <strong>AI agent toolkit for Claude Code</strong><br>
-  127 skills &middot; 42 agents &middot; 6 rules &middot; 26 hook scripts &middot; 4-layer+ security
+  <strong>AI agent toolkit for Claude Code, Codex, Cursor, Grok, Pi and OMP</strong><br>
+  127 skills &middot; 42 agents &middot; 6 rules &middot; 25 hook scripts
 </p>
 
 <p align="center">
@@ -30,7 +30,9 @@
 
 ## What is MeowKit
 
-MeowKit installs a `.claude/` directory that Claude Code reads at session start. It guides a structured 7-phase workflow, refuses a commit or push whose lint, related tests or type-check fail, blocks reads of credential files, and keeps a two-file team memory store (`.meowkit/memory/decisions.md`, `gotchas.md`) read by grep. Zero external dependencies for core workflow.
+MeowKit is a kit of skills, agents, rules and hooks for AI coding agents. The native `mewkit` binary installs it into a project for Claude Code, Codex, Cursor, Grok, Pi or OMP. The kit is written once in `.claude/`, and `mewkit init` projects it into the files each runtime reads.
+
+Once installed, the kit guides a 7-phase workflow, refuses a commit or push whose lint, related tests or type-check fail, blocks reads of credential files, and keeps a two-file team memory (`.meowkit/memory/decisions.md`, `gotchas.md`) that agents read with grep. The core workflow needs no external services.
 
 **Homepage:** [meowkit.dev](https://meowkit.dev) &nbsp;·&nbsp; **Docs:** [docs.meowkit.dev](https://docs.meowkit.dev/)
 
@@ -56,54 +58,61 @@ The installer checks the archive's size and SHA-256 against the pins it carries,
 
 ### Add MeowKit to a project
 
-MeowKit installs two ways. Pick **one** per project — running both resolves the
-same skills and agents twice (`mewkit doctor` warns when it detects both).
-
-### Flat-copy (default, supported)
-
 ```bash
 mewkit init
 ```
 
-The CLI fetches the latest release from GitHub, prompts for config, and scaffolds `.claude/` and `.meowkit/` into your project — the only two directories it adds. Skills resolve as `/mk:*`, agents as `mk:*`.
+`init` downloads the newest kit release, checks it against the release's `checksums.txt`, and asks
+which runtimes to set up. Pass `--target` to skip the question:
 
-### Native plugin (recommended on Claude Code; experimental on Codex)
+| Command | Installs for |
+| --- | --- |
+| `mewkit init --target claude-code` | Claude Code: `.claude/` |
+| `mewkit init --target codex` | Codex |
+| `mewkit init --target cursor` | Cursor |
+| `mewkit init --target grok`, `pi` or `omp` | Grok, Pi or OMP (project scope only) |
+| `mewkit init --target all` | Every runtime above |
 
-Installs the `mk` plugin from the MeowKit marketplace. Skills (`/mk:*`), agents (`mk:*`), and hooks all resolve under the plugin; nothing is copied into your project.
+Each runtime gets the skills and agents from `.claude/`, rewritten into the names, paths and tool
+words it loads, plus its overlay from `kit/overlays/` (hooks, rules, always-on text). Where the
+files land depends on which runtimes are installed together, because some read each other's
+folders: [Portability](https://docs.meowkit.dev/cli/portability). Everything the kit writes at
+runtime goes under `.meowkit/`.
 
-> **Codex support is an experimental projection.** On Claude Code and Codex the ship check and the credential guard run as hooks; Codex runs a new or changed hook only after the user reviews it, and the rest of the Codex projection is advisory. What each runtime enforces: [Enforcement & Security](https://docs.meowkit.dev/core-concepts/enforcement). Run `mewkit providers codex --lifecycle` to see exactly what is enforced vs advisory.
->
-> **Every runtime other than Claude Code is projected from the one authored kit.** `mewkit init --target codex|cursor|grok|pi|omp` (or `all`) rewrites the skills and agents under `.claude/` into the form that runtime loads (names, paths, tool words) and adds that runtime's overlay from `kit/overlays/`: hooks, rules and the always-on text, which cannot be derived. Where the files go depends on which runtimes are installed together, because some read each other's folders. Grok, Pi and OMP install at project scope only, and their enforcement has not yet been run in a live session. CI checks the installed result (instruction criteria, references that resolve, denied tokens, install idempotency). That is evidence the installed files are well formed, not of identical behavior across hosts.
->
-> **Validate a generated Codex project** with `mewkit validate --target codex <dir>` — a read-only post-install gate that checks the config/hook wiring, that hook wrappers exist + are executable + carry the deny contract, that agent TOMLs parse, and that installed skills declare a supported runtime and carry no host-bound tool tokens. `mewkit doctor --providers` run inside a Codex project recognizes it and points at this command.
+Enforcement differs by runtime. The credential read guard and the ship check are hooks on all six;
+the rest is advisory on most hosts. Codex runs a new or changed hook only after you review it.
+Grok, Pi and OMP enforcement follows each vendor's documentation and has not been run in a live
+session. The full table: [Enforcement & Security](https://docs.meowkit.dev/core-concepts/enforcement).
+`mewkit providers <runtime> --lifecycle` shows the same for one runtime.
+
+`mewkit upgrade` moves the kit to a newer release. It removes files the new kit dropped and keeps
+files you changed. `mewkit uninstall` removes what the install recorded. Commit
+`.meowkit/state/ownership/*.json` so a clone carries that record.
+
+#### Claude Code as a plugin
 
 ```bash
 mewkit init --target claude-code --delivery plugin
 ```
 
-The plugin shape is produced by the install itself, which is why there is nothing to build ahead of
-time: the same emitter writes the kit's skills, agents and hooks for both deliveries, and
-`--delivery plugin` adds the `.claude-plugin/plugin.json` manifest the host reads. There is no
-`build-plugin` verb, no committed `plugin/` payload, and no marketplace publication — MeowKit is not
-published to a plugin marketplace, so `claude plugin marketplace add` and its Codex equivalent have
-nothing to resolve. Run `mewkit providers claude-plugin --lifecycle` to see what the plugin delivery
-enforces.
+Same content as the default install, plus the `.claude-plugin/plugin.json` manifest Claude Code
+reads to load the kit as a plugin. `--delivery` applies to Claude Code only. MeowKit is not
+published to a plugin marketplace, so `claude plugin marketplace add` has nothing to install.
 
-### Setup (required for Python skills)
-
-After installing MeowKit, run:
+### Setup
 
 ```bash
 mewkit setup
 ```
 
-This writes `.mcp.json` and `.meowkit/.env`, extends `.gitignore`, seeds
-`docs/project-context.md`, and prepares the per-skill Python environments under
-`.meowkit/envs/<skill>/` — one environment per skill, created on demand rather
-than one shared venv. `--system-deps` interactively prompts for optional system
-deps (ImageMagick, FFmpeg, Playwright browsers).
+This copies `.mcp.json` from the kit's example, creates `.meowkit/.env` for API keys, and writes
+`.meowkit/.gitignore`. Skills that run Python get their own environment under
+`.meowkit/envs/<skill>/`: pass `--skills <a,b>` or run `mewkit skill env <skill>`.
+`--system-deps` offers to install ImageMagick, FFmpeg and Playwright browsers. `--dry-run` shows
+what would change. Safe to re-run after an upgrade.
 
-Run once per project. Idempotent — safe to re-run after upgrades.
+To get `docs/project-context.md`, the conventions file every agent loads, run
+`/mk:project-context generate` in your first session.
 
 To verify your environment after setup:
 
@@ -180,19 +189,19 @@ meowkit/
 │   ├── agents/               42 specialist agents
 │   ├── skills/               127 skills (mk: namespace) — 126 ship; benchmark is maintainer-only
 │   ├── rules/                6 enforcement rules (always-on)
-│   ├── hooks/                26 hook scripts — lifecycle hooks + handlers — plus their libraries
+│   ├── hooks/                25 hook scripts (dispatch, pre-ship, privacy-block + 22 handlers) and their libraries
 │   ├── statusline.cjs
 │   └── settings.json
 ├── .meowkit/memory/          Team store: decisions.md + gotchas.md (committed)
-├── crates/                   The mewkit CLI (Rust)
-├── kit/overlays/             What one runtime needs and cannot be derived: hooks, rules, catalogs
+├── crates/                   The mewkit CLI (Rust): mewkit-cli, mewkit-core, mewkit-adapters
+├── kit/overlays/             What one runtime needs and cannot be derived: codex, cursor, grok, pi, omp, shared
 ├── packages/
+│   ├── docs/                 Documentation site (docs.meowkit.dev, Fumadocs)
 │   └── landing/              Landing page (meowkit.dev, Nuxt + Tailwind v4)
-├── scripts/                  Release automation
-├── packages/docs/            Fumadocs documentation
+├── scripts/                  Release and validation scripts
+├── install.sh, install.ps1   Binary installers, pinned to one mewkit release
 ├── CLAUDE.md                 Maintainer guide for this repo (not shipped to projects)
-├── .releaserc.cjs            Semantic release config
-└── .github/workflows/        CI/CD (release, beta, PR validation)
+└── .github/workflows/        ci.yml (kit and docs), rust-ci.yml, rust-release.yml (binary release)
 ```
 
 ## Releasing
