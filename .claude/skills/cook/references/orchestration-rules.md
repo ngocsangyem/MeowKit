@@ -15,6 +15,7 @@ These rules apply when the agent spawns subagents or coordinates parallel work.
 
 - [Orchestrator Entry Point Rule](#orchestrator-entry-point-rule)
 - [Delegation Context](#delegation-context)
+- [Responsibilities](#responsibilities)
 - [Isolation Boundaries](#isolation-boundaries)
 - [Inner Harness Compatibility](#inner-harness-compatibility)
 - [Rejected Patterns](#rejected-patterns)
@@ -94,6 +95,18 @@ Return: [the shape of the answer: file path, verdict, or list]
 For non-trivial delegations, prefer `mk:delegate` to assemble the prompt from the template above. It collects the template fields (Reports and Plans derive from the work context), runs an injection-pattern guard on each user-provided field, and emits a ≤200-token prompt block for review before you paste it into the Agent tool. Compatible with all inner harnesses via `--silent` mode.
 
 Distinct from `mk:team-config` — that one sets up parallel agents in isolated worktrees (Conductor pattern). Use `mk:delegate` to build ONE clean prompt; use `mk:team-config` to coordinate MANY agents on non-overlapping files.
+
+## Responsibilities
+
+Three responsibilities, each held by a part that already exists. Stated here once.
+
+| Responsibility | Held by | Owns | May |
+|---|---|---|---|
+| **supervisor** | `athena`, under `--advice` only | Cross-scope view of one run, at the checkpoints in `advice-checkpoints.md` (same folder) | Return work to its executor; escalate to the human. Approves nothing and writes nothing |
+| **lead** | the session running `mk:cook` | Shared state, the file-ownership split, integration, and one accept-or-return line per subagent result | Accept a result, or return it with the reason |
+| **peer** | a worker agent (`developer`, `tester`, `reviewer`, `researcher`) | One scope, the files its brief names | Use the premise exit in its agent file; never call the supervisor |
+
+WHY: a hand-off with no named owner of the next decision loses the decision. Workers cannot reach the supervisor, so a premise that fails goes back to the lead.
 
 ## Isolation Boundaries
 
@@ -193,5 +206,9 @@ Subagents MUST end with the status block defined in `agent-conduct.md` A1.
 - `DONE_WITH_CONCERNS` → address correctness/security concerns before review; track observational debt separately.
 - `BLOCKED` → change something before retrying: provide context, simplify the task, escalate model tier, or ask the user.
 - `NEEDS_CONTEXT` → provide the missing context and re-dispatch.
+
+For each subagent result the lead writes one line before acting on it: `accepted: {what was checked}` or `returned: {reason}`. An unread result is neither.
+
+A `BLOCKED` or `DONE_WITH_CONCERNS` report that cites `file:line` evidence against the approach or an `[ASSUMPTION]` goes to the lead, who either changes the plan or answers the evidence. A report without evidence is returned.
 
 Never retry the same blocked approach more than 3 times.
