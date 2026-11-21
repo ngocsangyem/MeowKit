@@ -274,6 +274,12 @@
       "exec": true
     },
     {
+      "path": ".claude/hooks/handlers/delegation-brief-check.cjs",
+      "sha256": "0ec5868c346a5b5e8df61cf6c6b30bbcf9dd5fc23d344be8d798768e0053f0ff",
+      "size": 1515,
+      "exec": true
+    },
+    {
       "path": ".claude/hooks/handlers/jira-env-loader.cjs",
       "sha256": "b9cf74d1ca6dd32b9813d06860f66417534849d0890a73d9c1bb2b637eb4b352",
       "size": 1319,
@@ -6037,6 +6043,11 @@
       "size": 588
     },
     {
+      "path": ".meowkit/cache/.claude/hooks/handlers/delegation-brief-check.cjs",
+      "sha256": "0ec5868c346a5b5e8df61cf6c6b30bbcf9dd5fc23d344be8d798768e0053f0ff",
+      "size": 1515
+    },
+    {
       "path": ".meowkit/cache/.claude/hooks/handlers/jira-env-loader.cjs",
       "sha256": "b9cf74d1ca6dd32b9813d06860f66417534849d0890a73d9c1bb2b637eb4b352",
       "size": 1319
@@ -11509,8 +11520,8 @@
     },
     {
       "path": ".meowkit/config.yaml",
-      "sha256": "da3a5becec94893e5656ac2f7fbdebd40dc8e726e3de9bc782bb8b3be64bb241",
-      "size": 2122
+      "sha256": "a97af5f09614d49f32478b70e888652e5fc6c4271217f5c865d3fb725cff6344",
+      "size": 2155
     },
     {
       "path": ".meowkit/gitignore.meowkit",

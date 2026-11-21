@@ -10,8 +10,8 @@ shell to start and the kit runs on a host that has none. There is no exception: 
 registration runs a shell, a `.sh` file or an interpreter, and `mewkit doctor` sweeps
 the hook paths for one.
 
-The kit ships 26 node hooks: the 4 entrypoints directly under `hooks/`, which the host
-registers or an agent invokes, and the 22 observers under `hooks/handlers/`, which
+The kit ships 27 node hooks: the 4 entrypoints directly under `hooks/`, which the host
+registers or an agent invokes, and the 23 observers under `hooks/handlers/`, which
 `dispatch.cjs` runs. Nothing under `lib/` is a hook — the host registers none of it — and
 neither are the sidecars (`HOOKS_INDEX.md`, `handlers.json`) or `__tests__/`.
 
@@ -61,6 +61,7 @@ config removes that observer from every event it is registered on (`lib/handler-
 | `pre-ship.cjs` | PreToolUse | Bash | — | 300s | Ship check: team-memory lint, then lint on the changed files, the tests related to them and a type-check |
 | `privacy-block.cjs` | PreToolUse | Bash | — | 5s | Refuses reads of credential-bearing files and web-fetch artifacts, and obviously unsafe fetch targets |
 | `dispatch.cjs` | PreToolUse | Bash | — | 10s | Runs the observers registered for one event, fail-open |
+| `dispatch.cjs` | PreToolUse | Task\|Agent | — | 10s | Runs the observers registered for one event, fail-open |
 | `dispatch.cjs` | PostToolUse | Edit\|Write | — | 40s | Runs the observers registered for one event, fail-open |
 | `dispatch.cjs` | PostToolUse | Bash | — | 15s | Runs the observers registered for one event, fail-open |
 | `dispatch.cjs` | Stop | — | — | 15s | Runs the observers registered for one event, fail-open |
@@ -73,6 +74,7 @@ config removes that observer from every event it is registered on (`lib/handler-
 | Handler | Event | Matcher | Toggle key | Timeout | Purpose |
 |---|---|---|---|---|---|
 | `pre-task-check.cjs` | PreToolUse | Bash | pre-task-check | — | Reports prompt-injection patterns in a command to the model as additionalContext (advisory) |
+| `delegation-brief-check.cjs` | PreToolUse | Task\|Agent | delegation-brief-check | — | Notes, as additionalContext, a delegation brief with no `Goal:` or `Return:` label; records one trace event |
 | `build-verify.cjs` | PostToolUse | Edit\|Write | build-verify | — | Runs the project build after an edit |
 | `loop-detection.cjs` | PostToolUse | Edit\|Write | loop-detection | — | Reminds the model, as additionalContext, at 4 and 8 edits to one file, then every 4 |
 | `budget-tracker.cjs` | PostToolUse | Edit\|Write | budget-tracker | — | Accumulates token and cost estimates; notices are user-only |

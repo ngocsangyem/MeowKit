@@ -31,6 +31,7 @@
   },
   "handlers": {
     "pre-task-check": { "codex": "not-ported", "cursor": "not-ported", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "reason": "Advisory check before Bash; no blocking effect." },
+    "delegation-brief-check": { "codex": "not-ported", "cursor": "not-ported", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "reason": "Advisory brief check on the Claude Code subagent tool; no other runtime in the bundle exposes a delegation-tool event the check could read." },
     "build-verify": { "codex": "not-ported", "cursor": "not-ported", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "reason": "Advisory build after an edit; the shared gates do not depend on it." },
     "loop-detection": { "codex": "not-ported", "cursor": "not-ported", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "reason": "Advisory; Cursor bounds runaway loops with loop_limit in hooks.json." },
     "budget-tracker": { "codex": "not-ported", "cursor": "not-ported", "grok": "not-ported", "pi": "not-ported", "omp": "not-ported", "reason": "Cost telemetry; Cursor records tool events through telemetry-observers.cjs instead." },

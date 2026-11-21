@@ -35,6 +35,7 @@ Hooks and harness steps write records through `append-trace.cjs`. Event types wr
 | Event | Writer | When |
 |---|---|---|
 | `file_edited` | `learning-observer.cjs` | A file is edited, with its edit count in the session |
+| `delegation_brief_check` | `delegation-brief-check.cjs` | A subagent is delegated to; the data holds two booleans, whether the brief has a `Goal:` and a `Return:` label, and never the brief itself |
 | `session_end` | `post-session.cjs` | A session closes |
 | `dead_weight_audit_needed` | `post-session.cjs` | The session's model differs from the previous session's |
 | `task_transition` | `mewkit task` | A durable task changes status |

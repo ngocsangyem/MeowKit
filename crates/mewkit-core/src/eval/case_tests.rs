@@ -90,6 +90,14 @@ fn bad_regex_is_refused() {
 }
 
 #[test]
+fn bad_tool_input_pattern_is_refused() {
+    let r = invalid(
+        "id: q\nskill: cook\nkind: paired\nprompt: x\nassertions:\n  - { type: toolInputMatches, tool: Agent, pattern: '(' }\n",
+    );
+    assert!(r.contains("does not compile"), "{r}");
+}
+
+#[test]
 fn fields_of_another_kind_are_refused() {
     assert!(invalid(&format!("{TRIGGER}approachIsWrong: true\n")).contains("parachute"));
 }
