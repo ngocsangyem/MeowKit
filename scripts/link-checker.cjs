@@ -10,7 +10,15 @@ const path = require('path');
 
 const DOCS_DIR = path.resolve(__dirname, '..', 'packages', 'docs', 'content', 'docs');
 const MARKDOWN_LINK_RE = /\[([^\]]*)\]\(([^)]+)\)/g;
+// Code is not rendered as links, so a `[Title](url)` format example inside a fence or an
+// inline code span must not be checked as one.
+const FENCED_CODE_RE = /^(```|~~~)[^\n]*\n[\s\S]*?^\1[^\n]*$/gm;
+const INLINE_CODE_RE = /`[^`\n]*`/g;
 const BROKEN_LINKS = [];
+
+function stripCode(content) {
+  return content.replace(FENCED_CODE_RE, '').replace(INLINE_CODE_RE, '');
+}
 
 function getAllMarkdownFiles(dir) {
   const results = [];
@@ -67,7 +75,7 @@ function main() {
   console.log(`Checking ${files.length} markdown files...\n`);
 
   for (const file of files) {
-    const content = fs.readFileSync(file, 'utf-8');
+    const content = stripCode(fs.readFileSync(file, 'utf-8'));
     const relPath = path.relative(DOCS_DIR, file);
     let match;
     while ((match = MARKDOWN_LINK_RE.exec(content)) !== null) {
