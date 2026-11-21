@@ -96,7 +96,6 @@ enum Command {
 }
 
 fn main() -> ExitCode {
-    rename_notice();
     let result = match parse_cli().command {
         Command::Init(args) => commands::init::run(&args),
         Command::Upgrade(args) => commands::upgrade::run(&args),
@@ -127,16 +126,6 @@ fn main() -> ExitCode {
             eprintln!("mewkit: {failure}");
             ExitCode::from(failure.code)
         }
-    }
-}
-
-/// Run under the pre-rename name, say once what to type instead, then carry on: scripts
-/// and old kits that call `mewkit-next` keep working for the release that keeps the link.
-/// The notice goes to stderr so stdout stays parseable.
-fn rename_notice() {
-    let invoked = std::env::args_os().next().map(std::path::PathBuf::from);
-    if invoked.as_deref().and_then(std::path::Path::file_stem) == Some("mewkit-next".as_ref()) {
-        eprintln!("mewkit-next is now mewkit; run \"mewkit\" (or \"mk\")");
     }
 }
 

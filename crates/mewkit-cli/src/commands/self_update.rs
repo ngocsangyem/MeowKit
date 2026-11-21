@@ -79,6 +79,9 @@ pub fn run(args: &SelfUpdateArgs) -> Result<u8, Failure> {
     if !names.placed.is_empty() {
         println!("placed beside it: {}", names.placed.join(", "));
     }
+    if !names.removed.is_empty() {
+        println!("removed the retired name: {}", names.removed.join(", "));
+    }
     for problem in &names.problems {
         eprintln!("warning: {problem}");
     }

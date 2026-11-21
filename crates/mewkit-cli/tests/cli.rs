@@ -42,11 +42,10 @@ fn version_prints_workspace_version() {
     );
 }
 
-/// The installer places `mk` and `mewkit-next` beside `mewkit`: a link on Unix, a copy on
-/// Windows. `mk` must behave exactly as `mewkit`; `mewkit-next` may only add the rename
-/// notice on stderr, so a script or old kit that still calls it keeps parsing stdout.
+/// The installer places `mk` beside `mewkit`: a link on Unix, a copy on Windows. It must
+/// behave exactly as `mewkit`.
 #[test]
-fn mk_and_mewkit_next_run_the_same_binary() {
+fn mk_runs_the_same_binary() {
     let env = TempHome::new();
     let dir = tempfile::tempdir().unwrap();
     let run = |name: &str| {
@@ -64,14 +63,6 @@ fn mk_and_mewkit_next_run_the_same_binary() {
     assert_eq!(mk.status.code(), Some(0));
     assert_eq!(mk.stdout, canonical.stdout);
     assert_eq!(mk.stderr, canonical.stderr);
-
-    let next = run("mewkit-next");
-    assert_eq!(next.status.code(), Some(0));
-    assert_eq!(next.stdout, canonical.stdout);
-    assert_eq!(
-        String::from_utf8_lossy(&next.stderr).trim(),
-        r#"mewkit-next is now mewkit; run "mewkit" (or "mk")"#
-    );
 }
 
 #[test]

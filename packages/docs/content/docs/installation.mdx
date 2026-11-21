@@ -37,7 +37,7 @@ The installer checks the archive's size and SHA-256 against the pins it carries,
 Later updates come from `mewkit self-update`. When a newer `mewkit` is out, `init` ends with a one-line note that names it. It checks the release's `binary-manifest.json` and the archive's SHA-256 and size before it replaces the binary, and it keeps the previous binary beside it.
 
 <Callout type="info">
-  The installer also places `mewkit-next` for one release, with a notice that the name has changed. Use `mewkit` or `mk` instead. If an existing `mk` on your PATH is not MeowKit, the installer leaves it alone and reports it.
+  If an existing `mk` on your PATH is not MeowKit, the installer leaves it alone and reports it. A `mewkit-next` left by the 0.1.0 or 0.1.1 installer is removed by a reinstall or by `mewkit self-update`.
 </Callout>
 
 ## Add MeowKit to a project

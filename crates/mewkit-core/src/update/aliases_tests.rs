@@ -34,25 +34,48 @@ fn a_mewkit_install_with_no_other_names_gets_none_added() {
 }
 
 #[test]
-fn a_pre_rename_install_lands_on_the_new_names() {
-    let (_keep, dir) = tempdir();
-    let exe = exe_named(&dir, "mewkit-next", b"new");
-    let done = refresh(&exe);
-    assert_eq!(done.placed, vec![file("mewkit"), file("mk")]);
-    for name in ["mewkit", "mk"] {
-        assert_eq!(std::fs::read(dir.join(file(name))).unwrap(), b"new");
-    }
-}
-
-#[test]
 fn a_directory_under_an_alias_name_is_reported_not_replaced() {
     let (_keep, dir) = tempdir();
-    let exe = exe_named(&dir, "mewkit-next", b"new");
+    let exe = exe_named(&dir, "mewkit", b"new");
     std::fs::create_dir(dir.join(file("mk"))).unwrap();
     let done = refresh(&exe);
-    assert_eq!(done.placed, vec![file("mewkit")]);
+    assert!(done.placed.is_empty());
     assert_eq!(done.problems.len(), 1, "{:?}", done.problems);
     assert!(dir.join(file("mk")).is_dir());
+}
+
+#[cfg(unix)]
+#[test]
+fn a_retired_mewkit_next_link_is_removed() {
+    let (_keep, dir) = tempdir();
+    let exe = exe_named(&dir, "mewkit", b"new");
+    std::os::unix::fs::symlink("mewkit", dir.join("mewkit-next")).unwrap();
+    let done = refresh(&exe);
+    assert_eq!(done.removed, vec!["mewkit-next".to_owned()]);
+    assert!(done.problems.is_empty(), "{:?}", done.problems);
+    assert!(dir.join("mewkit-next").symlink_metadata().is_err());
+}
+
+#[cfg(unix)]
+#[test]
+fn a_retired_mewkit_next_copy_is_removed() {
+    let (_keep, dir) = tempdir();
+    let exe = exe_named(&dir, "mewkit", b"new");
+    script(&dir.join("mewkit-next"), "mewkit 0.1.0");
+    let done = refresh(&exe);
+    assert_eq!(done.removed, vec!["mewkit-next".to_owned()]);
+    assert!(!dir.join("mewkit-next").exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn a_foreign_file_named_mewkit_next_is_left_alone() {
+    let (_keep, dir) = tempdir();
+    let exe = exe_named(&dir, "mewkit", b"new");
+    script(&dir.join("mewkit-next"), "1.2.3");
+    let done = refresh(&exe);
+    assert!(done.removed.is_empty());
+    assert!(dir.join("mewkit-next").exists());
 }
 
 #[cfg(unix)]
@@ -60,7 +83,7 @@ fn a_directory_under_an_alias_name_is_reported_not_replaced() {
 fn an_older_mewkit_copy_becomes_a_link_to_the_new_binary() {
     let (_keep, dir) = tempdir();
     let exe = exe_named(&dir, "mewkit", b"new");
-    script(&dir.join("mk"), "mewkit-next 0.0.1");
+    script(&dir.join("mk"), "mewkit 0.0.1");
     let done = refresh(&exe);
     assert_eq!(done.placed, vec!["mk".to_owned()]);
     assert!(done.problems.is_empty(), "{:?}", done.problems);
@@ -87,11 +110,8 @@ fn called_through_the_mk_link_it_still_works_from_the_real_binary() {
     let (_keep, dir) = tempdir();
     let real = exe_named(&dir, "mewkit", b"new");
     std::os::unix::fs::symlink("mewkit", dir.join("mk")).unwrap();
-    std::os::unix::fs::symlink("mewkit", dir.join("mewkit-next")).unwrap();
     assert_eq!(refresh(&dir.join("mk")), Refreshed::default());
-    for name in ["mk", "mewkit-next"] {
-        assert_eq!(dir.join(name).canonicalize().unwrap(), real);
-    }
+    assert_eq!(dir.join("mk").canonicalize().unwrap(), real);
     assert_eq!(std::fs::read(&real).unwrap(), b"new");
 }
 

@@ -127,20 +127,22 @@ main() {
 	mv -f "$staged" "$install_dir/mewkit" || { rm -f "$staged"; die "cannot place $install_dir/mewkit"; }
 	say "installed $install_dir/mewkit ($version, $channel)"
 
-	# `mk` is the short name; `mewkit-next` is the pre-rename name, kept one release so
-	# existing scripts still run (the binary prints a rename notice under it). A name
-	# already taken by something that is not a mewkit binary is left alone: `mk` is short
-	# enough that another tool may own it. The binary is installed either way.
-	for alias in mk mewkit-next; do
-		link=$install_dir/$alias
-		if [ -e "$link" ] || [ -L "$link" ]; then
-			if [ -d "$link" ] || ! "$link" --version 2>/dev/null | grep -Eq '^mewkit(-next)? '; then
-				say "$link exists and is not mewkit; left as it is (run mewkit directly)"
-				continue
-			fi
-		fi
+	# `mk` is the short name. A name already taken by something that is not a mewkit
+	# binary is left alone: `mk` is short enough that another tool may own it. The binary
+	# is installed either way.
+	link=$install_dir/mk
+	if { [ -e "$link" ] || [ -L "$link" ]; } && { [ -d "$link" ] || ! "$link" --version 2>/dev/null | grep -q '^mewkit '; }; then
+		say "$link exists and is not mewkit; left as it is (run mewkit directly)"
+	else
 		ln -sf mewkit "$link" && say "linked $link to mewkit" || say "could not link $link; run mewkit directly"
-	done
+	fi
+
+	# Installers for 0.1.0 and 0.1.1 also placed `mewkit-next`; remove it when it is mewkit.
+	retired=$install_dir/mewkit-next
+	if { [ -L "$retired" ] && [ "$(readlink "$retired")" = mewkit ]; } ||
+		{ [ -f "$retired" ] && "$retired" --version 2>/dev/null | grep -q '^mewkit '; }; then
+		rm -f "$retired" && say "removed $retired (the name is retired; run mewkit or mk)"
+	fi
 
 	case ":${PATH:-}:" in
 		*":$install_dir:"*) ;;
