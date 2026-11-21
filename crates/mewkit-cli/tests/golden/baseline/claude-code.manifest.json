@@ -708,6 +708,11 @@
       "size": 4766
     },
     {
+      "path": ".claude/shared-families.json",
+      "sha256": "3f9343ebc1255f53b8414cc43cab0b0360419513ade82aa085dcfc7e1c733387",
+      "size": 1086
+    },
+    {
       "path": ".claude/skills/advise/SKILL.md",
       "sha256": "d06f72a9b5247b477da7e7a2d21dfba4989635821a4b85950f71f23ea5172b89",
       "size": 9009
@@ -4603,11 +4608,6 @@
       "path": ".claude/skills/ship/SKILL.md",
       "sha256": "c0934697a624606493fac765a87967a16489923464473052ac41e7a6b1dcf590",
       "size": 11736
-    },
-    {
-      "path": ".claude/skills/ship/references/adversarial-review.md",
-      "sha256": "a47f9434f90cd80ceef429d0224078498704d0224d55ee5253183da1bc471a79",
-      "size": 4949
     },
     {
       "path": ".claude/skills/ship/references/advice-checkpoints.md",
@@ -10344,11 +10344,6 @@
       "path": ".meowkit/cache/.claude/skills/ship/SKILL.md",
       "sha256": "c0934697a624606493fac765a87967a16489923464473052ac41e7a6b1dcf590",
       "size": 11736
-    },
-    {
-      "path": ".meowkit/cache/.claude/skills/ship/references/adversarial-review.md",
-      "sha256": "a47f9434f90cd80ceef429d0224078498704d0224d55ee5253183da1bc471a79",
-      "size": 4949
     },
     {
       "path": ".meowkit/cache/.claude/skills/ship/references/advice-checkpoints.md",
