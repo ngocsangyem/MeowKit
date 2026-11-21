@@ -25,8 +25,8 @@ use commands::{
     uninstall::UninstallArgs, upgrade::UpgradeArgs, validate::ValidateArgs, versions::VersionsArgs,
 };
 use commands::{
-    backups::BackupsArgs, capabilities::CapabilitiesArgs, pack::PackArgs, setup::SetupArgs,
-    skill::SkillArgs,
+    backups::BackupsArgs, capabilities::CapabilitiesArgs, eval::EvalArgs, pack::PackArgs,
+    setup::SetupArgs, skill::SkillArgs,
 };
 
 #[derive(Parser)]
@@ -81,6 +81,8 @@ enum Command {
     Advice(Box<AdviceArgs>),
     /// On-demand trace recall: score, audit, propose, record friction.
     Trace(TraceArgs),
+    /// Measure the kit: run eval cases in sandboxes, compare two reports.
+    Eval(EvalArgs),
     /// Token and USD spend from the cost log.
     Budget(BudgetArgs),
     /// Guided post-scaffold configuration.
@@ -113,6 +115,7 @@ fn main() -> ExitCode {
         Command::Review(args) => commands::review::run(&args),
         Command::Advice(args) => commands::advice::run(&args),
         Command::Trace(args) => commands::trace::run(&args),
+        Command::Eval(args) => commands::eval::run(&args),
         Command::Budget(args) => commands::budget::run(&args),
         Command::Setup(args) => commands::setup::run(&args),
         Command::Skill(args) => commands::skill::run(&args),

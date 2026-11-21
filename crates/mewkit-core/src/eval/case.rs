@@ -67,6 +67,9 @@ pub struct EvalCase {
     pub prompt: String,
     #[serde(default = "default_runs")]
     pub runs: u32,
+    /// The suite this case belongs to; `mewkit eval run --suite` selects by it.
+    #[serde(default = "default_suite")]
+    pub suite: String,
     /// Fixture directory relative to the case file's `eval/` folder; the runner
     /// copies it.
     #[serde(default)]
@@ -92,6 +95,10 @@ pub struct EvalCase {
 
 fn default_runs() -> u32 {
     3
+}
+
+fn default_suite() -> String {
+    "baseline".into()
 }
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]

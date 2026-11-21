@@ -3,7 +3,7 @@ title: "Cost and Telemetry"
 description: "See what a session cost, what it did, and which capabilities the kit declares."
 ---
 
-These commands read logs and manifests that the harness already writes. They change no project state, except `trace --friction`, which appends one note to the trace log.
+These commands read logs and manifests that the harness already writes. They change no project state, except `trace --friction`, which appends one note to the trace log, and `eval run`, which writes a report under `.meowkit/telemetry/eval/`.
 
 ## budget
 
@@ -56,6 +56,23 @@ mewkit trace --friction "<note>" [--responsibility <r>] [--id <run-id>]
 ```
 
 `propose --commit` appends the proposed items to the advisory backlog. `--id` filters `score` to one run and attributes a `--friction` note to a run. `--json` prints JSON.
+
+## eval
+
+`eval` measures the kit. `eval run` drives a runtime headlessly over a suite of cases and writes a JSON report; `eval compare` compares two reports of the same suite. Runs are opt-in: nothing starts one from a hook or an install.
+
+```bash
+mewkit eval run --suite baseline --dry-run
+mewkit eval run --suite baseline --runtime claude-code --model <pinned-model> --max-cost-usd 5 --max-runs 40 --kit-archive meowkit-release.zip
+mewkit eval compare <base.json> <new.json> [--json]
+```
+
+- Each run happens in a fresh copy of the case's fixture with the kit archive installed by `mewkit init`, never in your project. Use a release `meowkit-release.zip`, or build one from a checkout to measure your own changes. For a paired case, the "skill off" side deletes every installed copy of the skill under test.
+- The runtime gets an empty config home and only the environment it needs: `PATH`, locale, and its own login variable (`CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` for Claude Code, `CODEX_API_KEY` or `OPENAI_API_KEY` for Codex). No login file is copied.
+- `--model`, `--max-cost-usd`, `--max-runs` and `--kit-archive` are required to run cases. The cost ceiling is shared by every eval run in the project at the same time.
+- A run that times out, is rate-limited or ends without a result is retried twice and then recorded as an error, kept out of every rate. A report is incomplete when errors pass 5% of runs, when a case ran other than planned, or when a case was skipped.
+- `compare` refuses incomplete reports and reports that differ in runtime, model, case set or case list, and exits 1.
+- Cases live in `<skill>/eval/*.yaml` under `.claude/skills`. `--case-root` reads another folder and needs `--trust-cases`, because its cases run model turns.
 
 ## capabilities
 

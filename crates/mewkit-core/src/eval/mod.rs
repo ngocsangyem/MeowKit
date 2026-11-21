@@ -8,11 +8,14 @@
 pub mod case;
 pub mod compare;
 pub mod grade;
+pub mod ledger;
 pub mod load;
 mod load_fs;
 mod rates;
 pub mod report;
 mod report_check;
+pub mod runner;
+pub mod sandbox;
 pub mod transcript;
 
 pub use case::{Assertion, CaseError, CaseKind, EvalCase};
@@ -36,6 +39,9 @@ mod compare_tests;
 #[path = "grade_tests.rs"]
 mod grade_tests;
 #[cfg(test)]
+#[path = "ledger_tests.rs"]
+mod ledger_tests;
+#[cfg(test)]
 #[path = "load_tests.rs"]
 mod load_tests;
 #[cfg(test)]
@@ -44,6 +50,12 @@ mod report_check_tests;
 #[cfg(test)]
 #[path = "report_tests.rs"]
 mod report_tests;
+#[cfg(test)]
+#[path = "runner_tests.rs"]
+mod runner_tests;
+#[cfg(test)]
+#[path = "sandbox_tests.rs"]
+mod sandbox_tests;
 #[cfg(test)]
 #[path = "transcript_tests.rs"]
 mod transcript_tests;
