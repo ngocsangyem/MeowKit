@@ -76,6 +76,7 @@ dependencies: []
 ## Key Insights
 
 - {Finding from research, cite source: `(from: research/researcher-01-topic.md)`}
+- [ASSUMPTION] {claim not yet verified}. Breaks if: {the observable sign it is false}. Then: {the response}.
 - {Critical consideration for this phase}
 
 ## Requirements
@@ -103,8 +104,8 @@ dependencies: []
 
 ## Implementation Steps
 
-1. {Numbered, specific, file-referenced steps}
-2. {Each step is actionable by a developer}
+1. {Contract level: the behaviour to deliver, the boundary it must stay inside, the invariant it must keep}
+2. {Add file-level detail (paths, signatures, order of edits) only at FULL density; see Rules}
 
 ## Todo List
 
@@ -194,6 +195,8 @@ These sections are NOT added in default mode (12-section template remains unchan
 - Each phase file: ≤150 lines (≤180 with TDD or deep sections)
 - Sections can be brief but MUST exist (use "N/A" if not applicable)
 - Key Insights MUST cite research source when available
+- **Contract level by default.** Implementation Steps state behaviour, boundaries and invariants. File-level steps are added only when the executor is one that needs them: the `FULL` density in `mk:autobuild`'s density matrix (Sonnet-class and older models). At `LEAN` density, or in a plain `mk:cook` run on a current model, keep steps at contract level.
+- **Open assumptions carry their exit.** Every `[ASSUMPTION]` still unresolved when the plan is written records the sign that it broke (`Breaks if:`) and the response (`Then:`), so the executor can tell a failed assumption from a hard task.
 - Todo checkboxes map 1:1 to implementation steps
 - Success criteria must be verifiable (command to run or file to check)
 - **Runnable increment:** where applicable, the Success Criteria should confirm the phase leaves the system runnable / a demoable increment exists (e.g. a command boots, an endpoint responds, a screen renders). This pairs with vertical-slice decomposition (one end-to-end path per phase). Pure foundation phases — migrations, shared types, env/config — are exempt.

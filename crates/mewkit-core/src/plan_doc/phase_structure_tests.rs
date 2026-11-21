@@ -159,3 +159,22 @@ fn checkboxes_are_counted_only_inside_the_todo_list() {
     let content = "## Overview\n\n- [x] not a todo\n\n## Todo List\n\n- [x] a\n- [ ] b\n";
     assert_eq!(count_checkboxes(content), (2, 1));
 }
+
+#[test]
+fn contract_level_steps_and_assumption_exits_pass_the_structure_check() {
+    // Steps name behaviour, a boundary and an invariant, with no file paths; the
+    // open assumption carries the sign it broke and the response.
+    let content = complete_phase()
+        .replace(
+            "## Key Insights\n\nx",
+            "## Key Insights\n\n- [ASSUMPTION] The queue is ordered. Breaks if: two jobs for one key run out of order. Then: return to the plan.",
+        )
+        .replace(
+            "## Implementation Steps\n\nx",
+            "## Implementation Steps\n\n1. Deliver retries for failed jobs; stay inside the worker module; keep one job per key in flight.",
+        );
+    assert_eq!(
+        check_phase_file(&content, "phase-01-setup.md"),
+        Vec::<String>::new()
+    );
+}

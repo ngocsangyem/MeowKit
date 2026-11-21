@@ -48,9 +48,9 @@ depends_on: [phase numbers this depends on, e.g., "01, 02"]
 
 ## Implementation Steps
 
-1. [ ] {Step} — `path/to/file.ext`
-2. [ ] {Step} — `path/to/file.ext`
-3. [ ] {Step} — `path/to/file.ext`
+1. [ ] {Behaviour to deliver, boundary it stays inside, invariant it keeps}
+2. [ ] {Same level; name `path/to/file.ext` only when the executor needs the file-level detail}
+3. [ ] {Same level}
 
 ## Phase Acceptance Criteria
 
