@@ -13,12 +13,7 @@ tier_selection[3]{tier,pin,when_to_use,agents}:
 
 ## Complexity to Model
 
-```toon
-complexity_tier[3]{complexity,default_tier,override_to_complex}:
-  Quick,TRIVIAL,Never
-  Standard,STANDARD,User asks for architecture/design
-  Deep,STANDARD,Always consider COMPLEX for the planning phase
-```
+The task-complexity tiers and their routing CSV levels are defined in `model-selection-rules.md` (Task Complexity Tiers). A task takes the tier its complexity names.
 
 ## Task Type to Model
 
@@ -65,7 +60,6 @@ Include in detection result:
 
 - **Agent:** architect
 - **Tier:** COMPLEX (pin: `opus`)
-- **Complexity:** Standard
 - **Reason:** API endpoint implementation
 ```
 

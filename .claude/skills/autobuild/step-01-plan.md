@@ -34,7 +34,11 @@ Agent(
     - Return the absolute plan path
 
     Work context: $(pwd)
+    Plan: none
     Reports: tasks/reports/
+    Plans: tasks/plans/
+    Files to modify: tasks/plans/{date}-{slug}/
+    Acceptance criteria: check-product-spec.sh exits 0 and the absolute plan path is returned
   "
 )
 ```

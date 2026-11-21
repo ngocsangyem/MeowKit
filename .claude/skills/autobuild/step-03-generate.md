@@ -65,6 +65,10 @@ Agent(
     Status: return DONE | DONE_WITH_CONCERNS | BLOCKED with handoff path
 
     Work context: $(pwd)
+    Reports: tasks/reports/
+    Plans: none
+    Files to modify: the files the contract scope names
+    Files to read for context: the plan, the contract and the prior verdict above
   "
 )
 ```

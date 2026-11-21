@@ -32,12 +32,7 @@ After complexity routing, detect TDD mode:
 5. **If OFF (default):** Phase 2 is optional — skip `tester` invocation unless explicitly requested or unless the plan's acceptance criteria require test coverage. Route directly from `planner` → `developer` → `reviewer`
 6. TDD mode does NOT change model tier selection — that's controlled by complexity routing only
 
-```toon
-[3]{csv_level,model_tier,plan_agreement}
-low + one-shot workflow|TRIVIAL (Haiku)|Bypass eligible
-medium|STANDARD (Sonnet)|Required
-high|COMPLEX (Opus)|Required
-```
+Map the CSV level to a tier per `.claude/skills/agent-detector/references/model-selection-rules.md` (Task Complexity Tiers). Plan agreement: `low` + one-shot workflow is bypass eligible; `medium` and `high` require it.
 
 ## What You Do
 

@@ -27,7 +27,7 @@ The skill has no manual entry point. To force a lighter path, add `--quick` or u
 3. Phase-zero rules. Reads the phase contracts and the agent-routing, model-selection, scale-adaptive, risk-checklist and context-budget references. A missing one stops the run. The skill-domain-routing reference is advisory.
 4. Agile context. If a sprint-state contract exists, the active plan lists `jira_tickets`, `MEOW_JIRA_SITE_URL` is set, or the message contains a Jira key, it also reads three `agile-*.md` references and shows the sprint goal in the banner.
 5. Scoring. Reuses the cached result when the workflow is the same and the phase is above 1 (`.meowkit/cache/agent-detection-cache.json`). Otherwise it scores every agent across five layers.
-6. Tier and risk flags. Picks Quick, Standard or Deep, and checks nine risk flags. A match on AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC or EXT_SYSTEM raises the tier to COMPLEX.
+6. Tier and risk flags. Picks TRIVIAL, STANDARD or COMPLEX, and checks nine risk flags. A match on AUTH, AUTHZ, DATA_MODEL, AUDIT_SEC or EXT_SYSTEM raises the tier to COMPLEX.
 7. Banner and hand-off. Shows the banner, loads the chosen agent's instructions from `.claude/agents/` and invokes the matching skill.
 
 ## Scoring layers
@@ -53,17 +53,13 @@ The tester is secondary for implementation and bug fixes, primary for testing re
 
 ## Complexity
 
-| Level | Criteria | Approach |
-|---|---|---|
-| Quick | One file, typo, explicit path | Direct implementation |
-| Standard | 2 to 5 files, feature add, some unknowns | Scout, then implement |
-| Deep | 6 or more files, architecture, vague scope | Research, plan, implement |
+The tiers are TRIVIAL, STANDARD and COMPLEX, mapped to the routing CSV levels in `model-selection-rules.md` (Task Complexity Tiers).
 
 Each agent runs on its own model pin. The tier decides which agent runs, not which model it uses. Pins are listed in `scripts/lib/model-pins.md`.
 
 ## Team mode
 
-Team mode starts only when `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, complexity is Deep, at least two domains score 50 or more, and the task needs cross-domain work.
+Team mode starts only when `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, complexity is COMPLEX, at least two domains score 50 or more, and the task needs cross-domain work.
 
 ## Response depth
 

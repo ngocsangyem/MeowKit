@@ -41,6 +41,7 @@ The skill asks for each field and always offers an Other option for free input.
 | Files to read for context | Asked, as specific paths |
 | Acceptance criteria | Asked, binary pass or fail only |
 | Constraints | Asked: what must not change |
+| Reports and Plans paths | Derived from the work context: `tasks/reports/` and `tasks/plans/` under it |
 
 When the work context differs from the current directory, every path in the prompt uses the work-context root, because a subagent given the wrong root writes into the wrong project.
 
@@ -52,19 +53,6 @@ Every field is text a person supplied, so each is scanned before assembly for th
 
 ## Output
 
-A fenced block under a review header, aimed at 200 tokens or fewer:
-
-```
----DELEGATION PROMPT (review before delegating)---
-Task: {task}
-Work context: {work_context}
-Plan: {plan_path or "none"}
-Files to modify: {globs}
-Files to read for context: {paths}
-Acceptance criteria:
-  - {criterion}
-Constraints: {constraints or "none"}
----END DELEGATION PROMPT---
-```
+A review header, then the delegation prompt template, aimed at 200 tokens or fewer. The template (Task, Work context, Plan, Reports, Plans, Files to modify, Files to read for context, Acceptance criteria, Constraints) is defined once in `.claude/skills/cook/references/orchestration-rules.md` under Delegation Prompt Template. The skill copies it verbatim and `mewkit validate` keeps the copy identical.
 
 The prompt carries no session history, no prior conversation, no project instruction file content and no orchestrator reasoning. The subagent starts with these fields and nothing else.

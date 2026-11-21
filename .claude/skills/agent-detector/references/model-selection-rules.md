@@ -13,6 +13,13 @@ adaptation_notes: >
 These rules are the Claude Code adapter for model selection. Generic skills emit provider-neutral task tiers; this adapter maps those tiers to the models available in Claude Code.
 The orchestrator agent MUST declare the tier before any task begins.
 
+## Contents
+
+- [Routing Table](#routing-table)
+- [Task Complexity Tiers](#task-complexity-tiers)
+- [Agent `model:` Pins](#agent-model-pins)
+- [Rules](#rules)
+
 ## Routing Table
 
 | Task Type                  | Model Tier                     | Reasoning Level | Examples                                                                             |
@@ -22,6 +29,18 @@ The orchestrator agent MUST declare the tier before any task begins.
 | **Quick edits**            | TRIVIAL (Cheapest: Haiku)      | Low/Off         | Rename, typo, format, version bump, config change, comment update                    |
 | **Code review**            | COMPLEX (Best available)       | High            | Structural audit, security review, architecture review                               |
 | **Research/analysis**      | STANDARD or COMPLEX            | Medium-High     | Technical research, dependency analysis, performance profiling                       |
+
+## Task Complexity Tiers
+
+TRIVIAL, STANDARD and COMPLEX are the one task-complexity vocabulary in the kit. Other files point here instead of restating it. Quick, Standard and Deep elsewhere are skill modes or profiles, not complexity tiers.
+
+| Tier | Routing CSV `level` | Size signals | Approach |
+| --- | --- | --- | --- |
+| TRIVIAL | `low` | Single file, simple fix, clear scope, explicit path | Direct implementation, skip research |
+| STANDARD | `medium` | 2-5 files, feature add, some unknowns | Scout first, then implement |
+| COMPLEX | `high` | 6+ files, architecture, vague scope | Research, plan, implement |
+
+The CSV `level` values (`low`, `medium`, `high`) are data tokens that `mk:scale-routing` emits and its eval parses. They are not renamed; this table is the only place they are mapped to tiers. A CSV level is a floor: Rule 4 makes `high` binding, and size signals or a risk flag may raise the tier above `low` or `medium`.
 
 Source: prompt-crafting-for-different-models.md — Model Selection Strategy table
 

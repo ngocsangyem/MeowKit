@@ -54,6 +54,12 @@ Agent(
     and every AC form is present.
 
     Work context: $(pwd)
+    Plan: $plan_dir/plan.md
+    Reports: none
+    Plans: none
+    Files to modify: tasks/contracts/{date-time}-{slug}-sprint-1.md
+    Acceptance criteria: 5–15 ACs, each with a Verification line and a Rubric tie-in
+    Constraints: Do NOT edit source code or the product spec
   "
 )
 ```
@@ -70,6 +76,14 @@ Agent(
     Append Round 1 (reviewer) entries to the Negotiation Log section.
     If clean, write 'Round 1 (reviewer): accepted'.
     Hard cap: 2 rounds. Round 3 escalates to the user.
+
+    Work context: $(pwd)
+    Plan: $plan_dir/plan.md
+    Reports: none
+    Plans: none
+    Files to modify: tasks/contracts/*-${slug}-sprint-1.md (Negotiation Log only)
+    Acceptance criteria: the Negotiation Log carries a Round 1 (reviewer) entry
+    Constraints: Do NOT edit source code or any section other than the Negotiation Log
   "
 )
 ```

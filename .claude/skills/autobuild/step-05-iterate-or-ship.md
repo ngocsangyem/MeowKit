@@ -122,6 +122,9 @@ Agent(
     Read tasks/handoff/{slug}-sprint-1.md for the build summary.
 
     Work context: $(pwd)
+    Plan: $plan_dir/plan.md
+    Reports: tasks/reports/
+    Plans: none
     Files to modify: standard ship pipeline files (CHANGELOG, VERSION, git tags)
     Files to read: tasks/reviews/*-evalverdict.md, tasks/handoff/*.md, .claude/agents/shipper.md
     Acceptance criteria:

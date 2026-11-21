@@ -109,6 +109,8 @@ If the task involves a frontend (web, mobile, or visual UI):
 
    Work context: {absolute path to project root}
    Plan: {absolute path to {plan_dir}/plan.md}
+   Reports: none
+   Plans: {plan_dir}
    Files to modify: {plan_dir}/plan.md  (write only into the ## Design Language section, nothing else)
    Files to read for context: {plan_dir}/plan.md (current draft), references/anthropic-example-plan.md (calibration)
    Acceptance criteria:
