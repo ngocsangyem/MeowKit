@@ -177,4 +177,4 @@ mewkit self-update
 mewkit self-update --channel beta
 ```
 
-`self-update` fetches the newest binary release's `binary-manifest.json`, refuses an older version, checks the archive's SHA-256 and size, and replaces the running binary. The previous binary stays beside it with an `.old` suffix. `--check` only reports, and exits 3 when an update exists. When the running version has been withdrawn, it says so.
+`self-update` fetches the newest binary release's `binary-manifest.json`, refuses an older version, checks the archive's SHA-256 and size, and replaces the running binary. The previous binary stays beside it with an `.old` suffix. `--check` only reports, and exits 3 when an update exists. `init` makes the same comparison against the newest stable release and, when this binary is older, ends with one line on stderr naming it; it is skipped with `--offline`, `--kit-archive` or `--kit-dir`, and stays silent when GitHub does not answer within 2 seconds. When the running version has been withdrawn, it says so.

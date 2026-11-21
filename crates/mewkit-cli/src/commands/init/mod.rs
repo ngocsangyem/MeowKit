@@ -2,6 +2,7 @@
 mod choose;
 mod guard;
 mod mcp;
+mod update_notice;
 
 use clap::Args;
 use mewkit_adapters::claude_code::plugin_manifest;
@@ -254,6 +255,10 @@ pub fn run(args: &InitArgs) -> Result<u8, Failure> {
     )?;
     for note in mcp_notes {
         eprintln!("note: {note}");
+    }
+    // Only where this run was allowed to reach GitHub for its kit anyway.
+    if args.kit.may_fetch() {
+        update_notice::show();
     }
     if unconfirmed {
         return Ok(crate::failure::PENDING);

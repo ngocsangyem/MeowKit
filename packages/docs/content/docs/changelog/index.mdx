@@ -15,6 +15,10 @@ A project still on the npm CLI: read [Moving from the npm CLI](/migration/from-n
 
 ## Unreleased
 
+### Features
+
+- `init` ends with a one-line note when a newer `mewkit` binary is released, naming `mewkit self-update`. It asks GitHub once per run, waits at most 2 seconds, and is skipped with `--offline`, `--kit-archive` or `--kit-dir`.
+
 ### Bug Fixes
 
 - `upgrade` and `uninstall` download the installed kit release again when the cache no longer has it. Before, a clone or a project with a cleaned `.meowkit/cache` kept every file the new kit had dropped, because nothing proved the kit had written them.
