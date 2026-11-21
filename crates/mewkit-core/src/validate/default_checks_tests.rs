@@ -108,6 +108,27 @@ fn the_authoring_run_adds_every_coherence_section() {
 }
 
 #[test]
+fn shared_family_drift_fails_the_authoring_run() {
+    let dir = tempfile::tempdir().expect("a temp dir");
+    let claude = dir.path().join(".claude");
+    fs::create_dir_all(claude.join("skills/a")).expect("create a skill dir");
+    fs::create_dir_all(claude.join("skills/b")).expect("create a skill dir");
+    fs::write(claude.join("skills/a/p.md"), "x").expect("write the canonical");
+    fs::write(claude.join("skills/b/p.md"), "y").expect("write a drifted copy");
+    fs::write(
+        claude.join("shared-families.json"),
+        r#"{"families":[{"name":"p","canonical":"skills/a/p.md","members":["skills/b/p.md"]}]}"#,
+    )
+    .expect("write the manifest");
+    let results = build_default_checks(&claude, dir.path(), ValidateMode::Authoring, false);
+    let row = results
+        .iter()
+        .find(|r| r.name == "Shared family: p")
+        .expect("the family row");
+    assert_eq!(row.status, Status::Fail);
+}
+
+#[test]
 fn portable_adds_the_provider_contract_rows_in_either_mode() {
     let (_dir, consumer) = run(ValidateMode::FlatCopy, true);
     assert!(

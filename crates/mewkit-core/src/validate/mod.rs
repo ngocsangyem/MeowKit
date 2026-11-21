@@ -76,6 +76,7 @@ mod result;
 mod routing_breadth;
 mod runtime_contract;
 mod shared_families;
+mod shared_sections;
 mod stale_index;
 mod stale_index_emit;
 mod stale_index_specs;

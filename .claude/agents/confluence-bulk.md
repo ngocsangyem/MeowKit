@@ -17,22 +17,34 @@ You execute bulk operations across many Confluence pages via the `confluence-as`
 
 ## Required Context
 
+<!-- shared:executor-context -->
 Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
+<!-- /shared:executor-context -->
 
 ## Skill Rule of Two
 
-This agent is **A (untrusted CQL / page-id list) + C (Confluence state change via wrapper, HIGH BLAST RADIUS)**, NOT B (sensitive data — tokens stay in the wrapper). 2/3 = compliant under the injection-safety rule of two. Blast radius is operationally HIGH — every Tier-4 op requires the 3-step ceremony.
+This agent is **A (untrusted CQL / page-id list) + C (Confluence state change via wrapper, HIGH BLAST RADIUS)**.
+
+<!-- shared:executor-rule-of-two -->
+NOT B (sensitive data — tokens stay in the wrapper and never enter the agent context). 2/3 = compliant under the injection-safety rule of two.
+<!-- /shared:executor-rule-of-two -->
+
+Blast radius is operationally HIGH — every Tier-4 op requires the 3-step ceremony.
 
 ## Pre-flight
 
+<!-- shared:confluence-wrapper-call -->
 ```bash
 bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh <args>
 ```
+<!-- /shared:confluence-wrapper-call -->
 
 
 ## Procedure references
 
+<!-- shared:executor-procedure -->
 Use the routed skill and domain reference files for CLI syntax, safety tiers, templates, and operation-specific examples. Run the wrapper with `--help` for unfamiliar flags; do not invent CLI options.
+<!-- /shared:executor-procedure -->
 
 ## CQL Sanitization (MANDATORY)
 
@@ -80,7 +92,9 @@ bash $CLAUDE_PROJECT_DIR/.claude/skills/confluence/scripts/confluence-as.sh bulk
 
 ## Memory
 
+<!-- shared:executor-memory -->
 Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
+<!-- /shared:executor-memory -->
 
 ## Output Protocol
 
@@ -88,7 +102,9 @@ For dry-run: return: impacted-count + first 5 affected page titles + the exact c
 
 For exec: return: pages-changed-count + first 5 + last 5 + URL to the CQL search reflecting the change.
 
+<!-- shared:executor-status -->
 End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+<!-- /shared:executor-status -->
 
 ## Gotchas
 

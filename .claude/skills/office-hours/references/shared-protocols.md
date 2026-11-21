@@ -156,6 +156,7 @@ Then write a `## REVIEW REPORT` section to the end of the plan file:
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/mk:plan-ceo-review` | Scope & strategy | 0 | — | — |
+| Outside Voice | Claude adversarial subagent | Independent 2nd opinion | 0 | — | — |
 | Design Review | `/mk:frontend-design` | UI/UX gaps | 0 | — | — |
 
 **VERDICT:** NO REVIEWS YET — run `/mk:plan-ceo-review` or the individual reviews above.

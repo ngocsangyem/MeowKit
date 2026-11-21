@@ -49,7 +49,7 @@ Skip: Always — retros don't require pre-planning.
 
 ## Workflow
 
-1. **Initialize** — run preamble, parse arguments (time window, mode). See `references/preamble.md`, `references/data-gathering.md`
+1. **Initialize** — run preamble, parse arguments (time window, mode). See `references/preamble.md`, `references/preamble-retro.md`, `references/data-gathering.md`
 2. **Gather + compute** — fetch origin, run git commands, compute metrics (summary, leaderboard, backlog, skills, eureka). See `references/data-gathering.md`, `references/metrics-computation.md`
 3. **Analyze** — per-person breakdown (praise + growth), time patterns, trends, streaks. See `references/team-analysis.md`, `references/trends-history.md`
 4. **Output** — save snapshot to `tasks/reports/retros/`, write narrative with tweetable summary. See `references/narrative-output.md`, `references/telemetry.md`
@@ -78,6 +78,7 @@ See `references/tone-and-rules.md`
 | File                                       | Contents                                                             |
 | ------------------------------------------ | -------------------------------------------------------------------- |
 | `references/preamble.md`                   | Session initialization, upgrade checks, lake intro, telemetry prompt |
+| `references/preamble-retro.md`             | Memory write step, loaded with the preamble                          |
 | `references/ask-user-question-format.md`   | Standard ask the user structure (5 rules)                         |
 | `references/completeness-principle.md`     | Boil the Lake principle, effort estimation tables                    |
 | `references/repo-ownership-mode.md`        | Solo vs collaborative repo behavior                                  |

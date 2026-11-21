@@ -1670,6 +1670,11 @@
       "size": 3492
     },
     {
+      "path": ".claude/skills/cso/references/preamble-cso.md",
+      "sha256": "0911a4ad2be4c25ffb2c653af464c8a23ff161495cc9938b7b3a288f2fa6e7d8",
+      "size": 280
+    },
+    {
       "path": ".claude/skills/cso/references/preamble.md",
       "sha256": "8e3714b3fd585b4534c5d7a00fda9fc89336c0e7bae7e384f4fed9ec8ea4c25c",
       "size": 3396
@@ -2511,6 +2516,11 @@
       "size": 4314
     },
     {
+      "path": ".claude/skills/investigate/references/preamble-investigate.md",
+      "sha256": "0be35d1bea0d772c451e64fdaf56f41cad5a83440d59f3c34a4a4ab48a0e1933",
+      "size": 817
+    },
+    {
       "path": ".claude/skills/investigate/references/preamble.md",
       "sha256": "f21eead834ce90ce879a4592ca1631740daed05c0d0b41ac4b49cb5a16242b9a",
       "size": 2644
@@ -3275,6 +3285,11 @@
       "path": ".claude/skills/office-hours/references/phase6-handoff.md",
       "sha256": "33acc18c516012555a0cc306d6128d1866ec37651bc7d8032299954ac1ec5937",
       "size": 4943
+    },
+    {
+      "path": ".claude/skills/office-hours/references/preamble-office-hours.md",
+      "sha256": "1cf341450bb9deb5bb1cbd2774eabcd48ee1fd78c793dfdcb7a000a79324bb23",
+      "size": 693
     },
     {
       "path": ".claude/skills/office-hours/references/preamble.md",
@@ -4080,6 +4095,11 @@
       "size": 11368
     },
     {
+      "path": ".claude/skills/qa/references/shared-protocols.md",
+      "sha256": "746489e680811f3e56184fdd3d9bae86883f215d32977fc849817c7ab8612bc3",
+      "size": 10206
+    },
+    {
       "path": ".claude/skills/qa/references/workflow-phases.md",
       "sha256": "9d93e71964cddae8178428f8e9db2014ff4bbb9e1437b1c2e9c652884313b8b3",
       "size": 11912
@@ -4183,6 +4203,11 @@
       "path": ".claude/skills/retro/references/plan-status-footer.md",
       "sha256": "82c601ef9b220f22b6c044f985f897f1f4a2ca9c68a2b2472d03f6a71a45e31b",
       "size": 1231
+    },
+    {
+      "path": ".claude/skills/retro/references/preamble-retro.md",
+      "sha256": "34435b13c911f5702fe724fc3ffc9c632613e161e6bda86b84121ea0c29cf684",
+      "size": 557
     },
     {
       "path": ".claude/skills/retro/references/preamble.md",
@@ -4310,6 +4335,11 @@
       "size": 2736
     },
     {
+      "path": ".claude/skills/review/references/preamble-review.md",
+      "sha256": "2383d726ca20e6c89e506cfe7c1509bca6aeeb00857756a9b4a0a4db89204b50",
+      "size": 1204
+    },
+    {
       "path": ".claude/skills/review/references/preamble.md",
       "sha256": "e36d9670542bf6801718e319bc9af42434839ef20f6a5314e4d8a4e70e13af0c",
       "size": 14606
@@ -4318,6 +4348,11 @@
       "path": ".claude/skills/review/references/scope-drift-detection.md",
       "sha256": "036a8dc3efc7c4562ffe435c2bbbc8de90d80bb61f0fa21e8c9027d029518e4c",
       "size": 8244
+    },
+    {
+      "path": ".claude/skills/review/references/shared-protocols.md",
+      "sha256": "746489e680811f3e56184fdd3d9bae86883f215d32977fc849817c7ab8612bc3",
+      "size": 10206
     },
     {
       "path": ".claude/skills/review/references/test-coverage.md",
@@ -4653,6 +4688,11 @@
       "path": ".claude/skills/ship/references/pre-landing-review.md",
       "sha256": "aa4fbdcfa8cdb67ee1d2e69507f18a9775dd76ced86407b33b5721d6339754bf",
       "size": 3077
+    },
+    {
+      "path": ".claude/skills/ship/references/preamble-ship.md",
+      "sha256": "9c282cba2523bc6c9dc67c8f5c6c124676003eca1aa0a5f54780438ec6f28a12",
+      "size": 8435
     },
     {
       "path": ".claude/skills/ship/references/preamble.md",

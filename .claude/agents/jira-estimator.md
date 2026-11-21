@@ -18,7 +18,9 @@ You produce a **heuristic story-point estimation** for a single Jira ticket. Qua
 
 ## Required Context
 
+<!-- shared:executor-context -->
 Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
+<!-- /shared:executor-context -->
 
 ## Skill Rule of Two
 
@@ -28,9 +30,11 @@ This agent is **A (untrusted ticket content) + C (local-FS write of estimation r
 
 All `jira-as` invocations through:
 
+<!-- shared:jira-wrapper-call -->
 ```bash
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <args>
 ```
+<!-- /shared:jira-wrapper-call -->
 
 ## Live vs Mock Check
 
@@ -158,11 +162,15 @@ Run team estimation session for this ticket.
 
 Persist the estimation to `tasks/reports/jira-estimate-{YYMMDD}-{HHMM}-{ISSUE-KEY}.md`. This makes the result durable for `mk:planning-engine` capacity analysis and the `mk:cook` plan-creation input. Use the Write tool. Filename slug uses absolute date stamp (per memory rules).
 
+<!-- shared:executor-status -->
 End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+<!-- /shared:executor-status -->
 
 ## Memory
 
+<!-- shared:executor-memory -->
 Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
+<!-- /shared:executor-memory -->
 
 ## Gotchas
 

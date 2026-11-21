@@ -18,7 +18,9 @@ You analyze a single Jira ticket for **complexity** and **inconsistencies**. You
 
 ## Required Context
 
+<!-- shared:executor-context -->
 Load `docs/project-context.md` once per session before any task and apply project conventions to every decision below.
+<!-- /shared:executor-context -->
 
 ## Skill Rule of Two
 
@@ -28,9 +30,11 @@ This agent is **A (untrusted ticket content) + C (local-FS write of evaluation r
 
 The parent SessionStart hook validated `.meowkit/.env`. All `jira-as` invocations go through:
 
+<!-- shared:jira-wrapper-call -->
 ```bash
 bash $CLAUDE_PROJECT_DIR/.claude/skills/jira/scripts/jira-as.sh <args>
 ```
+<!-- /shared:jira-wrapper-call -->
 
 ## Live vs Mock Check
 
@@ -154,11 +158,15 @@ Persist the evaluation to `tasks/reports/jira-evaluate-{YYMMDD}-{HHMM}-{ISSUE-KE
 
 Naming uses the absolute date stamp (per memory rules: convert relative dates to absolute). Filename slug: `{YY}{MM}{DD}-{HH}{MM}` (e.g. `YYMMDD-HHMM`).
 
+<!-- shared:executor-status -->
 End with the A1 status block exactly as defined in `.claude/rules/agent-conduct.md` (A1).
+<!-- /shared:executor-status -->
 
 ## Memory
 
+<!-- shared:executor-memory -->
 Capture only durable, non-sensitive operational patterns. Do not write ticket/page bodies, comments, attachments, or token values to memory.
+<!-- /shared:executor-memory -->
 
 ## Gotchas
 

@@ -67,7 +67,7 @@ Skip: Investigation itself doesn't need a plan — it produces the input for pla
 
 ## Process
 
-1. **Run preamble** — load `references/preamble.md` and execute the startup bash block
+1. **Run preamble** — load `references/preamble.md` and `references/preamble-investigate.md` and execute the startup bash block
 2. **Collect symptoms** — read error messages, stack traces, reproduction steps
 3. **Investigate root cause** — load `references/debugging-methodology.md` and follow Phase 1-3. For recurring patterns or complex failures, load `references/rca-method-selection.md` for methodology selection. Load `references/rca-anti-patterns.md` to avoid common RCA mistakes.
 4. **Check alternatives** — test the strongest competing explanation before declaring a root cause.
@@ -82,6 +82,7 @@ Load **only when executing** the corresponding step — not upfront.
 | Reference                                                             | When to load                    | Content                                                                     |
 | --------------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------- |
 | **[preamble.md](./references/preamble.md)**                           | Step 1 — skill startup          | Session init, env detection, upgrade check                                  |
+| **[preamble-investigate.md](./references/preamble-investigate.md)**   | Step 1 — skill startup          | State dir, memory load, upgrade handling                                    |
 | **[debugging-methodology.md](./references/debugging-methodology.md)** | Steps 2-4 — investigation | Evidence collection and hypothesis testing |
 | **[shared-protocols.md](./references/shared-protocols.md)**           | Step 7 — completion             | User question format, completion status, telemetry      |
 

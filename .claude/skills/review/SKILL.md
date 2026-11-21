@@ -128,13 +128,15 @@ Execute via `workflow.md`. Each step is a separate file loaded JIT:
 
 For high-stakes code (payments, auth, security) or `--iterative` flag, load `references/iterative-evaluation-protocol.md` for the 3-pass structured review process.
 
-See also reference files for supplementary checks: [preamble](references/preamble.md), [scope-drift](references/scope-drift-detection.md), [design-review](references/design-review.md), [test-coverage](references/test-coverage.md), [adversarial-review](references/adversarial-review.md), [artifact-verification](references/artifact-verification.md).
+See also reference files for supplementary checks: [preamble](references/preamble.md), [preamble-review](references/preamble-review.md), [shared-protocols](references/shared-protocols.md), [scope-drift](references/scope-drift-detection.md), [design-review](references/design-review.md), [test-coverage](references/test-coverage.md), [adversarial-review](references/adversarial-review.md), [artifact-verification](references/artifact-verification.md).
 
 ## References
 
 | File                                                                       | Contents                                                                                                                                                                                      |
 | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [references/preamble.md](references/preamble.md)                           | Session setup, upgrade check, telemetry, user question format, completeness principle, repo ownership mode, search-before-building, completion status, plan status footer |
+| [references/preamble.md](references/preamble.md)                           | Session setup, upgrade check, lake intro, telemetry prompt |
+| [references/preamble-review.md](references/preamble-review.md)             | Memory read, write and sensitive-data boundary, loaded with the preamble |
+| [references/shared-protocols.md](references/shared-protocols.md)           | User question format, completeness principle, repo ownership mode, search-before-building, completion status, telemetry, plan status footer |
 | [references/scope-drift-detection.md](references/scope-drift-detection.md) | Plan file discovery, actionable item extraction, cross-reference against diff, scope creep and missing requirements detection                                                                 |
 | [references/two-pass-review.md](references/two-pass-review.md)             | Two-pass checklist application (critical then informational), enum completeness, search-before-recommending                                                                                   |
 | [references/design-review.md](references/design-review.md)                 | Frontend-conditional design review, design checklist application, design voice                                                                                                                 |

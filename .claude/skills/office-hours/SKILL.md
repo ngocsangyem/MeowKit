@@ -56,14 +56,15 @@ A bare “brainstorm” request is ambiguous: ask whether the user wants product
 
 ## Workflow
 
-1. **Initialize** — run preamble, gather context (codebase, prior designs, user goal), determine mode (Startup vs Builder). See `references/preamble.md`, `references/phase1-context-gathering.md`
+1. **Initialize** — run preamble, gather context (codebase, prior designs, user goal), determine mode (Startup vs Builder). See `references/preamble.md`, `references/preamble-office-hours.md`, `references/phase1-context-gathering.md`
 2. **Discovery** — Startup: six forcing questions with anti-sycophancy. Builder: generative brainstorming. Then landscape check + premise challenge. See `references/phase2a-startup-mode.md`, `references/phase2b-builder-mode.md`, `references/phase2.5-landscape-and-premises.md`
 3. **Alternatives + design doc** — generate 2-3 approaches, synthesize founder signals, write design doc, run spec review loop. See `references/phase4-alternatives-and-sketch.md`, `references/phase4.5-signals-and-design-doc.md`
 4. **Handoff** — three-beat closing, next-skill recommendations. See `references/phase6-handoff.md`, `references/important-rules.md`
 
 ## References
 
-- `references/preamble.md` — Preamble bash, upgrade handling, lake intro, telemetry prompt, browse setup
+- `references/preamble.md` — Preamble bash, upgrade handling, lake intro, telemetry prompt
+- `references/preamble-office-hours.md` — Browse setup check, loaded with the preamble
 - `references/shared-protocols.md` — user question format, Completeness Principle, Repo Ownership, Search Before Building, Completion Status Protocol, Telemetry, Plan Status Footer
 - `references/phase1-context-gathering.md` — Context gathering, mode selection, product stage assessment
 - `references/phase2a-startup-mode.md` — Startup mode operating principles, response posture, anti-sycophancy rules, pushback patterns, six forcing questions with smart routing

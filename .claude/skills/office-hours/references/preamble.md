@@ -1,12 +1,4 @@
-# Preamble & Setup
-
-
-## Contents
-
-- [Preamble (run first)](#preamble-run-first)
-- [SETUP (run this check BEFORE any browse command)](#setup-run-this-check-before-any-browse-command)
-
-## Preamble (run first)
+# Preamble (run first)
 
 ```bash
 mkdir -p .meowkit/state/sessions
@@ -29,9 +21,11 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p .meowkit/telemetry
-echo '{"skill":"office-hours","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"SKILL_NAME","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> .meowkit/telemetry/skill-usage.jsonl 2>/dev/null || true
 # zsh-compatible: use find instead of glob to avoid NOMATCH error
 ```
+
+Before running the block, replace `SKILL_NAME` with the `name:` from the loading skill's SKILL.md frontmatter, without the `mk:` prefix.
 
 If `PROACTIVE` is `"false"`, do not proactively suggest skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
@@ -80,20 +74,3 @@ touch .meowkit/state/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
-
-## SETUP (run this check BEFORE any browser command)
-
-```bash
-if command -v agent-browser >/dev/null 2>&1; then
-  echo "READY: $(command -v agent-browser)"
-elif command -v npx >/dev/null 2>&1 && npx --no-install agent-browser --version >/dev/null 2>&1; then
-  echo "READY: npx agent-browser"
-else
-  echo "NEEDS_SETUP"
-fi
-```
-
-If `NEEDS_SETUP`:
-1. Tell the user: "The agent-browser CLI is not installed. OK to install it now?" Then STOP and wait.
-2. Run: `npm i -g agent-browser` (or `brew install agent-browser`, or `cargo install agent-browser`).
-3. After install, run `agent-browser install` once to download Chrome.
