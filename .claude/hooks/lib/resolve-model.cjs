@@ -19,6 +19,39 @@ const UNKNOWN = 'unknown';
 
 const sanitize = (value) => String(value || '').replace(/[^a-zA-Z0-9._-]/g, '');
 
+/**
+ * Environment variables that may name the model, in precedence order. The hint
+ * comes first because the user sets it on purpose; the host and vendor variables
+ * can be stale shell exports. Session-start detection and end-of-session
+ * resolution both read this one list, so they cannot disagree.
+ */
+const ENV_MODEL_VARS = ['MEOWKIT_MODEL_HINT', 'CLAUDE_MODEL', 'CLAUDE_MODEL_ID', 'ANTHROPIC_MODEL'];
+
+/** Non-empty `[name, value]` pairs from ENV_MODEL_VARS, in precedence order. */
+function envModelCandidates(env = process.env) {
+  // Each name is read literally so the env-read scan can bind it to this file.
+  const values = {
+    MEOWKIT_MODEL_HINT: env.MEOWKIT_MODEL_HINT,
+    CLAUDE_MODEL: env.CLAUDE_MODEL,
+    CLAUDE_MODEL_ID: env.CLAUDE_MODEL_ID,
+    ANTHROPIC_MODEL: env.ANTHROPIC_MODEL,
+  };
+  return ENV_MODEL_VARS.filter((k) => values[k]).map((k) => [k, String(values[k])]);
+}
+
+/**
+ * The host of `ANTHROPIC_BASE_URL` when it points somewhere other than Anthropic,
+ * else ''. Such an endpoint may serve its own model under a Claude model name, so
+ * the name says nothing about the model's tier.
+ */
+function thirdPartyEndpoint(env = process.env) {
+  const raw = env.ANTHROPIC_BASE_URL;
+  if (!raw) return '';
+  let host;
+  try { host = new URL(raw).hostname.toLowerCase(); } catch { return 'unparseable-base-url'; }
+  return host === 'anthropic.com' || host.endsWith('.anthropic.com') ? '' : host;
+}
+
 function fromArtifact(root) {
   const file = sessionStateFile(ARTIFACT_BASENAME, root);
   let content;
@@ -47,9 +80,10 @@ function resolveModel({ root = process.cwd(), env = process.env, warn = (m) => p
     model = '';
   }
   if (!model) {
-    model = sanitize(env.MEOWKIT_MODEL_HINT || env.CLAUDE_MODEL || env.ANTHROPIC_MODEL || UNKNOWN);
+    const first = envModelCandidates(env)[0];
+    model = sanitize(first ? first[1] : UNKNOWN);
   }
   return model || UNKNOWN;
 }
 
-module.exports = { resolveModel, UNKNOWN };
+module.exports = { resolveModel, envModelCandidates, thirdPartyEndpoint, ENV_MODEL_VARS, UNKNOWN };

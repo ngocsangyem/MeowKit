@@ -171,7 +171,7 @@ pub const SHARED: Target = Target {
 /// Pi as the only reader of `.agents/skills`.
 pub const PI: Target = Target {
     // "`/skill:name` forces loading":
-    // https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/skills.md
+    // https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/skills.md
     invocation: Invocation::Sigil("/skill:"),
     host_name: "Pi",
     host_word: "pi",

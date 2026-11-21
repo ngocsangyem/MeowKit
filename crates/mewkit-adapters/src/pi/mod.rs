@@ -55,7 +55,7 @@ impl Emitter for Pi {
         let spec = agents_tree::spec(Runtime::Pi, req.placement);
         let mut plan = agents_tree::plan(req, spec)?;
         plan.ops.extend(agents_tree::overlay_files(req, OVERLAY)?);
-        // https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/security.md
+        // https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/security.md
         plan.notices.push(
             "Pi loads .pi/extensions and the project's .agents/skills only after you trust this project: answer its prompt, or /trust in Pi".into(),
         );

@@ -90,6 +90,7 @@ test('the environment chain is ordered hint, then host, then vendor', () => {
 	const root = projectWith(undefined);
 	assert.equal(resolve(root, { MEOWKIT_MODEL_HINT: 'a', CLAUDE_MODEL: 'b', ANTHROPIC_MODEL: 'c' }), 'a');
 	assert.equal(resolve(root, { CLAUDE_MODEL: 'b', ANTHROPIC_MODEL: 'c' }), 'b');
+	assert.equal(resolve(root, { CLAUDE_MODEL_ID: 'd', ANTHROPIC_MODEL: 'c' }), 'd');
 	assert.equal(resolve(root, { ANTHROPIC_MODEL: 'c' }), 'c');
 });
 
@@ -115,8 +116,54 @@ test('the density script and the model detector return the same density for ever
 		const fromScript = execFileSync('bash', [script, '--model', id], { env, encoding: 'utf8' }).trim();
 		const saved = {};
 		const state = { save: (_name, data) => Object.assign(saved, data), load: () => null };
-		detector({ model: id, root: projectWith() }, state);
+		detector({ model: id, root: projectWith(), env: {} }, state);
 		assert.equal(fromScript, expected, `script, ${id}`);
 		assert.equal(saved.density, expected, `detector, ${id}`);
 	}
+});
+
+/** Run the session-start detector against an explicit env; returns [saved, stdout]. */
+function detect(ctx) {
+	const detector = require('../handlers/model-detector.cjs');
+	const saved = {};
+	const state = { save: (_name, data) => Object.assign(saved, data), load: () => null };
+	const out = detector({ root: projectWith(), env: {}, ...ctx }, state);
+	return [saved, out];
+}
+
+test('detection and resolution read the environment in the same order', () => {
+	const env = { MEOWKIT_MODEL_HINT: 'claude-haiku-4-5', CLAUDE_MODEL: 'claude-opus-4-7', ANTHROPIC_MODEL: 'claude-sonnet-4-6' };
+	const [saved] = detect({ env });
+	assert.equal(saved.model_id, resolve(projectWith(undefined), env));
+	assert.equal(saved.tier, 'TRIVIAL');
+});
+
+test('with no model on stdin, a vendor variable still identifies the model', () => {
+	const [saved] = detect({ env: { ANTHROPIC_MODEL: 'claude-opus-5-5' } });
+	assert.equal(saved.tier, 'COMPLEX');
+	assert.equal(saved.confidence, 'env_ANTHROPIC_MODEL');
+});
+
+test('a Claude model name behind a non-Anthropic endpoint is not trusted', () => {
+	const [saved, out] = detect({ model: 'claude-opus-4-7', env: { ANTHROPIC_BASE_URL: 'https://api.deepseek.com/anthropic' } });
+	assert.equal(saved.tier, 'STANDARD');
+	assert.equal(saved.density, 'FULL');
+	assert.equal(saved.confidence, 'third_party_endpoint');
+	assert.match(out, /api\.deepseek\.com/);
+});
+
+test('an Anthropic base URL keeps normal detection', () => {
+	const [saved] = detect({ model: 'claude-opus-4-7', env: { ANTHROPIC_BASE_URL: 'https://api.anthropic.com' } });
+	assert.equal(saved.tier, 'COMPLEX');
+});
+
+test('the cost estimate prices a tool result at the input rate', () => {
+	const tracker = require('../handlers/budget-tracker.cjs');
+	const store = {};
+	const state = { load: (k) => store[k] ?? (k === 'detected-model' ? { tier: 'STANDARD' } : null), save: (k, v) => { store[k] = v; } };
+	// 4,000,000 characters of tool output ≈ 1M tokens read back: $3 at the STANDARD input rate.
+	tracker({ root: projectWith(), tool_input: '', tool_response: 'x'.repeat(4_000_000) }, state);
+	assert.equal(store['budget-state'].estimated_input_tokens, 1_000_000);
+	assert.equal(store['budget-state'].estimated_output_tokens, 0);
+	assert.equal(store['budget-state'].estimated_cost_usd, 3);
 });
